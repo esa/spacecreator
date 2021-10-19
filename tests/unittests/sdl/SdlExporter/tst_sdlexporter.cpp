@@ -292,7 +292,55 @@ void tst_sdlmodel::testGenerateProcessWithTasksVariablesAndParameters()
 
 void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
 {
-    // TODO
+    QString modelName = "LabelAndJoin";
+    QString modelPrefix = "Sdl_";
+    QString processName = "ExampleProcess";
+
+    auto transition1 = SdlTransitionBuilder().withNextStateAction().build();
+    auto state1 = SdlStateBuilder("Idle").withInput(SdlInputBuilder("sigReset", transition1.get()).build()).build();
+
+    auto process = SdlProcessBuilder(processName)
+                           .withStateMachine(SdlStateMachineBuilder()
+                                                     .withState(std::move(state1))
+                                                     .withTransition(std::move(transition1))
+                                                     .build())
+                           .build();
+
+    // clang-format off
+    const auto exampleModel = SdlModelBuilder(modelName)
+        .withProcess(
+            std::move(process)
+        ).build();
+    // clang-format on
+
+    Options options;
+    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+
+    SdlExporter exporter;
+    try {
+        exporter.exportModel(exampleModel.get(), options);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+
+    QString filename = QString("%1%2.%3").arg(modelPrefix, modelName, "pr");
+    QFile outputFile(filename);
+    if (!outputFile.open(QIODevice::ReadOnly)) {
+        QFAIL("requested file cannot be found");
+    }
+    QTextStream consumableOutput(&outputFile);
+    std::vector<QString> expectedOutput = {
+        "process ExampleProcess;",
+        "START;",
+        "fromStart:",
+        "NEXTSTATE Idle;",
+        "state Idle;",
+        "input sigReset;",
+        "join fromStart;"
+        "endstate;",
+        "endprocess ExampleProcess;",
+    };
+    checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
 } // namespace tests::sdl
