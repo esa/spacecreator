@@ -26,9 +26,4 @@ Action::Action(QString name)
 {
 }
 
-void Action::setLabel(std::unique_ptr<Label> label)
-{
-    m_label = std::move(label);
-}
-
 } // namespace sdl

@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "node.h"
+#include "action.h"
 
 #include <QString>
 
@@ -27,10 +27,8 @@ namespace sdl {
 
 /**
  * @brief   Represents a label in SDL model.
- *
- * Action can contain a Label
  */
-class Label final : public Node
+class Label final : public Action
 {
 public:
     /**

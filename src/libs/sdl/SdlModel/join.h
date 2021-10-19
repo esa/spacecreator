@@ -20,6 +20,7 @@
 #pragma once
 
 #include "action.h"
+#include "label.h"
 
 #include <QString>
 

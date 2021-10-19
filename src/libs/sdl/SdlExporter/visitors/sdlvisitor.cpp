@@ -142,8 +142,8 @@ void SdlVisitor::visit(const VariableDeclaration &declaration) const
 void SdlVisitor::visit(const Label &label) const
 {
     // write some dummy CIF
-    m_stream << "        /* CIF task (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
-    m_stream << "        " << label.name() << ";\n";
+    m_stream << "        /* CIF label (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "        " << label.name() << ":\n";
 }
 
 void SdlVisitor::visit(const Join &join) const
