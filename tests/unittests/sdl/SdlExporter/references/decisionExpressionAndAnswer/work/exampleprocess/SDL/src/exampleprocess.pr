@@ -1,0 +1,31 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Exampleprocess;
+    /* CIF TEXT (564, 198), (118, 45) */
+    dcl x MyInteger;
+    /* CIF ENDTEXT */
+    /* CIF START (412, 76), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (412, 131), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (412, 131), (70, 35) */
+    state Wait;
+        /* CIF input (390, 186), (111, 35) */
+        input startProcess(x);
+            /* CIF decision (388, 241), (115, 50) */
+            decision x;
+                /* CIF ANSWER (313, 311), (70, 24) */
+                (0):
+                    /* CIF NEXTSTATE (313, 355), (70, 35) */
+                    NEXTSTATE -;
+                /* CIF ANSWER (585, 323), (77, 24) */
+                (>0):
+                    /* CIF output (526, 367), (194, 35) */
+                    output sendOutput(x);
+                    /* CIF NEXTSTATE (588, 422), (70, 35) */
+                    NEXTSTATE -;
+            enddecision;
+    endstate;
+    /* CIF state (552, 86), (70, 35) */
+    state Wait;
+    endstate;
+endprocess Exampleprocess;
