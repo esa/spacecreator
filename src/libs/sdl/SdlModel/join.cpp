@@ -23,7 +23,7 @@
 
 namespace sdl {
 
-Label *Join::label()
+Label *Join::label() const
 {
     return m_label;
 }

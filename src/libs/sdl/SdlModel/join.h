@@ -63,7 +63,7 @@ public:
      *
      * @return  label
      */
-    auto label() -> Label *;
+    auto label() const -> Label *;
 
     /**
      * @brief   Setter for label
