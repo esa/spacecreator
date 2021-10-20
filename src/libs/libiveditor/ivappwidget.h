@@ -32,6 +32,7 @@ namespace ive {
 class GraphicsView;
 class InterfaceDocument;
 class IVCreatorTool;
+class IVEditorCore;
 
 /*!
    The main widget including all of the IV editor UI
@@ -41,7 +42,7 @@ class IVAppWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit IVAppWidget(InterfaceDocument *doc, QWidget *parent = nullptr);
+    explicit IVAppWidget(IVEditorCore *core, QWidget *parent = nullptr);
     ~IVAppWidget();
 
     GraphicsView *graphicsView() const;
@@ -68,6 +69,7 @@ private:
     void initSharedView();
 
     QVector<QAction *> initActions();
+    QVector<QAction *> initViewActions();
 
     Ui::IVAppWidget *ui = nullptr;
     IVCreatorTool *m_tool { nullptr };
@@ -77,8 +79,11 @@ private:
     QAction *m_actZoomOut { nullptr };
     QAction *m_actExitToRoot { nullptr };
     QAction *m_actExitToParent { nullptr };
-    QVector<QAction *> m_toolbarActions;
 
+    QVector<QAction *> m_toolbarActions;
+    QVector<QAction *> m_viewActions;
+
+    QPointer<IVEditorCore> m_ivCore;
     QPointer<InterfaceDocument> m_document;
 };
 

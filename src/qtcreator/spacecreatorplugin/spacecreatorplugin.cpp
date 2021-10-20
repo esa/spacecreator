@@ -129,16 +129,9 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
             m_showMinimapAction, Constants::SHOW_MINIMAP_ID, Core::Context(Core::Constants::C_EDIT_MODE));
     connect(m_showMinimapAction, &QAction::triggered, this, &SpaceCreatorPlugin::setMinimapVisible);
 
-    m_showE2EDataflow =
-            new QAction(QIcon(QLatin1String(":/toolbar/icns/end_to_end.png")), tr("Show end to end dataflow"), this);
-    Core::Command *showE2ECmd = Core::ActionManager::registerAction(
-            m_showE2EDataflow, Constants::SHOW_E2E_ID, Core::Context(Core::Constants::C_EDIT_MODE));
-    connect(m_showE2EDataflow, &QAction::triggered, this, &SpaceCreatorPlugin::showE2EDataflow);
-
     Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::MENU_ID);
     menu->menu()->setTitle(tr("SpaceCreator"));
     menu->addAction(showMinimapCmd);
-    menu->addAction(showE2ECmd);
     menu->addSeparator();
     menu->addAction(messageDeclCmd);
     menu->addAction(checkInstancesCmd);
@@ -148,38 +141,10 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     menu->addAction(checkDVMessagesCmd);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
-    // IV
-    m_actionSaveSceneRender =
-            new QAction(QIcon(QLatin1String(":/toolbar/icns/render.svg")), tr("Render Scene..."), this);
-    Core::Command *renderCmd = Core::ActionManager::registerAction(m_actionSaveSceneRender, Constants::IV_RENDER_ID);
-    ive::ActionsManager::registerAction(
-            Q_FUNC_INFO, m_actionSaveSceneRender, "Render", "Save current scene complete render.");
-    connect(m_actionSaveSceneRender, &QAction::triggered, this, []() {
-        if (auto ivEditor = qobject_cast<spctr::IVQtCEditor *>(Core::EditorManager::currentEditor())) {
-            ivEditor->ivPlugin()->onSaveRenderRequested();
-        }
-    });
-
-    m_exportSelectedIV =
-            new QAction(QIcon(QLatin1String(":/toolbar/icns/export_selected.svg")), tr("Export selected entity"), this);
-    Core::Command *exportElectedCmd = Core::ActionManager::registerAction(
-            m_exportSelectedIV, Constants::IV_EXPORT_SELECTED_ID, Core::Context(Core::Constants::C_EDIT_MODE));
-    connect(m_exportSelectedIV, &QAction::triggered, this, &SpaceCreatorPlugin::exportSelectedIV);
-
-    m_exportIVType = new QAction(
-            QIcon(QLatin1String(":/toolbar/icns/export_component_type.svg")), tr("Export component type"), this);
-    Core::Command *exporttypeCmd = Core::ActionManager::registerAction(
-            m_exportIVType, Constants::IV_EXPORT_IV_TYPE_ID, Core::Context(Core::Constants::C_EDIT_MODE));
-    connect(m_exportIVType, &QAction::triggered, this, &SpaceCreatorPlugin::exportComponentType);
-
     connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged, this,
             &spctr::SpaceCreatorPlugin::updateActions);
     updateActions();
 
-    menu->addSeparator();
-    menu->addAction(renderCmd);
-    menu->addAction(exportElectedCmd);
-    menu->addAction(exporttypeCmd);
     menu->menu()->setEnabled(true);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
@@ -197,10 +162,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     QList<QAction *> mscActions;
     mscActions << m_showMinimapAction << m_checkInstancesAction << m_checkMessagesAction;
     m_mscFactory = new MscEditorFactory(m_projectsManager, mscActions, this);
-    QList<QAction *> ivActions;
-    ivActions << m_showMinimapAction << m_showE2EDataflow << m_exportSelectedIV << m_exportIVType
-              << m_actionSaveSceneRender;
-    m_ivFactory = new IVEditorFactory(m_projectsManager, ivActions, this);
+    m_ivFactory = new IVEditorFactory(m_projectsManager, this);
     QList<QAction *> dvActions;
     dvActions << m_checkDvFunctionsAction << m_checkDvMessagesAction;
     m_dvFactory = new DVEditorFactory(m_projectsManager, dvActions, this);
@@ -238,37 +200,6 @@ void SpaceCreatorPlugin::showMessageDeclarations()
 void SpaceCreatorPlugin::setMinimapVisible(bool visible)
 {
     m_mscFactory->editorData()->setMinimapVisible(visible);
-    m_ivFactory->editorData()->showMinimap(visible);
-}
-
-void SpaceCreatorPlugin::showE2EDataflow()
-{
-    if (auto ivEditor = qobject_cast<spctr::IVQtCEditor *>(Core::EditorManager::currentEditor())) {
-        SpaceCreatorProjectImpl *project = m_projectsManager->project(ivEditor->ivPlugin());
-        if (project) {
-            ivEditor->showE2EDataflow(project->allMscFiles());
-        }
-    }
-}
-
-void SpaceCreatorPlugin::exportSelectedIV()
-{
-    if (auto ivEditor = qobject_cast<spctr::IVQtCEditor *>(Core::EditorManager::currentEditor())) {
-        SpaceCreatorProjectImpl *project = m_projectsManager->project(ivEditor->ivPlugin());
-        if (project) {
-            ivEditor->ivPlugin()->document()->exportSelectedFunctions();
-        }
-    }
-}
-
-void SpaceCreatorPlugin::exportComponentType()
-{
-    if (auto ivEditor = qobject_cast<spctr::IVQtCEditor *>(Core::EditorManager::currentEditor())) {
-        SpaceCreatorProjectImpl *project = m_projectsManager->project(ivEditor->ivPlugin());
-        if (project) {
-            ivEditor->ivPlugin()->document()->exportSelectedType();
-        }
-    }
 }
 
 /*!
@@ -284,11 +215,7 @@ void SpaceCreatorPlugin::updateActions()
         isIV = editor->document()->filePath().toString().endsWith("interfaceview.xml", Qt::CaseInsensitive);
     }
     m_messageDeclarationAction->setEnabled(isMsc);
-    m_actionSaveSceneRender->setEnabled(isIV);
     m_showMinimapAction->setEnabled(isIV || isMsc);
-    m_showE2EDataflow->setEnabled(isIV);
-    m_exportSelectedIV->setEnabled(isIV);
-    m_exportIVType->setEnabled(isIV);
 }
 
 void SpaceCreatorPlugin::checkInstancesForCurrentEditor()

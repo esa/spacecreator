@@ -27,10 +27,9 @@
 
 namespace spctr {
 
-IVEditorFactory::IVEditorFactory(
-        SpaceCreatorProjectManager *projectManager, const QList<QAction *> &ivActions, QObject *parent)
+IVEditorFactory::IVEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent)
     : IEditorFactory()
-    , m_editorData(new IVEditorData(projectManager, ivActions))
+    , m_editorData(new IVEditorData(projectManager))
 {
     setId(spctr::Constants::K_IV_EDITOR_ID);
     setDisplayName(QCoreApplication::translate("IV Editor", spctr::Constants::C_IVEDITOR_DISPLAY_NAME));

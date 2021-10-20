@@ -40,7 +40,7 @@ class IVQtCEditor : public Core::IEditor
     Q_OBJECT
 
 public:
-    IVQtCEditor(SpaceCreatorProjectManager *projectManager, const QList<QAction *> &ivActions);
+    IVQtCEditor(SpaceCreatorProjectManager *projectManager);
     ~IVQtCEditor();
 
     Core::IDocument *document() const override;
@@ -50,6 +50,7 @@ public:
     QWidget *toolBar() override;
 
 public Q_SLOTS:
+    void showCurrentE2EDataflow();
     void showE2EDataflow(const QStringList &mscFiles);
 
 private:
@@ -58,7 +59,6 @@ private:
     IVMainWidget *m_editorWidget = nullptr;
     QPointer<ive::EndToEndView> m_endToEndView;
     QPointer<SpaceCreatorProjectManager> m_projectManager;
-    QList<QAction *> m_globalToolbarActions;
 };
 
 }

@@ -38,6 +38,9 @@ public:
 
     IVEditorCorePtr ivPlugin() const;
 
+Q_SIGNALS:
+    void requestE2EDataflow();
+
 public Q_SLOTS:
     void setMinimapVisible(bool visible);
 

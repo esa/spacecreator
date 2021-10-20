@@ -35,12 +35,10 @@
 
 namespace spctr {
 
-IVEditorData::IVEditorData(
-        SpaceCreatorProjectManager *projectManager, const QList<QAction *> &ivActions, QObject *parent)
+IVEditorData::IVEditorData(SpaceCreatorProjectManager *projectManager, QObject *parent)
     : QObject(parent)
     , m_undoGroup(new QUndoGroup(this))
     , m_projectManager(projectManager)
-    , m_ivActions(ivActions)
 {
     Core::Context contexts;
     contexts.add(spctr::Constants::K_IV_EDITOR_ID);
@@ -73,28 +71,8 @@ IVEditorData::~IVEditorData()
 
 Core::IEditor *IVEditorData::createEditor()
 {
-    auto *ivEditor = new IVQtCEditor(m_projectManager, m_ivActions);
-
-    connect(ivEditor->ivDocument(), &spctr::IVEditorDocument::ivDataLoaded, this,
-            [this](const QString &fileName, IVEditorCorePtr data) {
-                data->minimapView()->setVisible(m_minimapVisible);
-                m_undoGroup->addStack(data->undoStack());
-            });
-
+    auto *ivEditor = new IVQtCEditor(m_projectManager);
     return ivEditor;
-}
-
-void IVEditorData::showMinimap(bool visible)
-{
-    m_minimapVisible = visible;
-
-    for (auto openedDocument : Core::DocumentModel::openedDocuments()) {
-        if (auto document = qobject_cast<spctr::IVEditorDocument *>(openedDocument)) {
-            if (document->ivEditorCore()) {
-                document->ivEditorCore()->minimapView()->setVisible(visible);
-            }
-        }
-    }
 }
 
 void IVEditorData::onCurrentEditorChanged(Core::IEditor *editor)

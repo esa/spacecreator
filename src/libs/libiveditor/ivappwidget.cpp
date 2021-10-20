@@ -28,6 +28,7 @@
 #include "itemeditor/ivfunctiongraphicsitem.h"
 #include "itemeditor/ivitemmodel.h"
 #include "ivcreatortool.h"
+#include "iveditorcore.h"
 #include "ivexporter.h"
 #include "ivvisualizationmodelbase.h"
 #include "properties/ivpropertiesdialog.h"
@@ -45,10 +46,11 @@
 
 namespace ive {
 
-IVAppWidget::IVAppWidget(InterfaceDocument *doc, QWidget *parent)
+IVAppWidget::IVAppWidget(IVEditorCore *core, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::IVAppWidget)
-    , m_document(doc)
+    , m_ivCore(core)
+    , m_document(core->document())
 {
     ui->setupUi(this);
 
@@ -64,6 +66,10 @@ IVAppWidget::IVAppWidget(InterfaceDocument *doc, QWidget *parent)
 
     QTimer::singleShot(0, this, [&]() {
         for (QAction *action : initActions()) {
+            ui->toolBar->addAction(action);
+        }
+        ui->toolBar->addSeparator();
+        for (QAction *action : initViewActions()) {
             ui->toolBar->addAction(action);
         }
     });
@@ -491,6 +497,27 @@ QVector<QAction *> IVAppWidget::initActions()
                 m_actCreateConnectionGroup->setEnabled(it != std::cend(idxs));
             });
     return m_toolbarActions;
+}
+
+QVector<QAction *> IVAppWidget::initViewActions()
+{
+    if (!m_viewActions.isEmpty() || !m_ivCore) {
+        return m_viewActions;
+    }
+
+    m_viewActions.append(m_ivCore->actionToggleMinimap());
+    m_viewActions.append(m_ivCore->actionToggleE2EView());
+    m_viewActions.append(m_ivCore->actionExportFunctions());
+    m_viewActions.append(m_ivCore->actionExportType());
+
+    auto actionSaveSceneRender =
+            new QAction(QIcon(QLatin1String(":/toolbar/icns/render.svg")), tr("Render Scene..."), this);
+    ive::ActionsManager::registerAction(
+            Q_FUNC_INFO, actionSaveSceneRender, "Render", "Save current scene complete render.");
+    connect(actionSaveSceneRender, &QAction::triggered, this, [this]() { m_ivCore->onSaveRenderRequested(); });
+    m_viewActions.append(actionSaveSceneRender);
+
+    return m_viewActions;
 }
 
 } // namespace ive

@@ -93,7 +93,7 @@ shared::ui::GraphicsViewBase *IVEditorCore::chartView()
 QWidget *IVEditorCore::mainwidget()
 {
     if (!m_mainWidget) {
-        m_mainWidget = new IVAppWidget(m_document);
+        m_mainWidget = new IVAppWidget(this);
     }
     return m_mainWidget;
 }
@@ -125,7 +125,9 @@ void IVEditorCore::populateCommandLineArguments(shared::CommandLineParser *parse
 QAction *IVEditorCore::actionExportFunctions()
 {
     if (m_actionExportFunctions == nullptr) {
-        m_actionExportFunctions = new QAction(tr("Export selected entity"), this);
+        m_actionExportFunctions =
+                new QAction(QIcon(":/toolbar/icns/export_selected.svg"), tr("Export selected entity"), this);
+        connect(m_actionExportFunctions, &QAction::triggered, m_document, &InterfaceDocument::exportSelectedFunctions);
     }
     return m_actionExportFunctions;
 }
@@ -133,7 +135,9 @@ QAction *IVEditorCore::actionExportFunctions()
 QAction *IVEditorCore::actionExportType()
 {
     if (m_actionExportType == nullptr) {
-        m_actionExportType = new QAction(tr("Export component type"), this);
+        m_actionExportType =
+                new QAction(QIcon(":/toolbar/icns/export_component_type.svg"), tr("Export component type"), this);
+        connect(m_actionExportType, &QAction::triggered, m_document, &InterfaceDocument::exportSelectedType);
     }
     return m_actionExportType;
 }
@@ -141,7 +145,8 @@ QAction *IVEditorCore::actionExportType()
 QAction *IVEditorCore::actionToggleE2EView()
 {
     if (m_actionToggleE2EView == nullptr) {
-        m_actionToggleE2EView = new QAction(tr("&Show end to end dataflow"), this);
+        m_actionToggleE2EView =
+                new QAction(QIcon(QIcon(":/toolbar/icns/end_to_end.png")), tr("Show end to end dataflow"), this);
         m_actionToggleE2EView->setCheckable(true);
     }
     return m_actionToggleE2EView;
@@ -489,7 +494,7 @@ void IVEditorCore::onSaveRenderRequested()
     dialog.setDefaultSuffix(".png");
     if (dialog.exec() == QDialog::Accepted) {
         const QString fileName = dialog.selectedUrls().value(0).toLocalFile();
-        //        saveSceneRender(fileName);
+        saveSceneRender(fileName);
     }
 }
 

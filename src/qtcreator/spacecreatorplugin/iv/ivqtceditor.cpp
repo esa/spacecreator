@@ -26,27 +26,29 @@
 #include "mainmodel.h"
 #include "msceditorcore.h"
 #include "spacecreatorpluginconstants.h"
+#include "spacecreatorprojectimpl.h"
 #include "spacecreatorprojectmanager.h"
 
 #include <QFileInfo>
 #include <QToolBar>
 #include <QUndoCommand>
+#include <editormanager/editormanager.h>
 #include <utils/qtcassert.h>
 
 namespace spctr {
 
-IVQtCEditor::IVQtCEditor(SpaceCreatorProjectManager *projectManager, const QList<QAction *> &ivActions)
+IVQtCEditor::IVQtCEditor(SpaceCreatorProjectManager *projectManager)
     : Core::IEditor()
     , m_document(new IVEditorDocument(projectManager, this))
     , m_editorWidget(new IVMainWidget)
     , m_projectManager(projectManager)
-    , m_globalToolbarActions(ivActions)
 {
     setContext(Core::Context(spctr::Constants::K_IV_EDITOR_ID));
     setWidget(m_editorWidget);
 
     connect(m_document, &spctr::IVEditorDocument::ivDataLoaded, this,
             [this](const QString &, IVEditorCorePtr data) { m_editorWidget->init(data); });
+    connect(m_editorWidget, &IVMainWidget::requestE2EDataflow, this, &IVQtCEditor::showCurrentE2EDataflow);
 }
 
 IVQtCEditor::~IVQtCEditor()
@@ -76,13 +78,19 @@ QWidget *IVQtCEditor::toolBar()
         m_toolbar = new QToolBar;
         m_toolbar->addAction(ivCore->actionUndo());
         m_toolbar->addAction(ivCore->actionRedo());
-        m_toolbar->addSeparator();
-        for (QAction *action : qAsConst(m_globalToolbarActions)) {
-            m_toolbar->addAction(action);
-        }
     }
 
     return m_toolbar;
+}
+
+void IVQtCEditor::showCurrentE2EDataflow()
+{
+    if (auto ivEditor = qobject_cast<spctr::IVQtCEditor *>(Core::EditorManager::currentEditor())) {
+        SpaceCreatorProjectImpl *project = m_projectManager->project(ivEditor->ivPlugin());
+        if (project) {
+            ivEditor->showE2EDataflow(project->allMscFiles());
+        }
+    }
 }
 
 void IVQtCEditor::showE2EDataflow(const QStringList &mscFiles)

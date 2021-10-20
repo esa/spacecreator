@@ -37,13 +37,10 @@ class IVEditorData : public QObject
 {
     Q_OBJECT
 public:
-    IVEditorData(
-            SpaceCreatorProjectManager *projectManager, const QList<QAction *> &ivActions, QObject *parent = nullptr);
+    IVEditorData(SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
     ~IVEditorData() override;
 
     Core::IEditor *createEditor();
-
-    void showMinimap(bool visible);
 
     IVEditorCorePtr ivPlugin(const QString &fileName);
 
@@ -54,10 +51,7 @@ private:
     MscContext *m_context = nullptr;
     QUndoGroup *m_undoGroup = nullptr;
 
-    bool m_minimapVisible = false;
-
     QPointer<SpaceCreatorProjectManager> m_projectManager;
-    QList<QAction *> m_ivActions;
 };
 
 }

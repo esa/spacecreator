@@ -81,8 +81,6 @@ MainWindow::MainWindow(ive::IVEditorCore *core, QWidget *parent)
     connect(m_core->actionSaveFile(), &QAction::triggered, this, [=]() { exportXml(); });
     connect(m_core->actionSaveFileAs(), &QAction::triggered, this, [=]() { exportXmlAs(); });
     connect(m_core->actionQuit(), &QAction::triggered, this, &MainWindow::onQuitRequested);
-    connect(m_core->actionExportFunctions(), &QAction::triggered, this, &MainWindow::onExportFunctionsRequested);
-    connect(m_core->actionExportType(), &QAction::triggered, this, &MainWindow::onExportTypeRequested);
 
     // Register the actions to the action manager
     ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionNewFile(), "Create file", "Create new empty file");
@@ -175,16 +173,6 @@ void MainWindow::onCreateFileRequested()
     if (closeFile()) {
         m_core->document()->create();
     }
-}
-
-void MainWindow::onExportFunctionsRequested()
-{
-    m_core->document()->exportSelectedFunctions();
-}
-
-void MainWindow::onExportTypeRequested()
-{
-    m_core->document()->exportSelectedType();
 }
 
 /*!
