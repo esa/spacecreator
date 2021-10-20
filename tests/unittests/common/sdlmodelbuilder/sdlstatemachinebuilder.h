@@ -34,7 +34,7 @@ namespace tests::common {
 class SdlStateMachineBuilder final
 {
 public:
-    explicit SdlStateMachineBuilder();
+    SdlStateMachineBuilder();
 
     auto build() -> std::unique_ptr<StateMachine>;
 

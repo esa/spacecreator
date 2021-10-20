@@ -29,7 +29,7 @@ namespace tests::common {
 class SdlTaskBuilder final
 {
 public:
-    explicit SdlTaskBuilder();
+    SdlTaskBuilder();
 
     auto build() -> std::unique_ptr<Task>;
 

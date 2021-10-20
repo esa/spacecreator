@@ -87,19 +87,16 @@ void SdlVisitor::visit(const Input &input) const
     m_stream << "        input " << input.name();
 
     const auto &inputParameters = input.parameters();
-    const size_t numOfInputParameters = inputParameters.size();
+    const auto numOfInputParameters = inputParameters.size();
 
     if (numOfInputParameters > 0) {
         m_stream << "(";
-    }
-    for (size_t i = 0; i < numOfInputParameters; i++) {
-        const auto parameter = inputParameters[i];
-        m_stream << parameter->declaration()->name();
-        if (i != numOfInputParameters - 1) {
-            m_stream << ", ";
-        }
-    }
-    if (numOfInputParameters > 0) {
+
+        QString parameters = std::accumulate(std::next(inputParameters.begin()), inputParameters.end(),
+                inputParameters[0]->declaration()->name(),
+                [](auto &a, auto *b) { return std::move(a) + ", " + b->declaration()->name(); });
+        m_stream << parameters;
+
         m_stream << ")";
     }
     m_stream << ";\n";

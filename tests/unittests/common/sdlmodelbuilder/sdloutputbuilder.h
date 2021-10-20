@@ -33,7 +33,7 @@ namespace tests::common {
 class SdlOutputBuilder final
 {
 public:
-    explicit SdlOutputBuilder();
+    SdlOutputBuilder();
 
     auto build() -> std::unique_ptr<Output>;
 
