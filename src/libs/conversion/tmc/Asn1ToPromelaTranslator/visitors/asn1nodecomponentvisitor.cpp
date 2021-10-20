@@ -56,82 +56,82 @@ using tmc::promela::model::Declaration;
 using tmc::promela::model::Utype;
 
 namespace conversion::tmc::translator {
-Asn1NodeComponentVisitor::Asn1NodeComponentVisitor(::tmc::promela::model::Utype &utype, QString name)
+Asn1NodeComponentVisitor::Asn1NodeComponentVisitor(Utype &utype, QString name)
     : m_utype(utype)
     , m_name(std::move(name))
 {
 }
 
-void Asn1NodeComponentVisitor::visit(const ::Asn1Acn::Types::Boolean &type)
+void Asn1NodeComponentVisitor::visit(const Boolean &type)
 {
     Q_UNUSED(type);
     m_utype.addField(Declaration(DataType(BasicType::BOOLEAN), m_name));
 }
 
-void Asn1NodeComponentVisitor::visit(const ::Asn1Acn::Types::Null &type)
+void Asn1NodeComponentVisitor::visit(const Null &type)
 {
     Q_UNUSED(type);
     m_utype.addField(Declaration(DataType(BasicType::BIT), m_name));
 }
 
-void Asn1NodeComponentVisitor::visit(const ::Asn1Acn::Types::BitString &type)
+void Asn1NodeComponentVisitor::visit(const BitString &type)
 {
     Q_UNUSED(type);
 }
 
-void Asn1NodeComponentVisitor::visit(const ::Asn1Acn::Types::OctetString &type)
+void Asn1NodeComponentVisitor::visit(const OctetString &type)
 {
     Q_UNUSED(type);
 }
 
-void Asn1NodeComponentVisitor::visit(const ::Asn1Acn::Types::IA5String &type)
+void Asn1NodeComponentVisitor::visit(const IA5String &type)
 {
     Q_UNUSED(type);
 }
 
-void Asn1NodeComponentVisitor::visit(const ::Asn1Acn::Types::NumericString &type)
+void Asn1NodeComponentVisitor::visit(const NumericString &type)
 {
     Q_UNUSED(type);
 }
 
-void Asn1NodeComponentVisitor::visit(const ::Asn1Acn::Types::Enumerated &type)
+void Asn1NodeComponentVisitor::visit(const Enumerated &type)
 {
     Q_UNUSED(type);
 }
 
-void Asn1NodeComponentVisitor::visit(const ::Asn1Acn::Types::Choice &type)
+void Asn1NodeComponentVisitor::visit(const Choice &type)
 {
     Q_UNUSED(type);
 }
 
-void Asn1NodeComponentVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
+void Asn1NodeComponentVisitor::visit(const Sequence &type)
 {
     Q_UNUSED(type);
 }
 
-void Asn1NodeComponentVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)
+void Asn1NodeComponentVisitor::visit(const SequenceOf &type)
 {
     Q_UNUSED(type);
 }
 
-void Asn1NodeComponentVisitor::visit(const ::Asn1Acn::Types::Real &type)
+void Asn1NodeComponentVisitor::visit(const Real &type)
 {
     Q_UNUSED(type);
     m_utype.addField(Declaration(DataType(BasicType::FLOAT), m_name));
 }
 
-void Asn1NodeComponentVisitor::visit(const ::Asn1Acn::Types::LabelType &type)
+void Asn1NodeComponentVisitor::visit(const LabelType &type)
 {
     Q_UNUSED(type);
 }
 
-void Asn1NodeComponentVisitor::visit(const ::Asn1Acn::Types::Integer &type)
+void Asn1NodeComponentVisitor::visit(const Integer &type)
 {
     Q_UNUSED(type);
     m_utype.addField(Declaration(DataType(BasicType::INT), m_name));
 }
 
-void Asn1NodeComponentVisitor::visit(const ::Asn1Acn::Types::UserdefinedType &type)
+void Asn1NodeComponentVisitor::visit(const UserdefinedType &type)
 {
     Q_UNUSED(type);
 }
