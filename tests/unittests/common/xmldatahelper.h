@@ -46,8 +46,6 @@ public:
         processXml(xml);
     }
 
-    bool operator==(const XmlData &other) { return other.nodes == nodes; }
-
 private:
     Node parseNode(QXmlStreamReader &xml)
     {
@@ -76,6 +74,13 @@ private:
         }
     }
 
+    friend bool operator==(const XmlData &lhs, const XmlData &rhs);
+
 private:
     QList<Node> nodes;
 };
+
+bool operator==(const XmlData &lhs, const XmlData &rhs)
+{
+    return lhs.nodes == rhs.nodes;
+}
