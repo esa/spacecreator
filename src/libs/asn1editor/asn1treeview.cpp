@@ -220,14 +220,22 @@ void Asn1TreeView::setChildValue(const QStandardItem *rootItem, const QVariant &
         const QVariantList childData = asn1Value.toList();
         for (int idx = 0; idx < rootItem->rowCount(); ++idx) {
             const QString name = rootItem->child(idx, MODEL_NAME_INDEX)->text();
-            auto it = std::find_if(childData.cbegin(), childData.cend(), [name](const QVariant &value) {
-                if (!value.isValid())
-                    return false;
+            QVariant value;
+            if (!name.isEmpty()) {
+                auto it = std::find_if(childData.cbegin(), childData.cend(), [name](const QVariant &value) {
+                    if (!value.isValid())
+                        return false;
 
-                return value.toMap().value(QLatin1String("name")).toString() == name;
-            });
+                    return value.toMap().value(QLatin1String("name")).toString() == name;
+                });
+                if (it != childData.cend()) {
+                    value = *it;
+                }
+            } else {
+                value = childData.value(idx);
+            }
 
-            setChildRowValue(rootItem, idx, it == childData.cend() ? QVariant() : *it);
+            setChildRowValue(rootItem, idx, value);
         }
     }
 }
