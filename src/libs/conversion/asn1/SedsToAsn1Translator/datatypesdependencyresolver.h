@@ -29,9 +29,18 @@ class DataTypeRef;
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Utility used for resolving dependencies in the SEDS types
+ *
+ * SEDS allows to reference a type (in an array or a container) before it's defined.
+ * ASN.1 model on the other hand requires Type object to be passed while creating a UserdefinedType
+ * Because of that we have to sort data types topologically so that we are sure that references in the
+ * compound types are already translated.
+ */
 class DataTypesDependencyResolver final
 {
 private:
+    /// @brief  Type of the mark for the soring
     enum class MarkType
     {
         Temporary,
@@ -43,6 +52,13 @@ private:
     using ResultList = std::list<const seds::model::DataType *>;
 
 public:
+    /**
+     * @brief   Resolve dependencies in given data type set
+     *
+     * @param   dataTypes       Data types to sort
+     *
+     * @return  Sorted list of data types
+     */
     auto resolve(const DataTypes *dataTypes) -> ResultList;
 
 private:
@@ -63,19 +79,42 @@ private:
     ResultList m_result;
 };
 
+/**
+ * @brief   Exception thrown when data types to sort doesn't create a DAG
+ *
+ * Exception for cyclic dependency
+ */
 class NotDAGException final : public std::exception
 {
 public:
+    /**
+     * @brief   Getter for exception message
+     *
+     * @return  Exception message
+     */
     virtual auto what() const noexcept -> const char * override;
 };
 
 class UndeclaredDataTypeException final : public std::exception
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   dataTypeName    Name of the referenced undeclared type
+     */
     UndeclaredDataTypeException(QString dataTypeName);
+    /**
+     * @brief   Getter for exception message
+     *
+     * @return  Exception message
+     */
     virtual auto what() const noexcept -> const char * override;
 
 private:
+    /**
+     * @brief   Exception message
+     */
     std::string m_message;
 };
 
