@@ -30,7 +30,7 @@ void PromelaModel::addMtype(const QString &value)
     m_mtype_values.insert(value);
 }
 
-const QSet<QString> &PromelaModel::getMtypeValues() const
+const QSet<QString> &PromelaModel::getMtypeValues() const noexcept
 {
     return m_mtype_values;
 }
@@ -41,7 +41,7 @@ void PromelaModel::addNamedMtype(const NamedMtype &mtype)
     m_named_m_type_values.emplace(name, mtype);
 }
 
-const std::map<QString, NamedMtype> &PromelaModel::getNamedMtypeValues() const
+const std::map<QString, NamedMtype> &PromelaModel::getNamedMtypeValues() const noexcept
 {
     return m_named_m_type_values;
 }
@@ -51,8 +51,18 @@ void PromelaModel::addUtype(const Utype &utype)
     m_user_types.append(utype);
 }
 
-const QList<Utype> &PromelaModel::getUtypes() const
+const QList<Utype> &PromelaModel::getUtypes() const noexcept
 {
     return m_user_types;
+}
+
+void PromelaModel::addTypeAlias(const TypeAlias &alias)
+{
+    m_type_aliases.append(alias);
+}
+
+const QList<TypeAlias> &PromelaModel::getTypeAliases() const noexcept
+{
+    return m_type_aliases;
 }
 }

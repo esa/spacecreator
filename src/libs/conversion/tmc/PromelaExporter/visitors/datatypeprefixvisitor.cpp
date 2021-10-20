@@ -17,15 +17,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "visitors/datatypeprefixvisitor.h"
+#include "datatypeprefixvisitor.h"
+
+#include "basictypegenerator.h"
+
+using tmc::promela::model::ArrayType;
+using tmc::promela::model::BasicType;
+using tmc::promela::model::DataType;
+using tmc::promela::model::MtypeRef;
+using tmc::promela::model::UnsignedDataType;
+using tmc::promela::model::UtypeRef;
 
 namespace conversion::tmc::exporter {
-using ::tmc::promela::model::ArrayType;
-using ::tmc::promela::model::BasicType;
-using ::tmc::promela::model::DataType;
-using ::tmc::promela::model::MtypeRef;
-using ::tmc::promela::model::UnsignedDataType;
-using ::tmc::promela::model::UtypeRef;
 
 DataTypePrefixVisitor::DataTypePrefixVisitor(QTextStream &stream)
     : m_stream(stream)
@@ -55,32 +58,8 @@ void DataTypePrefixVisitor::operator()(const UnsignedDataType &type)
 
 void DataTypePrefixVisitor::operator()(const BasicType &type)
 {
-    switch (type) {
-    case BasicType::BIT:
-        m_stream << "bit";
-        break;
-    case BasicType::BOOLEAN:
-        m_stream << "bool";
-        break;
-    case BasicType::BYTE:
-        m_stream << "byte";
-        break;
-    case BasicType::PID:
-        m_stream << "pid";
-        break;
-    case BasicType::SHORT:
-        m_stream << "short";
-        break;
-    case BasicType::INT:
-        m_stream << "int";
-        break;
-    case BasicType::FLOAT:
-        m_stream << "float";
-        break;
-    case BasicType::CHAN:
-        m_stream << "chan";
-        break;
-    }
+    BasicTypeGenerator generator(m_stream);
+    generator.generate(type);
 }
 
 void DataTypePrefixVisitor::operator()(const UtypeRef &type)
