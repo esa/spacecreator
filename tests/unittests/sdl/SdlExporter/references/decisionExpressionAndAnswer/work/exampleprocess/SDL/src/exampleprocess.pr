@@ -9,7 +9,7 @@ process Exampleprocess;
         NEXTSTATE Wait;
     /* CIF state (412, 131), (70, 35) */
     state Wait;
-        /* CIF input (390, 186), (111, 35) */
+        /* CIF input (389, 186), (111, 35) */
         input startProcess(x);
             /* CIF decision (388, 241), (115, 50) */
             decision x;
@@ -24,8 +24,5 @@ process Exampleprocess;
                     /* CIF NEXTSTATE (588, 422), (70, 35) */
                     NEXTSTATE -;
             enddecision;
-    endstate;
-    /* CIF state (552, 86), (70, 35) */
-    state Wait;
     endstate;
 endprocess Exampleprocess;
