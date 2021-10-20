@@ -30,6 +30,7 @@
 #include "graphicsviewutils.h"
 #include "interfacedocument.h"
 #include "itemeditor/common/ivutils.h"
+#include "itemeditor/graphicsview.h"
 #include "ivappwidget.h"
 #include "ivconnection.h"
 #include "ivcore/abstractsystemchecks.h"
@@ -85,12 +86,16 @@ InterfaceDocument *IVEditorCore::document() const
 
 shared::ui::GraphicsViewBase *IVEditorCore::chartView()
 {
-    return m_document->graphicsView();
+    mainwidget();
+    return m_mainWidget->graphicsView();
 }
 
 QWidget *IVEditorCore::mainwidget()
 {
-    return m_document->view();
+    if (!m_mainWidget) {
+        m_mainWidget = new IVAppWidget(m_document);
+    }
+    return m_mainWidget;
 }
 
 void IVEditorCore::addToolBars(QMainWindow *window)
@@ -455,7 +460,8 @@ ivm::AbstractSystemChecks *IVEditorCore::dvChecks() const
 
 void IVEditorCore::centerOnView()
 {
-    m_document->view()->centerView();
+    mainwidget();
+    m_mainWidget->centerView();
 }
 
 /*!

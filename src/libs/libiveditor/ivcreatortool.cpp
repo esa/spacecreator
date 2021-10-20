@@ -70,8 +70,8 @@ static const qreal kPreviewItemPenWidth = 2.;
 
 namespace ive {
 
-IVCreatorTool::IVCreatorTool(InterfaceDocument *doc)
-    : shared::ui::CreatorTool(doc->graphicsView(), doc->itemsModel(), doc)
+IVCreatorTool::IVCreatorTool(QGraphicsView *view, InterfaceDocument *doc)
+    : shared::ui::CreatorTool(view, doc->itemsModel(), doc)
     , m_doc(doc)
 {
 }

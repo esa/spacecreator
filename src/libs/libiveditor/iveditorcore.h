@@ -37,6 +37,7 @@ class CommandsStack;
 }
 
 class InterfaceDocument;
+class IVAppWidget;
 
 class IVEditorCore : public shared::EditorCore
 {
@@ -110,6 +111,8 @@ private:
     Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
 
     QPointer<ivm::AbstractSystemChecks> m_checks;
+
+    IVAppWidget *m_mainWidget = nullptr;
 };
 
 }

@@ -21,8 +21,6 @@
 #include "asn1modelstorage.h"
 #include "asn1systemchecks.h"
 #include "colors/colormanagerdialog.h"
-#include "commands/cmdentitiesimport.h"
-#include "commands/cmdentitiesinstantiate.h"
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
@@ -30,10 +28,8 @@
 #include "interface/objectstreeview.h"
 #include "itemeditor/common/ivutils.h"
 #include "itemeditor/graphicsitemhelpers.h"
-#include "itemeditor/graphicsview.h"
 #include "itemeditor/ivfunctiongraphicsitem.h"
 #include "itemeditor/ivitemmodel.h"
-#include "ivappwidget.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
@@ -44,7 +40,6 @@
 #include "ivpropertytemplateconfig.h"
 #include "ivvisualizationmodelbase.h"
 #include "ivxmlreader.h"
-#include "properties/ivpropertiesdialog.h"
 #include "propertytemplatemanager.h"
 #include "propertytemplatewidget.h"
 
@@ -54,6 +49,7 @@
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QDirIterator>
+#include <QGraphicsScene>
 #include <QInputDialog>
 #include <QLabel>
 #include <QLineEdit>
@@ -72,7 +68,6 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
 
     QString filePath;
 
-    IVAppWidget *view = nullptr;
     ivm::IVPropertyTemplateConfig *dynPropConfig { nullptr };
     IVItemModel *itemsModel { nullptr };
     IVVisualizationModelBase *objectsVisualizationModel { nullptr };
@@ -138,20 +133,6 @@ IVExporter *InterfaceDocument::exporter() const
 QGraphicsScene *InterfaceDocument::scene() const
 {
     return itemsModel()->scene();
-}
-
-shared::ui::GraphicsViewBase *InterfaceDocument::graphicsView() const
-{
-    view();
-    return d->view->graphicsView();
-}
-
-IVAppWidget *InterfaceDocument::view() const
-{
-    if (!d->view) {
-        d->view = new IVAppWidget(const_cast<InterfaceDocument *>(this));
-    }
-    return d->view;
 }
 
 QUndoStack *InterfaceDocument::undoStack() const
@@ -220,7 +201,7 @@ bool InterfaceDocument::loadAvailableComponents()
 QString InterfaceDocument::getComponentName(const QStringList &exportNames)
 {
     QString name = exportNames.join(QLatin1Char('_'));
-    auto dialog = new QDialog(qobject_cast<QWidget *>(window()));
+    auto dialog = new QDialog();
     dialog->setWindowTitle(tr("Export"));
     auto layout = new QVBoxLayout;
     layout->addWidget(new QLabel(tr("Enter the name for exporting component:"), dialog));
@@ -267,6 +248,11 @@ QList<shared::VEObject *> InterfaceDocument::prepareSelectedObjectsForExport(QSt
         objects.prepend(dummyFunction);
     }
     return objects;
+}
+
+ivm::IVPropertyTemplateConfig *InterfaceDocument::dynPropConfig() const
+{
+    return d->dynPropConfig;
 }
 
 bool InterfaceDocument::exportSelectedFunctions()
@@ -480,7 +466,6 @@ IVItemModel *InterfaceDocument::itemsModel() const
 {
     if (!d->itemsModel) {
         d->itemsModel = new IVItemModel(d->objectsModel, d->commandsStack, const_cast<InterfaceDocument *>(this));
-        connect(d->itemsModel, &IVItemModel::itemDoubleClicked, this, &InterfaceDocument::onItemDoubleClicked);
         connect(d->itemsModel, &IVItemModel::itemsSelected, this, &InterfaceDocument::onSceneSelectionChanged);
     }
 
@@ -548,9 +533,20 @@ void InterfaceDocument::setAsn1Check(Asn1Acn::Asn1SystemChecks *check)
             &ive::InterfaceDocument::checkAllInterfacesForAsn1Compliance, Qt::QueuedConnection);
 }
 
+Asn1Acn::Asn1SystemChecks *InterfaceDocument::asn1Check() const
+{
+    return d->asnCheck;
+    ;
+}
+
 void InterfaceDocument::setIvCheck(ivm::AbstractSystemChecks *checks)
 {
     d->ivCheck = checks;
+}
+
+ivm::AbstractSystemChecks *InterfaceDocument::ivCheck() const
+{
+    return d->ivCheck;
 }
 
 QString InterfaceDocument::supportedFileExtensions() const
@@ -625,42 +621,11 @@ void InterfaceDocument::setObjects(const QVector<ivm::IVObject *> &objects)
 {
     d->objectsModel->initFromObjects(objects);
     d->objectsModel->setRootObject({});
-    if (d->view) {
-        d->view->centerView();
-    }
-}
-
-void InterfaceDocument::onItemDoubleClicked(const shared::Id &id)
-{
-    if (id.isNull()) {
-        return;
-    }
-
-    if (auto entity = d->objectsModel->getObject(id)) {
-        if (entity->isFunction()) {
-            if (auto fn = entity->as<ivm::IVFunction *>()) {
-                if (fn->hasNestedChildren()) {
-                    itemsModel()->changeRootItem(id);
-                    return;
-                }
-            }
-        }
-        showPropertyEditor(id);
-    }
-}
-
-void InterfaceDocument::onItemCreated(const shared::Id &id)
-{
-    if (id.isNull()) {
-        return;
-    }
-
-    showPropertyEditor(id);
 }
 
 void InterfaceDocument::onAttributesManagerRequested()
 {
-    auto dialog = new shared::PropertyTemplateManager({ d->dynPropConfig }, window());
+    auto dialog = new shared::PropertyTemplateManager({ d->dynPropConfig }, nullptr);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }
@@ -682,7 +647,7 @@ void InterfaceDocument::prepareEntityNameForEditing(const shared::Id &id)
 
 void InterfaceDocument::onColorSchemeMenuInvoked()
 {
-    shared::ColorManagerDialog *dialog = new shared::ColorManagerDialog(window());
+    shared::ColorManagerDialog *dialog = new shared::ColorManagerDialog(nullptr);
     dialog->setFilterGroup("IVE");
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
@@ -690,7 +655,7 @@ void InterfaceDocument::onColorSchemeMenuInvoked()
 
 void InterfaceDocument::onDynContextEditorMenuInvoked()
 {
-    auto dialog = new DynActionEditor(window());
+    auto dialog = new DynActionEditor(nullptr);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
 
     dialog->open();
@@ -699,82 +664,9 @@ void InterfaceDocument::onDynContextEditorMenuInvoked()
     }
 }
 
-void InterfaceDocument::showPropertyEditor(const shared::Id &id)
-{
-    Q_ASSERT(d->asnCheck);
-    Q_ASSERT(d->commandsStack);
-    if (id.isNull()) {
-        return;
-    }
-
-    ivm::IVObject *obj = d->objectsModel->getObject(id);
-    if (!obj || obj->type() == ivm::IVObject::Type::InterfaceGroup || obj->type() == ivm::IVObject::Type::Connection) {
-        return;
-    }
-
-    ive::IVPropertiesDialog dialog(d->dynPropConfig, obj, d->ivCheck, d->asnCheck, d->commandsStack, graphicsView());
-    dialog.init();
-    dialog.exec();
-}
-
 void InterfaceDocument::showInfoMessage(const QString &title, const QString &message)
 {
     QMessageBox::information(qobject_cast<QWidget *>(parent()), title, message);
-}
-
-void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneDropPoint)
-{
-    const auto obj = d->importModel->getObject(id);
-    if (!obj) {
-        return;
-    }
-    const auto existingFunctionNames = d->objectsModel->nestedFunctionNames();
-    const auto intersectedNames = d->importModel->nestedFunctionNames(obj->as<const ivm::IVFunctionType *>())
-                                          .intersect(existingFunctionNames);
-    if (!intersectedNames.isEmpty()) {
-        const QString msg = tr("Chosen entity [%1] couldn't be imported because of Function names conflict(s): %2")
-                                    .arg(obj->titleUI(), intersectedNames.toList().join(QLatin1Char('\n')));
-        shared::ErrorHub::addError(shared::ErrorItem::Error, msg);
-        return;
-    }
-    QGraphicsItem *itemAtScenePos = scene()->itemAt(sceneDropPoint, graphicsView()->transform());
-    while (itemAtScenePos && itemAtScenePos->type() != IVFunctionGraphicsItem::Type) {
-        itemAtScenePos = itemAtScenePos->parentItem();
-    }
-
-    QBuffer buffer;
-    if (!buffer.open(QIODevice::WriteOnly)) {
-        shared::ErrorHub::addError(
-                shared::ErrorItem::Error, tr("Can't open buffer for exporting: %1").arg(buffer.errorString()));
-        return;
-    }
-
-    if (!exporter()->exportObjects({ obj }, &buffer)) {
-        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
-        return;
-    }
-    buffer.close();
-
-    ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
-    auto cmdImport = new cmd::CmdEntitiesImport(
-            buffer.data(), parentObject, d->objectsModel, sceneDropPoint, QFileInfo(path()).absolutePath());
-    d->commandsStack->push(cmdImport);
-}
-
-void InterfaceDocument::instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint)
-{
-    const auto obj = d->sharedModel->getObject(id);
-    if (!obj || obj->type() != ivm::IVObject::Type::FunctionType) {
-        return;
-    }
-    QGraphicsItem *itemAtScenePos = scene()->itemAt(sceneDropPoint, graphicsView()->transform());
-    while (itemAtScenePos && itemAtScenePos->type() != IVFunctionGraphicsItem::Type) {
-        itemAtScenePos = itemAtScenePos->parentItem();
-    }
-    ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
-    auto cmdInstantiate = new cmd::CmdEntitiesInstantiate(
-            obj->as<ivm::IVFunctionType *>(), parentObject, d->objectsModel, sceneDropPoint);
-    d->commandsStack->push(cmdInstantiate);
 }
 
 static inline bool exportObjects(
@@ -866,7 +758,7 @@ bool InterfaceDocument::exportImpl(QString &targetPath, const QList<shared::VEOb
 
     QDir targetDir(targetPath);
     if (QFile::exists(targetDir.filePath(shared::kDefaultInterfaceViewFileName))) {
-        if (!resolveNameConflict(targetPath, window())) {
+        if (!resolveNameConflict(targetPath, nullptr)) {
             return false;
         } else {
             targetDir.setPath(targetPath);
@@ -927,15 +819,7 @@ bool InterfaceDocument::loadImpl(const QString &path)
 void InterfaceDocument::showNIYGUI(const QString &title)
 {
     QString header = title.isEmpty() ? "NIY" : title;
-    QMessageBox::information(window(), header, "Not implemented yet!");
-}
-
-QWidget *InterfaceDocument::window()
-{
-    if (d->view) {
-        return d->view->window();
-    }
-    return nullptr;
+    QMessageBox::information(nullptr, header, "Not implemented yet!");
 }
 
 void InterfaceDocument::onSceneSelectionChanged(const QList<shared::Id> &selectedObjects)

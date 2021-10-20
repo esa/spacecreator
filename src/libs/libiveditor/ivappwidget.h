@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "common.h"
+
 #include <QAction>
 #include <QPointer>
 #include <QVector>
@@ -52,6 +54,12 @@ private Q_SLOTS:
     void cutItems();
     void pasteItems();
     void pasteItems(const QPointF &sceneDropPoint);
+    void showPropertyEditor(const shared::Id &id);
+    void importEntity(const shared::Id &id, const QPointF &sceneDropPoint);
+    void instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint);
+
+    void onItemDoubleClicked(const shared::Id &id);
+    void onItemCreated(const shared::Id &id);
 
 private:
     void initGraphicsView();

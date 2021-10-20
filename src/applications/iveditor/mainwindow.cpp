@@ -27,6 +27,7 @@
 #include "errorhub.h"
 #include "interfacedocument.h"
 #include "itemeditor/common/ivutils.h"
+#include "itemeditor/graphicsview.h"
 #include "ivappwidget.h"
 #include "iveditorcore.h"
 #include "ivexporter.h"

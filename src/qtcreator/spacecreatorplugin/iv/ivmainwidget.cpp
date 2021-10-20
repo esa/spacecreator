@@ -35,8 +35,8 @@ IVMainWidget::IVMainWidget(QWidget *parent)
 
 IVMainWidget::~IVMainWidget()
 {
-    if (m_plugin && m_plugin->document()->view() && m_plugin->document()->view()->parent() == this) {
-        m_plugin->document()->view()->setParent(nullptr);
+    if (m_plugin && m_plugin->mainwidget() && m_plugin->mainwidget()->parent() == this) {
+        m_plugin->mainwidget()->setParent(nullptr);
     }
 }
 

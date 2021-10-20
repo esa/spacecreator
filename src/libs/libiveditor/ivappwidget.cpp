@@ -18,6 +18,7 @@
 #include "ivappwidget.h"
 
 #include "commands/cmdentitiesimport.h"
+#include "commands/cmdentitiesinstantiate.h"
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "errorhub.h"
@@ -29,6 +30,7 @@
 #include "ivcreatortool.h"
 #include "ivexporter.h"
 #include "ivvisualizationmodelbase.h"
+#include "properties/ivpropertiesdialog.h"
 #include "ui_ivappwidget.h"
 
 #include <QAction>
@@ -57,6 +59,8 @@ IVAppWidget::IVAppWidget(InterfaceDocument *doc, QWidget *parent)
     initModelView();
     initImportView();
     initSharedView();
+
+    connect(m_document->itemsModel(), &IVItemModel::itemDoubleClicked, this, &IVAppWidget::onItemDoubleClicked);
 
     QTimer::singleShot(0, this, [&]() {
         for (QAction *action : initActions()) {
@@ -169,6 +173,110 @@ void IVAppWidget::pasteItems(const QPointF &sceneDropPoint)
     m_document->commandsStack()->push(cmdImport);
 }
 
+void IVAppWidget::showPropertyEditor(const shared::Id &id)
+{
+    Q_ASSERT(m_document);
+    if (id.isNull()) {
+        return;
+    }
+
+    ivm::IVObject *obj = m_document->objectsModel()->getObject(id);
+    if (!obj || obj->type() == ivm::IVObject::Type::InterfaceGroup || obj->type() == ivm::IVObject::Type::Connection) {
+        return;
+    }
+
+    ive::IVPropertiesDialog dialog(m_document->dynPropConfig(), obj, m_document->ivCheck(), m_document->asn1Check(),
+            m_document->commandsStack(), graphicsView());
+    dialog.init();
+    dialog.exec();
+}
+
+void IVAppWidget::importEntity(const shared::Id &id, const QPointF &sceneDropPoint)
+{
+    Q_ASSERT(m_document);
+    const auto obj = m_document->importModel()->getObject(id);
+    if (!obj) {
+        return;
+    }
+    const auto existingFunctionNames = m_document->objectsModel()->nestedFunctionNames();
+    const auto intersectedNames = m_document->importModel()
+                                          ->nestedFunctionNames(obj->as<const ivm::IVFunctionType *>())
+                                          .intersect(existingFunctionNames);
+    if (!intersectedNames.isEmpty()) {
+        const QString msg = tr("Chosen entity [%1] couldn't be imported because of Function names conflict(s): %2")
+                                    .arg(obj->titleUI(), intersectedNames.toList().join(QLatin1Char('\n')));
+        shared::ErrorHub::addError(shared::ErrorItem::Error, msg);
+        return;
+    }
+    QGraphicsItem *itemAtScenePos = m_document->scene()->itemAt(sceneDropPoint, graphicsView()->transform());
+    while (itemAtScenePos && itemAtScenePos->type() != IVFunctionGraphicsItem::Type) {
+        itemAtScenePos = itemAtScenePos->parentItem();
+    }
+
+    QBuffer buffer;
+    if (!buffer.open(QIODevice::WriteOnly)) {
+        shared::ErrorHub::addError(
+                shared::ErrorItem::Error, tr("Can't open buffer for exporting: %1").arg(buffer.errorString()));
+        return;
+    }
+
+    if (!m_document->exporter()->exportObjects({ obj }, &buffer)) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
+        return;
+    }
+    buffer.close();
+
+    ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
+    auto cmdImport = new cmd::CmdEntitiesImport(buffer.data(), parentObject, m_document->objectsModel(), sceneDropPoint,
+            QFileInfo(m_document->path()).absolutePath());
+    m_document->commandsStack()->push(cmdImport);
+}
+
+void IVAppWidget::instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint)
+{
+    Q_ASSERT(m_document);
+    const auto obj = m_document->sharedModel()->getObject(id);
+    if (!obj || obj->type() != ivm::IVObject::Type::FunctionType) {
+        return;
+    }
+    QGraphicsItem *itemAtScenePos = m_document->scene()->itemAt(sceneDropPoint, graphicsView()->transform());
+    while (itemAtScenePos && itemAtScenePos->type() != IVFunctionGraphicsItem::Type) {
+        itemAtScenePos = itemAtScenePos->parentItem();
+    }
+    ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
+    auto cmdInstantiate = new cmd::CmdEntitiesInstantiate(
+            obj->as<ivm::IVFunctionType *>(), parentObject, m_document->objectsModel(), sceneDropPoint);
+    m_document->commandsStack()->push(cmdInstantiate);
+}
+
+void IVAppWidget::onItemDoubleClicked(const shared::Id &id)
+{
+    if (id.isNull()) {
+        return;
+    }
+
+    if (auto entity = m_document->objectsModel()->getObject(id)) {
+        if (entity->isFunction()) {
+            if (auto fn = entity->as<ivm::IVFunction *>()) {
+                if (fn->hasNestedChildren()) {
+                    m_document->itemsModel()->changeRootItem(id);
+                    return;
+                }
+            }
+        }
+        showPropertyEditor(id);
+    }
+}
+
+void IVAppWidget::onItemCreated(const shared::Id &id)
+{
+    if (id.isNull()) {
+        return;
+    }
+
+    showPropertyEditor(id);
+}
+
 void IVAppWidget::pasteItems()
 {
     const QPoint viewportCursorPos = graphicsView()->viewport()->mapFromGlobal(QCursor::pos());
@@ -193,9 +301,8 @@ void IVAppWidget::initGraphicsView()
         m_actZoomOut->setEnabled(!qFuzzyCompare(percent, ui->graphicsView->minZoomPercent()));
     });
 
-    connect(ui->graphicsView, &GraphicsView::importEntity, m_document.data(), &InterfaceDocument::importEntity);
-    connect(ui->graphicsView, &GraphicsView::instantiateEntity, m_document.data(),
-            &InterfaceDocument::instantiateEntity);
+    connect(ui->graphicsView, &GraphicsView::importEntity, this, &IVAppWidget::importEntity);
+    connect(ui->graphicsView, &GraphicsView::instantiateEntity, this, &IVAppWidget::instantiateEntity);
     connect(ui->graphicsView, &GraphicsView::copyItems, this, &IVAppWidget::copyItems);
     connect(ui->graphicsView, &GraphicsView::cutItems, this, &IVAppWidget::cutItems);
     connect(ui->graphicsView, &GraphicsView::pasteItems, this, qOverload<>(&IVAppWidget::pasteItems));
@@ -246,7 +353,7 @@ QVector<QAction *> IVAppWidget::initActions()
     auto actionGroup = new QActionGroup(this);
     actionGroup->setExclusive(true);
 
-    m_tool = new IVCreatorTool(m_document);
+    m_tool = new IVCreatorTool(graphicsView(), m_document);
     connect(m_tool, &IVCreatorTool::created, this, [this, actionGroup]() {
         if (QAction *currentAction = actionGroup->checkedAction()) {
             currentAction->setChecked(false);
@@ -255,7 +362,7 @@ QVector<QAction *> IVAppWidget::initActions()
     });
     connect(m_tool, &IVCreatorTool::functionCreated, m_document.data(), &InterfaceDocument::prepareEntityNameForEditing,
             Qt::QueuedConnection);
-    connect(m_tool, &IVCreatorTool::propertyEditorRequest, m_document.data(), &InterfaceDocument::showPropertyEditor,
+    connect(m_tool, &IVCreatorTool::propertyEditorRequest, this, &IVAppWidget::showPropertyEditor,
             Qt::QueuedConnection);
     connect(m_tool, &IVCreatorTool::informUser, m_document.data(), &InterfaceDocument::showInfoMessage);
     connect(m_tool, &IVCreatorTool::copyActionTriggered, this, &IVAppWidget::copyItems);

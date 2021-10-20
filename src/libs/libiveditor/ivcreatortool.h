@@ -36,7 +36,7 @@ class IVCreatorTool : public shared::ui::CreatorTool
     Q_OBJECT
 
 public:
-    IVCreatorTool(InterfaceDocument *doc);
+    IVCreatorTool(QGraphicsView* view, InterfaceDocument *doc);
     ~IVCreatorTool() override;
 
     enum ToolType

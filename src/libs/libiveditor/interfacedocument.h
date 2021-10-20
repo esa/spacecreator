@@ -18,15 +18,16 @@
 #pragma once
 
 #include "common.h"
-#include "itemeditor/graphicsview.h"
 
+#include <QAction>
 #include <QPointer>
 #include <QQueue>
 
-class QMenu;
-class QUndoStack;
+class QGraphicsScene;
 class QItemSelection;
 class QItemSelectionModel;
+class QMenu;
+class QUndoStack;
 
 namespace Asn1Acn {
 class Asn1ModelStorage;
@@ -39,9 +40,10 @@ class VEObject;
 
 namespace ivm {
 class AbstractSystemChecks;
-class IVObject;
 class IVInterface;
 class IVModel;
+class IVObject;
+class IVPropertyTemplateConfig;
 }
 
 namespace ive {
@@ -74,8 +76,6 @@ public:
     IVExporter *exporter() const;
 
     QGraphicsScene *scene() const;
-    shared::ui::GraphicsViewBase *graphicsView() const;
-    ive::IVAppWidget *view() const;
 
     QUndoStack *undoStack() const;
     cmd::CommandsStack *commandsStack() const;
@@ -114,7 +114,9 @@ public:
     IVVisualizationModelBase *sharedVisualisationModel() const;
 
     void setAsn1Check(Asn1Acn::Asn1SystemChecks *check);
+    Asn1Acn::Asn1SystemChecks *asn1Check() const;
     void setIvCheck(ivm::AbstractSystemChecks *checks);
+    ivm::AbstractSystemChecks *ivCheck() const;
 
     QString supportedFileExtensions() const;
 
@@ -122,6 +124,8 @@ public:
     bool checkAllInterfacesForAsn1Compliance();
 
     QList<shared::VEObject *> prepareSelectedObjectsForExport(QString &name, bool silent = false);
+
+    ivm::IVPropertyTemplateConfig *dynPropConfig() const;
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
@@ -137,15 +141,9 @@ public Q_SLOTS:
     void onColorSchemeMenuInvoked();
     void onDynContextEditorMenuInvoked();
 
-    void onItemDoubleClicked(const shared::Id &id);
-    void onItemCreated(const shared::Id &id);
-
     void onDataTypesMenuInvoked();
     void prepareEntityNameForEditing(const shared::Id &id);
-    void showPropertyEditor(const shared::Id &id);
     void showInfoMessage(const QString &title, const QString &message);
-    void importEntity(const shared::Id &id, const QPointF &sceneDropPoint);
-    void instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint);
 
 private:
     bool exportImpl(QString &targetPath, const QList<shared::VEObject *> &objects);
