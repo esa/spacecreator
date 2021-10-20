@@ -9,6 +9,7 @@ set(SOURCES
   utype.cpp
   utyperef.cpp
   mtyperef.cpp
+  typealias.cpp
   )
 set(INCLUDES
   arraytype.h
@@ -21,6 +22,7 @@ set(INCLUDES
   utype.h
   utyperef.h
   mtyperef.h
+  typealias.h
   )
 
 add_library(PromelaModel STATIC)

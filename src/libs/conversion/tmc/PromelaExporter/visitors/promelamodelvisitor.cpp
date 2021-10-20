@@ -19,15 +19,18 @@
 
 #include "visitors/promelamodelvisitor.h"
 
+#include "visitors/typealiasvisitor.h"
 #include "visitors/utypevisitor.h"
 
 #include <QVector>
 #include <algorithm>
 
+using tmc::promela::model::NamedMtype;
+using tmc::promela::model::PromelaModel;
+using tmc::promela::model::TypeAlias;
+using tmc::promela::model::Utype;
+
 namespace conversion::tmc::exporter {
-using ::tmc::promela::model::NamedMtype;
-using ::tmc::promela::model::PromelaModel;
-using ::tmc::promela::model::Utype;
 
 PromelaModelVisitor::PromelaModelVisitor(QTextStream &stream, QString indent)
     : m_stream(stream)
@@ -39,6 +42,7 @@ void PromelaModelVisitor::visit(const PromelaModel &promelaModel)
 {
     generateMtypes(promelaModel.getMtypeValues());
     generateNamedMtypes(promelaModel.getNamedMtypeValues());
+    generateTypeAliases(promelaModel.getTypeAliases());
     generateUtypes(promelaModel.getUtypes());
 }
 
@@ -69,6 +73,12 @@ void PromelaModelVisitor::generateMtypeNames(const QVector<QString> &names)
     for (const QString &value : names) {
         m_stream << m_indent << value << ",\n";
     }
+}
+
+void PromelaModelVisitor::generateTypeAliases(const QList<TypeAlias> &aliases)
+{
+    TypeAliasVisitor visitor(m_stream);
+    std::for_each(aliases.begin(), aliases.end(), visitor);
 }
 
 void PromelaModelVisitor::generateUtypes(const QList<Utype> &utypes)

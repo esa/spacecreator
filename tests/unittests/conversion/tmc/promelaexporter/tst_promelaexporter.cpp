@@ -35,6 +35,7 @@ using tmc::promela::model::Declaration;
 using tmc::promela::model::MtypeRef;
 using tmc::promela::model::NamedMtype;
 using tmc::promela::model::PromelaModel;
+using tmc::promela::model::TypeAlias;
 using tmc::promela::model::UnsignedDataType;
 using tmc::promela::model::Utype;
 using tmc::promela::model::UtypeRef;
@@ -51,6 +52,7 @@ private Q_SLOTS:
     void testUtype();
     void testUtypeVisibility();
     void testUtypeUnion();
+    void testTypeAlias();
 
 private:
     QString getFileContents(const QString &filename);
@@ -218,6 +220,24 @@ void tst_PromelaExporter::testUtypeUnion()
         QFAIL(ex.what());
     }
     QString out2 = getFileContents("expect_promela_file5.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testTypeAlias()
+{
+    PromelaModel model;
+
+    model.addTypeAlias(TypeAlias("MyInteger", BasicType::INT));
+    model.addTypeAlias(TypeAlias("OtherInteger", UtypeRef("MyInteger")));
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_file6.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }

@@ -20,6 +20,7 @@
 #pragma once
 
 #include "namedmtype.h"
+#include "typealias.h"
 #include "utype.h"
 
 #include <QList>
@@ -68,7 +69,7 @@ public:
      *
      * @return Unnamed mtype values
      */
-    const QSet<QString> &getMtypeValues() const;
+    const QSet<QString> &getMtypeValues() const noexcept;
 
     /**
      * @brief Add named mtype.
@@ -81,7 +82,7 @@ public:
      *
      * @return All named mtypes.
      */
-    const std::map<QString, NamedMtype> &getNamedMtypeValues() const;
+    const std::map<QString, NamedMtype> &getNamedMtypeValues() const noexcept;
 
     /**
      * @brief Add Utype - user defined type to the model.
@@ -94,13 +95,27 @@ public:
      *
      * @return All Utypes of the model
      */
-    const QList<Utype> &getUtypes() const;
+    const QList<Utype> &getUtypes() const noexcept;
+
+    /**
+     * @brief Add TypeAlias - alias for type to the model.
+     *
+     * @param alias TypeAlias to add to the model
+     */
+    void addTypeAlias(const TypeAlias &alias);
+    /**
+     * @brief Getter for all type aliases in model
+     *
+     * @return All type aliases of the model
+     */
+    const QList<TypeAlias> &getTypeAliases() const noexcept;
 
 private:
     QSet<QString> m_mtype_values;
     std::map<QString, NamedMtype> m_named_m_type_values;
     QList<Utype> m_user_types;
     std::map<QString, Declaration> m_declarations;
+    QList<TypeAlias> m_type_aliases;
 };
 }
 namespace conversion {
