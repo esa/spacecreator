@@ -91,6 +91,7 @@ private Q_SLOTS:
     void testGenerateProcessWithTasksVariablesAndParameters();
     void testGenerateProcessWithLabelAndJoin();
     void testJoinWithoutSpecifiedLabel();
+    void testGenerateProcessWithDecisionExpressionAndAnswer();
 };
 
 void tst_sdlmodel::testDefaultValuesInModel()
@@ -331,6 +332,70 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
                            .build();
 
     const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
+
+    Options options;
+    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+
+    SdlExporter exporter;
+    try {
+        exporter.exportModel(exampleModel.get(), options);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+
+    QString filename = QString("%1%2.%3").arg(modelPrefix, modelName, "pr");
+    QFile outputFile(filename);
+    if (!outputFile.open(QIODevice::ReadOnly)) {
+        QFAIL("requested file cannot be found");
+    }
+    QTextStream consumableOutput(&outputFile);
+    std::vector<QString> expectedOutput = {
+        "process ExampleProcess;",
+        "START;",
+        "fromStart:",
+        "NEXTSTATE Idle;",
+        "state Idle;",
+        "input sigReset;",
+        "join fromStart;",
+        "endstate;",
+        "endprocess ExampleProcess;",
+    };
+    checkSequenceAndConsume(expectedOutput, consumableOutput);
+}
+
+void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
+{
+    QString modelName = "decisionExpressionAndAnswer";
+    QString modelPrefix = "Sdl_";
+    QString processName = "ExampleProcess";
+
+    // todo auto nextStateWait = std::make_unique<NextState>("");
+    // todo auto startTransition = SdlTransitionBuilder().withAction(std::move(nextStateWait)).build();
+
+    // todo create variable and add it to Process
+
+    // todo create two Answers
+    // todo create Expression
+    // todo create Decision with these Answers
+    // todo add Decision to transition
+    auto transition = SdlTransitionBuilder().withNextStateAction().build();
+
+    auto waitState =
+            SdlStateBuilder("Wait").withInput(SdlInputBuilder("startProcess", transition.get()).build()).build();
+
+    // clang-format off
+    const auto exampleModel = SdlModelBuilder(modelName)
+        .withProcess(
+            SdlProcessBuilder(processName)
+                // todo .withStartProcess()
+                .withStateMachine(
+                    SdlStateMachineBuilder()
+                        .withState(std::move(waitState))
+                        .withTransition(std::move(transition))
+                    .build()
+                ).build()
+        ).build();
+    // clang-format on
 
     Options options;
     options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
