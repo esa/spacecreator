@@ -69,7 +69,7 @@ MainWindow::MainWindow(ive::IVEditorCore *core, QWidget *parent)
 {
     ui->setupUi(this);
 
-    setCentralWidget(m_core->document()->view());
+    setCentralWidget(m_core->mainwidget());
 
     statusBar()->addPermanentWidget(m_zoomCtrl);
     m_core->addToolBars(this);

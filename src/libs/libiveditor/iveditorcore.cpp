@@ -88,6 +88,11 @@ shared::ui::GraphicsViewBase *IVEditorCore::chartView()
     return m_document->graphicsView();
 }
 
+QWidget *IVEditorCore::mainwidget()
+{
+    return m_document->view();
+}
+
 void IVEditorCore::addToolBars(QMainWindow *window)
 {
     window->addToolBar(mainToolBar());

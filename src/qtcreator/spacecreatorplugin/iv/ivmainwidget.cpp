@@ -72,7 +72,7 @@ void IVMainWidget::init()
     setLayout(layout);
     m_plugin->document()->init();
 
-    layout->addWidget(m_plugin->document()->view());
+    layout->addWidget(m_plugin->mainwidget());
 
     m_plugin->setupMiniMap();
 }

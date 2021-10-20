@@ -47,12 +47,23 @@ public:
 
     ive::InterfaceDocument *document() const;
 
+    void setDvChecks(ivm::AbstractSystemChecks *checks);
+    ivm::AbstractSystemChecks *dvChecks() const;
+
     shared::ui::GraphicsViewBase *chartView() override;
+    QWidget *mainwidget();
     void addToolBars(QMainWindow *window) override;
 
-    void registerBasicActions();
+    QUndoStack *undoStack() const override;
+    cmd::CommandsStack *commandsStack() const;
 
     void populateCommandLineArguments(shared::CommandLineParser *parser) const override;
+    bool renameAsnFile(const QString &oldName, const QString &newName) override;
+
+    QString filePath() const override;
+    bool save() override;
+
+    void registerBasicActions();
 
     QAction *actionExportFunctions();
     QAction *actionExportType();
@@ -67,22 +78,11 @@ public:
             const QString &toInstanceName);
     bool renameCyclicInterface(const QString &oldName, const QString &newName, const QString &functionName);
 
-    QUndoStack *undoStack() const override;
-    cmd::CommandsStack *commandsStack() const;
-
-    bool renameAsnFile(const QString &oldName, const QString &newName) override;
-
-    QString filePath() const override;
-    bool save() override;
-
     QVector<ivm::IVFunction *> allIVFunctions() const;
     QVector<ivm::IVConnection *> allIVConnections() const;
 
     QStringList ivFunctionsNames() const;
     QStringList ivConnectionNames() const;
-
-    void setDvChecks(ivm::AbstractSystemChecks *checks);
-    ivm::AbstractSystemChecks *dvChecks() const;
 
     void centerOnView();
 
