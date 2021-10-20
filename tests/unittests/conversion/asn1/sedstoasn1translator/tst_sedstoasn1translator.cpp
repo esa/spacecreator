@@ -103,9 +103,11 @@ void tst_SedsToAsn1Translator::testWrongModel()
             "Missing source Unspecified model");
 }
 
+void tst_SedsToAsn1Translator::testResolvingArrayDataType() {}
+
 void tst_SedsToAsn1Translator::testTranslateBinaryDataType()
 {
-    const auto sedsModel = SedsModelBuilder("Model").withBitStringDataType("Bitstring").build();
+    const auto sedsModel = SedsModelBuilder("Model").withBinaryDataType("Bitstring").build();
 
     Options options;
     SedsToAsn1Translator translator;

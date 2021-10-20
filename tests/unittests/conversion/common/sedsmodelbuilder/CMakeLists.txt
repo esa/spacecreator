@@ -1,11 +1,13 @@
 project(SedsModelBuilder VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES sedscomponentbuilder.cpp
+            sedsdatatypefactory.cpp
             sedsinterfacebuilder.cpp
             sedsinterfacecommandbuilder.cpp
             sedsinterfacedeclarationbuilder.cpp
             sedsmodelbuilder.cpp)
 set(INCLUDES sedscomponentbuilder.h
+             sedsdatatypefactory.h
              sedsinterfacebuilder.h
              sedsinterfacecommandbuilder.h
              sedsinterfacedeclarationbuilder.h

@@ -20,29 +20,19 @@
 #pragma once
 
 #include <QStringList>
-#include <memory>
-#include <seds/SedsModel/sedsmodel.h>
+#include <seds/SedsModel/types/datatype.h>
 
 namespace tests::conversion::common {
 
-class SedsModelBuilder final
+class SedsDataTypeFactory final
 {
 public:
-    SedsModelBuilder(QString name);
-    std::unique_ptr<seds::model::SedsModel> build();
-
-public:
-    auto withBinaryDataType(QString name) -> SedsModelBuilder &;
-    auto withBooleanDataType(QString name) -> SedsModelBuilder &;
-    auto withEnumeratedDataType(QString name, QStringList elems) -> SedsModelBuilder &;
-    auto withFloatDataType(QString name) -> SedsModelBuilder &;
-    auto withIntegerDataType(QString name) -> SedsModelBuilder &;
-    auto withStringDataType(QString name) -> SedsModelBuilder &;
-
-    auto withComponent(seds::model::Component component) -> SedsModelBuilder &;
-
-private:
-    seds::model::Package m_package;
+    static auto createBinary(QString name) -> seds::model::BinaryDataType;
+    static auto createBoolean(QString name) -> seds::model::BooleanDataType;
+    static auto createEnumerated(QString name, QStringList elems) -> seds::model::EnumeratedDataType;
+    static auto createFloat(QString name) -> seds::model::FloatDataType;
+    static auto createInteger(QString name) -> seds::model::IntegerDataType;
+    static auto createString(QString name) -> seds::model::StringDataType;
 };
 
 } // namespace tests::conversion::common
