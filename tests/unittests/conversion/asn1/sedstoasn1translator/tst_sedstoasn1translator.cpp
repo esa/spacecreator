@@ -46,6 +46,7 @@ using conversion::Options;
 using conversion::asn1::translator::DataTypesDependencyResolver;
 using conversion::asn1::translator::NotDAGException;
 using conversion::asn1::translator::SedsToAsn1Translator;
+using conversion::asn1::translator::UndeclaredDataTypeException;
 using conversion::translator::TranslationException;
 using tests::conversion::common::SedsContainerDataTypeBuilder;
 using tests::conversion::common::SedsDataTypeFactory;
@@ -70,6 +71,7 @@ private Q_SLOTS:
     void testResolvingArrayDataType();
     void testResolvingContainerDataType();
     void testResolvingCyclicDependency();
+    void testResolvingUndeclaredType();
 
     void testTranslateBinaryDataType();
     void testTranslateBooleanDataType();
@@ -184,6 +186,22 @@ void tst_SedsToAsn1Translator::testResolvingCyclicDependency()
     DataTypesDependencyResolver resolver;
 
     QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes), NotDAGException);
+}
+
+void tst_SedsToAsn1Translator::testResolvingUndeclaredType()
+{
+    // clang-format off
+    const seds::model::DataType containerDataType = SedsContainerDataTypeBuilder("Container")
+                                   .withEntry("fieldA", "DataTypeA")
+                               .build();
+    // clang-format on
+
+    std::vector<const DataType *> dataTypes;
+    dataTypes.push_back(&containerDataType);
+
+    DataTypesDependencyResolver resolver;
+
+    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes), UndeclaredDataTypeException);
 }
 
 void tst_SedsToAsn1Translator::testTranslateBinaryDataType()
