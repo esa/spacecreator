@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <QStringList>
 #include <memory>
 #include <seds/SedsModel/sedsmodel.h>
 
@@ -31,7 +32,12 @@ public:
     std::unique_ptr<seds::model::SedsModel> build();
 
 public:
+    auto withBitStringDataType(QString name) -> SedsModelBuilder &;
+    auto withBooleanDataType(QString name) -> SedsModelBuilder &;
+    auto withEnumeratedDataType(QString name, QStringList elems) -> SedsModelBuilder &;
+    auto withFloatDataType(QString name) -> SedsModelBuilder &;
     auto withIntegerDataType(QString name) -> SedsModelBuilder &;
+    auto withStringDataType(QString name) -> SedsModelBuilder &;
 
     auto withComponent(seds::model::Component component) -> SedsModelBuilder &;
 
