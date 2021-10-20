@@ -33,6 +33,7 @@
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/options.h>
 #include <seds/SedsModel/sedsmodel.h>
+#include <sedsmodelbuilder/sedsmodelbuilder.h>
 #include <unittests/common/verifyexception.h>
 
 using namespace Asn1Acn;
@@ -41,6 +42,7 @@ using namespace seds::model;
 using conversion::Options;
 using conversion::asn1::translator::SedsToAsn1Translator;
 using conversion::translator::TranslationException;
+using tests::conversion::common::SedsModelBuilder;
 
 namespace conversion::asn1::test {
 
@@ -66,13 +68,6 @@ private Q_SLOTS:
     void testTranslateStringDataType();
 
 private:
-    std::unique_ptr<SedsModel> createBitString();
-    std::unique_ptr<SedsModel> createBoolean();
-    std::unique_ptr<SedsModel> createEnumeration();
-    std::unique_ptr<SedsModel> createInteger16();
-    std::unique_ptr<SedsModel> createFloat64();
-    std::unique_ptr<SedsModel> createString();
-
     const Types::Type *getType(const Asn1Model *asn1Model, std::size_t index);
 };
 
@@ -90,8 +85,8 @@ void tst_SedsToAsn1Translator::testTooManyModels()
     Options options;
     SedsToAsn1Translator translator;
 
-    const auto sedsModel1 = createInteger16();
-    const auto sedsModel2 = createFloat64();
+    const auto sedsModel1 = SedsModelBuilder("Model1").withIntegerDataType("SignedInteger16").build();
+    const auto sedsModel2 = SedsModelBuilder("Model2").withFloatDataType("Float64").build();
 
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(translator.translateModels({ sedsModel1.get(), sedsModel2.get() }, options),
             TranslationException, "Too many models passed for SEDS to ASN.1 translation");
@@ -110,7 +105,7 @@ void tst_SedsToAsn1Translator::testWrongModel()
 
 void tst_SedsToAsn1Translator::testTranslateBinaryDataType()
 {
-    const auto sedsModel = createBitString();
+    const auto sedsModel = SedsModelBuilder("Model").withBitStringDataType("Bitstring").build();
 
     Options options;
     SedsToAsn1Translator translator;
@@ -156,7 +151,7 @@ void tst_SedsToAsn1Translator::testTranslateBinaryDataType()
 
 void tst_SedsToAsn1Translator::testTranslateBooleanDataType()
 {
-    const auto sedsModel = createBoolean();
+    const auto sedsModel = SedsModelBuilder("Model").withBooleanDataType("Boolean").build();
 
     Options options;
     SedsToAsn1Translator translator;
@@ -183,7 +178,8 @@ void tst_SedsToAsn1Translator::testTranslateBooleanDataType()
 
 void tst_SedsToAsn1Translator::testTranslateEnumeratedDataType()
 {
-    const auto sedsModel = createEnumeration();
+    const auto sedsModel =
+            SedsModelBuilder("Model").withEnumeratedDataType("Enumeration", { "One", "Two", "Three" }).build();
 
     Options options;
     SedsToAsn1Translator translator;
@@ -212,15 +208,15 @@ void tst_SedsToAsn1Translator::testTranslateEnumeratedDataType()
     const auto &items = enumType->items();
     QCOMPARE(items.size(), 3);
 
-    const auto &item = items["Twenty"];
+    const auto &item = items["Two"];
     QCOMPARE(item.index(), 1);
-    QCOMPARE(item.name(), "Twenty");
-    QCOMPARE(item.value(), 20);
+    QCOMPARE(item.name(), "Two");
+    QCOMPARE(item.value(), 2);
 }
 
 void tst_SedsToAsn1Translator::testTranslateIntegerDataType()
 {
-    const auto sedsModel = createInteger16();
+    const auto sedsModel = SedsModelBuilder("Model").withIntegerDataType("SignedInteger16").build();
 
     Options options;
     SedsToAsn1Translator translator;
@@ -262,7 +258,7 @@ void tst_SedsToAsn1Translator::testTranslateIntegerDataType()
 
 void tst_SedsToAsn1Translator::testTranslateFloatDataType()
 {
-    const auto sedsModel = createFloat64();
+    const auto sedsModel = SedsModelBuilder("Model").withFloatDataType("Float64").build();
 
     Options options;
     SedsToAsn1Translator translator;
@@ -303,7 +299,7 @@ void tst_SedsToAsn1Translator::testTranslateFloatDataType()
 
 void tst_SedsToAsn1Translator::testTranslateStringDataType()
 {
-    const auto sedsModel = createString();
+    const auto sedsModel = SedsModelBuilder("Model").withStringDataType("String20").build();
 
     Options options;
     SedsToAsn1Translator translator;
@@ -346,145 +342,6 @@ void tst_SedsToAsn1Translator::testTranslateStringDataType()
     const auto &range = rangeConstraint->range();
     QVERIFY(range.isSingleItem());
     QCOMPARE(range.begin(), 20);
-}
-
-std::unique_ptr<SedsModel> tst_SedsToAsn1Translator::createBitString()
-{
-    BinaryDataType binaryDataType;
-    binaryDataType.setName("Bitstring");
-    binaryDataType.setBits(42);
-    binaryDataType.setFixedSize(false);
-
-    Package package;
-    package.addDataType(std::move(binaryDataType));
-
-    PackageFile packageFile;
-    packageFile.setPackage(std::move(package));
-
-    return std::make_unique<SedsModel>(std::move(packageFile));
-}
-
-std::unique_ptr<SedsModel> tst_SedsToAsn1Translator::createBoolean()
-{
-    BooleanDataEncoding encoding;
-    encoding.setBits(16);
-    encoding.setFalseValue(FalseValue::NonZeroIsFalse);
-
-    BooleanDataType booleanDataType;
-    booleanDataType.setName("Boolean");
-    booleanDataType.setEncoding(std::move(encoding));
-
-    Package package;
-    package.addDataType(std::move(booleanDataType));
-
-    PackageFile packageFile;
-    packageFile.setPackage(std::move(package));
-
-    return std::make_unique<SedsModel>(std::move(packageFile));
-}
-
-std::unique_ptr<SedsModel> tst_SedsToAsn1Translator::createEnumeration()
-{
-    IntegerDataEncoding encoding;
-    encoding.setByteOrder(ByteOrder::BigEndian);
-    encoding.setEncoding(CoreIntegerEncoding::TwosComplement);
-    encoding.setBits(8);
-
-    EnumeratedDataType enumeratedDataType;
-    enumeratedDataType.setName("Enumeration");
-    enumeratedDataType.setEncoding(std::move(encoding));
-
-    ValueEnumeration value1;
-    value1.setValue(10);
-    value1.setLabel("Ten");
-    enumeratedDataType.addEnumeration(std::move(value1));
-
-    ValueEnumeration value2;
-    value2.setValue(20);
-    value2.setLabel("Twenty");
-    enumeratedDataType.addEnumeration(std::move(value2));
-
-    ValueEnumeration value3;
-    value3.setValue(30);
-    value3.setLabel("Thirty");
-    enumeratedDataType.addEnumeration(std::move(value3));
-
-    Package package;
-    package.addDataType(std::move(enumeratedDataType));
-
-    PackageFile packageFile;
-    packageFile.setPackage(std::move(package));
-
-    return std::make_unique<SedsModel>(std::move(packageFile));
-}
-
-std::unique_ptr<SedsModel> tst_SedsToAsn1Translator::createInteger16()
-{
-    MinMaxRange range;
-    range.setMin(QString("-42"));
-    range.setMax(QString("42"));
-
-    IntegerDataEncoding encoding;
-    encoding.setByteOrder(ByteOrder::BigEndian);
-    encoding.setEncoding(CoreIntegerEncoding::TwosComplement);
-    encoding.setBits(16);
-
-    IntegerDataType integerDataType;
-    integerDataType.setName("SignedInteger16");
-    integerDataType.setRange(std::move(range));
-    integerDataType.setEncoding(std::move(encoding));
-
-    Package package;
-    package.addDataType(std::move(integerDataType));
-
-    PackageFile packageFile;
-    packageFile.setPackage(std::move(package));
-
-    return std::make_unique<SedsModel>(std::move(packageFile));
-}
-
-std::unique_ptr<SedsModel> tst_SedsToAsn1Translator::createFloat64()
-{
-    FloatPrecisionRange range = FloatPrecisionRange::Double;
-
-    FloatDataEncoding encoding;
-    encoding.setByteOrder(ByteOrder::LittleEndian);
-    encoding.setEncoding(CoreEncodingAndPrecision::IeeeDouble);
-    encoding.setBits(64);
-
-    FloatDataType floatDataType;
-    floatDataType.setName("Float64");
-    floatDataType.setRange(range);
-    floatDataType.setEncoding(std::move(encoding));
-
-    Package package;
-    package.addDataType(std::move(floatDataType));
-
-    PackageFile packageFile;
-    packageFile.setPackage(std::move(package));
-
-    return std::make_unique<SedsModel>(std::move(packageFile));
-}
-
-std::unique_ptr<SedsModel> tst_SedsToAsn1Translator::createString()
-{
-    StringDataEncoding encoding;
-    encoding.setEncoding(CoreStringEncoding::Ascii);
-    encoding.setTerminationByte(88);
-
-    StringDataType stringDataType;
-    stringDataType.setName("String20");
-    stringDataType.setLength(20);
-    stringDataType.setFixedLength(true);
-    stringDataType.setEncoding(std::move(encoding));
-
-    Package package;
-    package.addDataType(std::move(stringDataType));
-
-    PackageFile packageFile;
-    packageFile.setPackage(std::move(package));
-
-    return std::make_unique<SedsModel>(std::move(packageFile));
 }
 
 const Types::Type *tst_SedsToAsn1Translator::getType(const Asn1Model *asn1Model, std::size_t index)
