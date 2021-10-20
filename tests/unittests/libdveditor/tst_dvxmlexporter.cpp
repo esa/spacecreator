@@ -146,7 +146,7 @@ void tst_DVXmlExporter::testExportDevice()
             "&quot;eth0&quot;, address &quot;127.0.0.1&quot;, version ipv4, port 5116}\"/>\n"
             "    </Node>\n"
             "</DeploymentView>";
-    QVERIFY(XmlData(expected) == XmlData(text));
+    QCOMPARE(XmlData(expected), XmlData(text));
 }
 
 void tst_DVXmlExporter::testExportConnection()
