@@ -38,6 +38,14 @@ std::unique_ptr<SedsModel> SedsModelBuilder::build()
     return std::make_unique<SedsModel>(std::move(packageFile));
 }
 
+SedsModelBuilder &SedsModelBuilder::withArrayDataType(QString name, QString itemTypeName)
+{
+    auto dataType = SedsDataTypeFactory::createArray(std::move(name), std::move(itemTypeName));
+    m_package.addDataType(std::move(dataType));
+
+    return *this;
+}
+
 SedsModelBuilder &SedsModelBuilder::withBinaryDataType(QString name)
 {
     auto dataType = SedsDataTypeFactory::createBinary(std::move(name));
@@ -49,6 +57,13 @@ SedsModelBuilder &SedsModelBuilder::withBinaryDataType(QString name)
 SedsModelBuilder &SedsModelBuilder::withBooleanDataType(QString name)
 {
     auto dataType = SedsDataTypeFactory::createBoolean(std::move(name));
+    m_package.addDataType(std::move(dataType));
+
+    return *this;
+}
+
+SedsModelBuilder &SedsModelBuilder::withContainerDataType(seds::model::ContainerDataType dataType)
+{
     m_package.addDataType(std::move(dataType));
 
     return *this;

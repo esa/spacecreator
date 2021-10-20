@@ -30,9 +30,12 @@
 #include <asn1library/asn1/types/real.h>
 #include <asn1library/asn1/types/type.h>
 #include <asn1library/asn1/values.h>
+#include <conversion/asn1/SedsToAsn1Translator/datatypesdependencyresolver.h>
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/options.h>
 #include <seds/SedsModel/sedsmodel.h>
+#include <sedsmodelbuilder/sedscontainerdatatypebuilder.h>
+#include <sedsmodelbuilder/sedsdatatypefactory.h>
 #include <sedsmodelbuilder/sedsmodelbuilder.h>
 #include <unittests/common/verifyexception.h>
 
@@ -40,8 +43,11 @@ using namespace Asn1Acn;
 using namespace seds::model;
 
 using conversion::Options;
+using conversion::asn1::translator::DataTypesDependencyResolver;
 using conversion::asn1::translator::SedsToAsn1Translator;
 using conversion::translator::TranslationException;
+using tests::conversion::common::SedsContainerDataTypeBuilder;
+using tests::conversion::common::SedsDataTypeFactory;
 using tests::conversion::common::SedsModelBuilder;
 
 namespace conversion::asn1::test {
@@ -59,6 +65,9 @@ private Q_SLOTS:
     void testMissingModel();
     void testTooManyModels();
     void testWrongModel();
+
+    void testResolvingArrayDataType();
+    void testResolvingContainerDataType();
 
     void testTranslateBinaryDataType();
     void testTranslateBooleanDataType();
@@ -103,7 +112,57 @@ void tst_SedsToAsn1Translator::testWrongModel()
             "Missing source Unspecified model");
 }
 
-void tst_SedsToAsn1Translator::testResolvingArrayDataType() {}
+void tst_SedsToAsn1Translator::testResolvingArrayDataType()
+{
+    const seds::model::DataType arrayDataType = SedsDataTypeFactory::createArray("Array", "DataItem");
+    const seds::model::DataType integerDataType = SedsDataTypeFactory::createInteger("DataItem");
+
+    std::vector<const DataType *> dataTypes;
+    dataTypes.push_back(&arrayDataType);
+    dataTypes.push_back(&integerDataType);
+
+    DataTypesDependencyResolver resolver;
+    auto resolvedDataTypes = resolver.resolve(&dataTypes);
+
+    QCOMPARE(resolvedDataTypes.size(), 2);
+
+    QCOMPARE(dataTypeNameStr(*resolvedDataTypes.front()), "DataItem");
+    resolvedDataTypes.pop_front();
+
+    QCOMPARE(dataTypeNameStr(*resolvedDataTypes.front()), "Array");
+    resolvedDataTypes.pop_front();
+}
+
+void tst_SedsToAsn1Translator::testResolvingContainerDataType()
+{
+    // clang-format off
+    const seds::model::DataType containerDataType = SedsContainerDataTypeBuilder("Container")
+                                   .withEntry("fieldA", "DataTypeA")
+                                   .withEntry("fieldB", "DataTypeB")
+                               .build();
+    // clang-format on
+    const seds::model::DataType dataTypeA = SedsDataTypeFactory::createInteger("DataTypeA");
+    const seds::model::DataType dataTypeB = SedsDataTypeFactory::createFloat("DataTypeB");
+
+    std::vector<const DataType *> dataTypes;
+    dataTypes.push_back(&containerDataType);
+    dataTypes.push_back(&dataTypeA);
+    dataTypes.push_back(&dataTypeB);
+
+    DataTypesDependencyResolver resolver;
+    auto resolvedDataTypes = resolver.resolve(&dataTypes);
+
+    QCOMPARE(resolvedDataTypes.size(), 3);
+
+    QCOMPARE(dataTypeNameStr(*resolvedDataTypes.front()), "DataTypeA");
+    resolvedDataTypes.pop_front();
+
+    QCOMPARE(dataTypeNameStr(*resolvedDataTypes.front()), "DataTypeB");
+    resolvedDataTypes.pop_front();
+
+    QCOMPARE(dataTypeNameStr(*resolvedDataTypes.front()), "Container");
+    resolvedDataTypes.pop_front();
+}
 
 void tst_SedsToAsn1Translator::testTranslateBinaryDataType()
 {
