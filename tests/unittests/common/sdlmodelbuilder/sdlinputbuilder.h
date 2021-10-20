@@ -33,7 +33,7 @@ namespace tests::common {
 class SdlInputBuilder final
 {
 public:
-    explicit SdlInputBuilder();
+    SdlInputBuilder();
 
     auto build() -> std::unique_ptr<Input>;
 

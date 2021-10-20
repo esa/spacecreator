@@ -29,7 +29,7 @@ Task::Task(QString name, QString content)
 {
 }
 
-QString Task::content() const
+const QString &Task::content() const
 {
     return m_content;
 }

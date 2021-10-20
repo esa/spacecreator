@@ -65,7 +65,7 @@ public:
      *
      * @returns a literal value
      */
-    auto value() const -> QString;
+    auto value() const -> const QString &;
 
     /**
      * @brief   Setter for literal value

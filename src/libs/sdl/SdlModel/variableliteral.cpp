@@ -29,7 +29,7 @@ VariableLiteral::VariableLiteral(QString value)
 {
 }
 
-QString VariableLiteral::value() const
+const QString &VariableLiteral::value() const
 {
     return m_value;
 }

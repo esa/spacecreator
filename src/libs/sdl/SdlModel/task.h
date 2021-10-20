@@ -67,7 +67,7 @@ public:
      *
      * @return  task content
      */
-    auto content() const -> QString;
+    auto content() const -> const QString &;
 
     /**
      * @brief   Setter for the task content
