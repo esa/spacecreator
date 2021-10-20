@@ -18,7 +18,7 @@ set(INCLUDES
   visitors/datatypeprefixvisitor.h
   visitors/datatypesuffixvisitor.h
   visitors/typealiasvisitor.h
-  visitors/basictypegenerator.cpp
+  visitors/basictypegenerator.h
   )
 
 add_library(PromelaExporter STATIC)

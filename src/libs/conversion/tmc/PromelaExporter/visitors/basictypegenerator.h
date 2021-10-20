@@ -23,30 +23,29 @@
 #include <tmc/PromelaModel/basictypes.h>
 
 namespace conversion::tmc::exporter {
-	/**
-	 * @brief Generate string representation of BasicType
-	 */
-	class BasicTypeGenerator final
-	{
-	public:
-		/**
-		 * @brief Constructor.
-		 *
-		 * Construct element with output stream.
-		 *
-		 * @param stream text stream to output string representation of BasicType
-		 */
-		BasicTypeGenerator(QTextStream& stream);
+/**
+ * @brief Generate string representation of BasicType
+ */
+class BasicTypeGenerator final
+{
+public:
+    /**
+     * @brief Constructor.
+     *
+     * Construct element with output stream.
+     *
+     * @param stream text stream to output string representation of BasicType
+     */
+    BasicTypeGenerator(QTextStream &stream);
 
-		/**
-		 * @brief generate string representation of basic type
-		 *
-		 * @param type value of BasicType, which will be converted to string
-		 */
-		void generate(::tmc::promela::model::BasicType type);
+    /**
+     * @brief generate string representation of basic type
+     *
+     * @param type value of BasicType, which will be converted to string
+     */
+    void generate(::tmc::promela::model::BasicType type);
 
-	private:
-		QTextStream& m_stream;
-
-	};
+private:
+    QTextStream &m_stream;
+};
 }
