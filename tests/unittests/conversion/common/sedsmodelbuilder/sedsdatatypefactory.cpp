@@ -19,6 +19,7 @@
 
 #include "sedsdatatypefactory.h"
 
+#include "sedscontainerdatatypebuilder.h"
 #include "types/arraydatatype.h"
 #include "types/binarydatatype.h"
 #include "types/booleandatatype.h"
@@ -32,6 +33,23 @@
 using namespace seds::model;
 
 namespace tests::conversion::common {
+
+ArrayDataType SedsDataTypeFactory::createArray(QString name, QString itemTypeName)
+{
+    DimensionSize dimension1;
+    dimension1.setSize(3);
+
+    DimensionSize dimension2;
+    dimension2.setSize(4);
+
+    ArrayDataType dataType;
+    dataType.setName(std::move(name));
+    dataType.addDimension(std::move(dimension1));
+    dataType.addDimension(std::move(dimension2));
+    dataType.setType(std::move(itemTypeName));
+
+    return dataType;
+}
 
 BinaryDataType SedsDataTypeFactory::createBinary(QString name)
 {

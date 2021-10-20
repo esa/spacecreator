@@ -23,6 +23,10 @@
 #include <memory>
 #include <seds/SedsModel/sedsmodel.h>
 
+namespace seds::model {
+class ContainerDataType;
+} // namespace seds::model
+
 namespace tests::conversion::common {
 
 class SedsModelBuilder final
@@ -32,8 +36,10 @@ public:
     std::unique_ptr<seds::model::SedsModel> build();
 
 public:
+    auto withArrayDataType(QString name, QString itemTypeName) -> SedsModelBuilder &;
     auto withBinaryDataType(QString name) -> SedsModelBuilder &;
     auto withBooleanDataType(QString name) -> SedsModelBuilder &;
+    auto withContainerDataType(seds::model::ContainerDataType dataType) -> SedsModelBuilder &;
     auto withEnumeratedDataType(QString name, QStringList elems) -> SedsModelBuilder &;
     auto withFloatDataType(QString name) -> SedsModelBuilder &;
     auto withIntegerDataType(QString name) -> SedsModelBuilder &;
