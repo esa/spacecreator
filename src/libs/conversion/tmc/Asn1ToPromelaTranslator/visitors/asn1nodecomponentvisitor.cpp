@@ -19,8 +19,6 @@
 
 #include "asn1nodecomponentvisitor.h"
 
-#include "asn1constraintvisitor.h"
-
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
 #include <asn1library/asn1/types/choice.h>
