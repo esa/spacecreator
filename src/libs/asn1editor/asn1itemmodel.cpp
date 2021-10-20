@@ -262,7 +262,6 @@ QStandardItem *Asn1ItemModel::createSequenceItem(const Asn1Acn::Types::Sequence 
         }
 
         ItemMap childItem = createModelItems(asnSequenceComponent->type(), asnSequenceComponent->name());
-        childItem["present"]->setEnabled(true);
         childItem["present"]->setCheckable(true);
         childItem["present"]->setCheckState(asnSequenceComponent->isOptional() ? Qt::Checked : Qt::Unchecked);
 
