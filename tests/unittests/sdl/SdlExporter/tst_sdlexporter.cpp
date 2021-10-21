@@ -138,6 +138,8 @@ void tst_sdlmodel::testGenerateProcess()
     auto someInput = SdlInputBuilder().withName("some_input_name").withTransition(transition1.get()).build();
     auto state1 = SdlStateBuilder("Looping").withInput(std::move(someInput)).build();
 
+    auto startTransition = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
+
     auto referenceOutput = SdlOutputBuilder().withName("referenceOutput").build();
 
     auto transition2 = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
@@ -152,6 +154,7 @@ void tst_sdlmodel::testGenerateProcess()
     // clang-format off
     const auto exampleModel = SdlModelBuilder(modelName)
         .withProcess(SdlProcessBuilder(processName)
+                           .withStartTransition(std::move(startTransition))
                            .withStateMachine(SdlStateMachineBuilder()
                                                      .withState(std::move(state1))
                                                      .withState(std::move(state2))
@@ -238,6 +241,7 @@ void tst_sdlmodel::testGenerateProcessWithTasksVariablesAndParameters()
 
     auto process = SdlProcessBuilder(processName)
                            .withStartTransition(std::move(startTransition))
+                           .withVariable(std::move(variable))
                            .withStateMachine(SdlStateMachineBuilder()
                                                      .withState(std::move(state1))
                                                      .withState(std::move(state2))
