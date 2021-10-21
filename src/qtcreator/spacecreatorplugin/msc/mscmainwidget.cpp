@@ -17,35 +17,19 @@
 
 #include "mscmainwidget.h"
 
-#include "actionsbar.h"
-#include "asn1fileview.h"
 #include "chartlayoutmanager.h"
 #include "commands/cmdsetasn1file.h"
-#include "documentitemmodel.h"
-#include "documenttreeview.h"
-#include "graphicsview.h"
 #include "mainmodel.h"
-#include "mscchart.h"
-#include "mscdocument.h"
+#include "mscappwidget.h"
 #include "mscmodel.h"
 #include "spacecreatorprojectimpl.h"
 
-#include <QAction>
 #include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
-#include <QGraphicsScene>
 #include <QHBoxLayout>
-#include <QImage>
-#include <QMessageBox>
-#include <QPushButton>
-#include <QSplitter>
-#include <QStackedWidget>
-#include <QUndoStack>
 #include <QVBoxLayout>
-#include <QtWidgets/QHeaderView>
-#include <coreplugin/minisplitter.h>
-#include <editormanager/editormanager.h>
+#include <coreplugin/editormanager/editormanager.h>
 
 namespace spctr {
 
@@ -58,36 +42,13 @@ MscMainWidget::MscMainWidget(QWidget *parent)
 {
 }
 
-MscMainWidget::~MscMainWidget()
-{
-    if (m_documentTree->model()) {
-        disconnect(m_documentTree->model(), nullptr, this, nullptr);
-    }
-    if (!m_plugin.isNull()) {
-        disconnect(&(m_plugin->mainModel()->chartViewModel()), nullptr, this, nullptr);
-        disconnect(m_plugin->mainModel(), nullptr, this, nullptr);
-        disconnect(m_plugin->mainModel()->undoStack(), nullptr, this, nullptr);
-    }
-}
+MscMainWidget::~MscMainWidget() { }
 
 bool MscMainWidget::init(MSCEditorCorePtr plugin, SpaceCreatorProjectImpl *project)
 {
     m_project = project;
     m_plugin = plugin;
-    if (!m_plugin->chartView()) {
-        init();
-        m_plugin->mainModel()->chartViewModel().clearScene();
-        m_plugin->mainModel()->chartViewModel().updateLayout();
-        m_plugin->chartView()->setZoom(100);
-    }
-
-    m_asn1Switch->setText(m_plugin->mainModel()->mscModel()->dataDefinitionString());
-
-    if (m_documentTree) {
-        m_documentTree->expandAll();
-        m_documentTree->setSelectedDocument(m_plugin->mainModel()->selectedDocument());
-    }
-
+    init();
     return true;
 }
 
@@ -95,80 +56,6 @@ MSCEditorCorePtr MscMainWidget::mscCore() const
 {
     Q_ASSERT(!m_plugin.isNull());
     return m_plugin;
-}
-
-void MscMainWidget::showChart(const QModelIndex &index)
-{
-    if (!index.isValid()) {
-        return;
-    }
-    if (m_plugin.isNull()) {
-        return;
-    }
-
-    auto *obj = static_cast<QObject *>(index.internalPointer());
-    if (obj == nullptr) {
-        return;
-    }
-
-    if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
-        if (!document->charts().empty()) {
-            m_plugin->mainModel()->chartViewModel().setCurrentChart(document->charts()[0]);
-            m_plugin->showDocumentView(true);
-        }
-    }
-}
-
-void MscMainWidget::showSelection(const QModelIndex &current, const QModelIndex &previous)
-{
-    Q_UNUSED(previous)
-    if (!current.isValid()) {
-        return;
-    }
-    if (m_plugin.isNull()) {
-        return;
-    }
-
-    auto *obj = static_cast<QObject *>(current.internalPointer());
-    if (obj == nullptr) {
-        m_plugin->mainModel()->setSelectedDocument(nullptr);
-        return;
-    }
-
-    if (m_plugin->chartView()) {
-        static constexpr qreal padding = 110.;
-        QSizeF preferredSize = m_plugin->chartView()->size() - QSizeF(padding, padding);
-        m_plugin->mainModel()->chartViewModel().setPreferredChartBoxSize(preferredSize);
-    }
-
-    auto chart = dynamic_cast<msc::MscChart *>(obj);
-    if (!chart) {
-        if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
-            if (document && document->hierarchyType() == msc::MscDocument::HierarchyLeaf) {
-                if (!document->charts().isEmpty())
-                    chart = document->charts().at(0);
-            }
-        }
-    }
-    if (chart) {
-        m_plugin->mainModel()->chartViewModel().setCurrentChart(chart);
-        m_plugin->showDocumentView(true);
-    } else {
-        m_plugin->showHierarchyView(true);
-
-        if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
-            m_plugin->mainModel()->setSelectedDocument(document);
-        }
-    }
-}
-
-/*!
-   Thw the chart of document tool bar depending of the view mode
- */
-void MscMainWidget::onViewModeChanged()
-{
-    m_chartToolBar->setVisible(m_plugin->viewMode() == msc::MSCEditorCore::ViewMode::CHART);
-    m_documentToolBar->setVisible(m_plugin->viewMode() == msc::MSCEditorCore::ViewMode::HIERARCHY);
 }
 
 void MscMainWidget::openAsn1Dialog()
@@ -184,46 +71,28 @@ void MscMainWidget::openAsn1Dialog()
 
 void MscMainWidget::init()
 {
-    if (m_documentTree || m_plugin.isNull()) {
-        // initialized already
+    if (m_plugin.isNull()) {
         return;
     }
 
-    // Graphical editors
-    auto editorsWidgets = new QWidget(this);
-    auto editorsLayout = new QHBoxLayout(editorsWidgets);
-    editorsLayout->setMargin(0);
-    editorsLayout->setSpacing(0);
-    editorsWidgets->setLayout(editorsLayout);
+    auto layout = new QHBoxLayout(this);
+    layout->setMargin(0);
+    layout->setSpacing(0);
+    setLayout(layout);
+    msc::MscAppWidget *mainWidget = m_plugin->mainwidget();
+    mainWidget->showAsn1View(false);
+    mainWidget->setParent(this);
+    layout->addWidget(mainWidget);
 
-    m_chartToolBar = new shared::ActionsBar(editorsWidgets);
-    editorsLayout->addWidget(m_chartToolBar);
-    m_documentToolBar = new shared::ActionsBar(editorsWidgets);
-    editorsLayout->addWidget(m_documentToolBar);
-    connect(m_plugin.data(), &msc::MSCEditorCore::viewModeChanged, this, &spctr::MscMainWidget::onViewModeChanged);
-    onViewModeChanged();
-
-    auto centerView = new QStackedWidget(editorsWidgets);
-    auto graphicsView = new msc::GraphicsView(centerView);
-    centerView->addWidget(graphicsView);
-    auto hierarchyView = new msc::GraphicsView(centerView);
-    centerView->addWidget(hierarchyView);
-    editorsLayout->addWidget(centerView);
-
-    m_plugin->setViews(centerView, graphicsView, hierarchyView);
-
-    // Doceuments tree etc.
-    auto leftArea = new QWidget(this);
-    auto leftVerticalLayout = new QVBoxLayout(leftArea);
-    leftVerticalLayout->setMargin(0);
-
-    m_documentTree = new msc::DocumentTreeView(leftArea);
-    m_documentTree->header()->setVisible(true);
-    leftVerticalLayout->addWidget(m_documentTree);
-
-    m_ivSwitch = new QPushButton("Interface view", leftArea);
-    m_ivSwitch->setToolTip(tr("Open the file"));
-    connect(m_ivSwitch, &QPushButton::clicked, this, [this]() {
+    if (!mainWidget->chartView()) {
+        m_plugin->mainModel()->chartViewModel().clearScene();
+        m_plugin->mainModel()->chartViewModel().updateLayout();
+        m_plugin->chartView()->setZoom(100);
+    }
+    connect(mainWidget, &msc::MscAppWidget::showAsn1File, this,
+            [&](const QString &asnFilename) { Core::EditorManager::instance()->openEditor(asnFilename); });
+    connect(mainWidget, &msc::MscAppWidget::selectAsn1, this, &spctr::MscMainWidget::openAsn1Dialog);
+    connect(mainWidget, &msc::MscAppWidget::showInterfaceView, this, [&]() {
         if (!m_project) {
             return;
         }
@@ -231,74 +100,6 @@ void MscMainWidget::init()
         if (!ivFiles.isEmpty()) {
             Core::EditorManager::instance()->openEditor(ivFiles.first());
         }
-    });
-    m_ivSwitch->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
-    leftVerticalLayout->addWidget(m_ivSwitch);
-
-    auto asn1Widget = new QWidget(leftArea);
-    asn1Widget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    auto asn1Layout = new QHBoxLayout(asn1Widget);
-    asn1Layout->setMargin(0);
-    asn1Widget->setLayout(asn1Layout);
-    m_asn1Switch = new QPushButton("file.asn", asn1Widget);
-    m_asn1Switch->setToolTip(tr("Open the file"));
-    m_asn1Switch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-    m_asn1Select = new QPushButton(tr("..."), asn1Widget);
-    m_asn1Select->setToolTip(tr("Select the ASN.1 file"));
-    connect(m_asn1Select, &QPushButton::clicked, this, &spctr::MscMainWidget::openAsn1Dialog);
-    m_asn1Select->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    asn1Layout->addWidget(m_asn1Switch);
-    asn1Layout->addWidget(m_asn1Select);
-
-    leftVerticalLayout->addWidget(asn1Widget);
-
-    auto horizontalSplitter = new Core::MiniSplitter(Qt::Horizontal);
-    horizontalSplitter->addWidget(leftArea);
-    horizontalSplitter->addWidget(editorsWidgets);
-    horizontalSplitter->setStretchFactor(0, 0);
-    horizontalSplitter->setStretchFactor(1, 1);
-
-    auto viewLayout = new QHBoxLayout(this);
-    viewLayout->setMargin(0);
-    viewLayout->setSpacing(0);
-    setLayout(viewLayout);
-    viewLayout->addWidget(horizontalSplitter);
-
-    // init
-    m_documentTree->setModel(m_plugin->mainModel()->documentItemModel());
-
-    m_plugin->createActionCopy(nullptr);
-    m_plugin->createActionPaste(nullptr);
-    m_plugin->initChartTools();
-    m_plugin->initHierarchyViewActions();
-    initConnections();
-    m_plugin->initConnections();
-    m_plugin->setupMiniMap();
-    m_plugin->showDocumentView(true);
-
-    for (QAction *chartAction : m_plugin->chartActions()) {
-        m_chartToolBar->addAction(chartAction);
-    }
-    for (QAction *documentAction : m_plugin->hierarchyActions()) {
-        m_documentToolBar->addAction(documentAction);
-    }
-}
-
-void MscMainWidget::initConnections()
-{
-    connect(m_documentTree->selectionModel(), &QItemSelectionModel::currentChanged, this,
-            &MscMainWidget::showSelection);
-    connect(m_documentTree, &QTreeView::doubleClicked, this, &MscMainWidget::showChart);
-
-    connect(m_plugin->mainModel(), &msc::MainModel::selectedDocumentChanged, m_documentTree,
-            &msc::DocumentTreeView::setSelectedDocument);
-
-    connect(m_plugin->mainModel()->documentItemModel(), &msc::DocumentItemModel::dataChanged, this,
-            &MscMainWidget::showSelection);
-
-    connect(m_plugin->mainModel(), &msc::MainModel::asn1FileNameChanged, m_asn1Switch, &QPushButton::setText);
-    connect(m_asn1Switch, &QPushButton::clicked, this, [&]() {
-        Core::EditorManager::instance()->openEditor(m_plugin->mainModel()->asn1File().absoluteFilePath());
     });
 }
 

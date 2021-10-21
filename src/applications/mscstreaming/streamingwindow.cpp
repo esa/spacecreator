@@ -67,9 +67,7 @@ StreamingWindow::StreamingWindow(msc::MSCEditorCore *plugin, QWidget *parent)
     , d(new StreamingWindowPrivate(plugin))
 {
     d->ui->setupUi(this);
-    d->m_plugin->showToolbars(false);
-    d->m_plugin->setViews(nullptr, d->ui->graphicsView, nullptr);
-    d->m_plugin->initChartTools();
+    d->ui->graphicsView->setScene(d->m_plugin->mainModel()->graphicsScene());
 
     static constexpr qreal padding = 120.;
     const QSizeF defaultSize(this->size() - QSizeF(padding, padding));
