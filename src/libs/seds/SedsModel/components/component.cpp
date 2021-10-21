@@ -51,17 +51,6 @@ void Component::addDataType(DataType dataType)
     m_dataTypes.push_back(std::move(dataType));
 }
 
-const DataType *Component::findDataType(const QString &dataTypeName) const
-{
-    auto found = std::find_if(m_dataTypes.begin(), m_dataTypes.end(),
-            [&dataTypeName](const DataType &dataType) { return dataTypeNameStr(dataType) == dataTypeName; });
-    if (found != m_dataTypes.end()) {
-        return &(*found);
-    } else {
-        return nullptr;
-    }
-}
-
 const Component::InterfaceDeclarationSet &Component::declaredInterfaces() const
 {
     return m_declaredInterfaces;
