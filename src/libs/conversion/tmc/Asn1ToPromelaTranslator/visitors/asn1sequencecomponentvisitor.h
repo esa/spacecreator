@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#pragma once
+
 #include <asn1library/asn1/sequencecomponentvisitor.h>
 #include <tmc/PromelaModel/promelamodel.h>
 #include <tmc/PromelaModel/utype.h>
