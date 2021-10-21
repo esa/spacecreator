@@ -60,16 +60,11 @@ void DataTypesDependencyResolver::visit(const seds::model::DataType *dataType)
 
     markTemporary(dataType);
 
-    std::visit(
-            [this](auto &&dataType) {
-                using T = std::decay_t<decltype(dataType)>;
-                if constexpr (std::is_same_v<T, seds::model::ArrayDataType>) {
-                    visitArray(dataType);
-                } else if constexpr (std::is_same_v<T, seds::model::ContainerDataType>) {
-                    visitContainer(dataType);
-                }
-            },
-            *dataType);
+    if (const auto *arrayDataType = std::get_if<seds::model::ArrayDataType>(dataType)) {
+        visitArray(*arrayDataType);
+    } else if (const auto *containerDataType = std::get_if<seds::model::ContainerDataType>(dataType)) {
+        visitContainer(*containerDataType);
+    }
 
     markPermanent(dataType);
     m_result.push_back(dataType);
