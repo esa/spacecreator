@@ -38,7 +38,7 @@ public:
      *
      * @return  Created data type
      */
-    static auto createArray(QString name, QString itemTypeName) -> seds::model::ArrayDataType;
+    static auto createArray(QString name, QString itemTypeName, uint32_t dimensionsCount) -> seds::model::ArrayDataType;
     /**
      * @brief   Create binary data type
      *

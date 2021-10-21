@@ -8,7 +8,7 @@ target_sources(${TEST_NAME}
     PRIVATE     main.cpp
                 testbase.cpp
                 tsti_arraydatatype.cpp
-    PUBLIC      testbase.h
+                testbase.h
                 tsti_arraydatatype.h)
 target_include_directories(${TEST_NAME}
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)

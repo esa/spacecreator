@@ -36,7 +36,7 @@ public:
     std::unique_ptr<seds::model::SedsModel> build();
 
 public:
-    auto withArrayDataType(QString name, QString itemTypeName) -> SedsModelBuilder &;
+    auto withArrayDataType(QString name, QString itemTypeName, uint32_t dimensionsCount) -> SedsModelBuilder &;
     auto withBinaryDataType(QString name) -> SedsModelBuilder &;
     auto withBooleanDataType(QString name) -> SedsModelBuilder &;
     auto withContainerDataType(seds::model::ContainerDataType dataType) -> SedsModelBuilder &;

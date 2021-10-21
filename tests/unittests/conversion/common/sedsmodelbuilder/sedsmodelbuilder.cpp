@@ -38,9 +38,9 @@ std::unique_ptr<SedsModel> SedsModelBuilder::build()
     return std::make_unique<SedsModel>(std::move(packageFile));
 }
 
-SedsModelBuilder &SedsModelBuilder::withArrayDataType(QString name, QString itemTypeName)
+SedsModelBuilder &SedsModelBuilder::withArrayDataType(QString name, QString itemTypeName, uint32_t dimensionsCount)
 {
-    auto dataType = SedsDataTypeFactory::createArray(std::move(name), std::move(itemTypeName));
+    auto dataType = SedsDataTypeFactory::createArray(std::move(name), std::move(itemTypeName), dimensionsCount);
     m_package.addDataType(std::move(dataType));
 
     return *this;
