@@ -25,6 +25,16 @@ namespace sdl {
 
 Decision::Decision() {}
 
+const std::vector<std::unique_ptr<Answer>> &Decision::answers() const
+{
+    return m_answers;
+}
+
+void Decision::addAnswer(std::unique_ptr<Answer> answer)
+{
+    m_answers.push_back(std::move(answer));
+}
+
 Expression *Decision::expression() const
 {
     return m_expression.get();

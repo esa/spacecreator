@@ -35,4 +35,15 @@ void Answer::setAction(Action *const action)
     m_action = action;
 }
 
+VariableLiteral *Answer::literal() const
+{
+    return m_literal;
+}
+
+void Answer::setLiteral(VariableLiteral *literal)
+{
+    m_literal = literal;
+}
+}
+
 } // namespace sdl

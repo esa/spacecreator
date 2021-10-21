@@ -369,9 +369,6 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     QString modelPrefix = "Sdl_";
     QString processName = "ExampleProcess";
 
-    // todo auto nextStateWait = std::make_unique<NextState>("");
-    // todo auto startTransition = SdlTransitionBuilder().withAction(std::move(nextStateWait)).build();
-
     // todo create variable and add it to Process
 
     // todo create two Answers
@@ -380,14 +377,21 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     // todo add Decision to transition
     auto transition = SdlTransitionBuilder().withNextStateAction().build();
 
-    auto waitState =
-            SdlStateBuilder("Wait").withInput(SdlInputBuilder("startProcess", transition.get()).build()).build();
+    auto waitState = SdlStateBuilder("Wait") //
+                             .withInput(SdlInputBuilder() //
+                                                .withName("startProcess")
+                                                .withTransition(transition.get())
+                                                .build())
+                             .build();
+
+    // todo: auto nextStateWait = std::make_unique<NextState>("", waitState.get()); (and use withAction() below)
+    auto startTransition = SdlTransitionBuilder().withNextStateAction(waitState.get()).build();
 
     // clang-format off
     const auto exampleModel = SdlModelBuilder(modelName)
         .withProcess(
             SdlProcessBuilder(processName)
-                // todo .withStartProcess()
+                .withStartTransition(std::move(startTransition))
                 .withStateMachine(
                     SdlStateMachineBuilder()
                         .withState(std::move(waitState))
