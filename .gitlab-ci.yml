@@ -50,6 +50,7 @@ space-creator-dev:
     reports:
       junit: build/tst_*-result.xml
   rules:
+    # For pipelines created when a merge request is created or updated
     - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
 
 
