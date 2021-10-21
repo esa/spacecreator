@@ -115,6 +115,7 @@ void DocumentTreeView::setSelectedDocument(msc::MscDocument *document)
 
         if (index.internalPointer() == document) {
             selectionModel()->select(index, QItemSelectionModel::ClearAndSelect);
+            setCurrentIndex(index);
         }
 
         for (int x = 0; x < model()->rowCount(index); ++x) {

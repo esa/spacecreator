@@ -109,7 +109,6 @@ MSCEditorCorePtr SpaceCreatorProject::mscData(const QString &fileName) const
 {
     if (!m_mscStore.contains(fileName)) {
         MSCEditorCorePtr data(new msc::MSCEditorCore());
-        data->showToolbars(false);
         data->mainModel()->setAsn1Check(m_asnChecks.get());
         data->mainModel()->loadFile(fileName);
         if (data->mainModel()->mscModel() && data->mainModel()->mscModel()->dataLanguage().isEmpty()) {

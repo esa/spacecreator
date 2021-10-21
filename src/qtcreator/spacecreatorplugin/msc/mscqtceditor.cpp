@@ -17,6 +17,7 @@
 
 #include "mscqtceditor.h"
 
+#include "mscappwidget.h"
 #include "msceditordocument.h"
 #include "mscmainwidget.h"
 #include "spacecreatorpluginconstants.h"
@@ -71,7 +72,7 @@ QWidget *MscQtCEditor::toolBar()
         m_toolbar->addAction(mscCore->actionUndo());
         m_toolbar->addAction(mscCore->actionRedo());
         m_toolbar->addSeparator();
-        m_toolbar->addAction(mscCore->deleteTool()->action());
+        m_toolbar->addAction(mscCore->mainwidget()->deleteTool()->action());
         m_toolbar->addSeparator();
         m_toolbar->addAction(mscCore->actionCopy());
         m_toolbar->addAction(mscCore->actionPaste());

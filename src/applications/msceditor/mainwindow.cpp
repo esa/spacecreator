@@ -33,6 +33,7 @@
 #include "mainmodel.h"
 #include "minimap.h"
 #include "mscaction.h"
+#include "mscappwidget.h"
 #include "mscchart.h"
 #include "msccommandsstack.h"
 #include "msccondition.h"
@@ -44,6 +45,7 @@
 #include "settingsmanager.h"
 #include "textviewdialog.h"
 #include "tools/entitydeletetool.h"
+#include "tools/pointertool.h"
 #include "ui/graphicsviewbase.h"
 #include "ui_mainwindow.h"
 
@@ -56,6 +58,7 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QMimeData>
+#include <QStackedWidget>
 #include <QtDebug>
 
 namespace msc {
@@ -75,6 +78,7 @@ struct MainWindow::MainWindowPrivate {
     IVEditorCorePtr m_ivCore { new ive::IVEditorCore() };
 
     Ui::MainWindow *ui = nullptr;
+    QPointer<msc::MscAppWidget> m_mainWidget;
 
     msc::MSCEditorCore *m_core = nullptr;
 
@@ -106,31 +110,18 @@ MainWindow::MainWindow(msc::MSCEditorCore *core, QWidget *parent)
     , d(new MainWindowPrivate(core, this))
 {
     setupUi();
-    d->m_core->hierarchyView()->setRenderHints(
-            QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 
     initConnections();
     d->m_core->initConnections();
 
     d->m_core->selectCurrentChart();
-    d->m_core->showDocumentView(true);
 
     loadSettings();
-
-    d->m_core->mscToolBar()->setVisible(d->m_core->centerView()->currentWidget() == d->m_core->chartView());
-    d->m_core->hierarchyToolBar()->setVisible(d->m_core->centerView()->currentWidget() == d->m_core->hierarchyView());
 }
 
 MainWindow::~MainWindow()
 {
-    if (d->ui->documentTreeView->model()) {
-        disconnect(d->ui->documentTreeView->model(), nullptr, this, nullptr);
-    }
     disconnect(&(d->m_core->mainModel()->chartViewModel()), nullptr, this, nullptr);
-
-    // Had this connection not dropped, the currentUndoStack() would need check
-    // for nullptr d, d->ui, d->m_core->chartView()
-    disconnect(d->m_core->mainModel()->undoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
 }
 
 /*!
@@ -139,7 +130,7 @@ MainWindow::~MainWindow()
  */
 QGraphicsView *MainWindow::currentView() const
 {
-    return d->m_core->chartView();
+    return d->m_mainWidget->chartView();
 }
 
 /*!
@@ -154,7 +145,7 @@ void MainWindow::createNewDocument()
     d->m_core->mainModel()->chartViewModel().setPreferredChartBoxSize(prepareChartBoxSize());
     d->m_core->mainModel()->initialModel();
 
-    d->m_core->chartView()->setZoom(100);
+    d->m_mainWidget->chartView()->setZoom(100);
 }
 
 /*!
@@ -243,12 +234,14 @@ void MainWindow::updateTitles()
  */
 bool MainWindow::openMscChain(const QString &dirPath)
 {
-    if (dirPath.isEmpty())
+    if (dirPath.isEmpty()) {
         return false;
+    }
 
     QDir dir(dirPath);
-    if (!dir.exists() || !dir.isReadable())
+    if (!dir.exists() || !dir.isReadable()) {
         return false;
+    }
 
     for (const QFileInfo &file : dir.entryInfoList(mscFileFilters())) {
         openFileMsc(file.absoluteFilePath());
@@ -291,9 +284,9 @@ void MainWindow::saveAsMsc()
  */
 void MainWindow::showDocumentView(bool show)
 {
-    d->m_core->showDocumentView(show);
+    d->m_mainWidget->showDocumentView(show);
     if (show) {
-        updateZoomBox(d->m_core->chartView()->zoom());
+        updateZoomBox(d->m_mainWidget->chartView()->zoom());
     }
 }
 
@@ -303,59 +296,9 @@ void MainWindow::showDocumentView(bool show)
  */
 void MainWindow::showHierarchyView(bool show)
 {
-    d->m_core->showHierarchyView(show);
+    d->m_mainWidget->showHierarchyView(show);
     if (show) {
-        updateZoomBox(d->m_core->hierarchyView()->zoom());
-    }
-}
-
-/*!
- * \brief MainWindow::showChart Show the chart \a index
- */
-void MainWindow::showChart(const QModelIndex &index)
-{
-    if (!index.isValid()) {
-        return;
-    }
-
-    auto *obj = static_cast<QObject *>(index.internalPointer());
-    if (obj == nullptr) {
-        return;
-    }
-
-    if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
-        if (!document->charts().empty()) {
-            d->m_core->mainModel()->chartViewModel().setCurrentChart(document->charts()[0]);
-            showDocumentView(true);
-        }
-    }
-}
-
-void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &previous)
-{
-    Q_UNUSED(previous)
-    if (!current.isValid()) {
-        return;
-    }
-
-    auto *obj = static_cast<QObject *>(current.internalPointer());
-    if (obj == nullptr) {
-        d->m_core->mainModel()->setSelectedDocument(nullptr);
-        return;
-    }
-
-    if (auto chart = dynamic_cast<msc::MscChart *>(obj)) {
-        d->m_core->mainModel()->chartViewModel().setCurrentChart(chart);
-        showDocumentView(true);
-    } else {
-        showHierarchyView(true);
-
-        if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
-            d->m_core->mainModel()->setSelectedDocument(document);
-            d->m_core->actionPaste()->setEnabled(
-                    QApplication::clipboard()->mimeData()->hasFormat(MainModel::MscChartMimeType)
-                    && d->m_core->mainModel()->selectedDocument()->isAddChildEnable());
-        }
+        updateZoomBox(d->m_mainWidget->hierarchyView()->zoom());
     }
 }
 
@@ -365,39 +308,36 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
 void MainWindow::setupUi()
 {
     d->ui->setupUi(this);
-    d->m_core->setViews(d->ui->centerView, d->ui->graphicsView, d->ui->hierarchyView);
+    d->m_mainWidget = d->m_core->mainwidget();
+    d->m_mainWidget->showAsn1View(true);
+    setCentralWidget(d->m_mainWidget);
 
     d->m_core->addToolBars(this);
 
-    d->ui->documentTreeView->setModel(d->m_core->mainModel()->documentItemModel());
     d->mscTextBrowser->setModel(d->m_core->mainModel()->mscModel());
 
     initActions();
 
-    d->m_core->initChartTools();
-    d->m_core->initHierarchyViewActions();
-
     initMenus();
-    initMainToolbar();
 
     d->m_core->setupMiniMap();
 
     // status bar
     d->m_zoomBox = new QComboBox(d->ui->statusBar);
-    for (auto x = d->m_core->chartView()->minZoomPercent(); x <= d->m_core->chartView()->maxZoomPercent();
-            x += d->m_core->chartView()->zoomStepPercent())
+    for (auto x = d->m_mainWidget->chartView()->minZoomPercent(); x <= d->m_core->chartView()->maxZoomPercent();
+            x += d->m_mainWidget->chartView()->zoomStepPercent())
         d->m_zoomBox->addItem(QString("%1 %").arg(x), x);
 
     d->m_zoomBox->setCurrentIndex(d->m_zoomBox->findData(100));
 
     connect(d->m_zoomBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [&](int index) {
-        if (auto graphicsView = dynamic_cast<msc::GraphicsView *>(d->m_core->centerView()->currentWidget()))
+        if (auto graphicsView = dynamic_cast<msc::GraphicsView *>(d->m_mainWidget->centerView()->currentWidget()))
             graphicsView->setZoom(qobject_cast<QComboBox *>(sender())->itemData(index).toDouble());
     });
 
-    connect(d->m_core->chartView(), QOverload<double>::of(&msc::GraphicsView::zoomChanged), this,
+    connect(d->m_mainWidget->chartView(), QOverload<double>::of(&msc::GraphicsView::zoomChanged), this,
             &MainWindow::updateZoomBox);
-    connect(d->m_core->hierarchyView(), QOverload<double>::of(&msc::GraphicsView::zoomChanged), this,
+    connect(d->m_mainWidget->hierarchyView(), QOverload<double>::of(&msc::GraphicsView::zoomChanged), this,
             &MainWindow::updateZoomBox);
 
     statusBar()->addPermanentWidget(d->m_zoomBox);
@@ -447,7 +387,7 @@ void MainWindow::initMenus()
     redoAction->setShortcut(QKeySequence::Redo);
     menu->addAction(redoAction);
     menu->addSeparator();
-    menu->addAction(d->m_core->deleteTool()->action());
+    menu->addAction(d->m_mainWidget->deleteTool()->action());
     menu->addSeparator();
     menu->addAction(d->m_core->createActionCopy(this));
     menu->addAction(d->m_core->createActionPaste(this));
@@ -468,9 +408,7 @@ void MainWindow::initMenus()
     menu->addAction(d->m_core->actionMessageDeclarations());
     menu->addSeparator();
     auto menuWindows = menu->addMenu("Windows");
-    menuWindows->addAction(dockWidgetDocumentToggleAction());
     menuWindows->addAction(mscTextViewToggleAction());
-    menuWindows->addAction(dockWidgetAsn1ToggleAction());
     menu->addSeparator();
     menu->addAction(tr("Color Scheme..."), this, &MainWindow::editColorScheme);
 
@@ -482,48 +420,17 @@ void MainWindow::initMenus()
     menu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
 }
 
-void MainWindow::initMainToolbar()
-{
-    auto mainToolBar = d->m_core->mainToolBar();
-    mainToolBar->addSeparator();
-    mainToolBar->addAction(d->m_core->deleteTool()->action());
-
-    mainToolBar->addSeparator();
-    mainToolBar->addAction(d->m_core->actionCopy());
-    mainToolBar->addAction(d->m_core->actionPaste());
-}
-
 void MainWindow::initConnections()
 {
-    connect(d->ui->documentTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this,
-            &MainWindow::showSelection);
-    connect(d->ui->documentTreeView, &QTreeView::doubleClicked, this, &MainWindow::showChart);
-
-    connect(d->m_core->mainModel(), &MainModel::selectedDocumentChanged, d->ui->documentTreeView,
-            &DocumentTreeView::setSelectedDocument);
-
-    connect(d->m_core->chartView(), &msc::GraphicsView::mouseMoved, this, &MainWindow::showCoordinatesInfo);
+    connect(d->m_mainWidget->chartView(), &msc::GraphicsView::mouseMoved, this, &MainWindow::showCoordinatesInfo);
 
     connect(d->m_core->mainModel(), &MainModel::modelDataChanged, this, &MainWindow::updateModel);
     connect(d->m_core->mainModel(), &MainModel::modelUpdated, this, &MainWindow::updateModel);
 
-    connect(d->m_core->mainModel()->documentItemModel(), &msc::DocumentItemModel::dataChanged, this,
-            &MainWindow::showSelection);
-
     connect(d->m_core->mainModel()->undoStack(), &QUndoStack::cleanChanged, this, &MainWindow::updateTitles);
 
-    // ASN1 view
-    connect(d->m_core->mainModel(), &MainModel::currentFilePathChanged, this, [&](const QString &filename) {
-        QFileInfo fileInfo(filename);
-        d->ui->asn1Widget->setDirectory(fileInfo.absolutePath());
-    });
-    connect(d->m_core->mainModel(), &msc::MainModel::asn1FileNameChanged, d->ui->asn1Widget,
-            &asn1::ASN1FileView::setFileName);
-    connect(d->ui->asn1Widget, &asn1::ASN1FileView::asn1Selected, this, [this]() {
-        msc::MscModel *model = d->m_core->mainModel()->mscModel();
-        if (model->dataDefinitionString() != d->ui->asn1Widget->fileName()) {
-            d->m_core->commandsStack()->push(new cmd::CmdSetAsn1File(model, d->ui->asn1Widget->fileName(), "ASN.1"));
-        }
+    connect(d->m_mainWidget, &MscAppWidget::viewModeChanged, this, [this]() {
+        d->m_actionShowDocument->setChecked(d->m_mainWidget->viewMode() == MscAppWidget::ViewMode::CHART);
     });
 }
 
@@ -550,19 +457,9 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
     return false;
 }
 
-QAction *MainWindow::dockWidgetDocumentToggleAction()
-{
-    return d->ui->dockWidgetDocument->toggleViewAction();
-}
-
 QAction *MainWindow::mscTextViewToggleAction()
 {
     return d->mscTextBrowser->toggleViewAction();
-}
-
-QAction *MainWindow::dockWidgetAsn1ToggleAction()
-{
-    return d->ui->dockWidgetAsn1->toggleViewAction();
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
@@ -572,9 +469,10 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     switch (e->key()) {
     case Qt::Key_Escape: {
         if (!e->isAutoRepeat()) {
-            if (QAction *pointerToolAction = d->m_core->mscToolBar()->actions().first())
-                if (!pointerToolAction->isChecked())
-                    pointerToolAction->setChecked(true);
+            QAction *pointerToolAction = d->m_mainWidget->pointerTool()->action();
+            if (!pointerToolAction->isChecked()) {
+                pointerToolAction->setChecked(true);
+            }
         }
         break;
     }
@@ -593,7 +491,7 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
         break;
     }
     default: {
-        if (msc::BaseTool *tool = d->m_core->activeTool())
+        if (msc::BaseTool *tool = d->m_mainWidget->activeTool())
             tool->processKeyPress(e);
         break;
     }
@@ -626,7 +524,7 @@ void MainWindow::saveSettings()
     using namespace shared;
     SettingsManager::store<QByteArray>(SettingsManager::Common::Geometry, saveGeometry());
     SettingsManager::store<QByteArray>(SettingsManager::Common::State, saveState());
-    SettingsManager::store<bool>(SettingsManager::MSC::DocViewMode, d->m_core->centerView()->currentIndex() == 0);
+    SettingsManager::store<bool>(SettingsManager::MSC::DocViewMode, d->m_mainWidget->centerView()->currentIndex() == 0);
     const QString path = d->m_core->mainModel()->currentFilePath();
 
     auto files = SettingsManager::load<QStringList>(SettingsManager::MSC::RecentFiles);
@@ -691,19 +589,24 @@ void MainWindow::onGeometryRestored()
 QSizeF MainWindow::prepareChartBoxSize() const
 {
     static constexpr qreal padding = 110.;
-    if (centralWidget()) {
-        return centralWidget()->geometry().size() - QSizeF(padding, padding);
+    GraphicsView *chartView = d->m_mainWidget->chartView();
+    if (chartView) {
+        return chartView->geometry().size() - QSizeF(padding, padding);
     }
     return QSizeF();
 }
 
 void MainWindow::updateMscToolbarActionsEnablement()
 {
+    if (!d->m_mainWidget) {
+        return;
+    }
+
     auto chart = d->m_core->mainModel()->chartViewModel().currentChart();
     const bool hasInstance = chart && !chart->instances().isEmpty();
 
     bool forceDefault(false);
-    for (QAction *act : d->m_core->mscToolBar()->actions()) {
+    for (QAction *act : d->m_mainWidget->chartActions()) {
         const msc::BaseTool::ToolType toolType(act->data().value<msc::BaseTool::ToolType>());
         switch (toolType) {
         case msc::BaseTool::ToolType::ActionCreator:
@@ -728,10 +631,10 @@ void MainWindow::updateMscToolbarActionsEnablement()
         }
     }
 
-    d->m_core->checkGlobalComment();
+    d->m_mainWidget->checkGlobalComment();
 
     if (forceDefault) {
-        d->m_core->activateDefaultTool();
+        d->m_mainWidget->activateDefaultTool();
     }
 }
 
