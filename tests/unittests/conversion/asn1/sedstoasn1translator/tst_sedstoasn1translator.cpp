@@ -28,7 +28,9 @@
 #include <asn1library/asn1/types/ia5string.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/real.h>
+#include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/type.h>
+#include <asn1library/asn1/types/userdefinedtype.h>
 #include <asn1library/asn1/values.h>
 #include <conversion/asn1/SedsToAsn1Translator/datatypesdependencyresolver.h>
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
@@ -73,6 +75,8 @@ private Q_SLOTS:
     void testResolvingCyclicDependency();
     void testResolvingUndeclaredType();
 
+    void testTranslateArrayDataTypeOneDimension();
+    void testTranslateArrayDataTypeMultiDimension();
     void testTranslateBinaryDataType();
     void testTranslateBooleanDataType();
     void testTranslateEnumeratedDataType();
@@ -118,7 +122,7 @@ void tst_SedsToAsn1Translator::testWrongModel()
 
 void tst_SedsToAsn1Translator::testResolvingArrayDataType()
 {
-    const seds::model::DataType arrayDataType = SedsDataTypeFactory::createArray("Array", "DataItem");
+    const seds::model::DataType arrayDataType = SedsDataTypeFactory::createArray("Array", "DataItem", 2);
     const seds::model::DataType integerDataType = SedsDataTypeFactory::createInteger("DataItem");
 
     std::vector<const DataType *> dataTypes;
@@ -202,6 +206,116 @@ void tst_SedsToAsn1Translator::testResolvingUndeclaredType()
     DataTypesDependencyResolver resolver;
 
     QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes), UndeclaredDataTypeException);
+}
+
+void tst_SedsToAsn1Translator::testTranslateArrayDataTypeOneDimension()
+{
+    // clang-format off
+    const auto sedsModel = SedsModelBuilder("Model")
+                               .withArrayDataType("Array", "DataItem", 1)
+                               .withIntegerDataType("DataItem")
+                           .build();
+    // clang-format on
+
+    Options options;
+    SedsToAsn1Translator translator;
+
+    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), ModelType::Asn1);
+
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+    QVERIFY(asn1Model);
+
+    const auto *type = getType(asn1Model, 1);
+    QVERIFY(type);
+
+    const auto *sequenceOfType = dynamic_cast<const Types::SequenceOf *>(type);
+    QVERIFY(sequenceOfType);
+
+    QCOMPARE(sequenceOfType->identifier(), "Array");
+    QCOMPARE(sequenceOfType->typeName(), "SEQUENCE OF");
+
+    const auto *sequenceOfItemsType = sequenceOfType->itemsType();
+    QVERIFY(sequenceOfItemsType);
+
+    const auto *sequenceOfReferencedItemsType = dynamic_cast<const Types::UserdefinedType *>(sequenceOfItemsType);
+    QVERIFY(sequenceOfReferencedItemsType);
+
+    const auto *referencedType = sequenceOfReferencedItemsType->type();
+    QVERIFY(referencedType);
+
+    const auto *integerType = dynamic_cast<const Types::Integer *>(referencedType);
+    QVERIFY(integerType);
+
+    QCOMPARE(integerType->identifier(), "DataItem");
+    QCOMPARE(integerType->typeName(), "INTEGER");
+}
+
+void tst_SedsToAsn1Translator::testTranslateArrayDataTypeMultiDimension()
+{
+    // clang-format off
+    const auto sedsModel = SedsModelBuilder("Model")
+                               .withArrayDataType("Array", "DataItem", 3)
+                               .withIntegerDataType("DataItem")
+                           .build();
+    // clang-format on
+
+    Options options;
+    SedsToAsn1Translator translator;
+
+    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), ModelType::Asn1);
+
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+    QVERIFY(asn1Model);
+
+    const auto *type = getType(asn1Model, 1);
+    QVERIFY(type);
+
+    const auto *sequenceOfType = dynamic_cast<const Types::SequenceOf *>(type);
+    QVERIFY(sequenceOfType);
+
+    QCOMPARE(sequenceOfType->identifier(), "Array");
+    QCOMPARE(sequenceOfType->typeName(), "SEQUENCE OF");
+
+    const auto *sequenceOfItemsType = sequenceOfType->itemsType();
+    QVERIFY(sequenceOfItemsType);
+
+    const auto *sequenceOfType2 = dynamic_cast<const Types::SequenceOf *>(sequenceOfItemsType);
+    QVERIFY(sequenceOfType2);
+
+    QCOMPARE(sequenceOfType2->identifier(), "");
+    QCOMPARE(sequenceOfType2->typeName(), "SEQUENCE OF");
+
+    const auto *sequenceOfItemsType2 = sequenceOfType2->itemsType();
+    QVERIFY(sequenceOfItemsType2);
+
+    const auto *sequenceOfType3 = dynamic_cast<const Types::SequenceOf *>(sequenceOfItemsType2);
+    QVERIFY(sequenceOfType3);
+
+    QCOMPARE(sequenceOfType3->identifier(), "");
+    QCOMPARE(sequenceOfType3->typeName(), "SEQUENCE OF");
+
+    const auto *sequenceOfItemsType3 = sequenceOfType3->itemsType();
+    QVERIFY(sequenceOfItemsType3);
+
+    const auto *sequenceOfReferencedItemsType = dynamic_cast<const Types::UserdefinedType *>(sequenceOfItemsType3);
+    QVERIFY(sequenceOfReferencedItemsType);
+
+    const auto *referencedType = sequenceOfReferencedItemsType->type();
+    QVERIFY(referencedType);
+
+    const auto *integerType = dynamic_cast<const Types::Integer *>(referencedType);
+    QVERIFY(integerType);
+
+    QCOMPARE(integerType->identifier(), "DataItem");
+    QCOMPARE(integerType->typeName(), "INTEGER");
 }
 
 void tst_SedsToAsn1Translator::testTranslateBinaryDataType()

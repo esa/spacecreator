@@ -34,19 +34,18 @@ using namespace seds::model;
 
 namespace tests::conversion::common {
 
-ArrayDataType SedsDataTypeFactory::createArray(QString name, QString itemTypeName)
+ArrayDataType SedsDataTypeFactory::createArray(QString name, QString itemTypeName, uint32_t dimensionsCount)
 {
-    DimensionSize dimension1;
-    dimension1.setSize(3);
-
-    DimensionSize dimension2;
-    dimension2.setSize(4);
-
     ArrayDataType dataType;
     dataType.setName(std::move(name));
-    dataType.addDimension(std::move(dimension1));
-    dataType.addDimension(std::move(dimension2));
     dataType.setType(std::move(itemTypeName));
+
+    for (uint32_t i = 0; i < dimensionsCount; ++i) {
+        DimensionSize dimension;
+        dimension.setSize(3);
+
+        dataType.addDimension(std::move(dimension));
+    }
 
     return dataType;
 }
