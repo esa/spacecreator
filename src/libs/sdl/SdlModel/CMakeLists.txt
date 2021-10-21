@@ -6,6 +6,7 @@ add_library(SdlModel STATIC)
 set(SOURCES action.cpp
             answer.cpp
             expression.cpp
+            decision.cpp
             input.cpp
             join.cpp
             label.cpp
@@ -27,6 +28,7 @@ set(SOURCES action.cpp
 set(INCLUDES action.h
              answer.h
              expression.h
+             decision.h
              input.h
              join.h
              label.h
