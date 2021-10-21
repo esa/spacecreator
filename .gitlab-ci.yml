@@ -50,7 +50,7 @@ space-creator-dev:
     reports:
       junit: build/tst_*-result.xml
   rules:
-    - if: "$CI_COMMIT_BRANCH != 'master'"
+    - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
 
 
 space-creator:
