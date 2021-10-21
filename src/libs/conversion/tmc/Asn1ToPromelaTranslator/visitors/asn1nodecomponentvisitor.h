@@ -20,6 +20,7 @@
 #pragma once
 
 #include <asn1library/asn1/types/typereadingvisitor.h>
+#include <tmc/PromelaModel/promelamodel.h>
 #include <tmc/PromelaModel/utype.h>
 
 namespace conversion::tmc::translator {
@@ -36,8 +37,11 @@ public:
      *
      * @param utype target promela utype
      * @param name name of type definition
+     * @param baseTypeName base name for nested types
+     * @param name field name
      */
-    Asn1NodeComponentVisitor(::tmc::promela::model::Utype &utype, QString name);
+    Asn1NodeComponentVisitor(::tmc::promela::model::PromelaModel &promelaModel, ::tmc::promela::model::Utype &utype,
+            QString baseTypeName, QString name);
 
     /**
      * @brief Visit ::Asn1Acn::Types::Boolean
@@ -125,7 +129,9 @@ public:
     void visit(const ::Asn1Acn::Types::UserdefinedType &type) override;
 
 private:
+    ::tmc::promela::model::PromelaModel &m_promelaModel;
     ::tmc::promela::model::Utype &m_utype;
-    QString m_name;
+    const QString m_baseTypeName;
+    const QString m_name;
 };
 }
