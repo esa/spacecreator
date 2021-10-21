@@ -22,6 +22,8 @@
         <file>icons/redo.svg</file>
         <file>icons/save.svg</file>
         <file>icons/undo.svg</file>
+        <file alias="check_blue.svg">icons/check_blue.svg</file>
+        <file alias="check_yellow.svg">icons/check_yellow.svg</file>
     </qresource>
     <qresource prefix="/defaults">
         <file>forbidden_names.txt</file>

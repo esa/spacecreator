@@ -59,11 +59,12 @@ void DVAppWidget::setDVCore(DVEditorCore *core)
     ui->dvTreeWidget->setDVCore(core);
 
     ui->hwLibraryView->setModel(m_dvCore->hwItemModel());
-}
 
-void DVAppWidget::setActions(const QVector<QAction *> &actions)
-{
-    for (QAction *action : actions) {
+    for (QAction *action : m_dvCore->initActions()) {
+        ui->toolBar->addAction(action);
+    }
+    ui->toolBar->addSeparator();
+    for (QAction *action : m_dvCore->initViewActions()) {
         ui->toolBar->addAction(action);
     }
 }

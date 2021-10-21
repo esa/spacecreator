@@ -95,6 +95,8 @@ struct DVEditorCore::DVEditorCorePrivate {
 
     QPointer<QToolBar> m_toolBar;
     QVector<QAction *> m_actions;
+    QAction *m_actionCheckFunctions { nullptr };
+    QAction *m_actionCheckMessages { nullptr };
     QPointer<DVAppWidget> m_mainWidget;
     QFileSystemWatcher m_hwLibraryWatcher;
     QTimer m_hwReload;
@@ -188,7 +190,6 @@ QWidget *DVEditorCore::mainwidget()
         d->m_mainWidget = new DVAppWidget;
         d->m_mainWidget->setGraphicsScene(d->m_model->scene());
         d->m_mainWidget->setDVCore(this);
-        d->m_mainWidget->setActions(initActions());
         connect(d->m_mainWidget->graphicsView(), &GraphicsView::importEntity, this, &DVEditorCore::importEntity);
         connect(d->m_mainWidget->selectionModel(), &QItemSelectionModel::selectionChanged, this,
                 &DVEditorCore::onViewSelectionChanged);
@@ -266,6 +267,14 @@ QVector<QAction *> DVEditorCore::initActions()
             });
 
     return d->m_actions;
+}
+
+QVector<QAction *> DVEditorCore::initViewActions()
+{
+    QVector<QAction *> actions;
+    actions.append(actionCheckFunctions());
+    actions.append(actionCheckMessages());
+    return actions;
 }
 
 QUndoStack *DVEditorCore::undoStack() const
@@ -353,6 +362,24 @@ void DVEditorCore::reloadHWLibrary()
 QAbstractItemModel *DVEditorCore::hwItemModel() const
 {
     return d->m_hwVisualizationModel.get();
+}
+
+QAction *DVEditorCore::actionCheckFunctions()
+{
+    if (d->m_actionCheckFunctions == nullptr) {
+        d->m_actionCheckFunctions =
+                new QAction(QIcon(":/sharedresources/check_yellow.svg"), tr("Check DV functions"), this);
+    }
+    return d->m_actionCheckFunctions;
+}
+
+QAction *DVEditorCore::actionCheckMessages()
+{
+    if (d->m_actionCheckMessages == nullptr) {
+        d->m_actionCheckMessages =
+                new QAction(QIcon(":/sharedresources/check_blue.svg"), tr("Check DV messages"), this);
+    }
+    return d->m_actionCheckMessages;
 }
 
 /*!

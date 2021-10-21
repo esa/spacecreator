@@ -76,6 +76,7 @@ public:
     QToolBar *toolBar();
     QWidget *mainwidget();
     QVector<QAction *> initActions();
+    QVector<QAction *> initViewActions();
 
     QUndoStack *undoStack() const override;
     shared::cmd::CommandsStackBase *commandsStack() const;
@@ -93,6 +94,9 @@ public:
     void loadHWLibrary(const QString &directory);
     void reloadHWLibrary();
     QAbstractItemModel *hwItemModel() const;
+
+    QAction *actionCheckFunctions();
+    QAction *actionCheckMessages();
 
     //
     void changeDvFunctionBindingName(const QString &oldName, const QString &name);
