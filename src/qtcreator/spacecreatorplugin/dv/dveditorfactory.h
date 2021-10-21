@@ -33,8 +33,7 @@ class DVEditorFactory : public Core::IEditorFactory
 {
     Q_OBJECT
 public:
-    DVEditorFactory(
-            SpaceCreatorProjectManager *projectManager, const QList<QAction *> &dvActions, QObject *parent = nullptr);
+    DVEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
 
 #if QTC_VERSION == 48
     Core::IEditor *createEditor() override { return createDVEditor(); }

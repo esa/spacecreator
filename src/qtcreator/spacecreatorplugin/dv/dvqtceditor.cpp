@@ -23,6 +23,7 @@
 #include "mainmodel.h"
 #include "msceditorcore.h"
 #include "spacecreatorpluginconstants.h"
+#include "spacecreatorprojectimpl.h"
 #include "spacecreatorprojectmanager.h"
 
 #include <QFileInfo>
@@ -32,12 +33,11 @@
 
 namespace spctr {
 
-DVQtCEditor::DVQtCEditor(SpaceCreatorProjectManager *projectManager, const QList<QAction *> &dvActions)
+DVQtCEditor::DVQtCEditor(SpaceCreatorProjectManager *projectManager)
     : Core::IEditor()
     , m_document(new DVEditorDocument(projectManager, this))
-    , m_editorWidget(new DVMainWidget)
+    , m_editorWidget(new DVMainWidget(projectManager))
     , m_projectManager(projectManager)
-    , m_globalToolbarActions(dvActions)
 {
     setContext(Core::Context(spctr::Constants::K_DV_EDITOR_ID));
     setWidget(m_editorWidget);
@@ -73,10 +73,6 @@ QWidget *DVQtCEditor::toolBar()
         m_toolbar = new QToolBar;
         m_toolbar->addAction(dvCore->actionUndo());
         m_toolbar->addAction(dvCore->actionRedo());
-        m_toolbar->addSeparator();
-        for (QAction *action : qAsConst(m_globalToolbarActions)) {
-            m_toolbar->addAction(action);
-        }
     }
 
     return m_toolbar;

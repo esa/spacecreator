@@ -26,10 +26,9 @@
 
 namespace spctr {
 
-DVEditorFactory::DVEditorFactory(
-        SpaceCreatorProjectManager *projectManager, const QList<QAction *> &dvActions, QObject *parent)
+DVEditorFactory::DVEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent)
     : IEditorFactory()
-    , m_editorData(new DVEditorData(projectManager, dvActions))
+    , m_editorData(new DVEditorData(projectManager))
 {
     setId(spctr::Constants::K_DV_EDITOR_ID);
     setDisplayName(QCoreApplication::translate("DV Editor", spctr::Constants::C_DVEDITOR_DISPLAY_NAME));

@@ -40,7 +40,7 @@ class DVQtCEditor : public Core::IEditor
     Q_OBJECT
 
 public:
-    DVQtCEditor(SpaceCreatorProjectManager *projectManager, const QList<QAction *> &dvActions);
+    DVQtCEditor(SpaceCreatorProjectManager *projectManager);
     ~DVQtCEditor();
 
     Core::IDocument *document() const override;
@@ -54,7 +54,6 @@ private:
     QPointer<QToolBar> m_toolbar = nullptr;
     DVMainWidget *m_editorWidget = nullptr;
     QPointer<SpaceCreatorProjectManager> m_projectManager;
-    QList<QAction *> m_globalToolbarActions;
 };
 
 }

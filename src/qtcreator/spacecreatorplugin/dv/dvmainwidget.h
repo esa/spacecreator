@@ -19,6 +19,7 @@
 
 #include "dveditorcore.h"
 
+#include <QPointer>
 #include <QSharedPointer>
 #include <QVector>
 #include <QWidget>
@@ -30,22 +31,28 @@ class DVEditorCore;
 }
 
 namespace spctr {
+class SpaceCreatorProjectManager;
 
 class DVMainWidget : public QWidget
 {
     Q_OBJECT
 public:
-    DVMainWidget(QWidget *parent = nullptr);
+    DVMainWidget(SpaceCreatorProjectManager *projectManager, QWidget *parent = nullptr);
     ~DVMainWidget();
 
     bool init(DVEditorCorePtr data);
 
     DVEditorCorePtr dvPlugin() const;
 
+public Q_SLOTS:
+    void checkDVFunctionsValidity();
+    void checkDVMessagesValidity();
+
 private:
     void init();
 
     DVEditorCorePtr m_plugin;
+    QPointer<SpaceCreatorProjectManager> m_projectManager;
 };
 
 }

@@ -73,8 +73,6 @@ private Q_SLOTS:
     void updateActions();
     void checkInstancesForCurrentEditor();
     void checkMesagesForCurrentEditor();
-    void checkDVFunctionsValidity();
-    void checkDVMessagesValidity();
 
 private:
     void addHelp();
@@ -85,8 +83,6 @@ private:
     QAction *m_messageDeclarationAction = nullptr;
     QAction *m_checkInstancesAction = nullptr;
     QAction *m_checkMessagesAction = nullptr;
-    QAction *m_checkDvFunctionsAction = nullptr;
-    QAction *m_checkDvMessagesAction = nullptr;
     QAction *m_showMinimapAction = nullptr;
     SpaceCreatorProjectManager *m_projectsManager = nullptr;
 

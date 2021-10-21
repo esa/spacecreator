@@ -19,14 +19,18 @@
 
 #include "actionsbar.h"
 #include "commandsstack.h"
+#include "dvsystemchecks.h"
+#include "spacecreatorprojectimpl.h"
+#include "spacecreatorprojectmanager.h"
 
 #include <QHBoxLayout>
 #include <QMessageBox>
 
 namespace spctr {
 
-DVMainWidget::DVMainWidget(QWidget *parent)
+DVMainWidget::DVMainWidget(SpaceCreatorProjectManager *projectManager, QWidget *parent)
     : QWidget(parent)
+    , m_projectManager(projectManager)
 {
 }
 
@@ -56,6 +60,39 @@ void DVMainWidget::init()
     setLayout(layout);
     m_plugin->mainwidget()->setParent(this);
     layout->addWidget(m_plugin->mainwidget());
+
+    connect(m_plugin->actionCheckFunctions(), &QAction::triggered, this, &DVMainWidget::checkDVFunctionsValidity);
+    connect(m_plugin->actionCheckMessages(), &QAction::triggered, this, &DVMainWidget::checkDVMessagesValidity);
+}
+
+void DVMainWidget::checkDVFunctionsValidity()
+{
+    SpaceCreatorProjectImpl *project = m_projectManager->project(dvPlugin());
+    if (project) {
+        bool ok = project->dvChecks()->checkFunctionBindings();
+        if (ok) {
+            QMessageBox::information(
+                    m_plugin->mainwidget(), tr("DV function check"), tr("All deployment view functions are ok."));
+        } else {
+            QMessageBox::warning(m_plugin->mainwidget(), tr("DV function check"),
+                    tr("Deployment view functions have errors.\nSee the issue panel for more details"));
+        }
+    }
+}
+
+void DVMainWidget::checkDVMessagesValidity()
+{
+    SpaceCreatorProjectImpl *project = m_projectManager->project(dvPlugin());
+    if (project) {
+        bool ok = project->dvChecks()->checkMessageBindings();
+        if (ok) {
+            QMessageBox::information(
+                    m_plugin->mainwidget(), tr("DV messages check"), tr("All deployment view messages are ok."));
+        } else {
+            QMessageBox::warning(m_plugin->mainwidget(), tr("DV messages check"),
+                    tr("Deployment view messages have errors.\nSee the issue panel for more details"));
+        }
+    }
 }
 
 }

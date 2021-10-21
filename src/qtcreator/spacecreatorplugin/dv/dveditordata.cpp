@@ -37,12 +37,10 @@
 
 namespace spctr {
 
-DVEditorData::DVEditorData(
-        SpaceCreatorProjectManager *projectManager, const QList<QAction *> &dvActions, QObject *parent)
+DVEditorData::DVEditorData(SpaceCreatorProjectManager *projectManager, QObject *parent)
     : QObject(parent)
     , m_undoGroup(new QUndoGroup(this))
     , m_projectManager(projectManager)
-    , m_dvActions(dvActions)
 {
     Core::Context contexts;
     contexts.add(spctr::Constants::K_DV_EDITOR_ID);
@@ -75,7 +73,7 @@ DVEditorData::~DVEditorData()
 
 Core::IEditor *DVEditorData::createEditor()
 {
-    auto *dvEditor = new DVQtCEditor(m_projectManager, m_dvActions);
+    auto *dvEditor = new DVQtCEditor(m_projectManager);
 
     connect(dvEditor->dvDocument(), &spctr::DVEditorDocument::dvDataLoaded, this,
             [this](const QString &fileName, DVEditorCorePtr data) { m_undoGroup->addStack(data->undoStack()); });

@@ -1,7 +1,5 @@
 <RCC>
     <qresource prefix="/icons">
-        <file alias="check_blue.svg">resources/check_blue.svg</file>
-        <file alias="check_yellow.svg">resources/check_yellow.svg</file>
         <file alias="document_and.png">resources/document_and.png</file>
         <file alias="document_exception.png">resources/document_exception.png</file>
         <file alias="document_is_scenario.png">resources/document_is_scenario.png</file>

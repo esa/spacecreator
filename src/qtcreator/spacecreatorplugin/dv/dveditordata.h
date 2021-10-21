@@ -40,8 +40,7 @@ class DVEditorData : public QObject
 {
     Q_OBJECT
 public:
-    DVEditorData(
-            SpaceCreatorProjectManager *projectManager, const QList<QAction *> &dvActions, QObject *parent = nullptr);
+    DVEditorData(SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
     ~DVEditorData() override;
 
     Core::IEditor *createEditor();
@@ -54,7 +53,6 @@ private:
     QUndoGroup *m_undoGroup = nullptr;
 
     QPointer<SpaceCreatorProjectManager> m_projectManager;
-    QList<QAction *> m_dvActions;
 };
 
 } // namespace spctr
