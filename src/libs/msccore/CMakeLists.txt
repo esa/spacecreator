@@ -17,11 +17,13 @@ set(ANTLR_SRC
 )
 
 foreach(src_file ${ANTLR_SRC})
-    set_source_files_properties(${src_file} PROPERTIES GENERATED TRUE)
+    set_property(SOURCE ${src_file} PROPERTY GENERATED TRUE)
+    set_property(SOURCE ${src_file} PROPERTY SKIP_AUTOMOC ON)
+    set_property(SOURCE ${src_file} PROPERTY SKIP_AUTOUIC ON)
+    set_property(SOURCE ${src_file} PROPERTY SKIP_AUTOGEN ON)
 endforeach()
 
 find_package(Java COMPONENTS Runtime REQUIRED)
-cmake_policy(SET CMP0071 OLD) # This makes AUTO_MOC skip the generated files
 add_custom_command(
     OUTPUT ${ANTLR_SRC}
     COMMAND "${Java_JAVA_EXECUTABLE}" -jar "${ANTLR_JAR_LOCATION}" -Dlanguage=Cpp -no-listener -visitor ${PARSER_FILE} -o "${CMAKE_CURRENT_BINARY_DIR}"

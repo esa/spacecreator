@@ -8,7 +8,7 @@ target_sources(${TEST_NAME}
     PRIVATE     tst_acnnodereconstructingvisitor.cpp
                 tst_asn1nodereconstructingvisitor.cpp
                 main.cpp
-    PUBLIC      tst_acnnodereconstructingvisitor.h
+                tst_acnnodereconstructingvisitor.h
                 tst_asn1nodereconstructingvisitor.h)
 target_include_directories(${TEST_NAME}
    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
