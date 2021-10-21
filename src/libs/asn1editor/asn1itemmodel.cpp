@@ -302,7 +302,6 @@ QStandardItem *Asn1ItemModel::createSequenceOfItem(
             for (int x = 0; x < range->end(); ++x) {
                 ItemMap childItem = createModelItems(type);
 
-                //                childItem["item"]->setText(QString(tr("elem%1")).arg(x + 1));
                 parent->appendRow(childItem["item"]);
 
                 typeItems.append(childItem["type"]);
