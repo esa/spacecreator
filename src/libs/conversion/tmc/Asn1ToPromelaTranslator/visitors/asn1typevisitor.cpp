@@ -110,7 +110,7 @@ void Asn1TypeVisitor::visit(const Sequence &type)
 {
     Utype utype(m_typeName);
     for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : type.components()) {
-        Asn1SequenceComponentVisitor componentVisitor(m_promelaModel, utype);
+        Asn1SequenceComponentVisitor componentVisitor(m_promelaModel, utype, m_typeName);
         component->accept(componentVisitor);
     }
     m_promelaModel.addUtype(utype);
