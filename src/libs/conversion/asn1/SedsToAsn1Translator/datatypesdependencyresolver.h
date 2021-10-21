@@ -21,6 +21,7 @@
 
 #include <list>
 #include <seds/SedsModel/types/datatype.h>
+#include <unordered_map>
 #include <vector>
 
 namespace seds::model {

@@ -80,7 +80,7 @@ void DataTypesDependencyResolver::visitArray(const seds::model::ArrayDataType &a
 
 void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDataType &containerDataType)
 {
-    for (const auto &entry : containerDataType.entries()) {
+    for (const auto &containerEntry : containerDataType.entries()) {
         std::visit(
                 [this](auto &&entry) {
                     using T = std::decay_t<decltype(entry)>;
@@ -93,7 +93,7 @@ void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDat
                         visit(entryDataType);
                     }
                 },
-                entry);
+                containerEntry);
     }
 }
 
