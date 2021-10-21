@@ -20,6 +20,7 @@
 #pragma once
 
 #include "action.h"
+#include "variableliteral.h"
 
 #include <QString>
 
@@ -70,9 +71,23 @@ public:
      */
     auto setAction(Action *action) -> void;
 
+    /**
+     * @brief   Getter for answer literal
+     *
+     * @return  variable literal
+     */
+    auto literal() const -> VariableLiteral *;
+
+    /**
+     * @brief   Setter for the stored value
+     *
+     * @param   action  action to store
+     */
+    auto setLiteral(VariableLiteral *) -> void;
+
 private:
     Action *m_action;
-    // todo VariableLiteral m_literal; (with getter and setter)
+    VariableLiteral *m_literal;
 };
 
 } // namespace sdl

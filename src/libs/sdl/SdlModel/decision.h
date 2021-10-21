@@ -64,14 +64,14 @@ public:
      *
      * @return  vector of answers
      */
-    auto answer() const -> const std::vector<std::unique_ptr<Answer>> &;
+    auto answers() const -> const std::vector<std::unique_ptr<Answer>> &;
 
     /**
      * @brief   Add an answer to a vector
      *
      * @param   answer  answer to add
      */
-    auto addAnswer(Answer *answer) -> void;
+    auto addAnswer(std::unique_ptr<Answer> answer) -> void;
 
     /**
      * @brief   Getter for expression
