@@ -35,7 +35,7 @@ const QString &dataTypeNameStr(const DataType &dataType)
 {
     const QString *dataTypeName = nullptr;
 
-    std::visit([&dataTypeName](auto &&dataType) { dataTypeName = &dataType.nameStr(); }, dataType);
+    std::visit([&dataTypeName](auto &&type) { dataTypeName = &type.nameStr(); }, dataType);
 
     if (dataTypeName) {
         return *dataTypeName;
