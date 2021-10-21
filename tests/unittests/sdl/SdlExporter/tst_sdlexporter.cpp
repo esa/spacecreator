@@ -147,8 +147,6 @@ void tst_sdlmodel::testGenerateProcess()
 
     auto referenceOutput = SdlOutputBuilder().withName("referenceOutput").build();
 
-    auto startTransition = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
-
     auto transition2 = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
 
     auto state2 = SdlStateBuilder("Idle")
@@ -310,7 +308,9 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
                                .withAction(std::move(joinFromStart))
                                .withAction(std::make_unique<NextState>(""))
                                .build();
-    auto state1 = SdlStateBuilder("Idle").withInput(SdlInputBuilder("sigReset", transition1.get()).build()).build();
+    auto state1 = SdlStateBuilder("Idle")
+                          .withInput(SdlInputBuilder().withName("sigReset").withTransition(transition1.get()).build())
+                          .build();
 
     auto nextStateSame = std::make_unique<NextState>("", state1.get());
     auto startTransition = SdlTransitionBuilder() //
