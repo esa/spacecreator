@@ -4,6 +4,7 @@ project(SdlModel VERSION 1.0.0 LANGUAGES CXX)
 add_library(SdlModel STATIC)
 
 set(SOURCES action.cpp
+            answer.cpp
             expression.cpp
             input.cpp
             join.cpp
@@ -24,6 +25,7 @@ set(SOURCES action.cpp
             variablereference.cpp
             )
 set(INCLUDES action.h
+             answer.h
              expression.h
              input.h
              join.h

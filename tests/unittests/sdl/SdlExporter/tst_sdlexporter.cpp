@@ -365,7 +365,7 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
 
 void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
 {
-    QString modelName = "decisionExpressionAndAnswer";
+    QString modelName = "DecisionExpressionAndAnswer";
     QString modelPrefix = "Sdl_";
     QString processName = "ExampleProcess";
 
