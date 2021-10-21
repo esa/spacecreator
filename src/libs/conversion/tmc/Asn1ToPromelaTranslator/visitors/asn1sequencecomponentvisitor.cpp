@@ -31,15 +31,17 @@ using tmc::promela::model::PromelaModel;
 using tmc::promela::model::Utype;
 
 namespace conversion::tmc::translator {
-Asn1SequenceComponentVisitor::Asn1SequenceComponentVisitor(PromelaModel &model, Utype &utype)
-    : m_model(model)
+Asn1SequenceComponentVisitor::Asn1SequenceComponentVisitor(
+        PromelaModel &promelaModel, Utype &utype, QString baseTypeName)
+    : m_promelaModel(promelaModel)
     , m_utype(utype)
+    , m_baseTypeName(std::move(baseTypeName))
 {
 }
 
 void Asn1SequenceComponentVisitor::visit(const AsnSequenceComponent &component)
 {
-    Asn1NodeComponentVisitor visitor(m_utype, component.name());
+    Asn1NodeComponentVisitor visitor(m_promelaModel, m_utype, m_baseTypeName, component.name());
     component.type()->accept(visitor);
 }
 

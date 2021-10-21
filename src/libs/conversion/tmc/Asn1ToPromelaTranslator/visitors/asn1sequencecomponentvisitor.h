@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <QString>
 #include <asn1library/asn1/sequencecomponentvisitor.h>
 #include <tmc/PromelaModel/promelamodel.h>
 #include <tmc/PromelaModel/utype.h>
@@ -35,10 +36,12 @@ public:
     /**
      * @brief Contructor.
      *
-     * @param model target promela model
+     * @param promelaModel target promela model
      * @param utype target utype
+     * @param baseTypeName base name for nested types
      */
-    Asn1SequenceComponentVisitor(::tmc::promela::model::PromelaModel &model, ::tmc::promela::model::Utype &utype);
+    Asn1SequenceComponentVisitor(::tmc::promela::model::PromelaModel &promelaModel, ::tmc::promela::model::Utype &utype,
+            QString baseTypeName);
 
     /**
      * @brief Visit ::Asn1Acn::AsnSequenceComponent
@@ -54,7 +57,8 @@ public:
     void visit(const ::Asn1Acn::AcnSequenceComponent &component) override;
 
 private:
-    ::tmc::promela::model::PromelaModel &m_model;
+    ::tmc::promela::model::PromelaModel &m_promelaModel;
     ::tmc::promela::model::Utype &m_utype;
+    const QString m_baseTypeName;
 };
 }

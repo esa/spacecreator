@@ -19,6 +19,8 @@
 
 #include "asn1nodecomponentvisitor.h"
 
+#include "asn1sequencecomponentvisitor.h"
+
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
 #include <asn1library/asn1/types/choice.h>
@@ -53,11 +55,16 @@ using tmc::promela::model::ArrayType;
 using tmc::promela::model::BasicType;
 using tmc::promela::model::DataType;
 using tmc::promela::model::Declaration;
+using tmc::promela::model::PromelaModel;
 using tmc::promela::model::Utype;
+using tmc::promela::model::UtypeRef;
 
 namespace conversion::tmc::translator {
-Asn1NodeComponentVisitor::Asn1NodeComponentVisitor(Utype &utype, QString name)
-    : m_utype(utype)
+Asn1NodeComponentVisitor::Asn1NodeComponentVisitor(
+        PromelaModel &promelaModel, Utype &utype, QString baseTypeName, QString name)
+    : m_promelaModel(promelaModel)
+    , m_utype(utype)
+    , m_baseTypeName(std::move(baseTypeName))
     , m_name(std::move(name))
 {
 }
@@ -106,7 +113,16 @@ void Asn1NodeComponentVisitor::visit(const Choice &type)
 
 void Asn1NodeComponentVisitor::visit(const Sequence &type)
 {
-    Q_UNUSED(type);
+    const QString nestedUtypeName = QString("%1-%2").arg(m_baseTypeName).arg(m_name);
+    Utype nestedUtype(nestedUtypeName);
+    for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : type.components()) {
+        Asn1SequenceComponentVisitor componentVisitor(m_promelaModel, nestedUtype, nestedUtypeName);
+        component->accept(componentVisitor);
+    }
+
+    m_promelaModel.addUtype(nestedUtype);
+
+    m_utype.addField(Declaration(DataType(UtypeRef("")), m_name));
 }
 
 void Asn1NodeComponentVisitor::visit(const SequenceOf &type)
