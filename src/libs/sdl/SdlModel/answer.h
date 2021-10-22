@@ -19,10 +19,11 @@
 
 #pragma once
 
-#include "action.h"
+#include "transition.h"
 #include "variableliteral.h"
 
 #include <QString>
+#include <memory>
 
 namespace sdl {
 
@@ -58,18 +59,18 @@ public:
     Answer &operator=(Answer &&) = default;
 
     /**
-     * @brief   Getter for the stored action
+     * @brief   Getter for the stored transition
      *
-     * @return  action
+     * @return  transition
      */
-    auto action() const -> Action *;
+    auto transition() const -> Transition *;
 
     /**
      * @brief   Setter for the stored value
      *
-     * @param   action  action to store
+     * @param   transition  transition to store
      */
-    auto setAction(Action *action) -> void;
+    auto setTransition(std::unique_ptr<Transition> Transition) -> void;
 
     /**
      * @brief   Getter for answer literal
@@ -81,7 +82,7 @@ public:
     /**
      * @brief   Setter for the stored value
      *
-     * @param   action  action to store
+     * @param   Transition  Transition to store
      */
     auto setLiteral(VariableLiteral *) -> void;
 
@@ -91,7 +92,7 @@ public:
     virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
-    Action *m_action;
+    std::unique_ptr<Transition> m_transition;
     VariableLiteral *m_literal;
 };
 

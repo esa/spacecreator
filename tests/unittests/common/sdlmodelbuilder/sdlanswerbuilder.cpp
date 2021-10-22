@@ -40,9 +40,9 @@ SdlAnswerBuilder &SdlAnswerBuilder::withName(QString name)
     return *this;
 }
 
-SdlAnswerBuilder &SdlAnswerBuilder::withAction(Action *action)
+SdlAnswerBuilder &SdlAnswerBuilder::withTransition(std::unique_ptr<Transition> transition)
 {
-    m_answer->setAction(action);
+    m_answer->setTransition(std::move(transition));
 
     return *this;
 }
