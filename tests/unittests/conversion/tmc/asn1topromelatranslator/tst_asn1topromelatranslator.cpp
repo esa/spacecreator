@@ -58,6 +58,7 @@ private Q_SLOTS:
     void testIntegerField();
     void testFloatField();
     void testBooleanField();
+    void testNestedSequence();
 
 private:
     std::unique_ptr<Definitions> createModel();
@@ -239,6 +240,77 @@ void tst_Asn1ToPromelaTranslator::testBooleanField()
     QCOMPARE("field1", decl.getName());
     QVERIFY(decl.getType().isBasicType());
     QCOMPARE(BasicType::BOOLEAN, decl.getType().getBasicType());
+}
+
+void tst_Asn1ToPromelaTranslator::testNestedSequence()
+{
+    auto model = createModel();
+    auto level0 = std::make_unique<Sequence>();
+    auto level1 = std::make_unique<Sequence>();
+    auto level2 = std::make_unique<Sequence>();
+
+    auto level2Component = std::make_unique<AsnSequenceComponent>(QStringLiteral("field"), QStringLiteral("field"),
+            false, std::nullopt, QStringLiteral(""), SourceLocation(),
+            TypeFactory::createBuiltinType(QStringLiteral("INTEGER")));
+
+    level2->addComponent(std::move(level2Component));
+
+    auto level1Component = std::make_unique<AsnSequenceComponent>(QStringLiteral("level2"), QStringLiteral("level2"),
+            false, std::nullopt, QStringLiteral(""), SourceLocation(), std::move(level2));
+
+    level1->addComponent(std::move(level1Component));
+
+    auto level0Component = std::make_unique<AsnSequenceComponent>(QStringLiteral("level1"), QStringLiteral("level1"),
+            false, std::nullopt, QStringLiteral(""), SourceLocation(), std::move(level1));
+
+    level0->addComponent(std::move(level0Component));
+
+    auto typeAssignment = std::make_unique<TypeAssignment>(
+            QStringLiteral("level0"), QStringLiteral("level0T"), SourceLocation(), std::move(level0));
+    model->addType(std::move(typeAssignment));
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel);
+    visitor.visit(*model);
+
+    QCOMPARE(0, promelaModel.getMtypeValues().size());
+    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
+    QCOMPARE(0, promelaModel.getTypeAliases().size());
+
+    QCOMPARE(3, promelaModel.getUtypes().size());
+
+    {
+        const Utype &expectedLevel2 = promelaModel.getUtypes().at(0);
+        QCOMPARE(false, expectedLevel2.isUnionType());
+        QCOMPARE("level0_level1_level2", expectedLevel2.getName());
+        QCOMPARE(1, expectedLevel2.getFields().size());
+        const Declaration &expectedLevel2Field = expectedLevel2.getFields().front();
+        QCOMPARE("field", expectedLevel2Field.getName());
+        QVERIFY(expectedLevel2Field.getType().isBasicType());
+        QCOMPARE(BasicType::INT, expectedLevel2Field.getType().getBasicType());
+    }
+
+    {
+        const Utype &expectedLevel1 = promelaModel.getUtypes().at(1);
+        QCOMPARE(false, expectedLevel1.isUnionType());
+        QCOMPARE("level0_level1", expectedLevel1.getName());
+        QCOMPARE(1, expectedLevel1.getFields().size());
+        const Declaration &expectedLevel1Field = expectedLevel1.getFields().front();
+        QCOMPARE("level2", expectedLevel1Field.getName());
+        QVERIFY(expectedLevel1Field.getType().isUtypeReference());
+        QCOMPARE("level0_level1_level2", expectedLevel1Field.getType().getUtypeReference().getName());
+    }
+
+    {
+        const Utype &expectedLevel0 = promelaModel.getUtypes().at(2);
+        QCOMPARE(false, expectedLevel0.isUnionType());
+        QCOMPARE("level0", expectedLevel0.getName());
+        QCOMPARE(1, expectedLevel0.getFields().size());
+        const Declaration &expectedLevel0Field = expectedLevel0.getFields().front();
+        QCOMPARE("level1", expectedLevel0Field.getName());
+        QVERIFY(expectedLevel0Field.getType().isUtypeReference());
+        QCOMPARE("level0_level1", expectedLevel0Field.getType().getUtypeReference().getName());
+    }
 }
 
 std::unique_ptr<Definitions> tst_Asn1ToPromelaTranslator::createModel()
