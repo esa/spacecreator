@@ -21,6 +21,7 @@
 
 #include "answer.h"
 #include "expression.h"
+#include "node.h"
 
 #include <QString>
 #include <memory>
@@ -31,7 +32,7 @@ namespace sdl {
 /**
  * @brief   Represents a decision used in SDL model.
  */
-class Decision final
+class Decision final : public Node
 {
 public:
     /**
@@ -86,6 +87,11 @@ public:
      * @param   expression expression to set
      */
     auto setExpression(std::unique_ptr<Expression> expression) -> void;
+
+    /**
+     * @brief  visitor acceptor (calls visit method of the given visitor)
+     */
+    virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
     std::vector<std::unique_ptr<Answer>> m_answers;

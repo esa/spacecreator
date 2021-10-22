@@ -20,6 +20,7 @@
 #pragma once
 
 #include <sdl/SdlModel/answer.h>
+#include <sdl/SdlModel/decision.h>
 #include <sdl/SdlModel/input.h>
 #include <sdl/SdlModel/join.h>
 #include <sdl/SdlModel/label.h>
@@ -147,6 +148,13 @@ public:
      * @param   answer  answer to be visited
      */
     virtual auto visit(const Answer &answer) const -> void = 0;
+
+    /**
+     * @brief   Decision visitor
+     *
+     * @param   decision  decision to be visited
+     */
+    virtual auto visit(const Decision &decision) const -> void = 0;
 };
 
 } // namespace sdl

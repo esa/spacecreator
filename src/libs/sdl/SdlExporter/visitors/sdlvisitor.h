@@ -146,6 +146,13 @@ public:
      */
     auto visit(const Answer &answer) const -> void override;
 
+    /**
+     * @brief   Decision visitor
+     *
+     * @param   decision  decision to be serialized
+     */
+    virtual auto visit(const Decision &decision) const -> void override;
+
 private:
     template<typename T>
     auto exportCollection(const T &collection) const -> void;
