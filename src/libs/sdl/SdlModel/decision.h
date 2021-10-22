@@ -19,9 +19,9 @@
 
 #pragma once
 
+#include "action.h"
 #include "answer.h"
 #include "expression.h"
-#include "node.h"
 
 #include <QString>
 #include <memory>
@@ -32,7 +32,7 @@ namespace sdl {
 /**
  * @brief   Represents a decision used in SDL model.
  */
-class Decision final : public Node
+class Decision final : public Action
 {
 public:
     /**

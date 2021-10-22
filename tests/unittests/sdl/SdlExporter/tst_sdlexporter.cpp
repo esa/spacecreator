@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QtTest>
 #include <common/sdlmodelbuilder/sdlanswerbuilder.h>
+#include <common/sdlmodelbuilder/sdldecisionbuilder.h>
 #include <common/sdlmodelbuilder/sdlinputbuilder.h>
 #include <common/sdlmodelbuilder/sdlmodelbuilder.h>
 #include <common/sdlmodelbuilder/sdloutputbuilder.h>
@@ -55,6 +56,7 @@ using conversion::Options;
 using conversion::exporter::ExportException;
 using sdl::Action;
 using sdl::ContinuousSignal;
+using sdl::Decision;
 using sdl::Expression;
 using sdl::Input;
 using sdl::Join;
@@ -74,6 +76,7 @@ using sdl::VariableReference;
 using sdl::exporter::SdlExporter;
 using sdl::exporter::SdlOptions;
 using tests::common::SdlAnswerBuilder;
+using tests::common::SdlDecisionBuilder;
 using tests::common::SdlInputBuilder;
 using tests::common::SdlModelBuilder;
 using tests::common::SdlOutputBuilder;
@@ -376,32 +379,35 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     auto variableX = std::make_unique<VariableDeclaration>("x", "MyInteger");
     auto variableXRef = VariableReference(variableX.get());
 
-    auto answer1 = SdlAnswerBuilder()
-                           .withName("firstAnswer") //
-                           .withTransition(SdlTransitionBuilder() //
-                                                   .withOutput(SdlOutputBuilder() //
-                                                                       .withName("sendOutput")
-                                                                       .withParameter(&variableXRef)
-                                                                       .build())
-                                                   .withTask(SdlTaskBuilder() //
-                                                                     .withContents("SOME EXAMPLE TASK")
-                                                                     .build())
-                                                   .build())
-                           .build();
-    auto answer2 = SdlAnswerBuilder()
-                           .withName("secondAnswer") //
-                           .withTransition(SdlTransitionBuilder() //
-                                                   .withNextStateAction()
-                                                   .build())
-                           .build();
     auto expressionForDecision = std::make_unique<Expression>();
     expressionForDecision->setContent("x");
-    // todo create Decision with these Answers
+
+    auto decision =
+            SdlDecisionBuilder()
+                    .withExpression(std::move(expressionForDecision))
+                    .withAnswer(
+                            SdlAnswerBuilder()
+                                    .withName("firstAnswer")
+                                    .withTransition(
+                                            SdlTransitionBuilder()
+                                                    .withOutput(SdlOutputBuilder()
+                                                                        .withName("sendOutput")
+                                                                        .withParameter(&variableXRef)
+                                                                        .build())
+                                                    .withTask(
+                                                            SdlTaskBuilder().withContents("SOME EXAMPLE TASK").build())
+                                                    .build())
+                                    .build())
+                    .withAnswer(SdlAnswerBuilder()
+                                        .withName("secondAnswer")
+                                        .withTransition(SdlTransitionBuilder().withNextStateAction().build())
+                                        .build())
+                    .build();
     // todo add Decision to transition (.withAction())
     auto transition = SdlTransitionBuilder().withNextStateAction().build();
 
-    auto waitState = SdlStateBuilder("Wait") //
-                             .withInput(SdlInputBuilder() //
+    auto waitState = SdlStateBuilder("Wait")
+                             .withInput(SdlInputBuilder()
                                                 .withName("startProcess")
                                                 .withParameter(&variableXRef)
                                                 .withTransition(transition.get())
