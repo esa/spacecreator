@@ -20,11 +20,10 @@
 #pragma once
 
 #include <memory>
-#include <sdl/SdlModel/action.h>
 #include <sdl/SdlModel/answer.h>
+#include <sdl/SdlModel/transition.h>
 #include <sdl/SdlModel/variableliteral.h>
 
-using sdl::Action;
 using sdl::Answer;
 using sdl::Transition;
 using sdl::VariableLiteral;
@@ -40,7 +39,7 @@ public:
 
     auto withName(QString name) -> SdlAnswerBuilder &;
 
-    auto withAction(Action *action) -> SdlAnswerBuilder &;
+    auto withTransition(std::unique_ptr<Transition> transition) -> SdlAnswerBuilder &;
 
     auto withLiteral(VariableLiteral *literal) -> SdlAnswerBuilder &;
 

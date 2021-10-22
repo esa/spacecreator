@@ -198,10 +198,12 @@ void SdlVisitor::visit(const Join &join) const
 
 void SdlVisitor::visit(const Answer &answer) const
 {
-    // write some dummy CIF
-    m_stream << "                /* CIF ANSWER (585, 323), (77, 24) */\n";
-    m_stream << "                (" << answer.literal() << "):\n";
-    exportCollection(answer.action());
+    if (answer.transition() != nullptr) {
+        // write some dummy CIF
+        m_stream << "                /* CIF ANSWER (585, 323), (77, 24) */\n";
+        m_stream << "                (" << answer.literal() << "):\n";
+        exportCollection(answer.transition()->actions());
+    }
 }
 
 void SdlVisitor::visit(const Decision &decision) const

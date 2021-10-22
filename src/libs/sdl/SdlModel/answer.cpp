@@ -19,21 +19,20 @@
 
 #include "answer.h"
 
-#include <memory>
 #include <sdl/SdlExporter/visitors/visitor.h>
 
 namespace sdl {
 
 Answer::Answer() {}
 
-Action *Answer::action() const
+Transition *Answer::transition() const
 {
-    return m_action;
+    return m_transition.get();
 }
 
-void Answer::setAction(Action *const action)
+void Answer::setTransition(std::unique_ptr<Transition> transition)
 {
-    m_action = action;
+    m_transition = std::move(transition);
 }
 
 VariableLiteral *Answer::literal() const
