@@ -186,23 +186,6 @@ void IVFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
     m_commandsStack->push(attributesCmd);
 }
 
-void IVFunctionTypeGraphicsItem::updateText()
-{
-    if (!m_textItem) {
-        return;
-    }
-
-    const QString text = entity()->titleUI();
-    if (Qt::mightBeRichText(text)) {
-        if (text != m_textItem->toHtml()) {
-            m_textItem->setHtml(text);
-        }
-    } else if (text != m_textItem->toPlainText()) {
-        m_textItem->setPlainText(entity()->titleUI());
-    }
-    updateTextPosition();
-}
-
 QString IVFunctionTypeGraphicsItem::prepareTooltip() const
 {
     const QString title = uniteNames<ivm::IVFunctionType *>({ entity() }, QString());

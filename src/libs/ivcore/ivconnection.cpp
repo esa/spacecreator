@@ -37,7 +37,7 @@ struct ConnectionHolder {
 };
 
 struct IVConnectionPrivate {
-    IVConnectionPrivate() { }
+    IVConnectionPrivate() {}
     IVConnectionPrivate(IVInterface *ifaceSource, IVInterface *ifaceTarget) { setData(ifaceSource, ifaceTarget); }
 
     void setData(IVInterface *ifaceSource, IVInterface *ifaceTarget)
@@ -175,6 +175,9 @@ void IVConnection::handleInheritPIChange(IVConnection::InheritPIChange inheritan
         return;
 
     if (!ri->isInheritPI() && !ri->hasPrototypePi())
+        return;
+
+    if (ri->hasPrototype(pi))
         return;
 
     const bool rmLabel = inheritance == IVConnection::InheritPIChange::NotInherit;

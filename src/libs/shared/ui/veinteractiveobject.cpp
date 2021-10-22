@@ -221,11 +221,17 @@ QString VEInteractiveObject::prepareTooltip() const
 
 void VEInteractiveObject::updateText()
 {
+    if (!m_textItem) {
+        return;
+    }
+
     const QString text = entity()->titleUI();
     if (Qt::mightBeRichText(text)) {
-        m_textItem->setHtml(text);
-    } else {
-        m_textItem->setPlainText(text);
+        if (text != m_textItem->toHtml()) {
+            m_textItem->setHtml(text);
+        }
+    } else if (text != m_textItem->toPlainText()) {
+        m_textItem->setPlainText(entity()->titleUI());
     }
     updateTextPosition();
 }

@@ -264,8 +264,8 @@ bool isValidName(const QString &name)
         return false;
     }
 
-    static QRegularExpression re(shared::namePatternUI);
-    QRegularExpressionMatch match = re.match(name);
+    static const QRegularExpression re(shared::namePatternUI);
+    const QRegularExpressionMatch match = re.match(name);
     return match.hasMatch();
 }
 

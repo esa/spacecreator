@@ -516,8 +516,7 @@ QPainterPath IVInterfaceGraphicsItem::typePath() const
 
 QPainterPath IVInterfaceGraphicsItem::itemPath(Qt::Alignment alignment) const
 {
-    QPainterPath path = textTransform(alignment).map(m_textItem->shape());
-    path = path.united(typeTransform(alignment).map(m_type->path()));
+    QPainterPath path = typeTransform(alignment).map(m_type->path());
     path = path.united(ifaceTransform(alignment).map(m_iface->path()));
     return path;
 }
@@ -525,6 +524,7 @@ QPainterPath IVInterfaceGraphicsItem::itemPath(Qt::Alignment alignment) const
 QPainterPath IVInterfaceGraphicsItem::composeShape() const
 {
     QPainterPath path = m_textItem->transform().map(m_textItem->shape());
+    path.translate(m_textItem->pos());
     for (auto sub : { m_type, m_iface }) {
         QPainterPath subPath = sub->transform().map(sub->path());
         subPath.translate(sub->pos());
