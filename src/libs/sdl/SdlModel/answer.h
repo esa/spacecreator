@@ -29,7 +29,7 @@ namespace sdl {
 /**
  * @brief   Represents an answer used in SDL model.
  */
-class Answer final
+class Answer final : public Node
 {
 public:
     /**
@@ -84,6 +84,11 @@ public:
      * @param   action  action to store
      */
     auto setLiteral(VariableLiteral *) -> void;
+
+    /**
+     * @brief  visitor acceptor (calls visit method of the given visitor)
+     */
+    virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
     Action *m_action;
