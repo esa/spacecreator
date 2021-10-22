@@ -22,6 +22,7 @@
 #include "visitor.h"
 
 #include <QTextStream>
+#include <sdl/SdlModel/answer.h>
 #include <sdl/SdlModel/input.h>
 #include <sdl/SdlModel/label.h>
 #include <sdl/SdlModel/nextstate.h>
@@ -137,6 +138,13 @@ public:
      * @param   join   join to be serialized
      */
     virtual auto visit(const Join &join) const -> void override;
+
+    /**
+     * @brief   Answer visitor
+     *
+     * @param   answer  answer to be serialized
+     */
+    auto visit(const Answer &answer) const -> void override;
 
 private:
     template<typename T>
