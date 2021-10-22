@@ -45,4 +45,9 @@ void Decision::setExpression(std::unique_ptr<Expression> expression)
     m_expression = std::move(expression);
 }
 
+void Decision::accept(Visitor &visitor) const
+{
+    visitor.visit(*this);
+}
+
 } // namespace sdl
