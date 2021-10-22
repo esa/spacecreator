@@ -113,9 +113,10 @@ struct IVInterfacePrivate {
 
 IVInterface::IVInterface(IVObject::Type ifaceType, const CreationInfo &ci)
     : IVObject(ifaceType, ci.function, ci.toBeCloned ? shared::createId() : ci.id)
-    , d(new IVInterfacePrivate(Type::InterfaceGroup == ifaceType ? ci.type
-                      : Type::RequiredInterface == ifaceType     ? IVInterface::InterfaceType::Required
-                                                                 : IVInterface::InterfaceType::Provided))
+    , d(new IVInterfacePrivate(Type::InterfaceGroup == ifaceType
+                      ? ci.type
+                      : Type::RequiredInterface == ifaceType ? IVInterface::InterfaceType::Required
+                                                             : IVInterface::InterfaceType::Provided))
 {
     setKind(ci.kind);
     setParams(ci.parameters);
@@ -705,6 +706,11 @@ void IVInterfaceRequired::unsetPrototype(const IVInterfaceProvided *pi)
         restoreInternals(pi);
 
     Q_EMIT inheritedLabelsChanged(inheritedLables());
+}
+
+bool IVInterfaceRequired::hasPrototype(const IVInterfaceProvided *pi)
+{
+    return m_prototypes.contains(pi);
 }
 
 QString IVInterfaceRequired::ifaceLabel() const

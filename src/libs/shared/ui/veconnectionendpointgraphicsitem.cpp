@@ -33,7 +33,7 @@ VEConnectionEndPointGraphicsItem::VEConnectionEndPointGraphicsItem(VEObject *obj
 {
 }
 
-VEConnectionEndPointGraphicsItem::~VEConnectionEndPointGraphicsItem() { }
+VEConnectionEndPointGraphicsItem::~VEConnectionEndPointGraphicsItem() {}
 
 void VEConnectionEndPointGraphicsItem::addConnection(VEConnectionGraphicsItem *item)
 {
@@ -230,10 +230,7 @@ void VEConnectionEndPointGraphicsItem::onManualMoveFinish(GripPoint *grip, const
     updateEntity();
 }
 
-void VEConnectionEndPointGraphicsItem::updateInternalItems(Qt::Alignment alignment)
-{
-    Q_UNUSED(alignment)
-}
+void VEConnectionEndPointGraphicsItem::updateInternalItems(Qt::Alignment alignment) { Q_UNUSED(alignment) }
 
 QPainterPath VEConnectionEndPointGraphicsItem::itemPath(Qt::Alignment alignment) const
 {

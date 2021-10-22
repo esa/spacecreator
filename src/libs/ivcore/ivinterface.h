@@ -207,6 +207,7 @@ public:
     QStringList inheritedLables() const;
     void setPrototype(const IVInterfaceProvided *pi);
     void unsetPrototype(const IVInterfaceProvided *pi);
+    bool hasPrototype(const IVInterfaceProvided *pi);
 
     QString ifaceLabel() const override;
     QStringList ifaceLabelList() const;

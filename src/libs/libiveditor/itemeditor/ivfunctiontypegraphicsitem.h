@@ -53,7 +53,6 @@ public:
 protected Q_SLOTS:
     void applyColorScheme() override;
     void updateNameFromUi(const QString &name);
-    void updateText();
 
 protected:
     void rebuildLayout() override;
