@@ -376,7 +376,6 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     auto variableX = std::make_unique<VariableDeclaration>("x", "MyInteger");
     auto variableXRef = VariableReference(variableX.get());
 
-    // todo create two Answers
     auto answer1 = SdlAnswerBuilder()
                            .withName("firstAnswer") //
                            .withTransition(SdlTransitionBuilder() //
@@ -395,14 +394,16 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
                                                    .withNextStateAction()
                                                    .build())
                            .build();
-    // todo create Expressions
+    auto expressionForDecision = std::make_unique<Expression>();
+    expressionForDecision->setContent("x");
     // todo create Decision with these Answers
-    // todo add Decision to transition
+    // todo add Decision to transition (.withAction())
     auto transition = SdlTransitionBuilder().withNextStateAction().build();
 
     auto waitState = SdlStateBuilder("Wait") //
                              .withInput(SdlInputBuilder() //
                                                 .withName("startProcess")
+                                                .withParameter(&variableXRef)
                                                 .withTransition(transition.get())
                                                 .build())
                              .build();
