@@ -9,9 +9,9 @@ process Exampleprocess;
         NEXTSTATE Wait;
     /* CIF state (412, 131), (70, 35) */
     state Wait;
-        /* CIF input (389, 186), (111, 35) */
+        /* CIF input (388, 186), (111, 35) */
         input startProcess(x);
-            /* CIF decision (388, 241), (115, 50) */
+            /* CIF decision (387, 241), (115, 50) */
             decision x;
                 /* CIF ANSWER (313, 311), (70, 24) */
                 (0):
@@ -21,7 +21,9 @@ process Exampleprocess;
                 (>0):
                     /* CIF output (526, 367), (194, 35) */
                     output sendOutput(x);
-                    /* CIF NEXTSTATE (588, 422), (70, 35) */
+                    /* CIF task (542, 422), (161, 35) */
+                    task 'SOME EXAMPLE TASK';
+                    /* CIF NEXTSTATE (588, 472), (70, 35) */
                     NEXTSTATE -;
             enddecision;
     endstate;
