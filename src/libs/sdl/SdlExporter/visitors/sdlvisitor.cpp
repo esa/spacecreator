@@ -66,7 +66,9 @@ void SdlVisitor::visit(const Process &process) const
     }
     m_stream << "\n";
 
-    exportCollection(process.stateMachine()->states());
+    if (process.stateMachine() != nullptr) {
+        exportCollection(process.stateMachine()->states());
+    }
 
     m_stream << "endprocess " << process.name() << ";\n";
 }
