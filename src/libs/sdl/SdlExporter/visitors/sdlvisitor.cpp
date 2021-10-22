@@ -194,6 +194,13 @@ void SdlVisitor::visit(const Join &join) const
     m_stream << ";\n";
 }
 
+void SdlVisitor::visit(const Answer &answer) const
+{
+    // write some dummy CIF
+    m_stream << "                /* CIF ANSWER (585, 323), (77, 24) */\n";
+    m_stream << "                (" << answer.literal() << "):\n";
+}
+
 template<typename T>
 void SdlVisitor::exportCollection(const T &collection) const
 {
