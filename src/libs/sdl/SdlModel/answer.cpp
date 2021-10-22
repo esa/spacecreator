@@ -20,6 +20,7 @@
 #include "answer.h"
 
 #include <memory>
+#include <sdl/SdlExporter/visitors/visitor.h>
 
 namespace sdl {
 
@@ -44,6 +45,10 @@ void Answer::setLiteral(VariableLiteral *literal)
 {
     m_literal = literal;
 }
+
+void Answer::accept(Visitor &visitor) const
+{
+    visitor.visit(*this);
 }
 
 } // namespace sdl
