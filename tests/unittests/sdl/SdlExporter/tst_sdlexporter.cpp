@@ -38,6 +38,7 @@
 #include <sdl/SdlExporter/SdlOptions/options.h>
 #include <sdl/SdlExporter/exporter.h>
 #include <sdl/SdlModel/action.h>
+#include <sdl/SdlModel/expression.h>
 #include <sdl/SdlModel/join.h>
 #include <sdl/SdlModel/label.h>
 #include <sdl/SdlModel/nextstate.h>
@@ -54,6 +55,7 @@ using conversion::Options;
 using conversion::exporter::ExportException;
 using sdl::Action;
 using sdl::ContinuousSignal;
+using sdl::Expression;
 using sdl::Input;
 using sdl::Join;
 using sdl::Label;
@@ -393,7 +395,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
                                                    .withNextStateAction()
                                                    .build())
                            .build();
-    // todo create Expression
+    // todo create Expressions
     // todo create Decision with these Answers
     // todo add Decision to transition
     auto transition = SdlTransitionBuilder().withNextStateAction().build();
@@ -440,14 +442,21 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     QTextStream consumableOutput(&outputFile);
     std::vector<QString> expectedOutput = {
         "process ExampleProcess;",
+        "dcl x MyInteger;",
         "START;",
-        "fromStart:",
-        "NEXTSTATE Idle;",
-        "state Idle;",
-        "input sigReset;",
-        "join fromStart;",
+        "NEXTSTATE Wait;",
+        "state Wait;",
+        "input startProcess(x);",
+        "decision x;",
+        "(0)",
+        "NEXTSTATE -;",
+        "(>0)",
+        "output sendOtput(x);",
+        "task 'SOME EXAMPLE TASK'",
+        "NEXTSTATE -;",
+        "enddecision;",
         "endstate;",
-        "endprocess ExampleProcess;",
+        "endprocess ExampleProcess",
     };
     checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
