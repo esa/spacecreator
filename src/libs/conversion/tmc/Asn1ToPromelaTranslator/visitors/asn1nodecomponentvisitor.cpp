@@ -113,7 +113,7 @@ void Asn1NodeComponentVisitor::visit(const Choice &type)
 
 void Asn1NodeComponentVisitor::visit(const Sequence &type)
 {
-    const QString nestedUtypeName = QString("%1-%2").arg(m_baseTypeName).arg(m_name);
+    const QString nestedUtypeName = QString("%1_%2").arg(m_baseTypeName).arg(m_name);
     Utype nestedUtype(nestedUtypeName);
     for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : type.components()) {
         Asn1SequenceComponentVisitor componentVisitor(m_promelaModel, nestedUtype, nestedUtypeName);
@@ -122,7 +122,7 @@ void Asn1NodeComponentVisitor::visit(const Sequence &type)
 
     m_promelaModel.addUtype(nestedUtype);
 
-    m_utype.addField(Declaration(DataType(UtypeRef("")), m_name));
+    m_utype.addField(Declaration(DataType(UtypeRef(nestedUtypeName)), m_name));
 }
 
 void Asn1NodeComponentVisitor::visit(const SequenceOf &type)
