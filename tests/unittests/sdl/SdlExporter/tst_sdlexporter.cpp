@@ -22,6 +22,7 @@
 
 #include <QObject>
 #include <QtTest>
+#include <common/sdlmodelbuilder/sdlanswerbuilder.h>
 #include <common/sdlmodelbuilder/sdlinputbuilder.h>
 #include <common/sdlmodelbuilder/sdlmodelbuilder.h>
 #include <common/sdlmodelbuilder/sdloutputbuilder.h>
@@ -70,6 +71,7 @@ using sdl::VariableLiteral;
 using sdl::VariableReference;
 using sdl::exporter::SdlExporter;
 using sdl::exporter::SdlOptions;
+using tests::common::SdlAnswerBuilder;
 using tests::common::SdlInputBuilder;
 using tests::common::SdlModelBuilder;
 using tests::common::SdlOutputBuilder;
@@ -370,8 +372,27 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     QString processName = "ExampleProcess";
 
     auto variableX = std::make_unique<VariableDeclaration>("x", "MyInteger");
+    auto variableXRef = VariableReference(variableX.get());
 
     // todo create two Answers
+    auto answer1 = SdlAnswerBuilder()
+                           .withName("firstAnswer") //
+                           .withTransition(SdlTransitionBuilder() //
+                                                   .withOutput(SdlOutputBuilder() //
+                                                                       .withName("sendOutput")
+                                                                       .withParameter(&variableXRef)
+                                                                       .build())
+                                                   .withTask(SdlTaskBuilder() //
+                                                                     .withContents("SOME EXAMPLE TASK")
+                                                                     .build())
+                                                   .build())
+                           .build();
+    auto answer2 = SdlAnswerBuilder()
+                           .withName("secondAnswer") //
+                           .withTransition(SdlTransitionBuilder() //
+                                                   .withNextStateAction()
+                                                   .build())
+                           .build();
     // todo create Expression
     // todo create Decision with these Answers
     // todo add Decision to transition
