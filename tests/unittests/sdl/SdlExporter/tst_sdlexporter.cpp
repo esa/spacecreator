@@ -369,7 +369,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     QString modelPrefix = "Sdl_";
     QString processName = "ExampleProcess";
 
-    // todo create variable and add it to Process
+    auto variableX = std::make_unique<VariableDeclaration>("x", "MyInteger");
 
     // todo create two Answers
     // todo create Expression
@@ -396,9 +396,9 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
                     SdlStateMachineBuilder()
                         .withState(std::move(waitState))
                         .withTransition(std::move(transition))
-                    .build()
-                ).build()
-        ).build();
+                    .build())
+                .withVariable(std::move(variableX)).build())
+            .build();
     // clang-format on
 
     Options options;
