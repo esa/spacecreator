@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2019-2021 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,39 +17,26 @@
 
 #pragma once
 
+#include "exportableivfunctiontype.h"
 #include "exportableivobject.h"
 
 namespace ivm {
-class IVFunctionType;
+class IVFunction;
 }
 
 namespace ive {
 
 /**
- * @brief The ExportableIVFunction is a class to export IVFunctionType and IVFunction
+ * @brief The ExportableIVFunction is a class to export IVFunction
  */
-class ExportableIVFunction : public ExportableIVObject
+class ExportableIVFunction : public ExportableIVFunctionType
 {
     Q_GADGET
-    Q_PROPERTY(QVariantList interfaces READ interfaces)
-    Q_PROPERTY(QVariantList functions READ functions)
-    Q_PROPERTY(QVariantList comments READ comments)
-    Q_PROPERTY(QVariantList connections READ connections)
-    Q_PROPERTY(QVariantList connectionGroups READ connectionGroups)
-    Q_PROPERTY(QVariantList connectedFunctions READ connectedFunctions)
-    Q_PROPERTY(QVariantList contextParameters READ contextParameters)
     Q_PROPERTY(QVariantList implementations READ implementations)
 
 public:
-    explicit ExportableIVFunction(const ivm::IVFunctionType *function = nullptr);
+    explicit ExportableIVFunction(const ivm::IVFunction *function = nullptr);
 
-    QVariantList interfaces() const;
-    QVariantList functions() const;
-    QVariantList comments() const;
-    QVariantList connections() const;
-    QVariantList connectionGroups() const;
-    QVariantList connectedFunctions() const;
-    QVariantList contextParameters() const;
     QVariantList implementations() const;
 };
 
