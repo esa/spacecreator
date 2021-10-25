@@ -80,11 +80,11 @@ public:
     auto literal() const -> VariableLiteral *;
 
     /**
-     * @brief   Setter for the stored value
+     * @brief   Setter for answer literal
      *
-     * @param   Transition  Transition to store
+     * @param   literal  literal to store
      */
-    auto setLiteral(VariableLiteral *) -> void;
+    auto setLiteral(VariableLiteral *literal) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)

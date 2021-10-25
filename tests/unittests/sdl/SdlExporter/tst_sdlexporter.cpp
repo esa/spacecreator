@@ -382,29 +382,41 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     auto expressionForDecision = std::make_unique<Expression>();
     expressionForDecision->setContent("x");
 
-    auto decision =
-            SdlDecisionBuilder()
-                    .withExpression(std::move(expressionForDecision))
-                    .withAnswer(
-                            SdlAnswerBuilder()
-                                    .withName("firstAnswer")
-                                    .withTransition(
-                                            SdlTransitionBuilder()
-                                                    .withOutput(SdlOutputBuilder()
-                                                                        .withName("sendOutput")
-                                                                        .withParameter(&variableXRef)
-                                                                        .build())
-                                                    .withTask(
-                                                            SdlTaskBuilder().withContents("SOME EXAMPLE TASK").build())
+    VariableLiteral valueForAnswer1;
+    valueForAnswer1.setValue("0");
+    VariableLiteral valueForAnswer2;
+    valueForAnswer2.setValue(">0");
+
+    auto transition =
+            SdlTransitionBuilder()
+                    .withNextStateAction()
+                    .withAction(
+                            SdlDecisionBuilder()
+                                    .withExpression(std::move(expressionForDecision))
+                                    .withAnswer(
+                                            SdlAnswerBuilder()
+                                                    .withName("firstAnswer")
+                                                    .withLiteral(&valueForAnswer1)
+                                                    .withTransition(
+                                                            SdlTransitionBuilder()
+                                                                    .withOutput(SdlOutputBuilder()
+                                                                                        .withName("sendOutput")
+                                                                                        .withParameter(&variableXRef)
+                                                                                        .build())
+                                                                    .withTask(
+                                                                            SdlTaskBuilder()
+                                                                                    .withContents("'SOME EXAMPLE TASK'")
+                                                                                    .build())
+                                                                    .build())
                                                     .build())
+                                    .withAnswer(SdlAnswerBuilder()
+                                                        .withName("secondAnswer")
+                                                        .withLiteral(&valueForAnswer2)
+                                                        .withTransition(
+                                                                SdlTransitionBuilder().withNextStateAction().build())
+                                                        .build())
                                     .build())
-                    .withAnswer(SdlAnswerBuilder()
-                                        .withName("secondAnswer")
-                                        .withTransition(SdlTransitionBuilder().withNextStateAction().build())
-                                        .build())
                     .build();
-    // todo add Decision to transition (.withAction())
-    auto transition = SdlTransitionBuilder().withNextStateAction().build();
 
     auto waitState = SdlStateBuilder("Wait")
                              .withInput(SdlInputBuilder()
@@ -414,8 +426,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
                                                 .build())
                              .build();
 
-    // todo: auto nextStateWait = std::make_unique<NextState>("", waitState.get()); (and use withAction() below)
-    auto startTransition = SdlTransitionBuilder().withNextStateAction(waitState.get()).build();
+    auto startTransition = SdlTransitionBuilder().withAction(std::make_unique<NextState>("", waitState.get())).build();
 
     // clang-format off
     const auto exampleModel = SdlModelBuilder(modelName)
@@ -456,10 +467,9 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
         "input startProcess(x);",
         "decision x;",
         "(0)",
-        "NEXTSTATE -;",
-        "(>0)",
-        "output sendOtput(x);",
+        "output sendOutput(x);",
         "task 'SOME EXAMPLE TASK'",
+        "(>0)",
         "NEXTSTATE -;",
         "enddecision;",
         "endstate;",
