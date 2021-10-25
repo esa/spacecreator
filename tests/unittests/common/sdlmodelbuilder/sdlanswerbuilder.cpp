@@ -47,9 +47,9 @@ SdlAnswerBuilder &SdlAnswerBuilder::withTransition(std::unique_ptr<Transition> t
     return *this;
 }
 
-SdlAnswerBuilder &SdlAnswerBuilder::withLiteral(VariableLiteral *literal)
+SdlAnswerBuilder &SdlAnswerBuilder::withLiteral(VariableLiteral literal)
 {
-    m_answer->setLiteral(literal);
+    m_answer->setLiteral(std::move(literal));
 
     return *this;
 }

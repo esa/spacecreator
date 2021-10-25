@@ -396,7 +396,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
                                     .withAnswer(
                                             SdlAnswerBuilder()
                                                     .withName("firstAnswer")
-                                                    .withLiteral(&valueForAnswer1)
+                                                    .withLiteral(std::move(valueForAnswer1))
                                                     .withTransition(
                                                             SdlTransitionBuilder()
                                                                     .withOutput(SdlOutputBuilder()
@@ -411,7 +411,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
                                                     .build())
                                     .withAnswer(SdlAnswerBuilder()
                                                         .withName("secondAnswer")
-                                                        .withLiteral(&valueForAnswer2)
+                                                        .withLiteral(std::move(valueForAnswer2))
                                                         .withTransition(
                                                                 SdlTransitionBuilder().withNextStateAction().build())
                                                         .build())

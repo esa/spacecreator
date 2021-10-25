@@ -35,14 +35,14 @@ void Answer::setTransition(std::unique_ptr<Transition> transition)
     m_transition = std::move(transition);
 }
 
-VariableLiteral *Answer::literal() const
+const VariableLiteral *Answer::literal() const
 {
-    return m_literal;
+    return &m_literal;
 }
 
-void Answer::setLiteral(VariableLiteral *literal)
+void Answer::setLiteral(VariableLiteral literal)
 {
-    m_literal = literal;
+    m_literal = std::move(literal);
 }
 
 void Answer::accept(Visitor &visitor) const
