@@ -1,0 +1,49 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Exampleprocess;
+    /* CIF TEXT (647, 29), (125, 56) */
+    dcl x MyInteger;
+    dcl y MyInteger;
+    dcl z MyInteger;
+    /* CIF ENDTEXT */
+    /* CIF procedure (588, 212), (236, 35) */
+    procedure myProcedureWithParam;
+        /* CIF TEXT (62, 28), (214, 84) */
+        fpar
+          in inputParam MyInteger,
+          in/out outputParam MyInteger;
+        returns MyInteger;
+        /* CIF ENDTEXT */
+        /* CIF START (402, 98), (70, 35) */
+        START;
+            /* CIF return (417, 153), (40, 40) */
+            return inputParam + outputParam;
+    endprocedure;
+    /* CIF procedure (584, 156), (161, 40) */
+    procedure myParamlessProcedure;
+        /* CIF START (200, 61), (70, 35) */
+        START;
+            /* CIF task (141, 116), (186, 35) */
+            task 'TASK INSIDE PROCEDURE';
+            /* CIF task (114, 171), (240, 35) */
+            task 'SECOND TASK INSIDE PROCEDURE';
+            /* CIF return (217, 226), (35, 35) */
+            return ;
+    endprocedure;
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (320, 60), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (320, 60), (70, 35) */
+    state Wait;
+        /* CIF input (299, 115), (111, 35) */
+        input startProcess(x);
+            /* CIF task (320, 170), (70, 35) */
+            task y := 0;
+            /* CIF PROCEDURECALL (274, 220), (161, 35) */
+            call myParamlessprocedure;
+            /* CIF task (246, 284), (217, 35) */
+            task z := myProcedureWithParam(x, y);
+            /* CIF NEXTSTATE (320, 334), (70, 35) */
+            NEXTSTATE -;
+    endstate;
+endprocess Exampleprocess;
