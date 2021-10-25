@@ -99,6 +99,7 @@ private Q_SLOTS:
     void testGenerateProcessWithLabelAndJoin();
     void testJoinWithoutSpecifiedLabel();
     void testGenerateProcessWithDecisionExpressionAndAnswer();
+    void testGenerateProcessWithProcedureWithParams();
 };
 
 void tst_sdlmodel::testDefaultValuesInModel()
@@ -522,6 +523,12 @@ void tst_sdlmodel::testJoinWithoutSpecifiedLabel()
     SdlExporter exporter;
     QVERIFY_EXCEPTION_THROWN(exporter.exportModel(exampleModel.get(), options), ExportException);
 }
+
+void tst_sdlmodel::testGenerateProcessWithProcedureWithParams()
+{
+    // todo
+}
+
 } // namespace tests::sdl
 
 QTEST_MAIN(tests::Sdl::tst_sdlmodel)
