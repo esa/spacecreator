@@ -23,7 +23,10 @@
 
 namespace sdl {
 
-Answer::Answer() {}
+Answer::Answer()
+{
+    m_literal.setValue("else");
+}
 
 Transition *Answer::transition() const
 {
