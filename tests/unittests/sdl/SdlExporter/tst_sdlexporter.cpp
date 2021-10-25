@@ -383,9 +383,9 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     expressionForDecision->setContent("x");
 
     VariableLiteral valueForAnswer1;
-    valueForAnswer1.setValue("0");
+    valueForAnswer1.setValue("1");
     VariableLiteral valueForAnswer2;
-    valueForAnswer2.setValue(">0");
+    valueForAnswer2.setValue(">1");
 
     auto transition =
             SdlTransitionBuilder()
@@ -415,6 +415,16 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
                                                         .withTransition(
                                                                 SdlTransitionBuilder().withNextStateAction().build())
                                                         .build())
+                                    .withAnswer(
+                                            SdlAnswerBuilder()
+                                                    .withTransition(
+                                                            SdlTransitionBuilder()
+                                                                    .withTask(SdlTaskBuilder()
+                                                                                      .withContents("'ANSWER UNKNOWN'")
+                                                                                      .build())
+                                                                    .withAction(std::make_unique<NextState>(""))
+                                                                    .build())
+                                                    .build())
                                     .build())
                     .build();
 
@@ -466,10 +476,13 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
         "state Wait;",
         "input startProcess(x);",
         "decision x;",
-        "(0)",
+        "(1)",
         "output sendOutput(x);",
-        "task 'SOME EXAMPLE TASK'",
-        "(>0)",
+        "task 'SOME EXAMPLE TASK';",
+        "(>1)",
+        "NEXTSTATE -;",
+        "else:",
+        "task 'ANSWER UNKNOWN';",
         "NEXTSTATE -;",
         "enddecision;",
         "endstate;",
