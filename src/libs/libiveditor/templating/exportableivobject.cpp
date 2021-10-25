@@ -20,10 +20,12 @@
 #include "exportableivconnection.h"
 #include "exportableivconnectiongroup.h"
 #include "exportableivfunction.h"
+#include "exportableivfunctiontype.h"
 #include "exportableivinterface.h"
 #include "exportableproperty.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
+#include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivobject.h"
 
@@ -50,8 +52,9 @@ QVariant ExportableIVObject::createFrom(const ivm::IVObject *ivObject)
     case ivm::IVObject::Type::InterfaceGroup:
         return {};
     case ivm::IVObject::Type::Function:
+        return QVariant::fromValue(ExportableIVFunction(static_cast<const ivm::IVFunction *>(ivObject)));
     case ivm::IVObject::Type::FunctionType:
-        return QVariant::fromValue(ExportableIVFunction(static_cast<const ivm::IVFunctionType *>(ivObject)));
+        return QVariant::fromValue(ExportableIVFunctionType(static_cast<const ivm::IVFunctionType *>(ivObject)));
     case ivm::IVObject::Type::RequiredInterface:
     case ivm::IVObject::Type::ProvidedInterface:
         return QVariant::fromValue(ExportableIVInterface(static_cast<const ivm::IVInterface *>(ivObject)));

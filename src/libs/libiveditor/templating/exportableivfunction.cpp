@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2019-2021 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -29,71 +29,9 @@
 
 namespace ive {
 
-ExportableIVFunction::ExportableIVFunction(const ivm::IVFunctionType *function)
-    : ExportableIVObject(function)
+ExportableIVFunction::ExportableIVFunction(const ivm::IVFunction *function)
+    : ExportableIVFunctionType(function)
 {
-}
-
-QVariantList ExportableIVFunction::interfaces() const
-{
-    QVariantList ifaces;
-    for (const auto iface : exportedObject<ivm::IVFunctionType>()->interfaces())
-        ifaces << createFrom(iface);
-    return ifaces;
-}
-
-QVariantList ExportableIVFunction::functions() const
-{
-    QVariantList functions;
-    const ivm::IVFunctionType *o = exportedObject<ivm::IVFunctionType>();
-    for (const auto function : o->functionTypes())
-        functions << createFrom(function);
-    for (const auto function : o->functions())
-        functions << createFrom(function);
-    return functions;
-}
-
-QVariantList ExportableIVFunction::comments() const
-{
-    QVariantList comments;
-    for (const auto comment : exportedObject<ivm::IVFunctionType>()->comments())
-        comments << createFrom(comment);
-    return comments;
-}
-
-QVariantList ExportableIVFunction::connections() const
-{
-    QVariantList connections;
-    for (const auto connection : exportedObject<ivm::IVFunctionType>()->connections())
-        connections << createFrom(connection);
-    return connections;
-}
-
-QVariantList ExportableIVFunction::connectionGroups() const
-{
-    QVariantList connectionGroups;
-    for (const auto connectionGroup : exportedObject<ivm::IVFunctionType>()->connectionGroups())
-        connectionGroups << createFrom(connectionGroup);
-    return connectionGroups;
-}
-
-QVariantList ExportableIVFunction::connectedFunctions() const
-{
-    const auto ivFunction = exportedObject<ivm::IVFunctionType>();
-    QVariantList list;
-    for (auto chain : ivm::IVInterfaceChain::linkedFunctions(ivFunction)) {
-        list << QVariant::fromValue(chain);
-    }
-    return list;
-}
-
-QVariantList ExportableIVFunction::contextParameters() const
-{
-    QVariantList parameters;
-    for (const shared::ContextParameter &param : exportedObject<ivm::IVFunctionType>()->contextParams()) {
-        parameters << QVariant::fromValue(param);
-    }
-    return parameters;
 }
 
 QVariantList ExportableIVFunction::implementations() const
@@ -102,6 +40,7 @@ QVariantList ExportableIVFunction::implementations() const
     if (!ivFunction) {
         return {};
     }
+
     QVariantList result;
     for (const auto &implementation : ivFunction->implementations()) {
         result << QVariant::fromValue(shared::ExportableProperty(implementation.name(), implementation.value()));
