@@ -307,6 +307,9 @@ QString Asn1TreeView::getItemValue(const QStandardItem *item, const QString &sep
     QString asnValue;
     modelIndex = itemIndex.sibling(item->row(), MODEL_VALUE_INDEX);
     if (modelIndex.isValid()) {
+        if (modelIndex.data(DEFAULT_ROLE).toBool()) {
+            return {};
+        }
         asnValue = model->itemFromIndex(modelIndex)->text();
     }
     if (asnValue.isEmpty()) {

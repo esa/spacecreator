@@ -65,24 +65,31 @@ private:
     ItemMap createModelItems(const Asn1Acn::Types::Type *asn1Item, const QString &name = {});
 
     template<typename ValueType>
-    QStandardItem *createNumberItem(const Asn1Acn::Constraints::WithConstraints<ValueType> *asn1Item, QString &typeLimit);
+    QStandardItem *createNumberItem(
+            const Asn1Acn::Constraints::WithConstraints<ValueType> *asn1Item, QString &typeLimit);
     QStandardItem *createBoolItem(const Asn1Acn::Types::Boolean *asn1Item);
     template<typename ValueType>
-    QStandardItem *createStringItem(const Asn1Acn::Constraints::WithConstraints<ValueType> *asn1Item, QString &typeLimit);
+    QStandardItem *createStringItem(
+            const Asn1Acn::Constraints::WithConstraints<ValueType> *asn1Item, QString &typeLimit);
     QStandardItem *createSequenceItem(const Asn1Acn::Types::Sequence *asn1Item, QStandardItem *parent);
-    QStandardItem *createSequenceOfItem(const Asn1Acn::Types::SequenceOf *asn1Item, QStandardItem *parent, QString &typeLimit);
+    QStandardItem *createSequenceOfItem(
+            const Asn1Acn::Types::SequenceOf *asn1Item, QStandardItem *parent, QString &typeLimit);
     QStandardItem *createEnumeratedItem(const Asn1Acn::Types::Enumerated *asn1Item);
     QStandardItem *createChoiceItem(const Asn1Acn::Types::Choice *asn1Item, QStandardItem *parent);
 
     QStandardItem *createPresentItem();
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
     template<typename ValueType>
-    std::optional<Asn1Acn::Range<typename ValueType::Type>> combineRanges(const Asn1Acn::Constraints::ConstraintList<ValueType> &constraintList);
+    std::optional<Asn1Acn::Range<typename ValueType::Type>> combineRanges(
+            const Asn1Acn::Constraints::ConstraintList<ValueType> &constraintList);
     template<typename ValueType>
-    std::optional<Asn1Acn::Range<typename ValueType::Type>> combineRange(const Asn1Acn::Constraints::Constraint<ValueType> *constraint);
+    std::optional<Asn1Acn::Range<typename ValueType::Type>> combineRange(
+            const Asn1Acn::Constraints::Constraint<ValueType> *constraint);
 
     template<typename ValueType>
-    std::optional<Asn1Acn::Range<int64_t>> combineSizes(const Asn1Acn::Constraints::ConstraintList<ValueType> &constraintList);
+    std::optional<Asn1Acn::Range<int64_t>> combineSizes(
+            const Asn1Acn::Constraints::ConstraintList<ValueType> &constraintList);
     template<typename ValueType>
     std::optional<Asn1Acn::Range<int64_t>> combineSize(const Asn1Acn::Constraints::Constraint<ValueType> *constraint);
 };
