@@ -41,7 +41,7 @@ public:
 
     auto withTransition(std::unique_ptr<Transition> transition) -> SdlAnswerBuilder &;
 
-    auto withLiteral(VariableLiteral *literal) -> SdlAnswerBuilder &;
+    auto withLiteral(VariableLiteral literal) -> SdlAnswerBuilder &;
 
 private:
     std::unique_ptr<Answer> m_answer;

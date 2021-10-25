@@ -77,14 +77,14 @@ public:
      *
      * @return  variable literal
      */
-    auto literal() const -> VariableLiteral *;
+    auto literal() const -> const VariableLiteral *;
 
     /**
      * @brief   Setter for answer literal
      *
      * @param   literal  literal to store
      */
-    auto setLiteral(VariableLiteral *literal) -> void;
+    auto setLiteral(VariableLiteral literal) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
@@ -93,7 +93,7 @@ public:
 
 private:
     std::unique_ptr<Transition> m_transition;
-    VariableLiteral *m_literal;
+    VariableLiteral m_literal;
 };
 
 } // namespace sdl
