@@ -40,7 +40,6 @@
 #include "values.h"
 
 #include <QStandardItem>
-#include <QtDebug>
 #include <iostream>
 
 namespace asn1 {
@@ -265,6 +264,16 @@ QStandardItem *Asn1ItemModel::createSequenceItem(const Asn1Acn::Types::Sequence 
         childItem["present"]->setCheckable(true);
         childItem["present"]->setCheckState(asnSequenceComponent->isOptional() ? Qt::Checked : Qt::Unchecked);
 
+        if (QStandardItem *valueItem = childItem["value"]) {
+            if (valueItem->text().isEmpty()) {
+                const std::optional<QString> defaultValue = asnSequenceComponent->defaultValue();
+                if (defaultValue.has_value()) {
+                    valueItem->setText(defaultValue.value());
+                    valueItem->setData(true, DEFAULT_ROLE);
+                }
+            }
+        }
+
         parent->appendRow(childItem["item"]);
 
         typeItems.append(childItem["type"]);
@@ -345,7 +354,7 @@ QStandardItem *Asn1ItemModel::createEnumeratedItem(const Asn1Acn::Types::Enumera
         childNames.append(enumItem.name());
     }
 
-    QStandardItem *item = new QStandardItem(enumItems.begin().key());
+    QStandardItem *item = new QStandardItem;
     item->setData(asn1Item->typeEnum(), ASN1TYPE_ROLE);
     item->setData(childNames, CHOICE_LIST_ROLE);
 
@@ -391,6 +400,14 @@ QStandardItem *Asn1ItemModel::createPresentItem()
     item->setEnabled(false);
 
     return item;
+}
+
+bool Asn1ItemModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (index.column() == MODEL_VALUE_INDEX) {
+        itemFromIndex(index)->setData(false, DEFAULT_ROLE);
+    }
+    return QStandardItemModel::setData(index, value, role);
 }
 
 template<typename ValueType>
