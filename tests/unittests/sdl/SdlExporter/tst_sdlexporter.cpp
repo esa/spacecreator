@@ -99,6 +99,7 @@ private Q_SLOTS:
     void testGenerateProcessWithLabelAndJoin();
     void testJoinWithoutSpecifiedLabel();
     void testGenerateProcessWithDecisionExpressionAndAnswer();
+    void testGenerateProcessWithParamlessProcedure();
     void testGenerateProcessWithProcedureWithParams();
 };
 
@@ -452,6 +453,97 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
                 .withVariable(std::move(variableX)).build())
             .build();
     // clang-format on
+
+    Options options;
+    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+
+    SdlExporter exporter;
+    try {
+        exporter.exportModel(exampleModel.get(), options);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+
+    QString filename = QString("%1%2.%3").arg(modelPrefix, modelName, "pr");
+    QFile outputFile(filename);
+    if (!outputFile.open(QIODevice::ReadOnly)) {
+        QFAIL("requested file cannot be found");
+    }
+    QTextStream consumableOutput(&outputFile);
+    std::vector<QString> expectedOutput = {
+        "process ExampleProcess;",
+        "dcl howManyLoops MyInteger",
+        "START;",
+        "NEXTSTATE Looping;",
+        "state Looping;",
+        "input some_input_name(howManyLoops);",
+        "output parameterlessOutput;",
+        "NEXTSTATE -;",
+        "endstate;",
+        "state Idle;",
+        "input some_other_input_name;",
+        "task 'EXAMPLE TASK CONTENTS';",
+        "output referenceOutput(howManyLoops);",
+        "NEXTSTATE Looping;",
+        "endstate;",
+        "endprocess ExampleProcess;",
+    };
+    checkSequenceAndConsume(expectedOutput, consumableOutput);
+}
+
+void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
+{
+    QString modelName = "ParamlessProcedure";
+    QString modelPrefix = "Sdl_";
+    QString processName = "ExampleProcess";
+
+    auto variable = std::make_unique<VariableDeclaration>("howManyLoops", "MyInteger");
+    auto variableReference = VariableReference(variable.get());
+
+    auto transition1 = SdlTransitionBuilder()
+                               .withOutput(SdlOutputBuilder().withName("parameterlessOutput").build())
+                               .withNextStateAction()
+                               .build();
+    auto someInput = SdlInputBuilder()
+                             .withName("some_input_name")
+                             .withTransition(transition1.get())
+                             .withParameter(&variableReference)
+                             .build();
+    auto state1 = SdlStateBuilder("Looping")
+                          .withInput(std::move(someInput))
+                          .withContinuousSignal(std::make_unique<ContinuousSignal>())
+                          .build();
+
+    auto referenceOutput = SdlOutputBuilder().withName("referenceOutput").withParameter(&variableReference).build();
+
+    auto transition2 = SdlTransitionBuilder()
+                               .withTask(SdlTaskBuilder().withContents("'EXAMPLE TASK CONTENTS'").build())
+                               .withOutput(std::move(referenceOutput))
+                               .withNextStateAction(state1.get())
+                               .build();
+
+    auto startTransition = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
+
+    auto state2 = SdlStateBuilder("Idle")
+                          .withInput(SdlInputBuilder()
+                                             .withName("some_other_input_name")
+                                             .withTransition(transition2.get())
+                                             .build())
+                          .withContinuousSignal(std::make_unique<ContinuousSignal>())
+                          .build();
+
+    auto process = SdlProcessBuilder(processName)
+                           .withStartTransition(std::move(startTransition))
+                           .withVariable(std::move(variable))
+                           .withStateMachine(SdlStateMachineBuilder()
+                                                     .withState(std::move(state1))
+                                                     .withState(std::move(state2))
+                                                     .withTransition(std::move(transition1))
+                                                     .withTransition(std::move(transition2))
+                                                     .build())
+                           .build();
+
+    const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
 
     Options options;
     options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
