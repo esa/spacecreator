@@ -44,6 +44,7 @@
 #include <sdl/SdlModel/label.h>
 #include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/output.h>
+#include <sdl/SdlModel/procedure.h>
 #include <sdl/SdlModel/process.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/task.h>
@@ -472,19 +473,21 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     QTextStream consumableOutput(&outputFile);
     std::vector<QString> expectedOutput = {
         "process ExampleProcess;",
-        "dcl howManyLoops MyInteger",
+
+        "procedure myParamlessProcedure;",
         "START;",
-        "NEXTSTATE Looping;",
-        "state Looping;",
-        "input some_input_name(howManyLoops);",
-        "output parameterlessOutput;",
+        "task 'TASK INSIDE PROCEDURE';",
+        "task 'SECOND TASK INSIDE PROCEDURE';",
+        "return;",
+
+        "START;",
+        "NEXTSTATE Wait;",
+
+        "state Wait;",
+        "input startProcess;",
+        "call myParamlessProcedure;",
         "NEXTSTATE -;",
-        "endstate;",
-        "state Idle;",
-        "input some_other_input_name;",
-        "task 'EXAMPLE TASK CONTENTS';",
-        "output referenceOutput(howManyLoops);",
-        "NEXTSTATE Looping;",
+
         "endstate;",
         "endprocess ExampleProcess;",
     };
@@ -497,28 +500,20 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
     QString modelPrefix = "Sdl_";
     QString processName = "ExampleProcess";
 
-    auto variable = std::make_unique<VariableDeclaration>("howManyLoops", "MyInteger");
-    auto variableReference = VariableReference(variable.get());
-
     auto transition1 = SdlTransitionBuilder()
                                .withOutput(SdlOutputBuilder().withName("parameterlessOutput").build())
                                .withNextStateAction()
                                .build();
-    auto someInput = SdlInputBuilder()
-                             .withName("some_input_name")
-                             .withTransition(transition1.get())
-                             .withParameter(&variableReference)
-                             .build();
+    auto someInput = SdlInputBuilder().withName("some_input_name").withTransition(transition1.get()).build();
     auto state1 = SdlStateBuilder("Looping")
                           .withInput(std::move(someInput))
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
-    auto referenceOutput = SdlOutputBuilder().withName("referenceOutput").withParameter(&variableReference).build();
+    auto referenceOutput = SdlOutputBuilder().withName("referenceOutput").build();
 
     auto transition2 = SdlTransitionBuilder()
                                .withTask(SdlTaskBuilder().withContents("'EXAMPLE TASK CONTENTS'").build())
-                               .withOutput(std::move(referenceOutput))
                                .withNextStateAction(state1.get())
                                .build();
 
@@ -532,9 +527,14 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
+    // todo procedure = SdlProcedureBuilder()
+    //                     .withTransition(
+    //                           SdlTransitionBuilder()
+    //                                .withAction(SdlTaskBuilder.withContents("'TASK INSIDE PROCEDURE'")
+    //                                .withAction(SdlTaskBuilder.withContents("'SECOND TASK INSIDE PROCEDURE'")
     auto process = SdlProcessBuilder(processName)
+                           // .withProcedure(std::move(procedure))
                            .withStartTransition(std::move(startTransition))
-                           .withVariable(std::move(variable))
                            .withStateMachine(SdlStateMachineBuilder()
                                                      .withState(std::move(state1))
                                                      .withState(std::move(state2))
