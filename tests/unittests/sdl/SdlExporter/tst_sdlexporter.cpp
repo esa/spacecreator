@@ -529,7 +529,7 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
-    auto procedure = SdlProcedureBuilder().build();
+    auto procedure = SdlProcedureBuilder().withName("myParamlessProcedure").build();
     //                     .withTransition(
     //                           SdlTransitionBuilder()
     //                                .withAction(SdlTaskBuilder.withContents("'TASK INSIDE PROCEDURE'")
