@@ -68,6 +68,8 @@ void SdlVisitor::visit(const Process &process) const
 
     if (process.stateMachine() != nullptr) {
         exportCollection(process.stateMachine()->states());
+    } else {
+        throw ExportException("Process does not contain a State Machine");
     }
 
     m_stream << "endprocess " << process.name() << ";\n";
@@ -179,6 +181,10 @@ void SdlVisitor::visit(const VariableDeclaration &declaration) const
 
 void SdlVisitor::visit(const Label &label) const
 {
+    if (label.name() == "") {
+        throw ExportException("Label name cannot be empty");
+    }
+
     // write some dummy CIF
     m_stream << "        /* CIF label (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "        " << label.name() << ":\n";
