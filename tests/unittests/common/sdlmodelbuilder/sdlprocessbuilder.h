@@ -20,11 +20,13 @@
 #pragma once
 
 #include <memory>
+#include <sdl/SdlModel/procedure.h>
 #include <sdl/SdlModel/process.h>
 #include <sdl/SdlModel/statemachine.h>
 #include <sdl/SdlModel/transition.h>
 #include <sdl/SdlModel/variabledeclaration.h>
 
+using sdl::Procedure;
 using sdl::Process;
 using sdl::StateMachine;
 using sdl::Transition;
@@ -41,7 +43,7 @@ public:
 
     auto withStartTransition(std::unique_ptr<Transition> transition) -> SdlProcessBuilder &;
     auto withStateMachine(std::unique_ptr<StateMachine> stateMachine) -> SdlProcessBuilder &;
-    // TODO withProcedures()
+    auto withProcedure(std::unique_ptr<Procedure> procedure) -> SdlProcessBuilder &;
     auto withVariable(std::unique_ptr<VariableDeclaration> variable) -> SdlProcessBuilder &;
 
 private:

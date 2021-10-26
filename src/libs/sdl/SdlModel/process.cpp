@@ -70,9 +70,9 @@ const std::vector<std::unique_ptr<Procedure>> &Process::procedures() const
     return m_procedures;
 }
 
-void Process::setProcedures(std::vector<std::unique_ptr<Procedure>> procedures)
+void Process::addProcedure(std::unique_ptr<Procedure> procedure)
 {
-    m_procedures = std::move(procedures);
+    m_procedures.push_back(std::move(procedure));
 }
 
 void Process::accept(Visitor &visitor) const

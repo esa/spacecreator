@@ -128,11 +128,11 @@ public:
     auto procedures() const -> const std::vector<std::unique_ptr<Procedure>> &;
 
     /**
-     * @brief   Setter for the procedures declared in this process
+     * @brief   Add a procedure declared in this process
      *
-     * @param   procedures a vector of pointers to procedure
+     * @param   procedure procedure to be added
      */
-    auto setProcedures(std::vector<std::unique_ptr<Procedure>> procedures) -> void;
+    auto addProcedure(std::unique_ptr<Procedure> procedure) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
