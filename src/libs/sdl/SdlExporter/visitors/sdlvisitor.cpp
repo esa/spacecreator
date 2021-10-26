@@ -19,11 +19,12 @@
 
 #include "sdlvisitor.h"
 
-#include "../exceptions.h"
-
+#include <conversion/common/export/exceptions.h>
 #include <iostream>
 #include <qglobal.h>
 #include <sdl/SdlModel/variablereference.h>
+
+using conversion::exporter::ExportException;
 
 namespace sdl {
 
@@ -40,7 +41,7 @@ void SdlVisitor::visit(const SdlModel &model) const
 void SdlVisitor::visit(const Process &process) const
 {
     if (process.name() == "") {
-        throw ExporterException("process shall have a name but it doesn't");
+        throw ExportException("Process shall have a name but it doesn't");
     }
 
     // write some dummy CIF
@@ -61,7 +62,7 @@ void SdlVisitor::visit(const Process &process) const
                     "    START;\n";
         exportCollection(process.startTransition()->actions());
     } else {
-        throw ExporterException("START transition not specified but required");
+        throw ExportException("START transition not specified but required");
     }
     m_stream << "\n";
 
@@ -73,7 +74,7 @@ void SdlVisitor::visit(const Process &process) const
 void SdlVisitor::visit(const State &state) const
 {
     if (state.name() == "") {
-        throw ExporterException("state shall have a name but it doesn't");
+        throw ExportException("State shall have a name but it doesn't");
     }
 
     // write some dummy CIF
@@ -87,7 +88,7 @@ void SdlVisitor::visit(const State &state) const
 void SdlVisitor::visit(const Input &input) const
 {
     if (input.name() == "") {
-        throw ExporterException("input shall have a name but it doesn't");
+        throw ExportException("Input shall have a name but it doesn't");
     }
 
     // write some dummy CIF
@@ -112,7 +113,7 @@ void SdlVisitor::visit(const Input &input) const
     if (input.transition() != nullptr) {
         exportCollection(input.transition()->actions());
     } else {
-        throw ExporterException("Transition in Input not specified but required");
+        throw ExportException("Transition in Input not specified but required");
     }
 }
 
@@ -121,7 +122,7 @@ void SdlVisitor::visit(const Output &output) const
     QString outputParamStr;
 
     if (output.name() == "") {
-        throw ExporterException("output shall have a name but it doesn't");
+        throw ExportException("Output shall have a name but it doesn't");
     }
 
     const auto outputParamRef = output.parameter();
@@ -144,7 +145,7 @@ void SdlVisitor::visit(const NextState &nextstate) const
         if (nextstate.state()->name() != nullptr) {
             nextStateName = nextstate.state()->name();
         } else {
-            throw ExporterException("Next state not specified");
+            throw ExportException("Next state not specified");
         }
     }
 
@@ -156,7 +157,7 @@ void SdlVisitor::visit(const NextState &nextstate) const
 void SdlVisitor::visit(const Task &task) const
 {
     if (task.content() == "") {
-        throw ExporterException("task shall have contents but it doesn't");
+        throw ExportException("Task shall have contents but it doesn't");
     }
 
     // write some dummy CIF
@@ -167,10 +168,10 @@ void SdlVisitor::visit(const Task &task) const
 void SdlVisitor::visit(const VariableDeclaration &declaration) const
 {
     if (declaration.name() == "") {
-        throw ExporterException("variable declaration shall have a name but it doesn't");
+        throw ExportException("Variable declaration shall have a name but it doesn't");
     }
     if (declaration.type() == "") {
-        throw ExporterException("variable declaration shall have a specified type but it doesn't");
+        throw ExportException("Variable declaration shall have a specified type but it doesn't");
     }
 
     m_stream << "    dcl " << declaration.name() << " " << declaration.type() << ";\n";
@@ -190,7 +191,7 @@ void SdlVisitor::visit(const Join &join) const
     if (join.label() != nullptr) {
         m_stream << join.label()->name();
     } else {
-        throw ExporterException("Label is not set in Join, but Join without specified Label is ill-formed");
+        throw ExportException("Label is not set in Join, but Join without specified Label is ill-formed");
     }
     m_stream << ";\n";
 }

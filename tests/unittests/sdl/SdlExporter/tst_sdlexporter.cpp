@@ -30,11 +30,11 @@
 #include <common/sdlmodelbuilder/sdlstatemachinebuilder.h>
 #include <common/sdlmodelbuilder/sdltaskbuilder.h>
 #include <common/sdlmodelbuilder/sdltransitionbuilder.h>
+#include <conversion/common/export/exceptions.h>
 #include <conversion/common/options.h>
 #include <memory>
 #include <qtestcase.h>
 #include <sdl/SdlExporter/SdlOptions/options.h>
-#include <sdl/SdlExporter/exceptions.h>
 #include <sdl/SdlExporter/exporter.h>
 #include <sdl/SdlModel/action.h>
 #include <sdl/SdlModel/join.h>
@@ -50,9 +50,9 @@
 
 using conversion::ModelType;
 using conversion::Options;
+using conversion::exporter::ExportException;
 using sdl::Action;
 using sdl::ContinuousSignal;
-using sdl::ExporterException;
 using sdl::Input;
 using sdl::Join;
 using sdl::Label;
@@ -392,7 +392,7 @@ void tst_sdlmodel::testJoinWithoutSpecifiedLabel()
     Options options;
 
     SdlExporter exporter;
-    QVERIFY_EXCEPTION_THROWN(exporter.exportModel(exampleModel.get(), options), ExporterException);
+    QVERIFY_EXCEPTION_THROWN(exporter.exportModel(exampleModel.get(), options), ExportException);
 }
 } // namespace tests::sdl
 
