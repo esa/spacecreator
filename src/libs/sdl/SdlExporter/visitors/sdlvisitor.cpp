@@ -119,20 +119,18 @@ void SdlVisitor::visit(const Input &input) const
 
 void SdlVisitor::visit(const Output &output) const
 {
-    QString outputParamStr;
-
     if (output.name() == "") {
         throw ExportException("Output shall have a name but it doesn't");
     }
 
-    const auto outputParamRef = output.parameter();
-    if (outputParamRef != nullptr) {
-        outputParamStr = QString("(%1)").arg(outputParamRef->declaration()->name());
-    }
-
     // write some dummy CIF
     m_stream << "            /* CIF output (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
-    m_stream << "            output " << output.name() << outputParamStr << ";\n";
+    m_stream << "            output " << output.name();
+    const auto outputParamRef = output.parameter();
+    if (outputParamRef != nullptr) {
+        m_stream << QString("(%1)").arg(outputParamRef->declaration()->name());
+    }
+    m_stream << ";\n";
 }
 
 void SdlVisitor::visit(const NextState &nextstate) const
