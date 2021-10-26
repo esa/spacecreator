@@ -55,7 +55,9 @@ void SdlVisitor::visit(const Process &process) const
         m_stream << "\n";
     }
 
-    // TODO: loop over procedures and export them
+    if (!process.procedures().empty()) {
+        exportCollection(process.procedures());
+    }
 
     if (process.startTransition() != nullptr) {
         m_stream << "    /* CIF START (9, 285), (70, 35) */\n"
@@ -243,8 +245,8 @@ void SdlVisitor::visit(const Decision &decision) const
 void SdlVisitor::visit(const Procedure &procedure) const
 {
     // write some dummy CIF
-    m_stream << "            /* CIF procedure (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
-    m_stream << "            procedure " << procedure.name() << ";\n";
+    m_stream << "    /* CIF procedure (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "    procedure " << procedure.name() << ";\n";
 }
 
 template<typename T>
