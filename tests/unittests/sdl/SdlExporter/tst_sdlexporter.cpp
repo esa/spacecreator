@@ -27,6 +27,7 @@
 #include <common/sdlmodelbuilder/sdlinputbuilder.h>
 #include <common/sdlmodelbuilder/sdlmodelbuilder.h>
 #include <common/sdlmodelbuilder/sdloutputbuilder.h>
+#include <common/sdlmodelbuilder/sdlprocedurebuilder.h>
 #include <common/sdlmodelbuilder/sdlprocessbuilder.h>
 #include <common/sdlmodelbuilder/sdlstatebuilder.h>
 #include <common/sdlmodelbuilder/sdlstatemachinebuilder.h>
@@ -81,6 +82,7 @@ using tests::common::SdlDecisionBuilder;
 using tests::common::SdlInputBuilder;
 using tests::common::SdlModelBuilder;
 using tests::common::SdlOutputBuilder;
+using tests::common::SdlProcedureBuilder;
 using tests::common::SdlProcessBuilder;
 using tests::common::SdlStateBuilder;
 using tests::common::SdlStateMachineBuilder;
@@ -527,13 +529,13 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
-    // todo procedure = SdlProcedureBuilder()
+    auto procedure = SdlProcedureBuilder().build();
     //                     .withTransition(
     //                           SdlTransitionBuilder()
     //                                .withAction(SdlTaskBuilder.withContents("'TASK INSIDE PROCEDURE'")
     //                                .withAction(SdlTaskBuilder.withContents("'SECOND TASK INSIDE PROCEDURE'")
     auto process = SdlProcessBuilder(processName)
-                           // .withProcedure(std::move(procedure))
+                           .withProcedure(std::move(procedure))
                            .withStartTransition(std::move(startTransition))
                            .withStateMachine(SdlStateMachineBuilder()
                                                      .withState(std::move(state1))
