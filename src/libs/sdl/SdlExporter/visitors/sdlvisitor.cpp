@@ -39,6 +39,10 @@ void SdlVisitor::visit(const SdlModel &model) const
 
 void SdlVisitor::visit(const Process &process) const
 {
+    if (process.name() == "") {
+        throw ExporterException("process shall have a name but it doesn't");
+    }
+
     // write some dummy CIF
     m_stream << "/* CIF PROCESS (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "process " << process.name() << ";\n";
@@ -56,6 +60,8 @@ void SdlVisitor::visit(const Process &process) const
         m_stream << "    /* CIF START (9, 285), (70, 35) */\n"
                     "    START;\n";
         exportCollection(process.startTransition()->actions());
+    } else {
+        throw ExporterException("START transition not specified but required");
     }
     m_stream << "\n";
 
@@ -66,18 +72,24 @@ void SdlVisitor::visit(const Process &process) const
 
 void SdlVisitor::visit(const State &state) const
 {
+    if (state.name() == "") {
+        throw ExporterException("state shall have a name but it doesn't");
+    }
+
     // write some dummy CIF
     m_stream << "    /* CIF state (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "    state " << state.name() << ";\n";
-
     exportCollection(state.inputs());
-
     m_stream << "    endstate;\n";
     m_stream << "\n";
 }
 
 void SdlVisitor::visit(const Input &input) const
 {
+    if (input.name() == "") {
+        throw ExporterException("input shall have a name but it doesn't");
+    }
+
     // write some dummy CIF
     m_stream << "        /* CIF input (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "        input " << input.name();
@@ -99,38 +111,54 @@ void SdlVisitor::visit(const Input &input) const
 
     if (input.transition() != nullptr) {
         exportCollection(input.transition()->actions());
+    } else {
+        throw ExporterException("Transition in Input not specified but required");
     }
 }
 
 void SdlVisitor::visit(const Output &output) const
 {
-    // write some dummy CIF
-    m_stream << "            /* CIF output (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
-    m_stream << "            output " << output.name();
+    QString outputParamStr;
+
+    if (output.name() == "") {
+        throw ExporterException("output shall have a name but it doesn't");
+    }
+
     const auto outputParamRef = output.parameter();
     if (outputParamRef != nullptr) {
-        m_stream << "(" << outputParamRef->declaration()->name() << ")";
+        outputParamStr = QString("(%1)").arg(outputParamRef->declaration()->name());
     }
-    m_stream << ";\n";
+
+    // write some dummy CIF
+    m_stream << "            /* CIF output (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "            output " << output.name() << outputParamStr << ";\n";
 }
 
 void SdlVisitor::visit(const NextState &nextstate) const
 {
-    // write some dummy CIF
-    m_stream << "            /* CIF NEXTSTATE (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
-    m_stream << "            NEXTSTATE ";
+    QString nextStateName;
+
     if (nextstate.state() == nullptr) {
-        m_stream << "-";
+        nextStateName = "-";
     } else {
         if (nextstate.state()->name() != nullptr) {
-            m_stream << nextstate.state()->name();
+            nextStateName = nextstate.state()->name();
+        } else {
+            throw ExporterException("Next state not specified");
         }
     }
-    m_stream << ";\n";
+
+    // write some dummy CIF
+    m_stream << "            /* CIF NEXTSTATE (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "            NEXTSTATE " << nextStateName << ";\n";
 }
 
 void SdlVisitor::visit(const Task &task) const
 {
+    if (task.content() == "") {
+        throw ExporterException("task shall have contents but it doesn't");
+    }
+
     // write some dummy CIF
     m_stream << "            /* CIF task (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "            task " << task.content() << ";\n";
@@ -138,6 +166,13 @@ void SdlVisitor::visit(const Task &task) const
 
 void SdlVisitor::visit(const VariableDeclaration &declaration) const
 {
+    if (declaration.name() == "") {
+        throw ExporterException("variable declaration shall have a name but it doesn't");
+    }
+    if (declaration.type() == "") {
+        throw ExporterException("variable declaration shall have a specified type but it doesn't");
+    }
+
     m_stream << "    dcl " << declaration.name() << " " << declaration.type() << ";\n";
 }
 
