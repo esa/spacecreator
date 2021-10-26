@@ -32,7 +32,9 @@
 #include <common/sdlmodelbuilder/sdltransitionbuilder.h>
 #include <conversion/common/options.h>
 #include <memory>
+#include <qtestcase.h>
 #include <sdl/SdlExporter/SdlOptions/options.h>
+#include <sdl/SdlExporter/exceptions.h>
 #include <sdl/SdlExporter/exporter.h>
 #include <sdl/SdlModel/action.h>
 #include <sdl/SdlModel/join.h>
@@ -50,6 +52,7 @@ using conversion::ModelType;
 using conversion::Options;
 using sdl::Action;
 using sdl::ContinuousSignal;
+using sdl::ExporterException;
 using sdl::Input;
 using sdl::Join;
 using sdl::Label;
@@ -87,6 +90,7 @@ private Q_SLOTS:
     void testGenerateProcess();
     void testGenerateProcessWithTasksVariablesAndParameters();
     void testGenerateProcessWithLabelAndJoin();
+    void testJoinWithoutSpecifiedLabel();
 };
 
 void tst_sdlmodel::testDefaultValuesInModel()
@@ -358,6 +362,38 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
     checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
+void tst_sdlmodel::testJoinWithoutSpecifiedLabel()
+{
+    QString modelName = "JoinWithoutSpecifiedLabel";
+    QString modelPrefix = "Sdl_";
+    QString processName = "ExampleProcess";
+
+    auto join = std::make_unique<Join>();
+    auto transition = SdlTransitionBuilder() //
+                              .withAction(std::move(join))
+                              .withAction(std::make_unique<NextState>(""))
+                              .build();
+    auto state = SdlStateBuilder("Idle")
+                         .withInput(SdlInputBuilder().withName("sigReset").withTransition(transition.get()).build())
+                         .build();
+
+    auto process =
+            SdlProcessBuilder(processName)
+                    .withStartTransition(
+                            SdlTransitionBuilder().withAction(std::make_unique<NextState>("", state.get())).build())
+                    .withStateMachine(SdlStateMachineBuilder()
+                                              .withState(std::move(state))
+                                              .withTransition(std::move(transition))
+                                              .build())
+                    .build();
+
+    const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
+
+    Options options;
+
+    SdlExporter exporter;
+    QVERIFY_EXCEPTION_THROWN(exporter.exportModel(exampleModel.get(), options), ExporterException);
+}
 } // namespace tests::sdl
 
 QTEST_MAIN(tests::Sdl::tst_sdlmodel)
