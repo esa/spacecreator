@@ -326,12 +326,7 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
                                                      .build())
                            .build();
 
-    // clang-format off
-    const auto exampleModel = SdlModelBuilder(modelName)
-        .withProcess(
-            std::move(process)
-        ).build();
-    // clang-format on
+    const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
 
     Options options;
     options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
