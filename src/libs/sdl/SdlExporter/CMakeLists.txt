@@ -1,8 +1,10 @@
 project(SdlExporter VERSION 1.0.0 LANGUAGES CXX)
 
-set(SOURCES exporter.cpp
+set(SOURCES exceptions.cpp
+            exporter.cpp
             visitors/sdlvisitor.cpp)
-set(INCLUDES exporter.h
+set(INCLUDES exceptions.h
+             exporter.h
              visitors/visitor.h
              visitors/sdlvisitor.h)
 
