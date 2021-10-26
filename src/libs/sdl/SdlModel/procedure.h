@@ -57,6 +57,11 @@ public:
      * @brief   Default move assignment operator
      */
     Procedure &operator=(Procedure &&) = default;
+
+    /**
+     * @brief  visitor acceptor (calls visit method of the given visitor)
+     */
+    virtual auto accept(Visitor &visitor) const -> void override;
 };
 
 } // namespace sdl
