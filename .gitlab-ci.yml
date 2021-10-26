@@ -1,4 +1,4 @@
-image: registry.gitlab.com/aurora-software/spacecreator/taste-buster:latest
+image: ${CI_REGISTRY_IMAGE}/taste-buster:latest
 
 stages:
   - build-test
