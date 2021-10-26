@@ -198,20 +198,35 @@ void SdlVisitor::visit(const Join &join) const
 
 void SdlVisitor::visit(const Answer &answer) const
 {
-    if (answer.transition() != nullptr && answer.literal() != nullptr) {
-        // write some dummy CIF
-        m_stream << "                /* CIF ANSWER (585, 323), (77, 24) */\n";
-        if (answer.literal()->value() == "else") {
-            m_stream << "                " << answer.literal()->value() << ":\n";
-        } else {
-            m_stream << "                (" << answer.literal()->value() << "):\n";
-        }
-        exportCollection(answer.transition()->actions());
+    if (answer.transition() == nullptr) {
+        throw ExportException("Required Transition is missing in Answer");
     }
+    if (answer.literal() == nullptr) {
+        throw ExportException("Required Literal is missing in Answer");
+    }
+
+    // write some dummy CIF
+    m_stream << "                /* CIF ANSWER (585, 323), (77, 24) */\n";
+    if (answer.literal()->value() == "else") {
+        m_stream << "                " << answer.literal()->value() << ":\n";
+    } else {
+        m_stream << "                (" << answer.literal()->value() << "):\n";
+    }
+    exportCollection(answer.transition()->actions());
 }
 
 void SdlVisitor::visit(const Decision &decision) const
 {
+    if (decision.expression() == nullptr) {
+        throw ExportException("Required Expression is missing in Decision");
+    }
+    if (decision.expression()->content() == "") {
+        throw ExportException("Content in Decision is empty");
+    }
+    if (decision.answers().empty()) {
+        throw ExportException("No Answers in Decision");
+    }
+
     // write some dummy CIF
     m_stream << "            /* CIF decision (388, 241), (115, 50) */\n";
     m_stream << "            decision " << decision.expression()->content() << ";\n";
