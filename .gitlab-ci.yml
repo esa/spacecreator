@@ -23,7 +23,7 @@ default:
     - mkdir -p ${BUILD_DIR}
     - mkdir -p ${PACKAGE_DIR}
     # dependencies
-    - apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip
+    - apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format
     # install qtcreator sources
     - ./scripts/download_qtcreator.sh
     - ./scripts/build_grantlee.sh
