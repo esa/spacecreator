@@ -19,6 +19,8 @@
 
 #include "sdlvisitor.h"
 
+#include "../exceptions.h"
+
 #include <iostream>
 #include <qglobal.h>
 #include <sdl/SdlModel/variablereference.h>
@@ -153,8 +155,7 @@ void SdlVisitor::visit(const Join &join) const
     if (join.label() != nullptr) {
         m_stream << join.label()->name();
     } else {
-        m_stream << "MISSING_LABEL";
-        // TODO: throw an exception here?
+        throw ExporterException("Label is not set in Join, but Join without specified Label is ill-formed");
     }
     m_stream << ";\n";
 }
