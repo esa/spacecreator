@@ -19,13 +19,18 @@
 
 #include "procedure.h"
 
-#include <memory>
+#include <sdl/SdlExporter/visitors/visitor.h>
 
 namespace sdl {
 
 Procedure::Procedure(QString name)
     : Node(std::move(name))
 {
+}
+
+void Procedure::accept(Visitor &visitor) const
+{
+    visitor.visit(*this);
 }
 
 } // namespace sdl

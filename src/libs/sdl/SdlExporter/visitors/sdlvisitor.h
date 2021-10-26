@@ -153,6 +153,13 @@ public:
      */
     virtual auto visit(const Decision &decision) const -> void override;
 
+    /**
+     * @brief   Procedure visitor
+     *
+     * @param   procedure   procedure to be serialized
+     */
+    auto visit(const Procedure &procedure) const -> void override;
+
 private:
     template<typename T>
     auto exportCollection(const T &collection) const -> void;

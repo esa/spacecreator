@@ -240,6 +240,13 @@ void SdlVisitor::visit(const Decision &decision) const
     m_stream << "            enddecision;\n";
 }
 
+void SdlVisitor::visit(const Procedure &procedure) const
+{
+    // write some dummy CIF
+    m_stream << "            /* CIF procedure (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "            procedure " << procedure.name() << ";\n";
+}
+
 template<typename T>
 void SdlVisitor::exportCollection(const T &collection) const
 {
