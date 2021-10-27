@@ -65,4 +65,13 @@ const QList<TypeAlias> &PromelaModel::getTypeAliases() const noexcept
 {
     return m_type_aliases;
 }
+void PromelaModel::addValueDefinition(const ValueDefinition &value)
+{
+    m_value_definitions.append(value);
+}
+
+const QList<ValueDefinition> &PromelaModel::getValueDefinitions() const noexcept
+{
+    return m_value_definitions;
+}
 }

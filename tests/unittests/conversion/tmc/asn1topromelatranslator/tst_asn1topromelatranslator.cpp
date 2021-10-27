@@ -21,18 +21,42 @@
 #include <QtTest>
 #include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/asnsequencecomponent.h>
+#include <asn1library/asn1/constraints/constraintlist.h>
+#include <asn1library/asn1/constraints/rangeconstraint.h>
+#include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/sourcelocation.h>
+#include <asn1library/asn1/types/bitstring.h>
+#include <asn1library/asn1/types/choice.h>
+#include <asn1library/asn1/types/enumerated.h>
+#include <asn1library/asn1/types/ia5string.h>
+#include <asn1library/asn1/types/octetstring.h>
 #include <asn1library/asn1/types/sequence.h>
+#include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/typefactory.h>
 #include <conversion/tmc/Asn1ToPromelaTranslator/translator.h>
 #include <conversion/tmc/Asn1ToPromelaTranslator/visitors/asn1nodevisitor.h>
 #include <tmc/PromelaModel/promelamodel.h>
 
 using Asn1Acn::AsnSequenceComponent;
+using Asn1Acn::BitStringValue;
 using Asn1Acn::Definitions;
+using Asn1Acn::IntegerValue;
+using Asn1Acn::OctetStringValue;
+using Asn1Acn::Range;
 using Asn1Acn::SourceLocation;
+using Asn1Acn::StringValue;
 using Asn1Acn::TypeAssignment;
+using Asn1Acn::Constraints::RangeConstraint;
+using Asn1Acn::Constraints::SizeConstraint;
+using Asn1Acn::Types::BitString;
+using Asn1Acn::Types::Choice;
+using Asn1Acn::Types::ChoiceAlternative;
+using Asn1Acn::Types::Enumerated;
+using Asn1Acn::Types::EnumeratedItem;
+using Asn1Acn::Types::IA5String;
+using Asn1Acn::Types::OctetString;
 using Asn1Acn::Types::Sequence;
+using Asn1Acn::Types::SequenceOf;
 using Asn1Acn::Types::Type;
 using Asn1Acn::Types::TypeFactory;
 using conversion::tmc::translator::Asn1NodeVisitor;
@@ -42,6 +66,8 @@ using tmc::promela::model::Declaration;
 using tmc::promela::model::PromelaModel;
 using tmc::promela::model::TypeAlias;
 using tmc::promela::model::Utype;
+using tmc::promela::model::UtypeRef;
+using tmc::promela::model::ValueDefinition;
 
 namespace tmc::test {
 
@@ -54,11 +80,22 @@ private Q_SLOTS:
     void cleanupTestCase();
 
     void testBasicTypes();
-    void testEmptySequence();
-    void testIntegerField();
-    void testFloatField();
-    void testBooleanField();
+    void testEnumerated();
+
+    void testVariableBitString();
+    void testFixedBitString();
+    void testVariableOctetString();
+    void testFixedOctetString();
+    void testVariableIA5String();
+    void testFixedIA5String();
+
+    void testChoice();
+    void testSequence();
+    void testSequenceWithOptional();
     void testNestedSequence();
+
+    void testVariableSequenceOf();
+    void testFixedSequenceOf();
 
 private:
     std::unique_ptr<Definitions> createModel();
@@ -107,6 +144,7 @@ void tst_Asn1ToPromelaTranslator::testBasicTypes()
     QCOMPARE(0, promelaModel.getMtypeValues().size());
     QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
     QCOMPARE(0, promelaModel.getUtypes().size());
+    QCOMPARE(0, promelaModel.getValueDefinitions().size());
     QCOMPARE(4, promelaModel.getTypeAliases().size());
 
     const QList<TypeAlias> aliases = promelaModel.getTypeAliases();
@@ -132,10 +170,58 @@ void tst_Asn1ToPromelaTranslator::testBasicTypes()
     QCOMPARE(BasicType::BIT, std::get<BasicType>(expectedNull.getType()));
 }
 
-void tst_Asn1ToPromelaTranslator::testEmptySequence()
+void tst_Asn1ToPromelaTranslator::testEnumerated()
 {
     auto model = createModel();
-    auto type = Asn1Acn::Types::TypeFactory::createBuiltinType("SEQUENCE");
+    std::unique_ptr<Enumerated> type = std::make_unique<Enumerated>();
+
+    type->addItem(EnumeratedItem(0, "zero", 0));
+    type->addItem(EnumeratedItem(1, "one", 1));
+    type->addItem(EnumeratedItem(2, "infinity", 100));
+
+    auto typeAssignment = std::make_unique<TypeAssignment>(
+            QStringLiteral("myType"), QStringLiteral("myTypeT"), SourceLocation(), std::move(type));
+    model->addType(std::move(typeAssignment));
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel);
+    visitor.visit(*model);
+
+    QCOMPARE(0, promelaModel.getMtypeValues().size());
+    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
+    QCOMPARE(0, promelaModel.getUtypes().size());
+    QCOMPARE(1, promelaModel.getTypeAliases().size());
+    QCOMPARE(3, promelaModel.getValueDefinitions().size());
+
+    const TypeAlias &expectedTypeAlias = promelaModel.getTypeAliases().at(0);
+    QCOMPARE("myType", expectedTypeAlias.getName());
+    QVERIFY(std::holds_alternative<BasicType>(expectedTypeAlias.getType()));
+    QCOMPARE(BasicType::INT, std::get<BasicType>(expectedTypeAlias.getType()));
+
+    const QList<ValueDefinition> &valueDefs = promelaModel.getValueDefinitions();
+
+    const ValueDefinition &expectedZero = valueDefs.at(0);
+    QCOMPARE("zero", expectedZero.getName());
+    QCOMPARE(0, expectedZero.getValue());
+
+    const ValueDefinition &expectedOne = valueDefs.at(1);
+    QCOMPARE("one", expectedOne.getName());
+    QCOMPARE(1, expectedOne.getValue());
+
+    const ValueDefinition &expectedInfinity = valueDefs.at(2);
+    QCOMPARE("infinity", expectedInfinity.getName());
+    QCOMPARE(100, expectedInfinity.getValue());
+}
+
+void tst_Asn1ToPromelaTranslator::testVariableBitString()
+{
+    const int EXPECTED_SIZE = 16;
+
+    auto model = createModel();
+    auto type = std::make_unique<BitString>();
+    auto sizeConstraint = std::make_unique<SizeConstraint<BitStringValue>>(
+            RangeConstraint<IntegerValue>::create({ 1, EXPECTED_SIZE }));
+    type->constraints().append(std::move(sizeConstraint));
     auto typeAssignment = std::make_unique<TypeAssignment>(
             QStringLiteral("myType"), QStringLiteral("myTypeT"), SourceLocation(), std::move(type));
     model->addType(std::move(typeAssignment));
@@ -148,46 +234,301 @@ void tst_Asn1ToPromelaTranslator::testEmptySequence()
     QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
     QCOMPARE(1, promelaModel.getUtypes().size());
     QCOMPARE(0, promelaModel.getTypeAliases().size());
+    QCOMPARE(0, promelaModel.getValueDefinitions().size());
+
+    const Utype &expectedUtype = promelaModel.getUtypes().at(0);
+
+    QCOMPARE(expectedUtype.getName(), "myType");
+    QVERIFY(!expectedUtype.isUnionType());
+    QCOMPARE(expectedUtype.getFields().size(), 2);
+
+    const Declaration &expectedArray = expectedUtype.getFields().at(0);
+
+    QCOMPARE(expectedArray.getName(), "data");
+    QVERIFY(expectedArray.getType().isArrayType());
+    QCOMPARE(expectedArray.getType().getArrayType().getSize(), EXPECTED_SIZE);
+    QVERIFY(std::holds_alternative<BasicType>(expectedArray.getType().getArrayType().getType()));
+    QCOMPARE(std::get<BasicType>(expectedArray.getType().getArrayType().getType()), BasicType::BIT);
+
+    const Declaration expectedLength = expectedUtype.getFields().at(1);
+    QCOMPARE(expectedLength.getName(), "length");
+    QVERIFY(expectedLength.getType().isBasicType());
+    QCOMPARE(expectedLength.getType().getBasicType(), BasicType::INT);
 }
 
-void tst_Asn1ToPromelaTranslator::testIntegerField()
+void tst_Asn1ToPromelaTranslator::testFixedBitString()
+{
+    const int EXPECTED_SIZE = 16;
+
+    auto model = createModel();
+    auto type = std::make_unique<BitString>();
+    auto sizeConstraint = std::make_unique<SizeConstraint<BitStringValue>>(
+            RangeConstraint<IntegerValue>::create(Range<int64_t>(EXPECTED_SIZE)));
+    type->constraints().append(std::move(sizeConstraint));
+    auto typeAssignment = std::make_unique<TypeAssignment>(
+            QStringLiteral("myType"), QStringLiteral("myTypeT"), SourceLocation(), std::move(type));
+    model->addType(std::move(typeAssignment));
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel);
+    visitor.visit(*model);
+
+    QCOMPARE(0, promelaModel.getMtypeValues().size());
+    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
+    QCOMPARE(1, promelaModel.getUtypes().size());
+    QCOMPARE(0, promelaModel.getTypeAliases().size());
+    QCOMPARE(0, promelaModel.getValueDefinitions().size());
+
+    const Utype &expectedUtype = promelaModel.getUtypes().at(0);
+
+    QCOMPARE(expectedUtype.getName(), "myType");
+    QVERIFY(!expectedUtype.isUnionType());
+    QCOMPARE(expectedUtype.getFields().size(), 1);
+
+    const Declaration &expectedArray = expectedUtype.getFields().at(0);
+
+    QCOMPARE(expectedArray.getName(), "data");
+    QVERIFY(expectedArray.getType().isArrayType());
+    QCOMPARE(expectedArray.getType().getArrayType().getSize(), EXPECTED_SIZE);
+    QVERIFY(std::holds_alternative<BasicType>(expectedArray.getType().getArrayType().getType()));
+    QCOMPARE(std::get<BasicType>(expectedArray.getType().getArrayType().getType()), BasicType::BIT);
+}
+
+void tst_Asn1ToPromelaTranslator::testVariableOctetString()
+{
+    const int EXPECTED_SIZE = 16;
+
+    auto model = createModel();
+    auto type = std::make_unique<OctetString>();
+    auto sizeConstraint = std::make_unique<SizeConstraint<OctetStringValue>>(
+            RangeConstraint<IntegerValue>::create({ 1, EXPECTED_SIZE }));
+    type->constraints().append(std::move(sizeConstraint));
+    auto typeAssignment = std::make_unique<TypeAssignment>(
+            QStringLiteral("myType"), QStringLiteral("myTypeT"), SourceLocation(), std::move(type));
+    model->addType(std::move(typeAssignment));
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel);
+    visitor.visit(*model);
+
+    QCOMPARE(0, promelaModel.getMtypeValues().size());
+    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
+    QCOMPARE(1, promelaModel.getUtypes().size());
+    QCOMPARE(0, promelaModel.getTypeAliases().size());
+    QCOMPARE(0, promelaModel.getValueDefinitions().size());
+
+    const Utype &expectedUtype = promelaModel.getUtypes().at(0);
+
+    QCOMPARE(expectedUtype.getName(), "myType");
+    QVERIFY(!expectedUtype.isUnionType());
+    QCOMPARE(expectedUtype.getFields().size(), 2);
+
+    const Declaration &expectedArray = expectedUtype.getFields().at(0);
+
+    QCOMPARE(expectedArray.getName(), "data");
+    QVERIFY(expectedArray.getType().isArrayType());
+    QCOMPARE(expectedArray.getType().getArrayType().getSize(), EXPECTED_SIZE);
+    QVERIFY(std::holds_alternative<BasicType>(expectedArray.getType().getArrayType().getType()));
+    QCOMPARE(std::get<BasicType>(expectedArray.getType().getArrayType().getType()), BasicType::BYTE);
+
+    const Declaration expectedLength = expectedUtype.getFields().at(1);
+    QCOMPARE(expectedLength.getName(), "length");
+    QVERIFY(expectedLength.getType().isBasicType());
+    QCOMPARE(expectedLength.getType().getBasicType(), BasicType::INT);
+}
+
+void tst_Asn1ToPromelaTranslator::testFixedOctetString()
+{
+    const int EXPECTED_SIZE = 16;
+
+    auto model = createModel();
+    auto type = std::make_unique<OctetString>();
+    auto sizeConstraint = std::make_unique<SizeConstraint<OctetStringValue>>(
+            RangeConstraint<IntegerValue>::create(Range<int64_t>(EXPECTED_SIZE)));
+    type->constraints().append(std::move(sizeConstraint));
+    auto typeAssignment = std::make_unique<TypeAssignment>(
+            QStringLiteral("myType"), QStringLiteral("myTypeT"), SourceLocation(), std::move(type));
+    model->addType(std::move(typeAssignment));
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel);
+    visitor.visit(*model);
+
+    QCOMPARE(0, promelaModel.getMtypeValues().size());
+    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
+    QCOMPARE(1, promelaModel.getUtypes().size());
+    QCOMPARE(0, promelaModel.getTypeAliases().size());
+    QCOMPARE(0, promelaModel.getValueDefinitions().size());
+
+    const Utype &expectedUtype = promelaModel.getUtypes().at(0);
+
+    QCOMPARE(expectedUtype.getName(), "myType");
+    QVERIFY(!expectedUtype.isUnionType());
+    QCOMPARE(expectedUtype.getFields().size(), 1);
+
+    const Declaration &expectedArray = expectedUtype.getFields().at(0);
+
+    QCOMPARE(expectedArray.getName(), "data");
+    QVERIFY(expectedArray.getType().isArrayType());
+    QCOMPARE(expectedArray.getType().getArrayType().getSize(), EXPECTED_SIZE);
+    QVERIFY(std::holds_alternative<BasicType>(expectedArray.getType().getArrayType().getType()));
+    QCOMPARE(std::get<BasicType>(expectedArray.getType().getArrayType().getType()), BasicType::BYTE);
+}
+
+void tst_Asn1ToPromelaTranslator::testVariableIA5String()
+{
+    const int EXPECTED_SIZE = 16;
+
+    auto model = createModel();
+    auto type = std::make_unique<IA5String>();
+    auto sizeConstraint =
+            std::make_unique<SizeConstraint<StringValue>>(RangeConstraint<IntegerValue>::create({ 1, EXPECTED_SIZE }));
+    type->constraints().append(std::move(sizeConstraint));
+    auto typeAssignment = std::make_unique<TypeAssignment>(
+            QStringLiteral("myType"), QStringLiteral("myTypeT"), SourceLocation(), std::move(type));
+    model->addType(std::move(typeAssignment));
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel);
+    visitor.visit(*model);
+
+    QCOMPARE(0, promelaModel.getMtypeValues().size());
+    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
+    QCOMPARE(1, promelaModel.getUtypes().size());
+    QCOMPARE(0, promelaModel.getTypeAliases().size());
+    QCOMPARE(0, promelaModel.getValueDefinitions().size());
+
+    const Utype &expectedUtype = promelaModel.getUtypes().at(0);
+
+    QCOMPARE(expectedUtype.getName(), "myType");
+    QVERIFY(!expectedUtype.isUnionType());
+    QCOMPARE(expectedUtype.getFields().size(), 2);
+
+    const Declaration &expectedArray = expectedUtype.getFields().at(0);
+
+    QCOMPARE(expectedArray.getName(), "data");
+    QVERIFY(expectedArray.getType().isArrayType());
+    QCOMPARE(expectedArray.getType().getArrayType().getSize(), EXPECTED_SIZE);
+    QVERIFY(std::holds_alternative<BasicType>(expectedArray.getType().getArrayType().getType()));
+    QCOMPARE(std::get<BasicType>(expectedArray.getType().getArrayType().getType()), BasicType::BYTE);
+
+    const Declaration expectedLength = expectedUtype.getFields().at(1);
+    QCOMPARE(expectedLength.getName(), "length");
+    QVERIFY(expectedLength.getType().isBasicType());
+    QCOMPARE(expectedLength.getType().getBasicType(), BasicType::INT);
+}
+
+void tst_Asn1ToPromelaTranslator::testFixedIA5String()
+{
+    const int EXPECTED_SIZE = 16;
+
+    auto model = createModel();
+    auto type = std::make_unique<IA5String>();
+    auto sizeConstraint = std::make_unique<SizeConstraint<StringValue>>(
+            RangeConstraint<IntegerValue>::create(Range<int64_t>(EXPECTED_SIZE)));
+    type->constraints().append(std::move(sizeConstraint));
+    auto typeAssignment = std::make_unique<TypeAssignment>(
+            QStringLiteral("myType"), QStringLiteral("myTypeT"), SourceLocation(), std::move(type));
+    model->addType(std::move(typeAssignment));
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel);
+    visitor.visit(*model);
+
+    QCOMPARE(0, promelaModel.getMtypeValues().size());
+    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
+    QCOMPARE(1, promelaModel.getUtypes().size());
+    QCOMPARE(0, promelaModel.getTypeAliases().size());
+    QCOMPARE(0, promelaModel.getValueDefinitions().size());
+
+    const Utype &expectedUtype = promelaModel.getUtypes().at(0);
+
+    QCOMPARE(expectedUtype.getName(), "myType");
+    QVERIFY(!expectedUtype.isUnionType());
+    QCOMPARE(expectedUtype.getFields().size(), 1);
+
+    const Declaration &expectedArray = expectedUtype.getFields().at(0);
+
+    QCOMPARE(expectedArray.getName(), "data");
+    QVERIFY(expectedArray.getType().isArrayType());
+    QCOMPARE(expectedArray.getType().getArrayType().getSize(), EXPECTED_SIZE);
+    QVERIFY(std::holds_alternative<BasicType>(expectedArray.getType().getArrayType().getType()));
+    QCOMPARE(std::get<BasicType>(expectedArray.getType().getArrayType().getType()), BasicType::BYTE);
+}
+
+void tst_Asn1ToPromelaTranslator::testChoice()
+{
+    auto model = createModel();
+    auto type = std::make_unique<Choice>();
+    type->addComponent(std::make_unique<ChoiceAlternative>(QStringLiteral("ch1"), QStringLiteral(""),
+            QStringLiteral(""), QStringLiteral(""), QStringLiteral(""), SourceLocation(),
+            TypeFactory::createBuiltinType(QStringLiteral("INTEGER"))));
+
+    type->addComponent(std::make_unique<ChoiceAlternative>(QStringLiteral("ch2"), QStringLiteral(""),
+            QStringLiteral(""), QStringLiteral(""), QStringLiteral(""), SourceLocation(),
+            TypeFactory::createBuiltinType(QStringLiteral("REAL"))));
+
+    auto typeAssignment = std::make_unique<TypeAssignment>(
+            QStringLiteral("myType"), QStringLiteral("myTypeT"), SourceLocation(), std::move(type));
+    model->addType(std::move(typeAssignment));
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel);
+    visitor.visit(*model);
+
+    QCOMPARE(promelaModel.getMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getUtypes().size(), 2);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 2);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 3);
+
+    const Utype &expectedDataUtype = promelaModel.getUtypes().at(0);
+    QCOMPARE(expectedDataUtype.getName(), "myType_data");
+    QVERIFY(expectedDataUtype.isUnionType());
+
+    QCOMPARE(expectedDataUtype.getFields().size(), 2);
+    QCOMPARE(expectedDataUtype.getFields().at(0).getName(), "ch1");
+    QVERIFY(expectedDataUtype.getFields().at(0).getType().isUtypeReference());
+    QCOMPARE(expectedDataUtype.getFields().at(0).getType().getUtypeReference().getName(), "myType_ch1");
+    QCOMPARE(expectedDataUtype.getFields().at(1).getName(), "ch2");
+    QVERIFY(expectedDataUtype.getFields().at(1).getType().isUtypeReference());
+    QCOMPARE(expectedDataUtype.getFields().at(1).getType().getUtypeReference().getName(), "myType_ch2");
+
+    const Utype &expectedUtype = promelaModel.getUtypes().at(1);
+    QCOMPARE(expectedUtype.getName(), "myType");
+    QVERIFY(!expectedUtype.isUnionType());
+    QCOMPARE(expectedUtype.getFields().size(), 2);
+
+    QCOMPARE(expectedUtype.getFields().at(0).getName(), "data");
+    QVERIFY(expectedUtype.getFields().at(0).getType().isUtypeReference());
+    QCOMPARE(expectedUtype.getFields().at(0).getType().getUtypeReference().getName(), "myType_data");
+
+    QCOMPARE(expectedUtype.getFields().at(1).getName(), "selection");
+    QVERIFY(expectedUtype.getFields().at(1).getType().isBasicType());
+    QCOMPARE(expectedUtype.getFields().at(1).getType().getBasicType(), BasicType::INT);
+
+    QCOMPARE(promelaModel.getValueDefinitions().at(0).getName(), "myType_NONE");
+    QCOMPARE(promelaModel.getValueDefinitions().at(0).getValue(), 0);
+    QCOMPARE(promelaModel.getValueDefinitions().at(1).getName(), "myType_ch1_PRESENT");
+    QCOMPARE(promelaModel.getValueDefinitions().at(1).getValue(), 1);
+    QCOMPARE(promelaModel.getValueDefinitions().at(2).getName(), "myType_ch2_PRESENT");
+    QCOMPARE(promelaModel.getValueDefinitions().at(2).getValue(), 2);
+
+    QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "myType_ch1");
+    QCOMPARE(promelaModel.getTypeAliases().at(1).getName(), "myType_ch2");
+}
+
+void tst_Asn1ToPromelaTranslator::testSequence()
 {
     auto model = createModel();
     auto type = std::make_unique<Sequence>();
-    auto component = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"), false,
+    auto component1 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"), false,
             std::nullopt, QStringLiteral(""), SourceLocation(),
             TypeFactory::createBuiltinType(QStringLiteral("INTEGER")));
-    type->addComponent(std::move(component));
-    auto typeAssignment = std::make_unique<TypeAssignment>(
-            QStringLiteral("myType"), QStringLiteral("myTypeT"), SourceLocation(), std::move(type));
-    model->addType(std::move(typeAssignment));
-
-    PromelaModel promelaModel;
-    Asn1NodeVisitor visitor(promelaModel);
-    visitor.visit(*model);
-
-    QCOMPARE(0, promelaModel.getMtypeValues().size());
-    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
-    QCOMPARE(0, promelaModel.getTypeAliases().size());
-
-    QCOMPARE(1, promelaModel.getUtypes().size());
-    const Utype &t = promelaModel.getUtypes().front();
-    QCOMPARE(false, t.isUnionType());
-    QCOMPARE("myType", t.getName());
-    QCOMPARE(1, t.getFields().size());
-    const Declaration &decl = t.getFields().front();
-    QCOMPARE("field1", decl.getName());
-    QVERIFY(decl.getType().isBasicType());
-    QCOMPARE(BasicType::INT, decl.getType().getBasicType());
-}
-
-void tst_Asn1ToPromelaTranslator::testFloatField()
-{
-    auto model = createModel();
-    auto type = std::make_unique<Sequence>();
-    auto component = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"), false,
+    type->addComponent(std::move(component1));
+    auto component2 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field2"), QStringLiteral("field2"), false,
             std::nullopt, QStringLiteral(""), SourceLocation(), TypeFactory::createBuiltinType(QStringLiteral("REAL")));
-    type->addComponent(std::move(component));
+    type->addComponent(std::move(component2));
     auto typeAssignment = std::make_unique<TypeAssignment>(
             QStringLiteral("myType"), QStringLiteral("myTypeT"), SourceLocation(), std::move(type));
     model->addType(std::move(typeAssignment));
@@ -196,29 +537,49 @@ void tst_Asn1ToPromelaTranslator::testFloatField()
     Asn1NodeVisitor visitor(promelaModel);
     visitor.visit(*model);
 
-    QCOMPARE(0, promelaModel.getMtypeValues().size());
-    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
-    QCOMPARE(0, promelaModel.getTypeAliases().size());
+    QCOMPARE(promelaModel.getMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 2);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 0);
+    QCOMPARE(promelaModel.getUtypes().size(), 1);
 
-    QCOMPARE(1, promelaModel.getUtypes().size());
-    const Utype &t = promelaModel.getUtypes().front();
-    QCOMPARE(false, t.isUnionType());
-    QCOMPARE("myType", t.getName());
-    QCOMPARE(1, t.getFields().size());
-    const Declaration &decl = t.getFields().front();
-    QCOMPARE("field1", decl.getName());
-    QVERIFY(decl.getType().isBasicType());
-    QCOMPARE(BasicType::FLOAT, decl.getType().getBasicType());
+    const Utype &expectedUtype = promelaModel.getUtypes().front();
+    QCOMPARE(expectedUtype.isUnionType(), false);
+    QCOMPARE(expectedUtype.getName(), "myType");
+    QCOMPARE(expectedUtype.getFields().size(), 2);
+
+    const Declaration &decl1 = expectedUtype.getFields().at(0);
+    QCOMPARE("field1", decl1.getName());
+    QVERIFY(decl1.getType().isUtypeReference());
+    QCOMPARE(decl1.getType().getUtypeReference().getName(), "myType_field1");
+
+    const Declaration &decl2 = expectedUtype.getFields().at(1);
+    QCOMPARE("field2", decl2.getName());
+    QVERIFY(decl2.getType().isUtypeReference());
+    QCOMPARE(decl2.getType().getUtypeReference().getName(), "myType_field2");
+
+    const TypeAlias &expectedAlias1 = promelaModel.getTypeAliases().at(0);
+    QCOMPARE(expectedAlias1.getName(), "myType_field1");
+    QVERIFY(std::holds_alternative<BasicType>(expectedAlias1.getType()));
+    QCOMPARE(std::get<BasicType>(expectedAlias1.getType()), BasicType::INT);
+
+    const TypeAlias &expectedAlias2 = promelaModel.getTypeAliases().at(1);
+    QCOMPARE(expectedAlias2.getName(), "myType_field2");
+    QVERIFY(std::holds_alternative<BasicType>(expectedAlias2.getType()));
+    QCOMPARE(std::get<BasicType>(expectedAlias2.getType()), BasicType::FLOAT);
 }
 
-void tst_Asn1ToPromelaTranslator::testBooleanField()
+void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
 {
     auto model = createModel();
     auto type = std::make_unique<Sequence>();
-    auto component = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"), false,
+    auto component1 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"), true,
             std::nullopt, QStringLiteral(""), SourceLocation(),
-            TypeFactory::createBuiltinType(QStringLiteral("BOOLEAN")));
-    type->addComponent(std::move(component));
+            TypeFactory::createBuiltinType(QStringLiteral("INTEGER")));
+    type->addComponent(std::move(component1));
+    auto component2 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field2"), QStringLiteral("field2"), true,
+            std::nullopt, QStringLiteral(""), SourceLocation(), TypeFactory::createBuiltinType(QStringLiteral("REAL")));
+    type->addComponent(std::move(component2));
     auto typeAssignment = std::make_unique<TypeAssignment>(
             QStringLiteral("myType"), QStringLiteral("myTypeT"), SourceLocation(), std::move(type));
     model->addType(std::move(typeAssignment));
@@ -227,19 +588,47 @@ void tst_Asn1ToPromelaTranslator::testBooleanField()
     Asn1NodeVisitor visitor(promelaModel);
     visitor.visit(*model);
 
-    QCOMPARE(0, promelaModel.getMtypeValues().size());
-    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
-    QCOMPARE(0, promelaModel.getTypeAliases().size());
+    QCOMPARE(promelaModel.getMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 2);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 0);
+    QCOMPARE(promelaModel.getUtypes().size(), 2);
 
-    QCOMPARE(1, promelaModel.getUtypes().size());
-    const Utype &t = promelaModel.getUtypes().front();
-    QCOMPARE(false, t.isUnionType());
-    QCOMPARE("myType", t.getName());
-    QCOMPARE(1, t.getFields().size());
-    const Declaration &decl = t.getFields().front();
-    QCOMPARE("field1", decl.getName());
-    QVERIFY(decl.getType().isBasicType());
-    QCOMPARE(BasicType::BOOLEAN, decl.getType().getBasicType());
+    const Utype &expectedExistUtype = promelaModel.getUtypes().at(0);
+    QCOMPARE(expectedExistUtype.getName(), "myType_exist");
+    QCOMPARE(expectedExistUtype.isUnionType(), false);
+    QCOMPARE(expectedExistUtype.getFields().size(), 2);
+    QCOMPARE(expectedExistUtype.getFields().at(0).getName(), "field1");
+    QVERIFY(expectedExistUtype.getFields().at(0).getType().isBasicType());
+    QCOMPARE(expectedExistUtype.getFields().at(0).getType().getBasicType(), BasicType::BOOLEAN);
+    QCOMPARE(expectedExistUtype.getFields().at(1).getName(), "field2");
+    QVERIFY(expectedExistUtype.getFields().at(1).getType().isBasicType());
+    QCOMPARE(expectedExistUtype.getFields().at(1).getType().getBasicType(), BasicType::BOOLEAN);
+
+    const Utype &expectedUtype = promelaModel.getUtypes().at(1);
+    QCOMPARE(expectedUtype.isUnionType(), false);
+    QCOMPARE(expectedUtype.getName(), "myType");
+    QCOMPARE(expectedUtype.getFields().size(), 3);
+
+    const Declaration &decl1 = expectedUtype.getFields().at(0);
+    QCOMPARE("field1", decl1.getName());
+    QVERIFY(decl1.getType().isUtypeReference());
+    QCOMPARE(decl1.getType().getUtypeReference().getName(), "myType_field1");
+
+    const Declaration &decl2 = expectedUtype.getFields().at(1);
+    QCOMPARE("field2", decl2.getName());
+    QVERIFY(decl2.getType().isUtypeReference());
+    QCOMPARE(decl2.getType().getUtypeReference().getName(), "myType_field2");
+
+    const TypeAlias &expectedAlias1 = promelaModel.getTypeAliases().at(0);
+    QCOMPARE(expectedAlias1.getName(), "myType_field1");
+    QVERIFY(std::holds_alternative<BasicType>(expectedAlias1.getType()));
+    QCOMPARE(std::get<BasicType>(expectedAlias1.getType()), BasicType::INT);
+
+    const TypeAlias &expectedAlias2 = promelaModel.getTypeAliases().at(1);
+    QCOMPARE(expectedAlias2.getName(), "myType_field2");
+    QVERIFY(std::holds_alternative<BasicType>(expectedAlias2.getType()));
+    QCOMPARE(std::get<BasicType>(expectedAlias2.getType()), BasicType::FLOAT);
 }
 
 void tst_Asn1ToPromelaTranslator::testNestedSequence()
@@ -275,7 +664,8 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
 
     QCOMPARE(0, promelaModel.getMtypeValues().size());
     QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
-    QCOMPARE(0, promelaModel.getTypeAliases().size());
+    QCOMPARE(1, promelaModel.getTypeAliases().size());
+    QCOMPARE(0, promelaModel.getValueDefinitions().size());
 
     QCOMPARE(3, promelaModel.getUtypes().size());
 
@@ -286,8 +676,8 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
         QCOMPARE(1, expectedLevel2.getFields().size());
         const Declaration &expectedLevel2Field = expectedLevel2.getFields().front();
         QCOMPARE("field", expectedLevel2Field.getName());
-        QVERIFY(expectedLevel2Field.getType().isBasicType());
-        QCOMPARE(BasicType::INT, expectedLevel2Field.getType().getBasicType());
+        QVERIFY(expectedLevel2Field.getType().isUtypeReference());
+        QCOMPARE(expectedLevel2Field.getType().getUtypeReference().getName(), "level0_level1_level2_field");
     }
 
     {
@@ -311,6 +701,100 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
         QVERIFY(expectedLevel0Field.getType().isUtypeReference());
         QCOMPARE("level0_level1", expectedLevel0Field.getType().getUtypeReference().getName());
     }
+
+    const TypeAlias &expectedAlias = promelaModel.getTypeAliases().at(0);
+    QCOMPARE(expectedAlias.getName(), "level0_level1_level2_field");
+    QVERIFY(std::holds_alternative<BasicType>(expectedAlias.getType()));
+    QCOMPARE(std::get<BasicType>(expectedAlias.getType()), BasicType::INT);
+}
+
+void tst_Asn1ToPromelaTranslator::testVariableSequenceOf()
+{
+    const int EXPECTED_SIZE = 16;
+
+    auto model = createModel();
+    auto type = std::make_unique<SequenceOf>();
+    type->setItemsType(TypeFactory::createBuiltinType("INTEGER"));
+    auto sizeConstraint = std::make_unique<SizeConstraint<IntegerValue>>(
+            RangeConstraint<IntegerValue>::create(Range<int64_t>({ 1, EXPECTED_SIZE })));
+    type->constraints().append(std::move(sizeConstraint));
+    auto typeAssignment = std::make_unique<TypeAssignment>(
+            QStringLiteral("myType"), QStringLiteral("myTypeT"), SourceLocation(), std::move(type));
+    model->addType(std::move(typeAssignment));
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel);
+    visitor.visit(*model);
+
+    QCOMPARE(promelaModel.getMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 1);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 0);
+    QCOMPARE(promelaModel.getUtypes().size(), 1);
+
+    const Utype &expectedUtype = promelaModel.getUtypes().at(0);
+    QCOMPARE(expectedUtype.getName(), "myType");
+    QVERIFY(!expectedUtype.isUnionType());
+    QCOMPARE(expectedUtype.getFields().size(), 2);
+
+    const Declaration &expectedData = expectedUtype.getFields().at(0);
+    QCOMPARE(expectedData.getName(), "data");
+    QVERIFY(expectedData.getType().isArrayType());
+    QCOMPARE(expectedData.getType().getArrayType().getSize(), EXPECTED_SIZE);
+    QVERIFY(std::holds_alternative<UtypeRef>(expectedData.getType().getArrayType().getType()));
+    const UtypeRef &expectedRef = std::get<UtypeRef>(expectedData.getType().getArrayType().getType());
+    QCOMPARE(expectedRef.getName(), "myType_item");
+
+    const Declaration expectedLength = expectedUtype.getFields().at(1);
+    QCOMPARE(expectedLength.getName(), "length");
+    QVERIFY(expectedLength.getType().isBasicType());
+    QCOMPARE(expectedLength.getType().getBasicType(), BasicType::INT);
+
+    QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "myType_item");
+    QVERIFY(std::holds_alternative<BasicType>(promelaModel.getTypeAliases().at(0).getType()));
+    QCOMPARE(std::get<BasicType>(promelaModel.getTypeAliases().at(0).getType()), BasicType::INT);
+}
+
+void tst_Asn1ToPromelaTranslator::testFixedSequenceOf()
+{
+    const int EXPECTED_SIZE = 16;
+
+    auto model = createModel();
+    auto type = std::make_unique<SequenceOf>();
+    type->setItemsType(TypeFactory::createBuiltinType("INTEGER"));
+    auto sizeConstraint = std::make_unique<SizeConstraint<IntegerValue>>(
+            RangeConstraint<IntegerValue>::create(Range<int64_t>(EXPECTED_SIZE)));
+    type->constraints().append(std::move(sizeConstraint));
+    auto typeAssignment = std::make_unique<TypeAssignment>(
+            QStringLiteral("myType"), QStringLiteral("myTypeT"), SourceLocation(), std::move(type));
+    model->addType(std::move(typeAssignment));
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel);
+    visitor.visit(*model);
+
+    QCOMPARE(promelaModel.getMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 1);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 0);
+    QCOMPARE(promelaModel.getUtypes().size(), 1);
+
+    const Utype &expectedUtype = promelaModel.getUtypes().at(0);
+    QCOMPARE(expectedUtype.getName(), "myType");
+    QVERIFY(!expectedUtype.isUnionType());
+    QCOMPARE(expectedUtype.getFields().size(), 1);
+
+    const Declaration &expectedData = expectedUtype.getFields().at(0);
+    QCOMPARE(expectedData.getName(), "data");
+    QVERIFY(expectedData.getType().isArrayType());
+    QCOMPARE(expectedData.getType().getArrayType().getSize(), EXPECTED_SIZE);
+    QVERIFY(std::holds_alternative<UtypeRef>(expectedData.getType().getArrayType().getType()));
+    const UtypeRef &expectedRef = std::get<UtypeRef>(expectedData.getType().getArrayType().getType());
+    QCOMPARE(expectedRef.getName(), "myType_item");
+
+    QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "myType_item");
+    QVERIFY(std::holds_alternative<BasicType>(promelaModel.getTypeAliases().at(0).getType()));
+    QCOMPARE(std::get<BasicType>(promelaModel.getTypeAliases().at(0).getType()), BasicType::INT);
 }
 
 std::unique_ptr<Definitions> tst_Asn1ToPromelaTranslator::createModel()

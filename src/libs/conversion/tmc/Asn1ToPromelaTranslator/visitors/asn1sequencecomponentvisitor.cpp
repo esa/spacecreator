@@ -19,30 +19,37 @@
 
 #include "asn1sequencecomponentvisitor.h"
 
-#include "asn1nodecomponentvisitor.h"
+#include "asn1itemtypevisitor.h"
 
 #include <asn1library/asn1/acnsequencecomponent.h>
 #include <asn1library/asn1/asnsequencecomponent.h>
 
 using Asn1Acn::AcnSequenceComponent;
 using Asn1Acn::AsnSequenceComponent;
+using tmc::promela::model::BasicType;
+using tmc::promela::model::DataType;
 using tmc::promela::model::Declaration;
 using tmc::promela::model::PromelaModel;
 using tmc::promela::model::Utype;
 
 namespace conversion::tmc::translator {
 Asn1SequenceComponentVisitor::Asn1SequenceComponentVisitor(
-        PromelaModel &promelaModel, Utype &utype, QString baseTypeName)
+        PromelaModel &promelaModel, Utype &utype, QString baseTypeName, QList<QString> &optionalFields)
     : m_promelaModel(promelaModel)
     , m_utype(utype)
     , m_baseTypeName(std::move(baseTypeName))
+    , m_optionalFields(optionalFields)
 {
 }
 
 void Asn1SequenceComponentVisitor::visit(const AsnSequenceComponent &component)
 {
-    Asn1NodeComponentVisitor visitor(m_promelaModel, m_utype, m_baseTypeName, component.name());
+    Asn1ItemTypeVisitor visitor(m_promelaModel, m_baseTypeName, component.name());
     component.type()->accept(visitor);
+    m_utype.addField(Declaration(visitor.getResultDataType().value(), component.name()));
+    if (component.isOptional()) {
+        m_optionalFields.append(component.name());
+    }
 }
 
 void Asn1SequenceComponentVisitor::visit(const AcnSequenceComponent &component)

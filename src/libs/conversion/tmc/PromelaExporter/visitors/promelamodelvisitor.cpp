@@ -29,6 +29,7 @@ using tmc::promela::model::NamedMtype;
 using tmc::promela::model::PromelaModel;
 using tmc::promela::model::TypeAlias;
 using tmc::promela::model::Utype;
+using tmc::promela::model::ValueDefinition;
 
 namespace conversion::tmc::exporter {
 
@@ -43,6 +44,7 @@ void PromelaModelVisitor::visit(const PromelaModel &promelaModel)
     generateMtypes(promelaModel.getMtypeValues());
     generateNamedMtypes(promelaModel.getNamedMtypeValues());
     generateTypeAliases(promelaModel.getTypeAliases());
+    generateValueDefinitions(promelaModel.getValueDefinitions());
     generateUtypes(promelaModel.getUtypes());
 }
 
@@ -79,6 +81,13 @@ void PromelaModelVisitor::generateTypeAliases(const QList<TypeAlias> &aliases)
 {
     TypeAliasVisitor visitor(m_stream);
     std::for_each(aliases.begin(), aliases.end(), visitor);
+}
+
+void PromelaModelVisitor::generateValueDefinitions(const QList<ValueDefinition> &values)
+{
+    for (const ValueDefinition &value : values) {
+        m_stream << "#define " << value.getName() << " (" << value.getValue() << ")\n";
+    }
 }
 
 void PromelaModelVisitor::generateUtypes(const QList<Utype> &utypes)

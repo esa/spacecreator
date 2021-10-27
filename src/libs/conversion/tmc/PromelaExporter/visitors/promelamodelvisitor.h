@@ -53,6 +53,7 @@ private:
     void generateNamedMtypes(const std::map<QString, ::tmc::promela::model::NamedMtype> &values);
     void generateMtypeNames(const QVector<QString> &names);
     void generateTypeAliases(const QList<::tmc::promela::model::TypeAlias> &aliases);
+    void generateValueDefinitions(const QList<::tmc::promela::model::ValueDefinition> &values);
     void generateUtypes(const QList<::tmc::promela::model::Utype> &utypes);
 
 private:

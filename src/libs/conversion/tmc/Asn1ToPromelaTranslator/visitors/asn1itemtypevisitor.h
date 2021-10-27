@@ -20,24 +20,34 @@
 #pragma once
 
 #include <asn1library/asn1/types/typereadingvisitor.h>
+#include <optional>
 #include <tmc/PromelaModel/promelamodel.h>
 
 namespace conversion::tmc::translator {
 /**
- * @brief Visitor for top-level ASN.1 types
+ * @brief Visitor for type in SequenceOf
  *
  * This is a part of Asn1ToPromelaTranslator
  */
-class Asn1TypeVisitor : public ::Asn1Acn::Types::TypeReadingVisitor
+class Asn1ItemTypeVisitor : public ::Asn1Acn::Types::TypeReadingVisitor
 {
 public:
     /**
      * @brief Constructor
      *
      * @param promelaModel target promela model
-     * @param name name of type definition
+     * @param baseTypeName base name for new types
+     * @param name name for new types
      */
-    Asn1TypeVisitor(::tmc::promela::model::PromelaModel &promelaModel, QString name);
+    Asn1ItemTypeVisitor(
+            ::tmc::promela::model::PromelaModel &promelaModel, std::optional<QString> baseTypeName, QString name);
+
+    /**
+     * @brief Getter for result promela data type
+     *
+     * @return result data type
+     */
+    const std::optional<::tmc::promela::model::DataType> &getResultDataType() const noexcept;
 
     /**
      * @brief Visit ::Asn1Acn::Types::Boolean
@@ -125,7 +135,12 @@ public:
     void visit(const ::Asn1Acn::Types::UserdefinedType &type) override;
 
 private:
+    QString constructTypeName(QString name);
+
+private:
     ::tmc::promela::model::PromelaModel &m_promelaModel;
-    QString m_typeName;
+    const std::optional<QString> m_baseTypeName;
+    const QString m_name;
+    std::optional<::tmc::promela::model::DataType> m_resultDataType;
 };
 }

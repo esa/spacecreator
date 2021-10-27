@@ -22,6 +22,7 @@
 #include "namedmtype.h"
 #include "typealias.h"
 #include "utype.h"
+#include "valuedefinition.h"
 
 #include <QList>
 #include <QSet>
@@ -110,12 +111,17 @@ public:
      */
     const QList<TypeAlias> &getTypeAliases() const noexcept;
 
+    void addValueDefinition(const ValueDefinition &value);
+
+    const QList<ValueDefinition> &getValueDefinitions() const noexcept;
+
 private:
     QSet<QString> m_mtype_values;
     std::map<QString, NamedMtype> m_named_m_type_values;
     QList<Utype> m_user_types;
     std::map<QString, Declaration> m_declarations;
     QList<TypeAlias> m_type_aliases;
+    QList<ValueDefinition> m_value_definitions;
 };
 }
 namespace conversion {
