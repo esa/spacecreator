@@ -77,7 +77,7 @@ public:
      *
      * @return  variable literal
      */
-    auto literal() const -> const VariableLiteral *;
+    auto literal() const -> const VariableLiteral &;
 
     /**
      * @brief   Setter for answer literal

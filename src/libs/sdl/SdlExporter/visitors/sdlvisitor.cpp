@@ -207,16 +207,16 @@ void SdlVisitor::visit(const Answer &answer) const
     if (answer.transition() == nullptr) {
         throw ExportException("Required Transition is missing in Answer");
     }
-    if (answer.literal() == nullptr) {
-        throw ExportException("Required Literal is missing in Answer");
+    if (answer.literal().value() == "") {
+        throw ExportException("Required Literal have a missing value in Answer");
     }
 
     // write some dummy CIF
     m_stream << "                /* CIF ANSWER (585, 323), (77, 24) */\n";
-    if (answer.literal()->value() == "else") {
-        m_stream << "                " << answer.literal()->value() << ":\n";
+    if (answer.literal().value() == "else") {
+        m_stream << "                " << answer.literal().value() << ":\n";
     } else {
-        m_stream << "                (" << answer.literal()->value() << "):\n";
+        m_stream << "                (" << answer.literal().value() << "):\n";
     }
     exportCollection(answer.transition()->actions());
 }
