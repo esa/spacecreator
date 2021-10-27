@@ -33,7 +33,7 @@ class VariableReference final
 {
 public:
     /**
-     * @brief   Default constructor
+     * @brief   Constructor
      *
      * @param   declaration   referenced variable declaration pointer
      */

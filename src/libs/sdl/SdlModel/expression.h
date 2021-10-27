@@ -30,7 +30,7 @@ class Expression final
 {
 public:
     /**
-     * @brief   Default constructor
+     * @brief   Constructor
      *
      * @param   content    content to store
      */

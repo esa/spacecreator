@@ -32,7 +32,7 @@ class Literal final
 {
 public:
     /**
-     * @brief   Default constructor
+     * @brief   Constructor
      *
      * @param   value    value to store
      */

@@ -24,8 +24,8 @@
 namespace sdl {
 
 Answer::Answer()
+    : m_literal("else")
 {
-    m_literal.setValue("else");
 }
 
 Transition *Answer::transition() const
