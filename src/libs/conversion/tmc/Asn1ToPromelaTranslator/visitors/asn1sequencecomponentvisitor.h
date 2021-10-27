@@ -41,7 +41,7 @@ public:
      * @param baseTypeName base name for nested types
      */
     Asn1SequenceComponentVisitor(::tmc::promela::model::PromelaModel &promelaModel, ::tmc::promela::model::Utype &utype,
-            QString baseTypeName);
+            QString baseTypeName, QList<QString> &optionalFields);
 
     /**
      * @brief Visit ::Asn1Acn::AsnSequenceComponent
@@ -60,5 +60,6 @@ private:
     ::tmc::promela::model::PromelaModel &m_promelaModel;
     ::tmc::promela::model::Utype &m_utype;
     const QString m_baseTypeName;
+    QList<QString> &m_optionalFields;
 };
 }

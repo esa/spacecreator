@@ -19,7 +19,7 @@
 
 #include "visitors/asn1nodevisitor.h"
 
-#include "visitors/asn1typevisitor.h"
+#include "asn1itemtypevisitor.h"
 
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/file.h>
@@ -54,7 +54,7 @@ void Asn1NodeVisitor::visit(const File &file)
 
 void Asn1NodeVisitor::visit(const TypeAssignment &type)
 {
-    Asn1TypeVisitor typeVisitor(m_promelaModel, type.name());
+    Asn1ItemTypeVisitor typeVisitor(m_promelaModel, std::nullopt, type.name());
     type.type()->accept(typeVisitor);
 }
 
