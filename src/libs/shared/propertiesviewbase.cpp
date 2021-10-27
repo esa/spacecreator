@@ -21,7 +21,6 @@
 #include "propertiesmodelbase.h"
 #include "ui_propertiesviewbase.h"
 
-#include <QtDebug>
 #include <QHeaderView>
 #include <QStandardItemModel>
 
@@ -60,14 +59,13 @@ void PropertiesViewBase::setModel(PropertiesModelBase *model)
 
     m_model = model;
     tableView()->setModel(m_model);
-    connect(m_model, &QStandardItemModel::rowsInserted,
-        this, &PropertiesViewBase::rowsInserted, Qt::QueuedConnection);
+    connect(m_model, &QStandardItemModel::rowsInserted, this, &PropertiesViewBase::rowsInserted, Qt::QueuedConnection);
 
     if (tableView()->selectionModel()) {
         connect(tableView()->selectionModel(), &QItemSelectionModel::selectionChanged, this,
                 &PropertiesViewBase::onSelectionChanged);
     }
-    setButtonsDisabled();
+    updateButtons();
     rowsInserted(QModelIndex(), 0, m_model->rowCount() - 1);
 
     if (m_model->rowCount()) {
@@ -83,17 +81,16 @@ QTableView *PropertiesViewBase::tableView() const
 
 void PropertiesViewBase::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
-    if (m_model && !setButtonsDisabled()) {
-        ui->btnDel->setEnabled(!selected.isEmpty());
-    }
+    updateButtons();
+    ui->btnDel->setEnabled(!selected.isEmpty());
 
     if (selected.isEmpty()) {
         ui->btnUp->setEnabled(false);
         ui->btnDown->setEnabled(false);
     } else {
         const QModelIndexList indexes = selected.indexes();
-        bool hasFirst{false}, hasLast{false};
-        auto it = std::for_each(indexes.cbegin(), indexes.cend(), [&hasFirst, &hasLast](const QModelIndex &index){
+        bool hasFirst { false }, hasLast { false };
+        std::for_each(indexes.cbegin(), indexes.cend(), [&hasFirst, &hasLast](const QModelIndex &index) {
             hasFirst |= index.row() == 0;
             hasLast |= index.row() == index.model()->rowCount(index.parent()) - 1;
         });
@@ -142,20 +139,20 @@ void PropertiesViewBase::moveCurrentRowUp()
     if (m_model) {
         QModelIndexList idxs = ui->tableView->selectionModel()->selectedRows();
         QList<int> rows;
-        for (const QModelIndex &idx: qAsConst(idxs))
+        for (const QModelIndex &idx : qAsConst(idxs))
             rows.append(idx.row() - 1);
 
-        std::sort(idxs.begin(), idxs.end(), [](const QModelIndex &idx1, const QModelIndex &idx2){
-            return idx1.row() < idx2.row();
-        });
+        std::sort(idxs.begin(), idxs.end(),
+                [](const QModelIndex &idx1, const QModelIndex &idx2) { return idx1.row() < idx2.row(); });
         for (int idx = 0; idx < idxs.size(); ++idx) {
             m_model->moveRow(QModelIndex(), idxs.value(idx).row(), QModelIndex(), idxs.value(idx).row() - 1);
         }
 
         ui->tableView->selectionModel()->clearSelection();
-        for (int row: qAsConst(rows)) {
+        for (int row : qAsConst(rows)) {
             const QItemSelection selection(m_model->index(row, 0), m_model->index(row, m_model->columnCount() - 1));
-            ui->tableView->selectionModel()->select(selection, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
+            ui->tableView->selectionModel()->select(
+                    selection, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
         }
     }
 }
@@ -165,28 +162,22 @@ void PropertiesViewBase::moveCurrentRowDown()
     if (m_model) {
         QModelIndexList idxs = ui->tableView->selectionModel()->selectedRows();
         QList<int> rows;
-        for (auto idx: idxs)
+        for (auto idx : idxs)
             rows.append(idx.row() + 1);
 
-        std::sort(idxs.begin(), idxs.end(), [](const QModelIndex &idx1, const QModelIndex &idx2){
-            return idx1.row() > idx2.row();
-        });
+        std::sort(idxs.begin(), idxs.end(),
+                [](const QModelIndex &idx1, const QModelIndex &idx2) { return idx1.row() > idx2.row(); });
         for (int idx = 0; idx < idxs.size(); ++idx) {
             m_model->moveRow(QModelIndex(), idxs.value(idx).row(), QModelIndex(), idxs.value(idx).row() + 1);
         }
 
         ui->tableView->selectionModel()->clearSelection();
-        for (int row: rows) {
+        for (int row : rows) {
             const QItemSelection selection(m_model->index(row, 0), m_model->index(row, m_model->columnCount() - 1));
-            ui->tableView->selectionModel()->select(selection, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
+            ui->tableView->selectionModel()->select(
+                    selection, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
         }
     }
-}
-
-void PropertiesViewBase::setButtonsDisabled(bool state)
-{
-    ui->btnAdd->setDisabled(state);
-    ui->btnDel->setDisabled(state);
 }
 
 void PropertiesViewBase::rowsInserted(const QModelIndex &parent, int first, int last)
@@ -202,19 +193,37 @@ void PropertiesViewBase::rowsInserted(const QModelIndex &parent, int first, int 
     }
 }
 
+QPushButton *PropertiesViewBase::addButton() const
+{
+    return ui->btnAdd;
+}
+
+QPushButton *PropertiesViewBase::deleteButton() const
+{
+    return ui->btnDel;
+}
+
+QPushButton *PropertiesViewBase::upButton() const
+{
+    return ui->btnUp;
+}
+
+QPushButton *PropertiesViewBase::downButton() const
+{
+    return ui->btnDown;
+}
+
 AttributesView::AttributesView(QWidget *widget)
     : PropertiesViewBase({ PropertiesListModel::Column::Value }, widget)
 {
-    ui->btnAdd->hide();
-    ui->btnDel->hide();
-    ui->btnDown->hide();
-    ui->btnUp->hide();
 }
 
-bool AttributesView::setButtonsDisabled()
+void AttributesView::updateButtons()
 {
-    PropertiesViewBase::setButtonsDisabled(true);
-    return true;
+    addButton()->hide();
+    deleteButton()->hide();
+    upButton()->hide();
+    downButton()->hide();
 }
 
 } // namespace shared

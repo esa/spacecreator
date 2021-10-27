@@ -17,16 +17,17 @@
 
 #include "ifaceparametersmodel.h"
 
-#include "commandsstack.h"
 #include "commands/cmdifaceparamchange.h"
 #include "commands/cmdifaceparamcreate.h"
 #include "commands/cmdifaceparamremove.h"
+#include "commandsstack.h"
 #include "ivinterface.h"
 #include "ivobject.h"
 #include "ivpropertytemplate.h"
 #include "propertytemplateconfig.h"
 
-#include <QDebug>
+#include <QApplication>
+#include <QMessageBox>
 #include <algorithm>
 
 namespace ive {
@@ -39,7 +40,7 @@ IfaceParametersModel::IfaceParametersModel(
 {
 }
 
-IfaceParametersModel::~IfaceParametersModel() { }
+IfaceParametersModel::~IfaceParametersModel() {}
 
 void IfaceParametersModel::createNewRow(const shared::InterfaceParameter &param, int row)
 {
@@ -120,7 +121,16 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
             break;
         }
         case Column::Direction: {
-            if (!paramNew.setDirection(shared::typeFromName<shared::InterfaceParameter::Direction>(value.toString())))
+            auto dir = shared::typeFromName<shared::InterfaceParameter::Direction>(value.toString());
+            if (auto iface = m_dataObject->as<ivm::IVInterface *>()) {
+                if (iface->kind() == ivm::IVInterface::OperationKind::Sporadic
+                        && dir == shared::InterfaceParameter::Direction::OUT) {
+                    QMessageBox::warning(qApp->activeWindow(), tr("Direction change"),
+                            tr("It's not possible to set direction to \"OUT\" for Sporadic Interface"));
+                    return false;
+                }
+            }
+            if (!paramNew.setDirection(dir))
                 return false;
             break;
         }
@@ -209,13 +219,13 @@ Qt::ItemFlags IfaceParametersModel::flags(const QModelIndex &index) const
     return flags;
 }
 
-ivm::IVObject *IfaceParametersModel::entity() const
+ivm::IVInterface *IfaceParametersModel::entity() const
 {
-    return qobject_cast<ivm::IVObject *>(PropertiesModelBase::entity());
+    return qobject_cast<ivm::IVInterface *>(PropertiesModelBase::entity());
 }
 
-bool IfaceParametersModel::moveRows(const QModelIndex &sourceParent, int sourceRow,
-        int count, const QModelIndex &destinationParent, int destinationChild)
+bool IfaceParametersModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
+        const QModelIndex &destinationParent, int destinationChild)
 {
     if (PropertiesModelBase::moveRows(sourceParent, sourceRow, count, destinationParent, destinationChild)) {
         for (int idx = 0; idx < count; ++idx)
@@ -224,6 +234,5 @@ bool IfaceParametersModel::moveRows(const QModelIndex &sourceParent, int sourceR
     }
     return false;
 }
-
 
 }
