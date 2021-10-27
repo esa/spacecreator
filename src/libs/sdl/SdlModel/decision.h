@@ -38,7 +38,7 @@ public:
     /**
      * @brief   Default constructor
      */
-    Decision();
+    Decision() = default;
 
     /**
      * @brief   Deleted copy constructor

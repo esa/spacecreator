@@ -32,7 +32,7 @@ class Node
 {
 public:
     /**
-     * @brief   Default constructor
+     * @brief   Constructor
      */
     Node(QString name = "");
 

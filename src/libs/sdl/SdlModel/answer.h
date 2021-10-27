@@ -34,7 +34,7 @@ class Answer final : public Node
 {
 public:
     /**
-     * @brief   Default constructor
+     * @brief   Constructor
      */
     Answer();
 

@@ -24,8 +24,6 @@
 
 namespace sdl {
 
-Decision::Decision() {}
-
 const std::vector<std::unique_ptr<Answer>> &Decision::answers() const
 {
     return m_answers;

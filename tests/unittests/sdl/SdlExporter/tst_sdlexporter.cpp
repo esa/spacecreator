@@ -519,7 +519,6 @@ void tst_sdlmodel::testJoinWithoutSpecifiedLabel()
     const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
 
     Options options;
-
     SdlExporter exporter;
     QVERIFY_EXCEPTION_THROWN(exporter.exportModel(exampleModel.get(), options), ExportException);
 }
