@@ -32,29 +32,43 @@
 #include <asn1library/asn1/values.h>
 
 namespace conversion::tmc::translator {
+/**
+ * @brief Visitor for ASN.1 constraints
+ *
+ * This is a part of Asn1ToPromelaTranslator.
+ * This visitor is used to determine size constraints.
+ *
+ * @tparam ValueType constrained value type
+ */
 template<typename ValueType>
 class Asn1ConstraintVisitor : public ::Asn1Acn::Constraints::ConstraintVisitor<ValueType>
 {
 public:
+    /// @brief Visit Asn1Acn::Constraints::RangeConstraint
     void visit(const ::Asn1Acn::Constraints::RangeConstraint<ValueType> &constraint) override { Q_UNUSED(constraint); }
 
+    /// @brief Visit Asn1Acn::Constraints::AndConstraint
     void visit(const ::Asn1Acn::Constraints::AndConstraint<ValueType> &constraint) override
     {
         constraint.leftChild()->accept(*this);
     }
 
+    /// @brief Visit Asn1Acn::Constraints::OrConstraint
     void visit(const ::Asn1Acn::Constraints::OrConstraint<ValueType> &constraint) override
     {
         constraint.rightChild()->accept(*this);
     }
 
+    /// @brief Visit Asn1Acn::Constraints::FromConstraint
     void visit(const ::Asn1Acn::Constraints::FromConstraint<ValueType> &constraint) override { Q_UNUSED(constraint); }
 
+    /// @brief Visit Asn1Acn::Constraints::SizeConstraint
     void visit(const ::Asn1Acn::Constraints::SizeConstraint<ValueType> &constraint) override
     {
         constraint.innerConstraints()->accept(m_sizeVisitor);
     }
 
+    /// @brief Visit Asn1Acn::Constraints::ConstraintList
     void visit(const ::Asn1Acn::Constraints::ConstraintList<ValueType> &constraint) override
     {
         for (const auto &c : constraint.constraints()) {
@@ -62,10 +76,25 @@ public:
         }
     }
 
+    /**
+     * @brief Check if size constraint was visited.
+     *
+     * @return true if size constraint was visited, otherwise false
+     */
     bool isSizeConstraintVisited() const noexcept { return m_sizeVisitor.isSizeConstraintVisited(); }
 
+    /**
+     * @brief Getter for found minimal size constraint
+     *
+     * @return minimal size constraint
+     */
     size_t getMinSize() const noexcept { return m_sizeVisitor.getMinSize(); }
 
+    /**
+     * @brief Getter for found maximal size constraint
+     *
+     * @return maximal size constraint
+     */
     size_t getMaxSize() const noexcept { return m_sizeVisitor.getMaxSize(); }
 
 private:

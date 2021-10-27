@@ -39,6 +39,7 @@ public:
      * @param promelaModel target promela model
      * @param utype target utype
      * @param baseTypeName base name for nested types
+     * @param optionalFields list to add found optional component names
      */
     Asn1SequenceComponentVisitor(::tmc::promela::model::PromelaModel &promelaModel, ::tmc::promela::model::Utype &utype,
             QString baseTypeName, QList<QString> &optionalFields);

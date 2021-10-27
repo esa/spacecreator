@@ -30,21 +30,59 @@
 #include <asn1library/asn1/values.h>
 
 namespace conversion::tmc::translator {
-
+/**
+ * @brief Visitor for ASN.1 size constraints
+ *
+ * This is a part of Asn1ToPromelaTranslator.
+ */
 class Asn1SizeVisitor : public ::Asn1Acn::Constraints::ConstraintVisitor<::Asn1Acn::IntegerValue>
 {
 public:
+    /**
+     * @brief Constructor.
+     *
+     * Initializes empty visitor
+     */
     Asn1SizeVisitor();
 
+    /**
+     * @brief Visit Asn1Acn::Constraints::RangeConstraint
+     *
+     * RangeConstraints contains actual sizes
+     *
+     * @param constraint element to visit
+     */
     void visit(const ::Asn1Acn::Constraints::RangeConstraint<::Asn1Acn::IntegerValue> &constraint) override;
+    /// @brief Visit Asn1Acn::Constraints::AndConstraint
     void visit(const ::Asn1Acn::Constraints::AndConstraint<::Asn1Acn::IntegerValue> &constraint) override;
+    /// @brief Visit Asn1Acn::Constraints::OrConstraint
     void visit(const ::Asn1Acn::Constraints::OrConstraint<::Asn1Acn::IntegerValue> &constraint) override;
+    /// @brief Visit Asn1Acn::Constraints::FromConstraint
     void visit(const ::Asn1Acn::Constraints::FromConstraint<::Asn1Acn::IntegerValue> &constraint) override;
+    /// @brief Visit Asn1Acn::Constraints::SizeConstraint
     void visit(const ::Asn1Acn::Constraints::SizeConstraint<::Asn1Acn::IntegerValue> &constraint) override;
+    /// @brief Visit Asn1Acn::Constraints::ConstraintList
     void visit(const ::Asn1Acn::Constraints::ConstraintList<::Asn1Acn::IntegerValue> &constraint) override;
 
+    /**
+     * @brief Check if size constraint was visited.
+     *
+     * @return true if size constraint was visited, otherwise false
+     */
     bool isSizeConstraintVisited() const noexcept;
+
+    /**
+     * @brief Getter for found minimal size constraint
+     *
+     * @return minimal size constraint
+     */
     size_t getMinSize() const noexcept;
+
+    /**
+     * @brief Getter for found maximal size constraint
+     *
+     * @return maximal size constraint
+     */
     size_t getMaxSize() const noexcept;
 
 private:
