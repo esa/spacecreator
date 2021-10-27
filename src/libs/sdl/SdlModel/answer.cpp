@@ -38,9 +38,9 @@ void Answer::setTransition(std::unique_ptr<Transition> transition)
     m_transition = std::move(transition);
 }
 
-const VariableLiteral *Answer::literal() const
+const VariableLiteral &Answer::literal() const
 {
-    return &m_literal;
+    return m_literal;
 }
 
 void Answer::setLiteral(VariableLiteral literal)
