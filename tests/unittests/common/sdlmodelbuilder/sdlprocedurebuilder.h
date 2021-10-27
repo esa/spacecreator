@@ -37,6 +37,8 @@ public:
 
     auto withName(QString name) -> SdlProcedureBuilder &;
 
+    auto withTransition(std::unique_ptr<Transition> transition) -> SdlProcedureBuilder &;
+
 private:
     std::unique_ptr<Procedure> m_procedure;
 };

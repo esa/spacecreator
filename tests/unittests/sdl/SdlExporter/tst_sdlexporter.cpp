@@ -481,6 +481,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
         "task 'TASK INSIDE PROCEDURE';",
         "task 'SECOND TASK INSIDE PROCEDURE';",
         "return;",
+        "endprocedure;",
 
         "START;",
         "NEXTSTATE Wait;",
@@ -529,11 +530,15 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
-    auto procedure = SdlProcedureBuilder().withName("myParamlessProcedure").build();
-    //                     .withTransition(
-    //                           SdlTransitionBuilder()
-    //                                .withAction(SdlTaskBuilder.withContents("'TASK INSIDE PROCEDURE'")
-    //                                .withAction(SdlTaskBuilder.withContents("'SECOND TASK INSIDE PROCEDURE'")
+    auto procedure =
+            SdlProcedureBuilder()
+                    .withName("myParamlessProcedure")
+                    .withTransition(
+                            SdlTransitionBuilder()
+                                    .withAction(SdlTaskBuilder().withContents("'TASK INSIDE PROCEDURE'").build())
+                                    .withAction(SdlTaskBuilder().withContents("'SECOND TASK INSIDE PROCEDURE'").build())
+                                    .build())
+                    .build();
     auto process = SdlProcessBuilder(processName)
                            .withProcedure(std::move(procedure))
                            .withStartTransition(std::move(startTransition))

@@ -20,8 +20,10 @@
 #pragma once
 
 #include "node.h"
+#include "transition.h"
 
 #include <QString>
+#include <memory>
 
 namespace sdl {
 
@@ -59,9 +61,26 @@ public:
     Procedure &operator=(Procedure &&) = default;
 
     /**
+     * @brief   Getter for the transition
+     *
+     * @return  a pointer to transition which should be triggered when this procedure is called
+     */
+    auto transition() const -> Transition *;
+
+    /**
+     * @brief   Setter for the transition
+     *
+     * @param   transition a pointer to transition which should be triggered when this procedure is called
+     */
+    auto setTransition(std::unique_ptr<Transition> transition) -> void;
+
+    /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */
     virtual auto accept(Visitor &visitor) const -> void override;
+
+private:
+    std::unique_ptr<Transition> m_implementation;
 };
 
 } // namespace sdl

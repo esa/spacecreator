@@ -40,4 +40,11 @@ SdlProcedureBuilder &SdlProcedureBuilder::withName(QString name)
     return *this;
 }
 
+SdlProcedureBuilder &SdlProcedureBuilder::withTransition(std::unique_ptr<Transition> transition)
+{
+    m_procedure->setTransition(std::move(transition));
+
+    return *this;
+}
+
 } // namespace tests::common
