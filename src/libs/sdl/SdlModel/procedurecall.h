@@ -30,7 +30,7 @@ namespace sdl {
 /**
  * @brief   Represents an SDL procedure call
  */
-class ProcedureCall : public Node
+class ProcedureCall : public Action
 {
 public:
     /**
