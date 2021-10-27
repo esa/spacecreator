@@ -261,6 +261,21 @@ void SdlVisitor::visit(const Procedure &procedure) const
     m_stream << "    endprocedure;\n";
 }
 
+void SdlVisitor::visit(const ProcedureCall &procedureCall) const
+{
+    if (procedureCall.procedure() == nullptr || procedureCall.procedure()->name() == "") {
+        throw ExportException("Procedure to call not specified");
+    }
+
+    // write some dummy CIF
+    m_stream << "        /* CIF PROCEDURECALL (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "        call " << procedureCall.procedure()->name();
+    // if (!procedureCall.arguments().empty()) {
+    //     // export arguments
+    // }
+    m_stream << ";\n";
+}
+
 template<typename T>
 void SdlVisitor::exportCollection(const T &collection) const
 {
