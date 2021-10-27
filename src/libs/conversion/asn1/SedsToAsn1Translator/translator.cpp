@@ -123,15 +123,15 @@ void SedsToAsn1Translator::translateDataTypes(
 std::vector<const seds::model::DataType *> SedsToAsn1Translator::collectDataTypes(
         const seds::model::Package &sedsPackage) const
 {
-    const auto func = [](const auto &dataType) { return &dataType; };
+    const auto extractPointer = [](const auto &dataType) { return &dataType; };
 
     std::vector<const seds::model::DataType *> sedsDataTypes;
 
-    std::transform(
-            sedsPackage.dataTypes().begin(), sedsPackage.dataTypes().end(), std::back_inserter(sedsDataTypes), func);
+    std::transform(sedsPackage.dataTypes().begin(), sedsPackage.dataTypes().end(), std::back_inserter(sedsDataTypes),
+            extractPointer);
     for (const auto &sedsComponent : sedsPackage.components()) {
         std::transform(sedsComponent.dataTypes().begin(), sedsComponent.dataTypes().end(),
-                std::back_inserter(sedsDataTypes), func);
+                std::back_inserter(sedsDataTypes), extractPointer);
     }
 
     return sedsDataTypes;
