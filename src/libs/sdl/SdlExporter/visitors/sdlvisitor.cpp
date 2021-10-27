@@ -40,7 +40,7 @@ void SdlVisitor::visit(const SdlModel &model) const
 
 void SdlVisitor::visit(const Process &process) const
 {
-    if (process.name() == "") {
+    if (process.name().isEmpty()) {
         throw ExportException("Process shall have a name but it doesn't");
     }
 
@@ -77,7 +77,7 @@ void SdlVisitor::visit(const Process &process) const
 
 void SdlVisitor::visit(const State &state) const
 {
-    if (state.name() == "") {
+    if (state.name().isEmpty()) {
         throw ExportException("State shall have a name but it doesn't");
     }
 
@@ -91,7 +91,7 @@ void SdlVisitor::visit(const State &state) const
 
 void SdlVisitor::visit(const Input &input) const
 {
-    if (input.name() == "") {
+    if (input.name().isEmpty()) {
         throw ExportException("Input shall have a name but it doesn't");
     }
 
@@ -123,7 +123,7 @@ void SdlVisitor::visit(const Input &input) const
 
 void SdlVisitor::visit(const Output &output) const
 {
-    if (output.name() == "") {
+    if (output.name().isEmpty()) {
         throw ExportException("Output shall have a name but it doesn't");
     }
 
@@ -158,7 +158,7 @@ void SdlVisitor::visit(const NextState &nextstate) const
 
 void SdlVisitor::visit(const Task &task) const
 {
-    if (task.content() == "") {
+    if (task.content().isEmpty()) {
         throw ExportException("Task shall have contents but it doesn't");
     }
 
@@ -169,10 +169,10 @@ void SdlVisitor::visit(const Task &task) const
 
 void SdlVisitor::visit(const VariableDeclaration &declaration) const
 {
-    if (declaration.name() == "") {
+    if (declaration.name().isEmpty()) {
         throw ExportException("Variable declaration shall have a name but it doesn't");
     }
-    if (declaration.type() == "") {
+    if (declaration.type().isEmpty()) {
         throw ExportException("Variable declaration shall have a specified type but it doesn't");
     }
 
@@ -181,7 +181,7 @@ void SdlVisitor::visit(const VariableDeclaration &declaration) const
 
 void SdlVisitor::visit(const Label &label) const
 {
-    if (label.name() == "") {
+    if (label.name().isEmpty()) {
         throw ExportException("Label name cannot be empty");
     }
 
@@ -207,7 +207,7 @@ void SdlVisitor::visit(const Answer &answer) const
     if (answer.transition() == nullptr) {
         throw ExportException("Required Transition is missing in Answer");
     }
-    if (answer.literal().value() == "") {
+    if (answer.literal().value().isEmpty()) {
         throw ExportException("Required Literal have a missing value in Answer");
     }
 
@@ -226,7 +226,7 @@ void SdlVisitor::visit(const Decision &decision) const
     if (decision.expression() == nullptr) {
         throw ExportException("Required Expression is missing in Decision");
     }
-    if (decision.expression()->content() == "") {
+    if (decision.expression()->content().isEmpty()) {
         throw ExportException("Content in Decision is empty");
     }
     if (decision.answers().empty()) {
