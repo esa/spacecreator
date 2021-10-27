@@ -23,6 +23,8 @@
 #include "ivinterface.h"
 #include "propertieslistmodel.h"
 
+#include <QPushButton>
+
 namespace ive {
 
 ContextParametersView::ContextParametersView(QWidget *widget)
@@ -30,42 +32,60 @@ ContextParametersView::ContextParametersView(QWidget *widget)
 {
 }
 
-bool ContextParametersView::setButtonsDisabled()
+void ContextParametersView::updateButtons()
 {
     if (!m_model || !m_model->entity())
-        return false;
+        return;
 
-    if (auto iface = qobject_cast<const ivm::IVInterface *>(m_model->entity())) {
-        bool disabled = iface->isClone();
-        if (!disabled && iface->isRequired()) {
-            if (auto ri = iface->as<const ivm::IVInterfaceRequired *>())
-                disabled = ri->hasPrototypePi();
-        }
-        return disabled;
+    if (auto fn = qobject_cast<const ivm::IVFunction *>(m_model->entity())) {
+        const bool disabled = fn->inheritsFunctionType();
+        addButton()->setDisabled(disabled);
+        deleteButton()->setDisabled(disabled);
     }
-
-    return false;
 }
 
 IfaceParametersView::IfaceParametersView(QWidget *widget)
     : shared::PropertiesViewBase({ IfaceParametersModel::Column::Type, IfaceParametersModel::Column::Encoding,
                                          IfaceParametersModel::Column::Direction },
-            widget)
+              widget)
 {
 }
 
-bool IfaceParametersView::setButtonsDisabled()
+void IfaceParametersView::updateButtons()
 {
     if (!m_model || !m_model->entity())
-        return false;
+        return;
 
-    if (auto fn = qobject_cast<const ivm::IVFunction *>(m_model->entity())) {
-        const bool disabled = fn->inheritsFunctionType();
-        shared::PropertiesViewBase::setButtonsDisabled(disabled);
-        return disabled;
+    if (auto iface = qobject_cast<const ivm::IVInterface *>(m_model->entity())) {
+        if (iface->isClone()) {
+            addButton()->setDisabled(true);
+            deleteButton()->setDisabled(true);
+        } else if (iface->isRequired()) {
+            if (auto ri = iface->as<const ivm::IVInterfaceRequired *>()) {
+                if (ri->hasPrototypePi()) {
+                    addButton()->setDisabled(true);
+                    deleteButton()->setDisabled(true);
+                }
+            }
+        } else if (iface->kind() == ivm::IVInterface::OperationKind::Cyclic) {
+            addButton()->setDisabled(true);
+            deleteButton()->setDisabled(true);
+        } else if (iface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
+            addButton()->setDisabled(iface->params().size() >= 1);
+        }
     }
+}
 
-    return false;
+void IfaceParametersView::setModel(shared::PropertiesModelBase *model)
+{
+    shared::PropertiesViewBase::setModel(model);
+    if (!m_model || !m_model->entity())
+        return;
+
+    if (auto iface = m_model->entity()->as<ivm::IVInterface *>()) {
+        connect(iface, &ivm::IVInterface::paramsChanged, this, &IfaceParametersView::updateButtons,
+                Qt::UniqueConnection);
+    }
 }
 
 } // namespace ive

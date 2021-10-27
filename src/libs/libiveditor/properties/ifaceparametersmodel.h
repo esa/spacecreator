@@ -18,7 +18,7 @@
 #pragma once
 
 #include "commandsstack.h"
-#include "ivobject.h"
+#include "ivinterface.h"
 #include "parameter.h"
 #include "propertiesmodelbase.h"
 
@@ -62,10 +62,11 @@ public:
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-    ivm::IVObject *entity() const override;
+    ivm::IVInterface *entity() const override;
 
-    bool moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
-            const QModelIndex &destinationParent, int destinationChild) override;
+    bool moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent,
+            int destinationChild) override;
+
 private:
     void createNewRow(const shared::InterfaceParameter &param, int row);
 

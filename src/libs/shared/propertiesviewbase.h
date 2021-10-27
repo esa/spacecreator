@@ -21,6 +21,7 @@
 
 class QTableView;
 class QItemSelection;
+class QPushButton;
 
 namespace Ui {
 class PropertiesViewBase;
@@ -52,11 +53,15 @@ protected:
     const QList<int> m_delegatesColumns;
 
 protected:
-    void setButtonsDisabled(bool state);
-    virtual bool setButtonsDisabled() = 0;
+    virtual void updateButtons() = 0;
     void rowsInserted(const QModelIndex &parent, int first, int last);
 
-protected:
+    QPushButton *addButton() const;
+    QPushButton *deleteButton() const;
+    QPushButton *upButton() const;
+    QPushButton *downButton() const;
+
+private:
     Ui::PropertiesViewBase *ui { nullptr };
 };
 
@@ -68,7 +73,7 @@ public:
     explicit AttributesView(QWidget *widget = nullptr);
     ~AttributesView() override = default;
 
-    bool setButtonsDisabled() override;
+    void updateButtons() override;
 };
 
 } // namespace shared

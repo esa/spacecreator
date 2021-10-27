@@ -21,6 +21,10 @@
 
 #include <QWidget>
 
+namespace shared {
+class PropertiesModelBase;
+}
+
 namespace ive {
 
 class ContextParametersView : public shared::PropertiesViewBase
@@ -31,7 +35,7 @@ public:
     explicit ContextParametersView(QWidget *widget = nullptr);
     ~ContextParametersView() override = default;
 
-    bool setButtonsDisabled() override;
+    void updateButtons() override;
 };
 
 class IfaceParametersView : public shared::PropertiesViewBase
@@ -42,7 +46,8 @@ public:
     explicit IfaceParametersView(QWidget *widget = nullptr);
     ~IfaceParametersView() override = default;
 
-    bool setButtonsDisabled() override;
+    void updateButtons() override;
+    void setModel(shared::PropertiesModelBase *model) override;
 };
 
 } // namespace ive

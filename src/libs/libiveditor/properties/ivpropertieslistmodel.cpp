@@ -27,7 +27,8 @@
 #include "ivnamevalidator.h"
 #include "ivpropertytemplateconfig.h"
 
-#include <QDebug>
+#include <QApplication>
+#include <QMessageBox>
 #include <QRegularExpression>
 
 namespace ive {
@@ -90,7 +91,7 @@ IVPropertiesListModel::IVPropertiesListModel(
 {
 }
 
-IVPropertiesListModel::~IVPropertiesListModel() { }
+IVPropertiesListModel::~IVPropertiesListModel() {}
 
 bool IVPropertiesListModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
@@ -219,8 +220,44 @@ QVariant InterfacePropertiesListModel::data(const QModelIndex &index, int role) 
     return PropertiesListModel::data(index, role);
 }
 
+static inline bool hasOutParameter(const QVector<shared::InterfaceParameter> &paramsList)
+{
+    auto it = std::find_if(paramsList.cbegin(), paramsList.cend(),
+            [](const shared::InterfaceParameter &param) { return param.isOutDirection(); });
+    return it != paramsList.cend();
+}
+
 bool InterfacePropertiesListModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
+    if (!index.isValid())
+        return false;
+
+    if (isAttr(index) && index.column() == Column::Value) {
+        if (ivm::meta::Props::Token::kind == tokenFromIndex(index)) {
+            const auto kindType = shared::typeFromName<ivm::IVInterface::OperationKind>(value.toString());
+            const QVector<shared::InterfaceParameter> paramsList = entity()->params();
+            if (kindType == ivm::IVInterface::OperationKind::Cyclic) {
+                if (!paramsList.isEmpty()) {
+                    QMessageBox::warning(qApp->activeWindow(), tr("Interface change"),
+                            tr("It's not possible to set Kind to \"Cyclic\" for Interface that has parameter(s)"));
+                    return false;
+                }
+            } else if (kindType == ivm::IVInterface::OperationKind::Sporadic) {
+                if (paramsList.size() > 1) {
+                    QMessageBox::warning(qApp->activeWindow(), tr("Interface change"),
+                            tr("It's not possible to set Kind to \"Sporadic\" for Interface that has more than one "
+                               "parameter"));
+                    return false;
+                } else if (hasOutParameter(paramsList)) {
+                    QMessageBox::warning(qApp->activeWindow(), tr("Interface change"),
+                            tr("It's not possible to set Kind to \"Sporadic\" for Interface that has at least one "
+                               "\"OUT\" parameter"));
+                    return false;
+                }
+            }
+        }
+    }
+
     const QPair<QString, QVariant> data = prepareDataForUpdate(index, value, role);
     if (!data.first.isEmpty()) {
         return m_cmdMacro->push(new cmd::CmdIfaceAttrChange(m_propTemplatesConfig, entity(), data.first, data.second));
