@@ -28,6 +28,16 @@ Procedure::Procedure(QString name)
 {
 }
 
+Transition *Procedure::transition() const
+{
+    return m_implementation.get();
+}
+
+void Procedure::setTransition(std::unique_ptr<Transition> transition)
+{
+    m_implementation = std::move(transition);
+}
+
 void Procedure::accept(Visitor &visitor) const
 {
     visitor.visit(*this);

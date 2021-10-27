@@ -247,6 +247,18 @@ void SdlVisitor::visit(const Procedure &procedure) const
     // write some dummy CIF
     m_stream << "    /* CIF procedure (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "    procedure " << procedure.name() << ";\n";
+    m_stream << "        START;\n";
+    if (procedure.transition()->actions().empty()) {
+        qWarning("Procedure is empty");
+    } else {
+        exportCollection(procedure.transition()->actions());
+    }
+    m_stream << "        return";
+    // TODO if (procedure.returnVariable() != "") {
+    //     m_stream << " " << procedure.returnVariable();
+    // }
+    m_stream << ";\n";
+    m_stream << "    endprocedure;\n";
 }
 
 template<typename T>
