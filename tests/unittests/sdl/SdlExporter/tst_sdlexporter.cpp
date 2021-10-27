@@ -507,28 +507,15 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
                                .withOutput(SdlOutputBuilder().withName("parameterlessOutput").build())
                                .withNextStateAction()
                                .build();
-    auto someInput = SdlInputBuilder().withName("some_input_name").withTransition(transition1.get()).build();
-    auto state1 = SdlStateBuilder("Looping")
+    auto someInput = SdlInputBuilder().withName("startProcess").withTransition(transition1.get()).build();
+    auto state1 = SdlStateBuilder("Wait")
                           .withInput(std::move(someInput))
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
     auto referenceOutput = SdlOutputBuilder().withName("referenceOutput").build();
 
-    auto transition2 = SdlTransitionBuilder()
-                               .withTask(SdlTaskBuilder().withContents("'EXAMPLE TASK CONTENTS'").build())
-                               .withNextStateAction(state1.get())
-                               .build();
-
     auto startTransition = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
-
-    auto state2 = SdlStateBuilder("Idle")
-                          .withInput(SdlInputBuilder()
-                                             .withName("some_other_input_name")
-                                             .withTransition(transition2.get())
-                                             .build())
-                          .withContinuousSignal(std::make_unique<ContinuousSignal>())
-                          .build();
 
     auto procedure =
             SdlProcedureBuilder()
@@ -544,9 +531,7 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
                            .withStartTransition(std::move(startTransition))
                            .withStateMachine(SdlStateMachineBuilder()
                                                      .withState(std::move(state1))
-                                                     .withState(std::move(state2))
                                                      .withTransition(std::move(transition1))
-                                                     .withTransition(std::move(transition2))
                                                      .build())
                            .build();
 
