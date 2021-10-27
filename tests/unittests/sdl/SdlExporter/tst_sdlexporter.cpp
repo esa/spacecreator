@@ -477,24 +477,23 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     QTextStream consumableOutput(&outputFile);
     std::vector<QString> expectedOutput = {
         "process ExampleProcess;",
-
-        "procedure myParamlessProcedure;",
-        "START;",
-        "task 'TASK INSIDE PROCEDURE';",
-        "task 'SECOND TASK INSIDE PROCEDURE';",
-        "return;",
-        "endprocedure;",
-
+        "dcl x MyInteger;",
         "START;",
         "NEXTSTATE Wait;",
-
         "state Wait;",
-        "input startProcess;",
-        "call myParamlessProcedure;",
+        "input startProcess(x);",
+        "decision x;",
+        "(1)",
+        "output sendOutput(x);",
+        "task 'SOME EXAMPLE TASK';",
+        "(>1)",
         "NEXTSTATE -;",
-
+        "else:",
+        "task 'ANSWER UNKNOWN';",
+        "NEXTSTATE -;",
+        "enddecision;",
         "endstate;",
-        "endprocess ExampleProcess;",
+        "endprocess ExampleProcess",
     };
     checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
@@ -559,23 +558,24 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
     QTextStream consumableOutput(&outputFile);
     std::vector<QString> expectedOutput = {
         "process ExampleProcess;",
-        "dcl x MyInteger;",
+
+        "procedure myParamlessProcedure;",
+        "START;",
+        "task 'TASK INSIDE PROCEDURE';",
+        "task 'SECOND TASK INSIDE PROCEDURE';",
+        "return;",
+        "endprocedure;",
+
         "START;",
         "NEXTSTATE Wait;",
+
         "state Wait;",
-        "input startProcess(x);",
-        "decision x;",
-        "(1)",
-        "output sendOutput(x);",
-        "task 'SOME EXAMPLE TASK';",
-        "(>1)",
+        "input startProcess;",
+        "call myParamlessProcedure;",
         "NEXTSTATE -;",
-        "else:",
-        "task 'ANSWER UNKNOWN';",
-        "NEXTSTATE -;",
-        "enddecision;",
+
         "endstate;",
-        "endprocess ExampleProcess",
+        "endprocess ExampleProcess;",
     };
     checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
