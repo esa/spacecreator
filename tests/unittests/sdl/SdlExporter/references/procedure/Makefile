@@ -13,7 +13,7 @@ SPACECREATOR?=spacecreator.AppImage
 # $ space-creator reset
 
 # Get the list of ASN.1 files from Space Creator project file:
-DISTFILES=$(shell qmake procedures.pro -o /tmp/null 2>&1)
+DISTFILES=$(shell qmake procedure.pro -o /tmp/null 2>&1)
 ASN1_FILES=$(shell find ${DISTFILES} 2>/dev/null | egrep '\.asn$$|\.asn1$$')
 
 all:	release
