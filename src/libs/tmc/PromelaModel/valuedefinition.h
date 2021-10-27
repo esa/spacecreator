@@ -23,14 +23,43 @@
 #include <cstdint>
 
 namespace tmc::promela::model {
+/**
+ * @brief ValueDefinition is used to give names to integer values.
+ */
 class ValueDefinition final
 {
 public:
+    /**
+     *@brief Constructor.
+     *
+     * @param name name of the defintion
+     * @param value value of the definition
+     */
     ValueDefinition(QString name, int32_t value);
 
+    /**
+     * @brief Getter for the name of definition
+     *
+     * @return Name of the definition
+     */
     const QString &getName() const noexcept;
+    /**
+     * @brief Setter for name of definition
+     *
+     * @param name new name of definition
+     */
     void setName(QString name);
+    /**
+     * @brief Getter for value of definition
+     *
+     * @return Value of definition
+     */
     int32_t getValue() const noexcept;
+    /**
+     * @brief Setter for value of definition
+     *
+     * @param value new value of definition
+     */
     void setValue(int32_t value);
 
 private:

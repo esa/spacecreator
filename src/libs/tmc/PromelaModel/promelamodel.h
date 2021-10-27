@@ -111,8 +111,18 @@ public:
      */
     const QList<TypeAlias> &getTypeAliases() const noexcept;
 
+    /**
+     * @brief Add ValueDefinition value definition to the model
+     *
+     * @param value ValueDefinition to add to the model
+     */
     void addValueDefinition(const ValueDefinition &value);
 
+    /**
+     * @brief Getter for all value definitions of promela model
+     *
+     * @return All value definitions of the model
+     */
     const QList<ValueDefinition> &getValueDefinitions() const noexcept;
 
 private:
