@@ -28,6 +28,7 @@
 #include <common/sdlmodelbuilder/sdlmodelbuilder.h>
 #include <common/sdlmodelbuilder/sdloutputbuilder.h>
 #include <common/sdlmodelbuilder/sdlprocedurebuilder.h>
+#include <common/sdlmodelbuilder/sdlprocedurecallbuilder.h>
 #include <common/sdlmodelbuilder/sdlprocessbuilder.h>
 #include <common/sdlmodelbuilder/sdlstatebuilder.h>
 #include <common/sdlmodelbuilder/sdlstatemachinebuilder.h>
@@ -83,6 +84,7 @@ using tests::common::SdlInputBuilder;
 using tests::common::SdlModelBuilder;
 using tests::common::SdlOutputBuilder;
 using tests::common::SdlProcedureBuilder;
+using tests::common::SdlProcedureCallBuilder;
 using tests::common::SdlProcessBuilder;
 using tests::common::SdlStateBuilder;
 using tests::common::SdlStateMachineBuilder;
@@ -503,8 +505,19 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
     QString modelPrefix = "Sdl_";
     QString processName = "ExampleProcess";
 
+    auto procedure =
+            SdlProcedureBuilder()
+                    .withName("myParamlessProcedure")
+                    .withTransition(
+                            SdlTransitionBuilder()
+                                    .withAction(SdlTaskBuilder().withContents("'TASK INSIDE PROCEDURE'").build())
+                                    .withAction(SdlTaskBuilder().withContents("'SECOND TASK INSIDE PROCEDURE'").build())
+                                    .build())
+                    .build();
+
     auto transition1 = SdlTransitionBuilder()
                                .withOutput(SdlOutputBuilder().withName("parameterlessOutput").build())
+                               .withAction(SdlProcedureCallBuilder().withProcedure(procedure.get()).build())
                                .withNextStateAction()
                                .build();
     auto someInput = SdlInputBuilder().withName("startProcess").withTransition(transition1.get()).build();
@@ -517,15 +530,6 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
 
     auto startTransition = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
 
-    auto procedure =
-            SdlProcedureBuilder()
-                    .withName("myParamlessProcedure")
-                    .withTransition(
-                            SdlTransitionBuilder()
-                                    .withAction(SdlTaskBuilder().withContents("'TASK INSIDE PROCEDURE'").build())
-                                    .withAction(SdlTaskBuilder().withContents("'SECOND TASK INSIDE PROCEDURE'").build())
-                                    .build())
-                    .build();
     auto process = SdlProcessBuilder(processName)
                            .withProcedure(std::move(procedure))
                            .withStartTransition(std::move(startTransition))

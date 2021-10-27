@@ -17,30 +17,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "procedurecall.h"
+#include "sdlprocedurecallbuilder.h"
 
-#include <sdl/SdlExporter/visitors/visitor.h>
+namespace tests::common {
 
-namespace sdl {
-
-ProcedureCall::ProcedureCall(QString name)
-    : Action(std::move(name))
+SdlProcedureCallBuilder::SdlProcedureCallBuilder()
+    : m_procedureCall(std::make_unique<ProcedureCall>())
 {
 }
 
-Procedure *ProcedureCall::procedure() const
+std::unique_ptr<ProcedureCall> SdlProcedureCallBuilder::build()
 {
-    return m_procedureDeclaration;
+    return std::move(m_procedureCall);
 }
 
-void ProcedureCall::setProcedure(Procedure *procedure)
+SdlProcedureCallBuilder &SdlProcedureCallBuilder::withProcedure(Procedure *const procedure)
 {
-    m_procedureDeclaration = procedure;
+    m_procedureCall->setProcedure(procedure);
+
+    return *this;
 }
 
-void ProcedureCall::accept(Visitor &visitor) const
-{
-    visitor.visit(*this);
-}
-
-} // namespace sdl
+} // namespace tests::common
