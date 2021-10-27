@@ -27,6 +27,7 @@
 #include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/output.h>
 #include <sdl/SdlModel/procedure.h>
+#include <sdl/SdlModel/procedurecall.h>
 #include <sdl/SdlModel/process.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/signal.h>
@@ -163,6 +164,13 @@ public:
      * @param   procedure   procedure to be visited
      */
     virtual auto visit(const Procedure &procedure) const -> void = 0;
+
+    /**
+     * @brief   Procedure call visitor
+     *
+     * @param   procedureCall   procedure call to be visited
+     */
+    virtual auto visit(const ProcedureCall &procedureCall) const -> void = 0;
 };
 
 } // namespace sdl
