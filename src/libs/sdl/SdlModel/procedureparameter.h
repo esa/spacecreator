@@ -19,59 +19,60 @@
 
 #pragma once
 
-#include "node.h"
+#include "variabledeclaration.h"
 
 #include <QString>
 
 namespace sdl {
 
 /**
- * @brief   Represents an SDL variable declaration
+ * @brief   Represents an input/output SDL Procedure parameter
  */
-class VariableDeclaration : public Node
+class ProcedureParameter final : public VariableDeclaration
 {
 public:
     /**
      * @brief   Constructor
      *
-     * @param   name   name of the declared variable
-     * @param   type   type of the declared variable
+     * @param   name         name of the parameter
+     * @param   type         type of the parameter
+     * @param   direction    direction (input or output) of the parameter
      */
-    VariableDeclaration(QString name = "", QString type = "");
+    ProcedureParameter(QString name = "", QString type = "", QString direction = "");
 
     /**
      * @brief   Deleted copy constructor
      */
-    VariableDeclaration(const VariableDeclaration &) = delete;
+    ProcedureParameter(const ProcedureParameter &) = delete;
 
     /**
      * @brief   Default move constructor
      */
-    VariableDeclaration(VariableDeclaration &&) = default;
+    ProcedureParameter(ProcedureParameter &&) = default;
 
     /**
      * @brief   Deleted copy assignment operator
      */
-    VariableDeclaration &operator=(const VariableDeclaration &) = delete;
+    ProcedureParameter &operator=(const ProcedureParameter &) = delete;
 
     /**
      * @brief   Default move assignment operator
      */
-    VariableDeclaration &operator=(VariableDeclaration &&) = default;
+    ProcedureParameter &operator=(ProcedureParameter &&) = default;
 
     /**
-     * @brief    Getter for the type
+     * @brief    Getter for the direction
      *
-     * @return   type of the declared variable
+     * @return   direction of the parameter
      */
-    auto type() const -> const QString &;
+    auto direction() const -> const QString &;
 
     /**
-     * @brief    Setter for the type
+     * @brief    Setter for the direction
      *
      * @param    type   type of the declared variable
      */
-    auto setType(QString type) -> void;
+    auto setDirection(QString type) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
@@ -79,7 +80,7 @@ public:
     virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
-    QString m_type;
+    QString m_direction;
 };
 
 } // namespace sdl

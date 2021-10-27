@@ -16,6 +16,7 @@ set(SOURCES action.cpp
             output.cpp
             procedure.cpp
             procedurecall.cpp
+            procedureparameter.cpp
             process.cpp
             sdlmodel.cpp
             signal.cpp
@@ -40,6 +41,7 @@ set(INCLUDES action.h
              output.h
              procedure.h
              procedurecall.h
+             procedureparameter.h
              process.h
              sdlmodel.h
              signal.h
