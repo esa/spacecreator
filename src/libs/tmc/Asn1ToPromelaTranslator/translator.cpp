@@ -26,10 +26,14 @@
 #include <tmc/PromelaModel/promelamodel.h>
 
 using Asn1Acn::Asn1Model;
+using Asn1Acn::File;
+using conversion::Model;
+using conversion::ModelType;
+using conversion::Options;
 using conversion::translator::TranslationException;
 using tmc::promela::model::PromelaModel;
 
-namespace conversion::tmc::translator {
+namespace tmc::translator {
 std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
         std::vector<Model *> sourceModels, const Options &options) const
 {
@@ -57,10 +61,10 @@ std::set<ModelType> Asn1ToPromelaTranslator::getDependencies() const
     return std::set<ModelType> { ModelType::Asn1 };
 }
 
-std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(const ::Asn1Acn::Asn1Model *model) const
+std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(const Asn1Model *model) const
 {
     std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
-    for (const std::unique_ptr<Asn1Acn::File> &file : model->data()) {
+    for (const std::unique_ptr<File> &file : model->data()) {
         visitAsn1File(file.get(), *promelaModel);
     }
 
@@ -69,8 +73,7 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
     return result;
 }
 
-void Asn1ToPromelaTranslator::visitAsn1File(
-        ::Asn1Acn::File *file, ::tmc::promela::model::PromelaModel &promelaModel) const
+void Asn1ToPromelaTranslator::visitAsn1File(File *file, PromelaModel &promelaModel) const
 {
     Asn1NodeVisitor visitor(promelaModel);
     visitor.visit(*file);

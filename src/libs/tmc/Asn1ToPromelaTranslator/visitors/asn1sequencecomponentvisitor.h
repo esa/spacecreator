@@ -24,7 +24,7 @@
 #include <tmc/PromelaModel/promelamodel.h>
 #include <tmc/PromelaModel/utype.h>
 
-namespace conversion::tmc::translator {
+namespace tmc::translator {
 /**
  * @brief Visitor for ASN.1 SequenceComponent
  *

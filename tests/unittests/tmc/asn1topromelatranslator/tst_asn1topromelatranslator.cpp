@@ -33,8 +33,8 @@
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/typefactory.h>
-#include <conversion/tmc/Asn1ToPromelaTranslator/translator.h>
-#include <conversion/tmc/Asn1ToPromelaTranslator/visitors/asn1nodevisitor.h>
+#include <tmc/Asn1ToPromelaTranslator/translator.h>
+#include <tmc/Asn1ToPromelaTranslator/visitors/asn1nodevisitor.h>
 #include <tmc/PromelaModel/promelamodel.h>
 
 using Asn1Acn::AsnSequenceComponent;
@@ -59,8 +59,6 @@ using Asn1Acn::Types::Sequence;
 using Asn1Acn::Types::SequenceOf;
 using Asn1Acn::Types::Type;
 using Asn1Acn::Types::TypeFactory;
-using conversion::tmc::translator::Asn1NodeVisitor;
-using conversion::tmc::translator::Asn1ToPromelaTranslator;
 using tmc::promela::model::BasicType;
 using tmc::promela::model::Declaration;
 using tmc::promela::model::PromelaModel;
@@ -68,6 +66,8 @@ using tmc::promela::model::TypeAlias;
 using tmc::promela::model::Utype;
 using tmc::promela::model::UtypeRef;
 using tmc::promela::model::ValueDefinition;
+using tmc::translator::Asn1NodeVisitor;
+using tmc::translator::Asn1ToPromelaTranslator;
 
 namespace tmc::test {
 

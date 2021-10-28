@@ -32,7 +32,7 @@ using tmc::promela::model::Declaration;
 using tmc::promela::model::PromelaModel;
 using tmc::promela::model::Utype;
 
-namespace conversion::tmc::translator {
+namespace tmc::translator {
 Asn1SequenceComponentVisitor::Asn1SequenceComponentVisitor(
         PromelaModel &promelaModel, Utype &utype, QString baseTypeName, QList<QString> &optionalFields)
     : m_promelaModel(promelaModel)

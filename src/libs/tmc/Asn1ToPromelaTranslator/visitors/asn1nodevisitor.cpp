@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "visitors/asn1nodevisitor.h"
+#include "asn1nodevisitor.h"
 
 #include "asn1itemtypevisitor.h"
 
@@ -32,7 +32,7 @@ using Asn1Acn::TypeAssignment;
 using Asn1Acn::ValueAssignment;
 using tmc::promela::model::PromelaModel;
 
-namespace conversion::tmc::translator {
+namespace tmc::translator {
 Asn1NodeVisitor::Asn1NodeVisitor(PromelaModel &promelaModel)
     : m_promelaModel(promelaModel)
 {

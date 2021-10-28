@@ -22,7 +22,7 @@
 #include <asn1library/asn1/visitor.h>
 #include <tmc/PromelaModel/promelamodel.h>
 
-namespace conversion::tmc::translator {
+namespace tmc::translator {
 /**
  * @brief Visitor for top-level ASN.1 nodes.
  *

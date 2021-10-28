@@ -28,7 +28,7 @@ class Definitions;
 class File;
 }
 
-namespace conversion::tmc::translator {
+namespace tmc::translator {
 /**
  * @brief Translate between ASN.1 model and PromelaModel
  */
@@ -43,30 +43,30 @@ public:
      *
      * @return  Promela model translated from the ASN.1 models
      */
-    auto translateModels(std::vector<Model *> sourceModels, const Options &options) const
-            -> std::vector<std::unique_ptr<Model>> override;
+    auto translateModels(std::vector<conversion::Model *> sourceModels, const conversion::Options &options) const
+            -> std::vector<std::unique_ptr<conversion::Model>> override;
 
     /**
      * @brief   Return a model type that is a source of this translator
      *
      * @return  Source model type
      */
-    auto getSourceModelType() const -> ModelType override;
+    auto getSourceModelType() const -> conversion::ModelType override;
     /**
      * @brief   Returns a model type that is a target of this translator
      *
      * @return  Target model type
      */
-    auto getTargetModelType() const -> ModelType override;
+    auto getTargetModelType() const -> conversion::ModelType override;
     /**
      * @brief   Provides a set of all source model types that are required for the translation
      *
      * @return  Set of required models
      */
-    auto getDependencies() const -> std::set<ModelType> override;
+    auto getDependencies() const -> std::set<conversion::ModelType> override;
 
 private:
-    auto translateAsn1Model(const ::Asn1Acn::Asn1Model *model) const -> std::vector<std::unique_ptr<Model>>;
+    auto translateAsn1Model(const ::Asn1Acn::Asn1Model *model) const -> std::vector<std::unique_ptr<conversion::Model>>;
     auto visitAsn1File(::Asn1Acn::File *file, ::tmc::promela::model::PromelaModel &promelaModel) const -> void;
 };
 }
