@@ -89,6 +89,12 @@ const TypeAssignment *Definitions::type(const QString &name) const
     return it != m_typeByNameMap.end() ? it->second : nullptr;
 }
 
+TypeAssignment *Definitions::type(const QString &name)
+{
+    const auto it = m_typeByNameMap.find(name);
+    return it != m_typeByNameMap.end() ? it->second : nullptr;
+}
+
 const ValueAssignment *Definitions::value(const QString &name) const
 {
     const auto it = m_valueByNameMap.find(name);

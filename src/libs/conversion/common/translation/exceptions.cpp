@@ -43,6 +43,11 @@ MissingGenericTypeMappingException::MissingGenericTypeMappingException(
 {
 }
 
+MissingAsn1TypeDefinitionException::MissingAsn1TypeDefinitionException(const QString &asn1TypeName)
+    : TranslationException(QString("Missing ASN.1 type definition '%1'").arg(asn1TypeName))
+{
+}
+
 UnhandledValueException::UnhandledValueException(const QString &enumName)
     : TranslationException(QString("Translator encountered unhandled value %1").arg(enumName))
 {

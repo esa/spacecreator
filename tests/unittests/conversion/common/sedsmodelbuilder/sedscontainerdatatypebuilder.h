@@ -35,6 +35,11 @@ public:
             -> SedsContainerDataTypeBuilder &;
     auto withFixedValueEntry(QString name, QString typeName, QString value) -> SedsContainerDataTypeBuilder &;
 
+    auto withTrailerEntry(QString name, QString typeName) -> SedsContainerDataTypeBuilder &;
+
+    auto setAbstract() -> SedsContainerDataTypeBuilder &;
+    auto setBaseType(QString baseTypeName) -> SedsContainerDataTypeBuilder &;
+
 private:
     seds::model::ContainerDataType m_dataType;
 };

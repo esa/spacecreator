@@ -109,8 +109,11 @@ QString TypeConstraintsReconstructingVisitor::valueFor(const Types::Integer &typ
 
 QString TypeConstraintsReconstructingVisitor::valueFor(const Types::UserdefinedType &type) const
 {
-    TypeConstraintsReconstructingVisitor visitor;
-    type.type()->accept(visitor);
-
-    return visitor.value();
+    if (type.type()) {
+        TypeConstraintsReconstructingVisitor visitor;
+        type.type()->accept(visitor);
+        return visitor.value();
+    } else {
+        return {};
+    }
 }
