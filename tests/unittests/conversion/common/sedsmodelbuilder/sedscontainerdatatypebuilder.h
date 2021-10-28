@@ -31,6 +31,9 @@ public:
 
 public:
     auto withEntry(QString name, QString typeName) -> SedsContainerDataTypeBuilder &;
+    auto withErrorControlEntry(QString name, QString typeName, seds::model::CoreErrorControl errorControl)
+            -> SedsContainerDataTypeBuilder &;
+    auto withFixedValueEntry(QString name, QString typeName, QString value) -> SedsContainerDataTypeBuilder &;
 
 private:
     seds::model::ContainerDataType m_dataType;

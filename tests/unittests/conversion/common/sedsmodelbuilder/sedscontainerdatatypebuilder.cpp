@@ -44,4 +44,30 @@ SedsContainerDataTypeBuilder &SedsContainerDataTypeBuilder::withEntry(QString na
     return *this;
 }
 
+SedsContainerDataTypeBuilder &SedsContainerDataTypeBuilder::withErrorControlEntry(
+        QString name, QString typeName, seds::model::CoreErrorControl errorControl)
+{
+    ErrorControlEntry entry;
+    entry.setName(std::move(name));
+    entry.setType(std::move(typeName));
+    entry.setErrorControl(errorControl);
+
+    m_dataType.addEntry(std::move(entry));
+
+    return *this;
+}
+
+SedsContainerDataTypeBuilder &SedsContainerDataTypeBuilder::withFixedValueEntry(
+        QString name, QString typeName, QString value)
+{
+    FixedValueEntry entry;
+    entry.setName(std::move(name));
+    entry.setType(std::move(typeName));
+    entry.setFixedValue(std::move(value));
+
+    m_dataType.addEntry(std::move(entry));
+
+    return *this;
+}
+
 } // namespace tests::conversion::common
