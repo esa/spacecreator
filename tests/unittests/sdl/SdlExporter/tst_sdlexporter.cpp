@@ -662,7 +662,6 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
                              .withParameter(std::move(parameterA))
                              .withParameter(std::move(parameterB))
                              .withReturnVariableDeclaration(std::move(returnVariable))
-                             // todo: withLocalVariable(ret)
                              .withTransition(SdlTransitionBuilder()
                                                      .withAction(SdlTaskBuilder().withContents("ret := a + b;").build())
                                                      .withAction(SdlTaskBuilder().withContents("a := a + 1;").build())
@@ -737,8 +736,6 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
         "input startProcess(x);",
         "task y := call myProcedure(x, 2);",
         "NEXTSTATE -;",
-        "endstate;",
-        "state Wait;",
         "endstate;",
 
         "endprocess ExampleProcess;",
