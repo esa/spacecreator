@@ -247,6 +247,16 @@ void SdlVisitor::visit(const Procedure &procedure) const
     // write some dummy CIF
     m_stream << "    /* CIF procedure (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "    procedure " << procedure.name() << ";\n";
+
+    // write some dummy CIF
+    m_stream << "        /* CIF TEXT (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "        fpar\n";
+    exportCollection(procedure.parameters());
+    m_stream << "        returns";
+    // TODO: if return type is specified: write it here
+    m_stream << ";\n";
+    m_stream << "        /* CIF ENDTEXT */";
+
     m_stream << "        START;\n";
     if (procedure.transition()->actions().empty()) {
         qWarning("Procedure is empty");
