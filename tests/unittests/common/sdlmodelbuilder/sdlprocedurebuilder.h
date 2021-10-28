@@ -21,9 +21,11 @@
 
 #include <memory>
 #include <sdl/SdlModel/procedure.h>
+#include <sdl/SdlModel/procedureparameter.h>
 #include <sdl/SdlModel/transition.h>
 
 using sdl::Procedure;
+using sdl::ProcedureParameter;
 using sdl::Transition;
 
 namespace tests::common {
@@ -38,6 +40,8 @@ public:
     auto withName(QString name) -> SdlProcedureBuilder &;
 
     auto withTransition(std::unique_ptr<Transition> transition) -> SdlProcedureBuilder &;
+
+    auto withParameter(std::unique_ptr<ProcedureParameter> parameter) -> SdlProcedureBuilder &;
 
 private:
     std::unique_ptr<Procedure> m_procedure;

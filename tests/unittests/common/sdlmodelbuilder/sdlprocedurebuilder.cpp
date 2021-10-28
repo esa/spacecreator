@@ -47,4 +47,11 @@ SdlProcedureBuilder &SdlProcedureBuilder::withTransition(std::unique_ptr<Transit
     return *this;
 }
 
+SdlProcedureBuilder &SdlProcedureBuilder::withParameter(std::unique_ptr<ProcedureParameter> parameter)
+{
+    m_procedure->addParameter(std::move(parameter));
+
+    return *this;
+}
+
 } // namespace tests::common
