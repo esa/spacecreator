@@ -38,6 +38,16 @@ void ProcedureCall::setProcedure(Procedure *procedure)
     m_procedureDeclaration = procedure;
 }
 
+const std::vector<ProcedureCall::Argument> &ProcedureCall::arguments() const
+{
+    return m_arguments;
+}
+
+void ProcedureCall::addArgument(Argument argument)
+{
+    m_arguments.push_back(std::move(argument));
+}
+
 void ProcedureCall::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
