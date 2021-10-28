@@ -576,7 +576,7 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
         "START;",
         "task 'TASK INSIDE PROCEDURE';",
         "task 'SECOND TASK INSIDE PROCEDURE';",
-        "return;",
+        "return ;",
         "endprocedure;",
 
         "START;",
@@ -745,7 +745,7 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
 
 void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
 {
-    QString modelName = "ProcedureNoReturn";
+    QString modelName = "ReturnlessProcedure";
     QString modelPrefix = "Sdl_";
     QString processName = "ExampleProcess";
 
@@ -765,15 +765,14 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
     parameterB->setType("MyInteger");
     parameterB->setDirection("in");
 
-    auto procedure =
-            SdlProcedureBuilder()
-                    .withName("myProcedure")
-                    .withParameter(std::move(parameterA))
-                    .withParameter(std::move(parameterB))
-                    .withTransition(SdlTransitionBuilder()
-                                            .withAction(SdlTaskBuilder().withContents("'EXAMPLE TASK'").build())
-                                            .build())
-                    .build();
+    auto procedure = SdlProcedureBuilder()
+                             .withName("returnlessProcedure")
+                             .withParameter(std::move(parameterA))
+                             .withParameter(std::move(parameterB))
+                             .withTransition(SdlTransitionBuilder()
+                                                     .withAction(SdlTaskBuilder().withContents("'EXAMPLE'").build())
+                                                     .build())
+                             .build();
 
     auto transition = SdlTransitionBuilder()
                               .withAction(SdlProcedureCallBuilder()
@@ -787,8 +786,8 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
     auto state = SdlStateBuilder("Wait")
                          .withInput(SdlInputBuilder()
                                             .withName("startProcess")
-                                            .withTransition(transition.get())
                                             .withParameter(&varXRef)
+                                            .withTransition(transition.get())
                                             .build())
                          .build();
 
@@ -826,14 +825,13 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
 
         "dcl x MyInteger;",
 
-        "procedure myProcedure;",
+        "procedure returnlessProcedure;",
         "fpar",
         "in a MyInteger,",
         "in b MyInteger;",
-        "returns ;",
         "START;",
-        "task 'EXAMPLE TASK'",
-        "returns ;",
+        "task 'EXAMPLE'",
+        "return ;",
         "endprocedure;",
 
         "START;",
