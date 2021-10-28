@@ -235,6 +235,9 @@ private:
      */
     auto translateFalseValue(seds::model::FalseValue falseValue, Asn1Acn::Types::Boolean *asn1Type) const -> void;
 
+    auto addContainerChildrenField(Asn1Acn::Types::Sequence *asn1Sequence) const -> void;
+    auto updateBaseContainer(const QString sedsBaseTypeName, Asn1Acn::Types::Sequence *asn1Sequence) -> void;
+
     /**
      * @brief   Converts SEDS byte order
      *
@@ -243,6 +246,10 @@ private:
      * @return  ASN.1 endiannes
      */
     auto convertByteOrder(seds::model::ByteOrder sedsByteOrder) const -> Asn1Acn::Types::Endianness;
+
+private:
+    inline static const QString m_childrenComponentsName = "sedsChildren";
+    inline static const QString m_childrenComponentsAlternativeNameTemplate = "child%1";
 };
 
 } // namespace conversion::asn1::translator

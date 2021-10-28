@@ -38,6 +38,7 @@
 #include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/package/package.h>
 
+using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredDataTypeException;
 using conversion::translator::UnhandledValueException;
@@ -101,11 +102,14 @@ void EntryTranslatorVisitor::operator()(const seds::model::PaddingEntry &sedsEnt
 std::unique_ptr<Asn1Acn::Types::UserdefinedType> EntryTranslatorVisitor::translateEntryType(
         const QString &sedsTypeName) const
 {
-    const auto *asn1ReferencedType = m_asn1Definitions->type(sedsTypeName)->type();
+    const auto *asn1ReferencedType = m_asn1Definitions->type(sedsTypeName);
+    if (!asn1ReferencedType || !asn1ReferencedType->type()) {
+        throw MissingAsn1TypeDefinitionException(sedsTypeName);
+    }
 
     auto asn1EntryType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
-            asn1ReferencedType->identifier(), m_asn1Definitions->name());
-    asn1EntryType->setType(asn1ReferencedType->clone());
+            asn1ReferencedType->type()->identifier(), m_asn1Definitions->name());
+    asn1EntryType->setType(asn1ReferencedType->type()->clone());
 
     return asn1EntryType;
 }

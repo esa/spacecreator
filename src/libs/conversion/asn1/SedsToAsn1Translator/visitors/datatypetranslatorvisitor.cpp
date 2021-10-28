@@ -24,12 +24,14 @@
 #include "visitors/integerrangetranslatorvisitor.h"
 
 #include <QDebug>
+#include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/typeassignment.h>
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
+#include <asn1library/asn1/types/choice.h>
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/ia5string.h>
 #include <asn1library/asn1/types/integer.h>
@@ -39,8 +41,10 @@
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <asn1library/asn1/values.h>
 #include <conversion/common/translation/exceptions.h>
+#include <iostream>
 #include <seds/SedsModel/package/package.h>
 
+using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::TranslationException;
 using conversion::translator::UnhandledValueException;
 using conversion::translator::UnsupportedValueException;
@@ -117,10 +121,20 @@ void DataTypeTranslatorVisitor::operator()(const BooleanDataType &sedsType)
 void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 {
     auto type = std::make_unique<Asn1Acn::Types::Sequence>(sedsType.nameStr());
-
     EntryTranslatorVisitor visitor { m_asn1Definitions, type };
+
     for (const auto &entry : sedsType.entries()) {
         std::visit(visitor, entry);
+    }
+    if (sedsType.isAbstract()) {
+        addContainerChildrenField(type.get());
+    }
+    for (const auto &trailerEntry : sedsType.trailerEntries()) {
+        std::visit(visitor, trailerEntry);
+    }
+
+    if (const auto &sedsBaseType = sedsType.baseType(); sedsBaseType) {
+        updateBaseContainer(sedsBaseType->nameStr(), type.get());
     }
 
     m_asn1Type = std::move(type);
@@ -354,6 +368,10 @@ void DataTypeTranslatorVisitor::translateArrayType(
         const QString &sedsTypeName, Asn1Acn::Types::SequenceOf *asn1Type) const
 {
     const auto *asn1ReferencedType = m_asn1Definitions->type(sedsTypeName)->type();
+    if (!asn1ReferencedType) {
+        throw MissingAsn1TypeDefinitionException(sedsTypeName);
+    }
+
     auto asn1ItemType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
             asn1ReferencedType->identifier(), m_asn1Definitions->name());
     asn1ItemType->setType(asn1ReferencedType->clone());
@@ -410,6 +428,44 @@ void DataTypeTranslatorVisitor::translateFalseValue(
         throw UnhandledValueException("FalseValue");
         break;
     }
+}
+
+void DataTypeTranslatorVisitor::addContainerChildrenField(Asn1Acn::Types::Sequence *asn1Sequence) const
+{
+    auto asn1ChoiceType = std::make_unique<Asn1Acn::Types::Choice>();
+    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(m_childrenComponentsName,
+            m_childrenComponentsName, false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(asn1ChoiceType));
+
+    asn1Sequence->addComponent(std::move(sequenceComponent));
+}
+
+void DataTypeTranslatorVisitor::updateBaseContainer(
+        const QString sedsBaseTypeName, Asn1Acn::Types::Sequence *asn1Sequence)
+{
+    auto *asn1BaseSequence =
+            dynamic_cast<Asn1Acn::Types::Sequence *>(m_asn1Definitions->type(sedsBaseTypeName)->type());
+    if (!asn1BaseSequence) {
+        throw MissingAsn1TypeDefinitionException(sedsBaseTypeName);
+    }
+
+    auto *asn1ChildrenComponent = asn1BaseSequence->component(m_childrenComponentsName);
+    if (!asn1ChildrenComponent) {
+        auto errorMessage = QString("Missing %1 component in the '%2' base component")
+                                    .arg(m_childrenComponentsName)
+                                    .arg(sedsBaseTypeName);
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    auto *asn1ChildrenChoice = dynamic_cast<Asn1Acn::Types::Choice *>(asn1ChildrenComponent->type());
+    const auto asn1ChildrenChoiceAlternativeName =
+            m_childrenComponentsAlternativeNameTemplate.arg(asn1Sequence->identifier());
+
+    auto asn1SequenceReference =
+            std::make_unique<Asn1Acn::Types::UserdefinedType>(asn1Sequence->identifier(), m_asn1Definitions->name());
+    auto asn1ChildrenChoiceAlternative = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(
+            asn1ChildrenChoiceAlternativeName, asn1ChildrenChoiceAlternativeName, asn1ChildrenChoiceAlternativeName,
+            asn1ChildrenChoiceAlternativeName, "", Asn1Acn::SourceLocation(), std::move(asn1SequenceReference));
+    asn1ChildrenChoice->addComponent(std::move(asn1ChildrenChoiceAlternative));
 }
 
 Asn1Acn::Types::Endianness DataTypeTranslatorVisitor::convertByteOrder(seds::model::ByteOrder sedsByteOrder) const

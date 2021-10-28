@@ -80,20 +80,30 @@ void DataTypesDependencyResolver::visitArray(const seds::model::ArrayDataType &a
 
 void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDataType &containerDataType)
 {
-    for (const auto &containerEntry : containerDataType.entries()) {
-        std::visit(
-                [this](auto &&entry) {
-                    using T = std::decay_t<decltype(entry)>;
-                    if constexpr (std::is_same_v<T, seds::model::PaddingEntry>) {
-                        return;
-                    } else {
-                        const auto &entryDataTypeRef = entry.type();
-                        const auto *entryDataType = findDataType(entryDataTypeRef);
+    const auto visitor = [this](auto &&entry) {
+        using T = std::decay_t<decltype(entry)>;
+        if constexpr (std::is_same_v<T, seds::model::PaddingEntry>) {
+            return;
+        } else {
+            const auto &entryDataTypeRef = entry.type();
+            const auto *entryDataType = findDataType(entryDataTypeRef);
 
-                        visit(entryDataType);
-                    }
-                },
-                containerEntry);
+            visit(entryDataType);
+        }
+    };
+
+    for (const auto &containerEntry : containerDataType.entries()) {
+        std::visit(visitor, containerEntry);
+    }
+    for (const auto &containerTrailerEntry : containerDataType.trailerEntries()) {
+        std::visit(visitor, containerTrailerEntry);
+    }
+
+    const auto &baseTypeRef = containerDataType.baseType();
+    if (baseTypeRef) {
+        const auto *baseType = findDataType(*baseTypeRef);
+
+        visit(baseType);
     }
 }
 

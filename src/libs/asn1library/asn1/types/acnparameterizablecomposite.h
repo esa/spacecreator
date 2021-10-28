@@ -44,6 +44,7 @@ public:
 
     const Components &components() const { return m_components; }
     const T *component(const QString &name) const;
+    T *component(const QString &name);
     void addComponent(std::unique_ptr<T> component);
 
     const AcnParameterPtrs &acnParameters() const { return m_parameters; }
@@ -56,6 +57,15 @@ protected:
 
 template<typename T>
 inline const T *AcnParameterizableCollection<T>::component(const QString &name) const
+{
+    auto found = find_if(
+            m_components.begin(), m_components.end(), [name](const auto &item) { return item->name() == name; });
+
+    return found == m_components.end() ? nullptr : (*found).get();
+}
+
+template<typename T>
+inline T *AcnParameterizableCollection<T>::component(const QString &name)
 {
     auto found = find_if(
             m_components.begin(), m_components.end(), [name](const auto &item) { return item->name() == name; });

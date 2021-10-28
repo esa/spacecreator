@@ -60,6 +60,7 @@ public:
 
     const Types &types() const { return m_types; }
     const TypeAssignment *type(const QString &name) const;
+    TypeAssignment *type(const QString &name);
     const Values &values() const { return m_values; }
     const ValueAssignment *value(const QString &name) const;
     const ImportedTypes &importedTypes() const { return m_importedTypes; }

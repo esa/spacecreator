@@ -26,6 +26,7 @@
 #include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
+#include <asn1library/asn1/types/choice.h>
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/ia5string.h>
 #include <asn1library/asn1/types/integer.h>
@@ -86,6 +87,7 @@ private Q_SLOTS:
     void testTranslateContainerSimpleWithEntry();
     void testTranslateContainerSimpleWithErrorControlEntry();
     void testTranslateContainerSimpleWithFixedValueEntry();
+    void testTranslateContainerExtensionOneLevel();
     void testTranslateEnumeratedDataType();
     void testTranslateIntegerDataType();
     void testTranslateFloatDataType();
@@ -396,14 +398,14 @@ void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithEntry()
 {
     // clang-format off
     auto container = SedsContainerDataTypeBuilder("SimpleContainer")
-                               .withEntry("entry", "Integer")
-                           .build();
+                        .withEntry("entry", "Integer")
+                     .build();
     // clang-format on
     // clang-format off
     const auto &sedsModel = SedsModelBuilder("Model")
-                               .withContainerDataType(std::move(container))
-                               .withIntegerDataType("Integer")
-                           .build();
+                                .withContainerDataType(std::move(container))
+                                .withIntegerDataType("Integer")
+                            .build();
     // clang-format on
 
     Options options;
@@ -449,14 +451,14 @@ void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithErrorControlEntry
 {
     // clang-format off
     auto container = SedsContainerDataTypeBuilder("SimpleContainer")
-                               .withErrorControlEntry("errorControlEntry", "CrcData", CoreErrorControl::Crc16)
-                           .build();
+                        .withErrorControlEntry("errorControlEntry", "CrcData", CoreErrorControl::Crc16)
+                     .build();
     // clang-format on
     // clang-format off
     const auto &sedsModel = SedsModelBuilder("Model")
-                               .withContainerDataType(std::move(container))
-                               .withIntegerDataType("CrcData")
-                           .build();
+                                .withContainerDataType(std::move(container))
+                                .withIntegerDataType("CrcData")
+                            .build();
     // clang-format on
 
     Options options;
@@ -499,14 +501,14 @@ void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithFixedValueEntry()
 {
     // clang-format off
     auto container = SedsContainerDataTypeBuilder("SimpleContainer")
-                               .withFixedValueEntry("fixedValueEntry", "Integer", "10")
-                           .build();
+                        .withFixedValueEntry("fixedValueEntry", "Integer", "10")
+                    .build();
     // clang-format on
     // clang-format off
     const auto &sedsModel = SedsModelBuilder("Model")
-                               .withContainerDataType(std::move(container))
-                               .withIntegerDataType("Integer")
-                           .build();
+                                .withContainerDataType(std::move(container))
+                                .withIntegerDataType("Integer")
+                            .build();
     // clang-format on
 
     Options options;
@@ -559,6 +561,80 @@ void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithFixedValueEntry()
     QVERIFY(entryComponentTypeValueRangeConstraint);
     QVERIFY(entryComponentTypeValueRangeConstraint->range().isSingleItem());
     QCOMPARE(entryComponentTypeValueRangeConstraint->range().begin(), 10);
+}
+
+void tst_SedsToAsn1Translator::testTranslateContainerExtensionOneLevel()
+{
+    // clang-format off
+    auto parentContainer = SedsContainerDataTypeBuilder("ParentContainer")
+                                .setAbstract()
+                                .withEntry("field", "Integer")
+                                .withTrailerEntry("trailing", "Integer")
+                           .build();
+
+    auto childContainer1 = SedsContainerDataTypeBuilder("ChildContainer1")
+                                .setBaseType("ParentContainer")
+                                .withEntry("intA", "Integer")
+                           .build();
+
+    auto childContainer2 = SedsContainerDataTypeBuilder("ChildContainer2")
+                                .setBaseType("ParentContainer")
+                                .withEntry("intB", "Integer")
+                           .build();
+
+    const auto &sedsModel = SedsModelBuilder("Model")
+                                .withContainerDataType(std::move(childContainer1))
+                                .withContainerDataType(std::move(childContainer2))
+                                .withContainerDataType(std::move(parentContainer))
+                                .withIntegerDataType("Integer")
+                            .build();
+    // clang-format on
+
+    Options options;
+    SedsToAsn1Translator translator;
+
+    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), ModelType::Asn1);
+
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+    QVERIFY(asn1Model);
+
+    const auto *parentType = getType(asn1Model, 1);
+    QVERIFY(parentType);
+
+    const auto *parentSequence = dynamic_cast<const Types::Sequence *>(parentType);
+    QVERIFY(parentSequence);
+    QCOMPARE(parentSequence->identifier(), "ParentContainer");
+    QCOMPARE(parentSequence->typeName(), "SEQUENCE");
+
+    const auto &parentComponents = parentSequence->components();
+    QCOMPARE(parentComponents.size(), 3);
+
+    const auto &fieldComponent = parentComponents.at(0);
+    QVERIFY(fieldComponent);
+    QCOMPARE(fieldComponent->name(), "field");
+
+    const auto &sedsChildrenComponent = parentComponents.at(1);
+    QVERIFY(sedsChildrenComponent);
+    QVERIFY(sedsChildrenComponent->type());
+    QCOMPARE(sedsChildrenComponent->name(), "sedsChildren");
+
+    const auto &sedsChildrenChoice = dynamic_cast<const Types::Choice *>(sedsChildrenComponent->type());
+    QVERIFY(sedsChildrenChoice);
+
+    const auto &sedsChildrenChoiceAlternatives = sedsChildrenChoice->components();
+    QCOMPARE(sedsChildrenChoiceAlternatives.size(), 2);
+    QCOMPARE(sedsChildrenChoiceAlternatives.at(0)->name(), "childChildContainer1");
+    QVERIFY(sedsChildrenChoiceAlternatives.at(0)->type());
+    QCOMPARE(sedsChildrenChoiceAlternatives.at(1)->name(), "childChildContainer2");
+    QVERIFY(sedsChildrenChoiceAlternatives.at(1)->type());
+
+    const auto &trailingComponent = parentComponents.at(2);
+    QVERIFY(trailingComponent);
+    QCOMPARE(trailingComponent->name(), "trailing");
 }
 
 void tst_SedsToAsn1Translator::testTranslateEnumeratedDataType()
