@@ -23,7 +23,7 @@
 #include <optional>
 #include <tmc/PromelaModel/promelamodel.h>
 
-namespace conversion::tmc::translator {
+namespace tmc::translator {
 /**
  * @brief Visitor for type in SequenceOf
  *

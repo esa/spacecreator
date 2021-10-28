@@ -33,4 +33,4 @@ target_link_libraries(Asn1ToPromelaTranslator
 add_format_target(Asn1ToPromelaTranslator)
 add_tidy_target(Asn1ToPromelaTranslator)
 
-add_library(Conversion::Asn1ToPromelaTranslator ALIAS Asn1ToPromelaTranslator)
+add_library(TMC::Asn1ToPromelaTranslator ALIAS Asn1ToPromelaTranslator)

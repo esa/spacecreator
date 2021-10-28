@@ -67,7 +67,7 @@ using tmc::promela::model::Utype;
 using tmc::promela::model::UtypeRef;
 using tmc::promela::model::ValueDefinition;
 
-namespace conversion::tmc::translator {
+namespace tmc::translator {
 Asn1ItemTypeVisitor::Asn1ItemTypeVisitor(PromelaModel &promelaModel, std::optional<QString> baseTypeName, QString name)
     : m_promelaModel(promelaModel)
     , m_baseTypeName(std::move(baseTypeName))

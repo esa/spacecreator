@@ -22,7 +22,7 @@
 using Asn1Acn::IntegerValue;
 using Asn1Acn::Range;
 
-namespace conversion::tmc::translator {
+namespace tmc::translator {
 Asn1SizeVisitor::Asn1SizeVisitor()
     : m_sizeVisited(false)
     , m_minSize(0)

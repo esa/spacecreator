@@ -31,7 +31,7 @@
 #include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/values.h>
 
-namespace conversion::tmc::translator {
+namespace tmc::translator {
 /**
  * @brief Visitor for ASN.1 constraints
  *
