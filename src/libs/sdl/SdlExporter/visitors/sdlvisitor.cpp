@@ -270,9 +270,14 @@ void SdlVisitor::visit(const Procedure &procedure) const
     }
 
     m_stream << "        returns";
-    // TODO: if return type is specified: write it here
+    if (procedure.returnVariableDeclaration() != nullptr) {
+        m_stream << QString(" %1").arg(procedure.returnVariableDeclaration()->type());
+    }
     m_stream << ";\n";
-    m_stream << "        /* CIF ENDTEXT */";
+    if (procedure.returnVariableDeclaration() != nullptr) {
+        visit(*procedure.returnVariableDeclaration());
+    }
+    m_stream << "        /* CIF ENDTEXT */\n";
 
     m_stream << "        START;\n";
     if (procedure.transition()->actions().empty()) {
@@ -281,9 +286,9 @@ void SdlVisitor::visit(const Procedure &procedure) const
         exportCollection(procedure.transition()->actions());
     }
     m_stream << "        return";
-    // TODO if (procedure.returnVariable() != "") {
-    //     m_stream << " " << procedure.returnVariable();
-    // }
+    if (procedure.returnVariableDeclaration() != nullptr) {
+        m_stream << " " << procedure.returnVariableDeclaration()->name();
+    }
     m_stream << ";\n";
     m_stream << "    endprocedure;\n";
 }
