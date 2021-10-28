@@ -39,7 +39,7 @@ public:
 
     auto withProcedure(Procedure *procedure) -> SdlProcedureCallBuilder &;
 
-    // todo withParameter
+    auto withArgument(ProcedureCall::Argument argument) -> SdlProcedureCallBuilder &;
 
 private:
     std::unique_ptr<ProcedureCall> m_procedureCall;

@@ -38,4 +38,11 @@ SdlProcedureCallBuilder &SdlProcedureCallBuilder::withProcedure(Procedure *const
     return *this;
 }
 
+SdlProcedureCallBuilder &SdlProcedureCallBuilder::withArgument(ProcedureCall::Argument argument)
+{
+    m_procedureCall->addArgument(std::move(argument));
+
+    return *this;
+}
+
 } // namespace tests::common
