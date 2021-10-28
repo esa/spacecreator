@@ -269,9 +269,9 @@ void SdlVisitor::visit(const Procedure &procedure) const
         m_stream << ";\n";
     }
 
-    m_stream << "        returns";
+    m_stream << "        returns ";
     if (procedure.returnVariableDeclaration() != nullptr) {
-        m_stream << QString(" %1").arg(procedure.returnVariableDeclaration()->type());
+        m_stream << procedure.returnVariableDeclaration()->type();
     }
     m_stream << ";\n";
     if (procedure.returnVariableDeclaration() != nullptr) {
@@ -285,9 +285,9 @@ void SdlVisitor::visit(const Procedure &procedure) const
     } else {
         exportCollection(procedure.transition()->actions());
     }
-    m_stream << "        return";
+    m_stream << "        return ";
     if (procedure.returnVariableDeclaration() != nullptr) {
-        m_stream << " " << procedure.returnVariableDeclaration()->name();
+        m_stream << procedure.returnVariableDeclaration()->name();
     }
     m_stream << ";\n";
     m_stream << "    endprocedure;\n";
