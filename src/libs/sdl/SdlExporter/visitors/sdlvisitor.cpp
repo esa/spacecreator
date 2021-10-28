@@ -251,7 +251,24 @@ void SdlVisitor::visit(const Procedure &procedure) const
     // write some dummy CIF
     m_stream << "        /* CIF TEXT (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "        fpar\n";
-    exportCollection(procedure.parameters());
+
+    auto &procedureParameters = procedure.parameters();
+    if (!procedureParameters.empty()) {
+        QString fpars = QString("            %1 %2 %3")
+                                .arg(procedureParameters[0]->direction())
+                                .arg(procedureParameters[0]->name())
+                                .arg(procedureParameters[0]->type());
+        for (auto it = std::next(procedureParameters.begin()); it != procedureParameters.end(); it++) {
+            fpars = fpars
+                    + QString(",\n            %1 %2 %3")
+                              .arg(it->get()->direction())
+                              .arg(it->get()->name())
+                              .arg(it->get()->type());
+        }
+        m_stream << fpars;
+        m_stream << ";\n";
+    }
+
     m_stream << "        returns";
     // TODO: if return type is specified: write it here
     m_stream << ";\n";
