@@ -67,7 +67,6 @@ public:
 
 private:
     auto translateAsn1Model(const ::Asn1Acn::Asn1Model *model) const -> std::vector<std::unique_ptr<Model>>;
-    auto visitAsn1File(const std::unique_ptr<::Asn1Acn::File> &file,
-            ::tmc::promela::model::PromelaModel &promelaModel) const -> void;
+    auto visitAsn1File(::Asn1Acn::File *file, ::tmc::promela::model::PromelaModel &promelaModel) const -> void;
 };
 }
