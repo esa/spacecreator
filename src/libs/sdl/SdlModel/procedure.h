@@ -90,6 +90,20 @@ public:
     auto addParameter(std::unique_ptr<ProcedureParameter> parameter) -> void;
 
     /**
+     * @brief   Getter for the return variable declaration
+     *
+     * @return  return variable declaration
+     */
+    auto returnVariableDeclaration() const -> VariableDeclaration *;
+
+    /**
+     * @brief   Setter for the return variable declaration
+     *
+     * @param   declaration     return variable declaration
+     */
+    auto setReturnVariableDeclaration(std::unique_ptr<VariableDeclaration> declaration) -> void;
+
+    /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */
     virtual auto accept(Visitor &visitor) const -> void override;
@@ -97,6 +111,7 @@ public:
 private:
     std::unique_ptr<Transition> m_implementation;
     std::vector<std::unique_ptr<ProcedureParameter>> m_parameters;
+    std::unique_ptr<VariableDeclaration> m_returnVariableDeclaration;
 };
 
 } // namespace sdl

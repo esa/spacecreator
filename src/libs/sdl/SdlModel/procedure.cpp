@@ -48,6 +48,16 @@ void Procedure::addParameter(std::unique_ptr<ProcedureParameter> parameter)
     m_parameters.push_back(std::move(parameter));
 }
 
+VariableDeclaration *Procedure::returnVariableDeclaration() const
+{
+    return m_returnVariableDeclaration.get();
+}
+
+void Procedure::setReturnVariableDeclaration(std::unique_ptr<VariableDeclaration> declaration)
+{
+    m_returnVariableDeclaration = std::move(declaration);
+}
+
 void Procedure::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
