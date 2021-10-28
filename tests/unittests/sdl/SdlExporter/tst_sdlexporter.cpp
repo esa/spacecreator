@@ -621,44 +621,58 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParams()
     auto variableX = std::make_unique<VariableDeclaration>();
     variableX->setName("x");
     variableX->setType("MyInteger");
-    auto varXRef = std::make_unique<VariableReference>();
-    // start here
+    VariableReference varXRef;
+    varXRef.setDeclaration(variableX.get());
 
     auto variableY = std::make_unique<VariableDeclaration>();
     variableY->setName("y");
     variableY->setType("MyInteger");
+    VariableReference varYRef;
+    varYRef.setDeclaration(variableY.get());
 
-    auto procedure =
-            SdlProcedureBuilder()
-                    .withName("myProcedure")
-                    .withTransition(
-                            SdlTransitionBuilder()
-                                    .withAction(SdlTaskBuilder().withContents("'TASK INSIDE PROCEDURE'").build())
-                                    .withAction(SdlTaskBuilder().withContents("'SECOND TASK INSIDE PROCEDURE'").build())
-                                    .build())
-                    .build();
+    auto procedure = SdlProcedureBuilder()
+                             .withName("myProcedure")
+                             // todo: withParameter(in/out a)
+                             // todo: withParameter(in b)
+                             // todo: withReturnType(out ret)
+                             // todo: withLocalVariable(ret)
+                             .withTransition(SdlTransitionBuilder()
+                                                     .withAction(SdlTaskBuilder().withContents("ret := a + b;").build())
+                                                     .withAction(SdlTaskBuilder().withContents("a := a + 1;").build())
+                                                     .build())
+                             .build();
 
-    auto transition1 = SdlTransitionBuilder()
-                               .withOutput(SdlOutputBuilder().withName("parameterlessOutput").build())
-                               .withAction(SdlProcedureCallBuilder().withProcedure(procedure.get()).build())
-                               .withNextStateAction()
-                               .build();
-    auto someInput = SdlInputBuilder().withName("startProcess").withTransition(transition1.get()).build();
-    auto state1 = SdlStateBuilder("Wait")
-                          .withInput(std::move(someInput))
-                          .withContinuousSignal(std::make_unique<ContinuousSignal>())
-                          .build();
+    auto transition = SdlTransitionBuilder()
+                              .withAction(SdlProcedureCallBuilder() //
+                                                  .withProcedure(procedure.get())
+                                                  // todo: withArgument(varXRef)
+                                                  // todo: withArgument(literalRef)
+                                                  .build())
+                              .withAction(SdlTaskBuilder().withContents("y := call myProcedure(x, 2);").build())
+                              .withNextStateAction()
+                              .build();
+    auto someInput = SdlInputBuilder() //
+                             .withName("startProcess")
+                             .withTransition(transition.get())
+                             .withParameter(&varXRef)
+                             .build();
+    auto state = SdlStateBuilder("Wait")
+                         .withInput(std::move(someInput))
+                         .withContinuousSignal(std::make_unique<ContinuousSignal>())
+                         .build();
 
     auto referenceOutput = SdlOutputBuilder().withName("referenceOutput").build();
 
-    auto startTransition = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
+    auto startTransition = SdlTransitionBuilder().withNextStateAction(state.get()).build();
 
     auto process = SdlProcessBuilder(processName)
+                           .withVariable(std::move(variableX))
+                           .withVariable(std::move(variableY))
                            .withProcedure(std::move(procedure))
                            .withStartTransition(std::move(startTransition))
                            .withStateMachine(SdlStateMachineBuilder()
-                                                     .withState(std::move(state1))
-                                                     .withTransition(std::move(transition1))
+                                                     .withState(std::move(state))
+                                                     .withTransition(std::move(transition))
                                                      .build())
                            .build();
 
