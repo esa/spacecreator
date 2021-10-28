@@ -61,7 +61,7 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
 {
     std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
     for (const std::unique_ptr<Asn1Acn::File> &file : model->data()) {
-        visitAsn1File(file, *promelaModel);
+        visitAsn1File(file.get(), *promelaModel);
     }
 
     std::vector<std::unique_ptr<Model>> result;
@@ -70,7 +70,7 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
 }
 
 void Asn1ToPromelaTranslator::visitAsn1File(
-        const std::unique_ptr<::Asn1Acn::File> &file, ::tmc::promela::model::PromelaModel &promelaModel) const
+        ::Asn1Acn::File *file, ::tmc::promela::model::PromelaModel &promelaModel) const
 {
     Asn1NodeVisitor visitor(promelaModel);
     visitor.visit(*file);

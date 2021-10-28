@@ -27,51 +27,52 @@ conversion::ModelType PromelaModel::modelType() const
 
 void PromelaModel::addMtype(const QString &value)
 {
-    m_mtype_values.insert(value);
+    m_mtypeValues.insert(value);
 }
 
 const QSet<QString> &PromelaModel::getMtypeValues() const noexcept
 {
-    return m_mtype_values;
+    return m_mtypeValues;
 }
 
 void PromelaModel::addNamedMtype(const NamedMtype &mtype)
 {
     const QString &name = mtype.getName();
-    m_named_m_type_values.emplace(name, mtype);
+    m_namedMtypeValues.emplace(name, mtype);
 }
 
 const std::map<QString, NamedMtype> &PromelaModel::getNamedMtypeValues() const noexcept
 {
-    return m_named_m_type_values;
+    return m_namedMtypeValues;
 }
 
 void PromelaModel::addUtype(const Utype &utype)
 {
-    m_user_types.append(utype);
+    m_userTypes.append(utype);
 }
 
 const QList<Utype> &PromelaModel::getUtypes() const noexcept
 {
-    return m_user_types;
+    return m_userTypes;
 }
 
 void PromelaModel::addTypeAlias(const TypeAlias &alias)
 {
-    m_type_aliases.append(alias);
+    m_typeAliases.append(alias);
 }
 
 const QList<TypeAlias> &PromelaModel::getTypeAliases() const noexcept
 {
-    return m_type_aliases;
+    return m_typeAliases;
 }
+
 void PromelaModel::addValueDefinition(const ValueDefinition &value)
 {
-    m_value_definitions.append(value);
+    m_valueDefinitions.append(value);
 }
 
 const QList<ValueDefinition> &PromelaModel::getValueDefinitions() const noexcept
 {
-    return m_value_definitions;
+    return m_valueDefinitions;
 }
 }

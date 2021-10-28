@@ -141,33 +141,33 @@ void tst_Asn1ToPromelaTranslator::testBasicTypes()
     Asn1NodeVisitor visitor(promelaModel);
     visitor.visit(*model);
 
-    QCOMPARE(0, promelaModel.getMtypeValues().size());
-    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
-    QCOMPARE(0, promelaModel.getUtypes().size());
-    QCOMPARE(0, promelaModel.getValueDefinitions().size());
-    QCOMPARE(4, promelaModel.getTypeAliases().size());
+    QCOMPARE(promelaModel.getMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getUtypes().size(), 0);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 0);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 4);
 
     const QList<TypeAlias> aliases = promelaModel.getTypeAliases();
 
     const TypeAlias &expectedInteger = aliases.at(0);
-    QCOMPARE("myInteger", expectedInteger.getName());
+    QCOMPARE(expectedInteger.getName(), "myInteger");
     QVERIFY(std::holds_alternative<BasicType>(expectedInteger.getType()));
-    QCOMPARE(BasicType::INT, std::get<BasicType>(expectedInteger.getType()));
+    QCOMPARE(std::get<BasicType>(expectedInteger.getType()), BasicType::INT);
 
     const TypeAlias &expectedReal = aliases.at(1);
-    QCOMPARE("myReal", expectedReal.getName());
+    QCOMPARE(expectedReal.getName(), "myReal");
     QVERIFY(std::holds_alternative<BasicType>(expectedReal.getType()));
-    QCOMPARE(BasicType::FLOAT, std::get<BasicType>(expectedReal.getType()));
+    QCOMPARE(std::get<BasicType>(expectedReal.getType()), BasicType::FLOAT);
 
     const TypeAlias &expectedBoolean = aliases.at(2);
-    QCOMPARE("myBoolean", expectedBoolean.getName());
+    QCOMPARE(expectedBoolean.getName(), "myBoolean");
     QVERIFY(std::holds_alternative<BasicType>(expectedBoolean.getType()));
-    QCOMPARE(BasicType::BOOLEAN, std::get<BasicType>(expectedBoolean.getType()));
+    QCOMPARE(std::get<BasicType>(expectedBoolean.getType()), BasicType::BOOLEAN);
 
     const TypeAlias &expectedNull = aliases.at(3);
-    QCOMPARE("myNull", expectedNull.getName());
+    QCOMPARE(expectedNull.getName(), "myNull");
     QVERIFY(std::holds_alternative<BasicType>(expectedNull.getType()));
-    QCOMPARE(BasicType::BIT, std::get<BasicType>(expectedNull.getType()));
+    QCOMPARE(std::get<BasicType>(expectedNull.getType()), BasicType::BIT);
 }
 
 void tst_Asn1ToPromelaTranslator::testEnumerated()
@@ -187,30 +187,30 @@ void tst_Asn1ToPromelaTranslator::testEnumerated()
     Asn1NodeVisitor visitor(promelaModel);
     visitor.visit(*model);
 
-    QCOMPARE(0, promelaModel.getMtypeValues().size());
-    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
-    QCOMPARE(0, promelaModel.getUtypes().size());
-    QCOMPARE(1, promelaModel.getTypeAliases().size());
-    QCOMPARE(3, promelaModel.getValueDefinitions().size());
+    QCOMPARE(promelaModel.getMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getUtypes().size(), 0);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 1);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 3);
 
     const TypeAlias &expectedTypeAlias = promelaModel.getTypeAliases().at(0);
-    QCOMPARE("myType", expectedTypeAlias.getName());
+    QCOMPARE(expectedTypeAlias.getName(), "myType");
     QVERIFY(std::holds_alternative<BasicType>(expectedTypeAlias.getType()));
-    QCOMPARE(BasicType::INT, std::get<BasicType>(expectedTypeAlias.getType()));
+    QCOMPARE(std::get<BasicType>(expectedTypeAlias.getType()), BasicType::INT);
 
     const QList<ValueDefinition> &valueDefs = promelaModel.getValueDefinitions();
 
     const ValueDefinition &expectedZero = valueDefs.at(0);
-    QCOMPARE("zero", expectedZero.getName());
-    QCOMPARE(0, expectedZero.getValue());
+    QCOMPARE(expectedZero.getName(), "zero");
+    QCOMPARE(expectedZero.getValue(), 0);
 
     const ValueDefinition &expectedOne = valueDefs.at(1);
-    QCOMPARE("one", expectedOne.getName());
-    QCOMPARE(1, expectedOne.getValue());
+    QCOMPARE(expectedOne.getName(), "one");
+    QCOMPARE(expectedOne.getValue(), 1);
 
     const ValueDefinition &expectedInfinity = valueDefs.at(2);
-    QCOMPARE("infinity", expectedInfinity.getName());
-    QCOMPARE(100, expectedInfinity.getValue());
+    QCOMPARE(expectedInfinity.getName(), "infinity");
+    QCOMPARE(expectedInfinity.getValue(), 100);
 }
 
 void tst_Asn1ToPromelaTranslator::testVariableBitString()
@@ -230,11 +230,11 @@ void tst_Asn1ToPromelaTranslator::testVariableBitString()
     Asn1NodeVisitor visitor(promelaModel);
     visitor.visit(*model);
 
-    QCOMPARE(0, promelaModel.getMtypeValues().size());
-    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
-    QCOMPARE(1, promelaModel.getUtypes().size());
-    QCOMPARE(0, promelaModel.getTypeAliases().size());
-    QCOMPARE(0, promelaModel.getValueDefinitions().size());
+    QCOMPARE(promelaModel.getMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getUtypes().size(), 1);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 0);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 0);
 
     const Utype &expectedUtype = promelaModel.getUtypes().at(0);
 
@@ -273,11 +273,11 @@ void tst_Asn1ToPromelaTranslator::testFixedBitString()
     Asn1NodeVisitor visitor(promelaModel);
     visitor.visit(*model);
 
-    QCOMPARE(0, promelaModel.getMtypeValues().size());
-    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
-    QCOMPARE(1, promelaModel.getUtypes().size());
-    QCOMPARE(0, promelaModel.getTypeAliases().size());
-    QCOMPARE(0, promelaModel.getValueDefinitions().size());
+    QCOMPARE(promelaModel.getMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getUtypes().size(), 1);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 0);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 0);
 
     const Utype &expectedUtype = promelaModel.getUtypes().at(0);
 
@@ -311,11 +311,11 @@ void tst_Asn1ToPromelaTranslator::testVariableOctetString()
     Asn1NodeVisitor visitor(promelaModel);
     visitor.visit(*model);
 
-    QCOMPARE(0, promelaModel.getMtypeValues().size());
-    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
-    QCOMPARE(1, promelaModel.getUtypes().size());
-    QCOMPARE(0, promelaModel.getTypeAliases().size());
-    QCOMPARE(0, promelaModel.getValueDefinitions().size());
+    QCOMPARE(promelaModel.getMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getUtypes().size(), 1);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 0);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 0);
 
     const Utype &expectedUtype = promelaModel.getUtypes().at(0);
 
@@ -354,11 +354,11 @@ void tst_Asn1ToPromelaTranslator::testFixedOctetString()
     Asn1NodeVisitor visitor(promelaModel);
     visitor.visit(*model);
 
-    QCOMPARE(0, promelaModel.getMtypeValues().size());
-    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
-    QCOMPARE(1, promelaModel.getUtypes().size());
-    QCOMPARE(0, promelaModel.getTypeAliases().size());
-    QCOMPARE(0, promelaModel.getValueDefinitions().size());
+    QCOMPARE(promelaModel.getMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getUtypes().size(), 1);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 0);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 0);
 
     const Utype &expectedUtype = promelaModel.getUtypes().at(0);
 
@@ -392,11 +392,11 @@ void tst_Asn1ToPromelaTranslator::testVariableIA5String()
     Asn1NodeVisitor visitor(promelaModel);
     visitor.visit(*model);
 
-    QCOMPARE(0, promelaModel.getMtypeValues().size());
-    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
-    QCOMPARE(1, promelaModel.getUtypes().size());
-    QCOMPARE(0, promelaModel.getTypeAliases().size());
-    QCOMPARE(0, promelaModel.getValueDefinitions().size());
+    QCOMPARE(promelaModel.getMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getUtypes().size(), 1);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 0);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 0);
 
     const Utype &expectedUtype = promelaModel.getUtypes().at(0);
 
@@ -435,11 +435,11 @@ void tst_Asn1ToPromelaTranslator::testFixedIA5String()
     Asn1NodeVisitor visitor(promelaModel);
     visitor.visit(*model);
 
-    QCOMPARE(0, promelaModel.getMtypeValues().size());
-    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
-    QCOMPARE(1, promelaModel.getUtypes().size());
-    QCOMPARE(0, promelaModel.getTypeAliases().size());
-    QCOMPARE(0, promelaModel.getValueDefinitions().size());
+    QCOMPARE(promelaModel.getMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getUtypes().size(), 1);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 0);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 0);
 
     const Utype &expectedUtype = promelaModel.getUtypes().at(0);
 
@@ -662,44 +662,45 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
     Asn1NodeVisitor visitor(promelaModel);
     visitor.visit(*model);
 
-    QCOMPARE(0, promelaModel.getMtypeValues().size());
-    QCOMPARE(0, promelaModel.getNamedMtypeValues().size());
-    QCOMPARE(1, promelaModel.getTypeAliases().size());
-    QCOMPARE(0, promelaModel.getValueDefinitions().size());
+    QCOMPARE(promelaModel.getMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 1);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 0);
 
-    QCOMPARE(3, promelaModel.getUtypes().size());
+    QCOMPARE(promelaModel.getUtypes().size(), 3);
 
     {
         const Utype &expectedLevel2 = promelaModel.getUtypes().at(0);
-        QCOMPARE(false, expectedLevel2.isUnionType());
-        QCOMPARE("level0_level1_level2", expectedLevel2.getName());
-        QCOMPARE(1, expectedLevel2.getFields().size());
+        QCOMPARE(expectedLevel2.isUnionType(), false);
+        QCOMPARE(expectedLevel2.getName(), "level0_level1_level2");
+        QCOMPARE(expectedLevel2.getFields().size(), 1);
         const Declaration &expectedLevel2Field = expectedLevel2.getFields().front();
-        QCOMPARE("field", expectedLevel2Field.getName());
+        QCOMPARE(expectedLevel2Field.getName(), "field");
         QVERIFY(expectedLevel2Field.getType().isUtypeReference());
         QCOMPARE(expectedLevel2Field.getType().getUtypeReference().getName(), "level0_level1_level2_field");
     }
 
     {
         const Utype &expectedLevel1 = promelaModel.getUtypes().at(1);
-        QCOMPARE(false, expectedLevel1.isUnionType());
-        QCOMPARE("level0_level1", expectedLevel1.getName());
-        QCOMPARE(1, expectedLevel1.getFields().size());
+        QCOMPARE(expectedLevel1.isUnionType(), false);
+        QCOMPARE(expectedLevel1.getName(), "level0_level1");
+        QCOMPARE(expectedLevel1.getFields().size(), 1);
         const Declaration &expectedLevel1Field = expectedLevel1.getFields().front();
-        QCOMPARE("level2", expectedLevel1Field.getName());
+        QCOMPARE(expectedLevel1Field.getName(), "level2");
         QVERIFY(expectedLevel1Field.getType().isUtypeReference());
-        QCOMPARE("level0_level1_level2", expectedLevel1Field.getType().getUtypeReference().getName());
+        QCOMPARE(expectedLevel1Field.getType().getUtypeReference().getName(), "level0_level1_level2");
     }
 
     {
         const Utype &expectedLevel0 = promelaModel.getUtypes().at(2);
-        QCOMPARE(false, expectedLevel0.isUnionType());
-        QCOMPARE("level0", expectedLevel0.getName());
-        QCOMPARE(1, expectedLevel0.getFields().size());
+        QCOMPARE(expectedLevel0.isUnionType(), false);
+        QCOMPARE(expectedLevel0.getName(), "level0");
+        QCOMPARE(expectedLevel0.getFields().size(), 1);
         const Declaration &expectedLevel0Field = expectedLevel0.getFields().front();
-        QCOMPARE("level1", expectedLevel0Field.getName());
+        QCOMPARE(expectedLevel0Field.getName(), "level1");
+        ;
         QVERIFY(expectedLevel0Field.getType().isUtypeReference());
-        QCOMPARE("level0_level1", expectedLevel0Field.getType().getUtypeReference().getName());
+        QCOMPARE(expectedLevel0Field.getType().getUtypeReference().getName(), "level0_level1");
     }
 
     const TypeAlias &expectedAlias = promelaModel.getTypeAliases().at(0);

@@ -126,12 +126,12 @@ public:
     const QList<ValueDefinition> &getValueDefinitions() const noexcept;
 
 private:
-    QSet<QString> m_mtype_values;
-    std::map<QString, NamedMtype> m_named_m_type_values;
-    QList<Utype> m_user_types;
+    QSet<QString> m_mtypeValues;
+    std::map<QString, NamedMtype> m_namedMtypeValues;
+    QList<Utype> m_userTypes;
     std::map<QString, Declaration> m_declarations;
-    QList<TypeAlias> m_type_aliases;
-    QList<ValueDefinition> m_value_definitions;
+    QList<TypeAlias> m_typeAliases;
+    QList<ValueDefinition> m_valueDefinitions;
 };
 }
 namespace conversion {
