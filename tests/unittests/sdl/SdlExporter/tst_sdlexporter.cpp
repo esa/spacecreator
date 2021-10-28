@@ -47,6 +47,8 @@
 #include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/output.h>
 #include <sdl/SdlModel/procedure.h>
+#include <sdl/SdlModel/procedurecall.h>
+#include <sdl/SdlModel/procedureparameter.h>
 #include <sdl/SdlModel/process.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/task.h>
@@ -67,6 +69,7 @@ using sdl::Label;
 using sdl::NextState;
 using sdl::Output;
 using sdl::Procedure;
+using sdl::ProcedureParameter;
 using sdl::Process;
 using sdl::SdlModel;
 using sdl::State;
@@ -640,10 +643,20 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
     VariableReference varYRef;
     varYRef.setDeclaration(variableY.get());
 
+    auto parameterA = std::make_unique<ProcedureParameter>();
+    parameterA->setName("a");
+    parameterA->setType("MyInteger");
+    parameterA->setDirection("in/out");
+
+    auto parameterB = std::make_unique<ProcedureParameter>();
+    parameterB->setName("b");
+    parameterB->setType("MyInteger");
+    parameterB->setDirection("in");
+
     auto procedure = SdlProcedureBuilder()
                              .withName("myProcedure")
-                             // todo: withParameter(in/out a)
-                             // todo: withParameter(in b)
+                             .withParameter(std::move(parameterA))
+                             .withParameter(std::move(parameterB))
                              // todo: withReturnType(out ret)
                              // todo: withLocalVariable(ret)
                              .withTransition(SdlTransitionBuilder()
