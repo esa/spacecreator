@@ -20,6 +20,7 @@
 #pragma once
 
 #include "node.h"
+#include "procedureparameter.h"
 #include "transition.h"
 
 #include <QString>
@@ -75,12 +76,27 @@ public:
     auto setTransition(std::unique_ptr<Transition> transition) -> void;
 
     /**
+     * @brief   Getter for the parameters
+     *
+     * @return  a vector of parameters
+     */
+    auto parameters() const -> const std::vector<std::unique_ptr<ProcedureParameter>> &;
+
+    /**
+     * @brief   Add a procedure parameter
+     *
+     * @param   parameter     procedure parameter to add
+     */
+    auto addParameter(std::unique_ptr<ProcedureParameter> parameter) -> void;
+
+    /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */
     virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
     std::unique_ptr<Transition> m_implementation;
+    std::vector<std::unique_ptr<ProcedureParameter>> m_parameters;
 };
 
 } // namespace sdl
