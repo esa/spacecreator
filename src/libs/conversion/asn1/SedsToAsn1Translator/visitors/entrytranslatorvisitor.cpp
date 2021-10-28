@@ -56,8 +56,8 @@ void EntryTranslatorVisitor::operator()(const seds::model::Entry &sedsEntry)
 {
     auto asn1EntryType = translateEntryType(sedsEntry.type().nameStr());
 
-    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            sedsEntry.nameStr(), sedsEntry.nameStr(), false, "", Asn1Acn::SourceLocation(), std::move(asn1EntryType));
+    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(sedsEntry.nameStr(), sedsEntry.nameStr(),
+            false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(asn1EntryType));
     m_asn1Sequence->addComponent(std::move(sequenceComponent));
 }
 
@@ -75,8 +75,8 @@ void EntryTranslatorVisitor::operator()(const seds::model::FixedValueEntry &seds
     auto asn1EntryType = translateEntryType(sedsEntry.type().nameStr());
     translateFixedValue(sedsEntry, asn1EntryType.get());
 
-    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            sedsEntry.nameStr(), sedsEntry.nameStr(), false, "", Asn1Acn::SourceLocation(), std::move(asn1EntryType));
+    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(sedsEntry.nameStr(), sedsEntry.nameStr(),
+            false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(asn1EntryType));
     m_asn1Sequence->addComponent(std::move(sequenceComponent));
 }
 
@@ -101,11 +101,10 @@ void EntryTranslatorVisitor::operator()(const seds::model::PaddingEntry &sedsEnt
 std::unique_ptr<Asn1Acn::Types::UserdefinedType> EntryTranslatorVisitor::translateEntryType(
         const QString &sedsTypeName) const
 {
-    const auto *asn1ReferencedTypeAssignment = m_asn1Definitions->type(sedsTypeName);
-    const auto *asn1ReferencedType = asn1ReferencedTypeAssignment->type();
+    const auto *asn1ReferencedType = m_asn1Definitions->type(sedsTypeName)->type();
 
     auto asn1EntryType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
-            asn1ReferencedType->identifier(), m_asn1Definitions->name(), asn1ReferencedTypeAssignment);
+            asn1ReferencedType->identifier(), m_asn1Definitions->name());
     asn1EntryType->setType(asn1ReferencedType->clone());
 
     return asn1EntryType;
