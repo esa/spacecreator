@@ -1,2 +1,1 @@
 add_subdirectory(promelaexporter)
-add_subdirectory(asn1topromelatranslator)
