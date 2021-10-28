@@ -38,6 +38,16 @@ void Procedure::setTransition(std::unique_ptr<Transition> transition)
     m_implementation = std::move(transition);
 }
 
+const std::vector<std::unique_ptr<ProcedureParameter>> &Procedure::parameters() const
+{
+    return m_parameters;
+}
+
+void Procedure::addParameter(std::unique_ptr<ProcedureParameter> parameter)
+{
+    m_parameters.push_back(std::move(parameter));
+}
+
 void Procedure::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
