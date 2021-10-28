@@ -19,6 +19,8 @@
 
 #include "sdlvisitor.h"
 
+#include "variableliteral.h"
+
 #include <conversion/common/export/exceptions.h>
 #include <iostream>
 #include <qglobal.h>
@@ -302,9 +304,31 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall) const
     // write some dummy CIF
     m_stream << "        /* CIF PROCEDURECALL (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "        call " << procedureCall.procedure()->name();
-    // if (!procedureCall.arguments().empty()) {
-    //     // export arguments
-    // }
+
+    auto &procedureCallArgs = procedureCall.arguments();
+    if (!procedureCallArgs.empty()) {
+        m_stream << "(";
+        QString args;
+        if (procedureCallArgs[0].index() == 0) {
+            args = std::get<VariableLiteral>(procedureCallArgs[0]).value();
+        } else if (procedureCallArgs[0].index() == 1) {
+            args = std::get<VariableReference *>(procedureCallArgs[0])->declaration()->name();
+        } else {
+            throw ExportException("Unknown Argument type");
+        }
+
+        for (auto it = std::next(procedureCallArgs.begin()); it != procedureCallArgs.end(); it++) {
+            if (it->index() == 0) {
+                args = args + ", " + std::get<VariableLiteral>(*it).value();
+            } else if (it->index() == 1) {
+                args = args + ", " + std::get<VariableReference *>(*it)->declaration()->name();
+            } else {
+                throw ExportException("Unknown Argument type");
+            }
+        }
+        m_stream << args;
+        m_stream << ")";
+    }
     m_stream << ";\n";
 }
 

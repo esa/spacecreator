@@ -842,7 +842,7 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
 
         "state Wait;",
         "input startProcess(x);",
-        "call myProcedure(2, x);",
+        "call returnlessProcedure(2, x);",
         "NEXTSTATE -;",
         "endstate;",
 
