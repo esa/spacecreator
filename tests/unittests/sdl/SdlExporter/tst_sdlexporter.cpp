@@ -774,11 +774,14 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
                                                      .build())
                              .build();
 
+    VariableLiteral literal;
+    literal.setValue("2");
+
     auto transition = SdlTransitionBuilder()
                               .withAction(SdlProcedureCallBuilder()
                                                   .withProcedure(procedure.get())
-                                                  // todo: withArgument(literalRef)
-                                                  // todo: withArgument(varXRef)
+                                                  .withArgument(std::move(literal))
+                                                  .withArgument(&varXRef)
                                                   .build())
                               .withNextStateAction()
                               .build();
