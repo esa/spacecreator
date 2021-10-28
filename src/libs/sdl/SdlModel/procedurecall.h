@@ -21,9 +21,12 @@
 
 #include "action.h"
 #include "procedure.h"
+#include "variableliteral.h"
 
 #include <QString>
 #include <memory>
+#include <variant>
+#include <vector>
 
 namespace sdl {
 
@@ -33,6 +36,8 @@ namespace sdl {
 class ProcedureCall : public Action
 {
 public:
+    using Argument = std::variant<VariableLiteral, VariableReference *>;
+
     /**
      * @brief   Constructor
      *
@@ -75,12 +80,27 @@ public:
     auto setProcedure(Procedure *procedure) -> void;
 
     /**
+     * @brief   Getter for the call arguments
+     *
+     * @return  vector of arguments
+     */
+    auto arguments() const -> const std::vector<Argument> &;
+
+    /**
+     * @brief   Add an argument
+     *
+     * @param   argument     an argument
+     */
+    auto addArgument(Argument argument) -> void;
+
+    /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */
     virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
     Procedure *m_procedureDeclaration;
+    std::vector<Argument> m_arguments;
 };
 
 } // namespace sdl
