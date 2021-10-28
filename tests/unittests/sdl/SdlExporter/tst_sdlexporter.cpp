@@ -109,7 +109,7 @@ private Q_SLOTS:
     void testGenerateProcessWithDecisionExpressionAndAnswer();
     void testGenerateProcessWithParamlessProcedure();
     void testGenerateProcessWithProcedureWithParamsAndReturn();
-    void testGenerateProcessWithProcedureWithParams();
+    void testGenerateProcessWithReturnlessProcedure();
 };
 
 void tst_sdlmodel::testDefaultValuesInModel()
@@ -743,7 +743,7 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
     checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
-void tst_sdlmodel::testGenerateProcessWithProcedureWithParams()
+void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
 {
     QString modelName = "ProcedureNoReturn";
     QString modelPrefix = "Sdl_";
@@ -755,11 +755,21 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParams()
     VariableReference varXRef;
     varXRef.setDeclaration(variableX.get());
 
+    auto parameterA = std::make_unique<ProcedureParameter>();
+    parameterA->setName("a");
+    parameterA->setType("MyInteger");
+    parameterA->setDirection("in");
+
+    auto parameterB = std::make_unique<ProcedureParameter>();
+    parameterB->setName("b");
+    parameterB->setType("MyInteger");
+    parameterB->setDirection("in");
+
     auto procedure =
             SdlProcedureBuilder()
                     .withName("myProcedure")
-                    // todo: withParameter(in a)
-                    // todo: withParameter(in b)
+                    .withParameter(std::move(parameterA))
+                    .withParameter(std::move(parameterB))
                     .withTransition(SdlTransitionBuilder()
                                             .withAction(SdlTaskBuilder().withContents("'EXAMPLE TASK'").build())
                                             .build())
@@ -823,7 +833,7 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParams()
         "returns ;",
         "START;",
         "task 'EXAMPLE TASK'",
-        "return ;",
+        "returns ;",
         "endprocedure;",
 
         "START;",
@@ -834,12 +844,10 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParams()
         "call myProcedure(2, x);",
         "NEXTSTATE -;",
         "endstate;",
-        "state Wait;",
-        "endstate;",
 
         "endprocess ExampleProcess;",
     };
-    // checkSequenceAndConsume(expectedOutput, consumableOutput);
+    checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
 } // namespace tests::sdl
