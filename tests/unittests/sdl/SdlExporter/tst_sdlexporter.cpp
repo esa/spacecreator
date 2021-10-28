@@ -653,11 +653,15 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
     parameterB->setType("MyInteger");
     parameterB->setDirection("in");
 
+    auto returnVariable = std::make_unique<VariableDeclaration>();
+    returnVariable->setName("ret");
+    returnVariable->setType("MyInteger");
+
     auto procedure = SdlProcedureBuilder()
                              .withName("myProcedure")
                              .withParameter(std::move(parameterA))
                              .withParameter(std::move(parameterB))
-                             // todo: withReturnType(out ret)
+                             .withReturnVariableDeclaration(std::move(returnVariable))
                              // todo: withLocalVariable(ret)
                              .withTransition(SdlTransitionBuilder()
                                                      .withAction(SdlTaskBuilder().withContents("ret := a + b;").build())
