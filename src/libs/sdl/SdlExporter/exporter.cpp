@@ -19,7 +19,6 @@
 
 #include "exporter.h"
 
-#include "SdlOptions/options.h"
 #include "export/exceptions.h"
 #include "modeltype.h"
 #include "visitors/sdlvisitor.h"
@@ -27,6 +26,7 @@
 #include <QSaveFile>
 #include <QString>
 #include <QTextStream>
+#include <sdl/SdlOptions/options.h>
 
 using conversion::ModelType;
 using conversion::exporter::ExportException;

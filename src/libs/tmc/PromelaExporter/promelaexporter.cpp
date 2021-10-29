@@ -26,8 +26,7 @@
 #include <QDirIterator>
 #include <QSaveFile>
 #include <QTextStream>
-#include <conversion/tmc/PromelaOptions/options.h>
-#include <iostream>
+#include <tmc/PromelaOptions/options.h>
 
 using conversion::exporter::ExportException;
 using conversion::exporter::IncorrectModelException;

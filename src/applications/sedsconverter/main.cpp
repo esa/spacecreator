@@ -26,7 +26,7 @@
 #include <conversion/common/import/exceptions.h>
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/iv/IvOptions/options.h>
-#include <conversion/seds/SedsOptions/options.h>
+#include <seds/SedsOptions/options.h>
 
 using conversion::ConversionException;
 using conversion::ModelType;

@@ -24,8 +24,8 @@
 #include <asn1library/asn1reader.h>
 #include <conversion/asn1/Asn1Registrar/registrar.h>
 #include <conversion/converter/converter.h>
-#include <conversion/seds/SedsOptions/options.h>
 #include <conversion/seds/SedsRegistrar/registrar.h>
+#include <seds/SedsOptions/options.h>
 
 using namespace conversion;
 using namespace conversion::asn1;
