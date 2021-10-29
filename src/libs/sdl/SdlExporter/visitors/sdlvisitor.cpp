@@ -19,11 +19,10 @@
 
 #include "sdlvisitor.h"
 
-#include "variableliteral.h"
-
 #include <conversion/common/export/exceptions.h>
 #include <iostream>
 #include <qglobal.h>
+#include <sdl/SdlModel/variableliteral.h>
 #include <sdl/SdlModel/variablereference.h>
 
 using conversion::exporter::ExportException;
