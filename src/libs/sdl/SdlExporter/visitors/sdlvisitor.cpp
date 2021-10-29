@@ -317,15 +317,21 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall) const
             throw ExportException("Unknown Argument type");
         }
 
-        for (auto it = std::next(procedureCallArgs.begin()); it != procedureCallArgs.end(); it++) {
-            if (std::holds_alternative<VariableLiteral>(*it)) {
-                args = args + ", " + std::get<VariableLiteral>(*it).value();
-            } else if (std::holds_alternative<VariableReference *>(*it)) {
-                args = args + ", " + std::get<VariableReference *>(*it)->declaration()->name();
-            } else {
-                throw ExportException("Unknown Argument type");
-            }
-        }
+        args = args
+                + std::accumulate(std::next(procedureCallArgs.begin()), procedureCallArgs.end(), QString(),
+                          [](QString &accumulator, const ProcedureCall::Argument &argument) {
+                              QString nextArg;
+                              if (std::holds_alternative<VariableLiteral>(argument)) {
+                                  nextArg = ", " + std::get<VariableLiteral>(argument).value();
+                              } else if (std::holds_alternative<VariableReference *>(argument)) {
+                                  nextArg = ", " + std::get<VariableReference *>(argument)->declaration()->name();
+                              } else {
+                                  throw ExportException("Unknown Argument type");
+                              }
+
+                              return accumulator + nextArg;
+                          });
+
         m_stream << args;
         m_stream << ")";
     }
