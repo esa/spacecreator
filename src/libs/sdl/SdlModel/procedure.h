@@ -29,7 +29,7 @@
 namespace sdl {
 
 /**
- * @brief   Represents an SDL procedure
+ * @brief   Represents an SDL procedure declaration
  */
 class Procedure : public Node
 {
