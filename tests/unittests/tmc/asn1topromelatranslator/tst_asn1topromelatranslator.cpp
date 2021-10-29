@@ -620,6 +620,11 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
     QVERIFY(decl2.getType().isUtypeReference());
     QCOMPARE(decl2.getType().getUtypeReference().getName(), "myType_field2");
 
+    const Declaration &decl3 = expectedUtype.getFields().at(2);
+    QCOMPARE("exist", decl3.getName());
+    QVERIFY(decl3.getType().isUtypeReference());
+    QCOMPARE(decl3.getType().getUtypeReference().getName(), "myType_exist");
+
     const TypeAlias &expectedAlias1 = promelaModel.getTypeAliases().at(0);
     QCOMPARE(expectedAlias1.getName(), "myType_field1");
     QVERIFY(std::holds_alternative<BasicType>(expectedAlias1.getType()));
