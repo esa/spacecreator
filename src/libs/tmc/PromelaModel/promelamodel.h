@@ -136,11 +136,11 @@ private:
 }
 namespace conversion {
 /**
- * @brief   Specialization for SEDS model properties
+ * @brief   Specialization for Promela model properties
  */
 template<>
 struct ModelProperties<::tmc::promela::model::PromelaModel> {
     /// @brief  Model type
-    static const ModelType type = ModelType::Seds;
+    static const ModelType type = ModelType::Promela;
 };
 }
