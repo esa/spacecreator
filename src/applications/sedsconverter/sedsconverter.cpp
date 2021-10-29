@@ -26,6 +26,7 @@
 #include <conversion/common/options.h>
 #include <conversion/converter/converter.h>
 #include <conversion/iv/IvRegistrar/registrar.h>
+#include <conversion/sdl/SdlRegistrar/registrar.h>
 #include <conversion/seds/SedsRegistrar/registrar.h>
 
 using conversion::Converter;
@@ -35,6 +36,7 @@ using conversion::RegistrationFailedException;
 using conversion::Registry;
 using conversion::asn1::Asn1Registrar;
 using conversion::iv::IvRegistrar;
+using conversion::sdl::SdlRegistrar;
 using conversion::seds::SedsRegistrar;
 
 namespace sedsconverter {
@@ -54,21 +56,23 @@ void SedsConverter::convert(std::set<conversion::ModelType> sourceModelTypes, Mo
 void SedsConverter::initializeRegistry()
 {
     Asn1Registrar asn1Registrar;
-    auto result = asn1Registrar.registerCapabilities(m_registry);
-    if (!result) {
+    if (!asn1Registrar.registerCapabilities(m_registry)) {
         throw RegistrationFailedException(ModelType::Asn1);
     }
 
     IvRegistrar ivRegistrar;
-    result = ivRegistrar.registerCapabilities(m_registry);
-    if (!result) {
+    if (!ivRegistrar.registerCapabilities(m_registry)) {
         throw RegistrationFailedException(ModelType::InterfaceView);
     }
 
     SedsRegistrar sedsRegistrar;
-    result = sedsRegistrar.registerCapabilities(m_registry);
-    if (!result) {
+    if (!sedsRegistrar.registerCapabilities(m_registry)) {
         throw RegistrationFailedException(ModelType::Seds);
+    }
+
+    SdlRegistrar sdlRegistrar;
+    if (!sdlRegistrar.registerCapabilities(m_registry)) {
+        throw RegistrationFailedException(ModelType::Sdl);
     }
 }
 

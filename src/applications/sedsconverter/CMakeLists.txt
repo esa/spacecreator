@@ -16,6 +16,7 @@ target_link_libraries(SedsConverter
                 Conversion::Registry
                 Conversion::Asn1Registrar
                 Conversion::IvRegistrar
-                Conversion::SedsRegistrar)
+                Conversion::SedsRegistrar
+                Conversion::SdlRegistrar)
 
 add_format_target(SedsConverter)
