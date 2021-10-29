@@ -65,4 +65,4 @@ target_link_libraries(SdlModel
 add_format_target(SdlModel)
 add_tidy_target(SdlModel)
 
-add_library(Conversion::SdlModel ALIAS SdlModel)
+add_library(SDL::Model ALIAS SdlModel)

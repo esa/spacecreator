@@ -19,4 +19,4 @@ target_link_libraries(IvXmlExporter
 add_format_target(IvXmlExporter)
 add_tidy_target(IvXmlExporter)
 
-add_library(Conversion::IvXmlExporter ALIAS IvXmlExporter)
+add_library(IV::XmlExporter ALIAS IvXmlExporter)
