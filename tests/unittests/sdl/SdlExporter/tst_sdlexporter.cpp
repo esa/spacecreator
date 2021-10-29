@@ -17,8 +17,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+<<<<<<< HEAD
 #include "statemachine.h"
 
+=======
+>>>>>>> SdlModel: refactored model to store multiple Processes
 #include <QObject>
 #include <QtTest>
 #include <common/sdlmodelbuilder/sdlanswerbuilder.h>
@@ -49,6 +52,7 @@
 #include <sdl/SdlModel/procedureparameter.h>
 #include <sdl/SdlModel/process.h>
 #include <sdl/SdlModel/sdlmodel.h>
+#include <sdl/SdlModel/statemachine.h>
 #include <sdl/SdlModel/task.h>
 #include <sdl/SdlModel/variabledeclaration.h>
 #include <sdl/SdlModel/variableliteral.h>
@@ -171,7 +175,8 @@ void tst_sdlmodel::testDefaultValuesInModel()
     // clang-format on
 
     QVERIFY(exampleModel->modelType() == ModelType::Sdl);
-    const auto *const data = &exampleModel->data();
+    QVERIFY(!exampleModel->processes().empty());
+    const auto *const data = &exampleModel->processes()[0];
     QVERIFY(processName == data->name());
 }
 

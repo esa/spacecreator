@@ -38,6 +38,7 @@ public:
     auto build() -> std::unique_ptr<State>;
 
     auto withInput(std::unique_ptr<Input> input) -> SdlStateBuilder &;
+
     auto withContinuousSignal(std::unique_ptr<ContinuousSignal> continuousSignal) -> SdlStateBuilder &;
 
 private:
