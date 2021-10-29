@@ -300,6 +300,10 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall) const
     if (procedureCall.procedure() == nullptr || procedureCall.procedure()->name().isEmpty()) {
         throw ExportException("Procedure to call not specified");
     }
+    if (procedureCall.procedure()->returnVariableDeclaration() != nullptr) {
+        throw ExportException("Procedure with a return variable cannot be called from a Procedure Call. "
+                              "It must be called from a Task");
+    }
 
     // write some dummy CIF
     m_stream << "        /* CIF PROCEDURECALL (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
