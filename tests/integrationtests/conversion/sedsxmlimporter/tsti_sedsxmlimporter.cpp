@@ -22,8 +22,8 @@
 #include <QtTest>
 #include <conversion/common/import/exceptions.h>
 #include <conversion/common/options.h>
-#include <conversion/seds/SedsOptions/options.h>
 #include <seds/SedsModel/sedsmodel.h>
+#include <seds/SedsOptions/options.h>
 #include <seds/SedsXmlImporter/importer.h>
 
 using conversion::Options;

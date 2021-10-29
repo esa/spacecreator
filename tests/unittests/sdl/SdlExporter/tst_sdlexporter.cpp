@@ -38,7 +38,6 @@
 #include <conversion/common/options.h>
 #include <memory>
 #include <qtestcase.h>
-#include <sdl/SdlExporter/SdlOptions/options.h>
 #include <sdl/SdlExporter/exporter.h>
 #include <sdl/SdlModel/action.h>
 #include <sdl/SdlModel/expression.h>
@@ -55,6 +54,7 @@
 #include <sdl/SdlModel/variabledeclaration.h>
 #include <sdl/SdlModel/variableliteral.h>
 #include <sdl/SdlModel/variablereference.h>
+#include <sdl/SdlOptions/options.h>
 
 using conversion::ModelType;
 using conversion::Options;
