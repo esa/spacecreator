@@ -112,6 +112,50 @@ private Q_SLOTS:
     void testGenerateProcessWithReturnlessProcedure();
 };
 
+std::unique_ptr<VariableDeclaration> makeVariableDeclaration(QString name, QString type)
+{
+    auto variable = std::make_unique<VariableDeclaration>();
+    variable->setName(std::move(name));
+    variable->setType(std::move(type));
+
+    return variable;
+}
+
+std::unique_ptr<ProcedureParameter> makeProcedureParameter(QString name, QString type, QString direction)
+{
+    auto parameter = std::make_unique<ProcedureParameter>();
+    parameter->setName(std::move(name));
+    parameter->setType(std::move(type));
+    parameter->setDirection(std::move(direction));
+
+    return parameter;
+}
+
+bool verifyAndConsume(QTextStream &stream, const QString &string)
+{
+    QString line;
+    do {
+        line = stream.readLine();
+        if (line.contains(string)) {
+            return true;
+        }
+    } while ((!line.isEmpty() || !line.contains(string)) && !stream.atEnd());
+
+    return false;
+}
+
+void checkSequenceAndConsume(std::vector<QString> &expectedOutput, QTextStream &consumableOutput)
+{
+    for (const auto &expectedLine : expectedOutput) {
+        if (verifyAndConsume(consumableOutput, expectedLine)) {
+            continue;
+        } else {
+            QString message = QString("the generated file does not contain '%1' substring").arg(expectedLine);
+            QFAIL(message.toStdString().c_str());
+        }
+    }
+}
+
 void tst_sdlmodel::testDefaultValuesInModel()
 {
     QString processName = "name_of_the_process";
@@ -130,30 +174,6 @@ void tst_sdlmodel::testDefaultValuesInModel()
     QVERIFY(exampleModel->modelType() == ModelType::Sdl);
     const auto *const data = &exampleModel->data();
     QVERIFY(processName == data->name());
-}
-
-void verifyAndConsume(QTextStream &stream, const QString &string)
-{
-    QString line;
-    do {
-        line = stream.readLine();
-        if (line.contains(string)) {
-            return;
-        }
-    } while ((!line.isEmpty() || !line.contains(string)) && !stream.atEnd());
-
-    if (stream.atEnd()) {
-        QString message = QString("the generated file does not contain '%1' substring").arg(string);
-        QFAIL(message.toStdString().c_str());
-        // TODO: abort the test
-    }
-}
-
-void checkSequenceAndConsume(std::vector<QString> &expectedOutput, QTextStream &consumableOutput)
-{
-    for (const auto &expectedLine : expectedOutput) {
-        verifyAndConsume(consumableOutput, expectedLine);
-    }
 }
 
 void tst_sdlmodel::testGenerateProcess()
@@ -749,26 +769,14 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
     QString modelPrefix = "Sdl_";
     QString processName = "ExampleProcess";
 
-    auto variableX = std::make_unique<VariableDeclaration>();
-    variableX->setName("x");
-    variableX->setType("MyInteger");
+    auto variableX = makeVariableDeclaration("x", "MyInteger");
     VariableReference varXRef;
     varXRef.setDeclaration(variableX.get());
 
-    auto parameterA = std::make_unique<ProcedureParameter>();
-    parameterA->setName("a");
-    parameterA->setType("MyInteger");
-    parameterA->setDirection("in");
-
-    auto parameterB = std::make_unique<ProcedureParameter>();
-    parameterB->setName("b");
-    parameterB->setType("MyInteger");
-    parameterB->setDirection("in");
-
     auto procedure = SdlProcedureBuilder()
                              .withName("returnlessProcedure")
-                             .withParameter(std::move(parameterA))
-                             .withParameter(std::move(parameterB))
+                             .withParameter(makeProcedureParameter("a", "MyInteger", "in"))
+                             .withParameter(makeProcedureParameter("b", "MyInteger", "in"))
                              .withTransition(SdlTransitionBuilder()
                                                      .withAction(SdlTaskBuilder().withContents("'EXAMPLE'").build())
                                                      .build())
