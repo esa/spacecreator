@@ -312,32 +312,26 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall) const
     auto &procedureCallArgs = procedureCall.arguments();
     if (!procedureCallArgs.empty()) {
         m_stream << "(";
-        QString args;
-        if (std::holds_alternative<VariableLiteral>(procedureCallArgs[0])) {
-            args = std::get<VariableLiteral>(procedureCallArgs[0]).value();
-        } else if (std::holds_alternative<VariableLiteral>(procedureCallArgs[0])) {
-            args = std::get<VariableReference *>(procedureCallArgs[0])->declaration()->name();
-        } else {
-            throw ExportException("Unknown Argument type");
-        }
 
-        args = args
+        auto getArgAsQString = [](const ProcedureCall::Argument &argument) -> QString {
+            QString arg;
+            if (std::holds_alternative<VariableLiteral>(argument)) {
+                arg += std::get<VariableLiteral>(argument).value();
+            } else if (std::holds_alternative<VariableReference *>(argument)) {
+                arg += std::get<VariableReference *>(argument)->declaration()->name();
+            } else {
+                throw ExportException("Unknown Argument type");
+            }
+            return arg;
+        };
+
+        QString args = getArgAsQString(procedureCallArgs[0])
                 + std::accumulate(std::next(procedureCallArgs.begin()), procedureCallArgs.end(), QString(),
-                          [](QString &accumulator, const ProcedureCall::Argument &argument) {
-                              QString nextArg;
-                              if (std::holds_alternative<VariableLiteral>(argument)) {
-                                  nextArg = ", " + std::get<VariableLiteral>(argument).value();
-                              } else if (std::holds_alternative<VariableReference *>(argument)) {
-                                  nextArg = ", " + std::get<VariableReference *>(argument)->declaration()->name();
-                              } else {
-                                  throw ExportException("Unknown Argument type");
-                              }
-
-                              return accumulator + nextArg;
+                          [&](QString &accumulator, const ProcedureCall::Argument &argument) {
+                              return accumulator + ", " + getArgAsQString(argument);
                           });
 
-        m_stream << args;
-        m_stream << ")";
+        m_stream << args << ")";
     }
     m_stream << ";\n";
 }
