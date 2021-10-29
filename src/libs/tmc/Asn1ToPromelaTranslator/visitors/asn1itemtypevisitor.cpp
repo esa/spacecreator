@@ -218,7 +218,7 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
             existUtype.addField(Declaration(DataType(BasicType::BOOLEAN), field));
         }
         m_promelaModel.addUtype(existUtype);
-        nestedUtype.addField(Declaration(DataType(UtypeRef(nestedUtypeName)), "exist"));
+        nestedUtype.addField(Declaration(DataType(UtypeRef(existUtypeName)), "exist"));
     }
 
     m_promelaModel.addUtype(nestedUtype);
