@@ -10,7 +10,7 @@ target_include_directories(${TEST_NAME}
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(${TEST_NAME}
     PRIVATE     Conversion::Common
-                Promela::Exporter
+                Conversion::PromelaExporter
                 Qt5::Core
                 Qt5::Test)
 
