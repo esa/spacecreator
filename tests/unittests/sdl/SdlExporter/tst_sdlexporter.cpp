@@ -256,7 +256,7 @@ void tst_sdlmodel::testGenerateProcessWithTasksVariablesAndParameters()
     QString modelPrefix = "Sdl_";
     QString processName = "ExampleProcess";
 
-    auto variable = std::make_unique<VariableDeclaration>("howManyLoops", "MyInteger");
+    auto variable = makeVariableDeclaration("howManyLoops", "MyInteger");
     auto variableReference = VariableReference(variable.get());
 
     auto transition1 = SdlTransitionBuilder()
@@ -416,27 +416,19 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     QString modelPrefix = "Sdl_";
     QString processName = "ExampleProcess";
 
-    auto variableX = std::make_unique<VariableDeclaration>("x", "MyInteger");
+    auto variableX = makeVariableDeclaration("x", "MyInteger");
     auto variableXRef = VariableReference(variableX.get());
-
-    auto expressionForDecision = std::make_unique<Expression>();
-    expressionForDecision->setContent("x");
-
-    VariableLiteral valueForAnswer1;
-    valueForAnswer1.setValue("1");
-    VariableLiteral valueForAnswer2;
-    valueForAnswer2.setValue(">1");
 
     auto transition =
             SdlTransitionBuilder()
                     .withNextStateAction()
                     .withAction(
                             SdlDecisionBuilder()
-                                    .withExpression(std::move(expressionForDecision))
+                                    .withExpression(std::make_unique<Expression>("x"))
                                     .withAnswer(
                                             SdlAnswerBuilder()
                                                     .withName("firstAnswer")
-                                                    .withLiteral(std::move(valueForAnswer1))
+                                                    .withLiteral(VariableLiteral("1"))
                                                     .withTransition(
                                                             SdlTransitionBuilder()
                                                                     .withOutput(SdlOutputBuilder()
@@ -451,7 +443,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
                                                     .build())
                                     .withAnswer(SdlAnswerBuilder()
                                                         .withName("secondAnswer")
-                                                        .withLiteral(std::move(valueForAnswer2))
+                                                        .withLiteral(VariableLiteral(">1"))
                                                         .withTransition(
                                                                 SdlTransitionBuilder().withNextStateAction().build())
                                                         .build())
@@ -651,37 +643,11 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
     QString modelPrefix = "Sdl_";
     QString processName = "ExampleProcess";
 
-    auto variableX = std::make_unique<VariableDeclaration>();
-    variableX->setName("x");
-    variableX->setType("MyInteger");
-    VariableReference varXRef;
-    varXRef.setDeclaration(variableX.get());
-
-    auto variableY = std::make_unique<VariableDeclaration>();
-    variableY->setName("y");
-    variableY->setType("MyInteger");
-    VariableReference varYRef;
-    varYRef.setDeclaration(variableY.get());
-
-    auto parameterA = std::make_unique<ProcedureParameter>();
-    parameterA->setName("a");
-    parameterA->setType("MyInteger");
-    parameterA->setDirection("in/out");
-
-    auto parameterB = std::make_unique<ProcedureParameter>();
-    parameterB->setName("b");
-    parameterB->setType("MyInteger");
-    parameterB->setDirection("in");
-
-    auto returnVariable = std::make_unique<VariableDeclaration>();
-    returnVariable->setName("ret");
-    returnVariable->setType("MyInteger");
-
     auto procedure = SdlProcedureBuilder()
                              .withName("myProcedure")
-                             .withParameter(std::move(parameterA))
-                             .withParameter(std::move(parameterB))
-                             .withReturnVariableDeclaration(std::move(returnVariable))
+                             .withParameter(makeProcedureParameter("a", "MyInteger", "in/out"))
+                             .withParameter(makeProcedureParameter("b", "MyInteger", "in"))
+                             .withReturnVariableDeclaration(makeVariableDeclaration("ret", "MyInteger"))
                              .withTransition(SdlTransitionBuilder()
                                                      .withAction(SdlTaskBuilder().withContents("ret := a + b;").build())
                                                      .withAction(SdlTaskBuilder().withContents("a := a + 1;").build())
@@ -692,6 +658,11 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
                               .withAction(SdlTaskBuilder().withContents("y := call myProcedure(x, 2);").build())
                               .withNextStateAction()
                               .build();
+
+    auto variableX = makeVariableDeclaration("x", "MyInteger");
+    VariableReference varXRef(variableX.get());
+    auto variableY = makeVariableDeclaration("y", "MyInteger");
+    VariableReference varYRef(variableY.get());
 
     auto state = SdlStateBuilder("Wait")
                          .withInput(SdlInputBuilder()
@@ -770,8 +741,7 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
     QString processName = "ExampleProcess";
 
     auto variableX = makeVariableDeclaration("x", "MyInteger");
-    VariableReference varXRef;
-    varXRef.setDeclaration(variableX.get());
+    VariableReference varXRef(variableX.get());
 
     auto procedure = SdlProcedureBuilder()
                              .withName("returnlessProcedure")
@@ -782,13 +752,10 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
                                                      .build())
                              .build();
 
-    VariableLiteral literal;
-    literal.setValue("2");
-
     auto transition = SdlTransitionBuilder()
                               .withAction(SdlProcedureCallBuilder()
                                                   .withProcedure(procedure.get())
-                                                  .withArgument(std::move(literal))
+                                                  .withArgument(VariableLiteral("2"))
                                                   .withArgument(&varXRef)
                                                   .build())
                               .withNextStateAction()

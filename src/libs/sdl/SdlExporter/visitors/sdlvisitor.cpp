@@ -24,6 +24,7 @@
 #include <qglobal.h>
 #include <sdl/SdlModel/variableliteral.h>
 #include <sdl/SdlModel/variablereference.h>
+#include <variant>
 
 using conversion::exporter::ExportException;
 
@@ -296,7 +297,7 @@ void SdlVisitor::visit(const Procedure &procedure) const
 
 void SdlVisitor::visit(const ProcedureCall &procedureCall) const
 {
-    if (procedureCall.procedure() == nullptr || procedureCall.procedure()->name() == "") {
+    if (procedureCall.procedure() == nullptr || procedureCall.procedure()->name().isEmpty()) {
         throw ExportException("Procedure to call not specified");
     }
 
@@ -308,18 +309,18 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall) const
     if (!procedureCallArgs.empty()) {
         m_stream << "(";
         QString args;
-        if (procedureCallArgs[0].index() == 0) {
+        if (std::holds_alternative<VariableLiteral>(procedureCallArgs[0])) {
             args = std::get<VariableLiteral>(procedureCallArgs[0]).value();
-        } else if (procedureCallArgs[0].index() == 1) {
+        } else if (std::holds_alternative<VariableLiteral>(procedureCallArgs[0])) {
             args = std::get<VariableReference *>(procedureCallArgs[0])->declaration()->name();
         } else {
             throw ExportException("Unknown Argument type");
         }
 
         for (auto it = std::next(procedureCallArgs.begin()); it != procedureCallArgs.end(); it++) {
-            if (it->index() == 0) {
+            if (std::holds_alternative<VariableLiteral>(*it)) {
                 args = args + ", " + std::get<VariableLiteral>(*it).value();
-            } else if (it->index() == 1) {
+            } else if (std::holds_alternative<VariableReference *>(*it)) {
                 args = args + ", " + std::get<VariableReference *>(*it)->declaration()->name();
             } else {
                 throw ExportException("Unknown Argument type");
