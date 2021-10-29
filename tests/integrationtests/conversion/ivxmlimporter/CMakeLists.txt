@@ -11,7 +11,7 @@ target_include_directories(${TEST_NAME}
 target_link_libraries(${TEST_NAME}
     PRIVATE     Conversion::Common
                 ivcore
-                Conversion::IvXmlImporter
+                IV::XmlImporter
                 Qt5::Core
                 Qt5::Test
                 CommonProjectWarnings)

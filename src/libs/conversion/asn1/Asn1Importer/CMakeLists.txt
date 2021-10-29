@@ -19,4 +19,4 @@ target_link_libraries(Asn1Importer
 add_format_target(Asn1Importer)
 add_tidy_target(Asn1Importer)
 
-add_library(Conversion::Asn1Importer ALIAS Asn1Importer)
+add_library(ASN1::Importer ALIAS Asn1Importer)

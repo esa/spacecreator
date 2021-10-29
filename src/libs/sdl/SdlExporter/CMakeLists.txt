@@ -15,10 +15,10 @@ target_include_directories(SdlExporter
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SdlExporter
     PUBLIC      Conversion::Common
-                SdlModel
+                SDL::Model
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(SdlExporter)
 add_tidy_target(SdlExporter)
 
-add_library(Conversion::SdlExporter ALIAS SdlExporter)
+add_library(SDL::Exporter ALIAS SdlExporter)
