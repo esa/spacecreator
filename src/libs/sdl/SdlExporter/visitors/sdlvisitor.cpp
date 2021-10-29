@@ -311,8 +311,6 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall) const
 
     auto &procedureCallArgs = procedureCall.arguments();
     if (!procedureCallArgs.empty()) {
-        m_stream << "(";
-
         auto getArgAsQString = [](const ProcedureCall::Argument &argument) -> QString {
             QString arg;
             if (std::holds_alternative<VariableLiteral>(argument)) {
@@ -325,13 +323,13 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall) const
             return arg;
         };
 
-        QString args = getArgAsQString(procedureCallArgs[0])
-                + std::accumulate(std::next(procedureCallArgs.begin()), procedureCallArgs.end(), QString(),
-                          [&](QString &accumulator, const ProcedureCall::Argument &argument) {
-                              return accumulator + ", " + getArgAsQString(argument);
-                          });
+        const auto args = std::accumulate(std::next(procedureCallArgs.begin()), procedureCallArgs.end(),
+                getArgAsQString(procedureCallArgs[0]),
+                [&](QString &accumulator, const ProcedureCall::Argument &argument) {
+                    return accumulator + ", " + getArgAsQString(argument);
+                });
 
-        m_stream << args << ")";
+        m_stream << "(" << args << ")";
     }
     m_stream << ";\n";
 }
