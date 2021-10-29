@@ -114,7 +114,7 @@ namespace conversion {
  * @brief   Specialization for SDL model properties
  */
 template<>
-struct ModelProperties<sdl::SdlModel> {
+struct ModelProperties<::sdl::SdlModel> {
     /// @brief  Model type
     static const ModelType type = ModelType::Sdl;
 };
