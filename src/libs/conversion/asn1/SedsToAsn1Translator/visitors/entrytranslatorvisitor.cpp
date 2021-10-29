@@ -33,6 +33,7 @@
 #include <asn1library/asn1/types/numericstring.h>
 #include <asn1library/asn1/types/octetstring.h>
 #include <asn1library/asn1/types/real.h>
+#include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <asn1library/asn1/values.h>
 #include <conversion/common/translation/exceptions.h>
@@ -83,14 +84,23 @@ void EntryTranslatorVisitor::operator()(const seds::model::FixedValueEntry &seds
 
 void EntryTranslatorVisitor::operator()(const seds::model::LengthEntry &sedsEntry)
 {
-    Q_UNUSED(sedsEntry);
-    throw TranslationException("LengthEntry translation not implemented");
+    auto asn1EntryType = translateEntryType(sedsEntry.type().nameStr());
+
+    auto sequenceComponent = std::make_unique<Asn1Acn::AcnSequenceComponent>(
+            sedsEntry.nameStr(), sedsEntry.nameStr(), std::move(asn1EntryType));
+    m_asn1Sequence->addComponent(std::move(sequenceComponent));
 }
 
 void EntryTranslatorVisitor::operator()(const seds::model::ListEntry &sedsEntry)
 {
-    Q_UNUSED(sedsEntry);
-    throw TranslationException("ListEntry translation not implemented");
+    auto asn1EntryType = translateEntryType(sedsEntry.type().nameStr());
+
+    auto asn1SequenceOfType = std::make_unique<Asn1Acn::Types::SequenceOf>();
+    asn1SequenceOfType->setItemsType(std::move(asn1EntryType));
+
+    auto sequenceComponent = std::make_unique<Asn1Acn::AcnSequenceComponent>(
+            sedsEntry.nameStr(), sedsEntry.nameStr(), std::move(asn1SequenceOfType));
+    m_asn1Sequence->addComponent(std::move(sequenceComponent));
 }
 
 void EntryTranslatorVisitor::operator()(const seds::model::PaddingEntry &sedsEntry)

@@ -70,6 +70,30 @@ SedsContainerDataTypeBuilder &SedsContainerDataTypeBuilder::withFixedValueEntry(
     return *this;
 }
 
+SedsContainerDataTypeBuilder &SedsContainerDataTypeBuilder::withLengthEntry(QString name, QString typeName)
+{
+    LengthEntry entry;
+    entry.setName(std::move(name));
+    entry.setType(std::move(typeName));
+
+    m_dataType.addEntry(std::move(entry));
+
+    return *this;
+}
+
+SedsContainerDataTypeBuilder &SedsContainerDataTypeBuilder::withListEntry(
+        QString name, QString typeName, QString lengthField)
+{
+    ListEntry entry;
+    entry.setName(std::move(name));
+    entry.setType(std::move(typeName));
+    entry.setListLengthField(std::move(lengthField));
+
+    m_dataType.addEntry(std::move(entry));
+
+    return *this;
+}
+
 SedsContainerDataTypeBuilder &SedsContainerDataTypeBuilder::withTrailerEntry(QString name, QString typeName)
 {
     Entry entry;
