@@ -140,6 +140,7 @@ target_sources(${LIB_NAME} PRIVATE
     xmlhighlighter.h
     xmlreader.cpp
     xmlreader.h
+    stacktrace.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

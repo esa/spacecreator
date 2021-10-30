@@ -41,6 +41,7 @@
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorprojectimpl.h"
 #include "spacecreatorprojectmanager.h"
+#include "stacktrace.h"
 
 #include <QAction>
 #include <QMenu>
@@ -80,6 +81,8 @@ SpaceCreatorPlugin::~SpaceCreatorPlugin()
 
 bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *errorString)
 {
+    stacktrace::init();
+
     // Register objects in the plugin manager's object pool
     // Load settings
     // Add actions to menus
