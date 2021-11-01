@@ -47,6 +47,8 @@ namespace shared {
            Save the file opened by OpenXMLFile using the template passed with OpenStringTemplateFile.
     \var shared::CommandLineParser::DropUnsavedChangesSilently
            Do not warn about unsaved changes on the document closing.
+    \var shared::CommandLineParser::StackTraceFilePath
+           Path to the file containing stack trace for crash dump.
 */
 
 CommandLineParser::CommandLineParser()
@@ -166,6 +168,12 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
         names << "l"
               << "list-actions";
         description = QCoreApplication::translate("CommandLineParser", "List scriptable actions and exit.");
+        break;
+    case CommandLineParser::Positional::StackTraceFilePath:
+        names << "s"
+              << "stack-trace-file-path";
+        description = QCoreApplication::translate("CommandLineParser", "Path to the stack trace file should be sent.");
+        valueName = QCoreApplication::translate("CommandLineParser", "file");
         break;
     default:
         qWarning() << Q_FUNC_INFO << "It seems the new option type is not handled here.";

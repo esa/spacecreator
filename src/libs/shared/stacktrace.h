@@ -1,7 +1,11 @@
 #pragma once
 
+#include <ctime>
 #include <cxxabi.h>
 #include <execinfo.h>
+#include <filesystem>
+#include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <signal.h>
 #include <stdio.h>
@@ -17,6 +21,14 @@ static inline void crit_err_hdlr(int sig_num, siginfo_t *info, void *ucontext)
     (void)sig_num;
     (void)info;
     (void)ucontext;
+
+    std::time_t tt = std::time(0);
+    std::tm tm = *std::localtime(&tt);
+    std::stringstream ss;
+    ss << std::filesystem::temp_directory_path().native() << "/";
+    ss << std::put_time(&tm, "%Y_%m_%d-%H_%M_%S.st");
+
+    std::ofstream os(ss.str(), std::ios::binary);
 
     void *array[50];
     int size = backtrace(array, 50);
@@ -50,23 +62,23 @@ static inline void crit_err_hdlr(int sig_num, siginfo_t *info, void *ucontext)
 
             // if demangling is successful, output the demangled function name
             if (status == 0) {
-                std::cerr << "[bt]: (" << i << ") " << messages[i] << " : " << real_name << "+" << offset_begin
-                          << offset_end << std::endl;
+                os << "[bt]: (" << i << ") " << messages[i] << " : " << real_name << "+" << offset_begin << offset_end
+                   << std::endl;
 
             }
             // otherwise, output the mangled function name
             else {
-                std::cerr << "[bt]: (" << i << ") " << messages[i] << " : " << mangled_name << "+" << offset_begin
-                          << offset_end << std::endl;
+                os << "[bt]: (" << i << ") " << messages[i] << " : " << mangled_name << "+" << offset_begin
+                   << offset_end << std::endl;
             }
             free(real_name);
         }
         // otherwise, print the whole line
         else {
-            std::cerr << "[bt]: (" << i << ") " << messages[i] << std::endl;
+            os << "[bt]: (" << i << ") " << messages[i] << std::endl;
         }
     }
-    std::cerr << std::endl;
+    os.close();
 
     free(messages);
 

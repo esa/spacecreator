@@ -49,6 +49,12 @@ public:
         ExportToFile,
         DropUnsavedChangesSilently,
 
+        // Crash reporter
+        StackTraceFilePath,
+        CrashReportHostBase64,
+        CrashReportProjectIDBase64,
+        CrashReportAccessTokenBase64,
+
         Unknown
     };
     Q_ENUM(Positional)

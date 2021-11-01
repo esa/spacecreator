@@ -26,6 +26,7 @@
 #include "mainwindow.h"
 #include "scversion.h"
 #include "sharedlibrary.h"
+#include "stacktrace.h"
 
 #include <QApplication>
 #include <QDirIterator>
@@ -34,6 +35,8 @@
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(asn1_resources);
+
+    stacktrace::init();
 
     shared::initSharedLibrary();
     ive::initIVEditor();
