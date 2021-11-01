@@ -18,10 +18,11 @@
 #include "contextparametersmodel.h"
 
 #include "asn1systemchecks.h"
-#include "commandsstack.h"
+#include "asn1valueparser.h"
 #include "commands/cmdcontextparameterchange.h"
 #include "commands/cmdcontextparametercreate.h"
 #include "commands/cmdcontextparameterremove.h"
+#include "commandsstack.h"
 #include "itemeditor/common/ivutils.h"
 #include "ivcommonprops.h"
 #include "ivfunction.h"
@@ -40,7 +41,7 @@ ContextParametersModel::ContextParametersModel(cmd::CommandsStack::Macro *macro,
 {
 }
 
-ContextParametersModel::~ContextParametersModel() { }
+ContextParametersModel::~ContextParametersModel() {}
 
 void ContextParametersModel::createNewRow(const shared::ContextParameter &param, int row)
 {
@@ -138,7 +139,8 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
                 return false;
             }
             const Asn1Acn::Types::Type *basicDataType = m_asn1Checks->typeFromName(paramNew.paramTypeName());
-            if (!paramNew.setDefaultValue(basicDataType, value)) {
+
+            if (!Asn1Acn::Asn1ValueParser::isValueValid(basicDataType, value) || !paramNew.setDefaultValue(value)) {
                 return false;
             }
             item->setData(value, Qt::DisplayRole);
@@ -252,8 +254,8 @@ ivm::IVObject *ContextParametersModel::entity() const
     return qobject_cast<ivm::IVObject *>(PropertiesModelBase::entity());
 }
 
-bool ContextParametersModel::moveRows(const QModelIndex &sourceParent, int sourceRow,
-        int count, const QModelIndex &destinationParent, int destinationChild)
+bool ContextParametersModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
+        const QModelIndex &destinationParent, int destinationChild)
 {
     if (PropertiesModelBase::moveRows(sourceParent, sourceRow, count, destinationParent, destinationChild)) {
         for (int idx = 0; idx < count; ++idx)

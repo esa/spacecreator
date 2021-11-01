@@ -43,6 +43,8 @@ public:
     QVariantMap parseAsn1Value(
             const Asn1Acn::Types::Type *type, const QString &asn1Value, bool *valueOk = nullptr) const;
 
+    static bool isValueValid(const Asn1Acn::Types::Type *basicDataType, const QVariant &value);
+
 Q_SIGNALS:
     void parseError(const QString &error) const;
 

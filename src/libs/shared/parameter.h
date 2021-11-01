@@ -23,12 +23,6 @@
 #include <QVariant>
 #include <QVector>
 
-namespace Asn1Acn {
-namespace Types {
-class Type;
-}
-}
-
 namespace shared {
 
 class BasicParameter
@@ -66,6 +60,7 @@ public:
     QString underscoredType() const;
 
     bool operator==(const BasicParameter &other) const;
+    bool isValidValue(const QVariant &value) const;
 
     virtual QString toString() const;
     virtual bool isNull() const;
@@ -74,8 +69,6 @@ protected:
     QString m_paramName = {};
     Type m_paramType = { Type::Other };
     QString m_typeName = {};
-
-    bool isValidValue(const Asn1Acn::Types::Type *basicDataType, const QVariant &value) const;
 };
 
 class ContextParameter : public BasicParameter
@@ -89,7 +82,7 @@ public:
     ~ContextParameter() override;
 
     QVariant defaultValue() const;
-    bool setDefaultValue(const Asn1Acn::Types::Type *basicDataType, const QVariant &value);
+    bool setDefaultValue(const QVariant &value);
 
     bool operator==(const ContextParameter &other) const;
 

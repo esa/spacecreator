@@ -38,8 +38,9 @@ namespace dve {
 DVPropertiesDialog::DVPropertiesDialog(shared::PropertyTemplateConfig *dynPropConfig, dvm::DVObject *obj,
         dvm::AbstractSystemChecks *systemChecker, Asn1Acn::Asn1SystemChecks *asn1Checks,
         shared::cmd::CommandsStackBase *commandsStack, QWidget *parent)
-    : shared::PropertiesDialog(dynPropConfig, obj, asn1Checks, commandsStack, parent)
-    , m_systemChecker(systemChecker)
+    : shared::PropertiesDialog(dynPropConfig, obj, commandsStack, parent)
+    , m_dvChecker(systemChecker)
+    , m_asn1Checks(asn1Checks)
 {
 }
 
@@ -77,7 +78,7 @@ void DVPropertiesDialog::init()
     switch (dataObject()->type()) {
     case dvm::DVObject::Type::Connection: {
         auto mBindings = new DVMessageBindingsWidget(commandMacro(), this);
-        mBindings->initModel(qobject_cast<dvm::DVConnection *>(dataObject()), m_systemChecker);
+        mBindings->initModel(qobject_cast<dvm::DVConnection *>(dataObject()), m_dvChecker);
         insertTab(mBindings, tr("Message Bindings"), -1);
         break;
     }
@@ -87,7 +88,7 @@ void DVPropertiesDialog::init()
         Q_ASSERT(model);
         for (dvm::DVConnection *connection : model->connections(device)) {
             auto mBindings = new DVMessageBindingsWidget(commandMacro(), this);
-            mBindings->initModel(connection, m_systemChecker);
+            mBindings->initModel(connection, m_dvChecker);
             QString title = QString("%1 <-> %2")
                                     .arg(connection->sourceDevice() ? connection->sourceDevice()->titleUI() : "",
                                             connection->targetDevice() ? connection->targetDevice()->titleUI() : "");
@@ -108,7 +109,7 @@ void DVPropertiesDialog::initAttributesView()
     modelAttrs->setDataObject(dataObject());
 
     shared::AttributesView *viewAttrs = new shared::AttributesView(this);
-    QStyledItemDelegate *attrDelegate = new DVAttributeDelegate(asn1Checks(), viewAttrs->tableView());
+    QStyledItemDelegate *attrDelegate = new DVAttributeDelegate(m_asn1Checks, viewAttrs->tableView());
 
     viewAttrs->tableView()->setItemDelegateForColumn(shared::PropertiesListModel::Column::Value, attrDelegate);
     viewAttrs->setModel(modelAttrs);
