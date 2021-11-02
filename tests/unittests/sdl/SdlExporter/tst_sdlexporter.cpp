@@ -101,7 +101,7 @@ class tst_sdlmodel : public QObject
 
 private Q_SLOTS:
     void testDefaultValuesInModel();
-    void testGenerateProcess();
+    void testGenerateBasicProcess();
     void testGenerateProcessWithDeclarationsAndTasks();
     void testGenerateProcessWithLabelAndJoin();
     void testJoinWithoutSpecifiedLabel();
@@ -175,19 +175,18 @@ void tst_sdlmodel::testDefaultValuesInModel()
     QVERIFY(processName == data->name());
 }
 
-void tst_sdlmodel::testGenerateProcess()
+void tst_sdlmodel::testGenerateBasicProcess()
 {
     QString modelName = "BasicProcess";
     QString modelPrefix = "Sdl_";
     QString processName = "Exampleprocess";
 
     auto transition1 = SdlTransitionBuilder().withNextStateAction().build();
-    auto someInput = SdlInputBuilder().withName("some_input_name").withTransition(transition1.get()).build();
-    auto state1 = SdlStateBuilder("Looping").withInput(std::move(someInput)).build();
+    auto state1 = SdlStateBuilder("Wait")
+                          .withInput(SdlInputBuilder().withName("someInput").withTransition(transition1.get()).build())
+                          .build();
 
     auto startTransition = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
-
-    auto referenceOutput = SdlOutputBuilder().withName("referenceOutput").build();
 
     auto transition2 = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
 
@@ -232,16 +231,16 @@ void tst_sdlmodel::testGenerateProcess()
         "process Exampleprocess;",
 
         "START;",
-        "NEXTSTATE Looping;",
+        "NEXTSTATE Wait;",
 
-        "state Looping;",
-        "input some_input_name;",
+        "state Wait;",
+        "input someInput;",
         "NEXTSTATE -;",
         "endstate;",
 
         "state Idle;",
         "input some_other_input_name;",
-        "NEXTSTATE Looping;",
+        "NEXTSTATE Wait;",
         "endstate;",
 
         "endprocess Exampleprocess;",
