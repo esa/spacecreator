@@ -102,7 +102,7 @@ class tst_sdlmodel : public QObject
 private Q_SLOTS:
     void testDefaultValuesInModel();
     void testGenerateProcess();
-    void testGenerateProcessWithTasksVariablesAndParameters();
+    void testGenerateProcessWithDeclarationsAndTasks();
     void testGenerateProcessWithLabelAndJoin();
     void testJoinWithoutSpecifiedLabel();
     void testGenerateProcessWithDecisionExpressionAndAnswer();
@@ -249,9 +249,9 @@ void tst_sdlmodel::testGenerateProcess()
     checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
-void tst_sdlmodel::testGenerateProcessWithTasksVariablesAndParameters()
+void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
 {
-    QString modelName = "TasksVariablesAndParameters";
+    QString modelName = "DeclarationsAndTasks";
     QString modelPrefix = "Sdl_";
     QString processName = "Exampleprocess";
 

@@ -1,5 +1,5 @@
 <InterfaceView asn1file="declarationsAndTasks.asn">
-<Function name="Modemanager" is_type="NO" language="SDL">
+<Function name="ExampleProcess" is_type="NO" language="SDL">
     <Property name="Taste::coordinates" value="48500 52900 68500 60900"/>
 <Provided_Interface name="some_input_name" kind="Sporadic">
     <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
@@ -17,14 +17,14 @@
     <Property name="Taste::coordinates" value="48500 58000"/>
     <Property name="Taste::InnerCoordinates" value="0 0"/>
     <Property name="Taste::InheritPI" value="true"/>
-    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
 <Required_Interface name="parameterlessOutput" kind="Sporadic">
     <Property name="Taste::coordinates" value="52300 60900"/>
     <Property name="Taste::InnerCoordinates" value="0 0"/>
     <Property name="Taste::InheritPI" value="true"/>
-    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
 </Function>
@@ -60,25 +60,25 @@
 </Function>
 
 <Connection >
+    <Source func_name="gui" ri_name="some_other_input_name"/>
+    <Target func_name="ExampleProcess" pi_name="some_other_input_name"/>
+    <Property name="Taste::coordinates" value="36300 37700 36300 45100 49500 45100 49500 52600"/>
+</Connection>
+
+<Connection >
     <Source func_name="gui" ri_name="some_input_name"/>
-    <Target func_name="Modemanager" pi_name="some_input_name"/>
+    <Target func_name="ExampleProcess" pi_name="some_input_name"/>
     <Property name="Taste::coordinates" value="42100 34000 70100 34000 70100 54600 68800 54600"/>
 </Connection>
 
 <Connection >
-    <Source func_name="Modemanager" ri_name="referenceOutput"/>
+    <Source func_name="ExampleProcess" ri_name="referenceOutput"/>
     <Target func_name="gui" pi_name="referenceOutput"/>
     <Property name="Taste::coordinates" value="47900 58000 2400 58000 2400 29700 21200 29700"/>
 </Connection>
 
 <Connection >
-    <Source func_name="gui" ri_name="some_other_input_name"/>
-    <Target func_name="Modemanager" pi_name="some_other_input_name"/>
-    <Property name="Taste::coordinates" value="36300 37700 36300 45100 49500 45100 49500 52600"/>
-</Connection>
-
-<Connection >
-    <Source func_name="Modemanager" ri_name="parameterlessOutput"/>
+    <Source func_name="ExampleProcess" ri_name="parameterlessOutput"/>
     <Target func_name="gui" pi_name="parameterlessOutput"/>
     <Property name="Taste::coordinates" value="52300 61500 52300 62500 19900 62500 19900 35400 21200 35400"/>
 </Connection>

@@ -1,5 +1,5 @@
 /* CIF PROCESS (250, 150), (150, 75) */
-process Modemanager;
+process Exampleprocess;
     /* CIF TEXT (764, 80), (208, 52) */
     dcl howManyLoops MyInteger;
     /* CIF ENDTEXT */
@@ -27,4 +27,4 @@ process Modemanager;
             /* CIF NEXTSTATE (1102, 383), (70, 35) */
             NEXTSTATE Looping;
     endstate;
-endprocess Modemanager;
+endprocess Exampleprocess;
