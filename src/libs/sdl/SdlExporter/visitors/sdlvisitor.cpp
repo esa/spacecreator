@@ -53,7 +53,6 @@ void SdlVisitor::visit(const Process &process) const
         m_stream << "    /* CIF TEXT (16, 317), (267, 140) */\n";
         exportCollection(process.variables());
         m_stream << "    /* CIF ENDTEXT */\n";
-        m_stream << "\n";
     }
 
     if (!process.procedures().empty()) {
@@ -67,7 +66,6 @@ void SdlVisitor::visit(const Process &process) const
     } else {
         throw ExportException("START transition not specified but required");
     }
-    m_stream << "\n";
 
     if (process.stateMachine() != nullptr) {
         exportCollection(process.stateMachine()->states());
@@ -88,7 +86,6 @@ void SdlVisitor::visit(const State &state) const
     m_stream << "    state " << state.name() << ";\n";
     exportCollection(state.inputs());
     m_stream << "    endstate;\n";
-    m_stream << "\n";
 }
 
 void SdlVisitor::visit(const Input &input) const
