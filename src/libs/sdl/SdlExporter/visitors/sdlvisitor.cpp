@@ -237,11 +237,18 @@ void SdlVisitor::visit(const Procedure &procedure) const
     m_stream << "    " << dummyCif("procedure");
     m_stream << "    procedure " << procedure.name() << ";\n";
 
-    m_stream << "        " << dummyCif("TEXT");
-    m_stream << "        fpar\n";
-
     auto &procedureParameters = procedure.parameters();
-    if (!procedureParameters.empty()) {
+
+    bool parametersPresent = !procedureParameters.empty();
+    bool returnVarPresent = procedure.returnVariableDeclaration() != nullptr;
+
+    if (parametersPresent || returnVarPresent) {
+        m_stream << "        " << dummyCif("TEXT");
+        m_stream << "        fpar\n";
+    }
+
+    if (parametersPresent) {
+        m_stream << "        fpar\n";
         QString fpars = QString("            %1 %2 %3")
                                 .arg(procedureParameters[0]->direction())
                                 .arg(procedureParameters[0]->name())
@@ -257,18 +264,19 @@ void SdlVisitor::visit(const Procedure &procedure) const
         m_stream << ";\n";
     }
 
-    if (procedure.returnVariableDeclaration() != nullptr) {
+    if (returnVarPresent) {
         m_stream << "        returns ";
         m_stream << procedure.returnVariableDeclaration()->type();
         m_stream << ";\n";
-    }
-    if (procedure.returnVariableDeclaration() != nullptr) {
+
         visit(*procedure.returnVariableDeclaration());
     }
-    m_stream << "        /* CIF ENDTEXT */\n";
 
-    // write some dummy CIF
-    m_stream << "        /* CIF START (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    if (parametersPresent || returnVarPresent) {
+        m_stream << "        /* CIF ENDTEXT */\n";
+    }
+
+    m_stream << "        " << dummyCif("START");
     m_stream << "        START;\n";
     if (procedure.transition()->actions().empty()) {
         qWarning("Procedure is empty");
