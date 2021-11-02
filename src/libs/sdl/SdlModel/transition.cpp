@@ -35,6 +35,9 @@ void Transition::addAction(std::unique_ptr<Action> action)
         if (dynamic_cast<Join *>(addedAction.get()) != nullptr) {
             throw "Adding action after Join is illegal";
         }
+        if (dynamic_cast<NextState *>(addedAction.get()) != nullptr) {
+            throw "Adding action after NextState is illegal";
+        }
     }
     m_actions.push_back(std::move(action));
 }
