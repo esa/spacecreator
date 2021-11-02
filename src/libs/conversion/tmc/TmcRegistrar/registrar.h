@@ -19,24 +19,12 @@
 
 #pragma once
 
-#include "export/modelexporter.h"
+#include <conversion/common/registrar.h>
 
-namespace conversion::tmc::exporter {
-/**
- * @brief PromelaExporter exports PromelaModel to textual representation.
- */
-class PromelaExporter final : public ::conversion::exporter::ModelExporter
+namespace conversion::tmc {
+class TmcRegistrar final : public Registrar
 {
 public:
-    /**
-     * @brief   Exports Promela model to file
-     *
-     * @param   model       Model to export
-     * @param   options     Options for export configuration
-     */
-    virtual auto exportModel(const Model *model, const Options &options) const -> void override;
-
-private:
-    static const QString m_commonIndent;
+    [[nodiscard]] bool registerCapabilities(conversion::Registry &registry) override;
 };
 }

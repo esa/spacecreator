@@ -31,7 +31,7 @@ using tmc::promela::model::TypeAlias;
 using tmc::promela::model::Utype;
 using tmc::promela::model::ValueDefinition;
 
-namespace conversion::tmc::exporter {
+namespace tmc::exporter {
 
 PromelaModelVisitor::PromelaModelVisitor(QTextStream &stream, QString indent)
     : m_stream(stream)

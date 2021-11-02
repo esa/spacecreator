@@ -17,20 +17,35 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "typealiasvisitor.h"
 
-#include <QString>
+#include "basictypegenerator.h"
 
-namespace conversion::tmc {
+using tmc::promela::model::BasicType;
+using tmc::promela::model::TypeAlias;
+using tmc::promela::model::UtypeRef;
 
-/**
- * @brief   Possible options for Promela conversion
- */
-class PromelaOptions
+namespace tmc::exporter {
+TypeAliasVisitor::TypeAliasVisitor(QTextStream &stream)
+    : m_stream(stream)
 {
-public:
-    /** @brief  Filepath of output file  */
-    inline static const QString promelaOutputFilepath = "Promela_Export_Filepath";
-};
+}
 
+void TypeAliasVisitor::operator()(const TypeAlias &typeAlias)
+{
+    m_stream << "#define " << typeAlias.getName() << " ";
+    std::visit(*this, typeAlias.getType());
+    m_stream << "\n";
+}
+
+void TypeAliasVisitor::operator()(const BasicType &basicType)
+{
+    BasicTypeGenerator generator(m_stream);
+    generator.generate(basicType);
+}
+
+void TypeAliasVisitor::operator()(const UtypeRef &utypeRef)
+{
+    m_stream << utypeRef.getName();
+}
 }

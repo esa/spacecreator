@@ -17,32 +17,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "visitors/utypevisitor.h"
+#include "registrar.h"
 
-#include "visitors/declarationvisitor.h"
+#include <conversion/common/modeltype.h>
+#include <tmc/Asn1ToPromelaTranslator/translator.h>
+#include <tmc/PromelaExporter/promelaexporter.h>
 
-namespace conversion::tmc::exporter {
-using ::tmc::promela::model::Declaration;
-using ::tmc::promela::model::Utype;
+using tmc::exporter::PromelaExporter;
+using tmc::translator::Asn1ToPromelaTranslator;
 
-UtypeVisitor::UtypeVisitor(QTextStream &stream, QString indent)
-    : m_stream(stream)
-    , m_indent(std::move(indent))
+namespace conversion::tmc {
+bool TmcRegistrar::registerCapabilities(conversion::Registry &registry)
 {
-}
+    auto promelaExporter = std::make_unique<PromelaExporter>();
+    bool result = registry.registerExporter(ModelType::Promela, std::move(promelaExporter));
+    if (!result) {
+        return false;
+    }
 
-void UtypeVisitor::visit(const Utype &utype)
-{
-    if (utype.isUnionType()) {
-        m_stream << "typedef union ";
-    } else {
-        m_stream << "typedef ";
-    }
-    m_stream << utype.getName() << " {\n";
-    for (const Declaration &declaration : utype.getFields()) {
-        DeclarationVisitor visitor(m_stream, m_indent);
-        visitor.visit(declaration);
-    }
-    m_stream << "}\n\n";
+    auto asn1ToPromelaTranslator = std::make_unique<Asn1ToPromelaTranslator>();
+
+    return registry.registerTranslator({ ModelType::Asn1 }, ModelType::Promela, std::move(asn1ToPromelaTranslator));
 }
 }

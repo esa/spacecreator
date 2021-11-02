@@ -1,1 +1,1 @@
-add_subdirectory(PromelaExporter)
+add_subdirectory(TmcRegistrar)

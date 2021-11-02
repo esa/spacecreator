@@ -19,35 +19,33 @@
 
 #pragma once
 
-#include "tmc/PromelaModel/utype.h"
-
 #include <QTextStream>
+#include <tmc/PromelaModel/basictypes.h>
 
-namespace conversion::tmc::exporter {
+namespace tmc::exporter {
 /**
- * @brief Vistor for exporting Utype
- *
- * This visitor exports user defined type to textual representation.
+ * @brief Generate string representation of BasicType
  */
-class UtypeVisitor
+class BasicTypeGenerator final
 {
 public:
     /**
      * @brief Constructor.
      *
-     * @param stream  A stream to append textual representation.
+     * Construct element with output stream.
+     *
+     * @param stream text stream to output string representation of BasicType
      */
-    UtypeVisitor(QTextStream &stream, QString indent);
+    BasicTypeGenerator(QTextStream &stream);
 
     /**
-     * @brief  Constructor
+     * @brief generate string representation of basic type
      *
-     * @param utype Utype to visit
+     * @param type value of BasicType, which will be converted to string
      */
-    void visit(const ::tmc::promela::model::Utype &utype);
+    void generate(::tmc::promela::model::BasicType type);
 
 private:
     QTextStream &m_stream;
-    const QString m_indent;
 };
 }

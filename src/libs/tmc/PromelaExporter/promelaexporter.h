@@ -19,36 +19,24 @@
 
 #pragma once
 
-#include "tmc/PromelaModel/declaration.h"
+#include "export/modelexporter.h"
 
-#include <QTextStream>
-
-namespace conversion::tmc::exporter {
+namespace tmc::exporter {
 /**
- * @brief  Visitor for exporting @link{::tmc::promelamodel::Declaration}
+ * @brief PromelaExporter exports PromelaModel to textual representation.
  */
-class DeclarationVisitor
+class PromelaExporter final : public ::conversion::exporter::ModelExporter
 {
 public:
     /**
-     * @brief Constructor.
+     * @brief   Exports Promela model to file
      *
-     * @param stream  stream to append data type prefix
-     * @param prefix  prefix, which shall be added at the beginning, e.g. indent
+     * @param   model       Model to export
+     * @param   options     Options for export configuration
      */
-    DeclarationVisitor(QTextStream &stream, QString prefix);
-
-    /** @brief  Visit Declaration
-     *
-     * @param declaration Declaration to visit
-     */
-    void visit(const ::tmc::promela::model::Declaration &declaration);
+    virtual auto exportModel(const conversion::Model *model, const conversion::Options &options) const -> void override;
 
 private:
-    QString getVisibilityString(const ::tmc::promela::model::Declaration &declaration);
-
-private:
-    QTextStream &m_stream;
-    QString m_prefix;
+    static const QString m_commonIndent;
 };
 }

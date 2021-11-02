@@ -19,7 +19,7 @@
 
 #include "visitors/datatypesuffixvisitor.h"
 
-namespace conversion::tmc::exporter {
+namespace tmc::exporter {
 using ::tmc::promela::model::ArrayType;
 using ::tmc::promela::model::BasicType;
 using ::tmc::promela::model::DataType;

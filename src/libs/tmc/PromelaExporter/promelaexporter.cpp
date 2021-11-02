@@ -26,14 +26,17 @@
 #include <QDirIterator>
 #include <QSaveFile>
 #include <QTextStream>
-#include <conversion/tmc/PromelaOptions/options.h>
 #include <iostream>
+#include <tmc/PromelaOptions/options.h>
 
+using conversion::Model;
+using conversion::ModelType;
+using conversion::Options;
 using conversion::exporter::ExportException;
 using conversion::exporter::IncorrectModelException;
 using tmc::promela::model::PromelaModel;
 
-namespace conversion::tmc::exporter {
+namespace tmc::exporter {
 void PromelaExporter::exportModel(const Model *model, const Options &options) const
 {
     if (model == nullptr) {

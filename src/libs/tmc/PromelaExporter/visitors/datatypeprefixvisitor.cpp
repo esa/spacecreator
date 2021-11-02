@@ -28,7 +28,7 @@ using tmc::promela::model::MtypeRef;
 using tmc::promela::model::UnsignedDataType;
 using tmc::promela::model::UtypeRef;
 
-namespace conversion::tmc::exporter {
+namespace tmc::exporter {
 
 DataTypePrefixVisitor::DataTypePrefixVisitor(QTextStream &stream)
     : m_stream(stream)

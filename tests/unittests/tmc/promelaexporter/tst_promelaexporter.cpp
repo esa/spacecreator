@@ -19,15 +19,15 @@
 
 #include <QObject>
 #include <QtTest>
-#include <conversion/tmc/PromelaExporter/promelaexporter.h>
-#include <conversion/tmc/PromelaOptions/options.h>
 #include <iostream>
+#include <tmc/PromelaExporter/promelaexporter.h>
 #include <tmc/PromelaModel/promelamodel.h>
+#include <tmc/PromelaOptions/options.h>
 
 namespace tmc::test {
 using conversion::Options;
-using conversion::tmc::PromelaOptions;
-using conversion::tmc::exporter::PromelaExporter;
+using tmc::PromelaOptions;
+using tmc::exporter::PromelaExporter;
 using tmc::promela::model::ArrayType;
 using tmc::promela::model::BasicType;
 using tmc::promela::model::DataType;
