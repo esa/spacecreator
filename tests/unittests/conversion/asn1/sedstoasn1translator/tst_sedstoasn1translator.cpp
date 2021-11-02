@@ -691,6 +691,7 @@ void tst_SedsToAsn1Translator::testTranslateContainerExtensionOneLevel()
     auto childContainer2 = SedsContainerDataTypeBuilder("ChildContainer2")
                                 .setBaseType("ParentContainer")
                                 .withEntry("intB", "Integer")
+                                .withEntry("intC", "Integer")
                            .build();
 
     const auto &sedsModel = SedsModelBuilder("Model")
@@ -715,37 +716,30 @@ void tst_SedsToAsn1Translator::testTranslateContainerExtensionOneLevel()
 
     const auto *parentType = getType(asn1Model, 1);
     QVERIFY(parentType);
+    QCOMPARE(parentType->typeName(), "SEQUENCE");
 
     const auto *parentSequence = dynamic_cast<const Types::Sequence *>(parentType);
     QVERIFY(parentSequence);
     QCOMPARE(parentSequence->identifier(), "ParentContainer");
-    QCOMPARE(parentSequence->typeName(), "SEQUENCE");
+    QCOMPARE(parentSequence->components().size(), 1);
 
-    const auto &parentComponents = parentSequence->components();
-    QCOMPARE(parentComponents.size(), 3);
+    const auto *childContainer1Type = getType(asn1Model, 2);
+    QVERIFY(childContainer1Type);
+    QCOMPARE(childContainer1Type->typeName(), "SEQUENCE");
 
-    const auto &fieldComponent = parentComponents.at(0);
-    QVERIFY(fieldComponent);
-    QCOMPARE(fieldComponent->name(), "field");
+    const auto *child1Sequence = dynamic_cast<const Types::Sequence *>(childContainer1Type);
+    QVERIFY(child1Sequence);
+    QCOMPARE(child1Sequence->identifier(), "ChildContainer1");
+    QCOMPARE(child1Sequence->components().size(), 3);
 
-    const auto &sedsChildrenComponent = parentComponents.at(1);
-    QVERIFY(sedsChildrenComponent);
-    QVERIFY(sedsChildrenComponent->type());
-    QCOMPARE(sedsChildrenComponent->name(), "sedsChildren");
+    const auto *childContainer2Type = getType(asn1Model, 3);
+    QVERIFY(childContainer2Type);
+    QCOMPARE(childContainer2Type->typeName(), "SEQUENCE");
 
-    const auto &sedsChildrenChoice = dynamic_cast<const Types::Choice *>(sedsChildrenComponent->type());
-    QVERIFY(sedsChildrenChoice);
-
-    const auto &sedsChildrenChoiceAlternatives = sedsChildrenChoice->components();
-    QCOMPARE(sedsChildrenChoiceAlternatives.size(), 2);
-    QCOMPARE(sedsChildrenChoiceAlternatives.at(0)->name(), "childChildContainer1");
-    QVERIFY(sedsChildrenChoiceAlternatives.at(0)->type());
-    QCOMPARE(sedsChildrenChoiceAlternatives.at(1)->name(), "childChildContainer2");
-    QVERIFY(sedsChildrenChoiceAlternatives.at(1)->type());
-
-    const auto &trailingComponent = parentComponents.at(2);
-    QVERIFY(trailingComponent);
-    QCOMPARE(trailingComponent->name(), "trailing");
+    const auto *child2Sequence = dynamic_cast<const Types::Sequence *>(childContainer2Type);
+    QVERIFY(child2Sequence);
+    QCOMPARE(child2Sequence->identifier(), "ChildContainer2");
+    QCOMPARE(child2Sequence->components().size(), 4);
 }
 
 void tst_SedsToAsn1Translator::testTranslateEnumeratedDataType()
