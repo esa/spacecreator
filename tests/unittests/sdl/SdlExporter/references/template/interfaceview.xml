@@ -1,4 +1,30 @@
 <InterfaceView asn1file="template.asn">
+<Function name="gui" is_type="NO" language="GUI">
+    <Property name="Taste::coordinates" value="21500 29100 41500 37100"/>
+<Required_Interface name="startProcess" kind="Sporadic">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="41500 34000"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="someInput" kind="Sporadic">
+    <Property name="Taste::coordinates" value="36300 37100"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="someOtherInput" kind="Sporadic">
+    <Property name="Taste::coordinates" value="21500 35400"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+</Function>
+
 <Function name="ExampleProcess" is_type="NO" language="SDL">
     <Property name="Taste::coordinates" value="48500 52900 68500 60900"/>
 <Provided_Interface name="startProcess" kind="Sporadic">
@@ -12,37 +38,29 @@
     <Property name="Taste::InnerCoordinates" value="0 0"/>
 </Provided_Interface>
 
-</Function>
-
-<Function name="gui" is_type="NO" language="GUI">
-    <Property name="Taste::coordinates" value="21500 29100 41500 37100"/>
-<Required_Interface name="startProcess" kind="Sporadic">
-    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="41500 34000"/>
+<Provided_Interface name="someOtherInput" kind="Sporadic">
+    <Property name="Taste::coordinates" value="48500 56400"/>
     <Property name="Taste::InnerCoordinates" value="0 0"/>
-    <Property name="Taste::InheritPI" value="true"/>
-    <Property name="Taste::Autonamed" value="true"/>
-</Required_Interface>
-
-<Required_Interface name="someInput" kind="Sporadic">
-    <Property name="Taste::coordinates" value="36300 37100"/>
-    <Property name="Taste::InnerCoordinates" value="0 0"/>
-    <Property name="Taste::InheritPI" value="true"/>
-    <Property name="Taste::Autonamed" value="true"/>
-</Required_Interface>
+</Provided_Interface>
 
 </Function>
 
 <Connection >
-    <Source func_name="gui" ri_name="someInput"/>
-    <Target func_name="ExampleProcess" pi_name="someInput"/>
-    <Property name="Taste::coordinates" value="36300 37700 36300 45100 49500 45100 49500 52600"/>
+    <Source func_name="gui" ri_name="someOtherInput"/>
+    <Target func_name="ExampleProcess" pi_name="someOtherInput"/>
+    <Property name="Taste::coordinates" value="20900 35400 19900 35400 19900 56400 48200 56400"/>
 </Connection>
 
 <Connection >
     <Source func_name="gui" ri_name="startProcess"/>
     <Target func_name="ExampleProcess" pi_name="startProcess"/>
     <Property name="Taste::coordinates" value="42100 34000 68500 34000 68500 52600"/>
+</Connection>
+
+<Connection >
+    <Source func_name="gui" ri_name="someInput"/>
+    <Target func_name="ExampleProcess" pi_name="someInput"/>
+    <Property name="Taste::coordinates" value="36300 37700 36300 45100 49500 45100 49500 52600"/>
 </Connection>
 
 <Comment name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3">
