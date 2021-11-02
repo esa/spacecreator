@@ -23,22 +23,22 @@
 
 #include <QTextStream>
 
-namespace conversion::tmc::exporter {
+namespace tmc::exporter {
 /**
  * @brief  Visitor for exporting @link{::tmc::promelamodel::DataType}
  *
- * This translator creates suffix for data type.
- * This should be used together with DataTypePrefixVisitor.
+ * This visitor creates prefix for data type.
+ * This should be used together with DataTypeSuffixVisitor.
  */
-class DataTypeSuffixVisitor
+class DataTypePrefixVisitor
 {
 public:
     /**
      * @brief  Constructor.
      *
-     * @param stream  steam to append data type suffix
+     * @param stream  stream to append data type prefix
      */
-    DataTypeSuffixVisitor(QTextStream &stream);
+    DataTypePrefixVisitor(QTextStream &stream);
 
     /**
      * @brief  Visit DataType
@@ -50,13 +50,13 @@ public:
     /**
      * @brief Visit value of DataType, which is std::variant
      *
-     * @param type std::variant to visit
+     * @param value std::variant to visit
      */
     void visit(const ::tmc::promela::model::DataType::Type &type);
     /**
      * @brief Visit value of ArrayType, which is std::variant
      *
-     * @param type std::variant to visit
+     * @param value std::variant to visit
      */
     void visit(const ::tmc::promela::model::ArrayType::Type &type);
 

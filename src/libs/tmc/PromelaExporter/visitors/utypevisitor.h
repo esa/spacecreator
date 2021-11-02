@@ -17,35 +17,37 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "typealiasvisitor.h"
+#pragma once
 
-#include "basictypegenerator.h"
+#include "tmc/PromelaModel/utype.h"
 
-using tmc::promela::model::BasicType;
-using tmc::promela::model::TypeAlias;
-using tmc::promela::model::UtypeRef;
+#include <QTextStream>
 
-namespace conversion::tmc::exporter {
-TypeAliasVisitor::TypeAliasVisitor(QTextStream &stream)
-    : m_stream(stream)
+namespace tmc::exporter {
+/**
+ * @brief Vistor for exporting Utype
+ *
+ * This visitor exports user defined type to textual representation.
+ */
+class UtypeVisitor
 {
-}
+public:
+    /**
+     * @brief Constructor.
+     *
+     * @param stream  A stream to append textual representation.
+     */
+    UtypeVisitor(QTextStream &stream, QString indent);
 
-void TypeAliasVisitor::operator()(const TypeAlias &typeAlias)
-{
-    m_stream << "#define " << typeAlias.getName() << " ";
-    std::visit(*this, typeAlias.getType());
-    m_stream << "\n";
-}
+    /**
+     * @brief  Constructor
+     *
+     * @param utype Utype to visit
+     */
+    void visit(const ::tmc::promela::model::Utype &utype);
 
-void TypeAliasVisitor::operator()(const BasicType &basicType)
-{
-    BasicTypeGenerator generator(m_stream);
-    generator.generate(basicType);
-}
-
-void TypeAliasVisitor::operator()(const UtypeRef &utypeRef)
-{
-    m_stream << utypeRef.getName();
-}
+private:
+    QTextStream &m_stream;
+    const QString m_indent;
+};
 }

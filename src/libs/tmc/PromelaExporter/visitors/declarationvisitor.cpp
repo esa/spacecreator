@@ -22,7 +22,7 @@
 #include "visitors/datatypeprefixvisitor.h"
 #include "visitors/datatypesuffixvisitor.h"
 
-namespace conversion::tmc::exporter {
+namespace tmc::exporter {
 using ::tmc::promela::model::ArrayType;
 using ::tmc::promela::model::Declaration;
 using ::tmc::promela::model::UnsignedDataType;

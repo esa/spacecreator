@@ -24,7 +24,7 @@
 #include <tmc/PromelaModel/typealias.h>
 #include <tmc/PromelaModel/utyperef.h>
 
-namespace conversion::tmc::exporter {
+namespace tmc::exporter {
 /**
  * @brief Visitor for TypeAlias. Generates string representation.
  */

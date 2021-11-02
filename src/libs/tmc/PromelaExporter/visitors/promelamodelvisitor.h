@@ -25,7 +25,7 @@
 
 #include <QTextStream>
 
-namespace conversion::tmc::exporter {
+namespace tmc::exporter {
 /**
  * @brief  Visitor for exporting @link{PromelaModel}
  *

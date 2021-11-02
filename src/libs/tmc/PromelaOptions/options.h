@@ -19,33 +19,18 @@
 
 #pragma once
 
-#include <QTextStream>
-#include <tmc/PromelaModel/basictypes.h>
+#include <QString>
 
-namespace conversion::tmc::exporter {
+namespace tmc {
+
 /**
- * @brief Generate string representation of BasicType
+ * @brief   Possible options for Promela conversion
  */
-class BasicTypeGenerator final
+class PromelaOptions
 {
 public:
-    /**
-     * @brief Constructor.
-     *
-     * Construct element with output stream.
-     *
-     * @param stream text stream to output string representation of BasicType
-     */
-    BasicTypeGenerator(QTextStream &stream);
-
-    /**
-     * @brief generate string representation of basic type
-     *
-     * @param type value of BasicType, which will be converted to string
-     */
-    void generate(::tmc::promela::model::BasicType type);
-
-private:
-    QTextStream &m_stream;
+    /** @brief  Filepath of output file  */
+    inline static const QString promelaOutputFilepath = "Promela_Export_Filepath";
 };
+
 }

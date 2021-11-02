@@ -17,44 +17,32 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "basictypegenerator.h"
+#include "visitors/utypevisitor.h"
 
-using tmc::promela::model::BasicType;
+#include "visitors/declarationvisitor.h"
 
-namespace conversion::tmc::exporter {
+namespace tmc::exporter {
+using ::tmc::promela::model::Declaration;
+using ::tmc::promela::model::Utype;
 
-BasicTypeGenerator::BasicTypeGenerator(QTextStream &stream)
+UtypeVisitor::UtypeVisitor(QTextStream &stream, QString indent)
     : m_stream(stream)
+    , m_indent(std::move(indent))
 {
 }
 
-void BasicTypeGenerator::generate(::tmc::promela::model::BasicType type)
+void UtypeVisitor::visit(const Utype &utype)
 {
-    switch (type) {
-    case BasicType::BIT:
-        m_stream << "bit";
-        break;
-    case BasicType::BOOLEAN:
-        m_stream << "bool";
-        break;
-    case BasicType::BYTE:
-        m_stream << "byte";
-        break;
-    case BasicType::PID:
-        m_stream << "pid";
-        break;
-    case BasicType::SHORT:
-        m_stream << "short";
-        break;
-    case BasicType::INT:
-        m_stream << "int";
-        break;
-    case BasicType::FLOAT:
-        m_stream << "float";
-        break;
-    case BasicType::CHAN:
-        m_stream << "chan";
-        break;
+    if (utype.isUnionType()) {
+        m_stream << "typedef union ";
+    } else {
+        m_stream << "typedef ";
     }
+    m_stream << utype.getName() << " {\n";
+    for (const Declaration &declaration : utype.getFields()) {
+        DeclarationVisitor visitor(m_stream, m_indent);
+        visitor.visit(declaration);
+    }
+    m_stream << "}\n\n";
 }
 }
