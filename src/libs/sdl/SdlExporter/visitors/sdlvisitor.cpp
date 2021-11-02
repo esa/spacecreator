@@ -257,16 +257,18 @@ void SdlVisitor::visit(const Procedure &procedure) const
         m_stream << ";\n";
     }
 
-    m_stream << "        returns ";
     if (procedure.returnVariableDeclaration() != nullptr) {
+        m_stream << "        returns ";
         m_stream << procedure.returnVariableDeclaration()->type();
+        m_stream << ";\n";
     }
-    m_stream << ";\n";
     if (procedure.returnVariableDeclaration() != nullptr) {
         visit(*procedure.returnVariableDeclaration());
     }
     m_stream << "        /* CIF ENDTEXT */\n";
 
+    // write some dummy CIF
+    m_stream << "        /* CIF START (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "        START;\n";
     if (procedure.transition()->actions().empty()) {
         qWarning("Procedure is empty");
