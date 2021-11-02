@@ -44,17 +44,52 @@ enum class CoreErrorControl;
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Translator visitor for SEDS entry type
+ *
+ * Translated entry will be added to the passed ASN.1 sequence
+ */
 struct EntryTranslatorVisitor final {
     /// @brief  Parent definitions
     Asn1Acn::Definitions *m_asn1Definitions;
     /// @brief  Where translated entry will be saved
     Asn1Acn::Types::Sequence *m_asn1Sequence;
 
+    /**
+     * @brief   Translates SEDS entry
+     *
+     * @param   sedsEntry   Entry to translate
+     */
     auto operator()(const seds::model::Entry &sedsEntry) -> void;
+    /**
+     * @brief   Translates SEDS error constrol entry
+     *
+     * @param   sedsEntry   Entry to translate
+     */
     auto operator()(const seds::model::ErrorControlEntry &sedsEntry) -> void;
+    /**
+     * @brief   Translates SEDS fixed value entry
+     *
+     * @param   sedsEntry   Entry to translate
+     */
     auto operator()(const seds::model::FixedValueEntry &sedsEntry) -> void;
+    /**
+     * @brief   Translates SEDS length entry
+     *
+     * @param   sedsEntry   Entry to translate
+     */
     auto operator()(const seds::model::LengthEntry &sedsEntry) -> void;
+    /**
+     * @brief   Translates SEDS list entry
+     *
+     * @param   sedsEntry   Entry to translate
+     */
     auto operator()(const seds::model::ListEntry &sedsEntry) -> void;
+    /**
+     * @brief   Translates SEDS padding entry
+     *
+     * @param   sedsEntry   Entry to translate
+     */
     auto operator()(const seds::model::PaddingEntry &sedsEntry) -> void;
 
 private:
