@@ -21,12 +21,6 @@
 
 namespace sdl {
 
-SdlModel::SdlModel(Process process, QString name)
-    : m_name(std::move(name))
-{
-    m_processes.push_back(std::move(process));
-}
-
 SdlModel::SdlModel(QString name)
     : m_name(std::move(name))
 {

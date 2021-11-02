@@ -176,8 +176,8 @@ void tst_sdlmodel::testDefaultValuesInModel()
 
     QVERIFY(exampleModel->modelType() == ModelType::Sdl);
     QVERIFY(!exampleModel->processes().empty());
-    const auto *const data = &exampleModel->processes()[0];
-    QVERIFY(processName == data->name());
+    const auto *const process = &exampleModel->processes()[0];
+    QVERIFY(processName == process->name());
 }
 
 void tst_sdlmodel::testGenerateBasicProcess()

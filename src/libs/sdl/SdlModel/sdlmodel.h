@@ -36,14 +36,6 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param process     model process (Process)
-     * @param name        name of this process model
-     */
-    explicit SdlModel(Process process, QString name = "");
-
-    /**
-     * @brief   Constructor
-     *
      * @param name        name of this process model
      */
     explicit SdlModel(QString name = "");
