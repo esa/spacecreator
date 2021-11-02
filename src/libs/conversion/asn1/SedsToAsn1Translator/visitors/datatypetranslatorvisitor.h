@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/type.h>
 #include <optional>
 #include <seds/SedsModel/types/datatype.h>
@@ -68,10 +69,8 @@ namespace conversion::asn1::translator {
  * Translated data type will be added to the passed ASN.1 Definitions
  */
 struct DataTypeTranslatorVisitor final {
-    /// @brief  Parent definitions
-    Asn1Acn::Definitions *m_asn1Definitions;
-    /// @brief  Where translated data type will be saved
-    std::unique_ptr<Asn1Acn::Types::Type> &m_asn1Type;
+
+    DataTypeTranslatorVisitor(Asn1Acn::Definitions *asn1Definitions, std::unique_ptr<Asn1Acn::Types::Type> &asn1Type);
 
     /**
      * @brief   Translates SEDS array data type
@@ -266,14 +265,19 @@ private:
     auto convertByteOrder(seds::model::ByteOrder sedsByteOrder) const -> Asn1Acn::Types::Endianness;
 
 private:
-    inline static const QString m_realizationComponentsName = "realization";
-    inline static const QString m_realizationComponentsAlternativeNameTemplate = "realization%1";
-
     using ContainerEntriesCacheValue =
             std::pair<std::unique_ptr<Asn1Acn::Types::Sequence>, std::unique_ptr<Asn1Acn::Types::Sequence>>;
     using ContainerEntriesCacheMap = std::unordered_map<QString, ContainerEntriesCacheValue>;
 
-    static ContainerEntriesCacheMap m_asn1SequenceComponentsCache;
+    /// @brief  Parent definitions
+    Asn1Acn::Definitions *m_asn1Definitions;
+    /// @brief  Where translated data type will be saved
+    std::unique_ptr<Asn1Acn::Types::Type> &m_asn1Type;
+    /// @brief  Cache for sequence components
+    ContainerEntriesCacheMap m_asn1SequenceComponentsCache;
+
+    inline static const QString m_realizationComponentsName = "realization";
+    inline static const QString m_realizationComponentsAlternativeNameTemplate = "realization%1";
 };
 
 } // namespace conversion::asn1::translator

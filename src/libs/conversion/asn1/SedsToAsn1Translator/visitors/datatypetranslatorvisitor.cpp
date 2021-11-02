@@ -36,7 +36,6 @@
 #include <asn1library/asn1/types/ia5string.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/real.h>
-#include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <asn1library/asn1/values.h>
@@ -67,7 +66,12 @@ struct overloaded : Ts... {
 template<class... Ts>
 overloaded(Ts...)->overloaded<Ts...>;
 
-DataTypeTranslatorVisitor::ContainerEntriesCacheMap DataTypeTranslatorVisitor::m_asn1SequenceComponentsCache;
+DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(
+        Asn1Acn::Definitions *asn1Definitions, std::unique_ptr<Asn1Acn::Types::Type> &asn1Type)
+    : m_asn1Definitions(asn1Definitions)
+    , m_asn1Type(asn1Type)
+{
+}
 
 void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
 {
