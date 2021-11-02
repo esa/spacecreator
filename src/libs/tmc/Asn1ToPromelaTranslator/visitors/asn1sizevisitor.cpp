@@ -32,6 +32,7 @@ Asn1SizeVisitor::Asn1SizeVisitor()
 
 void Asn1SizeVisitor::visit(const ::Asn1Acn::Constraints::RangeConstraint<IntegerValue> &constraint)
 {
+    // TODO Implement proper range arithmetic
     const Range<IntegerValue::Type> &range = constraint.range();
     if (!m_sizeVisited) {
         m_sizeVisited = true;
@@ -54,12 +55,14 @@ void Asn1SizeVisitor::visit(const ::Asn1Acn::Constraints::RangeConstraint<Intege
 
 void Asn1SizeVisitor::visit(const ::Asn1Acn::Constraints::AndConstraint<IntegerValue> &constraint)
 {
+    // TODO Implement proper range arithmetic
     constraint.leftChild()->accept(*this);
     constraint.rightChild()->accept(*this);
 }
 
 void Asn1SizeVisitor::visit(const ::Asn1Acn::Constraints::OrConstraint<IntegerValue> &constraint)
 {
+    // TODO Implement proper range arithmetic
     constraint.leftChild()->accept(*this);
     constraint.rightChild()->accept(*this);
 }
