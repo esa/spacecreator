@@ -26,4 +26,9 @@ void tsti_ContainerDataType::testSimpleContainer()
     runConversionTest("container_simple");
 }
 
+void tsti_ContainerDataType::testExtendedContainer()
+{
+    runConversionTest("container_extended");
+}
+
 } // namespace conversion::asn1::test

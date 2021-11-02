@@ -48,7 +48,7 @@ struct EntryTranslatorVisitor final {
     /// @brief  Parent definitions
     Asn1Acn::Definitions *m_asn1Definitions;
     /// @brief  Where translated entry will be saved
-    std::unique_ptr<Asn1Acn::Types::Sequence> &m_asn1Sequence;
+    Asn1Acn::Types::Sequence *m_asn1Sequence;
 
     auto operator()(const seds::model::Entry &sedsEntry) -> void;
     auto operator()(const seds::model::ErrorControlEntry &sedsEntry) -> void;

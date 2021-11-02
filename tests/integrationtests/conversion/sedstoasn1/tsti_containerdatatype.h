@@ -29,6 +29,7 @@ class tsti_ContainerDataType : public TestBase
 
 private Q_SLOTS:
     void testSimpleContainer();
+    void testExtendedContainer();
 };
 
 } // namespace conversion::asn1::test
