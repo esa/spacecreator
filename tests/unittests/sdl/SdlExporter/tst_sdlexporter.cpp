@@ -419,7 +419,6 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
 
     auto transition =
             SdlTransitionBuilder()
-                    .withNextStateAction()
                     .withAction(
                             SdlDecisionBuilder()
                                     .withExpression(std::make_unique<Expression>("x"))
@@ -443,8 +442,8 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
                                                                             SdlTaskBuilder()
                                                                                     .withContents("'SOME EXAMPLE TASK'")
                                                                                     .build())
+                                                                    .withAction(std::make_unique<NextState>(""))
                                                                     .build())
-
                                                     .build())
                                     .withAnswer(
                                             SdlAnswerBuilder()
@@ -515,6 +514,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
         "(>1)",
         "output sendOutput(x);",
         "task 'SOME EXAMPLE TASK';",
+        "NEXTSTATE -;",
         "else:",
         "task 'ANSWER UNKNOWN';",
         "NEXTSTATE -;",
