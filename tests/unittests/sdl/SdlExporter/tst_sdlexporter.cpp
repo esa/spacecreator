@@ -544,7 +544,6 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
                     .build();
 
     auto transition = SdlTransitionBuilder()
-                              .withOutput(SdlOutputBuilder().withName("parameterlessOutput").build())
                               .withAction(SdlProcedureCallBuilder().withProcedure(procedure.get()).build())
                               .withNextStateAction()
                               .build();
