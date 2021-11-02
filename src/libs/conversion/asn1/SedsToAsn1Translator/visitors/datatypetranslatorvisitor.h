@@ -21,6 +21,7 @@
 
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/type.h>
+#include <conversion/common/qstringhash.h>
 #include <optional>
 #include <seds/SedsModel/types/datatype.h>
 
