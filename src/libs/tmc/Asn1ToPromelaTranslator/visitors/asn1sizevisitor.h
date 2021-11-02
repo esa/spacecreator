@@ -34,6 +34,8 @@ namespace tmc::translator {
  * @brief Visitor for ASN.1 size constraints
  *
  * This is a part of Asn1ToPromelaTranslator.
+ *
+ * Visitor finds a size for an array, which is maximum constrained size.
  */
 class Asn1SizeVisitor : public ::Asn1Acn::Constraints::ConstraintVisitor<::Asn1Acn::IntegerValue>
 {
@@ -49,6 +51,7 @@ public:
      * @brief Visit Asn1Acn::Constraints::RangeConstraint
      *
      * RangeConstraints contains actual sizes
+     * Calculate maximum and minimum size of an array using Constraint
      *
      * @param constraint element to visit
      */

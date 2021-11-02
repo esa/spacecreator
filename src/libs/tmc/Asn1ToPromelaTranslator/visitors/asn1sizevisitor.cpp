@@ -36,7 +36,6 @@ void Asn1SizeVisitor::visit(const ::Asn1Acn::Constraints::RangeConstraint<Intege
     if (!m_sizeVisited) {
         m_sizeVisited = true;
         if (range.isSingleItem()) {
-
             m_minSize = static_cast<size_t>(range.begin());
             m_maxSize = m_minSize;
         } else {

@@ -51,11 +51,13 @@ public:
     void visit(const ::Asn1Acn::Constraints::AndConstraint<ValueType> &constraint) override
     {
         constraint.leftChild()->accept(*this);
+        constraint.rightChild()->accept(*this);
     }
 
     /// @brief Visit Asn1Acn::Constraints::OrConstraint
     void visit(const ::Asn1Acn::Constraints::OrConstraint<ValueType> &constraint) override
     {
+        constraint.leftChild()->accept(*this);
         constraint.rightChild()->accept(*this);
     }
 
