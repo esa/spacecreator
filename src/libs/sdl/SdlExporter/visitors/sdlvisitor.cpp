@@ -75,7 +75,7 @@ void SdlVisitor::visit(const Process &process) const
         throw ExportException("Process does not contain a State Machine");
     }
 
-    m_stream << "endprocess " << process.name() << ";\n";
+    m_stream << "endprocess " << process.name() << ";";
 }
 
 void SdlVisitor::visit(const State &state) const
