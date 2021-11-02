@@ -36,6 +36,7 @@
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <asn1library/asn1/values.h>
+#include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/package/package.h>
 
@@ -46,13 +47,6 @@ using conversion::translator::UnhandledValueException;
 using conversion::translator::UnsupportedValueException;
 
 namespace conversion::asn1::translator {
-
-template<class... Ts>
-struct overloaded : Ts... {
-    using Ts::operator()...;
-};
-template<class... Ts>
-overloaded(Ts...)->overloaded<Ts...>;
 
 void EntryTranslatorVisitor::operator()(const seds::model::Entry &sedsEntry)
 {

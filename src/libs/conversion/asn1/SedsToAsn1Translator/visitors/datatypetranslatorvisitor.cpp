@@ -39,6 +39,7 @@
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <asn1library/asn1/values.h>
+#include <conversion/common/overloaded.h>
 #include <conversion/common/qstringhash.h>
 #include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/package/package.h>
@@ -58,13 +59,6 @@ using seds::model::StringDataType;
 using seds::model::SubRangeDataType;
 
 namespace conversion::asn1::translator {
-
-template<class... Ts>
-struct overloaded : Ts... {
-    using Ts::operator()...;
-};
-template<class... Ts>
-overloaded(Ts...)->overloaded<Ts...>;
 
 DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(
         Asn1Acn::Definitions *asn1Definitions, std::unique_ptr<Asn1Acn::Types::Type> &asn1Type)

@@ -12,6 +12,7 @@ set(INCLUDES exceptions.h
              modelproperties.h
              modeltype.h
              options.h
+             overloaded.h
              registrar.h
              export/exceptions.h
              export/modelexporter.h
