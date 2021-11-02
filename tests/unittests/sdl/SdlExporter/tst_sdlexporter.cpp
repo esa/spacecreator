@@ -357,7 +357,6 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
     joinFromStart->setLabel(fromStartLabel.get());
     auto transition = SdlTransitionBuilder() //
                               .withAction(std::move(joinFromStart))
-                              .withAction(std::make_unique<NextState>(""))
                               .build();
     auto state1 = SdlStateBuilder("Idle")
                           .withInput(SdlInputBuilder().withName("sigReset").withTransition(transition.get()).build())
@@ -613,7 +612,6 @@ void tst_sdlmodel::testJoinWithoutSpecifiedLabel()
     auto join = std::make_unique<Join>();
     auto transition = SdlTransitionBuilder() //
                               .withAction(std::move(join))
-                              .withAction(std::make_unique<NextState>(""))
                               .build();
     auto state = SdlStateBuilder("Idle")
                          .withInput(SdlInputBuilder().withName("sigReset").withTransition(transition.get()).build())
