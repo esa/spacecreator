@@ -21,10 +21,18 @@
 
 #include <conversion/common/registrar.h>
 
+/**
+ * @brief   Registers conversion capabilities for TMC model
+ */
 namespace conversion::tmc {
 class TmcRegistrar final : public Registrar
 {
 public:
+    /**
+     * @brief   Register TMC conversion capabilties
+     *
+     * @param   registry    Registry to use
+     */
     [[nodiscard]] bool registerCapabilities(conversion::Registry &registry) override;
 };
 }
