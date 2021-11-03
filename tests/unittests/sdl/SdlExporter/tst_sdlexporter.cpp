@@ -190,12 +190,10 @@ void tst_sdlmodel::testGenerateBasicProcess()
 
     auto transition2 = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
 
-    auto state2 = SdlStateBuilder("Idle")
-                          .withInput(SdlInputBuilder()
-                                             .withName("some_other_input_name")
-                                             .withTransition(transition2.get())
-                                             .build())
-                          .build();
+    auto state2 =
+            SdlStateBuilder("Idle")
+                    .withInput(SdlInputBuilder().withName("someOtherInput").withTransition(transition2.get()).build())
+                    .build();
 
     // clang-format off
     const auto exampleModel = SdlModelBuilder(modelName)
@@ -239,7 +237,7 @@ void tst_sdlmodel::testGenerateBasicProcess()
         "endstate;",
 
         "state Idle;",
-        "input some_other_input_name;",
+        "input someOtherInput;",
         "NEXTSTATE Wait;",
         "endstate;",
 

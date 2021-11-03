@@ -244,7 +244,6 @@ void SdlVisitor::visit(const Procedure &procedure) const
 
     if (parametersPresent || returnVarPresent) {
         m_stream << "        " << dummyCif("TEXT");
-        m_stream << "        fpar\n";
     }
 
     if (parametersPresent) {
