@@ -6,8 +6,8 @@ if [ ! $1 ] ; then
     exit 1
 fi
 
-if [ $QT_INSTALL ]; then
-    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$QT_INSTALL/lib/qtcreator:$QT_INSTALL/lib/qtcreator/plugins
+if [ $QTC_INSTALL ]; then
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$QTC_INSTALL/lib/qtcreator:$QTC_INSTALL/lib/qtcreator/plugins
 fi
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/qtcreator:/usr/lib/x86_64-linux-gnu/qtcreator/plugins
