@@ -179,7 +179,7 @@ void tst_sdlmodel::testGenerateBasicProcess()
 {
     QString modelName = "BasicProcess";
     QString modelPrefix = "Sdl_";
-    QString processName = modelName; // NOLINT
+    QString processName = modelName.toLower(); // NOLINT
 
     auto transition1 = SdlTransitionBuilder().withNextStateAction().build();
     auto state1 = SdlStateBuilder("Wait")
@@ -219,7 +219,7 @@ void tst_sdlmodel::testGenerateBasicProcess()
         QFAIL(ex.what());
     }
 
-    QString filename = QString("%1%2.%3").arg(modelPrefix, modelName, "pr");
+    QString filename = QString("%1%2.%3").arg(modelPrefix, processName, "pr");
     QFile outputFile(filename);
     if (!outputFile.open(QIODevice::ReadOnly)) {
         QFAIL("requested file cannot be found");
@@ -250,7 +250,7 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
 {
     QString modelName = "DeclarationsAndTasks";
     QString modelPrefix = "Sdl_";
-    QString processName = modelName; // NOLINT
+    QString processName = modelName.toLower(); // NOLINT
 
     auto variable = makeVariableDeclaration("howManyLoops", "MyInteger");
     auto variableReference = VariableReference(variable.get());
@@ -310,7 +310,7 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
         QFAIL(ex.what());
     }
 
-    QString filename = QString("%1%2.%3").arg(modelPrefix, modelName, "pr");
+    QString filename = QString("%1%2.%3").arg(modelPrefix, processName, "pr");
     QFile outputFile(filename);
     if (!outputFile.open(QIODevice::ReadOnly)) {
         QFAIL("requested file cannot be found");
@@ -346,7 +346,7 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
 {
     QString modelName = "LabelAndJoin";
     QString modelPrefix = "Sdl_";
-    QString processName = modelName; // NOLINT
+    QString processName = modelName.toLower(); // NOLINT
 
     auto fromStartLabel = std::make_unique<Label>("fromStart");
 
@@ -382,7 +382,7 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
         QFAIL(ex.what());
     }
 
-    QString filename = QString("%1%2.%3").arg(modelPrefix, modelName, "pr");
+    QString filename = QString("%1%2.%3").arg(modelPrefix, processName, "pr");
     QFile outputFile(filename);
     if (!outputFile.open(QIODevice::ReadOnly)) {
         QFAIL("requested file cannot be found");
@@ -527,7 +527,7 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
 {
     QString modelName = "ParamlessProcedure";
     QString modelPrefix = "Sdl_";
-    QString processName = modelName; // NOLINT
+    QString processName = modelName.toLower(); // NOLINT
 
     auto procedure =
             SdlProcedureBuilder()
@@ -570,7 +570,7 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
         QFAIL(ex.what());
     }
 
-    QString filename = QString("%1%2.%3").arg(modelPrefix, modelName, "pr");
+    QString filename = QString("%1%2.%3").arg(modelPrefix, processName, "pr");
     QFile outputFile(filename);
     if (!outputFile.open(QIODevice::ReadOnly)) {
         QFAIL("requested file cannot be found");
@@ -605,7 +605,7 @@ void tst_sdlmodel::testJoinWithoutSpecifiedLabel()
 {
     QString modelName = "JoinWithoutSpecifiedLabel";
     QString modelPrefix = "Sdl_";
-    QString processName = modelName; // NOLINT
+    QString processName = modelName.toLower(); // NOLINT
 
     auto join = std::make_unique<Join>();
     auto transition = SdlTransitionBuilder() //
@@ -636,7 +636,7 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
 {
     QString modelName = "Procedure";
     QString modelPrefix = "Sdl_";
-    QString processName = modelName; // NOLINT
+    QString processName = modelName.toLower(); // NOLINT
 
     auto procedure = SdlProcedureBuilder()
                              .withName("myProcedure")
@@ -690,7 +690,7 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
         QFAIL(ex.what());
     }
 
-    QString filename = QString("%1%2.%3").arg(modelPrefix, modelName, "pr");
+    QString filename = QString("%1%2.%3").arg(modelPrefix, processName, "pr");
     QFile outputFile(filename);
     if (!outputFile.open(QIODevice::ReadOnly)) {
         QFAIL("requested file cannot be found");
@@ -733,7 +733,7 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
 {
     QString modelName = "ReturnlessProcedure";
     QString modelPrefix = "Sdl_";
-    QString processName = modelName; // NOLINT
+    QString processName = modelName.toLower(); // NOLINT
 
     auto variableX = makeVariableDeclaration("x", "MyInteger");
     VariableReference varXRef(variableX.get());
@@ -786,7 +786,7 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
         QFAIL(ex.what());
     }
 
-    QString filename = QString("%1%2.%3").arg(modelPrefix, modelName, "pr");
+    QString filename = QString("%1%2.%3").arg(modelPrefix, processName, "pr");
     QFile outputFile(filename);
     if (!outputFile.open(QIODevice::ReadOnly)) {
         QFAIL("requested file cannot be found");
