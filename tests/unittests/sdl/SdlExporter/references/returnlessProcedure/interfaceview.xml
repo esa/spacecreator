@@ -1,17 +1,5 @@
 <InterfaceView asn1file="returnlessProcedure.asn">
-<Function name="gui" is_type="NO" language="GUI">
-    <Property name="Taste::coordinates" value="21500 29100 41500 37100"/>
-<Required_Interface name="startProcess" kind="Sporadic">
-    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="41500 34000"/>
-    <Property name="Taste::InnerCoordinates" value="0 0"/>
-    <Property name="Taste::InheritPI" value="true"/>
-    <Property name="Taste::Autonamed" value="true"/>
-</Required_Interface>
-
-</Function>
-
-<Function name="ExampleProcess" is_type="NO" language="SDL">
+<Function name="returnlessProcedure" is_type="NO" language="SDL">
     <Property name="Taste::coordinates" value="48500 52900 68500 60900"/>
 <Provided_Interface name="startProcess" kind="Sporadic">
     <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
@@ -21,9 +9,21 @@
 
 </Function>
 
+<Function name="gui" is_type="NO" language="GUI">
+    <Property name="Taste::coordinates" value="21500 29100 41500 37100"/>
+<Required_Interface name="startProcess" kind="Sporadic">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="41500 34000"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+</Function>
+
 <Connection >
     <Source func_name="gui" ri_name="startProcess"/>
-    <Target func_name="ExampleProcess" pi_name="startProcess"/>
+    <Target func_name="returnlessProcedure" pi_name="startProcess"/>
     <Property name="Taste::coordinates" value="42100 34000 70100 34000 70100 54600 68800 54600"/>
 </Connection>
 

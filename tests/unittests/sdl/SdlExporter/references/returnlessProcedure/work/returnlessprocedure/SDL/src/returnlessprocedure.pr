@@ -1,5 +1,5 @@
 /* CIF PROCESS (250, 150), (150, 75) */
-process Exampleprocess;
+process Returnlessprocedure;
     /* CIF TEXT (574, 72), (267, 140) */
     dcl x MyInteger;
     /* CIF ENDTEXT */
@@ -30,4 +30,4 @@ process Exampleprocess;
             /* CIF NEXTSTATE (319, 225), (70, 35) */
             NEXTSTATE -;
     endstate;
-endprocess Exampleprocess;
+endprocess Returnlessprocedure;
