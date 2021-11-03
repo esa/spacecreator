@@ -502,7 +502,7 @@ void DataTypeTranslatorVisitor::createRealizationContainerField(Asn1Acn::Types::
 }
 
 void DataTypeTranslatorVisitor::updateParentContainer(
-        const QString sedsBaseTypeName, Asn1Acn::Types::Sequence *asn1RealizationSequence)
+        const QString &sedsBaseTypeName, Asn1Acn::Types::Sequence *asn1RealizationSequence)
 {
     auto *asn1BaseSequence =
             dynamic_cast<Asn1Acn::Types::Sequence *>(m_asn1Definitions->type(sedsBaseTypeName)->type());

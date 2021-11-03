@@ -253,7 +253,7 @@ private:
      * @param   sedsBaseTypeName            Name of the base container which should be updated
      * @param   asn1RealizationSeuqnece     Sequence that is a realization of the based container
      */
-    auto updateParentContainer(const QString sedsBaseTypeName, Asn1Acn::Types::Sequence *asn1RealizationSequence)
+    auto updateParentContainer(const QString &sedsBaseTypeName, Asn1Acn::Types::Sequence *asn1RealizationSequence)
             -> void;
 
     /**

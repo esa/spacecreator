@@ -170,6 +170,8 @@ public:
     auto visit(const ProcedureCall &procedureCall) const -> void override;
 
 private:
+    auto dummyCif(const QString &cifType) const -> QString;
+
     template<typename T>
     auto exportCollection(const T &collection) const -> void;
 

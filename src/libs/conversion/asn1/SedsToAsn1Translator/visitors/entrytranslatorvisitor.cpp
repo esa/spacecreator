@@ -207,14 +207,14 @@ void EntryTranslatorVisitor::translateCoreErrorControl(
 {
     switch (coreErrorControl) {
     case seds::model::CoreErrorControl::Crc8:
-        asn1Type->setPattern(QString(8, '0'));
+        asn1Type->setPattern(QString(m_crc8BitSize, '0'));
         break;
     case seds::model::CoreErrorControl::Crc16:
-        asn1Type->setPattern(QString(16, '0'));
+        asn1Type->setPattern(QString(m_crc16BitSize, '0'));
         break;
     case seds::model::CoreErrorControl::Checksum:
     case seds::model::CoreErrorControl::ChecksumLongitundinal:
-        asn1Type->setPattern(QString(32, '0'));
+        asn1Type->setPattern(QString(m_checksumBitSize, '0'));
         break;
     default:
         throw UnhandledValueException("CoreErrorControl");
