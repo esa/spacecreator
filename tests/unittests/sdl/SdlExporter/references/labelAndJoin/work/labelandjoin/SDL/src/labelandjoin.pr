@@ -1,5 +1,5 @@
 /* CIF PROCESS (250, 150), (150, 75) */
-process Exampleprocess;
+process Labelandjoin;
     /* CIF START (320, 10), (70, 35) */
     START;
         /* CIF label (314, 65), (81, 35) */
@@ -13,4 +13,4 @@ process Exampleprocess;
             /* CIF join (337, 230), (35, 35) */
             join fromStart;
     endstate;
-endprocess Exampleprocess;
+endprocess Labelandjoin;
