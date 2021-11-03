@@ -17,11 +17,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-<<<<<<< HEAD
-#include "statemachine.h"
-
-=======
->>>>>>> SdlModel: refactored model to store multiple Processes
 #include <QObject>
 #include <QtTest>
 #include <common/sdlmodelbuilder/sdlanswerbuilder.h>
@@ -161,7 +156,7 @@ void checkSequenceAndConsume(std::vector<QString> &expectedOutput, QTextStream &
 
 void tst_sdlmodel::testDefaultValuesInModel()
 {
-    QString processName = "name_of_the_process";
+    QString processName = "exampleProcess";
 
     // clang-format off
     const auto exampleModel =
@@ -184,7 +179,7 @@ void tst_sdlmodel::testGenerateBasicProcess()
 {
     QString modelName = "BasicProcess";
     QString modelPrefix = "Sdl_";
-    QString processName = "Exampleprocess";
+    QString processName = modelName; // NOLINT
 
     auto transition1 = SdlTransitionBuilder().withNextStateAction().build();
     auto state1 = SdlStateBuilder("Wait")
@@ -231,7 +226,7 @@ void tst_sdlmodel::testGenerateBasicProcess()
     }
     QTextStream consumableOutput(&outputFile);
     std::vector<QString> expectedOutput = {
-        "process Exampleprocess;",
+        QString("process %1;").arg(processName),
 
         "START;",
         "NEXTSTATE Wait;",
@@ -246,7 +241,7 @@ void tst_sdlmodel::testGenerateBasicProcess()
         "NEXTSTATE Wait;",
         "endstate;",
 
-        "endprocess Exampleprocess;",
+        QString("endprocess %1;").arg(processName),
     };
     checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
@@ -255,7 +250,7 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
 {
     QString modelName = "DeclarationsAndTasks";
     QString modelPrefix = "Sdl_";
-    QString processName = "Exampleprocess";
+    QString processName = modelName; // NOLINT
 
     auto variable = makeVariableDeclaration("howManyLoops", "MyInteger");
     auto variableReference = VariableReference(variable.get());
@@ -322,7 +317,7 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
     }
     QTextStream consumableOutput(&outputFile);
     std::vector<QString> expectedOutput = {
-        "process Exampleprocess;",
+        QString("process %1;").arg(processName),
 
         "dcl howManyLoops MyInteger",
 
@@ -342,7 +337,7 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
         "NEXTSTATE Looping;",
         "endstate;",
 
-        "endprocess Exampleprocess;",
+        QString("endprocess %1;").arg(processName),
     };
     checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
@@ -351,7 +346,7 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
 {
     QString modelName = "LabelAndJoin";
     QString modelPrefix = "Sdl_";
-    QString processName = "Exampleprocess";
+    QString processName = modelName; // NOLINT
 
     auto fromStartLabel = std::make_unique<Label>("fromStart");
 
@@ -394,7 +389,7 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
     }
     QTextStream consumableOutput(&outputFile);
     std::vector<QString> expectedOutput = {
-        "process Exampleprocess;",
+        QString("process %1;").arg(processName),
 
         "START;",
         "fromStart:",
@@ -405,7 +400,7 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
         "join fromStart;",
         "endstate;",
 
-        "endprocess Exampleprocess;",
+        QString("endprocess %1;").arg(processName),
     };
     checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
@@ -414,7 +409,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
 {
     QString modelName = "DecisionExpressionAndAnswer";
     QString modelPrefix = "Sdl_";
-    QString processName = "Exampleprocess";
+    QString processName = modelName; // NOLINT
 
     auto variableX = makeVariableDeclaration("x", "MyInteger");
     auto variableXRef = VariableReference(variableX.get());
@@ -501,7 +496,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     }
     QTextStream consumableOutput(&outputFile);
     std::vector<QString> expectedOutput = {
-        "process Exampleprocess;",
+        QString("process %1;").arg(processName),
 
         "dcl x MyInteger;",
 
@@ -523,7 +518,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
         "enddecision;",
         "endstate;",
 
-        "endprocess Exampleprocess",
+        QString("endprocess %1;").arg(processName),
     };
     checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
@@ -532,7 +527,7 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
 {
     QString modelName = "ParamlessProcedure";
     QString modelPrefix = "Sdl_";
-    QString processName = "Exampleprocess";
+    QString processName = modelName; // NOLINT
 
     auto procedure =
             SdlProcedureBuilder()
@@ -582,7 +577,7 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
     }
     QTextStream consumableOutput(&outputFile);
     std::vector<QString> expectedOutput = {
-        "process Exampleprocess;",
+        QString("process %1;").arg(processName),
 
         "procedure myParamlessProcedure;",
         "START;",
@@ -600,7 +595,8 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
         "NEXTSTATE -;",
 
         "endstate;",
-        "endprocess Exampleprocess;",
+
+        QString("endprocess %1;").arg(processName),
     };
     checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
@@ -609,7 +605,7 @@ void tst_sdlmodel::testJoinWithoutSpecifiedLabel()
 {
     QString modelName = "JoinWithoutSpecifiedLabel";
     QString modelPrefix = "Sdl_";
-    QString processName = "Exampleprocess";
+    QString processName = modelName; // NOLINT
 
     auto join = std::make_unique<Join>();
     auto transition = SdlTransitionBuilder() //
@@ -640,7 +636,7 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
 {
     QString modelName = "Procedure";
     QString modelPrefix = "Sdl_";
-    QString processName = "Exampleprocess";
+    QString processName = modelName; // NOLINT
 
     auto procedure = SdlProcedureBuilder()
                              .withName("myProcedure")
@@ -702,7 +698,7 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
     QTextStream consumableOutput(&outputFile);
 
     std::vector<QString> expectedOutput = {
-        "process Exampleprocess;",
+        QString("process %1;").arg(processName),
 
         "dcl x MyInteger;",
         "dcl y MyInteger;",
@@ -728,7 +724,7 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
         "NEXTSTATE -;",
         "endstate;",
 
-        "endprocess Exampleprocess;",
+        QString("endprocess %1;").arg(processName),
     };
     checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
@@ -737,7 +733,7 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
 {
     QString modelName = "ReturnlessProcedure";
     QString modelPrefix = "Sdl_";
-    QString processName = "Exampleprocess";
+    QString processName = modelName; // NOLINT
 
     auto variableX = makeVariableDeclaration("x", "MyInteger");
     VariableReference varXRef(variableX.get());
@@ -798,7 +794,7 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
     QTextStream consumableOutput(&outputFile);
 
     std::vector<QString> expectedOutput = {
-        "process Exampleprocess;",
+        QString("process %1;").arg(processName),
 
         "dcl x MyInteger;",
 
@@ -820,7 +816,7 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
         "NEXTSTATE -;",
         "endstate;",
 
-        "endprocess Exampleprocess;",
+        QString("endprocess %1;").arg(processName),
     };
     checkSequenceAndConsume(expectedOutput, consumableOutput);
 }

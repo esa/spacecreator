@@ -72,13 +72,6 @@ public:
     SdlVisitor &operator=(SdlVisitor &&) = delete; // instances of this class cannot be moved
 
     /**
-     * @brief   Model visitor
-     *
-     * @param   model   model to be serialized
-     */
-    auto visit(const SdlModel &model) const -> void override;
-
-    /**
      * @brief   Process visitor
      *
      * @param   process   process to be serialized
