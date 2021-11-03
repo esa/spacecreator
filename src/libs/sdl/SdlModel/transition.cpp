@@ -32,14 +32,16 @@ const std::vector<std::unique_ptr<Action>> &Transition::actions()
 
 void Transition::addAction(std::unique_ptr<Action> action)
 {
-    for (auto &addedAction : m_actions) {
-        if (dynamic_cast<Join *>(addedAction.get()) != nullptr) {
+    if (!m_actions.empty()) {
+        auto &lastAddedAction = m_actions.back();
+        if (dynamic_cast<Join *>(lastAddedAction.get()) != nullptr) {
             throw std::logic_error("Adding action after Join is illegal");
         }
-        if (dynamic_cast<NextState *>(addedAction.get()) != nullptr) {
+        if (dynamic_cast<NextState *>(lastAddedAction.get()) != nullptr) {
             throw std::logic_error("Adding action after NextState is illegal");
         }
     }
+
     m_actions.push_back(std::move(action));
 }
 
