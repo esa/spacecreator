@@ -1,5 +1,5 @@
 /* CIF PROCESS (250, 150), (150, 75) */
-process Exampleprocess;
+process decisionexpressionandanswer;
     /* CIF TEXT (564, 198), (118, 45) */
     dcl x MyInteger;
     /* CIF ENDTEXT */
@@ -33,4 +33,4 @@ process Exampleprocess;
                     NEXTSTATE -;
             enddecision;
     endstate;
-endprocess Exampleprocess;
+endprocess decisionexpressionandanswer;

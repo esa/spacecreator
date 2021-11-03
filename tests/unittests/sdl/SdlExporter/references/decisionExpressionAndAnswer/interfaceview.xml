@@ -17,34 +17,34 @@
 
 </Function>
 
-<Function name="ExampleProcess" is_type="NO" language="SDL">
-    <Property name="Taste::coordinates" value="48500 52900 68500 60900"/>
+<Function name="decisionExpressionAndAnswer" is_type="NO" language="SDL">
+    <Property name="Taste::coordinates" value="44300 52500 68500 60500"/>
 <Provided_Interface name="startProcess" kind="Sporadic">
     <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="68500 54600"/>
+    <Property name="Taste::coordinates" value="68500 54200"/>
     <Property name="Taste::InnerCoordinates" value="0 0"/>
 </Provided_Interface>
 
 <Required_Interface name="sendOutput" kind="Sporadic">
     <Input_Parameter name="val" type="MyInteger" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="50200 52900"/>
+    <Property name="Taste::coordinates" value="50200 52500"/>
     <Property name="Taste::InnerCoordinates" value="0 0"/>
     <Property name="Taste::InheritPI" value="true"/>
-    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
 </Function>
 
 <Connection >
-    <Source func_name="gui" ri_name="startProcess"/>
-    <Target func_name="ExampleProcess" pi_name="startProcess"/>
-    <Property name="Taste::coordinates" value="42100 34000 70100 34000 70100 54600 68800 54600"/>
+    <Source func_name="decisionExpressionAndAnswer" ri_name="sendOutput"/>
+    <Target func_name="gui" pi_name="sendOutput"/>
+    <Property name="Taste::coordinates" value="50200 51900 50200 44700 33900 44700 33900 37400"/>
 </Connection>
 
 <Connection >
-    <Source func_name="ExampleProcess" ri_name="sendOutput"/>
-    <Target func_name="gui" pi_name="sendOutput"/>
-    <Property name="Taste::coordinates" value="50200 52300 50200 44900 33900 44900 33900 37400"/>
+    <Source func_name="gui" ri_name="startProcess"/>
+    <Target func_name="decisionExpressionAndAnswer" pi_name="startProcess"/>
+    <Property name="Taste::coordinates" value="42100 34000 70100 34000 70100 54200 68800 54200"/>
 </Connection>
 
 <Comment name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3">
