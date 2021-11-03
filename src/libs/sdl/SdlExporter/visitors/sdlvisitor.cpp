@@ -239,8 +239,8 @@ void SdlVisitor::visit(const Procedure &procedure) const
 
     auto &procedureParameters = procedure.parameters();
 
-    bool parametersPresent = !procedureParameters.empty();
-    bool returnVarPresent = procedure.returnVariableDeclaration() != nullptr;
+    const bool parametersPresent = !procedureParameters.empty();
+    const bool returnVarPresent = procedure.returnVariableDeclaration() != nullptr;
 
     if (parametersPresent || returnVarPresent) {
         m_stream << "        " << dummyCif("TEXT");
