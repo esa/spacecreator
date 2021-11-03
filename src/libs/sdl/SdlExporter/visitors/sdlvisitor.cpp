@@ -35,13 +35,6 @@ SdlVisitor::SdlVisitor(QTextStream &stream)
 {
 }
 
-void SdlVisitor::visit(const SdlModel &model) const
-{
-    for (auto &process : model.processes()) {
-        visit(process);
-    }
-}
-
 void SdlVisitor::visit(const Process &process) const
 {
     if (process.name().isEmpty()) {

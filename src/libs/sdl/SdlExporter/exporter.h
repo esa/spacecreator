@@ -71,6 +71,8 @@ public:
 private:
     auto exportSdlModel(const SdlModel *model, const Options &options) const -> void;
 
+    auto exportProcess(const Process &process, const Options &options) const -> void;
+
     auto writeAndCommit(QSaveFile &outputFile, const std::string &data) const -> void;
 
     auto makeFilePath(const QString &pathPrefix, const QString &fileName, const QString &extension) const -> QString;

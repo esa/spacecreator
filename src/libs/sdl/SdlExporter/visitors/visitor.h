@@ -75,13 +75,6 @@ public:
     virtual ~Visitor() = default;
 
     /**
-     * @brief   Model visitor
-     *
-     * @param   model   model to be visited
-     */
-    virtual auto visit(const SdlModel &model) const -> void = 0;
-
-    /**
      * @brief   Process visitor
      *
      * @param   process   process to be visited
