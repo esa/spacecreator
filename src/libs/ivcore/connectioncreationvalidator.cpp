@@ -94,31 +94,37 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
         IVFunction *sourceFunction, IVFunction *targetFunction, IVInterface *sourceIface, IVInterface *targetIface)
 {
     // [1] - the edge functions are not FunctionType
-    for (const IVFunction *function : { sourceFunction, targetFunction })
-        if (function && function->isFunctionType())
+    for (const IVFunction *function : { sourceFunction, targetFunction }) {
+        if (function && function->isFunctionType()) {
             return FailReason::IsFunctionType;
+        }
+    }
 
     // [2] - the edge interfaces parents are not FunctionType
-    for (const IVInterface *iface : { sourceIface, targetIface })
-        if (iface && iface->isNestedInFunctionType())
+    for (const IVInterface *iface : { sourceIface, targetIface }) {
+        if (iface && iface->isNestedInFunctionType()) {
             return FailReason::ParentIsFunctionType;
+        }
+    }
 
     // [3] - an iface kind is not Cyclic
-    for (const IVInterface *iface : { sourceIface, targetIface })
-        if (iface && iface->kind() == IVInterface::OperationKind::Cyclic)
+    for (const IVInterface *iface : { sourceIface, targetIface }) {
+        if (iface && iface->kind() == IVInterface::OperationKind::Cyclic) {
             return FailReason::IsCyclic;
+        }
+    }
 
     // [4] - parent of the source and target interface differs
-    const IVObject *srcParent =
-            sourceFunction ? sourceFunction : (sourceIface ? sourceIface->parentObject() : nullptr);
-    const IVObject *dstParent =
-            targetFunction ? targetFunction : (targetIface ? targetIface->parentObject() : nullptr);
-    if ((srcParent || dstParent) && srcParent == dstParent)
+    const IVObject *srcParent = sourceFunction ? sourceFunction : (sourceIface ? sourceIface->parentObject() : nullptr);
+    const IVObject *dstParent = targetFunction ? targetFunction : (targetIface ? targetIface->parentObject() : nullptr);
+    if ((srcParent || dstParent) && srcParent == dstParent) {
         return FailReason::SameParent;
+    }
 
     // [7] - Source and Target is the same interface.
-    if (sourceIface == targetIface && sourceIface && targetIface)
+    if (sourceIface == targetIface && sourceIface && targetIface) {
         return FailReason::SameInterface;
+    }
 
     // [6] - Multicast is disabled
     if (sourceIface != nullptr && !sourceIface->isMulticastEnabled()) {
@@ -133,8 +139,9 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
     }
 
     // [5] - both ifaces should be either (PI+RI|PI+PI|RI+RI) compatible by kind and params, or PI+RI.inheritPI=true
-    if (sourceIface && targetIface)
+    if (sourceIface && targetIface) {
         return checkKindAndParams(sourceIface, targetIface);
+    }
 
     return FailReason::NotFail;
 }
@@ -152,32 +159,47 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
 ConnectionCreationValidator::FailReason ConnectionCreationValidator::checkKindAndParams(
         IVInterface *sourceIface, IVInterface *targetIface)
 {
+    const bool weakKind = (sourceIface->kind() == IVInterface::OperationKind::Any)
+            || (targetIface->kind() == IVInterface::OperationKind::Any);
+    const bool kindCompatible = sourceIface->kind() == targetIface->kind();
+    const bool paramsCompatible = sourceIface->params() == targetIface->params();
+
     const auto *ri = IVConnection::selectIface<const IVInterfaceRequired *>(sourceIface, targetIface);
-    const auto *pi = IVConnection::selectIface<const IVInterfaceProvided *>(sourceIface, targetIface);
-    if (ri != nullptr && pi != nullptr) {
-        const auto *model = ri->model();
-        if (model != nullptr && !ri->isMulticastEnabled()) {
-            const auto riConnections = model->getConnectionsForIface(ri->id());
+    if (ri != nullptr) {
+        if (ri->model() != nullptr) {
+            const auto riConnections = ri->model()->getConnectionsForIface(ri->id());
             for (const IVConnection *riConnection : riConnections) {
-                if ((riConnection->sourceInterface() != nullptr
-                            && riConnection->sourceInterface()->isProvided())
-                        || (riConnection->targetInterface() != nullptr
-                            && riConnection->targetInterface()->isProvided())) {
-                    return FailReason::MulticastDisabled;
+                QVector<shared::InterfaceParameter> riSourceIfParams;
+                if (riConnection->sourceInterface() != nullptr) {
+                    if (!ri->isMulticastEnabled() && riConnection->sourceInterface()->isProvided()) {
+                        return FailReason::MulticastDisabled;
+                    }
+                    riSourceIfParams = riConnection->sourceInterface()->params();
+                }
+                QVector<shared::InterfaceParameter> riTargetIfParams;
+                if (riConnection->targetInterface() != nullptr) {
+                    if (!ri->isMulticastEnabled() && riConnection->targetInterface()->isProvided()) {
+                        return FailReason::MulticastDisabled;
+                    }
+                    riTargetIfParams = riConnection->targetInterface()->params();
+                }
+                if (!paramsCompatible || (riSourceIfParams != riTargetIfParams)) {
+                    return FailReason::ParamsDiffer;
                 }
             }
         }
-        if (ri->isInheritPI())
+        if (ri->isInheritPI()) {
             return FailReason::NotFail;
+        }
     }
 
-    const bool weakKind = sourceIface->kind() == IVInterface::OperationKind::Any
-            || targetIface->kind() == IVInterface::OperationKind::Any;
-    if (!weakKind && sourceIface->kind() != targetIface->kind())
+    if (!weakKind && !kindCompatible) {
         return FailReason::KindDiffer;
+    }
 
-    if (sourceIface->params() != targetIface->params())
+    if (!paramsCompatible) {
         return FailReason::ParamsDiffer;
+    }
 
     return FailReason::NotFail;
 }
