@@ -1,5 +1,5 @@
 /* CIF PROCESS (250, 150), (150, 75) */
-process Exampleprocess;
+process Procedurewithparamsandreturn;
     /* CIF TEXT (606, 44), (239, 135) */
     dcl x MyInteger;
     dcl y MyInteger;
@@ -39,4 +39,4 @@ process Exampleprocess;
     /* CIF state (450, 10), (70, 35) */
     state Wait;
     endstate;
-endprocess Exampleprocess;
+endprocess Procedurewithparamsandreturn;
