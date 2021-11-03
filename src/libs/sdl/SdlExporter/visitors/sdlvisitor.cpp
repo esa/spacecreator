@@ -47,7 +47,7 @@ void SdlVisitor::visit(const Process &process) const
     }
 
     // write some dummy CIF
-    m_stream << "/* CIF PROCESS (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << dummyCif("PROCESS");
     m_stream << "process " << process.name() << ";\n";
 
     if (!process.variables().empty()) {
@@ -86,7 +86,7 @@ void SdlVisitor::visit(const State &state) const
     }
 
     // write some dummy CIF
-    m_stream << "    /* CIF state (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "    " << dummyCif("state");
     m_stream << "    state " << state.name() << ";\n";
     exportCollection(state.inputs());
     m_stream << "    endstate;\n";
@@ -100,7 +100,7 @@ void SdlVisitor::visit(const Input &input) const
     }
 
     // write some dummy CIF
-    m_stream << "        /* CIF input (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "        " << dummyCif("input");
     m_stream << "        input " << input.name();
 
     const auto &inputParameters = input.parameters();
@@ -132,7 +132,7 @@ void SdlVisitor::visit(const Output &output) const
     }
 
     // write some dummy CIF
-    m_stream << "            /* CIF output (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "            " << dummyCif("output");
     m_stream << "            output " << output.name();
     const auto outputParamRef = output.parameter();
     if (outputParamRef != nullptr) {
@@ -156,7 +156,7 @@ void SdlVisitor::visit(const NextState &nextstate) const
     }
 
     // write some dummy CIF
-    m_stream << "            /* CIF NEXTSTATE (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "            " << dummyCif("NEXTSTATE");
     m_stream << "            NEXTSTATE " << nextStateName << ";\n";
 }
 
@@ -167,7 +167,7 @@ void SdlVisitor::visit(const Task &task) const
     }
 
     // write some dummy CIF
-    m_stream << "            /* CIF task (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "            " << dummyCif("task");
     m_stream << "            task " << task.content() << ";\n";
 }
 
@@ -190,13 +190,13 @@ void SdlVisitor::visit(const Label &label) const
     }
 
     // write some dummy CIF
-    m_stream << "        /* CIF label (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "        " << dummyCif("label");
     m_stream << "        " << label.name() << ":\n";
 }
 
 void SdlVisitor::visit(const Join &join) const
 {
-    m_stream << "            /* CIF join (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "            " << dummyCif("join");
     m_stream << "            join ";
     if (join.label() != nullptr) {
         m_stream << join.label()->name();
@@ -247,11 +247,11 @@ void SdlVisitor::visit(const Decision &decision) const
 void SdlVisitor::visit(const Procedure &procedure) const
 {
     // write some dummy CIF
-    m_stream << "    /* CIF procedure (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "    " << dummyCif("procedure");
     m_stream << "    procedure " << procedure.name() << ";\n";
 
     // write some dummy CIF
-    m_stream << "        /* CIF TEXT (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "        " << dummyCif("TEXT");
     m_stream << "        fpar\n";
 
     auto &procedureParameters = procedure.parameters();
@@ -306,7 +306,7 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall) const
     }
 
     // write some dummy CIF
-    m_stream << "        /* CIF PROCEDURECALL (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "        " << dummyCif("PROCEDURECALL");
     m_stream << "        call " << procedureCall.procedure()->name();
 
     auto &procedureCallArgs = procedureCall.arguments();
@@ -332,6 +332,12 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall) const
         m_stream << "(" << args << ")";
     }
     m_stream << ";\n";
+}
+
+QString SdlVisitor::dummyCif(const QString &cifType) const
+{
+    const static QString dummyCifTemplate = "/* CIF %1 (250, 150), (150, 75) */\n";
+    return dummyCifTemplate.arg(cifType);
 }
 
 template<typename T>

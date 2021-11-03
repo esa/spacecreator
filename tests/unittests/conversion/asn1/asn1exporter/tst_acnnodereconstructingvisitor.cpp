@@ -91,7 +91,7 @@ void tst_AcnNodeReconstructingVisitor::testInteger()
     auto type = std::make_unique<Types::Integer>();
 
     type->setAlignToNext(Types::Type::mapAlignToNext(QString("word")));
-    type->setSize(10);
+    type->setSize(10); // NOLINT
     type->setEncoding(Types::IntegerAcnParameters::mapEncoding(QStringLiteral("pos-int")));
     type->setEndianness(Types::Type::mapEndianess(QStringLiteral("big")));
 
@@ -172,7 +172,7 @@ void tst_AcnNodeReconstructingVisitor::testEnumerated()
     auto type = std::make_unique<Types::Enumerated>();
 
     type->setAlignToNext(Types::Type::mapAlignToNext(QString("word")));
-    type->setSize(10);
+    type->setSize(10); // NOLINT
     type->setEncoding(Types::IntegerAcnParameters::mapEncoding(QStringLiteral("pos-int")));
     type->setEndianness(Types::Type::mapEndianess(QStringLiteral("big")));
     type->setEncodeValues(true);

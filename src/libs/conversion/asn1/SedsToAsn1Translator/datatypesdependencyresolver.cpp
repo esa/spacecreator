@@ -55,7 +55,7 @@ void DataTypesDependencyResolver::visit(const seds::model::DataType *dataType)
     }
 
     if (isTemporarilyMarked(dataType)) {
-        throw NotDAGException();
+        throw NotDagException();
     }
 
     markTemporary(dataType);
@@ -148,19 +148,14 @@ bool DataTypesDependencyResolver::isPermanentlyMarked(const seds::model::DataTyp
     return m_marks.at(dataType) == MarkType::Permanent;
 }
 
-const char *NotDAGException::what() const noexcept
-{
-    return "Data types doesn't make a DAG";
-}
-
-UndeclaredDataTypeException::UndeclaredDataTypeException(QString dataTypeName)
-    : m_message(QString("Undeclared data type '%1'").arg(std::move(dataTypeName)).toStdString())
+NotDagException::NotDagException()
+    : ConversionException("Data types doesn't make a DAG")
 {
 }
 
-const char *UndeclaredDataTypeException::what() const noexcept
+UndeclaredDataTypeException::UndeclaredDataTypeException(const QString &dataTypeName)
+    : ConversionException(QString("Undeclared data type '%1'").arg(dataTypeName))
 {
-    return m_message.c_str();
 }
 
 } // namespace conversion::asn1::translator

@@ -51,7 +51,7 @@ using namespace seds::model;
 
 using conversion::Options;
 using conversion::asn1::translator::DataTypesDependencyResolver;
-using conversion::asn1::translator::NotDAGException;
+using conversion::asn1::translator::NotDagException;
 using conversion::asn1::translator::SedsToAsn1Translator;
 using conversion::asn1::translator::UndeclaredDataTypeException;
 using conversion::translator::TranslationException;
@@ -200,7 +200,7 @@ void tst_SedsToAsn1Translator::testResolvingCyclicDependency()
 
     DataTypesDependencyResolver resolver;
 
-    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes), NotDAGException);
+    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes), NotDagException);
 }
 
 void tst_SedsToAsn1Translator::testResolvingUndeclaredType()

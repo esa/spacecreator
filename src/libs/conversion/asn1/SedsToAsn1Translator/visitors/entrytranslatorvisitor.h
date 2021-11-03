@@ -104,6 +104,11 @@ private:
 
     template<typename Type, typename ValueType>
     auto createValueConstraint(const QString &value, Asn1Acn::Types::Type *asn1Type) const -> void;
+
+private:
+    const static int m_crc8BitSize = 8;
+    const static int m_crc16BitSize = 16;
+    const static int m_checksumBitSize = 32;
 };
 
 template<typename Type, typename ValueType>
