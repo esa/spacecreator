@@ -634,7 +634,7 @@ void tst_sdlmodel::testJoinWithoutSpecifiedLabel()
 
 void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
 {
-    QString modelName = "Procedure";
+    QString modelName = "ProcedureWithParamsAndReturn";
     QString modelPrefix = "Sdl_";
     QString processName = modelName.toLower(); // NOLINT
 
