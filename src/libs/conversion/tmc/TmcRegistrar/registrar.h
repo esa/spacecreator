@@ -21,10 +21,11 @@
 
 #include <conversion/common/registrar.h>
 
+namespace conversion::tmc {
+
 /**
  * @brief   Registers conversion capabilities for TMC model
  */
-namespace conversion::tmc {
 class TmcRegistrar final : public Registrar
 {
 public:
