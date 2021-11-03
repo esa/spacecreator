@@ -409,7 +409,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
 {
     QString modelName = "DecisionExpressionAndAnswer";
     QString modelPrefix = "Sdl_";
-    QString processName = modelName; // NOLINT
+    QString processName = modelName.toLower(); // NOLINT
 
     auto variableX = makeVariableDeclaration("x", "MyInteger");
     auto variableXRef = VariableReference(variableX.get());
@@ -489,7 +489,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
         QFAIL(ex.what());
     }
 
-    QString filename = QString("%1%2.%3").arg(modelPrefix, modelName, "pr");
+    QString filename = QString("%1%2.%3").arg(modelPrefix, processName, "pr");
     QFile outputFile(filename);
     if (!outputFile.open(QIODevice::ReadOnly)) {
         QFAIL("requested file cannot be found");
