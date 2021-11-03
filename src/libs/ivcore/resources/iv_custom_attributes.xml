@@ -155,4 +155,13 @@
             <Required_Interface/>
         </Scopes>
     </Attr>
+    <Attr name="enable_multicast" visible="false">
+        <Type>
+            <Boolean defaultValue="False"/>
+        </Type>
+        <Scopes>
+            <Provided_Interface/>
+            <Required_Interface/>
+        </Scopes>
+    </Attr>
 </Attrs>

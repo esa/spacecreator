@@ -55,6 +55,7 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "is_visible", Token::is_visible },
     { "language", Token::language },
     { "default_implementation", Token::default_implementation },
+    { "enable_multicast", Token::enable_multicast },
 
     // TASTE props:
     { "Taste::coordinates", Token::coordinates },

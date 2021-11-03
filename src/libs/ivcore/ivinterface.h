@@ -120,6 +120,7 @@ public:
     IVInterface *cloneOf() const;
     bool isClone() const;
     bool isCloned() const;
+    bool isMulticastEnabled() const;
     QVector<QPointer<IVInterface>> clones() const;
 
     static IVInterface *createIface(const CreationInfo &descr);

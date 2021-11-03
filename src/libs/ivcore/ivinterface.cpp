@@ -308,6 +308,11 @@ bool IVInterface::isCloned() const
     return d->m_clones.size();
 }
 
+bool IVInterface::isMulticastEnabled() const
+{
+    return entityAttributeValue<bool>(meta::Props::token(meta::Props::Token::enable_multicast), false);
+}
+
 QVector<QPointer<IVInterface>> IVInterface::clones() const
 {
     return d->m_clones;
@@ -529,9 +534,14 @@ void IVInterfaceRequired::setAttributeImpl(
             if (entityAttributeValue<bool>(attributeName) != newVal) {
                 // should be handled in Connection _before_ the actual value change:
                 Q_EMIT inheritedLabelsChanged(inheritedLables());
-
                 IVInterface::setAttributeImpl(attributeName, value, type);
                 Q_EMIT propChanged_InheritPI(newVal);
+            }
+        } break;
+        case meta::Props::Token::enable_multicast: {
+            const bool newVal = value.toBool();
+            if (entityAttributeValue<bool>(attributeName) != newVal) {
+                IVInterface::setAttributeImpl(attributeName, value, type);
             }
         } break;
         case meta::Props::Token::name: {

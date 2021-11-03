@@ -120,10 +120,11 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
     if (sourceIface == targetIface && sourceIface && targetIface)
         return FailReason::SameInterface;
 
-    // [6] - Multicast is disabled atm
-    if (sourceIface) {
-        if (auto model = sourceIface->model()) {
-            for (const auto connection : model->getConnectionsForIface(sourceIface->id())) {
+    // [6] - Multicast is disabled
+    if (sourceIface != nullptr && !sourceIface->isMulticastEnabled()) {
+        const auto *model = sourceIface->model();
+        if (model != nullptr) {
+            for (const auto *connection : model->getConnectionsForIface(sourceIface->id())) {
                 if (connection->sourceInterface()->id() == sourceIface->id()) {
                     return FailReason::MulticastDisabled;
                 }
@@ -143,7 +144,7 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
  * have the same kind (or the kind of at least one of them is IVInterface::OperationKind::Any) and
  * have the same parameters,
  * or they are the PI and RI and the RI has InheritPI property set to true.
- * In case the passed interfaces are of different directions (PI and RI),
+ * In case the passed interfaces are of different directions (PI and RI) and multicast is disabled
  * the RI is also checked to be not connected to other PIs to avoid multicast connections.
  * Returns ConnectionCreationValidator::FailReason, anything except the FailReason::NotFail
  * means that the connection creation is prohibited.
@@ -151,21 +152,24 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
 ConnectionCreationValidator::FailReason ConnectionCreationValidator::checkKindAndParams(
         IVInterface *sourceIface, IVInterface *targetIface)
 {
-    if (auto ri = IVConnection::selectIface<const IVInterfaceRequired *>(sourceIface, targetIface))
-        if (IVConnection::selectIface<const IVInterfaceProvided *>(sourceIface, targetIface)) {
-#ifndef IV_MULTICAST_CONNECTION
-            if (IVModel *model = ri->model()) {
-                const QVector<IVConnection *> riConnections = model->getConnectionsForIface(ri->id());
-                for (const IVConnection *riConnection : riConnections)
-                    if ((riConnection->sourceInterface() && riConnection->sourceInterface()->isProvided())
-                            || (riConnection->targetInterface() && riConnection->targetInterface()->isProvided()))
-                        return FailReason::MulticastDisabled;
+    const auto *ri = IVConnection::selectIface<const IVInterfaceRequired *>(sourceIface, targetIface);
+    const auto *pi = IVConnection::selectIface<const IVInterfaceProvided *>(sourceIface, targetIface);
+    if (ri != nullptr && pi != nullptr) {
+        const auto *model = ri->model();
+        if (model != nullptr && !ri->isMulticastEnabled()) {
+            const auto riConnections = model->getConnectionsForIface(ri->id());
+            for (const IVConnection *riConnection : riConnections) {
+                if ((riConnection->sourceInterface() != nullptr
+                            && riConnection->sourceInterface()->isProvided())
+                        || (riConnection->targetInterface() != nullptr
+                            && riConnection->targetInterface()->isProvided())) {
+                    return FailReason::MulticastDisabled;
+                }
             }
-#endif // IV_MULTICAST_CONNECTION
-
-            if (ri->isInheritPI())
-                return FailReason::NotFail;
         }
+        if (ri->isInheritPI())
+            return FailReason::NotFail;
+    }
 
     const bool weakKind = sourceIface->kind() == IVInterface::OperationKind::Any
             || targetIface->kind() == IVInterface::OperationKind::Any;
