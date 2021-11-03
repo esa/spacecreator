@@ -10,7 +10,7 @@
 
 </Function>
 
-<Function name="ExampleProcess" is_type="NO" language="SDL">
+<Function name="paramlessProcedure" is_type="NO" language="SDL">
     <Property name="Taste::coordinates" value="48400 52900 68400 60900"/>
 <Provided_Interface name="startProcess" kind="Sporadic">
     <Property name="Taste::coordinates" value="68400 54600"/>
@@ -21,7 +21,7 @@
 
 <Connection >
     <Source func_name="gui" ri_name="startProcess"/>
-    <Target func_name="ExampleProcess" pi_name="startProcess"/>
+    <Target func_name="paramlessProcedure" pi_name="startProcess"/>
     <Property name="Taste::coordinates" value="42100 34000 70000 34000 70000 54600 68700 54600"/>
 </Connection>
 

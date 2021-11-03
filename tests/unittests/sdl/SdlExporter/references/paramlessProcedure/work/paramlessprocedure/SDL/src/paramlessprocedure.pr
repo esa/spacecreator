@@ -1,5 +1,5 @@
 /* CIF PROCESS (250, 150), (150, 75) */
-process Exampleprocess;
+process Paramlessprocedure;
     /* CIF procedure (583, 156), (161, 40) */
     procedure myParamlessProcedure;
         /* CIF START (200, 61), (70, 35) */
@@ -24,4 +24,4 @@ process Exampleprocess;
             /* CIF NEXTSTATE (319, 234), (70, 35) */
             NEXTSTATE -;
     endstate;
-endprocess Exampleprocess;
+endprocess Paramlessprocedure;
