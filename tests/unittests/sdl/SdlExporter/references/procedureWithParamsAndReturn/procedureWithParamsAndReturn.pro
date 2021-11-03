@@ -2,7 +2,7 @@ TEMPLATE = lib
 CONFIG -= qt
 CONFIG += generateC
 
-DISTFILES += procedure.asn
+DISTFILES += procedureWithParamsAndReturn.asn
 DISTFILES += interfaceview.xml
 DISTFILES += work/binaries/*.msc
 DISTFILES += work/binaries/coverage/index.html
