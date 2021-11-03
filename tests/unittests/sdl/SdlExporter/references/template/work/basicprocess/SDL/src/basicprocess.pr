@@ -1,5 +1,5 @@
 /* CIF PROCESS (250, 150), (150, 75) */
-process Exampleprocess;
+process Basicprocess;
     /* CIF START (148, 174), (70, 35) */
     START;
         /* CIF NEXTSTATE (108, 236), (150, 75) */
@@ -18,4 +18,4 @@ process Exampleprocess;
             /* CIF NEXTSTATE (140, 444), (150, 75) */
             NEXTSTATE -;
     endstate;
-endprocess Exampleprocess;
+endprocess Basicprocess;
