@@ -12,7 +12,7 @@ add_subdirectory(seds)
 add_subdirectory(sdl)
 add_subdirectory(shared)
 add_subdirectory(spacecreatorsystem)
-add_subdirectory(tmc)
+add_subdirectory(promela)
 
 if (${QTC_FOUND} AND QTC_VERSION EQUAL 48)
     add_subdirectory(asn1plugin)
