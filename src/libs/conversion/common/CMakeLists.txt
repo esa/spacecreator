@@ -2,6 +2,7 @@ project(ConversionCommon VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES exceptions.cpp
             modeltype.cpp
+            mangler/mangler.cpp
             options.cpp
             export/exceptions.cpp
             import/exceptions.cpp
@@ -11,6 +12,7 @@ set(INCLUDES exceptions.h
              model.h
              modelproperties.h
              modeltype.h
+             mangler/mangler.h
              options.h
              overloaded.h
              registrar.h
