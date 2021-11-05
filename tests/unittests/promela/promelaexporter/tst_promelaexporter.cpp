@@ -26,7 +26,7 @@
 
 namespace tmc::test {
 using conversion::Options;
-using promela::PromelaOptions;
+using conversion::promela::PromelaOptions;
 using promela::exporter::PromelaExporter;
 using promela::model::ArrayType;
 using promela::model::BasicType;

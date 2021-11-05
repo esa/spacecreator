@@ -27,10 +27,10 @@ target_include_directories(Asn1ToPromelaTranslator
 target_link_libraries(Asn1ToPromelaTranslator
   PUBLIC              Conversion::Common
                       asn1library
-                      Promela::PromelaModel
+                      Promela::Model
   PRIVATE             CommonProjectWarnings)
 
 add_format_target(Asn1ToPromelaTranslator)
 add_tidy_target(Asn1ToPromelaTranslator)
 
-add_library(Promela::Asn1ToPromelaTranslator ALIAS Asn1ToPromelaTranslator)
+add_library(Conversion::Asn1ToPromelaTranslator ALIAS Asn1ToPromelaTranslator)
