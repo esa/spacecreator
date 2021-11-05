@@ -17,13 +17,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "mangler.h"
+#include "escaper.h"
 
 #include <utility>
 
 namespace conversion {
 
-QString Mangler::mangleIvName(QString name)
+QString Escaper::escapeIvName(QString name)
 {
     QString newName = std::move(name);
 

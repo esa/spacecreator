@@ -1,3 +1,3 @@
 add_subdirectory(asn1modelbuilder)
 add_subdirectory(sedsmodelbuilder)
-add_subdirectory(mangler)
+add_subdirectory(escaper)

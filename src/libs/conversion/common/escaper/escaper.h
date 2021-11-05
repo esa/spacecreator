@@ -26,9 +26,9 @@
 namespace conversion {
 
 /**
- * @brief   Mangler
+ * @brief   Escaper
  */
-class Mangler
+class Escaper
 {
 public:
     /**
@@ -36,9 +36,9 @@ public:
      *
      * @param   message     Error message
      */
-    Mangler() = default;
+    Escaper() = default;
 
-    static auto mangleIvName(QString name) -> QString;
+    static auto escapeIvName(QString name) -> QString;
 };
 
 } // namespace conversion
