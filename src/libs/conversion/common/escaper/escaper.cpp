@@ -19,6 +19,7 @@
 
 #include "escaper.h"
 
+#include <QRegExp>
 #include <utility>
 
 namespace conversion {
@@ -27,7 +28,28 @@ QString Escaper::escapeIvName(QString name)
 {
     QString newName = std::move(name);
 
-    // TODO: implementation
+    // remove leading & trailing spaces
+    newName = newName.trimmed();
+
+    // remove leading numbers
+    newName.remove(QRegExp("^[0-9]*"));
+
+    // all non-ascii to ascii
+    // todo
+
+    // replace '-' with '_'
+    newName.replace(newName.indexOf("-"), 1U, '_');
+
+    if (!newName.contains("_")) {
+        // replace first encountered space with '_'
+        newName.replace(newName.indexOf(" "), 1U, '_');
+    }
+
+    // remove remaining spaces
+    newName.remove(" ");
+
+    // remove non-[letters | numbers | _]
+    newName.remove(QRegExp("[^a-zA-Z_0-9]"));
 
     return newName;
 }
