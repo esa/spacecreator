@@ -42,14 +42,25 @@ void tst_Escaper::testIvNominals()
 {
     QCOMPARE(Escaper::escapeIvName("Something"), "Something");
     QCOMPARE(Escaper::escapeIvName("something"), "something");
+    QCOMPARE(Escaper::escapeIvName("someThing"), "someThing");
+    QCOMPARE(Escaper::escapeIvName("somethinG"), "somethinG");
+
     QCOMPARE(Escaper::escapeIvName("some thing"), "some_thing");
     QCOMPARE(Escaper::escapeIvName("some   thing"), "some_thing");
+
     QCOMPARE(Escaper::escapeIvName(" some   thing"), "some_thing");
     QCOMPARE(Escaper::escapeIvName(" some thing"), "some_thing");
+    QCOMPARE(Escaper::escapeIvName("some thing "), "some_thing");
+    QCOMPARE(Escaper::escapeIvName("some thing    "), "some_thing");
+    QCOMPARE(Escaper::escapeIvName("some     thing    "), "some_thing");
+
+    QCOMPARE(Escaper::escapeIvName("0nd some thing"), "nd_something");
+    QCOMPARE(Escaper::escapeIvName("2345nd some thing"), "nd_something");
+    QCOMPARE(Escaper::escapeIvName("2nd some thing"), "nd_something");
     QCOMPARE(Escaper::escapeIvName(" 1st some thing"), "st_something");
-    QCOMPARE(Escaper::escapeIvName("some tHing 1"), "something1");
+    QCOMPARE(Escaper::escapeIvName("some tHing 1"), "some_tHing1");
+
     QCOMPARE(Escaper::escapeIvName("some-thing"), "some_thing");
-    QCOMPARE(Escaper::escapeIvName("śome thing"), "some_thing");
 
     QCOMPARE(Escaper::escapeIvName("śome thing"), "some_thing");
     QCOMPARE(Escaper::escapeIvName("ąćśęńółżź"), "acsenolzz");
