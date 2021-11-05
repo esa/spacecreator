@@ -26,32 +26,21 @@ namespace conversion {
 
 QString Escaper::escapeIvName(QString name)
 {
-    QString newName = std::move(name);
-
-    // remove leading & trailing spaces
-    newName = newName.trimmed();
-
-    // remove leading numbers
-    newName.remove(QRegExp("^[0-9]*"));
+    name = name.trimmed();
+    name.remove(QRegExp("^[0-9]*"));
 
     // all non-ascii to ascii
     // todo
 
-    // replace '-' with '_'
-    newName.replace(newName.indexOf("-"), 1U, '_');
+    name.replace(name.indexOf("-"), 1U, '_');
 
-    if (!newName.contains("_")) {
-        // replace first encountered space with '_'
-        newName.replace(newName.indexOf(" "), 1U, '_');
+    if (!name.contains("_")) {
+        name.replace(name.indexOf(" "), 1U, '_');
     }
+    name.remove(" ");
+    name.remove(QRegExp("[^a-zA-Z_0-9]"));
 
-    // remove remaining spaces
-    newName.remove(" ");
-
-    // remove non-[letters | numbers | _]
-    newName.remove(QRegExp("[^a-zA-Z_0-9]"));
-
-    return newName;
+    return name;
 }
 
 } // namespace conversion
