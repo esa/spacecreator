@@ -75,4 +75,14 @@ const QList<ValueDefinition> &PromelaModel::getValueDefinitions() const noexcept
 {
     return m_valueDefinitions;
 }
+
+void PromelaModel::addDeclaration(const Declaration &declaration)
+{
+    m_declarations.append(declaration);
+}
+
+const QList<Declaration> &PromelaModel::getDeclarations() const noexcept
+{
+    return m_declarations;
+}
 }

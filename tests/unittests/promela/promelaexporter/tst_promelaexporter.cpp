@@ -55,6 +55,7 @@ private Q_SLOTS:
     void testUtypeUnion();
     void testTypeAlias();
     void testValueDefinition();
+    void testDeclaration();
 
 private:
     QString getFileContents(const QString &filename);
@@ -259,6 +260,41 @@ void tst_PromelaExporter::testValueDefinition()
         QFAIL(ex.what());
     }
     QString out2 = getFileContents("expect_promela_file7.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testDeclaration()
+{
+    PromelaModel model;
+
+    model.addDeclaration(Declaration(DataType(BasicType::BIT), "var_one"));
+    model.addDeclaration(Declaration(DataType(BasicType::BOOLEAN), "var_two"));
+    model.addDeclaration(Declaration(DataType(BasicType::BYTE), "var_three"));
+    model.addDeclaration(Declaration(DataType(BasicType::PID), "var_four"));
+    model.addDeclaration(Declaration(DataType(BasicType::SHORT), "var_five"));
+    model.addDeclaration(Declaration(DataType(BasicType::INT), "var_six"));
+    model.addDeclaration(Declaration(DataType(BasicType::FLOAT), "var_seven"));
+    model.addDeclaration(Declaration(DataType(BasicType::CHAN), "var_eight"));
+
+    model.addDeclaration(Declaration(DataType(UnsignedDataType(4)), "var_uns1"));
+    model.addDeclaration(Declaration(DataType(UnsignedDataType(8)), "var_uns2"));
+
+    model.addDeclaration(Declaration(DataType(ArrayType(2, BasicType::BIT)), "var_array_bit"));
+    model.addDeclaration(Declaration(DataType(ArrayType(3, BasicType::BOOLEAN)), "var_array_bool"));
+    model.addDeclaration(Declaration(DataType(ArrayType(4, BasicType::BYTE)), "var_array_byte"));
+    model.addDeclaration(Declaration(DataType(ArrayType(5, BasicType::PID)), "var_array_pid"));
+    model.addDeclaration(Declaration(DataType(ArrayType(6, BasicType::SHORT)), "var_array_short"));
+    model.addDeclaration(Declaration(DataType(ArrayType(7, BasicType::INT)), "var_array_int"));
+    model.addDeclaration(Declaration(DataType(ArrayType(8, BasicType::CHAN)), "var_array_chan"));
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_file8.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }
