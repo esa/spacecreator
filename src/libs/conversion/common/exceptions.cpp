@@ -66,4 +66,9 @@ ExporterNotRegisteredException::ExporterNotRegisteredException(ModelType modelTy
 {
 }
 
+ManglerException::ManglerException(const QString &message)
+    : ConversionException(message)
+{
+}
+
 } // namespace conversion

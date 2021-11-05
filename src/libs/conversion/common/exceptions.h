@@ -142,4 +142,18 @@ public:
     explicit ExporterNotRegisteredException(ModelType modelType);
 };
 
+/**
+ * @brief   Exception thrown when mangler encounters an illegal input name
+ */
+class ManglerException : public ConversionException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   message     Error message
+     */
+    explicit ManglerException(const QString &message);
+};
+
 } // namespace conversion
