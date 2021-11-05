@@ -121,6 +121,7 @@ QString AsyncInterfaceCommandTranslator::buildAsn1SequenceType(
     } else {
         const auto cachedTypesCount = m_commandArgumentsCache.count(sedsCommandName);
         auto bundledTypeName = createBundledTypeName(sedsCommandName, cachedTypesCount);
+        // TODO: escape bundledTypeName with escapeAsnName
         createAsn1Sequence(bundledTypeName, arguments);
 
         m_commandArgumentsCache.insert({ sedsCommandName, { bundledTypeName, bundledTypeHash, std::move(arguments) } });
@@ -178,6 +179,7 @@ std::unordered_map<QString, QString> AsyncInterfaceCommandTranslator::processArg
             const auto &genericTypeName = sedsArgument.type().nameStr();
             const auto &concreteTypeName = findMappedType(genericTypeName);
 
+            // TODO: escape bundledTypeName with escapeAsnName?
             arguments.insert({ sedsArgument.nameStr(), concreteTypeName });
         }
     }
