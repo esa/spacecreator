@@ -1,4 +1,4 @@
-set(TEST_NAME tst_mangler)
+set(TEST_NAME tst_escaper)
 project(${TEST_NAME})
 
 add_executable(${TEST_NAME})

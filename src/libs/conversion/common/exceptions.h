@@ -143,9 +143,9 @@ public:
 };
 
 /**
- * @brief   Exception thrown when mangler encounters an illegal input name
+ * @brief   Exception thrown when escaper encounters an illegal input name
  */
-class ManglerException : public ConversionException
+class EscaperException : public ConversionException
 {
 public:
     /**
@@ -153,7 +153,7 @@ public:
      *
      * @param   message     Error message
      */
-    explicit ManglerException(const QString &message);
+    explicit EscaperException(const QString &message);
 };
 
 } // namespace conversion

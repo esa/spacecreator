@@ -66,7 +66,7 @@ ExporterNotRegisteredException::ExporterNotRegisteredException(ModelType modelTy
 {
 }
 
-ManglerException::ManglerException(const QString &message)
+EscaperException::EscaperException(const QString &message)
     : ConversionException(message)
 {
 }
