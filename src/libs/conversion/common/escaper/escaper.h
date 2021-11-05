@@ -33,11 +33,17 @@ class Escaper
 public:
     /**
      * @brief   Constructor
-     *
-     * @param   message     Error message
      */
     Escaper() = default;
 
+    /**
+     * @brief   Convert input name to id acceptable in InterfaceView
+     *          TODO: (compliant with AADL specification)
+     *
+     * @param   name    input name
+     *
+     * @returns identifier for InterfaceView
+     */
     static auto escapeIvName(QString name) -> QString;
 };
 
