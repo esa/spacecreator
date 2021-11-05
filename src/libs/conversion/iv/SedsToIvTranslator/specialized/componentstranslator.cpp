@@ -22,11 +22,14 @@
 #include "specialized/asyncinterfacecommandtranslator.h"
 #include "specialized/syncinterfacecommandtranslator.h"
 
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivcommonprops.h>
 #include <ivcore/ivfunction.h>
 #include <seds/SedsModel/package/package.h>
 
+using conversion::Escaper;
+using conversion::EscaperException;
 using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredInterfaceException;
 using conversion::translator::UnhandledValueException;
@@ -55,7 +58,8 @@ QVector<ivm::IVFunction *> ComponentsTranslator::translateComponents()
 ivm::IVFunction *ComponentsTranslator::translateComponent(const seds::model::Component &sedsComponent)
 {
     auto *ivFunction = new ivm::IVFunction();
-    ivFunction->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name), sedsComponent.nameStr());
+    ivFunction->setEntityAttribute(
+            ivm::meta::Props::token(ivm::meta::Props::Token::name), Escaper::escapeIvName(sedsComponent.nameStr()));
 
     for (const auto &sedsInterface : sedsComponent.providedInterfaces()) {
         translateInterface(sedsInterface, sedsComponent, ivm::IVInterface::InterfaceType::Provided, ivFunction);
@@ -72,7 +76,8 @@ void ComponentsTranslator::translateInterface(const seds::model::Interface &seds
         const seds::model::Component &sedsComponent, const ivm::IVInterface::InterfaceType interfaceType,
         ivm::IVFunction *ivFunction)
 {
-    const auto &sedsInterfaceDeclaration = findInterfaceDeclaration(sedsInterface.type().nameStr(), sedsComponent);
+    const auto &sedsInterfaceDeclaration =
+            findInterfaceDeclaration(Escaper::escapeIvName(sedsInterface.type().nameStr()), sedsComponent);
 
     AsyncInterfaceCommandTranslator asyncCommandTranslator(sedsInterface, m_asn1Definitions, ivFunction);
     SyncInterfaceCommandTranslator syncCommandTranslator(sedsInterface, ivFunction);
