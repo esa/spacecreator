@@ -125,13 +125,27 @@ public:
      */
     const QList<ValueDefinition> &getValueDefinitions() const noexcept;
 
+    /**
+     * @brief Add Declaration to the model
+     *
+     * @param declaration Declaration to add to the model
+     */
+    void addDeclaration(const Declaration &declaration);
+
+    /**
+     * @brief Getter for all declarations of promela model
+     *
+     * @return All declarations of the model
+     */
+    const QList<Declaration> &getDeclarations() const noexcept;
+
 private:
     QSet<QString> m_mtypeValues;
     std::map<QString, NamedMtype> m_namedMtypeValues;
     QList<Utype> m_userTypes;
-    std::map<QString, Declaration> m_declarations;
     QList<TypeAlias> m_typeAliases;
     QList<ValueDefinition> m_valueDefinitions;
+    QList<Declaration> m_declarations;
 };
 }
 namespace conversion {

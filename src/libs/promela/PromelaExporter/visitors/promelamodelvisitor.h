@@ -54,6 +54,7 @@ private:
     void generateTypeAliases(const QList<::promela::model::TypeAlias> &aliases);
     void generateValueDefinitions(const QList<::promela::model::ValueDefinition> &values);
     void generateUtypes(const QList<::promela::model::Utype> &utypes);
+    void generateDeclarations(const QList<::promela::model::Declaration> &values);
 
 private:
     QTextStream &m_stream;

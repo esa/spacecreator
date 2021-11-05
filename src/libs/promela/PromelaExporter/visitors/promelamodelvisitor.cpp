@@ -19,12 +19,14 @@
 
 #include "promelamodelvisitor.h"
 
+#include "declarationvisitor.h"
 #include "typealiasvisitor.h"
 #include "utypevisitor.h"
 
 #include <QVector>
 #include <algorithm>
 
+using promela::model::Declaration;
 using promela::model::NamedMtype;
 using promela::model::PromelaModel;
 using promela::model::TypeAlias;
@@ -46,6 +48,7 @@ void PromelaModelVisitor::visit(const PromelaModel &promelaModel)
     generateTypeAliases(promelaModel.getTypeAliases());
     generateValueDefinitions(promelaModel.getValueDefinitions());
     generateUtypes(promelaModel.getUtypes());
+    generateDeclarations(promelaModel.getDeclarations());
 }
 
 void PromelaModelVisitor::generateMtypes(const QSet<QString> &values)
@@ -95,6 +98,14 @@ void PromelaModelVisitor::generateUtypes(const QList<Utype> &utypes)
     for (const Utype &utype : utypes) {
         UtypeVisitor visitor(m_stream, m_indent);
         visitor.visit(utype);
+    }
+}
+
+void PromelaModelVisitor::generateDeclarations(const QList<::promela::model::Declaration> &values)
+{
+    for (const Declaration &declaration : values) {
+        DeclarationVisitor visitor(m_stream, "");
+        visitor.visit(declaration);
     }
 }
 

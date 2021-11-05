@@ -1,0 +1,17 @@
+bit var_one;
+bool var_two;
+byte var_three;
+pid var_four;
+short var_five;
+int var_six;
+float var_seven;
+chan var_eight;
+unsigned var_uns1:4;
+unsigned var_uns2:8;
+bit var_array_bit[2];
+bool var_array_bool[3];
+byte var_array_byte[4];
+pid var_array_pid[5];
+short var_array_short[6];
+int var_array_int[7];
+chan var_array_chan[8];
