@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "../exceptions.h"
+
 #include <QString>
 
 namespace conversion {

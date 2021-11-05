@@ -20,16 +20,12 @@
 #include <QObject>
 #include <QtTest/qtestcase.h>
 #include <QtTest>
+#include <conversion/common/exceptions.h>
 #include <conversion/common/mangler/mangler.h>
 #include <unittests/common/verifyexception.h>
 
 using conversion::Mangler;
-
-// todo: move to a separate file
-class ManglerException : std::exception
-{
-    // todo: implemention
-};
+using conversion::ManglerException;
 
 namespace conversion::iv::test {
 
@@ -70,7 +66,7 @@ void tst_Mangler::testIvNominals()
 
 void tst_Mangler::testIvExceptions()
 {
-    QString manglerExceptionMsg = "Incorrect name. Name must contain at least one ASCII character.";
+    const char *manglerExceptionMsg = "Incorrect name. Name must contain at least one ASCII character.";
 
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Mangler::mangleIvName("000000"), ManglerException, manglerExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
