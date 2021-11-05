@@ -36,6 +36,8 @@ class tst_Escaper : public QObject
 private Q_SLOTS:
     void testIvNominals();
     void testIvExceptions();
+    void testAsn1Nominals();
+    void testAsn1Exceptions();
 };
 
 void tst_Escaper::testIvNominals()
@@ -100,6 +102,17 @@ void tst_Escaper::testIvExceptions()
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("___"), EscaperException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName(")(*&^%$#@!"), EscaperException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("313€"), EscaperException, escaperExceptionMsg);
+}
+
+void tst_Escaper::testAsn1Nominals()
+{
+    QCOMPARE(Escaper::escapeAsn1Name("Something"), "Something");
+    // TODO
+}
+
+void tst_Escaper::testAsn1Exceptions()
+{
+    // TODO
 }
 
 } // namespace conversion::common
