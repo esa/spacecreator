@@ -34,6 +34,7 @@ using conversion::ModelType;
 using conversion::Options;
 using conversion::exporter::ExportException;
 using conversion::exporter::IncorrectModelException;
+using conversion::promela::PromelaOptions;
 using promela::model::PromelaModel;
 
 namespace promela::exporter {

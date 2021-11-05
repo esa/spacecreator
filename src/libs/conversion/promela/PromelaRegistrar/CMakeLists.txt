@@ -13,8 +13,8 @@ target_include_directories(PromelaRegistrar
   PRIVATE ${CMAKE_SOURCE_DIR}/src/libs)
 
 target_link_libraries(PromelaRegistrar
-  PRIVATE   Promela::PromelaExporter
-            Promela::Asn1ToPromelaTranslator
+  PRIVATE   Promela::Exporter
+            Conversion::Asn1ToPromelaTranslator
   PUBLIC    Conversion::Common
             CommonProjectWarnings)
 

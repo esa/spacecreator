@@ -21,7 +21,7 @@
 
 #include <QString>
 
-namespace promela {
+namespace conversion::promela {
 
 /**
  * @brief   Possible options for Promela conversion

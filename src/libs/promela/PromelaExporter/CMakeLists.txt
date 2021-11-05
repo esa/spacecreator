@@ -30,11 +30,11 @@ target_include_directories(PromelaExporter
   PRIVATE                  ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(PromelaExporter
   PUBLIC              Conversion::Common
-                      Promela::PromelaModel
+                      Promela::Model
                       ${QT_CORE}
   PRIVATE             CommonProjectWarnings)
 
 add_format_target(PromelaExporter)
 add_tidy_target(PromelaExporter)
 
-add_library(Promela::PromelaExporter ALIAS PromelaExporter)
+add_library(Promela::Exporter ALIAS PromelaExporter)

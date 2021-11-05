@@ -41,4 +41,4 @@ target_link_libraries(PromelaModel
 add_format_target(PromelaModel)
 add_tidy_target(PromelaModel)
 
-add_library(Promela::PromelaModel ALIAS PromelaModel)
+add_library(Promela::Model ALIAS PromelaModel)
