@@ -1,8 +1,10 @@
 project(SedsConverter VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES main.cpp
+            sedsconvertercli.cpp
             sedsconverter.cpp)
-set(INCLUDES sedsconverter.h)
+set(INCLUDES sedsconvertercli.h
+             sedsconverter.h)
 
 add_executable(SedsConverter)
 target_sources(SedsConverter
