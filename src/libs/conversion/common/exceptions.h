@@ -153,7 +153,8 @@ public:
      *
      * @param   message     Error message
      */
-    explicit EscaperException(const QString &message);
+    explicit EscaperException(
+            const QString &message = "Incorrect name. Name must contain at least one ASCII character.");
 };
 
 } // namespace conversion

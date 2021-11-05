@@ -51,10 +51,13 @@ void tst_Escaper::testIvNominals()
     QCOMPARE(Escaper::escapeIvName(" some   thing"), "some_thing");
     QCOMPARE(Escaper::escapeIvName(" some thing"), "some_thing");
     QCOMPARE(Escaper::escapeIvName("some thing "), "some_thing");
+    QCOMPARE(Escaper::escapeIvName("__some thing "), "some_thing");
     QCOMPARE(Escaper::escapeIvName("some thing    "), "some_thing");
     QCOMPARE(Escaper::escapeIvName("some     thing    "), "some_thing");
 
     QCOMPARE(Escaper::escapeIvName("0nd some thing"), "nd_something");
+    QCOMPARE(Escaper::escapeIvName("0 00 some thing"), "some_thing");
+    QCOMPARE(Escaper::escapeIvName("0 00-some thing"), "some_thing");
     QCOMPARE(Escaper::escapeIvName("2345nd some thing"), "nd_something");
     QCOMPARE(Escaper::escapeIvName("2nd some thing"), "nd_something");
     QCOMPARE(Escaper::escapeIvName(" 1st some thing"), "st_something");
@@ -82,21 +85,21 @@ void tst_Escaper::testIvNominals()
 
 void tst_Escaper::testIvExceptions()
 {
-    const char *EscaperExceptionMsg = "Incorrect name. Name must contain at least one ASCII character.";
+    const char *escaperExceptionMsg = "Incorrect name. Name must contain at least one ASCII character.";
 
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("000000"), EscaperException, EscaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("000000"), EscaperException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
-            Escaper::escapeIvName("12345567675578"), EscaperException, EscaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("000 000"), EscaperException, EscaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName(" 012 040"), EscaperException, EscaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName(" 000-000"), EscaperException, EscaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("-000-000"), EscaperException, EscaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("-000 000"), EscaperException, EscaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName(""), EscaperException, EscaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("-----------"), EscaperException, EscaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("___"), EscaperException, EscaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName(")(*&^%$#@!"), EscaperException, EscaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("313€"), EscaperException, EscaperExceptionMsg);
+            Escaper::escapeIvName("12345567675578"), EscaperException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("000 000"), EscaperException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName(" 012 040"), EscaperException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName(" 000-000"), EscaperException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("-000-000"), EscaperException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("-000 000"), EscaperException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName(""), EscaperException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("-----------"), EscaperException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("___"), EscaperException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName(")(*&^%$#@!"), EscaperException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("313€"), EscaperException, escaperExceptionMsg);
 }
 
 } // namespace conversion::common

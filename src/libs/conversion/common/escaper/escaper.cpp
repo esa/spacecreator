@@ -19,6 +19,8 @@
 
 #include "escaper.h"
 
+#include "../exceptions.h"
+
 #include <QRegExp>
 #include <utility>
 
@@ -27,7 +29,7 @@ namespace conversion {
 QString Escaper::escapeIvName(QString name)
 {
     name = name.trimmed();
-    name.remove(QRegExp("^[0-9]*"));
+    name.remove(QRegExp("^[0-9 \\-_]*"));
 
     // all non-ascii to ascii
     // todo
@@ -39,6 +41,10 @@ QString Escaper::escapeIvName(QString name)
     }
     name.remove(" ");
     name.remove(QRegExp("[^a-zA-Z_0-9]"));
+
+    if (name.isEmpty()) {
+        throw EscaperException();
+    }
 
     return name;
 }
