@@ -41,6 +41,8 @@ public:
     inline static const QString skipValidation = "Seds_Import_SkipValidation";
     /** @brief Don't remove intermediate files after import */
     inline static const QString keepIntermediateFiles = "Seds_Import_KeepIntermediateFiles";
+    /** @brief Default schema file name*/
+    inline static const QString defaultSchemaFilename = "seds.xsd";
 };
 
 } // namespace conversion::seds

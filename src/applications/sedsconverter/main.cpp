@@ -17,9 +17,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#include "scversion.h"
 #include "sedsconverter.h"
+#include "sedsconvertercli.h"
 
 #include <QCoreApplication>
+#include <QVector>
 #include <conversion/asn1/Asn1Options/options.h>
 #include <conversion/common/exceptions.h>
 #include <conversion/common/export/exceptions.h>
@@ -41,38 +44,31 @@ using conversion::translator::TranslationException;
 int main(int argc, char **argv)
 {
     QCoreApplication a(argc, argv);
-
-    if (argc < 2) {
-        qFatal("No input seds filename\n");
-    }
-
-    sedsconverter::SedsConverter sedsConverter;
-
     Options options;
-    options.add(Asn1Options::inputFilename, "optional.asn");
-    options.add(Asn1Options::importAsn1File);
-    options.add(IvOptions::configFilename, "config.xml");
-    options.add(IvOptions::outputFilename, "output.xml");
-    options.add(SedsOptions::inputFilename, argv[1]);
-    options.add(SedsOptions::schemaFilename, "seds.xsd");
-    options.add(SedsOptions::externalRefFilename, "config.toml");
-    options.add(SedsOptions::skipValidation);
-    options.add(IvOptions::configFilename, "config.xml");
-    options.add(IvOptions::outputFilename, QString("%1.iv").arg(argv[1]));
+    sedsconverter::SedsConverter sedsConverter;
+    sedsconverter::SedsConverterCLI cli;
 
+    a.setOrganizationName(SC_ORGANISATION);
+    a.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
+    a.setApplicationVersion(spaceCreatorVersion);
+    a.setApplicationName(QObject::tr("SedsConverter"));
+
+    const auto usage = QString("Usage: %1 --in <file> <options> [--out <file>]").arg(argv[0]);
     try {
-        sedsConverter.convert({ ModelType::Seds }, ModelType::Asn1, {}, std::move(options));
+        cli.parseArguments(a.arguments());
+        cli.setOptions(options);
+        sedsConverter.convert(cli.getSourceModelTypes(), cli.getTargetModelType(), cli.getAuxModelTypes(), std::move(options));
     } catch (const ImportException &ex) {
-        const auto errorMessage = QString("Import failure: %1").arg(ex.errorMessage());
+        const auto errorMessage = QString("Import failure: %1\n%2").arg(ex.errorMessage(), usage);
         qFatal("%s", errorMessage.toLatin1().constData());
     } catch (const TranslationException &ex) {
-        const auto errorMessage = QString("Translation failure: %1").arg(ex.errorMessage());
+        const auto errorMessage = QString("Translation failure: %1\n%2").arg(ex.errorMessage(), usage);
         qFatal("%s", errorMessage.toLatin1().constData());
     } catch (const ExportException &ex) {
-        const auto errorMessage = QString("Export failure: %1").arg(ex.errorMessage());
+        const auto errorMessage = QString("Export failure: %1\n%2").arg(ex.errorMessage(), usage);
         qFatal("%s", errorMessage.toLatin1().constData());
     } catch (const ConversionException &ex) {
-        const auto errorMessage = QString("Conversion failure: %1").arg(ex.errorMessage());
+        const auto errorMessage = QString("Conversion failure: %1\n%2").arg(ex.errorMessage(), usage);
         qFatal("%s", errorMessage.toLatin1().constData());
     }
 }

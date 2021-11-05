@@ -44,10 +44,27 @@ public:
         OpenXMLFile,
         ListScriptableActions,
 
-        // Both
+        // MSC & IV
         OpenStringTemplateFile,
         ExportToFile,
         DropUnsavedChangesSilently,
+
+        //Seds Converter
+        SedsConverterInputFilename,
+        SedsConverterOutputFilename,
+        SedsConverterModelFrom,
+        SedsConverterModelTo,
+        SedsConverterModelAux,
+        SedsConverterIvConfig,
+        SedsConverterSedsSchemaFilename,
+        SedsConverterSedsExtRef,
+        SedsConverterSedsExtRefFilename,
+        SedsConverterSkipValidation,
+        SedsConverterKeepIntermediateFiles,
+        SedsConverterAcnFilepathPrefix,
+        SedsConverterAsn1FilepathPrefix,
+        SedsConverterSdlFilepathPrefix,
+        SedsConverterImportXmlFileForAsn1,
 
         Unknown
     };
