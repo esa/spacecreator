@@ -1,7 +1,9 @@
 project(SedsToSdlTranslator VERSION 1.0.0 LANGUAGES CXX)
 
-set(SOURCES translator.cpp)
-set(INCLUDES translator.h)
+set(SOURCES translator.cpp
+            specialized/statemachinetranslator.cpp)
+set(INCLUDES translator.h
+             specialized/statemachinetranslator.h)
 
 add_library(SedsToSdlTranslator STATIC)
 target_sources(SedsToSdlTranslator

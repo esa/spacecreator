@@ -19,7 +19,10 @@
 
 #pragma once
 
+#include <asn1library/asn1/asn1model.h>
 #include <conversion/common/translation/translator.h>
+#include <ivcore/ivmodel.h>
+#include <sdl/SdlModel/sdlmodel.h>
 #include <seds/SedsModel/sedsmodel.h>
 
 namespace conversion::sdl::translator {
@@ -68,7 +71,30 @@ private:
      *
      * @return  Result SDL model
      */
-    auto translateSedsModel(const seds::model::SedsModel *sedsModel) const -> std::vector<std::unique_ptr<Model>>;
+    auto translateSedsModel(const seds::model::SedsModel *sedsModel, Asn1Acn::Asn1Model *asn1Model,
+            ivm::IVModel *ivModel) const -> std::vector<std::unique_ptr<Model>>;
+
+    /**
+     * @brief   Translate SEDS package
+     *
+     * @param   package             Package to translate
+     * @param   asn1Model           Relevant ASN.1/ACN model
+     * @param   ivModel             Relevant Interface View model
+     * @param   model               Target SDL model to add the translated component implementations
+     */
+    auto translatePackage(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
+            ::sdl::SdlModel *model) const -> void;
+
+    /**
+     * @brief   Translate SEDS component
+     *
+     * @param   component           Component to translate
+     * @param   asn1Model           Relevant ASN.1/ACN model
+     * @param   ivModel             Relevant Interface View model
+     * @param   model               Target SDL model to add the translated component implementation
+     */
+    auto translateComponent(const seds::model::Component &sedsComponent, Asn1Acn::Asn1Model *asn1Model,
+            ivm::IVModel *ivModel, ::sdl::SdlModel *model) const -> void;
 };
 
 } // namespace conversion::sdl::translator
