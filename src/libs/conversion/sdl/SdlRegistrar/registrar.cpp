@@ -20,6 +20,7 @@
 #include "registrar.h"
 
 #include <conversion/common/modeltype.h>
+#include <conversion/sdl/SedsToSdlTranslator/translator.h>
 #include <memory>
 #include <sdl/SdlExporter/exporter.h>
 
@@ -30,7 +31,13 @@ namespace conversion::sdl {
 bool SdlRegistrar::registerCapabilities(conversion::Registry &registry)
 {
     auto sdlExporter = std::make_unique<SdlExporter>();
-    return registry.registerExporter(ModelType::Sdl, std::move(sdlExporter));
+    const auto exporterRegistrationResult = registry.registerExporter(ModelType::Sdl, std::move(sdlExporter));
+    if (!exporterRegistrationResult) {
+        return false;
+    }
+
+    auto sedsToSdlTranslator = std::make_unique<translator::SedsToSdlTranslator>();
+    return registry.registerTranslator({ ModelType::Seds }, ModelType::Sdl, std::move(sedsToSdlTranslator));
 }
 
 } // namespace conversion::sdl
