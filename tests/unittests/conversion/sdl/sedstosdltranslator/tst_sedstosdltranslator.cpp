@@ -67,7 +67,7 @@ private Q_SLOTS:
     void testMissingModel();
     void testNotEnoughModels();
     void testTooManyModels();
-    void testWrongModel();
+    void testMissingModels();
 
     void testTranslateStateMachineIntoProcess();
 };
@@ -106,7 +106,7 @@ void tst_SedsToSdlTranslator::testTooManyModels()
             TranslationException, "Too many models passed for SEDS to SDL translation");
 }
 
-void tst_SedsToSdlTranslator::testWrongModel()
+void tst_SedsToSdlTranslator::testMissingModels()
 {
     Options options;
     SedsToSdlTranslator translator;
@@ -115,7 +115,7 @@ void tst_SedsToSdlTranslator::testWrongModel()
     const auto mockModel = std::make_unique<MockModel>();
 
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(translator.translateModels({ sedsModel.get(), mockModel.get() }, options),
-            TranslationException, "Missing source Unspecified model");
+            TranslationException, "Not enough models passed for SEDS to SDL translation");
 }
 
 void tst_SedsToSdlTranslator::testTranslateStateMachineIntoProcess()
