@@ -12,6 +12,7 @@ target_include_directories(SdlRegistrar
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SdlRegistrar
     PRIVATE     SDL::Exporter
+                Conversion::SedsToSdlTranslator
     PUBLIC      Conversion::Common
                 CommonProjectWarnings)
 
