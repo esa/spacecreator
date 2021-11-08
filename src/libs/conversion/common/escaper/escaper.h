@@ -62,6 +62,11 @@ public:
      * @returns identifier for ASN.1 field name
      */
     static auto escapeAsn1FieldName(QString name) -> QString;
+
+private:
+    static auto replaceFirstOccurence(QString &name, QChar before, QChar after) -> void;
+
+    static auto removeLeadingNonletters(QString &name) -> void;
 };
 
 } // namespace conversion
