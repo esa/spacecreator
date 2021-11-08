@@ -44,6 +44,24 @@ public:
      * @returns identifier for InterfaceView
      */
     static auto escapeIvName(QString name) -> QString;
+
+    /**
+     * @brief   Convert input name to id acceptable as ASN.1 type name
+     *
+     * @param   name    input name
+     *
+     * @returns identifier for ASN.1 type name
+     */
+    static auto escapeAsn1TypeName(QString name) -> QString;
+
+    /**
+     * @brief   Convert input name to id acceptable as ASN.1 field name
+     *
+     * @param   name    input name
+     *
+     * @returns identifier for ASN.1 field name
+     */
+    static auto escapeAsn1FieldName(QString name) -> QString;
 };
 
 } // namespace conversion
