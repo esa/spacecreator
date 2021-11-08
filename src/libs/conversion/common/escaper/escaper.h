@@ -38,7 +38,6 @@ public:
 
     /**
      * @brief   Convert input name to id acceptable in InterfaceView
-     *          TODO: (compliant with AADL specification)
      *
      * @param   name    input name
      *
