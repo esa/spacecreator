@@ -48,11 +48,45 @@ QString Escaper::escapeIvName(QString name)
 
 QString Escaper::escapeAsn1TypeName(QString name)
 {
+    name = name.trimmed();
+    name.remove(QRegExp("^[0-9 \\-_]*"));
+
+    name.replace(name.indexOf("_"), 1U, '-');
+
+    if (!name.contains("-")) {
+        name.replace(name.indexOf(" "), 1U, '-');
+    }
+    name.remove(" ");
+    name.remove(QRegExp("[^a-zA-Z\\-0-9]"));
+
+    if (name.isEmpty()) {
+        throw EscaperException();
+    }
+
+    name[0] = name[0].toUpper();
+
     return name;
 }
 
 QString Escaper::escapeAsn1FieldName(QString name)
 {
+    name = name.trimmed();
+    name.remove(QRegExp("^[0-9 \\-_]*"));
+
+    name.replace(name.indexOf("_"), 1U, '-');
+
+    if (!name.contains("-")) {
+        name.replace(name.indexOf(" "), 1U, '-');
+    }
+    name.remove(" ");
+    name.remove(QRegExp("[^a-zA-Z\\-0-9]"));
+
+    if (name.isEmpty()) {
+        throw EscaperException();
+    }
+
+    name[0] = name[0].toLower();
+
     return name;
 }
 
