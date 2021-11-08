@@ -17,26 +17,31 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "sedscommandprimitivebuilder.h"
 
-#include <seds/SedsModel/components/component.h>
+using namespace seds::model;
 
 namespace tests::conversion::common {
 
-class SedsComponentBuilder final
+SedsCommandPrimitiveBuilder::SedsCommandPrimitiveBuilder(QString interface, QString name)
 {
-public:
-    SedsComponentBuilder(QString name);
-    seds::model::Component build();
+    m_primitive.setInterface(interface);
+    m_primitive.setCommand(name);
+}
 
-public:
-    auto declaringInterface(seds::model::InterfaceDeclaration interfaceDeclaration) -> SedsComponentBuilder &;
-    auto withProvidedInterface(seds::model::Interface interface) -> SedsComponentBuilder &;
-    auto withRequiredInterface(seds::model::Interface interface) -> SedsComponentBuilder &;
-    auto withImplementation(seds::model::ComponentImplementation implementation) -> SedsComponentBuilder &;
+seds::model::OnCommandPrimitive SedsCommandPrimitiveBuilder::build()
+{
+    return std::move(m_primitive);
+}
 
-private:
-    seds::model::Component m_component;
-};
+auto SedsCommandPrimitiveBuilder::withArgumentValue(QString name, QString variable) -> SedsCommandPrimitiveBuilder &
+{
+    SinkArgumentValue value;
+    value.setName(name);
+    value.setOutputVariableRef(VariableRef(variable));
+    m_primitive.addArgumentValue(std::move(value));
+
+    return *this;
+}
 
 } // namespace tests::conversion::common

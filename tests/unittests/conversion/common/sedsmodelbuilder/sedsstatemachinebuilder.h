@@ -19,24 +19,25 @@
 
 #pragma once
 
-#include <seds/SedsModel/components/component.h>
+#include <seds/SedsCommon/basetypesmappings.h>
+#include <seds/SedsModel/components/states/statemachine.h>
 
 namespace tests::conversion::common {
 
-class SedsComponentBuilder final
+class SedsStateMachineBuilder final
 {
 public:
-    SedsComponentBuilder(QString name);
-    seds::model::Component build();
+    seds::model::StateMachine build();
 
-public:
-    auto declaringInterface(seds::model::InterfaceDeclaration interfaceDeclaration) -> SedsComponentBuilder &;
-    auto withProvidedInterface(seds::model::Interface interface) -> SedsComponentBuilder &;
-    auto withRequiredInterface(seds::model::Interface interface) -> SedsComponentBuilder &;
-    auto withImplementation(seds::model::ComponentImplementation implementation) -> SedsComponentBuilder &;
+    auto withState(seds::model::State state) -> SedsStateMachineBuilder &;
+    auto withState(seds::common::String name) -> SedsStateMachineBuilder &;
+
+    auto withTransition(seds::model::Transition transition) -> SedsStateMachineBuilder &;
+    auto withTransition(seds::common::String from, seds::common::String to, seds::model::Transition::Primitive on)
+            -> SedsStateMachineBuilder &;
 
 private:
-    seds::model::Component m_component;
+    seds::model::StateMachine m_machine;
 };
 
 } // namespace tests::conversion::common

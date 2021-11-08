@@ -17,26 +17,22 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "sedsimplementationbuilder.h"
 
-#include <seds/SedsModel/components/component.h>
+using namespace seds::model;
 
 namespace tests::conversion::common {
 
-class SedsComponentBuilder final
+seds::model::ComponentImplementation SedsImplementationBuilder::build()
 {
-public:
-    SedsComponentBuilder(QString name);
-    seds::model::Component build();
+    return std::move(m_implementation);
+}
 
-public:
-    auto declaringInterface(seds::model::InterfaceDeclaration interfaceDeclaration) -> SedsComponentBuilder &;
-    auto withProvidedInterface(seds::model::Interface interface) -> SedsComponentBuilder &;
-    auto withRequiredInterface(seds::model::Interface interface) -> SedsComponentBuilder &;
-    auto withImplementation(seds::model::ComponentImplementation implementation) -> SedsComponentBuilder &;
+auto SedsImplementationBuilder::withStateMachine(seds::model::StateMachine machine) -> SedsImplementationBuilder &
+{
+    m_implementation.addStateMachine(std::move(machine));
 
-private:
-    seds::model::Component m_component;
-};
+    return *this;
+}
 
 } // namespace tests::conversion::common
