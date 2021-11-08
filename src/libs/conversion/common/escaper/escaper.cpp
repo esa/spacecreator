@@ -21,6 +21,7 @@
 
 #include "../exceptions.h"
 
+#include <QChar>
 #include <QRegExp>
 #include <utility>
 
@@ -29,15 +30,15 @@ namespace conversion {
 QString Escaper::escapeIvName(QString name)
 {
     name = name.trimmed();
-    name.remove(QRegExp("^[0-9 \\-_]*"));
-
-    name.replace(name.indexOf("-"), 1U, '_');
+    removeLeadingNonletters(name);
+    replaceFirstOccurence(name, '-', '_');
 
     if (!name.contains("_")) {
-        name.replace(name.indexOf(" "), 1U, '_');
+        replaceFirstOccurence(name, ' ', '_');
     }
     name.remove(" ");
-    name.remove(QRegExp("[^a-zA-Z_0-9]"));
+
+    name.remove(QRegExp("[^a-zA-Z0-9_]"));
 
     if (name.isEmpty()) {
         throw EscaperException();
@@ -49,15 +50,15 @@ QString Escaper::escapeIvName(QString name)
 QString Escaper::escapeAsn1TypeName(QString name)
 {
     name = name.trimmed();
-    name.remove(QRegExp("^[0-9 \\-_]*"));
-
-    name.replace(name.indexOf("_"), 1U, '-');
+    removeLeadingNonletters(name);
+    replaceFirstOccurence(name, '_', '-');
 
     if (!name.contains("-")) {
         name.replace(name.indexOf(" "), 1U, '-');
     }
     name.remove(" ");
-    name.remove(QRegExp("[^a-zA-Z\\-0-9]"));
+
+    name.remove(QRegExp("[^a-zA-Z0-9\\-]"));
 
     if (name.isEmpty()) {
         throw EscaperException();
@@ -71,15 +72,15 @@ QString Escaper::escapeAsn1TypeName(QString name)
 QString Escaper::escapeAsn1FieldName(QString name)
 {
     name = name.trimmed();
-    name.remove(QRegExp("^[0-9 \\-_]*"));
-
-    name.replace(name.indexOf("_"), 1U, '-');
+    removeLeadingNonletters(name);
+    replaceFirstOccurence(name, '_', '-');
 
     if (!name.contains("-")) {
-        name.replace(name.indexOf(" "), 1U, '-');
+        replaceFirstOccurence(name, ' ', '-');
     }
     name.remove(" ");
-    name.remove(QRegExp("[^a-zA-Z\\-0-9]"));
+
+    name.remove(QRegExp("[^a-zA-Z0-9\\-]"));
 
     if (name.isEmpty()) {
         throw EscaperException();
@@ -88,6 +89,16 @@ QString Escaper::escapeAsn1FieldName(QString name)
     name[0] = name[0].toLower();
 
     return name;
+}
+
+void Escaper::replaceFirstOccurence(QString &name, QChar before, QChar after)
+{
+    name.replace(name.indexOf(before), 1U, after);
+}
+
+void Escaper::removeLeadingNonletters(QString &name)
+{
+    name.remove(QRegExp("^[0-9 \\-_]*"));
 }
 
 } // namespace conversion
