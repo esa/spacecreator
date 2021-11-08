@@ -46,4 +46,14 @@ QString Escaper::escapeIvName(QString name)
     return name;
 }
 
+QString Escaper::escapeAsn1TypeName(QString name)
+{
+    return name;
+}
+
+QString Escaper::escapeAsn1FieldName(QString name)
+{
+    return name;
+}
+
 } // namespace conversion
