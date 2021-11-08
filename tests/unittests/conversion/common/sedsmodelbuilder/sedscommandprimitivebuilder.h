@@ -19,24 +19,20 @@
 
 #pragma once
 
-#include <seds/SedsModel/components/component.h>
+#include <seds/SedsModel/components/primitives/oncommandprimitive.h>
 
 namespace tests::conversion::common {
 
-class SedsComponentBuilder final
+class SedsCommandPrimitiveBuilder final
 {
 public:
-    SedsComponentBuilder(QString name);
-    seds::model::Component build();
+    SedsCommandPrimitiveBuilder(QString interface, QString name);
+    seds::model::OnCommandPrimitive build();
 
-public:
-    auto declaringInterface(seds::model::InterfaceDeclaration interfaceDeclaration) -> SedsComponentBuilder &;
-    auto withProvidedInterface(seds::model::Interface interface) -> SedsComponentBuilder &;
-    auto withRequiredInterface(seds::model::Interface interface) -> SedsComponentBuilder &;
-    auto withImplementation(seds::model::ComponentImplementation implementation) -> SedsComponentBuilder &;
+    auto withArgumentValue(QString name, QString variable) -> SedsCommandPrimitiveBuilder &;
 
 private:
-    seds::model::Component m_component;
+    seds::model::OnCommandPrimitive m_primitive;
 };
 
 } // namespace tests::conversion::common

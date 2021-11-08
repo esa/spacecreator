@@ -100,8 +100,7 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Component &sedsC
 {
     Q_UNUSED(asn1Model);
     Q_UNUSED(ivModel);
-    Q_UNUSED(sedsComponent);
-    Q_UNUSED(model);
+
     const auto &implementation = sedsComponent.implementation();
     if (implementation.stateMachines().size() > 1) {
         throw new TranslationException("Only a single state machine is supported per SEDS component");

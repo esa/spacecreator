@@ -19,24 +19,19 @@
 
 #pragma once
 
-#include <seds/SedsModel/components/component.h>
+#include <seds/SedsModel/components/componentimplementation.h>
 
 namespace tests::conversion::common {
 
-class SedsComponentBuilder final
+class SedsImplementationBuilder final
 {
 public:
-    SedsComponentBuilder(QString name);
-    seds::model::Component build();
+    seds::model::ComponentImplementation build();
 
-public:
-    auto declaringInterface(seds::model::InterfaceDeclaration interfaceDeclaration) -> SedsComponentBuilder &;
-    auto withProvidedInterface(seds::model::Interface interface) -> SedsComponentBuilder &;
-    auto withRequiredInterface(seds::model::Interface interface) -> SedsComponentBuilder &;
-    auto withImplementation(seds::model::ComponentImplementation implementation) -> SedsComponentBuilder &;
+    auto withStateMachine(seds::model::StateMachine machine) -> SedsImplementationBuilder &;
 
 private:
-    seds::model::Component m_component;
+    seds::model::ComponentImplementation m_implementation;
 };
 
 } // namespace tests::conversion::common
