@@ -25,12 +25,15 @@
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <conversion/asn1/SedsToAsn1Translator/visitors/datatypetranslatorvisitor.h>
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/qstringhash.h>
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivfunction.h>
 #include <seds/SedsModel/package/package.h>
 #include <shared/parameter.h>
 
+using conversion::Escaper;
+using conversion::EscaperException;
 using conversion::translator::MissingGenericTypeMappingException;
 using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredDataTypeException;

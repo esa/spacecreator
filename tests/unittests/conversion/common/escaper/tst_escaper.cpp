@@ -56,6 +56,10 @@ void tst_Escaper::testIvNominals()
     QCOMPARE(Escaper::escapeIvName("some thing"), "some_thing");
     QCOMPARE(Escaper::escapeIvName("some   thing"), "some_thing");
 
+    QCOMPARE(Escaper::escapeIvName("the some thing"), "the_something");
+    QCOMPARE(Escaper::escapeIvName("the some   thing"), "the_something");
+    QCOMPARE(Escaper::escapeIvName(" the some   thing"), "the_something");
+
     QCOMPARE(Escaper::escapeIvName(" some   thing"), "some_thing");
     QCOMPARE(Escaper::escapeIvName(" some thing"), "some_thing");
     QCOMPARE(Escaper::escapeIvName("some thing "), "some_thing");
@@ -107,6 +111,10 @@ void tst_Escaper::testAsn1TypeNominals()
     QCOMPARE(Escaper::escapeAsn1TypeName("some   thing"), "Some-thing");
 
     QCOMPARE(Escaper::escapeAsn1TypeName(" some   thing"), "Some-thing");
+    QCOMPARE(Escaper::escapeAsn1TypeName("the some thing"), "The-something");
+    QCOMPARE(Escaper::escapeAsn1TypeName("the some   thing"), "The-something");
+    QCOMPARE(Escaper::escapeAsn1TypeName(" the some   thing"), "The-something");
+
     QCOMPARE(Escaper::escapeAsn1TypeName(" some thing"), "Some-thing");
     QCOMPARE(Escaper::escapeAsn1TypeName("some thing "), "Some-thing");
     QCOMPARE(Escaper::escapeAsn1TypeName("__some thing "), "Some-thing");
@@ -160,6 +168,11 @@ void tst_Escaper::testAsn1FieldNominals()
 
     QCOMPARE(Escaper::escapeAsn1FieldName("some thing"), "some-thing");
     QCOMPARE(Escaper::escapeAsn1FieldName("some   thing"), "some-thing");
+
+    QCOMPARE(Escaper::escapeAsn1FieldName(" some   thing"), "some-thing");
+    QCOMPARE(Escaper::escapeAsn1FieldName("the some thing"), "the-something");
+    QCOMPARE(Escaper::escapeAsn1FieldName("the some   thing"), "the-something");
+    QCOMPARE(Escaper::escapeAsn1FieldName(" the some   thing"), "the-something");
 
     QCOMPARE(Escaper::escapeAsn1FieldName(" some   thing"), "some-thing");
     QCOMPARE(Escaper::escapeAsn1FieldName(" some thing"), "some-thing");

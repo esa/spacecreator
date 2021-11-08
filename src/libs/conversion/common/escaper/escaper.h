@@ -28,13 +28,13 @@ namespace conversion {
 /**
  * @brief   Escaper
  */
-class Escaper
+class Escaper final
 {
 public:
     /**
      * @brief   Constructor
      */
-    Escaper() = default;
+    Escaper() = delete;
 
     /**
      * @brief   Convert input name to id acceptable in InterfaceView
