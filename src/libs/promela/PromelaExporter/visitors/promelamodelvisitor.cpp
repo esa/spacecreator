@@ -43,12 +43,20 @@ PromelaModelVisitor::PromelaModelVisitor(QTextStream &stream, QString indent)
 
 void PromelaModelVisitor::visit(const PromelaModel &promelaModel)
 {
+    generateIncludes(promelaModel.getIncludes());
     generateMtypes(promelaModel.getMtypeValues());
     generateNamedMtypes(promelaModel.getNamedMtypeValues());
     generateTypeAliases(promelaModel.getTypeAliases());
     generateValueDefinitions(promelaModel.getValueDefinitions());
     generateUtypes(promelaModel.getUtypes());
     generateDeclarations(promelaModel.getDeclarations());
+}
+
+void PromelaModelVisitor::generateIncludes(const QList<QString> &includes)
+{
+    for (const QString &file : includes) {
+        m_stream << "#include \"" << file << "\"\n";
+    }
 }
 
 void PromelaModelVisitor::generateMtypes(const QSet<QString> &values)

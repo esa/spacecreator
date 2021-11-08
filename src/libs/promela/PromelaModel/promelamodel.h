@@ -59,6 +59,20 @@ public:
     auto modelType() const -> conversion::ModelType override;
 
     /**
+     * @brief Add include file
+     *
+     * @param file filepath to the promela file
+     */
+    void addInclude(const QString &file);
+
+    /**
+     * @brief Getter for all included propmela files
+     *
+     * @return List of included promela files
+     */
+    const QList<QString> &getIncludes() const noexcept;
+
+    /**
      * @brief Add unnamed mtype value.
      *
      * @param value non empty string value to add
@@ -140,6 +154,7 @@ public:
     const QList<Declaration> &getDeclarations() const noexcept;
 
 private:
+    QList<QString> m_includes;
     QSet<QString> m_mtypeValues;
     std::map<QString, NamedMtype> m_namedMtypeValues;
     QList<Utype> m_userTypes;
