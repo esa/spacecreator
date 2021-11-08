@@ -56,9 +56,15 @@ void tst_Escaper::testIvNominals()
     QCOMPARE(Escaper::escapeIvName("some thing"), "some_thing");
     QCOMPARE(Escaper::escapeIvName("some   thing"), "some_thing");
 
-    QCOMPARE(Escaper::escapeIvName("the some thing"), "the_something");
-    QCOMPARE(Escaper::escapeIvName("the some   thing"), "the_something");
-    QCOMPARE(Escaper::escapeIvName(" the some   thing"), "the_something");
+    QCOMPARE(Escaper::escapeIvName("the-some-thing"), "the_some_thing");
+    QCOMPARE(Escaper::escapeIvName("the - some - thing"), "the_some_thing");
+    QCOMPARE(Escaper::escapeIvName("the --- some - thing"), "the_some_thing");
+    QCOMPARE(Escaper::escapeIvName("the --- some - - -- thing"), "the_some_thing");
+    QCOMPARE(Escaper::escapeIvName("the --   - some - -       -- thing"), "the_some_thing");
+
+    QCOMPARE(Escaper::escapeIvName("the some thing"), "the_some_thing");
+    QCOMPARE(Escaper::escapeIvName("the some   thing"), "the_some_thing");
+    QCOMPARE(Escaper::escapeIvName(" the some   thing"), "the_some_thing");
 
     QCOMPARE(Escaper::escapeIvName(" some   thing"), "some_thing");
     QCOMPARE(Escaper::escapeIvName(" some thing"), "some_thing");
@@ -67,13 +73,13 @@ void tst_Escaper::testIvNominals()
     QCOMPARE(Escaper::escapeIvName("some thing    "), "some_thing");
     QCOMPARE(Escaper::escapeIvName("some     thing    "), "some_thing");
 
-    QCOMPARE(Escaper::escapeIvName("0nd some thing"), "nd_something");
+    QCOMPARE(Escaper::escapeIvName("0nd some thing"), "nd_some_thing");
     QCOMPARE(Escaper::escapeIvName("0 00 some thing"), "some_thing");
     QCOMPARE(Escaper::escapeIvName("0 00-some thing"), "some_thing");
-    QCOMPARE(Escaper::escapeIvName("2345nd some thing"), "nd_something");
-    QCOMPARE(Escaper::escapeIvName("2nd some thing"), "nd_something");
-    QCOMPARE(Escaper::escapeIvName(" 1st some thing"), "st_something");
-    QCOMPARE(Escaper::escapeIvName("some tHing 1"), "some_tHing1");
+    QCOMPARE(Escaper::escapeIvName("2345nd some thing"), "nd_some_thing");
+    QCOMPARE(Escaper::escapeIvName("2nd some thing"), "nd_some_thing");
+    QCOMPARE(Escaper::escapeIvName(" 1st some thing"), "st_some_thing");
+    QCOMPARE(Escaper::escapeIvName("some tHing 1"), "some_tHing_1");
 
     QCOMPARE(Escaper::escapeIvName("some-thing"), "some_thing");
     QCOMPARE(Escaper::escapeIvName("some -thing"), "some_thing");
@@ -111,9 +117,9 @@ void tst_Escaper::testAsn1TypeNominals()
     QCOMPARE(Escaper::escapeAsn1TypeName("some   thing"), "Some-thing");
 
     QCOMPARE(Escaper::escapeAsn1TypeName(" some   thing"), "Some-thing");
-    QCOMPARE(Escaper::escapeAsn1TypeName("the some thing"), "The-something");
-    QCOMPARE(Escaper::escapeAsn1TypeName("the some   thing"), "The-something");
-    QCOMPARE(Escaper::escapeAsn1TypeName(" the some   thing"), "The-something");
+    QCOMPARE(Escaper::escapeAsn1TypeName("the some thing"), "The-some-thing");
+    QCOMPARE(Escaper::escapeAsn1TypeName("the some   thing"), "The-some-thing");
+    QCOMPARE(Escaper::escapeAsn1TypeName(" the some   thing"), "The-some-thing");
 
     QCOMPARE(Escaper::escapeAsn1TypeName(" some thing"), "Some-thing");
     QCOMPARE(Escaper::escapeAsn1TypeName("some thing "), "Some-thing");
@@ -121,13 +127,14 @@ void tst_Escaper::testAsn1TypeNominals()
     QCOMPARE(Escaper::escapeAsn1TypeName("some thing    "), "Some-thing");
     QCOMPARE(Escaper::escapeAsn1TypeName("some     thing    "), "Some-thing");
 
-    QCOMPARE(Escaper::escapeAsn1TypeName("0nd some thing"), "Nd-something");
+    QCOMPARE(Escaper::escapeAsn1TypeName("0nd some thing"), "Nd-some-thing");
     QCOMPARE(Escaper::escapeAsn1TypeName("0 00 some thing"), "Some-thing");
     QCOMPARE(Escaper::escapeAsn1TypeName("0 00-some thing"), "Some-thing");
-    QCOMPARE(Escaper::escapeAsn1TypeName("2345nd some thing"), "Nd-something");
-    QCOMPARE(Escaper::escapeAsn1TypeName("2nd some thing"), "Nd-something");
-    QCOMPARE(Escaper::escapeAsn1TypeName(" 1st some thing"), "St-something");
-    QCOMPARE(Escaper::escapeAsn1TypeName("some tHing 1"), "Some-tHing1");
+    QCOMPARE(Escaper::escapeAsn1TypeName("2345nd some thing"), "Nd-some-thing");
+    QCOMPARE(Escaper::escapeAsn1TypeName("2nd some thing"), "Nd-some-thing");
+    QCOMPARE(Escaper::escapeAsn1TypeName(" 1st some thing"), "St-some-thing");
+    QCOMPARE(Escaper::escapeAsn1TypeName("some tHing 1"), "Some-tHing-1");
+    QCOMPARE(Escaper::escapeAsn1TypeName("something-)"), "Something-");
 
     QCOMPARE(Escaper::escapeAsn1TypeName("some-thing"), "Some-thing");
     QCOMPARE(Escaper::escapeAsn1TypeName("some -thing"), "Some-thing");
@@ -170,9 +177,9 @@ void tst_Escaper::testAsn1FieldNominals()
     QCOMPARE(Escaper::escapeAsn1FieldName("some   thing"), "some-thing");
 
     QCOMPARE(Escaper::escapeAsn1FieldName(" some   thing"), "some-thing");
-    QCOMPARE(Escaper::escapeAsn1FieldName("the some thing"), "the-something");
-    QCOMPARE(Escaper::escapeAsn1FieldName("the some   thing"), "the-something");
-    QCOMPARE(Escaper::escapeAsn1FieldName(" the some   thing"), "the-something");
+    QCOMPARE(Escaper::escapeAsn1FieldName("the some thing"), "the-some-thing");
+    QCOMPARE(Escaper::escapeAsn1FieldName("the some   thing"), "the-some-thing");
+    QCOMPARE(Escaper::escapeAsn1FieldName(" the some   thing"), "the-some-thing");
 
     QCOMPARE(Escaper::escapeAsn1FieldName(" some   thing"), "some-thing");
     QCOMPARE(Escaper::escapeAsn1FieldName(" some thing"), "some-thing");
@@ -181,13 +188,13 @@ void tst_Escaper::testAsn1FieldNominals()
     QCOMPARE(Escaper::escapeAsn1FieldName("some thing    "), "some-thing");
     QCOMPARE(Escaper::escapeAsn1FieldName("some     thing    "), "some-thing");
 
-    QCOMPARE(Escaper::escapeAsn1FieldName("0nd some thing"), "nd-something");
+    QCOMPARE(Escaper::escapeAsn1FieldName("0nd some thing"), "nd-some-thing");
     QCOMPARE(Escaper::escapeAsn1FieldName("0 00 some thing"), "some-thing");
     QCOMPARE(Escaper::escapeAsn1FieldName("0 00-some thing"), "some-thing");
-    QCOMPARE(Escaper::escapeAsn1FieldName("2345nd some thing"), "nd-something");
-    QCOMPARE(Escaper::escapeAsn1FieldName("2nd some thing"), "nd-something");
-    QCOMPARE(Escaper::escapeAsn1FieldName(" 1st some thing"), "st-something");
-    QCOMPARE(Escaper::escapeAsn1FieldName("some tHing 1"), "some-tHing1");
+    QCOMPARE(Escaper::escapeAsn1FieldName("2345nd some thing"), "nd-some-thing");
+    QCOMPARE(Escaper::escapeAsn1FieldName("2nd some thing"), "nd-some-thing");
+    QCOMPARE(Escaper::escapeAsn1FieldName(" 1st some thing"), "st-some-thing");
+    QCOMPARE(Escaper::escapeAsn1FieldName("some tHing 1"), "some-tHing-1");
 
     QCOMPARE(Escaper::escapeAsn1FieldName("some-thing"), "some-thing");
     QCOMPARE(Escaper::escapeAsn1FieldName("some -thing"), "some-thing");
