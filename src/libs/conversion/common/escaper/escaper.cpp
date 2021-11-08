@@ -31,12 +31,7 @@ QString Escaper::escapeIvName(QString name)
 {
     name = name.trimmed();
     removeLeadingNonletters(name);
-    replaceFirstOccurence(name, '-', '_');
-
-    if (!name.contains("_")) {
-        replaceFirstOccurence(name, ' ', '_');
-    }
-    name.remove(" ");
+    replaceDelimetersWithOne(name, '_', { '_', '-', ' ' });
 
     name.remove(QRegExp("[^a-zA-Z0-9_]"));
 
@@ -51,12 +46,7 @@ QString Escaper::escapeAsn1TypeName(QString name)
 {
     name = name.trimmed();
     removeLeadingNonletters(name);
-    replaceFirstOccurence(name, '_', '-');
-
-    if (!name.contains("-")) {
-        name.replace(name.indexOf(" "), 1U, '-');
-    }
-    name.remove(" ");
+    replaceDelimetersWithOne(name, '-', { '_', '-', ' ' });
 
     name.remove(QRegExp("[^a-zA-Z0-9\\-]"));
 
@@ -73,12 +63,7 @@ QString Escaper::escapeAsn1FieldName(QString name)
 {
     name = name.trimmed();
     removeLeadingNonletters(name);
-    replaceFirstOccurence(name, '_', '-');
-
-    if (!name.contains("-")) {
-        replaceFirstOccurence(name, ' ', '-');
-    }
-    name.remove(" ");
+    replaceDelimetersWithOne(name, '-', { '_', '-', ' ' });
 
     name.remove(QRegExp("[^a-zA-Z0-9\\-]"));
 
@@ -99,6 +84,24 @@ void Escaper::replaceFirstOccurence(QString &name, QChar before, QChar after)
 void Escaper::removeLeadingNonletters(QString &name)
 {
     name.remove(QRegExp("^[0-9 \\-_]*"));
+}
+
+bool Escaper::isCharInVector(const QChar &c, std::vector<QChar> delimeters)
+{
+    return std::any_of(delimeters.begin(), delimeters.end(), [&](auto del) -> bool { return (del == c); });
+}
+
+void Escaper::replaceDelimetersWithOne(QString &name, const QChar dstDelimeter, const std::vector<QChar> &srcDelimeters)
+{
+    int howManyDelimeters = 0;
+    for (int i = 0; i < name.size(); i++) {
+        if (isCharInVector(name.at(i), srcDelimeters)) {
+            howManyDelimeters++;
+        } else if (howManyDelimeters > 0) {
+            name.replace(i - howManyDelimeters, howManyDelimeters, dstDelimeter);
+            howManyDelimeters = 0;
+        }
+    }
 }
 
 } // namespace conversion

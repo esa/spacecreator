@@ -22,6 +22,7 @@
 #include "../exceptions.h"
 
 #include <QString>
+#include <vector>
 
 namespace conversion {
 
@@ -64,6 +65,11 @@ public:
     static auto escapeAsn1FieldName(QString name) -> QString;
 
 private:
+    static auto replaceDelimetersWithOne(QString &name, QChar dstDelimeter, const std::vector<QChar> &srcDelimeters)
+            -> void;
+
+    static auto isCharInVector(const QChar &c, std::vector<QChar> delimeters) -> bool;
+
     static auto replaceFirstOccurence(QString &name, QChar before, QChar after) -> void;
 
     static auto removeLeadingNonletters(QString &name) -> void;
