@@ -19,7 +19,7 @@
 
 #include "escaper.h"
 
-#include "../exceptions.h"
+#include "exceptions.h"
 
 #include <QChar>
 #include <QRegExp>

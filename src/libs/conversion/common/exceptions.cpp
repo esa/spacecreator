@@ -66,8 +66,8 @@ ExporterNotRegisteredException::ExporterNotRegisteredException(ModelType modelTy
 {
 }
 
-EscaperException::EscaperException(const QString &message)
-    : ConversionException(message)
+EscaperException::EscaperException()
+    : ConversionException("Incorrect name. Name must contain at least one ASCII character.")
 {
 }
 

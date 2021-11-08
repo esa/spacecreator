@@ -150,11 +150,8 @@ class EscaperException : public ConversionException
 public:
     /**
      * @brief   Constructor
-     *
-     * @param   message     Error message
      */
-    explicit EscaperException(
-            const QString &message = "Incorrect name. Name must contain at least one ASCII character.");
+    explicit EscaperException();
 };
 
 } // namespace conversion
