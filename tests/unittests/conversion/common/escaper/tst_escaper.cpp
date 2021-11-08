@@ -34,6 +34,9 @@ class tst_Escaper : public QObject
 {
     Q_OBJECT
 
+private:
+    const char *escaperExceptionMsg = "Incorrect name. Name must contain at least one ASCII character.";
+
 private Q_SLOTS:
     void testIvNominals();
     void testIvExceptions();
@@ -78,8 +81,6 @@ void tst_Escaper::testIvNominals()
 
 void tst_Escaper::testIvExceptions()
 {
-    const char *escaperExceptionMsg = "Incorrect name. Name must contain at least one ASCII character.";
-
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("000000"), EscaperException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
             Escaper::escapeIvName("12345567675578"), EscaperException, escaperExceptionMsg);
@@ -130,8 +131,6 @@ void tst_Escaper::testAsn1TypeNominals()
 
 void tst_Escaper::testAsn1TypeExceptions()
 {
-    const char *escaperExceptionMsg = "Incorrect name. Name must contain at least one ASCII character.";
-
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeAsn1TypeName("000000"), EscaperException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
             Escaper::escapeAsn1TypeName("12345567675578"), EscaperException, escaperExceptionMsg);
@@ -187,8 +186,6 @@ void tst_Escaper::testAsn1FieldNominals()
 
 void tst_Escaper::testAsn1FieldExceptions()
 {
-    const char *escaperExceptionMsg = "Incorrect name. Name must contain at least one ASCII character.";
-
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeAsn1FieldName("000000"), EscaperException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
             Escaper::escapeAsn1FieldName("12345567675578"), EscaperException, escaperExceptionMsg);
