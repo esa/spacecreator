@@ -100,9 +100,10 @@ void tst_SedsToSdlTranslator::testTooManyModels()
     const auto sedsModel1 = SedsModelBuilder("Package").build();
     const auto sedsModel2 = SedsModelBuilder("Package").build();
     const auto sedsModel3 = SedsModelBuilder("Package").build();
+    const auto sedsModel4 = SedsModelBuilder("Package").build();
 
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
-            translator.translateModels({ sedsModel1.get(), sedsModel2.get(), sedsModel3.get() }, options),
+            translator.translateModels({ sedsModel1.get(), sedsModel2.get(), sedsModel3.get(), sedsModel4.get() }, options),
             TranslationException, "Too many models passed for SEDS to SDL translation");
 }
 
