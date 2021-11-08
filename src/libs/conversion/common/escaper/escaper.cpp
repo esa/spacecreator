@@ -31,9 +31,6 @@ QString Escaper::escapeIvName(QString name)
     name = name.trimmed();
     name.remove(QRegExp("^[0-9 \\-_]*"));
 
-    // all non-ascii to ascii
-    // todo
-
     name.replace(name.indexOf("-"), 1U, '_');
 
     if (!name.contains("_")) {

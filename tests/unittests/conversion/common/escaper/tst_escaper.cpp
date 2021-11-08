@@ -71,18 +71,6 @@ void tst_Escaper::testIvNominals()
 
     QCOMPARE(Escaper::escapeIvName("*some&thing)"), "something");
     QCOMPARE(Escaper::escapeIvName("μsomeμthingμ)"), "something");
-
-    // QCOMPARE(Escaper::escapeIvName("śome thing"), "some_thing");
-    // QCOMPARE(Escaper::escapeIvName("ąćśęńółżź"), "acsenolzz");
-    // QCOMPARE(Escaper::escapeIvName("udělátko"), "udelatko");
-    // QCOMPARE(Escaper::escapeIvName("atriði"), "atridi");
-    // QCOMPARE(Escaper::escapeIvName("artículo"), "articulo");
-    // QCOMPARE(Escaper::escapeIvName("položka"), "polozka");
-    // QCOMPARE(Escaper::escapeIvName("l'objet"), "lobjet");
-    // QCOMPARE(Escaper::escapeIvName("$#%^#abcd"), "abcd");
-    // QCOMPARE(Escaper::escapeIvName("fdgij$#%@^"), "fdgij");
-    // QCOMPARE(Escaper::escapeIvName("Edelweiß"), "Edelweis");
-    // QCOMPARE(Escaper::escapeIvName("entkräfter"), "entkrafter");
 }
 
 void tst_Escaper::testIvExceptions()
