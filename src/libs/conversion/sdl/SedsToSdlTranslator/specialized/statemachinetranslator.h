@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <map>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <seds/SedsModel/sedsmodel.h>
 
@@ -41,8 +42,11 @@ public:
             ::sdl::StateMachine *stateMachine) -> void;
 
 private:
-    static auto translateState(
-            const seds::model::State &sedsState, ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void;
+    static auto translateState(const seds::model::State &sedsState, ::sdl::Process *sdlProcess,
+            ::sdl::StateMachine *stateMachine) -> std::unique_ptr<::sdl::State>;
+
+    static auto translateTransition(const seds::model::Transition &sedsTransition, ::sdl::Process *sdlProcess,
+            ::sdl::StateMachine *stateMachine, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void;
 };
 
 } // namespace conversion::sdl::translator
