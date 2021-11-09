@@ -28,6 +28,7 @@
 #include <conversion/common/import/exceptions.h>
 #include <conversion/common/model.h>
 #include <conversion/common/options.h>
+#include <filesystem>
 #include <seds/SedsOptions/options.h>
 #include <seds/SedsXmlParser/parser.h>
 #include <seds/XmlPreprocessor/preprocessor.h>
@@ -52,6 +53,7 @@ using symbolreader::SymbolDefinitionReader;
 using validator::XmlValidator;
 
 const QString SedsXmlImporter::preprocessedFilenameTemplate = "preprocessed_%1";
+static const auto PREPROCESSED_FILE_PREFIX = "preprocessed_";
 
 std::unique_ptr<conversion::Model> SedsXmlImporter::importModel(const Options &options) const
 {
@@ -112,7 +114,14 @@ QString SedsXmlImporter::preprocess(
         if (value) {
             return *value;
         } else {
-            return preprocessedFilenameTemplate.arg(*inputFilename);
+            return QString::fromStdString(
+                    std::filesystem::path((*inputFilename).toStdString())
+                            .replace_filename((QString(PREPROCESSED_FILE_PREFIX)
+                                    + QString::fromStdString(std::filesystem::path((*inputFilename).toStdString())
+                                                                     .filename()
+                                                                     .string()))
+                                                      .toStdString())
+                            .string());
         }
     }();
 
