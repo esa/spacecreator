@@ -20,6 +20,8 @@
 #pragma once
 
 #include <seds/SedsCommon/basetypesmappings.h>
+#include <seds/SedsModel/components/states/entrystate.h>
+#include <seds/SedsModel/components/states/exitstate.h>
 #include <seds/SedsModel/components/states/statemachine.h>
 
 namespace tests::conversion::common {
@@ -31,6 +33,12 @@ public:
 
     auto withState(seds::model::State state) -> SedsStateMachineBuilder &;
     auto withState(seds::common::String name) -> SedsStateMachineBuilder &;
+
+    auto withEntryState(seds::model::EntryState state) -> SedsStateMachineBuilder &;
+    auto withEntryState(seds::common::String name) -> SedsStateMachineBuilder &;
+
+    auto withExitState(seds::model::ExitState state) -> SedsStateMachineBuilder &;
+    auto withExitState(seds::common::String name) -> SedsStateMachineBuilder &;
 
     auto withTransition(seds::model::Transition transition) -> SedsStateMachineBuilder &;
     auto withTransition(seds::common::String from, seds::common::String to, seds::model::Transition::Primitive on)

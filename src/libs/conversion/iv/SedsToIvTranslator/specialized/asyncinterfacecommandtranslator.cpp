@@ -76,7 +76,11 @@ void AsyncInterfaceCommandTranslator::translateCommand(
         translateArguments(sedsCommand, seds::model::CommandArgumentMode::Notify, ivInterfaceNotify);
         m_ivFunction->addChild(ivInterfaceNotify);
     } break;
-    case seds::model::ArgumentsCombination::NoArgs:
+    case seds::model::ArgumentsCombination::NoArgs: {
+        auto *ivInterface = createIvInterface(sedsCommand, interfaceType, ivm::IVInterface::OperationKind::Sporadic);
+        m_ivFunction->addChild(ivInterface);
+        break;
+    }
     case seds::model::ArgumentsCombination::NotifyOnly:
     case seds::model::ArgumentsCombination::InAndOut:
     case seds::model::ArgumentsCombination::OutAndNotify:

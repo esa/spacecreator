@@ -236,7 +236,7 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineInputs()
                         SedsImplementationBuilder()
                         .withStateMachine(
                             SedsStateMachineBuilder()
-                            .withState("StateA")
+                            .withEntryState("StateA")
                             .withState("StateB")
                             .withTransition("StateA", "StateB",
                                 SedsCommandPrimitiveBuilder("If1", "Cmd1").build()

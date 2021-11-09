@@ -44,6 +44,38 @@ auto SedsStateMachineBuilder::withState(seds::common::String name) -> SedsStateM
     return *this;
 }
 
+auto SedsStateMachineBuilder::withEntryState(seds::model::EntryState state) -> SedsStateMachineBuilder &
+{
+    m_machine.addElement(std::move(state));
+
+    return *this;
+}
+
+auto SedsStateMachineBuilder::withEntryState(seds::common::String name) -> SedsStateMachineBuilder &
+{
+    seds::model::EntryState state;
+    state.setName(name);
+    m_machine.addElement(std::move(state));
+
+    return *this;
+}
+
+auto SedsStateMachineBuilder::withExitState(seds::model::ExitState state) -> SedsStateMachineBuilder &
+{
+    m_machine.addElement(std::move(state));
+
+    return *this;
+}
+
+auto SedsStateMachineBuilder::withExitState(seds::common::String name) -> SedsStateMachineBuilder &
+{
+    seds::model::ExitState state;
+    state.setName(name);
+    m_machine.addElement(std::move(state));
+
+    return *this;
+}
+
 auto SedsStateMachineBuilder::withTransition(seds::model::Transition transition) -> SedsStateMachineBuilder &
 {
     m_machine.addElement(std::move(transition));
