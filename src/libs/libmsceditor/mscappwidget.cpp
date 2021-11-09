@@ -23,7 +23,10 @@
 #include "mainmodel.h"
 #include "msccommandsstack.h"
 #include "msceditorcore.h"
+#include "mscinstance.h"
+#include "mscmessage.h"
 #include "mscmodel.h"
+#include "systemchecks.h"
 #include "tools/actioncreatortool.h"
 #include "tools/basetool.h"
 #include "tools/commentcreatortool.h"
@@ -39,8 +42,10 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QDebug>
 #include <QFileInfo>
 #include <QGraphicsView>
+#include <QMessageBox>
 #include <QMimeData>
 #include <QUndoStack>
 
@@ -211,6 +216,15 @@ void MscAppWidget::initChartTools()
             &msc::EntityDeleteTool::setCurrentChart);
 
     activateDefaultTool();
+
+    ui->chartToolBar->addSeparator();
+    ui->chartToolBar->addAction(deleteTool()->action());
+    ui->chartToolBar->addAction(m_mscCore->actionCopy());
+    ui->chartToolBar->addAction(m_mscCore->actionPaste());
+    ui->chartToolBar->addSeparator();
+    for (QAction *action : initViewActions()) {
+        ui->chartToolBar->addAction(action);
+    }
 }
 
 void MscAppWidget::initHierarchyViewActions()
@@ -244,6 +258,13 @@ void MscAppWidget::initHierarchyViewActions()
     addAction(msc::MscDocument::HierarchyRepeat, tr("Hierarchy Repeat"), QIcon(":/icons/document_repeat.png"));
     addAction(msc::MscDocument::HierarchyException, tr("Hierarchy Exception"), QIcon(":/icons/document_exception.png"));
     addAction(msc::MscDocument::HierarchyLeaf, tr("Hierarchy Leaf"), QIcon(":/icons/document_leaf.png"));
+
+    ui->documentToolBar->addSeparator();
+    ui->documentToolBar->addAction(deleteTool()->action());
+    ui->documentToolBar->addSeparator();
+    for (QAction *action : initViewActions()) {
+        ui->documentToolBar->addAction(action);
+    }
 }
 
 void MscAppWidget::initConnections()
@@ -468,14 +489,79 @@ void MscAppWidget::checkGlobalComment()
     m_globalCommentCreateTool->action()->setEnabled(hasInstance && !hasGlobalComment);
 }
 
+void MscAppWidget::checkInstances()
+{
+    // Check for names
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultNames;
+    resultNames += m_mscCore->systemChecker()->checkInstanceNames();
+
+    // Check for nested functions usage
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultRelations;
+    resultRelations += m_mscCore->systemChecker()->checkInstanceRelations();
+
+    QString text;
+    if (!resultNames.isEmpty()) {
+        text += tr("Following instances have no corresponding iv function:\n");
+        for (auto item : resultNames) {
+            if (!text.isEmpty()) {
+                text += "\n";
+            }
+            text += QString("%1 from chart %2").arg(item.second->name(), item.first->name());
+        }
+    }
+    if (!resultRelations.isEmpty()) {
+        if (!text.isEmpty()) {
+            text += "\n\n";
+        }
+        text += tr("Following instances are used with parent/child of nested functions:\n");
+        for (auto item : resultRelations) {
+            if (!text.isEmpty()) {
+                text += "\n";
+            }
+            text += QString("%1 from chart %2").arg(item.second->name(), item.first->name());
+        }
+    }
+
+    if (resultNames.isEmpty() && resultRelations.isEmpty()) {
+        QMessageBox::information(nullptr, tr("All instances are ok"), tr("All instances are ok"));
+    } else {
+        QMessageBox::information(nullptr, tr("Non conforming instances"), text);
+    }
+}
+
+void MscAppWidget::checkMessages()
+{
+    // check messages
+    QVector<QPair<msc::MscChart *, msc::MscMessage *>> resultNames;
+    resultNames += m_mscCore->systemChecker()->checkMessages();
+
+    QString text;
+    if (!resultNames.isEmpty()) {
+        text += tr("Following messages have no corresponding iv connection:\n");
+        for (auto item : resultNames) {
+            if (!text.isEmpty()) {
+                text += "\n";
+            }
+            text += QString("%1 from chart %2").arg(item.second->name(), item.first->name());
+        }
+    }
+    if (resultNames.isEmpty()) {
+        QMessageBox::information(nullptr, tr("All messages are ok"), tr("All messages are ok"));
+    } else {
+        QMessageBox::information(nullptr, tr("Non conforming messages"), text);
+    }
+}
+
 void MscAppWidget::updateMscToolbarActionsChecked()
 {
     if (QAction *senderAction = qobject_cast<QAction *>(sender())) {
         if (senderAction->isChecked()) {
-            for (QAction *action : ui->chartToolBar->actions())
+            for (msc::BaseTool *tool : m_tools) {
+                QAction *action = tool->action();
                 if (action != senderAction) {
                     action->setChecked(false);
                 }
+            }
         }
     }
 }
@@ -561,6 +647,21 @@ void MscAppWidget::showSelection(const QModelIndex &current, const QModelIndex &
 MainModel *MscAppWidget::mainModel() const
 {
     return m_mscCore->mainModel();
+}
+
+QVector<QAction *> MscAppWidget::initViewActions()
+{
+    if (!m_viewActions.isEmpty() || !m_mscCore) {
+        return m_viewActions;
+    }
+
+    m_viewActions.append(m_mscCore->actionToggleMinimap());
+    m_viewActions.append(m_mscCore->actionMessageDeclarations());
+    m_viewActions.append(m_mscCore->actionCheckInstances());
+    connect(m_mscCore->actionCheckInstances(), &QAction::triggered, this, &MscAppWidget::checkInstances);
+    m_viewActions.append(m_mscCore->actionCheckMessages());
+    connect(m_mscCore->actionCheckMessages(), &QAction::triggered, this, &MscAppWidget::checkMessages);
+    return m_viewActions;
 }
 
 } // namespace msc
