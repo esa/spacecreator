@@ -128,7 +128,7 @@ void tst_SedsToAsn1Translator::testWrongModel()
     const auto mockModel = std::make_unique<MockModel>();
 
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(translator.translateModels({ mockModel.get() }, options), TranslationException,
-            "Missing source Unspecified model");
+            "Missing source SEDS model");
 }
 
 void tst_SedsToAsn1Translator::testResolvingArrayDataType()
