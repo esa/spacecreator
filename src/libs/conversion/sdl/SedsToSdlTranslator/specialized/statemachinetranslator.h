@@ -21,6 +21,8 @@
 
 #include <map>
 #include <sdl/SdlModel/sdlmodel.h>
+#include <seds/SedsModel/components/states/entrystate.h>
+#include <seds/SedsModel/components/states/exitstate.h>
 #include <seds/SedsModel/sedsmodel.h>
 
 namespace conversion::sdl::translator {
@@ -44,8 +46,11 @@ public:
             ::sdl::StateMachine *stateMachine) -> void;
 
 private:
-    static auto translateState(const seds::model::State &sedsState, ::sdl::Process *sdlProcess,
-            ::sdl::StateMachine *stateMachine) -> std::unique_ptr<::sdl::State>;
+    static auto translateState(const seds::model::State &sedsState) -> std::unique_ptr<::sdl::State>;
+
+    static auto translateState(const seds::model::ExitState &sedsState) -> std::unique_ptr<::sdl::State>;
+
+    static auto translateState(const seds::model::EntryState &sedsState) -> std::unique_ptr<::sdl::State>;
 
     static auto translatePrimitive(const seds::model::OnCommandPrimitive &command) -> InputHandler;
 
