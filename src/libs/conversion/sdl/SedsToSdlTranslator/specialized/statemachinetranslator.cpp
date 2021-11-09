@@ -19,6 +19,11 @@
 
 #include "statemachinetranslator.h"
 
+#include <conversion/common/translation/exceptions.h>
+#include <sdl/SdlModel/nextstate.h>
+
+using conversion::translator::TranslationException;
+
 namespace conversion::sdl::translator {
 
 auto StateMachineTranslator::translateStateMachine(const seds::model::StateMachine &sedsStateMachine,
@@ -57,19 +62,53 @@ auto StateMachineTranslator::translateState(const seds::model::State &sedsState,
     return std::move(state);
 }
 
+auto StateMachineTranslator::translatePrimitive(const seds::model::OnCommandPrimitive &command) -> InputHandler
+{
+    Q_UNUSED(command);
+
+    auto input = std::make_unique<::sdl::Input>();
+    std::vector<std::unique_ptr<::sdl::Action>> unpackingActions;
+
+    // TODO
+    // input->setName(command.nameStr()); // TODO mangle identifier
+
+    return std::move(std::make_pair(std::move(input), std::move(unpackingActions)));
+}
+
+auto StateMachineTranslator::translatePrimitive(const seds::model::Transition::Primitive &primitive) -> InputHandler
+{
+    if (std::holds_alternative<seds::model::OnCommandPrimitive>(primitive)) {
+        return translatePrimitive(std::get<seds::model::OnCommandPrimitive>(primitive));
+    }
+    throw TranslationException("Encountered unsupported primitive");
+    return InputHandler();
+}
+
 auto StateMachineTranslator::translateTransition(const seds::model::Transition &sedsTransition,
         ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine,
         std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void
 {
-    auto fromState = stateMap[sedsTransition.fromState().value().value()].get();
-    auto toStateName = stateMap[sedsTransition.toState().value().value()].get();
-
     Q_UNUSED(sdlProcess);
-    Q_UNUSED(stateMachine);
-    Q_UNUSED(fromState);
-    Q_UNUSED(toStateName);
 
-    // const auto signalName = sedsTransition.primitive()
+    auto fromState = stateMap[sedsTransition.fromState().value().value()].get();
+    auto toState = stateMap[sedsTransition.toState().value().value()].get();
+    auto inputHandler = translatePrimitive(sedsTransition.primitive());
+
+    auto transition = std::make_unique<::sdl::Transition>();
+    inputHandler.first->setTransition(transition.get());
+    fromState->addInput(std::move(inputHandler.first));
+    // Argument unpacking
+    for (auto &action : inputHandler.second) {
+        transition->addAction(std::move(action));
+    }
+    // TODO Guard
+    // TODO From Exit
+    // TODO Activity
+    // TODO To Entry
+    // State switch
+    transition->addAction(std::make_unique<::sdl::NextState>("", toState));
+
+    stateMachine->addTransition(std::move(transition));
 }
 
 } // namespace conversion::sdl::translator
