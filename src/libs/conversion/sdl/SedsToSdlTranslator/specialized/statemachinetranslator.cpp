@@ -69,8 +69,7 @@ auto StateMachineTranslator::translatePrimitive(const seds::model::OnCommandPrim
     auto input = std::make_unique<::sdl::Input>();
     std::vector<std::unique_ptr<::sdl::Action>> unpackingActions;
 
-    // TODO
-    // input->setName(command.nameStr()); // TODO mangle identifier
+    input->setName(command.interface().value() + "_" + command.command().value()); // TODO mangle identifier
 
     return std::move(std::make_pair(std::move(input), std::move(unpackingActions)));
 }
