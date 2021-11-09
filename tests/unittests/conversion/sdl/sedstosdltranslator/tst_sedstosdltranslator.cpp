@@ -25,6 +25,7 @@
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/sdl/SedsToSdlTranslator/translator.h>
 #include <ivcore/ivmodel.h>
+#include <sdl/SdlModel/nextstate.h>
 #include <sedsmodelbuilder/sedscommandprimitivebuilder.h>
 #include <sedsmodelbuilder/sedscomponentbuilder.h>
 #include <sedsmodelbuilder/sedsimplementationbuilder.h>
@@ -71,6 +72,7 @@ private Q_SLOTS:
 
     void testTranslateStateMachineIntoProcess();
     void testTranslateStateMachineStates();
+    void testTranslateStateMachineInputs();
 };
 
 void tst_SedsToSdlTranslator::testMissingModel()
@@ -221,6 +223,65 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineStates()
     QVERIFY(stateA);
     const auto stateB = getStateOfName(process, "StateB");
     QVERIFY(stateB);
+}
+
+void tst_SedsToSdlTranslator::testTranslateStateMachineInputs()
+{
+    // clang-format off
+    const auto sedsModel =
+        SedsModelBuilder("Package")
+            .withComponent(
+                SedsComponentBuilder("Component")
+                    .withImplementation(
+                        SedsImplementationBuilder()
+                        .withStateMachine(
+                            SedsStateMachineBuilder()
+                            .withState("StateA")
+                            .withState("StateB")
+                            .withTransition("StateA", "StateB",
+                                SedsCommandPrimitiveBuilder("If1", "Cmd1").build()
+                            )
+                            .build()
+                        )
+                        .build()
+                    )
+                    .build())
+            .build();
+
+    const auto asn1Model =
+        Asn1ModelBuilder("Package")
+        .build();
+    // clang-format on
+
+    Options options;
+    SedsToSdlTranslator translator;
+
+    const auto ivModel = std::make_unique<ivm::IVModel>(nullptr);
+
+    const auto resultModels = translator.translateModels({ sedsModel.get(), asn1Model.get(), ivModel.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), ModelType::Sdl);
+
+    const auto *sdlModel = dynamic_cast<SdlModel *>(resultModel.get());
+    QVERIFY(sdlModel);
+
+    QCOMPARE(sdlModel->processes().size(), 1);
+
+    const auto &process = sdlModel->processes()[0];
+    QCOMPARE(process.name(), "Component");
+    const auto stateA = getStateOfName(process, "StateA");
+    QVERIFY(stateA);
+    const auto stateB = getStateOfName(process, "StateB");
+    QVERIFY(stateB);
+    QCOMPARE(stateA->inputs().size(), 1);
+    QCOMPARE(stateA->inputs()[0]->name(), "If1_Cmd1");
+    QCOMPARE(stateA->inputs()[0]->transition()->actions().size(), 1);
+    const auto action = stateA->inputs()[0]->transition()->actions()[0].get();
+    const auto nextState = dynamic_cast<const ::sdl::NextState *>(action);
+    QVERIFY(nextState);
+    QCOMPARE(nextState->state()->name(), "StateB");
 }
 
 } // namespace conversion::sdl::test
