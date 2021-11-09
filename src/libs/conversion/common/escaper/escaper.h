@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include "exceptions.h"
-
 #include <QString>
 #include <vector>
 
@@ -33,7 +31,7 @@ class Escaper final
 {
 public:
     /**
-     * @brief   Constructor
+     * @brief   Deleted constructor
      */
     Escaper() = delete;
 
@@ -56,11 +54,11 @@ public:
     static auto escapeAsn1TypeName(QString name) -> QString;
 
     /**
-     * @brief   Convert input name to id acceptable as ASN.1 field name
+     * @brief   Convert input name to id acceptable as ASN.1 sequence field name
      *
      * @param   name    input name
      *
-     * @returns identifier for ASN.1 field name
+     * @returns identifier for ASN.1 sequence field name
      */
     static auto escapeAsn1FieldName(QString name) -> QString;
 
@@ -73,8 +71,8 @@ private:
 
     static auto removeNonalphanumericCharacters(QString &name, const QChar &delimeter) -> void;
 
-    static auto replaceDelimetersWithOne(
-            QString &name, const QChar &dstDelimeter, const std::vector<QChar> &srcDelimeters) -> void;
+    static auto replaceDelimeters(QString &name, const std::vector<QChar> &srcDelimeters, const QChar &dstDelimeter)
+            -> void;
 };
 
 } // namespace conversion

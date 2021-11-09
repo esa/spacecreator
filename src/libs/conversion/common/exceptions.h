@@ -142,16 +142,4 @@ public:
     explicit ExporterNotRegisteredException(ModelType modelType);
 };
 
-/**
- * @brief   Exception thrown when escaper encounters an illegal input name
- */
-class EscaperException : public ConversionException
-{
-public:
-    /**
-     * @brief   Constructor
-     */
-    explicit EscaperException();
-};
-
 } // namespace conversion

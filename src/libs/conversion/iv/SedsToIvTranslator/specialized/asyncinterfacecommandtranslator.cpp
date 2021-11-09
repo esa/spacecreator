@@ -33,7 +33,6 @@
 #include <shared/parameter.h>
 
 using conversion::Escaper;
-using conversion::EscaperException;
 using conversion::translator::MissingGenericTypeMappingException;
 using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredDataTypeException;
@@ -135,11 +134,13 @@ QString AsyncInterfaceCommandTranslator::buildAsn1SequenceType(
 void AsyncInterfaceCommandTranslator::createAsn1Sequence(
         const QString &name, const std::unordered_map<QString, QString> &arguments)
 {
-    auto escapedName = Escaper::escapeAsn1TypeName(name);
+    const auto escapedName = Escaper::escapeAsn1TypeName(name);
     auto sequence = std::make_unique<Asn1Acn::Types::Sequence>(escapedName);
 
     for (const auto &[argumentName, argumentTypeName] : arguments) {
-        createAsn1SequenceComponent(argumentName, Escaper::escapeAsn1TypeName(argumentTypeName), sequence.get());
+        const auto escapedArgumentName = Escaper::escapeAsn1TypeName(argumentName);
+        const auto escapedArgumentTypeName = Escaper::escapeAsn1TypeName(argumentTypeName);
+        createAsn1SequenceComponent(argumentName, argumentTypeName, sequence.get());
     }
 
     auto typeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
