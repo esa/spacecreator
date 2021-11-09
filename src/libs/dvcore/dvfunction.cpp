@@ -38,8 +38,8 @@ DVPartition *DVFunction::partition() const
 QString DVFunction::usedImplementation() const
 {
     QString value = implementation();
-    if (value.isEmpty() && model() && model()->ivQueries()) {
-        return model()->ivQueries()->defaultImplementationForFunction(title());
+    if (value.isEmpty()) {
+        return defaultImplementation();
     }
     return value;
 }
@@ -71,6 +71,17 @@ QStringList DVFunction::availableImplementations() const
 {
     if (model() && model()->ivQueries()) {
         return model()->ivQueries()->implementationsForFunction(title());
+    }
+    return {};
+}
+
+/*!
+   The implementation used, when no explicit one is set
+ */
+QString DVFunction::defaultImplementation() const
+{
+    if (model() && model()->ivQueries()) {
+        return model()->ivQueries()->defaultImplementationForFunction(title());
     }
     return {};
 }
