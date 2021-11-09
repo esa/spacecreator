@@ -259,18 +259,22 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineInputs()
     const auto ivModel = std::make_unique<ivm::IVModel>(nullptr);
 
     const auto resultModels = translator.translateModels({ sedsModel.get(), asn1Model.get(), ivModel.get() }, options);
-    QCOMPARE(resultModels.size(), 1);
 
+    QCOMPARE(resultModels.size(), 1);
     const auto &resultModel = resultModels[0];
     QCOMPARE(resultModel->modelType(), ModelType::Sdl);
-
     const auto *sdlModel = dynamic_cast<SdlModel *>(resultModel.get());
     QVERIFY(sdlModel);
-
     QCOMPARE(sdlModel->processes().size(), 1);
-
     const auto &process = sdlModel->processes()[0];
     QCOMPARE(process.name(), "Component");
+    const auto &startTransition = sdlModel->processes()[0].startTransition();
+    QVERIFY(startTransition);
+    QCOMPARE(startTransition->actions().size(), 1);
+    const auto entryAction = startTransition->actions()[0].get();
+    const auto entryState = dynamic_cast<const ::sdl::NextState *>(entryAction);
+    QVERIFY(entryState);
+    QCOMPARE(entryState->state()->name(), "StateA");
     const auto stateA = getStateOfName(process, "StateA");
     QVERIFY(stateA);
     const auto stateB = getStateOfName(process, "StateB");
