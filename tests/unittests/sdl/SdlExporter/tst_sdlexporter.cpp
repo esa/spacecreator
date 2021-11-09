@@ -98,7 +98,7 @@ class tst_sdlmodel : public QObject
 {
     Q_OBJECT
 
-private Q_SLOTS:
+public Q_SLOTS:
     void testDefaultValuesInModel();
     void testGenerateBasicProcess();
     void testGenerateProcessWithDeclarationsAndTasks();
@@ -175,6 +175,8 @@ void tst_sdlmodel::testDefaultValuesInModel()
     QVERIFY(processName == process->name());
 }
 
+/// BASIC PROCESS GENERATION TEST
+/// \SRS SRS-BSP-FUN-FPU-10
 void tst_sdlmodel::testGenerateBasicProcess()
 {
     QString modelName = "BasicProcess";
