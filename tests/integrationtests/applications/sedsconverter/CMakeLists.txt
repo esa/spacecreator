@@ -1,0 +1,19 @@
+set(TEST_NAME tst_sedsconverter)
+project(${TEST_NAME})
+
+add_executable(${TEST_NAME})
+add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+
+target_sources(${TEST_NAME}
+    PRIVATE     ${TEST_NAME}.cpp)
+target_include_directories(${TEST_NAME}
+    PRIVATE     ${CMAKE_SOURCE_DIR}/tests)
+target_link_libraries(${TEST_NAME}
+    PRIVATE     Qt5::Core
+                Qt5::Test)
+
+add_format_target(${TEST_NAME})
+
+configure_file(test_state_machine_with_bare_inputs.sh test_state_machine_with_bare_inputs.sh COPYONLY)
+configure_file(resources/state_machine_with_bare_inputs.xml resources/state_machine_with_bare_inputs.xml COPYONLY)
+configure_file(resources/state_machine_with_bare_inputs.output resources/state_machine_with_bare_inputs.output COPYONLY)

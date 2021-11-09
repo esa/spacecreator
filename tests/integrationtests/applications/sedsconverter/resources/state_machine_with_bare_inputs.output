@@ -1,0 +1,17 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Component;
+    /* CIF START (9, 285), (70, 35) */
+    START;
+            /* CIF NEXTSTATE (250, 150), (150, 75) */
+            NEXTSTATE StateA;
+    /* CIF state (250, 150), (150, 75) */
+    state StateA;
+        /* CIF input (250, 150), (150, 75) */
+        input If1_Cmd1;
+            /* CIF NEXTSTATE (250, 150), (150, 75) */
+            NEXTSTATE StateB;
+    endstate;
+    /* CIF state (250, 150), (150, 75) */
+    state StateB;
+    endstate;
+endprocess Component;
