@@ -19,11 +19,13 @@
 
 #include "specialized/interfacecommandtranslator.h"
 
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivfunction.h>
 #include <seds/SedsModel/components/interface.h>
 #include <seds/SedsModel/interfaces/interfacedeclaration.h>
 
+using conversion::Escaper;
 using conversion::translator::UnhandledValueException;
 
 namespace conversion::iv::translator {
@@ -44,9 +46,9 @@ ivm::IVInterface *InterfaceCommandTranslator::createIvInterface(const seds::mode
     ivm::IVInterface::CreationInfo creationInfo;
     creationInfo.function = m_ivFunction;
     creationInfo.type = type;
-    creationInfo.name = m_ivInterfaceNameTemplate.arg(m_sedsInterface.nameStr())
-                                .arg(sedsCommand.nameStr())
-                                .arg(interfaceTypeToString(type));
+    creationInfo.name = m_ivInterfaceNameTemplate.arg(Escaper::escapeIvName(m_sedsInterface.nameStr()))
+                                .arg(Escaper::escapeIvName(sedsCommand.nameStr()))
+                                .arg(Escaper::escapeIvName(interfaceTypeToString(type)));
     creationInfo.kind = kind;
 
     return ivm::IVInterface::createIface(creationInfo);
