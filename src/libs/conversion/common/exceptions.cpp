@@ -66,9 +66,4 @@ ExporterNotRegisteredException::ExporterNotRegisteredException(ModelType modelTy
 {
 }
 
-EscaperException::EscaperException()
-    : ConversionException("Incorrect name. Name must contain at least one ASCII character.")
-{
-}
-
 } // namespace conversion

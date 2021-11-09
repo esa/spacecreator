@@ -46,9 +46,9 @@ ivm::IVInterface *InterfaceCommandTranslator::createIvInterface(const seds::mode
     ivm::IVInterface::CreationInfo creationInfo;
     creationInfo.function = m_ivFunction;
     creationInfo.type = type;
-    creationInfo.name = m_ivInterfaceNameTemplate.arg(Escaper::escapeIvName(m_sedsInterface.nameStr()))
-                                .arg(Escaper::escapeIvName(sedsCommand.nameStr()))
-                                .arg(Escaper::escapeIvName(interfaceTypeToString(type)));
+    creationInfo.name = Escaper::escapeIvName(m_ivInterfaceNameTemplate.arg(m_sedsInterface.nameStr())
+                                                      .arg(sedsCommand.nameStr())
+                                                      .arg(interfaceTypeToString(type)));
     creationInfo.kind = kind;
 
     return ivm::IVInterface::createIface(creationInfo);

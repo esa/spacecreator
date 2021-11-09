@@ -19,7 +19,7 @@
 
 #include "escaper.h"
 
-#include "exceptions.h"
+#include "escaperexception.h"
 
 #include <QChar>
 #include <QRegExp>
@@ -39,7 +39,7 @@ QString Escaper::escapeAsn1TypeName(QString name)
 {
     escapeName(name, '-');
 
-    name[0] = name[0].toUpper();
+    name[0] = name[0].toUpper(); // type name starts with uppercase letter in ASN.1
 
     return name;
 }
@@ -48,7 +48,7 @@ QString Escaper::escapeAsn1FieldName(QString name)
 {
     escapeName(name, '-');
 
-    name[0] = name[0].toLower();
+    name[0] = name[0].toLower(); // sequence field name starts with lowercase letter in ASN.1
 
     return name;
 }
@@ -57,7 +57,7 @@ void Escaper::escapeName(QString &name, const QChar &delimeter)
 {
     name = name.trimmed();
     removeLeadingNonletters(name);
-    replaceDelimetersWithOne(name, delimeter, { '_', '-', ' ' });
+    replaceDelimeters(name, { '_', '-', ' ' }, delimeter);
     removeNonalphanumericCharacters(name, delimeter);
 
     if (name.isEmpty()) {
@@ -80,8 +80,7 @@ void Escaper::removeNonalphanumericCharacters(QString &name, const QChar &delime
     name.remove(QRegExp(QString("[^a-zA-Z0-9\\%1]").arg(delimeter)));
 }
 
-void Escaper::replaceDelimetersWithOne(
-        QString &name, const QChar &dstDelimeter, const std::vector<QChar> &srcDelimeters)
+void Escaper::replaceDelimeters(QString &name, const std::vector<QChar> &srcDelimeters, const QChar &dstDelimeter)
 {
     int howManyDelimeters = 0;
     for (int i = 0; i < name.size(); i++) {
