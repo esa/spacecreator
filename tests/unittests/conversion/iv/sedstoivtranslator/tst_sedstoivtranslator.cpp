@@ -111,7 +111,7 @@ void tst_SedsToIvTranslator::testWrongModel()
     const auto mockModel = std::make_unique<MockModel>();
 
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(translator.translateModels({ sedsModel.get(), mockModel.get() }, options),
-            TranslationException, "Missing source Unspecified model");
+            TranslationException, "Missing source ASN.1 model");
 }
 
 void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
