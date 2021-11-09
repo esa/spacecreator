@@ -25,26 +25,51 @@ auto StateMachineTranslator::translateStateMachine(const seds::model::StateMachi
         ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void
 {
     // Consider rewriting this to filters when C++20 is supported
+    std::map<QString, std::unique_ptr<::sdl::State>> stateMap;
     // First pass through states
     for (auto &element : sedsStateMachine.elements()) {
         if (std::holds_alternative<seds::model::State>(element)) {
-            translateState(std::get<seds::model::State>(element), sdlProcess, stateMachine);
+            const auto &state = std::get<seds::model::State>(element);
+            stateMap[state.nameStr()] = translateState(state, sdlProcess, stateMachine);
         }
     }
     // Second pass through transitions
-
+    for (auto &element : sedsStateMachine.elements()) {
+        if (std::holds_alternative<seds::model::Transition>(element)) {
+            translateTransition(std::get<seds::model::Transition>(element), sdlProcess, stateMachine, stateMap);
+        }
+    }
+    for (auto &entry : stateMap) {
+        stateMachine->addState(std::move(entry.second));
+    }
     // Set entry state
 }
 
-auto StateMachineTranslator::translateState(
-        const seds::model::State &sedsState, ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void
+auto StateMachineTranslator::translateState(const seds::model::State &sedsState, ::sdl::Process *sdlProcess,
+        ::sdl::StateMachine *stateMachine) -> std::unique_ptr<::sdl::State>
 {
     Q_UNUSED(sdlProcess);
+    Q_UNUSED(stateMachine);
 
     auto state = std::make_unique<::sdl::State>();
     state->setName(sedsState.nameStr()); // TODO mangle identifier
     // Entry and exit procedures shall be translated for transitions
-    stateMachine->addState(std::move(state));
+    return std::move(state);
+}
+
+auto StateMachineTranslator::translateTransition(const seds::model::Transition &sedsTransition,
+        ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine,
+        std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void
+{
+    auto fromState = stateMap[sedsTransition.fromState().value().value()].get();
+    auto toStateName = stateMap[sedsTransition.toState().value().value()].get();
+
+    Q_UNUSED(sdlProcess);
+    Q_UNUSED(stateMachine);
+    Q_UNUSED(fromState);
+    Q_UNUSED(toStateName);
+
+    // const auto signalName = sedsTransition.primitive()
 }
 
 } // namespace conversion::sdl::translator
