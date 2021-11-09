@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "../exceptions.h"
+#include "exceptions.h"
 
 #include <QString>
 #include <vector>
@@ -65,14 +65,16 @@ public:
     static auto escapeAsn1FieldName(QString name) -> QString;
 
 private:
-    static auto replaceDelimetersWithOne(QString &name, QChar dstDelimeter, const std::vector<QChar> &srcDelimeters)
-            -> void;
+    static auto escapeName(QString &name, const QChar &delimeter) -> void;
 
-    static auto isCharInVector(const QChar &c, std::vector<QChar> delimeters) -> bool;
-
-    static auto replaceFirstOccurence(QString &name, QChar before, QChar after) -> void;
+    static auto isCharInVector(const QChar &c, const std::vector<QChar> &delimeters) -> bool;
 
     static auto removeLeadingNonletters(QString &name) -> void;
+
+    static auto removeNonalphanumericCharacters(QString &name, const QChar &delimeter) -> void;
+
+    static auto replaceDelimetersWithOne(
+            QString &name, const QChar &dstDelimeter, const std::vector<QChar> &srcDelimeters) -> void;
 };
 
 } // namespace conversion

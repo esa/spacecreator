@@ -23,36 +23,21 @@
 
 #include <QChar>
 #include <QRegExp>
+#include <algorithm>
 #include <utility>
 
 namespace conversion {
 
 QString Escaper::escapeIvName(QString name)
 {
-    name = name.trimmed();
-    removeLeadingNonletters(name);
-    replaceDelimetersWithOne(name, '_', { '_', '-', ' ' });
-
-    name.remove(QRegExp("[^a-zA-Z0-9_]"));
-
-    if (name.isEmpty()) {
-        throw EscaperException();
-    }
+    escapeName(name, '_');
 
     return name;
 }
 
 QString Escaper::escapeAsn1TypeName(QString name)
 {
-    name = name.trimmed();
-    removeLeadingNonletters(name);
-    replaceDelimetersWithOne(name, '-', { '_', '-', ' ' });
-
-    name.remove(QRegExp("[^a-zA-Z0-9\\-]"));
-
-    if (name.isEmpty()) {
-        throw EscaperException();
-    }
+    escapeName(name, '-');
 
     name[0] = name[0].toUpper();
 
@@ -61,24 +46,28 @@ QString Escaper::escapeAsn1TypeName(QString name)
 
 QString Escaper::escapeAsn1FieldName(QString name)
 {
-    name = name.trimmed();
-    removeLeadingNonletters(name);
-    replaceDelimetersWithOne(name, '-', { '_', '-', ' ' });
-
-    name.remove(QRegExp("[^a-zA-Z0-9\\-]"));
-
-    if (name.isEmpty()) {
-        throw EscaperException();
-    }
+    escapeName(name, '-');
 
     name[0] = name[0].toLower();
 
     return name;
 }
 
-void Escaper::replaceFirstOccurence(QString &name, QChar before, QChar after)
+void Escaper::escapeName(QString &name, const QChar &delimeter)
 {
-    name.replace(name.indexOf(before), 1U, after);
+    name = name.trimmed();
+    removeLeadingNonletters(name);
+    replaceDelimetersWithOne(name, delimeter, { '_', '-', ' ' });
+    removeNonalphanumericCharacters(name, delimeter);
+
+    if (name.isEmpty()) {
+        throw EscaperException();
+    }
+}
+
+bool Escaper::isCharInVector(const QChar &c, const std::vector<QChar> &delimeters)
+{
+    return std::count(delimeters.begin(), delimeters.end(), c) != 0;
 }
 
 void Escaper::removeLeadingNonletters(QString &name)
@@ -86,12 +75,13 @@ void Escaper::removeLeadingNonletters(QString &name)
     name.remove(QRegExp("^[0-9 \\-_]*"));
 }
 
-bool Escaper::isCharInVector(const QChar &c, std::vector<QChar> delimeters)
+void Escaper::removeNonalphanumericCharacters(QString &name, const QChar &delimeter)
 {
-    return std::any_of(delimeters.begin(), delimeters.end(), [&](auto del) -> bool { return (del == c); });
+    name.remove(QRegExp(QString("[^a-zA-Z0-9\\%1]").arg(delimeter)));
 }
 
-void Escaper::replaceDelimetersWithOne(QString &name, const QChar dstDelimeter, const std::vector<QChar> &srcDelimeters)
+void Escaper::replaceDelimetersWithOne(
+        QString &name, const QChar &dstDelimeter, const std::vector<QChar> &srcDelimeters)
 {
     int howManyDelimeters = 0;
     for (int i = 0; i < name.size(); i++) {
