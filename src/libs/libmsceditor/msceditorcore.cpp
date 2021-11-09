@@ -74,6 +74,9 @@ MSCEditorCore::MSCEditorCore(QObject *parent)
                 }
                 Q_EMIT nameChanged(entity, entity->name(), nullptr);
             });
+
+    // Init widget, so the coordinate converter can be set up correctly
+    mainwidget();
 }
 
 MSCEditorCore::~MSCEditorCore() { }
@@ -85,7 +88,7 @@ MainModel *MSCEditorCore::mainModel() const
 
 shared::ui::GraphicsViewBase *MSCEditorCore::chartView()
 {
-    return m_mainWidget->chartView();
+    return mainwidget()->chartView();
 }
 
 void MSCEditorCore::initConnections()
