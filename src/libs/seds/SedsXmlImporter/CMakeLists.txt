@@ -14,6 +14,7 @@ target_include_directories(SedsXmlImporter
 target_link_libraries(SedsXmlImporter
     PUBLIC      Conversion::Common
                 SEDS::SymbolDefinitionReader
+                "stdc++fs"
     PRIVATE     SEDS::XmlParser
                 SEDS::XmlPreprocessor
                 SEDS::XmlValidator
