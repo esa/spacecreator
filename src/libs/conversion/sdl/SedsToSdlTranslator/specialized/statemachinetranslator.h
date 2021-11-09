@@ -46,6 +46,9 @@ public:
             ::sdl::StateMachine *stateMachine) -> void;
 
 private:
+    static auto createStartTransition(const seds::model::StateMachine &sedsStateMachine, ::sdl::Process *sdlProcess,
+            std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void;
+
     static auto translateState(const seds::model::State &sedsState) -> std::unique_ptr<::sdl::State>;
 
     static auto translateState(const seds::model::ExitState &sedsState) -> std::unique_ptr<::sdl::State>;

@@ -45,6 +45,10 @@ auto StateMachineTranslator::translateStateMachine(const seds::model::StateMachi
             stateMap[state.name().value()] = translateState(state);
         }
     }
+
+    // Setup the start transition
+    createStartTransition(sedsStateMachine, sdlProcess, stateMap);
+
     // Second pass through transitions
     for (auto &element : sedsStateMachine.elements()) {
         if (std::holds_alternative<seds::model::Transition>(element)) {
@@ -53,6 +57,22 @@ auto StateMachineTranslator::translateStateMachine(const seds::model::StateMachi
     }
     for (auto &entry : stateMap) {
         stateMachine->addState(std::move(entry.second));
+    }
+}
+
+auto StateMachineTranslator::createStartTransition(const seds::model::StateMachine &sedsStateMachine,
+        ::sdl::Process *sdlProcess, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void
+{
+    for (auto &element : sedsStateMachine.elements()) {
+        if (std::holds_alternative<seds::model::EntryState>(element)) {
+            if (sdlProcess->startTransition() != nullptr) {
+                throw TranslationException("Multiple entry states are not supported");
+            }
+            auto transition = std::make_unique<::sdl::Transition>();
+            const auto &state = std::get<seds::model::EntryState>(element);
+            transition->addAction(std::make_unique<::sdl::NextState>("", stateMap[state.name().value()].get()));
+            sdlProcess->setStartTransition(std::move(transition));
+        }
     }
 }
 

@@ -57,7 +57,8 @@ int main(int argc, char **argv)
     try {
         cli.parseArguments(a.arguments());
         cli.setOptions(options);
-        sedsConverter.convert(cli.getSourceModelTypes(), cli.getTargetModelType(), cli.getAuxModelTypes(), std::move(options));
+        sedsConverter.convert(
+                cli.getSourceModelTypes(), cli.getTargetModelType(), cli.getAuxModelTypes(), std::move(options));
     } catch (const ImportException &ex) {
         const auto errorMessage = QString("Import failure: %1\n%2").arg(ex.errorMessage(), usage);
         qFatal("%s", errorMessage.toLatin1().constData());
