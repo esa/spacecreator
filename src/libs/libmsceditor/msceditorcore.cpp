@@ -176,6 +176,22 @@ QAction *MSCEditorCore::createActionPaste(QMainWindow *window)
     return m_actionPaste;
 }
 
+QAction *MSCEditorCore::actionCheckInstances()
+{
+    if (m_actionCheckInstances == nullptr) {
+        m_actionCheckInstances = new QAction(QIcon(":/sharedresources/check_yellow.svg"), tr("Check instances"), this);
+    }
+    return m_actionCheckInstances;
+}
+
+QAction *MSCEditorCore::actionCheckMessages()
+{
+    if (m_actionCheckMessages == nullptr) {
+        m_actionCheckMessages = new QAction(QIcon(":/sharedresources/check_blue.svg"), tr("Check MSC messages"), this);
+    }
+    return m_actionCheckMessages;
+}
+
 /*!
    Sets the checker for iv consistency
  */

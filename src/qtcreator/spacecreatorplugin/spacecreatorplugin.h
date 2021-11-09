@@ -67,23 +67,12 @@ public:
     void extensionsInitialized() override;
     ShutdownFlag aboutToShutdown() override;
 
-private Q_SLOTS:
-    void showMessageDeclarations();
-    void setMinimapVisible(bool visible);
-    void updateActions();
-    void checkInstancesForCurrentEditor();
-    void checkMesagesForCurrentEditor();
-
 private:
     void addHelp();
 
     MscEditorFactory *m_mscFactory = nullptr;
     IVEditorFactory *m_ivFactory = nullptr;
     DVEditorFactory *m_dvFactory = nullptr;
-    QAction *m_messageDeclarationAction = nullptr;
-    QAction *m_checkInstancesAction = nullptr;
-    QAction *m_checkMessagesAction = nullptr;
-    QAction *m_showMinimapAction = nullptr;
     SpaceCreatorProjectManager *m_projectsManager = nullptr;
 
     Asn1SccOption m_asnCommandOptions;

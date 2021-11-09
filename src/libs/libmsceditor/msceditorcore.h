@@ -75,6 +75,9 @@ public:
     QAction *createActionCopy(QMainWindow *window);
     QAction *createActionPaste(QMainWindow *window);
 
+    QAction *actionCheckInstances();
+    QAction *actionCheckMessages();
+
     void setSystemChecker(msc::SystemChecks *checker);
     msc::SystemChecks *systemChecker() const;
 
@@ -110,6 +113,8 @@ private:
     QAction *m_actionCopy = nullptr;
     QAction *m_actionPaste = nullptr;
     QAction *m_actionMessageDeclarations = nullptr;
+    QAction *m_actionCheckInstances = nullptr;
+    QAction *m_actionCheckMessages = nullptr;
 
     bool m_connectionsDone = false;
 

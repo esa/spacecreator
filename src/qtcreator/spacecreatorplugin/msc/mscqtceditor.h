@@ -37,7 +37,7 @@ class MscQtCEditor : public Core::IEditor
     Q_OBJECT
 
 public:
-    MscQtCEditor(SpaceCreatorProjectManager *projectManager, const QList<QAction *> &toolbarActions);
+    MscQtCEditor(SpaceCreatorProjectManager *projectManager);
     ~MscQtCEditor();
 
     Core::IDocument *document() const override;
@@ -50,7 +50,6 @@ private:
     MscEditorDocument *m_document = nullptr;
     QPointer<QToolBar> m_toolbar = nullptr;
     MscMainWidget *m_editorWidget = nullptr;
-    QList<QAction *> m_globalToolbarActions;
 };
 
 }

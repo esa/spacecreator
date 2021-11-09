@@ -85,6 +85,8 @@ public Q_SLOTS:
     void showHierarchyView(bool show);
     void activateDefaultTool();
     void checkGlobalComment();
+    void checkInstances();
+    void checkMessages();
 
 Q_SIGNALS:
     void viewModeChanged(ViewMode);
@@ -100,6 +102,7 @@ private Q_SLOTS:
 
 private:
     msc::MainModel *mainModel() const;
+    QVector<QAction *> initViewActions();
 
     Ui::MSCAppWidget *ui;
     QPointer<MSCEditorCore> m_mscCore;
@@ -128,6 +131,7 @@ private:
     msc::TimerCreatorTool *m_timeoutTimerCreateTool = nullptr;
 
     QVector<QAction *> m_hierarchyActions;
+    QVector<QAction *> m_viewActions;
 };
 
 } // namespace msc

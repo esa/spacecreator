@@ -36,12 +36,10 @@
 
 namespace spctr {
 
-MscEditorData::MscEditorData(
-        SpaceCreatorProjectManager *projectManager, const QList<QAction *> &mscActions, QObject *parent)
+MscEditorData::MscEditorData(SpaceCreatorProjectManager *projectManager, QObject *parent)
     : QObject(parent)
     , m_undoGroup(new QUndoGroup(this))
     , m_projectManager(projectManager)
-    , m_mscActions(mscActions)
 {
     Core::Context contexts;
     contexts.add(spctr::Constants::K_MSC_EDITOR_ID);
@@ -74,28 +72,12 @@ MscEditorData::~MscEditorData()
 
 Core::IEditor *MscEditorData::createEditor()
 {
-    auto *mscEditor = new MscQtCEditor(m_projectManager, m_mscActions);
+    auto *mscEditor = new MscQtCEditor(m_projectManager);
 
     connect(mscEditor->mscDocument(), &spctr::MscEditorDocument::mscDataLoaded, this,
-            [this](const QString &fileName, MSCEditorCorePtr data) {
-                data->minimapView()->setVisible(m_minimapVisible);
-                m_undoGroup->addStack(data->undoStack());
-            });
+            [this](const QString &fileName, MSCEditorCorePtr data) { m_undoGroup->addStack(data->undoStack()); });
 
     return mscEditor;
-}
-
-void MscEditorData::setMinimapVisible(bool visible)
-{
-    m_minimapVisible = visible;
-
-    for (Core::IDocument *openedDocument : Core::DocumentModel::openedDocuments()) {
-        if (auto document = qobject_cast<spctr::MscEditorDocument *>(openedDocument)) {
-            if (document->mscEditorCore()) {
-                document->mscEditorCore()->minimapView()->setVisible(visible);
-            }
-        }
-    }
 }
 
 void MscEditorData::onCurrentEditorChanged(Core::IEditor *editor)

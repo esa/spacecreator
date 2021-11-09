@@ -27,10 +27,9 @@
 
 namespace spctr {
 
-MscEditorFactory::MscEditorFactory(
-        SpaceCreatorProjectManager *projectManager, const QList<QAction *> &mscActions, QObject *parent)
+MscEditorFactory::MscEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent)
     : IEditorFactory()
-    , m_editorData(new MscEditorData(projectManager, mscActions))
+    , m_editorData(new MscEditorData(projectManager))
 {
     setId(Constants::K_MSC_EDITOR_ID);
     setDisplayName(QCoreApplication::translate("MscEditor", Constants::C_MSCEDITOR_DISPLAY_NAME));
