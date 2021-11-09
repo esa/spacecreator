@@ -31,6 +31,8 @@ namespace conversion::sdl::translator {
 class StateMachineTranslator final
 {
 public:
+    using InputHandler = std::pair<std::unique_ptr<::sdl::Input>, std::vector<std::unique_ptr<::sdl::Action>>>;
+
     /**
      * @brief   Translate the given SEDS state machine into SDL state machine
      *
@@ -44,6 +46,10 @@ public:
 private:
     static auto translateState(const seds::model::State &sedsState, ::sdl::Process *sdlProcess,
             ::sdl::StateMachine *stateMachine) -> std::unique_ptr<::sdl::State>;
+
+    static auto translatePrimitive(const seds::model::OnCommandPrimitive &command) -> InputHandler;
+
+    static auto translatePrimitive(const seds::model::Transition::Primitive &primitive) -> InputHandler;
 
     static auto translateTransition(const seds::model::Transition &sedsTransition, ::sdl::Process *sdlProcess,
             ::sdl::StateMachine *stateMachine, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void;
