@@ -39,6 +39,10 @@ public:
      */
     static auto translateStateMachine(const seds::model::StateMachine &sedsStateMachine, ::sdl::Process *sdlProcess,
             ::sdl::StateMachine *stateMachine) -> void;
+
+private:
+    static auto translateState(
+            const seds::model::State &sedsState, ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void;
 };
 
 } // namespace conversion::sdl::translator
