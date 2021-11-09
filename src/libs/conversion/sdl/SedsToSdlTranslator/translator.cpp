@@ -113,7 +113,6 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Component &sedsC
         auto stateMachine = std::make_unique<::sdl::StateMachine>();
         ::sdl::Process process;
         process.setName(sedsComponent.nameStr()); // TODO -> mangle identifier
-        process.setStateMachine(std::move(stateMachine));
         // TODO translate variable declarations
         // TODO translate procedures (activities?)
         // TODO provide additional translation for parameter (activity) maps
@@ -121,6 +120,8 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Component &sedsC
             StateMachineTranslator::translateStateMachine(
                     implementation.stateMachines()[0], &process, stateMachine.get());
         }
+        // State machine needs to be moved after processing, because later it cannot be accessed for modification
+        process.setStateMachine(std::move(stateMachine));
         model->addProcess(std::move(process));
     }
 }

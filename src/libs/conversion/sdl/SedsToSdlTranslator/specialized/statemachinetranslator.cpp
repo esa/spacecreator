@@ -24,9 +24,27 @@ namespace conversion::sdl::translator {
 auto StateMachineTranslator::translateStateMachine(const seds::model::StateMachine &sedsStateMachine,
         ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void
 {
-    Q_UNUSED(sedsStateMachine);
+    // Consider rewriting this to filters when C++20 is supported
+    // First pass through states
+    for (auto &element : sedsStateMachine.elements()) {
+        if (std::holds_alternative<seds::model::State>(element)) {
+            translateState(std::get<seds::model::State>(element), sdlProcess, stateMachine);
+        }
+    }
+    // Second pass through transitions
+
+    // Set entry state
+}
+
+auto StateMachineTranslator::translateState(
+        const seds::model::State &sedsState, ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void
+{
     Q_UNUSED(sdlProcess);
-    Q_UNUSED(stateMachine);
+
+    auto state = std::make_unique<::sdl::State>();
+    state->setName(sedsState.nameStr()); // TODO mangle identifier
+    // Entry and exit procedures shall be translated for transitions
+    stateMachine->addState(std::move(state));
 }
 
 } // namespace conversion::sdl::translator
