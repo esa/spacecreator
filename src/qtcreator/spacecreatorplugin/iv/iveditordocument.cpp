@@ -84,6 +84,7 @@ Core::IDocument::OpenResult IVEditorDocument::open(
 
     connect(m_plugin->undoStack(), &QUndoStack::cleanChanged, this, [this](bool) { Q_EMIT changed(); });
     Q_EMIT ivDataLoaded(absfileName, m_plugin);
+    m_plugin->centerOnView();
 
     return OpenResult::Success;
 }
