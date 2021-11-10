@@ -53,7 +53,7 @@ using symbolreader::SymbolDefinitionReader;
 using validator::XmlValidator;
 
 const QString SedsXmlImporter::preprocessedFilenameTemplate = "preprocessed_%1";
-static const auto PREPROCESSED_FILE_PREFIX = "preprocessed_";
+static const std::string PREPROCESSED_FILE_PREFIX = "preprocessed_";
 
 std::unique_ptr<conversion::Model> SedsXmlImporter::importModel(const Options &options) const
 {
@@ -114,14 +114,9 @@ QString SedsXmlImporter::preprocess(
         if (value) {
             return *value;
         } else {
-            return QString::fromStdString(
-                    std::filesystem::path((*inputFilename).toStdString())
-                            .replace_filename((QString(PREPROCESSED_FILE_PREFIX)
-                                    + QString::fromStdString(std::filesystem::path((*inputFilename).toStdString())
-                                                                     .filename()
-                                                                     .string()))
-                                                      .toStdString())
-                            .string());
+            auto fsPath = std::filesystem::path((*inputFilename).toStdString());
+            const auto fileNamePart = std::filesystem::path((*inputFilename).toStdString()).filename().string();
+            return QString::fromStdString(fsPath.replace_filename(PREPROCESSED_FILE_PREFIX + fileNamePart).string());
         }
     }();
 
