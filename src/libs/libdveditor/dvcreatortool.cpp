@@ -344,6 +344,10 @@ void DVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &s
         return;
     }
 
+    if (!m_dvCore->systemChecker()) {
+        return;
+    }
+
     QMenu *bindingMenu = menu->addMenu(tr("Bindings"));
 
     const QStringList allFunctions = m_dvCore->systemChecker()->functionsNames();

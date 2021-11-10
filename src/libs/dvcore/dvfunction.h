@@ -27,6 +27,7 @@ class DVFunction : public DVObject
     Q_OBJECT
     Q_PROPERTY(QString usedImplementation READ usedImplementation NOTIFY usedImplementationChanged)
     Q_PROPERTY(QString implementation READ implementation WRITE setImplementation NOTIFY implementationChanged)
+    Q_PROPERTY(QStringList path READ path NOTIFY pathChanged)
 
 public:
     explicit DVFunction(DVObject *parent = nullptr);
@@ -38,9 +39,12 @@ public:
     QStringList availableImplementations() const;
     QString defaultImplementation() const;
 
+    QStringList path() const;
+
 Q_SIGNALS:
     void usedImplementationChanged();
     void implementationChanged();
+    void pathChanged();
 };
 
 } // namespace dvm

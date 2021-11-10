@@ -86,4 +86,15 @@ QString DVFunction::defaultImplementation() const
     return {};
 }
 
+/*!
+   Retruns the full ath of the function (relevant  for nested functions)
+ */
+QStringList DVFunction::path() const
+{
+    if (model() && model()->ivQueries()) {
+        return model()->ivQueries()->functionPath(title());
+    }
+    return {};
+}
+
 } // namespace dvm
