@@ -53,7 +53,7 @@ SpaceCreatorProject::SpaceCreatorProject(QObject *parent)
     m_asnChecks->setProject(this);
 }
 
-SpaceCreatorProject::~SpaceCreatorProject() { }
+SpaceCreatorProject::~SpaceCreatorProject() {}
 
 /*!
    Returns the DVEditorCore object for the given file
@@ -91,7 +91,7 @@ IVEditorCorePtr SpaceCreatorProject::ivData(const QString &fileName) const
         data->document()->setIvCheck(m_dvChecks.get());
 
         data->document()->load(fileName);
-        if (data->document()->asn1FileName().isEmpty()) {
+        if (data->document()->asn1FilesNames().isEmpty()) {
             data->document()->setAsn1FileName(GLOBAL_ASN_FILE);
         }
         const_cast<SpaceCreatorProject *>(this)->setIvData(fileName, data);
@@ -241,6 +241,11 @@ QStringList SpaceCreatorProject::projectFiles(const QString &suffix) const
     for (const MSCEditorCorePtr &mscCore : m_mscStore) {
         if (mscCore->filePath().endsWith(suffix)) {
             files.append(mscCore->filePath());
+        }
+    }
+    for (DVEditorCorePtr dvCore : m_dvStore) {
+        if (dvCore->filePath().endsWith(suffix)) {
+            files.append(dvCore->filePath());
         }
     }
     return files;

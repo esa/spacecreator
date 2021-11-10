@@ -90,9 +90,9 @@ public:
     QString path() const;
     void setPath(const QString &path);
 
-    void setAsn1FileName(const QString &asnfile);
-    QString asn1FileName() const;
-    QString asn1FilePath() const;
+    void setAsn1FileName(const QString &newAsnfile, const QString &oldAsnfile = {});
+    QStringList asn1FilesNames() const;
+    QStringList asn1FilesPaths() const;
 
     void setMscFileName(const QString &mscFile);
     const QString &mscFileName() const;

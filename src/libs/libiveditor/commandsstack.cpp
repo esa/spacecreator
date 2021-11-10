@@ -17,6 +17,7 @@
 
 #include "commandsstack.h"
 
+#include "commands/cmdentitiesimport.h"
 #include "commands/cmdentitiesremove.h"
 #include "commands/cmdfunctionattrchange.h"
 #include "commands/cmdfunctionlanguageinsert.h"
@@ -71,6 +72,12 @@ bool CommandsStack::push(QUndoCommand *command)
     if (auto attrCommand = dynamic_cast<shared::cmd::CmdEntityAttributesChange *>(command)) {
         connect(attrCommand, &shared::cmd::CmdEntityAttributesChange::attributeChanged, this,
                 &CommandsStack::attributeChanged, Qt::UniqueConnection);
+    }
+    if (auto importCommand = dynamic_cast<CmdEntitiesImport *>(command)) {
+        connect(importCommand, &CmdEntitiesImport::asn1FilesImported, this, &CommandsStack::asn1FilesImported,
+                Qt::UniqueConnection);
+        connect(importCommand, &CmdEntitiesImport::asn1FileRemoved, this, &CommandsStack::asn1FileRemoved,
+                Qt::UniqueConnection);
     }
 
     m_undoStack->push(command);

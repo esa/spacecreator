@@ -25,35 +25,31 @@
 namespace ive {
 namespace cmd {
 
-CmdChangeAsn1File::CmdChangeAsn1File(InterfaceDocument *document, const QString &newFileName)
+CmdChangeAsn1File::CmdChangeAsn1File(
+        InterfaceDocument *document, const QString &oldFileName, const QString &newFileName)
     : QUndoCommand(QObject::tr("Set ASN1 file"))
+    , m_oldFileName(oldFileName)
     , m_newFileName(newFileName)
     , m_document(document)
 {
     Q_ASSERT(document);
-    m_oldFileName = m_document->asn1FileName();
 }
 
 void CmdChangeAsn1File::redo()
 {
-    setFile(m_newFileName);
+    if (m_document)
+        m_document->setAsn1FileName(m_newFileName, m_oldFileName);
 }
 
 void CmdChangeAsn1File::undo()
 {
-    setFile(m_oldFileName);
+    if (m_document)
+        m_document->setAsn1FileName(m_oldFileName, m_newFileName);
 }
 
 int CmdChangeAsn1File::id() const
 {
     return ChangeAsn1File;
-}
-
-void CmdChangeAsn1File::setFile(const QString &fileName)
-{
-    QFileInfo fi(m_document->path());
-    fi.setFile(fi.absolutePath() + QDir::separator() + fileName);
-    m_document->setAsn1FileName(fi.fileName());
 }
 
 } // namespace cmd

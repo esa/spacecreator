@@ -74,7 +74,7 @@ IVEditorCore::IVEditorCore(QObject *parent)
     }
 }
 
-IVEditorCore::~IVEditorCore() { }
+IVEditorCore::~IVEditorCore() {}
 
 /*!
    Returns the interface document
@@ -394,8 +394,8 @@ bool IVEditorCore::renameAsnFile(const QString &oldName, const QString &newName)
     QFileInfo oldFile(oldName);
     const QString oldFileName = oldFile.fileName();
 
-    if (document()->asn1FileName() == oldFileName) {
-        auto command = new cmd::CmdChangeAsn1File(document(), newName);
+    if (!document()->asn1FilesNames().contains(newName)) {
+        auto command = new cmd::CmdChangeAsn1File(document(), oldName, newName);
         commandsStack()->push(command);
         Q_EMIT editedExternally(this);
         return true;
