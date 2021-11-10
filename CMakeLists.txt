@@ -5,6 +5,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 set(SC_NAME SpaceCreator)
 set(ORGANISATION ESA)
 set(ORGANISATION_DOMAIN https://taste.tools)
+set(SC_GIT_MAIN_BRANCH_NAME master)
 
 include(GitHash)
 include(FunctionReadVersion)

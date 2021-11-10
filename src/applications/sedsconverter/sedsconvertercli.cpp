@@ -179,7 +179,7 @@ void SedsConverterCLI::addSedsAdditionalFilesOptions(Options &options)
         options.add(SedsOptions::schemaFilename, parser.value(CommandArg::SedsConverterSedsSchemaFilename));
     }
     if (args.contains(CommandArg::SedsConverterSedsExtRef)) {
-        for(auto value : parser.value(CommandArg::SedsConverterSedsExtRef).split(",")) {
+        for (auto value : parser.value(CommandArg::SedsConverterSedsExtRef).split(",")) {
             options.add(SedsOptions::externalRefFilename, value);
         }
     }
@@ -242,4 +242,3 @@ void SedsConverterCLI::addDefaultValues(Options &options)
 }
 
 } // namespace sedsconverter
-
