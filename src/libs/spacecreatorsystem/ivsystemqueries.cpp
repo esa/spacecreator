@@ -241,6 +241,16 @@ QStringList IvSystemQueries::implementationsForFunction(const QString &function)
     return implementations;
 }
 
+QStringList IvSystemQueries::functionPath(const QString &function) const
+{
+    ivm::IVFunction *fn = functionByName(function);
+    if (!fn) {
+        return {};
+    }
+
+    return fn->path();
+}
+
 /*!
    Returns a pointer to the IV model of the in-core
  */

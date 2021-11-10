@@ -20,6 +20,7 @@ partitions.functions       :    |     |_ List of functions in that partition
 function                   :    |        |_ Instance of partitions.function (see "for function in function in partition.functions")
 function.usedImplementation:    |            |_ The implementation used for this functions
 function.implementation    :    |            |_ Implementation chosen excpilictly by the user (empty if default is used)
+function.path              :    |            |_ List of all parent function names and this one as last element (use for example {{ function.path|join:"::" }})
 node.devices               :    |_ List of devices (ports) in that node
 device                     :    |  |_ Instance of node.device
 device.fullName            :    |  |_ Full name of the device, consisting of name and port
