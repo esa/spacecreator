@@ -110,7 +110,7 @@ public Q_SLOTS:
     void testGenerateProcessWithReturnlessProcedure();
 };
 
-std::unique_ptr<VariableDeclaration> makeVariableDeclaration(QString name, QString type)
+static std::unique_ptr<VariableDeclaration> makeVariableDeclaration(QString name, QString type)
 {
     auto variable = std::make_unique<VariableDeclaration>();
     variable->setName(std::move(name));
@@ -119,7 +119,7 @@ std::unique_ptr<VariableDeclaration> makeVariableDeclaration(QString name, QStri
     return variable;
 }
 
-std::unique_ptr<ProcedureParameter> makeProcedureParameter(QString name, QString type, QString direction)
+static std::unique_ptr<ProcedureParameter> makeProcedureParameter(QString name, QString type, QString direction)
 {
     auto parameter = std::make_unique<ProcedureParameter>();
     parameter->setName(std::move(name));
@@ -129,7 +129,7 @@ std::unique_ptr<ProcedureParameter> makeProcedureParameter(QString name, QString
     return parameter;
 }
 
-bool verifyAndConsume(QTextStream &stream, const QString &string)
+static bool verifyAndConsume(QTextStream &stream, const QString &string)
 {
     QString line;
     do {
@@ -142,7 +142,7 @@ bool verifyAndConsume(QTextStream &stream, const QString &string)
     return false;
 }
 
-void checkSequenceAndConsume(std::vector<QString> &expectedOutput, QTextStream &consumableOutput)
+static void checkSequenceAndConsume(std::vector<QString> &expectedOutput, QTextStream &consumableOutput)
 {
     for (const auto &expectedLine : expectedOutput) {
         if (verifyAndConsume(consumableOutput, expectedLine)) {
@@ -175,7 +175,6 @@ void tst_sdlmodel::testDefaultValuesInModel()
     QVERIFY(processName == process->name());
 }
 
-/// BASIC PROCESS GENERATION TEST
 /// \SRS SRS-BSP-FUN-FPU-10
 void tst_sdlmodel::testGenerateBasicProcess()
 {
