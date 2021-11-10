@@ -82,7 +82,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     Asn1Acn::Asn1SystemChecks *asnCheck { nullptr };
     ivm::AbstractSystemChecks *ivCheck { nullptr };
     QString mscFileName;
-    QString asnFileName;
+    QStringList asnFilesNames;
 };
 
 /*!
@@ -229,7 +229,7 @@ QList<shared::VEObject *> InterfaceDocument::prepareSelectedObjectsForExport(QSt
     for (const auto id : d->objectsSelectionModel->selection().indexes()) {
         const int role = static_cast<int>(ive::IVVisualizationModelBase::IdRole);
         if (ivm::IVObject *object = d->objectsModel->getObject(id.data(role).toUuid())) {
-            if (object->isFunction() && object->parentObject() == nullptr) {
+            if ((object->isFunction() || object->isFunctionType()) && object->parentObject() == nullptr) {
                 exportNames.append(object->entityAttributeValue<QString>(QLatin1String("name")));
             }
             objects.append(object);
@@ -259,6 +259,9 @@ bool InterfaceDocument::exportSelectedFunctions()
 {
     QString name;
     const QList<shared::VEObject *> objects = prepareSelectedObjectsForExport(name);
+    if (name.isEmpty()) {
+        return false;
+    }
     QString path = shared::componentsLibraryPath() + name;
     if (exportImpl(path, objects)) {
         d->objectsSelectionModel->clearSelection();
@@ -340,45 +343,48 @@ void InterfaceDocument::setPath(const QString &path)
   Sets the filename of the used asn1 file. This is only the file name without a path. The File is expected to be next
    to the iv file
  */
-void InterfaceDocument::setAsn1FileName(const QString &asnfile)
+void InterfaceDocument::setAsn1FileName(const QString &newAsnfile, const QString &oldAsnfile)
 {
-    if (d->asnFileName == asnfile) {
-        return;
+    if (!oldAsnfile.isEmpty()) {
+        d->asnFilesNames.removeAll(oldAsnfile);
     }
 
-    d->asnFileName = asnfile;
-    Q_EMIT asn1FileNameChanged(d->asnFileName);
+    if (!newAsnfile.isEmpty()) {
+        d->asnFilesNames.append(newAsnfile);
+        Q_EMIT asn1FileNameChanged(newAsnfile);
 
-    if (d->asnCheck && d->asnCheck->asn1Storage()) {
-        if (d->asnCheck->asn1Storage()->contains(asn1FilePath())) {
-            checkAllInterfacesForAsn1Compliance();
-        } else {
-            // does load the data
-            d->asnCheck->asn1Storage()->asn1DataTypes(asn1FilePath());
+        if (d->asnCheck && d->asnCheck->asn1Storage()) {
+            const QDir projectPath { QFileInfo(path()).absoluteDir() };
+            if (d->asnCheck->asn1Storage()->contains(projectPath.filePath(newAsnfile))) {
+                checkAllInterfacesForAsn1Compliance();
+            } else {
+                // does load the data
+                d->asnCheck->asn1Storage()->asn1DataTypes(projectPath.filePath(newAsnfile));
+            }
         }
     }
 }
 
 /*!
-   Returns the filename of the used asn1 file. It does not contain any path.
+   Returns the filenames of the used asn1 files. Result does not contain any path.
  */
-QString InterfaceDocument::asn1FileName() const
+QStringList InterfaceDocument::asn1FilesNames() const
 {
-    return d->asnFileName;
+    return d->asnFilesNames;
 }
 
 /*!
-   Returns the ASN.1 file including it's full path
+   Returns the list of ASN.1 files including full path
  */
-QString InterfaceDocument::asn1FilePath() const
+QStringList InterfaceDocument::asn1FilesPaths() const
 {
-    if (path().isEmpty()) {
-        return {};
+    const QDir projectDir = QFileInfo(path()).absoluteDir();
+    QStringList paths;
+    for (const QString &filename : d->asnFilesNames) {
+        paths.append(projectDir.filePath(filename));
     }
 
-    QFileInfo fi(path());
-    fi.setFile(fi.absolutePath() + QDir::separator() + d->asnFileName);
-    return fi.absoluteFilePath();
+    return paths;
 }
 
 /*!
@@ -536,7 +542,6 @@ void InterfaceDocument::setAsn1Check(Asn1Acn::Asn1SystemChecks *check)
 Asn1Acn::Asn1SystemChecks *InterfaceDocument::asn1Check() const
 {
     return d->asnCheck;
-    ;
 }
 
 void InterfaceDocument::setIvCheck(ivm::AbstractSystemChecks *checks)
@@ -775,18 +780,19 @@ bool InterfaceDocument::exportImpl(QString &targetPath, const QList<shared::VEOb
         return false;
     }
 
-    if (!QFile::copy(asn1FilePath(), targetDir.filePath(asn1FileName()))) {
-        shared::ErrorHub::addError(
-                shared::ErrorItem::Error, tr("Error during ASN.1 file copying: %1").arg(asn1FilePath()));
+    const QFileInfo ivPath(path());
+    const QDir ivDir = ivPath.absoluteDir();
+    for (const QString &asnFile : asn1FilesNames()) {
+        if (!QFile::copy(ivDir.filePath(asnFile), targetDir.filePath(asnFile))) {
+            shared::ErrorHub::addError(
+                    shared::ErrorItem::Error, tr("Error during ASN.1 file copying: %1").arg(asnFile));
+        }
     }
 
-    const QFileInfo ivPath(path());
     for (shared::VEObject *object : objects) {
-        if (auto fn = object->as<ivm::IVFunction *>()) {
-            const QString subPath = QStringLiteral("work/%1").arg(object->title()).toLower();
-            const QString targetExportDir { shared::componentsLibraryPath() + QDir::separator() + subPath };
-            const QString sourceExportDir { ivPath.absolutePath() + QDir::separator() + subPath };
-            shared::copyDir(sourceExportDir, targetExportDir);
+        if (auto fn = object->as<ivm::IVFunctionType *>()) {
+            const QString subPath = QStringLiteral("work/%1").arg(object->title());
+            shared::copyDir(ivDir.filePath(subPath), targetDir.filePath(subPath));
         }
     }
 
@@ -810,7 +816,11 @@ bool InterfaceDocument::loadImpl(const QString &path)
 
     setObjects(parser.parsedObjects());
     const QVariantMap metadata = parser.metaData();
-    setAsn1FileName(metadata["asn1file"].toString());
+    QVariantMap::const_iterator i = metadata.constFind("asn1file");
+    while (i != metadata.end() && i.key() == "asn1file") {
+        setAsn1FileName(i.value().toString());
+        ++i;
+    }
     setMscFileName(metadata["mscfile"].toString());
     shared::ErrorHub::clearCurrentFile();
     return true;
