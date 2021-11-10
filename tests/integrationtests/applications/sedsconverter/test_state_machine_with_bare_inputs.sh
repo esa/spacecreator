@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# TODO Set proper path
-SEDS_CONVERTER=../../../../../build/src/applications/sedsconverter/SedsConverter
+
+SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 TEST_OUTPUT_DIR=output
 
 # Setup output dir
