@@ -116,7 +116,7 @@ bool StreamingWindow::startRemoteControl(quint16 port)
 void StreamingWindow::adaptWindowSizeToChart(const QRectF &rect)
 {
     QRect windowRect = geometry();
-    QRect widgetRect = d->m_plugin->chartView()->geometry();
+    QRect widgetRect = d->ui->graphicsView->geometry();
     const QSize extraMargin(5, 5);
     const QSize offsets(windowRect.width() - widgetRect.width(), windowRect.height() - widgetRect.height());
     widgetRect = rect.marginsAdded(msc::ChartItem::chartMargins()).toRect();
