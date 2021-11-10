@@ -17,26 +17,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
-
 #include "exceptions.h"
-
-#include <QString>
-#include <set>
-#include <stdexcept>
 
 namespace conversion {
 
-/**
- * @brief   Exception thrown when escaper encounters an illegal input name
- */
-class EscaperException : public ConversionException
+EscaperException::EscaperException(QString msg)
+    : ConversionException(std::move(msg))
 {
-public:
-    /**
-     * @brief   Constructor
-     */
-    EscaperException();
-};
+}
+
+EmptyNameException::EmptyNameException()
+    : EscaperException("Incorrect name. Name must contain at least one ASCII character.")
+{
+}
 
 } // namespace conversion
