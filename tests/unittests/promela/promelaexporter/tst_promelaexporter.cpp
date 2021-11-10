@@ -56,6 +56,7 @@ private Q_SLOTS:
     void testTypeAlias();
     void testValueDefinition();
     void testDeclaration();
+    void testIncludes();
 
 private:
     QString getFileContents(const QString &filename);
@@ -295,6 +296,24 @@ void tst_PromelaExporter::testDeclaration()
         QFAIL(ex.what());
     }
     QString out2 = getFileContents("expect_promela_file8.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testIncludes()
+{
+    PromelaModel model;
+
+    model.addInclude("first.pml");
+    model.addInclude("second.pml");
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_file9.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }

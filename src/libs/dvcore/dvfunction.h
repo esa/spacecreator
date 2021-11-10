@@ -36,6 +36,7 @@ public:
     void setImplementation(const QString &name);
     QString implementation() const;
     QStringList availableImplementations() const;
+    QString defaultImplementation() const;
 
 Q_SIGNALS:
     void usedImplementationChanged();

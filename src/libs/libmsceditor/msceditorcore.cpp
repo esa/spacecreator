@@ -17,6 +17,7 @@
 
 #include "msceditorcore.h"
 
+#include "chartlayoutmanager.h"
 #include "commandlineparser.h"
 #include "commands/cmddeleteentity.h"
 #include "commands/cmddocumentcreate.h"
@@ -28,6 +29,7 @@
 #include "ivfunction.h"
 #include "mainmodel.h"
 #include "messagedeclarationsdialog.h"
+#include "mscappwidget.h"
 #include "mscchart.h"
 #include "msccommandsstack.h"
 #include "mscdocument.h"
@@ -35,17 +37,6 @@
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 #include "systemchecks.h"
-#include "tools/actioncreatortool.h"
-#include "tools/basetool.h"
-#include "tools/commentcreatortool.h"
-#include "tools/conditioncreatortool.h"
-#include "tools/coregioncreatortool.h"
-#include "tools/entitydeletetool.h"
-#include "tools/instancecreatortool.h"
-#include "tools/instancestoptool.h"
-#include "tools/messagecreatortool.h"
-#include "tools/pointertool.h"
-#include "tools/timercreatortool.h"
 #include "ui/graphicsviewbase.h"
 
 #include <QActionGroup>
@@ -57,14 +48,11 @@
 #include <QMenu>
 #include <QMimeData>
 #include <QStackedWidget>
-#include <QToolBar>
 #include <QUndoGroup>
 #include <QUndoStack>
 #include <QUrl>
 
 namespace msc {
-
-static const char *HIERARCHY_TYPE_TAG = "hierarchyTag";
 
 /*!
  * \class MSCEditorCore
@@ -78,6 +66,17 @@ MSCEditorCore::MSCEditorCore(QObject *parent)
     setSystemChecker(new SystemChecks(this));
 
     connect(m_model->commandsStack(), &msc::MscCommandsStack::nameChanged, this, &msc::MSCEditorCore::nameChanged);
+
+    connect(&(mainModel()->chartViewModel()), &msc::ChartLayoutManager::initialNameAccepted, this,
+            [this](MscEntity *entity) {
+                if (!entity) {
+                    return;
+                }
+                Q_EMIT nameChanged(entity, entity->name(), nullptr);
+            });
+
+    // Init widget, so the coordinate converter can be set up correctly
+    mainwidget();
 }
 
 MSCEditorCore::~MSCEditorCore() { }
@@ -87,162 +86,9 @@ MainModel *MSCEditorCore::mainModel() const
     return m_model.get();
 }
 
-void MSCEditorCore::setViews(
-        QStackedWidget *centerView, shared::ui::GraphicsViewBase *chartView, GraphicsView *hierarchyView)
-{
-    m_centerView = centerView;
-    m_chartView = chartView;
-    m_hierarchyView = hierarchyView;
-
-    if (m_chartView) {
-        m_chartView->setScene(mainModel()->graphicsScene());
-    }
-    if (m_hierarchyView) {
-        m_hierarchyView->setScene(mainModel()->hierarchyScene());
-    }
-}
-
-QStackedWidget *MSCEditorCore::centerView()
-{
-    return m_centerView;
-}
-
 shared::ui::GraphicsViewBase *MSCEditorCore::chartView()
 {
-    return m_chartView;
-}
-
-GraphicsView *MSCEditorCore::hierarchyView()
-{
-    return m_hierarchyView;
-}
-
-void MSCEditorCore::initChartTools()
-{
-    Q_ASSERT(m_chartView != nullptr);
-
-    if (!m_tools.isEmpty()) {
-        qDeleteAll(m_tools);
-        m_tools.clear();
-    }
-
-    m_pointerTool = new msc::PointerTool(nullptr, this);
-    m_tools.append(m_pointerTool);
-
-    m_instanceCreatorTool = new msc::InstanceCreatorTool(&(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_instanceCreatorTool);
-
-    m_instanceStopTool = new msc::InstanceStopTool(&(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_instanceStopTool);
-
-    m_messageCreateTool = new msc::MessageCreatorTool(
-            msc::MscMessage::MessageType::Message, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_messageCreateTool);
-
-    m_createCreateTool = new msc::MessageCreatorTool(
-            msc::MscMessage::MessageType::Create, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_createCreateTool);
-
-    m_commentCreateTool = new msc::CommentCreatorTool(false, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_commentCreateTool);
-
-    m_globalCommentCreateTool = new msc::CommentCreatorTool(true, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_globalCommentCreateTool);
-
-    m_coregionCreateTool = new msc::CoregionCreatorTool(&(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_coregionCreateTool);
-
-    m_actionCreateTool = new msc::ActionCreatorTool(&(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_actionCreateTool);
-
-    m_conditionCreateTool = new msc::ConditionCreatorTool(false, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_conditionCreateTool);
-
-    m_sharedConditionTool = new msc::ConditionCreatorTool(true, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_sharedConditionTool);
-
-    m_startTimerCreateTool =
-            new msc::TimerCreatorTool(msc::MscTimer::TimerType::Start, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_startTimerCreateTool);
-
-    m_stopTimerCreateTool =
-            new msc::TimerCreatorTool(msc::MscTimer::TimerType::Stop, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_stopTimerCreateTool);
-
-    m_timeoutTimerCreateTool =
-            new msc::TimerCreatorTool(msc::MscTimer::TimerType::Timeout, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_timeoutTimerCreateTool);
-
-    QActionGroup *toolsActions = new QActionGroup(this);
-    toolsActions->setExclusive(false);
-    for (msc::BaseTool *tool : m_tools) {
-        QAction *toolAction = mscToolBar()->addAction(tool->title());
-        toolAction->setCheckable(true);
-        toolAction->setIcon(tool->icon());
-        toolAction->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
-        toolAction->setData(QVariant::fromValue<msc::BaseTool::ToolType>(tool->toolType()));
-        toolAction->setEnabled(m_viewMode == ViewMode::CHART);
-        tool->setView(m_chartView);
-        tool->setAction(toolAction);
-
-        if (msc::BaseCreatorTool *creatorTool = qobject_cast<msc::BaseCreatorTool *>(tool)) {
-            connect(creatorTool, &msc::BaseCreatorTool::created, this, [&]() {
-                m_chartView->setFocus();
-                activateDefaultTool();
-            });
-            connect(creatorTool, &msc::BaseCreatorTool::canceled, this, &MSCEditorCore::activateDefaultTool);
-        }
-
-        toolsActions->addAction(toolAction);
-        connect(toolAction, &QAction::toggled, this, &MSCEditorCore::updateMscToolbarActionsChecked);
-    }
-
-    m_defaultToolAction = toolsActions->actions().first();
-    m_defaultToolAction->setVisible(false);
-
-    m_deleteTool = new msc::EntityDeleteTool(&(m_model->chartViewModel()), m_chartView, this);
-    m_deleteTool->setCurrentChart(m_model->chartViewModel().currentChart());
-    connect(&m_model->chartViewModel(), &msc::ChartLayoutManager::currentChartChanged, m_deleteTool,
-            &msc::EntityDeleteTool::setCurrentChart);
-
-    activateDefaultTool();
-}
-
-void MSCEditorCore::initHierarchyViewActions()
-{
-    Q_ASSERT(m_hierarchyView != nullptr);
-
-    if (!m_hierarchyActions.isEmpty()) {
-        qDeleteAll(m_hierarchyActions);
-        m_hierarchyActions.clear();
-    }
-
-    auto addAction = [&](msc::MscDocument::HierarchyType type, const QString &title, const QIcon &icon) {
-        QAction *action = new QAction(title, this);
-        action->setProperty(HIERARCHY_TYPE_TAG, type);
-        action->setIcon(icon);
-        action->setToolTip(title);
-        action->setEnabled(m_viewMode == ViewMode::HIERARCHY);
-        if (m_hierarchyToolBar) {
-            m_hierarchyToolBar->addAction(action);
-        }
-
-        m_hierarchyActions.append(action);
-
-        connect(action, &QAction::triggered, this, [&]() {
-            msc::MscDocument::HierarchyType selectedType =
-                    sender()->property(HIERARCHY_TYPE_TAG).value<msc::MscDocument::HierarchyType>();
-            addDocument(selectedType);
-        });
-    };
-
-    addAction(msc::MscDocument::HierarchyAnd, tr("Hierarchy And"), QIcon(":/icons/document_and.png"));
-    addAction(msc::MscDocument::HierarchyOr, tr("Hierarchy Or"), QIcon(":/icons/document_or.png"));
-    addAction(msc::MscDocument::HierarchyParallel, tr("Hierarchy Parallel"), QIcon(":/icons/document_parallel.png"));
-    addAction(msc::MscDocument::HierarchyIs, tr("Hierarchy Is"), QIcon(":/icons/document_is_scenario.png"));
-    addAction(msc::MscDocument::HierarchyRepeat, tr("Hierarchy Repeat"), QIcon(":/icons/document_repeat.png"));
-    addAction(msc::MscDocument::HierarchyException, tr("Hierarchy Exception"), QIcon(":/icons/document_exception.png"));
-    addAction(msc::MscDocument::HierarchyLeaf, tr("Hierarchy Leaf"), QIcon(":/icons/document_leaf.png"));
+    return mainwidget()->chartView();
 }
 
 void MSCEditorCore::initConnections()
@@ -251,18 +97,6 @@ void MSCEditorCore::initConnections()
         return;
     }
 
-    Q_ASSERT(m_chartView != nullptr);
-
-    if (auto chartview = qobject_cast<GraphicsView *>(m_chartView)) {
-        connect(chartview, &msc::GraphicsView::createMessageToolRequested, this, [&]() {
-            if (m_messageCreateTool) {
-                m_messageCreateTool->activate();
-            }
-        });
-    }
-
-    connect(&(m_model->chartViewModel()), &msc::ChartLayoutManager::currentChartChanged, this,
-            &MSCEditorCore::selectCurrentChart);
     connect(&(m_model->chartViewModel()), &msc::ChartLayoutManager::initialNameAccepted, this,
             [this](MscEntity *entity) {
                 if (!entity) {
@@ -271,55 +105,21 @@ void MSCEditorCore::initConnections()
                 Q_EMIT nameChanged(entity, entity->name(), nullptr);
             });
 
-    connect(m_model.get(), &msc::MainModel::showChartVew, this, [this]() { showDocumentView(true); });
-
-    connect(&(m_model->hierarchyViewModel()), &msc::HierarchyViewModel::selectedDocumentChanged, this,
-            &msc::MSCEditorCore::updateHierarchyActions);
-    connect(this, &msc::MSCEditorCore::viewModeChanged, this, &msc::MSCEditorCore::updateHierarchyActions);
-    connect(&(m_model->hierarchyViewModel()), &msc::HierarchyViewModel::hierarchyTypeChanged, this,
-            &msc::MSCEditorCore::updateHierarchyActions);
-
     m_connectionsDone = true;
 }
 
 void MSCEditorCore::addToolBars(QMainWindow *window)
 {
     window->addToolBar(mainToolBar());
-    window->addToolBar(Qt::LeftToolBarArea, mscToolBar());
-    window->addToolBar(Qt::LeftToolBarArea, hierarchyToolBar());
 }
 
-QToolBar *MSCEditorCore::mscToolBar()
+MscAppWidget *MSCEditorCore::mainwidget()
 {
-    if (!m_mscToolBar) {
-        m_mscToolBar = new QToolBar(tr("MSC"));
-        m_mscToolBar->setObjectName("mscTools");
-        m_mscToolBar->setAllowedAreas(Qt::AllToolBarAreas);
-        m_mscToolBar->setVisible(m_toolbarsVisible);
+    if (!m_mainWidget) {
+        m_mainWidget = new MscAppWidget(this);
+        m_model->chartViewModel().preferredChartBoxSize();
     }
-    return m_mscToolBar;
-}
-
-QToolBar *MSCEditorCore::hierarchyToolBar()
-{
-    if (!m_hierarchyToolBar) {
-        m_hierarchyToolBar = new QToolBar(tr("Hierarchy"));
-        m_hierarchyToolBar->setObjectName("hierarchyTools");
-        m_hierarchyToolBar->setAllowedAreas(Qt::AllToolBarAreas);
-        m_hierarchyToolBar->setVisible(m_toolbarsVisible);
-    }
-    return m_hierarchyToolBar;
-}
-
-void MSCEditorCore::showToolbars(bool show)
-{
-    m_toolbarsVisible = show;
-    if (m_mscToolBar) {
-        m_mscToolBar->setVisible(m_toolbarsVisible);
-    }
-    if (m_hierarchyToolBar) {
-        m_hierarchyToolBar->setVisible(m_toolbarsVisible);
-    }
+    return m_mainWidget;
 }
 
 void MSCEditorCore::populateCommandLineArguments(shared::CommandLineParser *parser) const
@@ -327,17 +127,6 @@ void MSCEditorCore::populateCommandLineArguments(shared::CommandLineParser *pars
     parser->handlePositional(shared::CommandLineParser::Positional::OpenFileMsc);
     parser->handlePositional(shared::CommandLineParser::Positional::DbgOpenMscExamplesChain);
     parser->handlePositional(shared::CommandLineParser::Positional::DropUnsavedChangesSilently);
-}
-
-BaseTool *MSCEditorCore::activeTool() const
-{
-    for (auto tool : m_tools) {
-        if (tool->isActive()) {
-            return tool;
-        }
-    }
-
-    return nullptr;
 }
 
 QAction *MSCEditorCore::actionMessageDeclarations()
@@ -349,22 +138,6 @@ QAction *MSCEditorCore::actionMessageDeclarations()
                 [this]() { openMessageDeclarationEditor(nullptr); });
     }
     return m_actionMessageDeclarations;
-}
-
-QVector<QAction *> MSCEditorCore::chartActions() const
-{
-    QVector<QAction *> actions;
-    actions.reserve(m_tools.size());
-    for (msc::BaseTool *tool : m_tools) {
-        if (tool != m_deleteTool)
-            actions.append(tool->action());
-    }
-    return actions;
-}
-
-QVector<QAction *> MSCEditorCore::hierarchyActions() const
-{
-    return m_hierarchyActions;
 }
 
 QAction *MSCEditorCore::createActionCopy(QMainWindow *window)
@@ -406,6 +179,22 @@ QAction *MSCEditorCore::createActionPaste(QMainWindow *window)
     return m_actionPaste;
 }
 
+QAction *MSCEditorCore::actionCheckInstances()
+{
+    if (m_actionCheckInstances == nullptr) {
+        m_actionCheckInstances = new QAction(QIcon(":/sharedresources/check_yellow.svg"), tr("Check instances"), this);
+    }
+    return m_actionCheckInstances;
+}
+
+QAction *MSCEditorCore::actionCheckMessages()
+{
+    if (m_actionCheckMessages == nullptr) {
+        m_actionCheckMessages = new QAction(QIcon(":/sharedresources/check_blue.svg"), tr("Check MSC messages"), this);
+    }
+    return m_actionCheckMessages;
+}
+
 /*!
    Sets the checker for iv consistency
  */
@@ -428,11 +217,6 @@ void MSCEditorCore::setSystemChecker(SystemChecks *checker)
 SystemChecks *MSCEditorCore::systemChecker() const
 {
     return m_systemChecks;
-}
-
-MSCEditorCore::ViewMode MSCEditorCore::viewMode()
-{
-    return m_viewMode;
 }
 
 QUndoStack *MSCEditorCore::undoStack() const
@@ -604,113 +388,6 @@ bool MSCEditorCore::save()
     return m_model->saveMsc(m_model->currentFilePath());
 }
 
-void MSCEditorCore::setViewMode(MSCEditorCore::ViewMode mode)
-{
-    if (mode == m_viewMode) {
-        return;
-    }
-
-    m_viewMode = mode;
-    if (m_viewMode == ViewMode::CHART) {
-        showDocumentView(true);
-    } else {
-        showHierarchyView(true);
-    }
-
-    Q_EMIT viewModeChanged(m_viewMode);
-}
-
-void MSCEditorCore::showDocumentView(bool show)
-{
-    if (show) {
-        if (m_centerView->currentWidget() == m_chartView) {
-            return;
-        }
-
-        m_centerView->setCurrentWidget(m_chartView);
-
-        if (m_hierarchyToolBar) {
-            m_hierarchyToolBar->hide();
-        }
-        if (m_mscToolBar && m_toolbarsVisible) {
-            m_mscToolBar->show();
-        }
-        for (QAction *action : chartActions()) {
-            action->setEnabled(true);
-            checkGlobalComment();
-        }
-        for (QAction *action : hierarchyActions()) {
-            action->setEnabled(false);
-        }
-
-        actionCopy()->setEnabled(true);
-        msc::MscChart *chart = mainModel()->chartViewModel().currentChart();
-        QClipboard *clipboard = QApplication::clipboard();
-        const QMimeData *mimeData = clipboard->mimeData();
-        const bool clipBoardHasMscChart = mimeData ? mimeData->hasFormat(MainModel::MscChartMimeType) : false;
-        if (m_actionPaste) {
-            m_actionPaste->setEnabled(clipBoardHasMscChart && chart && chart->instances().isEmpty());
-        }
-        if (m_actionCopy) {
-            m_actionCopy->setEnabled(true);
-        }
-
-        m_deleteTool->setView(m_chartView);
-        m_deleteTool->setCurrentChart(chart);
-
-        setViewMode(ViewMode::CHART);
-    } else {
-        showHierarchyView(true);
-    }
-}
-
-void MSCEditorCore::showHierarchyView(bool show)
-{
-    if (show) {
-        if (m_centerView->currentWidget() == m_hierarchyView) {
-            return;
-        }
-
-        m_centerView->setCurrentWidget(m_hierarchyView);
-
-        if (m_hierarchyToolBar && m_toolbarsVisible) {
-            m_hierarchyToolBar->show();
-        }
-        if (m_mscToolBar) {
-            m_mscToolBar->hide();
-        }
-        for (QAction *action : chartActions()) {
-            action->setEnabled(false);
-        }
-        for (QAction *action : hierarchyActions()) {
-            action->setEnabled(true);
-        }
-
-        if (m_actionCopy) {
-            m_actionCopy->setEnabled(false);
-        }
-        if (m_actionPaste) {
-            m_actionPaste->setEnabled(false);
-        }
-
-        m_deleteTool->setView(m_hierarchyView);
-        m_deleteTool->setCurrentChart(nullptr);
-
-        setViewMode(ViewMode::HIERARCHY);
-    } else {
-        showDocumentView(true);
-    }
-}
-
-void MSCEditorCore::activateDefaultTool()
-{
-    for (msc::BaseTool *tool : m_tools) {
-        if (tool != m_pointerTool)
-            tool->action()->setChecked(false);
-    }
-    m_pointerTool->action()->setChecked(true);
-}
-
 /*!
  * \brief msc::MSCEditorCore::selectCurrentChart Set the current chart as the currently selected.
  */
@@ -718,27 +395,10 @@ void MSCEditorCore::selectCurrentChart()
 {
     msc::MscChart *chart = m_model->chartViewModel().currentChart();
     if (chart != nullptr) {
-        connect(chart, &msc::MscEntity::commentChanged, this, &msc::MSCEditorCore::checkGlobalComment,
+        connect(chart, &msc::MscEntity::commentChanged, m_mainWidget, &msc::MscAppWidget::checkGlobalComment,
                 Qt::UniqueConnection);
     }
-    checkGlobalComment();
-}
-
-void MSCEditorCore::checkGlobalComment()
-{
-    if (!m_globalCommentCreateTool) {
-        return;
-    }
-
-    msc::MscChart *currentChart = m_model->chartViewModel().currentChart();
-    if (!currentChart) {
-        m_globalCommentCreateTool->action()->setEnabled(false);
-        return;
-    }
-
-    const bool hasInstance = currentChart && !currentChart->instances().isEmpty();
-    const bool hasGlobalComment = !currentChart->commentString().isEmpty();
-    m_globalCommentCreateTool->action()->setEnabled(hasInstance && !hasGlobalComment);
+    m_mainWidget->checkGlobalComment();
 }
 
 void MSCEditorCore::openMessageDeclarationEditor(QWidget *parentwidget)
@@ -766,46 +426,12 @@ void MSCEditorCore::openMessageDeclarationEditor(QWidget *parentwidget)
     }
 }
 
-void MSCEditorCore::updateMscToolbarActionsChecked()
-{
-    if (!m_mscToolBar) {
-        return;
-    }
-
-    if (QAction *senderAction = qobject_cast<QAction *>(sender()))
-        if (senderAction->isChecked()) {
-            for (QAction *action : m_mscToolBar->actions())
-                if (action != senderAction) {
-                    action->setChecked(false);
-                }
-        }
-}
-
-/*!
-   Enables or disables the hierarchy actions, depending if a new document can be added or not
- */
-void MSCEditorCore::updateHierarchyActions()
-{
-    bool canAdd = true;
-    if (m_viewMode != ViewMode::HIERARCHY) {
-        canAdd = false;
-    }
-    MscDocument *parentDoc = m_model->selectedDocument();
-    if (!parentDoc || !parentDoc->isAddChildEnable()) {
-        canAdd = false;
-    }
-
-    for (QAction *action : m_hierarchyActions) {
-        action->setEnabled(canAdd);
-    }
-}
-
 /*!
    Adds a MSC document if the hierarchy view is active and a "non-leaf" document is selected
  */
 void MSCEditorCore::addDocument(MscDocument::HierarchyType type)
 {
-    if (m_viewMode != ViewMode::HIERARCHY) {
+    if (!m_mainWidget || m_mainWidget->viewMode() != MscAppWidget::ViewMode::HIERARCHY) {
         return;
     }
     MscDocument *parentDoc = m_model->hierarchyViewModel().selectedDocument();

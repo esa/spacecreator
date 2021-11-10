@@ -33,28 +33,6 @@
     <property name="spacing">
      <number>5</number>
     </property>
-    <item row="0" column="0">
-     <widget class="QStackedWidget" name="centerView">
-      <property name="currentIndex">
-       <number>0</number>
-      </property>
-      <widget class="msc::GraphicsView" name="graphicsView">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>200</width>
-         <height>0</height>
-        </size>
-       </property>
-      </widget>
-      <widget class="msc::GraphicsView" name="hierarchyView"/>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -63,107 +41,13 @@
      <x>0</x>
      <y>0</y>
      <width>861</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <widget class="QDockWidget" name="dockWidgetDocument">
-   <property name="windowTitle">
-    <string>Documents</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetDocumenetContents">
-    <layout class="QGridLayout" name="gridLayout">
-     <property name="leftMargin">
-      <number>5</number>
-     </property>
-     <property name="topMargin">
-      <number>5</number>
-     </property>
-     <property name="rightMargin">
-      <number>5</number>
-     </property>
-     <property name="bottomMargin">
-      <number>5</number>
-     </property>
-     <property name="spacing">
-      <number>5</number>
-     </property>
-     <item row="0" column="0">
-      <widget class="msc::DocumentTreeView" name="documentTreeView">
-       <property name="minimumSize">
-        <size>
-         <width>200</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="sizeAdjustPolicy">
-        <enum>QAbstractScrollArea::AdjustToContents</enum>
-       </property>
-       <attribute name="headerVisible">
-        <bool>true</bool>
-       </attribute>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="QDockWidget" name="dockWidgetAsn1">
-   <property name="windowTitle">
-    <string>ASN.1 file</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2">
-    <layout class="QGridLayout" name="gridLayout_4">
-     <property name="leftMargin">
-      <number>5</number>
-     </property>
-     <property name="topMargin">
-      <number>5</number>
-     </property>
-     <property name="rightMargin">
-      <number>5</number>
-     </property>
-     <property name="bottomMargin">
-      <number>5</number>
-     </property>
-     <item row="0" column="0">
-      <widget class="asn1::ASN1FileView" name="asn1Widget" native="true"/>
-     </item>
-    </layout>
-   </widget>
-  </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>msc::GraphicsView</class>
-   <extends>QGraphicsView</extends>
-   <header>graphicsview.h</header>
-  </customwidget>
-  <customwidget>
-   <class>msc::ASN1FileView</class>
-   <extends>QWidget</extends>
-   <header>asn1fileview.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>asn1::DocumentTreeView</class>
-   <extends>QTreeView</extends>
-   <header>documenttreeview.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

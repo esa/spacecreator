@@ -474,6 +474,9 @@ QVariantList MessageCreatorTool::prepareMessage()
 
 void MessageCreatorTool::movePreviewItemTo(const QPointF &newScenePos)
 {
+    if (!m_messageItem) {
+        return;
+    }
     MessageItem::GeometryNotificationBlocker lock(m_messageItem);
     m_messageItem->setTail(newScenePos, ObjectAnchor::Snap::SnapTo);
     m_messageItem->setHead(newScenePos, ObjectAnchor::Snap::SnapTo);

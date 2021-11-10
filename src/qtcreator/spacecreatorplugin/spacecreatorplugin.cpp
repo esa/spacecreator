@@ -92,50 +92,6 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
 
     m_projectsManager = new SpaceCreatorProjectManager(this);
 
-    // MSC
-    m_messageDeclarationAction =
-            new QAction(QIcon(QLatin1String(":/icons/message_declarations.svg")), tr("Message declarations ..."), this);
-    m_messageDeclarationAction->setEnabled(false);
-    Core::Command *messageDeclCmd =
-            Core::ActionManager::registerAction(m_messageDeclarationAction, Constants::MESSAGE_DECLARATIONS_ID);
-    connect(m_messageDeclarationAction, &QAction::triggered, this, &SpaceCreatorPlugin::showMessageDeclarations);
-
-    m_checkInstancesAction =
-            new QAction(QIcon(QLatin1String(":/sharedresources/check_yellow.svg")), tr("Check instances"), this);
-    Core::Command *checkInstancesCmd = Core::ActionManager::registerAction(
-            m_checkInstancesAction, Constants::CHECK_INSTANCES_ID, Core::Context(Core::Constants::C_GLOBAL));
-    connect(m_checkInstancesAction, &QAction::triggered, this, &SpaceCreatorPlugin::checkInstancesForCurrentEditor);
-
-    m_checkMessagesAction =
-            new QAction(QIcon(QLatin1String(":/sharedresources/check_blue.svg")), tr("Check messages"), this);
-    Core::Command *checkMessagesCmd = Core::ActionManager::registerAction(
-            m_checkMessagesAction, Constants::CHECK_MESSAGES_ID, Core::Context(Core::Constants::C_GLOBAL));
-    connect(m_checkMessagesAction, &QAction::triggered, this, &SpaceCreatorPlugin::checkMesagesForCurrentEditor);
-
-    m_showMinimapAction =
-            new QAction(QIcon(QLatin1String(":/sharedresources/icons/minimap.svg")), tr("Show minimap"), this);
-    m_showMinimapAction->setCheckable(true);
-    Core::Command *showMinimapCmd = Core::ActionManager::registerAction(
-            m_showMinimapAction, Constants::SHOW_MINIMAP_ID, Core::Context(Core::Constants::C_EDIT_MODE));
-    connect(m_showMinimapAction, &QAction::triggered, this, &SpaceCreatorPlugin::setMinimapVisible);
-
-    Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::MENU_ID);
-    menu->menu()->setTitle(tr("SpaceCreator"));
-    menu->addAction(showMinimapCmd);
-    menu->addSeparator();
-    menu->addAction(messageDeclCmd);
-    menu->addAction(checkInstancesCmd);
-    menu->addAction(checkMessagesCmd);
-    menu->addSeparator();
-    Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
-
-    connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged, this,
-            &spctr::SpaceCreatorPlugin::updateActions);
-    updateActions();
-
-    menu->menu()->setEnabled(true);
-    Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
-
     std::function<QStringList()> deploymentFilesCallback = [this]() {
         if (auto ivEditor = qobject_cast<spctr::IVQtCEditor *>(Core::EditorManager::currentEditor())) {
             SpaceCreatorProjectImpl *project = m_projectsManager->project(ivEditor->ivPlugin());
@@ -147,9 +103,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     };
     ive::ActionsManager::registerDeploymentFilesCallback(deploymentFilesCallback);
 
-    QList<QAction *> mscActions;
-    mscActions << m_showMinimapAction << m_checkInstancesAction << m_checkMessagesAction;
-    m_mscFactory = new MscEditorFactory(m_projectsManager, mscActions, this);
+    m_mscFactory = new MscEditorFactory(m_projectsManager, this);
     m_ivFactory = new IVEditorFactory(m_projectsManager, this);
     m_dvFactory = new DVEditorFactory(m_projectsManager, this);
 
@@ -171,57 +125,6 @@ ExtensionSystem::IPlugin::ShutdownFlag SpaceCreatorPlugin::aboutToShutdown()
     // Disconnect from signals that are not needed during shutdown
     // Hide UI (if you add UI that is not in the main window directly)
     return SynchronousShutdown;
-}
-
-/*!
-   Opens the message declaration dialog for the current msc file
- */
-void SpaceCreatorPlugin::showMessageDeclarations()
-{
-    if (auto mscEditor = qobject_cast<spctr::MscQtCEditor *>(Core::EditorManager::currentEditor())) {
-        mscEditor->mscEditorCore()->openMessageDeclarationEditor(Core::ICore::mainWindow());
-    }
-}
-
-void SpaceCreatorPlugin::setMinimapVisible(bool visible)
-{
-    m_mscFactory->editorData()->setMinimapVisible(visible);
-}
-
-/*!
-   Update the actiones enabled/disabled to represent the current editor
- */
-void SpaceCreatorPlugin::updateActions()
-{
-    bool isMsc = false;
-    bool isIV = false;
-    Core::IEditor *editor = Core::EditorManager::currentEditor();
-    if (editor && editor->document()) {
-        isMsc = editor->document()->filePath().toString().endsWith(".msc", Qt::CaseInsensitive);
-        isIV = editor->document()->filePath().toString().endsWith("interfaceview.xml", Qt::CaseInsensitive);
-    }
-    m_messageDeclarationAction->setEnabled(isMsc);
-    m_showMinimapAction->setEnabled(isIV || isMsc);
-}
-
-void SpaceCreatorPlugin::checkInstancesForCurrentEditor()
-{
-    if (auto mscEditor = qobject_cast<spctr::MscQtCEditor *>(Core::EditorManager::currentEditor())) {
-        SpaceCreatorProjectImpl *project = m_projectsManager->project(mscEditor->mscEditorCore());
-        if (project) {
-            project->mscChecks()->checkInstances();
-        }
-    }
-}
-
-void SpaceCreatorPlugin::checkMesagesForCurrentEditor()
-{
-    if (auto mscEditor = qobject_cast<spctr::MscQtCEditor *>(Core::EditorManager::currentEditor())) {
-        SpaceCreatorProjectImpl *project = m_projectsManager->project(mscEditor->mscEditorCore());
-        if (project) {
-            project->mscChecks()->checkMessages();
-        }
-    }
 }
 
 void SpaceCreatorPlugin::addHelp()

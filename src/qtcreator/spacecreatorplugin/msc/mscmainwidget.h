@@ -56,22 +56,10 @@ public:
     MSCEditorCorePtr mscCore() const;
 
 private Q_SLOTS:
-    void showChart(const QModelIndex &index);
-    void showSelection(const QModelIndex &current, const QModelIndex &previous);
-    void onViewModeChanged();
     void openAsn1Dialog();
 
 private:
     void init();
-    void initConnections();
-
-    shared::ActionsBar *m_chartToolBar = nullptr;
-    shared::ActionsBar *m_documentToolBar = nullptr;
-
-    msc::DocumentTreeView *m_documentTree = nullptr;
-    QPushButton *m_ivSwitch = nullptr;
-    QPushButton *m_asn1Switch = nullptr;
-    QPushButton *m_asn1Select = nullptr;
 
     MSCEditorCorePtr m_plugin;
     QPointer<SpaceCreatorProjectImpl> m_project;

@@ -48,6 +48,7 @@ public:
     void visit(const ::promela::model::PromelaModel &promelaModel);
 
 private:
+    void generateIncludes(const QList<QString> &includes);
     void generateMtypes(const QSet<QString> &values);
     void generateNamedMtypes(const std::map<QString, ::promela::model::NamedMtype> &values);
     void generateMtypeNames(const QVector<QString> &names);

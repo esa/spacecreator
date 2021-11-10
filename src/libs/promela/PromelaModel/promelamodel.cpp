@@ -25,6 +25,16 @@ conversion::ModelType PromelaModel::modelType() const
     return conversion::ModelProperties<PromelaModel>::type;
 }
 
+void PromelaModel::addInclude(const QString &file)
+{
+    m_includes.append(file);
+}
+
+const QList<QString> &PromelaModel::getIncludes() const noexcept
+{
+    return m_includes;
+}
+
 void PromelaModel::addMtype(const QString &value)
 {
     m_mtypeValues.insert(value);
