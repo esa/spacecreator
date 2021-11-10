@@ -19,7 +19,7 @@
 
 #include "escaper.h"
 
-#include "escaperexception.h"
+#include "exceptions.h"
 
 #include <QChar>
 #include <QRegExp>
@@ -61,7 +61,7 @@ void Escaper::escapeName(QString &name, const QChar &delimeter)
     removeNonalphanumericCharacters(name, delimeter);
 
     if (name.isEmpty()) {
-        throw EscaperException();
+        throw EmptyNameException();
     }
 }
 

@@ -4,7 +4,7 @@ set(SOURCES exceptions.cpp
             modeltype.cpp
             options.cpp
             escaper/escaper.cpp
-            escaper/escaperexception.cpp
+            escaper/exceptions.cpp
             export/exceptions.cpp
             import/exceptions.cpp
             translation/exceptions.cpp
@@ -17,7 +17,7 @@ set(INCLUDES exceptions.h
              overloaded.h
              registrar.h
              escaper/escaper.h
-             escaper/escaperexception.h
+             escaper/exceptions.h
              export/exceptions.h
              export/modelexporter.h
              import/exceptions.h

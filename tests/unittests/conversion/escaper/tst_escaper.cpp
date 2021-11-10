@@ -21,13 +21,13 @@
 #include <QtTest/qtestcase.h>
 #include <QtTest>
 #include <conversion/common/escaper/escaper.h>
-#include <conversion/common/escaper/escaperexception.h>
+#include <conversion/common/escaper/exceptions.h>
 #include <conversion/common/exceptions.h>
 #include <qnamespace.h>
 #include <unittests/common/verifyexception.h>
 
+using conversion::EmptyNameException;
 using conversion::Escaper;
-using conversion::EscaperException;
 
 namespace conversion::iv::test {
 
