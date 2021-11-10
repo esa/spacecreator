@@ -19,9 +19,11 @@
 
 #include "statemachinetranslator.h"
 
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <sdl/SdlModel/nextstate.h>
 
+using conversion::Escaper;
 using conversion::translator::TranslationException;
 
 namespace conversion::sdl::translator {
@@ -79,7 +81,7 @@ auto StateMachineTranslator::createStartTransition(const seds::model::StateMachi
 auto StateMachineTranslator::translateState(const seds::model::State &sedsState) -> std::unique_ptr<::sdl::State>
 {
     auto state = std::make_unique<::sdl::State>();
-    state->setName(sedsState.nameStr()); // TODO mangle identifier
+    state->setName(Escaper::escapeSdlName(sedsState.nameStr()));
     // Entry and exit procedures shall be translated for transitions
     return state;
 }
@@ -87,7 +89,7 @@ auto StateMachineTranslator::translateState(const seds::model::State &sedsState)
 auto StateMachineTranslator::translateState(const seds::model::ExitState &sedsState) -> std::unique_ptr<::sdl::State>
 {
     auto state = std::make_unique<::sdl::State>();
-    state->setName(sedsState.nameStr()); // TODO mangle identifier
+    state->setName(Escaper::escapeSdlName(sedsState.nameStr()));
     // No Entry and exit procedures
     return state;
 }
@@ -95,7 +97,7 @@ auto StateMachineTranslator::translateState(const seds::model::ExitState &sedsSt
 auto StateMachineTranslator::translateState(const seds::model::EntryState &sedsState) -> std::unique_ptr<::sdl::State>
 {
     auto state = std::make_unique<::sdl::State>();
-    state->setName(sedsState.nameStr()); // TODO mangle identifier
+    state->setName(Escaper::escapeSdlName(sedsState.nameStr()));
     // No Entry and exit procedures
     return state;
 }

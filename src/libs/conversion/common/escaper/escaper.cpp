@@ -28,6 +28,13 @@
 
 namespace conversion {
 
+QString Escaper::escapeSdlName(QString name)
+{
+    escapeName(name, '_');
+
+    return name;
+}
+
 QString Escaper::escapeIvName(QString name)
 {
     escapeName(name, '_');

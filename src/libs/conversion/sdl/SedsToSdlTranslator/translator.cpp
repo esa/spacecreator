@@ -21,11 +21,13 @@
 
 #include "specialized/statemachinetranslator.h"
 
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <seds/SedsModel/sedsmodel.h>
 
 using Asn1Acn::Asn1Model;
+using conversion::Escaper;
 using conversion::translator::TranslationException;
 using ivm::IVModel;
 using sdl::SdlModel;
@@ -114,7 +116,7 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Component &sedsC
         // There is at least one active element in the implementation
         auto stateMachine = std::make_unique<::sdl::StateMachine>();
         ::sdl::Process process;
-        process.setName(sedsComponent.nameStr()); // TODO -> mangle identifier
+        process.setName(Escaper::escapeIvName(sedsComponent.nameStr()));
         // TODO translate variable declarations
         // TODO translate procedures (activities?)
         // TODO provide additional translation for parameter (activity) maps
