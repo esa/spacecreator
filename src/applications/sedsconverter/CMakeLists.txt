@@ -21,4 +21,9 @@ target_link_libraries(SedsConverter
                 Conversion::SedsRegistrar
                 Conversion::SdlRegistrar)
 
+set_target_properties(SedsConverter PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    OUTPUT_NAME "sedsconverter"
+)
+
 add_format_target(SedsConverter)
