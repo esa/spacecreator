@@ -60,6 +60,8 @@ public:
     QString defaultImplementationForFunction(const QString &function) const override;
     QStringList implementationsForFunction(const QString &function) const override;
 
+    QStringList functionPath(const QString &function) const override;
+
     ivm::IVModel *ivModel() const;
 
 Q_SIGNALS:

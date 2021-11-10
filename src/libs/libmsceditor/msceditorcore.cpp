@@ -44,6 +44,7 @@
 #include <QClipboard>
 #include <QDebug>
 #include <QFileInfo>
+#include <QIcon>
 #include <QMainWindow>
 #include <QMenu>
 #include <QMimeData>
@@ -145,7 +146,6 @@ QAction *MSCEditorCore::createActionCopy(QMainWindow *window)
     if (m_actionCopy == nullptr) {
         if (window != nullptr) {
             m_actionCopy = new QAction(tr("Copy:"), this);
-            m_actionCopy->setIcon(QIcon::fromTheme("edit-copy"));
             m_actionCopy->setMenu(new QMenu(window));
             m_actionCopy->menu()->addAction(
                     tr("Copy Diagram"), m_model.get(), &msc::MainModel::copyCurrentChart, QKeySequence::Copy);
@@ -154,9 +154,10 @@ QAction *MSCEditorCore::createActionCopy(QMainWindow *window)
         } else {
             m_actionCopy = new QAction(tr("Copy Diagram"), this);
             m_actionCopy->setShortcut(QKeySequence::Copy);
-            m_actionCopy->setIcon(QIcon::fromTheme("edit-copy"));
             connect(m_actionCopy, &QAction::triggered, m_model.get(), &msc::MainModel::copyCurrentChart);
         }
+        QIcon icon = QIcon::fromTheme("edit-copy", QIcon(":/sharedresources/icons/copy.svg"));
+        m_actionCopy->setIcon(icon);
     }
     return m_actionCopy;
 }
@@ -167,14 +168,14 @@ QAction *MSCEditorCore::createActionPaste(QMainWindow *window)
         if (window) {
             m_actionPaste = new QAction(tr("Paste:"), window);
             m_actionPaste->setShortcut(QKeySequence::Paste);
-            m_actionPaste->setIcon(QIcon::fromTheme("edit-paste"));
             connect(m_actionPaste, &QAction::triggered, m_model.get(), &msc::MainModel::pasteChart);
         } else {
-            m_actionPaste = new QAction(tr("Paste:"), this);
+            m_actionPaste = new QAction(tr("Paste"), this);
             m_actionPaste->setShortcut(QKeySequence::Paste);
-            m_actionPaste->setIcon(QIcon::fromTheme("edit-paste"));
             connect(m_actionPaste, &QAction::triggered, m_model.get(), &msc::MainModel::pasteChart);
         }
+        QIcon icon = QIcon::fromTheme("edit-paste", QIcon(":/sharedresources/icons/paste.svg"));
+        m_actionPaste->setIcon(icon);
     }
     return m_actionPaste;
 }

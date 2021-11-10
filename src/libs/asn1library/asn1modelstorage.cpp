@@ -20,7 +20,6 @@
 #include "asn1/definitions.h"
 #include "asn1/file.h"
 #include "asn1reader.h"
-#include "common.h"
 
 #include <QDebug>
 #include <QDir>

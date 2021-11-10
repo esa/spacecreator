@@ -19,11 +19,13 @@
 
 #include "specialized/syncinterfacecommandtranslator.h"
 
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivfunction.h>
 #include <seds/SedsModel/interfaces/argumentscombination.h>
 #include <seds/SedsModel/interfaces/interfacecommand.h>
 
+using conversion::Escaper;
 using conversion::translator::TranslationException;
 using conversion::translator::UnhandledValueException;
 using conversion::translator::UnsupportedValueException;
@@ -96,8 +98,8 @@ void SyncInterfaceCommandTranslator::translateArguments(
 shared::InterfaceParameter SyncInterfaceCommandTranslator::createIvInterfaceParameter(
         const QString &name, const QString &typeName, shared::InterfaceParameter::Direction direction)
 {
-    return shared::InterfaceParameter(
-            name, shared::BasicParameter::Type::Other, typeName, m_interfaceParameterEncoding, direction);
+    return shared::InterfaceParameter(Escaper::escapeIvName(name), shared::BasicParameter::Type::Other,
+            Escaper::escapeIvName(typeName), m_interfaceParameterEncoding, direction);
 }
 
 } // namespace conversion::iv::translator

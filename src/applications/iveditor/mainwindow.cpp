@@ -324,14 +324,19 @@ void MainWindow::updateWindowTitle()
  */
 void MainWindow::openAsn1Dialog()
 {
+    const QStringList files = m_core->document()->asn1FilesPaths();
+    if (files.isEmpty()) {
+        return;
+    }
+
     Asn1Dialog dialog;
-    QFileInfo fi(m_core->document()->asn1FilePath());
+    QFileInfo fi(files.front());
     dialog.setFile(fi);
     dialog.show();
     int result = dialog.exec();
     if (result == QDialog::Accepted) {
-        if (m_core->document()->asn1FileName() != dialog.fileName()) {
-            auto command = new cmd::CmdChangeAsn1File(m_core->document(), dialog.fileName());
+        if (files.front() != dialog.fileName()) {
+            auto command = new cmd::CmdChangeAsn1File(m_core->document(), files.front(), dialog.fileName());
             m_core->commandsStack()->push(command);
         }
     }

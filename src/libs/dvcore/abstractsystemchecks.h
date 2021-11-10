@@ -41,6 +41,8 @@ public:
     virtual QString defaultImplementationForFunction(const QString &function) const = 0;
     virtual QStringList implementationsForFunction(const QString &function) const = 0;
 
+    virtual QStringList functionPath(const QString &function) const = 0;
+
 Q_SIGNALS:
     void ivDataReset();
 

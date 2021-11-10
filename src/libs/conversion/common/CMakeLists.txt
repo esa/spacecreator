@@ -3,6 +3,8 @@ project(ConversionCommon VERSION 1.0.0 LANGUAGES CXX)
 set(SOURCES exceptions.cpp
             modeltype.cpp
             options.cpp
+            escaper/escaper.cpp
+            escaper/exceptions.cpp
             export/exceptions.cpp
             import/exceptions.cpp
             translation/exceptions.cpp
@@ -14,6 +16,8 @@ set(INCLUDES exceptions.h
              options.h
              overloaded.h
              registrar.h
+             escaper/escaper.h
+             escaper/exceptions.h
              export/exceptions.h
              export/modelexporter.h
              import/exceptions.h
