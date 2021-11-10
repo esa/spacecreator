@@ -28,13 +28,13 @@
 namespace conversion::sdl::translator {
 
 /**
- * @brief   Translator between SEDS model and ASN.1 model
+ * @brief   Translator between SEDS model and SDL model
  */
 class SedsToSdlTranslator final : public ::conversion::translator::Translator
 {
 public:
     /**
-     * @brief   Translate given SEDS models into an ASN.1 model
+     * @brief   Translate given SEDS models into an SDL model
      *
      * @param   sourceModels    List of SEDS models
      * @param   options         List of options

@@ -38,7 +38,7 @@ auto SedsStateMachineBuilder::withState(seds::model::State state) -> SedsStateMa
 auto SedsStateMachineBuilder::withState(seds::common::String name) -> SedsStateMachineBuilder &
 {
     seds::model::State state;
-    state.setName(name);
+    state.setName(std::move(name));
     m_machine.addElement(std::move(state));
 
     return *this;
@@ -54,7 +54,7 @@ auto SedsStateMachineBuilder::withEntryState(seds::model::EntryState state) -> S
 auto SedsStateMachineBuilder::withEntryState(seds::common::String name) -> SedsStateMachineBuilder &
 {
     seds::model::EntryState state;
-    state.setName(name);
+    state.setName(std::move(name));
     m_machine.addElement(std::move(state));
 
     return *this;
@@ -70,7 +70,7 @@ auto SedsStateMachineBuilder::withExitState(seds::model::ExitState state) -> Sed
 auto SedsStateMachineBuilder::withExitState(seds::common::String name) -> SedsStateMachineBuilder &
 {
     seds::model::ExitState state;
-    state.setName(name);
+    state.setName(std::move(name));
     m_machine.addElement(std::move(state));
 
     return *this;

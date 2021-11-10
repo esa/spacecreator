@@ -102,13 +102,15 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Component &sedsC
     Q_UNUSED(ivModel);
 
     const auto &implementation = sedsComponent.implementation();
-    if (implementation.stateMachines().size() > 1) {
+    const auto parameterMapCount = implementation.parameterMaps().size();
+    const auto parameterActivityMapCount = implementation.parameterActivityMaps().size();
+    const auto stateMachineCount = implementation.stateMachines().size();
+
+    if (stateMachineCount > 1) {
         throw new TranslationException("Only a single state machine is supported per SEDS component");
     }
 
-    if (implementation.parameterMaps().size() + implementation.parameterActivityMaps().size()
-                    + implementation.stateMachines().size()
-            > 0) {
+    if (parameterMapCount + parameterActivityMapCount + stateMachineCount > 0) {
         // There is at least one active element in the implementation
         auto stateMachine = std::make_unique<::sdl::StateMachine>();
         ::sdl::Process process;
@@ -116,7 +118,7 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Component &sedsC
         // TODO translate variable declarations
         // TODO translate procedures (activities?)
         // TODO provide additional translation for parameter (activity) maps
-        if (implementation.stateMachines().size() == 1) {
+        if (stateMachineCount == 1) {
             StateMachineTranslator::translateStateMachine(
                     implementation.stateMachines()[0], &process, stateMachine.get());
         }

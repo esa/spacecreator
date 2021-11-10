@@ -70,7 +70,7 @@ auto StateMachineTranslator::createStartTransition(const seds::model::StateMachi
             }
             auto transition = std::make_unique<::sdl::Transition>();
             const auto &state = std::get<seds::model::EntryState>(element);
-            transition->addAction(std::make_unique<::sdl::NextState>("", stateMap[state.name().value()].get()));
+            transition->addAction(std::make_unique<::sdl::NextState>("", stateMap[state.nameStr()].get()));
             sdlProcess->setStartTransition(std::move(transition));
         }
     }
@@ -81,7 +81,7 @@ auto StateMachineTranslator::translateState(const seds::model::State &sedsState)
     auto state = std::make_unique<::sdl::State>();
     state->setName(sedsState.nameStr()); // TODO mangle identifier
     // Entry and exit procedures shall be translated for transitions
-    return std::move(state);
+    return state;
 }
 
 auto StateMachineTranslator::translateState(const seds::model::ExitState &sedsState) -> std::unique_ptr<::sdl::State>
@@ -89,7 +89,7 @@ auto StateMachineTranslator::translateState(const seds::model::ExitState &sedsSt
     auto state = std::make_unique<::sdl::State>();
     state->setName(sedsState.nameStr()); // TODO mangle identifier
     // No Entry and exit procedures
-    return std::move(state);
+    return state;
 }
 
 auto StateMachineTranslator::translateState(const seds::model::EntryState &sedsState) -> std::unique_ptr<::sdl::State>
@@ -97,7 +97,7 @@ auto StateMachineTranslator::translateState(const seds::model::EntryState &sedsS
     auto state = std::make_unique<::sdl::State>();
     state->setName(sedsState.nameStr()); // TODO mangle identifier
     // No Entry and exit procedures
-    return std::move(state);
+    return state;
 }
 
 auto StateMachineTranslator::translatePrimitive(const seds::model::OnCommandPrimitive &command) -> InputHandler
@@ -110,7 +110,7 @@ auto StateMachineTranslator::translatePrimitive(const seds::model::OnCommandPrim
     input->setName(command.interface().value() + "_" + command.command().value()); // TODO mangle identifier
     // TODO Create actions for argument unpacking
 
-    return std::move(std::make_pair(std::move(input), std::move(unpackingActions)));
+    return std::make_pair(std::move(input), std::move(unpackingActions));
 }
 
 auto StateMachineTranslator::translatePrimitive(const seds::model::Transition::Primitive &primitive) -> InputHandler
@@ -128,16 +128,18 @@ auto StateMachineTranslator::translateTransition(const seds::model::Transition &
 {
     Q_UNUSED(sdlProcess);
 
-    const auto fromStateName = sedsTransition.fromState().value().value();
-    const auto toStateName = sedsTransition.toState().value().value();
-    if (stateMap.find(fromStateName) == stateMap.end()) {
+    const auto fromStateName = sedsTransition.fromState().nameStr();
+    const auto toStateName = sedsTransition.toState().nameStr();
+    const auto &fromStateIterator = stateMap.find(fromStateName);
+    const auto &toStateIterator = stateMap.find(toStateName);
+    if (fromStateIterator == stateMap.end()) {
         throw TranslationException(QString("Unknown state %1 when translating transition").arg(fromStateName));
     }
-    if (stateMap.find(toStateName) == stateMap.end()) {
+    if (toStateIterator == stateMap.end()) {
         throw TranslationException(QString("Unknown state %1 when translating transition").arg(toStateName));
     }
-    auto fromState = stateMap[fromStateName].get();
-    auto toState = stateMap[toStateName].get();
+    auto fromState = (*fromStateIterator).second.get();
+    auto toState = (*toStateIterator).second.get();
     auto inputHandler = translatePrimitive(sedsTransition.primitive());
 
     auto transition = std::make_unique<::sdl::Transition>();

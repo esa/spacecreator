@@ -36,6 +36,8 @@ public:
 public:
     auto value() const -> const Name &;
 
+    auto nameStr() const -> const QString &;
+
 private:
     Name m_value;
 };
