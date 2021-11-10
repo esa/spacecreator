@@ -16,9 +16,11 @@
         <file alias="fonts/UbuntuMono-RI.ttf">ubuntu-font-family-0.83/UbuntuMono-RI.ttf</file>
     </qresource>
     <qresource prefix="/sharedresources">
+        <file>icons/copy.svg</file>
         <file>icons/minimap.svg</file>
         <file>icons/newfile.svg</file>
         <file>icons/open.svg</file>
+        <file>icons/paste.svg</file>
         <file>icons/redo.svg</file>
         <file>icons/save.svg</file>
         <file>icons/undo.svg</file>
