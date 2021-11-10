@@ -110,6 +110,9 @@ public:
 
     virtual QVariantList generateProperties(bool isProperty) const = 0;
 
+    // Perform updates/actions directly before the data is saved
+    virtual void updateForExport() {};
+
 Q_SIGNALS:
     void attributeChanged(const QString &name);
 

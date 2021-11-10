@@ -58,6 +58,7 @@ public:
         url,
         type,
         encoding,
+        path,
 
         from_node,
         from_port,
