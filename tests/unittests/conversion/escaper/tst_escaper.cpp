@@ -92,19 +92,19 @@ void tst_Escaper::testIvNominals()
 
 void tst_Escaper::testIvExceptions()
 {
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("000000"), EscaperException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("000000"), EmptyNameException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
-            Escaper::escapeIvName("12345567675578"), EscaperException, escaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("000 000"), EscaperException, escaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName(" 012 040"), EscaperException, escaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName(" 000-000"), EscaperException, escaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("-000-000"), EscaperException, escaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("-000 000"), EscaperException, escaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName(""), EscaperException, escaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("-----------"), EscaperException, escaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("___"), EscaperException, escaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName(")(*&^%$#@!"), EscaperException, escaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("313€"), EscaperException, escaperExceptionMsg);
+            Escaper::escapeIvName("12345567675578"), EmptyNameException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("000 000"), EmptyNameException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName(" 012 040"), EmptyNameException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName(" 000-000"), EmptyNameException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("-000-000"), EmptyNameException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("-000 000"), EmptyNameException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName(""), EmptyNameException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("-----------"), EmptyNameException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("___"), EmptyNameException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName(")(*&^%$#@!"), EmptyNameException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeIvName("313€"), EmptyNameException, escaperExceptionMsg);
 }
 
 void tst_Escaper::testAsn1TypeNominals()
@@ -147,24 +147,26 @@ void tst_Escaper::testAsn1TypeNominals()
 
 void tst_Escaper::testAsn1TypeExceptions()
 {
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeAsn1TypeName("000000"), EscaperException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
-            Escaper::escapeAsn1TypeName("12345567675578"), EscaperException, escaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeAsn1TypeName("000 000"), EscaperException, escaperExceptionMsg);
+            Escaper::escapeAsn1TypeName("000000"), EmptyNameException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
-            Escaper::escapeAsn1TypeName(" 012 040"), EscaperException, escaperExceptionMsg);
+            Escaper::escapeAsn1TypeName("12345567675578"), EmptyNameException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
-            Escaper::escapeAsn1TypeName(" 000-000"), EscaperException, escaperExceptionMsg);
+            Escaper::escapeAsn1TypeName("000 000"), EmptyNameException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
-            Escaper::escapeAsn1TypeName("-000-000"), EscaperException, escaperExceptionMsg);
+            Escaper::escapeAsn1TypeName(" 012 040"), EmptyNameException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
-            Escaper::escapeAsn1TypeName("-000 000"), EscaperException, escaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeAsn1TypeName(""), EscaperException, escaperExceptionMsg);
+            Escaper::escapeAsn1TypeName(" 000-000"), EmptyNameException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
-            Escaper::escapeAsn1TypeName("-----------"), EscaperException, escaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeAsn1TypeName("___"), EscaperException, escaperExceptionMsg);
+            Escaper::escapeAsn1TypeName("-000-000"), EmptyNameException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
-            Escaper::escapeAsn1TypeName(")(*&^%$#@!"), EscaperException, escaperExceptionMsg);
+            Escaper::escapeAsn1TypeName("-000 000"), EmptyNameException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeAsn1TypeName(""), EmptyNameException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
+            Escaper::escapeAsn1TypeName("-----------"), EmptyNameException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeAsn1TypeName("___"), EmptyNameException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
+            Escaper::escapeAsn1TypeName(")(*&^%$#@!"), EmptyNameException, escaperExceptionMsg);
 }
 
 void tst_Escaper::testAsn1FieldNominals()
@@ -207,25 +209,26 @@ void tst_Escaper::testAsn1FieldNominals()
 
 void tst_Escaper::testAsn1FieldExceptions()
 {
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeAsn1FieldName("000000"), EscaperException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
-            Escaper::escapeAsn1FieldName("12345567675578"), EscaperException, escaperExceptionMsg);
+            Escaper::escapeAsn1FieldName("000000"), EmptyNameException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
-            Escaper::escapeAsn1FieldName("000 000"), EscaperException, escaperExceptionMsg);
+            Escaper::escapeAsn1FieldName("12345567675578"), EmptyNameException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
-            Escaper::escapeAsn1FieldName(" 012 040"), EscaperException, escaperExceptionMsg);
+            Escaper::escapeAsn1FieldName("000 000"), EmptyNameException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
-            Escaper::escapeAsn1FieldName(" 000-000"), EscaperException, escaperExceptionMsg);
+            Escaper::escapeAsn1FieldName(" 012 040"), EmptyNameException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
-            Escaper::escapeAsn1FieldName("-000-000"), EscaperException, escaperExceptionMsg);
+            Escaper::escapeAsn1FieldName(" 000-000"), EmptyNameException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
-            Escaper::escapeAsn1FieldName("-000 000"), EscaperException, escaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeAsn1FieldName(""), EscaperException, escaperExceptionMsg);
+            Escaper::escapeAsn1FieldName("-000-000"), EmptyNameException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
-            Escaper::escapeAsn1FieldName("-----------"), EscaperException, escaperExceptionMsg);
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeAsn1FieldName("___"), EscaperException, escaperExceptionMsg);
+            Escaper::escapeAsn1FieldName("-000 000"), EmptyNameException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeAsn1FieldName(""), EmptyNameException, escaperExceptionMsg);
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
-            Escaper::escapeAsn1FieldName(")(*&^%$#@!"), EscaperException, escaperExceptionMsg);
+            Escaper::escapeAsn1FieldName("-----------"), EmptyNameException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(Escaper::escapeAsn1FieldName("___"), EmptyNameException, escaperExceptionMsg);
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
+            Escaper::escapeAsn1FieldName(")(*&^%$#@!"), EmptyNameException, escaperExceptionMsg);
 }
 
 } // namespace conversion::common
