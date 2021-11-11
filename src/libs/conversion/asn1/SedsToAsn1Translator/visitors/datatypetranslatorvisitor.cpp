@@ -132,7 +132,7 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 
         // Add parent component entries
         if (hasBaseType) {
-            const auto &sedsBaseTypeName = Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr());
+            const auto sedsBaseTypeName = Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr());
             const auto &asn1ParentComponents = m_asn1SequenceComponentsCache[sedsBaseTypeName].first->components();
 
             for (const auto &asn1ParentComponent : asn1ParentComponents) {
@@ -150,7 +150,7 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 
         // Add parent component trailer entries
         if (hasBaseType) {
-            const auto &sedsBaseTypeName = Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr());
+            const auto sedsBaseTypeName = Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr());
             const auto &asn1ParentTrailerComponents =
                     m_asn1SequenceComponentsCache[sedsBaseTypeName].second->components();
 
@@ -464,7 +464,7 @@ void DataTypeTranslatorVisitor::cacheAbstractContainerEntries(const ContainerDat
     EntryTranslatorVisitor componentsVisitor { m_asn1Definitions, asn1SequenceComponents.get() };
 
     if (sedsType.baseType()) {
-        const auto &sedsBaseTypeName = Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr());
+        const auto sedsBaseTypeName = Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr());
         const auto &asn1ParentComponents = m_asn1SequenceComponentsCache[sedsBaseTypeName];
 
         for (const auto &asn1Component : asn1ParentComponents.first->components()) {
@@ -482,7 +482,7 @@ void DataTypeTranslatorVisitor::cacheAbstractContainerEntries(const ContainerDat
         std::visit(trailerComponentsVisitor, sedsTrailerEntry);
     }
     if (sedsType.baseType()) {
-        const auto &sedsBaseTypeName = Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr());
+        const auto sedsBaseTypeName = Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr());
         const auto &asn1ParentComponents = m_asn1SequenceComponentsCache[sedsBaseTypeName];
 
         for (const auto &asn1TrailerComponent : asn1ParentComponents.second->components()) {

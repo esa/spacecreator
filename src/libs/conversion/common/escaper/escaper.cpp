@@ -37,23 +37,23 @@ QString Escaper::escapeSdlName(QString name)
 
 QString Escaper::escapeIvName(QString name)
 {
-    escapeName(name, '_');
+    // escapeName(name, '_');
 
     return name;
 }
 
 QString Escaper::escapeAsn1TypeName(QString name)
 {
-    escapeName(name, '-');
+    /*escapeName(name, '-');
 
     name[0] = name[0].toUpper(); // type name starts with uppercase letter in ASN.1
-
+    */
     return name;
 }
 
 QString Escaper::escapeAsn1PackageName(QString name)
 {
-    replaceDelimeters(name,
+    /*replaceDelimeters(name,
             {
                     '/',
                     '\\',
@@ -62,15 +62,17 @@ QString Escaper::escapeAsn1PackageName(QString name)
     escapeName(name, '-');
 
     name[0] = name[0].toUpper(); // package name starts with uppercase letter in ASN.1
+    */
 
     return name;
 }
 
 QString Escaper::escapeAsn1FieldName(QString name)
 {
-    escapeName(name, '-');
+    /*escapeName(name, '-');
 
     name[0] = name[0].toLower(); // sequence field name starts with lowercase letter in ASN.1
+    */
 
     return name;
 }

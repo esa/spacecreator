@@ -110,7 +110,7 @@ void SedsToIvTranslator::translatePackage(
     auto ivFunctions = componentsTranslator.translateComponents();
 
     if (generateFunction) {
-        const auto &parentIvFunctionName = sedsPackage.nameStr();
+        const auto parentIvFunctionName = Escaper::escapeIvName(sedsPackage.nameStr());
         auto *parentIvFunction = new ivm::IVFunction();
         parentIvFunction->setEntityAttribute(
                 ivm::meta::Props::token(ivm::meta::Props::Token::name), parentIvFunctionName);
@@ -128,7 +128,7 @@ void SedsToIvTranslator::translatePackage(
 Asn1Acn::Definitions *SedsToIvTranslator::getAsn1Definitions(
         const seds::model::Package &sedsPackage, Asn1Model *asn1Model) const
 {
-    const auto &asn1FileName = sedsPackage.nameStr();
+    const auto asn1FileName = Escaper::escapeAsn1PackageName(sedsPackage.nameStr());
     auto &asn1Files = asn1Model->data();
     auto asn1File = std::find_if(
             std::begin(asn1Files), std::end(asn1Files), [&](const auto &file) { return file->name() == asn1FileName; });
@@ -137,7 +137,7 @@ Asn1Acn::Definitions *SedsToIvTranslator::getAsn1Definitions(
         throw TranslationException(std::move(message));
     }
 
-    const auto &asn1DefinitionsName = Escaper::escapeAsn1PackageName(sedsPackage.nameStr());
+    const auto asn1DefinitionsName = Escaper::escapeAsn1PackageName(sedsPackage.nameStr());
     auto *asn1Definitions = (*asn1File)->definitions(asn1DefinitionsName);
     if (!asn1Definitions) {
         auto message =
