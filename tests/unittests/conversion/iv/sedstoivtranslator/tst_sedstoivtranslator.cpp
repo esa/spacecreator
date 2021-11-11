@@ -139,7 +139,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
 
     // clang-format off
     const auto asn1Model =
-        Asn1ModelBuilder("Package")
+        Asn1ModelBuilder("PACKAGE")
             .withIntegerDataType("MyInteger")
         .build();
     // clang-format on
@@ -202,7 +202,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
 
     // clang-format off
     const auto asn1Model =
-        Asn1ModelBuilder("Package")
+        Asn1ModelBuilder("PACKAGE")
             .withIntegerDataType("MyInteger")
         .build();
     // clang-format on

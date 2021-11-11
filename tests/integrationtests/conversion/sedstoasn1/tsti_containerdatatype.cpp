@@ -23,12 +23,12 @@ namespace conversion::asn1::test {
 
 void tsti_ContainerDataType::testSimpleContainer()
 {
-    runConversionTest("container_simple");
+    runConversionTest("container_simple", "CONTAINER-SIMPLE");
 }
 
 void tsti_ContainerDataType::testExtendedContainer()
 {
-    runConversionTest("container_extended");
+    runConversionTest("container_extended", "CONTAINER-EXTENDED");
 }
 
 } // namespace conversion::asn1::test
