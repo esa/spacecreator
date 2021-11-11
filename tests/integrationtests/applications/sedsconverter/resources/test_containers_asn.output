@@ -1,0 +1,52 @@
+COM-N7SPACE-CONTAINERS DEFINITIONS ::= BEGIN
+DataItemA ::= INTEGER(0 .. 255)
+DataItemB ::= INTEGER(0 .. 255)
+LengthType ::= INTEGER(0 .. 65535)
+ArrayType ::= SEQUENCE (SIZE(15)) OF DataItemA(0 .. 255)
+BasicContainer ::= SEQUENCE 
+{ 
+    fieldA DataItemA(0 .. 255), 
+    fieldB DataItemB(0 .. 255)
+} 
+BinaryPattern ::= BIT STRING(SIZE(0 .. 8))
+PacketId ::= ENUMERATED
+{
+    packetA(1),
+    packetB(2)
+}
+PayloadBase ::= SEQUENCE 
+{ 
+    realization CHOICE 
+    { 
+        realizationPayloadA PayloadA, 
+        realizationPayloadB PayloadB
+    } 
+} 
+PayloadA ::= SEQUENCE 
+{ 
+    data DataItemA(0 .. 255)
+} 
+PayloadB ::= SEQUENCE 
+{ 
+    data DataItemB(0 .. 255)
+} 
+DataPacket ::= SEQUENCE 
+{ 
+    realization CHOICE 
+    { 
+        realizationDataPacketA DataPacketA, 
+        realizationDataPacketB DataPacketB
+    } 
+} 
+DataPacketA ::= SEQUENCE 
+{ 
+    id PacketId, 
+    payload PayloadBase
+} 
+DataPacketB ::= SEQUENCE 
+{ 
+    id PacketId, 
+    payload PayloadBase
+} 
+END
+

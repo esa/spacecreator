@@ -1,0 +1,48 @@
+COM-N7SPACE-CONTAINERS DEFINITIONS ::= BEGIN
+DataItemA [size 8, encoding pos-int, endianness big]
+DataItemB [size 8, encoding pos-int, endianness big]
+LengthType [size 16, encoding pos-int, endianness little]
+ArrayType []
+BasicContainer []
+{
+    fieldA [],
+    fieldB []
+}
+BinaryPattern []
+PacketId [size 8, encoding pos-int, endianness big]
+PayloadBase []
+{
+    realization []
+    {
+        realizationPayloadA [],
+        realizationPayloadB []
+    }
+}
+PayloadA []
+{
+    data []
+}
+PayloadB []
+{
+    data []
+}
+DataPacket []
+{
+    realization []
+    {
+        realizationDataPacketA [],
+        realizationDataPacketB []
+    }
+}
+DataPacketA []
+{
+    id [],
+    payload []
+}
+DataPacketB []
+{
+    id [],
+    payload []
+}
+END
+
