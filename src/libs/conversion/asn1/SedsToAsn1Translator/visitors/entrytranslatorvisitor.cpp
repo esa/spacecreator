@@ -36,10 +36,12 @@
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <asn1library/asn1/values.h>
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/package/package.h>
 
+using conversion::Escaper;
 using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredDataTypeException;
@@ -106,9 +108,10 @@ void EntryTranslatorVisitor::operator()(const seds::model::PaddingEntry &sedsEnt
 std::unique_ptr<Asn1Acn::Types::UserdefinedType> EntryTranslatorVisitor::translateEntryType(
         const QString &sedsTypeName) const
 {
-    const auto *asn1ReferencedType = m_asn1Definitions->type(sedsTypeName);
+    const auto name = Escaper::escapeAsn1TypeName(sedsTypeName);
+    const auto *asn1ReferencedType = m_asn1Definitions->type(name);
     if (!asn1ReferencedType || !asn1ReferencedType->type()) {
-        throw MissingAsn1TypeDefinitionException(sedsTypeName);
+        throw MissingAsn1TypeDefinitionException(name);
     }
 
     auto asn1EntryType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
@@ -146,7 +149,7 @@ void EntryTranslatorVisitor::translateFixedValue(
         break;
     case Asn1Acn::Types::Type::ASN1Type::ENUMERATED:
         createValueConstraint<Asn1Acn::Types::Enumerated, Asn1Acn::EnumValue>(
-                sedsEntry.fixedValue()->value(), asn1Type->type());
+                Escaper::escapeAsn1FieldName(sedsEntry.fixedValue()->value()), asn1Type->type());
         break;
     case Asn1Acn::Types::Type::ASN1Type::CHOICE:
         throw UnsupportedValueException("ASN1Type/FixedValueEntry", "CHOICE");

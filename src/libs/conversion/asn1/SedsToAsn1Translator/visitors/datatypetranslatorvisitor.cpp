@@ -39,10 +39,12 @@
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <asn1library/asn1/values.h>
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/package/package.h>
 
+using conversion::Escaper;
 using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::TranslationException;
 using conversion::translator::UnhandledValueException;
@@ -74,14 +76,14 @@ void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
     }
 
     if (dimensions.size() == 1) { // Sequence of type with one dimension
-        auto type = std::make_unique<Asn1Acn::Types::SequenceOf>(sedsType.nameStr());
-        translateArrayType(sedsType.type().nameStr(), type.get());
+        auto type = std::make_unique<Asn1Acn::Types::SequenceOf>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
+        translateArrayType(Escaper::escapeAsn1TypeName(sedsType.type().nameStr()), type.get());
         translateArrayDimension(dimensions[0], type.get());
 
         m_asn1Type = std::move(type);
     } else { // Sequence of with many dimensions
         // The outermost 'sequence of' element
-        auto rootType = std::make_unique<Asn1Acn::Types::SequenceOf>(sedsType.nameStr());
+        auto rootType = std::make_unique<Asn1Acn::Types::SequenceOf>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
         translateArrayDimension(dimensions[0], rootType.get());
 
         // Create 'sequence of' chain
@@ -95,7 +97,7 @@ void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
         });
 
         // Add item type to the last element
-        translateArrayType(sedsType.type().nameStr(), lastType);
+        translateArrayType(Escaper::escapeAsn1TypeName(sedsType.type().nameStr()), lastType);
 
         m_asn1Type = std::move(rootType);
     }
@@ -103,7 +105,7 @@ void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const BinaryDataType &sedsType)
 {
-    auto type = std::make_unique<Asn1Acn::Types::BitString>(sedsType.nameStr());
+    auto type = std::make_unique<Asn1Acn::Types::BitString>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
     translateBitStringLength(sedsType, type.get());
 
     m_asn1Type = std::move(type);
@@ -111,7 +113,7 @@ void DataTypeTranslatorVisitor::operator()(const BinaryDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const BooleanDataType &sedsType)
 {
-    auto type = std::make_unique<Asn1Acn::Types::Boolean>(sedsType.nameStr());
+    auto type = std::make_unique<Asn1Acn::Types::Boolean>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
     translateBooleanEncoding(sedsType.encoding(), type.get());
 
     m_asn1Type = std::move(type);
@@ -120,7 +122,7 @@ void DataTypeTranslatorVisitor::operator()(const BooleanDataType &sedsType)
 void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 {
     const auto hasBaseType = sedsType.baseType().has_value();
-    auto type = std::make_unique<Asn1Acn::Types::Sequence>(sedsType.nameStr());
+    auto type = std::make_unique<Asn1Acn::Types::Sequence>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
 
     if (sedsType.isAbstract()) {
         cacheAbstractContainerEntries(sedsType);
@@ -130,7 +132,7 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 
         // Add parent component entries
         if (hasBaseType) {
-            const auto &sedsBaseTypeName = sedsType.baseType()->nameStr();
+            const auto &sedsBaseTypeName = Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr());
             const auto &asn1ParentComponents = m_asn1SequenceComponentsCache[sedsBaseTypeName].first->components();
 
             for (const auto &asn1ParentComponent : asn1ParentComponents) {
@@ -148,7 +150,7 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 
         // Add parent component trailer entries
         if (hasBaseType) {
-            const auto &sedsBaseTypeName = sedsType.baseType()->nameStr();
+            const auto &sedsBaseTypeName = Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr());
             const auto &asn1ParentTrailerComponents =
                     m_asn1SequenceComponentsCache[sedsBaseTypeName].second->components();
 
@@ -160,7 +162,7 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 
     // Add realization to the parent component
     if (hasBaseType) {
-        updateParentContainer(sedsType.baseType()->nameStr(), type.get());
+        updateParentContainer(Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr()), type.get());
     }
 
     m_asn1Type = std::move(type);
@@ -168,7 +170,7 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const EnumeratedDataType &sedsType)
 {
-    auto type = std::make_unique<Asn1Acn::Types::Enumerated>(sedsType.nameStr());
+    auto type = std::make_unique<Asn1Acn::Types::Enumerated>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
     translateIntegerEncoding(sedsType.encoding(), type.get());
     translateEnumerationList(sedsType.enumerationList(), type.get());
 
@@ -177,7 +179,7 @@ void DataTypeTranslatorVisitor::operator()(const EnumeratedDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const FloatDataType &sedsType)
 {
-    auto type = std::make_unique<Asn1Acn::Types::Real>(sedsType.nameStr());
+    auto type = std::make_unique<Asn1Acn::Types::Real>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
     std::visit(FloatRangeTranslatorVisitor { type->constraints() }, sedsType.range());
     translateFloatEncoding(sedsType.encoding(), type.get());
 
@@ -186,7 +188,7 @@ void DataTypeTranslatorVisitor::operator()(const FloatDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const IntegerDataType &sedsType)
 {
-    auto type = std::make_unique<Asn1Acn::Types::Integer>(sedsType.nameStr());
+    auto type = std::make_unique<Asn1Acn::Types::Integer>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
     std::visit(IntegerRangeTranslatorVisitor { type->constraints() }, sedsType.range());
     translateIntegerEncoding(sedsType.encoding(), type.get());
 
@@ -195,7 +197,7 @@ void DataTypeTranslatorVisitor::operator()(const IntegerDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const StringDataType &sedsType)
 {
-    auto type = std::make_unique<Asn1Acn::Types::IA5String>(sedsType.nameStr());
+    auto type = std::make_unique<Asn1Acn::Types::IA5String>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
     translateStringLength(sedsType, type.get());
     translateStringEncoding(sedsType.encoding(), type.get());
 
@@ -435,8 +437,8 @@ void DataTypeTranslatorVisitor::translateEnumerationList(
     for (std::size_t index = 0; index < items.size(); ++index) {
         const auto &item = items[index];
 
-        asn1Type->addItem(
-                Asn1Acn::Types::EnumeratedItem(index, item.label().value(), item.value(), Asn1Acn::SourceLocation()));
+        asn1Type->addItem(Asn1Acn::Types::EnumeratedItem(
+                index, Escaper::escapeAsn1FieldName(item.label().value()), item.value(), Asn1Acn::SourceLocation()));
     }
 }
 
@@ -462,7 +464,7 @@ void DataTypeTranslatorVisitor::cacheAbstractContainerEntries(const ContainerDat
     EntryTranslatorVisitor componentsVisitor { m_asn1Definitions, asn1SequenceComponents.get() };
 
     if (sedsType.baseType()) {
-        const auto &sedsBaseTypeName = sedsType.baseType()->nameStr();
+        const auto &sedsBaseTypeName = Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr());
         const auto &asn1ParentComponents = m_asn1SequenceComponentsCache[sedsBaseTypeName];
 
         for (const auto &asn1Component : asn1ParentComponents.first->components()) {
@@ -480,7 +482,7 @@ void DataTypeTranslatorVisitor::cacheAbstractContainerEntries(const ContainerDat
         std::visit(trailerComponentsVisitor, sedsTrailerEntry);
     }
     if (sedsType.baseType()) {
-        const auto &sedsBaseTypeName = sedsType.baseType()->nameStr();
+        const auto &sedsBaseTypeName = Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr());
         const auto &asn1ParentComponents = m_asn1SequenceComponentsCache[sedsBaseTypeName];
 
         for (const auto &asn1TrailerComponent : asn1ParentComponents.second->components()) {
