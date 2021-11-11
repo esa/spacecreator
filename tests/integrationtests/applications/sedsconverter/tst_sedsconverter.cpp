@@ -29,11 +29,18 @@ class tst_SedsConverter : public QObject
 
 private Q_SLOTS:
     void testStateMachineWithBareInput();
+    void testSimpleDataTypes();
 };
 
 void tst_SedsConverter::testStateMachineWithBareInput()
 {
     const int result = system("./test_state_machine_with_bare_inputs.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_SedsConverter::testSimpleDataTypes()
+{
+    const int result = system("./test_simple_data_types.sh");
     QCOMPARE(result, 0);
 }
 
