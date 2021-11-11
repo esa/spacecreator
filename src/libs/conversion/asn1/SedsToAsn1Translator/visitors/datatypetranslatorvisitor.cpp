@@ -272,7 +272,7 @@ void DataTypeTranslatorVisitor::translateStringEncoding(
         // clang-format on
 
         if (encoding->terminationByte()) {
-            asn1Type->setTerminationPattern(QChar(*encoding->terminationByte()));
+            asn1Type->setTerminationPattern(QString::fromStdString(std::to_string(*encoding->terminationByte())));
         }
     } else {
         asn1Type->setEncoding(Asn1Acn::Types::AsciiStringEncoding::unspecified);
