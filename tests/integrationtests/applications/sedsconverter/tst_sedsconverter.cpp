@@ -30,6 +30,7 @@ class tst_SedsConverter : public QObject
 private Q_SLOTS:
     void testStateMachineWithBareInput();
     void testSimpleDataTypes();
+    void testArrays();
 };
 
 void tst_SedsConverter::testStateMachineWithBareInput()
@@ -41,6 +42,12 @@ void tst_SedsConverter::testStateMachineWithBareInput()
 void tst_SedsConverter::testSimpleDataTypes()
 {
     const int result = system("./test_simple_data_types.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_SedsConverter::testArrays()
+{
+    const int result = system("./test_arrays.sh");
     QCOMPARE(result, 0);
 }
 

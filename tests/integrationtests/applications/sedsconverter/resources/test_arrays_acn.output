@@ -1,0 +1,6 @@
+COM-N7SPACE-ARRAYS DEFINITIONS ::= BEGIN
+DataItem [size 8, encoding pos-int, endianness big]
+BasicArray1D []
+Matrix4x4 []
+END
+

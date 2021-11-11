@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/Arrays">
+    <DataTypeSet>
+      <IntegerDataType name="DataItem">
+        <LongDescription>A sample data item to be embedded within other structures</LongDescription>
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <ArrayDataType name="BasicArray1D" dataTypeRef="DataItem">
+        <LongDescription>A 1-D array with maximum size</LongDescription>
+        <DimensionList>
+          <Dimension size="15" />
+        </DimensionList>
+      </ArrayDataType>
+      <ArrayDataType name="Matrix4x4" dataTypeRef="DataItem">
+        <LongDescription>A 2D array</LongDescription>
+        <DimensionList>
+          <Dimension size="4" />
+          <Dimension size="4" />
+        </DimensionList>
+      </ArrayDataType>
+    </DataTypeSet>
+  </Package>
+</PackageFile>

@@ -22,3 +22,8 @@ configure_file(test_simple_data_types.sh test_simple_data_types.sh COPYONLY)
 configure_file(resources/test_simple_data_types.xml resources/test_simple_data_types.xml COPYONLY)
 configure_file(resources/test_simple_data_types_asn.output resources/test_simple_data_types_asn.output COPYONLY)
 configure_file(resources/test_simple_data_types_acn.output resources/test_simple_data_types_acn.output COPYONLY)
+
+configure_file(test_arrays.sh test_arrays.sh COPYONLY)
+configure_file(resources/test_arrays.xml resources/test_arrays.xml COPYONLY)
+configure_file(resources/test_arrays_asn.output resources/test_arrays_asn.output COPYONLY)
+configure_file(resources/test_arrays_acn.output resources/test_arrays_acn.output COPYONLY)
