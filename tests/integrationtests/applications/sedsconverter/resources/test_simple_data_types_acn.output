@@ -1,4 +1,4 @@
-Com-n7space-SimpleDataTypes DEFINITIONS ::= BEGIN
+COM-N7SPACE-SIMPLEDATATYPES DEFINITIONS ::= BEGIN
 UnsignedInteger8 [size 8, encoding pos-int, endianness big]
 SignedInteger16 [size 16, encoding twos-complement, endianness big]
 BasicBoolean [false-value '0'B]

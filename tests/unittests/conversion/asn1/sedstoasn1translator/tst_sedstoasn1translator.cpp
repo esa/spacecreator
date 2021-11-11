@@ -774,9 +774,9 @@ void tst_SedsToAsn1Translator::testTranslateEnumeratedDataType()
     const auto &items = enumType->items();
     QCOMPARE(items.size(), 3);
 
-    const auto &item = items["Two"];
+    const auto &item = items["two"];
     QCOMPARE(item.index(), 1);
-    QCOMPARE(item.name(), "Two");
+    QCOMPARE(item.name(), "two");
     QCOMPARE(item.value(), 2);
 }
 
@@ -888,7 +888,7 @@ void tst_SedsToAsn1Translator::testTranslateStringDataType()
     QCOMPARE(stringType->identifier(), "String20");
     QCOMPARE(stringType->typeName(), "IA5String");
     QCOMPARE(stringType->encoding(), Types::AsciiStringEncoding::ASCII);
-    QCOMPARE(stringType->terminationPattern(), "X");
+    QCOMPARE(stringType->terminationPattern(), "88");
 
     const auto &constraints = stringType->constraints().constraints();
     QCOMPARE(constraints.size(), 1);

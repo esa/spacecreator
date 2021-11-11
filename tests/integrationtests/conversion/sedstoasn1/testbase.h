@@ -37,7 +37,7 @@ protected Q_SLOTS:
     void cleanup();
 
 protected:
-    void runConversionTest(QString testFilenameBase);
+    void runConversionTest(QString testFilenameBase, QString asn1PackageName);
     void validateAsn1(const QString &filename);
 
 protected:

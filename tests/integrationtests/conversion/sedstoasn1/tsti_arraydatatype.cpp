@@ -23,12 +23,12 @@ namespace conversion::asn1::test {
 
 void tsti_ArrayDataType::testOneDimensionArray()
 {
-    runConversionTest("array_onedimension");
+    runConversionTest("array_onedimension", "ARRAY-ONEDIMENSION");
 }
 
 void tsti_ArrayDataType::testMultiDimensionArray()
 {
-    runConversionTest("array_multidimension");
+    runConversionTest("array_multidimension", "ARRAY-MULTIDIMENSION");
 }
 
 } // namespace conversion::asn1::test

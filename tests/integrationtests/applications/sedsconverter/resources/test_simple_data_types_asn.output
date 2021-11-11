@@ -1,4 +1,4 @@
-Com-n7space-SimpleDataTypes DEFINITIONS ::= BEGIN
+COM-N7SPACE-SIMPLEDATATYPES DEFINITIONS ::= BEGIN
 UnsignedInteger8 ::= INTEGER(0 .. 255)
 SignedInteger16 ::= INTEGER(-32768 .. 32767)
 BasicBoolean ::= BOOLEAN
