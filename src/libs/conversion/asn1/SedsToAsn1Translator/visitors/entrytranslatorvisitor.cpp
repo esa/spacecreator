@@ -54,8 +54,9 @@ void EntryTranslatorVisitor::operator()(const seds::model::Entry &sedsEntry)
 {
     auto asn1EntryType = translateEntryType(sedsEntry.type().nameStr());
 
-    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(sedsEntry.nameStr(), sedsEntry.nameStr(),
-            false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(asn1EntryType));
+    const auto entryName = Escaper::escapeAsn1FieldName(sedsEntry.nameStr());
+    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
+            entryName, entryName, false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(asn1EntryType));
     m_asn1Sequence->addComponent(std::move(sequenceComponent));
 }
 
@@ -63,8 +64,9 @@ void EntryTranslatorVisitor::operator()(const seds::model::ErrorControlEntry &se
 {
     auto asn1EntryType = translateErrorControl(sedsEntry);
 
-    auto sequenceComponent = std::make_unique<Asn1Acn::AcnSequenceComponent>(
-            sedsEntry.nameStr(), sedsEntry.nameStr(), std::move(asn1EntryType));
+    const auto entryName = Escaper::escapeAsn1FieldName(sedsEntry.nameStr());
+    auto sequenceComponent =
+            std::make_unique<Asn1Acn::AcnSequenceComponent>(entryName, entryName, std::move(asn1EntryType));
     m_asn1Sequence->addComponent(std::move(sequenceComponent));
 }
 
@@ -73,8 +75,9 @@ void EntryTranslatorVisitor::operator()(const seds::model::FixedValueEntry &seds
     auto asn1EntryType = translateEntryType(sedsEntry.type().nameStr());
     translateFixedValue(sedsEntry, asn1EntryType.get());
 
-    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(sedsEntry.nameStr(), sedsEntry.nameStr(),
-            false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(asn1EntryType));
+    const auto entryName = Escaper::escapeAsn1FieldName(sedsEntry.nameStr());
+    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
+            entryName, entryName, false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(asn1EntryType));
     m_asn1Sequence->addComponent(std::move(sequenceComponent));
 }
 
@@ -82,8 +85,9 @@ void EntryTranslatorVisitor::operator()(const seds::model::LengthEntry &sedsEntr
 {
     auto asn1EntryType = translateEntryType(sedsEntry.type().nameStr());
 
-    auto sequenceComponent = std::make_unique<Asn1Acn::AcnSequenceComponent>(
-            sedsEntry.nameStr(), sedsEntry.nameStr(), std::move(asn1EntryType));
+    const auto entryName = Escaper::escapeAsn1FieldName(sedsEntry.nameStr());
+    auto sequenceComponent =
+            std::make_unique<Asn1Acn::AcnSequenceComponent>(entryName, entryName, std::move(asn1EntryType));
     m_asn1Sequence->addComponent(std::move(sequenceComponent));
 }
 
@@ -94,8 +98,9 @@ void EntryTranslatorVisitor::operator()(const seds::model::ListEntry &sedsEntry)
     auto asn1SequenceOfType = std::make_unique<Asn1Acn::Types::SequenceOf>();
     asn1SequenceOfType->setItemsType(std::move(asn1EntryType));
 
-    auto sequenceComponent = std::make_unique<Asn1Acn::AcnSequenceComponent>(
-            sedsEntry.nameStr(), sedsEntry.nameStr(), std::move(asn1SequenceOfType));
+    const auto entryName = Escaper::escapeAsn1FieldName(sedsEntry.nameStr());
+    auto sequenceComponent =
+            std::make_unique<Asn1Acn::AcnSequenceComponent>(entryName, entryName, std::move(asn1SequenceOfType));
     m_asn1Sequence->addComponent(std::move(sequenceComponent));
 }
 

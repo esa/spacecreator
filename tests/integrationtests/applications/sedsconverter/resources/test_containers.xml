@@ -26,7 +26,7 @@
       <ArrayDataType name="ArrayType" dataTypeRef="DataItemA">
         <LongDescription>A simple array type</LongDescription>
         <DimensionList>
-          <Dimension indexTypeRef="LengthType" />
+          <Dimension size="15" />
         </DimensionList>
       </ArrayDataType>
       <ContainerDataType name="BasicContainer">
@@ -48,7 +48,6 @@
       <ContainerDataType name="PayloadBase" abstract="true">
         <LongDescription>Base for the packet payload data</LongDescription>
         <EntryList>
-          <PaddingEntry sizeInBits="8" />
         </EntryList>
       </ContainerDataType>
       <ContainerDataType name="PayloadA" abstract="false" baseType="PayloadBase">
@@ -62,35 +61,25 @@
       <ContainerDataType name="DataPacket" abstract="true">
         <LongDescription>A data packet</LongDescription>
         <EntryList>
-          <FixedValueEntry name="MagicNumber" type="BinaryPattern" fixedValue="00110011" />
-          <Entry name="PacketId" type="PacketId" />
+          <Entry name="Id" type="PacketId" />
           <Entry name="Payload" type="PayloadBase" />
         </EntryList>
         <TrailerEntryList>
-          <LengthEntry name="PacketLength" type="LengthType" />
-          <ErrorControlEntry name="ErrorControlField" errorControlType="CRC8" type="BinaryPattern" />
         </TrailerEntryList>
       </ContainerDataType>
       <ContainerDataType name="DataPacketA" abstract="false" baseType="DataPacket">
         <LongDescription>Concrete packet implementation A</LongDescription>
         <ConstraintSet>
-          <ValueConstraint entry="PacketId" value="PacketA" />
+          <ValueConstraint entry="Id" value="PacketA" />
           <TypeConstraint entry="Payload" type="PayloadA" />
         </ConstraintSet>
       </ContainerDataType>
       <ContainerDataType name="DataPacketB" abstract="false" baseType="DataPacket">
         <LongDescription>Concrete packet implementation B</LongDescription>
         <ConstraintSet>
-          <ValueConstraint entry="PacketId" value="PacketB" />
+          <ValueConstraint entry="Id" value="PacketB" />
           <TypeConstraint entry="Payload" type="PayloadB" />
         </ConstraintSet>
-      </ContainerDataType>
-      <ContainerDataType name="ListContainer">
-        <LongDescription>A data structure containing a list and its length</LongDescription>
-        <EntryList>
-          <Entry name="ListLength" type="LengthType" />
-          <ListEntry name="List" type="PayloadBase" listLengthField="ListLength" />
-        </EntryList>
       </ContainerDataType>
     </DataTypeSet>
   </Package>
