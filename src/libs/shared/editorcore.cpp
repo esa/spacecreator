@@ -39,7 +39,7 @@ EditorCore::EditorCore(QObject *parent)
 {
 }
 
-EditorCore::~EditorCore() { }
+EditorCore::~EditorCore() {}
 
 QWidget *EditorCore::minimapView() const
 {
@@ -139,6 +139,7 @@ QAction *EditorCore::actionToggleMinimap()
     if (m_actionToggleMinimap == nullptr) {
         m_actionToggleMinimap = new QAction(tr("&Mini map"), this);
         m_actionToggleMinimap->setCheckable(true);
+        m_actionToggleMinimap->setChecked(true);
         m_actionToggleMinimap->setIcon(QIcon(QLatin1String(":/sharedresources/icons/minimap.svg")));
     }
     return m_actionToggleMinimap;
@@ -157,6 +158,7 @@ void EditorCore::setupMiniMap()
 {
     m_miniMap = new ui::MiniMap;
     m_miniMap->setupSourceView(chartView());
+    m_miniMap->setVisible(actionToggleMinimap()->isChecked());
     connect(actionToggleMinimap(), &QAction::toggled, m_miniMap, &shared::ui::MiniMap::setVisible);
     connect(m_miniMap, &shared::ui::MiniMap::visibilityChanged, actionToggleMinimap(), &QAction::setChecked);
 }

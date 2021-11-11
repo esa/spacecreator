@@ -231,7 +231,7 @@ void MainWindow::initSettings()
     restoreGeometry(shared::SettingsManager::load<QByteArray>(shared::SettingsManager::Common::Geometry));
     restoreState(shared::SettingsManager::load<QByteArray>(shared::SettingsManager::Common::State));
 
-    const bool showMinimap = shared::SettingsManager::load<bool>(shared::SettingsManager::Common::ShowMinimap);
+    const bool showMinimap = shared::SettingsManager::load<bool>(shared::SettingsManager::Common::ShowMinimap, true);
     m_core->actionToggleMinimap()->setChecked(showMinimap);
 }
 
