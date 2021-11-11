@@ -25,8 +25,8 @@
 #include <sdl/SdlModel/nextstate.h>
 
 using conversion::Escaper;
-using conversion::translator::TranslationException;
 using conversion::iv::translator::InterfaceCommandTranslator;
+using conversion::translator::TranslationException;
 
 namespace conversion::sdl::translator {
 
