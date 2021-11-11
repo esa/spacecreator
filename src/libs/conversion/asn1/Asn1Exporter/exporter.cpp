@@ -27,6 +27,7 @@
 #include <QString>
 #include <asn1library/asn1/asn1model.h>
 #include <conversion/asn1/Asn1Options/options.h>
+#include <iostream>
 
 using Asn1Acn::Asn1Model;
 using conversion::asn1::Asn1Options;
@@ -80,7 +81,8 @@ void Asn1Exporter::exportAcnModel(const Asn1Acn::File *file, const Options &opti
     const auto filePath = makeFilePath(pathPrefix, file->name(), "acn");
 
     QSaveFile outputFile(filePath);
-    writeAndCommit(outputFile, serializedModelData.toStdString());
+    const auto data = serializedModelData.toStdString();
+    writeAndCommit(outputFile, data);
 }
 
 void Asn1Exporter::writeAndCommit(QSaveFile &outputFile, const std::string &data) const
@@ -89,7 +91,7 @@ void Asn1Exporter::writeAndCommit(QSaveFile &outputFile, const std::string &data
         throw ExportException(QString("Failed to open a file %1").arg(outputFile.fileName()));
     }
 
-    if (outputFile.write(data.c_str()) == -1) {
+    if (outputFile.write(data.c_str(), qint64(data.size())) == -1) {
         throw ExportException(QString("Failed to write a file %1").arg(outputFile.fileName()));
     }
 
