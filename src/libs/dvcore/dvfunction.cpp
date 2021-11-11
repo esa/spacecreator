@@ -87,14 +87,27 @@ QString DVFunction::defaultImplementation() const
 }
 
 /*!
-   Retruns the full ath of the function (relevant  for nested functions)
+   Returns the full ath of the function (relevant for nested functions)
+   Does update the information from interfaceview if possible.
  */
 QStringList DVFunction::path() const
 {
+    QStringList path;
+    const QString tokenName = meta::Props::token(meta::Props::Token::path);
     if (model() && model()->ivQueries()) {
-        return model()->ivQueries()->functionPath(title());
+        path = model()->ivQueries()->functionPath(title());
+
+        auto self = const_cast<DVFunction *>(this);
+        self->setEntityAttribute(tokenName, QVariant::fromValue(path.join("::")));
+    } else {
+        path = entityAttributeValue<QString>(tokenName, title()).split("::");
     }
-    return {};
+    return path;
+}
+
+void DVFunction::updateForExport()
+{
+    path();
 }
 
 } // namespace dvm

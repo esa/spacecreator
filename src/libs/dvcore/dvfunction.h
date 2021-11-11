@@ -41,6 +41,8 @@ public:
 
     QStringList path() const;
 
+    void updateForExport() override;
+
 Q_SIGNALS:
     void usedImplementationChanged();
     void implementationChanged();

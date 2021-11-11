@@ -1409,6 +1409,13 @@ ActionItem *ChartLayoutManager::addActionItem(MscAction *action)
     if (!item) {
         item = new ActionItem(action, this);
         storeEntityItem(item);
+        if (item->geometryManagedByCif()) {
+            item->applyCif();
+            InstanceItem *instItem = itemForInstance(action->instance());
+            if (instItem) {
+                syncItemsPosToInstance(instItem);
+            }
+        }
         item->instantLayoutUpdate();
     }
 
@@ -1422,6 +1429,13 @@ ConditionItem *ChartLayoutManager::addConditionItem(MscCondition *condition, con
         item = new ConditionItem(condition, this);
         connect(this, &msc::ChartLayoutManager::instancesRectChanged, item, &msc::ConditionItem::setInstancesRect);
         storeEntityItem(item);
+        if (item->geometryManagedByCif()) {
+            item->applyCif();
+            InstanceItem *instItem = itemForInstance(condition->instance());
+            if (instItem) {
+                syncItemsPosToInstance(instItem);
+            }
+        }
         item->setInstancesRect(instancesRect);
         item->instantLayoutUpdate();
     }
@@ -1435,6 +1449,13 @@ TimerItem *ChartLayoutManager::addTimerItem(MscTimer *timer)
     if (!item) {
         item = new TimerItem(timer, this);
         storeEntityItem(item);
+        if (item->geometryManagedByCif()) {
+            item->applyCif();
+            InstanceItem *instItem = itemForInstance(timer->instance());
+            if (instItem) {
+                syncItemsPosToInstance(instItem);
+            }
+        }
         item->instantLayoutUpdate();
     }
 
