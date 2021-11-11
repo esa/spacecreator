@@ -17,3 +17,8 @@ add_format_target(${TEST_NAME})
 configure_file(test_state_machine_with_bare_inputs.sh test_state_machine_with_bare_inputs.sh COPYONLY)
 configure_file(resources/state_machine_with_bare_inputs.xml resources/state_machine_with_bare_inputs.xml COPYONLY)
 configure_file(resources/state_machine_with_bare_inputs.output resources/state_machine_with_bare_inputs.output COPYONLY)
+
+configure_file(test_simple_data_types.sh test_simple_data_types.sh COPYONLY)
+configure_file(resources/test_simple_data_types.xml resources/test_simple_data_types.xml COPYONLY)
+configure_file(resources/test_simple_data_types_asn.output resources/test_simple_data_types_asn.output COPYONLY)
+configure_file(resources/test_simple_data_types_acn.output resources/test_simple_data_types_acn.output COPYONLY)
