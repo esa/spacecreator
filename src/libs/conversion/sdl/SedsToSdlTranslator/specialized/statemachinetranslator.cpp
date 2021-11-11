@@ -21,10 +21,12 @@
 
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
+#include <conversion/iv/SedsToIvTranslator/specialized/interfacecommandtranslator.h>
 #include <sdl/SdlModel/nextstate.h>
 
 using conversion::Escaper;
 using conversion::translator::TranslationException;
+using conversion::iv::translator::InterfaceCommandTranslator;
 
 namespace conversion::sdl::translator {
 
@@ -109,7 +111,10 @@ auto StateMachineTranslator::translatePrimitive(const seds::model::OnCommandPrim
     auto input = std::make_unique<::sdl::Input>();
     std::vector<std::unique_ptr<::sdl::Action>> unpackingActions;
 
-    input->setName(command.interface().value() + "_" + command.command().value()); // TODO mangle identifier
+    // Input signal can be received only via a provided interface
+    input->setName(InterfaceCommandTranslator::getCommandName(
+            command.interface().value(), ivm::IVInterface::InterfaceType::Provided, command.command().value()));
+
     // TODO Create actions for argument unpacking
 
     return std::make_pair(std::move(input), std::move(unpackingActions));

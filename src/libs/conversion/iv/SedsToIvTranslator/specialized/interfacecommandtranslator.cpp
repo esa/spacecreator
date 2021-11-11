@@ -46,15 +46,13 @@ ivm::IVInterface *InterfaceCommandTranslator::createIvInterface(const seds::mode
     ivm::IVInterface::CreationInfo creationInfo;
     creationInfo.function = m_ivFunction;
     creationInfo.type = type;
-    creationInfo.name = Escaper::escapeIvName(m_ivInterfaceNameTemplate.arg(m_sedsInterface.nameStr())
-                                                      .arg(sedsCommand.nameStr())
-                                                      .arg(interfaceTypeToString(type)));
+    creationInfo.name = getCommandName(m_sedsInterface.nameStr(), type, sedsCommand.nameStr());
     creationInfo.kind = kind;
 
     return ivm::IVInterface::createIface(creationInfo);
 }
 
-const QString &InterfaceCommandTranslator::interfaceTypeToString(ivm::IVInterface::InterfaceType type) const
+const QString &InterfaceCommandTranslator::interfaceTypeToString(ivm::IVInterface::InterfaceType type)
 {
     switch (type) {
     case ivm::IVInterface::InterfaceType::Required: {
@@ -73,6 +71,13 @@ const QString &InterfaceCommandTranslator::interfaceTypeToString(ivm::IVInterfac
         throw UnhandledValueException("ivm::InterfaceType");
         break;
     }
+}
+
+const QString InterfaceCommandTranslator::getCommandName(
+        const QString &interfaceName, const ivm::IVInterface::InterfaceType type, const QString &commandName)
+{
+    return Escaper::escapeIvName(
+            m_ivInterfaceNameTemplate.arg(interfaceName).arg(commandName).arg(interfaceTypeToString(type)));
 }
 
 } // namespace conversion::iv::translator

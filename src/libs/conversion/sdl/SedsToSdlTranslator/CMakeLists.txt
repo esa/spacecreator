@@ -14,6 +14,7 @@ target_include_directories(SedsToSdlTranslator
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SedsToSdlTranslator
     PUBLIC      Conversion::Common
+                SedsToIvTranslator
                 asn1library
                 ivcore
                 SEDS::Model

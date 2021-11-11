@@ -280,7 +280,7 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineInputs()
     const auto stateB = getStateOfName(process, "StateB");
     QVERIFY(stateB);
     QCOMPARE(stateA->inputs().size(), 1);
-    QCOMPARE(stateA->inputs()[0]->name(), "If1_Cmd1");
+    QCOMPARE(stateA->inputs()[0]->name(), "If1_Cmd1_Pi");
     QCOMPARE(stateA->inputs()[0]->transition()->actions().size(), 1);
     const auto action = stateA->inputs()[0]->transition()->actions()[0].get();
     const auto nextState = dynamic_cast<const ::sdl::NextState *>(action);
