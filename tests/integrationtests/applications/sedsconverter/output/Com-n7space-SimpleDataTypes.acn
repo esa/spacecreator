@@ -1,0 +1,11 @@
+Com-n7space-SimpleDataTypes DEFINITIONS ::= BEGIN
+UnsignedInteger8 [size 8, encoding pos-int, endianness big]
+SignedInteger16 [size 16, encoding twos-complement, endianness big]
+BasicBoolean [false-value '0'B]
+InvertedBoolean [true-value '0'B]
+Float32 [encoding IEEE754-1985-32, endianness big]
+UnsignedFloat80 [encoding IEEE754-1985-64, endianness big]
+VariableSizeBLOB []
+FixedSizeBLOB []
+FixedSizeAsciiString [encoding ASCII]
+CString [encoding ASCII, termination-pattern '

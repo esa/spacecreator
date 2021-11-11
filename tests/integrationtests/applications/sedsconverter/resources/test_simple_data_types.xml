@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/SimpleDataTypes">
+    <DataTypeSet>
+      <IntegerDataType name="UnsignedInteger8">
+        <LongDescription>A simple 8-bit unsigned integer</LongDescription>
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="SignedInteger16">
+        <LongDescription>A simple 16-bit signed integer</LongDescription>
+        <IntegerDataEncoding encoding="twosComplement" byteOrder="bigEndian" sizeInBits="16" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="-32768" max="32767" />
+        </Range>
+      </IntegerDataType>
+      <BooleanDataType name="BasicBoolean">
+        <LongDescription>Basic boolean</LongDescription>
+        <BooleanDataEncoding sizeInBits="8" />
+      </BooleanDataType>
+      <BooleanDataType name="InvertedBoolean">
+        <LongDescription>A boolean with inverted encoding</LongDescription>
+        <BooleanDataEncoding sizeInBits="16" falseValue="nonZeroIsFalse" />
+      </BooleanDataType>
+      <FloatDataType name="Float32">
+        <LongDescription>A simple 32-bit float</LongDescription>
+        <FloatDataEncoding encodingAndPrecision="IEEE754_2008_single" sizeInBits="32" />
+        <Range>
+          <PrecisionRange>single</PrecisionRange>
+        </Range>
+      </FloatDataType>
+      <FloatDataType name="UnsignedFloat80">
+        <LongDescription>A complex 80-bit float</LongDescription>
+        <FloatDataEncoding sizeInBits="80" encodingAndPrecision="IEEE754_2008_double" />
+        <Range>
+          <MinMaxRange rangeType="greaterThan" min="0" />
+        </Range>
+      </FloatDataType>
+      <BinaryDataType name="VariableSizeBLOB" sizeInBits="128" fixedSize="false" />
+      <BinaryDataType name="FixedSizeBLOB" sizeInBits="64" fixedSize="true" />
+      <StringDataType name="FixedSizeAsciiString" length="32" fixedLength="true">
+        <LongDescription>A simple fixed-length ASCII string</LongDescription>
+        <StringDataEncoding encoding="ASCII" />
+      </StringDataType>
+      <StringDataType name="CString" length="64" fixedLength="false">
+        <LongDescription>A simple variable-length C-style NULL terminated ASCII string</LongDescription>
+        <StringDataEncoding encoding="ASCII" terminationByte="0" />
+      </StringDataType>
+      <StringDataType name="ASCIIString" length="32" fixedLength="false">
+        <LongDescription>A simple variable-length ASCII string</LongDescription>
+        <StringDataEncoding encoding="ASCII" />
+      </StringDataType>
+      <EnumeratedDataType name="SimpleEnumeration">
+        <LongDescription>A simple enumeration</LongDescription>
+        <IntegerDataEncoding encoding="twosComplement" byteOrder="bigEndian" sizeInBits="16" />
+        <EnumerationList>
+          <Enumeration value="12" label="Value1" />
+          <Enumeration value="15" label="Value2" />
+          <Enumeration value="-12" label="NegativeValue" />
+        </EnumerationList>
+      </EnumeratedDataType>
+    </DataTypeSet>
+  </Package>
+</PackageFile>

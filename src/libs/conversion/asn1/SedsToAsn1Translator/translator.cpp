@@ -26,10 +26,12 @@
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/file.h>
 #include <asn1library/asn1/sourcelocation.h>
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/sedsmodel.h>
 
 using Asn1Acn::Asn1Model;
+using conversion::Escaper;
 using conversion::translator::TranslationException;
 using seds::model::SedsModel;
 
@@ -92,10 +94,11 @@ std::unique_ptr<Asn1Acn::File> SedsToAsn1Translator::translatePackage(const seds
 {
     std::vector<const seds::model::DataType *> sedsDataTypes = collectDataTypes(sedsPackage);
 
-    auto asn1Definitions = std::make_unique<Asn1Acn::Definitions>(sedsPackage.asn1NameStr(), Asn1Acn::SourceLocation());
+    auto asn1Definitions = std::make_unique<Asn1Acn::Definitions>(
+            Escaper::escapeAsn1PackageName(sedsPackage.nameStr()), Asn1Acn::SourceLocation());
     translateDataTypes(sedsDataTypes, asn1Definitions.get());
 
-    auto asn1File = std::make_unique<Asn1Acn::File>(sedsPackage.nameStr());
+    auto asn1File = std::make_unique<Asn1Acn::File>(Escaper::escapeAsn1PackageName(sedsPackage.nameStr()));
     asn1File->add(std::move(asn1Definitions));
 
     return asn1File;

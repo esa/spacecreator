@@ -22,6 +22,7 @@
 #include "specialized/componentstranslator.h"
 
 #include <asn1library/asn1/asn1model.h>
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <ivcore/ivcommonprops.h>
@@ -31,6 +32,7 @@
 #include <seds/SedsModel/sedsmodel.h>
 
 using Asn1Acn::Asn1Model;
+using conversion::Escaper;
 using conversion::iv::IvOptions;
 using conversion::translator::TranslationException;
 using ivm::IVModel;
@@ -135,7 +137,7 @@ Asn1Acn::Definitions *SedsToIvTranslator::getAsn1Definitions(
         throw TranslationException(std::move(message));
     }
 
-    const auto &asn1DefinitionsName = sedsPackage.asn1NameStr();
+    const auto &asn1DefinitionsName = Escaper::escapeAsn1PackageName(sedsPackage.nameStr());
     auto *asn1Definitions = (*asn1File)->definitions(asn1DefinitionsName);
     if (!asn1Definitions) {
         auto message =

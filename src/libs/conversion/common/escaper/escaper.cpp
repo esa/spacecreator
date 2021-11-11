@@ -51,6 +51,21 @@ QString Escaper::escapeAsn1TypeName(QString name)
     return name;
 }
 
+QString Escaper::escapeAsn1PackageName(QString name)
+{
+    replaceDelimeters(name,
+            {
+                    '/',
+                    '\\',
+            },
+            '-');
+    escapeName(name, '-');
+
+    name[0] = name[0].toUpper(); // package name starts with uppercase letter in ASN.1
+
+    return name;
+}
+
 QString Escaper::escapeAsn1FieldName(QString name)
 {
     escapeName(name, '-');

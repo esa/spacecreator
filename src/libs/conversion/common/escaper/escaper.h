@@ -63,6 +63,15 @@ public:
     static auto escapeAsn1TypeName(QString name) -> QString;
 
     /**
+     * @brief   Convert the input name to an id acceptable as an ASN.1 package name
+     *
+     * @param   name    input name
+     *
+     * @returns ASN.1 package identifier
+     */
+    static auto escapeAsn1PackageName(QString name) -> QString;
+
+    /**
      * @brief   Convert the input name to an id acceptable as an ASN.1 sequence field name
      *
      * @param   name    input name
