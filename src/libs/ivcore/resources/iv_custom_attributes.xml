@@ -13,6 +13,7 @@
                 <Entry value="GUI"/>
                 <Entry value="SDL"/>
                 <Entry value="Simulink"/>
+                <Entry value="QGenC"/>
                 <Entry value="Blackbox_Device"/>
                 <Entry value="VHDL"/>
                 <Entry value="Pseudo function"/>
