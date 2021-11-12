@@ -126,7 +126,7 @@ void SedsToIvTranslator::translatePackage(
 }
 
 Asn1Acn::Definitions *SedsToIvTranslator::getAsn1Definitions(
-        const seds::model::Package &sedsPackage, Asn1Model *asn1Model) const
+        const seds::model::Package &sedsPackage, Asn1Model *asn1Model)
 {
     const auto asn1FileName = Escaper::escapeAsn1PackageName(sedsPackage.nameStr());
     auto &asn1Files = asn1Model->data();

@@ -36,7 +36,7 @@ namespace sdl {
 class ProcedureCall : public Action
 {
 public:
-    using Argument = std::variant<VariableLiteral, VariableReference *>;
+    using Argument = std::variant<std::unique_ptr<VariableLiteral>, std::unique_ptr<VariableReference>>;
 
     /**
      * @brief   Constructor

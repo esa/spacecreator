@@ -88,13 +88,14 @@ private:
     /**
      * @brief   Translate SEDS component
      *
+     * @param   sedsPackage         Package containing the component to be translated
      * @param   component           Component to translate
      * @param   asn1Model           Relevant ASN.1/ACN model
      * @param   ivModel             Relevant Interface View model
      * @param   model               Target SDL model to add the translated component implementation
      */
-    auto translateComponent(const seds::model::Component &sedsComponent, Asn1Acn::Asn1Model *asn1Model,
-            ivm::IVModel *ivModel, ::sdl::SdlModel *model) const -> void;
+    auto translateComponent(const seds::model::Package &sedsPackage, const seds::model::Component &sedsComponent,
+            Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel, ::sdl::SdlModel *model) const -> void;
 };
 
 } // namespace conversion::sdl::translator

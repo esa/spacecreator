@@ -19,9 +19,13 @@
 
 #include "statemachinetranslator.h"
 
+#include <algorithm>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/iv/SedsToIvTranslator/specialized/interfacecommandtranslator.h>
+#include <conversion/iv/SedsToIvTranslator/translator.h>
+#include <ivcore/ivfunction.h>
+#include <ivcore/ivmodel.h>
 #include <sdl/SdlModel/nextstate.h>
 
 using conversion::Escaper;
@@ -29,6 +33,8 @@ using conversion::iv::translator::InterfaceCommandTranslator;
 using conversion::translator::TranslationException;
 
 namespace conversion::sdl::translator {
+
+static constexpr auto RECEPTION_VARIABLE_PATTERN = "%1_InputVar";
 
 auto StateMachineTranslator::translateStateMachine(const seds::model::StateMachine &sedsStateMachine,
         ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void
@@ -62,6 +68,43 @@ auto StateMachineTranslator::translateStateMachine(const seds::model::StateMachi
     for (auto &entry : stateMap) {
         stateMachine->addState(std::move(entry.second));
     }
+}
+
+auto StateMachineTranslator::translateVariables(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
+        const seds::model::ComponentImplementation::VariableSet &variables, ::sdl::Process *sdlProcess) -> void
+{
+    for (const auto &variable : variables) {
+        const auto variableName = Escaper::escapeAsn1FieldName(variable.nameStr());
+        const auto variableTypeName = Escaper::escapeAsn1TypeName(variable.type().nameStr());
+        // TODO implement check for types imported from other packages
+        auto asn1Definitions = iv::translator::SedsToIvTranslator::getAsn1Definitions(sedsPackage, asn1Model);
+        const auto *referencedType = asn1Definitions->type(variableTypeName);
+        if (referencedType == nullptr) {
+            throw TranslationException(QString("Type %1 not found").arg(variableTypeName));
+        }
+        sdlProcess->addVariable(std::make_unique<::sdl::VariableDeclaration>(variableName, variableTypeName));
+    }
+}
+
+auto StateMachineTranslator::createVariablesForInputReception(const seds::model::Package &sedsPackage,
+        const seds::model::Component &sedsComponent, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
+        ::sdl::Process *sdlProcess) -> void
+{
+    const auto functionName = Escaper::escapeIvName(sedsComponent.nameStr());
+    const auto function = ivModel->getFunction(functionName, Qt::CaseSensitive);
+    if (function == nullptr) {
+        throw TranslationException(QString("Function %1 not found in the InterfaceView").arg(functionName));
+    }
+    for (const auto &interface : function->interfaces()) {
+        if (interface->isProvided() && interface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
+            createVariableForInput(sedsPackage, sedsComponent, asn1Model, interface, sdlProcess);
+        }
+    }
+}
+
+auto StateMachineTranslator::receptionVariableName(const QString interfaceName) -> QString
+{
+    return QString(RECEPTION_VARIABLE_PATTERN).arg(interfaceName);
 }
 
 auto StateMachineTranslator::createStartTransition(const seds::model::StateMachine &sedsStateMachine,
@@ -104,7 +147,8 @@ auto StateMachineTranslator::translateState(const seds::model::EntryState &sedsS
     return state;
 }
 
-auto StateMachineTranslator::translatePrimitive(const seds::model::OnCommandPrimitive &command) -> InputHandler
+auto StateMachineTranslator::translatePrimitive(
+        ::sdl::Process *sdlProcess, const seds::model::OnCommandPrimitive &command) -> InputHandler
 {
     Q_UNUSED(command);
 
@@ -114,16 +158,37 @@ auto StateMachineTranslator::translatePrimitive(const seds::model::OnCommandPrim
     // Input signal can be received only via a provided interface
     input->setName(InterfaceCommandTranslator::getCommandName(
             command.interface().value(), ivm::IVInterface::InterfaceType::Provided, command.command().value()));
+    if (command.argumentValues().size() == 0) {
+        return std::make_pair(std::move(input), std::move(unpackingActions));
+    }
+
+    const auto variableName = receptionVariableName(input->name());
+    const auto &variableIterator = std::find_if(sdlProcess->variables().begin(), sdlProcess->variables().end(),
+            [variableName](const auto &variable) { return variable->name() == variableName; });
+    if (variableIterator == sdlProcess->variables().end()) {
+        throw TranslationException(QString("Reception variable %1 not found").arg(variableName));
+    }
+    input->addParameter(std::make_unique<::sdl::VariableReference>(*variableIterator->get()));
+
+    for (const auto &argument : command.argumentValues()) {
+        Q_UNUSED(argument);
+    }
+
+    /*    auto name() const -> const Name &;
+    auto setName(Name name) -> void;
+
+    auto outputVariableRef() const -> const VariableRef &;*/
 
     // TODO Create actions for argument unpacking
 
     return std::make_pair(std::move(input), std::move(unpackingActions));
 }
 
-auto StateMachineTranslator::translatePrimitive(const seds::model::Transition::Primitive &primitive) -> InputHandler
+auto StateMachineTranslator::translatePrimitive(
+        ::sdl::Process *sdlProcess, const seds::model::Transition::Primitive &primitive) -> InputHandler
 {
     if (std::holds_alternative<seds::model::OnCommandPrimitive>(primitive)) {
-        return translatePrimitive(std::get<seds::model::OnCommandPrimitive>(primitive));
+        return translatePrimitive(sdlProcess, std::get<seds::model::OnCommandPrimitive>(primitive));
     }
     throw TranslationException("Encountered unsupported primitive");
     return InputHandler();
@@ -147,7 +212,7 @@ auto StateMachineTranslator::translateTransition(const seds::model::Transition &
     }
     auto fromState = (*fromStateIterator).second.get();
     auto toState = (*toStateIterator).second.get();
-    auto inputHandler = translatePrimitive(sedsTransition.primitive());
+    auto inputHandler = translatePrimitive(sdlProcess, sedsTransition.primitive());
 
     auto transition = std::make_unique<::sdl::Transition>();
     inputHandler.first->setTransition(transition.get());
@@ -164,6 +229,23 @@ auto StateMachineTranslator::translateTransition(const seds::model::Transition &
     transition->addAction(std::make_unique<::sdl::NextState>("", toState));
 
     stateMachine->addTransition(std::move(transition));
+}
+
+auto StateMachineTranslator::createVariableForInput(const seds::model::Package &sedsPackage,
+        const seds::model::Component &sedsComponent, Asn1Acn::Asn1Model *asn1Model, ivm::IVInterface const *interface,
+        ::sdl::Process *sdlProcess) -> void
+{
+    if (interface->params().size() == 0) {
+        return; // NOP
+    }
+    const auto interfaceName = interface->title();
+    if (interface->params().size() > 1) {
+        throw TranslationException(QString("Sporadic interface %1 has more than one interface").arg(interfaceName));
+        return;
+    }
+    const auto variableName = receptionVariableName(interfaceName);
+    const auto &param = interface->params()[0];
+    sdlProcess->addVariable(std::make_unique<::sdl::VariableDeclaration>(variableName, param.paramTypeName()));
 }
 
 } // namespace conversion::sdl::translator

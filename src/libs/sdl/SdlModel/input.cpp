@@ -39,14 +39,14 @@ void Input::setTransition(Transition *transition)
     m_transition = transition;
 }
 
-const std::vector<VariableReference *> &Input::parameters() const
+const std::vector<std::unique_ptr<VariableReference>> &Input::parameters() const
 {
     return m_parameters;
 }
 
-void Input::addParameter(VariableReference *parameter)
+void Input::addParameter(std::unique_ptr<VariableReference> parameter)
 {
-    m_parameters.push_back(parameter);
+    m_parameters.push_back(std::move(parameter));
 }
 
 void Input::accept(Visitor &visitor) const

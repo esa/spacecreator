@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <asn1library/asn1/asn1model.h>
 #include <map>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <seds/SedsModel/components/states/entrystate.h>
@@ -45,6 +46,39 @@ public:
     static auto translateStateMachine(const seds::model::StateMachine &sedsStateMachine, ::sdl::Process *sdlProcess,
             ::sdl::StateMachine *stateMachine) -> void;
 
+    /**
+     * @brief   Extract SEDS component implementation's variables into SDL variable declarations
+     *
+     * @param sedsPackage       SEDS package containing the component
+     * @param asn1Model         Data model
+     * @param sedsStateMachine  Source SEDS state machine
+     * @param sdlProcess        Target SDL process
+     */
+    static auto translateVariables(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
+            const seds::model::ComponentImplementation::VariableSet &variables, ::sdl::Process *sdlProcess) -> void;
+
+    /**
+     * @brief   Create variables for accepting input signal parameters
+     *
+     * @param sedsPackage       SEDS package containing the component
+     * @param sedsComponent     SEDS component
+     * @param asn1Model         Data model
+     * @param ivModel           InterfaceView model
+     * @param sdlProcess        Target SDL process
+     */
+    static auto createVariablesForInputReception(const seds::model::Package &sedsPackage,
+            const seds::model::Component &sedsComponent, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
+            ::sdl::Process *sdlProcess) -> void;
+
+    /**
+     * @brief   Get name of the variable used for receiving packed parameters on the given interface
+     *
+     * @param interfaceName     Interface name
+     *
+     * @return Variable name
+     */
+    static auto receptionVariableName(const QString interfaceName) -> QString;
+
 private:
     static auto createStartTransition(const seds::model::StateMachine &sedsStateMachine, ::sdl::Process *sdlProcess,
             std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void;
@@ -55,12 +89,18 @@ private:
 
     static auto translateState(const seds::model::EntryState &sedsState) -> std::unique_ptr<::sdl::State>;
 
-    static auto translatePrimitive(const seds::model::OnCommandPrimitive &command) -> InputHandler;
+    static auto translatePrimitive(::sdl::Process *sdlProcess, const seds::model::OnCommandPrimitive &command)
+            -> InputHandler;
 
-    static auto translatePrimitive(const seds::model::Transition::Primitive &primitive) -> InputHandler;
+    static auto translatePrimitive(::sdl::Process *sdlProcess, const seds::model::Transition::Primitive &primitive)
+            -> InputHandler;
 
     static auto translateTransition(const seds::model::Transition &sedsTransition, ::sdl::Process *sdlProcess,
             ::sdl::StateMachine *stateMachine, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void;
+
+    static auto createVariableForInput(const seds::model::Package &sedsPackage,
+            const seds::model::Component &sedsComponent, Asn1Acn::Asn1Model *asn1Model,
+            ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
 };
 
 } // namespace conversion::sdl::translator

@@ -93,14 +93,14 @@ auto SedsToSdlTranslator::translatePackage(const seds::model::Package &sedsPacka
         ivm::IVModel *ivModel, ::sdl::SdlModel *model) const -> void
 {
     for (const auto &component : sedsPackage.components()) {
-        translateComponent(component, asn1Model, ivModel, model);
+        translateComponent(sedsPackage, component, asn1Model, ivModel, model);
     }
 }
 
-auto SedsToSdlTranslator::translateComponent(const seds::model::Component &sedsComponent, Asn1Acn::Asn1Model *asn1Model,
-        ivm::IVModel *ivModel, ::sdl::SdlModel *model) const -> void
+auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPackage,
+        const seds::model::Component &sedsComponent, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
+        ::sdl::SdlModel *model) const -> void
 {
-    Q_UNUSED(asn1Model);
     Q_UNUSED(ivModel);
 
     const auto &implementation = sedsComponent.implementation();
@@ -117,7 +117,9 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Component &sedsC
         auto stateMachine = std::make_unique<::sdl::StateMachine>();
         ::sdl::Process process;
         process.setName(Escaper::escapeIvName(sedsComponent.nameStr()));
-        // TODO translate variable declarations
+        StateMachineTranslator::translateVariables(sedsPackage, asn1Model, implementation.variables(), &process);
+        StateMachineTranslator::createVariablesForInputReception(
+                sedsPackage, sedsComponent, asn1Model, ivModel, &process);
         // TODO translate procedures (activities?)
         // TODO provide additional translation for parameter (activity) maps
         if (stateMachineCount == 1) {

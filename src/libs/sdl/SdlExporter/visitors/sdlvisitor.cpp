@@ -100,7 +100,7 @@ void SdlVisitor::visit(const Input &input) const
 
         QString parameters = std::accumulate(std::next(inputParameters.begin()), inputParameters.end(),
                 inputParameters[0]->declaration()->name(),
-                [](auto &a, auto *b) { return std::move(a) + ", " + b->declaration()->name(); });
+                [](const auto &a, const auto &b) { return std::move(a) + ", " + b->declaration()->name(); });
         m_stream << parameters;
 
         m_stream << ")";
@@ -122,7 +122,7 @@ void SdlVisitor::visit(const Output &output) const
 
     m_stream << "            " << dummyCif("output");
     m_stream << "            output " << output.name();
-    const auto outputParamRef = output.parameter();
+    const auto &outputParamRef = output.parameter();
     if (outputParamRef != nullptr) {
         m_stream << QString("(%1)").arg(outputParamRef->declaration()->name());
     }
@@ -298,14 +298,14 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall) const
     m_stream << "        " << dummyCif("PROCEDURECALL");
     m_stream << "        call " << procedureCall.procedure()->name();
 
-    auto &procedureCallArgs = procedureCall.arguments();
+    const auto &procedureCallArgs = procedureCall.arguments();
     if (!procedureCallArgs.empty()) {
         auto getArgAsQString = [](const ProcedureCall::Argument &argument) -> QString {
             QString arg;
-            if (std::holds_alternative<VariableLiteral>(argument)) {
-                arg += std::get<VariableLiteral>(argument).value();
-            } else if (std::holds_alternative<VariableReference *>(argument)) {
-                arg += std::get<VariableReference *>(argument)->declaration()->name();
+            if (std::holds_alternative<std::unique_ptr<VariableLiteral>>(argument)) {
+                arg += std::get<std::unique_ptr<VariableLiteral>>(argument)->value();
+            } else if (std::holds_alternative<std::unique_ptr<VariableReference>>(argument)) {
+                arg += std::get<std::unique_ptr<VariableReference>>(argument)->declaration()->name();
             } else {
                 throw ExportException("Unknown Argument type");
             }
@@ -313,8 +313,7 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall) const
         };
 
         const auto args = std::accumulate(std::next(procedureCallArgs.begin()), procedureCallArgs.end(),
-                getArgAsQString(procedureCallArgs[0]),
-                [&](QString &accumulator, const ProcedureCall::Argument &argument) {
+                getArgAsQString(procedureCallArgs[0]), [&](QString &accumulator, const auto &argument) {
                     return accumulator + ", " + getArgAsQString(argument);
                 });
 

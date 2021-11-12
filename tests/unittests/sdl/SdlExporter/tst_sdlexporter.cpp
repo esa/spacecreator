@@ -253,7 +253,6 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
     QString processName = modelName.toLower(); // NOLINT
 
     auto variable = makeVariableDeclaration("howManyLoops", "MyInteger");
-    auto variableReference = VariableReference(variable.get());
 
     auto transition1 = SdlTransitionBuilder()
                                .withOutput(SdlOutputBuilder().withName("parameterlessOutput").build())
@@ -262,14 +261,17 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
     auto someInput = SdlInputBuilder()
                              .withName("some_input_name")
                              .withTransition(transition1.get())
-                             .withParameter(&variableReference)
+                             .withParameter(std::make_unique<VariableReference>(variable.get()))
                              .build();
     auto state1 = SdlStateBuilder("Looping")
                           .withInput(std::move(someInput))
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
-    auto referenceOutput = SdlOutputBuilder().withName("referenceOutput").withParameter(&variableReference).build();
+    auto referenceOutput = SdlOutputBuilder()
+                                   .withName("referenceOutput")
+                                   .withParameter(std::make_unique<VariableReference>(variable.get()))
+                                   .build();
 
     auto transition2 = SdlTransitionBuilder()
                                .withTask(SdlTaskBuilder().withContents("'EXAMPLE TASK CONTENTS'").build())
@@ -412,7 +414,6 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     QString processName = modelName.toLower(); // NOLINT
 
     auto variableX = makeVariableDeclaration("x", "MyInteger");
-    auto variableXRef = VariableReference(variableX.get());
 
     auto transition =
             SdlTransitionBuilder()
@@ -433,7 +434,9 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
                                                             SdlTransitionBuilder()
                                                                     .withOutput(SdlOutputBuilder()
                                                                                         .withName("sendOutput")
-                                                                                        .withParameter(&variableXRef)
+                                                                                        .withParameter(std::make_unique<
+                                                                                                VariableReference>(
+                                                                                                variableX.get()))
                                                                                         .build())
                                                                     .withTask(
                                                                             SdlTaskBuilder()
@@ -458,7 +461,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     auto waitState = SdlStateBuilder("Wait")
                              .withInput(SdlInputBuilder()
                                                 .withName("startProcess")
-                                                .withParameter(&variableXRef)
+                                                .withParameter(std::make_unique<VariableReference>(variableX.get()))
                                                 .withTransition(transition.get())
                                                 .build())
                              .build();
@@ -655,15 +658,13 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
                               .build();
 
     auto variableX = makeVariableDeclaration("x", "MyInteger");
-    VariableReference varXRef(variableX.get());
     auto variableY = makeVariableDeclaration("y", "MyInteger");
-    VariableReference varYRef(variableY.get());
 
     auto state = SdlStateBuilder("Wait")
                          .withInput(SdlInputBuilder()
                                             .withName("startProcess")
                                             .withTransition(transition.get())
-                                            .withParameter(&varXRef)
+                                            .withParameter(std::make_unique<VariableReference>(variableX.get()))
                                             .build())
                          .build();
 
@@ -736,7 +737,6 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
     QString processName = modelName.toLower(); // NOLINT
 
     auto variableX = makeVariableDeclaration("x", "MyInteger");
-    VariableReference varXRef(variableX.get());
 
     auto procedure = SdlProcedureBuilder()
                              .withName("returnlessProcedure")
@@ -750,8 +750,8 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
     auto transition = SdlTransitionBuilder()
                               .withAction(SdlProcedureCallBuilder()
                                                   .withProcedure(procedure.get())
-                                                  .withArgument(VariableLiteral("2"))
-                                                  .withArgument(&varXRef)
+                                                  .withArgument(std::make_unique<VariableLiteral>("2"))
+                                                  .withArgument(std::make_unique<VariableReference>(variableX.get()))
                                                   .build())
                               .withNextStateAction()
                               .build();
@@ -759,7 +759,7 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
     auto state = SdlStateBuilder("Wait")
                          .withInput(SdlInputBuilder()
                                             .withName("startProcess")
-                                            .withParameter(&varXRef)
+                                            .withParameter(std::make_unique<VariableReference>(variableX.get()))
                                             .withTransition(transition.get())
                                             .build())
                          .build();
