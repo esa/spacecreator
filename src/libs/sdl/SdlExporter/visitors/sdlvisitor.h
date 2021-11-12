@@ -27,6 +27,8 @@
 #include <sdl/SdlModel/label.h>
 #include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/output.h>
+#include <sdl/SdlModel/procedure.h>
+#include <sdl/SdlModel/procedurecall.h>
 #include <sdl/SdlModel/process.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/signal.h>
@@ -68,13 +70,6 @@ public:
      * @brief   Deleted move assignment operator
      */
     SdlVisitor &operator=(SdlVisitor &&) = delete; // instances of this class cannot be moved
-
-    /**
-     * @brief   Model visitor
-     *
-     * @param   model   model to be serialized
-     */
-    auto visit(const SdlModel &model) const -> void override;
 
     /**
      * @brief   Process visitor
@@ -153,7 +148,23 @@ public:
      */
     virtual auto visit(const Decision &decision) const -> void override;
 
+    /**
+     * @brief   Procedure visitor
+     *
+     * @param   procedure   procedure to be serialized
+     */
+    auto visit(const Procedure &procedure) const -> void override;
+
+    /**
+     * @brief   Procedure call visitor
+     *
+     * @param   procedureCall   procedure call to be serialized
+     */
+    auto visit(const ProcedureCall &procedureCall) const -> void override;
+
 private:
+    auto dummyCif(const QString &cifType) const -> QString;
+
     template<typename T>
     auto exportCollection(const T &collection) const -> void;
 

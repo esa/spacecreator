@@ -53,9 +53,7 @@ public:
     bool processCommandLineArg(shared::CommandLineParser::Positional arg, const QString &value);
     QPlainTextEdit *textOutputPane() const;
 
-    QAction *dockWidgetDocumentToggleAction();
     QAction *mscTextViewToggleAction();
-    QAction *dockWidgetAsn1ToggleAction();
 
 public Q_SLOTS:
     void createNewDocument();
@@ -66,8 +64,6 @@ Q_SIGNALS:
     void currentGraphicsViewChanged(QGraphicsView *view);
 
 public Q_SLOTS:
-    void showChart(const QModelIndex &index);
-    void showSelection(const QModelIndex &current, const QModelIndex &previous);
     bool openFileMsc(const QString &file);
     void saveMsc();
     void saveAsMsc();
@@ -96,7 +92,6 @@ private:
     void setupUi();
     void initActions();
     void initMenus();
-    void initMainToolbar();
     void initConnections();
 
     void closeEvent(QCloseEvent *e) override;

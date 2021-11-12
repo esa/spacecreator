@@ -18,12 +18,14 @@
 #include "implementationdelegate.h"
 
 #include "commands/cmdentityattributeschange.h"
+#include "commands/cmdentitypropertyremove.h"
 #include "commandsstackbase.h"
 #include "dvfunction.h"
 #include "dvpropertytemplateconfig.h"
 #include "dvtreeviewmodel.h"
 
 #include <QComboBox>
+#include <QFont>
 
 namespace dve {
 
@@ -62,6 +64,11 @@ void ImplementationDelegate::setEditorData(QWidget *editor, const QModelIndex &i
             m_updating = true;
             if (fn) {
                 comboBox->clear();
+                comboBox->addItem(tr("Reset to default"));
+                QFont font;
+                font.setItalic(true);
+                comboBox->setItemData(0, font, Qt::FontRole);
+
                 comboBox->addItems(fn->availableImplementations());
                 comboBox->setCurrentText(fn->usedImplementation());
             } else {
@@ -82,19 +89,26 @@ void ImplementationDelegate::setModelData(QWidget *editor, QAbstractItemModel *m
     }
 
     if (auto comboBox = qobject_cast<QComboBox *>(editor)) {
+        QString impltToken = dvm::meta::Props::token(dvm::meta::Props::Token::selected_implementation);
         QString implementation = comboBox->currentText();
         dvm::DVFunction *fn = index.data(dve::DVTreeViewModel::DVObjectRole).value<dvm::DVFunction *>();
-        if (fn && fn->implementation() != implementation) {
-            QString impltToken = dvm::meta::Props::token(dvm::meta::Props::Token::selected_implementation);
-            if (!fn->hasEntityAttribute(impltToken, implementation)) {
-                const QList<EntityAttribute> attributes = { EntityAttribute {
-                        impltToken, implementation, EntityAttribute::Type::Attribute } };
-                auto attributesCmd = new shared::cmd::CmdEntityAttributesChange(
-                        dvm::DVPropertyTemplateConfig::instance(), fn, attributes);
+        if (fn) {
+            if (comboBox->currentIndex() == 0) {
+                auto attributesCmd = new shared::cmd::CmdEntityPropertyRemove(fn, { impltToken });
                 m_commandsStack->push(attributesCmd);
+                implementation = fn->defaultImplementation();
+                comboBox->setCurrentText(implementation);
+            } else {
+                if (!fn->hasEntityAttribute(impltToken, implementation)) {
+                    const QList<EntityAttribute> attributes = { EntityAttribute {
+                            impltToken, implementation, EntityAttribute::Type::Attribute } };
+                    auto attributesCmd = new shared::cmd::CmdEntityAttributesChange(
+                            dvm::DVPropertyTemplateConfig::instance(), fn, attributes);
+                    m_commandsStack->push(attributesCmd);
+                }
             }
+            model->setData(index, implementation);
         }
-        model->setData(index, implementation);
         return;
     }
 

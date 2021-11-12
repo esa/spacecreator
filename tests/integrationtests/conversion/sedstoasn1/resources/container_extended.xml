@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="container_extended">
+    <DataTypeSet>
+      <ContainerDataType name="ChildContainer1" baseType="ParentContainer">
+        <EntryList>
+          <Entry name="child1Entry" type="DataItemA" />
+        </EntryList>
+        <TrailerEntryList>
+          <Entry name="child1TrailerEntry" type="DataItemA" />
+        </TrailerEntryList>
+      </ContainerDataType>
+      <ContainerDataType name="ChildContainer2" baseType="ParentContainer">
+        <EntryList>
+          <Entry name="child2Entry" type="DataItemB" />
+        </EntryList>
+        <TrailerEntryList>
+          <Entry name="child2TrailerEntry" type="DataItemB" />
+        </TrailerEntryList>
+      </ContainerDataType>
+      <ContainerDataType name="ParentContainer" abstract="true" baseType="GigaContainer">
+        <EntryList>
+          <Entry name="parentEntry" type="DataItemA" />
+        </EntryList>
+        <TrailerEntryList>
+          <Entry name="parentTrailerEntry" type="DataItemB" />
+        </TrailerEntryList>
+      </ContainerDataType>
+      <ContainerDataType name="GigaContainer" abstract="true">
+        <EntryList>
+          <Entry name="gigaEntry" type="DataItemA" />
+        </EntryList>
+        <TrailerEntryList>
+          <Entry name="gigaTrailerEntry" type="DataItemB" />
+        </TrailerEntryList>
+      </ContainerDataType>
+      <IntegerDataType name="DataItemA">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="DataItemB">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+  </Package>
+</PackageFile>

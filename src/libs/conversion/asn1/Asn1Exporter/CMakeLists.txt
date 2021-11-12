@@ -28,4 +28,4 @@ target_link_libraries(Asn1Exporter
 add_format_target(Asn1Exporter)
 add_tidy_target(Asn1Exporter)
 
-add_library(Conversion::Asn1Exporter ALIAS Asn1Exporter)
+add_library(ASN1::Exporter ALIAS Asn1Exporter)

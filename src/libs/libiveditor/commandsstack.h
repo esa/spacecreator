@@ -53,6 +53,8 @@ Q_SIGNALS:
     void defaultImplementationChanged(ivm::IVFunction *entity);
     void implementationListChanged(ivm::IVFunction *entity);
     void attributeChanged(shared::VEObject *entity, const QString &attrName, const QVariant &oldValue);
+    void asn1FilesImported(const QStringList &files);
+    void asn1FileRemoved(const QStringList &files);
 };
 
 }

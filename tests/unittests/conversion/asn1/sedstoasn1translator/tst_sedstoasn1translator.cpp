@@ -19,15 +19,20 @@
 
 #include <QObject>
 #include <QtTest>
+#include <asn1library/asn1/acnsequencecomponent.h>
 #include <asn1library/asn1/asn1model.h>
+#include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
+#include <asn1library/asn1/types/choice.h>
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/ia5string.h>
 #include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/null.h>
 #include <asn1library/asn1/types/real.h>
+#include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/type.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
@@ -46,7 +51,7 @@ using namespace seds::model;
 
 using conversion::Options;
 using conversion::asn1::translator::DataTypesDependencyResolver;
-using conversion::asn1::translator::NotDAGException;
+using conversion::asn1::translator::NotDagException;
 using conversion::asn1::translator::SedsToAsn1Translator;
 using conversion::asn1::translator::UndeclaredDataTypeException;
 using conversion::translator::TranslationException;
@@ -79,6 +84,12 @@ private Q_SLOTS:
     void testTranslateArrayDataTypeMultiDimension();
     void testTranslateBinaryDataType();
     void testTranslateBooleanDataType();
+    void testTranslateContainerSimpleWithEntry();
+    void testTranslateContainerSimpleWithErrorControlEntry();
+    void testTranslateContainerSimpleWithFixedValueEntry();
+    void testTranslateContainerSimpleWithLengthEntry();
+    void testTranslateContainerSimpleWithListEntry();
+    void testTranslateContainerExtensionOneLevel();
     void testTranslateEnumeratedDataType();
     void testTranslateIntegerDataType();
     void testTranslateFloatDataType();
@@ -189,7 +200,7 @@ void tst_SedsToAsn1Translator::testResolvingCyclicDependency()
 
     DataTypesDependencyResolver resolver;
 
-    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes), NotDAGException);
+    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes), NotDagException);
 }
 
 void tst_SedsToAsn1Translator::testResolvingUndeclaredType()
@@ -234,7 +245,6 @@ void tst_SedsToAsn1Translator::testTranslateArrayDataTypeOneDimension()
 
     const auto *sequenceOfType = dynamic_cast<const Types::SequenceOf *>(type);
     QVERIFY(sequenceOfType);
-
     QCOMPARE(sequenceOfType->identifier(), "Array");
     QCOMPARE(sequenceOfType->typeName(), "SEQUENCE OF");
 
@@ -249,7 +259,6 @@ void tst_SedsToAsn1Translator::testTranslateArrayDataTypeOneDimension()
 
     const auto *integerType = dynamic_cast<const Types::Integer *>(referencedType);
     QVERIFY(integerType);
-
     QCOMPARE(integerType->identifier(), "DataItem");
     QCOMPARE(integerType->typeName(), "INTEGER");
 }
@@ -280,7 +289,6 @@ void tst_SedsToAsn1Translator::testTranslateArrayDataTypeMultiDimension()
 
     const auto *sequenceOfType = dynamic_cast<const Types::SequenceOf *>(type);
     QVERIFY(sequenceOfType);
-
     QCOMPARE(sequenceOfType->identifier(), "Array");
     QCOMPARE(sequenceOfType->typeName(), "SEQUENCE OF");
 
@@ -289,7 +297,6 @@ void tst_SedsToAsn1Translator::testTranslateArrayDataTypeMultiDimension()
 
     const auto *sequenceOfType2 = dynamic_cast<const Types::SequenceOf *>(sequenceOfItemsType);
     QVERIFY(sequenceOfType2);
-
     QCOMPARE(sequenceOfType2->identifier(), "");
     QCOMPARE(sequenceOfType2->typeName(), "SEQUENCE OF");
 
@@ -298,7 +305,6 @@ void tst_SedsToAsn1Translator::testTranslateArrayDataTypeMultiDimension()
 
     const auto *sequenceOfType3 = dynamic_cast<const Types::SequenceOf *>(sequenceOfItemsType2);
     QVERIFY(sequenceOfType3);
-
     QCOMPARE(sequenceOfType3->identifier(), "");
     QCOMPARE(sequenceOfType3->typeName(), "SEQUENCE OF");
 
@@ -313,7 +319,6 @@ void tst_SedsToAsn1Translator::testTranslateArrayDataTypeMultiDimension()
 
     const auto *integerType = dynamic_cast<const Types::Integer *>(referencedType);
     QVERIFY(integerType);
-
     QCOMPARE(integerType->identifier(), "DataItem");
     QCOMPARE(integerType->typeName(), "INTEGER");
 }
@@ -389,6 +394,352 @@ void tst_SedsToAsn1Translator::testTranslateBooleanDataType()
     QCOMPARE(booleanType->identifier(), "Boolean");
     QCOMPARE(booleanType->typeName(), "BOOLEAN");
     QCOMPARE(booleanType->trueValue(), "0");
+}
+
+void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithEntry()
+{
+    // clang-format off
+    auto container = SedsContainerDataTypeBuilder("SimpleContainer")
+                        .withEntry("entry", "Integer")
+                     .build();
+    // clang-format on
+    // clang-format off
+    const auto &sedsModel = SedsModelBuilder("Model")
+                                .withContainerDataType(std::move(container))
+                                .withIntegerDataType("Integer")
+                            .build();
+    // clang-format on
+
+    Options options;
+    SedsToAsn1Translator translator;
+
+    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), ModelType::Asn1);
+
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+    QVERIFY(asn1Model);
+
+    const auto *type = getType(asn1Model, 1);
+    QVERIFY(type);
+
+    const auto *sequenceType = dynamic_cast<const Types::Sequence *>(type);
+    QVERIFY(sequenceType);
+    QCOMPARE(sequenceType->identifier(), "SimpleContainer");
+    QCOMPARE(sequenceType->typeName(), "SEQUENCE");
+
+    const auto &components = sequenceType->components();
+    QCOMPARE(components.size(), 1);
+
+    const auto *entryComponent = sequenceType->component("entry");
+    QVERIFY(entryComponent);
+    QVERIFY(dynamic_cast<const AsnSequenceComponent *>(entryComponent));
+
+    const auto *entryComponentType = entryComponent->type();
+    QVERIFY(entryComponentType);
+
+    const auto *entryComponentTypeReferenced = dynamic_cast<const Types::UserdefinedType *>(entryComponentType);
+    QVERIFY(entryComponentTypeReferenced);
+    QVERIFY(entryComponentTypeReferenced->type());
+
+    const auto *entryComponentTypeInteger = dynamic_cast<const Types::Integer *>(entryComponentTypeReferenced->type());
+    QCOMPARE(entryComponentTypeInteger->identifier(), "Integer");
+    QCOMPARE(entryComponentTypeInteger->typeName(), "INTEGER");
+}
+
+void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithErrorControlEntry()
+{
+    // clang-format off
+    auto container = SedsContainerDataTypeBuilder("SimpleContainer")
+                        .withErrorControlEntry("errorControlEntry", "CrcData", CoreErrorControl::Crc16)
+                     .build();
+    // clang-format on
+    // clang-format off
+    const auto &sedsModel = SedsModelBuilder("Model")
+                                .withContainerDataType(std::move(container))
+                                .withIntegerDataType("CrcData")
+                            .build();
+    // clang-format on
+
+    Options options;
+    SedsToAsn1Translator translator;
+
+    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), ModelType::Asn1);
+
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+    QVERIFY(asn1Model);
+
+    const auto *type = getType(asn1Model, 1);
+    QVERIFY(type);
+
+    const auto *sequenceType = dynamic_cast<const Types::Sequence *>(type);
+    QVERIFY(sequenceType);
+    QCOMPARE(sequenceType->identifier(), "SimpleContainer");
+    QCOMPARE(sequenceType->typeName(), "SEQUENCE");
+
+    const auto &components = sequenceType->components();
+    QCOMPARE(components.size(), 1);
+
+    const auto *entryComponent = sequenceType->component("errorControlEntry");
+    QVERIFY(entryComponent);
+    QVERIFY(dynamic_cast<const AcnSequenceComponent *>(entryComponent));
+
+    const auto *entryComponentType = entryComponent->type();
+    QVERIFY(entryComponentType);
+
+    const auto *entryComponentTypeReferenced = dynamic_cast<const Types::Null *>(entryComponentType);
+    QVERIFY(entryComponentTypeReferenced);
+    QCOMPARE(entryComponentTypeReferenced->identifier(), "errorControlEntry");
+    QCOMPARE(entryComponentTypeReferenced->typeName(), "NULL");
+}
+
+void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithFixedValueEntry()
+{
+    // clang-format off
+    auto container = SedsContainerDataTypeBuilder("SimpleContainer")
+                        .withFixedValueEntry("fixedValueEntry", "Integer", "10")
+                    .build();
+    // clang-format on
+    // clang-format off
+    const auto &sedsModel = SedsModelBuilder("Model")
+                                .withContainerDataType(std::move(container))
+                                .withIntegerDataType("Integer")
+                            .build();
+    // clang-format on
+
+    Options options;
+    SedsToAsn1Translator translator;
+
+    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), ModelType::Asn1);
+
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+    QVERIFY(asn1Model);
+
+    const auto *type = getType(asn1Model, 1);
+    QVERIFY(type);
+
+    const auto *sequenceType = dynamic_cast<const Types::Sequence *>(type);
+    QVERIFY(sequenceType);
+    QCOMPARE(sequenceType->identifier(), "SimpleContainer");
+    QCOMPARE(sequenceType->typeName(), "SEQUENCE");
+
+    const auto &components = sequenceType->components();
+    QCOMPARE(components.size(), 1);
+
+    const auto *entryComponent = sequenceType->component("fixedValueEntry");
+    QVERIFY(entryComponent);
+    QVERIFY(dynamic_cast<const AsnSequenceComponent *>(entryComponent));
+
+    const auto *entryComponentType = entryComponent->type();
+    QVERIFY(entryComponentType);
+
+    const auto *entryComponentTypeReferenced = dynamic_cast<const Types::UserdefinedType *>(entryComponentType);
+    QVERIFY(entryComponentTypeReferenced);
+    QVERIFY(entryComponentTypeReferenced->type());
+
+    const auto *entryComponentTypeInteger = dynamic_cast<const Types::Integer *>(entryComponentTypeReferenced->type());
+    QVERIFY(entryComponentTypeInteger);
+    QCOMPARE(entryComponentTypeInteger->identifier(), "Integer");
+    QCOMPARE(entryComponentTypeInteger->typeName(), "INTEGER");
+
+    const auto &entryComponentTypeConstraints = entryComponentTypeInteger->constraints();
+    QCOMPARE(entryComponentTypeConstraints.constraints().size(), 2);
+
+    const auto &entryComponentTypeValueConstraint = entryComponentTypeConstraints.constraints().at(1);
+    QVERIFY(entryComponentTypeValueConstraint);
+
+    const auto &entryComponentTypeValueRangeConstraint =
+            dynamic_cast<const Constraints::RangeConstraint<IntegerValue> *>(entryComponentTypeValueConstraint.get());
+    QVERIFY(entryComponentTypeValueRangeConstraint);
+    QVERIFY(entryComponentTypeValueRangeConstraint->range().isSingleItem());
+    QCOMPARE(entryComponentTypeValueRangeConstraint->range().begin(), 10);
+}
+
+void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithLengthEntry()
+{
+    // clang-format off
+    auto container = SedsContainerDataTypeBuilder("SimpleContainer")
+                        .withLengthEntry("entry", "Integer")
+                     .build();
+    // clang-format on
+    // clang-format off
+    const auto &sedsModel = SedsModelBuilder("Model")
+                                .withContainerDataType(std::move(container))
+                                .withIntegerDataType("Integer")
+                            .build();
+    // clang-format on
+
+    Options options;
+    SedsToAsn1Translator translator;
+
+    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), ModelType::Asn1);
+
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+    QVERIFY(asn1Model);
+
+    const auto *type = getType(asn1Model, 1);
+    QVERIFY(type);
+
+    const auto *sequenceType = dynamic_cast<const Types::Sequence *>(type);
+    QVERIFY(sequenceType);
+    QCOMPARE(sequenceType->identifier(), "SimpleContainer");
+    QCOMPARE(sequenceType->typeName(), "SEQUENCE");
+
+    const auto &components = sequenceType->components();
+    QCOMPARE(components.size(), 1);
+
+    const auto *entryComponent = sequenceType->component("entry");
+    QVERIFY(entryComponent);
+    QVERIFY(dynamic_cast<const AcnSequenceComponent *>(entryComponent));
+
+    const auto *entryComponentType = entryComponent->type();
+    QVERIFY(entryComponentType);
+
+    const auto *entryComponentTypeReferenced = dynamic_cast<const Types::UserdefinedType *>(entryComponentType);
+    QVERIFY(entryComponentTypeReferenced);
+    QVERIFY(entryComponentTypeReferenced->type());
+
+    const auto *entryComponentTypeInteger = dynamic_cast<const Types::Integer *>(entryComponentTypeReferenced->type());
+    QVERIFY(entryComponentTypeInteger);
+    QCOMPARE(entryComponentTypeInteger->identifier(), "Integer");
+    QCOMPARE(entryComponentTypeInteger->typeName(), "INTEGER");
+}
+
+void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithListEntry()
+{
+    // clang-format off
+    auto container = SedsContainerDataTypeBuilder("SimpleContainer")
+                        .withEntry("size", "Integer")
+                        .withListEntry("entry", "Integer", "size")
+                     .build();
+    // clang-format on
+    // clang-format off
+    const auto &sedsModel = SedsModelBuilder("Model")
+                                .withContainerDataType(std::move(container))
+                                .withIntegerDataType("Integer")
+                            .build();
+    // clang-format on
+
+    Options options;
+    SedsToAsn1Translator translator;
+
+    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), ModelType::Asn1);
+
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+    QVERIFY(asn1Model);
+
+    const auto *type = getType(asn1Model, 1);
+    QVERIFY(type);
+
+    const auto *sequenceType = dynamic_cast<const Types::Sequence *>(type);
+    QVERIFY(sequenceType);
+    QCOMPARE(sequenceType->identifier(), "SimpleContainer");
+    QCOMPARE(sequenceType->typeName(), "SEQUENCE");
+
+    const auto &components = sequenceType->components();
+    QCOMPARE(components.size(), 2);
+
+    const auto *entryComponent = sequenceType->component("entry");
+    QVERIFY(entryComponent);
+    QVERIFY(dynamic_cast<const AcnSequenceComponent *>(entryComponent));
+
+    const auto *entryComponentType = entryComponent->type();
+    QVERIFY(entryComponentType);
+
+    const auto *entryComponentTypeSequenceOf = dynamic_cast<const Types::SequenceOf *>(entryComponentType);
+    QVERIFY(entryComponentTypeSequenceOf);
+    QVERIFY(entryComponentTypeSequenceOf->itemsType());
+
+    const auto *entryComponentTypeReferenced =
+            dynamic_cast<const Types::UserdefinedType *>(entryComponentTypeSequenceOf->itemsType());
+    QVERIFY(entryComponentTypeReferenced);
+    QCOMPARE(entryComponentTypeReferenced->type()->typeName(), "INTEGER");
+}
+
+void tst_SedsToAsn1Translator::testTranslateContainerExtensionOneLevel()
+{
+    // clang-format off
+    auto parentContainer = SedsContainerDataTypeBuilder("ParentContainer")
+                                .setAbstract()
+                                .withEntry("field", "Integer")
+                                .withTrailerEntry("trailing", "Integer")
+                           .build();
+
+    auto childContainer1 = SedsContainerDataTypeBuilder("ChildContainer1")
+                                .setBaseType("ParentContainer")
+                                .withEntry("intA", "Integer")
+                           .build();
+
+    auto childContainer2 = SedsContainerDataTypeBuilder("ChildContainer2")
+                                .setBaseType("ParentContainer")
+                                .withEntry("intB", "Integer")
+                                .withEntry("intC", "Integer")
+                           .build();
+
+    const auto &sedsModel = SedsModelBuilder("Model")
+                                .withContainerDataType(std::move(childContainer1))
+                                .withContainerDataType(std::move(childContainer2))
+                                .withContainerDataType(std::move(parentContainer))
+                                .withIntegerDataType("Integer")
+                            .build();
+    // clang-format on
+
+    Options options;
+    SedsToAsn1Translator translator;
+
+    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), ModelType::Asn1);
+
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+    QVERIFY(asn1Model);
+
+    const auto *parentType = getType(asn1Model, 1);
+    QVERIFY(parentType);
+    QCOMPARE(parentType->typeName(), "SEQUENCE");
+
+    const auto *parentSequence = dynamic_cast<const Types::Sequence *>(parentType);
+    QVERIFY(parentSequence);
+    QCOMPARE(parentSequence->identifier(), "ParentContainer");
+    QCOMPARE(parentSequence->components().size(), 1);
+
+    const auto *childContainer1Type = getType(asn1Model, 2);
+    QVERIFY(childContainer1Type);
+    QCOMPARE(childContainer1Type->typeName(), "SEQUENCE");
+
+    const auto *child1Sequence = dynamic_cast<const Types::Sequence *>(childContainer1Type);
+    QVERIFY(child1Sequence);
+    QCOMPARE(child1Sequence->identifier(), "ChildContainer1");
+    QCOMPARE(child1Sequence->components().size(), 3);
+
+    const auto *childContainer2Type = getType(asn1Model, 3);
+    QVERIFY(childContainer2Type);
+    QCOMPARE(childContainer2Type->typeName(), "SEQUENCE");
+
+    const auto *child2Sequence = dynamic_cast<const Types::Sequence *>(childContainer2Type);
+    QVERIFY(child2Sequence);
+    QCOMPARE(child2Sequence->identifier(), "ChildContainer2");
+    QCOMPARE(child2Sequence->components().size(), 4);
 }
 
 void tst_SedsToAsn1Translator::testTranslateEnumeratedDataType()

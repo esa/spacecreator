@@ -35,6 +35,8 @@ public:
     inline static const QString generateFunctionsForPackages = "Iv_Translation_GenerateFunctionsForPackages";
     /** @biref Export output file */
     inline static const QString outputFilename = "Iv_Export_OutputFilename";
+    /** @brief Default IV parser file name*/
+    inline static const QString defaultConfigFilename = "config.xml";
 };
 
 } // namespace conversion::seds

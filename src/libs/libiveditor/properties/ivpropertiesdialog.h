@@ -59,7 +59,8 @@ private:
     void initCommentView();
     void initLanguageView();
 
-    QPointer<ivm::AbstractSystemChecks> m_checks;
+    QPointer<ivm::AbstractSystemChecks> m_ivChecks;
+    QPointer<Asn1Acn::Asn1SystemChecks> m_asn1Checks;
 };
 
 } // namespace ive

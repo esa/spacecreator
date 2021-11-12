@@ -26,23 +26,19 @@
 namespace sdl {
 
 /**
- * @brief   Represents an SDL data model.
+ * @brief   Represents an SDL process model.
  *
  * Stores a reference to the Process.
  */
 class SdlModel final : public conversion::Model
 {
 public:
-    /** @brief Model data type **/
-    using Data = Process;
-
     /**
      * @brief   Constructor
      *
-     * @param data     model data (Process)
-     * @param name     name of this data model
+     * @param name        name of this process model
      */
-    explicit SdlModel(Data data, QString name = "");
+    explicit SdlModel(QString name = "");
 
     /**
      * @brief   Deleted copy constructor/
@@ -72,18 +68,18 @@ public:
     virtual auto modelType() const -> conversion::ModelType override;
 
     /**
-     * @brief   Getter for model data
+     * @brief   Getter for processes stored in a model
      *
-     * @returns Model data
+     * @returns Model processes
      */
-    auto data() const -> const Data &;
+    auto processes() const -> const std::vector<Process> &;
 
     /**
-     * @brief   Setter for model data
+     * @brief   Add a Process to the model
      *
-     * @param   data model data
+     * @param   process    process
      */
-    auto setData(Data data) -> void;
+    auto addProcess(Process process) -> void;
 
     /**
      * @brief   Getter for model name
@@ -100,8 +96,8 @@ public:
     auto setName(QString name) -> void;
 
 private:
-    /** @brief  Model data */
-    Data m_data;
+    /** @brief  Model processes */
+    std::vector<Process> m_processes;
     /** @brief  Model name */
     QString m_name;
 };
@@ -114,7 +110,7 @@ namespace conversion {
  * @brief   Specialization for SDL model properties
  */
 template<>
-struct ModelProperties<sdl::SdlModel> {
+struct ModelProperties<::sdl::SdlModel> {
     /// @brief  Model type
     static const ModelType type = ModelType::Sdl;
 };

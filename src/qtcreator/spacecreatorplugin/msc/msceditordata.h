@@ -40,14 +40,10 @@ class MscEditorData : public QObject
 {
     Q_OBJECT
 public:
-    MscEditorData(
-            SpaceCreatorProjectManager *projectManager, const QList<QAction *> &mscActions, QObject *parent = nullptr);
+    MscEditorData(SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
     ~MscEditorData() override;
 
     Core::IEditor *createEditor();
-
-public Q_SLOTS:
-    void setMinimapVisible(bool visible);
 
 private Q_SLOTS:
     void onCurrentEditorChanged(Core::IEditor *editor);
@@ -56,10 +52,7 @@ private:
     MscContext *m_context = nullptr;
     QUndoGroup *m_undoGroup = nullptr;
 
-    bool m_minimapVisible = false;
-
     QPointer<SpaceCreatorProjectManager> m_projectManager;
-    QList<QAction *> m_mscActions;
 };
 
 }

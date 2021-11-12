@@ -36,7 +36,7 @@ class MscEditorFactory : public Core::IEditorFactory
     Q_OBJECT
 
 public:
-    MscEditorFactory(SpaceCreatorProjectManager *projectManager, const QList<QAction *> &mscActions, QObject *parent);
+    MscEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent);
 
 #if QTC_VERSION == 48
     Core::IEditor *createEditor() override { return createMSCEditor(); }

@@ -75,6 +75,7 @@ protected:
         QHash<QString, QVariant> grouppedObjects;
 
         for (const auto &object : objects) {
+            object->updateForExport();
             if (object->parentObject() != nullptr)
                 continue;
 

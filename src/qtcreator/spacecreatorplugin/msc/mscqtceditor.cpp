@@ -17,6 +17,7 @@
 
 #include "mscqtceditor.h"
 
+#include "mscappwidget.h"
 #include "msceditordocument.h"
 #include "mscmainwidget.h"
 #include "spacecreatorpluginconstants.h"
@@ -28,11 +29,10 @@
 
 namespace spctr {
 
-MscQtCEditor::MscQtCEditor(SpaceCreatorProjectManager *projectManager, const QList<QAction *> &toolbarActions)
+MscQtCEditor::MscQtCEditor(SpaceCreatorProjectManager *projectManager)
     : Core::IEditor()
     , m_document(new MscEditorDocument(projectManager, this))
     , m_editorWidget(new MscMainWidget)
-    , m_globalToolbarActions(toolbarActions)
 {
     setContext(Core::Context(spctr::Constants::K_MSC_EDITOR_ID));
     setWidget(m_editorWidget);
@@ -70,16 +70,6 @@ QWidget *MscQtCEditor::toolBar()
         m_toolbar = new QToolBar;
         m_toolbar->addAction(mscCore->actionUndo());
         m_toolbar->addAction(mscCore->actionRedo());
-        m_toolbar->addSeparator();
-        m_toolbar->addAction(mscCore->deleteTool()->action());
-        m_toolbar->addSeparator();
-        m_toolbar->addAction(mscCore->actionCopy());
-        m_toolbar->addAction(mscCore->actionPaste());
-        m_toolbar->addSeparator();
-        m_toolbar->addAction(mscCore->actionMessageDeclarations());
-        for (QAction *action : qAsConst(m_globalToolbarActions)) {
-            m_toolbar->addAction(action);
-        }
     }
 
     return m_toolbar;

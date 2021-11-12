@@ -1,22 +1,7 @@
 <InterfaceView asn1file="template.asn">
-<Function name="Modemanager" is_type="NO" language="SDL">
-    <Property name="Taste::coordinates" value="48500 52900 68500 60900"/>
-<Provided_Interface name="some_input_name" kind="Sporadic">
-    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="68500 54600"/>
-    <Property name="Taste::InnerCoordinates" value="0 0"/>
-</Provided_Interface>
-
-<Provided_Interface name="some_other_input_name" kind="Sporadic">
-    <Property name="Taste::coordinates" value="49500 52900"/>
-    <Property name="Taste::InnerCoordinates" value="0 0"/>
-</Provided_Interface>
-
-</Function>
-
 <Function name="gui" is_type="NO" language="GUI">
     <Property name="Taste::coordinates" value="21500 29100 41500 37100"/>
-<Required_Interface name="some_input_name" kind="Sporadic">
+<Required_Interface name="startProcess" kind="Sporadic">
     <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
     <Property name="Taste::coordinates" value="41500 34000"/>
     <Property name="Taste::InnerCoordinates" value="0 0"/>
@@ -24,8 +9,15 @@
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
-<Required_Interface name="some_other_input_name" kind="Sporadic">
+<Required_Interface name="someInput" kind="Sporadic">
     <Property name="Taste::coordinates" value="36300 37100"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="someOtherInput" kind="Sporadic">
+    <Property name="Taste::coordinates" value="21500 35400"/>
     <Property name="Taste::InnerCoordinates" value="0 0"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="false"/>
@@ -33,16 +25,42 @@
 
 </Function>
 
+<Function name="basicProcess" is_type="NO" language="SDL">
+    <Property name="Taste::coordinates" value="48500 52900 68500 60900"/>
+<Provided_Interface name="startProcess" kind="Sporadic">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="68500 52900"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="someInput" kind="Sporadic">
+    <Property name="Taste::coordinates" value="49500 52900"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="someOtherInput" kind="Sporadic">
+    <Property name="Taste::coordinates" value="50200 60900"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+</Function>
+
 <Connection >
-    <Source func_name="gui" ri_name="some_input_name"/>
-    <Target func_name="Modemanager" pi_name="some_input_name"/>
-    <Property name="Taste::coordinates" value="42100 34000 70100 34000 70100 54600 68800 54600"/>
+    <Source func_name="gui" ri_name="someOtherInput"/>
+    <Target func_name="basicProcess" pi_name="someOtherInput"/>
+    <Property name="Taste::coordinates" value="20900 35400 19300 35400 19300 38700 19900 62500 50200 62500 50200 61200"/>
 </Connection>
 
 <Connection >
-    <Source func_name="gui" ri_name="some_other_input_name"/>
-    <Target func_name="Modemanager" pi_name="some_other_input_name"/>
+    <Source func_name="gui" ri_name="someInput"/>
+    <Target func_name="basicProcess" pi_name="someInput"/>
     <Property name="Taste::coordinates" value="36300 37700 36300 45100 49500 45100 49500 52600"/>
+</Connection>
+
+<Connection >
+    <Source func_name="gui" ri_name="startProcess"/>
+    <Target func_name="basicProcess" pi_name="startProcess"/>
+    <Property name="Taste::coordinates" value="42100 34000 68500 34000 68500 52600"/>
 </Connection>
 
 <Comment name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3">

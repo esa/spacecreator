@@ -1,0 +1,34 @@
+<InterfaceView asn1file="procedureWithParamsAndReturn.asn">
+<Function name="gui" is_type="NO" language="GUI">
+    <Property name="Taste::coordinates" value="21500 29100 41500 37100"/>
+<Required_Interface name="some_input_name" kind="Sporadic">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="41500 34000"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+</Function>
+
+<Function name="procedureWithParamsAndReturn" is_type="NO" language="SDL">
+    <Property name="Taste::coordinates" value="37800 52900 68500 60900"/>
+<Provided_Interface name="startProcess" kind="Sporadic">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="68500 54600"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+</Function>
+
+<Connection >
+    <Source func_name="gui" ri_name="some_input_name"/>
+    <Target func_name="procedureWithParamsAndReturn" pi_name="startProcess"/>
+    <Property name="Taste::coordinates" value="42100 34000 70100 34000 70100 54600 68800 54600"/>
+</Connection>
+
+<Comment name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3">
+    <Property name="Taste::coordinates" value="4800 5100 46100 20700"/>
+</Comment>
+
+</InterfaceView>

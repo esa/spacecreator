@@ -45,11 +45,11 @@ class SedsToIvTranslator final : public ::conversion::translator::Translator
 {
 public:
     /**
-     * @brief   Translate given SEDS models into an ASN.1 model
+     * @brief   Translate given SEDS models into an InterfaceView model
      *
      * @param   sources     List of SEDS models
      *
-     * @return  ASN.1 model translated from SEDS models
+     * @return  InterfaceView model translated from SEDS models
      */
     virtual auto translateModels(std::vector<Model *> sourceModels, const Options &options) const
             -> std::vector<std::unique_ptr<Model>> override;

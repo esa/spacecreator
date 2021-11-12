@@ -1,0 +1,36 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process decisionexpressionandanswer;
+    /* CIF TEXT (564, 198), (118, 45) */
+    dcl x MyInteger;
+    /* CIF ENDTEXT */
+    /* CIF START (412, 76), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (412, 131), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (412, 131), (70, 35) */
+    state Wait;
+        /* CIF input (387, 186), (111, 35) */
+        input startProcess(x);
+            /* CIF decision (386, 241), (115, 50) */
+            decision x;
+                /* CIF ANSWER (268, 311), (70, 24) */
+                (1):
+                    /* CIF NEXTSTATE (268, 355), (70, 35) */
+                    NEXTSTATE -;
+                /* CIF ANSWER (448, 323), (77, 24) */
+                (>1):
+                    /* CIF output (389, 367), (194, 35) */
+                    output sendOutput(x);
+                    /* CIF task (405, 422), (161, 35) */
+                    task 'SOME EXAMPLE TASK';
+                    /* CIF NEXTSTATE (451, 472), (70, 35) */
+                    NEXTSTATE -;
+                /* CIF ANSWER (637, 311), (70, 24) */
+                else:
+                    /* CIF task (594, 355), (154, 35) */
+                    task  'ANSWER UNKNOWN';
+                    /* CIF NEXTSTATE (637, 410), (70, 35) */
+                    NEXTSTATE -;
+            enddecision;
+    endstate;
+endprocess decisionexpressionandanswer;

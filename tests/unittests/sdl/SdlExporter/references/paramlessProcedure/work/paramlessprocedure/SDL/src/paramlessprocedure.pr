@@ -1,0 +1,27 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Paramlessprocedure;
+    /* CIF procedure (583, 156), (161, 40) */
+    procedure myParamlessProcedure;
+        /* CIF START (200, 61), (70, 35) */
+        START;
+            /* CIF task (141, 116), (186, 35) */
+            task 'TASK INSIDE PROCEDURE';
+            /* CIF task (114, 171), (240, 35) */
+            task 'SECOND TASK INSIDE PROCEDURE';
+            /* CIF return (217, 226), (35, 35) */
+            return ;
+    endprocedure;
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (320, 60), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (320, 60), (70, 35) */
+    state Wait;
+        /* CIF input (298, 115), (111, 35) */
+        input startProcess;
+            /* CIF PROCEDURECALL (273, 170), (161, 35) */
+            call myParamlessprocedure;
+            /* CIF NEXTSTATE (319, 234), (70, 35) */
+            NEXTSTATE -;
+    endstate;
+endprocess Paramlessprocedure;

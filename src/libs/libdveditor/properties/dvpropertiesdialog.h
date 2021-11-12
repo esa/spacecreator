@@ -54,7 +54,8 @@ protected:
 private:
     void initAttributesView();
 
-    dvm::AbstractSystemChecks *m_systemChecker = nullptr;
+    dvm::AbstractSystemChecks *m_dvChecker = nullptr;
+    Asn1Acn::Asn1SystemChecks *m_asn1Checks = nullptr;
 };
 
 } // namespace dve

@@ -84,6 +84,21 @@ public:
 };
 
 /**
+ * @brief   Thrown when SEDS references an ASN.1 type (ie. as an entry type) but the definition is not present
+ *          in the ASN.1 model
+ */
+class MissingAsn1TypeDefinitionException : public TranslationException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   asn1TypeName    Name of the missing ASN.1 type
+     */
+    explicit MissingAsn1TypeDefinitionException(const QString &asn1TypeName);
+};
+
+/**
  * @brief   Exception thrown when translator encounters unhandled value while handling enum values
  */
 class UnhandledValueException : public TranslationException

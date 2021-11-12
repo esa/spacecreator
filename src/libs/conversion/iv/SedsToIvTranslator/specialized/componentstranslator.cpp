@@ -22,11 +22,13 @@
 #include "specialized/asyncinterfacecommandtranslator.h"
 #include "specialized/syncinterfacecommandtranslator.h"
 
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivcommonprops.h>
 #include <ivcore/ivfunction.h>
 #include <seds/SedsModel/package/package.h>
 
+using conversion::Escaper;
 using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredInterfaceException;
 using conversion::translator::UnhandledValueException;
@@ -55,7 +57,8 @@ QVector<ivm::IVFunction *> ComponentsTranslator::translateComponents()
 ivm::IVFunction *ComponentsTranslator::translateComponent(const seds::model::Component &sedsComponent)
 {
     auto *ivFunction = new ivm::IVFunction();
-    ivFunction->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name), sedsComponent.nameStr());
+    ivFunction->setEntityAttribute(
+            ivm::meta::Props::token(ivm::meta::Props::Token::name), Escaper::escapeIvName(sedsComponent.nameStr()));
 
     for (const auto &sedsInterface : sedsComponent.providedInterfaces()) {
         translateInterface(sedsInterface, sedsComponent, ivm::IVInterface::InterfaceType::Provided, ivFunction);

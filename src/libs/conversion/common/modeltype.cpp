@@ -37,6 +37,8 @@ QString modelTypeToString(ModelType modelType)
         return QStringLiteral("SDL");
     case ModelType::Seds:
         return QStringLiteral("SEDS");
+    case ModelType::Promela:
+        return QStringLiteral("Promela");
     default:
         return QStringLiteral("unhandled model type");
     }
@@ -46,6 +48,26 @@ QString modelTypesToString(const std::set<ModelType> &modelsTypes)
 {
     return std::accumulate(std::next(modelsTypes.begin()), modelsTypes.end(), modelTypeToString(*modelsTypes.begin()),
             [](const QString &acc, ModelType modelType) { return acc + ", " + modelTypeToString(modelType); });
+}
+
+ModelType stringToModelType(const QString &s)
+{
+    if (!s.compare("ASN.1", Qt::CaseInsensitive)) {
+        return conversion::ModelType::Asn1;
+    }
+    if (!s.compare("SEDS", Qt::CaseInsensitive)) {
+        return conversion::ModelType::Seds;
+    }
+    if (!s.compare("InterfaceView", Qt::CaseInsensitive)) {
+        return conversion::ModelType::InterfaceView;
+    }
+    if (!s.compare("SDL", Qt::CaseInsensitive)) {
+        return conversion::ModelType::Sdl;
+    }
+    if (!s.compare("Promela", Qt::CaseInsensitive)) {
+        return conversion::ModelType::Promela;
+    }
+    return conversion::ModelType::Unspecified;
 }
 
 } // namespace conversion

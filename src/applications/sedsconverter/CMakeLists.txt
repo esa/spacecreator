@@ -1,8 +1,10 @@
 project(SedsConverter VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES main.cpp
+            sedsconvertercli.cpp
             sedsconverter.cpp)
-set(INCLUDES sedsconverter.h)
+set(INCLUDES sedsconvertercli.h
+             sedsconverter.h)
 
 add_executable(SedsConverter)
 target_sources(SedsConverter
@@ -16,6 +18,12 @@ target_link_libraries(SedsConverter
                 Conversion::Registry
                 Conversion::Asn1Registrar
                 Conversion::IvRegistrar
-                Conversion::SedsRegistrar)
+                Conversion::SedsRegistrar
+                Conversion::SdlRegistrar)
+
+set_target_properties(SedsConverter PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    OUTPUT_NAME "sedsconverter"
+)
 
 add_format_target(SedsConverter)

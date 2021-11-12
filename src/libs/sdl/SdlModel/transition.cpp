@@ -19,6 +19,7 @@
 
 #include "transition.h"
 
+#include <exception>
 #include <memory>
 #include <sdl/SdlExporter/visitors/visitor.h>
 
@@ -31,6 +32,16 @@ const std::vector<std::unique_ptr<Action>> &Transition::actions()
 
 void Transition::addAction(std::unique_ptr<Action> action)
 {
+    if (!m_actions.empty()) {
+        auto &lastAddedAction = m_actions.back();
+        if (dynamic_cast<Join *>(lastAddedAction.get()) != nullptr) {
+            throw std::logic_error("Adding action after Join is illegal");
+        }
+        if (dynamic_cast<NextState *>(lastAddedAction.get()) != nullptr) {
+            throw std::logic_error("Adding action after NextState is illegal");
+        }
+    }
+
     m_actions.push_back(std::move(action));
 }
 

@@ -12,8 +12,8 @@ target_include_directories(IvRegistrar
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(IvRegistrar
     PUBLIC      Conversion::Common
-                Conversion::IvXmlImporter
-                Conversion::IvXmlExporter
+                IV::XmlImporter
+                IV::XmlExporter
                 Conversion::SedsToIvTranslator
     PRIVATE     CommonProjectWarnings)
 

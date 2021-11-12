@@ -22,10 +22,6 @@
 #include <QDialog>
 #include <memory>
 
-namespace Asn1Acn {
-class Asn1SystemChecks;
-}
-
 namespace shared {
 class VEObject;
 class PropertyTemplateConfig;
@@ -35,7 +31,7 @@ class PropertiesDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit PropertiesDialog(PropertyTemplateConfig *dynPropConfig, VEObject *obj, Asn1Acn::Asn1SystemChecks *asn1Checks,
+    explicit PropertiesDialog(PropertyTemplateConfig *dynPropConfig, VEObject *obj,
             cmd::CommandsStackBase *commandsStack, QWidget *parent = nullptr);
     ~PropertiesDialog() override;
 
@@ -53,7 +49,6 @@ protected:
     cmd::CommandsStackBase::Macro *commandMacro() const;
     cmd::CommandsStackBase *commandStack() const;
     PropertyTemplateConfig *propertiesConfig() const;
-    Asn1Acn::Asn1SystemChecks *asn1Checks() const;
 
 private:
     struct PropertiesDialogPrivate;

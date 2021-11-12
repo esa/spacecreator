@@ -1,0 +1,33 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Returnlessprocedure;
+    /* CIF TEXT (574, 72), (267, 140) */
+    dcl x MyInteger;
+    /* CIF ENDTEXT */
+    /* CIF procedure (568, 311), (144, 40) */
+    procedure returnlessProcedure;
+        /* CIF TEXT (305, 151), (267, 140) */
+        fpar
+          in a MyInteger,
+          in b MyInteger;
+        /* CIF ENDTEXT */
+        /* CIF START (67, 34), (70, 35) */
+        START;
+            /* CIF task (40, 89), (123, 35) */
+            task 'EXAMPLE';
+            /* CIF return (84, 144), (35, 35) */
+            return ;
+    endprocedure;
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (320, 60), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (320, 60), (70, 35) */
+    state Wait;
+        /* CIF input (298, 115), (111, 35) */
+        input startProcess(x);
+            /* CIF PROCEDURECALL (268, 170), (172, 35) */
+            call returnlessProcedure(x, 2);
+            /* CIF NEXTSTATE (319, 225), (70, 35) */
+            NEXTSTATE -;
+    endstate;
+endprocess Returnlessprocedure;

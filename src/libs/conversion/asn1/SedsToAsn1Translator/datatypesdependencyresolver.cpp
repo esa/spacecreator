@@ -55,7 +55,7 @@ void DataTypesDependencyResolver::visit(const seds::model::DataType *dataType)
     }
 
     if (isTemporarilyMarked(dataType)) {
-        throw NotDAGException();
+        throw NotDagException();
     }
 
     markTemporary(dataType);
@@ -80,20 +80,30 @@ void DataTypesDependencyResolver::visitArray(const seds::model::ArrayDataType &a
 
 void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDataType &containerDataType)
 {
-    for (const auto &containerEntry : containerDataType.entries()) {
-        std::visit(
-                [this](auto &&entry) {
-                    using T = std::decay_t<decltype(entry)>;
-                    if constexpr (std::is_same_v<T, seds::model::PaddingEntry>) {
-                        return;
-                    } else {
-                        const auto &entryDataTypeRef = entry.type();
-                        const auto *entryDataType = findDataType(entryDataTypeRef);
+    const auto visitor = [this](auto &&entry) {
+        using T = std::decay_t<decltype(entry)>;
+        if constexpr (std::is_same_v<T, seds::model::PaddingEntry>) {
+            return;
+        } else {
+            const auto &entryDataTypeRef = entry.type();
+            const auto *entryDataType = findDataType(entryDataTypeRef);
 
-                        visit(entryDataType);
-                    }
-                },
-                containerEntry);
+            visit(entryDataType);
+        }
+    };
+
+    for (const auto &containerEntry : containerDataType.entries()) {
+        std::visit(visitor, containerEntry);
+    }
+    for (const auto &containerTrailerEntry : containerDataType.trailerEntries()) {
+        std::visit(visitor, containerTrailerEntry);
+    }
+
+    const auto &baseTypeRef = containerDataType.baseType();
+    if (baseTypeRef) {
+        const auto *baseType = findDataType(*baseTypeRef);
+
+        visit(baseType);
     }
 }
 
@@ -138,19 +148,14 @@ bool DataTypesDependencyResolver::isPermanentlyMarked(const seds::model::DataTyp
     return m_marks.at(dataType) == MarkType::Permanent;
 }
 
-const char *NotDAGException::what() const noexcept
-{
-    return "Data types doesn't make a DAG";
-}
-
-UndeclaredDataTypeException::UndeclaredDataTypeException(QString dataTypeName)
-    : m_message(QString("Undeclared data type '%1'").arg(std::move(dataTypeName)).toStdString())
+NotDagException::NotDagException()
+    : ConversionException("Data types doesn't make a DAG")
 {
 }
 
-const char *UndeclaredDataTypeException::what() const noexcept
+UndeclaredDataTypeException::UndeclaredDataTypeException(const QString &dataTypeName)
+    : ConversionException(QString("Undeclared data type '%1'").arg(dataTypeName))
 {
-    return m_message.c_str();
 }
 
 } // namespace conversion::asn1::translator

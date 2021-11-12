@@ -46,6 +46,7 @@ enum class ModelType
  * @param   String with model type name
  */
 auto modelTypeToString(ModelType modelType) -> QString;
+
 /**
  * @brief   Converts given set of model types to string
  *
@@ -54,5 +55,14 @@ auto modelTypeToString(ModelType modelType) -> QString;
  * @return  String with model types names separated with comma
  */
 auto modelTypesToString(const std::set<ModelType> &modelsTypes) -> QString;
+
+/**
+ * @brief   Converts given model type to string
+ *
+ * @param   s   String with model type name
+ *
+ * @param   Model type from string
+ */
+auto stringToModelType(const QString &s) -> ModelType;
 
 } // namespace conversion

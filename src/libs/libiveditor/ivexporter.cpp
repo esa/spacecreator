@@ -122,8 +122,8 @@ QHash<QString, QVariant> IVExporter::collectInterfaceObjects(InterfaceDocument *
 {
     QHash<QString, QVariant> grouppedObjects = collectObjects(doc->objects().values());
     // Add meta-data
-    if (!doc->asn1FileName().isEmpty()) {
-        grouppedObjects["Asn1FileName"] = QVariant::fromValue(doc->asn1FileName());
+    for (const QString &asnFileName : doc->asn1FilesNames()) {
+        grouppedObjects["Asn1FileName"] = QVariant::fromValue(asnFileName);
     }
     if (!doc->mscFileName().isEmpty()) {
         grouppedObjects["MscFileName"] = QVariant::fromValue(doc->mscFileName());

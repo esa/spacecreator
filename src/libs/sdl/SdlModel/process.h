@@ -20,6 +20,7 @@
 #pragma once
 
 #include "node.h"
+#include "procedure.h"
 #include "statemachine.h"
 #include "variabledeclaration.h"
 
@@ -28,36 +29,6 @@
 #include <vector>
 
 namespace sdl {
-
-class Procedure
-{
-    // TODO: extract to a separate file
-
-    /**
-     * @brief   Default constructor
-     */
-    Procedure() = default;
-
-    /**
-     * @brief   Deleted move constructor
-     */
-    Procedure(const Procedure &) = delete;
-
-    /**
-     * @brief   Default move constructor
-     */
-    Procedure(Procedure &&) = default;
-
-    /**
-     * @brief   Deleted copy assignment operator
-     */
-    Procedure &operator=(const Procedure &) = delete;
-
-    /**
-     * @brief   Default move assignment operator
-     */
-    Procedure &operator=(Procedure &&) = default;
-};
 
 /**
  * @brief   Represents a next state (go to state) action in SDL model.
@@ -157,11 +128,11 @@ public:
     auto procedures() const -> const std::vector<std::unique_ptr<Procedure>> &;
 
     /**
-     * @brief   Setter for the procedures declared in this process
+     * @brief   Add a procedure declared in this process
      *
-     * @param   procedures a vector of pointers to procedure
+     * @param   procedure procedure to be added
      */
-    auto setProcedures(std::vector<std::unique_ptr<Procedure>> procedures) -> void;
+    auto addProcedure(std::unique_ptr<Procedure> procedure) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)

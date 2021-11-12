@@ -17,6 +17,7 @@
 
 #include "iveditordocument.h"
 
+#include "commandsstack.h"
 #include "errorhub.h"
 #include "interfacedocument.h"
 #include "ivexporter.h"
@@ -30,6 +31,8 @@
 #include <QUndoStack>
 #include <fileutils.h>
 #include <id.h>
+#include <projectexplorer/project.h>
+#include <projectexplorer/projectnodes.h>
 
 using namespace Utils;
 using namespace Core;
@@ -64,6 +67,15 @@ Core::IDocument::OpenResult IVEditorDocument::open(
         return OpenResult::ReadError;
     }
 
+    connect(m_plugin->commandsStack(), &ive::cmd::CommandsStack::asn1FilesImported, this,
+            [project](const QStringList &asn1FilesAdded) {
+                project->project()->rootProjectNode()->addFiles(asn1FilesAdded);
+            });
+    connect(m_plugin->commandsStack(), &ive::cmd::CommandsStack::asn1FileRemoved, this,
+            [project](const QStringList &asn1FilesRemoved) {
+                project->project()->rootProjectNode()->removeFiles(asn1FilesRemoved);
+            });
+
 #if QTC_VERSION == 48
     setFilePath(Utils::FileName::fromString(absfileName));
 #elif QTC_VERSION == 415
@@ -72,6 +84,7 @@ Core::IDocument::OpenResult IVEditorDocument::open(
 
     connect(m_plugin->undoStack(), &QUndoStack::cleanChanged, this, [this](bool) { Q_EMIT changed(); });
     Q_EMIT ivDataLoaded(absfileName, m_plugin);
+    m_plugin->centerOnView();
 
     return OpenResult::Success;
 }

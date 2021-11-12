@@ -214,6 +214,18 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
     return valueMap;
 }
 
+bool Asn1ValueParser::isValueValid(const Types::Type *basicDataType, const QVariant &value)
+{
+    if (!basicDataType) {
+        return value.isValid();
+    }
+
+    Asn1Acn::Asn1ValueParser valueParser;
+    bool ok;
+    valueParser.parseAsn1Value(basicDataType, value.toString(), &ok);
+    return ok;
+}
+
 bool Asn1ValueParser::checkFormat(const QString &asn1Value) const
 {
     return asn1Value.startsWith("{") && asn1Value.endsWith("}");

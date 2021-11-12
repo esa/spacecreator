@@ -29,15 +29,13 @@ namespace cmd {
 class CmdChangeAsn1File : public QUndoCommand
 {
 public:
-    CmdChangeAsn1File(InterfaceDocument *document, const QString &newFileName);
+    CmdChangeAsn1File(InterfaceDocument *document, const QString &oldFileName, const QString &newFileName);
 
     void redo() override;
     void undo() override;
     int id() const override;
 
 private:
-    void setFile(const QString &fileName);
-
     QString m_newFileName;
     QString m_oldFileName;
     QPointer<InterfaceDocument> m_document;

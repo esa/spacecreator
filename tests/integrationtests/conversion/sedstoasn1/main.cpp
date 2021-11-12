@@ -18,6 +18,7 @@
  */
 
 #include "tsti_arraydatatype.h"
+#include "tsti_containerdatatype.h"
 
 #include <QTest>
 
@@ -26,8 +27,10 @@ using namespace conversion::asn1::test;
 int main()
 {
     tsti_ArrayDataType arrayDataType;
+    tsti_ContainerDataType containerDataType;
 
     QTest::qExec(&arrayDataType);
+    QTest::qExec(&containerDataType);
 
     return EXIT_SUCCESS;
 }

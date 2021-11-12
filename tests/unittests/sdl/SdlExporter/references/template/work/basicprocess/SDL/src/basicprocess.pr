@@ -1,0 +1,21 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Basicprocess;
+    /* CIF START (148, 174), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (108, 236), (150, 75) */
+        NEXTSTATE Wait;
+    /* CIF state (421, 150), (150, 75) */
+    state Idle;
+        /* CIF input (411, 245), (170, 75) */
+        input someOtherInput;
+            /* CIF NEXTSTATE (421, 335), (150, 75) */
+            NEXTSTATE Wait;
+    endstate;
+    /* CIF state (108, 236), (150, 75) */
+    state Wait;
+        /* CIF input (140, 354), (150, 75) */
+        input someInput;
+            /* CIF NEXTSTATE (140, 444), (150, 75) */
+            NEXTSTATE -;
+    endstate;
+endprocess Basicprocess;

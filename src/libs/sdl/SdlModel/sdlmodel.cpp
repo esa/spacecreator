@@ -21,9 +21,8 @@
 
 namespace sdl {
 
-SdlModel::SdlModel(Data data, QString name)
-    : m_data(std::move(data))
-    , m_name(std::move(name))
+SdlModel::SdlModel(QString name)
+    : m_name(std::move(name))
 {
 }
 
@@ -32,14 +31,14 @@ conversion::ModelType SdlModel::modelType() const
     return conversion::ModelProperties<SdlModel>::type;
 }
 
-const SdlModel::Data &SdlModel::data() const
+const std::vector<Process> &SdlModel::processes() const
 {
-    return m_data;
+    return m_processes;
 }
 
-void SdlModel::setData(Data data)
+void SdlModel::addProcess(Process process)
 {
-    m_data = std::move(data);
+    m_processes.push_back(std::move(process));
 }
 
 const QString &SdlModel::name() const

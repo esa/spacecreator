@@ -15,16 +15,18 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "ivlibrary.h"
 #include "commandlineparser.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
+#include "ivlibrary.h"
 #include "msceditorcore.h"
 #include "sharedlibrary.h"
 
 #include <QtTest>
 
 using shared::CommandLineParser;
+
+typedef shared::CommandLineParser::Positional CommandArg;
 
 class tst_CommandLineParser : public QObject
 {
@@ -52,6 +54,23 @@ private Q_SLOTS:
     // Arguments valid for both. Skipping Unknown and DropUnsavedChangesSilently
     void testCmdArgumentOpenStringTemplateFile();
     void testCmdArgumentExportToFile();
+
+    // SedsConverter arguments
+    void testCmdArgumentSedsConverterInputFilename();
+    void testCmdArgumentSedsConverterOutputFilename();
+    void testCmdArgumentSedsConverterModelFrom();
+    void testCmdArgumentSedsConverterModelTo();
+    void testCmdArgumentSedsConverterModelAux();
+    void testCmdArgumentSedsConverterIvConfig();
+    void testCmdArgumentSedsConverterSedsSchemaFilename();
+    void testCmdArgumentSedsConverterSedsExtRef();
+    void testCmdArgumentSedsConverterSedsExtRefFilename();
+    void testCmdArgumentSedsConverterSkipValidation();
+    void testCmdArgumentSedsConverterKeepIntermediateFiles();
+    void testCmdArgumentSedsConverterAcnFilepathPrefix();
+    void testCmdArgumentSedsConverterAsn1FilepathPrefix();
+    void testCmdArgumentSedsConverterSdlFilepathPrefix();
+    void testCmdArgumentSedsConverterImportXmlFileForAsn1();
 
     void initTestCase();
     void testCoverage();
@@ -112,8 +131,7 @@ void tst_CommandLineParser::testCmdArgumentRemoteControl()
 
 void tst_CommandLineParser::testCmdArgumentOpenIVFile()
 {
-    const QCommandLineOption cmdOpenIV =
-            CommandLineParser::positionalArg(CommandLineParser::Positional::OpenXMLFile);
+    const QCommandLineOption cmdOpenIV = CommandLineParser::positionalArg(CommandLineParser::Positional::OpenXMLFile);
     const QString fileName(QString(EXAMPLES_DIR).append("msc/sample.xml"));
     const QString noFileName("./no-such-file.xml");
 
@@ -207,6 +225,267 @@ void tst_CommandLineParser::testCmdArgumentExportToFile()
 
     const QString argFromParserIV(parserIV.value(CommandLineParser::Positional::ExportToFile));
     QCOMPARE(argFromParserIV, fileName);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterInputFilename()
+{
+    const QCommandLineOption cmdExportToFile = CommandLineParser::positionalArg(CommandArg::SedsConverterInputFilename);
+    const QString fileName("input_file");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("-%1=%2").arg(cmdExportToFile.names().first(), fileName) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterInputFilename);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterInputFilename));
+
+    const QString value = parser.value(CommandArg::SedsConverterInputFilename);
+    QCOMPARE(value, fileName);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterOutputFilename()
+{
+    const QCommandLineOption cmdExportToFile = CommandLineParser::positionalArg(CommandArg::SedsConverterOutputFilename);
+    const QString fileName("output_file");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdExportToFile.names().first(), fileName) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterOutputFilename);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterOutputFilename));
+
+    const QString value = parser.value(CommandArg::SedsConverterOutputFilename);
+    QCOMPARE(value, fileName);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterModelFrom()
+{
+    const QCommandLineOption cmdExportToFile = CommandLineParser::positionalArg(CommandArg::SedsConverterModelFrom);
+    const QString models("model1,model2,model.3");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdExportToFile.names().first(), models) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterModelFrom);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterModelFrom));
+
+    const QString value = parser.value(CommandArg::SedsConverterModelFrom);
+    QCOMPARE(value, models);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterModelTo()
+{
+    const QCommandLineOption cmdExportToFile = CommandLineParser::positionalArg(CommandArg::SedsConverterModelTo);
+    const QString models("model1,model2,model.3");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdExportToFile.names().first(), models) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterModelTo);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterModelTo));
+
+    const QString value = parser.value(CommandArg::SedsConverterModelTo);
+    QCOMPARE(value, models);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterModelAux()
+{
+    const QCommandLineOption cmdExportToFile = CommandLineParser::positionalArg(CommandArg::SedsConverterModelAux);
+    const QString models("model1,model2,model.3");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdExportToFile.names().first(), models) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterModelAux);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterModelAux));
+
+    const QString value = parser.value(CommandArg::SedsConverterModelAux);
+    QCOMPARE(value, models);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterIvConfig()
+{
+    const QCommandLineOption cmdExportToFile = CommandLineParser::positionalArg(CommandArg::SedsConverterIvConfig);
+    const QString fileName("iv_config");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdExportToFile.names().first(), fileName) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterIvConfig);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterIvConfig));
+
+    const QString value = parser.value(CommandArg::SedsConverterIvConfig);
+    QCOMPARE(value, fileName);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterSedsSchemaFilename()
+{
+    const QCommandLineOption cmdExportToFile = CommandLineParser::positionalArg(CommandArg::SedsConverterSedsSchemaFilename);
+    const QString fileName("name.xsd");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdExportToFile.names().first(), fileName) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterSedsSchemaFilename);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterSedsSchemaFilename));
+
+    const QString value = parser.value(CommandArg::SedsConverterSedsSchemaFilename);
+    QCOMPARE(value, fileName);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterSedsExtRef()
+{
+    const QCommandLineOption cmdExportToFile = CommandLineParser::positionalArg(CommandArg::SedsConverterSedsExtRef);
+    const QString externalReference("foo1:bar2,foo1:bar2");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdExportToFile.names().first(), externalReference) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterSedsExtRef);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterSedsExtRef));
+
+    const QString value = parser.value(CommandArg::SedsConverterSedsExtRef);
+    QCOMPARE(value, externalReference);
+}
+
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterSedsExtRefFilename()
+{
+    const QCommandLineOption cmdExportToFile = CommandLineParser::positionalArg(CommandArg::SedsConverterSedsExtRefFilename);
+    const QString externalReferenceFile("ext_ref_file");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdExportToFile.names().first(), externalReferenceFile) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterSedsExtRefFilename);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterSedsExtRefFilename));
+
+    const QString value = parser.value(CommandArg::SedsConverterSedsExtRefFilename);
+    QCOMPARE(value, externalReferenceFile);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterSkipValidation()
+{
+    const QCommandLineOption cmdExportToFile = CommandLineParser::positionalArg(CommandArg::SedsConverterSkipValidation);
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1").arg(cmdExportToFile.names().first()) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterSkipValidation);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterSkipValidation));
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterKeepIntermediateFiles()
+{
+    const QCommandLineOption cmdExportToFile =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterKeepIntermediateFiles);
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1").arg(cmdExportToFile.names().first()) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterKeepIntermediateFiles);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterKeepIntermediateFiles));
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterAcnFilepathPrefix()
+{
+    const QCommandLineOption cmdExportToFile = CommandLineParser::positionalArg(CommandArg::SedsConverterAcnFilepathPrefix);
+    const QString prefix("acn_filepath_preifx_");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdExportToFile.names().first(), prefix) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterAcnFilepathPrefix);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterAcnFilepathPrefix));
+
+    const QString value = parser.value(CommandArg::SedsConverterAcnFilepathPrefix);
+    QCOMPARE(value, prefix);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterAsn1FilepathPrefix()
+{
+    const QCommandLineOption cmdExportToFile = CommandLineParser::positionalArg(CommandArg::SedsConverterAsn1FilepathPrefix);
+    const QString prefix("asn1_filepath_prefix_");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdExportToFile.names().first(), prefix) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterAsn1FilepathPrefix);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterAsn1FilepathPrefix));
+
+    const QString value = parser.value(CommandArg::SedsConverterAsn1FilepathPrefix);
+    QCOMPARE(value, prefix);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterSdlFilepathPrefix()
+{
+    const QCommandLineOption cmdExportToFile = CommandLineParser::positionalArg(CommandArg::SedsConverterSdlFilepathPrefix);
+    const QString prefix("sdl_filepath_prefix_");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdExportToFile.names().first(), prefix) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterSdlFilepathPrefix);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterSdlFilepathPrefix));
+
+    const QString value = parser.value(CommandArg::SedsConverterSdlFilepathPrefix);
+    QCOMPARE(value, prefix);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterImportXmlFileForAsn1()
+{
+    const QCommandLineOption cmdExportToFile =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterImportXmlFileForAsn1);
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1").arg(cmdExportToFile.names().first()) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterImportXmlFileForAsn1);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterImportXmlFileForAsn1));
 }
 
 void tst_CommandLineParser::initTestCase()

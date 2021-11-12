@@ -23,7 +23,6 @@
 
 #include <QList>
 #include <QSharedPointer>
-#include <QStackedWidget>
 #include <QVector>
 #include <memory>
 
@@ -37,79 +36,50 @@ class UndoCommand;
 }
 
 namespace msc {
-class ActionCreatorTool;
-class BaseTool;
-class CommentCreatorTool;
-class ConditionCreatorTool;
-class CoregionCreatorTool;
-class EntityDeleteTool;
-class InstanceCreatorTool;
-class InstanceStopTool;
 class MainModel;
-class MessageCreatorTool;
 class MscChart;
 class MscCommandsStack;
 class MscInstance;
 class MscMessage;
 class PointerTool;
 class SystemChecks;
-class TimerCreatorTool;
+class MscAppWidget;
 
 class MainWindow;
 
 class MSCEditorCore : public shared::EditorCore
 {
     Q_OBJECT
-    Q_PROPERTY(msc::MSCEditorCore::ViewMode viewMode READ viewMode WRITE setViewMode NOTIFY viewModeChanged)
 
 public:
-    enum class ViewMode
-    {
-        CHART,
-        HIERARCHY
-    };
-    Q_ENUM(ViewMode);
-
     explicit MSCEditorCore(QObject *parent = nullptr);
     ~MSCEditorCore();
 
     msc::MainModel *mainModel() const;
 
-    void setViews(
-            QStackedWidget *centerView, shared::ui::GraphicsViewBase *chartView, msc::GraphicsView *hierarchyView);
-    QStackedWidget *centerView();
     shared::ui::GraphicsViewBase *chartView() override;
-    msc::GraphicsView *hierarchyView();
 
-    void initChartTools();
-    void initHierarchyViewActions();
     void initConnections();
 
     void addToolBars(QMainWindow *window) override;
 
-    QToolBar *mscToolBar();
-    QToolBar *hierarchyToolBar();
-    void showToolbars(bool show);
+    MscAppWidget *mainwidget();
 
     void populateCommandLineArguments(shared::CommandLineParser *parser) const override;
 
     QAction *actionCopy() { return m_actionCopy; }
     QAction *actionPaste() { return m_actionPaste; }
-    msc::EntityDeleteTool *deleteTool() { return m_deleteTool; }
-    msc::BaseTool *activeTool() const;
 
     QAction *actionMessageDeclarations();
-
-    QVector<QAction *> chartActions() const;
-    QVector<QAction *> hierarchyActions() const;
 
     QAction *createActionCopy(QMainWindow *window);
     QAction *createActionPaste(QMainWindow *window);
 
+    QAction *actionCheckInstances();
+    QAction *actionCheckMessages();
+
     void setSystemChecker(msc::SystemChecks *checker);
     msc::SystemChecks *systemChecker() const;
-
-    ViewMode viewMode();
 
     QUndoStack *undoStack() const override;
     msc::MscCommandsStack *commandsStack() const;
@@ -127,22 +97,12 @@ public:
     bool save() override;
 
 public Q_SLOTS:
-    void setViewMode(ViewMode mode);
-    void showDocumentView(bool show);
-    void showHierarchyView(bool show);
-    void activateDefaultTool();
     void selectCurrentChart();
-    void checkGlobalComment();
     void openMessageDeclarationEditor(QWidget *parentwidget);
+    void addDocument(msc::MscDocument::HierarchyType type);
 
 Q_SIGNALS:
-    void viewModeChanged(ViewMode);
     void nameChanged(QObject *entity, const QString &oldName, shared::UndoCommand *command);
-
-private Q_SLOTS:
-    void updateMscToolbarActionsChecked();
-    void updateHierarchyActions();
-    void addDocument(msc::MscDocument::HierarchyType type);
 
 private:
     QUrl helpPage() const override;
@@ -150,41 +110,15 @@ private:
     std::unique_ptr<msc::MainModel> m_model;
     msc::SystemChecks *m_systemChecks = nullptr;
 
-    ViewMode m_viewMode = ViewMode::CHART;
-
-    QPointer<QStackedWidget> m_centerView = nullptr;
-    QPointer<shared::ui::GraphicsViewBase> m_chartView = nullptr;
-    QPointer<msc::GraphicsView> m_hierarchyView = nullptr;
-
-    QPointer<QToolBar> m_mscToolBar = nullptr;
-    QPointer<QToolBar> m_hierarchyToolBar = nullptr;
-
     QAction *m_actionCopy = nullptr;
     QAction *m_actionPaste = nullptr;
     QAction *m_actionMessageDeclarations = nullptr;
+    QAction *m_actionCheckInstances = nullptr;
+    QAction *m_actionCheckMessages = nullptr;
 
-    QVector<msc::BaseTool *> m_tools;
-    QAction *m_defaultToolAction = nullptr;
-    msc::EntityDeleteTool *m_deleteTool = nullptr;
-    msc::PointerTool *m_pointerTool = nullptr;
-    msc::InstanceCreatorTool *m_instanceCreatorTool = nullptr;
-    msc::InstanceStopTool *m_instanceStopTool = nullptr;
-    msc::MessageCreatorTool *m_messageCreateTool = nullptr;
-    msc::MessageCreatorTool *m_createCreateTool = nullptr;
-    msc::CommentCreatorTool *m_commentCreateTool = nullptr;
-    msc::CommentCreatorTool *m_globalCommentCreateTool = nullptr;
-    msc::CoregionCreatorTool *m_coregionCreateTool = nullptr;
-    msc::ActionCreatorTool *m_actionCreateTool = nullptr;
-    msc::ConditionCreatorTool *m_conditionCreateTool = nullptr;
-    msc::ConditionCreatorTool *m_sharedConditionTool = nullptr;
-    msc::TimerCreatorTool *m_startTimerCreateTool = nullptr;
-    msc::TimerCreatorTool *m_stopTimerCreateTool = nullptr;
-    msc::TimerCreatorTool *m_timeoutTimerCreateTool = nullptr;
-
-    QVector<QAction *> m_hierarchyActions;
-
-    bool m_toolbarsVisible = true;
     bool m_connectionsDone = false;
+
+    MscAppWidget *m_mainWidget = nullptr;
 };
 
 }

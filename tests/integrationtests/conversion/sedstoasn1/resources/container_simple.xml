@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="container_simple">
+    <DataTypeSet>
+      <IntegerDataType name="IntegerData">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <ContainerDataType name="SimpleContainer">
+        <EntryList>
+          <Entry name="fieldA" type="IntegerData" />
+          <Entry name="fieldB" type="IntegerData" />
+        </EntryList>
+      </ContainerDataType>
+    </DataTypeSet>
+  </Package>
+</PackageFile>

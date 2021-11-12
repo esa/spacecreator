@@ -79,6 +79,8 @@ void IVEditorData::onCurrentEditorChanged(Core::IEditor *editor)
 {
     if (auto ivEditor = qobject_cast<IVQtCEditor *>(editor)) {
         m_undoGroup->setActiveStack(ivEditor->ivPlugin()->undoStack());
+    } else {
+        m_undoGroup->setActiveStack(nullptr);
     }
 }
 

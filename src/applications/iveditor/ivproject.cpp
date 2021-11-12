@@ -36,13 +36,7 @@ void IvProject::setModel(InterfaceDocument *model)
 
 QStringList IvProject::allAsn1Files() const
 {
-    QStringList result;
-    QFileInfo fi(m_model->asn1FilePath());
-    if (m_model && fi.exists()) {
-        result.append(fi.absoluteFilePath());
-    }
-
-    return result;
+    return m_model->asn1FilesPaths();
 }
 
 QStringList IvProject::allDVFiles() const

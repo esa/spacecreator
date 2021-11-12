@@ -25,12 +25,14 @@
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <conversion/asn1/SedsToAsn1Translator/visitors/datatypetranslatorvisitor.h>
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/qstringhash.h>
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivfunction.h>
 #include <seds/SedsModel/package/package.h>
 #include <shared/parameter.h>
 
+using conversion::Escaper;
 using conversion::translator::MissingGenericTypeMappingException;
 using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredDataTypeException;
@@ -132,14 +134,17 @@ QString AsyncInterfaceCommandTranslator::buildAsn1SequenceType(
 void AsyncInterfaceCommandTranslator::createAsn1Sequence(
         const QString &name, const std::unordered_map<QString, QString> &arguments)
 {
-    auto sequence = std::make_unique<Asn1Acn::Types::Sequence>(name);
+    const auto escapedName = Escaper::escapeAsn1TypeName(name);
+    auto sequence = std::make_unique<Asn1Acn::Types::Sequence>(escapedName);
 
     for (const auto &[argumentName, argumentTypeName] : arguments) {
+        const auto escapedArgumentName = Escaper::escapeAsn1TypeName(argumentName);
+        const auto escapedArgumentTypeName = Escaper::escapeAsn1TypeName(argumentTypeName);
         createAsn1SequenceComponent(argumentName, argumentTypeName, sequence.get());
     }
 
-    auto typeAssignment =
-            std::make_unique<Asn1Acn::TypeAssignment>(name, name, Asn1Acn::SourceLocation(), std::move(sequence));
+    auto typeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
+            escapedName, escapedName, Asn1Acn::SourceLocation(), std::move(sequence));
     m_asn1Definitions->addType(std::move(typeAssignment));
 }
 
@@ -178,6 +183,7 @@ std::unordered_map<QString, QString> AsyncInterfaceCommandTranslator::processArg
             const auto &genericTypeName = sedsArgument.type().nameStr();
             const auto &concreteTypeName = findMappedType(genericTypeName);
 
+            // TODO: escape bundledTypeName with escapeAsnName?
             arguments.insert({ sedsArgument.nameStr(), concreteTypeName });
         }
     }

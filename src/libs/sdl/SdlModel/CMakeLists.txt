@@ -10,10 +10,12 @@ set(SOURCES action.cpp
             input.cpp
             join.cpp
             label.cpp
-            literal.cpp
             nextstate.cpp
             node.cpp
             output.cpp
+            procedure.cpp
+            procedurecall.cpp
+            procedureparameter.cpp
             process.cpp
             sdlmodel.cpp
             signal.cpp
@@ -32,10 +34,12 @@ set(INCLUDES action.h
              input.h
              join.h
              label.h
-             literal.h
              nextstate.h
              node.h
              output.h
+             procedure.h
+             procedurecall.h
+             procedureparameter.h
              process.h
              sdlmodel.h
              signal.h
@@ -61,4 +65,4 @@ target_link_libraries(SdlModel
 add_format_target(SdlModel)
 add_tidy_target(SdlModel)
 
-add_library(Conversion::SdlModel ALIAS SdlModel)
+add_library(SDL::Model ALIAS SdlModel)

@@ -282,9 +282,9 @@ void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentNumericStringWithValue
 void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentEnumerated()
 {
     auto type = std::make_unique<Types::Enumerated>();
-    type->addItem(Types::EnumeratedItem(1, QStringLiteral("e1"), 10, SourceLocation()));
-    type->addItem(Types::EnumeratedItem(2, QStringLiteral("e2"), 20, SourceLocation()));
-    type->addItem(Types::EnumeratedItem(0, QStringLiteral("e3"), 30, SourceLocation()));
+    type->addItem(Types::EnumeratedItem(1, QStringLiteral("e1"), 10, SourceLocation())); // NOLINT
+    type->addItem(Types::EnumeratedItem(2, QStringLiteral("e2"), 20, SourceLocation())); // NOLINT
+    type->addItem(Types::EnumeratedItem(0, QStringLiteral("e3"), 30, SourceLocation())); // NOLINT
 
     const auto actual = createComponentialTypeAssignmentValue(std::move(type));
 
@@ -428,10 +428,11 @@ void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentSequenceOfWithValue()
 {
     auto internalType = std::make_unique<Types::Integer>();
 
-    internalType->constraints().append(Constraints::RangeConstraint<IntegerValue>::create({ 5, 10 }));
+    internalType->constraints().append(Constraints::RangeConstraint<IntegerValue>::create({ 5, 10 })); // NOLINT
 
     auto assignment = createTypeAssignmentWithConstraint(QStringLiteral("SEQUENCE_OF"),
-            new Constraints::SizeConstraint<IntegerValue>(Constraints::RangeConstraint<IntegerValue>::create({ 10 })));
+            new Constraints::SizeConstraint<IntegerValue>(
+                    Constraints::RangeConstraint<IntegerValue>::create({ 10 }))); // NOLINT
 
     auto &sequenceType = dynamic_cast<Types::SequenceOf &>(*(assignment->type()));
     sequenceType.setItemsType(std::move(internalType));
@@ -450,7 +451,7 @@ void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentReal()
 void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentRealWithValue()
 {
     auto assignment = createTypeAssignmentWithConstraint(
-            QStringLiteral("REAL"), new Constraints::RangeConstraint<RealValue>(1.1));
+            QStringLiteral("REAL"), new Constraints::RangeConstraint<RealValue>(1.1)); // NOLINT
     auto actual = restoreNode(*assignment);
     QString expected = "MyType ::= REAL(1.1)\n";
 
@@ -465,7 +466,7 @@ void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentInteger()
 void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentIntegerWithValue()
 {
     auto assignment = createTypeAssignmentWithConstraint(
-            QStringLiteral("INTEGER"), new Constraints::RangeConstraint<IntegerValue>({ 1, 2 }));
+            QStringLiteral("INTEGER"), new Constraints::RangeConstraint<IntegerValue>({ 1, 2 })); // NOLINT
     auto actual = restoreNode(*assignment);
     QString expected = "MyType ::= INTEGER(1 .. 2)\n";
 
@@ -489,7 +490,7 @@ void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentUserDefinedWithValue()
 {
     auto referedType = Types::TypeFactory::createBuiltinType(QStringLiteral("INTEGER"));
     auto &constrainedType = dynamic_cast<Constraints::WithConstraints<IntegerValue> &>(*referedType);
-    constrainedType.constraints().append({ 1, 2 });
+    constrainedType.constraints().append({ 1, 2 }); // NOLINT
 
     auto type = std::make_unique<Types::UserdefinedType>(QStringLiteral("ReferencedType"), QStringLiteral("MyModule"));
     type->setType(std::move(referedType));
@@ -533,7 +534,7 @@ QString tst_Asn1NodeReconstructingVisitor::createSingleValueValueAssignmentValue
         const QString &typeName, const QString &typeValue, std::function<QString(const QString &)> printer) const
 {
     auto type = Types::TypeFactory::createBuiltinType(typeName);
-    auto value = std::make_unique<SingleValue>(typeValue, printer);
+    auto value = std::make_unique<SingleValue>(typeValue, std::move(printer));
 
     auto assignment = std::make_unique<ValueAssignment>(
             QStringLiteral("myValue"), SourceLocation(), std::move(type), std::move(value));

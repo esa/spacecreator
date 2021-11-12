@@ -114,7 +114,7 @@ private:
 
     QString createChoiceValueAssignmentValue() const;
 
-    QString restoreNode(const Asn1Acn::Node &assignment) const;
+    QString restoreNode(const Asn1Acn::Node &node) const;
 };
 
 template<typename T>

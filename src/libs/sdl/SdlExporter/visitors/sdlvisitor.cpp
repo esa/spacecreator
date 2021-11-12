@@ -22,7 +22,9 @@
 #include <conversion/common/export/exceptions.h>
 #include <iostream>
 #include <qglobal.h>
+#include <sdl/SdlModel/variableliteral.h>
 #include <sdl/SdlModel/variablereference.h>
+#include <variant>
 
 using conversion::exporter::ExportException;
 
@@ -33,29 +35,24 @@ SdlVisitor::SdlVisitor(QTextStream &stream)
 {
 }
 
-void SdlVisitor::visit(const SdlModel &model) const
-{
-    visit(model.data());
-}
-
 void SdlVisitor::visit(const Process &process) const
 {
     if (process.name().isEmpty()) {
         throw ExportException("Process shall have a name but it doesn't");
     }
 
-    // write some dummy CIF
-    m_stream << "/* CIF PROCESS (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << dummyCif("PROCESS");
     m_stream << "process " << process.name() << ";\n";
 
     if (!process.variables().empty()) {
         m_stream << "    /* CIF TEXT (16, 317), (267, 140) */\n";
         exportCollection(process.variables());
         m_stream << "    /* CIF ENDTEXT */\n";
-        m_stream << "\n";
     }
 
-    // TODO: loop over procedures and export them
+    if (!process.procedures().empty()) {
+        exportCollection(process.procedures());
+    }
 
     if (process.startTransition() != nullptr) {
         m_stream << "    /* CIF START (9, 285), (70, 35) */\n"
@@ -64,7 +61,6 @@ void SdlVisitor::visit(const Process &process) const
     } else {
         throw ExportException("START transition not specified but required");
     }
-    m_stream << "\n";
 
     if (process.stateMachine() != nullptr) {
         exportCollection(process.stateMachine()->states());
@@ -72,7 +68,7 @@ void SdlVisitor::visit(const Process &process) const
         throw ExportException("Process does not contain a State Machine");
     }
 
-    m_stream << "endprocess " << process.name() << ";\n";
+    m_stream << "endprocess " << process.name() << ";";
 }
 
 void SdlVisitor::visit(const State &state) const
@@ -81,12 +77,10 @@ void SdlVisitor::visit(const State &state) const
         throw ExportException("State shall have a name but it doesn't");
     }
 
-    // write some dummy CIF
-    m_stream << "    /* CIF state (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "    " << dummyCif("state");
     m_stream << "    state " << state.name() << ";\n";
     exportCollection(state.inputs());
     m_stream << "    endstate;\n";
-    m_stream << "\n";
 }
 
 void SdlVisitor::visit(const Input &input) const
@@ -95,8 +89,7 @@ void SdlVisitor::visit(const Input &input) const
         throw ExportException("Input shall have a name but it doesn't");
     }
 
-    // write some dummy CIF
-    m_stream << "        /* CIF input (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "        " << dummyCif("input");
     m_stream << "        input " << input.name();
 
     const auto &inputParameters = input.parameters();
@@ -127,8 +120,7 @@ void SdlVisitor::visit(const Output &output) const
         throw ExportException("Output shall have a name but it doesn't");
     }
 
-    // write some dummy CIF
-    m_stream << "            /* CIF output (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "            " << dummyCif("output");
     m_stream << "            output " << output.name();
     const auto outputParamRef = output.parameter();
     if (outputParamRef != nullptr) {
@@ -151,8 +143,7 @@ void SdlVisitor::visit(const NextState &nextstate) const
         }
     }
 
-    // write some dummy CIF
-    m_stream << "            /* CIF NEXTSTATE (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "            " << dummyCif("NEXTSTATE");
     m_stream << "            NEXTSTATE " << nextStateName << ";\n";
 }
 
@@ -162,8 +153,7 @@ void SdlVisitor::visit(const Task &task) const
         throw ExportException("Task shall have contents but it doesn't");
     }
 
-    // write some dummy CIF
-    m_stream << "            /* CIF task (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "            " << dummyCif("task");
     m_stream << "            task " << task.content() << ";\n";
 }
 
@@ -185,14 +175,13 @@ void SdlVisitor::visit(const Label &label) const
         throw ExportException("Label name cannot be empty");
     }
 
-    // write some dummy CIF
-    m_stream << "        /* CIF label (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "        " << dummyCif("label");
     m_stream << "        " << label.name() << ":\n";
 }
 
 void SdlVisitor::visit(const Join &join) const
 {
-    m_stream << "            /* CIF join (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "            " << dummyCif("join");
     m_stream << "            join ";
     if (join.label() != nullptr) {
         m_stream << join.label()->name();
@@ -211,7 +200,6 @@ void SdlVisitor::visit(const Answer &answer) const
         throw ExportException("Required Literal have a missing value in Answer");
     }
 
-    // write some dummy CIF
     m_stream << "                /* CIF ANSWER (585, 323), (77, 24) */\n";
     if (answer.literal().value() == "else") {
         m_stream << "                " << answer.literal().value() << ":\n";
@@ -233,11 +221,112 @@ void SdlVisitor::visit(const Decision &decision) const
         throw ExportException("No Answers in Decision");
     }
 
-    // write some dummy CIF
     m_stream << "            /* CIF decision (388, 241), (115, 50) */\n";
     m_stream << "            decision " << decision.expression()->content() << ";\n";
     exportCollection(decision.answers());
     m_stream << "            enddecision;\n";
+}
+
+void SdlVisitor::visit(const Procedure &procedure) const
+{
+    m_stream << "    " << dummyCif("procedure");
+    m_stream << "    procedure " << procedure.name() << ";\n";
+
+    auto &procedureParameters = procedure.parameters();
+
+    const bool parametersPresent = !procedureParameters.empty();
+    const bool returnVarPresent = procedure.returnVariableDeclaration() != nullptr;
+
+    if (parametersPresent || returnVarPresent) {
+        m_stream << "        " << dummyCif("TEXT");
+    }
+
+    if (parametersPresent) {
+        m_stream << "        fpar\n";
+        QString fpars = QString("            %1 %2 %3")
+                                .arg(procedureParameters[0]->direction())
+                                .arg(procedureParameters[0]->name())
+                                .arg(procedureParameters[0]->type());
+        for (auto it = std::next(procedureParameters.begin()); it != procedureParameters.end(); it++) {
+            fpars = fpars
+                    + QString(",\n            %1 %2 %3")
+                              .arg(it->get()->direction())
+                              .arg(it->get()->name())
+                              .arg(it->get()->type());
+        }
+        m_stream << fpars;
+        m_stream << ";\n";
+    }
+
+    if (returnVarPresent) {
+        m_stream << "        returns ";
+        m_stream << procedure.returnVariableDeclaration()->type();
+        m_stream << ";\n";
+
+        visit(*procedure.returnVariableDeclaration());
+    }
+
+    if (parametersPresent || returnVarPresent) {
+        m_stream << "        /* CIF ENDTEXT */\n";
+    }
+
+    m_stream << "        " << dummyCif("START");
+    m_stream << "        START;\n";
+    if (procedure.transition()->actions().empty()) {
+        qWarning("Procedure is empty");
+    } else {
+        exportCollection(procedure.transition()->actions());
+    }
+    m_stream << "        return ";
+    if (procedure.returnVariableDeclaration() != nullptr) {
+        m_stream << procedure.returnVariableDeclaration()->name();
+    }
+    m_stream << ";\n";
+    m_stream << "    endprocedure;\n";
+}
+
+void SdlVisitor::visit(const ProcedureCall &procedureCall) const
+{
+    if (procedureCall.procedure() == nullptr || procedureCall.procedure()->name().isEmpty()) {
+        throw ExportException("Procedure to call not specified");
+    }
+    if (procedureCall.procedure()->returnVariableDeclaration() != nullptr) {
+        throw ExportException("Procedure with a return variable cannot be called from a Procedure Call. "
+                              "It must be called from a Task");
+    }
+
+    m_stream << "        " << dummyCif("PROCEDURECALL");
+    m_stream << "        call " << procedureCall.procedure()->name();
+
+    auto &procedureCallArgs = procedureCall.arguments();
+    if (!procedureCallArgs.empty()) {
+        auto getArgAsQString = [](const ProcedureCall::Argument &argument) -> QString {
+            QString arg;
+            if (std::holds_alternative<VariableLiteral>(argument)) {
+                arg += std::get<VariableLiteral>(argument).value();
+            } else if (std::holds_alternative<VariableReference *>(argument)) {
+                arg += std::get<VariableReference *>(argument)->declaration()->name();
+            } else {
+                throw ExportException("Unknown Argument type");
+            }
+            return arg;
+        };
+
+        const auto args = std::accumulate(std::next(procedureCallArgs.begin()), procedureCallArgs.end(),
+                getArgAsQString(procedureCallArgs[0]),
+                [&](QString &accumulator, const ProcedureCall::Argument &argument) {
+                    return accumulator + ", " + getArgAsQString(argument);
+                });
+
+        m_stream << "(" << args << ")";
+    }
+    m_stream << ";\n";
+}
+
+QString SdlVisitor::dummyCif(const QString &cifType) const
+{
+    const static QString dummyCifTemplate = "/* CIF %1 (250, 150), (150, 75) */\n";
+    return dummyCifTemplate.arg(cifType);
 }
 
 template<typename T>

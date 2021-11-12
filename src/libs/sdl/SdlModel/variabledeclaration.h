@@ -28,7 +28,7 @@ namespace sdl {
 /**
  * @brief   Represents an SDL variable declaration
  */
-class VariableDeclaration final : public Node
+class VariableDeclaration : public Node
 {
 public:
     /**

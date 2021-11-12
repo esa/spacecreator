@@ -44,4 +44,79 @@ SedsContainerDataTypeBuilder &SedsContainerDataTypeBuilder::withEntry(QString na
     return *this;
 }
 
+SedsContainerDataTypeBuilder &SedsContainerDataTypeBuilder::withErrorControlEntry(
+        QString name, QString typeName, seds::model::CoreErrorControl errorControl)
+{
+    ErrorControlEntry entry;
+    entry.setName(std::move(name));
+    entry.setType(std::move(typeName));
+    entry.setErrorControl(errorControl);
+
+    m_dataType.addEntry(std::move(entry));
+
+    return *this;
+}
+
+SedsContainerDataTypeBuilder &SedsContainerDataTypeBuilder::withFixedValueEntry(
+        QString name, QString typeName, QString value)
+{
+    FixedValueEntry entry;
+    entry.setName(std::move(name));
+    entry.setType(std::move(typeName));
+    entry.setFixedValue(std::move(value));
+
+    m_dataType.addEntry(std::move(entry));
+
+    return *this;
+}
+
+SedsContainerDataTypeBuilder &SedsContainerDataTypeBuilder::withLengthEntry(QString name, QString typeName)
+{
+    LengthEntry entry;
+    entry.setName(std::move(name));
+    entry.setType(std::move(typeName));
+
+    m_dataType.addEntry(std::move(entry));
+
+    return *this;
+}
+
+SedsContainerDataTypeBuilder &SedsContainerDataTypeBuilder::withListEntry(
+        QString name, QString typeName, QString lengthField)
+{
+    ListEntry entry;
+    entry.setName(std::move(name));
+    entry.setType(std::move(typeName));
+    entry.setListLengthField(std::move(lengthField));
+
+    m_dataType.addEntry(std::move(entry));
+
+    return *this;
+}
+
+SedsContainerDataTypeBuilder &SedsContainerDataTypeBuilder::withTrailerEntry(QString name, QString typeName)
+{
+    Entry entry;
+    entry.setName(std::move(name));
+    entry.setType(std::move(typeName));
+
+    m_dataType.addTrailerEntry(std::move(entry));
+
+    return *this;
+}
+
+SedsContainerDataTypeBuilder &SedsContainerDataTypeBuilder::setAbstract()
+{
+    m_dataType.setAbstract(true);
+
+    return *this;
+}
+
+SedsContainerDataTypeBuilder &SedsContainerDataTypeBuilder::setBaseType(QString baseTypeName)
+{
+    m_dataType.setBaseType(std::move(baseTypeName));
+
+    return *this;
+}
+
 } // namespace tests::conversion::common

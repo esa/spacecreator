@@ -1,0 +1,42 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Procedurewithparamsandreturn;
+    /* CIF TEXT (606, 44), (239, 135) */
+    dcl x MyInteger;
+    dcl y MyInteger;
+    /* CIF ENDTEXT */
+    /* CIF procedure (679, 291), (126, 40) */
+    procedure myProcedure;
+        /* CIF TEXT (266, 207), (267, 140) */
+        fpar
+                  in/out a MyInteger,
+                  in b MyInteger;
+        returns MyInteger;
+        
+        dcl ret MyInteger;
+        /* CIF ENDTEXT */
+        /* CIF START (134, 119), (70, 35) */
+        START;
+            /* CIF task (125, 174), (87, 31) */
+            task ret := a + b;
+            /* CIF task (132, 225), (73, 35) */
+            task a := a + 1;
+            /* CIF return (151, 275), (35, 35) */
+            return ret;
+    endprocedure;
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (320, 60), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (320, 60), (70, 35) */
+    state Wait;
+        /* CIF input (299, 115), (111, 35) */
+        input startProcess(x);
+            /* CIF task (264, 170), (180, 40) */
+            task y := call myProcedure(x, 2);
+            /* CIF NEXTSTATE (320, 230), (70, 35) */
+            NEXTSTATE -;
+    endstate;
+    /* CIF state (450, 10), (70, 35) */
+    state Wait;
+    endstate;
+endprocess Procedurewithparamsandreturn;

@@ -19,7 +19,6 @@
 
 #include "exporter.h"
 
-#include "SdlOptions/options.h"
 #include "export/exceptions.h"
 #include "modeltype.h"
 #include "visitors/sdlvisitor.h"
@@ -27,6 +26,7 @@
 #include <QSaveFile>
 #include <QString>
 #include <QTextStream>
+#include <sdl/SdlOptions/options.h>
 
 using conversion::ModelType;
 using conversion::exporter::ExportException;
@@ -52,17 +52,25 @@ void SdlExporter::exportModel(const Model *const model, const Options &options) 
 
 void SdlExporter::exportSdlModel(const SdlModel *const model, const Options &options) const
 {
-    QString serializedModelData;
-    QTextStream outputTextStream(&serializedModelData, QIODevice::WriteOnly);
+    for (const auto &process : model->processes()) {
+        exportProcess(process, options);
+    }
+}
+
+void SdlExporter::exportProcess(const Process &process, const Options &options) const
+{
+    QString serializedProcess;
+    QTextStream outputTextStream(&serializedProcess, QIODevice::WriteOnly);
 
     sdl::SdlVisitor visitor(outputTextStream);
-    visitor.visit(*model);
+
+    visitor.visit(process);
 
     const auto pathPrefix = options.value(SdlOptions::sdlFilepathPrefix).value_or("");
-    const auto filePath = makeFilePath(pathPrefix, model->name(), "pr");
+    const auto filePath = makeFilePath(pathPrefix, process.name(), "pr");
 
     QSaveFile outputFile(filePath);
-    writeAndCommit(outputFile, serializedModelData.toStdString());
+    writeAndCommit(outputFile, serializedProcess.toStdString());
 }
 
 void SdlExporter::writeAndCommit(QSaveFile &outputFile, const std::string &data) const

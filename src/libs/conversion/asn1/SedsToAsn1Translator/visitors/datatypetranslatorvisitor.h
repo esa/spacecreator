@@ -19,7 +19,9 @@
 
 #pragma once
 
+#include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/type.h>
+#include <conversion/common/qstringhash.h>
 #include <optional>
 #include <seds/SedsModel/types/datatype.h>
 
@@ -68,10 +70,8 @@ namespace conversion::asn1::translator {
  * Translated data type will be added to the passed ASN.1 Definitions
  */
 struct DataTypeTranslatorVisitor final {
-    /// @brief  Parent definitions
-    Asn1Acn::Definitions *m_asn1Definitions;
-    /// @brief  Where translated data type will be saved
-    std::unique_ptr<Asn1Acn::Types::Type> &m_asn1Type;
+
+    DataTypeTranslatorVisitor(Asn1Acn::Definitions *asn1Definitions, std::unique_ptr<Asn1Acn::Types::Type> &asn1Type);
 
     /**
      * @brief   Translates SEDS array data type
@@ -236,6 +236,27 @@ private:
     auto translateFalseValue(seds::model::FalseValue falseValue, Asn1Acn::Types::Boolean *asn1Type) const -> void;
 
     /**
+     * @brief   Adds entries from given container data type to the entries cache
+     *
+     * @param   sedsType    Type which entries should be cached
+     */
+    auto cacheAbstractContainerEntries(const seds::model::ContainerDataType &sedsType) -> void;
+    /**
+     * @brief   Adds a choice field to the passed ASN.1 sequence for realization fields
+     *
+     * @param   asn1Sequence    Sequence to which field should be added
+     */
+    auto createRealizationContainerField(Asn1Acn::Types::Sequence *asn1Sequence) -> void;
+    /**
+     * @brief   Adds a reference to the realization in the given parent container
+     *
+     * @param   sedsBaseTypeName            Name of the base container which should be updated
+     * @param   asn1RealizationSeuqnece     Sequence that is a realization of the based container
+     */
+    auto updateParentContainer(const QString &sedsBaseTypeName, Asn1Acn::Types::Sequence *asn1RealizationSequence)
+            -> void;
+
+    /**
      * @brief   Converts SEDS byte order
      *
      * @param   sedsByteOrder   Value to convert
@@ -243,6 +264,21 @@ private:
      * @return  ASN.1 endiannes
      */
     auto convertByteOrder(seds::model::ByteOrder sedsByteOrder) const -> Asn1Acn::Types::Endianness;
+
+private:
+    using ContainerEntriesCacheValue =
+            std::pair<std::unique_ptr<Asn1Acn::Types::Sequence>, std::unique_ptr<Asn1Acn::Types::Sequence>>;
+    using ContainerEntriesCacheMap = std::unordered_map<QString, ContainerEntriesCacheValue>;
+
+    /// @brief  Parent definitions
+    Asn1Acn::Definitions *m_asn1Definitions;
+    /// @brief  Where translated data type will be saved
+    std::unique_ptr<Asn1Acn::Types::Type> &m_asn1Type;
+    /// @brief  Cache for sequence components
+    ContainerEntriesCacheMap m_asn1SequenceComponentsCache;
+
+    inline static const QString m_realizationComponentsName = "realization";
+    inline static const QString m_realizationComponentsAlternativeNameTemplate = "realization%1";
 };
 
 } // namespace conversion::asn1::translator

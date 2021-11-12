@@ -1,5 +1,5 @@
 <InterfaceView asn1file="labelAndJoin.asn">
-<Function name="exampleProcess" is_type="NO" language="SDL">
+<Function name="labelAndJoin" is_type="NO" language="SDL">
     <Property name="Taste::coordinates" value="48500 52900 68500 60900"/>
 <Provided_Interface name="sigReset" kind="Sporadic">
     <Property name="Taste::coordinates" value="68500 54400"/>
@@ -21,7 +21,7 @@
 
 <Connection >
     <Source func_name="gui" ri_name="sigReset"/>
-    <Target func_name="exampleProcess" pi_name="sigReset"/>
+    <Target func_name="labelAndJoin" pi_name="sigReset"/>
     <Property name="Taste::coordinates" value="42100 34000 70100 34000 70100 54400 68800 54400"/>
 </Connection>
 

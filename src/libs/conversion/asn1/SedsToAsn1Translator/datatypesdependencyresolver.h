@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <conversion/common/exceptions.h>
 #include <list>
 #include <seds/SedsModel/types/datatype.h>
 #include <unordered_map>
@@ -85,18 +86,16 @@ private:
  *
  * Exception for cyclic dependency
  */
-class NotDAGException final : public std::exception
+class NotDagException final : public ConversionException
 {
 public:
     /**
-     * @brief   Getter for exception message
-     *
-     * @return  Exception message
+     * @brief   Constructor
      */
-    virtual auto what() const noexcept -> const char * override;
+    NotDagException();
 };
 
-class UndeclaredDataTypeException final : public std::exception
+class UndeclaredDataTypeException final : public ConversionException
 {
 public:
     /**
@@ -104,19 +103,7 @@ public:
      *
      * @param   dataTypeName    Name of the referenced undeclared type
      */
-    UndeclaredDataTypeException(QString dataTypeName);
-    /**
-     * @brief   Getter for exception message
-     *
-     * @return  Exception message
-     */
-    virtual auto what() const noexcept -> const char * override;
-
-private:
-    /**
-     * @brief   Exception message
-     */
-    std::string m_message;
+    UndeclaredDataTypeException(const QString &dataTypeName);
 };
 
 } // namespace conversion::asn1::translator

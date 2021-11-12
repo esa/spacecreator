@@ -19,10 +19,9 @@
 
 #pragma once
 
-#include "options.h"
-
 #include <conversion/common/export/modelexporter.h>
 #include <sdl/SdlModel/sdlmodel.h>
+#include <sdl/SdlOptions/options.h>
 
 class QSaveFile;
 
@@ -71,6 +70,8 @@ public:
 
 private:
     auto exportSdlModel(const SdlModel *model, const Options &options) const -> void;
+
+    auto exportProcess(const Process &process, const Options &options) const -> void;
 
     auto writeAndCommit(QSaveFile &outputFile, const std::string &data) const -> void;
 

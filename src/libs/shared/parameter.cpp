@@ -17,9 +17,6 @@
 
 #include "parameter.h"
 
-#include "asn1/types/type.h"
-#include "asn1valueparser.h"
-
 #include <QMetaEnum>
 
 namespace shared {
@@ -31,7 +28,7 @@ BasicParameter::BasicParameter(const QString &name, Type t, const QString &param
 {
 }
 
-BasicParameter::~BasicParameter() { }
+BasicParameter::~BasicParameter() {}
 
 QString BasicParameter::name() const
 {
@@ -113,16 +110,9 @@ bool BasicParameter::operator==(const BasicParameter &other) const
     return m_paramName == other.m_paramName && m_paramType == other.m_paramType && m_typeName == other.m_typeName;
 }
 
-bool BasicParameter::isValidValue(const Asn1Acn::Types::Type *basicDataType, const QVariant &value) const
+bool BasicParameter::isValidValue(const QVariant &value) const
 {
-    if (!basicDataType) {
-        return true;
-    }
-
-    Asn1Acn::Asn1ValueParser valueParser;
-    bool ok;
-    valueParser.parseAsn1Value(basicDataType, value.toString(), &ok);
-    return ok;
+    return value.isValid();
 }
 
 QString BasicParameter::toString() const
@@ -150,23 +140,24 @@ ContextParameter::ContextParameter(const QString &name, Type t, const QString &p
 {
 }
 
-ContextParameter::~ContextParameter() { }
+ContextParameter::~ContextParameter() {}
 
 QVariant ContextParameter::defaultValue() const
 {
     return (paramType() == Type::Timer) ? QVariant() : m_defaultValue;
 }
 
-bool ContextParameter::setDefaultValue(const Asn1Acn::Types::Type *basicDataType, const QVariant &value)
+bool ContextParameter::setDefaultValue(const QVariant &value)
 {
     if (paramType() == Type::Timer || m_defaultValue == value)
         return false;
 
-    if (!isValidValue(basicDataType, value))
-        return false;
+    if (m_defaultValue != value) {
+        m_defaultValue = value;
+        return true;
+    }
 
-    m_defaultValue = value;
-    return true;
+    return false;
 }
 
 bool ContextParameter::operator==(const ContextParameter &other) const
@@ -220,7 +211,7 @@ InterfaceParameter::InterfaceParameter(
 {
 }
 
-InterfaceParameter::~InterfaceParameter() { }
+InterfaceParameter::~InterfaceParameter() {}
 
 QString InterfaceParameter::encoding() const
 {

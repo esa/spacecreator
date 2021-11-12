@@ -38,8 +38,8 @@ DVPartition *DVFunction::partition() const
 QString DVFunction::usedImplementation() const
 {
     QString value = implementation();
-    if (value.isEmpty() && model() && model()->ivQueries()) {
-        return model()->ivQueries()->defaultImplementationForFunction(title());
+    if (value.isEmpty()) {
+        return defaultImplementation();
     }
     return value;
 }
@@ -73,6 +73,41 @@ QStringList DVFunction::availableImplementations() const
         return model()->ivQueries()->implementationsForFunction(title());
     }
     return {};
+}
+
+/*!
+   The implementation used, when no explicit one is set
+ */
+QString DVFunction::defaultImplementation() const
+{
+    if (model() && model()->ivQueries()) {
+        return model()->ivQueries()->defaultImplementationForFunction(title());
+    }
+    return {};
+}
+
+/*!
+   Returns the full ath of the function (relevant for nested functions)
+   Does update the information from interfaceview if possible.
+ */
+QStringList DVFunction::path() const
+{
+    QStringList path;
+    const QString tokenName = meta::Props::token(meta::Props::Token::path);
+    if (model() && model()->ivQueries()) {
+        path = model()->ivQueries()->functionPath(title());
+
+        auto self = const_cast<DVFunction *>(this);
+        self->setEntityAttribute(tokenName, QVariant::fromValue(path.join("::")));
+    } else {
+        path = entityAttributeValue<QString>(tokenName, title()).split("::");
+    }
+    return path;
+}
+
+void DVFunction::updateForExport()
+{
+    path();
 }
 
 } // namespace dvm
