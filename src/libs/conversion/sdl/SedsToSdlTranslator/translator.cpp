@@ -19,6 +19,7 @@
 
 #include "translator.h"
 
+#include "specialized/activitytranslator.h"
 #include "specialized/statemachinetranslator.h"
 
 #include <conversion/common/escaper/escaper.h>
@@ -118,7 +119,9 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
         process.setName(Escaper::escapeIvName(sedsComponent.nameStr()));
         StateMachineTranslator::translateVariables(sedsPackage, asn1Model, implementation.variables(), &process);
         StateMachineTranslator::createVariablesForInputReception(sedsComponent, ivModel, &process);
-        // TODO translate procedures (activities?)
+        for (const auto &activity : implementation.activities()) {
+            ActivityTranslator::translateActivity(sedsPackage, asn1Model, activity, &process);
+        }
         // TODO provide additional translation for parameter (activity) maps
         if (stateMachineCount == 1) {
             StateMachineTranslator::translateStateMachine(
