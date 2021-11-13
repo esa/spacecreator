@@ -101,7 +101,6 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
         const seds::model::Component &sedsComponent, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
         ::sdl::SdlModel *model) const -> void
 {
-    Q_UNUSED(ivModel);
 
     const auto &implementation = sedsComponent.implementation();
     const auto parameterMapCount = implementation.parameterMaps().size();
@@ -118,8 +117,7 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
         ::sdl::Process process;
         process.setName(Escaper::escapeIvName(sedsComponent.nameStr()));
         StateMachineTranslator::translateVariables(sedsPackage, asn1Model, implementation.variables(), &process);
-        StateMachineTranslator::createVariablesForInputReception(
-                sedsPackage, sedsComponent, asn1Model, ivModel, &process);
+        StateMachineTranslator::createVariablesForInputReception(sedsComponent, ivModel, &process);
         // TODO translate procedures (activities?)
         // TODO provide additional translation for parameter (activity) maps
         if (stateMachineCount == 1) {

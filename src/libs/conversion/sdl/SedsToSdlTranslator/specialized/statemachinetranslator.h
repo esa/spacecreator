@@ -20,6 +20,7 @@
 #pragma once
 
 #include <asn1library/asn1/asn1model.h>
+#include <ivcore/ivmodel.h>
 #include <map>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <seds/SedsModel/components/states/entrystate.h>
@@ -60,15 +61,12 @@ public:
     /**
      * @brief   Create variables for accepting input signal parameters
      *
-     * @param sedsPackage       SEDS package containing the component
      * @param sedsComponent     SEDS component
-     * @param asn1Model         Data model
      * @param ivModel           InterfaceView model
      * @param sdlProcess        Target SDL process
      */
-    static auto createVariablesForInputReception(const seds::model::Package &sedsPackage,
-            const seds::model::Component &sedsComponent, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
-            ::sdl::Process *sdlProcess) -> void;
+    static auto createVariablesForInputReception(
+            const seds::model::Component &sedsComponent, ivm::IVModel *ivModel, ::sdl::Process *sdlProcess) -> void;
 
     /**
      * @brief   Get name of the variable used for receiving packed parameters on the given interface
@@ -98,9 +96,7 @@ private:
     static auto translateTransition(const seds::model::Transition &sedsTransition, ::sdl::Process *sdlProcess,
             ::sdl::StateMachine *stateMachine, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void;
 
-    static auto createVariableForInput(const seds::model::Package &sedsPackage,
-            const seds::model::Component &sedsComponent, Asn1Acn::Asn1Model *asn1Model,
-            ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
+    static auto createVariableForInput(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
 };
 
 } // namespace conversion::sdl::translator

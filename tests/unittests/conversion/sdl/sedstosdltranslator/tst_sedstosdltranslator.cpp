@@ -21,11 +21,15 @@
 #include <QtTest>
 #include <asn1library/asn1/asn1model.h>
 #include <asn1modelbuilder/asn1modelbuilder.h>
+#include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/options.h>
 #include <conversion/common/translation/exceptions.h>
+#include <conversion/iv/IvOptions/options.h>
+#include <conversion/iv/SedsToIvTranslator/translator.h>
 #include <conversion/sdl/SedsToSdlTranslator/translator.h>
 #include <ivcore/ivmodel.h>
 #include <sdl/SdlModel/nextstate.h>
+#include <sdl/SdlModel/task.h>
 #include <sedsmodelbuilder/sedscommandprimitivebuilder.h>
 #include <sedsmodelbuilder/sedscomponentbuilder.h>
 #include <sedsmodelbuilder/sedsimplementationbuilder.h>
@@ -73,6 +77,7 @@ private Q_SLOTS:
     void testTranslateStateMachineIntoProcess();
     void testTranslateStateMachineStates();
     void testTranslateStateMachineInputs();
+    void testTranslateStateMachineInputsWithVariables();
 };
 
 void tst_SedsToSdlTranslator::testMissingModel()
@@ -141,17 +146,20 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineIntoProcess()
                     .build())
             .build();
 
-    const auto asn1Model =
-        Asn1ModelBuilder("Package")
-        .build();
     // clang-format on
 
     Options options;
-    SedsToSdlTranslator translator;
+    options.add(conversion::iv::IvOptions::configFilename, "config.xml");
 
-    const auto ivModel = std::make_unique<ivm::IVModel>(nullptr);
+    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    SedsToSdlTranslator sdlTranslator;
 
-    const auto resultModels = translator.translateModels({ sedsModel.get(), asn1Model.get(), ivModel.get() }, options);
+    const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);
+    const auto ivModels = ivTranslator.translateModels({ sedsModel.get(), asn1Models[0].get() }, options);
+
+    const auto resultModels =
+            sdlTranslator.translateModels({ sedsModel.get(), asn1Models[0].get(), ivModels[0].get() }, options);
     QCOMPARE(resultModels.size(), 1);
 
     const auto &resultModel = resultModels[0];
@@ -187,7 +195,7 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineStates()
                         SedsImplementationBuilder()
                         .withStateMachine(
                             SedsStateMachineBuilder()
-                            .withState("StateA")
+                            .withEntryState("StateA")
                             .withState("StateB")
                             .build()
                         )
@@ -196,17 +204,21 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineStates()
                     .build())
             .build();
 
-    const auto asn1Model =
-        Asn1ModelBuilder("Package")
-        .build();
     // clang-format on
 
     Options options;
-    SedsToSdlTranslator translator;
+    options.add(conversion::iv::IvOptions::configFilename, "config.xml");
 
-    const auto ivModel = std::make_unique<ivm::IVModel>(nullptr);
+    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    SedsToSdlTranslator sdlTranslator;
 
-    const auto resultModels = translator.translateModels({ sedsModel.get(), asn1Model.get(), ivModel.get() }, options);
+    const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);
+    const auto ivModels = ivTranslator.translateModels({ sedsModel.get(), asn1Models[0].get() }, options);
+
+    const auto resultModels =
+            sdlTranslator.translateModels({ sedsModel.get(), asn1Models[0].get(), ivModels[0].get() }, options);
+
     QCOMPARE(resultModels.size(), 1);
 
     const auto &resultModel = resultModels[0];
@@ -214,7 +226,6 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineStates()
 
     const auto *sdlModel = dynamic_cast<SdlModel *>(resultModel.get());
     QVERIFY(sdlModel);
-
     QCOMPARE(sdlModel->processes().size(), 1);
 
     const auto &process = sdlModel->processes()[0];
@@ -248,27 +259,26 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineInputs()
                     .build())
             .build();
 
-    const auto asn1Model =
-        Asn1ModelBuilder("Package")
-        .build();
     // clang-format on
 
     Options options;
-    SedsToSdlTranslator translator;
+    options.add(conversion::iv::IvOptions::configFilename, "config.xml");
 
-    const auto ivModel = std::make_unique<ivm::IVModel>(nullptr);
+    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    SedsToSdlTranslator sdlTranslator;
 
-    const auto resultModels = translator.translateModels({ sedsModel.get(), asn1Model.get(), ivModel.get() }, options);
+    const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);
+    const auto ivModels = ivTranslator.translateModels({ sedsModel.get(), asn1Models[0].get() }, options);
 
-    QCOMPARE(resultModels.size(), 1);
+    const auto resultModels =
+            sdlTranslator.translateModels({ sedsModel.get(), asn1Models[0].get(), ivModels[0].get() }, options);
+
     const auto &resultModel = resultModels[0];
-    QCOMPARE(resultModel->modelType(), ModelType::Sdl);
     const auto *sdlModel = dynamic_cast<SdlModel *>(resultModel.get());
-    QVERIFY(sdlModel);
-    QCOMPARE(sdlModel->processes().size(), 1);
     const auto &process = sdlModel->processes()[0];
-    QCOMPARE(process.name(), "Component");
     const auto &startTransition = sdlModel->processes()[0].startTransition();
+
     QVERIFY(startTransition);
     QCOMPARE(startTransition->actions().size(), 1);
     const auto entryAction = startTransition->actions()[0].get();
@@ -276,14 +286,77 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineInputs()
     QVERIFY(entryState);
     QCOMPARE(entryState->state()->name(), "StateA");
     const auto stateA = getStateOfName(process, "StateA");
-    QVERIFY(stateA);
-    const auto stateB = getStateOfName(process, "StateB");
-    QVERIFY(stateB);
     QCOMPARE(stateA->inputs().size(), 1);
     QCOMPARE(stateA->inputs()[0]->name(), "If1_Cmd1_Pi");
     QCOMPARE(stateA->inputs()[0]->transition()->actions().size(), 1);
     const auto action = stateA->inputs()[0]->transition()->actions()[0].get();
     const auto nextState = dynamic_cast<const ::sdl::NextState *>(action);
+    QVERIFY(nextState);
+    QCOMPARE(nextState->state()->name(), "StateB");
+}
+
+void tst_SedsToSdlTranslator::testTranslateStateMachineInputsWithVariables()
+{
+    // clang-format off
+    const auto sedsModel =
+            SedsModelBuilder("Package")
+                    .withIntegerDataType("Integer")
+                    .withComponent(
+                            SedsComponentBuilder("Component")
+                                    .declaringInterface(SedsInterfaceDeclarationBuilder("If1Type")
+                                                                .withCommand(SedsInterfaceCommandBuilder(
+                                                                        "Cmd1", InterfaceCommandMode::Async)
+                                                                                     .withArgument("arg1", "Integer",
+                                                                                             CommandArgumentMode::In)
+                                                                                     .build())
+                                                                .build())
+                                    .withProvidedInterface(SedsInterfaceBuilder("If1", "If1Type").build())
+                                    .withImplementation(
+                                            SedsImplementationBuilder()
+                                                    .withVariable("var1", "Integer")
+                                                    .withStateMachine(
+                                                            SedsStateMachineBuilder()
+                                                                    .withEntryState("StateA")
+                                                                    .withState("StateB")
+                                                                    .withTransition("StateA", "StateB",
+                                                                            SedsCommandPrimitiveBuilder("If1", "Cmd1")
+                                                                                    .withArgumentValue("arg1", "var1")
+                                                                                    .build())
+                                                                    .build())
+                                                    .build())
+                                    .build())
+                    .build();
+
+    // clang-format on
+
+    Options options;
+    options.add(conversion::iv::IvOptions::configFilename, "config.xml");
+
+    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    SedsToSdlTranslator sdlTranslator;
+
+    const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);
+    const auto ivModels = ivTranslator.translateModels({ sedsModel.get(), asn1Models[0].get() }, options);
+
+    const auto resultModels =
+            sdlTranslator.translateModels({ sedsModel.get(), asn1Models[0].get(), ivModels[0].get() }, options);
+
+    const auto &resultModel = resultModels[0];
+    const auto *sdlModel = dynamic_cast<SdlModel *>(resultModel.get());
+    const auto &process = sdlModel->processes()[0];
+    const auto stateA = getStateOfName(process, "StateA");
+
+    QCOMPARE(stateA->inputs().size(), 1);
+    QCOMPARE(stateA->inputs()[0]->name(), "If1_Cmd1_Pi");
+    QCOMPARE(stateA->inputs()[0]->transition()->actions().size(), 2);
+
+    const auto unpackAction = stateA->inputs()[0]->transition()->actions()[0].get();
+    const auto unpack = dynamic_cast<const ::sdl::Task *>(unpackAction);
+    QCOMPARE(unpack->content(), "var1 := input_If1_Cmd1_Pi.arg1");
+
+    const auto nextStateAction = stateA->inputs()[0]->transition()->actions()[1].get();
+    const auto nextState = dynamic_cast<const ::sdl::NextState *>(nextStateAction);
     QVERIFY(nextState);
     QCOMPARE(nextState->state()->name(), "StateB");
 }

@@ -29,6 +29,7 @@ public:
     seds::model::ComponentImplementation build();
 
     auto withStateMachine(seds::model::StateMachine machine) -> SedsImplementationBuilder &;
+    auto withVariable(QString name, QString typeName) -> SedsImplementationBuilder &;
 
 private:
     seds::model::ComponentImplementation m_implementation;

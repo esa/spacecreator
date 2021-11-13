@@ -35,4 +35,14 @@ auto SedsImplementationBuilder::withStateMachine(seds::model::StateMachine machi
     return *this;
 }
 
+auto SedsImplementationBuilder::withVariable(QString name, QString typeName) -> SedsImplementationBuilder &
+{
+    seds::model::Variable variable;
+    variable.setName(std::move(name));
+    variable.setType(seds::model::DataTypeRef(std::move(typeName)));
+    m_implementation.addVariable(std::move(variable));
+
+    return *this;
+}
+
 } // namespace tests::conversion::common
