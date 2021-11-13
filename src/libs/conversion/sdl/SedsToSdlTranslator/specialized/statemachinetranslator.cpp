@@ -19,6 +19,8 @@
 
 #include "statemachinetranslator.h"
 
+#include "statementvisitor.h"
+
 #include <algorithm>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
@@ -194,10 +196,8 @@ auto StateMachineTranslator::translateTransition(const seds::model::Transition &
         ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine,
         std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void
 {
-    Q_UNUSED(sdlProcess);
-
-    const auto fromStateName = sedsTransition.fromState().nameStr();
-    const auto toStateName = sedsTransition.toState().nameStr();
+    const auto fromStateName = Escaper::escapeSdlName(sedsTransition.fromState().nameStr());
+    const auto toStateName = Escaper::escapeSdlName(sedsTransition.toState().nameStr());
     const auto &fromStateIterator = stateMap.find(fromStateName);
     const auto &toStateIterator = stateMap.find(toStateName);
     if (fromStateIterator == stateMap.end()) {
@@ -219,7 +219,9 @@ auto StateMachineTranslator::translateTransition(const seds::model::Transition &
     }
     // TODO Guard
     // TODO From Exit
-    // TODO Activity
+    if (sedsTransition.doActivity().has_value()) {
+        transition->addAction(StatementVisitor::translateActivityCall(sdlProcess, *sedsTransition.doActivity()));
+    }
     // TODO To Entry
     // State switch
     transition->addAction(std::make_unique<::sdl::NextState>("", toState));

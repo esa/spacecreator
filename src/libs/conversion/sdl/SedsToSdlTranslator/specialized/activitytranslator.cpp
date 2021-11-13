@@ -19,15 +19,41 @@
 
 #include "activitytranslator.h"
 
+#include "statementvisitor.h"
+
+#include <conversion/common/escaper/escaper.h>
+#include <sdl/SdlModel/task.h>
+
+using conversion::Escaper;
+
 namespace conversion::sdl::translator {
 
 auto ActivityTranslator::translateActivity(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
         const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess) -> void
 {
-    Q_UNUSED(sedsPackage);
-    Q_UNUSED(asn1Model);
-    Q_UNUSED(sedsActivity);
-    Q_UNUSED(sdlProcess);
+
+    const auto name = Escaper::escapeSdlName(sedsActivity.nameStr());
+    auto procedure = std::make_unique<::sdl::Procedure>(name);
+    for (const auto &argument : sedsActivity.arguments()) {
+        const auto &parameterName = Escaper::escapeAsn1FieldName(argument.nameStr());
+        const auto &parameterType = Escaper::escapeAsn1TypeName(argument.type().nameStr());
+        auto parameter = std::make_unique<::sdl::ProcedureParameter>(parameterName, parameterType, "in");
+        procedure->addParameter(std::move(parameter));
+    }
+    translateBody(sedsPackage, asn1Model, sedsActivity, sdlProcess, procedure.get());
+    sdlProcess->addProcedure(std::move(procedure));
+}
+
+auto ActivityTranslator::translateBody(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
+        const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess, ::sdl::Procedure *procedure) -> void
+{
+    auto transition = std::make_unique<::sdl::Transition>();
+    StatementVisitor visitor(sedsPackage, asn1Model, sdlProcess, procedure, transition.get());
+    for (const auto &statement : sedsActivity.body()->statements()) {
+        std::visit(visitor, statement);
+    }
+
+    procedure->setTransition(std::move(transition));
 }
 
 } // namespace conversion::sdl::translator

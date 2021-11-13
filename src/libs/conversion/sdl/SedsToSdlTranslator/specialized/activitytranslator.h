@@ -44,6 +44,8 @@ public:
             const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess) -> void;
 
 private:
+    static auto translateBody(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
+            const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess, ::sdl::Procedure *procedure) -> void;
 };
 
 }
