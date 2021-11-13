@@ -19,21 +19,23 @@
 
 #pragma once
 
-#include <seds/SedsModel/components/componentimplementation.h>
+#include <seds/SedsCommon/basetypesmappings.h>
+#include <seds/SedsModel/components/activities/activity.h>
 
 namespace tests::conversion::common {
 
-class SedsImplementationBuilder final
+class SedsActivityBuilder final
 {
 public:
-    seds::model::ComponentImplementation build();
+    SedsActivityBuilder(QString name);
 
-    auto withActivity(seds::model::Activity activity) -> SedsImplementationBuilder &;
-    auto withStateMachine(seds::model::StateMachine machine) -> SedsImplementationBuilder &;
-    auto withVariable(QString name, QString typeName) -> SedsImplementationBuilder &;
+    auto build() -> seds::model::Activity;
+
+    auto withValueAssignment(const QString target, const QString value) -> SedsActivityBuilder &;
+    auto withArgument(const QString name, const QString typeName) -> SedsActivityBuilder &;
 
 private:
-    seds::model::ComponentImplementation m_implementation;
+    seds::model::Activity m_activity;
 };
 
 } // namespace tests::conversion::common

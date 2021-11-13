@@ -52,10 +52,12 @@ auto StatementVisitor::operator()(const seds::model::Assignment &assignment) -> 
         const auto action =
                 QString("%1 := %2").arg(targetName, std::get<seds::model::VariableRef>(element).value().value());
         m_sdlTransition->addAction(std::make_unique<::sdl::Task>("", action));
+        return;
     } else if (std::holds_alternative<seds::model::ValueOperand>(element)) {
         const auto action =
                 QString("%1 := %2").arg(targetName, std::get<seds::model::ValueOperand>(element).value().value());
         m_sdlTransition->addAction(std::make_unique<::sdl::Task>("", action));
+        return;
     }
     throw TranslationException("Not implemented");
 }
@@ -94,7 +96,15 @@ auto StatementVisitor::translateActivityCall(::sdl::Process *process, const seds
         -> std::unique_ptr<::sdl::ProcedureCall>
 {
     auto call = std::make_unique<::sdl::ProcedureCall>();
-    call->setName(Escaper::escapeSdlName(invocation.activity().value()));
+    const auto procedureName = Escaper::escapeSdlName(invocation.activity().value());
+    const auto &procedure = std::find_if(process->procedures().begin(), process->procedures().end(),
+            [procedureName](const auto &p) { return p->name() == procedureName; });
+
+    if (procedure == process->procedures().end()) {
+        throw TranslationException(QString("Procedure %1 not found").arg(procedureName));
+    }
+    call->setProcedure(procedure->get());
+
     for (const auto &argument : invocation.argumentValues()) {
         if (std::holds_alternative<seds::model::ValueOperand>(argument.value())) {
             const auto &value = std::get<seds::model::ValueOperand>(argument.value());

@@ -9,6 +9,7 @@ set(SOURCES sedscomponentbuilder.cpp
             sedsmodelbuilder.cpp
             sedsimplementationbuilder.cpp
             sedsstatemachinebuilder.cpp
+            sedsactivitybuilder.cpp
             sedscommandprimitivebuilder.cpp)
 set(INCLUDES sedscomponentbuilder.h
              sedscontainerdatatypebuilder.h
@@ -19,6 +20,7 @@ set(INCLUDES sedscomponentbuilder.h
              sedsmodelbuilder.h
              sedsimplementationbuilder.h
              sedsstatemachinebuilder.h
+             sedsactivitybuilder.h
              sedscommandprimitivebuilder.h)
 
 add_library(SedsModelBuilder STATIC)

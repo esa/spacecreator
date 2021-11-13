@@ -43,6 +43,8 @@ public:
     auto withTransition(seds::model::Transition transition) -> SedsStateMachineBuilder &;
     auto withTransition(seds::common::String from, seds::common::String to, seds::model::Transition::Primitive on)
             -> SedsStateMachineBuilder &;
+    auto withTransition(seds::common::String from, seds::common::String to, seds::model::Transition::Primitive on,
+            seds::common::String doing) -> SedsStateMachineBuilder &;
 
 private:
     seds::model::StateMachine m_machine;

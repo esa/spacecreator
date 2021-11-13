@@ -96,4 +96,20 @@ auto SedsStateMachineBuilder::withTransition(seds::common::String from, seds::co
     return *this;
 }
 
+auto SedsStateMachineBuilder::withTransition(seds::common::String from, seds::common::String to,
+        seds::model::Transition::Primitive on, seds::common::String doing) -> SedsStateMachineBuilder &
+{
+    seds::model::Transition transition;
+    transition.setFromState(seds::model::StateRef(from));
+    transition.setToState(seds::model::StateRef(to));
+    transition.setPrimitive(std::move(on));
+    ActivityInvocation invocation;
+    invocation.setActivity(Name(doing));
+    transition.setDoActivity(std::move(invocation));
+
+    m_machine.addElement(std::move(transition));
+
+    return *this;
+}
+
 } // namespace tests::conversion::common

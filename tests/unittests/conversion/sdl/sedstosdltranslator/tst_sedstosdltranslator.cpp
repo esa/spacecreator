@@ -29,7 +29,9 @@
 #include <conversion/sdl/SedsToSdlTranslator/translator.h>
 #include <ivcore/ivmodel.h>
 #include <sdl/SdlModel/nextstate.h>
+#include <sdl/SdlModel/procedurecall.h>
 #include <sdl/SdlModel/task.h>
+#include <sedsmodelbuilder/sedsactivitybuilder.h>
 #include <sedsmodelbuilder/sedscommandprimitivebuilder.h>
 #include <sedsmodelbuilder/sedscomponentbuilder.h>
 #include <sedsmodelbuilder/sedsimplementationbuilder.h>
@@ -48,6 +50,7 @@ using conversion::sdl::translator::SedsToSdlTranslator;
 using conversion::translator::TranslationException;
 
 using tests::conversion::common::Asn1ModelBuilder;
+using tests::conversion::common::SedsActivityBuilder;
 using tests::conversion::common::SedsCommandPrimitiveBuilder;
 using tests::conversion::common::SedsComponentBuilder;
 using tests::conversion::common::SedsImplementationBuilder;
@@ -78,6 +81,8 @@ private Q_SLOTS:
     void testTranslateStateMachineStates();
     void testTranslateStateMachineInputs();
     void testTranslateStateMachineInputsWithVariables();
+    void testTranslateActivity();
+    void testTranslateStateTransitionActivity();
 };
 
 void tst_SedsToSdlTranslator::testMissingModel()
@@ -359,6 +364,115 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineInputsWithVariables()
     const auto nextState = dynamic_cast<const ::sdl::NextState *>(nextStateAction);
     QVERIFY(nextState);
     QCOMPARE(nextState->state()->name(), "StateB");
+}
+
+void tst_SedsToSdlTranslator::testTranslateActivity()
+{
+    // clang-format off
+    const auto sedsModel =
+            SedsModelBuilder("Package")
+                    .withIntegerDataType("Integer")
+                    .withComponent(SedsComponentBuilder("Component")
+                                           .withImplementation(
+                                                   SedsImplementationBuilder()
+                                                           .withVariable("var1", "Integer")
+                                                           .withActivity(SedsActivityBuilder("activity1")
+                                                                                 .withArgument("arg1", "Integer")
+                                                                                 .withValueAssignment("var1", "1969")
+                                                                                 .build())
+                                                           .build())
+                                           .build())
+                    .build();
+
+    // clang-format on
+
+    Options options;
+    options.add(conversion::iv::IvOptions::configFilename, "config.xml");
+
+    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    SedsToSdlTranslator sdlTranslator;
+
+    const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);
+    const auto ivModels = ivTranslator.translateModels({ sedsModel.get(), asn1Models[0].get() }, options);
+
+    const auto resultModels =
+            sdlTranslator.translateModels({ sedsModel.get(), asn1Models[0].get(), ivModels[0].get() }, options);
+
+    const auto &resultModel = resultModels[0];
+    const auto *sdlModel = dynamic_cast<SdlModel *>(resultModel.get());
+    const auto &process = sdlModel->processes()[0];
+
+    QCOMPARE(process.procedures().size(), 1);
+    const auto &procedure = process.procedures()[0];
+    QCOMPARE(procedure->name(), "activity1");
+    QCOMPARE(procedure->parameters().size(), 1);
+    QCOMPARE(procedure->parameters()[0]->name(), "arg1");
+    const auto &transition = procedure->transition();
+    QCOMPARE(transition->actions().size(), 1);
+    const auto action = dynamic_cast<::sdl::Task *>(transition->actions()[0].get());
+    QVERIFY(action);
+    QCOMPARE(action->content(), "var1 := 1969");
+}
+
+void tst_SedsToSdlTranslator::testTranslateStateTransitionActivity()
+{
+    // clang-format off
+    const auto sedsModel =
+            SedsModelBuilder("Package")
+                    .withIntegerDataType("Integer")
+                    .withComponent(
+                            SedsComponentBuilder("Component")
+                                    .declaringInterface(SedsInterfaceDeclarationBuilder("If1Type")
+                                                                .withCommand(SedsInterfaceCommandBuilder(
+                                                                        "Cmd1", InterfaceCommandMode::Async)
+                                                                                     .build())
+                                                                .build())
+                                    .withProvidedInterface(SedsInterfaceBuilder("If1", "If1Type").build())
+                                    .withImplementation(
+                                            SedsImplementationBuilder()                                                    
+                                                    .withActivity(SedsActivityBuilder("activity1")                                                                          
+                                                                          .build())
+                                                    .withStateMachine(
+                                                            SedsStateMachineBuilder()
+                                                                    .withEntryState("StateA")
+                                                                    .withState("StateB")
+                                                                    .withTransition("StateA", "StateB",
+                                                                            SedsCommandPrimitiveBuilder("If1", "Cmd1")
+                                                                                    .build(),
+                                                                            "activity1")
+                                                                    .build())
+                                                    .build())
+                                    .build())
+                    .build();
+
+    // clang-format on
+
+    Options options;
+    options.add(conversion::iv::IvOptions::configFilename, "config.xml");
+
+    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    SedsToSdlTranslator sdlTranslator;
+
+    const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);
+    const auto ivModels = ivTranslator.translateModels({ sedsModel.get(), asn1Models[0].get() }, options);
+
+    const auto resultModels =
+            sdlTranslator.translateModels({ sedsModel.get(), asn1Models[0].get(), ivModels[0].get() }, options);
+
+    const auto &resultModel = resultModels[0];
+    const auto *sdlModel = dynamic_cast<SdlModel *>(resultModel.get());
+    const auto &process = sdlModel->processes()[0];
+
+    const auto stateA = getStateOfName(process, "StateA");
+
+    QCOMPARE(stateA->inputs()[0]->transition()->actions().size(), 2);
+
+    const auto invocationAction = stateA->inputs()[0]->transition()->actions()[0].get();
+    const auto invocation = dynamic_cast<const ::sdl::ProcedureCall *>(invocationAction);
+    QVERIFY(invocation);
+    QCOMPARE(invocation->procedure()->name(), "activity1");
 }
 
 } // namespace conversion::sdl::test

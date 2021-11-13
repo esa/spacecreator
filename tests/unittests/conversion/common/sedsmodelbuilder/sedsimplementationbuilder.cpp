@@ -28,6 +28,13 @@ seds::model::ComponentImplementation SedsImplementationBuilder::build()
     return std::move(m_implementation);
 }
 
+auto SedsImplementationBuilder::withActivity(seds::model::Activity activity) -> SedsImplementationBuilder &
+{
+    m_implementation.addActivity(std::move(activity));
+
+    return *this;
+}
+
 auto SedsImplementationBuilder::withStateMachine(seds::model::StateMachine machine) -> SedsImplementationBuilder &
 {
     m_implementation.addStateMachine(std::move(machine));
