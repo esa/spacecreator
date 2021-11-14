@@ -21,6 +21,9 @@ doc/doxygen
 # VS Code directory
 .vscode
 
+# Temporary test outputs
+tests/**/output/*
+
 # locally generated files for SDL exporter references
 tests/unittests/sdl/SdlExporter/references/*/*.aadl
 tests/unittests/sdl/SdlExporter/references/*/*.acn
