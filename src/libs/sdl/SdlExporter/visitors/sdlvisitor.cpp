@@ -229,6 +229,10 @@ void SdlVisitor::visit(const Decision &decision) const
 
 void SdlVisitor::visit(const Procedure &procedure) const
 {
+    if (procedure.transition() == nullptr) {
+        // No implementation -> external procedure
+        return;
+    }
     m_stream << "    " << dummyCif("procedure");
     m_stream << "    procedure " << procedure.name() << ";\n";
 

@@ -120,6 +120,7 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
         process.setName(Escaper::escapeIvName(sedsComponent.nameStr()));
         StateMachineTranslator::translateVariables(sedsPackage, asn1Model, implementation.variables(), &process);
         StateMachineTranslator::createVariablesForInputReception(sedsComponent, ivModel, &process);
+        StateMachineTranslator::createExternalProcedures(sedsComponent, ivModel, &process);
         for (const auto &activity : implementation.activities()) {
             ActivityTranslator::translateActivity(sedsPackage, asn1Model, activity, &process);
         }

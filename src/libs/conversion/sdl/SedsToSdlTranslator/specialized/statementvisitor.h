@@ -118,6 +118,12 @@ private:
     ::sdl::Process *m_sdlProcess;
     ::sdl::Procedure *m_sdlProcedure;
     ::sdl::Transition *m_sdlTransition;
+
+    static auto findVariableDeclaration(::sdl::Process *process, ::sdl::Procedure *sdlProcedure, QString name)
+            -> ::sdl::VariableDeclaration *;
+
+    static auto translateArgument(::sdl::Process *process, ::sdl::Procedure *sdlProcedure,
+            const seds::model::NamedArgumentValue &argument) -> ::sdl::ProcedureCall::Argument;
 };
 
 } // namespace conversion::asn1::translator

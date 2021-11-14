@@ -69,6 +69,16 @@ public:
             const seds::model::Component &sedsComponent, ivm::IVModel *ivModel, ::sdl::Process *sdlProcess) -> void;
 
     /**
+     * @brief   Create declarations of external procedures
+     *
+     * @param sedsComponent     SEDS component
+     * @param ivModel           InterfaceView model
+     * @param sdlProcess        Target SDL process
+     */
+    static auto createExternalProcedures(
+            const seds::model::Component &sedsComponent, ivm::IVModel *ivModel, ::sdl::Process *sdlProcess) -> void;
+
+    /**
      * @brief   Get name of the variable used for receiving packed parameters on the given interface
      *
      * @param interfaceName     Interface name
@@ -97,6 +107,8 @@ private:
             ::sdl::StateMachine *stateMachine, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void;
 
     static auto createVariableForInput(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
+
+    static auto createExternalProcedure(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
 };
 
 } // namespace conversion::sdl::translator

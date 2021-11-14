@@ -104,6 +104,21 @@ auto StateMachineTranslator::createVariablesForInputReception(
     }
 }
 
+auto StateMachineTranslator::createExternalProcedures(
+        const seds::model::Component &sedsComponent, ivm::IVModel *ivModel, ::sdl::Process *sdlProcess) -> void
+{
+    const auto functionName = Escaper::escapeIvName(sedsComponent.nameStr());
+    const auto function = ivModel->getFunction(functionName, Qt::CaseSensitive);
+    if (function == nullptr) {
+        throw TranslationException(QString("Function %1 not found in the InterfaceView").arg(functionName));
+    }
+    for (const auto &interface : function->interfaces()) {
+        if (interface->isRequired() && interface->kind() == ivm::IVInterface::OperationKind::Protected) {
+            createExternalProcedure(interface, sdlProcess);
+        }
+    }
+}
+
 auto StateMachineTranslator::receptionVariableName(const QString interfaceName) -> QString
 {
     return QString(RECEPTION_VARIABLE_PATTERN).arg(interfaceName);
@@ -243,6 +258,19 @@ auto StateMachineTranslator::createVariableForInput(ivm::IVInterface const *inte
     const auto variableName = receptionVariableName(interfaceName);
     const auto &param = interface->params()[0];
     sdlProcess->addVariable(std::make_unique<::sdl::VariableDeclaration>(variableName, param.paramTypeName()));
+}
+
+auto StateMachineTranslator::createExternalProcedure(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess)
+        -> void
+{
+    const auto interfaceName = interface->title();
+
+    auto procedure = std::make_unique<::sdl::Procedure>();
+    procedure->setName(interfaceName);
+    // External procedures are required for call names
+    // Arguments do not need to be translated
+
+    sdlProcess->addProcedure(std::move(procedure));
 }
 
 } // namespace conversion::sdl::translator
