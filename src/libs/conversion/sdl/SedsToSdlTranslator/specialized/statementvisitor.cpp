@@ -59,37 +59,43 @@ auto StatementVisitor::operator()(const seds::model::Assignment &assignment) -> 
         m_sdlTransition->addAction(std::make_unique<::sdl::Task>("", action));
         return;
     }
-    throw TranslationException("Not implemented");
+    throw TranslationException("Assignment not implemented");
 }
 
 auto StatementVisitor::operator()(const seds::model::Calibration &calibration) -> void
 {
     Q_UNUSED(calibration);
+    throw TranslationException("Calibration activity not implemented");
 }
 
 auto StatementVisitor::operator()(const seds::model::Conditional &conditional) -> void
 {
     Q_UNUSED(conditional);
+    throw TranslationException("Conditional activity not implemented");
 }
 
 auto StatementVisitor::operator()(const seds::model::Iteration &iteration) -> void
 {
     Q_UNUSED(iteration);
+    throw TranslationException("Iteration activity not implemented");
 }
 
 auto StatementVisitor::operator()(const seds::model::MathOperation &operation) -> void
 {
     Q_UNUSED(operation);
+    throw TranslationException("Operation activity not implemented");
 }
 
 auto StatementVisitor::operator()(const seds::model::SendCommandPrimitive &sendCommand) -> void
 {
     Q_UNUSED(sendCommand);
+    throw TranslationException("SendCommand activity not implemented");
 }
 
 auto StatementVisitor::operator()(const seds::model::SendParameterPrimitive &sendPrimitive) -> void
 {
     Q_UNUSED(sendPrimitive);
+    throw TranslationException("SendPrimitive activity not implemented");
 }
 
 auto StatementVisitor::translateActivityCall(::sdl::Process *process, const seds::model::ActivityInvocation &invocation)
