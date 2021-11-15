@@ -19,8 +19,8 @@
 
 #include <QCache>
 #include <QObject>
-#include <memory>
 #include <QVector>
+#include <memory>
 
 class QFileInfo;
 class QStringList;
@@ -48,7 +48,8 @@ public:
             const QString &filePath, const QString &fileName, QStringList *errorMessages);
     std::unique_ptr<Asn1Acn::File> parseAsn1File(
             const QString &fileName, QStringList *errorMessages, const QString &content);
-    std::vector<std::unique_ptr<Asn1Acn::File>> parseAsn1Files(const QVector<QFileInfo> &fileInfos, QStringList *errorMessages);
+    std::vector<std::unique_ptr<Asn1Acn::File>> parseAsn1Files(
+            const QVector<QFileInfo> &fileInfos, QStringList *errorMessages);
 
     std::unique_ptr<Asn1Acn::File> parseAsn1XmlFile(const QString &fileName);
     std::unique_ptr<Asn1Acn::File> parseAsn1XmlContent(const QString &xmlContent, const QString &fileName);
