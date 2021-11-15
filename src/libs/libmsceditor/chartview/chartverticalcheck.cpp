@@ -19,6 +19,7 @@
 
 #include "baseitems/instanceheaditem.h"
 #include "chartlayoutmanager.h"
+#include "commentitem.h"
 #include "coregionitem.h"
 #include "instanceitem.h"
 #include "messageitem.h"
@@ -170,6 +171,11 @@ void ChartVerticalCheck::checkEvent(MscInstanceEvent *event)
         break;
     }
     m_processedEvents.insert(event);
+
+    if (event->comment()) {
+        CommentItem *commentItem = m_manager->itemForComment(event->comment());
+        commentItem->instantLayoutUpdate();
+    }
 }
 
 /*!
