@@ -63,7 +63,7 @@ CmdEntitiesInstantiate::CmdEntitiesInstantiate(
     QRectF typeGeometry = shared::graphicsviewutils::rect(entity->coordinates());
     typeGeometry.moveTo(pos);
     m_instantiatedEntity->setCoordinates(shared::graphicsviewutils::coordinates(typeGeometry));
-
+    m_instantiatedEntity->setInstanceOf(entity);
     m_subCmds.append(
             new shared::cmd::CmdEntityAttributesChange(ivm::IVPropertyTemplateConfig::instance(), m_instantiatedEntity,
                     { EntityAttribute { ivm::meta::Props::token(ivm::meta::Props::Token::is_type), QLatin1String("NO"),

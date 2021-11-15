@@ -86,10 +86,10 @@ static inline void dumpItem(QObject *obj, bool strict = false)
                 << shared::graphicsviewutils::polygon(connection->entity()->coordinates()) << "\n";
         Q_ASSERT(!strict
                 || shared::graphicsviewutils::comparePolygones(connection->graphicsPoints(),
-                        shared::graphicsviewutils::polygon(connection->entity()->coordinates())));
+                           shared::graphicsviewutils::polygon(connection->entity()->coordinates())));
         Q_ASSERT(!strict
-                || shared::graphicsviewutils::comparePolygones(
-                        connection->points(), shared::graphicsviewutils::polygon(connection->entity()->coordinates())));
+                || shared::graphicsviewutils::comparePolygones(connection->points(),
+                           shared::graphicsviewutils::polygon(connection->entity()->coordinates())));
     } else if (auto rectItem = qobject_cast<shared::ui::VERectGraphicsItem *>(item)) {
         qInfo() << "\nGraphics" << rectItem->metaObject()->className() << "geometry:\n"
                 << rectItem->sceneBoundingRect() << "\n";
@@ -125,7 +125,7 @@ IVItemModel::IVItemModel(ivm::IVModel *model, cmd::CommandsStack *commandsStack,
     connect(model, &ivm::IVModel::rootObjectChanged, this, &IVItemModel::onRootObjectChanged);
 }
 
-IVItemModel::~IVItemModel() { }
+IVItemModel::~IVItemModel() {}
 
 void IVItemModel::onObjectAdded(shared::Id objectId)
 {
@@ -540,8 +540,11 @@ void IVItemModel::changeRootItem(shared::Id id)
         return;
     }
 
+    const bool isClean = m_commandsStack->isClean();
     const auto geometryCmd = new cmd::CmdRootEntityChange(objectsModel(), id);
     m_commandsStack->push(geometryCmd);
+    if (isClean)
+        m_commandsStack->setClean();
 }
 
 ivm::IVModel *IVItemModel::objectsModel() const

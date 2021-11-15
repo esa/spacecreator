@@ -53,7 +53,6 @@ MiniMap::MiniMap(QWidget *parent)
     setOptimizationFlag(QGraphicsView::IndirectPainting);
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     setMouseTracking(true);
-    setVisible(false);
 }
 
 MiniMap::~MiniMap() { }
