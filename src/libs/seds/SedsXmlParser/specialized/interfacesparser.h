@@ -35,6 +35,7 @@ class Package;
 
 enum class CommandArgumentMode : uint8_t;
 enum class InterfaceCommandMode;
+enum class InterfaceLevel;
 enum class InterfaceParameterMode;
 } // namespace seds::model
 
@@ -117,10 +118,16 @@ private:
     static auto parseCommandArgumentMode(const QStringRef &commandArgumentModeStr) -> model::CommandArgumentMode;
     /**
      * @brief   Parses given string as an interface parameter mode
-     * @param   parameterModeStr      String to parse
-     * @return  parameter mode
+     * @param   parameterModeStr        String to parse
+     * @return  Parameter mode
      */
     static auto parseInterfaceParameterMode(const QStringRef &parameterModeStr) -> model::InterfaceParameterMode;
+    /**
+     * @brief   Parses given string as an interface level
+     * @param   interfaceLevelStr       String to parse
+     * @return  Interface level
+     */
+    static auto parseInterfaceLevel(const QStringRef &interfaceLevelStr) -> model::InterfaceLevel;
 };
 
 } // namespace seds::parser

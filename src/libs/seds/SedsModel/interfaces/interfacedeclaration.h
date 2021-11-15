@@ -22,18 +22,11 @@
 #include "base/namedentity.h"
 #include "generics/generictype.h"
 #include "interfaces/interfacecommand.h"
+#include "interfaces/interfacelevel.h"
 #include "interfaces/interfaceparameter.h"
 #include "interfaces/interfaceref.h"
 
 namespace seds::model {
-
-enum class InterfaceLevel
-{
-    APPLICATION,
-    FUNCTIONAL,
-    ACCESS,
-    SUBNETWORK
-};
 
 class InterfaceDeclaration final : public NamedEntity
 {

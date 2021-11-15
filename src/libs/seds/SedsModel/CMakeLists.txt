@@ -83,6 +83,7 @@ set(SOURCES
     interfaces/interfacecommandmode.cpp
     interfaces/interfacedeclaration.cpp
     interfaces/interfacedeclarationref.cpp
+    interfaces/interfacelevel.cpp
     interfaces/interfaceparameter.cpp
     interfaces/interfaceparametermode.cpp
     interfaces/interfaceref.cpp
@@ -217,6 +218,7 @@ set(INCLUDES
     interfaces/interfacecommandmode.h
     interfaces/interfacedeclaration.h
     interfaces/interfacedeclarationref.h
+    interfaces/interfacelevel.h
     interfaces/interfaceparameter.h
     interfaces/interfaceparametermode.h
     interfaces/interfaceref.h

@@ -62,6 +62,10 @@ model::InterfaceDeclaration InterfacesParser::readInterfaceDeclaration(QXmlStrea
     for (const auto &attribute : xmlReader.attributes()) {
         if (CoreParser::processForNamedEntity(&interfaceDeclaration, attribute)) {
             continue;
+        } else if (attribute.name() == QStringLiteral("abstract")) {
+            interfaceDeclaration.setAbstract(CoreParser::parseBool(attribute.value()));
+        } else if (attribute.name() == QStringLiteral("level")) {
+            interfaceDeclaration.setLevel(parseInterfaceLevel(attribute.value()));
         } else {
             throw UnhandledAttribute(attribute.name(), xmlReader.name());
         }
@@ -268,6 +272,17 @@ model::InterfaceParameterMode InterfacesParser::parseInterfaceParameterMode(cons
         return *parameterMode;
     } else {
         throw ParserException(QString("Unable to parse InterfaceParameterMode '%1'").arg(parameterModeStr));
+    }
+}
+
+model::InterfaceLevel InterfacesParser::parseInterfaceLevel(const QStringRef &interfaceLevelStr)
+{
+    auto interfaceLevel = model::enumFromString<model::InterfaceLevel>(interfaceLevelStr);
+
+    if (interfaceLevel) {
+        return *interfaceLevel;
+    } else {
+        throw ParserException(QString("Unable to parse InterfaceLevel '%1'").arg(interfaceLevelStr));
     }
 }
 
