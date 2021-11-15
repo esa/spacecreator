@@ -61,7 +61,7 @@ std::unique_ptr<conversion::Model> Asn1Importer::importModel(const Options &opti
         files = asn1Reader.parseAsn1Files(inputFilenameList, &errorMessages);
     } else if (options.isSet(Asn1Options::importXmlFile)) {
         if (inputFilenames.size() != 1) {
-            throw ImportException("Only one XML file");
+            throw ImportException("Only one ASN.1 XML source file is allowed");
         }
         std::unique_ptr<Asn1Acn::File> result = asn1Reader.parseAsn1XmlFile(inputFilenames.front());
         files.push_back(std::move(result));
