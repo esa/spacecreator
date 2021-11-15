@@ -32,7 +32,7 @@
 
 namespace msc {
 
-ChartVerticalCheck::ChartVerticalCheck() { }
+ChartVerticalCheck::ChartVerticalCheck() {}
 
 void ChartVerticalCheck::reset(ChartLayoutManager *manager, MscChart *chart)
 {
@@ -173,8 +173,9 @@ void ChartVerticalCheck::checkEvent(MscInstanceEvent *event)
     m_processedEvents.insert(event);
 
     if (event->comment()) {
-        CommentItem *commentItem = m_manager->itemForComment(event->comment());
-        commentItem->instantLayoutUpdate();
+        if (CommentItem *commentItem = m_manager->itemForComment(event->comment())) {
+            commentItem->instantLayoutUpdate();
+        }
     }
 }
 
