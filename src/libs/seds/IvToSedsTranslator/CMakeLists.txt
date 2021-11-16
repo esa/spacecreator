@@ -13,6 +13,7 @@ target_include_directories(IvToSedsTranslator
 target_link_libraries(IvToSedsTranslator
     PUBLIC      Conversion::Common
                 ivcore
+                libiveditor
                 asn1library
                 SEDS::Model
     PRIVATE     CommonProjectWarnings)
