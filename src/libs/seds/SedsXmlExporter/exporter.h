@@ -20,53 +20,40 @@
 #pragma once
 
 #include <conversion/common/export/modelexporter.h>
-#include <sdl/SdlModel/sdlmodel.h>
 
-class QSaveFile;
+namespace seds::exporter {
 
-namespace sdl::exporter {
-/**
- * @brief   Exporter that outputs a .pr text file with serialized SDL model
- */
-class SdlExporter final : public conversion::exporter::ModelExporter
+class SedsXmlExporter final : public conversion::exporter::ModelExporter
 {
 public:
     /**
      * @brief   Default constructor
      */
-    SdlExporter() = default;
+    SedsXmlExporter() = default;
     /**
      * @brief   Deleted copy constructor
      */
-    SdlExporter(const SdlExporter &) = delete;
+    SedsXmlExporter(const SedsXmlExporter &) = delete;
     /**
      * @brief   Default move constructor
      */
-    SdlExporter(SdlExporter &&) = default;
+    SedsXmlExporter(SedsXmlExporter &&) = default;
     /**
      * @brief   Deleted copy assignment operator
      */
-    SdlExporter &operator=(const SdlExporter &) = delete;
+    SedsXmlExporter &operator=(const SedsXmlExporter &) = delete;
     /**
      * @brief   Default move assignment operator
      */
-    SdlExporter &operator=(SdlExporter &&) = default;
+    SedsXmlExporter &operator=(SedsXmlExporter &&) = default;
 
     /**
-     * @brief   Exports SDL model to a file
+     * @brief   Exports SEDS model to a file
      *
      * @param   model       Model to export
      * @param   options     Options for export configuration
      */
     virtual auto exportModel(const conversion::Model *model, const conversion::Options &options) const -> void override;
-
-private:
-    auto exportSdlModel(const SdlModel *model, const conversion::Options &options) const -> void;
-
-    auto exportProcess(const Process &process, const conversion::Options &options) const -> void;
-
-    auto writeAndCommit(QSaveFile &outputFile, const std::string &data) const -> void;
-
-    auto makeFilePath(const QString &pathPrefix, const QString &fileName, const QString &extension) const -> QString;
 };
-} // namespace sdl::exporter
+
+} // namespace seds::exporter
