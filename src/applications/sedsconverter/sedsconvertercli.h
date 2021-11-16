@@ -72,7 +72,7 @@ private:
     /**
      * @brief   Add input filename for ASN.1
      */
-    void addAsn1InputOption(conversion::Options &options);
+    void addAsn1InputOptions(conversion::Options &options);
     /**
      * @brief   Add options for output in ASN.1 conversion
      */
@@ -80,7 +80,7 @@ private:
     /**
      * @brief   Add SEDS input filename
      */
-    void addSedsInputOption(conversion::Options &options);
+    void addSedsInputOptions(conversion::Options &options);
     /**
      * @brief   Specify validation and keeping intermediate files by SEDS converter
      */
@@ -92,7 +92,7 @@ private:
     /**
      * @brief   Add InterfaceView input filename
      */
-    void addIvInputOption(conversion::Options &options);
+    void addIvInputOptions(conversion::Options &options);
     /**
      * @brief   Add InterfaceView config xml
      */
@@ -100,7 +100,7 @@ private:
     /**
      * @brief   Add InterfaceView output filename
      */
-    void addIvOutputOption(conversion::Options &options);
+    void addIvOutputOptions(conversion::Options &options);
     /**
      * @brief   Add options for SDL model
      */
