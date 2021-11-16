@@ -20,17 +20,31 @@
 #include "registrar.h"
 
 #include <conversion/common/modeltype.h>
+#include <ivcore/ivlibrary.h>
+#include <libiveditor/iveditor.h>
 #include <memory>
+#include <seds/IvToSedsTranslator/translator.h>
 #include <seds/SedsXmlImporter/importer.h>
 
 using seds::importer::SedsXmlImporter;
 
 namespace conversion::seds {
 
+using translator::IvToSedsTranslator;
+
 bool SedsRegistrar::registerCapabilities(conversion::Registry &registry)
 {
+    ivm::initIVLibrary();
+    ive::initIVEditor();
+
     auto sedsImporter = std::make_unique<SedsXmlImporter>();
-    return registry.registerImporter(ModelType::Seds, std::move(sedsImporter));
+    const auto result = registry.registerImporter(ModelType::Seds, std::move(sedsImporter));
+    if (!result) {
+        return false;
+    }
+
+    auto ivToSedsTranslator = std::make_unique<IvToSedsTranslator>();
+    return registry.registerTranslator({ ModelType::InterfaceView }, ModelType::Seds, std::move(ivToSedsTranslator));
 }
 
 } // namespace conversion::seds

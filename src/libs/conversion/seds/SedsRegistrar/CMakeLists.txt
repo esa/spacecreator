@@ -12,6 +12,7 @@ target_include_directories(SedsRegistrar
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SedsRegistrar
     PRIVATE     SEDS::XmlImporter
+                Conversion::IvToSedsTranslator
     PUBLIC      Conversion::Common
                 CommonProjectWarnings)
 
