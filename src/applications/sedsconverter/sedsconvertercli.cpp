@@ -42,44 +42,44 @@ namespace sedsconverter {
 
 void SedsConverterCLI::parseArguments(const QStringList &arguments)
 {
-    parser.handlePositional(CommandArg::SedsConverterInputFilename);
-    parser.handlePositional(CommandArg::SedsConverterOutputFilename);
-    parser.handlePositional(CommandArg::SedsConverterModelFrom);
-    parser.handlePositional(CommandArg::SedsConverterModelTo);
-    parser.handlePositional(CommandArg::SedsConverterModelAux);
-    parser.handlePositional(CommandArg::SedsConverterIvConfig);
-    parser.handlePositional(CommandArg::SedsConverterSedsSchemaFilename);
-    parser.handlePositional(CommandArg::SedsConverterSedsExtRef);
-    parser.handlePositional(CommandArg::SedsConverterSedsExtRefFilename);
-    parser.handlePositional(CommandArg::SedsConverterSkipValidation);
-    parser.handlePositional(CommandArg::SedsConverterKeepIntermediateFiles);
-    parser.handlePositional(CommandArg::SedsConverterAcnFilepathPrefix);
-    parser.handlePositional(CommandArg::SedsConverterAsn1FilepathPrefix);
-    parser.handlePositional(CommandArg::SedsConverterSdlFilepathPrefix);
-    parser.handlePositional(CommandArg::SedsConverterImportXmlFileForAsn1);
+    m_parser.handlePositional(CommandArg::SedsConverterInputFilename);
+    m_parser.handlePositional(CommandArg::SedsConverterOutputFilename);
+    m_parser.handlePositional(CommandArg::SedsConverterModelFrom);
+    m_parser.handlePositional(CommandArg::SedsConverterModelTo);
+    m_parser.handlePositional(CommandArg::SedsConverterModelAux);
+    m_parser.handlePositional(CommandArg::SedsConverterIvConfig);
+    m_parser.handlePositional(CommandArg::SedsConverterSedsSchemaFilename);
+    m_parser.handlePositional(CommandArg::SedsConverterSedsExtRef);
+    m_parser.handlePositional(CommandArg::SedsConverterSedsExtRefFilename);
+    m_parser.handlePositional(CommandArg::SedsConverterSkipValidation);
+    m_parser.handlePositional(CommandArg::SedsConverterKeepIntermediateFiles);
+    m_parser.handlePositional(CommandArg::SedsConverterAcnFilepathPrefix);
+    m_parser.handlePositional(CommandArg::SedsConverterAsn1FilepathPrefix);
+    m_parser.handlePositional(CommandArg::SedsConverterSdlFilepathPrefix);
+    m_parser.handlePositional(CommandArg::SedsConverterImportXmlFileForAsn1);
 
-    parser.process(arguments);
-    args = parser.positionalsSet();
-    if (args.contains(CommandArg::SedsConverterInputFilename)) {
-        inputFilename = parser.value(CommandArg::SedsConverterInputFilename);
+    m_parser.process(arguments);
+    m_arguments = m_parser.positionalsSet();
+    if (m_arguments.contains(CommandArg::SedsConverterInputFilename)) {
+        m_inputFilename = m_parser.value(CommandArg::SedsConverterInputFilename);
     }
-    if (args.contains(CommandArg::SedsConverterOutputFilename)) {
-        outputFilename = parser.value(CommandArg::SedsConverterOutputFilename);
+    if (m_arguments.contains(CommandArg::SedsConverterOutputFilename)) {
+        m_outputFilename = m_parser.value(CommandArg::SedsConverterOutputFilename);
     }
-    if (args.contains(CommandArg::SedsConverterModelFrom)) {
-        for (auto modelName : parser.value(CommandArg::SedsConverterModelFrom).split(",")) {
-            sourceModels.emplace(conversion::stringToModelType(modelName));
+    if (m_arguments.contains(CommandArg::SedsConverterModelFrom)) {
+        for (auto modelName : m_parser.value(CommandArg::SedsConverterModelFrom).split(",")) {
+            m_sourceModels.emplace(conversion::stringToModelType(modelName));
         }
     }
-    if (args.contains(CommandArg::SedsConverterModelTo)) {
-        targetModel = conversion::stringToModelType(parser.value(CommandArg::SedsConverterModelTo));
+    if (m_arguments.contains(CommandArg::SedsConverterModelTo)) {
+        m_targetModel = conversion::stringToModelType(m_parser.value(CommandArg::SedsConverterModelTo));
     }
-    if (args.contains(CommandArg::SedsConverterModelAux)) {
-        for (auto modelName : parser.value(CommandArg::SedsConverterModelAux).split(",")) {
-            auxModels.emplace(conversion::stringToModelType(modelName));
+    if (m_arguments.contains(CommandArg::SedsConverterModelAux)) {
+        for (auto modelName : m_parser.value(CommandArg::SedsConverterModelAux).split(",")) {
+            m_auxModels.emplace(conversion::stringToModelType(modelName));
         }
     }
-    if (inputFilename.isEmpty()) {
+    if (m_inputFilename.isEmpty()) {
         throw ConversionException("No input file");
     }
 }
@@ -88,7 +88,7 @@ void SedsConverterCLI::setOptions(Options &options)
 {
     addDefaultValues(options);
 
-    for (auto sourceModel : sourceModels) {
+    for (auto sourceModel : m_sourceModels) {
         switch (sourceModel) {
         case conversion::ModelType::Asn1: {
             addAsn1InputOptions(options);
@@ -107,8 +107,8 @@ void SedsConverterCLI::setOptions(Options &options)
         }
     }
 
-    std::set<conversion::ModelType> outputModels = auxModels;
-    outputModels.insert(targetModel);
+    std::set<conversion::ModelType> outputModels = m_auxModels;
+    outputModels.insert(m_targetModel);
     for (auto outputModel : outputModels) {
         switch (outputModel) {
         case conversion::ModelType::Asn1: {
@@ -131,39 +131,39 @@ void SedsConverterCLI::setOptions(Options &options)
 
 std::set<conversion::ModelType> SedsConverterCLI::getSourceModelTypes()
 {
-    if (sourceModels.empty()) {
+    if (m_sourceModels.empty()) {
         throw ConversionException("Model type unspecified");
     }
-    for (auto model : sourceModels) {
+    for (auto model : m_sourceModels) {
         if (model == conversion::ModelType::Unspecified) {
             throw ConversionException("Model type unspecified");
         }
     }
-    return sourceModels;
+    return m_sourceModels;
 }
 
 conversion::ModelType SedsConverterCLI::getTargetModelType()
 {
-    if (targetModel == conversion::ModelType::Unspecified) {
+    if (m_targetModel == conversion::ModelType::Unspecified) {
         throw ConversionException("Model type unspecified");
     }
-    return targetModel;
+    return m_targetModel;
 }
 
 std::set<conversion::ModelType> SedsConverterCLI::getAuxModelTypes()
 {
-    for (auto model : auxModels) {
+    for (auto model : m_auxModels) {
         if (model == conversion::ModelType::Unspecified) {
             throw ConversionException("Model type unspecified");
         }
     }
-    return auxModels;
+    return m_auxModels;
 }
 
 void SedsConverterCLI::addAsn1InputOptions(Options &options)
 {
-    options.add(Asn1Options::inputFilename, inputFilename);
-    if (args.contains(CommandArg::SedsConverterImportXmlFileForAsn1)) {
+    options.add(Asn1Options::inputFilename, m_inputFilename);
+    if (m_arguments.contains(CommandArg::SedsConverterImportXmlFileForAsn1)) {
         options.add(Asn1Options::importXmlFile);
     } else {
         options.add(Asn1Options::importAsn1File);
@@ -172,68 +172,68 @@ void SedsConverterCLI::addAsn1InputOptions(Options &options)
 
 void SedsConverterCLI::addSedsInputOptions(Options &options)
 {
-    options.add(SedsOptions::inputFilename, inputFilename);
+    options.add(SedsOptions::inputFilename, m_inputFilename);
 }
 
 void SedsConverterCLI::addSedsAdditionalFilesOptions(Options &options)
 {
-    if (args.contains(CommandArg::SedsConverterIvConfig)) {
-        options.add(SedsOptions::schemaFilename, parser.value(CommandArg::SedsConverterSedsSchemaFilename));
+    if (m_arguments.contains(CommandArg::SedsConverterIvConfig)) {
+        options.add(SedsOptions::schemaFilename, m_parser.value(CommandArg::SedsConverterSedsSchemaFilename));
     }
-    if (args.contains(CommandArg::SedsConverterSedsExtRef)) {
-        for (auto value : parser.value(CommandArg::SedsConverterSedsExtRef).split(",")) {
+    if (m_arguments.contains(CommandArg::SedsConverterSedsExtRef)) {
+        for (auto value : m_parser.value(CommandArg::SedsConverterSedsExtRef).split(",")) {
             options.add(SedsOptions::externalRefFilename, value);
         }
     }
-    if (args.contains(CommandArg::SedsConverterSedsExtRefFilename)) {
-        options.add(SedsOptions::externalRefFilename, parser.value(CommandArg::SedsConverterSedsExtRefFilename));
+    if (m_arguments.contains(CommandArg::SedsConverterSedsExtRefFilename)) {
+        options.add(SedsOptions::externalRefFilename, m_parser.value(CommandArg::SedsConverterSedsExtRefFilename));
     }
 }
 
 void SedsConverterCLI::addSedsBehaviourOptions(Options &options)
 {
-    if (args.contains(CommandArg::SedsConverterSkipValidation)) {
+    if (m_arguments.contains(CommandArg::SedsConverterSkipValidation)) {
         options.add(SedsOptions::skipValidation);
     }
-    if (args.contains(CommandArg::SedsConverterKeepIntermediateFiles)) {
+    if (m_arguments.contains(CommandArg::SedsConverterKeepIntermediateFiles)) {
         options.add(SedsOptions::keepIntermediateFiles);
     }
 }
 
 void SedsConverterCLI::addAsn1OutputOptions(Options &options)
 {
-    if (args.contains(CommandArg::SedsConverterAcnFilepathPrefix)) {
-        options.add(Asn1Options::acnFilepathPrefix, parser.value(CommandArg::SedsConverterAcnFilepathPrefix));
+    if (m_arguments.contains(CommandArg::SedsConverterAcnFilepathPrefix)) {
+        options.add(Asn1Options::acnFilepathPrefix, m_parser.value(CommandArg::SedsConverterAcnFilepathPrefix));
     }
-    if (args.contains(CommandArg::SedsConverterAsn1FilepathPrefix)) {
-        options.add(Asn1Options::asn1FilepathPrefix, parser.value(CommandArg::SedsConverterAsn1FilepathPrefix));
+    if (m_arguments.contains(CommandArg::SedsConverterAsn1FilepathPrefix)) {
+        options.add(Asn1Options::asn1FilepathPrefix, m_parser.value(CommandArg::SedsConverterAsn1FilepathPrefix));
     }
 }
 
 void SedsConverterCLI::addIvInputOptions(Options &options)
 {
-    options.add(IvOptions::inputFilename, inputFilename);
+    options.add(IvOptions::inputFilename, m_inputFilename);
 }
 
 void SedsConverterCLI::addIvOutputOptions(Options &options)
 {
-    if (outputFilename.isEmpty()) {
-        outputFilename = QString("%1.iv").arg(inputFilename.toLatin1().constData());
+    if (m_outputFilename.isEmpty()) {
+        m_outputFilename = QString("%1.iv").arg(m_inputFilename.toLatin1().constData());
     }
-    options.add(IvOptions::outputFilename, outputFilename);
+    options.add(IvOptions::outputFilename, m_outputFilename);
 }
 
 void SedsConverterCLI::addIvConfigOption(Options &options)
 {
-    if (args.contains(CommandArg::SedsConverterIvConfig)) {
-        options.add(IvOptions::configFilename, parser.value(CommandArg::SedsConverterIvConfig));
+    if (m_arguments.contains(CommandArg::SedsConverterIvConfig)) {
+        options.add(IvOptions::configFilename, m_parser.value(CommandArg::SedsConverterIvConfig));
     }
 }
 
 void SedsConverterCLI::addSdlFilepathPrefix(Options &options)
 {
-    if (args.contains(CommandArg::SedsConverterSdlFilepathPrefix)) {
-        options.add(SdlOptions::sdlFilepathPrefix, parser.value(CommandArg::SedsConverterSdlFilepathPrefix));
+    if (m_arguments.contains(CommandArg::SedsConverterSdlFilepathPrefix)) {
+        options.add(SdlOptions::sdlFilepathPrefix, m_parser.value(CommandArg::SedsConverterSdlFilepathPrefix));
     }
 }
 

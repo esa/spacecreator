@@ -114,31 +114,31 @@ private:
     /**
      * @brief   input file for converter
      */
-    QString inputFilename;
+    QString m_inputFilename;
     /**
      * @brief   output file for converter
      */
-    QString outputFilename;
+    QString m_outputFilename;
     /**
      * @brief   source conversion model types
      */
-    std::set<conversion::ModelType> sourceModels;
+    std::set<conversion::ModelType> m_sourceModels;
     /**
      * @brief   target conversion model type
      */
-    conversion::ModelType targetModel;
+    conversion::ModelType m_targetModel;
     /**
      * @brief   auxillary conversion model types
      */
-    std::set<conversion::ModelType> auxModels;
+    std::set<conversion::ModelType> m_auxModels;
     /**
      * @brief   parsed command line arguments
      */
-    QVector<shared::CommandLineParser::Positional> args;
+    QVector<shared::CommandLineParser::Positional> m_arguments;
     /**
      * @brief   general command line parser
      */
-    shared::CommandLineParser parser;
+    shared::CommandLineParser m_parser;
 };
 
 } // namespace sedsconverter
