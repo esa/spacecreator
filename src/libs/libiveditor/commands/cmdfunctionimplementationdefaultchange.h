@@ -18,10 +18,11 @@
 
 #pragma once
 
-#include "entityattribute.h"
+#include "cmdfunctionattrchange.h"
 
 #include <QPointer>
-#include <undocommand.h>
+
+class EntityAttribute;
 
 namespace ivm {
 class IVFunction;
@@ -30,23 +31,22 @@ class IVFunction;
 namespace ive {
 namespace cmd {
 
-class CmdFunctionLanguageRemove : public shared::UndoCommand
+class CmdFunctionImplementationDefaultChange : public CmdFunctionAttrChange
 {
     Q_OBJECT
 public:
-    explicit CmdFunctionLanguageRemove(ivm::IVFunction *entity, int idx);
+    explicit CmdFunctionImplementationDefaultChange(
+            const QString &projectPath, ivm::IVFunction *function, const QString &defaultName, const QString &language);
 
     void redo() override;
     void undo() override;
     int id() const override;
 
-Q_SIGNALS:
-    void implementationListChanged(ivm::IVFunction *entity);
+private:
+    void moveDirectories(const QString &currentImplName, const QString &nextImplName, const QString &projectPath);
 
 private:
-    QPointer<ivm::IVFunction> m_function;
-    int m_idx = -1;
-    EntityAttribute m_value;
+    const QString m_projectPath;
 };
 
 } // namespace cmd

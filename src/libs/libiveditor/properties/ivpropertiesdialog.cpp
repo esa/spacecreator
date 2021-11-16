@@ -49,16 +49,17 @@
 
 namespace ive {
 
-IVPropertiesDialog::IVPropertiesDialog(ivm::IVPropertyTemplateConfig *dynPropConfig, ivm::IVObject *obj,
-        ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack,
-        QWidget *parent)
+IVPropertiesDialog::IVPropertiesDialog(const QString &projectPath, ivm::IVPropertyTemplateConfig *dynPropConfig,
+        ivm::IVObject *obj, ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks,
+        cmd::CommandsStack *commandsStack, QWidget *parent)
     : shared::PropertiesDialog(dynPropConfig, obj, commandsStack, parent)
     , m_ivChecks(checks)
     , m_asn1Checks(asn1Checks)
+    , m_projectPath(projectPath)
 {
 }
 
-IVPropertiesDialog::~IVPropertiesDialog() {}
+IVPropertiesDialog::~IVPropertiesDialog() { }
 
 QString IVPropertiesDialog::objectTypeName() const
 {
@@ -240,7 +241,7 @@ void IVPropertiesDialog::initLanguageView()
     if (!fn) {
         return;
     }
-    auto languagesWidget = new ive::ImplementationsWidget(fn, m_ivChecks, commandMacro(), this);
+    auto languagesWidget = new ive::ImplementationsWidget(m_projectPath, fn, m_ivChecks, commandMacro(), this);
     insertTab(languagesWidget, tr("Implementations"));
 }
 

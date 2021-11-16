@@ -16,40 +16,60 @@
  <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "cmdfunctionlanguageupdate.h"
+#include "cmdfunctionimplementationupdate.h"
 
 #include "commandids.h"
 #include "ivfunction.h"
 
+#include <QDir>
+
 namespace ive {
 namespace cmd {
 
-CmdFunctionLanguageUpdate::CmdFunctionLanguageUpdate(ivm::IVFunction *entity, int idx, const EntityAttribute &values)
+CmdFunctionImplementationUpdate::CmdFunctionImplementationUpdate(
+        const QString &projectPath, ivm::IVFunction *entity, int idx, const EntityAttribute &values)
     : m_function(entity)
     , m_idx(idx)
     , m_newValues(values)
+    , m_oldValues(m_function->implementations().value(m_idx))
+    , m_projectPath(projectPath)
 {
     Q_ASSERT(m_function);
     Q_ASSERT(idx >= 0 && idx < m_function->implementations().size());
-
-    m_oldValues = m_function->implementations().at(m_idx);
 }
 
-void CmdFunctionLanguageUpdate::redo()
+void CmdFunctionImplementationUpdate::redo()
 {
+    const bool isDefault = m_function->defaultImplementation() == m_newValues.name();
+    if (!isDefault) {
+        moveDirectories(m_oldValues.name(), m_newValues.name());
+    }
     m_function->setImplementation(m_idx, m_newValues);
     Q_EMIT implementationChanged(m_function.data(), m_newValues.name(), m_oldValues.name(), this);
 }
 
-void CmdFunctionLanguageUpdate::undo()
+void CmdFunctionImplementationUpdate::undo()
 {
+    const bool isDefault = m_function->defaultImplementation() == m_newValues.name();
+    if (!isDefault) {
+        moveDirectories(m_newValues.name(), m_oldValues.name());
+    }
     m_function->setImplementation(m_idx, m_oldValues);
     Q_EMIT implementationChanged(m_function.data(), m_oldValues.name(), m_newValues.name(), this);
 }
 
-int CmdFunctionLanguageUpdate::id() const
+int CmdFunctionImplementationUpdate::id() const
 {
-    return UpdateFunctionLanguage;
+    return UpdateFunctionImplementation;
+}
+
+void CmdFunctionImplementationUpdate::moveDirectories(const QString &currentImplName, const QString &nextImplName)
+{
+    static const QString pathTemplate { m_projectPath + QDir::separator() + QLatin1String("work") + QDir::separator()
+        + shared::kNonCurrentImplementationPath + QDir::separator() };
+
+    QDir dir(pathTemplate);
+    dir.rename(currentImplName, nextImplName);
 }
 
 } // namespace cmd

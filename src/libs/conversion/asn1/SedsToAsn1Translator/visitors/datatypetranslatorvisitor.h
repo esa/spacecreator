@@ -24,6 +24,7 @@
 #include <conversion/common/qstringhash.h>
 #include <optional>
 #include <seds/SedsModel/types/datatype.h>
+#include <unordered_map>
 
 namespace Asn1Acn {
 class Definitions;

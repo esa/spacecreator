@@ -20,9 +20,9 @@
 #include "commands/cmdentitiesimport.h"
 #include "commands/cmdentitiesremove.h"
 #include "commands/cmdfunctionattrchange.h"
-#include "commands/cmdfunctionlanguageinsert.h"
-#include "commands/cmdfunctionlanguageremove.h"
-#include "commands/cmdfunctionlanguageupdate.h"
+#include "commands/cmdfunctionimplementationinsert.h"
+#include "commands/cmdfunctionimplementationremove.h"
+#include "commands/cmdfunctionimplementationupdate.h"
 #include "commands/cmdifaceattrchange.h"
 #include "ivfunction.h"
 #include "ivobject.h"
@@ -57,16 +57,16 @@ bool CommandsStack::push(QUndoCommand *command)
         connect(nameCommand, &CmdEntitiesRemove::entitiesRemoved, this, &CommandsStack::entitiesRemoved,
                 Qt::UniqueConnection);
     }
-    if (auto implCommand = dynamic_cast<CmdFunctionLanguageUpdate *>(command)) {
-        connect(implCommand, &CmdFunctionLanguageUpdate::implementationChanged, this,
+    if (auto implCommand = dynamic_cast<CmdFunctionImplementationUpdate *>(command)) {
+        connect(implCommand, &CmdFunctionImplementationUpdate::implementationChanged, this,
                 &CommandsStack::implementationChanged, Qt::UniqueConnection);
     }
-    if (auto implAdded = dynamic_cast<CmdFunctionLanguageInsert *>(command)) {
-        connect(implAdded, &CmdFunctionLanguageInsert::implementationListChanged, this,
+    if (auto implAdded = dynamic_cast<CmdFunctionImplementationInsert *>(command)) {
+        connect(implAdded, &CmdFunctionImplementationInsert::implementationListChanged, this,
                 &CommandsStack::implementationListChanged, Qt::UniqueConnection);
     }
-    if (auto implAdded = dynamic_cast<CmdFunctionLanguageRemove *>(command)) {
-        connect(implAdded, &CmdFunctionLanguageRemove::implementationListChanged, this,
+    if (auto implAdded = dynamic_cast<CmdFunctionImplementationRemove *>(command)) {
+        connect(implAdded, &CmdFunctionImplementationRemove::implementationListChanged, this,
                 &CommandsStack::implementationListChanged, Qt::UniqueConnection);
     }
     if (auto attrCommand = dynamic_cast<shared::cmd::CmdEntityAttributesChange *>(command)) {

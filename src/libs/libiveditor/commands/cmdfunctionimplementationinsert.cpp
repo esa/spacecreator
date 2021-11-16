@@ -16,7 +16,7 @@
  <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "cmdfunctionlanguageinsert.h"
+#include "cmdfunctionimplementationinsert.h"
 
 #include "commandids.h"
 #include "ivfunction.h"
@@ -24,8 +24,9 @@
 namespace ive {
 namespace cmd {
 
-CmdFunctionLanguageInsert::CmdFunctionLanguageInsert(ivm::IVFunction *entity, int idx, const EntityAttribute &values)
-    : m_function(entity)
+CmdFunctionImplementationInsert::CmdFunctionImplementationInsert(ivm::IVFunction *entity, int idx, const EntityAttribute &values)
+    : shared::UndoCommand()
+    , m_function(entity)
     , m_idx(idx)
     , m_newValues(values)
 {
@@ -33,7 +34,7 @@ CmdFunctionLanguageInsert::CmdFunctionLanguageInsert(ivm::IVFunction *entity, in
     Q_ASSERT(idx >= 0 && idx < m_function->implementations().size() + 1);
 }
 
-void CmdFunctionLanguageInsert::redo()
+void CmdFunctionImplementationInsert::redo()
 {
     if (m_function) {
         m_function->insertImplementation(m_idx, m_newValues);
@@ -41,7 +42,7 @@ void CmdFunctionLanguageInsert::redo()
     }
 }
 
-void CmdFunctionLanguageInsert::undo()
+void CmdFunctionImplementationInsert::undo()
 {
     if (m_function) {
         m_function->removeImplementation(m_idx);
@@ -49,9 +50,9 @@ void CmdFunctionLanguageInsert::undo()
     }
 }
 
-int CmdFunctionLanguageInsert::id() const
+int CmdFunctionImplementationInsert::id() const
 {
-    return InsertFunctionLanguage;
+    return InsertFunctionImplementation;
 }
 
 } // namespace cmd

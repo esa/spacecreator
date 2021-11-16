@@ -41,7 +41,7 @@ class ImplementationsWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ImplementationsWidget(ivm::IVFunction *fn, ivm::AbstractSystemChecks *checks,
+    explicit ImplementationsWidget(const QString &projectPath, ivm::IVFunction *fn, ivm::AbstractSystemChecks *checks,
             cmd::CommandsStack::Macro *macro, QWidget *parent = nullptr);
     ~ImplementationsWidget();
 

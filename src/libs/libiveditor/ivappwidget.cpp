@@ -191,8 +191,8 @@ void IVAppWidget::showPropertyEditor(const shared::Id &id)
         return;
     }
 
-    ive::IVPropertiesDialog dialog(m_document->dynPropConfig(), obj, m_document->ivCheck(), m_document->asn1Check(),
-            m_document->commandsStack(), graphicsView());
+    ive::IVPropertiesDialog dialog(QFileInfo(m_document->path()).absolutePath(), m_document->dynPropConfig(), obj,
+            m_document->ivCheck(), m_document->asn1Check(), m_document->commandsStack(), graphicsView());
     dialog.init();
     dialog.exec();
 }
