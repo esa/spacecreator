@@ -175,7 +175,8 @@ void tst_sdlmodel::testDefaultValuesInModel()
     QVERIFY(processName == process->name());
 }
 
-/// \SRS SRS-BSP-FUN-FPU-10
+/// TODO this is a dummy trace for testing of the docs generation only!
+/// \SRS  ETB-FUN-10
 void tst_sdlmodel::testGenerateBasicProcess()
 {
     QString modelName = "BasicProcess";
