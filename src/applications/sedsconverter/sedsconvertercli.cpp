@@ -274,8 +274,13 @@ void SedsConverterCLI::addSedsOutputOptions(Options &options)
 
 QStringList SedsConverterCLI::getInputFilepaths(conversion::ModelType modelType)
 {
-    Q_UNUSED(modelType);
-    return { "stub" };
+    QStringList result;
+
+    const auto extension = conversion::modelTypeExtension(modelType).toStdString();
+    const auto range = m_inputFilepaths.equal_range(extension);
+    std::for_each(range.first, range.second, [&result](auto &&filepath) { result << std::move(filepath.second); });
+
+    return result;
 }
 
 } // namespace sedsconverter
