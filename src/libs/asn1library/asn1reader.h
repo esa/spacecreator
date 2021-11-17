@@ -19,6 +19,7 @@
 
 #include <QCache>
 #include <QObject>
+#include <QVector>
 #include <memory>
 
 class QFileInfo;
@@ -47,6 +48,9 @@ public:
             const QString &filePath, const QString &fileName, QStringList *errorMessages);
     std::unique_ptr<Asn1Acn::File> parseAsn1File(
             const QString &fileName, QStringList *errorMessages, const QString &content);
+    std::vector<std::unique_ptr<Asn1Acn::File>> parseAsn1Files(
+            const QVector<QFileInfo> &fileInfos, QStringList *errorMessages);
+
     std::unique_ptr<Asn1Acn::File> parseAsn1XmlFile(const QString &fileName);
     std::unique_ptr<Asn1Acn::File> parseAsn1XmlContent(const QString &xmlContent, const QString &fileName);
 
@@ -57,6 +61,7 @@ public:
     QString defaultParameter() const;
 
     int lineNumberFromError(const QString &error) const;
+    QString fileNameFromError(const QString &error) const;
 
 Q_SIGNALS:
     void parseError(const QString &error);
@@ -65,8 +70,11 @@ private:
     QString asn1CompilerCommand() const;
     QString temporaryFileName(const QString &basename, const QString &suffix) const;
 
-    QByteArray fileHash(const QString &fileName) const;
-    bool convertToXML(const QString &asn1FileName, const QString &xmlFilename, QStringList *errorMessages) const;
+    QByteArray fileHash(const QStringList &fileNames) const;
+    bool convertToXML(const QStringList &asn1FileNames, const QString &xmlFilename, QStringList *errorMessages) const;
+    QString createFilenameParameter(const QStringList &asn1FileNames) const;
+    void parseAsn1SccErrors(QString errorString, QStringList *errorMessages) const;
+    std::map<QString, std::unique_ptr<Asn1Acn::File>> parseAsn1XmlFileImpl(const QString &fileName);
 
     static QCache<QString, QString> m_cache;
 };

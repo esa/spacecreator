@@ -436,6 +436,9 @@ void DataTypeTranslatorVisitor::translateEnumerationList(
 {
     for (std::size_t index = 0; index < items.size(); ++index) {
         const auto &item = items[index];
+        const auto name = Escaper::escapeAsn1FieldName(item.label().value());
+        const auto enumeratedItem =
+                Asn1Acn::Types::EnumeratedItem(index, name, item.value(), Asn1Acn::SourceLocation());
 
         asn1Type->addItem(Asn1Acn::Types::EnumeratedItem(
                 index, Escaper::escapeAsn1FieldName(item.label().value()), item.value(), Asn1Acn::SourceLocation()));

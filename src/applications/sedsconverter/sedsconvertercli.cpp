@@ -91,15 +91,15 @@ void SedsConverterCLI::setOptions(Options &options)
     for (auto sourceModel : sourceModels) {
         switch (sourceModel) {
         case conversion::ModelType::Asn1: {
-            addAsn1InputOption(options);
+            addAsn1InputOptions(options);
         } break;
         case conversion::ModelType::Seds: {
-            addSedsInputOption(options);
+            addSedsInputOptions(options);
             addSedsAdditionalFilesOptions(options);
             addSedsBehaviourOptions(options);
         } break;
         case conversion::ModelType::InterfaceView: {
-            addIvInputOption(options);
+            addIvInputOptions(options);
             addIvConfigOption(options);
         } break;
         default:
@@ -115,11 +115,13 @@ void SedsConverterCLI::setOptions(Options &options)
             addAsn1OutputOptions(options);
         } break;
         case conversion::ModelType::InterfaceView: {
-            addIvOutputOption(options);
+            addIvOutputOptions(options);
             addIvConfigOption(options);
         } break;
         case conversion::ModelType::Sdl: {
             addSdlFilepathPrefix(options);
+        } break;
+        case conversion::ModelType::Seds: {
         } break;
         default:
             throw ConversionException("Unknown target model");
@@ -158,7 +160,7 @@ std::set<conversion::ModelType> SedsConverterCLI::getAuxModelTypes()
     return auxModels;
 }
 
-void SedsConverterCLI::addAsn1InputOption(Options &options)
+void SedsConverterCLI::addAsn1InputOptions(Options &options)
 {
     options.add(Asn1Options::inputFilename, inputFilename);
     if (args.contains(CommandArg::SedsConverterImportXmlFileForAsn1)) {
@@ -168,7 +170,7 @@ void SedsConverterCLI::addAsn1InputOption(Options &options)
     }
 }
 
-void SedsConverterCLI::addSedsInputOption(Options &options)
+void SedsConverterCLI::addSedsInputOptions(Options &options)
 {
     options.add(SedsOptions::inputFilename, inputFilename);
 }
@@ -208,12 +210,12 @@ void SedsConverterCLI::addAsn1OutputOptions(Options &options)
     }
 }
 
-void SedsConverterCLI::addIvInputOption(Options &options)
+void SedsConverterCLI::addIvInputOptions(Options &options)
 {
     options.add(IvOptions::inputFilename, inputFilename);
 }
 
-void SedsConverterCLI::addIvOutputOption(Options &options)
+void SedsConverterCLI::addIvOutputOptions(Options &options)
 {
     if (outputFilename.isEmpty()) {
         outputFilename = QString("%1.iv").arg(inputFilename.toLatin1().constData());

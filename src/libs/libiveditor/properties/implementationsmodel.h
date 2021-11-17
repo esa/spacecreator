@@ -42,8 +42,8 @@ public:
     };
     Q_ENUM(Column)
 
-    explicit ImplementationsModel(
-            ivm::AbstractSystemChecks *checks, cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
+    explicit ImplementationsModel(const QString &projectPath, ivm::AbstractSystemChecks *checks,
+            cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
 
     void setFunction(ivm::IVFunction *fn);
 
@@ -73,6 +73,7 @@ private:
     QPointer<ivm::IVFunction> m_function;
     QPointer<ivm::AbstractSystemChecks> m_checks;
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
+    const QString m_projectPath;
 };
 
 } // namespace ive

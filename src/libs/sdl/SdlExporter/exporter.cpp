@@ -28,7 +28,9 @@
 #include <QTextStream>
 #include <sdl/SdlOptions/options.h>
 
+using conversion::Model;
 using conversion::ModelType;
+using conversion::Options;
 using conversion::exporter::ExportException;
 using conversion::exporter::IncorrectModelException;
 using conversion::exporter::MissingOutputFilenameException;
@@ -97,4 +99,4 @@ QString SdlExporter::makeFilePath(const QString &pathPrefix, const QString &file
     return QString("%1%2.%3").arg(pathPrefix, fileName, extension);
 }
 
-} // namespace conversion::Sdl::exporter
+} // namespace sdl::exporter

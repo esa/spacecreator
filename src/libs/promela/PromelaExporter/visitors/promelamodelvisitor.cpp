@@ -97,7 +97,7 @@ void PromelaModelVisitor::generateTypeAliases(const QList<TypeAlias> &aliases)
 void PromelaModelVisitor::generateValueDefinitions(const QList<ValueDefinition> &values)
 {
     for (const ValueDefinition &value : values) {
-        m_stream << "#define " << value.getName() << " (" << value.getValue() << ")\n";
+        m_stream << "#define " << value.getName() << " " << value.getValue() << "\n";
     }
 }
 

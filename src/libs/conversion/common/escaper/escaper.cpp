@@ -75,6 +75,13 @@ QString Escaper::escapeAsn1FieldName(QString name)
     return name;
 }
 
+QString Escaper::escapePromelaName(QString name)
+{
+    escapeName(name, '_');
+
+    return name;
+}
+
 void Escaper::escapeName(QString &name, const QChar &delimeter)
 {
     name = name.trimmed();

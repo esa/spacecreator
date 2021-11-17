@@ -21,7 +21,11 @@
 #include "entityattribute.h"
 
 #include <QPointer>
+#include <QScopedPointer>
 #include <undocommand.h>
+
+class QDir;
+class QTemporaryDir;
 
 namespace ivm {
 class IVFunction;
@@ -30,25 +34,29 @@ class IVFunction;
 namespace ive {
 namespace cmd {
 
-class CmdFunctionLanguageUpdate : public shared::UndoCommand
+class CmdFunctionImplementationRemove : public shared::UndoCommand
 {
     Q_OBJECT
 public:
-    explicit CmdFunctionLanguageUpdate(ivm::IVFunction *entity, int idx, const EntityAttribute &values);
+    explicit CmdFunctionImplementationRemove(const QString &projectPath, ivm::IVFunction *entity, int idx);
+    ~CmdFunctionImplementationRemove() override;
 
     void redo() override;
     void undo() override;
     int id() const override;
 
 Q_SIGNALS:
-    void implementationChanged(
-            ivm::IVFunction *entity, const QString &newName, const QString &oldName, shared::UndoCommand *command);
+    void implementationListChanged(ivm::IVFunction *entity);
+
+private:
+    QDir implementationDir() const;
 
 private:
     QPointer<ivm::IVFunction> m_function;
-    int m_idx = -1;
-    EntityAttribute m_oldValues;
-    EntityAttribute m_newValues;
+    EntityAttribute m_value;
+    const int m_idx = -1;
+    QScopedPointer<QTemporaryDir> m_tempDir;
+    const QString m_projectPath;
 };
 
 } // namespace cmd

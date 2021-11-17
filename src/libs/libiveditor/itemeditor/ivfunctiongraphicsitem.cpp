@@ -56,14 +56,14 @@ IVFunctionGraphicsItem::IVFunctionGraphicsItem(ivm::IVFunction *entity, QGraphic
         m_svgRenderer = new QSvgRenderer(QLatin1String(":/toolbar/icns/change_root.svg"));
 }
 
-IVFunctionGraphicsItem::~IVFunctionGraphicsItem() { }
+IVFunctionGraphicsItem::~IVFunctionGraphicsItem() {}
 
 void IVFunctionGraphicsItem::init()
 {
     IVFunctionTypeGraphicsItem::init();
     if (auto dataObj = entity()) {
-        connect(dataObj, &ivm::IVFunction::childAdded, this, [this](){ update(); });
-        connect(dataObj, &ivm::IVFunction::childRemoved, this, [this](){ update(); });
+        connect(dataObj, &ivm::IVFunction::childAdded, this, [this]() { update(); });
+        connect(dataObj, &ivm::IVFunction::childRemoved, this, [this]() { update(); });
     }
 }
 
@@ -187,13 +187,4 @@ void IVFunctionGraphicsItem::applyColorScheme()
     update();
 }
 
-QString IVFunctionGraphicsItem::prepareTooltip() const
-{
-    const QString title = uniteNames<ivm::IVFunctionType *>({ entity() }, QString());
-    const QString prototype = uniteNames<const ivm::IVFunctionType *>({ entity()->instanceOf() }, tr("Instance of: "));
-    const QString ris = uniteNames<ivm::IVInterface *>(entity()->ris(), tr("RI: "));
-    const QString pis = uniteNames<ivm::IVInterface *>(entity()->pis(), tr("PI: "));
-
-    return joinNonEmpty({ title, prototype, ris, pis }, QStringLiteral("<br>"));
-}
-}
+} // namespace ive

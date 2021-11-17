@@ -39,8 +39,8 @@ namespace conversion::asn1::importer {
 
 std::unique_ptr<conversion::Model> Asn1Importer::importModel(const Options &options) const
 {
-    const auto inputFilename = options.value(Asn1Options::inputFilename);
-    if (!inputFilename) {
+    const auto inputFilenames = options.values(Asn1Options::inputFilename);
+    if (inputFilenames.empty()) {
         throw ImportException("File to import wasn't specified");
     }
 
@@ -50,12 +50,21 @@ std::unique_ptr<conversion::Model> Asn1Importer::importModel(const Options &opti
     QObject::connect(
             &asn1Reader, &Asn1Reader::parseError, [&errorMessages](const QString &error) { errorMessages << error; });
 
-    std::unique_ptr<Asn1Acn::File> result;
-
+    std::vector<std::unique_ptr<Asn1Acn::File>> files;
     if (options.isSet(Asn1Options::importAsn1File)) {
-        result = asn1Reader.parseAsn1File(QFileInfo(*inputFilename), &errorMessages);
+        QVector<QFileInfo> inputFilenameList;
+
+        for (const auto &filename : inputFilenames) {
+            inputFilenameList.append(QFileInfo(filename));
+        }
+
+        files = asn1Reader.parseAsn1Files(inputFilenameList, &errorMessages);
     } else if (options.isSet(Asn1Options::importXmlFile)) {
-        result = asn1Reader.parseAsn1XmlFile(*inputFilename);
+        if (inputFilenames.size() != 1) {
+            throw ImportException("Only one ASN.1 XML source file is allowed");
+        }
+        std::unique_ptr<Asn1Acn::File> result = asn1Reader.parseAsn1XmlFile(inputFilenames.front());
+        files.push_back(std::move(result));
     } else {
         throw ImportException("Not specified which format of the ASN.1 file should be read");
     }
@@ -64,9 +73,6 @@ std::unique_ptr<conversion::Model> Asn1Importer::importModel(const Options &opti
         auto message = errorMessages.join("\n");
         throw ImportException(std::move(message));
     }
-
-    std::vector<std::unique_ptr<Asn1Acn::File>> files;
-    files.push_back(std::move(result));
 
     return std::make_unique<Asn1Model>(std::move(files));
 }

@@ -105,6 +105,7 @@ public:
 
     static QVector<qint32> coordinatesFromString(const QString &strCoordinates);
     static QString coordinatesToString(const QVector<qint32> &coordinates);
+    static bool isNullCoordinates(const QVariant &coordinates);
 
     virtual bool isEqual(const VEObject *other) const;
 
@@ -127,6 +128,8 @@ protected:
 private:
     const std::unique_ptr<VEObjectPrivate> d;
 };
+
+QString toString(VEObject *object);
 
 }
 

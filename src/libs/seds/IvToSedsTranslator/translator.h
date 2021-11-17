@@ -23,29 +23,26 @@
 
 namespace Asn1Acn {
 class Asn1Model;
-class Definitions;
 } // namespace Asn1Acn
 
 namespace ivm {
 class IVModel;
-class IVPropertyTemplateConfig;
 } // namespace ivm
 
 namespace seds::model {
-class Package;
 class SedsModel;
 } // namespace seds::model
 
-namespace conversion::iv::translator {
+namespace conversion::seds::translator {
 
 /**
- * @brief   Translator between SEDS model and InterfaceView model
+ * @brief   Translator between InterfaceView model and SEDS model
  */
-class SedsToIvTranslator final : public ::conversion::translator::Translator
+class IvToSedsTranslator final : public conversion::translator::Translator
 {
 public:
     /**
-     * @brief   Translate given SEDS and ASN.1 models into an InterfaceView model
+     * @brief   Translate given IntefaceView and ASN.1 models into an SEDS model
      *
      * @param   sources     List of models
      *
@@ -73,43 +70,9 @@ public:
      */
     virtual auto getDependencies() const -> std::set<ModelType> override;
 
-    /**
-     * @brief   Gets ASN.1 definitions for given SEDS package from given ASN.1 model
-     *
-     * @param   sedsPackage     SEDS package
-     * @param   asn1Model       ASN.1 model
-     *
-     * @return  Asn1 definitions
-     */
-    static auto getAsn1Definitions(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model)
-            -> Asn1Acn::Definitions *;
-
 private:
-    /**
-     * @brief   Translate SEDS model
-     *
-     * @param   sedsModel   SEDS model to translate
-     * @param   asn1Model   ASN.1 Model with types defined in this package
-     * @param   ivConfig    IV model config
-     * @param   options     List of options
-     *
-     * @return  Result IV model with auxiliary ASN.1 model
-     */
-    auto translateSedsModel(const seds::model::SedsModel *sedsModel, Asn1Acn::Asn1Model *asn1Model,
-            ivm::IVPropertyTemplateConfig *ivConfig, const Options &options) const
+    auto translateIvModel(const ivm::IVModel *ivModel, Asn1Acn::Asn1Model *asn1Model, const Options &options) const
             -> std::vector<std::unique_ptr<Model>>;
-
-private:
-    /**
-     * @brief   Translate SEDS package
-     *
-     * @param   package             Package to translate
-     * @param   asn1Model           ASN.1 Model with types defined in this package
-     * @param   model               InterfaceView model to which should translated IV functions will be added
-     * @param   generateFunction    Generate parent function for the translated components
-     */
-    auto translatePackage(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
-            bool generateFunction) const -> void;
 };
 
 } // namespace conversion::iv::translator

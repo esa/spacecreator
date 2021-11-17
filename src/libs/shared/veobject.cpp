@@ -46,7 +46,7 @@ VEObject::VEObject(const shared::Id &id, QObject *parent)
         setModel(model);
 }
 
-VEObject::~VEObject() { }
+VEObject::~VEObject() {}
 
 shared::Id VEObject::id() const
 {
@@ -183,6 +183,26 @@ QString VEObject::coordinatesToString(const QVector<qint32> &coordinates)
     return coordString;
 }
 
+bool VEObject::isNullCoordinates(const QVariant &coordinates)
+{
+    if (!coordinates.isValid()) {
+        return true;
+    }
+
+    QVector<qint32> points;
+    if (coordinates.canConvert<QString>()) {
+        points = coordinatesFromString(coordinates.toString());
+    } else if (coordinates.canConvert<QVector<qint32>>()) {
+        points = coordinates.value<QVector<qint32>>();
+    }
+
+    if (points.isEmpty()) {
+        return true;
+    }
+
+    return std::all_of(points.cbegin(), points.cend(), [](const qint32 &coordinate) { return coordinate == 0; });
+}
+
 /*!
    Returns if the \p other is equal to this object.
    Two of these are considered euqal if they have the exact same attributes.
@@ -220,6 +240,11 @@ void VEObject::setModel(VEModel *model)
 VEModel *VEObject::model() const
 {
     return d->m_model;
+}
+
+QString toString(VEObject *object)
+{
+    return object->titleUI();
 }
 
 }

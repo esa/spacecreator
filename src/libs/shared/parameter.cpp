@@ -265,4 +265,10 @@ bool InterfaceParameter::isNull() const
 {
     return BasicParameter::isNull() || this->operator==({});
 }
+
+QString toString(const BasicParameter &parameter)
+{
+    return parameter.toString();
 }
+
+} // namespace shared

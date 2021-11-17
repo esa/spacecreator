@@ -41,9 +41,9 @@ class IVPropertiesDialog : public shared::PropertiesDialog
     Q_OBJECT
 
 public:
-    explicit IVPropertiesDialog(ivm::IVPropertyTemplateConfig *dynPropConfig, ivm::IVObject *obj,
-            ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack,
-            QWidget *parent = nullptr);
+    explicit IVPropertiesDialog(const QString &projectPath, ivm::IVPropertyTemplateConfig *dynPropConfig,
+            ivm::IVObject *obj, ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks,
+            cmd::CommandsStack *commandsStack, QWidget *parent = nullptr);
     ~IVPropertiesDialog() override;
     void init() override;
 
@@ -61,6 +61,7 @@ private:
 
     QPointer<ivm::AbstractSystemChecks> m_ivChecks;
     QPointer<Asn1Acn::Asn1SystemChecks> m_asn1Checks;
+    const QString m_projectPath;
 };
 
 } // namespace ive

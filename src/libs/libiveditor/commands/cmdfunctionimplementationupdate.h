@@ -30,23 +30,30 @@ class IVFunction;
 namespace ive {
 namespace cmd {
 
-class CmdFunctionLanguageInsert : public shared::UndoCommand
+class CmdFunctionImplementationUpdate : public shared::UndoCommand
 {
     Q_OBJECT
 public:
-    explicit CmdFunctionLanguageInsert(ivm::IVFunction *entity, int idx, const EntityAttribute &values);
+    explicit CmdFunctionImplementationUpdate(
+            const QString &projectPath, ivm::IVFunction *entity, int idx, const EntityAttribute &values);
 
     void redo() override;
     void undo() override;
     int id() const override;
 
 Q_SIGNALS:
-    void implementationListChanged(ivm::IVFunction *entity);
+    void implementationChanged(
+            ivm::IVFunction *entity, const QString &newName, const QString &oldName, shared::UndoCommand *command);
+
+private:
+    void moveDirectories(const QString &currentImplName, const QString &nextImplName);
 
 private:
     QPointer<ivm::IVFunction> m_function;
-    int m_idx = -1;
-    EntityAttribute m_newValues;
+    const int m_idx = -1;
+    const EntityAttribute m_oldValues;
+    const EntityAttribute m_newValues;
+    const QString m_projectPath;
 };
 
 } // namespace cmd

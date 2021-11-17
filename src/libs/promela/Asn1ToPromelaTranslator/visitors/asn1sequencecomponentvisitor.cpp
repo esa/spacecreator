@@ -23,9 +23,11 @@
 
 #include <asn1library/asn1/acnsequencecomponent.h>
 #include <asn1library/asn1/asnsequencecomponent.h>
+#include <conversion/common/escaper/escaper.h>
 
 using Asn1Acn::AcnSequenceComponent;
 using Asn1Acn::AsnSequenceComponent;
+using conversion::Escaper;
 using promela::model::BasicType;
 using promela::model::DataType;
 using promela::model::Declaration;
@@ -46,9 +48,9 @@ void Asn1SequenceComponentVisitor::visit(const AsnSequenceComponent &component)
 {
     Asn1ItemTypeVisitor visitor(m_promelaModel, m_baseTypeName, component.name());
     component.type()->accept(visitor);
-    m_utype.addField(Declaration(visitor.getResultDataType().value(), component.name()));
+    m_utype.addField(Declaration(visitor.getResultDataType().value(), Escaper::escapePromelaName(component.name())));
     if (component.isOptional()) {
-        m_optionalFields.append(component.name());
+        m_optionalFields.append(Escaper::escapePromelaName(component.name()));
     }
 }
 
