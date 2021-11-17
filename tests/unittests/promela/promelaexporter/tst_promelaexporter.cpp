@@ -30,6 +30,7 @@ using conversion::promela::PromelaOptions;
 using promela::exporter::PromelaExporter;
 using promela::model::ArrayType;
 using promela::model::BasicType;
+using promela::model::ChannelInit;
 using promela::model::DataType;
 using promela::model::Declaration;
 using promela::model::MtypeRef;
@@ -57,6 +58,7 @@ private Q_SLOTS:
     void testValueDefinition();
     void testDeclaration();
     void testIncludes();
+    void testChannelInitialization();
 
 private:
     QString getFileContents(const QString &filename);
@@ -314,6 +316,31 @@ void tst_PromelaExporter::testIncludes()
         QFAIL(ex.what());
     }
     QString out2 = getFileContents("expect_promela_file9.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testChannelInitialization()
+{
+    PromelaModel model;
+
+    model.addTypeAlias(TypeAlias("named_parameter", BasicType::INT));
+
+    Declaration channel1 = Declaration(DataType(BasicType::CHAN), "channel1");
+    channel1.setInit(ChannelInit(1, BasicType::INT));
+    Declaration channel2 = Declaration(DataType(BasicType::CHAN), "channel2");
+    channel2.setInit(ChannelInit(2, UtypeRef("named_parameter")));
+
+    model.addDeclaration(channel1);
+    model.addDeclaration(channel2);
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_file10.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }

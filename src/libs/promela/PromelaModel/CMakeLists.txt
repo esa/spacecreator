@@ -11,6 +11,7 @@ set(SOURCES
   mtyperef.cpp
   typealias.cpp
   valuedefinition.cpp
+  channelinit.cpp
   )
 set(INCLUDES
   arraytype.h
@@ -25,6 +26,7 @@ set(INCLUDES
   mtyperef.h
   typealias.h
   valuedefinition.h
+  channelinit.h
   )
 
 add_library(PromelaModel STATIC)
