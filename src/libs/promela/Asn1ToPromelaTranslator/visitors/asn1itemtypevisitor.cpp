@@ -179,13 +179,11 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
     const QString utypeName = constructTypeName(m_name);
     const QString nestedUtypeName = constructTypeName(QString("%1_data").arg(m_name));
     Utype utype(utypeName);
-    // QSet<QString> componentNames;
     Utype nestedUtype(nestedUtypeName, true);
     const QString none = QString("%1_NONE").arg(utypeName);
     m_promelaModel.addValueDefinition(ValueDefinition(none, 0));
     int32_t index = 1;
     for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type.components()) {
-        // componentNames.insert(component->name());
         Asn1ItemTypeVisitor nestedVisitor(m_promelaModel, utypeName, component->name());
         component->type()->accept(nestedVisitor);
         std::optional<DataType> nestedDataType = nestedVisitor.getResultDataType();
