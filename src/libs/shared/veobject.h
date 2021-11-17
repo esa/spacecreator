@@ -128,6 +128,8 @@ private:
     const std::unique_ptr<VEObjectPrivate> d;
 };
 
+QString toString(VEObject *object);
+
 }
 
 Q_DECLARE_METATYPE(shared::VEObject *)

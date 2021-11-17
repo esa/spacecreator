@@ -22,7 +22,6 @@
 #include "delayedsignal.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
-#include "interfacetabgraphicsscene.h"
 #include "itemeditor/common/ivutils.h"
 #include "ivcomment.h"
 #include "ivcommentgraphicsitem.h"

@@ -167,6 +167,18 @@ QSet<QString> forbiddenNamesSet();
  */
 bool isValidName(const QString &name);
 
+QString joinNonEmpty(const QStringList &values, const QString &lineBreak);
+
+template<class Type>
+QString uniteNames(const QVector<Type> &collection, const QString &prefix)
+{
+    QStringList result;
+    std::transform(collection.cbegin(), collection.cend(), std::back_inserter(result),
+            [](const Type &obj) { return toString(obj); });
+    const QString line = joinNonEmpty(result, QStringLiteral(", "));
+    return line.isEmpty() ? QString() : QString("<b>%1</b>%2").arg(prefix, line);
+}
+
 }
 
 Q_DECLARE_METATYPE(shared::Id)

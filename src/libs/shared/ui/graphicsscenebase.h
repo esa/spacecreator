@@ -40,6 +40,7 @@ Q_SIGNALS:
     void mousePressedChanged(bool mousePressed);
 
 protected:
+    void helpEvent(QGraphicsSceneHelpEvent *helpEvent) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 

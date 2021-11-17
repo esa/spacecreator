@@ -20,6 +20,7 @@
 #include "ivfunctiontype.h"
 #include "ivobject.h"
 #include "ui/verectgraphicsitem.h"
+#include "veobject.h"
 
 namespace ive {
 
@@ -60,23 +61,6 @@ protected:
     shared::ColorManager::HandledColors handledColorType() const override;
 
     void updateTextPosition() override;
-
-    template<class Type>
-    static QString uniteNames(const QVector<Type> &collection, const QString &prefix)
-    {
-        QStringList result;
-        std::transform(collection.cbegin(), collection.cend(), std::back_inserter(result),
-                [](Type obj) { return obj ? obj->titleUI() : QString(); });
-        const QString line = joinNonEmpty(result, QStringLiteral(", "));
-        return line.isEmpty() ? QString() : QString("<b>%1</b>%2").arg(prefix, line);
-    }
-
-    static QString joinNonEmpty(const QStringList &values, const QString &lineBreak)
-    {
-        QStringList filtered(values);
-        filtered.removeAll(QString());
-        return filtered.join(lineBreak);
-    }
 
     virtual void prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const;
 

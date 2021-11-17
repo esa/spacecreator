@@ -269,4 +269,11 @@ bool isValidName(const QString &name)
     return match.hasMatch();
 }
 
+QString joinNonEmpty(const QStringList &values, const QString &lineBreak)
+{
+    QStringList filtered(values);
+    filtered.removeAll(QString());
+    return filtered.join(lineBreak);
+}
+
 }

@@ -17,6 +17,12 @@
 
 #include "graphicsscenebase.h"
 
+#include "graphicsviewutils.h"
+#include "ui/veinteractiveobject.h"
+
+#include <QGraphicsSceneHelpEvent>
+#include <QToolTip>
+
 namespace shared {
 namespace ui {
 
@@ -52,5 +58,27 @@ void GraphicsSceneBase::setMousePressed(bool pressed)
     Q_EMIT mousePressedChanged(m_mousePressed);
 }
 
+void GraphicsSceneBase::helpEvent(QGraphicsSceneHelpEvent *event)
+{
+    const QList<QGraphicsItem *> itemsAtPos = items(event->scenePos());
+    for (int idx = 0; idx < itemsAtPos.size(); ++idx) {
+        const QGraphicsItem *item = itemsAtPos.value(idx);
+        if (!item || item->type() < QGraphicsItem::UserType) {
+            continue;
+        }
+
+        if (auto veItem = qobject_cast<const shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
+            const QString &tooltip = veItem->prepareTooltip();
+            if (!tooltip.isEmpty()) {
+                QToolTip::showText(event->screenPos(), tooltip, event->widget());
+                event->accept();
+                return;
+            }
+        }
+    }
+
+    QGraphicsScene::helpEvent(event);
 }
-}
+
+} // namespace ui
+} // namespace shared

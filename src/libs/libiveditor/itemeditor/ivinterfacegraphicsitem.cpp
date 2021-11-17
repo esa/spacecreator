@@ -353,8 +353,11 @@ QString IVInterfaceGraphicsItem::ifaceLabel() const
 QString IVInterfaceGraphicsItem::prepareTooltip() const
 {
     QString toolTip = shared::ui::VEInteractiveObject::prepareTooltip();
-    if (entity()->isProvided())
+    if (entity()->isProvided()) {
+        toolTip = shared::joinNonEmpty(
+                { toolTip, shared::uniteNames(entity()->params(), tr("Parameters:")) }, QStringLiteral("<br>"));
         return toolTip;
+    }
 
     auto ri = entity()->as<const ivm::IVInterfaceRequired *>();
     if (!ri)
@@ -364,6 +367,8 @@ QString IVInterfaceGraphicsItem::prepareTooltip() const
     if (toolTip != label)
         toolTip = QString("%1<br><i><b>%2</b></i>").arg(label, toolTip);
 
+    toolTip = shared::joinNonEmpty(
+            { toolTip, shared::uniteNames(entity()->params(), tr("Parameters:")) }, QStringLiteral("<br>"));
     return toolTip;
 }
 

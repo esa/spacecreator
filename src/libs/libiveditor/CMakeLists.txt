@@ -105,8 +105,6 @@ target_sources(${LIB_NAME} PRIVATE
     itemeditor/graphicsitemhelpers.h
     itemeditor/graphicsview.cpp
     itemeditor/graphicsview.h
-    itemeditor/interfacetabgraphicsscene.cpp
-    itemeditor/interfacetabgraphicsscene.h
     itemeditor/ivcommentgraphicsitem.cpp
     itemeditor/ivcommentgraphicsitem.h
     itemeditor/ivconnectiongraphicsitem.cpp
