@@ -45,7 +45,7 @@ public:
      *
      * @param   options                 Converter options list
      */
-    void setOptions(conversion::Options &options);
+    void processOptions(conversion::Options &options);
 
     /**
      * @brief   Get source model types set

@@ -86,53 +86,19 @@ void SedsConverterCLI::parseArguments(const QStringList &arguments)
     }
 }
 
-void SedsConverterCLI::setOptions(Options &options)
+void SedsConverterCLI::processOptions(Options &options)
 {
-    for (auto sourceModel : m_sourceModels) {
-        switch (sourceModel) {
-        case conversion::ModelType::Asn1:
-            addAsn1InputOptions(options);
-            break;
-        case conversion::ModelType::InterfaceView:
-            addIvInputOptions(options);
-            break;
-        case conversion::ModelType::Promela:
-            addPromelaInputOptions(options);
-            break;
-        case conversion::ModelType::Sdl:
-            addSdlInputOptions(options);
-            break;
-        case conversion::ModelType::Seds:
-            addSedsInputOptions(options);
-            break;
-        default:
-            throw ConversionException("Unknown source model");
-        }
-    }
+    addAsn1InputOptions(options);
+    addIvInputOptions(options);
+    addPromelaInputOptions(options);
+    addSdlInputOptions(options);
+    addSedsInputOptions(options);
 
-    std::set<conversion::ModelType> outputModels = m_auxModels;
-    outputModels.insert(m_targetModel);
-    for (auto outputModel : outputModels) {
-        switch (outputModel) {
-        case conversion::ModelType::Asn1:
-            addAsn1OutputOptions(options);
-            break;
-        case conversion::ModelType::InterfaceView:
-            addIvOutputOptions(options);
-            break;
-        case conversion::ModelType::Promela:
-            addPromelaOutputOptions(options);
-            break;
-        case conversion::ModelType::Sdl:
-            addSdlOutputOptions(options);
-            break;
-        case conversion::ModelType::Seds:
-            addSedsOutputOptions(options);
-            break;
-        default:
-            throw ConversionException("Unknown target model");
-        }
-    }
+    addAsn1OutputOptions(options);
+    addIvOutputOptions(options);
+    addPromelaOutputOptions(options);
+    addSdlOutputOptions(options);
+    addSedsOutputOptions(options);
 }
 
 std::set<conversion::ModelType> SedsConverterCLI::getSourceModelTypes()
