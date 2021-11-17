@@ -19,6 +19,8 @@
 
 #include "statementvisitor.h"
 
+#include "components/activities/coremathoperator.h"
+#include "mathoperationtranslator.h"
 #include "translation/exceptions.h"
 
 #include <conversion/common/escaper/escaper.h>
@@ -27,6 +29,7 @@
 using conversion::Escaper;
 using conversion::iv::translator::InterfaceCommandTranslator;
 using conversion::translator::TranslationException;
+using seds::model::CoreMathOperator;
 
 namespace conversion::sdl::translator {
 
@@ -84,8 +87,19 @@ auto StatementVisitor::operator()(const seds::model::Iteration &iteration) -> vo
 
 auto StatementVisitor::operator()(const seds::model::MathOperation &operation) -> void
 {
-    Q_UNUSED(operation);
-    throw TranslationException("Operation activity not implemented");
+    if (operation.elements().size() > 0 && std::holds_alternative<seds::model::Operator>(operation.elements()[0])) {
+        // Check for a special case of the swap operator
+        const auto &op = std::get<seds::model::Operator>(operation.elements()[0]);
+        if (std::get<CoreMathOperator>(op.mathOperator()) == CoreMathOperator::Swap) {
+            // TODO This needs proper knowledge of types
+            throw TranslationException("Swap operator is not implemented");
+            return;
+        }
+    }
+    const auto targetName = Escaper::escapeAsn1FieldName(operation.outputVariableRef().value().value());
+    const auto value = MathOperationTranslator::translateOperation(operation.elements());
+    const auto action = QString("%1 := %2").arg(targetName, value);
+    m_sdlTransition->addAction(std::make_unique<::sdl::Task>("", action));
 }
 
 auto StatementVisitor::operator()(const seds::model::SendCommandPrimitive &sendCommand) -> void
