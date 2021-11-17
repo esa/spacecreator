@@ -56,7 +56,7 @@ public:
      *
      * @returns Map with read external references
      */
-    static auto readSymbols(QString filename) -> ExternalReferencesMap;
+    static auto readSymbols(const QString &filepath) -> ExternalReferencesMap;
 };
 
 } // namespace seds::symbolreader

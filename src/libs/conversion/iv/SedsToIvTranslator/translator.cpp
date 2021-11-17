@@ -48,13 +48,13 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateModels(
     const auto *sedsModel = getModel<SedsModel>(sourceModels);
     auto *asn1Model = getModel<Asn1Model>(sourceModels);
 
-    const auto ivConfigFilename = options.value(IvOptions::configFilename);
-    if (!ivConfigFilename) {
+    const auto ivConfigFilepath = options.value(IvOptions::configFilepath);
+    if (!ivConfigFilepath) {
         throw TranslationException("InterfaceView configuration file wasn't specified");
     }
 
     ivm::IVPropertyTemplateConfig *ivConfig = ivm::IVPropertyTemplateConfig::instance();
-    ivConfig->init(*ivConfigFilename);
+    ivConfig->init(*ivConfigFilepath);
 
     return translateSedsModel(sedsModel, asn1Model, ivConfig, options);
 }

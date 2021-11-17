@@ -19,7 +19,8 @@ target_link_libraries(SedsConverter
                 Conversion::Asn1Registrar
                 Conversion::IvRegistrar
                 Conversion::SedsRegistrar
-                Conversion::SdlRegistrar)
+                Conversion::SdlRegistrar
+                "stdc++fs")
 
 set_target_properties(SedsConverter PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"

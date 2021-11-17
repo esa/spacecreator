@@ -58,7 +58,7 @@ void PromelaExporter::exportModel(const Model *model, const Options &options) co
 
     outputTextStream.flush();
 
-    std::optional<QString> outputFilepath = options.value(PromelaOptions::promelaOutputFilepath);
+    std::optional<QString> outputFilepath = options.value(PromelaOptions::outputFilepath);
 
     if (outputFilepath) {
         QSaveFile outputFile(outputFilepath.value());

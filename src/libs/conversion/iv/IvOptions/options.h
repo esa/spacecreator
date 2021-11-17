@@ -27,16 +27,19 @@ namespace conversion::iv {
 class IvOptions
 {
 public:
-    /** @brief File to import */
-    inline static const QString inputFilename = "Iv_Import_InputFilename";
-    /** @brief IV parser file */
-    inline static const QString configFilename = "Iv_Import_ConfigFilename";
-    /** @brief Use functions instead of a flat structure */
+    /** @brief  Filepath of input file */
+    inline static const QString inputFilepath = "Iv_Import_InputFilepath";
+    /** @brief  IV parser file */
+    inline static const QString configFilepath = "Iv_Import_ConfigFilename";
+    /** @brief  Use functions instead of a flat structure */
     inline static const QString generateFunctionsForPackages = "Iv_Translation_GenerateFunctionsForPackages";
-    /** @biref Export output file */
-    inline static const QString outputFilename = "Iv_Export_OutputFilename";
-    /** @brief Default IV parser file name*/
+    /** @biref  Filepath of output file */
+    inline static const QString outputFilepath = "Iv_Export_OutputFilepath";
+
+    /** @brief  Default IV parser filename */
     inline static const QString defaultConfigFilename = "config.xml";
+    /** @brief  Default output filename */
+    inline static const QString defaultOutputFilename = "interfaceview.xml";
 };
 
 } // namespace conversion::seds

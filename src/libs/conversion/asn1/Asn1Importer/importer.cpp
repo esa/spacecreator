@@ -39,8 +39,8 @@ namespace conversion::asn1::importer {
 
 std::unique_ptr<conversion::Model> Asn1Importer::importModel(const Options &options) const
 {
-    const auto inputFilenames = options.values(Asn1Options::inputFilename);
-    if (inputFilenames.empty()) {
+    const auto inputFilepaths = options.values(Asn1Options::inputFilepath);
+    if (inputFilepaths.empty()) {
         throw ImportException("File to import wasn't specified");
     }
 
@@ -50,24 +50,12 @@ std::unique_ptr<conversion::Model> Asn1Importer::importModel(const Options &opti
     QObject::connect(
             &asn1Reader, &Asn1Reader::parseError, [&errorMessages](const QString &error) { errorMessages << error; });
 
-    std::vector<std::unique_ptr<Asn1Acn::File>> files;
-    if (options.isSet(Asn1Options::importAsn1File)) {
-        QVector<QFileInfo> inputFilenameList;
-
-        for (const auto &filename : inputFilenames) {
-            inputFilenameList.append(QFileInfo(filename));
-        }
-
-        files = asn1Reader.parseAsn1Files(inputFilenameList, &errorMessages);
-    } else if (options.isSet(Asn1Options::importXmlFile)) {
-        if (inputFilenames.size() != 1) {
-            throw ImportException("Only one ASN.1 XML source file is allowed");
-        }
-        std::unique_ptr<Asn1Acn::File> result = asn1Reader.parseAsn1XmlFile(inputFilenames.front());
-        files.push_back(std::move(result));
-    } else {
-        throw ImportException("Not specified which format of the ASN.1 file should be read");
+    QVector<QFileInfo> inputFilesList;
+    for (const auto &filename : inputFilepaths) {
+        inputFilesList.append(QFileInfo(filename));
     }
+
+    auto files = asn1Reader.parseAsn1Files(inputFilesList, &errorMessages);
 
     if (!errorMessages.isEmpty()) {
         auto message = errorMessages.join("\n");
