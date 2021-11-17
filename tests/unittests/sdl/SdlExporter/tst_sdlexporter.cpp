@@ -57,6 +57,7 @@
 using conversion::ModelType;
 using conversion::Options;
 using conversion::exporter::ExportException;
+using conversion::sdl::SdlOptions;
 using sdl::Action;
 using sdl::ContinuousSignal;
 using sdl::Decision;
@@ -78,7 +79,6 @@ using sdl::VariableDeclaration;
 using sdl::VariableLiteral;
 using sdl::VariableReference;
 using sdl::exporter::SdlExporter;
-using sdl::exporter::SdlOptions;
 using tests::common::SdlAnswerBuilder;
 using tests::common::SdlDecisionBuilder;
 using tests::common::SdlInputBuilder;
@@ -210,7 +210,7 @@ void tst_sdlmodel::testGenerateBasicProcess()
     // clang-format on
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -301,7 +301,7 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
     const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -373,7 +373,7 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
     const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -480,7 +480,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     // clang-format on
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -561,7 +561,7 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
     const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -681,7 +681,7 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
     const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -777,7 +777,7 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
     const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {

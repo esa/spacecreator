@@ -329,7 +329,7 @@ QString tst_PromelaExporter::generatePromelaFromModel(const PromelaModel &model)
 {
     PromelaExporter exporter;
     Options options;
-    options.add(PromelaOptions::promelaOutputFilepath, "generated_promela.pml");
+    options.add(PromelaOptions::outputFilepath, "generated_promela.pml");
 
     exporter.exportModel(&model, options);
 

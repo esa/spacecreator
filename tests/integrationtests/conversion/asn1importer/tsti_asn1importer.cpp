@@ -47,8 +47,7 @@ private Q_SLOTS:
 void tsti_Asn1Importer::testValid()
 {
     Options options;
-    options.add(Asn1Options::inputFilename, "Valid.asn");
-    options.add(Asn1Options::importAsn1File);
+    options.add(Asn1Options::inputFilepath, "Valid.asn");
 
     Asn1Importer asn1Importer;
 
@@ -87,8 +86,7 @@ void tsti_Asn1Importer::testValid()
 void tsti_Asn1Importer::testInvalid()
 {
     Options options;
-    options.add(Asn1Options::inputFilename, "Invalid.asn");
-    options.add(Asn1Options::importAsn1File);
+    options.add(Asn1Options::inputFilepath, "Invalid.asn");
 
     Asn1Importer asn1Importer;
     QVERIFY_EXCEPTION_THROWN(asn1Importer.importModel(options), ImportException);

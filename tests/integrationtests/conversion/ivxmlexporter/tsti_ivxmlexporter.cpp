@@ -77,7 +77,7 @@ void tsti_IvXmlExporter::testValid()
     model.addObject(function);
 
     Options options;
-    options.add(IvOptions::outputFilename, "output.xml");
+    options.add(IvOptions::outputFilepath, "output.xml");
 
     IvXmlExporter ivExporter;
 
