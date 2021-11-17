@@ -36,7 +36,7 @@ class tst_SedsXmlParser : public QObject
 public:
     virtual ~tst_SedsXmlParser() = default;
 
-private Q_SLOTS:
+public Q_SLOTS:
     void testComponentsParsing();
     void testContainerDataTypesParsing();
     void testDeviceParsing();
@@ -44,6 +44,9 @@ private Q_SLOTS:
     void testSimpleDataTypesParsing();
 };
 
+/// \SRS  ETB-FUN-2040
+/// \SRS  ETB-FUN-2050
+/// \SRS  ETB-FUN-2060
 void tst_SedsXmlParser::testComponentsParsing()
 {
     try {
@@ -119,6 +122,7 @@ void tst_SedsXmlParser::testContainerDataTypesParsing()
     }
 }
 
+/// \SRS  ETB-FUN-1010
 void tst_SedsXmlParser::testDeviceParsing()
 {
     try {

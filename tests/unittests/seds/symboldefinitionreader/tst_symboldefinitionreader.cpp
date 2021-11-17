@@ -37,12 +37,13 @@ class tst_SymbolDefinitionReader : public QObject
 public:
     virtual ~tst_SymbolDefinitionReader() = default;
 
-private Q_SLOTS:
+public Q_SLOTS:
     void readValidFile();
     void readNonexistingFile();
     void readInvalidFile();
 };
 
+/// \SRS  ETB-FUN-120
 void tst_SymbolDefinitionReader::readValidFile()
 {
     SymbolDefinitionReader::ExternalReferencesMap externalReferences;

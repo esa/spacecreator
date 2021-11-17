@@ -27,7 +27,7 @@ class tst_SedsConverter : public QObject
 {
     Q_OBJECT
 
-private Q_SLOTS:
+public Q_SLOTS:
     void testStateMachineWithBareInput();
     void testSimpleDataTypes();
     void testArrays();
@@ -36,6 +36,8 @@ private Q_SLOTS:
     void testCalculator();
 };
 
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-2490
 void tst_SedsConverter::testStateMachineWithBareInput()
 {
     const int result = system("./test_state_machine_with_bare_inputs.sh");

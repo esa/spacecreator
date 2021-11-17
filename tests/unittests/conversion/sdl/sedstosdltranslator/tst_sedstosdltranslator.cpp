@@ -79,7 +79,7 @@ class tst_SedsToSdlTranslator : public QObject
 {
     Q_OBJECT
 
-private Q_SLOTS:
+public Q_SLOTS:
     void testMissingModel();
     void testNotEnoughModels();
     void testTooManyModels();
@@ -224,6 +224,8 @@ static inline auto getStateOfName(const ::sdl::Process &process, const QString n
     return (*iterator).get();
 }
 
+/// \SRS  ETB-FUN-2010
+/// \SRS  ETB-FUN-2490
 /// \SRS  ETB-FUN-2500
 /// \SRS  ETB-FUN-2520
 void tst_SedsToSdlTranslator::testTranslateStateMachineStates()
@@ -280,6 +282,11 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineStates()
 
 /// \SRS  ETB-FUN-2550
 /// \SRS  ETB-FUN-2560
+/// \SRS  ETB-FUN-2010
+/// \SRS  ETB-FUN-2490
+/// \SRS  ETB-FUN-2500
+/// \SRS  ETB-FUN-2520
+/// \SRS  ETB-FUN-2550
 void tst_SedsToSdlTranslator::testTranslateStateMachineInputs()
 {
     // clang-format off

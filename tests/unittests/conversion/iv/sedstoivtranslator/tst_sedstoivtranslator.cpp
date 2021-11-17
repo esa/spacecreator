@@ -58,7 +58,7 @@ class tst_SedsToIvTranslator : public QObject
 {
     Q_OBJECT
 
-private Q_SLOTS:
+public Q_SLOTS:
     void testMissingModel();
     void testNotEnoughModels();
     void testTooManyModels();
@@ -114,6 +114,9 @@ void tst_SedsToIvTranslator::testWrongModel()
             TranslationException, "Missing source ASN.1 model");
 }
 
+/// \SRS  ETB-FUN-1040
+/// \SRS  ETB-FUN-1050
+/// \SRS  ETB-FUN-1090
 void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
 {
     // clang-format off
@@ -178,6 +181,9 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
     QCOMPARE(param.direction(), shared::InterfaceParameter::Direction::IN);
 }
 
+/// \SRS  ETB-FUN-1040
+/// \SRS  ETB-FUN-1060
+/// \SRS  ETB-FUN-1090
 void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
 {
     // clang-format off

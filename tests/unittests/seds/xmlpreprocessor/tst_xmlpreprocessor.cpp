@@ -48,6 +48,7 @@ private Q_SLOTS:
     void testXIncludedNonexisting();
 };
 
+/// \SRS  ETB-FUN-1030
 void tst_XmlPreprocessor::testValid()
 {
     SymbolDefinitionReader::ExternalReferencesMap externalReferences;
