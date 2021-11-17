@@ -37,6 +37,7 @@
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <asn1library/asn1/values.h>
+#include <conversion/common/escaper/escaper.h>
 
 using Asn1Acn::BitStringValue;
 using Asn1Acn::IntegerValue;
@@ -57,6 +58,7 @@ using Asn1Acn::Types::Real;
 using Asn1Acn::Types::Sequence;
 using Asn1Acn::Types::SequenceOf;
 using Asn1Acn::Types::UserdefinedType;
+using conversion::Escaper;
 using promela::model::ArrayType;
 using promela::model::BasicType;
 using promela::model::DataType;
@@ -157,15 +159,17 @@ void Asn1ItemTypeVisitor::visit(const NumericString &type)
 
 void Asn1ItemTypeVisitor::visit(const Enumerated &type)
 {
+    const QString typeName = constructTypeName(m_name);
+
     QList<EnumeratedItem> elements = type.items().values();
     std::sort(elements.begin(), elements.end(),
             [](const EnumeratedItem &lhs, const EnumeratedItem &rhs) { return lhs.index() < rhs.index(); });
 
     for (const EnumeratedItem &element : elements) {
-        m_promelaModel.addValueDefinition(ValueDefinition(element.name(), element.value()));
+        QString enumName = QString("%1_%2").arg(typeName).arg(Escaper::escapePromelaName(element.name()));
+        m_promelaModel.addValueDefinition(ValueDefinition(enumName, element.value()));
     }
 
-    const QString typeName = constructTypeName(m_name);
     m_promelaModel.addTypeAlias(TypeAlias(typeName, BasicType::INT));
     m_resultDataType = DataType(UtypeRef(typeName));
 }
@@ -175,19 +179,22 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
     const QString utypeName = constructTypeName(m_name);
     const QString nestedUtypeName = constructTypeName(QString("%1_data").arg(m_name));
     Utype utype(utypeName);
-    QSet<QString> componentNames;
+    // QSet<QString> componentNames;
     Utype nestedUtype(nestedUtypeName, true);
     const QString none = QString("%1_NONE").arg(utypeName);
     m_promelaModel.addValueDefinition(ValueDefinition(none, 0));
     int32_t index = 1;
     for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type.components()) {
-        componentNames.insert(component->name());
+        // componentNames.insert(component->name());
         Asn1ItemTypeVisitor nestedVisitor(m_promelaModel, utypeName, component->name());
         component->type()->accept(nestedVisitor);
-        const QString fieldPresent = QString("%1_%2_PRESENT").arg(utypeName).arg(component->name());
+        std::optional<DataType> nestedDataType = nestedVisitor.getResultDataType();
+
+        const QString fieldPresent =
+                QString("%1_%2_PRESENT").arg(utypeName).arg(Escaper::escapePromelaName(component->name()));
         m_promelaModel.addValueDefinition(ValueDefinition(fieldPresent, index));
         ++index;
-        nestedUtype.addField(Declaration(nestedVisitor.getResultDataType().value(), component->name()));
+        nestedUtype.addField(Declaration(nestedDataType.value(), Escaper::escapePromelaName(component->name())));
     }
 
     m_promelaModel.addUtype(nestedUtype);
@@ -219,6 +226,10 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
         }
         m_promelaModel.addUtype(existUtype);
         nestedUtype.addField(Declaration(DataType(UtypeRef(existUtypeName)), "exist"));
+    }
+
+    if (nestedUtype.getFields().isEmpty()) {
+        nestedUtype.addField(Declaration(DataType(BasicType::BIT), "dummy"));
     }
 
     m_promelaModel.addUtype(nestedUtype);
@@ -280,15 +291,15 @@ void Asn1ItemTypeVisitor::visit(const Integer &type)
 void Asn1ItemTypeVisitor::visit(const UserdefinedType &type)
 {
     const QString typeName = constructTypeName(m_name);
-    m_promelaModel.addTypeAlias(TypeAlias(typeName, UtypeRef(type.typeName())));
+    m_promelaModel.addTypeAlias(TypeAlias(typeName, UtypeRef(Escaper::escapePromelaName(type.typeName()))));
     m_resultDataType = DataType(UtypeRef(typeName));
 }
 
 QString Asn1ItemTypeVisitor::constructTypeName(QString name)
 {
     if (m_baseTypeName.has_value()) {
-        return QString("%1_%2").arg(m_baseTypeName.value()).arg(m_name);
+        return QString("%1_%2").arg(m_baseTypeName.value()).arg(Escaper::escapePromelaName(m_name));
     }
-    return name;
+    return Escaper::escapePromelaName(name);
 }
 }

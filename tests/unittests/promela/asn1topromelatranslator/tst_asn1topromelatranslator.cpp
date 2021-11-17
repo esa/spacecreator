@@ -201,15 +201,15 @@ void tst_Asn1ToPromelaTranslator::testEnumerated()
     const QList<ValueDefinition> &valueDefs = promelaModel.getValueDefinitions();
 
     const ValueDefinition &expectedZero = valueDefs.at(0);
-    QCOMPARE(expectedZero.getName(), "zero");
+    QCOMPARE(expectedZero.getName(), "myType_zero");
     QCOMPARE(expectedZero.getValue(), 0);
 
     const ValueDefinition &expectedOne = valueDefs.at(1);
-    QCOMPARE(expectedOne.getName(), "one");
+    QCOMPARE(expectedOne.getName(), "myType_one");
     QCOMPARE(expectedOne.getValue(), 1);
 
     const ValueDefinition &expectedInfinity = valueDefs.at(2);
-    QCOMPARE(expectedInfinity.getName(), "infinity");
+    QCOMPARE(expectedInfinity.getName(), "myType_infinity");
     QCOMPARE(expectedInfinity.getValue(), 100);
 }
 
