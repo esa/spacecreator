@@ -188,6 +188,12 @@ void SedsConverterCLI::addIvInputOptions(Options &options)
     for (const auto &inputFilepath : getInputFilepaths(ModelType::InterfaceView)) {
         options.add(IvOptions::inputFilepath, std::move(inputFilepath));
     }
+
+    if (m_arguments.contains(CommandArg::SedsConverterIvConfig)) {
+        options.add(IvOptions::configFilepath, m_parser.value(CommandArg::SedsConverterIvConfig));
+    } else {
+        options.add(IvOptions::configFilepath, IvOptions::defaultConfigFilename);
+    }
 }
 
 void SedsConverterCLI::addIvOutputOptions(Options &options)
@@ -196,12 +202,6 @@ void SedsConverterCLI::addIvOutputOptions(Options &options)
         options.add(IvOptions::outputFilepath, m_outputFilepath);
     } else {
         options.add(IvOptions::outputFilepath, IvOptions::defaultOutputFilename);
-    }
-
-    if (m_arguments.contains(CommandArg::SedsConverterIvConfig)) {
-        options.add(IvOptions::configFilepath, m_parser.value(CommandArg::SedsConverterIvConfig));
-    } else {
-        options.add(IvOptions::configFilepath, IvOptions::defaultConfigFilename);
     }
 }
 
