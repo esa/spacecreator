@@ -51,7 +51,7 @@ IVObject::IVObject(const IVObject::Type t, QObject *parent, const shared::Id &id
         setModel(model);
 }
 
-IVObject::~IVObject() { }
+IVObject::~IVObject() {}
 
 QString IVObject::title() const
 {
@@ -318,7 +318,11 @@ void IVObject::setAttributeImpl(const QString &attributeName, const QVariant &va
         }
         case meta::Props::Token::RootCoordinates:
         case meta::Props::Token::coordinates: {
-            VEObject::setAttributeImpl(attr.name(), attr.value(), attr.type());
+            if (isNullCoordinates(attr.value())) {
+                VEObject::removeEntityAttribute(attr.name());
+            } else {
+                VEObject::setAttributeImpl(attr.name(), attr.value(), attr.type());
+            }
             Q_EMIT coordinatesChanged(value.value<QVector<qint32>>());
             break;
         }

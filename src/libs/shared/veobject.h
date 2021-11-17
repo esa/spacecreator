@@ -105,6 +105,7 @@ public:
 
     static QVector<qint32> coordinatesFromString(const QString &strCoordinates);
     static QString coordinatesToString(const QVector<qint32> &coordinates);
+    static bool isNullCoordinates(const QVariant &coordinates);
 
     virtual bool isEqual(const VEObject *other) const;
 

@@ -291,8 +291,15 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
         obj->setEntityProperty(tokenStr, strRootCoord);
     } else {
         const QString tokenStr = ivm::meta::Props::token(ivm::meta::Props::Token::coordinates);
-        if (obj->hasEntityAttribute(tokenStr)) {
-            return;
+        const QString coordinatesStr = obj->entityAttributeValue<QString>(tokenStr);
+        if (!coordinatesStr.isEmpty()) {
+            const QVector<qint32> coordinates = ivm::IVObject::coordinatesFromString(coordinatesStr);
+            if (!coordinates.isEmpty()) {
+                const QRectF geometry = shared::graphicsviewutils::rect(coordinates);
+                if (geometry.isValid()) {
+                    return;
+                }
+            }
         }
 
         QRectF parentGeometry;
