@@ -29,13 +29,8 @@ namespace conversion::promela {
 class PromelaOptions
 {
 public:
-    /** @brief  Filepath of input file */
-    inline static const QString inputFilepath = "Promela_Import_InputFilepath";
     /** @brief  Filepath of output file  */
     inline static const QString outputFilepath = "Promela_Export_OutputFilepath";
-
-    /** @brief  Default filepath of output file */
-    inline static const QString defaultOutputFilepath = "promela.pml";
 };
 
 }
