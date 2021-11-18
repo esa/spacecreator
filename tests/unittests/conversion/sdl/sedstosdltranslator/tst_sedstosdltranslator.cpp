@@ -26,11 +26,15 @@
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/SedsToIvTranslator/translator.h>
+#include <conversion/sdl/SedsToSdlTranslator/specialized/activitytranslator.h>
+#include <conversion/sdl/SedsToSdlTranslator/specialized/mathoperationtranslator.h>
+#include <conversion/sdl/SedsToSdlTranslator/specialized/statementvisitor.h>
 #include <conversion/sdl/SedsToSdlTranslator/translator.h>
 #include <ivcore/ivmodel.h>
 #include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/procedurecall.h>
 #include <sdl/SdlModel/task.h>
+#include <seds/SedsModel/components/activities/mathoperation.h>
 #include <sedsmodelbuilder/sedsactivitybuilder.h>
 #include <sedsmodelbuilder/sedscommandprimitivebuilder.h>
 #include <sedsmodelbuilder/sedscomponentbuilder.h>
@@ -46,6 +50,8 @@ using namespace seds::model;
 using namespace sdl;
 
 using conversion::Options;
+using conversion::sdl::translator::ActivityTranslator;
+using conversion::sdl::translator::MathOperationTranslator;
 using conversion::sdl::translator::SedsToSdlTranslator;
 using conversion::translator::TranslationException;
 
@@ -83,6 +89,28 @@ private Q_SLOTS:
     void testTranslateStateMachineInputsWithVariables();
     void testTranslateActivity();
     void testTranslateStateTransitionActivity();
+
+    void testTranslateAddOperation();
+    void testTranslateSubOperation();
+    void testTranslateMulOperation();
+    void testTranslateDivOperation();
+    void testTranslateModOperation();
+    void testTranslatePowOperation();
+    void testTranslateInvOperation();
+    void testTranslateTanOperation();
+    void testTranslateSinOperation();
+    void testTranslateCosOperation();
+    void testTranslateCeilOperation();
+    void testTranslateFloorOperation();
+    void testTranslateRoundOperation();
+    void testTranslateAbsOperation();
+    void testTranslateMinOperation();
+    void testTranslateMaxOperation();
+    void testTranslateSqrtOperation();
+    void testTranslateComplexOperation();
+
+    void testTranslateAssignment();
+    void testTranslateMathOperation();
 };
 
 void tst_SedsToSdlTranslator::testMissingModel()
@@ -430,8 +458,8 @@ void tst_SedsToSdlTranslator::testTranslateStateTransitionActivity()
                                                                 .build())
                                     .withProvidedInterface(SedsInterfaceBuilder("If1", "If1Type").build())
                                     .withImplementation(
-                                            SedsImplementationBuilder()                                                    
-                                                    .withActivity(SedsActivityBuilder("activity1")                                                                          
+                                            SedsImplementationBuilder()
+                                                    .withActivity(SedsActivityBuilder("activity1")
                                                                           .build())
                                                     .withStateMachine(
                                                             SedsStateMachineBuilder()
@@ -473,6 +501,315 @@ void tst_SedsToSdlTranslator::testTranslateStateTransitionActivity()
     const auto invocation = dynamic_cast<const ::sdl::ProcedureCall *>(invocationAction);
     QVERIFY(invocation);
     QCOMPARE(invocation->procedure()->name(), "activity1");
+}
+
+void tst_SedsToSdlTranslator::testTranslateAddOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    op.setMathOperator(seds::model::CoreMathOperator::Add);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("a"));
+    operation.push_back(seds::model::VariableRef("b"));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "a + b");
+}
+
+void tst_SedsToSdlTranslator::testTranslateSubOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    op.setMathOperator(seds::model::CoreMathOperator::Subtract);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("a"));
+    operation.push_back(seds::model::VariableRef("b"));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "a - b");
+}
+
+void tst_SedsToSdlTranslator::testTranslateMulOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    op.setMathOperator(seds::model::CoreMathOperator::Multiply);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("a"));
+    operation.push_back(seds::model::VariableRef("b"));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "a * b");
+}
+
+void tst_SedsToSdlTranslator::testTranslateDivOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    op.setMathOperator(seds::model::CoreMathOperator::Divide);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("a"));
+    operation.push_back(seds::model::VariableRef("b"));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "a / b");
+}
+
+void tst_SedsToSdlTranslator::testTranslateModOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    op.setMathOperator(seds::model::CoreMathOperator::Modulus);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("a"));
+    operation.push_back(seds::model::VariableRef("b"));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "mod(a, b)");
+}
+
+void tst_SedsToSdlTranslator::testTranslatePowOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    op.setMathOperator(seds::model::CoreMathOperator::Pow);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("a"));
+    operation.push_back(seds::model::VariableRef("b"));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "power(a, b)");
+}
+
+void tst_SedsToSdlTranslator::testTranslateInvOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    op.setMathOperator(seds::model::CoreMathOperator::Inverse);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("a"));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "1/a");
+}
+
+void tst_SedsToSdlTranslator::testTranslateTanOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    op.setMathOperator(seds::model::CoreMathOperator::Tan);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("a"));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "tan(a)");
+}
+
+void tst_SedsToSdlTranslator::testTranslateSinOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    op.setMathOperator(seds::model::CoreMathOperator::Sin);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("a"));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "sin(a)");
+}
+
+void tst_SedsToSdlTranslator::testTranslateCosOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    op.setMathOperator(seds::model::CoreMathOperator::Cos);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("a"));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "cos(a)");
+}
+
+void tst_SedsToSdlTranslator::testTranslateCeilOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    op.setMathOperator(seds::model::CoreMathOperator::Ceil);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("a"));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "ceil(a)");
+}
+
+void tst_SedsToSdlTranslator::testTranslateFloorOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    op.setMathOperator(seds::model::CoreMathOperator::Floor);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("a"));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "floor(a)");
+}
+
+void tst_SedsToSdlTranslator::testTranslateRoundOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    op.setMathOperator(seds::model::CoreMathOperator::Round);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("a"));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "round(a)");
+}
+
+void tst_SedsToSdlTranslator::testTranslateAbsOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    op.setMathOperator(seds::model::CoreMathOperator::Abs);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("a"));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "abs(a)");
+}
+
+void tst_SedsToSdlTranslator::testTranslateMinOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    op.setMathOperator(seds::model::CoreMathOperator::Min);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("a"));
+    operation.push_back(seds::model::VariableRef("b"));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "min(a, b)");
+}
+
+void tst_SedsToSdlTranslator::testTranslateMaxOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    op.setMathOperator(seds::model::CoreMathOperator::Max);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("a"));
+    operation.push_back(seds::model::VariableRef("b"));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "max(a, b)");
+}
+
+void tst_SedsToSdlTranslator::testTranslateSqrtOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    op.setMathOperator(seds::model::CoreMathOperator::Sqrt);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("a"));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "sqrt(a)");
+}
+
+void tst_SedsToSdlTranslator::testTranslateComplexOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator add;
+    add.setMathOperator(seds::model::CoreMathOperator::Add);
+
+    seds::model::Operator sub;
+    sub.setMathOperator(seds::model::CoreMathOperator::Subtract);
+
+    seds::model::Operator mul;
+    mul.setMathOperator(seds::model::CoreMathOperator::Multiply);
+
+    seds::model::Operator div;
+    div.setMathOperator(seds::model::CoreMathOperator::Divide);
+
+    operation.push_back(std::move(div));
+    operation.push_back(std::move(add));
+    operation.push_back(std::move(mul));
+    operation.push_back(std::move(sub));
+    operation.push_back(seds::model::VariableRef("s1"));
+    operation.push_back(seds::model::VariableRef("s2"));
+    operation.push_back(seds::model::VariableRef("m2"));
+    operation.push_back(seds::model::VariableRef("a2"));
+    operation.push_back(seds::model::VariableRef("d2"));
+
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "(((s1 - s2) * m2) + a2) / d2");
+}
+
+static inline auto translateAndVerifyActivityContainsAction(const std::unique_ptr<seds::model::SedsModel> model,
+        const QString activityName, const QString actionContent) -> void
+{
+    Options options;
+    options.add(conversion::iv::IvOptions::configFilename, "config.xml");
+
+    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    SedsToSdlTranslator sdlTranslator;
+
+    const auto asn1Models = asn1Translator.translateModels({ model.get() }, options);
+    const auto ivModels = ivTranslator.translateModels({ model.get(), asn1Models[0].get() }, options);
+
+    const auto resultModels =
+            sdlTranslator.translateModels({ model.get(), asn1Models[0].get(), ivModels[0].get() }, options);
+
+    const auto &resultModel = resultModels[0];
+    const auto *sdlModel = dynamic_cast<SdlModel *>(resultModel.get());
+    const auto &process = sdlModel->processes()[0];
+
+    QCOMPARE(process.procedures().size(), 1);
+    const auto &procedure = process.procedures()[0];
+    QCOMPARE(procedure->name(), activityName);
+    const auto &transition = procedure->transition();
+    QCOMPARE(transition->actions().size(), 1);
+    const auto action = dynamic_cast<::sdl::Task *>(transition->actions()[0].get());
+    QVERIFY(action);
+    QCOMPARE(action->content(), actionContent);
+}
+
+void tst_SedsToSdlTranslator::testTranslateAssignment()
+{
+    auto sedsModel =
+            SedsModelBuilder("Package")
+                    .withIntegerDataType("Integer")
+                    .withComponent(
+                            SedsComponentBuilder("Component")
+                                    .withImplementation(SedsImplementationBuilder()
+                                                                .withActivity(SedsActivityBuilder("activity1")
+                                                                                      .withValueAssignment("a", "12")
+                                                                                      .build())
+                                                                .build())
+                                    .build())
+                    .build();
+
+    translateAndVerifyActivityContainsAction(std::move(sedsModel), "activity1", "a := 12");
+}
+
+void tst_SedsToSdlTranslator::testTranslateMathOperation()
+{
+    auto sedsModel =
+            SedsModelBuilder("Package")
+                    .withIntegerDataType("Integer")
+                    .withComponent(SedsComponentBuilder("Component")
+                                           .withImplementation(
+                                                   SedsImplementationBuilder()
+                                                           .withActivity(SedsActivityBuilder("activity1")
+                                                                                 .withMathOperation("x",
+                                                                                         CoreMathOperator::Sin, "y")
+                                                                                 .build())
+                                                           .build())
+                                           .build())
+                    .build();
+
+    translateAndVerifyActivityContainsAction(std::move(sedsModel), "activity1", "x := sin(y)");
 }
 
 } // namespace conversion::sdl::test

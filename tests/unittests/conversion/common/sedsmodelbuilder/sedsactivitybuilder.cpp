@@ -49,6 +49,22 @@ auto SedsActivityBuilder::withValueAssignment(const QString target, const QStrin
     return *this;
 }
 
+auto SedsActivityBuilder::withMathOperation(
+        const QString target, const seds::model::CoreMathOperator op, const QString argument) -> SedsActivityBuilder &
+{
+
+    seds::model::MathOperation operation;
+    seds::model::Operator opElement;
+    opElement.setMathOperator(op);
+    operation.addElement(std::move(opElement));
+    operation.addElement(seds::model::VariableRef(argument));
+    operation.setOutputVariableRef(VariableRef(target));
+
+    m_activity.body()->addStatement(std::move(operation));
+
+    return *this;
+}
+
 auto SedsActivityBuilder::withArgument(const QString name, const QString typeName) -> SedsActivityBuilder &
 {
     ActivityArgument argument;

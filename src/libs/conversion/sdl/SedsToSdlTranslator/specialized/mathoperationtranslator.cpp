@@ -129,8 +129,10 @@ auto MathOperationTranslator::translateOperator(
         return QString("exp(%1)").arg(translateMutableExpression(expression, unused));
     case CoreMathOperator::Floor:
         return QString("floor(%1)").arg(translateMutableExpression(expression, unused));
-    case CoreMathOperator::Inverse:
-        return QString("1/(%1)").arg(translateMutableExpression(expression, unused));
+    case CoreMathOperator::Inverse: {
+        const auto right = translateMutableExpression(expression, isRightComplex);
+        return formExpression("%1/%2", "1", false, right, isRightComplex);
+    }
     case CoreMathOperator::Ln:
         return QString("ln(%1)").arg(translateMutableExpression(expression, unused));
     case CoreMathOperator::Log:
@@ -159,7 +161,7 @@ auto MathOperationTranslator::translateOperator(
     case CoreMathOperator::Pow: {
         const auto left = translateMutableExpression(expression, unused);
         const auto right = translateMutableExpression(expression, unused);
-        return formExpression("pow(%1, %2)", left, false, right, false);
+        return formExpression("power(%1, %2)", left, false, right, false);
     }
     case CoreMathOperator::Round:
         return QString("round(%1)").arg(translateMutableExpression(expression, unused));

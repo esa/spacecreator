@@ -21,6 +21,7 @@
 
 #include <seds/SedsCommon/basetypesmappings.h>
 #include <seds/SedsModel/components/activities/activity.h>
+#include <seds/SedsModel/components/activities/coremathoperator.h>
 
 namespace tests::conversion::common {
 
@@ -32,6 +33,9 @@ public:
     auto build() -> seds::model::Activity;
 
     auto withValueAssignment(const QString target, const QString value) -> SedsActivityBuilder &;
+    auto withMathOperation(const QString target, const seds::model::CoreMathOperator op, const QString argument)
+            -> SedsActivityBuilder &;
+
     auto withArgument(const QString name, const QString typeName) -> SedsActivityBuilder &;
 
 private:
