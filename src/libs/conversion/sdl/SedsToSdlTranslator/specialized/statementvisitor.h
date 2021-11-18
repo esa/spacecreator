@@ -19,6 +19,9 @@
 
 #pragma once
 
+#include "components/activities/polynomial.h"
+#include "components/activities/splinecalibrator.h"
+
 #include <asn1library/asn1/asn1model.h>
 #include <ivcore/ivmodel.h>
 #include <sdl/SdlModel/procedurecall.h>
@@ -124,6 +127,8 @@ private:
 
     static auto translateArgument(::sdl::Process *process, ::sdl::Procedure *sdlProcedure,
             const seds::model::NamedArgumentValue &argument) -> ::sdl::ProcedureCall::Argument;
+
+    static auto translatePolynomial(const QString variable, const seds::model::Polynomial &polynomial) -> QString;
 };
 
 } // namespace conversion::asn1::translator

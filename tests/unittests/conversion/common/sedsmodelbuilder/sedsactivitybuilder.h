@@ -35,6 +35,8 @@ public:
     auto withValueAssignment(const QString target, const QString value) -> SedsActivityBuilder &;
     auto withMathOperation(const QString target, const seds::model::CoreMathOperator op, const QString argument)
             -> SedsActivityBuilder &;
+    auto withPolynomialCalibration(const QString target, const QString source, const std::vector<double> coefficients,
+            const std::vector<uint64_t> exponents) -> SedsActivityBuilder &;
 
     auto withArgument(const QString name, const QString typeName) -> SedsActivityBuilder &;
 

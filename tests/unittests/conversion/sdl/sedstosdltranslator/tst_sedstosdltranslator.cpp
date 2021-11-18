@@ -111,6 +111,7 @@ private Q_SLOTS:
 
     void testTranslateAssignment();
     void testTranslateMathOperation();
+    void testTranslatePolynomialCalibrator();
 };
 
 void tst_SedsToSdlTranslator::testMissingModel()
@@ -810,6 +811,25 @@ void tst_SedsToSdlTranslator::testTranslateMathOperation()
                     .build();
 
     translateAndVerifyActivityContainsAction(std::move(sedsModel), "activity1", "x := sin(y)");
+}
+
+void tst_SedsToSdlTranslator::testTranslatePolynomialCalibrator()
+{
+    auto sedsModel =
+            SedsModelBuilder("Package")
+                    .withIntegerDataType("Integer")
+                    .withComponent(SedsComponentBuilder("Component")
+                                           .withImplementation(
+                                                   SedsImplementationBuilder()
+                                                           .withActivity(SedsActivityBuilder("activity1")
+                                                                                 .withPolynomialCalibration("x", "y",
+                                                                                         { 2.0, 4.0, 5.0 }, { 0, 2, 4 })
+                                                                                 .build())
+                                                           .build())
+                                           .build())
+                    .build();
+
+    translateAndVerifyActivityContainsAction(std::move(sedsModel), "activity1", "x := 2 + 4 * y * y + 5 * power(y, 4)");
 }
 
 } // namespace conversion::sdl::test

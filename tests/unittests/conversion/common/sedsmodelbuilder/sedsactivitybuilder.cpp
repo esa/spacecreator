@@ -19,6 +19,8 @@
 
 #include "sedsactivitybuilder.h"
 
+#include <assert.h>
+#include <seds/SedsModel/components/activities/calibration.h>
 #include <seds/SedsModel/sedsmodel.h>
 
 using namespace seds::model;
@@ -61,6 +63,29 @@ auto SedsActivityBuilder::withMathOperation(
     operation.setOutputVariableRef(VariableRef(target));
 
     m_activity.body()->addStatement(std::move(operation));
+
+    return *this;
+}
+
+auto SedsActivityBuilder::withPolynomialCalibration(const QString target, const QString source,
+        const std::vector<double> coefficients, const std::vector<uint64_t> exponents) -> SedsActivityBuilder &
+{
+    seds::model::Calibration calibration;
+    seds::model::Polynomial polynomial;
+
+    assert(coefficients.size() == exponents.size());
+    for (std::size_t i = 0; i < coefficients.size(); i++) {
+        seds::model::PolynomialTerm term;
+        term.setCoefficient(coefficients[i]);
+        term.setExponent(exponents[i]);
+        polynomial.addTerm(std::move(term));
+    }
+
+    calibration.setCalibrator(std::move(polynomial));
+    calibration.setOutputVariableRef(VariableRef(target));
+    calibration.setInputVariableRef(VariableRef(source));
+
+    m_activity.body()->addStatement(std::move(calibration));
 
     return *this;
 }

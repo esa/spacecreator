@@ -23,6 +23,7 @@
 #include "mathoperationtranslator.h"
 #include "translation/exceptions.h"
 
+#include <algorithm>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/iv/SedsToIvTranslator/specialized/interfacecommandtranslator.h>
 
@@ -30,6 +31,8 @@ using conversion::Escaper;
 using conversion::iv::translator::InterfaceCommandTranslator;
 using conversion::translator::TranslationException;
 using seds::model::CoreMathOperator;
+using seds::model::Polynomial;
+using seds::model::SplineCalibrator;
 
 namespace conversion::sdl::translator {
 
@@ -69,7 +72,15 @@ auto StatementVisitor::operator()(const seds::model::Assignment &assignment) -> 
 
 auto StatementVisitor::operator()(const seds::model::Calibration &calibration) -> void
 {
-    Q_UNUSED(calibration);
+    const auto targetName = Escaper::escapeAsn1FieldName(calibration.outputVariableRef().value().value());
+    const auto sourceName = Escaper::escapeAsn1FieldName(calibration.inputVariableRef().value().value());
+    const auto &calibrator = calibration.calibrator();
+    if (std::holds_alternative<Polynomial>(calibrator)) {
+        const auto &polynomial = std::get<Polynomial>(calibrator);
+        const auto action = QString("%1 := %2").arg(targetName, translatePolynomial(sourceName, polynomial));
+        m_sdlTransition->addAction(std::make_unique<::sdl::Task>("", action));
+        return;
+    }
     throw TranslationException("Calibration activity not implemented");
 }
 
@@ -186,6 +197,35 @@ auto StatementVisitor::translateArgument(::sdl::Process *process, ::sdl::Procedu
         return std::make_unique<::sdl::VariableReference>(variableDeclaration);
     }
     return std::unique_ptr<::sdl::VariableReference>();
+}
+
+auto StatementVisitor::translatePolynomial(const QString variable, const seds::model::Polynomial &polynomial) -> QString
+{
+    return std::accumulate(polynomial.terms().begin(), polynomial.terms().end(), QString(""),
+            [variable](const auto &accumulator, const auto &element) {
+                QString expression;
+                switch (element.exponent()) {
+                case 0:
+                    expression.append(QString("%1").arg(element.coefficient()));
+                    break;
+                case 1:
+                    expression.append(QString("%1 * %2").arg(QString::number(element.coefficient()), variable));
+                    break;
+                case 2:
+                    expression.append(QString("%1 * %2 * %2").arg(QString::number(element.coefficient()), variable));
+                    break;
+                case 3:
+                    expression.append(
+                            QString("%1 * %2 * %2 * %2").arg(QString::number(element.coefficient()), variable));
+                    break;
+                default:
+                    // From the 4th power and up, there are more efficient ways than naive multiplication
+                    expression.append(QString("%1 * power(%2, %3)")
+                                              .arg(QString::number(element.coefficient()), variable,
+                                                      QString::number(element.exponent())));
+                }
+                return accumulator.size() == 0 ? expression : QString(accumulator + " + " + expression);
+            });
 }
 
 }
