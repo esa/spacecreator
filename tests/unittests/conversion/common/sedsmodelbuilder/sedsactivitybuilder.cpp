@@ -21,6 +21,7 @@
 
 #include <assert.h>
 #include <seds/SedsModel/components/activities/calibration.h>
+#include <seds/SedsModel/components/activities/variablerefoperand.h>
 #include <seds/SedsModel/sedsmodel.h>
 
 using namespace seds::model;
@@ -86,6 +87,28 @@ auto SedsActivityBuilder::withPolynomialCalibration(const QString target, const 
     calibration.setInputVariableRef(VariableRef(source));
 
     m_activity.body()->addStatement(std::move(calibration));
+
+    return *this;
+}
+
+auto SedsActivityBuilder::withActivityCall(const QString target, const std::vector<QString> argumentNames,
+        const std::vector<QString> argumentValues) -> SedsActivityBuilder &
+{
+    seds::model::ActivityInvocation invocation;
+
+    invocation.setActivity(target);
+    assert(argumentNames.size() == argumentValues.size());
+    for (size_t i = 0; i < argumentNames.size(); i++) {
+        seds::model::VariableRefOperand ref;
+        seds::model::NamedArgumentValue namedValue;
+        ref.setVariableRef(VariableRef(argumentValues[i]));
+        namedValue.setValue(std::move(ref));
+        namedValue.setName(argumentNames[i]);
+
+        invocation.addArgumentValue(std::move(namedValue));
+    }
+
+    m_activity.body()->addStatement(std::move(invocation));
 
     return *this;
 }

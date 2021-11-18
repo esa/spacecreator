@@ -81,6 +81,8 @@ auto StatementVisitor::operator()(const seds::model::Calibration &calibration) -
         m_sdlTransition->addAction(std::make_unique<::sdl::Task>("", action));
         return;
     }
+    // TODO Spline calibrator - postponed, as it requires generation of a custom procedure,
+    // and possibly a custom type
     throw TranslationException("Calibration activity not implemented");
 }
 
