@@ -26,7 +26,6 @@
 #include <conversion/common/exceptions.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <filesystem>
-#include <promela/PromelaOptions/options.h>
 #include <sdl/SdlOptions/options.h>
 #include <seds/SedsOptions/options.h>
 
@@ -35,7 +34,6 @@ using conversion::ModelType;
 using conversion::Options;
 using conversion::asn1::Asn1Options;
 using conversion::iv::IvOptions;
-using conversion::promela::PromelaOptions;
 using conversion::sdl::SdlOptions;
 using conversion::seds::SedsOptions;
 
@@ -90,13 +88,11 @@ void SedsConverterCLI::processOptions(Options &options)
 {
     addAsn1InputOptions(options);
     addIvInputOptions(options);
-    addPromelaInputOptions(options);
     addSdlInputOptions(options);
     addSedsInputOptions(options);
 
     addAsn1OutputOptions(options);
     addIvOutputOptions(options);
-    addPromelaOutputOptions(options);
     addSdlOutputOptions(options);
     addSedsOutputOptions(options);
 }
@@ -168,22 +164,6 @@ void SedsConverterCLI::addIvOutputOptions(Options &options)
         options.add(IvOptions::outputFilepath, m_outputFilepath);
     } else {
         options.add(IvOptions::outputFilepath, IvOptions::defaultOutputFilename);
-    }
-}
-
-void SedsConverterCLI::addPromelaInputOptions(conversion::Options &options)
-{
-    for (const auto &inputFilepath : getInputFilepaths(ModelType::Promela)) {
-        options.add(PromelaOptions::inputFilepath, std::move(inputFilepath));
-    }
-}
-
-void SedsConverterCLI::addPromelaOutputOptions(conversion::Options &options)
-{
-    if (!m_outputFilepath.isEmpty()) {
-        options.add(PromelaOptions::outputFilepath, m_outputFilepath);
-    } else {
-        options.add(PromelaOptions::outputFilepath, PromelaOptions::defaultOutputFilepath);
     }
 }
 

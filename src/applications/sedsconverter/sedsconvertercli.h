@@ -92,14 +92,6 @@ private:
      */
     void addIvOutputOptions(conversion::Options &options);
     /**
-     * @brief   Process options for input Promela model
-     */
-    void addPromelaInputOptions(conversion::Options &options);
-    /**
-     * @brief   Process options for output Promela model
-     */
-    void addPromelaOutputOptions(conversion::Options &options);
-    /**
      * @brief   Process options for input SDL model
      */
     void addSdlInputOptions(conversion::Options &options);
