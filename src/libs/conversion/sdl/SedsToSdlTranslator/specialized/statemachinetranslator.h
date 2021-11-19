@@ -59,13 +59,13 @@ public:
             const seds::model::ComponentImplementation::VariableSet &variables, ::sdl::Process *sdlProcess) -> void;
 
     /**
-     * @brief   Create variables for accepting input signal parameters
+     * @brief   Create variables for storing input and output signal parameters
      *
      * @param sedsComponent     SEDS component
      * @param ivModel           InterfaceView model
      * @param sdlProcess        Target SDL process
      */
-    static auto createVariablesForInputReception(
+    static auto createIoVariables(
             const seds::model::Component &sedsComponent, ivm::IVModel *ivModel, ::sdl::Process *sdlProcess) -> void;
 
     /**
@@ -79,13 +79,13 @@ public:
             const seds::model::Component &sedsComponent, ivm::IVModel *ivModel, ::sdl::Process *sdlProcess) -> void;
 
     /**
-     * @brief   Get name of the variable used for receiving packed parameters on the given interface
+     * @brief   Get name of the variable used for packing parameters of the given interface
      *
      * @param interfaceName     Interface name
      *
      * @return Variable name
      */
-    static auto receptionVariableName(const QString interfaceName) -> QString;
+    static auto ioVariableName(const QString interfaceName) -> QString;
 
 private:
     static auto createStartTransition(const seds::model::StateMachine &sedsStateMachine, ::sdl::Process *sdlProcess,
@@ -106,7 +106,7 @@ private:
     static auto translateTransition(const seds::model::Transition &sedsTransition, ::sdl::Process *sdlProcess,
             ::sdl::StateMachine *stateMachine, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void;
 
-    static auto createVariableForInput(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
+    static auto createIoVariable(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
 
     static auto createExternalProcedure(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
 };

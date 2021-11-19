@@ -21,11 +21,13 @@
 
 #include "components/activities/coremathoperator.h"
 #include "mathoperationtranslator.h"
+#include "statemachinetranslator.h"
 #include "translation/exceptions.h"
 
 #include <algorithm>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/iv/SedsToIvTranslator/specialized/interfacecommandtranslator.h>
+#include <ivcore/ivfunction.h>
 
 using conversion::Escaper;
 using conversion::iv::translator::InterfaceCommandTranslator;
@@ -34,12 +36,22 @@ using seds::model::CoreMathOperator;
 using seds::model::Polynomial;
 using seds::model::SplineCalibrator;
 
+// Overload pattern
+template<class... Ts>
+struct overload : Ts... {
+    using Ts::operator()...;
+};
+template<class... Ts>
+overload(Ts...)->overload<Ts...>;
+
 namespace conversion::sdl::translator {
 
 StatementVisitor::StatementVisitor(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
-        ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure, ::sdl::Transition *sdlTransition)
+        ivm::IVModel *ivModel, ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure,
+        ::sdl::Transition *sdlTransition)
     : m_sedsPackage(sedsPackage)
     , m_asn1Model(asn1Model)
+    , m_ivModel(ivModel)
     , m_sdlProcess(sdlProcess)
     , m_sdlProcedure(sdlProcedure)
     , m_sdlTransition(sdlTransition)
@@ -122,22 +134,21 @@ auto StatementVisitor::operator()(const seds::model::SendCommandPrimitive &sendC
 
     const auto callName = InterfaceCommandTranslator::getCommandName(
             interfaceName, ivm::IVInterface::InterfaceType::Required, commandName);
-    // TODO check if this is sync or async, and generate OUTPUT instead if applicable
 
-    auto call = std::make_unique<::sdl::ProcedureCall>();
+    // Process name carries iv-escaped component name
+    const auto interface = findInterfaceDeclaration(m_ivModel, m_sdlProcess->name(), callName);
 
-    const auto &procedure = std::find_if(m_sdlProcess->procedures().begin(), m_sdlProcess->procedures().end(),
-            [callName](const auto &p) { return p->name() == callName; });
-
-    if (procedure == m_sdlProcess->procedures().end()) {
-        throw TranslationException(QString("Procedure %1 not found").arg(callName));
+    if (interface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
+        auto outputActions = translateOutput(m_sdlProcess, m_sdlProcedure, callName, sendCommand);
+        for (auto &action : outputActions) {
+            m_sdlTransition->addAction(std::move(action));
+        }
     }
-    call->setProcedure(procedure->get());
-
-    for (const auto &argument : sendCommand.argumentValues()) {
-        call->addArgument(std::move(translateArgument(m_sdlProcess, m_sdlProcedure, argument)));
+    if (interface->kind() == ivm::IVInterface::OperationKind::Protected
+            || interface->kind() == ivm::IVInterface::OperationKind::Unprotected) {
+        auto call = translateCall(m_sdlProcess, m_sdlProcedure, callName, sendCommand);
+        m_sdlTransition->addAction(std::move(call));
     }
-    m_sdlTransition->addAction(std::move(call));
 }
 
 auto StatementVisitor::operator()(const seds::model::SendParameterPrimitive &sendPrimitive) -> void
@@ -163,6 +174,22 @@ auto StatementVisitor::translateActivityCall(::sdl::Process *process, const seds
         call->addArgument(std::move(translateArgument(process, nullptr, argument)));
     }
     return std::move(call);
+}
+
+auto StatementVisitor::findInterfaceDeclaration(
+        ivm::IVModel *model, const QString functionName, const QString interfaceName) -> ivm::IVInterface *
+{
+    const auto &function = model->getFunction(functionName, Qt::CaseSensitive);
+    if (function == nullptr) {
+        throw TranslationException(QString("Function %1 not found").arg(functionName));
+    }
+
+    const auto interfaceIterator = std::find_if(function->interfaces().begin(), function->interfaces().end(),
+            [interfaceName](const auto &element) { return element->ifaceLabel() == interfaceName; });
+    if (interfaceIterator == function->interfaces().end()) {
+        throw TranslationException(QString("Interface %1 not found for function %2").arg(interfaceName, functionName));
+    }
+    return *interfaceIterator;
 }
 
 auto StatementVisitor::findVariableDeclaration(::sdl::Process *process, ::sdl::Procedure *sdlProcedure, QString name)
@@ -228,6 +255,58 @@ auto StatementVisitor::translatePolynomial(const QString variable, const seds::m
                 }
                 return accumulator.size() == 0 ? expression : QString(accumulator + " + " + expression);
             });
+}
+
+auto StatementVisitor::translateCall(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
+        const QString callName, const seds::model::SendCommandPrimitive &sendCommand)
+        -> std::unique_ptr<::sdl::ProcedureCall>
+{
+    auto call = std::make_unique<::sdl::ProcedureCall>();
+
+    const auto &procedure = std::find_if(hostProcess->procedures().begin(), hostProcess->procedures().end(),
+            [callName](const auto &p) { return p->name() == callName; });
+
+    if (procedure == hostProcess->procedures().end()) {
+        throw TranslationException(QString("Procedure %1 not found").arg(callName));
+    }
+    call->setProcedure(procedure->get());
+
+    for (const auto &argument : sendCommand.argumentValues()) {
+        call->addArgument(std::move(translateArgument(hostProcess, hostProcedure, argument)));
+    }
+    return std::move(call);
+}
+
+auto StatementVisitor::translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
+        const QString callName, const seds::model::SendCommandPrimitive &sendCommand)
+        -> std::vector<std::unique_ptr<::sdl::Action>>
+{
+    Q_UNUSED(hostProcess);
+    Q_UNUSED(hostProcedure);
+
+    std::vector<std::unique_ptr<::sdl::Action>> result;
+
+    auto output = std::make_unique<::sdl::Output>();
+    output->setName(callName);
+    if (sendCommand.argumentValues().size() > 0) {
+        const auto ioVariable = StateMachineTranslator::ioVariableName(callName);
+        for (const auto &argument : sendCommand.argumentValues()) {
+            const auto fieldName = Escaper::escapeAsn1FieldName(argument.name().value());
+            const auto source = std::visit(
+                    overload { [](const seds::model::ValueOperand &operand) { return operand.value().value(); },
+                            [](const seds::model::VariableRefOperand &operand) {
+                                return Escaper::escapeAsn1FieldName(operand.variableRef().value().value());
+                            } },
+                    argument.value());
+            auto assignment =
+                    std::make_unique<::sdl::Task>("", QString("%1.%2 := %3").arg(ioVariable, fieldName, source));
+            result.emplace_back(std::move(assignment));
+        }
+    }
+
+    result.emplace_back(std::move(output));
+
+    return std::move(result);
 }
 
 }

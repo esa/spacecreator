@@ -119,10 +119,10 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
         ::sdl::Process process;
         process.setName(Escaper::escapeIvName(sedsComponent.nameStr()));
         StateMachineTranslator::translateVariables(sedsPackage, asn1Model, implementation.variables(), &process);
-        StateMachineTranslator::createVariablesForInputReception(sedsComponent, ivModel, &process);
+        StateMachineTranslator::createIoVariables(sedsComponent, ivModel, &process);
         StateMachineTranslator::createExternalProcedures(sedsComponent, ivModel, &process);
         for (const auto &activity : implementation.activities()) {
-            ActivityTranslator::translateActivity(sedsPackage, asn1Model, activity, &process);
+            ActivityTranslator::translateActivity(sedsPackage, asn1Model, ivModel, activity, &process);
         }
         // TODO provide additional translation for parameter (activity) maps
         if (stateMachineCount == 1) {

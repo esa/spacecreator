@@ -37,7 +37,7 @@ using conversion::translator::TranslationException;
 
 namespace conversion::sdl::translator {
 
-static constexpr auto RECEPTION_VARIABLE_PATTERN = "input_%1";
+static constexpr auto IO_VARIABLE_PATTERN = "input_%1";
 
 auto StateMachineTranslator::translateStateMachine(const seds::model::StateMachine &sedsStateMachine,
         ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void
@@ -89,7 +89,7 @@ auto StateMachineTranslator::translateVariables(const seds::model::Package &seds
     }
 }
 
-auto StateMachineTranslator::createVariablesForInputReception(
+auto StateMachineTranslator::createIoVariables(
         const seds::model::Component &sedsComponent, ivm::IVModel *ivModel, ::sdl::Process *sdlProcess) -> void
 {
     const auto functionName = Escaper::escapeIvName(sedsComponent.nameStr());
@@ -98,8 +98,8 @@ auto StateMachineTranslator::createVariablesForInputReception(
         throw TranslationException(QString("Function %1 not found in the InterfaceView").arg(functionName));
     }
     for (const auto &interface : function->interfaces()) {
-        if (interface->isProvided() && interface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
-            createVariableForInput(interface, sdlProcess);
+        if (interface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
+            createIoVariable(interface, sdlProcess);
         }
     }
 }
@@ -119,9 +119,9 @@ auto StateMachineTranslator::createExternalProcedures(
     }
 }
 
-auto StateMachineTranslator::receptionVariableName(const QString interfaceName) -> QString
+auto StateMachineTranslator::ioVariableName(const QString interfaceName) -> QString
 {
-    return QString(RECEPTION_VARIABLE_PATTERN).arg(interfaceName);
+    return QString(IO_VARIABLE_PATTERN).arg(interfaceName);
 }
 
 auto StateMachineTranslator::createStartTransition(const seds::model::StateMachine &sedsStateMachine,
@@ -179,7 +179,7 @@ auto StateMachineTranslator::translatePrimitive(
         return std::make_pair(std::move(input), std::move(unpackingActions));
     }
 
-    const auto variableName = receptionVariableName(input->name());
+    const auto variableName = ioVariableName(input->name());
     const auto &variableIterator = std::find_if(sdlProcess->variables().begin(), sdlProcess->variables().end(),
             [variableName](const auto &variable) { return variable->name() == variableName; });
     if (variableIterator == sdlProcess->variables().end()) {
@@ -244,8 +244,7 @@ auto StateMachineTranslator::translateTransition(const seds::model::Transition &
     stateMachine->addTransition(std::move(transition));
 }
 
-auto StateMachineTranslator::createVariableForInput(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess)
-        -> void
+auto StateMachineTranslator::createIoVariable(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void
 {
     if (interface->params().size() == 0) {
         return; // NOP
@@ -255,7 +254,7 @@ auto StateMachineTranslator::createVariableForInput(ivm::IVInterface const *inte
         throw TranslationException(QString("Sporadic interface %1 has more than one parameter").arg(interfaceName));
         return;
     }
-    const auto variableName = receptionVariableName(interfaceName);
+    const auto variableName = ioVariableName(interfaceName);
     const auto &param = interface->params()[0];
     sdlProcess->addVariable(std::make_unique<::sdl::VariableDeclaration>(variableName, param.paramTypeName()));
 }

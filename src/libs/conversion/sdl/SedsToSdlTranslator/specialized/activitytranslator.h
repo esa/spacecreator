@@ -37,15 +37,17 @@ public:
      *
      * @param sedsPackage       SEDS package containing the activity
      * @param asn1Model         Data model
+     * @param ivModel           IV model
      * @param sedsStateMachine  Source SEDS activity
      * @param sdlProcess        Target SDL process
      */
     static auto translateActivity(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
-            const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess) -> void;
+            ivm::IVModel *ivModel, const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess) -> void;
 
 private:
     static auto translateBody(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
-            const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess, ::sdl::Procedure *procedure) -> void;
+            ivm::IVModel *ivModel, const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess,
+            ::sdl::Procedure *procedure) -> void;
 };
 
 }

@@ -24,6 +24,7 @@
 
 #include <asn1library/asn1/asn1model.h>
 #include <ivcore/ivmodel.h>
+#include <sdl/SdlModel/output.h>
 #include <sdl/SdlModel/procedurecall.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/task.h>
@@ -45,13 +46,14 @@ public:
      *
      * @param sedsPackage       SEDS package containing the activity
      * @param asn1Model         Data model
+     * @param ivModel           IV model
      * @param sdlProcess        Host SDL process
      * @param sdlProcedure      Host SDL procedure
      * @param sdlTransition     Target SDL transition
      */
 
-    StatementVisitor(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model, ::sdl::Process *sdlProcess,
-            ::sdl::Procedure *sdlProcedure, ::sdl::Transition *sdlTransition);
+    StatementVisitor(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
+            ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure, ::sdl::Transition *sdlTransition);
 
     /**
      * @brief   Translates SEDS activity invocation
@@ -118,9 +120,13 @@ public:
 private:
     const seds::model::Package &m_sedsPackage;
     Asn1Acn::Asn1Model *m_asn1Model;
+    ivm::IVModel *m_ivModel;
     ::sdl::Process *m_sdlProcess;
     ::sdl::Procedure *m_sdlProcedure;
     ::sdl::Transition *m_sdlTransition;
+
+    static auto findInterfaceDeclaration(ivm::IVModel *model, const QString functionName, const QString interfaceName)
+            -> ivm::IVInterface *;
 
     static auto findVariableDeclaration(::sdl::Process *process, ::sdl::Procedure *sdlProcedure, QString name)
             -> ::sdl::VariableDeclaration *;
@@ -129,6 +135,12 @@ private:
             const seds::model::NamedArgumentValue &argument) -> ::sdl::ProcedureCall::Argument;
 
     static auto translatePolynomial(const QString variable, const seds::model::Polynomial &polynomial) -> QString;
+
+    static auto translateCall(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString callName,
+            const seds::model::SendCommandPrimitive &sendCommand) -> std::unique_ptr<::sdl::ProcedureCall>;
+
+    static auto translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString callName,
+            const seds::model::SendCommandPrimitive &sendCommand) -> std::vector<std::unique_ptr<::sdl::Action>>;
 };
 
 } // namespace conversion::asn1::translator

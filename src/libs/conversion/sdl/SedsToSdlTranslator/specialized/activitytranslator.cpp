@@ -29,7 +29,7 @@ using conversion::Escaper;
 namespace conversion::sdl::translator {
 
 auto ActivityTranslator::translateActivity(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
-        const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess) -> void
+        ivm::IVModel *ivModel, const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess) -> void
 {
 
     const auto name = Escaper::escapeSdlName(sedsActivity.nameStr());
@@ -40,15 +40,16 @@ auto ActivityTranslator::translateActivity(const seds::model::Package &sedsPacka
         auto parameter = std::make_unique<::sdl::ProcedureParameter>(parameterName, parameterType, "in");
         procedure->addParameter(std::move(parameter));
     }
-    translateBody(sedsPackage, asn1Model, sedsActivity, sdlProcess, procedure.get());
+    translateBody(sedsPackage, asn1Model, ivModel, sedsActivity, sdlProcess, procedure.get());
     sdlProcess->addProcedure(std::move(procedure));
 }
 
 auto ActivityTranslator::translateBody(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
-        const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess, ::sdl::Procedure *procedure) -> void
+        ivm::IVModel *ivModel, const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess,
+        ::sdl::Procedure *procedure) -> void
 {
     auto transition = std::make_unique<::sdl::Transition>();
-    StatementVisitor visitor(sedsPackage, asn1Model, sdlProcess, procedure, transition.get());
+    StatementVisitor visitor(sedsPackage, asn1Model, ivModel, sdlProcess, procedure, transition.get());
     for (const auto &statement : sedsActivity.body()->statements()) {
         std::visit(visitor, statement);
     }
