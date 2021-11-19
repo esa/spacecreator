@@ -44,6 +44,7 @@ public:
     void setIVCore(IVEditorCorePtr ivCore);
     IVEditorCorePtr ivCore() const;
 
+    QStringList terminalFunctionsNames() const override;
     QStringList functionsNames() const override;
     QStringList pseudoFunctionsNames() const override;
     QList<ivm::IVFunction *> connectedPseudoFunctions(const QString &functionName) const;

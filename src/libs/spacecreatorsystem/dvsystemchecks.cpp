@@ -149,7 +149,7 @@ bool DvSystemChecks::checkFunctionIvValidity(const DVEditorCorePtr &dvCore) cons
         return true;
     }
     scs::IvSystemQueries *ivQuery = m_storage->ivQuery();
-    QStringList ivFunctionNames = ivQuery->functionsNames();
+    QStringList ivFunctionNames = ivQuery->terminalFunctionsNames();
     QStringList systemFunctionNames = ivQuery->pseudoFunctionsNames();
 
     bool ok = true;

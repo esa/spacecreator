@@ -31,6 +31,7 @@ public:
 
     virtual ~AbstractSystemChecks() override = default;
 
+    virtual QStringList terminalFunctionsNames() const = 0;
     virtual QStringList functionsNames() const = 0;
     virtual QStringList pseudoFunctionsNames() const = 0;
     virtual QStringList connectedProtectedFunctionNames(const QString &functionName) const = 0;
