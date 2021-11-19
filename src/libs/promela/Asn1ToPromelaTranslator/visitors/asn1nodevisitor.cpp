@@ -33,8 +33,9 @@ using Asn1Acn::ValueAssignment;
 using promela::model::PromelaModel;
 
 namespace promela::translator {
-Asn1NodeVisitor::Asn1NodeVisitor(PromelaModel &promelaModel)
+Asn1NodeVisitor::Asn1NodeVisitor(PromelaModel &promelaModel, bool enhancedSpinSupport)
     : m_promelaModel(promelaModel)
+    , m_enhancedSpinSupport(enhancedSpinSupport)
 {
 }
 
@@ -54,7 +55,7 @@ void Asn1NodeVisitor::visit(const File &file)
 
 void Asn1NodeVisitor::visit(const TypeAssignment &type)
 {
-    Asn1ItemTypeVisitor typeVisitor(m_promelaModel, std::nullopt, type.name());
+    Asn1ItemTypeVisitor typeVisitor(m_promelaModel, std::nullopt, type.name(), m_enhancedSpinSupport);
     type.type()->accept(typeVisitor);
 }
 

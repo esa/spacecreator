@@ -31,6 +31,9 @@ class PromelaOptions
 public:
     /** @brief  Filepath of output file  */
     inline static const QString outputFilepath = "Promela_Export_OutputFilepath";
+
+    /** @brief Generate promela code for enhanced spin */
+    inline static const QString enhancedSpinSupport = "Promela_CodeForEnhancedSpin";
 };
 
 }

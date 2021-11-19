@@ -138,7 +138,7 @@ void tst_Asn1ToPromelaTranslator::testBasicTypes()
     }
 
     PromelaModel promelaModel;
-    Asn1NodeVisitor visitor(promelaModel);
+    Asn1NodeVisitor visitor(promelaModel, true);
     visitor.visit(*model);
 
     QCOMPARE(promelaModel.getMtypeValues().size(), 0);
@@ -184,7 +184,7 @@ void tst_Asn1ToPromelaTranslator::testEnumerated()
     model->addType(std::move(typeAssignment));
 
     PromelaModel promelaModel;
-    Asn1NodeVisitor visitor(promelaModel);
+    Asn1NodeVisitor visitor(promelaModel, true);
     visitor.visit(*model);
 
     QCOMPARE(promelaModel.getMtypeValues().size(), 0);
@@ -227,7 +227,7 @@ void tst_Asn1ToPromelaTranslator::testVariableBitString()
     model->addType(std::move(typeAssignment));
 
     PromelaModel promelaModel;
-    Asn1NodeVisitor visitor(promelaModel);
+    Asn1NodeVisitor visitor(promelaModel, true);
     visitor.visit(*model);
 
     QCOMPARE(promelaModel.getMtypeValues().size(), 0);
@@ -270,7 +270,7 @@ void tst_Asn1ToPromelaTranslator::testFixedBitString()
     model->addType(std::move(typeAssignment));
 
     PromelaModel promelaModel;
-    Asn1NodeVisitor visitor(promelaModel);
+    Asn1NodeVisitor visitor(promelaModel, true);
     visitor.visit(*model);
 
     QCOMPARE(promelaModel.getMtypeValues().size(), 0);
@@ -308,7 +308,7 @@ void tst_Asn1ToPromelaTranslator::testVariableOctetString()
     model->addType(std::move(typeAssignment));
 
     PromelaModel promelaModel;
-    Asn1NodeVisitor visitor(promelaModel);
+    Asn1NodeVisitor visitor(promelaModel, true);
     visitor.visit(*model);
 
     QCOMPARE(promelaModel.getMtypeValues().size(), 0);
@@ -351,7 +351,7 @@ void tst_Asn1ToPromelaTranslator::testFixedOctetString()
     model->addType(std::move(typeAssignment));
 
     PromelaModel promelaModel;
-    Asn1NodeVisitor visitor(promelaModel);
+    Asn1NodeVisitor visitor(promelaModel, true);
     visitor.visit(*model);
 
     QCOMPARE(promelaModel.getMtypeValues().size(), 0);
@@ -389,7 +389,7 @@ void tst_Asn1ToPromelaTranslator::testVariableIA5String()
     model->addType(std::move(typeAssignment));
 
     PromelaModel promelaModel;
-    Asn1NodeVisitor visitor(promelaModel);
+    Asn1NodeVisitor visitor(promelaModel, true);
     visitor.visit(*model);
 
     QCOMPARE(promelaModel.getMtypeValues().size(), 0);
@@ -432,7 +432,7 @@ void tst_Asn1ToPromelaTranslator::testFixedIA5String()
     model->addType(std::move(typeAssignment));
 
     PromelaModel promelaModel;
-    Asn1NodeVisitor visitor(promelaModel);
+    Asn1NodeVisitor visitor(promelaModel, true);
     visitor.visit(*model);
 
     QCOMPARE(promelaModel.getMtypeValues().size(), 0);
@@ -473,7 +473,7 @@ void tst_Asn1ToPromelaTranslator::testChoice()
     model->addType(std::move(typeAssignment));
 
     PromelaModel promelaModel;
-    Asn1NodeVisitor visitor(promelaModel);
+    Asn1NodeVisitor visitor(promelaModel, true);
     visitor.visit(*model);
 
     QCOMPARE(promelaModel.getMtypeValues().size(), 0);
@@ -534,7 +534,7 @@ void tst_Asn1ToPromelaTranslator::testSequence()
     model->addType(std::move(typeAssignment));
 
     PromelaModel promelaModel;
-    Asn1NodeVisitor visitor(promelaModel);
+    Asn1NodeVisitor visitor(promelaModel, true);
     visitor.visit(*model);
 
     QCOMPARE(promelaModel.getMtypeValues().size(), 0);
@@ -585,7 +585,7 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
     model->addType(std::move(typeAssignment));
 
     PromelaModel promelaModel;
-    Asn1NodeVisitor visitor(promelaModel);
+    Asn1NodeVisitor visitor(promelaModel, true);
     visitor.visit(*model);
 
     QCOMPARE(promelaModel.getMtypeValues().size(), 0);
@@ -664,7 +664,7 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
     model->addType(std::move(typeAssignment));
 
     PromelaModel promelaModel;
-    Asn1NodeVisitor visitor(promelaModel);
+    Asn1NodeVisitor visitor(promelaModel, true);
     visitor.visit(*model);
 
     QCOMPARE(promelaModel.getMtypeValues().size(), 0);
@@ -729,7 +729,7 @@ void tst_Asn1ToPromelaTranslator::testVariableSequenceOf()
     model->addType(std::move(typeAssignment));
 
     PromelaModel promelaModel;
-    Asn1NodeVisitor visitor(promelaModel);
+    Asn1NodeVisitor visitor(promelaModel, true);
     visitor.visit(*model);
 
     QCOMPARE(promelaModel.getMtypeValues().size(), 0);
@@ -776,7 +776,7 @@ void tst_Asn1ToPromelaTranslator::testFixedSequenceOf()
     model->addType(std::move(typeAssignment));
 
     PromelaModel promelaModel;
-    Asn1NodeVisitor visitor(promelaModel);
+    Asn1NodeVisitor visitor(promelaModel, true);
     visitor.visit(*model);
 
     QCOMPARE(promelaModel.getMtypeValues().size(), 0);
