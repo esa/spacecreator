@@ -113,6 +113,29 @@ auto SedsActivityBuilder::withActivityCall(const QString target, const std::vect
     return *this;
 }
 
+auto SedsActivityBuilder::withSendCommand(const QString interfaceName, const QString commandName,
+        const std::vector<QString> argumentNames, const std::vector<QString> argumentValues) -> SedsActivityBuilder &
+{
+    seds::model::SendCommandPrimitive send;
+
+    send.setInterface(interfaceName);
+    send.setCommand(commandName);
+    assert(argumentNames.size() == argumentValues.size());
+    for (size_t i = 0; i < argumentNames.size(); i++) {
+        seds::model::VariableRefOperand ref;
+        seds::model::NamedArgumentValue namedValue;
+        ref.setVariableRef(VariableRef(argumentValues[i]));
+        namedValue.setValue(std::move(ref));
+        namedValue.setName(argumentNames[i]);
+
+        send.addArgumentValue(std::move(namedValue));
+    }
+
+    m_activity.body()->addStatement(std::move(send));
+
+    return *this;
+}
+
 auto SedsActivityBuilder::withArgument(const QString name, const QString typeName) -> SedsActivityBuilder &
 {
     ActivityArgument argument;

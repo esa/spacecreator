@@ -30,6 +30,8 @@
 #include <conversion/sdl/SedsToSdlTranslator/specialized/mathoperationtranslator.h>
 #include <conversion/sdl/SedsToSdlTranslator/specialized/statementvisitor.h>
 #include <conversion/sdl/SedsToSdlTranslator/translator.h>
+#include <iostream>
+#include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
 #include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/procedurecall.h>
@@ -113,6 +115,7 @@ private Q_SLOTS:
     void testTranslateMathOperation();
     void testTranslatePolynomialCalibrator();
     void testTranslateActivityCall();
+    void testTranslateSendCommand();
 };
 
 void tst_SedsToSdlTranslator::testMissingModel()
@@ -388,7 +391,7 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineInputsWithVariables()
 
     const auto unpackAction = stateA->inputs()[0]->transition()->actions()[0].get();
     const auto unpack = dynamic_cast<const ::sdl::Task *>(unpackAction);
-    QCOMPARE(unpack->content(), "var1 := input_If1_Cmd1_Pi.arg1");
+    QCOMPARE(unpack->content(), "var1 := io_If1_Cmd1_Pi.arg1");
 
     const auto nextStateAction = stateA->inputs()[0]->transition()->actions()[1].get();
     const auto nextState = dynamic_cast<const ::sdl::NextState *>(nextStateAction);
@@ -889,6 +892,74 @@ void tst_SedsToSdlTranslator::testTranslateActivityCall()
     const auto &argument = call->arguments()[0];
     QVERIFY(std::holds_alternative<std::unique_ptr<VariableReference>>(argument));
     QCOMPARE(std::get<std::unique_ptr<VariableReference>>(argument)->declaration()->name(), "x");
+}
+
+void tst_SedsToSdlTranslator::testTranslateSendCommand()
+{
+    auto sedsModel =
+            SedsModelBuilder("Package")
+                    .withIntegerDataType("Integer")
+                    .withComponent(
+                            SedsComponentBuilder("Component")
+                                    .declaringInterface(SedsInterfaceDeclarationBuilder("If1Type")
+                                                                .withCommand(SedsInterfaceCommandBuilder(
+                                                                        "Cmd1", InterfaceCommandMode::Async)
+                                                                                     .withArgument("arg1", "Integer",
+                                                                                             CommandArgumentMode::In)
+                                                                                     .build())
+                                                                .build())
+                                    .withRequiredInterface(SedsInterfaceBuilder("If1", "If1Type").build())
+                                    .withImplementation(SedsImplementationBuilder()
+                                                                .withVariable("x", "Integer")
+                                                                .withActivity(SedsActivityBuilder("activity1")
+                                                                                      .withSendCommand("If1", "Cmd1",
+                                                                                              { "arg1" }, { "x" })
+                                                                                      .build())
+                                                                .build())
+                                    .build())
+                    .build();
+
+    Options options;
+    options.add(conversion::iv::IvOptions::configFilename, "config.xml");
+
+    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    SedsToSdlTranslator sdlTranslator;
+
+    const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);
+    const auto ivModels = ivTranslator.translateModels({ sedsModel.get(), asn1Models[0].get() }, options);
+
+    const auto *ivModel = dynamic_cast<ivm::IVModel *>(ivModels[0].get());
+    const auto *function = ivModel->getFunction("Component", Qt::CaseSensitive);
+    for (const auto &interface : function->interfaces()) {
+        std::cout << "IF " << interface->ifaceLabel().toStdString() << std::endl;
+    }
+
+    const auto resultModels =
+            sdlTranslator.translateModels({ sedsModel.get(), asn1Models[0].get(), ivModels[0].get() }, options);
+
+    const auto &resultModel = resultModels[0];
+    const auto *sdlModel = dynamic_cast<SdlModel *>(resultModel.get());
+    const auto &process = sdlModel->processes()[0];
+
+    QCOMPARE(process.variables().size(), 2);
+    QCOMPARE(process.variables()[0]->name(), "x");
+    QCOMPARE(process.variables()[1]->name(), "io_If1_Cmd1_Ri");
+
+    QCOMPARE(process.procedures().size(), 1);
+    const auto &procedure = process.procedures()[0];
+    QCOMPARE(procedure->name(), "activity1");
+    const auto &transition = procedure->transition();
+    QCOMPARE(transition->actions().size(), 2);
+
+    const auto pack = dynamic_cast<::sdl::Task *>(transition->actions()[0].get());
+    QVERIFY(pack);
+    QCOMPARE(pack->content(), "io_If1_Cmd1_Ri.arg1 := x");
+
+    const auto output = dynamic_cast<::sdl::Output *>(transition->actions()[1].get());
+    QVERIFY(output);
+    QCOMPARE(output->name(), "If1_Cmd1_Ri");
+    QCOMPARE(output->parameter()->declaration()->name(), "io_If1_Cmd1_Ri");
 }
 
 } // namespace conversion::sdl::test

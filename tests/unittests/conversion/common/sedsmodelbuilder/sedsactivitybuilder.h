@@ -39,6 +39,9 @@ public:
             const std::vector<uint64_t> exponents) -> SedsActivityBuilder &;
     auto withActivityCall(const QString target, const std::vector<QString> argumentNames,
             const std::vector<QString> argumentValues) -> SedsActivityBuilder &;
+    auto withSendCommand(const QString interfaceName, const QString commandName,
+            const std::vector<QString> argumentNames, const std::vector<QString> argumentValues)
+            -> SedsActivityBuilder &;
 
     auto withArgument(const QString name, const QString typeName) -> SedsActivityBuilder &;
 

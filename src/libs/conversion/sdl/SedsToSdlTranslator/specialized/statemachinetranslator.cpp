@@ -37,7 +37,7 @@ using conversion::translator::TranslationException;
 
 namespace conversion::sdl::translator {
 
-static constexpr auto IO_VARIABLE_PATTERN = "input_%1";
+static constexpr auto IO_VARIABLE_PATTERN = "io_%1";
 
 auto StateMachineTranslator::translateStateMachine(const seds::model::StateMachine &sedsStateMachine,
         ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void

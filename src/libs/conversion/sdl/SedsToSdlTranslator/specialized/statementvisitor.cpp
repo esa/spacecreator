@@ -290,6 +290,8 @@ auto StatementVisitor::translateOutput(::sdl::Process *hostProcess, ::sdl::Proce
     output->setName(callName);
     if (sendCommand.argumentValues().size() > 0) {
         const auto ioVariable = StateMachineTranslator::ioVariableName(callName);
+        output->setParameter(std::make_unique<::sdl::VariableReference>(
+                findVariableDeclaration(hostProcess, hostProcedure, ioVariable)));
         for (const auto &argument : sendCommand.argumentValues()) {
             const auto fieldName = Escaper::escapeAsn1FieldName(argument.name().value());
             const auto source = std::visit(
