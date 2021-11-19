@@ -17,6 +17,7 @@
 
 #include "spacecreatorplugin.h"
 
+#include "actionmanager/command.h"
 #include "context/action/actionsmanager.h"
 #include "dv/dveditorfactory.h"
 #include "dv/dvqtceditor.h"
@@ -50,6 +51,7 @@
 #include <coreplugin/icore.h>
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
+#include <qaction.h>
 
 void initSpaceCreatorResources()
 {
@@ -108,6 +110,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     m_dvFactory = new DVEditorFactory(m_projectsManager, this);
 
     addHelp();
+    addSedsImportExport();
 
     return true;
 }
@@ -149,6 +152,23 @@ void SpaceCreatorPlugin::addHelp()
     });
     Core::Command *showIveHelp = Core::ActionManager::registerAction(iveHelpAction, Constants::IV_HELP_ID, allContexts);
     actions->addAction(showIveHelp);
+}
+
+void SpaceCreatorPlugin::addSedsImportExport()
+{
+    Core::Context allContexts(
+            Core::Constants::C_WELCOME_MODE, Core::Constants::C_EDIT_MODE, Core::Constants::C_DESIGN_MODE);
+
+    // auto menuBar = menuBar()->addMenu("&Tools");
+    auto importIvAction = new QAction(tr("Import InterfaceView"), this);
+    connect(importIvAction, &QAction::triggered, this, importInterfaceView);
+    Core::Command *cmdImportIvAction =
+            Core::ActionManager::registerAction(importIvAction, "SEDS.ImportInterfaceView", allContexts);
+}
+
+void SpaceCreatorPlugin::importInterfaceView()
+{
+    // TODO
 }
 
 }

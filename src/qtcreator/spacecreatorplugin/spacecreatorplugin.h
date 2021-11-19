@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018 - 2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2018 - 2021 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -69,6 +69,8 @@ public:
 
 private:
     void addHelp();
+    void addSedsImportExport();
+    static void importInterfaceView();
 
     MscEditorFactory *m_mscFactory = nullptr;
     IVEditorFactory *m_ivFactory = nullptr;
