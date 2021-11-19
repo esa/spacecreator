@@ -33,7 +33,7 @@ public:
     inline static const QString outputFilepath = "Promela_Export_OutputFilepath";
 
     /** @brief Generate promela code for enhanced spin */
-    inline static const QString enhancedSpinSupport = "Promela_CodeForEnhancedSpin";
+    inline static const QString enhancedSpinSupport = "Promela_Export_CodeForEnhancedSpin";
 };
 
 }
