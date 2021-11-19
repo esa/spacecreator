@@ -93,6 +93,7 @@ void tst_SedsXmlParser::testComponentsParsing()
     }
 }
 
+/// \SRS  ETB-FUN-1070
 void tst_SedsXmlParser::testContainerDataTypesParsing()
 {
     try {

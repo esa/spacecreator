@@ -39,10 +39,12 @@ class tsti_SedsXmlImporter : public QObject
 public:
     virtual ~tsti_SedsXmlImporter() = default;
 
-private Q_SLOTS:
+public Q_SLOTS:
     void testValid();
 };
 
+/// \SRS  ETB-FUN-40
+/// \SRS  ETB-FUN-1070
 void tsti_SedsXmlImporter::testValid()
 {
     Options options;

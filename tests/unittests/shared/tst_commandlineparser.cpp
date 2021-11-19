@@ -32,7 +32,7 @@ class tst_CommandLineParser : public QObject
 {
     Q_OBJECT
 
-private Q_SLOTS:
+public Q_SLOTS:
     /*
      * A test slot name for each option must contain "testCmdArgument" -
      * it's used in the tst_CommandLineParser::testCoverage
@@ -355,6 +355,7 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterSedsSchemaFilepath()
     QCOMPARE(value, fileName);
 }
 
+/// \SRS  ETB-FUN-40
 void tst_CommandLineParser::testCmdArgumentSedsConverterSedsExtRef()
 {
     const QCommandLineOption cmdExportToFile = CommandLineParser::positionalArg(CommandArg::SedsConverterSedsExtRef);
