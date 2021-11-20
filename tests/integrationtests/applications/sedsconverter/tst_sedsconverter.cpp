@@ -60,12 +60,42 @@ void tst_SedsConverter::testContainers()
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-2010
+/// \SRS  ETB-FUN-2020
+/// \SRS  ETB-FUN-2060
+/// \SRS  ETB-FUN-2140
+/// \SRS  ETB-FUN-2150
+/// \SRS  ETB-FUN-2170
+/// \SRS  ETB-FUN-2400
+/// \SRS  ETB-FUN-2490
+/// \SRS  ETB-FUN-2500
+/// \SRS  ETB-FUN-2520
+/// \SRS  ETB-FUN-2550
+/// \SRS  ETB-FUN-2560
+/// \SRS  ETB-FUN-2660
+/// \SRS  ETB-FUN-2670
 void tst_SedsConverter::testLedDemo()
 {
     const int result = system("./test_calculator.sh");
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-2010
+/// \SRS  ETB-FUN-2020
+/// \SRS  ETB-FUN-2060
+/// \SRS  ETB-FUN-2140
+/// \SRS  ETB-FUN-2150
+/// \SRS  ETB-FUN-2170
+/// \SRS  ETB-FUN-2210
+/// \SRS  ETB-FUN-2220
+/// \SRS  ETB-FUN-2490
+/// \SRS  ETB-FUN-2500
+/// \SRS  ETB-FUN-2520
+/// \SRS  ETB-FUN-2550
+/// \SRS  ETB-FUN-2560
+/// \SRS  ETB-FUN-2570
+/// \SRS  ETB-FUN-2660
+/// \SRS  ETB-FUN-2670
 void tst_SedsConverter::testCalculator()
 {
     const int result = system("./test_led_demo.sh");

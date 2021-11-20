@@ -166,6 +166,8 @@ void tst_SedsToSdlTranslator::testMissingModels()
             TranslationException, "Not enough models passed for SEDS to SDL translation");
 }
 
+/// \SRS  ETB-FUN-2010
+/// \SRS  ETB-FUN-2490
 void tst_SedsToSdlTranslator::testTranslateStateMachineIntoProcess()
 {
     // clang-format off
@@ -222,6 +224,8 @@ static inline auto getStateOfName(const ::sdl::Process &process, const QString n
     return (*iterator).get();
 }
 
+/// \SRS  ETB-FUN-2500
+/// \SRS  ETB-FUN-2520
 void tst_SedsToSdlTranslator::testTranslateStateMachineStates()
 {
     // clang-format off
@@ -274,6 +278,8 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineStates()
     QVERIFY(stateB);
 }
 
+/// \SRS  ETB-FUN-2550
+/// \SRS  ETB-FUN-2560
 void tst_SedsToSdlTranslator::testTranslateStateMachineInputs()
 {
     // clang-format off
@@ -333,6 +339,10 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineInputs()
     QCOMPARE(nextState->state()->name(), "StateB");
 }
 
+/// \SRS  ETB-FUN-2020
+/// \SRS  ETB-FUN-2550
+/// \SRS  ETB-FUN-2560
+/// \SRS  ETB-FUN-2570
 void tst_SedsToSdlTranslator::testTranslateStateMachineInputsWithVariables()
 {
     // clang-format off
@@ -399,6 +409,8 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineInputsWithVariables()
     QCOMPARE(nextState->state()->name(), "StateB");
 }
 
+/// \SRS  ETB-FUN-2060
+/// \SRS  ETB-FUN-2070
 void tst_SedsToSdlTranslator::testTranslateActivity()
 {
     // clang-format off
@@ -448,6 +460,9 @@ void tst_SedsToSdlTranslator::testTranslateActivity()
     QCOMPARE(action->content(), "var1 := 1969");
 }
 
+/// \SRS  ETB-FUN-2550
+/// \SRS  ETB-FUN-2560
+/// \SRS  ETB-FUN-2660
 void tst_SedsToSdlTranslator::testTranslateStateTransitionActivity()
 {
     // clang-format off
@@ -508,6 +523,7 @@ void tst_SedsToSdlTranslator::testTranslateStateTransitionActivity()
     QCOMPARE(invocation->procedure()->name(), "activity1");
 }
 
+/// \SRS  ETB-FUN-2220
 void tst_SedsToSdlTranslator::testTranslateAddOperation()
 {
     seds::model::MathOperation::Elements operation;
@@ -521,6 +537,7 @@ void tst_SedsToSdlTranslator::testTranslateAddOperation()
     QCOMPARE(result, "a + b");
 }
 
+/// \SRS  ETB-FUN-2230
 void tst_SedsToSdlTranslator::testTranslateSubOperation()
 {
     seds::model::MathOperation::Elements operation;
@@ -534,6 +551,7 @@ void tst_SedsToSdlTranslator::testTranslateSubOperation()
     QCOMPARE(result, "a - b");
 }
 
+/// \SRS  ETB-FUN-2240
 void tst_SedsToSdlTranslator::testTranslateMulOperation()
 {
     seds::model::MathOperation::Elements operation;
@@ -547,6 +565,7 @@ void tst_SedsToSdlTranslator::testTranslateMulOperation()
     QCOMPARE(result, "a * b");
 }
 
+/// \SRS  ETB-FUN-2250
 void tst_SedsToSdlTranslator::testTranslateDivOperation()
 {
     seds::model::MathOperation::Elements operation;
@@ -560,6 +579,7 @@ void tst_SedsToSdlTranslator::testTranslateDivOperation()
     QCOMPARE(result, "a / b");
 }
 
+/// \SRS  ETB-FUN-2260
 void tst_SedsToSdlTranslator::testTranslateModOperation()
 {
     seds::model::MathOperation::Elements operation;
@@ -573,6 +593,7 @@ void tst_SedsToSdlTranslator::testTranslateModOperation()
     QCOMPARE(result, "mod(a, b)");
 }
 
+/// \SRS  ETB-FUN-2270
 void tst_SedsToSdlTranslator::testTranslatePowOperation()
 {
     seds::model::MathOperation::Elements operation;
@@ -586,6 +607,7 @@ void tst_SedsToSdlTranslator::testTranslatePowOperation()
     QCOMPARE(result, "power(a, b)");
 }
 
+/// \SRS  ETB-FUN-2280
 void tst_SedsToSdlTranslator::testTranslateInvOperation()
 {
     seds::model::MathOperation::Elements operation;
@@ -598,6 +620,7 @@ void tst_SedsToSdlTranslator::testTranslateInvOperation()
     QCOMPARE(result, "1/a");
 }
 
+/// \SRS  ETB-FUN-2290
 void tst_SedsToSdlTranslator::testTranslateTanOperation()
 {
     seds::model::MathOperation::Elements operation;
@@ -610,6 +633,7 @@ void tst_SedsToSdlTranslator::testTranslateTanOperation()
     QCOMPARE(result, "tan(a)");
 }
 
+/// \SRS  ETB-FUN-2300
 void tst_SedsToSdlTranslator::testTranslateSinOperation()
 {
     seds::model::MathOperation::Elements operation;
@@ -622,6 +646,7 @@ void tst_SedsToSdlTranslator::testTranslateSinOperation()
     QCOMPARE(result, "sin(a)");
 }
 
+/// \SRS  ETB-FUN-2310
 void tst_SedsToSdlTranslator::testTranslateCosOperation()
 {
     seds::model::MathOperation::Elements operation;
@@ -634,6 +659,7 @@ void tst_SedsToSdlTranslator::testTranslateCosOperation()
     QCOMPARE(result, "cos(a)");
 }
 
+/// \SRS  ETB-FUN-2330
 void tst_SedsToSdlTranslator::testTranslateCeilOperation()
 {
     seds::model::MathOperation::Elements operation;
@@ -646,6 +672,7 @@ void tst_SedsToSdlTranslator::testTranslateCeilOperation()
     QCOMPARE(result, "ceil(a)");
 }
 
+/// \SRS  ETB-FUN-2340
 void tst_SedsToSdlTranslator::testTranslateFloorOperation()
 {
     seds::model::MathOperation::Elements operation;
@@ -658,6 +685,7 @@ void tst_SedsToSdlTranslator::testTranslateFloorOperation()
     QCOMPARE(result, "floor(a)");
 }
 
+/// \SRS  ETB-FUN-2350
 void tst_SedsToSdlTranslator::testTranslateRoundOperation()
 {
     seds::model::MathOperation::Elements operation;
@@ -670,6 +698,7 @@ void tst_SedsToSdlTranslator::testTranslateRoundOperation()
     QCOMPARE(result, "round(a)");
 }
 
+/// \SRS  ETB-FUN-2360
 void tst_SedsToSdlTranslator::testTranslateAbsOperation()
 {
     seds::model::MathOperation::Elements operation;
@@ -682,6 +711,7 @@ void tst_SedsToSdlTranslator::testTranslateAbsOperation()
     QCOMPARE(result, "abs(a)");
 }
 
+/// \SRS  ETB-FUN-2370
 void tst_SedsToSdlTranslator::testTranslateMinOperation()
 {
     seds::model::MathOperation::Elements operation;
@@ -695,6 +725,7 @@ void tst_SedsToSdlTranslator::testTranslateMinOperation()
     QCOMPARE(result, "min(a, b)");
 }
 
+/// \SRS  ETB-FUN-2380
 void tst_SedsToSdlTranslator::testTranslateMaxOperation()
 {
     seds::model::MathOperation::Elements operation;
@@ -708,6 +739,7 @@ void tst_SedsToSdlTranslator::testTranslateMaxOperation()
     QCOMPARE(result, "max(a, b)");
 }
 
+/// \SRS  ETB-FUN-2390
 void tst_SedsToSdlTranslator::testTranslateSqrtOperation()
 {
     seds::model::MathOperation::Elements operation;
@@ -720,6 +752,10 @@ void tst_SedsToSdlTranslator::testTranslateSqrtOperation()
     QCOMPARE(result, "sqrt(a)");
 }
 
+/// \SRS  ETB-FUN-2220
+/// \SRS  ETB-FUN-2230
+/// \SRS  ETB-FUN-2240
+/// \SRS  ETB-FUN-2250
 void tst_SedsToSdlTranslator::testTranslateComplexOperation()
 {
     seds::model::MathOperation::Elements operation;
@@ -780,6 +816,7 @@ static inline auto translateAndVerifyActivityContainsAction(const std::unique_pt
     QCOMPARE(action->content(), actionContent);
 }
 
+/// \SRS  ETB-FUN-2400
 void tst_SedsToSdlTranslator::testTranslateAssignment()
 {
     auto sedsModel =
@@ -799,6 +836,7 @@ void tst_SedsToSdlTranslator::testTranslateAssignment()
     translateAndVerifyActivityContainsAction(std::move(sedsModel), "activity1", "a := 12");
 }
 
+/// \SRS  ETB-FUN-2210
 void tst_SedsToSdlTranslator::testTranslateMathOperation()
 {
     auto sedsModel =
@@ -820,6 +858,8 @@ void tst_SedsToSdlTranslator::testTranslateMathOperation()
     translateAndVerifyActivityContainsAction(std::move(sedsModel), "activity1", "x := sin(y)");
 }
 
+/// \SRS  ETB-FUN-2200
+/// \SRS  ETB-FUN-2480
 void tst_SedsToSdlTranslator::testTranslatePolynomialCalibrator()
 {
     auto sedsModel =
@@ -841,6 +881,9 @@ void tst_SedsToSdlTranslator::testTranslatePolynomialCalibrator()
     translateAndVerifyActivityContainsAction(std::move(sedsModel), "activity1", "x := 2 + 4 * y * y + 5 * power(y, 4)");
 }
 
+/// \SRS  ETB-FUN-2430
+/// \SRS  ETB-FUN-2440
+/// \SRS  ETB-FUN-2460
 void tst_SedsToSdlTranslator::testTranslateActivityCall()
 {
     auto sedsModel =
@@ -894,6 +937,9 @@ void tst_SedsToSdlTranslator::testTranslateActivityCall()
     QCOMPARE(std::get<std::unique_ptr<VariableReference>>(argument)->declaration()->name(), "x");
 }
 
+/// \SRS  ETB-FUN-2140
+/// \SRS  ETB-FUN-2150
+/// \SRS  ETB-FUN-2170
 void tst_SedsToSdlTranslator::testTranslateSendCommand()
 {
     auto sedsModel =
