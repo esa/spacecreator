@@ -1,0 +1,66 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process LedDemo;
+    /* CIF TEXT (16, 317), (267, 140) */
+    dcl registerAddress DestinationAddress;
+    dcl registerMask WordMask;
+    dcl enableValue Word;
+    dcl disableValue Word;
+    /* CIF ENDTEXT */
+    /* CIF procedure (250, 150), (150, 75) */
+    procedure Initialize;
+        /* CIF START (250, 150), (150, 75) */
+        START;
+            /* CIF task (250, 150), (150, 75) */
+            task registerAddress := 1024;
+            /* CIF task (250, 150), (150, 75) */
+            task registerMask := 4;
+            /* CIF task (250, 150), (150, 75) */
+            task enableValue := 4;
+            /* CIF task (250, 150), (150, 75) */
+            task disableValue := 0;
+        return ;
+    endprocedure;
+    /* CIF procedure (250, 150), (150, 75) */
+    procedure IssueCommand;
+        /* CIF TEXT (250, 150), (150, 75) */
+        fpar
+            in value Word;
+        /* CIF ENDTEXT */
+        /* CIF START (250, 150), (150, 75) */
+        START;
+        /* CIF PROCEDURECALL (250, 150), (150, 75) */
+        call RawMemoryAccessInterface_WriteWord_Ri(registerAddress, registerMask, value);
+        return ;
+    endprocedure;
+    /* CIF START (9, 285), (70, 35) */
+    START;
+            /* CIF NEXTSTATE (250, 150), (150, 75) */
+            NEXTSTATE Uninitialized;
+    /* CIF state (250, 150), (150, 75) */
+    state Off;
+        /* CIF input (250, 150), (150, 75) */
+        input LedControl_Enable_Pi;
+        /* CIF PROCEDURECALL (250, 150), (150, 75) */
+        call IssueCommand(enableValue);
+            /* CIF NEXTSTATE (250, 150), (150, 75) */
+            NEXTSTATE On;
+    endstate;
+    /* CIF state (250, 150), (150, 75) */
+    state On;
+        /* CIF input (250, 150), (150, 75) */
+        input LedControl_Disable_Pi;
+        /* CIF PROCEDURECALL (250, 150), (150, 75) */
+        call IssueCommand(disableValue);
+            /* CIF NEXTSTATE (250, 150), (150, 75) */
+            NEXTSTATE Off;
+    endstate;
+    /* CIF state (250, 150), (150, 75) */
+    state Uninitialized;
+        /* CIF input (250, 150), (150, 75) */
+        input LedControl_Init_Pi;
+        /* CIF PROCEDURECALL (250, 150), (150, 75) */
+        call Initialize;
+            /* CIF NEXTSTATE (250, 150), (150, 75) */
+            NEXTSTATE Off;
+    endstate;
+endprocess LedDemo;

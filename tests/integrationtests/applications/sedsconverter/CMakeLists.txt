@@ -37,3 +37,8 @@ configure_file(test_calculator.sh test_calculator.sh COPYONLY)
 configure_file(resources/test_calculator.xml resources/test_calculator.xml COPYONLY)
 configure_file(resources/test_calculator.output resources/test_calculator.output COPYONLY)
 configure_file(resources/test_calculator.system_structure resources/test_calculator.system_structure COPYONLY)
+
+configure_file(test_led_demo.sh test_led_demo.sh COPYONLY)
+configure_file(resources/test_led_demo.xml resources/test_led_demo.xml COPYONLY)
+configure_file(resources/test_led_demo.output resources/test_led_demo.output COPYONLY)
+configure_file(resources/test_led_demo.system_structure resources/test_led_demo.system_structure COPYONLY)

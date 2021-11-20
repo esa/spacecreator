@@ -32,6 +32,7 @@ private Q_SLOTS:
     void testSimpleDataTypes();
     void testArrays();
     void testContainers();
+    void testLedDemo();
     void testCalculator();
 };
 
@@ -59,9 +60,15 @@ void tst_SedsConverter::testContainers()
     QCOMPARE(result, 0);
 }
 
-void tst_SedsConverter::testCalculator()
+void tst_SedsConverter::testLedDemo()
 {
     const int result = system("./test_calculator.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_SedsConverter::testCalculator()
+{
+    const int result = system("./test_led_demo.sh");
     QCOMPARE(result, 0);
 }
 
