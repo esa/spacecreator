@@ -65,7 +65,6 @@ CommentItem::CommentItem(MscChart *chart, ChartLayoutManager *chartLayoutManager
     m_textItem->setMultilineEnabled(true);
     connect(m_textItem, &TextItem::edited, this, &CommentItem::textEdited);
     connect(m_textItem, &TextItem::textChanged, this, [this]() {
-        prepareGeometryChange();
         setBoundingRect(m_textItem->boundingRect());
         updateGripPoints();
     });
@@ -94,7 +93,7 @@ void CommentItem::setText(const QString &text)
     if (m_textItem->toPlainText() == text)
         return;
 
-    m_textItem->setTextWidth(150);
+    m_textItem->setExplicitSize(QSizeF());
     m_textItem->setPlainText(text);
     m_textItem->setTextWidth(m_textItem->idealWidth());
 
@@ -172,11 +171,11 @@ void CommentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     const QRectF br = mapRectFromItem(m_textItem, m_textItem->boundingRect());
     if ((m_iObj && isGlobal()) || (!m_iObj && m_isGlobalPreview)) {
         painter->setBrush(color.brush());
-        painter->drawPolygon(QVector<QPointF> { br.topRight() - QPointF(COMMENT_MARIN, 0), br.topLeft(),
-                br.bottomLeft(), br.bottomRight(), br.topRight() + QPointF(0, COMMENT_MARIN),
-                br.topRight() - QPointF(COMMENT_MARIN, 0) });
-        painter->drawPolyline(QVector<QPointF> { br.topRight() + QPointF(0, COMMENT_MARIN),
-                br.topRight() - QPointF(COMMENT_MARIN, -COMMENT_MARIN), br.topRight() - QPointF(COMMENT_MARIN, 0) });
+        painter->drawPolygon(QVector<QPointF> { br.topRight() - QPointF(COMMENT_MARGIN, 0), br.topLeft(),
+                br.bottomLeft(), br.bottomRight(), br.topRight() + QPointF(0, COMMENT_MARGIN),
+                br.topRight() - QPointF(COMMENT_MARGIN, 0) });
+        painter->drawPolyline(QVector<QPointF> { br.topRight() + QPointF(0, COMMENT_MARGIN),
+                br.topRight() - QPointF(COMMENT_MARGIN, -COMMENT_MARGIN), br.topRight() - QPointF(COMMENT_MARGIN, 0) });
     } else {
         painter->fillRect(br, QColor(0xf9e29c));
         if (m_inverseLayout)
@@ -194,10 +193,10 @@ void CommentItem::initGripPoints()
     InteractiveObjectBase::initGripPoints();
     gripPointsHandler()->setUsedPoints(isGlobal()
                     ? shared::ui::GripPoint::Locations { shared::ui::GripPoint::Location::Top,
-                            shared::ui::GripPoint::Location::Left, shared::ui::GripPoint::Location::Bottom,
-                            shared::ui::GripPoint::Location::Right, shared::ui::GripPoint::Location::TopLeft,
-                            shared::ui::GripPoint::Location::BottomLeft, shared::ui::GripPoint::Location::TopRight,
-                            shared::ui::GripPoint::Location::BottomRight, shared::ui::GripPoint::Location::Center }
+                              shared::ui::GripPoint::Location::Left, shared::ui::GripPoint::Location::Bottom,
+                              shared::ui::GripPoint::Location::Right, shared::ui::GripPoint::Location::TopLeft,
+                              shared::ui::GripPoint::Location::BottomLeft, shared::ui::GripPoint::Location::TopRight,
+                              shared::ui::GripPoint::Location::BottomRight, shared::ui::GripPoint::Location::Center }
                     : shared::ui::GripPoint::Locations { shared::ui::GripPoint::Location::Center });
 }
 
@@ -218,22 +217,20 @@ void CommentItem::rebuildLayout()
     if (!m_linkItem->scene() && scene() != m_linkItem->scene())
         scene()->addItem(m_linkItem);
 
-    QRectF br = m_textItem->boundingRect();
     if (geometryManagedByCif() || isGlobal()) {
         applyCif();
-        br = m_textItem->sceneBoundingRect();
     } else {
+        QRectF br = m_textItem->boundingRect();
         br.moveCenter(commentPosition);
         if (m_inverseLayout)
             br.moveRight(commentPosition.x() - br.width() / 2 - COMMENT_LINE_LENGTH);
         else
             br.moveLeft(commentPosition.x() + br.width() / 2 + COMMENT_LINE_LENGTH);
 
-        setPos(br.topLeft());
         m_textItem->setExplicitSize(br.size());
+        setPos(br.topLeft());
     }
 
-    prepareGeometryChange();
     setBoundingRect(m_textItem->boundingRect());
 
     updateLinkPath();
@@ -302,9 +299,8 @@ void CommentItem::applyCif()
         qWarning() << "ChartItem: Coordinates conversion (mm->scene) failed" << storedCifRect;
 
     if (!rect.isNull() && rect != m_textItem->sceneBoundingRect()) {
-        setPos(rect.topLeft());
-        prepareGeometryChange();
         m_textItem->setExplicitSize(rect.size());
+        setPos(rect.topLeft());
     }
 }
 
