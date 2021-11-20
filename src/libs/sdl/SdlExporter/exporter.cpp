@@ -34,6 +34,7 @@ using conversion::Options;
 using conversion::exporter::ExportException;
 using conversion::exporter::IncorrectModelException;
 using conversion::exporter::MissingOutputFilenameException;
+using conversion::sdl::SdlOptions;
 using sdl::SdlModel;
 
 namespace sdl::exporter {
@@ -68,7 +69,7 @@ void SdlExporter::exportProcess(const Process &process, const Options &options) 
 
     visitor.visit(process);
 
-    const auto pathPrefix = options.value(SdlOptions::sdlFilepathPrefix).value_or("");
+    const auto pathPrefix = options.value(SdlOptions::filepathPrefix).value_or("");
     const auto filePath = makeFilePath(pathPrefix, process.name(), "pr");
 
     QSaveFile outputFile(filePath);

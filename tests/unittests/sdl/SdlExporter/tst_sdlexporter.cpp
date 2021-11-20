@@ -57,6 +57,7 @@
 using conversion::ModelType;
 using conversion::Options;
 using conversion::exporter::ExportException;
+using conversion::sdl::SdlOptions;
 using sdl::Action;
 using sdl::ContinuousSignal;
 using sdl::Decision;
@@ -78,7 +79,6 @@ using sdl::VariableDeclaration;
 using sdl::VariableLiteral;
 using sdl::VariableReference;
 using sdl::exporter::SdlExporter;
-using sdl::exporter::SdlOptions;
 using tests::common::SdlAnswerBuilder;
 using tests::common::SdlDecisionBuilder;
 using tests::common::SdlInputBuilder;
@@ -98,7 +98,7 @@ class tst_sdlmodel : public QObject
 {
     Q_OBJECT
 
-private Q_SLOTS:
+public Q_SLOTS:
     void testDefaultValuesInModel();
     void testGenerateBasicProcess();
     void testGenerateProcessWithDeclarationsAndTasks();
@@ -110,7 +110,7 @@ private Q_SLOTS:
     void testGenerateProcessWithReturnlessProcedure();
 };
 
-std::unique_ptr<VariableDeclaration> makeVariableDeclaration(QString name, QString type)
+static std::unique_ptr<VariableDeclaration> makeVariableDeclaration(QString name, QString type)
 {
     auto variable = std::make_unique<VariableDeclaration>();
     variable->setName(std::move(name));
@@ -119,7 +119,7 @@ std::unique_ptr<VariableDeclaration> makeVariableDeclaration(QString name, QStri
     return variable;
 }
 
-std::unique_ptr<ProcedureParameter> makeProcedureParameter(QString name, QString type, QString direction)
+static std::unique_ptr<ProcedureParameter> makeProcedureParameter(QString name, QString type, QString direction)
 {
     auto parameter = std::make_unique<ProcedureParameter>();
     parameter->setName(std::move(name));
@@ -129,7 +129,7 @@ std::unique_ptr<ProcedureParameter> makeProcedureParameter(QString name, QString
     return parameter;
 }
 
-bool verifyAndConsume(QTextStream &stream, const QString &string)
+static bool verifyAndConsume(QTextStream &stream, const QString &string)
 {
     QString line;
     do {
@@ -142,7 +142,7 @@ bool verifyAndConsume(QTextStream &stream, const QString &string)
     return false;
 }
 
-void checkSequenceAndConsume(std::vector<QString> &expectedOutput, QTextStream &consumableOutput)
+static void checkSequenceAndConsume(std::vector<QString> &expectedOutput, QTextStream &consumableOutput)
 {
     for (const auto &expectedLine : expectedOutput) {
         if (verifyAndConsume(consumableOutput, expectedLine)) {
@@ -175,6 +175,8 @@ void tst_sdlmodel::testDefaultValuesInModel()
     QVERIFY(processName == process->name());
 }
 
+/// TODO this is a dummy trace for testing of the docs generation only!
+/// \SRS  ETB-FUN-10
 void tst_sdlmodel::testGenerateBasicProcess()
 {
     QString modelName = "BasicProcess";
@@ -210,7 +212,7 @@ void tst_sdlmodel::testGenerateBasicProcess()
     // clang-format on
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -303,7 +305,7 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
     const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -375,7 +377,7 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
     const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -483,7 +485,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     // clang-format on
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -564,7 +566,7 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
     const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -682,7 +684,7 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
     const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -777,7 +779,7 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
     const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {

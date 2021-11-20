@@ -29,15 +29,11 @@ namespace conversion::asn1 {
 class Asn1Options
 {
 public:
-    /** @brief File to import */
-    inline static const QString inputFilename = "Asn1_Import_InputFilename";
-    /** @brief  File to import is an asn1 file */
-    inline static const QString importAsn1File = "Asn1_Import_ImportAsn1";
-    /** @brief  File to import is a xml file */
-    inline static const QString importXmlFile = "Asn1_Import_ImportXml";
-    /** @brief Prefix to add at the beginning of the filepath */
+    /** @brief  Filepath of input file */
+    inline static const QString inputFilepath = "Asn1_Import_InputFilepath";
+    /** @brief Prefix to add at the beginning of the ASN output filepath */
     inline static const QString asn1FilepathPrefix = "Asn1_Export_FilepathPrefix";
-    /** @brief Prefix to add at the beginning of the filepath */
+    /** @brief Prefix to add at the beginning of the ACN output filepath */
     inline static const QString acnFilepathPrefix = "Acn_Export_FilepathPrefix";
 };
 

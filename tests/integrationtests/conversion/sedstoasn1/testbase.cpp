@@ -66,7 +66,7 @@ void TestBase::runConversionTest(QString testFilenameBase, QString asn1PackageNa
     const auto acnFilename = QString("%1.acn").arg(asn1PackageName);
 
     Options options;
-    options.add(SedsOptions::inputFilename, sedsFilename);
+    options.add(SedsOptions::inputFilepath, sedsFilename);
     options.add(SedsOptions::skipValidation);
 
     Converter converter(m_registry, std::move(options));

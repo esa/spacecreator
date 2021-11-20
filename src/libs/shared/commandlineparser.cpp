@@ -167,18 +167,18 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
               << "list-actions";
         description = QCoreApplication::translate("CommandLineParser", "List scriptable actions and exit.");
     } break;
-    case CommandLineParser::Positional::SedsConverterInputFilename: {
+    case CommandLineParser::Positional::SedsConverterInputFilepaths: {
         names << "i"
               << "in";
-        description = QCoreApplication::translate("CommandLineParser", "Specify input <file>");
+        description = QCoreApplication::translate("CommandLineParser", "Specify input <files> separated with comma");
         valueName = QCoreApplication::translate("CommandLineParser", "file");
     } break;
-    case CommandLineParser::Positional::SedsConverterOutputFilename: {
+    case CommandLineParser::Positional::SedsConverterOutputFilepath: {
         names << "out";
         description = QCoreApplication::translate("CommandLineParser", "Specify main output <file>");
         valueName = QCoreApplication::translate("CommandLineParser", "file");
     } break;
-    case CommandLineParser::Positional::SedsConverterModelFrom: {
+    case CommandLineParser::Positional::SedsConverterModelsFrom: {
         names << "from";
         description = QCoreApplication::translate(
                 "CommandLineParser", "Specify <list> of source models for conversion from: ASN.1, SEDS, InterfaceView, e.g. model1,model2");
@@ -190,7 +190,7 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
                 "CommandLineParser", "Specify target <model> for conversion from: ASN.1, SDL, InterfaceView");
         valueName = QCoreApplication::translate("CommandLineParser", "model");
     } break;
-    case CommandLineParser::Positional::SedsConverterModelAux: {
+    case CommandLineParser::Positional::SedsConverterModelsAux: {
         names << "aux-models";
         description = QCoreApplication::translate("CommandLineParser", "<list> of auxillary models for conversion, e.g. model1,model2,...");
         valueName = QCoreApplication::translate("CommandLineParser", "list");
@@ -200,7 +200,7 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
         description = QCoreApplication::translate("CommandLineParser", "Specify config xml <file> for InterfaceView");
         valueName = QCoreApplication::translate("CommandLineParser", "file");
     } break;
-    case CommandLineParser::Positional::SedsConverterSedsSchemaFilename: {
+    case CommandLineParser::Positional::SedsConverterSedsSchemaFilepath: {
         names << "seds-schema";
         description = QCoreApplication::translate("CommandLineParser", "Specify schema <file> for SEDS");
         valueName = QCoreApplication::translate("CommandLineParser", "file");
@@ -210,7 +210,7 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
         description = QCoreApplication::translate("CommandLineParser", "Specify external <references> for SEDS, e.g. foo:bar,foo2:bar2,foo3:bar3,...");
         valueName = QCoreApplication::translate("CommandLineParser", "references");
     } break;
-    case CommandLineParser::Positional::SedsConverterSedsExtRefFilename: {
+    case CommandLineParser::Positional::SedsConverterSedsExtRefFilepath: {
         names << "seds-ext-ref-file";
         description = QCoreApplication::translate("CommandLineParser", "Specify <file> with an external references for SEDS");
         valueName = QCoreApplication::translate("CommandLineParser", "list");
@@ -237,10 +237,6 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
         names << "sdl-filepath-prefix";
         description = QCoreApplication::translate("CommandLineParser", "SDL filepath <prefix>");
         valueName = QCoreApplication::translate("CommandLineParser", "prefix");
-    } break;
-    case CommandLineParser::Positional::SedsConverterImportXmlFileForAsn1: {
-        names << "import-xml-file-for-asn1";
-        description = QCoreApplication::translate("CommandLineParser", "Import Xml file for ASN.1 model");
     } break;
     default:
         qWarning() << Q_FUNC_INFO << "It seems the new option type is not handled here.";

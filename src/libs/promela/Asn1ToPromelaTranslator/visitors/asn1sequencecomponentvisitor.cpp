@@ -35,18 +35,19 @@ using promela::model::PromelaModel;
 using promela::model::Utype;
 
 namespace promela::translator {
-Asn1SequenceComponentVisitor::Asn1SequenceComponentVisitor(
-        PromelaModel &promelaModel, Utype &utype, QString baseTypeName, QList<QString> &optionalFields)
+Asn1SequenceComponentVisitor::Asn1SequenceComponentVisitor(PromelaModel &promelaModel, Utype &utype,
+        QString baseTypeName, QList<QString> &optionalFields, bool enhancedSpinSupport)
     : m_promelaModel(promelaModel)
     , m_utype(utype)
     , m_baseTypeName(std::move(baseTypeName))
     , m_optionalFields(optionalFields)
+    , m_enhancedSpinSupport(enhancedSpinSupport)
 {
 }
 
 void Asn1SequenceComponentVisitor::visit(const AsnSequenceComponent &component)
 {
-    Asn1ItemTypeVisitor visitor(m_promelaModel, m_baseTypeName, component.name());
+    Asn1ItemTypeVisitor visitor(m_promelaModel, m_baseTypeName, component.name(), m_enhancedSpinSupport);
     component.type()->accept(visitor);
     m_utype.addField(Declaration(visitor.getResultDataType().value(), Escaper::escapePromelaName(component.name())));
     if (component.isOptional()) {

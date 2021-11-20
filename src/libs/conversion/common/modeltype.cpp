@@ -19,28 +19,31 @@
 
 #include "modeltype.h"
 
+#include "modelproperties.h"
+
 #include <QString>
 #include <numeric>
 
 namespace conversion {
 
-QString modelTypeToString(ModelType modelType)
+const QString &modelTypeToString(ModelType modelType)
 {
     switch (modelType) {
     case ModelType::Unspecified:
-        return QStringLiteral("Unspecified");
+        return ModelTypeProperties<ModelType::Unspecified>::name;
     case ModelType::Asn1:
-        return QStringLiteral("ASN.1");
+        return ModelTypeProperties<ModelType::Asn1>::name;
     case ModelType::InterfaceView:
-        return QStringLiteral("InterfaceView");
-    case ModelType::Sdl:
-        return QStringLiteral("SDL");
-    case ModelType::Seds:
-        return QStringLiteral("SEDS");
+        return ModelTypeProperties<ModelType::InterfaceView>::name;
     case ModelType::Promela:
-        return QStringLiteral("Promela");
+        return ModelTypeProperties<ModelType::Promela>::name;
+    case ModelType::Sdl:
+        return ModelTypeProperties<ModelType::Sdl>::name;
+    case ModelType::Seds:
+        return ModelTypeProperties<ModelType::Seds>::name;
     default:
-        return QStringLiteral("unhandled model type");
+        static const auto unhandled = QStringLiteral("unhandled model type name");
+        return unhandled;
     }
 }
 
@@ -50,21 +53,42 @@ QString modelTypesToString(const std::set<ModelType> &modelsTypes)
             [](const QString &acc, ModelType modelType) { return acc + ", " + modelTypeToString(modelType); });
 }
 
+const QString &modelTypeExtension(ModelType modelType)
+{
+    switch (modelType) {
+    case ModelType::Unspecified:
+        return ModelTypeProperties<ModelType::Unspecified>::extension;
+    case ModelType::Asn1:
+        return ModelTypeProperties<ModelType::Asn1>::extension;
+    case ModelType::InterfaceView:
+        return ModelTypeProperties<ModelType::InterfaceView>::extension;
+    case ModelType::Promela:
+        return ModelTypeProperties<ModelType::Promela>::extension;
+    case ModelType::Sdl:
+        return ModelTypeProperties<ModelType::Sdl>::extension;
+    case ModelType::Seds:
+        return ModelTypeProperties<ModelType::Seds>::extension;
+    default:
+        static const auto unhandled = QStringLiteral("unhandled model type extension");
+        return unhandled;
+    }
+}
+
 ModelType stringToModelType(const QString &s)
 {
-    if (!s.compare("ASN.1", Qt::CaseInsensitive)) {
+    if (!s.compare(ModelTypeProperties<ModelType::Asn1>::name, Qt::CaseInsensitive)) {
         return conversion::ModelType::Asn1;
     }
-    if (!s.compare("SEDS", Qt::CaseInsensitive)) {
+    if (!s.compare(ModelTypeProperties<ModelType::Seds>::name, Qt::CaseInsensitive)) {
         return conversion::ModelType::Seds;
     }
-    if (!s.compare("InterfaceView", Qt::CaseInsensitive)) {
+    if (!s.compare(ModelTypeProperties<ModelType::InterfaceView>::name, Qt::CaseInsensitive)) {
         return conversion::ModelType::InterfaceView;
     }
-    if (!s.compare("SDL", Qt::CaseInsensitive)) {
+    if (!s.compare(ModelTypeProperties<ModelType::Sdl>::name, Qt::CaseInsensitive)) {
         return conversion::ModelType::Sdl;
     }
-    if (!s.compare("Promela", Qt::CaseInsensitive)) {
+    if (!s.compare(ModelTypeProperties<ModelType::Promela>::name, Qt::CaseInsensitive)) {
         return conversion::ModelType::Promela;
     }
     return conversion::ModelType::Unspecified;

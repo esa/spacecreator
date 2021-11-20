@@ -53,8 +53,8 @@ void IvXmlExporter::exportModel(const Model *model, const Options &options) cons
 
     const auto *ivModel = dynamic_cast<const IVModel *>(model);
 
-    const auto outputFilename = options.value(IvOptions::outputFilename);
-    if (!outputFilename) {
+    const auto outputFilepath = options.value(IvOptions::outputFilepath);
+    if (!outputFilepath) {
         throw ExportException("Output filename wasn't specified");
     }
 
@@ -65,7 +65,7 @@ void IvXmlExporter::exportModel(const Model *model, const Options &options) cons
     IVExporter exporter;
     exporter.exportObjects(ivModel->objects().values(), &modelDataBuffer);
 
-    QSaveFile outputFile(*outputFilename);
+    QSaveFile outputFile(*outputFilepath);
     outputFile.open(QIODevice::WriteOnly);
     outputFile.write(modelData);
     outputFile.commit();

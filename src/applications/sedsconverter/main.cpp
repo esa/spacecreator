@@ -56,7 +56,7 @@ int main(int argc, char **argv)
     const auto usage = QString("Usage: %1 --in <file> <options> [--out <file>]").arg(argv[0]);
     try {
         cli.parseArguments(a.arguments());
-        cli.setOptions(options);
+        cli.processOptions(options);
         sedsConverter.convert(
                 cli.getSourceModelTypes(), cli.getTargetModelType(), cli.getAuxModelTypes(), std::move(options));
     } catch (const ImportException &ex) {

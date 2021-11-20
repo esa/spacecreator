@@ -60,7 +60,7 @@ DVCreatorTool::DVCreatorTool(QGraphicsView *view, DVItemModel *model, DVEditorCo
 {
 }
 
-DVCreatorTool::~DVCreatorTool() { }
+DVCreatorTool::~DVCreatorTool() {}
 
 void DVCreatorTool::removeSelectedItems()
 {
@@ -232,7 +232,7 @@ bool DVCreatorTool::onMouseMove(QMouseEvent *e)
 
                     if (item->parentItem() == m_previewItem->parentItem()
                             || (m_previewItem->parentItem() == item
-                                    && !item->sceneBoundingRect().contains(expandedGeometry))) {
+                                       && !item->sceneBoundingRect().contains(expandedGeometry))) {
                         items.insert(iObjItem);
                     }
                 });
@@ -350,7 +350,7 @@ void DVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &s
 
     QMenu *bindingMenu = menu->addMenu(tr("Bindings"));
 
-    const QStringList allFunctions = m_dvCore->systemChecker()->functionsNames();
+    const QStringList allFunctions = m_dvCore->systemChecker()->terminalFunctionsNames();
     const QStringList systemFunctions = m_dvCore->systemChecker()->pseudoFunctionsNames();
     const QVector<dvm::DVFunction *> allBoundFunctionsEntities =
             model()->objectsModel()->allObjectsByType<dvm::DVFunction>();

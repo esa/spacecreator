@@ -70,10 +70,12 @@ using promela::model::UtypeRef;
 using promela::model::ValueDefinition;
 
 namespace promela::translator {
-Asn1ItemTypeVisitor::Asn1ItemTypeVisitor(PromelaModel &promelaModel, std::optional<QString> baseTypeName, QString name)
+Asn1ItemTypeVisitor::Asn1ItemTypeVisitor(
+        PromelaModel &promelaModel, std::optional<QString> baseTypeName, QString name, bool enhancedSpinSupport)
     : m_promelaModel(promelaModel)
     , m_baseTypeName(std::move(baseTypeName))
     , m_name(std::move(name))
+    , m_enhancedSpinSupport(enhancedSpinSupport)
 {
 }
 
@@ -179,12 +181,12 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
     const QString utypeName = constructTypeName(m_name);
     const QString nestedUtypeName = constructTypeName(QString("%1_data").arg(m_name));
     Utype utype(utypeName);
-    Utype nestedUtype(nestedUtypeName, true);
+    Utype nestedUtype(nestedUtypeName, m_enhancedSpinSupport);
     const QString none = QString("%1_NONE").arg(utypeName);
     m_promelaModel.addValueDefinition(ValueDefinition(none, 0));
     int32_t index = 1;
     for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type.components()) {
-        Asn1ItemTypeVisitor nestedVisitor(m_promelaModel, utypeName, component->name());
+        Asn1ItemTypeVisitor nestedVisitor(m_promelaModel, utypeName, component->name(), m_enhancedSpinSupport);
         component->type()->accept(nestedVisitor);
         std::optional<DataType> nestedDataType = nestedVisitor.getResultDataType();
 
@@ -212,7 +214,8 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
     QList<QString> optionalFields;
 
     for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : type.components()) {
-        Asn1SequenceComponentVisitor componentVisitor(m_promelaModel, nestedUtype, nestedUtypeName, optionalFields);
+        Asn1SequenceComponentVisitor componentVisitor(
+                m_promelaModel, nestedUtype, nestedUtypeName, optionalFields, m_enhancedSpinSupport);
         component->accept(componentVisitor);
     }
 
@@ -243,7 +246,7 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
 
-    Asn1ItemTypeVisitor itemTypeVisitor(m_promelaModel, utypeName, "item");
+    Asn1ItemTypeVisitor itemTypeVisitor(m_promelaModel, utypeName, "item", m_enhancedSpinSupport);
     type.itemsType()->accept(itemTypeVisitor);
     DataType dataType = itemTypeVisitor.getResultDataType().value();
 
@@ -269,7 +272,11 @@ void Asn1ItemTypeVisitor::visit(const Real &type)
 {
     Q_UNUSED(type);
     const QString typeName = constructTypeName(m_name);
-    m_promelaModel.addTypeAlias(TypeAlias(typeName, BasicType::FLOAT));
+    if (m_enhancedSpinSupport) {
+        m_promelaModel.addTypeAlias(TypeAlias(typeName, BasicType::FLOAT));
+    } else {
+        m_promelaModel.addTypeAlias(TypeAlias(typeName, BasicType::INT));
+    }
     m_resultDataType = DataType(UtypeRef(typeName));
 }
 

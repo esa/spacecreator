@@ -56,7 +56,7 @@ IVFunctionType::IVFunctionType(const IVObject::Type t, QObject *parent, const sh
 {
 }
 
-IVFunctionType::~IVFunctionType() { }
+IVFunctionType::~IVFunctionType() {}
 
 QVector<IVObject *> IVFunctionType::children() const
 {
@@ -76,7 +76,7 @@ bool IVFunctionType::addChild(IVObject *child)
             break;
         }
         case IVObject::Type::Function: {
-            d->m_functionTypes.append(child->as<IVFunction *>());
+            d->m_functions.append(child->as<IVFunction *>());
             break;
         }
         case IVObject::Type::InterfaceGroup: {

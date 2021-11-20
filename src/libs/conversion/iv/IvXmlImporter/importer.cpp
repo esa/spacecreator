@@ -47,29 +47,28 @@ std::unique_ptr<conversion::Model> IvXmlImporter::importModel(const Options &opt
 
 IVPropertyTemplateConfig *IvXmlImporter::initConfig(const Options &options) const
 {
-    const auto configFilename = options.value(IvOptions::configFilename);
-    if (!configFilename) {
+    const auto configFilepath = options.value(IvOptions::configFilepath);
+    if (!configFilepath) {
         throw ImportException("Configuration file wasn't specified");
     }
 
     auto *config = IVPropertyTemplateConfig::instance();
-    config->init(*configFilename);
+    config->init(*configFilepath);
 
     return config;
 }
 
 std::unique_ptr<conversion::Model> IvXmlImporter::parse(const Options &options, IVPropertyTemplateConfig *config) const
 {
-    const auto inputFilename = options.value(IvOptions::inputFilename);
-    if (!inputFilename) {
+    const auto inputFilepath = options.value(IvOptions::inputFilepath);
+    if (!inputFilepath) {
         throw ImportException("File to import wasn't specified");
     }
 
     IVXMLReader parser;
 
-    if (!parser.readFile(*inputFilename)) {
-        const auto message = parser.errorString();
-        throw ImportException(message);
+    if (!parser.readFile(*inputFilepath)) {
+        throw ImportException(parser.errorString());
     }
 
     auto model = std::make_unique<IVModel>(config);

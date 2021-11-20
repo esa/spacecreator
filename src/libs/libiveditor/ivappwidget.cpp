@@ -87,11 +87,13 @@ ive::GraphicsView *IVAppWidget::graphicsView() const
 
 void IVAppWidget::centerView()
 {
-    if (const QGraphicsItem *item = m_document->itemsModel()->getItem(m_document->objectsModel()->rootObjectId())) {
+    const QGraphicsItem *item = m_document->itemsModel()->getItem(m_document->objectsModel()->rootObjectId());
+    const QList<QGraphicsItem *> items = item ? item->childItems() : graphicsView()->scene()->items();
+    if (items.isEmpty() && item) {
         graphicsView()->centerOn(item->sceneBoundingRect().center());
     } else {
         QRectF rect;
-        for (auto item : graphicsView()->scene()->items()) {
+        for (const QGraphicsItem *item : items) {
             if (item->type() > QGraphicsItem::UserType) {
                 rect |= item->sceneBoundingRect();
             }

@@ -108,12 +108,17 @@ private:
 namespace conversion {
 
 /**
- * @brief   Specialization for InterfaceView model properties
+ * @brief   Specialization for InterfaceView model
  */
-template <>
-struct ModelProperties<ivm::IVModel> {
+template<>
+struct ModelProperties<ivm::IVModel>
+{
     /// @brief  Model type
     static const ModelType type = ModelType::InterfaceView;
+    /// @brief  Model name
+    static inline const QString name = ModelTypeProperties<type>::name;
+    /// @brief  Model extension
+    static inline const QString extension = ModelTypeProperties<type>::extension;
 };
 
 } // namespace conversion

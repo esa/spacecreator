@@ -34,6 +34,10 @@ template<typename Model>
 struct ModelProperties {
     /// @brief  Model type
     static const ModelType type = ModelType::Unspecified;
+    /// @brief  Model name
+    static const inline QString name = ModelTypeProperties<type>::name;
+    /// @brief  Model extension
+    static const inline QString extension = ModelTypeProperties<type>::extension;
 };
 
 } // namespace conversion

@@ -145,7 +145,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
     // clang-format on
 
     Options options;
-    options.add(IvOptions::configFilename, "config.xml");
+    options.add(IvOptions::configFilepath, "config.xml");
 
     SedsToIvTranslator translator;
 
@@ -208,7 +208,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
     // clang-format on
 
     Options options;
-    options.add(IvOptions::configFilename, "config.xml");
+    options.add(IvOptions::configFilepath, "config.xml");
 
     SedsToIvTranslator translator;
 

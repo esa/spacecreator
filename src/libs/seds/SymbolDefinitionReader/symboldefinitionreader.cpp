@@ -31,16 +31,16 @@ using conversion::FileNotFoundException;
 
 namespace seds::symbolreader {
 
-SymbolDefinitionReader::ExternalReferencesMap SymbolDefinitionReader::readSymbols(QString filename)
+SymbolDefinitionReader::ExternalReferencesMap SymbolDefinitionReader::readSymbols(const QString &filepath)
 {
-    const QFileInfo fileInfo(filename);
+    const QFileInfo fileInfo(filepath);
     if (!fileInfo.exists()) {
-        throw FileNotFoundException(filename, "while reading symbol definitions");
+        throw FileNotFoundException(filepath, "while reading symbol definitions");
     }
 
-    const auto result = toml::parse_file(filename.toStdString());
+    const auto result = toml::parse_file(filepath.toStdString());
     if (!result) {
-        throw SymbolDefinitionReaderException(filename, result.error().description());
+        throw SymbolDefinitionReaderException(filepath, result.error().description());
     }
 
     ExternalReferencesMap externalReferences;
@@ -58,7 +58,7 @@ SymbolDefinitionReader::ExternalReferencesMap SymbolDefinitionReader::readSymbol
             } else {
                 const auto message = QString("key '%1' was expected to be a string, an integer, a float or a boolean")
                                              .arg(referenceName);
-                throw SymbolDefinitionReaderException(filename, message);
+                throw SymbolDefinitionReaderException(filepath, message);
             }
         });
     }

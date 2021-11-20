@@ -44,6 +44,7 @@ public:
     void visit(const ::promela::model::Declaration &declaration);
 
 private:
+    void generateChannelInit(const ::promela::model::ChannelInit &channelInit);
     QString getVisibilityString(const ::promela::model::Declaration &declaration);
 
 private:
