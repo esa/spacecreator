@@ -1,0 +1,51 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Calculator;
+    /* CIF TEXT (16, 317), (267, 140) */
+    dcl x Number;
+    dcl y Number;
+    dcl tmp Number;
+    dcl io_AsyncCalculator_Add_Pi Add_Type;
+    dcl io_AsyncCalculator_Add_Ri Add_Type1;
+    /* CIF ENDTEXT */
+    /* CIF procedure (250, 150), (150, 75) */
+    procedure AddAndNotify;
+        /* CIF TEXT (250, 150), (150, 75) */
+        fpar
+            in x1 Number,
+            in x2 Number;
+        /* CIF ENDTEXT */
+        /* CIF START (250, 150), (150, 75) */
+        START;
+            /* CIF task (250, 150), (150, 75) */
+            task tmp := x1 + x2;
+            /* CIF task (250, 150), (150, 75) */
+            task io_AsyncCalculator_Add_Ri.result := tmp;
+            /* CIF output (250, 150), (150, 75) */
+            output AsyncCalculator_Add_Ri(io_AsyncCalculator_Add_Ri);
+        return ;
+    endprocedure;
+    /* CIF START (9, 285), (70, 35) */
+    START;
+            /* CIF NEXTSTATE (250, 150), (150, 75) */
+            NEXTSTATE Off;
+    /* CIF state (250, 150), (150, 75) */
+    state Idle;
+        /* CIF input (250, 150), (150, 75) */
+        input AsyncCalculator_Add_Pi(io_AsyncCalculator_Add_Pi);
+            /* CIF task (250, 150), (150, 75) */
+            task x := io_AsyncCalculator_Add_Pi.x;
+            /* CIF task (250, 150), (150, 75) */
+            task y := io_AsyncCalculator_Add_Pi.y;
+        /* CIF PROCEDURECALL (250, 150), (150, 75) */
+        call AddAndNotify(x, y);
+            /* CIF NEXTSTATE (250, 150), (150, 75) */
+            NEXTSTATE Idle;
+    endstate;
+    /* CIF state (250, 150), (150, 75) */
+    state Off;
+        /* CIF input (250, 150), (150, 75) */
+        input AsyncCalculator_Init_Pi;
+            /* CIF NEXTSTATE (250, 150), (150, 75) */
+            NEXTSTATE Idle;
+    endstate;
+endprocess Calculator;

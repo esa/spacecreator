@@ -32,3 +32,8 @@ configure_file(test_containers.sh test_containers.sh COPYONLY)
 configure_file(resources/test_containers.xml resources/test_containers.xml COPYONLY)
 configure_file(resources/test_containers_asn.output resources/test_containers_asn.output COPYONLY)
 configure_file(resources/test_containers_acn.output resources/test_containers_acn.output COPYONLY)
+
+configure_file(test_calculator.sh test_calculator.sh COPYONLY)
+configure_file(resources/test_calculator.xml resources/test_calculator.xml COPYONLY)
+configure_file(resources/test_calculator.output resources/test_calculator.output COPYONLY)
+configure_file(resources/test_calculator.system_structure resources/test_calculator.system_structure COPYONLY)

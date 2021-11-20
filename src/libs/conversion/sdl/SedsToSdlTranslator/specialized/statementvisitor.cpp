@@ -184,12 +184,16 @@ auto StatementVisitor::findInterfaceDeclaration(
         throw TranslationException(QString("Function %1 not found").arg(functionName));
     }
 
-    const auto interfaceIterator = std::find_if(function->interfaces().begin(), function->interfaces().end(),
-            [interfaceName](const auto &element) { return element->ifaceLabel() == interfaceName; });
-    if (interfaceIterator == function->interfaces().end()) {
-        throw TranslationException(QString("Interface %1 not found for function %2").arg(interfaceName, functionName));
+    // This form is shorter and easier to debug than find_if and for unknown reason works more reliably
+    for (int i = 0; i < function->interfaces().size(); i++) {
+        const auto interface = function->interfaces()[i];
+        if (interface->ifaceLabel() == interfaceName) {
+            return interface;
+        }
     }
-    return *interfaceIterator;
+
+    throw TranslationException(QString("Interface %1 not found for function %2").arg(interfaceName, functionName));
+    return nullptr;
 }
 
 auto StatementVisitor::findVariableDeclaration(::sdl::Process *process, ::sdl::Procedure *sdlProcedure, QString name)
