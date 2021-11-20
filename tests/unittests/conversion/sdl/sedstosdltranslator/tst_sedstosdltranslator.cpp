@@ -187,7 +187,7 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineIntoProcess()
     // clang-format on
 
     Options options;
-    options.add(conversion::iv::IvOptions::configFilename, "config.xml");
+    options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
     conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
     conversion::iv::translator::SedsToIvTranslator ivTranslator;
@@ -245,7 +245,7 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineStates()
     // clang-format on
 
     Options options;
-    options.add(conversion::iv::IvOptions::configFilename, "config.xml");
+    options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
     conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
     conversion::iv::translator::SedsToIvTranslator ivTranslator;
@@ -300,7 +300,7 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineInputs()
     // clang-format on
 
     Options options;
-    options.add(conversion::iv::IvOptions::configFilename, "config.xml");
+    options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
     conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
     conversion::iv::translator::SedsToIvTranslator ivTranslator;
@@ -368,7 +368,7 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineInputsWithVariables()
     // clang-format on
 
     Options options;
-    options.add(conversion::iv::IvOptions::configFilename, "config.xml");
+    options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
     conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
     conversion::iv::translator::SedsToIvTranslator ivTranslator;
@@ -420,7 +420,7 @@ void tst_SedsToSdlTranslator::testTranslateActivity()
     // clang-format on
 
     Options options;
-    options.add(conversion::iv::IvOptions::configFilename, "config.xml");
+    options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
     conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
     conversion::iv::translator::SedsToIvTranslator ivTranslator;
@@ -482,7 +482,7 @@ void tst_SedsToSdlTranslator::testTranslateStateTransitionActivity()
     // clang-format on
 
     Options options;
-    options.add(conversion::iv::IvOptions::configFilename, "config.xml");
+    options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
     conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
     conversion::iv::translator::SedsToIvTranslator ivTranslator;
@@ -754,7 +754,7 @@ static inline auto translateAndVerifyActivityContainsAction(const std::unique_pt
         const QString activityName, const QString actionContent) -> void
 {
     Options options;
-    options.add(conversion::iv::IvOptions::configFilename, "config.xml");
+    options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
     conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
     conversion::iv::translator::SedsToIvTranslator ivTranslator;
@@ -862,7 +862,7 @@ void tst_SedsToSdlTranslator::testTranslateActivityCall()
                     .build();
 
     Options options;
-    options.add(conversion::iv::IvOptions::configFilename, "config.xml");
+    options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
     conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
     conversion::iv::translator::SedsToIvTranslator ivTranslator;
@@ -920,7 +920,7 @@ void tst_SedsToSdlTranslator::testTranslateSendCommand()
                     .build();
 
     Options options;
-    options.add(conversion::iv::IvOptions::configFilename, "config.xml");
+    options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
     conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
     conversion::iv::translator::SedsToIvTranslator ivTranslator;
