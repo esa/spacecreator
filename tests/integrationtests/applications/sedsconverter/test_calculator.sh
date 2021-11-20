@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
+OPENGEODE=$HOME/.local/bin/opengeode
 
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
@@ -20,7 +21,7 @@ cd $TEST_OUTPUT_DIR
 # Compare output against reference, and compile to make sure the reference is valid
 # Clean (rm) only if all steps pass
 $DIFF Calculator.pr ../resources/test_calculator.output \
-  && opengeode --toC system_structure.pr Calculator.pr \
+  && $OPENGEODE --toC system_structure.pr Calculator.pr \
   && asn1scc -c --type-prefix asn1Scc dataview-uniq.asn \
   && gcc -c Calculator.c \
   && cd .. \
