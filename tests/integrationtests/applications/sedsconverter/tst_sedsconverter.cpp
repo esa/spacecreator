@@ -34,6 +34,7 @@ private Q_SLOTS:
     void testContainers();
     void testLedDemo();
     void testCalculator();
+    void testComparator();
 };
 
 void tst_SedsConverter::testStateMachineWithBareInput()
@@ -99,6 +100,27 @@ void tst_SedsConverter::testLedDemo()
 void tst_SedsConverter::testCalculator()
 {
     const int result = system("./test_led_demo.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-2010
+/// \SRS  ETB-FUN-2020
+/// \SRS  ETB-FUN-2060
+/// \SRS  ETB-FUN-2140
+/// \SRS  ETB-FUN-2150
+/// \SRS  ETB-FUN-2160
+/// \SRS  ETB-FUN-2410
+/// \SRS  ETB-FUN-2490
+/// \SRS  ETB-FUN-2500
+/// \SRS  ETB-FUN-2520
+/// \SRS  ETB-FUN-2550
+/// \SRS  ETB-FUN-2560
+/// \SRS  ETB-FUN-2570
+/// \SRS  ETB-FUN-2660
+/// \SRS  ETB-FUN-2670
+void tst_SedsConverter::testComparator()
+{
+    const int result = system("./test_comparator.sh");
     QCOMPARE(result, 0);
 }
 

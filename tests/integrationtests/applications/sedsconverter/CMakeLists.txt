@@ -42,3 +42,8 @@ configure_file(test_led_demo.sh test_led_demo.sh COPYONLY)
 configure_file(resources/test_led_demo.xml resources/test_led_demo.xml COPYONLY)
 configure_file(resources/test_led_demo.output resources/test_led_demo.output COPYONLY)
 configure_file(resources/test_led_demo.system_structure resources/test_led_demo.system_structure COPYONLY)
+
+configure_file(test_comparator.sh test_comparator.sh COPYONLY)
+configure_file(resources/test_comparator.xml resources/test_comparator.xml COPYONLY)
+configure_file(resources/test_comparator.output resources/test_comparator.output COPYONLY)
+configure_file(resources/test_comparator.system_structure resources/test_comparator.system_structure COPYONLY)
