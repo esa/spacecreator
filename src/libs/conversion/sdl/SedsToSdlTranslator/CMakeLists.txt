@@ -24,6 +24,7 @@ target_link_libraries(SedsToSdlTranslator
                 asn1library
                 ivcore
                 SEDS::Model
+                SdlModel
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(SedsToSdlTranslator)

@@ -24,6 +24,9 @@
 
 #include <asn1library/asn1/asn1model.h>
 #include <ivcore/ivmodel.h>
+#include <sdl/SdlModel/decision.h>
+#include <sdl/SdlModel/join.h>
+#include <sdl/SdlModel/label.h>
 #include <sdl/SdlModel/output.h>
 #include <sdl/SdlModel/procedurecall.h>
 #include <sdl/SdlModel/sdlmodel.h>
@@ -141,6 +144,27 @@ private:
 
     static auto translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString callName,
             const seds::model::SendCommandPrimitive &sendCommand) -> std::vector<std::unique_ptr<::sdl::Action>>;
+
+    static auto translateBooleanExpression(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
+            const seds::model::BooleanExpression &expression) -> std::unique_ptr<::sdl::Decision>;
+
+    static auto translateComparison(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
+            const seds::model::Comparison &comparison) -> std::unique_ptr<::sdl::Decision>;
+
+    static auto translateAndedConditions(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
+            const seds::model::AndedConditions &conditions) -> std::unique_ptr<::sdl::Decision>;
+
+    static auto translateOredConditions(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
+            const seds::model::OredConditions &conditions) -> std::unique_ptr<::sdl::Decision>;
+
+    static auto translateTypeCheck(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
+            const seds::model::TypeCheck &check) -> std::unique_ptr<::sdl::Decision>;
+
+    static auto translateAnswer(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
+            ivm::IVModel *ivModel, ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure, ::sdl::Label *joinLabel,
+            const QString value, const seds::model::Body *body) -> std::unique_ptr<::sdl::Answer>;
+
+    static auto comparisonOperatorToString(const seds::model::ComparisonOperator op) -> QString;
 };
 
 } // namespace conversion::asn1::translator

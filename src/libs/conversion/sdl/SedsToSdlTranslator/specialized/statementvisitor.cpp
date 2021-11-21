@@ -100,8 +100,18 @@ auto StatementVisitor::operator()(const seds::model::Calibration &calibration) -
 
 auto StatementVisitor::operator()(const seds::model::Conditional &conditional) -> void
 {
-    Q_UNUSED(conditional);
-    throw TranslationException("Conditional activity not implemented");
+    auto decision = translateBooleanExpression(m_sdlProcess, m_sdlProcedure, conditional.condition());
+    auto label = std::make_unique<::sdl::Label>(Escaper::escapeSdlName("changema"));
+
+    auto trueAnswer = translateAnswer(m_sedsPackage, m_asn1Model, m_ivModel, m_sdlProcess, m_sdlProcedure, label.get(),
+            "True", conditional.onConditionTrue());
+    auto falseAnswer = translateAnswer(m_sedsPackage, m_asn1Model, m_ivModel, m_sdlProcess, m_sdlProcedure, label.get(),
+            "False", conditional.onConditionFalse());
+    decision->addAnswer(std::move(trueAnswer));
+    decision->addAnswer(std::move(falseAnswer));
+
+    m_sdlTransition->addAction(std::move(decision));
+    m_sdlTransition->addAction(std::move(label));
 }
 
 auto StatementVisitor::operator()(const seds::model::Iteration &iteration) -> void
@@ -285,9 +295,6 @@ auto StatementVisitor::translateOutput(::sdl::Process *hostProcess, ::sdl::Proce
         const QString callName, const seds::model::SendCommandPrimitive &sendCommand)
         -> std::vector<std::unique_ptr<::sdl::Action>>
 {
-    Q_UNUSED(hostProcess);
-    Q_UNUSED(hostProcedure);
-
     std::vector<std::unique_ptr<::sdl::Action>> result;
 
     auto output = std::make_unique<::sdl::Output>();
@@ -313,6 +320,119 @@ auto StatementVisitor::translateOutput(::sdl::Process *hostProcess, ::sdl::Proce
     result.emplace_back(std::move(output));
 
     return std::move(result);
+}
+
+auto StatementVisitor::translateBooleanExpression(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
+        const seds::model::BooleanExpression &expression) -> std::unique_ptr<::sdl::Decision>
+{
+    const auto &condition = expression.condition();
+    if (std::holds_alternative<seds::model::Comparison>(condition)) {
+        const auto &comparision = std::get<seds::model::Comparison>(condition);
+        return translateComparison(hostProcess, hostProcedure, comparision);
+    } else if (std::holds_alternative<std::unique_ptr<seds::model::AndedConditions>>(condition)) {
+        const auto &conditions = std::get<std::unique_ptr<seds::model::AndedConditions>>(condition);
+        return translateAndedConditions(hostProcess, hostProcedure, *conditions);
+    } else if (std::holds_alternative<std::unique_ptr<seds::model::OredConditions>>(condition)) {
+        const auto &conditions = std::get<std::unique_ptr<seds::model::OredConditions>>(condition);
+        return translateOredConditions(hostProcess, hostProcedure, *conditions);
+    } else if (std::holds_alternative<seds::model::TypeCheck>(condition)) {
+        const auto &check = std::get<seds::model::TypeCheck>(condition);
+        return translateTypeCheck(hostProcess, hostProcedure, check);
+    }
+    throw TranslationException("Expression not implemented");
+    return nullptr;
+}
+
+auto StatementVisitor::translateComparison(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
+        const seds::model::Comparison &comparison) -> std::unique_ptr<::sdl::Decision>
+{
+    Q_UNUSED(hostProcess);
+    Q_UNUSED(hostProcedure);
+    const auto left = comparison.firstOperand().variableRef().value().value();
+    const auto &right = std::visit(
+            overload {
+                    [](const seds::model::VariableRefOperand &reference) {
+                        return Escaper::escapeAsn1FieldName(reference.variableRef().value().value());
+                    },
+                    [](const seds::model::ValueOperand &value) { return value.value().value(); },
+            },
+            comparison.secondOperand());
+    const auto op = comparisonOperatorToString(comparison.comparisonOperator());
+    auto decision = std::make_unique<::sdl::Decision>();
+    auto expression = std::make_unique<::sdl::Expression>(QString("%1 %2 %3").arg(left, op, right));
+    decision->setExpression(std::move(expression));
+    return decision;
+}
+
+auto StatementVisitor::translateAndedConditions(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
+        const seds::model::AndedConditions &conditions) -> std::unique_ptr<::sdl::Decision>
+{
+    Q_UNUSED(hostProcess);
+    Q_UNUSED(hostProcedure);
+    Q_UNUSED(conditions);
+    throw TranslationException("Expression not implemented");
+    return nullptr;
+}
+
+auto StatementVisitor::translateOredConditions(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
+        const seds::model::OredConditions &conditions) -> std::unique_ptr<::sdl::Decision>
+{
+    Q_UNUSED(hostProcess);
+    Q_UNUSED(hostProcedure);
+    Q_UNUSED(conditions);
+    throw TranslationException("Expression not implemented");
+    return nullptr;
+}
+
+auto StatementVisitor::translateTypeCheck(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
+        const seds::model::TypeCheck &check) -> std::unique_ptr<::sdl::Decision>
+{
+    Q_UNUSED(hostProcess);
+    Q_UNUSED(hostProcedure);
+    Q_UNUSED(check);
+    throw TranslationException("Expression not implemented");
+    return nullptr;
+}
+
+auto StatementVisitor::comparisonOperatorToString(const seds::model::ComparisonOperator op) -> QString
+{
+    switch (op) {
+    case seds::model::ComparisonOperator::Equals:
+        return "=";
+    case seds::model::ComparisonOperator::NotEquals:
+        return "<>";
+    case seds::model::ComparisonOperator::LessThan:
+        return "<";
+    case seds::model::ComparisonOperator::LessThanEquals:
+        return "<=";
+    case seds::model::ComparisonOperator::GreaterThan:
+        return ">";
+    case seds::model::ComparisonOperator::GreaterThanEquals:
+        return ">=";
+    }
+    throw TranslationException("Expression not implemented");
+    return "";
+}
+
+auto StatementVisitor::translateAnswer(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
+        ivm::IVModel *ivModel, ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure, ::sdl::Label *joinLabel,
+        const QString value, const seds::model::Body *body) -> std::unique_ptr<::sdl::Answer>
+{
+    auto answer = std::make_unique<::sdl::Answer>();
+    answer->setLiteral(::sdl::VariableLiteral(value));
+    auto transition = std::make_unique<::sdl::Transition>();
+    if (body != nullptr) {
+        StatementVisitor nestedVisitor(sedsPackage, asn1Model, ivModel, sdlProcess, sdlProcedure, transition.get());
+        for (const auto &statement : body->statements()) {
+            std::visit(nestedVisitor, statement);
+        }
+    }
+    auto join = std::make_unique<::sdl::Join>();
+    join->setLabel(joinLabel);
+    transition->addAction(std::move(join));
+    answer->setTransition(std::move(transition));
+
+    return answer;
 }
 
 }
