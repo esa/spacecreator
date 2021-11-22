@@ -178,8 +178,7 @@ auto StatementTranslatorVisitor::findInterfaceDeclaration(
     }
 
     // This form is shorter and easier to debug than find_if and for unknown reason works more reliably
-    for (int i = 0; i < function->interfaces().size(); i++) {
-        const auto interface = function->interfaces()[i];
+    for (const auto &interface : function->interfaces()) {
         if (interface->ifaceLabel() == interfaceName) {
             return interface;
         }
