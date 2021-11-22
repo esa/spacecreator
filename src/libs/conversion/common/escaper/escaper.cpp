@@ -82,6 +82,15 @@ QString Escaper::escapePromelaName(QString name)
     return name;
 }
 
+QString Escaper::escapePromelaIV(QString name)
+{
+    escapeName(name, '_');
+
+    name[0] = name[0].toUpper();
+
+    return name;
+}
+
 void Escaper::escapeName(QString &name, const QChar &delimeter)
 {
     name = name.trimmed();

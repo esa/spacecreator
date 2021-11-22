@@ -327,9 +327,13 @@ void tst_PromelaExporter::testChannelInitialization()
     model.addTypeAlias(TypeAlias("named_parameter", BasicType::INT));
 
     Declaration channel1 = Declaration(DataType(BasicType::CHAN), "channel1");
-    channel1.setInit(ChannelInit(1, BasicType::INT));
+    QList<ChannelInit::Type> channel1Type;
+    channel1Type.append(ChannelInit::Type(BasicType::INT));
+    channel1.setInit(ChannelInit(1, std::move(channel1Type)));
     Declaration channel2 = Declaration(DataType(BasicType::CHAN), "channel2");
-    channel2.setInit(ChannelInit(2, UtypeRef("named_parameter")));
+    QList<ChannelInit::Type> channel2Type;
+    channel2Type.append(ChannelInit::Type(UtypeRef("named_parameter")));
+    channel2.setInit(ChannelInit(2, std::move(channel2Type)));
 
     model.addDeclaration(channel1);
     model.addDeclaration(channel2);

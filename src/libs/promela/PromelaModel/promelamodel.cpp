@@ -95,4 +95,13 @@ const QList<Declaration> &PromelaModel::getDeclarations() const noexcept
 {
     return m_declarations;
 }
+void PromelaModel::addProctype(const Proctype &proctype)
+{
+    m_proctypes.append(proctype);
+}
+
+const QList<Proctype> &PromelaModel::getProctypes() const noexcept
+{
+    return m_proctypes;
+}
 }

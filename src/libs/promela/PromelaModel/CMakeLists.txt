@@ -12,6 +12,7 @@ set(SOURCES
   typealias.cpp
   valuedefinition.cpp
   channelinit.cpp
+  proctype.cpp
   )
 set(INCLUDES
   arraytype.h
@@ -27,6 +28,7 @@ set(INCLUDES
   typealias.h
   valuedefinition.h
   channelinit.h
+  proctype.h
   )
 
 add_library(PromelaModel STATIC)

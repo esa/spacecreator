@@ -28,6 +28,7 @@
 
 using promela::model::Declaration;
 using promela::model::NamedMtype;
+using promela::model::Proctype;
 using promela::model::PromelaModel;
 using promela::model::TypeAlias;
 using promela::model::Utype;
@@ -109,11 +110,31 @@ void PromelaModelVisitor::generateUtypes(const QList<Utype> &utypes)
     }
 }
 
-void PromelaModelVisitor::generateDeclarations(const QList<::promela::model::Declaration> &values)
+void PromelaModelVisitor::generateDeclarations(const QList<Declaration> &values)
 {
     for (const Declaration &declaration : values) {
         DeclarationVisitor visitor(m_stream, "");
         visitor.visit(declaration);
+    }
+}
+
+void PromelaModelVisitor::generateProctypes(const QList<Proctype> &proctypes)
+{
+    for (const Proctype &proctype : proctypes) {
+        if (proctype.isActive()) {
+            m_stream << "active ";
+            if (proctype.getInstancesCount() > 1) {
+                m_stream << "[" << proctype.getInstancesCount() << "] ";
+            }
+        }
+        m_stream << "proctype " << proctype.getName() << "()";
+        if (proctype.hasPriority()) {
+            m_stream << " priority " << proctype.getPriority();
+        }
+        m_stream << "\n";
+        m_stream << "{\n";
+        m_stream << QString("printf(\"%1\\n\")\n").arg(proctype.getName());
+        m_stream << "}\n";
     }
 }
 

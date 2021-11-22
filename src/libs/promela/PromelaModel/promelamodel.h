@@ -20,6 +20,7 @@
 #pragma once
 
 #include "namedmtype.h"
+#include "proctype.h"
 #include "typealias.h"
 #include "utype.h"
 #include "valuedefinition.h"
@@ -153,6 +154,9 @@ public:
      */
     const QList<Declaration> &getDeclarations() const noexcept;
 
+    void addProctype(const Proctype &proctype);
+    const QList<Proctype> &getProctypes() const noexcept;
+
 private:
     QList<QString> m_includes;
     QSet<QString> m_mtypeValues;
@@ -161,6 +165,7 @@ private:
     QList<TypeAlias> m_typeAliases;
     QList<ValueDefinition> m_valueDefinitions;
     QList<Declaration> m_declarations;
+    QList<Proctype> m_proctypes;
 };
 }
 

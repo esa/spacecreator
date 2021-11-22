@@ -15,6 +15,7 @@ target_include_directories(PromelaRegistrar
 target_link_libraries(PromelaRegistrar
   PRIVATE   Promela::Exporter
             Conversion::Asn1ToPromelaTranslator
+            Conversion::IvToPromelaTranslator
             CommonProjectWarnings
   PUBLIC    Conversion::Common)
 

@@ -56,6 +56,7 @@ private:
     void generateValueDefinitions(const QList<::promela::model::ValueDefinition> &values);
     void generateUtypes(const QList<::promela::model::Utype> &utypes);
     void generateDeclarations(const QList<::promela::model::Declaration> &values);
+    void generateProctypes(const QList<::promela::model::Proctype> &proctypes);
 
 private:
     QTextStream &m_stream;

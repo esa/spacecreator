@@ -89,6 +89,8 @@ public:
      */
     static auto escapePromelaName(QString name) -> QString;
 
+    static auto escapePromelaIV(QString name) -> QString;
+
 private:
     static auto escapeName(QString &name, const QChar &delimeter) -> void;
 

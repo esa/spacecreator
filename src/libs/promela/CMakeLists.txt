@@ -1,3 +1,4 @@
 add_subdirectory(PromelaModel)
 add_subdirectory(PromelaExporter)
 add_subdirectory(Asn1ToPromelaTranslator)
+add_subdirectory(IvToPromelaTranslator)

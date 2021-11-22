@@ -17,22 +17,33 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "channelinit.h"
+#pragma once
+
+#include <QString>
+#include <cstddef>
+#include <optional>
 
 namespace promela::model {
-ChannelInit::ChannelInit(size_t size, QList<Type> types)
-    : m_size(size)
-    , m_types(std::move(types))
+class Proctype final
 {
-}
+public:
+    Proctype(QString name);
 
-size_t ChannelInit::getSize() const noexcept
-{
-    return m_size;
-}
+    const QString &getName() const noexcept;
+    void setName(QString name);
 
-const QList<ChannelInit::Type> &ChannelInit::getTypes() const noexcept
-{
-    return m_types;
-}
+    bool isActive() const noexcept;
+    size_t getInstancesCount() const;
+    void setActive(size_t instances);
+
+    bool hasPriority() const noexcept;
+    size_t getPriority() const;
+    void setPriority(size_t priority);
+
+private:
+    QString m_name;
+    bool m_active;
+    std::optional<size_t> m_instances;
+    std::optional<size_t> m_priority;
+};
 }
