@@ -44,19 +44,80 @@ class StatementTranslatorVisitor final
 {
 public:
     /**
+     *  @brief  Translation context which can be shared between visitors
+     */
+    class Context
+    {
+    public:
+        /**
+         * @brief   Context constructor
+         *
+         * @param sedsPackage       SEDS package containing the activity
+         * @param asn1Model         Data model
+         * @param ivModel           IV model
+         * @param sdlProcess        Host SDL process
+         * @param sdlProcedure      Host SDL procedure
+         */
+        Context(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
+                ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure);
+
+        /**
+         * @brief   Returns a unique label name, starting with the given prefix
+         *
+         * @param   prefix   Label name prefix
+         * @returns Unique label name
+         */
+        auto uniqueLabelName(const QString prefix = "label_") -> QString;
+
+        /**
+         * @brief SEDS Package accessor
+         *
+         * @returns SEDS Package
+         */
+
+        auto sedsPackage() -> const seds::model::Package &;
+        /**
+         * @brief ASN.1 Model accessor
+         *
+         * @returns ASN.1 Model
+         */
+        auto asn1Model() -> Asn1Acn::Asn1Model *;
+        /**
+         * @brief InterfaceView Model accessor
+         *
+         * @returns InterfaceView Model Package
+         */
+        auto ivModel() -> ivm::IVModel *;
+        /**
+         * @brief SDL Process accessor
+         *
+         * @returns SDL Process
+         */
+        auto sdlProcess() -> ::sdl::Process *;
+        /**
+         * @brief SDL Procedure accessor
+         *
+         * @returns SDL Procedure
+         */
+        auto sdlProcedure() -> ::sdl::Procedure *;
+
+    private:
+        int m_labelCount;
+        const seds::model::Package &m_sedsPackage;
+        Asn1Acn::Asn1Model *m_asn1Model;
+        ivm::IVModel *m_ivModel;
+        ::sdl::Process *m_sdlProcess;
+        ::sdl::Procedure *m_sdlProcedure;
+    };
+
+    /**
      * @brief Visitor constructor
      *
-     * @param sedsPackage       SEDS package containing the activity
-     * @param asn1Model         Data model
-     * @param ivModel           IV model
-     * @param sdlProcess        Host SDL process
-     * @param sdlProcedure      Host SDL procedure
+     * @param context           Shared translation context
      * @param sdlTransition     Target SDL transition
      */
 
-    StatementTranslatorVisitor(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
-            ivm::IVModel *ivModel, ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure,
-            ::sdl::Transition *sdlTransition);
+    StatementTranslatorVisitor(Context &context, ::sdl::Transition *sdlTransition);
 
     /**
      * @brief   Translates SEDS activity invocation
@@ -121,11 +182,7 @@ public:
             -> std::unique_ptr<::sdl::ProcedureCall>;
 
 private:
-    const seds::model::Package &m_sedsPackage;
-    Asn1Acn::Asn1Model *m_asn1Model;
-    ivm::IVModel *m_ivModel;
-    ::sdl::Process *m_sdlProcess;
-    ::sdl::Procedure *m_sdlProcedure;
+    Context &m_context;
     ::sdl::Transition *m_sdlTransition;
 
     static auto findInterfaceDeclaration(ivm::IVModel *model, const QString functionName, const QString interfaceName)
@@ -160,9 +217,8 @@ private:
     static auto translateTypeCheck(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
             const seds::model::TypeCheck &check) -> std::unique_ptr<::sdl::Decision>;
 
-    static auto translateAnswer(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
-            ivm::IVModel *ivModel, ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure, ::sdl::Label *joinLabel,
-            const QString value, const seds::model::Body *body) -> std::unique_ptr<::sdl::Answer>;
+    static auto translateAnswer(Context &context, ::sdl::Label *joinLabel, const QString value,
+            const seds::model::Body *body) -> std::unique_ptr<::sdl::Answer>;
 
     static auto comparisonOperatorToString(const seds::model::ComparisonOperator op) -> QString;
 

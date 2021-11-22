@@ -39,21 +39,56 @@ using seds::model::SplineCalibrator;
 
 namespace conversion::sdl::translator {
 
-StatementTranslatorVisitor::StatementTranslatorVisitor(const seds::model::Package &sedsPackage,
-        Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel, ::sdl::Process *sdlProcess,
-        ::sdl::Procedure *sdlProcedure, ::sdl::Transition *sdlTransition)
+StatementTranslatorVisitor::Context::Context(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
+        ivm::IVModel *ivModel, ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure)
     : m_sedsPackage(sedsPackage)
     , m_asn1Model(asn1Model)
     , m_ivModel(ivModel)
     , m_sdlProcess(sdlProcess)
     , m_sdlProcedure(sdlProcedure)
+{
+    m_labelCount = 0;
+}
+
+auto StatementTranslatorVisitor::Context::uniqueLabelName(const QString prefix) -> QString
+{
+    m_labelCount++;
+    return prefix + QString::number(m_labelCount);
+}
+
+auto StatementTranslatorVisitor::Context::sedsPackage() -> const seds::model::Package &
+{
+    return m_sedsPackage;
+}
+
+auto StatementTranslatorVisitor::Context::asn1Model() -> Asn1Acn::Asn1Model *
+{
+    return m_asn1Model;
+}
+
+auto StatementTranslatorVisitor::Context::ivModel() -> ivm::IVModel *
+{
+    return m_ivModel;
+}
+
+auto StatementTranslatorVisitor::Context::sdlProcess() -> ::sdl::Process *
+{
+    return m_sdlProcess;
+}
+auto StatementTranslatorVisitor::Context::sdlProcedure() -> ::sdl::Procedure *
+{
+    return m_sdlProcedure;
+}
+
+StatementTranslatorVisitor::StatementTranslatorVisitor(Context &context, ::sdl::Transition *sdlTransition)
+    : m_context(context)
     , m_sdlTransition(sdlTransition)
 {
 }
 
 auto StatementTranslatorVisitor::operator()(const seds::model::ActivityInvocation &invocation) -> void
 {
-    auto task = translateActivityCall(m_sdlProcess, invocation);
+    auto task = translateActivityCall(m_context.sdlProcess(), invocation);
     m_sdlTransition->addAction(std::move(task));
 }
 
@@ -93,13 +128,12 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Calibration &cali
 
 auto StatementTranslatorVisitor::operator()(const seds::model::Conditional &conditional) -> void
 {
-    auto decision = translateBooleanExpression(m_sdlProcess, m_sdlProcedure, conditional.condition());
+    auto decision =
+            translateBooleanExpression(m_context.sdlProcess(), m_context.sdlProcedure(), conditional.condition());
     auto label = std::make_unique<::sdl::Label>(Escaper::escapeSdlName("changema"));
 
-    auto trueAnswer = translateAnswer(m_sedsPackage, m_asn1Model, m_ivModel, m_sdlProcess, m_sdlProcedure, label.get(),
-            "True", conditional.onConditionTrue());
-    auto falseAnswer = translateAnswer(m_sedsPackage, m_asn1Model, m_ivModel, m_sdlProcess, m_sdlProcedure, label.get(),
-            "False", conditional.onConditionFalse());
+    auto trueAnswer = translateAnswer(m_context, label.get(), "True", conditional.onConditionTrue());
+    auto falseAnswer = translateAnswer(m_context, label.get(), "False", conditional.onConditionFalse());
     decision->addAnswer(std::move(trueAnswer));
     decision->addAnswer(std::move(falseAnswer));
 
@@ -113,7 +147,7 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Iteration &iterat
     auto endLabel = std::make_unique<::sdl::Label>("loop_end");
     auto loopBackJoin = std::make_unique<::sdl::Join>();
     loopBackJoin->setLabel(startLabel.get());
-    const auto variable = findVariableDeclaration(m_sdlProcess, m_sdlProcedure,
+    const auto variable = findVariableDeclaration(m_context.sdlProcess(), m_context.sdlProcedure(),
             Escaper::escapeAsn1FieldName(iteration.iteratorVariableRef().value().value()));
 
     auto decision = std::make_unique<::sdl::Decision>();
@@ -126,8 +160,8 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Iteration &iterat
 
     if (std::holds_alternative<seds::model::Iteration::NumericRange>(iteration.range())) {
         const auto &range = std::get<seds::model::Iteration::NumericRange>(iteration.range());
-        const auto startValue = getOperandValue(m_sdlProcess, m_sdlProcedure, range.startAt());
-        const auto endValue = getOperandValue(m_sdlProcess, m_sdlProcedure, range.endAt());
+        const auto startValue = getOperandValue(m_context.sdlProcess(), m_context.sdlProcedure(), range.startAt());
+        const auto endValue = getOperandValue(m_context.sdlProcess(), m_context.sdlProcedure(), range.endAt());
         m_sdlTransition->addAction(
                 std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(variable->name(), startValue)));
 
@@ -153,8 +187,7 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Iteration &iterat
     m_sdlTransition->addAction(std::move(endLabel));
 
     if (iteration.doBody() != nullptr) {
-        StatementTranslatorVisitor nestedVisitor(
-                m_sedsPackage, m_asn1Model, m_ivModel, m_sdlProcess, m_sdlProcedure, transitionPointer);
+        StatementTranslatorVisitor nestedVisitor(m_context, transitionPointer);
         for (const auto &statement : iteration.doBody()->statements()) {
             std::visit(nestedVisitor, statement);
         }
@@ -162,8 +195,9 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Iteration &iterat
 
     if (std::holds_alternative<seds::model::Iteration::NumericRange>(iteration.range())) {
         const auto &range = std::get<seds::model::Iteration::NumericRange>(iteration.range());
-        const auto stepValue =
-                range.step().has_value() ? getOperandValue(m_sdlProcess, m_sdlProcedure, *range.step()) : "1";
+        const auto stepValue = range.step().has_value()
+                ? getOperandValue(m_context.sdlProcess(), m_context.sdlProcedure(), *range.step())
+                : "1";
         transitionPointer->addAction(
                 std::make_unique<::sdl::Task>("", QString("%1 := %1 + %2").arg(variable->name(), stepValue)));
     } else {
@@ -197,16 +231,16 @@ auto StatementTranslatorVisitor::operator()(const seds::model::SendCommandPrimit
             interfaceName, ivm::IVInterface::InterfaceType::Required, commandName);
 
     // Process name carries iv-escaped component name
-    const auto interface = findInterfaceDeclaration(m_ivModel, m_sdlProcess->name(), callName);
+    const auto interface = findInterfaceDeclaration(m_context.ivModel(), m_context.sdlProcess()->name(), callName);
 
     if (interface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
-        auto outputActions = translateOutput(m_sdlProcess, m_sdlProcedure, callName, sendCommand);
+        auto outputActions = translateOutput(m_context.sdlProcess(), m_context.sdlProcedure(), callName, sendCommand);
         for (auto &action : outputActions) {
             m_sdlTransition->addAction(std::move(action));
         }
     } else if (interface->kind() == ivm::IVInterface::OperationKind::Protected
             || interface->kind() == ivm::IVInterface::OperationKind::Unprotected) {
-        auto call = translateCall(m_sdlProcess, m_sdlProcedure, callName, sendCommand);
+        auto call = translateCall(m_context.sdlProcess(), m_context.sdlProcedure(), callName, sendCommand);
         m_sdlTransition->addAction(std::move(call));
     }
 }
@@ -466,16 +500,14 @@ auto StatementTranslatorVisitor::comparisonOperatorToString(const seds::model::C
     return "";
 }
 
-auto StatementTranslatorVisitor::translateAnswer(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
-        ivm::IVModel *ivModel, ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure, ::sdl::Label *joinLabel,
-        const QString value, const seds::model::Body *body) -> std::unique_ptr<::sdl::Answer>
+auto StatementTranslatorVisitor::translateAnswer(Context &context, ::sdl::Label *joinLabel, const QString value,
+        const seds::model::Body *body) -> std::unique_ptr<::sdl::Answer>
 {
     auto answer = std::make_unique<::sdl::Answer>();
     answer->setLiteral(::sdl::VariableLiteral(value));
     auto transition = std::make_unique<::sdl::Transition>();
     if (body != nullptr) {
-        StatementTranslatorVisitor nestedVisitor(
-                sedsPackage, asn1Model, ivModel, sdlProcess, sdlProcedure, transition.get());
+        StatementTranslatorVisitor nestedVisitor(context, transition.get());
         for (const auto &statement : body->statements()) {
             std::visit(nestedVisitor, statement);
         }
