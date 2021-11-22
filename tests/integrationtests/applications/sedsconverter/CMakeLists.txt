@@ -47,3 +47,8 @@ configure_file(test_comparator.sh test_comparator.sh COPYONLY)
 configure_file(resources/test_comparator.xml resources/test_comparator.xml COPYONLY)
 configure_file(resources/test_comparator.output resources/test_comparator.output COPYONLY)
 configure_file(resources/test_comparator.system_structure resources/test_comparator.system_structure COPYONLY)
+
+configure_file(test_factorial.sh test_factorial.sh COPYONLY)
+configure_file(resources/test_factorial.xml resources/test_factorial.xml COPYONLY)
+configure_file(resources/test_factorial.output resources/test_factorial.output COPYONLY)
+configure_file(resources/test_factorial.system_structure resources/test_factorial.system_structure COPYONLY)
