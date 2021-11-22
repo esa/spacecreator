@@ -62,6 +62,7 @@ IVAppWidget::IVAppWidget(IVEditorCore *core, QWidget *parent)
     initModelView();
     initImportView();
     initSharedView();
+    initLayerView();
 
     connect(m_document->itemsModel(), &IVItemModel::itemDoubleClicked, this, &IVAppWidget::onItemDoubleClicked);
 
@@ -134,10 +135,18 @@ void IVAppWidget::showContextMenuForIVModel(const QPoint &pos)
         ActionsManager::registerAction(
                 Q_FUNC_INFO, actExportSelectedSharedType, "Export component type", "Export component type");
     }
-
     QMenu *menu = new QMenu;
     menu->addActions(actions);
     menu->exec(ui->objectsView->mapToGlobal(pos));
+}
+
+void IVAppWidget::showAvailableLayers(const QPoint &pos)
+{
+    /** TODO: implement actions triggered from menu **/
+    QList<QAction *> actions;
+    QMenu *menu = new QMenu;
+    menu->addActions(actions);
+    menu->exec(ui->layerView->mapToGlobal(pos));
 }
 
 void IVAppWidget::copyItems()
@@ -357,6 +366,16 @@ void IVAppWidget::initSharedView()
     ui->sharedView->setModel(m_document->sharedVisualisationModel());
 }
 
+void IVAppWidget::initLayerView()
+{
+    ui->layerView->setObjectName(QLatin1String("IV Connection Layers"));
+    ui->layerView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
+    ui->layerView->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
+    ui->layerView->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
+    connect(ui->layerView, &QTreeView::customContextMenuRequested, this, &IVAppWidget::showAvailableLayers);
+    ui->layerView->setModel(m_document->layerVisualisationModel());
+}
+
 QVector<QAction *> IVAppWidget::initActions()
 {
     Q_ASSERT(m_document.data());
@@ -442,6 +461,17 @@ QVector<QAction *> IVAppWidget::initActions()
     connect(m_actCreateConnectionGroup, &QAction::triggered, this, [this]() { m_tool->groupSelectedItems(); });
     m_actCreateConnectionGroup->setIcon(QIcon(":/toolbar/icns/connection_group.svg"));
 
+    auto actManageConnectionLayers = new QAction(tr("Manage Connection Layers"));
+    ActionsManager::registerAction(
+            Q_FUNC_INFO, actManageConnectionLayers, "Connection Layer", "Manage Connection Layers");
+    actManageConnectionLayers->setCheckable(false);
+    //actManageConnectionLayers->setActionGroup(actionGroup);
+    connect(actManageConnectionLayers, &QAction::toggled, this, [this]() {
+        m_tool->setCurrentToolType(IVCreatorTool::ToolType::ConnectionLayer);
+        qWarning() << Q_FUNC_INFO << "Not implemented yet.";
+    });
+    actManageConnectionLayers->setIcon(QIcon(":/toolbar/icns/connection_layer.svg"));
+
     m_actRemove = new QAction(tr("Remove"));
     ActionsManager::registerAction(Q_FUNC_INFO, m_actRemove, "Remove", "Remove selected object");
     m_actRemove->setIcon(QIcon(QLatin1String(":/toolbar/icns/delete.svg")));
@@ -481,8 +511,8 @@ QVector<QAction *> IVAppWidget::initActions()
     m_actExitToParent->setIcon(QIcon(":/toolbar/icns/exit_parent.svg"));
 
     m_toolbarActions = { actCreateFunctionType, actCreateFunction, actCreateProvidedInterface,
-        actCreateRequiredInterface, actCreateComment, actCreateConnection, m_actCreateConnectionGroup, m_actRemove,
-        m_actZoomIn, m_actZoomOut, m_actExitToRoot, m_actExitToParent };
+        actCreateRequiredInterface, actCreateComment, actCreateConnection, m_actCreateConnectionGroup,
+        actManageConnectionLayers, m_actRemove, m_actZoomIn, m_actZoomOut, m_actExitToRoot, m_actExitToParent };
 
     connect(m_document->objectsModel(), &ivm::IVModel::rootObjectChanged, this, [this](const shared::Id &rootId) {
         Q_UNUSED(rootId)

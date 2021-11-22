@@ -20,6 +20,7 @@
 #include "commands/cmdcommentitemcreate.h"
 #include "commands/cmdconnectiongroupitemcreate.h"
 #include "commands/cmdconnectionitemcreate.h"
+#include "commands/cmdconnectionlayermanage.h"
 #include "commands/cmdentitiesremove.h"
 #include "commands/cmdentitygeometrychange.h"
 #include "commands/cmdfunctionitemcreate.h"
@@ -45,6 +46,7 @@
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
+#include "manageconnectionlayersdialog.h"
 #include "ui/grippointshandler.h"
 
 #include <QAction>
@@ -76,7 +78,7 @@ IVCreatorTool::IVCreatorTool(QGraphicsView *view, InterfaceDocument *doc)
 {
 }
 
-IVCreatorTool::~IVCreatorTool() { }
+IVCreatorTool::~IVCreatorTool() {}
 
 void IVCreatorTool::removeSelectedItems()
 {
@@ -358,7 +360,7 @@ bool IVCreatorTool::onMouseMove(QMouseEvent *e)
 
                     if (item->parentItem() == m_previewItem->parentItem()
                             || (m_previewItem->parentItem() == item
-                                    && !item->sceneBoundingRect().contains(expandedGeometry))) {
+                                       && !item->sceneBoundingRect().contains(expandedGeometry))) {
                         items.insert(iObjItem);
                     }
                 });
@@ -426,6 +428,10 @@ void IVCreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF 
 
         action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/connection_group.svg")), tr("Connection group"),
                 this, [this]() { groupSelectedItems(); });
+
+        action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/connection_layer.svg")), tr("Connection layer"),
+                this, [this, scenePos]() { handleToolType(ToolType::ConnectionLayer, scenePos); });
+
         const auto selectedItems = m_previewItem->scene()->selectedItems();
         const auto it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
                 [](const QGraphicsItem *item) { return item->type() == IVConnectionGraphicsItem::Type; });
@@ -510,6 +516,9 @@ bool IVCreatorTool::handleToolType(int type, const QPointF &pos)
             if (!handleConnectionCreate(pos))
                 return false;
             handleConnectionReCreate(m_connectionPoints);
+            break;
+        case ToolType::ConnectionLayer:
+            handleConnectionLayer();
             break;
         default:
             break;
@@ -817,8 +826,8 @@ void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints) cons
 
             ifaceCommons.type = info.endIface ? info.endIface->direction()
                                               : (graphicPoints.last() == info.connectionPoints.first()
-                                                              ? ivm::IVInterface::InterfaceType::Required
-                                                              : ivm::IVInterface::InterfaceType::Provided);
+                                                                ? ivm::IVInterface::InterfaceType::Required
+                                                                : ivm::IVInterface::InterfaceType::Provided);
 
             if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
                 return;
@@ -884,6 +893,19 @@ void IVCreatorTool::handleConnectionReCreate(const QVector<QPointF> &graphicPoin
             m_doc->commandsStack()->push(cmd);
         }
     }
+}
+
+void IVCreatorTool::handleConnectionLayer()
+{
+    /** TODO: implement dialog window and undo/redo command **/
+    m_toolType = ToolType::ConnectionLayer;
+    auto *dialog = new ManageConnectionLayersDialog(m_view->window());
+    if (dialog->exec() == QDialog::Accepted) {
+        auto *cmd = new cmd::CmdConnectionLayerManage(m_doc->layersModel());
+        m_doc->commandsStack()->push(cmd);
+    }
+    dialog->deleteLater();
+    m_doc->updateLayersModel();
 }
 
 bool IVCreatorTool::warnConnectionPreview(const QPointF &pos)

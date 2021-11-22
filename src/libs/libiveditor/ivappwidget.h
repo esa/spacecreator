@@ -51,6 +51,7 @@ public:
 
 private Q_SLOTS:
     void showContextMenuForIVModel(const QPoint &pos);
+    void showAvailableLayers(const QPoint &pos);
     void copyItems();
     void cutItems();
     void pasteItems();
@@ -67,6 +68,7 @@ private:
     void initModelView();
     void initImportView();
     void initSharedView();
+    void initLayerView();
 
     QVector<QAction *> initActions();
     QVector<QAction *> initViewActions();

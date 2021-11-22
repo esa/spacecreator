@@ -19,6 +19,7 @@
 
 #include "connectioncreationvalidator.h"
 #include "errorhub.h"
+#include "ivconnectionlayertype.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
@@ -147,6 +148,16 @@ void IVConnection::unsetInheritPI()
         return;
 
     handleInheritPIChange(IVConnection::InheritPIChange::NotInherit);
+}
+
+IVConnectionLayerType *IVConnection::layer() const
+{
+    if (targetInterface() != nullptr && sourceInterface() != nullptr) {
+        if (targetInterface()->layer() == sourceInterface()->layer()) {
+            return sourceInterface()->layer();
+        }
+    }
+    return IVConnectionLayerType::getDefaultConnectionLayer();
 }
 
 /*!
