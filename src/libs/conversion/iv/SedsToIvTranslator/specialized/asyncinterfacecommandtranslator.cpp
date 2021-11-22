@@ -126,7 +126,7 @@ QString AsyncInterfaceCommandTranslator::buildAsn1SequenceType(
         return foundType->second.asn1TypeName;
     } else {
         const auto cachedTypesCount = m_commandArgumentsCache.count(sedsCommandName);
-        auto bundledTypeName = createBundledTypeName(sedsCommandName, cachedTypesCount);
+        auto bundledTypeName = createBundledTypeName(Escaper::escapeAsn1TypeName(sedsCommandName), cachedTypesCount);
         createAsn1Sequence(bundledTypeName, arguments);
 
         m_commandArgumentsCache.insert({ sedsCommandName, { bundledTypeName, bundledTypeHash, std::move(arguments) } });
@@ -142,9 +142,9 @@ void AsyncInterfaceCommandTranslator::createAsn1Sequence(
     auto sequence = std::make_unique<Asn1Acn::Types::Sequence>(escapedName);
 
     for (const auto &[argumentName, argumentTypeName] : arguments) {
-        const auto escapedArgumentName = Escaper::escapeAsn1TypeName(argumentName);
+        const auto escapedArgumentName = Escaper::escapeAsn1FieldName(argumentName);
         const auto escapedArgumentTypeName = Escaper::escapeAsn1TypeName(argumentTypeName);
-        createAsn1SequenceComponent(argumentName, argumentTypeName, sequence.get());
+        createAsn1SequenceComponent(escapedArgumentName, escapedArgumentTypeName, sequence.get());
     }
 
     auto typeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
