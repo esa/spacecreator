@@ -48,7 +48,7 @@ public:
      * @param size - the size of the channel
      * @param type - the type of element in the channel
      */
-    ChannelInit(size_t size, Type type);
+    ChannelInit(size_t size, const Type &type);
 
     /**
      * @brief Getter for size of the channel

@@ -22,7 +22,6 @@
 namespace promela::model {
 MtypeRef::MtypeRef()
     : m_named(false)
-    , m_ref()
 {
 }
 

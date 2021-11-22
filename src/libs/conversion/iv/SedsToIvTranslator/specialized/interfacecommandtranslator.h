@@ -89,7 +89,7 @@ public:
      * @return Assembled name
      */
     static auto getCommandName(const QString &interfaceName, const ivm::IVInterface::InterfaceType type,
-            const QString &commandName) -> const QString;
+            const QString &commandName) -> QString;
 
 protected:
     /**

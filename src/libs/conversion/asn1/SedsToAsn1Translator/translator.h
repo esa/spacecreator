@@ -71,6 +71,17 @@ public:
      */
     virtual auto getDependencies() const -> std::set<ModelType> override;
 
+    /**
+     * @brief   Gets ASN.1 definitions for given SEDS package from given ASN.1 model
+     *
+     * @param   sedsPackage     SEDS package
+     * @param   asn1Model       ASN.1 model
+     *
+     * @return  Asn1 definitions
+     */
+    static auto getAsn1Definitions(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model)
+            -> Asn1Acn::Definitions *;
+
 private:
     /**
      * @brief   Translate SEDS model

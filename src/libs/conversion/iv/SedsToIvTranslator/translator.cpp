@@ -22,6 +22,7 @@
 #include "specialized/componentstranslator.h"
 
 #include <asn1library/asn1/asn1model.h>
+#include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/iv/IvOptions/options.h>
@@ -33,6 +34,7 @@
 
 using Asn1Acn::Asn1Model;
 using conversion::Escaper;
+using conversion::asn1::translator::SedsToAsn1Translator;
 using conversion::iv::IvOptions;
 using conversion::translator::TranslationException;
 using ivm::IVModel;
@@ -104,7 +106,7 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(const
 void SedsToIvTranslator::translatePackage(
         const seds::model::Package &sedsPackage, Asn1Model *asn1Model, IVModel *ivModel, bool generateFunction) const
 {
-    auto asn1Definitions = getAsn1Definitions(sedsPackage, asn1Model);
+    auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(sedsPackage, asn1Model);
 
     ComponentsTranslator componentsTranslator(sedsPackage, asn1Definitions);
     auto ivFunctions = componentsTranslator.translateComponents();
@@ -123,29 +125,6 @@ void SedsToIvTranslator::translatePackage(
     } else {
         ivModel->addObjects(ivFunctions);
     }
-}
-
-Asn1Acn::Definitions *SedsToIvTranslator::getAsn1Definitions(
-        const seds::model::Package &sedsPackage, Asn1Model *asn1Model)
-{
-    const auto asn1FileName = Escaper::escapeAsn1PackageName(sedsPackage.nameStr());
-    auto &asn1Files = asn1Model->data();
-    auto asn1File = std::find_if(
-            std::begin(asn1Files), std::end(asn1Files), [&](const auto &file) { return file->name() == asn1FileName; });
-    if (asn1File == asn1Files.end()) {
-        auto message = QString("Unable to find file %1 in the ASN.1 model").arg(asn1FileName);
-        throw TranslationException(std::move(message));
-    }
-
-    const auto asn1DefinitionsName = Escaper::escapeAsn1PackageName(sedsPackage.nameStr());
-    auto *asn1Definitions = (*asn1File)->definitions(asn1DefinitionsName);
-    if (!asn1Definitions) {
-        auto message =
-                QString("ASN.1 file %1 doesn't have definitions named %2").arg(asn1FileName).arg(asn1DefinitionsName);
-        throw TranslationException(std::move(message));
-    }
-
-    return asn1Definitions;
 }
 
 } // namespace conversion::iv::translator

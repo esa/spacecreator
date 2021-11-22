@@ -127,4 +127,18 @@ public:
     explicit UnsupportedValueException(const QString &enumName, const QString &valueTypeName);
 };
 
+/**
+ * @brief   Thrown when SEDS references a Function which is not found in the InterfaceView
+ */
+class MissingInterfaceViewFunctionException : public TranslationException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   functionName    Name of the missing Function
+     */
+    explicit MissingInterfaceViewFunctionException(const QString &functionName);
+};
+
 } // namespace conversion::translator

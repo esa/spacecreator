@@ -4,12 +4,12 @@ set(SOURCES translator.cpp
             specialized/statemachinetranslator.cpp
             specialized/activitytranslator.cpp
             specialized/mathoperationtranslator.cpp
-            specialized/statementvisitor.cpp)
+            specialized/statementtranslatorvisitor.cpp)
 set(INCLUDES translator.h
              specialized/statemachinetranslator.h
              specialized/activitytranslator.h
              specialized/mathoperationtranslator.h
-             specialized/statementvisitor.h)
+             specialized/statementtranslatorvisitor.h)
 
 add_library(SedsToSdlTranslator STATIC)
 target_sources(SedsToSdlTranslator

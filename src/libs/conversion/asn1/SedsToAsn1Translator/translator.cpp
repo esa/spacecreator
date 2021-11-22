@@ -140,4 +140,27 @@ std::vector<const seds::model::DataType *> SedsToAsn1Translator::collectDataType
     return sedsDataTypes;
 }
 
+Asn1Acn::Definitions *SedsToAsn1Translator::getAsn1Definitions(
+        const seds::model::Package &sedsPackage, Asn1Model *asn1Model)
+{
+    const auto asn1FileName = Escaper::escapeAsn1PackageName(sedsPackage.nameStr());
+    auto &asn1Files = asn1Model->data();
+    auto asn1File = std::find_if(
+            std::begin(asn1Files), std::end(asn1Files), [&](const auto &file) { return file->name() == asn1FileName; });
+    if (asn1File == asn1Files.end()) {
+        auto message = QString("Unable to find file %1 in the ASN.1 model").arg(asn1FileName);
+        throw TranslationException(std::move(message));
+    }
+
+    const auto asn1DefinitionsName = Escaper::escapeAsn1PackageName(sedsPackage.nameStr());
+    auto *asn1Definitions = (*asn1File)->definitions(asn1DefinitionsName);
+    if (!asn1Definitions) {
+        auto message =
+                QString("ASN.1 file %1 doesn't have definitions named %2").arg(asn1FileName).arg(asn1DefinitionsName);
+        throw TranslationException(std::move(message));
+    }
+
+    return asn1Definitions;
+}
+
 } // namespace conversion::asn1::translator

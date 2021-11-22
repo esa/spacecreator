@@ -47,7 +47,7 @@ PropertyTemplate::PropertyTemplate()
 {
 }
 
-PropertyTemplate::~PropertyTemplate() { }
+PropertyTemplate::~PropertyTemplate() {}
 
 QString PropertyTemplate::name() const
 {
@@ -303,19 +303,17 @@ void PropertyTemplate::initFromXml(const QDomElement &element)
         while (!scopeSubElement.isNull()) {
             const QString scopeName = scopeSubElement.tagName();
             const int scopeInt = scopeMeta.keyToValue(scopeName.toUtf8().data(), &ok);
-            if (!ok || scopeInt == -1) {
-                continue;
-            }
-
-            s |= scopeInt;
-            QDomElement attrValidatorElement = scopeSubElement.firstChildElement(QLatin1String("AttrValidator"));
-            while (!attrValidatorElement.isNull()) {
-                const QString attrValidatorName = attrValidatorElement.attribute(QLatin1String("name"));
-                const QString attrValidatorPattern = attrValidatorElement.attribute(QLatin1String("value"));
-                if (!attrValidatorName.isEmpty() && !attrValidatorPattern.isNull()) {
-                    attrValidators.insert(scopeInt, qMakePair(attrValidatorName, attrValidatorPattern));
+            if (ok && scopeInt != -1) {
+                s |= scopeInt;
+                QDomElement attrValidatorElement = scopeSubElement.firstChildElement(QLatin1String("AttrValidator"));
+                while (!attrValidatorElement.isNull()) {
+                    const QString attrValidatorName = attrValidatorElement.attribute(QLatin1String("name"));
+                    const QString attrValidatorPattern = attrValidatorElement.attribute(QLatin1String("value"));
+                    if (!attrValidatorName.isEmpty() && !attrValidatorPattern.isNull()) {
+                        attrValidators.insert(scopeInt, qMakePair(attrValidatorName, attrValidatorPattern));
+                    }
+                    attrValidatorElement = attrValidatorElement.nextSiblingElement(attrValidatorElement.tagName());
                 }
-                attrValidatorElement = attrValidatorElement.nextSiblingElement(attrValidatorElement.tagName());
             }
             scopeSubElement = scopeSubElement.nextSiblingElement();
         }

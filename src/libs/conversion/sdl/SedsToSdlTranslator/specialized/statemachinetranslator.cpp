@@ -19,9 +19,10 @@
 
 #include "statemachinetranslator.h"
 
-#include "statementvisitor.h"
+#include "statementtranslatorvisitor.h"
 
 #include <algorithm>
+#include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/iv/SedsToIvTranslator/specialized/interfacecommandtranslator.h>
@@ -32,12 +33,15 @@
 #include <sdl/SdlModel/task.h>
 
 using conversion::Escaper;
+using conversion::asn1::translator::SedsToAsn1Translator;
 using conversion::iv::translator::InterfaceCommandTranslator;
+using conversion::translator::MissingAsn1TypeDefinitionException;
+using conversion::translator::MissingInterfaceViewFunctionException;
 using conversion::translator::TranslationException;
 
 namespace conversion::sdl::translator {
 
-static constexpr auto IO_VARIABLE_PATTERN = "io_%1";
+static const QString IO_VARIABLE_PATTERN = "io_%1";
 
 auto StateMachineTranslator::translateStateMachine(const seds::model::StateMachine &sedsStateMachine,
         ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void
@@ -80,10 +84,10 @@ auto StateMachineTranslator::translateVariables(const seds::model::Package &seds
         const auto variableName = Escaper::escapeAsn1FieldName(variable.nameStr());
         const auto variableTypeName = Escaper::escapeAsn1TypeName(variable.type().nameStr());
         // TODO implement check for types imported from other packages
-        auto asn1Definitions = iv::translator::SedsToIvTranslator::getAsn1Definitions(sedsPackage, asn1Model);
+        auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(sedsPackage, asn1Model);
         const auto *referencedType = asn1Definitions->type(variableTypeName);
         if (referencedType == nullptr) {
-            throw TranslationException(QString("Type %1 not found").arg(variableTypeName));
+            throw MissingAsn1TypeDefinitionException(variableTypeName);
         }
         sdlProcess->addVariable(std::make_unique<::sdl::VariableDeclaration>(variableName, variableTypeName));
     }
@@ -95,7 +99,7 @@ auto StateMachineTranslator::createIoVariables(
     const auto functionName = Escaper::escapeIvName(sedsComponent.nameStr());
     const auto function = ivModel->getFunction(functionName, Qt::CaseSensitive);
     if (function == nullptr) {
-        throw TranslationException(QString("Function %1 not found in the InterfaceView").arg(functionName));
+        throw MissingInterfaceViewFunctionException(functionName);
     }
     for (const auto &interface : function->interfaces()) {
         if (interface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
@@ -110,7 +114,7 @@ auto StateMachineTranslator::createExternalProcedures(
     const auto functionName = Escaper::escapeIvName(sedsComponent.nameStr());
     const auto function = ivModel->getFunction(functionName, Qt::CaseSensitive);
     if (function == nullptr) {
-        throw TranslationException(QString("Function %1 not found in the InterfaceView").arg(functionName));
+        throw MissingInterfaceViewFunctionException(functionName);
     }
     for (const auto &interface : function->interfaces()) {
         if (interface->isRequired() && interface->kind() == ivm::IVInterface::OperationKind::Protected) {
@@ -121,7 +125,7 @@ auto StateMachineTranslator::createExternalProcedures(
 
 auto StateMachineTranslator::ioVariableName(const QString interfaceName) -> QString
 {
-    return QString(IO_VARIABLE_PATTERN).arg(interfaceName);
+    return IO_VARIABLE_PATTERN.arg(interfaceName);
 }
 
 auto StateMachineTranslator::createStartTransition(const seds::model::StateMachine &sedsStateMachine,
@@ -235,7 +239,8 @@ auto StateMachineTranslator::translateTransition(const seds::model::Transition &
     // TODO Guard
     // TODO From Exit
     if (sedsTransition.doActivity().has_value()) {
-        transition->addAction(StatementVisitor::translateActivityCall(sdlProcess, *sedsTransition.doActivity()));
+        transition->addAction(
+                StatementTranslatorVisitor::translateActivityCall(sdlProcess, *sedsTransition.doActivity()));
     }
     // TODO To Entry
     // State switch
