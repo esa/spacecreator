@@ -19,11 +19,22 @@
 
 #include "exporter.h"
 
+#include <QDomDocument>
 #include <conversion/common/export/exceptions.h>
+#include <conversion/common/overloaded.h>
+#include <seds/SedsModel/sedsmodel.h>
+#include <seds/SedsOptions/options.h>
 
 using conversion::Model;
+using conversion::ModelType;
 using conversion::Options;
+using conversion::seds::SedsOptions;
+using conversion::exporter::IncorrectModelException;
+using conversion::exporter::MissingOutputFilenameException;
 using conversion::exporter::NullModelException;
+using seds::model::DataSheet;
+using seds::model::PackageFile;
+using seds::model::SedsModel;
 
 namespace seds::exporter {
 
@@ -34,6 +45,48 @@ void SedsXmlExporter::exportModel(const Model *const model, const Options &optio
     if (model == nullptr) {
         throw NullModelException();
     }
+
+    const auto *const sedsModel = dynamic_cast<const SedsModel *>(model);
+    if (sedsModel == nullptr) {
+        throw IncorrectModelException(ModelType::Seds, model->modelType());
+    }
+
+    QDomDocument sedsDocument;
+
+    // clang-format off
+    std::visit(overloaded {
+        [&](const PackageFile &packageFile) { sedsDocument = exportPackageFile(packageFile); },
+        [&](const DataSheet &dataSheet) { sedsDocument = exportDataSheet(dataSheet); }
+    }, sedsModel->data());
+    // clang-format on
+
+    const QString &sedsDocumentContent = sedsDocument.toString();
+
+    const auto outputFilePath = options.value(SedsOptions::outputFilepath);
+    if (!outputFilePath) {
+        throw MissingOutputFilenameException(ModelType::Seds);
+    }
+
+    QSaveFile outputFile(*outputFilePath);
+    writeAndCommit(outputFile, sedsDocumentContent);
+}
+
+QDomDocument SedsXmlExporter::exportPackageFile(const PackageFile &packageFile) const
+{
+    Q_UNUSED(packageFile);
+
+    QDomDocument doc;
+
+    return doc;
+}
+
+QDomDocument SedsXmlExporter::exportDataSheet(const DataSheet &dataSheet) const
+{
+    Q_UNUSED(dataSheet);
+
+    QDomDocument doc;
+
+    return doc;
 }
 
 } // namespace seds::exporter

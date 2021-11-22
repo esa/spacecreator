@@ -21,6 +21,13 @@
 
 #include <conversion/common/export/modelexporter.h>
 
+class QDomDocument;
+
+namespace seds::model {
+class DataSheet;
+class PackageFile;
+} // namespace seds::model
+
 namespace seds::exporter {
 
 class SedsXmlExporter final : public conversion::exporter::ModelExporter
@@ -54,6 +61,10 @@ public:
      * @param   options     Options for export configuration
      */
     virtual auto exportModel(const conversion::Model *model, const conversion::Options &options) const -> void override;
+
+private:
+    auto exportPackageFile(const seds::model::PackageFile &packageFile) const -> QDomDocument;
+    auto exportDataSheet(const seds::model::DataSheet &dataSheet) const -> QDomDocument;
 };
 
 } // namespace seds::exporter
