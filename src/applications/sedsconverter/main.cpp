@@ -61,15 +61,15 @@ int main(int argc, char **argv)
                 cli.getSourceModelTypes(), cli.getTargetModelType(), cli.getAuxModelTypes(), std::move(options));
     } catch (const ImportException &ex) {
         const auto errorMessage = QString("Import failure: %1\n%2").arg(ex.errorMessage(), usage);
-        qFatal("%s", errorMessage.toLatin1().constData());
+        qCritical("%s", errorMessage.toLatin1().constData());
     } catch (const TranslationException &ex) {
         const auto errorMessage = QString("Translation failure: %1\n%2").arg(ex.errorMessage(), usage);
-        qFatal("%s", errorMessage.toLatin1().constData());
+        qCritical("%s", errorMessage.toLatin1().constData());
     } catch (const ExportException &ex) {
         const auto errorMessage = QString("Export failure: %1\n%2").arg(ex.errorMessage(), usage);
-        qFatal("%s", errorMessage.toLatin1().constData());
+        qCritical("%s", errorMessage.toLatin1().constData());
     } catch (const ConversionException &ex) {
         const auto errorMessage = QString("Conversion failure: %1\n%2").arg(ex.errorMessage(), usage);
-        qFatal("%s", errorMessage.toLatin1().constData());
+        qCritical("%s", errorMessage.toLatin1().constData());
     }
 }
