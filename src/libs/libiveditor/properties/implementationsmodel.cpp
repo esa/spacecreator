@@ -151,11 +151,11 @@ bool ImplementationsModel::setData(const QModelIndex &index, const QVariant &val
     } else if ((role == Qt::DisplayRole || role == Qt::EditRole)
             && (index.column() == Column::Name || index.column() == Column::Language)) {
         EntityAttribute language = m_function->implementations().at(index.row());
-        if (index.column() == Column::Name) {
+        if (index.column() == Column::Name && language.name() != value.toString()) {
             QString name = uniqueName(value.toString());
             language.setName(name);
         }
-        if (index.column() == Column::Language) {
+        if (index.column() == Column::Language && language.value() != value) {
             language.setValue(value.toString());
         }
         auto cmd = new cmd::CmdFunctionImplementationUpdate(m_projectPath, m_function, index.row(), language);
