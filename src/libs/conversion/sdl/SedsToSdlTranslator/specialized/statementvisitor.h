@@ -39,7 +39,6 @@ namespace conversion::sdl::translator {
  */
 class StatementVisitor final
 {
-
 public:
     /**
      * @brief Visitor constructor

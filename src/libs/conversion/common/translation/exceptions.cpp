@@ -59,4 +59,9 @@ UnsupportedValueException::UnsupportedValueException(const QString &enumName, co
 {
 }
 
+MissingInterfaceViewFunctionException::MissingInterfaceViewFunctionException(const QString &functionName)
+    : TranslationException(QString("Function %1 not found in the InterfaceView").arg(functionName))
+{
+}
+
 } // namespace conversion::translator
