@@ -6,6 +6,7 @@ set(SOURCES exceptions.cpp
             escaper/escaper.cpp
             escaper/exceptions.cpp
             export/exceptions.cpp
+            export/modelexporter.cpp
             import/exceptions.cpp
             translation/exceptions.cpp
             translation/translator.cpp)

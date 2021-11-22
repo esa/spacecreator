@@ -17,31 +17,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
-
 #include "export/modelexporter.h"
 
-namespace Asn1Acn {
-class File;
-}
-class QSaveFile;
+#include "export/exceptions.h"
 
-namespace conversion::asn1::exporter {
-class Asn1Exporter final : public ::conversion::exporter::ModelExporter
+namespace conversion::exporter {
+
+void ModelExporter::writeAndCommit(QSaveFile &outputFile, const QString &data) const
 {
-public:
-    /**
-     * @brief   Exports ASN.1 and ACN models to separate files
-     *
-     * @param   model       Model to export
-     * @param   options     Options for export configuration
-     */
-    virtual auto exportModel(const Model *model, const Options &options) const -> void override;
+    if (!outputFile.open(QIODevice::WriteOnly)) {
+        throw ExportException(QString("Failed to open a file %1").arg(outputFile.fileName()));
+    }
 
-private:
-    auto exportAsn1Model(const Asn1Acn::File *file, const Options &options) const -> void;
-    auto exportAcnModel(const Asn1Acn::File *file, const Options &options) const -> void;
+    if (outputFile.write(data.toUtf8(), qint64(data.size())) == -1) {
+        throw ExportException(QString("Failed to write a file %1").arg(outputFile.fileName()));
+    }
 
-    auto makeFilePath(const QString &pathPrefix, const QString &fileName, const QString &extension) const -> QString;
-};
-} // namespace conversion::asn1::exporter
+    if (!outputFile.commit()) {
+        throw ExportException(QString("Failed to commit a transaction in %1").arg(outputFile.fileName()));
+    }
+}
+
+} // namespace conversion::exporter

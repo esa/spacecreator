@@ -74,22 +74,7 @@ void SdlExporter::exportProcess(const Process &process, const Options &options) 
     const auto filePath = makeFilePath(pathPrefix, process.name(), "pr");
 
     QSaveFile outputFile(filePath);
-    writeAndCommit(outputFile, serializedProcess.toStdString());
-}
-
-void SdlExporter::writeAndCommit(QSaveFile &outputFile, const std::string &data) const
-{
-    if (!outputFile.open(QIODevice::WriteOnly)) {
-        throw ExportException(QString("Failed to open a file %1").arg(outputFile.fileName()));
-    }
-
-    if (outputFile.write(data.c_str()) == -1) {
-        throw ExportException(QString("Failed to write a file %1").arg(outputFile.fileName()));
-    }
-
-    if (!outputFile.commit()) {
-        throw ExportException(QString("Failed to commit a transaction in %1").arg(outputFile.fileName()));
-    }
+    writeAndCommit(outputFile, serializedProcess);
 }
 
 QString SdlExporter::makeFilePath(const QString &pathPrefix, const QString &fileName, const QString &extension) const

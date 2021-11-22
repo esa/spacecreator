@@ -1,7 +1,5 @@
 #pragma once
 
-namespace conversion {
-
 /**
  * @brief   Overloaded pattern for the std::visit
  */
@@ -11,5 +9,3 @@ struct overloaded : Ts... {
 };
 template<class... Ts>
 overloaded(Ts...)->overloaded<Ts...>;
-
-} // namespace conversion
