@@ -34,6 +34,7 @@ using conversion::Options;
 using conversion::exporter::ExportException;
 using conversion::exporter::IncorrectModelException;
 using conversion::exporter::MissingOutputFilenameException;
+using conversion::exporter::NullModelException;
 using conversion::sdl::SdlOptions;
 using sdl::SdlModel;
 
@@ -42,7 +43,7 @@ namespace sdl::exporter {
 void SdlExporter::exportModel(const Model *const model, const Options &options) const
 {
     if (model == nullptr) {
-        throw ExportException("Model to export is null");
+        throw NullModelException();
     }
 
     const auto *const sdlModel = dynamic_cast<const SdlModel *>(model);

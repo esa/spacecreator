@@ -19,16 +19,21 @@
 
 #include "exporter.h"
 
+#include <conversion/common/export/exceptions.h>
+
 using conversion::Model;
 using conversion::Options;
+using conversion::exporter::NullModelException;
 
 namespace seds::exporter {
 
 void SedsXmlExporter::exportModel(const Model *const model, const Options &options) const
 {
-    // TODO: implementation
-    Q_UNUSED(model);
     Q_UNUSED(options);
+
+    if (model == nullptr) {
+        throw NullModelException();
+    }
 }
 
 } // namespace seds::exporter

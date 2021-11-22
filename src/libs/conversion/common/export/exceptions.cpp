@@ -26,6 +26,11 @@ ExportException::ExportException(QString message)
 {
 }
 
+NullModelException::NullModelException()
+    : ExportException("Model to export is null")
+{
+}
+
 IncorrectModelException::IncorrectModelException(ModelType expectedModelType, ModelType receivedModelType)
     : ExportException(QString("Incorrect model passed, expected %1 model, got %2 model")
                               .arg(modelTypeToString(expectedModelType))

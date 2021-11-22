@@ -33,13 +33,14 @@ using conversion::asn1::Asn1Options;
 using conversion::exporter::ExportException;
 using conversion::exporter::IncorrectModelException;
 using conversion::exporter::MissingOutputFilenameException;
+using conversion::exporter::NullModelException;
 
 namespace conversion::asn1::exporter {
 
 void Asn1Exporter::exportModel(const Model *const model, const Options &options) const
 {
     if (model == nullptr) {
-        throw ExportException("Model to export is null");
+        throw NullModelException();
     }
 
     const auto *const asn1Model = dynamic_cast<const Asn1Model *>(model);
