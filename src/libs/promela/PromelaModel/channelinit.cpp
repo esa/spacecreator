@@ -20,7 +20,7 @@
 #include "channelinit.h"
 
 namespace promela::model {
-ChannelInit::ChannelInit(size_t size, Type type)
+ChannelInit::ChannelInit(size_t size, const Type &type)
     : m_size(size)
 {
     m_types.append(type);

@@ -305,6 +305,6 @@ QString Asn1ItemTypeVisitor::constructTypeName(QString name)
     if (m_baseTypeName.has_value()) {
         return QString("%1_%2").arg(m_baseTypeName.value()).arg(Escaper::escapePromelaName(m_name));
     }
-    return Escaper::escapePromelaName(name);
+    return Escaper::escapePromelaName(std::move(name));
 }
 }

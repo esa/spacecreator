@@ -73,7 +73,7 @@ const QString &InterfaceCommandTranslator::interfaceTypeToString(ivm::IVInterfac
     }
 }
 
-const QString InterfaceCommandTranslator::getCommandName(
+QString InterfaceCommandTranslator::getCommandName(
         const QString &interfaceName, const ivm::IVInterface::InterfaceType type, const QString &commandName)
 {
     return Escaper::escapeIvName(
