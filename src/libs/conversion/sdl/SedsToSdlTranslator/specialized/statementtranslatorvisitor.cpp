@@ -39,6 +39,10 @@ using seds::model::SplineCalibrator;
 
 namespace conversion::sdl::translator {
 
+static const QString LOOP_START_LABEL_PREFIX = "loop_start_";
+static const QString LOOP_END_LABEL_PREFIX = "loop_end_";
+static const QString CONDITION_END_LABEL_PREFIX = "condition_";
+
 StatementTranslatorVisitor::Context::Context(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
         ivm::IVModel *ivModel, ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure)
     : m_sedsPackage(sedsPackage)
@@ -130,7 +134,7 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Conditional &cond
 {
     auto decision =
             translateBooleanExpression(m_context.sdlProcess(), m_context.sdlProcedure(), conditional.condition());
-    auto label = std::make_unique<::sdl::Label>(Escaper::escapeSdlName("changema"));
+    auto label = std::make_unique<::sdl::Label>(m_context.uniqueLabelName(CONDITION_END_LABEL_PREFIX));
 
     auto trueAnswer = translateAnswer(m_context, label.get(), "True", conditional.onConditionTrue());
     auto falseAnswer = translateAnswer(m_context, label.get(), "False", conditional.onConditionFalse());
@@ -143,8 +147,8 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Conditional &cond
 
 auto StatementTranslatorVisitor::operator()(const seds::model::Iteration &iteration) -> void
 {
-    auto startLabel = std::make_unique<::sdl::Label>("loop_start");
-    auto endLabel = std::make_unique<::sdl::Label>("loop_end");
+    auto startLabel = std::make_unique<::sdl::Label>(m_context.uniqueLabelName(LOOP_START_LABEL_PREFIX));
+    auto endLabel = std::make_unique<::sdl::Label>(m_context.uniqueLabelName(LOOP_END_LABEL_PREFIX));
     auto loopBackJoin = std::make_unique<::sdl::Join>();
     loopBackJoin->setLabel(startLabel.get());
     const auto variable = findVariableDeclaration(m_context.sdlProcess(), m_context.sdlProcedure(),

@@ -24,7 +24,7 @@ process Comparator;
             /* CIF output (250, 150), (150, 75) */
             output AsyncComparator_Less_Ri(io_AsyncComparator_Less_Ri);
             /* CIF join (250, 150), (150, 75) */
-            join changema;
+            join condition_1;
                 /* CIF ANSWER (585, 323), (77, 24) */
                 (False):
             /* CIF task (250, 150), (150, 75) */
@@ -32,10 +32,10 @@ process Comparator;
             /* CIF output (250, 150), (150, 75) */
             output AsyncComparator_Less_Ri(io_AsyncComparator_Less_Ri);
             /* CIF join (250, 150), (150, 75) */
-            join changema;
+            join condition_1;
             enddecision;
         /* CIF label (250, 150), (150, 75) */
-        changema:
+        condition_1:
         return ;
     endprocedure;
     /* CIF START (9, 285), (70, 35) */
