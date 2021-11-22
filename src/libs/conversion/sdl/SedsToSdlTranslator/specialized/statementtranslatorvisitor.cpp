@@ -26,6 +26,7 @@
 
 #include <algorithm>
 #include <conversion/common/escaper/escaper.h>
+#include <conversion/common/overloaded.h>
 #include <conversion/iv/SedsToIvTranslator/specialized/interfacecommandtranslator.h>
 #include <ivcore/ivfunction.h>
 
@@ -35,14 +36,6 @@ using conversion::translator::TranslationException;
 using seds::model::CoreMathOperator;
 using seds::model::Polynomial;
 using seds::model::SplineCalibrator;
-
-// Overload pattern
-template<class... Ts>
-struct overload : Ts... {
-    using Ts::operator()...;
-};
-template<class... Ts>
-overload(Ts...)->overload<Ts...>;
 
 namespace conversion::sdl::translator {
 
@@ -72,14 +65,14 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Assignment &assig
         const auto action =
                 QString("%1 := %2").arg(targetName, std::get<seds::model::VariableRef>(element).value().value());
         m_sdlTransition->addAction(std::make_unique<::sdl::Task>("", action));
-        return;
+
     } else if (std::holds_alternative<seds::model::ValueOperand>(element)) {
         const auto action =
                 QString("%1 := %2").arg(targetName, std::get<seds::model::ValueOperand>(element).value().value());
         m_sdlTransition->addAction(std::make_unique<::sdl::Task>("", action));
-        return;
+    } else {
+        throw TranslationException("Assignment not implemented");
     }
-    throw TranslationException("Assignment not implemented");
 }
 
 auto StatementTranslatorVisitor::operator()(const seds::model::Calibration &calibration) -> void
@@ -92,10 +85,11 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Calibration &cali
         const auto action = QString("%1 := %2").arg(targetName, translatePolynomial(sourceName, polynomial));
         m_sdlTransition->addAction(std::make_unique<::sdl::Task>("", action));
         return;
+    } else {
+        // TODO Spline calibrator - postponed, as it requires generation of a custom procedure,
+        // and possibly a custom type
+        throw TranslationException("Calibration activity not implemented");
     }
-    // TODO Spline calibrator - postponed, as it requires generation of a custom procedure,
-    // and possibly a custom type
-    throw TranslationException("Calibration activity not implemented");
 }
 
 auto StatementTranslatorVisitor::operator()(const seds::model::Conditional &conditional) -> void
@@ -143,8 +137,7 @@ auto StatementTranslatorVisitor::operator()(const seds::model::SendCommandPrimit
         for (auto &action : outputActions) {
             m_sdlTransition->addAction(std::move(action));
         }
-    }
-    if (interface->kind() == ivm::IVInterface::OperationKind::Protected
+    } else if (interface->kind() == ivm::IVInterface::OperationKind::Protected
             || interface->kind() == ivm::IVInterface::OperationKind::Unprotected) {
         auto call = translateCall(m_sdlProcess, m_sdlProcedure, callName, sendCommand);
         m_sdlTransition->addAction(std::move(call));
@@ -173,7 +166,7 @@ auto StatementTranslatorVisitor::translateActivityCall(::sdl::Process *process,
     for (const auto &argument : invocation.argumentValues()) {
         call->addArgument(std::move(translateArgument(process, nullptr, argument)));
     }
-    return std::move(call);
+    return call;
 }
 
 auto StatementTranslatorVisitor::findInterfaceDeclaration(
@@ -222,14 +215,15 @@ auto StatementTranslatorVisitor::translateArgument(::sdl::Process *process, ::sd
     if (std::holds_alternative<seds::model::ValueOperand>(argument.value())) {
         const auto &value = std::get<seds::model::ValueOperand>(argument.value());
         return std::make_unique<::sdl::VariableLiteral>(value.value().value());
-    }
-    if (std::holds_alternative<seds::model::VariableRefOperand>(argument.value())) {
+    } else if (std::holds_alternative<seds::model::VariableRefOperand>(argument.value())) {
         const auto &value = std::get<seds::model::VariableRefOperand>(argument.value());
         const auto variableName = Escaper::escapeAsn1FieldName(value.variableRef().value().value());
         const auto variableDeclaration = findVariableDeclaration(process, sdlProcedure, variableName);
         return std::make_unique<::sdl::VariableReference>(variableDeclaration);
+    } else {
+        throw TranslationException("Argument not implemented");
+        return std::unique_ptr<::sdl::VariableReference>();
     }
-    return std::unique_ptr<::sdl::VariableReference>();
 }
 
 auto StatementTranslatorVisitor::translatePolynomial(const QString variable, const seds::model::Polynomial &polynomial)
@@ -300,7 +294,7 @@ auto StatementTranslatorVisitor::translateOutput(::sdl::Process *hostProcess, ::
         for (const auto &argument : sendCommand.argumentValues()) {
             const auto fieldName = Escaper::escapeAsn1FieldName(argument.name().value());
             const auto source = std::visit(
-                    overload { [](const seds::model::ValueOperand &operand) { return operand.value().value(); },
+                    overloaded { [](const seds::model::ValueOperand &operand) { return operand.value().value(); },
                             [](const seds::model::VariableRefOperand &operand) {
                                 return Escaper::escapeAsn1FieldName(operand.variableRef().value().value());
                             } },

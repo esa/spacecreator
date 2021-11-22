@@ -24,18 +24,11 @@
 #include "translation/exceptions.h"
 
 #include <conversion/common/escaper/escaper.h>
+#include <conversion/common/overloaded.h>
 #include <conversion/iv/SedsToIvTranslator/specialized/interfacecommandtranslator.h>
 
 using conversion::Escaper;
 using conversion::translator::TranslationException;
-
-// Overload pattern
-template<class... Ts>
-struct overload : Ts... {
-    using Ts::operator()...;
-};
-template<class... Ts>
-overload(Ts...)->overload<Ts...>;
 
 namespace conversion::sdl::translator {
 
@@ -62,10 +55,10 @@ auto MathOperationTranslator::translateMutableExpression(Expression &expression,
 {
     const auto &head = expression.front();
     expression.pop();
-    return std::visit(overload { [&outIsComplexValue](const seds::model::ValueOperand &value) {
-                                    outIsComplexValue = false;
-                                    return value.value().value();
-                                },
+    return std::visit(overloaded { [&outIsComplexValue](const seds::model::ValueOperand &value) {
+                                      outIsComplexValue = false;
+                                      return value.value().value();
+                                  },
                               [&outIsComplexValue](const seds::model::VariableRef &value) {
                                   outIsComplexValue = false;
                                   return Escaper::escapeAsn1FieldName(value.value().value());
@@ -87,7 +80,6 @@ auto MathOperationTranslator::translateOperator(
     // This code depends on the presence of built-in operators in SDL software
     // Math operator variant has only one possible type
     switch (std::get<CoreMathOperator>(op.mathOperator())) {
-
     case CoreMathOperator::Abs:
         return QString("abs(%1)").arg(translateMutableExpression(expression, unused));
     case CoreMathOperator::Acos:
