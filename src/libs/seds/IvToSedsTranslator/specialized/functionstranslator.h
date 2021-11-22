@@ -41,26 +41,13 @@ public:
      * @brief   Deleted constructor
      */
     FunctionsTranslator() = delete;
-    /**
-     * @brief   Deleted copy constructor
-     */
-    FunctionsTranslator(const FunctionsTranslator &) = delete;
-    /**
-     * @brief   Deleted move constructor
-     */
-    FunctionsTranslator(FunctionsTranslator &&) = delete;
-    /**
-     * @brief   Deleted copy assignment operator
-     */
-    FunctionsTranslator &operator=(const FunctionsTranslator &) = delete;
-    /**
-     * @brief   Deleted move assignment operator
-     */
-    FunctionsTranslator &operator=(FunctionsTranslator &&) = delete;
 
 public:
     /**
      * @brief   Translates InterfaceView functions to SEDS components
+     *
+     * @param   ivFunction      Function to translate
+     * @param   sedsPackage     Package where created component will be placed
      */
     static auto translateFunction(const ivm::IVFunction *ivFunction, ::seds::model::Package &sedsPackage) -> void;
 
