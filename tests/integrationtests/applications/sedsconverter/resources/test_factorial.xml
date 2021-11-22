@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="Factorial">
+    <DataTypeSet>
+      <IntegerDataType name="Number">
+        <LongDescription>Number</LongDescription>
+        <IntegerDataEncoding encoding="twosComplement" sizeInBits="32" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="-1000000" max="1000000" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="AsyncFactorialType">
+        <LongDescription>Interface for performing calculations</LongDescription>
+        <CommandSet>
+          <Command name="CalculateFactorial" mode="async">
+            <LongDescription>Calculate factorial</LongDescription>
+            <Argument name="x" type="Number" mode="in" />
+            <Argument name="result" type="Number" mode="notify" />
+          </Command>
+          <Command name="Init" mode="async">
+            <LongDescription>Initialize</LongDescription>
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="Factorial">
+        <LongDescription></LongDescription>
+        <ProvidedInterfaceSet>
+          <Interface name="AsyncFactorial" type="AsyncFactorialType"></Interface>
+        </ProvidedInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="x" type="Number"></Variable>
+            <Variable name="tmp" type="Number" />
+            <Variable name="iterator" type="Number" />
+          </VariableSet>
+          <ActivitySet>
+            <Activity name="CalculateFactorial">
+              <Argument name="x" type="Number" />
+              <Body>
+                <Assignment outputVariableRef="tmp">
+                  <Value value="1" />
+                </Assignment>
+                <Iteration iteratorVariableRef="iterator">
+                  <StartAt>
+                    <Value value="1" />
+                  </StartAt>
+                  <EndAt>
+                    <VariableRef variableRef="x" />
+                  </EndAt>
+                  <Do>
+                    <MathOperation outputVariableRef="tmp">
+                      <Operator operator="multiply" />
+                      <VariableRef variableRef="tmp" />
+                      <VariableRef variableRef="iterator" />
+                    </MathOperation>
+                  </Do>
+                </Iteration>
+                <SendCommandPrimitive command="CalculateFactorial" interface="AsyncFactorial">
+                  <ArgumentValue name="result">
+                    <VariableRef variableRef="tmp" />
+                  </ArgumentValue>
+                </SendCommandPrimitive>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="Factorial">
+              <EntryState name="Off"></EntryState>
+              <State name="Idle" />
+              <Transition fromState="Idle" toState="Idle" name="Calc">
+                <OnCommandPrimitive command="CalculateFactorial" interface="AsyncFactorial">
+                  <ArgumentValue name="x" outputVariableRef="x" />
+                </OnCommandPrimitive>
+                <Do activity="CalculateFactorial">
+                  <ArgumentValue name="x">
+                    <VariableRef variableRef="x" />
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+              <Transition fromState="Off" toState="Idle" name="Init">
+                <OnCommandPrimitive interface="AsyncFactorial" command="Init" />
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

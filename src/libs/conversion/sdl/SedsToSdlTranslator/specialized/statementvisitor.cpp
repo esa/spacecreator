@@ -117,7 +117,6 @@ auto StatementVisitor::operator()(const seds::model::Conditional &conditional) -
 auto StatementVisitor::operator()(const seds::model::Iteration &iteration) -> void
 {
     auto startLabel = std::make_unique<::sdl::Label>("loop_start");
-    auto bodyLabel = std::make_unique<::sdl::Label>("loop_body");
     auto endLabel = std::make_unique<::sdl::Label>("loop_end");
     auto loopBackJoin = std::make_unique<::sdl::Join>();
     loopBackJoin->setLabel(startLabel.get());
@@ -131,19 +130,6 @@ auto StatementVisitor::operator()(const seds::model::Iteration &iteration) -> vo
     auto continueTransition = std::make_unique<::sdl::Transition>();
     auto exitJoin = std::make_unique<::sdl::Join>();
     exitJoin->setLabel(endLabel.get());
-    auto continueJoin = std::make_unique<::sdl::Join>();
-    continueJoin->setLabel(bodyLabel.get());
-
-    exitTransition->addAction(std::move(exitJoin));
-    exitLoop->setLiteral(::sdl::VariableLiteral("False"));
-    exitLoop->setTransition(std::move(exitTransition));
-
-    continueTransition->addAction(std::move(continueJoin));
-    continueLoop->setLiteral(::sdl::VariableLiteral("True"));
-    continueLoop->setTransition(std::move(continueTransition));
-
-    decision->addAnswer(std::move(exitLoop));
-    decision->addAnswer(std::move(continueLoop));
 
     if (std::holds_alternative<seds::model::Iteration::NumericRange>(iteration.range())) {
         const auto &range = std::get<seds::model::Iteration::NumericRange>(iteration.range());
@@ -151,33 +137,46 @@ auto StatementVisitor::operator()(const seds::model::Iteration &iteration) -> vo
         const auto endValue = getOperandValue(m_sdlProcess, m_sdlProcedure, range.endAt());
         m_sdlTransition->addAction(
                 std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(variable->name(), startValue)));
-        m_sdlTransition->addAction(std::move(startLabel));
 
+        m_sdlTransition->addAction(std::move(startLabel));
         decision->setExpression(
                 std::make_unique<::sdl::Expression>(QString("%1 <= %2").arg(variable->name(), endValue)));
     } else {
         throw TranslationException("Variable range not implemented");
     }
 
+    exitTransition->addAction(std::move(exitJoin));
+    exitLoop->setLiteral(::sdl::VariableLiteral("False"));
+    exitLoop->setTransition(std::move(exitTransition));
+
+    continueLoop->setLiteral(::sdl::VariableLiteral("True"));
+    continueLoop->setTransition(std::move(continueTransition));
+    // This needs to be saved so that actual body actions can be added
+    auto transitionPointer = continueLoop->transition();
+
+    decision->addAnswer(std::move(exitLoop));
+    decision->addAnswer(std::move(continueLoop));
     m_sdlTransition->addAction(std::move(decision));
-    m_sdlTransition->addAction(std::move(bodyLabel));
+    m_sdlTransition->addAction(std::move(endLabel));
 
     if (iteration.doBody() != nullptr) {
+        StatementVisitor nestedVisitor(
+                m_sedsPackage, m_asn1Model, m_ivModel, m_sdlProcess, m_sdlProcedure, transitionPointer);
         for (const auto &statement : iteration.doBody()->statements()) {
-            std::visit(*this, statement);
+            std::visit(nestedVisitor, statement);
         }
     }
+
     if (std::holds_alternative<seds::model::Iteration::NumericRange>(iteration.range())) {
         const auto &range = std::get<seds::model::Iteration::NumericRange>(iteration.range());
         const auto stepValue =
                 range.step().has_value() ? getOperandValue(m_sdlProcess, m_sdlProcedure, *range.step()) : "1";
-        m_sdlTransition->addAction(
+        transitionPointer->addAction(
                 std::make_unique<::sdl::Task>("", QString("%1 := %1 + %2").arg(variable->name(), stepValue)));
     } else {
         throw TranslationException("Variable range not implemented");
     }
-    m_sdlTransition->addAction(std::move(loopBackJoin));
-    m_sdlTransition->addAction(std::move(endLabel));
+    transitionPointer->addAction(std::move(loopBackJoin));
 }
 
 auto StatementVisitor::operator()(const seds::model::MathOperation &operation) -> void
