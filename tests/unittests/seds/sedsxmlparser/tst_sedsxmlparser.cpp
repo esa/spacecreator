@@ -44,9 +44,6 @@ public Q_SLOTS:
     void testSimpleDataTypesParsing();
 };
 
-/// \SRS  ETB-FUN-2040
-/// \SRS  ETB-FUN-2050
-/// \SRS  ETB-FUN-2060
 void tst_SedsXmlParser::testComponentsParsing()
 {
     try {
@@ -93,7 +90,6 @@ void tst_SedsXmlParser::testComponentsParsing()
     }
 }
 
-/// \SRS  ETB-FUN-1070
 void tst_SedsXmlParser::testContainerDataTypesParsing()
 {
     try {
@@ -123,7 +119,6 @@ void tst_SedsXmlParser::testContainerDataTypesParsing()
     }
 }
 
-/// \SRS  ETB-FUN-1010
 void tst_SedsXmlParser::testDeviceParsing()
 {
     try {

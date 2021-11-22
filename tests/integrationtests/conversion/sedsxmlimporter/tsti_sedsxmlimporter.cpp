@@ -44,7 +44,6 @@ public Q_SLOTS:
 };
 
 /// \SRS  ETB-FUN-40
-/// \SRS  ETB-FUN-1070
 void tsti_SedsXmlImporter::testValid()
 {
     Options options;

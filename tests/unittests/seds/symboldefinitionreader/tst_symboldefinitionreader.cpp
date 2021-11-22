@@ -43,7 +43,6 @@ public Q_SLOTS:
     void readInvalidFile();
 };
 
-/// \SRS  ETB-FUN-120
 void tst_SymbolDefinitionReader::readValidFile()
 {
     SymbolDefinitionReader::ExternalReferencesMap externalReferences;

@@ -220,7 +220,6 @@ void tst_SedsToAsn1Translator::testResolvingUndeclaredType()
 }
 
 /// \SRS  ETB-FUN-210
-/// \SRS  ETB-FUN-3090
 void tst_SedsToAsn1Translator::testTranslateArrayDataTypeOneDimension()
 {
     // clang-format off
@@ -266,7 +265,6 @@ void tst_SedsToAsn1Translator::testTranslateArrayDataTypeOneDimension()
 }
 
 /// \SRS  ETB-FUN-210
-/// \SRS  ETB-FUN-3090
 void tst_SedsToAsn1Translator::testTranslateArrayDataTypeMultiDimension()
 {
     // clang-format off
@@ -328,7 +326,6 @@ void tst_SedsToAsn1Translator::testTranslateArrayDataTypeMultiDimension()
 }
 
 /// \SRS  ETB-FUN-140
-/// \SRS  ETB-FUN-3120
 void tst_SedsToAsn1Translator::testTranslateBinaryDataType()
 {
     const auto sedsModel = SedsModelBuilder("Model").withBinaryDataType("Bitstring").build();
@@ -376,7 +373,6 @@ void tst_SedsToAsn1Translator::testTranslateBinaryDataType()
 }
 
 /// \SRS  ETB-FUN-150
-/// \SRS  ETB-FUN-3070
 void tst_SedsToAsn1Translator::testTranslateBooleanDataType()
 {
     const auto sedsModel = SedsModelBuilder("Model").withBooleanDataType("Boolean").build();
@@ -459,7 +455,6 @@ void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithEntry()
 }
 
 /// \SRS  ETB-FUN-230
-/// \SRS  ETB-FUN-260
 void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithErrorControlEntry()
 {
     // clang-format off
@@ -578,7 +573,6 @@ void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithFixedValueEntry()
 }
 
 /// \SRS  ETB-FUN-230
-/// \SRS  ETB-FUN-250
 void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithLengthEntry()
 {
     // clang-format off
@@ -759,7 +753,6 @@ void tst_SedsToAsn1Translator::testTranslateContainerExtensionOneLevel()
 }
 
 /// \SRS  ETB-FUN-160
-/// \SRS  ETB-FUN-3050
 void tst_SedsToAsn1Translator::testTranslateEnumeratedDataType()
 {
     const auto sedsModel =
@@ -799,7 +792,6 @@ void tst_SedsToAsn1Translator::testTranslateEnumeratedDataType()
 }
 
 /// \SRS  ETB-FUN-180
-/// \SRS  ETB-FUN-3030
 void tst_SedsToAsn1Translator::testTranslateIntegerDataType()
 {
     const auto sedsModel = SedsModelBuilder("Model").withIntegerDataType("SignedInteger16").build();
@@ -843,7 +835,6 @@ void tst_SedsToAsn1Translator::testTranslateIntegerDataType()
 }
 
 /// \SRS  ETB-FUN-170
-/// \SRS  ETB-FUN-3040
 void tst_SedsToAsn1Translator::testTranslateFloatDataType()
 {
     const auto sedsModel = SedsModelBuilder("Model").withFloatDataType("Float64").build();
@@ -886,7 +877,6 @@ void tst_SedsToAsn1Translator::testTranslateFloatDataType()
 }
 
 /// \SRS  ETB-FUN-190
-/// \SRS  ETB-FUN-3060
 void tst_SedsToAsn1Translator::testTranslateStringDataType()
 {
     const auto sedsModel = SedsModelBuilder("Model").withStringDataType("String20").build();

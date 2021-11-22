@@ -116,7 +116,6 @@ void tst_SedsToIvTranslator::testWrongModel()
 
 /// \SRS  ETB-FUN-1040
 /// \SRS  ETB-FUN-1050
-/// \SRS  ETB-FUN-1090
 void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
 {
     // clang-format off
@@ -183,7 +182,6 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
 
 /// \SRS  ETB-FUN-1040
 /// \SRS  ETB-FUN-1060
-/// \SRS  ETB-FUN-1090
 void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
 {
     // clang-format off
