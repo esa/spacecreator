@@ -66,4 +66,9 @@ ExporterNotRegisteredException::ExporterNotRegisteredException(ModelType modelTy
 {
 }
 
+InvalidModelNameException::InvalidModelNameException(const QString &modelName)
+    : ConversionException(QString("Model name '%1' is not valid").arg(modelName))
+{
+}
+
 } // namespace conversion

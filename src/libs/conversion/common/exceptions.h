@@ -142,4 +142,18 @@ public:
     explicit ExporterNotRegisteredException(ModelType modelType);
 };
 
+/**
+ * @brief   Exception throw when given string name doesn't correspond to any known model type
+ */
+class InvalidModelNameException : public ConversionException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   modelName   Model name that is invalid
+     */
+    explicit InvalidModelNameException(const QString &modelName);
+};
+
 } // namespace conversion

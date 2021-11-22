@@ -30,6 +30,7 @@
 #include <seds/SedsOptions/options.h>
 
 using conversion::ConversionException;
+using conversion::InvalidModelNameException;
 using conversion::ModelType;
 using conversion::Options;
 using conversion::asn1::Asn1Options;
@@ -70,17 +71,33 @@ void SedsConverterCLI::parseArguments(const QStringList &arguments)
         m_outputFilepath = m_parser.value(CommandArg::SedsConverterOutputFilepath);
     }
     if (m_arguments.contains(CommandArg::SedsConverterModelsFrom)) {
-        for (const auto &modelName : m_parser.value(CommandArg::SedsConverterModelsFrom).split(",")) {
-            m_sourceModels.emplace(conversion::stringToModelType(modelName));
+        for (const auto &sourceModelName : m_parser.value(CommandArg::SedsConverterModelsFrom).split(",")) {
+            const auto sourceModelType = conversion::stringToModelType(sourceModelName);
+            if (sourceModelType == conversion::ModelType::Unspecified) {
+                throw InvalidModelNameException(sourceModelName);
+            }
+            m_sourceModels.insert(sourceModelType);
         }
     }
     if (m_arguments.contains(CommandArg::SedsConverterModelTo)) {
-        m_targetModel = conversion::stringToModelType(m_parser.value(CommandArg::SedsConverterModelTo));
+        const auto &targetModelName = m_parser.value(CommandArg::SedsConverterModelTo);
+        m_targetModel = conversion::stringToModelType(targetModelName);
+        if (m_targetModel == conversion::ModelType::Unspecified) {
+            throw InvalidModelNameException(targetModelName);
+        }
     }
     if (m_arguments.contains(CommandArg::SedsConverterModelsAux)) {
-        for (const auto &modelName : m_parser.value(CommandArg::SedsConverterModelsAux).split(",")) {
-            m_auxModels.emplace(conversion::stringToModelType(modelName));
+        for (const auto &auxModelName : m_parser.value(CommandArg::SedsConverterModelsAux).split(",")) {
+            const auto auxModelType = conversion::stringToModelType(auxModelName);
+            if (auxModelType == conversion::ModelType::Unspecified) {
+                throw InvalidModelNameException(auxModelName);
+            }
+            m_auxModels.insert(auxModelType);
         }
+    }
+
+    if (m_sourceModels.empty()) {
+        throw ConversionException("No source models passed");
     }
 }
 
@@ -99,32 +116,16 @@ void SedsConverterCLI::processOptions(Options &options)
 
 std::set<conversion::ModelType> SedsConverterCLI::getSourceModelTypes()
 {
-    if (m_sourceModels.empty()) {
-        throw ConversionException("Model type unspecified");
-    }
-    for (auto model : m_sourceModels) {
-        if (model == conversion::ModelType::Unspecified) {
-            throw ConversionException("Model type unspecified");
-        }
-    }
     return m_sourceModels;
 }
 
 conversion::ModelType SedsConverterCLI::getTargetModelType()
 {
-    if (m_targetModel == conversion::ModelType::Unspecified) {
-        throw ConversionException("Model type unspecified");
-    }
     return m_targetModel;
 }
 
 std::set<conversion::ModelType> SedsConverterCLI::getAuxModelTypes()
 {
-    for (auto model : m_auxModels) {
-        if (model == conversion::ModelType::Unspecified) {
-            throw ConversionException("Model type unspecified");
-        }
-    }
     return m_auxModels;
 }
 
