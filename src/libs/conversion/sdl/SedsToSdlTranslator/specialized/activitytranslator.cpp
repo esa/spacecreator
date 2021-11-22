@@ -19,7 +19,7 @@
 
 #include "activitytranslator.h"
 
-#include "statementvisitor.h"
+#include "statementtranslatorvisitor.h"
 
 #include <conversion/common/escaper/escaper.h>
 #include <sdl/SdlModel/task.h>
@@ -49,7 +49,7 @@ auto ActivityTranslator::translateBody(const seds::model::Package &sedsPackage, 
         ::sdl::Procedure *procedure) -> void
 {
     auto transition = std::make_unique<::sdl::Transition>();
-    StatementVisitor visitor(sedsPackage, asn1Model, ivModel, sdlProcess, procedure, transition.get());
+    StatementTranslatorVisitor visitor(sedsPackage, asn1Model, ivModel, sdlProcess, procedure, transition.get());
     for (const auto &statement : sedsActivity.body()->statements()) {
         std::visit(visitor, statement);
     }

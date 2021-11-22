@@ -19,7 +19,7 @@
 
 #include "statemachinetranslator.h"
 
-#include "statementvisitor.h"
+#include "statementtranslatorvisitor.h"
 
 #include <algorithm>
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
@@ -239,7 +239,8 @@ auto StateMachineTranslator::translateTransition(const seds::model::Transition &
     // TODO Guard
     // TODO From Exit
     if (sedsTransition.doActivity().has_value()) {
-        transition->addAction(StatementVisitor::translateActivityCall(sdlProcess, *sedsTransition.doActivity()));
+        transition->addAction(
+                StatementTranslatorVisitor::translateActivityCall(sdlProcess, *sedsTransition.doActivity()));
     }
     // TODO To Entry
     // State switch

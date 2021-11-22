@@ -28,7 +28,7 @@
 #include <conversion/iv/SedsToIvTranslator/translator.h>
 #include <conversion/sdl/SedsToSdlTranslator/specialized/activitytranslator.h>
 #include <conversion/sdl/SedsToSdlTranslator/specialized/mathoperationtranslator.h>
-#include <conversion/sdl/SedsToSdlTranslator/specialized/statementvisitor.h>
+#include <conversion/sdl/SedsToSdlTranslator/specialized/statementtranslatorvisitor.h>
 #include <conversion/sdl/SedsToSdlTranslator/translator.h>
 #include <iostream>
 #include <ivcore/ivfunction.h>

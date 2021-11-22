@@ -37,7 +37,7 @@ namespace conversion::sdl::translator {
  *
  * Translated statements will be added to the passed transition
  */
-class StatementVisitor final
+class StatementTranslatorVisitor final
 {
 public:
     /**
@@ -51,8 +51,9 @@ public:
      * @param sdlTransition     Target SDL transition
      */
 
-    StatementVisitor(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
-            ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure, ::sdl::Transition *sdlTransition);
+    StatementTranslatorVisitor(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
+            ivm::IVModel *ivModel, ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure,
+            ::sdl::Transition *sdlTransition);
 
     /**
      * @brief   Translates SEDS activity invocation
