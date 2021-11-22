@@ -125,18 +125,18 @@ QString SedsXmlImporter::preprocess(
     return preprocessedFilepath;
 }
 
-void SedsXmlImporter::validate(const QString &preprocessedFilepath, const Options &options) const
+void SedsXmlImporter::validate(const QString &preprocessedFilename, const Options &options) const
 {
     const auto schemaFilename = [&]() {
         const auto value = options.value(SedsOptions::schemaFilepath);
         if (value) {
             return *value;
         } else {
-            return getSchemaFilename(preprocessedFilepath);
+            return getSchemaFilename(preprocessedFilename);
         }
     }();
 
-    XmlValidator::validate(preprocessedFilepath, schemaFilename);
+    XmlValidator::validate(preprocessedFilename, schemaFilename);
 }
 
 QString SedsXmlImporter::getSchemaFilename(const QString &filename) const
