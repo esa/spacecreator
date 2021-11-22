@@ -116,8 +116,68 @@ auto StatementVisitor::operator()(const seds::model::Conditional &conditional) -
 
 auto StatementVisitor::operator()(const seds::model::Iteration &iteration) -> void
 {
-    Q_UNUSED(iteration);
-    throw TranslationException("Iteration activity not implemented");
+    auto startLabel = std::make_unique<::sdl::Label>("loop_start");
+    auto bodyLabel = std::make_unique<::sdl::Label>("loop_body");
+    auto endLabel = std::make_unique<::sdl::Label>("loop_end");
+    auto loopBackJoin = std::make_unique<::sdl::Join>();
+    loopBackJoin->setLabel(startLabel.get());
+    const auto variable = findVariableDeclaration(m_sdlProcess, m_sdlProcedure,
+            Escaper::escapeAsn1FieldName(iteration.iteratorVariableRef().value().value()));
+
+    auto decision = std::make_unique<::sdl::Decision>();
+    auto exitLoop = std::make_unique<::sdl::Answer>();
+    auto continueLoop = std::make_unique<::sdl::Answer>();
+    auto exitTransition = std::make_unique<::sdl::Transition>();
+    auto continueTransition = std::make_unique<::sdl::Transition>();
+    auto exitJoin = std::make_unique<::sdl::Join>();
+    exitJoin->setLabel(endLabel.get());
+    auto continueJoin = std::make_unique<::sdl::Join>();
+    continueJoin->setLabel(bodyLabel.get());
+
+    exitTransition->addAction(std::move(exitJoin));
+    exitLoop->setLiteral(::sdl::VariableLiteral("False"));
+    exitLoop->setTransition(std::move(exitTransition));
+
+    continueTransition->addAction(std::move(continueJoin));
+    continueLoop->setLiteral(::sdl::VariableLiteral("True"));
+    continueLoop->setTransition(std::move(continueTransition));
+
+    decision->addAnswer(std::move(exitLoop));
+    decision->addAnswer(std::move(continueLoop));
+
+    if (std::holds_alternative<seds::model::Iteration::NumericRange>(iteration.range())) {
+        const auto &range = std::get<seds::model::Iteration::NumericRange>(iteration.range());
+        const auto startValue = getOperandValue(m_sdlProcess, m_sdlProcedure, range.startAt());
+        const auto endValue = getOperandValue(m_sdlProcess, m_sdlProcedure, range.endAt());
+        m_sdlTransition->addAction(
+                std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(variable->name(), startValue)));
+        m_sdlTransition->addAction(std::move(startLabel));
+
+        decision->setExpression(
+                std::make_unique<::sdl::Expression>(QString("%1 <= %2").arg(variable->name(), endValue)));
+    } else {
+        throw TranslationException("Variable range not implemented");
+    }
+
+    m_sdlTransition->addAction(std::move(decision));
+    m_sdlTransition->addAction(std::move(bodyLabel));
+
+    if (iteration.doBody() != nullptr) {
+        for (const auto &statement : iteration.doBody()->statements()) {
+            std::visit(*this, statement);
+        }
+    }
+    if (std::holds_alternative<seds::model::Iteration::NumericRange>(iteration.range())) {
+        const auto &range = std::get<seds::model::Iteration::NumericRange>(iteration.range());
+        const auto stepValue =
+                range.step().has_value() ? getOperandValue(m_sdlProcess, m_sdlProcedure, *range.step()) : "1";
+        m_sdlTransition->addAction(
+                std::make_unique<::sdl::Task>("", QString("%1 := %1 + %2").arg(variable->name(), stepValue)));
+    } else {
+        throw TranslationException("Variable range not implemented");
+    }
+    m_sdlTransition->addAction(std::move(loopBackJoin));
+    m_sdlTransition->addAction(std::move(endLabel));
 }
 
 auto StatementVisitor::operator()(const seds::model::MathOperation &operation) -> void
@@ -433,6 +493,22 @@ auto StatementVisitor::translateAnswer(const seds::model::Package &sedsPackage, 
     answer->setTransition(std::move(transition));
 
     return answer;
+}
+
+auto StatementVisitor::getOperandValue(
+        ::sdl::Process *process, ::sdl::Procedure *sdlProcedure, const seds::model::Operand &operand) -> QString
+{
+    if (std::holds_alternative<seds::model::ValueOperand>(operand.value())) {
+        const auto &value = std::get<seds::model::ValueOperand>(operand.value());
+        return value.value().value();
+    } else if (std::holds_alternative<seds::model::VariableRefOperand>(operand.value())) {
+        const auto &value = std::get<seds::model::VariableRefOperand>(operand.value());
+        const auto variableName = Escaper::escapeAsn1FieldName(value.variableRef().value().value());
+        const auto variableDeclaration = findVariableDeclaration(process, sdlProcedure, variableName);
+        return variableDeclaration->name();
+    }
+    throw TranslationException("Operand not implemented");
+    return "";
 }
 
 }

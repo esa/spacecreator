@@ -165,6 +165,9 @@ private:
             const QString value, const seds::model::Body *body) -> std::unique_ptr<::sdl::Answer>;
 
     static auto comparisonOperatorToString(const seds::model::ComparisonOperator op) -> QString;
+
+    static auto getOperandValue(
+            ::sdl::Process *process, ::sdl::Procedure *sdlProcedure, const seds::model::Operand &operand) -> QString;
 };
 
 } // namespace conversion::asn1::translator
