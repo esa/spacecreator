@@ -84,7 +84,6 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Calibration &cali
         const auto &polynomial = std::get<Polynomial>(calibrator);
         const auto action = QString("%1 := %2").arg(targetName, translatePolynomial(sourceName, polynomial));
         m_sdlTransition->addAction(std::make_unique<::sdl::Task>("", action));
-        return;
     } else {
         // TODO Spline calibrator - postponed, as it requires generation of a custom procedure,
         // and possibly a custom type
@@ -112,7 +111,6 @@ auto StatementTranslatorVisitor::operator()(const seds::model::MathOperation &op
         if (std::get<CoreMathOperator>(op.mathOperator()) == CoreMathOperator::Swap) {
             // TODO This needs proper knowledge of types
             throw TranslationException("Swap operator is not implemented");
-            return;
         }
     }
     const auto targetName = Escaper::escapeAsn1FieldName(operation.outputVariableRef().value().value());
