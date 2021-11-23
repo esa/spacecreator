@@ -245,7 +245,7 @@ auto StatementTranslatorVisitor::translateActivityCall(::sdl::Process *process,
     call->setProcedure(procedure->get());
 
     for (const auto &argument : invocation.argumentValues()) {
-        call->addArgument(std::move(translateArgument(process, nullptr, argument)));
+        call->addArgument(translateArgument(process, nullptr, argument));
     }
     return call;
 }
@@ -351,9 +351,9 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, ::sd
     call->setProcedure(procedure->get());
 
     for (const auto &argument : sendCommand.argumentValues()) {
-        call->addArgument(std::move(translateArgument(hostProcess, hostProcedure, argument)));
+        call->addArgument(translateArgument(hostProcess, hostProcedure, argument));
     }
-    return std::move(call);
+    return call;
 }
 
 auto StatementTranslatorVisitor::translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
@@ -384,7 +384,7 @@ auto StatementTranslatorVisitor::translateOutput(::sdl::Process *hostProcess, ::
 
     result.emplace_back(std::move(output));
 
-    return std::move(result);
+    return result;
 }
 
 class ExpressionTranslatorVisitor

@@ -17,6 +17,7 @@ set(CLANG_WARNINGS -Wall
                    -Wsign-conversion
                    -Wnull-dereference
                    -Wdouble-promotion
+                   -Wpessimizing-move
                    -Wformat=2
                    -Wno-c99-extensions
                    -Wno-deprecated-volatile)
