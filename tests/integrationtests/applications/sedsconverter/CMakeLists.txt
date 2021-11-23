@@ -52,3 +52,8 @@ configure_file(test_factorial.sh test_factorial.sh COPYONLY)
 configure_file(resources/test_factorial.xml resources/test_factorial.xml COPYONLY)
 configure_file(resources/test_factorial.output resources/test_factorial.output COPYONLY)
 configure_file(resources/test_factorial.system_structure resources/test_factorial.system_structure COPYONLY)
+
+configure_file(test_hwas.sh test_hwas.sh COPYONLY)
+configure_file(resources/test_hwas.xml resources/test_hwas.xml COPYONLY)
+configure_file(resources/test_hwas.interfaceview resources/test_hwas.interfaceview COPYONLY)
+configure_file(resources/test_hwas.hwasc resources/test_hwas.hwasc COPYONLY)
