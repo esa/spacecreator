@@ -80,7 +80,7 @@ space-creator:
       - package
     expire_in: 2 days
   rules:
-    - if: "$CI_COMMIT_BRANCH == 'n7s-etb#82-gui-eds-import'"
+    - if: "$CI_COMMIT_BRANCH == 'master'"
 
 
 space-creator-coverage:
