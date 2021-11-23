@@ -42,6 +42,8 @@ namespace conversion::sdl::translator {
 static const QString LOOP_START_LABEL_PREFIX = "loop_start_";
 static const QString LOOP_END_LABEL_PREFIX = "loop_end_";
 static const QString CONDITION_END_LABEL_PREFIX = "condition_";
+static const QString FALSE_LITERAL = "False";
+static const QString TRUE_LITERAL = "True";
 
 StatementTranslatorVisitor::Context::Context(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
         ivm::IVModel *ivModel, ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure)
@@ -136,8 +138,8 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Conditional &cond
             translateBooleanExpression(m_context.sdlProcess(), m_context.sdlProcedure(), conditional.condition());
     auto label = std::make_unique<::sdl::Label>(m_context.uniqueLabelName(CONDITION_END_LABEL_PREFIX));
 
-    auto trueAnswer = translateAnswer(m_context, label.get(), "True", conditional.onConditionTrue());
-    auto falseAnswer = translateAnswer(m_context, label.get(), "False", conditional.onConditionFalse());
+    auto trueAnswer = translateAnswer(m_context, label.get(), TRUE_LITERAL, conditional.onConditionTrue());
+    auto falseAnswer = translateAnswer(m_context, label.get(), FALSE_LITERAL, conditional.onConditionFalse());
     decision->addAnswer(std::move(trueAnswer));
     decision->addAnswer(std::move(falseAnswer));
 
@@ -149,11 +151,6 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Iteration &iterat
 {
     auto startLabel = std::make_unique<::sdl::Label>(m_context.uniqueLabelName(LOOP_START_LABEL_PREFIX));
     auto endLabel = std::make_unique<::sdl::Label>(m_context.uniqueLabelName(LOOP_END_LABEL_PREFIX));
-    auto loopBackJoin = std::make_unique<::sdl::Join>();
-    loopBackJoin->setLabel(startLabel.get());
-    const auto variable = findVariableDeclaration(m_context.sdlProcess(), m_context.sdlProcedure(),
-            Escaper::escapeAsn1FieldName(iteration.iteratorVariableRef().value().value()));
-
     auto decision = std::make_unique<::sdl::Decision>();
     auto exitLoop = std::make_unique<::sdl::Answer>();
     auto continueLoop = std::make_unique<::sdl::Answer>();
@@ -162,52 +159,33 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Iteration &iterat
     auto exitJoin = std::make_unique<::sdl::Join>();
     exitJoin->setLabel(endLabel.get());
 
-    if (std::holds_alternative<seds::model::Iteration::NumericRange>(iteration.range())) {
-        const auto &range = std::get<seds::model::Iteration::NumericRange>(iteration.range());
-        const auto startValue = getOperandValue(m_context.sdlProcess(), m_context.sdlProcedure(), range.startAt());
-        const auto endValue = getOperandValue(m_context.sdlProcess(), m_context.sdlProcedure(), range.endAt());
-        m_sdlTransition->addAction(
-                std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(variable->name(), startValue)));
-
-        m_sdlTransition->addAction(std::move(startLabel));
-        decision->setExpression(
-                std::make_unique<::sdl::Expression>(QString("%1 <= %2").arg(variable->name(), endValue)));
-    } else {
-        throw TranslationException("Variable range not implemented");
-    }
-
+    // Loop condition not met - jump to exit
     exitTransition->addAction(std::move(exitJoin));
-    exitLoop->setLiteral(::sdl::VariableLiteral("False"));
+    exitLoop->setLiteral(::sdl::VariableLiteral(FALSE_LITERAL));
     exitLoop->setTransition(std::move(exitTransition));
 
-    continueLoop->setLiteral(::sdl::VariableLiteral("True"));
+    // Loop condition met
+    continueLoop->setLiteral(::sdl::VariableLiteral(TRUE_LITERAL));
     continueLoop->setTransition(std::move(continueTransition));
     // This needs to be saved so that actual body actions can be added
     auto transitionPointer = continueLoop->transition();
 
     decision->addAnswer(std::move(exitLoop));
     decision->addAnswer(std::move(continueLoop));
+
+    generateLoopStart(m_context, m_sdlTransition, iteration, decision.get());
+
+    m_sdlTransition->addAction(std::move(startLabel));
+    // startLabel must be moved, but we want to take its pointer after the move
+    auto startLabelPointer = dynamic_cast<::sdl::Label *>(m_sdlTransition->actions().back().get());
+    // This contains the actual body, which is generated a few lines below
     m_sdlTransition->addAction(std::move(decision));
     m_sdlTransition->addAction(std::move(endLabel));
 
-    if (iteration.doBody() != nullptr) {
-        StatementTranslatorVisitor nestedVisitor(m_context, transitionPointer);
-        for (const auto &statement : iteration.doBody()->statements()) {
-            std::visit(nestedVisitor, statement);
-        }
-    }
+    // Generate loop body and insert it into the True decision
+    translateBody(m_context, transitionPointer, iteration.doBody());
 
-    if (std::holds_alternative<seds::model::Iteration::NumericRange>(iteration.range())) {
-        const auto &range = std::get<seds::model::Iteration::NumericRange>(iteration.range());
-        const auto stepValue = range.step().has_value()
-                ? getOperandValue(m_context.sdlProcess(), m_context.sdlProcedure(), *range.step())
-                : "1";
-        transitionPointer->addAction(
-                std::make_unique<::sdl::Task>("", QString("%1 := %1 + %2").arg(variable->name(), stepValue)));
-    } else {
-        throw TranslationException("Variable range not implemented");
-    }
-    transitionPointer->addAction(std::move(loopBackJoin));
+    generateLoopEnd(m_context, transitionPointer, iteration, startLabelPointer);
 }
 
 auto StatementTranslatorVisitor::operator()(const seds::model::MathOperation &operation) -> void
@@ -538,6 +516,58 @@ auto StatementTranslatorVisitor::getOperandValue(
     }
     throw TranslationException("Operand not implemented");
     return "";
+}
+
+auto StatementTranslatorVisitor::translateBody(
+        Context &context, ::sdl::Transition *transition, const seds::model::Body *body) -> void
+{
+    if (body != nullptr) {
+        StatementTranslatorVisitor nestedVisitor(context, transition);
+        for (const auto &statement : body->statements()) {
+            std::visit(nestedVisitor, statement);
+        }
+    }
+}
+
+auto StatementTranslatorVisitor::generateLoopStart(Context &context, ::sdl::Transition *transition,
+        const seds::model::Iteration &iteration, ::sdl::Decision *decision) -> void
+{
+    // Variable reacquired to reduce the number of arguments
+    const auto variable = findVariableDeclaration(context.sdlProcess(), context.sdlProcedure(),
+            Escaper::escapeAsn1FieldName(iteration.iteratorVariableRef().value().value()));
+
+    if (std::holds_alternative<seds::model::Iteration::NumericRange>(iteration.range())) {
+        const auto &range = std::get<seds::model::Iteration::NumericRange>(iteration.range());
+        const auto startValue = getOperandValue(context.sdlProcess(), context.sdlProcedure(), range.startAt());
+        const auto endValue = getOperandValue(context.sdlProcess(), context.sdlProcedure(), range.endAt());
+        transition->addAction(std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(variable->name(), startValue)));
+
+        decision->setExpression(
+                std::make_unique<::sdl::Expression>(QString("%1 <= %2").arg(variable->name(), endValue)));
+    } else {
+        throw TranslationException("Variable range not implemented");
+    }
+}
+
+auto StatementTranslatorVisitor::generateLoopEnd(Context &context, ::sdl::Transition *transition,
+        const seds::model::Iteration &iteration, ::sdl::Label *startLabel) -> void
+{
+    // Variable reacquired to reduce the number of arguments
+    const auto variable = findVariableDeclaration(context.sdlProcess(), context.sdlProcedure(),
+            Escaper::escapeAsn1FieldName(iteration.iteratorVariableRef().value().value()));
+    if (std::holds_alternative<seds::model::Iteration::NumericRange>(iteration.range())) {
+        const auto &range = std::get<seds::model::Iteration::NumericRange>(iteration.range());
+        const auto stepValue = range.step().has_value()
+                ? getOperandValue(context.sdlProcess(), context.sdlProcedure(), *range.step())
+                : "1";
+        transition->addAction(
+                std::make_unique<::sdl::Task>("", QString("%1 := %1 + %2").arg(variable->name(), stepValue)));
+    } else {
+        throw TranslationException("Variable range not implemented");
+    }
+    auto loopBackJoin = std::make_unique<::sdl::Join>();
+    loopBackJoin->setLabel(startLabel);
+    transition->addAction(std::move(loopBackJoin));
 }
 
 }

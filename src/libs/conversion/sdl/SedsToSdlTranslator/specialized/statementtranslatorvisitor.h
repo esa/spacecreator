@@ -224,6 +224,14 @@ private:
 
     static auto getOperandValue(
             ::sdl::Process *process, ::sdl::Procedure *sdlProcedure, const seds::model::Operand &operand) -> QString;
+
+    static auto translateBody(Context &context, ::sdl::Transition *transition, const seds::model::Body *body) -> void;
+
+    static auto generateLoopStart(Context &context, ::sdl::Transition *transition,
+            const seds::model::Iteration &iteration, ::sdl::Decision *decision) -> void;
+
+    static auto generateLoopEnd(Context &context, ::sdl::Transition *transition,
+            const seds::model::Iteration &iteration, ::sdl::Label *startLabel) -> void;
 };
 
 } // namespace conversion::asn1::translator
