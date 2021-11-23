@@ -68,7 +68,7 @@ void Asn1ItemModel::setAsn1Model(const std::unique_ptr<Asn1Acn::TypeAssignment> 
 {
     clear();
 
-    static QStringList headers = { tr("Field"), tr("Type"), tr("Value"), tr("Optional") };
+    static QStringList headers = { tr("Field"), tr("Type"), tr("Value"), tr("Present") };
     setHorizontalHeaderLabels(headers);
 
     ItemMap itemMap = createModelItems(asn1Item->type());
