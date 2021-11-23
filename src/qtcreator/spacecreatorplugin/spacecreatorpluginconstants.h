@@ -55,6 +55,10 @@ const char IV_EXPORT_SELECTED_ID[] = "IVEditor.ExportSelected";
 const char IV_EXPORT_IV_TYPE_ID[] = "IVEditor.ExportComponentType";
 const char MSC_HELP_ID[] = "MscEditor.Help";
 const char IV_HELP_ID[] = "IVEditor.Help";
+const char IV_IMPORT_ID[] = "IVEditor.Import";
+const char SDL_IMPORT_ID[] = "Sdl.Import";
+const char ASN1_IMPORT_ID[] = "Asn1.Import";
+const char M_TOOLS_SEDS[] = "QtCreator.Menu.Tools.SEDS";
 
 // Settings
 const char SETTINGS_CATEGORY_DISPLAY[] = QT_TRANSLATE_NOOP("SpaceCreator", "SpaceCreator");

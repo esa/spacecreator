@@ -159,16 +159,60 @@ void SpaceCreatorPlugin::addSedsImportExport()
     Core::Context allContexts(
             Core::Constants::C_WELCOME_MODE, Core::Constants::C_EDIT_MODE, Core::Constants::C_DESIGN_MODE);
 
-    // auto menuBar = menuBar()->addMenu("&Tools");
-    auto importIvAction = new QAction(tr("Import InterfaceView"), this);
-    connect(importIvAction, &QAction::triggered, this, importInterfaceView);
-    Core::Command *cmdImportIvAction =
-            Core::ActionManager::registerAction(importIvAction, "SEDS.ImportInterfaceView", allContexts);
+    ActionContainer *acToolsSeds = createActionContainerInTools(tr("&SEDS"));
+
+    Core::ActionContainer *actions = Core::ActionManager::actionContainer(Core::Constants::M_TOOLS);
+
+    auto ivImportAction = new QAction(tr("Import InterfaceView"), this);
+    connect(ivImportAction, &QAction::triggered, this, importInterfaceView);
+    Core::Command *ivImport = Core::ActionManager::registerAction(ivImportAction, Constants::IV_IMPORT_ID, allContexts);
+    acToolsSeds->addAction(ivImport);
+
+    auto sdlImportAction = new QAction(tr("Import SDL"), this);
+    connect(sdlImportAction, &QAction::triggered, this, importSdl);
+    Core::Command *sdlImport =
+            Core::ActionManager::registerAction(sdlImportAction, Constants::SDL_IMPORT_ID, allContexts);
+    acToolsSeds->addAction(sdlImport);
+
+    auto asn1ImportAction = new QAction(tr("Import ASN.1"), this);
+    connect(asn1ImportAction, &QAction::triggered, this, importAsn1);
+    Core::Command *asn1Import =
+            Core::ActionManager::registerAction(asn1ImportAction, Constants::ASN1_IMPORT_ID, allContexts);
+    acToolsSeds->addAction(asn1Import);
+}
+
+ActionContainer *SpaceCreatorPlugin::createActionContainerInTools(const QString &title)
+{
+    ActionContainer *acToolsSeds = ActionManager::createMenu(Constants::M_TOOLS_SEDS);
+    QMenu *menuToolsSeds = acToolsSeds->menu();
+    menuToolsSeds->setTitle(title);
+    menuToolsSeds->setEnabled(true);
+
+    ActionContainer *acTools = ActionManager::actionContainer(Core::Constants::M_TOOLS);
+    acTools->addMenu(acToolsSeds);
+
+    return acToolsSeds;
 }
 
 void SpaceCreatorPlugin::importInterfaceView()
 {
-    // TODO
+    // TODO: trigger the actual importer here
+    ive::IVEditorCore core;
+    core.showHelp();
+}
+
+void SpaceCreatorPlugin::importSdl()
+{
+    // TODO: trigger the actual importer here
+    ive::IVEditorCore core;
+    core.showHelp();
+}
+
+void SpaceCreatorPlugin::importAsn1()
+{
+    // TODO: trigger the actual importer here
+    ive::IVEditorCore core;
+    core.showHelp();
 }
 
 }

@@ -27,6 +27,7 @@
 
 #include <QSharedPointer>
 #include <QVector>
+#include <coreplugin/actionmanager/actioncontainer.h>
 #include <extensionsystem/iplugin.h>
 
 class QAction;
@@ -70,7 +71,10 @@ public:
 private:
     void addHelp();
     void addSedsImportExport();
+    Core::ActionContainer *createActionContainerInTools(const QString &title);
     static void importInterfaceView();
+    static void importSdl();
+    static void importAsn1();
 
     MscEditorFactory *m_mscFactory = nullptr;
     IVEditorFactory *m_ivFactory = nullptr;
