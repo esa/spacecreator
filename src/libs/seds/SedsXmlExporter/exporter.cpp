@@ -44,8 +44,6 @@ const QString SedsXmlExporter::m_schemaLocation = R"(http://www.ccsds.org/schema
 
 void SedsXmlExporter::exportModel(const Model *const model, const Options &options) const
 {
-    Q_UNUSED(options);
-
     if (model == nullptr) {
         throw NullModelException();
     }
