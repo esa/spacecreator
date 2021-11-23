@@ -20,6 +20,7 @@
 #pragma once
 
 #include <QString>
+#include <optional>
 
 namespace seds::validator {
 
@@ -41,14 +42,33 @@ public:
     /**
      * @brief   Validate given file
      *
-     * @param   inputFilename       Input XML filename
-     * @param   schemaFilename      Schema filename
+     * This searches for the schema filename in the input XML file
      *
-     * @throws  ValidatorException  Any error that occurred during validation
+     * @param   inputFilepath       Input XML filepath
+     *
+     * @throws  XmlValidatorException  Any error that occurred during validation
      */
-    static auto validate(const QString &inputFilename, const QString &schemaFilename) -> void;
+    static auto validate(const QString &inputFilepath) -> void;
+    /**
+     * @brief   Validate given file
+     *
+     * @param   inputFilepath       Input XML filepath
+     * @param   schemaFilepath      Schema filepath
+     *
+     * @throws  XmlValidatorException  Any error that occurred during validation
+     */
+    static auto validate(const QString &inputFilepath, const QString &schemaFilepath) -> void;
 
 private:
+    /**
+     * @brief   Extract schema filepath from the XML file
+     *
+     * @param   filename    File to search in
+     *
+     * @returns Schema filepath
+     */
+    static auto getSchemaFilepath(const QString &filepath) -> std::optional<QString>;
+
     /**
      * @brief   Callback for LibXml2 validation errors
      * @param   context     Context

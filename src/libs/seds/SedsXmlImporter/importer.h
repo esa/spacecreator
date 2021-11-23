@@ -101,17 +101,6 @@ private:
      */
     auto validate(const QString &preprocessedFilename, const conversion::Options &options) const -> void;
 
-    /**
-     * @brief   Get schema filename from imported file
-     *
-     * @param   filename    File to search in
-     *
-     * @throws  ImportException
-     *
-     * @returns Schema filename
-     */
-    auto getSchemaFilename(const QString &filename) const -> QString;
-
 private:
     static const QString preprocessedFilenameTemplate;
 };

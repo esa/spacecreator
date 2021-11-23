@@ -114,7 +114,7 @@ QString SedsXmlImporter::preprocess(
         if (value) {
             return *value;
         } else {
-            auto fsPath = std::filesystem::path((*inputFilepath).toStdString());
+            auto fsPath = std::filesystem::path(inputFilepath->toStdString());
             const auto fileNamePart = std::filesystem::path((*inputFilepath).toStdString()).filename().string();
             return QString::fromStdString(fsPath.replace_filename(PREPROCESSED_FILE_PREFIX + fileNamePart).string());
         }
@@ -127,44 +127,11 @@ QString SedsXmlImporter::preprocess(
 
 void SedsXmlImporter::validate(const QString &preprocessedFilename, const Options &options) const
 {
-    const auto schemaFilename = [&]() {
-        const auto value = options.value(SedsOptions::schemaFilepath);
-        if (value) {
-            return *value;
-        } else {
-            return getSchemaFilename(preprocessedFilename);
-        }
-    }();
-
-    XmlValidator::validate(preprocessedFilename, schemaFilename);
-}
-
-QString SedsXmlImporter::getSchemaFilename(const QString &filename) const
-{
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadWrite)) {
-        throw ImportException(file.errorString());
-    }
-
-    // Schema filename should be present in PackageFile/DataSheet
-    auto xmlReader = QXmlStreamReader(&file);
-    xmlReader.readNextStartElement();
-
-    const auto attributes = xmlReader.attributes();
-    const auto found = std::find_if(std::begin(attributes), std::end(attributes),
-            [](auto &&attribute) { return attribute.name() == QStringLiteral("schemaLocation"); });
-
-    if (found != std::end(attributes)) {
-        // xmi:schemaLocation contains url and schema filename separated by space
-        const auto schemaLocation = found->value().split(" ", SEDS_SPLIT_BEHAVIOR);
-
-        if (schemaLocation.size() != 2) {
-            throw ImportException("xmi:schemaLocation in the validated file is incorrect");
-        }
-
-        return schemaLocation.at(1).toString();
+    const auto schemaFilepath = options.value(SedsOptions::schemaFilepath);
+    if (schemaFilepath) {
+        XmlValidator::validate(preprocessedFilepath, *schemaFilepath);
     } else {
-        throw ImportException("Schema filename wasn't specified nor found in the validated file");
+        XmlValidator::validate(preprocessedFilepath);
     }
 }
 
