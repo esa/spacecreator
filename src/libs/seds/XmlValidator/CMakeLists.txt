@@ -16,7 +16,8 @@ target_link_libraries(SedsXmlValidator
     PUBLIC      Conversion::Converter
                 Qt5::Core
     PRIVATE     LibXml2::LibXml2
-                CommonProjectWarnings)
+                CommonProjectWarnings
+                stdc++fs)
 
 add_format_target(SedsXmlValidator)
 add_tidy_target(SedsXmlValidator)

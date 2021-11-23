@@ -17,19 +17,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include <cstdlib>
+#include <iostream>
+#include <seds/XmlValidator/validator.h>
 
-#include "testbase.h"
-
-namespace conversion::asn1::test {
-
-class tsti_ContainerDataType : public TestBase
+int main(int argc, char **argv)
 {
-    Q_OBJECT
+    if (argc != 2) {
+        std::cerr << "Usage: xmlvalidator <filename>\n";
+        return EXIT_FAILURE;
+    }
 
-private Q_SLOTS:
-    void testSimpleContainer();
-    void testExtendedContainer();
-};
+    try {
+        const auto inputFilepath = QString(argv[1]);
+        seds::validator::XmlValidator::validate(inputFilepath);
+    } catch (const std::exception &ex) {
+        std::cerr << ex.what() << "\n";
+        return EXIT_FAILURE;
+    }
 
-} // namespace conversion::asn1::test
+    std::cout << "Validation successful!\n";
+    return EXIT_SUCCESS;
+}

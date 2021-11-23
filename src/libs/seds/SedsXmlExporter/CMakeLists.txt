@@ -14,6 +14,7 @@ target_include_directories(SedsXmlExporter
 target_link_libraries(SedsXmlExporter
     PUBLIC      Conversion::Common
                 SEDS::Model
+                Qt5::Xml
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(SedsXmlExporter)

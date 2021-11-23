@@ -17,19 +17,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "export/modelexporter.h"
 
-#include "testbase.h"
+#include "export/exceptions.h"
 
-namespace conversion::asn1::test {
+namespace conversion::exporter {
 
-class tsti_ContainerDataType : public TestBase
+void ModelExporter::writeAndCommit(QSaveFile &outputFile, const QString &data) const
 {
-    Q_OBJECT
+    if (!outputFile.open(QIODevice::WriteOnly)) {
+        throw ExportException(QString("Failed to open a file %1").arg(outputFile.fileName()));
+    }
 
-private Q_SLOTS:
-    void testSimpleContainer();
-    void testExtendedContainer();
-};
+    if (outputFile.write(data.toUtf8()) == -1) {
+        throw ExportException(QString("Failed to write a file %1").arg(outputFile.fileName()));
+    }
 
-} // namespace conversion::asn1::test
+    if (!outputFile.commit()) {
+        throw ExportException(QString("Failed to commit a transaction in %1").arg(outputFile.fileName()));
+    }
+}
+
+} // namespace conversion::exporter

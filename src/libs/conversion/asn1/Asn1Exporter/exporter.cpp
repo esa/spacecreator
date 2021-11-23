@@ -33,13 +33,14 @@ using conversion::asn1::Asn1Options;
 using conversion::exporter::ExportException;
 using conversion::exporter::IncorrectModelException;
 using conversion::exporter::MissingOutputFilenameException;
+using conversion::exporter::NullModelException;
 
 namespace conversion::asn1::exporter {
 
 void Asn1Exporter::exportModel(const Model *const model, const Options &options) const
 {
     if (model == nullptr) {
-        throw ExportException("Model to export is null");
+        throw NullModelException();
     }
 
     const auto *const asn1Model = dynamic_cast<const Asn1Model *>(model);
@@ -65,7 +66,7 @@ void Asn1Exporter::exportAsn1Model(const Asn1Acn::File *file, const Options &opt
     const auto filePath = makeFilePath(pathPrefix, file->name(), "asn");
 
     QSaveFile outputFile(filePath);
-    writeAndCommit(outputFile, serializedModelData.toStdString());
+    writeAndCommit(outputFile, serializedModelData);
 }
 
 void Asn1Exporter::exportAcnModel(const Asn1Acn::File *file, const Options &options) const
@@ -80,23 +81,7 @@ void Asn1Exporter::exportAcnModel(const Asn1Acn::File *file, const Options &opti
     const auto filePath = makeFilePath(pathPrefix, file->name(), "acn");
 
     QSaveFile outputFile(filePath);
-    const auto data = serializedModelData.toStdString();
-    writeAndCommit(outputFile, data);
-}
-
-void Asn1Exporter::writeAndCommit(QSaveFile &outputFile, const std::string &data) const
-{
-    if (!outputFile.open(QIODevice::WriteOnly)) {
-        throw ExportException(QString("Failed to open a file %1").arg(outputFile.fileName()));
-    }
-
-    if (outputFile.write(data.c_str(), qint64(data.size())) == -1) {
-        throw ExportException(QString("Failed to write a file %1").arg(outputFile.fileName()));
-    }
-
-    if (!outputFile.commit()) {
-        throw ExportException(QString("Failed to commit a transaction in %1").arg(outputFile.fileName()));
-    }
+    writeAndCommit(outputFile, serializedModelData);
 }
 
 QString Asn1Exporter::makeFilePath(const QString &pathPrefix, const QString &fileName, const QString &extension) const

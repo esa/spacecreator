@@ -14,7 +14,8 @@ target_include_directories(SedsConverter
     PRIVATE     .
                 ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SedsConverter
-    PRIVATE     Conversion::Converter
+    PRIVATE     CommonProjectWarnings
+                Conversion::Converter
                 Conversion::Registry
                 Conversion::Asn1Registrar
                 Conversion::IvRegistrar

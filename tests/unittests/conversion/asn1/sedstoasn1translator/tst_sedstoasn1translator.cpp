@@ -70,7 +70,7 @@ class tst_SedsToAsn1Translator : public QObject
 {
     Q_OBJECT
 
-public Q_SLOTS:
+private Q_SLOTS:
     void testMissingModel();
     void testTooManyModels();
     void testWrongModel();

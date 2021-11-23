@@ -66,6 +66,7 @@ std::vector<std::unique_ptr<Model>> IvToSedsTranslator::translateIvModel(
     Q_UNUSED(options);
 
     ::seds::model::Package sedsPackage;
+    sedsPackage.setName("InterfaceView");
 
     const auto ivFunctions = ivModel->allObjectsByType<ivm::IVFunction>();
     for (const auto ivFunction : ivFunctions) {

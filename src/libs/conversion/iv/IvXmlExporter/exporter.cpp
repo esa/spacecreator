@@ -35,6 +35,8 @@
 using conversion::Options;
 using conversion::exporter::ExportException;
 using conversion::exporter::IncorrectModelException;
+using conversion::exporter::MissingOutputFilenameException;
+using conversion::exporter::NullModelException;
 using conversion::iv::IvOptions;
 using ive::IVExporter;
 using ivm::IVModel;
@@ -44,7 +46,7 @@ namespace conversion::iv::exporter {
 void IvXmlExporter::exportModel(const Model *model, const Options &options) const
 {
     if (model == nullptr) {
-        throw ExportException("Model to export is null");
+        throw NullModelException();
     }
 
     if (model->modelType() != ModelType::InterfaceView) {
@@ -55,7 +57,7 @@ void IvXmlExporter::exportModel(const Model *model, const Options &options) cons
 
     const auto outputFilepath = options.value(IvOptions::outputFilepath);
     if (!outputFilepath) {
-        throw ExportException("Output filename wasn't specified");
+        throw MissingOutputFilenameException(ModelType::InterfaceView);
     }
 
     QByteArray modelData;
