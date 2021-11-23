@@ -419,7 +419,7 @@ void DataTypeTranslatorVisitor::translateArrayDimension(
         }
 
         auto rangeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
-                { static_cast<Asn1Acn::IntegerValue::Type>(dimensionSize) });
+                { 0, static_cast<Asn1Acn::IntegerValue::Type>(dimensionSize) });
 
         auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::IntegerValue>>();
         sizeConstraint->setInnerConstraints(std::move(rangeConstraint));

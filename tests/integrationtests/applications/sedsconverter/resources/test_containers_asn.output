@@ -2,7 +2,7 @@ COM-N7SPACE-CONTAINERS DEFINITIONS ::= BEGIN
 DataItemA ::= INTEGER(0 .. 255)
 DataItemB ::= INTEGER(0 .. 255)
 LengthType ::= INTEGER(0 .. 65535)
-ArrayType ::= SEQUENCE (SIZE(15)) OF DataItemA(0 .. 255)
+ArrayType ::= SEQUENCE (SIZE(0 .. 15)) OF DataItemA(0 .. 255)
 BasicContainer ::= SEQUENCE 
 { 
     fieldA DataItemA(0 .. 255), 
