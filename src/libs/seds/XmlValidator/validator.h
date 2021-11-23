@@ -63,7 +63,7 @@ private:
     /**
      * @brief   Extract schema filepath from the XML file
      *
-     * @param   filename    File to search in
+     * @param   filepath    File to search in
      *
      * @returns Schema filepath
      */
