@@ -22,9 +22,11 @@
 #include <conversion/common/export/modelexporter.h>
 
 class QDomDocument;
+class QDomElement;
 
 namespace seds::model {
 class DataSheet;
+class Package;
 class PackageFile;
 } // namespace seds::model
 
@@ -63,8 +65,18 @@ public:
     virtual auto exportModel(const conversion::Model *model, const conversion::Options &options) const -> void override;
 
 private:
-    auto exportPackageFile(const seds::model::PackageFile &packageFile) const -> QDomDocument;
-    auto exportDataSheet(const seds::model::DataSheet &dataSheet) const -> QDomDocument;
+    static auto exportPackageFile(const model::PackageFile &packageFile, QDomDocument &sedsDocument) -> void;
+    static auto exportDataSheet(const model::DataSheet &dataSheet, QDomDocument &sedsDocument) -> void;
+    static auto exportPackage(const model::Package &package, QDomElement &parentElement, QDomDocument &sedsDocument)
+            -> void;
+
+    static auto createSedsXmlDocument() -> QDomDocument;
+    static auto createRootElement(QString rootElementName, QDomDocument &sedsDomDocument) -> QDomElement;
+
+private:
+    static const QString m_schemaNsUri;
+    static const QString m_schemaInstanceNsUri;
+    static const QString m_schemaLocation;
 };
 
 } // namespace seds::exporter

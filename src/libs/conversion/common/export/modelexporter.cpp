@@ -29,7 +29,7 @@ void ModelExporter::writeAndCommit(QSaveFile &outputFile, const QString &data) c
         throw ExportException(QString("Failed to open a file %1").arg(outputFile.fileName()));
     }
 
-    if (outputFile.write(data.toUtf8(), qint64(data.size())) == -1) {
+    if (outputFile.write(data.toUtf8()) == -1) {
         throw ExportException(QString("Failed to write a file %1").arg(outputFile.fileName()));
     }
 

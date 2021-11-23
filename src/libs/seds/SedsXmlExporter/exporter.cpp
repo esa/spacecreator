@@ -22,21 +22,25 @@
 #include <QDomDocument>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/overloaded.h>
+#include <iostream>
 #include <seds/SedsModel/sedsmodel.h>
 #include <seds/SedsOptions/options.h>
 
 using conversion::Model;
 using conversion::ModelType;
 using conversion::Options;
-using conversion::seds::SedsOptions;
 using conversion::exporter::IncorrectModelException;
 using conversion::exporter::MissingOutputFilenameException;
 using conversion::exporter::NullModelException;
-using seds::model::DataSheet;
-using seds::model::PackageFile;
-using seds::model::SedsModel;
+using conversion::seds::SedsOptions;
+
+using namespace seds::model;
 
 namespace seds::exporter {
+
+const QString SedsXmlExporter::m_schemaNsUri = R"(http://www.ccsds.org/schema/sois/seds)";
+const QString SedsXmlExporter::m_schemaInstanceNsUri = R"(http://www.w3.org/2001/XMLSchema-instance)";
+const QString SedsXmlExporter::m_schemaLocation = R"(http://www.ccsds.org/schema/sois/seds seds.xsd)";
 
 void SedsXmlExporter::exportModel(const Model *const model, const Options &options) const
 {
@@ -51,16 +55,17 @@ void SedsXmlExporter::exportModel(const Model *const model, const Options &optio
         throw IncorrectModelException(ModelType::Seds, model->modelType());
     }
 
-    QDomDocument sedsDocument;
+    auto sedsDocument = createSedsXmlDocument();
 
     // clang-format off
     std::visit(overloaded {
-        [&](const PackageFile &packageFile) { sedsDocument = exportPackageFile(packageFile); },
-        [&](const DataSheet &dataSheet) { sedsDocument = exportDataSheet(dataSheet); }
+        [&](const PackageFile &packageFile) { exportPackageFile(packageFile, sedsDocument); },
+        [&](const DataSheet &dataSheet) { exportDataSheet(dataSheet, sedsDocument); }
     }, sedsModel->data());
     // clang-format on
 
     const QString &sedsDocumentContent = sedsDocument.toString();
+    std::cerr << sedsDocumentContent.toStdString();
 
     const auto outputFilePath = options.value(SedsOptions::outputFilepath);
     if (!outputFilePath) {
@@ -71,22 +76,54 @@ void SedsXmlExporter::exportModel(const Model *const model, const Options &optio
     writeAndCommit(outputFile, sedsDocumentContent);
 }
 
-QDomDocument SedsXmlExporter::exportPackageFile(const PackageFile &packageFile) const
+void SedsXmlExporter::exportPackageFile(const PackageFile &packageFile, QDomDocument &sedsDocument)
 {
-    Q_UNUSED(packageFile);
+    auto rootElement = createRootElement("PackageFile", sedsDocument);
 
-    QDomDocument doc;
+    exportPackage(packageFile.package(), rootElement, sedsDocument);
 
-    return doc;
+    sedsDocument.appendChild(std::move(rootElement));
 }
 
-QDomDocument SedsXmlExporter::exportDataSheet(const DataSheet &dataSheet) const
+void SedsXmlExporter::exportDataSheet(const DataSheet &dataSheet, QDomDocument &sedsDocument)
 {
-    Q_UNUSED(dataSheet);
+    auto rootElement = createRootElement("DataSheet", sedsDocument);
 
-    QDomDocument doc;
+    for (const auto &package : dataSheet.packages()) {
+        exportPackage(package, rootElement, sedsDocument);
+    }
 
-    return doc;
+    sedsDocument.appendChild(std::move(rootElement));
+}
+
+void SedsXmlExporter::exportPackage(const Package &package, QDomElement &parentElement, QDomDocument &sedsDocument)
+{
+    auto packageElement = sedsDocument.createElement(QStringLiteral("Package"));
+
+    const auto &packageName = package.nameStr();
+    packageElement.setAttribute(QStringLiteral("name"), packageName);
+
+    parentElement.appendChild(std::move(packageElement));
+}
+
+QDomDocument SedsXmlExporter::createSedsXmlDocument()
+{
+    QDomDocument sedsDocument;
+
+    auto processingInstruction = sedsDocument.createProcessingInstruction("xml", R"(version="1.0" encoding="utf-8")");
+    sedsDocument.appendChild(std::move(processingInstruction));
+
+    return sedsDocument;
+}
+
+QDomElement SedsXmlExporter::createRootElement(QString rootElementName, QDomDocument &sedsDocument)
+{
+    auto rootElement = sedsDocument.createElement(std::move(rootElementName));
+    rootElement.setAttribute("xmlns", m_schemaNsUri);
+    rootElement.setAttribute("xmlns:xsi", m_schemaInstanceNsUri);
+    rootElement.setAttribute("xsi:schemaLocation", m_schemaLocation);
+
+    return rootElement;
 }
 
 } // namespace seds::exporter

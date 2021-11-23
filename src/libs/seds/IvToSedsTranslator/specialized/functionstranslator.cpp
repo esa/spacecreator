@@ -52,10 +52,10 @@ void FunctionsTranslator::translateInterface(
         throw TranslationException("Cyclic interface translation not implemented");
         break;
     case ivm::IVInterface::OperationKind::Sporadic:
-        throw TranslationException("Sporadic interface translation not implemented");
+        /* throw TranslationException("Sporadic interface translation not implemented"); */
         break;
     case ivm::IVInterface::OperationKind::Protected:
-        throw TranslationException("Protected interface translation not implemented");
+        /* throw TranslationException("Protected interface translation not implemented"); */
         break;
     case ivm::IVInterface::OperationKind::Unprotected:
         throw TranslationException("Unprotected interface translation not implemented");
