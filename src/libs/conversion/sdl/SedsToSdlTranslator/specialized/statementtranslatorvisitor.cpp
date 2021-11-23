@@ -150,12 +150,14 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Conditional &cond
 auto StatementTranslatorVisitor::operator()(const seds::model::Iteration &iteration) -> void
 {
     auto startLabel = std::make_unique<::sdl::Label>(m_context.uniqueLabelName(LOOP_START_LABEL_PREFIX));
+    auto startLabelPointer = startLabel.get();
     auto endLabel = std::make_unique<::sdl::Label>(m_context.uniqueLabelName(LOOP_END_LABEL_PREFIX));
     auto decision = std::make_unique<::sdl::Decision>();
     auto exitLoop = std::make_unique<::sdl::Answer>();
     auto continueLoop = std::make_unique<::sdl::Answer>();
     auto exitTransition = std::make_unique<::sdl::Transition>();
     auto continueTransition = std::make_unique<::sdl::Transition>();
+    auto transitionPointer = continueTransition.get();
     auto exitJoin = std::make_unique<::sdl::Join>();
     exitJoin->setLabel(endLabel.get());
 
@@ -167,8 +169,6 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Iteration &iterat
     // Loop condition met
     continueLoop->setLiteral(::sdl::VariableLiteral(TRUE_LITERAL));
     continueLoop->setTransition(std::move(continueTransition));
-    // This needs to be saved so that actual body actions can be added
-    auto transitionPointer = continueLoop->transition();
 
     decision->addAnswer(std::move(exitLoop));
     decision->addAnswer(std::move(continueLoop));
@@ -176,8 +176,6 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Iteration &iterat
     generateLoopStart(m_context, m_sdlTransition, iteration, decision.get());
 
     m_sdlTransition->addAction(std::move(startLabel));
-    // startLabel must be moved, but we want to take its pointer after the move
-    auto startLabelPointer = dynamic_cast<::sdl::Label *>(m_sdlTransition->actions().back().get());
     // This contains the actual body, which is generated a few lines below
     m_sdlTransition->addAction(std::move(decision));
     m_sdlTransition->addAction(std::move(endLabel));
