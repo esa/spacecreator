@@ -1,7 +1,9 @@
 project(IvToSedsTranslator VERSION 1.0.0 LANGUAGES CXX)
 
-set(SOURCES translator.cpp)
-set(INCLUDES translator.h)
+set(SOURCES     translator.cpp
+                specialized/functionstranslator.cpp)
+set(INCLUDES    translator.h
+                specialized/functionstranslator.h)
 
 add_library(IvToSedsTranslator STATIC)
 target_sources(IvToSedsTranslator

@@ -27,7 +27,7 @@ class tst_SedsConverter : public QObject
 {
     Q_OBJECT
 
-private Q_SLOTS:
+public Q_SLOTS:
     void testStateMachineWithBareInput();
     void testSimpleDataTypes();
     void testArrays();
@@ -38,24 +38,38 @@ private Q_SLOTS:
     void testFactorial();
 };
 
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-2490
+/// \SRS  ETB-IF-140
+/// \SRS  ETB-IF-150
+/// \SRS  ETB-IF-170
 void tst_SedsConverter::testStateMachineWithBareInput()
 {
     const int result = system("./test_state_machine_with_bare_inputs.sh");
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-IF-120
+/// \SRS  ETB-IF-150
+/// \SRS  ETB-IF-170
 void tst_SedsConverter::testSimpleDataTypes()
 {
     const int result = system("./test_simple_data_types.sh");
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-IF-120
+/// \SRS  ETB-IF-150
+/// \SRS  ETB-IF-170
 void tst_SedsConverter::testArrays()
 {
     const int result = system("./test_arrays.sh");
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-IF-120
+/// \SRS  ETB-IF-150
+/// \SRS  ETB-IF-170
 void tst_SedsConverter::testContainers()
 {
     const int result = system("./test_containers.sh");

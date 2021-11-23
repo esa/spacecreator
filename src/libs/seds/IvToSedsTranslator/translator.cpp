@@ -18,7 +18,10 @@
  */
 #include "translator.h"
 
+#include "specialized/functionstranslator.h"
+
 #include <asn1library/asn1/asn1model.h>
+#include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
 #include <seds/SedsModel/sedsmodel.h>
 
@@ -59,11 +62,23 @@ std::set<ModelType> IvToSedsTranslator::getDependencies() const
 std::vector<std::unique_ptr<Model>> IvToSedsTranslator::translateIvModel(
         const IVModel *ivModel, Asn1Model *asn1Model, const Options &options) const
 {
-    Q_UNUSED(ivModel);
     Q_UNUSED(asn1Model);
     Q_UNUSED(options);
 
+    ::seds::model::Package sedsPackage;
+
+    const auto ivFunctions = ivModel->allObjectsByType<ivm::IVFunction>();
+    for (const auto ivFunction : ivFunctions) {
+        FunctionsTranslator::translateFunction(ivFunction, sedsPackage);
+    }
+
+    ::seds::model::PackageFile sedsPackageFile;
+    sedsPackageFile.setPackage(std::move(sedsPackage));
+
+    auto sedsModel = std::make_unique<SedsModel>(std::move(sedsPackageFile));
+
     std::vector<std::unique_ptr<Model>> resultModels;
+    resultModels.push_back(std::move(sedsModel));
 
     return resultModels;
 }

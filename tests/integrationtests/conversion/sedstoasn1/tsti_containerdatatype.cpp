@@ -21,11 +21,13 @@
 
 namespace conversion::asn1::test {
 
+/// \SRS  ETB-FUN-230
 void tsti_ContainerDataType::testSimpleContainer()
 {
     runConversionTest("container_simple", "CONTAINER-SIMPLE");
 }
 
+/// \SRS  ETB-FUN-230
 void tsti_ContainerDataType::testExtendedContainer()
 {
     runConversionTest("container_extended", "CONTAINER-EXTENDED");
