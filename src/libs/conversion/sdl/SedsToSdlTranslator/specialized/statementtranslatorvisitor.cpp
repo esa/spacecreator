@@ -389,29 +389,44 @@ auto StatementTranslatorVisitor::translateOutput(::sdl::Process *hostProcess, ::
     return std::move(result);
 }
 
+class ExpressionTranslatorVisitor
+{
+public:
+    ExpressionTranslatorVisitor(::sdl::Process *process, ::sdl::Procedure *procedure)
+        : m_process(process)
+        , m_procedure(procedure)
+    {
+    }
+
+    auto operator()(const seds::model::Comparison &comparison) -> QString
+    {
+        return StatementTranslatorVisitor::translateComparison(m_process, m_procedure, comparison);
+    }
+    auto operator()(const std::unique_ptr<seds::model::AndedConditions> &conditions) -> QString
+    {
+        return StatementTranslatorVisitor::translateAndedConditions(m_process, m_procedure, *conditions);
+    }
+    auto operator()(const std::unique_ptr<seds::model::OredConditions> &conditions) -> QString
+    {
+        return StatementTranslatorVisitor::translateOredConditions(m_process, m_procedure, *conditions);
+    }
+    auto operator()(const seds::model::TypeCheck &check) -> QString
+    {
+        return StatementTranslatorVisitor::translateTypeCheck(m_process, m_procedure, check);
+    }
+
+private:
+    ::sdl::Process *m_process;
+    ::sdl::Procedure *m_procedure;
+};
+
 auto StatementTranslatorVisitor::translateBooleanExpression(
         ::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const seds::model::BooleanExpression &expression)
         -> std::unique_ptr<::sdl::Decision>
 {
     auto decision = std::make_unique<::sdl::Decision>();
     const auto &condition = expression.condition();
-    const auto expressionText = std::visit(
-            overloaded {
-                    [&hostProcess, &hostProcedure](const seds::model::Comparison &comparison) {
-                        return translateComparison(hostProcess, hostProcedure, comparison);
-                    },
-                    [&hostProcess, &hostProcedure](const std::unique_ptr<seds::model::AndedConditions> &conditions) {
-                        return translateAndedConditions(hostProcess, hostProcedure, *conditions);
-                    },
-                    [&hostProcess, &hostProcedure](const std::unique_ptr<seds::model::OredConditions> &conditions) {
-                        return translateOredConditions(hostProcess, hostProcedure, *conditions);
-                    },
-                    [&hostProcess, &hostProcedure](const seds::model::TypeCheck &check) {
-                        return translateTypeCheck(hostProcess, hostProcedure, check);
-                    },
-            },
-            condition);
-
+    const auto expressionText = std::visit(ExpressionTranslatorVisitor(hostProcess, hostProcedure), condition);
     auto expressionAction = std::make_unique<::sdl::Expression>(expressionText);
     decision->setExpression(std::move(expressionAction));
     return decision;
@@ -420,13 +435,15 @@ auto StatementTranslatorVisitor::translateBooleanExpression(
 auto StatementTranslatorVisitor::translateComparison(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
         const seds::model::Comparison &comparison) -> QString
 {
-    Q_UNUSED(hostProcess);
-    Q_UNUSED(hostProcedure);
-    const auto left = comparison.firstOperand().variableRef().value().value();
+    const auto leftVariable = findVariableDeclaration(hostProcess, hostProcedure,
+            Escaper::escapeAsn1FieldName(comparison.firstOperand().variableRef().value().value()));
+    const auto left = leftVariable->name();
     const auto &right = std::visit(
             overloaded {
-                    [](const seds::model::VariableRefOperand &reference) {
-                        return Escaper::escapeAsn1FieldName(reference.variableRef().value().value());
+                    [&hostProcess, &hostProcedure](const seds::model::VariableRefOperand &reference) {
+                        const auto rightVariable = findVariableDeclaration(
+                                hostProcess, hostProcedure, reference.variableRef().value().value());
+                        return rightVariable->name();
                     },
                     [](const seds::model::ValueOperand &value) { return value.value().value(); },
             },
@@ -438,22 +455,23 @@ auto StatementTranslatorVisitor::translateComparison(::sdl::Process *hostProcess
 auto StatementTranslatorVisitor::translateAndedConditions(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
         const seds::model::AndedConditions &conditions) -> QString
 {
-    Q_UNUSED(hostProcess);
-    Q_UNUSED(hostProcedure);
-    Q_UNUSED(conditions);
-
-    throw TranslationException("Expression not implemented");
-    return "";
+    return std::accumulate(conditions.conditions().begin(), conditions.conditions().end(), QString(""),
+            [&hostProcess, &hostProcedure](const auto &accumulator, const auto &element) {
+                const auto expression = std::visit(ExpressionTranslatorVisitor(hostProcess, hostProcedure), element);
+                return accumulator.size() == 0 ? QString("(%1)").arg(expression)
+                                               : QString(accumulator + " and " + QString("(%1)").arg(expression));
+            });
 }
 
 auto StatementTranslatorVisitor::translateOredConditions(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
         const seds::model::OredConditions &conditions) -> QString
 {
-    Q_UNUSED(hostProcess);
-    Q_UNUSED(hostProcedure);
-    Q_UNUSED(conditions);
-    throw TranslationException("Expression not implemented");
-    return "";
+    return std::accumulate(conditions.conditions().begin(), conditions.conditions().end(), QString(""),
+            [&hostProcess, &hostProcedure](const auto &accumulator, const auto &element) {
+                const auto expression = std::visit(ExpressionTranslatorVisitor(hostProcess, hostProcedure), element);
+                return accumulator.size() == 0 ? QString("(%1)").arg(expression)
+                                               : QString(accumulator + " or " + QString("(%1)").arg(expression));
+            });
 }
 
 auto StatementTranslatorVisitor::translateTypeCheck(

@@ -36,6 +36,13 @@
 namespace conversion::sdl::translator {
 
 /**
+ * @brief Forward declaration of an internal class used to reduce glue code
+ *
+ * For friendship declaration
+ */
+class ExpressionTranslatorVisitor;
+
+/**
  * @brief   Translator visitor for SEDS statements
  *
  * Translated statements will be added to the passed transition
@@ -232,6 +239,8 @@ private:
 
     static auto generateLoopEnd(Context &context, ::sdl::Transition *transition,
             const seds::model::Iteration &iteration, ::sdl::Label *startLabel) -> void;
+
+    friend class ExpressionTranslatorVisitor;
 };
 
 } // namespace conversion::asn1::translator
