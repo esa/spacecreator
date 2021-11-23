@@ -125,7 +125,7 @@ QString SedsXmlImporter::preprocess(
     return preprocessedFilepath;
 }
 
-void SedsXmlImporter::validate(const QString &preprocessedFilename, const Options &options) const
+void SedsXmlImporter::validate(const QString &preprocessedFilepath, const Options &options) const
 {
     const auto schemaFilepath = options.value(SedsOptions::schemaFilepath);
     if (schemaFilepath) {

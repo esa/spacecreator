@@ -99,7 +99,7 @@ private:
      * @throws  conversion::importer::FileNotFound
      * @throws  seds::validator::ValidatorException
      */
-    auto validate(const QString &preprocessedFilename, const conversion::Options &options) const -> void;
+    auto validate(const QString &preprocessedFilepath, const conversion::Options &options) const -> void;
 
 private:
     static const QString preprocessedFilenameTemplate;
