@@ -79,7 +79,7 @@ class tst_SedsToSdlTranslator : public QObject
 {
     Q_OBJECT
 
-public Q_SLOTS:
+private Q_SLOTS:
     void testMissingModel();
     void testNotEnoughModels();
     void testTooManyModels();

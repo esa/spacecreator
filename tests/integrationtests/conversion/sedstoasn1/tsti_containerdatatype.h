@@ -27,7 +27,7 @@ class tsti_ContainerDataType : public TestBase
 {
     Q_OBJECT
 
-public Q_SLOTS:
+private Q_SLOTS:
     void testSimpleContainer();
     void testExtendedContainer();
 };

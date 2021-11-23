@@ -27,7 +27,7 @@ class tst_SedsConverter : public QObject
 {
     Q_OBJECT
 
-public Q_SLOTS:
+private Q_SLOTS:
     void testStateMachineWithBareInput();
     void testSimpleDataTypes();
     void testArrays();

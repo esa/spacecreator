@@ -37,7 +37,7 @@ class tst_SymbolDefinitionReader : public QObject
 public:
     virtual ~tst_SymbolDefinitionReader() = default;
 
-public Q_SLOTS:
+private Q_SLOTS:
     void readValidFile();
     void readNonexistingFile();
     void readInvalidFile();

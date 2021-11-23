@@ -58,7 +58,7 @@ class tst_SedsToIvTranslator : public QObject
 {
     Q_OBJECT
 
-public Q_SLOTS:
+private Q_SLOTS:
     void testMissingModel();
     void testNotEnoughModels();
     void testTooManyModels();
