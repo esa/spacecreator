@@ -393,26 +393,32 @@ auto StatementTranslatorVisitor::translateBooleanExpression(
         ::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const seds::model::BooleanExpression &expression)
         -> std::unique_ptr<::sdl::Decision>
 {
+    auto decision = std::make_unique<::sdl::Decision>();
     const auto &condition = expression.condition();
-    if (std::holds_alternative<seds::model::Comparison>(condition)) {
-        const auto &comparision = std::get<seds::model::Comparison>(condition);
-        return translateComparison(hostProcess, hostProcedure, comparision);
-    } else if (std::holds_alternative<std::unique_ptr<seds::model::AndedConditions>>(condition)) {
-        const auto &conditions = std::get<std::unique_ptr<seds::model::AndedConditions>>(condition);
-        return translateAndedConditions(hostProcess, hostProcedure, *conditions);
-    } else if (std::holds_alternative<std::unique_ptr<seds::model::OredConditions>>(condition)) {
-        const auto &conditions = std::get<std::unique_ptr<seds::model::OredConditions>>(condition);
-        return translateOredConditions(hostProcess, hostProcedure, *conditions);
-    } else if (std::holds_alternative<seds::model::TypeCheck>(condition)) {
-        const auto &check = std::get<seds::model::TypeCheck>(condition);
-        return translateTypeCheck(hostProcess, hostProcedure, check);
-    }
-    throw TranslationException("Expression not implemented");
-    return nullptr;
+    const auto expressionText = std::visit(
+            overloaded {
+                    [&hostProcess, &hostProcedure](const seds::model::Comparison &comparison) {
+                        return translateComparison(hostProcess, hostProcedure, comparison);
+                    },
+                    [&hostProcess, &hostProcedure](const std::unique_ptr<seds::model::AndedConditions> &conditions) {
+                        return translateAndedConditions(hostProcess, hostProcedure, *conditions);
+                    },
+                    [&hostProcess, &hostProcedure](const std::unique_ptr<seds::model::OredConditions> &conditions) {
+                        return translateOredConditions(hostProcess, hostProcedure, *conditions);
+                    },
+                    [&hostProcess, &hostProcedure](const seds::model::TypeCheck &check) {
+                        return translateTypeCheck(hostProcess, hostProcedure, check);
+                    },
+            },
+            condition);
+
+    auto expressionAction = std::make_unique<::sdl::Expression>(expressionText);
+    decision->setExpression(std::move(expressionAction));
+    return decision;
 }
 
 auto StatementTranslatorVisitor::translateComparison(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-        const seds::model::Comparison &comparison) -> std::unique_ptr<::sdl::Decision>
+        const seds::model::Comparison &comparison) -> QString
 {
     Q_UNUSED(hostProcess);
     Q_UNUSED(hostProcedure);
@@ -426,40 +432,38 @@ auto StatementTranslatorVisitor::translateComparison(::sdl::Process *hostProcess
             },
             comparison.secondOperand());
     const auto op = comparisonOperatorToString(comparison.comparisonOperator());
-    auto decision = std::make_unique<::sdl::Decision>();
-    auto expression = std::make_unique<::sdl::Expression>(QString("%1 %2 %3").arg(left, op, right));
-    decision->setExpression(std::move(expression));
-    return decision;
+    return QString("%1 %2 %3").arg(left, op, right);
 }
 
 auto StatementTranslatorVisitor::translateAndedConditions(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-        const seds::model::AndedConditions &conditions) -> std::unique_ptr<::sdl::Decision>
+        const seds::model::AndedConditions &conditions) -> QString
 {
     Q_UNUSED(hostProcess);
     Q_UNUSED(hostProcedure);
     Q_UNUSED(conditions);
+
     throw TranslationException("Expression not implemented");
-    return nullptr;
+    return "";
 }
 
 auto StatementTranslatorVisitor::translateOredConditions(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-        const seds::model::OredConditions &conditions) -> std::unique_ptr<::sdl::Decision>
+        const seds::model::OredConditions &conditions) -> QString
 {
     Q_UNUSED(hostProcess);
     Q_UNUSED(hostProcedure);
     Q_UNUSED(conditions);
     throw TranslationException("Expression not implemented");
-    return nullptr;
+    return "";
 }
 
-auto StatementTranslatorVisitor::translateTypeCheck(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-        const seds::model::TypeCheck &check) -> std::unique_ptr<::sdl::Decision>
+auto StatementTranslatorVisitor::translateTypeCheck(
+        ::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const seds::model::TypeCheck &check) -> QString
 {
     Q_UNUSED(hostProcess);
     Q_UNUSED(hostProcedure);
     Q_UNUSED(check);
     throw TranslationException("Expression not implemented");
-    return nullptr;
+    return "";
 }
 
 auto StatementTranslatorVisitor::comparisonOperatorToString(const seds::model::ComparisonOperator op) -> QString

@@ -206,16 +206,16 @@ private:
             const seds::model::BooleanExpression &expression) -> std::unique_ptr<::sdl::Decision>;
 
     static auto translateComparison(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-            const seds::model::Comparison &comparison) -> std::unique_ptr<::sdl::Decision>;
+            const seds::model::Comparison &comparison) -> QString;
 
     static auto translateAndedConditions(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-            const seds::model::AndedConditions &conditions) -> std::unique_ptr<::sdl::Decision>;
+            const seds::model::AndedConditions &conditions) -> QString;
 
     static auto translateOredConditions(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-            const seds::model::OredConditions &conditions) -> std::unique_ptr<::sdl::Decision>;
+            const seds::model::OredConditions &conditions) -> QString;
 
     static auto translateTypeCheck(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-            const seds::model::TypeCheck &check) -> std::unique_ptr<::sdl::Decision>;
+            const seds::model::TypeCheck &check) -> QString;
 
     static auto translateAnswer(Context &context, ::sdl::Label *joinLabel, const QString value,
             const seds::model::Body *body) -> std::unique_ptr<::sdl::Answer>;
