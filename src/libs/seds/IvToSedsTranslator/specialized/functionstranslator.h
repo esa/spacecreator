@@ -26,6 +26,7 @@ class IVInterface;
 
 namespace seds::model {
 class Component;
+class Interface;
 class Package;
 } // namespace seds
 
@@ -54,6 +55,8 @@ public:
 private:
     static auto translateInterface(const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)
             -> void;
+    static auto translateInterfaceParameters(
+            const ivm::IVInterface *ivInterface, ::seds::model::Interface &sedsInterface) -> void;
 };
 
 } // namespace conversion::seds::translator

@@ -34,6 +34,7 @@ void FunctionsTranslator::translateFunction(const ivm::IVFunction *ivFunction, :
 
     auto ivFunctionName =
             ivFunction->entityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name)).value<QString>();
+    sedsComponent.setName(std::move(ivFunctionName));
 
     for (const auto ivInterface : ivFunction->allInterfaces()) {
         translateInterface(ivInterface, sedsComponent);
@@ -45,25 +46,30 @@ void FunctionsTranslator::translateFunction(const ivm::IVFunction *ivFunction, :
 void FunctionsTranslator::translateInterface(
         const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)
 {
-    Q_UNUSED(sedsComponent);
+    ::seds::model::Interface sedsInterface;
+    sedsInterface.setName(ivInterface->title());
 
-    switch (ivInterface->kind()) {
-    case ivm::IVInterface::OperationKind::Cyclic:
-        throw TranslationException("Cyclic interface translation not implemented");
+    translateInterfaceParameters(ivInterface, sedsInterface);
+
+    switch (ivInterface->direction()) {
+    case ivm::IVInterface::InterfaceType::Required:
+        sedsComponent.addProvidedInterface(std::move(sedsInterface));
         break;
-    case ivm::IVInterface::OperationKind::Sporadic:
-        /* throw TranslationException("Sporadic interface translation not implemented"); */
+    case ivm::IVInterface::InterfaceType::Provided:
+        sedsComponent.addRequiredInterface(std::move(sedsInterface));
         break;
-    case ivm::IVInterface::OperationKind::Protected:
-        /* throw TranslationException("Protected interface translation not implemented"); */
-        break;
-    case ivm::IVInterface::OperationKind::Unprotected:
-        throw TranslationException("Unprotected interface translation not implemented");
+    case ivm::IVInterface::InterfaceType::Grouped:
+        throw TranslationException("Grouped interfaces are not implemented");
         break;
     default:
         throw TranslationException("Unhandled OperationKind value");
         break;
     }
+}
+
+void FunctionsTranslator::translateInterfaceParameters(
+        const ivm::IVInterface *ivInterface, ::seds::model::Interface &sedsInterface)
+{
 }
 
 } // namespace conversion::seds::translator
