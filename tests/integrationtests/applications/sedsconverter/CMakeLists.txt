@@ -14,6 +14,8 @@ target_link_libraries(${TEST_NAME}
 
 add_format_target(${TEST_NAME})
 
+configure_file(resources/Makefile resources/Makefile COPYONLY)
+
 configure_file(test_simple_data_types.sh test_simple_data_types.sh COPYONLY)
 configure_file(resources/test_simple_data_types.xml resources/test_simple_data_types.xml COPYONLY)
 configure_file(resources/test_simple_data_types_asn.output resources/test_simple_data_types_asn.output COPYONLY)

@@ -2,14 +2,13 @@
 
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 AADL_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/aadlconverter
-SPACE_CREATOR=/home/taste/tool-src/helper-scripts/space-creator
-UPDATE_DATAVIEW=/home/taste/tool-src/helper-scripts/taste-update-data-view
-ASN2DATAVIEW=asn2aadlPlus
+UPDATE_DATAVIEW="asn2aadlPlus -f output.asn DataView.aadl -aadlv2"
 TEST_OUTPUT_DIR=output
 
 # Setup output dir and project
 rm -r -f $TEST_OUTPUT_DIR
-$SPACE_CREATOR init $TEST_OUTPUT_DIR
+mkdir $TEST_OUTPUT_DIR
+cp resources/Makefile $TEST_OUTPUT_DIR/Makefile
 # Translate
 $SEDS_CONVERTER --from SEDS --to InterfaceView --aux-models ASN.1 --skip-validation -i resources/test_hwas.xml \
   --out $TEST_OUTPUT_DIR/interfaceview.xml --iv-config config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/
@@ -24,8 +23,8 @@ sed -i 's/COM-N7SPACE-HWAS/OUTPUT-DATAVIEW/g' $TEST_OUTPUT_DIR/output.asn
 sed -i 's/language="SDL"/language="C"/g' $TEST_OUTPUT_DIR/interfaceview.xml
 
 cd $TEST_OUTPUT_DIR
-# Generate AADL
-$UPDATE_DATAVIEW output.asn
+
+$UPDATE_DATAVIEW
 
 $AADL_CONVERTER -o interfaceview.xml \
   -t /home/taste/tool-inst/share/xml2dv/interfaceview.tmplt \
