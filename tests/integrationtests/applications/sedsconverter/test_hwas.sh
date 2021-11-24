@@ -2,7 +2,8 @@
 
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 AADL_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/aadlconverter
-SPACE_CREATOR=space-creator
+SPACE_CREATOR=/home/taste/tool-inst/bin/space-creator
+UPDATE_DATAVIEW=/home/taste/tool-inst/bin/taste-update-data-view
 ASN2DATAVIEW=asn2aadlPlus
 TEST_OUTPUT_DIR=output
 
@@ -24,7 +25,7 @@ sed -i 's/language="SDL"/language="C"/g' $TEST_OUTPUT_DIR/interfaceview.xml
 
 cd $TEST_OUTPUT_DIR
 # Generate AADL
-taste-update-data-view output.asn
+$UPDATE_DATAVIEW output.asn
 
 $AADL_CONVERTER -o interfaceview.xml \
   -t /home/taste/tool-inst/share/xml2dv/interfaceview.tmplt \

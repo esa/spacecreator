@@ -2,7 +2,8 @@
 
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 AADL_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/aadlconverter
-SPACE_CREATOR=space-creator
+SPACE_CREATOR=/home/taste/tool-inst/bin/space-creator
+UPDATE_DATAVIEW=/home/taste/tool-inst/bin/taste-update-data-view
 ASN2DATAVIEW=asn2aadlPlus
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
@@ -27,7 +28,7 @@ sed -i 's/language="SDL"/language="C"/g' $TEST_OUTPUT_DIR/interfaceview.xml
 
 cd $TEST_OUTPUT_DIR
 # Generate AADL
-taste-update-data-view output.asn
+$UPDATE_DATAVIEW output.asn
 
 # Execute commands in chain to make sure that the generated interface view matches
 # the reference and allows to succesfully generate derived artefacts
