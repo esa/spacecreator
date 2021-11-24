@@ -79,4 +79,18 @@ public:
     explicit MissingOutputFilenameException(ModelType modelType);
 };
 
+/**
+ * @brief   Exception thrown when element is not supported
+ */
+class UnsupportedElementException final : public ExportException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   elementName     Element name
+     */
+    explicit UnsupportedElementException(QString elementName);
+};
+
 } // namespace conversion::exporter

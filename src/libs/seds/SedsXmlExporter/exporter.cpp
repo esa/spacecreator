@@ -19,6 +19,8 @@
 
 #include "exporter.h"
 
+#include "specialized/datatypeexporter.h"
+
 #include <QDomDocument>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/overloaded.h>
@@ -102,6 +104,14 @@ void SedsXmlExporter::exportPackage(const Package &package, QDomElement &parentE
     packageElement.setAttribute(QStringLiteral("name"), packageName);
 
     parentElement.appendChild(std::move(packageElement));
+
+    if (package.dataTypes().size() > 0) {
+        auto dataTypeSet = sedsDocument.createElement(QStringLiteral("DataTypeSet"));
+        for (const auto &dataType : package.dataTypes()) {
+            DataTypeExporter::exportDataType(dataType, dataTypeSet, sedsDocument);
+        }
+        packageElement.appendChild(std::move(dataTypeSet));
+    }
 }
 
 QDomDocument SedsXmlExporter::createSedsXmlDocument()

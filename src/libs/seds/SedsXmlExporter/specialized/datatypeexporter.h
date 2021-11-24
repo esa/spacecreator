@@ -20,7 +20,19 @@
 #pragma once
 
 #include <QDomElement>
+#include <seds/SedsModel/types/arraydatatype.h>
+#include <seds/SedsModel/types/binarydatatype.h>
+#include <seds/SedsModel/types/booleandatatype.h>
+#include <seds/SedsModel/types/containerdatatype.h>
 #include <seds/SedsModel/types/datatype.h>
+#include <seds/SedsModel/types/encodings/coreintegerencoding.h>
+#include <seds/SedsModel/types/encodings/falsevalue.h>
+#include <seds/SedsModel/types/enumerateddatatype.h>
+#include <seds/SedsModel/types/floatdatatype.h>
+#include <seds/SedsModel/types/integerdatatype.h>
+#include <seds/SedsModel/types/ranges/minmaxrange.h>
+#include <seds/SedsModel/types/stringdatatype.h>
+#include <seds/SedsModel/types/subrangedatatype.h>
 
 namespace seds::exporter {
 
@@ -38,6 +50,30 @@ public:
      * @param   sedsDocument    SEDS XML document
      */
     static auto exportDataType(const model::DataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument)
+            -> void;
+
+protected:
+    static auto exportArrayDataType(
+            const model::ArrayDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void;
+    static auto exportBinaryDataType(
+            const model::BinaryDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void;
+    static auto exportBooleanDataType(
+            const model::BooleanDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void;
+    static auto exportContainerDataType(
+            const model::ContainerDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void;
+    static auto exportEnumeratedDataType(
+            const model::EnumeratedDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void;
+    static auto exportFloatDataType(
+            const model::FloatDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void;
+    static auto exportIntegerDataType(
+            const model::IntegerDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void;
+    static auto exportStringDataType(
+            const model::StringDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void;
+    static auto exportSubRangeDataType(
+            const model::SubRangeDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void;
+
+    static auto exportCoreIntegerEncoding(model::CoreIntegerEncoding encoding, QDomElement &setElement) -> void;
+    static auto exportMinMaxRange(const model::MinMaxRange &range, QDomElement &setElement, QDomDocument &sedsDocument)
             -> void;
 };
 

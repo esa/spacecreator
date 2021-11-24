@@ -44,4 +44,9 @@ MissingOutputFilenameException::MissingOutputFilenameException(ModelType modelTy
 {
 }
 
+UnsupportedElementException::UnsupportedElementException(QString elementName)
+    : ExportException(QString("Element %1 is unsupported").arg(elementName))
+{
+}
+
 } // namespace conversion::exporter
