@@ -2,8 +2,8 @@
 
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 AADL_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/aadlconverter
-SPACE_CREATOR=/home/taste/tool-inst/bin/space-creator
-UPDATE_DATAVIEW=/home/taste/tool-inst/bin/taste-update-data-view
+SPACE_CREATOR=/home/taste/tool-src/helper-scripts/space-creator
+UPDATE_DATAVIEW=/home/taste/tool-src/helper-scripts/taste-update-data-view
 ASN2DATAVIEW=asn2aadlPlus
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
