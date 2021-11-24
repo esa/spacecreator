@@ -19,6 +19,8 @@
 
 #include "specialized/functionstranslator.h"
 
+#include "parameter.h"
+
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivinterface.h>
@@ -84,7 +86,22 @@ void FunctionsTranslator::createInterfaceCommand(
         break;
     }
 
+    for (const auto &ivInterfaceParameter : ivInterface->params()) {
+        createInterfaceArgument(ivInterfaceParameter, sedsInterfaceCommand);
+    }
+
     sedsInterfaceDeclaration.addCommand(std::move(sedsInterfaceCommand));
+}
+
+void FunctionsTranslator::createInterfaceArgument(
+        const shared::InterfaceParameter &ivInterfaceParameter, ::seds::model::InterfaceCommand &sedsInterfaceCommand)
+{
+    ::seds::model::CommandArgument sedsInterfaceCommandArgument;
+    sedsInterfaceCommandArgument.setName(ivInterfaceParameter.name());
+    sedsInterfaceCommandArgument.setType(ivInterfaceParameter.paramTypeName());
+    sedsInterfaceCommandArgument.setMode(::seds::model::CommandArgumentMode::In);
+
+    sedsInterfaceCommand.addArgument(std::move(sedsInterfaceCommandArgument));
 }
 
 void FunctionsTranslator::createInterface(const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)

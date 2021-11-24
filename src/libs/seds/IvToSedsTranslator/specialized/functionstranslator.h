@@ -27,9 +27,14 @@ class IVInterface;
 namespace seds::model {
 class Component;
 class Interface;
+class InterfaceCommand;
 class InterfaceDeclaration;
 class Package;
 } // namespace seds
+
+namespace shared {
+class InterfaceParameter;
+} // namespace shared
 
 namespace conversion::seds::translator {
 
@@ -61,6 +66,9 @@ private:
             -> void;
     static auto createInterfaceCommand(
             const ivm::IVInterface *ivInterface, ::seds::model::InterfaceDeclaration &sedsInterfaceDeclaration) -> void;
+    static auto createInterfaceArgument(const shared::InterfaceParameter &ivInterfaceParameter,
+            ::seds::model::InterfaceCommand &sedsInterfaceCommand) -> void;
+
     static auto createInterface(const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent) -> void;
 };
 
