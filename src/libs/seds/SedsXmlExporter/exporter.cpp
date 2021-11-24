@@ -19,6 +19,8 @@
 
 #include "exporter.h"
 
+#include "specialized/componentexporter.h"
+
 #include <QDomDocument>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/overloaded.h>
@@ -100,6 +102,8 @@ void SedsXmlExporter::exportPackage(const Package &package, QDomElement &parentE
 
     const auto &packageName = package.nameStr();
     packageElement.setAttribute(QStringLiteral("name"), packageName);
+
+    ComponentExporter::exportComponents(package.components(), packageElement, sedsDocument);
 
     parentElement.appendChild(std::move(packageElement));
 }
