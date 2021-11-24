@@ -13,7 +13,7 @@ rm -r -f $TEST_OUTPUT_DIR
 #mkdir $TEST_OUTPUT_DIR
 $SPACE_CREATOR init $TEST_OUTPUT_DIR
 # Translate
-$SEDS_CONVERTER --from SEDS --to InterfaceView --aux-models ASN.1 --skip-validation -i resources/test_interfaces.xml \
+$SEDS_CONVERTER --from SEDS --to InterfaceView --aux-models ASN.1 --skip-validation -i resources/test_provided_interfaces.xml \
   --out $TEST_OUTPUT_DIR/interfaceview.xml --iv-config config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/
 # Setup additional data
 cp $TEST_OUTPUT_DIR/INTERFACES.asn $TEST_OUTPUT_DIR/output.asn
@@ -32,7 +32,7 @@ taste-update-data-view output.asn
 # Execute commands in chain to make sure that the generated interface view matches
 # the reference and allows to succesfully generate derived artefacts
 
-$DIFF interfaceview.xml ../resources/test_interfaces.output \
+$DIFF interfaceview.xml ../resources/test_provided_interfaces.output \
   && $SPACE_CREATOR_IDE --aadlconverter -o interfaceview.xml \
   -t /home/taste/tool-inst/share/xml2dv/interfaceview.tmplt \
   -x DeploymentView.aadl \

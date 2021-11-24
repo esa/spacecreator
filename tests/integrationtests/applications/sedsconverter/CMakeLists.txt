@@ -36,6 +36,14 @@ configure_file(resources/test_datatype_inside_component_acn1.output resources/te
 configure_file(resources/test_datatype_inside_component_asn2.output resources/test_datatype_inside_component_asn2.output COPYONLY)
 configure_file(resources/test_datatype_inside_component_acn2.output resources/test_datatype_inside_component_acn2.output COPYONLY)
 
+configure_file(test_required_interfaces.sh test_required_interfaces.sh COPYONLY)
+configure_file(resources/test_required_interfaces.xml resources/test_required_interfaces.xml COPYONLY)
+configure_file(resources/test_required_interfaces.output resources/test_required_interfaces.output COPYONLY)
+
+configure_file(test_provided_interfaces.sh test_provided_interfaces.sh COPYONLY)
+configure_file(resources/test_provided_interfaces.xml resources/test_provided_interfaces.xml COPYONLY)
+configure_file(resources/test_provided_interfaces.output resources/test_provided_interfaces.output COPYONLY)
+
 configure_file(test_hwas.sh test_hwas.sh COPYONLY)
 configure_file(resources/test_hwas.xml resources/test_hwas.xml COPYONLY)
 configure_file(resources/test_hwas.interfaceview resources/test_hwas.interfaceview COPYONLY)

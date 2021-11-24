@@ -32,6 +32,8 @@ private Q_SLOTS:
     void testArrays();
     void testContainers();
     void testDatatypeInsideComponent();
+    void testRequiredInterfaces();
+    void testProvidedInterfaces();
     void testHwas();
     void testStateMachineWithBareInput();
     void testLedDemo();
@@ -41,6 +43,7 @@ private Q_SLOTS:
 };
 
 /// \SRS  ETB-FUN-110
+/// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-120
 void tst_SedsConverter::testSimpleDataTypes()
 {
@@ -49,6 +52,7 @@ void tst_SedsConverter::testSimpleDataTypes()
 }
 
 /// \SRS  ETB-FUN-110
+/// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-120
 void tst_SedsConverter::testArrays()
 {
@@ -57,6 +61,7 @@ void tst_SedsConverter::testArrays()
 }
 
 /// \SRS  ETB-FUN-110
+/// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-120
 void tst_SedsConverter::testContainers()
 {
@@ -66,6 +71,7 @@ void tst_SedsConverter::testContainers()
 
 /// \SRS  ETB-FUN-1070
 /// \SRS  ETB-FUN-1080
+/// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-120
 void tst_SedsConverter::testDatatypeInsideComponent()
 {
@@ -74,8 +80,29 @@ void tst_SedsConverter::testDatatypeInsideComponent()
 }
 
 /// \SRS  ETB-FUN-1040
+/// \SRS  ETB-FUN-1060
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-130
+void tst_SedsConverter::testRequiredInterfaces()
+{
+    const int result = system("./test_required_interfaces.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-1040
+/// \SRS  ETB-FUN-1050
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-130
+void tst_SedsConverter::testProvidedInterfaces()
+{
+    const int result = system("./test_provided_interfaces.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-1040
 /// \SRS  ETB-FUN-1050
 /// \SRS  ETB-FUN-1060
+/// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-130
 void tst_SedsConverter::testHwas()
 {
@@ -85,6 +112,7 @@ void tst_SedsConverter::testHwas()
 
 /// \SRS  ETB-FUN-10
 /// \SRS  ETB-FUN-2490
+/// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-140
 void tst_SedsConverter::testStateMachineWithBareInput()
 {
@@ -106,6 +134,7 @@ void tst_SedsConverter::testStateMachineWithBareInput()
 /// \SRS  ETB-FUN-2560
 /// \SRS  ETB-FUN-2660
 /// \SRS  ETB-FUN-2670
+/// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-140
 void tst_SedsConverter::testLedDemo()
 {
@@ -129,6 +158,7 @@ void tst_SedsConverter::testLedDemo()
 /// \SRS  ETB-FUN-2570
 /// \SRS  ETB-FUN-2660
 /// \SRS  ETB-FUN-2670
+/// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-140
 void tst_SedsConverter::testCalculator()
 {
@@ -151,6 +181,7 @@ void tst_SedsConverter::testCalculator()
 /// \SRS  ETB-FUN-2570
 /// \SRS  ETB-FUN-2660
 /// \SRS  ETB-FUN-2670
+/// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-140
 void tst_SedsConverter::testComparator()
 {
@@ -176,6 +207,7 @@ void tst_SedsConverter::testComparator()
 /// \SRS  ETB-FUN-2570
 /// \SRS  ETB-FUN-2660
 /// \SRS  ETB-FUN-2670
+/// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-140
 void tst_SedsConverter::testFactorial()
 {

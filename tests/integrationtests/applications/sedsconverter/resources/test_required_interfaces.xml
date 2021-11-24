@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="Interfaces">
+    <DataTypeSet>
+      <IntegerDataType name="DataItem">
+        <LongDescription>A sample data item</LongDescription>
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>      
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="InterfaceWithSynchronousCommands">
+        <LongDescription>Interface with synchronous commands</LongDescription>
+        <CommandSet>
+          <Command name="ExecuteSynchronousAction" mode="sync">
+            <LongDescription>Execute a synchronous action with arguments</LongDescription>
+            <Argument name="InputArg" type="DataItem" mode="in" defaultValue="15" />
+            <Argument name="OutputArg" type="DataItem" mode="out" defaultValue="20" />
+          </Command>          
+          <Command name="ExecuteSynchronousActionWithInOutArg" mode="sync">
+            <LongDescription>Execute a synchronous action with an in/out argument</LongDescription>
+            <Argument name="InOutArg" type="DataItem" mode="inout" />
+          </Command>
+        </CommandSet>
+      </Interface>
+      <Interface name="InterfaceWithAsynchronousCommands">
+        <LongDescription>Interface with asynchronous commands</LongDescription>
+        <CommandSet>
+          <Command name="ExecuteAsynchronousAction" mode="async">
+            <LongDescription>Execute an asynchronous action with input arguments</LongDescription>
+            <Argument name="ArgA" type="DataItem" mode="in" />
+            <Argument name="ArgB" type="DataItem" mode="in" />
+          </Command>
+          <Command name="ExecuteAsynchronousActionWithOutArgs" mode="async">
+            <LongDescription>Execute an asynchronous action with output arguments</LongDescription>
+            <Argument name="ArgA" type="DataItem" mode="out" />
+            <Argument name="ArgB" type="DataItem" mode="out" />
+          </Command>
+          <Command name="ExecuteAsynchronousActionWithNotification" mode="async">
+            <LongDescription>Execute an asynchronous action with output arguments</LongDescription>
+            <Argument name="InputArg" type="DataItem" mode="in" />
+            <Argument name="NotifyArg" type="DataItem" mode="notify" />
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>     
+      <Component name="Requirer">
+        <LongDescription>Host for required interfaces</LongDescription>
+        <RequiredInterfaceSet>
+          <Interface name="InterfaceWithSynchronousCommandsInstance" type="InterfaceWithSynchronousCommands" />
+          <Interface name="InterfaceWithAsynchronousCommandsInstance" type="InterfaceWithAsynchronousCommands" />
+        </RequiredInterfaceSet>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

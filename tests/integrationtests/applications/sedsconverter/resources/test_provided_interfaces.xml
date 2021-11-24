@@ -45,23 +45,6 @@
           </Command>
         </CommandSet>
       </Interface>
-      <Interface name="InterfaceWithParameters">
-        <LongDescription>Interface with parameters</LongDescription>
-        <ParameterSet>
-          <Parameter name="SynchronousParameter" type="DataItem" mode="sync">
-            <LongDescription>Synchronous parameter</LongDescription>
-          </Parameter>
-          <Parameter name="SynchronousReadOnlyParameter" type="DataItem" mode="sync" readOnly="true">
-            <LongDescription>Synchronous read-only parameter</LongDescription>
-          </Parameter>
-          <Parameter name="AsynchronousParameter" type="DataItem" mode="async">
-            <LongDescription>Asynchronous parameter</LongDescription>
-          </Parameter>
-          <Parameter name="AsynchronousReadOnlyParameter" type="DataItem" mode="async" readOnly="true">
-            <LongDescription>Asynchronous read-only parameter</LongDescription>
-          </Parameter>
-        </ParameterSet>
-      </Interface>     
     </DeclaredInterfaceSet>
     <ComponentSet>     
       <Component name="Provider">
@@ -70,13 +53,6 @@
           <Interface name="InterfaceWithSynchronousCommandsInstance" type="InterfaceWithSynchronousCommands" />
           <Interface name="InterfaceWithAsynchronousCommandsInstance" type="InterfaceWithAsynchronousCommands" />
         </ProvidedInterfaceSet>
-      </Component>
-      <Component name="Requirer">
-        <LongDescription>Host for required interfaces</LongDescription>
-        <RequiredInterfaceSet>
-          <Interface name="InterfaceWithSynchronousCommandsInstance" type="InterfaceWithSynchronousCommands" />
-          <Interface name="InterfaceWithAsynchronousCommandsInstance" type="InterfaceWithAsynchronousCommands" />
-        </RequiredInterfaceSet>
       </Component>
     </ComponentSet>
   </Package>
