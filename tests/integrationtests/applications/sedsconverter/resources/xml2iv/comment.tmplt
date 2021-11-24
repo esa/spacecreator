@@ -1,0 +1,18 @@
+{% comment %}
+Template for generation of XML scheme of comment.
+The following tags are available in this sub-template:
+comm            : Instance of comment (provided by a top level template)
+comm.attributes :   |_ List of all attributes of comment
+attr            :       |_ Instance of attriubute
+attr.name       :           |_ Name of attribute
+attr.value      :           |_ Value of attribute
+comm.properties :   |_ List of all properties of comment
+prop            :       |_ Instance of property
+prop.name       :           |_ Name of property
+prop.value      :           |_ Value of property
+{% endcomment %}
+<Comment{% for attr in comm.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+{% for prop in comm.properties %}
+    <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
+{% endfor %}
+</Comment>

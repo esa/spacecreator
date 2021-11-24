@@ -31,10 +31,10 @@ cd $TEST_OUTPUT_DIR
 $DIFF interfaceview.xml ../resources/test_hwas.interfaceview \
   && $UPDATE_DATAVIEW \
   && $AADL_CONVERTER -o interfaceview.xml \
-  -t /home/taste/tool-inst/share/xml2dv/interfaceview.tmplt \
+  -t ../resources/xml2dv/interfaceview.tmplt \
   -x DeploymentView.aadl \
   && $AADL_CONVERTER -o interfaceview.xml \
-  -t /home/taste/tool-inst/share/xml2aadl/interfaceview.tmplt \
-  -x InterfaceView.aadl  \
+  -t ../resources/xml2iv/interfaceview.tmplt \
+  -x InterfaceView.aadl \
   && cd .. \
   && rm -r -f $TEST_OUTPUT_DIR

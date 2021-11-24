@@ -16,6 +16,22 @@ add_format_target(${TEST_NAME})
 
 configure_file(resources/Makefile resources/Makefile COPYONLY)
 
+configure_file(resources/xml2dv/function_properties.tmplt resources/xml2dv/function_properties.tmplt COPYONLY)
+configure_file(resources/xml2dv/function_subcomponents.tmplt resources/xml2dv/function_subcomponents.tmplt COPYONLY)
+configure_file(resources/xml2dv/function_with.tmplt resources/xml2dv/function_with.tmplt COPYONLY)
+configure_file(resources/xml2dv/interfaceview.tmplt resources/xml2dv/interfaceview.tmplt COPYONLY)
+
+configure_file(resources/xml2iv/comment.tmplt resources/xml2iv/comment.tmplt COPYONLY)
+configure_file(resources/xml2iv/comments.tmplt resources/xml2iv/comments.tmplt COPYONLY)
+configure_file(resources/xml2iv/connection.tmplt resources/xml2iv/connection.tmplt COPYONLY)
+configure_file(resources/xml2iv/connectiongroup.tmplt resources/xml2iv/connectiongroup.tmplt COPYONLY)
+configure_file(resources/xml2iv/connections.tmplt resources/xml2iv/connections.tmplt COPYONLY)
+configure_file(resources/xml2iv/function.tmplt resources/xml2iv/function.tmplt COPYONLY)
+configure_file(resources/xml2iv/functions.tmplt resources/xml2iv/functions.tmplt COPYONLY)
+configure_file(resources/xml2iv/interface.tmplt resources/xml2iv/interface.tmplt COPYONLY)
+configure_file(resources/xml2iv/interfaces.tmplt resources/xml2iv/interfaces.tmplt COPYONLY)
+configure_file(resources/xml2iv/interfaceview.tmplt resources/xml2iv/interfaceview.tmplt COPYONLY)
+
 configure_file(test_simple_data_types.sh test_simple_data_types.sh COPYONLY)
 configure_file(resources/test_simple_data_types.xml resources/test_simple_data_types.xml COPYONLY)
 configure_file(resources/test_simple_data_types_asn.output resources/test_simple_data_types_asn.output COPYONLY)
