@@ -1,8 +1,10 @@
 project(SedsXmlExporter VERSION 1.0.0 LANGUAGES CXX)
 
-set(SOURCES exporter.cpp)
+set(SOURCES exporter.cpp
+            specialized/datatypeexporter.cpp)
 
-set(INCLUDES exporter.h)
+set(INCLUDES exporter.h
+             specialized/datatypeexporter.h)
 
 add_library(SedsXmlExporter STATIC)
 target_sources(SedsXmlExporter
