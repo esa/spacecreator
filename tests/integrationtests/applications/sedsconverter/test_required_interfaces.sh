@@ -37,6 +37,6 @@ $DIFF interfaceview.xml ../resources/test_required_interfaces.output \
   && $AADL_CONVERTER -o interfaceview.xml \
   -t /home/taste/tool-inst/share/xml2aadl/interfaceview.tmplt \
   -x InterfaceView.aadl \
-  && make skeletons
-  #&& cd .. \
-  #&& rm -r -f $TEST_OUTPUT_DIR
+  && make skeletons \
+  && cd .. \
+  && rm -r -f $TEST_OUTPUT_DIR
