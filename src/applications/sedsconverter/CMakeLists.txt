@@ -21,8 +21,11 @@ target_link_libraries(SedsConverter
                 Conversion::IvRegistrar
                 Conversion::SedsRegistrar
                 Conversion::SdlRegistrar
-                Conversion::Asn1ToSedsTranslator
-                "stdc++fs")
+                Conversion::SdlRegistrar)
+
+if (NOT APPLE)
+    target_link_libraries(SedsConverter "stdc++fs")
+endif()
 
 set_target_properties(SedsConverter PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"

@@ -16,8 +16,11 @@ target_link_libraries(SedsXmlValidator
     PUBLIC      Conversion::Converter
                 Qt${QT_VERSION_MAJOR}::Core
     PRIVATE     LibXml2::LibXml2
-                CommonProjectWarnings
-                stdc++fs)
+                CommonProjectWarnings)
+
+if (NOT APPLE)
+    target_link_libraries(SedsXmlValidator "stdc++fs")
+endif()
 
 add_format_target(SedsXmlValidator)
 add_tidy_target(SedsXmlValidator)

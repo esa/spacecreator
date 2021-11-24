@@ -14,12 +14,15 @@ target_include_directories(SedsXmlImporter
 target_link_libraries(SedsXmlImporter
     PUBLIC      Conversion::Common
                 SEDS::SymbolDefinitionReader
-                "stdc++fs"
     PRIVATE     SEDS::XmlParser
                 SEDS::XmlPreprocessor
                 SEDS::XmlValidator
                 Qt${QT_VERSION_MAJOR}::Xml
                 CommonProjectWarnings)
+
+if (NOT APPLE)
+    target_link_libraries(SedsXmlImporter "stdc++fs")
+endif()
 
 add_format_target(SedsXmlImporter)
 add_tidy_target(SedsXmlImporter)
