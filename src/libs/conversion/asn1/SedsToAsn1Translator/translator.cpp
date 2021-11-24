@@ -110,7 +110,7 @@ std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePacka
 
     for (const auto &sedsComponent : sedsPackage.components()) {
         if (sedsComponent.dataTypes().size() == 0) {
-            // Don't generate package for a component without data type declarations
+            // Don't generate ASN.1 package (and therefore a file) for a component without data type declarations
             continue;
         }
         std::vector<const seds::model::DataType *> componentDataTypes = collectDataTypes(sedsComponent);
