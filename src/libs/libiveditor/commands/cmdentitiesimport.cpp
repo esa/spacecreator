@@ -307,7 +307,7 @@ void CmdEntitiesImport::undoAsnFileImport()
 
 QString CmdEntitiesImport::relativePathForObject(const ivm::IVObject *object) const
 {
-    return QStringLiteral("work/%1").arg(object->title());
+    return shared::kRootImplementationPath + QDir::separator() + object->title().toLower();
 }
 
 } // namespace ive

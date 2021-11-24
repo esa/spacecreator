@@ -34,6 +34,7 @@ static const QString kStringDelemiter = QStringLiteral("::");
 static const QString namePatternUI("^[a-zA-Z][\\w ]*(?(?<=_)[a-zA-Z0-9])$");
 
 static const QString kNonCurrentImplementationPath { "implem" };
+static const QString kRootImplementationPath { "work" };
 
 Id createId();
 
