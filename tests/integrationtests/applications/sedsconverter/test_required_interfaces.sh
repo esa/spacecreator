@@ -10,7 +10,7 @@ TEST_OUTPUT_DIR=output
 # Setup output dir and project
 rm -r -f $TEST_OUTPUT_DIR
 mkdir $TEST_OUTPUT_DIR
-cp resources/Makefile $TEST_OUTPUT_DIR/Makefile
+
 # Translate
 $SEDS_CONVERTER --from SEDS --to InterfaceView --aux-models ASN.1 --skip-validation -i resources/test_required_interfaces.xml \
   --out $TEST_OUTPUT_DIR/interfaceview.xml --iv-config config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/
@@ -26,17 +26,15 @@ sed -i 's/language="SDL"/language="C"/g' $TEST_OUTPUT_DIR/interfaceview.xml
 
 cd $TEST_OUTPUT_DIR
 
-$UPDATE_DATAVIEW
 # Execute commands in chain to make sure that the generated interface view matches
 # the reference and allows to succesfully generate derived artefacts
-
 $DIFF interfaceview.xml ../resources/test_required_interfaces.output \
+  && $UPDATE_DATAVIEW \
   && $AADL_CONVERTER -o interfaceview.xml \
   -t /home/taste/tool-inst/share/xml2dv/interfaceview.tmplt \
   -x DeploymentView.aadl \
   && $AADL_CONVERTER -o interfaceview.xml \
   -t /home/taste/tool-inst/share/xml2aadl/interfaceview.tmplt \
   -x InterfaceView.aadl \
-  && make skeletons \
   && cd .. \
   && rm -r -f $TEST_OUTPUT_DIR
