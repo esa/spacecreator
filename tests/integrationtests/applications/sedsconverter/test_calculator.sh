@@ -2,7 +2,6 @@
 
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 OPENGEODE=$HOME/.local/bin/opengeode
-
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
 TEST_OUTPUT_DIR=output

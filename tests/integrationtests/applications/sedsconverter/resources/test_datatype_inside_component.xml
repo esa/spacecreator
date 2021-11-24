@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="PKG">
+    <DataTypeSet>
+      <IntegerDataType name="OutsideInteger">
+        <Range>
+          <MinMaxRange max="16" min="0" rangeType="inclusiveMinInclusiveMax" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <ComponentSet>
+      <Component name="Container">
+        <DataTypeSet>
+          <IntegerDataType name="InsideInteger">
+            <Range>
+              <MinMaxRange min="100" max="1000" rangeType="inclusiveMinInclusiveMax" />
+            </Range>
+          </IntegerDataType>
+        </DataTypeSet>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

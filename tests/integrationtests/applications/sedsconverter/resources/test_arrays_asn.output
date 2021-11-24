@@ -1,6 +1,6 @@
 COM-N7SPACE-ARRAYS DEFINITIONS ::= BEGIN
 DataItem ::= INTEGER(0 .. 255)
-BasicArray1D ::= SEQUENCE (SIZE(15)) OF DataItem(0 .. 255)
-Matrix4x4 ::= SEQUENCE (SIZE(4)) OF SEQUENCE (SIZE(4)) OF DataItem(0 .. 255)
+BasicArray1D ::= SEQUENCE (SIZE(0 .. 15)) OF DataItem(0 .. 255)
+Matrix4x4 ::= SEQUENCE (SIZE(0 .. 4)) OF SEQUENCE (SIZE(0 .. 4)) OF DataItem(0 .. 255)
 END
 

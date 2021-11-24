@@ -14,9 +14,21 @@ target_link_libraries(${TEST_NAME}
 
 add_format_target(${TEST_NAME})
 
-configure_file(test_state_machine_with_bare_inputs.sh test_state_machine_with_bare_inputs.sh COPYONLY)
-configure_file(resources/state_machine_with_bare_inputs.xml resources/state_machine_with_bare_inputs.xml COPYONLY)
-configure_file(resources/state_machine_with_bare_inputs.output resources/state_machine_with_bare_inputs.output COPYONLY)
+configure_file(resources/xml2dv/function_properties.tmplt resources/xml2dv/function_properties.tmplt COPYONLY)
+configure_file(resources/xml2dv/function_subcomponents.tmplt resources/xml2dv/function_subcomponents.tmplt COPYONLY)
+configure_file(resources/xml2dv/function_with.tmplt resources/xml2dv/function_with.tmplt COPYONLY)
+configure_file(resources/xml2dv/interfaceview.tmplt resources/xml2dv/interfaceview.tmplt COPYONLY)
+
+configure_file(resources/xml2iv/comment.tmplt resources/xml2iv/comment.tmplt COPYONLY)
+configure_file(resources/xml2iv/comments.tmplt resources/xml2iv/comments.tmplt COPYONLY)
+configure_file(resources/xml2iv/connection.tmplt resources/xml2iv/connection.tmplt COPYONLY)
+configure_file(resources/xml2iv/connectiongroup.tmplt resources/xml2iv/connectiongroup.tmplt COPYONLY)
+configure_file(resources/xml2iv/connections.tmplt resources/xml2iv/connections.tmplt COPYONLY)
+configure_file(resources/xml2iv/function.tmplt resources/xml2iv/function.tmplt COPYONLY)
+configure_file(resources/xml2iv/functions.tmplt resources/xml2iv/functions.tmplt COPYONLY)
+configure_file(resources/xml2iv/interface.tmplt resources/xml2iv/interface.tmplt COPYONLY)
+configure_file(resources/xml2iv/interfaces.tmplt resources/xml2iv/interfaces.tmplt COPYONLY)
+configure_file(resources/xml2iv/interfaceview.tmplt resources/xml2iv/interfaceview.tmplt COPYONLY)
 
 configure_file(test_simple_data_types.sh test_simple_data_types.sh COPYONLY)
 configure_file(resources/test_simple_data_types.xml resources/test_simple_data_types.xml COPYONLY)
@@ -33,15 +45,38 @@ configure_file(resources/test_containers.xml resources/test_containers.xml COPYO
 configure_file(resources/test_containers_asn.output resources/test_containers_asn.output COPYONLY)
 configure_file(resources/test_containers_acn.output resources/test_containers_acn.output COPYONLY)
 
-configure_file(test_calculator.sh test_calculator.sh COPYONLY)
-configure_file(resources/test_calculator.xml resources/test_calculator.xml COPYONLY)
-configure_file(resources/test_calculator.output resources/test_calculator.output COPYONLY)
-configure_file(resources/test_calculator.system_structure resources/test_calculator.system_structure COPYONLY)
+configure_file(test_datatype_inside_component.sh test_datatype_inside_component.sh COPYONLY)
+configure_file(resources/test_datatype_inside_component.xml resources/test_datatype_inside_component.xml COPYONLY)
+configure_file(resources/test_datatype_inside_component_asn1.output resources/test_datatype_inside_component_asn1.output COPYONLY)
+configure_file(resources/test_datatype_inside_component_acn1.output resources/test_datatype_inside_component_acn1.output COPYONLY)
+configure_file(resources/test_datatype_inside_component_asn2.output resources/test_datatype_inside_component_asn2.output COPYONLY)
+configure_file(resources/test_datatype_inside_component_acn2.output resources/test_datatype_inside_component_acn2.output COPYONLY)
+
+configure_file(test_required_interfaces.sh test_required_interfaces.sh COPYONLY)
+configure_file(resources/test_required_interfaces.xml resources/test_required_interfaces.xml COPYONLY)
+configure_file(resources/test_required_interfaces.output resources/test_required_interfaces.output COPYONLY)
+
+configure_file(test_provided_interfaces.sh test_provided_interfaces.sh COPYONLY)
+configure_file(resources/test_provided_interfaces.xml resources/test_provided_interfaces.xml COPYONLY)
+configure_file(resources/test_provided_interfaces.output resources/test_provided_interfaces.output COPYONLY)
+
+configure_file(test_hwas.sh test_hwas.sh COPYONLY)
+configure_file(resources/test_hwas.xml resources/test_hwas.xml COPYONLY)
+configure_file(resources/test_hwas.interfaceview resources/test_hwas.interfaceview COPYONLY)
+
+configure_file(test_state_machine_with_bare_inputs.sh test_state_machine_with_bare_inputs.sh COPYONLY)
+configure_file(resources/state_machine_with_bare_inputs.xml resources/state_machine_with_bare_inputs.xml COPYONLY)
+configure_file(resources/state_machine_with_bare_inputs.output resources/state_machine_with_bare_inputs.output COPYONLY)
 
 configure_file(test_led_demo.sh test_led_demo.sh COPYONLY)
 configure_file(resources/test_led_demo.xml resources/test_led_demo.xml COPYONLY)
 configure_file(resources/test_led_demo.output resources/test_led_demo.output COPYONLY)
 configure_file(resources/test_led_demo.system_structure resources/test_led_demo.system_structure COPYONLY)
+
+configure_file(test_calculator.sh test_calculator.sh COPYONLY)
+configure_file(resources/test_calculator.xml resources/test_calculator.xml COPYONLY)
+configure_file(resources/test_calculator.output resources/test_calculator.output COPYONLY)
+configure_file(resources/test_calculator.system_structure resources/test_calculator.system_structure COPYONLY)
 
 configure_file(test_comparator.sh test_comparator.sh COPYONLY)
 configure_file(resources/test_comparator.xml resources/test_comparator.xml COPYONLY)

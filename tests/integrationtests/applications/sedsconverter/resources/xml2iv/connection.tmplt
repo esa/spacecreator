@@ -1,0 +1,28 @@
+{% comment %}
+Template for generation of XML scheme of connection.
+The following tags are available in this sub-template:
+conn              : Instance of connection (provided by a top level template)
+conn.source       :   |_ Name of source object
+conn.target       :   |_ Name of target object
+conn.siName       :   |_ Name of source interface
+conn.tiName       :   |_ Name of target interface
+conn.siIsRequired :   |_ Whether source interface is required
+conn.tiIsRequired :   |_ Whether target interface is required
+conn.siIsProvided :   |_ Whether source interface is provided
+conn.tiIsProvided :   |_ Whether target interface is provided
+conn.attributes   :   |_ List of all available attributes
+attr              :      |_ Instance of attribute
+attr.name         :          |_ Name of attribute
+attr.value        :          |_ Value of attribute
+conn.properties   :   |_ List of all available properties
+prop              :      |_ Instance of property
+prop.name         :          |_ Name of property
+prop.value        :          |_ Value of property
+{% endcomment %}
+<Connection {% for attr in conn.attributes %}{% if attr.value %} {{ attr.name }}="{{ attr.value }}"{% endif %}{% endfor %}>
+    <Source func_name="{{ conn.source }}" {% if conn.siIsRequired %}ri_name={% else %}pi_name={% endif %}"{{ conn.siName }}"/>
+    <Target func_name="{{ conn.target }}" {% if conn.tiIsRequired %}ri_name={% else %}pi_name={% endif %}"{{ conn.tiName }}"/>
+    {% for prop in conn.properties %}
+    <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
+    {% endfor %}
+</Connection>
