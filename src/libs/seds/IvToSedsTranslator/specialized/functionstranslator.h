@@ -27,6 +27,7 @@ class IVInterface;
 namespace seds::model {
 class Component;
 class Interface;
+class InterfaceDeclaration;
 class Package;
 } // namespace seds
 
@@ -58,6 +59,8 @@ private:
 
     static auto createInterfaceDeclaration(const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)
             -> void;
+    static auto createInterfaceCommand(
+            const ivm::IVInterface *ivInterface, ::seds::model::InterfaceDeclaration &sedsInterfaceDeclaration) -> void;
     static auto createInterface(const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent) -> void;
 };
 

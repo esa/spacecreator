@@ -56,7 +56,35 @@ void FunctionsTranslator::createInterfaceDeclaration(
     ::seds::model::InterfaceDeclaration sedsInterfaceDeclaration;
     sedsInterfaceDeclaration.setName(ivInterface->title());
 
+    createInterfaceCommand(ivInterface, sedsInterfaceDeclaration);
+
     sedsComponent.addInterfaceDeclaration(std::move(sedsInterfaceDeclaration));
+}
+
+void FunctionsTranslator::createInterfaceCommand(
+        const ivm::IVInterface *ivInterface, ::seds::model::InterfaceDeclaration &sedsInterfaceDeclaration)
+{
+    ::seds::model::InterfaceCommand sedsInterfaceCommand;
+    sedsInterfaceCommand.setName(ivInterface->title());
+
+    switch (ivInterface->kind()) {
+    case ivm::IVInterface::OperationKind::Protected:
+    case ivm::IVInterface::OperationKind::Unprotected:
+        sedsInterfaceCommand.setMode(::seds::model::InterfaceCommandMode::Sync);
+        break;
+    case ivm::IVInterface::OperationKind::Cyclic:
+    case ivm::IVInterface::OperationKind::Sporadic:
+        sedsInterfaceCommand.setMode(::seds::model::InterfaceCommandMode::Async);
+        break;
+    case ivm::IVInterface::OperationKind::Any:
+        throw TranslationException("Any interfaces are unsupported");
+        break;
+    default:
+        throw TranslationException("Unhandled OperationKind value");
+        break;
+    }
+
+    sedsInterfaceDeclaration.addCommand(std::move(sedsInterfaceCommand));
 }
 
 void FunctionsTranslator::createInterface(const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)
