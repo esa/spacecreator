@@ -43,33 +43,50 @@ void InterfaceExporter::exportInterfaceDeclaration(
     const auto &interfaceDeclarationName = interfaceDeclaration.nameStr();
     interfaceDeclarationElement.setAttribute(QStringLiteral("name"), interfaceDeclarationName);
 
-    exportInterfaceCommands(interfaceDeclaration.commands(), interfaceDeclarationElement, sedsDocument);
+    exportCommands(interfaceDeclaration.commands(), interfaceDeclarationElement, sedsDocument);
 
     setElement.appendChild(std::move(interfaceDeclarationElement));
 }
 
-void InterfaceExporter::exportInterfaceCommands(const model::InterfaceDeclaration::CommandSet &interfaceCommands,
+void InterfaceExporter::exportCommands(const model::InterfaceDeclaration::CommandSet &commands,
         QDomElement &interfaceDeclarationElement, QDomDocument &sedsDocument)
 {
-    auto interfaceCommandSetElement = sedsDocument.createElement(QStringLiteral("CommandSet"));
+    auto commandSetElement = sedsDocument.createElement(QStringLiteral("CommandSet"));
 
-    for (const auto &interfaceCommand : interfaceCommands) {
-        exportInterfaceCommand(interfaceCommand, interfaceCommandSetElement, sedsDocument);
+    for (const auto &command : commands) {
+        exportCommand(command, commandSetElement, sedsDocument);
     }
 
-    interfaceDeclarationElement.appendChild(std::move(interfaceCommandSetElement));
+    interfaceDeclarationElement.appendChild(std::move(commandSetElement));
 }
 
-void InterfaceExporter::exportInterfaceCommand(const model::InterfaceCommand &interfaceCommand,
-        QDomElement &interfaceCommandSetElement, QDomDocument &sedsDocument)
+void InterfaceExporter::exportCommand(
+        const model::InterfaceCommand &command, QDomElement &commandSetElement, QDomDocument &sedsDocument)
 {
-    auto interfaceCommandElement = sedsDocument.createElement(QStringLiteral("Command"));
+    auto commandElement = sedsDocument.createElement(QStringLiteral("Command"));
 
-    const auto &interfaceCommandName = interfaceCommand.nameStr();
-    interfaceCommandElement.setAttribute(QStringLiteral("name"), interfaceCommandName);
-    interfaceCommandElement.setAttribute(QStringLiteral("mode"), stringFromEnum(interfaceCommand.mode()));
+    const auto &commandName = command.nameStr();
+    commandElement.setAttribute(QStringLiteral("name"), commandName);
+    for (const auto &commandArgument : command.arguments()) {
+        exportCommandArgument(commandArgument, commandElement, sedsDocument);
+    }
+    commandElement.setAttribute(QStringLiteral("mode"), stringFromEnum(command.mode()));
 
-    interfaceCommandSetElement.appendChild(std::move(interfaceCommandElement));
+    commandSetElement.appendChild(std::move(commandElement));
+}
+
+void InterfaceExporter::exportCommandArgument(
+        const model::CommandArgument &commandArgument, QDomElement &commandElement, QDomDocument &sedsDocument)
+{
+    auto commandArgumentElement = sedsDocument.createElement(QStringLiteral("Argument"));
+
+    const auto &commandArgumentName = commandArgument.nameStr();
+    commandArgumentElement.setAttribute(QStringLiteral("name"), commandArgumentName);
+    const auto &commandArgumentType = commandArgument.type().nameStr();
+    commandArgumentElement.setAttribute(QStringLiteral("type"), commandArgumentType);
+    commandArgumentElement.setAttribute(QStringLiteral("mode"), stringFromEnum(commandArgument.mode()));
+
+    commandElement.appendChild(std::move(commandArgumentElement));
 }
 
 } // namespace seds::exporter

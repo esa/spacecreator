@@ -99,7 +99,15 @@ void FunctionsTranslator::createInterfaceArgument(
     ::seds::model::CommandArgument sedsInterfaceCommandArgument;
     sedsInterfaceCommandArgument.setName(ivInterfaceParameter.name());
     sedsInterfaceCommandArgument.setType(ivInterfaceParameter.paramTypeName());
-    sedsInterfaceCommandArgument.setMode(::seds::model::CommandArgumentMode::In);
+
+    switch (ivInterfaceParameter.direction()) {
+    case shared::InterfaceParameter::Direction::IN:
+        sedsInterfaceCommandArgument.setMode(::seds::model::CommandArgumentMode::In);
+        break;
+    case shared::InterfaceParameter::Direction::OUT:
+        sedsInterfaceCommandArgument.setMode(::seds::model::CommandArgumentMode::Out);
+        break;
+    }
 
     sedsInterfaceCommand.addArgument(std::move(sedsInterfaceCommandArgument));
 }
