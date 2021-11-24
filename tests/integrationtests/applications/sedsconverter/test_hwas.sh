@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
-SPACE_CREATOR_IDE=spacecreator.AppImage
+AADL_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/aadlconverter
 SPACE_CREATOR=space-creator
 ASN2DATAVIEW=asn2aadlPlus
 TEST_OUTPUT_DIR=output
@@ -26,11 +26,11 @@ cd $TEST_OUTPUT_DIR
 # Generate AADL
 taste-update-data-view output.asn
 
-$SPACE_CREATOR_IDE --aadlconverter -o interfaceview.xml \
+$AADL_CONVERTER -o interfaceview.xml \
   -t /home/taste/tool-inst/share/xml2dv/interfaceview.tmplt \
   -x DeploymentView.aadl
 
-$SPACE_CREATOR_IDE --aadlconverter -o interfaceview.xml \
+$AADL_CONVERTER -o interfaceview.xml \
   -t /home/taste/tool-inst/share/xml2aadl/interfaceview.tmplt \
   -x InterfaceView.aadl
 

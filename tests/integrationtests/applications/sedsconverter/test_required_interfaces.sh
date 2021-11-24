@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
-SPACE_CREATOR_IDE=spacecreator.AppImage
+AADL_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/aadlconverter
 SPACE_CREATOR=space-creator
 ASN2DATAVIEW=asn2aadlPlus
 # diff ignoring white space and blank lines
@@ -33,10 +33,10 @@ taste-update-data-view output.asn
 # the reference and allows to succesfully generate derived artefacts
 
 $DIFF interfaceview.xml ../resources/test_required_interfaces.output \
-  && $SPACE_CREATOR_IDE --aadlconverter -o interfaceview.xml \
+  && $AADL_CONVERTER -o interfaceview.xml \
   -t /home/taste/tool-inst/share/xml2dv/interfaceview.tmplt \
   -x DeploymentView.aadl \
-  && $SPACE_CREATOR_IDE --aadlconverter -o interfaceview.xml \
+  && $AADL_CONVERTER -o interfaceview.xml \
   -t /home/taste/tool-inst/share/xml2aadl/interfaceview.tmplt \
   -x InterfaceView.aadl \
   && make skeletons \
