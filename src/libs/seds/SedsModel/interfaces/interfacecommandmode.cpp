@@ -33,4 +33,19 @@ auto enumFromString(const QStringRef &enumStr) -> std::optional<InterfaceCommand
     }
 }
 
+template<>
+auto stringFromEnum(InterfaceCommandMode mode) -> const QString &
+{
+    switch (mode) {
+    case InterfaceCommandMode::Sync: {
+        static const QString sync = "sync";
+        return sync;
+    }
+    case InterfaceCommandMode::Async: {
+        static const QString async = "async";
+        return async;
+    }
+    }
+}
+
 } // namespace seds::model

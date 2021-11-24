@@ -50,6 +50,12 @@ public:
      */
     static auto exportInterfaceDeclaration(const model::InterfaceDeclaration &interfaceDeclaration,
             QDomElement &setElement, QDomDocument &sedsDocument) -> void;
+
+private:
+    static auto exportInterfaceCommands(const model::InterfaceDeclaration::CommandSet &interfaceCommands,
+            QDomElement &interfaceDeclarationElement, QDomDocument &sedsDocument) -> void;
+    static auto exportInterfaceCommand(const model::InterfaceCommand &interfaceCommand,
+            QDomElement &interfaceCommandSetElement, QDomDocument &sedsDocument) -> void;
 };
 
 } // namespace seds::exporter

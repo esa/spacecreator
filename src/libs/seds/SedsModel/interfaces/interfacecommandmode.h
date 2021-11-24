@@ -32,4 +32,7 @@ enum class InterfaceCommandMode
 template<>
 auto enumFromString(const QStringRef &enumStr) -> std::optional<InterfaceCommandMode>;
 
+template<>
+auto stringFromEnum(InterfaceCommandMode mode) -> const QString &;
+
 } // namespace seds::model

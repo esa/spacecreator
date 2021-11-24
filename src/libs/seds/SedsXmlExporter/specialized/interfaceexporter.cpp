@@ -43,7 +43,33 @@ void InterfaceExporter::exportInterfaceDeclaration(
     const auto &interfaceDeclarationName = interfaceDeclaration.nameStr();
     interfaceDeclarationElement.setAttribute(QStringLiteral("name"), interfaceDeclarationName);
 
+    exportInterfaceCommands(interfaceDeclaration.commands(), interfaceDeclarationElement, sedsDocument);
+
     setElement.appendChild(std::move(interfaceDeclarationElement));
+}
+
+void InterfaceExporter::exportInterfaceCommands(const model::InterfaceDeclaration::CommandSet &interfaceCommands,
+        QDomElement &interfaceDeclarationElement, QDomDocument &sedsDocument)
+{
+    auto interfaceCommandSetElement = sedsDocument.createElement(QStringLiteral("CommandSet"));
+
+    for (const auto &interfaceCommand : interfaceCommands) {
+        exportInterfaceCommand(interfaceCommand, interfaceCommandSetElement, sedsDocument);
+    }
+
+    interfaceDeclarationElement.appendChild(std::move(interfaceCommandSetElement));
+}
+
+void InterfaceExporter::exportInterfaceCommand(const model::InterfaceCommand &interfaceCommand,
+        QDomElement &interfaceCommandSetElement, QDomDocument &sedsDocument)
+{
+    auto interfaceCommandElement = sedsDocument.createElement(QStringLiteral("Command"));
+
+    const auto &interfaceCommandName = interfaceCommand.nameStr();
+    interfaceCommandElement.setAttribute(QStringLiteral("name"), interfaceCommandName);
+    interfaceCommandElement.setAttribute(QStringLiteral("mode"), stringFromEnum(interfaceCommand.mode()));
+
+    interfaceCommandSetElement.appendChild(std::move(interfaceCommandElement));
 }
 
 } // namespace seds::exporter
