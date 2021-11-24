@@ -45,6 +45,10 @@ auto stringFromEnum(InterfaceCommandMode mode) -> const QString &
         static const QString async = "async";
         return async;
     }
+    default: {
+        static const QString unhandled = "unhandledCommandMode";
+        return unhandled;
+    }
     }
 }
 

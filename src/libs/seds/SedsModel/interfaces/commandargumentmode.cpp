@@ -57,6 +57,10 @@ auto stringFromEnum(CommandArgumentMode mode) -> const QString &
         static const QString notify = "notify";
         return notify;
     }
+    default: {
+        static const QString unhandled = "unhandledArgumentMode";
+        return unhandled;
+    }
     }
 }
 
