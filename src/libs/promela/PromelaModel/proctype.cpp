@@ -66,4 +66,14 @@ size_t Proctype::getPriority() const
 {
     return m_priority.value();
 }
+
+const QList<ProctypeElement> &Proctype::getContent() const noexcept
+{
+    return m_content;
+}
+
+void Proctype::appendElement(const ProctypeElement &element)
+{
+    m_content.append(element);
+}
 }

@@ -31,16 +31,24 @@ using promela::exporter::PromelaExporter;
 using promela::model::ArrayType;
 using promela::model::BasicType;
 using promela::model::ChannelInit;
+using promela::model::ChannelRecv;
+using promela::model::ChannelSend;
+using promela::model::Constant;
 using promela::model::DataType;
 using promela::model::Declaration;
+using promela::model::Expression;
+using promela::model::InitProctype;
 using promela::model::MtypeRef;
 using promela::model::NamedMtype;
+using promela::model::Proctype;
+using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
 using promela::model::TypeAlias;
 using promela::model::UnsignedDataType;
 using promela::model::Utype;
 using promela::model::UtypeRef;
 using promela::model::ValueDefinition;
+using promela::model::VariableRef;
 
 class tst_PromelaExporter : public QObject
 {
@@ -59,6 +67,9 @@ private Q_SLOTS:
     void testDeclaration();
     void testIncludes();
     void testChannelInitialization();
+    void testBasicProctypes();
+    void testInitProctype();
+    void testProctypeElements();
 
 private:
     QString getFileContents(const QString &filename);
@@ -345,6 +356,108 @@ void tst_PromelaExporter::testChannelInitialization()
         QFAIL(ex.what());
     }
     QString out2 = getFileContents("expect_promela_file10.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testBasicProctypes()
+{
+    PromelaModel model;
+
+    model.addDeclaration(Declaration(DataType(BasicType::INT), "inited"));
+
+    ProctypeElement simpleProctypeElement(Expression(VariableRef("inited")));
+
+    Proctype basicProctype("basic");
+    basicProctype.appendElement(simpleProctypeElement);
+    model.addProctype(basicProctype);
+
+    Proctype activeProctype("activeProctype");
+    activeProctype.setActive(1);
+    activeProctype.appendElement(simpleProctypeElement);
+    model.addProctype(activeProctype);
+
+    Proctype activeProctypeManyInstances("activeProctypeMany");
+    activeProctypeManyInstances.setActive(2);
+    activeProctypeManyInstances.appendElement(simpleProctypeElement);
+    model.addProctype(activeProctypeManyInstances);
+
+    Proctype proctypeWithPriority("withPriority");
+    proctypeWithPriority.setPriority(10);
+    proctypeWithPriority.appendElement(simpleProctypeElement);
+    model.addProctype(proctypeWithPriority);
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_file11.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testInitProctype()
+{
+    PromelaModel model;
+
+    model.addDeclaration(Declaration(DataType(BasicType::INT), "inited"));
+
+    ProctypeElement simpleProctypeElement(Expression(VariableRef("inited")));
+
+    InitProctype init;
+    init.appendElement(simpleProctypeElement);
+    model.setInit(std::move(init));
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_file12.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testProctypeElements()
+{
+    PromelaModel model;
+
+    model.addDeclaration(Declaration(DataType(BasicType::INT), "inited"));
+    Declaration channel1 = Declaration(DataType(BasicType::CHAN), "channel1");
+    QList<ChannelInit::Type> channel1Type;
+    channel1Type.append(ChannelInit::Type(BasicType::INT));
+    channel1.setInit(ChannelInit(2, std::move(channel1Type)));
+    model.addDeclaration(channel1);
+
+    ProctypeElement expressionVariableRef(Expression(VariableRef("inited")));
+    ProctypeElement expressionConstant(Expression(Constant(2)));
+    Declaration paramDecl(DataType(BasicType::INT), "param");
+    paramDecl.setInit(Expression(Constant(4)));
+    ProctypeElement declaration(paramDecl);
+    QList<VariableRef> params;
+    params.append(VariableRef("param"));
+    ProctypeElement channelSend(ChannelSend(VariableRef("channel1"), params));
+    ProctypeElement channelRecv(ChannelRecv(VariableRef("channel1"), params));
+
+    InitProctype init;
+    init.appendElement(expressionVariableRef);
+    init.appendElement(expressionConstant);
+    init.appendElement(declaration);
+    init.appendElement(channelSend);
+    init.appendElement(channelRecv);
+
+    model.setInit(std::move(init));
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_file13.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }

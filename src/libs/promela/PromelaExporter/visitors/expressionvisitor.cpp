@@ -17,43 +17,29 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "declaration.h"
+#include "expressionvisitor.h"
 
-namespace promela::model {
-Declaration::Declaration(DataType type, QString name, Visibility visibility)
-    : m_type(std::move(type))
-    , m_name(std::move(name))
-    , m_visibility(visibility)
+#include "variablerefvisitor.h"
+
+namespace promela::exporter {
+ExpressionVisitor::ExpressionVisitor(QTextStream &stream)
+    : m_stream(stream)
 {
 }
 
-const DataType &Declaration::getType() const noexcept
+void ExpressionVisitor::visit(const ::promela::model::Expression &expression)
 {
-    return m_type;
+    std::visit(*this, expression.getContent());
 }
 
-const QString &Declaration::getName() const noexcept
+void ExpressionVisitor::operator()(const ::promela::model::VariableRef &variableRef)
 {
-    return m_name;
+    VariableRefVisitor visitor(m_stream);
+    visitor.visit(variableRef);
 }
 
-Declaration::Visibility Declaration::getVisibility() const noexcept
+void ExpressionVisitor::operator()(const ::promela::model::Constant &constant)
 {
-    return m_visibility;
-}
-
-bool Declaration::hasInit() const noexcept
-{
-    return m_init.has_value();
-}
-
-const std::optional<Declaration::InitExpression> &Declaration::getInit() const noexcept
-{
-    return m_init;
-}
-
-void Declaration::setInit(const InitExpression &initExpression)
-{
-    m_init = initExpression;
+    m_stream << constant.getValue();
 }
 }

@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "initproctype.h"
 #include "namedmtype.h"
 #include "proctype.h"
 #include "typealias.h"
@@ -157,6 +158,10 @@ public:
     void addProctype(const Proctype &proctype);
     const QList<Proctype> &getProctypes() const noexcept;
 
+    bool hasInit() const noexcept;
+    const InitProctype &getInit() const;
+    void setInit(InitProctype initProctype);
+
 private:
     QList<QString> m_includes;
     QSet<QString> m_mtypeValues;
@@ -166,6 +171,7 @@ private:
     QList<ValueDefinition> m_valueDefinitions;
     QList<Declaration> m_declarations;
     QList<Proctype> m_proctypes;
+    std::optional<InitProctype> m_initProctype;
 };
 }
 

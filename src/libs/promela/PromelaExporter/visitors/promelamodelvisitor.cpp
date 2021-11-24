@@ -20,6 +20,7 @@
 #include "promelamodelvisitor.h"
 
 #include "declarationvisitor.h"
+#include "proctypeelementvisitor.h"
 #include "typealiasvisitor.h"
 #include "utypevisitor.h"
 
@@ -27,8 +28,10 @@
 #include <algorithm>
 
 using promela::model::Declaration;
+using promela::model::InitProctype;
 using promela::model::NamedMtype;
 using promela::model::Proctype;
+using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
 using promela::model::TypeAlias;
 using promela::model::Utype;
@@ -51,6 +54,10 @@ void PromelaModelVisitor::visit(const PromelaModel &promelaModel)
     generateValueDefinitions(promelaModel.getValueDefinitions());
     generateUtypes(promelaModel.getUtypes());
     generateDeclarations(promelaModel.getDeclarations());
+    generateProctypes(promelaModel.getProctypes());
+    if (promelaModel.hasInit()) {
+        generateInitProctype(promelaModel.getInit());
+    }
 }
 
 void PromelaModelVisitor::generateIncludes(const QList<QString> &includes)
@@ -133,9 +140,23 @@ void PromelaModelVisitor::generateProctypes(const QList<Proctype> &proctypes)
         }
         m_stream << "\n";
         m_stream << "{\n";
-        m_stream << QString("printf(\"%1\\n\")\n").arg(proctype.getName());
+        ProctypeElementVisitor visitor(m_stream, m_indent);
+        for (const ProctypeElement &element : proctype.getContent()) {
+            visitor.visit(element);
+        }
+
         m_stream << "}\n";
     }
+}
+void PromelaModelVisitor::generateInitProctype(const InitProctype &init)
+{
+    m_stream << "init\n";
+    m_stream << "{\n";
+    ProctypeElementVisitor visitor(m_stream, m_indent);
+    for (const ProctypeElement &element : init.getContent()) {
+        visitor.visit(element);
+    }
+    m_stream << "}\n";
 }
 
 }

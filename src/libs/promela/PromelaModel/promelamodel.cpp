@@ -104,4 +104,19 @@ const QList<Proctype> &PromelaModel::getProctypes() const noexcept
 {
     return m_proctypes;
 }
+
+bool PromelaModel::hasInit() const noexcept
+{
+    return m_initProctype.has_value();
+}
+
+const InitProctype &PromelaModel::getInit() const
+{
+    return m_initProctype.value();
+}
+
+void PromelaModel::setInit(InitProctype initProctype)
+{
+    m_initProctype = std::move(initProctype);
+}
 }

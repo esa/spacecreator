@@ -17,43 +17,30 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "declaration.h"
+#pragma once
+
+#include "constant.h"
+#include "variableref.h"
+
+#include <QString>
+#include <variant>
 
 namespace promela::model {
-Declaration::Declaration(DataType type, QString name, Visibility visibility)
-    : m_type(std::move(type))
-    , m_name(std::move(name))
-    , m_visibility(visibility)
+/**
+ * @brief Representation of declaration in promela.
+ *
+ * The declaration can be used to declare a variable or a field inside user defined data type.
+ */
+class Expression final
 {
-}
+public:
+    // TODO: implement full support for expressions
+    using Value = std::variant<VariableRef, Constant>;
+    Expression(Value value);
 
-const DataType &Declaration::getType() const noexcept
-{
-    return m_type;
-}
+    const Value &getContent() const noexcept;
 
-const QString &Declaration::getName() const noexcept
-{
-    return m_name;
-}
-
-Declaration::Visibility Declaration::getVisibility() const noexcept
-{
-    return m_visibility;
-}
-
-bool Declaration::hasInit() const noexcept
-{
-    return m_init.has_value();
-}
-
-const std::optional<Declaration::InitExpression> &Declaration::getInit() const noexcept
-{
-    return m_init;
-}
-
-void Declaration::setInit(const InitExpression &initExpression)
-{
-    m_init = initExpression;
-}
+private:
+    Value m_value;
+};
 }

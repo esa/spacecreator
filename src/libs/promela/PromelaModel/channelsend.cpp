@@ -17,43 +17,22 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "declaration.h"
+#include "channelsend.h"
 
 namespace promela::model {
-Declaration::Declaration(DataType type, QString name, Visibility visibility)
-    : m_type(std::move(type))
-    , m_name(std::move(name))
-    , m_visibility(visibility)
+ChannelSend::ChannelSend(VariableRef channelRef, const QList<VariableRef> &args)
+    : m_channelRef(std::move(channelRef))
+    , m_args(args)
 {
 }
 
-const DataType &Declaration::getType() const noexcept
+const VariableRef &ChannelSend::getChannelRef() const noexcept
 {
-    return m_type;
+    return m_channelRef;
 }
 
-const QString &Declaration::getName() const noexcept
+const QList<VariableRef> &ChannelSend::getArgs() const noexcept
 {
-    return m_name;
-}
-
-Declaration::Visibility Declaration::getVisibility() const noexcept
-{
-    return m_visibility;
-}
-
-bool Declaration::hasInit() const noexcept
-{
-    return m_init.has_value();
-}
-
-const std::optional<Declaration::InitExpression> &Declaration::getInit() const noexcept
-{
-    return m_init;
-}
-
-void Declaration::setInit(const InitExpression &initExpression)
-{
-    m_init = initExpression;
+    return m_args;
 }
 }

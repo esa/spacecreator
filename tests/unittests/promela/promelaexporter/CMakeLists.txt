@@ -24,5 +24,8 @@ configure_file(resources/expect_promela_file7.pml expect_promela_file7.pml COPYO
 configure_file(resources/expect_promela_file8.pml expect_promela_file8.pml COPYONLY)
 configure_file(resources/expect_promela_file9.pml expect_promela_file9.pml COPYONLY)
 configure_file(resources/expect_promela_file10.pml expect_promela_file10.pml COPYONLY)
+configure_file(resources/expect_promela_file11.pml expect_promela_file11.pml COPYONLY)
+configure_file(resources/expect_promela_file12.pml expect_promela_file12.pml COPYONLY)
+configure_file(resources/expect_promela_file13.pml expect_promela_file13.pml COPYONLY)
 
 add_format_target(${TEST_NAME})

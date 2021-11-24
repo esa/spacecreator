@@ -37,10 +37,14 @@ using promela::model::BasicType;
 using promela::model::ChannelInit;
 using promela::model::DataType;
 using promela::model::Declaration;
+using promela::model::Expression;
+using promela::model::InitProctype;
 using promela::model::Proctype;
+using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
 using promela::model::Utype;
 using promela::model::UtypeRef;
+using promela::model::VariableRef;
 using shared::ExportableProperty;
 using shared::InterfaceParameter;
 using shared::VEObject;
@@ -61,29 +65,31 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     QList<QString> functionNames;
     for (IVFunction *ivFunction : ivFunctionList) {
         const QString functionName = ivFunction->property("name").toString();
-        qDebug() << "Found function " << functionName;
+        // qDebug() << "Found function " << functionName;
         functionNames.append(functionName);
     }
 
     promelaModel->addInclude("dataview.pml");
+
+    promelaModel->addDeclaration(Declaration(DataType(BasicType::INT), "inited"));
 
     for (IVFunction *ivFunction : ivFunctionList) {
         const QString functionName = ivFunction->property("name").toString();
         QVector<IVInterface *> interfaceList = ivFunction->pis();
         for (IVInterface *interface : interfaceList) {
             const QString interfaceName = interface->property("name").toString();
-            qDebug() << "  Found interface " << interfaceName;
+            // qDebug() << "  Found interface " << interfaceName;
             size_t queueSize = getQueueSize(interface);
             size_t priority = getPriority(interface);
-            qDebug() << "    Queue size " << queueSize;
-            qDebug() << "    Priority  " << priority;
+            // qDebug() << "    Queue size " << queueSize;
+            // qDebug() << "    Priority  " << priority;
             QVector<InterfaceParameter> parameterList = interface->params();
             QString parameterName;
             QString parameterType;
             for (InterfaceParameter &parameter : parameterList) {
                 parameterName = parameter.name();
                 parameterType = parameter.paramTypeName();
-                qDebug() << "    Found parameter " << parameterName << " of type " << parameterType;
+                // qDebug() << "    Found parameter " << parameterName << " of type " << parameterType;
             }
 
             QString channelName = QString("%1_%2_channel").arg(functionName).arg(interfaceName);
@@ -108,6 +114,9 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
             proctype.setActive(1);
             proctype.setPriority(priority);
 
+            ProctypeElement waitForInit(Expression(VariableRef("inited")));
+            proctype.appendElement(waitForInit);
+
             promelaModel->addProctype(proctype);
         }
     }
@@ -121,6 +130,10 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     }
 
     promelaModel->addUtype(systemState);
+    InitProctype init;
+    ProctypeElement waitForInit(Expression(VariableRef("inited")));
+    init.appendElement(waitForInit);
+    promelaModel->setInit(init);
 
     std::vector<std::unique_ptr<Model>> result;
     result.push_back(std::move(promelaModel));

@@ -17,43 +17,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "declaration.h"
+#pragma once
+
+#include <QString>
 
 namespace promela::model {
-Declaration::Declaration(DataType type, QString name, Visibility visibility)
-    : m_type(std::move(type))
-    , m_name(std::move(name))
-    , m_visibility(visibility)
+class VariableRef
 {
-}
+public:
+    VariableRef(QString ref);
 
-const DataType &Declaration::getType() const noexcept
-{
-    return m_type;
-}
+    const QString &getReference() const noexcept;
 
-const QString &Declaration::getName() const noexcept
-{
-    return m_name;
-}
-
-Declaration::Visibility Declaration::getVisibility() const noexcept
-{
-    return m_visibility;
-}
-
-bool Declaration::hasInit() const noexcept
-{
-    return m_init.has_value();
-}
-
-const std::optional<Declaration::InitExpression> &Declaration::getInit() const noexcept
-{
-    return m_init;
-}
-
-void Declaration::setInit(const InitExpression &initExpression)
-{
-    m_init = initExpression;
-}
+private:
+    QString m_ref;
+};
 }

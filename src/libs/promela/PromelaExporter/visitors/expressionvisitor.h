@@ -17,43 +17,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "declaration.h"
+#pragma once
 
-namespace promela::model {
-Declaration::Declaration(DataType type, QString name, Visibility visibility)
-    : m_type(std::move(type))
-    , m_name(std::move(name))
-    , m_visibility(visibility)
-{
-}
+#include <QTextStream>
+#include <promela/PromelaModel/expression.h>
 
-const DataType &Declaration::getType() const noexcept
+namespace promela::exporter {
+class ExpressionVisitor final
 {
-    return m_type;
-}
+public:
+    ExpressionVisitor(QTextStream &stream);
 
-const QString &Declaration::getName() const noexcept
-{
-    return m_name;
-}
+    void visit(const ::promela::model::Expression &expression);
 
-Declaration::Visibility Declaration::getVisibility() const noexcept
-{
-    return m_visibility;
-}
+    void operator()(const ::promela::model::VariableRef &variableRef);
+    void operator()(const ::promela::model::Constant &constant);
 
-bool Declaration::hasInit() const noexcept
-{
-    return m_init.has_value();
-}
-
-const std::optional<Declaration::InitExpression> &Declaration::getInit() const noexcept
-{
-    return m_init;
-}
-
-void Declaration::setInit(const InitExpression &initExpression)
-{
-    m_init = initExpression;
-}
+private:
+    QTextStream &m_stream;
+};
 }

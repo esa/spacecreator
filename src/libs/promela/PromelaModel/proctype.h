@@ -19,6 +19,9 @@
 
 #pragma once
 
+#include "proctypeelement.h"
+
+#include <QList>
 #include <QString>
 #include <cstddef>
 #include <optional>
@@ -40,10 +43,14 @@ public:
     size_t getPriority() const;
     void setPriority(size_t priority);
 
+    const QList<ProctypeElement> &getContent() const noexcept;
+    void appendElement(const ProctypeElement &element);
+
 private:
     QString m_name;
     bool m_active;
     std::optional<size_t> m_instances;
     std::optional<size_t> m_priority;
+    QList<ProctypeElement> m_content;
 };
 }
