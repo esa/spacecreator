@@ -19,11 +19,13 @@
 
 #include "actionmanager/command.h"
 #include "context/action/actionsmanager.h"
+#include "conversion/asn1/Asn1Options/options.h"
 #include "dv/dveditorfactory.h"
 #include "dv/dvqtceditor.h"
 #include "dveditor.h"
 #include "dvlibrary.h"
 #include "dvsystemchecks.h"
+#include "import/exceptions.h"
 #include "interfacedocument.h"
 #include "iv/iveditordata.h"
 #include "iv/iveditorfactory.h"
@@ -44,8 +46,11 @@
 #include "spacecreatorprojectmanager.h"
 
 #include <QAction>
+#include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
+#include <asn1library/asn1/asn1model.h>
+#include <conversion/asn1/Asn1Importer/importer.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/icore.h>
@@ -210,9 +215,28 @@ void SpaceCreatorPlugin::importSdl()
 
 void SpaceCreatorPlugin::importAsn1()
 {
-    // TODO: trigger the actual importer here
-    ive::IVEditorCore core;
-    core.showHelp();
+    const QString inputFilePath =
+            QFileDialog::getOpenFileName(nullptr, "Select ASN.1 file to import...", QString(), tr("*.asn"));
+
+    conversion::Options options;
+    options.add(conversion::asn1::Asn1Options::inputFilepath, inputFilePath);
+
+    conversion::asn1::importer::Asn1Importer asn1importer;
+    try {
+        const auto model = asn1importer.importModel(options);
+        if (model) {
+            const auto *asn1Model = dynamic_cast<Asn1Acn::Asn1Model *>(model.get());
+            if (asn1Model) {
+                const auto &files = asn1Model->data();
+                if (files.size() != 1) {
+                    throw conversion::importer::ImportException("no data in imported file");
+                }
+                // TODO: what should be done with imported ASN.1 file?
+            }
+        }
+    } catch (conversion::importer::ImportException &ex) {
+        // TODO: write an exception to some debug console
+    }
 }
 
 }

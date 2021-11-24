@@ -64,6 +64,7 @@ set(SC_QTC_LIBRARIES
     -L"${QTC_PLUGINS_DIR}"
     Aggregation
     ExtensionSystem
+    Asn1Importer
     Utils
 )
 set(SC_QTC_PLUGINS
