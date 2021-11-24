@@ -55,8 +55,10 @@ public:
 private:
     static auto translateInterface(const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)
             -> void;
-    static auto translateInterfaceParameters(
-            const ivm::IVInterface *ivInterface, ::seds::model::Interface &sedsInterface) -> void;
+
+    static auto createInterfaceDeclaration(const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)
+            -> void;
+    static auto createInterface(const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent) -> void;
 };
 
 } // namespace conversion::seds::translator

@@ -43,6 +43,13 @@ public:
 private:
     static auto exportComponent(
             const model::Component &component, QDomElement &componentSetElement, QDomDocument &sedsDocument) -> void;
+
+    static auto exportProvidedInterfaces(
+            const model::Component &component, QDomElement &componentElement, QDomDocument &sedsDocument) -> void;
+    static auto exportRequiredInterfaces(
+            const model::Component &component, QDomElement &componentElement, QDomDocument &sedsDocument) -> void;
+    static auto exportDeclaredInterfaces(
+            const model::Component &component, QDomElement &componentElement, QDomDocument &sedsDocument) -> void;
 };
 
 } // namespace seds::exporter

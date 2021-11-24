@@ -26,6 +26,12 @@ void InterfaceExporter::exportInterface(
 {
     auto interfaceElement = sedsDocument.createElement(QStringLiteral("Interface"));
 
+    const auto &interfaceName = interface.nameStr();
+    interfaceElement.setAttribute(QStringLiteral("name"), interfaceName);
+
+    const auto &interfaceType = interface.type().nameStr();
+    interfaceElement.setAttribute(QStringLiteral("type"), interfaceType);
+
     setElement.appendChild(std::move(interfaceElement));
 }
 
@@ -33,6 +39,9 @@ void InterfaceExporter::exportInterfaceDeclaration(
         const model::InterfaceDeclaration &interfaceDeclaration, QDomElement &setElement, QDomDocument &sedsDocument)
 {
     auto interfaceDeclarationElement = sedsDocument.createElement(QStringLiteral("Interface"));
+
+    const auto &interfaceDeclarationName = interfaceDeclaration.nameStr();
+    interfaceDeclarationElement.setAttribute(QStringLiteral("name"), interfaceDeclarationName);
 
     setElement.appendChild(std::move(interfaceDeclarationElement));
 }

@@ -46,35 +46,39 @@ void FunctionsTranslator::translateFunction(const ivm::IVFunction *ivFunction, :
 void FunctionsTranslator::translateInterface(
         const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)
 {
+    createInterfaceDeclaration(ivInterface, sedsComponent);
+    createInterface(ivInterface, sedsComponent);
+}
+
+void FunctionsTranslator::createInterfaceDeclaration(
+        const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)
+{
     ::seds::model::InterfaceDeclaration sedsInterfaceDeclaration;
     sedsInterfaceDeclaration.setName(ivInterface->title());
 
+    sedsComponent.addInterfaceDeclaration(std::move(sedsInterfaceDeclaration));
+}
+
+void FunctionsTranslator::createInterface(const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)
+{
     ::seds::model::Interface sedsInterface;
     sedsInterface.setName(ivInterface->title());
-
-    translateInterfaceParameters(ivInterface, sedsInterface);
-
-    sedsComponent.addInterfaceDeclaration(std::move(sedsInterfaceDeclaration));
+    sedsInterface.setType(ivInterface->title());
 
     switch (ivInterface->direction()) {
-    case ivm::IVInterface::InterfaceType::Required:
+    case ivm::IVInterface::InterfaceType::Provided:
         sedsComponent.addProvidedInterface(std::move(sedsInterface));
         break;
-    case ivm::IVInterface::InterfaceType::Provided:
+    case ivm::IVInterface::InterfaceType::Required:
         sedsComponent.addRequiredInterface(std::move(sedsInterface));
         break;
     case ivm::IVInterface::InterfaceType::Grouped:
         throw TranslationException("Grouped interfaces are not implemented");
         break;
     default:
-        throw TranslationException("Unhandled OperationKind value");
+        throw TranslationException("Unhandled InterfaceType value");
         break;
     }
-}
-
-void FunctionsTranslator::translateInterfaceParameters(
-        const ivm::IVInterface *ivInterface, ::seds::model::Interface &sedsInterface)
-{
 }
 
 } // namespace conversion::seds::translator

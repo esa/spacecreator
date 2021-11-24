@@ -43,25 +43,59 @@ void ComponentExporter::exportComponent(
     const auto &componentName = component.nameStr();
     componentElement.setAttribute(QStringLiteral("name"), componentName);
 
+    exportProvidedInterfaces(component, componentElement, sedsDocument);
+    exportRequiredInterfaces(component, componentElement, sedsDocument);
+    exportDeclaredInterfaces(component, componentElement, sedsDocument);
+
+    componentSetElement.appendChild(std::move(componentElement));
+}
+
+void ComponentExporter::exportProvidedInterfaces(
+        const model::Component &component, QDomElement &componentElement, QDomDocument &sedsDocument)
+{
+    const auto &providedInterfaces = component.providedInterfaces();
+
+    if (providedInterfaces.empty()) {
+        return;
+    }
+
     auto providedInterfaceSetElement = sedsDocument.createElement("ProvidedInterfaceSet");
-    for (const auto &providedInterface : component.providedInterfaces()) {
+    for (const auto &providedInterface : providedInterfaces) {
         InterfaceExporter::exportInterface(providedInterface, providedInterfaceSetElement, sedsDocument);
     }
     componentElement.appendChild(std::move(providedInterfaceSetElement));
+}
+
+void ComponentExporter::exportRequiredInterfaces(
+        const model::Component &component, QDomElement &componentElement, QDomDocument &sedsDocument)
+{
+    const auto &requiredInterfaces = component.requiredInterfaces();
+
+    if (requiredInterfaces.empty()) {
+        return;
+    }
 
     auto requiredInterfaceSetElement = sedsDocument.createElement("RequiredInterfaceSet");
-    for (const auto &requiredInterface : component.requiredInterfaces()) {
+    for (const auto &requiredInterface : requiredInterfaces) {
         InterfaceExporter::exportInterface(requiredInterface, requiredInterfaceSetElement, sedsDocument);
     }
     componentElement.appendChild(std::move(requiredInterfaceSetElement));
+}
+
+void ComponentExporter::exportDeclaredInterfaces(
+        const model::Component &component, QDomElement &componentElement, QDomDocument &sedsDocument)
+{
+    const auto &declaredInterfaces = component.declaredInterfaces();
+
+    if (declaredInterfaces.empty()) {
+        return;
+    }
 
     auto declaredInterfaceSetElement = sedsDocument.createElement("DeclaredInterfaceSet");
-    for (const auto &interfaceDeclaration : component.declaredInterfaces()) {
+    for (const auto &interfaceDeclaration : declaredInterfaces) {
         InterfaceExporter::exportInterfaceDeclaration(interfaceDeclaration, declaredInterfaceSetElement, sedsDocument);
     }
     componentElement.appendChild(std::move(declaredInterfaceSetElement));
-
-    componentSetElement.appendChild(std::move(componentElement));
 }
 
 } // namespace seds::exporter
