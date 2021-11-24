@@ -46,4 +46,20 @@ bool DVTreeSortProxyModel::lessThan(const QModelIndex &left, const QModelIndex &
     return QString::compare(leftString, rightString, Qt::CaseInsensitive) >= 0;
 }
 
+SelectionOverProxyModel::SelectionOverProxyModel(QSortFilterProxyModel *proxyModel, QObject *parent)
+    : QItemSelectionModel(proxyModel, parent)
+    , m_proxyModel(proxyModel)
+{
+}
+
+void SelectionOverProxyModel::select(const QItemSelection &selection, SelectionFlags command)
+{
+    QItemSelectionModel::select(m_proxyModel->mapSelectionFromSource(selection), command);
+}
+
+void SelectionOverProxyModel::select(const QModelIndex &index, SelectionFlags command)
+{
+    QItemSelectionModel::select(m_proxyModel->mapFromSource(index), command);
+}
+
 } // namespace dve
