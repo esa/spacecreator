@@ -3,9 +3,7 @@
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 SPACE_CREATOR_IDE=spacecreator.AppImage
 SPACE_CREATOR=space-creator
-OPENGEODE=$HOME/.local/bin/opengeode
 ASN2DATAVIEW=asn2aadlPlus
-
 TEST_OUTPUT_DIR=output
 
 # Setup output dir and project
@@ -24,8 +22,8 @@ sed -i 's/COM-N7SPACE-HWAS/OUTPUT-DATAVIEW/g' $TEST_OUTPUT_DIR/output.asn
 # Change implementation language to C
 sed -i 's/language="SDL"/language="C"/g' $TEST_OUTPUT_DIR/interfaceview.xml
 
-# Generate AADL
 cd $TEST_OUTPUT_DIR
+# Generate AADL
 taste-update-data-view output.asn
 
 $SPACE_CREATOR_IDE --aadlconverter -o interfaceview.xml \
