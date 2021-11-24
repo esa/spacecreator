@@ -14,8 +14,6 @@ target_link_libraries(${TEST_NAME}
 
 add_format_target(${TEST_NAME})
 
-configure_file(resources/Makefile resources/Makefile COPYONLY)
-
 configure_file(resources/xml2dv/function_properties.tmplt resources/xml2dv/function_properties.tmplt COPYONLY)
 configure_file(resources/xml2dv/function_subcomponents.tmplt resources/xml2dv/function_subcomponents.tmplt COPYONLY)
 configure_file(resources/xml2dv/function_with.tmplt resources/xml2dv/function_with.tmplt COPYONLY)
@@ -65,7 +63,6 @@ configure_file(resources/test_provided_interfaces.output resources/test_provided
 configure_file(test_hwas.sh test_hwas.sh COPYONLY)
 configure_file(resources/test_hwas.xml resources/test_hwas.xml COPYONLY)
 configure_file(resources/test_hwas.interfaceview resources/test_hwas.interfaceview COPYONLY)
-configure_file(resources/test_hwas.hwasc resources/test_hwas.hwasc COPYONLY)
 
 configure_file(test_state_machine_with_bare_inputs.sh test_state_machine_with_bare_inputs.sh COPYONLY)
 configure_file(resources/state_machine_with_bare_inputs.xml resources/state_machine_with_bare_inputs.xml COPYONLY)
