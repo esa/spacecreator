@@ -40,6 +40,7 @@
 #include "msceditorcore.h"
 #include "msclibrary.h"
 #include "mscsystemchecks.h"
+#include "sdl/SdlOptions/options.h"
 #include "sharedlibrary.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorprojectimpl.h"
@@ -201,16 +202,18 @@ ActionContainer *SpaceCreatorPlugin::createActionContainerInTools(const QString 
 
 void SpaceCreatorPlugin::importInterfaceView()
 {
-    // TODO: trigger the actual importer here
-    ive::IVEditorCore core;
-    core.showHelp();
+    const QString inputFilePath =
+            QFileDialog::getOpenFileName(nullptr, "Select InterfaceView file to import...", QString(), tr("*.xml"));
+
+    // TODO: implementation
 }
 
 void SpaceCreatorPlugin::importSdl()
 {
-    // TODO: trigger the actual importer here
-    ive::IVEditorCore core;
-    core.showHelp();
+    const QString inputFilePath =
+            QFileDialog::getOpenFileName(nullptr, "Select SDL file to import...", QString(), tr("*.pr"));
+
+    // TODO: implementation
 }
 
 void SpaceCreatorPlugin::importAsn1()
