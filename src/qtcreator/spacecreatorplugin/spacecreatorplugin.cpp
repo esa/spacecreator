@@ -185,6 +185,17 @@ void SpaceCreatorPlugin::addSedsImportExport()
     Core::Command *asn1Import =
             Core::ActionManager::registerAction(asn1ImportAction, Constants::ASN1_IMPORT_ID, allContexts);
     acToolsSeds->addAction(asn1Import);
+
+    auto ivExportAction = new QAction(tr("Export InterfaceView"), this);
+    connect(ivExportAction, &QAction::triggered, this, exportInterfaceView);
+    Core::Command *ivExport = Core::ActionManager::registerAction(ivExportAction, Constants::IV_EXPORT_ID, allContexts);
+    acToolsSeds->addAction(ivExport);
+
+    auto asn1ExportAction = new QAction(tr("Export ASN.1"), this);
+    connect(asn1ExportAction, &QAction::triggered, this, exportAsn1);
+    Core::Command *asn1Export =
+            Core::ActionManager::registerAction(asn1ExportAction, Constants::ASN1_EXPORT_ID, allContexts);
+    acToolsSeds->addAction(asn1Export);
 }
 
 ActionContainer *SpaceCreatorPlugin::createActionContainerInTools(const QString &title)
@@ -240,6 +251,16 @@ void SpaceCreatorPlugin::importAsn1()
     } catch (conversion::importer::ImportException &ex) {
         // TODO: write an exception to some debug console
     }
+}
+
+void SpaceCreatorPlugin::exportAsn1()
+{
+    // todo
+}
+
+void SpaceCreatorPlugin::exportInterfaceView()
+{
+    // todo
 }
 
 }

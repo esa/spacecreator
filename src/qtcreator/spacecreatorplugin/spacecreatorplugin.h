@@ -75,6 +75,8 @@ private:
     static void importInterfaceView();
     static void importSdl();
     static void importAsn1();
+    static void exportAsn1();
+    static void exportInterfaceView();
 
     MscEditorFactory *m_mscFactory = nullptr;
     IVEditorFactory *m_ivFactory = nullptr;

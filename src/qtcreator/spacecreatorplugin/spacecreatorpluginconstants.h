@@ -58,6 +58,8 @@ const char IV_HELP_ID[] = "IVEditor.Help";
 const char IV_IMPORT_ID[] = "IVEditor.Import";
 const char SDL_IMPORT_ID[] = "Sdl.Import";
 const char ASN1_IMPORT_ID[] = "Asn1.Import";
+const char IV_EXPORT_ID[] = "IVEditor.Export";
+const char ASN1_EXPORT_ID[] = "Asn1.Export";
 const char M_TOOLS_SEDS[] = "QtCreator.Menu.Tools.SEDS";
 
 // Settings
