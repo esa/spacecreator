@@ -46,10 +46,15 @@ void FunctionsTranslator::translateFunction(const ivm::IVFunction *ivFunction, :
 void FunctionsTranslator::translateInterface(
         const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)
 {
+    ::seds::model::InterfaceDeclaration sedsInterfaceDeclaration;
+    sedsInterfaceDeclaration.setName(ivInterface->title());
+
     ::seds::model::Interface sedsInterface;
     sedsInterface.setName(ivInterface->title());
 
     translateInterfaceParameters(ivInterface, sedsInterface);
+
+    sedsComponent.addInterfaceDeclaration(std::move(sedsInterfaceDeclaration));
 
     switch (ivInterface->direction()) {
     case ivm::IVInterface::InterfaceType::Required:
