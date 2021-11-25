@@ -175,11 +175,11 @@ auto DataTypeExporter::exportFloatDataType(
         typeElement.appendChild(std::move(encodingElement));
     }
 
-    std::visit(overloaded { [&typeElement, &sedsDocument](
-                                    const MinMaxRange &range) { exportMinMaxRange(range, typeElement, sedsDocument); },
-                       [&typeElement](
-                               const FloatPrecisionRange &range) { exportFloatPrecisionRange(range, typeElement); } },
-            dataType.range());
+    if (std::holds_alternative<FloatPrecisionRange>(dataType.range())) {
+        exportFloatPrecisionRange(std::get<FloatPrecisionRange>(dataType.range()), typeElement, sedsDocument);
+    } else if (std::holds_alternative<MinMaxRange>(dataType.range())) {
+        exportMinMaxRange(std::get<MinMaxRange>(dataType.range()), typeElement, sedsDocument);
+    }
 
     setElement.appendChild(std::move(typeElement));
 }
@@ -238,7 +238,7 @@ auto DataTypeExporter::exportStringDataType(
                 encoding.encoding());
 
         if (encoding.terminationByte().has_value()) {
-            typeElement.setAttribute(QStringLiteral("terminationByte"), *encoding.terminationByte());
+            encodingElement.setAttribute(QStringLiteral("terminationByte"), *encoding.terminationByte());
         }
 
         typeElement.appendChild(std::move(encodingElement));
@@ -377,22 +377,25 @@ auto DataTypeExporter::exportCoreStringEncoding(model::CoreStringEncoding encodi
     throw UnsupportedElementException("CoreStringEncoding");
 }
 
-auto DataTypeExporter::exportFloatPrecisionRange(const model::FloatPrecisionRange &range, QDomElement &setElement)
-        -> void
+auto DataTypeExporter::exportFloatPrecisionRange(
+        const model::FloatPrecisionRange &range, QDomElement &setElement, QDomDocument &sedsDocument) -> void
 {
-
+    auto rangeElement = sedsDocument.createElement(QStringLiteral("Range"));
+    auto precisionRangeElement = sedsDocument.createElement(QStringLiteral("PrecisionRange"));
     switch (range) {
     case FloatPrecisionRange::Single:
-        setElement.setAttribute(QStringLiteral("encodingAndPrecision"), QStringLiteral("SINGLE"));
-        return;
+        precisionRangeElement.appendChild(sedsDocument.createTextNode((QStringLiteral("single"))));
+        break;
     case FloatPrecisionRange::Double:
-        setElement.setAttribute(QStringLiteral("encodingAndPrecision"), QStringLiteral("DOUBLE"));
-        return;
+        precisionRangeElement.appendChild(sedsDocument.createTextNode((QStringLiteral("double"))));
+        break;
     case FloatPrecisionRange::Quad:
-        setElement.setAttribute(QStringLiteral("encodingAndPrecision"), QStringLiteral("QUAD"));
-        return;
+        precisionRangeElement.appendChild(sedsDocument.createTextNode((QStringLiteral("quad"))));
+        break;
     }
-    throw UnsupportedElementException("FloatPrecisionRange");
+
+    rangeElement.appendChild(std::move(precisionRangeElement));
+    setElement.appendChild(std::move(rangeElement));
 }
 
 } // namespace seds::exporter

@@ -21,5 +21,7 @@ target_link_libraries(${TEST_NAME}
 
 configure_file(resources/testExportsInteger.xml resources/testExportsInteger.xml COPYONLY)
 configure_file(resources/testExportsEnum.xml resources/testExportsEnum.xml COPYONLY)
+configure_file(resources/testExportsFloat.xml resources/testExportsFloat.xml COPYONLY)
+configure_file(resources/testExportsString.xml resources/testExportsString.xml COPYONLY)
 
 add_format_target(${TEST_NAME})
