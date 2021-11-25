@@ -58,7 +58,9 @@
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
 #include <qaction.h>
+#include <qboxlayout.h>
 #include <qfiledialog.h>
+#include <qtreeview.h>
 
 void initSpaceCreatorResources()
 {
@@ -254,15 +256,36 @@ void SpaceCreatorPlugin::importAsn1()
     }
 }
 
+class ListTreeDialog : public QDialog
+{
+public:
+    ListTreeDialog();
+
+private:
+    QTreeView *tree = nullptr;
+};
+
+ListTreeDialog::ListTreeDialog()
+{
+    QHBoxLayout *hblayout = new QHBoxLayout(this);
+    setLayout(hblayout);
+    tree = new QTreeView(this);
+    hblayout->addWidget(tree);
+    // tree->setData(); // or something like that
+}
+
 void SpaceCreatorPlugin::exportInterfaceView()
 {
     // todo
+    ListTreeDialog ldDialog;
+
+    ldDialog.exec();
 }
 
 void SpaceCreatorPlugin::exportAsn1()
 {
     const auto names =
-            QFileDialog::getOpenFileNames(nullptr, "Select ASN.1 files to import to InterfaceView", QString(), "*.asn");
+            QFileDialog::getOpenFileNames(nullptr, "Select ASN.1 files to export to InterfaceView", QString(), "*.asn");
 
     const auto outputDir = QFileDialog::getExistingDirectory(nullptr, "Select destination directory");
 
