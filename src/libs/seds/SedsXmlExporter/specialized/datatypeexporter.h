@@ -77,6 +77,7 @@ protected:
     static auto exportCoreIntegerEncoding(model::CoreIntegerEncoding encoding, QDomElement &setElement) -> void;
     static auto exportCoreEncodingAndPrecision(model::CoreEncodingAndPrecision encoding, QDomElement &setElement)
             -> void;
+    static auto exportCoreStringEncoding(model::CoreStringEncoding encoding, QDomElement &setElement) -> void;
     static auto exportMinMaxRange(const model::MinMaxRange &range, QDomElement &setElement, QDomDocument &sedsDocument)
             -> void;
     static auto exportFloatPrecisionRange(const model::FloatPrecisionRange &range, QDomElement &setElement) -> void;

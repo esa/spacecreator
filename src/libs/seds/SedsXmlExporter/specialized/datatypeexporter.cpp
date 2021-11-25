@@ -222,10 +222,29 @@ auto DataTypeExporter::exportIntegerDataType(
 auto DataTypeExporter::exportStringDataType(
         const model::StringDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void
 {
-    Q_UNUSED(dataType);
-    Q_UNUSED(setElement);
-    Q_UNUSED(sedsDocument);
-    throw UnsupportedElementException("StringDataType");
+    auto typeElement = sedsDocument.createElement(QStringLiteral("StringDataType"));
+    typeElement.setAttribute(QStringLiteral("name"), dataType.nameStr());
+    typeElement.setAttribute(QStringLiteral("length"), static_cast<qulonglong>(dataType.length()));
+    typeElement.setAttribute(QStringLiteral("fixedLength"),
+            dataType.hasFixedLength() ? QStringLiteral("true") : QStringLiteral("false"));
+
+    if (dataType.encoding().has_value()) {
+        const auto &encoding = *dataType.encoding();
+        auto encodingElement = sedsDocument.createElement(QStringLiteral("StringDataEncoding"));
+
+        std::visit(overloaded { [&encodingElement](const CoreStringEncoding &coreEncoding) {
+            exportCoreStringEncoding(coreEncoding, encodingElement);
+        } },
+                encoding.encoding());
+
+        if (encoding.terminationByte().has_value()) {
+            typeElement.setAttribute(QStringLiteral("terminationByte"), *encoding.terminationByte());
+        }
+
+        typeElement.appendChild(std::move(encodingElement));
+    }
+
+    setElement.appendChild(std::move(typeElement));
 }
 
 auto DataTypeExporter::exportSubRangeDataType(
@@ -343,6 +362,19 @@ auto DataTypeExporter::exportCoreEncodingAndPrecision(model::CoreEncodingAndPrec
         return;
     }
     throw UnsupportedElementException("CoreEncodingAndPrecision");
+}
+
+auto DataTypeExporter::exportCoreStringEncoding(model::CoreStringEncoding encoding, QDomElement &setElement) -> void
+{
+    switch (encoding) {
+    case CoreStringEncoding::Ascii:
+        setElement.setAttribute(QStringLiteral("encoding"), QStringLiteral("ASCII"));
+        return;
+    case CoreStringEncoding::Utf8:
+        setElement.setAttribute(QStringLiteral("encoding"), QStringLiteral("UTF-8"));
+        return;
+    }
+    throw UnsupportedElementException("CoreStringEncoding");
 }
 
 auto DataTypeExporter::exportFloatPrecisionRange(const model::FloatPrecisionRange &range, QDomElement &setElement)
