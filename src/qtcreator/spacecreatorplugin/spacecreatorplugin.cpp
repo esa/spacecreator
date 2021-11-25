@@ -25,9 +25,11 @@
 #include "dveditor.h"
 #include "dvlibrary.h"
 #include "dvsystemchecks.h"
+#include "export/exceptions.h"
 #include "import/exceptions.h"
 #include "interfacedocument.h"
 #include "iv/iveditordata.h"
+#include "iv/iveditordocument.h"
 #include "iv/iveditorfactory.h"
 #include "iv/ivqtceditor.h"
 #include "iveditor.h"
@@ -61,6 +63,7 @@
 #include <qabstractitemmodel.h>
 #include <qaction.h>
 #include <qboxlayout.h>
+#include <qdebug.h>
 #include <qfiledialog.h>
 #include <qtreeview.h>
 
@@ -299,7 +302,41 @@ void ListTreeDialog::getSelectedItems()
 
 void SpaceCreatorPlugin::exportInterfaceView()
 {
-    IvComponentsItemModel *componentsItemModel = new IvComponentsItemModel();
+    auto *const currentDocument = Core::EditorManager::currentDocument();
+    auto *const currentIvDocument = static_cast<IVEditorDocument *>(currentDocument);
+    if (currentIvDocument == nullptr) {
+        throw conversion::exporter::ExportException(tr("InterfaceView file not selected"));
+        // TODO: throw unhandled exception or write a warning visible to user and just return?
+    }
+
+    const auto ivEditorCore = currentIvDocument->ivEditorCore();
+
+    auto ivFunctionsNames = ivEditorCore->ivFunctionsNames();
+    if (!ivFunctionsNames.empty()) {
+        for (auto &name : ivFunctionsNames) {
+            qDebug() << "fname: " << name;
+        }
+    }
+
+    auto allIvFunctions = ivEditorCore->allIVFunctions();
+    if (!allIvFunctions.empty()) {
+        for (auto &function : allIvFunctions) {
+            auto *const model = function->model();
+            const auto fid = function->id();
+            if (model != nullptr) {
+                qDebug() << "model object name: " << model->objectName();
+                qDebug() << model->rootObjectId();
+                for (int i = 0; i < ivFunctionsNames.size(); i++) {
+                    auto *const func = model->getFunction(fid);
+                    if (func != nullptr) {
+                        qDebug() << "id: " << func->id();
+                    }
+                }
+            }
+        }
+    }
+
+    IvComponentsItemModel *componentsItemModel = nullptr; // new IvComponentsItemModel();
 
     ListTreeDialog ldDialog(componentsItemModel);
 

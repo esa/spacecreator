@@ -18,6 +18,7 @@
 #pragma once
 
 #include "editorcore.h"
+#include "ivfunction.h"
 #include "ivinterface.h"
 #include "ui/graphicsviewbase.h"
 
