@@ -23,18 +23,11 @@
 
 namespace sedsconverter {
 
-class tst_SedsConverter : public QObject
+class tst_SedsConverter_SedsToSdl : public QObject
 {
     Q_OBJECT
 
 private Q_SLOTS:
-    void testSimpleDataTypes();
-    void testArrays();
-    void testContainers();
-    void testDatatypeInsideComponent();
-    void testRequiredInterfaces();
-    void testProvidedInterfaces();
-    void testHwas();
     void testStateMachineWithBareInput();
     void testLedDemo();
     void testCalculator();
@@ -42,79 +35,11 @@ private Q_SLOTS:
     void testFactorial();
 };
 
-/// \SRS  ETB-FUN-110
-/// \SRS  ETB-IF-10
-/// \SRS  ETB-IF-120
-void tst_SedsConverter::testSimpleDataTypes()
-{
-    const int result = system("./test_simple_data_types.sh");
-    QCOMPARE(result, 0);
-}
-
-/// \SRS  ETB-FUN-110
-/// \SRS  ETB-IF-10
-/// \SRS  ETB-IF-120
-void tst_SedsConverter::testArrays()
-{
-    const int result = system("./test_arrays.sh");
-    QCOMPARE(result, 0);
-}
-
-/// \SRS  ETB-FUN-110
-/// \SRS  ETB-IF-10
-/// \SRS  ETB-IF-120
-void tst_SedsConverter::testContainers()
-{
-    const int result = system("./test_containers.sh");
-    QCOMPARE(result, 0);
-}
-
-/// \SRS  ETB-FUN-1070
-/// \SRS  ETB-FUN-1080
-/// \SRS  ETB-IF-10
-/// \SRS  ETB-IF-120
-void tst_SedsConverter::testDatatypeInsideComponent()
-{
-    const int result = system("./test_datatype_inside_component.sh");
-    QCOMPARE(result, 0);
-}
-
-/// \SRS  ETB-FUN-1040
-/// \SRS  ETB-FUN-1060
-/// \SRS  ETB-IF-10
-/// \SRS  ETB-IF-130
-void tst_SedsConverter::testRequiredInterfaces()
-{
-    const int result = system("./test_required_interfaces.sh");
-    QCOMPARE(result, 0);
-}
-
-/// \SRS  ETB-FUN-1040
-/// \SRS  ETB-FUN-1050
-/// \SRS  ETB-IF-10
-/// \SRS  ETB-IF-130
-void tst_SedsConverter::testProvidedInterfaces()
-{
-    const int result = system("./test_provided_interfaces.sh");
-    QCOMPARE(result, 0);
-}
-
-/// \SRS  ETB-FUN-1040
-/// \SRS  ETB-FUN-1050
-/// \SRS  ETB-FUN-1060
-/// \SRS  ETB-IF-10
-/// \SRS  ETB-IF-130
-void tst_SedsConverter::testHwas()
-{
-    const int result = system("./test_hwas.sh");
-    QCOMPARE(result, 0);
-}
-
 /// \SRS  ETB-FUN-10
 /// \SRS  ETB-FUN-2490
 /// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-140
-void tst_SedsConverter::testStateMachineWithBareInput()
+void tst_SedsConverter_SedsToSdl::testStateMachineWithBareInput()
 {
     const int result = system("./test_state_machine_with_bare_inputs.sh");
     QCOMPARE(result, 0);
@@ -136,7 +61,7 @@ void tst_SedsConverter::testStateMachineWithBareInput()
 /// \SRS  ETB-FUN-2670
 /// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-140
-void tst_SedsConverter::testLedDemo()
+void tst_SedsConverter_SedsToSdl::testLedDemo()
 {
     const int result = system("./test_calculator.sh");
     QCOMPARE(result, 0);
@@ -160,7 +85,7 @@ void tst_SedsConverter::testLedDemo()
 /// \SRS  ETB-FUN-2670
 /// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-140
-void tst_SedsConverter::testCalculator()
+void tst_SedsConverter_SedsToSdl::testCalculator()
 {
     const int result = system("./test_led_demo.sh");
     QCOMPARE(result, 0);
@@ -183,7 +108,7 @@ void tst_SedsConverter::testCalculator()
 /// \SRS  ETB-FUN-2670
 /// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-140
-void tst_SedsConverter::testComparator()
+void tst_SedsConverter_SedsToSdl::testComparator()
 {
     const int result = system("./test_comparator.sh");
     QCOMPARE(result, 0);
@@ -209,7 +134,7 @@ void tst_SedsConverter::testComparator()
 /// \SRS  ETB-FUN-2670
 /// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-140
-void tst_SedsConverter::testFactorial()
+void tst_SedsConverter_SedsToSdl::testFactorial()
 {
     const int result = system("./test_factorial.sh");
     QCOMPARE(result, 0);
@@ -217,6 +142,6 @@ void tst_SedsConverter::testFactorial()
 
 } // namespace sedsconverter
 
-QTEST_MAIN(sedsconverter::tst_SedsConverter)
+QTEST_MAIN(sedsconverter::tst_SedsConverter_SedsToSdl)
 
-#include "tst_sedsconverter.moc"
+#include "tst_sedsconverter_sedstosdl.moc"
