@@ -186,8 +186,9 @@ void CmdEntitiesImport::redoSourceCloning(const ivm::IVObject *object)
     const QStringList objPath = ivm::IVObject::path(object);
     const QString rootName = objPath.isEmpty() ? object->title() : objPath.front();
     const QString subPath = relativePathForObject(object);
-    const QString sourcePrefix = m_tempDir.isNull() ? shared::componentsLibraryPath() : m_tempDir->path();
-    const QDir sourceDir { sourcePrefix + QDir::separator() + rootName };
+    const QString sourcePath =
+            m_tempDir.isNull() ? shared::componentsLibraryPath() + QDir::separator() + rootName : m_tempDir->path();
+    const QDir sourceDir { sourcePath };
     const QDir targetDir { m_destPath };
     shared::copyDir(sourceDir.filePath(subPath), targetDir.filePath(subPath));
 }
@@ -201,11 +202,11 @@ void CmdEntitiesImport::undoSourceCloning(const ivm::IVObject *object)
     }
 
     const QString subPath = relativePathForObject(object);
-    const QString sourcePath = m_tempDir->path() + QDir::separator() + subPath;
-    const QString destPath { m_destPath + QDir::separator() + subPath };
-    shared::copyDir(destPath, sourcePath);
-    QDir destDir(destPath);
-    destDir.removeRecursively();
+    const QString destPath = m_tempDir->path() + QDir::separator() + subPath;
+    const QString sourcePath { m_destPath + QDir::separator() + subPath };
+    shared::copyDir(sourcePath, destPath);
+    QDir sourceDir(sourcePath);
+    sourceDir.removeRecursively();
 }
 
 static inline bool isSame(const QString &filePath1, const QString &filePath2)
