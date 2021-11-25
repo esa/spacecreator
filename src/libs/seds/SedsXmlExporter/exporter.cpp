@@ -126,6 +126,8 @@ QDomDocument SedsXmlExporter::createSedsXmlDocument()
 
 QDomElement SedsXmlExporter::createRootElement(QString rootElementName, QDomDocument &sedsDocument)
 {
+    // Set global hash seed, so that the output is deterministic
+    qSetGlobalQHashSeed(0);
     auto rootElement = sedsDocument.createElement(std::move(rootElementName));
     rootElement.setAttribute("xmlns", m_schemaNsUri);
     rootElement.setAttribute("xmlns:xsi", m_schemaInstanceNsUri);

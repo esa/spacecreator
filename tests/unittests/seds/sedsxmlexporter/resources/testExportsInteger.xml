@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+ <Package name="Model">
+  <DataTypeSet>
+   <IntegerDataType name="TestInteger">
+    <IntegerDataEncoding byteOrder="bigEndian" sizeInBits="16" encoding="twosComplement"/>
+    <Range>
+     <MinMaxRange min="-42" max="42" rangeType="exclusiveMinExclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+  </DataTypeSet>
+ </Package>
+</PackageFile>

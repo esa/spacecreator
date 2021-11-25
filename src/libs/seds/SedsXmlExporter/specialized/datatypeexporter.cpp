@@ -112,10 +112,37 @@ auto DataTypeExporter::exportContainerDataType(
 auto DataTypeExporter::exportEnumeratedDataType(
         const model::EnumeratedDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void
 {
-    Q_UNUSED(dataType);
-    Q_UNUSED(setElement);
-    Q_UNUSED(sedsDocument);
-    throw UnsupportedElementException("EnumeratedDataType");
+    auto typeElement = sedsDocument.createElement(QStringLiteral("EnumeratedDataType"));
+    typeElement.setAttribute(QStringLiteral("name"), dataType.nameStr());
+    if (dataType.encoding().has_value()) {
+        const auto &encoding = *dataType.encoding();
+        auto encodingElement = sedsDocument.createElement(QStringLiteral("IntegerDataEncoding"));
+        encodingElement.setAttribute(QStringLiteral("sizeInBits"), static_cast<qulonglong>(encoding.bits()));
+
+        std::visit(overloaded { [&encodingElement](const CoreIntegerEncoding &coreEncoding) {
+            exportCoreIntegerEncoding(coreEncoding, encodingElement);
+        } },
+                encoding.encoding());
+
+        switch (encoding.byteOrder()) {
+        case ByteOrder::BigEndian:
+            encodingElement.setAttribute(QStringLiteral("byteOrder"), QStringLiteral("bigEndian"));
+            break;
+        case ByteOrder::LittleEndian:
+            encodingElement.setAttribute(QStringLiteral("byteOrder"), QStringLiteral("littleEndian"));
+            break;
+        }
+
+        typeElement.appendChild(std::move(encodingElement));
+    }
+
+    if (dataType.enumerationList().size() > 0) {
+        auto listElement = sedsDocument.createElement(QStringLiteral("EnumerationList"));
+
+        exportEnumerationList(dataType.enumerationList(), listElement, sedsDocument);
+        typeElement.appendChild(std::move(listElement));
+    }
+    setElement.appendChild(std::move(typeElement));
 }
 
 auto DataTypeExporter::exportFloatDataType(
@@ -180,27 +207,39 @@ auto DataTypeExporter::exportSubRangeDataType(
     throw UnsupportedElementException("SubRangeDataType");
 }
 
+auto DataTypeExporter::exportEnumerationList(
+        const std::vector<model::ValueEnumeration> &values, QDomElement &setElement, QDomDocument &sedsDocument) -> void
+{
+    for (const auto &value : values) {
+        auto valueElement = sedsDocument.createElement(QStringLiteral("Enumeration"));
+        valueElement.setAttribute(QStringLiteral("label"), value.label().value());
+        valueElement.setAttribute(QStringLiteral("value"), value.value());
+
+        setElement.appendChild(std::move(valueElement));
+    }
+}
+
 auto DataTypeExporter::exportCoreIntegerEncoding(model::CoreIntegerEncoding encoding, QDomElement &setElement) -> void
 {
     switch (encoding) {
     case CoreIntegerEncoding::Unsigned:
         setElement.setAttribute(QStringLiteral("encoding"), QStringLiteral("unsigned"));
-        break;
+        return;
     case CoreIntegerEncoding::SignMagnitude:
         setElement.setAttribute(QStringLiteral("encoding"), QStringLiteral("signMagnitude"));
-        break;
+        return;
     case CoreIntegerEncoding::TwosComplement:
         setElement.setAttribute(QStringLiteral("encoding"), QStringLiteral("twosComplement"));
-        break;
+        return;
     case CoreIntegerEncoding::OnesComplement:
         setElement.setAttribute(QStringLiteral("encoding"), QStringLiteral("onesComplement"));
-        break;
+        return;
     case CoreIntegerEncoding::Bcd:
         setElement.setAttribute(QStringLiteral("encoding"), QStringLiteral("BCD"));
-        break;
+        return;
     case CoreIntegerEncoding::PackedBcd:
         setElement.setAttribute(QStringLiteral("encoding"), QStringLiteral("packedBCD"));
-        break;
+        return;
     }
     throw UnsupportedElementException("CoreIntegerEncoding");
 }

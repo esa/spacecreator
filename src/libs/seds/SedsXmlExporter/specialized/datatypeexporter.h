@@ -72,6 +72,8 @@ protected:
     static auto exportSubRangeDataType(
             const model::SubRangeDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void;
 
+    static auto exportEnumerationList(const std::vector<model::ValueEnumeration> &values, QDomElement &setElement,
+            QDomDocument &sedsDocument) -> void;
     static auto exportCoreIntegerEncoding(model::CoreIntegerEncoding encoding, QDomElement &setElement) -> void;
     static auto exportMinMaxRange(const model::MinMaxRange &range, QDomElement &setElement, QDomDocument &sedsDocument)
             -> void;
