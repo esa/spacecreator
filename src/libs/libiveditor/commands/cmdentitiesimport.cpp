@@ -129,7 +129,11 @@ void CmdEntitiesImport::redo()
         if (!entity) {
             return;
         }
-        entity->setParentObject(m_parentChildMappings[entity->id()]);
+        ivm::IVObject *parentObj = m_parentChildMappings.value(entity->id());
+        if (auto parentFunc = qobject_cast<ivm::IVFunctionType *>(parentObj)) {
+            entity->setParentObject(parentFunc);
+            parentFunc->addChild(entity);
+        }
         entities.append(entity);
         redoSourceCloning(entity);
     }
