@@ -72,10 +72,13 @@ auto DataTypeExporter::exportArrayDataType(
 auto DataTypeExporter::exportBinaryDataType(
         const model::BinaryDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void
 {
-    Q_UNUSED(dataType);
-    Q_UNUSED(setElement);
-    Q_UNUSED(sedsDocument);
-    throw UnsupportedElementException("BinaryDataType");
+    auto typeElement = sedsDocument.createElement(QStringLiteral("BinaryDataType"));
+    typeElement.setAttribute(QStringLiteral("name"), dataType.nameStr());
+    typeElement.setAttribute(
+            QStringLiteral("fixedSize"), dataType.hasFixedSize() ? QStringLiteral("true") : QStringLiteral("false"));
+    typeElement.setAttribute(QStringLiteral("sizeInBits"), static_cast<qulonglong>(dataType.bits()));
+
+    setElement.appendChild(std::move(typeElement));
 }
 
 auto DataTypeExporter::exportBooleanDataType(
@@ -174,9 +177,8 @@ auto DataTypeExporter::exportFloatDataType(
 
     std::visit(overloaded { [&typeElement, &sedsDocument](
                                     const MinMaxRange &range) { exportMinMaxRange(range, typeElement, sedsDocument); },
-                       [&typeElement, &sedsDocument](const FloatPrecisionRange &range) {
-                           exportFloatPrecisionRange(range, typeElement, sedsDocument);
-                       } },
+                       [&typeElement](
+                               const FloatPrecisionRange &range) { exportFloatPrecisionRange(range, typeElement); } },
             dataType.range());
 
     setElement.appendChild(std::move(typeElement));
@@ -343,8 +345,8 @@ auto DataTypeExporter::exportCoreEncodingAndPrecision(model::CoreEncodingAndPrec
     throw UnsupportedElementException("CoreEncodingAndPrecision");
 }
 
-auto DataTypeExporter::exportFloatPrecisionRange(
-        const model::FloatPrecisionRange &range, QDomElement &setElement, QDomDocument &sedsDocument) -> void
+auto DataTypeExporter::exportFloatPrecisionRange(const model::FloatPrecisionRange &range, QDomElement &setElement)
+        -> void
 {
 
     switch (range) {
