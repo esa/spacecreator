@@ -33,6 +33,7 @@
 #include "iveditor.h"
 #include "iveditorcore.h"
 #include "ivlibrary.h"
+#include "ivmodel.h"
 #include "msc/msceditordata.h"
 #include "msc/msceditorfactory.h"
 #include "msc/mscqtceditor.h"
@@ -57,6 +58,7 @@
 #include <coreplugin/icore.h>
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
+#include <qabstractitemmodel.h>
 #include <qaction.h>
 #include <qboxlayout.h>
 #include <qfiledialog.h>
@@ -256,28 +258,50 @@ void SpaceCreatorPlugin::importAsn1()
     }
 }
 
+//////////////////////////////////////////////////
+
+class IvComponentsItemModel : public QAbstractItemModel
+{
+public:
+    IvComponentsItemModel();
+};
+
+//////////////////////////////////////////////////
+
 class ListTreeDialog : public QDialog
 {
 public:
-    ListTreeDialog();
+    ListTreeDialog() = delete;
+    ListTreeDialog(QAbstractItemModel *model);
+    void getSelectedItems();
 
 private:
-    QTreeView *tree = nullptr;
+    QTreeView *m_tree = nullptr;
+    QAbstractItemModel *m_model = nullptr;
 };
 
-ListTreeDialog::ListTreeDialog()
+ListTreeDialog::ListTreeDialog(QAbstractItemModel *model)
+    : m_model(model)
 {
     QHBoxLayout *hblayout = new QHBoxLayout(this);
     setLayout(hblayout);
-    tree = new QTreeView(this);
-    hblayout->addWidget(tree);
-    // tree->setData(); // or something like that
+    m_tree = new QTreeView(this);
+    hblayout->addWidget(m_tree);
+    m_tree->setModel(m_model);
 }
+
+void ListTreeDialog::getSelectedItems()
+{
+    // TODO: return list  of currently selected items in the model
+}
+
+//////////////////////////////////////////////////
 
 void SpaceCreatorPlugin::exportInterfaceView()
 {
-    // todo
-    ListTreeDialog ldDialog;
+    IvComponentsItemModel *componentsItemModel = new IvComponentsItemModel();
+
+    ListTreeDialog ldDialog(componentsItemModel);
 
     ldDialog.exec();
 }
