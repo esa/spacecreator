@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 OPENGEODE=$HOME/.local/bin/opengeode
 

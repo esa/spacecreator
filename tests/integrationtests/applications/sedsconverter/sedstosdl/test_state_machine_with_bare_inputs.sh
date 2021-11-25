@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -euo pipefail
 
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 TEST_OUTPUT_DIR=output

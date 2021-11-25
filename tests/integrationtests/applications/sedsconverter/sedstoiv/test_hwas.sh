@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 AADL_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/aadlconverter
 UPDATE_DATAVIEW="asn2aadlPlus -f output.asn DataView.aadl -aadlv2"
@@ -10,7 +12,6 @@ TEST_OUTPUT_DIR=output
 # Setup output dir and project
 rm -r -f $TEST_OUTPUT_DIR
 mkdir $TEST_OUTPUT_DIR
-cp resources/Makefile $TEST_OUTPUT_DIR/Makefile
 # Translate
 $SEDS_CONVERTER --from SEDS --to InterfaceView --aux-models ASN.1 --skip-validation -i resources/test_hwas.xml \
   --out $TEST_OUTPUT_DIR/interfaceview.xml --iv-config config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/
