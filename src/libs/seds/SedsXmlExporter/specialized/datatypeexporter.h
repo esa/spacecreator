@@ -43,7 +43,7 @@ class DataTypeExporter final
 {
 public:
     /**
-     * @brief   Export SEDS interface
+     * @brief   Export SEDS data type
      *
      * @param   dataType        Data type to export
      * @param   setElement      Parent set element
