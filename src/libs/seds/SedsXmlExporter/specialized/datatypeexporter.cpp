@@ -148,10 +148,38 @@ auto DataTypeExporter::exportEnumeratedDataType(
 auto DataTypeExporter::exportFloatDataType(
         const model::FloatDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void
 {
-    Q_UNUSED(dataType);
-    Q_UNUSED(setElement);
-    Q_UNUSED(sedsDocument);
-    throw UnsupportedElementException("FloatDataType");
+    auto typeElement = sedsDocument.createElement(QStringLiteral("FloatDataType"));
+    typeElement.setAttribute(QStringLiteral("name"), dataType.nameStr());
+    if (dataType.encoding().has_value()) {
+        const auto &encoding = *dataType.encoding();
+        auto encodingElement = sedsDocument.createElement(QStringLiteral("FloatDataEncoding"));
+        encodingElement.setAttribute(QStringLiteral("sizeInBits"), static_cast<qulonglong>(encoding.bits()));
+
+        std::visit(overloaded { [&encodingElement](const CoreEncodingAndPrecision &coreEncoding) {
+            exportCoreEncodingAndPrecision(coreEncoding, encodingElement);
+        } },
+                encoding.encoding());
+
+        switch (encoding.byteOrder()) {
+        case ByteOrder::BigEndian:
+            encodingElement.setAttribute(QStringLiteral("byteOrder"), QStringLiteral("bigEndian"));
+            break;
+        case ByteOrder::LittleEndian:
+            encodingElement.setAttribute(QStringLiteral("byteOrder"), QStringLiteral("littleEndian"));
+            break;
+        }
+
+        typeElement.appendChild(std::move(encodingElement));
+    }
+
+    std::visit(overloaded { [&typeElement, &sedsDocument](
+                                    const MinMaxRange &range) { exportMinMaxRange(range, typeElement, sedsDocument); },
+                       [&typeElement, &sedsDocument](const FloatPrecisionRange &range) {
+                           exportFloatPrecisionRange(range, typeElement, sedsDocument);
+                       } },
+            dataType.range());
+
+    setElement.appendChild(std::move(typeElement));
 }
 
 auto DataTypeExporter::exportIntegerDataType(
@@ -290,6 +318,47 @@ auto DataTypeExporter::exportMinMaxRange(
 
     rangeElement.appendChild(std::move(minMaxRangeElement));
     setElement.appendChild(std::move(rangeElement));
+}
+
+auto DataTypeExporter::exportCoreEncodingAndPrecision(model::CoreEncodingAndPrecision encoding, QDomElement &setElement)
+        -> void
+{
+    switch (encoding) {
+    case CoreEncodingAndPrecision::IeeeSingle:
+        setElement.setAttribute(QStringLiteral("encodingAndPrecision"), QStringLiteral("IEEE754_2008_single"));
+        return;
+    case CoreEncodingAndPrecision::IeeeDouble:
+        setElement.setAttribute(QStringLiteral("encodingAndPrecision"), QStringLiteral("IEEE754_2008_double"));
+        return;
+    case CoreEncodingAndPrecision::IeeeQuad:
+        setElement.setAttribute(QStringLiteral("encodingAndPrecision"), QStringLiteral("IEEE754_2008_quad"));
+        return;
+    case CoreEncodingAndPrecision::MilstdSimple:
+        setElement.setAttribute(QStringLiteral("encodingAndPrecision"), QStringLiteral("MILSTD_1750A_simple"));
+        return;
+    case CoreEncodingAndPrecision::MilstdExtended:
+        setElement.setAttribute(QStringLiteral("encodingAndPrecision"), QStringLiteral("MILSTD_1750A_extended"));
+        return;
+    }
+    throw UnsupportedElementException("CoreEncodingAndPrecision");
+}
+
+auto DataTypeExporter::exportFloatPrecisionRange(
+        const model::FloatPrecisionRange &range, QDomElement &setElement, QDomDocument &sedsDocument) -> void
+{
+
+    switch (range) {
+    case FloatPrecisionRange::Single:
+        setElement.setAttribute(QStringLiteral("encodingAndPrecision"), QStringLiteral("SINGLE"));
+        return;
+    case FloatPrecisionRange::Double:
+        setElement.setAttribute(QStringLiteral("encodingAndPrecision"), QStringLiteral("DOUBLE"));
+        return;
+    case FloatPrecisionRange::Quad:
+        setElement.setAttribute(QStringLiteral("encodingAndPrecision"), QStringLiteral("QUAD"));
+        return;
+    }
+    throw UnsupportedElementException("FloatPrecisionRange");
 }
 
 } // namespace seds::exporter
