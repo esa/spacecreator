@@ -1,5 +1,6 @@
 find_package(LibXml2 REQUIRED)
 
+add_subdirectory(Asn1ToSedsTranslator)
 add_subdirectory(IvToSedsTranslator)
 add_subdirectory(SedsModel)
 add_subdirectory(SedsXmlExporter)
