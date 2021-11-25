@@ -221,16 +221,16 @@ void SpaceCreatorPlugin::importInterfaceView()
 
 void SpaceCreatorPlugin::importSdl()
 {
-    const QString inputFilePath =
-            QFileDialog::getOpenFileName(nullptr, "Select SDL file to import...", QString(), tr("*.pr"));
+    const QString inputFilePath = QFileDialog::getOpenFileName(
+            nullptr, "Select InterfaceView file to import SDL from...", QString(), tr("*.xml"));
 
     // TODO: implementation
 }
 
 void SpaceCreatorPlugin::importAsn1()
 {
-    const QString inputFilePath =
-            QFileDialog::getOpenFileName(nullptr, "Select ASN.1 file to import...", QString(), tr("*.asn"));
+    const QString inputFilePath = QFileDialog::getOpenFileName(
+            nullptr, "Select InterfaceView file to import ASN.1 from...", QString(), tr("*.xml"));
 
     conversion::Options options;
     options.add(conversion::asn1::Asn1Options::inputFilepath, inputFilePath);
