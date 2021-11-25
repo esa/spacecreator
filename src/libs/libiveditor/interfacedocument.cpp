@@ -262,7 +262,7 @@ bool InterfaceDocument::exportSelectedFunctions()
     if (name.isEmpty()) {
         return false;
     }
-    QString path = shared::componentsLibraryPath() + name;
+    QString path = shared::componentsLibraryPath() + QDir::separator() + name;
     if (exportImpl(path, objects)) {
         d->objectsSelectionModel->clearSelection();
         return loadComponentModel(d->importModel, path + QDir::separator() + shared::kDefaultInterfaceViewFileName);
@@ -753,6 +753,18 @@ static inline bool resolveNameConflict(QString &targetPath, QWidget *window)
     return true;
 }
 
+static inline void copyImplementation(
+        const QDir &projectDir, const QDir &targetDir, const QVector<ivm::IVFunction *> &objects)
+{
+    for (shared::VEObject *object : objects) {
+        if (auto fn = object->as<ivm::IVFunctionType *>()) {
+            const QString subPath = shared::kRootImplementationPath + QDir::separator() + object->title().toLower();
+            shared::copyDir(projectDir.filePath(subPath), targetDir.filePath(subPath));
+            copyImplementation(projectDir, targetDir, fn->functions());
+        }
+    }
+}
+
 bool InterfaceDocument::exportImpl(QString &targetPath, const QList<shared::VEObject *> &objects)
 {
     const bool ok = shared::ensureDirExists(targetPath);
@@ -789,13 +801,13 @@ bool InterfaceDocument::exportImpl(QString &targetPath, const QList<shared::VEOb
         }
     }
 
-    for (shared::VEObject *object : objects) {
-        if (auto fn = object->as<ivm::IVFunctionType *>()) {
-            const QString subPath = QStringLiteral("work/%1").arg(object->title());
-            shared::copyDir(ivDir.filePath(subPath), targetDir.filePath(subPath));
+    QVector<ivm::IVFunction *> functions;
+    std::for_each(objects.cbegin(), objects.cend(), [&functions](shared::VEObject *veObj) {
+        if (auto fn = veObj->as<ivm::IVFunction *>()) {
+            functions.append(fn);
         }
-    }
-
+    });
+    copyImplementation(ivDir, targetDir, functions);
     return true;
 }
 

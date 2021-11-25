@@ -43,7 +43,7 @@ public:
     int id() const override;
 
 private:
-    void moveDirectories(const QString &currentImplName, const QString &nextImplName, const QString &projectPath);
+    void moveDirectories(const QString &currentImplName, const QString &nextImplName, const QString &projectPath, const QString &functionName);
 
 private:
     const QString m_projectPath;

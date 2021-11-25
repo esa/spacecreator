@@ -37,7 +37,9 @@ static inline QString implToken()
 
 static inline QList<EntityAttribute> attributes(const QString &defaultName, const QString &language)
 {
-    return { EntityAttribute { implToken(), defaultName, EntityAttribute::Type::Attribute } };
+    return { EntityAttribute { implToken(), defaultName, EntityAttribute::Type::Attribute },
+        EntityAttribute { ivm::meta::Props::token(ivm::meta::Props::Token::language), language,
+                EntityAttribute::Type::Attribute } };
 }
 
 CmdFunctionImplementationDefaultChange::CmdFunctionImplementationDefaultChange(
@@ -57,7 +59,7 @@ void CmdFunctionImplementationDefaultChange::redo()
     CmdFunctionAttrChange::redo();
     const QString implName = m_entity->entityAttributeValue<QString>(implToken());
 
-    moveDirectories(currentImplName, implName, m_projectPath);
+    moveDirectories(currentImplName, implName, m_projectPath, m_entity->title().toLower());
 }
 
 void CmdFunctionImplementationDefaultChange::undo()
@@ -66,7 +68,7 @@ void CmdFunctionImplementationDefaultChange::undo()
     CmdFunctionAttrChange::undo();
     const QString implName = m_entity->entityAttributeValue<QString>(implToken());
 
-    moveDirectories(currentImplName, implName, m_projectPath);
+    moveDirectories(currentImplName, implName, m_projectPath, m_entity->title().toLower());
 }
 
 int CmdFunctionImplementationDefaultChange::id() const
@@ -74,16 +76,16 @@ int CmdFunctionImplementationDefaultChange::id() const
     return ChangeFunctionDefaultImplementation;
 }
 
-void CmdFunctionImplementationDefaultChange::moveDirectories(
-        const QString &currentImplName, const QString &nextImplName, const QString &projectPath)
+void CmdFunctionImplementationDefaultChange::moveDirectories(const QString &currentImplName,
+        const QString &nextImplName, const QString &projectPath, const QString &functionName)
 {
-    static const QString kDefaultImplPath { projectPath + QDir::separator() + QStringLiteral("work") };
-    const QString kCommonPathTemplate { projectPath + QDir::separator() + QStringLiteral("work") + QDir::separator()
-        + shared::kNonCurrentImplementationPath + QDir::separator() };
+    const QString kDefaultImplPath { projectPath + QDir::separator() + shared::kRootImplementationPath
+        + QDir::separator() + functionName };
+    const QString kCommonPathTemplate { kDefaultImplPath + QDir::separator() + shared::kNonCurrentImplementationPath };
 
-    const QString currentImplDestPath { kCommonPathTemplate + currentImplName };
+    const QString currentImplDestPath { kCommonPathTemplate + QDir::separator() + currentImplName };
     if (shared::ensureDirExists(currentImplDestPath)) {
-        QDir dir { kDefaultImplPath };
+        const QDir dir { kDefaultImplPath };
         const QStringList subfolders = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
         for (const QString &dirName : subfolders) {
             if (dirName != shared::kNonCurrentImplementationPath) {
@@ -95,7 +97,7 @@ void CmdFunctionImplementationDefaultChange::moveDirectories(
         }
     }
 
-    const QString nextImplSourcePath { kCommonPathTemplate + nextImplName };
+    const QString nextImplSourcePath { kCommonPathTemplate + QDir::separator() + nextImplName };
     shared::copyDir(nextImplSourcePath, kDefaultImplPath, shared::FileCopyingMode::Overwrite);
     QDir(nextImplSourcePath).removeRecursively();
 }

@@ -19,6 +19,8 @@
 
 #include "specialized/functionstranslator.h"
 
+#include "parameter.h"
+
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivinterface.h>
@@ -34,6 +36,7 @@ void FunctionsTranslator::translateFunction(const ivm::IVFunction *ivFunction, :
 
     auto ivFunctionName =
             ivFunction->entityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name)).value<QString>();
+    sedsComponent.setName(std::move(ivFunctionName));
 
     for (const auto ivInterface : ivFunction->allInterfaces()) {
         translateInterface(ivInterface, sedsComponent);
@@ -45,23 +48,88 @@ void FunctionsTranslator::translateFunction(const ivm::IVFunction *ivFunction, :
 void FunctionsTranslator::translateInterface(
         const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)
 {
-    Q_UNUSED(sedsComponent);
+    createInterfaceDeclaration(ivInterface, sedsComponent);
+    createInterface(ivInterface, sedsComponent);
+}
+
+void FunctionsTranslator::createInterfaceDeclaration(
+        const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)
+{
+    ::seds::model::InterfaceDeclaration sedsInterfaceDeclaration;
+    sedsInterfaceDeclaration.setName(ivInterface->title());
+
+    createInterfaceCommand(ivInterface, sedsInterfaceDeclaration);
+
+    sedsComponent.addInterfaceDeclaration(std::move(sedsInterfaceDeclaration));
+}
+
+void FunctionsTranslator::createInterfaceCommand(
+        const ivm::IVInterface *ivInterface, ::seds::model::InterfaceDeclaration &sedsInterfaceDeclaration)
+{
+    ::seds::model::InterfaceCommand sedsInterfaceCommand;
+    sedsInterfaceCommand.setName(ivInterface->title());
 
     switch (ivInterface->kind()) {
-    case ivm::IVInterface::OperationKind::Cyclic:
-        throw TranslationException("Cyclic interface translation not implemented");
-        break;
-    case ivm::IVInterface::OperationKind::Sporadic:
-        /* throw TranslationException("Sporadic interface translation not implemented"); */
-        break;
     case ivm::IVInterface::OperationKind::Protected:
-        /* throw TranslationException("Protected interface translation not implemented"); */
-        break;
     case ivm::IVInterface::OperationKind::Unprotected:
-        throw TranslationException("Unprotected interface translation not implemented");
+        sedsInterfaceCommand.setMode(::seds::model::InterfaceCommandMode::Sync);
+        break;
+    case ivm::IVInterface::OperationKind::Cyclic:
+    case ivm::IVInterface::OperationKind::Sporadic:
+        sedsInterfaceCommand.setMode(::seds::model::InterfaceCommandMode::Async);
+        break;
+    case ivm::IVInterface::OperationKind::Any:
+        throw TranslationException("Any interfaces are unsupported");
         break;
     default:
         throw TranslationException("Unhandled OperationKind value");
+        break;
+    }
+
+    for (const auto &ivInterfaceParameter : ivInterface->params()) {
+        createInterfaceArgument(ivInterfaceParameter, sedsInterfaceCommand);
+    }
+
+    sedsInterfaceDeclaration.addCommand(std::move(sedsInterfaceCommand));
+}
+
+void FunctionsTranslator::createInterfaceArgument(
+        const shared::InterfaceParameter &ivInterfaceParameter, ::seds::model::InterfaceCommand &sedsInterfaceCommand)
+{
+    ::seds::model::CommandArgument sedsInterfaceCommandArgument;
+    sedsInterfaceCommandArgument.setName(ivInterfaceParameter.name());
+    sedsInterfaceCommandArgument.setType(ivInterfaceParameter.paramTypeName());
+
+    switch (ivInterfaceParameter.direction()) {
+    case shared::InterfaceParameter::Direction::IN:
+        sedsInterfaceCommandArgument.setMode(::seds::model::CommandArgumentMode::In);
+        break;
+    case shared::InterfaceParameter::Direction::OUT:
+        sedsInterfaceCommandArgument.setMode(::seds::model::CommandArgumentMode::Out);
+        break;
+    }
+
+    sedsInterfaceCommand.addArgument(std::move(sedsInterfaceCommandArgument));
+}
+
+void FunctionsTranslator::createInterface(const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)
+{
+    ::seds::model::Interface sedsInterface;
+    sedsInterface.setName(ivInterface->title());
+    sedsInterface.setType(ivInterface->title());
+
+    switch (ivInterface->direction()) {
+    case ivm::IVInterface::InterfaceType::Provided:
+        sedsComponent.addProvidedInterface(std::move(sedsInterface));
+        break;
+    case ivm::IVInterface::InterfaceType::Required:
+        sedsComponent.addRequiredInterface(std::move(sedsInterface));
+        break;
+    case ivm::IVInterface::InterfaceType::Grouped:
+        throw TranslationException("Grouped interfaces are not implemented");
+        break;
+    default:
+        throw TranslationException("Unhandled InterfaceType value");
         break;
     }
 }

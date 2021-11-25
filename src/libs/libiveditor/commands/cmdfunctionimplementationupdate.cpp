@@ -36,13 +36,20 @@ CmdFunctionImplementationUpdate::CmdFunctionImplementationUpdate(
 {
     Q_ASSERT(m_function);
     Q_ASSERT(idx >= 0 && idx < m_function->implementations().size());
+    if (m_oldValues == m_newValues) {
+        setObsolete(true);
+    }
 }
 
 void CmdFunctionImplementationUpdate::redo()
 {
-    const bool isDefault = m_function->defaultImplementation() == m_newValues.name();
+    const bool isDefault = m_function->defaultImplementation() == m_oldValues.name();
     if (!isDefault) {
-        moveDirectories(m_oldValues.name(), m_newValues.name());
+        if (m_oldValues.name() != m_newValues.name()) {
+            moveDirectories(m_oldValues.name(), m_newValues.name());
+        }
+    } else {
+        m_function->setDefaultImplementation(m_newValues.name());
     }
     m_function->setImplementation(m_idx, m_newValues);
     Q_EMIT implementationChanged(m_function.data(), m_newValues.name(), m_oldValues.name(), this);
@@ -52,7 +59,11 @@ void CmdFunctionImplementationUpdate::undo()
 {
     const bool isDefault = m_function->defaultImplementation() == m_newValues.name();
     if (!isDefault) {
-        moveDirectories(m_newValues.name(), m_oldValues.name());
+        if (m_newValues.name() != m_oldValues.name()) {
+            moveDirectories(m_newValues.name(), m_oldValues.name());
+        }
+    } else {
+        m_function->setDefaultImplementation(m_oldValues.name());
     }
     m_function->setImplementation(m_idx, m_oldValues);
     Q_EMIT implementationChanged(m_function.data(), m_oldValues.name(), m_newValues.name(), this);
@@ -65,10 +76,14 @@ int CmdFunctionImplementationUpdate::id() const
 
 void CmdFunctionImplementationUpdate::moveDirectories(const QString &currentImplName, const QString &nextImplName)
 {
-    static const QString pathTemplate { m_projectPath + QDir::separator() + QLatin1String("work") + QDir::separator()
-        + shared::kNonCurrentImplementationPath + QDir::separator() };
+    if (currentImplName == nextImplName) {
+        return;
+    }
 
-    QDir dir(pathTemplate);
+    const QStringList pathTemplate { m_projectPath, shared::kRootImplementationPath, m_function->title().toLower(),
+        shared::kNonCurrentImplementationPath };
+
+    QDir dir(pathTemplate.join(QDir::separator()));
     dir.rename(currentImplName, nextImplName);
 }
 

@@ -19,6 +19,7 @@
 
 #include "exporter.h"
 
+#include "specialized/componentexporter.h"
 #include "specialized/datatypeexporter.h"
 
 #include <QDomDocument>
@@ -102,6 +103,10 @@ void SedsXmlExporter::exportPackage(const Package &package, QDomElement &parentE
 
     const auto &packageName = package.nameStr();
     packageElement.setAttribute(QStringLiteral("name"), packageName);
+
+    if (package.components().size() > 0) {
+        ComponentExporter::exportComponents(package.components(), packageElement, sedsDocument);
+    }
 
     parentElement.appendChild(std::move(packageElement));
 

@@ -30,4 +30,12 @@ auto enumFromString(const QStringRef &enumStr) -> std::optional<EnumType>
     return std::nullopt;
 }
 
+template <typename EnumType>
+auto stringFromEnum(EnumType enumType) -> const QString&
+{
+    Q_UNUSED(enumType);
+    static const QString unhandled = "unhandled";
+    return unhandled;
+}
+
 } // namespace seds::model

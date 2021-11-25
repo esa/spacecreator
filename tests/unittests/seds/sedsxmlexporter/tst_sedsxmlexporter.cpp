@@ -52,7 +52,7 @@ void tst_SedsXmlExporter::testExportsInteger()
 {
     const auto model = SedsModelBuilder("Model").withIntegerDataType("TestInteger").build();
     conversion::Options options;
-    options.add(SedsOptions::outputFilepath, "output.xml");
+    options.add(SedsOptions::outputFilepath, "testExportsInteger.xml");
     SedsXmlExporter exporter;
     try {
         exporter.exportModel(model.get(), options);
@@ -60,14 +60,14 @@ void tst_SedsXmlExporter::testExportsInteger()
         QFAIL(ex.what());
     }
 
-    QCOMPARE(getFileContents("output.xml"), getFileContents("resources/testExportsInteger.xml"));
+    QCOMPARE(getFileContents("testExportsInteger.xml"), getFileContents("resources/testExportsInteger.xml"));
 }
 
 void tst_SedsXmlExporter::testExportsEnum()
 {
     const auto model = SedsModelBuilder("Model").withEnumeratedDataType("TestEnum", { "a", "b", "c" }).build();
     conversion::Options options;
-    options.add(SedsOptions::outputFilepath, "output.xml");
+    options.add(SedsOptions::outputFilepath, "testExportsEnum.xml");
     SedsXmlExporter exporter;
     try {
         exporter.exportModel(model.get(), options);
@@ -75,14 +75,14 @@ void tst_SedsXmlExporter::testExportsEnum()
         QFAIL(ex.what());
     }
 
-    QCOMPARE(getFileContents("output.xml"), getFileContents("resources/testExportsEnum.xml"));
+    QCOMPARE(getFileContents("testExportsEnum.xml"), getFileContents("resources/testExportsEnum.xml"));
 }
 
 void tst_SedsXmlExporter::testExportsFloat()
 {
     const auto model = SedsModelBuilder("Model").withFloatDataType("TestFloat").build();
     conversion::Options options;
-    options.add(SedsOptions::outputFilepath, "output.xml");
+    options.add(SedsOptions::outputFilepath, "testExportsFloat.xml");
     SedsXmlExporter exporter;
     try {
         exporter.exportModel(model.get(), options);
@@ -90,14 +90,14 @@ void tst_SedsXmlExporter::testExportsFloat()
         QFAIL(ex.what());
     }
 
-    QCOMPARE(getFileContents("output.xml"), getFileContents("resources/testExportsFloat.xml"));
+    QCOMPARE(getFileContents("testExportsFloat.xml"), getFileContents("resources/testExportsFloat.xml"));
 }
 
 void tst_SedsXmlExporter::testExportsString()
 {
     const auto model = SedsModelBuilder("Model").withStringDataType("TestString").build();
     conversion::Options options;
-    options.add(SedsOptions::outputFilepath, "output.xml");
+    options.add(SedsOptions::outputFilepath, "testExportsString.xml");
     SedsXmlExporter exporter;
     try {
         exporter.exportModel(model.get(), options);
@@ -105,7 +105,7 @@ void tst_SedsXmlExporter::testExportsString()
         QFAIL(ex.what());
     }
 
-    QCOMPARE(getFileContents("output.xml"), getFileContents("resources/testExportsString.xml"));
+    QCOMPARE(getFileContents("testExportsString.xml"), getFileContents("resources/testExportsString.xml"));
 }
 
 } // namespace seds::test
