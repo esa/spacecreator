@@ -58,6 +58,7 @@
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
 #include <qaction.h>
+#include <qfiledialog.h>
 
 void initSpaceCreatorResources()
 {
@@ -253,14 +254,23 @@ void SpaceCreatorPlugin::importAsn1()
     }
 }
 
-void SpaceCreatorPlugin::exportAsn1()
+void SpaceCreatorPlugin::exportInterfaceView()
 {
     // todo
 }
 
-void SpaceCreatorPlugin::exportInterfaceView()
+void SpaceCreatorPlugin::exportAsn1()
 {
-    // todo
+    const auto names =
+            QFileDialog::getOpenFileNames(nullptr, "Select ASN.1 files to import to InterfaceView", QString(), "*.asn");
+
+    const auto outputDir = QFileDialog::getExistingDirectory(nullptr, "Select destination directory");
+
+    for (auto &name : names) {
+        // TODO: implementation
+        (void)name;
+        (void)outputDir;
+    }
 }
 
 }
