@@ -15,7 +15,7 @@ mkdir $TEST_OUTPUT_DIR
 
 # Translate
 $SEDS_CONVERTER --from SEDS --to InterfaceView --aux-models ASN.1 --skip-validation -i resources/test_required_interfaces.xml \
-  --out $TEST_OUTPUT_DIR/interfaceview.xml --iv-config config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/
+  --out $TEST_OUTPUT_DIR/interfaceview.xml --iv-config resources/config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/
 # Setup additional data
 cp $TEST_OUTPUT_DIR/INTERFACES.asn $TEST_OUTPUT_DIR/output.asn
 # Remove output ACN to avoid conflicts between the existing one and the ASN.1 file

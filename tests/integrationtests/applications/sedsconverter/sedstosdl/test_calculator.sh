@@ -13,7 +13,7 @@ rm -r -f $TEST_OUTPUT_DIR
 mkdir -p $TEST_OUTPUT_DIR
 # Translate
 $SEDS_CONVERTER --from SEDS --to SDL --aux-models ASN.1,InterfaceView --skip-validation -i resources/test_calculator.xml \
-  --out $TEST_OUTPUT_DIR/calculator.xml --iv-config config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/ \
+  --out $TEST_OUTPUT_DIR/calculator.xml --iv-config resources/config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/ \
   --sdl-filepath-prefix $TEST_OUTPUT_DIR/
 # Setup additional data
 cp resources/test_calculator.system_structure output/system_structure.pr
