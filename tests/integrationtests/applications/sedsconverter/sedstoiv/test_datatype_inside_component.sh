@@ -14,7 +14,7 @@ rm -r -f $TEST_OUTPUT_DIR
 mkdir -p $TEST_OUTPUT_DIR
 # Translate
 $SEDS_CONVERTER --from SEDS --to InterfaceView --aux-models ASN.1 --skip-validation -i resources/test_datatype_inside_component.xml \
-    --out $TEST_OUTPUT_DIR/test_datatype_inside_component.xml \
+    --out $TEST_OUTPUT_DIR/test_datatype_inside_component.xml --iv-config resources/config.xml\
     --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/
 # Compare and clean-up on success
 $DIFF $TEST_OUTPUT_DIR/PKG.asn resources/test_datatype_inside_component_asn1.output && \
