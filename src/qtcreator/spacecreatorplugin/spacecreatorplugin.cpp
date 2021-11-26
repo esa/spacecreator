@@ -270,7 +270,7 @@ class ListTreeDialog : public QDialog
 public:
     ListTreeDialog() = delete;
     ListTreeDialog(QAbstractItemModel *model, const QString &buttonText);
-    void getSelectedItems();
+    QList<QString> getSelectedItems();
 
 private:
     QTreeView *m_tree = nullptr;
@@ -292,9 +292,10 @@ ListTreeDialog::ListTreeDialog(QAbstractItemModel *model, const QString &buttonT
     layout->addWidget(m_button);
 }
 
-void ListTreeDialog::getSelectedItems()
+QList<QString> ListTreeDialog::getSelectedItems()
 {
     // TODO: return list  of currently selected items in the model
+    return QList<QString>();
 }
 
 //////////////////////////////////////////////////
@@ -330,6 +331,11 @@ void SpaceCreatorPlugin::exportInterfaceView()
     ldDialog.setWindowTitle("IV functions to be exported");
 
     ldDialog.exec();
+
+    QList<QString> selectedFunctions = ldDialog.getSelectedItems();
+    for (auto &item : selectedFunctions) {
+        qDebug() << item;
+    }
 
     // auto allIvFunctions = ivEditorCore->allIVFunctions();
     // if (!allIvFunctions.empty()) {
