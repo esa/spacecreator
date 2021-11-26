@@ -307,6 +307,20 @@ void LTDialogButtonHandler::onButtonPressed()
 
 /////////////^^^^^^^^^^///////////////////////////
 
+void updateModelWithFunctionNames(QStandardItemModel &model, QStringList &ivFunctionsNames)
+{
+    QStandardItemModel *functionsListModel = &model;
+
+    QList<QStandardItem *> ivFunctionNamesList;
+    for (auto &name : ivFunctionsNames) {
+        QStandardItem *item = new QStandardItem(name);
+        item->setCheckable(true);
+        ivFunctionNamesList.append(item);
+    }
+    functionsListModel->appendColumn(ivFunctionNamesList);
+    functionsListModel->setHeaderData(0, Qt::Horizontal, "Functions");
+}
+
 void SpaceCreatorPlugin::exportInterfaceView()
 {
     auto *const currentDocument = Core::EditorManager::currentDocument();
@@ -326,14 +340,7 @@ void SpaceCreatorPlugin::exportInterfaceView()
     }
 
     QStandardItemModel functionsListModel;
-    QList<QStandardItem *> ivFunctionNamesList;
-    for (auto &name : ivFunctionsNames) {
-        QStandardItem *item = new QStandardItem(name);
-        item->setCheckable(true);
-        ivFunctionNamesList.append(item);
-    }
-    functionsListModel.appendColumn(ivFunctionNamesList);
-    functionsListModel.setHeaderData(0, Qt::Horizontal, "Functions");
+    updateModelWithFunctionNames(functionsListModel, ivFunctionsNames);
 
     ListTreeDialog ldDialog(&functionsListModel, "export to SEDS");
     ldDialog.setWindowTitle("IV functions to be exported");
