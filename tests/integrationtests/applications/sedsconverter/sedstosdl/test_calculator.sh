@@ -8,6 +8,8 @@ OPENGEODE=$HOME/.local/bin/opengeode
 DIFF="diff -w -B"
 TEST_OUTPUT_DIR=output
 
+echo "Running SedsConverter test: ${0##*/}'"
+
 # Setup output dir
 rm -r -f $TEST_OUTPUT_DIR
 mkdir -p $TEST_OUTPUT_DIR

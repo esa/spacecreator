@@ -9,6 +9,8 @@ UPDATE_DATAVIEW="asn2aadlPlus -f output.asn DataView.aadl -aadlv2"
 DIFF="diff -w -B"
 TEST_OUTPUT_DIR=output
 
+echo "Running SedsConverter test: ${0##*/}'"
+
 # Setup output dir and project
 rm -r -f $TEST_OUTPUT_DIR
 mkdir $TEST_OUTPUT_DIR
