@@ -21,6 +21,7 @@ target_link_libraries(SedsConverter
                 Conversion::IvRegistrar
                 Conversion::SedsRegistrar
                 Conversion::SdlRegistrar
+                Conversion::Asn1ToSedsTranslator
                 "stdc++fs")
 
 set_target_properties(SedsConverter PROPERTIES

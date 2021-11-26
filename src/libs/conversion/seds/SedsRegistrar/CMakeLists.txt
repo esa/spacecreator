@@ -14,6 +14,7 @@ target_link_libraries(SedsRegistrar
     PRIVATE     SEDS::XmlImporter
                 SEDS::XmlExporter
                 Conversion::IvToSedsTranslator
+                Conversion::Asn1ToSedsTranslator
     PUBLIC      Conversion::Common
                 CommonProjectWarnings)
 

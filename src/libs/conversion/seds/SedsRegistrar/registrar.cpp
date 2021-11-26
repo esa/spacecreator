@@ -20,6 +20,7 @@
 #include "registrar.h"
 
 #include <conversion/common/modeltype.h>
+#include <conversion/seds/Asn1ToSedsTranslator/translator.h>
 #include <ivcore/ivlibrary.h>
 #include <libiveditor/iveditor.h>
 #include <memory>
@@ -27,6 +28,7 @@
 #include <seds/SedsXmlExporter/exporter.h>
 #include <seds/SedsXmlImporter/importer.h>
 
+using conversion::seds::translator::Asn1ToSedsTranslator;
 using seds::exporter::SedsXmlExporter;
 using seds::importer::SedsXmlImporter;
 
@@ -48,6 +50,12 @@ bool SedsRegistrar::registerCapabilities(conversion::Registry &registry)
     auto ivToSedsTranslator = std::make_unique<IvToSedsTranslator>();
     result = registry.registerTranslator(
             { ModelType::InterfaceView, ModelType::Asn1 }, ModelType::Seds, std::move(ivToSedsTranslator));
+    if (!result) {
+        return false;
+    }
+
+    auto asn1ToSedsTranslator = std::make_unique<Asn1ToSedsTranslator>();
+    result = registry.registerTranslator({ ModelType::Asn1 }, ModelType::Seds, std::move(asn1ToSedsTranslator));
     if (!result) {
         return false;
     }
