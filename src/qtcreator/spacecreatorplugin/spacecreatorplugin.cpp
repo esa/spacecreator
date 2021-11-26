@@ -65,6 +65,7 @@
 #include <qboxlayout.h>
 #include <qdebug.h>
 #include <qfiledialog.h>
+#include <qpushbutton.h>
 #include <qstandarditemmodel.h>
 #include <qtreeview.h>
 
@@ -268,22 +269,27 @@ class ListTreeDialog : public QDialog
 {
 public:
     ListTreeDialog() = delete;
-    ListTreeDialog(QAbstractItemModel *model);
+    ListTreeDialog(QAbstractItemModel *model, const QString &buttonText);
     void getSelectedItems();
 
 private:
     QTreeView *m_tree = nullptr;
     QAbstractItemModel *m_model = nullptr;
+    QPushButton *m_button = nullptr;
 };
 
-ListTreeDialog::ListTreeDialog(QAbstractItemModel *model)
+ListTreeDialog::ListTreeDialog(QAbstractItemModel *model, const QString &buttonText)
     : m_model(model)
 {
-    QHBoxLayout *hblayout = new QHBoxLayout(this);
-    setLayout(hblayout);
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    setLayout(layout);
     m_tree = new QTreeView(this);
-    hblayout->addWidget(m_tree);
+    layout->addWidget(m_tree);
     m_tree->setModel(m_model);
+
+    m_button = new QPushButton(this);
+    m_button->setText(buttonText);
+    layout->addWidget(m_button);
 }
 
 void ListTreeDialog::getSelectedItems()
@@ -320,7 +326,7 @@ void SpaceCreatorPlugin::exportInterfaceView()
     }
     functionsListModel.appendColumn(ivFunctionNamesList);
 
-    ListTreeDialog ldDialog(&functionsListModel);
+    ListTreeDialog ldDialog(&functionsListModel, "export to SEDS");
     ldDialog.setWindowTitle("IV functions to be exported");
 
     ldDialog.exec();
