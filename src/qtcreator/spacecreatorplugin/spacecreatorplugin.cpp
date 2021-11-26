@@ -315,11 +315,13 @@ void SpaceCreatorPlugin::exportInterfaceView()
     QStandardItemModel functionsListModel;
     for (auto &name : ivFunctionsNames) {
         QStandardItem *item = new QStandardItem(name);
+        item->setCheckable(true);
         ivFunctionNamesList.append(item);
     }
     functionsListModel.appendColumn(ivFunctionNamesList);
 
     ListTreeDialog ldDialog(&functionsListModel);
+    ldDialog.setWindowTitle("IV functions to be exported");
 
     ldDialog.exec();
 
