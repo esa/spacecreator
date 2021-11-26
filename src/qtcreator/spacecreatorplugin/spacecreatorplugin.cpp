@@ -65,6 +65,7 @@
 #include <qboxlayout.h>
 #include <qdebug.h>
 #include <qfiledialog.h>
+#include <qstandarditemmodel.h>
 #include <qtreeview.h>
 
 void initSpaceCreatorResources()
@@ -263,14 +264,6 @@ void SpaceCreatorPlugin::importAsn1()
 
 //////////////////////////////////////////////////
 
-class IvComponentsItemModel : public QAbstractItemModel
-{
-public:
-    IvComponentsItemModel();
-};
-
-//////////////////////////////////////////////////
-
 class ListTreeDialog : public QDialog
 {
 public:
@@ -318,29 +311,33 @@ void SpaceCreatorPlugin::exportInterfaceView()
         }
     }
 
-    auto allIvFunctions = ivEditorCore->allIVFunctions();
-    if (!allIvFunctions.empty()) {
-        for (auto &function : allIvFunctions) {
-            auto *const model = function->model();
-            const auto fid = function->id();
-            if (model != nullptr) {
-                qDebug() << "model object name: " << model->objectName();
-                qDebug() << model->rootObjectId();
-                for (int i = 0; i < ivFunctionsNames.size(); i++) {
-                    auto *const func = model->getFunction(fid);
-                    if (func != nullptr) {
-                        qDebug() << "id: " << func->id();
-                    }
-                }
-            }
-        }
+    QList<QStandardItem *> ivFunctionNamesList;
+    QStandardItemModel functionsListModel;
+    for (auto &name : ivFunctionsNames) {
+        QStandardItem *item = new QStandardItem(name);
+        ivFunctionNamesList.append(item);
     }
+    functionsListModel.appendColumn(ivFunctionNamesList);
 
-    IvComponentsItemModel *componentsItemModel = nullptr; // new IvComponentsItemModel();
-
-    ListTreeDialog ldDialog(componentsItemModel);
+    ListTreeDialog ldDialog(&functionsListModel);
 
     ldDialog.exec();
+
+    // auto allIvFunctions = ivEditorCore->allIVFunctions();
+    // if (!allIvFunctions.empty()) {
+    //     for (auto &function : allIvFunctions) {
+    //         auto *const model = function->model();
+    //         const auto fid = function->id();
+    //         if (model != nullptr) {
+    //             for (int i = 0; i < ivFunctionsNames.size(); i++) {
+    //                 auto *const func = model->getFunction(fid);
+    //                 if (func != nullptr) {
+    //                     qDebug() << "id: " << func->id();
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 }
 
 void SpaceCreatorPlugin::exportAsn1()
