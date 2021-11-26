@@ -120,6 +120,8 @@ target_sources(${LIB_NAME} PRIVATE
     ui/highlightrectitem.h
     ui/interactiveobjectbase.cpp
     ui/interactiveobjectbase.h
+    ui/listtreedialog.h
+    ui/listtreedialog.cpp
     ui/textitem.cpp
     ui/textitem.h
     ui/veconnectionendpointgraphicsitem.cpp

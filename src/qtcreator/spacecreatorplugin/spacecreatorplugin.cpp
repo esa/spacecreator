@@ -65,9 +65,13 @@
 #include <qboxlayout.h>
 #include <qdebug.h>
 #include <qfiledialog.h>
+#include <qnamespace.h>
+#include <qobject.h>
+#include <qobjectdefs.h>
 #include <qpushbutton.h>
 #include <qstandarditemmodel.h>
 #include <qtreeview.h>
+#include <shared/ui/listtreedialog.h>
 
 void initSpaceCreatorResources()
 {
@@ -263,42 +267,45 @@ void SpaceCreatorPlugin::importAsn1()
     }
 }
 
-//////////////////////////////////////////////////
+////////////////vvvvvvvvvvvvvvvvvvvv///////////////////////////
 
-class ListTreeDialog : public QDialog
+class LTDialogButtonHandler
 {
 public:
-    ListTreeDialog() = delete;
-    ListTreeDialog(QAbstractItemModel *model, const QString &buttonText);
-    QList<QString> getSelectedItems();
+    static void setLTDialog(ListTreeDialog *dialog);
 
 private:
-    QTreeView *m_tree = nullptr;
-    QAbstractItemModel *m_model = nullptr;
-    QPushButton *m_button = nullptr;
+    static ListTreeDialog *m_dialog;
+    static void onButtonPressed();
 };
+ListTreeDialog *LTDialogButtonHandler::m_dialog = nullptr;
 
-ListTreeDialog::ListTreeDialog(QAbstractItemModel *model, const QString &buttonText)
-    : m_model(model)
+void LTDialogButtonHandler::setLTDialog(ListTreeDialog *dialog)
 {
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    setLayout(layout);
-    m_tree = new QTreeView(this);
-    layout->addWidget(m_tree);
-    m_tree->setModel(m_model);
+    m_dialog = dialog;
 
-    m_button = new QPushButton(this);
-    m_button->setText(buttonText);
-    layout->addWidget(m_button);
+    QObject::connect(m_dialog->button(), &QPushButton::pressed, onButtonPressed);
 }
 
-QList<QString> ListTreeDialog::getSelectedItems()
+void LTDialogButtonHandler::onButtonPressed()
 {
-    // TODO: return list  of currently selected items in the model
-    return QList<QString>();
+    QStandardItemModel *const model = m_dialog->model();
+    const unsigned int rows = model->rowCount();
+    const unsigned int cols = model->columnCount();
+
+    for (unsigned int i = 0; i < cols; i++) {
+        for (unsigned int j = 0; j < rows; j++) {
+            QStandardItem *const item = model->takeItem(j, i);
+            if (item != nullptr && item->checkState() == Qt::Checked) {
+                m_dialog->selectedItemsPtr()->append(item->text());
+            }
+        }
+    }
+
+    m_dialog->close();
 }
 
-//////////////////////////////////////////////////
+/////////////^^^^^^^^^^///////////////////////////
 
 void SpaceCreatorPlugin::exportInterfaceView()
 {
@@ -312,28 +319,31 @@ void SpaceCreatorPlugin::exportInterfaceView()
     const auto ivEditorCore = currentIvDocument->ivEditorCore();
 
     auto ivFunctionsNames = ivEditorCore->ivFunctionsNames();
-    if (!ivFunctionsNames.empty()) {
-        for (auto &name : ivFunctionsNames) {
-            qDebug() << "fname: " << name;
-        }
+    if (ivFunctionsNames.empty()) {
+        throw conversion::exporter::ExportException(
+                tr("InterfaceView does not contain functions which could be exported"));
+        // TODO: throw unhandled exception or write a warning visible to user and just return?
     }
 
-    QList<QStandardItem *> ivFunctionNamesList;
     QStandardItemModel functionsListModel;
+    QList<QStandardItem *> ivFunctionNamesList;
     for (auto &name : ivFunctionsNames) {
         QStandardItem *item = new QStandardItem(name);
         item->setCheckable(true);
         ivFunctionNamesList.append(item);
     }
     functionsListModel.appendColumn(ivFunctionNamesList);
+    functionsListModel.setHeaderData(0, Qt::Horizontal, "Functions");
 
     ListTreeDialog ldDialog(&functionsListModel, "export to SEDS");
     ldDialog.setWindowTitle("IV functions to be exported");
+    LTDialogButtonHandler::setLTDialog(&ldDialog);
 
     ldDialog.exec();
 
-    QList<QString> selectedFunctions = ldDialog.getSelectedItems();
-    for (auto &item : selectedFunctions) {
+    QList<QString> *selectedFunctions = ldDialog.selectedItemsPtr();
+    qDebug() << "selected functions: ";
+    for (auto &item : *selectedFunctions) {
         qDebug() << item;
     }
 
