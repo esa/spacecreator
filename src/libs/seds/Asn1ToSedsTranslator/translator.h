@@ -19,15 +19,9 @@
 
 #pragma once
 
+#include <asn1library/asn1/asn1model.h>
 #include <conversion/common/translation/translator.h>
-
-namespace Asn1Acn {
-class Asn1Model;
-} // namespace Asn1Acn
-
-namespace seds::model {
-class SedsModel;
-} // namespace seds::model
+#include <seds/SedsModel/sedsmodel.h>
 
 namespace conversion::seds::translator {
 
@@ -67,8 +61,11 @@ public:
     virtual auto getDependencies() const -> std::set<ModelType> override;
 
 private:
-    auto translateAsn1Model(const Asn1Acn::Asn1Model *asn1Model, const Options &options) const
+    static auto translateAsn1Model(const Asn1Acn::Asn1Model *asn1Model, const Options &options)
             -> std::vector<std::unique_ptr<Model>>;
+
+    static auto translateAsn1Definitions(const Asn1Acn::Asn1Model *asn1Model, const Asn1Acn::Definitions *definitions)
+            -> ::seds::model::Package;
 };
 
-} // namespace conversion::iv::translator
+} // namespace conversion::seds::translator

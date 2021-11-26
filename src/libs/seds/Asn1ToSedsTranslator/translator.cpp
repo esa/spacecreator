@@ -18,8 +18,7 @@
  */
 #include "translator.h"
 
-#include <asn1library/asn1/asn1model.h>
-#include <seds/SedsModel/sedsmodel.h>
+#include "specialized/typetranslator.h"
 
 using Asn1Acn::Asn1Model;
 using conversion::translator::TranslationException;
@@ -54,20 +53,38 @@ std::set<ModelType> Asn1ToSedsTranslator::getDependencies() const
 }
 
 std::vector<std::unique_ptr<Model>> Asn1ToSedsTranslator::translateAsn1Model(
-        const Asn1Model *asn1Model, const Options &options) const
+        const Asn1Model *asn1Model, const Options &options)
 {
-    Q_UNUSED(asn1Model);
     Q_UNUSED(options);
-
-    ::seds::model::Package sedsPackage;
-    ::seds::model::PackageFile sedsPackageFile;
-    sedsPackageFile.setPackage(std::move(sedsPackage));
-    auto sedsModel = std::make_unique<SedsModel>(std::move(sedsPackageFile));
-
     std::vector<std::unique_ptr<Model>> resultModels;
-    resultModels.push_back(std::move(sedsModel));
+
+    for (const auto &file : asn1Model->data()) {
+        for (const auto &definitions : file->definitionsList()) {
+            if (definitions->types().size() == 0) {
+                continue;
+            }
+            auto sedsPackage = translateAsn1Definitions(asn1Model, definitions.get());
+
+            ::seds::model::PackageFile sedsPackageFile;
+            sedsPackageFile.setPackage(std::move(sedsPackage));
+            auto sedsModel = std::make_unique<SedsModel>(std::move(sedsPackageFile));
+            resultModels.push_back(std::move(sedsModel));
+        }
+    }
 
     return resultModels;
+}
+
+auto Asn1ToSedsTranslator::translateAsn1Definitions(const Asn1Model *asn1Model, const Asn1Acn::Definitions *definitions)
+        -> ::seds::model::Package
+{
+    ::seds::model::Package package;
+    package.setName(definitions->name());
+    for (const auto &type : definitions->types()) {
+        TypeTranslator::translateType(asn1Model, definitions, type.get(), &package);
+    }
+
+    return package;
 }
 
 } // namespace conversion::seds::translator
