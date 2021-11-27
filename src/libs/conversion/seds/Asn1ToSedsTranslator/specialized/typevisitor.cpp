@@ -19,6 +19,23 @@
 
 #include "typevisitor.h"
 
+#include "constraintvisitor.h"
+
+#include <asn1library/asn1/types/bitstring.h>
+#include <asn1library/asn1/types/boolean.h>
+#include <asn1library/asn1/types/choice.h>
+#include <asn1library/asn1/types/enumerated.h>
+#include <asn1library/asn1/types/ia5string.h>
+#include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/labeltype.h>
+#include <asn1library/asn1/types/null.h>
+#include <asn1library/asn1/types/numericstring.h>
+#include <asn1library/asn1/types/octetstring.h>
+#include <asn1library/asn1/types/real.h>
+#include <asn1library/asn1/types/sequence.h>
+#include <asn1library/asn1/types/sequenceof.h>
+#include <asn1library/asn1/types/userdefinedtype.h>
+#include <iostream>
 #include <seds/SedsModel/types/arraydatatype.h>
 #include <seds/SedsModel/types/binarydatatype.h>
 #include <seds/SedsModel/types/booleandatatype.h>
@@ -32,6 +49,26 @@
 #include <seds/SedsModel/types/ranges/minmaxrange.h>
 #include <seds/SedsModel/types/stringdatatype.h>
 #include <seds/SedsModel/types/subrangedatatype.h>
+
+using Asn1Acn::BitStringValue;
+using Asn1Acn::IntegerValue;
+using Asn1Acn::OctetStringValue;
+using Asn1Acn::StringValue;
+using Asn1Acn::Types::BitString;
+using Asn1Acn::Types::Boolean;
+using Asn1Acn::Types::Choice;
+using Asn1Acn::Types::Enumerated;
+using Asn1Acn::Types::EnumeratedItem;
+using Asn1Acn::Types::IA5String;
+using Asn1Acn::Types::Integer;
+using Asn1Acn::Types::LabelType;
+using Asn1Acn::Types::Null;
+using Asn1Acn::Types::NumericString;
+using Asn1Acn::Types::OctetString;
+using Asn1Acn::Types::Real;
+using Asn1Acn::Types::Sequence;
+using Asn1Acn::Types::SequenceOf;
+using Asn1Acn::Types::UserdefinedType;
 
 namespace conversion::seds::translator {
 
@@ -134,6 +171,29 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::LabelType &type)
 void TypeVisitor::visit(const ::Asn1Acn::Types::Integer &type)
 {
     Q_UNUSED(type);
+    ConstraintVisitor<IntegerValue> constraintVisitor;
+    type.constraints().accept(constraintVisitor);
+    std::cout << "Constraints size " << type.constraints().constraints().size() << " " << std::endl;
+
+    ::seds::model::IntegerDataType sedsType;
+
+    if (constraintVisitor.isRangeConstraintVisited()) {
+        std::cout << "Constraint do" << std::endl;
+        ::seds::model::MinMaxRange range;
+        range.setType(::seds::model::RangeType::InclusiveMinInclusiveMax);
+        range.setMax(IntegerValue::asString(constraintVisitor.getRange().end()));
+        range.setMin(IntegerValue::asString(constraintVisitor.getRange().begin()));
+        sedsType.setRange(std::move(range));
+    }
+
+    /*::seds::model::IntegerDataEncoding encoding;
+    encoding.setByteOrder(::seds::model::ByteOrder::BigEndian);
+    encoding.setEncoding(::seds::model::CoreIntegerEncoding::TwosComplement);
+    encoding.setBits(16);*/
+
+    sedsType.setName(m_context.name());
+
+    m_context.package()->addDataType(std::move(sedsType));
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::UserdefinedType &type)

@@ -1,5 +1,17 @@
 SimpleDataTypes DEFINITIONS ::= BEGIN
 
-    MyBoolean ::= BOOLEAN
+   -- MyBoolean ::= BOOLEAN
+
+    MyInteger ::= INTEGER(0..20)
+
+    --MyFloat ::= REAL(0..1)
+
+    --MyString ::= IA5String(SIZE(0..32))
+
+    --MyEnum ::= ENUMERATED {
+        -- val1,
+        -- val2,
+        -- val3
+    -- }
 
 END

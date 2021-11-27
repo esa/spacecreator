@@ -21,6 +21,7 @@
 
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/overloaded.h>
+#include <iostream>
 
 using namespace seds::model;
 using conversion::exporter::UnsupportedElementException;
@@ -187,8 +188,10 @@ auto DataTypeExporter::exportFloatDataType(
 auto DataTypeExporter::exportIntegerDataType(
         const model::IntegerDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void
 {
+    std::cout << "Export start" << std::endl;
     auto typeElement = sedsDocument.createElement(QStringLiteral("IntegerDataType"));
     typeElement.setAttribute(QStringLiteral("name"), dataType.nameStr());
+    std::cout << "Encoding start" << std::endl;
     if (dataType.encoding().has_value()) {
         const auto &encoding = *dataType.encoding();
         auto encodingElement = sedsDocument.createElement(QStringLiteral("IntegerDataEncoding"));
@@ -210,6 +213,7 @@ auto DataTypeExporter::exportIntegerDataType(
 
         typeElement.appendChild(std::move(encodingElement));
     }
+    std::cout << "Encoding end" << std::endl;
 
     std::visit(overloaded { [&typeElement, &sedsDocument](const MinMaxRange &range) {
         exportMinMaxRange(range, typeElement, sedsDocument);
@@ -217,6 +221,7 @@ auto DataTypeExporter::exportIntegerDataType(
             dataType.range());
 
     setElement.appendChild(std::move(typeElement));
+    std::cout << "Export end" << std::endl;
 }
 
 auto DataTypeExporter::exportStringDataType(
@@ -298,6 +303,7 @@ auto DataTypeExporter::exportMinMaxRange(
 {
     auto rangeElement = sedsDocument.createElement(QStringLiteral("Range"));
     auto minMaxRangeElement = sedsDocument.createElement(QStringLiteral("MinMaxRange"));
+    std::cout << "Range start" << std::endl;
     switch (range.type()) {
     case RangeType::ExclusiveMinExclusiveMax:
         minMaxRangeElement.setAttribute(QStringLiteral("rangeType"), QStringLiteral("exclusiveMinExclusiveMax"));
@@ -305,9 +311,13 @@ auto DataTypeExporter::exportMinMaxRange(
         minMaxRangeElement.setAttribute(QStringLiteral("max"), range.max()->value());
         break;
     case RangeType::InclusiveMinInclusiveMax:
+        std::cout << "Range type" << std::endl;
         minMaxRangeElement.setAttribute(QStringLiteral("rangeType"), QStringLiteral("inclusiveMinInclusiveMax"));
+        std::cout << "Range min" << std::endl;
         minMaxRangeElement.setAttribute(QStringLiteral("min"), range.min()->value());
+        std::cout << "Range max" << std::endl;
         minMaxRangeElement.setAttribute(QStringLiteral("max"), range.max()->value());
+        std::cout << "Range end" << std::endl;
         break;
     case RangeType::InclusiveMinExclusiveMax:
         minMaxRangeElement.setAttribute(QStringLiteral("rangeType"), QStringLiteral("inclusiveMinExclusiveMax"));
@@ -336,6 +346,7 @@ auto DataTypeExporter::exportMinMaxRange(
         minMaxRangeElement.setAttribute(QStringLiteral("max"), range.max()->value());
         break;
     }
+    std::cout << "Range end" << std::endl;
 
     rangeElement.appendChild(std::move(minMaxRangeElement));
     setElement.appendChild(std::move(rangeElement));

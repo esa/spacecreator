@@ -1,9 +1,13 @@
 project(Asn1ToSedsTranslator VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES     translator.cpp
+                specialized/sizevisitor.cpp                
                 specialized/typetranslator.cpp
                 specialized/typevisitor.cpp)
 set(INCLUDES    translator.h
+                specialized/sizevisitor.h
+                specialized/rangevisitor.h
+                specialized/constraintvisitor.h
                 specialized/typetranslator.h
                 specialized/typevisitor.h)
 
