@@ -188,7 +188,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Integer &type)
     }
 
     // Encoding in ASN.1 model is not optional, but may be unset
-    if (type.size() > -1) {
+    if (type.size() > 0) {
         ::seds::model::IntegerDataEncoding encoding;
         encoding.setBits(static_cast<uint64_t>(type.size()));
         switch (type.endianness()) {

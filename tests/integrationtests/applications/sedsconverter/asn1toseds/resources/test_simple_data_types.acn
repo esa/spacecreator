@@ -2,9 +2,9 @@ SimpleDataTypes DEFINITIONS ::= BEGIN
 
     MyBoolean []
 
-    MyInteger [size 8, encoding pos-int, endianness little]
+    MyInteger []
 
-    MyIntegerWithEncoding [size 8, encoding pos-int, endianness big]
+    MyIntegerWithEncoding [size 32, encoding pos-int, endianness big]
 
 
 END

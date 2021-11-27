@@ -176,7 +176,7 @@ struct ModelProperties<::promela::model::PromelaModel> {
     /// @brief  Model name
     static inline const QString name = ModelTypeProperties<type>::name;
     /// @brief  Model extension
-    static inline const QString extension = ModelTypeProperties<type>::extension;
+    static inline const QStringList extensions = ModelTypeProperties<type>::extensions;
 };
 
 } // namespace conversion
