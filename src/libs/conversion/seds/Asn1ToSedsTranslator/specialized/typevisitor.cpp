@@ -35,6 +35,7 @@
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
+#include <conversion/common/translation/exceptions.h>
 #include <iostream>
 #include <seds/SedsModel/types/arraydatatype.h>
 #include <seds/SedsModel/types/binarydatatype.h>
@@ -69,6 +70,8 @@ using Asn1Acn::Types::Real;
 using Asn1Acn::Types::Sequence;
 using Asn1Acn::Types::SequenceOf;
 using Asn1Acn::Types::UserdefinedType;
+
+using conversion::translator::UnsupportedValueException;
 
 namespace conversion::seds::translator {
 
@@ -173,12 +176,10 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Integer &type)
     Q_UNUSED(type);
     ConstraintVisitor<IntegerValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
-    std::cout << "Constraints size " << type.constraints().constraints().size() << " " << std::endl;
 
     ::seds::model::IntegerDataType sedsType;
 
     if (constraintVisitor.isRangeConstraintVisited()) {
-        std::cout << "Constraint do" << std::endl;
         ::seds::model::MinMaxRange range;
         range.setType(::seds::model::RangeType::InclusiveMinInclusiveMax);
         range.setMax(IntegerValue::asString(constraintVisitor.getRange().end()));
@@ -186,13 +187,42 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Integer &type)
         sedsType.setRange(std::move(range));
     }
 
-    /*::seds::model::IntegerDataEncoding encoding;
-    encoding.setByteOrder(::seds::model::ByteOrder::BigEndian);
-    encoding.setEncoding(::seds::model::CoreIntegerEncoding::TwosComplement);
-    encoding.setBits(16);*/
+    // Encoding in ASN.1 model is not optional, but may be unset
+    if (type.size() > -1) {
+        ::seds::model::IntegerDataEncoding encoding;
+        encoding.setBits(static_cast<uint64_t>(type.size()));
+        switch (type.endianness()) {
+        case Asn1Acn::Types::Endianness::big:
+            encoding.setByteOrder(::seds::model::ByteOrder::BigEndian);
+            break;
+        case Asn1Acn::Types::Endianness::little:
+            encoding.setByteOrder(::seds::model::ByteOrder::LittleEndian);
+            break;
+        case Asn1Acn::Types::Endianness::unspecified:
+            throw UnsupportedValueException("Endianness", "unspecified");
+            break;
+        }
+        switch (type.encoding()) {
+        case Asn1Acn::Types::IntegerEncoding::pos_int:
+            encoding.setEncoding(::seds::model::CoreIntegerEncoding::Unsigned);
+            break;
+        case Asn1Acn::Types::IntegerEncoding::twos_complement:
+            encoding.setEncoding(::seds::model::CoreIntegerEncoding::TwosComplement);
+            break;
+        case Asn1Acn::Types::IntegerEncoding::ASCII:
+            throw UnsupportedValueException("IntegerEncoding", "ASCII");
+            break;
+        case Asn1Acn::Types::IntegerEncoding::BCD:
+            encoding.setEncoding(::seds::model::CoreIntegerEncoding::Bcd);
+            break;
+        case Asn1Acn::Types::IntegerEncoding::unspecified:
+            throw UnsupportedValueException("IntegerEncoding", "unspecified");
+            break;
+        }
 
+        sedsType.setEncoding(std::move(encoding));
+    }
     sedsType.setName(m_context.name());
-
     m_context.package()->addDataType(std::move(sedsType));
 }
 

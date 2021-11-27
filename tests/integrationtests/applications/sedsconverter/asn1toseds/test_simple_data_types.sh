@@ -10,4 +10,5 @@ TEST_OUTPUT_DIR=output
 rm -r -f $TEST_OUTPUT_DIR
 mkdir -p $TEST_OUTPUT_DIR
 # Translate
-$SEDS_CONVERTER --from ASN.1 --to SEDS -i resources/test_simple_data_types.asn --out $TEST_OUTPUT_DIR/package.xml
+$SEDS_CONVERTER --from ASN.1 --to SEDS -i resources/test_simple_data_types.asn,resources/test_simple_data_types.acn \
+    --out $TEST_OUTPUT_DIR/package.xml

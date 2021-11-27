@@ -1,8 +1,10 @@
 SimpleDataTypes DEFINITIONS ::= BEGIN
 
-   -- MyBoolean ::= BOOLEAN
+    MyBoolean ::= BOOLEAN
 
     MyInteger ::= INTEGER(0..20)
+
+    MyIntegerWithEncoding ::= INTEGER(5..200)
 
     --MyFloat ::= REAL(0..1)
 
