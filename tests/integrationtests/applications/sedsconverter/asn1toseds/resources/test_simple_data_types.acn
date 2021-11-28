@@ -24,5 +24,9 @@ SimpleDataTypes DEFINITIONS ::= BEGIN
 
     MyFixedSizeBitString []
 
+    MyEnum []
+
+    MyValueEnumWithEncoding [size 16, encoding pos-int, endianness little]
+
 
 END

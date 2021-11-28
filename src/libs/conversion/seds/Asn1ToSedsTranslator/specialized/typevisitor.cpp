@@ -53,6 +53,7 @@
 
 using Asn1Acn::BitStringValue;
 using Asn1Acn::BooleanValue;
+using Asn1Acn::EnumValue;
 using Asn1Acn::IntegerValue;
 using Asn1Acn::OctetStringValue;
 using Asn1Acn::RealValue;
@@ -218,8 +219,40 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::NumericString &type)
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Enumerated &type)
 {
-    Q_UNUSED(type);
-    throw UnsupportedDataTypeException("Enumerated");
+    ConstraintVisitor<EnumValue> constraintVisitor;
+    type.constraints().accept(constraintVisitor);
+
+    ::seds::model::EnumeratedDataType sedsType;
+
+    // Encoding in ASN.1 model is not optional, but may be unset
+    if (type.size() > 0) {
+        ::seds::model::IntegerDataEncoding encoding;
+        encoding.setBits(static_cast<uint64_t>(type.size()));
+
+        setEndianness(encoding, type.endianness());
+
+        switch (type.encoding()) {
+        case Asn1Acn::Types::IntegerEncoding::pos_int:
+            encoding.setEncoding(::seds::model::CoreIntegerEncoding::Unsigned);
+            break;
+        case Asn1Acn::Types::IntegerEncoding::twos_complement:
+            encoding.setEncoding(::seds::model::CoreIntegerEncoding::TwosComplement);
+            break;
+        case Asn1Acn::Types::IntegerEncoding::ASCII:
+            throw UnsupportedValueException("IntegerEncoding", "ASCII");
+            break;
+        case Asn1Acn::Types::IntegerEncoding::BCD:
+            encoding.setEncoding(::seds::model::CoreIntegerEncoding::Bcd);
+            break;
+        case Asn1Acn::Types::IntegerEncoding::unspecified:
+            throw UnsupportedValueException("IntegerEncoding", "unspecified");
+            break;
+        }
+
+        sedsType.setEncoding(std::move(encoding));
+    }
+    sedsType.setName(m_context.name());
+    m_context.package()->addDataType(std::move(sedsType));
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Choice &type)

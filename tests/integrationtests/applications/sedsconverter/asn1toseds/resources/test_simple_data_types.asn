@@ -20,10 +20,16 @@ SimpleDataTypes DEFINITIONS ::= BEGIN
 
     MyFixedSizeBitString ::= BIT STRING(SIZE(17))
 
-    --MyEnum ::= ENUMERATED {
-        -- val1,
-        -- val2,
-        -- val3
-    -- }
+    MyEnum ::= ENUMERATED {
+        val1,
+        val2,
+        val3
+    }
+
+    MyValueEnumWithEncoding ::= ENUMERATED {
+        a (300),
+        b (20),
+        c (5)
+    }
 
 END
