@@ -52,7 +52,7 @@ public:
     static auto exportDataType(const model::DataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument)
             -> void;
 
-protected:
+private:
     static auto exportArrayDataType(
             const model::ArrayDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void;
     static auto exportBinaryDataType(

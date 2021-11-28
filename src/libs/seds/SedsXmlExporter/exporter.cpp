@@ -104,12 +104,6 @@ void SedsXmlExporter::exportPackage(const Package &package, QDomElement &parentE
     const auto &packageName = package.nameStr();
     packageElement.setAttribute(QStringLiteral("name"), packageName);
 
-    if (package.components().size() > 0) {
-        ComponentExporter::exportComponents(package.components(), packageElement, sedsDocument);
-    }
-
-    parentElement.appendChild(std::move(packageElement));
-
     if (package.dataTypes().size() > 0) {
         auto dataTypeSet = sedsDocument.createElement(QStringLiteral("DataTypeSet"));
         for (const auto &dataType : package.dataTypes()) {
@@ -117,6 +111,12 @@ void SedsXmlExporter::exportPackage(const Package &package, QDomElement &parentE
         }
         packageElement.appendChild(std::move(dataTypeSet));
     }
+
+    if (package.components().size() > 0) {
+        ComponentExporter::exportComponents(package.components(), packageElement, sedsDocument);
+    }
+
+    parentElement.appendChild(std::move(packageElement));
 }
 
 QDomDocument SedsXmlExporter::createSedsXmlDocument()
