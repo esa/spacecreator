@@ -364,8 +364,8 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Integer &type)
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::UserdefinedType &type)
 {
-    Q_UNUSED(type);
-    throw UnsupportedDataTypeException("UserdefinedType");
+    Context context(m_context.model(), m_context.definitions(), m_context.name(), m_context.package());
+    type.type()->accept(*this);
 }
 
 } // namespace conversion::seds::translator

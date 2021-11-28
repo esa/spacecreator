@@ -28,5 +28,11 @@ SimpleDataTypes DEFINITIONS ::= BEGIN
 
     MyValueEnumWithEncoding [size 16, encoding pos-int, endianness little, encode-values]
 
+    DerivedInteger []
+
+    DerivedIntegerWithEncoding [size 16, encoding BCD, endianness big]
+
+    DerivedFloatWithEncoding [encoding IEEE754-1985-32, endianness big]
+
 
 END

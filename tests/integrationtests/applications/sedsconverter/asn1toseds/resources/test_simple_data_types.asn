@@ -32,4 +32,10 @@ SimpleDataTypes DEFINITIONS ::= BEGIN
         c (5)
     }
 
+    DerivedInteger ::= MyInteger(10..16)
+
+    DerivedIntegerWithEncoding ::= MyInteger(10..16)
+
+    DerivedFloatWithEncoding ::= MyFloatWithEncoding(50..60)
+
 END
