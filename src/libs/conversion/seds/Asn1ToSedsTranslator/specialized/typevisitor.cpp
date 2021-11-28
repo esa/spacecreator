@@ -138,8 +138,22 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::OctetString &type)
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::IA5String &type)
 {
-    Q_UNUSED(type);
-    throw UnsupportedDataTypeException("IA5String");
+    ConstraintVisitor<StringValue> constraintVisitor;
+    type.constraints().accept(constraintVisitor);
+
+    ::seds::model::StringDataType sedsType;
+
+    if (constraintVisitor.isSizeConstraintVisited()) {
+        sedsType.setLength(constraintVisitor.getMaxSize());
+        sedsType.setFixedLength(constraintVisitor.getMaxSize() == constraintVisitor.getMinSize());
+    }
+    ::seds::model::StringDataEncoding encoding;
+    // The closest encoding to IA5
+    encoding.setEncoding(::seds::model::CoreStringEncoding::Ascii);
+
+    sedsType.setEncoding(std::move(encoding));
+    sedsType.setName(m_context.name());
+    m_context.package()->addDataType(std::move(sedsType));
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::NumericString &type)

@@ -10,5 +10,9 @@ SimpleDataTypes DEFINITIONS ::= BEGIN
 
     MyFloatWithEncoding [encoding IEEE754-1985-64, endianness little]
 
+    MyString []
+
+    MyFixedSizeString []
+
 
 END

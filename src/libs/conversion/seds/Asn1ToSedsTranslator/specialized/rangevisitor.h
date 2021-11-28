@@ -49,7 +49,7 @@ public:
      */
     RangeVisitor()
         : m_rangeVisited(false)
-        , m_range(static_cast<typename ValueType::Type>(0))
+        , m_range(typename ValueType::Type())
     {
     }
 

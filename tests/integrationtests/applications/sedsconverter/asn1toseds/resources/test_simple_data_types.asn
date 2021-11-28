@@ -10,7 +10,9 @@ SimpleDataTypes DEFINITIONS ::= BEGIN
 
     MyFloatWithEncoding ::= REAL(32..64)
 
-    --MyString ::= IA5String(SIZE(0..32))
+    MyString ::= IA5String(SIZE(0..32))
+
+    MyFixedSizeString ::= IA5String(SIZE(64))
 
     --MyEnum ::= ENUMERATED {
         -- val1,
