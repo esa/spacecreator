@@ -39,24 +39,24 @@ void FunctionsTranslator::translateFunction(const ivm::IVFunction *ivFunction, :
     sedsComponent.setName(std::move(ivFunctionName));
 
     for (const auto ivInterface : ivFunction->allInterfaces()) {
-        translateInterface(ivInterface, sedsComponent);
+        translateInterface(ivInterface, ivFunction, sedsComponent);
     }
 
     sedsPackage.addComponent(std::move(sedsComponent));
 }
 
 void FunctionsTranslator::translateInterface(
-        const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)
+        const ivm::IVInterface *ivInterface, const ivm::IVFunction *ivFunction, ::seds::model::Component &sedsComponent)
 {
-    createInterfaceDeclaration(ivInterface, sedsComponent);
-    createInterface(ivInterface, sedsComponent);
+    createInterfaceDeclaration(ivInterface, ivFunction, sedsComponent);
+    createInterface(ivInterface, ivFunction, sedsComponent);
 }
 
 void FunctionsTranslator::createInterfaceDeclaration(
-        const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)
+        const ivm::IVInterface *ivInterface, const ivm::IVFunction *ivFunction, ::seds::model::Component &sedsComponent)
 {
     ::seds::model::InterfaceDeclaration sedsInterfaceDeclaration;
-    sedsInterfaceDeclaration.setName(ivInterface->title());
+    sedsInterfaceDeclaration.setName(QString("%1%2").arg(ivFunction->title()).arg(ivInterface->title()));
 
     createInterfaceCommand(ivInterface, sedsInterfaceDeclaration);
 
@@ -112,11 +112,12 @@ void FunctionsTranslator::createInterfaceArgument(
     sedsInterfaceCommand.addArgument(std::move(sedsInterfaceCommandArgument));
 }
 
-void FunctionsTranslator::createInterface(const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)
+void FunctionsTranslator::createInterface(
+        const ivm::IVInterface *ivInterface, const ivm::IVFunction *ivFunction, ::seds::model::Component &sedsComponent)
 {
     ::seds::model::Interface sedsInterface;
     sedsInterface.setName(ivInterface->title());
-    sedsInterface.setType(ivInterface->title());
+    sedsInterface.setType(QString("%1%2").arg(ivFunction->title()).arg(ivInterface->title()));
 
     switch (ivInterface->direction()) {
     case ivm::IVInterface::InterfaceType::Provided:

@@ -59,17 +59,18 @@ public:
     static auto translateFunction(const ivm::IVFunction *ivFunction, ::seds::model::Package &sedsPackage) -> void;
 
 private:
-    static auto translateInterface(const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)
-            -> void;
+    static auto translateInterface(const ivm::IVInterface *ivInterface, const ivm::IVFunction *ivFunction,
+            ::seds::model::Component &sedsComponent) -> void;
 
-    static auto createInterfaceDeclaration(const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent)
-            -> void;
+    static auto createInterfaceDeclaration(const ivm::IVInterface *ivInterface, const ivm::IVFunction *ivFunction,
+            ::seds::model::Component &sedsComponent) -> void;
     static auto createInterfaceCommand(
             const ivm::IVInterface *ivInterface, ::seds::model::InterfaceDeclaration &sedsInterfaceDeclaration) -> void;
     static auto createInterfaceArgument(const shared::InterfaceParameter &ivInterfaceParameter,
             ::seds::model::InterfaceCommand &sedsInterfaceCommand) -> void;
 
-    static auto createInterface(const ivm::IVInterface *ivInterface, ::seds::model::Component &sedsComponent) -> void;
+    static auto createInterface(const ivm::IVInterface *ivInterface, const ivm::IVFunction *ivFunction,
+            ::seds::model::Component &sedsComponent) -> void;
 };
 
 } // namespace conversion::seds::translator
