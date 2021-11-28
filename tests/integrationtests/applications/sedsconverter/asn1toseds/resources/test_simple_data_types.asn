@@ -2,6 +2,8 @@ SimpleDataTypes DEFINITIONS ::= BEGIN
 
     MyBoolean ::= BOOLEAN
 
+    MyInvertedBoolean ::= BOOLEAN
+
     MyInteger ::= INTEGER(0..20)
 
     MyIntegerWithEncoding ::= INTEGER(5..200)

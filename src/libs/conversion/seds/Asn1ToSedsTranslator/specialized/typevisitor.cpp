@@ -52,6 +52,7 @@
 #include <seds/SedsModel/types/subrangedatatype.h>
 
 using Asn1Acn::BitStringValue;
+using Asn1Acn::BooleanValue;
 using Asn1Acn::IntegerValue;
 using Asn1Acn::OctetStringValue;
 using Asn1Acn::RealValue;
@@ -110,10 +111,53 @@ TypeVisitor::TypeVisitor(Context &context)
 {
 }
 
+template<typename EncodingType>
+static inline auto setEndianness(EncodingType &encoding, const Asn1Acn::Types::Endianness endianness) -> void
+{
+    switch (endianness) {
+    case Asn1Acn::Types::Endianness::big:
+        encoding.setByteOrder(::seds::model::ByteOrder::BigEndian);
+        return;
+    case Asn1Acn::Types::Endianness::little:
+        encoding.setByteOrder(::seds::model::ByteOrder::LittleEndian);
+        return;
+    case Asn1Acn::Types::Endianness::unspecified:
+        throw UnsupportedValueException("Endianness", "unspecified");
+        return;
+    }
+}
+
+static inline auto isZero(const QString value) -> bool
+{
+    return value == "" || value.toULongLong() == 0;
+}
+
 void TypeVisitor::visit(const ::Asn1Acn::Types::Boolean &type)
 {
-    Q_UNUSED(type);
+    ConstraintVisitor<BooleanValue> constraintVisitor;
+
+    type.constraints().accept(constraintVisitor);
+
     ::seds::model::BooleanDataType sedsType;
+
+    if (constraintVisitor.isSizeConstraintVisited() || type.trueValue() != "" || type.falseValue() != "") {
+        if (constraintVisitor.getMaxSize() != constraintVisitor.getMinSize()) {
+            throw UnsupportedDataTypeException("variable size Boolean");
+        }
+
+        ::seds::model::BooleanDataEncoding encoding;
+        encoding.setBits(constraintVisitor.getMaxSize());
+        if (type.trueValue() != "") {
+            encoding.setFalseValue(isZero(type.trueValue()) ? ::seds::model::FalseValue::NonZeroIsFalse
+                                                            : ::seds::model::FalseValue::ZeroIsFalse);
+        } else if (type.falseValue() != "") {
+            encoding.setFalseValue(isZero(type.falseValue()) ? ::seds::model::FalseValue::ZeroIsFalse
+                                                             : ::seds::model::FalseValue::NonZeroIsFalse);
+        }
+
+        sedsType.setEncoding(std::move(encoding));
+    }
+
     sedsType.setName(m_context.name());
     m_context.package()->addDataType(std::move(sedsType));
 }
@@ -194,22 +238,6 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)
 {
     Q_UNUSED(type);
     throw UnsupportedDataTypeException("SequenceOf");
-}
-
-template<typename EncodingType>
-static inline auto setEndianness(EncodingType &encoding, const Asn1Acn::Types::Endianness endianness) -> void
-{
-    switch (endianness) {
-    case Asn1Acn::Types::Endianness::big:
-        encoding.setByteOrder(::seds::model::ByteOrder::BigEndian);
-        return;
-    case Asn1Acn::Types::Endianness::little:
-        encoding.setByteOrder(::seds::model::ByteOrder::LittleEndian);
-        return;
-    case Asn1Acn::Types::Endianness::unspecified:
-        throw UnsupportedValueException("Endianness", "unspecified");
-        return;
-    }
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Real &type)
