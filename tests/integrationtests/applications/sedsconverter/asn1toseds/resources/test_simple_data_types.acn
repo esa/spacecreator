@@ -26,7 +26,7 @@ SimpleDataTypes DEFINITIONS ::= BEGIN
 
     MyEnum []
 
-    MyValueEnumWithEncoding [size 16, encoding pos-int, endianness little]
+    MyValueEnumWithEncoding [size 16, encoding pos-int, endianness little, encode-values]
 
 
 END

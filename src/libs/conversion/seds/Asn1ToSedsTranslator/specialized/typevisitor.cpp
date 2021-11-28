@@ -257,6 +257,15 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Enumerated &type)
 
         sedsType.setEncoding(std::move(encoding));
     }
+
+    int computedValue = 0;
+    for (const auto &item : type.items()) {
+        ::seds::model::ValueEnumeration valueEnumeration;
+        valueEnumeration.setLabel(item.name());
+        valueEnumeration.setValue(type.encodeValues() ? item.value() : computedValue++);
+        sedsType.addEnumeration(std::move(valueEnumeration));
+    }
+
     sedsType.setName(m_context.name());
     m_context.package()->addDataType(std::move(sedsType));
 }
