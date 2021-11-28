@@ -126,8 +126,18 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Null &type)
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::BitString &type)
 {
-    Q_UNUSED(type);
-    throw UnsupportedDataTypeException("BitString");
+    ConstraintVisitor<BitStringValue> constraintVisitor;
+    type.constraints().accept(constraintVisitor);
+
+    ::seds::model::BinaryDataType sedsType;
+
+    if (constraintVisitor.isSizeConstraintVisited()) {
+        sedsType.setBits(constraintVisitor.getMaxSize());
+        sedsType.setFixedSize(constraintVisitor.getMaxSize() == constraintVisitor.getMinSize());
+    }
+
+    sedsType.setName(m_context.name());
+    m_context.package()->addDataType(std::move(sedsType));
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::OctetString &type)

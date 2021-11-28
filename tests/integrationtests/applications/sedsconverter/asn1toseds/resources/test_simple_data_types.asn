@@ -14,6 +14,10 @@ SimpleDataTypes DEFINITIONS ::= BEGIN
 
     MyFixedSizeString ::= IA5String(SIZE(64))
 
+    MyBitString ::= BIT STRING(SIZE(16..24))
+
+    MyFixedSizeBitString ::= BIT STRING(SIZE(17))
+
     --MyEnum ::= ENUMERATED {
         -- val1,
         -- val2,

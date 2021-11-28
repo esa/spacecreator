@@ -14,5 +14,9 @@ SimpleDataTypes DEFINITIONS ::= BEGIN
 
     MyFixedSizeString []
 
+    MyBitString []
+
+    MyFixedSizeBitString []
+
 
 END
