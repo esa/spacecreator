@@ -21,10 +21,10 @@
 
 #include <conversion/common/modeltype.h>
 #include <conversion/seds/Asn1ToSedsTranslator/translator.h>
+#include <conversion/seds/IvToSedsTranslator/translator.h>
 #include <ivcore/ivlibrary.h>
 #include <libiveditor/iveditor.h>
 #include <memory>
-#include <seds/IvToSedsTranslator/translator.h>
 #include <seds/SedsXmlExporter/exporter.h>
 #include <seds/SedsXmlImporter/importer.h>
 
