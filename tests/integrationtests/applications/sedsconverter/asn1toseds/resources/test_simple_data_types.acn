@@ -6,5 +6,9 @@ SimpleDataTypes DEFINITIONS ::= BEGIN
 
     MyIntegerWithEncoding [size 32, encoding pos-int, endianness big]
 
+    MyFloat []
+
+    MyFloatWithEncoding [encoding IEEE754-1985-64]
+
 
 END

@@ -49,9 +49,23 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   dataTypeName    Name of undeclared the type
+     * @param   dataTypeName    Name of the undeclared type
      */
     explicit UndeclaredDataTypeException(const QString &dataTypeName);
+};
+
+/**
+ * @brief   Exception thrown when translator encounters a data type that is not supported
+ */
+class UnsupportedDataTypeException : public TranslationException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   dataTypeName    Name of the unsupported type
+     */
+    explicit UnsupportedDataTypeException(const QString &dataTypeName);
 };
 
 /**

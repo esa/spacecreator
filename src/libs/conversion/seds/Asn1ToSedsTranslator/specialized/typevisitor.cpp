@@ -71,6 +71,7 @@ using Asn1Acn::Types::Sequence;
 using Asn1Acn::Types::SequenceOf;
 using Asn1Acn::Types::UserdefinedType;
 
+using conversion::translator::UnsupportedDataTypeException;
 using conversion::translator::UnsupportedValueException;
 
 namespace conversion::seds::translator {
@@ -119,56 +120,67 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Boolean &type)
 void TypeVisitor::visit(const ::Asn1Acn::Types::Null &type)
 {
     Q_UNUSED(type);
+    throw UnsupportedDataTypeException("Null");
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::BitString &type)
 {
     Q_UNUSED(type);
+    throw UnsupportedDataTypeException("BitString");
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::OctetString &type)
 {
     Q_UNUSED(type);
+    throw UnsupportedDataTypeException("OctetString");
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::IA5String &type)
 {
     Q_UNUSED(type);
+    throw UnsupportedDataTypeException("IA5String");
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::NumericString &type)
 {
     Q_UNUSED(type);
+    throw UnsupportedDataTypeException("NumericString");
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Enumerated &type)
 {
     Q_UNUSED(type);
+    throw UnsupportedDataTypeException("Enumerated");
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Choice &type)
 {
     Q_UNUSED(type);
+    throw UnsupportedDataTypeException("Choice");
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
 {
     Q_UNUSED(type);
+    throw UnsupportedDataTypeException("Sequence");
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)
 {
     Q_UNUSED(type);
+    throw UnsupportedDataTypeException("SequenceOf");
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Real &type)
 {
     Q_UNUSED(type);
+    throw UnsupportedDataTypeException("Real");
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::LabelType &type)
 {
     Q_UNUSED(type);
+    throw UnsupportedDataTypeException("LabelType");
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Integer &type)
@@ -229,6 +241,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Integer &type)
 void TypeVisitor::visit(const ::Asn1Acn::Types::UserdefinedType &type)
 {
     Q_UNUSED(type);
+    throw UnsupportedDataTypeException("UserdefinedType");
 }
 
 } // namespace conversion::seds::translator

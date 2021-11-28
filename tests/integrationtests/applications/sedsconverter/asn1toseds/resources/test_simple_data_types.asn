@@ -6,7 +6,9 @@ SimpleDataTypes DEFINITIONS ::= BEGIN
 
     MyIntegerWithEncoding ::= INTEGER(5..200)
 
-    --MyFloat ::= REAL(0..1)
+    MyFloat ::= REAL(0..1)
+
+    MyFloatWithEncoding ::= REAL(32..64)
 
     --MyString ::= IA5String(SIZE(0..32))
 

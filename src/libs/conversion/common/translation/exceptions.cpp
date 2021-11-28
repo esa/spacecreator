@@ -31,6 +31,11 @@ UndeclaredDataTypeException::UndeclaredDataTypeException(const QString &dataType
 {
 }
 
+UnsupportedDataTypeException::UnsupportedDataTypeException(const QString &dataTypeName)
+    : TranslationException(QString("Unsupported data type '%1'").arg(dataTypeName))
+{
+}
+
 UndeclaredInterfaceException::UndeclaredInterfaceException(const QString &interfaceTypeName)
     : TranslationException(QString("Undeclared interface '%1'").arg(interfaceTypeName))
 {
