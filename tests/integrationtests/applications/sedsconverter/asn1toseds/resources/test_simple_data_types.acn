@@ -8,7 +8,7 @@ SimpleDataTypes DEFINITIONS ::= BEGIN
 
     MyFloat []
 
-    MyFloatWithEncoding [encoding IEEE754-1985-64]
+    MyFloatWithEncoding [encoding IEEE754-1985-64, endianness little]
 
 
 END

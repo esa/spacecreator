@@ -54,6 +54,7 @@
 using Asn1Acn::BitStringValue;
 using Asn1Acn::IntegerValue;
 using Asn1Acn::OctetStringValue;
+using Asn1Acn::RealValue;
 using Asn1Acn::StringValue;
 using Asn1Acn::Types::BitString;
 using Asn1Acn::Types::Boolean;
@@ -173,8 +174,51 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Real &type)
 {
-    Q_UNUSED(type);
-    throw UnsupportedDataTypeException("Real");
+    ConstraintVisitor<RealValue> constraintVisitor;
+    type.constraints().accept(constraintVisitor);
+
+    ::seds::model::FloatDataType sedsType;
+
+    if (constraintVisitor.isRangeConstraintVisited()) {
+        ::seds::model::MinMaxRange range;
+        range.setType(::seds::model::RangeType::InclusiveMinInclusiveMax);
+        range.setMax(IntegerValue::asString(constraintVisitor.getRange().end()));
+        range.setMin(IntegerValue::asString(constraintVisitor.getRange().begin()));
+        sedsType.setRange(std::move(range));
+    }
+
+    // Encoding in ASN.1 model is not optional, but may be unset
+    if (type.encoding() != Asn1Acn::Types::RealEncoding::unspecified) {
+        ::seds::model::FloatDataEncoding encoding;
+        switch (type.encoding()) {
+        case Asn1Acn::Types::RealEncoding::IEEE754_1985_32:
+            encoding.setEncoding(::seds::model::CoreEncodingAndPrecision::IeeeSingle);
+            encoding.setBits(32);
+            break;
+        case Asn1Acn::Types::RealEncoding::IEEE754_1985_64:
+            encoding.setEncoding(::seds::model::CoreEncodingAndPrecision::IeeeDouble);
+            encoding.setBits(64);
+            break;
+        case Asn1Acn::Types::RealEncoding::unspecified:
+            break;
+        }
+
+        switch (type.endianness()) {
+        case Asn1Acn::Types::Endianness::big:
+            encoding.setByteOrder(::seds::model::ByteOrder::BigEndian);
+            break;
+        case Asn1Acn::Types::Endianness::little:
+            encoding.setByteOrder(::seds::model::ByteOrder::LittleEndian);
+            break;
+        case Asn1Acn::Types::Endianness::unspecified:
+            throw UnsupportedValueException("Endianness", "unspecified");
+            break;
+        }
+
+        sedsType.setEncoding(std::move(encoding));
+    }
+    sedsType.setName(m_context.name());
+    m_context.package()->addDataType(std::move(sedsType));
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::LabelType &type)
@@ -185,7 +229,6 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::LabelType &type)
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Integer &type)
 {
-    Q_UNUSED(type);
     ConstraintVisitor<IntegerValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
 
