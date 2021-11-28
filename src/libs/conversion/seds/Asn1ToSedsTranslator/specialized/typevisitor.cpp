@@ -172,6 +172,22 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)
     throw UnsupportedDataTypeException("SequenceOf");
 }
 
+template<typename EncodingType>
+static inline auto setEndianness(EncodingType &encoding, const Asn1Acn::Types::Endianness endianness) -> void
+{
+    switch (endianness) {
+    case Asn1Acn::Types::Endianness::big:
+        encoding.setByteOrder(::seds::model::ByteOrder::BigEndian);
+        return;
+    case Asn1Acn::Types::Endianness::little:
+        encoding.setByteOrder(::seds::model::ByteOrder::LittleEndian);
+        return;
+    case Asn1Acn::Types::Endianness::unspecified:
+        throw UnsupportedValueException("Endianness", "unspecified");
+        return;
+    }
+}
+
 void TypeVisitor::visit(const ::Asn1Acn::Types::Real &type)
 {
     ConstraintVisitor<RealValue> constraintVisitor;
@@ -203,17 +219,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Real &type)
             break;
         }
 
-        switch (type.endianness()) {
-        case Asn1Acn::Types::Endianness::big:
-            encoding.setByteOrder(::seds::model::ByteOrder::BigEndian);
-            break;
-        case Asn1Acn::Types::Endianness::little:
-            encoding.setByteOrder(::seds::model::ByteOrder::LittleEndian);
-            break;
-        case Asn1Acn::Types::Endianness::unspecified:
-            throw UnsupportedValueException("Endianness", "unspecified");
-            break;
-        }
+        setEndianness(encoding, type.endianness());
 
         sedsType.setEncoding(std::move(encoding));
     }
@@ -246,17 +252,9 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Integer &type)
     if (type.size() > 0) {
         ::seds::model::IntegerDataEncoding encoding;
         encoding.setBits(static_cast<uint64_t>(type.size()));
-        switch (type.endianness()) {
-        case Asn1Acn::Types::Endianness::big:
-            encoding.setByteOrder(::seds::model::ByteOrder::BigEndian);
-            break;
-        case Asn1Acn::Types::Endianness::little:
-            encoding.setByteOrder(::seds::model::ByteOrder::LittleEndian);
-            break;
-        case Asn1Acn::Types::Endianness::unspecified:
-            throw UnsupportedValueException("Endianness", "unspecified");
-            break;
-        }
+
+        setEndianness(encoding, type.endianness());
+
         switch (type.encoding()) {
         case Asn1Acn::Types::IntegerEncoding::pos_int:
             encoding.setEncoding(::seds::model::CoreIntegerEncoding::Unsigned);
