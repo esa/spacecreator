@@ -128,6 +128,29 @@ static inline auto setEndianness(EncodingType &encoding, const Asn1Acn::Types::E
     }
 }
 
+template<typename EncodingType>
+static inline auto setIntegerEncoding(EncodingType &encoding, const Asn1Acn::Types::IntegerEncoding integerEncoding)
+        -> void
+{
+    switch (integerEncoding) {
+    case Asn1Acn::Types::IntegerEncoding::pos_int:
+        encoding.setEncoding(::seds::model::CoreIntegerEncoding::Unsigned);
+        break;
+    case Asn1Acn::Types::IntegerEncoding::twos_complement:
+        encoding.setEncoding(::seds::model::CoreIntegerEncoding::TwosComplement);
+        break;
+    case Asn1Acn::Types::IntegerEncoding::ASCII:
+        throw UnsupportedValueException("IntegerEncoding", "ASCII");
+        break;
+    case Asn1Acn::Types::IntegerEncoding::BCD:
+        encoding.setEncoding(::seds::model::CoreIntegerEncoding::Bcd);
+        break;
+    case Asn1Acn::Types::IntegerEncoding::unspecified:
+        throw UnsupportedValueException("IntegerEncoding", "unspecified");
+        break;
+    }
+}
+
 static inline auto isZero(const QString value) -> bool
 {
     return value == "" || value.toULongLong() == 0;
@@ -230,24 +253,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Enumerated &type)
         encoding.setBits(static_cast<uint64_t>(type.size()));
 
         setEndianness(encoding, type.endianness());
-
-        switch (type.encoding()) {
-        case Asn1Acn::Types::IntegerEncoding::pos_int:
-            encoding.setEncoding(::seds::model::CoreIntegerEncoding::Unsigned);
-            break;
-        case Asn1Acn::Types::IntegerEncoding::twos_complement:
-            encoding.setEncoding(::seds::model::CoreIntegerEncoding::TwosComplement);
-            break;
-        case Asn1Acn::Types::IntegerEncoding::ASCII:
-            throw UnsupportedValueException("IntegerEncoding", "ASCII");
-            break;
-        case Asn1Acn::Types::IntegerEncoding::BCD:
-            encoding.setEncoding(::seds::model::CoreIntegerEncoding::Bcd);
-            break;
-        case Asn1Acn::Types::IntegerEncoding::unspecified:
-            throw UnsupportedValueException("IntegerEncoding", "unspecified");
-            break;
-        }
+        setIntegerEncoding(encoding, type.encoding());
 
         sedsType.setEncoding(std::move(encoding));
     }
@@ -339,24 +345,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Integer &type)
         encoding.setBits(static_cast<uint64_t>(type.size()));
 
         setEndianness(encoding, type.endianness());
-
-        switch (type.encoding()) {
-        case Asn1Acn::Types::IntegerEncoding::pos_int:
-            encoding.setEncoding(::seds::model::CoreIntegerEncoding::Unsigned);
-            break;
-        case Asn1Acn::Types::IntegerEncoding::twos_complement:
-            encoding.setEncoding(::seds::model::CoreIntegerEncoding::TwosComplement);
-            break;
-        case Asn1Acn::Types::IntegerEncoding::ASCII:
-            throw UnsupportedValueException("IntegerEncoding", "ASCII");
-            break;
-        case Asn1Acn::Types::IntegerEncoding::BCD:
-            encoding.setEncoding(::seds::model::CoreIntegerEncoding::Bcd);
-            break;
-        case Asn1Acn::Types::IntegerEncoding::unspecified:
-            throw UnsupportedValueException("IntegerEncoding", "unspecified");
-            break;
-        }
+        setIntegerEncoding(encoding, type.encoding());
 
         sedsType.setEncoding(std::move(encoding));
     }
