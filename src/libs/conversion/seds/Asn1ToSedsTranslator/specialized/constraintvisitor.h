@@ -31,14 +31,12 @@
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/values.h>
-#include <iostream>
 
 namespace conversion::seds::translator {
 /**
  * @brief Visitor for ASN.1 constraints
  *
  * This is a part of Asn1ToSedsTranslator.
- * This visitor is used to determine size constraints.
  *
  * @tparam ValueType constrained value type
  */
@@ -50,14 +48,12 @@ public:
     void visit(const ::Asn1Acn::Constraints::RangeConstraint<ValueType> &constraint) override
     {
         Q_UNUSED(constraint);
-        std::cout << "Visit RangeConstraint" << std::endl;
         constraint.accept(m_rangeVisitor);
     }
 
     /// @brief Visit Asn1Acn::Constraints::AndConstraint
     void visit(const ::Asn1Acn::Constraints::AndConstraint<ValueType> &constraint) override
     {
-        std::cout << "Visit and" << std::endl;
         constraint.leftChild()->accept(*this);
         constraint.rightChild()->accept(*this);
     }
@@ -65,29 +61,22 @@ public:
     /// @brief Visit Asn1Acn::Constraints::OrConstraint
     void visit(const ::Asn1Acn::Constraints::OrConstraint<ValueType> &constraint) override
     {
-        std::cout << "Visit or" << std::endl;
         constraint.leftChild()->accept(*this);
         constraint.rightChild()->accept(*this);
     }
 
     /// @brief Visit Asn1Acn::Constraints::FromConstraint
-    void visit(const ::Asn1Acn::Constraints::FromConstraint<ValueType> &constraint) override
-    {
-        std::cout << "Visit FromConstraint" << std::endl;
-        Q_UNUSED(constraint);
-    }
+    void visit(const ::Asn1Acn::Constraints::FromConstraint<ValueType> &constraint) override { Q_UNUSED(constraint); }
 
     /// @brief Visit Asn1Acn::Constraints::SizeConstraint
     void visit(const ::Asn1Acn::Constraints::SizeConstraint<ValueType> &constraint) override
     {
-        std::cout << "Visit size" << std::endl;
         constraint.innerConstraints()->accept(m_sizeVisitor);
     }
 
     /// @brief Visit Asn1Acn::Constraints::ConstraintList
     void visit(const ::Asn1Acn::Constraints::ConstraintList<ValueType> &constraint) override
     {
-        std::cout << "Visit ConstraintList" << std::endl;
         for (const auto &c : constraint.constraints()) {
             c->accept(*this);
         }

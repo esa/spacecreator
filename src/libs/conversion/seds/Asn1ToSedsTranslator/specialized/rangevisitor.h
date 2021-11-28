@@ -56,8 +56,8 @@ public:
     /**
      * @brief Visit Asn1Acn::Constraints::RangeConstraint
      *
-     * RangeConstraints contains actual sizes
-     * Calculate maximum and minimum size of an array using Constraint
+     * RangeConstraints contains actual range
+     * Calculate maximum and minimum range of a numeric type
      *
      * @param constraint element to visit
      */
@@ -68,9 +68,17 @@ public:
     }
 
     /// @brief Visit Asn1Acn::Constraints::AndConstraint
-    void visit(const ::Asn1Acn::Constraints::AndConstraint<ValueType> &constraint) override { Q_UNUSED(constraint); }
+    void visit(const ::Asn1Acn::Constraints::AndConstraint<ValueType> &constraint) override
+    {
+        // TODO Implement proper range arithmetic
+        Q_UNUSED(constraint);
+    }
     /// @brief Visit Asn1Acn::Constraints::OrConstraint
-    void visit(const ::Asn1Acn::Constraints::OrConstraint<ValueType> &constraint) override { Q_UNUSED(constraint); }
+    void visit(const ::Asn1Acn::Constraints::OrConstraint<ValueType> &constraint) override
+    {
+        // TODO Implement proper range arithmetic
+        Q_UNUSED(constraint);
+    }
     /// @brief Visit Asn1Acn::Constraints::FromConstraint
     void visit(const ::Asn1Acn::Constraints::FromConstraint<ValueType> &constraint) override { Q_UNUSED(constraint); }
     /// @brief Visit Asn1Acn::Constraints::SizeConstraint
@@ -79,9 +87,9 @@ public:
     void visit(const ::Asn1Acn::Constraints::ConstraintList<ValueType> &constraint) override { Q_UNUSED(constraint); }
 
     /**
-     * @brief Check if size constraint was visited.
+     * @brief Check if range constraint was visited.
      *
-     * @return true if size constraint was visited, otherwise false
+     * @return true if range constraint was visited, otherwise false
      */
     bool isRangeConstraintVisited() const noexcept { return m_rangeVisited; }
 

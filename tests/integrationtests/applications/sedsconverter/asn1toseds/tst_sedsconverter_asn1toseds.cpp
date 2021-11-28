@@ -31,6 +31,17 @@ private Q_SLOTS:
     void testSimpleDataTypes();
 };
 
+/// \SRS  ETB-FUN-3010
+/// \SRS  ETB-FUN-3030
+/// \SRS  ETB-FUN-3040
+/// \SRS  ETB-FUN-3050
+/// \SRS  ETB-FUN-3060
+/// \SRS  ETB-FUN-3070
+/// \SRS  ETB-FUN-3120
+/// \SRS  ETB-FUN-3160
+/// \SRS  ETB-FUN-3170
+/// \SRS  ETB-IF-160
+/// \SRS  ETB-IF-180
 void tst_SedsConverter_Asn1ToSeds::testSimpleDataTypes()
 {
     const int result = system("./test_simple_data_types.sh");

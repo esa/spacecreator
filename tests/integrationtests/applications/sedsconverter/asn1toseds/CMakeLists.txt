@@ -15,4 +15,5 @@ target_link_libraries(${TEST_NAME}
 add_format_target(${TEST_NAME})
 
 configure_file(test_simple_data_types.sh test_simple_data_types.sh COPYONLY)
+configure_file(resources/test_simple_data_types.output resources/test_simple_data_types.output COPYONLY)
 configure_file(resources/test_simple_data_types.asn resources/test_simple_data_types.asn COPYONLY)
