@@ -326,8 +326,8 @@ void SpaceCreatorPlugin::exportInterfaceView()
 
 void SpaceCreatorPlugin::exportAsn1()
 {
-    const auto names =
-            QFileDialog::getOpenFileNames(nullptr, "Select ASN.1 files to export to InterfaceView", QString(), "*.asn");
+    const auto names = QFileDialog::getOpenFileNames(
+            nullptr, "Select ASN.1 and ACN files to export to SEDS", QString(), "*.asn *.acn");
 
     const auto outputDir = QFileDialog::getExistingDirectory(nullptr, "Select destination directory");
 
