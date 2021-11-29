@@ -20,6 +20,7 @@
 
 #include "specialized/functionstranslator.h"
 
+#include <iostream>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
 #include <seds/SedsModel/sedsmodel.h>
@@ -64,8 +65,13 @@ std::vector<std::unique_ptr<Model>> IvToSedsTranslator::translateIvModel(
     ::seds::model::Package sedsPackage;
     sedsPackage.setName("InterfaceView");
 
-    const auto ivFunctions = ivModel->allObjectsByType<ivm::IVFunction>();
+    auto ivFunctions = ivModel->allObjectsByType<ivm::IVFunction>();
+
+    const auto comparator = [](auto lhs, auto rhs) { return lhs->title() < rhs->title(); };
+    std::sort(std::begin(ivFunctions), std::end(ivFunctions), comparator);
+
     for (const auto ivFunction : ivFunctions) {
+        std::cerr << "FUNCTION: " << ivFunction->title().toStdString() << "\n";
         FunctionsTranslator::translateFunction(ivFunction, sedsPackage);
     }
 
