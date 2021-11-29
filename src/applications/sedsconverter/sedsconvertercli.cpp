@@ -195,6 +195,11 @@ void SedsConverterCLI::addSedsInputOptions(Options &options)
         options.add(SedsOptions::inputFilepath, std::move(inputFilepath));
     }
 
+    if (m_arguments.contains(CommandArg::SedsConverterSedsPreprocessedFilepath)) {
+        options.add(
+                SedsOptions::preprocessedFilepath, m_parser.value(CommandArg::SedsConverterSedsPreprocessedFilepath));
+    }
+
     if (m_arguments.contains(CommandArg::SedsConverterSedsSchemaFilepath)) {
         options.add(SedsOptions::schemaFilepath, m_parser.value(CommandArg::SedsConverterSedsSchemaFilepath));
     }

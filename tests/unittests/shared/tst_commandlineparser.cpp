@@ -63,6 +63,7 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterModelsAux();
     void testCmdArgumentSedsConverterIvConfig();
     void testCmdArgumentSedsConverterIvGenerateParentFunctions();
+    void testCmdArgumentSedsConverterSedsPreprocessedFilepath();
     void testCmdArgumentSedsConverterSedsSchemaFilepath();
     void testCmdArgumentSedsConverterSedsExtRef();
     void testCmdArgumentSedsConverterSedsExtRefFilepath();
@@ -350,6 +351,25 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterIvGenerateParentFunction
 
     QVERIFY(!parser.isSet(CommandArg::Unknown));
     QVERIFY(parser.isSet(CommandArg::SedsConverterIvGenerateParentFunctions));
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterSedsPreprocessedFilepath()
+{
+    const QCommandLineOption cmdPreprocessedFilepath =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterSedsPreprocessedFilepath);
+    const QString fileName("preprocessed.xml");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdPreprocessedFilepath.names().first(), fileName) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterSedsPreprocessedFilepath);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterSedsPreprocessedFilepath));
+
+    const QString value = parser.value(CommandArg::SedsConverterSedsPreprocessedFilepath);
+    QCOMPARE(value, fileName);
 }
 
 void tst_CommandLineParser::testCmdArgumentSedsConverterSedsSchemaFilepath()
