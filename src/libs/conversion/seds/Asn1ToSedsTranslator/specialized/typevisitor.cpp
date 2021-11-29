@@ -152,7 +152,7 @@ static inline auto setIntegerEncoding(EncodingType &encoding, const Asn1Acn::Typ
 
 static inline auto isZero(const QString value) -> bool
 {
-    return value == "" || value.toULongLong() == 0;
+    return value.isEmpty() || value.toULongLong() == 0;
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Boolean &type)
