@@ -72,6 +72,7 @@
 #include <qstandarditemmodel.h>
 #include <qtreeview.h>
 #include <shared/ui/listtreedialog.h>
+#include <shared/ui/ltdialoghandler.h>
 
 void initSpaceCreatorResources()
 {
@@ -266,46 +267,6 @@ void SpaceCreatorPlugin::importAsn1()
         // TODO: write an exception to some debug console
     }
 }
-
-////////////////vvvvvvvvvvvvvvvvvvvv///////////////////////////
-
-class LTDialogButtonHandler
-{
-public:
-    static void setLTDialog(ListTreeDialog *dialog);
-
-private:
-    static ListTreeDialog *m_dialog;
-    static void onButtonPressed();
-};
-ListTreeDialog *LTDialogButtonHandler::m_dialog = nullptr;
-
-void LTDialogButtonHandler::setLTDialog(ListTreeDialog *dialog)
-{
-    m_dialog = dialog;
-
-    QObject::connect(m_dialog->button(), &QPushButton::pressed, onButtonPressed);
-}
-
-void LTDialogButtonHandler::onButtonPressed()
-{
-    QStandardItemModel *const model = m_dialog->model();
-    const unsigned int rows = model->rowCount();
-    const unsigned int cols = model->columnCount();
-
-    for (unsigned int i = 0; i < cols; i++) {
-        for (unsigned int j = 0; j < rows; j++) {
-            QStandardItem *const item = model->takeItem(j, i);
-            if (item != nullptr && item->checkState() == Qt::Checked) {
-                m_dialog->selectedItemsPtr()->append(item->text());
-            }
-        }
-    }
-
-    m_dialog->close();
-}
-
-/////////////^^^^^^^^^^///////////////////////////
 
 void updateModelWithFunctionNames(QStandardItemModel &model, QStringList &ivFunctionsNames)
 {
