@@ -83,6 +83,7 @@ add_qtc_plugin(${PLUGIN_NAME}
 
 target_include_directories(${PLUGIN_NAME}
     PRIVATE src
+    PRIVATE ../sedsplugin
     PRIVATE ${QTC_SOURCE_DIR}/src
     PRIVATE ${QTC_SOURCE_DIR}/src/libs
     PRIVATE ${QTC_SOURCE_DIR}/src/libs/aggregation

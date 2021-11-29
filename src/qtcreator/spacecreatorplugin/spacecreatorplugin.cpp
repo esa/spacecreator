@@ -71,6 +71,7 @@
 #include <qpushbutton.h>
 #include <qstandarditemmodel.h>
 #include <qtreeview.h>
+#include <sedsplugin.h>
 #include <shared/ui/listtreedialog.h>
 
 void initSpaceCreatorResources()
