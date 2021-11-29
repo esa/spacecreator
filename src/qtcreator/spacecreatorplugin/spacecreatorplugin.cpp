@@ -34,7 +34,6 @@
 #include "iveditor.h"
 #include "iveditorcore.h"
 #include "ivlibrary.h"
-#include "ivmodel.h"
 #include "msc/msceditordata.h"
 #include "msc/msceditorfactory.h"
 #include "msc/mscqtceditor.h"
@@ -48,17 +47,13 @@
 #include "spacecreatorprojectmanager.h"
 
 #include <QAction>
-#include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
-#include <asn1library/asn1/asn1model.h>
-#include <conversion/asn1/Asn1Importer/importer.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/icore.h>
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
-#include <shared/ui/listtreedialog.h>
 
 void initSpaceCreatorResources()
 {
