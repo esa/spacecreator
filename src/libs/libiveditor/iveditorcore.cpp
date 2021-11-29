@@ -36,6 +36,7 @@
 #include "ivcore/abstractsystemchecks.h"
 #include "ivcreatortool.h"
 #include "ivexporter.h"
+#include "ivfunction.h"
 #include "ivinterface.h"
 #include "ivmodel.h"
 #include "ivpropertytemplateconfig.h"
