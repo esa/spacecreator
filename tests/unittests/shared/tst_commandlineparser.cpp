@@ -62,6 +62,7 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterModelTo();
     void testCmdArgumentSedsConverterModelsAux();
     void testCmdArgumentSedsConverterIvConfig();
+    void testCmdArgumentSedsConverterIvGenerateParentFunctions();
     void testCmdArgumentSedsConverterSedsSchemaFilepath();
     void testCmdArgumentSedsConverterSedsExtRef();
     void testCmdArgumentSedsConverterSedsExtRefFilepath();
@@ -334,6 +335,21 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterIvConfig()
 
     const QString value = parser.value(CommandArg::SedsConverterIvConfig);
     QCOMPARE(value, fileName);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterIvGenerateParentFunctions()
+{
+    const QCommandLineOption cmdGenerateParentFunctions =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterIvGenerateParentFunctions);
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1").arg(cmdGenerateParentFunctions.names().first()) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterIvGenerateParentFunctions);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterIvGenerateParentFunctions));
 }
 
 void tst_CommandLineParser::testCmdArgumentSedsConverterSedsSchemaFilepath()

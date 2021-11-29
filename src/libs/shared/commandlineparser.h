@@ -56,6 +56,7 @@ public:
         SedsConverterModelTo,
         SedsConverterModelsAux,
         SedsConverterIvConfig,
+        SedsConverterIvGenerateParentFunctions,
         SedsConverterSedsSchemaFilepath,
         SedsConverterSedsExtRef,
         SedsConverterSedsExtRefFilepath,

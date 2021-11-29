@@ -159,6 +159,13 @@ void SedsConverterCLI::addIvInputOptions(Options &options)
     }
 }
 
+void SedsConverterCLI::addIVTranslationOptions(Options &options)
+{
+    if (m_arguments.contains(CommandArg::SedsConverterIvGenerateParentFunctions)) {
+        options.add(IvOptions::generateFunctionsForPackages);
+    }
+}
+
 void SedsConverterCLI::addIvOutputOptions(Options &options)
 {
     if (!m_outputFilepath.isEmpty()) {

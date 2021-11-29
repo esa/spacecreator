@@ -200,6 +200,10 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
         description = QCoreApplication::translate("CommandLineParser", "Specify config xml <file> for InterfaceView");
         valueName = QCoreApplication::translate("CommandLineParser", "file");
     } break;
+    case CommandLineParser::Positional::SedsConverterIvGenerateParentFunctions: {
+        names << "iv-generate-parent-functions";
+        description = QCoreApplication::translate("CommandLineParser", "Generate parent functions for each SEDS package");
+    } break;
     case CommandLineParser::Positional::SedsConverterSedsSchemaFilepath: {
         names << "seds-schema";
         description = QCoreApplication::translate("CommandLineParser", "Specify schema <file> for SEDS");
