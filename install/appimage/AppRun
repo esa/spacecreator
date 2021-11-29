@@ -21,6 +21,8 @@ Options:
             Run the dvconverter
         [--mscconverter [--help]]
             Run the mscconverter
+        [--sedsconverter [--help]]
+            Run the sedsconverter
         [--mscstreaming [--help]]
             Run the mscstreaming
         [--DVeditor [--help]]
@@ -62,6 +64,9 @@ case $1 in
     ;;
 --mscconverter)
     exec "$bindir/mscconverter" "$2" "$3" "$4" "$5" "$6" "$7"
+    ;;
+--sedsconverter)
+    exec "$bindir/sedsconverter" "${@:2}"
     ;;
 --mscstreaming)
     exec "$bindir/mscstreaming" "$2" "$3" "$4" "$5" "$6" "$7"

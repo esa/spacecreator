@@ -88,6 +88,10 @@ private:
      */
     void addIvInputOptions(conversion::Options &options);
     /**
+     * @brief   Process options for translation IV model
+     */
+    void addIVTranslationOptions(conversion::Options &options);
+    /**
      * @brief   Process options for output IV model
      */
     void addIvOutputOptions(conversion::Options &options);
