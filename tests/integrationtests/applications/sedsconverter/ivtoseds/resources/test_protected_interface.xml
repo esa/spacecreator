@@ -3,6 +3,7 @@
     <Property name="Taste::coordinates" value="45100 55200 82700 77200"/>
 <Provided_Interface name="ProtectedInterface" kind="Protected">
     <Input_Parameter name="ProtectedArg" type="MyInteger" encoding="ACN"/>
+    <Output_Parameter name="ProtectedArgOut" type="MyInteger" encoding="ACN"/>
     <Property name="Taste::coordinates" value="62900 55200"/>
 </Provided_Interface>
 
