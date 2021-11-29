@@ -1,15 +1,15 @@
 {
     \"Name\" : \"SedsPlugin\",
-    \"Version\" : \"1.0\",
+    \"Version\" : \"$$PLUGIN_VERSION\",
     \"CompatVersion\" : \"$$QTCREATOR_COMPAT_VERSION\",
     \"Vendor\" : \"N7 Space\",
-    \"Copyright\" : \"(C) 2021 N7 Space\",
+    \"Copyright\" : \"(C) 2021 N7 Space sp. z o.o.\",
     \"License\" : \"LGPL 2 or later\",
     \"Category\" : \"Modeling\",
     \"Description\" : \"SOIS Electronic Data Sheet Importer/Exporter for TASTE\",
     \"Url\" : \"www.n7space.com",
     $$dependencyList,
 
-    \"Mimetypes\" : [        
+    \"Mimetypes\" : [
     ]
 }
