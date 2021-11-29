@@ -36,7 +36,7 @@ void LTDialogButtonHandler::onButtonPressed()
         for (unsigned int j = 0; j < rows; j++) {
             QStandardItem *const item = model->takeItem(j, i);
             if (item != nullptr && item->checkState() == Qt::Checked) {
-                m_dialog->selectedItemsPtr()->append(item->text());
+                m_dialog->selectedItems()->append(item->text());
             }
         }
     }

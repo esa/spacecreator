@@ -39,12 +39,7 @@ QPushButton *ListTreeDialog::button()
     return m_button;
 }
 
-QList<QString> ListTreeDialog::getSelectedItems()
-{
-    return m_selectedItems;
-}
-
-QList<QString> *ListTreeDialog::selectedItemsPtr()
+QList<QString> *ListTreeDialog::selectedItems()
 {
     return &m_selectedItems;
 }

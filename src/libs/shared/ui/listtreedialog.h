@@ -27,8 +27,7 @@ class ListTreeDialog : public QDialog
 public:
     ListTreeDialog() = delete;
     ListTreeDialog(QStandardItemModel *model, const QString &buttonText = "select");
-    QList<QString> getSelectedItems();
-    QList<QString> *selectedItemsPtr();
+    QList<QString> *selectedItems();
     QStandardItemModel *model();
     QPushButton *button();
 

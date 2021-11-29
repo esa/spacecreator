@@ -264,11 +264,11 @@ void SpaceCreatorPlugin::importAsn1()
             }
         }
     } catch (conversion::importer::ImportException &ex) {
-        // TODO: write an exception to some debug console
+        // TODO: write an exception to a debug console
     }
 }
 
-void updateModelWithFunctionNames(QStandardItemModel &model, QStringList &ivFunctionsNames)
+static void updateModelWithFunctionNames(QStandardItemModel &model, const QStringList &ivFunctionsNames)
 {
     QStandardItemModel *functionsListModel = &model;
 
@@ -292,8 +292,7 @@ void SpaceCreatorPlugin::exportInterfaceView()
     }
 
     const auto ivEditorCore = currentIvDocument->ivEditorCore();
-
-    auto ivFunctionsNames = ivEditorCore->ivFunctionsNames();
+    const auto ivFunctionsNames = ivEditorCore->ivFunctionsNames();
     if (ivFunctionsNames.empty()) {
         throw conversion::exporter::ExportException(
                 tr("InterfaceView does not contain functions which could be exported"));
@@ -309,7 +308,7 @@ void SpaceCreatorPlugin::exportInterfaceView()
 
     ldDialog.exec();
 
-    QList<QString> *selectedFunctions = ldDialog.selectedItemsPtr();
+    QList<QString> *selectedFunctions = ldDialog.selectedItems();
     qDebug() << "selected functions: ";
     for (auto &item : *selectedFunctions) {
         qDebug() << item;
@@ -324,7 +323,7 @@ void SpaceCreatorPlugin::exportAsn1()
     const auto outputDir = QFileDialog::getExistingDirectory(nullptr, "Select destination directory");
 
     for (auto &name : names) {
-        // TODO: implementation
+        // TODO: implementation (call sedsConverter, from asn1 to seds)
         (void)name;
         (void)outputDir;
     }
