@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+ <Package name="InterfaceView">
+  <ComponentSet>
+   <Component name="Pinger">
+    <ProvidedInterfaceSet>
+     <Interface type="PingerPongInterface" name="PongInterface"/>
+    </ProvidedInterfaceSet>
+    <RequiredInterfaceSet>
+     <Interface type="PingerPingInterface" name="PingInterface"/>
+    </RequiredInterfaceSet>
+    <DeclaredInterfaceSet>
+     <Interface name="PingerPongInterface">
+      <CommandSet>
+       <Command name="PongInterface" mode="async">
+        <Argument type="MyInteger" name="PongArg" mode="in"/>
+       </Command>
+      </CommandSet>
+     </Interface>
+     <Interface name="PingerPingInterface">
+      <CommandSet>
+       <Command name="PingInterface" mode="async">
+        <Argument type="MyInteger" name="PingArg" mode="in"/>
+       </Command>
+      </CommandSet>
+     </Interface>
+    </DeclaredInterfaceSet>
+   </Component>
+   <Component name="Ponger">
+    <ProvidedInterfaceSet>
+     <Interface type="PongerPingInterface" name="PingInterface"/>
+    </ProvidedInterfaceSet>
+    <RequiredInterfaceSet>
+     <Interface type="PongerPongInterface" name="PongInterface"/>
+    </RequiredInterfaceSet>
+    <DeclaredInterfaceSet>
+     <Interface name="PongerPingInterface">
+      <CommandSet>
+       <Command name="PingInterface" mode="async">
+        <Argument type="MyInteger" name="PingArg" mode="in"/>
+       </Command>
+      </CommandSet>
+     </Interface>
+     <Interface name="PongerPongInterface">
+      <CommandSet>
+       <Command name="PongInterface" mode="async">
+        <Argument type="MyInteger" name="PongArg" mode="in"/>
+       </Command>
+      </CommandSet>
+     </Interface>
+    </DeclaredInterfaceSet>
+   </Component>
+  </ComponentSet>
+ </Package>
+</PackageFile>

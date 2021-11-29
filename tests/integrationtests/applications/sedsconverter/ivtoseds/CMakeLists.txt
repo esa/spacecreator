@@ -34,3 +34,7 @@ configure_file(resources/test_sporadic_interface.xml resources/test_sporadic_int
 configure_file(test_unprotected_interface.sh test_unprotected_interface.sh COPYONLY)
 configure_file(resources/test_unprotected_interface.output resources/test_unprotected_interface.output COPYONLY)
 configure_file(resources/test_unprotected_interface.xml resources/test_unprotected_interface.xml COPYONLY)
+
+configure_file(test_pinger.sh test_pinger.sh COPYONLY)
+configure_file(resources/test_pinger.output resources/test_pinger.output COPYONLY)
+configure_file(resources/test_pinger.xml resources/test_pinger.xml COPYONLY)
