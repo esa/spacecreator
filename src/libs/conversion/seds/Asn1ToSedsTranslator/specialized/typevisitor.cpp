@@ -163,8 +163,8 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Boolean &type)
 
     ::seds::model::BooleanDataType sedsType;
 
-    if (constraintVisitor.isSizeConstraintVisited() || type.trueValue() != "" || type.falseValue() != "") {
-        if (constraintVisitor.getMaxSize() != constraintVisitor.getMinSize()) {
+    if (constraintVisitor.isSizeConstraintVisited() || !type.trueValue().isEmpty() || !type.falseValue().isEmpty()) {
+        if (constraintVisitor.isVariableSize()) {
             throw UnsupportedDataTypeException("variable size Boolean");
         }
 
@@ -200,7 +200,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::BitString &type)
 
     if (constraintVisitor.isSizeConstraintVisited()) {
         sedsType.setBits(constraintVisitor.getMaxSize());
-        sedsType.setFixedSize(constraintVisitor.getMaxSize() == constraintVisitor.getMinSize());
+        sedsType.setFixedSize(!constraintVisitor.isVariableSize());
     }
 
     sedsType.setName(m_context.name());
@@ -222,7 +222,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::IA5String &type)
 
     if (constraintVisitor.isSizeConstraintVisited()) {
         sedsType.setLength(constraintVisitor.getMaxSize());
-        sedsType.setFixedLength(constraintVisitor.getMaxSize() == constraintVisitor.getMinSize());
+        sedsType.setFixedLength(!constraintVisitor.isVariableSize());
     }
     ::seds::model::StringDataEncoding encoding;
     // The closest encoding to IA5
@@ -297,8 +297,8 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Real &type)
     if (constraintVisitor.isRangeConstraintVisited()) {
         ::seds::model::MinMaxRange range;
         range.setType(::seds::model::RangeType::InclusiveMinInclusiveMax);
-        range.setMax(IntegerValue::asString(constraintVisitor.getRange().end()));
-        range.setMin(IntegerValue::asString(constraintVisitor.getRange().begin()));
+        range.setMax(RealValue::asString(constraintVisitor.getRange().end()));
+        range.setMin(RealValue::asString(constraintVisitor.getRange().begin()));
         sedsType.setRange(std::move(range));
     }
 

@@ -27,7 +27,6 @@
 namespace conversion::seds::translator {
 /**
  * @brief Visitor for ASN.1/ACN types, translating them into SEDS equivalents
- *
  */
 class TypeVisitor : public ::Asn1Acn::Types::TypeReadingVisitor
 {
@@ -87,7 +86,7 @@ public:
      *
      * @param context Translation visit context
      */
-    TypeVisitor(Context &context);
+    explicit TypeVisitor(Context &context);
 
     /**
      * @brief Visit ::Asn1Acn::Types::Boolean

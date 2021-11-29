@@ -104,6 +104,13 @@ public:
     size_t getMaxSize() const noexcept { return m_sizeVisitor.getMaxSize(); }
 
     /**
+     * @brief Whether minimum and maximum size contraints differ
+     *
+     * @return true if maximum and minimum size constraints are different, false otherwise
+     */
+    bool isVariableSize() const noexcept { return m_sizeVisitor.getMaxSize() != m_sizeVisitor.getMinSize(); };
+
+    /**
      * @brief Check if range constraint was visited.
      *
      * @return true if range constraint was visited, otherwise false
