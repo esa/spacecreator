@@ -1,0 +1,14 @@
+<InterfaceView asn1file="dataview-uniq.asn">
+<Function name="ProtectedFunction" is_type="NO" language="SDL" default_implementation="default">
+    <Property name="Taste::coordinates" value="45100 55200 82700 77200"/>
+<Provided_Interface name="ProtectedInterface" kind="Protected">
+    <Input_Parameter name="ProtectedArg" type="MyInteger" encoding="ACN"/>
+    <Property name="Taste::coordinates" value="62900 55200"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+</InterfaceView>
