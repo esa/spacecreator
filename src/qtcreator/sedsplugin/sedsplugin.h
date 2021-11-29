@@ -21,21 +21,12 @@
 
 #include "sedspluginconstants.h"
 
-#include <QSharedPointer>
 #include <QStandardItemModel>
 #include <QStringList>
-#include <QVector>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <extensionsystem/iplugin.h>
 
-void updateModelWithFunctionNames(QStandardItemModel &model, const QStringList &ivFunctionsNames);
-
 namespace spctr {
-
-class IVEditorFactory;
-class DVEditorFactory;
-class MscEditorFactory;
-class SpaceCreatorProjectManager;
 
 class SedsPlugin : public ExtensionSystem::IPlugin
 {
@@ -46,18 +37,19 @@ public:
     SedsPlugin();
     ~SedsPlugin() override;
 
-    bool initialize(const QStringList &arguments, QString *errorString) override;
-    void extensionsInitialized() override;
-    ShutdownFlag aboutToShutdown() override;
+    auto initialize(const QStringList &arguments, QString *errorString) -> bool override;
+    auto extensionsInitialized() -> void override;
+    auto aboutToShutdown() -> ShutdownFlag override;
 
-private:    
-    void addSedsImportExport();
-    Core::ActionContainer *createActionContainerInTools(const QString &title);
-    static void importInterfaceView();
-    static void importSdl();
-    static void importAsn1();
-    static void exportAsn1();
-    static void exportInterfaceView();
+private:
+    auto addSedsImportExport() -> void;
+    auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
+    auto importInterfaceView() -> void;
+    auto importSdl() -> void;
+    auto importAsn1() -> void;
+    auto exportAsn1() -> void;
+    auto exportInterfaceView() -> void;
+    auto updateModelWithFunctionNames(QStandardItemModel &model, const QStringList &ivFunctionsNames) -> void;
 };
 
 }

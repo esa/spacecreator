@@ -4,7 +4,7 @@
     \"CompatVersion\" : \"$$QTCREATOR_COMPAT_VERSION\",
     \"Vendor\" : \"N7 Space\",
     \"Copyright\" : \"(C) 2021 N7 Space\",
-    \"License\" : \"LGPL 2.1\",
+    \"License\" : \"LGPL 2 or later\",
     \"Category\" : \"Modeling\",
     \"Description\" : \"SOIS Electronic Data Sheet Importer/Exporter for TASTE\",
     \"Url\" : \"www.n7space.com",
