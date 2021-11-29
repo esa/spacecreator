@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <functional>
 #include <qdialog.h>
 #include <qpushbutton.h>
 #include <qstandarditemmodel.h>
@@ -26,7 +27,8 @@ class ListTreeDialog : public QDialog
 {
 public:
     ListTreeDialog() = delete;
-    ListTreeDialog(QStandardItemModel *model, const QString &buttonText = "select");
+    ListTreeDialog(QStandardItemModel *model, const QString &buttonText = "select",
+            const std::function<void()> &func = []() -> void {});
     QList<QString> *selectedItems();
     QStandardItemModel *model();
     QPushButton *button();

@@ -20,7 +20,7 @@
 #include <QVBoxLayout>
 #include <qstandarditemmodel.h>
 
-ListTreeDialog::ListTreeDialog(QStandardItemModel *model, const QString &buttonText)
+ListTreeDialog::ListTreeDialog(QStandardItemModel *model, const QString &buttonText, const std::function<void()> &func)
     : m_model(model)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -32,6 +32,8 @@ ListTreeDialog::ListTreeDialog(QStandardItemModel *model, const QString &buttonT
     m_button = new QPushButton(this);
     m_button->setText(buttonText);
     layout->addWidget(m_button);
+
+    QObject::connect(m_button, &QPushButton::pressed, func);
 }
 
 QPushButton *ListTreeDialog::button()

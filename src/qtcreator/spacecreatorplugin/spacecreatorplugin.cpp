@@ -72,7 +72,6 @@
 #include <qstandarditemmodel.h>
 #include <qtreeview.h>
 #include <shared/ui/listtreedialog.h>
-#include <shared/ui/ltdialoghandler.h>
 
 void initSpaceCreatorResources()
 {
@@ -300,9 +299,23 @@ void SpaceCreatorPlugin::exportInterfaceView()
     QStandardItemModel functionsListModel;
     updateModelWithFunctionNames(functionsListModel, ivFunctionsNames);
 
-    ListTreeDialog ldDialog(&functionsListModel, "export to SEDS");
+    ListTreeDialog ldDialog(&functionsListModel, "export to SEDS", [&]() {
+        QStandardItemModel *const model = ldDialog.model();
+        const unsigned int rows = model->rowCount();
+        const unsigned int cols = model->columnCount();
+
+        for (unsigned int i = 0; i < cols; i++) {
+            for (unsigned int j = 0; j < rows; j++) {
+                QStandardItem *const item = model->takeItem(j, i);
+                if (item != nullptr && item->checkState() == Qt::Checked) {
+                    ldDialog.selectedItems()->append(item->text());
+                }
+            }
+        }
+
+        ldDialog.close();
+    });
     ldDialog.setWindowTitle("IV functions to be exported");
-    LTDialogButtonHandler::setLTDialog(&ldDialog);
 
     ldDialog.exec();
 

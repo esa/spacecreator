@@ -122,8 +122,6 @@ target_sources(${LIB_NAME} PRIVATE
     ui/interactiveobjectbase.h
     ui/listtreedialog.h
     ui/listtreedialog.cpp
-    ui/ltdialoghandler.h
-    ui/ltdialoghandler.cpp
     ui/textitem.cpp
     ui/textitem.h
     ui/veconnectionendpointgraphicsitem.cpp
