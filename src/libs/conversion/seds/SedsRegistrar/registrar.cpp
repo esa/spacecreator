@@ -48,8 +48,7 @@ bool SedsRegistrar::registerCapabilities(conversion::Registry &registry)
     }
 
     auto ivToSedsTranslator = std::make_unique<IvToSedsTranslator>();
-    result = registry.registerTranslator(
-            { ModelType::InterfaceView, ModelType::Asn1 }, ModelType::Seds, std::move(ivToSedsTranslator));
+    result = registry.registerTranslator({ ModelType::InterfaceView }, ModelType::Seds, std::move(ivToSedsTranslator));
     if (!result) {
         return false;
     }
