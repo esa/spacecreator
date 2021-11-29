@@ -16,3 +16,17 @@
 */
 
 #include "sedsplugin.h"
+
+void updateModelWithFunctionNames(QStandardItemModel &model, const QStringList &ivFunctionsNames)
+{
+    QStandardItemModel *const functionsListModel = &model;
+
+    QList<QStandardItem *> ivFunctionNamesList;
+    for (auto &name : ivFunctionsNames) {
+        QStandardItem *item = new QStandardItem(name);
+        item->setCheckable(true);
+        ivFunctionNamesList.append(item);
+    }
+    functionsListModel->appendColumn(ivFunctionNamesList);
+    functionsListModel->setHeaderData(0, Qt::Horizontal, "Functions");
+}

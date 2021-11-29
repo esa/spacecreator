@@ -18,3 +18,8 @@
 #pragma once
 
 #include "sedspluginconstants.h"
+
+#include <QStandardItemModel>
+#include <QStringList>
+
+void updateModelWithFunctionNames(QStandardItemModel &model, const QStringList &ivFunctionsNames);

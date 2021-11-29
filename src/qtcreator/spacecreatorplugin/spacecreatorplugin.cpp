@@ -59,7 +59,6 @@
 #include <coreplugin/icore.h>
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
-#include <qfiledialog.h>
 #include <sedsplugin.h>
 #include <shared/ui/listtreedialog.h>
 
@@ -253,20 +252,6 @@ void SpaceCreatorPlugin::importAsn1()
     } catch (conversion::importer::ImportException &ex) {
         // TODO: write an exception to a debug console
     }
-}
-
-static void updateModelWithFunctionNames(QStandardItemModel &model, const QStringList &ivFunctionsNames)
-{
-    QStandardItemModel *const functionsListModel = &model;
-
-    QList<QStandardItem *> ivFunctionNamesList;
-    for (auto &name : ivFunctionsNames) {
-        QStandardItem *item = new QStandardItem(name);
-        item->setCheckable(true);
-        ivFunctionNamesList.append(item);
-    }
-    functionsListModel->appendColumn(ivFunctionNamesList);
-    functionsListModel->setHeaderData(0, Qt::Horizontal, "Functions");
 }
 
 void SpaceCreatorPlugin::exportInterfaceView()
