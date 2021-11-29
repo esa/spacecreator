@@ -76,14 +76,13 @@ set(SC_QTC_PLUGINS
 
 add_qtc_plugin(${PLUGIN_NAME}
     DEFINES SCPLUGIN_LIBRARY
-    DEPENDS spacecreatorsystem SedsPlugin libmsceditor libiveditor libdveditor ${QT_CORE} ${QT_GUI} ${QT_WIDGETS} ${SC_QTC_LIBRARIES} ${SC_QTC_PLUGINS}
+    DEPENDS spacecreatorsystem libmsceditor libiveditor libdveditor ${QT_CORE} ${QT_GUI} ${QT_WIDGETS} ${SC_QTC_LIBRARIES} ${SC_QTC_PLUGINS}
     PLUGIN_DEPENDS ${SC_QTC_PLUGINS}
     SOURCES ${SC_PLUGIN_SOURCES}
 )
 
 target_include_directories(${PLUGIN_NAME}
-    PRIVATE src
-    PRIVATE ../sedsplugin
+    PRIVATE src    
     PRIVATE ${QTC_SOURCE_DIR}/src
     PRIVATE ${QTC_SOURCE_DIR}/src/libs
     PRIVATE ${QTC_SOURCE_DIR}/src/libs/aggregation

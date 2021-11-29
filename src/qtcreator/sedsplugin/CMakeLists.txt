@@ -1,15 +1,43 @@
 set(PLUGIN_NAME SedsPlugin)
 
-set(SC_PLUGIN_SOURCES
+set(SEDS_PLUGIN_SOURCES
+    SedsPlugin.json.in
     sedsplugin.cpp
     sedsplugin.h
 )
 
-add_library(${PLUGIN_NAME} SHARED)
+set(SEDS_QTC_LIBRARIES
+    -L"${QTC_LIB_DIR}"
+    -L"${QTC_PLUGINS_DIR}"
+    Aggregation
+    ExtensionSystem
+    Asn1Importer
+    Utils
+)
+set(SEDS_QTC_PLUGINS
+    Core
+    ProjectExplorer
+    QtSupport
+    TextEditor    
+)
 
-target_sources(${PLUGIN_NAME} PRIVATE ${SC_PLUGIN_SOURCES})
-
-target_link_libraries(${PLUGIN_NAME} PUBLIC Qt5::Gui)
+add_qtc_plugin(${PLUGIN_NAME}
+    DEFINES SCPLUGIN_LIBRARY
+    DEPENDS spacecreatorsystem libmsceditor libiveditor libdveditor ${QT_CORE} ${QT_GUI} ${QT_WIDGETS} ${SEDS_QTC_LIBRARIES} ${SEDS_QTC_PLUGINS}
+    PLUGIN_DEPENDS ${SEDS_QTC_PLUGINS}
+    SOURCES ${SEDS_PLUGIN_SOURCES}
+)
 
 target_include_directories(${PLUGIN_NAME}
-   PUBLIC . ${CMAKE_SOURCE_DIR}/src/libs)
+    PRIVATE src
+    PRIVATE ${QTC_SOURCE_DIR}/src
+    PRIVATE ${QTC_SOURCE_DIR}/src/libs
+    PRIVATE ${QTC_SOURCE_DIR}/src/libs/aggregation
+    PRIVATE ${QTC_SOURCE_DIR}/src/libs/extensionsystem
+    PRIVATE ${QTC_SOURCE_DIR}/src/libs/utils
+    PRIVATE ${QTC_SOURCE_DIR}/src/plugins
+    PRIVATE ${QTC_SOURCE_DIR}/src/plugins/coreplugin
+    PRIVATE ${QTC_SOURCE_DIR}/src/plugins/projectexplorer
+    PRIVATE ${QTC_SOURCE_DIR}/src/plugins/qtsupport
+    PRIVATE ${QTC_SOURCE_DIR}/src/plugins/texteditor
+)

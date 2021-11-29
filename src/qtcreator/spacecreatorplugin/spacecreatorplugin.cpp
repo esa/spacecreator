@@ -42,7 +42,6 @@
 #include "msceditorcore.h"
 #include "msclibrary.h"
 #include "mscsystemchecks.h"
-#include "sdl/SdlOptions/options.h"
 #include "sharedlibrary.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorprojectimpl.h"
@@ -59,7 +58,6 @@
 #include <coreplugin/icore.h>
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
-#include <sedsplugin.h>
 #include <shared/ui/listtreedialog.h>
 
 void initSpaceCreatorResources()
@@ -119,7 +117,6 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     m_dvFactory = new DVEditorFactory(m_projectsManager, this);
 
     addHelp();
-    addSedsImportExport();
 
     return true;
 }
@@ -161,169 +158,6 @@ void SpaceCreatorPlugin::addHelp()
     });
     Core::Command *showIveHelp = Core::ActionManager::registerAction(iveHelpAction, Constants::IV_HELP_ID, allContexts);
     actions->addAction(showIveHelp);
-}
-
-void SpaceCreatorPlugin::addSedsImportExport()
-{
-    Core::Context allContexts(
-            Core::Constants::C_WELCOME_MODE, Core::Constants::C_EDIT_MODE, Core::Constants::C_DESIGN_MODE);
-
-    ActionContainer *const acToolsSeds = createActionContainerInTools(tr("&SEDS"));
-
-    const auto ivImportAction = new QAction(tr("Import InterfaceView"), this);
-    connect(ivImportAction, &QAction::triggered, this, importInterfaceView);
-    Core::Command *ivImport = Core::ActionManager::registerAction(ivImportAction, Constants::IV_IMPORT_ID, allContexts);
-    acToolsSeds->addAction(ivImport);
-
-    const auto sdlImportAction = new QAction(tr("Import SDL"), this);
-    connect(sdlImportAction, &QAction::triggered, this, importSdl);
-    Core::Command *sdlImport =
-            Core::ActionManager::registerAction(sdlImportAction, Constants::SDL_IMPORT_ID, allContexts);
-    acToolsSeds->addAction(sdlImport);
-
-    const auto asn1ImportAction = new QAction(tr("Import ASN.1"), this);
-    connect(asn1ImportAction, &QAction::triggered, this, importAsn1);
-    Core::Command *asn1Import =
-            Core::ActionManager::registerAction(asn1ImportAction, Constants::ASN1_IMPORT_ID, allContexts);
-    acToolsSeds->addAction(asn1Import);
-
-    const auto ivExportAction = new QAction(tr("Export InterfaceView"), this);
-    connect(ivExportAction, &QAction::triggered, this, exportInterfaceView);
-    Core::Command *ivExport = Core::ActionManager::registerAction(ivExportAction, Constants::IV_EXPORT_ID, allContexts);
-    acToolsSeds->addAction(ivExport);
-
-    const auto asn1ExportAction = new QAction(tr("Export ASN.1"), this);
-    connect(asn1ExportAction, &QAction::triggered, this, exportAsn1);
-    Core::Command *asn1Export =
-            Core::ActionManager::registerAction(asn1ExportAction, Constants::ASN1_EXPORT_ID, allContexts);
-    acToolsSeds->addAction(asn1Export);
-}
-
-ActionContainer *SpaceCreatorPlugin::createActionContainerInTools(const QString &title)
-{
-    ActionContainer *const acToolsSeds = ActionManager::createMenu(Constants::M_TOOLS_SEDS);
-    QMenu *const menuToolsSeds = acToolsSeds->menu();
-    menuToolsSeds->setTitle(title);
-    menuToolsSeds->setEnabled(true);
-
-    ActionContainer *const acTools = ActionManager::actionContainer(Core::Constants::M_TOOLS);
-    acTools->addMenu(acToolsSeds);
-
-    return acToolsSeds;
-}
-
-void SpaceCreatorPlugin::importInterfaceView()
-{
-    const QString inputFilePath = QFileDialog::getOpenFileName(
-            nullptr, "Select SEDS file to import InterfaceView from...", QString(), tr("*.xml"));
-
-    // TODO: implementation
-}
-
-void SpaceCreatorPlugin::importSdl()
-{
-    const QString inputFilePath =
-            QFileDialog::getOpenFileName(nullptr, "Select SEDS file to import SDL from...", QString(), tr("*.xml"));
-
-    // TODO: implementation
-}
-
-void SpaceCreatorPlugin::importAsn1()
-{
-    const QString inputFilePath =
-            QFileDialog::getOpenFileName(nullptr, "Select SEDS file to import ASN.1 from...", QString(), tr("*.xml"));
-
-    conversion::Options options;
-    options.add(conversion::asn1::Asn1Options::inputFilepath, inputFilePath);
-
-    conversion::asn1::importer::Asn1Importer asn1importer;
-    try {
-        const auto model = asn1importer.importModel(options);
-        if (model) {
-            const auto *asn1Model = dynamic_cast<Asn1Acn::Asn1Model *>(model.get());
-            if (asn1Model) {
-                const auto &files = asn1Model->data();
-                if (files.size() != 1) {
-                    throw conversion::importer::ImportException("No data in imported file");
-                }
-                // TODO: implementation
-            }
-        }
-    } catch (conversion::importer::ImportException &ex) {
-        // TODO: write an exception to a debug console
-    }
-}
-
-void SpaceCreatorPlugin::exportInterfaceView()
-{
-    auto *const currentDocument = Core::EditorManager::currentDocument();
-    auto *const currentIvDocument = static_cast<IVEditorDocument *>(currentDocument);
-    if (currentIvDocument == nullptr) {
-        throw conversion::exporter::ExportException(tr("InterfaceView file not selected"));
-        // TODO: throw unhandled exception or write a warning visible to user and just return?
-    }
-
-    const auto ivEditorCore = currentIvDocument->ivEditorCore();
-    const auto ivFunctionsNames = ivEditorCore->ivFunctionsNames();
-    if (ivFunctionsNames.empty()) {
-        throw conversion::exporter::ExportException(
-                tr("InterfaceView does not contain functions which could be exported"));
-        // TODO: throw unhandled exception or write a warning visible to user and just return?
-    }
-
-    QStandardItemModel functionsListModel;
-    updateModelWithFunctionNames(functionsListModel, ivFunctionsNames);
-
-    ListTreeDialog ldDialog(&functionsListModel, "export to SEDS", [&]() {
-        QStandardItemModel *const model = ldDialog.model();
-        const unsigned int rows = model->rowCount();
-        const unsigned int cols = model->columnCount();
-
-        for (unsigned int i = 0; i < cols; i++) {
-            for (unsigned int j = 0; j < rows; j++) {
-                QStandardItem *const item = model->takeItem(j, i);
-                if (item != nullptr && item->checkState() == Qt::Checked) {
-                    ldDialog.selectedItems()->append(item->text());
-                }
-            }
-        }
-
-        ldDialog.close();
-    });
-    ldDialog.setWindowTitle("IV functions to be exported");
-
-    ldDialog.exec();
-
-    QList<QString> *const selectedFunctions = ldDialog.selectedItems();
-    if (!selectedFunctions->empty()) {
-        for (auto &item : *selectedFunctions) {
-            qDebug() << "selected function: " << item;
-        }
-
-        QString outputDir = QFileDialog::getExistingDirectory(nullptr, "Select destination directory");
-        qDebug() << "selected directory: " << outputDir;
-
-        // TODO: implementation (take selected functions and export them to a file in a selected directory
-        //       using sedsConverter)
-    } else {
-        qDebug() << "no functions selected to export";
-        throw conversion::exporter::ExportException(tr("No functions selected to export"));
-        // TODO: throw unhandled exception or write a warning visible to user and just return?
-    }
-}
-
-void SpaceCreatorPlugin::exportAsn1()
-{
-    const auto names = QFileDialog::getOpenFileNames(
-            nullptr, "Select ASN.1 and ACN files to export to SEDS", QString(), "*.asn *.acn");
-
-    const auto outputDir = QFileDialog::getExistingDirectory(nullptr, "Select destination directory");
-
-    for (auto &name : names) {
-        // TODO: implementation (call sedsConverter, from asn1 to seds)
-        (void)name;
-        (void)outputDir;
-    }
 }
 
 }
