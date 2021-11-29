@@ -314,22 +314,6 @@ void SpaceCreatorPlugin::exportInterfaceView()
     for (auto &item : *selectedFunctions) {
         qDebug() << item;
     }
-
-    // auto allIvFunctions = ivEditorCore->allIVFunctions();
-    // if (!allIvFunctions.empty()) {
-    //     for (auto &function : allIvFunctions) {
-    //         auto *const model = function->model();
-    //         const auto fid = function->id();
-    //         if (model != nullptr) {
-    //             for (int i = 0; i < ivFunctionsNames.size(); i++) {
-    //                 auto *const func = model->getFunction(fid);
-    //                 if (func != nullptr) {
-    //                     qDebug() << "id: " << func->id();
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
 }
 
 void SpaceCreatorPlugin::exportAsn1()
