@@ -222,7 +222,7 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
     case CommandLineParser::Positional::SedsConverterSedsExtRefFilepath: {
         names << "seds-ext-ref-file";
         description = QCoreApplication::translate("CommandLineParser", "Specify <file> with an external references for SEDS");
-        valueName = QCoreApplication::translate("CommandLineParser", "list");
+        valueName = QCoreApplication::translate("CommandLineParser", "file");
     } break;
     case CommandLineParser::Positional::SedsConverterSkipValidation: {
         names << "skip-validation";
