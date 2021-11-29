@@ -63,7 +63,7 @@ set(SC_QTC_LIBRARIES
     -L"${QTC_LIB_DIR}"
     -L"${QTC_PLUGINS_DIR}"
     Aggregation
-    ExtensionSystem    
+    ExtensionSystem
     Utils
 )
 set(SC_QTC_PLUGINS
@@ -81,7 +81,7 @@ add_qtc_plugin(${PLUGIN_NAME}
 )
 
 target_include_directories(${PLUGIN_NAME}
-    PRIVATE src    
+    PRIVATE src
     PRIVATE ${QTC_SOURCE_DIR}/src
     PRIVATE ${QTC_SOURCE_DIR}/src/libs
     PRIVATE ${QTC_SOURCE_DIR}/src/libs/aggregation

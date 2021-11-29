@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018 - 2021 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2018 - 2019 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -18,17 +18,13 @@
 #include "spacecreatorplugin.h"
 
 #include "context/action/actionsmanager.h"
-#include "conversion/asn1/Asn1Options/options.h"
 #include "dv/dveditorfactory.h"
 #include "dv/dvqtceditor.h"
 #include "dveditor.h"
 #include "dvlibrary.h"
 #include "dvsystemchecks.h"
-#include "export/exceptions.h"
-#include "import/exceptions.h"
 #include "interfacedocument.h"
 #include "iv/iveditordata.h"
-#include "iv/iveditordocument.h"
 #include "iv/iveditorfactory.h"
 #include "iv/ivqtceditor.h"
 #include "iveditor.h"
