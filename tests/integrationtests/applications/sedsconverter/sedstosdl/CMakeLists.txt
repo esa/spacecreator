@@ -14,6 +14,8 @@ target_link_libraries(${TEST_NAME}
 
 add_format_target(${TEST_NAME})
 
+configure_file(resources/config.xml resources/config.xml COPYONLY)
+
 configure_file(test_state_machine_with_bare_inputs.sh test_state_machine_with_bare_inputs.sh COPYONLY)
 configure_file(resources/state_machine_with_bare_inputs.xml resources/state_machine_with_bare_inputs.xml COPYONLY)
 configure_file(resources/state_machine_with_bare_inputs.output resources/state_machine_with_bare_inputs.output COPYONLY)

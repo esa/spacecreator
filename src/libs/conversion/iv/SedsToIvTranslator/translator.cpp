@@ -21,6 +21,7 @@
 
 #include "specialized/componentstranslator.h"
 
+#include <QFileInfo>
 #include <asn1library/asn1/asn1model.h>
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/escaper/escaper.h>
@@ -53,6 +54,12 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateModels(
     const auto ivConfigFilepath = options.value(IvOptions::configFilepath);
     if (!ivConfigFilepath) {
         throw TranslationException("InterfaceView configuration file wasn't specified");
+    }
+
+    QFileInfo ivConfigFile(*ivConfigFilepath);
+    if (!ivConfigFile.exists()) {
+        auto errorMsg = QString("InterfaceView configuration file '%1' doesn't exist").arg(*ivConfigFilepath);
+        throw TranslationException(std::move(errorMsg));
     }
 
     ivm::IVPropertyTemplateConfig *ivConfig = ivm::IVPropertyTemplateConfig::instance();

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 OPENGEODE=$HOME/.local/bin/opengeode
 
@@ -7,12 +9,14 @@ OPENGEODE=$HOME/.local/bin/opengeode
 DIFF="diff -w -B"
 TEST_OUTPUT_DIR=output
 
+echo "Running SedsConverter test: ${0##*/}'"
+
 # Setup output dir
 rm -r -f $TEST_OUTPUT_DIR
 mkdir -p $TEST_OUTPUT_DIR
 # Translate
 $SEDS_CONVERTER --from SEDS --to SDL --aux-models ASN.1,InterfaceView --skip-validation -i resources/test_factorial.xml \
-  --out $TEST_OUTPUT_DIR/factorial.xml --iv-config config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/ \
+  --out $TEST_OUTPUT_DIR/factorial.xml --iv-config resources/config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/ \
   --sdl-filepath-prefix $TEST_OUTPUT_DIR/
 # Setup additional data
 cp resources/test_factorial.system_structure output/system_structure.pr

@@ -56,6 +56,9 @@ void SedsXmlExporter::exportModel(const Model *const model, const Options &optio
         throw IncorrectModelException(ModelType::Seds, model->modelType());
     }
 
+    // Set global hash seed, so that the output is deterministic
+    qSetGlobalQHashSeed(0);
+
     auto sedsDocument = createSedsXmlDocument();
 
     // clang-format off
@@ -104,12 +107,6 @@ void SedsXmlExporter::exportPackage(const Package &package, QDomElement &parentE
     const auto &packageName = package.nameStr();
     packageElement.setAttribute(QStringLiteral("name"), packageName);
 
-    if (package.components().size() > 0) {
-        ComponentExporter::exportComponents(package.components(), packageElement, sedsDocument);
-    }
-
-    parentElement.appendChild(std::move(packageElement));
-
     if (package.dataTypes().size() > 0) {
         auto dataTypeSet = sedsDocument.createElement(QStringLiteral("DataTypeSet"));
         for (const auto &dataType : package.dataTypes()) {
@@ -117,6 +114,12 @@ void SedsXmlExporter::exportPackage(const Package &package, QDomElement &parentE
         }
         packageElement.appendChild(std::move(dataTypeSet));
     }
+
+    if (package.components().size() > 0) {
+        ComponentExporter::exportComponents(package.components(), packageElement, sedsDocument);
+    }
+
+    parentElement.appendChild(std::move(packageElement));
 }
 
 QDomDocument SedsXmlExporter::createSedsXmlDocument()
@@ -131,8 +134,6 @@ QDomDocument SedsXmlExporter::createSedsXmlDocument()
 
 QDomElement SedsXmlExporter::createRootElement(QString rootElementName, QDomDocument &sedsDocument)
 {
-    // Set global hash seed, so that the output is deterministic
-    qSetGlobalQHashSeed(0);
     auto rootElement = sedsDocument.createElement(std::move(rootElementName));
     rootElement.setAttribute("xmlns", m_schemaNsUri);
     rootElement.setAttribute("xmlns:xsi", m_schemaInstanceNsUri);

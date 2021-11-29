@@ -159,6 +159,13 @@ void SedsConverterCLI::addIvInputOptions(Options &options)
     }
 }
 
+void SedsConverterCLI::addIVTranslationOptions(Options &options)
+{
+    if (m_arguments.contains(CommandArg::SedsConverterIvGenerateParentFunctions)) {
+        options.add(IvOptions::generateFunctionsForPackages);
+    }
+}
+
 void SedsConverterCLI::addIvOutputOptions(Options &options)
 {
     if (!m_outputFilepath.isEmpty()) {
@@ -186,6 +193,11 @@ void SedsConverterCLI::addSedsInputOptions(Options &options)
 {
     for (const auto &inputFilepath : getInputFilepaths(ModelType::Seds)) {
         options.add(SedsOptions::inputFilepath, std::move(inputFilepath));
+    }
+
+    if (m_arguments.contains(CommandArg::SedsConverterSedsPreprocessedFilepath)) {
+        options.add(
+                SedsOptions::preprocessedFilepath, m_parser.value(CommandArg::SedsConverterSedsPreprocessedFilepath));
     }
 
     if (m_arguments.contains(CommandArg::SedsConverterSedsSchemaFilepath)) {

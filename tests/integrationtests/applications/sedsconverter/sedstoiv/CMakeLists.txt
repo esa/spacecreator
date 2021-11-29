@@ -14,6 +14,8 @@ target_link_libraries(${TEST_NAME}
 
 add_format_target(${TEST_NAME})
 
+configure_file(resources/config.xml resources/config.xml COPYONLY)
+
 configure_file(resources/xml2dv/function_properties.tmplt resources/xml2dv/function_properties.tmplt COPYONLY)
 configure_file(resources/xml2dv/function_subcomponents.tmplt resources/xml2dv/function_subcomponents.tmplt COPYONLY)
 configure_file(resources/xml2dv/function_with.tmplt resources/xml2dv/function_with.tmplt COPYONLY)

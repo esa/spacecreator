@@ -45,7 +45,7 @@ QString getFileContents(const QString &filename)
 {
     QFile file(filename);
     file.open(QIODevice::ReadOnly);
-    return file.readAll().trimmed();
+    return file.readAll().simplified().trimmed();
 }
 
 void tst_SedsXmlExporter::testExportsInteger()
