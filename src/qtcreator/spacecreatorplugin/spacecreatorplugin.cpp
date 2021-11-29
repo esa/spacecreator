@@ -17,7 +17,6 @@
 
 #include "spacecreatorplugin.h"
 
-#include "actionmanager/command.h"
 #include "context/action/actionsmanager.h"
 #include "conversion/asn1/Asn1Options/options.h"
 #include "dv/dveditorfactory.h"
@@ -60,17 +59,7 @@
 #include <coreplugin/icore.h>
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
-#include <qabstractitemmodel.h>
-#include <qaction.h>
-#include <qboxlayout.h>
-#include <qdebug.h>
 #include <qfiledialog.h>
-#include <qnamespace.h>
-#include <qobject.h>
-#include <qobjectdefs.h>
-#include <qpushbutton.h>
-#include <qstandarditemmodel.h>
-#include <qtreeview.h>
 #include <sedsplugin.h>
 #include <shared/ui/listtreedialog.h>
 
