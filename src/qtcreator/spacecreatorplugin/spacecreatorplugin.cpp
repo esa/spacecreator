@@ -309,9 +309,20 @@ void SpaceCreatorPlugin::exportInterfaceView()
     ldDialog.exec();
 
     QList<QString> *selectedFunctions = ldDialog.selectedItems();
-    qDebug() << "selected functions: ";
-    for (auto &item : *selectedFunctions) {
-        qDebug() << item;
+    if (!selectedFunctions->empty()) {
+        for (auto &item : *selectedFunctions) {
+            qDebug() << "selected function: " << item;
+        }
+
+        QString outputDir = QFileDialog::getExistingDirectory(nullptr, "Select destination directory");
+        qDebug() << "selected directory: " << outputDir;
+
+        // TODO: implementation (take selected functions and export them to a file in a selected directory
+        //       using sedsConverter)
+    } else {
+        qDebug() << "no functions selected to export";
+        throw conversion::exporter::ExportException(tr("No functions selected to export"));
+        // TODO: throw unhandled exception or write a warning visible to user and just return?
     }
 }
 
