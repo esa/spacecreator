@@ -102,37 +102,33 @@ auto SedsPlugin::updateModelWithFunctionNames(QStandardItemModel &model, const Q
 
 auto SedsPlugin::addSedsImportExport() -> void
 {
-    Core::Context allContexts(
-            Core::Constants::C_WELCOME_MODE, Core::Constants::C_EDIT_MODE, Core::Constants::C_DESIGN_MODE);
+    Context allContexts(Core::Constants::C_WELCOME_MODE, Core::Constants::C_EDIT_MODE, Core::Constants::C_DESIGN_MODE);
 
     ActionContainer *const acToolsSeds = createActionContainerInTools(tr("&SEDS"));
 
     const auto ivImportAction = new QAction(tr("Import InterfaceView"), this);
     connect(ivImportAction, &QAction::triggered, [=]() { this->importInterfaceView(); });
-    Core::Command *ivImport = Core::ActionManager::registerAction(ivImportAction, Constants::IV_IMPORT_ID, allContexts);
+    Command *const ivImport = ActionManager::registerAction(ivImportAction, Constants::IV_IMPORT_ID, allContexts);
     acToolsSeds->addAction(ivImport);
 
     const auto sdlImportAction = new QAction(tr("Import SDL"), this);
     connect(sdlImportAction, &QAction::triggered, [=]() { this->importSdl(); });
-    Core::Command *sdlImport =
-            Core::ActionManager::registerAction(sdlImportAction, Constants::SDL_IMPORT_ID, allContexts);
+    Command *const sdlImport = ActionManager::registerAction(sdlImportAction, Constants::SDL_IMPORT_ID, allContexts);
     acToolsSeds->addAction(sdlImport);
 
     const auto asn1ImportAction = new QAction(tr("Import ASN.1"), this);
     connect(asn1ImportAction, &QAction::triggered, [=]() { this->importAsn1(); });
-    Core::Command *asn1Import =
-            Core::ActionManager::registerAction(asn1ImportAction, Constants::ASN1_IMPORT_ID, allContexts);
+    Command *const asn1Import = ActionManager::registerAction(asn1ImportAction, Constants::ASN1_IMPORT_ID, allContexts);
     acToolsSeds->addAction(asn1Import);
 
     const auto ivExportAction = new QAction(tr("Export InterfaceView"), this);
     connect(ivExportAction, &QAction::triggered, [=]() { this->exportInterfaceView(); });
-    Core::Command *ivExport = Core::ActionManager::registerAction(ivExportAction, Constants::IV_EXPORT_ID, allContexts);
+    Command *const ivExport = ActionManager::registerAction(ivExportAction, Constants::IV_EXPORT_ID, allContexts);
     acToolsSeds->addAction(ivExport);
 
     const auto asn1ExportAction = new QAction(tr("Export ASN.1"), this);
     connect(asn1ExportAction, &QAction::triggered, [=]() { this->exportAsn1(); });
-    Core::Command *asn1Export =
-            Core::ActionManager::registerAction(asn1ExportAction, Constants::ASN1_EXPORT_ID, allContexts);
+    Command *const asn1Export = ActionManager::registerAction(asn1ExportAction, Constants::ASN1_EXPORT_ID, allContexts);
     acToolsSeds->addAction(asn1Export);
 }
 
@@ -170,14 +166,14 @@ auto SedsPlugin::importSdl() -> void
     const QString inputFilePath =
             QFileDialog::getOpenFileName(nullptr, "Select SEDS file to import SDL from...", QString(), tr("*.xml"));
     if (inputFilePath.isEmpty()) {
-        Core::MessageManager::write(msgInfo.arg(fileToImportNotSelected));
+        MessageManager::write(msgInfo.arg(fileToImportNotSelected));
         return;
     }
 
     const QString spacecreatorBuildDirEnvVar = "SPACECREATOR_BUILD_DIR";
     const QString spacecreatorBuildDir = QProcessEnvironment::systemEnvironment().value(spacecreatorBuildDirEnvVar);
     if (spacecreatorBuildDir.isEmpty()) {
-        Core::MessageManager::write(msgError.arg(spacecreatorDirEnvVarNotRead));
+        MessageManager::write(msgError.arg(spacecreatorDirEnvVarNotRead));
         return;
     }
     const QString sedsConverterPath = QString("%1/bin/sedsconverter").arg(spacecreatorBuildDir);
@@ -194,7 +190,7 @@ auto SedsPlugin::importSdl() -> void
     QProcess sedsConverterProcess;
     sedsConverterProcess.start(sedsConverterPath, arguments);
     if (!sedsConverterProcess.waitForStarted()) {
-        Core::MessageManager::write(msgError.arg(sedsconverterNotStarted));
+        MessageManager::write(msgError.arg(sedsconverterNotStarted));
         return;
     } else if (sedsConverterProcess.waitForFinished()) {
         const QByteArray sedsConverterOutput =
@@ -215,7 +211,7 @@ auto SedsPlugin::importAsn1() -> void
 
 auto SedsPlugin::exportInterfaceView() -> void
 {
-    auto *const currentDocument = Core::EditorManager::currentDocument();
+    auto *const currentDocument = EditorManager::currentDocument();
     auto *const currentIvDocument = static_cast<IVEditorDocument *>(currentDocument);
     if (currentIvDocument == nullptr) {
         qWarning() << "InterfaceView file not selected";
