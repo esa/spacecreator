@@ -164,26 +164,7 @@ auto SedsPlugin::importAsn1() -> void
     const QString inputFilePath = QFileDialog::getOpenFileName(
             nullptr, "Select SEDS file to import ASN.1 and ACN from...", QString(), tr("*.xml"));
 
-    conversion::Options options;
-    options.add(conversion::asn1::Asn1Options::inputFilepath, inputFilePath);
-
-    conversion::asn1::importer::Asn1Importer asn1importer;
-    try {
-        const auto model = asn1importer.importModel(options);
-        if (model) {
-            const auto *asn1Model = dynamic_cast<Asn1Acn::Asn1Model *>(model.get());
-            if (asn1Model) {
-                const auto &files = asn1Model->data();
-                if (files.size() != 1) {
-                    qWarning() << "No data in imported file";
-                    return;
-                }
-                // TODO: implementation
-            }
-        }
-    } catch (conversion::importer::ImportException &ex) {
-        // TODO: Report warning in QTC IF
-    }
+    // TODO: implementation
 }
 
 auto SedsPlugin::exportInterfaceView() -> void
