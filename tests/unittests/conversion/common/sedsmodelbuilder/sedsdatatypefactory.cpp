@@ -116,6 +116,7 @@ FloatDataType SedsDataTypeFactory::createFloat(QString name)
 IntegerDataType SedsDataTypeFactory::createInteger(QString name)
 {
     MinMaxRange range;
+    range.setType(RangeType::InclusiveMinInclusiveMax);
     range.setMin(QString("-42"));
     range.setMax(QString("42"));
 

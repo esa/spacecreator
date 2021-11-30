@@ -5,7 +5,7 @@
    <IntegerDataType name="TestInteger">
     <IntegerDataEncoding byteOrder="bigEndian" sizeInBits="16" encoding="twosComplement"/>
     <Range>
-     <MinMaxRange min="-42" max="42" rangeType="exclusiveMinExclusiveMax"/>
+     <MinMaxRange min="-42" max="42" rangeType="inclusiveMinInclusiveMax"/>
     </Range>
    </IntegerDataType>
   </DataTypeSet>
