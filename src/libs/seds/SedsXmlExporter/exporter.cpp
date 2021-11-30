@@ -25,7 +25,6 @@
 #include <QDomDocument>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/overloaded.h>
-#include <iostream>
 #include <seds/SedsModel/sedsmodel.h>
 #include <seds/SedsOptions/options.h>
 
@@ -71,16 +70,13 @@ void SedsXmlExporter::exportModel(const Model *const model, const Options &optio
     }, sedsModel->data());
     // clang-format on
 
-    const QString &sedsDocumentContent = sedsDocument.toString();
-    std::cerr << sedsDocumentContent.toStdString();
-
     const auto outputFilePath = options.value(SedsOptions::outputFilepath);
     if (!outputFilePath) {
         throw MissingOutputFilenameException(ModelType::Seds);
     }
 
     QSaveFile outputFile(*outputFilePath);
-    writeAndCommit(outputFile, sedsDocumentContent);
+    writeAndCommit(outputFile, sedsDocument.toString());
 }
 
 void SedsXmlExporter::exportPackageFile(const PackageFile &packageFile, QDomDocument &sedsDocument)
