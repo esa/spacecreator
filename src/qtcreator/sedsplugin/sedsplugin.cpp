@@ -49,6 +49,7 @@
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
 #include <limits>
+#include <messagemanager.h>
 #include <shared/ui/listtreedialog.h>
 
 using namespace Core;
@@ -155,21 +156,37 @@ auto SedsPlugin::importInterfaceView() -> void
     // TODO: implementation
 }
 
+namespace {
+const QString msgInfo = "INFO: %1";
+const QString msgWarning = "WARNING: %1";
+const QString msgError = "ERROR: %1";
+const QString fileToImportNotSelected = "file to import not selected";
+const QString spacecreatorDirEnvVarNotRead = "SPACECREATOR_BUILD_DIR environment variable could not be read";
+const QString sedsconverterNotStarted = "SedsConverter could not be started";
+}
+
 auto SedsPlugin::importSdl() -> void
 {
     const QString inputFilePath =
             QFileDialog::getOpenFileName(nullptr, "Select SEDS file to import SDL from...", QString(), tr("*.xml"));
-    // TODO: implementation
+    if (inputFilePath.isEmpty()) {
+        Core::MessageManager::write(msgInfo.arg(fileToImportNotSelected));
+        return;
+    }
 
-    const QString sedsConverterPath =
-            QString("%1/bin/sedsconverter")
-                    .arg(QProcessEnvironment::systemEnvironment().value("SPACECREATOR_BUILD_DIR"));
+    const QString spacecreatorBuildDirEnvVar = "SPACECREATOR_BUILD_DIR";
+    const QString spacecreatorBuildDir = QProcessEnvironment::systemEnvironment().value(spacecreatorBuildDirEnvVar);
+    if (spacecreatorBuildDir.isEmpty()) {
+        Core::MessageManager::write(msgError.arg(spacecreatorDirEnvVarNotRead));
+        return;
+    }
+    const QString sedsConverterPath = QString("%1/bin/sedsconverter").arg(spacecreatorBuildDir);
 
     QStringList arguments;
     // clang-format off
     arguments << "--from" << "SEDS";
     arguments << "--to" << "SDL";
-    arguments << "--skip-validation"; // remove this line
+    arguments << "--skip-validation"; // TODO: remove this line?
     arguments << "-i" << inputFilePath;
     arguments << "--sdl-filepath-prefix" << "work/sdl/";
     // clang-format on
@@ -177,7 +194,8 @@ auto SedsPlugin::importSdl() -> void
     QProcess sedsConverterProcess;
     sedsConverterProcess.start(sedsConverterPath, arguments);
     if (!sedsConverterProcess.waitForStarted()) {
-        qDebug() << "SedsConverter could not not started";
+        Core::MessageManager::write(msgError.arg(sedsconverterNotStarted));
+        return;
     } else if (sedsConverterProcess.waitForFinished()) {
         const QByteArray sedsConverterOutput =
                 sedsConverterProcess.read(512 * 1024 * 1024); // read up to 512 MB of text output
