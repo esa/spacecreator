@@ -98,6 +98,9 @@ auto DataTypeExporter::exportBooleanDataType(
         case FalseValue::NonZeroIsFalse:
             encodingElement.setAttribute(QStringLiteral("falseValue"), QStringLiteral("nonZeroIsFalse"));
             break;
+        default:
+            throw UnhandledValueException("FalseValue");
+            break;
         }
         typeElement.appendChild(std::move(encodingElement));
     }
@@ -135,6 +138,9 @@ auto DataTypeExporter::exportEnumeratedDataType(
         case ByteOrder::LittleEndian:
             encodingElement.setAttribute(QStringLiteral("byteOrder"), QStringLiteral("littleEndian"));
             break;
+        default:
+            throw UnhandledValueException("ByteOrder");
+            break;
         }
 
         typeElement.appendChild(std::move(encodingElement));
@@ -171,6 +177,9 @@ auto DataTypeExporter::exportFloatDataType(
         case ByteOrder::LittleEndian:
             encodingElement.setAttribute(QStringLiteral("byteOrder"), QStringLiteral("littleEndian"));
             break;
+        default:
+            throw UnhandledValueException("ByteOrder");
+            break;
         }
 
         typeElement.appendChild(std::move(encodingElement));
@@ -206,6 +215,9 @@ auto DataTypeExporter::exportIntegerDataType(
             break;
         case ByteOrder::LittleEndian:
             encodingElement.setAttribute(QStringLiteral("byteOrder"), QStringLiteral("littleEndian"));
+            break;
+        default:
+            throw UnhandledValueException("ByteOrder");
             break;
         }
 
@@ -290,6 +302,9 @@ auto DataTypeExporter::exportCoreIntegerEncoding(model::CoreIntegerEncoding enco
     case CoreIntegerEncoding::PackedBcd:
         setElement.setAttribute(QStringLiteral("encoding"), QStringLiteral("packedBCD"));
         return;
+    default:
+        throw UnhandledValueException("CoreIntegerEncoding");
+        break;
     }
     throw UnsupportedElementException("CoreIntegerEncoding");
 }
@@ -336,6 +351,9 @@ auto DataTypeExporter::exportMinMaxRange(
         minMaxRangeElement.setAttribute(QStringLiteral("rangeType"), QStringLiteral("atMost"));
         minMaxRangeElement.setAttribute(QStringLiteral("max"), range.max()->value());
         break;
+    default:
+        throw UnhandledValueException("RangeType");
+        break;
     }
 
     rangeElement.appendChild(std::move(minMaxRangeElement));
@@ -361,6 +379,9 @@ auto DataTypeExporter::exportCoreEncodingAndPrecision(model::CoreEncodingAndPrec
     case CoreEncodingAndPrecision::MilstdExtended:
         setElement.setAttribute(QStringLiteral("encodingAndPrecision"), QStringLiteral("MILSTD_1750A_extended"));
         return;
+    default:
+        throw UnhandledValueException("CoreEncodingAndPrecision");
+        break;
     }
     throw UnsupportedElementException("CoreEncodingAndPrecision");
 }
@@ -374,6 +395,9 @@ auto DataTypeExporter::exportCoreStringEncoding(model::CoreStringEncoding encodi
     case CoreStringEncoding::Utf8:
         setElement.setAttribute(QStringLiteral("encoding"), QStringLiteral("UTF-8"));
         return;
+    default:
+        throw UnhandledValueException("CoreStringEncoding");
+        break;
     }
     throw UnsupportedElementException("CoreStringEncoding");
 }
@@ -392,6 +416,9 @@ auto DataTypeExporter::exportFloatPrecisionRange(
         break;
     case FloatPrecisionRange::Quad:
         precisionRangeElement.appendChild(sedsDocument.createTextNode((QStringLiteral("quad"))));
+        break;
+    default:
+        throw UnhandledValueException("FloatPrecisionRange");
         break;
     }
 
