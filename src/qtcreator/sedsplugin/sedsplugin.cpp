@@ -25,6 +25,7 @@
 #include "../spacecreatorplugin/iv/ivqtceditor.h"
 #include "context/action/actionsmanager.h"
 #include "conversion/asn1/Asn1Options/options.h"
+#include "coreconstants.h"
 #include "export/exceptions.h"
 #include "import/exceptions.h"
 #include "interfacedocument.h"
@@ -39,6 +40,7 @@
 #include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
+#include <QProcess>
 #include <asn1library/asn1/asn1model.h>
 #include <conversion/asn1/Asn1Importer/importer.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
@@ -46,6 +48,7 @@
 #include <coreplugin/icore.h>
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
+#include <limits>
 #include <shared/ui/listtreedialog.h>
 
 using namespace Core;
@@ -157,6 +160,31 @@ auto SedsPlugin::importSdl() -> void
     const QString inputFilePath =
             QFileDialog::getOpenFileName(nullptr, "Select SEDS file to import SDL from...", QString(), tr("*.xml"));
     // TODO: implementation
+
+    const QString sedsConverterPath =
+            QString("%1/bin/sedsconverter")
+                    .arg(QProcessEnvironment::systemEnvironment().value("SPACECREATOR_BUILD_DIR"));
+
+    QStringList arguments;
+    // clang-format off
+    arguments << "--from" << "SEDS";
+    arguments << "--to" << "SDL";
+    arguments << "--skip-validation"; // remove this line
+    arguments << "-i" << inputFilePath;
+    arguments << "--sdl-filepath-prefix" << "work/sdl/";
+    // clang-format on
+
+    QProcess sedsConverterProcess;
+    sedsConverterProcess.start(sedsConverterPath, arguments);
+    if (!sedsConverterProcess.waitForStarted()) {
+        qDebug() << "SedsConverter could not not started";
+    } else if (sedsConverterProcess.waitForFinished()) {
+        const QByteArray sedsConverterOutput =
+                sedsConverterProcess.read(512 * 1024 * 1024); // read up to 512 MB of text output
+        qDebug() << "sedsConverter output: " << QString::fromStdString(sedsConverterOutput.toStdString());
+        qDebug() << "stderr: " << sedsConverterProcess.readAllStandardError();
+        qDebug() << "stdout: " << sedsConverterProcess.readAllStandardOutput();
+    }
 }
 
 auto SedsPlugin::importAsn1() -> void
@@ -237,5 +265,4 @@ auto SedsPlugin::exportAsn1() -> void
         // TODO: implementation
     }
 }
-
 }
