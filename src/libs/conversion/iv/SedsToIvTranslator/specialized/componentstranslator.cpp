@@ -29,9 +29,9 @@
 #include <seds/SedsModel/package/package.h>
 
 using conversion::Escaper;
+using conversion::UnhandledValueException;
 using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredInterfaceException;
-using conversion::translator::UnhandledValueException;
 
 namespace conversion::iv::translator {
 

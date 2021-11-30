@@ -26,7 +26,7 @@
 #include <seds/SedsModel/interfaces/interfacedeclaration.h>
 
 using conversion::Escaper;
-using conversion::translator::UnhandledValueException;
+using conversion::UnhandledValueException;
 
 namespace conversion::iv::translator {
 

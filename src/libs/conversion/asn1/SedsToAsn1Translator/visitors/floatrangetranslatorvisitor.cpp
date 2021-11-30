@@ -26,8 +26,8 @@
 #include <seds/SedsModel/types/ranges/minmaxrange.h>
 
 using Asn1Acn::RealValue;
-using conversion::translator::UnhandledValueException;
-using conversion::translator::UnsupportedValueException;
+using conversion::UnhandledValueException;
+using conversion::UnsupportedValueException;
 using seds::model::FloatPrecisionRange;
 using seds::model::MinMaxRange;
 

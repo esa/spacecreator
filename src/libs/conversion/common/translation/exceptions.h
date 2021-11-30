@@ -113,35 +113,6 @@ public:
 };
 
 /**
- * @brief   Exception thrown when translator encounters unhandled value while handling enum values
- */
-class UnhandledValueException : public TranslationException
-{
-public:
-    /**
-     * @brief   Constructor
-     *
-     * @param   enumName        Name of the enum
-     */
-    explicit UnhandledValueException(const QString &enumName);
-};
-
-/**
- * @brief   Exception thrown when translator encounters unsupported value while handling enum values
- */
-class UnsupportedValueException : public TranslationException
-{
-public:
-    /**
-     * @brief   Constructor
-     *
-     * @param   enumName        Name of the enum
-     * @param   valueTypeName   Name of the unsupported value type
-     */
-    explicit UnsupportedValueException(const QString &enumName, const QString &valueTypeName);
-};
-
-/**
  * @brief   Thrown when SEDS references a Function which is not found in the InterfaceView
  */
 class MissingInterfaceViewFunctionException : public TranslationException

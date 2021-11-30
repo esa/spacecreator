@@ -45,10 +45,10 @@
 #include <seds/SedsModel/package/package.h>
 
 using conversion::Escaper;
+using conversion::UnhandledValueException;
+using conversion::UnsupportedValueException;
 using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::TranslationException;
-using conversion::translator::UnhandledValueException;
-using conversion::translator::UnsupportedValueException;
 using seds::model::ArrayDataType;
 using seds::model::BinaryDataType;
 using seds::model::BooleanDataType;

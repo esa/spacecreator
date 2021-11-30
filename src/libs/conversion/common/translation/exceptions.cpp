@@ -53,17 +53,6 @@ MissingAsn1TypeDefinitionException::MissingAsn1TypeDefinitionException(const QSt
 {
 }
 
-UnhandledValueException::UnhandledValueException(const QString &enumName)
-    : TranslationException(QString("Translator encountered unhandled value %1").arg(enumName))
-{
-}
-
-UnsupportedValueException::UnsupportedValueException(const QString &enumName, const QString &valueTypeName)
-    : TranslationException(
-              QString("Translator encountered unsupported value %1 in %2").arg(valueTypeName).arg(enumName))
-{
-}
-
 MissingInterfaceViewFunctionException::MissingInterfaceViewFunctionException(const QString &functionName)
     : TranslationException(QString("Function %1 not found in the InterfaceView").arg(functionName))
 {

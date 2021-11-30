@@ -73,8 +73,8 @@ using Asn1Acn::Types::Sequence;
 using Asn1Acn::Types::SequenceOf;
 using Asn1Acn::Types::UserdefinedType;
 
+using conversion::UnsupportedValueException;
 using conversion::translator::UnsupportedDataTypeException;
-using conversion::translator::UnsupportedValueException;
 
 namespace conversion::seds::translator {
 

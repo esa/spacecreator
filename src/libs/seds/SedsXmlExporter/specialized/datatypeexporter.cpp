@@ -23,6 +23,7 @@
 #include <conversion/common/overloaded.h>
 
 using namespace seds::model;
+using conversion::UnhandledValueException;
 using conversion::exporter::UnsupportedElementException;
 
 namespace seds::exporter {

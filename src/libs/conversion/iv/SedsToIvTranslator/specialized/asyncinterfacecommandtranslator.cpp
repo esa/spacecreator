@@ -33,10 +33,10 @@
 #include <shared/parameter.h>
 
 using conversion::Escaper;
+using conversion::UnhandledValueException;
 using conversion::translator::MissingGenericTypeMappingException;
 using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredDataTypeException;
-using conversion::translator::UnhandledValueException;
 
 namespace conversion::iv::translator {
 
