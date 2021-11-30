@@ -17,12 +17,12 @@ mkdir $TEST_OUTPUT_DIR
 
 # Translate
 $SEDS_CONVERTER --from InterfaceView --to SEDS -i resources/test_sporadic_interface.xml \
-    --out $TEST_OUTPUT_DIR/test_sporadic_interface.seds --iv-config resources/config.xml
+    --out $TEST_OUTPUT_DIR/test_sporadic_interface.xml --iv-config resources/config.xml
 
 cd $TEST_OUTPUT_DIR
 
 cp ../resources/*.xsd . \
-  && $XML_VALIDATOR test_sporadic_interface.seds \
-  && $DIFF test_sporadic_interface.seds ../resources/test_sporadic_interface.output \
+  && $XML_VALIDATOR test_sporadic_interface.xml \
+  && $DIFF test_sporadic_interface.xml ../resources/test_sporadic_interface.output \
   && cd .. \
   && rm -r -f $TEST_OUTPUT_DIR

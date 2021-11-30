@@ -17,12 +17,12 @@ mkdir $TEST_OUTPUT_DIR
 
 # Translate
 $SEDS_CONVERTER --from InterfaceView --to SEDS -i resources/test_pinger.xml \
-    --out $TEST_OUTPUT_DIR/test_pinger.seds --iv-config resources/config.xml
+    --out $TEST_OUTPUT_DIR/test_pinger.xml --iv-config resources/config.xml
 
 cd $TEST_OUTPUT_DIR
 
 cp ../resources/*.xsd . \
-  && $XML_VALIDATOR test_pinger.seds \
-  && $DIFF test_pinger.seds ../resources/test_pinger.output \
+  && $XML_VALIDATOR test_pinger.xml \
+  && $DIFF test_pinger.xml ../resources/test_pinger.output \
   && cd .. \
   && rm -r -f $TEST_OUTPUT_DIR
