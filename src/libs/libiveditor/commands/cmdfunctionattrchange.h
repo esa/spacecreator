@@ -50,11 +50,10 @@ Q_SIGNALS:
 
 protected:
     QPointer<ivm::IVFunction> m_entity;
-
-private:
     const QVariantHash m_newAttrs;
     const QVariantHash m_oldAttrs;
 
+private:
     QHash<shared::Id, QVector<QUndoCommand *>> m_cmdSet;
     QHash<shared::Id, QVector<QUndoCommand *>> m_cmdUnset;
 

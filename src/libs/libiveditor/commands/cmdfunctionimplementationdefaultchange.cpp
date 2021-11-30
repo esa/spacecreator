@@ -29,6 +29,12 @@
 namespace ive {
 namespace cmd {
 
+static inline QString languageToken()
+{
+    static auto token = ivm::meta::Props::token(ivm::meta::Props::Token::language);
+    return token;
+}
+
 static inline QString implToken()
 {
     static auto token = ivm::meta::Props::token(ivm::meta::Props::Token::default_implementation);
@@ -38,8 +44,7 @@ static inline QString implToken()
 static inline QList<EntityAttribute> attributes(const QString &defaultName, const QString &language)
 {
     return { EntityAttribute { implToken(), defaultName, EntityAttribute::Type::Attribute },
-        EntityAttribute { ivm::meta::Props::token(ivm::meta::Props::Token::language), language,
-                EntityAttribute::Type::Attribute } };
+        EntityAttribute { languageToken(), language, EntityAttribute::Type::Attribute } };
 }
 
 CmdFunctionImplementationDefaultChange::CmdFunctionImplementationDefaultChange(
@@ -50,25 +55,44 @@ CmdFunctionImplementationDefaultChange::CmdFunctionImplementationDefaultChange(
     Q_ASSERT(defaultName != function->defaultImplementation());
     if (defaultName == function->defaultImplementation()) {
         setObsolete(true);
+    } else {
+        const QList<EntityAttribute> &impls = function->implementations();
+        auto it = std::find_if(impls.cbegin(), impls.cend(),
+                [defaultName = function->defaultImplementation()](
+                        const EntityAttribute &impl) { return impl.name() == defaultName; });
+        if (it != impls.cend()) {
+            shared::moveDefaultDirectories(function->defaultImplementation(), projectPath, function->title().toLower(),
+                    it->value().toString());
+        }
     }
 }
 
 void CmdFunctionImplementationDefaultChange::redo()
 {
-    const QString currentImplName = m_entity->entityAttributeValue<QString>(implToken());
-    CmdFunctionAttrChange::redo();
-    const QString implName = m_entity->entityAttributeValue<QString>(implToken());
+    const QFileInfo fileInfo(oldCurrentImplementationPath());
+    if (fileInfo.isSymLink()) {
+        QFile::remove(fileInfo.absoluteFilePath());
+    } else if (fileInfo.exists()) {
+        shared::copyDir(fileInfo.absoluteFilePath(), oldImplementationPath(), shared::FileCopyingMode::Overwrite);
+        QDir(fileInfo.absoluteFilePath()).removeRecursively();
+    }
 
-    moveDirectories(currentImplName, implName, m_projectPath, m_entity->title().toLower());
+    shared::ensureDirExists(newImplementationPath());
+    if (QFile::link(newImplementationPath(), newCurrentImplementationPath())) {
+        CmdFunctionAttrChange::redo();
+    }
 }
 
 void CmdFunctionImplementationDefaultChange::undo()
 {
-    const QString currentImplName = m_entity->entityAttributeValue<QString>(implToken());
-    CmdFunctionAttrChange::undo();
-    const QString implName = m_entity->entityAttributeValue<QString>(implToken());
+    const QFileInfo fileInfo(newCurrentImplementationPath());
+    if (fileInfo.isSymLink()) {
+        QFile::remove(fileInfo.absoluteFilePath());
+    }
 
-    moveDirectories(currentImplName, implName, m_projectPath, m_entity->title().toLower());
+    if (QFile::link(oldImplementationPath(), oldCurrentImplementationPath())) {
+        CmdFunctionAttrChange::undo();
+    }
 }
 
 int CmdFunctionImplementationDefaultChange::id() const
@@ -76,30 +100,38 @@ int CmdFunctionImplementationDefaultChange::id() const
     return ChangeFunctionDefaultImplementation;
 }
 
-void CmdFunctionImplementationDefaultChange::moveDirectories(const QString &currentImplName,
-        const QString &nextImplName, const QString &projectPath, const QString &functionName)
+QString CmdFunctionImplementationDefaultChange::currentImplementationPath(const QString &language) const
 {
-    const QString kDefaultImplPath { projectPath + QDir::separator() + shared::kRootImplementationPath
-        + QDir::separator() + functionName };
-    const QString kCommonPathTemplate { kDefaultImplPath + QDir::separator() + shared::kNonCurrentImplementationPath };
+    return m_projectPath + QDir::separator() + shared::kRootImplementationPath + QDir::separator()
+            + m_entity->title().toLower() + QDir::separator() + language;
+}
 
-    const QString currentImplDestPath { kCommonPathTemplate + QDir::separator() + currentImplName };
-    if (shared::ensureDirExists(currentImplDestPath)) {
-        const QDir dir { kDefaultImplPath };
-        const QStringList subfolders = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-        for (const QString &dirName : subfolders) {
-            if (dirName != shared::kNonCurrentImplementationPath) {
-                const QString subfolderPath = dir.filePath(dirName);
-                shared::copyDir(subfolderPath, currentImplDestPath + QDir::separator() + dirName,
-                        shared::FileCopyingMode::Overwrite);
-                QDir(subfolderPath).removeRecursively();
-            }
-        }
-    }
+QString CmdFunctionImplementationDefaultChange::newCurrentImplementationPath() const
+{
+    return currentImplementationPath(m_newAttrs.value(languageToken()).toString());
+}
+QString CmdFunctionImplementationDefaultChange::oldCurrentImplementationPath() const
+{
+    return currentImplementationPath(m_oldAttrs.value(languageToken()).toString());
+}
 
-    const QString nextImplSourcePath { kCommonPathTemplate + QDir::separator() + nextImplName };
-    shared::copyDir(nextImplSourcePath, kDefaultImplPath, shared::FileCopyingMode::Overwrite);
-    QDir(nextImplSourcePath).removeRecursively();
+QString CmdFunctionImplementationDefaultChange::implementationPath(
+        const QString &language, const QString &implName) const
+{
+    const QString defaultImplPath { m_projectPath + QDir::separator() + shared::kRootImplementationPath
+        + QDir::separator() + m_entity->title().toLower() };
+    return defaultImplPath + QDir::separator() + shared::kNonCurrentImplementationPath + QDir::separator() + implName
+            + QDir::separator() + language;
+}
+
+QString CmdFunctionImplementationDefaultChange::newImplementationPath() const
+{
+    return implementationPath(m_newAttrs.value(languageToken()).toString(), m_newAttrs.value(implToken()).toString());
+}
+
+QString CmdFunctionImplementationDefaultChange::oldImplementationPath() const
+{
+    return implementationPath(m_oldAttrs.value(languageToken()).toString(), m_oldAttrs.value(implToken()).toString());
 }
 
 } // namespace cmd

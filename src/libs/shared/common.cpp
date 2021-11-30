@@ -276,4 +276,35 @@ QString joinNonEmpty(const QStringList &values, const QString &lineBreak)
     return filtered.join(lineBreak);
 }
 
+bool moveDefaultDirectories(const QString &currentImplName, const QString &projectPath, const QString &functionName,
+        const QString &language)
+{
+    const QString defaultImplPath { projectPath + QDir::separator() + shared::kRootImplementationPath
+        + QDir::separator() + functionName };
+    const QString commonImplPath { defaultImplPath + QDir::separator() + shared::kNonCurrentImplementationPath
+        + QDir::separator() + currentImplName };
+
+    bool result = true;
+    if (shared::ensureDirExists(commonImplPath)) {
+        QDir dir { defaultImplPath };
+        const QStringList subfolders = dir.entryList(QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+        for (const QString &dirName : subfolders) {
+            if (dirName != shared::kNonCurrentImplementationPath) {
+                const QString subfolderPath = dir.filePath(dirName);
+                shared::copyDir(subfolderPath, commonImplPath + QDir::separator() + dirName,
+                        shared::FileCopyingMode::Overwrite);
+                result &= QDir(subfolderPath).removeRecursively();
+            }
+        }
+    }
+    const QFileInfo link { defaultImplPath + QDir::separator() + language };
+    const QString linkTargetPath = commonImplPath + QDir::separator() + language;
+    if (link.isSymLink()) {
+        result &= link.symLinkTarget() == linkTargetPath;
+    } else {
+        result &= QFile::link(linkTargetPath, link.absoluteFilePath());
+    }
+    return result;
+}
+
 }

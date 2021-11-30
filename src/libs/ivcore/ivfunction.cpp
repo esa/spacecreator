@@ -42,7 +42,7 @@ IVFunction::IVFunction(QObject *parent, const shared::Id &id)
 {
 }
 
-IVFunction::~IVFunction() { }
+IVFunction::~IVFunction() {}
 
 bool IVFunction::postInit()
 {
@@ -162,6 +162,11 @@ void IVFunction::removeImplementation(int idx)
 void IVFunction::setDefaultImplementation(const QString &name)
 {
     setEntityAttribute(meta::Props::token(meta::Props::Token::default_implementation), name);
+    auto it = std::find_if(d->m_implementations.cbegin(), d->m_implementations.cend(),
+            [&name](const EntityAttribute &impl) { return impl.name() == name; });
+    if (it != d->m_implementations.cend()) {
+        setEntityAttribute(meta::Props::token(meta::Props::Token::language), it->value());
+    }
 }
 
 QString IVFunction::defaultImplementation() const
@@ -172,7 +177,7 @@ QString IVFunction::defaultImplementation() const
 bool IVFunction::isPseudoFunction() const
 {
     /// @todo update to multi language support
-    return entityAttributeValue("language").toString() == "Pseudo function";
+    return entityAttributeValue(meta::Props::token(meta::Props::Token::language)).toString() == "Pseudo function";
 }
 
 void IVFunction::reflectAttrs(const EntityAttributes &attributes)

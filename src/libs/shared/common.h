@@ -180,6 +180,8 @@ QString uniteNames(const QVector<Type> &collection, const QString &prefix)
     return line.isEmpty() ? QString() : QString("<b>%1</b>%2").arg(prefix, line);
 }
 
+bool moveDefaultDirectories(const QString &currentImplName, const QString &projectPath, const QString &functionName, const QString &language);
+
 }
 
 Q_DECLARE_METATYPE(shared::Id)
