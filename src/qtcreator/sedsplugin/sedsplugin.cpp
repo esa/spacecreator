@@ -25,7 +25,6 @@
 #include "../spacecreatorplugin/iv/ivqtceditor.h"
 #include "context/action/actionsmanager.h"
 #include "conversion/asn1/Asn1Options/options.h"
-#include "coreconstants.h"
 #include "export/exceptions.h"
 #include "import/exceptions.h"
 #include "interfacedocument.h"
@@ -48,14 +47,13 @@
 #include <coreplugin/icore.h>
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
-#include <limits>
 #include <messagemanager.h>
 #include <shared/ui/listtreedialog.h>
 
 using namespace Core;
 
 /// messages for General Messages GUI
-namespace {
+namespace GenMsg {
 const QString msgInfo = "INFO: %1";
 const QString msgWarning = "WARNING: %1";
 const QString msgError = "ERROR: %1";
@@ -66,7 +64,7 @@ const QString ivFileNotSelected = "InterfaceView file not selected";
 const QString ivNoFunctionsInIv = "InterfaceView does not contain functions which could be exported";
 const QString ivNoFunctionsSelected = "No functions selected to export";
 const QString conversionFinished = "Conversion finished";
-}
+};
 
 namespace spctr {
 
@@ -171,7 +169,7 @@ auto SedsPlugin::importSdl() -> void
     const QString inputFilePath =
             QFileDialog::getOpenFileName(nullptr, "Select EDS file to import SDL from...", QString(), tr("*.xml"));
     if (inputFilePath.isEmpty()) {
-        MessageManager::write(msgInfo.arg(fileToImportNotSelected));
+        MessageManager::write(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
         return;
     }
 
@@ -182,6 +180,10 @@ auto SedsPlugin::importAsn1() -> void
 {
     const QString inputFilePath = QFileDialog::getOpenFileName(
             nullptr, "Select EDS file to import ASN.1 and ACN from...", QString(), tr("*.xml"));
+    if (inputFilePath.isEmpty()) {
+        MessageManager::write(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
+        return;
+    }
 
     // TODO: implementation
 }
@@ -191,14 +193,14 @@ auto SedsPlugin::exportInterfaceView() -> void
     auto *const currentDocument = EditorManager::currentDocument();
     auto *const currentIvDocument = static_cast<IVEditorDocument *>(currentDocument);
     if (currentIvDocument == nullptr) {
-        MessageManager::write(msgError.arg(ivFileNotSelected));
+        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivFileNotSelected));
         return;
     }
 
     const auto ivEditorCore = currentIvDocument->ivEditorCore();
     const auto ivFunctionsNames = ivEditorCore->ivFunctionsNames();
     if (ivFunctionsNames.empty()) {
-        MessageManager::write(msgError.arg(ivNoFunctionsInIv));
+        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivNoFunctionsInIv));
         return;
     }
 
@@ -235,7 +237,7 @@ auto SedsPlugin::exportInterfaceView() -> void
         qDebug() << "Selected directory: " << outputDir;
         // TODO: implementation
     } else {
-        MessageManager::write(msgError.arg(ivNoFunctionsSelected));
+        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivNoFunctionsSelected));
         return;
     }
 }
@@ -245,7 +247,7 @@ auto SedsPlugin::exportAsn1() -> void
     const auto names = QFileDialog::getOpenFileNames(
             nullptr, "Select ASN.1 and ACN files to export to EDS", QString(), "*.asn *.acn");
     if (names.isEmpty()) {
-        MessageManager::write(msgInfo.arg(fileToImportNotSelected));
+        MessageManager::write(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
         return;
     }
 
