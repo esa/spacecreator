@@ -17,11 +17,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "visitors/datatypetranslatorvisitor.h"
+#include "specialized/datatypetranslatorvisitor.h"
 
-#include "visitors/entrytranslatorvisitor.h"
-#include "visitors/floatrangetranslatorvisitor.h"
-#include "visitors/integerrangetranslatorvisitor.h"
+#include "specialized/dimensiontranslator.h"
+#include "specialized/entrytranslatorvisitor.h"
+#include "specialized/floatrangetranslatorvisitor.h"
+#include "specialized/integerrangetranslatorvisitor.h"
 
 #include <QDebug>
 #include <asn1library/asn1/asnsequencecomponent.h>
@@ -75,22 +76,24 @@ void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
         throw TranslationException("Encountered ArrayDataType without dimensions");
     }
 
+    DimensionTranslator dimensionTranslator(m_asn1Definitions);
+
     if (dimensions.size() == 1) { // Sequence of type with one dimension
         auto type = std::make_unique<Asn1Acn::Types::SequenceOf>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
         translateArrayType(Escaper::escapeAsn1TypeName(sedsType.type().nameStr()), type.get());
-        translateArrayDimension(dimensions[0], type.get());
+        dimensionTranslator.translateDimension(dimensions[0], type.get());
 
         m_asn1Type = std::move(type);
     } else { // Sequence of with many dimensions
         // The outermost 'sequence of' element
         auto rootType = std::make_unique<Asn1Acn::Types::SequenceOf>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
-        translateArrayDimension(dimensions[0], rootType.get());
+        dimensionTranslator.translateDimension(dimensions[0], rootType.get());
 
         // Create 'sequence of' chain
         auto *lastType = rootType.get();
         std::for_each(std::next(dimensions.begin()), dimensions.end(), [&](const auto &dimension) {
             auto subType = std::make_unique<Asn1Acn::Types::SequenceOf>();
-            translateArrayDimension(dimension, subType.get());
+            dimensionTranslator.translateDimension(dimension, subType.get());
             lastType->setItemsType(std::move(subType));
 
             lastType = dynamic_cast<Asn1Acn::Types::SequenceOf *>(lastType->itemsType());
@@ -405,30 +408,6 @@ void DataTypeTranslatorVisitor::translateArrayType(
     asn1ItemType->setType(asn1ReferencedType->clone());
 
     asn1Type->setItemsType(std::move(asn1ItemType));
-}
-
-void DataTypeTranslatorVisitor::translateArrayDimension(
-        const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const
-{
-    if (dimension.size()) {
-        const auto dimensionSize = dimension.size()->value();
-
-        if (dimensionSize > std::numeric_limits<Asn1Acn::IntegerValue::Type>::max()) {
-            const auto message = QString("Dimension size (%1) overflows ASN.1 range").arg(dimensionSize);
-            throw TranslationException(message);
-        }
-
-        auto rangeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
-                { 0, static_cast<Asn1Acn::IntegerValue::Type>(dimensionSize) });
-
-        auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::IntegerValue>>();
-        sizeConstraint->setInnerConstraints(std::move(rangeConstraint));
-        asn1Type->constraints().append(std::move(sizeConstraint));
-    } else if (dimension.indexTypeRef()) {
-        throw TranslationException("Array dimension with index type not yet implemented");
-    } else {
-        throw TranslationException("Array dimension without size nor index type");
-    }
 }
 
 void DataTypeTranslatorVisitor::translateEnumerationList(

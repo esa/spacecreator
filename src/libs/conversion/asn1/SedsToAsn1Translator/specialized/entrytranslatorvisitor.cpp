@@ -17,9 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "visitors/entrytranslatorvisitor.h"
+#include "specialized/entrytranslatorvisitor.h"
 
-#include "visitors/datatypetranslatorvisitor.h"
+#include "specialized/datatypetranslatorvisitor.h"
 
 #include <asn1library/asn1/acnsequencecomponent.h>
 #include <asn1library/asn1/asnsequencecomponent.h>
