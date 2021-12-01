@@ -104,29 +104,29 @@ auto SedsPlugin::addSedsImportExport() -> void
 {
     Context allContexts(Core::Constants::C_WELCOME_MODE, Core::Constants::C_EDIT_MODE, Core::Constants::C_DESIGN_MODE);
 
-    ActionContainer *const acToolsSeds = createActionContainerInTools(tr("&SEDS"));
+    ActionContainer *const acToolsSeds = createActionContainerInTools(tr("&Electronic Data Sheet"));
 
-    const auto ivImportAction = new QAction(tr("Import InterfaceView"), this);
+    const auto ivImportAction = new QAction(tr("Import InterfaceView from EDS"), this);
     connect(ivImportAction, &QAction::triggered, [=]() { this->importInterfaceView(); });
     Command *const ivImport = ActionManager::registerAction(ivImportAction, Constants::IV_IMPORT_ID, allContexts);
     acToolsSeds->addAction(ivImport);
 
-    const auto sdlImportAction = new QAction(tr("Import SDL"), this);
+    const auto sdlImportAction = new QAction(tr("Import SDL from EDS"), this);
     connect(sdlImportAction, &QAction::triggered, [=]() { this->importSdl(); });
     Command *const sdlImport = ActionManager::registerAction(sdlImportAction, Constants::SDL_IMPORT_ID, allContexts);
     acToolsSeds->addAction(sdlImport);
 
-    const auto asn1ImportAction = new QAction(tr("Import ASN.1"), this);
+    const auto asn1ImportAction = new QAction(tr("Import ASN.1 from EDS"), this);
     connect(asn1ImportAction, &QAction::triggered, [=]() { this->importAsn1(); });
     Command *const asn1Import = ActionManager::registerAction(asn1ImportAction, Constants::ASN1_IMPORT_ID, allContexts);
     acToolsSeds->addAction(asn1Import);
 
-    const auto ivExportAction = new QAction(tr("Export InterfaceView"), this);
+    const auto ivExportAction = new QAction(tr("Export InterfaceView to EDS"), this);
     connect(ivExportAction, &QAction::triggered, [=]() { this->exportInterfaceView(); });
     Command *const ivExport = ActionManager::registerAction(ivExportAction, Constants::IV_EXPORT_ID, allContexts);
     acToolsSeds->addAction(ivExport);
 
-    const auto asn1ExportAction = new QAction(tr("Export ASN.1"), this);
+    const auto asn1ExportAction = new QAction(tr("Export ASN.1 to EDS"), this);
     connect(asn1ExportAction, &QAction::triggered, [=]() { this->exportAsn1(); });
     Command *const asn1Export = ActionManager::registerAction(asn1ExportAction, Constants::ASN1_EXPORT_ID, allContexts);
     acToolsSeds->addAction(asn1Export);
@@ -148,7 +148,7 @@ auto SedsPlugin::createActionContainerInTools(const QString &title) -> ActionCon
 auto SedsPlugin::importInterfaceView() -> void
 {
     const QString inputFilePath = QFileDialog::getOpenFileName(
-            nullptr, "Select SEDS file to import InterfaceView from...", QString(), tr("*.xml"));
+            nullptr, "Select EDS file to import InterfaceView from...", QString(), tr("*.xml"));
     // TODO: implementation
 }
 
@@ -164,7 +164,7 @@ const QString sedsconverterNotStarted = "SedsConverter could not be started";
 auto SedsPlugin::importSdl() -> void
 {
     const QString inputFilePath =
-            QFileDialog::getOpenFileName(nullptr, "Select SEDS file to import SDL from...", QString(), tr("*.xml"));
+            QFileDialog::getOpenFileName(nullptr, "Select EDS file to import SDL from...", QString(), tr("*.xml"));
     if (inputFilePath.isEmpty()) {
         MessageManager::write(msgInfo.arg(fileToImportNotSelected));
         return;
@@ -204,7 +204,7 @@ auto SedsPlugin::importSdl() -> void
 auto SedsPlugin::importAsn1() -> void
 {
     const QString inputFilePath = QFileDialog::getOpenFileName(
-            nullptr, "Select SEDS file to import ASN.1 and ACN from...", QString(), tr("*.xml"));
+            nullptr, "Select EDS file to import ASN.1 and ACN from...", QString(), tr("*.xml"));
 
     // TODO: implementation
 }
@@ -230,7 +230,7 @@ auto SedsPlugin::exportInterfaceView() -> void
     QStandardItemModel functionsListModel;
     updateModelWithFunctionNames(functionsListModel, ivFunctionsNames);
 
-    ListTreeDialog ldDialog(&functionsListModel, "Export to SEDS", [&]() {
+    ListTreeDialog ldDialog(&functionsListModel, "Export to EDS", [&]() {
         QStandardItemModel *const model = ldDialog.model();
         const unsigned int rows = model->rowCount();
         const unsigned int cols = model->columnCount();
@@ -269,7 +269,7 @@ auto SedsPlugin::exportInterfaceView() -> void
 auto SedsPlugin::exportAsn1() -> void
 {
     const auto names = QFileDialog::getOpenFileNames(
-            nullptr, "Select ASN.1 and ACN files to export to SEDS", QString(), "*.asn *.acn");
+            nullptr, "Select ASN.1 and ACN files to export to EDS", QString(), "*.asn *.acn");
 
     const auto outputDir = QFileDialog::getExistingDirectory(nullptr, "Select destination directory");
 
