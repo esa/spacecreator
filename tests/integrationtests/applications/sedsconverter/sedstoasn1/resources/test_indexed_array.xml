@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+ <Package name="com/n7space/IndexedArray">
+    <DataTypeSet>
+      <ArrayDataType name="ItemArray1D" dataTypeRef="DataItem">
+        <LongDescription>A 1-D array with index type ref</LongDescription>
+        <DimensionList>
+          <Dimension indexTypeRef="IndexItem" />
+        </DimensionList>
+      </ArrayDataType>
+      <IntegerDataType name="DataItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="IndexItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="16" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="65000" max="65535" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+  </Package>
+</PackageFile>

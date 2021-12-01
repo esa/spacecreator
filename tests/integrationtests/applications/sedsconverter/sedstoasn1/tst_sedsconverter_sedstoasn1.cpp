@@ -30,6 +30,7 @@ class tst_SedsConverter_SedsToAsn1 : public QObject
 private Q_SLOTS:
     void testSimpleDataTypes();
     void testArrays();
+    void testIndexedArray();
     void testContainers();
 };
 
@@ -48,6 +49,15 @@ void tst_SedsConverter_SedsToAsn1::testSimpleDataTypes()
 void tst_SedsConverter_SedsToAsn1::testArrays()
 {
     const int result = system("./test_arrays.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-110
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-120
+void tst_SedsConverter_SedsToAsn1::testIndexedArray()
+{
+    const int result = system("./test_indexed_array.sh");
     QCOMPARE(result, 0);
 }
 
