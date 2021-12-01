@@ -54,6 +54,20 @@
 
 using namespace Core;
 
+/// messages for General Messages GUI
+namespace {
+const QString msgInfo = "INFO: %1";
+const QString msgWarning = "WARNING: %1";
+const QString msgError = "ERROR: %1";
+const QString fileToImportNotSelected = "file to import not selected";
+const QString spacecreatorDirEnvVarNotRead = "SPACECREATOR_BUILD_DIR environment variable could not be read";
+const QString sedsconverterNotStarted = "SedsConverter could not be started";
+const QString ivFileNotSelected = "InterfaceView file not selected";
+const QString ivNoFunctionsInIv = "InterfaceView does not contain functions which could be exported";
+const QString ivNoFunctionsSelected = "No functions selected to export";
+const QString conversionFinished = "Conversion finished";
+}
+
 namespace spctr {
 
 SedsPlugin::SedsPlugin()
@@ -152,15 +166,6 @@ auto SedsPlugin::importInterfaceView() -> void
     // TODO: implementation
 }
 
-namespace {
-const QString msgInfo = "INFO: %1";
-const QString msgWarning = "WARNING: %1";
-const QString msgError = "ERROR: %1";
-const QString fileToImportNotSelected = "file to import not selected";
-const QString spacecreatorDirEnvVarNotRead = "SPACECREATOR_BUILD_DIR environment variable could not be read";
-const QString sedsconverterNotStarted = "SedsConverter could not be started";
-}
-
 auto SedsPlugin::importSdl() -> void
 {
     const QString inputFilePath =
@@ -170,35 +175,7 @@ auto SedsPlugin::importSdl() -> void
         return;
     }
 
-    const QString spacecreatorBuildDirEnvVar = "SPACECREATOR_BUILD_DIR";
-    const QString spacecreatorBuildDir = QProcessEnvironment::systemEnvironment().value(spacecreatorBuildDirEnvVar);
-    if (spacecreatorBuildDir.isEmpty()) {
-        MessageManager::write(msgError.arg(spacecreatorDirEnvVarNotRead));
-        return;
-    }
-    const QString sedsConverterPath = QString("%1/bin/sedsconverter").arg(spacecreatorBuildDir);
-
-    QStringList arguments;
-    // clang-format off
-    arguments << "--from" << "SEDS";
-    arguments << "--to" << "SDL";
-    arguments << "--skip-validation"; // TODO: remove this line?
-    arguments << "-i" << inputFilePath;
-    arguments << "--sdl-filepath-prefix" << "work/sdl/";
-    // clang-format on
-
-    QProcess sedsConverterProcess;
-    sedsConverterProcess.start(sedsConverterPath, arguments);
-    if (!sedsConverterProcess.waitForStarted()) {
-        MessageManager::write(msgError.arg(sedsconverterNotStarted));
-        return;
-    } else if (sedsConverterProcess.waitForFinished()) {
-        const QByteArray sedsConverterOutput =
-                sedsConverterProcess.read(512 * 1024 * 1024); // read up to 512 MB of text output
-        qDebug() << "sedsConverter output: " << QString::fromStdString(sedsConverterOutput.toStdString());
-        qDebug() << "stderr: " << sedsConverterProcess.readAllStandardError();
-        qDebug() << "stdout: " << sedsConverterProcess.readAllStandardOutput();
-    }
+    // TODO: implementation
 }
 
 auto SedsPlugin::importAsn1() -> void
@@ -214,17 +191,15 @@ auto SedsPlugin::exportInterfaceView() -> void
     auto *const currentDocument = EditorManager::currentDocument();
     auto *const currentIvDocument = static_cast<IVEditorDocument *>(currentDocument);
     if (currentIvDocument == nullptr) {
-        qWarning() << "InterfaceView file not selected";
+        MessageManager::write(msgError.arg(ivFileNotSelected));
         return;
-        // TODO: Report warning in QTC IF
     }
 
     const auto ivEditorCore = currentIvDocument->ivEditorCore();
     const auto ivFunctionsNames = ivEditorCore->ivFunctionsNames();
     if (ivFunctionsNames.empty()) {
-        qWarning() << "InterfaceView does not contain functions which could be exported";
+        MessageManager::write(msgError.arg(ivNoFunctionsInIv));
         return;
-        // TODO: Report warning in QTC IF
     }
 
     QStandardItemModel functionsListModel;
@@ -260,9 +235,8 @@ auto SedsPlugin::exportInterfaceView() -> void
         qDebug() << "Selected directory: " << outputDir;
         // TODO: implementation
     } else {
-        qWarning() << "No functions selected to export";
+        MessageManager::write(msgError.arg(ivNoFunctionsSelected));
         return;
-        // TODO: Report warning in QTC IF
     }
 }
 
@@ -270,6 +244,10 @@ auto SedsPlugin::exportAsn1() -> void
 {
     const auto names = QFileDialog::getOpenFileNames(
             nullptr, "Select ASN.1 and ACN files to export to EDS", QString(), "*.asn *.acn");
+    if (names.isEmpty()) {
+        MessageManager::write(msgInfo.arg(fileToImportNotSelected));
+        return;
+    }
 
     const auto outputDir = QFileDialog::getExistingDirectory(nullptr, "Select destination directory");
 
@@ -279,4 +257,5 @@ auto SedsPlugin::exportAsn1() -> void
         // TODO: implementation
     }
 }
+
 }
