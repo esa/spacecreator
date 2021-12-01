@@ -19,6 +19,7 @@
 
 #include "sedsplugin.h"
 
+#include "../../src/applications/sedsconverter/sedsconverter.h"
 #include "../spacecreatorplugin/iv/iveditordata.h"
 #include "../spacecreatorplugin/iv/iveditordocument.h"
 #include "../spacecreatorplugin/iv/iveditorfactory.h"
@@ -32,7 +33,10 @@
 #include "iveditorcore.h"
 #include "ivlibrary.h"
 #include "ivmodel.h"
+#include "model.h"
+#include "modeltype.h"
 #include "sdl/SdlOptions/options.h"
+#include "seds/SedsOptions/options.h"
 #include "sharedlibrary.h"
 
 #include <QAction>
@@ -64,7 +68,7 @@ const QString ivFileNotSelected = "InterfaceView file not selected";
 const QString ivNoFunctionsInIv = "InterfaceView does not contain functions which could be exported";
 const QString ivNoFunctionsSelected = "No functions selected to export";
 const QString conversionFinished = "Conversion finished";
-};
+}
 
 namespace spctr {
 
@@ -161,6 +165,11 @@ auto SedsPlugin::importInterfaceView() -> void
 {
     const QString inputFilePath = QFileDialog::getOpenFileName(
             nullptr, "Select EDS file to import InterfaceView from...", QString(), tr("*.xml"));
+    if (inputFilePath.isEmpty()) {
+        MessageManager::write(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
+        return;
+    }
+
     // TODO: implementation
 }
 
@@ -185,7 +194,20 @@ auto SedsPlugin::importAsn1() -> void
         return;
     }
 
-    // TODO: implementation
+    // conversion::Options options;
+    // // options.add(conversion::seds::SedsOptions::inputFilepath, inputFilePath);
+    // // options.add(conversion::asn1::Asn1Options::asn1FilepathPrefix, "");
+    // // options.add(conversion::asn1::Asn1Options::acnFilepathPrefix, "");
+    // try {
+    //     sedsconverter::SedsConverter sedsConverter;
+    //     sedsConverter.convert( //
+    //             std::set<conversion::ModelType>({ conversion::ModelType::Seds }), // from
+    //             conversion::ModelType::Asn1, // to
+    //             std::set<conversion::ModelType>({ conversion::ModelType::Unspecified }), // auxiliary
+    //             options);
+    // } catch (conversion::importer::ImportException &ex) {
+    //     MessageManager::write(GenMsg::msgError.arg(ex.what()));
+    // }
 }
 
 auto SedsPlugin::exportInterfaceView() -> void
@@ -209,11 +231,11 @@ auto SedsPlugin::exportInterfaceView() -> void
 
     ListTreeDialog ldDialog(&functionsListModel, "Export to EDS", [&]() {
         QStandardItemModel *const model = ldDialog.model();
-        const unsigned int rows = model->rowCount();
-        const unsigned int cols = model->columnCount();
+        const auto rows = model->rowCount();
+        const auto cols = model->columnCount();
 
-        for (unsigned int i = 0; i < cols; i++) {
-            for (unsigned int j = 0; j < rows; j++) {
+        for (int i = 0; i < cols; i++) {
+            for (int j = 0; j < rows; j++) {
                 QStandardItem *const item = model->takeItem(j, i);
                 if (item != nullptr && item->checkState() == Qt::Checked) {
                     ldDialog.selectedItems()->append(item->text());

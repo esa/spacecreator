@@ -4,6 +4,8 @@ set(SEDS_PLUGIN_SOURCES
     SedsPlugin.json.in
     sedsplugin.cpp
     sedsplugin.h
+    ../../../src/applications/sedsconverter/sedsconverter.h
+    ../../../src/applications/sedsconverter/sedsconverter.cpp
 )
 
 set(SEDS_QTC_LIBRARIES
@@ -11,7 +13,12 @@ set(SEDS_QTC_LIBRARIES
     -L"${QTC_PLUGINS_DIR}"
     Aggregation
     ExtensionSystem
-    Asn1Importer
+    Conversion::Converter
+    Conversion::Registry
+    Conversion::SedsRegistrar
+    Conversion::SdlRegistrar
+    Conversion::IvRegistrar
+    Conversion::Asn1Registrar
     Utils
 )
 set(SEDS_QTC_PLUGINS
