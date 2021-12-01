@@ -35,7 +35,7 @@ IVEditorFactory::IVEditorFactory(SpaceCreatorProjectManager *projectManager, QOb
     setDisplayName(QCoreApplication::translate("IV Editor", spctr::Constants::C_IVEDITOR_DISPLAY_NAME));
     addMimeType(spctr::Constants::IV_MIMETYPE);
 
-#if QTC_VERSION == 415
+#if QTC_VERSION > 414
     setEditorCreator(std::bind(&IVEditorFactory::createIVEditor, this));
 #endif
     Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "xml");
