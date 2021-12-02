@@ -25,6 +25,7 @@
 #include "../spacecreatorplugin/iv/ivqtceditor.h"
 #include "context/action/actionsmanager.h"
 #include "conversion/asn1/Asn1Options/options.h"
+#include "conversion/converter/exceptions.h"
 #include "export/exceptions.h"
 #include "import/exceptions.h"
 #include "interfacedocument.h"
@@ -98,6 +99,7 @@ auto SedsPlugin::initialize(const QStringList &arguments, QString *errorString) 
     Q_UNUSED(arguments)
     Q_UNUSED(errorString)
 
+    initializeRegistry();
     addSedsImportExport();
 
     return true;
@@ -209,16 +211,17 @@ auto SedsPlugin::importAsn1() -> void
     options.add(conversion::seds::SedsOptions::inputFilepath, inputFilePath);
     options.add(conversion::asn1::Asn1Options::asn1FilepathPrefix, "");
     options.add(conversion::asn1::Asn1Options::acnFilepathPrefix, "");
-    // try {
-    //     sedsconverter::SedsConverter sedsConverter;
-    //     sedsConverter.convert( //
-    //             std::set<conversion::ModelType>({ conversion::ModelType::Seds }), // from
-    //             conversion::ModelType::Asn1, // to
-    //             std::set<conversion::ModelType>({ conversion::ModelType::Unspecified }), // auxiliary
-    //             options);
-    // } catch (conversion::importer::ImportException &ex) {
-    //     MessageManager::write(GenMsg::msgError.arg(ex.what()));
-    // }
+    options.add(conversion::seds::SedsOptions::skipValidation); // TODO: this will be removed
+    try {
+        auto srcModelTypes = std::set<conversion::ModelType>({ conversion::ModelType::Seds });
+        auto targetModelType = conversion::ModelType::Asn1;
+        auto auxModelTypes = std::set<conversion::ModelType>({});
+        Converter converter(m_registry, std::move(options));
+        converter.convert(srcModelTypes, targetModelType, auxModelTypes);
+        MessageManager::write(GenMsg::msgInfo.arg("file(s) imported"));
+    } catch (conversion::ConverterException &ex) {
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
+    }
 }
 
 auto SedsPlugin::exportInterfaceView() -> void
