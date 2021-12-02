@@ -26,6 +26,7 @@
 #include "context/action/actionsmanager.h"
 #include "conversion/asn1/Asn1Options/options.h"
 #include "conversion/converter/exceptions.h"
+#include "exceptions.h"
 #include "export/exceptions.h"
 #include "import/exceptions.h"
 #include "interfacedocument.h"
@@ -57,6 +58,7 @@
 #include <coreplugin/icore.h>
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
+#include <exception>
 #include <messagemanager.h>
 #include <shared/ui/listtreedialog.h>
 
@@ -221,6 +223,10 @@ auto SedsPlugin::importAsn1() -> void
         MessageManager::write(GenMsg::msgInfo.arg("file(s) imported"));
     } catch (conversion::ConverterException &ex) {
         MessageManager::write(GenMsg::msgError.arg(ex.what()));
+    } catch (conversion::FileNotFoundException &ex) {
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
+    } catch (std::exception &ex) {
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
     }
 }
 
@@ -325,6 +331,8 @@ auto SedsPlugin::exportAsn1() -> void
             converter.convert(srcModelTypes, targetModelType, auxModelTypes);
             MessageManager::write(GenMsg::msgInfo.arg("file(s) exported"));
         } catch (conversion::ConverterException &ex) {
+            MessageManager::write(GenMsg::msgError.arg(ex.what()));
+        } catch (std::exception &ex) {
             MessageManager::write(GenMsg::msgError.arg(ex.what()));
         }
     }
