@@ -21,11 +21,16 @@
 
 #include <ivcore/ivinterface.h>
 
+namespace Asn1Acn {
+class Definitions;
+} // namespace Asn1Acn
+
 namespace ivm {
 class IVFunction;
 } // namespace ivm
 
 namespace seds::model {
+class CommandArgument;
 class Interface;
 class InterfaceCommand;
 } // namespace seds::model
@@ -44,9 +49,11 @@ public:
      * @brief   Constructor
      *
      * @param   sedsInterface   Parent interface
+     * @param   asn1Definitions     ASN.1 type definitions for parent package
      * @param   ivFunction      Output interface view function
      */
-    InterfaceCommandTranslator(const seds::model::Interface &sedsInterface, ivm::IVFunction *ivFunction);
+    InterfaceCommandTranslator(const seds::model::Interface &sedsInterface, Asn1Acn::Definitions *asn1Definitions,
+            ivm::IVFunction *ivFunction);
     /**
      * @brief   Default destructor
      */
@@ -117,6 +124,8 @@ protected:
 protected:
     /// @brief  Parent SEDS interface
     const seds::model::Interface &m_sedsInterface;
+    /// @brief  Output ASN.1 type definitions
+    Asn1Acn::Definitions *m_asn1Definitions;
     /// @brief  Output interface view function
     ivm::IVFunction *m_ivFunction;
 

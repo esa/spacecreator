@@ -19,6 +19,8 @@
 
 #include "specialized/interfacecommandtranslator.h"
 
+#include <asn1library/asn1/definitions.h>
+#include <conversion/asn1/SedsToAsn1Translator/specialized/dimensiontranslator.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivfunction.h>
@@ -32,10 +34,12 @@ namespace conversion::iv::translator {
 
 const QString InterfaceCommandTranslator::m_interfaceParameterEncoding = "ACN";
 const QString InterfaceCommandTranslator::m_ivInterfaceNameTemplate = "%1_%2_%3";
+const QString InterfaceCommandTranslator::m_arrayArgumentNameTemplate = "%1_Array";
 
 InterfaceCommandTranslator::InterfaceCommandTranslator(
-        const seds::model::Interface &sedsInterface, ivm::IVFunction *ivFunction)
+        const seds::model::Interface &sedsInterface, Asn1Acn::Definitions *asn1Definitions, ivm::IVFunction *ivFunction)
     : m_sedsInterface(sedsInterface)
+    , m_asn1Definitions(asn1Definitions)
     , m_ivFunction(ivFunction)
 {
 }

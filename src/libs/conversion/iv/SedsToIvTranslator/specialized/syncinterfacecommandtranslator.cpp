@@ -19,6 +19,7 @@
 
 #include "specialized/syncinterfacecommandtranslator.h"
 
+#include <asn1library/asn1/definitions.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivfunction.h>
@@ -33,8 +34,8 @@ using conversion::translator::TranslationException;
 namespace conversion::iv::translator {
 
 SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(
-        const seds::model::Interface &sedsInterface, ivm::IVFunction *ivFunction)
-    : InterfaceCommandTranslator(sedsInterface, ivFunction)
+        const seds::model::Interface &sedsInterface, Asn1Acn::Definitions *asn1Definitions, ivm::IVFunction *ivFunction)
+    : InterfaceCommandTranslator(sedsInterface, asn1Definitions, ivFunction)
 {
 }
 

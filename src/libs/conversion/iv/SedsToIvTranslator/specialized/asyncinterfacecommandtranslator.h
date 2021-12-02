@@ -28,7 +28,6 @@
 
 namespace Asn1Acn {
 class AsnSequenceComponent;
-class Definitions;
 class SequenceComponent;
 namespace Types {
 class Sequence;
@@ -55,8 +54,6 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   sedsPackage         Parent SEDS package
-     * @param   sedsComponent       Parent SEDS component
      * @param   sedsInterface       Parent SEDS interface
      * @param   asn1Definitions     ASN.1 type definitions for parent package
      * @param   ivFunction          Output interface view function
@@ -193,9 +190,6 @@ private:
 
         auto compareArguments(const std::unordered_map<QString, QString> &arguments) const -> bool;
     };
-
-    /// @brief  Output ASN.1 type definitions
-    Asn1Acn::Definitions *m_asn1Definitions;
 
     /// @brief  Cache of the bundled ASN.1 types that was created for given command
     static std::multimap<QString, ArgumentsCacheEntry> m_commandArgumentsCache;
