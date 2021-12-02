@@ -2,10 +2,16 @@
 <PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
  <Package name="com/n7space/IndexedArray">
     <DataTypeSet>
-      <ArrayDataType name="ItemArray1D" dataTypeRef="DataItem">
-        <LongDescription>A 1-D array with index type ref</LongDescription>
+      <ArrayDataType name="IntegerIndexedArray" dataTypeRef="DataItem">
+        <LongDescription>Array with integer index ref</LongDescription>
         <DimensionList>
           <Dimension indexTypeRef="IndexItem" />
+        </DimensionList>
+      </ArrayDataType>
+      <ArrayDataType name="EnumIndexedArray" dataTypeRef="DataItem">
+        <LongDescription>Array with integer index ref</LongDescription>
+        <DimensionList>
+          <Dimension indexTypeRef="EnumItem" />
         </DimensionList>
       </ArrayDataType>
       <IntegerDataType name="DataItem">
@@ -20,6 +26,15 @@
           <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="65000" max="65535" />
         </Range>
       </IntegerDataType>
+      <EnumeratedDataType name="EnumItem">
+        <IntegerDataEncoding encoding="BCD" byteOrder="bigEndian" sizeInBits="16" />
+        <EnumerationList>
+          <Enumeration value="12" label="Value1" />
+          <Enumeration value="15" label="Value2" />
+          <Enumeration value="6" label="Value3" />
+          <Enumeration value="42" label="Value4" />
+        </EnumerationList>
+      </EnumeratedDataType>
     </DataTypeSet>
   </Package>
 </PackageFile>

@@ -56,8 +56,7 @@ void DimensionTranslator::translateSizeDimension(
     }
 
     if (dimensionSize <= 0) {
-        auto errorMessage = QString("Dimension size of %1 must be greater than zero")
-                                    .arg(asn1Sequence->identifier());
+        auto errorMessage = QString("Dimension size of %1 must be greater than zero").arg(asn1Sequence->identifier());
         throw TranslationException(std::move(errorMessage));
     }
 
