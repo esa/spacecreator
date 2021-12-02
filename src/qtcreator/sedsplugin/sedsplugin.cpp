@@ -19,7 +19,6 @@
 
 #include "sedsplugin.h"
 
-#include "../../src/applications/sedsconverter/sedsconverter.h"
 #include "../spacecreatorplugin/iv/iveditordata.h"
 #include "../spacecreatorplugin/iv/iveditordocument.h"
 #include "../spacecreatorplugin/iv/iveditorfactory.h"
@@ -46,6 +45,11 @@
 #include <QProcess>
 #include <asn1library/asn1/asn1model.h>
 #include <conversion/asn1/Asn1Importer/importer.h>
+#include <conversion/asn1/Asn1Registrar/registrar.h>
+#include <conversion/converter/converter.h>
+#include <conversion/iv/IvRegistrar/registrar.h>
+#include <conversion/sdl/SdlRegistrar/registrar.h>
+#include <conversion/seds/SedsRegistrar/registrar.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/icore.h>
@@ -55,6 +59,13 @@
 #include <shared/ui/listtreedialog.h>
 
 using namespace Core;
+using conversion::Converter;
+using conversion::ModelType;
+using conversion::RegistrationFailedException;
+using conversion::asn1::Asn1Registrar;
+using conversion::iv::IvRegistrar;
+using conversion::sdl::SdlRegistrar;
+using conversion::seds::SedsRegistrar;
 
 /// messages for General Messages GUI
 namespace GenMsg {
@@ -194,10 +205,10 @@ auto SedsPlugin::importAsn1() -> void
         return;
     }
 
-    // conversion::Options options;
-    // // options.add(conversion::seds::SedsOptions::inputFilepath, inputFilePath);
-    // // options.add(conversion::asn1::Asn1Options::asn1FilepathPrefix, "");
-    // // options.add(conversion::asn1::Asn1Options::acnFilepathPrefix, "");
+    conversion::Options options;
+    options.add(conversion::seds::SedsOptions::inputFilepath, inputFilePath);
+    options.add(conversion::asn1::Asn1Options::asn1FilepathPrefix, "");
+    options.add(conversion::asn1::Asn1Options::acnFilepathPrefix, "");
     // try {
     //     sedsconverter::SedsConverter sedsConverter;
     //     sedsConverter.convert( //
@@ -279,6 +290,29 @@ auto SedsPlugin::exportAsn1() -> void
         (void)name;
         (void)outputDir;
         // TODO: implementation
+    }
+}
+
+void SedsPlugin::initializeRegistry()
+{
+    Asn1Registrar asn1Registrar;
+    if (!asn1Registrar.registerCapabilities(m_registry)) {
+        throw RegistrationFailedException(ModelType::Asn1);
+    }
+
+    IvRegistrar ivRegistrar;
+    if (!ivRegistrar.registerCapabilities(m_registry)) {
+        throw RegistrationFailedException(ModelType::InterfaceView);
+    }
+
+    SedsRegistrar sedsRegistrar;
+    if (!sedsRegistrar.registerCapabilities(m_registry)) {
+        throw RegistrationFailedException(ModelType::Seds);
+    }
+
+    SdlRegistrar sdlRegistrar;
+    if (!sdlRegistrar.registerCapabilities(m_registry)) {
+        throw RegistrationFailedException(ModelType::Sdl);
     }
 }
 

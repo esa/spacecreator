@@ -4,8 +4,6 @@ set(SEDS_PLUGIN_SOURCES
     SedsPlugin.json.in
     sedsplugin.cpp
     sedsplugin.h
-    ../../../src/applications/sedsconverter/sedsconverter.h
-    ../../../src/applications/sedsconverter/sedsconverter.cpp
 )
 
 set(SEDS_QTC_LIBRARIES

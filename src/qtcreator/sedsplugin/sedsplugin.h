@@ -23,6 +23,7 @@
 
 #include <QStandardItemModel>
 #include <QStringList>
+#include <conversion/registry/registry.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <extensionsystem/iplugin.h>
 
@@ -50,6 +51,10 @@ private:
     auto exportAsn1() -> void;
     auto exportInterfaceView() -> void;
     auto updateModelWithFunctionNames(QStandardItemModel &model, const QStringList &ivFunctionsNames) -> void;
+    auto initializeRegistry() -> void;
+
+    /** @brief  Internal registry */
+    conversion::Registry m_registry;
 };
 
 }
