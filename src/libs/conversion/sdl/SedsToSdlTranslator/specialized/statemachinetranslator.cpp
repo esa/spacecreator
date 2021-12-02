@@ -42,6 +42,8 @@ using conversion::translator::TranslationException;
 namespace conversion::sdl::translator {
 
 static const QString IO_VARIABLE_PATTERN = "io_%1";
+static const QString FALSE_LITERAL = "False";
+static const QString TRUE_LITERAL = "True";
 
 template<typename ElementType>
 static inline auto getElementOfName(const seds::model::StateMachine &sedsStateMachine, const QString name)
@@ -279,35 +281,61 @@ auto StateMachineTranslator::translateTransition(const seds::model::StateMachine
 
     auto inputHandler = translatePrimitive(sdlProcess, sedsTransition.primitive());
 
-    auto transition = std::make_unique<::sdl::Transition>();
-    inputHandler.first->setTransition(transition.get());
+    auto mainTransition = std::make_unique<::sdl::Transition>();
+    auto currentTransitionPtr = mainTransition.get();
+    inputHandler.first->setTransition(mainTransition.get());
     sdlFromState->addInput(std::move(inputHandler.first));
     // Argument unpacking
     for (auto &action : inputHandler.second) {
-        transition->addAction(std::move(action));
+        currentTransitionPtr->addAction(std::move(action));
     }
-    // TODO Guard
+
+    if (sedsTransition.guard().has_value()) {
+        const auto &guard = *sedsTransition.guard();
+        auto decision = StatementTranslatorVisitor::translateBooleanExpression(sdlProcess, nullptr, guard);
+        auto label = std::make_unique<::sdl::Label>(
+                QString("%1_%2_to_%3_guard").arg(inputHandler.first->name(), fromStateName, toStateName));
+
+        auto falseTransition = std::make_unique<::sdl::Transition>();
+        // Abort the transition
+        falseTransition->addAction(std::make_unique<::sdl::NextState>("", sdlFromState));
+        auto falseAnswer = std::make_unique<::sdl::Answer>();
+        falseAnswer->setLiteral(::sdl::VariableLiteral(FALSE_LITERAL));
+        falseAnswer->setTransition(std::move(falseTransition));
+        auto trueTransition = std::make_unique<::sdl::Transition>();
+        // Switch the current transition for exit/action/entry to the true answer
+        currentTransitionPtr = trueTransition.get();
+        auto trueAnswer = std::make_unique<::sdl::Answer>();
+        trueAnswer->setLiteral(::sdl::VariableLiteral(TRUE_LITERAL));
+        trueAnswer->setTransition(std::move(trueTransition));
+
+        decision->addAnswer(std::move(trueAnswer));
+        decision->addAnswer(std::move(falseAnswer));
+
+        mainTransition->addAction(std::move(decision));
+    }
+
     if (stateChange) {
         const auto onExit = getOnExit(sedsStateMachine, sedsTransition.fromState().nameStr());
         if (onExit.has_value()) {
-            transition->addAction(StatementTranslatorVisitor::translateActivityCall(sdlProcess, **onExit));
+            currentTransitionPtr->addAction(StatementTranslatorVisitor::translateActivityCall(sdlProcess, **onExit));
         }
     }
 
     if (sedsTransition.doActivity().has_value()) {
-        transition->addAction(
+        currentTransitionPtr->addAction(
                 StatementTranslatorVisitor::translateActivityCall(sdlProcess, *sedsTransition.doActivity()));
     }
     if (stateChange) {
         const auto onEntry = getOnEntry(sedsStateMachine, sedsTransition.toState().nameStr());
         if (onEntry.has_value()) {
-            transition->addAction(StatementTranslatorVisitor::translateActivityCall(sdlProcess, **onEntry));
+            currentTransitionPtr->addAction(StatementTranslatorVisitor::translateActivityCall(sdlProcess, **onEntry));
         }
     }
     // State switch
-    transition->addAction(std::make_unique<::sdl::NextState>("", sdlToState));
+    currentTransitionPtr->addAction(std::make_unique<::sdl::NextState>("", sdlToState));
 
-    stateMachine->addTransition(std::move(transition));
+    stateMachine->addTransition(std::move(mainTransition));
 }
 
 auto StateMachineTranslator::createIoVariable(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void
