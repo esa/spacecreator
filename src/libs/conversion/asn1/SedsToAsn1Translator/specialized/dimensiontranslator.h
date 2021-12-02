@@ -51,22 +51,22 @@ public:
      *
      * This is translated as ASN.1 range constraint
      *
-     * @param   dimension   SEDS array dimension
-     * @param   asn1Type    ASN.1 type that will be updated
+     * @param   dimension       SEDS array dimension
+     * @param   asn1Sequence    ASN.1 type that will be updated
      */
-    auto translateDimension(const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const
+    auto translateDimension(const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Sequence) const
             -> void;
 
 private:
-    auto translateSizeDimension(const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const
-            -> void;
+    auto translateSizeDimension(
+            const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Sequence) const -> void;
     auto translateIndexDimension(
-            const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
+            const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Sequence) const -> void;
 
     auto translateIntegerDimensionIndex(
-            const Asn1Acn::Types::Integer *indexType, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
+            const Asn1Acn::Types::Integer *indexType, Asn1Acn::Types::SequenceOf *asn1Sequence) const -> void;
     auto translateEnumDimensionIndex(
-            const Asn1Acn::Types::Enumerated *indexType, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
+            const Asn1Acn::Types::Enumerated *indexType, Asn1Acn::Types::SequenceOf *asn1Sequence) const -> void;
 
     auto mergeRanges(const Asn1Acn::Constraints::Constraint<Asn1Acn::IntegerValue> *constraint) const
             -> std::optional<Asn1Acn::Range<Asn1Acn::IntegerValue::Type>>;
