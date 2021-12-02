@@ -35,6 +35,7 @@
 #include "ivmodel.h"
 #include "model.h"
 #include "modeltype.h"
+#include "options.h"
 #include "sdl/SdlOptions/options.h"
 #include "seds/SedsOptions/options.h"
 #include "sharedlibrary.h"
@@ -73,7 +74,7 @@ namespace GenMsg {
 const QString msgInfo = "INFO: %1";
 const QString msgWarning = "WARNING: %1";
 const QString msgError = "ERROR: %1";
-const QString fileToImportNotSelected = "file to import not selected";
+const QString fileToImportNotSelected = "File to import not selected";
 const QString spacecreatorDirEnvVarNotRead = "SPACECREATOR_BUILD_DIR environment variable could not be read";
 const QString sedsconverterNotStarted = "SedsConverter could not be started";
 const QString ivFileNotSelected = "InterfaceView file not selected";
@@ -287,12 +288,47 @@ auto SedsPlugin::exportAsn1() -> void
         return;
     }
 
+    QStringList asn1Names;
+    std::copy_if(names.begin(), names.end(), std::back_inserter(asn1Names),
+            [](const QString &name) -> bool { return name.endsWith(".asn"); });
+    asn1Names.sort();
+
+    QStringList acnNames;
+    std::copy_if(names.begin(), names.end(), std::back_inserter(acnNames),
+            [](const QString &name) -> bool { return name.endsWith(".acn"); });
+    acnNames.sort();
+
+    if (asn1Names.size() != acnNames.size()) {
+        MessageManager::write(GenMsg::msgError.arg(".asn or .acn file missing!"));
+        return;
+    }
+
     const auto outputDir = QFileDialog::getExistingDirectory(nullptr, "Select destination directory");
 
-    for (auto &name : names) {
-        (void)name;
-        (void)outputDir;
-        // TODO: implementation
+    const auto getFileName = [](const auto &fullpath) -> QString {
+        QString name = fullpath.split("/").last();
+        name = name.split(".").first();
+
+        return name;
+    };
+
+    for (unsigned int i = 0; i < asn1Names.size(); i++) {
+        conversion::Options options;
+        options.add(conversion::asn1::Asn1Options::inputFilepath, asn1Names[i]);
+        options.add(conversion::asn1::Asn1Options::inputFilepath, acnNames[i]);
+        options.add(conversion::seds::SedsOptions::outputFilepath,
+                QString("%1/%2.xml").arg(outputDir).arg(getFileName(acnNames[i])));
+        options.add(conversion::seds::SedsOptions::skipValidation); // TODO: this will be removed
+        try {
+            auto srcModelTypes = std::set<conversion::ModelType>({ conversion::ModelType::Asn1 });
+            auto targetModelType = conversion::ModelType::Seds;
+            auto auxModelTypes = std::set<conversion::ModelType>({});
+            Converter converter(m_registry, std::move(options));
+            converter.convert(srcModelTypes, targetModelType, auxModelTypes);
+            MessageManager::write(GenMsg::msgInfo.arg("file(s) exported"));
+        } catch (conversion::ConverterException &ex) {
+            MessageManager::write(GenMsg::msgError.arg(ex.what()));
+        }
     }
 }
 
