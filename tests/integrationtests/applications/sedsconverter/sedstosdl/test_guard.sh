@@ -21,10 +21,14 @@ $SEDS_CONVERTER --from SEDS --to SDL --aux-models ASN.1 --skip-validation -i res
 # Setup additional data
 cp resources/test_guard.system_structure output/system_structure.pr
 cp $TEST_OUTPUT_DIR/GUARD.asn $TEST_OUTPUT_DIR/dataview-uniq.asn
+# Rename the module to avoid naming conflicts
+sed -i 's/GUARD/SYSTEM-DATAVIEW/g' $TEST_OUTPUT_DIR/dataview-uniq.asn
 cd $TEST_OUTPUT_DIR
-# Compare and clean-up on success
-$OPENGEODE --toAda system_structure.pr Component.pr \
-
-#diff $TEST_OUTPUT_DIR/Component.pr resources/state_machine_with_bare_inputs.output
-
-# && rm -r -f $TEST_OUTPUT_DIR
+# Compare output against reference, and compile to make sure the reference is valid
+# Clean (rm) only if all steps pass
+$DIFF Component.pr ../resources/test_guard.output \
+  && $OPENGEODE --toAda system_structure.pr Component.pr \
+  && asn1scc -Ada --type-prefix asn1Scc dataview-uniq.asn component_datamodel.asn \
+  && gcc -c component.adb \
+  && cd .. \
+  && rm -r -f $TEST_OUTPUT_DIR
