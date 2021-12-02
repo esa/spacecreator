@@ -118,7 +118,6 @@ private Q_SLOTS:
     void testTranslatePolynomialCalibrator();
     void testTranslateActivityCall();
     void testTranslateSendCommand();
-
     void testTranslateOnEntryAndOnExit();
 };
 

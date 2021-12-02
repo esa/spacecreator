@@ -193,7 +193,7 @@ public:
      *
      * @param sdlProcess        Host SDL process
      * @param sdlProcedure      Host SDL procedure
-     * @param expression      Expression to be translated
+     * @param expression        Expression to be translated
      *
      * @returns SDL decision
      */
