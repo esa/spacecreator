@@ -293,8 +293,6 @@ auto StateMachineTranslator::translateTransition(const seds::model::StateMachine
     if (sedsTransition.guard().has_value()) {
         const auto &guard = *sedsTransition.guard();
         auto decision = StatementTranslatorVisitor::translateBooleanExpression(sdlProcess, nullptr, guard);
-        auto label = std::make_unique<::sdl::Label>(
-                QString("%1_%2_to_%3_guard").arg(inputHandler.first->name(), fromStateName, toStateName));
 
         auto falseTransition = std::make_unique<::sdl::Transition>();
         // Abort the transition
