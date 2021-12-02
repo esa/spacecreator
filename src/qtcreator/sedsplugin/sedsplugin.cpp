@@ -45,7 +45,6 @@
 #include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
-#include <QProcess>
 #include <asn1library/asn1/asn1model.h>
 #include <conversion/asn1/Asn1Importer/importer.h>
 #include <conversion/asn1/Asn1Registrar/registrar.h>
@@ -77,8 +76,6 @@ const QString msgInfo = "INFO: %1";
 const QString msgWarning = "WARNING: %1";
 const QString msgError = "ERROR: %1";
 const QString fileToImportNotSelected = "File to import not selected";
-const QString spacecreatorDirEnvVarNotRead = "SPACECREATOR_BUILD_DIR environment variable could not be read";
-const QString sedsconverterNotStarted = "SedsConverter could not be started";
 const QString ivFileNotSelected = "InterfaceView file not selected";
 const QString ivNoFunctionsInIv = "InterfaceView does not contain functions which could be exported";
 const QString ivNoFunctionsSelected = "No functions selected to export";
@@ -311,7 +308,7 @@ auto SedsPlugin::exportAsn1() -> void
     const auto outputDir = QFileDialog::getExistingDirectory(nullptr, "Select destination directory");
 
     const auto getFileName = [](const auto &fullpath) -> QString {
-        QString name = fullpath.split("/").last();
+        QString name = fullpath.split(QDir::separator()).last();
         name = name.split(".").first();
 
         return name;
@@ -322,7 +319,7 @@ auto SedsPlugin::exportAsn1() -> void
         options.add(conversion::asn1::Asn1Options::inputFilepath, asn1Names[i]);
         options.add(conversion::asn1::Asn1Options::inputFilepath, acnNames[i]);
         options.add(conversion::seds::SedsOptions::outputFilepath,
-                QString("%1/%2.xml").arg(outputDir).arg(getFileName(acnNames[i])));
+                QString("%1%2%3.xml").arg(outputDir).arg(QDir::separator()).arg(getFileName(asn1Names[i])));
         try {
             auto srcModelTypes = std::set<conversion::ModelType>({ conversion::ModelType::Asn1 });
             auto targetModelType = conversion::ModelType::Seds;
