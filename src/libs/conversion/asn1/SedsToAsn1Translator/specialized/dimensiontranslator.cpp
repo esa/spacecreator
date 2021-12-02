@@ -72,7 +72,7 @@ void DimensionTranslator::translateIndexDimension(
     if (const auto integerIndexType = dynamic_cast<const Asn1Acn::Types::Integer *>(indexType); integerIndexType) {
         translateIntegerDimensionIndex(integerIndexType, asn1Type);
     } else if (const auto enumIndexType = dynamic_cast<const Asn1Acn::Types::Enumerated *>(indexType); enumIndexType) {
-        throw TranslationException("Enumerated dimension index type not implemented");
+        translateEnumDimensionIndex(enumIndexType, asn1Type);
     } else {
         throw TranslationException("Only integer and enum dimension index types are supported");
     }
@@ -100,6 +100,22 @@ void DimensionTranslator::translateIntegerDimensionIndex(
     }
 
     auto rangeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(*resultRange);
+
+    auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::IntegerValue>>();
+    sizeConstraint->setInnerConstraints(std::move(rangeConstraint));
+    asn1Type->constraints().append(std::move(sizeConstraint));
+}
+
+void DimensionTranslator::translateEnumDimensionIndex(
+        const Asn1Acn::Types::Enumerated *indexType, Asn1Acn::Types::SequenceOf *asn1Type) const
+{
+    std::vector<long> enumValues;
+    std::transform(indexType->items().begin(), indexType->items().end(), std::back_inserter(enumValues),
+            [](const auto &enumItem) { return enumItem.value(); });
+    std::sort(enumValues.begin(), enumValues.end());
+
+    auto rangeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
+            { enumValues.front(), enumValues.back() });
 
     auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::IntegerValue>>();
     sizeConstraint->setInnerConstraints(std::move(rangeConstraint));
