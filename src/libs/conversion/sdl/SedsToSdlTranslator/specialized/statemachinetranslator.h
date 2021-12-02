@@ -103,7 +103,8 @@ private:
     static auto translatePrimitive(::sdl::Process *sdlProcess, const seds::model::Transition::Primitive &primitive)
             -> InputHandler;
 
-    static auto translateTransition(const seds::model::Transition &sedsTransition, ::sdl::Process *sdlProcess,
+    static auto translateTransition(const seds::model::StateMachine &sedsStateMachine,
+            const seds::model::Transition &sedsTransition, ::sdl::Process *sdlProcess,
             ::sdl::StateMachine *stateMachine, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void;
 
     static auto createIoVariable(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;

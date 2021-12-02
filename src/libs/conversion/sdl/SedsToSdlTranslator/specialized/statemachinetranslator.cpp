@@ -43,6 +43,51 @@ namespace conversion::sdl::translator {
 
 static const QString IO_VARIABLE_PATTERN = "io_%1";
 
+template<typename ElementType>
+static inline auto getElementOfName(const seds::model::StateMachine &sedsStateMachine, const QString name)
+        -> std::optional<const ElementType *>
+{
+    for (auto &element : sedsStateMachine.elements()) {
+        if (std::holds_alternative<ElementType>(element)) {
+            const auto &item = std::get<ElementType>(element);
+            if (item.nameStr() == name) {
+                return &item;
+            }
+        }
+    }
+    return std::nullopt;
+}
+
+static inline auto getOnExit(const seds::model::StateMachine &sedsStateMachine, const QString name)
+        -> std::optional<const seds::model::ActivityInvocation *>
+{
+    // OnExit applies only to states, not entry or exit states
+    const auto &state = getElementOfName<seds::model::State>(sedsStateMachine, name);
+    if (!state.has_value()) {
+        return std::nullopt;
+    }
+    if (!(*state)->onExit().has_value()) {
+        return std::nullopt;
+    }
+
+    return &(*((*state)->onExit()));
+}
+
+static inline auto getOnEntry(const seds::model::StateMachine &sedsStateMachine, const QString name)
+        -> std::optional<const seds::model::ActivityInvocation *>
+{
+    // OnEntry applies only to states, not entry or exit states
+    const auto &state = getElementOfName<seds::model::State>(sedsStateMachine, name);
+    if (!state.has_value()) {
+        return std::nullopt;
+    }
+    if (!(*state)->onEntry().has_value()) {
+        return std::nullopt;
+    }
+
+    return &(*((*state)->onEntry()));
+}
+
 auto StateMachineTranslator::translateStateMachine(const seds::model::StateMachine &sedsStateMachine,
         ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void
 {
@@ -69,7 +114,8 @@ auto StateMachineTranslator::translateStateMachine(const seds::model::StateMachi
     // Second pass through transitions
     for (auto &element : sedsStateMachine.elements()) {
         if (std::holds_alternative<seds::model::Transition>(element)) {
-            translateTransition(std::get<seds::model::Transition>(element), sdlProcess, stateMachine, stateMap);
+            translateTransition(
+                    sedsStateMachine, std::get<seds::model::Transition>(element), sdlProcess, stateMachine, stateMap);
         }
     }
     for (auto &entry : stateMap) {
@@ -211,40 +257,55 @@ auto StateMachineTranslator::translatePrimitive(
     return InputHandler();
 }
 
-auto StateMachineTranslator::translateTransition(const seds::model::Transition &sedsTransition,
-        ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine,
+auto StateMachineTranslator::translateTransition(const seds::model::StateMachine &sedsStateMachine,
+        const seds::model::Transition &sedsTransition, ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine,
         std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void
 {
+    Q_UNUSED(sedsStateMachine);
     const auto fromStateName = Escaper::escapeSdlName(sedsTransition.fromState().nameStr());
     const auto toStateName = Escaper::escapeSdlName(sedsTransition.toState().nameStr());
+    const auto stateChange = fromStateName != toStateName;
     const auto &fromStateIterator = stateMap.find(fromStateName);
     const auto &toStateIterator = stateMap.find(toStateName);
+
     if (fromStateIterator == stateMap.end()) {
         throw TranslationException(QString("Unknown state %1 when translating transition").arg(fromStateName));
     }
     if (toStateIterator == stateMap.end()) {
         throw TranslationException(QString("Unknown state %1 when translating transition").arg(toStateName));
     }
-    auto fromState = (*fromStateIterator).second.get();
-    auto toState = (*toStateIterator).second.get();
+    auto sdlFromState = (*fromStateIterator).second.get();
+    auto sdlToState = (*toStateIterator).second.get();
+
     auto inputHandler = translatePrimitive(sdlProcess, sedsTransition.primitive());
 
     auto transition = std::make_unique<::sdl::Transition>();
     inputHandler.first->setTransition(transition.get());
-    fromState->addInput(std::move(inputHandler.first));
+    sdlFromState->addInput(std::move(inputHandler.first));
     // Argument unpacking
     for (auto &action : inputHandler.second) {
         transition->addAction(std::move(action));
     }
     // TODO Guard
-    // TODO From Exit
+    if (stateChange) {
+        const auto onExit = getOnExit(sedsStateMachine, sedsTransition.fromState().nameStr());
+        if (onExit.has_value()) {
+            transition->addAction(StatementTranslatorVisitor::translateActivityCall(sdlProcess, **onExit));
+        }
+    }
+
     if (sedsTransition.doActivity().has_value()) {
         transition->addAction(
                 StatementTranslatorVisitor::translateActivityCall(sdlProcess, *sedsTransition.doActivity()));
     }
-    // TODO To Entry
+    if (stateChange) {
+        const auto onEntry = getOnEntry(sedsStateMachine, sedsTransition.toState().nameStr());
+        if (onEntry.has_value()) {
+            transition->addAction(StatementTranslatorVisitor::translateActivityCall(sdlProcess, **onEntry));
+        }
+    }
     // State switch
-    transition->addAction(std::make_unique<::sdl::NextState>("", toState));
+    transition->addAction(std::make_unique<::sdl::NextState>("", sdlToState));
 
     stateMachine->addTransition(std::move(transition));
 }

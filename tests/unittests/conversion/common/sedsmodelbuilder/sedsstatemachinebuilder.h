@@ -33,6 +33,8 @@ public:
 
     auto withState(seds::model::State state) -> SedsStateMachineBuilder &;
     auto withState(seds::common::String name) -> SedsStateMachineBuilder &;
+    auto withState(seds::common::String name, seds::model::ActivityInvocation onEntry,
+            seds::model::ActivityInvocation onExit) -> SedsStateMachineBuilder &;
 
     auto withEntryState(seds::model::EntryState state) -> SedsStateMachineBuilder &;
     auto withEntryState(seds::common::String name) -> SedsStateMachineBuilder &;
