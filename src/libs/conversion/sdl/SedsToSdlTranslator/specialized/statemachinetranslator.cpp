@@ -291,26 +291,7 @@ auto StateMachineTranslator::translateTransition(const seds::model::StateMachine
     }
 
     if (sedsTransition.guard().has_value()) {
-        const auto &guard = *sedsTransition.guard();
-        auto decision = StatementTranslatorVisitor::translateBooleanExpression(sdlProcess, nullptr, guard);
-
-        auto falseTransition = std::make_unique<::sdl::Transition>();
-        // Abort the transition
-        falseTransition->addAction(std::make_unique<::sdl::NextState>("", sdlFromState));
-        auto falseAnswer = std::make_unique<::sdl::Answer>();
-        falseAnswer->setLiteral(::sdl::VariableLiteral(FALSE_LITERAL));
-        falseAnswer->setTransition(std::move(falseTransition));
-        auto trueTransition = std::make_unique<::sdl::Transition>();
-        // Switch the current transition for exit/action/entry to the true answer
-        currentTransitionPtr = trueTransition.get();
-        auto trueAnswer = std::make_unique<::sdl::Answer>();
-        trueAnswer->setLiteral(::sdl::VariableLiteral(TRUE_LITERAL));
-        trueAnswer->setTransition(std::move(trueTransition));
-
-        decision->addAnswer(std::move(trueAnswer));
-        decision->addAnswer(std::move(falseAnswer));
-
-        mainTransition->addAction(std::move(decision));
+        currentTransitionPtr = translateGuard(sdlProcess, sdlFromState, currentTransitionPtr, *sedsTransition.guard());
     }
 
     if (stateChange) {
@@ -362,6 +343,32 @@ auto StateMachineTranslator::createExternalProcedure(ivm::IVInterface const *int
     // Arguments do not need to be translated
 
     sdlProcess->addProcedure(std::move(procedure));
+}
+
+auto StateMachineTranslator::translateGuard(::sdl::Process *sdlProcess, ::sdl::State *fromState,
+        ::sdl::Transition *currentTransitionPtr, const seds::model::BooleanExpression &guard) -> ::sdl::Transition *
+{
+    auto decision = StatementTranslatorVisitor::translateBooleanExpression(sdlProcess, nullptr, guard);
+
+    auto falseTransition = std::make_unique<::sdl::Transition>();
+    // Abort the transition
+    falseTransition->addAction(std::make_unique<::sdl::NextState>("", fromState));
+    auto falseAnswer = std::make_unique<::sdl::Answer>();
+    falseAnswer->setLiteral(::sdl::VariableLiteral(FALSE_LITERAL));
+    falseAnswer->setTransition(std::move(falseTransition));
+    auto trueTransition = std::make_unique<::sdl::Transition>();
+    // Switch the current transition for exit/action/entry to the true answer
+    auto newTransitionPtr = trueTransition.get();
+    auto trueAnswer = std::make_unique<::sdl::Answer>();
+    trueAnswer->setLiteral(::sdl::VariableLiteral(TRUE_LITERAL));
+    trueAnswer->setTransition(std::move(trueTransition));
+
+    decision->addAnswer(std::move(trueAnswer));
+    decision->addAnswer(std::move(falseAnswer));
+
+    currentTransitionPtr->addAction(std::move(decision));
+
+    return newTransitionPtr;
 }
 
 } // namespace conversion::sdl::translator

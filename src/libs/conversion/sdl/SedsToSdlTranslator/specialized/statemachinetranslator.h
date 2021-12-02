@@ -110,6 +110,10 @@ private:
     static auto createIoVariable(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
 
     static auto createExternalProcedure(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
+
+    static auto translateGuard(::sdl::Process *sdlProcess, ::sdl::State *fromState,
+            ::sdl::Transition *currentTransitionPtr, const seds::model::BooleanExpression &guard)
+            -> ::sdl::Transition *;
 };
 
 } // namespace conversion::sdl::translator
