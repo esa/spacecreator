@@ -13,8 +13,8 @@ target_include_directories(SdlRegistrar
 target_link_libraries(SdlRegistrar
     PRIVATE     SDL::Exporter
                 Conversion::SedsToSdlTranslator
-    PUBLIC      Conversion::Common
-                CommonProjectWarnings)
+                CommonProjectWarnings
+    PUBLIC      Conversion::Common)
 
 add_format_target(SdlRegistrar)
 add_tidy_target(SdlRegistrar)
