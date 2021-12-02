@@ -212,7 +212,6 @@ auto SedsPlugin::importAsn1() -> void
     options.add(conversion::seds::SedsOptions::inputFilepath, inputFilePath);
     options.add(conversion::asn1::Asn1Options::asn1FilepathPrefix, "");
     options.add(conversion::asn1::Asn1Options::acnFilepathPrefix, "");
-    options.add(conversion::seds::SedsOptions::skipValidation); // TODO: this will be removed
     try {
         auto srcModelTypes = std::set<conversion::ModelType>({ conversion::ModelType::Seds });
         auto targetModelType = conversion::ModelType::Asn1;
@@ -318,7 +317,6 @@ auto SedsPlugin::exportAsn1() -> void
         options.add(conversion::asn1::Asn1Options::inputFilepath, acnNames[i]);
         options.add(conversion::seds::SedsOptions::outputFilepath,
                 QString("%1/%2.xml").arg(outputDir).arg(getFileName(acnNames[i])));
-        options.add(conversion::seds::SedsOptions::skipValidation); // TODO: this will be removed
         try {
             auto srcModelTypes = std::set<conversion::ModelType>({ conversion::ModelType::Asn1 });
             auto targetModelType = conversion::ModelType::Seds;
