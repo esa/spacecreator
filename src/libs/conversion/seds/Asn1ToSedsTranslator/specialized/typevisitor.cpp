@@ -35,10 +35,13 @@
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
+#include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
+#include <iostream>
 #include <seds/SedsModel/types/arraydatatype.h>
 #include <seds/SedsModel/types/binarydatatype.h>
 #include <seds/SedsModel/types/booleandatatype.h>
+#include <seds/SedsModel/types/compositedatatype.h>
 #include <seds/SedsModel/types/containerdatatype.h>
 #include <seds/SedsModel/types/datatype.h>
 #include <seds/SedsModel/types/encodings/coreintegerencoding.h>
@@ -46,6 +49,7 @@
 #include <seds/SedsModel/types/enumerateddatatype.h>
 #include <seds/SedsModel/types/floatdatatype.h>
 #include <seds/SedsModel/types/integerdatatype.h>
+#include <seds/SedsModel/types/numericdatatype.h>
 #include <seds/SedsModel/types/ranges/minmaxrange.h>
 #include <seds/SedsModel/types/stringdatatype.h>
 #include <seds/SedsModel/types/subrangedatatype.h>
@@ -74,6 +78,7 @@ using Asn1Acn::Types::SequenceOf;
 using Asn1Acn::Types::UserdefinedType;
 
 using conversion::UnsupportedValueException;
+using conversion::translator::TranslationException;
 using conversion::translator::UnsupportedDataTypeException;
 
 static const QString MEMBER_TYPE_NAME_PATTERN = "Type_%1_%2";
@@ -298,30 +303,212 @@ static inline auto createIntegerType(const QString name, const uint32_t bits, ::
     package->addDataType(std::move(sedsType));
 }
 
+template<typename EntryType>
+static inline auto setEntryNameAndType(EntryType &entry, const QString typeName, const QString name) -> void
+{
+    ::seds::model::DataTypeRef reference(typeName);
+    entry.setType(std::move(reference));
+    entry.setName(name);
+}
+
+static inline auto getTypeName(const ::seds::model::DataType &type) -> QString
+{
+    return std::visit(overloaded { [](const ::seds::model::ArrayDataType &item) { return item.nameStr(); },
+                              [](const ::seds::model::BinaryDataType &item) { return item.nameStr(); },
+                              [](const ::seds::model::BooleanDataType &item) { return item.nameStr(); },
+                              [](const ::seds::model::ContainerDataType &item) { return item.nameStr(); },
+                              [](const ::seds::model::EnumeratedDataType &item) { return item.nameStr(); },
+                              [](const ::seds::model::FloatDataType &item) { return item.nameStr(); },
+                              [](const ::seds::model::IntegerDataType &item) { return item.nameStr(); },
+                              [](const ::seds::model::StringDataType &item) { return item.nameStr(); },
+                              [](const ::seds::model::SubRangeDataType &item) { return item.nameStr(); } },
+            type);
+}
+
+static inline auto retrieveTypeFromPackage(::seds::model::Package *package, const QString name)
+        -> const ::seds::model::DataType &
+{
+    for (auto &type : package->dataTypes()) {
+        if (getTypeName(type) == name) {
+            return type;
+        }
+    }
+    throw TranslationException("Referenced type not found");
+}
+
+template<typename TypeName>
+static bool typeEncodingMatches(TypeName &type1, TypeName &type2);
+
+template<>
+bool typeEncodingMatches(const ::seds::model::ArrayDataType &type1, const ::seds::model::ArrayDataType &type2)
+{
+    Q_UNUSED(type1);
+    Q_UNUSED(type2);
+    return false;
+}
+
+template<>
+bool typeEncodingMatches(const ::seds::model::BinaryDataType &type1, const ::seds::model::BinaryDataType &type2)
+{
+    Q_UNUSED(type1);
+    Q_UNUSED(type2);
+    return false;
+}
+
+template<>
+bool typeEncodingMatches(const ::seds::model::BooleanDataType &type1, const ::seds::model::BooleanDataType &type2)
+{
+    Q_UNUSED(type1);
+    Q_UNUSED(type2);
+    return false;
+}
+
+template<>
+bool typeEncodingMatches(const ::seds::model::ContainerDataType &type1, const ::seds::model::ContainerDataType &type2)
+{
+    Q_UNUSED(type1);
+    Q_UNUSED(type2);
+    return false;
+}
+
+template<>
+bool typeEncodingMatches(const ::seds::model::EnumeratedDataType &type1, const ::seds::model::EnumeratedDataType &type2)
+{
+    Q_UNUSED(type1);
+    Q_UNUSED(type2);
+    return false;
+}
+
+template<>
+bool typeEncodingMatches(const ::seds::model::FloatDataType &type1, const ::seds::model::FloatDataType &type2)
+{
+    Q_UNUSED(type1);
+    Q_UNUSED(type2);
+    return false;
+}
+
+template<>
+bool typeEncodingMatches(const ::seds::model::IntegerDataType &type1, const ::seds::model::IntegerDataType &type2)
+{
+    std::cout << "typeEncodingMatches IntegerDataType start" << std::endl;
+    if (type1.encoding().has_value() != type2.encoding().has_value()) {
+        std::cout << "typeEncodingMatches IntegerDataType has value !=" << std::endl;
+        return false;
+    }
+    if (!type1.encoding().has_value()) {
+        return true;
+    }
+
+    std::cout << "typeEncodingMatches IntegerDataType has value OK" << std::endl;
+    const auto &encoding1 = *type1.encoding();
+    const auto &encoding2 = *type2.encoding();
+    return encoding1.bits() == encoding2.bits() && encoding1.byteOrder() == encoding2.byteOrder()
+            && encoding1.encoding() == encoding2.encoding();
+}
+
+template<>
+bool typeEncodingMatches(const ::seds::model::StringDataType &type1, const ::seds::model::StringDataType &type2)
+{
+    Q_UNUSED(type1);
+    Q_UNUSED(type2);
+    return false;
+}
+
+template<>
+bool typeEncodingMatches(const ::seds::model::SubRangeDataType &type1, const ::seds::model::SubRangeDataType &type2)
+{
+    Q_UNUSED(type1);
+    Q_UNUSED(type2);
+    return false;
+}
+
+template<>
+bool typeEncodingMatches(const ::seds::model::DataType &type1, const ::seds::model::DataType &type2)
+{
+    if (std::holds_alternative<::seds::model::ArrayDataType>(type1)) {
+        std::cout << "typeEncodingMatches ArrayDataType" << std::endl;
+        return typeEncodingMatches(
+                std::get<::seds::model::ArrayDataType>(type1), std::get<::seds::model::ArrayDataType>(type2));
+    }
+    if (std::holds_alternative<::seds::model::BinaryDataType>(type1)) {
+        std::cout << "typeEncodingMatches BinaryDataType" << std::endl;
+        return typeEncodingMatches(
+                std::get<::seds::model::BinaryDataType>(type1), std::get<::seds::model::BinaryDataType>(type2));
+    }
+    if (std::holds_alternative<::seds::model::BooleanDataType>(type1)) {
+        std::cout << "typeEncodingMatches BooleanDataType" << std::endl;
+        return typeEncodingMatches(
+                std::get<::seds::model::BooleanDataType>(type1), std::get<::seds::model::BooleanDataType>(type2));
+    }
+    if (std::holds_alternative<::seds::model::ContainerDataType>(type1)) {
+        std::cout << "typeEncodingMatches ContainerDataType" << std::endl;
+        return typeEncodingMatches(
+                std::get<::seds::model::ContainerDataType>(type1), std::get<::seds::model::ContainerDataType>(type2));
+    }
+    if (std::holds_alternative<::seds::model::EnumeratedDataType>(type1)) {
+        std::cout << "typeEncodingMatches EnumeratedDataType" << std::endl;
+        return typeEncodingMatches(
+                std::get<::seds::model::EnumeratedDataType>(type1), std::get<::seds::model::EnumeratedDataType>(type2));
+    }
+    if (std::holds_alternative<::seds::model::FloatDataType>(type1)) {
+        std::cout << "typeEncodingMatches FloatDataType" << std::endl;
+        return typeEncodingMatches(
+                std::get<::seds::model::FloatDataType>(type1), std::get<::seds::model::FloatDataType>(type2));
+    }
+    if (std::holds_alternative<::seds::model::IntegerDataType>(type1)) {
+        std::cout << "typeEncodingMatches IntegerDataType" << std::endl;
+        return typeEncodingMatches(
+                std::get<::seds::model::IntegerDataType>(type1), std::get<::seds::model::IntegerDataType>(type2));
+    }
+    if (std::holds_alternative<::seds::model::StringDataType>(type1)) {
+        std::cout << "typeEncodingMatches StringDataType" << std::endl;
+        return typeEncodingMatches(
+                std::get<::seds::model::StringDataType>(type1), std::get<::seds::model::StringDataType>(type2));
+    }
+    if (std::holds_alternative<::seds::model::SubRangeDataType>(type1)) {
+        std::cout << "typeEncodingMatches SubRangeDataType" << std::endl;
+        return typeEncodingMatches(
+                std::get<::seds::model::SubRangeDataType>(type1), std::get<::seds::model::SubRangeDataType>(type2));
+    }
+
+    std::cout << "typeEncodingMatches Unknown" << std::endl;
+    return false;
+}
+
 void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
 {
     ::seds::model::ContainerDataType sedsType;
 
     for (const auto &component : type.components()) {
-        /*if (component->type()->typeEnum() == Asn1Acn::Types::Type::USERDEFINED) {
-            ::seds::model::Entry entry;
-            ::seds::model::DataTypeRef reference(component->type()->typeName());
-            entry.setType(std::move(reference));
-            entry.setName(component->name());
-            sedsType.addEntry(std::move(entry));
-        } else {*/
         if (component->type()->typeEnum() == Asn1Acn::Types::Type::NULLTYPE) {
             const auto typeName = MEMBER_TYPE_NAME_PATTERN.arg(m_context.name(), component->name());
             const auto pattern = dynamic_cast<Asn1Acn::Types::Null *>(component->type())->pattern();
             createIntegerType(typeName, static_cast<uint32_t>(pattern.length()), m_context.package());
 
             ::seds::model::FixedValueEntry entry;
-            ::seds::model::DataTypeRef reference(typeName);
+            setEntryNameAndType(entry, typeName, component->name());
             entry.setFixedValue(pattern);
-            entry.setType(std::move(reference));
-            entry.setName(component->name());
             sedsType.addEntry(std::move(entry));
             continue;
+        }
+        if (component->type()->typeEnum() == Asn1Acn::Types::Type::USERDEFINED) {
+            const auto &referencedType = retrieveTypeFromPackage(m_context.package(), component->type()->typeName());
+            std::cout << "referencedType " << referencedType.index() << std::endl;
+            ::seds::model::Package tempPackage;
+            Context context(m_context.model(), m_context.definitions(), component->type()->typeName(), &tempPackage);
+            TypeVisitor visitor(context);
+            component->type()->accept(visitor);
+            const auto &expectedType = retrieveTypeFromPackage(&tempPackage, component->type()->typeName());
+            std::cout << "expectedType " << expectedType.index() << std::endl;
+            if (typeEncodingMatches(referencedType, expectedType)) {
+                std::cout << "typeEncodingMatches true " << std::endl;
+                ::seds::model::Entry entry;
+                setEntryNameAndType(entry, component->type()->typeName(), component->name());
+                sedsType.addEntry(std::move(entry));
+                continue;
+                // If the encoding does not match, then fall through
+            }
+            std::cout << "typeEncodingMatches false " << std::endl;
         }
         const auto typeName = MEMBER_TYPE_NAME_PATTERN.arg(m_context.name(), component->name());
         Context context(m_context.model(), m_context.definitions(), typeName, m_context.package());
@@ -329,20 +516,14 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
         component->type()->accept(visitor);
 
         ::seds::model::Entry entry;
-        ::seds::model::DataTypeRef reference(typeName);
-        entry.setType(std::move(reference));
-        entry.setName(component->name());
+        setEntryNameAndType(entry, typeName, component->name());
+
         sedsType.addEntry(std::move(entry));
-        // }
     }
 
-    /*for (const auto &parameter : type.acnParameters()) {
-        ::seds::model::Entry entry;
-        ::seds::model::DataTypeRef reference(parameter->type());
-        entry.setType(std::move(reference));
-        entry.setName(parameter->name());
-        sedsType.addEntry(std::move(entry));
-    }*/
+    // TODO investigate type.acnParameters, as additional acn fields are included in type.components
+    // together with type overrides.
+
     sedsType.setName(m_context.name());
     m_context.package()->addDataType(std::move(sedsType));
 }
