@@ -44,6 +44,7 @@
 #include <sedsmodelbuilder/sedsinterfacebuilder.h>
 #include <sedsmodelbuilder/sedsinterfacecommandbuilder.h>
 #include <sedsmodelbuilder/sedsinterfacedeclarationbuilder.h>
+#include <sedsmodelbuilder/sedsinvocationbuilder.h>
 #include <sedsmodelbuilder/sedsmodelbuilder.h>
 #include <sedsmodelbuilder/sedsstatemachinebuilder.h>
 #include <unittests/common/verifyexception.h>
@@ -65,6 +66,7 @@ using tests::conversion::common::SedsImplementationBuilder;
 using tests::conversion::common::SedsInterfaceBuilder;
 using tests::conversion::common::SedsInterfaceCommandBuilder;
 using tests::conversion::common::SedsInterfaceDeclarationBuilder;
+using tests::conversion::common::SedsInvocationBuilder;
 using tests::conversion::common::SedsModelBuilder;
 using tests::conversion::common::SedsStateMachineBuilder;
 
@@ -116,6 +118,7 @@ private Q_SLOTS:
     void testTranslatePolynomialCalibrator();
     void testTranslateActivityCall();
     void testTranslateSendCommand();
+    void testTranslateOnEntryAndOnExit();
 };
 
 void tst_SedsToSdlTranslator::testMissingModel()
@@ -1013,6 +1016,92 @@ void tst_SedsToSdlTranslator::testTranslateSendCommand()
     QVERIFY(output);
     QCOMPARE(output->name(), "If1_Cmd1_Ri");
     QCOMPARE(output->parameter()->declaration()->name(), "io_If1_Cmd1_Ri");
+}
+
+/// \SRS  ETB-FUN-2530
+/// \SRS  ETB-FUN-2540
+/// \SRS  ETB-FUN-2550
+void tst_SedsToSdlTranslator::testTranslateOnEntryAndOnExit()
+{
+    const auto sedsModel =
+            SedsModelBuilder("Package")
+                    .withIntegerDataType("Integer")
+                    .withComponent(
+                            SedsComponentBuilder("Component")
+                                    .declaringInterface(SedsInterfaceDeclarationBuilder("If1Type")
+                                                                .withCommand(SedsInterfaceCommandBuilder(
+                                                                        "Cmd1", InterfaceCommandMode::Async)
+                                                                                     .build())
+                                                                .build())
+                                    .withProvidedInterface(SedsInterfaceBuilder("If1", "If1Type").build())
+                                    .withImplementation(
+                                            SedsImplementationBuilder()
+                                                    .withActivity(SedsActivityBuilder("activity1").build())
+                                                    .withActivity(SedsActivityBuilder("onExit1").build())
+                                                    .withActivity(SedsActivityBuilder("onEntry1").build())
+                                                    .withStateMachine(
+                                                            SedsStateMachineBuilder()
+                                                                    .withEntryState("StateA")
+                                                                    .withState("StateB",
+                                                                            SedsInvocationBuilder("onEntry1").build(),
+                                                                            SedsInvocationBuilder("onExit1").build())
+                                                                    .withTransition("StateA", "StateB",
+                                                                            SedsCommandPrimitiveBuilder("If1", "Cmd1")
+                                                                                    .build(),
+                                                                            "activity1")
+                                                                    .withTransition("StateB", "StateA",
+                                                                            SedsCommandPrimitiveBuilder("If1", "Cmd1")
+                                                                                    .build(),
+                                                                            "activity1")
+                                                                    .build())
+                                                    .build())
+                                    .build())
+                    .build();
+
+    Options options;
+    options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
+
+    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    SedsToSdlTranslator sdlTranslator;
+
+    const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);
+    const auto ivModels = ivTranslator.translateModels({ sedsModel.get(), asn1Models[0].get() }, options);
+
+    const auto resultModels =
+            sdlTranslator.translateModels({ sedsModel.get(), asn1Models[0].get(), ivModels[0].get() }, options);
+
+    const auto &resultModel = resultModels[0];
+    const auto *sdlModel = dynamic_cast<SdlModel *>(resultModel.get());
+    const auto &process = sdlModel->processes()[0];
+
+    const auto stateA = getStateOfName(process, "StateA");
+
+    QCOMPARE(stateA->inputs()[0]->transition()->actions().size(), 3);
+
+    const auto activityInvocationActionA = stateA->inputs()[0]->transition()->actions()[0].get();
+    const auto activityInvocationA = dynamic_cast<const ::sdl::ProcedureCall *>(activityInvocationActionA);
+    QVERIFY(activityInvocationA);
+    QCOMPARE(activityInvocationA->procedure()->name(), "activity1");
+
+    const auto entryInvocationActionA = stateA->inputs()[0]->transition()->actions()[1].get();
+    const auto entryInvocationA = dynamic_cast<const ::sdl::ProcedureCall *>(entryInvocationActionA);
+    QVERIFY(entryInvocationA);
+    QCOMPARE(entryInvocationA->procedure()->name(), "onEntry1");
+
+    const auto stateB = getStateOfName(process, "StateB");
+
+    QCOMPARE(stateB->inputs()[0]->transition()->actions().size(), 3);
+
+    const auto exitInvocationActionB = stateB->inputs()[0]->transition()->actions()[0].get();
+    const auto exitInvocationB = dynamic_cast<const ::sdl::ProcedureCall *>(exitInvocationActionB);
+    QVERIFY(exitInvocationB);
+    QCOMPARE(exitInvocationB->procedure()->name(), "onExit1");
+
+    const auto activityInvocationActionB = stateB->inputs()[0]->transition()->actions()[1].get();
+    const auto activityInvocationB = dynamic_cast<const ::sdl::ProcedureCall *>(activityInvocationActionB);
+    QVERIFY(activityInvocationB);
+    QCOMPARE(activityInvocationB->procedure()->name(), "activity1");
 }
 
 } // namespace conversion::sdl::test
