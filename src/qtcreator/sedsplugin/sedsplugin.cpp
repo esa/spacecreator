@@ -61,7 +61,6 @@
 #include <editormanager/ieditor.h>
 #include <exception>
 #include <messagemanager.h>
-#include <shared/ui/listtreedialog.h>
 
 using namespace Core;
 using conversion::Converter;
@@ -116,7 +115,8 @@ auto SedsPlugin::aboutToShutdown() -> ExtensionSystem::IPlugin::ShutdownFlag
     return SynchronousShutdown;
 }
 
-auto SedsPlugin::updateModelWithFunctionNames(QStandardItemModel &model, const QStringList &ivFunctionsNames) -> void
+auto SedsPlugin::itemModelUpdateWithFunctionNames(QStandardItemModel &model, const QStringList &ivFunctionsNames)
+        -> void
 {
     QStandardItemModel *const functionsListModel = &model;
 
@@ -245,37 +245,24 @@ auto SedsPlugin::exportInterfaceView() -> void
     }
 
     QStandardItemModel functionsListModel;
-    updateModelWithFunctionNames(functionsListModel, ivFunctionsNames);
+    itemModelUpdateWithFunctionNames(functionsListModel, ivFunctionsNames);
 
-    ListTreeDialog ldDialog(&functionsListModel, "Export to EDS", [&]() {
-        QStandardItemModel *const model = ldDialog.model();
-        const auto rows = model->rowCount();
-        const auto cols = model->columnCount();
+    ListTreeDialog ltDialog;
+    ltdialogUpdateWithItemModel(ltDialog, &functionsListModel);
 
-        for (int i = 0; i < cols; i++) {
-            for (int j = 0; j < rows; j++) {
-                QStandardItem *const item = model->takeItem(j, i);
-                if (item != nullptr && item->checkState() == Qt::Checked) {
-                    ldDialog.selectedItems()->append(item->text());
-                }
-            }
-        }
+    ltDialog.exec();
 
-        ldDialog.close();
-    });
-    ldDialog.setWindowTitle("IV functions to be exported");
-
-    ldDialog.exec();
-
-    QList<QString> *const selectedFunctions = ldDialog.selectedItems();
-    if (!selectedFunctions->empty()) {
+    QList<QString> *const selectedFunctions = ltDialog.selectedItems();
+    if (selectedFunctions->empty()) {
+        MessageManager::write(GenMsg::msgInfo.arg(GenMsg::ivNoFunctionsSelected));
+        return;
+    } else {
         for (auto &item : *selectedFunctions) {
             qDebug() << "Selected function: " << item;
         }
     }
 
-    QString outputDir = QFileDialog::getExistingDirectory(nullptr, "Select destination directory");
-    qDebug() << "Selected directory: " << outputDir;
+    const QString outputDir = QFileDialog::getExistingDirectory(nullptr, "Select destination directory");
 
     const QVector<ivm::IVFunction *> allIvFunctions = ivEditorCore->allIVFunctions();
     if (!allIvFunctions.isEmpty()) {
@@ -283,9 +270,6 @@ auto SedsPlugin::exportInterfaceView() -> void
         ivm::IVModel *const ivModel = ivFunction->model();
         if (ivModel != nullptr) {
             conversion::Options options;
-            for (auto &selectedFunction : *selectedFunctions) {
-                // options.add(conversion::iv::IvOptions::, selectedFunction);
-            }
             options.add(conversion::iv::IvOptions::inputFilepath,
                     QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg("interfaceview.xml"));
             options.add(conversion::asn1::Asn1Options::inputFilepath,
@@ -296,20 +280,16 @@ auto SedsPlugin::exportInterfaceView() -> void
             options.add(conversion::iv::IvOptions::configFilepath,
                     QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg("config.xml"));
             options.add(conversion::seds::SedsOptions::outputFilepath,
-                    QString("%1%2%3.xml").arg(outputDir).arg(QDir::separator()).arg("output-eds"));
+                    QString("%1%2%3.xml").arg(outputDir).arg(QDir::separator()).arg("output"));
+            for (auto &selectedFunction : *selectedFunctions) {
+                // options.add(conversion::iv::IvOptions::, selectedFunction);
+            }
 
             try {
-                auto srcModelType = std::set<conversion::ModelType>(
-                        { conversion::ModelType::InterfaceView, conversion::ModelType::Asn1 });
-                auto targetModelType = conversion::ModelType::Seds;
-                auto auxModelTypes = std::set<conversion::ModelType>({});
-                Converter converter(m_registry, std::move(options));
-                converter.convert(srcModelType, targetModelType, auxModelTypes);
+                convertIvToSeds(options);
                 MessageManager::write(GenMsg::msgInfo.arg("file(s) exported"));
             } catch (conversion::ConverterException &ex) {
                 MessageManager::write(GenMsg::msgWarning.arg(ex.what()));
-            } catch (std::exception &ex) {
-                MessageManager::write(GenMsg::msgError.arg(ex.what()));
             }
         } else {
             MessageManager::write(GenMsg::msgError.arg("IV model could not be read"));
@@ -397,4 +377,39 @@ auto SedsPlugin::initializeRegistry() -> void
         throw RegistrationFailedException(ModelType::Sdl);
     }
 }
+
+auto SedsPlugin::convertIvToSeds(conversion::Options options) -> void
+{
+    auto srcModelType =
+            std::set<conversion::ModelType>({ conversion::ModelType::InterfaceView, conversion::ModelType::Asn1 });
+    auto targetModelType = conversion::ModelType::Seds;
+    auto auxModelTypes = std::set<conversion::ModelType>({});
+
+    Converter converter(m_registry, std::move(options));
+    converter.convert(srcModelType, targetModelType, auxModelTypes);
 }
+
+auto SedsPlugin::ltdialogUpdateWithItemModel(ListTreeDialog &ltdialog, QStandardItemModel *model) -> void
+{
+    ltdialog.setModel(model);
+    ltdialog.setButtonText("Export to EDS");
+    ltdialog.setButtonHandler([&]() {
+        QStandardItemModel *const model = ltdialog.model();
+        const auto rows = model->rowCount();
+        const auto cols = model->columnCount();
+
+        for (int i = 0; i < cols; i++) {
+            for (int j = 0; j < rows; j++) {
+                QStandardItem *const item = model->takeItem(j, i);
+                if (item != nullptr && item->checkState() == Qt::Checked) {
+                    ltdialog.selectedItems()->append(item->text());
+                }
+            }
+        }
+
+        ltdialog.close();
+    });
+    ltdialog.setWindowTitle("IV functions to be exported");
+}
+
+} // namespace spctr
