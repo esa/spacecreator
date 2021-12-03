@@ -26,12 +26,14 @@
 #include "context/action/actionsmanager.h"
 #include "conversion/asn1/Asn1Options/options.h"
 #include "conversion/converter/exceptions.h"
+#include "conversion/iv/IvOptions/options.h"
 #include "exceptions.h"
 #include "export/exceptions.h"
 #include "import/exceptions.h"
 #include "interfacedocument.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
+#include "ivfunction.h"
 #include "ivlibrary.h"
 #include "ivmodel.h"
 #include "model.h"
@@ -79,7 +81,6 @@ const QString fileToImportNotSelected = "File to import not selected";
 const QString ivFileNotSelected = "InterfaceView file not selected";
 const QString ivNoFunctionsInIv = "InterfaceView does not contain functions which could be exported";
 const QString ivNoFunctionsSelected = "No functions selected to export";
-const QString conversionFinished = "Conversion finished";
 }
 
 namespace spctr {
@@ -271,10 +272,49 @@ auto SedsPlugin::exportInterfaceView() -> void
         for (auto &item : *selectedFunctions) {
             qDebug() << "Selected function: " << item;
         }
+    }
 
-        QString outputDir = QFileDialog::getExistingDirectory(nullptr, "Select destination directory");
-        qDebug() << "Selected directory: " << outputDir;
-        // TODO: implementation
+    QString outputDir = QFileDialog::getExistingDirectory(nullptr, "Select destination directory");
+    qDebug() << "Selected directory: " << outputDir;
+
+    const QVector<ivm::IVFunction *> allIvFunctions = ivEditorCore->allIVFunctions();
+    if (!allIvFunctions.isEmpty()) {
+        ivm::IVFunction *const ivFunction = allIvFunctions[0];
+        ivm::IVModel *const ivModel = ivFunction->model();
+        if (ivModel != nullptr) {
+            conversion::Options options;
+            for (auto &selectedFunction : *selectedFunctions) {
+                // options.add(conversion::iv::IvOptions::, selectedFunction);
+            }
+            options.add(conversion::iv::IvOptions::inputFilepath,
+                    QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg("interfaceview.xml"));
+            options.add(conversion::asn1::Asn1Options::inputFilepath,
+                    QString("%1%2%3")
+                            .arg(QDir::currentPath())
+                            .arg(QDir::separator())
+                            .arg("test_simple_data_types.asn"));
+            options.add(conversion::iv::IvOptions::configFilepath,
+                    QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg("config.xml"));
+            options.add(conversion::seds::SedsOptions::outputFilepath,
+                    QString("%1%2%3.xml").arg(outputDir).arg(QDir::separator()).arg("output-eds"));
+
+            try {
+                auto srcModelType = std::set<conversion::ModelType>(
+                        { conversion::ModelType::InterfaceView, conversion::ModelType::Asn1 });
+                auto targetModelType = conversion::ModelType::Seds;
+                auto auxModelTypes = std::set<conversion::ModelType>({});
+                Converter converter(m_registry, std::move(options));
+                converter.convert(srcModelType, targetModelType, auxModelTypes);
+                MessageManager::write(GenMsg::msgInfo.arg("file(s) exported"));
+            } catch (conversion::ConverterException &ex) {
+                MessageManager::write(GenMsg::msgWarning.arg(ex.what()));
+            } catch (std::exception &ex) {
+                MessageManager::write(GenMsg::msgError.arg(ex.what()));
+            }
+        } else {
+            MessageManager::write(GenMsg::msgError.arg("IV model could not be read"));
+            return;
+        }
     } else {
         MessageManager::write(GenMsg::msgError.arg(GenMsg::ivNoFunctionsSelected));
         return;
@@ -335,7 +375,7 @@ auto SedsPlugin::exportAsn1() -> void
     }
 }
 
-void SedsPlugin::initializeRegistry()
+auto SedsPlugin::initializeRegistry() -> void
 {
     Asn1Registrar asn1Registrar;
     if (!asn1Registrar.registerCapabilities(m_registry)) {
@@ -357,5 +397,4 @@ void SedsPlugin::initializeRegistry()
         throw RegistrationFailedException(ModelType::Sdl);
     }
 }
-
 }
