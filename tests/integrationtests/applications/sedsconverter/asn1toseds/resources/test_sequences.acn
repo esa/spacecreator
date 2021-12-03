@@ -23,4 +23,6 @@ SequenceWithPattern [] {
     pattern2 NULL [pattern '1010'B]
 }
 
+SequenceWithOptional []
+
 END

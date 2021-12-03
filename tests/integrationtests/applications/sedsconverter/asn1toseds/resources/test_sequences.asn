@@ -28,4 +28,10 @@ SequenceWithPattern ::= SEQUENCE {
     payload Type1
 }
 
+SequenceWithOptional ::= SEQUENCE {
+    a Type1,
+    b Type2 OPTIONAL,
+    c Type1 OPTIONAL
+}
+
 END

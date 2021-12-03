@@ -21,6 +21,8 @@
 
 #include "constraintvisitor.h"
 
+#include <asn1library/asn1/asnsequencecomponent.h>
+#include <asn1library/asn1/sequencecomponent.h>
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
 #include <asn1library/asn1/types/choice.h>
@@ -82,6 +84,8 @@ using conversion::translator::TranslationException;
 using conversion::translator::UnsupportedDataTypeException;
 
 static const QString MEMBER_TYPE_NAME_PATTERN = "Type_%1_%2";
+static const QString MEMBER_IS_PRESENT_PATTERN = "is_%1_present";
+static const QString IS_PRESENT_TYPE_NAME = "IsPresent";
 
 namespace conversion::seds::translator {
 
@@ -325,10 +329,20 @@ static inline auto getTypeName(const ::seds::model::DataType &type) -> QString
             type);
 }
 
+static inline auto isTypePresentInPackage(::seds::model::Package *package, const QString name) -> bool
+{
+    for (const auto &type : package->dataTypes()) {
+        if (getTypeName(type) == name) {
+            return true;
+        }
+    }
+    return false;
+}
+
 static inline auto retrieveTypeFromPackage(::seds::model::Package *package, const QString name)
         -> const ::seds::model::DataType &
 {
-    for (auto &type : package->dataTypes()) {
+    for (const auto &type : package->dataTypes()) {
         if (getTypeName(type) == name) {
             return type;
         }
@@ -482,9 +496,34 @@ static inline auto expectedTypeMatchesExistingOne(TypeVisitor::Context &context,
     return typeEncodingMatches(referencedType, expectedType);
 }
 
+static inline auto addOptionalIndicators(TypeVisitor::Context &context, const ::Asn1Acn::Types::Sequence &type,
+        ::seds::model::ContainerDataType &sedsType)
+{
+    bool has_optionals = false;
+    for (const auto &component : type.components()) {
+        const auto asn1Component = dynamic_cast<Asn1Acn::AsnSequenceComponent *>(component.get());
+        if (asn1Component == nullptr) {
+            continue;
+        }
+        if (asn1Component->isOptional()) {
+            has_optionals = true;
+            ::seds::model::Entry entry;
+            setEntryNameAndType(entry, IS_PRESENT_TYPE_NAME, MEMBER_IS_PRESENT_PATTERN.arg(component->name()));
+            sedsType.addEntry(std::move(entry));
+        }
+    }
+    // Add BOOLEAN type if not found but required
+    if (has_optionals && !isTypePresentInPackage(context.package(), IS_PRESENT_TYPE_NAME)) {
+        ::seds::model::BooleanDataType boolType;
+        boolType.setName(IS_PRESENT_TYPE_NAME);
+        context.package()->addDataType(std::move(boolType));
+    }
+}
+
 void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
 {
     ::seds::model::ContainerDataType sedsType;
+    addOptionalIndicators(m_context, type, sedsType);
 
     for (const auto &component : type.components()) {
         if (component->type()->typeEnum() == Asn1Acn::Types::Type::NULLTYPE) {

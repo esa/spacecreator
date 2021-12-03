@@ -115,13 +115,14 @@ auto DataTypeExporter::exportContainerDataType(
     auto entryListElement = sedsDocument.createElement(QStringLiteral("EntryList"));
 
     for (const auto &entry : dataType.entries()) {
-        auto entryElement = sedsDocument.createElement(QStringLiteral("Entry"));
         if (std::holds_alternative<model::Entry>(entry)) {
+            auto entryElement = sedsDocument.createElement(QStringLiteral("Entry"));
             const auto &castEntry = std::get<model::Entry>(entry);
             entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
             entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
             entryListElement.appendChild(std::move(entryElement));
         } else if (std::holds_alternative<model::FixedValueEntry>(entry)) {
+            auto entryElement = sedsDocument.createElement(QStringLiteral("FixedValueEntry"));
             const auto &castEntry = std::get<model::FixedValueEntry>(entry);
             entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
             entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
