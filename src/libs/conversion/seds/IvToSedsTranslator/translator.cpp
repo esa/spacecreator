@@ -74,7 +74,7 @@ std::vector<std::unique_ptr<Model>> IvToSedsTranslator::translateIvModel(
         std::vector<QString> functionsToConvert = options.values(iv::IvOptions::functionToConvert);
         for (const auto &ivFunction : ivFunctions) {
             const QString &ivFunctionName = ivFunction->title();
-            bool isPresent = std::any_of(functionsToConvert.begin(), functionsToConvert.end(),
+            const bool isPresent = std::any_of(functionsToConvert.begin(), functionsToConvert.end(),
                     [&](const QString &name) { return name == ivFunctionName; });
 
             if (isPresent) {

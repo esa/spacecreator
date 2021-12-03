@@ -80,6 +80,9 @@ const QString fileToImportNotSelected = "File to import not selected";
 const QString ivFileNotSelected = "InterfaceView file not selected";
 const QString ivNoFunctionsInIv = "InterfaceView does not contain functions which could be exported";
 const QString ivNoFunctionsSelected = "No functions selected to export";
+const QString filesExported = "file(s) exported";
+const QString filesImported = "file(s) imported";
+const QString ivModelNotRead = "IV model could not be read";
 }
 
 namespace spctr {
@@ -218,7 +221,7 @@ auto SedsPlugin::importAsn1() -> void
         auto auxModelTypes = std::set<conversion::ModelType>({});
         Converter converter(m_registry, std::move(options));
         converter.convert(srcModelTypes, targetModelType, auxModelTypes);
-        MessageManager::write(GenMsg::msgInfo.arg("file(s) imported"));
+        MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesImported));
     } catch (conversion::ConverterException &ex) {
         MessageManager::write(GenMsg::msgError.arg(ex.what()));
     } catch (conversion::FileNotFoundException &ex) {
@@ -256,10 +259,6 @@ auto SedsPlugin::exportInterfaceView() -> void
     if (selectedFunctions->empty()) {
         MessageManager::write(GenMsg::msgInfo.arg(GenMsg::ivNoFunctionsSelected));
         return;
-    } else {
-        for (auto &item : *selectedFunctions) {
-            qDebug() << "Selected function: " << item;
-        }
     }
 
     const QString outputDir = QFileDialog::getExistingDirectory(nullptr, "Select destination directory");
@@ -273,27 +272,26 @@ auto SedsPlugin::exportInterfaceView() -> void
             options.add(conversion::iv::IvOptions::inputFilepath,
                     QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg("interfaceview.xml"));
             options.add(conversion::asn1::Asn1Options::inputFilepath,
-                    QString("%1%2%3")
-                            .arg(QDir::currentPath())
-                            .arg(QDir::separator())
-                            .arg("test_simple_data_types.asn"));
+                    QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg("DataView.asn"));
             options.add(conversion::iv::IvOptions::configFilepath,
                     QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg("config.xml"));
             options.add(conversion::seds::SedsOptions::outputFilepath,
-                    QString("%1%2%3.xml").arg(outputDir).arg(QDir::separator()).arg("output"));
+                    QString("%1%2%3.xml").arg(outputDir).arg(QDir::separator()).arg("seds_interfaceview"));
             for (auto &selectedFunction : *selectedFunctions) {
                 options.add(conversion::iv::IvOptions::functionToConvert, selectedFunction);
             }
 
             try {
                 convertIvToSeds(options);
-                MessageManager::write(GenMsg::msgInfo.arg("file(s) exported"));
+                MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesExported));
             } catch (conversion::ConverterException &ex) {
                 MessageManager::write(GenMsg::msgWarning.arg(ex.what()));
+            } catch (std::exception &ex) {
+                MessageManager::write(GenMsg::msgWarning.arg(ex.what()));
             }
+
         } else {
-            MessageManager::write(GenMsg::msgError.arg("IV model could not be read"));
-            return;
+            MessageManager::write(GenMsg::msgError.arg(GenMsg::ivModelNotRead));
         }
     } else {
         MessageManager::write(GenMsg::msgError.arg(GenMsg::ivNoFunctionsSelected));
@@ -346,7 +344,7 @@ auto SedsPlugin::exportAsn1() -> void
             auto auxModelTypes = std::set<conversion::ModelType>({});
             Converter converter(m_registry, std::move(options));
             converter.convert(srcModelTypes, targetModelType, auxModelTypes);
-            MessageManager::write(GenMsg::msgInfo.arg("file(s) exported"));
+            MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesExported));
         } catch (conversion::ConverterException &ex) {
             MessageManager::write(GenMsg::msgError.arg(ex.what()));
         } catch (std::exception &ex) {
