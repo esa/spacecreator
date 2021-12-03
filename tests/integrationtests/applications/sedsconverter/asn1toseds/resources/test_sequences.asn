@@ -9,9 +9,23 @@ SimpleSequence ::= SEQUENCE {
     c Type2
 }
 
+SimpleSequenceWithEncodingOverride ::= SEQUENCE {
+    a Type1,
+    b Type2
+}
+
 AnonymousTypes ::= SEQUENCE {
     x INTEGER(0..100),
     y REAL(0..1)
+}
+
+AnonymousTypesWithEncoding ::= SEQUENCE {
+    x INTEGER(0..100),
+    y REAL(0..1)
+}
+
+SequenceWithPattern ::= SEQUENCE {
+    payload Type1
 }
 
 END

@@ -5,4 +5,22 @@ Type2 [size 32, encoding pos-int, endianness little]
 
 SimpleSequence []
 
+SimpleSequenceWithEncodingOverride [] {
+    a [size 64, encoding pos-int, endianness little],
+    b [size 16, encoding pos-int, endianness big]
+}
+
+AnonymousTypes []
+
+AnonymousTypesWithEncoding [] {
+    x [size 16, encoding pos-int, endianness big],
+    y [encoding IEEE754-1985-32, endianness big]
+}
+
+SequenceWithPattern [] {
+    pattern1 NULL [pattern '000'B],
+    payload [],
+    pattern2 NULL [pattern '1010'B]
+}
+
 END

@@ -277,30 +277,72 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Choice &type)
     throw UnsupportedDataTypeException("Choice");
 }
 
+static inline auto createIntegerType(const QString name, const uint32_t bits, ::seds::model::Package *package) -> void
+{
+    ::seds::model::IntegerDataType sedsType;
+    ::seds::model::MinMaxRange range;
+    range.setType(::seds::model::RangeType::InclusiveMinInclusiveMax);
+    range.setMax(QString::number((1 << bits) - 1));
+    range.setMin(QString("0"));
+    sedsType.setRange(std::move(range));
+
+    ::seds::model::IntegerDataEncoding encoding;
+    encoding.setBits(bits);
+
+    setEndianness(encoding, Asn1Acn::Types::Endianness::little);
+    setIntegerEncoding(encoding, Asn1Acn::Types::IntegerEncoding::pos_int);
+
+    sedsType.setEncoding(std::move(encoding));
+
+    sedsType.setName(name);
+    package->addDataType(std::move(sedsType));
+}
+
 void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
 {
     ::seds::model::ContainerDataType sedsType;
 
     for (const auto &component : type.components()) {
-        if (component->type()->typeEnum() == Asn1Acn::Types::Type::USERDEFINED) {
+        /*if (component->type()->typeEnum() == Asn1Acn::Types::Type::USERDEFINED) {
             ::seds::model::Entry entry;
             ::seds::model::DataTypeRef reference(component->type()->typeName());
             entry.setType(std::move(reference));
             entry.setName(component->name());
             sedsType.addEntry(std::move(entry));
-        } else {
+        } else {*/
+        if (component->type()->typeEnum() == Asn1Acn::Types::Type::NULLTYPE) {
             const auto typeName = MEMBER_TYPE_NAME_PATTERN.arg(m_context.name(), component->name());
-            Context context(m_context.model(), m_context.definitions(), typeName, m_context.package());
-            TypeVisitor visitor(context);
-            component->type()->accept(visitor);
+            const auto pattern = dynamic_cast<Asn1Acn::Types::Null *>(component->type())->pattern();
+            createIntegerType(typeName, static_cast<uint32_t>(pattern.length()), m_context.package());
 
-            ::seds::model::Entry entry;
+            ::seds::model::FixedValueEntry entry;
             ::seds::model::DataTypeRef reference(typeName);
+            entry.setFixedValue(pattern);
             entry.setType(std::move(reference));
             entry.setName(component->name());
             sedsType.addEntry(std::move(entry));
+            continue;
         }
+        const auto typeName = MEMBER_TYPE_NAME_PATTERN.arg(m_context.name(), component->name());
+        Context context(m_context.model(), m_context.definitions(), typeName, m_context.package());
+        TypeVisitor visitor(context);
+        component->type()->accept(visitor);
+
+        ::seds::model::Entry entry;
+        ::seds::model::DataTypeRef reference(typeName);
+        entry.setType(std::move(reference));
+        entry.setName(component->name());
+        sedsType.addEntry(std::move(entry));
+        // }
     }
+
+    /*for (const auto &parameter : type.acnParameters()) {
+        ::seds::model::Entry entry;
+        ::seds::model::DataTypeRef reference(parameter->type());
+        entry.setType(std::move(reference));
+        entry.setName(parameter->name());
+        sedsType.addEntry(std::move(entry));
+    }*/
     sedsType.setName(m_context.name());
     m_context.package()->addDataType(std::move(sedsType));
 }
@@ -308,7 +350,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
 void TypeVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)
 {
     Q_UNUSED(type);
-    throw UnsupportedDataTypeException("SequenceOf");
+    // throw UnsupportedDataTypeException("SequenceOf");
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Real &type)

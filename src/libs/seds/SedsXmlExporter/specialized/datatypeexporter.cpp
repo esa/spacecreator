@@ -116,13 +116,20 @@ auto DataTypeExporter::exportContainerDataType(
 
     for (const auto &entry : dataType.entries()) {
         auto entryElement = sedsDocument.createElement(QStringLiteral("Entry"));
-        if (!std::holds_alternative<model::Entry>(entry)) {
-            throw UnsupportedElementException("Non-entry Container element");
+        if (std::holds_alternative<model::Entry>(entry)) {
+            const auto &castEntry = std::get<model::Entry>(entry);
+            entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
+            entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
+            entryListElement.appendChild(std::move(entryElement));
+        } else if (std::holds_alternative<model::FixedValueEntry>(entry)) {
+            const auto &castEntry = std::get<model::FixedValueEntry>(entry);
+            entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
+            entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
+            entryElement.setAttribute(QStringLiteral("fixedValue"), castEntry.fixedValue()->value());
+            entryListElement.appendChild(std::move(entryElement));
+        } else {
+            throw UnsupportedElementException("Container element");
         }
-        const auto &castEntry = std::get<model::Entry>(entry);
-        entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
-        entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
-        entryListElement.appendChild(std::move(entryElement));
     }
 
     typeElement.appendChild(std::move(entryListElement));
