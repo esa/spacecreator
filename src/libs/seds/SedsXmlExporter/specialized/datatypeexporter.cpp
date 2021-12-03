@@ -64,10 +64,22 @@ auto DataTypeExporter::exportDataType(
 auto DataTypeExporter::exportArrayDataType(
         const model::ArrayDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void
 {
-    Q_UNUSED(dataType);
-    Q_UNUSED(setElement);
-    Q_UNUSED(sedsDocument);
-    throw UnsupportedElementException("ArrayDataType");
+    auto typeElement = sedsDocument.createElement(QStringLiteral("ArrayDataType"));
+    typeElement.setAttribute(QStringLiteral("name"), dataType.nameStr());
+    typeElement.setAttribute(QStringLiteral("dataTypeRef"), dataType.type().nameStr());
+    auto dimmensionsElement = sedsDocument.createElement(QStringLiteral("DimensionList"));
+    for (const auto &dimmension : dataType.dimensions()) {
+        auto dimmensionElement = sedsDocument.createElement(QStringLiteral("Dimension"));
+        if (!dimmension.size().has_value()) {
+            throw UnsupportedElementException("Array Dimmension without size");
+        }
+        const auto &size = dimmension.size().value();
+        dimmensionElement.setAttribute(QStringLiteral("size"), QString::number(size.value()));
+        dimmensionsElement.appendChild(std::move(dimmensionElement));
+    }
+
+    typeElement.appendChild(std::move(dimmensionsElement));
+    setElement.appendChild(std::move(typeElement));
 }
 
 auto DataTypeExporter::exportBinaryDataType(
@@ -115,22 +127,40 @@ auto DataTypeExporter::exportContainerDataType(
     auto entryListElement = sedsDocument.createElement(QStringLiteral("EntryList"));
 
     for (const auto &entry : dataType.entries()) {
-        if (std::holds_alternative<model::Entry>(entry)) {
-            auto entryElement = sedsDocument.createElement(QStringLiteral("Entry"));
-            const auto &castEntry = std::get<model::Entry>(entry);
-            entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
-            entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
-            entryListElement.appendChild(std::move(entryElement));
-        } else if (std::holds_alternative<model::FixedValueEntry>(entry)) {
-            auto entryElement = sedsDocument.createElement(QStringLiteral("FixedValueEntry"));
-            const auto &castEntry = std::get<model::FixedValueEntry>(entry);
-            entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
-            entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
-            entryElement.setAttribute(QStringLiteral("fixedValue"), castEntry.fixedValue()->value());
-            entryListElement.appendChild(std::move(entryElement));
-        } else {
-            throw UnsupportedElementException("Container element");
-        }
+        std::visit(overloaded { [&sedsDocument, &entryListElement](const model::Entry &castEntry) {
+                                   auto entryElement = sedsDocument.createElement(QStringLiteral("Entry"));
+                                   entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
+                                   entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
+                                   entryListElement.appendChild(std::move(entryElement));
+                               },
+                           [&sedsDocument, &entryListElement](const model::FixedValueEntry &castEntry) {
+                               auto entryElement = sedsDocument.createElement(QStringLiteral("FixedValueEntry"));
+                               entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
+                               entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
+                               entryElement.setAttribute(QStringLiteral("fixedValue"), castEntry.fixedValue()->value());
+                               entryListElement.appendChild(std::move(entryElement));
+                           },
+                           [&sedsDocument, &entryListElement](const model::LengthEntry &castEntry) {
+                               Q_UNUSED(castEntry);
+                               throw UnsupportedElementException("Container LengthEntry");
+                           },
+                           [&sedsDocument, &entryListElement](const model::ErrorControlEntry &castEntry) {
+                               Q_UNUSED(castEntry);
+                               throw UnsupportedElementException("Container ErrorControlEntry");
+                           },
+                           [&sedsDocument, &entryListElement](const model::ListEntry &castEntry) {
+                               auto entryElement = sedsDocument.createElement(QStringLiteral("ListEntry"));
+                               entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
+                               entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
+                               entryElement.setAttribute(
+                                       QStringLiteral("listLengthField"), castEntry.listLengthField().value().value());
+                               entryListElement.appendChild(std::move(entryElement));
+                           },
+                           [&sedsDocument, &entryListElement](const model::PaddingEntry &castEntry) {
+                               Q_UNUSED(castEntry);
+                               throw UnsupportedElementException("Container PaddingEntry");
+                           } },
+                entry);
     }
 
     typeElement.appendChild(std::move(entryListElement));

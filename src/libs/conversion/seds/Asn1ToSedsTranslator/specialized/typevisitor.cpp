@@ -84,8 +84,12 @@ using conversion::translator::TranslationException;
 using conversion::translator::UnsupportedDataTypeException;
 
 static const QString MEMBER_TYPE_NAME_PATTERN = "Type_%1_%2";
+static const QString ITEM_TYPE_NAME_PATTERN = "ItemType_%1";
 static const QString MEMBER_IS_PRESENT_PATTERN = "is_%1_present";
 static const QString IS_PRESENT_TYPE_NAME = "IsPresent";
+static const QString ARRAY_MEMBER_NAME = "elements";
+static const QString ARRAY_LENGTH_MEMBER_NAME = "count";
+static const QString ARRAY_LENGTH_TYPE_NAME = "Size_%1";
 
 namespace conversion::seds::translator {
 
@@ -199,6 +203,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Boolean &type)
 void TypeVisitor::visit(const ::Asn1Acn::Types::Null &type)
 {
     Q_UNUSED(type);
+    // Nulls are supported only as patterns within containers (e.g. sequences)
     throw UnsupportedDataTypeException("Null");
 }
 
@@ -302,6 +307,20 @@ static inline auto createIntegerType(const QString name, const uint32_t bits, ::
     setIntegerEncoding(encoding, Asn1Acn::Types::IntegerEncoding::pos_int);
 
     sedsType.setEncoding(std::move(encoding));
+
+    sedsType.setName(name);
+    package->addDataType(std::move(sedsType));
+}
+
+static inline auto createIntegerType(const QString name, const uint32_t minimumSize, const uint32_t maximumSize,
+        ::seds::model::Package *package) -> void
+{
+    ::seds::model::IntegerDataType sedsType;
+    ::seds::model::MinMaxRange range;
+    range.setType(::seds::model::RangeType::InclusiveMinInclusiveMax);
+    range.setMax(QString::number(maximumSize));
+    range.setMin(QString::number(minimumSize));
+    sedsType.setRange(std::move(range));
 
     sedsType.setName(name);
     package->addDataType(std::move(sedsType));
@@ -482,7 +501,8 @@ bool typeEncodingMatches(const ::seds::model::DataType &type1, const ::seds::mod
     return false;
 }
 
-static inline auto expectedTypeMatchesExistingOne(TypeVisitor::Context &context, Asn1Acn::Types::Type *type) -> bool
+static inline auto expectedTypeMatchesExistingOne(TypeVisitor::Context &context, const Asn1Acn::Types::Type *type)
+        -> bool
 {
     const auto typeName = type->typeName();
     const auto &referencedType = retrieveTypeFromPackage(context.package(), typeName);
@@ -566,8 +586,54 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)
 {
-    Q_UNUSED(type);
-    throw UnsupportedDataTypeException("SequenceOf");
+    ConstraintVisitor<IntegerValue> constraintVisitor;
+    type.constraints().accept(constraintVisitor);
+
+    if (!constraintVisitor.isSizeConstraintVisited()) {
+
+        throw TranslationException("Sequences Of without specified size are not supported");
+    }
+
+    QString itemTypeName;
+    if (type.itemsType()->typeEnum() == Asn1Acn::Types::Type::USERDEFINED
+            && expectedTypeMatchesExistingOne(m_context, type.itemsType())) {
+        itemTypeName = type.itemsType()->typeName();
+
+    } else {
+        itemTypeName = ITEM_TYPE_NAME_PATTERN.arg(m_context.name());
+        Context context(m_context.model(), m_context.definitions(), itemTypeName, m_context.package());
+        TypeVisitor visitor(context);
+        type.itemsType()->accept(visitor);
+    }
+
+    if (constraintVisitor.isVariableSize()) {
+        // Variable size -> container with a list
+        ::seds::model::ContainerDataType sedsType;
+        ::seds::model::Entry lengthEntry;
+        const auto sizeTypeName = ARRAY_LENGTH_TYPE_NAME.arg(m_context.name());
+        createIntegerType(
+                sizeTypeName, constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), m_context.package());
+        setEntryNameAndType(lengthEntry, sizeTypeName, ARRAY_LENGTH_MEMBER_NAME);
+        sedsType.addEntry(std::move(lengthEntry));
+        ::seds::model::ListEntry listEntry;
+        listEntry.setListLengthField(::seds::model::EntryRef(ARRAY_LENGTH_MEMBER_NAME));
+        setEntryNameAndType(listEntry, itemTypeName, ARRAY_MEMBER_NAME);
+        sedsType.setName(m_context.name());
+        sedsType.addEntry(std::move(listEntry));
+        m_context.package()->addDataType(std::move(sedsType));
+
+    } else {
+        // Fixed size -> array
+        ::seds::model::DimensionSize size;
+        // Only maximum size is supported for an array
+        ::seds::model::ArrayDataType sedsType;
+        size.setSize(constraintVisitor.getMaxSize());
+        sedsType.addDimension(std::move(size));
+        ::seds::model::DataTypeRef reference(itemTypeName);
+        sedsType.setType(std::move(reference));
+        sedsType.setName(m_context.name());
+        m_context.package()->addDataType(std::move(sedsType));
+    }
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Real &type)
