@@ -1,0 +1,5 @@
+SequencesOf DEFINITIONS ::= BEGIN
+
+Type1 [size 16, encoding pos-int, endianness big]
+
+END
