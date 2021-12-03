@@ -390,7 +390,6 @@ bool typeEncodingMatches(const ::seds::model::FloatDataType &type1, const ::seds
 template<>
 bool typeEncodingMatches(const ::seds::model::IntegerDataType &type1, const ::seds::model::IntegerDataType &type2)
 {
-    std::cout << "typeEncodingMatches IntegerDataType start" << std::endl;
     if (type1.encoding().has_value() != type2.encoding().has_value()) {
         std::cout << "typeEncodingMatches IntegerDataType has value !=" << std::endl;
         return false;
@@ -399,7 +398,6 @@ bool typeEncodingMatches(const ::seds::model::IntegerDataType &type1, const ::se
         return true;
     }
 
-    std::cout << "typeEncodingMatches IntegerDataType has value OK" << std::endl;
     const auto &encoding1 = *type1.encoding();
     const auto &encoding2 = *type2.encoding();
     return encoding1.bits() == encoding2.bits() && encoding1.byteOrder() == encoding2.byteOrder()
@@ -426,53 +424,57 @@ template<>
 bool typeEncodingMatches(const ::seds::model::DataType &type1, const ::seds::model::DataType &type2)
 {
     if (std::holds_alternative<::seds::model::ArrayDataType>(type1)) {
-        std::cout << "typeEncodingMatches ArrayDataType" << std::endl;
         return typeEncodingMatches(
                 std::get<::seds::model::ArrayDataType>(type1), std::get<::seds::model::ArrayDataType>(type2));
     }
     if (std::holds_alternative<::seds::model::BinaryDataType>(type1)) {
-        std::cout << "typeEncodingMatches BinaryDataType" << std::endl;
         return typeEncodingMatches(
                 std::get<::seds::model::BinaryDataType>(type1), std::get<::seds::model::BinaryDataType>(type2));
     }
     if (std::holds_alternative<::seds::model::BooleanDataType>(type1)) {
-        std::cout << "typeEncodingMatches BooleanDataType" << std::endl;
         return typeEncodingMatches(
                 std::get<::seds::model::BooleanDataType>(type1), std::get<::seds::model::BooleanDataType>(type2));
     }
     if (std::holds_alternative<::seds::model::ContainerDataType>(type1)) {
-        std::cout << "typeEncodingMatches ContainerDataType" << std::endl;
         return typeEncodingMatches(
                 std::get<::seds::model::ContainerDataType>(type1), std::get<::seds::model::ContainerDataType>(type2));
     }
     if (std::holds_alternative<::seds::model::EnumeratedDataType>(type1)) {
-        std::cout << "typeEncodingMatches EnumeratedDataType" << std::endl;
         return typeEncodingMatches(
                 std::get<::seds::model::EnumeratedDataType>(type1), std::get<::seds::model::EnumeratedDataType>(type2));
     }
     if (std::holds_alternative<::seds::model::FloatDataType>(type1)) {
-        std::cout << "typeEncodingMatches FloatDataType" << std::endl;
         return typeEncodingMatches(
                 std::get<::seds::model::FloatDataType>(type1), std::get<::seds::model::FloatDataType>(type2));
     }
     if (std::holds_alternative<::seds::model::IntegerDataType>(type1)) {
-        std::cout << "typeEncodingMatches IntegerDataType" << std::endl;
         return typeEncodingMatches(
                 std::get<::seds::model::IntegerDataType>(type1), std::get<::seds::model::IntegerDataType>(type2));
     }
     if (std::holds_alternative<::seds::model::StringDataType>(type1)) {
-        std::cout << "typeEncodingMatches StringDataType" << std::endl;
         return typeEncodingMatches(
                 std::get<::seds::model::StringDataType>(type1), std::get<::seds::model::StringDataType>(type2));
     }
     if (std::holds_alternative<::seds::model::SubRangeDataType>(type1)) {
-        std::cout << "typeEncodingMatches SubRangeDataType" << std::endl;
         return typeEncodingMatches(
                 std::get<::seds::model::SubRangeDataType>(type1), std::get<::seds::model::SubRangeDataType>(type2));
     }
 
-    std::cout << "typeEncodingMatches Unknown" << std::endl;
     return false;
+}
+
+static inline auto expectedTypeMatchesExistingOne(TypeVisitor::Context &context, Asn1Acn::Types::Type *type) -> bool
+{
+    const auto typeName = type->typeName();
+    const auto &referencedType = retrieveTypeFromPackage(context.package(), typeName);
+    // Create temporary package to perform "look-ahead" translation into SEDS
+    // It is much easier to verify encoding in SEDS than ASN.1/ACN
+    ::seds::model::Package tempPackage;
+    TypeVisitor::Context tempContext(context.model(), context.definitions(), typeName, &tempPackage);
+    TypeVisitor visitor(tempContext);
+    type->accept(visitor);
+    const auto &expectedType = retrieveTypeFromPackage(&tempPackage, typeName);
+    return typeEncodingMatches(referencedType, expectedType);
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
@@ -492,23 +494,13 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
             continue;
         }
         if (component->type()->typeEnum() == Asn1Acn::Types::Type::USERDEFINED) {
-            const auto &referencedType = retrieveTypeFromPackage(m_context.package(), component->type()->typeName());
-            std::cout << "referencedType " << referencedType.index() << std::endl;
-            ::seds::model::Package tempPackage;
-            Context context(m_context.model(), m_context.definitions(), component->type()->typeName(), &tempPackage);
-            TypeVisitor visitor(context);
-            component->type()->accept(visitor);
-            const auto &expectedType = retrieveTypeFromPackage(&tempPackage, component->type()->typeName());
-            std::cout << "expectedType " << expectedType.index() << std::endl;
-            if (typeEncodingMatches(referencedType, expectedType)) {
-                std::cout << "typeEncodingMatches true " << std::endl;
+            if (expectedTypeMatchesExistingOne(m_context, component->type())) {
                 ::seds::model::Entry entry;
                 setEntryNameAndType(entry, component->type()->typeName(), component->name());
                 sedsType.addEntry(std::move(entry));
                 continue;
                 // If the encoding does not match, then fall through
             }
-            std::cout << "typeEncodingMatches false " << std::endl;
         }
         const auto typeName = MEMBER_TYPE_NAME_PATTERN.arg(m_context.name(), component->name());
         Context context(m_context.model(), m_context.definitions(), typeName, m_context.package());
