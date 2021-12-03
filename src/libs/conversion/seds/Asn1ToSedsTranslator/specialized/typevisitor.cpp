@@ -342,6 +342,7 @@ static bool typeEncodingMatches(TypeName &type1, TypeName &type2);
 template<>
 bool typeEncodingMatches(const ::seds::model::ArrayDataType &type1, const ::seds::model::ArrayDataType &type2)
 {
+    // TODO when doing sequences of
     Q_UNUSED(type1);
     Q_UNUSED(type2);
     return false;
@@ -350,48 +351,38 @@ bool typeEncodingMatches(const ::seds::model::ArrayDataType &type1, const ::seds
 template<>
 bool typeEncodingMatches(const ::seds::model::BinaryDataType &type1, const ::seds::model::BinaryDataType &type2)
 {
-    Q_UNUSED(type1);
-    Q_UNUSED(type2);
-    return false;
+    return type1.bits() == type2.bits() && type1.hasFixedSize() == type2.hasFixedSize();
 }
 
 template<>
 bool typeEncodingMatches(const ::seds::model::BooleanDataType &type1, const ::seds::model::BooleanDataType &type2)
 {
-    Q_UNUSED(type1);
-    Q_UNUSED(type2);
-    return false;
+    if (type1.encoding().has_value() != type2.encoding().has_value()) {
+        return false;
+    }
+    if (!type1.encoding().has_value()) {
+        return true;
+    }
+
+    const auto &encoding1 = *type1.encoding();
+    const auto &encoding2 = *type2.encoding();
+    return encoding1.bits() == encoding2.bits() && encoding1.byteOrder() == encoding2.byteOrder()
+            && encoding1.falseValue() == encoding2.falseValue();
 }
 
 template<>
 bool typeEncodingMatches(const ::seds::model::ContainerDataType &type1, const ::seds::model::ContainerDataType &type2)
 {
+    // Containers are assumed to be custom
     Q_UNUSED(type1);
     Q_UNUSED(type2);
     return false;
 }
 
-template<>
-bool typeEncodingMatches(const ::seds::model::EnumeratedDataType &type1, const ::seds::model::EnumeratedDataType &type2)
-{
-    Q_UNUSED(type1);
-    Q_UNUSED(type2);
-    return false;
-}
-
-template<>
-bool typeEncodingMatches(const ::seds::model::FloatDataType &type1, const ::seds::model::FloatDataType &type2)
-{
-    Q_UNUSED(type1);
-    Q_UNUSED(type2);
-    return false;
-}
-
-template<>
-bool typeEncodingMatches(const ::seds::model::IntegerDataType &type1, const ::seds::model::IntegerDataType &type2)
+template<typename TypeName>
+bool numericEncodingMatches(const TypeName &type1, const TypeName &type2)
 {
     if (type1.encoding().has_value() != type2.encoding().has_value()) {
-        std::cout << "typeEncodingMatches IntegerDataType has value !=" << std::endl;
         return false;
     }
     if (!type1.encoding().has_value()) {
@@ -405,19 +396,37 @@ bool typeEncodingMatches(const ::seds::model::IntegerDataType &type1, const ::se
 }
 
 template<>
-bool typeEncodingMatches(const ::seds::model::StringDataType &type1, const ::seds::model::StringDataType &type2)
+bool typeEncodingMatches(const ::seds::model::EnumeratedDataType &type1, const ::seds::model::EnumeratedDataType &type2)
 {
-    Q_UNUSED(type1);
-    Q_UNUSED(type2);
-    return false;
+    return numericEncodingMatches(type1, type2);
 }
 
 template<>
-bool typeEncodingMatches(const ::seds::model::SubRangeDataType &type1, const ::seds::model::SubRangeDataType &type2)
+bool typeEncodingMatches(const ::seds::model::FloatDataType &type1, const ::seds::model::FloatDataType &type2)
 {
-    Q_UNUSED(type1);
-    Q_UNUSED(type2);
-    return false;
+    return numericEncodingMatches(type1, type2);
+}
+
+template<>
+bool typeEncodingMatches(const ::seds::model::IntegerDataType &type1, const ::seds::model::IntegerDataType &type2)
+{
+    return numericEncodingMatches(type1, type2);
+}
+
+template<>
+bool typeEncodingMatches(const ::seds::model::StringDataType &type1, const ::seds::model::StringDataType &type2)
+{
+    if (type1.encoding().has_value() != type2.encoding().has_value()) {
+        return false;
+    }
+    if (!type1.encoding().has_value()) {
+        return true;
+    }
+
+    const auto &encoding1 = *type1.encoding();
+    const auto &encoding2 = *type2.encoding();
+    return encoding1.byteOrder() == encoding2.byteOrder() && encoding1.encoding() == encoding2.encoding()
+            && encoding1.terminationByte() == encoding2.terminationByte();
 }
 
 template<>
@@ -454,10 +463,6 @@ bool typeEncodingMatches(const ::seds::model::DataType &type1, const ::seds::mod
     if (std::holds_alternative<::seds::model::StringDataType>(type1)) {
         return typeEncodingMatches(
                 std::get<::seds::model::StringDataType>(type1), std::get<::seds::model::StringDataType>(type2));
-    }
-    if (std::holds_alternative<::seds::model::SubRangeDataType>(type1)) {
-        return typeEncodingMatches(
-                std::get<::seds::model::SubRangeDataType>(type1), std::get<::seds::model::SubRangeDataType>(type2));
     }
 
     return false;
