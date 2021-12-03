@@ -110,10 +110,23 @@ auto DataTypeExporter::exportBooleanDataType(
 auto DataTypeExporter::exportContainerDataType(
         const model::ContainerDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void
 {
-    Q_UNUSED(dataType);
-    Q_UNUSED(setElement);
-    Q_UNUSED(sedsDocument);
-    throw UnsupportedElementException("ContainerDataType");
+    auto typeElement = sedsDocument.createElement(QStringLiteral("ContainerDataType"));
+    typeElement.setAttribute(QStringLiteral("name"), dataType.nameStr());
+    auto entryListElement = sedsDocument.createElement(QStringLiteral("EntryList"));
+
+    for (const auto &entry : dataType.entries()) {
+        auto entryElement = sedsDocument.createElement(QStringLiteral("Entry"));
+        if (!std::holds_alternative<model::Entry>(entry)) {
+            throw UnsupportedElementException("Non-entry Container element");
+        }
+        const auto &castEntry = std::get<model::Entry>(entry);
+        entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
+        entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
+        entryListElement.appendChild(std::move(entryElement));
+    }
+
+    typeElement.appendChild(std::move(entryListElement));
+    setElement.appendChild(std::move(typeElement));
 }
 
 auto DataTypeExporter::exportEnumeratedDataType(

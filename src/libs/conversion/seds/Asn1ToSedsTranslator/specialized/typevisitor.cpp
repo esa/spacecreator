@@ -277,8 +277,21 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Choice &type)
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
 {
-    Q_UNUSED(type);
-    throw UnsupportedDataTypeException("Sequence");
+    ::seds::model::ContainerDataType sedsType;
+
+    for (const auto &component : type.components()) {
+        if (component->type()->typeEnum() == Asn1Acn::Types::Type::USERDEFINED) {
+            ::seds::model::Entry entry;
+            ::seds::model::DataTypeRef reference(component->type()->typeName());
+            entry.setType(std::move(reference));
+            entry.setName(component->name());
+            sedsType.addEntry(std::move(entry));
+        } else {
+            throw UnsupportedDataTypeException("explicit Sequence Component");
+        }
+    }
+    sedsType.setName(m_context.name());
+    m_context.package()->addDataType(std::move(sedsType));
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)

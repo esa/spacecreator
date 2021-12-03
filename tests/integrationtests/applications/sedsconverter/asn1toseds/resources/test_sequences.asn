@@ -1,0 +1,12 @@
+Sequences DEFINITIONS ::= BEGIN
+
+Type1 ::= INTEGER(0..20)
+Type2 ::= INTEGER(21..50)
+
+SimpleSequence ::= SEQUENCE {
+    a Type1,
+    b Type2,
+    c Type2
+}
+
+END
