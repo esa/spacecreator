@@ -1,5 +1,5 @@
 option(OPTIONS_WARNINGS_AS_ERRORS
-       "Treat compiler wargnings as errors"
+       "Treat compiler warnings as errors"
        TRUE)
 option(OPTIONS_NO_DEPRECATED
        "Disable deprecation warnings"

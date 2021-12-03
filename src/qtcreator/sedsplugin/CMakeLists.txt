@@ -11,7 +11,12 @@ set(SEDS_QTC_LIBRARIES
     -L"${QTC_PLUGINS_DIR}"
     Aggregation
     ExtensionSystem
-    Asn1Importer
+    Conversion::Converter
+    Conversion::Registry
+    Conversion::SedsRegistrar
+    Conversion::SdlRegistrar
+    Conversion::IvRegistrar
+    Conversion::Asn1Registrar
     Utils
 )
 set(SEDS_QTC_PLUGINS
