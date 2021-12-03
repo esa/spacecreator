@@ -18,3 +18,8 @@ configure_file(test_simple_data_types.sh test_simple_data_types.sh COPYONLY)
 configure_file(resources/test_simple_data_types.output resources/test_simple_data_types.output COPYONLY)
 configure_file(resources/test_simple_data_types.asn resources/test_simple_data_types.asn COPYONLY)
 configure_file(resources/test_simple_data_types.acn resources/test_simple_data_types.acn COPYONLY)
+
+configure_file(test_sequences.sh test_sequences.sh COPYONLY)
+configure_file(resources/test_sequences.output resources/test_sequences.output COPYONLY)
+configure_file(resources/test_sequences.asn resources/test_sequences.asn COPYONLY)
+configure_file(resources/test_sequences.acn resources/test_sequences.acn COPYONLY)
