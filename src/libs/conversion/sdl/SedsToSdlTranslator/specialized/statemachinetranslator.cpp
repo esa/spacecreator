@@ -263,7 +263,6 @@ auto StateMachineTranslator::translateTransition(const seds::model::StateMachine
         const seds::model::Transition &sedsTransition, ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine,
         std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void
 {
-    Q_UNUSED(sedsStateMachine);
     const auto fromStateName = Escaper::escapeSdlName(sedsTransition.fromState().nameStr());
     const auto toStateName = Escaper::escapeSdlName(sedsTransition.toState().nameStr());
     const auto stateChange = fromStateName != toStateName;

@@ -10,17 +10,14 @@
     </DataTypeSet>
     <DeclaredInterfaceSet>
       <Interface level="subnetwork" name="If1Type">
-        <LongDescription>Lorem ipsum</LongDescription>
         <CommandSet>
           <Command name="Cmd1" mode="async">
-            <LongDescription>Lorem ipsum</LongDescription>
           </Command>
         </CommandSet>
       </Interface>
     </DeclaredInterfaceSet>
     <ComponentSet>
       <Component name="Component">
-        <LongDescription>Lorem ipsum</LongDescription>
         <ProvidedInterfaceSet>
           <Interface name="If1" type="If1Type" />
         </ProvidedInterfaceSet>
@@ -39,11 +36,9 @@
           </ActivitySet>
           <StateMachineSet>
             <StateMachine name="StateMachine">
-              <LongDescription>Lorem ipsum</LongDescription>
               <State name="StateB" />
               <EntryState name="StateA" />
               <Transition fromState="StateA" toState="StateB" name="dummy">
-                <LongDescription>Lorem ipsum</LongDescription>
                 <OnCommandPrimitive interface="If1" command="Cmd1" />
                 <Guard>
                   <Condition>
