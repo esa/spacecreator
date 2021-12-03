@@ -9,4 +9,9 @@ SimpleSequence ::= SEQUENCE {
     c Type2
 }
 
+AnonymousTypes ::= SEQUENCE {
+    x INTEGER(0..100),
+    y REAL(0..1)
+}
+
 END

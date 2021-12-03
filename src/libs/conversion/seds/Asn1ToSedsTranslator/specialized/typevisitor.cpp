@@ -76,6 +76,8 @@ using Asn1Acn::Types::UserdefinedType;
 using conversion::UnsupportedValueException;
 using conversion::translator::UnsupportedDataTypeException;
 
+static const QString MEMBER_TYPE_NAME_PATTERN = "Type_%1_%2";
+
 namespace conversion::seds::translator {
 
 TypeVisitor::Context::Context(const Asn1Acn::Asn1Model *asn1Model, const Asn1Acn::Definitions *definitions,
@@ -287,7 +289,16 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
             entry.setName(component->name());
             sedsType.addEntry(std::move(entry));
         } else {
-            throw UnsupportedDataTypeException("explicit Sequence Component");
+            const auto typeName = MEMBER_TYPE_NAME_PATTERN.arg(m_context.name(), component->name());
+            Context context(m_context.model(), m_context.definitions(), typeName, m_context.package());
+            TypeVisitor visitor(context);
+            component->type()->accept(visitor);
+
+            ::seds::model::Entry entry;
+            ::seds::model::DataTypeRef reference(typeName);
+            entry.setType(std::move(reference));
+            entry.setName(component->name());
+            sedsType.addEntry(std::move(entry));
         }
     }
     sedsType.setName(m_context.name());
