@@ -567,7 +567,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
 void TypeVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)
 {
     Q_UNUSED(type);
-    // throw UnsupportedDataTypeException("SequenceOf");
+    throw UnsupportedDataTypeException("SequenceOf");
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Real &type)
