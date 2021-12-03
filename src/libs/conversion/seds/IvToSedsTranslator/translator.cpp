@@ -21,6 +21,7 @@
 #include "specialized/functionstranslator.h"
 
 #include <asn1library/asn1/asn1model.h>
+#include <conversion/iv/IvOptions/options.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
 #include <seds/SedsModel/sedsmodel.h>
@@ -69,8 +70,21 @@ std::vector<std::unique_ptr<Model>> IvToSedsTranslator::translateIvModel(
     sedsPackage.setName("InterfaceView");
 
     const auto ivFunctions = ivModel->allObjectsByType<ivm::IVFunction>();
-    for (const auto ivFunction : ivFunctions) {
-        FunctionsTranslator::translateFunction(ivFunction, sedsPackage);
+    if (options.isSet(iv::IvOptions::functionToConvert)) {
+        std::vector<QString> functionsToConvert = options.values(iv::IvOptions::functionToConvert);
+        for (const auto &ivFunction : ivFunctions) {
+            const QString &ivFunctionName = ivFunction->title();
+            bool isPresent = std::any_of(functionsToConvert.begin(), functionsToConvert.end(),
+                    [&](const QString &name) { return name == ivFunctionName; });
+
+            if (isPresent) {
+                FunctionsTranslator::translateFunction(ivFunction, sedsPackage);
+            }
+        }
+    } else { // translate all
+        for (const auto ivFunction : ivFunctions) {
+            FunctionsTranslator::translateFunction(ivFunction, sedsPackage);
+        }
     }
 
     ::seds::model::PackageFile sedsPackageFile;

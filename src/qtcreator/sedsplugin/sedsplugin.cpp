@@ -282,7 +282,7 @@ auto SedsPlugin::exportInterfaceView() -> void
             options.add(conversion::seds::SedsOptions::outputFilepath,
                     QString("%1%2%3.xml").arg(outputDir).arg(QDir::separator()).arg("output"));
             for (auto &selectedFunction : *selectedFunctions) {
-                // options.add(conversion::iv::IvOptions::, selectedFunction);
+                options.add(conversion::iv::IvOptions::functionToConvert, selectedFunction);
             }
 
             try {
