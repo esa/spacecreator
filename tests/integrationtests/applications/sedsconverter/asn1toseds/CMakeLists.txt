@@ -23,3 +23,8 @@ configure_file(test_sequences.sh test_sequences.sh COPYONLY)
 configure_file(resources/test_sequences.output resources/test_sequences.output COPYONLY)
 configure_file(resources/test_sequences.asn resources/test_sequences.asn COPYONLY)
 configure_file(resources/test_sequences.acn resources/test_sequences.acn COPYONLY)
+
+configure_file(test_sequences_of.sh test_sequences_of.sh COPYONLY)
+configure_file(resources/test_sequences_of.output resources/test_sequences_of.output COPYONLY)
+configure_file(resources/test_sequences_of.asn resources/test_sequences_of.asn COPYONLY)
+configure_file(resources/test_sequences_of.acn resources/test_sequences_of.acn COPYONLY)

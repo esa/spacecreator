@@ -4,11 +4,11 @@ Type1 ::= INTEGER(0..20)
 
 LengthType ::= INTEGER(0..15)
 
---SimpleFizedSizeSequenceOf ::= SEQUENCE (SIZE(66)) OF Type1
+SimpleFizedSizeSequenceOf ::= SEQUENCE (SIZE(66)) OF Type1
 
---SimpleFizedSizeSequenceOfAnonymousType ::= SEQUENCE (SIZE(66)) OF INTEGER(2..12)
+SimpleFizedSizeSequenceOfAnonymousType ::= SEQUENCE (SIZE(66)) OF INTEGER(2..12)
 
---SimpleVariableSizeSequenceOf ::= SEQUENCE (SIZE(33..55)) OF Type1
+SimpleVariableSizeSequenceOf ::= SEQUENCE (SIZE(33..55)) OF Type1
 
 NestedSequenceWithAcnSize ::= SEQUENCE {
     someField Type1,
