@@ -26,14 +26,6 @@
 #include <seds/SedsModel/types/datatype.h>
 #include <unordered_map>
 
-namespace Asn1Acn {
-class AsnSequenceComponent;
-class SequenceComponent;
-namespace Types {
-class Sequence;
-} // namespace Types
-} // namespace Asn1Acn
-
 namespace seds::model {
 class CommandArgument;
 class Component;
@@ -110,51 +102,31 @@ private:
      *
      * @return  Name of the created type
      */
-    auto buildAsn1SequenceType(const seds::model::InterfaceCommand &sedsCommand,
+    auto buildBundledType(const seds::model::InterfaceCommand &sedsCommand,
             seds::model::CommandArgumentMode requestedArgumentMode) -> QString;
-
     /**
-     * @brief   Creates ASN.1 sequence type
+     * @brief   Creates ASN.1 sequence type that bundles all argumenst
      *
      * Adds the created sequence to the ASN.1 definitions member
      *
      * @param   name        Name of the sequence
      * @param   arguments   SEDS command arguments
+     *
+     * @return  Bundled type name
      */
-    auto createAsn1Sequence(const QString &name, const std::unordered_map<QString, QString> &arguments) -> void;
+    auto createBundledType(const QString &sedsCommandName, const std::unordered_map<QString, QString> &arguments)
+            -> QString;
     /**
-     * @brief   Creates ASN.1 sequence component type
+     * @brief   Filters all arguments by their mode
      *
-     * Added the created sequence component to the passed ASN.1 sequence
-     *
-     * @param   name        Name of the component
-     * @param   typeName    Name of the component type
-     * @param   sequence    Sequence to which component should be added
-     */
-    auto createAsn1SequenceComponent(
-            const QString &name, const QString &typeName, Asn1Acn::Types::Sequence *sequence) const -> void;
-    /**
-     *  Create a name for the bundled argument type
-     *
-     *  @param  sedsCommandName     SEDS command name
-     *  @param  counter             Additional counter
-     *
-     *  @return Type name
-     */
-    auto createBundledTypeName(const QString &sedsCommandName, const std::size_t counter = 0) const -> QString;
-
-    /**
-     * @brief   Process SEDS command arguments types
-     *
-     * Maps generic types of the arguments to a concrete type
-     *
-     * @param   sedsArguments   Arguments to process
+     * @param   sedsArguments           Arguments to process
      * @param   requestedArgumentMode   Which arguments should be used
      *
-     * @return  Processed arguments
+     * @return  Matching arguments
      */
-    auto processArgumentsTypes(const std::vector<seds::model::CommandArgument> &sedsArguments,
+    auto filterArguments(const std::vector<seds::model::CommandArgument> &sedsArguments,
             seds::model::CommandArgumentMode requestedArgumentMode) const -> std::unordered_map<QString, QString>;
+
     /**
      * @brief   Calculates hash from arguments types
      *
@@ -165,22 +137,13 @@ private:
     auto calculateArgumentsHash(const std::unordered_map<QString, QString> &arguments) const -> std::size_t;
 
     /**
-     * @brief   Checks if given type name is mapped in the parent SEDS interface
+     *  Create a name for the bundled argument type
      *
-     * @param   genericTypeName     Generic type name
+     *  @param  sedsCommandName     SEDS command name
      *
-     * @return  Mapped type name if given type name was mapped, given type name otherwise
+     *  @return Type name
      */
-    auto findMappedType(const QString &genericTypeName) const -> const QString &;
-
-    /**
-     * @brief   Swaps between provided and required interface types
-     *
-     * @param   interfaceType   Interface type to switch
-     *
-     * @return  Provided type if required was passed, requried otherwise
-     */
-    auto switchInterfaceType(ivm::IVInterface::InterfaceType interfaceType) const -> ivm::IVInterface::InterfaceType;
+    auto createBundledTypeName(const QString &sedsCommandName) const -> QString;
 
 private:
     struct ArgumentsCacheEntry final {
