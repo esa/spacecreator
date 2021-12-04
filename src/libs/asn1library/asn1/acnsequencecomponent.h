@@ -29,6 +29,7 @@
 
 #include <QString>
 #include <memory>
+#include <optional>
 #include <vector>
 
 namespace Asn1Acn {
@@ -51,8 +52,12 @@ public:
 
     const QString &id() const;
 
+    void setReference(const QString reference);
+    std::optional<QString> reference() const;
+
 private:
     QString m_id;
+    std::optional<QString> m_reference;
 };
 
 using AcnSequenceComponentPtr = std::unique_ptr<AcnSequenceComponent>;
