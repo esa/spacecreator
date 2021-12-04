@@ -3,7 +3,7 @@ SequencesOf DEFINITIONS ::= BEGIN
 Type1 [size 16, encoding pos-int, endianness big]
 
 NestedSequenceWithAcnSize [] {
-    someField [],
+    someField [],    
     lengthDeterminant LengthType [],
     sequenceField [size lengthDeterminant]
 }

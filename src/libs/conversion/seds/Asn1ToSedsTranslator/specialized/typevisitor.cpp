@@ -21,6 +21,7 @@
 
 #include "constraintvisitor.h"
 
+#include <asn1library/asn1/acnsequencecomponent.h>
 #include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/sequencecomponent.h>
 #include <asn1library/asn1/types/bitstring.h>
@@ -573,7 +574,10 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
     addOptionalIndicators(m_context, type, sedsType);
 
     for (const auto &component : type.components()) {
-        std::cout << "Processing field " << component->name().toStdString() << std::endl;
+        const auto acnComponent = dynamic_cast<Asn1Acn::AcnSequenceComponent *>(component.get());
+        const auto isAcnComponent = acnComponent != nullptr;
+
+        std::cout << "Processing field " << component->name().toStdString() << " ACN " << isAcnComponent << std::endl;
         if (component->type()->typeEnum() == Asn1Acn::Types::Type::NULLTYPE) {
             const auto typeName = MEMBER_TYPE_NAME_PATTERN.arg(m_context.name(), component->name());
             const auto pattern = dynamic_cast<Asn1Acn::Types::Null *>(component->type())->pattern();
@@ -589,18 +593,34 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
         QString referencedField = "";
 
         if (component->type()->typeEnum() == Asn1Acn::Types::Type::SEQUENCEOF) {
+            std::cout << "Processing field " << component->name().toStdString() << " Sequence Of " << std::endl;
             const auto sequenceOf = dynamic_cast<Asn1Acn::Types::SequenceOf *>(component->type());
             // Sequence Of is a special case, as it may contain explicit ACN size reference
             if (!sequenceOf->acnSize().isEmpty()) {
                 entryType = EntryType::ListEntry;
                 referencedField = sequenceOf->acnSize();
+                addEntry(entryType, sequenceOf->itemsType()->typeName(), component->name(), referencedField, sedsType);
+                continue;
             }
         }
         if (component->type()->typeEnum() == Asn1Acn::Types::Type::USERDEFINED) {
-            if (expectedTypeMatchesExistingOne(m_context, component->type())) {
+            std::cout << "Processing field " << component->name().toStdString() << " User defined " << std::endl;
+            // ACN defined fields do not have additional ranges, so they cannot be encoded independently
+            if (expectedTypeMatchesExistingOne(m_context, component->type()) || isAcnComponent) {
+                std::cout << "Processing field " << component->name().toStdString() << " Continue " << std::endl;
                 addEntry(entryType, component->type()->typeName(), component->name(), referencedField, sedsType);
                 continue;
                 // If the encoding does not match, then fall through
+            }
+        }
+        if (isAcnComponent) {
+            // ACN component, which is not a pattern -> it is a determinant
+            // Ranges cannot be properly defined on ACN level, so translation will fail
+            // Let's instead use a reference, if there is one
+            if (acnComponent->reference().has_value()) {
+                const auto referencedType = *(acnComponent->reference());
+                addEntry(entryType, referencedType, component->name(), referencedField, sedsType);
+                continue;
             }
         }
         const auto typeName = MEMBER_TYPE_NAME_PATTERN.arg(m_context.name(), component->name());
@@ -733,7 +753,9 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Integer &type)
 
     ::seds::model::IntegerDataType sedsType;
 
-    std::cout << "Translating " << m_context.name().toStdString() << " isRange?" << std::endl;
+    std::cout << "Translating " << m_context.name().toStdString() << " type " << type.typeName().toStdString()
+              << " isRange?" << std::endl;
+
     if (constraintVisitor.isRangeConstraintVisited()) {
         std::cout << "Translating " << m_context.name().toStdString() << " range" << std::endl;
         ::seds::model::MinMaxRange range;
