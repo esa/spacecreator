@@ -23,10 +23,6 @@ cp $TEST_OUTPUT_DIR/PARAMETERS.asn $TEST_OUTPUT_DIR/output.asn
 # Remove output ACN to avoid conflicts between the existing one and the ASN.1 file
 # This cannot be replaced due to a reported bug in SEDS -> ASN.1 conversion
 rm -f $TEST_OUTPUT_DIR/output.acn
-# Rename the module to avoid naming conflicts
-sed -i 's/INTERFACES/OUTPUT-DATAVIEW/g' $TEST_OUTPUT_DIR/output.asn
-# Change implementation language to C (SDL is not compatible with all interface types)
-sed -i 's/language="SDL"/language="C"/g' $TEST_OUTPUT_DIR/interfaceview.xml
 
 cd $TEST_OUTPUT_DIR
 

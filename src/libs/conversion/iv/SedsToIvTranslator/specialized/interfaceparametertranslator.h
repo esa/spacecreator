@@ -33,7 +33,7 @@ class IVFunction;
 namespace conversion::iv::translator {
 
 /**
- * @brief   Translatro from SEDS interface parameter to InterfaceView interface
+ * @brief   Translator from SEDS interface parameter to InterfaceView interface
  */
 class InterfaceParameterTranslator final
 {

@@ -22,11 +22,7 @@
   <ComponentSet>
     <Component name="MegaComponent">
       <ProvidedInterfaceSet>
-        <Interface name="ProvidedInterface" type="MegaInterface">
-          <GenericTypeMapSet>
-            <GenericTypeMap name="AbstractType" type="MyInteger" />
-          </GenericTypeMapSet>
-        </Interface>
+        <Interface name="ProvidedInterface" type="MegaInterface"/>
       </ProvidedInterfaceSet>
     </Component>
   </ComponentSet>
