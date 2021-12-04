@@ -540,12 +540,40 @@ static inline auto addOptionalIndicators(TypeVisitor::Context &context, const ::
     }
 }
 
+enum class EntryType
+{
+    ListEntry,
+    Entry
+};
+
+static inline auto addEntry(const EntryType entryType, const QString typeName, const QString name,
+        const QString referencedField, ::seds::model::ContainerDataType &sedsType) -> void
+{
+    switch (entryType) {
+    case EntryType::Entry: {
+        ::seds::model::Entry entry;
+        setEntryNameAndType(entry, typeName, name);
+        sedsType.addEntry(std::move(entry));
+        break;
+    }
+    case EntryType::ListEntry: {
+        ::seds::model::ListEntry entry;
+        entry.setListLengthField(::seds::model::EntryRef(referencedField));
+        setEntryNameAndType(entry, typeName, name);
+        sedsType.addEntry(std::move(entry));
+        break;
+    }
+    }
+}
+
 void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
 {
+    Q_UNUSED(type);
     ::seds::model::ContainerDataType sedsType;
     addOptionalIndicators(m_context, type, sedsType);
 
     for (const auto &component : type.components()) {
+        std::cout << "Processing field " << component->name().toStdString() << std::endl;
         if (component->type()->typeEnum() == Asn1Acn::Types::Type::NULLTYPE) {
             const auto typeName = MEMBER_TYPE_NAME_PATTERN.arg(m_context.name(), component->name());
             const auto pattern = dynamic_cast<Asn1Acn::Types::Null *>(component->type())->pattern();
@@ -557,11 +585,20 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
             sedsType.addEntry(std::move(entry));
             continue;
         }
+        EntryType entryType = EntryType::Entry;
+        QString referencedField = "";
+
+        if (component->type()->typeEnum() == Asn1Acn::Types::Type::SEQUENCEOF) {
+            const auto sequenceOf = dynamic_cast<Asn1Acn::Types::SequenceOf *>(component->type());
+            // Sequence Of is a special case, as it may contain explicit ACN size reference
+            if (!sequenceOf->acnSize().isEmpty()) {
+                entryType = EntryType::ListEntry;
+                referencedField = sequenceOf->acnSize();
+            }
+        }
         if (component->type()->typeEnum() == Asn1Acn::Types::Type::USERDEFINED) {
             if (expectedTypeMatchesExistingOne(m_context, component->type())) {
-                ::seds::model::Entry entry;
-                setEntryNameAndType(entry, component->type()->typeName(), component->name());
-                sedsType.addEntry(std::move(entry));
+                addEntry(entryType, component->type()->typeName(), component->name(), referencedField, sedsType);
                 continue;
                 // If the encoding does not match, then fall through
             }
@@ -570,11 +607,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
         Context context(m_context.model(), m_context.definitions(), typeName, m_context.package());
         TypeVisitor visitor(context);
         component->type()->accept(visitor);
-
-        ::seds::model::Entry entry;
-        setEntryNameAndType(entry, typeName, component->name());
-
-        sedsType.addEntry(std::move(entry));
+        addEntry(entryType, typeName, component->name(), referencedField, sedsType);
     }
 
     // TODO investigate type.acnParameters, as additional acn fields are included in type.components
@@ -586,6 +619,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)
 {
+    std::cout << "Constraints " << std::endl;
     ConstraintVisitor<IntegerValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
 
@@ -595,6 +629,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)
     }
 
     QString itemTypeName;
+    std::cout << "Check user " << std::endl;
     if (type.itemsType()->typeEnum() == Asn1Acn::Types::Type::USERDEFINED
             && expectedTypeMatchesExistingOne(m_context, type.itemsType())) {
         itemTypeName = type.itemsType()->typeName();
@@ -607,22 +642,32 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)
     }
 
     if (constraintVisitor.isVariableSize()) {
+        std::cout << "variable size " << std::endl;
         // Variable size -> container with a list
         ::seds::model::ContainerDataType sedsType;
         ::seds::model::Entry lengthEntry;
         const auto sizeTypeName = ARRAY_LENGTH_TYPE_NAME.arg(m_context.name());
+        std::cout << "Create integer type " << std::endl;
         createIntegerType(
                 sizeTypeName, constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), m_context.package());
+        std::cout << "Set type and name " << std::endl;
         setEntryNameAndType(lengthEntry, sizeTypeName, ARRAY_LENGTH_MEMBER_NAME);
+
+        std::cout << "Add " << std::endl;
         sedsType.addEntry(std::move(lengthEntry));
         ::seds::model::ListEntry listEntry;
+        std::cout << "Set length field " << std::endl;
         listEntry.setListLengthField(::seds::model::EntryRef(ARRAY_LENGTH_MEMBER_NAME));
+        std::cout << "set name and type 2 " << std::endl;
         setEntryNameAndType(listEntry, itemTypeName, ARRAY_MEMBER_NAME);
         sedsType.setName(m_context.name());
         sedsType.addEntry(std::move(listEntry));
+        std::cout << "package add " << std::endl;
         m_context.package()->addDataType(std::move(sedsType));
+        std::cout << "package add done " << std::endl;
 
     } else {
+        std::cout << "fixedf size" << std::endl;
         // Fixed size -> array
         ::seds::model::DimensionSize size;
         // Only maximum size is supported for an array
@@ -688,7 +733,9 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Integer &type)
 
     ::seds::model::IntegerDataType sedsType;
 
+    std::cout << "Translating " << m_context.name().toStdString() << " isRange?" << std::endl;
     if (constraintVisitor.isRangeConstraintVisited()) {
+        std::cout << "Translating " << m_context.name().toStdString() << " range" << std::endl;
         ::seds::model::MinMaxRange range;
         range.setType(::seds::model::RangeType::InclusiveMinInclusiveMax);
         range.setMax(IntegerValue::asString(constraintVisitor.getRange().end()));
@@ -697,7 +744,9 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Integer &type)
     }
 
     // Encoding in ASN.1 model is not optional, but may be unset
+    std::cout << "Translating " << m_context.name().toStdString() << " isSize?" << std::endl;
     if (type.size() > 0) {
+        std::cout << "Translating " << m_context.name().toStdString() << " size" << std::endl;
         ::seds::model::IntegerDataEncoding encoding;
         encoding.setBits(static_cast<uint64_t>(type.size()));
 
