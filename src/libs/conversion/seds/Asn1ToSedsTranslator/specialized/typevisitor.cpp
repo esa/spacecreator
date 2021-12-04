@@ -548,7 +548,7 @@ enum class EntryType
 };
 
 static inline auto addEntry(const EntryType entryType, const QString typeName, const QString name,
-        const QString referencedField, ::seds::model::ContainerDataType &sedsType) -> void
+        ::seds::model::ContainerDataType &sedsType, const QString referencedField = "") -> void
 {
     switch (entryType) {
     case EntryType::Entry: {
@@ -567,6 +567,19 @@ static inline auto addEntry(const EntryType entryType, const QString typeName, c
     }
 }
 
+static inline auto addFixedValueEntry(TypeVisitor::Context &context, Asn1Acn::SequenceComponent *component,
+        ::seds::model::ContainerDataType &sedsType) -> void
+{
+    const auto typeName = MEMBER_TYPE_NAME_PATTERN.arg(context.name(), component->name());
+    const auto pattern = dynamic_cast<Asn1Acn::Types::Null *>(component->type())->pattern();
+    createIntegerType(typeName, static_cast<uint32_t>(pattern.length()), context.package());
+
+    ::seds::model::FixedValueEntry entry;
+    setEntryNameAndType(entry, typeName, component->name());
+    entry.setFixedValue(pattern);
+    sedsType.addEntry(std::move(entry));
+}
+
 void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
 {
     Q_UNUSED(type);
@@ -579,38 +592,28 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
 
         std::cout << "Processing field " << component->name().toStdString() << " ACN " << isAcnComponent << std::endl;
         if (component->type()->typeEnum() == Asn1Acn::Types::Type::NULLTYPE) {
-            const auto typeName = MEMBER_TYPE_NAME_PATTERN.arg(m_context.name(), component->name());
-            const auto pattern = dynamic_cast<Asn1Acn::Types::Null *>(component->type())->pattern();
-            createIntegerType(typeName, static_cast<uint32_t>(pattern.length()), m_context.package());
-
-            ::seds::model::FixedValueEntry entry;
-            setEntryNameAndType(entry, typeName, component->name());
-            entry.setFixedValue(pattern);
-            sedsType.addEntry(std::move(entry));
+            addFixedValueEntry(m_context, component.get(), sedsType);
             continue;
         }
-        EntryType entryType = EntryType::Entry;
-        QString referencedField = "";
 
         if (component->type()->typeEnum() == Asn1Acn::Types::Type::SEQUENCEOF) {
             std::cout << "Processing field " << component->name().toStdString() << " Sequence Of " << std::endl;
             const auto sequenceOf = dynamic_cast<Asn1Acn::Types::SequenceOf *>(component->type());
             // Sequence Of is a special case, as it may contain explicit ACN size reference
+            // If no ACN size is given, then it is translated as usual, resuling in an array or embedded container
             if (!sequenceOf->acnSize().isEmpty()) {
-                entryType = EntryType::ListEntry;
-                referencedField = sequenceOf->acnSize();
-                addEntry(entryType, sequenceOf->itemsType()->typeName(), component->name(), referencedField, sedsType);
+                addEntry(EntryType::ListEntry, sequenceOf->itemsType()->typeName(), component->name(), sedsType,
+                        sequenceOf->acnSize());
                 continue;
             }
         }
         if (component->type()->typeEnum() == Asn1Acn::Types::Type::USERDEFINED) {
             std::cout << "Processing field " << component->name().toStdString() << " User defined " << std::endl;
-            // ACN defined fields do not have additional ranges, so they cannot be encoded independently
-            if (expectedTypeMatchesExistingOne(m_context, component->type()) || isAcnComponent) {
+            if (expectedTypeMatchesExistingOne(m_context, component->type())) {
+                // User defined type, with no encoding override -> let's use the existing type name
                 std::cout << "Processing field " << component->name().toStdString() << " Continue " << std::endl;
-                addEntry(entryType, component->type()->typeName(), component->name(), referencedField, sedsType);
+                addEntry(EntryType::Entry, component->type()->typeName(), component->name(), sedsType);
                 continue;
-                // If the encoding does not match, then fall through
             }
         }
         if (isAcnComponent) {
@@ -619,7 +622,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
             // Let's instead use a reference, if there is one
             if (acnComponent->reference().has_value()) {
                 const auto referencedType = *(acnComponent->reference());
-                addEntry(entryType, referencedType, component->name(), referencedField, sedsType);
+                addEntry(EntryType::Entry, referencedType, component->name(), sedsType);
                 continue;
             }
         }
@@ -627,11 +630,8 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
         Context context(m_context.model(), m_context.definitions(), typeName, m_context.package());
         TypeVisitor visitor(context);
         component->type()->accept(visitor);
-        addEntry(entryType, typeName, component->name(), referencedField, sedsType);
+        addEntry(EntryType::Entry, typeName, component->name(), sedsType);
     }
-
-    // TODO investigate type.acnParameters, as additional acn fields are included in type.components
-    // together with type overrides.
 
     sedsType.setName(m_context.name());
     m_context.package()->addDataType(std::move(sedsType));
