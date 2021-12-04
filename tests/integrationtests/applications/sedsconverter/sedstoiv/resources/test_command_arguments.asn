@@ -1,0 +1,14 @@
+COM-N7SPACE-COMMANDARGUMENTS DEFINITIONS ::= BEGIN
+MyInteger ::= INTEGER(0 .. 255)
+AsyncInCommand-Type ::= SEQUENCE 
+{ 
+    asyncInArgument2 MyInteger(0 .. 255), 
+    asyncInArgument1 MyInteger(0 .. 255)
+} 
+AsyncOutCommand-Type ::= SEQUENCE 
+{ 
+    asyncOutArgument2 MyInteger(0 .. 255), 
+    asyncOutArgument1 MyInteger(0 .. 255)
+} 
+END
+

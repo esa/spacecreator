@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/CommandArguments">
+  <DataTypeSet>
+    <IntegerDataType name="MyInteger">
+      <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+      <Range>
+        <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+      </Range>
+    </IntegerDataType>
+  </DataTypeSet>
+  <DeclaredInterfaceSet>
+    <Interface name="AsyncInterface">
+      <CommandSet>
+        <Command name="AsyncInCommand" mode="async">
+          <Argument name="AsyncInArgument1" type="MyInteger" mode="in" />
+          <Argument name="AsyncInArgument2" type="MyInteger" mode="in" />
+        </Command>
+        <Command name="AsyncOutCommand" mode="async">
+          <Argument name="AsyncOutArgument1" type="MyInteger" mode="out" />
+          <Argument name="AsyncOutArgument2" type="MyInteger" mode="out" />
+        </Command>
+      </CommandSet>
+    </Interface>
+  </DeclaredInterfaceSet>
+  <ComponentSet>
+    <Component name="Component">
+      <ProvidedInterfaceSet>
+        <Interface name="AsyncInterfacePI" type="AsyncInterface"/>
+      </ProvidedInterfaceSet>
+      <RequiredInterfaceSet>
+        <Interface name="AsyncInterfaceRI" type="AsyncInterface"/>
+      </RequiredInterfaceSet>
+    </Component>
+  </ComponentSet>
+  </Package>
+</PackageFile>

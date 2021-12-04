@@ -52,6 +52,11 @@ configure_file(test_hwas.sh test_hwas.sh COPYONLY)
 configure_file(resources/test_hwas.xml resources/test_hwas.xml COPYONLY)
 configure_file(resources/test_hwas.interfaceview resources/test_hwas.interfaceview COPYONLY)
 
+configure_file(test_command_arguments.sh test_command_arguments.sh COPYONLY)
+configure_file(resources/test_command_arguments.xml resources/test_command_arguments.xml COPYONLY)
+configure_file(resources/test_command_arguments.output resources/test_command_arguments.output COPYONLY)
+configure_file(resources/test_command_arguments.asn resources/test_command_arguments.asn COPYONLY)
+
 configure_file(test_parameters.sh test_parameters.sh COPYONLY)
 configure_file(resources/test_parameters.xml resources/test_parameters.xml COPYONLY)
 configure_file(resources/test_parameters.output resources/test_parameters.output COPYONLY)
