@@ -91,6 +91,10 @@ static const QString IS_PRESENT_TYPE_NAME = "IsPresent";
 static const QString ARRAY_MEMBER_NAME = "elements";
 static const QString ARRAY_LENGTH_MEMBER_NAME = "count";
 static const QString ARRAY_LENGTH_TYPE_NAME = "Size_%1";
+static const QString CHOICE_INDEX_TYPE_NAME_PATTERN = "Index_%1";
+static const QString CHOICE_INDEX_MEMBER_NAME = "index";
+static const QString CHOICE_ELEMENT_MEMBER_NAME = "element";
+static const QString CHOICE_ELEMENT_TYPE_NAME_PATTERN = "%1_%2";
 
 namespace conversion::seds::translator {
 
@@ -284,12 +288,6 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Enumerated &type)
 
     sedsType.setName(m_context.name());
     m_context.package()->addDataType(std::move(sedsType));
-}
-
-void TypeVisitor::visit(const ::Asn1Acn::Types::Choice &type)
-{
-    Q_UNUSED(type);
-    throw UnsupportedDataTypeException("Choice");
 }
 
 static inline auto createIntegerType(const QString name, const uint32_t bits, ::seds::model::Package *package) -> void
@@ -567,8 +565,9 @@ static inline auto addEntry(const EntryType entryType, const QString typeName, c
     }
 }
 
-static inline auto addFixedValueEntry(TypeVisitor::Context &context, Asn1Acn::SequenceComponent *component,
-        ::seds::model::ContainerDataType &sedsType) -> void
+template<typename ComponentType>
+static inline auto addFixedValueEntry(
+        TypeVisitor::Context &context, ComponentType *component, ::seds::model::ContainerDataType &sedsType) -> void
 {
     const auto typeName = MEMBER_TYPE_NAME_PATTERN.arg(context.name(), component->name());
     const auto pattern = dynamic_cast<Asn1Acn::Types::Null *>(component->type())->pattern();
@@ -630,6 +629,64 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
 
     sedsType.setName(m_context.name());
     m_context.package()->addDataType(std::move(sedsType));
+}
+
+static inline auto createChoiceIndexType(
+        const QString name, const ::Asn1Acn::Types::Choice &type, ::seds::model::Package *package) -> void
+{
+    ::seds::model::EnumeratedDataType sedsType;
+
+    int computedValue = 0;
+    for (const auto &component : type.components()) {
+        ::seds::model::ValueEnumeration valueEnumeration;
+        valueEnumeration.setLabel(component->name());
+        valueEnumeration.setValue(computedValue++);
+        sedsType.addEnumeration(std::move(valueEnumeration));
+    }
+
+    sedsType.setName(name);
+    package->addDataType(std::move(sedsType));
+}
+
+void TypeVisitor::visit(const ::Asn1Acn::Types::Choice &type)
+{
+    const auto indexTypeName = CHOICE_INDEX_TYPE_NAME_PATTERN.arg(m_context.name());
+    createChoiceIndexType(indexTypeName, type, m_context.package());
+
+    ::seds::model::ContainerDataType parentSedsType;
+    parentSedsType.setAbstract(true);
+    addEntry(EntryType::Entry, indexTypeName, CHOICE_INDEX_MEMBER_NAME, parentSedsType);
+    parentSedsType.setName(m_context.name());
+    m_context.package()->addDataType(std::move(parentSedsType));
+
+    int computedValue = 0;
+    for (const auto &component : type.components()) {
+        ::seds::model::ContainerDataType innerSedsType;
+        ::seds::model::DataTypeRef baseTypeReference(m_context.name());
+        innerSedsType.setBaseType(std::move(baseTypeReference));
+        ::seds::model::ContainerValueConstraint constraint;
+        ::seds::model::EntryRef entryReference(CHOICE_INDEX_MEMBER_NAME);
+        constraint.setEntry(std::move(entryReference));
+        constraint.setValue(QString::number(computedValue++));
+        innerSedsType.addConstraint(std::move(constraint));
+
+        if (component->type()->typeEnum() == Asn1Acn::Types::Type::NULLTYPE) {
+            addFixedValueEntry(m_context, component.get(), innerSedsType);
+        } else if (component->type()->typeEnum() == Asn1Acn::Types::Type::USERDEFINED
+                && expectedTypeMatchesExistingOne(m_context, component->type())) {
+            // User defined type, with no encoding override -> let's use the existing type name
+            addEntry(EntryType::Entry, component->type()->typeName(), CHOICE_ELEMENT_MEMBER_NAME, innerSedsType);
+        } else {
+            const auto typeName = MEMBER_TYPE_NAME_PATTERN.arg(m_context.name(), component->name());
+            Context context(m_context.model(), m_context.definitions(), typeName, m_context.package());
+            TypeVisitor visitor(context);
+            component->type()->accept(visitor);
+            addEntry(EntryType::Entry, typeName, CHOICE_ELEMENT_MEMBER_NAME, innerSedsType);
+        }
+
+        innerSedsType.setName(CHOICE_ELEMENT_TYPE_NAME_PATTERN.arg(m_context.name(), component->name()));
+        m_context.package()->addDataType(std::move(innerSedsType));
+    }
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)

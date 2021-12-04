@@ -119,13 +119,43 @@ auto DataTypeExporter::exportBooleanDataType(
     setElement.appendChild(std::move(typeElement));
 }
 
-auto DataTypeExporter::exportContainerDataType(
-        const model::ContainerDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void
+static inline auto exportContainerConstraints(
+        const model::ContainerDataType &dataType, QDomElement &typeElement, QDomDocument &sedsDocument) -> void
 {
-    auto typeElement = sedsDocument.createElement(QStringLiteral("ContainerDataType"));
-    typeElement.setAttribute(QStringLiteral("name"), dataType.nameStr());
-    auto entryListElement = sedsDocument.createElement(QStringLiteral("EntryList"));
+    if (dataType.constraints().size() > 0) {
+        auto constraintListElement = sedsDocument.createElement(QStringLiteral("ConstraintSet"));
+        for (const auto &constraint : dataType.constraints()) {
+            std::visit(
+                    overloaded {
+                            [&sedsDocument, &constraintListElement](
+                                    const model::ContainerRangeConstraint &castConstraint) {
+                                Q_UNUSED(castConstraint);
+                                throw UnsupportedElementException("Container ContainerRangeConstraint");
+                            },
+                            [&sedsDocument, &constraintListElement](
+                                    const model::ContainerTypeConstraint &castConstraint) {
+                                Q_UNUSED(castConstraint);
+                                throw UnsupportedElementException("Container ContainerTypeConstraint");
+                            },
+                            [&sedsDocument, &constraintListElement](
+                                    const model::ContainerValueConstraint &castConstraint) {
+                                auto entryElement = sedsDocument.createElement(QStringLiteral("ValueConstraint"));
+                                entryElement.setAttribute(
+                                        QStringLiteral("entry"), castConstraint.entry().value().value());
+                                entryElement.setAttribute(QStringLiteral("value"), castConstraint.value().value());
+                                constraintListElement.appendChild(std::move(entryElement));
+                            },
+                    },
+                    constraint);
+        }
+        typeElement.appendChild(std::move(constraintListElement));
+    }
+}
 
+static inline auto exportContainerEntries(
+        const model::ContainerDataType &dataType, QDomElement &typeElement, QDomDocument &sedsDocument) -> void
+{
+    auto entryListElement = sedsDocument.createElement(QStringLiteral("EntryList"));
     for (const auto &entry : dataType.entries()) {
         std::visit(overloaded { [&sedsDocument, &entryListElement](const model::Entry &castEntry) {
                                    auto entryElement = sedsDocument.createElement(QStringLiteral("Entry"));
@@ -164,6 +194,22 @@ auto DataTypeExporter::exportContainerDataType(
     }
 
     typeElement.appendChild(std::move(entryListElement));
+}
+
+auto DataTypeExporter::exportContainerDataType(
+        const model::ContainerDataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void
+{
+    auto typeElement = sedsDocument.createElement(QStringLiteral("ContainerDataType"));
+    typeElement.setAttribute(QStringLiteral("name"), dataType.nameStr());
+    if (dataType.isAbstract()) {
+        typeElement.setAttribute(QStringLiteral("abstract"), QStringLiteral("true"));
+    }
+    if (dataType.baseType().has_value()) {
+        typeElement.setAttribute(QStringLiteral("baseType"), (*dataType.baseType()).nameStr());
+    }
+    exportContainerConstraints(dataType, typeElement, sedsDocument);
+    exportContainerEntries(dataType, typeElement, sedsDocument);
+
     setElement.appendChild(std::move(typeElement));
 }
 
