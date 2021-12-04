@@ -21,7 +21,6 @@
 
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/overloaded.h>
-#include <iostream>
 
 using namespace seds::model;
 using conversion::UnhandledValueException;
@@ -33,7 +32,6 @@ auto DataTypeExporter::exportDataType(
         const model::DataType &dataType, QDomElement &setElement, QDomDocument &sedsDocument) -> void
 {
     std::visit(overloaded { [&setElement, &sedsDocument](const ArrayDataType &arrayType) {
-                               std::cout << "Exporting " << arrayType.nameStr().toStdString() << std::endl;
                                DataTypeExporter::exportArrayDataType(arrayType, setElement, sedsDocument);
                            },
                        [&setElement, &sedsDocument](const BinaryDataType &binaryType) {
@@ -43,7 +41,6 @@ auto DataTypeExporter::exportDataType(
                            DataTypeExporter::exportBooleanDataType(booleanType, setElement, sedsDocument);
                        },
                        [&setElement, &sedsDocument](const ContainerDataType &containerType) {
-                           std::cout << "Exporting " << containerType.nameStr().toStdString() << std::endl;
                            DataTypeExporter::exportContainerDataType(containerType, setElement, sedsDocument);
                        },
                        [&setElement, &sedsDocument](const EnumeratedDataType &enumeratedType) {
@@ -53,7 +50,6 @@ auto DataTypeExporter::exportDataType(
                            DataTypeExporter::exportFloatDataType(floatType, setElement, sedsDocument);
                        },
                        [&setElement, &sedsDocument](const IntegerDataType &integerType) {
-                           std::cout << "Exporting " << integerType.nameStr().toStdString() << std::endl;
                            DataTypeExporter::exportIntegerDataType(integerType, setElement, sedsDocument);
                        },
                        [&setElement, &sedsDocument](const StringDataType &stringType) {
@@ -153,16 +149,12 @@ auto DataTypeExporter::exportContainerDataType(
                                throw UnsupportedElementException("Container ErrorControlEntry");
                            },
                            [&sedsDocument, &entryListElement](const model::ListEntry &castEntry) {
-                               std::cout << "List entry start " << std::endl;
                                auto entryElement = sedsDocument.createElement(QStringLiteral("ListEntry"));
                                entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
                                entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
-                               std::cout << "List entry set len " << std::endl;
                                entryElement.setAttribute(
                                        QStringLiteral("listLengthField"), castEntry.listLengthField().value().value());
-                               std::cout << "List entry set len end " << std::endl;
                                entryListElement.appendChild(std::move(entryElement));
-                               std::cout << "List entry end " << std::endl;
                            },
                            [&sedsDocument, &entryListElement](const model::PaddingEntry &castEntry) {
                                Q_UNUSED(castEntry);
@@ -258,22 +250,17 @@ auto DataTypeExporter::exportIntegerDataType(
 {
     auto typeElement = sedsDocument.createElement(QStringLiteral("IntegerDataType"));
     typeElement.setAttribute(QStringLiteral("name"), dataType.nameStr());
-    std::cout << dataType.nameStr().toStdString() << " Encoding has value?" << std::endl;
     if (dataType.encoding().has_value()) {
-        std::cout << dataType.nameStr().toStdString() << " encoding?" << std::endl;
         const auto &encoding = *dataType.encoding();
 
         auto encodingElement = sedsDocument.createElement(QStringLiteral("IntegerDataEncoding"));
-        std::cout << dataType.nameStr().toStdString() << " bits?" << std::endl;
         encodingElement.setAttribute(QStringLiteral("sizeInBits"), static_cast<qulonglong>(encoding.bits()));
 
-        std::cout << dataType.nameStr().toStdString() << " core?" << std::endl;
         std::visit(overloaded { [&encodingElement](const CoreIntegerEncoding &coreEncoding) {
             exportCoreIntegerEncoding(coreEncoding, encodingElement);
         } },
                 encoding.encoding());
 
-        std::cout << dataType.nameStr().toStdString() << " byteoder?" << std::endl;
         switch (encoding.byteOrder()) {
         case ByteOrder::BigEndian:
             encodingElement.setAttribute(QStringLiteral("byteOrder"), QStringLiteral("bigEndian"));
@@ -289,13 +276,11 @@ auto DataTypeExporter::exportIntegerDataType(
         typeElement.appendChild(std::move(encodingElement));
     }
 
-    std::cout << dataType.nameStr().toStdString() << " range" << std::endl;
     std::visit(overloaded { [&typeElement, &sedsDocument](const MinMaxRange &range) {
         exportMinMaxRange(range, typeElement, sedsDocument);
     } },
             dataType.range());
 
-    std::cout << dataType.nameStr().toStdString() << " append" << std::endl;
     setElement.appendChild(std::move(typeElement));
 }
 
