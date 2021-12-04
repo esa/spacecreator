@@ -2,10 +2,17 @@ SequencesOf DEFINITIONS ::= BEGIN
 
 Type1 ::= INTEGER(0..20)
 
-SimpleFizedSizeSequenceOf ::= SEQUENCE (SIZE(66)) OF Type1
+LengthType ::= INTEGER(0..15)
 
-SimpleFizedSizeSequenceOfAnonymousType ::= SEQUENCE (SIZE(66)) OF INTEGER(2..12)
+--SimpleFizedSizeSequenceOf ::= SEQUENCE (SIZE(66)) OF Type1
 
-SimpleVariableSizeSequenceOf ::= SEQUENCE (SIZE(33..55)) OF Type1
+--SimpleFizedSizeSequenceOfAnonymousType ::= SEQUENCE (SIZE(66)) OF INTEGER(2..12)
+
+--SimpleVariableSizeSequenceOf ::= SEQUENCE (SIZE(33..55)) OF Type1
+
+NestedSequenceWithAcnSize ::= SEQUENCE {
+    someField Type1,
+    sequenceField SEQUENCE (SIZE(12..15)) OF Type1
+}
 
 END
