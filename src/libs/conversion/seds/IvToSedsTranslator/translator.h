@@ -21,10 +21,6 @@
 
 #include <conversion/common/translation/translator.h>
 
-namespace Asn1Acn {
-class Asn1Model;
-} // namespace Asn1Acn
-
 namespace ivm {
 class IVModel;
 } // namespace ivm
@@ -42,7 +38,7 @@ class IvToSedsTranslator final : public conversion::translator::Translator
 {
 public:
     /**
-     * @brief   Translate given IntefaceView and ASN.1 models into an SEDS model
+     * @brief   Translate given IntefaceView model into an SEDS model
      *
      * @param   sources     List of models
      *
@@ -71,7 +67,7 @@ public:
     virtual auto getDependencies() const -> std::set<ModelType> override;
 
 private:
-    auto translateIvModel(const ivm::IVModel *ivModel, Asn1Acn::Asn1Model *asn1Model, const Options &options) const
+    auto translateIvModel(const ivm::IVModel *ivModel, const Options &options) const
             -> std::vector<std::unique_ptr<Model>>;
 };
 

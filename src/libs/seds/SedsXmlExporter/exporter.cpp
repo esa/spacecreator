@@ -25,7 +25,6 @@
 #include <QDomDocument>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/overloaded.h>
-#include <iostream>
 #include <seds/SedsModel/sedsmodel.h>
 #include <seds/SedsOptions/options.h>
 
@@ -47,6 +46,9 @@ const QString SedsXmlExporter::m_schemaLocation = R"(http://www.ccsds.org/schema
 
 void SedsXmlExporter::exportModel(const Model *const model, const Options &options) const
 {
+    // Set global hash seed, so that the output is deterministic
+    qSetGlobalQHashSeed(0);
+
     if (model == nullptr) {
         throw NullModelException();
     }
@@ -68,16 +70,13 @@ void SedsXmlExporter::exportModel(const Model *const model, const Options &optio
     }, sedsModel->data());
     // clang-format on
 
-    const QString &sedsDocumentContent = sedsDocument.toString();
-    std::cerr << sedsDocumentContent.toStdString();
-
     const auto outputFilePath = options.value(SedsOptions::outputFilepath);
     if (!outputFilePath) {
         throw MissingOutputFilenameException(ModelType::Seds);
     }
 
     QSaveFile outputFile(*outputFilePath);
-    writeAndCommit(outputFile, sedsDocumentContent);
+    writeAndCommit(outputFile, sedsDocument.toString());
 }
 
 void SedsXmlExporter::exportPackageFile(const PackageFile &packageFile, QDomDocument &sedsDocument)
