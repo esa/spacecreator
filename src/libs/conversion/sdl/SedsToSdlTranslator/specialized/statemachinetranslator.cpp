@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/escaper/escaper.h>
+#include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/iv/SedsToIvTranslator/specialized/interfacecommandtranslator.h>
 #include <conversion/iv/SedsToIvTranslator/translator.h>
@@ -44,6 +45,11 @@ namespace conversion::sdl::translator {
 static const QString IO_VARIABLE_PATTERN = "io_%1";
 static const QString FALSE_LITERAL = "False";
 static const QString TRUE_LITERAL = "True";
+static const QString TIMER_NAME_PATTERN = "timer_%1";
+// This is a built-in procedure, so it is not declared as an external one
+// And it is not defined internally
+// But a pointer is still needed to the SDL model for call invocation
+static ::sdl::Procedure BUILT_IN_SET_TIMER_PROCEDURE("set_timer");
 
 template<typename ElementType>
 static inline auto getElementOfName(const seds::model::StateMachine &sedsStateMachine, const QString name)
@@ -141,6 +147,24 @@ auto StateMachineTranslator::translateVariables(const seds::model::Package &seds
     }
 }
 
+auto StateMachineTranslator::createTimerVariables(
+        const seds::model::StateMachine &sedsStateMachine, ::sdl::Process *sdlProcess) -> void
+{
+    std::set<QString> statesWithTimers;
+    for (auto &element : sedsStateMachine.elements()) {
+        if (std::holds_alternative<seds::model::Transition>(element)) {
+            const auto &transition = std::get<seds::model::Transition>(element);
+            if (std::holds_alternative<seds::model::TimerSink>(transition.primitive())) {
+                const auto stateName = transition.fromState().nameStr();
+                if (statesWithTimers.find(stateName) == statesWithTimers.end()) {
+                    statesWithTimers.insert(stateName);
+                    sdlProcess->addTimer(timerName(stateName));
+                }
+            }
+        }
+    }
+}
+
 auto StateMachineTranslator::createIoVariables(
         const seds::model::Component &sedsComponent, ivm::IVModel *ivModel, ::sdl::Process *sdlProcess) -> void
 {
@@ -176,6 +200,11 @@ auto StateMachineTranslator::ioVariableName(const QString interfaceName) -> QStr
     return IO_VARIABLE_PATTERN.arg(interfaceName);
 }
 
+auto StateMachineTranslator::timerName(const QString stateName) -> QString
+{
+    return Escaper::escapeSdlName(TIMER_NAME_PATTERN.arg(stateName));
+}
+
 auto StateMachineTranslator::createStartTransition(const seds::model::StateMachine &sedsStateMachine,
         ::sdl::Process *sdlProcess, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void
 {
@@ -186,6 +215,10 @@ auto StateMachineTranslator::createStartTransition(const seds::model::StateMachi
             }
             auto transition = std::make_unique<::sdl::Transition>();
             const auto &state = std::get<seds::model::EntryState>(element);
+            const auto timerTime = getTimerInvocationTime(sedsStateMachine, state.nameStr());
+            if (timerTime.has_value()) {
+                transition->addAction(createTimerSetCall(timerName(state.nameStr()), *timerTime));
+            }
             transition->addAction(std::make_unique<::sdl::NextState>("", stateMap[state.nameStr()].get()));
             sdlProcess->setStartTransition(std::move(transition));
         }
@@ -219,8 +252,6 @@ auto StateMachineTranslator::translateState(const seds::model::EntryState &sedsS
 auto StateMachineTranslator::translatePrimitive(
         ::sdl::Process *sdlProcess, const seds::model::OnCommandPrimitive &command) -> InputHandler
 {
-    Q_UNUSED(command);
-
     auto input = std::make_unique<::sdl::Input>();
     std::vector<std::unique_ptr<::sdl::Action>> unpackingActions;
 
@@ -249,14 +280,29 @@ auto StateMachineTranslator::translatePrimitive(
     return std::make_pair(std::move(input), std::move(unpackingActions));
 }
 
-auto StateMachineTranslator::translatePrimitive(
-        ::sdl::Process *sdlProcess, const seds::model::Transition::Primitive &primitive) -> InputHandler
+auto StateMachineTranslator::translatePrimitive(::sdl::State *sdlFromState) -> InputHandler
 {
-    if (std::holds_alternative<seds::model::OnCommandPrimitive>(primitive)) {
-        return translatePrimitive(sdlProcess, std::get<seds::model::OnCommandPrimitive>(primitive));
-    }
-    throw TranslationException("Encountered unsupported primitive");
-    return InputHandler();
+    auto input = std::make_unique<::sdl::Input>();
+    input->setName(TIMER_NAME_PATTERN.arg(sdlFromState->name()));
+    return std::make_pair(std::move(input), std::vector<std::unique_ptr<::sdl::Action>>());
+}
+
+auto StateMachineTranslator::translatePrimitive(::sdl::Process *sdlProcess, ::sdl::State *sdlFromState,
+        const seds::model::Transition::Primitive &primitive) -> InputHandler
+{
+    return std::visit(
+            overloaded { [&sdlProcess](const seds::model::OnCommandPrimitive &command) {
+                            return translatePrimitive(sdlProcess, command);
+                        },
+                    [](const seds::model::OnParameterPrimitive &parameter) {
+                        Q_UNUSED(parameter);
+                        throw TranslationException("Encountered unsupported primitive");
+                        return InputHandler();
+                    },
+                    [&sdlFromState](const seds::model::TimerSink &) { return translatePrimitive(sdlFromState); }
+
+            },
+            primitive);
 }
 
 auto StateMachineTranslator::translateTransition(const seds::model::StateMachine &sedsStateMachine,
@@ -278,7 +324,7 @@ auto StateMachineTranslator::translateTransition(const seds::model::StateMachine
     auto sdlFromState = (*fromStateIterator).second.get();
     auto sdlToState = (*toStateIterator).second.get();
 
-    auto inputHandler = translatePrimitive(sdlProcess, sedsTransition.primitive());
+    auto inputHandler = translatePrimitive(sdlProcess, sdlFromState, sedsTransition.primitive());
 
     auto mainTransition = std::make_unique<::sdl::Transition>();
     auto currentTransitionPtr = mainTransition.get();
@@ -308,6 +354,11 @@ auto StateMachineTranslator::translateTransition(const seds::model::StateMachine
         const auto onEntry = getOnEntry(sedsStateMachine, sedsTransition.toState().nameStr());
         if (onEntry.has_value()) {
             currentTransitionPtr->addAction(StatementTranslatorVisitor::translateActivityCall(sdlProcess, **onEntry));
+        }
+        const auto timerTime = getTimerInvocationTime(sedsStateMachine, sedsTransition.toState().nameStr());
+        if (timerTime.has_value()) {
+            currentTransitionPtr->addAction(
+                    createTimerSetCall(timerName(sedsTransition.toState().nameStr()), *timerTime));
         }
     }
     // State switch
@@ -368,6 +419,39 @@ auto StateMachineTranslator::translateGuard(::sdl::Process *sdlProcess, ::sdl::S
     currentTransitionPtr->addAction(std::move(decision));
 
     return newTransitionPtr;
+}
+auto StateMachineTranslator::getTimerInvocationTime(
+        const seds::model::StateMachine &sedsStateMachine, const QString stateName) -> std::optional<uint64_t>
+{
+    // TODO - consider supporting multiple different OnTimer events for a state timed separately
+    for (auto &element : sedsStateMachine.elements()) {
+        if (std::holds_alternative<seds::model::Transition>(element)) {
+            const auto &transition = std::get<seds::model::Transition>(element);
+            if (transition.fromState().nameStr() != stateName) {
+                continue;
+            }
+            if (std::holds_alternative<seds::model::TimerSink>(transition.primitive())) {
+                return std::get<seds::model::TimerSink>(transition.primitive()).nanosecondsAfterEntry();
+            }
+        }
+    }
+    return std::nullopt;
+}
+
+static inline auto nanosecondsToMiliseconds(const uint64_t nanoseconds) -> uint64_t
+{
+    return nanoseconds / 1000u;
+}
+
+auto StateMachineTranslator::createTimerSetCall(const QString timerName, const uint64_t callTimeInNanoseconds)
+        -> std::unique_ptr<::sdl::ProcedureCall>
+{
+    auto call = std::make_unique<::sdl::ProcedureCall>();
+    call->setProcedure(&BUILT_IN_SET_TIMER_PROCEDURE);
+    call->addArgument(
+            std::make_unique<::sdl::VariableLiteral>(QString::number(nanosecondsToMiliseconds(callTimeInNanoseconds))));
+    call->addArgument(std::make_unique<::sdl::VariableLiteral>(timerName));
+    return std::move(call);
 }
 
 } // namespace conversion::sdl::translator

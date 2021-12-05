@@ -44,8 +44,12 @@ void SdlVisitor::visit(const Process &process) const
     m_stream << dummyCif("PROCESS");
     m_stream << "process " << process.name() << ";\n";
 
-    if (!process.variables().empty()) {
+    if (!process.variables().empty() || !process.timerNames().empty()) {
         m_stream << "    /* CIF TEXT (16, 317), (267, 140) */\n";
+        // Timers are just names, a dedicated visitor does not add any benfits
+        for (const auto &timer : process.timerNames()) {
+            m_stream << "    Timer " << timer << "\n";
+        }
         exportCollection(process.variables());
         m_stream << "    /* CIF ENDTEXT */\n";
     }

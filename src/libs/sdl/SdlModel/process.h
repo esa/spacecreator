@@ -135,6 +135,18 @@ public:
     auto addProcedure(std::unique_ptr<Procedure> procedure) -> void;
 
     /**
+     * @brief   Add timer
+     *
+     * @param   timerName Timer name
+     */
+    auto addTimer(const QString timerName) -> void;
+
+    /**
+     * @brief   Timer names
+     */
+    auto timerNames() const -> const std::vector<QString> &;
+
+    /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */
     virtual auto accept(Visitor &visitor) const -> void override;
@@ -143,6 +155,7 @@ private:
     std::unique_ptr<Transition> m_startTransition;
     std::unique_ptr<StateMachine> m_stateMachine;
     std::vector<std::unique_ptr<VariableDeclaration>> m_variables;
+    std::vector<QString> m_timerNames;
     std::vector<std::unique_ptr<Procedure>> m_procedures;
 };
 } // namespace sdl

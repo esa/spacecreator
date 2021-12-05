@@ -126,8 +126,9 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
         }
         // TODO provide additional translation for parameter (activity) maps
         if (stateMachineCount == 1) {
-            StateMachineTranslator::translateStateMachine(
-                    implementation.stateMachines()[0], &process, stateMachine.get());
+            const auto &sedsStateMachine = implementation.stateMachines()[0];
+            StateMachineTranslator::createTimerVariables(sedsStateMachine, &process);
+            StateMachineTranslator::translateStateMachine(sedsStateMachine, &process, stateMachine.get());
         }
         // State machine needs to be moved after processing, because later it cannot be accessed for modification
         process.setStateMachine(std::move(stateMachine));

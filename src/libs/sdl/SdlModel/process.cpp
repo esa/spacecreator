@@ -75,6 +75,16 @@ void Process::addProcedure(std::unique_ptr<Procedure> procedure)
     m_procedures.push_back(std::move(procedure));
 }
 
+auto Process::addTimer(const QString timerName) -> void
+{
+    m_timerNames.push_back(timerName);
+}
+
+auto Process::timerNames() const -> const std::vector<QString> &
+{
+    return m_timerNames;
+}
+
 void Process::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
