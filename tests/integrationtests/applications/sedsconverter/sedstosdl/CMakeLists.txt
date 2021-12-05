@@ -16,6 +16,17 @@ add_format_target(${TEST_NAME})
 
 configure_file(resources/config.xml resources/config.xml COPYONLY)
 
+configure_file(resources/xml2iv/comment.tmplt resources/xml2iv/comment.tmplt COPYONLY)
+configure_file(resources/xml2iv/comments.tmplt resources/xml2iv/comments.tmplt COPYONLY)
+configure_file(resources/xml2iv/connection.tmplt resources/xml2iv/connection.tmplt COPYONLY)
+configure_file(resources/xml2iv/connectiongroup.tmplt resources/xml2iv/connectiongroup.tmplt COPYONLY)
+configure_file(resources/xml2iv/connections.tmplt resources/xml2iv/connections.tmplt COPYONLY)
+configure_file(resources/xml2iv/function.tmplt resources/xml2iv/function.tmplt COPYONLY)
+configure_file(resources/xml2iv/functions.tmplt resources/xml2iv/functions.tmplt COPYONLY)
+configure_file(resources/xml2iv/interface.tmplt resources/xml2iv/interface.tmplt COPYONLY)
+configure_file(resources/xml2iv/interfaces.tmplt resources/xml2iv/interfaces.tmplt COPYONLY)
+configure_file(resources/xml2iv/interfaceview.tmplt resources/xml2iv/interfaceview.tmplt COPYONLY)
+
 configure_file(test_state_machine_with_bare_inputs.sh test_state_machine_with_bare_inputs.sh COPYONLY)
 configure_file(resources/state_machine_with_bare_inputs.xml resources/state_machine_with_bare_inputs.xml COPYONLY)
 configure_file(resources/state_machine_with_bare_inputs.output resources/state_machine_with_bare_inputs.output COPYONLY)
