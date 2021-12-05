@@ -95,6 +95,7 @@ static const QString CHOICE_INDEX_TYPE_NAME_PATTERN = "Index_%1";
 static const QString CHOICE_INDEX_MEMBER_NAME = "index";
 static const QString CHOICE_ELEMENT_MEMBER_NAME = "element";
 static const QString CHOICE_ELEMENT_TYPE_NAME_PATTERN = "%1_%2";
+static const QString BYTE_TYPE_NAME = "Byte";
 
 namespace conversion::seds::translator {
 
@@ -226,12 +227,6 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::BitString &type)
 
     sedsType.setName(m_context.name());
     m_context.package()->addDataType(std::move(sedsType));
-}
-
-void TypeVisitor::visit(const ::Asn1Acn::Types::OctetString &type)
-{
-    Q_UNUSED(type);
-    throw UnsupportedDataTypeException("OctetString");
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::IA5String &type)
@@ -374,7 +369,7 @@ static bool typeEncodingMatches(TypeName &type1, TypeName &type2);
 template<>
 bool typeEncodingMatches(const ::seds::model::ArrayDataType &type1, const ::seds::model::ArrayDataType &type2)
 {
-    // TODO when doing sequences of
+    // Arrays are assumed to be custom
     Q_UNUSED(type1);
     Q_UNUSED(type2);
     return false;
@@ -734,6 +729,65 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)
         size.setSize(constraintVisitor.getMaxSize());
         sedsType.addDimension(std::move(size));
         ::seds::model::DataTypeRef reference(itemTypeName);
+        sedsType.setType(std::move(reference));
+        sedsType.setName(m_context.name());
+        m_context.package()->addDataType(std::move(sedsType));
+    }
+}
+
+static inline auto ensureByteTypePresence(::seds::model::Package *package) -> void
+{
+    if (isTypePresentInPackage(package, BYTE_TYPE_NAME)) {
+        return;
+    }
+    ::seds::model::IntegerDataType sedsType;
+    ::seds::model::MinMaxRange range;
+    range.setType(::seds::model::RangeType::InclusiveMinInclusiveMax);
+    range.setMax(QString::number(255));
+    range.setMin(QString::number(0));
+    sedsType.setRange(std::move(range));
+    ::seds::model::IntegerDataEncoding encoding;
+    encoding.setBits(8);
+    setEndianness(encoding, Asn1Acn::Types::Endianness::little);
+    setIntegerEncoding(encoding, Asn1Acn::Types::IntegerEncoding::pos_int);
+    sedsType.setEncoding(std::move(encoding));
+    sedsType.setName(BYTE_TYPE_NAME);
+    package->addDataType(std::move(sedsType));
+}
+
+void TypeVisitor::visit(const ::Asn1Acn::Types::OctetString &type)
+{
+    ensureByteTypePresence(m_context.package());
+    ConstraintVisitor<OctetStringValue> constraintVisitor;
+    type.constraints().accept(constraintVisitor);
+
+    if (!constraintVisitor.isSizeConstraintVisited()) {
+        throw TranslationException("Octet Strings without specified size are not supported");
+    }
+
+    if (constraintVisitor.isVariableSize()) {
+        // Variable size -> container with a list
+        ::seds::model::ContainerDataType sedsType;
+        ::seds::model::Entry lengthEntry;
+        const auto sizeTypeName = ARRAY_LENGTH_TYPE_NAME.arg(m_context.name());
+        createIntegerType(
+                sizeTypeName, constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), m_context.package());
+        setEntryNameAndType(lengthEntry, sizeTypeName, ARRAY_LENGTH_MEMBER_NAME);
+        sedsType.addEntry(std::move(lengthEntry));
+        ::seds::model::ListEntry listEntry;
+        listEntry.setListLengthField(::seds::model::EntryRef(ARRAY_LENGTH_MEMBER_NAME));
+        setEntryNameAndType(listEntry, BYTE_TYPE_NAME, ARRAY_MEMBER_NAME);
+        sedsType.setName(m_context.name());
+        sedsType.addEntry(std::move(listEntry));
+        m_context.package()->addDataType(std::move(sedsType));
+    } else {
+        // Fixed size -> array
+        ::seds::model::DimensionSize size;
+        // Only maximum size is supported for an array
+        ::seds::model::ArrayDataType sedsType;
+        size.setSize(constraintVisitor.getMaxSize());
+        sedsType.addDimension(std::move(size));
+        ::seds::model::DataTypeRef reference(BYTE_TYPE_NAME);
         sedsType.setType(std::move(reference));
         sedsType.setName(m_context.name());
         m_context.package()->addDataType(std::move(sedsType));

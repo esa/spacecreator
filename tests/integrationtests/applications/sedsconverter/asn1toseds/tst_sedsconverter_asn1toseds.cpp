@@ -43,6 +43,7 @@ private Q_SLOTS:
 /// \SRS  ETB-FUN-3120
 /// \SRS  ETB-FUN-3160
 /// \SRS  ETB-FUN-3170
+/// \SRS  ETB-FUN-3130
 /// \SRS  ETB-IF-160
 /// \SRS  ETB-IF-170
 /// \SRS  ETB-IF-180
