@@ -48,7 +48,7 @@ void SdlVisitor::visit(const Process &process) const
         m_stream << "    /* CIF TEXT (16, 317), (267, 140) */\n";
         // Timers are just names, a dedicated visitor does not add any benfits
         for (const auto &timer : process.timerNames()) {
-            m_stream << "    Timer " << timer << "\n";
+            m_stream << "    Timer " << timer << ";\n";
         }
         exportCollection(process.variables());
         m_stream << "    /* CIF ENDTEXT */\n";

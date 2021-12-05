@@ -44,3 +44,8 @@ configure_file(test_guard.sh test_guard.sh COPYONLY)
 configure_file(resources/test_guard.xml resources/test_guard.xml COPYONLY)
 configure_file(resources/test_guard.output resources/test_guard.output COPYONLY)
 configure_file(resources/test_guard.system_structure resources/test_guard.system_structure COPYONLY)
+
+configure_file(test_timers.sh test_timers.sh COPYONLY)
+configure_file(resources/test_timers.xml resources/test_timers.xml COPYONLY)
+configure_file(resources/test_timers.output resources/test_timers.output COPYONLY)
+configure_file(resources/test_timers.system_structure resources/test_timers.system_structure COPYONLY)

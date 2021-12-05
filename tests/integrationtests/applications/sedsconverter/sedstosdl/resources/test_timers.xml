@@ -2,9 +2,9 @@
 <PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
   <Package name="Timers">
     <DataTypeSet>
-      <IntegerDataType name="MyType">
+      <IntegerDataType name="T_UInt32">
         <Range>
-          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="100" />
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="4294967295" />
         </Range>
       </IntegerDataType>
     </DataTypeSet>
