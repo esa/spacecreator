@@ -59,12 +59,13 @@ void tst_PositionLookupHelper::testOnSide(
 {
     QList<QRectF> siblingsRects;
     for (int idx = 0; idx < itemRects.size(); ++idx) {
-        shared::PositionLookupHelper helper(sidePaths, parentBoundingRect, siblingsRects, itemRects.value(idx), initialOffset);
+        shared::PositionLookupHelper helper(
+                sidePaths, parentBoundingRect, siblingsRects, itemRects.value(idx).topLeft() - initialOffset);
         if (helper.lookup()) {
+            ifaceItem->setPos(helper.mappedOriginPoint());
             if (helper.isSideChanged()) {
                 ifaceItem->updateInternalItems(helper.side());
             }
-            ifaceItem->setPos(helper.mappedOriginPoint());
             iface->setCoordinates(shared::graphicsviewutils::coordinates(helper.mappedOriginPoint()));
             ifaceItem->rebuildLayout();
         }

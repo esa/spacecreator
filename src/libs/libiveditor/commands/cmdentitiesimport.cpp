@@ -82,7 +82,7 @@ CmdEntitiesImport::CmdEntitiesImport(const QByteArray &data, ivm::IVFunctionType
             });
             m_rootEntities.append(obj);
         }
-        const QPointF offset = basePoint == outOfScene ? QPointF() : pos - basePoint;
+        const QPointF offset = basePoint == outOfScene ? pos : pos - basePoint;
         for (ivm::IVObject *obj : objects) {
             QVector<QPointF> coordinates = shared::graphicsviewutils::polygon(obj->coordinates());
             if (coordinates.isEmpty() && !obj->parentObject()) {

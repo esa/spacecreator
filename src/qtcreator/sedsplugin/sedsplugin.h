@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "options.h"
 #include "sedspluginconstants.h"
 
 #include <QStandardItemModel>
@@ -26,6 +27,7 @@
 #include <conversion/registry/registry.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <extensionsystem/iplugin.h>
+#include <shared/ui/listtreedialog.h>
 
 namespace spctr {
 
@@ -50,8 +52,10 @@ private:
     auto importAsn1() -> void;
     auto exportAsn1() -> void;
     auto exportInterfaceView() -> void;
-    auto updateModelWithFunctionNames(QStandardItemModel &model, const QStringList &ivFunctionsNames) -> void;
+    auto itemModelUpdateWithFunctionNames(QStandardItemModel &model, const QStringList &ivFunctionsNames) -> void;
     auto initializeRegistry() -> void;
+    auto convertIvToSeds(conversion::Options options) -> void;
+    auto ltdialogUpdateWithItemModel(ListTreeDialog &ltdialog, QStandardItemModel *model) -> void;
 
     /** @brief  Internal registry */
     conversion::Registry m_registry;

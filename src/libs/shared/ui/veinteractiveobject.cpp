@@ -67,6 +67,7 @@ void VEInteractiveObject::onSelectionChanged(bool isSelected)
 
 void VEInteractiveObject::mergeGeometry()
 {
+#ifdef __NONE__
     if (!m_commandsStack) {
         qWarning() << Q_FUNC_INFO << "No command stack set in shared::ui::VEInteractiveObject";
         return;
@@ -81,6 +82,7 @@ void VEInteractiveObject::mergeGeometry()
         }
     }
     m_commandsStack->push(new cmd::CmdEntityAutoLayout(geometryData));
+#endif
 }
 
 QFont VEInteractiveObject::font() const
