@@ -12,6 +12,8 @@ target_link_libraries(${TEST_NAME}
     PRIVATE     Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test)
 
+add_dependencies(${TEST_NAME} SedsConverter)
+
 add_format_target(${TEST_NAME})
 
 configure_file(resources/config.xml resources/config.xml COPYONLY)
