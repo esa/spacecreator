@@ -32,6 +32,7 @@ private Q_SLOTS:
     void testRequiredInterfaces();
     void testProvidedInterfaces();
     void testHwas();
+    void testParameters();
 };
 
 /// \SRS  ETB-FUN-1070
@@ -72,6 +73,13 @@ void tst_SedsConverter_SedsToIv::testProvidedInterfaces()
 void tst_SedsConverter_SedsToIv::testHwas()
 {
     const int result = system("./test_hwas.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS ETB-FUN-4050
+void tst_SedsConverter_SedsToIv::testParameters()
+{
+    const int result = system("./test_parameters.sh");
     QCOMPARE(result, 0);
 }
 

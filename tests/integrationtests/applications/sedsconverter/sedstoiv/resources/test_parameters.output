@@ -1,0 +1,34 @@
+<InterfaceView>
+<Function name="MegaComponent" is_type="NO" language="SDL" default_implementation="default">
+<Provided_Interface name="Get_ProvidedInterface_ReadOnlySync_Pi" kind="Protected">
+    <Output_Parameter name="Param" type="MyInteger" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="Set_ProvidedInterface_ReadWriteAsync_Pi">
+    <Input_Parameter name="Param" type="MyInteger" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="Get_ProvidedInterface_ReadWriteSync_Pi" kind="Protected">
+    <Output_Parameter name="Param" type="MyInteger" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="Set_ProvidedInterface_ReadWriteSync_Pi" kind="Protected">
+    <Input_Parameter name="Param" type="MyInteger" encoding="ACN"/>
+</Provided_Interface>
+
+<Required_Interface name="Get_ProvidedInterface_ReadOnlyAsync_Ri" kind="Sporadic">
+    <Input_Parameter name="Param" type="MyInteger" encoding="ACN"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="Get_ProvidedInterface_ReadWriteAsync_Ri" kind="Sporadic">
+    <Input_Parameter name="Param" type="MyInteger" encoding="ACN"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+</InterfaceView>
