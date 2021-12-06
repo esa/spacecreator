@@ -1,5 +1,5 @@
 <InterfaceView>
-<Function name="MegaComponent" is_type="NO" language="C" default_implementation="default">
+<Function name="MegaComponent" is_type="NO" language="SDL" default_implementation="default">
 <Provided_Interface name="Get_ProvidedInterface_ReadOnlySync_Pi" kind="Protected">
     <Output_Parameter name="Param" type="MyInteger" encoding="ACN"/>
 </Provided_Interface>
@@ -27,7 +27,7 @@
 </Required_Interface>
 
     <Implementations>
-        <Implementation name="default" language="C"/>
+        <Implementation name="default" language="SDL"/>
     </Implementations>
 </Function>
 
