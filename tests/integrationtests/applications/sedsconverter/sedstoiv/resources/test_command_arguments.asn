@@ -1,5 +1,6 @@
 COM-N7SPACE-COMMANDARGUMENTS DEFINITIONS ::= BEGIN
 MyInteger ::= INTEGER(0 .. 255)
+MyFloat ::= REAL(1.17549e-38 .. 3.40282e+38)
 AsyncInCommand-Type ::= SEQUENCE 
 { 
     asyncInArgument2 MyInteger(0 .. 255), 
@@ -10,5 +11,15 @@ AsyncOutCommand-Type ::= SEQUENCE
     asyncOutArgument2 MyInteger(0 .. 255), 
     asyncOutArgument1 MyInteger(0 .. 255)
 } 
+GenericCommand-Type ::= SEQUENCE 
+{ 
+    genericArgument2 MyInteger(0 .. 255), 
+    genericArgument1 MyInteger(0 .. 255)
+} 
+GenericCommand-Type1 ::= SEQUENCE 
+{ 
+    genericArgument2 MyFloat(1.17549e-38 .. 3.40282e+38), 
+    genericArgument1 MyFloat(1.17549e-38 .. 3.40282e+38)
+}
 END
 

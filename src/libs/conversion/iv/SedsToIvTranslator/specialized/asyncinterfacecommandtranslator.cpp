@@ -42,7 +42,7 @@ std::multimap<QString, AsyncInterfaceCommandTranslator::ArgumentsCacheEntry>
         AsyncInterfaceCommandTranslator::m_commandArgumentsCache;
 
 const QString AsyncInterfaceCommandTranslator::m_ivInterfaceParameterName = "InputParam";
-const QString AsyncInterfaceCommandTranslator::m_bundledTypeNameTemplate = "%1_Type%2";
+const QString AsyncInterfaceCommandTranslator::m_bundledTypeNameTemplate = "%1-Type%2";
 
 AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(
         const seds::model::Interface &sedsInterface, Asn1Acn::Definitions *asn1Definitions, ivm::IVFunction *ivFunction)
@@ -138,8 +138,7 @@ QString AsyncInterfaceCommandTranslator::buildBundledType(
 
     // Create a new bundled type and add it to the ASN.1 model
     auto bundledTypeName = createBundledType(sedsCommandName, arguments);
-    m_commandArgumentsCache.insert(
-            { sedsCommandName, { std::move(bundledTypeName), bundledTypeHash, std::move(arguments) } });
+    m_commandArgumentsCache.insert({ sedsCommandName, { bundledTypeName, bundledTypeHash, std::move(arguments) } });
 
     return bundledTypeName;
 }

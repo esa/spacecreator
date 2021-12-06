@@ -44,7 +44,7 @@
       <CommandSet>
         <Command name="GenericCommand" mode="async">
           <Argument name="GenericArgument1" type="GenericType" mode="in" />
-          <Argument name="GenericArugment2" type="GenericType" mode="in" />
+          <Argument name="GenericArgument2" type="GenericType" mode="in" />
         </Command>
       </CommandSet>
     </Interface>
@@ -55,6 +55,11 @@
         <Interface name="AsyncInterfacePI" type="AsyncInterface"/>
         <Interface name="SyncInterfacePI" type="SyncInterface"/>
         <Interface name="GenericInterfaceIntegerPI" type="GenericInterface">
+          <GenericTypeMapSet>
+            <GenericTypeMap name="GenericType" type="MyInteger"/>
+          </GenericTypeMapSet>
+        </Interface>
+        <Interface name="GenericInterfaceIntegerReusePI" type="GenericInterface">
           <GenericTypeMapSet>
             <GenericTypeMap name="GenericType" type="MyInteger"/>
           </GenericTypeMapSet>

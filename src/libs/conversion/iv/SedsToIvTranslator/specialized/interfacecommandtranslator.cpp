@@ -48,6 +48,13 @@ InterfaceCommandTranslator::InterfaceCommandTranslator(
 {
 }
 
+QString InterfaceCommandTranslator::getCommandName(
+        const QString &interfaceName, const ivm::IVInterface::InterfaceType type, const QString &commandName)
+{
+    return Escaper::escapeIvName(
+            m_ivInterfaceNameTemplate.arg(interfaceName).arg(commandName).arg(interfaceTypeToString(type)));
+}
+
 QString InterfaceCommandTranslator::handleArgumentType(const seds::model::CommandArgument &sedsArgument) const
 {
     const auto &sedsArgumentTypeName = findMappedType(sedsArgument.type().nameStr());
@@ -140,13 +147,6 @@ const QString &InterfaceCommandTranslator::interfaceTypeToString(ivm::IVInterfac
         throw UnhandledValueException("ivm::InterfaceType");
         break;
     }
-}
-
-QString InterfaceCommandTranslator::getCommandName(
-        const QString &interfaceName, const ivm::IVInterface::InterfaceType type, const QString &commandName)
-{
-    return Escaper::escapeIvName(
-            m_ivInterfaceNameTemplate.arg(interfaceName).arg(commandName).arg(interfaceTypeToString(type)));
 }
 
 const QString &InterfaceCommandTranslator::findMappedType(const QString &genericTypeName) const
