@@ -8,6 +8,12 @@
         <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
       </Range>
     </IntegerDataType>
+    <FloatDataType name="MyFloat">
+      <FloatDataEncoding encodingAndPrecision="IEEE754_2008_single" sizeInBits="32" />
+      <Range>
+        <PrecisionRange>single</PrecisionRange>
+      </Range>
+    </FloatDataType>
   </DataTypeSet>
   <DeclaredInterfaceSet>
     <Interface name="AsyncInterface">
@@ -22,14 +28,46 @@
         </Command>
       </CommandSet>
     </Interface>
+    <Interface name="SyncInterface">
+      <CommandSet>
+        <Command name="SyncInCommand" mode="sync">
+          <Argument name="SyncInArgument1" type="MyInteger" mode="in" />
+          <Argument name="SyncInArgument2" type="MyInteger" mode="in" />
+        </Command>
+        <Command name="SyncOutCommand" mode="sync">
+          <Argument name="SyncOutArgument1" type="MyInteger" mode="out" />
+          <Argument name="SyncOutArgument2" type="MyInteger" mode="out" />
+        </Command>
+      </CommandSet>
+    </Interface>
+    <Interface name="GenericInterface">
+      <CommandSet>
+        <Command name="GenericCommand" mode="async">
+          <Argument name="GenericArgument1" type="GenericType" mode="in" />
+          <Argument name="GenericArugment2" type="GenericType" mode="in" />
+        </Command>
+      </CommandSet>
+    </Interface>
   </DeclaredInterfaceSet>
   <ComponentSet>
     <Component name="Component">
       <ProvidedInterfaceSet>
         <Interface name="AsyncInterfacePI" type="AsyncInterface"/>
+        <Interface name="SyncInterfacePI" type="SyncInterface"/>
+        <Interface name="GenericInterfaceIntegerPI" type="GenericInterface">
+          <GenericTypeMapSet>
+            <GenericTypeMap name="GenericType" type="MyInteger"/>
+          </GenericTypeMapSet>
+        </Interface>
+        <Interface name="GenericInterfaceFloatPI" type="GenericInterface">
+          <GenericTypeMapSet>
+            <GenericTypeMap name="GenericType" type="MyFloat"/>
+          </GenericTypeMapSet>
+        </Interface>
       </ProvidedInterfaceSet>
       <RequiredInterfaceSet>
         <Interface name="AsyncInterfaceRI" type="AsyncInterface"/>
+        <Interface name="SyncInterfaceRI" type="SyncInterface"/>
       </RequiredInterfaceSet>
     </Component>
   </ComponentSet>

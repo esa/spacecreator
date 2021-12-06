@@ -4,6 +4,24 @@
     <Input_Parameter name="InputParam" type="AsyncInCommand_Type" encoding="ACN"/>
 </Provided_Interface>
 
+<Provided_Interface name="SyncInterfacePI_SyncInCommand_Pi" kind="Protected">
+    <Input_Parameter name="SyncInArgument1" type="MyInteger" encoding="ACN"/>
+    <Input_Parameter name="SyncInArgument2" type="MyInteger" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="SyncInterfacePI_SyncOutCommand_Pi" kind="Protected">
+    <Output_Parameter name="SyncOutArgument1" type="MyInteger" encoding="ACN"/>
+    <Output_Parameter name="SyncOutArgument2" type="MyInteger" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="GenericInterfaceIntegerPI_GenericCommand_Pi">
+    <Input_Parameter name="InputParam" type="GenericCommand_Type" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="GenericInterfaceFloatPI_GenericCommand_Pi">
+    <Input_Parameter name="InputParam" type="GenericCommand_Type1" encoding="ACN"/>
+</Provided_Interface>
+
 <Provided_Interface name="AsyncInterfaceRI_AsyncOutCommand_Pi">
     <Input_Parameter name="InputParam" type="AsyncOutCommand_Type" encoding="ACN"/>
 </Provided_Interface>
@@ -17,6 +35,19 @@
     <Input_Parameter name="InputParam" type="AsyncInCommand_Type" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
+
+<Required_Interface name="SyncInterfaceRI_SyncInCommand_Ri" kind="Protected">
+    <Input_Parameter name="SyncInArgument1" type="MyInteger" encoding="ACN"/>
+    <Input_Parameter name="SyncInArgument2" type="MyInteger" encoding="ACN"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="SyncInterfaceRI_SyncOutCommand_Ri" kind="Protected">
+    <Output_Parameter name="SyncOutArgument1" type="MyInteger" encoding="ACN"/>
+    <Output_Parameter name="SyncOutArgument2" type="MyInteger" encoding="ACN"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
 
     <Implementations>
         <Implementation name="default" language="SDL"/>
