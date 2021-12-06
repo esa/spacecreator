@@ -125,7 +125,7 @@ auto SedsPlugin::itemModelUpdateWithFunctionNames(QStandardItemModel &model, con
 
     QList<QStandardItem *> ivFunctionNamesList;
     for (auto &name : ivFunctionsNames) {
-        QStandardItem *item = new QStandardItem(name);
+        QStandardItem *const item = new QStandardItem(name);
         item->setCheckable(true);
         ivFunctionNamesList.append(item);
     }
@@ -216,9 +216,9 @@ auto SedsPlugin::importAsn1() -> void
     options.add(conversion::asn1::Asn1Options::asn1FilepathPrefix, "");
     options.add(conversion::asn1::Asn1Options::acnFilepathPrefix, "");
     try {
-        auto srcModelTypes = std::set<conversion::ModelType>({ conversion::ModelType::Seds });
-        auto targetModelType = conversion::ModelType::Asn1;
-        auto auxModelTypes = std::set<conversion::ModelType>({});
+        const auto srcModelTypes = std::set<conversion::ModelType>({ conversion::ModelType::Seds });
+        const auto targetModelType = conversion::ModelType::Asn1;
+        const auto auxModelTypes = std::set<conversion::ModelType>({});
         Converter converter(m_registry, std::move(options));
         converter.convert(srcModelTypes, targetModelType, auxModelTypes);
         MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesImported));
@@ -337,9 +337,9 @@ auto SedsPlugin::exportAsn1() -> void
         options.add(conversion::seds::SedsOptions::outputFilepath,
                 QString("%1%2%3.xml").arg(outputDir).arg(QDir::separator()).arg(getFileName(asn1Names[i])));
         try {
-            auto srcModelTypes = std::set<conversion::ModelType>({ conversion::ModelType::Asn1 });
-            auto targetModelType = conversion::ModelType::Seds;
-            auto auxModelTypes = std::set<conversion::ModelType>({});
+            const auto srcModelTypes = std::set<conversion::ModelType>({ conversion::ModelType::Asn1 });
+            const auto targetModelType = conversion::ModelType::Seds;
+            const auto auxModelTypes = std::set<conversion::ModelType>({});
             Converter converter(m_registry, std::move(options));
             converter.convert(srcModelTypes, targetModelType, auxModelTypes);
             MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesExported));
@@ -376,9 +376,9 @@ auto SedsPlugin::initializeRegistry() -> void
 
 auto SedsPlugin::convertIvToSeds(conversion::Options options) -> void
 {
-    auto srcModelType = std::set<conversion::ModelType>({ conversion::ModelType::InterfaceView });
-    auto targetModelType = conversion::ModelType::Seds;
-    auto auxModelTypes = std::set<conversion::ModelType>({});
+    const auto srcModelType = std::set<conversion::ModelType>({ conversion::ModelType::InterfaceView });
+    const auto targetModelType = conversion::ModelType::Seds;
+    const auto auxModelTypes = std::set<conversion::ModelType>({});
 
     Converter converter(m_registry, std::move(options));
     converter.convert(srcModelType, targetModelType, auxModelTypes);
