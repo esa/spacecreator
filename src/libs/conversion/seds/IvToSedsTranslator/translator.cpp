@@ -68,7 +68,7 @@ std::vector<std::unique_ptr<Model>> IvToSedsTranslator::translateIvModel(
 
     auto ivFunctions = ivModel->allObjectsByType<ivm::IVFunction>();
 
-    // IV model stores functions in UUID-> function map, which makes translation undeterministic
+    // IV model stores functions in UUID->Function map, which makes translation undeterministic
     // Because of that we need to sort functions by name to keep them in the same order on every
     // conversion.
     const auto comparator = [](auto lhs, auto rhs) { return lhs->title() < rhs->title(); };
