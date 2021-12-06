@@ -48,7 +48,7 @@ fi
 
 QTC_BASE_URL="https://download.qt.io/official_releases/qtcreator/${ENV_QTC_VERSION_SHORT}/${ENV_QTC_VERSION}/installer_source/linux_x64"
 if ! curl --head --silent --fail ${QTC_BASE_URL} > /dev/null; then
-    QTC_BASE_URL="https://download.qt.io/official_releases/qtcreator/${ENV_QTC_VERSION_SHORT}/${ENV_QTC_VERSION}/installer_source/linux_gcc_64_rhel72"
+    QTC_BASE_URL="https://download.qt.io/archive/qtcreator/${ENV_QTC_VERSION_SHORT}/${ENV_QTC_VERSION}/installer_source/linux_gcc_64_rhel72"
 fi
 echo "Loading QtCreator from ${QTC_BASE_URL}"
 

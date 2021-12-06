@@ -26,7 +26,6 @@
 #include <ivcore/ivmodel.h>
 #include <seds/SedsModel/sedsmodel.h>
 
-using Asn1Acn::Asn1Model;
 using conversion::translator::TranslationException;
 using ivm::IVModel;
 using seds::model::SedsModel;
@@ -39,9 +38,8 @@ std::vector<std::unique_ptr<Model>> IvToSedsTranslator::translateModels(
     checkSourceModelCount(sourceModels);
 
     const auto *ivModel = getModel<IVModel>(sourceModels);
-    auto *asn1Model = getModel<Asn1Model>(sourceModels);
 
-    return translateIvModel(ivModel, asn1Model, options);
+    return translateIvModel(ivModel, options);
 }
 
 ModelType IvToSedsTranslator::getSourceModelType() const
@@ -56,20 +54,26 @@ ModelType IvToSedsTranslator::getTargetModelType() const
 
 std::set<ModelType> IvToSedsTranslator::getDependencies() const
 {
-    static std::set<ModelType> dependencies { ModelType::InterfaceView, ModelType::Asn1 };
+    static std::set<ModelType> dependencies { ModelType::InterfaceView };
     return dependencies;
 }
 
 std::vector<std::unique_ptr<Model>> IvToSedsTranslator::translateIvModel(
-        const IVModel *ivModel, Asn1Model *asn1Model, const Options &options) const
+        const IVModel *ivModel, const Options &options) const
 {
-    Q_UNUSED(asn1Model);
     Q_UNUSED(options);
 
     ::seds::model::Package sedsPackage;
     sedsPackage.setName("InterfaceView");
 
-    const auto ivFunctions = ivModel->allObjectsByType<ivm::IVFunction>();
+    auto ivFunctions = ivModel->allObjectsByType<ivm::IVFunction>();
+
+    // IV model stores functions in UUID-> function map, which makes translation undeterministic
+    // Because of that we need to sort functions by name to keep them in the same order on every
+    // conversion.
+    const auto comparator = [](auto lhs, auto rhs) { return lhs->title() < rhs->title(); };
+    std::sort(std::begin(ivFunctions), std::end(ivFunctions), comparator);
+
     if (options.isSet(iv::IvOptions::functionToConvert)) {
         std::vector<QString> functionsToConvert = options.values(iv::IvOptions::functionToConvert);
         for (const auto &ivFunction : ivFunctions) {

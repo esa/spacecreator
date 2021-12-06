@@ -22,6 +22,7 @@
 #include "commands/cmdifaceparamremove.h"
 #include "commandsstack.h"
 #include "ivinterface.h"
+#include "ivnamevalidator.h"
 #include "ivobject.h"
 #include "ivpropertytemplate.h"
 #include "propertytemplateconfig.h"
@@ -106,7 +107,7 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
 
         switch (index.column()) {
         case Column::Name: {
-            if (!paramNew.setName(value.toString()))
+            if (!paramNew.setName(ivm::IVNameValidator::encodeName(entity()->type(), value.toString())))
                 return false;
             break;
         }

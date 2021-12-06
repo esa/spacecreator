@@ -39,3 +39,8 @@ configure_file(test_factorial.sh test_factorial.sh COPYONLY)
 configure_file(resources/test_factorial.xml resources/test_factorial.xml COPYONLY)
 configure_file(resources/test_factorial.output resources/test_factorial.output COPYONLY)
 configure_file(resources/test_factorial.system_structure resources/test_factorial.system_structure COPYONLY)
+
+configure_file(test_guard.sh test_guard.sh COPYONLY)
+configure_file(resources/test_guard.xml resources/test_guard.xml COPYONLY)
+configure_file(resources/test_guard.output resources/test_guard.output COPYONLY)
+configure_file(resources/test_guard.system_structure resources/test_guard.system_structure COPYONLY)

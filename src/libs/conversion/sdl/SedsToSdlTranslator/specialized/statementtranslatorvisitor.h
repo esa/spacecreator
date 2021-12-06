@@ -188,6 +188,18 @@ public:
     static auto translateActivityCall(::sdl::Process *process, const seds::model::ActivityInvocation &invocation)
             -> std::unique_ptr<::sdl::ProcedureCall>;
 
+    /**
+     * @brief   Translates SEDS BooleanExpression into SDL decision
+     *
+     * @param sdlProcess        Host SDL process
+     * @param sdlProcedure      Host SDL procedure
+     * @param expression        Expression to be translated
+     *
+     * @returns SDL decision
+     */
+    static auto translateBooleanExpression(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
+            const seds::model::BooleanExpression &expression) -> std::unique_ptr<::sdl::Decision>;
+
 private:
     Context &m_context;
     ::sdl::Transition *m_sdlTransition;
@@ -208,9 +220,6 @@ private:
 
     static auto translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString callName,
             const seds::model::SendCommandPrimitive &sendCommand) -> std::vector<std::unique_ptr<::sdl::Action>>;
-
-    static auto translateBooleanExpression(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-            const seds::model::BooleanExpression &expression) -> std::unique_ptr<::sdl::Decision>;
 
     static auto translateComparison(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
             const seds::model::Comparison &comparison) -> QString;
