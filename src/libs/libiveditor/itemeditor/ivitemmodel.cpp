@@ -290,7 +290,7 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
                 ivm::IVObject::coordinatesToString(shared::graphicsviewutils::coordinates(mappedViewportGeometry));
         obj->setEntityProperty(tokenStr, strRootCoord);
     } else {
-        const QString tokenStr = ivm::meta::Props::token(ivm::meta::Props::Token::coordinates);
+        static const QString tokenStr = ivm::meta::Props::token(ivm::meta::Props::Token::coordinates);
         const QString coordinatesStr = obj->entityAttributeValue<QString>(tokenStr);
         if (!coordinatesStr.isEmpty()) {
             const QVector<qint32> coordinates = ivm::IVObject::coordinatesFromString(coordinatesStr);
@@ -324,7 +324,7 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
         QList<QRectF> existingRects;
         QRectF itemsGeometry;
         for (const shared::VEObject *veObj : objectsModel()->objects()) { // Check if visible would be ehough
-            if (veObj->id() == obj->id()) {
+            if (veObj->id() == obj->id() || veObj->id() == objectsModel()->rootObjectId()) {
                 continue;
             }
             auto child = qobject_cast<const ivm::IVObject *>(veObj);
@@ -382,14 +382,15 @@ void IVItemModel::setupInterfaceGeometry(ivm::IVObject *obj)
     } else if (obj->hasEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates))) {
         ifacePos = mapPositionFromOrigin(
                 obj->as<ivm::IVInterface *>(), ivm::meta::Props::Token::RootCoordinates, parentRect, &side);
+    } else {
+        ifacePos = parentRect.topLeft();
     }
 
     const qreal sideSize = IVInterfaceGraphicsItem::baseLength();
     const QRectF kBaseRect = shared::graphicsviewutils::adjustFromPoint(QPointF(0, 0), sideSize);
 
     QRectF itemRect = shared::graphicsviewutils::adjustFromPoint(
-            QPointF(0, 0), sideSize + IVInterfaceGraphicsItem::minSiblingDistance());
-    const QPointF initialOffset = itemRect.topLeft();
+            ifacePos, sideSize + IVInterfaceGraphicsItem::minSiblingDistance());
 
     QList<QRectF> siblingsRects;
     for (const ivm::IVInterface *iface : parentObj->allInterfaces()) {
@@ -407,10 +408,13 @@ void IVItemModel::setupInterfaceGeometry(ivm::IVObject *obj)
         siblingsRects.append(itemRect);
     }
 
-    itemRect.setTopLeft(ifacePos - initialOffset);
+    itemRect.moveCenter(ifacePos);
     QPointF innerGeometry = ifacePos;
     QRectF intersectedRect;
-    if (shared::graphicsviewutils::isCollided(siblingsRects, itemRect, &intersectedRect) && parentRect.isValid()) {
+
+    if (((ifacePos.isNull() && siblingsRects.isEmpty())
+                || shared::graphicsviewutils::isCollided(siblingsRects, itemRect, &intersectedRect))
+            && parentRect.isValid()) {
         QPainterPath pp;
         pp.addRect(kBaseRect);
         const QList<QPair<Qt::Alignment, QPainterPath>> sidePaths {
@@ -419,7 +423,7 @@ void IVItemModel::setupInterfaceGeometry(ivm::IVObject *obj)
             { Qt::AlignRight, pp },
             { Qt::AlignBottom, pp },
         };
-        shared::PositionLookupHelper helper(sidePaths, parentRect, siblingsRects, itemRect, initialOffset);
+        shared::PositionLookupHelper helper(sidePaths, parentRect, siblingsRects, ifacePos);
         if (helper.lookup()) {
             innerGeometry = helper.mappedOriginPoint();
         }
