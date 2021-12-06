@@ -20,6 +20,7 @@
 #include "specialized/componentstranslator.h"
 
 #include "specialized/asyncinterfacecommandtranslator.h"
+#include "specialized/interfaceparametertranslator.h"
 #include "specialized/syncinterfacecommandtranslator.h"
 
 #include <conversion/common/escaper/escaper.h>
@@ -76,6 +77,12 @@ void ComponentsTranslator::translateInterface(const seds::model::Interface &seds
         ivm::IVFunction *ivFunction)
 {
     const auto &sedsInterfaceDeclaration = findInterfaceDeclaration(sedsInterface.type().nameStr(), sedsComponent);
+
+    InterfaceParameterTranslator parameterTranslator(sedsInterface, ivFunction);
+
+    for (const auto &sedsParameter : sedsInterfaceDeclaration.parameters()) {
+        parameterTranslator.translateParameter(sedsParameter, interfaceType);
+    }
 
     AsyncInterfaceCommandTranslator asyncCommandTranslator(sedsInterface, m_asn1Definitions, ivFunction);
     SyncInterfaceCommandTranslator syncCommandTranslator(sedsInterface, ivFunction);

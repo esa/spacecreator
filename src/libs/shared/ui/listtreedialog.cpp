@@ -19,23 +19,19 @@
 
 #include "listtreedialog.h"
 
+#include <QStandardItemModel>
 #include <QVBoxLayout>
-#include <qstandarditemmodel.h>
 
-ListTreeDialog::ListTreeDialog(QStandardItemModel *model, const QString &buttonText, const std::function<void()> &func)
-    : m_model(model)
+ListTreeDialog::ListTreeDialog()
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
     setLayout(layout);
     m_tree = new QTreeView(this);
     layout->addWidget(m_tree);
-    m_tree->setModel(m_model);
 
     m_button = new QPushButton(this);
-    m_button->setText(buttonText);
+    m_button->setText("select");
     layout->addWidget(m_button);
-
-    QObject::connect(m_button, &QPushButton::pressed, func);
 }
 
 QPushButton *ListTreeDialog::button()
@@ -51,4 +47,20 @@ QList<QString> *ListTreeDialog::selectedItems()
 QStandardItemModel *ListTreeDialog::model()
 {
     return m_model;
+}
+
+void ListTreeDialog::setModel(QStandardItemModel *const model)
+{
+    m_model = model;
+    m_tree->setModel(m_model);
+}
+
+void ListTreeDialog::setButtonText(const QString &buttonText)
+{
+    m_button->setText(buttonText);
+}
+
+void ListTreeDialog::setButtonHandler(const std::function<void()> &func)
+{
+    QObject::connect(m_button, &QPushButton::pressed, func);
 }

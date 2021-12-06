@@ -40,7 +40,6 @@
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
-#include <iostream>
 #include <seds/SedsModel/types/arraydatatype.h>
 #include <seds/SedsModel/types/binarydatatype.h>
 #include <seds/SedsModel/types/booleandatatype.h>
@@ -337,16 +336,7 @@ static inline auto setEntryNameAndType(EntryType &entry, const QString typeName,
 
 static inline auto getTypeName(const ::seds::model::DataType &type) -> QString
 {
-    return std::visit(overloaded { [](const ::seds::model::ArrayDataType &item) { return item.nameStr(); },
-                              [](const ::seds::model::BinaryDataType &item) { return item.nameStr(); },
-                              [](const ::seds::model::BooleanDataType &item) { return item.nameStr(); },
-                              [](const ::seds::model::ContainerDataType &item) { return item.nameStr(); },
-                              [](const ::seds::model::EnumeratedDataType &item) { return item.nameStr(); },
-                              [](const ::seds::model::FloatDataType &item) { return item.nameStr(); },
-                              [](const ::seds::model::IntegerDataType &item) { return item.nameStr(); },
-                              [](const ::seds::model::StringDataType &item) { return item.nameStr(); },
-                              [](const ::seds::model::SubRangeDataType &item) { return item.nameStr(); } },
-            type);
+    return std::visit(overloaded { [](const auto &item) { return item.nameStr(); } }, type);
 }
 
 static inline auto isTypePresentInPackage(::seds::model::Package *package, const QString name) -> bool
