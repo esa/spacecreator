@@ -271,8 +271,6 @@ auto SedsPlugin::exportInterfaceView() -> void
             conversion::Options options;
             options.add(conversion::iv::IvOptions::inputFilepath,
                     QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg("interfaceview.xml"));
-            options.add(conversion::asn1::Asn1Options::inputFilepath,
-                    QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg("DataView.asn"));
             options.add(conversion::iv::IvOptions::configFilepath,
                     QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg("config.xml"));
             options.add(conversion::seds::SedsOptions::outputFilepath,
@@ -378,8 +376,7 @@ auto SedsPlugin::initializeRegistry() -> void
 
 auto SedsPlugin::convertIvToSeds(conversion::Options options) -> void
 {
-    auto srcModelType =
-            std::set<conversion::ModelType>({ conversion::ModelType::InterfaceView, conversion::ModelType::Asn1 });
+    auto srcModelType = std::set<conversion::ModelType>({ conversion::ModelType::InterfaceView });
     auto targetModelType = conversion::ModelType::Seds;
     auto auxModelTypes = std::set<conversion::ModelType>({});
 
