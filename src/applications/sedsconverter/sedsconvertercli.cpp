@@ -23,13 +23,13 @@
 
 #include <QStringList>
 #include <conversion/asn1/Asn1Options/options.h>
-#include <conversion/common/exceptions.h>
+#include <conversion/converter/exceptions.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <filesystem>
 #include <sdl/SdlOptions/options.h>
 #include <seds/SedsOptions/options.h>
 
-using conversion::ConversionException;
+using conversion::ConverterException;
 using conversion::InvalidModelNameException;
 using conversion::ModelType;
 using conversion::Options;
@@ -97,7 +97,7 @@ void SedsConverterCLI::parseArguments(const QStringList &arguments)
     }
 
     if (m_sourceModels.empty()) {
-        throw ConversionException("No source models passed");
+        throw ConverterException("No source models passed");
     }
 }
 

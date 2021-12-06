@@ -83,20 +83,6 @@ public:
 };
 
 /**
- * @brief   Exception thrown when registering capabilities for model failed
- */
-class RegistrationFailedException final : public ConversionException
-{
-public:
-    /**
-     * @brief   Constructor
-     *
-     * @param   modelType       Type of model for which registration failed
-     */
-    explicit RegistrationFailedException(ModelType modelType);
-};
-
-/**
  * @brief   Exception thrown when importer for given model type wasn't registered
  */
 class ImporterNotRegisteredException final : public ConversionException
@@ -169,20 +155,6 @@ public:
      * @param   valueTypeName   Name of the unsupported value type
      */
     explicit UnsupportedValueException(const QString &enumName, const QString &valueTypeName);
-};
-
-/**
- * @brief   Exception throw when given string name doesn't correspond to any known model type
- */
-class InvalidModelNameException final : public ConversionException
-{
-public:
-    /**
-     * @brief   Constructor
-     *
-     * @param   modelName   Model name that is invalid
-     */
-    explicit InvalidModelNameException(const QString &modelName);
 };
 
 } // namespace conversion

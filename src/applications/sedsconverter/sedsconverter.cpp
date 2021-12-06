@@ -19,12 +19,14 @@
 
 #include "sedsconverter.h"
 
+#include "exceptions.h"
+
 #include <QDebug>
 #include <conversion/asn1/Asn1Registrar/registrar.h>
-#include <conversion/common/exceptions.h>
 #include <conversion/common/modeltype.h>
 #include <conversion/common/options.h>
 #include <conversion/converter/converter.h>
+#include <conversion/converter/exceptions.h>
 #include <conversion/iv/IvRegistrar/registrar.h>
 #include <conversion/sdl/SdlRegistrar/registrar.h>
 #include <conversion/seds/SedsRegistrar/registrar.h>

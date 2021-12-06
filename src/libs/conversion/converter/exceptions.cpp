@@ -26,4 +26,14 @@ ConverterException::ConverterException(QString message)
 {
 }
 
+RegistrationFailedException::RegistrationFailedException(ModelType modelType)
+    : ConverterException(QString("Unable to register for %1 model").arg(modelTypeToString(modelType)))
+{
+}
+
+InvalidModelNameException::InvalidModelNameException(const QString &modelName)
+    : ConverterException(QString("Model name '%1' is not valid").arg(modelName))
+{
+}
+
 } // namespace conversion
