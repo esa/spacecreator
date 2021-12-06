@@ -187,7 +187,24 @@ auto SedsPlugin::importInterfaceView() -> void
         return;
     }
 
-    // TODO: implementation
+    conversion::Options options;
+    options.add(conversion::iv::IvOptions::outputFilepath,
+            QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg("tmp-interfaceview.xml"));
+    options.add(conversion::iv::IvOptions::configFilepath,
+            QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg("config.xml"));
+    options.add(conversion::seds::SedsOptions::inputFilepath, inputFilePath);
+    // options.add(conversion::seds::SedsOptions::skipValidation);
+
+    try {
+        convertSedsToIv(options);
+        MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesExported));
+    } catch (conversion::ConverterException &ex) {
+        MessageManager::write(GenMsg::msgWarning.arg(ex.what()));
+    } catch (std::exception &ex) {
+        MessageManager::write(GenMsg::msgWarning.arg(ex.what()));
+    }
+
+    // TODO: merge tmp-interfaceview.xml and interfaceview.xml
 }
 
 auto SedsPlugin::importSdl() -> void
@@ -378,6 +395,16 @@ auto SedsPlugin::convertIvToSeds(conversion::Options options) -> void
 {
     const auto srcModelType = std::set<conversion::ModelType>({ conversion::ModelType::InterfaceView });
     const auto targetModelType = conversion::ModelType::Seds;
+    const auto auxModelTypes = std::set<conversion::ModelType>({});
+
+    Converter converter(m_registry, std::move(options));
+    converter.convert(srcModelType, targetModelType, auxModelTypes);
+}
+
+auto SedsPlugin::convertSedsToIv(conversion::Options options) -> void
+{
+    const auto srcModelType = std::set<conversion::ModelType>({ conversion::ModelType::Seds });
+    const auto targetModelType = conversion::ModelType::InterfaceView;
     const auto auxModelTypes = std::set<conversion::ModelType>({});
 
     Converter converter(m_registry, std::move(options));

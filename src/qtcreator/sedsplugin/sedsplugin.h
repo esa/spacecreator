@@ -55,6 +55,7 @@ private:
     auto itemModelUpdateWithFunctionNames(QStandardItemModel &model, const QStringList &ivFunctionsNames) -> void;
     auto initializeRegistry() -> void;
     auto convertIvToSeds(conversion::Options options) -> void;
+    auto convertSedsToIv(conversion::Options options) -> void;
     auto ltdialogUpdateWithItemModel(ListTreeDialog &ltdialog, QStandardItemModel *model) -> void;
 
     /** @brief  Internal registry */
