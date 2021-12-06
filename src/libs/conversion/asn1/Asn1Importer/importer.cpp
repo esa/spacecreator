@@ -55,7 +55,11 @@ std::unique_ptr<conversion::Model> Asn1Importer::importModel(const Options &opti
         inputFilesList.append(QFileInfo(filename));
     }
 
-    auto files = asn1Reader.parseAsn1Files(inputFilesList, &errorMessages);
+    auto parsedFiles = asn1Reader.parseAsn1Files(inputFilesList, &errorMessages);
+    std::vector<std::unique_ptr<Asn1Acn::File>> files;
+    for (auto &pair : parsedFiles) {
+        files.push_back(std::move(pair.second));
+    }
 
     if (!errorMessages.isEmpty()) {
         auto message = errorMessages.join("\n");
