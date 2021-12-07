@@ -1,0 +1,24 @@
+CHOICES DEFINITIONS ::= BEGIN
+
+Type1 [encoding pos-int, size 32, endianness big]
+Type2 [encoding pos-int, size 32, endianness big]
+
+SimpleChoice [] 
+{
+    alt1 [],
+    alt2 []
+}
+
+SimpleChoiceWithAnonymousTypes []
+{
+    alt1 [encoding pos-int, size 16, endianness big],
+    alt2 [encoding twos-complement, size 16, endianness little]
+}
+
+SimpleChoiceWithEncodingOverride []
+{
+    alt1 [encoding pos-int, size 16, endianness little],
+    alt2 [encoding pos-int, size 16, endianness little]
+}
+
+END

@@ -47,27 +47,25 @@ public:
     Asn1ModelStorage(QObject *parent = nullptr);
     ~Asn1ModelStorage();
 
-    QSharedPointer<File> asn1DataTypes(const QString &fileName) const;
+    Asn1Acn::File *asn1DataTypes(const QString &fileName);
     bool contains(const QString &fileName) const;
 
     void clear();
 
-    void watchFile(const QString &fileName);
+    void watchFiles(const QStringList &fileNames);
 
 Q_SIGNALS:
-    void dataTypesChanged(const QString &fileName);
-    void success(const QString &fileName);
-    void error(const QString &fileName, const QStringList &errors);
+    void dataTypesChanged(const QStringList &fileNames);
+    void success(const QStringList &fileNames);
+    void error(const QStringList &fileNames, const QStringList &errors);
 
 private:
-    bool loadFile(const QString &fileName);
-    QSharedPointer<Asn1Acn::File> loadData(const QString &fileName);
-    Q_SLOT void loadChangedFiles();
+    void invalidateStorage();
 
-    QHash<QString, QSharedPointer<Asn1Acn::File>> m_store;
+private:
+    std::map<QString, std::unique_ptr<Asn1Acn::File>> m_store;
     QFileSystemWatcher *m_asn1Watcher = nullptr;
     QTimer m_reloadTimer;
-    QSet<QString> m_filesToReload;
 };
 
-}
+} // namespace Asn1Acn

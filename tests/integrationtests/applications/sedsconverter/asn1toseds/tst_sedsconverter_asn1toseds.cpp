@@ -29,6 +29,9 @@ class tst_SedsConverter_Asn1ToSeds : public QObject
 
 private Q_SLOTS:
     void testSimpleDataTypes();
+    void testSequences();
+    void testSequencesOf();
+    void testChoices();
 };
 
 /// \SRS  ETB-FUN-3010
@@ -40,11 +43,48 @@ private Q_SLOTS:
 /// \SRS  ETB-FUN-3120
 /// \SRS  ETB-FUN-3160
 /// \SRS  ETB-FUN-3170
+/// \SRS  ETB-FUN-3130
 /// \SRS  ETB-IF-160
+/// \SRS  ETB-IF-170
 /// \SRS  ETB-IF-180
 void tst_SedsConverter_Asn1ToSeds::testSimpleDataTypes()
 {
     const int result = system("./test_simple_data_types.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-3010
+/// \SRS  ETB-FUN-3090
+/// \SRS  ETB-FUN-3092
+/// \SRS  ETB-FUN-3200
+/// \SRS  ETB-IF-160
+/// \SRS  ETB-IF-170
+/// \SRS  ETB-IF-180
+void tst_SedsConverter_Asn1ToSeds::testSequences()
+{
+    const int result = system("./test_sequences.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-3100
+/// \SRS  ETB-FUN-3110
+/// \SRS  ETB-FUN-3150
+/// \SRS  ETB-IF-160
+/// \SRS  ETB-IF-170
+/// \SRS  ETB-IF-180
+void tst_SedsConverter_Asn1ToSeds::testSequencesOf()
+{
+    const int result = system("./test_sequences_of.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-3080
+/// \SRS  ETB-IF-160
+/// \SRS  ETB-IF-170
+/// \SRS  ETB-IF-180
+void tst_SedsConverter_Asn1ToSeds::testChoices()
+{
+    const int result = system("./test_choices.sh");
     QCOMPARE(result, 0);
 }
 

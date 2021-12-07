@@ -66,6 +66,28 @@
      <MinMaxRange min="50" max="60" rangeType="inclusiveMinInclusiveMax"/>
     </Range>
    </FloatDataType>
+   <IntegerDataType name="Byte">
+    <IntegerDataEncoding byteOrder="littleEndian" sizeInBits="8" encoding="unsigned"/>
+    <Range>
+     <MinMaxRange min="0" max="255" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ArrayDataType name="FixedSizeOctetString" dataTypeRef="Byte">
+    <DimensionList>
+     <Dimension size="12"/>
+    </DimensionList>
+   </ArrayDataType>
+   <IntegerDataType name="Size_VariableSizeOctetString">
+    <Range>
+     <MinMaxRange min="1" max="12" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType name="VariableSizeOctetString">
+    <EntryList>
+     <Entry type="Size_VariableSizeOctetString" name="count"/>
+     <ListEntry type="Byte" name="elements" listLengthField="count"/>
+    </EntryList>
+   </ContainerDataType>
   </DataTypeSet>
  </Package>
 </PackageFile>

@@ -82,7 +82,7 @@ CmdEntitiesImport::CmdEntitiesImport(const QByteArray &data, ivm::IVFunctionType
             });
             m_rootEntities.append(obj);
         }
-        const QPointF offset = basePoint == outOfScene ? QPointF() : pos - basePoint;
+        const QPointF offset = basePoint == outOfScene ? pos : pos - basePoint;
         for (ivm::IVObject *obj : objects) {
             QVector<QPointF> coordinates = shared::graphicsviewutils::polygon(obj->coordinates());
             if (coordinates.isEmpty() && !obj->parentObject()) {
@@ -228,25 +228,47 @@ static inline bool isSame(const QString &filePath1, const QString &filePath2)
     return true;
 }
 
-static inline QStringList asn1ModuleDuplication(Asn1Acn::Asn1SystemChecks *asn1Checks, const QFileInfo &asn1FileInfo)
+static inline QStringList asn1ModuleDuplication(
+        Asn1Acn::Asn1SystemChecks *asn1Checks, const QVector<QFileInfo> &asn1FileInfos)
 {
+    if (asn1FileInfos.empty()) {
+        return {};
+    }
     Asn1Acn::Asn1Reader parser;
     QStringList errorMessages;
     QStringList modulesNames;
-    const std::unique_ptr<Asn1Acn::File> asn1Data = parser.parseAsn1File(asn1FileInfo, &errorMessages);
-    if (!asn1Data) {
+    const std::map<QString, std::unique_ptr<Asn1Acn::File>> asn1Data =
+            parser.parseAsn1Files(asn1FileInfos, &errorMessages);
+    if (asn1Data.empty()) {
+        QStringList filenames;
+        for (const QFileInfo &fi : qAsConst(asn1FileInfos)) {
+            filenames.append(fi.fileName());
+        }
         shared::ErrorHub::addError(shared::ErrorItem::Error,
-                QObject::tr("%1 wasn't imported: ").arg(asn1FileInfo.fileName()), errorMessages.join(", "));
+                QObject::tr("%1 was/were not imported: ").arg(filenames.join(", ")), errorMessages.join(", "));
         return modulesNames;
     }
 
-    for (const auto &defs : asn1Data->definitionsList()) {
-        const std::vector<Asn1Acn::Definitions *> projectDefinitions = asn1Checks->definitionsList();
-        auto it = std::find_if(projectDefinitions.cbegin(), projectDefinitions.cend(),
-                [defName = defs->name()](
-                        const Asn1Acn::Definitions *definitions) { return definitions->name() == defName; });
-        if (it != projectDefinitions.cend())
-            modulesNames.append(defs->name());
+    QStringList projectDefinitionsNames;
+    QStringList projectTypeAssignmentsNames;
+    const std::vector<Asn1Acn::Definitions *> &projectDefinitions = asn1Checks->definitionsList();
+    for_each(projectDefinitions.cbegin(), projectDefinitions.cend(), [&](Asn1Acn::Definitions *defs) {
+        projectDefinitionsNames << defs->name();
+        projectTypeAssignmentsNames << defs->typeAssignmentNames();
+    });
+
+    for (auto it = asn1Data.cbegin(); it != asn1Data.cend(); ++it) {
+        for (const auto &defs : it->second->definitionsList()) {
+            if (projectDefinitionsNames.contains(defs->name())) {
+                modulesNames.append(defs->name());
+            } else {
+                for (const QString &typeAssignment : defs->typeAssignmentNames()) {
+                    if (projectTypeAssignmentsNames.contains(typeAssignment)) {
+                        modulesNames.append(defs->name());
+                    }
+                }
+            }
+        }
     }
     return modulesNames;
 }
@@ -265,12 +287,29 @@ void CmdEntitiesImport::redoAsnFileImport(const ivm::IVObject *object)
     const QDir sourceDir { sourcePrefix + QDir::separator() + rootName };
     const QDir targetDir { m_destPath };
 
-    const QList<QFileInfo> rootFiles = sourceDir.entryInfoList(
+    QList<QFileInfo> asnFiles = sourceDir.entryInfoList(
             { QLatin1String("*.asn1"), QLatin1String("*.asn"), QLatin1String("*.acn") }, QDir::Files);
 
-    for (const QFileInfo &file : rootFiles) {
+    QVector<QFileInfo> fileInfos;
+    std::copy_if(asnFiles.begin(), asnFiles.end(), std::back_inserter(fileInfos), [targetDir](const QFileInfo &fi) {
+        const QString destFilePath { targetDir.filePath(fi.fileName()) };
+        return !isSame(destFilePath, fi.absoluteFilePath());
+    });
+
+    auto alreadyExistingModules = asn1ModuleDuplication(m_asn1Checks, fileInfos);
+    if (!alreadyExistingModules.isEmpty()) {
+        auto res = QMessageBox::question(qApp->activeWindow(), tr("Import ASN1 files"),
+                tr("%1 module(s) already exist(s) in project or have(s) same type assignment(s), "
+                   "do you want add it/them anyway?")
+                        .arg(alreadyExistingModules.join(", ")));
+        if (res == QMessageBox::No) {
+            return; // CHECK: probably skip only files with module duplication
+        }
+    }
+
+    for (const QFileInfo &file : qAsConst(fileInfos)) {
         QString destFilePath { targetDir.filePath(file.fileName()) };
-        if (QFile::exists(destFilePath) && isSame(destFilePath, file.absoluteFilePath())) {
+        if (QFile::exists(destFilePath)) {
             auto res = QMessageBox::question(qApp->activeWindow(), tr("Import ASN1 files"),
                     tr("%1 already exists in project directory, do you want to rename importing one")
                             .arg(file.fileName()));
@@ -283,16 +322,6 @@ void CmdEntitiesImport::redoAsnFileImport(const ivm::IVObject *object)
             if (!ok || !text.isEmpty())
                 destFilePath = targetDir.filePath(text);
         }
-        auto alreadyExistingModules = asn1ModuleDuplication(m_asn1Checks, file);
-        if (!alreadyExistingModules.isEmpty()) {
-            auto res = QMessageBox::question(qApp->activeWindow(), tr("Import ASN1 files"),
-                    tr("%1 module already exists in project, do you want add it anyway?")
-                            .arg(alreadyExistingModules.join(", ")));
-            if (res == QMessageBox::No) {
-                continue;
-            }
-        }
-
         if (shared::copyFile(file.absoluteFilePath(), destFilePath)) {
             m_importedAsnFiles.append(destFilePath);
         } else {

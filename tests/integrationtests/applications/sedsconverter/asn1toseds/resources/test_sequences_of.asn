@@ -1,0 +1,18 @@
+SequencesOf DEFINITIONS ::= BEGIN
+
+Type1 ::= INTEGER(0..20)
+
+LengthType ::= INTEGER(0..15)
+
+SimpleFixedSizeSequenceOf ::= SEQUENCE (SIZE(66)) OF Type1
+
+SimpleFixedSizeSequenceOfAnonymousType ::= SEQUENCE (SIZE(66)) OF INTEGER(2..12)
+
+SimpleVariableSizeSequenceOf ::= SEQUENCE (SIZE(33..55)) OF Type1
+
+NestedSequenceWithAcnSize ::= SEQUENCE {
+    someField Type1,
+    sequenceField SEQUENCE (SIZE(12..15)) OF Type1
+}
+
+END

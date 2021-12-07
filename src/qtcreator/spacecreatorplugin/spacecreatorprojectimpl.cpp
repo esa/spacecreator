@@ -50,9 +50,7 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
     m_asnFiles = allAsn1Files();
     connect(m_project, &ProjectExplorer::Project::fileListChanged, this,
             &spctr::SpaceCreatorProjectImpl::checkAsnFileRename);
-    for (const QString &file : qAsConst(m_asnFiles)) {
-        m_asn1Storage->watchFile(file);
-    }
+    m_asn1Storage->watchFiles(m_asnFiles);
 
     static bool hubInitialized = false;
     if (!hubInitialized) {
@@ -66,7 +64,7 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
             &SpaceCreatorProjectImpl::clearTasksForFile);
 }
 
-SpaceCreatorProjectImpl::~SpaceCreatorProjectImpl() { }
+SpaceCreatorProjectImpl::~SpaceCreatorProjectImpl() {}
 
 /*!
    Returns all files of the current project endig with the given \p suffix
@@ -104,9 +102,7 @@ void SpaceCreatorProjectImpl::checkAsnFileRename()
 {
     QStringList asnFiles = allAsn1Files();
 
-    for (const QString &file : qAsConst(asnFiles)) {
-        m_asn1Storage->watchFile(file);
-    }
+    m_asn1Storage->watchFiles(asnFiles);
 
     QStringList newAsnFiles;
     for (const QString &file : qAsConst(asnFiles)) {

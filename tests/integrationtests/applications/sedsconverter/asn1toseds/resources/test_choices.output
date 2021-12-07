@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+ <Package name="CHOICES">
+  <DataTypeSet>
+   <IntegerDataType name="Type1">
+    <IntegerDataEncoding byteOrder="bigEndian" sizeInBits="32" encoding="unsigned"/>
+    <Range>
+     <MinMaxRange min="100" max="200" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <IntegerDataType name="Type2">
+    <IntegerDataEncoding byteOrder="bigEndian" sizeInBits="32" encoding="unsigned"/>
+    <Range>
+     <MinMaxRange min="50" max="100" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <EnumeratedDataType name="Index_SimpleChoice">
+    <EnumerationList>
+     <Enumeration value="0" label="alt1"/>
+     <Enumeration value="1" label="alt2"/>
+    </EnumerationList>
+   </EnumeratedDataType>
+   <ContainerDataType name="SimpleChoice" abstract="true">
+    <EntryList>
+     <Entry type="Index_SimpleChoice" name="index"/>
+    </EntryList>
+   </ContainerDataType>
+   <ContainerDataType baseType="SimpleChoice" name="SimpleChoice_alt1">
+    <ConstraintSet>
+     <ValueConstraint value="0" entry="index"/>
+    </ConstraintSet>
+    <EntryList>
+     <Entry type="Type1" name="element"/>
+    </EntryList>
+   </ContainerDataType>
+   <ContainerDataType baseType="SimpleChoice" name="SimpleChoice_alt2">
+    <ConstraintSet>
+     <ValueConstraint value="1" entry="index"/>
+    </ConstraintSet>
+    <EntryList>
+     <Entry type="Type2" name="element"/>
+    </EntryList>
+   </ContainerDataType>
+   <EnumeratedDataType name="Index_SimpleChoiceWithAnonymousTypes">
+    <EnumerationList>
+     <Enumeration value="0" label="alt1"/>
+     <Enumeration value="1" label="alt2"/>
+    </EnumerationList>
+   </EnumeratedDataType>
+   <ContainerDataType name="SimpleChoiceWithAnonymousTypes" abstract="true">
+    <EntryList>
+     <Entry type="Index_SimpleChoiceWithAnonymousTypes" name="index"/>
+    </EntryList>
+   </ContainerDataType>
+   <IntegerDataType name="Type_SimpleChoiceWithAnonymousTypes_alt1">
+    <IntegerDataEncoding byteOrder="bigEndian" sizeInBits="16" encoding="unsigned"/>
+    <Range>
+     <MinMaxRange min="0" max="50" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType baseType="SimpleChoiceWithAnonymousTypes" name="SimpleChoiceWithAnonymousTypes_alt1">
+    <ConstraintSet>
+     <ValueConstraint value="0" entry="index"/>
+    </ConstraintSet>
+    <EntryList>
+     <Entry type="Type_SimpleChoiceWithAnonymousTypes_alt1" name="element"/>
+    </EntryList>
+   </ContainerDataType>
+   <IntegerDataType name="Type_SimpleChoiceWithAnonymousTypes_alt2">
+    <IntegerDataEncoding byteOrder="littleEndian" sizeInBits="16" encoding="twosComplement"/>
+    <Range>
+     <MinMaxRange min="-1" max="1" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType baseType="SimpleChoiceWithAnonymousTypes" name="SimpleChoiceWithAnonymousTypes_alt2">
+    <ConstraintSet>
+     <ValueConstraint value="1" entry="index"/>
+    </ConstraintSet>
+    <EntryList>
+     <Entry type="Type_SimpleChoiceWithAnonymousTypes_alt2" name="element"/>
+    </EntryList>
+   </ContainerDataType>
+   <EnumeratedDataType name="Index_SimpleChoiceWithEncodingOverride">
+    <EnumerationList>
+     <Enumeration value="0" label="alt1"/>
+     <Enumeration value="1" label="alt2"/>
+    </EnumerationList>
+   </EnumeratedDataType>
+   <ContainerDataType name="SimpleChoiceWithEncodingOverride" abstract="true">
+    <EntryList>
+     <Entry type="Index_SimpleChoiceWithEncodingOverride" name="index"/>
+    </EntryList>
+   </ContainerDataType>
+   <IntegerDataType name="Type_SimpleChoiceWithEncodingOverride_alt1">
+    <IntegerDataEncoding byteOrder="littleEndian" sizeInBits="16" encoding="unsigned"/>
+    <Range>
+     <MinMaxRange min="100" max="200" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType baseType="SimpleChoiceWithEncodingOverride" name="SimpleChoiceWithEncodingOverride_alt1">
+    <ConstraintSet>
+     <ValueConstraint value="0" entry="index"/>
+    </ConstraintSet>
+    <EntryList>
+     <Entry type="Type_SimpleChoiceWithEncodingOverride_alt1" name="element"/>
+    </EntryList>
+   </ContainerDataType>
+   <IntegerDataType name="Type_SimpleChoiceWithEncodingOverride_alt2">
+    <IntegerDataEncoding byteOrder="littleEndian" sizeInBits="16" encoding="unsigned"/>
+    <Range>
+     <MinMaxRange min="50" max="100" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType baseType="SimpleChoiceWithEncodingOverride" name="SimpleChoiceWithEncodingOverride_alt2">
+    <ConstraintSet>
+     <ValueConstraint value="1" entry="index"/>
+    </ConstraintSet>
+    <EntryList>
+     <Entry type="Type_SimpleChoiceWithEncodingOverride_alt2" name="element"/>
+    </EntryList>
+   </ContainerDataType>
+  </DataTypeSet>
+ </Package>
+</PackageFile>

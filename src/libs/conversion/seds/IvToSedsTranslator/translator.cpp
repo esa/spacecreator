@@ -20,6 +20,8 @@
 
 #include "specialized/functionstranslator.h"
 
+#include <asn1library/asn1/asn1model.h>
+#include <conversion/iv/IvOptions/options.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
 #include <seds/SedsModel/sedsmodel.h>
@@ -66,11 +68,27 @@ std::vector<std::unique_ptr<Model>> IvToSedsTranslator::translateIvModel(
 
     auto ivFunctions = ivModel->allObjectsByType<ivm::IVFunction>();
 
+    // IV model stores functions in UUID->Function map, which makes translation undeterministic
+    // Because of that we need to sort functions by name to keep them in the same order on every
+    // conversion.
     const auto comparator = [](auto lhs, auto rhs) { return lhs->title() < rhs->title(); };
     std::sort(std::begin(ivFunctions), std::end(ivFunctions), comparator);
 
-    for (const auto ivFunction : ivFunctions) {
-        FunctionsTranslator::translateFunction(ivFunction, sedsPackage);
+    if (options.isSet(iv::IvOptions::functionToConvert)) {
+        std::vector<QString> functionsToConvert = options.values(iv::IvOptions::functionToConvert);
+        for (const auto &ivFunction : ivFunctions) {
+            const QString &ivFunctionName = ivFunction->title();
+            const bool isPresent = std::any_of(functionsToConvert.begin(), functionsToConvert.end(),
+                    [&](const QString &name) { return name == ivFunctionName; });
+
+            if (isPresent) {
+                FunctionsTranslator::translateFunction(ivFunction, sedsPackage);
+            }
+        }
+    } else { // translate all
+        for (const auto ivFunction : ivFunctions) {
+            FunctionsTranslator::translateFunction(ivFunction, sedsPackage);
+        }
     }
 
     ::seds::model::PackageFile sedsPackageFile;
