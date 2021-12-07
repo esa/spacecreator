@@ -19,21 +19,23 @@
 
 #pragma once
 
+#include <QDialog>
+#include <QPushButton>
+#include <QStandardItemModel>
+#include <QTreeView>
 #include <functional>
-#include <qdialog.h>
-#include <qpushbutton.h>
-#include <qstandarditemmodel.h>
-#include <qtreeview.h>
 
 class ListTreeDialog : public QDialog
 {
 public:
-    ListTreeDialog() = delete;
-    ListTreeDialog(QStandardItemModel *model, const QString &buttonText = "select",
-            const std::function<void()> &func = []() -> void {});
+    ListTreeDialog();
     QList<QString> *selectedItems();
     QStandardItemModel *model();
     QPushButton *button();
+
+    auto setModel(QStandardItemModel *model) -> void;
+    auto setButtonText(const QString &buttonText) -> void;
+    auto setButtonHandler(const std::function<void()> &func) -> void;
 
 private:
     QTreeView *m_tree = nullptr;

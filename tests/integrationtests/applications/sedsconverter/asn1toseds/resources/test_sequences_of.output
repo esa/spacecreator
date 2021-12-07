@@ -14,17 +14,17 @@
      <MinMaxRange min="0" max="15" rangeType="inclusiveMinInclusiveMax"/>
     </Range>
    </IntegerDataType>
-   <ArrayDataType name="SimpleFizedSizeSequenceOf" dataTypeRef="Type1">
+   <ArrayDataType name="SimpleFixedSizeSequenceOf" dataTypeRef="Type1">
     <DimensionList>
      <Dimension size="66"/>
     </DimensionList>
    </ArrayDataType>
-   <IntegerDataType name="ItemType_SimpleFizedSizeSequenceOfAnonymousType">
+   <IntegerDataType name="ItemType_SimpleFixedSizeSequenceOfAnonymousType">
     <Range>
      <MinMaxRange min="2" max="12" rangeType="inclusiveMinInclusiveMax"/>
     </Range>
    </IntegerDataType>
-   <ArrayDataType name="SimpleFizedSizeSequenceOfAnonymousType" dataTypeRef="ItemType_SimpleFizedSizeSequenceOfAnonymousType">
+   <ArrayDataType name="SimpleFixedSizeSequenceOfAnonymousType" dataTypeRef="ItemType_SimpleFixedSizeSequenceOfAnonymousType">
     <DimensionList>
      <Dimension size="66"/>
     </DimensionList>

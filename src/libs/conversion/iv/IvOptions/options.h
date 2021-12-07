@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <QString>
+
 namespace conversion::iv {
 
 /**
@@ -35,6 +37,8 @@ public:
     inline static const QString generateFunctionsForPackages = "Iv_Translation_GenerateFunctionsForPackages";
     /** @biref  Filepath of output file */
     inline static const QString outputFilepath = "Iv_Export_OutputFilepath";
+    /** @biref  Name of a function to convert */
+    inline static const QString functionToConvert = "Iv_FunctionToConvert";
 
     /** @brief  Default IV parser filename */
     inline static const QString defaultConfigFilename = "config.xml";

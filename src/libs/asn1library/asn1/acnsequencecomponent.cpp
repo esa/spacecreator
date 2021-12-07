@@ -66,10 +66,11 @@ const QString &AcnSequenceComponent::id() const
     return m_id;
 }
 
-void AcnSequenceComponent::setReference(const QString reference)
+void AcnSequenceComponent::setReference(const QString &reference)
 {
     m_reference = reference;
 }
+
 std::optional<QString> AcnSequenceComponent::reference() const
 {
     return m_reference;

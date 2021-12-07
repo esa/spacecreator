@@ -33,6 +33,7 @@ class InterfaceCommand;
 #include <ivcore/ivinterface.h>
 
 namespace conversion::iv::translator {
+
 /**
  * @brief   Interface for translators from SEDS interface command to InterfaceView interface
  */
