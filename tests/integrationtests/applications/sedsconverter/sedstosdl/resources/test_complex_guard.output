@@ -1,0 +1,39 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Component;
+    /* CIF TEXT (16, 317), (267, 140) */
+    dcl x MyType;
+    /* CIF ENDTEXT */
+    /* CIF procedure (250, 150), (150, 75) */
+    procedure myActivity;
+        /* CIF START (250, 150), (150, 75) */
+        START;
+            /* CIF task (250, 150), (150, 75) */
+            task x := 100;
+        return ;
+    endprocedure;
+    /* CIF START (9, 285), (70, 35) */
+    START;
+            /* CIF NEXTSTATE (250, 150), (150, 75) */
+            NEXTSTATE StateA;
+    /* CIF state (250, 150), (150, 75) */
+    state StateA;
+        /* CIF input (250, 150), (150, 75) */
+        input If1_Cmd1_Pi;
+            /* CIF decision (388, 241), (115, 50) */
+            decision ((x < -100) or (x > 100)) and (x >= 500);
+                /* CIF ANSWER (585, 323), (77, 24) */
+                (True):
+        /* CIF PROCEDURECALL (250, 150), (150, 75) */
+        call myActivity;
+            /* CIF NEXTSTATE (250, 150), (150, 75) */
+            NEXTSTATE StateB;
+                /* CIF ANSWER (585, 323), (77, 24) */
+                (False):
+            /* CIF NEXTSTATE (250, 150), (150, 75) */
+            NEXTSTATE StateA;
+            enddecision;
+    endstate;
+    /* CIF state (250, 150), (150, 75) */
+    state StateB;
+    endstate;
+endprocess Component;
