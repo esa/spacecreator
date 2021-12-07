@@ -48,6 +48,7 @@ void tst_SedsConverter_SedsToSdl::testStateMachineWithBareInput()
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-10
 /// \SRS  ETB-FUN-2010
 /// \SRS  ETB-FUN-2020
 /// \SRS  ETB-FUN-2060
@@ -70,6 +71,7 @@ void tst_SedsConverter_SedsToSdl::testLedDemo()
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-10
 /// \SRS  ETB-FUN-2010
 /// \SRS  ETB-FUN-2020
 /// \SRS  ETB-FUN-2060
@@ -94,6 +96,7 @@ void tst_SedsConverter_SedsToSdl::testCalculator()
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-10
 /// \SRS  ETB-FUN-2010
 /// \SRS  ETB-FUN-2020
 /// \SRS  ETB-FUN-2060
@@ -117,6 +120,7 @@ void tst_SedsConverter_SedsToSdl::testComparator()
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-10
 /// \SRS  ETB-FUN-2010
 /// \SRS  ETB-FUN-2020
 /// \SRS  ETB-FUN-2060
@@ -143,9 +147,11 @@ void tst_SedsConverter_SedsToSdl::testFactorial()
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-10
 /// \SRS  ETB-FUN-2010
 /// \SRS  ETB-FUN-2020
 /// \SRS  ETB-FUN-2060
+/// \SRS  ETB-FUN-2490
 /// \SRS  ETB-FUN-2650
 /// \SRS  ETB-FUN-2660
 /// \SRS  ETB-IF-10
@@ -156,9 +162,11 @@ void tst_SedsConverter_SedsToSdl::testGuard()
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-10
 /// \SRS  ETB-FUN-2010
 /// \SRS  ETB-FUN-2020
 /// \SRS  ETB-FUN-2060
+/// \SRS  ETB-FUN-2490
 /// \SRS  ETB-FUN-2650
 /// \SRS  ETB-FUN-2660
 /// \SRS  ETB-FUN-2680
@@ -173,7 +181,9 @@ void tst_SedsConverter_SedsToSdl::testComplexGuard()
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-10
 /// \SRS  ETB-FUN-2010
+/// \SRS  ETB-FUN-2490
 /// \SRS  ETB-FUN-2640
 /// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-140

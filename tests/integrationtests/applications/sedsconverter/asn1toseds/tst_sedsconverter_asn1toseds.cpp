@@ -78,6 +78,7 @@ void tst_SedsConverter_Asn1ToSeds::testSequencesOf()
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-3100
 /// \SRS  ETB-FUN-3080
 /// \SRS  ETB-IF-160
 /// \SRS  ETB-IF-170
