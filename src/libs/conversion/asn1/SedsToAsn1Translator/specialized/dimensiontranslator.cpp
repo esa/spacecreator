@@ -162,6 +162,7 @@ std::optional<Asn1Acn::Range<Asn1Acn::IntegerValue::Type>> DimensionTranslator::
         } else if (!rightRange) {
             return leftRange;
         } else {
+            // TODO: This should probably do an intersection
             return leftRange->merge(*rightRange);
         }
     } else if (const auto *orConstraint =
