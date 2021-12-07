@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "visitors/integerrangetranslatorvisitor.h"
+#include "specialized/integerrangetranslatorvisitor.h"
 
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <limits>

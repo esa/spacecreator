@@ -1,0 +1,8 @@
+COM-N7SPACE-INDEXEDARRAY DEFINITIONS ::= BEGIN
+DataItem [size 8, encoding pos-int, endianness big]
+IndexItem [size 16, encoding pos-int, endianness big]
+IntegerIndexedArray []
+EnumItem [size 16, encoding BCD, endianness big]
+EnumIndexedArray []
+END
+
