@@ -67,18 +67,18 @@ auto DataTypeExporter::exportArrayDataType(
     auto typeElement = sedsDocument.createElement(QStringLiteral("ArrayDataType"));
     typeElement.setAttribute(QStringLiteral("name"), dataType.nameStr());
     typeElement.setAttribute(QStringLiteral("dataTypeRef"), dataType.type().nameStr());
-    auto dimmensionsElement = sedsDocument.createElement(QStringLiteral("DimensionList"));
-    for (const auto &dimmension : dataType.dimensions()) {
-        auto dimmensionElement = sedsDocument.createElement(QStringLiteral("Dimension"));
-        if (!dimmension.size().has_value()) {
-            throw UnsupportedElementException("Array Dimmension without size");
+    auto dimensionsElement = sedsDocument.createElement(QStringLiteral("DimensionList"));
+    for (const auto &dimension : dataType.dimensions()) {
+        auto dimensionElement = sedsDocument.createElement(QStringLiteral("Dimension"));
+        if (!dimension.size().has_value()) {
+            throw UnsupportedElementException("Array Dimension without size");
         }
-        const auto &size = dimmension.size().value();
-        dimmensionElement.setAttribute(QStringLiteral("size"), QString::number(size.value()));
-        dimmensionsElement.appendChild(std::move(dimmensionElement));
+        const auto &size = dimension.size().value();
+        dimensionElement.setAttribute(QStringLiteral("size"), QString::number(size.value()));
+        dimensionsElement.appendChild(std::move(dimensionElement));
     }
 
-    typeElement.appendChild(std::move(dimmensionsElement));
+    typeElement.appendChild(std::move(dimensionsElement));
     setElement.appendChild(std::move(typeElement));
 }
 
