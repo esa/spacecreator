@@ -291,7 +291,8 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Choice &type)
     throw UnsupportedDataTypeException("Choice");
 }
 
-static inline auto createIntegerType(const QString name, const uint32_t bits, ::seds::model::Package *package) -> void
+static inline auto createIntegerType(const QString &name, const uint32_t bits, ::seds::model::Package *const package)
+        -> void
 {
     ::seds::model::IntegerDataType sedsType;
     ::seds::model::MinMaxRange range;
@@ -537,8 +538,8 @@ enum class EntryType
     Entry
 };
 
-static inline auto addEntry(const EntryType entryType, const QString typeName, const QString name,
-        ::seds::model::ContainerDataType &sedsType, const QString referencedField = "") -> void
+static inline auto addEntry(const EntryType entryType, const QString typeName, const QString &name,
+        ::seds::model::ContainerDataType &sedsType, const QString &referencedField = "") -> void
 {
     switch (entryType) {
     case EntryType::Entry: {
@@ -557,7 +558,7 @@ static inline auto addEntry(const EntryType entryType, const QString typeName, c
     }
 }
 
-static inline auto addFixedValueEntry(TypeVisitor::Context &context, Asn1Acn::SequenceComponent *component,
+static inline auto addFixedValueEntry(TypeVisitor::Context &context, Asn1Acn::SequenceComponent *const component,
         ::seds::model::ContainerDataType &sedsType) -> void
 {
     const auto typeName = MEMBER_TYPE_NAME_PATTERN.arg(context.name(), component->name());
@@ -587,7 +588,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
         if (component->type()->typeEnum() == Asn1Acn::Types::Type::SEQUENCEOF) {
             const auto sequenceOf = dynamic_cast<Asn1Acn::Types::SequenceOf *>(component->type());
             // Sequence Of is a special case, as it may contain explicit ACN size reference
-            // If no ACN size is given, then it is translated as usual, resuling in an array or embedded container
+            // If no ACN size is given, then it is translated as usual, resulting in an array or embedded container
             if (!sequenceOf->acnSize().isEmpty()) {
                 addEntry(EntryType::ListEntry, sequenceOf->itemsType()->typeName(), component->name(), sedsType,
                         sequenceOf->acnSize());
@@ -628,7 +629,6 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)
     type.constraints().accept(constraintVisitor);
 
     if (!constraintVisitor.isSizeConstraintVisited()) {
-
         throw TranslationException("Sequences Of without specified size are not supported");
     }
 

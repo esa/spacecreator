@@ -4,9 +4,9 @@ Type1 [size 16, encoding pos-int, endianness big]
 
 LengthType [size 32, encoding pos-int, endianness little]
 
-SimpleFizedSizeSequenceOf []
+SimpleFixedSizeSequenceOf []
 
-SimpleFizedSizeSequenceOfAnonymousType []
+SimpleFixedSizeSequenceOfAnonymousType []
 
 SimpleVariableSizeSequenceOf []
 

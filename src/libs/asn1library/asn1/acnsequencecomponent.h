@@ -52,7 +52,7 @@ public:
 
     const QString &id() const;
 
-    void setReference(const QString reference);
+    void setReference(const QString &reference);
     std::optional<QString> reference() const;
 
 private:
