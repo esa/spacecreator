@@ -34,6 +34,7 @@ private Q_SLOTS:
     void testComparator();
     void testFactorial();
     void testGuard();
+    void testTimers();
 };
 
 /// \SRS  ETB-FUN-10
@@ -151,6 +152,16 @@ void tst_SedsConverter_SedsToSdl::testFactorial()
 void tst_SedsConverter_SedsToSdl::testGuard()
 {
     const int result = system("./test_guard.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-2010
+/// \SRS  ETB-FUN-2640
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-140
+void tst_SedsConverter_SedsToSdl::testTimers()
+{
+    const int result = system("./test_timers.sh");
     QCOMPARE(result, 0);
 }
 

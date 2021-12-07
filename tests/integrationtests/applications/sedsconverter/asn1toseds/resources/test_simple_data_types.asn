@@ -38,4 +38,8 @@ SimpleDataTypes DEFINITIONS ::= BEGIN
 
     DerivedFloatWithEncoding ::= MyFloatWithEncoding(50..60)
 
+    FixedSizeOctetString ::= OCTET STRING(SIZE(12))
+
+    VariableSizeOctetString ::= OCTET STRING(SIZE(1..12))
+
 END

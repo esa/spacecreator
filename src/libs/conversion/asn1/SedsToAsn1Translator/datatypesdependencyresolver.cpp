@@ -76,6 +76,13 @@ void DataTypesDependencyResolver::visitArray(const seds::model::ArrayDataType &a
     const auto *itemDataType = findDataType(itemDataTypeRef);
 
     visit(itemDataType);
+
+    for (const auto &dimension : arrayDataType.dimensions()) {
+        if (dimension.indexTypeRef()) {
+            const auto *indexType = findDataType(*dimension.indexTypeRef());
+            visit(indexType);
+        }
+    }
 }
 
 void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDataType &containerDataType)

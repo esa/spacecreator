@@ -71,7 +71,12 @@ namespace conversion::asn1::translator {
  * Translated data type will be added to the passed ASN.1 Definitions
  */
 struct DataTypeTranslatorVisitor final {
-
+    /**
+     * @brief   Constructor
+     *
+     * @param   asn1Definitions     Parent ASN.1 defintions
+     * @param   asn1Type            Type where translated types are saved
+     */
     DataTypeTranslatorVisitor(Asn1Acn::Definitions *asn1Definitions, std::unique_ptr<Asn1Acn::Types::Type> &asn1Type);
 
     /**
@@ -210,16 +215,6 @@ private:
      * @param   asn1Type        ASN.1 type that will be updated
      */
     auto translateArrayType(const QString &sedsTypeName, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
-    /**
-     * @brief   Translate SEDS array dimension
-     *
-     * This is translated as ASN.1 range constraint
-     *
-     * @param   dimension   SEDS array dimension
-     * @param   asn1Type    ASN.1 type that will be updated
-     */
-    auto translateArrayDimension(
-            const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
     /**
      * @brief   Translate SEDS enumeration list
      *

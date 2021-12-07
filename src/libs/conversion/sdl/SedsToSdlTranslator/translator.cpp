@@ -24,8 +24,10 @@
 
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
+#include <ivcore/ivfunction.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <seds/SedsModel/sedsmodel.h>
+#include <shared/parameter.h>
 
 using Asn1Acn::Asn1Model;
 using conversion::Escaper;
@@ -126,9 +128,17 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
         }
         // TODO provide additional translation for parameter (activity) maps
         if (stateMachineCount == 1) {
-            StateMachineTranslator::translateStateMachine(
-                    implementation.stateMachines()[0], &process, stateMachine.get());
+            const auto &sedsStateMachine = implementation.stateMachines()[0];
+            StateMachineTranslator::createTimerVariables(sedsStateMachine, &process);
+            StateMachineTranslator::translateStateMachine(sedsStateMachine, &process, stateMachine.get());
         }
+        // Register all timers in the interface view
+        const auto function = ivModel->getFunction(process.name(), Qt::CaseInsensitive);
+        for (const auto timerName : process.timerNames()) {
+            shared::ContextParameter timer(timerName, shared::BasicParameter::Type::Timer);
+            function->addContextParam(timer);
+        }
+
         // State machine needs to be moved after processing, because later it cannot be accessed for modification
         process.setStateMachine(std::move(stateMachine));
         model->addProcess(std::move(process));

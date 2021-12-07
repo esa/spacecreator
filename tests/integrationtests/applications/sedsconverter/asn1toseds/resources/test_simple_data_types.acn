@@ -34,5 +34,9 @@ SimpleDataTypes DEFINITIONS ::= BEGIN
 
     DerivedFloatWithEncoding [encoding IEEE754-1985-32, endianness big]
 
+    FixedSizeOctetString []
+
+    VariableSizeOctetString []
+
 
 END

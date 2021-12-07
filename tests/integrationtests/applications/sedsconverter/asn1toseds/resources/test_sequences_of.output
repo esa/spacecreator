@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+ <Package name="SequencesOf">
+  <DataTypeSet>
+   <IntegerDataType name="Type1">
+    <IntegerDataEncoding byteOrder="bigEndian" sizeInBits="16" encoding="unsigned"/>
+    <Range>
+     <MinMaxRange min="0" max="20" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <IntegerDataType name="LengthType">
+    <IntegerDataEncoding byteOrder="littleEndian" sizeInBits="32" encoding="unsigned"/>
+    <Range>
+     <MinMaxRange min="0" max="15" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ArrayDataType name="SimpleFixedSizeSequenceOf" dataTypeRef="Type1">
+    <DimensionList>
+     <Dimension size="66"/>
+    </DimensionList>
+   </ArrayDataType>
+   <IntegerDataType name="ItemType_SimpleFixedSizeSequenceOfAnonymousType">
+    <Range>
+     <MinMaxRange min="2" max="12" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ArrayDataType name="SimpleFixedSizeSequenceOfAnonymousType" dataTypeRef="ItemType_SimpleFixedSizeSequenceOfAnonymousType">
+    <DimensionList>
+     <Dimension size="66"/>
+    </DimensionList>
+   </ArrayDataType>
+   <IntegerDataType name="Size_SimpleVariableSizeSequenceOf">
+    <Range>
+     <MinMaxRange min="33" max="55" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType name="SimpleVariableSizeSequenceOf">
+    <EntryList>
+     <Entry type="Size_SimpleVariableSizeSequenceOf" name="count"/>
+     <ListEntry type="Type1" name="elements" listLengthField="count"/>
+    </EntryList>
+   </ContainerDataType>
+   <ContainerDataType name="NestedSequenceWithAcnSize">
+    <EntryList>
+     <Entry type="Type1" name="someField"/>
+     <Entry type="LengthType" name="lengthDeterminant"/>
+     <ListEntry type="Type1" name="sequenceField" listLengthField="lengthDeterminant"/>
+    </EntryList>
+   </ContainerDataType>
+  </DataTypeSet>
+ </Package>
+</PackageFile>

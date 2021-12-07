@@ -20,7 +20,7 @@
 #include "translator.h"
 
 #include "datatypesdependencyresolver.h"
-#include "visitors/datatypetranslatorvisitor.h"
+#include "specialized/datatypetranslatorvisitor.h"
 
 #include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/definitions.h>

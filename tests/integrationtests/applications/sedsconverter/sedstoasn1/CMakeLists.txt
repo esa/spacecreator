@@ -24,6 +24,11 @@ configure_file(resources/test_arrays.xml resources/test_arrays.xml COPYONLY)
 configure_file(resources/test_arrays_asn.output resources/test_arrays_asn.output COPYONLY)
 configure_file(resources/test_arrays_acn.output resources/test_arrays_acn.output COPYONLY)
 
+configure_file(test_indexed_array.sh test_indexed_array.sh COPYONLY)
+configure_file(resources/test_indexed_array.xml resources/test_indexed_array.xml COPYONLY)
+configure_file(resources/test_indexed_array_asn.output resources/test_indexed_array_asn.output COPYONLY)
+configure_file(resources/test_indexed_array_acn.output resources/test_indexed_array_acn.output COPYONLY)
+
 configure_file(test_containers.sh test_containers.sh COPYONLY)
 configure_file(resources/test_containers.xml resources/test_containers.xml COPYONLY)
 configure_file(resources/test_containers_asn.output resources/test_containers_asn.output COPYONLY)
