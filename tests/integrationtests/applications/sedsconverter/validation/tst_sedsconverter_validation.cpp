@@ -43,6 +43,7 @@ void tst_SedsConverter_Validation::testInvalidFails()
 
 /// \SRS  ETB-FUN-20
 /// \SRS  ETB-DAT-20
+/// \SRS  ETB-IF-40
 void tst_SedsConverter_Validation::testMissingCoreSemanticsFails()
 {
     const int result = system("./test_missing_core_semantics_fails.sh");
@@ -51,6 +52,7 @@ void tst_SedsConverter_Validation::testMissingCoreSemanticsFails()
 
 /// \SRS  ETB-FUN-20
 /// \SRS  ETB-DAT-20
+/// \SRS  ETB-IF-40
 void tst_SedsConverter_Validation::testMissingExtensionSemanticsFails()
 {
     const int result = system("./test_missing_extension_semantics_fails.sh");
@@ -59,6 +61,7 @@ void tst_SedsConverter_Validation::testMissingExtensionSemanticsFails()
 
 /// \SRS  ETB-FUN-20
 /// \SRS  ETB-DAT-20
+/// \SRS  ETB-IF-40
 void tst_SedsConverter_Validation::testValidPasses()
 {
     const int result = system("./test_valid_passes.sh");
