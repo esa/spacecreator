@@ -618,7 +618,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
 }
 
 static inline auto createChoiceIndexType(
-        const QString name, const ::Asn1Acn::Types::Choice &type, ::seds::model::Package *package) -> void
+        const QString name, const ::Asn1Acn::Types::Choice &type, ::seds::model::Package *const package) -> void
 {
     ::seds::model::EnumeratedDataType sedsType;
 
@@ -725,7 +725,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)
     }
 }
 
-static inline auto ensureByteTypePresence(::seds::model::Package *package) -> void
+static inline auto ensureByteTypePresence(::seds::model::Package *const package) -> void
 {
     if (isTypePresentInPackage(package, BYTE_TYPE_NAME)) {
         return;
