@@ -75,7 +75,7 @@ void Process::addProcedure(std::unique_ptr<Procedure> procedure)
     m_procedures.push_back(std::move(procedure));
 }
 
-auto Process::addTimer(const QString timerName) -> void
+auto Process::addTimer(const QString &timerName) -> void
 {
     m_timerNames.push_back(timerName);
 }

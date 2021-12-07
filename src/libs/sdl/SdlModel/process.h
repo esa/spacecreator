@@ -139,7 +139,7 @@ public:
      *
      * @param   timerName Timer name
      */
-    auto addTimer(const QString timerName) -> void;
+    auto addTimer(const QString &timerName) -> void;
 
     /**
      * @brief   Timer names

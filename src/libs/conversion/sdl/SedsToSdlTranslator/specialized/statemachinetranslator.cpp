@@ -290,19 +290,24 @@ auto StateMachineTranslator::translatePrimitive(::sdl::State *sdlFromState) -> I
 auto StateMachineTranslator::translatePrimitive(::sdl::Process *sdlProcess, ::sdl::State *sdlFromState,
         const seds::model::Transition::Primitive &primitive) -> InputHandler
 {
+    // clang-format off
     return std::visit(
-            overloaded { [&sdlProcess](const seds::model::OnCommandPrimitive &command) {
-                            return translatePrimitive(sdlProcess, command);
-                        },
-                    [](const seds::model::OnParameterPrimitive &parameter) {
+            overloaded {
+                [&sdlProcess](const seds::model::OnCommandPrimitive &command) {
+                        return translatePrimitive(sdlProcess, command);
+                    },
+                [](const seds::model::OnParameterPrimitive &parameter) {
                         Q_UNUSED(parameter);
                         throw TranslationException("Encountered unsupported primitive");
                         return InputHandler();
                     },
-                    [&sdlFromState](const seds::model::TimerSink &) { return translatePrimitive(sdlFromState); }
+                [&sdlFromState](const seds::model::TimerSink &) {
+                        return translatePrimitive(sdlFromState);
+                    }
 
             },
             primitive);
+    // clang-format on
 }
 
 auto StateMachineTranslator::translateTransition(const seds::model::StateMachine &sedsStateMachine,
