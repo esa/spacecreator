@@ -345,6 +345,9 @@ void InterfaceDocument::setPath(const QString &path)
  */
 void InterfaceDocument::setAsn1FileName(const QString &newAsnfile, const QString &oldAsnfile)
 {
+    if (d->asnFilesNames.contains(newAsnfile)) {
+        return;
+    }
     if (!oldAsnfile.isEmpty()) {
         d->asnFilesNames.removeAll(oldAsnfile);
     }

@@ -136,7 +136,7 @@ std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1File(
     return asn1TypesData;
 }
 
-std::vector<std::unique_ptr<Asn1Acn::File>> Asn1Reader::parseAsn1Files(
+std::map<QString, std::unique_ptr<Asn1Acn::File>> Asn1Reader::parseAsn1Files(
         const QVector<QFileInfo> &fileInfos, QStringList *errorMessages)
 {
     bool earlyError = false;
@@ -171,14 +171,7 @@ std::vector<std::unique_ptr<Asn1Acn::File>> Asn1Reader::parseAsn1Files(
         }
     }
 
-    std::map<QString, std::unique_ptr<Asn1Acn::File>> files = parseAsn1XmlFileImpl(asnCacheFile);
-
-    std::vector<std::unique_ptr<Asn1Acn::File>> result;
-    for (auto &pair : files) {
-        result.push_back(std::move(pair.second));
-    }
-
-    return result;
+    return parseAsn1XmlFileImpl(asnCacheFile);
 }
 
 /*!

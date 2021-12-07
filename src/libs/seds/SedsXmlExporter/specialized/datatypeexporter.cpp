@@ -207,6 +207,44 @@ auto DataTypeExporter::exportContainerDataType(
     if (dataType.baseType().has_value()) {
         typeElement.setAttribute(QStringLiteral("baseType"), (*dataType.baseType()).nameStr());
     }
+    auto entryListElement = sedsDocument.createElement(QStringLiteral("EntryList"));
+
+    for (const auto &entry : dataType.entries()) {
+        std::visit(overloaded { [&sedsDocument, &entryListElement](const model::Entry &castEntry) {
+                                   auto entryElement = sedsDocument.createElement(QStringLiteral("Entry"));
+                                   entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
+                                   entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
+                                   entryListElement.appendChild(std::move(entryElement));
+                               },
+                           [&sedsDocument, &entryListElement](const model::FixedValueEntry &castEntry) {
+                               auto entryElement = sedsDocument.createElement(QStringLiteral("FixedValueEntry"));
+                               entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
+                               entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
+                               entryElement.setAttribute(QStringLiteral("fixedValue"), castEntry.fixedValue()->value());
+                               entryListElement.appendChild(std::move(entryElement));
+                           },
+                           [&sedsDocument, &entryListElement](const model::LengthEntry &castEntry) {
+                               Q_UNUSED(castEntry);
+                               throw UnsupportedElementException("Container LengthEntry");
+                           },
+                           [&sedsDocument, &entryListElement](const model::ErrorControlEntry &castEntry) {
+                               Q_UNUSED(castEntry);
+                               throw UnsupportedElementException("Container ErrorControlEntry");
+                           },
+                           [&sedsDocument, &entryListElement](const model::ListEntry &castEntry) {
+                               auto entryElement = sedsDocument.createElement(QStringLiteral("ListEntry"));
+                               entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
+                               entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
+                               entryElement.setAttribute(
+                                       QStringLiteral("listLengthField"), castEntry.listLengthField().value().value());
+                               entryListElement.appendChild(std::move(entryElement));
+                           },
+                           [&sedsDocument, &entryListElement](const model::PaddingEntry &castEntry) {
+                               Q_UNUSED(castEntry);
+                               throw UnsupportedElementException("Container PaddingEntry");
+                           } },
+                entry);
+    }
     exportContainerConstraints(dataType, typeElement, sedsDocument);
     exportContainerEntries(dataType, typeElement, sedsDocument);
 
