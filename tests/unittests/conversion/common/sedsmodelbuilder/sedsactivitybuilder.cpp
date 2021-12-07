@@ -99,10 +99,21 @@ auto SedsActivityBuilder::withActivityCall(const QString target, const std::vect
     invocation.setActivity(target);
     assert(argumentNames.size() == argumentValues.size());
     for (size_t i = 0; i < argumentNames.size(); i++) {
-        seds::model::VariableRefOperand ref;
         seds::model::NamedArgumentValue namedValue;
-        ref.setVariableRef(VariableRef(argumentValues[i]));
-        namedValue.setValue(std::move(ref));
+
+        // Let's treat integers as literal values
+        bool isInt;
+        argumentValues[i].toInt(&isInt, 10);
+        if (isInt) {
+            seds::model::ValueOperand val;
+            val.setValue(argumentValues[i]);
+            namedValue.setValue(std::move(val));
+        } else {
+            seds::model::VariableRefOperand ref;
+            ref.setVariableRef(VariableRef(argumentValues[i]));
+            namedValue.setValue(std::move(ref));
+        }
+
         namedValue.setName(argumentNames[i]);
 
         invocation.addArgumentValue(std::move(namedValue));

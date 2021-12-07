@@ -34,6 +34,7 @@ private Q_SLOTS:
 };
 
 /// \SRS  ETB-FUN-110
+/// \SRS  ETB-FUN-130
 /// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-120
 void tst_SedsConverter_SedsToAsn1::testSimpleDataTypes()
@@ -43,6 +44,7 @@ void tst_SedsConverter_SedsToAsn1::testSimpleDataTypes()
 }
 
 /// \SRS  ETB-FUN-110
+/// \SRS  ETB-FUN-130
 /// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-120
 void tst_SedsConverter_SedsToAsn1::testArrays()
@@ -52,6 +54,7 @@ void tst_SedsConverter_SedsToAsn1::testArrays()
 }
 
 /// \SRS  ETB-FUN-110
+/// \SRS  ETB-FUN-130
 /// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-120
 void tst_SedsConverter_SedsToAsn1::testContainers()

@@ -116,7 +116,8 @@ private Q_SLOTS:
     void testTranslateAssignment();
     void testTranslateMathOperation();
     void testTranslatePolynomialCalibrator();
-    void testTranslateActivityCall();
+    void testTranslateActivityCallWithValue();
+    void testTranslateActivityCallWithReference();
     void testTranslateSendCommand();
     void testTranslateOnEntryAndOnExit();
 };
@@ -894,7 +895,7 @@ void tst_SedsToSdlTranslator::testTranslatePolynomialCalibrator()
 /// \SRS  ETB-FUN-2430
 /// \SRS  ETB-FUN-2440
 /// \SRS  ETB-FUN-2460
-void tst_SedsToSdlTranslator::testTranslateActivityCall()
+void tst_SedsToSdlTranslator::testTranslateActivityCallWithReference()
 {
     auto sedsModel =
             SedsModelBuilder("Package")
@@ -945,6 +946,63 @@ void tst_SedsToSdlTranslator::testTranslateActivityCall()
     const auto &argument = call->arguments()[0];
     QVERIFY(std::holds_alternative<std::unique_ptr<VariableReference>>(argument));
     QCOMPARE(std::get<std::unique_ptr<VariableReference>>(argument)->declaration()->name(), "x");
+}
+
+/// \SRS  ETB-FUN-2430
+/// \SRS  ETB-FUN-2440
+/// \SRS  ETB-FUN-2450
+void tst_SedsToSdlTranslator::testTranslateActivityCallWithValue()
+{
+    auto sedsModel =
+            SedsModelBuilder("Package")
+                    .withIntegerDataType("Integer")
+                    .withComponent(
+                            SedsComponentBuilder("Component")
+                                    .withImplementation(SedsImplementationBuilder()
+                                                                .withVariable("x", "Integer")
+                                                                .withActivity(SedsActivityBuilder("activity1")
+                                                                                      .withArgument("arg1", "Integer")
+                                                                                      .build())
+                                                                .withActivity(SedsActivityBuilder("activity2")
+                                                                                      .withActivityCall("activity1",
+                                                                                              { "arg1" }, { "2" })
+                                                                                      .build())
+                                                                .build())
+                                    .build())
+                    .build();
+
+    Options options;
+    options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
+
+    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    SedsToSdlTranslator sdlTranslator;
+
+    const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);
+    const auto ivModels = ivTranslator.translateModels({ sedsModel.get(), asn1Models[0].get() }, options);
+
+    const auto resultModels =
+            sdlTranslator.translateModels({ sedsModel.get(), asn1Models[0].get(), ivModels[0].get() }, options);
+
+    const auto &resultModel = resultModels[0];
+    const auto *sdlModel = dynamic_cast<SdlModel *>(resultModel.get());
+    const auto &process = sdlModel->processes()[0];
+
+    QCOMPARE(process.procedures().size(), 2);
+    const auto &procedure1 = process.procedures()[0];
+    QCOMPARE(procedure1->name(), "activity1");
+    const auto &procedure2 = process.procedures()[1];
+    QCOMPARE(procedure2->name(), "activity2");
+    const auto &transition = procedure2->transition();
+    QCOMPARE(transition->actions().size(), 1);
+    const auto call = dynamic_cast<::sdl::ProcedureCall *>(transition->actions()[0].get());
+    QVERIFY(call);
+    QCOMPARE(call->procedure()->name(), "activity1");
+    QCOMPARE(call->arguments().size(), 1);
+    const auto &argument = call->arguments()[0];
+
+    QVERIFY(std::holds_alternative<std::unique_ptr<VariableLiteral>>(argument));
+    QCOMPARE(std::get<std::unique_ptr<VariableLiteral>>(argument)->value(), "2");
 }
 
 /// \SRS  ETB-FUN-2140
