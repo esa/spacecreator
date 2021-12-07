@@ -101,7 +101,10 @@ void DimensionTranslator::translateIntegerDimensionIndex(
             });
 
     if (!resultRange) {
-        return;
+        auto errorMessage = QString("%1 used as an index type for %2 doesn't have a range that can be used")
+                                    .arg(indexType->identifier())
+                                    .arg(asn1Sequence->identifier());
+        throw TranslationException(std::move(errorMessage));
     }
 
     if (resultRange->begin() < 0) {

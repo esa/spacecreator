@@ -46,6 +46,7 @@ void tst_SedsConverter_SedsToAsn1::testSimpleDataTypes()
 /// \SRS  ETB-FUN-110
 /// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-120
+/// \SRS  ETB-IF-210
 void tst_SedsConverter_SedsToAsn1::testArrays()
 {
     const int result = system("./test_arrays.sh");
