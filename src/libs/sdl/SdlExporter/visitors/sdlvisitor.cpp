@@ -36,20 +36,20 @@ static const QString POSITION_STRING_PATTERN = "/* CIF %1 (%2, %3), (%4, %5) */"
 
 // const does not work with std::map accesses
 static std::map<SdlVisitor::Layouter::ElementType, SdlVisitor::SdlVisitor::Layouter::Size> CIF_SIZES = {
-    { SdlVisitor::Layouter::ElementType::Text, std::make_pair<uint32_t, uint32_t>(20, 20) },
-    { SdlVisitor::Layouter::ElementType::Start, std::make_pair<uint32_t, uint32_t>(20, 20) },
-    { SdlVisitor::Layouter::ElementType::Answer, std::make_pair<uint32_t, uint32_t>(20, 20) },
-    { SdlVisitor::Layouter::ElementType::Decision, std::make_pair<uint32_t, uint32_t>(20, 20) },
-    { SdlVisitor::Layouter::ElementType::Process, std::make_pair<uint32_t, uint32_t>(20, 20) },
-    { SdlVisitor::Layouter::ElementType::State, std::make_pair<uint32_t, uint32_t>(20, 20) },
-    { SdlVisitor::Layouter::ElementType::Input, std::make_pair<uint32_t, uint32_t>(20, 20) },
-    { SdlVisitor::Layouter::ElementType::Output, std::make_pair<uint32_t, uint32_t>(20, 20) },
-    { SdlVisitor::Layouter::ElementType::NextState, std::make_pair<uint32_t, uint32_t>(20, 20) },
-    { SdlVisitor::Layouter::ElementType::Task, std::make_pair<uint32_t, uint32_t>(20, 20) },
-    { SdlVisitor::Layouter::ElementType::Label, std::make_pair<uint32_t, uint32_t>(20, 20) },
-    { SdlVisitor::Layouter::ElementType::Join, std::make_pair<uint32_t, uint32_t>(20, 20) },
-    { SdlVisitor::Layouter::ElementType::Procedure, std::make_pair<uint32_t, uint32_t>(20, 20) },
-    { SdlVisitor::Layouter::ElementType::ProcedureCall, std::make_pair<uint32_t, uint32_t>(20, 20) }    
+    { SdlVisitor::Layouter::ElementType::Text, std::make_pair<uint32_t, uint32_t>(400, 500) },
+    { SdlVisitor::Layouter::ElementType::Start, std::make_pair<uint32_t, uint32_t>(200, 50) },
+    { SdlVisitor::Layouter::ElementType::Answer, std::make_pair<uint32_t, uint32_t>(400, 50) },
+    { SdlVisitor::Layouter::ElementType::Decision, std::make_pair<uint32_t, uint32_t>(400, 50) },
+    { SdlVisitor::Layouter::ElementType::Process, std::make_pair<uint32_t, uint32_t>(800, 100) },
+    { SdlVisitor::Layouter::ElementType::State, std::make_pair<uint32_t, uint32_t>(250, 50) },
+    { SdlVisitor::Layouter::ElementType::Input, std::make_pair<uint32_t, uint32_t>(200, 50) },
+    { SdlVisitor::Layouter::ElementType::Output, std::make_pair<uint32_t, uint32_t>(200, 50) },
+    { SdlVisitor::Layouter::ElementType::NextState, std::make_pair<uint32_t, uint32_t>(200, 50) },
+    { SdlVisitor::Layouter::ElementType::Task, std::make_pair<uint32_t, uint32_t>(100, 50) },
+    { SdlVisitor::Layouter::ElementType::Label, std::make_pair<uint32_t, uint32_t>(100, 50) },
+    { SdlVisitor::Layouter::ElementType::Join, std::make_pair<uint32_t, uint32_t>(100, 50) },
+    { SdlVisitor::Layouter::ElementType::Procedure, std::make_pair<uint32_t, uint32_t>(800, 50) },
+    { SdlVisitor::Layouter::ElementType::ProcedureCall, std::make_pair<uint32_t, uint32_t>(100, 50) }
 };
 
 static std::map<SdlVisitor::Layouter::ElementType, QString> CIF_NAMES = {
@@ -66,7 +66,7 @@ static std::map<SdlVisitor::Layouter::ElementType, QString> CIF_NAMES = {
     { SdlVisitor::Layouter::ElementType::Label, "Label" },
     { SdlVisitor::Layouter::ElementType::Join, "Join" },
     { SdlVisitor::Layouter::ElementType::Procedure,"Procedure" },
-    { SdlVisitor::Layouter::ElementType::ProcedureCall, "ProcedureCall" }    
+    { SdlVisitor::Layouter::ElementType::ProcedureCall, "ProcedureCall" }
 };
 
 // clang-format on
@@ -89,13 +89,13 @@ auto SdlVisitor::Layouter::popPosition() -> void
     m_positions.pop_back();
 }
 
-auto SdlVisitor::Layouter::moveRight() -> void
+auto SdlVisitor::Layouter::moveRight(const ElementType element) -> void
 {
-    m_positions[m_positions.size() - 1].first += m_xOffset;
+    m_positions[m_positions.size() - 1].first += (CIF_SIZES[element].first * 3) / 2;
 }
-auto SdlVisitor::Layouter::moveDown() -> void
+auto SdlVisitor::Layouter::moveDown(const ElementType element) -> void
 {
-    m_positions[m_positions.size() - 1].first += m_yOffset;
+    m_positions[m_positions.size() - 1].second += (CIF_SIZES[element].second * 3) / 2;
 }
 auto SdlVisitor::Layouter::getPosition() -> const Position &
 {
@@ -111,8 +111,9 @@ auto SdlVisitor::Layouter::getPositionString(const SdlVisitor::Layouter::Element
             QString::number(CIF_SIZES[element].second));
 }
 
-SdlVisitor::SdlVisitor(QTextStream &stream)
+SdlVisitor::SdlVisitor(QTextStream &stream, Layouter &layouter)
     : m_stream(stream)
+    , m_layouter(layouter)
 {
 }
 
@@ -122,11 +123,14 @@ void SdlVisitor::visit(const Process &process)
         throw ExportException("Process shall have a name but it doesn't");
     }
 
+    m_layouter.pushPosition();
     m_stream << m_layouter.getPositionString(Layouter::ElementType::Process) << "\n";
+    m_layouter.moveDown(Layouter::ElementType::Process);
     m_stream << "process " << process.name() << ";\n";
 
     if (!process.variables().empty() || !process.timerNames().empty()) {
         m_stream << m_layouter.getPositionString(Layouter::ElementType::Text) << "\n";
+        m_layouter.moveDown(Layouter::ElementType::Text);
         // Timers are just names, a dedicated visitor does not add any benfits
         for (const auto &timer : process.timerNames()) {
             m_stream << "    Timer " << timer << ";\n";
@@ -136,20 +140,28 @@ void SdlVisitor::visit(const Process &process)
     }
 
     if (!process.procedures().empty()) {
+        m_layouter.pushPosition();
         exportCollection(process.procedures());
+        m_layouter.popPosition();
+        m_layouter.moveRight(Layouter::ElementType::Procedure);
     }
 
     if (process.startTransition() != nullptr) {
         m_stream << m_layouter.getPositionString(Layouter::ElementType::Start)
                  << "\n"
                     "    START;\n";
+        m_layouter.moveDown(Layouter::ElementType::Start);
         exportCollection(process.startTransition()->actions());
+        m_layouter.popPosition();
+        m_layouter.moveRight(Layouter::ElementType::Process);
     } else {
         throw ExportException("START transition not specified but required");
     }
 
     if (process.stateMachine() != nullptr) {
+        m_layouter.pushPosition();
         exportCollection(process.stateMachine()->states());
+        m_layouter.popPosition();
     } else {
         throw ExportException("Process does not contain a State Machine");
     }
@@ -163,10 +175,13 @@ void SdlVisitor::visit(const State &state)
         throw ExportException("State shall have a name but it doesn't");
     }
 
+    m_layouter.pushPosition();
     m_stream << m_layouter.getPositionString(Layouter::ElementType::State) << "\n";
     m_stream << "    state " << state.name() << ";\n";
     exportCollection(state.inputs());
     m_stream << "    endstate;\n";
+    m_layouter.popPosition();
+    m_layouter.moveRight(Layouter::ElementType::State);
 }
 
 void SdlVisitor::visit(const Input &input)
@@ -175,6 +190,7 @@ void SdlVisitor::visit(const Input &input)
         throw ExportException("Input shall have a name but it doesn't");
     }
 
+    m_layouter.pushPosition();
     m_stream << m_layouter.getPositionString(Layouter::ElementType::Input) << "\n";
     m_stream << "        input " << input.name();
 
@@ -198,6 +214,8 @@ void SdlVisitor::visit(const Input &input)
     } else {
         throw ExportException("Transition in Input not specified but required");
     }
+    m_layouter.popPosition();
+    m_layouter.moveRight(Layouter::ElementType::Input);
 }
 
 void SdlVisitor::visit(const Output &output)
@@ -206,6 +224,7 @@ void SdlVisitor::visit(const Output &output)
         throw ExportException("Output shall have a name but it doesn't");
     }
 
+    m_layouter.moveDown(Layouter::ElementType::Output);
     m_stream << m_layouter.getPositionString(Layouter::ElementType::Output) << "\n";
     m_stream << "            output " << output.name();
     const auto &outputParamRef = output.parameter();
@@ -229,6 +248,7 @@ void SdlVisitor::visit(const NextState &nextstate)
         }
     }
 
+    m_layouter.moveDown(Layouter::ElementType::State);
     m_stream << m_layouter.getPositionString(Layouter::ElementType::NextState) << "\n";
     m_stream << "            NEXTSTATE " << nextStateName << ";\n";
 }
@@ -239,6 +259,7 @@ void SdlVisitor::visit(const Task &task)
         throw ExportException("Task shall have contents but it doesn't");
     }
 
+    m_layouter.moveDown(Layouter::ElementType::Task);
     m_stream << m_layouter.getPositionString(Layouter::ElementType::Task) << "\n";
     m_stream << "            task " << task.content() << ";\n";
 }
@@ -261,12 +282,14 @@ void SdlVisitor::visit(const Label &label)
         throw ExportException("Label name cannot be empty");
     }
 
+    m_layouter.moveDown(Layouter::ElementType::Label);
     m_stream << m_layouter.getPositionString(Layouter::ElementType::Label) << "\n";
     m_stream << "        " << label.name() << ":\n";
 }
 
 void SdlVisitor::visit(const Join &join)
 {
+    m_layouter.moveDown(Layouter::ElementType::Join);
     m_stream << m_layouter.getPositionString(Layouter::ElementType::Join) << "\n";
     m_stream << "            join ";
     if (join.label() != nullptr) {
@@ -286,6 +309,7 @@ void SdlVisitor::visit(const Answer &answer)
         throw ExportException("Required Literal have a missing value in Answer");
     }
 
+    m_layouter.pushPosition();
     m_stream << m_layouter.getPositionString(Layouter::ElementType::Answer) << "\n";
     if (answer.literal().value() == "else") {
         m_stream << "                " << answer.literal().value() << ":\n";
@@ -293,6 +317,8 @@ void SdlVisitor::visit(const Answer &answer)
         m_stream << "                (" << answer.literal().value() << "):\n";
     }
     exportCollection(answer.transition()->actions());
+    m_layouter.popPosition();
+    m_layouter.moveRight(Layouter::ElementType::Answer);
 }
 
 void SdlVisitor::visit(const Decision &decision)
@@ -309,7 +335,10 @@ void SdlVisitor::visit(const Decision &decision)
 
     m_stream << m_layouter.getPositionString(Layouter::ElementType::Decision) << "\n";
     m_stream << "            decision " << decision.expression()->content() << ";\n";
+    m_layouter.moveDown(Layouter::ElementType::Decision);
+    m_layouter.pushPosition();
     exportCollection(decision.answers());
+    m_layouter.popPosition();
     m_stream << "            enddecision;\n";
 }
 
@@ -319,7 +348,9 @@ void SdlVisitor::visit(const Procedure &procedure)
         // No implementation -> external procedure
         return;
     }
+    m_layouter.pushPosition();
     m_stream << m_layouter.getPositionString(Layouter::ElementType::Procedure) << "\n";
+    m_layouter.moveDown(Layouter::ElementType::Procedure);
     m_stream << "    procedure " << procedure.name() << ";\n";
 
     auto &procedureParameters = procedure.parameters();
@@ -329,6 +360,7 @@ void SdlVisitor::visit(const Procedure &procedure)
 
     if (parametersPresent || returnVarPresent) {
         m_stream << m_layouter.getPositionString(Layouter::ElementType::Text) << "\n";
+        m_layouter.moveDown(Layouter::ElementType::Text);
     }
 
     if (parametersPresent) {
@@ -361,6 +393,7 @@ void SdlVisitor::visit(const Procedure &procedure)
     }
 
     m_stream << m_layouter.getPositionString(Layouter::ElementType::Start) << "\n";
+    m_layouter.moveDown(Layouter::ElementType::Start);
     m_stream << "        START;\n";
     if (procedure.transition()->actions().empty()) {
         qWarning("Procedure is empty");
@@ -373,6 +406,8 @@ void SdlVisitor::visit(const Procedure &procedure)
     }
     m_stream << ";\n";
     m_stream << "    endprocedure;\n";
+    m_layouter.popPosition();
+    m_layouter.moveRight(Layouter::ElementType::Procedure);
 }
 
 void SdlVisitor::visit(const ProcedureCall &procedureCall)
@@ -385,6 +420,7 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall)
                               "It must be called from a Task");
     }
 
+    m_layouter.moveDown(Layouter::ElementType::ProcedureCall);
     m_stream << m_layouter.getPositionString(Layouter::ElementType::ProcedureCall) << "\n";
     m_stream << "        call " << procedureCall.procedure()->name();
 
@@ -422,7 +458,7 @@ template<typename T>
 void SdlVisitor::exportCollection(const T &collection)
 {
     for (const auto &item : collection) {
-        SdlVisitor visitor(m_stream);
+        SdlVisitor visitor(m_stream, m_layouter);
         item->accept(visitor);
     }
 }

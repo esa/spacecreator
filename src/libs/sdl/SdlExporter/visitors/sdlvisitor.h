@@ -77,8 +77,8 @@ public:
 
         auto pushPosition() -> void;
         auto popPosition() -> void;
-        auto moveRight() -> void;
-        auto moveDown() -> void;
+        auto moveRight(const ElementType element) -> void;
+        auto moveDown(const ElementType element) -> void;
         auto getPosition() -> const Position &;
         auto getPositionString(const ElementType element) -> QString;
     };
@@ -88,8 +88,9 @@ public:
      * @brief   Constructor
      *
      * @param   stream   output stream (where the serialized values are put)
+     * @param   layouter layouter for calculating element positions
      */
-    SdlVisitor(QTextStream &stream);
+    SdlVisitor(QTextStream &stream, Layouter &layouter);
 
     /**
      * @brief   Deleted copy constructor
@@ -203,13 +204,13 @@ public:
     auto visit(const ProcedureCall &procedureCall) -> void override;
 
 private:
-    Layouter m_layouter;
     auto dummyCif(const QString &cifType) -> QString;
 
     template<typename T>
     auto exportCollection(const T &collection) -> void;
 
     QTextStream &m_stream;
+    Layouter &m_layouter;
 };
 
 } // namespace conversion::Sdl
