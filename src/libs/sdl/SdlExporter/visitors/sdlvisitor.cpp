@@ -30,22 +30,103 @@ using conversion::exporter::ExportException;
 
 namespace sdl {
 
+static const QString POSITION_STRING_PATTERN = "/* CIF %1 (%2, %3), (%4, %5) */";
+
+// clang-format off
+
+// const does not work with std::map accesses
+static std::map<SdlVisitor::Layouter::ElementType, SdlVisitor::SdlVisitor::Layouter::Size> CIF_SIZES = {
+    { SdlVisitor::Layouter::ElementType::Text, std::make_pair<uint32_t, uint32_t>(20, 20) },
+    { SdlVisitor::Layouter::ElementType::Start, std::make_pair<uint32_t, uint32_t>(20, 20) },
+    { SdlVisitor::Layouter::ElementType::Answer, std::make_pair<uint32_t, uint32_t>(20, 20) },
+    { SdlVisitor::Layouter::ElementType::Decision, std::make_pair<uint32_t, uint32_t>(20, 20) },
+    { SdlVisitor::Layouter::ElementType::Process, std::make_pair<uint32_t, uint32_t>(20, 20) },
+    { SdlVisitor::Layouter::ElementType::State, std::make_pair<uint32_t, uint32_t>(20, 20) },
+    { SdlVisitor::Layouter::ElementType::Input, std::make_pair<uint32_t, uint32_t>(20, 20) },
+    { SdlVisitor::Layouter::ElementType::Output, std::make_pair<uint32_t, uint32_t>(20, 20) },
+    { SdlVisitor::Layouter::ElementType::NextState, std::make_pair<uint32_t, uint32_t>(20, 20) },
+    { SdlVisitor::Layouter::ElementType::Task, std::make_pair<uint32_t, uint32_t>(20, 20) },
+    { SdlVisitor::Layouter::ElementType::Label, std::make_pair<uint32_t, uint32_t>(20, 20) },
+    { SdlVisitor::Layouter::ElementType::Join, std::make_pair<uint32_t, uint32_t>(20, 20) },
+    { SdlVisitor::Layouter::ElementType::Procedure, std::make_pair<uint32_t, uint32_t>(20, 20) },
+    { SdlVisitor::Layouter::ElementType::ProcedureCall, std::make_pair<uint32_t, uint32_t>(20, 20) }    
+};
+
+static std::map<SdlVisitor::Layouter::ElementType, QString> CIF_NAMES = {
+    { SdlVisitor::Layouter::ElementType::Text, "Text" },
+    { SdlVisitor::Layouter::ElementType::Start, "Start" },
+    { SdlVisitor::Layouter::ElementType::Answer, "Answer" },
+    { SdlVisitor::Layouter::ElementType::Decision, "Decision" },
+    { SdlVisitor::Layouter::ElementType::Process, "Process" },
+    { SdlVisitor::Layouter::ElementType::State, "State" },
+    { SdlVisitor::Layouter::ElementType::Input, "Input" },
+    { SdlVisitor::Layouter::ElementType::Output, "Output" },
+    { SdlVisitor::Layouter::ElementType::NextState, "NextState" },
+    { SdlVisitor::Layouter::ElementType::Task, "Task" },
+    { SdlVisitor::Layouter::ElementType::Label, "Label" },
+    { SdlVisitor::Layouter::ElementType::Join, "Join" },
+    { SdlVisitor::Layouter::ElementType::Procedure,"Procedure" },
+    { SdlVisitor::Layouter::ElementType::ProcedureCall, "ProcedureCall" }    
+};
+
+// clang-format on
+
+SdlVisitor::Layouter::Layouter()
+{
+    m_xOffset = 100;
+    m_yOffset = 50;
+    m_positions.push_back(std::make_pair(0, 0));
+}
+
+auto SdlVisitor::Layouter::pushPosition() -> void
+{
+    auto current = getPosition();
+    m_positions.push_back(current);
+}
+
+auto SdlVisitor::Layouter::popPosition() -> void
+{
+    m_positions.pop_back();
+}
+
+auto SdlVisitor::Layouter::moveRight() -> void
+{
+    m_positions[m_positions.size() - 1].first += m_xOffset;
+}
+auto SdlVisitor::Layouter::moveDown() -> void
+{
+    m_positions[m_positions.size() - 1].first += m_yOffset;
+}
+auto SdlVisitor::Layouter::getPosition() -> const Position &
+{
+    return m_positions.back();
+}
+
+auto SdlVisitor::Layouter::getPositionString(const SdlVisitor::Layouter::ElementType element) -> QString
+{
+    Q_UNUSED(element);
+    const auto position = getPosition();
+    return POSITION_STRING_PATTERN.arg(CIF_NAMES[element], QString::number(position.first),
+            QString::number(position.second), QString::number(CIF_SIZES[element].first),
+            QString::number(CIF_SIZES[element].second));
+}
+
 SdlVisitor::SdlVisitor(QTextStream &stream)
     : m_stream(stream)
 {
 }
 
-void SdlVisitor::visit(const Process &process) const
+void SdlVisitor::visit(const Process &process)
 {
     if (process.name().isEmpty()) {
         throw ExportException("Process shall have a name but it doesn't");
     }
 
-    m_stream << dummyCif("PROCESS");
+    m_stream << m_layouter.getPositionString(Layouter::ElementType::Process) << "\n";
     m_stream << "process " << process.name() << ";\n";
 
     if (!process.variables().empty() || !process.timerNames().empty()) {
-        m_stream << "    /* CIF TEXT (16, 317), (267, 140) */\n";
+        m_stream << m_layouter.getPositionString(Layouter::ElementType::Text) << "\n";
         // Timers are just names, a dedicated visitor does not add any benfits
         for (const auto &timer : process.timerNames()) {
             m_stream << "    Timer " << timer << ";\n";
@@ -59,7 +140,8 @@ void SdlVisitor::visit(const Process &process) const
     }
 
     if (process.startTransition() != nullptr) {
-        m_stream << "    /* CIF START (9, 285), (70, 35) */\n"
+        m_stream << m_layouter.getPositionString(Layouter::ElementType::Start)
+                 << "\n"
                     "    START;\n";
         exportCollection(process.startTransition()->actions());
     } else {
@@ -75,25 +157,25 @@ void SdlVisitor::visit(const Process &process) const
     m_stream << "endprocess " << process.name() << ";";
 }
 
-void SdlVisitor::visit(const State &state) const
+void SdlVisitor::visit(const State &state)
 {
     if (state.name().isEmpty()) {
         throw ExportException("State shall have a name but it doesn't");
     }
 
-    m_stream << "    " << dummyCif("state");
+    m_stream << m_layouter.getPositionString(Layouter::ElementType::State) << "\n";
     m_stream << "    state " << state.name() << ";\n";
     exportCollection(state.inputs());
     m_stream << "    endstate;\n";
 }
 
-void SdlVisitor::visit(const Input &input) const
+void SdlVisitor::visit(const Input &input)
 {
     if (input.name().isEmpty()) {
         throw ExportException("Input shall have a name but it doesn't");
     }
 
-    m_stream << "        " << dummyCif("input");
+    m_stream << m_layouter.getPositionString(Layouter::ElementType::Input) << "\n";
     m_stream << "        input " << input.name();
 
     const auto &inputParameters = input.parameters();
@@ -118,13 +200,13 @@ void SdlVisitor::visit(const Input &input) const
     }
 }
 
-void SdlVisitor::visit(const Output &output) const
+void SdlVisitor::visit(const Output &output)
 {
     if (output.name().isEmpty()) {
         throw ExportException("Output shall have a name but it doesn't");
     }
 
-    m_stream << "            " << dummyCif("output");
+    m_stream << m_layouter.getPositionString(Layouter::ElementType::Output) << "\n";
     m_stream << "            output " << output.name();
     const auto &outputParamRef = output.parameter();
     if (outputParamRef != nullptr) {
@@ -133,7 +215,7 @@ void SdlVisitor::visit(const Output &output) const
     m_stream << ";\n";
 }
 
-void SdlVisitor::visit(const NextState &nextstate) const
+void SdlVisitor::visit(const NextState &nextstate)
 {
     QString nextStateName;
 
@@ -147,21 +229,21 @@ void SdlVisitor::visit(const NextState &nextstate) const
         }
     }
 
-    m_stream << "            " << dummyCif("NEXTSTATE");
+    m_stream << m_layouter.getPositionString(Layouter::ElementType::NextState) << "\n";
     m_stream << "            NEXTSTATE " << nextStateName << ";\n";
 }
 
-void SdlVisitor::visit(const Task &task) const
+void SdlVisitor::visit(const Task &task)
 {
     if (task.content().isEmpty()) {
         throw ExportException("Task shall have contents but it doesn't");
     }
 
-    m_stream << "            " << dummyCif("task");
+    m_stream << m_layouter.getPositionString(Layouter::ElementType::Task) << "\n";
     m_stream << "            task " << task.content() << ";\n";
 }
 
-void SdlVisitor::visit(const VariableDeclaration &declaration) const
+void SdlVisitor::visit(const VariableDeclaration &declaration)
 {
     if (declaration.name().isEmpty()) {
         throw ExportException("Variable declaration shall have a name but it doesn't");
@@ -173,19 +255,19 @@ void SdlVisitor::visit(const VariableDeclaration &declaration) const
     m_stream << "    dcl " << declaration.name() << " " << declaration.type() << ";\n";
 }
 
-void SdlVisitor::visit(const Label &label) const
+void SdlVisitor::visit(const Label &label)
 {
     if (label.name().isEmpty()) {
         throw ExportException("Label name cannot be empty");
     }
 
-    m_stream << "        " << dummyCif("label");
+    m_stream << m_layouter.getPositionString(Layouter::ElementType::Label) << "\n";
     m_stream << "        " << label.name() << ":\n";
 }
 
-void SdlVisitor::visit(const Join &join) const
+void SdlVisitor::visit(const Join &join)
 {
-    m_stream << "            " << dummyCif("join");
+    m_stream << m_layouter.getPositionString(Layouter::ElementType::Join) << "\n";
     m_stream << "            join ";
     if (join.label() != nullptr) {
         m_stream << join.label()->name();
@@ -195,7 +277,7 @@ void SdlVisitor::visit(const Join &join) const
     m_stream << ";\n";
 }
 
-void SdlVisitor::visit(const Answer &answer) const
+void SdlVisitor::visit(const Answer &answer)
 {
     if (answer.transition() == nullptr) {
         throw ExportException("Required Transition is missing in Answer");
@@ -204,7 +286,7 @@ void SdlVisitor::visit(const Answer &answer) const
         throw ExportException("Required Literal have a missing value in Answer");
     }
 
-    m_stream << "                /* CIF ANSWER (585, 323), (77, 24) */\n";
+    m_stream << m_layouter.getPositionString(Layouter::ElementType::Answer) << "\n";
     if (answer.literal().value() == "else") {
         m_stream << "                " << answer.literal().value() << ":\n";
     } else {
@@ -213,7 +295,7 @@ void SdlVisitor::visit(const Answer &answer) const
     exportCollection(answer.transition()->actions());
 }
 
-void SdlVisitor::visit(const Decision &decision) const
+void SdlVisitor::visit(const Decision &decision)
 {
     if (decision.expression() == nullptr) {
         throw ExportException("Required Expression is missing in Decision");
@@ -225,19 +307,19 @@ void SdlVisitor::visit(const Decision &decision) const
         throw ExportException("No Answers in Decision");
     }
 
-    m_stream << "            /* CIF decision (388, 241), (115, 50) */\n";
+    m_stream << m_layouter.getPositionString(Layouter::ElementType::Decision) << "\n";
     m_stream << "            decision " << decision.expression()->content() << ";\n";
     exportCollection(decision.answers());
     m_stream << "            enddecision;\n";
 }
 
-void SdlVisitor::visit(const Procedure &procedure) const
+void SdlVisitor::visit(const Procedure &procedure)
 {
     if (procedure.transition() == nullptr) {
         // No implementation -> external procedure
         return;
     }
-    m_stream << "    " << dummyCif("procedure");
+    m_stream << m_layouter.getPositionString(Layouter::ElementType::Procedure) << "\n";
     m_stream << "    procedure " << procedure.name() << ";\n";
 
     auto &procedureParameters = procedure.parameters();
@@ -246,7 +328,7 @@ void SdlVisitor::visit(const Procedure &procedure) const
     const bool returnVarPresent = procedure.returnVariableDeclaration() != nullptr;
 
     if (parametersPresent || returnVarPresent) {
-        m_stream << "        " << dummyCif("TEXT");
+        m_stream << m_layouter.getPositionString(Layouter::ElementType::Text) << "\n";
     }
 
     if (parametersPresent) {
@@ -278,7 +360,7 @@ void SdlVisitor::visit(const Procedure &procedure) const
         m_stream << "        /* CIF ENDTEXT */\n";
     }
 
-    m_stream << "        " << dummyCif("START");
+    m_stream << m_layouter.getPositionString(Layouter::ElementType::Start) << "\n";
     m_stream << "        START;\n";
     if (procedure.transition()->actions().empty()) {
         qWarning("Procedure is empty");
@@ -293,7 +375,7 @@ void SdlVisitor::visit(const Procedure &procedure) const
     m_stream << "    endprocedure;\n";
 }
 
-void SdlVisitor::visit(const ProcedureCall &procedureCall) const
+void SdlVisitor::visit(const ProcedureCall &procedureCall)
 {
     if (procedureCall.procedure() == nullptr || procedureCall.procedure()->name().isEmpty()) {
         throw ExportException("Procedure to call not specified");
@@ -303,7 +385,7 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall) const
                               "It must be called from a Task");
     }
 
-    m_stream << "        " << dummyCif("PROCEDURECALL");
+    m_stream << m_layouter.getPositionString(Layouter::ElementType::ProcedureCall) << "\n";
     m_stream << "        call " << procedureCall.procedure()->name();
 
     const auto &procedureCallArgs = procedureCall.arguments();
@@ -330,14 +412,14 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall) const
     m_stream << ";\n";
 }
 
-QString SdlVisitor::dummyCif(const QString &cifType) const
+QString SdlVisitor::dummyCif(const QString &cifType)
 {
     const static QString dummyCifTemplate = "/* CIF %1 (250, 150), (150, 75) */\n";
     return dummyCifTemplate.arg(cifType);
 }
 
 template<typename T>
-void SdlVisitor::exportCollection(const T &collection) const
+void SdlVisitor::exportCollection(const T &collection)
 {
     for (const auto &item : collection) {
         SdlVisitor visitor(m_stream);

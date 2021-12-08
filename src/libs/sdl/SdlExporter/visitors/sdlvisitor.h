@@ -44,6 +44,46 @@ namespace sdl {
 class SdlVisitor final : public Visitor
 {
 public:
+    class Layouter
+    {
+    public:
+        using Position = std::pair<uint32_t, uint32_t>;
+        using Size = std::pair<uint32_t, uint32_t>;
+        enum class ElementType
+        {
+            Text,
+            Start,
+            Answer,
+            Decision,
+            Process,
+            State,
+            Input,
+            Output,
+            NextState,
+            Task,
+            Label,
+            Join,
+            Procedure,
+            ProcedureCall,
+        };
+
+    private:
+        std::vector<Position> m_positions;
+        uint32_t m_xOffset;
+        uint32_t m_yOffset;
+
+    public:
+        Layouter();
+
+        auto pushPosition() -> void;
+        auto popPosition() -> void;
+        auto moveRight() -> void;
+        auto moveDown() -> void;
+        auto getPosition() -> const Position &;
+        auto getPositionString(const ElementType element) -> QString;
+    };
+
+public:
     /**
      * @brief   Constructor
      *
@@ -76,97 +116,98 @@ public:
      *
      * @param   process   process to be serialized
      */
-    auto visit(const Process &process) const -> void override;
+    auto visit(const Process &process) -> void override;
 
     /**
      * @brief   State visitor
      *
      * @param   state   state to be serialized
      */
-    auto visit(const State &state) const -> void override;
+    auto visit(const State &state) -> void override;
 
     /**
      * @brief   Input visitor
      *
      * @param   input   input to be serialized
      */
-    auto visit(const Input &input) const -> void override;
+    auto visit(const Input &input) -> void override;
 
     /**
      * @brief   Output visitor
      *
      * @param   output  output to be serialized
      */
-    auto visit(const Output &output) const -> void override;
+    auto visit(const Output &output) -> void override;
 
     /**
      * @brief   NEXTSTATE action visitor
      *
      * @param   nextstate   NEXTSTATE action to be serialized
      */
-    auto visit(const NextState &nextstate) const -> void override;
+    auto visit(const NextState &nextstate) -> void override;
 
     /**
      * @brief   Task visitor
      *
      * @param   task   task to be serialized
      */
-    auto visit(const Task &task) const -> void override;
+    auto visit(const Task &task) -> void override;
 
     /**
      * @brief   Variable declaration visitor
      *
      * @param   declaration   declaration to be serialized
      */
-    auto visit(const VariableDeclaration &declaration) const -> void override;
+    auto visit(const VariableDeclaration &declaration) -> void override;
 
     /**
      * @brief   Label visitor
      *
      * @param   label   label to be serialized
      */
-    auto visit(const Label &label) const -> void override;
+    auto visit(const Label &label) -> void override;
 
     /**
      * @brief   Join visitor
      *
      * @param   join   join to be serialized
      */
-    virtual auto visit(const Join &join) const -> void override;
+    virtual auto visit(const Join &join) -> void override;
 
     /**
      * @brief   Answer visitor
      *
      * @param   answer  answer to be serialized
      */
-    auto visit(const Answer &answer) const -> void override;
+    auto visit(const Answer &answer) -> void override;
 
     /**
      * @brief   Decision visitor
      *
      * @param   decision  decision to be serialized
      */
-    virtual auto visit(const Decision &decision) const -> void override;
+    virtual auto visit(const Decision &decision) -> void override;
 
     /**
      * @brief   Procedure visitor
      *
      * @param   procedure   procedure to be serialized
      */
-    auto visit(const Procedure &procedure) const -> void override;
+    auto visit(const Procedure &procedure) -> void override;
 
     /**
      * @brief   Procedure call visitor
      *
      * @param   procedureCall   procedure call to be serialized
      */
-    auto visit(const ProcedureCall &procedureCall) const -> void override;
+    auto visit(const ProcedureCall &procedureCall) -> void override;
 
 private:
-    auto dummyCif(const QString &cifType) const -> QString;
+    Layouter m_layouter;
+    auto dummyCif(const QString &cifType) -> QString;
 
     template<typename T>
-    auto exportCollection(const T &collection) const -> void;
+    auto exportCollection(const T &collection) -> void;
 
     QTextStream &m_stream;
 };

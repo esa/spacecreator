@@ -79,91 +79,91 @@ public:
      *
      * @param   process   process to be visited
      */
-    virtual auto visit(const Process &process) const -> void = 0;
+    virtual auto visit(const Process &process) -> void = 0;
 
     /**
      * @brief   State visitor
      *
      * @param   state   state to be visited
      */
-    virtual auto visit(const State &state) const -> void = 0;
+    virtual auto visit(const State &state) -> void = 0;
 
     /**
      * @brief   Input visitor
      *
      * @param   input   input to be visited
      */
-    virtual auto visit(const Input &input) const -> void = 0;
+    virtual auto visit(const Input &input) -> void = 0;
 
     /**
      * @brief   Output visitor
      *
      * @param   output  output to be visited
      */
-    virtual auto visit(const Output &output) const -> void = 0;
+    virtual auto visit(const Output &output) -> void = 0;
 
     /**
      * @brief   NEXTSTATE action visitor
      *
      * @param   nextstate   NEXTSTATE action to be visited
      */
-    virtual auto visit(const NextState &nextstate) const -> void = 0;
+    virtual auto visit(const NextState &nextstate) -> void = 0;
 
     /**
      * @brief   Task visitor
      *
      * @param   task   task to be visited
      */
-    virtual auto visit(const Task &task) const -> void = 0;
+    virtual auto visit(const Task &task) -> void = 0;
 
     /**
      * @brief   Variable declaration visitor
      *
      * @param   declaration   declaration to be visited
      */
-    virtual auto visit(const VariableDeclaration &declaration) const -> void = 0;
+    virtual auto visit(const VariableDeclaration &declaration) -> void = 0;
 
     /**
      * @brief   Label visitor
      *
      * @param   label   label to be visited
      */
-    virtual auto visit(const Label &label) const -> void = 0;
+    virtual auto visit(const Label &label) -> void = 0;
 
     /**
      * @brief   Join visitor
      *
      * @param   join   join to be visited
      */
-    virtual auto visit(const Join &join) const -> void = 0;
+    virtual auto visit(const Join &join) -> void = 0;
 
     /**
      * @brief   Answer visitor
      *
      * @param   answer  answer to be visited
      */
-    virtual auto visit(const Answer &answer) const -> void = 0;
+    virtual auto visit(const Answer &answer) -> void = 0;
 
     /**
      * @brief   Decision visitor
      *
      * @param   decision  decision to be visited
      */
-    virtual auto visit(const Decision &decision) const -> void = 0;
+    virtual auto visit(const Decision &decision) -> void = 0;
 
     /**
      * @brief   Procedure visitor
      *
      * @param   procedure   procedure to be visited
      */
-    virtual auto visit(const Procedure &procedure) const -> void = 0;
+    virtual auto visit(const Procedure &procedure) -> void = 0;
 
     /**
      * @brief   Procedure call visitor
      *
      * @param   procedureCall   procedure call to be visited
      */
-    virtual auto visit(const ProcedureCall &procedureCall) const -> void = 0;
+    virtual auto visit(const ProcedureCall &procedureCall) -> void = 0;
 };
 
 } // namespace sdl
