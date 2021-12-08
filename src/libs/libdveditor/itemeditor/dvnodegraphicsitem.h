@@ -48,6 +48,8 @@ public:
     int type() const override { return Type; }
     int itemLevel(bool isSelected) const override;
 
+    void childBoundingBoxChanged() override;
+
 protected Q_SLOTS:
     void applyColorScheme() override;
 

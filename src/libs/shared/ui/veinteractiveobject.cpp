@@ -65,6 +65,11 @@ void VEInteractiveObject::onSelectionChanged(bool isSelected)
     }
 }
 
+void VEInteractiveObject::childBoundingBoxChanged()
+{
+    scheduleLayoutUpdate();
+}
+
 void VEInteractiveObject::mergeGeometry()
 {
 #ifdef __NONE__

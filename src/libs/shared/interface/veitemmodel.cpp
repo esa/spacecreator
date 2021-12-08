@@ -170,7 +170,7 @@ VEInteractiveObject *VEItemModel::createItemForObject(shared::Id objectId)
         if (const QGraphicsItem *parentItem = iObj->parentItem()) {
             if (auto iObjParent = qobject_cast<const VEInteractiveObject *>(parentItem->toGraphicsObject())) {
                 connect(iObj, &VEInteractiveObject::boundingBoxChanged, iObjParent,
-                        &VEInteractiveObject::scheduleLayoutUpdate, Qt::QueuedConnection);
+                        &VEInteractiveObject::childBoundingBoxChanged);
             }
         }
         iObj->setCommandsStack(m_commandsStack);
