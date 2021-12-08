@@ -193,7 +193,6 @@ auto SedsPlugin::importInterfaceView() -> void
     options.add(conversion::iv::IvOptions::configFilepath,
             QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg("config.xml"));
     options.add(conversion::seds::SedsOptions::inputFilepath, inputFilePath);
-    // options.add(conversion::seds::SedsOptions::skipValidation);
 
     try {
         convertSedsToIv(options);
@@ -204,7 +203,31 @@ auto SedsPlugin::importInterfaceView() -> void
         MessageManager::write(GenMsg::msgWarning.arg(ex.what()));
     }
 
-    // TODO: merge tmp-interfaceview.xml and interfaceview.xml
+    conversion::Options loadTmpOptions;
+    loadTmpOptions.add(conversion::seds::SedsOptions::inputFilepath, "seds.xml");
+    loadTmpOptions.add(conversion::seds::SedsOptions::preprocessedFilepath, "preprocessed.xml");
+    loadTmpOptions.add(conversion::seds::SedsOptions::externalRefFilepath, "external_references.toml");
+    loadTmpOptions.add(conversion::seds::SedsOptions::externalRef, "integer.name:UnsignedInteger8");
+    seds::importer::SedsXmlImporter sedsImporter;
+
+    std::unique_ptr<conversion::Model> model;
+    try {
+        model = sedsImporter.importModel(options);
+    } catch (const std::exception &ex) {
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
+        return;
+    }
+
+    // TODO: merge tmp-interfaceview and interfaceview
+
+    const auto tmpSedsModel = dynamic_cast<seds::model::SedsModel *>(model.get());
+    const auto currentSedsModel = nullptr;
+    // const auto &packageFile = std::get<seds::model::PackageFile>(sedsModel->data());
+    // const auto &dataTypeSet = packageFile.package().dataTypes();
+
+    // const auto &unsignedInteger8 = std::get<model::IntegerDataType>(dataTypeSet.at(0));
+    // QCOMPARE(unsignedInteger8.name().value(), "UnsignedInteger8");
+    // QCOMPARE(*unsignedInteger8.longDescription(), "A simple 8-bit unsigned integer");
 }
 
 auto SedsPlugin::importSdl() -> void
