@@ -37,11 +37,11 @@ static const QString POSITION_STRING_PATTERN = "/* CIF %1 (%2, %3), (%4, %5) */"
 // const does not work with std::map accesses
 static std::map<SdlVisitor::Layouter::ElementType, SdlVisitor::SdlVisitor::Layouter::Size> CIF_SIZES = {
     { SdlVisitor::Layouter::ElementType::Text, std::make_pair<uint32_t, uint32_t>(400, 500) },
-    { SdlVisitor::Layouter::ElementType::Start, std::make_pair<uint32_t, uint32_t>(200, 50) },
+    { SdlVisitor::Layouter::ElementType::Start, std::make_pair<uint32_t, uint32_t>(200, 75) },
     { SdlVisitor::Layouter::ElementType::Answer, std::make_pair<uint32_t, uint32_t>(400, 50) },
     { SdlVisitor::Layouter::ElementType::Decision, std::make_pair<uint32_t, uint32_t>(400, 50) },
     { SdlVisitor::Layouter::ElementType::Process, std::make_pair<uint32_t, uint32_t>(800, 100) },
-    { SdlVisitor::Layouter::ElementType::State, std::make_pair<uint32_t, uint32_t>(250, 50) },
+    { SdlVisitor::Layouter::ElementType::State, std::make_pair<uint32_t, uint32_t>(200, 50) },
     { SdlVisitor::Layouter::ElementType::Input, std::make_pair<uint32_t, uint32_t>(200, 50) },
     { SdlVisitor::Layouter::ElementType::Output, std::make_pair<uint32_t, uint32_t>(200, 50) },
     { SdlVisitor::Layouter::ElementType::NextState, std::make_pair<uint32_t, uint32_t>(200, 50) },
@@ -73,9 +73,15 @@ static std::map<SdlVisitor::Layouter::ElementType, QString> CIF_NAMES = {
 
 SdlVisitor::Layouter::Layouter()
 {
-    m_xOffset = 100;
-    m_yOffset = 50;
     m_positions.push_back(std::make_pair(0, 0));
+    m_highWatermarkX = 0;
+}
+
+auto SdlVisitor::Layouter::resetPosition() -> void
+{
+    m_positions[m_positions.size() - 1].first = 0;
+    m_positions[m_positions.size() - 1].second = 0;
+    m_highWatermarkX = 0;
 }
 
 auto SdlVisitor::Layouter::pushPosition() -> void
@@ -100,6 +106,11 @@ auto SdlVisitor::Layouter::moveDown(const ElementType element) -> void
 auto SdlVisitor::Layouter::getPosition() -> const Position &
 {
     return m_positions.back();
+}
+
+auto SdlVisitor::Layouter::moveRightToHighWatermark() -> void
+{
+    m_positions[m_positions.size() - 1].first = m_highWatermarkX;
 }
 
 auto SdlVisitor::Layouter::getPositionString(const SdlVisitor::Layouter::ElementType element) -> QString
@@ -140,10 +151,7 @@ void SdlVisitor::visit(const Process &process)
     }
 
     if (!process.procedures().empty()) {
-        m_layouter.pushPosition();
         exportCollection(process.procedures());
-        m_layouter.popPosition();
-        m_layouter.moveRight(Layouter::ElementType::Procedure);
     }
 
     if (process.startTransition() != nullptr) {
@@ -152,8 +160,7 @@ void SdlVisitor::visit(const Process &process)
                     "    START;\n";
         m_layouter.moveDown(Layouter::ElementType::Start);
         exportCollection(process.startTransition()->actions());
-        m_layouter.popPosition();
-        m_layouter.moveRight(Layouter::ElementType::Process);
+        m_layouter.moveDown(Layouter::ElementType::State);
     } else {
         throw ExportException("START transition not specified but required");
     }
@@ -167,6 +174,7 @@ void SdlVisitor::visit(const Process &process)
     }
 
     m_stream << "endprocess " << process.name() << ";";
+    m_layouter.popPosition();
 }
 
 void SdlVisitor::visit(const State &state)
@@ -181,6 +189,7 @@ void SdlVisitor::visit(const State &state)
     exportCollection(state.inputs());
     m_stream << "    endstate;\n";
     m_layouter.popPosition();
+    m_layouter.moveRightToHighWatermark();
     m_layouter.moveRight(Layouter::ElementType::State);
 }
 
@@ -318,6 +327,7 @@ void SdlVisitor::visit(const Answer &answer)
     }
     exportCollection(answer.transition()->actions());
     m_layouter.popPosition();
+    m_layouter.moveRightToHighWatermark();
     m_layouter.moveRight(Layouter::ElementType::Answer);
 }
 
@@ -339,6 +349,7 @@ void SdlVisitor::visit(const Decision &decision)
     m_layouter.pushPosition();
     exportCollection(decision.answers());
     m_layouter.popPosition();
+    m_layouter.moveRightToHighWatermark();
     m_stream << "            enddecision;\n";
 }
 
@@ -349,6 +360,7 @@ void SdlVisitor::visit(const Procedure &procedure)
         return;
     }
     m_layouter.pushPosition();
+    m_layouter.resetPosition();
     m_stream << m_layouter.getPositionString(Layouter::ElementType::Procedure) << "\n";
     m_layouter.moveDown(Layouter::ElementType::Procedure);
     m_stream << "    procedure " << procedure.name() << ";\n";
@@ -407,7 +419,7 @@ void SdlVisitor::visit(const Procedure &procedure)
     m_stream << ";\n";
     m_stream << "    endprocedure;\n";
     m_layouter.popPosition();
-    m_layouter.moveRight(Layouter::ElementType::Procedure);
+    m_layouter.moveDown(Layouter::ElementType::Procedure);
 }
 
 void SdlVisitor::visit(const ProcedureCall &procedureCall)

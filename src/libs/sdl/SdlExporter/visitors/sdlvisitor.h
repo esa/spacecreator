@@ -69,18 +69,19 @@ public:
 
     private:
         std::vector<Position> m_positions;
-        uint32_t m_xOffset;
-        uint32_t m_yOffset;
+        uint32_t m_highWatermarkX;
 
     public:
         Layouter();
 
+        auto resetPosition() -> void;
         auto pushPosition() -> void;
         auto popPosition() -> void;
         auto moveRight(const ElementType element) -> void;
         auto moveDown(const ElementType element) -> void;
         auto getPosition() -> const Position &;
         auto getPositionString(const ElementType element) -> QString;
+        auto moveRightToHighWatermark() -> void;
     };
 
 public:
