@@ -36,6 +36,7 @@
 #include "ivfunction.h"
 #include "ivlibrary.h"
 #include "ivmodel.h"
+#include "ivobject.h"
 #include "model.h"
 #include "modeltype.h"
 #include "options.h"
@@ -52,6 +53,7 @@
 #include <conversion/asn1/Asn1Registrar/registrar.h>
 #include <conversion/converter/converter.h>
 #include <conversion/iv/IvRegistrar/registrar.h>
+#include <conversion/iv/IvXmlImporter/importer.h>
 #include <conversion/sdl/SdlRegistrar/registrar.h>
 #include <conversion/seds/SedsRegistrar/registrar.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
@@ -80,9 +82,11 @@ const QString fileToImportNotSelected = "File to import not selected";
 const QString ivFileNotSelected = "InterfaceView file not selected";
 const QString ivNoFunctionsInIv = "InterfaceView does not contain functions which could be exported";
 const QString ivNoFunctionsSelected = "No functions selected to export";
-const QString filesExported = "file(s) exported";
-const QString filesImported = "file(s) imported";
+const QString filesExported = "File(s) exported";
+const QString filesImported = "File(s) imported";
+const QString functionsImported = "Function(s) imported";
 const QString ivModelNotRead = "IV model could not be read";
+const QString ivTmpModelNotRead = QString("Temporary %1").arg(ivModelNotRead);
 }
 
 namespace spctr {
@@ -180,6 +184,9 @@ auto SedsPlugin::createActionContainerInTools(const QString &title) -> ActionCon
 
 auto SedsPlugin::importInterfaceView() -> void
 {
+    const QString tmpIvFilename = "tmp-interfaceview.xml";
+    const QString ivConfig = "config.xml";
+
     const QString inputFilePath = QFileDialog::getOpenFileName(
             nullptr, "Select EDS file to import InterfaceView from...", QString(), tr("*.xml"));
     if (inputFilePath.isEmpty()) {
@@ -189,14 +196,13 @@ auto SedsPlugin::importInterfaceView() -> void
 
     conversion::Options options;
     options.add(conversion::iv::IvOptions::outputFilepath,
-            QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg("tmp-interfaceview.xml"));
+            QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg(tmpIvFilename));
     options.add(conversion::iv::IvOptions::configFilepath,
-            QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg("config.xml"));
+            QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg(ivConfig));
     options.add(conversion::seds::SedsOptions::inputFilepath, inputFilePath);
 
     try {
         convertSedsToIv(options);
-        MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesExported));
     } catch (conversion::ConverterException &ex) {
         MessageManager::write(GenMsg::msgWarning.arg(ex.what()));
     } catch (std::exception &ex) {
@@ -204,30 +210,55 @@ auto SedsPlugin::importInterfaceView() -> void
     }
 
     conversion::Options loadTmpOptions;
-    loadTmpOptions.add(conversion::seds::SedsOptions::inputFilepath, "seds.xml");
-    loadTmpOptions.add(conversion::seds::SedsOptions::preprocessedFilepath, "preprocessed.xml");
-    loadTmpOptions.add(conversion::seds::SedsOptions::externalRefFilepath, "external_references.toml");
-    loadTmpOptions.add(conversion::seds::SedsOptions::externalRef, "integer.name:UnsignedInteger8");
-    seds::importer::SedsXmlImporter sedsImporter;
+    loadTmpOptions.add(conversion::iv::IvOptions::inputFilepath, tmpIvFilename);
+    loadTmpOptions.add(conversion::iv::IvOptions::configFilepath, ivConfig);
 
     std::unique_ptr<conversion::Model> model;
+    conversion::iv::importer::IvXmlImporter ivImporter;
     try {
-        model = sedsImporter.importModel(options);
+        model = ivImporter.importModel(loadTmpOptions);
     } catch (const std::exception &ex) {
         MessageManager::write(GenMsg::msgError.arg(ex.what()));
         return;
     }
 
-    // TODO: merge tmp-interfaceview and interfaceview
+    ivm::IVModel *const tmpIvModel = dynamic_cast<ivm::IVModel *>(model.get());
+    if (tmpIvModel == nullptr) {
+        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivTmpModelNotRead));
+        return;
+    }
 
-    const auto tmpSedsModel = dynamic_cast<seds::model::SedsModel *>(model.get());
-    const auto currentSedsModel = nullptr;
-    // const auto &packageFile = std::get<seds::model::PackageFile>(sedsModel->data());
-    // const auto &dataTypeSet = packageFile.package().dataTypes();
+    // TODO: get current IV model from getCurIvEditorCore() and remove isEmpty() check
+    QVector<ivm::IVFunction *> allIvFunctions = getCurIvEditorCore()->allIVFunctions();
+    if (allIvFunctions.isEmpty()) {
+        MessageManager::write(GenMsg::msgError.arg("No IV Functions in current document"));
+        return;
+    }
+    auto &ivFunction = allIvFunctions.first();
 
-    // const auto &unsignedInteger8 = std::get<model::IntegerDataType>(dataTypeSet.at(0));
-    // QCOMPARE(unsignedInteger8.name().value(), "UnsignedInteger8");
-    // QCOMPARE(*unsignedInteger8.longDescription(), "A simple 8-bit unsigned integer");
+    ivm::IVModel *const currentIvModel = ivFunction->model();
+    if (currentIvModel == nullptr) {
+        MessageManager::write(GenMsg::ivModelNotRead);
+        return;
+    }
+
+    for (auto &curIvObject : currentIvModel->visibleObjects()) {
+        for (auto &tmpIvObject : tmpIvModel->visibleObjects()) {
+            if (curIvObject->isFunction() && tmpIvObject->isFunction()) {
+                if (curIvObject->title() == tmpIvObject->title()) {
+                    MessageManager::write(
+                            GenMsg::msgInfo.arg(QString("%1, %2 - names are the same, Function will not be imported")
+                                                        .arg(curIvObject->title())
+                                                        .arg(tmpIvObject->title())));
+                    return;
+                } else {
+                    currentIvModel->addObject(tmpIvObject);
+                }
+            }
+        }
+    }
+
+    MessageManager::write(GenMsg::msgInfo.arg(GenMsg::functionsImported));
 }
 
 auto SedsPlugin::importSdl() -> void
