@@ -64,6 +64,7 @@
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
 #include <exception>
+#include <memory>
 #include <messagemanager.h>
 
 using namespace Core;

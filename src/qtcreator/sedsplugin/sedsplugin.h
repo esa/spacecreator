@@ -31,6 +31,7 @@
 #include <conversion/registry/registry.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <extensionsystem/iplugin.h>
+#include <memory>
 #include <shared/ui/listtreedialog.h>
 
 namespace spctr {
