@@ -199,11 +199,12 @@ std::size_t AsyncInterfaceCommandTranslator::calculateArgumentsHash(
 QString AsyncInterfaceCommandTranslator::createBundledTypeName(const QString &sedsCommandName) const
 {
     const auto cachedTypesCount = m_commandArgumentsCache.count(sedsCommandName);
+    const auto sedsCommandNameEscaped = Escaper::escapeAsn1TypeName(sedsCommandName);
 
     if (cachedTypesCount == 0) {
-        return Escaper::escapeAsn1TypeName(m_bundledTypeNameTemplate.arg(sedsCommandName).arg(""));
+        return m_bundledTypeNameTemplate.arg(sedsCommandNameEscaped).arg("");
     } else {
-        return Escaper::escapeAsn1TypeName(m_bundledTypeNameTemplate.arg(sedsCommandName).arg(cachedTypesCount));
+        return m_bundledTypeNameTemplate.arg(sedsCommandNameEscaped).arg(cachedTypesCount);
     }
 }
 

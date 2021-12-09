@@ -21,6 +21,19 @@
 
 namespace seds::model {
 
+DimensionSize::DimensionSize(const DimensionSize &rhs)
+    : m_size(std::nullopt)
+    , m_indexTypeRef(std::nullopt)
+{
+    if (rhs.size()) {
+        m_size = rhs.size()->value();
+    }
+
+    if (rhs.indexTypeRef()) {
+        m_indexTypeRef = rhs.indexTypeRef()->nameStr();
+    }
+}
+
 const std::optional<PositiveLong> &DimensionSize::size() const
 {
     return m_size;

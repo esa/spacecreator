@@ -23,12 +23,13 @@
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
-#include <conversion/asn1/SedsToAsn1Translator/specialized/dimensiontranslator.h>
+#include <conversion/asn1/SedsToAsn1Translator/specialized/datatypetranslatorvisitor.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivfunction.h>
 #include <seds/SedsModel/components/interface.h>
 #include <seds/SedsModel/interfaces/interfacedeclaration.h>
+#include <seds/SedsModel/types/arraydatatype.h>
 
 using conversion::Escaper;
 using conversion::UnhandledValueException;
@@ -81,11 +82,23 @@ QString InterfaceCommandTranslator::handleArgumentType(const seds::model::Comman
         return arrayArgumentTypeName;
     }
 
-    // Create new sequence type to use
-    // TODO
+    seds::model::ArrayDataType sedsArrayArgument;
+    sedsArrayArgument.setName(arrayArgumentTypeName);
+    sedsArrayArgument.setType(sedsArgumentTypeName);
 
-    static const QString stub = "stub";
-    return stub;
+    for (auto argumentDimension : sedsArgument.arrayDimensions()) {
+        sedsArrayArgument.addDimension(std::move(argumentDimension));
+    }
+
+    std::unique_ptr<Asn1Acn::Types::Type> asn1ArrayArgument;
+    asn1::translator::DataTypeTranslatorVisitor dataTypeVisitor { m_asn1Definitions, asn1ArrayArgument };
+    dataTypeVisitor(sedsArrayArgument);
+
+    auto asn1ArrayArgumentAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
+            arrayArgumentTypeName, arrayArgumentTypeName, Asn1Acn::SourceLocation(), std::move(asn1ArrayArgument));
+    m_asn1Definitions->addType(std::move(asn1ArrayArgumentAssignment));
+
+    return arrayArgumentTypeName;
 }
 
 ivm::IVInterface *InterfaceCommandTranslator::createIvInterface(const seds::model::InterfaceCommand &sedsCommand,
@@ -104,6 +117,13 @@ void InterfaceCommandTranslator::createAsn1SequenceComponent(
         const QString &name, const QString &typeName, Asn1Acn::Types::Sequence *sequence) const
 {
     const auto *referencedTypeAssignment = m_asn1Definitions->type(typeName);
+
+    if (!referencedTypeAssignment) {
+        auto errorMessage =
+                QString("Type %1 not found while creating ASN.1 sequence %2").arg(typeName).arg(sequence->identifier());
+        throw TranslationException(std::move(errorMessage));
+    }
+
     const auto *referencedType = referencedTypeAssignment->type();
 
     auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(typeName, m_asn1Definitions->name());

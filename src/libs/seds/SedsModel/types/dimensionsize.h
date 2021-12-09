@@ -30,6 +30,7 @@ class DimensionSize final
 {
 public:
     DimensionSize() = default;
+    DimensionSize(const DimensionSize &rhs);
     DimensionSize(DimensionSize &&) = default;
     DimensionSize &operator=(DimensionSize &&) = default;
 

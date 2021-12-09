@@ -48,6 +48,17 @@
         </Command>
       </CommandSet>
     </Interface>
+    <Interface name="ArrayInterface">
+      <CommandSet>
+        <Command name="ArrayCommand" mode="async">
+          <Argument name="ArrayArgument1" type="MyInteger" mode="in">
+            <ArrayDimensions>
+              <Dimension size="10" />
+            </ArrayDimensions>
+          </Argument>
+        </Command>
+      </CommandSet>
+    </Interface>
   </DeclaredInterfaceSet>
   <ComponentSet>
     <Component name="Component">
@@ -69,6 +80,7 @@
             <GenericTypeMap name="GenericType" type="MyFloat"/>
           </GenericTypeMapSet>
         </Interface>
+        <Interface name="ArrayInterfacePI" type="ArrayInterface"/>
       </ProvidedInterfaceSet>
       <RequiredInterfaceSet>
         <Interface name="AsyncInterfaceRI" type="AsyncInterface"/>
