@@ -412,11 +412,11 @@ void SdlVisitor::visit(const Procedure &procedure)
         return;
     }
     m_layouter.pushPosition();
-    m_layouter.resetPosition();
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Procedure));
     m_layouter.moveDown(Layouter::ElementType::Procedure);
     m_writer.writeLine("procedure " + procedure.name() + ";");
     m_writer.pushIndent(INDENT);
+    m_layouter.resetPosition();
 
     auto &procedureParameters = procedure.parameters();
 
