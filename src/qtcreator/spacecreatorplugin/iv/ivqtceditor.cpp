@@ -20,6 +20,7 @@
 #include "commands/cmdchangeasn1file.h"
 #include "commandsstack.h"
 #include "endtoend/endtoendview.h"
+#include "modelchecking/modelcheckingwindow.h"
 #include "interfacedocument.h"
 #include "iveditordocument.h"
 #include "ivmainwidget.h"
@@ -49,6 +50,7 @@ IVQtCEditor::IVQtCEditor(SpaceCreatorProjectManager *projectManager)
     connect(m_document, &spctr::IVEditorDocument::ivDataLoaded, this,
             [this](const QString &, IVEditorCorePtr data) { m_editorWidget->init(data); });
     connect(m_editorWidget, &IVMainWidget::requestE2EDataflow, this, &IVQtCEditor::showCurrentE2EDataflow);
+    connect(m_editorWidget, &IVMainWidget::requestModelCheckingWindow, this, &IVQtCEditor::showCurrentModelCheckingWindow);
 }
 
 IVQtCEditor::~IVQtCEditor()
@@ -81,6 +83,29 @@ QWidget *IVQtCEditor::toolBar()
     }
 
     return m_toolbar;
+}
+
+void IVQtCEditor::showCurrentModelCheckingWindow()
+{
+    if (auto ivEditor = qobject_cast<spctr::IVQtCEditor *>(Core::EditorManager::currentEditor())) {
+        ivEditor->showModelCheckingWindow();
+    }
+}
+
+void IVQtCEditor::showModelCheckingWindow()
+{
+    if (ivPlugin().isNull()) {
+        return;
+    }
+
+    IVEditorCorePtr plugin = ivPlugin();
+    if (m_modelCheckingWindow.isNull()) {
+        m_modelCheckingWindow = new ive::ModelCheckingWindow(plugin->document(), nullptr);
+        m_modelCheckingWindow->setAttribute(Qt::WA_DeleteOnClose);
+        connect(plugin->document(), &QObject::destroyed, m_modelCheckingWindow.data(), &QObject::deleteLater);
+    }
+    m_modelCheckingWindow->show();
+    m_modelCheckingWindow->raise();
 }
 
 void IVQtCEditor::showCurrentE2EDataflow()

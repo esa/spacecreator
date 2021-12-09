@@ -26,7 +26,10 @@
 class QToolBar;
 
 namespace ive {
+
+class ModelCheckingWindow;
 class EndToEndView;
+
 }
 
 namespace spctr {
@@ -52,11 +55,14 @@ public:
 public Q_SLOTS:
     void showCurrentE2EDataflow();
     void showE2EDataflow(const QStringList &mscFiles);
+    void showCurrentModelCheckingWindow();
+    void showModelCheckingWindow();
 
 private:
     IVEditorDocument *m_document = nullptr;
     QPointer<QToolBar> m_toolbar = nullptr;
     IVMainWidget *m_editorWidget = nullptr;
+    QPointer<ive::ModelCheckingWindow> m_modelCheckingWindow;
     QPointer<ive::EndToEndView> m_endToEndView;
     QPointer<SpaceCreatorProjectManager> m_projectManager;
 };

@@ -97,6 +97,9 @@ target_sources(${LIB_NAME} PRIVATE
     endtoend/endtoendview.ui
     endtoend/leafdocumentsmodel.cpp
     endtoend/leafdocumentsmodel.h
+    modelchecking/modelcheckingwindow.cpp
+    modelchecking/modelcheckingwindow.h
+    modelchecking/modelcheckingwindow.ui
     interfacedocument.cpp
     interfacedocument.h
     itemeditor/common/ivutils.cpp

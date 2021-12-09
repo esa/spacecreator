@@ -36,5 +36,6 @@
         <file>icns/copy.svg</file>
         <file>icns/paste.svg</file>
         <file>icns/cut.svg</file>
+        <file>icns/model_checking_window.png</file>
     </qresource>
 </RCC>

@@ -74,6 +74,7 @@ void IVMainWidget::init()
 
     layout->addWidget(m_plugin->mainwidget());
     connect(m_plugin->actionToggleE2EView(), &QAction::triggered, this, &IVMainWidget::requestE2EDataflow);
+    connect(m_plugin->actionLaunchModelCheckingWindow(), &QAction::triggered, this, &IVMainWidget::requestModelCheckingWindow);
 
     m_plugin->setupMiniMap();
 }

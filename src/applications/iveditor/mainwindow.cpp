@@ -24,6 +24,7 @@
 #include "config/ivlibrarydialog.h"
 #include "context/action/actionsmanager.h"
 #include "endtoend/endtoendview.h"
+#include "modelchecking/modelcheckingwindow.h"
 #include "errorhub.h"
 #include "interfacedocument.h"
 #include "itemeditor/common/ivutils.h"
@@ -115,6 +116,13 @@ MainWindow::MainWindow(ive::IVEditorCore *core, QWidget *parent)
     connect(core->actionToggleE2EView(), &QAction::toggled, endToEndView, &QWidget::setVisible);
     connect(endToEndView, &EndToEndView::visibleChanged, core->actionToggleE2EView(), &QAction::setChecked);
     endToEndView->setVisible(core->actionToggleE2EView()->isChecked());
+
+    // Create the MC window and add the action
+    auto modelCheckingWindow = new ModelCheckingWindow(m_core->document(), this);
+    modelCheckingWindow->hide();
+    connect(core->actionLaunchModelCheckingWindow(), &QAction::toggled, modelCheckingWindow, &QWidget::setVisible);
+    connect(modelCheckingWindow, &ModelCheckingWindow::visibleChanged, core->actionLaunchModelCheckingWindow(), &QAction::setChecked);
+    modelCheckingWindow->setVisible(core->actionLaunchModelCheckingWindow()->isChecked());
 
     connect(shared::ErrorHub::instance(), &shared::ErrorHub::errorAdded, this, [this](const shared::ErrorItem &error) {
         switch (error.m_type) {
@@ -390,6 +398,7 @@ void MainWindow::initMenus()
     menu = menuBar()->addMenu(tr("&View"));
     menu->addAction(m_core->actionToggleMinimap());
     menu->addAction(m_core->actionToggleE2EView());
+    menu->addAction(m_core->actionLaunchModelCheckingWindow());
 
     // Initialize the help menu
     menu = menuBar()->addMenu(tr("&Help"));

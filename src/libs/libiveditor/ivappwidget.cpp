@@ -511,6 +511,7 @@ QVector<QAction *> IVAppWidget::initViewActions()
     m_viewActions.append(m_ivCore->actionToggleE2EView());
     m_viewActions.append(m_ivCore->actionExportFunctions());
     m_viewActions.append(m_ivCore->actionExportType());
+    m_viewActions.append(m_ivCore->actionLaunchModelCheckingWindow());
 
     auto actionSaveSceneRender =
             new QAction(QIcon(QLatin1String(":/toolbar/icns/render.svg")), tr("Render Scene..."), this);

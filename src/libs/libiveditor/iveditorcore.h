@@ -69,6 +69,7 @@ public:
     QAction *actionExportFunctions();
     QAction *actionExportType();
     QAction *actionToggleE2EView();
+    QAction *actionLaunchModelCheckingWindow();
 
     ivm::IVFunction *addFunction(const QString &name, ivm::IVFunction *parent = nullptr);
     bool addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName);
@@ -104,6 +105,7 @@ private:
     QAction *m_actionExportFunctions { nullptr };
     QAction *m_actionExportType { nullptr };
     QAction *m_actionToggleE2EView { nullptr };
+    QAction *m_actionLaunchModelCheckingWindow { nullptr };
 
     QVector<ivm::IVFunction *> m_ivFunctions;
     QVector<ivm::IVConnection *> m_ivConnections;

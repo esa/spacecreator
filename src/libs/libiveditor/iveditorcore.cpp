@@ -152,6 +152,16 @@ QAction *IVEditorCore::actionToggleE2EView()
     return m_actionToggleE2EView;
 }
 
+QAction *IVEditorCore::actionLaunchModelCheckingWindow()
+{
+    if (m_actionLaunchModelCheckingWindow == nullptr) {
+        m_actionLaunchModelCheckingWindow =
+                new QAction(QIcon(QIcon(":/toolbar/icns/model_checking_window.png")), tr("Launch Model Checking Window"), this);
+        m_actionLaunchModelCheckingWindow->setCheckable(true);
+    }
+    return m_actionLaunchModelCheckingWindow;
+}
+
 /*!
    Adds an iv function with the given \p name
    @return Returns the newly created function. Or nullptr if the creation failed.
