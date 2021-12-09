@@ -228,17 +228,9 @@ auto SedsPlugin::importInterfaceView() -> void
         return;
     }
 
-    // TODO: get current IV model from getCurIvEditorCore() and remove isEmpty() check
-    QVector<ivm::IVFunction *> allIvFunctions = getCurIvEditorCore()->allIVFunctions();
-    if (allIvFunctions.isEmpty()) {
-        MessageManager::write(GenMsg::msgError.arg("No IV Functions in current document"));
-        return;
-    }
-    auto &ivFunction = allIvFunctions.first();
-
-    ivm::IVModel *const currentIvModel = ivFunction->model();
+    ivm::IVModel *const currentIvModel = getCurIvEditorCore()->document()->objectsModel();
     if (currentIvModel == nullptr) {
-        MessageManager::write(GenMsg::ivModelNotRead);
+        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivModelNotRead));
         return;
     }
 
