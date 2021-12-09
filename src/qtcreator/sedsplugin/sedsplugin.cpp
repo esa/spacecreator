@@ -234,21 +234,7 @@ auto SedsPlugin::importInterfaceView() -> void
         return;
     }
 
-    for (auto &curIvObject : currentIvModel->visibleObjects()) {
-        for (auto &tmpIvObject : tmpIvModel->visibleObjects()) {
-            if (curIvObject->isFunction() && tmpIvObject->isFunction()) {
-                if (curIvObject->title() == tmpIvObject->title()) {
-                    MessageManager::write(
-                            GenMsg::msgInfo.arg(QString("%1, %2 - names are the same, Function will not be imported")
-                                                        .arg(curIvObject->title())
-                                                        .arg(tmpIvObject->title())));
-                    return;
-                } else {
-                    currentIvModel->addObject(tmpIvObject);
-                }
-            }
-        }
-    }
+    mergeIvModels(currentIvModel, tmpIvModel);
 
     MessageManager::write(GenMsg::msgInfo.arg(GenMsg::functionsImported));
 }
@@ -351,18 +337,6 @@ auto SedsPlugin::exportInterfaceView() -> void
         MessageManager::write(GenMsg::msgError.arg(GenMsg::ivNoFunctionsSelected));
         return;
     }
-}
-
-auto SedsPlugin::getCurIvEditorCore() -> IVEditorCorePtr
-{
-    auto *const currentDocument = EditorManager::currentDocument();
-    auto *const currentIvDocument = static_cast<IVEditorDocument *>(currentDocument);
-    if (currentIvDocument == nullptr) {
-        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivFileNotSelected));
-        return nullptr;
-    }
-
-    return currentIvDocument->ivEditorCore();
 }
 
 auto SedsPlugin::exportAsn1() -> void
@@ -483,6 +457,37 @@ auto SedsPlugin::ltdialogUpdateWithItemModel(ListTreeDialog &ltdialog, QStandard
         ltdialog.close();
     });
     ltdialog.setWindowTitle("IV functions to be exported");
+}
+
+auto SedsPlugin::getCurIvEditorCore() -> IVEditorCorePtr
+{
+    auto *const currentDocument = EditorManager::currentDocument();
+    auto *const currentIvDocument = static_cast<IVEditorDocument *>(currentDocument);
+    if (currentIvDocument == nullptr) {
+        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivFileNotSelected));
+        return nullptr;
+    }
+
+    return currentIvDocument->ivEditorCore();
+}
+
+void SedsPlugin::mergeIvModels(ivm::IVModel *const dstIvModel, ivm::IVModel *const srcIvModel)
+{
+    for (auto &dstIvObject : dstIvModel->visibleObjects()) {
+        for (auto &srcIvObject : srcIvModel->visibleObjects()) {
+            if (dstIvObject->isFunction() && srcIvObject->isFunction()) {
+                if (dstIvObject->title() == srcIvObject->title()) {
+                    MessageManager::write(
+                            GenMsg::msgInfo.arg(QString("%1, %2 - names are the same, Function will not be imported")
+                                                        .arg(dstIvObject->title())
+                                                        .arg(srcIvObject->title())));
+                    return;
+                } else {
+                    dstIvModel->addObject(srcIvObject);
+                }
+            }
+        }
+    }
 }
 
 } // namespace spctr

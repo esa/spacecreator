@@ -59,6 +59,7 @@ private:
     auto convertSedsToIv(conversion::Options options) -> void;
     auto ltdialogUpdateWithItemModel(ListTreeDialog &ltdialog, QStandardItemModel *model) -> void;
     auto getCurIvEditorCore() -> IVEditorCorePtr;
+    auto mergeIvModels(ivm::IVModel *dstIvModel, ivm::IVModel *srcIvModel) -> void;
 
     /** @brief  Internal registry */
     conversion::Registry m_registry;
