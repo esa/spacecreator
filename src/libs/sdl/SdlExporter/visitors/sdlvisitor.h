@@ -84,14 +84,32 @@ public:
         auto moveRightToHighWatermark() -> void;
     };
 
+    class IndentingStreamWriter
+    {
+    private:
+        QTextStream &m_stream;
+        std::vector<QString> m_indent;
+        auto getIndent() -> QString;
+
+    public:
+        IndentingStreamWriter(QTextStream &stream);
+
+        auto beginLine(const QString &line) -> void;
+        auto write(const QString &line) -> void;
+        auto endLine(const QString &line) -> void;
+        auto writeLine(const QString &line) -> void;
+        auto pushIndent(const QString &indent) -> void;
+        auto popIndent() -> void;
+    };
+
 public:
     /**
      * @brief   Constructor
      *
-     * @param   stream   output stream (where the serialized values are put)
+     * @param   writer   output stream writer
      * @param   layouter layouter for calculating element positions
      */
-    SdlVisitor(QTextStream &stream, Layouter &layouter);
+    SdlVisitor(IndentingStreamWriter &writer, Layouter &layouter);
 
     /**
      * @brief   Deleted copy constructor
@@ -205,12 +223,10 @@ public:
     auto visit(const ProcedureCall &procedureCall) -> void override;
 
 private:
-    auto dummyCif(const QString &cifType) -> QString;
-
     template<typename T>
     auto exportCollection(const T &collection) -> void;
 
-    QTextStream &m_stream;
+    IndentingStreamWriter &m_writer;
     Layouter &m_layouter;
 };
 

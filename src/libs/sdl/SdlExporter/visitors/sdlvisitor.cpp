@@ -31,6 +31,7 @@ using conversion::exporter::ExportException;
 namespace sdl {
 
 static const QString POSITION_STRING_PATTERN = "/* CIF %1 (%2, %3), (%4, %5) */";
+static const QString INDENT = "  ";
 
 // clang-format off
 
@@ -122,8 +123,49 @@ auto SdlVisitor::Layouter::getPositionString(const SdlVisitor::Layouter::Element
             QString::number(CIF_SIZES[element].second));
 }
 
-SdlVisitor::SdlVisitor(QTextStream &stream, Layouter &layouter)
+auto SdlVisitor::IndentingStreamWriter::getIndent() -> QString
+{
+    return std::accumulate(m_indent.begin(), m_indent.end(), QString(""),
+            [](const QString &accumulator, const QString &indent) { return accumulator + indent; });
+}
+
+SdlVisitor::IndentingStreamWriter::IndentingStreamWriter(QTextStream &stream)
     : m_stream(stream)
+{
+}
+
+auto SdlVisitor::IndentingStreamWriter::beginLine(const QString &line) -> void
+{
+    m_stream << getIndent() << line;
+}
+
+auto SdlVisitor::IndentingStreamWriter::write(const QString &line) -> void
+{
+    m_stream << line;
+}
+
+auto SdlVisitor::IndentingStreamWriter::endLine(const QString &line) -> void
+{
+    m_stream << line << "\n";
+}
+
+auto SdlVisitor::IndentingStreamWriter::writeLine(const QString &line) -> void
+{
+    m_stream << getIndent() << line << "\n";
+}
+
+auto SdlVisitor::IndentingStreamWriter::pushIndent(const QString &indent) -> void
+{
+    m_indent.push_back(indent);
+}
+
+auto SdlVisitor::IndentingStreamWriter::popIndent() -> void
+{
+    m_indent.pop_back();
+}
+
+SdlVisitor::SdlVisitor(IndentingStreamWriter &writer, Layouter &layouter)
+    : m_writer(writer)
     , m_layouter(layouter)
 {
 }
@@ -135,19 +177,22 @@ void SdlVisitor::visit(const Process &process)
     }
 
     m_layouter.pushPosition();
-    m_stream << m_layouter.getPositionString(Layouter::ElementType::Process) << "\n";
+    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Process));
     m_layouter.moveDown(Layouter::ElementType::Process);
-    m_stream << "process " << process.name() << ";\n";
+    m_writer.writeLine("process " + process.name() + ";");
+    m_writer.pushIndent(INDENT);
 
     if (!process.variables().empty() || !process.timerNames().empty()) {
-        m_stream << m_layouter.getPositionString(Layouter::ElementType::Text) << "\n";
+        m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
         m_layouter.moveDown(Layouter::ElementType::Text);
+        m_writer.pushIndent(INDENT);
         // Timers are just names, a dedicated visitor does not add any benfits
         for (const auto &timer : process.timerNames()) {
-            m_stream << "    Timer " << timer << ";\n";
+            m_writer.writeLine("Timer " + timer + ";");
         }
         exportCollection(process.variables());
-        m_stream << "    /* CIF ENDTEXT */\n";
+        m_writer.popIndent();
+        m_writer.writeLine("/* CIF ENDTEXT */");
     }
 
     if (!process.procedures().empty()) {
@@ -155,12 +200,13 @@ void SdlVisitor::visit(const Process &process)
     }
 
     if (process.startTransition() != nullptr) {
-        m_stream << m_layouter.getPositionString(Layouter::ElementType::Start)
-                 << "\n"
-                    "    START;\n";
+        m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Start));
+        m_writer.writeLine("START;");
+        m_writer.pushIndent(INDENT);
         m_layouter.moveDown(Layouter::ElementType::Start);
         exportCollection(process.startTransition()->actions());
         m_layouter.moveDown(Layouter::ElementType::State);
+        m_writer.popIndent();
     } else {
         throw ExportException("START transition not specified but required");
     }
@@ -173,7 +219,8 @@ void SdlVisitor::visit(const Process &process)
         throw ExportException("Process does not contain a State Machine");
     }
 
-    m_stream << "endprocess " << process.name() << ";";
+    m_writer.popIndent();
+    m_writer.writeLine("endprocess " + process.name() + ";");
     m_layouter.popPosition();
 }
 
@@ -184,10 +231,12 @@ void SdlVisitor::visit(const State &state)
     }
 
     m_layouter.pushPosition();
-    m_stream << m_layouter.getPositionString(Layouter::ElementType::State) << "\n";
-    m_stream << "    state " << state.name() << ";\n";
+    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::State));
+    m_writer.writeLine("state " + state.name() + ";");
+    m_writer.pushIndent(INDENT);
     exportCollection(state.inputs());
-    m_stream << "    endstate;\n";
+    m_writer.popIndent();
+    m_writer.writeLine("endstate;");
     m_layouter.popPosition();
     m_layouter.moveRightToHighWatermark();
     m_layouter.moveRight(Layouter::ElementType::State);
@@ -200,26 +249,27 @@ void SdlVisitor::visit(const Input &input)
     }
 
     m_layouter.pushPosition();
-    m_stream << m_layouter.getPositionString(Layouter::ElementType::Input) << "\n";
-    m_stream << "        input " << input.name();
+    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Input));
+    m_writer.beginLine("input " + input.name());
 
     const auto &inputParameters = input.parameters();
     const auto numOfInputParameters = inputParameters.size();
 
     if (numOfInputParameters > 0) {
-        m_stream << "(";
+        m_writer.write("(");
 
         QString parameters = std::accumulate(std::next(inputParameters.begin()), inputParameters.end(),
                 inputParameters[0]->declaration()->name(),
                 [](const auto &a, const auto &b) { return std::move(a) + ", " + b->declaration()->name(); });
-        m_stream << parameters;
-
-        m_stream << ")";
+        m_writer.write(parameters);
+        m_writer.write(")");
     }
-    m_stream << ";\n";
+    m_writer.endLine(";");
 
     if (input.transition() != nullptr) {
+        m_writer.pushIndent(INDENT);
         exportCollection(input.transition()->actions());
+        m_writer.popIndent();
     } else {
         throw ExportException("Transition in Input not specified but required");
     }
@@ -234,13 +284,13 @@ void SdlVisitor::visit(const Output &output)
     }
 
     m_layouter.moveDown(Layouter::ElementType::Output);
-    m_stream << m_layouter.getPositionString(Layouter::ElementType::Output) << "\n";
-    m_stream << "            output " << output.name();
+    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Output));
+    m_writer.beginLine("output " + output.name());
     const auto &outputParamRef = output.parameter();
     if (outputParamRef != nullptr) {
-        m_stream << QString("(%1)").arg(outputParamRef->declaration()->name());
+        m_writer.write(QString("(%1)").arg(outputParamRef->declaration()->name()));
     }
-    m_stream << ";\n";
+    m_writer.endLine(";");
 }
 
 void SdlVisitor::visit(const NextState &nextstate)
@@ -258,8 +308,8 @@ void SdlVisitor::visit(const NextState &nextstate)
     }
 
     m_layouter.moveDown(Layouter::ElementType::State);
-    m_stream << m_layouter.getPositionString(Layouter::ElementType::NextState) << "\n";
-    m_stream << "            NEXTSTATE " << nextStateName << ";\n";
+    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::NextState));
+    m_writer.writeLine("NEXTSTATE " + nextStateName + ";");
 }
 
 void SdlVisitor::visit(const Task &task)
@@ -269,8 +319,8 @@ void SdlVisitor::visit(const Task &task)
     }
 
     m_layouter.moveDown(Layouter::ElementType::Task);
-    m_stream << m_layouter.getPositionString(Layouter::ElementType::Task) << "\n";
-    m_stream << "            task " << task.content() << ";\n";
+    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Task));
+    m_writer.writeLine("task " + task.content() + ";");
 }
 
 void SdlVisitor::visit(const VariableDeclaration &declaration)
@@ -282,7 +332,7 @@ void SdlVisitor::visit(const VariableDeclaration &declaration)
         throw ExportException("Variable declaration shall have a specified type but it doesn't");
     }
 
-    m_stream << "    dcl " << declaration.name() << " " << declaration.type() << ";\n";
+    m_writer.writeLine("dcl " + declaration.name() + " " + declaration.type() + ";");
 }
 
 void SdlVisitor::visit(const Label &label)
@@ -292,21 +342,21 @@ void SdlVisitor::visit(const Label &label)
     }
 
     m_layouter.moveDown(Layouter::ElementType::Label);
-    m_stream << m_layouter.getPositionString(Layouter::ElementType::Label) << "\n";
-    m_stream << "        " << label.name() << ":\n";
+    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Label));
+    m_writer.writeLine(label.name() + ":");
 }
 
 void SdlVisitor::visit(const Join &join)
 {
     m_layouter.moveDown(Layouter::ElementType::Join);
-    m_stream << m_layouter.getPositionString(Layouter::ElementType::Join) << "\n";
-    m_stream << "            join ";
+    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Join));
+    m_writer.beginLine("join ");
     if (join.label() != nullptr) {
-        m_stream << join.label()->name();
+        m_writer.write(join.label()->name());
     } else {
         throw ExportException("Label is not set in Join, but Join without specified Label is ill-formed");
     }
-    m_stream << ";\n";
+    m_writer.endLine(";");
 }
 
 void SdlVisitor::visit(const Answer &answer)
@@ -319,13 +369,15 @@ void SdlVisitor::visit(const Answer &answer)
     }
 
     m_layouter.pushPosition();
-    m_stream << m_layouter.getPositionString(Layouter::ElementType::Answer) << "\n";
+    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Answer));
     if (answer.literal().value() == "else") {
-        m_stream << "                " << answer.literal().value() << ":\n";
+        m_writer.writeLine(answer.literal().value() + ":");
     } else {
-        m_stream << "                (" << answer.literal().value() << "):\n";
+        m_writer.writeLine("(" + answer.literal().value() + "):");
     }
+    m_writer.pushIndent(INDENT);
     exportCollection(answer.transition()->actions());
+    m_writer.popIndent();
     m_layouter.popPosition();
     m_layouter.moveRightToHighWatermark();
     m_layouter.moveRight(Layouter::ElementType::Answer);
@@ -343,14 +395,16 @@ void SdlVisitor::visit(const Decision &decision)
         throw ExportException("No Answers in Decision");
     }
 
-    m_stream << m_layouter.getPositionString(Layouter::ElementType::Decision) << "\n";
-    m_stream << "            decision " << decision.expression()->content() << ";\n";
+    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Decision));
+    m_writer.writeLine("decision " + decision.expression()->content() + ";");
     m_layouter.moveDown(Layouter::ElementType::Decision);
     m_layouter.pushPosition();
+    m_writer.pushIndent(INDENT);
     exportCollection(decision.answers());
+    m_writer.popIndent();
     m_layouter.popPosition();
     m_layouter.moveRightToHighWatermark();
-    m_stream << "            enddecision;\n";
+    m_writer.writeLine("enddecision;");
 }
 
 void SdlVisitor::visit(const Procedure &procedure)
@@ -361,9 +415,10 @@ void SdlVisitor::visit(const Procedure &procedure)
     }
     m_layouter.pushPosition();
     m_layouter.resetPosition();
-    m_stream << m_layouter.getPositionString(Layouter::ElementType::Procedure) << "\n";
+    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Procedure));
     m_layouter.moveDown(Layouter::ElementType::Procedure);
-    m_stream << "    procedure " << procedure.name() << ";\n";
+    m_writer.writeLine("procedure " + procedure.name() + ";");
+    m_writer.pushIndent(INDENT);
 
     auto &procedureParameters = procedure.parameters();
 
@@ -371,12 +426,12 @@ void SdlVisitor::visit(const Procedure &procedure)
     const bool returnVarPresent = procedure.returnVariableDeclaration() != nullptr;
 
     if (parametersPresent || returnVarPresent) {
-        m_stream << m_layouter.getPositionString(Layouter::ElementType::Text) << "\n";
+        m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
         m_layouter.moveDown(Layouter::ElementType::Text);
     }
 
     if (parametersPresent) {
-        m_stream << "        fpar\n";
+        m_writer.writeLine("fpar");
         QString fpars = QString("            %1 %2 %3")
                                 .arg(procedureParameters[0]->direction())
                                 .arg(procedureParameters[0]->name())
@@ -388,36 +443,36 @@ void SdlVisitor::visit(const Procedure &procedure)
                               .arg(it->get()->name())
                               .arg(it->get()->type());
         }
-        m_stream << fpars;
-        m_stream << ";\n";
+        m_writer.writeLine(fpars + ";");
     }
 
     if (returnVarPresent) {
-        m_stream << "        returns ";
-        m_stream << procedure.returnVariableDeclaration()->type();
-        m_stream << ";\n";
+        m_writer.writeLine("returns " + procedure.returnVariableDeclaration()->type() + ";");
 
         visit(*procedure.returnVariableDeclaration());
     }
 
     if (parametersPresent || returnVarPresent) {
-        m_stream << "        /* CIF ENDTEXT */\n";
+        m_writer.writeLine("/* CIF ENDTEXT */");
     }
 
-    m_stream << m_layouter.getPositionString(Layouter::ElementType::Start) << "\n";
+    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Start));
     m_layouter.moveDown(Layouter::ElementType::Start);
-    m_stream << "        START;\n";
+    m_writer.writeLine("START;");
     if (procedure.transition()->actions().empty()) {
         qWarning("Procedure is empty");
     } else {
+        m_writer.pushIndent(INDENT);
         exportCollection(procedure.transition()->actions());
+        m_writer.popIndent();
     }
-    m_stream << "        return ";
+    m_writer.beginLine("return ");
     if (procedure.returnVariableDeclaration() != nullptr) {
-        m_stream << procedure.returnVariableDeclaration()->name();
+        m_writer.write(procedure.returnVariableDeclaration()->name());
     }
-    m_stream << ";\n";
-    m_stream << "    endprocedure;\n";
+    m_writer.endLine(";");
+    m_writer.popIndent();
+    m_writer.writeLine("endprocedure;");
     m_layouter.popPosition();
     m_layouter.moveDown(Layouter::ElementType::Procedure);
 }
@@ -433,8 +488,8 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall)
     }
 
     m_layouter.moveDown(Layouter::ElementType::ProcedureCall);
-    m_stream << m_layouter.getPositionString(Layouter::ElementType::ProcedureCall) << "\n";
-    m_stream << "        call " << procedureCall.procedure()->name();
+    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::ProcedureCall));
+    m_writer.beginLine("call " + procedureCall.procedure()->name());
 
     const auto &procedureCallArgs = procedureCall.arguments();
     if (!procedureCallArgs.empty()) {
@@ -455,22 +510,16 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall)
                     return accumulator + ", " + getArgAsQString(argument);
                 });
 
-        m_stream << "(" << args << ")";
+        m_writer.write("(" + args + ")");
     }
-    m_stream << ";\n";
-}
-
-QString SdlVisitor::dummyCif(const QString &cifType)
-{
-    const static QString dummyCifTemplate = "/* CIF %1 (250, 150), (150, 75) */\n";
-    return dummyCifTemplate.arg(cifType);
+    m_writer.endLine(";");
 }
 
 template<typename T>
 void SdlVisitor::exportCollection(const T &collection)
 {
     for (const auto &item : collection) {
-        SdlVisitor visitor(m_stream, m_layouter);
+        SdlVisitor visitor(m_writer, m_layouter);
         item->accept(visitor);
     }
 }
