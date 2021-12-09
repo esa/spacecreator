@@ -44,11 +44,25 @@ namespace sdl {
 class SdlVisitor final : public Visitor
 {
 public:
+    /**
+     * @brief   Simple layouter for ensuring that SLD entities do not overlap and therefore do not crash OpenGEODE
+     */
     class Layouter
     {
     public:
+        /**
+         * @brief  Entity 2D position
+         */
         using Position = std::pair<uint32_t, uint32_t>;
+
+        /**
+         * @brief   Entity 2D size
+         */
         using Size = std::pair<uint32_t, uint32_t>;
+
+        /**
+         * @brief   SDL element type
+         */
         enum class ElementType
         {
             Text,
@@ -67,39 +81,123 @@ public:
             ProcedureCall,
         };
 
+        /**
+         * @brief   Constructor
+         */
+        Layouter();
+
+        /**
+         * @brief   Reset the current position and position watermarks
+         */
+        auto resetPosition() -> void;
+
+        /**
+         * @brief   Push current position onto the position stack
+         */
+        auto pushPosition() -> void;
+
+        /**
+         * @brief   Pop current position from the position stack
+         */
+        auto popPosition() -> void;
+
+        /**
+         * @brief   Move position right by the size of the element + proportional margin
+         *
+         * @param   element   element to use as size reference
+         */
+        auto moveRight(const ElementType element) -> void;
+
+        /**
+         * @brief   Move position down by the size of the element + proportional margin
+         *
+         * @param   element   element to use as size reference
+         */
+        auto moveDown(const ElementType element) -> void;
+
+        /**
+         * @brief   Get current position
+         *
+         * @return  current position
+         */
+        auto getPosition() -> const Position &;
+
+        /**
+         * @brief   Get CIF position string
+         *
+         * @param   element   element to source the name from
+         *
+         * @return  CIF position string
+         */
+        auto getPositionString(const ElementType element) -> QString;
+
+        /**
+         * @brief   Move position cursor to the rightmost encountered position
+         */
+        auto moveRightToHighWatermark() -> void;
+
     private:
         std::vector<Position> m_positions;
         uint32_t m_highWatermarkX;
-
-    public:
-        Layouter();
-
-        auto resetPosition() -> void;
-        auto pushPosition() -> void;
-        auto popPosition() -> void;
-        auto moveRight(const ElementType element) -> void;
-        auto moveDown(const ElementType element) -> void;
-        auto getPosition() -> const Position &;
-        auto getPositionString(const ElementType element) -> QString;
-        auto moveRightToHighWatermark() -> void;
     };
 
+    /**
+     * @brief   Stream writer which keeps track of intent
+     */
     class IndentingStreamWriter
     {
+    public:
+        /**
+         * @brief   Constructor
+         *
+         * @param   stream   stream to write to
+         */
+        IndentingStreamWriter(QTextStream &stream);
+
+        /**
+         * @brief   Start new line with indent and write text
+         *
+         * @param   line   text to write
+         */
+        auto beginLine(const QString &line) -> void;
+
+        /**
+         * @brief   Write text
+         *
+         * @param   line   text to write
+         */
+        auto write(const QString &line) -> void;
+
+        /**
+         * @brief   Write text and end line
+         *
+         * @param   line   text to write
+         */
+        auto endLine(const QString &line) -> void;
+
+        /**
+         * @brief   Write entire line - indent, text and newline
+         *
+         * @param   line   text to write
+         */
+        auto writeLine(const QString &line) -> void;
+
+        /**
+         * @brief   Push indent onto the top of the indent stack
+         *
+         * @param   indent   additional indent amount
+         */
+        auto pushIndent(const QString &indent) -> void;
+
+        /**
+         * @brief   Remove indent from the top of the indent stack
+         */
+        auto popIndent() -> void;
+
     private:
         QTextStream &m_stream;
         std::vector<QString> m_indent;
         auto getIndent() -> QString;
-
-    public:
-        IndentingStreamWriter(QTextStream &stream);
-
-        auto beginLine(const QString &line) -> void;
-        auto write(const QString &line) -> void;
-        auto endLine(const QString &line) -> void;
-        auto writeLine(const QString &line) -> void;
-        auto pushIndent(const QString &indent) -> void;
-        auto popIndent() -> void;
     };
 
 public:

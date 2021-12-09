@@ -35,8 +35,7 @@ static const QString INDENT = "    ";
 
 // clang-format off
 
-// const does not work with std::map accesses
-static std::map<SdlVisitor::Layouter::ElementType, SdlVisitor::SdlVisitor::Layouter::Size> CIF_SIZES = {
+static const std::map<SdlVisitor::Layouter::ElementType, SdlVisitor::SdlVisitor::Layouter::Size> CIF_SIZES = {
     { SdlVisitor::Layouter::ElementType::Text, std::make_pair<uint32_t, uint32_t>(400, 500) },
     { SdlVisitor::Layouter::ElementType::Start, std::make_pair<uint32_t, uint32_t>(200, 75) },
     { SdlVisitor::Layouter::ElementType::Answer, std::make_pair<uint32_t, uint32_t>(400, 50) },
@@ -53,7 +52,7 @@ static std::map<SdlVisitor::Layouter::ElementType, SdlVisitor::SdlVisitor::Layou
     { SdlVisitor::Layouter::ElementType::ProcedureCall, std::make_pair<uint32_t, uint32_t>(100, 50) }
 };
 
-static std::map<SdlVisitor::Layouter::ElementType, QString> CIF_NAMES = {
+static const std::map<SdlVisitor::Layouter::ElementType, QString> CIF_NAMES = {
     { SdlVisitor::Layouter::ElementType::Text, "Text" },
     { SdlVisitor::Layouter::ElementType::Start, "Start" },
     { SdlVisitor::Layouter::ElementType::Answer, "Answer" },
@@ -74,20 +73,20 @@ static std::map<SdlVisitor::Layouter::ElementType, QString> CIF_NAMES = {
 
 SdlVisitor::Layouter::Layouter()
 {
-    m_positions.push_back(std::make_pair(0, 0));
+    m_positions.emplace_back(0, 0);
     m_highWatermarkX = 0;
 }
 
 auto SdlVisitor::Layouter::resetPosition() -> void
 {
-    m_positions[m_positions.size() - 1].first = 0;
-    m_positions[m_positions.size() - 1].second = 0;
+    m_positions.back().first = 0;
+    m_positions.back().second = 0;
     m_highWatermarkX = 0;
 }
 
 auto SdlVisitor::Layouter::pushPosition() -> void
 {
-    auto current = getPosition();
+    const auto &current = getPosition();
     m_positions.push_back(current);
 }
 
@@ -98,12 +97,15 @@ auto SdlVisitor::Layouter::popPosition() -> void
 
 auto SdlVisitor::Layouter::moveRight(const ElementType element) -> void
 {
-    m_positions[m_positions.size() - 1].first += (CIF_SIZES[element].first * 3) / 2;
+    m_positions.back().first += (CIF_SIZES.at(element).first * 3) / 2;
+    m_highWatermarkX = std::max(m_highWatermarkX, m_positions.back().first);
 }
+
 auto SdlVisitor::Layouter::moveDown(const ElementType element) -> void
 {
-    m_positions[m_positions.size() - 1].second += (CIF_SIZES[element].second * 3) / 2;
+    m_positions.back().second += (CIF_SIZES.at(element).second * 3) / 2;
 }
+
 auto SdlVisitor::Layouter::getPosition() -> const Position &
 {
     return m_positions.back();
@@ -111,22 +113,21 @@ auto SdlVisitor::Layouter::getPosition() -> const Position &
 
 auto SdlVisitor::Layouter::moveRightToHighWatermark() -> void
 {
-    m_positions[m_positions.size() - 1].first = m_highWatermarkX;
+    m_positions.back().first = m_highWatermarkX;
 }
 
 auto SdlVisitor::Layouter::getPositionString(const SdlVisitor::Layouter::ElementType element) -> QString
 {
-    Q_UNUSED(element);
-    const auto position = getPosition();
-    return POSITION_STRING_PATTERN.arg(CIF_NAMES[element], QString::number(position.first),
-            QString::number(position.second), QString::number(CIF_SIZES[element].first),
-            QString::number(CIF_SIZES[element].second));
+    const auto &position = getPosition();
+    return POSITION_STRING_PATTERN.arg(CIF_NAMES.at(element), QString::number(position.first),
+            QString::number(position.second), QString::number(CIF_SIZES.at(element).first),
+            QString::number(CIF_SIZES.at(element).second));
 }
 
 auto SdlVisitor::IndentingStreamWriter::getIndent() -> QString
 {
     return std::accumulate(m_indent.begin(), m_indent.end(), QString(""),
-            [](const QString &accumulator, const QString &indent) { return accumulator + indent; });
+            [](QString &accumulator, const QString &indent) { return std::move(accumulator) + indent; });
 }
 
 SdlVisitor::IndentingStreamWriter::IndentingStreamWriter(QTextStream &stream)
