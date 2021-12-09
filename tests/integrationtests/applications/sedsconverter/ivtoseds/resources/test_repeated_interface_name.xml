@@ -1,0 +1,16 @@
+<InterfaceView asn1file="dataview-uniq.asn">
+<Function name="SporadicFunction" is_type="NO" language="SDL" default_implementation="default">
+    <Property name="Taste::coordinates" value="18200 42900 60100 65700"/>
+<Provided_Interface name="TheSameName" kind="Sporadic">
+    <Input_Parameter name="ButProvided" type="MyInteger" encoding="ACN"/>
+</Provided_Interface>
+<Required_Interface name="TheSameName" kind="Sporadic">
+    <Input_Parameter name="ButRequired" type="MyInteger" encoding="ACN"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+</InterfaceView>

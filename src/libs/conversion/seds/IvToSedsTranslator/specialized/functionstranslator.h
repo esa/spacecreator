@@ -19,9 +19,12 @@
 
 #pragma once
 
+#include <conversion/common/qstringhash.h>
+#include <ivcore/ivinterface.h>
+#include <unordered_map>
+
 namespace ivm {
 class IVFunction;
-class IVInterface;
 } // namespace ivm
 
 namespace seds::model {
@@ -71,6 +74,13 @@ private:
 
     static auto createInterface(const ivm::IVInterface *ivInterface, const ivm::IVFunction *ivFunction,
             ::seds::model::Component &sedsComponent) -> void;
+
+    static auto getInterfaceDeclarationName(const ivm::IVInterface *ivInterface, const ivm::IVFunction *ivFunction)
+            -> QString;
+    static auto getInterfaceName(const ivm::IVInterface *ivInterface) -> QString;
+    static auto getInterfaceCommandName(const ivm::IVInterface *ivInterface) -> QString;
+
+    static auto interfaceTypeToString(ivm::IVInterface::InterfaceType type) -> const QString &;
 };
 
 } // namespace conversion::seds::translator
