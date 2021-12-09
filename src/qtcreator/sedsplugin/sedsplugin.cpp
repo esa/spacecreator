@@ -273,14 +273,7 @@ auto SedsPlugin::importAsn1() -> void
 
 auto SedsPlugin::exportInterfaceView() -> void
 {
-    auto *const currentDocument = EditorManager::currentDocument();
-    auto *const currentIvDocument = static_cast<IVEditorDocument *>(currentDocument);
-    if (currentIvDocument == nullptr) {
-        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivFileNotSelected));
-        return;
-    }
-
-    const auto ivEditorCore = currentIvDocument->ivEditorCore();
+    const auto ivEditorCore = getCurIvEditorCore();
     const auto ivFunctionsNames = ivEditorCore->ivFunctionsNames();
     if (ivFunctionsNames.empty()) {
         MessageManager::write(GenMsg::msgError.arg(GenMsg::ivNoFunctionsInIv));
@@ -335,6 +328,18 @@ auto SedsPlugin::exportInterfaceView() -> void
         MessageManager::write(GenMsg::msgError.arg(GenMsg::ivNoFunctionsSelected));
         return;
     }
+}
+
+auto SedsPlugin::getCurIvEditorCore() -> IVEditorCorePtr
+{
+    auto *const currentDocument = EditorManager::currentDocument();
+    auto *const currentIvDocument = static_cast<IVEditorDocument *>(currentDocument);
+    if (currentIvDocument == nullptr) {
+        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivFileNotSelected));
+        return nullptr;
+    }
+
+    return currentIvDocument->ivEditorCore();
 }
 
 auto SedsPlugin::exportAsn1() -> void
