@@ -31,7 +31,7 @@ using conversion::exporter::ExportException;
 namespace sdl {
 
 static const QString POSITION_STRING_PATTERN = "/* CIF %1 (%2, %3), (%4, %5) */";
-static const QString INDENT = "  ";
+static const QString INDENT = "    ";
 
 // clang-format off
 
@@ -185,13 +185,11 @@ void SdlVisitor::visit(const Process &process)
     if (!process.variables().empty() || !process.timerNames().empty()) {
         m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
         m_layouter.moveDown(Layouter::ElementType::Text);
-        m_writer.pushIndent(INDENT);
         // Timers are just names, a dedicated visitor does not add any benfits
         for (const auto &timer : process.timerNames()) {
             m_writer.writeLine("Timer " + timer + ";");
         }
         exportCollection(process.variables());
-        m_writer.popIndent();
         m_writer.writeLine("/* CIF ENDTEXT */");
     }
 
