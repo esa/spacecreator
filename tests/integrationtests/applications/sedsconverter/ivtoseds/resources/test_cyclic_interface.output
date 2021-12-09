@@ -4,12 +4,12 @@
   <ComponentSet>
    <Component name="CyclicFunction">
     <ProvidedInterfaceSet>
-     <Interface type="CyclicFunctionCyclicInterface" name="CyclicInterface"/>
+     <Interface type="CyclicFunctionCyclicInterfacePi" name="CyclicInterfacePi"/>
     </ProvidedInterfaceSet>
     <DeclaredInterfaceSet>
-     <Interface name="CyclicFunctionCyclicInterface">
+     <Interface name="CyclicFunctionCyclicInterfacePi">
       <CommandSet>
-       <Command name="CyclicInterface" mode="async"/>
+       <Command name="CyclicInterfacePi" mode="async"/>
       </CommandSet>
      </Interface>
     </DeclaredInterfaceSet>

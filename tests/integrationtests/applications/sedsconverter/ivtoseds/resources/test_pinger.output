@@ -4,22 +4,22 @@
   <ComponentSet>
    <Component name="Pinger">
     <ProvidedInterfaceSet>
-     <Interface type="PingerPongInterface" name="PongInterface"/>
+     <Interface type="PingerPongInterfacePi" name="PongInterfacePi"/>
     </ProvidedInterfaceSet>
     <RequiredInterfaceSet>
-     <Interface type="PingerPingInterface" name="PingInterface"/>
+     <Interface type="PingerPingInterfaceRi" name="PingInterfaceRi"/>
     </RequiredInterfaceSet>
     <DeclaredInterfaceSet>
-     <Interface name="PingerPongInterface">
+     <Interface name="PingerPongInterfacePi">
       <CommandSet>
-       <Command name="PongInterface" mode="async">
+       <Command name="PongInterfacePi" mode="async">
         <Argument type="MyInteger" name="PongArg" mode="in"/>
        </Command>
       </CommandSet>
      </Interface>
-     <Interface name="PingerPingInterface">
+     <Interface name="PingerPingInterfaceRi">
       <CommandSet>
-       <Command name="PingInterface" mode="async">
+       <Command name="PingInterfaceRi" mode="async">
         <Argument type="MyInteger" name="PingArg" mode="in"/>
        </Command>
       </CommandSet>
@@ -28,22 +28,22 @@
    </Component>
    <Component name="Ponger">
     <ProvidedInterfaceSet>
-     <Interface type="PongerPingInterface" name="PingInterface"/>
+     <Interface type="PongerPingInterfacePi" name="PingInterfacePi"/>
     </ProvidedInterfaceSet>
     <RequiredInterfaceSet>
-     <Interface type="PongerPongInterface" name="PongInterface"/>
+     <Interface type="PongerPongInterfaceRi" name="PongInterfaceRi"/>
     </RequiredInterfaceSet>
     <DeclaredInterfaceSet>
-     <Interface name="PongerPingInterface">
+     <Interface name="PongerPingInterfacePi">
       <CommandSet>
-       <Command name="PingInterface" mode="async">
+       <Command name="PingInterfacePi" mode="async">
         <Argument type="MyInteger" name="PingArg" mode="in"/>
        </Command>
       </CommandSet>
      </Interface>
-     <Interface name="PongerPongInterface">
+     <Interface name="PongerPongInterfaceRi">
       <CommandSet>
-       <Command name="PongInterface" mode="async">
+       <Command name="PongInterfaceRi" mode="async">
         <Argument type="MyInteger" name="PongArg" mode="in"/>
        </Command>
       </CommandSet>

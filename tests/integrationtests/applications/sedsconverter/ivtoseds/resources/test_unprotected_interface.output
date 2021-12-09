@@ -4,12 +4,12 @@
   <ComponentSet>
    <Component name="UnprotectedFunction">
     <ProvidedInterfaceSet>
-     <Interface type="UnprotectedFunctionUnprotectedInterface" name="UnprotectedInterface"/>
+     <Interface type="UnprotectedFunctionUnprotectedInterfacePi" name="UnprotectedInterfacePi"/>
     </ProvidedInterfaceSet>
     <DeclaredInterfaceSet>
-     <Interface name="UnprotectedFunctionUnprotectedInterface">
+     <Interface name="UnprotectedFunctionUnprotectedInterfacePi">
       <CommandSet>
-       <Command name="UnprotectedInterface" mode="sync">
+       <Command name="UnprotectedInterfacePi" mode="sync">
         <Argument type="MyInteger" name="UnprotectedInterface" mode="in"/>
        </Command>
       </CommandSet>
