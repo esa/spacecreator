@@ -33,7 +33,7 @@ process Component;
                     NEXTSTATE StateA;
             enddecision;
     endstate;
-    /* CIF State (300, 1237), (200, 50) */
+    /* CIF State (1500, 1237), (200, 50) */
     state StateB;
     endstate;
 endprocess Component;

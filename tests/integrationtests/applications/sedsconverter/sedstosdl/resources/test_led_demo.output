@@ -45,22 +45,22 @@ process LedDemo;
             /* CIF NextState (0, 1462), (200, 50) */
             NEXTSTATE On;
     endstate;
-    /* CIF State (300, 1312), (200, 50) */
+    /* CIF State (600, 1312), (200, 50) */
     state On;
-        /* CIF Input (300, 1312), (200, 50) */
+        /* CIF Input (600, 1312), (200, 50) */
         input LedControl_Disable_Pi;
-            /* CIF ProcedureCall (300, 1387), (100, 50) */
+            /* CIF ProcedureCall (600, 1387), (100, 50) */
             call IssueCommand(disableValue);
-            /* CIF NextState (300, 1462), (200, 50) */
+            /* CIF NextState (600, 1462), (200, 50) */
             NEXTSTATE Off;
     endstate;
-    /* CIF State (300, 1312), (200, 50) */
+    /* CIF State (1200, 1312), (200, 50) */
     state Uninitialized;
-        /* CIF Input (300, 1312), (200, 50) */
+        /* CIF Input (1200, 1312), (200, 50) */
         input LedControl_Init_Pi;
-            /* CIF ProcedureCall (300, 1387), (100, 50) */
+            /* CIF ProcedureCall (1200, 1387), (100, 50) */
             call Initialize;
-            /* CIF NextState (300, 1462), (200, 50) */
+            /* CIF NextState (1200, 1462), (200, 50) */
             NEXTSTATE Off;
     endstate;
 endprocess LedDemo;

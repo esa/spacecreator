@@ -36,11 +36,11 @@ process Factorial;
                     /* CIF Join (600, 1387), (100, 50) */
                     join loop_start_1;
             enddecision;
-            /* CIF Label (0, 1237), (100, 50) */
+            /* CIF Label (1200, 1237), (100, 50) */
             loop_end_2:
-            /* CIF Task (0, 1312), (100, 50) */
+            /* CIF Task (1200, 1312), (100, 50) */
             task io_AsyncFactorial_CalculateFactorial_Ri.result := tmp;
-            /* CIF Output (0, 1387), (200, 50) */
+            /* CIF Output (1200, 1387), (200, 50) */
             output AsyncFactorial_CalculateFactorial_Ri(io_AsyncFactorial_CalculateFactorial_Ri);
         return ;
     endprocedure;
@@ -59,11 +59,11 @@ process Factorial;
             /* CIF NextState (0, 1462), (200, 50) */
             NEXTSTATE Idle;
     endstate;
-    /* CIF State (300, 1237), (200, 50) */
+    /* CIF State (1500, 1237), (200, 50) */
     state Off;
-        /* CIF Input (300, 1237), (200, 50) */
+        /* CIF Input (1500, 1237), (200, 50) */
         input AsyncFactorial_Init_Pi;
-            /* CIF NextState (300, 1312), (200, 50) */
+            /* CIF NextState (1500, 1312), (200, 50) */
             NEXTSTATE Idle;
     endstate;
 endprocess Factorial;

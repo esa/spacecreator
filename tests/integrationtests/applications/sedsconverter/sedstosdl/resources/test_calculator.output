@@ -41,11 +41,11 @@ process Calculator;
             /* CIF NextState (0, 1537), (200, 50) */
             NEXTSTATE Idle;
     endstate;
-    /* CIF State (300, 1237), (200, 50) */
+    /* CIF State (600, 1237), (200, 50) */
     state Off;
-        /* CIF Input (300, 1237), (200, 50) */
+        /* CIF Input (600, 1237), (200, 50) */
         input AsyncCalculator_Init_Pi;
-            /* CIF NextState (300, 1312), (200, 50) */
+            /* CIF NextState (600, 1312), (200, 50) */
             NEXTSTATE Idle;
     endstate;
 endprocess Calculator;

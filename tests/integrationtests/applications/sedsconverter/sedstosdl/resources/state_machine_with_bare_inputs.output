@@ -11,7 +11,7 @@ process Component;
             /* CIF NextState (0, 487), (200, 50) */
             NEXTSTATE StateB;
     endstate;
-    /* CIF State (300, 412), (200, 50) */
+    /* CIF State (600, 412), (200, 50) */
     state StateB;
     endstate;
 endprocess Component;

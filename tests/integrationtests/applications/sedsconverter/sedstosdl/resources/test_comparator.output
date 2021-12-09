@@ -34,7 +34,7 @@ process Comparator;
                     /* CIF Join (600, 1162), (100, 50) */
                     join condition_1;
             enddecision;
-            /* CIF Label (0, 1012), (100, 50) */
+            /* CIF Label (1200, 1012), (100, 50) */
             condition_1:
         return ;
     endprocedure;
@@ -55,11 +55,11 @@ process Comparator;
             /* CIF NextState (0, 1537), (200, 50) */
             NEXTSTATE Idle;
     endstate;
-    /* CIF State (300, 1237), (200, 50) */
+    /* CIF State (1500, 1237), (200, 50) */
     state Off;
-        /* CIF Input (300, 1237), (200, 50) */
+        /* CIF Input (1500, 1237), (200, 50) */
         input AsyncComparator_Init_Pi;
-            /* CIF NextState (300, 1312), (200, 50) */
+            /* CIF NextState (1500, 1312), (200, 50) */
             NEXTSTATE Idle;
     endstate;
 endprocess Comparator;
