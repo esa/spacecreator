@@ -220,6 +220,9 @@ auto SedsPlugin::importInterfaceView() -> void
 
 auto SedsPlugin::importSdl() -> void
 {
+    const QString tmpIvFilename = "tmp-interfaceview.xml";
+    const QString ivConfig = "config.xml";
+
     const QString inputFilePath =
             QFileDialog::getOpenFileName(nullptr, "Select EDS file to import SDL from...", QString(), tr("*.xml"));
     if (inputFilePath.isEmpty()) {
@@ -227,7 +230,29 @@ auto SedsPlugin::importSdl() -> void
         return;
     }
 
-    // TODO: implementation
+    conversion::Options options;
+    options.add(conversion::sdl::SdlOptions::filepathPrefix, "sdl-");
+    options.add(conversion::seds::SedsOptions::inputFilepath, inputFilePath);
+    options.add(conversion::iv::IvOptions::outputFilepath, tmpIvFilename);
+    options.add(conversion::iv::IvOptions::configFilepath, ivConfig);
+
+    const auto srcModelType = std::set<conversion::ModelType>({ conversion::ModelType::Seds });
+    const auto targetModelType = conversion::ModelType::Sdl;
+    const auto auxModelTypes =
+            std::set<conversion::ModelType>({ conversion::ModelType::InterfaceView, conversion::ModelType::Asn1 });
+
+    try {
+        Converter converter(m_registry, std::move(options));
+        converter.convert(srcModelType, targetModelType, auxModelTypes);
+    } catch (std::exception &ex) {
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
+    }
+
+    // merge imported IV with the current one
+
+    MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesImported));
+
+    QFile(tmpIvFilename).remove();
 }
 
 auto SedsPlugin::importAsn1() -> void
