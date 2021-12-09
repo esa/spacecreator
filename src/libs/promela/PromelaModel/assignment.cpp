@@ -17,27 +17,22 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
-
-#include "proctypeelement.h"
-#include "sequence.h"
-
-#include <QString>
-#include <cstddef>
-#include <list>
-#include <memory>
-#include <optional>
+#include "assignment.h"
 
 namespace promela::model {
-class InitProctype final
+Assignment::Assignment(VariableRef variableRef, Expression expression)
+    : m_variableRef(std::move(variableRef))
+    , m_expression(std::move(expression))
 {
-public:
-    InitProctype(Sequence sequence);
+}
 
-    const Sequence &getSequence() const noexcept;
-    void setSequence(Sequence sequence);
+const VariableRef &Assignment::getVariableRef() const noexcept
+{
+    return m_variableRef;
+}
 
-private:
-    Sequence m_sequence;
-};
+const Expression &Assignment::getExpression() const noexcept
+{
+    return m_expression;
+}
 }

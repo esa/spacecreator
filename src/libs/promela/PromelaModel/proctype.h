@@ -20,17 +20,19 @@
 #pragma once
 
 #include "proctypeelement.h"
+#include "sequence.h"
 
-#include <QList>
 #include <QString>
 #include <cstddef>
+#include <list>
+#include <memory>
 #include <optional>
 
 namespace promela::model {
 class Proctype final
 {
 public:
-    Proctype(QString name);
+    Proctype(QString name, Sequence sequence);
 
     const QString &getName() const noexcept;
     void setName(QString name);
@@ -43,14 +45,14 @@ public:
     size_t getPriority() const;
     void setPriority(size_t priority);
 
-    const QList<ProctypeElement> &getContent() const noexcept;
-    void appendElement(const ProctypeElement &element);
+    const Sequence &getSequence() const noexcept;
+    void setSequence(Sequence sequence);
 
 private:
     QString m_name;
     bool m_active;
     std::optional<size_t> m_instances;
     std::optional<size_t> m_priority;
-    QList<ProctypeElement> m_content;
+    Sequence m_sequence;
 };
 }

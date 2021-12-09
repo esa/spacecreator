@@ -19,25 +19,18 @@
 
 #pragma once
 
-#include "proctypeelement.h"
-#include "sequence.h"
-
-#include <QString>
-#include <cstddef>
 #include <list>
 #include <memory>
-#include <optional>
 
 namespace promela::model {
-class InitProctype final
+class ProctypeElement;
+class Sequence final
 {
 public:
-    InitProctype(Sequence sequence);
-
-    const Sequence &getSequence() const noexcept;
-    void setSequence(Sequence sequence);
+    const std::list<std::unique_ptr<ProctypeElement>> &getContent() const noexcept;
+    void appendElement(std::unique_ptr<ProctypeElement> element);
 
 private:
-    Sequence m_sequence;
+    std::list<std::unique_ptr<ProctypeElement>> m_content;
 };
 }

@@ -12,6 +12,7 @@ set(SOURCES
   visitors/proctypeelementvisitor.cpp
   visitors/expressionvisitor.cpp
   visitors/variablerefvisitor.cpp
+  visitors/sequencevisitor.cpp
   )
 set(INCLUDES
   promelaexporter.h
@@ -25,6 +26,7 @@ set(INCLUDES
   visitors/proctypeelementvisitor.h
   visitors/expressionvisitor.h
   visitors/variablerefvisitor.h
+  visitors/sequencevisitor.h
   )
 
 add_library(PromelaExporter STATIC)

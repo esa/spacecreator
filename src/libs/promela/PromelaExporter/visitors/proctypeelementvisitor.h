@@ -26,7 +26,7 @@ namespace promela::exporter {
 class ProctypeElementVisitor
 {
 public:
-    ProctypeElementVisitor(QTextStream &stream, QString indent);
+    ProctypeElementVisitor(QTextStream &stream, QString baseIndent, QString sequenceIndent, QString indent);
 
     void visit(const ::promela::model::ProctypeElement &element);
 
@@ -34,9 +34,13 @@ public:
     void operator()(const ::promela::model::ChannelRecv &channelRecv);
     void operator()(const ::promela::model::ChannelSend &channelSend);
     void operator()(const ::promela::model::Expression &expression);
+    void operator()(const ::promela::model::DoLoop &doLoop);
+    void operator()(const ::promela::model::Assignment &assignment);
 
 private:
     QTextStream &m_stream;
+    const QString m_baseIndent;
+    const QString m_sequenceIndent;
     const QString m_indent;
 };
 }

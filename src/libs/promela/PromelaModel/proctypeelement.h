@@ -19,9 +19,11 @@
 
 #pragma once
 
+#include "assignment.h"
 #include "channelrecv.h"
 #include "channelsend.h"
 #include "declaration.h"
+#include "doloop.h"
 #include "expression.h"
 
 #include <variant>
@@ -30,7 +32,7 @@ namespace promela::model {
 class ProctypeElement final
 {
 public:
-    using Value = std::variant<Declaration, ChannelSend, ChannelRecv, Expression>;
+    using Value = std::variant<Declaration, ChannelSend, ChannelRecv, Expression, DoLoop, Assignment>;
     ProctypeElement(Value value);
 
     const Value &getValue() const noexcept;

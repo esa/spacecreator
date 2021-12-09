@@ -17,27 +17,22 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
-
-#include "proctypeelement.h"
-#include "sequence.h"
-
 #include <QString>
-#include <cstddef>
-#include <list>
-#include <memory>
-#include <optional>
+#include <QTextStream>
+#include <promela/PromelaModel/sequence.h>
 
-namespace promela::model {
-class InitProctype final
+namespace promela::exporter {
+class SequenceVisitor final
 {
 public:
-    InitProctype(Sequence sequence);
+    SequenceVisitor(QTextStream &stream, QString baseIndent, QString sequenceIndent, QString indent);
 
-    const Sequence &getSequence() const noexcept;
-    void setSequence(Sequence sequence);
+    void visit(const ::promela::model::Sequence &sequence, bool useSequenceIndent = false);
 
 private:
-    Sequence m_sequence;
+    QTextStream &m_stream;
+    const QString m_baseIndent;
+    const QString m_sequenceIndent;
+    const QString m_indent;
 };
 }

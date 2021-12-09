@@ -22,6 +22,7 @@
 #include "initproctype.h"
 #include "namedmtype.h"
 #include "proctype.h"
+#include "proctypeelement.h"
 #include "typealias.h"
 #include "utype.h"
 #include "valuedefinition.h"
@@ -31,7 +32,9 @@
 #include <QString>
 #include <conversion/common/model.h>
 #include <conversion/common/modelproperties.h>
+#include <list>
 #include <map>
+#include <memory>
 
 namespace promela::model {
 /**
@@ -155,11 +158,11 @@ public:
      */
     const QList<Declaration> &getDeclarations() const noexcept;
 
-    void addProctype(const Proctype &proctype);
-    const QList<Proctype> &getProctypes() const noexcept;
+    void addProctype(std::unique_ptr<Proctype> proctype);
+    const std::list<std::unique_ptr<Proctype>> &getProctypes() const noexcept;
 
     bool hasInit() const noexcept;
-    const InitProctype &getInit() const;
+    const InitProctype &getInit() const noexcept;
     void setInit(InitProctype initProctype);
 
 private:
@@ -170,7 +173,7 @@ private:
     QList<TypeAlias> m_typeAliases;
     QList<ValueDefinition> m_valueDefinitions;
     QList<Declaration> m_declarations;
-    QList<Proctype> m_proctypes;
+    std::list<std::unique_ptr<Proctype>> m_proctypes;
     std::optional<InitProctype> m_initProctype;
 };
 }

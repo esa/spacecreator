@@ -21,18 +21,25 @@
 
 #include "declarationvisitor.h"
 #include "expressionvisitor.h"
+#include "sequencevisitor.h"
 #include "variablerefvisitor.h"
 
+using promela::model::Assignment;
 using promela::model::ChannelRecv;
 using promela::model::ChannelSend;
 using promela::model::Declaration;
+using promela::model::DoLoop;
 using promela::model::Expression;
 using promela::model::ProctypeElement;
+using promela::model::Sequence;
 using promela::model::VariableRef;
 
 namespace promela::exporter {
-ProctypeElementVisitor::ProctypeElementVisitor(QTextStream &stream, QString indent)
+ProctypeElementVisitor::ProctypeElementVisitor(
+        QTextStream &stream, QString baseIndent, QString sequenceIndent, QString indent)
     : m_stream(stream)
+    , m_baseIndent(std::move(baseIndent))
+    , m_sequenceIndent(std::move(sequenceIndent))
     , m_indent(std::move(indent))
 {
 }
@@ -92,6 +99,27 @@ void ProctypeElementVisitor::operator()(const Expression &expression)
     m_stream << m_indent;
     ExpressionVisitor visitor(m_stream);
     visitor.visit(expression);
+    m_stream << ";\n";
+}
+
+void ProctypeElementVisitor::operator()(const DoLoop &doLoop)
+{
+    m_stream << m_indent << "do\n";
+    for (const std::unique_ptr<Sequence> &sequence : doLoop.getSequences()) {
+        SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
+        visitor.visit(*sequence, true);
+    }
+    m_stream << m_indent << "od;\n";
+}
+
+void ProctypeElementVisitor::operator()(const ::promela::model::Assignment &assignment)
+{
+    m_stream << m_indent;
+    VariableRefVisitor variableRefVisitor(m_stream);
+    variableRefVisitor.visit(assignment.getVariableRef());
+    m_stream << " = ";
+    ExpressionVisitor expressionVisitor(m_stream);
+    expressionVisitor.visit(assignment.getExpression());
     m_stream << ";\n";
 }
 }

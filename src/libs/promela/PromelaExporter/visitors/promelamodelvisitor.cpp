@@ -21,6 +21,7 @@
 
 #include "declarationvisitor.h"
 #include "proctypeelementvisitor.h"
+#include "sequencevisitor.h"
 #include "typealiasvisitor.h"
 #include "utypevisitor.h"
 
@@ -33,15 +34,17 @@ using promela::model::NamedMtype;
 using promela::model::Proctype;
 using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
+using promela::model::Sequence;
 using promela::model::TypeAlias;
 using promela::model::Utype;
 using promela::model::ValueDefinition;
 
 namespace promela::exporter {
 
-PromelaModelVisitor::PromelaModelVisitor(QTextStream &stream, QString indent)
+PromelaModelVisitor::PromelaModelVisitor(QTextStream &stream, QString baseIndent, QString sequenceIndent)
     : m_stream(stream)
-    , m_indent(std::move(indent))
+    , m_baseIndent(std::move(baseIndent))
+    , m_sequenceIndent(std::move(sequenceIndent))
 {
 }
 
@@ -92,7 +95,7 @@ void PromelaModelVisitor::generateNamedMtypes(const std::map<QString, NamedMtype
 void PromelaModelVisitor::generateMtypeNames(const QVector<QString> &names)
 {
     for (const QString &value : names) {
-        m_stream << m_indent << value << ",\n";
+        m_stream << m_baseIndent << value << ",\n";
     }
 }
 
@@ -112,7 +115,7 @@ void PromelaModelVisitor::generateValueDefinitions(const QList<ValueDefinition> 
 void PromelaModelVisitor::generateUtypes(const QList<Utype> &utypes)
 {
     for (const Utype &utype : utypes) {
-        UtypeVisitor visitor(m_stream, m_indent);
+        UtypeVisitor visitor(m_stream, m_baseIndent);
         visitor.visit(utype);
     }
 }
@@ -125,26 +128,22 @@ void PromelaModelVisitor::generateDeclarations(const QList<Declaration> &values)
     }
 }
 
-void PromelaModelVisitor::generateProctypes(const QList<Proctype> &proctypes)
+void PromelaModelVisitor::generateProctypes(const std::list<std::unique_ptr<Proctype>> &proctypes)
 {
-    for (const Proctype &proctype : proctypes) {
-        if (proctype.isActive()) {
+    for (const std::unique_ptr<Proctype> &proctype : proctypes) {
+        if (proctype->isActive()) {
             m_stream << "active ";
-            if (proctype.getInstancesCount() > 1) {
-                m_stream << "[" << proctype.getInstancesCount() << "] ";
+            if (proctype->getInstancesCount() > 1) {
+                m_stream << "[" << proctype->getInstancesCount() << "] ";
             }
         }
-        m_stream << "proctype " << proctype.getName() << "()";
-        if (proctype.hasPriority()) {
-            m_stream << " priority " << proctype.getPriority();
+        m_stream << "proctype " << proctype->getName() << "()";
+        if (proctype->hasPriority()) {
+            m_stream << " priority " << proctype->getPriority();
         }
         m_stream << "\n";
         m_stream << "{\n";
-        ProctypeElementVisitor visitor(m_stream, m_indent);
-        for (const ProctypeElement &element : proctype.getContent()) {
-            visitor.visit(element);
-        }
-
+        generateSequence(proctype->getSequence());
         m_stream << "}\n";
     }
 }
@@ -152,11 +151,13 @@ void PromelaModelVisitor::generateInitProctype(const InitProctype &init)
 {
     m_stream << "init\n";
     m_stream << "{\n";
-    ProctypeElementVisitor visitor(m_stream, m_indent);
-    for (const ProctypeElement &element : init.getContent()) {
-        visitor.visit(element);
-    }
+    generateSequence(init.getSequence());
     m_stream << "}\n";
 }
 
+void PromelaModelVisitor::generateSequence(const Sequence &sequence)
+{
+    SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, "");
+    visitor.visit(sequence);
+}
 }

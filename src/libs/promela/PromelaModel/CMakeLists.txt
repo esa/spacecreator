@@ -20,6 +20,9 @@ set(SOURCES
   proctypeelement.cpp
   constant.cpp
   variableref.cpp
+  doloop.cpp
+  sequence.cpp
+  assignment.cpp
   )
 set(INCLUDES
   arraytype.h
@@ -43,6 +46,9 @@ set(INCLUDES
   proctypeelement.h
   constant.h
   variableref.h
+  doloop.h
+  sequence.h
+  assignment.h
   )
 
 add_library(PromelaModel STATIC)

@@ -20,15 +20,18 @@
 #include "initproctype.h"
 
 namespace promela::model {
-InitProctype::InitProctype() {}
-
-const QList<ProctypeElement> &InitProctype::getContent() const noexcept
+InitProctype::InitProctype(Sequence sequence)
+    : m_sequence(std::move(sequence))
 {
-    return m_content;
 }
 
-void InitProctype::appendElement(const ProctypeElement &element)
+const Sequence &InitProctype::getSequence() const noexcept
 {
-    m_content.append(element);
+    return m_sequence;
+}
+
+void InitProctype::setSequence(Sequence sequence)
+{
+    m_sequence = std::move(sequence);
 }
 }

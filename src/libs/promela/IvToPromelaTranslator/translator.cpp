@@ -42,6 +42,7 @@ using promela::model::InitProctype;
 using promela::model::Proctype;
 using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
+using promela::model::Sequence;
 using promela::model::Utype;
 using promela::model::UtypeRef;
 using promela::model::VariableRef;
@@ -109,15 +110,18 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
                 promelaModel->addDeclaration(declaration);
             }
 
-            Proctype proctype(QString("%1_%2").arg(functionName).arg(interfaceName));
+            Sequence sequence;
+            std::unique_ptr<ProctypeElement> waitForInit =
+                    std::make_unique<ProctypeElement>(Expression(VariableRef("inited")));
+            sequence.appendElement(std::move(waitForInit));
 
-            proctype.setActive(1);
-            proctype.setPriority(priority);
+            QString proctypeName = QString("%1_%2").arg(functionName).arg(interfaceName);
+            std::unique_ptr<Proctype> proctype = std::make_unique<Proctype>(proctypeName, std::move(sequence));
 
-            ProctypeElement waitForInit(Expression(VariableRef("inited")));
-            proctype.appendElement(waitForInit);
+            proctype->setActive(1);
+            proctype->setPriority(priority);
 
-            promelaModel->addProctype(proctype);
+            promelaModel->addProctype(std::move(proctype));
         }
     }
 
@@ -130,10 +134,11 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     }
 
     promelaModel->addUtype(systemState);
-    InitProctype init;
-    ProctypeElement waitForInit(Expression(VariableRef("inited")));
-    init.appendElement(waitForInit);
-    promelaModel->setInit(init);
+    Sequence sequence;
+    std::unique_ptr<ProctypeElement> waitForInit = std::make_unique<ProctypeElement>(Expression(VariableRef("inited")));
+    sequence.appendElement(std::move(waitForInit));
+    InitProctype init(std::move(sequence));
+    promelaModel->setInit(std::move(init));
 
     std::vector<std::unique_ptr<Model>> result;
     result.push_back(std::move(promelaModel));

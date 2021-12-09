@@ -17,27 +17,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
-
-#include "proctypeelement.h"
 #include "sequence.h"
 
-#include <QString>
-#include <cstddef>
-#include <list>
-#include <memory>
-#include <optional>
+#include "proctypeelement.h"
 
 namespace promela::model {
-class InitProctype final
+const std::list<std::unique_ptr<ProctypeElement>> &Sequence::getContent() const noexcept
 {
-public:
-    InitProctype(Sequence sequence);
+    return m_content;
+}
 
-    const Sequence &getSequence() const noexcept;
-    void setSequence(Sequence sequence);
-
-private:
-    Sequence m_sequence;
-};
+void Sequence::appendElement(std::unique_ptr<ProctypeElement> element)
+{
+    m_content.push_back(std::move(element));
+}
 }

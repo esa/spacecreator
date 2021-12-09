@@ -17,27 +17,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "doloop.h"
 
 #include "proctypeelement.h"
-#include "sequence.h"
-
-#include <QString>
-#include <cstddef>
-#include <list>
-#include <memory>
-#include <optional>
 
 namespace promela::model {
-class InitProctype final
+DoLoop::DoLoop() {}
+
+const std::list<std::unique_ptr<Sequence>> &DoLoop::getSequences() const noexcept
 {
-public:
-    InitProctype(Sequence sequence);
+    return m_sequences;
+}
 
-    const Sequence &getSequence() const noexcept;
-    void setSequence(Sequence sequence);
+void DoLoop::setSequences(std::list<std::unique_ptr<Sequence>> sequences)
+{
+    m_sequences = std::move(sequences);
+}
 
-private:
-    Sequence m_sequence;
-};
+void DoLoop::appendSequence(std::unique_ptr<Sequence> element)
+{
+    m_sequences.push_back(std::move(element));
+}
 }

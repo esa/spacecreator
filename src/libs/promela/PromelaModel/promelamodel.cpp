@@ -95,12 +95,13 @@ const QList<Declaration> &PromelaModel::getDeclarations() const noexcept
 {
     return m_declarations;
 }
-void PromelaModel::addProctype(const Proctype &proctype)
+
+void PromelaModel::addProctype(std::unique_ptr<Proctype> proctype)
 {
-    m_proctypes.append(proctype);
+    m_proctypes.push_back(std::move(proctype));
 }
 
-const QList<Proctype> &PromelaModel::getProctypes() const noexcept
+const std::list<std::unique_ptr<Proctype>> &PromelaModel::getProctypes() const noexcept
 {
     return m_proctypes;
 }
@@ -110,7 +111,7 @@ bool PromelaModel::hasInit() const noexcept
     return m_initProctype.has_value();
 }
 
-const InitProctype &PromelaModel::getInit() const
+const InitProctype &PromelaModel::getInit() const noexcept
 {
     return m_initProctype.value();
 }

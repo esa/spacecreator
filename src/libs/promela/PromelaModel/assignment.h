@@ -19,25 +19,20 @@
 
 #pragma once
 
-#include "proctypeelement.h"
-#include "sequence.h"
-
-#include <QString>
-#include <cstddef>
-#include <list>
-#include <memory>
-#include <optional>
+#include "expression.h"
+#include "variableref.h"
 
 namespace promela::model {
-class InitProctype final
+class Assignment final
 {
 public:
-    InitProctype(Sequence sequence);
+    Assignment(VariableRef variableRef, Expression expression);
 
-    const Sequence &getSequence() const noexcept;
-    void setSequence(Sequence sequence);
+    const VariableRef &getVariableRef() const noexcept;
+    const Expression &getExpression() const noexcept;
 
 private:
-    Sequence m_sequence;
+    VariableRef m_variableRef;
+    Expression m_expression;
 };
 }

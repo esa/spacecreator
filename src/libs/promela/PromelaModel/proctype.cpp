@@ -20,9 +20,10 @@
 #include "proctype.h"
 
 namespace promela::model {
-Proctype::Proctype(QString name)
+Proctype::Proctype(QString name, Sequence sequence)
     : m_name(std::move(name))
     , m_active(false)
+    , m_sequence(std::move(sequence))
 {
 }
 
@@ -67,13 +68,13 @@ size_t Proctype::getPriority() const
     return m_priority.value();
 }
 
-const QList<ProctypeElement> &Proctype::getContent() const noexcept
+const Sequence &Proctype::getSequence() const noexcept
 {
-    return m_content;
+    return m_sequence;
 }
 
-void Proctype::appendElement(const ProctypeElement &element)
+void Proctype::setSequence(Sequence sequence)
 {
-    m_content.append(element);
+    m_sequence = std::move(sequence);
 }
 }
