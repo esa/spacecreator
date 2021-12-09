@@ -214,6 +214,8 @@ auto SedsPlugin::importInterfaceView() -> void
     loadAndMergeIvModelIntoCurrent(ivConfig, tmpIvFilename);
 
     MessageManager::write(GenMsg::msgInfo.arg(GenMsg::functionsImported));
+
+    QFile(tmpIvFilename).remove();
 }
 
 auto SedsPlugin::importSdl() -> void
