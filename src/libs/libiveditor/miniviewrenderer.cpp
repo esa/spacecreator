@@ -59,7 +59,7 @@ MiniViewRenderer::MiniViewRenderer(const IVFunctionGraphicsItem *item)
 {
 }
 
-MiniViewRenderer::~MiniViewRenderer() { }
+MiniViewRenderer::~MiniViewRenderer() {}
 
 void MiniViewRenderer::render(QPainter *painter)
 {

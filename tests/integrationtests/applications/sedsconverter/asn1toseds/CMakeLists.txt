@@ -9,8 +9,8 @@ target_sources(${TEST_NAME}
 target_include_directories(${TEST_NAME}
     PRIVATE     ${CMAKE_SOURCE_DIR}/tests)
 target_link_libraries(${TEST_NAME}
-    PRIVATE     Qt5::Core
-                Qt5::Test)
+    PRIVATE     Qt${QT_VERSION_MAJOR}::Core
+                Qt${QT_VERSION_MAJOR}::Test)
 
 add_format_target(${TEST_NAME})
 

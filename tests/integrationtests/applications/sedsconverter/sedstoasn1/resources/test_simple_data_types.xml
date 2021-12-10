@@ -2,14 +2,28 @@
 <PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
   <Package name="com/n7space/SimpleDataTypes">
     <DataTypeSet>
-      <IntegerDataType name="UnsignedInteger8">
+      <IntegerDataType name="UnsignedInteger8Little">
         <LongDescription>A simple 8-bit unsigned integer</LongDescription>
-        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" byteOrder="littleEndian" />
         <Range>
           <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
         </Range>
       </IntegerDataType>
-      <IntegerDataType name="SignedInteger16">
+      <IntegerDataType name="UnsignedInteger8Big">
+        <LongDescription>A simple 8-bit unsigned integer</LongDescription>
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" byteOrder="bigEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="SignedInteger16Little">
+        <LongDescription>A simple 16-bit signed integer</LongDescription>
+        <IntegerDataEncoding encoding="twosComplement" byteOrder="littleEndian" sizeInBits="16" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="-32768" max="32767" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="SignedInteger16Big">
         <LongDescription>A simple 16-bit signed integer</LongDescription>
         <IntegerDataEncoding encoding="twosComplement" byteOrder="bigEndian" sizeInBits="16" />
         <Range>

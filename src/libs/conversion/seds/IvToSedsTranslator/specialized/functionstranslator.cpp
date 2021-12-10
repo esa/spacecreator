@@ -23,7 +23,6 @@
 
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivfunction.h>
-#include <ivcore/ivinterface.h>
 #include <seds/SedsModel/package/package.h>
 
 using conversion::translator::TranslationException;
@@ -55,8 +54,10 @@ void FunctionsTranslator::translateInterface(
 void FunctionsTranslator::createInterfaceDeclaration(
         const ivm::IVInterface *ivInterface, const ivm::IVFunction *ivFunction, ::seds::model::Component &sedsComponent)
 {
+    auto sedsInterfaceDeclarationName = getInterfaceDeclarationName(ivInterface, ivFunction);
+
     ::seds::model::InterfaceDeclaration sedsInterfaceDeclaration;
-    sedsInterfaceDeclaration.setName(QString("%1%2").arg(ivFunction->title()).arg(ivInterface->title()));
+    sedsInterfaceDeclaration.setName(std::move(sedsInterfaceDeclarationName));
 
     createInterfaceCommand(ivInterface, sedsInterfaceDeclaration);
 
@@ -66,8 +67,10 @@ void FunctionsTranslator::createInterfaceDeclaration(
 void FunctionsTranslator::createInterfaceCommand(
         const ivm::IVInterface *ivInterface, ::seds::model::InterfaceDeclaration &sedsInterfaceDeclaration)
 {
+    auto sedsInterfaceCommandName = getInterfaceCommandName(ivInterface);
+
     ::seds::model::InterfaceCommand sedsInterfaceCommand;
-    sedsInterfaceCommand.setName(ivInterface->title());
+    sedsInterfaceCommand.setName(std::move(sedsInterfaceCommandName));
 
     switch (ivInterface->kind()) {
     case ivm::IVInterface::OperationKind::Protected:
@@ -115,9 +118,12 @@ void FunctionsTranslator::createInterfaceArgument(
 void FunctionsTranslator::createInterface(
         const ivm::IVInterface *ivInterface, const ivm::IVFunction *ivFunction, ::seds::model::Component &sedsComponent)
 {
+    auto sedsInterfaceName = getInterfaceName(ivInterface);
+    auto sedsInterfaceDeclarationName = getInterfaceDeclarationName(ivInterface, ivFunction);
+
     ::seds::model::Interface sedsInterface;
-    sedsInterface.setName(ivInterface->title());
-    sedsInterface.setType(QString("%1%2").arg(ivFunction->title()).arg(ivInterface->title()));
+    sedsInterface.setName(std::move(sedsInterfaceName));
+    sedsInterface.setType(std::move(sedsInterfaceDeclarationName));
 
     switch (ivInterface->direction()) {
     case ivm::IVInterface::InterfaceType::Provided:
@@ -131,6 +137,46 @@ void FunctionsTranslator::createInterface(
         break;
     default:
         throw TranslationException("Unhandled InterfaceType value");
+        break;
+    }
+}
+
+QString FunctionsTranslator::getInterfaceDeclarationName(
+        const ivm::IVInterface *ivInterface, const ivm::IVFunction *ivFunction)
+{
+    return QString("%1%2%3")
+            .arg(ivFunction->title())
+            .arg(ivInterface->title())
+            .arg(interfaceTypeToString(ivInterface->direction()));
+}
+
+QString FunctionsTranslator::getInterfaceName(const ivm::IVInterface *ivInterface)
+{
+    return QString("%1%2").arg(ivInterface->title()).arg(interfaceTypeToString(ivInterface->direction()));
+}
+
+QString FunctionsTranslator::getInterfaceCommandName(const ivm::IVInterface *ivInterface)
+{
+    return QString("%1%2").arg(ivInterface->title()).arg(interfaceTypeToString(ivInterface->direction()));
+}
+
+const QString &FunctionsTranslator::interfaceTypeToString(ivm::IVInterface::InterfaceType type)
+{
+    switch (type) {
+    case ivm::IVInterface::InterfaceType::Required: {
+        static QString name = "Ri";
+        return name;
+    }
+    case ivm::IVInterface::InterfaceType::Provided: {
+        static QString name = "Pi";
+        return name;
+    }
+    case ivm::IVInterface::InterfaceType::Grouped: {
+        static QString name = "Grp";
+        return name;
+    }
+    default:
+        throw UnhandledValueException("ivm::InterfaceType");
         break;
     }
 }

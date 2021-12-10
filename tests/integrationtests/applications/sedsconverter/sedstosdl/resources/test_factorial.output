@@ -1,69 +1,69 @@
-/* CIF PROCESS (250, 150), (150, 75) */
+/* CIF Process (0, 0), (800, 100) */
 process Factorial;
-    /* CIF TEXT (16, 317), (267, 140) */
+    /* CIF Text (0, 150), (400, 500) */
     dcl x Number;
     dcl tmp Number;
     dcl iterator Number;
     dcl io_AsyncFactorial_CalculateFactorial_Pi CalculateFactorial_Type;
     dcl io_AsyncFactorial_CalculateFactorial_Ri CalculateFactorial_Type1;
     /* CIF ENDTEXT */
-    /* CIF procedure (250, 150), (150, 75) */
+    /* CIF Procedure (0, 900), (800, 50) */
     procedure CalculateFactorial;
-        /* CIF TEXT (250, 150), (150, 75) */
+        /* CIF Text (0, 0), (400, 500) */
         fpar
             in x Number;
         /* CIF ENDTEXT */
-        /* CIF START (250, 150), (150, 75) */
+        /* CIF Start (0, 750), (200, 75) */
         START;
-            /* CIF task (250, 150), (150, 75) */
+            /* CIF Task (0, 937), (100, 50) */
             task tmp := 1;
-            /* CIF task (250, 150), (150, 75) */
+            /* CIF Task (0, 1012), (100, 50) */
             task iterator := 1;
-        /* CIF label (250, 150), (150, 75) */
-        loop_start_1:
-            /* CIF decision (388, 241), (115, 50) */
+            /* CIF Label (0, 1087), (100, 50) */
+            loop_start_1:
+            /* CIF Decision (0, 1087), (400, 50) */
             decision iterator <= x;
-                /* CIF ANSWER (585, 323), (77, 24) */
+                /* CIF Answer (0, 1162), (400, 50) */
                 (False):
-            /* CIF join (250, 150), (150, 75) */
-            join loop_end_2;
-                /* CIF ANSWER (585, 323), (77, 24) */
+                    /* CIF Join (0, 1237), (100, 50) */
+                    join loop_end_2;
+                /* CIF Answer (600, 1162), (400, 50) */
                 (True):
-            /* CIF task (250, 150), (150, 75) */
-            task tmp := tmp * iterator;
-            /* CIF task (250, 150), (150, 75) */
-            task iterator := iterator + 1;
-            /* CIF join (250, 150), (150, 75) */
-            join loop_start_1;
+                    /* CIF Task (600, 1237), (100, 50) */
+                    task tmp := tmp * iterator;
+                    /* CIF Task (600, 1312), (100, 50) */
+                    task iterator := iterator + 1;
+                    /* CIF Join (600, 1387), (100, 50) */
+                    join loop_start_1;
             enddecision;
-        /* CIF label (250, 150), (150, 75) */
-        loop_end_2:
-            /* CIF task (250, 150), (150, 75) */
+            /* CIF Label (1200, 1237), (100, 50) */
+            loop_end_2:
+            /* CIF Task (1200, 1312), (100, 50) */
             task io_AsyncFactorial_CalculateFactorial_Ri.result := tmp;
-            /* CIF output (250, 150), (150, 75) */
+            /* CIF Output (1200, 1387), (200, 50) */
             output AsyncFactorial_CalculateFactorial_Ri(io_AsyncFactorial_CalculateFactorial_Ri);
         return ;
     endprocedure;
-    /* CIF START (9, 285), (70, 35) */
+    /* CIF Start (0, 975), (200, 75) */
     START;
-            /* CIF NEXTSTATE (250, 150), (150, 75) */
-            NEXTSTATE Off;
-    /* CIF state (250, 150), (150, 75) */
+        /* CIF NextState (0, 1162), (200, 50) */
+        NEXTSTATE Off;
+    /* CIF State (0, 1237), (200, 50) */
     state Idle;
-        /* CIF input (250, 150), (150, 75) */
+        /* CIF Input (0, 1237), (200, 50) */
         input AsyncFactorial_CalculateFactorial_Pi(io_AsyncFactorial_CalculateFactorial_Pi);
-            /* CIF task (250, 150), (150, 75) */
+            /* CIF Task (0, 1312), (100, 50) */
             task x := io_AsyncFactorial_CalculateFactorial_Pi.x;
-        /* CIF PROCEDURECALL (250, 150), (150, 75) */
-        call CalculateFactorial(x);
-            /* CIF NEXTSTATE (250, 150), (150, 75) */
+            /* CIF ProcedureCall (0, 1387), (100, 50) */
+            call CalculateFactorial(x);
+            /* CIF NextState (0, 1462), (200, 50) */
             NEXTSTATE Idle;
     endstate;
-    /* CIF state (250, 150), (150, 75) */
+    /* CIF State (1500, 1237), (200, 50) */
     state Off;
-        /* CIF input (250, 150), (150, 75) */
+        /* CIF Input (1500, 1237), (200, 50) */
         input AsyncFactorial_Init_Pi;
-            /* CIF NEXTSTATE (250, 150), (150, 75) */
+            /* CIF NextState (1500, 1312), (200, 50) */
             NEXTSTATE Idle;
     endstate;
 endprocess Factorial;

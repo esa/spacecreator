@@ -129,7 +129,7 @@ QVariantList IVObject::generateProperties(bool isProperty) const
     QVariantList result;
     EntityAttributes attributes = entityAttributes();
     for (auto it = attributes.cbegin(); it != attributes.cend(); ++it) {
-        if (it.value().isProperty() == isProperty) {
+        if (it.value().isExportable() && it.value().isProperty() == isProperty) {
             result << QVariant::fromValue(shared::ExportableProperty(it.key(), it.value().value()));
         }
     }

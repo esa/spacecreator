@@ -1,39 +1,39 @@
-/* CIF PROCESS (250, 150), (150, 75) */
+/* CIF Process (0, 0), (800, 100) */
 process Component;
-    /* CIF TEXT (16, 317), (267, 140) */
+    /* CIF Text (0, 150), (400, 500) */
     dcl x MyType;
     /* CIF ENDTEXT */
-    /* CIF procedure (250, 150), (150, 75) */
+    /* CIF Procedure (0, 900), (800, 50) */
     procedure myActivity;
-        /* CIF START (250, 150), (150, 75) */
+        /* CIF Start (0, 0), (200, 75) */
         START;
-            /* CIF task (250, 150), (150, 75) */
+            /* CIF Task (0, 187), (100, 50) */
             task x := 100;
         return ;
     endprocedure;
-    /* CIF START (9, 285), (70, 35) */
+    /* CIF Start (0, 975), (200, 75) */
     START;
-            /* CIF NEXTSTATE (250, 150), (150, 75) */
-            NEXTSTATE StateA;
-    /* CIF state (250, 150), (150, 75) */
+        /* CIF NextState (0, 1162), (200, 50) */
+        NEXTSTATE StateA;
+    /* CIF State (0, 1237), (200, 50) */
     state StateA;
-        /* CIF input (250, 150), (150, 75) */
+        /* CIF Input (0, 1237), (200, 50) */
         input If1_Cmd1_Pi;
-            /* CIF decision (388, 241), (115, 50) */
+            /* CIF Decision (0, 1237), (400, 50) */
             decision ((x < -100) or (x > 100)) and (x >= 500);
-                /* CIF ANSWER (585, 323), (77, 24) */
+                /* CIF Answer (0, 1312), (400, 50) */
                 (True):
-        /* CIF PROCEDURECALL (250, 150), (150, 75) */
-        call myActivity;
-            /* CIF NEXTSTATE (250, 150), (150, 75) */
-            NEXTSTATE StateB;
-                /* CIF ANSWER (585, 323), (77, 24) */
+                    /* CIF ProcedureCall (0, 1387), (100, 50) */
+                    call myActivity;
+                    /* CIF NextState (0, 1462), (200, 50) */
+                    NEXTSTATE StateB;
+                /* CIF Answer (600, 1312), (400, 50) */
                 (False):
-            /* CIF NEXTSTATE (250, 150), (150, 75) */
-            NEXTSTATE StateA;
+                    /* CIF NextState (600, 1387), (200, 50) */
+                    NEXTSTATE StateA;
             enddecision;
     endstate;
-    /* CIF state (250, 150), (150, 75) */
+    /* CIF State (1500, 1237), (200, 50) */
     state StateB;
     endstate;
 endprocess Component;

@@ -4,12 +4,12 @@
   <ComponentSet>
    <Component name="SporadicFunction">
     <ProvidedInterfaceSet>
-     <Interface type="SporadicFunctionSporadicInterface" name="SporadicInterface"/>
+     <Interface type="SporadicFunctionSporadicInterfacePi" name="SporadicInterfacePi"/>
     </ProvidedInterfaceSet>
     <DeclaredInterfaceSet>
-     <Interface name="SporadicFunctionSporadicInterface">
+     <Interface name="SporadicFunctionSporadicInterfacePi">
       <CommandSet>
-       <Command name="SporadicInterface" mode="async">
+       <Command name="SporadicInterfacePi" mode="async">
         <Argument type="MyInteger" name="SporadicArg" mode="in"/>
        </Command>
       </CommandSet>

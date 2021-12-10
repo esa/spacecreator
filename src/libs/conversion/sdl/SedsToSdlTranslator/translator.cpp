@@ -134,7 +134,7 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
         }
         // Register all timers in the interface view
         const auto function = ivModel->getFunction(process.name(), Qt::CaseInsensitive);
-        for (const auto timerName : process.timerNames()) {
+        for (const auto &timerName : process.timerNames()) {
             shared::ContextParameter timer(timerName, shared::BasicParameter::Type::Timer);
             function->addContextParam(timer);
         }

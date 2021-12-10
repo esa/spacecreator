@@ -66,7 +66,9 @@ void SdlExporter::exportProcess(const Process &process, const Options &options) 
     QString serializedProcess;
     QTextStream outputTextStream(&serializedProcess, QIODevice::WriteOnly);
 
-    sdl::SdlVisitor visitor(outputTextStream);
+    sdl::SdlVisitor::Layouter layouter;
+    sdl::SdlVisitor::IndentingStreamWriter writer(outputTextStream);
+    sdl::SdlVisitor visitor(writer, layouter);
 
     visitor.visit(process);
 

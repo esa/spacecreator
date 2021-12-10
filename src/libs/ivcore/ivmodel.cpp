@@ -47,7 +47,7 @@ IVModel::IVModel(shared::PropertyTemplateConfig *dynPropConfig, IVModel *sharedM
     d->m_sharedTypesModel = sharedModel;
 }
 
-IVModel::~IVModel() { }
+IVModel::~IVModel() {}
 
 bool IVModel::addObjectImpl(shared::VEObject *obj)
 {
@@ -101,6 +101,27 @@ void IVModel::setRootObject(shared::Id rootId)
 
     d->m_rootObjectId = rootId;
     d->m_visibleObjects = visibleObjects(rootId);
+
+    if (auto fnType = qobject_cast<IVFunctionType *>(rootObject())) {
+        for (auto connection : fnType->connections()) {
+            connection->setAttributeExportable(meta::Props::token(meta::Props::Token::coordinates), true);
+        }
+        for (auto interface : fnType->allInterfaces()) {
+            interface->setAttributeExportable(meta::Props::token(meta::Props::Token::RootCoordinates), true);
+        }
+        for (auto fn : fnType->functionTypes()) {
+            fn->setAttributeExportable(meta::Props::token(meta::Props::Token::coordinates), true);
+            for (auto fnInterface : fn->allInterfaces()) {
+                fnInterface->setAttributeExportable(meta::Props::token(meta::Props::Token::coordinates), true);
+            }
+        }
+        for (auto fnt : fnType->functions()) {
+            fnt->setAttributeExportable(meta::Props::token(meta::Props::Token::coordinates), true);
+            for (auto fntInterface : fnt->allInterfaces()) {
+                fntInterface->setAttributeExportable(meta::Props::token(meta::Props::Token::coordinates), true);
+            }
+        }
+    }
 
     Q_EMIT rootObjectChanged(d->m_rootObjectId);
 }
@@ -205,8 +226,8 @@ IVFunctionType *IVModel::getFunctionType(const shared::Id &id) const
 
 IVFunctionType *IVModel::getSharedFunctionType(const QString &name, Qt::CaseSensitivity caseSensitivity) const
 {
-    return d->m_sharedTypesModel ? qobject_cast<IVFunctionType *>(
-                   d->m_sharedTypesModel->getObjectByName(name, IVObject::Type::FunctionType, caseSensitivity))
+    return d->m_sharedTypesModel ? qobject_cast<IVFunctionType *>(d->m_sharedTypesModel->getObjectByName(
+                                           name, IVObject::Type::FunctionType, caseSensitivity))
                                  : nullptr;
 }
 

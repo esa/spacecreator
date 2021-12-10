@@ -114,6 +114,8 @@ public:
     // Perform updates/actions directly before the data is saved
     virtual void updateForExport() {};
 
+    void setAttributeExportable(const QString &attrName, bool isExportable);
+
 Q_SIGNALS:
     void attributeChanged(const QString &name);
 

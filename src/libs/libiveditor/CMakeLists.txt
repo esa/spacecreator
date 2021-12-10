@@ -180,6 +180,9 @@ target_sources(${LIB_NAME} PRIVATE
     config/ivlibrarydialog.h
 )
 
+if(${QT_VERSION_MAJOR} STREQUAL "6")
+    set(QT_SVGWIDGETS Qt6::SvgWidgets)
+endif()
 target_link_libraries(${LIB_NAME}
     ivcore
     asn1library
@@ -189,6 +192,7 @@ target_link_libraries(${LIB_NAME}
     ${QT_CONCURRENT}
     ${QT_NETWORK}
     ${QT_SVG}
+    ${QT_SVGWIDGETS}
     ${QT_WIDGETS}
     ${QT_XML}
 )

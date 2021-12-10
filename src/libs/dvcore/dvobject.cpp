@@ -41,7 +41,7 @@ DVObject::DVObject(const DVObject::Type t, const QString &title, QObject *parent
     setEntityAttribute(meta::Props::token(meta::Props::Token::name), title);
 }
 
-DVObject::~DVObject() { }
+DVObject::~DVObject() {}
 
 QString DVObject::title() const
 {
@@ -182,7 +182,7 @@ QVariantList DVObject::generateProperties(bool isProperty) const
     QVariantList result;
     EntityAttributes attributes = entityAttributes();
     for (auto it = attributes.cbegin(); it != attributes.cend(); ++it) {
-        if (it.value().isProperty() == isProperty) {
+        if (it.value().isExportable() && it.value().isProperty() == isProperty) {
             result << QVariant::fromValue(shared::ExportableProperty(it.key(), it.value().value()));
         }
     }
