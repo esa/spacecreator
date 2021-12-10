@@ -456,7 +456,7 @@ auto StateMachineTranslator::createTimerSetCall(const QString timerName, const u
     call->addArgument(
             std::make_unique<::sdl::VariableLiteral>(QString::number(nanosecondsToMiliseconds(callTimeInNanoseconds))));
     call->addArgument(std::make_unique<::sdl::VariableLiteral>(timerName));
-    return std::move(call);
+    return call;
 }
 
 } // namespace conversion::sdl::translator
