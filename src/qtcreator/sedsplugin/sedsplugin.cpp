@@ -48,6 +48,7 @@
 #include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
+#include <algorithm>
 #include <asn1library/asn1/asn1model.h>
 #include <conversion/asn1/Asn1Importer/importer.h>
 #include <conversion/asn1/Asn1Registrar/registrar.h>
@@ -446,23 +447,27 @@ auto SedsPlugin::getCurIvEditorCore() -> IVEditorCorePtr
     return currentIvDocument->ivEditorCore();
 }
 
-void SedsPlugin::mergeIvModels(ivm::IVModel *const dstIvModel, ivm::IVModel *const srcIvModel)
+auto SedsPlugin::mergeIvModels(ivm::IVModel *const dstIvModel, ivm::IVModel *const srcIvModel) -> void
 {
-    for (auto &dstIvObject : dstIvModel->visibleObjects()) {
-        for (auto &srcIvObject : srcIvModel->visibleObjects()) {
-            if (dstIvObject->isFunction() && srcIvObject->isFunction()) {
-                if (dstIvObject->title() == srcIvObject->title()) {
-                    MessageManager::write(
-                            GenMsg::msgInfo.arg(QString("%1, %2 - names are the same, Function will not be imported")
-                                                        .arg(dstIvObject->title())
-                                                        .arg(srcIvObject->title())));
-                    return;
-                } else {
-                    addFunctionToModel(srcIvObject, dstIvModel);
-                }
-            }
+    for (auto &srcIvObject : srcIvModel->visibleObjects()) {
+        auto *const srcFunction = dynamic_cast<ivm::IVFunction *>(srcIvObject);
+        if (srcFunction == nullptr) {
+            continue;
+        } else if (doesModelContainFunction(dstIvModel, srcFunction)) {
+            MessageManager::write(GenMsg::msgInfo.arg(
+                    QString("%1 - names are the same, Function will not be imported").arg(srcIvObject->title())));
+        } else {
+            addFunctionToModel(srcIvObject, dstIvModel);
         }
     }
+}
+
+auto SedsPlugin::doesModelContainFunction(ivm::IVModel *const model, ivm::IVFunction *const function) -> bool
+{
+    return std::any_of(model->visibleObjects().begin(), model->visibleObjects().end(),
+            [&function](auto &obj) -> bool { //
+                return obj->isFunction() && obj->title() == function->title();
+            });
 }
 
 auto SedsPlugin::loadIvModel(const QString &ivConfigFilename, const QString &ivFilename)

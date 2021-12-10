@@ -67,6 +67,7 @@ private:
     auto getCurrentIvModel() -> ivm::IVModel *;
     auto loadAndMergeIvModelIntoCurrent(const QString &ivConfig, const QString &ivFilename) -> bool;
     auto addFunctionToModel(ivm::IVObject *object, ivm::IVModel *model) -> void;
+    auto doesModelContainFunction(ivm::IVModel *model, ivm::IVFunction *function) -> bool;
 
     /** @brief  Internal registry */
     conversion::Registry m_registry;
