@@ -149,6 +149,11 @@ QList<EntityAttribute> VEObject::sortedAttributesValues(const EntityAttributes &
 
 void VEObject::setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type)
 {
+    bool isExportable = true;
+    auto it = d->m_attrs.find(name);
+    if (it == d->m_attrs.end()) {
+        isExportable = it->isExportable();
+    }
     d->m_attrs[name] = EntityAttribute { name, value, type };
     Q_EMIT attributeChanged(name);
 }
@@ -212,6 +217,14 @@ bool VEObject::isEqual(const VEObject *other) const
     return other && d->m_attrs == other->d->m_attrs;
 }
 
+void VEObject::setAttributeExportable(const QString &attrName, bool isExportable)
+{
+    auto it = d->m_attrs.find(attrName);
+    if (it != d->m_attrs.end()) {
+        it->setExportable(isExportable);
+    }
+}
+
 VEObject *VEObject::parentObject() const
 {
     return qobject_cast<VEObject *>(parent());
@@ -246,5 +259,4 @@ QString toString(VEObject *object)
 {
     return object->titleUI();
 }
-
 }

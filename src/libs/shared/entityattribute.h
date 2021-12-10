@@ -49,10 +49,14 @@ public:
     bool isValid() const;
     bool isNull() const;
 
+    void setExportable(bool value);
+    bool isExportable() const;
+
 private:
     QString m_name;
     QVariant m_value;
     Type m_type { Type::Attribute };
+    bool m_isExportable { true };
 };
 
 bool operator==(const EntityAttribute &lhs, const EntityAttribute &rhs);

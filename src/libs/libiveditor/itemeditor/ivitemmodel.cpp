@@ -141,16 +141,10 @@ void IVItemModel::onObjectAdded(shared::Id objectId)
         return;
     }
 
-    const int lowestLevel = gi::nestingLevel(objectsModel()->rootObject()) + 1;
-    const int objectLevel = gi::nestingLevel(object);
-    const bool isRootOrRootChild = objectId == objectsModel()->rootObjectId()
-            || (objectsModel()->rootObject() && object->parentObject() == objectsModel()->rootObject());
-    if ((objectLevel < lowestLevel || objectLevel > (lowestLevel + gi::kNestingVisibilityLevel))
-            && !isRootOrRootChild) {
+    setupGeometry(object);
+    if (!isVisible(object)) {
         return;
     }
-    setupGeometry(object);
-
     shared::ui::VEItemModel::onObjectAdded(objectId);
 }
 
@@ -271,6 +265,9 @@ static inline QPointF mapPositionFromOrigin(ivm::IVInterface *iface, ivm::meta::
 void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
 {
     ivm::IVObject *parentObj = obj->parentObject();
+    if (!isVisible(parentObj)) {
+        return;
+    }
 
     if (obj->isRootObject()) { // Root Level Function in Inner View
         static const QString tokenStr = ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates);
@@ -289,6 +286,7 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
         const QString strRootCoord =
                 ivm::IVObject::coordinatesToString(shared::graphicsviewutils::coordinates(mappedViewportGeometry));
         obj->setEntityProperty(tokenStr, strRootCoord);
+        obj->setAttributeExportable(tokenStr, true);
     } else {
         static const QString tokenStr = ivm::meta::Props::token(ivm::meta::Props::Token::coordinates);
         const QString coordinatesStr = obj->entityAttributeValue<QString>(tokenStr);
@@ -324,7 +322,8 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
         QList<QRectF> existingRects;
         QRectF itemsGeometry;
         for (const shared::VEObject *veObj : objectsModel()->objects()) { // Check if visible would be ehough
-            if (veObj->id() == obj->id() || veObj->id() == objectsModel()->rootObjectId()) {
+            if (veObj->id() == obj->id() || veObj->id() == objectsModel()->rootObjectId()
+                    || veObj->parentObject() != parentObj) {
                 continue;
             }
             auto child = qobject_cast<const ivm::IVObject *>(veObj);
@@ -347,11 +346,15 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
                     shared::graphicsviewutils::coordinates(parentGeometry | itemsGeometry | itemGeometry));
             parentObj->setEntityProperty(
                     ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates), strRootCoord);
+            parentObj->setAttributeExportable(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates), false);
         }
 
         const QString strCoord =
                 ivm::IVObject::coordinatesToString(shared::graphicsviewutils::coordinates(itemGeometry));
         obj->setEntityProperty(tokenStr, strCoord);
+        if (parentObj) {
+            obj->setAttributeExportable(tokenStr, false);
+        }
     }
 }
 
@@ -359,6 +362,9 @@ void IVItemModel::setupInterfaceGeometry(ivm::IVObject *obj)
 {
     auto parentObj = qobject_cast<ivm::IVFunctionType *>(obj->parentObject());
     if (!parentObj) {
+        return;
+    }
+    if (!isVisible(parentObj->parentObject())) {
         return;
     }
 
@@ -431,10 +437,17 @@ void IVItemModel::setupInterfaceGeometry(ivm::IVObject *obj)
 
     const QString strCoord = ivm::IVObject::coordinatesToString(shared::graphicsviewutils::coordinates(innerGeometry));
     obj->setEntityProperty(ivm::meta::Props::token(token), strCoord);
+    if (parentObj->parentObject()) {
+        obj->setAttributeExportable(ivm::meta::Props::token(token), false);
+    }
 }
 
 void IVItemModel::setupConnectionGeometry(ivm::IVObject *obj)
 {
+    if (!isVisible(obj->parentObject())) {
+        return;
+    }
+
     if (obj->hasEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::coordinates))) {
         return;
     }
@@ -473,6 +486,23 @@ void IVItemModel::setupConnectionGeometry(ivm::IVObject *obj)
     const QVector<QPointF> points =
             shared::graphicsviewutils::createConnectionPath(siblingRects, startPos, startRect, endPos, endRect);
     connection->setCoordinates(shared::graphicsviewutils::coordinates(points));
+    if (obj->parentObject()) {
+        obj->setAttributeExportable(ivm::meta::Props::token(ivm::meta::Props::Token::coordinates), false);
+    }
+}
+
+bool IVItemModel::isVisible(ivm::IVObject *obj)
+{
+    if (!obj) {
+        return true;
+    }
+
+    const int lowestLevel = gi::nestingLevel(objectsModel()->rootObject()) + 1;
+    const int objectLevel = gi::nestingLevel(obj);
+    const bool isRootOrRootChild = obj->id() == objectsModel()->rootObjectId()
+            || (objectsModel()->rootObject() && obj->parentObject() == objectsModel()->rootObject());
+    return !((objectLevel < lowestLevel || objectLevel > (lowestLevel + gi::kNestingVisibilityLevel))
+            && !isRootOrRootChild);
 }
 
 void IVItemModel::setupGeometry(ivm::IVObject *obj)
@@ -480,7 +510,6 @@ void IVItemModel::setupGeometry(ivm::IVObject *obj)
     if (!obj) {
         return;
     }
-
     if (kInterfaceTypes.contains(obj->type())) {
         setupInterfaceGeometry(obj);
     } else if (kRectangularTypes.contains(obj->type())) {
