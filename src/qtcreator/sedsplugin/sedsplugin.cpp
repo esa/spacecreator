@@ -209,8 +209,12 @@ auto SedsPlugin::importInterfaceView() -> void
         convertSedsToIv(options);
     } catch (conversion::ConverterException &ex) {
         MessageManager::write(GenMsg::msgWarning.arg(ex.what()));
+        QFile(tmpIvFilename).remove();
+        return;
     } catch (std::exception &ex) {
         MessageManager::write(GenMsg::msgWarning.arg(ex.what()));
+        QFile(tmpIvFilename).remove();
+        return;
     }
 
     if (!loadAndMergeIvModelIntoCurrent(ivConfig, tmpIvFilename)) {
@@ -261,6 +265,8 @@ auto SedsPlugin::importSdl() -> void
         converter.convert(srcModelType, targetModelType, auxModelTypes);
     } catch (std::exception &ex) {
         MessageManager::write(GenMsg::msgError.arg(ex.what()));
+        QFile(tmpIvFilename).remove();
+        return;
     }
 
     if (!loadAndMergeIvModelIntoCurrent(ivConfig, tmpIvFilename)) {
