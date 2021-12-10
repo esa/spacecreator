@@ -46,6 +46,7 @@
 #include "sharedlibrary.h"
 
 #include <QAction>
+#include <QDir>
 #include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
@@ -233,8 +234,19 @@ auto SedsPlugin::importSdl() -> void
         return;
     }
 
+    const auto extractFunctionNameFromPath = [](const QString &path) -> QString {
+        auto elements = path.split(QDir::separator());
+        auto filename = elements.last().split(".");
+        return filename.first();
+    };
+    const QString prefix = QString("work/%1/src/SDL/").arg(extractFunctionNameFromPath(inputFilePath));
+    if (!QDir().mkpath(prefix)) {
+        MessageManager::write(GenMsg::msgError.arg(QString("Could not create path %1").arg(prefix)));
+        return;
+    }
+
     conversion::Options options;
-    options.add(conversion::sdl::SdlOptions::filepathPrefix, "sdl-");
+    options.add(conversion::sdl::SdlOptions::filepathPrefix, prefix);
     options.add(conversion::seds::SedsOptions::inputFilepath, inputFilePath);
     options.add(conversion::iv::IvOptions::outputFilepath, tmpIvFilename);
     options.add(conversion::iv::IvOptions::configFilepath, ivConfig);
