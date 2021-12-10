@@ -209,32 +209,7 @@ auto SedsPlugin::importInterfaceView() -> void
         MessageManager::write(GenMsg::msgWarning.arg(ex.what()));
     }
 
-    conversion::Options loadTmpOptions;
-    loadTmpOptions.add(conversion::iv::IvOptions::inputFilepath, tmpIvFilename);
-    loadTmpOptions.add(conversion::iv::IvOptions::configFilepath, ivConfig);
-
-    std::unique_ptr<conversion::Model> model;
-    conversion::iv::importer::IvXmlImporter ivImporter;
-    try {
-        model = ivImporter.importModel(loadTmpOptions);
-    } catch (const std::exception &ex) {
-        MessageManager::write(GenMsg::msgError.arg(ex.what()));
-        return;
-    }
-
-    ivm::IVModel *const tmpIvModel = dynamic_cast<ivm::IVModel *>(model.get());
-    if (tmpIvModel == nullptr) {
-        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivTmpModelNotRead));
-        return;
-    }
-
-    ivm::IVModel *const currentIvModel = getCurIvEditorCore()->document()->objectsModel();
-    if (currentIvModel == nullptr) {
-        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivModelNotRead));
-        return;
-    }
-
-    mergeIvModels(currentIvModel, tmpIvModel);
+    loadAndMergeIvModelIntoCurrent(ivConfig, tmpIvFilename);
 
     MessageManager::write(GenMsg::msgInfo.arg(GenMsg::functionsImported));
 }
