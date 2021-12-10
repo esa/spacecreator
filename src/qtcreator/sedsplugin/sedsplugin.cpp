@@ -483,10 +483,81 @@ void SedsPlugin::mergeIvModels(ivm::IVModel *const dstIvModel, ivm::IVModel *con
                                                         .arg(srcIvObject->title())));
                     return;
                 } else {
-                    dstIvModel->addObject(srcIvObject);
+                    addFunctionToModel(srcIvObject, dstIvModel);
                 }
             }
         }
+    }
+}
+
+auto SedsPlugin::loadIvModel(const QString &ivConfigFilename, const QString &ivFilename)
+        -> std::unique_ptr<conversion::Model>
+{
+    std::unique_ptr<conversion::Model> model;
+
+    conversion::Options options;
+    options.add(conversion::iv::IvOptions::inputFilepath, ivFilename);
+    options.add(conversion::iv::IvOptions::configFilepath, ivConfigFilename);
+
+    conversion::iv::importer::IvXmlImporter ivImporter;
+    try {
+        model = ivImporter.importModel(options);
+    } catch (const std::exception &ex) {
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
+        return nullptr;
+    }
+
+    return model;
+}
+
+auto SedsPlugin::getCurrentIvModel() -> ivm::IVModel *
+{
+    if (getCurIvEditorCore()->document() == nullptr) {
+        MessageManager::write(GenMsg::msgError.arg("No document in current IV Editor core"));
+        return nullptr;
+    }
+
+    return getCurIvEditorCore()->document()->objectsModel();
+}
+
+auto SedsPlugin::loadAndMergeIvModelIntoCurrent(const QString &ivConfig, const QString &ivFilename) -> bool
+{
+    std::unique_ptr<conversion::Model> model = loadIvModel(ivConfig, ivFilename);
+
+    ivm::IVModel *const tmpIvModel = dynamic_cast<ivm::IVModel *>(model.get());
+    if (tmpIvModel == nullptr) {
+        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivTmpModelNotRead));
+        return false;
+    }
+
+    ivm::IVModel *const currentIvModel = getCurrentIvModel();
+    if (currentIvModel == nullptr) {
+        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivModelNotRead));
+        return false;
+    }
+
+    mergeIvModels(currentIvModel, tmpIvModel);
+
+    return true;
+}
+
+auto SedsPlugin::addFunctionToModel(ivm::IVObject *object, ivm::IVModel *model) -> void
+{
+    ivm::IVFunction *const srcFun = dynamic_cast<ivm::IVFunction *>(object);
+    ivm::IVFunction *const dstFun = new ivm::IVFunction(model, object->id());
+
+    if (srcFun != nullptr && dstFun != nullptr) {
+        dstFun->setDefaultImplementation(srcFun->defaultImplementation());
+        dstFun->setTitle(srcFun->title());
+        if (!srcFun->contextParams().isEmpty()) {
+            QVector<shared::ContextParameter> pars;
+            std::copy(srcFun->contextParams().begin(), srcFun->contextParams().end(), pars.begin());
+            dstFun->setContextParams(pars);
+        }
+        model->addObject(dstFun);
+        // TODO: copy rest of the necessary member values
+    } else {
+        MessageManager::write(GenMsg::msgError.arg("IV function could not be read"));
     }
 }
 

@@ -20,6 +20,9 @@
 #pragma once
 
 #include "iveditorcore.h"
+#include "ivfunction.h"
+#include "ivmodel.h"
+#include "model.h"
 #include "options.h"
 #include "sedspluginconstants.h"
 
@@ -60,9 +63,12 @@ private:
     auto ltdialogUpdateWithItemModel(ListTreeDialog &ltdialog, QStandardItemModel *model) -> void;
     auto getCurIvEditorCore() -> IVEditorCorePtr;
     auto mergeIvModels(ivm::IVModel *dstIvModel, ivm::IVModel *srcIvModel) -> void;
+    auto loadIvModel(const QString &ivConfigFilename, const QString &ivFilename) -> std::unique_ptr<conversion::Model>;
+    auto getCurrentIvModel() -> ivm::IVModel *;
+    auto loadAndMergeIvModelIntoCurrent(const QString &ivConfig, const QString &ivFilename) -> bool;
+    auto addFunctionToModel(ivm::IVObject *object, ivm::IVModel *model) -> void;
 
     /** @brief  Internal registry */
     conversion::Registry m_registry;
 };
-
 }
