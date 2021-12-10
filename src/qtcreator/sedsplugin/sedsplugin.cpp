@@ -250,6 +250,7 @@ auto SedsPlugin::importSdl() -> void
     }
 
     // merge imported IV with the current one
+    std::unique_ptr<conversion::Model> model = loadIvModel(ivConfig, tmpIvFilename);
 
     MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesImported));
 
