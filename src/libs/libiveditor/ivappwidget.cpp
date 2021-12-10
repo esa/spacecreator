@@ -149,8 +149,13 @@ void IVAppWidget::copyItems()
         return;
     }
 
-    QString name;
-    const QList<shared::VEObject *> objects = m_document->prepareSelectedObjectsForExport(name, true);
+    QList<shared::VEObject *> objects;
+    for (const QModelIndex &index : m_document->objectsSelectionModel()->selection().indexes()) {
+        const int role = static_cast<int>(ive::IVVisualizationModelBase::IdRole);
+        if (ivm::IVObject *object = m_document->objectsModel()->getObject(index.data(role).toUuid())) {
+            objects.append(object);
+        }
+    }
     if (!m_document->exporter()->exportObjects(objects, &buffer)) {
         shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
         return;
