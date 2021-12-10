@@ -212,7 +212,9 @@ auto SedsPlugin::importInterfaceView() -> void
         MessageManager::write(GenMsg::msgWarning.arg(ex.what()));
     }
 
-    loadAndMergeIvModelIntoCurrent(ivConfig, tmpIvFilename);
+    if (!loadAndMergeIvModelIntoCurrent(ivConfig, tmpIvFilename)) {
+        return;
+    }
 
     MessageManager::write(GenMsg::msgInfo.arg(GenMsg::functionsImported));
 
@@ -249,8 +251,9 @@ auto SedsPlugin::importSdl() -> void
         MessageManager::write(GenMsg::msgError.arg(ex.what()));
     }
 
-    // merge imported IV with the current one
-    std::unique_ptr<conversion::Model> model = loadIvModel(ivConfig, tmpIvFilename);
+    if (!loadAndMergeIvModelIntoCurrent(ivConfig, tmpIvFilename)) {
+        return;
+    }
 
     MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesImported));
 
