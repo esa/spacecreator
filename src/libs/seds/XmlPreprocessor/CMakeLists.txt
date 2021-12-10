@@ -15,7 +15,7 @@ target_include_directories(SedsXmlPreprocessor
 target_link_libraries(SedsXmlPreprocessor
     PUBLIC      Conversion::Common
     PRIVATE     LibXml2::LibXml2
-                Qt5::Xml
+                Qt${QT_VERSION_MAJOR}::Xml
                 CommonProjectWarnings)
 
 add_format_target(SedsXmlPreprocessor)

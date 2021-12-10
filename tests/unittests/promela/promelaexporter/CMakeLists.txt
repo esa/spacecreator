@@ -11,8 +11,8 @@ target_include_directories(${TEST_NAME}
 target_link_libraries(${TEST_NAME}
     PRIVATE     Conversion::Common
                 Promela::Exporter
-                Qt5::Core
-                Qt5::Test)
+                Qt${QT_VERSION_MAJOR}::Core
+                Qt${QT_VERSION_MAJOR}::Test)
 
 configure_file(resources/expect_promela_file1.pml expect_promela_file1.pml COPYONLY)
 configure_file(resources/expect_promela_file2.pml expect_promela_file2.pml COPYONLY)
