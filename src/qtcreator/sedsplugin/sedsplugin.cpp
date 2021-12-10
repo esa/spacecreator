@@ -451,7 +451,7 @@ auto SedsPlugin::convertSedsToIv(conversion::Options options) -> void
 {
     const auto srcModelType = std::set<conversion::ModelType>({ conversion::ModelType::Seds });
     const auto targetModelType = conversion::ModelType::InterfaceView;
-    const auto auxModelTypes = std::set<conversion::ModelType>({});
+    const auto auxModelTypes = std::set<conversion::ModelType>({ conversion::ModelType::Asn1 });
 
     Converter converter(m_registry, std::move(options));
     converter.convert(srcModelType, targetModelType, auxModelTypes);
