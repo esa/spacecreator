@@ -35,6 +35,7 @@
 #include "ui_ivappwidget.h"
 
 #include <QAction>
+#include <QActionGroup>
 #include <QApplication>
 #include <QBuffer>
 #include <QClipboard>

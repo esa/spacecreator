@@ -18,6 +18,7 @@
 #pragma once
 
 #include <QAction>
+#include <QCursor>
 #include <QGraphicsObject>
 #include <QIcon>
 #include <QObject>

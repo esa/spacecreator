@@ -115,7 +115,11 @@ bool AddPropertyTemplateDialog::validateType()
 QStringList AddPropertyTemplateDialog::listValues() const
 {
     const QString &values = ui->teValues->toPlainText().trimmed();
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
     return values.split(QLatin1Char(','), QString::SkipEmptyParts);
+#else
+    return values.split(QLatin1Char(','), Qt::SkipEmptyParts);
+#endif
 }
 
 bool AddPropertyTemplateDialog::validateValuesList()

@@ -91,6 +91,18 @@ MscInstance *MscTimer::instance() const
     return m_instance;
 }
 
+MscEntity *MscTimer::instanceObj() const
+{
+    return m_instance;
+}
+
+void MscTimer::setInstanceObj(MscEntity *instance)
+{
+    if (auto inst = qobject_cast<MscInstance *>(instance)) {
+        setInstance(inst);
+    }
+}
+
 bool MscTimer::relatesTo(const MscInstance *instance) const
 {
     return m_instance == instance;

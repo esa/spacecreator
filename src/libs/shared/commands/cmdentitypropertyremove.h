@@ -19,6 +19,7 @@
 
 #include <QPointer>
 #include <QUndoCommand>
+#include <QVariantHash>
 
 namespace shared {
 class VEObject;

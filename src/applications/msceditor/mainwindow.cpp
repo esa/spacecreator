@@ -49,6 +49,7 @@
 #include "ui/graphicsviewbase.h"
 #include "ui_mainwindow.h"
 
+#include <QActionGroup>
 #include <QClipboard>
 #include <QComboBox>
 #include <QDateTime>

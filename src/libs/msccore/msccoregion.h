@@ -24,7 +24,7 @@ namespace msc {
 class MscCoregion : public MscInstanceEvent
 {
     Q_OBJECT
-    Q_PROPERTY(msc::MscInstance *instance READ instance WRITE setInstance NOTIFY instanceChanged)
+    Q_PROPERTY(msc::MscEntity *instance READ instanceObj WRITE setInstanceObj NOTIFY instanceChanged)
     Q_PROPERTY(msc::MscCoregion::Type type READ type WRITE setType NOTIFY typeChanged)
 
 public:
@@ -48,6 +48,8 @@ public:
 
     MscInstance *instance() const;
     void setInstance(MscInstance *instance);
+    MscEntity *instanceObj() const;
+    void setInstanceObj(MscEntity *instance);
 
 Q_SIGNALS:
     void typeChanged();

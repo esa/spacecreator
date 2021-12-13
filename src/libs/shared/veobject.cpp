@@ -46,7 +46,7 @@ VEObject::VEObject(const shared::Id &id, QObject *parent)
         setModel(model);
 }
 
-VEObject::~VEObject() {}
+VEObject::~VEObject() { }
 
 shared::Id VEObject::id() const
 {
@@ -168,7 +168,11 @@ QVector<qint32> VEObject::coordinatesFromString(const QString &strCoordinates)
     if (strCoordinates.isEmpty())
         return {};
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
     const QStringList &strCoords = strCoordinates.split(QLatin1Char(' '), QString::SkipEmptyParts);
+#else
+    const QStringList &strCoords = strCoordinates.split(QLatin1Char(' '), Qt::SkipEmptyParts);
+#endif
     const int coordsCount = strCoords.size();
     QVector<qint32> coords(coordsCount);
     for (int i = 0; i < coordsCount; ++i)

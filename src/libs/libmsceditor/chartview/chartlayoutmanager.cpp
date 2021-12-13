@@ -34,7 +34,6 @@
 #include "coregionitem.h"
 #include "messageitem.h"
 #include "mscaction.h"
-#include "mscchart.h"
 #include "msccommandsstack.h"
 #include "msccomment.h"
 #include "msccondition.h"
