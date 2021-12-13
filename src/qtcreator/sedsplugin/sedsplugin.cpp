@@ -34,6 +34,8 @@
 #include "iveditor.h"
 #include "iveditorcore.h"
 #include "ivfunction.h"
+#include "ivinterface.h"
+#include "ivinterfacegroup.h"
 #include "ivlibrary.h"
 #include "ivmodel.h"
 #include "ivobject.h"
@@ -464,9 +466,13 @@ auto SedsPlugin::mergeIvModels(ivm::IVModel *const dstIvModel, ivm::IVModel *con
 
 auto SedsPlugin::doesModelContainFunction(ivm::IVModel *const model, ivm::IVFunction *const function) -> bool
 {
-    return std::any_of(model->visibleObjects().begin(), model->visibleObjects().end(),
-            [&function](auto &obj) -> bool { //
-                return obj->isFunction() && obj->title() == function->title();
+    return std::any_of(model->visibleObjects().begin(), model->visibleObjects().end(), //
+            [&function](auto &obj) -> bool {
+                if (obj == nullptr) {
+                    return false;
+                } else {
+                    return obj->isFunction() && obj->title() == function->title();
+                }
             });
 }
 
@@ -534,8 +540,23 @@ auto SedsPlugin::addFunctionToModel(ivm::IVObject *object, ivm::IVModel *model) 
             std::copy(srcFun->contextParams().begin(), srcFun->contextParams().end(), pars.begin());
             dstFun->setContextParams(pars);
         }
-        model->addObject(dstFun);
         // TODO: copy rest of the necessary member values
+        for (ivm::IVInterface *const srcIf : srcFun->interfaces()) {
+            ivm::IVInterface::CreationInfo ci;
+            ci = ivm::IVInterface::CreationInfo::fromIface(srcIf);
+            ci.function = dstFun;
+            ci.model = model;
+            auto dstIf = ivm::IVInterface::createIface(ci);
+            dstIf->setVisible(true);
+            dstFun->interfaces().push_back(dstIf);
+
+            if (srcIf != nullptr) {
+                qDebug() << srcIf->direction();
+                qDebug() << "iface label: " << srcIf->ifaceLabel();
+                qDebug() << "title:       " << srcIf->title();
+            }
+        }
+        model->addObject(dstFun);
     } else {
         MessageManager::write(GenMsg::msgError.arg("IV function could not be read"));
     }
