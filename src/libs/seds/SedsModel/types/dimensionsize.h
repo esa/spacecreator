@@ -41,6 +41,9 @@ public:
     auto indexTypeRef() const -> const std::optional<DataTypeRef> &;
     auto setIndexTypeRef(DataTypeRef indexTypeRef) -> void;
 
+    auto operator==(const DimensionSize &rhs) const -> bool;
+    auto operator!=(const DimensionSize &rhs) const -> bool;
+
 private:
     std::optional<PositiveLong> m_size;
     std::optional<DataTypeRef> m_indexTypeRef;

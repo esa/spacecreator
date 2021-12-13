@@ -37,6 +37,9 @@ using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator {
 
+std::multimap<QString, InterfaceCommandTranslator::ArrayArgumentsCacheEntry>
+        InterfaceCommandTranslator::m_arrayArgumentsCache;
+
 const QString InterfaceCommandTranslator::m_interfaceParameterEncoding = "ACN";
 const QString InterfaceCommandTranslator::m_ivInterfaceNameTemplate = "%1_%2_%3";
 const QString InterfaceCommandTranslator::m_arrayArgumentNameTemplate = "%1-Array";
@@ -59,46 +62,19 @@ QString InterfaceCommandTranslator::getCommandName(
 QString InterfaceCommandTranslator::handleArgumentType(const seds::model::CommandArgument &sedsArgument) const
 {
     const auto &sedsArgumentTypeName = findMappedType(sedsArgument.type().nameStr());
-    const auto sedsArgumentTypeNameEscaped = Escaper::escapeAsn1TypeName(sedsArgumentTypeName);
-
-    // Check if type exists
-    const auto sedsArgumentTypeAssignment = m_asn1Definitions->type(sedsArgumentTypeNameEscaped);
-    if (!sedsArgumentTypeAssignment) {
-        auto errorMessage = QString("Argument %1 has an unknown type %2")
-                                    .arg(sedsArgument.nameStr())
-                                    .arg(sedsArgumentTypeNameEscaped);
-        throw TranslationException(std::move(errorMessage));
-    }
 
     // Just use type name if the type is not handled as an array
     if (sedsArgument.arrayDimensions().empty()) {
-        return sedsArgumentTypeNameEscaped;
+        return Escaper::escapeAsn1TypeName(sedsArgumentTypeName);
     }
 
-    const auto arrayArgumentTypeName = m_arrayArgumentNameTemplate.arg(sedsArgumentTypeNameEscaped);
+    return buildArrayType(sedsArgument, sedsArgumentTypeName);
+}
 
-    // If the type was already created - use it
-    if (m_asn1Definitions->type(arrayArgumentTypeName) != nullptr) {
-        return arrayArgumentTypeName;
-    }
-
-    seds::model::ArrayDataType sedsArrayArgument;
-    sedsArrayArgument.setName(arrayArgumentTypeName);
-    sedsArrayArgument.setType(sedsArgumentTypeName);
-
-    for (auto argumentDimension : sedsArgument.arrayDimensions()) {
-        sedsArrayArgument.addDimension(std::move(argumentDimension));
-    }
-
-    std::unique_ptr<Asn1Acn::Types::Type> asn1ArrayArgument;
-    asn1::translator::DataTypeTranslatorVisitor dataTypeVisitor { m_asn1Definitions, asn1ArrayArgument };
-    dataTypeVisitor(sedsArrayArgument);
-
-    auto asn1ArrayArgumentAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
-            arrayArgumentTypeName, arrayArgumentTypeName, Asn1Acn::SourceLocation(), std::move(asn1ArrayArgument));
-    m_asn1Definitions->addType(std::move(asn1ArrayArgumentAssignment));
-
-    return arrayArgumentTypeName;
+QString InterfaceCommandTranslator::buildArrayType(
+        const seds::model::CommandArgument &sedsArgument, const QString &sedsArgumentTypeName) const
+{
+    return createArrayType(sedsArgument, sedsArgumentTypeName);
 }
 
 ivm::IVInterface *InterfaceCommandTranslator::createIvInterface(const seds::model::InterfaceCommand &sedsCommand,
@@ -132,6 +108,30 @@ void InterfaceCommandTranslator::createAsn1SequenceComponent(
     auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
             name, name, false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(sequenceComponentType));
     sequence->addComponent(std::move(sequenceComponent));
+}
+
+QString InterfaceCommandTranslator::createArrayType(
+        const seds::model::CommandArgument &sedsArgument, const QString &sedsArgumentTypeName) const
+{
+    auto arrayArgumentTypeName = Escaper::escapeAsn1TypeName(m_arrayArgumentNameTemplate.arg(sedsArgumentTypeName));
+
+    seds::model::ArrayDataType sedsArrayArgument;
+    sedsArrayArgument.setName(arrayArgumentTypeName);
+    sedsArrayArgument.setType(sedsArgumentTypeName);
+
+    for (auto argumentDimension : sedsArgument.arrayDimensions()) {
+        sedsArrayArgument.addDimension(std::move(argumentDimension));
+    }
+
+    std::unique_ptr<Asn1Acn::Types::Type> asn1ArrayArgument;
+    asn1::translator::DataTypeTranslatorVisitor dataTypeVisitor { m_asn1Definitions, asn1ArrayArgument };
+    dataTypeVisitor(sedsArrayArgument);
+
+    auto asn1ArrayArgumentAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
+            arrayArgumentTypeName, arrayArgumentTypeName, Asn1Acn::SourceLocation(), std::move(asn1ArrayArgument));
+    m_asn1Definitions->addType(std::move(asn1ArrayArgumentAssignment));
+
+    return arrayArgumentTypeName;
 }
 
 ivm::IVInterface::InterfaceType InterfaceCommandTranslator::switchInterfaceType(
@@ -186,6 +186,28 @@ const QString &InterfaceCommandTranslator::findMappedType(const QString &generic
     } else {
         return genericTypeName;
     }
+}
+
+bool InterfaceCommandTranslator::ArrayArgumentsCacheEntry::compareDimensions(
+        const std::vector<seds::model::DimensionSize> &dimensions) const
+{
+    if (arrayDimensions.size() != dimensions.size()) {
+        return false;
+    }
+
+    auto lhsIt = arrayDimensions.begin();
+    auto rhsIt = dimensions.begin();
+
+    while (lhsIt != arrayDimensions.end() && rhsIt != dimensions.end()) {
+        if (*lhsIt != *rhsIt) {
+            return false;
+        }
+
+        ++lhsIt;
+        ++rhsIt;
+    }
+
+    return true;
 }
 
 } // namespace conversion::iv::translator

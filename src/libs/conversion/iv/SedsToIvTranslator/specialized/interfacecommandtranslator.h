@@ -35,6 +35,7 @@ class IVFunction;
 
 namespace seds::model {
 class CommandArgument;
+class DimensionSize;
 class Interface;
 class InterfaceCommand;
 } // namespace seds::model
@@ -117,6 +118,9 @@ protected:
      */
     auto handleArgumentType(const seds::model::CommandArgument &sedsArgument) const -> QString;
 
+    auto buildArrayType(const seds::model::CommandArgument &sedsArgument, const QString &sedsArgumentTypeName) const
+            -> QString;
+
     /**
      * @brief   Creates new interface view interface
      *
@@ -139,6 +143,8 @@ protected:
      */
     auto createAsn1SequenceComponent(
             const QString &name, const QString &typeName, Asn1Acn::Types::Sequence *sequence) const -> void;
+    auto createArrayType(const seds::model::CommandArgument &sedsArgument, const QString &sedsArgumentTypeName) const
+            -> QString;
 
     /**
      * @brief   Swaps between provided and required interface types
@@ -174,6 +180,16 @@ protected:
     Asn1Acn::Definitions *m_asn1Definitions;
     /// @brief  Output interface view function
     ivm::IVFunction *m_ivFunction;
+
+    struct ArrayArgumentsCacheEntry final {
+        QString asn1TypeName;
+        std::size_t typeHash;
+        std::vector<seds::model::DimensionSize> arrayDimensions;
+
+        auto compareDimensions(const std::vector<seds::model::DimensionSize> &diumensions) const -> bool;
+    };
+
+    static std::multimap<QString, ArrayArgumentsCacheEntry> m_arrayArgumentsCache;
 
     /// @brief  Interface parameter encoding name
     static const QString m_interfaceParameterEncoding;
