@@ -202,7 +202,6 @@ public:
 
     bool isInheritPI() const;
     bool hasPrototypePi() const;
-    bool postInit() override;
 
     QStringList inheritedLables() const;
     void setPrototype(const IVInterfaceProvided *pi);

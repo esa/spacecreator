@@ -54,16 +54,6 @@
             </Enumeration>
         </Type>
     </Attr>
-    <Attr label="Instance of" name="instance_of">
-        <Type>
-            <String validator="[a-zA-Z0-9_]+"/>
-        </Type>
-        <Scopes>
-            <Function>
-                <AttrValidator name="is_type" value="NO"/>
-            </Function>
-        </Scopes>
-    </Attr>
     <Attr label="Period (in ms)" name="period">
         <Type>
             <String defaultValue="1000" validator="\d+"/>
@@ -137,22 +127,6 @@
                 <AttrValidator name="kind" value="Cyclic"/>
                 <AttrValidator name="kind" value="Sporadic"/>
             </Provided_Interface>
-        </Scopes>
-    </Attr>
-    <Attr name="Taste::InheritPI" type="property">
-        <Type>
-            <Boolean/>
-        </Type>
-        <Scopes>
-            <Required_Interface/>
-        </Scopes>
-    </Attr>
-    <Attr name="Taste::Autonamed" type="property">
-        <Type>
-            <Boolean defaultValue="True"/>
-        </Type>
-        <Scopes>
-            <Required_Interface/>
         </Scopes>
     </Attr>
 </Attrs>
