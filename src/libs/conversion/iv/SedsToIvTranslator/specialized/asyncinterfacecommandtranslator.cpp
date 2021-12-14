@@ -26,6 +26,7 @@
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/qstringhash.h>
 #include <conversion/common/translation/exceptions.h>
+#include <iostream>
 #include <ivcore/ivfunction.h>
 #include <seds/SedsModel/package/package.h>
 #include <shared/parameter.h>
@@ -42,7 +43,7 @@ std::multimap<QString, AsyncInterfaceCommandTranslator::ArgumentsCacheEntry>
         AsyncInterfaceCommandTranslator::m_commandArgumentsCache;
 
 const QString AsyncInterfaceCommandTranslator::m_ivInterfaceParameterName = "InputParam";
-const QString AsyncInterfaceCommandTranslator::m_bundledTypeNameTemplate = "%1_Type%2";
+const QString AsyncInterfaceCommandTranslator::m_bundledTypeNameTemplate = "%1-Type%2";
 
 AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(
         const seds::model::Interface &sedsInterface, Asn1Acn::Definitions *asn1Definitions, ivm::IVFunction *ivFunction)
@@ -111,7 +112,8 @@ void AsyncInterfaceCommandTranslator::translateArguments(const seds::model::Inte
     const auto bundledTypeName = buildBundledType(sedsCommand, requestedArgumentMode);
 
     auto ivParameter = shared::InterfaceParameter(m_ivInterfaceParameterName, shared::BasicParameter::Type::Other,
-            bundledTypeName, m_interfaceParameterEncoding, shared::InterfaceParameter::Direction::IN);
+            Escaper::escapeIvName(bundledTypeName), m_interfaceParameterEncoding,
+            shared::InterfaceParameter::Direction::IN);
     ivInterface->addParam(ivParameter);
 }
 

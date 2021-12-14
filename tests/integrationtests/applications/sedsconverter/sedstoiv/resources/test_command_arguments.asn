@@ -1,37 +1,37 @@
 COM-N7SPACE-COMMANDARGUMENTS DEFINITIONS ::= BEGIN
 MyInteger ::= INTEGER(0 .. 255)
 MyFloat ::= REAL(1.17549e-38 .. 3.40282e+38)
-AsyncInCommand_Type ::= SEQUENCE 
+AsyncInCommand-Type ::= SEQUENCE 
 { 
     asyncInArgument2 MyInteger(0 .. 255), 
     asyncInArgument1 MyInteger(0 .. 255)
 } 
-AsyncOutCommand_Type ::= SEQUENCE 
+AsyncOutCommand-Type ::= SEQUENCE 
 { 
     asyncOutArgument2 MyInteger(0 .. 255), 
     asyncOutArgument1 MyInteger(0 .. 255)
 } 
-GenericCommand_Type ::= SEQUENCE 
+GenericCommand-Type ::= SEQUENCE 
 { 
     genericArgument2 MyInteger(0 .. 255), 
     genericArgument1 MyInteger(0 .. 255)
 } 
-GenericCommand_Type1 ::= SEQUENCE 
+GenericCommand-Type1 ::= SEQUENCE 
 { 
     genericArgument2 MyFloat(1.17549e-38 .. 3.40282e+38), 
     genericArgument1 MyFloat(1.17549e-38 .. 3.40282e+38)
 }
 MyInteger_Array ::= SEQUENCE (SIZE(0 .. 10)) OF MyInteger(0 .. 255)
-ArrayCommand1_Type ::= SEQUENCE
+ArrayCommand1-Type ::= SEQUENCE
 {
     arrayArgument1 MyInteger_Array(SIZE(0 .. 10))
 }
 MyInteger_Array1 ::= SEQUENCE (SIZE(0 .. 20)) OF MyInteger(0 .. 255)
-ArrayCommand2_Type ::= SEQUENCE 
+ArrayCommand2-Type ::= SEQUENCE 
 { 
     arrayArgument1 MyInteger_Array1(SIZE(0 .. 20))
 } 
-ArrayCommand3_Type ::= SEQUENCE 
+ArrayCommand3-Type ::= SEQUENCE 
 { 
     arrayArgument1 MyInteger_Array(SIZE(0 .. 10))
 } 
