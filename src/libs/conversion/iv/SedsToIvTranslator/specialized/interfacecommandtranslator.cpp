@@ -42,7 +42,7 @@ std::multimap<QString, InterfaceCommandTranslator::ArrayArgumentsCacheEntry>
 
 const QString InterfaceCommandTranslator::m_interfaceParameterEncoding = "ACN";
 const QString InterfaceCommandTranslator::m_ivInterfaceNameTemplate = "%1_%2_%3";
-const QString InterfaceCommandTranslator::m_arrayArgumentNameTemplate = "%1-Array%2";
+const QString InterfaceCommandTranslator::m_arrayArgumentNameTemplate = "%1_Array%2";
 
 InterfaceCommandTranslator::InterfaceCommandTranslator(
         const seds::model::Interface &sedsInterface, Asn1Acn::Definitions *asn1Definitions, ivm::IVFunction *ivFunction)

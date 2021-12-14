@@ -1,7 +1,7 @@
 <InterfaceView>
 <Function name="Component" is_type="NO" language="SDL" default_implementation="default">
 <Provided_Interface name="AsyncInterfacePI_AsyncInCommand_Pi">
-    <Input_Parameter name="InputParam" type="AsyncInCommand-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="AsyncInCommand_Type" encoding="ACN"/>
 </Provided_Interface>
 
 <Provided_Interface name="SyncInterfacePI_SyncInCommand_Pi" kind="Protected">
@@ -15,40 +15,40 @@
 </Provided_Interface>
 
 <Provided_Interface name="GenericInterfaceIntegerPI_GenericCommand_Pi">
-    <Input_Parameter name="InputParam" type="GenericCommand-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="GenericCommand_Type" encoding="ACN"/>
 </Provided_Interface>
 
 <Provided_Interface name="GenericInterfaceIntegerReusePI_GenericCommand_Pi">
-    <Input_Parameter name="InputParam" type="GenericCommand-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="GenericCommand_Type" encoding="ACN"/>
 </Provided_Interface>
 
 <Provided_Interface name="GenericInterfaceFloatPI_GenericCommand_Pi">
-    <Input_Parameter name="InputParam" type="GenericCommand-Type1" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="GenericCommand_Type1" encoding="ACN"/>
 </Provided_Interface>
 
 <Provided_Interface name="ArrayInterfacePI_ArrayCommand1_Pi">
-    <Input_Parameter name="InputParam" type="ArrayCommand1-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="ArrayCommand1_Type" encoding="ACN"/>
 </Provided_Interface>
 
 <Provided_Interface name="ArrayInterfacePI_ArrayCommand2_Pi">
-    <Input_Parameter name="InputParam" type="ArrayCommand2-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="ArrayCommand2_Type" encoding="ACN"/>
 </Provided_Interface>
 
 <Provided_Interface name="ArrayInterfacePI_ArrayCommand3_Pi">
-    <Input_Parameter name="InputParam" type="ArrayCommand3-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="ArrayCommand3_Type" encoding="ACN"/>
 </Provided_Interface>
 
 <Provided_Interface name="AsyncInterfaceRI_AsyncOutCommand_Pi">
-    <Input_Parameter name="InputParam" type="AsyncOutCommand-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="AsyncOutCommand_Type" encoding="ACN"/>
 </Provided_Interface>
 
 <Required_Interface name="AsyncInterfacePI_AsyncOutCommand_Ri" kind="Sporadic">
-    <Input_Parameter name="InputParam" type="AsyncOutCommand-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="AsyncOutCommand_Type" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
 <Required_Interface name="AsyncInterfaceRI_AsyncInCommand_Ri" kind="Sporadic">
-    <Input_Parameter name="InputParam" type="AsyncInCommand-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="AsyncInCommand_Type" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 

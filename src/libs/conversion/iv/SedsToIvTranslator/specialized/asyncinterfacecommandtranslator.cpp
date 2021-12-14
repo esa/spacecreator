@@ -42,7 +42,7 @@ std::multimap<QString, AsyncInterfaceCommandTranslator::ArgumentsCacheEntry>
         AsyncInterfaceCommandTranslator::m_commandArgumentsCache;
 
 const QString AsyncInterfaceCommandTranslator::m_ivInterfaceParameterName = "InputParam";
-const QString AsyncInterfaceCommandTranslator::m_bundledTypeNameTemplate = "%1-Type%2";
+const QString AsyncInterfaceCommandTranslator::m_bundledTypeNameTemplate = "%1_Type%2";
 
 AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(
         const seds::model::Interface &sedsInterface, Asn1Acn::Definitions *asn1Definitions, ivm::IVFunction *ivFunction)
