@@ -22,9 +22,19 @@ GenericCommand-Type1 ::= SEQUENCE
     genericArgument1 MyFloat(1.17549e-38 .. 3.40282e+38)
 }
 MyInteger-Array ::= SEQUENCE (SIZE(0 .. 10)) OF MyInteger(0 .. 255)
-ArrayCommand-Type ::= SEQUENCE
+ArrayCommand1-Type ::= SEQUENCE
 {
     arrayArgument1 MyInteger-Array(SIZE(0 .. 10))
 }
+MyInteger-Array1 ::= SEQUENCE (SIZE(0 .. 20)) OF MyInteger(0 .. 255)
+ArrayCommand2-Type ::= SEQUENCE 
+{ 
+    arrayArgument1 MyInteger-Array1(SIZE(0 .. 20))
+} 
+ArrayCommand3-Type ::= SEQUENCE 
+{ 
+    arrayArgument1 MyInteger-Array(SIZE(0 .. 10))
+} 
+
 END
 

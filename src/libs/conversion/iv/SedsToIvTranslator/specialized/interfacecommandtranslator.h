@@ -145,6 +145,9 @@ protected:
             const QString &name, const QString &typeName, Asn1Acn::Types::Sequence *sequence) const -> void;
     auto createArrayType(const seds::model::CommandArgument &sedsArgument, const QString &sedsArgumentTypeName) const
             -> QString;
+    auto createArrayTypeName(const QString &sedsArgumentTypeName) const -> QString;
+
+    auto calculateDimensionsHash(const std::vector<seds::model::DimensionSize> &dimensions) const -> std::size_t;
 
     /**
      * @brief   Swaps between provided and required interface types
@@ -183,7 +186,7 @@ protected:
 
     struct ArrayArgumentsCacheEntry final {
         QString asn1TypeName;
-        std::size_t typeHash;
+        std::size_t dimensionsHash;
         std::vector<seds::model::DimensionSize> arrayDimensions;
 
         auto compareDimensions(const std::vector<seds::model::DimensionSize> &diumensions) const -> bool;

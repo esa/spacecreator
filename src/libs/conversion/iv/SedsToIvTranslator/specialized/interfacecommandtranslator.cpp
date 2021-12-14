@@ -42,7 +42,7 @@ std::multimap<QString, InterfaceCommandTranslator::ArrayArgumentsCacheEntry>
 
 const QString InterfaceCommandTranslator::m_interfaceParameterEncoding = "ACN";
 const QString InterfaceCommandTranslator::m_ivInterfaceNameTemplate = "%1_%2_%3";
-const QString InterfaceCommandTranslator::m_arrayArgumentNameTemplate = "%1-Array";
+const QString InterfaceCommandTranslator::m_arrayArgumentNameTemplate = "%1-Array%2";
 
 InterfaceCommandTranslator::InterfaceCommandTranslator(
         const seds::model::Interface &sedsInterface, Asn1Acn::Definitions *asn1Definitions, ivm::IVFunction *ivFunction)
@@ -74,7 +74,53 @@ QString InterfaceCommandTranslator::handleArgumentType(const seds::model::Comman
 QString InterfaceCommandTranslator::buildArrayType(
         const seds::model::CommandArgument &sedsArgument, const QString &sedsArgumentTypeName) const
 {
-    return createArrayType(sedsArgument, sedsArgumentTypeName);
+    // Calculate hash of the given SEDS argument type dimensions
+    auto dimensions = sedsArgument.arrayDimensions();
+    const auto dimensionsHash = calculateDimensionsHash(dimensions);
+
+    // Check if the array type was already created and cached
+    const auto arraysForArgumentType = m_arrayArgumentsCache.equal_range(sedsArgumentTypeName);
+    const auto foundArray =
+            std::find_if(arraysForArgumentType.first, arraysForArgumentType.second, [&](const auto &arrayPair) {
+                return arrayPair.second.dimensionsHash == dimensionsHash
+                        && arrayPair.second.compareDimensions(dimensions);
+            });
+
+    // Use the existing array type
+    if (foundArray != arraysForArgumentType.second) {
+        return foundArray->second.asn1TypeName;
+    }
+
+    // Create a new array type and add it to the ASN.1 model
+    auto arrayArgumentTypeName = createArrayType(sedsArgument, sedsArgumentTypeName);
+    m_arrayArgumentsCache.insert(
+            { sedsArgumentTypeName, { arrayArgumentTypeName, dimensionsHash, std::move(dimensions) } });
+
+    return arrayArgumentTypeName;
+}
+
+std::size_t InterfaceCommandTranslator::calculateDimensionsHash(
+        const std::vector<seds::model::DimensionSize> &dimensions) const
+{
+    std::size_t resultHash = 0;
+
+    for (const auto &dimension : dimensions) {
+        std::size_t dimensionHash = 0;
+
+        if (dimension.size()) {
+            dimensionHash = std::hash<seds::model::PositiveLong::Value> {}(dimension.size()->value());
+        } else if (dimension.indexTypeRef()) {
+            dimensionHash = std::hash<QString> {}(dimension.indexTypeRef()->nameStr());
+        }
+
+        if (resultHash == 0) {
+            resultHash = dimensionHash;
+        } else {
+            resultHash ^= (dimensionHash << 1);
+        }
+    }
+
+    return resultHash;
 }
 
 ivm::IVInterface *InterfaceCommandTranslator::createIvInterface(const seds::model::InterfaceCommand &sedsCommand,
@@ -113,7 +159,7 @@ void InterfaceCommandTranslator::createAsn1SequenceComponent(
 QString InterfaceCommandTranslator::createArrayType(
         const seds::model::CommandArgument &sedsArgument, const QString &sedsArgumentTypeName) const
 {
-    auto arrayArgumentTypeName = Escaper::escapeAsn1TypeName(m_arrayArgumentNameTemplate.arg(sedsArgumentTypeName));
+    auto arrayArgumentTypeName = createArrayTypeName(sedsArgumentTypeName);
 
     seds::model::ArrayDataType sedsArrayArgument;
     sedsArrayArgument.setName(arrayArgumentTypeName);
@@ -132,6 +178,18 @@ QString InterfaceCommandTranslator::createArrayType(
     m_asn1Definitions->addType(std::move(asn1ArrayArgumentAssignment));
 
     return arrayArgumentTypeName;
+}
+
+QString InterfaceCommandTranslator::createArrayTypeName(const QString &sedsArgumentTypeName) const
+{
+    const auto cachedArraysCount = m_arrayArgumentsCache.count(sedsArgumentTypeName);
+    const auto sedsArgumentTypeNameEscaped = Escaper::escapeAsn1TypeName(sedsArgumentTypeName);
+
+    if (cachedArraysCount == 0) {
+        return m_arrayArgumentNameTemplate.arg(sedsArgumentTypeNameEscaped).arg("");
+    } else {
+        return m_arrayArgumentNameTemplate.arg(sedsArgumentTypeNameEscaped).arg(cachedArraysCount);
+    }
 }
 
 ivm::IVInterface::InterfaceType InterfaceCommandTranslator::switchInterfaceType(

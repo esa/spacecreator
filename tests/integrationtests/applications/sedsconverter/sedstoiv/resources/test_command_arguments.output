@@ -26,8 +26,16 @@
     <Input_Parameter name="InputParam" type="GenericCommand-Type1" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="ArrayInterfacePI_ArrayCommand_Pi">
-    <Input_Parameter name="InputParam" type="ArrayCommand-Type" encoding="ACN"/>
+<Provided_Interface name="ArrayInterfacePI_ArrayCommand1_Pi">
+    <Input_Parameter name="InputParam" type="ArrayCommand1-Type" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="ArrayInterfacePI_ArrayCommand2_Pi">
+    <Input_Parameter name="InputParam" type="ArrayCommand2-Type" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="ArrayInterfacePI_ArrayCommand3_Pi">
+    <Input_Parameter name="InputParam" type="ArrayCommand3-Type" encoding="ACN"/>
 </Provided_Interface>
 
 <Provided_Interface name="AsyncInterfaceRI_AsyncOutCommand_Pi">

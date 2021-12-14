@@ -50,7 +50,21 @@
     </Interface>
     <Interface name="ArrayInterface">
       <CommandSet>
-        <Command name="ArrayCommand" mode="async">
+        <Command name="ArrayCommand1" mode="async">
+          <Argument name="ArrayArgument1" type="MyInteger" mode="in">
+            <ArrayDimensions>
+              <Dimension size="10" />
+            </ArrayDimensions>
+          </Argument>
+        </Command>
+        <Command name="ArrayCommand2" mode="async">
+          <Argument name="ArrayArgument1" type="MyInteger" mode="in">
+            <ArrayDimensions>
+              <Dimension size="20" />
+            </ArrayDimensions>
+          </Argument>
+        </Command>
+        <Command name="ArrayCommand3" mode="async">
           <Argument name="ArrayArgument1" type="MyInteger" mode="in">
             <ArrayDimensions>
               <Dimension size="10" />
