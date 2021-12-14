@@ -118,6 +118,14 @@ protected:
      */
     auto handleArgumentType(const seds::model::CommandArgument &sedsArgument) const -> QString;
 
+    /**
+     * @brief   Builds ASN.1 sequence of version of command argument type
+     *
+     * @param   sedsArgument            SEDS command argument
+     * @param   sedsArgumentTypeName    Resolved SEDS command argument type name
+     *
+     * @return  Name of the created type
+     */
     auto buildArrayType(const seds::model::CommandArgument &sedsArgument, const QString &sedsArgumentTypeName) const
             -> QString;
 
@@ -143,10 +151,34 @@ protected:
      */
     auto createAsn1SequenceComponent(
             const QString &name, const QString &typeName, Asn1Acn::Types::Sequence *sequence) const -> void;
+    /**
+     * @brief   Creates ASN.1 sequence of version of the seds argument type
+     *
+     * Adds the created sequence to the ASN.1 definitions member
+     *
+     * @param   sedsArgument            SEDS command argument
+     * @param   sedsArgumentTypeName    Resolved SEDS command argument type name
+     *
+     * @return  Array type name
+     */
     auto createArrayType(const seds::model::CommandArgument &sedsArgument, const QString &sedsArgumentTypeName) const
             -> QString;
+    /**
+     *  Create a name for the array argument type
+     *
+     * @param   sedsArgumentTypeName    Resolved SEDS command argument type name
+     *
+     *  @return Type name
+     */
     auto createArrayTypeName(const QString &sedsArgumentTypeName) const -> QString;
 
+    /**
+     * @brief   Calculates hash from dimension vector
+     *
+     * @param   dimensions  Dimensions to process
+     *
+     * @return  Calculated hash
+     */
     auto calculateDimensionsHash(const std::vector<seds::model::DimensionSize> &dimensions) const -> std::size_t;
 
     /**
@@ -184,12 +216,13 @@ protected:
     /// @brief  Output interface view function
     ivm::IVFunction *m_ivFunction;
 
+    /// @brief  Struct for the array arguments cache
     struct ArrayArgumentsCacheEntry final {
         QString asn1TypeName;
         std::size_t dimensionsHash;
         std::vector<seds::model::DimensionSize> arrayDimensions;
 
-        auto compareDimensions(const std::vector<seds::model::DimensionSize> &diumensions) const -> bool;
+        auto compareDimensions(const std::vector<seds::model::DimensionSize> &dimensions) const -> bool;
     };
 
     static std::multimap<QString, ArrayArgumentsCacheEntry> m_arrayArgumentsCache;
