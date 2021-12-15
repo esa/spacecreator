@@ -67,9 +67,13 @@ protected:
 protected Q_SLOTS:
     void applyColorScheme() override;
 
+protected:
+    explicit IVFunctionGraphicsItem(ivm::IVFunction *entity, std::unique_ptr<MiniViewRenderer> renderer, QGraphicsItem *parent = nullptr);
+
+    std::unique_ptr<MiniViewRenderer> m_miniViewDrawer;
+
 private:
     static QPointer<QSvgRenderer> m_svgRenderer;
-    std::unique_ptr<MiniViewRenderer> m_miniViewDrawer;
     QList<IVInterfaceGraphicsItem *> m_interfaces;
 };
 }

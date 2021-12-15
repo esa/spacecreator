@@ -97,6 +97,8 @@ target_sources(${LIB_NAME} PRIVATE
     endtoend/endtoendview.ui
     endtoend/leafdocumentsmodel.cpp
     endtoend/leafdocumentsmodel.h
+    endtoend/end2endfunctiongraphicsitem.cpp
+    endtoend/end2endfunctiongraphicsitem.h
     interfacedocument.cpp
     interfacedocument.h
     itemeditor/common/ivutils.cpp

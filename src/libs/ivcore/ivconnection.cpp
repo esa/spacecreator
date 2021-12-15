@@ -255,7 +255,6 @@ bool IVConnection::lookupEndpointsPostponed()
             ivFunction = model()->getObjectByName(
                     IVNameValidator::encodeName(IVObject::Type::Function, info->m_functionName));
             if (!ivFunction) {
-                QString warningMessage = QStringLiteral("Unable to find Fn/FnType %1").arg(info->m_functionName);
                 shared::ErrorHub::addError(shared::ErrorItem::Warning,
                         tr("Connection removed - Unable to find Fn/FnType %1").arg(info->m_functionName), "");
             }
@@ -276,7 +275,6 @@ bool IVConnection::lookupEndpointsPostponed()
                     IVNameValidator::encodeName(IVObject::Type::RequiredInterface, info->m_interfaceName);
             ivIface = model()->getIfaceByName(encodedName, info->m_ifaceDirection, parentObj);
             if (!ivIface) {
-                QString warningMessage = QStringLiteral("Unable to find Interface %1").arg(info->m_interfaceName);
                 shared::ErrorHub::addError(shared::ErrorItem::Warning,
                         tr("Connection removed - Unable to find interface %1").arg(info->m_interfaceName), "");
             }
