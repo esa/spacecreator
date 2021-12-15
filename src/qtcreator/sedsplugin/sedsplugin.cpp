@@ -541,63 +541,54 @@ auto SedsPlugin::loadAndMergeIvModelIntoCurrent(const QString &ivConfig, const Q
 auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel *const model) -> void
 {
     if (srcFun == nullptr) {
+        MessageManager::write(GenMsg::msgError.arg("Source IV function could not be read"));
         return;
     }
 
     ivm::IVFunction *const dstFun = getCurIvEditorCore()->addFunction(srcFun->title(), nullptr);
-    // ivm::IVFunction *const dstFun = new ivm::IVFunction(model, shared::Id::createUuid());
-
     if (dstFun == nullptr) {
-        MessageManager::write("dstfun is null");
+        MessageManager::write(GenMsg::msgError.arg("Destination IV function could not be created"));
         return;
-    } else {
-        // dstFun->setDefaultImplementation(srcFun->defaultImplementation());
+    }
 
-        // if (!srcFun->contextParams().isEmpty()) {
-        //     QVector<shared::ContextParameter> pars;
-        //     std::copy(srcFun->contextParams().begin(), srcFun->contextParams().end(), pars.begin());
-        //     dstFun->setContextParams(pars);
-        // }
+    QString srcFunDefaultImplementation = srcFun->defaultImplementation();
+    dstFun->setDefaultImplementation(srcFunDefaultImplementation);
 
-        // TODO: copy rest of the necessary member values
-        for (ivm::IVInterface *const srcIf : srcFun->interfaces()) {
-            ivm::IVInterface::CreationInfo ci;
-            ci.kind = srcIf->kind();
-            ci.type = srcIf->direction();
-            ci.function = dstFun;
-            ci.model = model;
-            ci.name = srcIf->title();
-            QRectF funcRect = shared::graphicsviewutils::rect(dstFun->coordinates());
-            QPointF ifPos(funcRect.left(), funcRect.center().y());
-            if (ci.type == ivm::IVInterface::InterfaceType::Required) {
-                ifPos.setX(funcRect.right());
-            }
-            ci.position = ifPos;
+    // if (!srcFun->contextParams().isEmpty()) {
+    //     QVector<shared::ContextParameter> pars;
+    //     std::copy(srcFun->contextParams().begin(), srcFun->contextParams().end(), pars.begin());
+    //     dstFun->setContextParams(pars);
+    // }
 
-            auto *const command = new ive::cmd::CmdInterfaceItemCreate(ci);
-            if (getCurIvEditorCore() != nullptr) {
-                if (getCurIvEditorCore()->commandsStack() != nullptr) {
-                    getCurIvEditorCore()->commandsStack()->push(command);
-                } else {
-                    MessageManager::write("curent commands stack is null");
-                }
-            } else {
-                MessageManager::write("curent ivecitor core is null");
-            }
-
-            Q_EMIT getCurIvEditorCore()->editedExternally(getCurIvEditorCore().get());
-
-            // auto *const dstIf = ivm::IVInterface::createIface(ci);
-            // dstIf->setVisible(true);
-            // dstIf->setTitle(srcIf->title());
-
-            // dstIf->setParent(dstFun);
-            // dstFun->addChild(dstIf);
-
-            qDebug() << "interfaces in dstFun: " << dstFun->interfaces().size();
-            qDebug() << srcIf->direction();
-            qDebug() << "title:       " << srcIf->title() << "\n";
+    for (ivm::IVInterface *const srcIf : srcFun->interfaces()) {
+        ivm::IVInterface::CreationInfo ci;
+        ci.kind = srcIf->kind();
+        ci.type = srcIf->direction();
+        ci.function = dstFun;
+        ci.model = model;
+        ci.name = srcIf->title();
+        QRectF funcRect = shared::graphicsviewutils::rect(dstFun->coordinates());
+        QPointF ifPos(funcRect.left(), funcRect.center().y());
+        if (ci.type == ivm::IVInterface::InterfaceType::Required) {
+            ifPos.setX(funcRect.right());
         }
+        ci.position = ifPos;
+
+        auto *const command = new ive::cmd::CmdInterfaceItemCreate(ci);
+        if (command == nullptr) {
+            MessageManager::write(GenMsg::msgError.arg("Command could not be created"));
+            return;
+        }
+
+        auto *const commandsStack = getCurIvEditorCore()->commandsStack();
+        if (commandsStack != nullptr) {
+            commandsStack->push(command);
+        } else {
+            MessageManager::write(GenMsg::msgError.arg("Curent commands stack is null"));
+            return;
+        }
+
+        Q_EMIT getCurIvEditorCore()->editedExternally(getCurIvEditorCore().get());
     }
 }
 
