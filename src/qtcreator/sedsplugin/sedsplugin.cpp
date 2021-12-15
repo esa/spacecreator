@@ -23,12 +23,16 @@
 #include "../spacecreatorplugin/iv/iveditordocument.h"
 #include "../spacecreatorplugin/iv/iveditorfactory.h"
 #include "../spacecreatorplugin/iv/ivqtceditor.h"
+#include "commands/cmdinterfaceitemcreate.h"
+#include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "conversion/asn1/Asn1Options/options.h"
 #include "conversion/converter/exceptions.h"
 #include "conversion/iv/IvOptions/options.h"
+#include "editorcore.h"
 #include "exceptions.h"
 #include "export/exceptions.h"
+#include "graphicsviewutils.h"
 #include "import/exceptions.h"
 #include "interfacedocument.h"
 #include "iveditor.h"
@@ -536,35 +540,64 @@ auto SedsPlugin::loadAndMergeIvModelIntoCurrent(const QString &ivConfig, const Q
 
 auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel *const model) -> void
 {
-    ivm::IVFunction *const dstFun = new ivm::IVFunction(model, srcFun->id());
+    if (srcFun == nullptr) {
+        return;
+    }
 
-    if (srcFun != nullptr && dstFun != nullptr) {
-        dstFun->setDefaultImplementation(srcFun->defaultImplementation());
-        dstFun->setTitle(srcFun->title());
-        if (!srcFun->contextParams().isEmpty()) {
-            QVector<shared::ContextParameter> pars;
-            std::copy(srcFun->contextParams().begin(), srcFun->contextParams().end(), pars.begin());
-            dstFun->setContextParams(pars);
-        }
+    ivm::IVFunction *const dstFun = getCurIvEditorCore()->addFunction(srcFun->title(), nullptr);
+    // ivm::IVFunction *const dstFun = new ivm::IVFunction(model, shared::Id::createUuid());
+
+    if (dstFun == nullptr) {
+        MessageManager::write("dstfun is null");
+        return;
+    } else {
+        // dstFun->setDefaultImplementation(srcFun->defaultImplementation());
+
+        // if (!srcFun->contextParams().isEmpty()) {
+        //     QVector<shared::ContextParameter> pars;
+        //     std::copy(srcFun->contextParams().begin(), srcFun->contextParams().end(), pars.begin());
+        //     dstFun->setContextParams(pars);
+        // }
+
         // TODO: copy rest of the necessary member values
         for (ivm::IVInterface *const srcIf : srcFun->interfaces()) {
             ivm::IVInterface::CreationInfo ci;
-            ci = ivm::IVInterface::CreationInfo::fromIface(srcIf);
+            ci.kind = srcIf->kind();
+            ci.type = srcIf->direction();
             ci.function = dstFun;
             ci.model = model;
-            auto *const dstIf = ivm::IVInterface::createIface(ci);
-            dstIf->setVisible(true);
-            dstFun->interfaces().push_back(dstIf);
-
-            if (srcIf != nullptr) {
-                qDebug() << srcIf->direction();
-                qDebug() << "iface label: " << srcIf->ifaceLabel();
-                qDebug() << "title:       " << srcIf->title();
+            ci.name = srcIf->title();
+            QRectF funcRect = shared::graphicsviewutils::rect(dstFun->coordinates());
+            QPointF ifPos(funcRect.left(), funcRect.center().y());
+            if (ci.type == ivm::IVInterface::InterfaceType::Required) {
+                ifPos.setX(funcRect.right());
             }
+            ci.position = ifPos;
+
+            auto *const command = new ive::cmd::CmdInterfaceItemCreate(ci);
+            if (getCurIvEditorCore() != nullptr) {
+                if (getCurIvEditorCore()->commandsStack() != nullptr) {
+                    getCurIvEditorCore()->commandsStack()->push(command);
+                } else {
+                    MessageManager::write("curent commands stack is null");
+                }
+            } else {
+                MessageManager::write("curent ivecitor core is null");
+            }
+
+            Q_EMIT getCurIvEditorCore()->editedExternally(getCurIvEditorCore().get());
+
+            // auto *const dstIf = ivm::IVInterface::createIface(ci);
+            // dstIf->setVisible(true);
+            // dstIf->setTitle(srcIf->title());
+
+            // dstIf->setParent(dstFun);
+            // dstFun->addChild(dstIf);
+
+            qDebug() << "interfaces in dstFun: " << dstFun->interfaces().size();
+            qDebug() << srcIf->direction();
+            qDebug() << "title:       " << srcIf->title() << "\n";
         }
-        model->addObject(dstFun);
-    } else {
-        MessageManager::write(GenMsg::msgError.arg("IV function could not be read"));
     }
 }
 
