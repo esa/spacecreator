@@ -143,6 +143,17 @@ void IVAppWidget::showContextMenuForIVModel(const QPoint &pos)
 void IVAppWidget::showAvailableLayers(const QPoint &pos)
 {
     /** TODO: implement actions triggered from menu **/
+    const QModelIndex idx = ui->objectsView->indexAt(pos);
+    if (!idx.isValid()) {
+        return;
+    }
+
+    const auto obj = m_document->objectsModel()->getObject(
+            idx.data(static_cast<int>(ive::IVVisualizationModelBase::IdRole)).toUuid());
+    if (!obj) {
+        return;
+    }
+
     QList<QAction *> actions;
     QMenu *menu = new QMenu;
     menu->addActions(actions);

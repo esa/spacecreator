@@ -41,32 +41,11 @@ void IVConnectionLayerType::rename(const QString &name)
     m_name = name;
 }
 
-bool IVConnectionLayerType::moveObjectToLayer(IVObject *obj)
-{
-    if (obj != nullptr && !m_objects.contains(obj)) {
-        m_objects.append(obj);
-        return true;
-    }
-    return false;
-}
-
-bool IVConnectionLayerType::removeObjectFromLayer(IVObject *obj)
-{
-    if (obj != nullptr && m_objects.contains(obj)) {
-        m_objects.removeAll(obj);
-        return true;
-    }
-    return false;
-}
-
-QList<IVObject *> IVConnectionLayerType::getObjectsForLayer()
-{
-    return m_objects;
-}
-
 IVConnectionLayerType::~IVConnectionLayerType()
 {
-    IVConnectionLayerType::connectionLayers.removeAll(this);
+    if (!IVConnectionLayerType::connectionLayers.isEmpty()) {
+        IVConnectionLayerType::connectionLayers.removeAll(this);
+    }
 }
 
 IVConnectionLayerType *IVConnectionLayerType::getConnectionLayerByName(const QString &name)
@@ -86,40 +65,6 @@ IVConnectionLayerType *IVConnectionLayerType::renameConnectionLayer(const QStrin
         layer->rename(newName);
     }
     return nullptr;
-}
-
-IVConnectionLayerType *IVConnectionLayerType::addConnectionLayer(IVConnectionLayerType *layer)
-{
-    if (layer != nullptr) {
-        auto existingLayer = IVConnectionLayerType::getConnectionLayerByName(layer->name());
-        if (existingLayer == nullptr) {
-            IVConnectionLayerType::connectionLayers.append(layer);
-            return layer;
-        }
-        return existingLayer;
-    }
-    return nullptr;
-}
-
-IVConnectionLayerType *IVConnectionLayerType::addConnectionLayer(const QString &name, IVObject *parent)
-{
-    if (IVConnectionLayerType::getConnectionLayerByName(name) == nullptr) {
-        auto *layer = new IVConnectionLayerType(name, parent, shared::createId());
-        IVConnectionLayerType::connectionLayers.append(layer);
-        return layer;
-    }
-    return nullptr;
-}
-
-bool IVConnectionLayerType::removeConnectionLayer(const QString &name)
-{
-    auto *layer = IVConnectionLayerType::getConnectionLayerByName(name);
-    if (layer != nullptr && layer->getObjectsForLayer().empty()) {
-        IVConnectionLayerType::connectionLayers.removeAll(layer);
-        delete layer;
-        return true;
-    }
-    return false;
 }
 
 IVConnectionLayerType *IVConnectionLayerType::addDefaultConnectionLayer(IVObject *parent)

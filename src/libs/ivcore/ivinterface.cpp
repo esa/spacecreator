@@ -41,15 +41,11 @@ IVInterface::CreationInfo::CreationInfo(IVModel *model, IVFunctionType *function
     , id(id)
     , parameters(parameters)
     , kind(kind)
+    , layer(layer == nullptr ? IVConnectionLayerType::getDefaultConnectionLayer() : layer)
     , name(name)
     , policy(policy)
     , toBeCloned(policy == Policy::Clone ? source : nullptr)
 {
-    if (layer == nullptr) {
-        layer = IVConnectionLayerType::getDefaultConnectionLayer();
-    } else {
-        this->layer = layer;
-    }
 }
 
 QVariantList IVInterface::CreationInfo::toVarList() const
@@ -242,16 +238,11 @@ IVConnectionLayerType *IVInterface::layer() const
 
 bool IVInterface::setLayer(IVConnectionLayerType *layer)
 {
-    if (this->layer() != nullptr && this->layer() != layer) {
-        this->layer()->removeObjectFromLayer(this);
-    }
     if (layer != nullptr) {
         setEntityAttribute(meta::Props::token(meta::Props::Token::layer), layer->name());
-        layer->moveObjectToLayer(this);
         return true;
     }
     setEntityAttribute(meta::Props::token(meta::Props::Token::layer), IVConnectionLayerType::DefaultLayerName);
-    IVConnectionLayerType::getDefaultConnectionLayer()->moveObjectToLayer(this);
     return false;
 }
 

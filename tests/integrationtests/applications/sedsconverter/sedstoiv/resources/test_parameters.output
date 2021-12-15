@@ -1,27 +1,27 @@
 <InterfaceView>
 <Function name="MegaComponent" is_type="NO" language="SDL" default_implementation="default">
-<Provided_Interface name="Get_ProvidedInterface_ReadOnlySync_Pi" kind="Protected">
+<Provided_Interface name="Get_ProvidedInterface_ReadOnlySync_Pi" kind="Protected" layer="default">
     <Output_Parameter name="Param" type="MyInteger" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="Set_ProvidedInterface_ReadWriteAsync_Pi">
+<Provided_Interface name="Set_ProvidedInterface_ReadWriteAsync_Pi" layer="default">
     <Input_Parameter name="Param" type="MyInteger" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="Get_ProvidedInterface_ReadWriteSync_Pi" kind="Protected">
+<Provided_Interface name="Get_ProvidedInterface_ReadWriteSync_Pi" kind="Protected" layer="default">
     <Output_Parameter name="Param" type="MyInteger" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="Set_ProvidedInterface_ReadWriteSync_Pi" kind="Protected">
+<Provided_Interface name="Set_ProvidedInterface_ReadWriteSync_Pi" kind="Protected" layer="default">
     <Input_Parameter name="Param" type="MyInteger" encoding="ACN"/>
 </Provided_Interface>
 
-<Required_Interface name="Get_ProvidedInterface_ReadOnlyAsync_Ri" kind="Sporadic">
+<Required_Interface name="Get_ProvidedInterface_ReadOnlyAsync_Ri" kind="Sporadic" layer="default">
     <Input_Parameter name="Param" type="MyInteger" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
-<Required_Interface name="Get_ProvidedInterface_ReadWriteAsync_Ri" kind="Sporadic">
+<Required_Interface name="Get_ProvidedInterface_ReadWriteAsync_Ri" kind="Sporadic" layer="default">
     <Input_Parameter name="Param" type="MyInteger" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>

@@ -3,7 +3,7 @@
     <ContextParameter name="timer_StateA" type="Timer" value=""/>
     <ContextParameter name="timer_StateB" type="Timer" value=""/>
     <ContextParameter name="timer_StateC" type="Timer" value=""/>
-<Provided_Interface name="If1_Cmd1_Pi">
+<Provided_Interface name="If1_Cmd1_Pi" layer="default">
 </Provided_Interface>
 
     <Implementations>

@@ -21,7 +21,7 @@
     </Attr>
     <Attr label="Layer" name="layer" visible="true" editable="false">
         <Type>
-            <String validator="[a-zA-Z][a-zA-Z0-9_]*" />
+            <String validator="[a-zA-Z][a-zA-Z0-9_]*" defaultValue="default" />
         </Type>
         <Scopes>
             <Provided_Interface/>
