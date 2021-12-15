@@ -498,12 +498,19 @@ auto SedsPlugin::loadIvModel(const QString &ivConfigFilename, const QString &ivF
 
 auto SedsPlugin::getCurrentIvModel() -> ivm::IVModel *
 {
-    if (getCurIvEditorCore()->document() == nullptr) {
+    const auto curIvEditorCore = getCurIvEditorCore();
+    if (curIvEditorCore == nullptr) {
+        MessageManager::write(GenMsg::msgError.arg("IV Editor core could not be read"));
+        return nullptr;
+    }
+
+    const auto curIvEditorCoreDocument = curIvEditorCore->document();
+    if (curIvEditorCoreDocument == nullptr) {
         MessageManager::write(GenMsg::msgError.arg("No document in current IV Editor core"));
         return nullptr;
     }
 
-    return getCurIvEditorCore()->document()->objectsModel();
+    return curIvEditorCoreDocument->objectsModel();
 }
 
 auto SedsPlugin::loadAndMergeIvModelIntoCurrent(const QString &ivConfig, const QString &ivFilename) -> bool
