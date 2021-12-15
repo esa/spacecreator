@@ -174,11 +174,19 @@ void GraphicsViewBase::mouseReleaseEvent(QMouseEvent *event)
 void GraphicsViewBase::wheelEvent(QWheelEvent *event)
 {
     if (event->modifiers() & Qt::ControlModifier) {
-        QPointF oldPos = mapToScene(event->pos());
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        const QPoint oldPos = mapToScene(event->position().toPoint()).toPoint();
+#else
+        const QPoint oldPos = mapToScene(event->pos()).toPoint();
+#endif
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        setZoom(d->zoomPercent + (event->angleDelta().y() > 0 ? zoomStepPercent() : -zoomStepPercent()));
+#else
         setZoom(d->zoomPercent + (event->delta() > 0 ? zoomStepPercent() : -zoomStepPercent()));
+#endif
 
-        QPointF newPos = mapToScene(event->pos());
+        QPointF newPos = mapToScene(oldPos);
         QPointF delta = newPos - oldPos;
 
         translate(delta.x(), delta.y());

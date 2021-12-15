@@ -37,7 +37,11 @@ VEItemModel::VEItemModel(VEModel *model, cmd::CommandsStackBase *commandsStack, 
     , m_model(model)
     , m_commandsStack(commandsStack)
     , m_graphicsScene(new GraphicsSceneBase(this))
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    , m_mutex(new QMutex())
+#else
     , m_mutex(new QMutex(QMutex::NonRecursive))
+#endif
 {
     Q_ASSERT(!m_commandsStack.isNull());
 
@@ -52,7 +56,7 @@ VEItemModel::VEItemModel(VEModel *model, cmd::CommandsStackBase *commandsStack, 
     connect(m_graphicsScene, &QGraphicsScene::selectionChanged, this, &VEItemModel::onSceneSelectionChanged);
 }
 
-VEItemModel::~VEItemModel() {}
+VEItemModel::~VEItemModel() { }
 
 QGraphicsScene *VEItemModel::scene() const
 {
@@ -195,9 +199,11 @@ void VEItemModel::initItem(VEInteractiveObject *item)
     }
 
     connect(object, &VEObject::attributeChanged, this, &VEItemModel::onObjectAttributeChanged);
-    connect(item, &VEInteractiveObject::clicked, this,
+    connect(
+            item, &VEInteractiveObject::clicked, this,
             [this, entity = item->entity()]() { Q_EMIT itemClicked(entity->id()); }, Qt::QueuedConnection);
-    connect(item, &VEInteractiveObject::doubleClicked, this,
+    connect(
+            item, &VEInteractiveObject::doubleClicked, this,
             [this, entity = item->entity()]() { Q_EMIT itemDoubleClicked(entity->id()); }, Qt::QueuedConnection);
 
     m_items.insert(object->id(), item);

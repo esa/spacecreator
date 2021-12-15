@@ -42,8 +42,8 @@
 #include <QDebug>
 #include <QKeyEvent>
 #include <QMessageBox>
-#include <QRegExp>
-#include <QRegExpValidator>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <QStyledItemDelegate>
 #include <QTimer>
 
@@ -63,7 +63,7 @@ MessageDialog::MessageDialog(msc::MscMessage *message, msc::ChartLayoutManager *
     Q_ASSERT(message);
     ui->setupUi(this);
 
-    QRegExpValidator *nameValidator = new QRegExpValidator(msc::MscEntity::nameVerifier(), this);
+    QRegularExpressionValidator *nameValidator = new QRegularExpressionValidator(msc::MscEntity::nameVerifier(), this);
     ui->nameLineEdit->setValidator(nameValidator);
 
     ui->nameLineEdit->setText(m_message->name());

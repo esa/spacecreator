@@ -217,8 +217,13 @@ void IVAppWidget::importEntity(const shared::Id &id, const QPointF &sceneDropPoi
                                           ->nestedFunctionNames(obj->as<const ivm::IVFunctionType *>())
                                           .intersect(existingFunctionNames);
     if (!intersectedNames.isEmpty()) {
+        QList<QString> intersectedNamesList;
+        intersectedNamesList.reserve(intersectedNames.size());
+        for (const QString &name : intersectedNames) {
+            intersectedNamesList.append(name);
+        }
         const QString msg = tr("Chosen entity [%1] couldn't be imported because of Function names conflict(s): %2")
-                                    .arg(obj->titleUI(), intersectedNames.toList().join(QLatin1Char('\n')));
+                                    .arg(obj->titleUI(), intersectedNamesList.join(QLatin1Char('\n')));
         shared::ErrorHub::addError(shared::ErrorItem::Error, msg);
         return;
     }

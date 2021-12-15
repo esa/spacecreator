@@ -67,7 +67,11 @@ void CmdContextParameterRemove::undo()
 bool CmdContextParameterRemove::mergeWith(const QUndoCommand *command)
 {
     if (command->id() == id()) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        m_params.insert(static_cast<const CmdContextParameterRemove *>(command)->m_params);
+#else
         m_params.unite(static_cast<const CmdContextParameterRemove *>(command)->m_params);
+#endif
         return true;
     }
     return false;

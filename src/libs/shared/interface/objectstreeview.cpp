@@ -54,8 +54,7 @@ void ObjectsTreeView::mouseMoveEvent(QMouseEvent *event)
 
             QDrag *drag = new QDrag(this);
             DropData *mimeData = new DropData;
-            const Id id = index.data(AbstractVisualizationModel::IdRole).toUuid();
-            mimeData->entityId = id.toString();
+            mimeData->entityId = index.data(AbstractVisualizationModel::IdRole).toUuid();
             const int dropType = index.data(AbstractVisualizationModel::DropRole).toInt();
             mimeData->dropType = static_cast<DropData::Type>(dropType);
             drag->setMimeData(mimeData);

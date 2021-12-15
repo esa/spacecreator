@@ -33,7 +33,11 @@ CreateConnectionGroupDialog::CreateConnectionGroupDialog(
     , m_info(groupCreationDataList)
     , m_signalMapper(new QSignalMapper(this))
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    connect(m_signalMapper, &QSignalMapper::mappedInt, this, [this](int idx) {
+#else
     connect(m_signalMapper, qOverload<int>(&QSignalMapper::mapped), this, [this](int idx) {
+#endif
         if (const auto textEdit = qobject_cast<QPlainTextEdit *>(m_signalMapper->mapping(idx))) {
             m_info[idx].name = textEdit->toPlainText().trimmed();
         }

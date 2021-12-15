@@ -19,11 +19,11 @@
 
 #include <QCache>
 #include <QObject>
+#include <QStringList>
 #include <QVector>
 #include <memory>
 
 class QFileInfo;
-class QStringList;
 
 namespace Asn1Acn {
 class File;

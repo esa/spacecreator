@@ -147,7 +147,7 @@ typename AstXmlConstraintNodeParser<T>::Constraints AstXmlConstraintNodeParser<T
     else if (m_xmlReader.name() == QStringLiteral("SIZE"))
         return readSize();
 
-    m_xmlReader.raiseError("Unknown node: " + m_xmlReader.name());
+    m_xmlReader.raiseError(QString("Unknown node: %1").arg(m_xmlReader.name()));
     return nullptr;
 }
 

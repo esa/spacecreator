@@ -18,6 +18,7 @@
 #pragma once
 
 #include "common.h"
+#include "ivobject.h"
 #include "undocommand.h"
 
 #include <QPointer>
@@ -25,7 +26,6 @@
 #include <QVector>
 
 namespace ivm {
-class IVObject;
 class IVModel;
 class IVFunctionType;
 }

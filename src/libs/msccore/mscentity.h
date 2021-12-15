@@ -21,6 +21,7 @@
 #include "cif/cifline.h"
 
 #include <QPointer>
+#include <QRegularExpression>
 #include <QString>
 #include <QUuid>
 #include <QVector>
@@ -61,7 +62,7 @@ public:
     const QString &name() const;
     void setName(const QString &name);
 
-    static const QRegExp &nameVerifier();
+    static const QRegularExpression &nameVerifier();
 
     QUuid internalId() const;
 
@@ -102,7 +103,7 @@ private:
     QPointer<MscComment> m_comment;
     QVector<cif::CifBlockShared> m_cifs;
 
-    static const QRegExp m_nameVerify;
+    static const QRegularExpression m_nameVerify;
 };
 
 }

@@ -24,7 +24,7 @@
 
 namespace msc {
 
-const QRegExp MscEntity::m_nameVerify("([A-Z]|[a-z]|\\d|_|\\.)+");
+const QRegularExpression MscEntity::m_nameVerify("([A-Z]|[a-z]|\\d|_|\\.)+");
 
 /*!
    \class msc::MscEntity
@@ -64,7 +64,7 @@ void MscEntity::setName(const QString &name)
 /*!
    Returns a regular expression that can be used to check if names are correct for the msc specification
  */
-const QRegExp &MscEntity::nameVerifier()
+const QRegularExpression &MscEntity::nameVerifier()
 {
     return m_nameVerify;
 }

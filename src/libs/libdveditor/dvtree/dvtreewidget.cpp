@@ -38,7 +38,7 @@ DVTreeWidget::DVTreeWidget(QWidget *parent)
     , m_selectionModel(new SelectionOverProxyModel(m_dvTreeSortModel, this))
 {
     auto layout = new QVBoxLayout(this);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     setLayout(layout);
     layout->addWidget(m_treeView);
 

@@ -47,7 +47,7 @@ PropertyTemplate::PropertyTemplate()
 {
 }
 
-PropertyTemplate::~PropertyTemplate() {}
+PropertyTemplate::~PropertyTemplate() { }
 
 QString PropertyTemplate::name() const
 {
@@ -169,7 +169,7 @@ void PropertyTemplate::setValueValidatorPattern(const QString &pattern)
     d->m_rxValueValidatorPattern = pattern;
 }
 
-QMap<int, QPair<QString, QString>> PropertyTemplate::attrValidatorPatterns() const
+QMultiMap<int, QPair<QString, QString>> PropertyTemplate::attrValidatorPatterns() const
 {
     return d->m_rxAttrValidatorPattern;
 }
