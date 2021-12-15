@@ -552,7 +552,7 @@ auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel 
             ci = ivm::IVInterface::CreationInfo::fromIface(srcIf);
             ci.function = dstFun;
             ci.model = model;
-            auto dstIf = ivm::IVInterface::createIface(ci);
+            auto *const dstIf = ivm::IVInterface::createIface(ci);
             dstIf->setVisible(true);
             dstFun->interfaces().push_back(dstIf);
 
