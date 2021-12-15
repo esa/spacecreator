@@ -42,7 +42,7 @@ public:
     void setView(shared::ui::GraphicsViewBase *view);
 
 protected Q_SLOTS:
-    void onCurrentIndexChanged(const QString &text);
+    void onCurrentIndexChanged(int idx);
     void setZoomLevel(qreal percent);
     void displayZoomLevel(qreal percent);
 
