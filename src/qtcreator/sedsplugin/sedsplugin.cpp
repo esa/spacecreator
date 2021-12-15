@@ -459,7 +459,7 @@ auto SedsPlugin::mergeIvModels(ivm::IVModel *const dstIvModel, ivm::IVModel *con
             MessageManager::write(GenMsg::msgInfo.arg(
                     QString("%1 - names are the same, Function will not be imported").arg(srcIvObject->title())));
         } else {
-            addFunctionToModel(srcIvObject, dstIvModel);
+            addFunctionToModel(dynamic_cast<ivm::IVFunction *>(srcIvObject), dstIvModel);
         }
     }
 }
@@ -527,10 +527,9 @@ auto SedsPlugin::loadAndMergeIvModelIntoCurrent(const QString &ivConfig, const Q
     return true;
 }
 
-auto SedsPlugin::addFunctionToModel(ivm::IVObject *object, ivm::IVModel *model) -> void
+auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel *const model) -> void
 {
-    ivm::IVFunction *const srcFun = dynamic_cast<ivm::IVFunction *>(object);
-    ivm::IVFunction *const dstFun = new ivm::IVFunction(model, object->id());
+    ivm::IVFunction *const dstFun = new ivm::IVFunction(model, srcFun->id());
 
     if (srcFun != nullptr && dstFun != nullptr) {
         dstFun->setDefaultImplementation(srcFun->defaultImplementation());

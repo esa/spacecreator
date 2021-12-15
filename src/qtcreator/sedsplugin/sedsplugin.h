@@ -66,7 +66,7 @@ private:
     auto loadIvModel(const QString &ivConfigFilename, const QString &ivFilename) -> std::unique_ptr<conversion::Model>;
     auto getCurrentIvModel() -> ivm::IVModel *;
     auto loadAndMergeIvModelIntoCurrent(const QString &ivConfig, const QString &ivFilename) -> bool;
-    auto addFunctionToModel(ivm::IVObject *object, ivm::IVModel *model) -> void;
+    auto addFunctionToModel(ivm::IVFunction *srcFun, ivm::IVModel *model) -> void;
     auto doesModelContainFunction(ivm::IVModel *model, ivm::IVFunction *function) -> bool;
 
     /** @brief  Internal registry */
