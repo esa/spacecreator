@@ -22,6 +22,7 @@
 #include <QPointer>
 #include <QWidget>
 
+class QLabel;
 class QTreeView;
 
 namespace dvm {
@@ -47,7 +48,7 @@ private Q_SLOTS:
 private:
     void setMessagesChecked(bool value);
 
-private:
+    QLabel *m_sourceTargetName = nullptr;
     QTreeView *m_treeView = nullptr;
     DVMessageBindingsModel *m_model = nullptr;
     QPointer<dvm::DVConnection> m_connection;
