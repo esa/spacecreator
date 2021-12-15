@@ -467,7 +467,7 @@ auto SedsPlugin::mergeIvModels(ivm::IVModel *const dstIvModel, ivm::IVModel *con
 auto SedsPlugin::doesModelContainFunction(ivm::IVModel *const model, ivm::IVFunction *const function) -> bool
 {
     return std::any_of(model->visibleObjects().begin(), model->visibleObjects().end(), //
-            [&function](auto &obj) -> bool {
+            [&function](ivm::IVObject *const obj) -> bool {
                 if (obj == nullptr) {
                     return false;
                 } else {
