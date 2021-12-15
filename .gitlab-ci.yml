@@ -66,6 +66,7 @@ space-creator:
     - cd ${DOWNLOAD_DIR}
     - wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2 | tar jxvf -
     - export PATH=$PATH:${DOWNLOAD_DIR}/asn1scc
+    - export PATH=$PATH:/root/.local/bin
     - cd ${PROJECT_ROOT}
     - ./scripts/run_tests.sh ${BUILD_DIR}
     # Create AppImage
