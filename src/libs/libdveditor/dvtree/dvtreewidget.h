@@ -47,8 +47,8 @@ private Q_SLOTS:
 
 private:
     QTreeView *m_treeView = nullptr;
-    QItemSelectionModel *m_selectionModel = nullptr;
     DVTreeSortProxyModel *m_dvTreeSortModel = nullptr;
+    QItemSelectionModel *m_selectionModel = nullptr;
     DVEditorCore *m_dvCore = nullptr;
 };
 

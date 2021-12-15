@@ -43,12 +43,13 @@ private Q_SLOTS:
     void testValid();
 };
 
+/// \SRS  ETB-FUN-40
 void tsti_SedsXmlImporter::testValid()
 {
     Options options;
-    options.add(SedsOptions::inputFilename, "seds.xml");
-    options.add(SedsOptions::preprocessedFilename, "preprocessed.xml");
-    options.add(SedsOptions::externalRefFilename, "external_references.toml");
+    options.add(SedsOptions::inputFilepath, "seds.xml");
+    options.add(SedsOptions::preprocessedFilepath, "preprocessed.xml");
+    options.add(SedsOptions::externalRefFilepath, "external_references.toml");
     options.add(SedsOptions::externalRef, "integer.name:UnsignedInteger8");
 
     SedsXmlImporter sedsImporter;

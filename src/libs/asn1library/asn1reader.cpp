@@ -77,13 +77,13 @@ std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1File(
     }
 
     const QString fullFilePath = asn1File.absoluteFilePath();
-    const QByteArray asn1FileHash = fileHash(fullFilePath);
+    const QByteArray asn1FileHash = fileHash(QStringList(fullFilePath));
 
     const QString asnCacheFile =
             QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/asn/" + asn1FileHash + ".xml";
 
     if (!QFile::exists(asnCacheFile)) {
-        if (!convertToXML(fullFilePath, asnCacheFile, errorMessages)) {
+        if (!convertToXML(QStringList(fullFilePath), asnCacheFile, errorMessages)) {
             return {};
         }
     }
@@ -117,7 +117,7 @@ std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1File(
         fileAsn.write(content.toUtf8());
         fileAsn.close();
 
-        bool ok = convertToXML(asnFile, xmlFile, errorMessages);
+        bool ok = convertToXML(QStringList(asnFile), xmlFile, errorMessages);
         if (!ok) {
             return {};
         }
@@ -134,6 +134,44 @@ std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1File(
         asn1TypesData->setName(fileName);
     }
     return asn1TypesData;
+}
+
+std::map<QString, std::unique_ptr<Asn1Acn::File>> Asn1Reader::parseAsn1Files(
+        const QVector<QFileInfo> &fileInfos, QStringList *errorMessages)
+{
+    bool earlyError = false;
+    for (const QFileInfo &fileInfo : fileInfos) {
+        shared::ErrorHub::clearFileErrors(fileInfo.absoluteFilePath());
+
+        if (!fileInfo.exists()) {
+            QString msg = tr("ASN.1 file %1 does not exist").arg(fileInfo.absoluteFilePath());
+            errorMessages->append(msg);
+            shared::ErrorHub::addError(shared::ErrorItem::Error, msg, fileInfo.absoluteFilePath());
+            earlyError = true;
+        }
+    }
+
+    if (earlyError) {
+        return {};
+    }
+
+    QStringList absoluteFilePaths;
+    for (const QFileInfo &fileInfo : fileInfos) {
+        absoluteFilePaths.append(fileInfo.absoluteFilePath());
+    }
+
+    const QByteArray asn1FileHash = fileHash(absoluteFilePaths);
+
+    const QString asnCacheFile =
+            QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/asn/" + asn1FileHash + ".xml";
+
+    if (!QFile::exists(asnCacheFile)) {
+        if (!convertToXML(absoluteFilePaths, asnCacheFile, errorMessages)) {
+            return {};
+        }
+    }
+
+    return parseAsn1XmlFileImpl(asnCacheFile);
 }
 
 /*!
@@ -323,6 +361,16 @@ int Asn1Reader::lineNumberFromError(const QString &error) const
     return ok ? line : -1;
 }
 
+QString Asn1Reader::fileNameFromError(const QString &error) const
+{
+    QStringList tokens = error.split(':');
+    if (tokens.size() < 4) {
+        return "";
+    }
+
+    return tokens.first();
+}
+
 QString Asn1Reader::asn1CompilerCommand() const
 {
     QSettings settings;
@@ -353,30 +401,39 @@ QString Asn1Reader::temporaryFileName(const QString &basename, const QString &su
     return QDir::tempPath() + QDir::separator() + QString("%1_%2.%3").arg(basename).arg(value).arg(suffix);
 }
 
-QByteArray Asn1Reader::fileHash(const QString &fileName) const
+QByteArray Asn1Reader::fileHash(const QStringList &fileNames) const
 {
-    QFile file(fileName);
-    if (file.open(QIODevice::ReadOnly)) {
-        QByteArray content = file.readAll();
-        QByteArray hash = QCryptographicHash::hash(content, QCryptographicHash::Md5);
-        return hash.toHex();
+    QVector<QString> tmp = QVector<QString>::fromList(fileNames);
+    std::sort(tmp.begin(), tmp.end());
+
+    QByteArray content;
+    for (const QString &fileName : tmp) {
+        QFile file(fileName);
+        if (file.open(QIODevice::ReadOnly)) {
+            content.append(file.readAll());
+        }
     }
-    return {};
+
+    QByteArray hash = QCryptographicHash::hash(content, QCryptographicHash::Md5);
+    return hash.toHex();
 }
 
-bool Asn1Reader::convertToXML(const QString &asn1FileName, const QString &xmlFilename, QStringList *errorMessages) const
+bool Asn1Reader::convertToXML(
+        const QStringList &asn1FileNames, const QString &xmlFilename, QStringList *errorMessages) const
 {
     QString cmd = asn1CompilerCommand();
     if (cmd.isEmpty()) {
         QString msg = tr("ASN1 parse error: Unable to run the asn1scc compiler. https://github.com/ttsiodras/asn1scc");
         if (errorMessages)
             errorMessages->append(msg);
-        shared::ErrorHub::addError(shared::ErrorItem::Error, msg, asn1FileName);
+        for (const QString &asn1FileName : asn1FileNames) {
+            shared::ErrorHub::addError(shared::ErrorItem::Error, msg, asn1FileName);
+        }
         return false;
     }
     QString asn1Command = cmd + "%1 %2";
 
-    QString asn1FileNameParameter = "\"" + asn1FileName + "\"";
+    QString asn1FileNamesParameter = createFilenameParameter(asn1FileNames);
     QString asn1XMLFileName = temporaryFileName("asn1", "xml");
 
     QProcess asn1Process;
@@ -390,26 +447,18 @@ bool Asn1Reader::convertToXML(const QString &asn1FileName, const QString &xmlFil
                 }
             });
 
-    connect(&asn1Process, &QProcess::errorOccurred, [&](QProcess::ProcessError) {
-        shared::ErrorHub::addError(shared::ErrorItem::Error, asn1Process.errorString(), asn1FileName,
-                lineNumberFromError(asn1Process.errorString()));
-        if (errorMessages) {
-            errorMessages->append(asn1Process.errorString());
-        }
-    });
+    connect(&asn1Process, &QProcess::errorOccurred,
+            [&](QProcess::ProcessError) { parseAsn1SccErrors(asn1Process.errorString(), errorMessages); });
 
     asn1Process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
     asn1Process.setProcessChannelMode(QProcess::MergedChannels);
-    asn1Process.start(QString(asn1Command).arg(asn1XMLFileName, asn1FileNameParameter));
+    asn1Process.start(QString(asn1Command).arg(asn1XMLFileName, asn1FileNamesParameter));
     asn1Process.waitForFinished();
 
     auto error = asn1Process.readAll();
     if (!error.isEmpty()) {
-        if (errorMessages) {
-            errorMessages->append(error);
-        }
+        parseAsn1SccErrors(error, errorMessages);
         QFile::remove(asn1XMLFileName);
-        shared::ErrorHub::addError(shared::ErrorItem::Error, error, asn1FileName, lineNumberFromError(error));
         return false;
     }
 
@@ -418,6 +467,61 @@ bool Asn1Reader::convertToXML(const QString &asn1FileName, const QString &xmlFil
     QFile::rename(asn1XMLFileName, xmlFilename);
 
     return QFile::exists(xmlFilename);
+}
+
+QString Asn1Reader::createFilenameParameter(const QStringList &asn1FileNames) const
+{
+    QStringList result;
+
+    std::transform(asn1FileNames.begin(), asn1FileNames.end(), std::back_inserter(result),
+            [](const QString &file) { return QString("\"%1\"").arg(file); });
+
+    return result.join(QChar(' '));
+}
+
+void Asn1Reader::parseAsn1SccErrors(QString errorString, QStringList *errorMessages) const
+{
+    QTextStream stream(&errorString);
+
+    QString line;
+    while (stream.readLineInto(&line)) {
+        const int lineNumber = lineNumberFromError(line);
+        const QString fileName = fileNameFromError(line);
+        shared::ErrorHub::addError(shared::ErrorItem::Error, line, fileName, lineNumber);
+        if (errorMessages) {
+            errorMessages->append(line);
+        }
+    }
+}
+
+std::map<QString, std::unique_ptr<Asn1Acn::File>> Asn1Reader::parseAsn1XmlFileImpl(const QString &fileName)
+{
+    QFileInfo fileInfo(fileName);
+    if (fileInfo.exists()) {
+        QFile file(fileName);
+
+        if (file.open(QIODevice::ReadOnly)) {
+
+            QXmlStreamReader reader(&file);
+            Asn1Acn::AstXmlParser parser(reader);
+            const bool ok = parser.parse();
+            if (!ok) {
+                Q_EMIT parseError(tr("Error parsing the asn1 file %1").arg(fileName));
+            }
+            std::map<QString, std::unique_ptr<Asn1Acn::File>> data = parser.takeData();
+            if (data.empty()) {
+                Q_EMIT parseError(tr("Invalid XML format"));
+                return {};
+            }
+
+            return data;
+        } else
+            Q_EMIT parseError(file.errorString());
+    } else {
+        Q_EMIT parseError(tr("File not found"));
+    }
+
+    return {};
 }
 
 }

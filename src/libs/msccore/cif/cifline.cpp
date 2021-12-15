@@ -98,7 +98,11 @@ void CifLine::setPayloadPoints(const QVector<QPoint> &points)
 QPoint CifLine::stringToPoint(const QString &from, bool *ok)
 {
     QPoint res;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    const QStringList &coordinates = from.split(",", Qt::SkipEmptyParts);
+#else
     const QStringList &coordinates = from.split(",", QString::SkipEmptyParts);
+#endif
     if (coordinates.size() == 2) {
         res.rx() = coordinates.first().trimmed().toInt(ok);
         if (ok && *ok)

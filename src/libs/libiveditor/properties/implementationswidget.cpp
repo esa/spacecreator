@@ -28,8 +28,8 @@
 
 namespace ive {
 
-ImplementationsWidget::ImplementationsWidget(ivm::IVFunction *fn, ivm::AbstractSystemChecks *checks,
-        shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent)
+ImplementationsWidget::ImplementationsWidget(const QString &projectPath, ivm::IVFunction *fn,
+        ivm::AbstractSystemChecks *checks, shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ImplementationsWidget)
 {
@@ -39,7 +39,7 @@ ImplementationsWidget::ImplementationsWidget(ivm::IVFunction *fn, ivm::AbstractS
     ui->tableView->setItemDelegateForColumn(ImplementationsModel::Column::Language,
             new shared::ComboBoxDelegate(fn->model()->availableFunctionLanguages(), ui->tableView));
 
-    m_model = new ImplementationsModel(checks, macro, this);
+    m_model = new ImplementationsModel(projectPath, checks, macro, this);
     m_model->setFunction(fn);
     ui->tableView->setModel(m_model);
     ui->tableView->horizontalHeader()->resizeSection(0, 220);

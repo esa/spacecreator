@@ -14,6 +14,6 @@ add_subdirectory(shared)
 add_subdirectory(spacecreatorsystem)
 add_subdirectory(promela)
 
-if (${QTC_FOUND} AND QTC_VERSION EQUAL 48)
+if (${QTC_FOUND} AND QTC_VERSION EQUAL 408)
     add_subdirectory(asn1plugin)
 endif()

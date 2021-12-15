@@ -105,6 +105,7 @@ public:
 
     static QVector<qint32> coordinatesFromString(const QString &strCoordinates);
     static QString coordinatesToString(const QVector<qint32> &coordinates);
+    static bool isNullCoordinates(const QVariant &coordinates);
 
     virtual bool isEqual(const VEObject *other) const;
 
@@ -112,6 +113,8 @@ public:
 
     // Perform updates/actions directly before the data is saved
     virtual void updateForExport() {};
+
+    void setAttributeExportable(const QString &attrName, bool isExportable);
 
 Q_SIGNALS:
     void attributeChanged(const QString &name);
@@ -127,6 +130,8 @@ protected:
 private:
     const std::unique_ptr<VEObjectPrivate> d;
 };
+
+QString toString(VEObject *object);
 
 }
 

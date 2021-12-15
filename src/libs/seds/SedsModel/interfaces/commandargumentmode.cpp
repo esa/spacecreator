@@ -37,4 +37,31 @@ auto enumFromString(const QStringRef &enumStr) -> std::optional<CommandArgumentM
     }
 }
 
+template<>
+auto stringFromEnum(CommandArgumentMode mode) -> const QString &
+{
+    switch (mode) {
+    case CommandArgumentMode::In: {
+        static const QString in = "in";
+        return in;
+    }
+    case CommandArgumentMode::Out: {
+        static const QString out = "out";
+        return out;
+    }
+    case CommandArgumentMode::InOut: {
+        static const QString inOut = "inOut";
+        return inOut;
+    }
+    case CommandArgumentMode::Notify: {
+        static const QString notify = "notify";
+        return notify;
+    }
+    default: {
+        static const QString unhandled = "unhandledArgumentMode";
+        return unhandled;
+    }
+    }
+}
+
 } // namespace seds::model

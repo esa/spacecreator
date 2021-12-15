@@ -21,6 +21,7 @@
 #include "commands/cmdentityattributeschange.h"
 #include "commands/cmdfunctionattrchange.h"
 #include "commandsstack.h"
+#include "common.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
 #include "itemeditor/common/ivutils.h"
@@ -35,7 +36,9 @@
 #include "ivnamevalidator.h"
 #include "ivobject.h"
 #include "ivpropertytemplateconfig.h"
+#include "parameter.h"
 #include "ui/textitem.h"
+#include "veobject.h"
 
 #include <QApplication>
 #include <QGraphicsScene>
@@ -116,6 +119,17 @@ QSizeF IVFunctionTypeGraphicsItem::minimalSize() const
         qMax(textSize.height(), shared::graphicsviewutils::kDefaultGraphicsItemSize.height()) };
 }
 
+QString IVFunctionTypeGraphicsItem::prepareTooltip() const
+{
+    const QString title = shared::uniteNames<ivm::IVFunctionType *>({ entity() }, QString());
+    const QString instances = shared::uniteNames<QPointer<ivm::IVFunction>>(entity()->instances(), tr("Instances: "));
+    const QString ris = shared::uniteNames<ivm::IVInterface *>(entity()->ris(), tr("RI: "));
+    const QString pis = shared::uniteNames<ivm::IVInterface *>(entity()->pis(), tr("PI: "));
+    const QString ctxParamsStr = shared::uniteNames(entity()->contextParams(), tr("Parameters: "));
+
+    return shared::joinNonEmpty({ title, instances, ris, pis, ctxParamsStr }, QStringLiteral("<br>"));
+}
+
 void IVFunctionTypeGraphicsItem::updateTextPosition()
 {
     if (!m_textItem) {
@@ -184,16 +198,6 @@ void IVFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
                 ivm::IVPropertyTemplateConfig::instance(), entity(), attributess);
     }
     m_commandsStack->push(attributesCmd);
-}
-
-QString IVFunctionTypeGraphicsItem::prepareTooltip() const
-{
-    const QString title = uniteNames<ivm::IVFunctionType *>({ entity() }, QString());
-    const QString instances = uniteNames<QPointer<ivm::IVFunction>>(entity()->instances(), tr("Instances: "));
-    const QString ris = uniteNames<ivm::IVInterface *>(entity()->ris(), tr("RI: "));
-    const QString pis = uniteNames<ivm::IVInterface *>(entity()->pis(), tr("PI: "));
-
-    return joinNonEmpty({ title, instances, ris, pis }, QStringLiteral("<br>"));
 }
 
 bool IVFunctionTypeGraphicsItem::isRootItem() const

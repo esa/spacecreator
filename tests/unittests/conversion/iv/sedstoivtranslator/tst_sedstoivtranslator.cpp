@@ -111,9 +111,11 @@ void tst_SedsToIvTranslator::testWrongModel()
     const auto mockModel = std::make_unique<MockModel>();
 
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(translator.translateModels({ sedsModel.get(), mockModel.get() }, options),
-            TranslationException, "Missing source Unspecified model");
+            TranslationException, "Missing source ASN.1 model");
 }
 
+/// \SRS  ETB-FUN-1040
+/// \SRS  ETB-FUN-1050
 void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
 {
     // clang-format off
@@ -139,13 +141,13 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
 
     // clang-format off
     const auto asn1Model =
-        Asn1ModelBuilder("Package")
+        Asn1ModelBuilder("PACKAGE")
             .withIntegerDataType("MyInteger")
         .build();
     // clang-format on
 
     Options options;
-    options.add(IvOptions::configFilename, "config.xml");
+    options.add(IvOptions::configFilepath, "config.xml");
 
     SedsToIvTranslator translator;
 
@@ -178,6 +180,8 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
     QCOMPARE(param.direction(), shared::InterfaceParameter::Direction::IN);
 }
 
+/// \SRS  ETB-FUN-1040
+/// \SRS  ETB-FUN-1060
 void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
 {
     // clang-format off
@@ -202,13 +206,13 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
 
     // clang-format off
     const auto asn1Model =
-        Asn1ModelBuilder("Package")
+        Asn1ModelBuilder("PACKAGE")
             .withIntegerDataType("MyInteger")
         .build();
     // clang-format on
 
     Options options;
-    options.add(IvOptions::configFilename, "config.xml");
+    options.add(IvOptions::configFilepath, "config.xml");
 
     SedsToIvTranslator translator;
 

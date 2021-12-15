@@ -34,9 +34,10 @@ public:
     /**
      * @brief Constructor.
      *
-     * @param promelaModel target promela model
+     * @param promelaModel         target promela model
+     * @param enhancedSpinSupport  if true, then generate model for enhanced spin
      */
-    Asn1NodeVisitor(::promela::model::PromelaModel &promelaModel);
+    Asn1NodeVisitor(::promela::model::PromelaModel &promelaModel, bool enhancedSpinSupport);
 
     /// @brief Visit Asn1Acn::Definitions
     void visit(const ::Asn1Acn::Definitions &defs) override;
@@ -53,5 +54,6 @@ public:
 
 private:
     ::promela::model::PromelaModel &m_promelaModel;
+    const bool m_enhancedSpinSupport;
 };
 }

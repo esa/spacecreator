@@ -35,6 +35,7 @@
 #include "ui_ivappwidget.h"
 
 #include <QAction>
+#include <QActionGroup>
 #include <QApplication>
 #include <QBuffer>
 #include <QClipboard>
@@ -87,11 +88,13 @@ ive::GraphicsView *IVAppWidget::graphicsView() const
 
 void IVAppWidget::centerView()
 {
-    if (const QGraphicsItem *item = m_document->itemsModel()->getItem(m_document->objectsModel()->rootObjectId())) {
+    const QGraphicsItem *item = m_document->itemsModel()->getItem(m_document->objectsModel()->rootObjectId());
+    const QList<QGraphicsItem *> items = item ? item->childItems() : graphicsView()->scene()->items();
+    if (items.isEmpty() && item) {
         graphicsView()->centerOn(item->sceneBoundingRect().center());
     } else {
         QRectF rect;
-        for (auto item : graphicsView()->scene()->items()) {
+        for (const QGraphicsItem *item : items) {
             if (item->type() > QGraphicsItem::UserType) {
                 rect |= item->sceneBoundingRect();
             }
@@ -146,8 +149,13 @@ void IVAppWidget::copyItems()
         return;
     }
 
-    QString name;
-    const QList<shared::VEObject *> objects = m_document->prepareSelectedObjectsForExport(name, true);
+    QList<shared::VEObject *> objects;
+    for (const QModelIndex &index : m_document->objectsSelectionModel()->selection().indexes()) {
+        const int role = static_cast<int>(ive::IVVisualizationModelBase::IdRole);
+        if (ivm::IVObject *object = m_document->objectsModel()->getObject(index.data(role).toUuid())) {
+            objects.append(object);
+        }
+    }
     if (!m_document->exporter()->exportObjects(objects, &buffer)) {
         shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
         return;
@@ -191,8 +199,8 @@ void IVAppWidget::showPropertyEditor(const shared::Id &id)
         return;
     }
 
-    ive::IVPropertiesDialog dialog(m_document->dynPropConfig(), obj, m_document->ivCheck(), m_document->asn1Check(),
-            m_document->commandsStack(), graphicsView());
+    ive::IVPropertiesDialog dialog(QFileInfo(m_document->path()).absolutePath(), m_document->dynPropConfig(), obj,
+            m_document->ivCheck(), m_document->asn1Check(), m_document->commandsStack(), graphicsView());
     dialog.init();
     dialog.exec();
 }

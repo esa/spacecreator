@@ -33,6 +33,7 @@ class InterfaceCommand;
 #include <ivcore/ivinterface.h>
 
 namespace conversion::iv::translator {
+
 /**
  * @brief   Interface for translators from SEDS interface command to InterfaceView interface
  */
@@ -79,6 +80,18 @@ public:
     virtual auto translateCommand(
             const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType interfaceType) -> void = 0;
 
+    /**
+     * @brief   Assemble name based on the names of a command and its hosting interface
+     *
+     * @param interfaceName Name of the interface hosting the command
+     * @param type Interface type
+     * @param commandName Name of the command
+     *
+     * @return Assembled name
+     */
+    static auto getCommandName(const QString &interfaceName, const ivm::IVInterface::InterfaceType type,
+            const QString &commandName) -> QString;
+
 protected:
     /**
      * @brief   Creates new interface view interface
@@ -99,7 +112,7 @@ protected:
      *
      * @return   Interface type name
      */
-    auto interfaceTypeToString(ivm::IVInterface::InterfaceType type) const -> const QString &;
+    static auto interfaceTypeToString(ivm::IVInterface::InterfaceType type) -> const QString &;
 
 protected:
     /// @brief  Parent SEDS interface

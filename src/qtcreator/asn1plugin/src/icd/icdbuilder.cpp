@@ -25,7 +25,7 @@
 
 #include "icdbuilder.h"
 
-#if QTC_VERSION == 48
+#if QTC_VERSION == 408
 
 #include <QStringList>
 

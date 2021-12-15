@@ -66,4 +66,19 @@ ExporterNotRegisteredException::ExporterNotRegisteredException(ModelType modelTy
 {
 }
 
+UnhandledValueException::UnhandledValueException(const QString &enumName)
+    : ConversionException(QString("Encountered unhandled enum value %1").arg(enumName))
+{
+}
+
+UnsupportedValueException::UnsupportedValueException(const QString &enumName, const QString &valueTypeName)
+    : ConversionException(QString("Encountered unsupported enum value %1 in %2").arg(valueTypeName).arg(enumName))
+{
+}
+
+InvalidModelNameException::InvalidModelNameException(const QString &modelName)
+    : ConversionException(QString("Model name '%1' is not valid").arg(modelName))
+{
+}
+
 } // namespace conversion

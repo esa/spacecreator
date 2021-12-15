@@ -144,7 +144,11 @@ endfunction(separate_object_libraries)
 
 function(set_explicit_moc target_name file)
   set_property(SOURCE "${file}" PROPERTY SKIP_AUTOMOC ON)
-  qt5_wrap_cpp(file_moc "${file}")
+  if(${QT_VERSION_MAJOR} STREQUAL "6")
+    qt6_wrap_cpp(file_moc "${file}")
+  else()
+    qt5_wrap_cpp(file_moc "${file}")
+  endif()
   target_sources(${target_name} PRIVATE "${file_moc}")
 endfunction()
 

@@ -1,0 +1,38 @@
+<InterfaceView>
+<Function name="Requirer" is_type="NO" language="C" default_implementation="default">
+<Provided_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithOutArgs_Pi">
+    <Input_Parameter name="InputParam" type="ExecuteAsynchronousActionWithOutArgs_Type" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithNotification_Pi">
+    <Input_Parameter name="InputParam" type="ExecuteAsynchronousActionWithNotification_Type1" encoding="ACN"/>
+</Provided_Interface>
+
+<Required_Interface name="InterfaceWithSynchronousCommandsInstance_ExecuteSynchronousAction_Ri" kind="Protected">
+    <Input_Parameter name="InputArg" type="DataItem" encoding="ACN"/>
+    <Output_Parameter name="OutputArg" type="DataItem" encoding="ACN"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="InterfaceWithSynchronousCommandsInstance_ExecuteSynchronousActionWithInOutArg_Ri" kind="Protected">
+    <Input_Parameter name="InOutArg_In" type="DataItem" encoding="ACN"/>
+    <Output_Parameter name="InOutArg_Out" type="DataItem" encoding="ACN"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousAction_Ri" kind="Sporadic">
+    <Input_Parameter name="InputParam" type="ExecuteAsynchronousAction_Type" encoding="ACN"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithNotification_Ri" kind="Sporadic">
+    <Input_Parameter name="InputParam" type="ExecuteAsynchronousActionWithNotification_Type" encoding="ACN"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+</InterfaceView>

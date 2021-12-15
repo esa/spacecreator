@@ -18,6 +18,7 @@
 #pragma once
 
 #include "cif/cifblock.h"
+#include "cif/cifline.h"
 
 #include <QPointer>
 #include <QString>
@@ -32,7 +33,7 @@ class MscEntity : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
-    Q_PROPERTY(msc::MscComment *comment READ comment WRITE setComment NOTIFY commentChanged)
+    Q_PROPERTY(QObject *comment READ commentObj WRITE setCommentObj NOTIFY commentChanged)
     Q_PROPERTY(QString commentString READ commentString WRITE setCommentString NOTIFY commentChanged)
     Q_PROPERTY(msc::MscEntity::EntityType entityType READ entityType CONSTANT)
     Q_PROPERTY(QString cifText READ cifText NOTIFY cifTextChanged)
@@ -68,6 +69,8 @@ public:
 
     MscComment *comment() const;
     void setComment(MscComment *comment);
+    QObject *commentObj() const;
+    void setCommentObj(QObject *obj);
 
     QString commentString() const;
     MscComment *setCommentString(const QString &comment);

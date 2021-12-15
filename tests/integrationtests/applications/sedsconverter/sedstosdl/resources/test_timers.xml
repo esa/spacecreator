@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="Timers">
+    <DataTypeSet>
+      <IntegerDataType name="T_UInt32">
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="4294967295" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface level="subnetwork" name="If1Type">
+        <CommandSet>
+          <Command name="Cmd1" mode="async"></Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="Component">
+        <ProvidedInterfaceSet>
+          <Interface name="If1" type="If1Type" />
+        </ProvidedInterfaceSet>
+        <Implementation>
+          <StateMachineSet>
+            <StateMachine name="StateMachine">
+              <State name="StateB" />
+              <State name="StateC" />
+              <EntryState name="StateA" />
+              <Transition fromState="StateA" toState="StateB" name="dummy">
+                <OnTimer nanosecondsAfterEntry="1000000" />
+              </Transition>
+              <Transition fromState="StateB" toState="StateC" name="dummy">
+                <OnTimer nanosecondsAfterEntry="2000000" />
+              </Transition>
+              <Transition fromState="StateC" toState="StateB" name="dummy">
+                <OnTimer nanosecondsAfterEntry="3000000" />
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

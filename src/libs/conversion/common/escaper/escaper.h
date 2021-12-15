@@ -36,7 +36,16 @@ public:
     Escaper() = delete;
 
     /**
-     * @brief   Convert input name to id acceptable in InterfaceView
+     * @brief   Convert the input name to an id acceptable as an SDL identifier
+     *
+     * @param   name    input name
+     *
+     * @returns identifier for InterfaceView
+     */
+    static auto escapeSdlName(QString name) -> QString;
+
+    /**
+     * @brief   Convert the input name to an id acceptable in InterfaceView
      *
      * @param   name    input name
      *
@@ -45,7 +54,7 @@ public:
     static auto escapeIvName(QString name) -> QString;
 
     /**
-     * @brief   Convert input name to id acceptable as ASN.1 type name
+     * @brief   Convert the input name to an id acceptable as an ASN.1 type name
      *
      * @param   name    input name
      *
@@ -54,13 +63,31 @@ public:
     static auto escapeAsn1TypeName(QString name) -> QString;
 
     /**
-     * @brief   Convert input name to id acceptable as ASN.1 sequence field name
+     * @brief   Convert the input name to an id acceptable as an ASN.1 package name
+     *
+     * @param   name    input name
+     *
+     * @returns ASN.1 package identifier
+     */
+    static auto escapeAsn1PackageName(QString name) -> QString;
+
+    /**
+     * @brief   Convert the input name to an id acceptable as an ASN.1 sequence field name
      *
      * @param   name    input name
      *
      * @returns identifier for ASN.1 sequence field name
      */
     static auto escapeAsn1FieldName(QString name) -> QString;
+
+    /**
+     * @brief   Convert the input name to an id acceptable as an Proomela identifier
+     *
+     * @param   name    input name
+     *
+     * @returns identifier for Promela
+     */
+    static auto escapePromelaName(QString name) -> QString;
 
 private:
     static auto escapeName(QString &name, const QChar &delimeter) -> void;

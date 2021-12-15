@@ -31,6 +31,11 @@ UndeclaredDataTypeException::UndeclaredDataTypeException(const QString &dataType
 {
 }
 
+UnsupportedDataTypeException::UnsupportedDataTypeException(const QString &dataTypeName)
+    : TranslationException(QString("Unsupported data type '%1'").arg(dataTypeName))
+{
+}
+
 UndeclaredInterfaceException::UndeclaredInterfaceException(const QString &interfaceTypeName)
     : TranslationException(QString("Undeclared interface '%1'").arg(interfaceTypeName))
 {
@@ -48,14 +53,8 @@ MissingAsn1TypeDefinitionException::MissingAsn1TypeDefinitionException(const QSt
 {
 }
 
-UnhandledValueException::UnhandledValueException(const QString &enumName)
-    : TranslationException(QString("Translator encountered unhandled value %1").arg(enumName))
-{
-}
-
-UnsupportedValueException::UnsupportedValueException(const QString &enumName, const QString &valueTypeName)
-    : TranslationException(
-              QString("Translator encountered unsupported value %1 in %2").arg(valueTypeName).arg(enumName))
+MissingInterfaceViewFunctionException::MissingInterfaceViewFunctionException(const QString &functionName)
+    : TranslationException(QString("Function %1 not found in the InterfaceView").arg(functionName))
 {
 }
 

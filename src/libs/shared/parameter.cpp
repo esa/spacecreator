@@ -40,6 +40,10 @@ bool BasicParameter::setName(const QString &name)
     if (m_paramName == name)
         return false;
 
+    if (!isValidName(name)) {
+        return false;
+    }
+
     m_paramName = name;
     return true;
 }
@@ -265,4 +269,10 @@ bool InterfaceParameter::isNull() const
 {
     return BasicParameter::isNull() || this->operator==({});
 }
+
+QString toString(const BasicParameter &parameter)
+{
+    return parameter.toString();
 }
+
+} // namespace shared

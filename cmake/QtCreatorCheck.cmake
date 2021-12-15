@@ -30,7 +30,7 @@ endif()
 
 if(LINUX)
     find_path(QTC_PLUGINS_DIR libCore.so
-        "$ENV{QTC_LIB_DIR}/plugins"
+        "${QTC_LIB_DIR}/plugins"
         "$ENV{QTC_INSTALL}/lib/qtcreator/plugins")
 elseif(APPLE)
     find_path(QTC_PLUGINS_DIR libCore.dylib
@@ -90,7 +90,10 @@ if (EXISTS ${QTC_SOURCE_DIR} AND EXISTS ${QTC_LIB_DIR})
     message(STATUS "QtCreator (compat) version is ${QTC_VERSION_STR}")
 
     # Make a string that is usabe by C definitions - like 480 out of 4.8.0
-    string(REGEX REPLACE "^([0-9]+)\.([0-9]+)\.([0-9]+)$" "\\1\\2" QTC_VERSION ${QTC_VERSION_STR})
+    string(REGEX REPLACE "^([0-9]+)\.([0-9]+)\.([0-9]+)$" "\\1" QTC_VERSION_MAJOR ${QTC_VERSION_STR})
+    MATH(EXPR QTC_VERSION_MAJOR "100 * ${QTC_VERSION_MAJOR}")
+    string(REGEX REPLACE "^([0-9]+)\.([0-9]+)\.([0-9]+)$" "\\2" QTC_VERSION_MINOR ${QTC_VERSION_STR})
+    MATH(EXPR QTC_VERSION "${QTC_VERSION_MAJOR} + ${QTC_VERSION_MINOR}")
 endif()
 
 if (NOT EXISTS ${QTC_SOURCE_DIR})

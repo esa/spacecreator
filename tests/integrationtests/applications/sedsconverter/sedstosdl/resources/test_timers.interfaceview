@@ -1,0 +1,14 @@
+<InterfaceView>
+<Function name="Component" is_type="NO" language="SDL" default_implementation="default">
+    <ContextParameter name="timer_StateA" type="Timer" value=""/>
+    <ContextParameter name="timer_StateB" type="Timer" value=""/>
+    <ContextParameter name="timer_StateC" type="Timer" value=""/>
+<Provided_Interface name="If1_Cmd1_Pi">
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+</InterfaceView>

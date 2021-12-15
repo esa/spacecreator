@@ -1,0 +1,37 @@
+Sequences DEFINITIONS ::= BEGIN
+
+Type1 ::= INTEGER(0..20)
+Type2 ::= INTEGER(21..50)
+
+SimpleSequence ::= SEQUENCE {
+    a Type1,
+    b Type2,
+    c Type2
+}
+
+SimpleSequenceWithEncodingOverride ::= SEQUENCE {
+    a Type1,
+    b Type2
+}
+
+AnonymousTypes ::= SEQUENCE {
+    x INTEGER(0..100),
+    y REAL(0..1)
+}
+
+AnonymousTypesWithEncoding ::= SEQUENCE {
+    x INTEGER(0..100),
+    y REAL(0..1)
+}
+
+SequenceWithPattern ::= SEQUENCE {
+    payload Type1
+}
+
+SequenceWithOptional ::= SEQUENCE {
+    a Type1,
+    b Type2 OPTIONAL,
+    c Type1 OPTIONAL
+}
+
+END

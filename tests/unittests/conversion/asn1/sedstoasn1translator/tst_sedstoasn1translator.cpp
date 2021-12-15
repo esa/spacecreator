@@ -128,7 +128,7 @@ void tst_SedsToAsn1Translator::testWrongModel()
     const auto mockModel = std::make_unique<MockModel>();
 
     VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(translator.translateModels({ mockModel.get() }, options), TranslationException,
-            "Missing source Unspecified model");
+            "Missing source SEDS model");
 }
 
 void tst_SedsToAsn1Translator::testResolvingArrayDataType()
@@ -219,6 +219,7 @@ void tst_SedsToAsn1Translator::testResolvingUndeclaredType()
     QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes), UndeclaredDataTypeException);
 }
 
+/// \SRS  ETB-FUN-210
 void tst_SedsToAsn1Translator::testTranslateArrayDataTypeOneDimension()
 {
     // clang-format off
@@ -263,6 +264,7 @@ void tst_SedsToAsn1Translator::testTranslateArrayDataTypeOneDimension()
     QCOMPARE(integerType->typeName(), "INTEGER");
 }
 
+/// \SRS  ETB-FUN-210
 void tst_SedsToAsn1Translator::testTranslateArrayDataTypeMultiDimension()
 {
     // clang-format off
@@ -323,6 +325,7 @@ void tst_SedsToAsn1Translator::testTranslateArrayDataTypeMultiDimension()
     QCOMPARE(integerType->typeName(), "INTEGER");
 }
 
+/// \SRS  ETB-FUN-140
 void tst_SedsToAsn1Translator::testTranslateBinaryDataType()
 {
     const auto sedsModel = SedsModelBuilder("Model").withBinaryDataType("Bitstring").build();
@@ -369,6 +372,7 @@ void tst_SedsToAsn1Translator::testTranslateBinaryDataType()
     QCOMPARE(range.end(), 42);
 }
 
+/// \SRS  ETB-FUN-150
 void tst_SedsToAsn1Translator::testTranslateBooleanDataType()
 {
     const auto sedsModel = SedsModelBuilder("Model").withBooleanDataType("Boolean").build();
@@ -396,6 +400,7 @@ void tst_SedsToAsn1Translator::testTranslateBooleanDataType()
     QCOMPARE(booleanType->trueValue(), "0");
 }
 
+/// \SRS  ETB-FUN-230
 void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithEntry()
 {
     // clang-format off
@@ -449,6 +454,7 @@ void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithEntry()
     QCOMPARE(entryComponentTypeInteger->typeName(), "INTEGER");
 }
 
+/// \SRS  ETB-FUN-230
 void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithErrorControlEntry()
 {
     // clang-format off
@@ -499,6 +505,7 @@ void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithErrorControlEntry
     QCOMPARE(entryComponentTypeReferenced->typeName(), "NULL");
 }
 
+/// \SRS  ETB-FUN-230
 void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithFixedValueEntry()
 {
     // clang-format off
@@ -565,6 +572,7 @@ void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithFixedValueEntry()
     QCOMPARE(entryComponentTypeValueRangeConstraint->range().begin(), 10);
 }
 
+/// \SRS  ETB-FUN-230
 void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithLengthEntry()
 {
     // clang-format off
@@ -619,6 +627,7 @@ void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithLengthEntry()
     QCOMPARE(entryComponentTypeInteger->typeName(), "INTEGER");
 }
 
+/// \SRS  ETB-FUN-230
 void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithListEntry()
 {
     // clang-format off
@@ -674,6 +683,7 @@ void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithListEntry()
     QCOMPARE(entryComponentTypeReferenced->type()->typeName(), "INTEGER");
 }
 
+/// \SRS  ETB-FUN-230
 void tst_SedsToAsn1Translator::testTranslateContainerExtensionOneLevel()
 {
     // clang-format off
@@ -742,6 +752,7 @@ void tst_SedsToAsn1Translator::testTranslateContainerExtensionOneLevel()
     QCOMPARE(child2Sequence->components().size(), 4);
 }
 
+/// \SRS  ETB-FUN-160
 void tst_SedsToAsn1Translator::testTranslateEnumeratedDataType()
 {
     const auto sedsModel =
@@ -774,12 +785,13 @@ void tst_SedsToAsn1Translator::testTranslateEnumeratedDataType()
     const auto &items = enumType->items();
     QCOMPARE(items.size(), 3);
 
-    const auto &item = items["Two"];
+    const auto &item = items["two"];
     QCOMPARE(item.index(), 1);
-    QCOMPARE(item.name(), "Two");
+    QCOMPARE(item.name(), "two");
     QCOMPARE(item.value(), 2);
 }
 
+/// \SRS  ETB-FUN-180
 void tst_SedsToAsn1Translator::testTranslateIntegerDataType()
 {
     const auto sedsModel = SedsModelBuilder("Model").withIntegerDataType("SignedInteger16").build();
@@ -822,6 +834,7 @@ void tst_SedsToAsn1Translator::testTranslateIntegerDataType()
     QCOMPARE(range.end(), 42);
 }
 
+/// \SRS  ETB-FUN-170
 void tst_SedsToAsn1Translator::testTranslateFloatDataType()
 {
     const auto sedsModel = SedsModelBuilder("Model").withFloatDataType("Float64").build();
@@ -863,6 +876,7 @@ void tst_SedsToAsn1Translator::testTranslateFloatDataType()
     QCOMPARE(range.end(), 1.79769e+308);
 }
 
+/// \SRS  ETB-FUN-190
 void tst_SedsToAsn1Translator::testTranslateStringDataType()
 {
     const auto sedsModel = SedsModelBuilder("Model").withStringDataType("String20").build();
@@ -888,7 +902,7 @@ void tst_SedsToAsn1Translator::testTranslateStringDataType()
     QCOMPARE(stringType->identifier(), "String20");
     QCOMPARE(stringType->typeName(), "IA5String");
     QCOMPARE(stringType->encoding(), Types::AsciiStringEncoding::ASCII);
-    QCOMPARE(stringType->terminationPattern(), "X");
+    QCOMPARE(stringType->terminationPattern(), "88");
 
     const auto &constraints = stringType->constraints().constraints();
     QCOMPARE(constraints.size(), 1);

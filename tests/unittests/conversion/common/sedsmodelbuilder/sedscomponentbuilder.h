@@ -33,6 +33,7 @@ public:
     auto declaringInterface(seds::model::InterfaceDeclaration interfaceDeclaration) -> SedsComponentBuilder &;
     auto withProvidedInterface(seds::model::Interface interface) -> SedsComponentBuilder &;
     auto withRequiredInterface(seds::model::Interface interface) -> SedsComponentBuilder &;
+    auto withImplementation(seds::model::ComponentImplementation implementation) -> SedsComponentBuilder &;
 
 private:
     seds::model::Component m_component;

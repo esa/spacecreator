@@ -25,20 +25,21 @@ void Translator::checkSourceModelCount(const std::vector<Model *> &models) const
 {
     const auto requiredModelsCount = getDependencies().size();
 
+    const auto &sourceModelName = modelTypeToString(getSourceModelType());
+    const auto &targetModelName = modelTypeToString(getTargetModelType());
+
     if (models.empty()) {
         auto message = QString("No models passed for translation for %1 to %2 translation")
-                               .arg(modelTypeToString(getSourceModelType()))
-                               .arg(modelTypeToString(getTargetModelType()));
+                               .arg(sourceModelName)
+                               .arg(targetModelName);
         throw TranslationException(std::move(message));
     } else if (models.size() < requiredModelsCount) {
-        auto message = QString("Not enough models passed for %1 to %2 translation")
-                               .arg(modelTypeToString(getSourceModelType()))
-                               .arg(modelTypeToString(getTargetModelType()));
+        auto message =
+                QString("Not enough models passed for %1 to %2 translation").arg(sourceModelName).arg(targetModelName);
         throw TranslationException(std::move(message));
     } else if (models.size() > requiredModelsCount) {
-        auto message = QString("Too many models passed for %1 to %2 translation")
-                               .arg(modelTypeToString(getSourceModelType()))
-                               .arg(modelTypeToString(getTargetModelType()));
+        auto message =
+                QString("Too many models passed for %1 to %2 translation").arg(sourceModelName).arg(targetModelName);
         throw TranslationException(std::move(message));
     }
 }

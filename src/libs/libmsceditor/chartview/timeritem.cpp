@@ -26,6 +26,7 @@
 #include "colors/colormanager.h"
 #include "commands/cmdentitynamechange.h"
 #include "msccommandsstack.h"
+#include "mscreader.h"
 #include "msctimer.h"
 #include "ui/grippointshandler.h"
 
@@ -34,6 +35,36 @@
 #include <QPainter>
 
 namespace msc {
+
+class TimerTextItem : public TextItem
+{
+public:
+    TimerTextItem(QGraphicsItem *parent = nullptr)
+        : TextItem(parent)
+    {
+    }
+
+protected:
+    bool validateText(const QString &text) const override
+    {
+        MscReader reader;
+        QStringList errors;
+        // test plain informal timer, or data statements
+        QString testDoc = QString("msc c1;instance i1;starttimer %1;endinstance;endmsc;").arg(text);
+        try {
+            reader.parseText(testDoc, &errors);
+        } catch (...) {
+            // test quoted informal timer
+            testDoc = QString("msc c1;instance i1;starttimer '%1';endinstance;endmsc;").arg(text);
+            try {
+                reader.parseText(testDoc, &errors);
+            } catch (...) {
+                return false;
+            }
+        }
+        return errors.isEmpty();
+    }
+};
 
 /*!
    \class msc::TimerItem
@@ -44,7 +75,7 @@ namespace msc {
 TimerItem::TimerItem(msc::MscTimer *timer, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
     : EventItem(timer, chartLayoutManager, parent)
     , m_timer(timer)
-    , m_textItem(new TextItem(this))
+    , m_textItem(new TimerTextItem(this))
     , m_timerConnector(new QGraphicsLineItem(this))
 {
     Q_ASSERT(m_timer != nullptr);

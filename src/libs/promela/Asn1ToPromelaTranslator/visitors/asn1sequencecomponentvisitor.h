@@ -42,7 +42,7 @@ public:
      * @param optionalFields list to add found optional component names
      */
     Asn1SequenceComponentVisitor(::promela::model::PromelaModel &promelaModel, ::promela::model::Utype &utype,
-            QString baseTypeName, QList<QString> &optionalFields);
+            QString baseTypeName, QList<QString> &optionalFields, bool enhancedSpinSupport);
 
     /**
      * @brief Visit ::Asn1Acn::AsnSequenceComponent
@@ -62,5 +62,6 @@ private:
     ::promela::model::Utype &m_utype;
     const QString m_baseTypeName;
     QList<QString> &m_optionalFields;
+    const bool m_enhancedSpinSupport;
 };
 }

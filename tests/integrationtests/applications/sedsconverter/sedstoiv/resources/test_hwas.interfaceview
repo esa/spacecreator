@@ -1,0 +1,47 @@
+<InterfaceView>
+<Function name="HWAS" is_type="NO" language="C" default_implementation="default">
+<Provided_Interface name="InterruptSubscriptionManagement_SubscribeToInterrupt_Pi" kind="Protected">
+    <Input_Parameter name="interrupt" type="InterruptNumber" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="InterruptManagement_EnableInterrupt_Pi" kind="Protected">
+    <Input_Parameter name="interrupt" type="InterruptNumber" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="InterruptManagement_DisableInterrupt_Pi" kind="Protected">
+    <Input_Parameter name="interrupt" type="InterruptNumber" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="RawMemoryAccess_ReadWord_Pi" kind="Protected">
+    <Input_Parameter name="address" type="SourceAddress" encoding="ACN"/>
+    <Input_Parameter name="mask" type="WordMask" encoding="ACN"/>
+    <Output_Parameter name="value" type="Word" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="RawMemoryAccess_WriteWord_Pi" kind="Protected">
+    <Input_Parameter name="address" type="DestinationAddress" encoding="ACN"/>
+    <Input_Parameter name="mask" type="WordMask" encoding="ACN"/>
+    <Input_Parameter name="value" type="Word" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="RawMemoryAccess_WriteBuffer_Pi" kind="Protected">
+    <Input_Parameter name="address" type="DestinationAddress" encoding="ACN"/>
+    <Input_Parameter name="buffer" type="ByteBuffer" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="RawMemoryAccess_ReadBuffer_Pi" kind="Protected">
+    <Input_Parameter name="address" type="SourceAddress" encoding="ACN"/>
+    <Output_Parameter name="buffer" type="ByteBuffer" encoding="ACN"/>
+</Provided_Interface>
+
+<Required_Interface name="InterruptSubscription_Interrupt_Ri" kind="Sporadic">
+    <Input_Parameter name="InputParam" type="Interrupt_Type" encoding="ACN"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+</InterfaceView>

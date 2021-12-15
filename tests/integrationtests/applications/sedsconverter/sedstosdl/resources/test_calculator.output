@@ -1,0 +1,51 @@
+/* CIF Process (0, 0), (800, 100) */
+process Calculator;
+    /* CIF Text (0, 150), (400, 500) */
+    dcl x Number;
+    dcl y Number;
+    dcl tmp Number;
+    dcl io_AsyncCalculator_Add_Pi Add_Type;
+    dcl io_AsyncCalculator_Add_Ri Add_Type1;
+    /* CIF ENDTEXT */
+    /* CIF Procedure (0, 900), (800, 50) */
+    procedure AddAndNotify;
+        /* CIF Text (0, 0), (400, 500) */
+        fpar
+            in x1 Number,
+            in x2 Number;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Task (0, 937), (100, 50) */
+            task tmp := x1 + x2;
+            /* CIF Task (0, 1012), (100, 50) */
+            task io_AsyncCalculator_Add_Ri.result := tmp;
+            /* CIF Output (0, 1087), (200, 50) */
+            output AsyncCalculator_Add_Ri(io_AsyncCalculator_Add_Ri);
+        return ;
+    endprocedure;
+    /* CIF Start (0, 975), (200, 75) */
+    START;
+        /* CIF NextState (0, 1162), (200, 50) */
+        NEXTSTATE Off;
+    /* CIF State (0, 1237), (200, 50) */
+    state Idle;
+        /* CIF Input (0, 1237), (200, 50) */
+        input AsyncCalculator_Add_Pi(io_AsyncCalculator_Add_Pi);
+            /* CIF Task (0, 1312), (100, 50) */
+            task x := io_AsyncCalculator_Add_Pi.x;
+            /* CIF Task (0, 1387), (100, 50) */
+            task y := io_AsyncCalculator_Add_Pi.y;
+            /* CIF ProcedureCall (0, 1462), (100, 50) */
+            call AddAndNotify(x, y);
+            /* CIF NextState (0, 1537), (200, 50) */
+            NEXTSTATE Idle;
+    endstate;
+    /* CIF State (600, 1237), (200, 50) */
+    state Off;
+        /* CIF Input (600, 1237), (200, 50) */
+        input AsyncCalculator_Init_Pi;
+            /* CIF NextState (600, 1312), (200, 50) */
+            NEXTSTATE Idle;
+    endstate;
+endprocess Calculator;

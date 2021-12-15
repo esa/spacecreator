@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+ <Package name="InterfaceView">
+  <ComponentSet>
+   <Component name="ProtectedFunction">
+    <ProvidedInterfaceSet>
+     <Interface type="ProtectedFunctionProtectedInterfacePi" name="ProtectedInterfacePi"/>
+    </ProvidedInterfaceSet>
+    <DeclaredInterfaceSet>
+     <Interface name="ProtectedFunctionProtectedInterfacePi">
+      <CommandSet>
+       <Command name="ProtectedInterfacePi" mode="sync">
+        <Argument type="MyInteger" name="ProtectedArg" mode="in"/>
+        <Argument type="MyInteger" name="ProtectedArgOut" mode="out"/>
+       </Command>
+      </CommandSet>
+     </Interface>
+    </DeclaredInterfaceSet>
+   </Component>
+  </ComponentSet>
+ </Package>
+</PackageFile>

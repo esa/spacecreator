@@ -50,21 +50,22 @@ public:
         DropUnsavedChangesSilently,
 
         //Seds Converter
-        SedsConverterInputFilename,
-        SedsConverterOutputFilename,
-        SedsConverterModelFrom,
+        SedsConverterInputFilepaths,
+        SedsConverterOutputFilepath,
+        SedsConverterModelsFrom,
         SedsConverterModelTo,
-        SedsConverterModelAux,
+        SedsConverterModelsAux,
         SedsConverterIvConfig,
-        SedsConverterSedsSchemaFilename,
+        SedsConverterIvGenerateParentFunctions,
+        SedsConverterSedsPreprocessedFilepath,
+        SedsConverterSedsSchemaFilepath,
         SedsConverterSedsExtRef,
-        SedsConverterSedsExtRefFilename,
+        SedsConverterSedsExtRefFilepath,
         SedsConverterSkipValidation,
         SedsConverterKeepIntermediateFiles,
         SedsConverterAcnFilepathPrefix,
         SedsConverterAsn1FilepathPrefix,
         SedsConverterSdlFilepathPrefix,
-        SedsConverterImportXmlFileForAsn1,
 
         Unknown
     };

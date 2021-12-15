@@ -86,7 +86,7 @@ void MscEntity::setComment(MscComment *comment)
     }
 
     if (m_comment) {
-        disconnect(m_comment, 0, this, 0);
+        disconnect(m_comment, nullptr, this, nullptr);
     }
 
     m_comment = comment;
@@ -94,6 +94,18 @@ void MscEntity::setComment(MscComment *comment)
         connect(m_comment, &MscComment::textChanged, this, &MscEntity::commentChanged);
     }
     Q_EMIT commentChanged();
+}
+
+QObject *MscEntity::commentObj() const
+{
+    return m_comment;
+}
+
+void MscEntity::setCommentObj(QObject *obj)
+{
+    if (auto com = qobject_cast<MscComment *>(obj)) {
+        setComment(com);
+    }
 }
 
 QString MscEntity::commentString() const

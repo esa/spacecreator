@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+ <Package name="Model">
+  <DataTypeSet>
+   <EnumeratedDataType name="TestEnum">
+    <IntegerDataEncoding byteOrder="bigEndian" sizeInBits="8" encoding="twosComplement"/>
+    <EnumerationList>
+     <Enumeration value="1" label="a"/>
+     <Enumeration value="2" label="b"/>
+     <Enumeration value="3" label="c"/>
+    </EnumerationList>
+   </EnumeratedDataType>
+  </DataTypeSet>
+ </Package>
+</PackageFile>

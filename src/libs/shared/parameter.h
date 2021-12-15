@@ -135,7 +135,9 @@ protected:
     Direction m_direction = { Direction::IN };
 };
 
-}
+QString toString(const BasicParameter &contextParameter);
+
+} // namespace shared
 
 Q_DECLARE_METATYPE(shared::BasicParameter)
 Q_DECLARE_METATYPE(shared::ContextParameter)

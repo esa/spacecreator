@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="ComplexGuard">
+    <DataTypeSet>
+      <IntegerDataType name="MyType">
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="100" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface level="subnetwork" name="If1Type">
+        <CommandSet>
+          <Command name="Cmd1" mode="async"></Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="Component">
+        <ProvidedInterfaceSet>
+          <Interface name="If1" type="If1Type" />
+        </ProvidedInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="x" type="MyType" />
+          </VariableSet>
+          <ActivitySet>
+            <Activity name="myActivity">
+              <Body>
+                <Assignment outputVariableRef="x">
+                  <Value value="100" />
+                </Assignment>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="StateMachine">              
+              <EntryState name="StateA" />
+              <Transition fromState="StateA" toState="StateB" name="dummy">
+                <OnCommandPrimitive interface="If1" command="Cmd1" />
+                <Guard>
+                  <ANDedConditions>
+                    <ORedConditions>
+                      <Condition>
+                        <FirstOperand variableRef="x" />
+                        <ComparisonOperator>lessThan</ComparisonOperator>
+                        <Value value="-100"></Value>
+                      </Condition>
+                      <Condition>
+                        <FirstOperand variableRef="x" />
+                        <ComparisonOperator>greaterThan</ComparisonOperator>
+                        <Value value="100" />
+                      </Condition>
+                    </ORedConditions>
+                    <Condition>
+                      <FirstOperand variableRef="x" />
+                      <ComparisonOperator>greaterThanEquals</ComparisonOperator>
+                      <Value value="500" />
+                    </Condition>
+                  </ANDedConditions>
+                </Guard>
+                <Do activity="myActivity" />
+              </Transition>
+              <ExitState name="StateB" />
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

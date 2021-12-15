@@ -60,13 +60,41 @@ IVEditorCorePtr IvSystemQueries::ivCore() const
     return m_ivCore;
 }
 
+/*
+ * Terminal function is the final function in the chain.
+ * This is the function without nested (child) functitons
+ */
+
+QStringList IvSystemQueries::terminalFunctionsNames() const
+{
+    if (!ivCore()) {
+        return {};
+    }
+
+    QStringList fnNames;
+    for (const ivm::IVFunction *fn : ivCore()->allIVFunctions()) {
+        if (!fn->title().isEmpty() && fn->functions().isEmpty()) {
+            fnNames.append(fn->title());
+        }
+    }
+
+    return fnNames;
+}
+
 QStringList IvSystemQueries::functionsNames() const
 {
     if (!ivCore()) {
         return {};
     }
 
-    return ivCore()->ivFunctionsNames();
+    QStringList fnNames;
+    for (const ivm::IVFunction *fn : ivCore()->allIVFunctions()) {
+        if (!fn->title().isEmpty()) {
+            fnNames.append(fn->title());
+        }
+    }
+
+    return fnNames;
 }
 
 /*!

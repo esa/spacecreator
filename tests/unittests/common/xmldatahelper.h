@@ -12,7 +12,7 @@ public:
         QVariantHash attrs;
         QList<Node> children;
 
-        bool operator==(const Node &n)
+        bool operator==(const Node &n) const
         {
             const bool ok = n.type == type && n.data == data && n.attrs == attrs && n.children == children;
             if (!ok) {

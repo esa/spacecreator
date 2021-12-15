@@ -33,6 +33,9 @@ static const QString kStringDelemiter = QStringLiteral("::");
 
 static const QString namePatternUI("^[a-zA-Z][\\w ]*(?(?<=_)[a-zA-Z0-9])$");
 
+static const QString kNonCurrentImplementationPath { "implem" };
+static const QString kRootImplementationPath { "work" };
+
 Id createId();
 
 namespace env {
@@ -164,6 +167,20 @@ QSet<QString> forbiddenNamesSet();
    Returns is the given \p name is usable as name in general.
  */
 bool isValidName(const QString &name);
+
+QString joinNonEmpty(const QStringList &values, const QString &lineBreak);
+
+template<class Type>
+QString uniteNames(const QVector<Type> &collection, const QString &prefix)
+{
+    QStringList result;
+    std::transform(collection.cbegin(), collection.cend(), std::back_inserter(result),
+            [](const Type &obj) { return toString(obj); });
+    const QString line = joinNonEmpty(result, QStringLiteral(", "));
+    return line.isEmpty() ? QString() : QString("<b>%1</b>%2").arg(prefix, line);
+}
+
+bool moveDefaultDirectories(const QString &currentImplName, const QString &projectPath, const QString &functionName, const QString &language);
 
 }
 

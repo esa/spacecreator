@@ -38,9 +38,10 @@ public:
      * @param promelaModel target promela model
      * @param baseTypeName base name for new types
      * @param name name for new types
+     * @param enhancedSpinSupport  if true, then generate model for enhanced spin
      */
-    Asn1ItemTypeVisitor(
-            ::promela::model::PromelaModel &promelaModel, std::optional<QString> baseTypeName, QString name);
+    Asn1ItemTypeVisitor(::promela::model::PromelaModel &promelaModel, std::optional<QString> baseTypeName, QString name,
+            bool enhancedSpinSupport);
 
     /**
      * @brief Getter for result promela data type
@@ -141,6 +142,7 @@ private:
     ::promela::model::PromelaModel &m_promelaModel;
     const std::optional<QString> m_baseTypeName;
     const QString m_name;
+    const bool m_enhancedSpinSupport;
     std::optional<::promela::model::DataType> m_resultDataType;
 };
 }

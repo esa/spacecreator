@@ -163,13 +163,20 @@ private:
     QList<Declaration> m_declarations;
 };
 }
+
 namespace conversion {
+
 /**
- * @brief   Specialization for Promela model properties
+ * @brief   Specialization for Promela model
  */
 template<>
 struct ModelProperties<::promela::model::PromelaModel> {
     /// @brief  Model type
     static const ModelType type = ModelType::Promela;
+    /// @brief  Model name
+    static inline const QString name = ModelTypeProperties<type>::name;
+    /// @brief  Model extension
+    static inline const QStringList extensions = ModelTypeProperties<type>::extensions;
 };
-}
+
+} // namespace conversion

@@ -28,7 +28,7 @@ class DVDevice : public DVObject
     Q_OBJECT
     Q_PROPERTY(QString portName READ portName WRITE setPortName NOTIFY portChanged)
     Q_PROPERTY(QString qualifier READ qualifier WRITE setQualifier NOTIFY qualifierChanged)
-    Q_PROPERTY(dvm::DVNode *node READ node)
+    Q_PROPERTY(dvm::DVObject *node READ node)
 
 public:
     explicit DVDevice(const DVPort &port, DVObject *parent = nullptr);

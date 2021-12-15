@@ -23,6 +23,7 @@
 #include "datatypesuffixvisitor.h"
 
 using promela::model::ArrayType;
+using promela::model::ChannelInit;
 using promela::model::Declaration;
 using promela::model::UnsignedDataType;
 using promela::model::UtypeRef;
@@ -44,7 +45,29 @@ void DeclarationVisitor::visit(const Declaration &declaration)
     m_stream << " " << declaration.getName();
     DataTypeSuffixVisitor suffixVisitor(m_stream);
     suffixVisitor.visit(declaration.getType());
+
+    if (declaration.hasInit()) {
+        generateChannelInit(declaration.getInit().value());
+    }
+
     m_stream << ";\n";
+}
+
+void DeclarationVisitor::generateChannelInit(const ChannelInit &channelInit)
+{
+    m_stream << " = [" << channelInit.getSize() << "] of {";
+
+    bool first = true;
+    for (const ChannelInit::Type &type : channelInit.getTypes()) {
+        if (!first) {
+            m_stream << ", ";
+        }
+        first = true;
+        DataTypePrefixVisitor typeVisitor(m_stream);
+        typeVisitor.visit(type);
+    }
+
+    m_stream << "}";
 }
 
 QString DeclarationVisitor::getVisibilityString(const Declaration &declaration)

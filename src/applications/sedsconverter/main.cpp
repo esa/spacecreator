@@ -56,20 +56,30 @@ int main(int argc, char **argv)
     const auto usage = QString("Usage: %1 --in <file> <options> [--out <file>]").arg(argv[0]);
     try {
         cli.parseArguments(a.arguments());
-        cli.setOptions(options);
+        cli.processOptions(options);
         sedsConverter.convert(
                 cli.getSourceModelTypes(), cli.getTargetModelType(), cli.getAuxModelTypes(), std::move(options));
     } catch (const ImportException &ex) {
         const auto errorMessage = QString("Import failure: %1\n%2").arg(ex.errorMessage(), usage);
-        qFatal("%s", errorMessage.toLatin1().constData());
+        qCritical("%s", errorMessage.toLatin1().constData());
+        return EXIT_FAILURE;
     } catch (const TranslationException &ex) {
         const auto errorMessage = QString("Translation failure: %1\n%2").arg(ex.errorMessage(), usage);
-        qFatal("%s", errorMessage.toLatin1().constData());
+        qCritical("%s", errorMessage.toLatin1().constData());
+        return EXIT_FAILURE;
     } catch (const ExportException &ex) {
         const auto errorMessage = QString("Export failure: %1\n%2").arg(ex.errorMessage(), usage);
-        qFatal("%s", errorMessage.toLatin1().constData());
+        qCritical("%s", errorMessage.toLatin1().constData());
+        return EXIT_FAILURE;
     } catch (const ConversionException &ex) {
         const auto errorMessage = QString("Conversion failure: %1\n%2").arg(ex.errorMessage(), usage);
-        qFatal("%s", errorMessage.toLatin1().constData());
+        qCritical("%s", errorMessage.toLatin1().constData());
+        return EXIT_FAILURE;
+    } catch (const std::exception &ex) {
+        const auto errorMessage = QString("Runtime exception: %1\n%2").arg(ex.what(), usage);
+        qCritical("%s", errorMessage.toLatin1().constData());
+        return EXIT_FAILURE;
     }
+
+    return EXIT_SUCCESS;
 }

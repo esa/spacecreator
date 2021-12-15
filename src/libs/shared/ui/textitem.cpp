@@ -250,9 +250,8 @@ void TextItem::keyPressEvent(QKeyEvent *event)
 
     QGraphicsTextItem::keyPressEvent(event);
 
-    if (m_explicitSize.isValid()
-            && (QGraphicsTextItem::boundingRect().width() > m_explicitSize.width()
-                    || QGraphicsTextItem::boundingRect().height() > m_explicitSize.height())) {
+    if (m_explicitSize.isValid()) {
+        adjustSize();
         prepareGeometryChange();
         m_explicitSize = QGraphicsTextItem::boundingRect().size();
     }
@@ -449,6 +448,8 @@ void TextItem::setExplicitSize(const QSizeF &size)
         if (!m_explicitSize.isEmpty()) {
             setTextMargin(textMargin());
             setTextWidth(m_explicitSize.width());
+        } else {
+            adjustSize();
         }
         update();
     }

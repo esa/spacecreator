@@ -14,12 +14,15 @@ target_include_directories(SedsConverter
     PRIVATE     .
                 ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SedsConverter
-    PRIVATE     Conversion::Converter
+    PRIVATE     CommonProjectWarnings
+                Conversion::Converter
                 Conversion::Registry
                 Conversion::Asn1Registrar
                 Conversion::IvRegistrar
                 Conversion::SedsRegistrar
-                Conversion::SdlRegistrar)
+                Conversion::SdlRegistrar
+                Conversion::Asn1ToSedsTranslator
+                "stdc++fs")
 
 set_target_properties(SedsConverter PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"

@@ -29,7 +29,7 @@ class MscTimer : public MscInstanceEvent
 {
     Q_OBJECT
     Q_PROPERTY(msc::MscTimer::TimerType timerType READ timerType WRITE setTimerType NOTIFY timerTypeChanged)
-    Q_PROPERTY(msc::MscInstance *instance READ instance WRITE setInstance NOTIFY instanceChanged)
+    Q_PROPERTY(msc::MscEntity *instance READ instanceObj WRITE setInstanceObj NOTIFY instanceChanged)
     Q_PROPERTY(
             QString timerInstanceName READ timerInstanceName WRITE setTimerInstanceName NOTIFY timerInstanceNameChanged)
 
@@ -54,6 +54,8 @@ public:
 
     void setInstance(msc::MscInstance *instance);
     msc::MscInstance *instance() const;
+    MscEntity *instanceObj() const;
+    void setInstanceObj(MscEntity *instance);
 
     bool relatesTo(const MscInstance *instance) const override;
 

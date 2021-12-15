@@ -15,11 +15,15 @@ CMakeLists.txt.user
 # Example files to be used locally
 examples/*.local.msc
 
-# Generated API documentation
+# Generated API and tests documentation
 doc/doxygen
+doc-tests/doxygen
 
 # VS Code directory
 .vscode
+
+# Temporary test outputs
+tests/**/output/*
 
 # locally generated files for SDL exporter references
 tests/unittests/sdl/SdlExporter/references/*/*.aadl

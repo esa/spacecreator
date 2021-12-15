@@ -30,14 +30,16 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdentitiesremove.h
     commands/cmdfunctionattrchange.cpp
     commands/cmdfunctionattrchange.h
+    commands/cmdfunctionimplementationdefaultchange.cpp
+    commands/cmdfunctionimplementationdefaultchange.h
     commands/cmdfunctionitemcreate.cpp
     commands/cmdfunctionitemcreate.h
-    commands/cmdfunctionlanguageinsert.cpp
-    commands/cmdfunctionlanguageinsert.h
-    commands/cmdfunctionlanguageremove.cpp
-    commands/cmdfunctionlanguageremove.h
-    commands/cmdfunctionlanguageupdate.cpp
-    commands/cmdfunctionlanguageupdate.h
+    commands/cmdfunctionimplementationinsert.cpp
+    commands/cmdfunctionimplementationinsert.h
+    commands/cmdfunctionimplementationremove.cpp
+    commands/cmdfunctionimplementationremove.h
+    commands/cmdfunctionimplementationupdate.cpp
+    commands/cmdfunctionimplementationupdate.h
     commands/cmdfunctiontypeitemcreate.cpp
     commands/cmdfunctiontypeitemcreate.h
     commands/cmdifaceattrchange.cpp
@@ -103,8 +105,6 @@ target_sources(${LIB_NAME} PRIVATE
     itemeditor/graphicsitemhelpers.h
     itemeditor/graphicsview.cpp
     itemeditor/graphicsview.h
-    itemeditor/interfacetabgraphicsscene.cpp
-    itemeditor/interfacetabgraphicsscene.h
     itemeditor/ivcommentgraphicsitem.cpp
     itemeditor/ivcommentgraphicsitem.h
     itemeditor/ivconnectiongraphicsitem.cpp
@@ -180,6 +180,9 @@ target_sources(${LIB_NAME} PRIVATE
     config/ivlibrarydialog.h
 )
 
+if(${QT_VERSION_MAJOR} STREQUAL "6")
+    set(QT_SVGWIDGETS Qt6::SvgWidgets)
+endif()
 target_link_libraries(${LIB_NAME}
     ivcore
     asn1library
@@ -189,6 +192,7 @@ target_link_libraries(${LIB_NAME}
     ${QT_CONCURRENT}
     ${QT_NETWORK}
     ${QT_SVG}
+    ${QT_SVGWIDGETS}
     ${QT_WIDGETS}
     ${QT_XML}
 )

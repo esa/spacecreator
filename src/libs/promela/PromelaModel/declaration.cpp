@@ -41,4 +41,19 @@ Declaration::Visibility Declaration::getVisibility() const noexcept
 {
     return m_visibility;
 }
+
+bool Declaration::hasInit() const noexcept
+{
+    return m_init.has_value();
+}
+
+const std::optional<ChannelInit> &Declaration::getInit() const noexcept
+{
+    return m_init;
+}
+
+void Declaration::setInit(const ChannelInit &channelInit)
+{
+    m_init = channelInit;
+}
 }

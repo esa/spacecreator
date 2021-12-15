@@ -18,25 +18,29 @@
 #include "implementationsmodel.h"
 
 #include "commands/cmdfunctionattrchange.h"
-#include "commands/cmdfunctionlanguageinsert.h"
-#include "commands/cmdfunctionlanguageremove.h"
-#include "commands/cmdfunctionlanguageupdate.h"
+#include "commands/cmdfunctionimplementationdefaultchange.h"
+#include "commands/cmdfunctionimplementationinsert.h"
+#include "commands/cmdfunctionimplementationremove.h"
+#include "commands/cmdfunctionimplementationupdate.h"
 #include "ivcore/abstractsystemchecks.h"
 #include "ivfunction.h"
 #include "ivmodel.h"
 #include "ivpropertytemplateconfig.h"
 
+#include <QApplication>
 #include <QDebug>
 #include <QFont>
+#include <QMessageBox>
 #include <QMetaEnum>
 
 namespace ive {
 
-ImplementationsModel::ImplementationsModel(
-        ivm::AbstractSystemChecks *checks, cmd::CommandsStack::Macro *macro, QObject *parent)
+ImplementationsModel::ImplementationsModel(const QString &projectPath, ivm::AbstractSystemChecks *checks,
+        cmd::CommandsStack::Macro *macro, QObject *parent)
     : QAbstractItemModel(parent)
     , m_checks(checks)
     , m_cmdMacro(macro)
+    , m_projectPath(projectPath)
 {
 }
 
@@ -56,7 +60,7 @@ QVariant ImplementationsModel::headerData(int section, Qt::Orientation orientati
         case Column::Language:
             return tr("Language");
         case Column::Default:
-            return tr("Default");
+            return tr("Current");
         }
     }
     return QVariant();
@@ -130,51 +134,33 @@ bool ImplementationsModel::setData(const QModelIndex &index, const QVariant &val
         return false;
     }
 
-    auto setDefaultLanguage = [this](const QString &name, const QString &language) {
-        const QList<EntityAttribute> attrs = {
-            EntityAttribute { ivm::meta::Props::token(ivm::meta::Props::Token::default_implementation), name,
-                    EntityAttribute::Type::Attribute },
-            EntityAttribute { ivm::meta::Props::token(ivm::meta::Props::Token::language), language,
-                    EntityAttribute::Type::Attribute }
-        };
-        auto cmd = new cmd::CmdFunctionAttrChange(ivm::IVPropertyTemplateConfig::instance(), m_function, attrs);
-        m_cmdMacro->push(cmd);
-    };
-
-    if (index.column() == Column::Default) {
-        if (role == Qt::CheckStateRole) {
-            QModelIndex oldDefault = defaultIndex();
-            if (index == oldDefault) {
-                return false;
-            }
-            setDefaultLanguage(data(createIndex(index.row(), Column::Name)).toString(),
-                    data(createIndex(index.row(), Column::Language)).toString());
+    if (index.column() == Column::Default && role == Qt::CheckStateRole) {
+        QModelIndex oldDefault = defaultIndex();
+        if (index == oldDefault) {
+            return false;
+        }
+        const QString name = data(createIndex(index.row(), Column::Name)).toString();
+        const QString language = data(createIndex(index.row(), Column::Language)).toString();
+        auto cmd = new cmd::CmdFunctionImplementationDefaultChange(m_projectPath, m_function, name, language);
+        if (m_cmdMacro->push(cmd)) {
             Q_EMIT dataChanged(oldDefault, oldDefault, QVector<int>() << role);
             Q_EMIT dataChanged(index, index, QVector<int>() << role);
             return true;
         }
-    }
-    if ((role == Qt::DisplayRole || role == Qt::EditRole)
+        return false;
+    } else if ((role == Qt::DisplayRole || role == Qt::EditRole)
             && (index.column() == Column::Name || index.column() == Column::Language)) {
-        QModelIndex defaultIdx = createIndex(index.row(), Column::Default);
-        const bool isDefault = data(defaultIdx, Qt::CheckStateRole) == Qt::CheckState::Checked;
         EntityAttribute language = m_function->implementations().at(index.row());
-        if (index.column() == Column::Name) {
+        if (index.column() == Column::Name && language.name() != value.toString()) {
             QString name = uniqueName(value.toString());
             language.setName(name);
         }
-        if (index.column() == Column::Language) {
+        if (index.column() == Column::Language && language.value() != value) {
             language.setValue(value.toString());
         }
-        auto cmd = new cmd::CmdFunctionLanguageUpdate(m_function, index.row(), language);
+        auto cmd = new cmd::CmdFunctionImplementationUpdate(m_projectPath, m_function, index.row(), language);
         m_cmdMacro->push(cmd);
         Q_EMIT dataChanged(index, index, QVector<int>() << role);
-
-        if (isDefault) {
-            setDefaultLanguage(language.name(), language.value().toString());
-            Q_EMIT dataChanged(defaultIdx, defaultIdx, QVector<int>() << Qt::CheckStateRole);
-        }
-
         return true;
     }
 
@@ -202,9 +188,10 @@ bool ImplementationsModel::insertRows(int row, int count, const QModelIndex &par
     const QString name("new_name");
     const QString defaultLanguage = m_function->model()->defaultFunctionLanguage();
     for (int i = 0; i < count; ++i) {
-        EntityAttribute language(
-                uniqueName(name), QVariant::fromValue(defaultLanguage), EntityAttribute::Type::Attribute);
-        auto cmd = new cmd::CmdFunctionLanguageInsert(m_function, row + i, language);
+        const QString implUniqueName = uniqueName(name);
+        EntityAttribute implAttribute(
+                implUniqueName, QVariant::fromValue(defaultLanguage), EntityAttribute::Type::Attribute);
+        QUndoCommand *cmd = new cmd::CmdFunctionImplementationInsert(m_function, row + i, implAttribute);
         m_cmdMacro->push(cmd);
     }
     endInsertRows();
@@ -216,9 +203,14 @@ bool ImplementationsModel::removeRows(int row, int count, const QModelIndex &par
     if (!m_function) {
         return false;
     }
+    const auto result = QMessageBox::question(qApp->activeWindow(), tr("Remove implementations"),
+            tr("Are you sure you want to remove selected implementations?"));
+    if (QMessageBox::StandardButton::Yes != result) {
+        return false;
+    }
     beginRemoveRows(parent, row, row + count - 1);
     for (int i = 0; i < count; ++i) {
-        auto cmd = new cmd::CmdFunctionLanguageRemove(m_function, row + i);
+        auto cmd = new cmd::CmdFunctionImplementationRemove(m_projectPath, m_function, row + i);
         m_cmdMacro->push(cmd);
     }
     endRemoveRows();

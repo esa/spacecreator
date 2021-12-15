@@ -45,11 +45,169 @@ class SdlVisitor final : public Visitor
 {
 public:
     /**
+     * @brief   Simple layouter for ensuring that SLD entities do not overlap and therefore do not crash OpenGEODE
+     */
+    class Layouter
+    {
+    public:
+        /**
+         * @brief  Entity 2D position
+         */
+        using Position = std::pair<uint32_t, uint32_t>;
+
+        /**
+         * @brief   Entity 2D size
+         */
+        using Size = std::pair<uint32_t, uint32_t>;
+
+        /**
+         * @brief   SDL element type
+         */
+        enum class ElementType
+        {
+            Text,
+            Start,
+            Answer,
+            Decision,
+            Process,
+            State,
+            Input,
+            Output,
+            NextState,
+            Task,
+            Label,
+            Join,
+            Procedure,
+            ProcedureCall,
+        };
+
+        /**
+         * @brief   Constructor
+         */
+        Layouter();
+
+        /**
+         * @brief   Reset the current position and position watermarks
+         */
+        auto resetPosition() -> void;
+
+        /**
+         * @brief   Push current position onto the position stack
+         */
+        auto pushPosition() -> void;
+
+        /**
+         * @brief   Pop current position from the position stack
+         */
+        auto popPosition() -> void;
+
+        /**
+         * @brief   Move position right by the size of the element + proportional margin
+         *
+         * @param   element   element to use as size reference
+         */
+        auto moveRight(const ElementType element) -> void;
+
+        /**
+         * @brief   Move position down by the size of the element + proportional margin
+         *
+         * @param   element   element to use as size reference
+         */
+        auto moveDown(const ElementType element) -> void;
+
+        /**
+         * @brief   Get current position
+         *
+         * @return  current position
+         */
+        auto getPosition() -> const Position &;
+
+        /**
+         * @brief   Get CIF position string
+         *
+         * @param   element   element to source the name from
+         *
+         * @return  CIF position string
+         */
+        auto getPositionString(const ElementType element) -> QString;
+
+        /**
+         * @brief   Move position cursor to the rightmost encountered position
+         */
+        auto moveRightToHighWatermark() -> void;
+
+    private:
+        std::vector<Position> m_positions;
+        uint32_t m_highWatermarkX;
+    };
+
+    /**
+     * @brief   Stream writer which keeps track of intent
+     */
+    class IndentingStreamWriter
+    {
+    public:
+        /**
+         * @brief   Constructor
+         *
+         * @param   stream   stream to write to
+         */
+        IndentingStreamWriter(QTextStream &stream);
+
+        /**
+         * @brief   Start new line with indent and write text
+         *
+         * @param   line   text to write
+         */
+        auto beginLine(const QString &line) -> void;
+
+        /**
+         * @brief   Write text
+         *
+         * @param   line   text to write
+         */
+        auto write(const QString &line) -> void;
+
+        /**
+         * @brief   Write text and end line
+         *
+         * @param   line   text to write
+         */
+        auto endLine(const QString &line) -> void;
+
+        /**
+         * @brief   Write entire line - indent, text and newline
+         *
+         * @param   line   text to write
+         */
+        auto writeLine(const QString &line) -> void;
+
+        /**
+         * @brief   Push indent onto the top of the indent stack
+         *
+         * @param   indent   additional indent amount
+         */
+        auto pushIndent(const QString &indent) -> void;
+
+        /**
+         * @brief   Remove indent from the top of the indent stack
+         */
+        auto popIndent() -> void;
+
+    private:
+        QTextStream &m_stream;
+        std::vector<QString> m_indent;
+        auto getIndent() -> QString;
+    };
+
+public:
+    /**
      * @brief   Constructor
      *
-     * @param   stream   output stream (where the serialized values are put)
+     * @param   writer   output stream writer
+     * @param   layouter layouter for calculating element positions
      */
-    SdlVisitor(QTextStream &stream);
+    SdlVisitor(IndentingStreamWriter &writer, Layouter &layouter);
 
     /**
      * @brief   Deleted copy constructor
@@ -76,99 +234,98 @@ public:
      *
      * @param   process   process to be serialized
      */
-    auto visit(const Process &process) const -> void override;
+    auto visit(const Process &process) -> void override;
 
     /**
      * @brief   State visitor
      *
      * @param   state   state to be serialized
      */
-    auto visit(const State &state) const -> void override;
+    auto visit(const State &state) -> void override;
 
     /**
      * @brief   Input visitor
      *
      * @param   input   input to be serialized
      */
-    auto visit(const Input &input) const -> void override;
+    auto visit(const Input &input) -> void override;
 
     /**
      * @brief   Output visitor
      *
      * @param   output  output to be serialized
      */
-    auto visit(const Output &output) const -> void override;
+    auto visit(const Output &output) -> void override;
 
     /**
      * @brief   NEXTSTATE action visitor
      *
      * @param   nextstate   NEXTSTATE action to be serialized
      */
-    auto visit(const NextState &nextstate) const -> void override;
+    auto visit(const NextState &nextstate) -> void override;
 
     /**
      * @brief   Task visitor
      *
      * @param   task   task to be serialized
      */
-    auto visit(const Task &task) const -> void override;
+    auto visit(const Task &task) -> void override;
 
     /**
      * @brief   Variable declaration visitor
      *
      * @param   declaration   declaration to be serialized
      */
-    auto visit(const VariableDeclaration &declaration) const -> void override;
+    auto visit(const VariableDeclaration &declaration) -> void override;
 
     /**
      * @brief   Label visitor
      *
      * @param   label   label to be serialized
      */
-    auto visit(const Label &label) const -> void override;
+    auto visit(const Label &label) -> void override;
 
     /**
      * @brief   Join visitor
      *
      * @param   join   join to be serialized
      */
-    virtual auto visit(const Join &join) const -> void override;
+    virtual auto visit(const Join &join) -> void override;
 
     /**
      * @brief   Answer visitor
      *
      * @param   answer  answer to be serialized
      */
-    auto visit(const Answer &answer) const -> void override;
+    auto visit(const Answer &answer) -> void override;
 
     /**
      * @brief   Decision visitor
      *
      * @param   decision  decision to be serialized
      */
-    virtual auto visit(const Decision &decision) const -> void override;
+    virtual auto visit(const Decision &decision) -> void override;
 
     /**
      * @brief   Procedure visitor
      *
      * @param   procedure   procedure to be serialized
      */
-    auto visit(const Procedure &procedure) const -> void override;
+    auto visit(const Procedure &procedure) -> void override;
 
     /**
      * @brief   Procedure call visitor
      *
      * @param   procedureCall   procedure call to be serialized
      */
-    auto visit(const ProcedureCall &procedureCall) const -> void override;
+    auto visit(const ProcedureCall &procedureCall) -> void override;
 
 private:
-    auto dummyCif(const QString &cifType) const -> QString;
-
     template<typename T>
-    auto exportCollection(const T &collection) const -> void;
+    auto exportCollection(const T &collection) -> void;
 
-    QTextStream &m_stream;
+    IndentingStreamWriter &m_writer;
+    Layouter &m_layouter;
 };
 
 } // namespace conversion::Sdl

@@ -24,12 +24,14 @@
 #include <asn1library/asn1/asn1model.h>
 #include <conversion/common/translation/exceptions.h>
 #include <promela/PromelaModel/promelamodel.h>
+#include <promela/PromelaOptions/options.h>
 
 using Asn1Acn::Asn1Model;
 using Asn1Acn::File;
 using conversion::Model;
 using conversion::ModelType;
 using conversion::Options;
+using conversion::promela::PromelaOptions;
 using conversion::translator::TranslationException;
 using promela::model::PromelaModel;
 
@@ -41,9 +43,11 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
 
     checkSourceModelCount(sourceModels);
 
+    bool enhancedSpinSupport = options.isSet(PromelaOptions::enhancedSpinSupport);
+
     const auto *asn1Model = getModel<Asn1Model>(sourceModels);
 
-    return translateAsn1Model(asn1Model);
+    return translateAsn1Model(asn1Model, enhancedSpinSupport);
 }
 
 ModelType Asn1ToPromelaTranslator::getSourceModelType() const
@@ -61,11 +65,12 @@ std::set<ModelType> Asn1ToPromelaTranslator::getDependencies() const
     return std::set<ModelType> { ModelType::Asn1 };
 }
 
-std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(const Asn1Model *model) const
+std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
+        const Asn1Model *model, bool enhancedSpinSupport) const
 {
     std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
     for (const std::unique_ptr<File> &file : model->data()) {
-        visitAsn1File(file.get(), *promelaModel);
+        visitAsn1File(file.get(), *promelaModel, enhancedSpinSupport);
     }
 
     std::vector<std::unique_ptr<Model>> result;
@@ -73,9 +78,9 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
     return result;
 }
 
-void Asn1ToPromelaTranslator::visitAsn1File(File *file, PromelaModel &promelaModel) const
+void Asn1ToPromelaTranslator::visitAsn1File(File *file, PromelaModel &promelaModel, bool enhancedSpinSupport) const
 {
-    Asn1NodeVisitor visitor(promelaModel);
+    Asn1NodeVisitor visitor(promelaModel, enhancedSpinSupport);
     visitor.visit(*file);
 }
 }

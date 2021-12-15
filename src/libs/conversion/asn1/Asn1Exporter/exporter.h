@@ -42,8 +42,6 @@ private:
     auto exportAsn1Model(const Asn1Acn::File *file, const Options &options) const -> void;
     auto exportAcnModel(const Asn1Acn::File *file, const Options &options) const -> void;
 
-    auto writeAndCommit(QSaveFile &outputFile, const std::string &data) const -> void;
-
     auto makeFilePath(const QString &pathPrefix, const QString &fileName, const QString &extension) const -> QString;
 };
 } // namespace conversion::asn1::exporter

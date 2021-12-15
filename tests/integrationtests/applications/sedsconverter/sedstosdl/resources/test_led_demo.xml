@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/leddemo">
+    <DataTypeSet>
+      <IntegerDataType name="DestinationAddress">
+        <LongDescription>Type for a memory destination address.</LongDescription>
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="32" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="4294967295" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="SourceAddress">
+        <LongDescription>Type for a memory source address.</LongDescription>
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="32" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="4294967295" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="Word">
+        <LongDescription>Machine word.</LongDescription>
+        <IntegerDataEncoding encoding="unsigned" byteOrder="littleEndian" sizeInBits="32" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="4294967295" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="WordMask">
+        <LongDescription>Mask for a machine word.</LongDescription>
+        <IntegerDataEncoding byteOrder="littleEndian" sizeInBits="32" encoding="unsigned" />
+        <Range>
+          <MinMaxRange min="0" max="4294967295" rangeType="inclusiveMinInclusiveMax" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="RawMemoryAccessInterfaceType">
+        <LongDescription>Interface for accessing RAW memory.</LongDescription>
+        <CommandSet>
+          <Command name="ReadWord" mode="sync">
+            <LongDescription>Read word from memory, masked by the mask. The address must be word-aligned.</LongDescription>
+            <Argument name="address" type="SourceAddress" mode="in" />
+            <Argument name="mask" type="WordMask" mode="in" />
+            <Argument name="value" type="Word" mode="out" />
+          </Command>
+          <Command name="WriteWord" mode="sync">
+            <LongDescription>Write word to memory, masked by the mask.  The address must be word-aligned.</LongDescription>
+            <Argument name="address" type="DestinationAddress" mode="in" />
+            <Argument name="mask" type="WordMask" mode="in" />
+            <Argument name="value" type="Word" mode="in" />
+          </Command>
+        </CommandSet>
+      </Interface>
+      <Interface name="LedControlType">
+        <LongDescription>Interface for controlling an example virtual LED</LongDescription>
+        <CommandSet>
+          <Command name="Init" mode="async">
+            <LongDescription>Initialize component</LongDescription>
+          </Command>
+          <Command name="Enable" mode="async">
+            <LongDescription>Enable the example virtual LED</LongDescription>
+          </Command>
+          <Command name="Disable" mode="async">
+            <LongDescription>Disable the example virtual LED</LongDescription>
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="LedDemo">
+        <LongDescription>Facade for the underlying microprocessor/microcontroller system.</LongDescription>
+        <ProvidedInterfaceSet>
+          <Interface name="LedControl" type="LedControlType" />
+        </ProvidedInterfaceSet>
+        <RequiredInterfaceSet>
+          <Interface name="RawMemoryAccessInterface" type="RawMemoryAccessInterfaceType" />
+        </RequiredInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="registerAddress" type="DestinationAddress"></Variable>
+            <Variable name="registerMask" type="WordMask" />
+            <Variable name="enableValue" type="Word" />
+            <Variable name="disableValue" type="Word" />
+          </VariableSet>
+          <ActivitySet>
+            <Activity name="Initialize">
+              <Body>
+                <Assignment outputVariableRef="registerAddress">
+                  <Value value="1024" />
+                </Assignment>
+                <Assignment outputVariableRef="registerMask">
+                  <Value value="4" />
+                </Assignment>
+                <Assignment outputVariableRef="enableValue">
+                  <Value value="4" />
+                </Assignment>
+                <Assignment outputVariableRef="disableValue">
+                  <Value value="0" />
+                </Assignment>
+              </Body>
+            </Activity>
+            <Activity name="IssueCommand">
+              <Argument name="value" type="Word" />
+              <Body>
+                <SendCommandPrimitive interface="RawMemoryAccessInterface" command="WriteWord">
+                  <ArgumentValue name="address">
+                    <VariableRef variableRef="registerAddress" />
+                  </ArgumentValue>
+                  <ArgumentValue name="mask">
+                    <VariableRef variableRef="registerMask" />
+                  </ArgumentValue>
+                  <ArgumentValue name="value">
+                    <VariableRef variableRef="value" />
+                  </ArgumentValue>
+                </SendCommandPrimitive>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="VirtualLED">
+              <EntryState name="Uninitialized"></EntryState>
+              <State name="Off" />
+              <State name="On" />
+              <Transition fromState="Uninitialized" toState="Off" name="Initialize">
+                <OnCommandPrimitive command="Init" interface="LedControl" />
+                <Do activity="Initialize" />
+              </Transition>
+              <Transition fromState="Off" toState="On" name="ToggleOn">
+                <OnCommandPrimitive command="Enable" interface="LedControl" />
+                <Do activity="IssueCommand">
+                  <ArgumentValue name="value">
+                    <VariableRef variableRef="enableValue" />
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+              <Transition fromState="On" toState="Off" name="ToggleOff">
+                <OnCommandPrimitive command="Disable" interface="LedControl" />
+                <Do activity="IssueCommand">
+                  <ArgumentValue name="value">
+                    <VariableRef variableRef="disableValue" />
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

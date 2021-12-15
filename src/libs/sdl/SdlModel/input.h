@@ -91,14 +91,14 @@ public:
      *
      * @return  a reference to vector of pointers to input parameters
      */
-    auto parameters() const -> const std::vector<VariableReference *> &;
+    auto parameters() const -> const std::vector<std::unique_ptr<VariableReference>> &;
 
     /**
      * @brief   Setter for the transition
      *
      * @param   parameter  a pointer to input parameter
      */
-    auto addParameter(VariableReference *parameter) -> void;
+    auto addParameter(std::unique_ptr<VariableReference> parameter) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
@@ -108,7 +108,7 @@ public:
 private:
     Transition *m_transition;
 
-    std::vector<VariableReference *> m_parameters;
+    std::vector<std::unique_ptr<VariableReference>> m_parameters;
 };
 
 } // namespace sdl

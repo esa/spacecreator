@@ -28,6 +28,13 @@
 
 namespace conversion {
 
+QString Escaper::escapeSdlName(QString name)
+{
+    escapeName(name, '_');
+
+    return name;
+}
+
 QString Escaper::escapeIvName(QString name)
 {
     escapeName(name, '_');
@@ -44,11 +51,33 @@ QString Escaper::escapeAsn1TypeName(QString name)
     return name;
 }
 
+QString Escaper::escapeAsn1PackageName(QString name)
+{
+    replaceDelimeters(name,
+            {
+                    '/',
+                    '\\',
+            },
+            '-');
+    escapeName(name, '-');
+
+    name = name.toUpper();
+
+    return name;
+}
+
 QString Escaper::escapeAsn1FieldName(QString name)
 {
     escapeName(name, '-');
 
     name[0] = name[0].toLower(); // sequence field name starts with lowercase letter in ASN.1
+
+    return name;
+}
+
+QString Escaper::escapePromelaName(QString name)
+{
+    escapeName(name, '_');
 
     return name;
 }

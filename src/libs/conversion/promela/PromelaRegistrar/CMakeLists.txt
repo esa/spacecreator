@@ -15,8 +15,8 @@ target_include_directories(PromelaRegistrar
 target_link_libraries(PromelaRegistrar
   PRIVATE   Promela::Exporter
             Conversion::Asn1ToPromelaTranslator
-  PUBLIC    Conversion::Common
-            CommonProjectWarnings)
+            CommonProjectWarnings
+  PUBLIC    Conversion::Common)
 
 add_format_target(PromelaRegistrar)
 add_tidy_target(PromelaRegistrar)

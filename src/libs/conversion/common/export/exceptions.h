@@ -39,9 +39,21 @@ public:
 };
 
 /**
+ * @brief   Exception thrown when exporters get null model
+ */
+class NullModelException final : public ExportException
+{
+public:
+    /**
+     * @brief   Constructor
+     */
+    NullModelException();
+};
+
+/**
  * @brief   Exception thrown when exporters get incorrect model
  */
-class IncorrectModelException : public ExportException
+class IncorrectModelException final : public ExportException
 {
 public:
     /**
@@ -56,7 +68,7 @@ public:
 /**
  * @brief   Exception thrown when output file name is missing
  */
-class MissingOutputFilenameException : public ExportException
+class MissingOutputFilenameException final : public ExportException
 {
 public:
     /**
@@ -65,6 +77,20 @@ public:
      * @param   message     Model type
      */
     explicit MissingOutputFilenameException(ModelType modelType);
+};
+
+/**
+ * @brief   Exception thrown when element is not supported
+ */
+class UnsupportedElementException final : public ExportException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   elementName     Element name
+     */
+    explicit UnsupportedElementException(QString elementName);
 };
 
 } // namespace conversion::exporter

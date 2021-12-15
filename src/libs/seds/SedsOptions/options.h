@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <QString>
+
 namespace conversion::seds {
 
 /**
@@ -27,22 +29,25 @@ namespace conversion::seds {
 class SedsOptions
 {
 public:
-    /** @brief File to import */
-    inline static const QString inputFilename = "Seds_Import_InputFilename";
+    /** @brief  Filepath of input file */
+    inline static const QString inputFilepath = "Seds_Import_InputFilepath";
     /** @brief Intermediate file that will be created during preprocessing */
-    inline static const QString preprocessedFilename = "Seds_Import_PreprocessedFilename";
+    inline static const QString preprocessedFilepath = "Seds_Import_PreprocessedFilename";
     /** @brief Schema file that will be used during validation */
-    inline static const QString schemaFilename = "Seds_Import_SchemaFilename";
+    inline static const QString schemaFilepath = "Seds_Import_SchemaFilepath";
     /** @brief Declaration of an external reference */
     inline static const QString externalRef = "Seds_Import_ExternalRef";
     /** @brief File with external references declarations */
-    inline static const QString externalRefFilename = "Seds_Import_ExternalRefFilename";
+    inline static const QString externalRefFilepath = "Seds_Import_ExternalRefFilepath";
     /** @brief Skip SEDS validation */
     inline static const QString skipValidation = "Seds_Import_SkipValidation";
     /** @brief Don't remove intermediate files after import */
     inline static const QString keepIntermediateFiles = "Seds_Import_KeepIntermediateFiles";
-    /** @brief Default schema file name*/
-    inline static const QString defaultSchemaFilename = "seds.xsd";
+    /** @brief  Filepath of output file */
+    inline static const QString outputFilepath = "Seds_Export_OutputFilepath";
+
+    /** @brief Default output filename */
+    inline static const QString defaultOutputFilepath = "seds.xml";
 };
 
 } // namespace conversion::seds

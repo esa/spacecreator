@@ -1,0 +1,41 @@
+/* CIF Process (0, 0), (800, 100) */
+process Component;
+    /* CIF Text (0, 150), (400, 500) */
+    Timer timer_StateA;
+    Timer timer_StateB;
+    Timer timer_StateC;
+    /* CIF ENDTEXT */
+    /* CIF Start (0, 900), (200, 75) */
+    START;
+        /* CIF ProcedureCall (0, 1087), (100, 50) */
+        call set_timer(1000, timer_StateA);
+        /* CIF NextState (0, 1162), (200, 50) */
+        NEXTSTATE StateA;
+    /* CIF State (0, 1237), (200, 50) */
+    state StateA;
+        /* CIF Input (0, 1237), (200, 50) */
+        input timer_StateA;
+            /* CIF ProcedureCall (0, 1312), (100, 50) */
+            call set_timer(2000, timer_StateB);
+            /* CIF NextState (0, 1387), (200, 50) */
+            NEXTSTATE StateB;
+    endstate;
+    /* CIF State (600, 1237), (200, 50) */
+    state StateB;
+        /* CIF Input (600, 1237), (200, 50) */
+        input timer_StateB;
+            /* CIF ProcedureCall (600, 1312), (100, 50) */
+            call set_timer(3000, timer_StateC);
+            /* CIF NextState (600, 1387), (200, 50) */
+            NEXTSTATE StateC;
+    endstate;
+    /* CIF State (1200, 1237), (200, 50) */
+    state StateC;
+        /* CIF Input (1200, 1237), (200, 50) */
+        input timer_StateC;
+            /* CIF ProcedureCall (1200, 1312), (100, 50) */
+            call set_timer(2000, timer_StateB);
+            /* CIF NextState (1200, 1387), (200, 50) */
+            NEXTSTATE StateB;
+    endstate;
+endprocess Component;

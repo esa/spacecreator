@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "mscchart.h"
 #include "mscmessage.h"
 
 #include <QObject>
@@ -47,7 +48,6 @@ class SystemChecks;
 class TimerItem;
 
 class MscAction;
-class MscChart;
 class MscCommandsStack;
 class MscCondition;
 class MscCoregion;

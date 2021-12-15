@@ -171,7 +171,18 @@ void AcnTypeComponentReconstructingVisitor::tryAppendIntegerAcnParams(
 {
     tryAppendSize(type, params);
     tryAppendEncoding(type, params);
-    tryAppendEndianness(type, params);
+
+    // Querying size on the tryAppendEndianness() function level is infesible, as it
+    // requires a major rewrite (separate specializations for different types
+    // and re-ordering the file so that instantiations are after specialization)
+    const auto size = type.size();
+    if ((type.endianness() != Types::Endianness::little) || (size == 0) || ((size % 8 == 0) && (size > 8))) {
+        // Apply endianess if it is not little
+        // or if size is undefined
+        // or if size is multibyte.
+        // Otherwise ASN1SCC will complain.
+        tryAppendEndianness(type, params);
+    }
 }
 
 void AcnTypeComponentReconstructingVisitor::tryAppendAsciiStringParams(

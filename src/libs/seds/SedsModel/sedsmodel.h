@@ -88,12 +88,16 @@ private:
 namespace conversion {
 
 /**
- * @brief   Specialization for SEDS model properties
+ * @brief   Specialization for SEDS model
  */
 template<>
 struct ModelProperties<::seds::model::SedsModel> {
     /// @brief  Model type
     static const ModelType type = ModelType::Seds;
+    /// @brief  Model name
+    static inline const QString name = ModelTypeProperties<type>::name;
+    /// @brief  Model extension
+    static inline const QStringList extensions = ModelTypeProperties<type>::extensions;
 };
 
 } // namespace conversion

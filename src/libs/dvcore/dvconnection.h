@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include "dvdevice.h"
+#include "dvmessage.h"
+#include "dvnode.h"
 #include "dvobject.h"
 
 #include <QList>
@@ -24,10 +27,7 @@
 #include <memory>
 
 namespace dvm {
-class DVDevice;
 struct DVConnectionPrivate;
-class DVMessage;
-class DVNode;
 
 class DVConnection : public DVObject
 {

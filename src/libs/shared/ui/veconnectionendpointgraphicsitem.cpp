@@ -136,12 +136,13 @@ void VEConnectionEndPointGraphicsItem::adjustItem()
     const QRectF parentRect = parentItem()->boundingRect();
 
     if ((pos().isNull() || shared::graphicsviewutils::isCollided(siblingsRects, itemRect)) && parentRect.isValid()) {
-        PositionLookupHelper helper(sidePaths(), parentRect, siblingsRects, itemRect, initialOffset, lookupType());
+        PositionLookupHelper helper(
+                sidePaths(), parentRect, siblingsRects, itemRect.topLeft() - initialOffset, lookupType());
         if (helper.lookup()) {
+            setPos(helper.mappedOriginPoint());
             if (helper.isSideChanged()) {
                 updateInternalItems(helper.side());
             }
-            setPos(helper.mappedOriginPoint());
             for (VEConnectionGraphicsItem *connection : qAsConst(m_connections)) {
                 if (connection) {
                     connection->doLayout();

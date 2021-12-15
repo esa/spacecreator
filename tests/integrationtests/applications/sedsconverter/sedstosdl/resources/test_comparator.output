@@ -1,0 +1,65 @@
+/* CIF Process (0, 0), (800, 100) */
+process Comparator;
+    /* CIF Text (0, 150), (400, 500) */
+    dcl x Number;
+    dcl y Number;
+    dcl io_AsyncComparator_Less_Pi Less_Type;
+    dcl io_AsyncComparator_Less_Ri Less_Type1;
+    /* CIF ENDTEXT */
+    /* CIF Procedure (0, 900), (800, 50) */
+    procedure NotifyLess;
+        /* CIF Text (0, 0), (400, 500) */
+        fpar
+            in x1 Number,
+            in x2 Number;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Decision (0, 862), (400, 50) */
+            decision x1 < x2;
+                /* CIF Answer (0, 937), (400, 50) */
+                (True):
+                    /* CIF Task (0, 1012), (100, 50) */
+                    task io_AsyncComparator_Less_Ri.result := True;
+                    /* CIF Output (0, 1087), (200, 50) */
+                    output AsyncComparator_Less_Ri(io_AsyncComparator_Less_Ri);
+                    /* CIF Join (0, 1162), (100, 50) */
+                    join condition_1;
+                /* CIF Answer (600, 937), (400, 50) */
+                (False):
+                    /* CIF Task (600, 1012), (100, 50) */
+                    task io_AsyncComparator_Less_Ri.result := False;
+                    /* CIF Output (600, 1087), (200, 50) */
+                    output AsyncComparator_Less_Ri(io_AsyncComparator_Less_Ri);
+                    /* CIF Join (600, 1162), (100, 50) */
+                    join condition_1;
+            enddecision;
+            /* CIF Label (1200, 1012), (100, 50) */
+            condition_1:
+        return ;
+    endprocedure;
+    /* CIF Start (0, 975), (200, 75) */
+    START;
+        /* CIF NextState (0, 1162), (200, 50) */
+        NEXTSTATE Off;
+    /* CIF State (0, 1237), (200, 50) */
+    state Idle;
+        /* CIF Input (0, 1237), (200, 50) */
+        input AsyncComparator_Less_Pi(io_AsyncComparator_Less_Pi);
+            /* CIF Task (0, 1312), (100, 50) */
+            task x := io_AsyncComparator_Less_Pi.x;
+            /* CIF Task (0, 1387), (100, 50) */
+            task y := io_AsyncComparator_Less_Pi.y;
+            /* CIF ProcedureCall (0, 1462), (100, 50) */
+            call NotifyLess(x, y);
+            /* CIF NextState (0, 1537), (200, 50) */
+            NEXTSTATE Idle;
+    endstate;
+    /* CIF State (1500, 1237), (200, 50) */
+    state Off;
+        /* CIF Input (1500, 1237), (200, 50) */
+        input AsyncComparator_Init_Pi;
+            /* CIF NextState (1500, 1312), (200, 50) */
+            NEXTSTATE Idle;
+    endstate;
+endprocess Comparator;

@@ -21,6 +21,7 @@
 
 #include "process.h"
 
+#include <QStringList>
 #include <conversion/common/model.h>
 
 namespace sdl {
@@ -107,12 +108,16 @@ private:
 namespace conversion {
 
 /**
- * @brief   Specialization for SDL model properties
+ * @brief   Specialization for SDL model
  */
 template<>
 struct ModelProperties<::sdl::SdlModel> {
     /// @brief  Model type
     static const ModelType type = ModelType::Sdl;
+    /// @brief  Model name
+    static inline const QString name = ModelTypeProperties<type>::name;
+    /// @brief  Model extension
+    static inline const QStringList extensions = ModelTypeProperties<type>::extensions;
 };
 
 } // namespace conversion

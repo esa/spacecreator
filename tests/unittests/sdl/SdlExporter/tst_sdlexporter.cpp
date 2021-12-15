@@ -57,6 +57,7 @@
 using conversion::ModelType;
 using conversion::Options;
 using conversion::exporter::ExportException;
+using conversion::sdl::SdlOptions;
 using sdl::Action;
 using sdl::ContinuousSignal;
 using sdl::Decision;
@@ -78,7 +79,6 @@ using sdl::VariableDeclaration;
 using sdl::VariableLiteral;
 using sdl::VariableReference;
 using sdl::exporter::SdlExporter;
-using sdl::exporter::SdlOptions;
 using tests::common::SdlAnswerBuilder;
 using tests::common::SdlDecisionBuilder;
 using tests::common::SdlInputBuilder;
@@ -110,7 +110,7 @@ private Q_SLOTS:
     void testGenerateProcessWithReturnlessProcedure();
 };
 
-std::unique_ptr<VariableDeclaration> makeVariableDeclaration(QString name, QString type)
+static std::unique_ptr<VariableDeclaration> makeVariableDeclaration(QString name, QString type)
 {
     auto variable = std::make_unique<VariableDeclaration>();
     variable->setName(std::move(name));
@@ -119,7 +119,7 @@ std::unique_ptr<VariableDeclaration> makeVariableDeclaration(QString name, QStri
     return variable;
 }
 
-std::unique_ptr<ProcedureParameter> makeProcedureParameter(QString name, QString type, QString direction)
+static std::unique_ptr<ProcedureParameter> makeProcedureParameter(QString name, QString type, QString direction)
 {
     auto parameter = std::make_unique<ProcedureParameter>();
     parameter->setName(std::move(name));
@@ -129,7 +129,7 @@ std::unique_ptr<ProcedureParameter> makeProcedureParameter(QString name, QString
     return parameter;
 }
 
-bool verifyAndConsume(QTextStream &stream, const QString &string)
+static bool verifyAndConsume(QTextStream &stream, const QString &string)
 {
     QString line;
     do {
@@ -142,7 +142,7 @@ bool verifyAndConsume(QTextStream &stream, const QString &string)
     return false;
 }
 
-void checkSequenceAndConsume(std::vector<QString> &expectedOutput, QTextStream &consumableOutput)
+static void checkSequenceAndConsume(std::vector<QString> &expectedOutput, QTextStream &consumableOutput)
 {
     for (const auto &expectedLine : expectedOutput) {
         if (verifyAndConsume(consumableOutput, expectedLine)) {
@@ -210,7 +210,7 @@ void tst_sdlmodel::testGenerateBasicProcess()
     // clang-format on
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -253,7 +253,6 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
     QString processName = modelName.toLower(); // NOLINT
 
     auto variable = makeVariableDeclaration("howManyLoops", "MyInteger");
-    auto variableReference = VariableReference(variable.get());
 
     auto transition1 = SdlTransitionBuilder()
                                .withOutput(SdlOutputBuilder().withName("parameterlessOutput").build())
@@ -262,14 +261,17 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
     auto someInput = SdlInputBuilder()
                              .withName("some_input_name")
                              .withTransition(transition1.get())
-                             .withParameter(&variableReference)
+                             .withParameter(std::make_unique<VariableReference>(variable.get()))
                              .build();
     auto state1 = SdlStateBuilder("Looping")
                           .withInput(std::move(someInput))
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
-    auto referenceOutput = SdlOutputBuilder().withName("referenceOutput").withParameter(&variableReference).build();
+    auto referenceOutput = SdlOutputBuilder()
+                                   .withName("referenceOutput")
+                                   .withParameter(std::make_unique<VariableReference>(variable.get()))
+                                   .build();
 
     auto transition2 = SdlTransitionBuilder()
                                .withTask(SdlTaskBuilder().withContents("'EXAMPLE TASK CONTENTS'").build())
@@ -301,7 +303,7 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
     const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -373,7 +375,7 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
     const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -412,7 +414,6 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     QString processName = modelName.toLower(); // NOLINT
 
     auto variableX = makeVariableDeclaration("x", "MyInteger");
-    auto variableXRef = VariableReference(variableX.get());
 
     auto transition =
             SdlTransitionBuilder()
@@ -433,7 +434,9 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
                                                             SdlTransitionBuilder()
                                                                     .withOutput(SdlOutputBuilder()
                                                                                         .withName("sendOutput")
-                                                                                        .withParameter(&variableXRef)
+                                                                                        .withParameter(std::make_unique<
+                                                                                                VariableReference>(
+                                                                                                variableX.get()))
                                                                                         .build())
                                                                     .withTask(
                                                                             SdlTaskBuilder()
@@ -458,7 +461,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     auto waitState = SdlStateBuilder("Wait")
                              .withInput(SdlInputBuilder()
                                                 .withName("startProcess")
-                                                .withParameter(&variableXRef)
+                                                .withParameter(std::make_unique<VariableReference>(variableX.get()))
                                                 .withTransition(transition.get())
                                                 .build())
                              .build();
@@ -480,7 +483,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     // clang-format on
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -561,7 +564,7 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
     const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -655,15 +658,13 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
                               .build();
 
     auto variableX = makeVariableDeclaration("x", "MyInteger");
-    VariableReference varXRef(variableX.get());
     auto variableY = makeVariableDeclaration("y", "MyInteger");
-    VariableReference varYRef(variableY.get());
 
     auto state = SdlStateBuilder("Wait")
                          .withInput(SdlInputBuilder()
                                             .withName("startProcess")
                                             .withTransition(transition.get())
-                                            .withParameter(&varXRef)
+                                            .withParameter(std::make_unique<VariableReference>(variableX.get()))
                                             .build())
                          .build();
 
@@ -681,7 +682,7 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
     const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -736,7 +737,6 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
     QString processName = modelName.toLower(); // NOLINT
 
     auto variableX = makeVariableDeclaration("x", "MyInteger");
-    VariableReference varXRef(variableX.get());
 
     auto procedure = SdlProcedureBuilder()
                              .withName("returnlessProcedure")
@@ -750,8 +750,8 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
     auto transition = SdlTransitionBuilder()
                               .withAction(SdlProcedureCallBuilder()
                                                   .withProcedure(procedure.get())
-                                                  .withArgument(VariableLiteral("2"))
-                                                  .withArgument(&varXRef)
+                                                  .withArgument(std::make_unique<VariableLiteral>("2"))
+                                                  .withArgument(std::make_unique<VariableReference>(variableX.get()))
                                                   .build())
                               .withNextStateAction()
                               .build();
@@ -759,7 +759,7 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
     auto state = SdlStateBuilder("Wait")
                          .withInput(SdlInputBuilder()
                                             .withName("startProcess")
-                                            .withParameter(&varXRef)
+                                            .withParameter(std::make_unique<VariableReference>(variableX.get()))
                                             .withTransition(transition.get())
                                             .build())
                          .build();
@@ -777,7 +777,7 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
     const auto exampleModel = SdlModelBuilder(modelName).withProcess(std::move(process)).build();
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {

@@ -108,11 +108,10 @@ ModelT *Translator::getModel(const std::vector<Model *> models)
             [](Model *model) { return dynamic_cast<ModelT *>(model) != nullptr; });
 
     if (foundModels.empty()) {
-        auto message = QString("Missing source %1 model").arg(modelTypeToString(ModelProperties<ModelType>::type));
+        auto message = QString("Missing source %1 model").arg(ModelProperties<ModelT>::name);
         throw conversion::translator::TranslationException(std::move(message));
     } else if (foundModels.size() > 1) {
-        auto message =
-                QString("More than 1 source %1 model passed").arg(modelTypeToString(ModelProperties<ModelType>::type));
+        auto message = QString("More than 1 source %1 model passed").arg(ModelProperties<ModelT>::name);
         throw conversion::translator::TranslationException(std::move(message));
     } else {
         return dynamic_cast<ModelT *>(foundModels[0]);

@@ -26,7 +26,7 @@ class MscInstance;
 class MscCondition : public MscInstanceEvent
 {
     Q_OBJECT
-    Q_PROPERTY(msc::MscInstance *instance READ instance WRITE setInstance NOTIFY instanceChanged)
+    Q_PROPERTY(msc::MscEntity *instance READ instanceObj WRITE setInstanceObj NOTIFY instanceChanged)
     Q_PROPERTY(bool shared READ shared WRITE setShared NOTIFY sharedChanged)
 
 public:
@@ -38,6 +38,8 @@ public:
 
     MscInstance *instance() const;
     void setInstance(MscInstance *instance);
+    MscEntity *instanceObj() const;
+    void setInstanceObj(MscEntity *instance);
 
     MscEntity::EntityType entityType() const override;
 

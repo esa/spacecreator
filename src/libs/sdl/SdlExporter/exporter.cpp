@@ -28,10 +28,14 @@
 #include <QTextStream>
 #include <sdl/SdlOptions/options.h>
 
+using conversion::Model;
 using conversion::ModelType;
+using conversion::Options;
 using conversion::exporter::ExportException;
 using conversion::exporter::IncorrectModelException;
 using conversion::exporter::MissingOutputFilenameException;
+using conversion::exporter::NullModelException;
+using conversion::sdl::SdlOptions;
 using sdl::SdlModel;
 
 namespace sdl::exporter {
@@ -39,7 +43,7 @@ namespace sdl::exporter {
 void SdlExporter::exportModel(const Model *const model, const Options &options) const
 {
     if (model == nullptr) {
-        throw ExportException("Model to export is null");
+        throw NullModelException();
     }
 
     const auto *const sdlModel = dynamic_cast<const SdlModel *>(model);
@@ -62,30 +66,17 @@ void SdlExporter::exportProcess(const Process &process, const Options &options) 
     QString serializedProcess;
     QTextStream outputTextStream(&serializedProcess, QIODevice::WriteOnly);
 
-    sdl::SdlVisitor visitor(outputTextStream);
+    sdl::SdlVisitor::Layouter layouter;
+    sdl::SdlVisitor::IndentingStreamWriter writer(outputTextStream);
+    sdl::SdlVisitor visitor(writer, layouter);
 
     visitor.visit(process);
 
-    const auto pathPrefix = options.value(SdlOptions::sdlFilepathPrefix).value_or("");
+    const auto pathPrefix = options.value(SdlOptions::filepathPrefix).value_or("");
     const auto filePath = makeFilePath(pathPrefix, process.name(), "pr");
 
     QSaveFile outputFile(filePath);
-    writeAndCommit(outputFile, serializedProcess.toStdString());
-}
-
-void SdlExporter::writeAndCommit(QSaveFile &outputFile, const std::string &data) const
-{
-    if (!outputFile.open(QIODevice::WriteOnly)) {
-        throw ExportException(QString("Failed to open a file %1").arg(outputFile.fileName()));
-    }
-
-    if (outputFile.write(data.c_str()) == -1) {
-        throw ExportException(QString("Failed to write a file %1").arg(outputFile.fileName()));
-    }
-
-    if (!outputFile.commit()) {
-        throw ExportException(QString("Failed to commit a transaction in %1").arg(outputFile.fileName()));
-    }
+    writeAndCommit(outputFile, serializedProcess);
 }
 
 QString SdlExporter::makeFilePath(const QString &pathPrefix, const QString &fileName, const QString &extension) const
@@ -97,4 +88,4 @@ QString SdlExporter::makeFilePath(const QString &pathPrefix, const QString &file
     return QString("%1%2.%3").arg(pathPrefix, fileName, extension);
 }
 
-} // namespace conversion::Sdl::exporter
+} // namespace sdl::exporter

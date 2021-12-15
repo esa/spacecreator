@@ -109,7 +109,7 @@ public:
     virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
-    std::unique_ptr<Transition> m_implementation;
+    std::unique_ptr<Transition> m_implementation; // Null if external
     std::vector<std::unique_ptr<ProcedureParameter>> m_parameters;
     std::unique_ptr<VariableDeclaration> m_returnVariableDeclaration;
 };

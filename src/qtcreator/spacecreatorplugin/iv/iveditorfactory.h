@@ -36,7 +36,7 @@ class IVEditorFactory : public Core::IEditorFactory
 public:
     explicit IVEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent);
 
-#if QTC_VERSION == 48
+#if QTC_VERSION == 408
     Core::IEditor *createEditor() override { return createIVEditor(); }
 #endif
     Core::IEditor *createIVEditor();

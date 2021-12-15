@@ -17,10 +17,6 @@
 
 #include "mscdocument.h"
 
-#include "mscchart.h"
-#include "mscmessagedeclaration.h"
-#include "mscmessagedeclarationlist.h"
-
 namespace msc {
 
 /*!

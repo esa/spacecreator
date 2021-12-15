@@ -21,6 +21,7 @@
 
 #include "file.h"
 
+#include <QStringList>
 #include <conversion/common/model.h>
 #include <memory>
 
@@ -92,12 +93,16 @@ private:
 namespace conversion {
 
 /**
- * @brief   Specialization for ASN.1 model properties
+ * @brief   Specialization for ASN.1 model
  */
 template<>
 struct ModelProperties<Asn1Acn::Asn1Model> {
     /// @brief  Model type
     static const ModelType type = ModelType::Asn1;
+    /// @brief  Model name
+    static inline const QString name = ModelTypeProperties<type>::name;
+    /// @brief  Model extension
+    static inline const QStringList extensions = ModelTypeProperties<type>::extensions;
 };
 
 } // namespace conversion

@@ -1,0 +1,4 @@
+PKG DEFINITIONS ::= BEGIN
+OutsideInteger ::= INTEGER(0 .. 16)
+END
+

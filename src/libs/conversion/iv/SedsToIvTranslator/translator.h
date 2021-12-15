@@ -45,11 +45,11 @@ class SedsToIvTranslator final : public ::conversion::translator::Translator
 {
 public:
     /**
-     * @brief   Translate given SEDS models into an InterfaceView model
+     * @brief   Translate given SEDS and ASN.1 models into an InterfaceView model
      *
-     * @param   sources     List of SEDS models
+     * @param   sources     List of models
      *
-     * @return  InterfaceView model translated from SEDS models
+     * @return  Created InterfaceView model
      */
     virtual auto translateModels(std::vector<Model *> sourceModels, const Options &options) const
             -> std::vector<std::unique_ptr<Model>> override;
@@ -99,17 +99,6 @@ private:
      */
     auto translatePackage(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
             bool generateFunction) const -> void;
-
-    /**
-     * @brief   Gets ASN.1 definitions for given SEDS package from given ASN.1 model
-     *
-     * @param   sedsPackage     SEDS package
-     * @param   asn1Model       ASN.1 model
-     *
-     * @return  Asn1 definitions
-     */
-    auto getAsn1Definitions(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model) const
-            -> Asn1Acn::Definitions *;
 };
 
 } // namespace conversion::iv::translator

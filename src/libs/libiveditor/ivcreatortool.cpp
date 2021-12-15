@@ -154,9 +154,9 @@ void IVCreatorTool::groupSelectedItems()
                 QPointF startPoint = sourceItem->sceneBoundingRect().center();
                 QPointF endPoint = targetItem->sceneBoundingRect().center();
                 const bool startAdjusted = shared::graphicsviewutils::intersects(
-                        sourceItem->sceneBoundingRect(), { startPoint, endPoint }, &startPoint);
+                        sourceItem->sceneBoundingRect(), QLineF(startPoint, endPoint), &startPoint);
                 const bool endAdjusted = shared::graphicsviewutils::intersects(
-                        targetItem->sceneBoundingRect(), { startPoint, endPoint }, &endPoint);
+                        targetItem->sceneBoundingRect(), QLineF(startPoint, endPoint), &endPoint);
                 if (!startAdjusted || !endAdjusted) {
                     return;
                 }

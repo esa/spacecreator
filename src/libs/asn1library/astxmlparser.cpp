@@ -934,9 +934,14 @@ void AstXmlParser::readAcnComponent(Types::Type &type)
     auto alignToNext = readIsAlignedToNext();
     auto name = readNameAttribute();
     auto id = readIdAttribute(QStringLiteral("Id"));
-    auto component = readTypeDetails(readTypeAttribute(), {}, false, alignToNext);
+    auto reference = readTypeAssignmentAttribute();
 
-    AcnDefinedItemsAddingVisitor visitor(std::make_unique<AcnSequenceComponent>(id, name, std::move(component)));
+    auto component = readTypeDetails(readTypeAttribute(), {}, false, alignToNext);
+    auto acnComponentPointer = std::make_unique<AcnSequenceComponent>(id, name, std::move(component));
+    if (!reference.isEmpty()) {
+        acnComponentPointer->setReference(reference);
+    }
+    AcnDefinedItemsAddingVisitor visitor(std::move(acnComponentPointer));
     type.accept(visitor);
 }
 

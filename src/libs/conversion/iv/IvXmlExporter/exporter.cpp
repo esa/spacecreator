@@ -35,6 +35,8 @@
 using conversion::Options;
 using conversion::exporter::ExportException;
 using conversion::exporter::IncorrectModelException;
+using conversion::exporter::MissingOutputFilenameException;
+using conversion::exporter::NullModelException;
 using conversion::iv::IvOptions;
 using ive::IVExporter;
 using ivm::IVModel;
@@ -44,7 +46,7 @@ namespace conversion::iv::exporter {
 void IvXmlExporter::exportModel(const Model *model, const Options &options) const
 {
     if (model == nullptr) {
-        throw ExportException("Model to export is null");
+        throw NullModelException();
     }
 
     if (model->modelType() != ModelType::InterfaceView) {
@@ -53,9 +55,9 @@ void IvXmlExporter::exportModel(const Model *model, const Options &options) cons
 
     const auto *ivModel = dynamic_cast<const IVModel *>(model);
 
-    const auto outputFilename = options.value(IvOptions::outputFilename);
-    if (!outputFilename) {
-        throw ExportException("Output filename wasn't specified");
+    const auto outputFilepath = options.value(IvOptions::outputFilepath);
+    if (!outputFilepath) {
+        throw MissingOutputFilenameException(ModelType::InterfaceView);
     }
 
     QByteArray modelData;
@@ -65,7 +67,7 @@ void IvXmlExporter::exportModel(const Model *model, const Options &options) cons
     IVExporter exporter;
     exporter.exportObjects(ivModel->objects().values(), &modelDataBuffer);
 
-    QSaveFile outputFile(*outputFilename);
+    QSaveFile outputFile(*outputFilepath);
     outputFile.open(QIODevice::WriteOnly);
     outputFile.write(modelData);
     outputFile.commit();

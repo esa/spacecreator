@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+ <Package name="InterfaceView">
+  <ComponentSet>
+   <Component name="CyclicFunction">
+    <ProvidedInterfaceSet>
+     <Interface type="CyclicFunctionCyclicInterfacePi" name="CyclicInterfacePi"/>
+    </ProvidedInterfaceSet>
+    <DeclaredInterfaceSet>
+     <Interface name="CyclicFunctionCyclicInterfacePi">
+      <CommandSet>
+       <Command name="CyclicInterfacePi" mode="async"/>
+      </CommandSet>
+     </Interface>
+    </DeclaredInterfaceSet>
+   </Component>
+  </ComponentSet>
+ </Package>
+</PackageFile>

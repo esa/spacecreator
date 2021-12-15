@@ -12,10 +12,11 @@ target_include_directories(${TEST_NAME}
                 ${CMAKE_SOURCE_DIR}/tests/unittests/conversion/common)
 target_link_libraries(${TEST_NAME}
     PRIVATE     Conversion::SedsToIvTranslator
+                Conversion::SedsToAsn1Translator
                 ConversionTests::Asn1ModelBuilder
                 ConversionTests::SedsModelBuilder
-                Qt5::Core
-                Qt5::Test
+                Qt${QT_VERSION_MAJOR}::Core
+                Qt${QT_VERSION_MAJOR}::Test
                 CommonProjectWarnings)
 
 configure_file(resources/config.xml config.xml COPYONLY)

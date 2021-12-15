@@ -34,17 +34,17 @@ public:
     /*
      * @brief   Constructor
      *
-     * @param   filename    File that is being read
+     * @param   filepath    File that is being read
      * @param   message     Error message
      */
-    SymbolDefinitionReaderException(const QString &filename, const QString &message);
+    SymbolDefinitionReaderException(const QString &filepath, const QString &message);
     /*
      * @brief   Constructor
      *
-     * @param   filename    File that is being read
+     * @param   filepath    File that is being read
      * @param   message     Error message
      */
-    SymbolDefinitionReaderException(const QString &filename, std::string_view message);
+    SymbolDefinitionReaderException(const QString &filepath, std::string_view message);
 };
 
 } // namespace seds::symbolreader

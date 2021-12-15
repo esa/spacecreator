@@ -39,7 +39,7 @@ public:
 
     auto withName(QString name) -> SdlOutputBuilder &;
 
-    auto withParameter(VariableReference *parameter) -> SdlOutputBuilder &;
+    auto withParameter(std::unique_ptr<VariableReference> parameter) -> SdlOutputBuilder &;
 
 private:
     std::unique_ptr<Output> m_output;

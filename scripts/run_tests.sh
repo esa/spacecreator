@@ -15,6 +15,8 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/qtcreator:/usr
 BUILD_DIR=$1
 
 export QT_QPA_PLATFORM=offscreen
+# Non-colliding alias that can be used outside of this script
+export SPACECREATOR_BUILD_DIR=$BUILD_DIR
 
 cd $BUILD_DIR
 BASE_DIR=`pwd`

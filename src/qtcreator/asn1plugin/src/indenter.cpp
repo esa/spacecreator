@@ -31,7 +31,7 @@
 
 using namespace Asn1Acn::Internal;
 
-#if QTC_VERSION == 48
+#if QTC_VERSION == 408
 Indenter::Indenter() {}
 
 Indenter::~Indenter() {}

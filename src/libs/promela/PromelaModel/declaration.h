@@ -19,9 +19,11 @@
 
 #pragma once
 
+#include "channelinit.h"
 #include "datatype.h"
 
 #include <QString>
+#include <optional>
 
 namespace promela::model {
 /**
@@ -70,10 +72,29 @@ public:
      * @return declaration visibility.
      */
     Visibility getVisibility() const noexcept;
+    /**
+     * @brief Checks if declaration contains an initialization expression
+     *
+     * @return true if the declaration has initialization expression, otherwise false
+     */
+    bool hasInit() const noexcept;
+    /**
+     * @brief Getter for initialization expression.
+     *
+     * @return intialization expression or empty.
+     */
+    const std::optional<ChannelInit> &getInit() const noexcept;
+    /**
+     * @brief Setter for initialization expression.
+     *
+     * @param channelInit ChannelInit to set as initialization expression for declaration.
+     */
+    void setInit(const ChannelInit &channelInit);
 
 private:
     DataType m_type;
     QString m_name;
     Visibility m_visibility;
+    std::optional<ChannelInit> m_init;
 };
 }

@@ -14,9 +14,10 @@ target_include_directories(SedsXmlValidator
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SedsXmlValidator
     PUBLIC      Conversion::Converter
-                Qt5::Core
+                Qt${QT_VERSION_MAJOR}::Core
     PRIVATE     LibXml2::LibXml2
-                CommonProjectWarnings)
+                CommonProjectWarnings
+                stdc++fs)
 
 add_format_target(SedsXmlValidator)
 add_tidy_target(SedsXmlValidator)

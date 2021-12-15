@@ -149,6 +149,11 @@ QList<EntityAttribute> VEObject::sortedAttributesValues(const EntityAttributes &
 
 void VEObject::setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type)
 {
+    bool isExportable = true;
+    auto it = d->m_attrs.find(name);
+    if (it == d->m_attrs.end()) {
+        isExportable = it->isExportable();
+    }
     d->m_attrs[name] = EntityAttribute { name, value, type };
     Q_EMIT attributeChanged(name);
 }
@@ -163,7 +168,11 @@ QVector<qint32> VEObject::coordinatesFromString(const QString &strCoordinates)
     if (strCoordinates.isEmpty())
         return {};
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
     const QStringList &strCoords = strCoordinates.split(QLatin1Char(' '), QString::SkipEmptyParts);
+#else
+    const QStringList &strCoords = strCoordinates.split(QLatin1Char(' '), Qt::SkipEmptyParts);
+#endif
     const int coordsCount = strCoords.size();
     QVector<qint32> coords(coordsCount);
     for (int i = 0; i < coordsCount; ++i)
@@ -183,6 +192,26 @@ QString VEObject::coordinatesToString(const QVector<qint32> &coordinates)
     return coordString;
 }
 
+bool VEObject::isNullCoordinates(const QVariant &coordinates)
+{
+    if (!coordinates.isValid()) {
+        return true;
+    }
+
+    QVector<qint32> points;
+    if (coordinates.canConvert<QString>()) {
+        points = coordinatesFromString(coordinates.toString());
+    } else if (coordinates.canConvert<QVector<qint32>>()) {
+        points = coordinates.value<QVector<qint32>>();
+    }
+
+    if (points.isEmpty()) {
+        return true;
+    }
+
+    return std::all_of(points.cbegin(), points.cend(), [](const qint32 &coordinate) { return coordinate == 0; });
+}
+
 /*!
    Returns if the \p other is equal to this object.
    Two of these are considered euqal if they have the exact same attributes.
@@ -190,6 +219,14 @@ QString VEObject::coordinatesToString(const QVector<qint32> &coordinates)
 bool VEObject::isEqual(const VEObject *other) const
 {
     return other && d->m_attrs == other->d->m_attrs;
+}
+
+void VEObject::setAttributeExportable(const QString &attrName, bool isExportable)
+{
+    auto it = d->m_attrs.find(attrName);
+    if (it != d->m_attrs.end()) {
+        it->setExportable(isExportable);
+    }
 }
 
 VEObject *VEObject::parentObject() const
@@ -222,4 +259,8 @@ VEModel *VEObject::model() const
     return d->m_model;
 }
 
+QString toString(VEObject *object)
+{
+    return object->titleUI();
+}
 }

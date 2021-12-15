@@ -25,7 +25,7 @@ class DVBoard;
 class DVPort : public DVObject
 {
     Q_OBJECT
-    Q_PROPERTY(dvm::DVBoard *board READ board)
+    Q_PROPERTY(dvm::DVObject *board READ board)
     Q_PROPERTY(QString busName READ busName)
 
 public:

@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/Containers">
+    <DataTypeSet>
+      <IntegerDataType name="DataItemA">
+        <LongDescription>A sample data item to be embedded within other structures</LongDescription>
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="DataItemB">
+        <LongDescription>A sample data item to be embedded within other structures</LongDescription>
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="LengthType">
+        <LongDescription>Type used for array length specification</LongDescription>
+        <IntegerDataEncoding encoding="unsigned" byteOrder="littleEndian" sizeInBits="16" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="65535" />
+        </Range>
+      </IntegerDataType>
+      <ArrayDataType name="ArrayType" dataTypeRef="DataItemA">
+        <LongDescription>A simple array type</LongDescription>
+        <DimensionList>
+          <Dimension size="15" />
+        </DimensionList>
+      </ArrayDataType>
+      <ContainerDataType name="BasicContainer">
+        <LongDescription>A basic container data type</LongDescription>
+        <EntryList>
+          <Entry name="fieldA" type="DataItemA" />
+          <Entry name="fieldB" type="DataItemB" />
+        </EntryList>
+      </ContainerDataType>
+      <BinaryDataType name="BinaryPattern" sizeInBits="8" />
+      <EnumeratedDataType name="PacketId">
+        <LongDescription>Packet ID to distinguish between packets</LongDescription>
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <EnumerationList>
+          <Enumeration value="1" label="PacketA"></Enumeration>
+          <Enumeration value="2" label="PacketB" />
+        </EnumerationList>
+      </EnumeratedDataType>
+      <ContainerDataType name="PayloadBase" abstract="true">
+        <LongDescription>Base for the packet payload data</LongDescription>
+        <EntryList>
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="PayloadA" abstract="false" baseType="PayloadBase">
+        <LongDescription>Payload A for a data packet</LongDescription><EntryList><Entry name="data" type="DataItemA"></Entry></EntryList></ContainerDataType>
+      <ContainerDataType name="PayloadB" abstract="false" baseType="PayloadBase">
+        <LongDescription>Payload B for a data packet</LongDescription>
+        <EntryList>
+          <Entry name="data" type="DataItemB" />
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="DataPacket" abstract="true">
+        <LongDescription>A data packet</LongDescription>
+        <EntryList>
+          <Entry name="Id" type="PacketId" />
+          <Entry name="Payload" type="PayloadBase" />
+        </EntryList>
+        <TrailerEntryList>
+        </TrailerEntryList>
+      </ContainerDataType>
+      <ContainerDataType name="DataPacketA" abstract="false" baseType="DataPacket">
+        <LongDescription>Concrete packet implementation A</LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Id" value="PacketA" />
+          <TypeConstraint entry="Payload" type="PayloadA" />
+        </ConstraintSet>
+      </ContainerDataType>
+      <ContainerDataType name="DataPacketB" abstract="false" baseType="DataPacket">
+        <LongDescription>Concrete packet implementation B</LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Id" value="PacketB" />
+          <TypeConstraint entry="Payload" type="PayloadB" />
+        </ConstraintSet>
+      </ContainerDataType>
+    </DataTypeSet>
+  </Package>
+</PackageFile>

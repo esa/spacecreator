@@ -21,7 +21,7 @@
 
 #include <QString>
 
-namespace sdl::exporter {
+namespace conversion::sdl {
 
 /**
  * @brief   Possible options for SDL export
@@ -29,8 +29,10 @@ namespace sdl::exporter {
 class SdlOptions
 {
 public:
-    /** @brief Prefix to add at the beginning of the filepath */
-    inline static const QString sdlFilepathPrefix = "Sdl_Export_FilepathPrefix";
+    /** @brief  Filepath of input file */
+    inline static const QString inputFilepath = "Sdl_Import_InputFilepath";
+    /** @brief Prefix to add at the beginning of the output filepath */
+    inline static const QString filepathPrefix = "Sdl_Export_FilepathPrefix";
 };
 
-} // namespace sdl::exporter
+} // namespace conversion::sdl

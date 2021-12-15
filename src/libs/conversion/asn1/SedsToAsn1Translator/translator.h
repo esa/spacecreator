@@ -21,6 +21,7 @@
 
 #include <conversion/common/translation/translator.h>
 #include <seds/SedsModel/types/datatype.h>
+#include <vector>
 
 namespace Asn1Acn {
 class Asn1Model;
@@ -31,6 +32,7 @@ class File;
 namespace seds::model {
 class SedsModel;
 class Package;
+class Component;
 } // namespace seds::model
 
 namespace conversion::asn1::translator {
@@ -71,6 +73,17 @@ public:
      */
     virtual auto getDependencies() const -> std::set<ModelType> override;
 
+    /**
+     * @brief   Gets ASN.1 definitions for given SEDS package from given ASN.1 model
+     *
+     * @param   sedsPackage     SEDS package
+     * @param   asn1Model       ASN.1 model
+     *
+     * @return  Asn1 definitions
+     */
+    static auto getAsn1Definitions(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model)
+            -> Asn1Acn::Definitions *;
+
 private:
     /**
      * @brief   Translate SEDS model
@@ -86,9 +99,9 @@ private:
      *
      * @param   sedsPackage     Package to translate
      *
-     * @return  Result ASN.1 file
+     * @return  Result ASN.1 files
      */
-    auto translatePackage(const seds::model::Package &sedsPackage) const -> std::unique_ptr<Asn1Acn::File>;
+    auto translatePackage(const seds::model::Package &sedsPackage) const -> std::vector<std::unique_ptr<Asn1Acn::File>>;
     /**
      * @brief   Translate SEDS data types
      *
@@ -99,15 +112,26 @@ private:
             Asn1Acn::Definitions *asn1Definitions) const -> void;
 
     /**
-     * @brief   Collects all data types declared in given package
+     * @brief   Collects all data types declared directly in given package
      *
-     * Gets data types from the package and those declared in the components
+     * Gets data types from the package without those declared in the components
      *
      * @param   sedsPackage     SEDS package
      *
      * @return  Vector with all data types declared in the given package
      */
     std::vector<const seds::model::DataType *> collectDataTypes(const seds::model::Package &sedsPackage) const;
+
+    /**
+     * @brief   Collects all data types declared in given component
+     *
+     * Gets data types from the component
+     *
+     * @param   sedsComponent     SEDS component
+     *
+     * @return  Vector with all data types declared in the given component
+     */
+    std::vector<const seds::model::DataType *> collectDataTypes(const seds::model::Component &sedsComponent) const;
 };
 
 } // namespace conversion::asn1::translator

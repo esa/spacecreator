@@ -15,8 +15,8 @@ target_include_directories(${TEST_NAME}
 target_link_libraries(${TEST_NAME}
    PRIVATE     Conversion::Common
                ASN1::Exporter
-               Qt5::Core
-               Qt5::Test
+               Qt${QT_VERSION_MAJOR}::Core
+               Qt${QT_VERSION_MAJOR}::Test
                CommonProjectWarnings)
 
 add_format_target(${TEST_NAME})

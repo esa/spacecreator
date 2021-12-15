@@ -48,12 +48,12 @@ Q_SIGNALS:
     void nameChanged(ivm::IVObject *entity, const QString &oldName, shared::UndoCommand *command);
     void defaultImplementationChanged(ivm::IVFunction *entity);
 
-private:
+protected:
     QPointer<ivm::IVFunction> m_entity;
-
     const QVariantHash m_newAttrs;
     const QVariantHash m_oldAttrs;
 
+private:
     QHash<shared::Id, QVector<QUndoCommand *>> m_cmdSet;
     QHash<shared::Id, QVector<QUndoCommand *>> m_cmdUnset;
 

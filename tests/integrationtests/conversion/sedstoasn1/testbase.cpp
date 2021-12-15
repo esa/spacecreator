@@ -57,16 +57,16 @@ void TestBase::cleanup()
     QFile(acnFilename).remove();
 }
 
-void TestBase::runConversionTest(QString testFilenameBase)
+void TestBase::runConversionTest(QString testFilenameBase, QString asn1PackageName)
 {
     m_currentTestFilename = std::move(testFilenameBase);
 
     const auto sedsFilename = QString("%1.xml").arg(m_currentTestFilename);
-    const auto asnFilename = QString("%1.asn").arg(m_currentTestFilename);
-    const auto acnFilename = QString("%1.acn").arg(m_currentTestFilename);
+    const auto asnFilename = QString("%1.asn").arg(asn1PackageName);
+    const auto acnFilename = QString("%1.acn").arg(asn1PackageName);
 
     Options options;
-    options.add(SedsOptions::inputFilename, sedsFilename);
+    options.add(SedsOptions::inputFilepath, sedsFilename);
     options.add(SedsOptions::skipValidation);
 
     Converter converter(m_registry, std::move(options));

@@ -31,4 +31,9 @@ const Name &StateRef::value() const
     return m_value;
 }
 
+const QString &StateRef::nameStr() const
+{
+    return m_value.value();
+}
+
 } // namespace seds::model

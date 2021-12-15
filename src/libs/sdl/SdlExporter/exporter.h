@@ -21,12 +21,8 @@
 
 #include <conversion/common/export/modelexporter.h>
 #include <sdl/SdlModel/sdlmodel.h>
-#include <sdl/SdlOptions/options.h>
 
 class QSaveFile;
-
-using conversion::Model;
-using conversion::Options;
 
 namespace sdl::exporter {
 /**
@@ -39,22 +35,18 @@ public:
      * @brief   Default constructor
      */
     SdlExporter() = default;
-
     /**
      * @brief   Deleted copy constructor
      */
     SdlExporter(const SdlExporter &) = delete;
-
     /**
      * @brief   Default move constructor
      */
     SdlExporter(SdlExporter &&) = default;
-
     /**
      * @brief   Deleted copy assignment operator
      */
     SdlExporter &operator=(const SdlExporter &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
@@ -66,14 +58,11 @@ public:
      * @param   model       Model to export
      * @param   options     Options for export configuration
      */
-    virtual auto exportModel(const Model *model, const Options &options) const -> void override;
+    virtual auto exportModel(const conversion::Model *model, const conversion::Options &options) const -> void override;
 
 private:
-    auto exportSdlModel(const SdlModel *model, const Options &options) const -> void;
-
-    auto exportProcess(const Process &process, const Options &options) const -> void;
-
-    auto writeAndCommit(QSaveFile &outputFile, const std::string &data) const -> void;
+    auto exportSdlModel(const SdlModel *model, const conversion::Options &options) const -> void;
+    auto exportProcess(const Process &process, const conversion::Options &options) const -> void;
 
     auto makeFilePath(const QString &pathPrefix, const QString &fileName, const QString &extension) const -> QString;
 };

@@ -54,4 +54,11 @@ SedsComponentBuilder &SedsComponentBuilder::withRequiredInterface(Interface inte
     return *this;
 }
 
+SedsComponentBuilder &SedsComponentBuilder::withImplementation(seds::model::ComponentImplementation implementation)
+{
+    m_component.setImplementation(std::move(implementation));
+
+    return *this;
+}
+
 } // namespace tests::conversion::common

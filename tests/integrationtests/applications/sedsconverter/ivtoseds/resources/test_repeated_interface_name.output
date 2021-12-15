@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+ <Package name="InterfaceView">
+  <ComponentSet>
+   <Component name="SporadicFunction">
+    <ProvidedInterfaceSet>
+     <Interface type="SporadicFunctionTheSameNamePi" name="TheSameNamePi"/>
+    </ProvidedInterfaceSet>
+    <RequiredInterfaceSet>
+     <Interface type="SporadicFunctionTheSameNameRi" name="TheSameNameRi"/>
+    </RequiredInterfaceSet>
+    <DeclaredInterfaceSet>
+     <Interface name="SporadicFunctionTheSameNamePi">
+      <CommandSet>
+       <Command name="TheSameNamePi" mode="async">
+        <Argument type="MyInteger" name="ButProvided" mode="in"/>
+       </Command>
+      </CommandSet>
+     </Interface>
+     <Interface name="SporadicFunctionTheSameNameRi">
+      <CommandSet>
+       <Command name="TheSameNameRi" mode="async">
+        <Argument type="MyInteger" name="ButRequired" mode="in"/>
+       </Command>
+      </CommandSet>
+     </Interface>
+    </DeclaredInterfaceSet>
+   </Component>
+  </ComponentSet>
+ </Package>
+</PackageFile>

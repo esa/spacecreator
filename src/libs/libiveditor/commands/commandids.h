@@ -41,9 +41,10 @@ enum Id
     ChangeIfaceParam,
 
     ChangeFunctionAttribute,
-    UpdateFunctionLanguage,
-    InsertFunctionLanguage,
-    RemoveFunctionLanguage,
+    ChangeFunctionDefaultImplementation,
+    UpdateFunctionImplementation,
+    InsertFunctionImplementation,
+    RemoveFunctionImplementation,
 
     ChangeRequiredIfaceProperty,
     ChangeIfaceAttribute,

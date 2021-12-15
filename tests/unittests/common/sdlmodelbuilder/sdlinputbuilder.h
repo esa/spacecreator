@@ -41,7 +41,7 @@ public:
 
     auto withTransition(Transition *transition) -> SdlInputBuilder &;
 
-    auto withParameter(VariableReference *parameter) -> SdlInputBuilder &;
+    auto withParameter(std::unique_ptr<VariableReference> parameter) -> SdlInputBuilder &;
 
 private:
     std::unique_ptr<Input> m_input;

@@ -26,6 +26,11 @@ ExportException::ExportException(QString message)
 {
 }
 
+NullModelException::NullModelException()
+    : ExportException("Model to export is null")
+{
+}
+
 IncorrectModelException::IncorrectModelException(ModelType expectedModelType, ModelType receivedModelType)
     : ExportException(QString("Incorrect model passed, expected %1 model, got %2 model")
                               .arg(modelTypeToString(expectedModelType))
@@ -36,6 +41,11 @@ IncorrectModelException::IncorrectModelException(ModelType expectedModelType, Mo
 MissingOutputFilenameException::MissingOutputFilenameException(ModelType modelType)
     : ExportException(
               QString("Missing name of the output filename while exporting %1 model").arg(modelTypeToString(modelType)))
+{
+}
+
+UnsupportedElementException::UnsupportedElementException(QString elementName)
+    : ExportException(QString("Element %1 is unsupported").arg(elementName))
 {
 }
 

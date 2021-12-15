@@ -49,9 +49,23 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   dataTypeName    Name of undeclared the type
+     * @param   dataTypeName    Name of the undeclared type
      */
     explicit UndeclaredDataTypeException(const QString &dataTypeName);
+};
+
+/**
+ * @brief   Exception thrown when translator encounters a data type that is not supported
+ */
+class UnsupportedDataTypeException : public TranslationException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   dataTypeName    Name of the unsupported type
+     */
+    explicit UnsupportedDataTypeException(const QString &dataTypeName);
 };
 
 /**
@@ -99,32 +113,17 @@ public:
 };
 
 /**
- * @brief   Exception thrown when translator encounters unhandled value while handling enum values
+ * @brief   Thrown when SEDS references a Function which is not found in the InterfaceView
  */
-class UnhandledValueException : public TranslationException
+class MissingInterfaceViewFunctionException : public TranslationException
 {
 public:
     /**
      * @brief   Constructor
      *
-     * @param   enumName        Name of the enum
+     * @param   functionName    Name of the missing Function
      */
-    explicit UnhandledValueException(const QString &enumName);
-};
-
-/**
- * @brief   Exception thrown when translator encounters unsupported value while handling enum values
- */
-class UnsupportedValueException : public TranslationException
-{
-public:
-    /**
-     * @brief   Constructor
-     *
-     * @param   enumName        Name of the enum
-     * @param   valueTypeName   Name of the unsupported value type
-     */
-    explicit UnsupportedValueException(const QString &enumName, const QString &valueTypeName);
+    explicit MissingInterfaceViewFunctionException(const QString &functionName);
 };
 
 } // namespace conversion::translator

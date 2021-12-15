@@ -44,6 +44,9 @@ public:
     bool layoutShouldBeChanged() const;
     bool doLayout() override;
 
+    void layoutConnectionsOnResize(VEConnectionGraphicsItem::CollisionsPolicy collisionsPolicy);
+    void layoutConnectionsOnMove(VEConnectionGraphicsItem::CollisionsPolicy collisionsPolicy);
+
 protected:
     void initGripPoints() override;
     void onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
@@ -55,9 +58,6 @@ protected:
 
     bool setGeometry(const QRectF &sceneGeometry);
     void layoutInterfaces();
-
-    void layoutConnectionsOnResize(VEConnectionGraphicsItem::CollisionsPolicy collisionsPolicy);
-    void layoutConnectionsOnMove(VEConnectionGraphicsItem::CollisionsPolicy collisionsPolicy);
 
 private Q_SLOTS:
     void onGeometryChanged();

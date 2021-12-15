@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QItemSelectionModel>
 #include <QSortFilterProxyModel>
 
 namespace dve {
@@ -28,6 +29,19 @@ public:
 
 protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+};
+
+class SelectionOverProxyModel : public QItemSelectionModel
+{
+    Q_OBJECT
+public:
+    explicit SelectionOverProxyModel(QSortFilterProxyModel *proxyModel, QObject *parent = nullptr);
+
+    void select(const QItemSelection &selection, QItemSelectionModel::SelectionFlags command) override;
+    void select(const QModelIndex &index, QItemSelectionModel::SelectionFlags command) override;
+
+private:
+    QSortFilterProxyModel *m_proxyModel { nullptr };
 };
 
 } // namespace dve

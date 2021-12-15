@@ -21,7 +21,10 @@
 
 #include "specialized/componentstranslator.h"
 
+#include <QFileInfo>
 #include <asn1library/asn1/asn1model.h>
+#include <conversion/asn1/SedsToAsn1Translator/translator.h>
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <ivcore/ivcommonprops.h>
@@ -31,6 +34,8 @@
 #include <seds/SedsModel/sedsmodel.h>
 
 using Asn1Acn::Asn1Model;
+using conversion::Escaper;
+using conversion::asn1::translator::SedsToAsn1Translator;
 using conversion::iv::IvOptions;
 using conversion::translator::TranslationException;
 using ivm::IVModel;
@@ -46,13 +51,19 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateModels(
     const auto *sedsModel = getModel<SedsModel>(sourceModels);
     auto *asn1Model = getModel<Asn1Model>(sourceModels);
 
-    const auto ivConfigFilename = options.value(IvOptions::configFilename);
-    if (!ivConfigFilename) {
+    const auto ivConfigFilepath = options.value(IvOptions::configFilepath);
+    if (!ivConfigFilepath) {
         throw TranslationException("InterfaceView configuration file wasn't specified");
     }
 
+    QFileInfo ivConfigFile(*ivConfigFilepath);
+    if (!ivConfigFile.exists()) {
+        auto errorMsg = QString("InterfaceView configuration file '%1' doesn't exist").arg(*ivConfigFilepath);
+        throw TranslationException(std::move(errorMsg));
+    }
+
     ivm::IVPropertyTemplateConfig *ivConfig = ivm::IVPropertyTemplateConfig::instance();
-    ivConfig->init(*ivConfigFilename);
+    ivConfig->init(*ivConfigFilepath);
 
     return translateSedsModel(sedsModel, asn1Model, ivConfig, options);
 }
@@ -102,13 +113,13 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(const
 void SedsToIvTranslator::translatePackage(
         const seds::model::Package &sedsPackage, Asn1Model *asn1Model, IVModel *ivModel, bool generateFunction) const
 {
-    auto asn1Definitions = getAsn1Definitions(sedsPackage, asn1Model);
+    auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(sedsPackage, asn1Model);
 
     ComponentsTranslator componentsTranslator(sedsPackage, asn1Definitions);
     auto ivFunctions = componentsTranslator.translateComponents();
 
     if (generateFunction) {
-        const auto &parentIvFunctionName = sedsPackage.nameStr();
+        const auto parentIvFunctionName = Escaper::escapeIvName(sedsPackage.nameStr());
         auto *parentIvFunction = new ivm::IVFunction();
         parentIvFunction->setEntityAttribute(
                 ivm::meta::Props::token(ivm::meta::Props::Token::name), parentIvFunctionName);
@@ -121,29 +132,6 @@ void SedsToIvTranslator::translatePackage(
     } else {
         ivModel->addObjects(ivFunctions);
     }
-}
-
-Asn1Acn::Definitions *SedsToIvTranslator::getAsn1Definitions(
-        const seds::model::Package &sedsPackage, Asn1Model *asn1Model) const
-{
-    const auto &asn1FileName = sedsPackage.nameStr();
-    auto &asn1Files = asn1Model->data();
-    auto asn1File = std::find_if(
-            std::begin(asn1Files), std::end(asn1Files), [&](const auto &file) { return file->name() == asn1FileName; });
-    if (asn1File == asn1Files.end()) {
-        auto message = QString("Unable to find file %1 in the ASN.1 model").arg(asn1FileName);
-        throw TranslationException(std::move(message));
-    }
-
-    const auto &asn1DefinitionsName = sedsPackage.asn1NameStr();
-    auto *asn1Definitions = (*asn1File)->definitions(asn1DefinitionsName);
-    if (!asn1Definitions) {
-        auto message =
-                QString("ASN.1 file %1 doesn't have definitions named %2").arg(asn1FileName).arg(asn1DefinitionsName);
-        throw TranslationException(std::move(message));
-    }
-
-    return asn1Definitions;
 }
 
 } // namespace conversion::iv::translator

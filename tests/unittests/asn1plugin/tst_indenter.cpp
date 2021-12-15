@@ -41,7 +41,7 @@ IndenterTests::IndenterTests(QObject *parent)
 void IndenterTests::initTestCase()
 {
     m_document = new QTextDocument;
-#if QTC_VERSION == 48
+#if QTC_VERSION == 408
     m_indenter = new Indenter();
 #else
     m_indenter = new Indenter(m_document);

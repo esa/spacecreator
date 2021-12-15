@@ -17,10 +17,10 @@
 
 #pragma once
 
+#include "dvnode.h"
 #include "dvobject.h"
 
 namespace dvm {
-class DVNode;
 
 class DVMessage : public DVObject
 {

@@ -19,6 +19,7 @@
 
 #include "baseitems/instanceheaditem.h"
 #include "chartlayoutmanager.h"
+#include "commentitem.h"
 #include "coregionitem.h"
 #include "instanceitem.h"
 #include "messageitem.h"
@@ -31,7 +32,7 @@
 
 namespace msc {
 
-ChartVerticalCheck::ChartVerticalCheck() { }
+ChartVerticalCheck::ChartVerticalCheck() {}
 
 void ChartVerticalCheck::reset(ChartLayoutManager *manager, MscChart *chart)
 {
@@ -170,6 +171,12 @@ void ChartVerticalCheck::checkEvent(MscInstanceEvent *event)
         break;
     }
     m_processedEvents.insert(event);
+
+    if (event->comment()) {
+        if (CommentItem *commentItem = m_manager->itemForComment(event->comment())) {
+            commentItem->instantLayoutUpdate();
+        }
+    }
 }
 
 /*!

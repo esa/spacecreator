@@ -18,8 +18,8 @@ target_link_libraries(${TEST_NAME}
     PRIVATE     Conversion::Common
                 Conversion::Asn1Registrar;
                 Conversion::SedsRegistrar;
-                Qt5::Core
-                Qt5::Test
+                Qt${QT_VERSION_MAJOR}::Core
+                Qt${QT_VERSION_MAJOR}::Test
                 CommonProjectWarnings)
 
 configure_file(resources/array_onedimension.xml array_onedimension.xml COPYONLY)
