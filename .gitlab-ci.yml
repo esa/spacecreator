@@ -24,6 +24,8 @@ default:
     - mkdir -p ${PACKAGE_DIR}
     # dependencies
     - apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format
+    # TASTE dependencies
+    - /root/tool-src/install/10_dmt.sh
     # install qtcreator sources
     - ./scripts/download_qtcreator.sh
     - ./scripts/build_grantlee.sh
