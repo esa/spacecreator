@@ -545,7 +545,13 @@ auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel 
         return;
     }
 
-    ivm::IVFunction *const dstFun = getCurIvEditorCore()->addFunction(srcFun->title(), nullptr);
+    const auto curIvEditorCore = getCurIvEditorCore();
+    if (curIvEditorCore == nullptr) {
+        MessageManager::write(GenMsg::msgError.arg("Current IV Editor Core could not be read"));
+        return;
+    }
+
+    ivm::IVFunction *const dstFun = curIvEditorCore->addFunction(srcFun->title(), nullptr);
     if (dstFun == nullptr) {
         MessageManager::write(GenMsg::msgError.arg("Destination IV function could not be created"));
         return;
@@ -578,7 +584,7 @@ auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel 
             return;
         }
 
-        auto *const commandsStack = getCurIvEditorCore()->commandsStack();
+        auto *const commandsStack = curIvEditorCore->commandsStack();
         if (commandsStack != nullptr) {
             commandsStack->push(command);
         } else {
@@ -586,7 +592,7 @@ auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel 
             return;
         }
 
-        Q_EMIT getCurIvEditorCore()->editedExternally(getCurIvEditorCore().get());
+        Q_EMIT curIvEditorCore->editedExternally(curIvEditorCore.get());
     }
 }
 
