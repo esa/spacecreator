@@ -791,13 +791,13 @@ static inline bool resolveNameConflict(QString &targetPath, QWidget *window)
 }
 
 static inline void copyImplementation(
-        const QDir &projectDir, const QDir &targetDir, const QVector<ivm::IVFunction *> &objects)
+        const QDir &projectDir, const QDir &targetDir, const QVector<ivm::IVObject *> &objects)
 {
     for (shared::VEObject *object : objects) {
         if (auto fn = object->as<ivm::IVFunctionType *>()) {
             const QString subPath = shared::kRootImplementationPath + QDir::separator() + object->title().toLower();
             shared::copyDir(projectDir.filePath(subPath), targetDir.filePath(subPath));
-            copyImplementation(projectDir, targetDir, fn->functions());
+            copyImplementation(projectDir, targetDir, fn->children());
         }
     }
 }
@@ -838,13 +838,13 @@ bool InterfaceDocument::exportImpl(QString &targetPath, const QList<shared::VEOb
         }
     }
 
-    QVector<ivm::IVFunction *> functions;
-    std::for_each(objects.cbegin(), objects.cend(), [&functions](shared::VEObject *veObj) {
-        if (auto fn = veObj->as<ivm::IVFunction *>()) {
-            functions.append(fn);
+    QVector<ivm::IVObject *> children;
+    std::for_each(objects.cbegin(), objects.cend(), [&children](shared::VEObject *veObj) {
+        if (auto fn = veObj->as<ivm::IVObject *>()) {
+            children.append(fn);
         }
     });
-    copyImplementation(ivDir, targetDir, functions);
+    copyImplementation(ivDir, targetDir, children);
     return true;
 }
 
