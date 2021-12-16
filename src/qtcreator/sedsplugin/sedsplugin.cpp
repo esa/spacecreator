@@ -206,7 +206,8 @@ auto SedsPlugin::importInterfaceView() -> void
     options.add(conversion::seds::SedsOptions::inputFilepath, inputFilePath);
 
     try {
-        convertSedsToIv(options);
+        convert({ conversion::ModelType::Seds }, conversion::ModelType::InterfaceView, { conversion::ModelType::Asn1 },
+                options);
     } catch (conversion::ConverterException &ex) {
         MessageManager::write(GenMsg::msgWarning.arg(ex.what()));
         QFile(tmpIvFilename).remove();
@@ -255,14 +256,9 @@ auto SedsPlugin::importSdl() -> void
     options.add(conversion::iv::IvOptions::outputFilepath, tmpIvFilename);
     options.add(conversion::iv::IvOptions::configFilepath, ivConfig);
 
-    const auto srcModelType = std::set<conversion::ModelType>({ conversion::ModelType::Seds });
-    const auto targetModelType = conversion::ModelType::Sdl;
-    const auto auxModelTypes =
-            std::set<conversion::ModelType>({ conversion::ModelType::InterfaceView, conversion::ModelType::Asn1 });
-
     try {
-        Converter converter(m_registry, std::move(options));
-        converter.convert(srcModelType, targetModelType, auxModelTypes);
+        convert({ conversion::ModelType::Seds }, conversion::ModelType::Sdl,
+                { conversion::ModelType::InterfaceView, conversion::ModelType::Asn1 }, options);
     } catch (std::exception &ex) {
         MessageManager::write(GenMsg::msgError.arg(ex.what()));
         QFile(tmpIvFilename).remove();
@@ -349,7 +345,7 @@ auto SedsPlugin::exportInterfaceView() -> void
             }
 
             try {
-                convertIvToSeds(options);
+                convert({ conversion::ModelType::InterfaceView }, conversion::ModelType::Seds, {}, options);
                 MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesExported));
             } catch (conversion::ConverterException &ex) {
                 MessageManager::write(GenMsg::msgWarning.arg(ex.what()));
@@ -443,22 +439,10 @@ auto SedsPlugin::initializeRegistry() -> void
     }
 }
 
-auto SedsPlugin::convertIvToSeds(conversion::Options options) -> void
+auto SedsPlugin::convert(const std::set<conversion::ModelType> &srcModelType,
+        const conversion::ModelType targetModelType, const std::set<conversion::ModelType> &auxModelTypes,
+        conversion::Options options) -> void
 {
-    const auto srcModelType = std::set<conversion::ModelType>({ conversion::ModelType::InterfaceView });
-    const auto targetModelType = conversion::ModelType::Seds;
-    const auto auxModelTypes = std::set<conversion::ModelType>({});
-
-    Converter converter(m_registry, std::move(options));
-    converter.convert(srcModelType, targetModelType, auxModelTypes);
-}
-
-auto SedsPlugin::convertSedsToIv(conversion::Options options) -> void
-{
-    const auto srcModelType = std::set<conversion::ModelType>({ conversion::ModelType::Seds });
-    const auto targetModelType = conversion::ModelType::InterfaceView;
-    const auto auxModelTypes = std::set<conversion::ModelType>({ conversion::ModelType::Asn1 });
-
     Converter converter(m_registry, std::move(options));
     converter.convert(srcModelType, targetModelType, auxModelTypes);
 }

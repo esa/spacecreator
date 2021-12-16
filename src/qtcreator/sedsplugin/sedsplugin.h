@@ -59,8 +59,8 @@ private:
     auto exportInterfaceView() -> void;
     auto itemModelUpdateWithFunctionNames(QStandardItemModel &model, const QStringList &ivFunctionsNames) -> void;
     auto initializeRegistry() -> void;
-    auto convertIvToSeds(conversion::Options options) -> void;
-    auto convertSedsToIv(conversion::Options options) -> void;
+    auto convert(const std::set<conversion::ModelType> &srcModelType, conversion::ModelType targetModelType,
+            const std::set<conversion::ModelType> &auxModelTypes, conversion::Options options) -> void;
     auto ltdialogUpdateWithItemModel(ListTreeDialog &ltdialog, QStandardItemModel *model) -> void;
     auto getCurIvEditorCore() -> IVEditorCorePtr;
     auto mergeIvModels(ivm::IVModel *dstIvModel, ivm::IVModel *srcIvModel) -> void;
