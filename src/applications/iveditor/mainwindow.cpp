@@ -118,7 +118,7 @@ MainWindow::MainWindow(ive::IVEditorCore *core, QWidget *parent)
     endToEndView->setVisible(core->actionToggleE2EView()->isChecked());
 
     // Create the MC window and add the action
-    auto modelCheckingWindow = new ModelCheckingWindow(m_core->document(), this);
+    auto modelCheckingWindow = new ModelCheckingWindow(m_core->document(), "", this);
     modelCheckingWindow->hide();
     connect(core->actionLaunchModelCheckingWindow(), &QAction::toggled, modelCheckingWindow, &QWidget::setVisible);
     connect(modelCheckingWindow, &ModelCheckingWindow::visibleChanged, core->actionLaunchModelCheckingWindow(), &QAction::setChecked);

@@ -56,7 +56,7 @@ public Q_SLOTS:
     void showCurrentE2EDataflow();
     void showE2EDataflow(const QStringList &mscFiles);
     void showCurrentModelCheckingWindow();
-    void showModelCheckingWindow();
+    void showModelCheckingWindow(const QString);
 
 private:
     IVEditorDocument *m_document = nullptr;

@@ -35,6 +35,8 @@
 #include <QUndoCommand>
 #include <editormanager/editormanager.h>
 #include <utils/qtcassert.h>
+#include <projectexplorer/project.h>
+#include <projectexplorer/projecttree.h>
 
 namespace spctr {
 
@@ -88,11 +90,14 @@ QWidget *IVQtCEditor::toolBar()
 void IVQtCEditor::showCurrentModelCheckingWindow()
 {
     if (auto ivEditor = qobject_cast<spctr::IVQtCEditor *>(Core::EditorManager::currentEditor())) {
-        ivEditor->showModelCheckingWindow();
+        SpaceCreatorProjectImpl *project = m_projectManager->project(ivEditor->ivPlugin());
+        if (project) {
+            ivEditor->showModelCheckingWindow(ProjectExplorer::ProjectTree::currentProject()->projectDirectory().toString());
+        }
     }
 }
 
-void IVQtCEditor::showModelCheckingWindow()
+void IVQtCEditor::showModelCheckingWindow(const QString projectDir)
 {
     if (ivPlugin().isNull()) {
         return;
@@ -100,7 +105,7 @@ void IVQtCEditor::showModelCheckingWindow()
 
     IVEditorCorePtr plugin = ivPlugin();
     if (m_modelCheckingWindow.isNull()) {
-        m_modelCheckingWindow = new ive::ModelCheckingWindow(plugin->document(), nullptr);
+        m_modelCheckingWindow = new ive::ModelCheckingWindow(plugin->document(), projectDir, nullptr);
         m_modelCheckingWindow->setAttribute(Qt::WA_DeleteOnClose);
         connect(plugin->document(), &QObject::destroyed, m_modelCheckingWindow.data(), &QObject::deleteLater);
     }

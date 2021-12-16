@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2021-2022 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,6 +17,10 @@
 
 #include "modelcheckingwindow.h"
 #include "ui_modelcheckingwindow.h"
+#include "ivfunction.h"
+#include "interfacedocument.h"
+#include "ivmodel.h"
+
 #include <QDir>
 #include <QProcess>
 #include <QInputDialog>
@@ -31,18 +35,18 @@ struct ModelCheckingWindow::ModelCheckingWindowPrivate {
     InterfaceDocument *document { nullptr };
 };
 
-ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, QWidget *parent) :
+ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QString projectDir, QWidget *parent) :
     QMainWindow(parent)
     , d(new ModelCheckingWindowPrivate)
 {
+    // Set ui and interface document
     d->ui->setupUi(this);
-
     d->document = document;
 
     // Set paths for properties, subtypes and results/oputputs
-    this->propertiesPath = "./work/modelchecking/properties";
-    this->subtypesPath = "./work/modelchecking/subtypes";
-    this->outputPath = "./work/build/modelchecking/output";
+    this->propertiesPath =  projectDir + "/work/modelchecking/properties";
+    this->subtypesPath =  projectDir + "/work/modelchecking/subtypes";
+    this->outputPath = projectDir + "/work/build/modelchecking/output";
 
     // Define right-click menus and set menu policy
     this->contextMenuPropertiesTop = new QMenu(d->ui->treeWidget_properties);
@@ -71,6 +75,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, QWidget *p
     // Make tree views show horizontal scroll bars
     d->ui->treeWidget_properties->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     d->ui->treeWidget_subtyping->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    d->ui->treeWidget_submodel->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     d->ui->treeWidget_results->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     // Build properties tree view
@@ -93,15 +98,32 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, QWidget *p
     d->ui->treeWidget_subtyping->addTopLevelItem(dir2);
     listFile(dir2, fileInfo2, true, true);
 
+    // Build submodel tree view
+    QStringList functionColumn3;
+    functionColumn3.append("Model Functions");
+    QTreeWidgetItem *topFunctionNode = new QTreeWidgetItem(functionColumn3);
+    topFunctionNode->setIcon(0, this->style()->standardIcon(QStyle::SP_FileDialogListView));
+    d->ui->treeWidget_submodel->addTopLevelItem(topFunctionNode);
+    for (ivm::IVFunction *function : d->document->objectsModel()->allObjectsByType<ivm::IVFunction>()) {
+        if(!function->hasNestedChildren()){
+            QStringList functionColumn3;
+            functionColumn3.append(function->title());
+            QTreeWidgetItem *functionNode = new QTreeWidgetItem(functionColumn3);
+            functionNode->setIcon(0, this->style()->standardIcon(QStyle::SP_MediaStop));
+            functionNode->setCheckState(0, Qt::Checked);
+            topFunctionNode->addChild(functionNode);
+        }
+    }
+
     // Pre-build results tree view
-    QFileInfo fileInfo3(this->outputPath);
-    QStringList fileColumn3;
-    fileColumn3.append(fileInfo3.fileName());
-    QTreeWidgetItem *dir3 = new QTreeWidgetItem(fileColumn3);
-    dir3->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
+    QFileInfo fileInfo4(this->outputPath);
+    QStringList fileColumn4;
+    fileColumn4.append(fileInfo4.fileName());
+    QTreeWidgetItem *dir4 = new QTreeWidgetItem(fileColumn4);
+    dir4->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
     //dir2->setCheckState(0, Qt::Unchecked);
-    d->ui->treeWidget_results->addTopLevelItem(dir3);
-    //listFile(dir3, fileInfo3, true, false);
+    d->ui->treeWidget_results->addTopLevelItem(dir4);
+    //listFile(dir4, fileInfo4, true, false);
 
     // Set validators on MC options value fileds
     d->ui->lineEdit_maxNumEnvRICalls->setValidator( new QIntValidator(0, 50, this) );
@@ -129,7 +151,7 @@ void ModelCheckingWindow::listFile(QTreeWidgetItem *parentWidgetItem, QFileInfo 
         QStringList fileColumn;
         fileColumn.append(fileInfo.fileName());
         if (fileInfo.fileName() == "." || fileInfo.fileName() == ".." ); // nothing
-        else if(fileInfo.isDir()) {
+        else if(fileInfo.isDir()) { // is directory
             if (noSubDirectories) continue;
             QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
             child->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
@@ -137,9 +159,8 @@ void ModelCheckingWindow::listFile(QTreeWidgetItem *parentWidgetItem, QFileInfo 
             parentWidgetItem->addChild(child);
             listFile(child, fileInfo, true, checkable);
         }
-        else {
+        else { // is file
                 if (fileInfo.suffix() == "msc" || fileInfo.suffix() == "pr"){
-                    //fileColumn.append(fileInfo.completeSuffix() == "msc" ? "Message Sequence Chart" : "Observer");
                     fileColumn.append(fileInfo.filePath());
                     QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
                     if (fileInfo.suffix() == "msc") {
@@ -151,7 +172,6 @@ void ModelCheckingWindow::listFile(QTreeWidgetItem *parentWidgetItem, QFileInfo 
                     parentWidgetItem->addChild(child);
                 }
                 if (fileInfo.suffix() == "asn"){
-                    //fileColumn.append("Abstract Syntax Notation One (ASN.1)");
                     fileColumn.append(fileInfo.filePath());
                     QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
                     child->setIcon(0, this->style()->standardIcon(QStyle::SP_TitleBarNormalButton));
