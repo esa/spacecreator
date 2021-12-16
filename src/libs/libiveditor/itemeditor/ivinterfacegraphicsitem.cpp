@@ -207,10 +207,6 @@ qreal IVInterfaceGraphicsItem::maxWidth() const
 
     const QRectF itemRect = sceneBoundingRect();
     const QRectF sceneRect = scene()->sceneRect();
-    if (targetItem() == nullptr) {
-        qDebug() << "target item is null";
-        return -1;
-    }
     const QRectF parentRect = targetItem()->boundingRect();
     const QPointF ifacePos = pos();
     const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(parentRect, ifacePos);
