@@ -36,7 +36,7 @@ class IVCreatorTool : public shared::ui::CreatorTool
     Q_OBJECT
 
 public:
-    IVCreatorTool(QGraphicsView* view, InterfaceDocument *doc);
+    IVCreatorTool(QGraphicsView *view, InterfaceDocument *doc);
     ~IVCreatorTool() override;
 
     enum ToolType
@@ -51,6 +51,7 @@ public:
         DirectConnection,
         GroupConnection,
         ReCreateConnection,
+        ConnectionLayer
     };
 
     void removeSelectedItems() override;
@@ -79,6 +80,7 @@ private:
     void handleDirectConnection(const QPointF &pos);
     void handleConnectionReCreate(const QVector<QPointF> &graphicPoints);
     void handleConnection(const QVector<QPointF> &graphicPoints) const;
+    void handleConnectionLayer();
 
     bool warnConnectionPreview(const QPointF &pos) override;
 

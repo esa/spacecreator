@@ -258,6 +258,11 @@ bool IVObject::isConnectionGroup() const
     return type() == Type::ConnectionGroup;
 }
 
+bool IVObject::isConnectionLayer() const
+{
+    return type() == Type::ConnectionLayer;
+}
+
 bool IVObject::isNestedInFunction() const
 {
     if (const IVObject *parent = parentObject())

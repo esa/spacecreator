@@ -16,6 +16,8 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdconnectiongroupitemcreate.h
     commands/cmdconnectionitemcreate.cpp
     commands/cmdconnectionitemcreate.h
+    commands/cmdconnectionlayermanage.cpp
+    commands/cmdconnectionlayermanage.h
     commands/cmdcontextparameterchange.cpp
     commands/cmdcontextparameterchange.h
     commands/cmdcontextparametercreate.cpp
@@ -90,6 +92,8 @@ target_sources(${LIB_NAME} PRIVATE
     context/action/extprocmonitor.h
     createconnectiongroupdialog.cpp
     createconnectiongroupdialog.h
+    manageconnectionlayersdialog.cpp
+    manageconnectionlayersdialog.h
     endtoend/endtoendconnections.cpp
     endtoend/endtoendconnections.h
     endtoend/endtoendview.cpp
@@ -178,7 +182,7 @@ target_sources(${LIB_NAME} PRIVATE
     config/ivlibrarywidget.h
     config/ivlibrarydialog.cpp
     config/ivlibrarydialog.h
-)
+    )
 
 if(${QT_VERSION_MAJOR} STREQUAL "6")
     set(QT_SVGWIDGETS Qt6::SvgWidgets)
@@ -195,7 +199,7 @@ target_link_libraries(${LIB_NAME}
     ${QT_SVGWIDGETS}
     ${QT_WIDGETS}
     ${QT_XML}
-)
+    )
 
 target_include_directories(${LIB_NAME} PUBLIC .)
 

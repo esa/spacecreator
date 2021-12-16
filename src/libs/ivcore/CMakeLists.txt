@@ -9,6 +9,8 @@ target_sources(${LIB_NAME} PRIVATE
     ivcommonprops.h
     ivconnectionchain.cpp
     ivconnectionchain.h
+    ivconnectionlayertype.cpp
+    ivconnectionlayertype.h
     ivinterfacechain.cpp
     ivinterfacechain.h
     ivnamevalidator.cpp
@@ -46,7 +48,7 @@ target_sources(${LIB_NAME} PRIVATE
     ivpropertytemplateconfig.cpp
     ivpropertytemplateconfig.h
     ivresources.qrc
-)
+    )
 
 target_include_directories(${LIB_NAME}
     PUBLIC . ${CMAKE_SOURCE_DIR}/src/libs)
@@ -57,6 +59,6 @@ target_link_libraries(${LIB_NAME}
     Conversion::Common
     ${QT_CORE}
     ${QT_XML}
-)
+    )
 
 source_group("Resource Files" REGULAR_EXPRESSION ".*.qrc$")

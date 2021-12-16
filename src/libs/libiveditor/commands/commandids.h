@@ -29,6 +29,7 @@ enum Id
     CreateConnectionEntity,
     CreateConnectionGroupEntity,
     ChangeConnectionGroupEntity,
+    ManageConnectionLayer,
     RemoveEntity,
     ChangeRootEntity,
 
