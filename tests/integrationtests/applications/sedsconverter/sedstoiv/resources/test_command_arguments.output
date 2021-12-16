@@ -1,64 +1,64 @@
 <InterfaceView>
 <Function name="Component" is_type="NO" language="SDL" default_implementation="default">
-<Provided_Interface name="AsyncInterfacePI_AsyncInCommand_Pi">
+<Provided_Interface name="AsyncInterfacePI_AsyncInCommand_Pi" layer="default">
     <Input_Parameter name="InputParam" type="AsyncInCommand_Type" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="SyncInterfacePI_SyncInCommand_Pi" kind="Protected">
+<Provided_Interface name="SyncInterfacePI_SyncInCommand_Pi" kind="Protected" layer="default">
     <Input_Parameter name="SyncInArgument1" type="MyInteger" encoding="ACN"/>
     <Input_Parameter name="SyncInArgument2" type="MyInteger" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="SyncInterfacePI_SyncOutCommand_Pi" kind="Protected">
+<Provided_Interface name="SyncInterfacePI_SyncOutCommand_Pi" kind="Protected" layer="default">
     <Output_Parameter name="SyncOutArgument1" type="MyInteger" encoding="ACN"/>
     <Output_Parameter name="SyncOutArgument2" type="MyInteger" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="GenericInterfaceIntegerPI_GenericCommand_Pi">
+<Provided_Interface name="GenericInterfaceIntegerPI_GenericCommand_Pi" layer="default">
     <Input_Parameter name="InputParam" type="GenericCommand_Type" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="GenericInterfaceIntegerReusePI_GenericCommand_Pi">
+<Provided_Interface name="GenericInterfaceIntegerReusePI_GenericCommand_Pi" layer="default">
     <Input_Parameter name="InputParam" type="GenericCommand_Type" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="GenericInterfaceFloatPI_GenericCommand_Pi">
+<Provided_Interface name="GenericInterfaceFloatPI_GenericCommand_Pi" layer="default">
     <Input_Parameter name="InputParam" type="GenericCommand_Type1" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="ArrayInterfacePI_ArrayCommand1_Pi">
+<Provided_Interface name="ArrayInterfacePI_ArrayCommand1_Pi" layer="default">
     <Input_Parameter name="InputParam" type="ArrayCommand1_Type" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="ArrayInterfacePI_ArrayCommand2_Pi">
+<Provided_Interface name="ArrayInterfacePI_ArrayCommand2_Pi" layer="default">
     <Input_Parameter name="InputParam" type="ArrayCommand2_Type" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="ArrayInterfacePI_ArrayCommand3_Pi">
+<Provided_Interface name="ArrayInterfacePI_ArrayCommand3_Pi" layer="default">
     <Input_Parameter name="InputParam" type="ArrayCommand3_Type" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="AsyncInterfaceRI_AsyncOutCommand_Pi">
+<Provided_Interface name="AsyncInterfaceRI_AsyncOutCommand_Pi" layer="default">
     <Input_Parameter name="InputParam" type="AsyncOutCommand_Type" encoding="ACN"/>
 </Provided_Interface>
 
-<Required_Interface name="AsyncInterfacePI_AsyncOutCommand_Ri" kind="Sporadic">
+<Required_Interface name="AsyncInterfacePI_AsyncOutCommand_Ri" kind="Sporadic" layer="default">
     <Input_Parameter name="InputParam" type="AsyncOutCommand_Type" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
-<Required_Interface name="AsyncInterfaceRI_AsyncInCommand_Ri" kind="Sporadic">
+<Required_Interface name="AsyncInterfaceRI_AsyncInCommand_Ri" kind="Sporadic" layer="default">
     <Input_Parameter name="InputParam" type="AsyncInCommand_Type" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
-<Required_Interface name="SyncInterfaceRI_SyncInCommand_Ri" kind="Protected">
+<Required_Interface name="SyncInterfaceRI_SyncInCommand_Ri" kind="Protected" layer="default">
     <Input_Parameter name="SyncInArgument1" type="MyInteger" encoding="ACN"/>
     <Input_Parameter name="SyncInArgument2" type="MyInteger" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
-<Required_Interface name="SyncInterfaceRI_SyncOutCommand_Ri" kind="Protected">
+<Required_Interface name="SyncInterfaceRI_SyncOutCommand_Ri" kind="Protected" layer="default">
     <Output_Parameter name="SyncOutArgument1" type="MyInteger" encoding="ACN"/>
     <Output_Parameter name="SyncOutArgument2" type="MyInteger" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
