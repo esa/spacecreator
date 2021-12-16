@@ -554,11 +554,9 @@ auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel 
     QString srcFunDefaultImplementation = srcFun->defaultImplementation();
     dstFun->setDefaultImplementation(srcFunDefaultImplementation);
 
-    // if (!srcFun->contextParams().isEmpty()) {
-    //     QVector<shared::ContextParameter> pars;
-    //     std::copy(srcFun->contextParams().begin(), srcFun->contextParams().end(), pars.begin());
-    //     dstFun->setContextParams(pars);
-    // }
+    if (!srcFun->contextParams().isEmpty()) {
+        dstFun->setContextParams(srcFun->contextParams());
+    }
 
     for (ivm::IVInterface *const srcIf : srcFun->interfaces()) {
         ivm::IVInterface::CreationInfo ci;
