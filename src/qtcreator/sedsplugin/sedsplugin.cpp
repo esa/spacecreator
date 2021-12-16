@@ -242,9 +242,10 @@ auto SedsPlugin::importSdl() -> void
     const auto extractFunctionNameFromPath = [](const QString &path) -> QString {
         auto elements = path.split(QDir::separator());
         auto filename = elements.last().split(".");
-        return filename.first();
+        return filename.first().toLower();
     };
-    const QString prefix = QString("work/%1/src/SDL/").arg(extractFunctionNameFromPath(inputFilePath));
+
+    const QString prefix = QString("work/%1/SDL/src/").arg(extractFunctionNameFromPath(inputFilePath));
     if (!QDir().mkpath(prefix)) {
         MessageManager::write(GenMsg::msgError.arg(QString("Could not create path %1").arg(prefix)));
         return;
