@@ -118,6 +118,7 @@ void CmdFunctionImplementationUpdate::updateSymLink(
         QDir(newFileInfo.absoluteFilePath()).removeRecursively();
     }
     if (isDefault) {
+        shared::ensureDirExists(destPath);
         QFile::link(destPath, newFileInfo.absoluteFilePath());
     }
 }

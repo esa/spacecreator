@@ -299,6 +299,7 @@ bool moveDefaultDirectories(const QString &currentImplName, const QString &proje
     }
     const QFileInfo link { defaultImplPath + QDir::separator() + language };
     const QString linkTargetPath = commonImplPath + QDir::separator() + language;
+    ensureDirExists(linkTargetPath);
     if (link.isSymLink()) {
         result &= link.symLinkTarget() == linkTargetPath;
     } else {
