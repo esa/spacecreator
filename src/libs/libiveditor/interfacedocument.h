@@ -107,11 +107,13 @@ public:
     ivm::IVModel *importModel() const;
     ivm::IVModel *sharedModel() const;
     IVItemModel *itemsModel() const;
+    ivm::IVModel *layersModel() const;
 
     IVVisualizationModelBase *visualisationModel() const;
     QItemSelectionModel *objectsSelectionModel() const;
     IVVisualizationModelBase *importVisualisationModel() const;
     IVVisualizationModelBase *sharedVisualisationModel() const;
+    IVVisualizationModelBase *layerVisualisationModel() const;
 
     void setAsn1Check(Asn1Acn::Asn1SystemChecks *check);
     Asn1Acn::Asn1SystemChecks *asn1Check() const;
@@ -126,6 +128,8 @@ public:
     QList<shared::VEObject *> prepareSelectedObjectsForExport(QString &name, bool silent = false);
 
     ivm::IVPropertyTemplateConfig *dynPropConfig() const;
+
+    auto updateLayersModel() const -> void;
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);

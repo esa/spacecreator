@@ -58,6 +58,7 @@ private Q_SLOTS:
     void testItem_ProvidedInterface();
     void testItem_Connection();
     void testItem_ConnectionGroup();
+    void testItem_ConnectionLayer();
 
     void testItem_CheckCoverage();
 
@@ -225,6 +226,15 @@ void tst_ItemZOrder::testItem_ConnectionGroup()
     QVERIFY(ivConnectionGroup.groupedConnections().isEmpty());
     delete ivFunctionA;
     delete ivFunctionB;
+}
+
+void tst_ItemZOrder::testItem_ConnectionLayer()
+{
+    auto *layer = ivm::testutils::createConnectionLayer();
+    ++m_itemTypesTested;
+    QVERIFY(layer->name().compare("default") == 0);
+    delete layer;
+    QVERIFY(ivm::IVConnectionLayerType::connectionLayers.isEmpty());
 }
 
 void tst_ItemZOrder::testItem_CheckCoverage()

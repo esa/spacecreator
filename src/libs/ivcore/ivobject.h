@@ -41,7 +41,6 @@ public:
     enum class Type
     {
         Unknown = 0,
-
         Function,
         FunctionType,
         RequiredInterface,
@@ -50,6 +49,7 @@ public:
         Comment,
         Connection,
         ConnectionGroup,
+        ConnectionLayer
     };
     Q_ENUM(Type)
 
@@ -78,6 +78,7 @@ public:
     bool isComment() const;
     bool isConnection() const;
     bool isConnectionGroup() const;
+    bool isConnectionLayer() const;
     bool isNestedInFunction() const;
     bool isNestedInFunctionType() const;
     bool isNested() const;

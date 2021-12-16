@@ -78,6 +78,8 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     ivm::IVModel *sharedModel { nullptr };
     IVVisualizationModelBase *sharedVisualisationModel { nullptr };
     IVExporter *exporter { nullptr };
+    ivm::IVModel *layersModel { nullptr };
+    IVVisualizationModelBase *layerSelect { nullptr };
 
     Asn1Acn::Asn1SystemChecks *asnCheck { nullptr };
     ivm::AbstractSystemChecks *ivCheck { nullptr };
@@ -104,6 +106,7 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     d->importModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
     d->sharedModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
     d->objectsModel = new ivm::IVModel(d->dynPropConfig, d->sharedModel, this);
+    d->layersModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
 }
 
 InterfaceDocument::~InterfaceDocument()
@@ -118,6 +121,7 @@ void InterfaceDocument::init()
     visualisationModel();
     importVisualisationModel();
     sharedVisualisationModel();
+    layerVisualisationModel();
 
     QTimer::singleShot(0, this, &InterfaceDocument::loadAvailableComponents);
 }
@@ -255,6 +259,18 @@ ivm::IVPropertyTemplateConfig *InterfaceDocument::dynPropConfig() const
     return d->dynPropConfig;
 }
 
+void InterfaceDocument::updateLayersModel() const
+{
+    if (ivm::IVConnectionLayerType::connectionLayers.isEmpty()) {
+        ivm::IVConnectionLayerType::addDefaultConnectionLayer(layersModel()->rootObject());
+    }
+    for (auto &layer : ivm::IVConnectionLayerType::connectionLayers) {
+        if (!layersModel()->allObjectsByType<ivm::IVConnectionLayerType>().contains(layer)) {
+            layersModel()->addObject(layer);
+        }
+    }
+}
+
 bool InterfaceDocument::exportSelectedFunctions()
 {
     QString name;
@@ -322,6 +338,7 @@ bool InterfaceDocument::loadComponentModel(ivm::IVModel *model, const QString &p
 void InterfaceDocument::close()
 {
     d->objectsModel->clear();
+    d->layersModel->clear();
     setPath(QString());
     d->commandsStack->clear();
 }
@@ -481,6 +498,11 @@ IVItemModel *InterfaceDocument::itemsModel() const
     return d->itemsModel;
 }
 
+ivm::IVModel *InterfaceDocument::layersModel() const
+{
+    return d->layersModel;
+}
+
 IVVisualizationModelBase *InterfaceDocument::visualisationModel() const
 {
     if (!d->objectsVisualizationModel) {
@@ -528,6 +550,18 @@ IVVisualizationModelBase *InterfaceDocument::sharedVisualisationModel() const
     }
 
     return d->sharedVisualisationModel;
+}
+
+IVVisualizationModelBase *InterfaceDocument::layerVisualisationModel() const
+{
+    if (d->layerSelect == nullptr) {
+        d->layerSelect = new IVVisualizationModelBase(
+                layersModel(), d->commandsStack, shared::DropData::Type::None, const_cast<InterfaceDocument *>(this));
+        auto *title = new QStandardItem(tr("IV Connecion Layers"));
+        title->setTextAlignment(Qt::AlignCenter);
+        d->layerSelect->setHorizontalHeaderItem(0, title);
+    }
+    return d->layerSelect;
 }
 
 void InterfaceDocument::setAsn1Check(Asn1Acn::Asn1SystemChecks *check)
@@ -838,6 +872,7 @@ bool InterfaceDocument::loadImpl(const QString &path)
     }
     setMscFileName(metadata["mscfile"].toString());
     shared::ErrorHub::clearCurrentFile();
+
     return true;
 }
 

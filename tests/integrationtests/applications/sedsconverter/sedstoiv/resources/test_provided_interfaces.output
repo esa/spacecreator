@@ -1,29 +1,29 @@
 <InterfaceView>
 <Function name="Provider" is_type="NO" language="C" default_implementation="default">
-<Provided_Interface name="InterfaceWithSynchronousCommandsInstance_ExecuteSynchronousAction_Pi" kind="Protected">
+<Provided_Interface name="InterfaceWithSynchronousCommandsInstance_ExecuteSynchronousAction_Pi" kind="Protected" layer="default">
     <Input_Parameter name="InputArg" type="DataItem" encoding="ACN"/>
     <Output_Parameter name="OutputArg" type="DataItem" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="InterfaceWithSynchronousCommandsInstance_ExecuteSynchronousActionWithInOutArg_Pi" kind="Protected">
+<Provided_Interface name="InterfaceWithSynchronousCommandsInstance_ExecuteSynchronousActionWithInOutArg_Pi" kind="Protected" layer="default">
     <Input_Parameter name="InOutArg_In" type="DataItem" encoding="ACN"/>
     <Output_Parameter name="InOutArg_Out" type="DataItem" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousAction_Pi">
+<Provided_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousAction_Pi" layer="default">
     <Input_Parameter name="InputParam" type="ExecuteAsynchronousAction_Type" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithNotification_Pi">
+<Provided_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithNotification_Pi" layer="default">
     <Input_Parameter name="InputParam" type="ExecuteAsynchronousActionWithNotification_Type" encoding="ACN"/>
 </Provided_Interface>
 
-<Required_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithOutArgs_Ri" kind="Sporadic">
+<Required_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithOutArgs_Ri" kind="Sporadic" layer="default">
     <Input_Parameter name="InputParam" type="ExecuteAsynchronousActionWithOutArgs_Type" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
-<Required_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithNotification_Ri" kind="Sporadic">
+<Required_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithNotification_Ri" kind="Sporadic" layer="default">
     <Input_Parameter name="InputParam" type="ExecuteAsynchronousActionWithNotification_Type1" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
