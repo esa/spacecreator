@@ -65,6 +65,7 @@ private:
     auto getCurIvEditorCore() -> IVEditorCorePtr;
     auto mergeIvModels(ivm::IVModel *dstIvModel, ivm::IVModel *srcIvModel) -> void;
     auto loadIvModel(const QString &ivConfigFilename, const QString &ivFilename) -> std::unique_ptr<conversion::Model>;
+    auto loadSedsModel(const QString &sedsFilename) -> std::unique_ptr<conversion::Model>;
     auto getCurrentIvModel() -> ivm::IVModel *;
     auto loadAndMergeIvModelIntoCurrent(const QString &ivConfig, const QString &ivFilename) -> bool;
     auto addFunctionToModel(ivm::IVFunction *srcFun, ivm::IVModel *model) -> void;

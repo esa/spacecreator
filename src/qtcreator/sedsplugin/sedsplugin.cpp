@@ -43,6 +43,8 @@
 #include "options.h"
 #include "sdl/SdlOptions/options.h"
 #include "seds/SedsOptions/options.h"
+#include "seds/SedsXmlImporter/importer.h"
+#include "sedsmodel.h"
 #include "sharedlibrary.h"
 
 #include <QAction>
@@ -244,6 +246,26 @@ auto SedsPlugin::importSdl() -> void
         auto filename = elements.last().split(".");
         return filename.first().toLower();
     };
+
+    std::unique_ptr<conversion::Model> ivmodel = loadSedsModel(inputFilePath);
+    seds::model::SedsModel *const tmpSedsModel = dynamic_cast<seds::model::SedsModel *>(ivmodel.get());
+    if (tmpSedsModel == nullptr) {
+        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivTmpModelNotRead));
+        return;
+    }
+
+    // get packagefile or datasheet; sedsmodel.h:38
+    // get package name from ^^^
+    //
+    // QList<ivm::IVObject *> sdl_function_objs = tmpSedsModel->data();
+    // for (auto &obj : sdl_function_objs) {
+    //     if (obj == nullptr) {
+    //         continue;
+    //     }
+    //     if (obj->isFunction()) {
+    //         qDebug() << obj->title();
+    //     }
+    // }
 
     const QString prefix = QString("work/%1/SDL/src/").arg(extractFunctionNameFromPath(inputFilePath));
     if (!QDir().mkpath(prefix)) {
@@ -529,6 +551,24 @@ auto SedsPlugin::loadIvModel(const QString &ivConfigFilename, const QString &ivF
     conversion::iv::importer::IvXmlImporter ivImporter;
     try {
         model = ivImporter.importModel(options);
+    } catch (const std::exception &ex) {
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
+        return nullptr;
+    }
+
+    return model;
+}
+
+auto SedsPlugin::loadSedsModel(const QString &sedsFilename) -> std::unique_ptr<conversion::Model>
+{
+    std::unique_ptr<conversion::Model> model;
+
+    conversion::Options options;
+    options.add(conversion::seds::SedsOptions::inputFilepath, sedsFilename);
+
+    seds::importer::SedsXmlImporter sedsImporter;
+    try {
+        model = sedsImporter.importModel(options);
     } catch (const std::exception &ex) {
         MessageManager::write(GenMsg::msgError.arg(ex.what()));
         return nullptr;
