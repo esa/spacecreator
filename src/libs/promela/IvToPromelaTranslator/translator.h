@@ -62,6 +62,10 @@ public:
     auto getDependencies() const -> std::set<conversion::ModelType> override;
 
 private:
+    ::promela::model::InitProctype generateInitProctype(const QList<QString> &functionNames) const;
+    std::unique_ptr<::promela::model::Proctype> generateProctype(::promela::model::PromelaModel *promelaModel,
+            const QString &functionName, const QString &interfaceName, const QString &parameterName,
+            const QString &parameterType, size_t queueSize, size_t priority) const;
     auto getQueueSize(ivm::IVInterface *interface) const -> size_t;
     auto getPriority(ivm::IVInterface *interface) const -> size_t;
 };

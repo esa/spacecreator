@@ -40,6 +40,7 @@ using promela::model::Declaration;
 using promela::model::DoLoop;
 using promela::model::Expression;
 using promela::model::InitProctype;
+using promela::model::InlineCall;
 using promela::model::MtypeRef;
 using promela::model::NamedMtype;
 using promela::model::Proctype;
@@ -454,6 +455,7 @@ void tst_PromelaExporter::testProctypeElements()
             std::make_unique<ProctypeElement>(ChannelSend(VariableRef("channel1"), params));
     std::unique_ptr<ProctypeElement> channelRecv =
             std::make_unique<ProctypeElement>(ChannelRecv(VariableRef("channel1"), params));
+    std::unique_ptr<ProctypeElement> inlineCall = std::make_unique<ProctypeElement>(InlineCall("fn"));
 
     Sequence initSequence;
     initSequence.appendElement(std::move(assignment));
@@ -462,6 +464,7 @@ void tst_PromelaExporter::testProctypeElements()
     initSequence.appendElement(std::move(declaration));
     initSequence.appendElement(std::move(channelSend));
     initSequence.appendElement(std::move(channelRecv));
+    initSequence.appendElement(std::move(inlineCall));
 
     InitProctype init(std::move(initSequence));
 

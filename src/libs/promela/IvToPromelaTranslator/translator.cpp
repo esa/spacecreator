@@ -33,12 +33,17 @@ using conversion::translator::TranslationException;
 using ivm::IVFunction;
 using ivm::IVInterface;
 using ivm::IVModel;
+using promela::model::Assignment;
 using promela::model::BasicType;
 using promela::model::ChannelInit;
+using promela::model::ChannelRecv;
+using promela::model::Constant;
 using promela::model::DataType;
 using promela::model::Declaration;
+using promela::model::DoLoop;
 using promela::model::Expression;
 using promela::model::InitProctype;
+using promela::model::InlineCall;
 using promela::model::Proctype;
 using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
@@ -66,7 +71,6 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     QList<QString> functionNames;
     for (IVFunction *ivFunction : ivFunctionList) {
         const QString functionName = ivFunction->property("name").toString();
-        // qDebug() << "Found function " << functionName;
         functionNames.append(functionName);
     }
 
@@ -76,52 +80,22 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
 
     for (IVFunction *ivFunction : ivFunctionList) {
         const QString functionName = ivFunction->property("name").toString();
+        promelaModel->addInclude(QString("%1.pml").arg(functionName.toLower()));
         QVector<IVInterface *> interfaceList = ivFunction->pis();
         for (IVInterface *interface : interfaceList) {
             const QString interfaceName = interface->property("name").toString();
-            // qDebug() << "  Found interface " << interfaceName;
             size_t queueSize = getQueueSize(interface);
             size_t priority = getPriority(interface);
-            // qDebug() << "    Queue size " << queueSize;
-            // qDebug() << "    Priority  " << priority;
             QVector<InterfaceParameter> parameterList = interface->params();
             QString parameterName;
             QString parameterType;
             for (InterfaceParameter &parameter : parameterList) {
                 parameterName = parameter.name();
                 parameterType = parameter.paramTypeName();
-                // qDebug() << "    Found parameter " << parameterName << " of type " << parameterType;
             }
 
-            QString channelName = QString("%1_%2_channel").arg(functionName).arg(interfaceName);
-            if (parameterType.isEmpty()) {
-                QList<ChannelInit::Type> channelType;
-                channelType.append(ChannelInit::Type(BasicType::INT));
-                ChannelInit channelInit(queueSize, std::move(channelType));
-                Declaration declaration(DataType(BasicType::CHAN), channelName);
-                declaration.setInit(channelInit);
-                promelaModel->addDeclaration(declaration);
-            } else {
-                QList<ChannelInit::Type> channelType;
-                channelType.append(ChannelInit::Type(UtypeRef(parameterType)));
-                ChannelInit channelInit(queueSize, std::move(channelType));
-                Declaration declaration(DataType(BasicType::CHAN), channelName);
-                declaration.setInit(channelInit);
-                promelaModel->addDeclaration(declaration);
-            }
-
-            Sequence sequence;
-            std::unique_ptr<ProctypeElement> waitForInit =
-                    std::make_unique<ProctypeElement>(Expression(VariableRef("inited")));
-            sequence.appendElement(std::move(waitForInit));
-
-            QString proctypeName = QString("%1_%2").arg(functionName).arg(interfaceName);
-            std::unique_ptr<Proctype> proctype = std::make_unique<Proctype>(proctypeName, std::move(sequence));
-
-            proctype->setActive(1);
-            proctype->setPriority(priority);
-
-            promelaModel->addProctype(std::move(proctype));
+            promelaModel->addProctype(generateProctype(promelaModel.get(), functionName, interfaceName, parameterName,
+                    parameterType, queueSize, priority));
         }
     }
 
@@ -134,11 +108,10 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     }
 
     promelaModel->addUtype(systemState);
-    Sequence sequence;
-    std::unique_ptr<ProctypeElement> waitForInit = std::make_unique<ProctypeElement>(Expression(VariableRef("inited")));
-    sequence.appendElement(std::move(waitForInit));
-    InitProctype init(std::move(sequence));
-    promelaModel->setInit(std::move(init));
+
+    promelaModel->addDeclaration(Declaration(DataType(UtypeRef("system_state")), "global_state"));
+
+    promelaModel->setInit(generateInitProctype(functionNames));
 
     std::vector<std::unique_ptr<Model>> result;
     result.push_back(std::move(promelaModel));
@@ -158,6 +131,86 @@ ModelType IvToPromelaTranslator::getTargetModelType() const
 std::set<ModelType> IvToPromelaTranslator::getDependencies() const
 {
     return std::set<ModelType> { ModelType::InterfaceView };
+}
+
+InitProctype IvToPromelaTranslator::generateInitProctype(const QList<QString> &functionNames) const
+{
+    Sequence sequence;
+
+    for (const QString &functionName : functionNames) {
+        QString initFn = QString("%1_0_init").arg(Escaper::escapePromelaIV(functionName));
+        std::unique_ptr<ProctypeElement> initCall = std::make_unique<ProctypeElement>(InlineCall(initFn));
+        sequence.appendElement(std::move(initCall));
+    }
+
+    std::unique_ptr<ProctypeElement> setInited =
+            std::make_unique<ProctypeElement>(Assignment(VariableRef("inited"), Expression(Constant(1))));
+    sequence.appendElement(std::move(setInited));
+    return InitProctype(std::move(sequence));
+}
+
+std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *promelaModel,
+        const QString &functionName, const QString &interfaceName, const QString &parameterName,
+        const QString &parameterType, size_t queueSize, size_t priority) const
+{
+    QString channelName = QString("%1_%2_channel").arg(functionName).arg(interfaceName);
+    if (parameterType.isEmpty()) {
+        QList<ChannelInit::Type> channelType;
+        channelType.append(ChannelInit::Type(BasicType::INT));
+        ChannelInit channelInit(queueSize, std::move(channelType));
+        Declaration declaration(DataType(BasicType::CHAN), channelName);
+        declaration.setInit(channelInit);
+        promelaModel->addDeclaration(declaration);
+    } else {
+        QList<ChannelInit::Type> channelType;
+        channelType.append(ChannelInit::Type(UtypeRef(parameterType)));
+        ChannelInit channelInit(queueSize, std::move(channelType));
+        Declaration declaration(DataType(BasicType::CHAN), channelName);
+        declaration.setInit(channelInit);
+        promelaModel->addDeclaration(declaration);
+    }
+
+    Sequence sequence;
+    std::unique_ptr<ProctypeElement> waitForInit = std::make_unique<ProctypeElement>(Expression(VariableRef("inited")));
+    sequence.appendElement(std::move(waitForInit));
+    if (parameterType.isEmpty()) {
+        std::unique_ptr<ProctypeElement> variableDecl =
+                std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "var0"));
+        sequence.appendElement(std::move(variableDecl));
+    } else {
+        std::unique_ptr<ProctypeElement> variableDecl =
+                std::make_unique<ProctypeElement>(Declaration(DataType(UtypeRef(parameterName)), "var0"));
+        sequence.appendElement(std::move(variableDecl));
+    }
+
+    std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>();
+
+    QList<VariableRef> params;
+    params.append(VariableRef("var0"));
+    std::unique_ptr<ProctypeElement> channelReceive =
+            std::make_unique<ProctypeElement>(ChannelRecv(VariableRef(channelName), params));
+
+    loopSequence->appendElement(std::move(channelReceive));
+
+    QString piName = QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
+
+    loopSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(piName)));
+
+    DoLoop loop;
+
+    loop.appendSequence(std::move(loopSequence));
+
+    std::unique_ptr<ProctypeElement> loopElement = std::make_unique<ProctypeElement>(std::move(loop));
+
+    sequence.appendElement(std::move(loopElement));
+
+    QString proctypeName = QString("%1_%2").arg(functionName).arg(interfaceName);
+    std::unique_ptr<Proctype> proctype = std::make_unique<Proctype>(proctypeName, std::move(sequence));
+
+    proctype->setActive(1);
+    proctype->setPriority(priority);
+
+    return proctype;
 }
 
 size_t IvToPromelaTranslator::getQueueSize(IVInterface *interface) const

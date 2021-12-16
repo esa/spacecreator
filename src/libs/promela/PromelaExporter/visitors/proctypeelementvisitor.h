@@ -36,6 +36,7 @@ public:
     void operator()(const ::promela::model::Expression &expression);
     void operator()(const ::promela::model::DoLoop &doLoop);
     void operator()(const ::promela::model::Assignment &assignment);
+    void operator()(const ::promela::model::InlineCall &inlineCall);
 
 private:
     QTextStream &m_stream;

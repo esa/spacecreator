@@ -17,28 +17,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
-
-#include "assignment.h"
-#include "channelrecv.h"
-#include "channelsend.h"
-#include "declaration.h"
-#include "doloop.h"
-#include "expression.h"
 #include "inlinecall.h"
 
-#include <variant>
-
 namespace promela::model {
-class ProctypeElement final
+InlineCall::InlineCall(QString name)
+    : m_name(std::move(name))
 {
-public:
-    using Value = std::variant<Declaration, ChannelSend, ChannelRecv, Expression, DoLoop, Assignment, InlineCall>;
-    ProctypeElement(Value value);
-
-    const Value &getValue() const noexcept;
-
-private:
-    Value m_value;
-};
+}
+const QString &InlineCall::getName() const noexcept
+{
+    return m_name;
+}
 }

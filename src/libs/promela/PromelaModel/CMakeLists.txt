@@ -23,6 +23,7 @@ set(SOURCES
   doloop.cpp
   sequence.cpp
   assignment.cpp
+  inlinecall.cpp
   )
 set(INCLUDES
   arraytype.h
@@ -49,6 +50,7 @@ set(INCLUDES
   doloop.h
   sequence.h
   assignment.h
+  inlinecall.cpp
   )
 
 add_library(PromelaModel STATIC)

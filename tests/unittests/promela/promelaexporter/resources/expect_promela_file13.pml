@@ -8,4 +8,5 @@ init
     int param = 4;
     channel1!param;
     channel1?param;
+    fn();
 }

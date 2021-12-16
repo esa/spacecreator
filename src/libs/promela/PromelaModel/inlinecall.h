@@ -19,26 +19,17 @@
 
 #pragma once
 
-#include "assignment.h"
-#include "channelrecv.h"
-#include "channelsend.h"
-#include "declaration.h"
-#include "doloop.h"
-#include "expression.h"
-#include "inlinecall.h"
-
-#include <variant>
+#include <QString>
 
 namespace promela::model {
-class ProctypeElement final
+class InlineCall
 {
 public:
-    using Value = std::variant<Declaration, ChannelSend, ChannelRecv, Expression, DoLoop, Assignment, InlineCall>;
-    ProctypeElement(Value value);
+    InlineCall(QString name);
 
-    const Value &getValue() const noexcept;
+    const QString &getName() const noexcept;
 
 private:
-    Value m_value;
+    QString m_name;
 };
 }

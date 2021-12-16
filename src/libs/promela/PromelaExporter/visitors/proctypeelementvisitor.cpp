@@ -30,6 +30,7 @@ using promela::model::ChannelSend;
 using promela::model::Declaration;
 using promela::model::DoLoop;
 using promela::model::Expression;
+using promela::model::InlineCall;
 using promela::model::ProctypeElement;
 using promela::model::Sequence;
 using promela::model::VariableRef;
@@ -112,7 +113,7 @@ void ProctypeElementVisitor::operator()(const DoLoop &doLoop)
     m_stream << m_indent << "od;\n";
 }
 
-void ProctypeElementVisitor::operator()(const ::promela::model::Assignment &assignment)
+void ProctypeElementVisitor::operator()(const Assignment &assignment)
 {
     m_stream << m_indent;
     VariableRefVisitor variableRefVisitor(m_stream);
@@ -121,5 +122,11 @@ void ProctypeElementVisitor::operator()(const ::promela::model::Assignment &assi
     ExpressionVisitor expressionVisitor(m_stream);
     expressionVisitor.visit(assignment.getExpression());
     m_stream << ";\n";
+}
+
+void ProctypeElementVisitor::operator()(const InlineCall &inlineCall)
+{
+    m_stream << m_indent;
+    m_stream << inlineCall.getName() << "();\n";
 }
 }

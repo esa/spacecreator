@@ -31,7 +31,7 @@ function(add_format_target TARGET)
             endif()
             if(ENABLE_FORMAT_CHECK)
                 add_custom_command(TARGET ${FORMAT_TARGET_NAME}
-                                   COMMAND bash -c "diff ${FILE} <(${CLANG-FORMAT} -style=file ${FILE})"
+                                   COMMAND bash -c "diff -u ${FILE} <(${CLANG-FORMAT} -style=file ${FILE})"
                                    VERBATIM)
             endif()
         endforeach()
