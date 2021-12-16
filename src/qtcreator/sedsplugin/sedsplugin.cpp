@@ -565,34 +565,9 @@ auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel 
     }
 
     for (ivm::IVInterface *const srcIf : srcFun->interfaces()) {
-        ivm::IVInterface::CreationInfo ci;
-        ci.kind = srcIf->kind();
-        ci.type = srcIf->direction();
-        ci.function = dstFun;
-        ci.model = model;
-        ci.name = srcIf->title();
-        QRectF funcRect = shared::graphicsviewutils::rect(dstFun->coordinates());
-        QPointF ifPos(funcRect.left(), funcRect.center().y());
-        if (ci.type == ivm::IVInterface::InterfaceType::Required) {
-            ifPos.setX(funcRect.right());
-        }
-        ci.position = ifPos;
-
-        auto *const command = new ive::cmd::CmdInterfaceItemCreate(ci);
-        if (command == nullptr) {
-            MessageManager::write(GenMsg::msgError.arg("Command could not be created"));
-            return;
-        }
-
-        auto *const commandsStack = curIvEditorCore->commandsStack();
-        if (commandsStack != nullptr) {
-            commandsStack->push(command);
-        } else {
-            MessageManager::write(GenMsg::msgError.arg("Curent commands stack is null"));
-            return;
-        }
-
-        Q_EMIT curIvEditorCore->editedExternally(curIvEditorCore.get());
+        ivm::IVInterface *const dstIf = curIvEditorCore->addInterface(srcIf->title(), dstFun->title());
+        dstIf->setKind(srcIf->kind());
+        dstIf->setDirection(srcIf->direction());
     }
 }
 
