@@ -470,14 +470,21 @@ auto SedsPlugin::mergeIvModels(ivm::IVModel *const dstIvModel, ivm::IVModel *con
 
 auto SedsPlugin::doesModelContainFunction(ivm::IVModel *const model, ivm::IVFunction *const function) -> bool
 {
-    return std::any_of(model->visibleObjects().begin(), model->visibleObjects().end(), //
-            [&function](ivm::IVObject *const obj) -> bool {
-                if (obj == nullptr) {
-                    return false;
-                } else {
-                    return obj->isFunction() && obj->title() == function->title();
-                }
-            });
+    const auto isObjectTitleEqualFunctionTitle = [&function](ivm::IVObject *const obj) -> bool {
+        if (obj == nullptr) {
+            return false;
+        } else {
+            return obj->isFunction() && obj->title() == function->title();
+        }
+    };
+
+    for (ivm::IVObject *const obj : model->visibleObjects()) {
+        if (isObjectTitleEqualFunctionTitle(obj)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 auto SedsPlugin::loadIvModel(const QString &ivConfigFilename, const QString &ivFilename)
