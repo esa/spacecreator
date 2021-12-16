@@ -136,6 +136,11 @@ IVInterface::InterfaceType IVInterface::direction() const
     return d->m_direction;
 }
 
+void IVInterface::setDirection(IVInterface::InterfaceType type) const
+{
+    d->m_direction = type;
+}
+
 bool IVInterface::postInit()
 {
     if (!model() || !function()) {

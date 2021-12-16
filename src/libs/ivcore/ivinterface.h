@@ -100,6 +100,8 @@ public:
 
     IVInterface::InterfaceType direction() const;
 
+    void setDirection(IVInterface::InterfaceType type) const;
+
     bool postInit() override;
 
     bool isProvided() const;
