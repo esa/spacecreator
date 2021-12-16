@@ -119,7 +119,7 @@ void CmdFunctionImplementationUpdate::updateSymLink(
     }
     if (isDefault) {
         shared::ensureDirExists(destPath);
-        QFile::link(destPath, newFileInfo.absoluteFilePath());
+        QFile::link(newFileInfo.dir().relativeFilePath(destPath), newFileInfo.absoluteFilePath());
     }
 }
 

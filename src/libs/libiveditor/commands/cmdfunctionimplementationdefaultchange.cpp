@@ -78,7 +78,8 @@ void CmdFunctionImplementationDefaultChange::redo()
     }
 
     shared::ensureDirExists(newImplementationPath());
-    if (QFile::link(newImplementationPath(), newCurrentImplementationPath())) {
+    const QFileInfo link { newCurrentImplementationPath() };
+    if (QFile::link(link.dir().relativeFilePath(newImplementationPath()), link.absoluteFilePath())) {
         CmdFunctionAttrChange::redo();
     }
 }
@@ -90,7 +91,8 @@ void CmdFunctionImplementationDefaultChange::undo()
         QFile::remove(fileInfo.absoluteFilePath());
     }
 
-    if (QFile::link(oldImplementationPath(), oldCurrentImplementationPath())) {
+    const QFileInfo link { oldCurrentImplementationPath() };
+    if (QFile::link(link.dir().relativeFilePath(oldImplementationPath()), link.absoluteFilePath())) {
         CmdFunctionAttrChange::undo();
     }
 }

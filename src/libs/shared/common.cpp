@@ -173,7 +173,14 @@ void copyDir(const QString &source, const QString &dest, FileCopyingMode replace
         const QString filePath = it.next();
         const QFileInfo fileInfo = it.fileInfo();
         const QString relPath = sourceExportDir.relativeFilePath(fileInfo.absoluteFilePath());
-        if (fileInfo.isDir()) {
+        if (fileInfo.isSymLink()) {
+            const QString linkTarget = fileInfo.dir().relativeFilePath(fileInfo.symLinkTarget());
+            const bool result = QFile::link(linkTarget, targetExportDir.absoluteFilePath(relPath));
+            if (!result) {
+                qWarning() << "Error during symlink copying:" << filePath << fileInfo.symLinkTarget()
+                           << targetExportDir.absoluteFilePath(relPath);
+            }
+        } else if (fileInfo.isDir()) {
             targetExportDir.mkpath(relPath);
         } else {
             const bool result =
@@ -303,7 +310,7 @@ bool moveDefaultDirectories(const QString &currentImplName, const QString &proje
     if (link.isSymLink()) {
         result &= link.symLinkTarget() == linkTargetPath;
     } else {
-        result &= QFile::link(linkTargetPath, link.absoluteFilePath());
+        result &= QFile::link(link.dir().relativeFilePath(linkTargetPath), link.absoluteFilePath());
     }
     return result;
 }
