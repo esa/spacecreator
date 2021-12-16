@@ -560,10 +560,6 @@ auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel 
     QString srcFunDefaultImplementation = srcFun->defaultImplementation();
     dstFun->setDefaultImplementation(srcFunDefaultImplementation);
 
-    if (!srcFun->contextParams().isEmpty()) {
-        dstFun->setContextParams(srcFun->contextParams());
-    }
-
     for (ivm::IVInterface *const srcIf : srcFun->interfaces()) {
         ivm::IVInterface *const dstIf = curIvEditorCore->addInterface(srcIf->title(), dstFun->title());
         dstIf->setKind(srcIf->kind());
