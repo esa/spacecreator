@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2021-2022 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2021-2022 GMV - <tiago.jorge@gmv.com>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -86,7 +86,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     dir->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
     dir->setCheckState(0, Qt::Unchecked);
     d->ui->treeWidget_properties->addTopLevelItem(dir);
-    listFile(dir, fileInfo, false, true);
+    listProperties(dir, fileInfo);
 
     // Build subtyping tree view
     QFileInfo fileInfo2(this->subtypesPath);
@@ -94,9 +94,8 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     fileColumn2.append(fileInfo2.fileName());
     QTreeWidgetItem *dir2 = new QTreeWidgetItem(fileColumn2);
     dir2->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
-    //dir2->setCheckState(0, Qt::Unchecked);
     d->ui->treeWidget_subtyping->addTopLevelItem(dir2);
-    listFile(dir2, fileInfo2, true, true);
+    listSubtypes(dir2, fileInfo2);
 
     // Build submodel tree view
     QStringList functionColumn3;
@@ -104,16 +103,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     QTreeWidgetItem *topFunctionNode = new QTreeWidgetItem(functionColumn3);
     topFunctionNode->setIcon(0, this->style()->standardIcon(QStyle::SP_FileDialogListView));
     d->ui->treeWidget_submodel->addTopLevelItem(topFunctionNode);
-    for (ivm::IVFunction *function : d->document->objectsModel()->allObjectsByType<ivm::IVFunction>()) {
-        if(!function->hasNestedChildren()){
-            QStringList functionColumn3;
-            functionColumn3.append(function->title());
-            QTreeWidgetItem *functionNode = new QTreeWidgetItem(functionColumn3);
-            functionNode->setIcon(0, this->style()->standardIcon(QStyle::SP_MediaStop));
-            functionNode->setCheckState(0, Qt::Checked);
-            topFunctionNode->addChild(functionNode);
-        }
-    }
+    listModelFunctions(topFunctionNode);
 
     // Pre-build results tree view
     QFileInfo fileInfo4(this->outputPath);
@@ -121,9 +111,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     fileColumn4.append(fileInfo4.fileName());
     QTreeWidgetItem *dir4 = new QTreeWidgetItem(fileColumn4);
     dir4->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
-    //dir2->setCheckState(0, Qt::Unchecked);
     d->ui->treeWidget_results->addTopLevelItem(dir4);
-    //listFile(dir4, fileInfo4, true, false);
 
     // Set validators on MC options value fileds
     d->ui->lineEdit_maxNumEnvRICalls->setValidator( new QIntValidator(0, 50, this) );
@@ -138,7 +126,7 @@ ModelCheckingWindow::~ModelCheckingWindow()
     d = nullptr;
 }
 
-void ModelCheckingWindow::listFile(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent, bool noSubDirectories, bool checkable) {
+void ModelCheckingWindow::listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent) {
     QDir dir;
     dir.setPath(parent.filePath());
     dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoSymLinks);
@@ -152,12 +140,11 @@ void ModelCheckingWindow::listFile(QTreeWidgetItem *parentWidgetItem, QFileInfo 
         fileColumn.append(fileInfo.fileName());
         if (fileInfo.fileName() == "." || fileInfo.fileName() == ".." ); // nothing
         else if(fileInfo.isDir()) { // is directory
-            if (noSubDirectories) continue;
             QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
             child->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
-            if (checkable) {child->setCheckState(0, Qt::Unchecked);}
+            child->setCheckState(0, Qt::Unchecked);
             parentWidgetItem->addChild(child);
-            listFile(child, fileInfo, true, checkable);
+            listProperties(child, fileInfo);
         }
         else { // is file
                 if (fileInfo.suffix() == "msc" || fileInfo.suffix() == "pr"){
@@ -168,16 +155,77 @@ void ModelCheckingWindow::listFile(QTreeWidgetItem *parentWidgetItem, QFileInfo 
                     } else {
                         child->setIcon(0, this->style()->standardIcon(QStyle::SP_FileDialogContentsView));
                     }
-                    if (checkable) {child->setCheckState(0, Qt::Unchecked);}
+                    child->setCheckState(0, Qt::Unchecked);
                     parentWidgetItem->addChild(child);
                 }
+        }
+    }
+}
+
+void ModelCheckingWindow::listSubtypes(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent) {
+    QDir dir;
+    dir.setPath(parent.filePath());
+    dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoSymLinks);
+    dir.setSorting(QDir::DirsFirst | QDir::Name);
+
+    const QFileInfoList fileList = dir.entryInfoList();
+
+    for (int i = 0; i < fileList.size(); i++) {
+        QFileInfo fileInfo = fileList.at(i);
+        QStringList fileColumn;
+        fileColumn.append(fileInfo.fileName());
+        if (fileInfo.fileName() == "." || fileInfo.fileName() == ".." ); // nothing
+        else if(fileInfo.isDir()) { // is directory
+            continue;
+        }
+        else { // is file
                 if (fileInfo.suffix() == "asn"){
                     fileColumn.append(fileInfo.filePath());
                     QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
                     child->setIcon(0, this->style()->standardIcon(QStyle::SP_TitleBarNormalButton));
-                    if (checkable) {child->setCheckState(0, Qt::Unchecked);}
+                    child->setCheckState(0, Qt::Unchecked);
                     parentWidgetItem->addChild(child);
-                }  
+                }
+        }
+    }
+}
+
+void ModelCheckingWindow::listModelFunctions(QTreeWidgetItem *parentWidgetItem) {
+    for (ivm::IVFunction *function : d->document->objectsModel()->allObjectsByType<ivm::IVFunction>()) {
+        if(!function->hasNestedChildren()){
+            QStringList functionColumn3;
+            functionColumn3.append(function->title());
+            QTreeWidgetItem *functionNode = new QTreeWidgetItem(functionColumn3);
+            functionNode->setIcon(0, this->style()->standardIcon(QStyle::SP_MediaStop));
+            functionNode->setCheckState(0, Qt::Checked);
+            parentWidgetItem->addChild(functionNode);
+        }
+    }
+}
+
+void ModelCheckingWindow::listResults(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent) {
+    QDir dir;
+    dir.setPath(parent.filePath());
+    dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoSymLinks);
+    dir.setSorting(QDir::DirsFirst | QDir::Name);
+
+    const QFileInfoList fileList = dir.entryInfoList();
+
+    for (int i = 0; i < fileList.size(); i++) {
+        QFileInfo fileInfo = fileList.at(i);
+        QStringList fileColumn;
+        fileColumn.append(fileInfo.fileName());
+        if (fileInfo.fileName() == "." || fileInfo.fileName() == ".." ); // nothing
+        else if(fileInfo.isDir()) { // is directory
+            continue;
+        }
+        else { // is file
+                if (fileInfo.suffix() == "msc"){
+                    fileColumn.append(fileInfo.filePath());
+                    QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
+                    child->setIcon(0, this->style()->standardIcon(QStyle::SP_MediaPlay));
+                    parentWidgetItem->addChild(child);
+                }
         }
     }
 }
@@ -317,7 +365,7 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
 
     //Build results/output tree view
     QFileInfo fileInfo3(this->outputPath);
-    listFile(d->ui->treeWidget_results->topLevelItem(0), fileInfo3, true, false);
+    listResults(d->ui->treeWidget_results->topLevelItem(0), fileInfo3);
 }
 
 void ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked(QTreeWidgetItem *item, int column)

@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2021-2022 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2021-2022 GMV - <tiago.jorge@gmv.com>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -42,7 +42,10 @@ Q_SIGNALS:
     void visibleChanged(bool visible);
 
 private Q_SLOTS:
-    void listFile(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent, bool noSubDirectories, bool checkable);
+    void listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent);
+    void listSubtypes(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent);
+    void listModelFunctions(QTreeWidgetItem *parentWidgetItem);
+    void listResults(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent);
     void on_treeWidget_properties_itemChanged(QTreeWidgetItem *item, int column);
     void updateParentItem(QTreeWidgetItem *item);
     void on_treeWidget_properties_itemDoubleClicked(QTreeWidgetItem *item, int column);
