@@ -220,10 +220,11 @@ Qt::ItemFlags ContextParametersModel::flags(const QModelIndex &index) const
     if (flags.testFlag(Qt::ItemIsEditable) || flags.testFlag(Qt::ItemIsEnabled)) {
         switch (entity()->type()) {
         case ivm::IVObject::Type::Function: {
-            if (auto fn = m_dataObject->as<const ivm::IVFunction *>())
-                if (fn->inheritsFunctionType())
+            if (auto fn = m_dataObject->as<const ivm::IVFunction *>()) {
+                if (fn->inheritsFunctionType() && index.column() != Column::Value) {
                     flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
-
+                }
+            }
             break;
         }
         default:
