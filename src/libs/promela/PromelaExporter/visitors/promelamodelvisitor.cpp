@@ -30,6 +30,7 @@
 
 using promela::model::Declaration;
 using promela::model::InitProctype;
+using promela::model::InlineDef;
 using promela::model::NamedMtype;
 using promela::model::Proctype;
 using promela::model::ProctypeElement;
@@ -57,6 +58,7 @@ void PromelaModelVisitor::visit(const PromelaModel &promelaModel)
     generateValueDefinitions(promelaModel.getValueDefinitions());
     generateUtypes(promelaModel.getUtypes());
     generateDeclarations(promelaModel.getDeclarations());
+    generateInlineDefs(promelaModel.getInlineDefs());
     generateProctypes(promelaModel.getProctypes());
     if (promelaModel.hasInit()) {
         generateInitProctype(promelaModel.getInit());
@@ -125,6 +127,16 @@ void PromelaModelVisitor::generateDeclarations(const QList<Declaration> &values)
     for (const Declaration &declaration : values) {
         DeclarationVisitor visitor(m_stream, "");
         visitor.visit(declaration);
+    }
+}
+
+void PromelaModelVisitor::generateInlineDefs(const std::list<std::unique_ptr<InlineDef>> &inlines)
+{
+    for (const std::unique_ptr<InlineDef> &inlineDef : inlines) {
+        m_stream << "inline " << inlineDef->getName() << "()\n";
+        m_stream << "{\n";
+        generateSequence(inlineDef->getSequence());
+        m_stream << "}\n";
     }
 }
 

@@ -58,6 +58,7 @@ private:
     void generateValueDefinitions(const QList<::promela::model::ValueDefinition> &values);
     void generateUtypes(const QList<::promela::model::Utype> &utypes);
     void generateDeclarations(const QList<::promela::model::Declaration> &values);
+    void generateInlineDefs(const std::list<std::unique_ptr<::promela::model::InlineDef>> &inlines);
     void generateProctypes(const std::list<std::unique_ptr<::promela::model::Proctype>> &proctypes);
     void generateInitProctype(const ::promela::model::InitProctype &init);
     void generateSequence(const ::promela::model::Sequence &sequence);

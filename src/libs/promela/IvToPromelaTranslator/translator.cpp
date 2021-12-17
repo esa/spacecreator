@@ -21,6 +21,7 @@
 
 #include <QDebug>
 #include <conversion/common/escaper/escaper.h>
+#include <ivcore/ivconnection.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
 #include <shared/exportableproperty.h>
@@ -30,13 +31,16 @@ using conversion::Model;
 using conversion::ModelType;
 using conversion::Options;
 using conversion::translator::TranslationException;
+using ivm::IVConnection;
 using ivm::IVFunction;
 using ivm::IVInterface;
+using ivm::IVInterfaceRequired;
 using ivm::IVModel;
 using promela::model::Assignment;
 using promela::model::BasicType;
 using promela::model::ChannelInit;
 using promela::model::ChannelRecv;
+using promela::model::ChannelSend;
 using promela::model::Constant;
 using promela::model::DataType;
 using promela::model::Declaration;
@@ -44,6 +48,7 @@ using promela::model::DoLoop;
 using promela::model::Expression;
 using promela::model::InitProctype;
 using promela::model::InlineCall;
+using promela::model::InlineDef;
 using promela::model::Proctype;
 using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
@@ -81,8 +86,16 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     for (IVFunction *ivFunction : ivFunctionList) {
         const QString functionName = ivFunction->property("name").toString();
         promelaModel->addInclude(QString("%1.pml").arg(functionName.toLower()));
+
         QVector<IVInterface *> interfaceList = ivFunction->pis();
         for (IVInterface *interface : interfaceList) {
+
+            IVConnection *connection = ivModel->getConnectionForIface(interface->id());
+
+            IVInterface *requiredInterface = connection->sourceInterface();
+            const QString sourceInterfaceName = requiredInterface->property("name").toString();
+            const QString sourceFunctionName = requiredInterface->function()->property("name").toString();
+
             const QString interfaceName = interface->property("name").toString();
             size_t queueSize = getQueueSize(interface);
             size_t priority = getPriority(interface);
@@ -93,6 +106,9 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
                 parameterName = parameter.name();
                 parameterType = parameter.paramTypeName();
             }
+
+            promelaModel->addInlineDef(generateSendInline(functionName, interfaceName, parameterName, parameterType,
+                    sourceFunctionName, sourceInterfaceName));
 
             promelaModel->addProctype(generateProctype(promelaModel.get(), functionName, interfaceName, parameterName,
                     parameterType, queueSize, priority));
@@ -211,6 +227,31 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *
     proctype->setPriority(priority);
 
     return proctype;
+}
+
+std::unique_ptr<::promela::model::InlineDef> IvToPromelaTranslator::generateSendInline(const QString &functionName,
+        const QString &interfaceName, const QString &parameterName, const QString &parameterType,
+        const QString &sourceFunctionName, const QString &sourceInterfaceName) const
+{
+    Q_UNUSED(parameterName);
+    Q_UNUSED(parameterType);
+    QString inlineName =
+            QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(sourceFunctionName)).arg(sourceInterfaceName);
+    QString channelName = QString("%1_%2_channel").arg(functionName).arg(interfaceName);
+
+    Sequence sequence;
+
+    std::unique_ptr<ProctypeElement> dummyVariableDef =
+            std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "dummy"));
+    QList<VariableRef> params;
+    params.append(VariableRef("dummy"));
+    std::unique_ptr<ProctypeElement> channelSend =
+            std::make_unique<ProctypeElement>(ChannelSend(VariableRef(channelName), params));
+
+    sequence.appendElement(std::move(dummyVariableDef));
+    sequence.appendElement(std::move(channelSend));
+
+    return std::make_unique<InlineDef>(inlineName, std::move(sequence));
 }
 
 size_t IvToPromelaTranslator::getQueueSize(IVInterface *interface) const

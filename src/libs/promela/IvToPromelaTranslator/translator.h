@@ -66,6 +66,9 @@ private:
     std::unique_ptr<::promela::model::Proctype> generateProctype(::promela::model::PromelaModel *promelaModel,
             const QString &functionName, const QString &interfaceName, const QString &parameterName,
             const QString &parameterType, size_t queueSize, size_t priority) const;
+    std::unique_ptr<::promela::model::InlineDef> generateSendInline(const QString &functionName,
+            const QString &interfaceName, const QString &parameterName, const QString &parameterType,
+            const QString &sourceFunctionName, const QString &sourceInterfaceName) const;
     auto getQueueSize(ivm::IVInterface *interface) const -> size_t;
     auto getPriority(ivm::IVInterface *interface) const -> size_t;
 };

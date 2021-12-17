@@ -20,6 +20,7 @@
 #pragma once
 
 #include "initproctype.h"
+#include "inlinedef.h"
 #include "namedmtype.h"
 #include "proctype.h"
 #include "proctypeelement.h"
@@ -158,6 +159,9 @@ public:
      */
     const QList<Declaration> &getDeclarations() const noexcept;
 
+    void addInlineDef(std::unique_ptr<InlineDef> inlineDef);
+    const std::list<std::unique_ptr<InlineDef>> &getInlineDefs() const noexcept;
+
     void addProctype(std::unique_ptr<Proctype> proctype);
     const std::list<std::unique_ptr<Proctype>> &getProctypes() const noexcept;
 
@@ -173,6 +177,7 @@ private:
     QList<TypeAlias> m_typeAliases;
     QList<ValueDefinition> m_valueDefinitions;
     QList<Declaration> m_declarations;
+    std::list<std::unique_ptr<InlineDef>> m_inlineDefs;
     std::list<std::unique_ptr<Proctype>> m_proctypes;
     std::optional<InitProctype> m_initProctype;
 };

@@ -96,6 +96,16 @@ const QList<Declaration> &PromelaModel::getDeclarations() const noexcept
     return m_declarations;
 }
 
+void PromelaModel::addInlineDef(std::unique_ptr<InlineDef> inlineDef)
+{
+    m_inlineDefs.push_back(std::move(inlineDef));
+}
+
+const std::list<std::unique_ptr<InlineDef>> &PromelaModel::getInlineDefs() const noexcept
+{
+    return m_inlineDefs;
+}
+
 void PromelaModel::addProctype(std::unique_ptr<Proctype> proctype)
 {
     m_proctypes.push_back(std::move(proctype));

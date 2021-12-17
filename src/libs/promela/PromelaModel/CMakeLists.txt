@@ -24,6 +24,7 @@ set(SOURCES
   sequence.cpp
   assignment.cpp
   inlinecall.cpp
+  inlinedef.cpp
   )
 set(INCLUDES
   arraytype.h
@@ -51,6 +52,7 @@ set(INCLUDES
   sequence.h
   assignment.h
   inlinecall.cpp
+  inlinedef.h
   )
 
 add_library(PromelaModel STATIC)
