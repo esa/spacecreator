@@ -566,6 +566,7 @@ auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel 
         ivm::IVInterface *const dstIf = curIvEditorCore->addInterface(srcIf->title(), dstFun->title());
         dstIf->setKind(srcIf->kind());
         dstIf->setDirection(srcIf->direction());
+        dstIf->setParams(srcIf->params());
     }
 }
 
