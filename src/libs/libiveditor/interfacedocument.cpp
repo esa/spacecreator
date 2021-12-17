@@ -183,23 +183,7 @@ bool InterfaceDocument::load(const QString &path)
 
 bool InterfaceDocument::loadAvailableComponents()
 {
-    bool result = true;
-
-    d->sharedModel->clear();
-    QDirIterator instantiatableIt(shared::sharedTypesPath(), QDir::Dirs | QDir::NoDotAndDotDot);
-    while (instantiatableIt.hasNext()) {
-        result |= loadComponentModel(
-                d->sharedModel, instantiatableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName);
-    }
-
-    d->importModel->clear();
-    QDirIterator importableIt(shared::componentsLibraryPath(), QDir::Dirs | QDir::NoDotAndDotDot);
-    while (importableIt.hasNext()) {
-        result |= loadComponentModel(
-                d->importModel, importableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName);
-    }
-
-    return result;
+    return reloadComponentModel() && reloadSharedTypeModel();
 }
 
 QString InterfaceDocument::getComponentName(const QStringList &exportNames)
@@ -281,7 +265,7 @@ bool InterfaceDocument::exportSelectedFunctions()
     QString path = shared::componentsLibraryPath() + QDir::separator() + name;
     if (exportImpl(path, objects)) {
         d->objectsSelectionModel->clearSelection();
-        return loadComponentModel(d->importModel, path + QDir::separator() + shared::kDefaultInterfaceViewFileName);
+        return reloadComponentModel();
     }
     return false;
 }
@@ -310,7 +294,7 @@ bool InterfaceDocument::exportSelectedType()
     QString path = shared::sharedTypesPath() + QDir::separator() + rootType->title();
     if (exportImpl(path, { rootType })) {
         d->objectsSelectionModel->clearSelection();
-        return loadComponentModel(d->sharedModel, path + QDir::separator() + shared::kDefaultInterfaceViewFileName);
+        return reloadSharedTypeModel();
     }
     return false;
 }
@@ -333,6 +317,30 @@ bool InterfaceDocument::loadComponentModel(ivm::IVModel *model, const QString &p
     model->addObjects(parser.parsedObjects());
     shared::ErrorHub::clearCurrentFile();
     return true;
+}
+
+bool InterfaceDocument::reloadComponentModel()
+{
+    bool result = true;
+    d->importModel->clear();
+    QDirIterator importableIt(shared::componentsLibraryPath(), QDir::Dirs | QDir::NoDotAndDotDot);
+    while (importableIt.hasNext()) {
+        result |= loadComponentModel(
+                d->importModel, importableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName);
+    }
+    return result;
+}
+
+bool InterfaceDocument::reloadSharedTypeModel()
+{
+    bool result = true;
+    d->sharedModel->clear();
+    QDirIterator instantiatableIt(shared::sharedTypesPath(), QDir::Dirs | QDir::NoDotAndDotDot);
+    while (instantiatableIt.hasNext()) {
+        result |= loadComponentModel(
+                d->sharedModel, instantiatableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName);
+    }
+    return result;
 }
 
 void InterfaceDocument::close()

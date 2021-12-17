@@ -155,6 +155,9 @@ private:
     QString getComponentName(const QStringList &exportNames);
     bool loadComponentModel(ivm::IVModel *model, const QString &path);
 
+    bool reloadComponentModel();
+    bool reloadSharedTypeModel();
+
     void onSceneSelectionChanged(const QList<shared::Id> &selectedObjects);
     void onViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
