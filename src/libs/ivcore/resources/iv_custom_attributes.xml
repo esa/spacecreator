@@ -13,6 +13,7 @@
                 <Entry value="GUI"/>
                 <Entry value="SDL"/>
                 <Entry value="Simulink"/>
+                <Entry value="QGenC"/>
                 <Entry value="Blackbox_Device"/>
                 <Entry value="VHDL"/>
                 <Entry value="Pseudo function"/>
@@ -127,6 +128,15 @@
                 <AttrValidator name="kind" value="Cyclic"/>
                 <AttrValidator name="kind" value="Sporadic"/>
             </Provided_Interface>
+        </Scopes>
+    </Attr>
+    <Attr name="enable_multicast" visible="false">
+        <Type>
+            <Boolean defaultValue="False"/>
+        </Type>
+        <Scopes>
+            <Provided_Interface/>
+            <Required_Interface/>
         </Scopes>
     </Attr>
 </Attrs>

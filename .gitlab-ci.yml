@@ -1,4 +1,4 @@
-image: taste-buster:latest
+image: ${CI_REGISTRY_IMAGE}/taste-buster:latest
 
 stages:
   - build-test
@@ -23,7 +23,7 @@ default:
     - mkdir -p ${BUILD_DIR}
     - mkdir -p ${PACKAGE_DIR}
     # dependencies
-    - apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip
+    - apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format
     # install qtcreator sources
     - ./scripts/download_qtcreator.sh
     - ./scripts/build_grantlee.sh
@@ -40,6 +40,7 @@ space-creator-dev:
     - cd ${DOWNLOAD_DIR}
     - wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2 | tar jxvf -
     - export PATH=$PATH:${DOWNLOAD_DIR}/asn1scc
+    - export PATH=$PATH:/root/.local/bin
     - cd ${PROJECT_ROOT}
     - ./scripts/run_tests.sh ${BUILD_DIR}
   cache:
@@ -65,6 +66,7 @@ space-creator:
     - cd ${DOWNLOAD_DIR}
     - wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2 | tar jxvf -
     - export PATH=$PATH:${DOWNLOAD_DIR}/asn1scc
+    - export PATH=$PATH:/root/.local/bin
     - cd ${PROJECT_ROOT}
     - ./scripts/run_tests.sh ${BUILD_DIR}
     # Create AppImage

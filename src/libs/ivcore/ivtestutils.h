@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ivinterface.h"
+#include "ivconnectionlayertype.h"
 
 #include <QString>
 
@@ -27,5 +28,8 @@ IVFunction *createFunction(const QString &name = QString(), QObject *parent = nu
 IVFunctionType *createFunctionType(const QString &name = QString(), QObject *parent = nullptr);
 
 IVComment *createComment(const QString &name = QString(), QObject *parent = nullptr);
+
+IVConnectionLayerType *createConnectionLayer(const QString &name = "default", QObject *parent = nullptr);
+
 }
 }

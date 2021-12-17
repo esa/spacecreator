@@ -1,7 +1,7 @@
 <Attrs>
     <Attr label="Name" name="name">
         <Type>
-        <String validator="[a-zA-Z][a-zA-Z0-9_]*"/>
+            <String validator="[a-zA-Z][a-zA-Z0-9_]*"/>
         </Type>
     </Attr>
     <Attr label="Kind" name="kind">
@@ -19,6 +19,15 @@
             <Provided_Interface/>
         </Scopes>
     </Attr>
+    <Attr label="Layer" name="layer" visible="true" editable="false">
+        <Type>
+            <String validator="[a-zA-Z][a-zA-Z0-9_]*" defaultValue="default" />
+        </Type>
+        <Scopes>
+            <Provided_Interface/>
+            <Required_Interface/>
+        </Scopes>
+    </Attr>
     <Attr name="is_type">
         <Type>
             <Enumeration defaultValue="NO">
@@ -32,7 +41,7 @@
     </Attr>
     <Attr label="Instance of" name="instance_of">
         <Type>
-        <String validator="[a-zA-Z][a-zA-Z0-9_]*"/>
+            <String validator="[a-zA-Z][a-zA-Z0-9_]*"/>
         </Type>
         <Scopes>
             <Function>

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "ivconnectionlayertype.h"
 #include "ivinterface.h"
 #include "ivobject.h"
 
@@ -48,6 +49,8 @@ public:
 
     void setInheritPI();
     void unsetInheritPI();
+
+    IVConnectionLayerType *layer() const;
 
     bool isProtected() const;
 

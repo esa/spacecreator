@@ -185,7 +185,7 @@ void IVFunction::reflectAttrs(const EntityAttributes &attributes)
     EntityAttributes prepared { attributes };
     static const QList<meta::Props::Token> excludeTokens = { meta::Props::Token::is_type,
         meta::Props::Token::instance_of, meta::Props::Token::name, meta::Props::Token::RootCoordinates,
-        meta::Props::Token::coordinates };
+        meta::Props::Token::coordinates, meta::Props::Token::enable_multicast };
     for (meta::Props::Token t : excludeTokens) {
         const QString name = meta::Props::token(t);
         prepared[name] = entityAttribute(name);
@@ -211,6 +211,7 @@ void IVFunction::reflectAttr(const QString &attrName)
     case meta::Props::Token::instance_of:
     case meta::Props::Token::RootCoordinates:
     case meta::Props::Token::coordinates:
+    case meta::Props::Token::enable_multicast:
         break;
     case meta::Props::Token::name:
         setEntityAttribute(meta::Props::token(meta::Props::Token::instance_of), d->m_fnType->title());
