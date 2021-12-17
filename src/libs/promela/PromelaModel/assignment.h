@@ -23,12 +23,32 @@
 #include "variableref.h"
 
 namespace promela::model {
+/**
+ * @brief Representation of assignment in promela
+ */
 class Assignment final
 {
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param variableRef reference to the variable on the left side of assignment
+     * @param expression expression on the right side of assignment
+     */
     Assignment(VariableRef variableRef, Expression expression);
 
+    /**
+     * @brief Getter for variable reference on left side of assignment
+     *
+     * @return variable reference
+     */
     const VariableRef &getVariableRef() const noexcept;
+
+    /**
+     * @brief Getter for expression on the right side of assignment
+     *
+     * @return expression
+     */
     const Expression &getExpression() const noexcept;
 
 private:

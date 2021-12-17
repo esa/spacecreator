@@ -159,14 +159,50 @@ public:
      */
     const QList<Declaration> &getDeclarations() const noexcept;
 
+    /**
+     * @brief Add InlineDef to the model
+     *
+     * @param inlineDef InlineDef to add to the model
+     */
     void addInlineDef(std::unique_ptr<InlineDef> inlineDef);
+    /**
+     * @brief Getter for all inline definitions
+     *
+     * @return All inline definitions of the model
+     */
     const std::list<std::unique_ptr<InlineDef>> &getInlineDefs() const noexcept;
 
+    /**
+     * @brief Add proctype definition to the model
+     *
+     * @param proctype Proctype to add to the model
+     */
     void addProctype(std::unique_ptr<Proctype> proctype);
+    /**
+     * @brief Getter for all proctypes of promela model
+     *
+     * @return All proctypes of the model
+     */
     const std::list<std::unique_ptr<Proctype>> &getProctypes() const noexcept;
 
+    /**
+     * @brief Check if init proctype is present in promela model
+     *
+     * @return true if init proctype is present, otherwise false
+     */
     bool hasInit() const noexcept;
+    /**
+     * @brief Getter for init proctype of promela model
+     *
+     * @return init proctype if present
+     * @throw std::bad_optional_access if init proctype is not present
+     */
     const InitProctype &getInit() const noexcept;
+    /**
+     * @brief Setter for init proctype
+     *
+     * @param initProctype init proctype to set in promela model
+     */
     void setInit(InitProctype initProctype);
 
 private:

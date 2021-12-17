@@ -24,14 +24,34 @@
 #include <QList>
 
 namespace promela::model {
+/**
+ * @brief Representation of channel receive operation in promela
+ */
 class ChannelRecv
 {
 public:
-    // TODO in future, it shall be possible to receive a constant - for condition
+    /**
+     * @brief Constructor.
+     *
+     * TODO in future, it shall be possible to receive a constant - for condition
+     *
+     * @param channelRef variableRef, which shall be a reference to channel
+     * @param args list of variable references, where received signal parameters shall be stored
+     */
     ChannelRecv(VariableRef channelRef, const QList<VariableRef> &args);
 
+    /**
+     * @brief Getter for channel reference.
+     *
+     * @return reference to the channel
+     */
     const VariableRef &getChannelRef() const noexcept;
 
+    /**
+     * @brief Getter for argument of channel receive operation.
+     *
+     * @return list of arguments for receive operation
+     */
     const QList<VariableRef> &getArgs() const noexcept;
 
 private:
