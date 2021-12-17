@@ -69,6 +69,7 @@
 #include <exception>
 #include <memory>
 #include <messagemanager.h>
+#include <variant>
 
 using namespace Core;
 using conversion::Converter;
@@ -229,6 +230,59 @@ auto SedsPlugin::importInterfaceView() -> void
     QFile(tmpIvFilename).remove();
 }
 
+auto SedsPlugin::getPackagenameFromPackageFile(const seds::model::PackageFile &file) -> QString
+{
+    QString name;
+
+    auto &package = file.package();
+    auto &components = package.components();
+    if (components.empty()) {
+        return "";
+    }
+    auto &firstComponent = components.front();
+    auto &componentNameType = firstComponent.name();
+    name = componentNameType.value();
+
+    return name;
+}
+
+auto SedsPlugin::getPackagenameFromDatasheet(const seds::model::DataSheet &datasheet) -> QString
+{
+    QString name;
+
+    auto &packages = datasheet.packages();
+    if (packages.empty()) {
+        return "";
+    }
+    auto &firstPackage = packages.front();
+    name = firstPackage.nameStr();
+
+    return name;
+}
+
+auto SedsPlugin::getPackagenameFromSedsModel(const QString &inputFilePath) -> QString
+{
+    const std::unique_ptr<conversion::Model> sedsModel = loadSedsModel(inputFilePath);
+    seds::model::SedsModel *const sedsModelPtr = dynamic_cast<seds::model::SedsModel *>(sedsModel.get());
+    if (sedsModelPtr == nullptr) {
+        MessageManager::write(GenMsg::msgError.arg("SEDS model could not be read"));
+        return "";
+    }
+
+    QString packageName;
+    auto &variantData = sedsModelPtr->data();
+    if (std::holds_alternative<seds::model::PackageFile>(variantData)) {
+        packageName = getPackagenameFromPackageFile(std::get<seds::model::PackageFile>(variantData));
+    } else if (std::holds_alternative<seds::model::DataSheet>(variantData)) {
+        packageName = getPackagenameFromDatasheet(std::get<seds::model::DataSheet>(variantData));
+    } else {
+        MessageManager::write(GenMsg::msgError.arg("Selected file does not contain valid SEDS model"));
+        return "";
+    }
+
+    return packageName;
+}
+
 auto SedsPlugin::importSdl() -> void
 {
     const QString tmpIvFilename = "tmp-interfaceview.xml";
@@ -241,33 +295,12 @@ auto SedsPlugin::importSdl() -> void
         return;
     }
 
-    const auto extractFunctionNameFromPath = [](const QString &path) -> QString {
-        auto elements = path.split(QDir::separator());
-        auto filename = elements.last().split(".");
-        return filename.first().toLower();
-    };
-
-    std::unique_ptr<conversion::Model> ivmodel = loadSedsModel(inputFilePath);
-    seds::model::SedsModel *const tmpSedsModel = dynamic_cast<seds::model::SedsModel *>(ivmodel.get());
-    if (tmpSedsModel == nullptr) {
-        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivTmpModelNotRead));
+    const QString packageName = getPackagenameFromSedsModel(inputFilePath);
+    if (packageName == "") {
         return;
     }
 
-    // get packagefile or datasheet; sedsmodel.h:38
-    // get package name from ^^^
-    //
-    // QList<ivm::IVObject *> sdl_function_objs = tmpSedsModel->data();
-    // for (auto &obj : sdl_function_objs) {
-    //     if (obj == nullptr) {
-    //         continue;
-    //     }
-    //     if (obj->isFunction()) {
-    //         qDebug() << obj->title();
-    //     }
-    // }
-
-    const QString prefix = QString("work/%1/SDL/src/").arg(extractFunctionNameFromPath(inputFilePath));
+    const QString prefix = QString("work/%1/SDL/src/").arg(packageName.toLower());
     if (!QDir().mkpath(prefix)) {
         MessageManager::write(GenMsg::msgError.arg(QString("Could not create path %1").arg(prefix)));
         return;

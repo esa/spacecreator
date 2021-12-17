@@ -19,11 +19,13 @@
 
 #pragma once
 
+#include "datasheet.h"
 #include "iveditorcore.h"
 #include "ivfunction.h"
 #include "ivmodel.h"
 #include "model.h"
 #include "options.h"
+#include "packagefile.h"
 #include "sedspluginconstants.h"
 
 #include <QStandardItemModel>
@@ -70,6 +72,9 @@ private:
     auto loadAndMergeIvModelIntoCurrent(const QString &ivConfig, const QString &ivFilename) -> bool;
     auto addFunctionToModel(ivm::IVFunction *srcFun, ivm::IVModel *model) -> void;
     auto doesModelContainFunction(ivm::IVModel *model, ivm::IVFunction *function) -> bool;
+    auto getPackagenameFromPackageFile(const seds::model::PackageFile &file) -> QString;
+    auto getPackagenameFromDatasheet(const seds::model::DataSheet &datasheet) -> QString;
+    auto getPackagenameFromSedsModel(const QString &inputFilePath) -> QString;
 
     /** @brief  Internal registry */
     conversion::Registry m_registry;
