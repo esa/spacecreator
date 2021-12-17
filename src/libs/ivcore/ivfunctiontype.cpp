@@ -48,6 +48,7 @@ struct IVFunctionTypePrivate {
 IVFunctionType::IVFunctionType(QObject *parent, const shared::Id &id)
     : IVFunctionType(IVObject::Type::FunctionType, parent, id)
 {
+    setEntityAttribute(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("YES"));
 }
 
 IVFunctionType::IVFunctionType(const IVObject::Type t, QObject *parent, const shared::Id &id)
@@ -170,12 +171,6 @@ bool IVFunctionType::removeChild(IVObject *child)
     }
 
     return false;
-}
-
-bool IVFunctionType::postInit()
-{
-    setEntityAttribute(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("YES"));
-    return IVObject::postInit();
 }
 
 QVector<IVFunctionType *> IVFunctionType::functionTypes() const
