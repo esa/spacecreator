@@ -22,11 +22,24 @@
 #include <QString>
 
 namespace promela::model {
+/**
+ * @brief Representation of inline call in promela
+ */
 class InlineCall
 {
 public:
+    /**
+     * @brief Constructor
+     *
+     * @param name name of inline
+     */
     InlineCall(QString name);
 
+    /**
+     * @brief Getter for name of inline
+     *
+     * @return Name of inline
+     */
     const QString &getName() const noexcept;
 
 private:

@@ -25,14 +25,30 @@
 #include <memory>
 
 namespace promela::model {
+/**
+ * @brief Representation of do loop in promela
+ */
 class DoLoop final
 {
 public:
-    DoLoop();
-
+    /**
+     * @brief Getter for sequences of do loop
+     *
+     * @return list of sequences
+     */
     const std::list<std::unique_ptr<Sequence>> &getSequences() const noexcept;
 
+    /**
+     * @brief Setter for sequences
+     *
+     * @param sequences list of sequences
+     */
     void setSequences(std::list<std::unique_ptr<Sequence>> sequences);
+    /**
+     * @brief Add sequence to the do loop
+     *
+     * @param element sequence to add
+     */
     void appendSequence(std::unique_ptr<Sequence> element);
 
 private:

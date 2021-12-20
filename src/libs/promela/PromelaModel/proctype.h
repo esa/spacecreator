@@ -29,23 +29,85 @@
 #include <optional>
 
 namespace promela::model {
+/**
+ * @brief Representation of proctype in promela
+ */
 class Proctype final
 {
 public:
+    /**
+     * @brief Constructor
+     *
+     * @param name name of proctype
+     * @param sequence content of proctype
+     */
     Proctype(QString name, Sequence sequence);
 
+    /**
+     * @brief Getter for name of proctype
+     *
+     * @return name of proctype
+     */
     const QString &getName() const noexcept;
+    /**
+     * @brief Setter for name of proctype
+     *
+     * @param name name of proctype
+     */
     void setName(QString name);
 
+    /**
+     * @brief Check if proctye is active proctype
+     *
+     * @return true if proctype is active proctype, otherwise false
+     */
     bool isActive() const noexcept;
+    /**
+     * @brief Getter for instance count of proctype
+     *
+     * Active proctype has number of instances, default 1
+     *
+     * @return number of instances of active proctype
+     */
     size_t getInstancesCount() const;
+    /**
+     * @brief Set proctype as active proctype.
+     *
+     * @param instances number of instances
+     */
     void setActive(size_t instances);
 
+    /**
+     * @brief Check if proctype has assigned priority
+     *
+     * @return true if proctype has assigned priority, otherwise false
+     */
     bool hasPriority() const noexcept;
+    /**
+     * @brief Getter for priority of proctype
+     *
+     * @return Priority value
+     * @throws std::bad_optional_access if proctype has no prority
+     */
     size_t getPriority() const;
+    /**
+     * @brief Setter for priority of proctype
+     *
+     * @param priority priority of proctype
+     */
     void setPriority(size_t priority);
 
+    /**
+     * @brief Getter for content of proctype
+     *
+     * @return content of proctype
+     */
     const Sequence &getSequence() const noexcept;
+    /**
+     * @brief Setter for content of proctype
+     *
+     * @param sequence content of proctype
+     */
     void setSequence(Sequence sequence);
 
 private:

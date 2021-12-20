@@ -22,11 +22,26 @@
 #include <cstdint>
 
 namespace promela::model {
+/**
+ * @brief Representation of constant in promela
+ *
+ * Only numeric constants are supported.
+ */
 class Constant final
 {
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param value numeric constant value
+     */
     Constant(int32_t value);
 
+    /**
+     * @brief Getter for numeric constant value
+     *
+     * @return numeric constant value
+     */
     int32_t getValue() const noexcept;
 
 private:

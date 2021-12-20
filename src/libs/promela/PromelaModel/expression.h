@@ -27,20 +27,33 @@
 
 namespace promela::model {
 /**
- * @brief Representation of declaration in promela.
- *
- * The declaration can be used to declare a variable or a field inside user defined data type.
+ * @brief Representation of expression in promela.
  */
 class Expression final
 {
 public:
-    // TODO: implement full support for expressions
+    /**
+     * @brief Variant to represent alternatives of expression
+     *
+     * TODO: implement full support for expressions
+     */
     using Value = std::variant<VariableRef, Constant>;
-    Expression(Value value);
 
+    /**
+     * @brief Constructor.
+     *
+     * @param content expression content
+     */
+    Expression(Value content);
+
+    /**
+     * @brief Getter for expression content
+     *
+     * @return content of expression
+     */
     const Value &getContent() const noexcept;
 
 private:
-    Value m_value;
+    Value m_content;
 };
 }

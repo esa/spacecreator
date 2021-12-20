@@ -20,13 +20,13 @@
 #include "expression.h"
 
 namespace promela::model {
-Expression::Expression(Value value)
-    : m_value(std::move(value))
+Expression::Expression(Value content)
+    : m_content(std::move(content))
 {
 }
 
 const Expression::Value &Expression::getContent() const noexcept
 {
-    return m_value;
+    return m_content;
 }
 }

@@ -22,8 +22,6 @@
 #include "proctypeelement.h"
 
 namespace promela::model {
-DoLoop::DoLoop() {}
-
 const std::list<std::unique_ptr<Sequence>> &DoLoop::getSequences() const noexcept
 {
     return m_sequences;

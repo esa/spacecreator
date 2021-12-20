@@ -22,11 +22,24 @@
 #include <QString>
 
 namespace promela::model {
+/**
+ * @brief Representation of variable reference in promela
+ */
 class VariableRef
 {
 public:
+    /**
+     * @brief Constructor
+     *
+     * @param ref name of the variable
+     */
     VariableRef(QString ref);
 
+    /**
+     * @brief Getter for reference to variable
+     *
+     * @retun Name of the variable
+     */
     const QString &getReference() const noexcept;
 
 private:

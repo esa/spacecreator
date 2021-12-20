@@ -24,10 +24,25 @@
 
 namespace promela::model {
 class ProctypeElement;
+/**
+ * @brief Representation of sequence in promela
+ *
+ * Sequence is a list of steps, where first element might be condition guard
+ */
 class Sequence final
 {
 public:
+    /**
+     * @brief Getter for content of sequence
+     *
+     * @return list of sequence elements
+     */
     const std::list<std::unique_ptr<ProctypeElement>> &getContent() const noexcept;
+    /**
+     * @brief Add element to sequence
+     *
+     * @param element element to add
+     */
     void appendElement(std::unique_ptr<ProctypeElement> element);
 
 private:

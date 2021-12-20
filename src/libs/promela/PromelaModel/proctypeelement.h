@@ -30,12 +30,29 @@
 #include <variant>
 
 namespace promela::model {
+/**
+ * @brief Representation of proctype element i.e. step in promela
+ */
 class ProctypeElement final
 {
 public:
+    /**
+     * @brief Variant representation of different alternatives of proctype element
+     */
     using Value = std::variant<Declaration, ChannelSend, ChannelRecv, Expression, DoLoop, Assignment, InlineCall>;
+
+    /**
+     * @brief Constructor
+     *
+     * @param value value of proctype element
+     */
     ProctypeElement(Value value);
 
+    /**
+     * @brief Getter for value of proctype element
+     *
+     * @return value of proctype element
+     */
     const Value &getValue() const noexcept;
 
 private:

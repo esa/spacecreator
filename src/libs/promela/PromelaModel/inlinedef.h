@@ -25,15 +25,44 @@
 #include <QString>
 
 namespace promela::model {
+/**
+ * @brief Representation of inline definition in promela
+ */
 class InlineDef final
 {
 public:
+    /**
+     * @brief Constructor
+     *
+     * @param name name of inline definition
+     * @param sequence content of inline definition
+     */
     InlineDef(QString name, Sequence sequence);
 
+    /**
+     * @brief Getter for name of inline definition
+     *
+     * @return name of inline definition
+     */
     const QString &getName() const noexcept;
+    /**
+     * @brief Setter for name of inline definition
+     *
+     * @param name name to set
+     */
     void setName(QString name);
 
+    /**
+     * @brief Getter for content of inline definition
+     *
+     * @return content of inline definition
+     */
     const Sequence &getSequence() const noexcept;
+    /**
+     * @brief Setter for content of inline definition
+     *
+     * @param sequence content of inline definition
+     */
     void setSequence(Sequence sequence);
 
 private:

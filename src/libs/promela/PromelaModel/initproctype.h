@@ -29,12 +29,30 @@
 #include <optional>
 
 namespace promela::model {
+/**
+ * @brief Representation of init proctype in promela
+ */
 class InitProctype final
 {
 public:
+    /**
+     * @brief Constructor
+     *
+     * @param sequence sequence of init proctype
+     */
     InitProctype(Sequence sequence);
 
+    /**
+     * @brief Getter for sequence of init proctype
+     *
+     * @return Sequence of init proctype
+     */
     const Sequence &getSequence() const noexcept;
+    /**
+     * @brief Setter for sequence of init proctype
+     *
+     * @param sequence Sequence to set
+     */
     void setSequence(Sequence sequence);
 
 private:
