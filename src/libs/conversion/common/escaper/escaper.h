@@ -81,7 +81,7 @@ public:
     static auto escapeAsn1FieldName(QString name) -> QString;
 
     /**
-     * @brief   Convert the input name to an id acceptable as an Proomela identifier
+     * @brief   Convert the input type name to an id acceptable as an Promela identifier
      *
      * @param   name    input name
      *
@@ -89,6 +89,13 @@ public:
      */
     static auto escapePromelaName(QString name) -> QString;
 
+    /**
+     * @brief   Convert the input IV name to an id acceptable as an Promela identifier
+     *
+     * @param   name    input name
+     *
+     * @returns identifier for Promela
+     */
     static auto escapePromelaIV(QString name) -> QString;
 
 private:
