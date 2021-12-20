@@ -287,7 +287,10 @@ bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const
                     return !isClone && !ri->hasPrototypePi();
                 }
             }
-            return !isClone;
+            if (index.column() == Column::Name) {
+                return !isClone;
+            }
+            break;
         }
     }
 
