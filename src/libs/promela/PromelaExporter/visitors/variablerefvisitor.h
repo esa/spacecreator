@@ -23,11 +23,23 @@
 #include <promela/PromelaModel/variableref.h>
 
 namespace promela::exporter {
+/**
+ * @brief Visitor for @link{::promela::model::VariableRef}
+ */
 class VariableRefVisitor
 {
 public:
+    /**
+     * @brief Constructor
+     *
+     * @param stream stream to append exported proctype element
+     */
     VariableRefVisitor(QTextStream &stream);
 
+    /**
+     * @brief Visit VariableRef
+     *
+     * @param element VariableRef to visit*/
     void visit(const ::promela::model::VariableRef &variableRef);
 
 private:

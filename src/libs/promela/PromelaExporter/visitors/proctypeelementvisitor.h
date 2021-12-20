@@ -23,19 +23,69 @@
 #include <promela/PromelaModel/proctypeelement.h>
 
 namespace promela::exporter {
+/**
+ * @brief Visitor for exporting @link{::promela::model::ProctypeElement}
+ */
 class ProctypeElementVisitor
 {
 public:
+    /**
+     * @brief Constructor
+     *
+     * @param stream stream to append exported proctype element
+     * @param baseIndent base identation unit for whole exported model
+     * @param sequenceIndent special indent unit for sequences
+     * @param indent current indent
+     */
     ProctypeElementVisitor(QTextStream &stream, QString baseIndent, QString sequenceIndent, QString indent);
 
+    /**
+     * @brief Visit ProctypeElement
+     *
+     * @param element ProctypeElement to visit*/
     void visit(const ::promela::model::ProctypeElement &element);
 
+    /**
+     * @brief Handle Declaration
+     *
+     * @param declaration declaration to export
+     */
     void operator()(const ::promela::model::Declaration &declaration);
+    /**
+     * @brief Handle ChannelRecv
+     *
+     * @param channelRecv ChannelRecv to export
+     */
     void operator()(const ::promela::model::ChannelRecv &channelRecv);
+    /**
+     * @brief Handle ChannelSend
+     *
+     * @param channelSend ChannelSend to export
+     */
     void operator()(const ::promela::model::ChannelSend &channelSend);
+    /**
+     * @brief Handle Expression
+     *
+     * @param expression Expression to export
+     */
     void operator()(const ::promela::model::Expression &expression);
+    /**
+     * @brief Handle DoLoop
+     *
+     * @param doLoop DoLoop to export
+     */
     void operator()(const ::promela::model::DoLoop &doLoop);
+    /**
+     * @brief Handle Assignment
+     *
+     * @param assignment Assignment to export
+     */
     void operator()(const ::promela::model::Assignment &assignment);
+    /**
+     * @brief Handle InlineCall
+     *
+     * @param inlineCall InlineCall to export
+     */
     void operator()(const ::promela::model::InlineCall &inlineCall);
 
 private:

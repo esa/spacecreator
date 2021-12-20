@@ -24,7 +24,7 @@
 
 namespace promela::exporter {
 /**
- * @brief  Visitor for exporting @link{::tmc::promelamodel::Declaration}
+ * @brief  Visitor for exporting @link{::promela::model::Declaration}
  */
 class DeclarationVisitor
 {
@@ -32,7 +32,7 @@ public:
     /**
      * @brief Constructor.
      *
-     * @param stream  stream to append data type prefix
+     * @param stream  stream to append exported declaration
      * @param prefix  prefix, which shall be added at the beginning, e.g. indent
      */
     DeclarationVisitor(QTextStream &stream, QString prefix);

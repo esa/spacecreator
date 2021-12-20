@@ -23,14 +23,37 @@
 #include <promela/PromelaModel/expression.h>
 
 namespace promela::exporter {
+/**
+ * @brief Visitor for exporting @link{::romela::model::Expression}
+ */
 class ExpressionVisitor final
 {
 public:
+    /**
+     * @brief Constructor
+     *
+     * @param stream stream to append exported expression
+     */
     ExpressionVisitor(QTextStream &stream);
 
+    /**
+     * @brief Visit Expression
+     *
+     * @param expression to visit
+     */
     void visit(const ::promela::model::Expression &expression);
 
+    /**
+     * @brief Handle VariableRef
+     *
+     * @param variableRef variable reference to export
+     */
     void operator()(const ::promela::model::VariableRef &variableRef);
+    /**
+     * @brief Handle Constant
+     *
+     * @param constant constant to export
+     */
     void operator()(const ::promela::model::Constant &constant);
 
 private:

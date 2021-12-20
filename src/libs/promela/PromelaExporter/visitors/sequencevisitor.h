@@ -22,11 +22,28 @@
 #include <promela/PromelaModel/sequence.h>
 
 namespace promela::exporter {
+/**
+ * @brief Visitor for @link{::promela::model::Sequence}
+ */
 class SequenceVisitor final
 {
 public:
+    /**
+     * @brief Constructor
+     *
+     * @param strean stream to append exported sequence
+     * @param baseIndent base identation unit for whole exported model
+     * @param sequenceIndent special indent unit for sequences
+     * @param indent current indent
+     */
     SequenceVisitor(QTextStream &stream, QString baseIndent, QString sequenceIndent, QString indent);
 
+    /**
+     * @brief Visit Sequence
+     *
+     * @param sequence sequence to visit
+     * @param useSequenceIndent if true the indent for first element will be sequenceIndent
+     */
     void visit(const ::promela::model::Sequence &sequence, bool useSequenceIndent = false);
 
 private:
