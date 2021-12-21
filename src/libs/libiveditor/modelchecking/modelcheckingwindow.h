@@ -55,9 +55,6 @@ private Q_SLOTS:
     void on_treeWidget_results_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void convertToObs();
     void addProperty();
-    void addBSC();
-    void addMSC();
-    void addOBS();
     void addSubtypes();
     void deleteSubtypes();
     void deleteProperty();
@@ -69,6 +66,7 @@ private:
     QString propertiesPath;
     QString subtypesPath;
     QString outputPath;
+    QString projectDir;
 
     QMenu* contextMenuPropertiesTop;
     QMenu* contextMenuProperties;

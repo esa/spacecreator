@@ -43,7 +43,8 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     d->ui->setupUi(this);
     d->document = document;
 
-    // Set paths for properties, subtypes and results/oputputs
+    // Set paths for project, properties, subtypes and results/oputputs
+    this->projectDir = projectDir;
     this->propertiesPath =  projectDir + "/work/modelchecking/properties";
     this->subtypesPath =  projectDir + "/work/modelchecking/subtypes";
     this->outputPath = projectDir + "/work/build/modelchecking/output";
@@ -51,24 +52,24 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     // Define right-click menus and set menu policy
     this->contextMenuPropertiesTop = new QMenu(d->ui->treeWidget_properties);
     this->contextMenuProperties = new QMenu(d->ui->treeWidget_properties);
-    this->contextMenuPropertiesFile = new QMenu(d->ui->treeWidget_properties);
     this->contextMenuPropertiesMSCFile = new QMenu(d->ui->treeWidget_properties);
+    this->contextMenuPropertiesFile = new QMenu(d->ui->treeWidget_properties);
     this->contextMenuSubtypes = new QMenu(d->ui->treeWidget_subtyping);
     this->contextMenuSubtypesFile = new QMenu(d->ui->treeWidget_subtyping);
     d->ui->treeWidget_properties->setContextMenuPolicy(Qt::CustomContextMenu);
     d->ui->treeWidget_subtyping->setContextMenuPolicy(Qt::CustomContextMenu);
     QAction *newProperty = this->contextMenuPropertiesTop->addAction("New property");
-    QAction *deletePropertyDir = this->contextMenuProperties->addAction("Delete property");
+    QAction *deletePropertyDir = this->contextMenuProperties->addAction("Delete property folder");
     QAction *MSC2OBS = this->contextMenuPropertiesMSCFile->addAction("Convert MSC to Observer");
-    QAction *deleteProperty = this->contextMenuPropertiesFile->addAction("Delete property");
-    QAction *deleteMSC = this->contextMenuPropertiesMSCFile->addAction("Delete property");
+    QAction *deleteMSC = this->contextMenuPropertiesMSCFile->addAction("Delete property file");
+    QAction *deletePropertyFile = this->contextMenuPropertiesFile->addAction("Delete property file");
     QAction *newSubtypes = this->contextMenuSubtypes->addAction("New subtypes");
     QAction *deleteSubtypes = this->contextMenuSubtypesFile->addAction("Delete subtypes");
     connect(newProperty, SIGNAL(triggered()), this, SLOT(addProperty()));
     connect(deletePropertyDir, SIGNAL(triggered()), this, SLOT(deleteProperty()));
     connect(MSC2OBS, SIGNAL(triggered()), this, SLOT(convertToObs()));
-    connect(deleteProperty, SIGNAL(triggered()), this, SLOT(deleteProperty()));
     connect(deleteMSC, SIGNAL(triggered()), this, SLOT(deleteProperty()));
+    connect(deletePropertyFile, SIGNAL(triggered()), this, SLOT(deleteProperty()));
     connect(newSubtypes, SIGNAL(triggered()), this, SLOT(addSubtypes()));
     connect(deleteSubtypes, SIGNAL(triggered()), this, SLOT(deleteSubtypes()));
 
@@ -79,14 +80,14 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     d->ui->treeWidget_results->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     // Build properties tree view
-    QFileInfo fileInfo(this->propertiesPath);
+    QFileInfo propertiesFileInfo(this->propertiesPath);
     QStringList fileColumn;
-    fileColumn.append(fileInfo.fileName());
-    QTreeWidgetItem *dir = new QTreeWidgetItem(fileColumn);
-    dir->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
-    dir->setCheckState(0, Qt::Unchecked);
-    d->ui->treeWidget_properties->addTopLevelItem(dir);
-    listProperties(dir, fileInfo);
+    fileColumn.append(propertiesFileInfo.fileName());
+    QTreeWidgetItem *propertiesDirWidgetItem = new QTreeWidgetItem(fileColumn);
+    propertiesDirWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
+    propertiesDirWidgetItem->setCheckState(0, Qt::Unchecked);
+    d->ui->treeWidget_properties->addTopLevelItem(propertiesDirWidgetItem);
+    listProperties(propertiesDirWidgetItem, propertiesFileInfo);
 
     // Build subtyping tree view
     QFileInfo fileInfo2(this->subtypesPath);
@@ -126,38 +127,38 @@ ModelCheckingWindow::~ModelCheckingWindow()
     d = nullptr;
 }
 
-void ModelCheckingWindow::listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent) {
+void ModelCheckingWindow::listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parentFileInfo) {
     QDir dir;
-    dir.setPath(parent.filePath());
+    dir.setPath(parentFileInfo.filePath());
     dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoSymLinks);
     dir.setSorting(QDir::DirsFirst | QDir::Name);
 
     const QFileInfoList fileList = dir.entryInfoList();
 
     for (int i = 0; i < fileList.size(); i++) {
-        QFileInfo fileInfo = fileList.at(i);
-        QStringList fileColumn;
-        fileColumn.append(fileInfo.fileName());
-        if (fileInfo.fileName() == "." || fileInfo.fileName() == ".." ); // nothing
-        else if(fileInfo.isDir()) { // is directory
-            QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
-            child->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
-            child->setCheckState(0, Qt::Unchecked);
-            parentWidgetItem->addChild(child);
-            listProperties(child, fileInfo);
+        QFileInfo childFileInfo = fileList.at(i);
+        QStringList childWidgetInfo;
+        childWidgetInfo.append(childFileInfo.fileName());
+        if (childFileInfo.fileName() == "." || childFileInfo.fileName() == ".." ); // nothing
+        else if(childFileInfo.isDir()) { // is directory
+            QTreeWidgetItem *childWidgetItem = new QTreeWidgetItem(childWidgetInfo);
+            childWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
+            childWidgetItem->setCheckState(0, Qt::Unchecked);
+            parentWidgetItem->addChild(childWidgetItem);
+            listProperties(childWidgetItem, childFileInfo);
         }
         else { // is file
-                if (fileInfo.suffix() == "msc" || fileInfo.suffix() == "pr"){
-                    fileColumn.append(fileInfo.filePath());
-                    QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
-                    if (fileInfo.suffix() == "msc") {
-                        child->setIcon(0, this->style()->standardIcon(QStyle::SP_MediaPlay));
-                    } else {
-                        child->setIcon(0, this->style()->standardIcon(QStyle::SP_FileDialogContentsView));
-                    }
-                    child->setCheckState(0, Qt::Unchecked);
-                    parentWidgetItem->addChild(child);
+            if (childFileInfo.suffix() == "msc" || childFileInfo.suffix() == "pr"){
+                childWidgetInfo.append(childFileInfo.filePath());
+                QTreeWidgetItem *childWidgetItem = new QTreeWidgetItem(childWidgetInfo);
+                if (childFileInfo.suffix() == "msc") {
+                    childWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_MediaPlay));
+                } else {
+                    childWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_FileDialogContentsView));
                 }
+                childWidgetItem->setCheckState(0, Qt::Unchecked);
+                parentWidgetItem->addChild(childWidgetItem);
+            }
         }
     }
 }
@@ -405,109 +406,52 @@ void ModelCheckingWindow::convertToObs()
 
 void ModelCheckingWindow::addProperty()
 {
-    //if (d->ui->treeWidget_properties->currentItem() == nullptr) return;
-    bool ok;
-    QString propertyType;
-    //if (type == "Any"){
-        QStringList propertyTypes = { "Boolean Stop Condition - LTL", "Boolean Stop Condition - Observer", "Message Sequence Chart", "Observer" };
-        propertyType = QInputDialog::getItem(this, tr("New Property"), tr("Property type:"), propertyTypes, 0, false, &ok);
-    //} else {
-    //    propertyType = type;
-    //    ok = true;
-    //}
+    bool ok1;
+    QString propertyType = "";
+    QStringList propertyTypes = { "Boolean Stop Condition - LTL", "Boolean Stop Condition - Observer", "Message Sequence Chart", "Observer" };
+    propertyType = QInputDialog::getItem(this, tr("New Property"), tr("Property type:"), propertyTypes, 0, false, &ok1);
 
-
-    if (ok && !propertyType.isEmpty()){
-
-        //TODO change below
-        this->addOBS();
-        return;
-
-        //if (propertyType == "Boolean Stop Condition - LTL") return;
-        QString extenxion = propertyType == "Message Sequence Chart" ? "msc" : propertyType == "Boolean Stop Condition - LTL" ? "ltl" : "pr";
+    if (ok1 && !propertyType.isEmpty()){
+        QString makeRule = "";
+        if(propertyType == "Observer") {makeRule = "create-obs";}
+        if(propertyType == "Message Sequence Chart") {makeRule = "create-msc";}
+        if(propertyType == "Boolean Stop Condition - Observer") {makeRule = "create-bsc";}
+        if(propertyType == "Boolean Stop Condition - LTL") {qDebug("LTL not yet supported"); return;}
+        bool ok2;
         QString label = "Property name:                                                                                         ";
-        QString fileName = QInputDialog::getText(this, "New " + propertyType,
+        QString propertyName = QInputDialog::getText(this, "New " + propertyType,
                                                 label, QLineEdit::Normal,
-                                                "new-property." + extenxion, &ok);
-        if (ok && !fileName.isEmpty()){
-            QString testMessage;
-            testMessage = "creating property " + fileName + " of type " + propertyType;
-            QProcess *process = new QProcess(this);
-            QString cmd;
-            cmd = "xterm -hold -e echo '" + testMessage + "'";
-            process->start(cmd);
+                                                "new-property", &ok2);
+
+        if (ok2 && !propertyName.isEmpty()){
+            // CHECK FILE NAME
+            // check if file with same name exists already, append suffix in that case
+            QFile file;
+            QString filePath = this->propertiesPath + "/" + propertyName;
+            file.setFileName(filePath);
+            while(file.exists())
+            {
+                //qDebug("That name already exists!");
+                filePath = filePath + "-another";
+                propertyName = propertyName + "-another";
+                file.setFileName(filePath);
+            }
+            // CALL MAKE RULE
+            QString makeCall = "make " + makeRule + " NAME=" + propertyName;
+            QProcess *makeCallerProcess = new QProcess(this);
+            //makeCallerProcess->setWorkingDirectory(this->projectDir+"/");
+            QString qDirAppPath = QDir::currentPath();
+            QDir::setCurrent(this->projectDir+"/");
+            if (makeCallerProcess->execute(makeCall) != 0) {
+                // TODO report in dialog or console instead
+                qDebug("error executing make: %s (from %s)", qPrintable(makeCall), qPrintable(QDir::currentPath()));
+                return;
+            } else {
+                // TODO ADD NEW TREE NODE or REFRESH TREEVIEW
+            }
+            QDir::setCurrent(qDirAppPath);
         }
     }
-}
-
-void ModelCheckingWindow::addBSC()
-{
-        bool ok;
-        QString propertyType = "Boolean Stop Condition - Observer";
-        QString extenxion = "pr";
-        QString label = "Property name:                                                                                         ";
-        QString fileName = QInputDialog::getText(this, "New " + propertyType,
-                                                label, QLineEdit::Normal,
-                                                "new-property." + extenxion, &ok);
-        if (ok && !fileName.isEmpty()){
-            // Call make rule
-            // TODO use name from input (name shall not have the extension!)
-            if (QProcess::execute("make create-bsc NAME=my-new-bsc") != 0) return;
-
-            /*QString testMessage;
-            testMessage = "creating property " + fileName + " of type " + propertyType;
-            QProcess *process = new QProcess(this);
-            QString cmd;
-            cmd = "xterm -hold -e echo '" + testMessage + "'";
-            process->start(cmd);*/
-        }
-}
-
-void ModelCheckingWindow::addMSC()
-{
-        bool ok;
-        QString propertyType = "Message Sequence Chart";
-        QString extenxion = "msc";
-        QString label = "Property name:                                                                                         ";
-        QString fileName = QInputDialog::getText(this, "New " + propertyType,
-                                                label, QLineEdit::Normal,
-                                                "new-property." + extenxion, &ok);
-        if (ok && !fileName.isEmpty()){
-            // Call make rule
-            // TODO use name from input without extention, but add suffix if already existing
-            if (QProcess::execute("make create-msc NAME=my-new-msc") != 0) return;
-
-            /*QString testMessage;
-            testMessage = "creating property " + fileName + " of type " + propertyType;
-            QProcess *process = new QProcess(this);
-            QString cmd;
-            cmd = "xterm -hold -e echo '" + testMessage + "'";
-            process->start(cmd);*/
-        }
-}
-
-void ModelCheckingWindow::addOBS()
-{
-        bool ok;
-        QString propertyType = "Observer";
-        QString extenxion = "pr";
-        QString label = "Property name:                                                                                         ";
-        QString fileName = QInputDialog::getText(this, "New " + propertyType,
-                                                label, QLineEdit::Normal,
-                                                "new-property." + extenxion, &ok);
-        if (ok && !fileName.isEmpty()){
-            // Call make rule
-            if (QProcess::execute("make create-obs NAME=my-new-obs") != 0) return;
-
-            /*QString testMessage;
-            testMessage = "creating property " + fileName + " of type " + propertyType;
-            QProcess *process = new QProcess(this);
-            QString cmd;
-            cmd = "xterm -hold -e echo '" + testMessage + "'";
-            process->start(cmd);*/
-        }
-
-        //TODO add node to treeview
 }
 
 void ModelCheckingWindow::addSubtypes()
@@ -604,10 +548,15 @@ void ModelCheckingWindow::deleteSubtypes()
     }
 }
 
+// TODO write code documentation
+/*!
+ * \brief Deletes a property file or property directory/folder.
+ */
 void ModelCheckingWindow::deleteProperty()
 {
     QFileInfo fileInfo(d->ui->treeWidget_properties->currentItem()->text(0));
     QString fileOrDir, parent;
+    // check if what is to be deleted is a file or a directory/folder
     if (d->ui->treeWidget_properties->currentItem()->text(1) == ""){ // is directory
        fileOrDir = "folder";
     }
@@ -616,27 +565,27 @@ void ModelCheckingWindow::deleteProperty()
         parent = d->ui->treeWidget_properties->currentItem()->parent()->text(0);
     }
 
+    // confirm deletion with user
     int ret = QMessageBox::warning(this, tr("Delete property"),
                                    "Do you confirm you want to delete property " + fileOrDir + " " + fileInfo.fileName() + "?",
                                    QMessageBox::Yes | QMessageBox::No);
 
     if (ret == QMessageBox::Yes){
-        if (d->ui->treeWidget_properties->currentItem()->text(1) == ""){ // is directory
+        if (fileOrDir == "folder"){ // is directory
             if (QProcess::execute("rm -r " + this->propertiesPath + "/" + fileInfo.fileName()) != 0) {
                 qDebug("error executing rm");
                 return;
             }
         }
-        else{ // if file
+        else{ // is file
             if (QProcess::execute("rm " + this->propertiesPath + "/" + parent + "/" + fileInfo.fileName()) != 0) {
                 qDebug("error executing rm");
                 return;
             }
         }
+        // delete tree node
+        d->ui->treeWidget_properties->currentItem()->parent()->removeChild(d->ui->treeWidget_properties->currentItem());
     }
-
-    // delete tree node
-    d->ui->treeWidget_properties->currentItem()->parent()->removeChild(d->ui->treeWidget_properties->currentItem());
 }
 
 void ModelCheckingWindow::on_treeWidget_properties_customContextMenuRequested(const QPoint &pos)
