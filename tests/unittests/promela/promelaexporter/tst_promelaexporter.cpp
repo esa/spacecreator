@@ -457,7 +457,7 @@ void tst_PromelaExporter::testProctypeElements()
             std::make_unique<ProctypeElement>(ChannelSend(VariableRef("channel1"), params));
     std::unique_ptr<ProctypeElement> channelRecv =
             std::make_unique<ProctypeElement>(ChannelRecv(VariableRef("channel1"), params));
-    std::unique_ptr<ProctypeElement> inlineCall = std::make_unique<ProctypeElement>(InlineCall("fn"));
+    std::unique_ptr<ProctypeElement> inlineCall = std::make_unique<ProctypeElement>(InlineCall("fn", {}));
 
     Sequence initSequence;
     initSequence.appendElement(std::move(assignment));

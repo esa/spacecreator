@@ -21,8 +21,9 @@
 
 namespace promela::model {
 
-InlineDef::InlineDef(QString name, Sequence sequence)
+InlineDef::InlineDef(QString name, const QList<QString> &arguments, Sequence sequence)
     : m_name(std::move(name))
+    , m_arguments(arguments)
     , m_sequence(std::move(sequence))
 {
 }
@@ -47,4 +48,13 @@ void InlineDef::setSequence(Sequence sequence)
     m_sequence = std::move(sequence);
 }
 
+const QList<QString> &InlineDef::getArguments() const noexcept
+{
+    return m_arguments;
+}
+
+void InlineDef::setArguments(const QList<QString> &arguments)
+{
+    m_arguments = arguments;
+}
 }

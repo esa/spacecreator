@@ -20,12 +20,18 @@
 #include "inlinecall.h"
 
 namespace promela::model {
-InlineCall::InlineCall(QString name)
+InlineCall::InlineCall(QString name, const QList<VariableRef> &arguments)
     : m_name(std::move(name))
+    , m_arguments(arguments)
 {
 }
 const QString &InlineCall::getName() const noexcept
 {
     return m_name;
+}
+
+const QList<VariableRef> &InlineCall::getArguments() const noexcept
+{
+    return m_arguments;
 }
 }
