@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "ivconnectionlayertype.h"
 #include "ivinterface.h"
 #include "ivobject.h"
 #include "vemodel.h"
@@ -80,6 +81,9 @@ public:
     QVector<IVConnection *> getConnectionsForIface(const shared::Id &id) const;
 
     QVector<IVConnection *> getConnectionsForFunction(const shared::Id &id) const;
+
+    auto setConnectionLayersModel(IVModel *layersModel) -> void;
+    auto getConnectionLayerByName(const QString &name) const -> IVConnectionLayerType *;
 
     QList<IVObject *> visibleObjects() const;
     QList<IVObject *> visibleObjects(shared::Id rootId) const;

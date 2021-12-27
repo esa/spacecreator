@@ -37,6 +37,7 @@ struct IVModelPrivate {
     shared::Id m_rootObjectId;
     QList<IVObject *> m_visibleObjects;
     QVector<QString> m_headerTitles;
+    IVModel *m_layersModel;
 };
 
 IVModel::IVModel(shared::PropertyTemplateConfig *dynPropConfig, IVModel *sharedModel, QObject *parent)
@@ -45,6 +46,7 @@ IVModel::IVModel(shared::PropertyTemplateConfig *dynPropConfig, IVModel *sharedM
 {
     d->m_dynPropConfig = dynPropConfig;
     d->m_sharedTypesModel = sharedModel;
+    d->m_layersModel = nullptr;
 }
 
 IVModel::~IVModel() {}
@@ -332,6 +334,21 @@ QVector<IVConnection *> IVModel::getConnectionsForIface(const shared::Id &id) co
         }
     }
     return result;
+}
+
+void IVModel::setConnectionLayersModel(IVModel *layersModel)
+{
+    d->m_layersModel = layersModel;
+}
+
+IVConnectionLayerType *IVModel::getConnectionLayerByName(const QString &name) const
+{
+    for (auto *layer : this->allObjectsByType<IVConnectionLayerType>()) {
+        if (layer->name().compare(name)) {
+            return layer;
+        }
+    }
+    return nullptr;
 }
 
 QVector<IVConnection *> IVModel::getConnectionsForFunction(const shared::Id &id) const

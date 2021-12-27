@@ -41,11 +41,14 @@ IVInterface::CreationInfo::CreationInfo(IVModel *model, IVFunctionType *function
     , id(id)
     , parameters(parameters)
     , kind(kind)
-    , layer(layer == nullptr ? IVConnectionLayerType::getDefaultConnectionLayer() : layer)
+    , layer(layer)
     , name(name)
     , policy(policy)
     , toBeCloned(policy == Policy::Clone ? source : nullptr)
 {
+    if (this->layer == nullptr && this->model != nullptr) {
+        this->layer = model->getConnectionLayerByName(IVConnectionLayerType::DefaultLayerName);
+    }
 }
 
 QVariantList IVInterface::CreationInfo::toVarList() const
@@ -237,8 +240,9 @@ QString IVInterface::ifaceLabel() const
 
 IVConnectionLayerType *IVInterface::layer() const
 {
-    return IVConnectionLayerType::getConnectionLayerByName(
-            entityAttributeValue(meta::Props::token(meta::Props::Token::layer)).toString());
+    return model() != nullptr ? model()->getConnectionLayerByName(
+                                        entityAttributeValue(meta::Props::token(meta::Props::Token::layer)).toString())
+                              : nullptr;
 }
 
 bool IVInterface::setLayer(IVConnectionLayerType *layer)

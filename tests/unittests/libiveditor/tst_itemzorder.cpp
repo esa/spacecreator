@@ -234,7 +234,6 @@ void tst_ItemZOrder::testItem_ConnectionLayer()
     ++m_itemTypesTested;
     QVERIFY(layer->name().compare("default") == 0);
     delete layer;
-    QVERIFY(ivm::IVConnectionLayerType::connectionLayers.isEmpty());
 }
 
 void tst_ItemZOrder::testItem_CheckCoverage()

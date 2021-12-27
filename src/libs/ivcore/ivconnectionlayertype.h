@@ -35,19 +35,10 @@ public:
     ~IVConnectionLayerType();
     inline QString name() const { return m_name; };
     auto rename(const QString &name) -> void;
-
     static const QString DefaultLayerName;
-    static QVector<IVConnectionLayerType *> connectionLayers;
-
-    static auto getConnectionLayerByName(const QString &name) -> IVConnectionLayerType *;
-    static auto renameConnectionLayer(const QString &oldName, const QString &newName) -> IVConnectionLayerType *;
-
-    static auto addDefaultConnectionLayer(IVObject *parent) -> IVConnectionLayerType *;
-    static auto getDefaultConnectionLayer() -> IVConnectionLayerType *;
 
 private:
     QString m_name;
-    QList<IVObject *> m_objects;
 };
 
 } // namespace ivm
