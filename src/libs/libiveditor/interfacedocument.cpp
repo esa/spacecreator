@@ -245,12 +245,17 @@ ivm::IVPropertyTemplateConfig *InterfaceDocument::dynPropConfig() const
 
 void InterfaceDocument::updateLayersModel() const
 {
-    if (ivm::IVConnectionLayerType::connectionLayers.isEmpty()) {
-        ivm::IVConnectionLayerType::addDefaultConnectionLayer(layersModel()->rootObject());
-    }
-    for (auto &layer : ivm::IVConnectionLayerType::connectionLayers) {
-        if (!layersModel()->allObjectsByType<ivm::IVConnectionLayerType>().contains(layer)) {
-            layersModel()->addObject(layer);
+    if (layersModel() != nullptr) {
+        auto layers = layersModel()->allObjectsByType<ivm::IVConnectionLayerType>();
+        bool isDefault = false;
+        for (auto *layer : layers) {
+            if (layer->name().compare(ivm::IVConnectionLayerType::DefaultLayerName) == 0) {
+                isDefault = true;
+            }
+        }
+        if (!isDefault) {
+            layersModel()->addObject(new ivm::IVConnectionLayerType(
+                    ivm::IVConnectionLayerType::DefaultLayerName, layersModel()->rootObject(), shared::createId()));
         }
     }
 }
@@ -673,6 +678,7 @@ void InterfaceDocument::setObjects(const QVector<ivm::IVObject *> &objects)
 {
     d->objectsModel->initFromObjects(objects);
     d->objectsModel->setRootObject({});
+    d->objectsModel->setConnectionLayersModel(d->layersModel);
 }
 
 void InterfaceDocument::onAttributesManagerRequested()
