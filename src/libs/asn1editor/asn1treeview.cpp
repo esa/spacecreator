@@ -84,9 +84,7 @@ void Asn1TreeView::setAsn1Value(const QVariantMap &asn1Value)
         setChildValue(nameItem, asn1Value["seqofvalue"], seqOfSize);
     } else if (asnType.startsWith("choice", Qt::CaseInsensitive)) {
         QString choiceValue = asn1Value["choice"].toMap()["name"].toString();
-
         m_ItemModel->item(row, MODEL_VALUE_INDEX)->setText(choiceValue);
-
         setChildValue(nameItem, asn1Value["choice"], -1, itemChoiceIndex(nameItem, choiceValue));
     } else if (asnType.startsWith("integer", Qt::CaseInsensitive) || asnType.startsWith("double", Qt::CaseInsensitive)
             || asnType.startsWith("real", Qt::CaseInsensitive) || asnType.startsWith("string", Qt::CaseInsensitive)
@@ -175,6 +173,7 @@ void Asn1TreeView::setChildRowValue(const QStandardItem *rootItem, int childInde
     const QStandardItem *childItem = rootItem->child(childIndex, MODEL_TYPE_INDEX);
     const QString asnType = childItem ? rootItem->child(childIndex, MODEL_TYPE_INDEX)->text() : "";
     auto *child = rootItem->child(childIndex, MODEL_VALUE_INDEX);
+    const QString defaultValue = child->data(DEFAULT_ROLE).toString();
 
     if (asnType.startsWith("integer", Qt::CaseInsensitive) || asnType.startsWith("double", Qt::CaseInsensitive)
             || asnType.startsWith("real", Qt::CaseInsensitive) || asnType.startsWith("string", Qt::CaseInsensitive)
@@ -182,11 +181,11 @@ void Asn1TreeView::setChildRowValue(const QStandardItem *rootItem, int childInde
             || asnType.startsWith("BIT STRING", Qt::CaseInsensitive)
             || asnType.startsWith("OCTET STRING", Qt::CaseInsensitive)
             || asnType.startsWith("IA5String", Qt::CaseInsensitive)
-            || asnType.startsWith("NumericString", Qt::CaseInsensitive))
+            || asnType.startsWith("NumericString", Qt::CaseInsensitive)) {
         child->setText(asn1Value.toMap()["value"].toString());
-    else if (asnType.startsWith("bool", Qt::CaseInsensitive))
+    } else if (asnType.startsWith("bool", Qt::CaseInsensitive)) {
         child->setText(asn1Value.toMap()["value"].toString().toLower());
-    else if (asnType.startsWith("sequenceOf", Qt::CaseInsensitive)
+    } else if (asnType.startsWith("sequenceOf", Qt::CaseInsensitive)
             || asnType.startsWith("sequence of", Qt::CaseInsensitive)) {
         int seqOfSize = asn1Value.toMap()["seqofvalue"].toList().count();
         child->setText(QString::number(seqOfSize));
@@ -198,6 +197,15 @@ void Asn1TreeView::setChildRowValue(const QStandardItem *rootItem, int childInde
         child->setText(choiceValue);
         setChildRowValue(rootItem->child(childIndex), itemChoiceIndex(rootItem->child(childIndex), choiceValue),
                 asn1Value.toMap()["choice"]);
+    }
+    if (child->text().isEmpty()) {
+        if (!defaultValue.isEmpty()) {
+            child->setText(defaultValue);
+        }
+    } else if (auto present = rootItem->child(childIndex, MODEL_IS_PRESENT_INDEX)) {
+        if (present->isCheckable()) {
+            present->setCheckState(Qt::Checked);
+        }
     }
 }
 
@@ -307,17 +315,17 @@ QString Asn1TreeView::getItemValue(const QStandardItem *item, const QString &sep
     QString asnValue;
     modelIndex = itemIndex.sibling(item->row(), MODEL_VALUE_INDEX);
     if (modelIndex.isValid()) {
-        if (modelIndex.data(DEFAULT_ROLE).toBool()) {
-            return {};
-        }
         asnValue = model->itemFromIndex(modelIndex)->text();
     }
+
     if (asnValue.isEmpty()) {
-        const bool isOptional =
-                itemIndex.sibling(item->row(), MODEL_IS_OPTIONAL_INDEX).data(Qt::CheckStateRole).value<Qt::CheckState>()
-                == Qt::Checked;
-        if (isOptional) {
-            return {};
+        auto presentIndex = itemIndex.sibling(item->row(), MODEL_IS_PRESENT_INDEX);
+        if (auto presentItem = model->itemFromIndex(presentIndex)) {
+            if (presentItem->isCheckable()) {
+                if (presentItem->checkState() == Qt::Unchecked) {
+                    return {};
+                }
+            }
         }
     }
 
