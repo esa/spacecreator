@@ -314,7 +314,9 @@ bool InterfaceDocument::loadComponentModel(ivm::IVModel *model, const QString &p
         return false;
     }
 
-    model->addObjects(parser.parsedObjects());
+    auto objects = parser.parsedObjects();
+    ivm::IVObject::sortObjectList(objects);
+    model->addObjects(objects);
     shared::ErrorHub::clearCurrentFile();
     return true;
 }

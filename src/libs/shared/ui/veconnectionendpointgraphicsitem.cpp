@@ -23,8 +23,6 @@
 #include "veobject.h"
 #include "verectgraphicsitem.h"
 
-static const int kSiblingMinDistance = 8;
-
 namespace shared {
 namespace ui {
 
@@ -109,6 +107,7 @@ VEConnectionEndPointGraphicsItem::prepareChangeCoordinatesCommandParams() const
 
 void VEConnectionEndPointGraphicsItem::adjustItem()
 {
+    static const qreal kSiblingMinDistance = shared::graphicsviewutils::kSiblingMinDistance;
     if (!parentItem()) {
         return;
     }
@@ -150,11 +149,6 @@ void VEConnectionEndPointGraphicsItem::adjustItem()
             }
         }
     }
-}
-
-qreal VEConnectionEndPointGraphicsItem::minSiblingDistance()
-{
-    return kSiblingMinDistance;
 }
 
 bool VEConnectionEndPointGraphicsItem::doLayout()

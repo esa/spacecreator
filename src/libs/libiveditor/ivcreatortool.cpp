@@ -596,11 +596,10 @@ void IVCreatorTool::handleFunction(QGraphicsScene *scene, const QPointF &pos)
         if (!shared::graphicsviewutils::isBounded(m_previewItem, itemSceneRect))
             return;
 
-        if (auto parentItem = m_previewItem->parentItem()) {
+        ivm::IVFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
+        if (parentObject && parentObject->id() != model()->objectsModel()->rootObjectId()) {
             itemSceneRect = {};
         }
-
-        ivm::IVFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
         const shared::Id id = shared::createId();
         auto cmd = new cmd::CmdFunctionItemCreate(model()->objectsModel(), parentObject, itemSceneRect, QString(), id);
         if (m_doc->commandsStack()->push(cmd)) {

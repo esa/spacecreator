@@ -58,7 +58,6 @@ public:
     QString prepareTooltip() const override;
 
     qreal maxWidth() const;
-    static qreal baseLength();
 
 public Q_SLOTS:
     void updateLabel();

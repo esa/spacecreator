@@ -58,12 +58,19 @@ private:
     void undoAsnFileImport();
     QString relativePathForObject(const ivm::IVObject *object) const;
 
+    void prepareRectangularType(
+            ivm::IVObject *obj, const QPointF &offset, QRectF &parentRect, QList<QRectF> &existingRects);
+    void prepareEndPointType(ivm::IVObject *obj, const QPointF &offset);
+    void prepareConnectionType(ivm::IVObject *obj, const QVector<ivm::IVObject *> &objects);
+    QList<QRectF> existingModelRects() const;
+
     Asn1Acn::Asn1SystemChecks *m_asn1Checks;
     QPointer<ivm::IVModel> m_model;
     QPointer<ivm::IVModel> m_importModel;
     QPointer<ivm::IVFunctionType> m_parent;
     QVector<QPointer<ivm::IVObject>> m_rootEntities;
     QVector<QPointer<ivm::IVObject>> m_importedEntities;
+    QHash<QString, QString> m_renamedFunctions;
 
     QString m_destPath;
     QScopedPointer<QTemporaryDir> m_tempDir;

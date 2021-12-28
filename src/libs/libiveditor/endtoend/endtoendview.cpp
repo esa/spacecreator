@@ -31,6 +31,7 @@
 #include "ivconnection.h"
 #include "ivconnectionchain.h"
 #include "ivconnectiongroup.h"
+#include "ivcoreutils.h"
 #include "ivfunction.h"
 #include "ivinterfacegroup.h"
 #include "ivmodel.h"
@@ -179,7 +180,7 @@ bool EndToEndView::refreshView()
     qDeleteAll(d->scene->items());
 
     // Get the visible non-nested objects
-    QList<ivm::IVObject *> objects = d->document->objectsModel()->visibleObjects({});
+    QVector<ivm::IVObject *> objects = d->document->objectsModel()->visibleObjects({}).toVector();
     ivm::IVObject::sortObjectList(objects);
 
     const QList<ivm::IVConnectionChain *> chains = ivm::IVConnectionChain::build(*d->document->objectsModel());
@@ -201,8 +202,8 @@ bool EndToEndView::refreshView()
     QHash<shared::Id, QGraphicsItem *> items;
     shared::ui::VEInteractiveObject *rootItem = nullptr;
     for (auto obj : qAsConst(objects)) {
-        const int lowestLevel = gi::nestingLevel(d->document->objectsModel()->rootObject()) + 1;
-        const int objectLevel = gi::nestingLevel(obj);
+        const int lowestLevel = ivm::utils::nestingLevel(d->document->objectsModel()->rootObject()) + 1;
+        const int objectLevel = ivm::utils::nestingLevel(obj);
         const bool isRootOrRootChild = obj->id() == d->document->objectsModel()->rootObjectId()
                 || (d->document->objectsModel()->rootObject()
                            && obj->parentObject() == d->document->objectsModel()->rootObject());

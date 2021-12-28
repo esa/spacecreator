@@ -49,7 +49,6 @@ public:
 
     void adjustItem();
 
-    static qreal minSiblingDistance();
     bool doLayout() override;
     virtual QPainterPath ifaceShape() const;
 

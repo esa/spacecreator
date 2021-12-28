@@ -30,6 +30,7 @@
 #include "ivinterfacegraphicsitem.h"
 #include "ivnamevalidator.h"
 #include "ui/grippointshandler.h"
+#include "ivcoreutils.h"
 
 #include <QGuiApplication>
 #include <QPainter>
@@ -73,7 +74,7 @@ void IVConnectionGraphicsItem::rebuildLayout()
 {
     if (!m_startItem || !m_startItem->isVisible() || !m_endItem || !m_endItem->isVisible() || !entity()
             || !entity()->isVisible()
-            || (gi::nestingLevel(entity()) < gi::kNestingVisibilityLevel && !entity()->isRootObject())) {
+            || (ivm::utils::nestingLevel(entity()) < gi::kNestingVisibilityLevel && !entity()->isRootObject())) {
         setVisible(false);
         return;
     }

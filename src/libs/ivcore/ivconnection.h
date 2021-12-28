@@ -79,10 +79,17 @@ public:
         QString m_interfaceName;
         IVInterface::InterfaceType m_ifaceDirection;
         inline bool isReady() const { return !m_functionName.isEmpty() && !m_interfaceName.isEmpty(); }
+        inline void reset()
+        {
+            m_functionName.clear();
+            m_interfaceName.clear();
+        }
     };
 
-    void setDelayedStart(IVConnection::EndPointInfo *start);
-    void setDelayedEnd(IVConnection::EndPointInfo *end);
+    void setDelayedStart(const IVConnection::EndPointInfo &info);
+    const IVConnection::EndPointInfo &delayedStart() const;
+    void setDelayedEnd(const EndPointInfo &end);
+    const IVConnection::EndPointInfo &delayedEnd() const;
 
     enum class ConnectionType
     {
@@ -118,6 +125,9 @@ private:
     void handleInheritPIChange(bool enabled);
 
     void clearPostponedEndpoints();
+
+    IVObject *findFunction(const IVConnection::EndPointInfo &info) const;
+    IVInterface *findIface(const IVConnection::EndPointInfo &info, IVObject *parentObject) const;
 };
 
 }
