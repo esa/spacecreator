@@ -572,7 +572,7 @@ IVVisualizationModelBase *InterfaceDocument::layerVisualisationModel() const
     if (d->layerSelect == nullptr) {
         d->layerSelect = new IVVisualizationModelBase(
                 layersModel(), d->commandsStack, shared::DropData::Type::None, const_cast<InterfaceDocument *>(this));
-        auto *title = new QStandardItem(tr("IV Connection Layers"));
+        auto *title = new QStandardItem(tr("Connection Layers"));
         title->setTextAlignment(Qt::AlignCenter);
         d->layerSelect->setHorizontalHeaderItem(0, title);
     }

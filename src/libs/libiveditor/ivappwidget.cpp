@@ -384,7 +384,7 @@ void IVAppWidget::initSharedView()
 
 void IVAppWidget::initLayerView()
 {
-    ui->layerView->setObjectName(QLatin1String("IV Connection Layers"));
+    ui->layerView->setObjectName(QLatin1String("Connection Layers"));
     ui->layerView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     ui->layerView->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
     ui->layerView->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);

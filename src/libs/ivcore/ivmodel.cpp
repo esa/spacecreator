@@ -341,7 +341,7 @@ void IVModel::setConnectionLayersModel(IVModel *layersModel)
     d->m_layersModel = layersModel;
 }
 
-IVModel * IVModel::getConnectionLayersModel() const
+IVModel *IVModel::getConnectionLayersModel() const
 {
     return d->m_layersModel;
 }
