@@ -28,11 +28,52 @@
 namespace ive {
 namespace cmd {
 
-CmdConnectionLayerManage::CmdConnectionLayerManage(ivm::IVModel *model)
+CmdConnectionLayerManage::CmdConnectionLayerManage(ivm::IVModel *objectsModel)
     : shared::UndoCommand()
-    , m_model(model)
-    , m_parent(model != nullptr ? model->rootObject() : nullptr)
+    , m_objectsModel(objectsModel)
+    , m_parent(objectsModel != nullptr ? objectsModel->rootObject() : nullptr)
 {
+}
+
+ivm::IVConnectionLayerType *CmdConnectionLayerManage::createLayer()
+{
+    QString newName;
+    if (model() != nullptr && model()->getConnectionLayersModel() != nullptr) {
+        if (model()->getConnectionLayerByName(newName) == nullptr) {
+            model()->getConnectionLayersModel()->addObject(
+                    new ivm::IVConnectionLayerType(newName, m_parent, shared::createId()));
+        }
+    }
+    return model()->getConnectionLayerByName(newName);
+}
+
+ivm::IVConnectionLayerType *CmdConnectionLayerManage::renameLayer()
+{
+    QString oldName;
+    QString newName;
+    if (model() != nullptr) {
+        auto *layer = model()->getConnectionLayerByName(oldName);
+        layer->rename(newName);
+        return layer;
+    }
+    return nullptr;
+}
+
+bool CmdConnectionLayerManage::deleteLayer()
+{
+    QString name;
+    if (model() != nullptr && model()->getConnectionLayersModel() != nullptr) {
+        auto *layer = model()->getConnectionLayerByName(name);
+        if (layer != nullptr) {
+            return model()->getConnectionLayersModel()->removeObject(layer);
+        }
+    }
+    return false;
+}
+
+ivm::IVModel *CmdConnectionLayerManage::model() const
+{
+    return m_objectsModel;
 }
 
 }

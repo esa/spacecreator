@@ -900,11 +900,9 @@ void IVCreatorTool::handleConnectionLayer()
     m_toolType = ToolType::ConnectionLayer;
     auto *dialog = new ManageConnectionLayersDialog(m_view->window());
     if (dialog->exec() == QDialog::Accepted) {
-        auto *cmd = new cmd::CmdConnectionLayerManage(m_doc->layersModel());
+        auto *cmd = new cmd::CmdConnectionLayerManage(model()->objectsModel());
         m_doc->commandsStack()->push(cmd);
     }
-    dialog->deleteLater();
-    m_doc->updateLayersModel();
 }
 
 bool IVCreatorTool::warnConnectionPreview(const QPointF &pos)

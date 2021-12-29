@@ -83,6 +83,7 @@ public:
     QVector<IVConnection *> getConnectionsForFunction(const shared::Id &id) const;
 
     auto setConnectionLayersModel(IVModel *layersModel) -> void;
+    auto getConnectionLayersModel() const -> IVModel *;
     auto getConnectionLayerByName(const QString &name) const -> IVConnectionLayerType *;
 
     QList<IVObject *> visibleObjects() const;

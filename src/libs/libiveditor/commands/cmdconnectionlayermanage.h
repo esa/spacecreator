@@ -32,13 +32,22 @@ namespace cmd {
 class CmdConnectionLayerManage : public shared::UndoCommand
 {
 public:
-    CmdConnectionLayerManage(ivm::IVModel *model);
+    CmdConnectionLayerManage(ivm::IVModel *objectsModel);
 
     inline int id() const { return ManageConnectionLayer; };
 
+    auto createLayer() -> ivm::IVConnectionLayerType *;
+
+    auto renameLayer() -> ivm::IVConnectionLayerType *;
+
+    auto deleteLayer() -> bool;
+
+    auto model() const -> ivm::IVModel *;
+
 private:
-    ivm::IVModel *m_model;
+    ivm::IVModel *m_objectsModel;
     ivm::IVObject *m_parent;
 };
+
 }
 }

@@ -240,9 +240,11 @@ QString IVInterface::ifaceLabel() const
 
 IVConnectionLayerType *IVInterface::layer() const
 {
-    return model() != nullptr ? model()->getConnectionLayerByName(
-                                        entityAttributeValue(meta::Props::token(meta::Props::Token::layer)).toString())
-                              : nullptr;
+    if (model() != nullptr) {
+        return model()->getConnectionLayerByName(
+                entityAttributeValue(meta::Props::token(meta::Props::Token::layer)).toString());
+    }
+    return nullptr;
 }
 
 bool IVInterface::setLayer(IVConnectionLayerType *layer)

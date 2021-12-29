@@ -341,11 +341,18 @@ void IVModel::setConnectionLayersModel(IVModel *layersModel)
     d->m_layersModel = layersModel;
 }
 
+IVModel * IVModel::getConnectionLayersModel() const
+{
+    return d->m_layersModel;
+}
+
 IVConnectionLayerType *IVModel::getConnectionLayerByName(const QString &name) const
 {
-    for (auto *layer : this->allObjectsByType<IVConnectionLayerType>()) {
-        if (layer->name().compare(name)) {
-            return layer;
+    if (d->m_layersModel != nullptr) {
+        for (auto *layer : d->m_layersModel->allObjectsByType<IVConnectionLayerType>()) {
+            if (layer->name().compare(name)) {
+                return layer;
+            }
         }
     }
     return nullptr;
