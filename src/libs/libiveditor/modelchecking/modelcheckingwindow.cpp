@@ -27,6 +27,7 @@
 #include <QMessageBox>
 #include <QThread>
 #include <QMenu>
+#include <QDebug>
 
 namespace ive {
 
@@ -83,11 +84,10 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     QFileInfo propertiesFileInfo(this->propertiesPath);
     QStringList fileColumn;
     fileColumn.append(propertiesFileInfo.fileName());
-    QTreeWidgetItem *propertiesDirWidgetItem = new QTreeWidgetItem(fileColumn);
-    propertiesDirWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
-    propertiesDirWidgetItem->setCheckState(0, Qt::Unchecked);
-    d->ui->treeWidget_properties->addTopLevelItem(propertiesDirWidgetItem);
-    listProperties(propertiesDirWidgetItem, propertiesFileInfo);
+    this->propertiesTopDirWidgetItem = new QTreeWidgetItem(fileColumn);
+    this->propertiesTopDirWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
+    d->ui->treeWidget_properties->addTopLevelItem(this->propertiesTopDirWidgetItem);
+    this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, {}));
 
     // Build subtyping tree view
     QFileInfo fileInfo2(this->subtypesPath);
@@ -127,11 +127,14 @@ ModelCheckingWindow::~ModelCheckingWindow()
     d = nullptr;
 }
 
-void ModelCheckingWindow::listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parentFileInfo) {
+Qt::CheckState ModelCheckingWindow::listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parentFileInfo, QStringList preSelection) {
     QDir dir;
     dir.setPath(parentFileInfo.filePath());
     dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoSymLinks);
     dir.setSorting(QDir::DirsFirst | QDir::Name);
+    Qt::CheckState checkState;
+    bool parentIsFullyChecked = true;
+    bool parentIsUnchecked = true;
 
     const QFileInfoList fileList = dir.entryInfoList();
 
@@ -143,9 +146,11 @@ void ModelCheckingWindow::listProperties(QTreeWidgetItem *parentWidgetItem, QFil
         else if(childFileInfo.isDir()) { // is directory
             QTreeWidgetItem *childWidgetItem = new QTreeWidgetItem(childWidgetInfo);
             childWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
-            childWidgetItem->setCheckState(0, Qt::Unchecked);
             parentWidgetItem->addChild(childWidgetItem);
-            listProperties(childWidgetItem, childFileInfo);
+            checkState = listProperties(childWidgetItem, childFileInfo, preSelection);
+            childWidgetItem->setCheckState(0, checkState);
+            if (checkState == Qt::Unchecked){parentIsFullyChecked = false;}
+            if (checkState == Qt::Checked || checkState == Qt::PartiallyChecked){parentIsUnchecked = false;}
         }
         else { // is file
             if (childFileInfo.suffix() == "msc" || childFileInfo.suffix() == "pr"){
@@ -156,11 +161,27 @@ void ModelCheckingWindow::listProperties(QTreeWidgetItem *parentWidgetItem, QFil
                 } else {
                     childWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_FileDialogContentsView));
                 }
-                childWidgetItem->setCheckState(0, Qt::Unchecked);
+                checkState = getCheckState(preSelection, childFileInfo.filePath());
+                childWidgetItem->setCheckState(0, checkState);
                 parentWidgetItem->addChild(childWidgetItem);
+                if (checkState == Qt::Unchecked){parentIsFullyChecked = false;}
+                if (checkState == Qt::Checked || checkState == Qt::PartiallyChecked){parentIsUnchecked = false;}
             }
         }
     }
+    if (parentIsFullyChecked && !parentIsUnchecked){return Qt::Checked;}
+    if (!parentIsFullyChecked && parentIsUnchecked){return Qt::Unchecked;}
+    // empty dir
+    if (parentIsFullyChecked && parentIsUnchecked){return Qt::Unchecked;}
+    return Qt::PartiallyChecked;
+
+}
+
+Qt::CheckState ModelCheckingWindow::getCheckState(QStringList selections, QString path){
+    for (QString selection : selections){
+        if (path.contains(selection, Qt::CaseSensitive)) {return Qt::Checked;}
+    }
+    return Qt::Unchecked;
 }
 
 void ModelCheckingWindow::listSubtypes(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent) {
@@ -445,13 +466,40 @@ void ModelCheckingWindow::addProperty()
             if (makeCallerProcess->execute(makeCall) != 0) {
                 // TODO report in dialog or console instead
                 qDebug("error executing make: %s (from %s)", qPrintable(makeCall), qPrintable(QDir::currentPath()));
-                return;
-            } else {
-                // TODO ADD NEW TREE NODE or REFRESH TREEVIEW
-            }
+                //return;
+            } //else { TODO correct makefile errors and uncomment this else statement
+                // REFRESH TREEVIEW with preselection
+                QFileInfo propertiesFileInfo(this->propertiesPath);
+                // save user selection
+                QStringList preSelection = getPropertiesSelection(this->propertiesTopDirWidgetItem, {});
+                // destroy tree except root
+                QTreeWidgetItem *treeRoot = this->propertiesTopDirWidgetItem;
+                for (int i = treeRoot->childCount(); i > 0; i--){
+                    treeRoot->removeChild(treeRoot->child(i-1));
+                }
+                // rebuild tree with saved selection
+                // TODO (improvement) the new tree has all nodes collapsed, so user expanded folders are lost
+                this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, preSelection));
+            //}
             QDir::setCurrent(qDirAppPath);
         }
     }
+}
+
+QStringList ModelCheckingWindow::getPropertiesSelection(QTreeWidgetItem *propertyWidgetItem, QStringList selections){
+    for (int i = 0; i < propertyWidgetItem->childCount(); i++)
+    {
+        QTreeWidgetItem *child = propertyWidgetItem->child(i);
+        if (child->childCount() == 0 && child->text(1) != ""){ // is property file
+            if (child->checkState(0) == Qt::Checked){ // and is checked
+                selections.append(child->parent()->text(0) + "/" + child->text(0));
+            }
+        } else if (child->childCount() > 0) {
+            selections = selections + getPropertiesSelection(child, {});
+        }
+    }
+
+    return selections;
 }
 
 void ModelCheckingWindow::addSubtypes()

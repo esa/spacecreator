@@ -42,7 +42,9 @@ Q_SIGNALS:
     void visibleChanged(bool visible);
 
 private Q_SLOTS:
-    void listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent);
+    Qt::CheckState listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent, QStringList preSelection);
+    QStringList getPropertiesSelection(QTreeWidgetItem *propertyWidgetItem, QStringList selections);
+    Qt::CheckState getCheckState(QStringList selection, QString path);
     void listSubtypes(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent);
     void listModelFunctions(QTreeWidgetItem *parentWidgetItem);
     void listResults(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent);
@@ -80,6 +82,8 @@ private:
 
     struct ModelCheckingWindowPrivate;
     ModelCheckingWindowPrivate *d;
+
+    QTreeWidgetItem *propertiesTopDirWidgetItem;
 };
 
 }
