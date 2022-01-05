@@ -21,6 +21,7 @@
 #include "asn1modelstorage.h"
 #include "asn1systemchecks.h"
 #include "colors/colormanagerdialog.h"
+#include "commands/cmdconnectionlayermanage.h"
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
@@ -246,16 +247,15 @@ ivm::IVPropertyTemplateConfig *InterfaceDocument::dynPropConfig() const
 void InterfaceDocument::updateLayersModel() const
 {
     if (layersModel() != nullptr) {
-        auto layers = layersModel()->allObjectsByType<ivm::IVConnectionLayerType>();
         bool isDefaultPresent = false;
-        for (auto *layer : layers) {
+        for (auto *layer : layersModel()->allObjectsByType<ivm::IVConnectionLayerType>()) {
             if (layer->name().compare(ivm::IVConnectionLayerType::DefaultLayerName) == 0) {
                 isDefaultPresent = true;
             }
         }
         if (!isDefaultPresent) {
-            layersModel()->addObject(new ivm::IVConnectionLayerType(
-                    ivm::IVConnectionLayerType::DefaultLayerName, layersModel()->rootObject(), shared::createId()));
+            auto *cmd = new cmd::CmdConnectionLayerCreate(ivm::IVConnectionLayerType::DefaultLayerName, layersModel(), objectsModel());
+            commandsStack()->push(cmd);
         }
     }
 }

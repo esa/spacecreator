@@ -43,6 +43,7 @@ class AbstractSystemChecks;
 class IVInterface;
 class IVModel;
 class IVObject;
+class IVConnectionLayerType;
 class IVPropertyTemplateConfig;
 }
 

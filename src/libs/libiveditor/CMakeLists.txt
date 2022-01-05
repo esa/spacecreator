@@ -96,8 +96,6 @@ target_sources(${LIB_NAME} PRIVATE
     context/action/extprocmonitor.h
     createconnectiongroupdialog.cpp
     createconnectiongroupdialog.h
-    manageconnectionlayersdialog.cpp
-    manageconnectionlayersdialog.h
     endtoend/endtoendconnections.cpp
     endtoend/endtoendconnections.h
     endtoend/endtoendview.cpp

@@ -37,6 +37,7 @@ IVConnectionLayerType::IVConnectionLayerType(const QString &name, QObject *paren
 void IVConnectionLayerType::rename(const QString &name)
 {
     m_name = name;
+    Q_EMIT titleChanged(m_name);
 }
 
 IVConnectionLayerType::~IVConnectionLayerType() {}

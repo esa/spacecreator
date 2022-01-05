@@ -50,8 +50,7 @@ public:
         MultiPointConnection,
         DirectConnection,
         GroupConnection,
-        ReCreateConnection,
-        ConnectionLayer
+        ReCreateConnection
     };
 
     void removeSelectedItems() override;
@@ -80,7 +79,6 @@ private:
     void handleDirectConnection(const QPointF &pos);
     void handleConnectionReCreate(const QVector<QPointF> &graphicPoints);
     void handleConnection(const QVector<QPointF> &graphicPoints) const;
-    void handleConnectionLayer();
 
     bool warnConnectionPreview(const QPointF &pos) override;
 

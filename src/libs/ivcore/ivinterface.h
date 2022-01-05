@@ -140,7 +140,8 @@ public:
     virtual QString ifaceLabel() const;
 
     IVConnectionLayerType *layer() const;
-    bool setLayer(IVConnectionLayerType *layer);
+
+    auto setLayer(IVConnectionLayerType *layer) -> bool;
 
 Q_SIGNALS:
     void paramsChanged();
