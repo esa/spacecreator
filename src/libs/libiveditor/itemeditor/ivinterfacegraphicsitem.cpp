@@ -434,23 +434,21 @@ QTransform IVInterfaceGraphicsItem::ifaceTransform(Qt::Alignment alignment) cons
 
 QTransform IVInterfaceGraphicsItem::textTransform(Qt::Alignment alignment) const
 {
-    const qreal leading = QFontMetricsF(m_textItem->font()).leading();
-    const QPointF leadingOffset = QPointF(0, 4 * leading);
-
+    static const qreal kOffset = 2;
     QRectF textRect = mapRectFromItem(m_textItem, m_textItem->boundingRect());
-    const QRectF ifaceRect = mapRectFromItem(m_iface, m_iface->boundingRect());
+    const QRectF ifaceRect = mapRectFromItem(m_type, m_type->boundingRect());
     switch (alignment) {
     case Qt::AlignLeft:
-        textRect.moveBottomRight(ifaceRect.center() + leadingOffset);
+        textRect.moveBottomRight(QPointF(-kOffset, ifaceRect.top() + kOffset));
         break;
     case Qt::AlignRight:
-        textRect.moveBottomLeft(ifaceRect.center() + leadingOffset);
+        textRect.moveBottomLeft(QPointF(kOffset, ifaceRect.top() + kOffset));
         break;
     case Qt::AlignTop:
-        textRect.moveBottomLeft(ifaceRect.topRight());
+        textRect.moveBottomLeft(QPointF(ifaceRect.right() - kOffset, -kOffset));
         break;
     case Qt::AlignBottom:
-        textRect.moveTopLeft(ifaceRect.bottomRight());
+        textRect.moveTopLeft(QPointF(ifaceRect.right() - kOffset, kOffset));
         break;
     default:
         return {};
