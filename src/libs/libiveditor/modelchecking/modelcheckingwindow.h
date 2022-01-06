@@ -46,7 +46,9 @@ private Q_SLOTS:
     QStringList getPropertiesSelection(QTreeWidgetItem *propertyWidgetItem, QStringList selections);
     Qt::CheckState getCheckState(QStringList selection, QString path);
     void listSubtypes(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent);
+    QStringList getSubtypesSelection();
     void listModelFunctions(QTreeWidgetItem *parentWidgetItem);
+    QStringList getFunctionsSelection();
     void listResults(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent);
     void on_treeWidget_properties_itemChanged(QTreeWidgetItem *item, int column);
     void updateParentItem(QTreeWidgetItem *item);
@@ -63,10 +65,12 @@ private Q_SLOTS:
     void on_treeWidget_properties_customContextMenuRequested(const QPoint &pos);
     void on_treeWidget_subtyping_customContextMenuRequested(const QPoint &pos);
     void refreshView();
+    void on_pushButton_saveConfiguration_clicked();
 
 private:
     QString propertiesPath;
     QString subtypesPath;
+    QString configurationsPath;
     QString outputPath;
     QString projectDir;
 
@@ -84,6 +88,8 @@ private:
     ModelCheckingWindowPrivate *d;
 
     QTreeWidgetItem *propertiesTopDirWidgetItem;
+    QTreeWidgetItem *subtypesTopDirWidgetItem;
+    QTreeWidgetItem *functionsTopNodeWidgetItem;
 };
 
 }

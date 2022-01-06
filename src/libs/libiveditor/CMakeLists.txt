@@ -100,6 +100,8 @@ target_sources(${LIB_NAME} PRIVATE
     modelchecking/modelcheckingwindow.cpp
     modelchecking/modelcheckingwindow.h
     modelchecking/modelcheckingwindow.ui
+    modelchecking/xmlwriter.h
+    modelchecking/xmlwriter.cpp
     interfacedocument.cpp
     interfacedocument.h
     itemeditor/common/ivutils.cpp
