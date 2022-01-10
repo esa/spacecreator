@@ -99,10 +99,10 @@ static const QString BYTE_TYPE_NAME = "Byte";
 namespace conversion::seds::translator {
 
 TypeVisitor::Context::Context(const Asn1Acn::Asn1Model *asn1Model, const Asn1Acn::Definitions *definitions,
-        const QString name, ::seds::model::Package *sedsPackage)
+        QString name, ::seds::model::Package *sedsPackage)
     : m_asn1Model(asn1Model)
     , m_definitions(definitions)
-    , m_name(name)
+    , m_name(std::move(name))
     , m_sedsPackage(sedsPackage)
 {
 }
@@ -116,7 +116,7 @@ auto TypeVisitor::Context::definitions() -> const Asn1Acn::Definitions *
     return m_definitions;
 }
 
-auto TypeVisitor::Context::name() -> const QString
+auto TypeVisitor::Context::name() -> const QString &
 {
     return m_name;
 }
@@ -170,7 +170,7 @@ static inline auto setIntegerEncoding(EncodingType &encoding, const Asn1Acn::Typ
     }
 }
 
-static inline auto isZero(const QString value) -> bool
+static inline auto isZero(const QString &value) -> bool
 {
     return value.isEmpty() || value.toULongLong() == 0;
 }
@@ -306,8 +306,8 @@ static inline auto createIntegerType(const QString &name, const uint32_t bits, :
     package->addDataType(std::move(sedsType));
 }
 
-static inline auto createIntegerType(const QString name, const uint32_t minimumSize, const uint32_t maximumSize,
-        ::seds::model::Package *package) -> void
+static inline auto createIntegerType(
+        QString name, const uint32_t minimumSize, const uint32_t maximumSize, ::seds::model::Package *package) -> void
 {
     ::seds::model::IntegerDataType sedsType;
     ::seds::model::MinMaxRange range;
@@ -316,12 +316,12 @@ static inline auto createIntegerType(const QString name, const uint32_t minimumS
     range.setMin(QString::number(minimumSize));
     sedsType.setRange(std::move(range));
 
-    sedsType.setName(name);
+    sedsType.setName(std::move(name));
     package->addDataType(std::move(sedsType));
 }
 
 template<typename EntryType>
-static inline auto setEntryNameAndType(EntryType &entry, const QString typeName, const QString name) -> void
+static inline auto setEntryNameAndType(EntryType &entry, const QString &typeName, const QString &name) -> void
 {
     ::seds::model::DataTypeRef reference(typeName);
     entry.setType(std::move(reference));
@@ -333,17 +333,13 @@ static inline auto getTypeName(const ::seds::model::DataType &type) -> QString
     return std::visit(overloaded { [](const auto &item) { return item.nameStr(); } }, type);
 }
 
-static inline auto isTypePresentInPackage(::seds::model::Package *package, const QString name) -> bool
+static inline auto isTypePresentInPackage(::seds::model::Package *package, const QString &name) -> bool
 {
-    for (const auto &type : package->dataTypes()) {
-        if (getTypeName(type) == name) {
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(package->dataTypes().cbegin(), package->dataTypes().cend(),
+            [&name](const auto &type) { return getTypeName(type) == name; });
 }
 
-static inline auto retrieveTypeFromPackage(::seds::model::Package *package, const QString name)
+static inline auto retrieveTypeFromPackage(::seds::model::Package *package, const QString &name)
         -> const ::seds::model::DataType &
 {
     for (const auto &type : package->dataTypes()) {
@@ -531,7 +527,7 @@ enum class EntryType
     Entry
 };
 
-static inline auto addEntry(const EntryType entryType, const QString typeName, const QString &name,
+static inline auto addEntry(const EntryType entryType, const QString &typeName, const QString &name,
         ::seds::model::ContainerDataType &sedsType, const QString &referencedField = "") -> void
 {
     switch (entryType) {
@@ -618,7 +614,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
 }
 
 static inline auto createChoiceIndexType(
-        const QString name, const ::Asn1Acn::Types::Choice &type, ::seds::model::Package *const package) -> void
+        QString name, const ::Asn1Acn::Types::Choice &type, ::seds::model::Package *const package) -> void
 {
     ::seds::model::EnumeratedDataType sedsType;
 
@@ -630,7 +626,7 @@ static inline auto createChoiceIndexType(
         sedsType.addEnumeration(std::move(valueEnumeration));
     }
 
-    sedsType.setName(name);
+    sedsType.setName(std::move(name));
     package->addDataType(std::move(sedsType));
 }
 
@@ -733,11 +729,11 @@ static inline auto ensureByteTypePresence(::seds::model::Package *const package)
     ::seds::model::IntegerDataType sedsType;
     ::seds::model::MinMaxRange range;
     range.setType(::seds::model::RangeType::InclusiveMinInclusiveMax);
-    range.setMax(QString::number(255));
+    range.setMax(QString::number(255)); // NOLINT
     range.setMin(QString::number(0));
     sedsType.setRange(std::move(range));
     ::seds::model::IntegerDataEncoding encoding;
-    encoding.setBits(8);
+    encoding.setBits(8); // NOLINT
     setEndianness(encoding, Asn1Acn::Types::Endianness::little);
     setIntegerEncoding(encoding, Asn1Acn::Types::IntegerEncoding::pos_int);
     sedsType.setEncoding(std::move(encoding));
@@ -805,11 +801,11 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Real &type)
         switch (type.encoding()) {
         case Asn1Acn::Types::RealEncoding::IEEE754_1985_32:
             encoding.setEncoding(::seds::model::CoreEncodingAndPrecision::IeeeSingle);
-            encoding.setBits(32);
+            encoding.setBits(32); // NOLINT
             break;
         case Asn1Acn::Types::RealEncoding::IEEE754_1985_64:
             encoding.setEncoding(::seds::model::CoreEncodingAndPrecision::IeeeDouble);
-            encoding.setBits(64);
+            encoding.setBits(64); // NOLINT
             break;
         case Asn1Acn::Types::RealEncoding::unspecified:
             break;

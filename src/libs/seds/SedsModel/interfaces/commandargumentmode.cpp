@@ -38,9 +38,9 @@ auto enumFromString(const QStringRef &enumStr) -> std::optional<CommandArgumentM
 }
 
 template<>
-auto stringFromEnum(CommandArgumentMode mode) -> const QString &
+auto stringFromEnum(CommandArgumentMode enumType) -> const QString &
 {
-    switch (mode) {
+    switch (enumType) {
     case CommandArgumentMode::In: {
         static const QString in = "in";
         return in;

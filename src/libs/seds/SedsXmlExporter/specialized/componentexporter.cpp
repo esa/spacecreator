@@ -32,7 +32,7 @@ void ComponentExporter::exportComponents(
         exportComponent(component, componentSetElement, sedsDocument);
     }
 
-    packageElement.appendChild(std::move(componentSetElement));
+    packageElement.appendChild(componentSetElement);
 }
 
 void ComponentExporter::exportComponent(
@@ -47,7 +47,7 @@ void ComponentExporter::exportComponent(
     exportRequiredInterfaces(component, componentElement, sedsDocument);
     exportDeclaredInterfaces(component, componentElement, sedsDocument);
 
-    componentSetElement.appendChild(std::move(componentElement));
+    componentSetElement.appendChild(componentElement);
 }
 
 void ComponentExporter::exportProvidedInterfaces(
@@ -63,7 +63,7 @@ void ComponentExporter::exportProvidedInterfaces(
     for (const auto &providedInterface : providedInterfaces) {
         InterfaceExporter::exportInterface(providedInterface, providedInterfaceSetElement, sedsDocument);
     }
-    componentElement.appendChild(std::move(providedInterfaceSetElement));
+    componentElement.appendChild(providedInterfaceSetElement);
 }
 
 void ComponentExporter::exportRequiredInterfaces(
@@ -79,7 +79,7 @@ void ComponentExporter::exportRequiredInterfaces(
     for (const auto &requiredInterface : requiredInterfaces) {
         InterfaceExporter::exportInterface(requiredInterface, requiredInterfaceSetElement, sedsDocument);
     }
-    componentElement.appendChild(std::move(requiredInterfaceSetElement));
+    componentElement.appendChild(requiredInterfaceSetElement);
 }
 
 void ComponentExporter::exportDeclaredInterfaces(
@@ -95,7 +95,7 @@ void ComponentExporter::exportDeclaredInterfaces(
     for (const auto &interfaceDeclaration : declaredInterfaces) {
         InterfaceExporter::exportInterfaceDeclaration(interfaceDeclaration, declaredInterfaceSetElement, sedsDocument);
     }
-    componentElement.appendChild(std::move(declaredInterfaceSetElement));
+    componentElement.appendChild(declaredInterfaceSetElement);
 }
 
 } // namespace seds::exporter

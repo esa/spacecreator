@@ -180,12 +180,12 @@ auto MathOperationTranslator::translateOperator(
     return "";
 }
 
-auto MathOperationTranslator::formExpression(const QString pattern, const QString left, const bool isLeftComplex,
-        const QString right, const bool isRightComplex) -> QString
+auto MathOperationTranslator::formExpression(const QString &pattern, const QString &left, const bool isLeftComplex,
+        const QString &right, const bool isRightComplex) -> QString
 {
     const auto leftSide = isLeftComplex ? QString("(%1)").arg(left) : left;
     const auto rightSide = isRightComplex ? QString("(%1)").arg(right) : right;
-    return QString(pattern).arg(leftSide, rightSide);
+    return pattern.arg(leftSide, rightSide);
 }
 
 }

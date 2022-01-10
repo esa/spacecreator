@@ -127,7 +127,7 @@ auto SdlVisitor::Layouter::getPositionString(const SdlVisitor::Layouter::Element
 auto SdlVisitor::IndentingStreamWriter::getIndent() -> QString
 {
     return std::accumulate(m_indent.begin(), m_indent.end(), QString(""),
-            [](QString &accumulator, const QString &indent) { return std::move(accumulator) + indent; });
+            [](const QString &accumulator, const QString &indent) { return accumulator + indent; });
 }
 
 SdlVisitor::IndentingStreamWriter::IndentingStreamWriter(QTextStream &stream)

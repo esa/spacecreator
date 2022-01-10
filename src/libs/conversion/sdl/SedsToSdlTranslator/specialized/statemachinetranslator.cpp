@@ -52,7 +52,7 @@ static const QString TIMER_NAME_PATTERN = "timer_%1";
 static ::sdl::Procedure BUILT_IN_SET_TIMER_PROCEDURE("set_timer");
 
 template<typename ElementType>
-static inline auto getElementOfName(const seds::model::StateMachine &sedsStateMachine, const QString name)
+static inline auto getElementOfName(const seds::model::StateMachine &sedsStateMachine, const QString &name)
         -> std::optional<const ElementType *>
 {
     for (auto &element : sedsStateMachine.elements()) {
@@ -66,7 +66,7 @@ static inline auto getElementOfName(const seds::model::StateMachine &sedsStateMa
     return std::nullopt;
 }
 
-static inline auto getOnExit(const seds::model::StateMachine &sedsStateMachine, const QString name)
+static inline auto getOnExit(const seds::model::StateMachine &sedsStateMachine, const QString &name)
         -> std::optional<const seds::model::ActivityInvocation *>
 {
     // OnExit applies only to states, not entry or exit states
@@ -81,7 +81,7 @@ static inline auto getOnExit(const seds::model::StateMachine &sedsStateMachine, 
     return &(*((*state)->onExit()));
 }
 
-static inline auto getOnEntry(const seds::model::StateMachine &sedsStateMachine, const QString name)
+static inline auto getOnEntry(const seds::model::StateMachine &sedsStateMachine, const QString &name)
         -> std::optional<const seds::model::ActivityInvocation *>
 {
     // OnEntry applies only to states, not entry or exit states
@@ -195,12 +195,12 @@ auto StateMachineTranslator::createExternalProcedures(
     }
 }
 
-auto StateMachineTranslator::ioVariableName(const QString interfaceName) -> QString
+auto StateMachineTranslator::ioVariableName(const QString &interfaceName) -> QString
 {
     return IO_VARIABLE_PATTERN.arg(interfaceName);
 }
 
-auto StateMachineTranslator::timerName(const QString stateName) -> QString
+auto StateMachineTranslator::timerName(const QString &stateName) -> QString
 {
     return Escaper::escapeSdlName(TIMER_NAME_PATTERN.arg(stateName));
 }
@@ -258,7 +258,7 @@ auto StateMachineTranslator::translatePrimitive(
     // Input signal can be received only via a provided interface
     input->setName(InterfaceCommandTranslator::getCommandName(
             command.interface().value(), ivm::IVInterface::InterfaceType::Provided, command.command().value()));
-    if (command.argumentValues().size() == 0) {
+    if (command.argumentValues().empty()) {
         return std::make_pair(std::move(input), std::move(unpackingActions));
     }
 
@@ -374,7 +374,7 @@ auto StateMachineTranslator::translateTransition(const seds::model::StateMachine
 
 auto StateMachineTranslator::createIoVariable(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void
 {
-    if (interface->params().size() == 0) {
+    if (interface->params().empty()) {
         return; // NOP
     }
     const auto interfaceName = interface->title();
@@ -426,7 +426,7 @@ auto StateMachineTranslator::translateGuard(::sdl::Process *sdlProcess, ::sdl::S
     return newTransitionPtr;
 }
 auto StateMachineTranslator::getTimerInvocationTime(
-        const seds::model::StateMachine &sedsStateMachine, const QString stateName) -> std::optional<uint64_t>
+        const seds::model::StateMachine &sedsStateMachine, const QString &stateName) -> std::optional<uint64_t>
 {
     // TODO - consider supporting multiple different OnTimer events for a state timed separately
     for (auto &element : sedsStateMachine.elements()) {
@@ -445,17 +445,17 @@ auto StateMachineTranslator::getTimerInvocationTime(
 
 static inline auto nanosecondsToMiliseconds(const uint64_t nanoseconds) -> uint64_t
 {
-    return nanoseconds / 1000u;
+    return nanoseconds / 1000U; // NOLINT
 }
 
-auto StateMachineTranslator::createTimerSetCall(const QString timerName, const uint64_t callTimeInNanoseconds)
+auto StateMachineTranslator::createTimerSetCall(QString timerName, const uint64_t callTimeInNanoseconds)
         -> std::unique_ptr<::sdl::ProcedureCall>
 {
     auto call = std::make_unique<::sdl::ProcedureCall>();
     call->setProcedure(&BUILT_IN_SET_TIMER_PROCEDURE);
     call->addArgument(
             std::make_unique<::sdl::VariableLiteral>(QString::number(nanosecondsToMiliseconds(callTimeInNanoseconds))));
-    call->addArgument(std::make_unique<::sdl::VariableLiteral>(timerName));
+    call->addArgument(std::make_unique<::sdl::VariableLiteral>(std::move(timerName)));
     return call;
 }
 

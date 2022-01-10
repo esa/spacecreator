@@ -85,7 +85,7 @@ void SedsXmlExporter::exportPackageFile(const PackageFile &packageFile, QDomDocu
 
     exportPackage(packageFile.package(), rootElement, sedsDocument);
 
-    sedsDocument.appendChild(std::move(rootElement));
+    sedsDocument.appendChild(rootElement);
 }
 
 void SedsXmlExporter::exportDataSheet(const DataSheet &dataSheet, QDomDocument &sedsDocument)
@@ -96,7 +96,7 @@ void SedsXmlExporter::exportDataSheet(const DataSheet &dataSheet, QDomDocument &
         exportPackage(package, rootElement, sedsDocument);
     }
 
-    sedsDocument.appendChild(std::move(rootElement));
+    sedsDocument.appendChild(rootElement);
 }
 
 void SedsXmlExporter::exportPackage(const Package &package, QDomElement &parentElement, QDomDocument &sedsDocument)
@@ -106,34 +106,35 @@ void SedsXmlExporter::exportPackage(const Package &package, QDomElement &parentE
     const auto &packageName = package.nameStr();
     packageElement.setAttribute(QStringLiteral("name"), packageName);
 
-    if (package.dataTypes().size() > 0) {
+    if (!package.dataTypes().empty()) {
         auto dataTypeSet = sedsDocument.createElement(QStringLiteral("DataTypeSet"));
         for (const auto &dataType : package.dataTypes()) {
             DataTypeExporter::exportDataType(dataType, dataTypeSet, sedsDocument);
         }
-        packageElement.appendChild(std::move(dataTypeSet));
+        packageElement.appendChild(dataTypeSet);
     }
 
-    if (package.components().size() > 0) {
+    if (!package.components().empty()) {
         ComponentExporter::exportComponents(package.components(), packageElement, sedsDocument);
     }
 
-    parentElement.appendChild(std::move(packageElement));
+    parentElement.appendChild(packageElement);
 }
 
 QDomDocument SedsXmlExporter::createSedsXmlDocument()
 {
     QDomDocument sedsDocument;
 
-    auto processingInstruction = sedsDocument.createProcessingInstruction("xml", R"(version="1.0" encoding="utf-8")");
-    sedsDocument.appendChild(std::move(processingInstruction));
+    const auto processingInstruction =
+            sedsDocument.createProcessingInstruction("xml", R"(version="1.0" encoding="utf-8")");
+    sedsDocument.appendChild(processingInstruction);
 
     return sedsDocument;
 }
 
-QDomElement SedsXmlExporter::createRootElement(QString rootElementName, QDomDocument &sedsDocument)
+QDomElement SedsXmlExporter::createRootElement(const QString &rootElementName, QDomDocument &sedsDocument)
 {
-    auto rootElement = sedsDocument.createElement(std::move(rootElementName));
+    auto rootElement = sedsDocument.createElement(rootElementName);
     rootElement.setAttribute("xmlns", m_schemaNsUri);
     rootElement.setAttribute("xmlns:xsi", m_schemaInstanceNsUri);
     rootElement.setAttribute("xsi:schemaLocation", m_schemaLocation);

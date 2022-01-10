@@ -60,7 +60,7 @@ std::vector<std::unique_ptr<Model>> Asn1ToSedsTranslator::translateAsn1Model(
 
     for (const auto &file : asn1Model->data()) {
         for (const auto &definitions : file->definitionsList()) {
-            if (definitions->types().size() == 0) {
+            if (definitions->types().empty()) {
                 continue;
             }
             auto sedsPackage = translateAsn1Definitions(asn1Model, definitions.get());

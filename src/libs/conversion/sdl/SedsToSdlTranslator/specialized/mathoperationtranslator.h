@@ -42,8 +42,8 @@ private:
     static auto translateMutableExpression(Expression &expression, bool &outIsComplexValue) -> QString;
     static auto translateOperator(const seds::model::Operator &op, Expression &expression, bool &outIsComplexValue)
             -> QString;
-    static auto formExpression(const QString pattern, const QString left, const bool isLeftComplex, const QString right,
-            const bool isRightComplex) -> QString;
+    static auto formExpression(const QString &pattern, const QString &left, const bool isLeftComplex,
+            const QString &right, const bool isRightComplex) -> QString;
 };
 
 }

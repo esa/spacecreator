@@ -95,7 +95,7 @@ public:
      *
      * @return Variable name
      */
-    static auto ioVariableName(const QString interfaceName) -> QString;
+    static auto ioVariableName(const QString &interfaceName) -> QString;
 
     /**
      * @brief   Get name of the timer for a state
@@ -104,7 +104,7 @@ public:
      *
      * @return Timer name
      */
-    static auto timerName(const QString stateName) -> QString;
+    static auto timerName(const QString &stateName) -> QString;
 
 private:
     static auto createStartTransition(const seds::model::StateMachine &sedsStateMachine, ::sdl::Process *sdlProcess,
@@ -136,10 +136,10 @@ private:
             ::sdl::Transition *currentTransitionPtr, const seds::model::BooleanExpression &guard)
             -> ::sdl::Transition *;
 
-    static auto getTimerInvocationTime(const seds::model::StateMachine &sedsStateMachine, const QString stateName)
+    static auto getTimerInvocationTime(const seds::model::StateMachine &sedsStateMachine, const QString &stateName)
             -> std::optional<uint64_t>;
 
-    static auto createTimerSetCall(const QString timerName, const uint64_t callTimeInNanoseconds)
+    static auto createTimerSetCall(QString timerName, const uint64_t callTimeInNanoseconds)
             -> std::unique_ptr<::sdl::ProcedureCall>;
 };
 

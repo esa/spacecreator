@@ -185,6 +185,7 @@ QList<int> knownGraphicsItemTypes()
         case ivm::IVObject::Type::ConnectionGroup:
             itemType = ive::IVConnectionGroupGraphicsItem::Type;
             break;
+        case ivm::IVObject::Type::ConnectionLayer:
         case ivm::IVObject::Type::Unknown:
             continue;
         }

@@ -67,7 +67,9 @@ auto DataTypeExporter::exportArrayDataType(
     auto typeElement = sedsDocument.createElement(QStringLiteral("ArrayDataType"));
     typeElement.setAttribute(QStringLiteral("name"), dataType.nameStr());
     typeElement.setAttribute(QStringLiteral("dataTypeRef"), dataType.type().nameStr());
+
     auto dimensionsElement = sedsDocument.createElement(QStringLiteral("DimensionList"));
+
     for (const auto &dimension : dataType.dimensions()) {
         auto dimensionElement = sedsDocument.createElement(QStringLiteral("Dimension"));
         if (!dimension.size().has_value()) {
@@ -75,11 +77,11 @@ auto DataTypeExporter::exportArrayDataType(
         }
         const auto &size = dimension.size().value();
         dimensionElement.setAttribute(QStringLiteral("size"), QString::number(size.value()));
-        dimensionsElement.appendChild(std::move(dimensionElement));
+        dimensionsElement.appendChild(dimensionElement);
     }
 
-    typeElement.appendChild(std::move(dimensionsElement));
-    setElement.appendChild(std::move(typeElement));
+    typeElement.appendChild(dimensionsElement);
+    setElement.appendChild(typeElement);
 }
 
 auto DataTypeExporter::exportBinaryDataType(
@@ -91,7 +93,7 @@ auto DataTypeExporter::exportBinaryDataType(
             QStringLiteral("fixedSize"), dataType.hasFixedSize() ? QStringLiteral("true") : QStringLiteral("false"));
     typeElement.setAttribute(QStringLiteral("sizeInBits"), static_cast<qulonglong>(dataType.bits()));
 
-    setElement.appendChild(std::move(typeElement));
+    setElement.appendChild(typeElement);
 }
 
 auto DataTypeExporter::exportBooleanDataType(
@@ -114,26 +116,24 @@ auto DataTypeExporter::exportBooleanDataType(
             throw UnhandledValueException("FalseValue");
             break;
         }
-        typeElement.appendChild(std::move(encodingElement));
+        typeElement.appendChild(encodingElement);
     }
-    setElement.appendChild(std::move(typeElement));
+    setElement.appendChild(typeElement);
 }
 
 static inline auto exportContainerConstraints(
         const model::ContainerDataType &dataType, QDomElement &typeElement, QDomDocument &sedsDocument) -> void
 {
-    if (dataType.constraints().size() > 0) {
+    if (!dataType.constraints().empty()) {
         auto constraintListElement = sedsDocument.createElement(QStringLiteral("ConstraintSet"));
         for (const auto &constraint : dataType.constraints()) {
             std::visit(
                     overloaded {
-                            [&sedsDocument, &constraintListElement](
-                                    const model::ContainerRangeConstraint &castConstraint) {
+                            [](const model::ContainerRangeConstraint &castConstraint) {
                                 Q_UNUSED(castConstraint);
                                 throw UnsupportedElementException("Container ContainerRangeConstraint");
                             },
-                            [&sedsDocument, &constraintListElement](
-                                    const model::ContainerTypeConstraint &castConstraint) {
+                            [](const model::ContainerTypeConstraint &castConstraint) {
                                 Q_UNUSED(castConstraint);
                                 throw UnsupportedElementException("Container ContainerTypeConstraint");
                             },
@@ -143,12 +143,12 @@ static inline auto exportContainerConstraints(
                                 entryElement.setAttribute(
                                         QStringLiteral("entry"), castConstraint.entry().value().value());
                                 entryElement.setAttribute(QStringLiteral("value"), castConstraint.value().value());
-                                constraintListElement.appendChild(std::move(entryElement));
+                                constraintListElement.appendChild(entryElement);
                             },
                     },
                     constraint);
         }
-        typeElement.appendChild(std::move(constraintListElement));
+        typeElement.appendChild(constraintListElement);
     }
 }
 
@@ -161,20 +161,20 @@ static inline auto exportContainerEntries(
                                    auto entryElement = sedsDocument.createElement(QStringLiteral("Entry"));
                                    entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
                                    entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
-                                   entryListElement.appendChild(std::move(entryElement));
+                                   entryListElement.appendChild(entryElement);
                                },
                            [&sedsDocument, &entryListElement](const model::FixedValueEntry &castEntry) {
                                auto entryElement = sedsDocument.createElement(QStringLiteral("FixedValueEntry"));
                                entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
                                entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
                                entryElement.setAttribute(QStringLiteral("fixedValue"), castEntry.fixedValue()->value());
-                               entryListElement.appendChild(std::move(entryElement));
+                               entryListElement.appendChild(entryElement);
                            },
-                           [&sedsDocument, &entryListElement](const model::LengthEntry &castEntry) {
+                           [](const model::LengthEntry &castEntry) {
                                Q_UNUSED(castEntry);
                                throw UnsupportedElementException("Container LengthEntry");
                            },
-                           [&sedsDocument, &entryListElement](const model::ErrorControlEntry &castEntry) {
+                           [](const model::ErrorControlEntry &castEntry) {
                                Q_UNUSED(castEntry);
                                throw UnsupportedElementException("Container ErrorControlEntry");
                            },
@@ -184,16 +184,16 @@ static inline auto exportContainerEntries(
                                entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
                                entryElement.setAttribute(
                                        QStringLiteral("listLengthField"), castEntry.listLengthField().value().value());
-                               entryListElement.appendChild(std::move(entryElement));
+                               entryListElement.appendChild(entryElement);
                            },
-                           [&sedsDocument, &entryListElement](const model::PaddingEntry &castEntry) {
+                           [](const model::PaddingEntry &castEntry) {
                                Q_UNUSED(castEntry);
                                throw UnsupportedElementException("Container PaddingEntry");
                            } },
                 entry);
     }
 
-    typeElement.appendChild(std::move(entryListElement));
+    typeElement.appendChild(entryListElement);
 }
 
 auto DataTypeExporter::exportContainerDataType(
@@ -211,7 +211,7 @@ auto DataTypeExporter::exportContainerDataType(
     exportContainerConstraints(dataType, typeElement, sedsDocument);
     exportContainerEntries(dataType, typeElement, sedsDocument);
 
-    setElement.appendChild(std::move(typeElement));
+    setElement.appendChild(typeElement);
 }
 
 auto DataTypeExporter::exportEnumeratedDataType(
@@ -241,16 +241,16 @@ auto DataTypeExporter::exportEnumeratedDataType(
             break;
         }
 
-        typeElement.appendChild(std::move(encodingElement));
+        typeElement.appendChild(encodingElement);
     }
 
-    if (dataType.enumerationList().size() > 0) {
+    if (!dataType.enumerationList().empty()) {
         auto listElement = sedsDocument.createElement(QStringLiteral("EnumerationList"));
 
         exportEnumerationList(dataType.enumerationList(), listElement, sedsDocument);
-        typeElement.appendChild(std::move(listElement));
+        typeElement.appendChild(listElement);
     }
-    setElement.appendChild(std::move(typeElement));
+    setElement.appendChild(typeElement);
 }
 
 auto DataTypeExporter::exportFloatDataType(
@@ -280,7 +280,7 @@ auto DataTypeExporter::exportFloatDataType(
             break;
         }
 
-        typeElement.appendChild(std::move(encodingElement));
+        typeElement.appendChild(encodingElement);
     }
 
     if (std::holds_alternative<FloatPrecisionRange>(dataType.range())) {
@@ -289,7 +289,7 @@ auto DataTypeExporter::exportFloatDataType(
         exportMinMaxRange(std::get<MinMaxRange>(dataType.range()), typeElement, sedsDocument);
     }
 
-    setElement.appendChild(std::move(typeElement));
+    setElement.appendChild(typeElement);
 }
 
 auto DataTypeExporter::exportIntegerDataType(
@@ -320,7 +320,7 @@ auto DataTypeExporter::exportIntegerDataType(
             break;
         }
 
-        typeElement.appendChild(std::move(encodingElement));
+        typeElement.appendChild(encodingElement);
     }
 
     std::visit(overloaded { [&typeElement, &sedsDocument](const MinMaxRange &range) {
@@ -328,7 +328,7 @@ auto DataTypeExporter::exportIntegerDataType(
     } },
             dataType.range());
 
-    setElement.appendChild(std::move(typeElement));
+    setElement.appendChild(typeElement);
 }
 
 auto DataTypeExporter::exportStringDataType(
@@ -353,10 +353,10 @@ auto DataTypeExporter::exportStringDataType(
             encodingElement.setAttribute(QStringLiteral("terminationByte"), *encoding.terminationByte());
         }
 
-        typeElement.appendChild(std::move(encodingElement));
+        typeElement.appendChild(encodingElement);
     }
 
-    setElement.appendChild(std::move(typeElement));
+    setElement.appendChild(typeElement);
 }
 
 auto DataTypeExporter::exportSubRangeDataType(
@@ -376,7 +376,7 @@ auto DataTypeExporter::exportEnumerationList(
         valueElement.setAttribute(QStringLiteral("label"), value.label().value());
         valueElement.setAttribute(QStringLiteral("value"), value.value());
 
-        setElement.appendChild(std::move(valueElement));
+        setElement.appendChild(valueElement);
     }
 }
 
@@ -455,8 +455,8 @@ auto DataTypeExporter::exportMinMaxRange(
         break;
     }
 
-    rangeElement.appendChild(std::move(minMaxRangeElement));
-    setElement.appendChild(std::move(rangeElement));
+    rangeElement.appendChild(minMaxRangeElement);
+    setElement.appendChild(rangeElement);
 }
 
 auto DataTypeExporter::exportCoreEncodingAndPrecision(model::CoreEncodingAndPrecision encoding, QDomElement &setElement)
@@ -521,8 +521,8 @@ auto DataTypeExporter::exportFloatPrecisionRange(
         break;
     }
 
-    rangeElement.appendChild(std::move(precisionRangeElement));
-    setElement.appendChild(std::move(rangeElement));
+    rangeElement.appendChild(precisionRangeElement);
+    setElement.appendChild(rangeElement);
 }
 
 } // namespace seds::exporter

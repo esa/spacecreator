@@ -32,7 +32,7 @@ void InterfaceExporter::exportInterface(
     const auto &interfaceType = interface.type().nameStr();
     interfaceElement.setAttribute(QStringLiteral("type"), interfaceType);
 
-    setElement.appendChild(std::move(interfaceElement));
+    setElement.appendChild(interfaceElement);
 }
 
 void InterfaceExporter::exportInterfaceDeclaration(
@@ -45,7 +45,7 @@ void InterfaceExporter::exportInterfaceDeclaration(
 
     exportCommands(interfaceDeclaration.commands(), interfaceDeclarationElement, sedsDocument);
 
-    setElement.appendChild(std::move(interfaceDeclarationElement));
+    setElement.appendChild(interfaceDeclarationElement);
 }
 
 void InterfaceExporter::exportCommands(const model::InterfaceDeclaration::CommandSet &commands,
@@ -57,7 +57,7 @@ void InterfaceExporter::exportCommands(const model::InterfaceDeclaration::Comman
         exportCommand(command, commandSetElement, sedsDocument);
     }
 
-    interfaceDeclarationElement.appendChild(std::move(commandSetElement));
+    interfaceDeclarationElement.appendChild(commandSetElement);
 }
 
 void InterfaceExporter::exportCommand(
@@ -72,7 +72,7 @@ void InterfaceExporter::exportCommand(
     }
     commandElement.setAttribute(QStringLiteral("mode"), stringFromEnum(command.mode()));
 
-    commandSetElement.appendChild(std::move(commandElement));
+    commandSetElement.appendChild(commandElement);
 }
 
 void InterfaceExporter::exportCommandArgument(
@@ -86,7 +86,7 @@ void InterfaceExporter::exportCommandArgument(
     commandArgumentElement.setAttribute(QStringLiteral("type"), commandArgumentType);
     commandArgumentElement.setAttribute(QStringLiteral("mode"), stringFromEnum(commandArgument.mode()));
 
-    commandElement.appendChild(std::move(commandArgumentElement));
+    commandElement.appendChild(commandArgumentElement);
 }
 
 } // namespace seds::exporter

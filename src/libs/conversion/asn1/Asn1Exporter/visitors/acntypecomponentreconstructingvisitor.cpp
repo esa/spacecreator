@@ -176,6 +176,8 @@ void AcnTypeComponentReconstructingVisitor::tryAppendIntegerAcnParams(
     // requires a major rewrite (separate specializations for different types
     // and re-ordering the file so that instantiations are after specialization)
     const auto size = type.size();
+
+    // NOLINTNEXTLINE
     if ((type.endianness() != Types::Endianness::little) || (size == 0) || ((size % 8 == 0) && (size > 8))) {
         // Apply endianess if it is not little
         // or if size is undefined
