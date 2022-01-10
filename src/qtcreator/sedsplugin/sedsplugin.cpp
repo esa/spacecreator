@@ -29,6 +29,7 @@
 #include "conversion/iv/IvOptions/options.h"
 #include "exceptions.h"
 #include "export/exceptions.h"
+#include "fileutils.h"
 #include "graphicsviewutils.h"
 #include "import/exceptions.h"
 #include "interfacedocument.h"
@@ -41,6 +42,8 @@
 #include "model.h"
 #include "modeltype.h"
 #include "options.h"
+#include "projectexplorer.h"
+#include "projectnodes.h"
 #include "sdl/SdlOptions/options.h"
 #include "seds/SedsOptions/options.h"
 #include "seds/SedsXmlImporter/importer.h"
@@ -69,6 +72,9 @@
 #include <exception>
 #include <memory>
 #include <messagemanager.h>
+#include <projectexplorer/project.h>
+#include <projectexplorer/projecttree.h>
+#include <qdir.h>
 #include <variant>
 
 using namespace Core;
@@ -312,6 +318,14 @@ auto SedsPlugin::importSdl() -> void
     options.add(conversion::iv::IvOptions::outputFilepath, tmpIvFilename);
     options.add(conversion::iv::IvOptions::configFilepath, ivConfig);
 
+    // TODO: get generated asn/acn file names
+    const QStringList fileNames = {
+        QString("%1%2GUARD.asn").arg(QDir::currentPath()).arg(QDir::separator()),
+        QString("%1%2GUARD.acn").arg(QDir::currentPath()).arg(QDir::separator()),
+    };
+    for (const auto &filename : fileNames) {
+        MessageManager::write(filename);
+    };
     try {
         convert({ conversion::ModelType::Seds }, conversion::ModelType::Sdl,
                 { conversion::ModelType::InterfaceView, conversion::ModelType::Asn1 }, options);
@@ -320,6 +334,9 @@ auto SedsPlugin::importSdl() -> void
         QFile(tmpIvFilename).remove();
         return;
     }
+
+    ProjectExplorer::Project *const project = ProjectExplorer::ProjectTree::currentProject();
+    project->rootProjectNode()->addFiles(fileNames);
 
     if (!loadAndMergeIvModelIntoCurrent(ivConfig, tmpIvFilename)) {
         return;
