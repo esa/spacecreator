@@ -545,7 +545,7 @@
    <widget class="QPushButton" name="pushButton_saveConfiguration">
     <property name="geometry">
      <rect>
-      <x>750</x>
+      <x>740</x>
       <y>530</y>
       <width>121</width>
       <height>23</height>
@@ -558,16 +558,16 @@
    <widget class="QPushButton" name="pushButton_loadConfiguration">
     <property name="geometry">
      <rect>
-      <x>730</x>
+      <x>740</x>
       <y>500</y>
-      <width>141</width>
+      <width>121</width>
       <height>23</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <weight>75</weight>
-      <bold>true</bold>
+      <weight>50</weight>
+      <bold>false</bold>
      </font>
     </property>
     <property name="text">

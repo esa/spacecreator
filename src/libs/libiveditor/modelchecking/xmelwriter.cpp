@@ -14,9 +14,9 @@
    You should have received a copy of the GNU Library General Public License
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
-#include "xmlwriter.h"
+#include "xmelwriter.h"
 
-struct XmlWriter::IFConfig {
+struct XmelWriter::IFConfig {
     QString maxScenarios { "" };
     QString errorScenarios { "" };
     QString successScenarios { "" };
@@ -26,7 +26,7 @@ struct XmlWriter::IFConfig {
     QString maxStates { "" };
 };
 
-XmlWriter::XmlWriter(QStringList propertiesSelected, QStringList subtypesSelected, QStringList functionsSelected, QStringList ifConfiguration)
+XmelWriter::XmelWriter(QStringList propertiesSelected, QStringList subtypesSelected, QStringList functionsSelected, QStringList ifConfiguration)
     : propertiesSelected(propertiesSelected), subtypesSelected(subtypesSelected), functionsSelected(functionsSelected), ifConfig(new IFConfig)
 {
     xml.setAutoFormatting(true);
@@ -40,13 +40,14 @@ XmlWriter::XmlWriter(QStringList propertiesSelected, QStringList subtypesSelecte
     ifConfig->maxStates = ifConfiguration.at(6);
 }
 
-bool XmlWriter::writeFile(QIODevice *device, QString fileName)
+bool XmelWriter::writeFile(QIODevice *device, QString fileName)
 {
     xml.setDevice(device);
 
     xml.writeStartDocument();
-    xml.writeDTD(QStringLiteral("<!DOCTYPE xml>"));
-    xml.writeStartElement(QStringLiteral("xml"));
+    // XEML stands for XML MODELCHECKING EXCHANGE LANGUAGE
+    xml.writeDTD(QStringLiteral("<!DOCTYPE xmel>"));
+    xml.writeStartElement(QStringLiteral("xmel"));
     //TODO use instead XmlReader::versionAttributes()
     xml.writeAttribute(QStringLiteral("version"), QStringLiteral("1.0"));
 
@@ -94,7 +95,7 @@ bool XmlWriter::writeFile(QIODevice *device, QString fileName)
 
     // closing ModelCheckingWindow
     xml.writeEndElement();
-    // closing xml
+    // closing XMEL
     xml.writeEndElement();
 
     xml.writeEndDocument();
@@ -102,7 +103,7 @@ bool XmlWriter::writeFile(QIODevice *device, QString fileName)
     return true;
 }
 
-void XmlWriter::writeItem(QString str, QString type){
+void XmelWriter::writeItem(QString str, QString type){
     xml.writeStartElement(type);
     if (type == "Property"){
         xml.writeAttribute("path", str);

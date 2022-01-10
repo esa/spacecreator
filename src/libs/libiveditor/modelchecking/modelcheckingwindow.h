@@ -45,9 +45,9 @@ private Q_SLOTS:
     Qt::CheckState listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent, QStringList preSelection);
     QStringList getPropertiesSelection(QTreeWidgetItem *propertyWidgetItem, QStringList selections);
     Qt::CheckState getCheckState(QStringList selection, QString path);
-    void listSubtypes(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent);
+    void listSubtypes(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent, QStringList preSelection);
     QStringList getSubtypesSelection();
-    void listModelFunctions(QTreeWidgetItem *parentWidgetItem);
+    void listModelFunctions(QTreeWidgetItem *parentWidgetItem, QStringList preSelection);
     QStringList getFunctionsSelection();
     void listResults(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent);
     void on_treeWidget_properties_itemChanged(QTreeWidgetItem *item, int column);
@@ -66,6 +66,10 @@ private Q_SLOTS:
     void on_treeWidget_subtyping_customContextMenuRequested(const QPoint &pos);
     void refreshView();
     void on_pushButton_saveConfiguration_clicked();
+    void on_pushButton_loadConfiguration_clicked();
+    void setPropertiesSelection(QStringList propertiesSelected);
+    void setSubtypesSelection(QStringList subtypesSelected);
+    void setFunctionsSelection(QStringList functionsSelected);
 
 private:
     QString propertiesPath;

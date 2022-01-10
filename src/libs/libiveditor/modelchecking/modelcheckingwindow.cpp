@@ -20,7 +20,9 @@
 #include "ivfunction.h"
 #include "interfacedocument.h"
 #include "ivmodel.h"
-#include "xmlwriter.h"
+#include "xmelwriter.h"
+#include "xmelreader.h"
+#include "xmelreader.h"
 
 #include <QDir>
 #include <QProcess>
@@ -28,12 +30,15 @@
 #include <QMessageBox>
 #include <QThread>
 #include <QMenu>
+#include <QDirIterator>
+#include <QFileDialog>
+#include <QDebug>
 
 namespace ive {
 
 struct ModelCheckingWindow::ModelCheckingWindowPrivate {
     Ui::ModelCheckingWindow *ui { new Ui::ModelCheckingWindow };
-    InterfaceDocument *document { nullptr };
+    InterfaceDocument *document { nullptr };   
 };
 
 ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QString projectDir, QWidget *parent) :
@@ -97,7 +102,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     subtypesTopDirWidgetItem = new QTreeWidgetItem(fileColumnSubtypes);
     subtypesTopDirWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
     d->ui->treeWidget_subtyping->addTopLevelItem(subtypesTopDirWidgetItem);
-    listSubtypes(subtypesTopDirWidgetItem, subtypesFileInfo);
+    listSubtypes(subtypesTopDirWidgetItem, subtypesFileInfo, {});
 
     // Build submodel tree view
     QStringList functionColumnSubmodel;
@@ -105,7 +110,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     functionsTopNodeWidgetItem = new QTreeWidgetItem(functionColumnSubmodel);
     functionsTopNodeWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_FileDialogListView));
     d->ui->treeWidget_submodel->addTopLevelItem(functionsTopNodeWidgetItem);
-    listModelFunctions(functionsTopNodeWidgetItem);
+    listModelFunctions(functionsTopNodeWidgetItem, {});
 
     // Pre-build results tree view
     QFileInfo resultsFileInfo(this->outputPath);
@@ -188,7 +193,7 @@ Qt::CheckState ModelCheckingWindow::getCheckState(QStringList selections, QStrin
     return Qt::Unchecked;
 }
 
-void ModelCheckingWindow::listSubtypes(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent) {
+void ModelCheckingWindow::listSubtypes(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent, QStringList preSelection) {
     QDir dir;
     dir.setPath(parent.filePath());
     dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoSymLinks);
@@ -197,33 +202,37 @@ void ModelCheckingWindow::listSubtypes(QTreeWidgetItem *parentWidgetItem, QFileI
     const QFileInfoList fileList = dir.entryInfoList();
 
     for (int i = 0; i < fileList.size(); i++) {
-        QFileInfo fileInfo = fileList.at(i);
+        QFileInfo childFileInfo = fileList.at(i);
         QStringList fileColumn;
-        fileColumn.append(fileInfo.fileName());
-        if (fileInfo.fileName() == "." || fileInfo.fileName() == ".." ); // nothing
-        else if(fileInfo.isDir()) { // is directory
+        fileColumn.append(childFileInfo.fileName());
+        if (childFileInfo.fileName() == "." || childFileInfo.fileName() == ".." ); // nothing
+        else if(childFileInfo.isDir()) { // is directory
             continue;
         }
         else { // is file
-                if (fileInfo.suffix() == "asn"){
-                    fileColumn.append(fileInfo.filePath());
+                if (childFileInfo.suffix() == "asn"){
+                    fileColumn.append(childFileInfo.filePath());
                     QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
                     child->setIcon(0, this->style()->standardIcon(QStyle::SP_TitleBarNormalButton));
-                    child->setCheckState(0, Qt::Unchecked);
+                    child->setCheckState(0, getCheckState(preSelection, childFileInfo.filePath()));
                     parentWidgetItem->addChild(child);
                 }
         }
     }
 }
 
-void ModelCheckingWindow::listModelFunctions(QTreeWidgetItem *parentWidgetItem) {
+void ModelCheckingWindow::listModelFunctions(QTreeWidgetItem *parentWidgetItem, QStringList preSelection) {
     for (ivm::IVFunction *function : d->document->objectsModel()->allObjectsByType<ivm::IVFunction>()) {
         if(!function->hasNestedChildren()){
-            QStringList functionColumn3;
-            functionColumn3.append(function->title());
-            QTreeWidgetItem *functionNode = new QTreeWidgetItem(functionColumn3);
+            QStringList functionColumn;
+            functionColumn.append(function->title());
+            QTreeWidgetItem *functionNode = new QTreeWidgetItem(functionColumn);
             functionNode->setIcon(0, this->style()->standardIcon(QStyle::SP_MediaStop));
-            functionNode->setCheckState(0, Qt::Checked);
+            if (preSelection.size() == 0) { // cannot be empty, only if in first tree build so preselect all nodes in that case
+                functionNode->setCheckState(0, Qt::Checked);
+            } else {
+                functionNode->setCheckState(0, getCheckState(preSelection, function->title()));
+            }
             parentWidgetItem->addChild(functionNode);
         }
     }
@@ -761,10 +770,112 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
     ifOptions.append(d->ui->lineEdit_maxNumEnvRICalls->text());
     ifOptions.append(d->ui->comboBox_expAlgorithm->currentText().left(3) == "DFS" ? "dfs" : "bfs");
     ifOptions.append(d->ui->lineEdit_maxNumStates->text());
-    XmlWriter writer(propsSelection, subtypesSelection, functionSelection, ifOptions);
+    XmelWriter writer(propsSelection, subtypesSelection, functionSelection, ifOptions);
     if (writer.writeFile(&file, fileName + ".xml")){
         statusBar()->showMessage("Configuration file successfully saved as " + fileName + ".xml", 6000);
     }
+}
+
+
+void ModelCheckingWindow::on_pushButton_loadConfiguration_clicked()
+{
+    // check if configurations dir exists and create it otherwise
+    if (!QDir(this->configurationsPath).exists()){
+        QDir().mkdir(this->configurationsPath);
+    }
+
+    // Ask user for file to load
+    QString configFilePath =
+            QFileDialog::getOpenFileName(this, tr("Open configuration file"),
+                                         this->configurationsPath,
+                                         tr("XMEL Files (*.xmel *.xml)"));
+    if (configFilePath.isEmpty())
+        return;
+
+    // Open selected configuration file
+    QFile file(configFilePath);
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+        QMessageBox::warning(this, tr("Load configuration"),
+                             tr("Cannot read file %1:\n%2.")
+                             .arg(QDir::toNativeSeparators(configFilePath),
+                                  file.errorString()));
+        return;
+    }
+
+    // Read from configuration file
+    XmelReader reader;
+    int readRet = reader.read(&file);
+    if ( readRet != 0) {
+        QMessageBox::warning(this, tr("Load configuration"),
+                             tr("Invalid configuration file %1")
+                             .arg(QDir::toNativeSeparators(configFilePath)));
+        return;
+    }
+
+    // set all user selections
+    setPropertiesSelection(reader.getPropertiesSelected());
+    //qDebug() << reader.getPropertiesSelected();
+    setSubtypesSelection(reader.getSubtypesSelected());
+    //qDebug() << reader.getSubtypesSelected();
+    setFunctionsSelection(reader.getFunctionsSelected());
+    //qDebug() << reader.getFunctionsSelected();
+
+    //qDebug() << reader.getIfConfig().at(0);
+    // set IF config params
+    d->ui->lineEdit_maxNumScenarios->setText(reader.getIfConfig().at(0));
+    reader.getIfConfig().at(1) == "true" ? d->ui->checkBox_errorScenarios->setCheckState(Qt::Checked) : d->ui->checkBox_errorScenarios->setCheckState(Qt::Unchecked);
+    reader.getIfConfig().at(2) == "true" ? d->ui->checkBox_successScenarios->setCheckState(Qt::Checked) : d->ui->checkBox_successScenarios->setCheckState(Qt::Unchecked);
+    d->ui->lineEdit_timeLimit->setText(reader.getIfConfig().at(3));
+    d->ui->lineEdit_maxNumEnvRICalls->setText(reader.getIfConfig().at(4));
+    reader.getIfConfig().at(5) == "dfs" ? d->ui->comboBox_expAlgorithm->setCurrentIndex(0) : d->ui->comboBox_expAlgorithm->setCurrentIndex(1);
+    d->ui->lineEdit_maxNumStates->setText(reader.getIfConfig().at(6));
+
+    statusBar()->showMessage(tr("Configuration file loaded"), 6000);
+}
+
+
+void ModelCheckingWindow::setPropertiesSelection(QStringList propertiesSelected){
+
+    Q_ASSERT(propertiesSelected.size() > 0);
+
+    QFileInfo propertiesFileInfo(this->propertiesPath);
+    // destroy tree except root
+    QTreeWidgetItem *treeRoot = this->propertiesTopDirWidgetItem;
+    for (int i = treeRoot->childCount(); i > 0; i--){
+        treeRoot->removeChild(treeRoot->child(i-1));
+    }
+    // rebuild tree with selection
+    this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, propertiesSelected));
+
+}
+
+void ModelCheckingWindow::setSubtypesSelection(QStringList subtypesSelected){
+
+    Q_ASSERT(subtypesSelected.size() <= 1);
+
+    QFileInfo subtypesFileInfo(this->subtypesPath);
+    // destroy tree except root
+    QTreeWidgetItem *treeRoot = this->subtypesTopDirWidgetItem;
+    for (int i = treeRoot->childCount(); i > 0; i--){
+        treeRoot->removeChild(treeRoot->child(i-1));
+    }
+    // rebuild tree with selection
+    listSubtypes(this->subtypesTopDirWidgetItem, subtypesFileInfo, subtypesSelected);
+
+}
+
+void ModelCheckingWindow::setFunctionsSelection(QStringList functionsSelected){
+
+    Q_ASSERT(functionsSelected.size() > 0);
+
+    // destroy tree except root
+    QTreeWidgetItem *treeRoot = this->functionsTopNodeWidgetItem;
+    for (int i = treeRoot->childCount(); i > 0; i--){
+        treeRoot->removeChild(treeRoot->child(i-1));
+    }
+    // rebuild tree with selection
+    listModelFunctions(this->functionsTopNodeWidgetItem, functionsSelected);
+
 }
 
 }
