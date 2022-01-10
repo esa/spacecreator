@@ -73,7 +73,7 @@ void SdlExporter::exportProcess(const Process &process, const Options &options) 
     visitor.visit(process);
 
     const auto pathPrefix = options.value(SdlOptions::filepathPrefix).value_or("");
-    const auto filePath = makeFilePath(pathPrefix, process.name(), "pr");
+    const auto filePath = makeFilePath(pathPrefix, process.name().toLower(), "pr");
 
     QSaveFile outputFile(filePath);
     writeAndCommit(outputFile, serializedProcess);
