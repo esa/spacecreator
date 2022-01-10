@@ -43,6 +43,9 @@ class BooleanDataEncoding;
 class BooleanDataType;
 class Component;
 class ContainerDataType;
+class ContainerRangeConstraint;
+class ContainerTypeConstraint;
+class ContainerValueConstraint;
 class DataTypeRef;
 class DimensionSize;
 class EnumeratedDataType;
@@ -279,6 +282,7 @@ private:
      * @param   asn1Sequence    Sequence to which field should be added
      */
     auto createRealizationContainerField(Asn1Acn::Types::Sequence *asn1Sequence) -> void;
+
     /**
      * @brief   Adds a reference to the realization in the given parent container
      *
@@ -287,6 +291,15 @@ private:
      */
     auto updateParentContainer(const QString &sedsBaseTypeName, Asn1Acn::Types::Sequence *asn1RealizationSequence)
             -> void;
+
+    auto applyContainerConstraints(const seds::model::ContainerDataType &sedsType,
+            Asn1Acn::Types::Sequence *asn1RealizationSequence) const -> void;
+    auto applyContainerRangeConstraint(const seds::model::ContainerRangeConstraint &rangeConstraint,
+            Asn1Acn::Types::Sequence *asn1RealizationSequence) const -> void;
+    auto applyContainerTypeConstraint(const seds::model::ContainerTypeConstraint &typeConstraint,
+            Asn1Acn::Types::Sequence *asn1RealizationSequence) const -> void;
+    auto applyContainerValueConstraint(const seds::model::ContainerValueConstraint &valueConstraint,
+            Asn1Acn::Types::Sequence *asn1RealizationSequence) const -> void;
 
     /**
      * @brief   Converts SEDS byte order

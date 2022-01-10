@@ -54,6 +54,9 @@ using seds::model::ArrayDataType;
 using seds::model::BinaryDataType;
 using seds::model::BooleanDataType;
 using seds::model::ContainerDataType;
+using seds::model::ContainerRangeConstraint;
+using seds::model::ContainerTypeConstraint;
+using seds::model::ContainerValueConstraint;
 using seds::model::EnumeratedDataType;
 using seds::model::FloatDataType;
 using seds::model::IntegerDataType;
@@ -144,8 +147,10 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
         }
     }
 
+
     // Add realization to the parent component
     if (sedsType.baseType()) {
+        applyContainerConstraints(sedsType, type.get());
         updateParentContainer(Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr()), type.get());
     }
 
@@ -593,6 +598,40 @@ void DataTypeTranslatorVisitor::createRealizationContainerField(Asn1Acn::Types::
             std::make_unique<Asn1Acn::AsnSequenceComponent>(m_realizationComponentsName, m_realizationComponentsName,
                     false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(realizationChoice));
     asn1Sequence->addComponent(std::move(realizationComponent));
+}
+
+void DataTypeTranslatorVisitor::applyContainerConstraints(
+        const ContainerDataType &sedsType, Asn1Acn::Types::Sequence *asn1RealizationSequence) const
+{
+    for (const auto &constraint : sedsType.constraints()) {
+        std::visit(overloaded { [&](const ContainerRangeConstraint &rangeConstraint) {
+                                   applyContainerRangeConstraint(rangeConstraint, asn1RealizationSequence);
+                               },
+                           [&](const ContainerTypeConstraint &typeConstraint) { Q_UNUSED(typeConstraint); },
+                           [&](const ContainerValueConstraint &valueConstraint) { Q_UNUSED(valueConstraint); } },
+                constraint);
+    }
+}
+
+void DataTypeTranslatorVisitor::applyContainerRangeConstraint(
+        const ContainerRangeConstraint &rangeConstraint, Asn1Acn::Types::Sequence *asn1RealizationSequence) const
+{
+    Q_UNUSED(rangeConstraint);
+    Q_UNUSED(asn1RealizationSequence);
+}
+
+void DataTypeTranslatorVisitor::applyContainerTypeConstraint(
+        const ContainerTypeConstraint &typeConstraint, Asn1Acn::Types::Sequence *asn1RealizationSequence) const
+{
+    Q_UNUSED(typeConstraint);
+    Q_UNUSED(asn1RealizationSequence);
+}
+
+void DataTypeTranslatorVisitor::applyContainerValueConstraint(
+        const ContainerValueConstraint &valueConstraint, Asn1Acn::Types::Sequence *asn1RealizationSequence) const
+{
+    Q_UNUSED(valueConstraint);
+    Q_UNUSED(asn1RealizationSequence);
 }
 
 void DataTypeTranslatorVisitor::updateParentContainer(
