@@ -247,13 +247,13 @@ void InterfaceDocument::updateLayersModel() const
 {
     if (layersModel() != nullptr) {
         auto layers = layersModel()->allObjectsByType<ivm::IVConnectionLayerType>();
-        bool isDefault = false;
+        bool isDefaultPresent = false;
         for (auto *layer : layers) {
             if (layer->name().compare(ivm::IVConnectionLayerType::DefaultLayerName) == 0) {
-                isDefault = true;
+                isDefaultPresent = true;
             }
         }
-        if (!isDefault) {
+        if (!isDefaultPresent) {
             layersModel()->addObject(new ivm::IVConnectionLayerType(
                     ivm::IVConnectionLayerType::DefaultLayerName, layersModel()->rootObject(), shared::createId()));
         }

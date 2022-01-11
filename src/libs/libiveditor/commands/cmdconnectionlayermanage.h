@@ -49,8 +49,8 @@ protected:
 
     ivm::IVModel *m_layersModel;
     ivm::IVObject *m_parent;
-    ivm::IVConnectionLayerType *m_entity;
-    QString m_entityPrevName;
+    ivm::IVConnectionLayerType *m_layer;
+    QString m_layerPrevName;
 };
 
 class CmdConnectionLayerCreate : public CmdConnectionLayerManage

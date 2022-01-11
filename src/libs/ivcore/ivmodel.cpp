@@ -350,7 +350,7 @@ IVConnectionLayerType *IVModel::getConnectionLayerByName(const QString &name) co
 {
     if (d->m_layersModel != nullptr) {
         for (auto *layer : d->m_layersModel->allObjectsByType<IVConnectionLayerType>()) {
-            if (layer->name().compare(name)) {
+            if (layer->name().compare(name) == 0) {
                 return layer;
             }
         }
