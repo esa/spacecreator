@@ -18,6 +18,8 @@ static const QSizeF kDefaultGraphicsItemSize = { 200, 80 };
 static const QSizeF kDefaultNodeGraphicsItemSize = { 160, 160 };
 
 static const qreal kInterfaceLayoutOffset = 17.0;
+static const qreal kInterfaceBaseLength = 12.0;
+static const qreal kSiblingMinDistance = 8.0;
 
 /*!
  * \brief The tolerance used to find an IVInterfaceGraphicsItem on scene (the size of a square used as a search area)
@@ -119,6 +121,8 @@ bool rectContainsPoint(const QRectF &rect, const QPointF &point, bool proper = t
 QList<QRectF> siblingItemsRects(const QGraphicsItem *item);
 
 QRectF collidingRect(const QRectF &rect, const QList<QRectF> &existingRects);
+void findGeometryForPoint(QPointF &itemRect, const QRectF &boundedRect, const QList<QRectF> &existingRects = {},
+        const QMarginsF &margins = kRootMargins);
 void findGeometryForRect(QRectF &itemRect, QRectF &boundedRect, const QList<QRectF> &existingRects = {},
         const QMarginsF &margins = kRootMargins);
 

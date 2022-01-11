@@ -46,7 +46,7 @@ public:
          * @param   name        Target type name
          * @param   sedsPackage Target package to add the type to
          */
-        Context(const Asn1Acn::Asn1Model *asn1Model, const Asn1Acn::Definitions *definitions, const QString name,
+        Context(const Asn1Acn::Asn1Model *asn1Model, const Asn1Acn::Definitions *definitions, QString name,
                 ::seds::model::Package *sedsPackage);
 
         /**
@@ -66,7 +66,7 @@ public:
          *
          * @returns Target type name
          */
-        auto name() -> const QString;
+        auto name() -> const QString &;
         /**
          * @brief Target SEDS package accessor
          *

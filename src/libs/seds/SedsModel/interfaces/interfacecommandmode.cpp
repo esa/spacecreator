@@ -34,9 +34,9 @@ auto enumFromString(const QStringRef &enumStr) -> std::optional<InterfaceCommand
 }
 
 template<>
-auto stringFromEnum(InterfaceCommandMode mode) -> const QString &
+auto stringFromEnum(InterfaceCommandMode enumType) -> const QString &
 {
-    switch (mode) {
+    switch (enumType) {
     case InterfaceCommandMode::Sync: {
         static const QString sync = "sync";
         return sync;

@@ -77,7 +77,7 @@ QPainterPath IVInterfaceGroupGraphicsItem::ifacePath() const
     }
 
     static const qreal baseHeightValue = typeIconHeight();
-    static const qreal baseWidthValue = baseLength();
+    static const qreal baseWidthValue = shared::graphicsviewutils::kInterfaceBaseLength;
     QPainterPath path;
     path.addPolygon(QVector<QPointF> { QPointF(-2 * baseHeightValue / 3, 0), QPointF(0, -baseWidthValue / 2),
             QPointF(2 * baseHeightValue / 3, 0), QPointF(0, baseWidthValue / 2) });

@@ -1,5 +1,6 @@
 #include "graphicsviewutils.h"
 
+#include "positionlookuphelper.h"
 #include "ui/veinteractiveobject.h"
 #include "ui/verectgraphicsitem.h"
 #include "veobject.h"
@@ -1114,6 +1115,32 @@ void drawText(QPainter *painter, const QRectF &rect, const QString &text, qreal 
         textLayout.endLayout();
         if (complete)
             break;
+    }
+}
+
+void findGeometryForPoint(
+        QPointF &ifacePos, const QRectF &boundedRect, const QList<QRectF> &existingRects, const QMarginsF &margins)
+{
+    const QRectF kBaseRect = adjustFromPoint(QPointF(0, 0), kInterfaceBaseLength);
+    QRectF itemRect = adjustFromPoint(ifacePos, kInterfaceBaseLength + kSiblingMinDistance);
+
+    itemRect.moveCenter(ifacePos);
+    QRectF intersectedRect;
+
+    if (((ifacePos.isNull() && existingRects.isEmpty()) || isCollided(existingRects, itemRect, &intersectedRect))
+            && boundedRect.isValid()) {
+        QPainterPath pp;
+        pp.addRect(kBaseRect);
+        const QList<QPair<Qt::Alignment, QPainterPath>> sidePaths {
+            { Qt::AlignLeft, pp },
+            { Qt::AlignTop, pp },
+            { Qt::AlignRight, pp },
+            { Qt::AlignBottom, pp },
+        };
+        shared::PositionLookupHelper helper(sidePaths, boundedRect, existingRects, ifacePos);
+        if (helper.lookup()) {
+            ifacePos = helper.mappedOriginPoint();
+        }
     }
 }
 

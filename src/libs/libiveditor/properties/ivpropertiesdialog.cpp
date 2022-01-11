@@ -59,7 +59,7 @@ IVPropertiesDialog::IVPropertiesDialog(const QString &projectPath, ivm::IVProper
 {
 }
 
-IVPropertiesDialog::~IVPropertiesDialog() { }
+IVPropertiesDialog::~IVPropertiesDialog() {}
 
 QString IVPropertiesDialog::objectTypeName() const
 {
@@ -238,7 +238,7 @@ void IVPropertiesDialog::initCommentView()
 void IVPropertiesDialog::initLanguageView()
 {
     auto fn = qobject_cast<ivm::IVFunction *>(dataObject());
-    if (!fn) {
+    if (!fn || fn->instanceOf() != nullptr) {
         return;
     }
     auto languagesWidget = new ive::ImplementationsWidget(m_projectPath, fn, m_ivChecks, commandMacro(), this);

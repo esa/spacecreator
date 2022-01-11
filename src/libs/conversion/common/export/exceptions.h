@@ -90,7 +90,7 @@ public:
      *
      * @param   elementName     Element name
      */
-    explicit UnsupportedElementException(QString elementName);
+    explicit UnsupportedElementException(const QString &elementName);
 };
 
 } // namespace conversion::exporter

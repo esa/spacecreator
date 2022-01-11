@@ -127,6 +127,10 @@ void MiniViewRenderer::updateData()
                 itemsWithoutGeometry.append(child->id());
             }
         } else if (auto connection = qobject_cast<const ivm::IVConnection *>(child)) {
+            if (!connection->source() || !connection->target() || !connection->sourceInterface()
+                    || !connection->targetInterface()) {
+                continue;
+            }
             const QPolygonF itemScenePoints =
                     shared::graphicsviewutils::polygon(ivm::IVObject::coordinatesFromString(strCoordinates));
 

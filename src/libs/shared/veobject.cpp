@@ -149,12 +149,12 @@ QList<EntityAttribute> VEObject::sortedAttributesValues(const EntityAttributes &
 
 void VEObject::setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type)
 {
-    bool isExportable = true;
+    EntityAttribute attr { name, value, type };
     auto it = d->m_attrs.find(name);
-    if (it == d->m_attrs.end()) {
-        isExportable = it->isExportable();
+    if (it != d->m_attrs.end()) {
+        attr.setExportable(it->isExportable());
     }
-    d->m_attrs[name] = EntityAttribute { name, value, type };
+    d->m_attrs[name] = attr;
     Q_EMIT attributeChanged(name);
 }
 

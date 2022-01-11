@@ -21,14 +21,31 @@
 #include "ivconnection.h"
 #include "ivinterface.h"
 #include "ivmodel.h"
+#include "propertytemplate.h"
+#include "propertytemplateconfig.h"
 
 namespace ive {
 namespace cmd {
 
+static inline EntityAttribute::Type entityType(
+        shared::PropertyTemplateConfig *config, const ivm::IVObject *obj, const QString &attrName)
+{
+    if (!config || !obj) {
+        return EntityAttribute::Type::Attribute;
+    }
+
+    if (auto propertyTemplate = config->propertyTemplateForObject(obj, attrName)) {
+        return propertyTemplate->info() == shared::PropertyTemplate::Info::Attribute ? EntityAttribute::Type::Attribute
+                                                                                     : EntityAttribute::Type::Property;
+    }
+
+    return EntityAttribute::Type::Attribute;
+}
+
 CmdIfaceDataChangeBase::CmdIfaceDataChangeBase(shared::PropertyTemplateConfig *config, ivm::IVInterface *iface,
         const QString &targetName, const QVariant &targetValue, const QVariant &prevValue, QUndoCommand *parent)
     : shared::cmd::CmdEntityAttributesChange(
-            config, iface, { EntityAttribute { targetName, targetValue, EntityAttribute::Type::Attribute } })
+              config, iface, { EntityAttribute { targetName, targetValue, entityType(config, iface, targetName) } })
     , m_iface(iface)
     , m_model(m_iface ? m_iface->model() : nullptr)
     , m_relatedConnections()
@@ -38,7 +55,9 @@ CmdIfaceDataChangeBase::CmdIfaceDataChangeBase(shared::PropertyTemplateConfig *c
     , m_newValue(targetValue)
     , m_cmdRmConnection()
 {
-    setText(QObject::tr("Change %1's %2").arg(m_iface->titleUI(), m_targetName));
+    if (m_iface) {
+        setText(QObject::tr("Change %1's %2").arg(m_iface->titleUI(), m_targetName));
+    }
 }
 
 CmdIfaceDataChangeBase::~CmdIfaceDataChangeBase()

@@ -112,7 +112,7 @@ public:
     virtual QVariantList generateProperties(bool isProperty) const = 0;
 
     // Perform updates/actions directly before the data is saved
-    virtual void updateForExport() {};
+    virtual void updateForExport() { }
 
     void setAttributeExportable(const QString &attrName, bool isExportable);
 

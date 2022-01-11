@@ -71,7 +71,7 @@ private:
             -> void;
 
     static auto createSedsXmlDocument() -> QDomDocument;
-    static auto createRootElement(QString rootElementName, QDomDocument &sedsDomDocument) -> QDomElement;
+    static auto createRootElement(const QString &rootElementName, QDomDocument &sedsDocument) -> QDomElement;
 
 private:
     static const QString m_schemaNsUri;

@@ -76,7 +76,7 @@ void Asn1ItemModel::setAsn1Model(const std::unique_ptr<Asn1Acn::TypeAssignment> 
     setItem(0, MODEL_NAME_INDEX, itemMap["item"]);
     setItem(0, MODEL_TYPE_INDEX, itemMap["type"]);
     setItem(0, MODEL_VALUE_INDEX, itemMap["value"]);
-    setItem(0, MODEL_IS_OPTIONAL_INDEX, itemMap["present"]);
+    setItem(0, MODEL_IS_PRESENT_INDEX, itemMap["present"]);
 }
 
 /*!
@@ -261,17 +261,16 @@ QStandardItem *Asn1ItemModel::createSequenceItem(const Asn1Acn::Types::Sequence 
         }
 
         ItemMap childItem = createModelItems(asnSequenceComponent->type(), asnSequenceComponent->name());
-        childItem["present"]->setCheckable(true);
-        childItem["present"]->setCheckState(asnSequenceComponent->isOptional() ? Qt::Checked : Qt::Unchecked);
+        if (asnSequenceComponent->isOptional()) {
+            childItem["present"]->setEnabled(true);
+            childItem["present"]->setCheckable(true);
+        } else {
+            childItem["present"]->setCheckState(Qt::Checked);
+        }
 
-        if (QStandardItem *valueItem = childItem["value"]) {
-            if (valueItem->text().isEmpty()) {
-                const std::optional<QString> defaultValue = asnSequenceComponent->defaultValue();
-                if (defaultValue.has_value()) {
-                    valueItem->setText(defaultValue.value());
-                    valueItem->setData(true, DEFAULT_ROLE);
-                }
-            }
+        const std::optional<QString> defaultValue = asnSequenceComponent->defaultValue();
+        if (defaultValue.has_value()) {
+            childItem["value"]->setData(defaultValue.value(), DEFAULT_ROLE);
         }
 
         parent->appendRow(childItem["item"]);
@@ -398,6 +397,7 @@ QStandardItem *Asn1ItemModel::createPresentItem()
 {
     QStandardItem *item = new QStandardItem();
     item->setEnabled(false);
+    item->setEditable(false);
 
     return item;
 }
@@ -405,7 +405,22 @@ QStandardItem *Asn1ItemModel::createPresentItem()
 bool Asn1ItemModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (index.column() == MODEL_VALUE_INDEX) {
-        itemFromIndex(index)->setData(false, DEFAULT_ROLE);
+        if (auto item = itemFromIndex(index.siblingAtColumn(MODEL_IS_PRESENT_INDEX))) {
+            if (item->isCheckable()) {
+                item->setCheckState(value.isNull() ? Qt::Unchecked : Qt::Checked);
+            }
+        }
+    } else if (index.column() == MODEL_IS_PRESENT_INDEX && role == Qt::CheckStateRole) {
+        if (auto item = itemFromIndex(index.siblingAtColumn(MODEL_VALUE_INDEX))) {
+            if (value.value<Qt::CheckState>() == Qt::Unchecked) {
+                item->setText(QString());
+            } else if (item->text().isEmpty()) {
+                const QVariant defaultValue = item->data(DEFAULT_ROLE);
+                if (!defaultValue.isNull()) {
+                    item->setText(defaultValue.toString());
+                }
+            }
+        }
     }
     return QStandardItemModel::setData(index, value, role);
 }

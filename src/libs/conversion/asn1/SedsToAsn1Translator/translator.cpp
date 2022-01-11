@@ -109,7 +109,7 @@ std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePacka
     result.push_back(std::move(packageAsn1File));
 
     for (const auto &sedsComponent : sedsPackage.components()) {
-        if (sedsComponent.dataTypes().size() == 0) {
+        if (sedsComponent.dataTypes().empty()) {
             // Don't generate ASN.1 package (and therefore a file) for a component without data type declarations
             continue;
         }

@@ -44,7 +44,7 @@ MissingOutputFilenameException::MissingOutputFilenameException(ModelType modelTy
 {
 }
 
-UnsupportedElementException::UnsupportedElementException(QString elementName)
+UnsupportedElementException::UnsupportedElementException(const QString &elementName)
     : ExportException(QString("Element %1 is unsupported").arg(elementName))
 {
 }

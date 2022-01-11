@@ -4,6 +4,8 @@ set(SEDS_PLUGIN_SOURCES
     SedsPlugin.json.in
     sedsplugin.cpp
     sedsplugin.h
+    messagemanager.cpp
+    messagemanager.h
 )
 
 set(SEDS_QTC_LIBRARIES

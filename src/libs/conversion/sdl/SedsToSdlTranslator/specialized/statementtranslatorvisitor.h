@@ -74,7 +74,7 @@ public:
          * @param   prefix   Label name prefix
          * @returns Unique label name
          */
-        auto uniqueLabelName(const QString prefix = "label_") -> QString;
+        auto uniqueLabelName(const QString &prefix = "label_") -> QString;
 
         /**
          * @brief SEDS Package accessor
@@ -204,7 +204,7 @@ private:
     Context &m_context;
     ::sdl::Transition *m_sdlTransition;
 
-    static auto findInterfaceDeclaration(ivm::IVModel *model, const QString functionName, const QString interfaceName)
+    static auto findInterfaceDeclaration(ivm::IVModel *model, const QString &functionName, const QString &interfaceName)
             -> ivm::IVInterface *;
 
     static auto findVariableDeclaration(::sdl::Process *process, ::sdl::Procedure *sdlProcedure, QString name)
@@ -218,7 +218,7 @@ private:
     static auto translateCall(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString callName,
             const seds::model::SendCommandPrimitive &sendCommand) -> std::unique_ptr<::sdl::ProcedureCall>;
 
-    static auto translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString callName,
+    static auto translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString &callName,
             const seds::model::SendCommandPrimitive &sendCommand) -> std::vector<std::unique_ptr<::sdl::Action>>;
 
     static auto translateComparison(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
@@ -233,7 +233,7 @@ private:
     static auto translateTypeCheck(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
             const seds::model::TypeCheck &check) -> QString;
 
-    static auto translateAnswer(Context &context, ::sdl::Label *joinLabel, const QString value,
+    static auto translateAnswer(Context &context, ::sdl::Label *joinLabel, const QString &value,
             const seds::model::Body *body) -> std::unique_ptr<::sdl::Answer>;
 
     static auto comparisonOperatorToString(const seds::model::ComparisonOperator op) -> QString;

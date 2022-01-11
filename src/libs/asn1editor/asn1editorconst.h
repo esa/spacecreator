@@ -31,5 +31,5 @@ const int DEFAULT_ROLE = Qt::UserRole + 4;
 const int MODEL_NAME_INDEX = 0;
 const int MODEL_TYPE_INDEX = 1;
 const int MODEL_VALUE_INDEX = 2;
-const int MODEL_IS_OPTIONAL_INDEX = 3;
+const int MODEL_IS_PRESENT_INDEX = 3;
 }
