@@ -23,10 +23,12 @@
 #include "../spacecreatorplugin/iv/iveditordocument.h"
 #include "../spacecreatorplugin/iv/iveditorfactory.h"
 #include "../spacecreatorplugin/iv/ivqtceditor.h"
+#include "common.h"
 #include "context/action/actionsmanager.h"
 #include "conversion/asn1/Asn1Options/options.h"
 #include "conversion/converter/exceptions.h"
 #include "conversion/iv/IvOptions/options.h"
+#include "entityattribute.h"
 #include "exceptions.h"
 #include "export/exceptions.h"
 #include "exporter.h"
@@ -201,7 +203,7 @@ auto SedsPlugin::createActionContainerInTools(const QString &title) -> ActionCon
 auto SedsPlugin::importInterfaceView() -> void
 {
     const QString tmpIvFilename = "tmp-interfaceview.xml";
-    const QString ivConfig = "config.xml";
+    const QString ivConfig = shared::interfaceCustomAttributesFilePath();
 
     const QString inputFilePath = QFileDialog::getOpenFileName(
             nullptr, "Select EDS file to import InterfaceView from...", QString(), tr("*.xml"));
@@ -295,7 +297,8 @@ auto SedsPlugin::getPackagenameFromSedsModel(const QString &inputFilePath) -> QS
 auto SedsPlugin::importSdl() -> void
 {
     const QString tmpIvFilename = "tmp-interfaceview.xml";
-    const QString ivConfig = "config.xml";
+    const QString ivConfig = shared::interfaceCustomAttributesFilePath();
+    MessageManager::write(GenMsg::msgInfo.arg(ivConfig));
 
     const QString inputFilePath =
             QFileDialog::getOpenFileName(nullptr, "Select EDS file to import SDL from...", QString(), tr("*.xml"));
@@ -415,7 +418,10 @@ auto SedsPlugin::exportInterfaceView() -> void
             options.add(conversion::iv::IvOptions::inputFilepath,
                     QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg("interfaceview.xml"));
             options.add(conversion::iv::IvOptions::configFilepath,
-                    QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg("config.xml"));
+                    QString("%1%2%3")
+                            .arg(QDir::currentPath())
+                            .arg(QDir::separator())
+                            .arg(shared::interfaceCustomAttributesFilePath()));
             options.add(conversion::seds::SedsOptions::outputFilepath,
                     QString("%1%2%3.xml").arg(outputDir).arg(QDir::separator()).arg("seds_interfaceview"));
             for (auto &selectedFunction : *selectedFunctions) {
@@ -697,6 +703,9 @@ auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel 
         dstIf->setKind(srcIf->kind());
         dstIf->setDirection(srcIf->direction());
         dstIf->setParams(srcIf->params());
+
+        dstIf->removeEntityAttribute("miat");
+        dstIf->removeEntityAttribute("period");
     }
 }
 
