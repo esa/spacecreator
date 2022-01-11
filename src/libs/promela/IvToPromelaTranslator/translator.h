@@ -69,6 +69,8 @@ private:
     std::unique_ptr<::promela::model::InlineDef> generateSendInline(const QString &functionName,
             const QString &interfaceName, const QString &parameterName, const QString &parameterType,
             const QString &sourceFunctionName, const QString &sourceInterfaceName) const;
+    void createPromelaObjectsForFunction(::promela::model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,
+            ::ivm::IVFunction *ivFunction, const QString &functionName) const;
     auto getQueueSize(ivm::IVInterface *interface) const -> size_t;
     auto getPriority(ivm::IVInterface *interface) const -> size_t;
 };
