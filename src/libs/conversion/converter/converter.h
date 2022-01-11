@@ -76,7 +76,7 @@ public:
      * @param   auxiliaryModelsTypes    List of types that will be additionally exported
      */
     auto convert(const std::set<ModelType> &sourceModelsTypes, ModelType targetModelType,
-            const std::set<ModelType> &auxiliaryModelsTypes) -> void;
+            const std::set<ModelType> &auxiliaryModelsTypes) -> std::set<std::unique_ptr<Model>>;
 
 private:
     /**
@@ -97,7 +97,7 @@ private:
      *
      * @param   modelType       Type of model to export
      */
-    auto exportModel(ModelType modelType) -> void;
+    auto exportModel(ModelType modelType) -> std::unique_ptr<Model>;
 
     /**
      * @brief   Checks if model of given type is already present in the model cache

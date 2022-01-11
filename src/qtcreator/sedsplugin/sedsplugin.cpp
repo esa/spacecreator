@@ -29,6 +29,7 @@
 #include "conversion/iv/IvOptions/options.h"
 #include "exceptions.h"
 #include "export/exceptions.h"
+#include "exporter.h"
 #include "fileutils.h"
 #include "graphicsviewutils.h"
 #include "import/exceptions.h"
@@ -44,6 +45,7 @@
 #include "options.h"
 #include "projectexplorer.h"
 #include "projectnodes.h"
+#include "sdl/SdlExporter/exporter.h"
 #include "sdl/SdlOptions/options.h"
 #include "seds/SedsOptions/options.h"
 #include "seds/SedsXmlImporter/importer.h"
@@ -57,6 +59,7 @@
 #include <QMessageBox>
 #include <algorithm>
 #include <asn1library/asn1/asn1model.h>
+#include <conversion/asn1/Asn1Exporter/exporter.h>
 #include <conversion/asn1/Asn1Importer/importer.h>
 #include <conversion/asn1/Asn1Registrar/registrar.h>
 #include <conversion/converter/converter.h>
@@ -318,25 +321,27 @@ auto SedsPlugin::importSdl() -> void
     options.add(conversion::iv::IvOptions::outputFilepath, tmpIvFilename);
     options.add(conversion::iv::IvOptions::configFilepath, ivConfig);
 
-    // TODO: get generated asn/acn file names
-    const QStringList fileNames = {
-        QString("%1%2GUARD.asn").arg(QDir::currentPath()).arg(QDir::separator()),
-        QString("%1%2GUARD.acn").arg(QDir::currentPath()).arg(QDir::separator()),
-    };
-    for (const auto &filename : fileNames) {
-        MessageManager::write(filename);
-    };
+    QStringList asn1Filenames;
     try {
-        convert({ conversion::ModelType::Seds }, conversion::ModelType::Sdl,
+        auto outputModels = convert({ conversion::ModelType::Seds }, conversion::ModelType::Sdl,
                 { conversion::ModelType::InterfaceView, conversion::ModelType::Asn1 }, options);
+        for (const auto &model : outputModels) {
+            auto *const asn1Model = dynamic_cast<Asn1Acn::Asn1Model *>(model.get());
+            if (asn1Model != nullptr) {
+                asn1Filenames = conversion::asn1::exporter::Asn1Exporter::getFilenamesForModel(asn1Model);
+            }
+        }
     } catch (std::exception &ex) {
         MessageManager::write(GenMsg::msgError.arg(ex.what()));
         QFile(tmpIvFilename).remove();
         return;
     }
 
+    for (auto &filename : asn1Filenames) {
+        filename = QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg(filename);
+    };
     ProjectExplorer::Project *const project = ProjectExplorer::ProjectTree::currentProject();
-    project->rootProjectNode()->addFiles(fileNames);
+    project->rootProjectNode()->addFiles(asn1Filenames);
 
     if (!loadAndMergeIvModelIntoCurrent(ivConfig, tmpIvFilename)) {
         return;
@@ -514,10 +519,10 @@ auto SedsPlugin::initializeRegistry() -> void
 
 auto SedsPlugin::convert(const std::set<conversion::ModelType> &srcModelType,
         const conversion::ModelType targetModelType, const std::set<conversion::ModelType> &auxModelTypes,
-        conversion::Options options) -> void
+        conversion::Options options) -> std::set<std::unique_ptr<conversion::Model>>
 {
     Converter converter(m_registry, std::move(options));
-    converter.convert(srcModelType, targetModelType, auxModelTypes);
+    return converter.convert(srcModelType, targetModelType, auxModelTypes);
 }
 
 auto SedsPlugin::ltdialogUpdateWithItemModel(ListTreeDialog &ltdialog, QStandardItemModel *model) -> void

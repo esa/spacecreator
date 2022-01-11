@@ -62,7 +62,8 @@ private:
     auto itemModelUpdateWithFunctionNames(QStandardItemModel &model, const QStringList &ivFunctionsNames) -> void;
     auto initializeRegistry() -> void;
     auto convert(const std::set<conversion::ModelType> &srcModelType, conversion::ModelType targetModelType,
-            const std::set<conversion::ModelType> &auxModelTypes, conversion::Options options) -> void;
+            const std::set<conversion::ModelType> &auxModelTypes, conversion::Options options)
+            -> std::set<std::unique_ptr<conversion::Model>>;
     auto ltdialogUpdateWithItemModel(ListTreeDialog &ltdialog, QStandardItemModel *model) -> void;
     auto getCurIvEditorCore() -> IVEditorCorePtr;
     auto mergeIvModels(ivm::IVModel *dstIvModel, ivm::IVModel *srcIvModel) -> void;

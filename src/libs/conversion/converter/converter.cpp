@@ -44,8 +44,8 @@ Converter::Converter(const Registry &registry, Options options)
 {
 }
 
-void Converter::convert(const std::set<ModelType> &sourceModelsTypes, ModelType targetModelType,
-        const std::set<ModelType> &auxiliaryModelsTypes)
+std::set<std::unique_ptr<Model>> Converter::convert(const std::set<ModelType> &sourceModelsTypes,
+        ModelType targetModelType, const std::set<ModelType> &auxiliaryModelsTypes)
 {
     for (const auto sourceModelType : sourceModelsTypes) {
         if (!m_registry.isImporterRegistered(sourceModelType)) {
@@ -70,11 +70,15 @@ void Converter::convert(const std::set<ModelType> &sourceModelsTypes, ModelType 
         }
     }
 
+    std::set<std::unique_ptr<Model>> outputModels;
+
     translateModels(sourceModelsTypes, targetModelType);
-    exportModel(targetModelType);
+    outputModels.insert(exportModel(targetModelType));
     for (const auto &auxiliaryModelType : auxiliaryModelsTypes) {
-        exportModel(auxiliaryModelType);
+        outputModels.insert(exportModel(auxiliaryModelType));
     }
+
+    return outputModels;
 }
 
 void Converter::importModel(ModelType modelType)
@@ -126,7 +130,7 @@ void Converter::translateModels(const std::set<ModelType> &sourceModelsTypes, Mo
     }
 }
 
-void Converter::exportModel(ModelType modelType)
+std::unique_ptr<Model> Converter::exportModel(ModelType modelType)
 {
     const auto *exporter = m_registry.findExporter(modelType);
 
@@ -137,6 +141,8 @@ void Converter::exportModel(ModelType modelType)
 
     const auto *model = m_modelCache[modelType].get();
     exporter->exportModel(model, m_options);
+
+    return std::move(m_modelCache.extract(modelType).mapped());
 }
 
 bool Converter::isModelImported(ModelType modelType) const

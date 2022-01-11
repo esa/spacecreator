@@ -21,6 +21,8 @@
 
 #include "export/modelexporter.h"
 
+#include <asn1library/asn1/asn1model.h>
+
 namespace Asn1Acn {
 class File;
 }
@@ -38,10 +40,21 @@ public:
      */
     virtual auto exportModel(const Model *model, const Options &options) const -> void override;
 
+    /**
+     * @brief Get the names of files which will be generated for Files within the model
+     *
+     * @param model         ASN.1 model
+     *
+     * @return              a list of filenames
+     */
+    static auto getFilenamesForModel(const Asn1Acn::Asn1Model *model) -> QStringList;
+
 private:
     auto exportAsn1Model(const Asn1Acn::File *file, const Options &options) const -> void;
     auto exportAcnModel(const Asn1Acn::File *file, const Options &options) const -> void;
 
-    auto makeFilePath(const QString &pathPrefix, const QString &fileName, const QString &extension) const -> QString;
+    static auto getFilename(const Asn1Acn::File *file) -> QString;
+    static auto makeAsn1Filename(const Asn1Acn::File *file) -> QString;
+    static auto makeAcnFilename(const Asn1Acn::File *file) -> QString;
 };
 } // namespace conversion::asn1::exporter
