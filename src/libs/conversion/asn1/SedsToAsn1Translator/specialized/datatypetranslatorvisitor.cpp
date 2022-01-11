@@ -58,8 +58,10 @@ using seds::model::ContainerRangeConstraint;
 using seds::model::ContainerTypeConstraint;
 using seds::model::ContainerValueConstraint;
 using seds::model::EnumeratedDataType;
+using seds::model::EnumeratedDataTypeRange;
 using seds::model::FloatDataType;
 using seds::model::IntegerDataType;
+using seds::model::MinMaxRange;
 using seds::model::StringDataType;
 using seds::model::SubRangeDataType;
 
@@ -147,10 +149,9 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
         }
     }
 
-
     // Add realization to the parent component
     if (sedsType.baseType()) {
-        applyContainerConstraints(sedsType, type.get());
+        applyContainerConstraints(sedsType);
         updateParentContainer(Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr()), type.get());
     }
 
@@ -600,38 +601,53 @@ void DataTypeTranslatorVisitor::createRealizationContainerField(Asn1Acn::Types::
     asn1Sequence->addComponent(std::move(realizationComponent));
 }
 
-void DataTypeTranslatorVisitor::applyContainerConstraints(
-        const ContainerDataType &sedsType, Asn1Acn::Types::Sequence *asn1RealizationSequence) const
+void DataTypeTranslatorVisitor::applyContainerConstraints(const ContainerDataType &sedsType) const
 {
     for (const auto &constraint : sedsType.constraints()) {
         std::visit(overloaded { [&](const ContainerRangeConstraint &rangeConstraint) {
-                                   applyContainerRangeConstraint(rangeConstraint, asn1RealizationSequence);
+                                   applyContainerRangeConstraint(rangeConstraint);
                                },
-                           [&](const ContainerTypeConstraint &typeConstraint) { Q_UNUSED(typeConstraint); },
-                           [&](const ContainerValueConstraint &valueConstraint) { Q_UNUSED(valueConstraint); } },
+                           [&](const ContainerTypeConstraint &typeConstraint) {
+                               applyContainerTypeConstraint(typeConstraint);
+                           },
+                           [&](const ContainerValueConstraint &valueConstraint) {
+                               applyContainerValueConstraint(valueConstraint);
+                           } },
                 constraint);
     }
 }
 
-void DataTypeTranslatorVisitor::applyContainerRangeConstraint(
-        const ContainerRangeConstraint &rangeConstraint, Asn1Acn::Types::Sequence *asn1RealizationSequence) const
+void DataTypeTranslatorVisitor::applyContainerRangeConstraint(const ContainerRangeConstraint &rangeConstraint) const
 {
-    Q_UNUSED(rangeConstraint);
-    Q_UNUSED(asn1RealizationSequence);
+    const auto &range = rangeConstraint.range();
+
+    if (const auto minMaxRange = std::get_if<MinMaxRange>(&range)) {
+        applyContainerMinMaxRangeConstraint(*minMaxRange);
+    } else if (const auto enumeratedRange = std::get_if<EnumeratedDataTypeRange>(&range)) {
+        applyContainerEnumeratedRangeConstraint(*enumeratedRange);
+    } else {
+        throw TranslationException("Unhandled ContainerRangeConstraint range type");
+    }
 }
 
-void DataTypeTranslatorVisitor::applyContainerTypeConstraint(
-        const ContainerTypeConstraint &typeConstraint, Asn1Acn::Types::Sequence *asn1RealizationSequence) const
+void DataTypeTranslatorVisitor::applyContainerTypeConstraint(const ContainerTypeConstraint &typeConstraint) const
 {
     Q_UNUSED(typeConstraint);
-    Q_UNUSED(asn1RealizationSequence);
 }
 
-void DataTypeTranslatorVisitor::applyContainerValueConstraint(
-        const ContainerValueConstraint &valueConstraint, Asn1Acn::Types::Sequence *asn1RealizationSequence) const
+void DataTypeTranslatorVisitor::applyContainerValueConstraint(const ContainerValueConstraint &valueConstraint) const
 {
     Q_UNUSED(valueConstraint);
-    Q_UNUSED(asn1RealizationSequence);
+}
+
+void DataTypeTranslatorVisitor::applyContainerMinMaxRangeConstraint(const MinMaxRange &minMaxRange) const
+{
+    Q_UNUSED(minMaxRange);
+}
+
+void DataTypeTranslatorVisitor::applyContainerEnumeratedRangeConstraint(const EnumeratedDataTypeRange &enumeratedRange) const
+{
+    Q_UNUSED(enumeratedRange);
 }
 
 void DataTypeTranslatorVisitor::updateParentContainer(
