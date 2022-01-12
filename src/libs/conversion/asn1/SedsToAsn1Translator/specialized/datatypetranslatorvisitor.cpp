@@ -151,7 +151,7 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 
     // Add realization to the parent component
     if (sedsType.baseType()) {
-        applyContainerConstraints(sedsType);
+        applyContainerConstraints(sedsType, type.get());
         updateParentContainer(Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr()), type.get());
     }
 
@@ -601,32 +601,43 @@ void DataTypeTranslatorVisitor::createRealizationContainerField(Asn1Acn::Types::
     asn1Sequence->addComponent(std::move(realizationComponent));
 }
 
-void DataTypeTranslatorVisitor::applyContainerConstraints(const ContainerDataType &sedsType) const
+void DataTypeTranslatorVisitor::applyContainerConstraints(
+        const ContainerDataType &sedsType, Asn1Acn::Types::Sequence *asn1Type) const
 {
     for (const auto &constraint : sedsType.constraints()) {
-        std::visit(overloaded { [&](const ContainerRangeConstraint &rangeConstraint) {
-                                   applyContainerRangeConstraint(rangeConstraint);
-                               },
-                           [&](const ContainerTypeConstraint &typeConstraint) {
-                               applyContainerTypeConstraint(typeConstraint);
-                           },
-                           [&](const ContainerValueConstraint &valueConstraint) {
-                               applyContainerValueConstraint(valueConstraint);
-                           } },
-                constraint);
+        // clang-format off
+        std::visit(overloaded {
+            [&](const ContainerRangeConstraint &rangeConstraint) {
+                auto asn1ConstrainedType = asn1Type->component(rangeConstraint.entry().nameStr())->type();
+                applyContainerRangeConstraint(rangeConstraint, asn1ConstrainedType);
+            },
+            [&](const ContainerTypeConstraint &typeConstraint) {
+                applyContainerTypeConstraint(typeConstraint);
+            },
+            [&](const ContainerValueConstraint &valueConstraint) {
+                applyContainerValueConstraint(valueConstraint);
+            }
+        }, constraint);
+        // clang-format on
     }
 }
 
-void DataTypeTranslatorVisitor::applyContainerRangeConstraint(const ContainerRangeConstraint &rangeConstraint) const
+void DataTypeTranslatorVisitor::applyContainerRangeConstraint(
+        const ContainerRangeConstraint &rangeConstraint, Asn1Acn::Types::Type *asn1Type) const
 {
-    const auto &range = rangeConstraint.range();
-
-    if (const auto minMaxRange = std::get_if<MinMaxRange>(&range)) {
-        applyContainerMinMaxRangeConstraint(*minMaxRange);
-    } else if (const auto enumeratedRange = std::get_if<EnumeratedDataTypeRange>(&range)) {
-        applyContainerEnumeratedRangeConstraint(*enumeratedRange);
+    if (auto asn1IntegerType = dynamic_cast<Asn1Acn::Types::Integer *>(asn1Type); asn1IntegerType) {
+        RangeTranslatorVisitor<Asn1Acn::IntegerValue> rangeTranslator(
+                asn1IntegerType->constraints(), std::nullopt, std::nullopt);
+        std::visit(rangeTranslator, rangeConstraint.range());
+    } else if (auto asn1RealType = dynamic_cast<Asn1Acn::Types::Real *>(asn1Type); asn1RealType) {
+        RangeTranslatorVisitor<Asn1Acn::RealValue> rangeTranslator(
+                asn1RealType->constraints(), std::nullopt, std::nullopt);
+        std::visit(rangeTranslator, rangeConstraint.range());
+    } else if (auto asn1UserType = dynamic_cast<Asn1Acn::Types::UserdefinedType *>(asn1Type); asn1UserType) {
+        applyContainerRangeConstraint(rangeConstraint, asn1UserType->type());
     } else {
-        throw TranslationException("Unhandled ContainerRangeConstraint range type");
+        throw conversion::translator::TranslationException(
+                "ContainerRangeConstraint can only be applied to the integer and real entries");
     }
 }
 
@@ -638,16 +649,6 @@ void DataTypeTranslatorVisitor::applyContainerTypeConstraint(const ContainerType
 void DataTypeTranslatorVisitor::applyContainerValueConstraint(const ContainerValueConstraint &valueConstraint) const
 {
     Q_UNUSED(valueConstraint);
-}
-
-void DataTypeTranslatorVisitor::applyContainerMinMaxRangeConstraint(const MinMaxRange &minMaxRange) const
-{
-    Q_UNUSED(minMaxRange);
-}
-
-void DataTypeTranslatorVisitor::applyContainerEnumeratedRangeConstraint(const EnumeratedDataTypeRange &enumeratedRange) const
-{
-    Q_UNUSED(enumeratedRange);
 }
 
 void DataTypeTranslatorVisitor::updateParentContainer(

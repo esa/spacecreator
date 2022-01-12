@@ -34,6 +34,9 @@ public:
 public:
     auto value() const -> const FieldRef &;
 
+public:
+    auto nameStr() const -> const QString &;
+
 private:
     FieldRef m_value;
 };

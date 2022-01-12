@@ -19,6 +19,7 @@
 
 #include <conversion/common/translation/exceptions.h>
 #include <optional>
+#include <seds/SedsModel/types/ranges/enumerateddatatyperange.h>
 #include <seds/SedsModel/types/ranges/floatprecisionrange.h>
 #include <seds/SedsModel/types/ranges/minmaxrange.h>
 
@@ -73,6 +74,12 @@ public:
      * @param   range   Range to translate
      */
     auto operator()(const seds::model::FloatPrecisionRange &range) -> void;
+    /**
+     * @brief   Translate SEDS enumerated data type range
+     *
+     * @param   range   Range to translate
+     */
+    auto operator()(const seds::model::EnumeratedDataTypeRange &range) -> void;
 
 private:
     /**
@@ -253,6 +260,14 @@ void RangeTranslatorVisitor<ValueType>::operator()(const seds::model::FloatPreci
     default:
         throw conversion::UnhandledValueException("FloatPrecisionRange");
     }
+}
+
+template<typename ValueType>
+void RangeTranslatorVisitor<ValueType>::operator()(const seds::model::EnumeratedDataTypeRange &range)
+{
+    Q_UNUSED(range);
+
+    throw conversion::translator::TranslationException("EnumeratedDataTypeRange not yet supported");
 }
 
 template<typename ValueType>

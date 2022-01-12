@@ -1,0 +1,17 @@
+COM-N7SPACE-CONTAINERCONSTRAINTS DEFINITIONS ::= BEGIN
+IntegerData ::= INTEGER(0 .. 255)
+RealData ::= REAL(0 .. 255)
+PayloadBase ::= SEQUENCE
+{
+    realization CHOICE
+    {
+        realizationPayloadA PayloadA
+    }
+}
+PayloadA ::= SEQUENCE
+{
+    intData IntegerData(0 .. 255) (5 .. 10),
+    floatData RealData(0 .. 255) (3.14 .. 42.1)
+}
+END
+

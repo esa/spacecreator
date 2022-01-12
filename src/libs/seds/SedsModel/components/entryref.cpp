@@ -31,4 +31,9 @@ const FieldRef &EntryRef::value() const
     return m_value;
 }
 
+const QString &EntryRef::nameStr() const
+{
+    return m_value.value();
+}
+
 } // namespace seds::model

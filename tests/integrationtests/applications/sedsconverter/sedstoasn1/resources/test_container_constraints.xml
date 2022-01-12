@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/ContainerConstraints">
+    <DataTypeSet>
+      <IntegerDataType name="IntegerData">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <FloatDataType name="RealData">
+        <FloatDataEncoding encodingAndPrecision="IEEE754_2008_single" sizeInBits="32" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0.0" max="255.0" />
+        </Range>
+      </FloatDataType>
+      <ContainerDataType name="PayloadBase" abstract="true">
+        <LongDescription>Base for the packet payload data</LongDescription>
+        <EntryList>
+          <Entry name="intData" type="IntegerData" />
+          <Entry name="floatData" type="RealData" />
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="PayloadA" abstract="false" baseType="PayloadBase">
+        <ConstraintSet>
+          <RangeConstraint entry="intData">
+            <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="5" max="10" />
+          </RangeConstraint>
+          <RangeConstraint entry="floatData">
+            <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="3.14" max="42.1" />
+          </RangeConstraint>
+        </ConstraintSet>
+      </ContainerDataType>
+    </DataTypeSet>
+  </Package>
+</PackageFile>

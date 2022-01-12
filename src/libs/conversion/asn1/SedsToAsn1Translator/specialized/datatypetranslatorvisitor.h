@@ -294,12 +294,12 @@ private:
     auto updateParentContainer(const QString &sedsBaseTypeName, Asn1Acn::Types::Sequence *asn1RealizationSequence)
             -> void;
 
-    auto applyContainerConstraints(const seds::model::ContainerDataType &sedsType) const -> void;
-    auto applyContainerRangeConstraint(const seds::model::ContainerRangeConstraint &rangeConstraint) const -> void;
+    auto applyContainerConstraints(
+            const seds::model::ContainerDataType &sedsType, Asn1Acn::Types::Sequence *asn1Type) const -> void;
+    auto applyContainerRangeConstraint(
+            const seds::model::ContainerRangeConstraint &rangeConstraint, Asn1Acn::Types::Type *asn1Type) const -> void;
     auto applyContainerTypeConstraint(const seds::model::ContainerTypeConstraint &typeConstraint) const -> void;
     auto applyContainerValueConstraint(const seds::model::ContainerValueConstraint &valueConstraint) const -> void;
-    auto applyContainerMinMaxRangeConstraint(const seds::model::MinMaxRange &minMaxRange) const -> void;
-    auto applyContainerEnumeratedRangeConstraint(const seds::model::EnumeratedDataTypeRange &enumeratedRange) const -> void;
 
     /**
      * @brief   Converts SEDS byte order
