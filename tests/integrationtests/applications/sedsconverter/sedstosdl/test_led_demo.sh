@@ -24,7 +24,7 @@ cp $TEST_OUTPUT_DIR/COM-N7SPACE-LEDDEMO.asn $TEST_OUTPUT_DIR/dataview-uniq.asn
 cd $TEST_OUTPUT_DIR
 # Compare output against reference, and compile to make sure the reference is valid
 # Clean (rm) only if all steps pass
-$DIFF ledDemo.pr ../resources/test_led_demo.output \
+$DIFF leddemo.pr ../resources/test_led_demo.output \
   && $OPENGEODE --toC system_structure.pr ledDemo.pr \
   && asn1scc -c --type-prefix asn1Scc dataview-uniq.asn \
   && gcc -c LedDemo.c \

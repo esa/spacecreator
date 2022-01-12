@@ -67,7 +67,7 @@ void tst_SedsConverter_SedsToSdl::testStateMachineWithBareInput()
 /// \SRS  ETB-IF-140
 void tst_SedsConverter_SedsToSdl::testLedDemo()
 {
-    const int result = system("./test_calculator.sh");
+    const int result = system("./test_led_demo.sh");
     QCOMPARE(result, 0);
 }
 
@@ -92,7 +92,7 @@ void tst_SedsConverter_SedsToSdl::testLedDemo()
 /// \SRS  ETB-IF-140
 void tst_SedsConverter_SedsToSdl::testCalculator()
 {
-    const int result = system("./test_led_demo.sh");
+    const int result = system("./test_calculator.sh");
     QCOMPARE(result, 0);
 }
 
