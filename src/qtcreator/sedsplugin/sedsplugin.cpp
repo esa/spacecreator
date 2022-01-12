@@ -224,16 +224,18 @@ auto SedsPlugin::importInterfaceView() -> void
         convert({ conversion::ModelType::Seds }, conversion::ModelType::InterfaceView, { conversion::ModelType::Asn1 },
                 options);
     } catch (conversion::ConverterException &ex) {
-        MessageManager::write(GenMsg::msgWarning.arg(ex.what()));
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
         QFile(tmpIvFilename).remove();
         return;
     } catch (std::exception &ex) {
-        MessageManager::write(GenMsg::msgWarning.arg(ex.what()));
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
         QFile(tmpIvFilename).remove();
         return;
     }
 
     if (!loadAndMergeIvModelIntoCurrent(ivConfig, tmpIvFilename)) {
+        MessageManager::write(GenMsg::msgError.arg("Could not merge imported IV into current one"));
+        QFile(tmpIvFilename).remove();
         return;
     }
 
@@ -286,7 +288,6 @@ auto SedsPlugin::importSdl() -> void
 
     for (const auto &filename : sdlFilenames) {
         const QString dstPath = QString("work/%1/SDL/src/").arg(filename.split(".").first().toLower());
-        MessageManager::write(dstPath);
         if (!QDir().mkpath(dstPath)) {
             MessageManager::write(GenMsg::msgError.arg(QString("Could not create path %1").arg(prefix)));
             QFile(tmpIvFilename).remove();
@@ -303,7 +304,7 @@ auto SedsPlugin::importSdl() -> void
     project->rootProjectNode()->addFiles(asn1Filenames);
 
     if (!loadAndMergeIvModelIntoCurrent(ivConfig, tmpIvFilename)) {
-        // todo: pack it into cleanup function
+        MessageManager::write(GenMsg::msgError.arg("Could not merge imported IV into current one"));
         QFile(tmpIvFilename).remove();
         return;
     }
