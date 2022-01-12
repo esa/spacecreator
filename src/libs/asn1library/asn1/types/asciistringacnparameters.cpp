@@ -31,9 +31,9 @@ AsciiStringAcnParameters::AsciiStringAcnParameters()
 {
 }
 
-AsciiStringEncoding AsciiStringAcnParameters::mapEncoding(QStringRef in)
+AsciiStringEncoding AsciiStringAcnParameters::mapEncoding(StringRef in)
 {
-    if (in == "ASCII")
+    if (in == QLatin1String("ASCII"))
         return AsciiStringEncoding::ASCII;
     return AsciiStringEncoding::unspecified;
 }

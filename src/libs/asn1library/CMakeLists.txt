@@ -125,8 +125,8 @@ target_include_directories(${LIB_NAME}
 )
 
 target_link_libraries(${LIB_NAME}
-    shared
-    ${QT_CORE}
+    PUBLIC shared
+           ${QT_CORE}
 )
 
 if(OPTIONS_NO_DEPRECATED)

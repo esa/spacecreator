@@ -87,7 +87,11 @@ void PromelaModelVisitor::generateNamedMtypes(const std::map<QString, NamedMtype
 {
     for (auto iter = values.begin(); iter != values.end(); ++iter) {
         m_stream << "mtype :" << iter->first << " {\n";
-        QVector<QString> mtype_values = QVector<QString>::fromList(iter->second.values().toList());
+        QVector<QString> mtype_values;
+        mtype_values.reserve(iter->second.values().size());
+        for (const auto &value : iter->second.values()) {
+            mtype_values.append(value);
+        }
         std::sort(mtype_values.begin(), mtype_values.end());
         generateMtypeNames(mtype_values);
         m_stream << "}\n";

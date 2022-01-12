@@ -278,6 +278,7 @@ target_include_directories(SedsModel
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SedsModel
     PUBLIC     Conversion::Common
+               shared
     PRIVATE    CommonProjectWarnings)
 
 add_format_target(SedsModel)

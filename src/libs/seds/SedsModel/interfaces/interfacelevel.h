@@ -32,6 +32,6 @@ enum class InterfaceLevel
 };
 
 template<>
-auto enumFromString(const QStringRef &enumStr) -> std::optional<InterfaceLevel>;
+auto enumFromString(const StringRef &enumStr) -> std::optional<InterfaceLevel>;
 
 } // namespace seds::model

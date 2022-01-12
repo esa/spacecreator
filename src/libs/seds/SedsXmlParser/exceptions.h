@@ -21,6 +21,7 @@
 
 #include <QString>
 #include <conversion/common/import/exceptions.h>
+#include <seds/SedsCommon/basetypesmappings.h>
 
 namespace seds::parser {
 
@@ -50,7 +51,7 @@ public:
      * @param   encounteredType     Type of the encountered element
      * @param   elementType         Type of the element in which unhandled element was encountered in
      */
-    UnhandledElement(const QStringRef &encounteredType, const QString &elementType);
+    UnhandledElement(const StringRef &encounteredType, const QString &elementType);
 };
 
 /**
@@ -65,7 +66,7 @@ public:
      * @param   attributeName   Encountered attribute
      * @param   elementType     Type of the element in which unhandled attribute was encountered in
      */
-    UnhandledAttribute(const QStringRef &attributeName, const QStringRef &elementType);
+    UnhandledAttribute(const StringRef &attributeName, const StringRef &elementType);
 };
 
 /**
@@ -79,7 +80,7 @@ public:
      *
      * @param   elementType     Type of the element in which EOF was encountered in
      */
-    UnexpectedEOF(const QStringRef &elementType);
+    UnexpectedEOF(const StringRef &elementType);
 };
 
 } // namespace seds::parser

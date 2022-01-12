@@ -22,7 +22,7 @@
 #include "exceptions.h"
 
 #include <QChar>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <algorithm>
 #include <utility>
 
@@ -110,12 +110,12 @@ bool Escaper::isCharInVector(const QChar &c, const std::vector<QChar> &delimeter
 
 void Escaper::removeLeadingNonletters(QString &name)
 {
-    name.remove(QRegExp("^[0-9 \\-_]*"));
+    name.remove(QRegularExpression("^[0-9 \\-_]*"));
 }
 
 void Escaper::removeNonalphanumericCharacters(QString &name, const QChar &delimeter)
 {
-    name.remove(QRegExp(QString("[^a-zA-Z0-9\\%1]").arg(delimeter)));
+    name.remove(QRegularExpression(QString("[^a-zA-Z0-9\\%1]").arg(delimeter)));
 }
 
 void Escaper::replaceDelimeters(QString &name, const std::vector<QChar> &srcDelimeters, const QChar &dstDelimeter)
