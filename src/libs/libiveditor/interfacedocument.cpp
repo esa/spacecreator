@@ -245,12 +245,17 @@ ivm::IVPropertyTemplateConfig *InterfaceDocument::dynPropConfig() const
 
 void InterfaceDocument::updateLayersModel() const
 {
-    if (ivm::IVConnectionLayerType::connectionLayers.isEmpty()) {
-        ivm::IVConnectionLayerType::addDefaultConnectionLayer(layersModel()->rootObject());
-    }
-    for (auto &layer : ivm::IVConnectionLayerType::connectionLayers) {
-        if (!layersModel()->allObjectsByType<ivm::IVConnectionLayerType>().contains(layer)) {
-            layersModel()->addObject(layer);
+    if (layersModel() != nullptr) {
+        auto layers = layersModel()->allObjectsByType<ivm::IVConnectionLayerType>();
+        bool isDefaultPresent = false;
+        for (auto *layer : layers) {
+            if (layer->name().compare(ivm::IVConnectionLayerType::DefaultLayerName) == 0) {
+                isDefaultPresent = true;
+            }
+        }
+        if (!isDefaultPresent) {
+            layersModel()->addObject(new ivm::IVConnectionLayerType(
+                    ivm::IVConnectionLayerType::DefaultLayerName, layersModel()->rootObject(), shared::createId()));
         }
     }
 }
@@ -567,7 +572,7 @@ IVVisualizationModelBase *InterfaceDocument::layerVisualisationModel() const
     if (d->layerSelect == nullptr) {
         d->layerSelect = new IVVisualizationModelBase(
                 layersModel(), d->commandsStack, shared::DropData::Type::None, const_cast<InterfaceDocument *>(this));
-        auto *title = new QStandardItem(tr("IV Connection Layers"));
+        auto *title = new QStandardItem(tr("Connection Layers"));
         title->setTextAlignment(Qt::AlignCenter);
         d->layerSelect->setHorizontalHeaderItem(0, title);
     }
@@ -673,6 +678,7 @@ void InterfaceDocument::setObjects(const QVector<ivm::IVObject *> &objects)
 {
     d->objectsModel->initFromObjects(objects);
     d->objectsModel->setRootObject({});
+    d->objectsModel->setConnectionLayersModel(d->layersModel);
 }
 
 void InterfaceDocument::onAttributesManagerRequested()

@@ -23,7 +23,10 @@
 
 namespace ive {
 
-ManageConnectionLayersDialog::ManageConnectionLayersDialog(QWidget *parent) {}
+ManageConnectionLayersDialog::ManageConnectionLayersDialog(QWidget *parent)
+    : QDialog(parent)
+{
+}
 
 ManageConnectionLayersDialog::~ManageConnectionLayersDialog() {}
 

@@ -384,7 +384,7 @@ void IVAppWidget::initSharedView()
 
 void IVAppWidget::initLayerView()
 {
-    ui->layerView->setObjectName(QLatin1String("IV Connection Layers"));
+    ui->layerView->setObjectName(QLatin1String("Connection Layers"));
     ui->layerView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     ui->layerView->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
     ui->layerView->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
@@ -480,11 +480,10 @@ QVector<QAction *> IVAppWidget::initActions()
     auto actManageConnectionLayers = new QAction(tr("Manage Connection Layers"));
     ActionsManager::registerAction(
             Q_FUNC_INFO, actManageConnectionLayers, "Connection Layer", "Manage Connection Layers");
-    actManageConnectionLayers->setCheckable(false);
-    //actManageConnectionLayers->setActionGroup(actionGroup);
-    connect(actManageConnectionLayers, &QAction::toggled, this, [this]() {
+    actManageConnectionLayers->setCheckable(true);
+    actManageConnectionLayers->setActionGroup(actionGroup);
+    connect(actManageConnectionLayers, &QAction::triggered, this, [this]() {
         m_tool->setCurrentToolType(IVCreatorTool::ToolType::ConnectionLayer);
-        qWarning() << Q_FUNC_INFO << "Not implemented yet.";
     });
     actManageConnectionLayers->setIcon(QIcon(":/toolbar/icns/connection_layer.svg"));
 

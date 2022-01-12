@@ -157,7 +157,7 @@ IVConnectionLayerType *IVConnection::layer() const
             return sourceInterface()->layer();
         }
     }
-    return IVConnectionLayerType::getDefaultConnectionLayer();
+    return model()->getConnectionLayerByName(IVConnectionLayerType::DefaultLayerName);
 }
 
 /*!

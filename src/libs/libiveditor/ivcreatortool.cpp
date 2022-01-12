@@ -894,18 +894,7 @@ void IVCreatorTool::handleConnectionReCreate(const QVector<QPointF> &graphicPoin
     }
 }
 
-void IVCreatorTool::handleConnectionLayer()
-{
-    /** TODO: implement dialog window and undo/redo command **/
-    m_toolType = ToolType::ConnectionLayer;
-    auto *dialog = new ManageConnectionLayersDialog(m_view->window());
-    if (dialog->exec() == QDialog::Accepted) {
-        auto *cmd = new cmd::CmdConnectionLayerManage(m_doc->layersModel());
-        m_doc->commandsStack()->push(cmd);
-    }
-    dialog->deleteLater();
-    m_doc->updateLayersModel();
-}
+void IVCreatorTool::handleConnectionLayer() {}
 
 bool IVCreatorTool::warnConnectionPreview(const QPointF &pos)
 {
