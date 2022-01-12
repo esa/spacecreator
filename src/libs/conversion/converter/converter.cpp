@@ -19,7 +19,10 @@
 
 #include "converter.h"
 
+#include "asn1library/asn1/asn1model.h"
 #include "exceptions.h"
+#include "modeltype.h"
+#include "sdl/SdlModel/sdlmodel.h"
 
 #include <conversion/common/exceptions.h>
 #include <conversion/common/export/modelexporter.h>
@@ -44,8 +47,8 @@ Converter::Converter(const Registry &registry, Options options)
 {
 }
 
-std::vector<std::unique_ptr<Model>> Converter::convert(const std::set<ModelType> &sourceModelsTypes,
-        ModelType targetModelType, const std::set<ModelType> &auxiliaryModelsTypes)
+void Converter::convert(const std::set<ModelType> &sourceModelsTypes, ModelType targetModelType,
+        const std::set<ModelType> &auxiliaryModelsTypes)
 {
     for (const auto sourceModelType : sourceModelsTypes) {
         if (!m_registry.isImporterRegistered(sourceModelType)) {
@@ -70,12 +73,22 @@ std::vector<std::unique_ptr<Model>> Converter::convert(const std::set<ModelType>
         }
     }
 
+    translateModels(sourceModelsTypes, targetModelType);
+    exportModel(targetModelType);
+    for (const auto &auxiliaryModelType : auxiliaryModelsTypes) {
+        exportModel(auxiliaryModelType);
+    }
+}
+
+std::vector<std::unique_ptr<Model>> Converter::extractCache()
+{
     std::vector<std::unique_ptr<Model>> outputModels;
 
-    translateModels(sourceModelsTypes, targetModelType);
-    outputModels.push_back(exportModel(targetModelType));
-    for (const auto &auxiliaryModelType : auxiliaryModelsTypes) {
-        outputModels.push_back(exportModel(auxiliaryModelType));
+    const std::vector<ModelType> modelTypes { ModelType::Unspecified, ModelType::Asn1, ModelType::InterfaceView,
+        ModelType::Promela, ModelType::Sdl, ModelType::Seds };
+    outputModels.reserve(modelTypes.size());
+    for (auto modelType : modelTypes) {
+        outputModels.push_back(std::move(m_modelCache.extract(modelType).mapped()));
     }
 
     return outputModels;
@@ -130,7 +143,7 @@ void Converter::translateModels(const std::set<ModelType> &sourceModelsTypes, Mo
     }
 }
 
-std::unique_ptr<Model> Converter::exportModel(ModelType modelType)
+void Converter::exportModel(ModelType modelType)
 {
     const auto *exporter = m_registry.findExporter(modelType);
 
@@ -141,8 +154,6 @@ std::unique_ptr<Model> Converter::exportModel(ModelType modelType)
 
     const auto *model = m_modelCache[modelType].get();
     exporter->exportModel(model, m_options);
-
-    return std::move(m_modelCache.extract(modelType).mapped());
 }
 
 bool Converter::isModelImported(ModelType modelType) const

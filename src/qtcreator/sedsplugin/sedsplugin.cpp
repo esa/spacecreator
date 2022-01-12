@@ -487,7 +487,8 @@ auto SedsPlugin::convert(const std::set<conversion::ModelType> &srcModelType,
         conversion::Options options) -> std::vector<std::unique_ptr<conversion::Model>>
 {
     Converter converter(m_registry, std::move(options));
-    return converter.convert(srcModelType, targetModelType, auxModelTypes);
+    converter.convert(srcModelType, targetModelType, auxModelTypes);
+    return converter.extractCache();
 }
 
 auto SedsPlugin::ltdialogUpdateWithItemModel(ListTreeDialog &ltdialog, QStandardItemModel *model) -> void
