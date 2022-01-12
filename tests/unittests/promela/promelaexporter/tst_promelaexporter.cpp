@@ -379,14 +379,16 @@ void tst_PromelaExporter::testBasicProctypes()
     Sequence activeSequence;
     activeSequence.appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("inited"))));
     std::unique_ptr<Proctype> activeProctype = std::make_unique<Proctype>("activeProctype", std::move(activeSequence));
-    activeProctype->setActive(1);
+    activeProctype->setActive(true);
+    activeProctype->setInstancesCount(1);
     model.addProctype(std::move(activeProctype));
 
     Sequence activeManyInstancesSequence;
     activeManyInstancesSequence.appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("inited"))));
     std::unique_ptr<Proctype> activeProctypeManyInstances =
             std::make_unique<Proctype>("activeProctypeMany", std::move(activeManyInstancesSequence));
-    activeProctypeManyInstances->setActive(2);
+    activeProctypeManyInstances->setActive(true);
+    activeProctypeManyInstances->setInstancesCount(2);
     model.addProctype(std::move(activeProctypeManyInstances));
 
     Sequence sequenceWithPriority;

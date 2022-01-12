@@ -181,7 +181,8 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *
     QString proctypeName = QString("%1_%2").arg(functionName).arg(interfaceName);
     std::unique_ptr<Proctype> proctype = std::make_unique<Proctype>(proctypeName, std::move(sequence));
 
-    proctype->setActive(1);
+    proctype->setActive(true);
+    proctype->setInstancesCount(1);
     proctype->setPriority(priority);
 
     return proctype;

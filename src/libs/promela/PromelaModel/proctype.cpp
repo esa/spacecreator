@@ -23,6 +23,7 @@ namespace promela::model {
 Proctype::Proctype(QString name, Sequence sequence)
     : m_name(std::move(name))
     , m_active(false)
+    , m_instances(1)
     , m_sequence(std::move(sequence))
 {
 }
@@ -42,14 +43,18 @@ bool Proctype::isActive() const noexcept
     return m_active;
 }
 
-size_t Proctype::getInstancesCount() const
+void Proctype::setActive(bool active)
 {
-    return m_instances.value();
+    m_active = active;
 }
 
-void Proctype::setActive(size_t instances)
+size_t Proctype::getInstancesCount() const noexcept
 {
-    m_active = true;
+    return m_instances;
+}
+
+void Proctype::setInstancesCount(size_t instances)
+{
     m_instances = instances;
 }
 

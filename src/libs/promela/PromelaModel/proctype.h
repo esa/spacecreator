@@ -63,19 +63,25 @@ public:
      */
     bool isActive() const noexcept;
     /**
+     * @brief Set proctype as active proctype.
+     *
+     * @param active true if proctype is active proctype, otherwise false
+     */
+    void setActive(bool active);
+    /**
      * @brief Getter for instance count of proctype
      *
      * Active proctype has number of instances, default 1
      *
      * @return number of instances of active proctype
      */
-    size_t getInstancesCount() const;
+    size_t getInstancesCount() const noexcept;
     /**
-     * @brief Set proctype as active proctype.
+     * @brief Set number of active instances.
      *
-     * @param instances number of instances
+     * @param instances number of active instances
      */
-    void setActive(size_t instances);
+    void setInstancesCount(size_t instances);
 
     /**
      * @brief Check if proctype has assigned priority
@@ -113,7 +119,7 @@ public:
 private:
     QString m_name;
     bool m_active;
-    std::optional<size_t> m_instances;
+    size_t m_instances;
     std::optional<size_t> m_priority;
     Sequence m_sequence;
 };
