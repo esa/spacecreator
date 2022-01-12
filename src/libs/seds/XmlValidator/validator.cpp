@@ -129,13 +129,13 @@ std::optional<QString> XmlValidator::getSchemaFilepath(const QString &filepath)
         return std::nullopt;
     }
     // xmi:schemaLocation contains url and schema filename separated by space
-    const auto schemaLocation = found->value().split(" ", SEDS_SPLIT_BEHAVIOR);
+    const auto schemaLocation = found->value().toString().split(" ", SEDS_SPLIT_BEHAVIOR);
 
     if (schemaLocation.size() != 2) {
         return std::nullopt;
     }
 
-    const auto schemaFilename = schemaLocation.at(1).toString();
+    const auto schemaFilename = schemaLocation.at(1);
 
     auto fsPath = std::filesystem::path(filepath.toStdString());
     return QString::fromStdString(fsPath.replace_filename(schemaFilename.toStdString()));

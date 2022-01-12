@@ -21,6 +21,7 @@
 
 #include "channelinit.h"
 #include "datatype.h"
+#include "expression.h"
 
 #include <QString>
 #include <optional>
@@ -43,6 +44,8 @@ public:
         SHOW,
         HIDDEN
     };
+
+    using InitExpression = std::variant<ChannelInit, Expression>;
 
 public:
     /**
@@ -83,18 +86,18 @@ public:
      *
      * @return intialization expression or empty.
      */
-    const std::optional<ChannelInit> &getInit() const noexcept;
+    const std::optional<InitExpression> &getInit() const noexcept;
     /**
      * @brief Setter for initialization expression.
      *
-     * @param channelInit ChannelInit to set as initialization expression for declaration.
+     * @param initExpression InitExpression to set as initialization expression for declaration.
      */
-    void setInit(const ChannelInit &channelInit);
+    void setInit(const InitExpression &initExpression);
 
 private:
     DataType m_type;
     QString m_name;
     Visibility m_visibility;
-    std::optional<ChannelInit> m_init;
+    std::optional<InitExpression> m_init;
 };
 }

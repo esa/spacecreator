@@ -24,6 +24,7 @@
 ****************************************************************************/
 #pragma once
 
+#include "stringref.h"
 #include "typereadingvisitor.h"
 
 #include <QString>
@@ -102,11 +103,19 @@ public:
     void setAlignToNext(const AlignToNext alignToNext) { m_alignment = alignToNext; }
     AlignToNext alignToNext() const { return m_alignment; }
 
-    static AlignToNext mapAlignToNext(QStringRef in);
+    static AlignToNext mapAlignToNext(StringRef in);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    static AlignToNext mapAlignToNext(const QString &in) { return mapAlignToNext(StringRef(in)); }
+#else
     static AlignToNext mapAlignToNext(const QString &in) { return mapAlignToNext(&in); }
+#endif
 
-    static Endianness mapEndianess(QStringRef in);
+    static Endianness mapEndianess(StringRef in);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    static Endianness mapEndianess(const QString &in) { return mapEndianess(StringRef(in)); }
+#else
     static Endianness mapEndianess(const QString &in) { return mapEndianess(&in); }
+#endif
 
     static QString alignToNextToString(AlignToNext param);
     static QString endiannessToString(Endianness param);

@@ -57,9 +57,9 @@ std::unique_ptr<conversion::Model> Parser::parse(const QString &inputSedsFilenam
 
     xmlReader.readNextStartElement();
 
-    if (xmlReader.name() == "PackageFile") {
+    if (xmlReader.name() == QLatin1String("PackageFile")) {
         return std::make_unique<model::SedsModel>(readPackageFile(xmlReader));
-    } else if (xmlReader.name() == "DataSheet") {
+    } else if (xmlReader.name() == QLatin1String("DataSheet")) {
         return std::make_unique<model::SedsModel>(readDataSheet(xmlReader));
     } else {
         throw UnhandledElement(xmlReader.name(), "Root");

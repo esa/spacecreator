@@ -15,6 +15,7 @@ target_include_directories(SedsSymbolDefinitionReader SYSTEM
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SedsSymbolDefinitionReader
     PUBLIC      Conversion::Common
+                shared
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(SedsSymbolDefinitionReader)

@@ -20,20 +20,15 @@
 #include "channelinit.h"
 
 namespace promela::model {
-ChannelInit::ChannelInit(size_t size, const Type &type)
+ChannelInit::ChannelInit(size_t size, QList<Type> types)
     : m_size(size)
+    , m_types(std::move(types))
 {
-    m_types.append(type);
 }
 
 size_t ChannelInit::getSize() const noexcept
 {
     return m_size;
-}
-
-void ChannelInit::addType(const Type &type)
-{
-    m_types.append(type);
 }
 
 const QList<ChannelInit::Type> &ChannelInit::getTypes() const noexcept

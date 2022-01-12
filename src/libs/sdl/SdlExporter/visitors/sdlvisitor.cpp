@@ -21,6 +21,7 @@
 
 #include <conversion/common/export/exceptions.h>
 #include <iostream>
+#include <map>
 #include <qglobal.h>
 #include <sdl/SdlModel/variableliteral.h>
 #include <sdl/SdlModel/variablereference.h>

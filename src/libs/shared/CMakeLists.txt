@@ -106,6 +106,7 @@ target_sources(${LIB_NAME} PRIVATE
     sharedlibrary.h
     sharedresources/colors/default_colors.json
     sharedresources/sharedresources.qrc
+    stringref.h
     ui/drawrectinfo.cpp
     ui/drawrectinfo.h
     ui/graphicsscenebase.cpp

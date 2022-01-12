@@ -109,25 +109,25 @@ private:
      * @param   commandModeStr      String to parse
      * @return  Command mode
      */
-    static auto parseInterfaceCommandMode(const QStringRef &commandModeStr) -> model::InterfaceCommandMode;
+    static auto parseInterfaceCommandMode(const StringRef &commandModeStr) -> model::InterfaceCommandMode;
     /**
      * @brief   Parses given string as a command argument mode
      * @param   commandArgumentModeStr      String to parse
      * @return  Command argument mode
      */
-    static auto parseCommandArgumentMode(const QStringRef &commandArgumentModeStr) -> model::CommandArgumentMode;
+    static auto parseCommandArgumentMode(const StringRef &commandArgumentModeStr) -> model::CommandArgumentMode;
     /**
      * @brief   Parses given string as an interface parameter mode
      * @param   parameterModeStr        String to parse
      * @return  Parameter mode
      */
-    static auto parseInterfaceParameterMode(const QStringRef &parameterModeStr) -> model::InterfaceParameterMode;
+    static auto parseInterfaceParameterMode(const StringRef &parameterModeStr) -> model::InterfaceParameterMode;
     /**
      * @brief   Parses given string as an interface level
      * @param   interfaceLevelStr       String to parse
      * @return  Interface level
      */
-    static auto parseInterfaceLevel(const QStringRef &interfaceLevelStr) -> model::InterfaceLevel;
+    static auto parseInterfaceLevel(const StringRef &interfaceLevelStr) -> model::InterfaceLevel;
 };
 
 } // namespace seds::parser

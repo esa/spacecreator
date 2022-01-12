@@ -13,8 +13,8 @@ target_include_directories(Asn1Importer
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(Asn1Importer
     PUBLIC      Conversion::Common
-    PRIVATE     asn1library
-                CommonProjectWarnings)
+                asn1library
+    PRIVATE     CommonProjectWarnings)
 
 add_format_target(Asn1Importer)
 add_tidy_target(Asn1Importer)

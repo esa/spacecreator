@@ -21,10 +21,12 @@
 
 #include <conversion/common/modeltype.h>
 #include <promela/Asn1ToPromelaTranslator/translator.h>
+#include <promela/IvToPromelaTranslator/translator.h>
 #include <promela/PromelaExporter/promelaexporter.h>
 
 using promela::exporter::PromelaExporter;
 using promela::translator::Asn1ToPromelaTranslator;
+using promela::translator::IvToPromelaTranslator;
 
 namespace conversion::promela {
 bool PromelaRegistrar::registerCapabilities(conversion::Registry &registry)
@@ -37,6 +39,18 @@ bool PromelaRegistrar::registerCapabilities(conversion::Registry &registry)
 
     auto asn1ToPromelaTranslator = std::make_unique<Asn1ToPromelaTranslator>();
 
-    return registry.registerTranslator({ ModelType::Asn1 }, ModelType::Promela, std::move(asn1ToPromelaTranslator));
+    result = registry.registerTranslator({ ModelType::Asn1 }, ModelType::Promela, std::move(asn1ToPromelaTranslator));
+    if (!result) {
+        return false;
+    }
+
+    auto ivToPromelaTranslator = std::make_unique<IvToPromelaTranslator>();
+    result = registry.registerTranslator(
+            { ModelType::InterfaceView }, ModelType::Promela, std::move(ivToPromelaTranslator));
+    if (!result) {
+        return false;
+    }
+
+    return true;
 }
 }

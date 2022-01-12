@@ -24,6 +24,8 @@
 ****************************************************************************/
 #pragma once
 
+#include "type.h"
+
 #include <QString>
 
 namespace Asn1Acn {
@@ -46,8 +48,12 @@ public:
     void setTerminationPattern(const QString &pattern) { m_terminationPattern = pattern; }
     const QString &terminationPattern() const { return m_terminationPattern; }
 
-    static AsciiStringEncoding mapEncoding(QStringRef in);
+    static AsciiStringEncoding mapEncoding(StringRef in);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    static AsciiStringEncoding mapEncoding(const QString &in) { return mapEncoding(StringRef(in)); }
+#else
     static AsciiStringEncoding mapEncoding(const QString &in) { return mapEncoding(&in); }
+#endif
     static QString encodingToString(AsciiStringEncoding encoding);
 
 private:

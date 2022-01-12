@@ -58,22 +58,22 @@ void Type::setIdentifier(QString name)
     m_identifier = std::move(name);
 }
 
-AlignToNext Type::mapAlignToNext(QStringRef in)
+AlignToNext Type::mapAlignToNext(StringRef in)
 {
-    if (in == "byte")
+    if (in == QLatin1String("byte"))
         return AlignToNext::byte;
-    if (in == "word")
+    if (in == QLatin1String("word"))
         return AlignToNext::word;
-    if (in == "dword")
+    if (in == QLatin1String("dword"))
         return AlignToNext::dword;
     return AlignToNext::unspecified;
 }
 
-Endianness Type::mapEndianess(QStringRef in)
+Endianness Type::mapEndianess(StringRef in)
 {
-    if (in == "big")
+    if (in == QLatin1String("big"))
         return Endianness::big;
-    if (in == "little")
+    if (in == QLatin1String("little"))
         return Endianness::little;
     return Endianness::unspecified;
 }

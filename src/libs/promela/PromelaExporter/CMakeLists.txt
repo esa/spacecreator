@@ -9,6 +9,10 @@ set(SOURCES
   visitors/datatypesuffixvisitor.cpp
   visitors/typealiasvisitor.cpp
   visitors/basictypegenerator.cpp
+  visitors/proctypeelementvisitor.cpp
+  visitors/expressionvisitor.cpp
+  visitors/variablerefvisitor.cpp
+  visitors/sequencevisitor.cpp
   )
 set(INCLUDES
   promelaexporter.h
@@ -19,6 +23,10 @@ set(INCLUDES
   visitors/datatypesuffixvisitor.h
   visitors/typealiasvisitor.h
   visitors/basictypegenerator.h
+  visitors/proctypeelementvisitor.h
+  visitors/expressionvisitor.h
+  visitors/variablerefvisitor.h
+  visitors/sequencevisitor.h
   )
 
 add_library(PromelaExporter STATIC)

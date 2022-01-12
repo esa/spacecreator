@@ -37,8 +37,10 @@ public:
      * @brief Constructor.
      *
      * @param stream A stream to append exported model.
+     * @param baseIndent base indentation unit
+     * @param sequenceIndent base indentation for sequences
      */
-    PromelaModelVisitor(QTextStream &stream, QString indent);
+    PromelaModelVisitor(QTextStream &stream, QString baseIndent, QString sequenceIndent);
 
     /**
      * @brief Visit PromelaModel
@@ -56,9 +58,14 @@ private:
     void generateValueDefinitions(const QList<::promela::model::ValueDefinition> &values);
     void generateUtypes(const QList<::promela::model::Utype> &utypes);
     void generateDeclarations(const QList<::promela::model::Declaration> &values);
+    void generateInlineDefs(const std::list<std::unique_ptr<::promela::model::InlineDef>> &inlines);
+    void generateProctypes(const std::list<std::unique_ptr<::promela::model::Proctype>> &proctypes);
+    void generateInitProctype(const ::promela::model::InitProctype &init);
+    void generateSequence(const ::promela::model::Sequence &sequence);
 
 private:
     QTextStream &m_stream;
-    const QString m_indent;
+    const QString m_baseIndent;
+    const QString m_sequenceIndent;
 };
 }

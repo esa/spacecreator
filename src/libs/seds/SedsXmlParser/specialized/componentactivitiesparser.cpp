@@ -660,7 +660,11 @@ model::TypeCheck ComponentActivitiesParser::readTypeCheck(QXmlStreamReader &xmlR
 
 model::ComparisonOperator ComponentActivitiesParser::parseComparisonOperator(const QString &comparisonOperatorStr)
 {
-    auto coreComparisonOperator = model::enumFromString<model::ComparisonOperator>(QStringRef(&comparisonOperatorStr));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    auto coreComparisonOperator = model::enumFromString<model::ComparisonOperator>(StringRef(comparisonOperatorStr));
+#else
+    auto coreComparisonOperator = model::enumFromString<model::ComparisonOperator>(&comparisonOperatorStr);
+#endif
 
     if (coreComparisonOperator) {
         return *coreComparisonOperator;
@@ -669,7 +673,7 @@ model::ComparisonOperator ComponentActivitiesParser::parseComparisonOperator(con
     }
 }
 
-model::MathOperator ComponentActivitiesParser::parseMathOperator(const QStringRef &mathOperatorStr)
+model::MathOperator ComponentActivitiesParser::parseMathOperator(const StringRef &mathOperatorStr)
 {
     auto coreMathOperator = model::enumFromString<model::CoreMathOperator>(mathOperatorStr);
 

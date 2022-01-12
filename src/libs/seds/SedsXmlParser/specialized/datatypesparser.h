@@ -293,19 +293,19 @@ private:
      * @param   encodingStr     String to parse
      * @return  Float encoding
      */
-    static auto parseFloatEncoding(const QStringRef &encodingStr) -> model::FloatDataEncoding::Encoding;
+    static auto parseFloatEncoding(const StringRef &encodingStr) -> model::FloatDataEncoding::Encoding;
     /**
      * @brief   Parses given string as a integer encoding
      * @param   encodingStr     String to parse
      * @return  Integer encoding
      */
-    static auto parseIntegerEncoding(const QStringRef &encodingStr) -> model::IntegerDataEncoding::Encoding;
+    static auto parseIntegerEncoding(const StringRef &encodingStr) -> model::IntegerDataEncoding::Encoding;
     /**
      * @brief   Parses given string as a string encoding
      * @param   encodingStr     String to parse
      * @return  String encoding
      */
-    static auto parseStringEncoding(const QStringRef &encodingStr) -> model::StringDataEncoding::Encoding;
+    static auto parseStringEncoding(const StringRef &encodingStr) -> model::StringDataEncoding::Encoding;
 
     /**
      * @brief   Parses current element as a float precision range
@@ -319,25 +319,25 @@ private:
      * @param   rangeTypeStr    String to parse
      * @return  Byte order
      */
-    static auto parseByteOrder(const QStringRef &byteOrderStr) -> model::ByteOrder;
+    static auto parseByteOrder(const StringRef &byteOrderStr) -> model::ByteOrder;
     /**
      * @brief   Parses given string as a error control
      * @param   errorControlStr     String to parse
      * @return  Error control value
      */
-    static auto parseErrorControl(const QStringRef &errorControlStr) -> model::ErrorControlEntry::ErrorControl;
+    static auto parseErrorControl(const StringRef &errorControlStr) -> model::ErrorControlEntry::ErrorControl;
     /**
      * @brief   Parses given string as a false value
      * @param   falseValueStr   String to parse
      * @return  False value
      */
-    static auto parseFalseValue(const QStringRef &falseValueStr) -> model::FalseValue;
+    static auto parseFalseValue(const StringRef &falseValueStr) -> model::FalseValue;
     /**
      * @brief   Parses given string as a range type
      * @param   rangeTypeStr    String to parse
      * @return  Range type
      */
-    static auto parseRangeType(const QStringRef &rangeTypeStr) -> model::RangeType;
+    static auto parseRangeType(const StringRef &rangeTypeStr) -> model::RangeType;
 
     /**
      * @brief   Processes attribute for ContainerConstraint

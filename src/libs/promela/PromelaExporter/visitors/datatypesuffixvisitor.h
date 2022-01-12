@@ -24,7 +24,7 @@
 
 namespace promela::exporter {
 /**
- * @brief  Visitor for exporting @link{::tmc::promelamodel::DataType}
+ * @brief  Visitor for exporting @link{::promela::model::DataType}
  *
  * This translator creates suffix for data type.
  * This should be used together with DataTypePrefixVisitor.

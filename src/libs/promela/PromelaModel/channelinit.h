@@ -31,7 +31,7 @@ namespace promela::model {
  * @brief Representation of channel initialization in promela.
  *
  * The channel initialization consists of a size of the channel,
- * and the list of possible datatypes for channel elements.
+ * and the ordered list of datatypes for channel element.
  * The channel in promela might contain only basic types or user defined structures;
  */
 class ChannelInit final
@@ -46,9 +46,9 @@ public:
      * @brief Constructor.
      *
      * @param size - the size of the channel
-     * @param type - the type of element in the channel
+     * @param types - the types of element in the channel
      */
-    ChannelInit(size_t size, const Type &type);
+    ChannelInit(size_t size, QList<Type> types);
 
     /**
      * @brief Getter for size of the channel
@@ -56,13 +56,6 @@ public:
      * @return size of the channel.
      */
     size_t getSize() const noexcept;
-
-    /**
-     * @brief Adds another type to the channel
-     *
-     * @param type a type which will be added as an alternative type
-     */
-    void addType(const Type &type);
 
     /**
      * @brief Getter for types of channel.

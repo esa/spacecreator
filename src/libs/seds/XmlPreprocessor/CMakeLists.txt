@@ -14,6 +14,7 @@ target_include_directories(SedsXmlPreprocessor
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SedsXmlPreprocessor
     PUBLIC      Conversion::Common
+                shared
     PRIVATE     LibXml2::LibXml2
                 Qt${QT_VERSION_MAJOR}::Xml
                 CommonProjectWarnings)

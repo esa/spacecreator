@@ -34,12 +34,12 @@ common::String CoreParser::readLongDescription(QXmlStreamReader &xmlReader)
     return xmlReader.readElementText();
 }
 
-bool CoreParser::parseBool(const QStringRef &valueStr)
+bool CoreParser::parseBool(const StringRef &valueStr)
 {
     return QVariant(valueStr.toString()).toBool();
 }
 
-uint8_t CoreParser::parseUInt8(const QStringRef &valueStr)
+uint8_t CoreParser::parseUInt8(const StringRef &valueStr)
 {
     bool ok = false;
     const auto value = valueStr.toShort(&ok);
@@ -51,7 +51,7 @@ uint8_t CoreParser::parseUInt8(const QStringRef &valueStr)
     throw ParserException(QString("Unable to parse uint8 '%1'").arg(valueStr));
 }
 
-int32_t CoreParser::parseInt32(const QStringRef &valueStr)
+int32_t CoreParser::parseInt32(const StringRef &valueStr)
 {
     bool ok = false;
     const auto value = valueStr.toInt(&ok);
@@ -63,7 +63,7 @@ int32_t CoreParser::parseInt32(const QStringRef &valueStr)
     throw ParserException(QString("Unable to parse int32 '%1'").arg(valueStr));
 }
 
-int64_t CoreParser::parseInt64(const QStringRef &valueStr)
+int64_t CoreParser::parseInt64(const StringRef &valueStr)
 {
     bool ok = false;
     const auto value = valueStr.toLong(&ok);
@@ -75,7 +75,7 @@ int64_t CoreParser::parseInt64(const QStringRef &valueStr)
     throw ParserException(QString("Unable to parse int64 '%1'").arg(valueStr));
 }
 
-uint64_t CoreParser::parseUInt64(const QStringRef &valueStr)
+uint64_t CoreParser::parseUInt64(const StringRef &valueStr)
 {
     bool ok = false;
     const auto value = valueStr.toULong(&ok);
@@ -87,7 +87,7 @@ uint64_t CoreParser::parseUInt64(const QStringRef &valueStr)
     throw ParserException(QString("Unable to parse uint64 '%1'").arg(valueStr));
 }
 
-double CoreParser::parseDouble(const QStringRef &valueStr)
+double CoreParser::parseDouble(const StringRef &valueStr)
 {
     bool ok = false;
     const auto value = valueStr.toDouble(&ok);
@@ -99,7 +99,7 @@ double CoreParser::parseDouble(const QStringRef &valueStr)
     throw ParserException(QString("Unable to parse double '%1'").arg(valueStr));
 }
 
-model::PositiveLong::Value CoreParser::parsePositiveLong(const QStringRef &valueStr)
+model::PositiveLong::Value CoreParser::parsePositiveLong(const StringRef &valueStr)
 {
     bool ok = false;
     const auto value = valueStr.toULong(&ok);

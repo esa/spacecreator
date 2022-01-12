@@ -38,5 +38,6 @@ public:
 
 private:
     static const QString m_commonIndent;
+    static const QString m_sequenceIndent;
 };
 }

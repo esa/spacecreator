@@ -1,0 +1,5 @@
+int inited;
+init
+{
+    inited;
+}
