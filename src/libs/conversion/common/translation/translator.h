@@ -92,12 +92,19 @@ public:
      * @return  Set of required models
      */
     virtual auto getDependencies() const -> std::set<ModelType> = 0;
+    /**
+     * @brief Get the specified model from the vector of different models
+     *
+     * @tparam ModelT  type of required model
+     * @param models   vector of models
+     *
+     * @return a model of the required type
+     */
+    template<typename ModelT>
+    static auto getModel(const std::vector<Model *> models) -> ModelT *;
 
 protected:
     auto checkSourceModelCount(const std::vector<Model *> &models) const -> void;
-
-    template<typename ModelT>
-    static auto getModel(const std::vector<Model *> models) -> ModelT *;
 };
 
 template<typename ModelT>

@@ -44,7 +44,7 @@ Converter::Converter(const Registry &registry, Options options)
 {
 }
 
-std::set<std::unique_ptr<Model>> Converter::convert(const std::set<ModelType> &sourceModelsTypes,
+std::vector<std::unique_ptr<Model>> Converter::convert(const std::set<ModelType> &sourceModelsTypes,
         ModelType targetModelType, const std::set<ModelType> &auxiliaryModelsTypes)
 {
     for (const auto sourceModelType : sourceModelsTypes) {
@@ -70,12 +70,12 @@ std::set<std::unique_ptr<Model>> Converter::convert(const std::set<ModelType> &s
         }
     }
 
-    std::set<std::unique_ptr<Model>> outputModels;
+    std::vector<std::unique_ptr<Model>> outputModels;
 
     translateModels(sourceModelsTypes, targetModelType);
-    outputModels.insert(exportModel(targetModelType));
+    outputModels.push_back(exportModel(targetModelType));
     for (const auto &auxiliaryModelType : auxiliaryModelsTypes) {
-        outputModels.insert(exportModel(auxiliaryModelType));
+        outputModels.push_back(exportModel(auxiliaryModelType));
     }
 
     return outputModels;

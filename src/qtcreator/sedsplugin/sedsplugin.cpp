@@ -65,6 +65,7 @@
 #include <conversion/asn1/Asn1Exporter/exporter.h>
 #include <conversion/asn1/Asn1Importer/importer.h>
 #include <conversion/asn1/Asn1Registrar/registrar.h>
+#include <conversion/common/translation/translator.h>
 #include <conversion/converter/converter.h>
 #include <conversion/iv/IvRegistrar/registrar.h>
 #include <conversion/iv/IvXmlImporter/importer.h>
@@ -80,6 +81,7 @@
 #include <messagemanager.h>
 #include <projectexplorer/project.h>
 #include <projectexplorer/projecttree.h>
+#include <qglobal.h>
 
 using namespace Core;
 using conversion::Converter;
@@ -265,15 +267,17 @@ auto SedsPlugin::importSdl() -> void
     try {
         auto outputModels = convert({ conversion::ModelType::Seds }, conversion::ModelType::Sdl,
                 { conversion::ModelType::InterfaceView, conversion::ModelType::Asn1 }, options);
-        for (const auto &model : outputModels) {
-            auto *const asn1Model = dynamic_cast<Asn1Acn::Asn1Model *>(model.get());
-            if (asn1Model != nullptr) {
-                asn1Filenames = conversion::asn1::exporter::Asn1Exporter::getFilenamesForModel(asn1Model);
-            }
-            auto *const sdlModel = dynamic_cast<sdl::SdlModel *>(model.get());
-            if (sdlModel != nullptr) {
-                sdlFilenames = sdl::exporter::SdlExporter::getFilenamesForModel(sdlModel);
-            }
+        std::vector<conversion::Model *> rawOutModels;
+        for_each(outputModels.begin(), outputModels.end(),
+                [&rawOutModels](auto &model) { rawOutModels.push_back(model.get()); });
+
+        auto *const asn1model = conversion::translator::Translator::getModel<Asn1Acn::Asn1Model>(rawOutModels);
+        if (asn1model != nullptr) {
+            asn1Filenames = conversion::asn1::exporter::Asn1Exporter::getFilenamesForModel(asn1model);
+        }
+        auto *const sdlModel = conversion::translator::Translator::getModel<sdl::SdlModel>(rawOutModels);
+        if (sdlModel != nullptr) {
+            sdlFilenames = sdl::exporter::SdlExporter::getFilenamesForModel(sdlModel);
         }
     } catch (std::exception &ex) {
         MessageManager::write(GenMsg::msgError.arg(ex.what()));
@@ -282,7 +286,8 @@ auto SedsPlugin::importSdl() -> void
     }
 
     for (const auto &filename : sdlFilenames) {
-        const QString dstPath = QString("work/%1/SDL/src/").arg(filename.split(".").first().toLower());
+        const QString processName = filename.split(".").first();
+        const QString dstPath = QString("work/%1/SDL/src/").arg(processName.toLower());
         if (!QDir().mkpath(dstPath)) {
             MessageManager::write(GenMsg::msgError.arg(QString("Could not create path %1").arg(dstPath)));
             QFile(tmpIvFilename).remove();
@@ -479,7 +484,7 @@ auto SedsPlugin::initializeRegistry() -> void
 
 auto SedsPlugin::convert(const std::set<conversion::ModelType> &srcModelType,
         const conversion::ModelType targetModelType, const std::set<conversion::ModelType> &auxModelTypes,
-        conversion::Options options) -> std::set<std::unique_ptr<conversion::Model>>
+        conversion::Options options) -> std::vector<std::unique_ptr<conversion::Model>>
 {
     Converter converter(m_registry, std::move(options));
     return converter.convert(srcModelType, targetModelType, auxModelTypes);

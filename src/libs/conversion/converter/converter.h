@@ -74,9 +74,11 @@ public:
      * @param   sourceModelsTypes       List of types of source models
      * @param   targetModelType         Type of target model
      * @param   auxiliaryModelsTypes    List of types that will be additionally exported
+     *
+     * @return  Vector of created models
      */
     auto convert(const std::set<ModelType> &sourceModelsTypes, ModelType targetModelType,
-            const std::set<ModelType> &auxiliaryModelsTypes) -> std::set<std::unique_ptr<Model>>;
+            const std::set<ModelType> &auxiliaryModelsTypes) -> std::vector<std::unique_ptr<Model>>;
 
 private:
     /**
@@ -96,6 +98,8 @@ private:
      * @brief   Exports a model
      *
      * @param   modelType       Type of model to export
+     *
+     * @return  A model
      */
     auto exportModel(ModelType modelType) -> std::unique_ptr<Model>;
 
