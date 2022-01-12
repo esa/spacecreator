@@ -37,5 +37,7 @@ enum class RangeType
 
 template<>
 auto enumFromString(const StringRef &enumStr) -> std::optional<RangeType>;
+template<>
+auto stringFromEnum(RangeType enumType) -> const QString &;
 
 } // namespace seds::model

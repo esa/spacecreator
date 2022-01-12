@@ -231,6 +231,13 @@ private:
      */
     auto translateFalseValue(seds::model::FalseValue falseValue, Asn1Acn::Types::Boolean *asn1Type) const -> void;
 
+    auto getSmallestValue(const std::optional<seds::model::IntegerDataEncoding> &encoding) const
+            -> std::optional<std::int64_t>;
+    auto getSmallestValue(const std::optional<seds::model::FloatDataEncoding> &encoding) const -> std::optional<double>;
+    auto getGreatestValue(const std::optional<seds::model::IntegerDataEncoding> &encoding) const
+            -> std::optional<std::int64_t>;
+    auto getGreatestValue(const std::optional<seds::model::FloatDataEncoding> &encoding) const -> std::optional<double>;
+
     /**
      * @brief   Adds entries from given container data type to the entries cache
      *

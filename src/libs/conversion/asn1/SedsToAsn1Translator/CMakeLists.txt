@@ -4,16 +4,13 @@ set(SOURCES     datatypesdependencyresolver.cpp
                 translator.cpp
                 specialized/datatypetranslatorvisitor.cpp
                 specialized/dimensiontranslator.cpp
-                specialized/entrytranslatorvisitor.cpp
-                specialized/floatrangetranslatorvisitor.cpp
-                specialized/integerrangetranslatorvisitor.cpp)
+                specialized/entrytranslatorvisitor.cpp)
 set(INCLUDES    datatypesdependencyresolver.h
                 translator.h
                 specialized/datatypetranslatorvisitor.h
                 specialized/dimensiontranslator.h
                 specialized/entrytranslatorvisitor.h
-                specialized/floatrangetranslatorvisitor.h
-                specialized/integerrangetranslatorvisitor.h)
+                specialized/rangetranslatorvisitor.h)
 
 add_library(SedsToAsn1Translator STATIC)
 target_sources(SedsToAsn1Translator

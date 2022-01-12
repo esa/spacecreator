@@ -33,3 +33,6 @@ configure_file(test_containers.sh test_containers.sh COPYONLY)
 configure_file(resources/test_containers.xml resources/test_containers.xml COPYONLY)
 configure_file(resources/test_containers_asn.output resources/test_containers_asn.output COPYONLY)
 configure_file(resources/test_containers_acn.output resources/test_containers_acn.output COPYONLY)
+
+configure_file(test_min_max_range.sh test_min_max_range.sh COPYONLY)
+configure_file(resources/test_min_max_range.xml resources/test_min_max_range.xml COPYONLY)

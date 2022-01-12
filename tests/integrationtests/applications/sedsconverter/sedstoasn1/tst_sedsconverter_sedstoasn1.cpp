@@ -32,6 +32,7 @@ private Q_SLOTS:
     void testArrays();
     void testIndexedArray();
     void testContainers();
+    void testMinMaxRange();
 };
 
 /// \SRS  ETB-FUN-10
@@ -76,6 +77,17 @@ void tst_SedsConverter_SedsToAsn1::testIndexedArray()
 void tst_SedsConverter_SedsToAsn1::testContainers()
 {
     const int result = system("./test_containers.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-110
+/// \SRS  ETB-FUN-180
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-120
+void tst_SedsConverter_SedsToAsn1::testMinMaxRange()
+{
+    const int result = system("./test_min_max_range.sh");
     QCOMPARE(result, 0);
 }
 

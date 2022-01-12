@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/MinMaxRange">
+    <DataTypeSet>
+      <IntegerDataType name="InclusiveMinInclusiveMaxInteger">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="ExclusiveMinExclusiveMaxInteger">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="exclusiveMinExclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="InclusiveMinExclusiveMaxInteger">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinExclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="ExclusiveMinInclusiveMaxInteger">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="exclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="GreaterThanInteger">
+        <IntegerDataEncoding encoding="twosComplement" sizeInBits="10" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="greaterThan" min="-42" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="LessThanInteger">
+        <IntegerDataEncoding encoding="twosComplement" sizeInBits="10" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="lessThan" max="-42" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="AtLeastInteger">
+        <IntegerDataEncoding encoding="bcd" sizeInBits="12" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="atLeast" min="42" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="AtMostInteger">
+        <IntegerDataEncoding encoding="bcd" sizeInBits="12" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="atMost" max="42" />
+        </Range>
+      </IntegerDataType>
+
+      <FloatDataType name="InclusiveMinInclusiveMaxFloat">
+        <FloatDataEncoding encodingAndPrecision="IEEE754_2008_single" sizeInBits="32" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0.42" max="3.14" />
+        </Range>
+      </FloatDataType>
+      <FloatDataType name="AtLeastFloat">
+        <FloatDataEncoding encodingAndPrecision="IEEE754_2008_single" sizeInBits="32" />
+        <Range>
+          <MinMaxRange rangeType="atLeast" min="0.42"/>
+        </Range>
+      </FloatDataType>
+      <FloatDataType name="AtMostFloat">
+        <FloatDataEncoding encodingAndPrecision="IEEE754_2008_single" sizeInBits="32" />
+        <Range>
+          <MinMaxRange rangeType="atMost" max="3.14" />
+        </Range>
+      </FloatDataType>
+    </DataTypeSet>
+  </Package>
+</PackageFile>
