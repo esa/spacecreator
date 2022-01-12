@@ -58,7 +58,7 @@ QStringList SdlExporter::getFilenamesForModel(const SdlModel *const model)
 {
     QStringList names;
 
-    for (auto &process : model->processes()) {
+    for (const auto &process : model->processes()) {
         names.append(makeSdlFilename(process));
     }
 
