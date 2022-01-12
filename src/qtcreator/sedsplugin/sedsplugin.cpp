@@ -81,7 +81,6 @@
 #include <messagemanager.h>
 #include <projectexplorer/project.h>
 #include <projectexplorer/projecttree.h>
-#include <qglobal.h>
 
 using namespace Core;
 using conversion::Converter;
@@ -267,15 +266,11 @@ auto SedsPlugin::importSdl() -> void
     try {
         auto outputModels = convert({ conversion::ModelType::Seds }, conversion::ModelType::Sdl,
                 { conversion::ModelType::InterfaceView, conversion::ModelType::Asn1 }, options);
-        std::vector<conversion::Model *> rawOutModels;
-        for_each(outputModels.begin(), outputModels.end(),
-                [&rawOutModels](auto &model) { rawOutModels.push_back(model.get()); });
-
-        auto *const asn1model = conversion::translator::Translator::getModel<Asn1Acn::Asn1Model>(rawOutModels);
+        auto *const asn1model = conversion::translator::Translator::getModel<Asn1Acn::Asn1Model>(outputModels);
         if (asn1model != nullptr) {
             asn1Filenames = conversion::asn1::exporter::Asn1Exporter::getFilenamesForModel(asn1model);
         }
-        auto *const sdlModel = conversion::translator::Translator::getModel<sdl::SdlModel>(rawOutModels);
+        auto *const sdlModel = conversion::translator::Translator::getModel<sdl::SdlModel>(outputModels);
         if (sdlModel != nullptr) {
             sdlFilenames = sdl::exporter::SdlExporter::getFilenamesForModel(sdlModel);
         }

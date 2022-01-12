@@ -88,7 +88,9 @@ std::vector<std::unique_ptr<Model>> Converter::extractCache()
         ModelType::Promela, ModelType::Sdl, ModelType::Seds };
     outputModels.reserve(modelTypes.size());
     for (auto modelType : modelTypes) {
-        outputModels.push_back(std::move(m_modelCache.extract(modelType).mapped()));
+        if (m_modelCache[modelType].get() != nullptr) {
+            outputModels.push_back(std::move(m_modelCache.extract(modelType).mapped()));
+        }
     }
 
     return outputModels;
