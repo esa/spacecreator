@@ -100,7 +100,7 @@ void tst_PromelaExporter::testMtype()
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
-    QString out2 = getFileContents("expect_promela_file1.pml");
+    QString out2 = getFileContents("expect_promela_mtype.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }
@@ -128,7 +128,7 @@ void tst_PromelaExporter::testNamedMtype()
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
-    QString out2 = getFileContents("expect_promela_file2.pml");
+    QString out2 = getFileContents("expect_promela_named_mtype.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }
@@ -197,7 +197,7 @@ void tst_PromelaExporter::testUtype()
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
-    QString out2 = getFileContents("expect_promela_file3.pml");
+    QString out2 = getFileContents("expect_promela_utype.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }
@@ -219,7 +219,7 @@ void tst_PromelaExporter::testUtypeVisibility()
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
-    QString out2 = getFileContents("expect_promela_file4.pml");
+    QString out2 = getFileContents("expect_promela_utype_visibility.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }
@@ -241,7 +241,7 @@ void tst_PromelaExporter::testUtypeUnion()
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
-    QString out2 = getFileContents("expect_promela_file5.pml");
+    QString out2 = getFileContents("expect_promela_utype_union.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }
@@ -259,7 +259,7 @@ void tst_PromelaExporter::testTypeAlias()
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
-    QString out2 = getFileContents("expect_promela_file6.pml");
+    QString out2 = getFileContents("expect_promela_type_alias.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }
@@ -278,7 +278,7 @@ void tst_PromelaExporter::testValueDefinition()
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
-    QString out2 = getFileContents("expect_promela_file7.pml");
+    QString out2 = getFileContents("expect_promela_value_definition.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }
@@ -313,7 +313,7 @@ void tst_PromelaExporter::testDeclaration()
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
-    QString out2 = getFileContents("expect_promela_file8.pml");
+    QString out2 = getFileContents("expect_promela_declaration.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }
@@ -331,7 +331,7 @@ void tst_PromelaExporter::testIncludes()
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
-    QString out2 = getFileContents("expect_promela_file9.pml");
+    QString out2 = getFileContents("expect_promela_includes.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }
@@ -360,7 +360,7 @@ void tst_PromelaExporter::testChannelInitialization()
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
-    QString out2 = getFileContents("expect_promela_file10.pml");
+    QString out2 = getFileContents("expect_promela_channel_initialization.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }
@@ -404,7 +404,7 @@ void tst_PromelaExporter::testBasicProctypes()
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
-    QString out2 = getFileContents("expect_promela_file11.pml");
+    QString out2 = getFileContents("expect_promela_basic_proctypes.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }
@@ -427,7 +427,7 @@ void tst_PromelaExporter::testInitProctype()
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
-    QString out2 = getFileContents("expect_promela_file12.pml");
+    QString out2 = getFileContents("expect_promela_init_proctype.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }
@@ -478,7 +478,7 @@ void tst_PromelaExporter::testProctypeElements()
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
-    QString out2 = getFileContents("expect_promela_file13.pml");
+    QString out2 = getFileContents("expect_promela_proctype_elements.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }
@@ -535,7 +535,7 @@ void tst_PromelaExporter::testDoLoop()
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
-    QString out2 = getFileContents("expect_promela_file14.pml");
+    QString out2 = getFileContents("expect_promela_do_loop.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }

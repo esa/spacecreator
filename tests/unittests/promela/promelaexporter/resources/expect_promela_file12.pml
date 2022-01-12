@@ -1,5 +1,0 @@
-int inited;
-init
-{
-    inited;
-}
