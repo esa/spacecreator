@@ -31,7 +31,7 @@ public:
     /**
      * @brief Constructor
      *
-     * @param strean stream to append exported sequence
+     * @param stream stream to append exported sequence
      * @param baseIndent base identation unit for whole exported model
      * @param sequenceIndent special indent unit for sequences
      * @param indent current indent

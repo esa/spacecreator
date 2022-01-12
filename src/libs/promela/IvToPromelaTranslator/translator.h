@@ -26,18 +26,18 @@
 
 namespace promela::translator {
 /**
- * @brief Translate between ASN.1 model and PromelaModel
+ * @brief Translate between InterfaceView model and Promela Model
  */
 class IvToPromelaTranslator final : public ::conversion::translator::Translator
 {
 public:
     /**
-     * @brief   Translate given ASN.1 model into an Promela model
+     * @brief   Translate given InterfaceView model into an Promela model
      *
-     * @param   sourceModels    List of ASN.1 models
+     * @param   sourceModels    List of models
      * @param   options         List of options
      *
-     * @return  Promela model translated from the ASN.1 models
+     * @return  Promela model translated from the InterfaceView model
      */
     auto translateModels(std::vector<conversion::Model *> sourceModels, const conversion::Options &options) const
             -> std::vector<std::unique_ptr<conversion::Model>> override;
@@ -73,5 +73,7 @@ private:
             ::ivm::IVFunction *ivFunction, const QString &functionName) const;
     auto getQueueSize(ivm::IVInterface *interface) const -> size_t;
     auto getPriority(ivm::IVInterface *interface) const -> size_t;
+    auto getInterfaceProperty(ivm::IVInterface *interface, const QString &name) const -> QVariant;
+    auto constructChannelName(const QString &functionName, const QString &interfaceName) const -> QString;
 };
 }

@@ -33,7 +33,7 @@ public:
      * @brief Constructor
      *
      * @param stream stream to append exported proctype element
-     * @param baseIndent base identation unit for whole exported model
+     * @param baseIndent base indentation unit for whole exported model
      * @param sequenceIndent special indent unit for sequences
      * @param indent current indent
      */

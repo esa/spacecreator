@@ -140,35 +140,22 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *
         const QString &functionName, const QString &interfaceName, const QString &parameterName,
         const QString &parameterType, size_t queueSize, size_t priority) const
 {
-    QString channelName = QString("%1_%2_channel").arg(functionName).arg(interfaceName);
-    if (parameterType.isEmpty()) {
-        QList<ChannelInit::Type> channelType;
-        channelType.append(ChannelInit::Type(BasicType::INT));
-        ChannelInit channelInit(queueSize, std::move(channelType));
-        Declaration declaration(DataType(BasicType::CHAN), channelName);
-        declaration.setInit(channelInit);
-        promelaModel->addDeclaration(declaration);
-    } else {
-        QList<ChannelInit::Type> channelType;
-        channelType.append(ChannelInit::Type(UtypeRef(parameterType)));
-        ChannelInit channelInit(queueSize, std::move(channelType));
-        Declaration declaration(DataType(BasicType::CHAN), channelName);
-        declaration.setInit(channelInit);
-        promelaModel->addDeclaration(declaration);
-    }
+    QString channelName = constructChannelName(functionName, interfaceName);
+    QList<ChannelInit::Type> channelType;
+    channelType.append(
+            parameterType.isEmpty() ? ChannelInit::Type(BasicType::INT) : ChannelInit::Type(UtypeRef(parameterType)));
+    ChannelInit channelInit(queueSize, std::move(channelType));
+    Declaration declaration(DataType(BasicType::CHAN), channelName);
+    declaration.setInit(channelInit);
+    promelaModel->addDeclaration(declaration);
 
     Sequence sequence;
     std::unique_ptr<ProctypeElement> waitForInit = std::make_unique<ProctypeElement>(Expression(VariableRef("inited")));
     sequence.appendElement(std::move(waitForInit));
-    if (parameterType.isEmpty()) {
-        std::unique_ptr<ProctypeElement> variableDecl =
-                std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "var0"));
-        sequence.appendElement(std::move(variableDecl));
-    } else {
-        std::unique_ptr<ProctypeElement> variableDecl =
-                std::make_unique<ProctypeElement>(Declaration(DataType(UtypeRef(parameterName)), "var0"));
-        sequence.appendElement(std::move(variableDecl));
-    }
+
+    std::unique_ptr<ProctypeElement> variableDecl = std::make_unique<ProctypeElement>(Declaration(
+            parameterType.isEmpty() ? DataType(BasicType::INT) : DataType(UtypeRef(parameterName)), "var0"));
+    sequence.appendElement(std::move(variableDecl));
 
     std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>();
 
@@ -208,7 +195,7 @@ std::unique_ptr<::promela::model::InlineDef> IvToPromelaTranslator::generateSend
     Q_UNUSED(parameterType);
     QString inlineName =
             QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(sourceFunctionName)).arg(sourceInterfaceName);
-    QString channelName = QString("%1_%2_channel").arg(functionName).arg(interfaceName);
+    QString channelName = constructChannelName(functionName, interfaceName);
 
     Sequence sequence;
 
@@ -225,11 +212,19 @@ std::unique_ptr<::promela::model::InlineDef> IvToPromelaTranslator::generateSend
     return std::make_unique<InlineDef>(inlineName, std::move(sequence));
 }
 
-void IvToPromelaTranslator::createPromelaObjectsForFunction(::promela::model::PromelaModel *promelaModel,
-        const ::ivm::IVModel *ivModel, ::ivm::IVFunction *ivFunction, const QString &functionName) const
+void IvToPromelaTranslator::createPromelaObjectsForFunction(
+        PromelaModel *promelaModel, const IVModel *ivModel, IVFunction *ivFunction, const QString &functionName) const
 {
     QVector<IVInterface *> providedInterfaceList = ivFunction->pis();
     for (IVInterface *providedInterface : providedInterfaceList) {
+
+        if (providedInterface->kind() != IVInterface::OperationKind::Cyclic
+                && providedInterface->kind() != IVInterface::OperationKind::Protected) {
+            auto message =
+                    QString("Unallowed interface kind in function %1, only sporatic and cyclic interfaces are allowed")
+                            .arg(functionName);
+            throw TranslationException(message);
+        }
 
         IVConnection *connection = ivModel->getConnectionForIface(providedInterface->id());
 
@@ -262,35 +257,41 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(::promela::model::Pr
 
 size_t IvToPromelaTranslator::getQueueSize(IVInterface *interface) const
 {
-    QVariantList attrs = interface->attributes();
-    {
-        for (const QVariant attr : attrs) {
-            if (attr.canConvert<ExportableProperty>()) {
-                ExportableProperty ep = attr.value<ExportableProperty>();
-                if (ep.name() == "queue_size") {
-                    return ep.value().toULongLong();
-                }
-            }
-        }
+    QVariant property = getInterfaceProperty(interface, "queue_size");
+    if (property.isValid()) {
+        return property.toULongLong();
     }
-
     return 1;
 }
 
 size_t IvToPromelaTranslator::getPriority(IVInterface *interface) const
+{
+    QVariant property = getInterfaceProperty(interface, "priority");
+    if (property.isValid()) {
+        return property.toULongLong();
+    }
+    return 1;
+}
+
+QVariant IvToPromelaTranslator::getInterfaceProperty(ivm::IVInterface *interface, const QString &name) const
 {
     QVariantList attrs = interface->attributes();
     {
         for (const QVariant attr : attrs) {
             if (attr.canConvert<ExportableProperty>()) {
                 ExportableProperty ep = attr.value<ExportableProperty>();
-                if (ep.name() == "priority") {
-                    return ep.value().toULongLong();
+                if (ep.name() == name) {
+                    return ep.value();
                 }
             }
         }
     }
 
-    return 1;
+    return QVariant();
+}
+
+QString IvToPromelaTranslator::constructChannelName(const QString &functionName, const QString &interfaceName) const
+{
+    return QString("%1_%2_channel").arg(functionName).arg(interfaceName);
 }
 }
