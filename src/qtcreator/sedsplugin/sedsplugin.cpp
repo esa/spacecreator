@@ -242,59 +242,6 @@ auto SedsPlugin::importInterfaceView() -> void
     QFile(tmpIvFilename).remove();
 }
 
-auto SedsPlugin::getPackagenameFromPackageFile(const seds::model::PackageFile &file) -> QString
-{
-    QString name;
-
-    auto &package = file.package();
-    auto &components = package.components();
-    if (components.empty()) {
-        return "";
-    }
-    auto &firstComponent = components.front();
-    auto &componentNameType = firstComponent.name();
-    name = componentNameType.value();
-
-    return name;
-}
-
-auto SedsPlugin::getPackagenameFromDatasheet(const seds::model::DataSheet &datasheet) -> QString
-{
-    QString name;
-
-    auto &packages = datasheet.packages();
-    if (packages.empty()) {
-        return "";
-    }
-    auto &firstPackage = packages.front();
-    name = firstPackage.nameStr();
-
-    return name;
-}
-
-auto SedsPlugin::getPackagenameFromSedsModel(const QString &inputFilePath) -> QString
-{
-    const std::unique_ptr<conversion::Model> sedsModel = loadSedsModel(inputFilePath);
-    seds::model::SedsModel *const sedsModelPtr = dynamic_cast<seds::model::SedsModel *>(sedsModel.get());
-    if (sedsModelPtr == nullptr) {
-        MessageManager::write(GenMsg::msgError.arg("SEDS model could not be read"));
-        return "";
-    }
-
-    QString packageName;
-    auto &variantData = sedsModelPtr->data();
-    if (std::holds_alternative<seds::model::PackageFile>(variantData)) {
-        packageName = getPackagenameFromPackageFile(std::get<seds::model::PackageFile>(variantData));
-    } else if (std::holds_alternative<seds::model::DataSheet>(variantData)) {
-        packageName = getPackagenameFromDatasheet(std::get<seds::model::DataSheet>(variantData));
-    } else {
-        MessageManager::write(GenMsg::msgError.arg("Selected file does not contain valid SEDS model"));
-        return "";
-    }
-
-    return packageName;
-}
-
 auto SedsPlugin::importSdl() -> void
 {
     const QString tmpIvFilename = "tmp-interfaceview.xml";
@@ -305,11 +252,6 @@ auto SedsPlugin::importSdl() -> void
             QFileDialog::getOpenFileName(nullptr, "Select EDS file to import SDL from...", QString(), tr("*.xml"));
     if (inputFilePath.isEmpty()) {
         MessageManager::write(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
-        return;
-    }
-
-    const QString packageName = getPackagenameFromSedsModel(inputFilePath);
-    if (packageName == "") {
         return;
     }
 
