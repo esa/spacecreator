@@ -29,12 +29,12 @@ sed -i 's/TIMERS/SYSTEM-DATAVIEW/g' $TEST_OUTPUT_DIR/dataview-uniq.asn
 cd $TEST_OUTPUT_DIR
 # Compare output against reference, and compile to make sure the reference is valid
 # Clean (rm) only if all steps pass
-$DIFF Component.pr ../resources/test_timers.output \
+$DIFF component.pr ../resources/test_timers.output \
   && $DIFF interfaceview.xml ../resources/test_timers.interfaceview \
   && $AADL_CONVERTER -o interfaceview.xml \
   -t ../resources/xml2iv/interfaceview.tmplt \
   -x InterfaceView.aadl \
-  && $OPENGEODE --toAda system_structure.pr Component.pr \
+  && $OPENGEODE --toAda system_structure.pr component.pr \
   && asn1scc -Ada --type-prefix asn1Scc dataview-uniq.asn component_datamodel.asn \
   && gcc -c component.adb \
   && cd .. \
