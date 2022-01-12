@@ -48,6 +48,7 @@
 #include "projectexplorer.h"
 #include "projectnodes.h"
 #include "sdl/SdlExporter/exporter.h"
+#include "sdl/SdlModel/sdlmodel.h"
 #include "sdl/SdlOptions/options.h"
 #include "seds/SedsOptions/options.h"
 #include "seds/SedsXmlImporter/importer.h"
@@ -312,11 +313,7 @@ auto SedsPlugin::importSdl() -> void
         return;
     }
 
-    const QString prefix = QString("work/%1/SDL/src/").arg(packageName.toLower());
-    if (!QDir().mkpath(prefix)) {
-        MessageManager::write(GenMsg::msgError.arg(QString("Could not create path %1").arg(prefix)));
-        return;
-    }
+    const QString prefix = "";
 
     conversion::Options options;
     options.add(conversion::sdl::SdlOptions::filepathPrefix, prefix);
@@ -325,6 +322,7 @@ auto SedsPlugin::importSdl() -> void
     options.add(conversion::iv::IvOptions::configFilepath, ivConfig);
 
     QStringList asn1Filenames;
+    QStringList sdlFilenames;
     try {
         auto outputModels = convert({ conversion::ModelType::Seds }, conversion::ModelType::Sdl,
                 { conversion::ModelType::InterfaceView, conversion::ModelType::Asn1 }, options);
@@ -333,11 +331,27 @@ auto SedsPlugin::importSdl() -> void
             if (asn1Model != nullptr) {
                 asn1Filenames = conversion::asn1::exporter::Asn1Exporter::getFilenamesForModel(asn1Model);
             }
+            auto *const sdlModel = dynamic_cast<sdl::SdlModel *>(model.get());
+            if (sdlModel != nullptr) {
+                sdlFilenames = sdl::exporter::SdlExporter::getFilenamesForModel(sdlModel);
+            }
         }
     } catch (std::exception &ex) {
         MessageManager::write(GenMsg::msgError.arg(ex.what()));
         QFile(tmpIvFilename).remove();
         return;
+    }
+
+    for (const auto &filename : sdlFilenames) {
+        const QString dstPath = QString("work/%1/SDL/src/").arg(filename.split(".").first().toLower());
+        MessageManager::write(dstPath);
+        if (!QDir().mkpath(dstPath)) {
+            MessageManager::write(GenMsg::msgError.arg(QString("Could not create path %1").arg(prefix)));
+            QFile(tmpIvFilename).remove();
+            return;
+        }
+        QFile::copy(filename, QString("%1%2").arg(dstPath).arg(filename));
+        QFile(filename).remove();
     }
 
     for (auto &filename : asn1Filenames) {
@@ -347,6 +361,8 @@ auto SedsPlugin::importSdl() -> void
     project->rootProjectNode()->addFiles(asn1Filenames);
 
     if (!loadAndMergeIvModelIntoCurrent(ivConfig, tmpIvFilename)) {
+        // todo: pack it into cleanup function
+        QFile(tmpIvFilename).remove();
         return;
     }
 
