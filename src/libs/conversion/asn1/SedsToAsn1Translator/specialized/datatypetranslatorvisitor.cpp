@@ -272,17 +272,14 @@ std::optional<std::int64_t> DataTypeTranslatorVisitor::getSmallestValue(
 std::optional<double> DataTypeTranslatorVisitor::getSmallestValue(
         const std::optional<seds::model::FloatDataEncoding> &encoding) const
 {
-    const static double singleMin = 1.17549E-38;
-    const static double doubleMin = 2.22507e-308;
-
     if (encoding) {
         if (const auto coreEncodingAndPrecision =
                         std::get_if<seds::model::CoreEncodingAndPrecision>(&encoding->encoding())) {
             switch (*coreEncodingAndPrecision) {
             case seds::model::CoreEncodingAndPrecision::IeeeSingle:
-                return singleMin;
+                return std::numeric_limits<float>::min();
             case seds::model::CoreEncodingAndPrecision::IeeeDouble:
-                return doubleMin;
+                return std::numeric_limits<double>::min();
             default:
                 return std::nullopt;
             }
@@ -316,17 +313,15 @@ std::optional<std::int64_t> DataTypeTranslatorVisitor::getGreatestValue(
 std::optional<double> DataTypeTranslatorVisitor::getGreatestValue(
         const std::optional<seds::model::FloatDataEncoding> &encoding) const
 {
-    const static double singleMax = 3.40282e+38;
-    const static double doubleMax = 1.79769e+308;
-
     if (encoding) {
         if (const auto coreEncodingAndPrecision =
                         std::get_if<seds::model::CoreEncodingAndPrecision>(&encoding->encoding())) {
             switch (*coreEncodingAndPrecision) {
             case seds::model::CoreEncodingAndPrecision::IeeeSingle:
-                return singleMax;
+                return std::numeric_limits<float>::max();
             case seds::model::CoreEncodingAndPrecision::IeeeDouble:
                 return doubleMax;
+                return std::numeric_limits<double>::max();
             default:
                 return std::nullopt;
             }
