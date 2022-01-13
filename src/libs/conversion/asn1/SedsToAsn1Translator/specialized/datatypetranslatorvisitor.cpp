@@ -320,7 +320,6 @@ std::optional<double> DataTypeTranslatorVisitor::getGreatestValue(
             case seds::model::CoreEncodingAndPrecision::IeeeSingle:
                 return std::numeric_limits<float>::max();
             case seds::model::CoreEncodingAndPrecision::IeeeDouble:
-                return doubleMax;
                 return std::numeric_limits<double>::max();
             default:
                 return std::nullopt;
