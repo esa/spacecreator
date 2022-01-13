@@ -10,8 +10,8 @@ PayloadBase ::= SEQUENCE
 }
 PayloadA ::= SEQUENCE
 {
-    intDataRange IntegerData(0 .. 255) (5 .. 10),
-    floatDataRange RealData(0 .. 255) (3.14 .. 42.1),
+    intDataRange IntegerData(0 .. 255) (5 .. 255),
+    floatDataRange RealData(0 .. 255) (3.14 .. 3.40282e+38),
     intDataValue IntegerData(0 .. 255) (42),
     floatDataValue RealData(0 .. 255) (3.14)
 }

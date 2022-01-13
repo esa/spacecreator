@@ -19,7 +19,11 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace Asn1Acn::Types {
+class Integer;
+class Real;
 class Sequence;
 class Type;
 } // namespace Asn1Acn::Types
@@ -54,6 +58,11 @@ private:
             const seds::model::ContainerValueConstraint &valueConstraint, Asn1Acn::Types::Type *asn1Type) const -> void;
 
     auto getConstrainedType(const seds::model::EntryRef &entry) const -> Asn1Acn::Types::Type *;
+
+    auto getSmallestValue(Asn1Acn::Types::Integer *type) const -> std::int64_t;
+    auto getSmallestValue(Asn1Acn::Types::Real *type) const -> double;
+    auto getGreatestValue(Asn1Acn::Types::Integer *type) const -> std::int64_t;
+    auto getGreatestValue(Asn1Acn::Types::Real *type) const -> double;
 
 private:
     Asn1Acn::Types::Sequence *m_asn1Sequence;

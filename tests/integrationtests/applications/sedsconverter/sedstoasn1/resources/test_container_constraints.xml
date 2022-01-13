@@ -26,10 +26,10 @@
       <ContainerDataType name="PayloadA" abstract="false" baseType="PayloadBase">
         <ConstraintSet>
           <RangeConstraint entry="intDataRange">
-            <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="5" max="10" />
+            <MinMaxRange rangeType="atLeast" min="5" />
           </RangeConstraint>
           <RangeConstraint entry="floatDataRange">
-            <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="3.14" max="42.1" />
+            <MinMaxRange rangeType="atLeast" min="3.14" />
           </RangeConstraint>
           <ValueConstraint entry="intDataValue" value="42" />
           <ValueConstraint entry="floatDataValue" value="3.14" />
