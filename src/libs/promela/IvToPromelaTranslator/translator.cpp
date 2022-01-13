@@ -212,11 +212,6 @@ std::unique_ptr<::promela::model::InlineDef> IvToPromelaTranslator::generateSend
 
     if (parameterType.isEmpty()) {
         argumentName = "dummy";
-        // variable defined inside inline
-        // this is bad
-        // this might be called from other places in code
-        // so the variable shall be defined globally
-        // use constant instead
         std::unique_ptr<ProctypeElement> dummyVariableDef =
                 std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), argumentName));
         sequence.appendElement(std::move(dummyVariableDef));
@@ -242,7 +237,7 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(
     for (IVInterface *providedInterface : providedInterfaceList) {
 
         if (providedInterface->kind() != IVInterface::OperationKind::Cyclic
-                && providedInterface->kind() != IVInterface::OperationKind::Protected) {
+                && providedInterface->kind() != IVInterface::OperationKind::Sporadic) {
             auto message =
                     QString("Unallowed interface kind in function %1, only sporatic and cyclic interfaces are allowed")
                             .arg(functionName);
