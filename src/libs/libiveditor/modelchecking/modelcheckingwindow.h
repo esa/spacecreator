@@ -42,8 +42,10 @@ Q_SIGNALS:
     void visibleChanged(bool visible);
 
 private Q_SLOTS:
-    Qt::CheckState listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent, QStringList preSelection);
+    Qt::CheckState listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent, QStringList preSelection, QStringList expanded);
     QStringList getPropertiesSelection(QTreeWidgetItem *propertyWidgetItem, QStringList selections);
+    QStringList getExpandedNodes(QTreeWidgetItem *propertyWidgetItem, QStringList expanded);
+    bool isExpanded(QStringList expanded, QString dirName);
     Qt::CheckState getCheckState(QStringList selection, QString path);
     void listSubtypes(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent, QStringList preSelection);
     QStringList getSubtypesSelection();
@@ -66,6 +68,7 @@ private Q_SLOTS:
     void on_treeWidget_subtyping_customContextMenuRequested(const QPoint &pos);
     void refreshView();
     void on_pushButton_saveConfiguration_clicked();
+    bool saveConfiguration();
     void on_pushButton_loadConfiguration_clicked();
     void setPropertiesSelection(QStringList propertiesSelected);
     void setSubtypesSelection(QStringList subtypesSelected);
@@ -94,6 +97,7 @@ private:
     QTreeWidgetItem *propertiesTopDirWidgetItem;
     QTreeWidgetItem *subtypesTopDirWidgetItem;
     QTreeWidgetItem *functionsTopNodeWidgetItem;
+    QTreeWidgetItem *resultsTopDirWidgetItem;
 };
 
 }

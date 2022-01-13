@@ -93,7 +93,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     this->propertiesTopDirWidgetItem = new QTreeWidgetItem(fileColumnProps);
     this->propertiesTopDirWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
     d->ui->treeWidget_properties->addTopLevelItem(this->propertiesTopDirWidgetItem);
-    this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, {}));
+    this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, {}, {}));
 
     // Build subtyping tree view
     QFileInfo subtypesFileInfo(this->subtypesPath);
@@ -116,9 +116,9 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     QFileInfo resultsFileInfo(this->outputPath);
     QStringList fileColumnResuls;
     fileColumnResuls.append(resultsFileInfo.fileName());
-    QTreeWidgetItem *dir4 = new QTreeWidgetItem(fileColumnResuls);
-    dir4->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
-    d->ui->treeWidget_results->addTopLevelItem(dir4);
+    resultsTopDirWidgetItem = new QTreeWidgetItem(fileColumnResuls);
+    resultsTopDirWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
+    d->ui->treeWidget_results->addTopLevelItem(resultsTopDirWidgetItem);
 
     // Set validators on MC options value fileds
     d->ui->lineEdit_maxNumEnvRICalls->setValidator( new QIntValidator(0, 50, this) );
@@ -127,7 +127,21 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     d->ui->lineEdit_timeLimit->setValidator( new QIntValidator(0, 14400, this) );
 
     // set status bar text color
-    statusBar()->setStyleSheet("color: red");
+    statusBar()->setStyleSheet("color: blue");
+
+    // CALL Kazoo
+    QString kazooCall = "kazoo -t MOCHECK";
+    QProcess *kazooCallerProcess = new QProcess(this);
+    // set path to project dir
+    QString qDirAppPath = QDir::currentPath();
+    QDir::setCurrent(this->projectDir+"/");
+    if (kazooCallerProcess->execute(kazooCall) != 0) {
+        QMessageBox::warning(this, tr("Kazoo call"),
+                             "Error when calling kazoo!");
+        return;
+    }
+    // reset path
+    QDir::setCurrent(qDirAppPath);
 }
 
 ModelCheckingWindow::~ModelCheckingWindow()
@@ -136,7 +150,7 @@ ModelCheckingWindow::~ModelCheckingWindow()
     d = nullptr;
 }
 
-Qt::CheckState ModelCheckingWindow::listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parentFileInfo, QStringList preSelection) {
+Qt::CheckState ModelCheckingWindow::listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parentFileInfo, QStringList preSelection, QStringList expanded) {
     QDir dir;
     dir.setPath(parentFileInfo.filePath());
     dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoSymLinks);
@@ -156,7 +170,7 @@ Qt::CheckState ModelCheckingWindow::listProperties(QTreeWidgetItem *parentWidget
             QTreeWidgetItem *childWidgetItem = new QTreeWidgetItem(childWidgetInfo);
             childWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
             parentWidgetItem->addChild(childWidgetItem);
-            checkState = listProperties(childWidgetItem, childFileInfo, preSelection);
+            checkState = listProperties(childWidgetItem, childFileInfo, preSelection, expanded);
             childWidgetItem->setCheckState(0, checkState);
             if (checkState == Qt::Unchecked){parentIsFullyChecked = false;}
             if (checkState == Qt::Checked || checkState == Qt::PartiallyChecked){parentIsUnchecked = false;}
@@ -178,12 +192,22 @@ Qt::CheckState ModelCheckingWindow::listProperties(QTreeWidgetItem *parentWidget
             }
         }
     }
+
+    parentWidgetItem->setExpanded(isExpanded(expanded, parentWidgetItem->text(0)));
+
     if (parentIsFullyChecked && !parentIsUnchecked){return Qt::Checked;}
     if (!parentIsFullyChecked && parentIsUnchecked){return Qt::Unchecked;}
     // empty dir
     if (parentIsFullyChecked && parentIsUnchecked){return Qt::Unchecked;}
     return Qt::PartiallyChecked;
 
+}
+
+bool ModelCheckingWindow::isExpanded(QStringList expanded, QString dirName){
+    for (QString expand : expanded){
+        if (expand == dirName) {return true;}
+    }
+    return false;
 }
 
 Qt::CheckState ModelCheckingWindow::getCheckState(QStringList selections, QString path){
@@ -345,7 +369,10 @@ void ModelCheckingWindow::on_treeWidget_properties_itemDoubleClicked(QTreeWidget
     } else{ // then has to be a .pr file
         cmd = "opengeode " + item->text(1);
     }
-    if(QProcess::execute(cmd) != 0) {statusBar()->showMessage("error executig " + cmd, 6000);}
+    if(QProcess::execute(cmd) != 0) {
+        QMessageBox::warning(this, tr("Open property"),
+                             tr("Error when calling '%1'.").arg(cmd));
+    }
 }
 
 void ModelCheckingWindow::on_treeWidget_subtyping_itemDoubleClicked(QTreeWidgetItem *item, int column)
@@ -355,7 +382,10 @@ void ModelCheckingWindow::on_treeWidget_subtyping_itemDoubleClicked(QTreeWidgetI
     }
     // is subtyping file
     QString cmd = "kate " + item->text(1);
-    if(QProcess::execute(cmd) != 0) {statusBar()->showMessage("error executig " + cmd, 6000);}
+    if(QProcess::execute(cmd) != 0) {
+        QMessageBox::warning(this, tr("Open subtyping"),
+                             tr("Error when calling '%1'.").arg(cmd));
+    }
 }
 
 void ModelCheckingWindow::on_treeWidget_subtyping_itemChanged(QTreeWidgetItem *item, int column)
@@ -389,19 +419,108 @@ void ModelCheckingWindow::on_treeWidget_subtyping_itemChanged(QTreeWidgetItem *i
 
 void ModelCheckingWindow::on_pushButton_callIF_clicked()
 {
-    // Call make rule
-    if (QProcess::execute("make model-check CONFIG=the-config-file-name.xml") != 0) return;
+    // First save current configuration to hidden file .mcconfig.xml
+    if (!saveConfiguration()) {
+        return;
+    }
 
-    QString ifCallCmd;
-    ifCallCmd = "if --max-env-calls=" + d->ui->lineEdit_maxNumEnvRICalls->text() + " --max-scenarios=" + d->ui->lineEdit_maxNumScenarios->text() + " --max-states=" + d->ui->lineEdit_maxNumStates->text() + " --exp-algorithm=" + d->ui->comboBox_expAlgorithm->currentText().toLower().left(3) + " --time-limit=" + d->ui->lineEdit_timeLimit->text();
-    QProcess *process = new QProcess(this);
-    QString cmd;
-    cmd = "xterm -hold -e echo '" + ifCallCmd + "'";
-    process->start(cmd);
+    // JUMP to project directory
+    QString qDirAppPath = QDir::currentPath();
+    QDir::setCurrent(this->projectDir+"/");
+
+    // REMOVE statusfile and callif.sh
+    QString rmFilesCmd = "rm -f statusfile callif.sh";
+    if (QProcess::execute(rmFilesCmd) != 0) {
+        QMessageBox::warning(this, tr("Call IF"),
+                             "Error executing: " + rmFilesCmd);
+        // reset path
+        QDir::setCurrent(qDirAppPath);
+        return;
+    }
+
+    // CREATE callif.sh
+    QFile callIfFile("callif.sh");
+    if(callIfFile.open(QIODevice::ReadWrite)){
+        QTextStream stream(&callIfFile);
+        stream << "#!/bin/bash" << endl;
+        stream << "make model-check" << endl;
+        stream << "echo $? > statusfile" << endl;
+    }
+    Q_ASSERT(QDir("callif.sh").exists());
+
+    // CALL IF make rule via terminal, saving make return in statusfile
+    if (QProcess::execute(QStringLiteral("xterm -hold -e sh callif.sh")) != 0) {
+        QMessageBox::warning(this, tr("Call IF"),
+                             "Error executing xterm! ");
+        // reset path
+        QDir::setCurrent(qDirAppPath);
+        return;
+    }
+
+    // READ statusfile with make return value
+    QString makeStatus;
+    QFile statusFile("statusfile");
+    Q_ASSERT(statusFile.exists());
+    if (statusFile.open(QIODevice::ReadOnly | QIODevice::Text)){
+        makeStatus = statusFile.readAll();
+    } else {
+        QMessageBox::warning(this, tr("Call IF"),
+                             "Error opening status file!");
+        // reset path
+        QDir::setCurrent(qDirAppPath);
+        return;
+    }
+    if (makeStatus != "0") {
+        QMessageBox::warning(this, tr("Call IF"),
+                             "Error executing: make model-check");
+        // reset path
+        QDir::setCurrent(qDirAppPath);
+        return;
+    }
+
+    // REMOVE statusfile and callif.sh
+    if (QProcess::execute(rmFilesCmd) != 0) {
+        QMessageBox::warning(this, tr("Call IF"),
+                             "Error executing: " + rmFilesCmd);
+        // reset path
+        QDir::setCurrent(qDirAppPath);
+        return;
+    }
+
+    // CHECK output dir exists
+    Q_ASSERT(QDir(this->outputPath).exists());
+
+    // DESTROY tree except root
+    QTreeWidgetItem *treeRoot = this->resultsTopDirWidgetItem;
+    for (int i = treeRoot->childCount(); i > 0; i--){
+        treeRoot->removeChild(treeRoot->child(i-1));
+    }
+
+    // CONVERT IF SCENARIOS (scn files) into msc files
+    if (QDir(this->outputPath).isEmpty()){
+        QMessageBox::information(this, tr("Call IF"),
+                             "No scenarios found. ");
+        // reset path
+        QDir::setCurrent(qDirAppPath);
+        return;
+    }
+    QDir::setCurrent(this->outputPath+"/");
+    //TODO remove python3 and script path
+    QString scn2mscCmd = "python3 ~/work/moc4space/scn2msc/scn2msc.py scn2msc.py *.scn .mcconfig.xml";
+    if (QProcess::execute(scn2mscCmd) != 0) {
+        QMessageBox::warning(this, tr("Call IF"),
+                             "Error when calling: " + scn2mscCmd);
+        // reset path
+        QDir::setCurrent(qDirAppPath);
+        return;
+    }
+
+    // reset path
+    QDir::setCurrent(qDirAppPath);
 
     //Build results/output tree view
-    QFileInfo fileInfo3(this->outputPath);
-    listResults(d->ui->treeWidget_results->topLevelItem(0), fileInfo3);
+    QFileInfo resultsFileInfo(this->outputPath);
+    listResults(resultsTopDirWidgetItem, resultsFileInfo);
 }
 
 void ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked(QTreeWidgetItem *item, int column)
@@ -420,22 +539,38 @@ void ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked(QTreeWidgetIte
 
 void ModelCheckingWindow::convertToObs()
 {
+    // Get msc property name
     QFileInfo fileInfo(d->ui->treeWidget_properties->currentItem()->text(0));
-    bool ok;
-    QString fileName = QInputDialog::getText(this, tr("MSC to OBS"),
-                                            tr("Observer file name:"), QLineEdit::Normal,
-                                            fileInfo.baseName()+".pr", &ok);
-    if (ok && !fileName.isEmpty()){
-        // Call make rule
-        if (QProcess::execute("make -C work/modelchecking/properties/mscdir/ msc2if") != 0) return;
+    QString fileName = fileInfo.baseName()+".pr";
 
-        /*QString convertToObsCmd;
-        convertToObsCmd = "msc2obs " + d->ui->treeWidget_properties->currentItem()->text(0) + " " + fileName;
-        QProcess *process = new QProcess(this);
-        QString cmd;
-        cmd = "xterm -hold -e echo '" + convertToObsCmd + "'";
-        process->start(cmd);*/
+    // CALL MAKE RULE
+    // set path to property dir
+    QString qDirAppPath = QDir::currentPath();
+    QDir::setCurrent(this->projectDir+"/work/modelchecking/properties/" + fileInfo.baseName());
+    if (QProcess::execute("make " + fileName) != 0) {
+        QMessageBox::warning(this, tr("Convert to Observer"),
+                             "Error when calling make rule!");
+        // reset path
+        QDir::setCurrent(qDirAppPath);
+        return;
     }
+    // reset path
+    QDir::setCurrent(qDirAppPath);
+
+    // REFRESH TREEVIEW with preselection
+    QFileInfo propertiesFileInfo(this->propertiesPath);
+    // save user selection
+    QStringList preSelection = getPropertiesSelection(this->propertiesTopDirWidgetItem, {});
+    // save user expanded nodes
+    QStringList expandedNodes = getExpandedNodes(this->propertiesTopDirWidgetItem, {this->propertiesTopDirWidgetItem->text(0)});
+    // destroy tree except root
+    QTreeWidgetItem *treeRoot = this->propertiesTopDirWidgetItem;
+    for (int i = treeRoot->childCount(); i > 0; i--){
+        treeRoot->removeChild(treeRoot->child(i-1));
+    }
+    // rebuild tree with saved selection
+    // TODO (improvement) the new tree has all nodes collapsed, so user expanded folders are lost
+    this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, preSelection, expandedNodes));
 }
 
 void ModelCheckingWindow::addProperty()
@@ -450,7 +585,11 @@ void ModelCheckingWindow::addProperty()
         if(propertyType == "Observer") {makeRule = "create-obs";}
         if(propertyType == "Message Sequence Chart") {makeRule = "create-msc";}
         if(propertyType == "Boolean Stop Condition - Observer") {makeRule = "create-bsc";}
-        if(propertyType == "Boolean Stop Condition - LTL") {statusBar()->showMessage("LTL not yet supported", 6000); return;}
+        if(propertyType == "Boolean Stop Condition - LTL") {
+            QMessageBox::warning(this, tr("Add property"),
+                                 "LTL not yet supported.");
+            return;
+        }
         bool ok2;
         QString label = "Property name:                                                                                         ";
         QString propertyName = QInputDialog::getText(this, "New " + propertyType,
@@ -465,26 +604,27 @@ void ModelCheckingWindow::addProperty()
             file.setFileName(filePath);
             while(file.exists())
             {
-                filePath = filePath + "-another";
-                propertyName = propertyName + "-another";
+                filePath = filePath + "-1";
+                propertyName = propertyName + "-1";
                 file.setFileName(filePath);
             }
             // CALL MAKE RULE
             QString makeCall = "make " + makeRule + " NAME=" + propertyName;
             QProcess *makeCallerProcess = new QProcess(this);
             // set path to project dir
-            //makeCallerProcess->setWorkingDirectory(this->projectDir+"/");
             QString qDirAppPath = QDir::currentPath();
             QDir::setCurrent(this->projectDir+"/");
             if (makeCallerProcess->execute(makeCall) != 0) {
-                // TODO report in dialog or console instead
-                statusBar()->showMessage("error executing : " + makeCall, 6000);
-                //return;
-            } //else { TODO correct makefile errors and uncomment this else statement
+                QMessageBox::warning(this, tr("Add property"),
+                                     tr("Error executing '%1'").arg(makeCall));
+                return;
+            } else {
                 // REFRESH TREEVIEW with preselection
                 QFileInfo propertiesFileInfo(this->propertiesPath);
                 // save user selection
                 QStringList preSelection = getPropertiesSelection(this->propertiesTopDirWidgetItem, {});
+                // save user expanded nodes
+                QStringList expandedNodes = getExpandedNodes(this->propertiesTopDirWidgetItem, {this->propertiesTopDirWidgetItem->text(0)});
                 // destroy tree except root
                 QTreeWidgetItem *treeRoot = this->propertiesTopDirWidgetItem;
                 for (int i = treeRoot->childCount(); i > 0; i--){
@@ -492,8 +632,8 @@ void ModelCheckingWindow::addProperty()
                 }
                 // rebuild tree with saved selection
                 // TODO (improvement) the new tree has all nodes collapsed, so user expanded folders are lost
-                this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, preSelection));
-            //}
+                this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, preSelection, expandedNodes));
+            }
             // reset path
             QDir::setCurrent(qDirAppPath);
         }
@@ -516,6 +656,22 @@ QStringList ModelCheckingWindow::getPropertiesSelection(QTreeWidgetItem *propert
     return selections;
 }
 
+QStringList ModelCheckingWindow::getExpandedNodes(QTreeWidgetItem *propertyWidgetItem, QStringList expanded){
+
+    for (int i = 0; i < propertyWidgetItem->childCount(); i++)
+    {
+        QTreeWidgetItem *child = propertyWidgetItem->child(i);
+        if (child->childCount() > 0){ // is dir with children
+            if (child->isExpanded()){ // and is expanded
+                expanded.append(child->text(0));
+            }
+            expanded = expanded + getExpandedNodes(child, {});
+        }
+    }
+
+    return expanded;
+}
+
 QStringList ModelCheckingWindow::getSubtypesSelection(){
     QStringList selections = {};
     for (int i = 0; i < this->subtypesTopDirWidgetItem->childCount(); i++)
@@ -526,7 +682,8 @@ QStringList ModelCheckingWindow::getSubtypesSelection(){
         }
     }
     if (selections.size() > 1) {
-        statusBar()->showMessage("Only one subtyping can be selected!", 6000);
+        QMessageBox::warning(this, tr("Selected subtypes"),
+                             "Select up to one subtyping!");
         return {selections.at(0)};
     }
     return selections;
@@ -568,22 +725,14 @@ void ModelCheckingWindow::addSubtypes()
         QString qDirAppPath = QDir::currentPath();
         QDir::setCurrent(this->projectDir+"/");
         if (QProcess::execute("make create-subtype NAME="+fileName) != 0) {
-            statusBar()->showMessage("error executing make create-subtype NAME="+fileName, 6000);
+            QMessageBox::warning(this, tr("Add subtypes"),
+                                 tr("Error executing 'make create-subtype NAME=%1'").arg(fileName));
             //reset path
             QDir::setCurrent(qDirAppPath);
             return;
         }
         //reset path
         QDir::setCurrent(qDirAppPath);
-
-        //TODO remove this code in comment
-        /* rebuild tree view
-        QTreeWidgetItem *treeViewRoot = d->ui->treeWidget_subtyping->topLevelItem(0);
-        for (int i = treeViewRoot->childCount(); i > 0; i--){
-            treeViewRoot->removeChild(treeViewRoot->child(i-1));
-        }
-        QFileInfo fileInfo(this->subtypesPath);
-        listFile(treeViewRoot, fileInfo, true, true);*/
 
         // ADD NEW TREE NODE
         QStringList fileColumn;
@@ -610,22 +759,15 @@ void ModelCheckingWindow::deleteSubtypes()
         QString rmSubtypesCmd;
         rmSubtypesCmd = "rm " + this->subtypesPath + "/" + fileInfo.fileName();
         if (QProcess::execute(rmSubtypesCmd) != 0) {
-            statusBar()->showMessage("error executing rm command", 6000);
+            QMessageBox::warning(this, tr("Delete subtypes"),
+                                 "Error rm command");
             return;
         }
 
-        // rebuild tree view (we shall not rebuild otherwise selection is lost)
-        // TODO delete code in comment
-        /*QThread::sleep(1);
-        QTreeWidgetItem *treeViewRoot = d->ui->treeWidget_subtyping->topLevelItem(0);
-        for (int i = treeViewRoot->childCount(); i > 0; i--){
-            treeViewRoot->removeChild(treeViewRoot->child(i-1));
-        }
-        QFileInfo fileInfo(this->subtypesPath);
-        listFile(treeViewRoot, fileInfo, true, true);*/
-
         // delete tree node
         d->ui->treeWidget_subtyping->topLevelItem(0)->removeChild(d->ui->treeWidget_subtyping->currentItem());
+
+        statusBar()->showMessage(tr("Subtyping deleted."), 6000);
     }
 }
 
@@ -654,18 +796,22 @@ void ModelCheckingWindow::deleteProperty()
     if (ret == QMessageBox::Yes){
         if (fileOrDir == "folder"){ // is directory
             if (QProcess::execute("rm -r " + this->propertiesPath + "/" + fileInfo.fileName()) != 0) {
-                statusBar()->showMessage("error executing rm", 6000);
+                QMessageBox::warning(this, tr("Delete property"),
+                                     "Error rm command");
                 return;
             }
         }
         else{ // is file
             if (QProcess::execute("rm " + this->propertiesPath + "/" + parent + "/" + fileInfo.fileName()) != 0) {
-                statusBar()->showMessage("error executing rm", 6000);
+                QMessageBox::warning(this, tr("Delete property"),
+                                     "Error rm command");
                 return;
             }
         }
         // delete tree node
         d->ui->treeWidget_properties->currentItem()->parent()->removeChild(d->ui->treeWidget_properties->currentItem());
+
+        statusBar()->showMessage(tr("Property deleted."), 6000);
     }
 }
 
@@ -755,9 +901,28 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
     QStringList subtypesSelection = getSubtypesSelection();
     QStringList functionSelection = getFunctionsSelection();
 
+    // check if current configuration is valid
+    QString warningMsg = "Current invalid configuration.";
+    if (propsSelection.size() < 1) {
+        QMessageBox::warning(this, tr("Save configuration"),
+                             warningMsg.append(" Select at least one property."));
+        return;
+    }
+    if (subtypesSelection.size() > 1){
+        QMessageBox::warning(this, tr("Save configuration"),
+                             warningMsg.append(" Select up to one subtyping."));
+        return;
+    }
+    if (functionSelection.size() < 1){
+        QMessageBox::warning(this, tr("Save configuration"),
+                             warningMsg.append(" Select at least one Function."));
+        return;
+    }
+
     // create and open configuration file
     if (!file.open(QFile::WriteOnly | QFile::Text)){
-        statusBar()->showMessage("Cannot write configuration file!", 6000);
+        QMessageBox::warning(this, tr("Save configuration"),
+                             "Error when opening file.");
         return;
     }
 
@@ -773,9 +938,76 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
     XmelWriter writer(propsSelection, subtypesSelection, functionSelection, ifOptions);
     if (writer.writeFile(&file, fileName + ".xml")){
         statusBar()->showMessage("Configuration file successfully saved as " + fileName + ".xml", 6000);
+    } else {
+        QMessageBox::warning(this, tr("Save configuration"),
+                             "Error when writing to file.");
+        return;
     }
 }
 
+bool ModelCheckingWindow::saveConfiguration()
+{
+    QString fileName = ".mcconfig";
+    QFile file;
+
+    // check if configurations dir exists and create it otherwise
+    if (!QDir(this->configurationsPath).exists()){
+        QDir().mkdir(this->configurationsPath);
+    }
+
+    // set path to file object
+    QString filePath = this->configurationsPath + "/" + fileName + ".xml";
+    file.setFileName(filePath);
+
+    // get all user selections
+    QStringList propsSelection = getPropertiesSelection(this->propertiesTopDirWidgetItem, {});
+    QStringList subtypesSelection = getSubtypesSelection();
+    QStringList functionSelection = getFunctionsSelection();
+
+    // check if current configuration is valid
+    QString warningMsg = "Current invalid configuration.";
+    if (propsSelection.size() < 1) {
+        QMessageBox::warning(this, tr("Save configuration"),
+                             warningMsg.append(" Select at least one property."));
+        return false;
+    }
+    if (subtypesSelection.size() > 1){
+        QMessageBox::warning(this, tr("Save configuration"),
+                             warningMsg.append(" Select up to one subtyping."));
+        return false;
+    }
+    if (functionSelection.size() < 1){
+        QMessageBox::warning(this, tr("Save configuration"),
+                             warningMsg.append(" Select at least one Function."));
+        return false;
+    }
+
+    // create and open configuration file
+    if (!file.open(QFile::WriteOnly | QFile::Text)){
+        QMessageBox::warning(this, tr("Save configuration"),
+                             "Error when opening file.");
+        return false;
+    }
+
+    // write to configuration file
+    QStringList ifOptions = {};
+    ifOptions.append(d->ui->lineEdit_maxNumScenarios->text());
+    ifOptions.append(d->ui->checkBox_errorScenarios->isChecked() ? "true" : "false");
+    ifOptions.append(d->ui->checkBox_successScenarios->isChecked() ? "true" : "false");
+    ifOptions.append(d->ui->lineEdit_timeLimit->text());
+    ifOptions.append(d->ui->lineEdit_maxNumEnvRICalls->text());
+    ifOptions.append(d->ui->comboBox_expAlgorithm->currentText().left(3) == "DFS" ? "dfs" : "bfs");
+    ifOptions.append(d->ui->lineEdit_maxNumStates->text());
+    XmelWriter writer(propsSelection, subtypesSelection, functionSelection, ifOptions);
+    if (writer.writeFile(&file, fileName + ".xml")){
+        //statusBar()->showMessage("Configuration file successfully saved as " + fileName + ".xml", 6000);
+        return true;
+    } else {
+        QMessageBox::warning(this, tr("Save configuration"),
+                             "Error when writing to file.");
+        return false;
+    }
+}
 
 void ModelCheckingWindow::on_pushButton_loadConfiguration_clicked()
 {
@@ -845,7 +1077,7 @@ void ModelCheckingWindow::setPropertiesSelection(QStringList propertiesSelected)
         treeRoot->removeChild(treeRoot->child(i-1));
     }
     // rebuild tree with selection
-    this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, propertiesSelected));
+    this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, propertiesSelected, {}));
 
 }
 
