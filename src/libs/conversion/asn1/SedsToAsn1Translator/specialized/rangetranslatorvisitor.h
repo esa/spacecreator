@@ -24,18 +24,41 @@
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Translator for all SEDS ranges
+ */
 template<typename ValueType>
 class RangeTranslatorVisitor final
 {
     using RangeConstraint = Asn1Acn::Constraints::RangeConstraint<ValueType>;
 
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   asn1Type        ASN.1 type that is currently translated
+     * @param   constraints     Constraints of the ASN.1 type that is currently translated
+     * @param   smallestValue   Optional smallest value possible to use in range
+     * @param   greatestValue   Optional greatest value possible to use in range
+     */
     RangeTranslatorVisitor(Asn1Acn::Types::Type *asn1Type, Asn1Acn::Constraints::ConstraintList<ValueType> &constraints,
             std::optional<typename ValueType::Type> smallestValue,
             std::optional<typename ValueType::Type> greatestValue);
+    /**
+     * @brief   Deleted copy constructor
+     */
     RangeTranslatorVisitor(const RangeTranslatorVisitor &) = delete;
+    /**
+     * @brief   Deleted move constructor
+     */
     RangeTranslatorVisitor(RangeTranslatorVisitor &&) = delete;
+    /**
+     * @brief   Deleted copy assisnment operator
+     */
     RangeTranslatorVisitor &operator=(const RangeTranslatorVisitor &) = delete;
+    /**
+     * @brief   Deleted move assisnment operator
+     */
     RangeTranslatorVisitor &operator=(RangeTranslatorVisitor &&) = delete;
 
     /**
@@ -52,11 +75,40 @@ public:
     auto operator()(const seds::model::FloatPrecisionRange &range) -> void;
 
 private:
+    /**
+     * @brief   Get minimum value from given range
+     *
+     * @param   ragne       MinMaxRange
+     *
+     * @return  Minimum value
+     */
     auto getMin(const seds::model::MinMaxRange &range) const -> typename ValueType::Type;
+    /**
+     * @brief   Get maximum value from given range
+     *
+     * @param   ragne       MinMaxRange
+     *
+     * @return  Maximum value
+     */
     auto getMax(const seds::model::MinMaxRange &range) const -> typename ValueType::Type;
+    /**
+     * @brief   Get smallest value that could be used in the range
+     *
+     * @return  Smallest value
+     */
     auto getSmallest() const -> typename ValueType::Type;
+    /**
+     * @brief   Get greatest value that could be used in the range
+     *
+     * @return  Greatest value
+     */
     auto getGreatest() const -> typename ValueType::Type;
 
+    /**
+     * @brief   Check if range with given min and max would be values
+     *
+     * @throws  TranslationException    Thrown when range would be invalid
+     */
     auto checkIfValid(typename ValueType::Type min, typename ValueType::Type max) const -> void;
 
 private:
