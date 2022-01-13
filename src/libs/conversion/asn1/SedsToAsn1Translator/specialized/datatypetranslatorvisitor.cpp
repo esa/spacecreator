@@ -19,6 +19,7 @@
 
 #include "specialized/datatypetranslatorvisitor.h"
 
+#include "specialized/containerconstrainttranslatorvisitor.h"
 #include "specialized/dimensiontranslator.h"
 #include "specialized/entrytranslatorvisitor.h"
 #include "specialized/rangetranslatorvisitor.h"
@@ -54,14 +55,9 @@ using seds::model::ArrayDataType;
 using seds::model::BinaryDataType;
 using seds::model::BooleanDataType;
 using seds::model::ContainerDataType;
-using seds::model::ContainerRangeConstraint;
-using seds::model::ContainerTypeConstraint;
-using seds::model::ContainerValueConstraint;
 using seds::model::EnumeratedDataType;
-using seds::model::EnumeratedDataTypeRange;
 using seds::model::FloatDataType;
 using seds::model::IntegerDataType;
-using seds::model::MinMaxRange;
 using seds::model::StringDataType;
 using seds::model::SubRangeDataType;
 
@@ -604,51 +600,11 @@ void DataTypeTranslatorVisitor::createRealizationContainerField(Asn1Acn::Types::
 void DataTypeTranslatorVisitor::applyContainerConstraints(
         const ContainerDataType &sedsType, Asn1Acn::Types::Sequence *asn1Type) const
 {
+    ContainerConstraintTranslatorVisitor translatorVisitor(asn1Type);
+
     for (const auto &constraint : sedsType.constraints()) {
-        // clang-format off
-        std::visit(overloaded {
-            [&](const ContainerRangeConstraint &rangeConstraint) {
-                auto asn1ConstrainedType = asn1Type->component(rangeConstraint.entry().nameStr())->type();
-                applyContainerRangeConstraint(rangeConstraint, asn1ConstrainedType);
-            },
-            [&](const ContainerTypeConstraint &typeConstraint) {
-                applyContainerTypeConstraint(typeConstraint);
-            },
-            [&](const ContainerValueConstraint &valueConstraint) {
-                applyContainerValueConstraint(valueConstraint);
-            }
-        }, constraint);
-        // clang-format on
+        std::visit(translatorVisitor, constraint);
     }
-}
-
-void DataTypeTranslatorVisitor::applyContainerRangeConstraint(
-        const ContainerRangeConstraint &rangeConstraint, Asn1Acn::Types::Type *asn1Type) const
-{
-    if (auto asn1IntegerType = dynamic_cast<Asn1Acn::Types::Integer *>(asn1Type); asn1IntegerType) {
-        RangeTranslatorVisitor<Asn1Acn::IntegerValue> rangeTranslator(
-                asn1IntegerType, asn1IntegerType->constraints(), std::nullopt, std::nullopt);
-        std::visit(rangeTranslator, rangeConstraint.range());
-    } else if (auto asn1RealType = dynamic_cast<Asn1Acn::Types::Real *>(asn1Type); asn1RealType) {
-        RangeTranslatorVisitor<Asn1Acn::RealValue> rangeTranslator(
-                asn1RealType, asn1RealType->constraints(), std::nullopt, std::nullopt);
-        std::visit(rangeTranslator, rangeConstraint.range());
-    } else if (auto asn1UserType = dynamic_cast<Asn1Acn::Types::UserdefinedType *>(asn1Type); asn1UserType) {
-        applyContainerRangeConstraint(rangeConstraint, asn1UserType->type());
-    } else {
-        throw conversion::translator::TranslationException(
-                "ContainerRangeConstraint can only be applied to the integer and real entries");
-    }
-}
-
-void DataTypeTranslatorVisitor::applyContainerTypeConstraint(const ContainerTypeConstraint &typeConstraint) const
-{
-    Q_UNUSED(typeConstraint);
-}
-
-void DataTypeTranslatorVisitor::applyContainerValueConstraint(const ContainerValueConstraint &valueConstraint) const
-{
-    Q_UNUSED(valueConstraint);
 }
 
 void DataTypeTranslatorVisitor::updateParentContainer(

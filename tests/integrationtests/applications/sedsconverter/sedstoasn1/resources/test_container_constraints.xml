@@ -17,18 +17,22 @@
       <ContainerDataType name="PayloadBase" abstract="true">
         <LongDescription>Base for the packet payload data</LongDescription>
         <EntryList>
-          <Entry name="intData" type="IntegerData" />
-          <Entry name="floatData" type="RealData" />
+          <Entry name="intDataRange" type="IntegerData" />
+          <Entry name="floatDataRange" type="RealData" />
+          <Entry name="intDataValue" type="IntegerData" />
+          <Entry name="floatDataValue" type="RealData" />
         </EntryList>
       </ContainerDataType>
       <ContainerDataType name="PayloadA" abstract="false" baseType="PayloadBase">
         <ConstraintSet>
-          <RangeConstraint entry="intData">
+          <RangeConstraint entry="intDataRange">
             <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="5" max="10" />
           </RangeConstraint>
-          <RangeConstraint entry="floatData">
+          <RangeConstraint entry="floatDataRange">
             <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="3.14" max="42.1" />
           </RangeConstraint>
+          <ValueConstraint entry="intDataValue" value="42" />
+          <ValueConstraint entry="floatDataValue" value="3.14" />
         </ConstraintSet>
       </ContainerDataType>
     </DataTypeSet>

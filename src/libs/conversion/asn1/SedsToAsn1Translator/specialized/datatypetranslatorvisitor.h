@@ -43,9 +43,6 @@ class BooleanDataEncoding;
 class BooleanDataType;
 class Component;
 class ContainerDataType;
-class ContainerRangeConstraint;
-class ContainerTypeConstraint;
-class ContainerValueConstraint;
 class DataTypeRef;
 class DimensionSize;
 class EnumeratedDataType;
@@ -296,10 +293,6 @@ private:
 
     auto applyContainerConstraints(
             const seds::model::ContainerDataType &sedsType, Asn1Acn::Types::Sequence *asn1Type) const -> void;
-    auto applyContainerRangeConstraint(
-            const seds::model::ContainerRangeConstraint &rangeConstraint, Asn1Acn::Types::Type *asn1Type) const -> void;
-    auto applyContainerTypeConstraint(const seds::model::ContainerTypeConstraint &typeConstraint) const -> void;
-    auto applyContainerValueConstraint(const seds::model::ContainerValueConstraint &valueConstraint) const -> void;
 
     /**
      * @brief   Converts SEDS byte order

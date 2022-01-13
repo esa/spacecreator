@@ -17,6 +17,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#pragma once
+
+#include <asn1library/asn1/constraints/constraintlist.h>
+#include <asn1library/asn1/constraints/rangeconstraint.h>
+#include <asn1library/asn1/types/type.h>
+#include <asn1library/asn1/values.h>
 #include <conversion/common/translation/exceptions.h>
 #include <optional>
 #include <seds/SedsModel/types/ranges/enumerateddatatyperange.h>
@@ -80,6 +86,15 @@ public:
      * @param   range   Range to translate
      */
     auto operator()(const seds::model::EnumeratedDataTypeRange &range) -> void;
+
+    /**
+     * @brief   Create range constraint from given value
+     *
+     * @param   value   Range value
+     *
+     * @return  ASN.1 range constraint
+     */
+    static auto createRangeConstraint(const typename ValueType::Type &value) -> std::unique_ptr<RangeConstraint>;
     /**
      * @brief   Create range constraint from given min and max values
      *
@@ -88,7 +103,7 @@ public:
      *
      * @return  ASN.1 range constraint
      */
-    auto createRangeConstraint(const typename ValueType::Type &min, const typename ValueType::Type &max) const
+    static auto createRangeConstraint(const typename ValueType::Type &min, const typename ValueType::Type &max)
             -> std::unique_ptr<RangeConstraint>;
 
 private:
@@ -126,7 +141,7 @@ private:
      *
      * @throws  TranslationException    Thrown when range would be invalid
      */
-    auto checkIfValid(typename ValueType::Type min, typename ValueType::Type max) const -> void;
+    static auto checkIfValid(typename ValueType::Type min, typename ValueType::Type max) -> void;
 
 private:
     Asn1Acn::Types::Type *m_asn1Type;
@@ -144,96 +159,6 @@ RangeTranslatorVisitor<ValueType>::RangeTranslatorVisitor(Asn1Acn::Types::Type *
     , m_smallestValue(std::move(smallestValue))
     , m_greatestValue(std::move(greatestValue))
 {
-}
-
-template<>
-void RangeTranslatorVisitor<Asn1Acn::RealValue>::operator()(const seds::model::MinMaxRange &range)
-{
-    switch (range.type()) {
-    case seds::model::RangeType::ExclusiveMinExclusiveMax:
-    case seds::model::RangeType::InclusiveMinExclusiveMax:
-    case seds::model::RangeType::ExclusiveMinInclusiveMax:
-    case seds::model::RangeType::GreaterThan:
-    case seds::model::RangeType::LessThan: {
-        auto errorMessage =
-                QString("Exclusive min-max ranges are not supported for floating point values (in type \"%1\")")
-                        .arg(m_asn1Type->identifier());
-        throw conversion::translator::TranslationException(std::move(errorMessage));
-    } break;
-    case seds::model::RangeType::InclusiveMinInclusiveMax: {
-        const auto min = getMin(range);
-        const auto max = getMax(range);
-
-        m_constraints.append(createRangeConstraint(min, max));
-    } break;
-    case seds::model::RangeType::AtLeast: {
-        const auto min = getMin(range);
-        const auto max = getGreatest();
-
-        m_constraints.append(createRangeConstraint(min, max));
-    } break;
-    case seds::model::RangeType::AtMost: {
-        const auto min = getSmallest();
-        const auto max = getMax(range);
-
-        m_constraints.append(createRangeConstraint(min, max));
-    } break;
-    }
-}
-
-template<>
-void RangeTranslatorVisitor<Asn1Acn::IntegerValue>::operator()(const seds::model::MinMaxRange &range)
-{
-    switch (range.type()) {
-    case seds::model::RangeType::ExclusiveMinExclusiveMax: {
-        const auto min = getMin(range) + 1;
-        const auto max = getMax(range) - 1;
-
-        m_constraints.append(createRangeConstraint(min, max));
-    } break;
-    case seds::model::RangeType::InclusiveMinInclusiveMax: {
-        const auto min = getMin(range);
-        const auto max = getMax(range);
-
-        m_constraints.append(RangeConstraint::create({ min, max }));
-    } break;
-    case seds::model::RangeType::InclusiveMinExclusiveMax: {
-        const auto min = getMin(range);
-        const auto max = getMax(range) - 1;
-
-        m_constraints.append(createRangeConstraint(min, max));
-    } break;
-    case seds::model::RangeType::ExclusiveMinInclusiveMax: {
-        const auto min = getMin(range) + 1;
-        const auto max = getMax(range);
-
-        m_constraints.append(createRangeConstraint(min, max));
-    } break;
-    case seds::model::RangeType::GreaterThan: {
-        const auto min = getMin(range) + 1;
-        const auto max = getGreatest();
-
-        m_constraints.append(createRangeConstraint(min, max));
-    } break;
-    case seds::model::RangeType::LessThan: {
-        const auto min = getSmallest();
-        const auto max = getMax(range) - 1;
-
-        m_constraints.append(createRangeConstraint(min, max));
-    } break;
-    case seds::model::RangeType::AtLeast: {
-        const auto min = getMin(range);
-        const auto max = getGreatest();
-
-        m_constraints.append(createRangeConstraint(min, max));
-    } break;
-    case seds::model::RangeType::AtMost: {
-        const auto min = getSmallest();
-        const auto max = getMax(range);
-
-        m_constraints.append(createRangeConstraint(min, max));
-    } break;
-    }
 }
 
 template<typename ValueType>
@@ -266,11 +191,17 @@ void RangeTranslatorVisitor<ValueType>::operator()(const seds::model::Enumerated
 
     throw conversion::translator::TranslationException("EnumeratedDataTypeRange not yet supported");
 }
+template<typename ValueType>
+std::unique_ptr<Asn1Acn::Constraints::RangeConstraint<ValueType>>
+RangeTranslatorVisitor<ValueType>::createRangeConstraint(const typename ValueType::Type &value)
+{
+    return RangeConstraint::create({ value });
+}
 
 template<typename ValueType>
 std::unique_ptr<Asn1Acn::Constraints::RangeConstraint<ValueType>>
 RangeTranslatorVisitor<ValueType>::createRangeConstraint(
-        const typename ValueType::Type &min, const typename ValueType::Type &max) const
+        const typename ValueType::Type &min, const typename ValueType::Type &max)
 {
     checkIfValid(min, max);
     return RangeConstraint::create({ min, max });
@@ -323,7 +254,7 @@ typename ValueType::Type RangeTranslatorVisitor<ValueType>::getGreatest() const
 }
 
 template<typename ValueType>
-void RangeTranslatorVisitor<ValueType>::checkIfValid(typename ValueType::Type min, typename ValueType::Type max) const
+void RangeTranslatorVisitor<ValueType>::checkIfValid(typename ValueType::Type min, typename ValueType::Type max)
 {
     if (min > max) {
         throw conversion::translator::TranslationException(QString("Range (%1 .. %2) is invalid").arg(min).arg(max));
