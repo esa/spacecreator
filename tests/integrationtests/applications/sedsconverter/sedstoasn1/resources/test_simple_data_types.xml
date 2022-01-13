@@ -49,7 +49,7 @@
         <LongDescription>A complex 80-bit float</LongDescription>
         <FloatDataEncoding sizeInBits="80" encodingAndPrecision="IEEE754_2008_double" />
         <Range>
-          <MinMaxRange rangeType="greaterThan" min="0" />
+          <MinMaxRange rangeType="atLeast" min="0" />
         </Range>
       </FloatDataType>
       <BinaryDataType name="VariableSizeBLOB" sizeInBits="128" fixedSize="false" />

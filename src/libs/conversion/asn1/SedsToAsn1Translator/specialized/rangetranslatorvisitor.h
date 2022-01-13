@@ -30,7 +30,7 @@ class RangeTranslatorVisitor final
     using RangeConstraint = Asn1Acn::Constraints::RangeConstraint<ValueType>;
 
 public:
-    RangeTranslatorVisitor(Asn1Acn::Constraints::ConstraintList<ValueType> &constraints,
+    RangeTranslatorVisitor(Asn1Acn::Types::Type *asn1Type, Asn1Acn::Constraints::ConstraintList<ValueType> &constraints,
             std::optional<typename ValueType::Type> smallestValue,
             std::optional<typename ValueType::Type> greatestValue);
     RangeTranslatorVisitor(const RangeTranslatorVisitor &) = delete;
@@ -60,6 +60,7 @@ private:
     auto checkIfValid(typename ValueType::Type min, typename ValueType::Type max) const -> void;
 
 private:
+    Asn1Acn::Types::Type *m_asn1Type;
     Asn1Acn::Constraints::ConstraintList<ValueType> &m_constraints;
     std::optional<typename ValueType::Type> m_smallestValue;
     std::optional<typename ValueType::Type> m_greatestValue;
@@ -75,9 +76,11 @@ private:
 };
 
 template<typename ValueType>
-RangeTranslatorVisitor<ValueType>::RangeTranslatorVisitor(Asn1Acn::Constraints::ConstraintList<ValueType> &constraints,
+RangeTranslatorVisitor<ValueType>::RangeTranslatorVisitor(Asn1Acn::Types::Type *asn1Type,
+        Asn1Acn::Constraints::ConstraintList<ValueType> &constraints,
         std::optional<typename ValueType::Type> smallestValue, std::optional<typename ValueType::Type> greatestValue)
-    : m_constraints(constraints)
+    : m_asn1Type(asn1Type)
+    , m_constraints(constraints)
     , m_smallestValue(std::move(smallestValue))
     , m_greatestValue(std::move(greatestValue))
 {
@@ -91,10 +94,12 @@ void RangeTranslatorVisitor<Asn1Acn::RealValue>::operator()(const seds::model::M
     case seds::model::RangeType::InclusiveMinExclusiveMax:
     case seds::model::RangeType::ExclusiveMinInclusiveMax:
     case seds::model::RangeType::GreaterThan:
-    case seds::model::RangeType::LessThan:
-        throw conversion::translator::TranslationException(
-                "Exclusive min-max ranges are not supported for floating point values");
-        break;
+    case seds::model::RangeType::LessThan: {
+        auto errorMessage =
+                QString("Exclusive min-max ranges are not supported for floating point values (in type \"%1\")")
+                        .arg(m_asn1Type->identifier());
+        throw conversion::translator::TranslationException(std::move(errorMessage));
+    } break;
     case seds::model::RangeType::InclusiveMinInclusiveMax: {
         const auto min = getMin(range);
         const auto max = getMax(range);

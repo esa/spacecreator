@@ -190,7 +190,7 @@ void DataTypeTranslatorVisitor::operator()(const FloatDataType &sedsType)
     auto greatestValue = getGreatestValue(sedsType.encoding());
 
     RangeTranslatorVisitor<Asn1Acn::RealValue> rangeTranslator(
-            type->constraints(), std::move(smallestValue), std::move(greatestValue));
+            type.get(), type->constraints(), std::move(smallestValue), std::move(greatestValue));
     std::visit(rangeTranslator, sedsType.range());
 
     m_asn1Type = std::move(type);
@@ -206,7 +206,7 @@ void DataTypeTranslatorVisitor::operator()(const IntegerDataType &sedsType)
     auto greatestValue = getGreatestValue(sedsType.encoding());
 
     RangeTranslatorVisitor<Asn1Acn::IntegerValue> rangeTranslator(
-            type->constraints(), std::move(smallestValue), std::move(greatestValue));
+            type.get(), type->constraints(), std::move(smallestValue), std::move(greatestValue));
     std::visit(rangeTranslator, sedsType.range());
 
     m_asn1Type = std::move(type);

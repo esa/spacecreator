@@ -36,3 +36,4 @@ configure_file(resources/test_containers_acn.output resources/test_containers_ac
 
 configure_file(test_min_max_range.sh test_min_max_range.sh COPYONLY)
 configure_file(resources/test_min_max_range.xml resources/test_min_max_range.xml COPYONLY)
+configure_file(resources/test_min_max_range_asn.output resources/test_min_max_range_asn.output COPYONLY)
