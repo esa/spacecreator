@@ -19,7 +19,6 @@
 
 #include "converter.h"
 
-#include "asn1library/asn1/asn1model.h"
 #include "exceptions.h"
 #include "modeltype.h"
 #include "sdl/SdlModel/sdlmodel.h"
