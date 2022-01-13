@@ -80,6 +80,16 @@ public:
      * @param   range   Range to translate
      */
     auto operator()(const seds::model::EnumeratedDataTypeRange &range) -> void;
+    /**
+     * @brief   Create range constraint from given min and max values
+     *
+     * @param   min     Min range value
+     * @param   max     Max range value
+     *
+     * @return  ASN.1 range constraint
+     */
+    auto createRangeConstraint(const typename ValueType::Type &min, const typename ValueType::Type &max) const
+            -> std::unique_ptr<RangeConstraint>;
 
 private:
     /**
@@ -153,23 +163,20 @@ void RangeTranslatorVisitor<Asn1Acn::RealValue>::operator()(const seds::model::M
     case seds::model::RangeType::InclusiveMinInclusiveMax: {
         const auto min = getMin(range);
         const auto max = getMax(range);
-        checkIfValid(min, max);
 
-        m_constraints.append(RangeConstraint::create({ min, max }));
+        m_constraints.append(createRangeConstraint(min, max));
     } break;
     case seds::model::RangeType::AtLeast: {
         const auto min = getMin(range);
         const auto max = getGreatest();
-        checkIfValid(min, max);
 
-        m_constraints.append(RangeConstraint::create({ min, max }));
+        m_constraints.append(createRangeConstraint(min, max));
     } break;
     case seds::model::RangeType::AtMost: {
         const auto min = getSmallest();
         const auto max = getMax(range);
-        checkIfValid(min, max);
 
-        m_constraints.append(RangeConstraint::create({ min, max }));
+        m_constraints.append(createRangeConstraint(min, max));
     } break;
     }
 }
@@ -181,58 +188,50 @@ void RangeTranslatorVisitor<Asn1Acn::IntegerValue>::operator()(const seds::model
     case seds::model::RangeType::ExclusiveMinExclusiveMax: {
         const auto min = getMin(range) + 1;
         const auto max = getMax(range) - 1;
-        checkIfValid(min, max);
 
-        m_constraints.append(RangeConstraint::create({ min, max }));
+        m_constraints.append(createRangeConstraint(min, max));
     } break;
     case seds::model::RangeType::InclusiveMinInclusiveMax: {
         const auto min = getMin(range);
         const auto max = getMax(range);
-        checkIfValid(min, max);
 
         m_constraints.append(RangeConstraint::create({ min, max }));
     } break;
     case seds::model::RangeType::InclusiveMinExclusiveMax: {
         const auto min = getMin(range);
         const auto max = getMax(range) - 1;
-        checkIfValid(min, max);
 
-        m_constraints.append(RangeConstraint::create({ min, max }));
+        m_constraints.append(createRangeConstraint(min, max));
     } break;
     case seds::model::RangeType::ExclusiveMinInclusiveMax: {
         const auto min = getMin(range) + 1;
         const auto max = getMax(range);
-        checkIfValid(min, max);
 
-        m_constraints.append(RangeConstraint::create({ min, max }));
+        m_constraints.append(createRangeConstraint(min, max));
     } break;
     case seds::model::RangeType::GreaterThan: {
         const auto min = getMin(range) + 1;
         const auto max = getGreatest();
-        checkIfValid(min, max);
 
-        m_constraints.append(RangeConstraint::create({ min, max }));
+        m_constraints.append(createRangeConstraint(min, max));
     } break;
     case seds::model::RangeType::LessThan: {
         const auto min = getSmallest();
         const auto max = getMax(range) - 1;
-        checkIfValid(min, max);
 
-        m_constraints.append(RangeConstraint::create({ min, max }));
+        m_constraints.append(createRangeConstraint(min, max));
     } break;
     case seds::model::RangeType::AtLeast: {
         const auto min = getMin(range);
         const auto max = getGreatest();
-        checkIfValid(min, max);
 
-        m_constraints.append(RangeConstraint::create({ min, max }));
+        m_constraints.append(createRangeConstraint(min, max));
     } break;
     case seds::model::RangeType::AtMost: {
         const auto min = getSmallest();
         const auto max = getMax(range);
-        checkIfValid(min, max);
 
-        m_constraints.append(RangeConstraint::create({ min, max }));
+        m_constraints.append(createRangeConstraint(min, max));
     } break;
     }
 }
@@ -245,15 +244,13 @@ void RangeTranslatorVisitor<ValueType>::operator()(const seds::model::FloatPreci
         const auto min = static_cast<double>(std::numeric_limits<float>::min());
         const auto max = static_cast<double>(std::numeric_limits<float>::max());
 
-        auto constraint = Asn1Acn::Constraints::RangeConstraint<ValueType>::create({ min, max });
-        m_constraints.append(std::move(constraint));
+        m_constraints.append(createRangeConstraint(min, max));
     } break;
     case seds::model::FloatPrecisionRange::Double: {
         const auto min = std::numeric_limits<double>::min();
         const auto max = std::numeric_limits<double>::max();
 
-        auto constraint = Asn1Acn::Constraints::RangeConstraint<ValueType>::create({ min, max });
-        m_constraints.append(std::move(constraint));
+        m_constraints.append(createRangeConstraint(min, max));
     } break;
     case seds::model::FloatPrecisionRange::Quad:
         throw conversion::UnsupportedValueException("FloatPrecisionRange", "Quad");
@@ -268,6 +265,15 @@ void RangeTranslatorVisitor<ValueType>::operator()(const seds::model::Enumerated
     Q_UNUSED(range);
 
     throw conversion::translator::TranslationException("EnumeratedDataTypeRange not yet supported");
+}
+
+template<typename ValueType>
+std::unique_ptr<Asn1Acn::Constraints::RangeConstraint<ValueType>>
+RangeTranslatorVisitor<ValueType>::createRangeConstraint(
+        const typename ValueType::Type &min, const typename ValueType::Type &max) const
+{
+    checkIfValid(min, max);
+    return RangeConstraint::create({ min, max });
 }
 
 template<typename ValueType>

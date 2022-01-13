@@ -627,11 +627,11 @@ void DataTypeTranslatorVisitor::applyContainerRangeConstraint(
 {
     if (auto asn1IntegerType = dynamic_cast<Asn1Acn::Types::Integer *>(asn1Type); asn1IntegerType) {
         RangeTranslatorVisitor<Asn1Acn::IntegerValue> rangeTranslator(
-                asn1IntegerType->constraints(), std::nullopt, std::nullopt);
+                asn1IntegerType, asn1IntegerType->constraints(), std::nullopt, std::nullopt);
         std::visit(rangeTranslator, rangeConstraint.range());
     } else if (auto asn1RealType = dynamic_cast<Asn1Acn::Types::Real *>(asn1Type); asn1RealType) {
         RangeTranslatorVisitor<Asn1Acn::RealValue> rangeTranslator(
-                asn1RealType->constraints(), std::nullopt, std::nullopt);
+                asn1RealType, asn1RealType->constraints(), std::nullopt, std::nullopt);
         std::visit(rangeTranslator, rangeConstraint.range());
     } else if (auto asn1UserType = dynamic_cast<Asn1Acn::Types::UserdefinedType *>(asn1Type); asn1UserType) {
         applyContainerRangeConstraint(rangeConstraint, asn1UserType->type());
