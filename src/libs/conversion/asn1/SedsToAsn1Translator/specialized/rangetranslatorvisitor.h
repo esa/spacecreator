@@ -116,15 +116,6 @@ private:
     Asn1Acn::Constraints::ConstraintList<ValueType> &m_constraints;
     std::optional<typename ValueType::Type> m_smallestValue;
     std::optional<typename ValueType::Type> m_greatestValue;
-
-    /** @brief   Smallest range value for single precision */
-    constexpr static double singleRangeMin = 1.17549E-38;
-    /** @brief   Greatest range value for single precision */
-    constexpr static double singleRangeMax = 3.40282e+38;
-    /** @brief   Smallest range value for double precision */
-    constexpr static double doubleRangeMin = 2.22507e-308;
-    /** @brief   Greate range value for double precision */
-    constexpr static double doubleRangeMax = 1.79769e+308;
 };
 
 template<typename ValueType>
@@ -244,11 +235,17 @@ void RangeTranslatorVisitor<ValueType>::operator()(const seds::model::FloatPreci
 {
     switch (range) {
     case seds::model::FloatPrecisionRange::Single: {
-        auto constraint = Asn1Acn::Constraints::RangeConstraint<ValueType>::create({ singleRangeMin, singleRangeMax });
+        const auto min = static_cast<double>(std::numeric_limits<float>::min());
+        const auto max = static_cast<double>(std::numeric_limits<float>::max());
+
+        auto constraint = Asn1Acn::Constraints::RangeConstraint<ValueType>::create({ min, max });
         m_constraints.append(std::move(constraint));
     } break;
     case seds::model::FloatPrecisionRange::Double: {
-        auto constraint = Asn1Acn::Constraints::RangeConstraint<ValueType>::create({ doubleRangeMin, doubleRangeMax });
+        const auto min = std::numeric_limits<double>::min();
+        const auto max = std::numeric_limits<double>::max();
+
+        auto constraint = Asn1Acn::Constraints::RangeConstraint<ValueType>::create({ min, max });
         m_constraints.append(std::move(constraint));
     } break;
     case seds::model::FloatPrecisionRange::Quad:

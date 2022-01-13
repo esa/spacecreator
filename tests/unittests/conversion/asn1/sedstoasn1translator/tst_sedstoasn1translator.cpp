@@ -872,8 +872,8 @@ void tst_SedsToAsn1Translator::testTranslateFloatDataType()
     QVERIFY(rangeConstraint);
 
     const auto &range = rangeConstraint->range();
-    QCOMPARE(range.begin(), 2.22507e-308);
-    QCOMPARE(range.end(), 1.79769e+308);
+    QCOMPARE(range.begin(), std::numeric_limits<double>::min());
+    QCOMPARE(range.end(), std::numeric_limits<double>::max());
 }
 
 /// \SRS  ETB-FUN-190
