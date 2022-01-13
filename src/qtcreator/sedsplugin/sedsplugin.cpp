@@ -109,15 +109,6 @@ const QString ivTmpModelNotRead = QString("Temporary %1").arg(ivModelNotRead);
 
 namespace spctr {
 
-void writeToMessagePane(const QString &text)
-{
-#if QTC_VERSION > 409
-    MessageManager::writeSilently(text);
-#else
-    MessageManager::write(text);
-#endif
-}
-
 SedsPlugin::SedsPlugin()
 {
     // Do not remove
@@ -217,7 +208,7 @@ auto SedsPlugin::importInterfaceView() -> void
     const QString inputFilePath = QFileDialog::getOpenFileName(
             nullptr, "Select EDS file to import InterfaceView from...", QString(), tr("*.xml"));
     if (inputFilePath.isEmpty()) {
-        writeToMessagePane(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
+        MessageManager::write(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
         return;
     }
 
@@ -232,22 +223,22 @@ auto SedsPlugin::importInterfaceView() -> void
         convert({ conversion::ModelType::Seds }, conversion::ModelType::InterfaceView, { conversion::ModelType::Asn1 },
                 options);
     } catch (conversion::ConverterException &ex) {
-        writeToMessagePane(GenMsg::msgError.arg(ex.what()));
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
         QFile(tmpIvFilename).remove();
         return;
     } catch (std::exception &ex) {
-        writeToMessagePane(GenMsg::msgError.arg(ex.what()));
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
         QFile(tmpIvFilename).remove();
         return;
     }
 
     if (!loadAndMergeIvModelIntoCurrent(ivConfig, tmpIvFilename)) {
-        writeToMessagePane(GenMsg::msgError.arg("Could not merge imported IV into current one"));
+        MessageManager::write(GenMsg::msgError.arg("Could not merge imported IV into current one"));
         QFile(tmpIvFilename).remove();
         return;
     }
 
-    writeToMessagePane(GenMsg::msgInfo.arg(GenMsg::functionsImported));
+    MessageManager::write(GenMsg::msgInfo.arg(GenMsg::functionsImported));
 
     QFile(tmpIvFilename).remove();
 }
@@ -256,12 +247,12 @@ auto SedsPlugin::importSdl() -> void
 {
     const QString tmpIvFilename = "tmp-interfaceview.xml";
     const QString ivConfig = shared::interfaceCustomAttributesFilePath();
-    writeToMessagePane(GenMsg::msgInfo.arg(ivConfig));
+    MessageManager::write(GenMsg::msgInfo.arg(ivConfig));
 
     const QString inputFilePath =
             QFileDialog::getOpenFileName(nullptr, "Select EDS file to import SDL from...", QString(), tr("*.xml"));
     if (inputFilePath.isEmpty()) {
-        writeToMessagePane(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
+        MessageManager::write(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
         return;
     }
 
@@ -284,7 +275,7 @@ auto SedsPlugin::importSdl() -> void
             sdlFilenames = sdl::exporter::SdlExporter::getFilenamesForModel(sdlModel);
         }
     } catch (std::exception &ex) {
-        writeToMessagePane(GenMsg::msgError.arg(ex.what()));
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
         QFile(tmpIvFilename).remove();
         return;
     }
@@ -293,7 +284,7 @@ auto SedsPlugin::importSdl() -> void
         const QString processName = filename.split(".").first();
         const QString dstPath = QString("work/%1/SDL/src/").arg(processName.toLower());
         if (!QDir().mkpath(dstPath)) {
-            writeToMessagePane(GenMsg::msgError.arg(QString("Could not create path %1").arg(dstPath)));
+            MessageManager::write(GenMsg::msgError.arg(QString("Could not create path %1").arg(dstPath)));
             QFile(tmpIvFilename).remove();
             return;
         }
@@ -308,12 +299,12 @@ auto SedsPlugin::importSdl() -> void
     project->rootProjectNode()->addFiles(asn1Filenames);
 
     if (!loadAndMergeIvModelIntoCurrent(ivConfig, tmpIvFilename)) {
-        writeToMessagePane(GenMsg::msgError.arg("Could not merge imported IV into current one"));
+        MessageManager::write(GenMsg::msgError.arg("Could not merge imported IV into current one"));
         QFile(tmpIvFilename).remove();
         return;
     }
 
-    writeToMessagePane(GenMsg::msgInfo.arg(GenMsg::filesImported));
+    MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesImported));
 
     QFile(tmpIvFilename).remove();
 }
@@ -323,7 +314,7 @@ auto SedsPlugin::importAsn1() -> void
     const QString inputFilePath = QFileDialog::getOpenFileName(
             nullptr, "Select EDS file to import ASN.1 and ACN from...", QString(), tr("*.xml"));
     if (inputFilePath.isEmpty()) {
-        writeToMessagePane(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
+        MessageManager::write(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
         return;
     }
 
@@ -337,13 +328,13 @@ auto SedsPlugin::importAsn1() -> void
         const auto auxModelTypes = std::set<conversion::ModelType>({});
         Converter converter(m_registry, std::move(options));
         converter.convert(srcModelTypes, targetModelType, auxModelTypes);
-        writeToMessagePane(GenMsg::msgInfo.arg(GenMsg::filesImported));
+        MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesImported));
     } catch (conversion::ConverterException &ex) {
-        writeToMessagePane(GenMsg::msgError.arg(ex.what()));
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
     } catch (conversion::FileNotFoundException &ex) {
-        writeToMessagePane(GenMsg::msgError.arg(ex.what()));
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
     } catch (std::exception &ex) {
-        writeToMessagePane(GenMsg::msgError.arg(ex.what()));
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
     }
 }
 
@@ -352,7 +343,7 @@ auto SedsPlugin::exportInterfaceView() -> void
     const auto ivEditorCore = getCurIvEditorCore();
     const auto ivFunctionsNames = ivEditorCore->ivFunctionsNames();
     if (ivFunctionsNames.empty()) {
-        writeToMessagePane(GenMsg::msgError.arg(GenMsg::ivNoFunctionsInIv));
+        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivNoFunctionsInIv));
         return;
     }
 
@@ -366,7 +357,7 @@ auto SedsPlugin::exportInterfaceView() -> void
 
     QList<QString> *const selectedFunctions = ltDialog.selectedItems();
     if (selectedFunctions->empty()) {
-        writeToMessagePane(GenMsg::msgInfo.arg(GenMsg::ivNoFunctionsSelected));
+        MessageManager::write(GenMsg::msgInfo.arg(GenMsg::ivNoFunctionsSelected));
         return;
     }
 
@@ -393,18 +384,18 @@ auto SedsPlugin::exportInterfaceView() -> void
 
             try {
                 convert({ conversion::ModelType::InterfaceView }, conversion::ModelType::Seds, {}, options);
-                writeToMessagePane(GenMsg::msgInfo.arg(GenMsg::filesExported));
+                MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesExported));
             } catch (conversion::ConverterException &ex) {
-                writeToMessagePane(GenMsg::msgWarning.arg(ex.what()));
+                MessageManager::write(GenMsg::msgWarning.arg(ex.what()));
             } catch (std::exception &ex) {
-                writeToMessagePane(GenMsg::msgWarning.arg(ex.what()));
+                MessageManager::write(GenMsg::msgWarning.arg(ex.what()));
             }
 
         } else {
-            writeToMessagePane(GenMsg::msgError.arg(GenMsg::ivModelNotRead));
+            MessageManager::write(GenMsg::msgError.arg(GenMsg::ivModelNotRead));
         }
     } else {
-        writeToMessagePane(GenMsg::msgError.arg(GenMsg::ivNoFunctionsSelected));
+        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivNoFunctionsSelected));
         return;
     }
 }
@@ -414,7 +405,7 @@ auto SedsPlugin::exportAsn1() -> void
     const auto names = QFileDialog::getOpenFileNames(
             nullptr, "Select ASN.1 and ACN files to export to EDS", QString(), "*.asn *.acn");
     if (names.isEmpty()) {
-        writeToMessagePane(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
+        MessageManager::write(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
         return;
     }
 
@@ -429,7 +420,7 @@ auto SedsPlugin::exportAsn1() -> void
     acnNames.sort();
 
     if (asn1Names.size() != acnNames.size()) {
-        writeToMessagePane(GenMsg::msgError.arg(".asn or .acn file missing!"));
+        MessageManager::write(GenMsg::msgError.arg(".asn or .acn file missing!"));
         return;
     }
 
@@ -454,11 +445,11 @@ auto SedsPlugin::exportAsn1() -> void
             const auto auxModelTypes = std::set<conversion::ModelType>({});
             Converter converter(m_registry, std::move(options));
             converter.convert(srcModelTypes, targetModelType, auxModelTypes);
-            writeToMessagePane(GenMsg::msgInfo.arg(GenMsg::filesExported));
+            MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesExported));
         } catch (conversion::ConverterException &ex) {
-            writeToMessagePane(GenMsg::msgError.arg(ex.what()));
+            MessageManager::write(GenMsg::msgError.arg(ex.what()));
         } catch (std::exception &ex) {
-            writeToMessagePane(GenMsg::msgError.arg(ex.what()));
+            MessageManager::write(GenMsg::msgError.arg(ex.what()));
         }
     }
 }
@@ -523,7 +514,7 @@ auto SedsPlugin::getCurIvEditorCore() -> IVEditorCorePtr
     auto *const currentDocument = EditorManager::currentDocument();
     auto *const currentIvDocument = static_cast<IVEditorDocument *>(currentDocument);
     if (currentIvDocument == nullptr) {
-        writeToMessagePane(GenMsg::msgError.arg(GenMsg::ivFileNotSelected));
+        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivFileNotSelected));
         return nullptr;
     }
 
@@ -537,7 +528,7 @@ auto SedsPlugin::mergeIvModels(ivm::IVModel *const dstIvModel, ivm::IVModel *con
         if (srcFunction == nullptr) {
             continue;
         } else if (doesModelContainFunction(dstIvModel, srcFunction)) {
-            writeToMessagePane(GenMsg::msgInfo.arg(
+            MessageManager::write(GenMsg::msgInfo.arg(
                     QString("%1 - names are the same, Function will not be imported").arg(srcIvObject->title())));
         } else {
             addFunctionToModel(dynamic_cast<ivm::IVFunction *>(srcIvObject), dstIvModel);
@@ -577,7 +568,7 @@ auto SedsPlugin::loadIvModel(const QString &ivConfigFilename, const QString &ivF
     try {
         model = ivImporter.importModel(options);
     } catch (const std::exception &ex) {
-        writeToMessagePane(GenMsg::msgError.arg(ex.what()));
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
         return nullptr;
     }
 
@@ -595,7 +586,7 @@ auto SedsPlugin::loadSedsModel(const QString &sedsFilename) -> std::unique_ptr<c
     try {
         model = sedsImporter.importModel(options);
     } catch (const std::exception &ex) {
-        writeToMessagePane(GenMsg::msgError.arg(ex.what()));
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
         return nullptr;
     }
 
@@ -606,13 +597,13 @@ auto SedsPlugin::getCurrentIvModel() -> ivm::IVModel *
 {
     const auto curIvEditorCore = getCurIvEditorCore();
     if (curIvEditorCore == nullptr) {
-        writeToMessagePane(GenMsg::msgError.arg("IV Editor core could not be read"));
+        MessageManager::write(GenMsg::msgError.arg("IV Editor core could not be read"));
         return nullptr;
     }
 
     const auto curIvEditorCoreDocument = curIvEditorCore->document();
     if (curIvEditorCoreDocument == nullptr) {
-        writeToMessagePane(GenMsg::msgError.arg("No document in current IV Editor core"));
+        MessageManager::write(GenMsg::msgError.arg("No document in current IV Editor core"));
         return nullptr;
     }
 
@@ -625,13 +616,13 @@ auto SedsPlugin::loadAndMergeIvModelIntoCurrent(const QString &ivConfig, const Q
 
     ivm::IVModel *const tmpIvModel = dynamic_cast<ivm::IVModel *>(model.get());
     if (tmpIvModel == nullptr) {
-        writeToMessagePane(GenMsg::msgError.arg(GenMsg::ivTmpModelNotRead));
+        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivTmpModelNotRead));
         return false;
     }
 
     ivm::IVModel *const currentIvModel = getCurrentIvModel();
     if (currentIvModel == nullptr) {
-        writeToMessagePane(GenMsg::msgError.arg(GenMsg::ivModelNotRead));
+        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivModelNotRead));
         return false;
     }
 
@@ -643,19 +634,19 @@ auto SedsPlugin::loadAndMergeIvModelIntoCurrent(const QString &ivConfig, const Q
 auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel *const model) -> void
 {
     if (srcFun == nullptr) {
-        writeToMessagePane(GenMsg::msgError.arg("Source IV function could not be read"));
+        MessageManager::write(GenMsg::msgError.arg("Source IV function could not be read"));
         return;
     }
 
     const auto curIvEditorCore = getCurIvEditorCore();
     if (curIvEditorCore == nullptr) {
-        writeToMessagePane(GenMsg::msgError.arg("Current IV Editor Core could not be read"));
+        MessageManager::write(GenMsg::msgError.arg("Current IV Editor Core could not be read"));
         return;
     }
 
     ivm::IVFunction *const dstFun = curIvEditorCore->addFunction(srcFun->title(), nullptr);
     if (dstFun == nullptr) {
-        writeToMessagePane(GenMsg::msgError.arg("Destination IV function could not be created"));
+        MessageManager::write(GenMsg::msgError.arg("Destination IV function could not be created"));
         return;
     }
 
