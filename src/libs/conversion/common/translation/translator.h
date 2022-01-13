@@ -93,7 +93,7 @@ public:
      */
     virtual auto getDependencies() const -> std::set<ModelType> = 0;
     /**
-     * @brief Get the specified model from the vector models
+     * @brief Get the specified model from the vector of models
      *
      * @tparam ModelT  type of required model
      * @param models   vector of models
@@ -103,7 +103,7 @@ public:
     template<typename ModelT>
     static auto getModel(const std::vector<Model *> &models) -> ModelT *;
     /**
-     * @brief Get the specified model from the vector models
+     * @brief Get the specified model from the vector of models
      *
      * @tparam ModelT  type of required model
      * @param models   vector of models
