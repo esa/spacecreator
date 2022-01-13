@@ -14,6 +14,18 @@
           <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0.0" max="255.0" />
         </Range>
       </FloatDataType>
+      <EnumeratedDataType name="EnumData">
+        <IntegerDataEncoding encoding="unsigned" byteOrder="bigEndian" sizeInBits="8" />
+        <EnumerationList>
+          <Enumeration value="12" label="Value1" />
+          <Enumeration value="15" label="Value2" />
+          <Enumeration value="18" label="Value3" />
+        </EnumerationList>
+      </EnumeratedDataType>
+      <BinaryDataType name="BitStringData" sizeInBits="4" fixedSize="true" />
+      <StringDataType name="StringData" length="32" fixedLength="false">
+        <StringDataEncoding encoding="ASCII" />
+      </StringDataType>
       <ContainerDataType name="PayloadBase" abstract="true">
         <LongDescription>Base for the packet payload data</LongDescription>
         <EntryList>
@@ -21,6 +33,9 @@
           <Entry name="floatDataRange" type="RealData" />
           <Entry name="intDataValue" type="IntegerData" />
           <Entry name="floatDataValue" type="RealData" />
+          <Entry name="enumDataValue" type="EnumData" />
+          <Entry name="bitStringDataValue" type="BitStringData" />
+          <Entry name="stringDataValue" type="StringData" />
         </EntryList>
       </ContainerDataType>
       <ContainerDataType name="PayloadA" abstract="false" baseType="PayloadBase">
@@ -33,6 +48,9 @@
           </RangeConstraint>
           <ValueConstraint entry="intDataValue" value="42" />
           <ValueConstraint entry="floatDataValue" value="3.14" />
+          <ValueConstraint entry="enumDataValue" value="Value2" />
+          <ValueConstraint entry="bitStringDataValue" value="0110" />
+          <ValueConstraint entry="stringDataValue" value="GuruMeditation" />
         </ConstraintSet>
       </ContainerDataType>
     </DataTypeSet>

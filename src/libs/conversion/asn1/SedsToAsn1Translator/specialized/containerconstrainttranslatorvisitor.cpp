@@ -21,13 +21,21 @@
 
 #include "specialized/rangetranslatorvisitor.h"
 
+#include <asn1library/asn1/types/bitstring.h>
+#include <asn1library/asn1/types/boolean.h>
+#include <asn1library/asn1/types/enumerated.h>
+#include <asn1library/asn1/types/ia5string.h>
 #include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/numericstring.h>
+#include <asn1library/asn1/types/octetstring.h>
 #include <asn1library/asn1/types/real.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <asn1library/asn1/values.h>
 #include <cmath>
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
+#include <iostream>
 #include <seds/SedsModel/components/entryref.h>
 #include <seds/SedsModel/types/constraints/containerrangeconstraint.h>
 #include <seds/SedsModel/types/constraints/containertypeconstraint.h>
@@ -122,13 +130,66 @@ void ContainerConstraintTranslatorVisitor::applyContainerValueConstraint(
 
         asn1RealType->constraints().append(std::move(constraint));
     } break;
+    case ASN1Type::ENUMERATED: {
+        auto asn1EnumType = dynamic_cast<Asn1Acn::Types::Enumerated *>(asn1Type);
+
+        const auto enumValue = Escaper::escapeAsn1FieldName(Asn1Acn::EnumValue::fromAstValue(value));
+        auto constraint = RangeTranslatorVisitor<Asn1Acn::EnumValue>::createRangeConstraint(enumValue);
+
+        asn1EnumType->constraints().append(std::move(constraint));
+    } break;
+    case ASN1Type::BITSTRING: {
+        auto asn1BitStringType = dynamic_cast<Asn1Acn::Types::BitString *>(asn1Type);
+
+        const auto bitStringValue = Asn1Acn::BitStringValue::fromAstValue(value);
+        auto constraint = RangeTranslatorVisitor<Asn1Acn::BitStringValue>::createRangeConstraint(bitStringValue);
+
+        asn1BitStringType->constraints().append(std::move(constraint));
+    } break;
+    case ASN1Type::IA5STRING: {
+        auto asn1IA5StringType = dynamic_cast<Asn1Acn::Types::IA5String *>(asn1Type);
+
+        const auto ia5StringValue = Asn1Acn::StringValue::fromAstValue(value);
+        auto constraint = RangeTranslatorVisitor<Asn1Acn::StringValue>::createRangeConstraint(ia5StringValue);
+
+        asn1IA5StringType->constraints().append(std::move(constraint));
+    } break;
+    case ASN1Type::NUMERICSTRING: {
+        auto asn1NumericStringType = dynamic_cast<Asn1Acn::Types::NumericString *>(asn1Type);
+
+        const auto numericStringValue = Asn1Acn::StringValue::fromAstValue(value);
+        auto constraint = RangeTranslatorVisitor<Asn1Acn::StringValue>::createRangeConstraint(numericStringValue);
+
+        asn1NumericStringType->constraints().append(std::move(constraint));
+    }
+    case ASN1Type::OCTETSTRING: {
+        auto asn1OctetStringType = dynamic_cast<Asn1Acn::Types::OctetString *>(asn1Type);
+
+        const auto octetStringValue = Asn1Acn::OctetStringValue::fromAstValue(value);
+        auto constraint = RangeTranslatorVisitor<Asn1Acn::OctetStringValue>::createRangeConstraint(octetStringValue);
+
+        asn1OctetStringType->constraints().append(std::move(constraint));
+    } break;
     case ASN1Type::USERDEFINED: {
         auto asn1UserType = dynamic_cast<Asn1Acn::Types::UserdefinedType *>(asn1Type);
         applyContainerValueConstraint(valueConstraint, asn1UserType->type());
     } break;
+    case ASN1Type::BOOLEAN:
+    case ASN1Type::SEQUENCE:
+    case ASN1Type::SEQUENCEOF:
+    case ASN1Type::CHOICE:
+    case ASN1Type::STRING:
+    case ASN1Type::NULLTYPE:
+    case ASN1Type::LABELTYPE: {
+        auto errorMessage = QString("ContainerValueConstraints cannot be applied on \"%1\" with type %2")
+                                    .arg(valueConstraint.entry().nameStr())
+                                    .arg(asn1Type->typeName());
+        throw conversion::translator::TranslationException(std::move(errorMessage));
+    } break;
     default: {
-        throw conversion::translator::TranslationException(
-                "ContainerRangeConstraint can only be applied to the integer and real entries");
+        auto errorMessage =
+                QString("Unhandled ASN1Type \"%1\" in ContainerValueConstraint translation").arg(asn1Type->typeName());
+        throw conversion::translator::TranslationException(std::move(errorMessage));
     } break;
     }
 }

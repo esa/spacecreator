@@ -1,6 +1,14 @@
 COM-N7SPACE-CONTAINERCONSTRAINTS DEFINITIONS ::= BEGIN
 IntegerData ::= INTEGER(0 .. 255)
 RealData ::= REAL(0 .. 255)
+EnumData ::= ENUMERATED
+{
+    value1(12),
+    value2(15),
+    value3(18)
+}
+BitStringData ::= BIT STRING(SIZE(4))
+StringData ::= IA5String(SIZE(0 .. 32))
 PayloadBase ::= SEQUENCE
 {
     realization CHOICE
@@ -13,7 +21,10 @@ PayloadA ::= SEQUENCE
     intDataRange IntegerData(0 .. 255) (5 .. 255),
     floatDataRange RealData(0 .. 255) (3.14 .. 3.40282e+38),
     intDataValue IntegerData(0 .. 255) (42),
-    floatDataValue RealData(0 .. 255) (3.14)
+    floatDataValue RealData(0 .. 255) (3.14),
+    enumDataValue EnumData(value2),
+    bitStringDataValue BitStringData(SIZE(4)) ('0110'B),
+    stringDataValue StringData(SIZE(0 .. 32)) ("GuruMeditation")
 }
 END
 
