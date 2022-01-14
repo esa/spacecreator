@@ -1,5 +1,6 @@
 COM-N7SPACE-CONTAINERCONSTRAINTS DEFINITIONS ::= BEGIN
 IntegerData ::= INTEGER(0 .. 255)
+IntegerDataNoEncoding ::= INTEGER(0 .. 255)
 RealData ::= REAL(0 .. 255)
 EnumData ::= ENUMERATED
 {
@@ -19,6 +20,7 @@ PayloadBase ::= SEQUENCE
 PayloadA ::= SEQUENCE
 {
     intDataRange IntegerData(0 .. 255) (5 .. 255),
+    intDataNoEncodingRange IntegerDataNoEncoding(0 .. 255) (5 .. 9223372036854775807),
     floatDataRange RealData(0 .. 255) (3.14 .. 3.40282e+38),
     intDataValue IntegerData(0 .. 255) (42),
     floatDataValue RealData(0 .. 255) (3.14),

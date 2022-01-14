@@ -40,7 +40,6 @@
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <asn1library/asn1/values.h>
-#include <cmath>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
@@ -169,11 +168,7 @@ void DataTypeTranslatorVisitor::operator()(const FloatDataType &sedsType)
 
     translateFloatEncoding(sedsType.encoding(), type.get());
 
-    auto smallestValue = getSmallestValue(sedsType.encoding());
-    auto greatestValue = getGreatestValue(sedsType.encoding());
-
-    RangeTranslatorVisitor<Asn1Acn::RealValue> rangeTranslator(
-            type.get(), type->constraints(), std::move(smallestValue), std::move(greatestValue));
+    RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue> rangeTranslator(type.get());
     std::visit(rangeTranslator, sedsType.range());
 
     m_asn1Type = std::move(type);
@@ -185,11 +180,7 @@ void DataTypeTranslatorVisitor::operator()(const IntegerDataType &sedsType)
 
     translateIntegerEncoding(sedsType.encoding(), type.get());
 
-    auto smallestValue = getSmallestValue(sedsType.encoding());
-    auto greatestValue = getGreatestValue(sedsType.encoding());
-
-    RangeTranslatorVisitor<Asn1Acn::IntegerValue> rangeTranslator(
-            type.get(), type->constraints(), std::move(smallestValue), std::move(greatestValue));
+    RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue> rangeTranslator(type.get());
     std::visit(rangeTranslator, sedsType.range());
 
     m_asn1Type = std::move(type);
@@ -229,88 +220,6 @@ void DataTypeTranslatorVisitor::translateIntegerEncoding(
         asn1Type->setEndianness(Asn1Acn::Types::Endianness::unspecified);
         asn1Type->setSize(0);
     }
-}
-
-std::optional<std::int64_t> DataTypeTranslatorVisitor::getSmallestValue(
-        const std::optional<seds::model::IntegerDataEncoding> &encoding) const
-{
-    if (encoding) {
-        if (const auto coreIntegerEncoding = std::get_if<seds::model::CoreIntegerEncoding>(&encoding->encoding())) {
-            switch (*coreIntegerEncoding) {
-            case seds::model::CoreIntegerEncoding::Unsigned:
-                return 0;
-            case seds::model::CoreIntegerEncoding::TwosComplement:
-                return -std::pow(2, encoding->bits() - 1);
-            case seds::model::CoreIntegerEncoding::Bcd:
-                return 0;
-            default:
-                return std::nullopt;
-            }
-        }
-    }
-
-    return std::nullopt;
-}
-
-std::optional<double> DataTypeTranslatorVisitor::getSmallestValue(
-        const std::optional<seds::model::FloatDataEncoding> &encoding) const
-{
-    if (encoding) {
-        if (const auto coreEncodingAndPrecision =
-                        std::get_if<seds::model::CoreEncodingAndPrecision>(&encoding->encoding())) {
-            switch (*coreEncodingAndPrecision) {
-            case seds::model::CoreEncodingAndPrecision::IeeeSingle:
-                return std::numeric_limits<float>::min();
-            case seds::model::CoreEncodingAndPrecision::IeeeDouble:
-                return std::numeric_limits<double>::min();
-            default:
-                return std::nullopt;
-            }
-        }
-    }
-
-    return std::nullopt;
-}
-
-std::optional<std::int64_t> DataTypeTranslatorVisitor::getGreatestValue(
-        const std::optional<seds::model::IntegerDataEncoding> &encoding) const
-{
-    if (encoding) {
-        if (const auto coreIntegerEncoding = std::get_if<seds::model::CoreIntegerEncoding>(&encoding->encoding())) {
-            switch (*coreIntegerEncoding) {
-            case seds::model::CoreIntegerEncoding::Unsigned:
-                return std::pow(2, encoding->bits()) - 1;
-            case seds::model::CoreIntegerEncoding::TwosComplement:
-                return std::pow(2, encoding->bits() - 1) - 1;
-            case seds::model::CoreIntegerEncoding::Bcd:
-                return std::pow(10, (encoding->bits() / 4)) - 1;
-            default:
-                return std::nullopt;
-            }
-        }
-    }
-
-    return std::nullopt;
-}
-
-std::optional<double> DataTypeTranslatorVisitor::getGreatestValue(
-        const std::optional<seds::model::FloatDataEncoding> &encoding) const
-{
-    if (encoding) {
-        if (const auto coreEncodingAndPrecision =
-                        std::get_if<seds::model::CoreEncodingAndPrecision>(&encoding->encoding())) {
-            switch (*coreEncodingAndPrecision) {
-            case seds::model::CoreEncodingAndPrecision::IeeeSingle:
-                return std::numeric_limits<float>::max();
-            case seds::model::CoreEncodingAndPrecision::IeeeDouble:
-                return std::numeric_limits<double>::max();
-            default:
-                return std::nullopt;
-            }
-        }
-    }
-
-    return std::nullopt;
 }
 
 void DataTypeTranslatorVisitor::translateFloatEncoding(

@@ -235,41 +235,6 @@ private:
     auto translateFalseValue(seds::model::FalseValue falseValue, Asn1Acn::Types::Boolean *asn1Type) const -> void;
 
     /**
-     * @brief   Returns smallest value possible for given integer encoding
-     *
-     * @param   encoding    Integer encoding
-     *
-     * @return  Smallest value possible
-     */
-    auto getSmallestValue(const std::optional<seds::model::IntegerDataEncoding> &encoding) const
-            -> std::optional<std::int64_t>;
-    /**
-     * @brief   Returns smallest value possible for given float encoding
-     *
-     * @param   encoding    Float encoding
-     *
-     * @return  Smallest value possible
-     */
-    auto getSmallestValue(const std::optional<seds::model::FloatDataEncoding> &encoding) const -> std::optional<double>;
-    /**
-     * @brief   Returns greatest value possible for given integer encoding
-     *
-     * @param   encoding    Integer encoding
-     *
-     * @return  Greatest value possible
-     */
-    auto getGreatestValue(const std::optional<seds::model::IntegerDataEncoding> &encoding) const
-            -> std::optional<std::int64_t>;
-    /**
-     * @brief   Returns greatest value possible for given float encoding
-     *
-     * @param   encoding    Float encoding
-     *
-     * @return  Greatest value possible
-     */
-    auto getGreatestValue(const std::optional<seds::model::FloatDataEncoding> &encoding) const -> std::optional<double>;
-
-    /**
      * @brief   Adds entries from given container data type to the entries cache
      *
      * @param   sedsType    Type which entries should be cached

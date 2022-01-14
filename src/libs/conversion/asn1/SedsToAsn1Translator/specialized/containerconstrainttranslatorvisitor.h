@@ -59,11 +59,6 @@ private:
 
     auto getConstrainedType(const seds::model::EntryRef &entry) const -> Asn1Acn::Types::Type *;
 
-    auto getSmallestValue(Asn1Acn::Types::Integer *type) const -> std::int64_t;
-    auto getSmallestValue(Asn1Acn::Types::Real *type) const -> double;
-    auto getGreatestValue(Asn1Acn::Types::Integer *type) const -> std::int64_t;
-    auto getGreatestValue(Asn1Acn::Types::Real *type) const -> double;
-
 private:
     Asn1Acn::Types::Sequence *m_asn1Sequence;
 };

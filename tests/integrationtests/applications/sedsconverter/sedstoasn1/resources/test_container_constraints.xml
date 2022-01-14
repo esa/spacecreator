@@ -8,6 +8,11 @@
           <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
         </Range>
       </IntegerDataType>
+      <IntegerDataType name="IntegerDataNoEncoding">
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
       <FloatDataType name="RealData">
         <FloatDataEncoding encodingAndPrecision="IEEE754_2008_single" sizeInBits="32" />
         <Range>
@@ -30,6 +35,7 @@
         <LongDescription>Base for the packet payload data</LongDescription>
         <EntryList>
           <Entry name="intDataRange" type="IntegerData" />
+          <Entry name="intDataNoEncodingRange" type="IntegerDataNoEncoding" />
           <Entry name="floatDataRange" type="RealData" />
           <Entry name="intDataValue" type="IntegerData" />
           <Entry name="floatDataValue" type="RealData" />
@@ -41,6 +47,9 @@
       <ContainerDataType name="PayloadA" abstract="false" baseType="PayloadBase">
         <ConstraintSet>
           <RangeConstraint entry="intDataRange">
+            <MinMaxRange rangeType="atLeast" min="5" />
+          </RangeConstraint>
+          <RangeConstraint entry="intDataNoEncodingRange">
             <MinMaxRange rangeType="atLeast" min="5" />
           </RangeConstraint>
           <RangeConstraint entry="floatDataRange">

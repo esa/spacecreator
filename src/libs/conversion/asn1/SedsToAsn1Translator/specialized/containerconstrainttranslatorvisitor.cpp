@@ -32,7 +32,6 @@
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <asn1library/asn1/values.h>
-#include <cmath>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <iostream>
@@ -78,23 +77,11 @@ void ContainerConstraintTranslatorVisitor::applyContainerRangeConstraint(
 
     switch (asn1Type->typeEnum()) {
     case ASN1Type::INTEGER: {
-        auto asn1IntegerType = dynamic_cast<Asn1Acn::Types::Integer *>(asn1Type);
-
-        auto smallestValue = getSmallestValue(asn1IntegerType);
-        auto greatestValue = getGreatestValue(asn1IntegerType);
-
-        RangeTranslatorVisitor<Asn1Acn::IntegerValue> rangeTranslator(
-                asn1IntegerType, asn1IntegerType->constraints(), smallestValue, greatestValue);
+        RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue> rangeTranslator(asn1Type);
         std::visit(rangeTranslator, range);
     } break;
     case ASN1Type::REAL: {
-        auto asn1RealType = dynamic_cast<Asn1Acn::Types::Real *>(asn1Type);
-
-        auto smallestValue = getSmallestValue(asn1RealType);
-        auto greatestValue = getGreatestValue(asn1RealType);
-
-        RangeTranslatorVisitor<Asn1Acn::RealValue> rangeTranslator(
-                asn1RealType, asn1RealType->constraints(), smallestValue, greatestValue);
+        RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue> rangeTranslator(asn1Type);
         std::visit(rangeTranslator, range);
     } break;
     case ASN1Type::USERDEFINED: {
@@ -115,60 +102,46 @@ void ContainerConstraintTranslatorVisitor::applyContainerValueConstraint(
 
     switch (asn1Type->typeEnum()) {
     case ASN1Type::INTEGER: {
-        auto asn1IntegerType = dynamic_cast<Asn1Acn::Types::Integer *>(asn1Type);
-
         const auto intValue = Asn1Acn::IntegerValue::fromAstValue(value);
-        auto constraint = RangeTranslatorVisitor<Asn1Acn::IntegerValue>::createRangeConstraint(intValue);
 
-        asn1IntegerType->constraints().append(std::move(constraint));
+        RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue> rangeTranslator(asn1Type);
+        rangeTranslator.addValueConstraint(intValue);
     } break;
     case ASN1Type::REAL: {
-        auto asn1RealType = dynamic_cast<Asn1Acn::Types::Real *>(asn1Type);
-
         const auto realValue = Asn1Acn::RealValue::fromAstValue(value);
-        auto constraint = RangeTranslatorVisitor<Asn1Acn::RealValue>::createRangeConstraint(realValue);
 
-        asn1RealType->constraints().append(std::move(constraint));
+        RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue> rangeTranslator(asn1Type);
+        rangeTranslator.addValueConstraint(realValue);
     } break;
     case ASN1Type::ENUMERATED: {
-        auto asn1EnumType = dynamic_cast<Asn1Acn::Types::Enumerated *>(asn1Type);
-
         const auto enumValue = Escaper::escapeAsn1FieldName(Asn1Acn::EnumValue::fromAstValue(value));
-        auto constraint = RangeTranslatorVisitor<Asn1Acn::EnumValue>::createRangeConstraint(enumValue);
 
-        asn1EnumType->constraints().append(std::move(constraint));
+        RangeTranslatorVisitor<Asn1Acn::Types::Enumerated, Asn1Acn::EnumValue> rangeTranslator(asn1Type);
+        rangeTranslator.addValueConstraint(enumValue);
     } break;
     case ASN1Type::BITSTRING: {
-        auto asn1BitStringType = dynamic_cast<Asn1Acn::Types::BitString *>(asn1Type);
-
         const auto bitStringValue = Asn1Acn::BitStringValue::fromAstValue(value);
-        auto constraint = RangeTranslatorVisitor<Asn1Acn::BitStringValue>::createRangeConstraint(bitStringValue);
 
-        asn1BitStringType->constraints().append(std::move(constraint));
+        RangeTranslatorVisitor<Asn1Acn::Types::BitString, Asn1Acn::BitStringValue> rangeTranslator(asn1Type);
+        rangeTranslator.addValueConstraint(bitStringValue);
     } break;
     case ASN1Type::IA5STRING: {
-        auto asn1IA5StringType = dynamic_cast<Asn1Acn::Types::IA5String *>(asn1Type);
-
         const auto ia5StringValue = Asn1Acn::StringValue::fromAstValue(value);
-        auto constraint = RangeTranslatorVisitor<Asn1Acn::StringValue>::createRangeConstraint(ia5StringValue);
 
-        asn1IA5StringType->constraints().append(std::move(constraint));
+        RangeTranslatorVisitor<Asn1Acn::Types::IA5String, Asn1Acn::StringValue> rangeTranslator(asn1Type);
+        rangeTranslator.addValueConstraint(ia5StringValue);
     } break;
     case ASN1Type::NUMERICSTRING: {
-        auto asn1NumericStringType = dynamic_cast<Asn1Acn::Types::NumericString *>(asn1Type);
-
         const auto numericStringValue = Asn1Acn::StringValue::fromAstValue(value);
-        auto constraint = RangeTranslatorVisitor<Asn1Acn::StringValue>::createRangeConstraint(numericStringValue);
 
-        asn1NumericStringType->constraints().append(std::move(constraint));
+        RangeTranslatorVisitor<Asn1Acn::Types::NumericString, Asn1Acn::StringValue> rangeTranslator(asn1Type);
+        rangeTranslator.addValueConstraint(numericStringValue);
     }
     case ASN1Type::OCTETSTRING: {
-        auto asn1OctetStringType = dynamic_cast<Asn1Acn::Types::OctetString *>(asn1Type);
-
         const auto octetStringValue = Asn1Acn::OctetStringValue::fromAstValue(value);
-        auto constraint = RangeTranslatorVisitor<Asn1Acn::OctetStringValue>::createRangeConstraint(octetStringValue);
 
-        asn1OctetStringType->constraints().append(std::move(constraint));
+        RangeTranslatorVisitor<Asn1Acn::Types::OctetString, Asn1Acn::OctetStringValue> rangeTranslator(asn1Type);
+        rangeTranslator.addValueConstraint(octetStringValue);
     } break;
     case ASN1Type::USERDEFINED: {
         auto asn1UserType = dynamic_cast<Asn1Acn::Types::UserdefinedType *>(asn1Type);
@@ -206,70 +179,6 @@ Asn1Acn::Types::Type *ContainerConstraintTranslatorVisitor::getConstrainedType(c
     }
 
     return asn1ConstrainedComponent->type();
-}
-
-std::int64_t ContainerConstraintTranslatorVisitor::getSmallestValue(Asn1Acn::Types::Integer *type) const
-{
-    switch (type->encoding()) {
-    case Asn1Acn::Types::IntegerEncoding::pos_int:
-        return 0;
-    case Asn1Acn::Types::IntegerEncoding::twos_complement:
-        return -std::pow(2, type->size() - 1);
-    case Asn1Acn::Types::IntegerEncoding::ASCII:
-        return -std::pow(10, (type->size() / 8));
-    case Asn1Acn::Types::IntegerEncoding::BCD:
-        return 0;
-    case Asn1Acn::Types::IntegerEncoding::unspecified:
-    default:
-        throw conversion::translator::TranslationException("Unhandled IntegerEncoding for container constraint");
-        break;
-    }
-}
-
-double ContainerConstraintTranslatorVisitor::getSmallestValue(Asn1Acn::Types::Real *type) const
-{
-    switch (type->encoding()) {
-    case Asn1Acn::Types::RealEncoding::IEEE754_1985_32:
-        return static_cast<double>(std::numeric_limits<float>::min());
-    case Asn1Acn::Types::RealEncoding::IEEE754_1985_64:
-        return std::numeric_limits<double>::min();
-    case Asn1Acn::Types::RealEncoding::unspecified:
-    default:
-        throw conversion::translator::TranslationException("Unhandled RealEncoding for container constraint");
-        break;
-    }
-}
-
-std::int64_t ContainerConstraintTranslatorVisitor::getGreatestValue(Asn1Acn::Types::Integer *type) const
-{
-    switch (type->encoding()) {
-    case Asn1Acn::Types::IntegerEncoding::pos_int:
-        return std::pow(2, type->size()) - 1;
-    case Asn1Acn::Types::IntegerEncoding::twos_complement:
-        return std::pow(2, type->size() - 1) - 1;
-    case Asn1Acn::Types::IntegerEncoding::ASCII:
-        return std::pow(10, (type->size() / 8)) - 1;
-    case Asn1Acn::Types::IntegerEncoding::BCD:
-        return std::pow(10, (type->size() / 4)) - 1;
-    case Asn1Acn::Types::IntegerEncoding::unspecified:
-    default:
-        throw conversion::translator::TranslationException("Unhandled IntegerEncoding for container constraint");
-        break;
-    }
-}
-
-double ContainerConstraintTranslatorVisitor::getGreatestValue(Asn1Acn::Types::Real *type) const
-{
-    switch (type->encoding()) {
-    case Asn1Acn::Types::RealEncoding::IEEE754_1985_32:
-        return static_cast<double>(std::numeric_limits<float>::max());
-    case Asn1Acn::Types::RealEncoding::IEEE754_1985_64:
-        return std::numeric_limits<double>::max();
-    case Asn1Acn::Types::RealEncoding::unspecified:
-    default:
-        throw conversion::translator::TranslationException("Unhandled RealEncoding for container constraint");
-        break;
-    }
 }
 
 } // namespace conversion::asn1::translator
