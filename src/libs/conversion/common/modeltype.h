@@ -34,6 +34,7 @@ enum class ModelType
 {
     Unspecified,
     Asn1,
+    Csv,
     InterfaceView,
     Promela,
     Sdl,

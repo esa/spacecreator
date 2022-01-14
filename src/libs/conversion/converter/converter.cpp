@@ -83,8 +83,8 @@ std::vector<std::unique_ptr<Model>> Converter::extractCache()
 {
     std::vector<std::unique_ptr<Model>> outputModels;
 
-    const std::vector<ModelType> modelTypes { ModelType::Unspecified, ModelType::Asn1, ModelType::InterfaceView,
-        ModelType::Promela, ModelType::Sdl, ModelType::Seds };
+    const std::vector<ModelType> modelTypes { ModelType::Unspecified, ModelType::Asn1, ModelType::Csv,
+        ModelType::InterfaceView, ModelType::Promela, ModelType::Sdl, ModelType::Seds };
     outputModels.reserve(modelTypes.size());
     for (auto modelType : modelTypes) {
         if (m_modelCache[modelType].get() != nullptr) {

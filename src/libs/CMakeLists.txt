@@ -21,6 +21,9 @@ add_subdirectory(libdveditor)
 # SDL metamodel and exporter
 add_subdirectory(sdl)
 
+# CSV metamodel and importer
+add_subdirectory(csv)
+
 # conversion
 add_subdirectory(conversion)
 add_subdirectory(seds)
