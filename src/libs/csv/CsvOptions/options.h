@@ -17,29 +17,22 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "csvimporter.h"
+#pragma once
 
-#include "CsvModel/csvmodel.h"
-#include "CsvOptions/options.h"
-#include "import/exceptions.h"
+#include <QString>
 
-#include <memory>
+namespace csv {
 
-using csv::CsvOptions;
-
-namespace csv::importer {
-
-auto CsvImporter::importModel(const conversion::Options &options) const -> std::unique_ptr<conversion::Model>
+/**
+ * @brief   Possible options for CSV import
+ */
+class CsvOptions
 {
-    const QString fileToImport = options.value(CsvOptions::inputFilepath).value_or("");
-    if (fileToImport.isEmpty()) {
-        throw conversion::importer::ImportException("No name of file to import supplied");
-    }
-    (void)fileToImport;
+public:
+    /** @brief  Filepath of input file */
+    inline static const QString inputFilepath = "Csv_Import_InputFilepath";
+    /** @brief  Separator used in file */
+    inline static const QString separator = "Csv_Import_Separator";
+};
 
-    // TODO
-
-    return std::make_unique<CsvModel>();
-}
-
-} // namespace csv::importer
+} // namespace conversion::asn1

@@ -17,18 +17,28 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#include "csv/CsvModel/csvmodel.h"
+#include "csv/CsvModel/row.h"
+#include "modeltype.h"
+
 #include <QObject>
 #include <QTest>
+#include <QtTest/qtestcase.h>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/options.h>
 #include <csv/CsvImporter/csvimporter.h>
+#include <csv/CsvOptions/options.h>
 #include <memory>
 #include <qtestcase.h>
 
 using conversion::ModelType;
 using conversion::Options;
 // using conversion::importer::ImportException;
-// using csv::importer::CsvImporter;
+using csv::CsvModel;
+using csv::CsvOptions;
+using csv::Field;
+using csv::Row;
+using csv::importer::CsvImporter;
 // using tests::common::CsvFieldBuilder;
 
 namespace tests::csv {
@@ -38,12 +48,28 @@ class tst_csvimporter : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
-    void illFail();
+    void testEmpty();
 };
 
-void tst_csvimporter::illFail()
+void tst_csvimporter::testEmpty()
 {
-    QFAIL("this shall happen");
+    Options options;
+    options.add(CsvOptions::inputFilepath, "resources/empty.csv");
+
+    const CsvImporter importer;
+    const std::unique_ptr<conversion::Model> model = importer.importModel(options);
+    QVERIFY(model != nullptr);
+    auto *const csvModel = dynamic_cast<CsvModel *>(model.get());
+    QVERIFY(csvModel != nullptr);
+
+    QCOMPARE(csvModel->modelType(), ModelType::Csv);
+    QCOMPARE(csvModel->separator(), ",");
+
+    const Row importedHeader = csvModel->header();
+    QCOMPARE(importedHeader.fields().size(), 0);
+
+    const std::vector<std::unique_ptr<Row>> &importedRecords = csvModel->records();
+    QCOMPARE(importedRecords.size(), 0);
 }
 
 } // namespace tests::csv
