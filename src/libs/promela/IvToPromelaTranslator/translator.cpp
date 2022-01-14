@@ -74,8 +74,6 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
 
     QList<QString> functionNames;
 
-    qWarning() << "Translator";
-
     promelaModel->addInclude("dataview.pml");
 
     promelaModel->addDeclaration(Declaration(DataType(BasicType::INT), "inited"));
@@ -172,10 +170,8 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *
     const QString piName = QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
     const QString proctypeName = QString("%1_%2").arg(functionName).arg(interfaceName);
     if (parameterType.isEmpty()) {
-        qDebug() << "Proctype " << proctypeName << " without parameter";
         loopSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(piName, {})));
     } else {
-        qDebug() << "Proctype " << proctypeName << " with parameter";
         QList<VariableRef> arguments;
         arguments.append(VariableRef("var0"));
         loopSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(piName, arguments)));
