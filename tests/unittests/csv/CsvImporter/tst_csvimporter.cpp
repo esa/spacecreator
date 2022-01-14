@@ -49,6 +49,7 @@ class tst_csvimporter : public QObject
 
 private Q_SLOTS:
     void testEmpty();
+    void testHeaderOnly();
 };
 
 void tst_csvimporter::testEmpty()
@@ -67,6 +68,31 @@ void tst_csvimporter::testEmpty()
 
     const Row importedHeader = csvModel->header();
     QCOMPARE(importedHeader.fields().size(), 0);
+
+    const std::vector<std::unique_ptr<Row>> &importedRecords = csvModel->records();
+    QCOMPARE(importedRecords.size(), 0);
+}
+
+void tst_csvimporter::testHeaderOnly()
+{
+    Options options;
+    options.add(CsvOptions::inputFilepath, "resources/header_only.csv");
+
+    const CsvImporter importer;
+    const std::unique_ptr<conversion::Model> model = importer.importModel(options);
+    QVERIFY(model != nullptr);
+    auto *const csvModel = dynamic_cast<CsvModel *>(model.get());
+    QVERIFY(csvModel != nullptr);
+
+    QCOMPARE(csvModel->modelType(), ModelType::Csv);
+    QCOMPARE(csvModel->separator(), ",");
+
+    const std::array<Field, 4> expectedFields = { "name", "2nd name", "date of birth", "address" };
+    const Row importedHeader = csvModel->header();
+    QCOMPARE(importedHeader.fields().size(), expectedFields.size());
+    for (unsigned int i = 0; i < importedHeader.fields().size(); i++) {
+        QCOMPARE(importedHeader.fields()[i], expectedFields[i]);
+    }
 
     const std::vector<std::unique_ptr<Row>> &importedRecords = csvModel->records();
     QCOMPARE(importedRecords.size(), 0);
