@@ -50,12 +50,21 @@ void CsvModel::setHeader(const Row &header)
     m_header = header;
 }
 
+void CsvModel::setHeader(const QStringList &header)
+{
+    Row hdr;
+    for (const auto &field : header) {
+        hdr.addField(field);
+    }
+    m_header = hdr;
+}
+
 void CsvModel::addRecord(std::unique_ptr<Row> record)
 {
     m_records.push_back(std::move(record));
 }
 
-void CsvModel::setSeparator(const QString &separator)
+void CsvModel::setSeparator(const QString separator)
 {
     m_separator = separator;
 }

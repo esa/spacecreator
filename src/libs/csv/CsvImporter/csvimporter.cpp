@@ -20,10 +20,17 @@
 #include "csvimporter.h"
 
 #include "CsvModel/csvmodel.h"
+#include "CsvModel/row.h"
 #include "CsvOptions/options.h"
+#include "csv/CsvModel/csvmodel.h"
 #include "import/exceptions.h"
 
+#include <QDebug>
+#include <QDir>
+#include <QFile>
+#include <QTextStream>
 #include <memory>
+#include <utility>
 
 using csv::CsvOptions;
 
@@ -35,11 +42,23 @@ auto CsvImporter::importModel(const conversion::Options &options) const -> std::
     if (fileToImport.isEmpty()) {
         throw conversion::importer::ImportException("No name of file to import supplied");
     }
-    (void)fileToImport;
 
-    // TODO
+    QFile importedFile = QFile(fileToImport);
+    qDebug() << "cur path: " << QDir::currentPath();
+    if (!importedFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        throw conversion::importer::ImportException("File to import cannot be opened.");
+    }
+    QTextStream importedFileTextStream(&importedFile);
 
-    return std::make_unique<CsvModel>();
+    auto model = std::make_unique<CsvModel>();
+
+    model->setSeparator(options.value(CsvOptions::separator).value_or(","));
+    model->setHeader(importedFileTextStream.readLine().split(model->separator()));
+    while (!importedFileTextStream.atEnd()) {
+        // TODO: import records
+    }
+
+    return std::move(model);
 }
 
 } // namespace csv::importer

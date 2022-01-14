@@ -49,9 +49,11 @@ public:
 
     auto setHeader(const Row &header) -> void;
 
+    auto setHeader(const QStringList &header) -> void;
+
     auto addRecord(std::unique_ptr<Row> record) -> void;
 
-    auto setSeparator(const QString &separator) -> void;
+    auto setSeparator(QString separator) -> void;
 
 private:
     Row m_header;

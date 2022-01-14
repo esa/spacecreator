@@ -16,4 +16,7 @@ target_link_libraries(${TEST_NAME}
                 Qt${QT_VERSION_MAJOR}::Test
                 CommonProjectWarnings)
 
+configure_file(resources/empty.csv resources/empty.csv COPYONLY)
+configure_file(resources/header_only.csv resources/header_only.csv COPYONLY)
+
 add_format_target(${TEST_NAME})
