@@ -139,9 +139,9 @@ public:
 
     virtual QString ifaceLabel() const;
 
-    IVConnectionLayerType *layer() const;
-
-    auto setLayer(IVConnectionLayerType *layer) -> bool;
+    auto layer() const ->  IVConnectionLayerType *;
+    auto layerName() const ->  QString;
+    auto setLayerName(const QString &layerName) -> void;
 
 Q_SIGNALS:
     void paramsChanged();

@@ -254,8 +254,12 @@ void InterfaceDocument::updateLayersModel() const
             }
         }
         if (!isDefaultPresent) {
-            auto *cmd = new cmd::CmdConnectionLayerCreate(ivm::IVConnectionLayerType::DefaultLayerName, layersModel(), objectsModel());
+            auto *cmd = new cmd::CmdConnectionLayerCreate(
+                    ivm::IVConnectionLayerType::DefaultLayerName, layersModel(), objectsModel());
             commandsStack()->push(cmd);
+        }
+        if (objectsModel() != nullptr) {
+            objectsModel()->setConnectionLayersModel(layersModel());
         }
     }
 }
@@ -678,7 +682,6 @@ void InterfaceDocument::setObjects(const QVector<ivm::IVObject *> &objects)
 {
     d->objectsModel->initFromObjects(objects);
     d->objectsModel->setRootObject({});
-    d->objectsModel->setConnectionLayersModel(d->layersModel);
 }
 
 void InterfaceDocument::onAttributesManagerRequested()

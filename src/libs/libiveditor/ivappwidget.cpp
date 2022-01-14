@@ -161,7 +161,7 @@ void IVAppWidget::showAvailableLayers(const QPoint &pos)
 
         auto *actAddNewLayer = new QAction(tr("Add"));
         connect(actAddNewLayer, &QAction::triggered, this, [&]() {
-            QString newLayerName = "new_layer";
+            QString newLayerName = "newLayer";
             auto cmd = new cmd::CmdConnectionLayerCreate(
                     newLayerName, m_document->layersModel(), m_document->objectsModel());
             if (cmd->layer() != nullptr) {
@@ -174,7 +174,7 @@ void IVAppWidget::showAvailableLayers(const QPoint &pos)
 
         auto *actDeleteLayer = new QAction(tr("Delete"));
         connect(actDeleteLayer, &QAction::triggered, this, [&]() {
-            if (layer->name().compare(ivm::IVConnectionLayerType::DefaultLayerName) != 0) {
+            if (layer != nullptr && layer->name().compare(ivm::IVConnectionLayerType::DefaultLayerName) != 0) {
                 auto cmd = new cmd::CmdConnectionLayerDelete(
                         layer->name(), m_document->layersModel(), m_document->objectsModel());
                 m_document->commandsStack()->push(cmd);
@@ -198,16 +198,26 @@ void IVAppWidget::renameSelectedLayer(QStandardItem *item)
         return;
     }
 
+    disconnect(m_document->layerVisualisationModel(), &IVVisualizationModelBase::itemChanged, this,
+            &IVAppWidget::renameSelectedLayer);
+
     if (obj->type() == ivm::IVObject::Type::ConnectionLayer) {
         const auto *layer = qobject_cast<const ivm::IVConnectionLayerType *>(obj);
-        auto *cmd = new cmd::CmdConnectionLayerRename(
-                layer->name(), item->text(), m_document->layersModel(), m_document->objectsModel());
-        if (cmd->layer() != nullptr) {
-            m_document->commandsStack()->push(cmd);
-        } else {
-            delete cmd;
+        if (layer != nullptr && layer->name().compare(ivm::IVConnectionLayerType::DefaultLayerName) != 0) {
+            auto *cmd = new cmd::CmdConnectionLayerRename(
+                    layer->name(), item->text(), m_document->layersModel(), m_document->objectsModel());
+            if (cmd->layer() != nullptr) {
+                m_document->commandsStack()->push(cmd);
+            } else {
+                delete cmd;
+            }
         }
     }
+
+    connect(m_document->layerVisualisationModel(), &IVVisualizationModelBase::itemChanged, this,
+            &IVAppWidget::renameSelectedLayer);
+
+    item->setText(obj->title());
 }
 
 void IVAppWidget::copyItems()
@@ -436,11 +446,13 @@ void IVAppWidget::initLayerView()
 {
     ui->layerView->setObjectName(QLatin1String("Connection Layers"));
     ui->layerView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
-    ui->layerView->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
+    ui->layerView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
     ui->layerView->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
     ui->layerView->setEditTriggers(QAbstractItemView::EditTrigger::DoubleClicked);
+    ui->layerView->setSortingEnabled(true);
     connect(ui->layerView, &QTreeView::customContextMenuRequested, this, &IVAppWidget::showAvailableLayers);
-    connect(m_document->layerVisualisationModel(), &IVVisualizationModelBase::itemChanged, this, &IVAppWidget::renameSelectedLayer);
+    connect(m_document->layerVisualisationModel(), &IVVisualizationModelBase::itemChanged, this,
+            &IVAppWidget::renameSelectedLayer);
     ui->layerView->setModel(m_document->layerVisualisationModel());
 }
 

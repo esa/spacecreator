@@ -46,14 +46,14 @@ public:
 
 protected:
     auto addLayer() -> void;
-    auto renameLayer() -> void;
     auto deleteLayer() -> void;
 
     ivm::IVModel *m_layersModel;
     ivm::IVModel *m_objectsModel;
     ivm::IVObject *m_parent;
     ivm::IVConnectionLayerType *m_layer;
-    QString m_renameValue;
+    QString m_oldName;
+    QString m_newName;
 };
 
 class CmdConnectionLayerCreate : public CmdConnectionLayerManage
