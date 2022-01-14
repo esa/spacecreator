@@ -142,6 +142,8 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     }
     // reset path
     QDir::setCurrent(qDirAppPath);
+
+    statusBar()->showMessage("Window started.", 6000);
 }
 
 ModelCheckingWindow::~ModelCheckingWindow()
@@ -369,10 +371,14 @@ void ModelCheckingWindow::on_treeWidget_properties_itemDoubleClicked(QTreeWidget
     } else{ // then has to be a .pr file
         cmd = "opengeode " + item->text(1);
     }
-    if(QProcess::execute(cmd) != 0) {
+    QProcess *p = new QProcess();
+    p->start(cmd);
+    if(!p->waitForStarted(10000)) {
         QMessageBox::warning(this, tr("Open property"),
                              tr("Error when calling '%1'.").arg(cmd));
+        return;
     }
+    statusBar()->showMessage("External editor called.", 6000);
 }
 
 void ModelCheckingWindow::on_treeWidget_subtyping_itemDoubleClicked(QTreeWidgetItem *item, int column)
@@ -382,10 +388,14 @@ void ModelCheckingWindow::on_treeWidget_subtyping_itemDoubleClicked(QTreeWidgetI
     }
     // is subtyping file
     QString cmd = "kate " + item->text(1);
-    if(QProcess::execute(cmd) != 0) {
+    QProcess *p = new QProcess();
+    p->start(cmd);
+    if(!p->waitForStarted(10000)) {
         QMessageBox::warning(this, tr("Open subtyping"),
                              tr("Error when calling '%1'.").arg(cmd));
+        return;
     }
+    statusBar()->showMessage("External editor called.", 6000);
 }
 
 void ModelCheckingWindow::on_treeWidget_subtyping_itemChanged(QTreeWidgetItem *item, int column)
@@ -419,6 +429,12 @@ void ModelCheckingWindow::on_treeWidget_subtyping_itemChanged(QTreeWidgetItem *i
 
 void ModelCheckingWindow::on_pushButton_callIF_clicked()
 {
+    // CONFIRM MC call with user
+    int ret = QMessageBox::warning(this, tr("Call IF"),
+                                   "Do you confirm you want to call IF? Previous scenarios will be deleted!",
+                                   QMessageBox::Yes | QMessageBox::No);
+    if (ret != QMessageBox::Yes) return;
+
     // First save current configuration to hidden file .mcconfig.xml
     if (!saveConfiguration()) {
         return;
@@ -447,6 +463,11 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
         stream << "echo $? > statusfile" << endl;
     }
     Q_ASSERT(QDir("callif.sh").exists());
+
+    // REMOVE output dir, if existing
+    if(QDir(this->outputPath).exists()){
+        QDir(this->outputPath).removeRecursively();
+    }
 
     // CALL IF make rule via terminal, saving make return in statusfile
     if (QProcess::execute(QStringLiteral("xterm -hold -e sh callif.sh")) != 0) {
@@ -499,11 +520,13 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     // CONVERT IF SCENARIOS (scn files) into msc files
     if (QDir(this->outputPath).isEmpty()){
         QMessageBox::information(this, tr("Call IF"),
-                             "No scenarios found. ");
+                             "No scenarios found! ");
         // reset path
         QDir::setCurrent(qDirAppPath);
         return;
     }
+    statusBar()->showMessage("Scenarios were found!", 6000);
+
     QDir::setCurrent(this->outputPath+"/");
     //TODO remove python3 and script path
     QString scn2mscCmd = "python3 ~/work/moc4space/scn2msc/scn2msc.py scn2msc.py *.scn .mcconfig.xml";
@@ -527,14 +550,20 @@ void ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked(QTreeWidgetIte
 {
     if (item->text(1) == "") {return;}
     QFileInfo fileInfo(item->text(1));
-    QProcess *process = new QProcess(this);
     QString cmd;
     if (fileInfo.completeSuffix() == "msc"){
         cmd = "msceditor -m " + item->text(1);
     } else{
         cmd = "kate " + item->text(1);
     }
-    process->start(cmd);
+    QProcess *p = new QProcess();
+    p->start(cmd);
+    if(!p->waitForStarted(10000)) {
+        QMessageBox::warning(this, tr("Open scenario"),
+                             tr("Error when calling '%1'.").arg(cmd));
+        return;
+    }
+    statusBar()->showMessage("External editor called.", 6000);
 }
 
 void ModelCheckingWindow::convertToObs()
@@ -569,8 +598,9 @@ void ModelCheckingWindow::convertToObs()
         treeRoot->removeChild(treeRoot->child(i-1));
     }
     // rebuild tree with saved selection
-    // TODO (improvement) the new tree has all nodes collapsed, so user expanded folders are lost
     this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, preSelection, expandedNodes));
+
+    statusBar()->showMessage("Observer generated.", 6000);
 }
 
 void ModelCheckingWindow::addProperty()
@@ -591,13 +621,15 @@ void ModelCheckingWindow::addProperty()
             return;
         }
         bool ok2;
-        QString label = "Property name:                                                                                         ";
+        QString label = "Property name: (no whitespaces)                                                                             ";
         QString propertyName = QInputDialog::getText(this, "New " + propertyType,
                                                 label, QLineEdit::Normal,
                                                 "new-property", &ok2);
 
         if (ok2 && !propertyName.isEmpty()){
             // CHECK FILE NAME
+            // use "-"s instead of whitespaces, if existing
+            propertyName.replace(" ", "-");
             // check if file with same name exists already, append suffix in that case
             QFile file;
             QString filePath = this->propertiesPath + "/" + propertyName;
@@ -614,11 +646,18 @@ void ModelCheckingWindow::addProperty()
             // set path to project dir
             QString qDirAppPath = QDir::currentPath();
             QDir::setCurrent(this->projectDir+"/");
-            if (makeCallerProcess->execute(makeCall) != 0) {
+            makeCallerProcess->start(makeCall);
+            if (!makeCallerProcess->waitForStarted(10000)) {
                 QMessageBox::warning(this, tr("Add property"),
                                      tr("Error executing '%1'").arg(makeCall));
                 return;
             } else {
+                // WAITS property dir/file is created by make
+                int timeout = 0;
+                if (!QDir(filePath).exists() && timeout < 5){
+                    QThread::sleep(1);
+                    timeout++;
+                }
                 // REFRESH TREEVIEW with preselection
                 QFileInfo propertiesFileInfo(this->propertiesPath);
                 // save user selection
@@ -631,8 +670,11 @@ void ModelCheckingWindow::addProperty()
                     treeRoot->removeChild(treeRoot->child(i-1));
                 }
                 // rebuild tree with saved selection
-                // TODO (improvement) the new tree has all nodes collapsed, so user expanded folders are lost
                 this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, preSelection, expandedNodes));
+
+                if (QDir(filePath).exists() && !QDir(filePath).isEmpty()){
+                    statusBar()->showMessage("Property " + propertyName + " added.", 6000);
+                }
             }
             // reset path
             QDir::setCurrent(qDirAppPath);
@@ -704,19 +746,21 @@ QStringList ModelCheckingWindow::getFunctionsSelection(){
 void ModelCheckingWindow::addSubtypes()
 {
     bool ok;
-    QString fileName = QInputDialog::getText(this, tr("New subtypes"),
-                                            tr("Subtyping file name:"), QLineEdit::Normal,
+    QString subtypingFileName = QInputDialog::getText(this, tr("New subtypes"),
+                                            tr("Subtyping file name (no whitespaces):"), QLineEdit::Normal,
                                             "new-subtypes", &ok);
-    if (ok && !fileName.isEmpty()){
+    if (ok && !subtypingFileName.isEmpty()){
         // CHECK FILE NAME
+        // use "-"s instead of whitespaces, if existing
+        subtypingFileName.replace(" ", "-");
         // check if file with same name exists already, append suffix in that case
         QFile file;
-        QString filePath = this->subtypesPath + "/" + fileName + ".asn";
+        QString filePath = this->subtypesPath + "/" + subtypingFileName + ".asn";
         file.setFileName(filePath);
         while(file.exists())
         {
             filePath = filePath.left(filePath.size()-4) + "-1.asn";
-            fileName = fileName + "-1";
+            subtypingFileName = subtypingFileName + "-1";
             file.setFileName(filePath);
         }
 
@@ -724,9 +768,9 @@ void ModelCheckingWindow::addSubtypes()
         // first set path to project dir
         QString qDirAppPath = QDir::currentPath();
         QDir::setCurrent(this->projectDir+"/");
-        if (QProcess::execute("make create-subtype NAME="+fileName) != 0) {
+        if (QProcess::execute("make create-subtype NAME="+subtypingFileName) != 0) {
             QMessageBox::warning(this, tr("Add subtypes"),
-                                 tr("Error executing 'make create-subtype NAME=%1'").arg(fileName));
+                                 tr("Error executing 'make create-subtype NAME=%1'").arg(subtypingFileName));
             //reset path
             QDir::setCurrent(qDirAppPath);
             return;
@@ -744,6 +788,8 @@ void ModelCheckingWindow::addSubtypes()
         child->setIcon(0, this->style()->standardIcon(QStyle::SP_TitleBarNormalButton));
         child->setCheckState(0, Qt::Unchecked);
         d->ui->treeWidget_subtyping->topLevelItem(0)->addChild(child);
+
+        statusBar()->showMessage("Subtyping " + subtypingFileName + " added.", 6000);
     }
 }
 
@@ -873,23 +919,25 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
 {
     // Ask user for file name
     bool ok;
-    QString label = "Configuration file name:                                    ";
-    QString fileName = QInputDialog::getText(this, tr("Save MC configuration"),
+    QString label = "Configuration file name: (no whitespaces)                   ";
+    QString configurationFileName = QInputDialog::getText(this, tr("Save MC configuration"),
                                             label, QLineEdit::Normal,
                                             "my-config", &ok);
     QFile file;
-    if (ok && !fileName.isEmpty()){
+    if (ok && !configurationFileName.isEmpty()){
+        // use "-"s instead of whitespaces, if existing
+        configurationFileName.replace(" ", "-");
         // check if configurations dir exists and create it otherwise
         if (!QDir(this->configurationsPath).exists()){
             QDir().mkdir(this->configurationsPath);
         }
         // check if file with same name exists already, append suffix in that case
-        QString filePath = this->configurationsPath + "/" + fileName + ".xml";
+        QString filePath = this->configurationsPath + "/" + configurationFileName + ".xml";
         file.setFileName(filePath);
         while(file.exists())
         {
             filePath = filePath.left(filePath.size()-4) + "-1.xml";
-            fileName = fileName + "-1";
+            configurationFileName = configurationFileName + "-1";
             file.setFileName(filePath);
         }
     } else {
@@ -936,8 +984,8 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
     ifOptions.append(d->ui->comboBox_expAlgorithm->currentText().left(3) == "DFS" ? "dfs" : "bfs");
     ifOptions.append(d->ui->lineEdit_maxNumStates->text());
     XmelWriter writer(propsSelection, subtypesSelection, functionSelection, ifOptions);
-    if (writer.writeFile(&file, fileName + ".xml")){
-        statusBar()->showMessage("Configuration file successfully saved as " + fileName + ".xml", 6000);
+    if (writer.writeFile(&file, configurationFileName + ".xml")){
+        statusBar()->showMessage("Configuration file successfully saved as " + configurationFileName + ".xml", 6000);
     } else {
         QMessageBox::warning(this, tr("Save configuration"),
                              "Error when writing to file.");

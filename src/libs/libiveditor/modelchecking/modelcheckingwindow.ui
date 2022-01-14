@@ -320,78 +320,6 @@
        <string>60</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_10">
-      <property name="geometry">
-       <rect>
-        <x>330</x>
-        <y>110</y>
-        <width>71</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>(up to 50)</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_11">
-      <property name="geometry">
-       <rect>
-        <x>330</x>
-        <y>40</y>
-        <width>71</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>(up to 100)</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_12">
-      <property name="geometry">
-       <rect>
-        <x>330</x>
-        <y>170</y>
-        <width>81</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>(up to 10000)</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_14">
-      <property name="geometry">
-       <rect>
-        <x>330</x>
-        <y>70</y>
-        <width>131</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>(up to 14400 - 4 hours)</string>
-      </property>
-     </widget>
      <widget class="QComboBox" name="comboBox_expAlgorithm">
       <property name="geometry">
        <rect>
@@ -411,19 +339,6 @@
         <string>BFS (Breadth First Search)</string>
        </property>
       </item>
-     </widget>
-     <widget class="QPushButton" name="pushButton_stopIF">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>260</y>
-        <width>80</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Stop IF</string>
-      </property>
      </widget>
      <widget class="QPushButton" name="pushButton_callIF">
       <property name="geometry">
@@ -471,7 +386,7 @@
      <widget class="QCheckBox" name="checkBox_errorScenarios">
       <property name="geometry">
        <rect>
-        <x>410</x>
+        <x>340</x>
         <y>40</y>
         <width>141</width>
         <height>21</height>
@@ -487,7 +402,7 @@
      <widget class="QCheckBox" name="checkBox_successScenarios">
       <property name="geometry">
        <rect>
-        <x>550</x>
+        <x>480</x>
         <y>40</y>
         <width>161</width>
         <height>21</height>
