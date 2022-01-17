@@ -75,14 +75,12 @@
         <LongDescription>Concrete packet implementation A</LongDescription>
         <ConstraintSet>
           <ValueConstraint entry="Id" value="PacketA" />
-          <TypeConstraint entry="Payload" type="PayloadA" />
         </ConstraintSet>
       </ContainerDataType>
       <ContainerDataType name="DataPacketB" abstract="false" baseType="DataPacket">
         <LongDescription>Concrete packet implementation B</LongDescription>
         <ConstraintSet>
           <ValueConstraint entry="Id" value="PacketB" />
-          <TypeConstraint entry="Payload" type="PayloadB" />
         </ConstraintSet>
       </ContainerDataType>
     </DataTypeSet>

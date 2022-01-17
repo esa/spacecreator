@@ -222,7 +222,7 @@ void ContainerConstraintTranslatorVisitor::applyContainerValueConstraint(
 
 Asn1Acn::Types::Type *ContainerConstraintTranslatorVisitor::getConstrainedType(const seds::model::EntryRef &entry) const
 {
-    const auto constrainedEntryName = entry.nameStr();
+    const auto constrainedEntryName = Escaper::escapeAsn1FieldName(entry.nameStr());
     const auto asn1ConstrainedComponent = m_asn1Sequence->component(constrainedEntryName);
 
     if (!asn1ConstrainedComponent) {
