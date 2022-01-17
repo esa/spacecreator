@@ -114,7 +114,7 @@ void ContainerConstraintTranslatorVisitor::applyContainerTypeConstraint(
             RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue> rangeTranslator(asn1Type);
             std::visit(rangeTranslator, intDataType->range());
         } else {
-            auto errorMessage = QString("ContainerTypeConstraint cannot be applied on \"%1\" entry because referenced "
+            auto errorMessage = QString("ContainerTypeConstraint cannot be applied to \"%1\" entry because referenced "
                                         "type \"%2\" is not of the same type")
                                         .arg(typeConstraint.entry().nameStr())
                                         .arg(referencedTypeName);
@@ -126,7 +126,7 @@ void ContainerConstraintTranslatorVisitor::applyContainerTypeConstraint(
             RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue> rangeTranslator(asn1Type);
             std::visit(rangeTranslator, floatDataType->range());
         } else {
-            auto errorMessage = QString("ContainerTypeConstraint cannot be applied on \"%1\" entry because referenced "
+            auto errorMessage = QString("ContainerTypeConstraint cannot be applied to \"%1\" entry because referenced "
                                         "type \"%2\" is not of the same type")
                                         .arg(typeConstraint.entry().nameStr())
                                         .arg(referencedTypeName);
@@ -138,7 +138,7 @@ void ContainerConstraintTranslatorVisitor::applyContainerTypeConstraint(
         applyContainerTypeConstraint(typeConstraint, asn1UserType->type());
     } break;
     default: {
-        auto errorMessage = QString("ContainerTypeConstraint cannot be applied on \"%1\" entry because it's neither an "
+        auto errorMessage = QString("ContainerTypeConstraint cannot be applied to \"%1\" entry because it's neither an "
                                     "integer nor float data type")
                                     .arg(typeConstraint.entry().nameStr());
         throw conversion::translator::TranslationException(std::move(errorMessage));
@@ -207,7 +207,7 @@ void ContainerConstraintTranslatorVisitor::applyContainerValueConstraint(
     case ASN1Type::STRING:
     case ASN1Type::NULLTYPE:
     case ASN1Type::LABELTYPE: {
-        auto errorMessage = QString("ContainerValueConstraints cannot be applied on \"%1\" with type %2")
+        auto errorMessage = QString("ContainerValueConstraints cannot be applied to \"%1\" with type %2")
                                     .arg(valueConstraint.entry().nameStr())
                                     .arg(asn1Type->typeName());
         throw conversion::translator::TranslationException(std::move(errorMessage));

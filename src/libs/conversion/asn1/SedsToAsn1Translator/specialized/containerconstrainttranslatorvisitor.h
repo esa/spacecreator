@@ -38,19 +38,57 @@ class Package;
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Translator visitor for SEDS container constraints
+ *
+ * Translated constraints will be applied to the passed ASN.1 sequence
+ */
 class ContainerConstraintTranslatorVisitor final
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   asn1Sequence    ASN.1 sequence to which the translated constraints will be applied
+     * @param   sedsPackage     Parent SEDS package
+     */
     ContainerConstraintTranslatorVisitor(
             Asn1Acn::Types::Sequence *asn1Sequence, const seds::model::Package *sedsPackage);
+    /**
+     * @brief   Deleted copy constructor
+     */
     ContainerConstraintTranslatorVisitor(const ContainerConstraintTranslatorVisitor &) = delete;
+    /**
+     * @brief   Deleted move constructor
+     */
     ContainerConstraintTranslatorVisitor(ContainerConstraintTranslatorVisitor &&) = delete;
+    /**
+     * @brief   Deleted copy assignment operator
+     */
     ContainerConstraintTranslatorVisitor &operator=(const ContainerConstraintTranslatorVisitor &) = delete;
+    /**
+     * @brief   Deleted move assignment operator
+     */
     ContainerConstraintTranslatorVisitor &operator=(ContainerConstraintTranslatorVisitor &&) = delete;
 
 public:
+    /**
+     * @brief   Translates range container constraint
+     *
+     * @param   rangeConstraint     Constraint to translate
+     */
     auto operator()(const seds::model::ContainerRangeConstraint &rangeConstraint) -> void;
+    /**
+     * @brief   Translates type container constraint
+     *
+     * @param   typeConstraint      Constraint to translate
+     */
     auto operator()(const seds::model::ContainerTypeConstraint &typeConstraint) -> void;
+    /**
+     * @brief   Translates value container constraint
+     *
+     * @param   valueConstraint     Constraint to translate
+     */
     auto operator()(const seds::model::ContainerValueConstraint &valueConstraint) -> void;
 
 private:

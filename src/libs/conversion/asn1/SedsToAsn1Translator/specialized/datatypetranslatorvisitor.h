@@ -258,6 +258,12 @@ private:
     auto updateParentContainer(const QString &sedsBaseTypeName, Asn1Acn::Types::Sequence *asn1RealizationSequence)
             -> void;
 
+    /**
+     * @brief   Translates container constraints and applies them to the ASN.1 sequence
+     *
+     * @param   sedsType        Container data type which constraints should be translated
+     * @param   asn1Type        ASN.1 sequence which should be constrained
+     */
     auto applyContainerConstraints(
             const seds::model::ContainerDataType &sedsType, Asn1Acn::Types::Sequence *asn1Type) const -> void;
 
