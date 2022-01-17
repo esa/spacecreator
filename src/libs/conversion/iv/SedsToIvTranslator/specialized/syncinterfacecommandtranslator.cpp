@@ -34,9 +34,9 @@ using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator {
 
-SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(
-        const seds::model::Interface &sedsInterface, Asn1Acn::Definitions *asn1Definitions, ivm::IVFunction *ivFunction)
-    : InterfaceCommandTranslator(sedsInterface, asn1Definitions, ivFunction)
+SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(const seds::model::Interface &sedsInterface,
+        Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage, ivm::IVFunction *ivFunction)
+    : InterfaceCommandTranslator(sedsInterface, asn1Definitions, sedsPackage, ivFunction)
 {
 }
 

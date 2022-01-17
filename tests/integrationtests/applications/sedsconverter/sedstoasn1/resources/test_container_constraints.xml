@@ -8,6 +8,12 @@
           <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
         </Range>
       </IntegerDataType>
+      <IntegerDataType name="IntegerDataBigger">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="16" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="65535" />
+        </Range>
+      </IntegerDataType>
       <IntegerDataType name="IntegerDataNoEncoding">
         <Range>
           <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
@@ -37,6 +43,7 @@
           <Entry name="intDataRange" type="IntegerData" />
           <Entry name="intDataNoEncodingRange" type="IntegerDataNoEncoding" />
           <Entry name="floatDataRange" type="RealData" />
+          <Entry name="intDataType" type="IntegerDataBigger" />
           <Entry name="intDataValue" type="IntegerData" />
           <Entry name="floatDataValue" type="RealData" />
           <Entry name="enumDataValue" type="EnumData" />
@@ -55,6 +62,7 @@
           <RangeConstraint entry="floatDataRange">
             <MinMaxRange rangeType="atLeast" min="3.14" />
           </RangeConstraint>
+          <TypeConstraint entry="intDataType" type="IntegerData" />
           <ValueConstraint entry="intDataValue" value="42" />
           <ValueConstraint entry="floatDataValue" value="3.14" />
           <ValueConstraint entry="enumDataValue" value="Value2" />

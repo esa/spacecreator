@@ -62,10 +62,11 @@ using seds::model::SubRangeDataType;
 
 namespace conversion::asn1::translator {
 
-DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(
-        Asn1Acn::Definitions *asn1Definitions, std::unique_ptr<Asn1Acn::Types::Type> &asn1Type)
-    : m_asn1Definitions(asn1Definitions)
-    , m_asn1Type(asn1Type)
+DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(std::unique_ptr<Asn1Acn::Types::Type> &asn1Type,
+        Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage)
+    : m_asn1Type(asn1Type)
+    , m_asn1Definitions(asn1Definitions)
+    , m_sedsPackage(sedsPackage)
 {
 }
 
@@ -509,7 +510,7 @@ void DataTypeTranslatorVisitor::createRealizationContainerField(Asn1Acn::Types::
 void DataTypeTranslatorVisitor::applyContainerConstraints(
         const ContainerDataType &sedsType, Asn1Acn::Types::Sequence *asn1Type) const
 {
-    ContainerConstraintTranslatorVisitor translatorVisitor(asn1Type);
+    ContainerConstraintTranslatorVisitor translatorVisitor(asn1Type, m_sedsPackage);
 
     for (const auto &constraint : sedsType.constraints()) {
         std::visit(translatorVisitor, constraint);

@@ -33,6 +33,7 @@ class EntryRef;
 class ContainerRangeConstraint;
 class ContainerTypeConstraint;
 class ContainerValueConstraint;
+class Package;
 } // namespace seds::model
 
 namespace conversion::asn1::translator {
@@ -40,7 +41,8 @@ namespace conversion::asn1::translator {
 class ContainerConstraintTranslatorVisitor final
 {
 public:
-    explicit ContainerConstraintTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence);
+    ContainerConstraintTranslatorVisitor(
+            Asn1Acn::Types::Sequence *asn1Sequence, const seds::model::Package *sedsPackage);
     ContainerConstraintTranslatorVisitor(const ContainerConstraintTranslatorVisitor &) = delete;
     ContainerConstraintTranslatorVisitor(ContainerConstraintTranslatorVisitor &&) = delete;
     ContainerConstraintTranslatorVisitor &operator=(const ContainerConstraintTranslatorVisitor &) = delete;
@@ -54,6 +56,8 @@ public:
 private:
     auto applyContainerRangeConstraint(
             const seds::model::ContainerRangeConstraint &rangeConstraint, Asn1Acn::Types::Type *asn1Type) const -> void;
+    auto applyContainerTypeConstraint(
+            const seds::model::ContainerTypeConstraint &typeConstraint, Asn1Acn::Types::Type *asn1Type) const -> void;
     auto applyContainerValueConstraint(
             const seds::model::ContainerValueConstraint &valueConstraint, Asn1Acn::Types::Type *asn1Type) const -> void;
 
@@ -61,6 +65,7 @@ private:
 
 private:
     Asn1Acn::Types::Sequence *m_asn1Sequence;
+    const seds::model::Package *m_sedsPackage;
 };
 
 } // namespace conversion::asn1::translator
