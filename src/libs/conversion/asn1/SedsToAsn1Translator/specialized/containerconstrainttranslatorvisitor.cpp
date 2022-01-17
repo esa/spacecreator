@@ -189,7 +189,7 @@ void ContainerConstraintTranslatorVisitor::applyContainerValueConstraint(
 
         RangeTranslatorVisitor<Asn1Acn::Types::NumericString, Asn1Acn::StringValue> rangeTranslator(asn1Type);
         rangeTranslator.addValueConstraint(numericStringValue);
-    }
+    } break;
     case ASN1Type::OCTETSTRING: {
         const auto octetStringValue = Asn1Acn::OctetStringValue::fromAstValue(value);
 
