@@ -60,7 +60,7 @@
             <MinMaxRange rangeType="atLeast" min="5" />
           </RangeConstraint>
           <RangeConstraint entry="floatDataRange">
-            <MinMaxRange rangeType="atLeast" min="3.14" />
+            <MinMaxRange rangeType="atMost" max="3.14" />
           </RangeConstraint>
           <TypeConstraint entry="intDataType" type="IntegerData" />
           <ValueConstraint entry="intDataValue" value="42" />
