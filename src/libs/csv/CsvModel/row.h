@@ -29,7 +29,12 @@ typedef QString Field;
 class Row
 {
 public:
+    Row();
+
+    Row(const QStringList &fields);
+
     auto fields() const -> std::vector<Field>;
+
     auto addField(const Field &field) -> void;
 
 private:

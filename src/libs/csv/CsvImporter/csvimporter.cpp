@@ -44,7 +44,6 @@ auto CsvImporter::importModel(const conversion::Options &options) const -> std::
     }
 
     QFile importedFile = QFile(fileToImport);
-    qDebug() << "cur path: " << QDir::currentPath();
     if (!importedFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         throw conversion::importer::ImportException("File to import cannot be opened.");
     }
@@ -53,9 +52,31 @@ auto CsvImporter::importModel(const conversion::Options &options) const -> std::
     auto model = std::make_unique<CsvModel>();
 
     model->setSeparator(options.value(CsvOptions::separator).value_or(","));
-    model->setHeader(importedFileTextStream.readLine().split(model->separator()));
+
+    bool labelsImported = false;
     while (!importedFileTextStream.atEnd()) {
-        // TODO: import records
+        const QStringList words = importedFileTextStream.readLine().split(model->separator());
+        if (labelsImported) {
+            if (!words.empty()) {
+                model->addRecord(std::make_unique<Row>(words));
+            }
+        } else {
+            if (!words.isEmpty() && !words.first().isEmpty()) {
+                bool notNumber = true;
+                std::for_each(words.begin(), words.end(), [&notNumber](const QString &word) {
+                    QRegExp numberFormat("\\d*\\.{0,1}\\d*"); // digits, optional dot, digits
+                    if (numberFormat.exactMatch(word)) {
+                        notNumber = false;
+                    }
+                });
+                if (notNumber) {
+                    model->setHeader(words);
+                } else if (!words.empty()) {
+                    model->addRecord(std::make_unique<Row>(words));
+                }
+                labelsImported = true;
+            }
+        }
     }
 
     return std::move(model);

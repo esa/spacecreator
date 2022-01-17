@@ -53,7 +53,7 @@ public:
 
     auto addRecord(std::unique_ptr<Row> record) -> void;
 
-    auto setSeparator(QString separator) -> void;
+    auto setSeparator(const QString &separator) -> void;
 
 private:
     Row m_header;

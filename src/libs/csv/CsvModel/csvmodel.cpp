@@ -21,6 +21,7 @@
 
 #include "modeltype.h"
 
+#include <algorithm>
 #include <memory>
 
 namespace csv {
@@ -52,11 +53,10 @@ void CsvModel::setHeader(const Row &header)
 
 void CsvModel::setHeader(const QStringList &header)
 {
-    Row hdr;
-    for (const auto &field : header) {
-        hdr.addField(field);
-    }
-    m_header = hdr;
+    std::for_each(header.begin(), header.end(),
+            [&](const auto &field) { //
+                m_header.addField(field);
+            });
 }
 
 void CsvModel::addRecord(std::unique_ptr<Row> record)
@@ -64,7 +64,7 @@ void CsvModel::addRecord(std::unique_ptr<Row> record)
     m_records.push_back(std::move(record));
 }
 
-void CsvModel::setSeparator(const QString separator)
+void CsvModel::setSeparator(const QString &separator)
 {
     m_separator = separator;
 }

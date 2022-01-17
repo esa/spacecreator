@@ -19,7 +19,20 @@
 
 #include "row.h"
 
+#include <QStringList>
+#include <algorithm>
+
 namespace csv {
+
+Row::Row() {}
+
+Row::Row(const QStringList &fields)
+{
+    std::for_each(fields.begin(), fields.end(),
+            [&](const QString &field) { //
+                m_fields.push_back(field);
+            });
+}
 
 std::vector<Field> Row::fields() const
 {

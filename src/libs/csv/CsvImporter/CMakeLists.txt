@@ -16,7 +16,8 @@ target_include_directories(CsvImporter
 target_link_libraries(CsvImporter
     PUBLIC      Conversion::Common
                 CsvModel
-    PRIVATE     CommonProjectWarnings)
+    PRIVATE     CommonProjectWarnings
+)
 
 add_format_target(CsvImporter)
 add_tidy_target(CsvImporter)

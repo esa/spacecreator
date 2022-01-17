@@ -24,6 +24,7 @@
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
+#include <algorithm>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/options.h>
 #include <csv/CsvImporter/csvimporter.h>
@@ -50,7 +51,31 @@ class tst_csvimporter : public QObject
 private Q_SLOTS:
     void testEmpty();
     void testHeaderOnly();
+    void testOneRowWithHeader();
+    void testTwoRowsWithHeader();
+    void testTwoRowsNoHeader();
+    void testManyRowsWithHeader();
+    void testManyRowsNoHeader();
 };
+
+static void checkExpectedFields(const std::vector<Field> &expected, const Row &row)
+{
+    QCOMPARE(row.fields().size(), expected.size());
+    for (std::vector<Field>::size_type i = 0; i < expected.size(); i++) {
+        QCOMPARE(expected[i], row.fields()[i]);
+    }
+}
+
+static void checkExpectedRecords(const std::vector<std::vector<Field>> &expectedRecords, //
+        const std::vector<std::unique_ptr<Row>> &actualRecords)
+{
+    QCOMPARE(actualRecords.size(), expectedRecords.size());
+    for (std::vector<std::unique_ptr<Row>>::size_type i = 0; i < actualRecords.size(); i++) {
+        for (std::vector<Field>::size_type j = 0; j < actualRecords[i]->fields().size(); j++) {
+            QCOMPARE(actualRecords.at(i)->fields()[j], expectedRecords[i][j]);
+        }
+    }
+}
 
 void tst_csvimporter::testEmpty()
 {
@@ -62,15 +87,11 @@ void tst_csvimporter::testEmpty()
     QVERIFY(model != nullptr);
     auto *const csvModel = dynamic_cast<CsvModel *>(model.get());
     QVERIFY(csvModel != nullptr);
-
     QCOMPARE(csvModel->modelType(), ModelType::Csv);
     QCOMPARE(csvModel->separator(), ",");
 
-    const Row importedHeader = csvModel->header();
-    QCOMPARE(importedHeader.fields().size(), 0);
-
-    const std::vector<std::unique_ptr<Row>> &importedRecords = csvModel->records();
-    QCOMPARE(importedRecords.size(), 0);
+    checkExpectedFields({}, csvModel->header());
+    checkExpectedRecords({}, csvModel->records());
 }
 
 void tst_csvimporter::testHeaderOnly()
@@ -83,19 +104,124 @@ void tst_csvimporter::testHeaderOnly()
     QVERIFY(model != nullptr);
     auto *const csvModel = dynamic_cast<CsvModel *>(model.get());
     QVERIFY(csvModel != nullptr);
-
     QCOMPARE(csvModel->modelType(), ModelType::Csv);
     QCOMPARE(csvModel->separator(), ",");
 
-    const std::array<Field, 4> expectedFields = { "name", "2nd name", "date of birth", "address" };
-    const Row importedHeader = csvModel->header();
-    QCOMPARE(importedHeader.fields().size(), expectedFields.size());
-    for (unsigned int i = 0; i < importedHeader.fields().size(); i++) {
-        QCOMPARE(importedHeader.fields()[i], expectedFields[i]);
-    }
+    checkExpectedFields({ "name", "2nd name", "date of birth", "address" }, csvModel->header());
+    checkExpectedRecords({}, csvModel->records());
+}
 
-    const std::vector<std::unique_ptr<Row>> &importedRecords = csvModel->records();
-    QCOMPARE(importedRecords.size(), 0);
+void tst_csvimporter::testOneRowWithHeader()
+{
+    Options options;
+    options.add(CsvOptions::inputFilepath, "resources/one_row_with_header.csv");
+
+    const CsvImporter importer;
+    const std::unique_ptr<conversion::Model> model = importer.importModel(options);
+    QVERIFY(model != nullptr);
+    auto *const csvModel = dynamic_cast<CsvModel *>(model.get());
+    QVERIFY(csvModel != nullptr);
+    QCOMPARE(csvModel->modelType(), ModelType::Csv);
+    QCOMPARE(csvModel->separator(), ",");
+
+    checkExpectedFields({ "posX", "posY", "temp" }, csvModel->header());
+    checkExpectedRecords({ { "1", "3.2", "-10.0" } }, csvModel->records());
+}
+
+void tst_csvimporter::testTwoRowsWithHeader()
+{
+    Options options;
+    options.add(CsvOptions::inputFilepath, "resources/two_rows_with_header.csv");
+
+    const CsvImporter importer;
+    const std::unique_ptr<conversion::Model> model = importer.importModel(options);
+    QVERIFY(model != nullptr);
+    auto *const csvModel = dynamic_cast<CsvModel *>(model.get());
+    QVERIFY(csvModel != nullptr);
+    QCOMPARE(csvModel->modelType(), ModelType::Csv);
+    QCOMPARE(csvModel->separator(), ",");
+
+    checkExpectedFields({ "posX", "posY", "temp" }, csvModel->header());
+    checkExpectedRecords(
+            {
+                    { "1", "3.2", "-10.0" },
+                    { "10", "33", "3000" },
+            },
+            csvModel->records());
+}
+
+void tst_csvimporter::testTwoRowsNoHeader()
+{
+    Options options;
+    options.add(CsvOptions::inputFilepath, "resources/two_rows_no_header.csv");
+
+    const CsvImporter importer;
+    const std::unique_ptr<conversion::Model> model = importer.importModel(options);
+    QVERIFY(model != nullptr);
+    auto *const csvModel = dynamic_cast<CsvModel *>(model.get());
+    QVERIFY(csvModel != nullptr);
+    QCOMPARE(csvModel->modelType(), ModelType::Csv);
+    QCOMPARE(csvModel->separator(), ",");
+
+    checkExpectedFields({}, csvModel->header());
+    checkExpectedRecords(
+            {
+                    { "1", "3.2", "-10.0" },
+                    { "10", "33", "3000" },
+            },
+            csvModel->records());
+}
+
+void tst_csvimporter::testManyRowsWithHeader()
+{
+    Options options;
+    options.add(CsvOptions::inputFilepath, "resources/many_rows_with_header.csv");
+
+    const CsvImporter importer;
+    const std::unique_ptr<conversion::Model> model = importer.importModel(options);
+    QVERIFY(model != nullptr);
+    auto *const csvModel = dynamic_cast<CsvModel *>(model.get());
+    QVERIFY(csvModel != nullptr);
+    QCOMPARE(csvModel->modelType(), ModelType::Csv);
+    QCOMPARE(csvModel->separator(), ",");
+
+    checkExpectedFields({ "posX", "posY", "temp" }, csvModel->header());
+    checkExpectedRecords(
+            {
+                    { "1", "3.2", "-10.0" },
+                    { "10", "33", "3000" },
+                    { "3425", "2543", "33" },
+                    { "345", "23", "0" },
+                    { "0", "0", "0" },
+                    { "-1", "-1", "-1" },
+            },
+            csvModel->records());
+}
+
+void tst_csvimporter::testManyRowsNoHeader()
+{
+    Options options;
+    options.add(CsvOptions::inputFilepath, "resources/many_rows_no_header.csv");
+
+    const CsvImporter importer;
+    const std::unique_ptr<conversion::Model> model = importer.importModel(options);
+    QVERIFY(model != nullptr);
+    auto *const csvModel = dynamic_cast<CsvModel *>(model.get());
+    QVERIFY(csvModel != nullptr);
+    QCOMPARE(csvModel->modelType(), ModelType::Csv);
+    QCOMPARE(csvModel->separator(), ",");
+
+    checkExpectedFields({}, csvModel->header());
+    checkExpectedRecords(
+            {
+                    { "1", "3.2", "-10.0" },
+                    { "10", "33", "3000" },
+                    { "3425", "2543", "33" },
+                    { "345", "23", "0" },
+                    { "0", "0", "0" },
+                    { "-1", "-1", "-1" },
+            },
+            csvModel->records());
 }
 
 } // namespace tests::csv
