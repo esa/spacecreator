@@ -24,6 +24,7 @@
 #include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/types/dimensionsize.h>
 
+using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::TranslationException;
 
 namespace conversion::asn1::translator {
@@ -72,7 +73,13 @@ void DimensionTranslator::translateIndexDimension(
         const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Sequence) const
 {
     const auto indexTypeName = dimension.indexTypeRef()->nameStr();
-    const auto indexType = m_asn1Definitions->type(indexTypeName)->type();
+    const auto indexTypeAssignment = m_asn1Definitions->type(indexTypeName);
+
+    if (!indexTypeAssignment) {
+        throw MissingAsn1TypeDefinitionException(indexTypeName);
+    }
+
+    const auto indexType = indexTypeAssignment->type();
 
     if (const auto integerIndexType = dynamic_cast<const Asn1Acn::Types::Integer *>(indexType); integerIndexType) {
         translateIntegerDimensionIndex(integerIndexType, asn1Sequence);

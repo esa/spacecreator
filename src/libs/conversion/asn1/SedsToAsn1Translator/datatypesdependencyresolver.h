@@ -61,7 +61,7 @@ public:
      *
      * @return  Sorted list of data types
      */
-    auto resolve(const DataTypes *dataTypes) -> ResultList;
+    auto resolve(const DataTypes *dataTypes, const DataTypes *globalDataTypes) -> ResultList;
 
 private:
     auto visit(const seds::model::DataType *dataType) -> void;
@@ -77,6 +77,8 @@ private:
 
 private:
     const DataTypes *m_dataTypes;
+    const DataTypes *m_globalDataTypes;
+
     MarksMap m_marks;
     ResultList m_result;
 };

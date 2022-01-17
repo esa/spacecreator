@@ -34,12 +34,20 @@
 namespace conversion::asn1::translator {
 
 DataTypesDependencyResolver::ResultList DataTypesDependencyResolver::resolve(
-        const DataTypesDependencyResolver::DataTypes *dataTypes)
+        const DataTypesDependencyResolver::DataTypes *dataTypes,
+        const DataTypesDependencyResolver::DataTypes *globalDataTypes)
 {
-    m_dataTypes = dataTypes;
-
     m_marks.clear();
     m_result.clear();
+
+    m_dataTypes = dataTypes;
+    m_globalDataTypes = globalDataTypes;
+
+    if (m_globalDataTypes) {
+        for (const auto *dataType : *m_globalDataTypes) {
+            markPermanent(dataType);
+        }
+    }
 
     for (const auto *dataType : *m_dataTypes) {
         visit(dataType);
@@ -116,15 +124,22 @@ void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDat
 
 const seds::model::DataType *DataTypesDependencyResolver::findDataType(const seds::model::DataTypeRef &dataTypeRef)
 {
-    const auto result = std::find_if(m_dataTypes->begin(), m_dataTypes->end(),
+    auto result = std::find_if(m_dataTypes->begin(), m_dataTypes->end(),
             [&dataTypeRef](const auto *dataType) { return dataTypeNameStr(*dataType) == dataTypeRef.nameStr(); });
 
-    if (result == m_dataTypes->end()) {
-        throw UndeclaredDataTypeException(dataTypeRef.nameStr());
-        return nullptr;
+    if (result != m_dataTypes->end()) {
+        return *result;
     }
 
-    return *result;
+    result = std::find_if(m_globalDataTypes->begin(), m_globalDataTypes->end(),
+            [&dataTypeRef](const auto *dataType) { return dataTypeNameStr(*dataType) == dataTypeRef.nameStr(); });
+
+    if (result != m_globalDataTypes->end()) {
+        return *result;
+    }
+
+    throw UndeclaredDataTypeException(dataTypeRef.nameStr());
+    return nullptr;
 }
 
 void DataTypesDependencyResolver::markTemporary(const seds::model::DataType *dataType)

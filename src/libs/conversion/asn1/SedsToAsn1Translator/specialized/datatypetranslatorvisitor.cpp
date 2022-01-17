@@ -395,10 +395,12 @@ void DataTypeTranslatorVisitor::translateStringLength(
 void DataTypeTranslatorVisitor::translateArrayType(
         const QString &sedsTypeName, Asn1Acn::Types::SequenceOf *asn1Type) const
 {
-    const auto *asn1ReferencedType = m_asn1Definitions->type(sedsTypeName)->type();
-    if (!asn1ReferencedType) {
+    const auto *asn1ReferencedTypeAssignment = m_asn1Definitions->type(sedsTypeName);
+    if (!asn1ReferencedTypeAssignment) {
         throw MissingAsn1TypeDefinitionException(sedsTypeName);
     }
+
+    const auto *asn1ReferencedType = asn1ReferencedTypeAssignment->type();
 
     auto asn1ItemType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
             asn1ReferencedType->identifier(), m_asn1Definitions->name());
@@ -440,9 +442,21 @@ void DataTypeTranslatorVisitor::cacheContainerType(const ContainerDataType &seds
 {
     auto asn1SequenceComponents = std::make_unique<Asn1Acn::Types::Sequence>();
 
+    // Check if base type is visible
+    if (sedsType.baseType()) {
+        const auto sedsBaseTypeName = sedsType.baseType()->nameStr();
+
+        if (m_asn1SequenceComponentsCache.count(sedsBaseTypeName) == 0) {
+            auto errorMessage = QString("Unable to find base type \"%1\" for container \"%2\" in the current scope")
+                                        .arg(sedsBaseTypeName)
+                                        .arg(sedsType.nameStr());
+            throw TranslationException(std::move(errorMessage));
+        }
+    }
+
     // Get parent entries from cache
     if (sedsType.baseType()) {
-        const auto sedsBaseTypeName = Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr());
+        const auto sedsBaseTypeName = sedsType.baseType()->nameStr();
         const auto &asn1ParentComponents = m_asn1SequenceComponentsCache[sedsBaseTypeName].first->components();
 
         for (const auto &asn1Component : asn1ParentComponents) {
@@ -468,7 +482,7 @@ void DataTypeTranslatorVisitor::cacheContainerType(const ContainerDataType &seds
 
     // Get parent trailer entries from cache
     if (sedsType.baseType()) {
-        const auto sedsBaseTypeName = Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr());
+        const auto sedsBaseTypeName = sedsType.baseType()->nameStr();
         const auto &asn1ParentTrailerComponents = m_asn1SequenceComponentsCache[sedsBaseTypeName].second->components();
 
         for (const auto &asn1TrailerComponent : asn1ParentTrailerComponents) {
