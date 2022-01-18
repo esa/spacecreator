@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2022 N7 Space Sp. z o.o.
+ * @copyright (C) 2021 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,40 +17,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "csvmodel.h"
+#pragma once
 
-#include <QStringList>
-#include <algorithm>
-#include <memory>
+#include <QHash>
+#include <QString>
+#include <functional>
 
-namespace csv {
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+namespace std {
 
-Row CsvModel::header()
-{
-    return m_header;
-}
+template<>
+struct hash<QString> {
+    std::size_t operator()(const QString &s) const noexcept {
+      return static_cast<size_t>(qHash(s));
+    }
+};
 
-const std::vector<std::unique_ptr<Row>> &CsvModel::records()
-{
-    return m_records;
-}
-
-void CsvModel::setHeader(const Row &header)
-{
-    m_header = header;
-}
-
-void CsvModel::setHeader(const QStringList &header)
-{
-    std::for_each(header.begin(), header.end(),
-            [&](const auto &field) { //
-                m_header.addField(field);
-            });
-}
-
-void CsvModel::addRecord(std::unique_ptr<Row> record)
-{
-    m_records.push_back(std::move(record));
-}
-
-} // csv
+} // namespace std
+#endif

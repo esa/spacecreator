@@ -17,40 +17,22 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "csvmodel.h"
+#pragma once
 
-#include <QStringList>
-#include <algorithm>
-#include <memory>
+#include <QString>
 
-namespace csv {
+namespace csv::importer {
 
-Row CsvModel::header()
+/**
+ * @brief   Possible options for CSV import
+ */
+class CsvOptions
 {
-    return m_header;
-}
+public:
+    /** @brief  Filepath of input file */
+    inline static const QString inputFilepath = "Csv_Import_InputFilepath";
+    /** @brief  Separator used in file */
+    inline static const QString separator = "Csv_Import_Separator";
+};
 
-const std::vector<std::unique_ptr<Row>> &CsvModel::records()
-{
-    return m_records;
-}
-
-void CsvModel::setHeader(const Row &header)
-{
-    m_header = header;
-}
-
-void CsvModel::setHeader(const QStringList &header)
-{
-    std::for_each(header.begin(), header.end(),
-            [&](const auto &field) { //
-                m_header.addField(field);
-            });
-}
-
-void CsvModel::addRecord(std::unique_ptr<Row> record)
-{
-    m_records.push_back(std::move(record));
-}
-
-} // csv
+} // namespace conversion::asn1

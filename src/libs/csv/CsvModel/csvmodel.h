@@ -21,7 +21,6 @@
 
 #include "row.h"
 
-#include <conversion/common/model.h>
 #include <memory>
 #include <vector>
 
@@ -32,16 +31,9 @@ namespace csv {
  *
  * Based on RFC 4180: https://www.ietf.org/rfc/rfc4180.txt
  */
-class CsvModel : public conversion::Model
+class CsvModel
 {
 public:
-    /**
-     * @brief   Getter for this model type
-     *
-     * @return  Model type
-     */
-    virtual auto modelType() const -> conversion::ModelType override;
-
     /**
      * @brief   Getter for data header (column labels)
      *

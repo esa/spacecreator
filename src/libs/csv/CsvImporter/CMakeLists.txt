@@ -5,6 +5,10 @@ add_library(CsvImporter STATIC)
 target_sources(CsvImporter
     PRIVATE     csvimporter.cpp
                 csvimporter.h
+                importerexception.cpp
+                importerexception.h
+                ../CsvOptions/options.cpp
+                ../CsvOptions/options.h
 )
 
 target_include_directories(CsvImporter
@@ -14,8 +18,8 @@ target_include_directories(CsvImporter
 )
 
 target_link_libraries(CsvImporter
-    PUBLIC      Conversion::Common
-                CsvModel
+    PUBLIC      CsvModel
+                Qt${QT_VERSION_MAJOR}::Core
     PRIVATE     CommonProjectWarnings
 )
 

@@ -19,13 +19,13 @@
 
 #pragma once
 
-#include "import/modelimporter.h"
-
-#include <conversion/common/model.h>
+#include <csv/CsvModel/csvmodel.h>
+#include <csv/CsvOptions/csvimporteroptions.h>
+#include <csv/CsvOptions/options.h>
 
 namespace csv::importer {
 
-class CsvImporter : public conversion::importer::ModelImporter
+class CsvImporter final
 {
 public:
     /**
@@ -33,7 +33,7 @@ public:
      *
      * @param   options     Options for import configuration
      */
-    virtual auto importModel(const conversion::Options &options) const -> std::unique_ptr<conversion::Model> override;
+    auto importModel(const Options &options) const -> std::unique_ptr<CsvModel>;
 };
 
 } // namespace csv::importer

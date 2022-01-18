@@ -17,40 +17,41 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "csvmodel.h"
+#include <QString>
+#include <exception>
 
-#include <QStringList>
-#include <algorithm>
-#include <memory>
+namespace csv::importer {
 
-namespace csv {
-
-Row CsvModel::header()
+/**
+ * @brief Importer exception class
+ *
+ */
+class ImporterException final : public std::exception
 {
-    return m_header;
-}
+public:
+    /**
+     * @brief Construct a new Importer Exception object
+     *
+     * @param message error message
+     */
+    ImporterException(QString message);
 
-const std::vector<std::unique_ptr<Row>> &CsvModel::records()
-{
-    return m_records;
-}
+    /**
+     * @brief   Returns error message as const char*
+     *
+     * @returns Error message
+     */
+    virtual auto what() const noexcept -> const char * override;
 
-void CsvModel::setHeader(const Row &header)
-{
-    m_header = header;
-}
+    /**
+     * @brief   Returns error message as QString
+     *
+     * @returns Error message
+     */
+    auto errorMessage() const noexcept -> const QString &;
 
-void CsvModel::setHeader(const QStringList &header)
-{
-    std::for_each(header.begin(), header.end(),
-            [&](const auto &field) { //
-                m_header.addField(field);
-            });
-}
+private:
+    QString m_message;
+};
 
-void CsvModel::addRecord(std::unique_ptr<Row> record)
-{
-    m_records.push_back(std::move(record));
-}
-
-} // csv
+} // csv::importer

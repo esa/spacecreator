@@ -15,7 +15,7 @@ target_include_directories(CsvModel
 )
 
 target_link_libraries(CsvModel
-    PUBLIC      Conversion::Common
+    PUBLIC      Qt${QT_VERSION_MAJOR}::Core
     PRIVATE     CommonProjectWarnings
 )
 
