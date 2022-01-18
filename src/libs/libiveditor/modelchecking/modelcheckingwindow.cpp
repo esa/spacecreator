@@ -56,6 +56,20 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     this->configurationsPath =  projectDir + "/work/modelchecking/configurations";
     this->outputPath = projectDir + "/work/build/modelchecking/output";
 
+    // CHECK project dir structure, create directories where necessary
+    // check if properties dir exists and create it otherwise
+    if (!QDir(this->propertiesPath).exists()){
+        QDir().mkdir(this->propertiesPath);
+    }
+    // check if subtypes dir exists and create it otherwise
+    if (!QDir(this->subtypesPath).exists()){
+        QDir().mkdir(this->subtypesPath);
+    }
+    // check if configurations dir exists
+    Q_ASSERT(QDir(this->configurationsPath).exists());
+    // check if output dir exists
+    Q_ASSERT(QDir(this->outputPath).exists());
+
     // Define right-click menus and set menu policy
     this->contextMenuPropertiesTop = new QMenu(d->ui->treeWidget_properties);
     this->contextMenuProperties = new QMenu(d->ui->treeWidget_properties);
@@ -129,16 +143,29 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     // set status bar text color
     statusBar()->setStyleSheet("color: blue");
 
-    // CALL Kazoo
+    QString makeSkeletonsCall = "make skeletons";
+    QProcess *makeSleletonsCallerProcess = new QProcess(this);
+    // set path to project dir
+    QString qDirAppPath = QDir::currentPath();
+    QDir::setCurrent(this->projectDir+"/");
+    if (makeSleletonsCallerProcess->execute(makeSkeletonsCall) != 0) {
+        QMessageBox::warning(this, tr("Make skeletons call"),
+                             "Error when making skeletons!");
+        //return;
+    }
+    // reset path
+    QDir::setCurrent(qDirAppPath);
+
+    // CALL KAZOO
     QString kazooCall = "kazoo -t MOCHECK";
     QProcess *kazooCallerProcess = new QProcess(this);
     // set path to project dir
-    QString qDirAppPath = QDir::currentPath();
+    qDirAppPath = QDir::currentPath();
     QDir::setCurrent(this->projectDir+"/");
     if (kazooCallerProcess->execute(kazooCall) != 0) {
         QMessageBox::warning(this, tr("Kazoo call"),
                              "Error when calling kazoo!");
-        return;
+        //return;
     }
     // reset path
     QDir::setCurrent(qDirAppPath);
@@ -470,12 +497,12 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     }
 
     // CALL IF make rule via terminal, saving make return in statusfile
-    if (QProcess::execute(QStringLiteral("xterm -hold -e sh callif.sh")) != 0) {
+    if (QProcess::execute(QStringLiteral("xterm -e sh callif.sh")) != 0) {
         QMessageBox::warning(this, tr("Call IF"),
                              "Error executing xterm! ");
         // reset path
         QDir::setCurrent(qDirAppPath);
-        return;
+        //return;
     }
 
     // READ statusfile with make return value
@@ -489,14 +516,14 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
                              "Error opening status file!");
         // reset path
         QDir::setCurrent(qDirAppPath);
-        return;
+        //return;
     }
     if (makeStatus != "0") {
         QMessageBox::warning(this, tr("Call IF"),
                              "Error executing: make model-check");
         // reset path
         QDir::setCurrent(qDirAppPath);
-        return;
+        //return;
     }
 
     // REMOVE statusfile and callif.sh
@@ -505,7 +532,7 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
                              "Error executing: " + rmFilesCmd);
         // reset path
         QDir::setCurrent(qDirAppPath);
-        return;
+        //return;
     }
 
     // CHECK output dir exists
