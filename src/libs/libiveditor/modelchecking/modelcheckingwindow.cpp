@@ -143,6 +143,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     // set status bar text color
     statusBar()->setStyleSheet("color: blue");
 
+    // CALL MAKE SKELETONS
     QString makeSkeletonsCall = "make skeletons";
     QProcess *makeSleletonsCallerProcess = new QProcess(this);
     // set path to project dir
@@ -497,9 +498,9 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     }
 
     // CALL IF make rule via terminal, saving make return in statusfile
-    if (QProcess::execute(QStringLiteral("xterm -e sh callif.sh")) != 0) {
+    if (QProcess::execute(QStringLiteral("xterm -hold -e sh callif.sh")) != 0) {
         QMessageBox::warning(this, tr("Call IF"),
-                             "Error executing xterm! ");
+                             "Error executing xterm!");
         // reset path
         QDir::setCurrent(qDirAppPath);
         //return;
@@ -511,16 +512,16 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     Q_ASSERT(statusFile.exists());
     if (statusFile.open(QIODevice::ReadOnly | QIODevice::Text)){
         makeStatus = statusFile.readAll();
+        if (makeStatus.compare("0") == 0) {
+            QMessageBox::warning(this, tr("Call IF"),
+                                 "Error executing: make model-check - make return: " + makeStatus);
+            // reset path
+            QDir::setCurrent(qDirAppPath);
+            //return;
+        }
     } else {
         QMessageBox::warning(this, tr("Call IF"),
                              "Error opening status file!");
-        // reset path
-        QDir::setCurrent(qDirAppPath);
-        //return;
-    }
-    if (makeStatus != "0") {
-        QMessageBox::warning(this, tr("Call IF"),
-                             "Error executing: make model-check");
         // reset path
         QDir::setCurrent(qDirAppPath);
         //return;
@@ -556,13 +557,13 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
 
     QDir::setCurrent(this->outputPath+"/");
     //TODO remove python3 and script path
-    QString scn2mscCmd = "python3 ~/work/moc4space/scn2msc/scn2msc.py scn2msc.py *.scn .mcconfig.xml";
+    QString scn2mscCmd = "python3 /home/taste/work/if-model-checking/modules/scn2msc/scn2msc.py *.scn " + this->configurationsPath + "/.mcconfig.xml";
     if (QProcess::execute(scn2mscCmd) != 0) {
         QMessageBox::warning(this, tr("Call IF"),
                              "Error when calling: " + scn2mscCmd);
         // reset path
         QDir::setCurrent(qDirAppPath);
-        return;
+        //return;
     }
 
     // reset path
