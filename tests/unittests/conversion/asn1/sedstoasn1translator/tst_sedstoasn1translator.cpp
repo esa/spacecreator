@@ -141,7 +141,7 @@ void tst_SedsToAsn1Translator::testResolvingArrayDataType()
     dataTypes.push_back(&integerDataType);
 
     DataTypesDependencyResolver resolver;
-    auto resolvedDataTypes = resolver.resolve(&dataTypes);
+    auto resolvedDataTypes = resolver.resolve(&dataTypes, nullptr);
 
     QCOMPARE(resolvedDataTypes.size(), 2);
 
@@ -169,7 +169,7 @@ void tst_SedsToAsn1Translator::testResolvingContainerDataType()
     dataTypes.push_back(&dataTypeB);
 
     DataTypesDependencyResolver resolver;
-    auto resolvedDataTypes = resolver.resolve(&dataTypes);
+    auto resolvedDataTypes = resolver.resolve(&dataTypes, nullptr);
 
     QCOMPARE(resolvedDataTypes.size(), 3);
 
@@ -200,7 +200,7 @@ void tst_SedsToAsn1Translator::testResolvingCyclicDependency()
 
     DataTypesDependencyResolver resolver;
 
-    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes), NotDagException);
+    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes, nullptr), NotDagException);
 }
 
 void tst_SedsToAsn1Translator::testResolvingUndeclaredType()
@@ -216,7 +216,7 @@ void tst_SedsToAsn1Translator::testResolvingUndeclaredType()
 
     DataTypesDependencyResolver resolver;
 
-    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes), UndeclaredDataTypeException);
+    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes, nullptr), UndeclaredDataTypeException);
 }
 
 /// \SRS  ETB-FUN-210
