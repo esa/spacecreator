@@ -14,7 +14,6 @@ target_include_directories(TestGenerator
 
 target_link_libraries(TestGenerator
     PRIVATE     CommonProjectWarnings
-                Conversion::Common
                 CsvImporter
 )
 
