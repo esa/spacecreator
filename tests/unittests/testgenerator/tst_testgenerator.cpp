@@ -20,7 +20,6 @@
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
-#include <conversion/common/options.h>
 #include <csv/CsvImporter/csvimporter.h>
 #include <csv/CsvOptions/options.h>
 #include <qtestcase.h>
@@ -37,7 +36,15 @@ private Q_SLOTS:
 
 void tst_testgenerator::testEmpty()
 {
-    QFAIL("this shall happen");
+    csv::importer::CsvImporter importer;
+    csv::importer::Options options;
+    options.add(csv::importer::CsvOptions::separator, ",");
+    options.add(csv::importer::CsvOptions::inputFilepath, "resources/test_data.csv");
+
+    auto csvModel = importer.importModel(options);
+    (void)csvModel;
+
+    QFAIL("This shall happen");
 }
 
 } // namespace tests::testgenerator

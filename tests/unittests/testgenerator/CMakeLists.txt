@@ -19,4 +19,6 @@ target_link_libraries(${TEST_NAME}
                 CommonProjectWarnings
 )
 
+configure_file(resources/test_data.csv resources/test_data.csv COPYONLY)
+
 add_format_target(${TEST_NAME})
