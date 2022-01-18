@@ -26,15 +26,39 @@ namespace csv {
 
 typedef QString Field;
 
+/**
+ * @brief   Represents CSV row
+ *
+ * Could store either data or header (labels)
+ */
 class Row
 {
 public:
+    /**
+     * @brief   Construct a new Row object
+     *
+     */
     Row();
 
+    /**
+     * @brief   Construct a new Row object
+     *
+     * @param   fields fields for this Row
+     */
     Row(const QStringList &fields);
 
+    /**
+     * @brief   Getter for the fields
+     *
+     * @return  Fields
+     */
     auto fields() const -> std::vector<Field>;
 
+    /**
+     * @brief   Add a given field
+     *
+     * @param   field a field to be added
+     */
     auto addField(const Field &field) -> void;
 
 private:
