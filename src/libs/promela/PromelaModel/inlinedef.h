@@ -67,8 +67,17 @@ public:
      */
     void setSequence(Sequence sequence);
 
+    /**
+     * @brief Getter for arguments of inline definition
+     *
+     * @return arguments of inline definition
+     */
     const QList<QString> &getArguments() const noexcept;
-
+    /**
+     * @brief Setter for arguments of inline definition
+     *
+     * @param arguments arguments of inline definition
+     */
     void setArguments(const QList<QString> &arguments);
 
 private:

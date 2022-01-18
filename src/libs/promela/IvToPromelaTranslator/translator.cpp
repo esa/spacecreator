@@ -154,14 +154,17 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *
     std::unique_ptr<ProctypeElement> waitForInit = std::make_unique<ProctypeElement>(Expression(VariableRef("inited")));
     sequence.appendElement(std::move(waitForInit));
 
-    std::unique_ptr<ProctypeElement> variableDecl = std::make_unique<ProctypeElement>(Declaration(
-            parameterType.isEmpty() ? DataType(BasicType::INT) : DataType(UtypeRef(parameterType)), "var0"));
+    const QString &signalParameterName = "signal_parameter";
+
+    std::unique_ptr<ProctypeElement> variableDecl = std::make_unique<ProctypeElement>(
+            Declaration(parameterType.isEmpty() ? DataType(BasicType::INT) : DataType(UtypeRef(parameterType)),
+                    signalParameterName));
     sequence.appendElement(std::move(variableDecl));
 
     std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>();
 
     QList<VariableRef> params;
-    params.append(VariableRef("var0"));
+    params.append(VariableRef(parameterType.isEmpty() ? QString("_") : signalParameterName));
     std::unique_ptr<ProctypeElement> channelReceive =
             std::make_unique<ProctypeElement>(ChannelRecv(VariableRef(channelName), params));
 
@@ -173,7 +176,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *
         loopSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(piName, {})));
     } else {
         QList<VariableRef> arguments;
-        arguments.append(VariableRef("var0"));
+        arguments.append(VariableRef(signalParameterName));
         loopSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(piName, arguments)));
     }
 

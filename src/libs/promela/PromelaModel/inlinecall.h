@@ -35,6 +35,7 @@ public:
      * @brief Constructor
      *
      * @param name name of inline
+     * @param arguments list of arguments
      */
     InlineCall(QString name, const QList<VariableRef> &arguments);
 
@@ -44,7 +45,11 @@ public:
      * @return Name of inline
      */
     const QString &getName() const noexcept;
-
+    /**
+     * @brief Getter for arguments of inline call
+     *
+     * @return List of inline arguments.
+     */
     const QList<VariableRef> &getArguments() const noexcept;
 
 private:
