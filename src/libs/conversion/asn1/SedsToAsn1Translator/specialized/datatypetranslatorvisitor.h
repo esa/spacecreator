@@ -180,10 +180,11 @@ private:
      * @brief   Translate SEDS core float encoding and precision
      *
      * @param   coreEncoding    Encoding to translatoe
+     * @param   bits            Number of bits for the encoding
      * @param   asn1Type        ASN.1 type that will be updated
      */
-    auto translateCoreEncodingAndPrecision(
-            seds::model::CoreEncodingAndPrecision coreEncoding, Asn1Acn::Types::Real *asn1Type) const -> void;
+    auto translateCoreEncodingAndPrecision(seds::model::CoreEncodingAndPrecision coreEncoding, uint64_t bits,
+            Asn1Acn::Types::Real *asn1Type) const -> void;
     /**
      * @brief   Translate SEDS core string encoding
      *
