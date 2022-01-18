@@ -131,11 +131,13 @@ const seds::model::DataType *DataTypesDependencyResolver::findDataType(const sed
         return *result;
     }
 
-    result = std::find_if(m_globalDataTypes->begin(), m_globalDataTypes->end(),
-            [&dataTypeRef](const auto *dataType) { return dataTypeNameStr(*dataType) == dataTypeRef.nameStr(); });
+    if (m_globalDataTypes) {
+        result = std::find_if(m_globalDataTypes->begin(), m_globalDataTypes->end(),
+                [&dataTypeRef](const auto *dataType) { return dataTypeNameStr(*dataType) == dataTypeRef.nameStr(); });
 
-    if (result != m_globalDataTypes->end()) {
-        return *result;
+        if (result != m_globalDataTypes->end()) {
+            return *result;
+        }
     }
 
     throw UndeclaredDataTypeException(dataTypeRef.nameStr());
