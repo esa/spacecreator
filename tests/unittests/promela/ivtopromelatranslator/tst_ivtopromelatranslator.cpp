@@ -47,6 +47,7 @@ private Q_SLOTS:
     void cleanupTestCase();
 
     void testSimple();
+    void testParameters();
 
 private:
     std::unique_ptr<ivm::IVModel> importIvModel(const QString &filepath);
@@ -177,16 +178,143 @@ void tst_IvToPromelaTranslator::testSimple()
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_test");
         QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 0);
     }
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_RI_0_success");
         QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 0);
     }
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_RI_0_fail");
         QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 0);
+    }
+}
+
+void tst_IvToPromelaTranslator::testParameters()
+{
+    std::unique_ptr<ivm::IVModel> ivModel = importIvModel("interface_params.xml");
+    QVERIFY(ivModel);
+    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel));
+    QVERIFY(promelaModel);
+
+    QCOMPARE(promelaModel->getIncludes().size(), 3);
+    QVERIFY(promelaModel->getIncludes().indexOf("dataview.pml") >= 0);
+    QVERIFY(promelaModel->getIncludes().indexOf("controller.pml") >= 0);
+    QVERIFY(promelaModel->getIncludes().indexOf("actuator.pml") >= 0);
+
+    QCOMPARE(promelaModel->getUtypes().size(), 1);
+
+    const auto &systemState = promelaModel->getUtypes().first();
+    QCOMPARE(systemState.getName(), "system_state");
+    QCOMPARE(systemState.isUnionType(), false);
+    QCOMPARE(systemState.getFields().size(), 2);
+    {
+        const Declaration *controller = findDeclaration(systemState.getFields(), "controller");
+        QVERIFY(controller != nullptr);
+        QVERIFY(controller->getType().isUtypeReference());
+        QCOMPARE(controller->getType().getUtypeReference().getName(), "Controller_Context");
+        QCOMPARE(controller->getVisibility(), Declaration::Visibility::NORMAL);
+    }
+    {
+        const Declaration *actuator = findDeclaration(systemState.getFields(), "actuator");
+        QVERIFY(actuator != nullptr);
+        QVERIFY(actuator->getType().isUtypeReference());
+        QCOMPARE(actuator->getType().getUtypeReference().getName(), "Actuator_Context");
+        QCOMPARE(actuator->getVisibility(), Declaration::Visibility::NORMAL);
+    }
+
+    QCOMPARE(promelaModel->getDeclarations().size(), 5);
+
+    {
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "global_state");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isUtypeReference());
+        QCOMPARE(declaration->getType().getUtypeReference().getName(), "system_state");
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+    }
+
+    {
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "inited");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::INT);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+    }
+
+    {
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "actuator_work_channel");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+
+    {
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "controller_result_channel");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+
+    {
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "controller_error_channel");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+
+    QVERIFY(promelaModel->hasInit());
+
+    QCOMPARE(promelaModel->getProctypes().size(), 3);
+
+    {
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "actuator_work");
+        QVERIFY(proctype != nullptr);
+        QVERIFY(proctype->isActive());
+        QCOMPARE(proctype->getInstancesCount(), 1);
+    }
+
+    {
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "controller_result");
+        QVERIFY(proctype != nullptr);
+        QVERIFY(proctype->isActive());
+        QCOMPARE(proctype->getInstancesCount(), 1);
+    }
+
+    {
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "controller_error");
+        QVERIFY(proctype != nullptr);
+        QVERIFY(proctype->isActive());
+        QCOMPARE(proctype->getInstancesCount(), 1);
+    }
+
+    QCOMPARE(promelaModel->getInlineDefs().size(), 3);
+
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_work");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+    }
+
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_RI_0_result");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+    }
+
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_RI_0_error");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 0);
     }
 }
 

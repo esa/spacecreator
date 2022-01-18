@@ -15,5 +15,6 @@ target_link_libraries(${TEST_NAME}
                 Qt${QT_VERSION_MAJOR}::Test)
 
 configure_file(resources/parameterless.xml parameterless.xml COPYONLY)
+configure_file(resources/interface_params.xml interface_params.xml COPYONLY)
 
 add_format_target(${TEST_NAME})
