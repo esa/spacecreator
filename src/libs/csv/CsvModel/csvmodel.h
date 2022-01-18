@@ -30,6 +30,7 @@ namespace csv {
 /**
  * @brief   Represents CSV data model
  *
+ * Based on RFC 4180: https://www.ietf.org/rfc/rfc4180.txt
  */
 class CsvModel : public conversion::Model
 {
@@ -41,18 +42,53 @@ public:
      */
     virtual auto modelType() const -> conversion::ModelType override;
 
+    /**
+     * @brief   Getter for data header (column labels)
+     *
+     * @return  Header
+     */
     auto header() -> Row;
 
+    /**
+     * @brief   Getter for data records
+     *
+     * @return  Data records
+     */
     auto records() -> const std::vector<std::unique_ptr<Row>> &;
 
+    /**
+     * @brief   Getter for a separator to be used when importing data
+     *
+     * @return  Separator
+     */
     auto separator() -> QString;
 
+    /**
+     * @brief   Set the data header
+     *
+     * @param   header row of labels
+     */
     auto setHeader(const Row &header) -> void;
 
+    /**
+     * @brief   Set the data header
+     *
+     * @param   header list of labels
+     */
     auto setHeader(const QStringList &header) -> void;
 
+    /**
+     * @brief   Add a data record to this model
+     *
+     * @param   record record with data
+     */
     auto addRecord(std::unique_ptr<Row> record) -> void;
 
+    /**
+     * @brief   Set the separator
+     *
+     * @param   separator separator used
+     */
     auto setSeparator(const QString &separator) -> void;
 
 private:
