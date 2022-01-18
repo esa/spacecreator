@@ -129,7 +129,6 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 
     if (sedsType.isAbstract()) {
         cacheAbstractContainerEntries(sedsType);
-        createRealizationContainerField(type.get());
     } else {
         EntryTranslatorVisitor visitor { m_asn1Definitions, type.get() };
 
@@ -599,10 +598,8 @@ void DataTypeTranslatorVisitor::updateParentContainer(
 
     auto *asn1RealizationComponent = asn1BaseSequence->component(m_realizationComponentsName);
     if (!asn1RealizationComponent) {
-        auto errorMessage = QString("Missing %1 component in the '%2' base component")
-                                    .arg(m_realizationComponentsName)
-                                    .arg(sedsBaseTypeName);
-        throw TranslationException(std::move(errorMessage));
+        createRealizationContainerField(asn1BaseSequence);
+        asn1RealizationComponent = asn1BaseSequence->component(m_realizationComponentsName);
     }
 
     auto *asn1RealizationChoice = dynamic_cast<Asn1Acn::Types::Choice *>(asn1RealizationComponent->type());

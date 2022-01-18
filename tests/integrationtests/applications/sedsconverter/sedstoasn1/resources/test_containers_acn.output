@@ -10,6 +10,8 @@ BasicContainer []
 }
 BinaryPattern []
 PacketId [size 8, encoding pos-int, endianness big]
+EmptyContainer []
+EmptyAbstractContainer[]
 PayloadBase []
 {
     realization []
