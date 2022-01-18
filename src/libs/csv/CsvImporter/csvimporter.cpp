@@ -51,11 +51,11 @@ auto CsvImporter::importModel(const conversion::Options &options) const -> std::
 
     auto model = std::make_unique<CsvModel>();
 
-    model->setSeparator(options.value(CsvOptions::separator).value_or(","));
+    const QString separator = options.value(CsvOptions::separator).value_or(",");
 
     bool labelsImported = false;
     while (!importedFileTextStream.atEnd()) {
-        const QStringList words = importedFileTextStream.readLine().split(model->separator());
+        const QStringList words = importedFileTextStream.readLine().split(separator);
         if (labelsImported) {
             if (!words.empty()) {
                 model->addRecord(std::make_unique<Row>(words));

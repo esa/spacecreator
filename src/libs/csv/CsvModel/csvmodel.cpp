@@ -41,11 +41,6 @@ const std::vector<std::unique_ptr<Row>> &CsvModel::records()
     return m_records;
 }
 
-QString CsvModel::separator()
-{
-    return m_separator;
-}
-
 void CsvModel::setHeader(const Row &header)
 {
     m_header = header;
@@ -62,11 +57,6 @@ void CsvModel::setHeader(const QStringList &header)
 void CsvModel::addRecord(std::unique_ptr<Row> record)
 {
     m_records.push_back(std::move(record));
-}
-
-void CsvModel::setSeparator(const QString &separator)
-{
-    m_separator = separator;
 }
 
 } // csv

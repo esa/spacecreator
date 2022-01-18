@@ -57,13 +57,6 @@ public:
     auto records() -> const std::vector<std::unique_ptr<Row>> &;
 
     /**
-     * @brief   Getter for a separator to be used when importing data
-     *
-     * @return  Separator
-     */
-    auto separator() -> QString;
-
-    /**
      * @brief   Set the data header
      *
      * @param   header row of labels
@@ -84,17 +77,9 @@ public:
      */
     auto addRecord(std::unique_ptr<Row> record) -> void;
 
-    /**
-     * @brief   Set the separator
-     *
-     * @param   separator separator used
-     */
-    auto setSeparator(const QString &separator) -> void;
-
 private:
     Row m_header;
     std::vector<std::unique_ptr<Row>> m_records;
-    QString m_separator = ",";
 };
 
 } // namespace csv

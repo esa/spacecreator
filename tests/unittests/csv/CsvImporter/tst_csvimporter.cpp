@@ -34,13 +34,11 @@
 
 using conversion::ModelType;
 using conversion::Options;
-// using conversion::importer::ImportException;
 using csv::CsvModel;
 using csv::CsvOptions;
 using csv::Field;
 using csv::Row;
 using csv::importer::CsvImporter;
-// using tests::common::CsvFieldBuilder;
 
 namespace tests::csv {
 
@@ -88,7 +86,6 @@ void tst_csvimporter::testEmpty()
     auto *const csvModel = dynamic_cast<CsvModel *>(model.get());
     QVERIFY(csvModel != nullptr);
     QCOMPARE(csvModel->modelType(), ModelType::Csv);
-    QCOMPARE(csvModel->separator(), ",");
 
     checkExpectedFields({}, csvModel->header());
     checkExpectedRecords({}, csvModel->records());
@@ -105,7 +102,6 @@ void tst_csvimporter::testHeaderOnly()
     auto *const csvModel = dynamic_cast<CsvModel *>(model.get());
     QVERIFY(csvModel != nullptr);
     QCOMPARE(csvModel->modelType(), ModelType::Csv);
-    QCOMPARE(csvModel->separator(), ",");
 
     checkExpectedFields({ "name", "2nd name", "date of birth", "address" }, csvModel->header());
     checkExpectedRecords({}, csvModel->records());
@@ -122,7 +118,6 @@ void tst_csvimporter::testOneRowWithHeader()
     auto *const csvModel = dynamic_cast<CsvModel *>(model.get());
     QVERIFY(csvModel != nullptr);
     QCOMPARE(csvModel->modelType(), ModelType::Csv);
-    QCOMPARE(csvModel->separator(), ",");
 
     checkExpectedFields({ "posX", "posY", "temp" }, csvModel->header());
     checkExpectedRecords({ { "1", "3.2", "-10.0" } }, csvModel->records());
@@ -139,7 +134,6 @@ void tst_csvimporter::testTwoRowsWithHeader()
     auto *const csvModel = dynamic_cast<CsvModel *>(model.get());
     QVERIFY(csvModel != nullptr);
     QCOMPARE(csvModel->modelType(), ModelType::Csv);
-    QCOMPARE(csvModel->separator(), ",");
 
     checkExpectedFields({ "posX", "posY", "temp" }, csvModel->header());
     checkExpectedRecords(
@@ -161,7 +155,6 @@ void tst_csvimporter::testTwoRowsNoHeader()
     auto *const csvModel = dynamic_cast<CsvModel *>(model.get());
     QVERIFY(csvModel != nullptr);
     QCOMPARE(csvModel->modelType(), ModelType::Csv);
-    QCOMPARE(csvModel->separator(), ",");
 
     checkExpectedFields({}, csvModel->header());
     checkExpectedRecords(
@@ -183,7 +176,6 @@ void tst_csvimporter::testManyRowsWithHeader()
     auto *const csvModel = dynamic_cast<CsvModel *>(model.get());
     QVERIFY(csvModel != nullptr);
     QCOMPARE(csvModel->modelType(), ModelType::Csv);
-    QCOMPARE(csvModel->separator(), ",");
 
     checkExpectedFields({ "posX", "posY", "temp" }, csvModel->header());
     checkExpectedRecords(
@@ -209,7 +201,6 @@ void tst_csvimporter::testManyRowsNoHeader()
     auto *const csvModel = dynamic_cast<CsvModel *>(model.get());
     QVERIFY(csvModel != nullptr);
     QCOMPARE(csvModel->modelType(), ModelType::Csv);
-    QCOMPARE(csvModel->separator(), ",");
 
     checkExpectedFields({}, csvModel->header());
     checkExpectedRecords(
