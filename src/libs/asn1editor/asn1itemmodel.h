@@ -79,19 +79,6 @@ private:
 
     QStandardItem *createPresentItem();
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
-
-    template<typename ValueType>
-    std::optional<Asn1Acn::Range<typename ValueType::Type>> combineRanges(
-            const Asn1Acn::Constraints::ConstraintList<ValueType> &constraintList);
-    template<typename ValueType>
-    std::optional<Asn1Acn::Range<typename ValueType::Type>> combineRange(
-            const Asn1Acn::Constraints::Constraint<ValueType> *constraint);
-
-    template<typename ValueType>
-    std::optional<Asn1Acn::Range<int64_t>> combineSizes(
-            const Asn1Acn::Constraints::ConstraintList<ValueType> &constraintList);
-    template<typename ValueType>
-    std::optional<Asn1Acn::Range<int64_t>> combineSize(const Asn1Acn::Constraints::Constraint<ValueType> *constraint);
 };
 
 } // namespace asn1
