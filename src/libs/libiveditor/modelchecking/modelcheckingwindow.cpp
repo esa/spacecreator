@@ -685,36 +685,29 @@ void ModelCheckingWindow::addProperty()
             // set path to project dir
             QString qDirAppPath = QDir::currentPath();
             QDir::setCurrent(this->projectDir+"/");
-            makeCallerProcess->start(makeCall);
-            if (!makeCallerProcess->waitForStarted(10000)) {
+            if (makeCallerProcess->execute(makeCall)) {
                 QMessageBox::warning(this, tr("Add property"),
                                      tr("Error executing '%1'").arg(makeCall));
-                return;
-            } else {
-                // WAITS property dir/file is created by make
-                int timeout = 0;
-                if (!QDir(filePath).exists() && timeout < 5){
-                    QThread::sleep(1);
-                    timeout++;
-                }
-                // REFRESH TREEVIEW with preselection
-                QFileInfo propertiesFileInfo(this->propertiesPath);
-                // save user selection
-                QStringList preSelection = getPropertiesSelection(this->propertiesTopDirWidgetItem, {});
-                // save user expanded nodes
-                QStringList expandedNodes = getExpandedNodes(this->propertiesTopDirWidgetItem, {this->propertiesTopDirWidgetItem->text(0)});
-                // destroy tree except root
-                QTreeWidgetItem *treeRoot = this->propertiesTopDirWidgetItem;
-                for (int i = treeRoot->childCount(); i > 0; i--){
-                    treeRoot->removeChild(treeRoot->child(i-1));
-                }
-                // rebuild tree with saved selection
-                this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, preSelection, expandedNodes));
-
-                if (QDir(filePath).exists() && !QDir(filePath).isEmpty()){
-                    statusBar()->showMessage("Property " + propertyName + " added.", 6000);
-                }
             }
+
+            // REFRESH TREEVIEW with preselection
+            QFileInfo propertiesFileInfo(this->propertiesPath);
+            // save user selection
+            QStringList preSelection = getPropertiesSelection(this->propertiesTopDirWidgetItem, {});
+            // save user expanded nodes
+            QStringList expandedNodes = getExpandedNodes(this->propertiesTopDirWidgetItem, {this->propertiesTopDirWidgetItem->text(0)});
+            // destroy tree except root
+            QTreeWidgetItem *treeRoot = this->propertiesTopDirWidgetItem;
+            for (int i = treeRoot->childCount(); i > 0; i--){
+                treeRoot->removeChild(treeRoot->child(i-1));
+            }
+            // rebuild tree with saved selection
+            this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, preSelection, expandedNodes));
+
+            if (QDir(filePath).exists() && !QDir(filePath).isEmpty()){
+                statusBar()->showMessage("Property " + propertyName + " added.", 6000);
+            }
+
             // reset path
             QDir::setCurrent(qDirAppPath);
         }
@@ -990,11 +983,11 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
 
     // check if current configuration is valid
     QString warningMsg = "Current invalid configuration.";
-    if (propsSelection.size() < 1) {
+    /*if (propsSelection.size() < 1) {
         QMessageBox::warning(this, tr("Save configuration"),
                              warningMsg.append(" Select at least one property."));
         return;
-    }
+    }*/
     if (subtypesSelection.size() > 1){
         QMessageBox::warning(this, tr("Save configuration"),
                              warningMsg.append(" Select up to one subtyping."));
@@ -1053,11 +1046,11 @@ bool ModelCheckingWindow::saveConfiguration()
 
     // check if current configuration is valid
     QString warningMsg = "Current invalid configuration.";
-    if (propsSelection.size() < 1) {
+    /*if (propsSelection.size() < 1) {
         QMessageBox::warning(this, tr("Save configuration"),
                              warningMsg.append(" Select at least one property."));
         return false;
-    }
+    }*/
     if (subtypesSelection.size() > 1){
         QMessageBox::warning(this, tr("Save configuration"),
                              warningMsg.append(" Select up to one subtyping."));
@@ -1133,13 +1126,9 @@ void ModelCheckingWindow::on_pushButton_loadConfiguration_clicked()
 
     // set all user selections
     setPropertiesSelection(reader.getPropertiesSelected());
-    //qDebug() << reader.getPropertiesSelected();
     setSubtypesSelection(reader.getSubtypesSelected());
-    //qDebug() << reader.getSubtypesSelected();
     setFunctionsSelection(reader.getFunctionsSelected());
-    //qDebug() << reader.getFunctionsSelected();
 
-    //qDebug() << reader.getIfConfig().at(0);
     // set IF config params
     d->ui->lineEdit_maxNumScenarios->setText(reader.getIfConfig().at(0));
     reader.getIfConfig().at(1) == "true" ? d->ui->checkBox_errorScenarios->setCheckState(Qt::Checked) : d->ui->checkBox_errorScenarios->setCheckState(Qt::Unchecked);
@@ -1149,7 +1138,7 @@ void ModelCheckingWindow::on_pushButton_loadConfiguration_clicked()
     reader.getIfConfig().at(5) == "dfs" ? d->ui->comboBox_expAlgorithm->setCurrentIndex(0) : d->ui->comboBox_expAlgorithm->setCurrentIndex(1);
     d->ui->lineEdit_maxNumStates->setText(reader.getIfConfig().at(6));
 
-    statusBar()->showMessage(tr("Configuration file loaded"), 6000);
+    statusBar()->showMessage("Configuration file " + file.fileName() + " loaded", 6000);
 }
 
 
@@ -1158,13 +1147,17 @@ void ModelCheckingWindow::setPropertiesSelection(QStringList propertiesSelected)
     Q_ASSERT(propertiesSelected.size() > 0);
 
     QFileInfo propertiesFileInfo(this->propertiesPath);
+
+    // save user expanded nodes
+    QStringList expandedNodes = getExpandedNodes(this->propertiesTopDirWidgetItem, {this->propertiesTopDirWidgetItem->text(0)});
+
     // destroy tree except root
     QTreeWidgetItem *treeRoot = this->propertiesTopDirWidgetItem;
     for (int i = treeRoot->childCount(); i > 0; i--){
         treeRoot->removeChild(treeRoot->child(i-1));
     }
     // rebuild tree with selection
-    this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, propertiesSelected, {}));
+    this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, propertiesSelected, expandedNodes));
 
 }
 

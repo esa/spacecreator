@@ -59,7 +59,6 @@ int XmelReader::readXMEL()
 
     while (xml.readNextStartElement()) {
         if (xml.name() == QLatin1String("ModelCheckingWindow")){
-            //qDebug("Entering element %s", qPrintable(xml.name().toString()));
             if (readModelCheckingWindow() != 0) return -1;
         }
         else {
@@ -76,19 +75,15 @@ int XmelReader::readModelCheckingWindow()
 
     while (xml.readNextStartElement()) {
         if (xml.name() == QLatin1String("Configuration")){
-            //qDebug("Entering element %s", qPrintable(xml.name().toString()));
             if (readConfiguration() != 0) return -1;
         }
         else if (xml.name() == QLatin1String("NativeModelChecker")){
-            //qDebug("Entering element %s", qPrintable(xml.name().toString()));
             xml.skipCurrentElement();
         }
         else if (xml.name() == QLatin1String("IFModelChecker")){
-            //qDebug("Entering element %s", qPrintable(xml.name().toString()));
             if (!readIfModelChecker()) return -2;
         }
         else if (xml.name() == QLatin1String("SPINModelChecker")){
-            //qDebug("Entering element %s", qPrintable(xml.name().toString()));
             xml.skipCurrentElement();
         }
         else {
@@ -105,15 +100,12 @@ int XmelReader::readConfiguration()
 
     while (xml.readNextStartElement()) {
         if (xml.name() == QLatin1String("Properties")){
-            //qDebug("Entering element %s", qPrintable(xml.name().toString()));
             if (!readProperties()) return -1;
         }
         else if (xml.name() == QLatin1String("Subtyping")){
-            //qDebug("Entering element %s", qPrintable(xml.name().toString()));
             if (!readSubtyping()) return -2;
         }
         else if (xml.name() == QLatin1String("Submodel")){
-            //qDebug("Entering element %s", qPrintable(xml.name().toString()));
             if (!readSubmodel()) return -3;
         }
         else {
@@ -130,24 +122,17 @@ bool XmelReader::readProperties()
 
     propertiesSelected.clear();
 
-    bool hasProp = false;
-
     while (xml.readNextStartElement()) {
         if (xml.name() == QLatin1String("Property")){
-            //qDebug("Entering element %s", qPrintable(xml.name().toString()));
             Q_ASSERT(xml.attributes().hasAttribute("path"));
-            //qDebug("propertiesSelected.append");
             propertiesSelected.append(xml.attributes().value("path").toString());
-            hasProp = true;
             xml.skipCurrentElement();
         } else {
-            //qDebug("skipCurrentElement");
             xml.skipCurrentElement();
         }
     }
 
-    //qDebug("return hasProp");
-    return hasProp;
+    return true;
 }
 
 bool XmelReader::readSubtyping()
@@ -174,13 +159,11 @@ bool XmelReader::readSubmodel()
 
     while (xml.readNextStartElement()) {
         if (xml.name() == QLatin1String("Function")){
-            //qDebug("Entering element %s", qPrintable(xml.name().toString()));
             Q_ASSERT(xml.attributes().hasAttribute("name"));
             functionsSelected.append(xml.attributes().value("name").toString());
             hasFunction = true;
             xml.skipCurrentElement();
         } else {
-            //qDebug("skipCurrentElement");
             xml.skipCurrentElement();
         }
     }
