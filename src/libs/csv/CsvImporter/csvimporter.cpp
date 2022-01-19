@@ -58,14 +58,15 @@ auto CsvImporter::importModel(const Options &options) const -> std::unique_ptr<C
             }
         } else {
             if (!words.isEmpty() && !words.first().isEmpty()) {
-                bool notNumber = true;
-                std::for_each(words.begin(), words.end(), [&notNumber](const QString &word) {
-                    QRegExp numberFormat("\\d*\\.{0,1}\\d*"); // digits, optional dot, digits
-                    if (numberFormat.exactMatch(word)) {
-                        notNumber = false;
+                bool isNumber = false;
+                std::for_each(words.begin(), words.end(), [&isNumber](const QString &word) {
+                    bool conversionSuccessfull = false;
+                    word.toDouble(&conversionSuccessfull);
+                    if (conversionSuccessfull) {
+                        isNumber = true;
                     }
                 });
-                if (notNumber) {
+                if (!isNumber) {
                     model->setHeader(words);
                 } else if (!words.empty()) {
                     model->addRecord(std::make_unique<Row>(words));
@@ -75,7 +76,7 @@ auto CsvImporter::importModel(const Options &options) const -> std::unique_ptr<C
         }
     }
 
-    return std::move(model);
+    return model;
 }
 
 } // namespace csv::importer
