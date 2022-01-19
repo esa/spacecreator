@@ -1,12 +1,13 @@
 #include "C/src/testdriver.h"
 
-#define TEST_DATA_SIZE 5
+#define TEST_DATA_SIZE 6
 
 typedef struct {
-    asn1SccMyInteger posX;
-    asn1SccMyInteger posY;
-    asn1SccMyInteger temp;
-    asn1SccMyInteger result;
+    asn1SccMyBool active_in;
+    asn1SccMyReal temp_in;
+    asn1SccMyInteger posX_in;
+    asn1SccMyInteger posY_in;
+    asn1SccMyInteger result_out;
 } TestVector;
 
 extern TestVector testData[TEST_DATA_SIZE];
@@ -18,11 +19,9 @@ void testdriver_RI_InterfaceUnderTest(const asn1SccMyBool *active_in, const asn1
     (void)temp_in;
     (void)posX_in;
     (void)posY_in;
-    (void)result_out;
 
-    for (int i = 0; i < TEST_DATA_SIZE; i++) {
-        testData[i].result++;
-    }
+    *result_out = 42;
+    puts("im called");
 }
 
 int main(void)
@@ -34,7 +33,7 @@ int main(void)
     testdriver_PI_StartTest();
 
     for (int i = 0; i < TEST_DATA_SIZE; i++) {
-        printf("result %d after test: %d\n", i, testData[i].result);
+        printf("result %d after test: %d\n", i, testData[i].result_out);
     }
 
     return 0;
