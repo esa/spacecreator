@@ -17,6 +17,7 @@ target_include_directories(TestGenerator
 target_link_libraries(TestGenerator
     PRIVATE     CommonProjectWarnings
                 CsvImporter
+                ivcore
 )
 
 add_format_target(TestGenerator)

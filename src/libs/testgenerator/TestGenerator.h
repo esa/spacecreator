@@ -19,14 +19,16 @@
 
 #pragma once
 
-// #include <csv/CsvModel/csvmodel.h>
+#include <csv/CsvModel/csvmodel.h>
+#include <ivcore/ivinterface.h>
 
 namespace testgenerator {
 
 class TestGenerator final
 {
 public:
-    //     static auto generateTestDriver(const csv::CsvModel &testVectors) -> void;
+    static auto generateTestDriver(
+            const csv::CsvModel &testVectors, const ivm::IVInterface &interface, const QString &outputFilepath) -> void;
 
 private:
     // this will be empty?

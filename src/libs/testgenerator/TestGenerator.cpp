@@ -21,4 +21,10 @@
 
 namespace testgenerator {
 
+auto TestGenerator::generateTestDriver(const csv::CsvModel &testVectors, const ivm::IVInterface &interface) -> void
+{
+    (void)testVectors;
+    (void)interface;
+}
+
 } // testgenerator
