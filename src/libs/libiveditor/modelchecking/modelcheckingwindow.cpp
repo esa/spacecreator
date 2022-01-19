@@ -472,8 +472,8 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     QString qDirAppPath = QDir::currentPath();
     QDir::setCurrent(this->projectDir+"/");
 
-    // REMOVE statusfile and callif.sh
-    QString rmFilesCmd = "rm -f statusfile callif.sh";
+    // REMOVE statusfile, callif.sh and callpy.sh
+    QString rmFilesCmd = "rm -f statusfile callif.sh callpy.sh";
     if (QProcess::execute(rmFilesCmd) != 0) {
         QMessageBox::warning(this, tr("Call IF"),
                              "Error executing: " + rmFilesCmd);
@@ -527,7 +527,7 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
         //return;
     }
 
-    // REMOVE statusfile and callif.sh
+    // REMOVE statusfile, callif.sh and callpy.sh
     if (QProcess::execute(rmFilesCmd) != 0) {
         QMessageBox::warning(this, tr("Call IF"),
                              "Error executing: " + rmFilesCmd);
@@ -555,12 +555,22 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     }
     statusBar()->showMessage("Scenarios were found!", 6000);
 
+    // CREATE callpy.sh
     QDir::setCurrent(this->outputPath+"/");
     //TODO remove python3 and script path
-    QString scn2mscCmd = "python3 /home/taste/work/if-model-checking/modules/scn2msc/scn2msc.py *.scn " + this->configurationsPath + "/.mcconfig.xml";
-    if (QProcess::execute(scn2mscCmd) != 0) {
+    QString scn2mscCmd = "python3 /home/taste/tool-src/if-model-checking/modules/scn2msc/scn2msc.py *.scn " + this->configurationsPath + "/.mcconfig.xml";
+    QFile callPyFile("callpy.sh");
+    if(callPyFile.open(QIODevice::ReadWrite)){
+        QTextStream stream(&callPyFile);
+        stream << "#!/bin/bash" << endl;
+        stream << scn2mscCmd << endl;
+    }
+    Q_ASSERT(QDir("callpy.sh").exists());
+
+    // CALL callpy.sh
+    if (QProcess::execute("sh callpy.sh") != 0) {
         QMessageBox::warning(this, tr("Call IF"),
-                             "Error when calling: " + scn2mscCmd);
+                             "Error when calling: sh callpy.sh");
         // reset path
         QDir::setCurrent(qDirAppPath);
         //return;
@@ -649,23 +659,24 @@ void ModelCheckingWindow::addProperty()
             return;
         }
         bool ok2;
-        QString label = "Property name: (no whitespaces)                                                                             ";
+        QString label = "Property name: (no whitespace or '-')                                                                             ";
         QString propertyName = QInputDialog::getText(this, "New " + propertyType,
                                                 label, QLineEdit::Normal,
-                                                "new-property", &ok2);
+                                                "new_property", &ok2);
 
         if (ok2 && !propertyName.isEmpty()){
             // CHECK FILE NAME
-            // use "-"s instead of whitespaces, if existing
-            propertyName.replace(" ", "-");
+            // use "_" instead of whitespace or '-', if existing
+            propertyName.replace(" ", "_");
+            propertyName.replace("-", "_");
             // check if file with same name exists already, append suffix in that case
             QFile file;
             QString filePath = this->propertiesPath + "/" + propertyName;
             file.setFileName(filePath);
             while(file.exists())
             {
-                filePath = filePath + "-1";
-                propertyName = propertyName + "-1";
+                filePath = filePath + "_1";
+                propertyName = propertyName + "_1";
                 file.setFileName(filePath);
             }
             // CALL MAKE RULE
@@ -775,11 +786,11 @@ void ModelCheckingWindow::addSubtypes()
 {
     bool ok;
     QString subtypingFileName = QInputDialog::getText(this, tr("New subtypes"),
-                                            tr("Subtyping file name (no whitespaces):"), QLineEdit::Normal,
+                                            tr("Subtyping file name (no whitespace):"), QLineEdit::Normal,
                                             "new-subtypes", &ok);
     if (ok && !subtypingFileName.isEmpty()){
         // CHECK FILE NAME
-        // use "-"s instead of whitespaces, if existing
+        // use "-" instead of whitespace, if existing
         subtypingFileName.replace(" ", "-");
         // check if file with same name exists already, append suffix in that case
         QFile file;
@@ -947,13 +958,13 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
 {
     // Ask user for file name
     bool ok;
-    QString label = "Configuration file name: (no whitespaces)                   ";
+    QString label = "Configuration file name: (no whitespace)                   ";
     QString configurationFileName = QInputDialog::getText(this, tr("Save MC configuration"),
                                             label, QLineEdit::Normal,
                                             "my-config", &ok);
     QFile file;
     if (ok && !configurationFileName.isEmpty()){
-        // use "-"s instead of whitespaces, if existing
+        // use "-" instead of whitespace, if existing
         configurationFileName.replace(" ", "-");
         // check if configurations dir exists and create it otherwise
         if (!QDir(this->configurationsPath).exists()){
