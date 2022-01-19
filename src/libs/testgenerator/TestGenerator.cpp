@@ -21,7 +21,7 @@
 
 namespace testgenerator {
 
-auto TestGenerator::generateTestDriver(const csv::CsvModel &testVectors, const ivm::IVInterface &interface) -> void
+auto generateTestDriver(const csv::CsvModel &testVectors, const ivm::IVInterface &interface) -> QTextStream
 {
     (void)testVectors;
     (void)interface;

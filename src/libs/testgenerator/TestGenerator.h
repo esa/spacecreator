@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <QTextStream>
 #include <csv/CsvModel/csvmodel.h>
 #include <ivcore/ivinterface.h>
 
@@ -27,8 +28,7 @@ namespace testgenerator {
 class TestGenerator final
 {
 public:
-    static auto generateTestDriver(
-            const csv::CsvModel &testVectors, const ivm::IVInterface &interface, const QString &outputFilepath) -> void;
+    static auto generateTestDriver(const csv::CsvModel &testVectors, const ivm::IVInterface &interface) -> QTextStream;
 
 private:
     // this will be empty?
