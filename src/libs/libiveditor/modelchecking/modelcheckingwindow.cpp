@@ -949,29 +949,25 @@ void ModelCheckingWindow::refreshView()
 
 void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
 {
+    // check if configurations dir exists and create it otherwise
+    if (!QDir(this->configurationsPath).exists()){
+        QDir().mkdir(this->configurationsPath);
+    }
+
     // Ask user for file name
-    bool ok;
-    QString label = "Configuration file name: (no whitespace)                   ";
-    QString configurationFileName = QInputDialog::getText(this, tr("Save MC configuration"),
-                                            label, QLineEdit::Normal,
-                                            "my-config", &ok);
-    QFile file;
-    if (ok && !configurationFileName.isEmpty()){
-        // use "-" instead of whitespace, if existing
-        configurationFileName.replace(" ", "-");
-        // check if configurations dir exists and create it otherwise
-        if (!QDir(this->configurationsPath).exists()){
-            QDir().mkdir(this->configurationsPath);
+    QString configurationFileName =
+            QFileDialog::getSaveFileName(this, tr("Save configuration file"),
+                                         this->configurationsPath,
+                                         tr("XMEL Files (*.xmel *.xml)"));
+
+    QFile configFile;
+    if (!configurationFileName.isEmpty()){
+        // append extension if not present
+        QFileInfo configFileInfo(configurationFileName);
+        if(configFileInfo.suffix() != "xml" && configFileInfo.suffix() != "xmel"){
+            configurationFileName.append(".xml");
         }
-        // check if file with same name exists already, append suffix in that case
-        QString filePath = this->configurationsPath + "/" + configurationFileName + ".xml";
-        file.setFileName(filePath);
-        while(file.exists())
-        {
-            filePath = filePath.left(filePath.size()-4) + "-1.xml";
-            configurationFileName = configurationFileName + "-1";
-            file.setFileName(filePath);
-        }
+        configFile.setFileName(configurationFileName);
     } else {
         return;
     }
@@ -1000,9 +996,9 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
     }
 
     // create and open configuration file
-    if (!file.open(QFile::WriteOnly | QFile::Text)){
+    if (!configFile.open(QFile::WriteOnly | QFile::Text)){
         QMessageBox::warning(this, tr("Save configuration"),
-                             "Error when opening file.");
+                             "Error when opening file: " + configFile.fileName());
         return;
     }
 
@@ -1016,8 +1012,8 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
     ifOptions.append(d->ui->comboBox_expAlgorithm->currentText().left(3) == "DFS" ? "dfs" : "bfs");
     ifOptions.append(d->ui->lineEdit_maxNumStates->text());
     XmelWriter writer(propsSelection, subtypesSelection, functionSelection, ifOptions);
-    if (writer.writeFile(&file, configurationFileName + ".xml")){
-        statusBar()->showMessage("Configuration file successfully saved as " + configurationFileName + ".xml", 6000);
+    if (writer.writeFile(&configFile, configurationFileName)){
+        statusBar()->showMessage("Configuration file saved as " + configurationFileName, 6000);
     } else {
         QMessageBox::warning(this, tr("Save configuration"),
                              "Error when writing to file.");
@@ -1080,7 +1076,7 @@ bool ModelCheckingWindow::saveConfiguration()
     ifOptions.append(d->ui->lineEdit_maxNumStates->text());
     XmelWriter writer(propsSelection, subtypesSelection, functionSelection, ifOptions);
     if (writer.writeFile(&file, fileName + ".xml")){
-        //statusBar()->showMessage("Configuration file successfully saved as " + fileName + ".xml", 6000);
+        //statusBar()->showMessage("Configuration file saved as " + fileName + ".xml", 6000);
         return true;
     } else {
         QMessageBox::warning(this, tr("Save configuration"),

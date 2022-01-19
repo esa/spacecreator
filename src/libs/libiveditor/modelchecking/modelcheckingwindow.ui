@@ -76,7 +76,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Select properties to model check</string>
+       <string>Select properties to check</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_2">
