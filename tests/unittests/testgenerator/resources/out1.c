@@ -7,13 +7,21 @@
 #define TEST_DATA_SIZE 5
 
 typedef struct {
-    MyInteger posX;
-    MyInteger posY;
-    MyInteger temp;
-    MyInteger result;
+    asn1SccMyInteger posX;
+    asn1SccMyInteger posY;
+    asn1SccMyInteger temp;
+    asn1SccMyInteger result;
 } TestVector;
 
 TestVector testData[TEST_DATA_SIZE] = { 0 };
+
+void notifyTestFinished(void)
+{
+    volatile int a;
+    while (true) {
+        a = 0;
+    }
+}
 
 void testdriver_startup(void)
 {
@@ -50,12 +58,4 @@ void testdriver_PI_StartTest(void)
                 &(testData[i].posX, &(testData[i].posY, &(testData[i].temp), &(testData[i].result))));
     }
     notifyTestFinished();
-}
-
-void notifyTestFinished(void)
-{
-    volatile int a;
-    while (true) {
-        a = 0;
-    }
 }

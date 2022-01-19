@@ -23,7 +23,7 @@ namespace testgenerator {
 
 auto generateTestDriver(const csv::CsvModel &testVectors, const ivm::IVInterface &interface) -> QTextStream
 {
-    (void)testVectors;
+    static const QString(void) testVectors;
     (void)interface;
 }
 
