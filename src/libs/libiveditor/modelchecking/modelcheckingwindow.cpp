@@ -126,13 +126,14 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     d->ui->treeWidget_submodel->addTopLevelItem(functionsTopNodeWidgetItem);
     listModelFunctions(functionsTopNodeWidgetItem, {});
 
-    // Pre-build results tree view
+    // Build results tree view
     QFileInfo resultsFileInfo(this->outputPath);
     QStringList fileColumnResuls;
     fileColumnResuls.append(resultsFileInfo.fileName());
     resultsTopDirWidgetItem = new QTreeWidgetItem(fileColumnResuls);
     resultsTopDirWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
     d->ui->treeWidget_results->addTopLevelItem(resultsTopDirWidgetItem);
+    listResults(resultsTopDirWidgetItem, resultsFileInfo);
 
     // Set validators on MC options value fileds
     d->ui->lineEdit_maxNumEnvRICalls->setValidator( new QIntValidator(0, 50, this) );
@@ -315,6 +316,12 @@ void ModelCheckingWindow::listResults(QTreeWidgetItem *parentWidgetItem, QFileIn
                     child->setIcon(0, this->style()->standardIcon(QStyle::SP_MediaPlay));
                     parentWidgetItem->addChild(child);
                 }
+                if (fileInfo.suffix() == "scn"){
+                    fileColumn.append(fileInfo.filePath());
+                    QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
+                    child->setIcon(0, this->style()->standardIcon(QStyle::SP_FileIcon));
+                    parentWidgetItem->addChild(child);
+                }
         }
     }
 }
@@ -459,7 +466,7 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
 {
     // CONFIRM MC call with user
     int ret = QMessageBox::warning(this, tr("Call IF"),
-                                   "Do you confirm you want to call IF? Previous scenarios will be deleted!",
+                                   "Do you confirm you want to call IF? Default output folder will be rebuilt!",
                                    QMessageBox::Yes | QMessageBox::No);
     if (ret != QMessageBox::Yes) return;
 
@@ -472,14 +479,22 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     QString qDirAppPath = QDir::currentPath();
     QDir::setCurrent(this->projectDir+"/");
 
-    // REMOVE statusfile, callif.sh and callpy.sh
-    QString rmFilesCmd = "rm -f statusfile callif.sh callpy.sh";
+    // REMOVE statusfile, callif.sh
+    QString rmFilesCmd = "rm -f statusfile callif.sh";
     if (QProcess::execute(rmFilesCmd) != 0) {
         QMessageBox::warning(this, tr("Call IF"),
                              "Error executing: " + rmFilesCmd);
-        // reset path
-        QDir::setCurrent(qDirAppPath);
-        return;
+    }
+
+    // REMOVE output dir, if existing
+    if(QDir(this->outputPath).exists()){
+        QDir(this->outputPath).removeRecursively();
+    }
+
+    // DESTROY tree except root
+    QTreeWidgetItem *treeRoot = this->resultsTopDirWidgetItem;
+    for (int i = treeRoot->childCount(); i > 0; i--){
+        treeRoot->removeChild(treeRoot->child(i-1));
     }
 
     // CREATE callif.sh
@@ -489,91 +504,110 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
         stream << "#!/bin/bash" << endl;
         stream << "make model-check" << endl;
         stream << "echo $? > statusfile" << endl;
-    }
-    Q_ASSERT(QDir("callif.sh").exists());
-
-    // REMOVE output dir, if existing
-    if(QDir(this->outputPath).exists()){
-        QDir(this->outputPath).removeRecursively();
+    } else {
+        QMessageBox::warning(this, tr("Call IF"),
+                             "Error opening callif.sh!");
     }
 
     // CALL IF make rule via terminal, saving make return in statusfile
-    if (QProcess::execute(QStringLiteral("xterm -hold -e sh callif.sh")) != 0) {
+    QString callIFCmd = "xterm -hold -e sh callif.sh";
+    if (QProcess::execute(callIFCmd) != 0) {
         QMessageBox::warning(this, tr("Call IF"),
-                             "Error executing xterm!");
+                             "Error executing: " + callIFCmd);
         // reset path
-        QDir::setCurrent(qDirAppPath);
-        //return;
+        // QDir::setCurrent(qDirAppPath);
+        // return;
     }
 
     // READ statusfile with make return value
-    QString makeStatus;
+    QByteArray makeStatus;
+    int makeReturn;
     QFile statusFile("statusfile");
-    Q_ASSERT(statusFile.exists());
     if (statusFile.open(QIODevice::ReadOnly | QIODevice::Text)){
         makeStatus = statusFile.readAll();
-        if (makeStatus.compare("0") == 0) {
+        makeReturn = QString::compare(QString(makeStatus.at(0)), "0");
+        if (makeReturn != 0) {
             QMessageBox::warning(this, tr("Call IF"),
-                                 "Error executing: make model-check - make return: " + makeStatus);
-            // reset path
-            QDir::setCurrent(qDirAppPath);
-            //return;
+                                 "Error executing: make model-check - make return: " + QString::number(makeReturn));
+            // reset path and return
+            // QDir::setCurrent(qDirAppPath);
+            // return;
         }
     } else {
         QMessageBox::warning(this, tr("Call IF"),
                              "Error opening status file!");
         // reset path
-        QDir::setCurrent(qDirAppPath);
-        //return;
-    }
-
-    // REMOVE statusfile, callif.sh and callpy.sh
-    if (QProcess::execute(rmFilesCmd) != 0) {
-        QMessageBox::warning(this, tr("Call IF"),
-                             "Error executing: " + rmFilesCmd);
-        // reset path
-        QDir::setCurrent(qDirAppPath);
-        //return;
+        // QDir::setCurrent(qDirAppPath);
+        // return;
     }
 
     // CHECK output dir exists
-    Q_ASSERT(QDir(this->outputPath).exists());
-
-    // DESTROY tree except root
-    QTreeWidgetItem *treeRoot = this->resultsTopDirWidgetItem;
-    for (int i = treeRoot->childCount(); i > 0; i--){
-        treeRoot->removeChild(treeRoot->child(i-1));
-    }
-
-    // CONVERT IF SCENARIOS (scn files) into msc files
-    if (QDir(this->outputPath).isEmpty()){
-        QMessageBox::information(this, tr("Call IF"),
-                             "No scenarios found! ");
-        // reset path
+    if(!QDir(this->outputPath).exists()){
+        QMessageBox::warning(this, tr("Call IF"),
+                             "Default output folder was not generated!");
+        // reset path and return
         QDir::setCurrent(qDirAppPath);
         return;
     }
+
+    // CONVERT IF scenarios (scn files) into msc files
+    if (QDir(this->outputPath).isEmpty()){
+        QMessageBox::information(this, tr("Call IF"),
+                             "No scenarios present in default output folder! ");
+        // reset path and return
+        QDir::setCurrent(qDirAppPath);
+        return;
+    }
+
+    // Output folder was generated and it is not empty
     statusBar()->showMessage("Scenarios were found!", 6000);
 
-    // CREATE callpy.sh
+    // CREATE scn2msc.sh
     QDir::setCurrent(this->outputPath+"/");
-    //TODO remove python3 and script path
+    // TODO remove python3 and script path
     QString scn2mscCmd = "python3 /home/taste/tool-src/if-model-checking/modules/scn2msc/scn2msc.py *.scn " + this->configurationsPath + "/.mcconfig.xml";
-    QFile callPyFile("callpy.sh");
-    if(callPyFile.open(QIODevice::ReadWrite)){
-        QTextStream stream(&callPyFile);
+    QFile callScn2MscFile("scn2msc.sh");
+    if(callScn2MscFile.open(QIODevice::ReadWrite)){
+        QTextStream stream(&callScn2MscFile);
         stream << "#!/bin/bash" << endl;
         stream << scn2mscCmd << endl;
+    } else {
+        QMessageBox::information(this, tr("Call IF"),
+                             "Error opening scn2msc.sh!");
     }
-    Q_ASSERT(QDir("callpy.sh").exists());
-
-    // CALL callpy.sh
-    if (QProcess::execute("sh callpy.sh") != 0) {
+    // CALL scn2msc.sh
+    if (QProcess::execute("sh scn2msc.sh") != 0) {
         QMessageBox::warning(this, tr("Call IF"),
-                             "Error when calling: sh callpy.sh");
-        // reset path
-        QDir::setCurrent(qDirAppPath);
-        //return;
+                             "Error executing scn2msc.sh!");
+
+    }
+
+    // ask user to save scenarios
+    ret = QMessageBox::warning(this, tr("Call IF"),
+                                   "Do you want to copy somewhere the generated scenarios?",
+                                   QMessageBox::Yes | QMessageBox::No);
+    if (ret == QMessageBox::Yes) {
+        QString saveDirectoryName =
+                QFileDialog::getExistingDirectory(this, tr("Select Directory (no whitespaces)"),
+                                             this->configurationsPath,
+                                             QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+        while(!saveDirectoryName.isEmpty() && saveDirectoryName.contains(" ")){
+            QMessageBox::warning(this, tr("Call IF"),
+                                 "Please pick a directory name with no whitespaces.");
+            saveDirectoryName =
+                                QFileDialog::getExistingDirectory(this, tr("Select Directory (no whitespaces)"),
+                                                             this->configurationsPath,
+                                                             QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+        }
+        if(!saveDirectoryName.isEmpty()){
+            // discard scn2msc.sh
+            QProcess::execute("rm -f scn2msc.sh");
+            // copy output directory
+            if (QProcess::execute("cp -r . " + saveDirectoryName) != 0) {
+                QMessageBox::warning(this, tr("Call IF"),
+                                     "Error copying output folder to: " + saveDirectoryName);
+            }
+        }
     }
 
     // reset path
