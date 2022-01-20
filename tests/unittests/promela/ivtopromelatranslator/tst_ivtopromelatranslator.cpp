@@ -26,13 +26,16 @@
 #include <ivcore/ivxmlreader.h>
 #include <memory>
 #include <promela/IvToPromelaTranslator/translator.h>
+#include <promela/PromelaModel/proctypeelement.h>
 #include <promela/PromelaModel/promelamodel.h>
 
 using promela::model::BasicType;
+using promela::model::ChannelSend;
 using promela::model::DataType;
 using promela::model::Declaration;
 using promela::model::InlineDef;
 using promela::model::Proctype;
+using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
 using promela::model::Utype;
 using promela::translator::IvToPromelaTranslator;
@@ -179,18 +182,24 @@ void tst_IvToPromelaTranslator::testSimple()
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_test");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 0);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
     }
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_RI_0_success");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 0);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
     }
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_RI_0_fail");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 0);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
     }
 }
 
@@ -303,18 +312,24 @@ void tst_IvToPromelaTranslator::testParameters()
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_work");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
     }
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_RI_0_result");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
     }
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_RI_0_error");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 0);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
     }
 }
 
