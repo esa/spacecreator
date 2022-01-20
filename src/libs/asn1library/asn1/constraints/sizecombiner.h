@@ -24,18 +24,20 @@
 ****************************************************************************/
 #pragma once
 
+#include "values.h"
+
 namespace Asn1Acn::Constraints {
 
 template<typename ValueType>
-class RangeCombiner final
+class SizeCombiner final
 {
 public:
-    static std::optional<Range<typename ValueType::Type>> combineRanges(const ConstraintList<ValueType> *constraintList);
-    static std::optional<Range<typename ValueType::Type>> combineRange(const Constraint<ValueType> *constraint);
+    static std::optional<Range<int64_t>> combineSizes(const ConstraintList<ValueType> *constraintList);
+    static std::optional<Range<int64_t>> combineSize(const Constraint<ValueType> *constraint);
 };
 
 template<typename ValueType>
-std::optional<Range<typename ValueType::Type>> RangeCombiner<ValueType>::combineRanges(const ConstraintList<ValueType> *constraintList)
+std::optional<Range<int64_t>> SizeCombiner<ValueType>::combineSizes(const ConstraintList<ValueType> *constraintList)
 {
     const auto &constraints = constraintList->constraints();
 
@@ -44,8 +46,8 @@ std::optional<Range<typename ValueType::Type>> RangeCombiner<ValueType>::combine
     }
 
     return std::accumulate(std::next(constraints.begin()), constraints.end(),
-            combineRange(constraints[0].get()), [&](const auto &range, const auto &constraint) {
-                auto combinedRange = combineRange(constraint.get());
+            combineSize(constraints[0].get()), [&](const auto &range, const auto &constraint) {
+                auto combinedRange = combineSize(constraint.get());
 
                 if (!combinedRange) {
                     return range;
@@ -57,19 +59,20 @@ std::optional<Range<typename ValueType::Type>> RangeCombiner<ValueType>::combine
             });
 }
 
+
 template<typename ValueType>
-std::optional<Range<typename ValueType::Type>> RangeCombiner<ValueType>::combineRange(const Constraint<ValueType> *constraint)
+std::optional<Range<int64_t>> SizeCombiner<ValueType>::combineSize(const Constraint<ValueType> *constraint)
 {
     if (!constraint) {
         return std::nullopt;
     }
 
     if (const auto *constraintList = dynamic_cast<const ConstraintList<ValueType> *>(constraint); constraintList) {
-        return combineRanges(constraintList);
+        return combineSizes(constraintList);
     } else if (const auto *andConstraint = dynamic_cast<const Constraints::AndConstraint<ValueType> *>(constraint);
                andConstraint) {
-        const auto leftRange = combineRange(andConstraint->leftChild());
-        const auto rightRange = combineRange(andConstraint->rightChild());
+        const auto leftRange = combineSize(andConstraint->leftChild());
+        const auto rightRange = combineSize(andConstraint->rightChild());
 
         if (!leftRange) {
             return rightRange;
@@ -80,8 +83,8 @@ std::optional<Range<typename ValueType::Type>> RangeCombiner<ValueType>::combine
         }
     } else if (const auto *orConstraint = dynamic_cast<const Constraints::OrConstraint<ValueType> *>(constraint);
                orConstraint) {
-        const auto leftRange = combineRange(andConstraint->leftChild());
-        const auto rightRange = combineRange(andConstraint->rightChild());
+        const auto leftRange = combineSize(andConstraint->leftChild());
+        const auto rightRange = combineSize(andConstraint->rightChild());
 
         if (!leftRange) {
             return rightRange;
@@ -90,12 +93,14 @@ std::optional<Range<typename ValueType::Type>> RangeCombiner<ValueType>::combine
         } else {
             return leftRange->merge(*rightRange);
         }
-    } else if (const auto *rangeConstraint = dynamic_cast<const Constraints::RangeConstraint<ValueType> *>(constraint);
-               rangeConstraint) {
-        return rangeConstraint->range();
+    } else if (const auto *sizeConstraint = dynamic_cast<const Constraints::SizeConstraint<ValueType> *>(constraint);
+               sizeConstraint) {
+        return RangeCombiner<IntegerValue>::combineRange(sizeConstraint->innerConstraints());
     } else {
         return std::nullopt;
     }
+
+    return std::nullopt;
 }
 
 } // namespace Asn1Acn::Constraints

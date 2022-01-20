@@ -48,9 +48,6 @@ public:
     void append(std::unique_ptr<Constraint<ValueType>> c) { m_constraints.emplace_back(std::move(c)); }
     void append(const Range<typename ValueType::Type> &r) { append(std::make_unique<RangeConstraint<ValueType>>(r)); }
 
-    std::optional<Range<int64_t>> combineSizes() const;
-    std::optional<Range<int64_t>> combineSize(const Constraint<ValueType> *constraint) const;
-
     void clear() { m_constraints.clear(); }
 
     void accept(ConstraintVisitor<ValueType> &visitor) const override { visitor.visit(*this); }
@@ -66,76 +63,6 @@ ConstraintList<ValueType>::ConstraintList(const ConstraintList &other)
 {
     for (const auto &c : other.constraints())
         append(c->clone());
-}
-
-template<typename ValueType>
-std::optional<Range<int64_t>> ConstraintList<ValueType>::combineSizes() const
-{
-    /* if (m_constraints.empty()) { */
-    /*     return std::nullopt; */
-    /* } */
-
-    /* return std::accumulate(std::next(m_constraints.begin()), m_constraints.end(),
-     * combineSize(m_constraints[0].get()), */
-    /*         [&](const auto &range, const auto &constraint) { */
-    /*             auto combinedRange = combineSize(constraint.get()); */
-
-    /*             if (!combinedRange) { */
-    /*                 return range; */
-    /*             } else if (!range) { */
-    /*                 return combinedRange; */
-    /*             } else { */
-    /*                 return std::make_optional(range->merge(*combinedRange)); */
-    /*             } */
-    /*         }); */
-
-    return std::nullopt;
-}
-
-template<typename ValueType>
-std::optional<Range<int64_t>> ConstraintList<ValueType>::combineSize(const Constraint<ValueType> *constraint) const
-{
-    /* if (!constraint) { */
-    /*     return std::nullopt; */
-    /* } */
-
-    /* if (const auto *constraintList = dynamic_cast<const ConstraintList<ValueType> *>(constraint); constraintList) {
-     */
-    /*     return constraintList->combineSizes(); */
-    /* } else if (const auto *andConstraint = dynamic_cast<const Constraints::AndConstraint<ValueType> *>(constraint);
-     */
-    /*            andConstraint) { */
-    /*     const auto leftRange = combineSize(andConstraint->leftChild()); */
-    /*     const auto rightRange = combineSize(andConstraint->rightChild()); */
-
-    /*     if (!leftRange) { */
-    /*         return rightRange; */
-    /*     } else if (!rightRange) { */
-    /*         return leftRange; */
-    /*     } else { */
-    /*         return leftRange->intersection(*rightRange); */
-    /*     } */
-    /* } else if (const auto *orConstraint = dynamic_cast<const Constraints::OrConstraint<ValueType> *>(constraint); */
-    /*            orConstraint) { */
-    /*     const auto leftRange = combineSize(andConstraint->leftChild()); */
-    /*     const auto rightRange = combineSize(andConstraint->rightChild()); */
-
-    /*     if (!leftRange) { */
-    /*         return rightRange; */
-    /*     } else if (!rightRange) { */
-    /*         return leftRange; */
-    /*     } else { */
-    /*         return leftRange->merge(*rightRange); */
-    /*     } */
-    /* } else if (const auto *sizeConstraint = dynamic_cast<const Constraints::SizeConstraint<ValueType> *>(constraint);
-     */
-    /*            sizeConstraint) { */
-    /*     return combineRange<IntegerValue>(sizeConstraint->innerConstraints()); */
-    /* } else { */
-    /*     return std::nullopt; */
-    /* } */
-
-    return std::nullopt;
 }
 
 template<typename ValueType>

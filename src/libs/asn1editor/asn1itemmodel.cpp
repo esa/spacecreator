@@ -23,6 +23,7 @@
 #include "constraints/logicoperators.h"
 #include "constraints/rangecombiner.h"
 #include "constraints/rangeconstraint.h"
+#include "constraints/sizecombiner.h"
 #include "constraints/sizeconstraint.h"
 #include "range.h"
 #include "typeassignment.h"
@@ -193,6 +194,7 @@ QStandardItem *Asn1ItemModel::createNumberItem(
 
     const auto &constraints = asn1Item->constraints();
     const auto range = Asn1Acn::Constraints::RangeCombiner<ValueType>::combineRanges(&constraints);
+
     if (range) {
         item->setText(QString::number(range->begin()));
         item->setData(QVariant::fromValue(range->begin()), MIN_RANGE_ROLE);
@@ -227,7 +229,8 @@ QStandardItem *Asn1ItemModel::createStringItem(
     QStandardItem *item = new QStandardItem("");
 
     const auto &constraints = asn1Item->constraints();
-    const auto range = constraints.combineSizes();
+    const auto range = Asn1Acn::Constraints::SizeCombiner<ValueType>::combineSizes(&constraints);
+
     if (range) {
         item->setData(QVariant::fromValue(range->begin()), MIN_RANGE_ROLE);
         item->setData(QVariant::fromValue(range->end()), MAX_RANGE_ROLE);
@@ -298,7 +301,7 @@ QStandardItem *Asn1ItemModel::createSequenceOfItem(
         const Asn1Acn::Types::SequenceOf *asn1Item, QStandardItem *parent, QString &typeLimit)
 {
     const auto &constraints = asn1Item->constraints();
-    const auto range = constraints.combineSizes();
+    const auto range = Asn1Acn::Constraints::SizeCombiner<Asn1Acn::IntegerValue>::combineSizes(&constraints);
 
     QList<QStandardItem *> typeItems;
     QList<QStandardItem *> valueItems;
