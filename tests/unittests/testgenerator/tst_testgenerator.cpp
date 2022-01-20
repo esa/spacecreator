@@ -17,17 +17,34 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#include "ivlibrary.h"
+#include "sharedlibrary.h"
+
 #include <QDebug>
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
 #include <algorithm>
+#include <conversion/common/model.h>
+#include <conversion/common/options.h>
+#include <conversion/iv/IvOptions/options.h>
+#include <conversion/iv/IvXmlImporter/importer.h>
 #include <csv/CsvImporter/csvimporter.h>
+#include <csv/CsvModel/csvmodel.h>
 #include <csv/CsvOptions/options.h>
+#include <ivcore/ivinterface.h>
+#include <ivcore/ivmodel.h>
+#include <ivcore/ivobject.h>
+#include <memory>
+#include <qdiriterator.h>
+#include <qstandardpaths.h>
 #include <qtestcase.h>
+#include <shared/common.h>
 #include <testgenerator/TestGenerator.h>
+#include <testgenerator/TestGeneratorException.h>
 
 using testgenerator::TestGenerator;
+using testgenerator::TestGeneratorException;
 
 namespace tests::testgenerator {
 
@@ -40,20 +57,55 @@ private Q_SLOTS:
     void testNominal();
 };
 
+static std::unique_ptr<conversion::Model> loadIvModel(
+        const QString &ivFilename, QString ivConfigFilename = shared::interfaceCustomAttributesFilePath())
+{
+    std::unique_ptr<conversion::Model> model;
+
+    conversion::Options options;
+    options.add(conversion::iv::IvOptions::inputFilepath, ivFilename);
+    options.add(conversion::iv::IvOptions::configFilepath, std::move(ivConfigFilename));
+
+    conversion::iv::importer::IvXmlImporter ivImporter;
+    try {
+        model = ivImporter.importModel(options);
+    } catch (const std::exception &ex) {
+        return nullptr;
+    }
+
+    return model;
+}
+
 void tst_testgenerator::testEmpty()
 {
+    shared::initSharedLibrary();
+    ivm::initIVLibrary();
+
     csv::importer::CsvImporter importer;
     csv::importer::Options options;
     options.add(csv::importer::CsvOptions::separator, ",");
-    options.add(csv::importer::CsvOptions::inputFilepath, "resources/empty.csv");
+    options.add(csv::importer::CsvOptions::inputFilepath, "empty.csv");
 
-    auto csvModel = importer.importModel(options);
+    const auto csvModel = importer.importModel(options);
     QVERIFY(csvModel != nullptr);
     QVERIFY(csvModel->header().fields().empty());
 
-    TestGenerator generator;
-    (void)generator;
-    // TODO: verify that generator with empty test data throws an exception
+    const auto model = loadIvModel("interfaceview.xml", "config.xml");
+
+    const auto ivModel = dynamic_cast<ivm::IVModel *>(model.get());
+    if (ivModel == nullptr) {
+        QFAIL("no model");
+    }
+    const QString ifName = "PI_InterfaceUnderTest";
+    const auto ifUnderTest = ivModel->getIfaceByName(ifName, ivm::IVInterface::InterfaceType::Provided);
+    if (ifUnderTest == nullptr) {
+        QFAIL(QString("provided if named not %1 found in given IV file").arg(ifName).toStdString().c_str());
+    }
+
+    ivm::IVInterface::CreationInfo ci;
+    const ivm::IVInterface &interface = *ifUnderTest; // TODO: take interfaceUnderTest from ivModel
+    const csv::CsvModel &csvRef = *csvModel;
+    QVERIFY_EXCEPTION_THROWN(TestGenerator::generateTestDriver(csvRef, interface), TestGeneratorException);
 }
 
 void tst_testgenerator::testNominal()

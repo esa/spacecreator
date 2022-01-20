@@ -21,17 +21,22 @@
 
 #include "TestGeneratorException.h"
 
+#include <QDebug>
+
 namespace testgenerator {
 
-auto generateTestDriver(const csv::CsvModel &testData, const ivm::IVInterface &interface) -> QTextStream
+auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm::IVInterface &interface) -> QTextStream
 {
     (void)interface;
 
     if (testData.records().empty()) {
         throw TestGeneratorException("Given test data is empty");
+    } else {
+        qDebug() << "loaded CSV not empty";
     }
 
     // TODO
+    return QTextStream();
 }
 
 } // testgenerator
