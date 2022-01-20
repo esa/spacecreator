@@ -24,6 +24,8 @@
 ****************************************************************************/
 #pragma once
 
+#include <optional>
+
 namespace Asn1Acn::Constraints {
 
 template<typename ValueType>

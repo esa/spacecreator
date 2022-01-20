@@ -38,6 +38,7 @@ template<typename Type, typename ValueType>
 class RangeTranslatorVisitor final
 {
     using RangeConstraint = Asn1Acn::Constraints::RangeConstraint<ValueType>;
+    using SizeConstraint = Asn1Acn::Constraints::SizeConstraint<ValueType>;
 
 public:
     /**
@@ -102,6 +103,14 @@ public:
      * @return  ASN.1 range constraint
      */
     auto addRangeConstraint(const typename ValueType::Type &min, const typename ValueType::Type &max) -> void;
+    /**
+     * @brief   Create size constraint from given range
+     *
+     * @param   range   Range
+     *
+     * @return  ASN.1 size constraint
+     */
+    auto addSizeConstraint(const Asn1Acn::Range<Asn1Acn::IntegerValue::Type> &range) -> void;
 
 private:
     /**
@@ -173,6 +182,18 @@ void RangeTranslatorVisitor<Type, ValueType>::addRangeConstraint(
     auto constraint = RangeConstraint::create({ min, max });
 
     m_asn1Type->constraints().append(std::move(constraint));
+}
+
+template<typename Type, typename ValueType>
+void RangeTranslatorVisitor<Type, ValueType>::addSizeConstraint(
+        const Asn1Acn::Range<Asn1Acn::IntegerValue::Type> &range)
+{
+    auto rangeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(range);
+
+    auto sizeConstraint = std::make_unique<SizeConstraint>();
+    sizeConstraint->setInnerConstraints(std::move(rangeConstraint));
+
+    m_asn1Type->constraints().append(std::move(sizeConstraint));
 }
 
 template<typename Type, typename ValueType>

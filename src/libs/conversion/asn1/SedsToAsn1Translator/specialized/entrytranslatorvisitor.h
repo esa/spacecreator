@@ -21,6 +21,7 @@
 
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <asn1library/asn1/types/sequence.h>
+#include <optional>
 #include <seds/SedsModel/types/datatype.h>
 
 namespace Asn1Acn {
@@ -94,6 +95,7 @@ struct EntryTranslatorVisitor final {
 
 private:
     auto translateEntryType(const QString &sedsTypeName) const -> std::unique_ptr<Asn1Acn::Types::UserdefinedType>;
+
     auto translateFixedValue(
             const seds::model::FixedValueEntry &sedsEntry, Asn1Acn::Types::UserdefinedType *asn1Type) const -> void;
     auto translateErrorControl(const seds::model::ErrorControlEntry &sedsEntry) const
@@ -104,6 +106,12 @@ private:
 
     template<typename Type, typename ValueType>
     auto createValueConstraint(const QString &value, Asn1Acn::Types::Type *asn1Type) const -> void;
+
+    auto getListLengthSequenceComponent(const seds::model::ListEntry &sedsEntry) const
+            -> std::unique_ptr<Asn1Acn::SequenceComponent> &;
+    auto getListLengthRange(const Asn1Acn::Types::Type *asn1Type) const -> std::optional<Asn1Acn::Range<int64_t>>;
+    auto addListSizeConstraint(
+            Asn1Acn::Types::SequenceOf *asn1Type, const Asn1Acn::Types::Type *listLengthFieldType) const -> void;
 
 private:
     const static int m_crc8BitSize = 8;
