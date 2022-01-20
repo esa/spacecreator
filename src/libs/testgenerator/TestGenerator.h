@@ -28,10 +28,7 @@ namespace testgenerator {
 class TestGenerator final
 {
 public:
-    static auto generateTestDriver(const csv::CsvModel &testVectors, const ivm::IVInterface &interface) -> QTextStream;
-
-private:
-    // this will be empty?
+    static auto generateTestDriver(const csv::CsvModel &testData, const ivm::IVInterface &interface) -> QTextStream;
 };
 
 } // testgenerator
