@@ -19,10 +19,9 @@
 
 #pragma once
 
-#include "qstringhash.h"
-
 #include <QString>
 #include <optional>
+#include <qstringhash.h>
 #include <unordered_map>
 #include <vector>
 
