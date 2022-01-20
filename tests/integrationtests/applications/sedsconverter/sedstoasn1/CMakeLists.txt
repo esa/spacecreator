@@ -38,6 +38,11 @@ configure_file(test_container_constraints.sh test_container_constraints.sh COPYO
 configure_file(resources/test_container_constraints.xml resources/test_container_constraints.xml COPYONLY)
 configure_file(resources/test_container_constraints_asn.output resources/test_container_constraints_asn.output COPYONLY)
 
+configure_file(test_container_entries.sh test_container_entries.sh COPYONLY)
+configure_file(resources/test_container_entries.xml resources/test_container_entries.xml COPYONLY)
+configure_file(resources/test_container_entries_asn.output resources/test_container_entries_asn.output COPYONLY)
+configure_file(resources/test_container_entries_acn.output resources/test_container_entries_acn.output COPYONLY)
+
 configure_file(test_container_inheritance.sh test_container_inheritance.sh COPYONLY)
 configure_file(resources/test_container_inheritance.xml resources/test_container_inheritance.xml COPYONLY)
 configure_file(resources/test_container_inheritance_asn.output resources/test_container_inheritance_asn.output COPYONLY)

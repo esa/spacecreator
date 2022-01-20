@@ -78,10 +78,8 @@ struct DataTypeTranslatorVisitor final {
      *
      * @param   asn1Type            Type where translated types are saved
      * @param   asn1Definitions     Parent ASN.1 defintions
-     * @param   sedsPackage         Parent SEDS package
      */
-    DataTypeTranslatorVisitor(std::unique_ptr<Asn1Acn::Types::Type> &asn1Type, Asn1Acn::Definitions *asn1Definitions,
-            const seds::model::Package *sedsPackage);
+    DataTypeTranslatorVisitor(std::unique_ptr<Asn1Acn::Types::Type> &asn1Type, Asn1Acn::Definitions *asn1Definitions);
 
     /**
      * @brief   Translates SEDS array data type
@@ -286,8 +284,6 @@ private:
 
     /// @brief  Parent definitions
     Asn1Acn::Definitions *m_asn1Definitions;
-    /// @brief  Parent package
-    const seds::model::Package *m_sedsPackage;
 
     /// @brief  Cache for sequence components
     ContainerEntriesCacheMap m_asn1SequenceComponentsCache;

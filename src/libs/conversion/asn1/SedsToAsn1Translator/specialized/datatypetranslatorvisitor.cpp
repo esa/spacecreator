@@ -62,11 +62,10 @@ using seds::model::SubRangeDataType;
 
 namespace conversion::asn1::translator {
 
-DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(std::unique_ptr<Asn1Acn::Types::Type> &asn1Type,
-        Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage)
+DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(
+        std::unique_ptr<Asn1Acn::Types::Type> &asn1Type, Asn1Acn::Definitions *asn1Definitions)
     : m_asn1Type(asn1Type)
     , m_asn1Definitions(asn1Definitions)
-    , m_sedsPackage(sedsPackage)
 {
 }
 
@@ -465,7 +464,7 @@ void DataTypeTranslatorVisitor::cacheContainerType(const ContainerDataType &seds
     }
 
     // Translate own entries
-    EntryTranslatorVisitor entriesTranslator { m_asn1Definitions, asn1SequenceComponents.get() };
+    EntryTranslatorVisitor entriesTranslator { asn1SequenceComponents.get(), m_asn1Definitions };
     for (const auto &sedsEntry : sedsType.entries()) {
         std::visit(entriesTranslator, sedsEntry);
     }
@@ -474,7 +473,7 @@ void DataTypeTranslatorVisitor::cacheContainerType(const ContainerDataType &seds
 
     if (sedsType.isAbstract()) {
         // Translate own trailer entries
-        EntryTranslatorVisitor trailerEntriesTranslator { m_asn1Definitions, asn1SequenceTrailerComponents.get() };
+        EntryTranslatorVisitor trailerEntriesTranslator { asn1SequenceTrailerComponents.get(), m_asn1Definitions };
         for (const auto &sedsTrailerEntry : sedsType.trailerEntries()) {
             std::visit(trailerEntriesTranslator, sedsTrailerEntry);
         }
@@ -524,7 +523,7 @@ void DataTypeTranslatorVisitor::createRealizationContainerField(Asn1Acn::Types::
 void DataTypeTranslatorVisitor::applyContainerConstraints(
         const ContainerDataType &sedsType, Asn1Acn::Types::Sequence *asn1Type) const
 {
-    ContainerConstraintTranslatorVisitor translatorVisitor(asn1Type, m_sedsPackage);
+    ContainerConstraintTranslatorVisitor translatorVisitor(asn1Type, m_asn1Definitions);
 
     for (const auto &constraint : sedsType.constraints()) {
         std::visit(translatorVisitor, constraint);

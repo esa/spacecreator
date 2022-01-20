@@ -47,8 +47,8 @@ const QString AsyncInterfaceCommandTranslator::m_bundledTypeNameTemplate = "%1-T
 
 AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(const QString &sedsInterfaceName,
         const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet, Asn1Acn::Definitions *asn1Definitions,
-        const seds::model::Package *sedsPackage, ivm::IVFunction *ivFunction)
-    : InterfaceCommandTranslator(sedsInterfaceName, genericTypeMapSet, asn1Definitions, sedsPackage, ivFunction)
+        ivm::IVFunction *ivFunction)
+    : InterfaceCommandTranslator(sedsInterfaceName, genericTypeMapSet, asn1Definitions, ivFunction)
 {
 }
 

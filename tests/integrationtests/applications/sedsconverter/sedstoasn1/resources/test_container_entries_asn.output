@@ -1,0 +1,13 @@
+COM-N7SPACE-CONTAINERENTRIES DEFINITIONS ::= BEGIN
+IntegerData ::= INTEGER(0 .. 255)
+BinaryData ::= BIT STRING(SIZE(0 .. 8))
+BasicEntryContainer ::= SEQUENCE
+{
+    basicEntry IntegerData(0 .. 255)
+}
+FixedValueEntryContainer ::= SEQUENCE
+{
+    fixedValueEntry BinaryData(SIZE(0 .. 8)) ('00110011'B)
+}
+END
+

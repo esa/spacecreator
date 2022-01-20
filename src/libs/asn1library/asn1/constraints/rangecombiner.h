@@ -24,6 +24,12 @@
 ****************************************************************************/
 #pragma once
 
+#include "constraints/constraintlist.h"
+#include "constraints/logicoperators.h"
+#include "constraints/rangeconstraint.h"
+#include "constraints/sizeconstraint.h"
+#include "range.h"
+
 #include <optional>
 
 namespace Asn1Acn::Constraints {

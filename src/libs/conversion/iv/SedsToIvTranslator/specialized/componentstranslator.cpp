@@ -118,9 +118,9 @@ void ComponentsTranslator::translateCommands(const QString &sedsInterfaceName,
         const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const
 {
     AsyncInterfaceCommandTranslator asyncCommandTranslator(
-            sedsInterfaceName, genericTypeMapSet, m_asn1Definitions, &m_sedsPackage, ivFunction);
+            sedsInterfaceName, genericTypeMapSet, m_asn1Definitions, ivFunction);
     SyncInterfaceCommandTranslator syncCommandTranslator(
-            sedsInterfaceName, genericTypeMapSet, m_asn1Definitions, &m_sedsPackage, ivFunction);
+            sedsInterfaceName, genericTypeMapSet, m_asn1Definitions, ivFunction);
 
     for (const auto &sedsCommand : sedsInterfaceDeclaration.commands()) {
         switch (sedsCommand.mode()) {

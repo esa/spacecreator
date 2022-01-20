@@ -68,9 +68,6 @@ private:
     auto translateEnumDimensionIndex(
             const Asn1Acn::Types::Enumerated *indexType, Asn1Acn::Types::SequenceOf *asn1Sequence) const -> void;
 
-    auto mergeRanges(const Asn1Acn::Constraints::Constraint<Asn1Acn::IntegerValue> *constraint) const
-            -> std::optional<Asn1Acn::Range<Asn1Acn::IntegerValue::Type>>;
-
 private:
     /// @brief  Parent definitions
     Asn1Acn::Definitions *m_asn1Definitions;

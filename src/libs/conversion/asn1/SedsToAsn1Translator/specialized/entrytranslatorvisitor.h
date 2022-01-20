@@ -20,6 +20,7 @@
 #pragma once
 
 #include <asn1library/asn1/constraints/rangeconstraint.h>
+#include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <optional>
 #include <seds/SedsModel/types/datatype.h>
@@ -34,6 +35,7 @@ class Null;
 namespace seds::model {
 class Component;
 class Entry;
+class EntryRef;
 class ErrorControlEntry;
 class FixedValueEntry;
 class LengthEntry;
@@ -51,10 +53,10 @@ namespace conversion::asn1::translator {
  * Translated entry will be added to the passed ASN.1 sequence
  */
 struct EntryTranslatorVisitor final {
-    /// @brief  Parent definitions
-    Asn1Acn::Definitions *m_asn1Definitions;
     /// @brief  Where translated entry will be saved
     Asn1Acn::Types::Sequence *m_asn1Sequence;
+    /// @brief  Parent definitions
+    Asn1Acn::Definitions *m_asn1Definitions;
 
     /**
      * @brief   Translates SEDS entry
@@ -104,9 +106,6 @@ private:
     auto translateCoreErrorControl(seds::model::CoreErrorControl coreErrorControl, Asn1Acn::Types::Null *asn1Type) const
             -> void;
 
-    template<typename Type, typename ValueType>
-    auto createValueConstraint(const QString &value, Asn1Acn::Types::Type *asn1Type) const -> void;
-
     auto getListLengthSequenceComponent(const seds::model::ListEntry &sedsEntry) const
             -> std::unique_ptr<Asn1Acn::SequenceComponent> &;
     auto getListLengthRange(const Asn1Acn::Types::Type *asn1Type) const -> std::optional<Asn1Acn::Range<int64_t>>;
@@ -118,13 +117,5 @@ private:
     const static int m_crc16BitSize = 16;
     const static int m_checksumBitSize = 32;
 };
-
-template<typename Type, typename ValueType>
-void EntryTranslatorVisitor::createValueConstraint(const QString &value, Asn1Acn::Types::Type *asn1Type) const
-{
-    auto *referencedType = dynamic_cast<Type *>(asn1Type);
-    auto constraint = Asn1Acn::Constraints::RangeConstraint<ValueType>::create({ ValueType::fromAstValue(value) });
-    referencedType->constraints().append(std::move(constraint));
-}
 
 } // namespace conversion::asn1::translator

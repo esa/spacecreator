@@ -24,7 +24,6 @@
 
 #include <asn1library/asn1/acnsequencecomponent.h>
 #include <asn1library/asn1/asnsequencecomponent.h>
-#include <asn1library/asn1/constraints/logicoperators.h>
 #include <asn1library/asn1/constraints/rangecombiner.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <asn1library/asn1/constraints/sizeconstraint.h>
@@ -40,10 +39,10 @@
 #include <asn1library/asn1/types/real.h>
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
-#include <asn1library/asn1/values.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
+#include <iostream>
 #include <seds/SedsModel/package/package.h>
 
 using conversion::Escaper;
@@ -167,53 +166,62 @@ void EntryTranslatorVisitor::translateFixedValue(
     }
 
     switch (asn1Type->type()->typeEnum()) {
-    case Asn1Acn::Types::Type::ASN1Type::INTEGER:
-        createValueConstraint<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>(
-                sedsEntry.fixedValue()->value(), asn1Type->type());
-        break;
-    case Asn1Acn::Types::Type::ASN1Type::REAL:
-        createValueConstraint<Asn1Acn::Types::Real, Asn1Acn::RealValue>(
-                sedsEntry.fixedValue()->value(), asn1Type->type());
-        break;
-    case Asn1Acn::Types::Type::ASN1Type::BOOLEAN:
-        createValueConstraint<Asn1Acn::Types::Boolean, Asn1Acn::BooleanValue>(
-                sedsEntry.fixedValue()->value(), asn1Type->type());
-        break;
+    case Asn1Acn::Types::Type::ASN1Type::INTEGER: {
+        const auto value = Asn1Acn::IntegerValue::fromAstValue(sedsEntry.fixedValue()->value());
+        RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue> rangeTranslator(asn1Type->type());
+        rangeTranslator.addValueConstraint(value);
+    } break;
+    case Asn1Acn::Types::Type::ASN1Type::REAL: {
+        const auto value = Asn1Acn::RealValue::fromAstValue(sedsEntry.fixedValue()->value());
+        RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue> rangeTranslator(asn1Type->type());
+        rangeTranslator.addValueConstraint(value);
+    } break;
+    case Asn1Acn::Types::Type::ASN1Type::BOOLEAN: {
+        const auto value = Asn1Acn::BooleanValue::fromAstValue(sedsEntry.fixedValue()->value());
+        RangeTranslatorVisitor<Asn1Acn::Types::Boolean, Asn1Acn::BooleanValue> rangeTranslator(asn1Type->type());
+        rangeTranslator.addValueConstraint(value);
+    } break;
     case Asn1Acn::Types::Type::ASN1Type::SEQUENCE:
         throw UnsupportedValueException("ASN1Type/FixedValueEntry", "SEQUENCE");
         break;
     case Asn1Acn::Types::Type::ASN1Type::SEQUENCEOF:
         throw UnsupportedValueException("ASN1Type/FixedValueEntry", "SEQUENCEOF");
         break;
-    case Asn1Acn::Types::Type::ASN1Type::ENUMERATED:
-        createValueConstraint<Asn1Acn::Types::Enumerated, Asn1Acn::EnumValue>(
-                Escaper::escapeAsn1FieldName(sedsEntry.fixedValue()->value()), asn1Type->type());
-        break;
+    case Asn1Acn::Types::Type::ASN1Type::ENUMERATED: {
+        const auto value = Asn1Acn::EnumValue::fromAstValue(sedsEntry.fixedValue()->value());
+        RangeTranslatorVisitor<Asn1Acn::Types::Enumerated, Asn1Acn::EnumValue> rangeTranslator(asn1Type->type());
+        rangeTranslator.addValueConstraint(value);
+    } break;
     case Asn1Acn::Types::Type::ASN1Type::CHOICE:
         throw UnsupportedValueException("ASN1Type/FixedValueEntry", "CHOICE");
         break;
     case Asn1Acn::Types::Type::ASN1Type::STRING:
         throw UnsupportedValueException("ASN1Type/FixedValueEntry", "STRING");
         break;
-    case Asn1Acn::Types::Type::ASN1Type::IA5STRING:
-        createValueConstraint<Asn1Acn::Types::IA5String, Asn1Acn::StringValue>(
-                sedsEntry.fixedValue()->value(), asn1Type->type());
-        break;
-    case Asn1Acn::Types::Type::ASN1Type::NUMERICSTRING:
-        createValueConstraint<Asn1Acn::Types::NumericString, Asn1Acn::StringValue>(
-                sedsEntry.fixedValue()->value(), asn1Type->type());
-        break;
+    case Asn1Acn::Types::Type::ASN1Type::IA5STRING: {
+        const auto value = Asn1Acn::StringValue::fromAstValue(sedsEntry.fixedValue()->value());
+        RangeTranslatorVisitor<Asn1Acn::Types::IA5String, Asn1Acn::StringValue> rangeTranslator(asn1Type->type());
+        rangeTranslator.addValueConstraint(value);
+    } break;
+    case Asn1Acn::Types::Type::ASN1Type::NUMERICSTRING: {
+        const auto value = Asn1Acn::StringValue::fromAstValue(sedsEntry.fixedValue()->value());
+        RangeTranslatorVisitor<Asn1Acn::Types::NumericString, Asn1Acn::StringValue> rangeTranslator(asn1Type->type());
+        rangeTranslator.addValueConstraint(value);
+    } break;
     case Asn1Acn::Types::Type::ASN1Type::NULLTYPE:
         throw UnsupportedValueException("ASN1Type/FixedValueEntry", "NULLTYPE");
         break;
-    case Asn1Acn::Types::Type::ASN1Type::BITSTRING:
-        createValueConstraint<Asn1Acn::Types::BitString, Asn1Acn::BitStringValue>(
-                sedsEntry.fixedValue()->value(), asn1Type->type());
-        break;
-    case Asn1Acn::Types::Type::ASN1Type::OCTETSTRING:
-        createValueConstraint<Asn1Acn::Types::OctetString, Asn1Acn::OctetStringValue>(
-                sedsEntry.fixedValue()->value(), asn1Type->type());
-        break;
+    case Asn1Acn::Types::Type::ASN1Type::BITSTRING: {
+        const auto value = Asn1Acn::BitStringValue::fromAstValue(sedsEntry.fixedValue()->value());
+        RangeTranslatorVisitor<Asn1Acn::Types::BitString, Asn1Acn::BitStringValue> rangeTranslator(asn1Type->type());
+        rangeTranslator.addValueConstraint(value);
+    } break;
+    case Asn1Acn::Types::Type::ASN1Type::OCTETSTRING: {
+        const auto value = Asn1Acn::OctetStringValue::fromAstValue(sedsEntry.fixedValue()->value());
+        RangeTranslatorVisitor<Asn1Acn::Types::OctetString, Asn1Acn::OctetStringValue> rangeTranslator(
+                asn1Type->type());
+        rangeTranslator.addValueConstraint(value);
+    } break;
     case Asn1Acn::Types::Type::ASN1Type::LABELTYPE:
         throw UnsupportedValueException("ASN1Type/FixedValueEntry", "LABELTYPE");
         break;

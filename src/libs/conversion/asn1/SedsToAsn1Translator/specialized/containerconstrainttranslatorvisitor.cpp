@@ -19,8 +19,7 @@
 
 #include "specialized/containerconstrainttranslatorvisitor.h"
 
-#include "specialized/rangetranslatorvisitor.h"
-
+#include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
 #include <asn1library/asn1/types/enumerated.h>
@@ -34,7 +33,6 @@
 #include <asn1library/asn1/values.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/overloaded.h>
-#include <conversion/common/translation/exceptions.h>
 #include <iostream>
 #include <seds/SedsModel/components/entryref.h>
 #include <seds/SedsModel/package/package.h>
@@ -51,9 +49,9 @@ using seds::model::ContainerValueConstraint;
 namespace conversion::asn1::translator {
 
 ContainerConstraintTranslatorVisitor::ContainerConstraintTranslatorVisitor(
-        Asn1Acn::Types::Sequence *asn1Sequence, const seds::model::Package *sedsPackage)
+        Asn1Acn::Types::Sequence *asn1Sequence, Asn1Acn::Definitions *asn1Definitions)
     : m_asn1Sequence(asn1Sequence)
-    , m_sedsPackage(sedsPackage)
+    , m_asn1Definitions(asn1Definitions)
 {
 }
 
@@ -103,35 +101,45 @@ void ContainerConstraintTranslatorVisitor::applyContainerRangeConstraint(
 void ContainerConstraintTranslatorVisitor::applyContainerTypeConstraint(
         const ContainerTypeConstraint &typeConstraint, Asn1Acn::Types::Type *asn1Type) const
 {
-    Q_UNUSED(asn1Type);
-
     const auto &referencedTypeName = typeConstraint.type().nameStr();
-    const auto referencedType = m_sedsPackage->dataType(referencedTypeName);
+    const auto referencedTypeAssignment = m_asn1Definitions->type(referencedTypeName);
+
+    if (!referencedTypeAssignment) {
+        auto errorMessage = QString("ContainerTypeConstraint for \"%1\" refers to an unknown type \"%2\"")
+                                    .arg(typeConstraint.entry().nameStr())
+                                    .arg(referencedTypeName);
+        throw conversion::translator::TranslationException(std::move(errorMessage));
+    }
+
+    auto referencedType = referencedTypeAssignment->type();
+    while (referencedType->typeEnum() == ASN1Type::USERDEFINED) {
+        auto referencedUserType = dynamic_cast<Asn1Acn::Types::UserdefinedType *>(referencedType);
+        referencedType = referencedUserType->type();
+    }
 
     switch (asn1Type->typeEnum()) {
     case ASN1Type::INTEGER: {
-        if (const auto *intDataType = std::get_if<seds::model::IntegerDataType>(referencedType)) {
-            RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue> rangeTranslator(asn1Type);
-            std::visit(rangeTranslator, intDataType->range());
-        } else {
+        if (referencedType->typeEnum() != ASN1Type::INTEGER) {
             auto errorMessage = QString("ContainerTypeConstraint cannot be applied to \"%1\" entry because referenced "
                                         "type \"%2\" is not of the same type")
                                         .arg(typeConstraint.entry().nameStr())
                                         .arg(referencedTypeName);
             throw conversion::translator::TranslationException(std::move(errorMessage));
         }
+
+        const auto referencedIntegerType = dynamic_cast<const Asn1Acn::Types::Integer *>(referencedType);
+        addTypeRangeConstraint<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>(asn1Type, referencedIntegerType);
     } break;
     case ASN1Type::REAL: {
-        if (const auto *floatDataType = std::get_if<seds::model::FloatDataType>(referencedType)) {
-            RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue> rangeTranslator(asn1Type);
-            std::visit(rangeTranslator, floatDataType->range());
-        } else {
+        if (referencedType->typeEnum() != ASN1Type::REAL) {
             auto errorMessage = QString("ContainerTypeConstraint cannot be applied to \"%1\" entry because referenced "
                                         "type \"%2\" is not of the same type")
                                         .arg(typeConstraint.entry().nameStr())
                                         .arg(referencedTypeName);
             throw conversion::translator::TranslationException(std::move(errorMessage));
         }
+        const auto referencedRealType = dynamic_cast<const Asn1Acn::Types::Real *>(referencedType);
+        addTypeRangeConstraint<Asn1Acn::Types::Real, Asn1Acn::RealValue>(asn1Type, referencedRealType);
     } break;
     case ASN1Type::USERDEFINED: {
         auto asn1UserType = dynamic_cast<Asn1Acn::Types::UserdefinedType *>(asn1Type);
@@ -144,8 +152,6 @@ void ContainerConstraintTranslatorVisitor::applyContainerTypeConstraint(
         throw conversion::translator::TranslationException(std::move(errorMessage));
     } break;
     }
-
-    Q_UNUSED(referencedType);
 }
 
 void ContainerConstraintTranslatorVisitor::applyContainerValueConstraint(

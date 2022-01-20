@@ -104,7 +104,7 @@ std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePacka
 
     auto packageAsn1Definitions = std::make_unique<Asn1Acn::Definitions>(
             Escaper::escapeAsn1PackageName(sedsPackage.nameStr()), Asn1Acn::SourceLocation());
-    translateDataTypes(resolvedPackageDataTypes, packageAsn1Definitions.get(), &sedsPackage);
+    translateDataTypes(resolvedPackageDataTypes, packageAsn1Definitions.get());
 
     std::vector<std::unique_ptr<Asn1Acn::File>> result;
 
@@ -125,7 +125,7 @@ std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePacka
                 Escaper::escapeAsn1PackageName(sedsPackage.nameStr() + "-" + sedsComponent.nameStr());
         auto componentAsn1Definitions =
                 std::make_unique<Asn1Acn::Definitions>(componentPackageName, Asn1Acn::SourceLocation());
-        translateDataTypes(resolvedComponentDataTypes, componentAsn1Definitions.get(), &sedsPackage);
+        translateDataTypes(resolvedComponentDataTypes, componentAsn1Definitions.get());
 
         auto componentAsn1File = std::make_unique<Asn1Acn::File>(componentPackageName);
         componentAsn1File->add(std::move(componentAsn1Definitions));
@@ -135,11 +135,11 @@ std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePacka
     return result;
 }
 
-void SedsToAsn1Translator::translateDataTypes(const std::list<const seds::model::DataType *> &sedsDataTypes,
-        Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage) const
+void SedsToAsn1Translator::translateDataTypes(
+        const std::list<const seds::model::DataType *> &sedsDataTypes, Asn1Acn::Definitions *asn1Definitions) const
 {
     std::unique_ptr<Asn1Acn::Types::Type> asn1Type;
-    DataTypeTranslatorVisitor dataTypeVisitor(asn1Type, asn1Definitions, sedsPackage);
+    DataTypeTranslatorVisitor dataTypeVisitor(asn1Type, asn1Definitions);
 
     for (const auto *sedsDataType : sedsDataTypes) {
         std::visit(dataTypeVisitor, *sedsDataType);

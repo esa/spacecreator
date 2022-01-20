@@ -1,0 +1,13 @@
+COM-N7SPACE-CONTAINERENTRIES DEFINITIONS ::= BEGIN
+IntegerData [size 8, encoding pos-int, endianness big]
+BinaryData []
+BasicEntryContainer []
+{
+    basicEntry []
+}
+FixedValueEntryContainer []
+{
+    fixedValueEntry []
+}
+END
+

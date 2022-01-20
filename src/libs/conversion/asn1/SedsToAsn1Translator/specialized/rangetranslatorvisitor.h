@@ -95,6 +95,14 @@ public:
      */
     auto addValueConstraint(const typename ValueType::Type &value) -> void;
     /**
+     * @brief   Create range constraint from given range
+     *
+     * @param   range   Range
+     *
+     * @return  ASN.1 range constraint
+     */
+    auto addRangeConstraint(const Asn1Acn::Range<typename ValueType::Type> &range) -> void;
+    /**
      * @brief   Create range constraint from given min and max values
      *
      * @param   min     Min range value
@@ -170,6 +178,14 @@ template<typename Type, typename ValueType>
 void RangeTranslatorVisitor<Type, ValueType>::addValueConstraint(const typename ValueType::Type &value)
 {
     auto constraint = RangeConstraint::create({ value });
+
+    m_asn1Type->constraints().append(std::move(constraint));
+}
+
+template<typename Type, typename ValueType>
+void RangeTranslatorVisitor<Type, ValueType>::addRangeConstraint(const Asn1Acn::Range<typename ValueType::Type> &range)
+{
+    auto constraint = RangeConstraint::create(range);
 
     m_asn1Type->constraints().append(std::move(constraint));
 }
