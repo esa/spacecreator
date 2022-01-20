@@ -21,6 +21,7 @@
 #include "asn1editorconst.h"
 #include "asnsequencecomponent.h"
 #include "constraints/logicoperators.h"
+#include "constraints/rangecombiner.h"
 #include "constraints/rangeconstraint.h"
 #include "constraints/sizeconstraint.h"
 #include "range.h"
@@ -191,7 +192,7 @@ QStandardItem *Asn1ItemModel::createNumberItem(
     QStandardItem *item = new QStandardItem("");
 
     const auto &constraints = asn1Item->constraints();
-    const auto range = constraints.combineRanges();
+    const auto range = Asn1Acn::Constraints::RangeCombiner<ValueType>::combineRanges(&constraints);
     if (range) {
         item->setText(QString::number(range->begin()));
         item->setData(QVariant::fromValue(range->begin()), MIN_RANGE_ROLE);
