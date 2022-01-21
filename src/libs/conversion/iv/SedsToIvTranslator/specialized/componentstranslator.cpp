@@ -84,9 +84,12 @@ void ComponentsTranslator::translateInterface(const seds::model::Interface &seds
         parameterTranslator.translateParameter(sedsParameter, interfaceType);
     }
 
+    const auto &sedsInterfaceName = sedsInterface.nameStr();
+
     AsyncInterfaceCommandTranslator asyncCommandTranslator(
-            sedsInterface, m_asn1Definitions, &m_sedsPackage, ivFunction);
-    SyncInterfaceCommandTranslator syncCommandTranslator(sedsInterface, m_asn1Definitions, &m_sedsPackage, ivFunction);
+            sedsInterfaceName, sedsInterface.genericTypeMapSet(), m_asn1Definitions, &m_sedsPackage, ivFunction);
+    SyncInterfaceCommandTranslator syncCommandTranslator(
+            sedsInterfaceName, sedsInterface.genericTypeMapSet(), m_asn1Definitions, &m_sedsPackage, ivFunction);
 
     for (const auto &sedsCommand : sedsInterfaceDeclaration.commands()) {
         switch (sedsCommand.mode()) {

@@ -23,6 +23,8 @@
 #include "generics/generictypemapset.h"
 #include "interfaces/interfacedeclarationref.h"
 
+#include <optional>
+
 namespace seds::model {
 
 class Interface final : public NamedEntity
@@ -33,14 +35,14 @@ public:
     Interface &operator=(Interface &&) = default;
 
 public:
-    auto genericTypeMapSet() const -> const GenericTypeMapSet &;
+    auto genericTypeMapSet() const -> const std::optional<GenericTypeMapSet> &;
     auto setGenericTypeMapSet(GenericTypeMapSet genericTypeMapSet) -> void;
 
     auto type() const -> const InterfaceDeclarationRef &;
     auto setType(InterfaceDeclarationRef type) -> void;
 
 private:
-    GenericTypeMapSet m_genericTypeMapSet;
+    std::optional<GenericTypeMapSet> m_genericTypeMapSet;
     InterfaceDeclarationRef m_type;
 };
 

@@ -20,6 +20,7 @@
 #pragma once
 
 #include <ivcore/ivinterface.h>
+#include <optional>
 
 namespace Asn1Acn {
 class Definitions;
@@ -36,6 +37,7 @@ class IVFunction;
 namespace seds::model {
 class CommandArgument;
 class DimensionSize;
+class GenericTypeMapSet;
 class Interface;
 class InterfaceCommand;
 class Package;
@@ -54,13 +56,16 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   sedsInterface       Parent SEDS interface
+     * @param   sedsInterfaceName   Parent interface name
+     * @param   genericTypeMap      Generic type mappings
      * @param   asn1Definitions     ASN.1 type definitions for parent package
      * @param   sedsPackage         Parent SEDS package
      * @param   ivFunction          Output interface view function
      */
-    InterfaceCommandTranslator(const seds::model::Interface &sedsInterface, Asn1Acn::Definitions *asn1Definitions,
-            const seds::model::Package *sedsPackage, ivm::IVFunction *ivFunction);
+    InterfaceCommandTranslator(const QString &sedsInterfaceName,
+            const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
+            Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
+            ivm::IVFunction *ivFunction);
     /**
      * @brief   Default destructor
      */
@@ -93,18 +98,6 @@ public:
      */
     virtual auto translateCommand(
             const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType interfaceType) -> void = 0;
-
-    /**
-     * @brief   Assemble name based on the names of a command and its hosting interface
-     *
-     * @param interfaceName Name of the interface hosting the command
-     * @param type Interface type
-     * @param commandName Name of the command
-     *
-     * @return Assembled name
-     */
-    static auto getCommandName(const QString &interfaceName, const ivm::IVInterface::InterfaceType type,
-            const QString &commandName) -> QString;
 
 protected:
     /**
@@ -184,6 +177,17 @@ protected:
     auto calculateDimensionsHash(const std::vector<seds::model::DimensionSize> &dimensions) const -> std::size_t;
 
     /**
+     * @brief   Assemble name based on the names of a command and its hosting interface
+     *
+     * @param interfaceName Name of the interface hosting the command
+     * @param type Interface type
+     * @param commandName Name of the command
+     *
+     * @return Assembled name
+     */
+    auto getCommandName(const ivm::IVInterface::InterfaceType type, const QString &commandName) const -> QString;
+
+    /**
      * @brief   Swaps between provided and required interface types
      *
      * @param   interfaceType   Interface type to switch
@@ -211,8 +215,10 @@ private:
     auto findMappedType(const QString &genericTypeName) const -> const QString &;
 
 protected:
-    /// @brief  Parent SEDS interface
-    const seds::model::Interface &m_sedsInterface;
+    /// @brief  Parent SEDS interface name
+    const QString &m_sedsInterfaceName;
+    /// @brief  Generic type mappings
+    const std::optional<seds::model::GenericTypeMapSet> &m_genericTypeMapSet;
     /// @brief  Output ASN.1 type definitions
     Asn1Acn::Definitions *m_asn1Definitions;
     /// @brief  Parent SEDS package

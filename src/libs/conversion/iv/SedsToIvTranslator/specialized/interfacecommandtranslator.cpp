@@ -45,20 +45,15 @@ const QString InterfaceCommandTranslator::m_interfaceParameterEncoding = "ACN";
 const QString InterfaceCommandTranslator::m_ivInterfaceNameTemplate = "%1_%2_%3";
 const QString InterfaceCommandTranslator::m_arrayArgumentNameTemplate = "%1_Array%2";
 
-InterfaceCommandTranslator::InterfaceCommandTranslator(const seds::model::Interface &sedsInterface,
-        Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage, ivm::IVFunction *ivFunction)
-    : m_sedsInterface(sedsInterface)
+InterfaceCommandTranslator::InterfaceCommandTranslator(const QString &sedsInterfaceName,
+        const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet, Asn1Acn::Definitions *asn1Definitions,
+        const seds::model::Package *sedsPackage, ivm::IVFunction *ivFunction)
+    : m_sedsInterfaceName(sedsInterfaceName)
+    , m_genericTypeMapSet(genericTypeMapSet)
     , m_asn1Definitions(asn1Definitions)
     , m_sedsPackage(sedsPackage)
     , m_ivFunction(ivFunction)
 {
-}
-
-QString InterfaceCommandTranslator::getCommandName(
-        const QString &interfaceName, const ivm::IVInterface::InterfaceType type, const QString &commandName)
-{
-    return Escaper::escapeIvName(
-            m_ivInterfaceNameTemplate.arg(interfaceName).arg(commandName).arg(interfaceTypeToString(type)));
 }
 
 QString InterfaceCommandTranslator::handleArgumentType(const seds::model::CommandArgument &sedsArgument) const
@@ -131,7 +126,7 @@ ivm::IVInterface *InterfaceCommandTranslator::createIvInterface(const seds::mode
     ivm::IVInterface::CreationInfo creationInfo;
     creationInfo.function = m_ivFunction;
     creationInfo.type = type;
-    creationInfo.name = getCommandName(m_sedsInterface.nameStr(), type, sedsCommand.nameStr());
+    creationInfo.name = getCommandName(type, sedsCommand.nameStr());
     creationInfo.kind = kind;
 
     return ivm::IVInterface::createIface(creationInfo);
@@ -194,6 +189,13 @@ QString InterfaceCommandTranslator::createArrayTypeName(const QString &sedsArgum
     }
 }
 
+QString InterfaceCommandTranslator::getCommandName(
+        const ivm::IVInterface::InterfaceType type, const QString &commandName) const
+{
+    return Escaper::escapeIvName(
+            m_ivInterfaceNameTemplate.arg(m_sedsInterfaceName).arg(commandName).arg(interfaceTypeToString(type)));
+}
+
 ivm::IVInterface::InterfaceType InterfaceCommandTranslator::switchInterfaceType(
         ivm::IVInterface::InterfaceType interfaceType)
 {
@@ -231,7 +233,11 @@ const QString &InterfaceCommandTranslator::interfaceTypeToString(ivm::IVInterfac
 
 const QString &InterfaceCommandTranslator::findMappedType(const QString &genericTypeName) const
 {
-    const auto &genericTypeMaps = m_sedsInterface.genericTypeMapSet().genericTypeMaps();
+    if (!m_genericTypeMapSet) {
+        return genericTypeName;
+    }
+
+    const auto &genericTypeMaps = m_genericTypeMapSet->genericTypeMaps();
 
     if (genericTypeMaps.empty()) {
         return genericTypeName;
