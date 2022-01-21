@@ -502,6 +502,7 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     if(callIfFile.open(QIODevice::ReadWrite)){
         QTextStream stream(&callIfFile);
         stream << "#!/bin/bash" << endl;
+        stream << "make clean" << endl;
         stream << "make model-check" << endl;
         stream << "echo $? > statusfile" << endl;
     } else {
