@@ -77,6 +77,7 @@ private Q_SLOTS:
 
     void testResolvingArrayDataType();
     void testResolvingContainerDataType();
+    void testResolvingUsingGlobal();
     void testResolvingCyclicDependency();
     void testResolvingUndeclaredType();
 
@@ -180,6 +181,26 @@ void tst_SedsToAsn1Translator::testResolvingContainerDataType()
     resolvedDataTypes.pop_front();
 
     QCOMPARE(dataTypeNameStr(*resolvedDataTypes.front()), "Container");
+    resolvedDataTypes.pop_front();
+}
+
+void tst_SedsToAsn1Translator::testResolvingUsingGlobal()
+{
+    const seds::model::DataType arrayDataType = SedsDataTypeFactory::createArray("Array", "DataItem", 2);
+    const seds::model::DataType integerDataType = SedsDataTypeFactory::createInteger("DataItem");
+
+    std::vector<const DataType *> dataTypes;
+    dataTypes.push_back(&arrayDataType);
+
+    std::vector<const DataType *> globalDataTypes;
+    globalDataTypes.push_back(&integerDataType);
+
+    DataTypesDependencyResolver resolver;
+    auto resolvedDataTypes = resolver.resolve(&dataTypes, &globalDataTypes);
+
+    QCOMPARE(resolvedDataTypes.size(), 1);
+
+    QCOMPARE(dataTypeNameStr(*resolvedDataTypes.front()), "Array");
     resolvedDataTypes.pop_front();
 }
 
