@@ -76,20 +76,23 @@ void ComponentsTranslator::translateInterface(const seds::model::Interface &seds
         const seds::model::Component &sedsComponent, const ivm::IVInterface::InterfaceType interfaceType,
         ivm::IVFunction *ivFunction)
 {
+    const auto &sedsInterfaceName = sedsInterface.nameStr();
     const auto &sedsInterfaceDeclaration = findInterfaceDeclaration(sedsInterface.type().nameStr(), sedsComponent);
 
-    InterfaceParameterTranslator parameterTranslator(sedsInterface.nameStr(), ivFunction);
+    translateParameters(sedsInterfaceName, sedsInterfaceDeclaration, interfaceType, ivFunction);
+    translateCommands(
+            sedsInterfaceName, sedsInterface.genericTypeMapSet(), sedsInterfaceDeclaration, interfaceType, ivFunction);
+}
 
-    for (const auto &sedsParameter : sedsInterfaceDeclaration.parameters()) {
-        parameterTranslator.translateParameter(sedsParameter, interfaceType);
-    }
-
-    const auto &sedsInterfaceName = sedsInterface.nameStr();
-
+void ComponentsTranslator::translateCommands(const QString &sedsInterfaceName,
+        const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
+        const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
+        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const
+{
     AsyncInterfaceCommandTranslator asyncCommandTranslator(
-            sedsInterfaceName, sedsInterface.genericTypeMapSet(), m_asn1Definitions, &m_sedsPackage, ivFunction);
+            sedsInterfaceName, genericTypeMapSet, m_asn1Definitions, &m_sedsPackage, ivFunction);
     SyncInterfaceCommandTranslator syncCommandTranslator(
-            sedsInterfaceName, sedsInterface.genericTypeMapSet(), m_asn1Definitions, &m_sedsPackage, ivFunction);
+            sedsInterfaceName, genericTypeMapSet, m_asn1Definitions, &m_sedsPackage, ivFunction);
 
     for (const auto &sedsCommand : sedsInterfaceDeclaration.commands()) {
         switch (sedsCommand.mode()) {
@@ -103,6 +106,17 @@ void ComponentsTranslator::translateInterface(const seds::model::Interface &seds
             throw UnhandledValueException("InterfaceCommandMode");
             break;
         }
+    }
+}
+
+void ComponentsTranslator::translateParameters(const QString &sedsInterfaceName,
+        const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
+        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const
+{
+    InterfaceParameterTranslator parameterTranslator(sedsInterfaceName, ivFunction);
+
+    for (const auto &sedsParameter : sedsInterfaceDeclaration.parameters()) {
+        parameterTranslator.translateParameter(sedsParameter, interfaceType);
     }
 }
 
