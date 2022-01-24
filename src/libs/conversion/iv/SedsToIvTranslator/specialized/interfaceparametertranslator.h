@@ -41,10 +41,10 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   sedsInterface   Parent interface
-     * @param   ivFunction      Output interface view function
+     * @param   sedsInterfaceName   Parent interface name
+     * @param   ivFunction          Output interface view function
      */
-    InterfaceParameterTranslator(const seds::model::Interface &sedsInterface, ivm::IVFunction *ivFunction);
+    InterfaceParameterTranslator(const QString &sedsInterfaceName, ivm::IVFunction *ivFunction);
     /**
      * @brief   Deleted copy constructor
      */
@@ -97,8 +97,8 @@ private:
     static auto interfaceTypeToString(ivm::IVInterface::InterfaceType type) -> const QString &;
 
 private:
-    /// @brief  Parent SEDS interface
-    const seds::model::Interface &m_sedsInterface;
+    /// @brief  Parent SEDS interface name
+    const QString &m_sedsInterfaceName;
     /// @brief  Output interface view function
     ivm::IVFunction *m_ivFunction;
 

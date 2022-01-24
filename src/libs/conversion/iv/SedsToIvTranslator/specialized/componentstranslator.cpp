@@ -78,7 +78,7 @@ void ComponentsTranslator::translateInterface(const seds::model::Interface &seds
 {
     const auto &sedsInterfaceDeclaration = findInterfaceDeclaration(sedsInterface.type().nameStr(), sedsComponent);
 
-    InterfaceParameterTranslator parameterTranslator(sedsInterface, ivFunction);
+    InterfaceParameterTranslator parameterTranslator(sedsInterface.nameStr(), ivFunction);
 
     for (const auto &sedsParameter : sedsInterfaceDeclaration.parameters()) {
         parameterTranslator.translateParameter(sedsParameter, interfaceType);

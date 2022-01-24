@@ -38,8 +38,8 @@ const QString InterfaceParameterTranslator::m_ivInterfaceNameTemplate = "%1_%2_%
 const QString InterfaceParameterTranslator::m_ivInterfaceParameterName = "Param";
 
 InterfaceParameterTranslator::InterfaceParameterTranslator(
-        const seds::model::Interface &sedsInterface, ivm::IVFunction *ivFunction)
-    : m_sedsInterface(sedsInterface)
+        const QString &sedsInterfaceName, ivm::IVFunction *ivFunction)
+    : m_sedsInterfaceName(sedsInterfaceName)
     , m_ivFunction(ivFunction)
 {
 }
@@ -93,7 +93,7 @@ void InterfaceParameterTranslator::createIvInterface(const InterfaceParameterTra
         const seds::model::InterfaceParameter &sedsParameter, ivm::IVInterface::InterfaceType type,
         ivm::IVInterface::OperationKind kind, shared::InterfaceParameter::Direction direction) const
 {
-    const auto name = getParameterName(mode, m_sedsInterface.nameStr(), type, sedsParameter.nameStr());
+    const auto name = getParameterName(mode, m_sedsInterfaceName, type, sedsParameter.nameStr());
 
     ivm::IVInterface::CreationInfo creationInfo;
     creationInfo.function = m_ivFunction;
