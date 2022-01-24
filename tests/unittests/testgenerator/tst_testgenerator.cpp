@@ -88,7 +88,8 @@ void tst_testgenerator::testEmpty()
 
     const auto csvModel = importer.importModel(options);
     QVERIFY(csvModel != nullptr);
-    QVERIFY(csvModel->header().fields().empty());
+    const csv::CsvModel &csvRef = *csvModel;
+    QVERIFY(csvRef.header().fields().empty());
 
     const auto model = loadIvModel("interfaceview.xml", "config.xml");
 
@@ -103,8 +104,7 @@ void tst_testgenerator::testEmpty()
     }
 
     ivm::IVInterface::CreationInfo ci;
-    const ivm::IVInterface &interface = *ifUnderTest; // TODO: take interfaceUnderTest from ivModel
-    const csv::CsvModel &csvRef = *csvModel;
+    const ivm::IVInterface &interface = *ifUnderTest;
     QVERIFY_EXCEPTION_THROWN(TestGenerator::generateTestDriver(csvRef, interface), TestGeneratorException);
 }
 
@@ -113,11 +113,12 @@ void tst_testgenerator::testNominal()
     csv::importer::CsvImporter importer;
     csv::importer::Options options;
     options.add(csv::importer::CsvOptions::separator, ",");
-    options.add(csv::importer::CsvOptions::inputFilepath, "resources/test_data.csv");
+    options.add(csv::importer::CsvOptions::inputFilepath, "test_data.csv");
 
     auto csvModel = importer.importModel(options);
     QVERIFY(csvModel != nullptr);
-    QVERIFY(!csvModel->header().fields().empty());
+    const csv::CsvModel &csvRef = *csvModel;
+    QVERIFY(csvRef.header().fields().size() == 4);
 
     QString headerText = "";
     const auto &headerFields = csvModel->header().fields();
@@ -127,9 +128,36 @@ void tst_testgenerator::testNominal()
             });
     qDebug() << "header" << headerText;
 
+    const auto model = loadIvModel("interfaceview.xml", "config.xml");
+
+    const auto ivModel = dynamic_cast<ivm::IVModel *>(model.get());
+    if (ivModel == nullptr) {
+        QFAIL("no model");
+    }
+    const QString ifName = "PI_InterfaceUnderTest";
+    const auto ifUnderTest = ivModel->getIfaceByName(ifName, ivm::IVInterface::InterfaceType::Provided);
+    if (ifUnderTest == nullptr) {
+        QFAIL(QString("provided if named not %1 found in given IV file").arg(ifName).toStdString().c_str());
+    }
+
+    ivm::IVInterface::CreationInfo ci;
+    const ivm::IVInterface &interface = *ifUnderTest;
+
     // TODO: verify that generator with correct inputs creates a correct source file
     // - csv data read
-    // - function's interface drom interfaceview (protected or unprotected)
+    // - function's interface from interfaceview (protected or unprotected)
+    auto testDriver = TestGenerator::generateTestDriver(csvRef, interface);
+
+    const QString testDriverStr = testDriver.readAll();
+    const QStringList testDriverStrList = testDriverStr.split("\n");
+
+    auto expectedFile = QFile("testdriver.c.out");
+    expectedFile.open(QFile::ReadOnly | QFile::Text);
+    const QStringList expectedStrList = QTextStream(&expectedFile).readAll().split("\n");
+
+    for (int i = 0; i < testDriverStrList.size(); i++) {
+        QCOMPARE(testDriverStrList[i], expectedStrList[i]);
+    }
 }
 
 // TODO: test case to verify that the generator throws an exception on cyclic interface
