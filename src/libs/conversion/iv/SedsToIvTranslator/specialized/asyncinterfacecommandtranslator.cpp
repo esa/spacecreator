@@ -147,7 +147,7 @@ QString AsyncInterfaceCommandTranslator::buildBundledType(
 }
 
 QString AsyncInterfaceCommandTranslator::createBundledType(
-        const QString &sedsCommandName, const std::unordered_map<QString, QString> &arguments)
+        const QString &sedsCommandName, const std::map<QString, QString> &arguments)
 {
     auto name = createBundledTypeName(sedsCommandName);
 
@@ -164,11 +164,11 @@ QString AsyncInterfaceCommandTranslator::createBundledType(
     return name;
 }
 
-std::unordered_map<QString, QString> AsyncInterfaceCommandTranslator::filterArguments(
+std::map<QString, QString> AsyncInterfaceCommandTranslator::filterArguments(
         const std::vector<seds::model::CommandArgument> &sedsArguments,
         seds::model::CommandArgumentMode requestedArgumentMode) const
 {
-    std::unordered_map<QString, QString> arguments;
+    std::map<QString, QString> arguments;
 
     for (const auto &sedsArgument : sedsArguments) {
         if (sedsArgument.mode() == requestedArgumentMode) {
@@ -181,8 +181,7 @@ std::unordered_map<QString, QString> AsyncInterfaceCommandTranslator::filterArgu
     return arguments;
 }
 
-std::size_t AsyncInterfaceCommandTranslator::calculateArgumentsHash(
-        const std::unordered_map<QString, QString> &arguments) const
+std::size_t AsyncInterfaceCommandTranslator::calculateArgumentsHash(const std::map<QString, QString> &arguments) const
 {
     std::size_t typeHash = 0;
 
@@ -212,7 +211,7 @@ QString AsyncInterfaceCommandTranslator::createBundledTypeName(const QString &se
 }
 
 bool AsyncInterfaceCommandTranslator::ArgumentsCacheEntry::compareArguments(
-        const std::unordered_map<QString, QString> &arguments) const
+        const std::map<QString, QString> &arguments) const
 {
     if (typeArguments.size() != arguments.size()) {
         return false;

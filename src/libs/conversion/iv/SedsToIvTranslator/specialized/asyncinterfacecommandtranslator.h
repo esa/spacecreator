@@ -24,7 +24,6 @@
 #include <map>
 #include <seds/SedsModel/types/datatype.h>
 #include <shared/qstringhash.h>
-#include <unordered_map>
 
 namespace seds::model {
 class CommandArgument;
@@ -116,8 +115,7 @@ private:
      *
      * @return  Bundled type name
      */
-    auto createBundledType(const QString &sedsCommandName, const std::unordered_map<QString, QString> &arguments)
-            -> QString;
+    auto createBundledType(const QString &sedsCommandName, const std::map<QString, QString> &arguments) -> QString;
     /**
      * @brief   Filters all arguments by their mode
      *
@@ -127,7 +125,7 @@ private:
      * @return  Matching arguments
      */
     auto filterArguments(const std::vector<seds::model::CommandArgument> &sedsArguments,
-            seds::model::CommandArgumentMode requestedArgumentMode) const -> std::unordered_map<QString, QString>;
+            seds::model::CommandArgumentMode requestedArgumentMode) const -> std::map<QString, QString>;
 
     /**
      * @brief   Calculates hash from arguments types
@@ -136,7 +134,7 @@ private:
      *
      * @return  Calculated hash
      */
-    auto calculateArgumentsHash(const std::unordered_map<QString, QString> &arguments) const -> std::size_t;
+    auto calculateArgumentsHash(const std::map<QString, QString> &arguments) const -> std::size_t;
 
     /**
      *  Create a name for the bundled argument type
@@ -151,9 +149,9 @@ private:
     struct ArgumentsCacheEntry final {
         QString asn1TypeName;
         std::size_t typeHash;
-        std::unordered_map<QString, QString> typeArguments;
+        std::map<QString, QString> typeArguments;
 
-        auto compareArguments(const std::unordered_map<QString, QString> &arguments) const -> bool;
+        auto compareArguments(const std::map<QString, QString> &arguments) const -> bool;
     };
 
     /// @brief  Cache of the bundled ASN.1 types that was created for given command
