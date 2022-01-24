@@ -42,4 +42,3 @@ $DIFF interfaceview.xml ../resources/test_interface_inheritance.output \
   -x InterfaceView.aadl \
   && cd .. \
   && rm -r -f $TEST_OUTPUT_DIR
-

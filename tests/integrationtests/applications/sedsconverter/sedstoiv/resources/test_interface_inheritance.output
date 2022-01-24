@@ -1,7 +1,7 @@
 <InterfaceView>
 <Function name="Component" is_type="NO" language="C" default_implementation="default">
 <Provided_Interface name="Get_ComponentInterface_MegaParam_Pi" kind="Protected" layer="default">
-    <Output_Parameter name="Param" type="GenericInteger" encoding="ACN"/>
+    <Output_Parameter name="Param" type="MegaInteger" encoding="ACN"/>
 </Provided_Interface>
 
 <Provided_Interface name="ComponentInterface_MegaCommand_Pi" kind="Protected" layer="default">
@@ -10,7 +10,7 @@
 </Provided_Interface>
 
 <Provided_Interface name="Get_ComponentInterface_BaseParam_Pi" kind="Protected" layer="default">
-    <Output_Parameter name="Param" type="GenericInteger" encoding="ACN"/>
+    <Output_Parameter name="Param" type="BaseInteger" encoding="ACN"/>
 </Provided_Interface>
 
 <Provided_Interface name="ComponentInterface_BaseCommand_Pi" kind="Protected" layer="default">
@@ -19,7 +19,7 @@
 </Provided_Interface>
 
 <Provided_Interface name="Get_ComponentInterface_ChildParam_Pi" kind="Protected" layer="default">
-    <Output_Parameter name="Param" type="GenericInteger" encoding="ACN"/>
+    <Output_Parameter name="Param" type="ChildInteger" encoding="ACN"/>
 </Provided_Interface>
 
 <Provided_Interface name="ComponentInterface_ChildCommand_Pi" kind="Protected" layer="default">

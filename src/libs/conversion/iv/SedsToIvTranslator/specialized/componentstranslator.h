@@ -104,6 +104,7 @@ private:
             const seds::model::Component &sedsComponent, const ivm::IVInterface::InterfaceType interfaceType,
             ivm::IVFunction *ivFunction) const -> void;
     auto translateParameters(const QString &sedsInterfaceName,
+            const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
             const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
     auto translateCommands(const QString &sedsInterfaceName,
