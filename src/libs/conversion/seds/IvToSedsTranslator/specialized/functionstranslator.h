@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <conversion/common/qstringhash.h>
 #include <ivcore/ivinterface.h>
+#include <shared/qstringhash.h>
 #include <unordered_map>
 
 namespace ivm {

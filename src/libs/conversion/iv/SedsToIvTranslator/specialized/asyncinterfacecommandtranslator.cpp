@@ -24,12 +24,12 @@
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <conversion/common/escaper/escaper.h>
-#include <conversion/common/qstringhash.h>
 #include <conversion/common/translation/exceptions.h>
 #include <iostream>
 #include <ivcore/ivfunction.h>
 #include <seds/SedsModel/package/package.h>
 #include <shared/parameter.h>
+#include <shared/qstringhash.h>
 
 using conversion::Escaper;
 using conversion::UnhandledValueException;
