@@ -99,6 +99,18 @@ public:
     virtual auto translateCommand(
             const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType interfaceType) -> void = 0;
 
+    /**
+     * @brief   Assemble name based on the names of a command and its hosting interface
+     *
+     * @param interfaceName Name of the interface hosting the command
+     * @param type Interface type
+     * @param commandName Name of the command
+     *
+     * @return Assembled name
+     */
+    static auto getCommandName(const QString &sedsInterfaceName, const ivm::IVInterface::InterfaceType type,
+            const QString &commandName) -> QString;
+
 protected:
     /**
      * @brief   Process argument to get its concrete type name
@@ -175,17 +187,6 @@ protected:
      * @return  Calculated hash
      */
     auto calculateDimensionsHash(const std::vector<seds::model::DimensionSize> &dimensions) const -> std::size_t;
-
-    /**
-     * @brief   Assemble name based on the names of a command and its hosting interface
-     *
-     * @param interfaceName Name of the interface hosting the command
-     * @param type Interface type
-     * @param commandName Name of the command
-     *
-     * @return Assembled name
-     */
-    auto getCommandName(const ivm::IVInterface::InterfaceType type, const QString &commandName) const -> QString;
 
     /**
      * @brief   Swaps between provided and required interface types
