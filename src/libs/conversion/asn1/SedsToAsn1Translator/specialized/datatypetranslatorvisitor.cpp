@@ -129,7 +129,6 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 
     if (sedsType.isAbstract()) {
         cacheAbstractContainerEntries(sedsType);
-        createRealizationContainerField(type.get());
     } else {
         EntryTranslatorVisitor visitor { m_asn1Definitions, type.get() };
 
@@ -337,7 +336,7 @@ void DataTypeTranslatorVisitor::translateFloatEncoding(
         // clang-format off
         std::visit(overloaded {
             [&](seds::model::CoreEncodingAndPrecision coreEncoding) {
-                translateCoreEncodingAndPrecision(coreEncoding, asn1Type);
+                translateCoreEncodingAndPrecision(coreEncoding, encoding->bits(), asn1Type);
             }
         }, encoding->encoding());
         // clang-format on
@@ -407,15 +406,23 @@ void DataTypeTranslatorVisitor::translateCoreIntegerEncoding(
 }
 
 void DataTypeTranslatorVisitor::translateCoreEncodingAndPrecision(
-        seds::model::CoreEncodingAndPrecision coreEncoding, Asn1Acn::Types::Real *asn1Type) const
+        seds::model::CoreEncodingAndPrecision coreEncoding, uint64_t bits, Asn1Acn::Types::Real *asn1Type) const
 {
     switch (coreEncoding) {
-    case seds::model::CoreEncodingAndPrecision::IeeeSingle:
+    case seds::model::CoreEncodingAndPrecision::IeeeSingle: {
+        if (bits != 32) {
+            auto errorMessage = QString("Wrong number of bits specified (%1) for IEEE754_1985_32 encoding").arg(bits);
+            throw TranslationException(std::move(errorMessage));
+        }
         asn1Type->setEncoding(Asn1Acn::Types::RealEncoding::IEEE754_1985_32);
-        break;
-    case seds::model::CoreEncodingAndPrecision::IeeeDouble:
+    } break;
+    case seds::model::CoreEncodingAndPrecision::IeeeDouble: {
+        if (bits != 64) {
+            auto errorMessage = QString("Wrong number of bits specified (%1) for IEEE754_1985_64 encoding").arg(bits);
+            throw TranslationException(std::move(errorMessage));
+        }
         asn1Type->setEncoding(Asn1Acn::Types::RealEncoding::IEEE754_1985_64);
-        break;
+    } break;
     case seds::model::CoreEncodingAndPrecision::IeeeQuad:
         throw UnsupportedValueException("CoreEncodingAndPrecision", "IeeeQuad");
         break;
@@ -591,10 +598,8 @@ void DataTypeTranslatorVisitor::updateParentContainer(
 
     auto *asn1RealizationComponent = asn1BaseSequence->component(m_realizationComponentsName);
     if (!asn1RealizationComponent) {
-        auto errorMessage = QString("Missing %1 component in the '%2' base component")
-                                    .arg(m_realizationComponentsName)
-                                    .arg(sedsBaseTypeName);
-        throw TranslationException(std::move(errorMessage));
+        createRealizationContainerField(asn1BaseSequence);
+        asn1RealizationComponent = asn1BaseSequence->component(m_realizationComponentsName);
     }
 
     auto *asn1RealizationChoice = dynamic_cast<Asn1Acn::Types::Choice *>(asn1RealizationComponent->type());

@@ -45,13 +45,19 @@
           <Enumeration value="2" label="PacketB" />
         </EnumerationList>
       </EnumeratedDataType>
+      <ContainerDataType name="EmptyContainer">
+      </ContainerDataType>
+      <ContainerDataType name="EmptyAbstractContainer" abstract="true">
+      </ContainerDataType>
       <ContainerDataType name="PayloadBase" abstract="true">
         <LongDescription>Base for the packet payload data</LongDescription>
-        <EntryList>
-        </EntryList>
       </ContainerDataType>
       <ContainerDataType name="PayloadA" abstract="false" baseType="PayloadBase">
-        <LongDescription>Payload A for a data packet</LongDescription><EntryList><Entry name="data" type="DataItemA"></Entry></EntryList></ContainerDataType>
+        <LongDescription>Payload A for a data packet</LongDescription>
+        <EntryList>
+          <Entry name="data" type="DataItemA" />
+        </EntryList>
+      </ContainerDataType>
       <ContainerDataType name="PayloadB" abstract="false" baseType="PayloadBase">
         <LongDescription>Payload B for a data packet</LongDescription>
         <EntryList>
@@ -64,8 +70,6 @@
           <Entry name="Id" type="PacketId" />
           <Entry name="Payload" type="PayloadBase" />
         </EntryList>
-        <TrailerEntryList>
-        </TrailerEntryList>
       </ContainerDataType>
       <ContainerDataType name="DataPacketA" abstract="false" baseType="DataPacket">
         <LongDescription>Concrete packet implementation A</LongDescription>

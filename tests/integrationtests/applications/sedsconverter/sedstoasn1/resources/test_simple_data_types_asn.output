@@ -6,7 +6,6 @@ SignedInteger16Big ::= INTEGER(-32768 .. 32767)
 BasicBoolean ::= BOOLEAN
 InvertedBoolean ::= BOOLEAN
 Float32 ::= REAL(1.17549e-38 .. 3.40282e+38)
-UnsignedFloat80 ::= REAL(0 .. 1.79769e+308)
 VariableSizeBLOB ::= BIT STRING(SIZE(0 .. 128))
 FixedSizeBLOB ::= BIT STRING(SIZE(64))
 FixedSizeAsciiString ::= IA5String(SIZE(32))

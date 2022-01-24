@@ -1,0 +1,72 @@
+<InterfaceView asn1file="mcheck.asn">
+<Function name="controller" is_type="NO" language="SDL" default_implementation="default">
+    <Property name="Taste::coordinates" value="43000 34200 65200 59200"/>
+<Provided_Interface name="result" kind="Sporadic" miat="0" queue_size="2" priority="2" stack_size="50">
+    <Input_Parameter name="p1" type="TestInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="65200 54200"/>
+</Provided_Interface>
+
+<Provided_Interface name="error" kind="Sporadic" miat="0" queue_size="1" priority="10" stack_size="50">
+    <Property name="Taste::coordinates" value="65200 44500"/>
+</Provided_Interface>
+
+<Required_Interface name="work" kind="Sporadic" miat="0" queue_size="2" priority="4" stack_size="50">
+    <Input_Parameter name="p1" type="TestParam" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="65200 38800"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="actuator" is_type="NO" language="SDL" default_implementation="default">
+    <Property name="Taste::coordinates" value="81900 34400 104800 59200"/>
+<Provided_Interface name="work" kind="Sporadic" miat="0" queue_size="2" priority="4" stack_size="50">
+    <Input_Parameter name="p1" type="TestParam" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="81900 38800"/>
+</Provided_Interface>
+
+<Required_Interface name="result" kind="Sporadic" miat="0" queue_size="2" priority="2" stack_size="50">
+    <Input_Parameter name="p1" type="TestInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="81900 54100"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="error" kind="Sporadic" miat="0" queue_size="1" priority="10" stack_size="50">
+    <Property name="Taste::coordinates" value="81900 44500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Connection >
+    <Source func_name="actuator" ri_name="result"/>
+    <Target func_name="controller" pi_name="result"/>
+    <Property name="Taste::coordinates" value="81300 54100 73400 54100 65500 54200"/>
+</Connection>
+
+<Connection >
+    <Source func_name="actuator" ri_name="error"/>
+    <Target func_name="controller" pi_name="error"/>
+    <Property name="Taste::coordinates" value="81300 44500 65500 44500"/>
+</Connection>
+
+<Connection >
+    <Source func_name="controller" ri_name="work"/>
+    <Target func_name="actuator" pi_name="work"/>
+    <Property name="Taste::coordinates" value="65800 38800 81600 38800"/>
+</Connection>
+
+<Comment name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3">
+    <Property name="Taste::coordinates" value="4800 5100 46100 20700"/>
+</Comment>
+
+</InterfaceView>

@@ -127,6 +127,18 @@ void ProctypeElementVisitor::operator()(const Assignment &assignment)
 void ProctypeElementVisitor::operator()(const InlineCall &inlineCall)
 {
     m_stream << m_indent;
-    m_stream << inlineCall.getName() << "();\n";
+    m_stream << inlineCall.getName() << "(";
+    VariableRefVisitor variableRefVisitor(m_stream);
+
+    bool first = true;
+    for (const VariableRef &variableRef : inlineCall.getArguments()) {
+        if (!first) {
+            m_stream << ", ";
+        } else {
+            first = false;
+        }
+        variableRefVisitor.visit(variableRef);
+    }
+    m_stream << ");\n";
 }
 }

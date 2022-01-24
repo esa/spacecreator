@@ -137,7 +137,13 @@ void PromelaModelVisitor::generateDeclarations(const QList<Declaration> &values)
 void PromelaModelVisitor::generateInlineDefs(const std::list<std::unique_ptr<InlineDef>> &inlines)
 {
     for (const std::unique_ptr<InlineDef> &inlineDef : inlines) {
-        m_stream << "inline " << inlineDef->getName() << "()\n";
+        m_stream << "inline " << inlineDef->getName();
+
+        m_stream << "(";
+        const QString allArguments = QStringList(inlineDef->getArguments()).join(", ");
+        m_stream << allArguments;
+        m_stream << ")\n";
+
         m_stream << "{\n";
         generateSequence(inlineDef->getSequence());
         m_stream << "}\n";

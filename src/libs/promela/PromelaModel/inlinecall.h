@@ -19,6 +19,9 @@
 
 #pragma once
 
+#include "variableref.h"
+
+#include <QList>
 #include <QString>
 
 namespace promela::model {
@@ -32,8 +35,9 @@ public:
      * @brief Constructor
      *
      * @param name name of inline
+     * @param arguments list of arguments
      */
-    InlineCall(QString name);
+    InlineCall(QString name, const QList<VariableRef> &arguments);
 
     /**
      * @brief Getter for name of inline
@@ -41,8 +45,15 @@ public:
      * @return Name of inline
      */
     const QString &getName() const noexcept;
+    /**
+     * @brief Getter for arguments of inline call
+     *
+     * @return List of inline arguments.
+     */
+    const QList<VariableRef> &getArguments() const noexcept;
 
 private:
     QString m_name;
+    QList<VariableRef> m_arguments;
 };
 }

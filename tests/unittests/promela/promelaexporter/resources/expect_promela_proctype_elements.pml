@@ -9,4 +9,5 @@ init
     channel1!param;
     channel1?param;
     fn();
+    fnParams(param);
 }

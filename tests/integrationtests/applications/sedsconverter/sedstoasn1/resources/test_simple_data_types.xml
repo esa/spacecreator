@@ -45,13 +45,6 @@
           <PrecisionRange>single</PrecisionRange>
         </Range>
       </FloatDataType>
-      <FloatDataType name="UnsignedFloat80">
-        <LongDescription>A complex 80-bit float</LongDescription>
-        <FloatDataEncoding sizeInBits="80" encodingAndPrecision="IEEE754_2008_double" />
-        <Range>
-          <MinMaxRange rangeType="atLeast" min="0" />
-        </Range>
-      </FloatDataType>
       <BinaryDataType name="VariableSizeBLOB" sizeInBits="128" fixedSize="false" />
       <BinaryDataType name="FixedSizeBLOB" sizeInBits="64" fixedSize="true" />
       <StringDataType name="FixedSizeAsciiString" length="32" fixedLength="true">

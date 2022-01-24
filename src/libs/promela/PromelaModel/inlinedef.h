@@ -22,6 +22,7 @@
 #include "proctypeelement.h"
 #include "sequence.h"
 
+#include <QList>
 #include <QString>
 
 namespace promela::model {
@@ -35,9 +36,10 @@ public:
      * @brief Constructor
      *
      * @param name name of inline definition
+     * @param arguments list of arguments
      * @param sequence content of inline definition
      */
-    InlineDef(QString name, Sequence sequence);
+    InlineDef(QString name, const QList<QString> &arguments, Sequence sequence);
 
     /**
      * @brief Getter for name of inline definition
@@ -65,8 +67,22 @@ public:
      */
     void setSequence(Sequence sequence);
 
+    /**
+     * @brief Getter for arguments of inline definition
+     *
+     * @return arguments of inline definition
+     */
+    const QList<QString> &getArguments() const noexcept;
+    /**
+     * @brief Setter for arguments of inline definition
+     *
+     * @param arguments arguments of inline definition
+     */
+    void setArguments(const QList<QString> &arguments);
+
 private:
     QString m_name;
+    QList<QString> m_arguments;
     Sequence m_sequence;
 };
 }
