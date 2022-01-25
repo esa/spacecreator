@@ -21,9 +21,13 @@
 
 #include <QTextStream>
 #include <asn1/asn1model.h>
+#include <asn1library/asn1/types/type.h>
 #include <csv/CsvModel/csvmodel.h>
 #include <ivcore/ivinterface.h>
 #include <sstream>
+
+using Asn1Acn::Asn1Model;
+using Asn1Acn::Types::Type;
 
 namespace testgenerator {
 
@@ -32,6 +36,9 @@ class TestGenerator final
 public:
     static auto generateTestDriver(const csv::CsvModel &testData, const ivm::IVInterface &interface,
             const Asn1Acn::Asn1Model &asn1Model) -> std::stringstream;
+
+private:
+    static auto getAsn1Type(const QString &name, const Asn1Model &model) -> Type::ASN1Type;
 };
 
 } // testgenerator

@@ -20,6 +20,7 @@
 #include "TestGenerator.h"
 
 #include "TestGeneratorException.h"
+#include "common.h"
 
 #include <QDebug>
 #include <ivcore/ivfunctiontype.h>
@@ -73,23 +74,65 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
           "{\n";
 
     for (unsigned long int i = 0; i < testRecordsSize; i++) {
-        // switch on parameter type
         const auto &ifParams = interface.params();
-        for (const auto &param : ifParams) {
-            (void)param;
+        for (int j = 0; j < ifParams.size(); j++) {
+            const auto &param = ifParams[j];
+
             ss << QString("    testData[%1].%2 = ").arg(i).arg(param.name()).toStdString();
-            // qDebug() << param.paramTypeName(); // TODO: get applicable type (float/int/bool)
+
+            switch (getAsn1Type(param.paramTypeName(), asn1Model)) {
+            case Asn1Acn::Types::Type::INTEGER:
+                ss << "integer";
+                break;
+            case Asn1Acn::Types::Type::REAL:
+                ss << "real (float)";
+                break;
+            case Asn1Acn::Types::Type::BOOLEAN: {
+                ss << "bool ";
+
+                auto valStr = "";
+                const auto val = testData.records()[i]->fields()[j].toInt();
+                if (val == 0) {
+                    valStr = "0";
+                } else if (val == 1) {
+                    valStr = "1";
+                } else {
+                    throw TestGeneratorException("Invalid boolean value");
+                }
+                ss << valStr;
+
+                break;
+            }
+            case Asn1Acn::Types::Type::UNKNOWN:
+                throw TestGeneratorException("Interface parameter type not present in ASN.1 file");
+            default:
+                throw TestGeneratorException("Interface parameter type not yet implemented");
+            }
 
             if (interface.function() == nullptr) {
                 throw TestGeneratorException("Interface has no Function set.");
             }
-            (void)asn1Model;
 
             ss << "\n";
         }
     }
 
     return ss;
+}
+
+auto TestGenerator::getAsn1Type(const QString &name, const Asn1Model &model) -> Type::ASN1Type
+{
+    for (const auto &datum : model.data()) {
+        const auto &definitionsList = datum->definitionsList();
+        for (const auto &definition : definitionsList) {
+            for (const auto &type : definition->types()) {
+                if (type->name().compare(name) == 0) {
+                    return type->typeEnum();
+                }
+            }
+        }
+    }
+    return Type::ASN1Type::UNKNOWN;
 }
 
 } // testgenerator
