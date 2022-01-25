@@ -161,7 +161,7 @@ RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>::getSmall
     case Asn1Acn::Types::IntegerEncoding::twos_complement:
         return -std::pow(2, m_asn1Type->size() - 1);
     case Asn1Acn::Types::IntegerEncoding::ASCII:
-        return -std::pow(10, (m_asn1Type->size() / 8) - 1);
+        return -(std::pow(10, (m_asn1Type->size() / 8) - 1) - 1);
     case Asn1Acn::Types::IntegerEncoding::BCD:
         return 0;
     case Asn1Acn::Types::IntegerEncoding::unspecified:
