@@ -17,14 +17,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "ivlibrary.h"
-#include "sharedlibrary.h"
+#include "conversion/asn1/Asn1Importer/importer.h"
+#include "conversion/asn1/Asn1Options/options.h"
 
 #include <QDebug>
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
 #include <algorithm>
+#include <asn1library/asn1/asn1model.h>
 #include <conversion/common/model.h>
 #include <conversion/common/options.h>
 #include <conversion/iv/IvOptions/options.h>
@@ -33,6 +34,7 @@
 #include <csv/CsvModel/csvmodel.h>
 #include <csv/CsvOptions/options.h>
 #include <ivcore/ivinterface.h>
+#include <ivcore/ivlibrary.h>
 #include <ivcore/ivmodel.h>
 #include <ivcore/ivobject.h>
 #include <memory>
@@ -41,6 +43,7 @@
 #include <qstandardpaths.h>
 #include <qtestcase.h>
 #include <shared/common.h>
+#include <shared/sharedlibrary.h>
 #include <testgenerator/TestGenerator.h>
 #include <testgenerator/TestGeneratorException.h>
 
@@ -57,6 +60,23 @@ private Q_SLOTS:
     void testEmpty();
     void testNominal();
 };
+
+static std::unique_ptr<conversion::Model> loadAsn1Model(const QString &file)
+{
+    std::unique_ptr<conversion::Model> model;
+
+    conversion::Options options;
+    options.add(conversion::asn1::Asn1Options::inputFilepath, file);
+
+    conversion::asn1::importer::Asn1Importer importer;
+    try {
+        model = importer.importModel(options);
+    } catch (const std::exception &ex) {
+        return nullptr;
+    }
+
+    return model;
+}
 
 static std::unique_ptr<conversion::Model> loadIvModel(
         const QString &ivFilename, QString ivConfigFilename = shared::interfaceCustomAttributesFilePath())
@@ -129,8 +149,12 @@ void tst_testgenerator::testNominal()
     }
     QCOMPARE(headerText, "active,temperature,posX,posY");
 
-    const auto model = loadIvModel("interfaceview.xml", "config.xml");
+    // TODO: load ASN1 model
+    const auto asn1ModelRaw = loadAsn1Model("testgenerator.asn");
+    const auto asn1Model = dynamic_cast<Asn1Acn::Asn1Model *>(asn1ModelRaw.get());
+    (void)asn1Model; // TODO
 
+    const auto model = loadIvModel("interfaceview.xml", "config.xml");
     const auto ivModel = dynamic_cast<ivm::IVModel *>(model.get());
     if (ivModel == nullptr) {
         QFAIL("The model could not be read");

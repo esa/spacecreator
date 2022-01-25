@@ -20,9 +20,12 @@
 #include "TestGenerator.h"
 
 #include "TestGeneratorException.h"
-#include "types/type.h"
 
 #include <QDebug>
+#include <asn1/asn1model.h>
+#include <ivcore/ivfunctiontype.h>
+#include <ivcore/ivmodel.h>
+#include <ivcore/ivobject.h>
 #include <sstream>
 
 namespace testgenerator {
@@ -30,12 +33,8 @@ namespace testgenerator {
 auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm::IVInterface &interface)
         -> std::stringstream
 {
-    (void)interface;
-
     if (testData.records().empty()) {
         throw TestGeneratorException("Given test data is empty");
-    } else {
-        qDebug() << "loaded CSV not empty";
     }
 
     const auto testRecordsSize = testData.records().size();
@@ -81,14 +80,43 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
             (void)param;
             ss << QString("    testData[%1].%2 = ").arg(i).arg(param.name()).toStdString();
             // qDebug() << param.paramTypeName(); // TODO: get applicable type (float/int/bool)
+            qDebug() << param.toString();
+            qDebug() << param.encoding();
+
+            if (interface.function() == nullptr) {
+                throw TestGeneratorException("Interface has no Function set.");
+            }
+
+            auto parent = interface.function()->parent();
+            if (parent == nullptr) {
+                throw TestGeneratorException("Parent is null.");
+            }
+
+            auto model = dynamic_cast<ivm::IVModel *>(parent);
+            if (model == nullptr) {
+                throw TestGeneratorException("Parent cannot be read.");
+            }
+
+            auto project = model->parent();
+            if (project == nullptr) {
+                throw TestGeneratorException("no project");
+            }
+
+            for (auto &child : project->children()) {
+                auto *const asn1Model = dynamic_cast<Asn1Acn::Asn1Model *>(child);
+                if (asn1Model == nullptr) {
+                    continue;
+                }
+
+                for (auto &datum : asn1Model->data()) {
+                    //
+                    (void)datum;
+                }
+            }
+
             ss << "\n";
         }
     }
-
-    QString testDriver = "";
-
-    // TODO
-    ss << testDriver.toStdString();
 
     return ss;
 }
