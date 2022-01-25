@@ -22,10 +22,12 @@
 #include "TestGeneratorException.h"
 
 #include <QDebug>
+#include <sstream>
 
 namespace testgenerator {
 
-auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm::IVInterface &interface) -> QTextStream
+auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm::IVInterface &interface)
+        -> std::stringstream
 {
     (void)interface;
 
@@ -35,8 +37,23 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
         qDebug() << "loaded CSV not empty";
     }
 
+    std::stringstream ss;
+    ss << "/**\n";
+    ss << " * This file was generated automatically by TestGenerator\n";
+    ss << " */\n";
+    ss << "\n";
+    ss << "#include \"testdriver.h\"\n";
+    ss << "//#include <stdio.h>";
+    ss << "\n";
+    ss << "\n";
+    ss << QString("#define TEST_DATA_SIZE %1").arg(testData.records().size()).toStdString();
+
+    QString testDriver = "";
+
     // TODO
-    return QTextStream();
+    ss << testDriver.toStdString();
+
+    return ss;
 }
 
 } // testgenerator

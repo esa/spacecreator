@@ -5,7 +5,7 @@
 #include "testdriver.h"
 //#include <stdio.h>
 
-#define TEST_DATA_SIZE 6
+#define TEST_DATA_SIZE 5
 
 typedef struct {
     asn1SccMyBool active_in;

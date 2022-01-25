@@ -22,13 +22,15 @@
 #include <QTextStream>
 #include <csv/CsvModel/csvmodel.h>
 #include <ivcore/ivinterface.h>
+#include <sstream>
 
 namespace testgenerator {
 
 class TestGenerator final
 {
 public:
-    static auto generateTestDriver(const csv::CsvModel &testData, const ivm::IVInterface &interface) -> QTextStream;
+    static auto generateTestDriver(const csv::CsvModel &testData, const ivm::IVInterface &interface)
+            -> std::stringstream;
 };
 
 } // testgenerator

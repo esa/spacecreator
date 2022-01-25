@@ -36,6 +36,7 @@
 #include <ivcore/ivmodel.h>
 #include <ivcore/ivobject.h>
 #include <memory>
+#include <qdebug.h>
 #include <qdiriterator.h>
 #include <qstandardpaths.h>
 #include <qtestcase.h>
@@ -132,7 +133,7 @@ void tst_testgenerator::testNominal()
 
     const auto ivModel = dynamic_cast<ivm::IVModel *>(model.get());
     if (ivModel == nullptr) {
-        QFAIL("no model");
+        QFAIL("The model could not be read");
     }
     const QString ifName = "PI_InterfaceUnderTest";
     const auto ifUnderTest = ivModel->getIfaceByName(ifName, ivm::IVInterface::InterfaceType::Provided);
@@ -148,15 +149,24 @@ void tst_testgenerator::testNominal()
     // - function's interface from interfaceview (protected or unprotected)
     auto testDriver = TestGenerator::generateTestDriver(csvRef, interface);
 
-    const QString testDriverStr = testDriver.readAll();
+    const QString testDriverStr = QString::fromStdString(testDriver.str());
     const QStringList testDriverStrList = testDriverStr.split("\n");
 
     auto expectedFile = QFile("testdriver.c.out");
     expectedFile.open(QFile::ReadOnly | QFile::Text);
     const QStringList expectedStrList = QTextStream(&expectedFile).readAll().split("\n");
 
-    for (int i = 0; i < testDriverStrList.size(); i++) {
-        QCOMPARE(testDriverStrList[i], expectedStrList[i]);
+    for (int i = 0; i < expectedStrList.size(); i++) {
+        if (testDriverStrList.size() == i) {
+            qDebug() << (QString("missing line: %1").arg(expectedStrList[i]).toStdString().c_str());
+            QFAIL("Actual size too short");
+        }
+        if (testDriverStrList[i].compare(expectedStrList[i]) != 0) {
+            qDebug() << (QString("in line no %1").arg(i).toStdString().c_str());
+            qDebug() << (QString("expected %1").arg(expectedStrList[i]).toStdString().c_str());
+            qDebug() << (QString("but was  %1").arg(testDriverStrList[i]).toStdString().c_str());
+            QFAIL("Lines not equal");
+        }
     }
 }
 
