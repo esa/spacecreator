@@ -123,11 +123,11 @@ void tst_testgenerator::testNominal()
 
     QString headerText = "";
     const auto &headerFields = csvModel->header().fields();
-    std::for_each(headerFields.begin(), headerFields.end(),
-            [&](const auto &field) { //
-                headerText = QString("%1, %2").arg(headerText, field);
-            });
-    qDebug() << "header" << headerText;
+    headerText = *headerFields.begin();
+    for (auto it = std::next(headerFields.begin()); it != headerFields.end(); it++) {
+        headerText = QString("%1,%2").arg(headerText, *it);
+    }
+    QCOMPARE(headerText, "active,temperature,posX,posY");
 
     const auto model = loadIvModel("interfaceview.xml", "config.xml");
 

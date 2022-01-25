@@ -20,6 +20,7 @@
 #include "TestGenerator.h"
 
 #include "TestGeneratorException.h"
+#include "types/type.h"
 
 #include <QDebug>
 #include <sstream>
@@ -37,16 +38,52 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
         qDebug() << "loaded CSV not empty";
     }
 
+    const auto testRecordsSize = testData.records().size();
+
     std::stringstream ss;
-    ss << "/**\n";
-    ss << " * This file was generated automatically by TestGenerator\n";
-    ss << " */\n";
-    ss << "\n";
-    ss << "#include \"testdriver.h\"\n";
-    ss << "//#include <stdio.h>";
-    ss << "\n";
-    ss << "\n";
-    ss << QString("#define TEST_DATA_SIZE %1").arg(testData.records().size()).toStdString();
+    ss << "/**\n"
+          " * This file was generated automatically by TestGenerator\n"
+          " */\n"
+          "\n"
+          "#include \"testdriver.h\"\n"
+          "//#include <stdio.h>"
+          "\n"
+          "\n";
+    ss << QString("#define TEST_DATA_SIZE %1").arg(testRecordsSize).toStdString();
+    ss << "\n"
+          "\n"
+          "typedef struct {\n";
+
+    for (const auto &param : interface.params()) {
+        ss << "    asn1Scc" << param.paramTypeName().toStdString() << " " << param.name().toStdString() << ";\n";
+    }
+
+    ss << "} TestVector;\n"
+          "\n"
+          "TestVector testData[TEST_DATA_SIZE] = { 0 };\n"
+          "\n"
+          "void notifyTestFinished(void)\n"
+          "{\n"
+          "    volatile int a;\n"
+          "    while (true) {\n"
+          "        a = 0;\n"
+          "        break;\n"
+          "    }\n"
+          "}\n"
+          "\n"
+          "void testdriver_startup(void)\n"
+          "{\n";
+
+    for (unsigned long int i = 0; i < testRecordsSize; i++) {
+        // switch on parameter type
+        const auto &ifParams = interface.params();
+        for (const auto &param : ifParams) {
+            (void)param;
+            ss << QString("    testData[%1].%2 = ").arg(i).arg(param.name()).toStdString();
+            // qDebug() << param.paramTypeName(); // TODO: get applicable type (float/int/bool)
+            ss << "\n";
+        }
+    }
 
     QString testDriver = "";
 

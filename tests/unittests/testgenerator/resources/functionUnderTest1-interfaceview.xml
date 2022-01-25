@@ -1,12 +1,12 @@
-<InterfaceView asn1file="testgenerator.acn">
+<InterfaceView asn1file="testgenerator.asn">
 <Function name="FunctionUnderTest" is_type="NO" language="C" default_implementation="default" FPGA_Configurations="">
     <Property name="Taste::coordinates" value="48200 29800 68200 37800"/>
 <Provided_Interface name="PI_InterfaceUnderTest" kind="Protected" layer="default" wcet="0">
-    <Input_Parameter name="actv_in" type="MyBool" encoding="ACN"/>
-    <Input_Parameter name="tmp_in" type="MyReal" encoding="ACN"/>
+    <Input_Parameter name="active" type="MyBool" encoding="ACN"/>
+    <Input_Parameter name="temperature" type="MyReal" encoding="ACN"/>
     <Input_Parameter name="posX" type="MyInteger" encoding="ACN"/>
     <Input_Parameter name="posY" type="MyInteger" encoding="ACN"/>
-    <Output_Parameter name="result_out" type="MyBool" encoding="ACN"/>
+    <Output_Parameter name="result" type="MyBool" encoding="ACN"/>
     <Property name="Taste::coordinates" value="49300 33700"/>
 </Provided_Interface>
 
