@@ -112,6 +112,11 @@ void tst_testgenerator::testEmpty()
     const csv::CsvModel &csvRef = *csvModel;
     QVERIFY(csvRef.header().fields().empty());
 
+    const auto asn1ModelRaw = loadAsn1Model("testgenerator.asn");
+    const auto asn1Model = dynamic_cast<Asn1Acn::Asn1Model *>(asn1ModelRaw.get());
+    QVERIFY(asn1Model != nullptr);
+    const Asn1Acn::Asn1Model &asn1ModelRef = *asn1Model;
+
     const auto model = loadIvModel("interfaceview.xml", "config.xml");
 
     const auto ivModel = dynamic_cast<ivm::IVModel *>(model.get());
@@ -126,7 +131,8 @@ void tst_testgenerator::testEmpty()
 
     ivm::IVInterface::CreationInfo ci;
     const ivm::IVInterface &interface = *ifUnderTest;
-    QVERIFY_EXCEPTION_THROWN(TestGenerator::generateTestDriver(csvRef, interface), TestGeneratorException);
+    QVERIFY_EXCEPTION_THROWN(
+            TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef), TestGeneratorException);
 }
 
 void tst_testgenerator::testNominal()
@@ -149,16 +155,15 @@ void tst_testgenerator::testNominal()
     }
     QCOMPARE(headerText, "active,temperature,posX,posY");
 
-    // TODO: load ASN1 model
     const auto asn1ModelRaw = loadAsn1Model("testgenerator.asn");
     const auto asn1Model = dynamic_cast<Asn1Acn::Asn1Model *>(asn1ModelRaw.get());
-    (void)asn1Model; // TODO
+    QVERIFY(asn1Model != nullptr);
+    const Asn1Acn::Asn1Model &asn1ModelRef = *asn1Model;
 
     const auto model = loadIvModel("interfaceview.xml", "config.xml");
     const auto ivModel = dynamic_cast<ivm::IVModel *>(model.get());
-    if (ivModel == nullptr) {
-        QFAIL("The model could not be read");
-    }
+    QVERIFY(ivModel != nullptr);
+
     const QString ifName = "PI_InterfaceUnderTest";
     const auto ifUnderTest = ivModel->getIfaceByName(ifName, ivm::IVInterface::InterfaceType::Provided);
     if (ifUnderTest == nullptr) {
@@ -171,7 +176,7 @@ void tst_testgenerator::testNominal()
     // TODO: verify that generator with correct inputs creates a correct source file
     // - csv data read
     // - function's interface from interfaceview (protected or unprotected)
-    auto testDriver = TestGenerator::generateTestDriver(csvRef, interface);
+    auto testDriver = TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
 
     const QString testDriverStr = QString::fromStdString(testDriver.str());
     const QStringList testDriverStrList = testDriverStr.split("\n");

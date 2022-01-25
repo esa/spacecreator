@@ -20,6 +20,7 @@
 #pragma once
 
 #include <QTextStream>
+#include <asn1/asn1model.h>
 #include <csv/CsvModel/csvmodel.h>
 #include <ivcore/ivinterface.h>
 #include <sstream>
@@ -29,8 +30,8 @@ namespace testgenerator {
 class TestGenerator final
 {
 public:
-    static auto generateTestDriver(const csv::CsvModel &testData, const ivm::IVInterface &interface)
-            -> std::stringstream;
+    static auto generateTestDriver(const csv::CsvModel &testData, const ivm::IVInterface &interface,
+            const Asn1Acn::Asn1Model &asn1Model) -> std::stringstream;
 };
 
 } // testgenerator
