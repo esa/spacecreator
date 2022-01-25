@@ -39,6 +39,7 @@ public:
 
 private:
     static auto getAsn1Type(const QString &name, const Asn1Model &model) -> Type::ASN1Type;
+    static auto qstringToBoolSymbol(const QString &str) -> QString;
 };
 
 } // testgenerator

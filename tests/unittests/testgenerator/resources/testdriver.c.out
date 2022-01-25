@@ -30,32 +30,32 @@ void testdriver_startup(void)
 {
     testData[0].active = 1;
     testData[0].temperature = 2.3;
-    testData[0].posX = -2.5;
+    testData[0].posX = -2;
     testData[0].posY = 3;
     testData[0].result = 0;
 
-    testData[1].active = 0;
-    testData[1].temperature = 0;
-    testData[1].posX = 0;
-    testData[1].posY = 0;
+    testData[1].active = 1;
+    testData[1].temperature = 5.3444;
+    testData[1].posX = -2;
+    testData[1].posY = 3;
     testData[1].result = 0;
 
     testData[2].active = 0;
-    testData[2].temperature = 0;
-    testData[2].posX = 0;
-    testData[2].posY = 0;
+    testData[2].temperature = 2.3;
+    testData[2].posX = -8;
+    testData[2].posY = 3;
     testData[2].result = 0;
 
     testData[3].active = 0;
-    testData[3].temperature = 0;
-    testData[3].posX = 0;
-    testData[3].posY = 0;
+    testData[3].temperature = 2.3;
+    testData[3].posX = -1;
+    testData[3].posY = -1;
     testData[3].result = 0;
 
-    testData[4].active = 0;
-    testData[4].temperature = 0;
-    testData[4].posX = 0;
-    testData[4].posY = 0;
+    testData[4].active = 1;
+    testData[4].temperature = 2.3;
+    testData[4].posX = 4;
+    testData[4].posY = 1;
     testData[4].result = 0;
 }
 

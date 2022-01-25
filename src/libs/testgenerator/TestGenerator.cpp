@@ -26,6 +26,7 @@
 #include <ivcore/ivfunctiontype.h>
 #include <ivcore/ivmodel.h>
 #include <ivcore/ivobject.h>
+#include <qdebug.h>
 #include <sstream>
 
 namespace testgenerator {
@@ -75,32 +76,21 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
 
     for (unsigned long int i = 0; i < testRecordsSize; i++) {
         const auto &ifParams = interface.params();
-        for (int j = 0; j < ifParams.size(); j++) {
-            const auto &param = ifParams[j];
+        for (unsigned int j = 0; j < static_cast<unsigned int>(ifParams.size() - 1);
+                j++) { // one of the records is a result field
+            const auto &param = ifParams[static_cast<int>(j)];
 
             ss << QString("    testData[%1].%2 = ").arg(i).arg(param.name()).toStdString();
 
             switch (getAsn1Type(param.paramTypeName(), asn1Model)) {
             case Asn1Acn::Types::Type::INTEGER:
-                ss << "integer";
+                ss << static_cast<int>(testData.field(i, j).toDouble());
                 break;
             case Asn1Acn::Types::Type::REAL:
-                ss << "real (float)";
+                ss << testData.field(i, j).toFloat();
                 break;
             case Asn1Acn::Types::Type::BOOLEAN: {
-                ss << "bool ";
-
-                auto valStr = "";
-                const auto val = testData.records()[i]->fields()[j].toInt();
-                if (val == 0) {
-                    valStr = "0";
-                } else if (val == 1) {
-                    valStr = "1";
-                } else {
-                    throw TestGeneratorException("Invalid boolean value");
-                }
-                ss << valStr;
-
+                ss << qstringToBoolSymbol(testData.field(i, j)).toStdString();
                 break;
             }
             case Asn1Acn::Types::Type::UNKNOWN:
@@ -109,13 +99,23 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
                 throw TestGeneratorException("Interface parameter type not yet implemented");
             }
 
+            ss << ";\n";
+
             if (interface.function() == nullptr) {
                 throw TestGeneratorException("Interface has no Function set.");
             }
-
-            ss << "\n";
         }
+
+        ss << QString("    testData[%1].%2 = 0;\n").arg(i).arg(ifParams.last().name()).toStdString();
+        ss << "\n";
     }
+    ss << "}\n"
+          "\n"
+          "void testdriver_PI_StartTest(void)\n"
+          "{\n"
+          "    for (unsigned int i = 0; i < TEST_DATA_SIZE; i++) {\n"
+          "        // clang-format off\n";
+    ss << QString("        testdriver_RI_%1(\n").arg("InterfaceUnderTest").toStdString();
 
     return ss;
 }
@@ -133,6 +133,18 @@ auto TestGenerator::getAsn1Type(const QString &name, const Asn1Model &model) -> 
         }
     }
     return Type::ASN1Type::UNKNOWN;
+}
+
+auto TestGenerator::qstringToBoolSymbol(const QString &str) -> QString
+{
+    const int val = str.toInt();
+    if (val == 0) {
+        return "0";
+    } else if (val == 1) {
+        return "1";
+    } else {
+        throw "Invalid boolean value in loaded CSV";
+    }
 }
 
 } // testgenerator
