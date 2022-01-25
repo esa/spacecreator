@@ -1,0 +1,53 @@
+COM-N7SPACE-CONTAINERINHERITANCE DEFINITIONS ::= BEGIN
+DataType [size 8, encoding pos-int, endianness big]
+GigaContainer []
+{
+    realization []
+    {
+        realizationGigaContainer []
+        {
+            gigaEntry []
+        },
+        realizationMegaContainer []
+    }
+}
+MegaContainer []
+{
+    realization []
+    {
+        realizationParentContainer []
+    }
+}
+ParentContainer []
+{
+    realization []
+    {
+        realizationParentContainer []
+        {
+            gigaEntry [],
+            megaEntry [],
+            parentEntry [],
+            megaTrailerEntry []
+        },
+        realizationChildContainer1 [],
+        realizationChildContainer2 []
+    }
+}
+ChildContainer1 []
+{
+    gigaEntry [],
+    megaEntry [],
+    parentEntry [],
+    childEntry1 [],
+    megaTrailerEntry []
+}
+ChildContainer2 []
+{
+    gigaEntry [],
+    megaEntry [],
+    parentEntry [],
+    childEntry2 [],
+    megaTrailerEntry []
+}
+END
+

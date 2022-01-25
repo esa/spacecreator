@@ -56,6 +56,7 @@ public:
     auto qualifiedName() const -> const QualifiedName &;
     auto setName(common::String name) -> void;
 
+    auto dataType(const common::String &name) const -> const DataType *;
     auto dataTypes() const -> const DataTypeSet &;
     auto addDataType(DataType dataType) -> void;
 

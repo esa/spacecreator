@@ -39,12 +39,13 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   sedsInterface   Parent interface
+     * @param   sedsInterface       Parent interface
      * @param   asn1Definitions     ASN.1 type definitions for parent package
-     * @param   ivFunction      Output interface view function
+     * @param   sedsPackage         Parent SEDS package
+     * @param   ivFunction          Output interface view function
      */
     SyncInterfaceCommandTranslator(const seds::model::Interface &sedsInterface, Asn1Acn::Definitions *asn1Definitions,
-            ivm::IVFunction *ivFunction);
+            const seds::model::Package *sedsPackage, ivm::IVFunction *ivFunction);
     /**
      * @brief   Deleted copy constructor
      */

@@ -46,11 +46,13 @@ class ContainerDataType;
 class DataTypeRef;
 class DimensionSize;
 class EnumeratedDataType;
+class EnumeratedDataTypeRange;
 class FloatDataEncoding;
 class FloatDataType;
 class IntegerDataEncoding;
 class IntegerDataType;
 class Name;
+class MinMaxRange;
 class Package;
 class StringDataEncoding;
 class StringDataType;
@@ -74,10 +76,12 @@ struct DataTypeTranslatorVisitor final {
     /**
      * @brief   Constructor
      *
-     * @param   asn1Definitions     Parent ASN.1 defintions
      * @param   asn1Type            Type where translated types are saved
+     * @param   asn1Definitions     Parent ASN.1 defintions
+     * @param   sedsPackage         Parent SEDS package
      */
-    DataTypeTranslatorVisitor(Asn1Acn::Definitions *asn1Definitions, std::unique_ptr<Asn1Acn::Types::Type> &asn1Type);
+    DataTypeTranslatorVisitor(std::unique_ptr<Asn1Acn::Types::Type> &asn1Type, Asn1Acn::Definitions *asn1Definitions,
+            const seds::model::Package *sedsPackage);
 
     /**
      * @brief   Translates SEDS array data type
@@ -233,52 +237,18 @@ private:
     auto translateFalseValue(seds::model::FalseValue falseValue, Asn1Acn::Types::Boolean *asn1Type) const -> void;
 
     /**
-     * @brief   Returns smallest value possible for given integer encoding
-     *
-     * @param   encoding    Integer encoding
-     *
-     * @return  Smallest value possible
-     */
-    auto getSmallestValue(const std::optional<seds::model::IntegerDataEncoding> &encoding) const
-            -> std::optional<std::int64_t>;
-    /**
-     * @brief   Returns smallest value possible for given float encoding
-     *
-     * @param   encoding    Float encoding
-     *
-     * @return  Smallest value possible
-     */
-    auto getSmallestValue(const std::optional<seds::model::FloatDataEncoding> &encoding) const -> std::optional<double>;
-    /**
-     * @brief   Returns greatest value possible for given integer encoding
-     *
-     * @param   encoding    Integer encoding
-     *
-     * @return  Greatest value possible
-     */
-    auto getGreatestValue(const std::optional<seds::model::IntegerDataEncoding> &encoding) const
-            -> std::optional<std::int64_t>;
-    /**
-     * @brief   Returns greatest value possible for given float encoding
-     *
-     * @param   encoding    Float encoding
-     *
-     * @return  Greatest value possible
-     */
-    auto getGreatestValue(const std::optional<seds::model::FloatDataEncoding> &encoding) const -> std::optional<double>;
-
-    /**
      * @brief   Adds entries from given container data type to the entries cache
      *
      * @param   sedsType    Type which entries should be cached
      */
-    auto cacheAbstractContainerEntries(const seds::model::ContainerDataType &sedsType) -> void;
+    auto cacheContainerType(const seds::model::ContainerDataType &sedsType) -> void;
     /**
      * @brief   Adds a choice field to the passed ASN.1 sequence for realization fields
      *
      * @param   asn1Sequence    Sequence to which field should be added
      */
     auto createRealizationContainerField(Asn1Acn::Types::Sequence *asn1Sequence) -> void;
+
     /**
      * @brief   Adds a reference to the realization in the given parent container
      *
@@ -287,6 +257,15 @@ private:
      */
     auto updateParentContainer(const QString &sedsBaseTypeName, Asn1Acn::Types::Sequence *asn1RealizationSequence)
             -> void;
+
+    /**
+     * @brief   Translates container constraints and applies them to the ASN.1 sequence
+     *
+     * @param   sedsType        Container data type which constraints should be translated
+     * @param   asn1Type        ASN.1 sequence which should be constrained
+     */
+    auto applyContainerConstraints(
+            const seds::model::ContainerDataType &sedsType, Asn1Acn::Types::Sequence *asn1Type) const -> void;
 
     /**
      * @brief   Converts SEDS byte order
@@ -302,10 +281,14 @@ private:
             std::pair<std::unique_ptr<Asn1Acn::Types::Sequence>, std::unique_ptr<Asn1Acn::Types::Sequence>>;
     using ContainerEntriesCacheMap = std::unordered_map<QString, ContainerEntriesCacheValue>;
 
-    /// @brief  Parent definitions
-    Asn1Acn::Definitions *m_asn1Definitions;
     /// @brief  Where translated data type will be saved
     std::unique_ptr<Asn1Acn::Types::Type> &m_asn1Type;
+
+    /// @brief  Parent definitions
+    Asn1Acn::Definitions *m_asn1Definitions;
+    /// @brief  Parent package
+    const seds::model::Package *m_sedsPackage;
+
     /// @brief  Cache for sequence components
     ContainerEntriesCacheMap m_asn1SequenceComponentsCache;
 

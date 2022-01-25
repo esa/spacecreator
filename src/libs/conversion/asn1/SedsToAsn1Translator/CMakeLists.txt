@@ -2,11 +2,14 @@ project(SedsToAsn1Translator VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES     datatypesdependencyresolver.cpp
                 translator.cpp
+                specialized/containerconstrainttranslatorvisitor.cpp
                 specialized/datatypetranslatorvisitor.cpp
                 specialized/dimensiontranslator.cpp
-                specialized/entrytranslatorvisitor.cpp)
+                specialized/entrytranslatorvisitor.cpp
+                specialized/rangetranslatorvisitor.cpp)
 set(INCLUDES    datatypesdependencyresolver.h
                 translator.h
+                specialized/containerconstrainttranslatorvisitor.h
                 specialized/datatypetranslatorvisitor.h
                 specialized/dimensiontranslator.h
                 specialized/entrytranslatorvisitor.h

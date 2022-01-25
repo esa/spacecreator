@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/ContainerConstraints">
+    <DataTypeSet>
+      <IntegerDataType name="IntegerData">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="IntegerDataBigger">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="16" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="65535" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="IntegerDataNoEncoding">
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <FloatDataType name="RealData">
+        <FloatDataEncoding encodingAndPrecision="IEEE754_2008_single" sizeInBits="32" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0.0" max="255.0" />
+        </Range>
+      </FloatDataType>
+      <EnumeratedDataType name="EnumData">
+        <IntegerDataEncoding encoding="unsigned" byteOrder="bigEndian" sizeInBits="8" />
+        <EnumerationList>
+          <Enumeration value="12" label="Value1" />
+          <Enumeration value="15" label="Value2" />
+          <Enumeration value="18" label="Value3" />
+        </EnumerationList>
+      </EnumeratedDataType>
+      <BinaryDataType name="BitStringData" sizeInBits="4" fixedSize="true" />
+      <StringDataType name="StringData" length="32" fixedLength="false">
+        <StringDataEncoding encoding="ASCII" />
+      </StringDataType>
+      <ContainerDataType name="PayloadBase" abstract="true">
+        <LongDescription>Base for the packet payload data</LongDescription>
+        <EntryList>
+          <Entry name="intDataRange" type="IntegerData" />
+          <Entry name="intDataNoEncodingRange" type="IntegerDataNoEncoding" />
+          <Entry name="floatDataRange" type="RealData" />
+          <Entry name="intDataType" type="IntegerDataBigger" />
+          <Entry name="intDataValue" type="IntegerData" />
+          <Entry name="floatDataValue" type="RealData" />
+          <Entry name="enumDataValue" type="EnumData" />
+          <Entry name="bitStringDataValue" type="BitStringData" />
+          <Entry name="stringDataValue" type="StringData" />
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="PayloadA" abstract="false" baseType="PayloadBase">
+        <ConstraintSet>
+          <RangeConstraint entry="intDataRange">
+            <MinMaxRange rangeType="atLeast" min="5" />
+          </RangeConstraint>
+          <RangeConstraint entry="intDataNoEncodingRange">
+            <MinMaxRange rangeType="atLeast" min="5" />
+          </RangeConstraint>
+          <RangeConstraint entry="floatDataRange">
+            <MinMaxRange rangeType="atMost" max="3.14" />
+          </RangeConstraint>
+          <TypeConstraint entry="intDataType" type="IntegerData" />
+          <ValueConstraint entry="intDataValue" value="42" />
+          <ValueConstraint entry="floatDataValue" value="3.14" />
+          <ValueConstraint entry="enumDataValue" value="Value2" />
+          <ValueConstraint entry="bitStringDataValue" value="0110" />
+          <ValueConstraint entry="stringDataValue" value="GuruMeditation" />
+        </ConstraintSet>
+      </ContainerDataType>
+    </DataTypeSet>
+  </Package>
+</PackageFile>

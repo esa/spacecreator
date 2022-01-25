@@ -48,10 +48,11 @@ public:
      *
      * @param   sedsInterface       Parent SEDS interface
      * @param   asn1Definitions     ASN.1 type definitions for parent package
+     * @param   sedsPackage         Parent SEDS package
      * @param   ivFunction          Output interface view function
      */
     AsyncInterfaceCommandTranslator(const seds::model::Interface &sedsInterface, Asn1Acn::Definitions *asn1Definitions,
-            ivm::IVFunction *ivFunction);
+            const seds::model::Package *sedsPackage, ivm::IVFunction *ivFunction);
     /**
      * @brief   Deleted copy constructor
      */

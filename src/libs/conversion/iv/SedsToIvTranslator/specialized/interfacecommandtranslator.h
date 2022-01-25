@@ -38,6 +38,7 @@ class CommandArgument;
 class DimensionSize;
 class Interface;
 class InterfaceCommand;
+class Package;
 } // namespace seds::model
 
 #include <ivcore/ivinterface.h>
@@ -53,12 +54,13 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   sedsInterface   Parent interface
+     * @param   sedsInterface       Parent SEDS interface
      * @param   asn1Definitions     ASN.1 type definitions for parent package
-     * @param   ivFunction      Output interface view function
+     * @param   sedsPackage         Parent SEDS package
+     * @param   ivFunction          Output interface view function
      */
     InterfaceCommandTranslator(const seds::model::Interface &sedsInterface, Asn1Acn::Definitions *asn1Definitions,
-            ivm::IVFunction *ivFunction);
+            const seds::model::Package *sedsPackage, ivm::IVFunction *ivFunction);
     /**
      * @brief   Default destructor
      */
@@ -213,6 +215,8 @@ protected:
     const seds::model::Interface &m_sedsInterface;
     /// @brief  Output ASN.1 type definitions
     Asn1Acn::Definitions *m_asn1Definitions;
+    /// @brief  Parent SEDS package
+    const seds::model::Package *m_sedsPackage;
     /// @brief  Output interface view function
     ivm::IVFunction *m_ivFunction;
 

@@ -34,6 +34,15 @@ configure_file(resources/test_containers.xml resources/test_containers.xml COPYO
 configure_file(resources/test_containers_asn.output resources/test_containers_asn.output COPYONLY)
 configure_file(resources/test_containers_acn.output resources/test_containers_acn.output COPYONLY)
 
+configure_file(test_container_constraints.sh test_container_constraints.sh COPYONLY)
+configure_file(resources/test_container_constraints.xml resources/test_container_constraints.xml COPYONLY)
+configure_file(resources/test_container_constraints_asn.output resources/test_container_constraints_asn.output COPYONLY)
+
+configure_file(test_container_inheritance.sh test_container_inheritance.sh COPYONLY)
+configure_file(resources/test_container_inheritance.xml resources/test_container_inheritance.xml COPYONLY)
+configure_file(resources/test_container_inheritance_asn.output resources/test_container_inheritance_asn.output COPYONLY)
+configure_file(resources/test_container_inheritance_acn.output resources/test_container_inheritance_acn.output COPYONLY)
+
 configure_file(test_min_max_range.sh test_min_max_range.sh COPYONLY)
 configure_file(resources/test_min_max_range.xml resources/test_min_max_range.xml COPYONLY)
 configure_file(resources/test_min_max_range_asn.output resources/test_min_max_range_asn.output COPYONLY)
