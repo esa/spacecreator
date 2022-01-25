@@ -13,7 +13,8 @@ set(INCLUDES    datatypesdependencyresolver.h
                 specialized/datatypetranslatorvisitor.h
                 specialized/dimensiontranslator.h
                 specialized/entrytranslatorvisitor.h
-                specialized/rangetranslatorvisitor.h)
+                specialized/rangetranslatorvisitor.h
+                specialized/sizetranslatorvisitor.h)
 
 add_library(SedsToAsn1Translator STATIC)
 target_sources(SedsToAsn1Translator

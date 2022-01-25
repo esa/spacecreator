@@ -21,6 +21,7 @@
 
 #include "specialized/datatypetranslatorvisitor.h"
 #include "specialized/rangetranslatorvisitor.h"
+#include "specialized/sizetranslatorvisitor.h"
 
 #include <asn1library/asn1/acnsequencecomponent.h>
 #include <asn1library/asn1/asnsequencecomponent.h>
@@ -304,8 +305,8 @@ void EntryTranslatorVisitor::addListSizeConstraint(
         throw TranslationException(std::move(errorMessage));
     }
 
-    RangeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn::IntegerValue> rangeTranslator(asn1Type);
-    rangeTranslator.addSizeConstraint(*listLengthRange);
+    SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn::IntegerValue> sizeTranslator(asn1Type);
+    sizeTranslator.addSizeConstraint(*listLengthRange);
 }
 
 } // namespace conversion::asn1::translator
