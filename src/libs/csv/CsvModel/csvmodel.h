@@ -49,6 +49,16 @@ public:
     auto records() -> const std::vector<std::unique_ptr<Row>> &;
 
     /**
+     * @brief   Getter for data field
+     *
+     * @param   record  number of data record index
+     * @param   field   number of data field index
+     *
+     * @return  data field
+     */
+    auto field(unsigned int record, unsigned int field) const -> QString;
+
+    /**
      * @brief   Set the data header
      *
      * @param   header row of labels

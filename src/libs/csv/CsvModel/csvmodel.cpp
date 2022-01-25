@@ -20,7 +20,6 @@
 #include "csvmodel.h"
 
 #include <QStringList>
-#include <algorithm>
 #include <memory>
 
 namespace csv {
@@ -33,6 +32,19 @@ Row CsvModel::header()
 const std::vector<std::unique_ptr<Row>> &CsvModel::records()
 {
     return m_records;
+}
+
+auto CsvModel::field(const unsigned int record, const unsigned int field) const -> QString
+{
+    if (record >= m_records.size() || m_records[record] == nullptr) {
+        throw "Accessing non-existing record";
+    }
+
+    if (field >= m_records[record]->fields().size()) {
+        throw "Accessing non-existing field";
+    }
+
+    return records()[record]->fields()[field];
 }
 
 void CsvModel::setHeader(const Row &header)
