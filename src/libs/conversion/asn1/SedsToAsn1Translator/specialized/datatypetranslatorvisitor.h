@@ -272,7 +272,7 @@ private:
      *
      * @param   sedsType    Type which entries should be cached
      */
-    auto cacheAbstractContainerEntries(const seds::model::ContainerDataType &sedsType) -> void;
+    auto cacheContainerType(const seds::model::ContainerDataType &sedsType) -> void;
     /**
      * @brief   Adds a choice field to the passed ASN.1 sequence for realization fields
      *

@@ -124,46 +124,28 @@ void DataTypeTranslatorVisitor::operator()(const BooleanDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 {
-    const auto hasBaseType = sedsType.baseType().has_value();
     auto type = std::make_unique<Asn1Acn::Types::Sequence>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
 
-    if (sedsType.isAbstract()) {
-        cacheAbstractContainerEntries(sedsType);
-    } else {
-        EntryTranslatorVisitor visitor { m_asn1Definitions, type.get() };
+    // Add this type to the cache for future inheritance
+    cacheContainerType(sedsType);
 
-        // Add parent component entries
-        if (hasBaseType) {
-            const auto sedsBaseTypeName = Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr());
-            const auto &asn1ParentComponents = m_asn1SequenceComponentsCache[sedsBaseTypeName].first->components();
+    // If type is not abstract, then we want it's entries in the ASN.1 type
+    if (!sedsType.isAbstract()) {
+        const auto &cachedAsn1Type = m_asn1SequenceComponentsCache[sedsType.nameStr()];
 
-            for (const auto &asn1ParentComponent : asn1ParentComponents) {
-                type->addComponent(asn1ParentComponent->clone());
-            }
+        const auto &cachedAsn1Components = cachedAsn1Type.first->components();
+        for (const auto &asn1Component : cachedAsn1Components) {
+            type->addComponent(asn1Component->clone());
         }
 
-        for (const auto &sedsEntry : sedsType.entries()) {
-            std::visit(visitor, sedsEntry);
-        }
-
-        for (const auto &sedsTrailerEntry : sedsType.trailerEntries()) {
-            std::visit(visitor, sedsTrailerEntry);
-        }
-
-        // Add parent component trailer entries
-        if (hasBaseType) {
-            const auto sedsBaseTypeName = Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr());
-            const auto &asn1ParentTrailerComponents =
-                    m_asn1SequenceComponentsCache[sedsBaseTypeName].second->components();
-
-            for (const auto &asn1ParentTrailerComponent : asn1ParentTrailerComponents) {
-                type->addComponent(asn1ParentTrailerComponent->clone());
-            }
+        const auto &cachedAsn1TrailerComponents = cachedAsn1Type.second->components();
+        for (const auto &asn1TrailerComponent : cachedAsn1TrailerComponents) {
+            type->addComponent(asn1TrailerComponent->clone());
         }
     }
 
     // Add realization to the parent component
-    if (hasBaseType) {
+    if (sedsType.baseType()) {
         updateParentContainer(Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr()), type.get());
     }
 
@@ -542,48 +524,74 @@ void DataTypeTranslatorVisitor::translateFalseValue(
     }
 }
 
-void DataTypeTranslatorVisitor::cacheAbstractContainerEntries(const ContainerDataType &sedsType)
+void DataTypeTranslatorVisitor::cacheContainerType(const ContainerDataType &sedsType)
 {
     auto asn1SequenceComponents = std::make_unique<Asn1Acn::Types::Sequence>();
-    EntryTranslatorVisitor componentsVisitor { m_asn1Definitions, asn1SequenceComponents.get() };
 
+    // Get parent entries from cache
     if (sedsType.baseType()) {
         const auto sedsBaseTypeName = Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr());
-        const auto &asn1ParentComponents = m_asn1SequenceComponentsCache[sedsBaseTypeName];
+        const auto &asn1ParentComponents = m_asn1SequenceComponentsCache[sedsBaseTypeName].first->components();
 
-        for (const auto &asn1Component : asn1ParentComponents.first->components()) {
+        for (const auto &asn1Component : asn1ParentComponents) {
             asn1SequenceComponents->addComponent(asn1Component->clone());
         }
     }
+
+    // Translate own entries
+    EntryTranslatorVisitor entriesTranslator { m_asn1Definitions, asn1SequenceComponents.get() };
     for (const auto &sedsEntry : sedsType.entries()) {
-        std::visit(componentsVisitor, sedsEntry);
+        std::visit(entriesTranslator, sedsEntry);
     }
 
     auto asn1SequenceTrailerComponents = std::make_unique<Asn1Acn::Types::Sequence>();
-    EntryTranslatorVisitor trailerComponentsVisitor { m_asn1Definitions, asn1SequenceTrailerComponents.get() };
 
-    for (const auto &sedsTrailerEntry : sedsType.trailerEntries()) {
-        std::visit(trailerComponentsVisitor, sedsTrailerEntry);
+    if (sedsType.isAbstract()) {
+        // Translate own trailer entries
+        EntryTranslatorVisitor trailerEntriesTranslator { m_asn1Definitions, asn1SequenceTrailerComponents.get() };
+        for (const auto &sedsTrailerEntry : sedsType.trailerEntries()) {
+            std::visit(trailerEntriesTranslator, sedsTrailerEntry);
+        }
     }
+
+    // Get parent trailer entries from cache
     if (sedsType.baseType()) {
         const auto sedsBaseTypeName = Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr());
-        const auto &asn1ParentComponents = m_asn1SequenceComponentsCache[sedsBaseTypeName];
+        const auto &asn1ParentTrailerComponents = m_asn1SequenceComponentsCache[sedsBaseTypeName].second->components();
 
-        for (const auto &asn1TrailerComponent : asn1ParentComponents.second->components()) {
+        for (const auto &asn1TrailerComponent : asn1ParentTrailerComponents) {
             asn1SequenceTrailerComponents->addComponent(asn1TrailerComponent->clone());
         }
     }
 
+    // Cache this type
     m_asn1SequenceComponentsCache.insert({ sedsType.nameStr(),
             std::make_pair(std::move(asn1SequenceComponents), std::move(asn1SequenceTrailerComponents)) });
 }
 
 void DataTypeTranslatorVisitor::createRealizationContainerField(Asn1Acn::Types::Sequence *asn1Sequence)
 {
+    auto realizationChoice = std::make_unique<Asn1Acn::Types::Choice>();
+
+    if (!asn1Sequence->components().empty()) {
+        auto ownRealizationSequence = std::make_unique<Asn1Acn::Types::Sequence>();
+        for (const auto &asn1SequenceComponent : asn1Sequence->components()) {
+            ownRealizationSequence->addComponent(asn1SequenceComponent->clone());
+        }
+        asn1Sequence->components().clear();
+
+        const auto ownRealizationChoiceAlternativeName =
+                m_realizationComponentsAlternativeNameTemplate.arg(asn1Sequence->identifier());
+        auto ownRealizationChoiceAlternative = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(
+                ownRealizationChoiceAlternativeName, ownRealizationChoiceAlternativeName,
+                ownRealizationChoiceAlternativeName, ownRealizationChoiceAlternativeName, "", Asn1Acn::SourceLocation(),
+                std::move(ownRealizationSequence));
+        realizationChoice->addComponent(std::move(ownRealizationChoiceAlternative));
+    }
+
     auto realizationComponent =
             std::make_unique<Asn1Acn::AsnSequenceComponent>(m_realizationComponentsName, m_realizationComponentsName,
-                    false, std::nullopt, "", Asn1Acn::SourceLocation(), std::make_unique<Asn1Acn::Types::Choice>());
-
+                    false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(realizationChoice));
     asn1Sequence->addComponent(std::move(realizationComponent));
 }
 

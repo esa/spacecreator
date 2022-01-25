@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/ContainerInheritance">
+    <DataTypeSet>
+      <IntegerDataType name="DataType">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="10" />
+        </Range>
+      </IntegerDataType>
+      <ContainerDataType name="ChildContainer1" baseType="ParentContainer">
+        <EntryList>
+          <Entry name="ChildEntry1" type="DataType" />
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="ChildContainer2" baseType="ParentContainer">
+        <EntryList>
+          <Entry name="ChildEntry2" type="DataType" />
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="ParentContainer" baseType="MegaContainer">
+        <EntryList>
+          <Entry name="ParentEntry" type="DataType" />
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="MegaContainer" abstract="true" baseType="GigaContainer">
+        <EntryList>
+          <Entry name="MegaEntry" type="DataType" />
+        </EntryList>
+        <TrailerEntryList>
+          <Entry name="MegaTrailerEntry" type="DataType" />
+        </TrailerEntryList>
+      </ContainerDataType>
+      <ContainerDataType name="GigaContainer">
+        <EntryList>
+          <Entry name="GigaEntry" type="DataType" />
+        </EntryList>
+      </ContainerDataType>
+    </DataTypeSet>
+  </Package>
+</PackageFile>
