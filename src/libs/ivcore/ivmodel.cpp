@@ -349,7 +349,7 @@ IVModel *IVModel::getConnectionLayersModel() const
 IVConnectionLayerType *IVModel::getConnectionLayerByName(const QString &name) const
 {
     if (d->m_layersModel != nullptr) {
-        for (auto *layer : d->m_layersModel->allObjectsByType<IVConnectionLayerType>()) {
+        for (auto * const layer : d->m_layersModel->allObjectsByType<IVConnectionLayerType>()) {
             if (layer->name().compare(name) == 0) {
                 return layer;
             }

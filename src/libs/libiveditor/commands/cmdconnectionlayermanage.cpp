@@ -36,8 +36,8 @@ CmdConnectionLayerManage::CmdConnectionLayerManage(ivm::IVModel *layersModel, iv
     , m_objectsModel(objectsModel)
     , m_parent(layersModel != nullptr ? layersModel->rootObject() : nullptr)
     , m_layer(nullptr)
-    , m_oldName("")
-    , m_newName("")
+    , m_previousName("")
+    , m_currentName("")
 {
 }
 
@@ -57,7 +57,7 @@ ivm::IVConnectionLayerType *CmdConnectionLayerManage::find(const QString &name) 
 {
     if (model() != nullptr) {
         for (auto *layer : model()->allObjectsByType<ivm::IVConnectionLayerType>()) {
-            if (layer->name().compare(name) == 0) {
+            if (layer->name() == name) {
                 return layer;
             }
         }
@@ -79,7 +79,7 @@ void CmdConnectionLayerManage::deleteLayer()
     if (model() != nullptr && m_layer != nullptr) {
         if (find(m_layer->name()) != nullptr) {
             for (auto *iface : m_objectsModel->allObjectsByType<ivm::IVInterface>()) {
-                if (iface->layerName().compare(m_layer->name()) == 0) {
+                if (iface->layerName() == m_layer->name()) {
                     iface->setLayerName(ivm::IVConnectionLayerType::DefaultLayerName);
                 }
             }
@@ -111,14 +111,14 @@ void CmdConnectionLayerCreate::redo()
 }
 
 CmdConnectionLayerRename::CmdConnectionLayerRename(
-        const QString &oldName, const QString &newName, ivm::IVModel *layersModel, ivm::IVModel *objectsModel)
+        const QString &previousName, const QString &currentName, ivm::IVModel *layersModel, ivm::IVModel *objectsModel)
     : CmdConnectionLayerManage(layersModel, objectsModel)
 {
     if (model() != nullptr && m_objectsModel != nullptr) {
-        if (oldName.compare(newName) != 0 && find(oldName) != nullptr && find(newName) == nullptr) {
-            m_layer = find(oldName);
-            m_oldName = oldName;
-            m_newName = newName;
+        if (previousName != currentName && find(previousName) != nullptr && find(currentName) == nullptr) {
+            m_layer = find(previousName);
+            m_previousName = previousName;
+            m_currentName = currentName;
         }
     }
 }
@@ -129,11 +129,11 @@ void CmdConnectionLayerRename::undo()
 {
     if (model() != nullptr && m_layer != nullptr && m_objectsModel != nullptr) {
         for (auto *iface : m_objectsModel->allObjectsByType<ivm::IVInterface>()) {
-            if (iface->layerName().compare(m_layer->name()) == 0) {
-                iface->setLayerName(m_oldName);
+            if (iface->layerName() == m_layer->name()) {
+                iface->setLayerName(m_previousName);
             }
         }
-        m_layer->rename(m_oldName);
+        m_layer->rename(m_previousName);
     }
 }
 
@@ -141,11 +141,11 @@ void CmdConnectionLayerRename::redo()
 {
     if (model() != nullptr && m_layer != nullptr && m_objectsModel != nullptr) {
         for (auto *iface : m_objectsModel->allObjectsByType<ivm::IVInterface>()) {
-            if (iface->layerName().compare(m_layer->name()) == 0) {
-                iface->setLayerName(m_newName);
+            if (iface->layerName() == m_layer->name()) {
+                iface->setLayerName(m_currentName);
             }
         }
-        m_layer->rename(m_newName);
+        m_layer->rename(m_currentName);
     }
 }
 

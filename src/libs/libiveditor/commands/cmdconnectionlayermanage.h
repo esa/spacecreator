@@ -52,8 +52,8 @@ protected:
     ivm::IVModel *m_objectsModel;
     ivm::IVObject *m_parent;
     ivm::IVConnectionLayerType *m_layer;
-    QString m_oldName;
-    QString m_newName;
+    QString m_previousName;
+    QString m_currentName;
 };
 
 class CmdConnectionLayerCreate : public CmdConnectionLayerManage
@@ -70,7 +70,8 @@ public:
 class CmdConnectionLayerRename : public CmdConnectionLayerManage
 {
 public:
-    explicit CmdConnectionLayerRename(const QString &oldName, const QString &newName, ivm::IVModel *layersModel, ivm::IVModel *objectsModel);
+    explicit CmdConnectionLayerRename(const QString &previousName, const QString &currentName,
+            ivm::IVModel *layersModel, ivm::IVModel *objectsModel);
     ~CmdConnectionLayerRename() override;
 
     void redo() override;

@@ -148,7 +148,6 @@ void IVAppWidget::showAvailableLayers(const QPoint &pos)
     if (!idx.isValid()) {
         return;
     }
-
     const auto *obj = m_document->layersModel()->getObject(
             idx.data(static_cast<int>(ive::IVVisualizationModelBase::IdRole)).toUuid());
     if (obj == nullptr) {
@@ -158,7 +157,6 @@ void IVAppWidget::showAvailableLayers(const QPoint &pos)
     QList<QAction *> actions;
     if (obj->type() == ivm::IVObject::Type::ConnectionLayer) {
         const auto *layer = qobject_cast<const ivm::IVConnectionLayerType *>(obj);
-
         auto *actAddNewLayer = new QAction(tr("Add"));
         connect(actAddNewLayer, &QAction::triggered, this, [&]() {
             QString newLayerName = "newLayer";
@@ -191,19 +189,17 @@ void IVAppWidget::showAvailableLayers(const QPoint &pos)
 void IVAppWidget::renameSelectedLayer(QStandardItem *item)
 {
     const auto index = item->index();
-
     const auto *obj = m_document->layersModel()->getObject(
             index.data(static_cast<int>(ive::IVVisualizationModelBase::IdRole)).toUuid());
     if (obj == nullptr) {
         return;
     }
 
-    disconnect(m_document->layerVisualisationModel(), &IVVisualizationModelBase::itemChanged, this,
-            &IVAppWidget::renameSelectedLayer);
-
     if (obj->type() == ivm::IVObject::Type::ConnectionLayer) {
         const auto *layer = qobject_cast<const ivm::IVConnectionLayerType *>(obj);
         if (layer != nullptr && layer->name().compare(ivm::IVConnectionLayerType::DefaultLayerName) != 0) {
+            disconnect(m_document->layerVisualisationModel(), &IVVisualizationModelBase::itemChanged, this,
+                    &IVAppWidget::renameSelectedLayer);
             auto *cmd = new cmd::CmdConnectionLayerRename(
                     layer->name(), item->text(), m_document->layersModel(), m_document->objectsModel());
             if (cmd->layer() != nullptr) {
@@ -211,11 +207,10 @@ void IVAppWidget::renameSelectedLayer(QStandardItem *item)
             } else {
                 delete cmd;
             }
+            connect(m_document->layerVisualisationModel(), &IVVisualizationModelBase::itemChanged, this,
+                    &IVAppWidget::renameSelectedLayer);
         }
     }
-
-    connect(m_document->layerVisualisationModel(), &IVVisualizationModelBase::itemChanged, this,
-            &IVAppWidget::renameSelectedLayer);
 
     item->setText(obj->title());
 }

@@ -247,9 +247,10 @@ ivm::IVPropertyTemplateConfig *InterfaceDocument::dynPropConfig() const
 void InterfaceDocument::updateLayersModel() const
 {
     if (layersModel() != nullptr) {
+        auto layers = layersModel()->allObjectsByType<ivm::IVConnectionLayerType>();
         bool isDefaultPresent = false;
-        for (auto *layer : layersModel()->allObjectsByType<ivm::IVConnectionLayerType>()) {
-            if (layer->name().compare(ivm::IVConnectionLayerType::DefaultLayerName) == 0) {
+        for (auto * const layer : layers) {
+            if (layer->name() == ivm::IVConnectionLayerType::DefaultLayerName) {
                 isDefaultPresent = true;
             }
         }
