@@ -51,9 +51,9 @@ public:
      * @param   asn1Definitions     ASN.1 type definitions for parent package
      * @param   ivFunction          Output interface view function
      */
-    AsyncInterfaceCommandTranslator(const QString &sedsInterfaceName,
+    AsyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
             const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
-            Asn1Acn::Definitions *asn1Definitions, ivm::IVFunction *ivFunction);
+            Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage);
     /**
      * @brief   Deleted copy constructor
      */

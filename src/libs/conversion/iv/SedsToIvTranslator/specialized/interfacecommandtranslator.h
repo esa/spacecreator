@@ -63,9 +63,9 @@ public:
      * @param   asn1Definitions     ASN.1 type definitions for parent package
      * @param   ivFunction          Output interface view function
      */
-    InterfaceCommandTranslator(const QString &sedsInterfaceName,
+    InterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
             const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
-            Asn1Acn::Definitions *asn1Definitions, ivm::IVFunction *ivFunction);
+            Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage);
     /**
      * @brief   Default destructor
      */
@@ -217,12 +217,15 @@ private:
     auto findMappedType(const QString &genericTypeName) const -> const QString &;
 
 protected:
-    /// @brief  Parent SEDS interface name
-    const QString &m_sedsInterfaceName;
-    /// @brief  Output ASN.1 type definitions
-    Asn1Acn::Definitions *m_asn1Definitions;
     /// @brief  Output interface view function
     ivm::IVFunction *m_ivFunction;
+
+    /// @brief  Parent SEDS interface name
+    const QString &m_sedsInterfaceName;
+    /// @brief  Parent ASN.1 type definitions
+    Asn1Acn::Definitions *m_asn1Definitions;
+    /// @brief  Parent SEDS package
+    const seds::model::Package *m_sedsPackage;
 
     /// @brief  Mapper for generic command argument types
     GenericTypeMapper m_typeMapper;

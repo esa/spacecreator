@@ -55,10 +55,11 @@ using conversion::translator::UndeclaredDataTypeException;
 
 namespace conversion::asn1::translator {
 
-EntryTranslatorVisitor::EntryTranslatorVisitor(
-        Asn1Acn::Types::Sequence *asn1Sequence, Asn1Acn::Definitions *asn1Definitions)
+EntryTranslatorVisitor::EntryTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence,
+        Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage)
     : m_asn1Sequence(asn1Sequence)
     , m_asn1Definitions(asn1Definitions)
+    , m_sedsPackage(sedsPackage)
 {
 }
 

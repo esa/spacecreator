@@ -61,7 +61,8 @@ public:
      * @param   asn1Definitions     Parent ASN.1 definitions
      * @param   sedsPackage         Parent SEDS package
      */
-    EntryTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence, Asn1Acn::Definitions *asn1Definitions);
+    EntryTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence, Asn1Acn::Definitions *asn1Definitions,
+            const seds::model::Package *sedsPackage);
     /**
      * @brief   Deleted copy constructor
      */
@@ -140,6 +141,8 @@ private:
 
     /// @brief  Parent definitions
     Asn1Acn::Definitions *m_asn1Definitions;
+    /// @brief  Parent package
+    const seds::model::Package *m_sedsPackage;
 
     const static int m_crc8BitSize = 8;
     const static int m_crc16BitSize = 16;

@@ -465,7 +465,7 @@ void DataTypeTranslatorVisitor::cacheContainerType(const ContainerDataType &seds
     }
 
     // Translate own entries
-    EntryTranslatorVisitor entriesTranslator(asn1SequenceComponents.get(), m_asn1Definitions);
+    EntryTranslatorVisitor entriesTranslator(asn1SequenceComponents.get(), m_asn1Definitions, m_sedsPackage);
     for (const auto &sedsEntry : sedsType.entries()) {
         std::visit(entriesTranslator, sedsEntry);
     }
@@ -474,7 +474,8 @@ void DataTypeTranslatorVisitor::cacheContainerType(const ContainerDataType &seds
 
     if (sedsType.isAbstract()) {
         // Translate own trailer entries
-        EntryTranslatorVisitor trailerEntriesTranslator(asn1SequenceTrailerComponents.get(), m_asn1Definitions);
+        EntryTranslatorVisitor trailerEntriesTranslator(
+                asn1SequenceTrailerComponents.get(), m_asn1Definitions, m_sedsPackage);
         for (const auto &sedsTrailerEntry : sedsType.trailerEntries()) {
             std::visit(trailerEntriesTranslator, sedsTrailerEntry);
         }

@@ -45,12 +45,13 @@ const QString InterfaceCommandTranslator::m_interfaceParameterEncoding = "ACN";
 const QString InterfaceCommandTranslator::m_ivInterfaceNameTemplate = "%1_%2_%3";
 const QString InterfaceCommandTranslator::m_arrayArgumentNameTemplate = "%1_Array%2";
 
-InterfaceCommandTranslator::InterfaceCommandTranslator(const QString &sedsInterfaceName,
+InterfaceCommandTranslator::InterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
         const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet, Asn1Acn::Definitions *asn1Definitions,
-        ivm::IVFunction *ivFunction)
-    : m_sedsInterfaceName(sedsInterfaceName)
+        const seds::model::Package *sedsPackage)
+    : m_ivFunction(ivFunction)
+    , m_sedsInterfaceName(sedsInterfaceName)
     , m_asn1Definitions(asn1Definitions)
-    , m_ivFunction(ivFunction)
+    , m_sedsPackage(sedsPackage)
     , m_typeMapper(genericTypeMapSet)
 {
 }
@@ -173,7 +174,7 @@ QString InterfaceCommandTranslator::createArrayType(
     }
 
     std::unique_ptr<Asn1Acn::Types::Type> asn1ArrayArgument;
-    asn1::translator::DataTypeTranslatorVisitor dataTypeVisitor { asn1ArrayArgument, m_asn1Definitions };
+    asn1::translator::DataTypeTranslatorVisitor dataTypeVisitor(asn1ArrayArgument, m_asn1Definitions, m_sedsPackage);
     dataTypeVisitor(sedsArrayArgument);
 
     auto asn1ArrayArgumentAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
