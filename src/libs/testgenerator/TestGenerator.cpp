@@ -30,6 +30,7 @@
 #include <ivcore/ivobject.h>
 #include <qdebug.h>
 #include <shared/common.h>
+#include <shared/sharedlibrary.h>
 #include <sstream>
 
 namespace testgenerator {
@@ -49,6 +50,23 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
 
     if (interface.params().isEmpty()) {
         throw TestGeneratorException("No input parameters in selected interface");
+    }
+
+    if (!interface.isProvided()) {
+        throw TestGeneratorException("Only provided interface could be tested");
+    }
+
+    if (interface.function() == nullptr) {
+        throw TestGeneratorException("Interface without function is invalid");
+    }
+
+    const QString functionImplementation =
+            interface.function()
+                    ->entityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::language))
+                    .value()
+                    .toString();
+    if (functionImplementation.compare("C") != 0) {
+        throw TestGeneratorException("Only functions with implementation in C could be tested");
     }
 
     const auto testRecordsSize = testData.records().size();

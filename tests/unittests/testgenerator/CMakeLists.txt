@@ -31,6 +31,7 @@ configure_file(resources/empty.csv resources/empty.csv COPYONLY)
 
 configure_file(resources/nominal-interfaceview.xml resources/nominal-interfaceview.xml COPYONLY)
 configure_file(resources/cyclicif-interfaceview.xml resources/cyclicif-interfaceview.xml COPYONLY)
+configure_file(resources/implementation-interfaceview.xml resources/implementation-interfaceview.xml COPYONLY)
 
 configure_file(resources/testgenerator.asn resources/testgenerator.asn COPYONLY)
 

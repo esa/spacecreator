@@ -59,8 +59,7 @@ private Q_SLOTS:
     void testEmpty();
     void testNominal();
     void testCyclicInterface();
-    // TODO: test case to verify that the generator throws an exception on interface with implementation
-    //       NOT in C
+    void testImplementationNotInC();
 };
 
 static std::unique_ptr<conversion::Model> loadAsn1Model(const QString &file)
@@ -192,6 +191,31 @@ void tst_testgenerator::testCyclicInterface()
     const Asn1Acn::Asn1Model &asn1ModelRef = *asn1Model;
 
     const auto ivModelRaw = loadIvModel("resources/cyclicif-interfaceview.xml", "resources/config.xml");
+    const auto ivModel = dynamic_cast<ivm::IVModel *>(ivModelRaw.get());
+    QVERIFY(ivModel != nullptr);
+
+    const QString ifName = "PI_InterfaceUnderTest";
+    const auto ifUnderTest = ivModel->getIfaceByName(ifName, ivm::IVInterface::InterfaceType::Provided);
+    if (ifUnderTest == nullptr) {
+        QFAIL(QString("provided if named not %1 found in given IV file").arg(ifName).toStdString().c_str());
+    }
+    const ivm::IVInterface &interface = *ifUnderTest;
+
+    QVERIFY_EXCEPTION_THROWN(
+            TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef), TestGeneratorException);
+}
+
+void tst_testgenerator::testImplementationNotInC()
+{
+    auto csvModel = loadCsvModel("resources/test_data.csv");
+    const csv::CsvModel &csvRef = *csvModel;
+
+    const auto asn1ModelRaw = loadAsn1Model("resources/testgenerator.asn");
+    const auto asn1Model = dynamic_cast<Asn1Acn::Asn1Model *>(asn1ModelRaw.get());
+    QVERIFY(asn1Model != nullptr);
+    const Asn1Acn::Asn1Model &asn1ModelRef = *asn1Model;
+
+    const auto ivModelRaw = loadIvModel("resources/implementation-interfaceview.xml", "resources/config.xml");
     const auto ivModel = dynamic_cast<ivm::IVModel *>(ivModelRaw.get());
     QVERIFY(ivModel != nullptr);
 
