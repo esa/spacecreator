@@ -22,6 +22,7 @@
 #include "TestGeneratorException.h"
 
 #include <QDebug>
+#include <algorithm>
 #include <asn1/asn1model.h>
 #include <csv/CsvModel/csvmodel.h>
 #include <ivcore/ivfunctiontype.h>
@@ -70,6 +71,32 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
     }
 
     const auto testRecordsSize = testData.records().size();
+    std::vector<unsigned int> mappings(testRecordsSize, 0);
+    if (!testData.header().fields().empty()) {
+        if (static_cast<int>(testData.header().fields().size()) != interface.params().size() - 1) {
+            throw TestGeneratorException("Imported CSV contains invalid number of data columns");
+        }
+        std::vector<bool> elementsFound(testRecordsSize, false);
+        for (const auto &param : interface.params()) {
+            const QString &name = param.name();
+            for (const auto &field : testData.header().fields()) {
+                if (name.compare(field) == 0) {
+                    // found[i] = true;
+                    break;
+                } else {
+                    // mappings[i] = j;
+                }
+            }
+        }
+        if (std::any_of(elementsFound.begin(), elementsFound.end(), [](const auto &found) -> bool { return !found; })) {
+            // throw TestGeneratorException("Header fields do not match interface parameter names");
+            qDebug() << "something not found";
+        }
+    } else {
+        for (unsigned int i = 0; i < testRecordsSize; i++) {
+            mappings[i] = i;
+        }
+    }
 
     std::stringstream ss;
     ss << "/**\n"
@@ -168,6 +195,7 @@ auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, 
     if (ifParams.isEmpty()) {
         return "";
     }
+    // TODO: map between header position/column and parameter position
     for (unsigned int j = 0; j < static_cast<unsigned int>(ifParams.size() - 1);
             j++) { // one of the records is a result field
         const auto &param = ifParams[static_cast<int>(j)];
@@ -213,4 +241,5 @@ auto TestGenerator::removePiPrefix(const QString &str) -> QString
 
     return str.right(str.size() - prefixLen);
 }
-} // testgenerator
+
+} // namespace testgenerator
