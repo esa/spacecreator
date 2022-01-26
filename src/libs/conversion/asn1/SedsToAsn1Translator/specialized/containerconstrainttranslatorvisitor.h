@@ -57,10 +57,12 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   asn1Sequence    ASN.1 sequence to which the translated constraints will be applied
-     * @param   sedsPackage     Parent SEDS package
+     * @param   asn1Sequence        ASN.1 sequence to which the translated constraints will be applied
+     * @param   asn1Definitions     Parent ASN.1 definitions
+     * @param   sedsPackage         Parent SEDS package
      */
-    ContainerConstraintTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence, Asn1Acn::Definitions *asn1Definitions);
+    ContainerConstraintTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence, Asn1Acn::Definitions *asn1Definitions,
+            const seds::model::Package *sedsPackage);
     /**
      * @brief   Deleted copy constructor
      */
@@ -113,7 +115,9 @@ private:
 
 private:
     Asn1Acn::Types::Sequence *m_asn1Sequence;
+
     Asn1Acn::Definitions *m_asn1Definitions;
+    const seds::model::Package *m_sedsPackage;
 };
 
 template<typename Type, typename ValueType>

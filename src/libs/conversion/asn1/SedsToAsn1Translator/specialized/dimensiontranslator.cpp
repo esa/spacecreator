@@ -19,10 +19,13 @@
 
 #include "specialized/dimensiontranslator.h"
 
+#include "specialized/rangetranslatorvisitor.h"
+
 #include <asn1library/asn1/constraints/logicoperators.h>
 #include <asn1library/asn1/constraints/rangecombiner.h>
 #include <asn1library/asn1/types/enumerated.h>
 #include <conversion/common/translation/exceptions.h>
+#include <seds/SedsModel/package/package.h>
 #include <seds/SedsModel/types/dimensionsize.h>
 
 using conversion::translator::MissingAsn1TypeDefinitionException;
@@ -30,25 +33,26 @@ using conversion::translator::TranslationException;
 
 namespace conversion::asn1::translator {
 
-DimensionTranslator::DimensionTranslator(Asn1Acn::Definitions *asn1Definitions)
+DimensionTranslator::DimensionTranslator(Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage)
     : m_asn1Definitions(asn1Definitions)
+    , m_sedsPackage(sedsPackage)
 {
 }
 
 void DimensionTranslator::translateDimension(
-        const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Sequence) const
+        const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1SequenceOf) const
 {
     if (dimension.size()) {
-        translateSizeDimension(dimension, asn1Sequence);
+        translateSizeDimension(dimension, asn1SequenceOf);
     } else if (dimension.indexTypeRef()) {
-        translateIndexDimension(dimension, asn1Sequence);
+        translateIndexDimension(dimension, asn1SequenceOf);
     } else {
         throw TranslationException("Array dimension without size nor index type");
     }
 }
 
 void DimensionTranslator::translateSizeDimension(
-        const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Sequence) const
+        const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1SequenceOf) const
 {
     const auto dimensionSize = dimension.size()->value();
 
@@ -58,7 +62,7 @@ void DimensionTranslator::translateSizeDimension(
     }
 
     if (dimensionSize <= 0) {
-        auto errorMessage = QString("Dimension size of %1 must be greater than zero").arg(asn1Sequence->identifier());
+        auto errorMessage = QString("Dimension size of %1 must be greater than zero").arg(asn1SequenceOf->identifier());
         throw TranslationException(std::move(errorMessage));
     }
 
@@ -67,7 +71,7 @@ void DimensionTranslator::translateSizeDimension(
 
     auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::IntegerValue>>();
     sizeConstraint->setInnerConstraints(std::move(rangeConstraint));
-    asn1Sequence->constraints().append(std::move(sizeConstraint));
+    asn1SequenceOf->constraints().append(std::move(sizeConstraint));
 }
 
 void DimensionTranslator::translateIndexDimension(

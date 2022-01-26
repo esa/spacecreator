@@ -53,11 +53,33 @@ namespace conversion::asn1::translator {
  * Translated entry will be added to the passed ASN.1 sequence
  */
 struct EntryTranslatorVisitor final {
-    /// @brief  Where translated entry will be saved
-    Asn1Acn::Types::Sequence *m_asn1Sequence;
-    /// @brief  Parent definitions
-    Asn1Acn::Definitions *m_asn1Definitions;
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   asn1Sequence        ASN.1 sequence to which the translated entries will be added
+     * @param   asn1Definitions     Parent ASN.1 definitions
+     * @param   sedsPackage         Parent SEDS package
+     */
+    EntryTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence, Asn1Acn::Definitions *asn1Definitions);
+    /**
+     * @brief   Deleted copy constructor
+     */
+    EntryTranslatorVisitor(const EntryTranslatorVisitor &) = delete;
+    /**
+     * @brief   Deleted move constructor
+     */
+    EntryTranslatorVisitor(EntryTranslatorVisitor &&) = delete;
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    EntryTranslatorVisitor &operator=(const EntryTranslatorVisitor &) = delete;
+    /**
+     * @brief   Deleted move assignment operator
+     */
+    EntryTranslatorVisitor &operator=(EntryTranslatorVisitor &&) = delete;
 
+public:
     /**
      * @brief   Translates SEDS entry
      *
@@ -113,6 +135,12 @@ private:
             Asn1Acn::Types::SequenceOf *asn1Type, const Asn1Acn::Types::Type *listLengthFieldType) const -> void;
 
 private:
+    /// @brief  Where translated entry will be saved
+    Asn1Acn::Types::Sequence *m_asn1Sequence;
+
+    /// @brief  Parent definitions
+    Asn1Acn::Definitions *m_asn1Definitions;
+
     const static int m_crc8BitSize = 8;
     const static int m_crc16BitSize = 16;
     const static int m_checksumBitSize = 32;

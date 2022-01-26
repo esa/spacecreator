@@ -48,10 +48,11 @@ using seds::model::ContainerValueConstraint;
 
 namespace conversion::asn1::translator {
 
-ContainerConstraintTranslatorVisitor::ContainerConstraintTranslatorVisitor(
-        Asn1Acn::Types::Sequence *asn1Sequence, Asn1Acn::Definitions *asn1Definitions)
+ContainerConstraintTranslatorVisitor::ContainerConstraintTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence,
+        Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage)
     : m_asn1Sequence(asn1Sequence)
     , m_asn1Definitions(asn1Definitions)
+    , m_sedsPackage(sedsPackage)
 {
 }
 

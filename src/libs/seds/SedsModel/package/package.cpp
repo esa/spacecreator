@@ -31,6 +31,27 @@ void Package::setName(common::String name)
     m_qualifiedName = std::move(name);
 }
 
+const DataType *Package::dataType(const common::String &name) const
+{
+    auto result = std::find_if(m_dataTypes.begin(), m_dataTypes.end(),
+            [&name](const auto &dataType) { return dataTypeNameStr(dataType) == name; });
+
+    if (result != m_dataTypes.end()) {
+        return &(*result);
+    }
+
+    for (const auto &component : m_components) {
+        result = std::find_if(component.dataTypes().begin(), component.dataTypes().end(),
+                [&name](const auto &dataType) { return dataTypeNameStr(dataType) == name; });
+
+        if (result != component.dataTypes().end()) {
+            return &(*result);
+        }
+    }
+
+    return nullptr;
+}
+
 const Package::DataTypeSet &Package::dataTypes() const
 {
     return m_dataTypes;

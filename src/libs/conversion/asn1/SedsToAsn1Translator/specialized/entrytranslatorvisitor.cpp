@@ -55,6 +55,13 @@ using conversion::translator::UndeclaredDataTypeException;
 
 namespace conversion::asn1::translator {
 
+EntryTranslatorVisitor::EntryTranslatorVisitor(
+        Asn1Acn::Types::Sequence *asn1Sequence, Asn1Acn::Definitions *asn1Definitions)
+    : m_asn1Sequence(asn1Sequence)
+    , m_asn1Definitions(asn1Definitions)
+{
+}
+
 void EntryTranslatorVisitor::operator()(const seds::model::Entry &sedsEntry)
 {
     auto asn1EntryType = translateEntryType(sedsEntry.type().nameStr());
