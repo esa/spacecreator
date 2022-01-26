@@ -24,12 +24,12 @@
 
 namespace csv {
 
-Row CsvModel::header()
+Row CsvModel::header() const
 {
     return m_header;
 }
 
-const std::vector<std::unique_ptr<Row>> &CsvModel::records()
+const std::vector<std::unique_ptr<Row>> &CsvModel::records() const
 {
     return m_records;
 }

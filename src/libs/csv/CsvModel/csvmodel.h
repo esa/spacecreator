@@ -39,14 +39,14 @@ public:
      *
      * @return  Header
      */
-    auto header() -> Row;
+    auto header() const -> Row;
 
     /**
      * @brief   Getter for data records
      *
      * @return  Data records
      */
-    auto records() -> const std::vector<std::unique_ptr<Row>> &;
+    auto records() const -> const std::vector<std::unique_ptr<Row>> &;
 
     /**
      * @brief   Getter for data field
