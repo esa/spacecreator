@@ -40,6 +40,8 @@ public:
 private:
     static auto getAsn1Type(const QString &name, const Asn1Model &model) -> Type::ASN1Type;
     static auto qstringToBoolSymbol(const QString &str) -> QString;
+    static auto getAssignmentsForRecords(const ivm::IVInterface &interface, const Asn1Acn::Asn1Model &asn1Model,
+            const csv::CsvModel &testData, unsigned int index) -> QString;
 };
 
 } // testgenerator

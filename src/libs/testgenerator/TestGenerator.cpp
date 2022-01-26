@@ -20,13 +20,16 @@
 #include "TestGenerator.h"
 
 #include "TestGeneratorException.h"
-#include "common.h"
 
 #include <QDebug>
+#include <asn1/asn1model.h>
+#include <csv/CsvModel/csvmodel.h>
 #include <ivcore/ivfunctiontype.h>
+#include <ivcore/ivinterface.h>
 #include <ivcore/ivmodel.h>
 #include <ivcore/ivobject.h>
 #include <qdebug.h>
+#include <shared/common.h>
 #include <sstream>
 
 namespace testgenerator {
@@ -74,41 +77,12 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
           "void testdriver_startup(void)\n"
           "{\n";
 
-    for (unsigned long int i = 0; i < testRecordsSize; i++) {
-        const auto &ifParams = interface.params();
-        for (unsigned int j = 0; j < static_cast<unsigned int>(ifParams.size() - 1);
-                j++) { // one of the records is a result field
-            const auto &param = ifParams[static_cast<int>(j)];
-
-            ss << QString("    testData[%1].%2 = ").arg(i).arg(param.name()).toStdString();
-
-            switch (getAsn1Type(param.paramTypeName(), asn1Model)) {
-            case Asn1Acn::Types::Type::INTEGER:
-                ss << static_cast<int>(testData.field(i, j).toDouble());
-                break;
-            case Asn1Acn::Types::Type::REAL:
-                ss << testData.field(i, j).toFloat();
-                break;
-            case Asn1Acn::Types::Type::BOOLEAN: {
-                ss << qstringToBoolSymbol(testData.field(i, j)).toStdString();
-                break;
-            }
-            case Asn1Acn::Types::Type::UNKNOWN:
-                throw TestGeneratorException("Interface parameter type not present in ASN.1 file");
-            default:
-                throw TestGeneratorException("Interface parameter type not yet implemented");
-            }
-
-            ss << ";\n";
-
-            if (interface.function() == nullptr) {
-                throw TestGeneratorException("Interface has no Function set.");
-            }
-        }
-
-        ss << QString("    testData[%1].%2 = 0;\n").arg(i).arg(ifParams.last().name()).toStdString();
+    for (unsigned long int i = 0; i < testRecordsSize - 1; i++) {
+        ss << getAssignmentsForRecords(interface, asn1Model, testData, i).toStdString();
         ss << "\n";
     }
+    ss << getAssignmentsForRecords(interface, asn1Model, testData, testRecordsSize - 1).toStdString();
+
     ss << "}\n"
           "\n"
           "void testdriver_PI_StartTest(void)\n"
@@ -116,6 +90,7 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
           "    for (unsigned int i = 0; i < TEST_DATA_SIZE; i++) {\n"
           "        // clang-format off\n";
     ss << QString("        testdriver_RI_%1(\n").arg("InterfaceUnderTest").toStdString();
+    //
 
     return ss;
 }
@@ -145,6 +120,47 @@ auto TestGenerator::qstringToBoolSymbol(const QString &str) -> QString
     } else {
         throw "Invalid boolean value in loaded CSV";
     }
+}
+
+auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, const Asn1Acn::Asn1Model &asn1Model,
+        const csv::CsvModel &testData, const unsigned int index) -> QString
+{
+    QString result;
+
+    const auto &ifParams = interface.params();
+    for (unsigned int j = 0; j < static_cast<unsigned int>(ifParams.size() - 1);
+            j++) { // one of the records is a result field
+        const auto &param = ifParams[static_cast<int>(j)];
+
+        result += QString("    testData[%1].%2 = ").arg(index).arg(param.name());
+
+        switch (getAsn1Type(param.paramTypeName(), asn1Model)) {
+        case Asn1Acn::Types::Type::INTEGER:
+            result += QString::number(static_cast<int>(testData.field(index, j).toDouble()));
+            break;
+        case Asn1Acn::Types::Type::REAL:
+            result += QString::number(testData.field(index, j).toFloat());
+            break;
+        case Asn1Acn::Types::Type::BOOLEAN: {
+            result += qstringToBoolSymbol(testData.field(index, j));
+            break;
+        }
+        case Asn1Acn::Types::Type::UNKNOWN:
+            throw TestGeneratorException("Interface parameter type not present in ASN.1 file");
+        default:
+            throw TestGeneratorException("Interface parameter type not yet implemented");
+        }
+
+        result += ";\n";
+
+        if (interface.function() == nullptr) {
+            throw TestGeneratorException("Interface has no Function set.");
+        }
+    }
+
+    result += QString("    testData[%1].%2 = 0;\n").arg(index).arg(ifParams.last().name());
+
+    return result;
 }
 
 } // testgenerator
