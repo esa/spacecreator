@@ -70,6 +70,11 @@ void tst_SedsConverter_SedsToIv::testProvidedInterfaces()
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-1040
+/// \SRS  ETB-FUN-1050
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-130
 void tst_SedsConverter_SedsToIv::testInterfaceInheritance()
 {
     const int result = system("./test_interface_inheritance.sh");
