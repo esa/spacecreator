@@ -34,7 +34,6 @@ configure_file(resources/xml2iv/interface.tmplt resources/xml2iv/interface.tmplt
 configure_file(resources/xml2iv/interfaces.tmplt resources/xml2iv/interfaces.tmplt COPYONLY)
 configure_file(resources/xml2iv/interfaceview.tmplt resources/xml2iv/interfaceview.tmplt COPYONLY)
 
-
 configure_file(test_datatype_inside_component.sh test_datatype_inside_component.sh COPYONLY)
 configure_file(resources/test_datatype_inside_component.xml resources/test_datatype_inside_component.xml COPYONLY)
 configure_file(resources/test_datatype_inside_component_asn1.output resources/test_datatype_inside_component_asn1.output COPYONLY)
@@ -49,6 +48,10 @@ configure_file(resources/test_required_interfaces.output resources/test_required
 configure_file(test_provided_interfaces.sh test_provided_interfaces.sh COPYONLY)
 configure_file(resources/test_provided_interfaces.xml resources/test_provided_interfaces.xml COPYONLY)
 configure_file(resources/test_provided_interfaces.output resources/test_provided_interfaces.output COPYONLY)
+
+configure_file(test_interface_inheritance.sh test_interface_inheritance.sh COPYONLY)
+configure_file(resources/test_interface_inheritance.xml resources/test_interface_inheritance.xml COPYONLY)
+configure_file(resources/test_interface_inheritance.output resources/test_interface_inheritance.output COPYONLY)
 
 configure_file(test_hwas.sh test_hwas.sh COPYONLY)
 configure_file(resources/test_hwas.xml resources/test_hwas.xml COPYONLY)

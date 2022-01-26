@@ -33,13 +33,13 @@ cd $TEST_OUTPUT_DIR
 # Execute commands in chain to make sure that the generated interface view matches
 # the reference and allows to succesfully generate derived artefacts
 $DIFF interfaceview.xml ../resources/test_interface_inheritance.output \
+  && $UPDATE_DATAVIEW \
+  && $AADL_CONVERTER -o interfaceview.xml \
+  -t ../resources/xml2dv/interfaceview.tmplt \
+  -x DeploymentView.aadl \
+  && $AADL_CONVERTER -o interfaceview.xml \
+  -t ../resources/xml2iv/interfaceview.tmplt \
+  -x InterfaceView.aadl \
   && cd .. \
   && rm -r -f $TEST_OUTPUT_DIR
 
-  # && $UPDATE_DATAVIEW \
-  # && $AADL_CONVERTER -o interfaceview.xml \
-  # -t ../resources/xml2dv/interfaceview.tmplt \
-  # -x DeploymentView.aadl \
-  # && $AADL_CONVERTER -o interfaceview.xml \
-  # -t ../resources/xml2iv/interfaceview.tmplt \
-  # -x InterfaceView.aadl \

@@ -31,6 +31,7 @@ private Q_SLOTS:
     void testDatatypeInsideComponent();
     void testRequiredInterfaces();
     void testProvidedInterfaces();
+    void testInterfaceInheritance();
     void testHwas();
     void testCommandArguments();
     void testParameters();
@@ -66,6 +67,12 @@ void tst_SedsConverter_SedsToIv::testRequiredInterfaces()
 void tst_SedsConverter_SedsToIv::testProvidedInterfaces()
 {
     const int result = system("./test_provided_interfaces.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_SedsConverter_SedsToIv::testInterfaceInheritance()
+{
+    const int result = system("./test_interface_inheritance.sh");
     QCOMPARE(result, 0);
 }
 
