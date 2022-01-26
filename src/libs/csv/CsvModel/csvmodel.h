@@ -51,8 +51,8 @@ public:
     /**
      * @brief   Getter for data field
      *
-     * @param   record  number of data record index
-     * @param   field   number of data field index
+     * @param   record  data record index
+     * @param   field   data field index
      *
      * @return  data field
      */

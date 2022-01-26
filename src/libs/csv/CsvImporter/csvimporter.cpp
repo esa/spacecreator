@@ -19,8 +19,8 @@
 
 #include "csvimporter.h"
 
-#include "CsvModel/row.h"
 #include "csv/CsvModel/csvmodel.h"
+#include "csv/CsvModel/row.h"
 #include "importerexception.h"
 
 #include <QDebug>
@@ -28,55 +28,84 @@
 #include <QFile>
 #include <QTextStream>
 #include <memory>
+#include <shared/sharedlibrary.h>
 #include <utility>
 
 namespace csv::importer {
 
 auto CsvImporter::importModel(const Options &options) const -> std::unique_ptr<CsvModel>
 {
-    const QString fileToImport = options.value(CsvOptions::inputFilepath).value_or("");
-    if (fileToImport.isEmpty()) {
+    const QString fileToImportName = options.value(CsvOptions::inputFilepath).value_or("");
+    if (fileToImportName.isEmpty()) {
         throw ImporterException("No name of file to import supplied");
     }
 
-    QFile importedFile = QFile(fileToImport);
-    if (!importedFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    QFile fileToImport = QFile(fileToImportName);
+    if (!fileToImport.open(QIODevice::ReadOnly | QIODevice::Text)) {
         throw ImporterException("File to import cannot be opened.");
     }
-    QTextStream importedFileTextStream(&importedFile);
-
-    auto model = std::make_unique<CsvModel>();
 
     const QString separator = options.value(CsvOptions::separator).value_or(",");
 
-    bool labelsImported = false;
-    while (!importedFileTextStream.atEnd()) {
-        const QStringList words = importedFileTextStream.readLine().split(separator);
-        if (labelsImported) {
-            if (!words.empty()) {
-                model->addRecord(std::make_unique<Row>(words));
-            }
-        } else {
-            if (!words.isEmpty() && !words.first().isEmpty()) {
-                bool isNumber = false;
-                std::for_each(words.begin(), words.end(), [&isNumber](const QString &word) {
-                    bool conversionSuccessfull = false;
-                    word.toDouble(&conversionSuccessfull);
-                    if (conversionSuccessfull) {
-                        isNumber = true;
-                    }
-                });
-                if (!isNumber) {
-                    model->setHeader(words);
-                } else if (!words.empty()) {
-                    model->addRecord(std::make_unique<Row>(words));
-                }
-                labelsImported = true;
-            }
+    QTextStream fileToImportTextStream(&fileToImport);
+
+    auto model = std::make_unique<CsvModel>();
+
+    const QStringList firstReadLine = fileToImportTextStream.readLine().split(separator);
+    const int fieldsNumber = firstReadLine.size();
+
+    if (isLineAHeader(firstReadLine)) {
+        model->setHeader(firstReadLine);
+    } else {
+        addLineToModel(firstReadLine, model.get());
+    }
+
+    while (!fileToImportTextStream.atEnd()) {
+        const QStringList readLine = fileToImportTextStream.readLine().split(separator);
+        if (readLine.size() != fieldsNumber) {
+            throw ImporterException("Invalid CSV file. Number of columns does not match");
         }
+        addLineToModel(readLine, model.get());
     }
 
     return model;
+}
+
+bool CsvImporter::isLineAHeader(const QStringList &line) const
+{
+    for (const auto &word : line) {
+        if (word.isEmpty()) {
+            return false;
+        }
+    }
+
+    bool areAllNumbers = true;
+    std::for_each(line.begin(), line.end(), [&areAllNumbers](const QString &word) {
+        bool conversionSuccessfull = false;
+        word.toDouble(&conversionSuccessfull);
+        if (!conversionSuccessfull) {
+            areAllNumbers = false;
+        }
+    });
+
+    return !areAllNumbers;
+}
+
+void CsvImporter::addLineToModel(const QStringList &line, CsvModel *const model) const
+{
+    if (model == nullptr) {
+        throw ImporterException("Model is a nullptr");
+    }
+
+    if (line.isEmpty()) {
+        return;
+    }
+
+    if (line.first().isEmpty()) {
+        return;
+    }
+
+    model->addRecord(std::make_unique<Row>(line));
 }
 
 } // namespace csv::importer

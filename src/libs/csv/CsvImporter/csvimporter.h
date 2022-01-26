@@ -32,8 +32,14 @@ public:
      * @brief   Imports CSV data model from a file
      *
      * @param   options     Options for import configuration
+     *
+     * @return  CSV model
      */
     auto importModel(const Options &options) const -> std::unique_ptr<CsvModel>;
+
+private:
+    auto isLineAHeader(const QStringList &line) const -> bool;
+    auto addLineToModel(const QStringList &line, CsvModel *model) const -> void;
 };
 
 } // namespace csv::importer
