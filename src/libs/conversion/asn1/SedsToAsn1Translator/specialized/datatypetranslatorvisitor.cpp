@@ -77,7 +77,7 @@ void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
         throw TranslationException("Encountered ArrayDataType without dimensions");
     }
 
-    DimensionTranslator dimensionTranslator(m_asn1Definitions, m_sedsPackage);
+    DimensionTranslator dimensionTranslator(m_sedsPackage);
 
     if (dimensions.size() == 1) { // Sequence of type with one dimension
         auto type = std::make_unique<Asn1Acn::Types::SequenceOf>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));

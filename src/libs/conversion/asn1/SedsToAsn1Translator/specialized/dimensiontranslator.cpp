@@ -20,22 +20,25 @@
 #include "specialized/dimensiontranslator.h"
 
 #include "specialized/rangetranslatorvisitor.h"
+#include "specialized/sizetranslatorvisitor.h"
 
 #include <asn1library/asn1/constraints/logicoperators.h>
 #include <asn1library/asn1/constraints/rangecombiner.h>
 #include <asn1library/asn1/types/enumerated.h>
+#include <asn1library/asn1/values.h>
 #include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/package/package.h>
 #include <seds/SedsModel/types/dimensionsize.h>
+#include <seds/SedsModel/types/enumerateddatatype.h>
+#include <seds/SedsModel/types/integerdatatype.h>
 
 using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::TranslationException;
 
 namespace conversion::asn1::translator {
 
-DimensionTranslator::DimensionTranslator(Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage)
-    : m_asn1Definitions(asn1Definitions)
-    , m_sedsPackage(sedsPackage)
+DimensionTranslator::DimensionTranslator(const seds::model::Package *sedsPackage)
+    : m_sedsPackage(sedsPackage)
 {
 }
 
@@ -75,74 +78,51 @@ void DimensionTranslator::translateSizeDimension(
 }
 
 void DimensionTranslator::translateIndexDimension(
-        const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Sequence) const
+        const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1SequenceOf) const
 {
     const auto indexTypeName = dimension.indexTypeRef()->nameStr();
-    const auto indexTypeAssignment = m_asn1Definitions->type(indexTypeName);
+    const auto indexType = m_sedsPackage->dataType(indexTypeName);
 
-    if (!indexTypeAssignment) {
+    if (!indexType) {
         throw MissingAsn1TypeDefinitionException(indexTypeName);
     }
 
-    const auto indexType = indexTypeAssignment->type();
-
-    if (const auto integerIndexType = dynamic_cast<const Asn1Acn::Types::Integer *>(indexType); integerIndexType) {
-        translateIntegerDimensionIndex(integerIndexType, asn1Sequence);
-    } else if (const auto enumIndexType = dynamic_cast<const Asn1Acn::Types::Enumerated *>(indexType); enumIndexType) {
-        translateEnumDimensionIndex(enumIndexType, asn1Sequence);
+    if (const auto integerIndexType = std::get_if<seds::model::IntegerDataType>(indexType); integerIndexType) {
+        SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn::IntegerValue> sizeTranslator(asn1SequenceOf);
+        std::visit(sizeTranslator, integerIndexType->range());
+    } else if (const auto enumIndexType = std::get_if<seds::model::EnumeratedDataType>(indexType); enumIndexType) {
+        translateEnumDimensionIndex(*enumIndexType, asn1SequenceOf);
     } else {
         throw TranslationException("Only integer and enum dimension index types are supported");
     }
 }
 
-void DimensionTranslator::translateIntegerDimensionIndex(
-        const Asn1Acn::Types::Integer *indexType, Asn1Acn::Types::SequenceOf *asn1Sequence) const
-{
-    const auto &constraints = indexType->constraints();
-    const auto resultRange = Asn1Acn::Constraints::RangeCombiner<Asn1Acn::IntegerValue>::combineRanges(&constraints);
-
-    if (!resultRange) {
-        auto errorMessage = QString("%1 used as an index type for %2 doesn't have a range that can be used")
-                                    .arg(indexType->identifier())
-                                    .arg(asn1Sequence->identifier());
-        throw TranslationException(std::move(errorMessage));
-    }
-
-    if (resultRange->begin() < 0) {
-        auto errorMessage = QString("Range of %1 used as an index type for %2 contains a negative values")
-                                    .arg(indexType->identifier())
-                                    .arg(asn1Sequence->identifier());
-        throw TranslationException(std::move(errorMessage));
-    }
-
-    auto rangeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(*resultRange);
-
-    auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::IntegerValue>>();
-    sizeConstraint->setInnerConstraints(std::move(rangeConstraint));
-    asn1Sequence->constraints().append(std::move(sizeConstraint));
-}
-
 void DimensionTranslator::translateEnumDimensionIndex(
-        const Asn1Acn::Types::Enumerated *indexType, Asn1Acn::Types::SequenceOf *asn1Sequence) const
+        const seds::model::EnumeratedDataType &indexType, Asn1Acn::Types::SequenceOf *asn1SequenceOf) const
 {
+    const auto &enumItems = indexType.enumerationList();
+
+    if (enumItems.empty()) {
+        auto errorMessage = QString("Enumeration %1 used as an index type for %2 doesn't contain any values")
+                                    .arg(indexType.nameStr())
+                                    .arg(asn1SequenceOf->identifier());
+        throw TranslationException(std::move(errorMessage));
+    }
+
     std::vector<long> enumValues;
-    std::transform(indexType->items().begin(), indexType->items().end(), std::back_inserter(enumValues),
+    std::transform(enumItems.begin(), enumItems.end(), std::back_inserter(enumValues),
             [](const auto &enumItem) { return enumItem.value(); });
     std::sort(enumValues.begin(), enumValues.end());
 
     if (enumValues.front() < 0) {
-        auto errorMessage = QString("%1 used as an index type for %2 contains a negative values")
-                                    .arg(indexType->identifier())
-                                    .arg(asn1Sequence->identifier());
+        auto errorMessage = QString("Enumeration %1 used as an index type for %2 contains a negative values")
+                                    .arg(indexType.nameStr())
+                                    .arg(asn1SequenceOf->identifier());
         throw TranslationException(std::move(errorMessage));
     }
 
-    auto rangeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
-            { enumValues.front(), enumValues.back() });
-
-    auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::IntegerValue>>();
-    sizeConstraint->setInnerConstraints(std::move(rangeConstraint));
-    asn1Sequence->constraints().append(std::move(sizeConstraint));
+    SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn::IntegerValue> sizeTranslator(asn1SequenceOf);
+    sizeTranslator.addSizeConstraint(enumValues.front(), enumValues.back());
 }
 
 } // namespace conversion::asn1::translator

@@ -29,6 +29,8 @@
 
 namespace seds::model {
 class DimensionSize;
+class EnumeratedDataType;
+class IntegerDataType;
 class Package;
 } // namespace seds::model
 
@@ -43,10 +45,9 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   asn1Definitions     Parent ASN.1 defintions
      * @param   sedsPackage         Parent SEDS package
      */
-    explicit DimensionTranslator(Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage);
+    explicit DimensionTranslator(const seds::model::Package *sedsPackage);
 
     /**
      * @brief   Translate SEDS array dimension
@@ -64,15 +65,10 @@ private:
             const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1SequenceOf) const -> void;
     auto translateIndexDimension(
             const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1SequenceOf) const -> void;
-
-    auto translateIntegerDimensionIndex(
-            const Asn1Acn::Types::Integer *indexType, Asn1Acn::Types::SequenceOf *asn1Sequence) const -> void;
     auto translateEnumDimensionIndex(
-            const Asn1Acn::Types::Enumerated *indexType, Asn1Acn::Types::SequenceOf *asn1Sequence) const -> void;
+            const seds::model::EnumeratedDataType &indexType, Asn1Acn::Types::SequenceOf *asn1SequenceOf) const -> void;
 
 private:
-    /// @brief  Parent definitions
-    Asn1Acn::Definitions *m_asn1Definitions;
     /// @brief  Parent package
     const seds::model::Package *m_sedsPackage;
 };
