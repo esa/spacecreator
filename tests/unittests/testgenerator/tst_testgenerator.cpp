@@ -17,15 +17,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "conversion/asn1/Asn1Importer/importer.h"
-#include "conversion/asn1/Asn1Options/options.h"
-
 #include <QDebug>
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
 #include <algorithm>
 #include <asn1library/asn1/asn1model.h>
+#include <conversion/asn1/Asn1Importer/importer.h>
+#include <conversion/asn1/Asn1Options/options.h>
 #include <conversion/common/model.h>
 #include <conversion/common/options.h>
 #include <conversion/iv/IvOptions/options.h>
@@ -118,7 +117,6 @@ void tst_testgenerator::testEmpty()
     const Asn1Acn::Asn1Model &asn1ModelRef = *asn1Model;
 
     const auto model = loadIvModel("interfaceview.xml", "config.xml");
-
     const auto ivModel = dynamic_cast<ivm::IVModel *>(model.get());
     if (ivModel == nullptr) {
         QFAIL("no model");
@@ -126,7 +124,7 @@ void tst_testgenerator::testEmpty()
     const QString ifName = "PI_InterfaceUnderTest";
     const auto ifUnderTest = ivModel->getIfaceByName(ifName, ivm::IVInterface::InterfaceType::Provided);
     if (ifUnderTest == nullptr) {
-        QFAIL(QString("provided if named not %1 found in given IV file").arg(ifName).toStdString().c_str());
+        QFAIL(QString("Provided interface named not %1 found in given IV file").arg(ifName).toStdString().c_str());
     }
 
     ivm::IVInterface::CreationInfo ci;
@@ -173,9 +171,6 @@ void tst_testgenerator::testNominal()
     ivm::IVInterface::CreationInfo ci;
     const ivm::IVInterface &interface = *ifUnderTest;
 
-    // TODO: verify that generator with correct inputs creates a correct source file
-    // - csv data read
-    // - function's interface from interfaceview (protected or unprotected)
     auto testDriver = TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
 
     const QString testDriverStr = QString::fromStdString(testDriver.str());

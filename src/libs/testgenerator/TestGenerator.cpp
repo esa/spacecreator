@@ -89,8 +89,17 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
           "{\n"
           "    for (unsigned int i = 0; i < TEST_DATA_SIZE; i++) {\n"
           "        // clang-format off\n";
-    ss << QString("        testdriver_RI_%1(\n").arg("InterfaceUnderTest").toStdString();
-    //
+    ss << QString("        testdriver_RI_%1(\n").arg(removePiPrefix(interface.title())).toStdString();
+    for (auto it = interface.params().begin(); it != std::prev(interface.params().end()); it++) {
+        ss << QString("                &(testData[i].%1),\n").arg(it->name()).toStdString();
+    }
+    ss << QString("                &(testData[i].%1)\n").arg(std::prev(interface.params().end())->name()).toStdString();
+    ss << "        );\n"
+          "        // clang-format on\n"
+          "    }\n"
+          "    notifyTestFinished();\n"
+          "}\n"
+          "\n";
 
     return ss;
 }
@@ -163,4 +172,14 @@ auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, 
     return result;
 }
 
+auto TestGenerator::removePiPrefix(const QString &str) -> QString
+{
+    constexpr int prefixLen = 3;
+
+    if (str.left(prefixLen).compare("PI_") != 0) {
+        throw TestGeneratorException("Selected interface does not have required 'PI_' prefix");
+    }
+
+    return str.right(str.size() - prefixLen);
+}
 } // testgenerator
