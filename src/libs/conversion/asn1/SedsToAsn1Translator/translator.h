@@ -20,6 +20,7 @@
 #pragma once
 
 #include <conversion/common/translation/translator.h>
+#include <list>
 #include <seds/SedsModel/types/datatype.h>
 #include <vector>
 
@@ -109,7 +110,7 @@ private:
      * @param   asn1Definitions     Where translated data types should be added
      * @param   sedsPackage         Currently translated package
      */
-    auto translateDataTypes(const std::vector<const seds::model::DataType *> &sedsDataTypes,
+    auto translateDataTypes(const std::list<const seds::model::DataType *> &sedsDataTypes,
             Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage) const -> void;
 
     /**

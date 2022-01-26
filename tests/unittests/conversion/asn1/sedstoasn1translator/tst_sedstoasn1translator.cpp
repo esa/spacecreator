@@ -77,6 +77,7 @@ private Q_SLOTS:
 
     void testResolvingArrayDataType();
     void testResolvingContainerDataType();
+    void testResolvingUsingGlobal();
     void testResolvingCyclicDependency();
     void testResolvingUndeclaredType();
 
@@ -141,7 +142,7 @@ void tst_SedsToAsn1Translator::testResolvingArrayDataType()
     dataTypes.push_back(&integerDataType);
 
     DataTypesDependencyResolver resolver;
-    auto resolvedDataTypes = resolver.resolve(&dataTypes);
+    auto resolvedDataTypes = resolver.resolve(&dataTypes, nullptr);
 
     QCOMPARE(resolvedDataTypes.size(), 2);
 
@@ -169,7 +170,7 @@ void tst_SedsToAsn1Translator::testResolvingContainerDataType()
     dataTypes.push_back(&dataTypeB);
 
     DataTypesDependencyResolver resolver;
-    auto resolvedDataTypes = resolver.resolve(&dataTypes);
+    auto resolvedDataTypes = resolver.resolve(&dataTypes, nullptr);
 
     QCOMPARE(resolvedDataTypes.size(), 3);
 
@@ -180,6 +181,26 @@ void tst_SedsToAsn1Translator::testResolvingContainerDataType()
     resolvedDataTypes.pop_front();
 
     QCOMPARE(dataTypeNameStr(*resolvedDataTypes.front()), "Container");
+    resolvedDataTypes.pop_front();
+}
+
+void tst_SedsToAsn1Translator::testResolvingUsingGlobal()
+{
+    const seds::model::DataType arrayDataType = SedsDataTypeFactory::createArray("Array", "DataItem", 2);
+    const seds::model::DataType integerDataType = SedsDataTypeFactory::createInteger("DataItem");
+
+    std::vector<const DataType *> dataTypes;
+    dataTypes.push_back(&arrayDataType);
+
+    std::vector<const DataType *> globalDataTypes;
+    globalDataTypes.push_back(&integerDataType);
+
+    DataTypesDependencyResolver resolver;
+    auto resolvedDataTypes = resolver.resolve(&dataTypes, &globalDataTypes);
+
+    QCOMPARE(resolvedDataTypes.size(), 1);
+
+    QCOMPARE(dataTypeNameStr(*resolvedDataTypes.front()), "Array");
     resolvedDataTypes.pop_front();
 }
 
@@ -200,7 +221,7 @@ void tst_SedsToAsn1Translator::testResolvingCyclicDependency()
 
     DataTypesDependencyResolver resolver;
 
-    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes), NotDagException);
+    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes, nullptr), NotDagException);
 }
 
 void tst_SedsToAsn1Translator::testResolvingUndeclaredType()
@@ -216,7 +237,7 @@ void tst_SedsToAsn1Translator::testResolvingUndeclaredType()
 
     DataTypesDependencyResolver resolver;
 
-    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes), UndeclaredDataTypeException);
+    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes, nullptr), UndeclaredDataTypeException);
 }
 
 /// \SRS  ETB-FUN-210

@@ -114,14 +114,16 @@ std::unique_ptr<Asn1Acn::Types::UserdefinedType> EntryTranslatorVisitor::transla
         const QString &sedsTypeName) const
 {
     const auto name = Escaper::escapeAsn1TypeName(sedsTypeName);
-    const auto *asn1ReferencedType = m_asn1Definitions->type(name);
-    if (!asn1ReferencedType || !asn1ReferencedType->type()) {
+    const auto *asn1ReferencedTypeAssignment = m_asn1Definitions->type(name);
+    if (!asn1ReferencedTypeAssignment || !asn1ReferencedTypeAssignment->type()) {
         throw MissingAsn1TypeDefinitionException(name);
     }
 
+    const auto *asn1ReferencedType = asn1ReferencedTypeAssignment->type();
+
     auto asn1EntryType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
-            asn1ReferencedType->type()->identifier(), m_asn1Definitions->name());
-    asn1EntryType->setType(asn1ReferencedType->type()->clone());
+            asn1ReferencedType->identifier(), m_asn1Definitions->name());
+    asn1EntryType->setType(asn1ReferencedType->clone());
 
     return asn1EntryType;
 }
