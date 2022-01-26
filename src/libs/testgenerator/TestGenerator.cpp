@@ -41,6 +41,16 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
         throw TestGeneratorException("Given test data is empty");
     }
 
+    if (interface.kind() == ivm::IVInterface::OperationKind::Cyclic
+            || interface.kind() == ivm::IVInterface::OperationKind::Sporadic
+            || interface.kind() == ivm::IVInterface::OperationKind::Any) {
+        throw TestGeneratorException("Tested interface must be of type Protected or Unprotected");
+    }
+
+    if (interface.params().isEmpty()) {
+        throw TestGeneratorException("No input parameters in selected interface");
+    }
+
     const auto testRecordsSize = testData.records().size();
 
     std::stringstream ss;
@@ -137,6 +147,9 @@ auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, 
     QString result;
 
     const auto &ifParams = interface.params();
+    if (ifParams.isEmpty()) {
+        return "";
+    }
     for (unsigned int j = 0; j < static_cast<unsigned int>(ifParams.size() - 1);
             j++) { // one of the records is a result field
         const auto &param = ifParams[static_cast<int>(j)];

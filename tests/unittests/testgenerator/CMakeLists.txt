@@ -23,11 +23,17 @@ target_link_libraries(${TEST_NAME}
                 CommonProjectWarnings
 )
 
-configure_file(resources/config.xml config.xml COPYONLY)
-configure_file(resources/test_data.csv test_data.csv COPYONLY)
-configure_file(resources/empty.csv empty.csv COPYONLY)
-configure_file(resources/functionUnderTest1-interfaceview.xml interfaceview.xml COPYONLY)
-configure_file(resources/functionUnderTest1-testgenerator.asn testgenerator.asn COPYONLY)
-configure_file(resources/testdriver.c.out testdriver.c.out)
+configure_file(resources/config.xml resources/config.xml COPYONLY)
+
+configure_file(resources/test_data.csv resources/test_data.csv COPYONLY)
+
+configure_file(resources/empty.csv resources/empty.csv COPYONLY)
+
+configure_file(resources/nominal-interfaceview.xml resources/nominal-interfaceview.xml COPYONLY)
+configure_file(resources/cyclicif-interfaceview.xml resources/cyclicif-interfaceview.xml COPYONLY)
+
+configure_file(resources/testgenerator.asn resources/testgenerator.asn COPYONLY)
+
+configure_file(resources/testdriver.c.out resources/testdriver.c.out)
 
 add_format_target(${TEST_NAME})
