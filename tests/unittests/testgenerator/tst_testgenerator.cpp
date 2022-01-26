@@ -96,18 +96,23 @@ static std::unique_ptr<conversion::Model> loadIvModel(
     return model;
 }
 
-void tst_testgenerator::testEmpty()
+static std::unique_ptr<csv::CsvModel> loadCsvModel(const QString &filename)
 {
-    shared::initSharedLibrary();
-    ivm::initIVLibrary();
-
     csv::importer::CsvImporter importer;
     csv::importer::Options options;
-    options.add(csv::importer::CsvOptions::separator, ",");
-    options.add(csv::importer::CsvOptions::inputFilepath, "empty.csv");
+    options.add(csv::importer::CsvOptions::inputFilepath, filename);
 
-    const auto csvModel = importer.importModel(options);
-    QVERIFY(csvModel != nullptr);
+    auto csvModel = importer.importModel(options);
+    if (csvModel == nullptr) {
+        throw "CSV file could not be read";
+    }
+
+    return csvModel;
+}
+
+void tst_testgenerator::testEmpty()
+{
+    const auto csvModel = loadCsvModel("empty.csv");
     const csv::CsvModel &csvRef = *csvModel;
     QVERIFY(csvRef.header().fields().empty());
 
@@ -116,8 +121,8 @@ void tst_testgenerator::testEmpty()
     QVERIFY(asn1Model != nullptr);
     const Asn1Acn::Asn1Model &asn1ModelRef = *asn1Model;
 
-    const auto model = loadIvModel("interfaceview.xml", "config.xml");
-    const auto ivModel = dynamic_cast<ivm::IVModel *>(model.get());
+    const auto ivModelRaw = loadIvModel("interfaceview.xml", "config.xml");
+    const auto ivModel = dynamic_cast<ivm::IVModel *>(ivModelRaw.get());
     if (ivModel == nullptr) {
         QFAIL("no model");
     }
@@ -126,40 +131,24 @@ void tst_testgenerator::testEmpty()
     if (ifUnderTest == nullptr) {
         QFAIL(QString("Provided interface named not %1 found in given IV file").arg(ifName).toStdString().c_str());
     }
-
-    ivm::IVInterface::CreationInfo ci;
     const ivm::IVInterface &interface = *ifUnderTest;
+
     QVERIFY_EXCEPTION_THROWN(
             TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef), TestGeneratorException);
 }
 
 void tst_testgenerator::testNominal()
 {
-    csv::importer::CsvImporter importer;
-    csv::importer::Options options;
-    options.add(csv::importer::CsvOptions::separator, ",");
-    options.add(csv::importer::CsvOptions::inputFilepath, "test_data.csv");
-
-    auto csvModel = importer.importModel(options);
-    QVERIFY(csvModel != nullptr);
+    auto csvModel = loadCsvModel("test_data.csv");
     const csv::CsvModel &csvRef = *csvModel;
-    QVERIFY(csvRef.header().fields().size() == 4);
-
-    QString headerText = "";
-    const auto &headerFields = csvModel->header().fields();
-    headerText = *headerFields.begin();
-    for (auto it = std::next(headerFields.begin()); it != headerFields.end(); it++) {
-        headerText = QString("%1,%2").arg(headerText, *it);
-    }
-    QCOMPARE(headerText, "active,temperature,posX,posY");
 
     const auto asn1ModelRaw = loadAsn1Model("testgenerator.asn");
     const auto asn1Model = dynamic_cast<Asn1Acn::Asn1Model *>(asn1ModelRaw.get());
     QVERIFY(asn1Model != nullptr);
     const Asn1Acn::Asn1Model &asn1ModelRef = *asn1Model;
 
-    const auto model = loadIvModel("interfaceview.xml", "config.xml");
-    const auto ivModel = dynamic_cast<ivm::IVModel *>(model.get());
+    const auto ivModelRaw = loadIvModel("interfaceview.xml", "config.xml");
+    const auto ivModel = dynamic_cast<ivm::IVModel *>(ivModelRaw.get());
     QVERIFY(ivModel != nullptr);
 
     const QString ifName = "PI_InterfaceUnderTest";
@@ -167,28 +156,24 @@ void tst_testgenerator::testNominal()
     if (ifUnderTest == nullptr) {
         QFAIL(QString("provided if named not %1 found in given IV file").arg(ifName).toStdString().c_str());
     }
-
-    ivm::IVInterface::CreationInfo ci;
     const ivm::IVInterface &interface = *ifUnderTest;
 
-    auto testDriver = TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
+    auto outStream = TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
 
-    const QString testDriverStr = QString::fromStdString(testDriver.str());
-    const QStringList testDriverStrList = testDriverStr.split("\n");
+    auto expectedOutputFile = QFile("testdriver.c.out");
+    expectedOutputFile.open(QFile::ReadOnly | QFile::Text);
+    const QStringList expectedOutStrList = QTextStream(&expectedOutputFile).readAll().split("\n");
 
-    auto expectedFile = QFile("testdriver.c.out");
-    expectedFile.open(QFile::ReadOnly | QFile::Text);
-    const QStringList expectedStrList = QTextStream(&expectedFile).readAll().split("\n");
-
-    for (int i = 0; i < expectedStrList.size(); i++) {
-        if (testDriverStrList.size() == i) {
-            qDebug() << (QString("missing line: %1").arg(expectedStrList[i]).toStdString().c_str());
+    const QStringList actualOutStrList = QString::fromStdString(outStream.str()).split("\n");
+    for (int i = 0; i < expectedOutStrList.size(); i++) {
+        if (actualOutStrList.size() == i) {
+            qDebug() << (QString("missing line: %1").arg(expectedOutStrList[i]).toStdString().c_str());
             QFAIL("Actual size too short");
         }
-        if (testDriverStrList[i].compare(expectedStrList[i]) != 0) {
+        if (actualOutStrList[i].compare(expectedOutStrList[i]) != 0) {
             qDebug() << (QString("in line no %1").arg(i).toStdString().c_str());
-            qDebug() << (QString("expected %1").arg(expectedStrList[i]).toStdString().c_str());
-            qDebug() << (QString("but was  %1").arg(testDriverStrList[i]).toStdString().c_str());
+            qDebug() << (QString("expected %1").arg(expectedOutStrList[i]).toStdString().c_str());
+            qDebug() << (QString("but was  %1").arg(actualOutStrList[i]).toStdString().c_str());
             QFAIL("Lines not equal");
         }
     }
@@ -200,8 +185,6 @@ void tst_testgenerator::testNominal()
 
 // TODO: test case to verify that the generator throws an exception on interface with implementation
 //       NOT in C
-
-// TODO:
 
 } // namespace tests::testgenerator
 
