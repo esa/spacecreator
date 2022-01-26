@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="InterfaceInheritance">
+  <DataTypeSet>
+    <IntegerDataType name="MegaInteger">
+      <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+      <Range>
+        <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+      </Range>
+    </IntegerDataType>
+    <IntegerDataType name="BaseInteger">
+      <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+      <Range>
+        <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+      </Range>
+    </IntegerDataType>
+    <IntegerDataType name="ChildInteger">
+      <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+      <Range>
+        <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+      </Range>
+    </IntegerDataType>
+  </DataTypeSet>
+  <DeclaredInterfaceSet>
+    <Interface name="ChildInterface">
+      <BaseInterfaceSet>
+          <Interface type="BaseInterface">
+            <GenericTypeMapSet>
+              <GenericTypeMap name="GenericInteger" type="BaseInteger"/>
+            </GenericTypeMapSet>
+          </Interface>
+      </BaseInterfaceSet>
+      <ParameterSet>
+        <Parameter name="ChildParam" type="GenericInteger" mode="sync" readOnly="true"/>
+      </ParameterSet>
+      <CommandSet>
+        <Command name="ChildCommand" mode="sync">
+          <Argument name="InputArg" type="GenericInteger" mode="in" defaultValue="15" />
+          <Argument name="OutputArg" type="GenericInteger" mode="out" defaultValue="20" />
+        </Command>
+      </CommandSet>
+    </Interface>
+    <Interface name="BaseInterface">
+      <BaseInterfaceSet>
+          <Interface type="MegaInterface">
+            <GenericTypeMapSet>
+              <GenericTypeMap name="GenericInteger" type="MegaInteger"/>
+            </GenericTypeMapSet>
+          </Interface>
+      </BaseInterfaceSet>
+      <ParameterSet>
+        <Parameter name="BaseParam" type="GenericInteger" mode="sync" readOnly="true"/>
+      </ParameterSet>
+      <CommandSet>
+        <Command name="BaseCommand" mode="sync">
+          <Argument name="InputArg" type="GenericInteger" mode="in" defaultValue="15" />
+          <Argument name="OutputArg" type="GenericInteger" mode="out" defaultValue="20" />
+        </Command>
+      </CommandSet>
+    </Interface>
+    <Interface name="MegaInterface">
+      <ParameterSet>
+        <Parameter name="MegaParam" type="GenericInteger" mode="sync" readOnly="true"/>
+      </ParameterSet>
+      <CommandSet>
+        <Command name="MegaCommand" mode="sync">
+          <Argument name="InputArg" type="GenericInteger" mode="in" defaultValue="15" />
+          <Argument name="OutputArg" type="GenericInteger" mode="out" defaultValue="20" />
+        </Command>
+      </CommandSet>
+    </Interface>
+  </DeclaredInterfaceSet>
+  <ComponentSet>
+    <Component name="Component">
+      <ProvidedInterfaceSet>
+        <Interface name="ComponentInterface" type="ChildInterface">
+          <GenericTypeMapSet>
+            <GenericTypeMap name="GenericInteger" type="ChildInteger"/>
+          </GenericTypeMapSet>
+        </Interface>
+      </ProvidedInterfaceSet>
+    </Component>
+  </ComponentSet>
+  </Package>
+</PackageFile>
