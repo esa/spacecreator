@@ -1,0 +1,2 @@
+add_subdirectory(TmcConverter)
+add_subdirectory(TmcVerifier)

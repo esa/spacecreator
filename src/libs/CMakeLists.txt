@@ -31,6 +31,7 @@ add_subdirectory(testgenerator)
 add_subdirectory(conversion)
 add_subdirectory(seds)
 add_subdirectory(promela)
+add_subdirectory(tmc)
 
 # Total SpaceCreator system
 add_subdirectory(spacecreatorsystem)
