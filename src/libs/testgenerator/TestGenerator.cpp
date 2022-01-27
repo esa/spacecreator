@@ -20,6 +20,7 @@
 #include "TestGenerator.h"
 
 #include "TestGeneratorException.h"
+#include "parameter.h"
 
 #include <QDebug>
 #include <algorithm>
@@ -72,19 +73,26 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
 
     const auto testRecordsSize = testData.records().size();
     std::vector<unsigned int> mappings(testRecordsSize, 0);
-    if (!testData.header().fields().empty()) {
-        if (static_cast<int>(testData.header().fields().size()) != interface.params().size() - 1) {
+    const auto &headerFields = testData.header().fields();
+    const auto &ifParams = interface.params();
+    if (!headerFields.empty()) {
+        if (static_cast<int>(headerFields.size()) != ifParams.size() - 1) {
             throw TestGeneratorException("Imported CSV contains invalid number of data columns");
         }
         std::vector<bool> elementsFound(testRecordsSize, false);
-        for (const auto &param : interface.params()) {
+        for (unsigned int i = 0; i < static_cast<unsigned int>(ifParams.size()); i++) {
+            const auto &param = ifParams.at(static_cast<int>(i));
             const QString &name = param.name();
-            for (const auto &field : testData.header().fields()) {
+            if (param.direction() == shared::InterfaceParameter::Direction::OUT) {
+                elementsFound.at(i) = true;
+                continue;
+            }
+            for (unsigned int j = 0; j < headerFields.size(); j++) {
+                const auto &field = headerFields.at(j);
                 if (name.compare(field) == 0) {
-                    // found[i] = true;
+                    elementsFound.at(i) = true;
+                    mappings.at(i) = j;
                     break;
-                } else {
-                    // mappings[i] = j;
                 }
             }
         }
@@ -97,6 +105,7 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
             mappings[i] = i;
         }
     }
+    qDebug() << mappings;
 
     std::stringstream ss;
     ss << "/**\n"
