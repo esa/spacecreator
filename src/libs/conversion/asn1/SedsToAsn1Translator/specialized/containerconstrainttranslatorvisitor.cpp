@@ -140,9 +140,13 @@ void ContainerConstraintTranslatorVisitor::applyContainerTypeConstraint(
         RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue> rangeTranslator(asn1Type);
         std::visit(rangeTranslator, referencedFloatType->range());
     } break;
+    case ASN1Type::USERDEFINED: {
+        auto asn1UserdefinedType = dynamic_cast<Asn1Acn::Types::UserdefinedType *>(asn1Type);
+        applyContainerTypeConstraint(typeConstraint, asn1UserdefinedType->type());
+    } break;
     default: {
-        auto errorMessage = QString("ContainerTypeConstraint cannot be applied to \"%1\" entry because it's neither "
-                                    "an integer nor float data type")
+        auto errorMessage = QString("ContainerTypeConstraint cannot be applied to \"%1\" entry because it's neither an "
+                                    "integer nor float data type")
                                     .arg(typeConstraint.entry().nameStr());
         throw conversion::translator::TranslationException(std::move(errorMessage));
     } break;
