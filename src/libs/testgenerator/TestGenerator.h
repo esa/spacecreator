@@ -25,6 +25,7 @@
 #include <csv/CsvModel/csvmodel.h>
 #include <ivcore/ivinterface.h>
 #include <sstream>
+#include <vector>
 
 using Asn1Acn::Asn1Model;
 using Asn1Acn::Types::Type;
@@ -43,6 +44,11 @@ private:
     static auto getAssignmentsForRecords(const ivm::IVInterface &interface, const Asn1Acn::Asn1Model &asn1Model,
             const csv::CsvModel &testData, unsigned int index) -> QString;
     static auto removePiPrefix(const QString &str) -> QString;
+
+    // which column in CSV model matches which interface input parameter
+    // mappings index - parameter number
+    // mappings value - data column in CSV model
+    static std::vector<unsigned int> mappings;
 };
 
 } // testgenerator

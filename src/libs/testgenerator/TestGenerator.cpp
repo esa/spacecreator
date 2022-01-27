@@ -37,6 +37,8 @@
 
 namespace testgenerator {
 
+std::vector<unsigned int> TestGenerator::mappings;
+
 auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm::IVInterface &interface,
         const Asn1Acn::Asn1Model &asn1Model) -> std::stringstream
 {
@@ -72,7 +74,8 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
     }
 
     const auto testRecordsSize = testData.records().size();
-    std::vector<unsigned int> mappings(testRecordsSize, 0);
+    mappings = std::vector<unsigned int>(testRecordsSize, 0);
+
     const auto &headerFields = testData.header().fields();
     const auto &ifParams = interface.params();
     if (!headerFields.empty()) {
@@ -105,7 +108,6 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
             mappings[i] = i;
         }
     }
-    qDebug() << mappings;
 
     std::stringstream ss;
     ss << "/**\n"
@@ -213,13 +215,13 @@ auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, 
 
         switch (getAsn1Type(param.paramTypeName(), asn1Model)) {
         case Asn1Acn::Types::Type::INTEGER:
-            result += QString::number(static_cast<int>(testData.field(index, j).toDouble()));
+            result += QString::number(static_cast<int>(testData.field(index, mappings.at(j)).toDouble()));
             break;
         case Asn1Acn::Types::Type::REAL:
-            result += QString::number(testData.field(index, j).toFloat());
+            result += QString::number(testData.field(index, mappings.at(j)).toFloat());
             break;
         case Asn1Acn::Types::Type::BOOLEAN: {
-            result += qstringToBoolSymbol(testData.field(index, j));
+            result += qstringToBoolSymbol(testData.field(index, mappings.at(j)));
             break;
         }
         case Asn1Acn::Types::Type::UNKNOWN:
