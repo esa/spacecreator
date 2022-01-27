@@ -24,33 +24,42 @@
 #include <asn1library/asn1/types/type.h>
 #include <csv/CsvModel/csvmodel.h>
 #include <ivcore/ivinterface.h>
+#include <shared/parameter.h>
 #include <sstream>
 #include <vector>
 
 using Asn1Acn::Asn1Model;
 using Asn1Acn::Types::Type;
+using csv::CsvModel;
+using InterfaceParameters = QVector<shared::InterfaceParameter>;
+using Mappings = std::vector<unsigned int>;
+using Fields = std::vector<csv::Field>;
 
 namespace testgenerator {
 
 class TestGenerator final
 {
 public:
-    static auto generateTestDriver(const csv::CsvModel &testData, const ivm::IVInterface &interface,
-            const Asn1Acn::Asn1Model &asn1Model) -> std::stringstream;
+    static auto generateTestDriver(const CsvModel &testData, const ivm::IVInterface &interface,
+            const Asn1Model &asn1Model) -> std::stringstream;
 
 private:
+    static auto checkTestData(const CsvModel &testData) -> void;
+    static auto checkInterface(const ivm::IVInterface &interface) -> void;
+    static auto getHeaderFieldsToParamsMappings(const Fields &headerFields, const InterfaceParameters &params)
+            -> Mappings;
+    static auto countOutputParameters(const InterfaceParameters &params) -> unsigned int;
     static auto getAsn1Type(const QString &name, const Asn1Model &model) -> Type::ASN1Type;
     static auto qstringToBoolSymbol(const QString &str) -> QString;
-    static auto getAssignmentsForRecords(const ivm::IVInterface &interface, const Asn1Acn::Asn1Model &asn1Model,
-            const csv::CsvModel &testData, unsigned int index) -> QString;
+    static auto getAssignmentsForRecords(const ivm::IVInterface &interface, const Asn1Model &asn1Model,
+            const CsvModel &testData, unsigned int index) -> QString;
     static auto removePiPrefix(const QString &str) -> QString;
 
     // which column in CSV model matches which interface input parameter
-    // mappings index - parameter number
+    // mappings index - interface parameter number
     // mappings value - data column in CSV model
-    static std::vector<unsigned int> mappings;
-
-    static unsigned int outputParameters;
+    static Mappings m_mappings;
+    static unsigned int m_outputParameters;
 };
 
-} // testgenerator
+} // namespace testgenerator

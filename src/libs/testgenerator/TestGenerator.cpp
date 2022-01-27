@@ -20,7 +20,6 @@
 #include "TestGenerator.h"
 
 #include "TestGeneratorException.h"
-#include "parameter.h"
 
 #include <QDebug>
 #include <algorithm>
@@ -39,84 +38,19 @@ using IfDirection = shared::InterfaceParameter::Direction;
 
 namespace testgenerator {
 
-std::vector<unsigned int> TestGenerator::mappings;
-unsigned int TestGenerator::outputParameters = 0;
+std::vector<unsigned int> TestGenerator::m_mappings;
+unsigned int TestGenerator::m_outputParameters = 0;
 
-auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm::IVInterface &interface,
-        const Asn1Acn::Asn1Model &asn1Model) -> std::stringstream
+auto TestGenerator::generateTestDriver(
+        const CsvModel &testData, const ivm::IVInterface &interface, const Asn1Model &asn1Model) -> std::stringstream
 {
-    if (testData.records().empty()) {
-        throw TestGeneratorException("Given test data is empty");
-    }
+    checkTestData(testData);
+    checkInterface(interface);
 
-    if (interface.kind() == ivm::IVInterface::OperationKind::Cyclic
-            || interface.kind() == ivm::IVInterface::OperationKind::Sporadic
-            || interface.kind() == ivm::IVInterface::OperationKind::Any) {
-        throw TestGeneratorException("Tested interface must be of type Protected or Unprotected");
-    }
-
-    if (interface.params().isEmpty()) {
-        throw TestGeneratorException("No input parameters in selected interface");
-    }
-
-    if (!interface.isProvided()) {
-        throw TestGeneratorException("Only provided interface could be tested");
-    }
-
-    if (interface.function() == nullptr) {
-        throw TestGeneratorException("Interface without function is invalid");
-    }
-
-    const QString functionImplementation =
-            interface.function()
-                    ->entityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::language))
-                    .value()
-                    .toString();
-    if (functionImplementation.compare("C") != 0) {
-        throw TestGeneratorException("Only functions with implementation in C could be tested");
-    }
+    m_outputParameters = countOutputParameters(interface.params());
+    m_mappings = getHeaderFieldsToParamsMappings(testData.header().fields(), interface.params());
 
     const auto testRecordsSize = testData.records().size();
-
-    const auto &headerFields = testData.header().fields();
-
-    const auto &ifParams = interface.params();
-    const unsigned int ifParamsSize = static_cast<unsigned int>(ifParams.size());
-    mappings = std::vector<unsigned int>(ifParamsSize, 0);
-
-    outputParameters = std::count_if(
-            ifParams.begin(), ifParams.end(), [](const auto &param) { return param.direction() == IfDirection::OUT; });
-
-    if (!headerFields.empty()) {
-        if (headerFields.size() != ifParamsSize - outputParameters) {
-            throw TestGeneratorException("Imported CSV contains invalid number of data columns");
-        }
-        std::vector<bool> elementsFound(ifParamsSize, false);
-        for (unsigned int i = 0; i < ifParamsSize; i++) {
-            const auto &param = ifParams.at(static_cast<int>(i));
-            const QString &name = param.name();
-            if (param.direction() == IfDirection::OUT) {
-                elementsFound.at(i) = true;
-                continue;
-            }
-            for (unsigned int j = 0; j < headerFields.size(); j++) {
-                const auto &field = headerFields.at(j);
-                if (name.compare(field) == 0) {
-                    elementsFound.at(i) = true;
-                    mappings.at(i) = j;
-                    break;
-                }
-            }
-        }
-        if (std::any_of(elementsFound.begin(), elementsFound.end(), [](const auto &found) -> bool { return !found; })) {
-            // throw TestGeneratorException("Header fields do not match interface parameter names");
-            qDebug() << "something not found";
-        }
-    } else {
-        for (unsigned int i = 0; i < testRecordsSize; i++) {
-            mappings[i] = i;
-        }
-    }
 
     std::stringstream ss;
     ss << "/**\n"
@@ -152,11 +86,12 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
           "void testdriver_startup(void)\n"
           "{\n";
 
-    for (unsigned long int i = 0; i < testRecordsSize - 1; i++) {
+    const unsigned long int lastTestRecordIndex = testRecordsSize - 1;
+    for (unsigned long int i = 0; i < lastTestRecordIndex; i++) {
         ss << getAssignmentsForRecords(interface, asn1Model, testData, i).toStdString();
         ss << "\n";
     }
-    ss << getAssignmentsForRecords(interface, asn1Model, testData, testRecordsSize - 1).toStdString();
+    ss << getAssignmentsForRecords(interface, asn1Model, testData, lastTestRecordIndex).toStdString();
 
     ss << "}\n"
           "\n"
@@ -177,6 +112,89 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
           "\n";
 
     return ss;
+}
+
+auto TestGenerator::checkTestData(const CsvModel &testData) -> void
+{
+    if (testData.records().empty()) {
+        throw TestGeneratorException("Given test data is empty");
+    }
+}
+
+auto TestGenerator::checkInterface(const ivm::IVInterface &interface) -> void
+{
+    if (interface.kind() == ivm::IVInterface::OperationKind::Cyclic
+            || interface.kind() == ivm::IVInterface::OperationKind::Sporadic
+            || interface.kind() == ivm::IVInterface::OperationKind::Any) {
+        throw TestGeneratorException("Tested interface must be of type Protected or Unprotected");
+    }
+
+    if (interface.params().isEmpty()) {
+        throw TestGeneratorException("No input parameters in selected interface");
+    }
+
+    if (!interface.isProvided()) {
+        throw TestGeneratorException("Only provided interface could be tested");
+    }
+
+    if (interface.function() == nullptr) {
+        throw TestGeneratorException("Interface without function is invalid");
+    }
+
+    const QString functionImplementation =
+            interface.function()
+                    ->entityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::language))
+                    .value()
+                    .toString();
+    if (functionImplementation.compare("C") != 0) {
+        throw TestGeneratorException("Only functions with implementation in C could be tested");
+    }
+}
+
+auto TestGenerator::getHeaderFieldsToParamsMappings(
+        const std::vector<csv::Field> &headerFields, const InterfaceParameters &params) -> Mappings
+{
+    const unsigned int paramsSize = static_cast<unsigned int>(params.size());
+
+    auto mappings = std::vector<unsigned int>(paramsSize, 0);
+
+    if (!headerFields.empty()) {
+        if (headerFields.size() != paramsSize - m_outputParameters) {
+            throw TestGeneratorException("Imported CSV contains invalid number of data columns");
+        }
+        std::vector<bool> elementsFound(paramsSize, false);
+        for (unsigned int i = 0; i < paramsSize; i++) {
+            const auto &param = params.at(static_cast<int>(i));
+            const QString &name = param.name();
+            if (param.direction() == IfDirection::OUT) {
+                elementsFound.at(i) = true;
+                continue;
+            }
+            for (unsigned int j = 0; j < headerFields.size(); j++) {
+                const auto &field = headerFields.at(j);
+                if (name.compare(field) == 0) {
+                    elementsFound.at(i) = true;
+                    mappings.at(i) = j;
+                    break;
+                }
+            }
+        }
+        if (std::any_of(elementsFound.begin(), elementsFound.end(), [](const auto &found) -> bool { return !found; })) {
+            throw TestGeneratorException("Header fields do not match interface parameter names");
+        }
+    } else {
+        for (unsigned int i = 0; i < paramsSize; i++) {
+            mappings[i] = i;
+        }
+    }
+
+    return mappings;
+}
+
+auto TestGenerator::countOutputParameters(const InterfaceParameters &params) -> unsigned int
+{
+    return std::count_if(
+            params.begin(), params.end(), [](const auto &param) { return param.direction() == IfDirection::OUT; });
 }
 
 auto TestGenerator::getAsn1Type(const QString &name, const Asn1Model &model) -> Type::ASN1Type
@@ -206,8 +224,8 @@ auto TestGenerator::qstringToBoolSymbol(const QString &str) -> QString
     }
 }
 
-auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, const Asn1Acn::Asn1Model &asn1Model,
-        const csv::CsvModel &testData, const unsigned int index) -> QString
+auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, const Asn1Model &asn1Model,
+        const CsvModel &testData, const unsigned int testDataRowIndex) -> QString
 {
     QString result;
 
@@ -219,22 +237,24 @@ auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, 
     for (unsigned int j = 0; j < static_cast<unsigned int>(ifParams.size()); j++) {
         const auto &param = ifParams[static_cast<int>(j)];
 
-        result += QString("    testData[%1].%2 = ").arg(index).arg(param.name());
+        result += QString("    testData[%1].%2 = ").arg(testDataRowIndex).arg(param.name());
 
         if (param.direction() == IfDirection::OUT) {
             result += "0;\n";
             continue;
         }
 
+        const unsigned int srcFieldIndex = testData.header().fields().empty() ? j : m_mappings.at(j);
+
         switch (getAsn1Type(param.paramTypeName(), asn1Model)) {
         case Asn1Acn::Types::Type::INTEGER:
-            result += QString::number(static_cast<int>(testData.field(index, mappings.at(j)).toDouble()));
+            result += QString::number(static_cast<int>(testData.field(testDataRowIndex, srcFieldIndex).toDouble()));
             break;
         case Asn1Acn::Types::Type::REAL:
-            result += QString::number(testData.field(index, mappings.at(j)).toFloat());
+            result += QString::number(testData.field(testDataRowIndex, srcFieldIndex).toFloat());
             break;
         case Asn1Acn::Types::Type::BOOLEAN: {
-            result += qstringToBoolSymbol(testData.field(index, mappings.at(j)));
+            result += qstringToBoolSymbol(testData.field(testDataRowIndex, srcFieldIndex));
             break;
         }
         case Asn1Acn::Types::Type::UNKNOWN:
@@ -244,10 +264,6 @@ auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, 
         }
 
         result += ";\n";
-
-        if (interface.function() == nullptr) {
-            throw TestGeneratorException("Interface has no Function set.");
-        }
     }
 
     return result;
