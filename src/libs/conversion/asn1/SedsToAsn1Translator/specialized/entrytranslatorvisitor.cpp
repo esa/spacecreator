@@ -25,9 +25,6 @@
 
 #include <asn1library/asn1/acnsequencecomponent.h>
 #include <asn1library/asn1/asnsequencecomponent.h>
-#include <asn1library/asn1/constraints/rangecombiner.h>
-#include <asn1library/asn1/constraints/rangeconstraint.h>
-#include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
@@ -56,9 +53,11 @@ using conversion::translator::UndeclaredDataTypeException;
 namespace conversion::asn1::translator {
 
 EntryTranslatorVisitor::EntryTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence,
-        Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage)
+        Asn1Acn::Definitions *asn1Definitions, const seds::model::ContainerDataType *sedsParentContainer,
+        const seds::model::Package *sedsPackage)
     : m_asn1Sequence(asn1Sequence)
     , m_asn1Definitions(asn1Definitions)
+    , m_sedsParentContainer(sedsParentContainer)
     , m_sedsPackage(sedsPackage)
 {
 }
@@ -106,17 +105,15 @@ void EntryTranslatorVisitor::operator()(const seds::model::LengthEntry &sedsEntr
 
 void EntryTranslatorVisitor::operator()(const seds::model::ListEntry &sedsEntry)
 {
-    auto &listLengthSequenceComponent = getListLengthSequenceComponent(sedsEntry);
     // Replace the existing ASN.1 length entry with an ACN-only one
-    listLengthSequenceComponent.reset(new Asn1Acn::AcnSequenceComponent(listLengthSequenceComponent->name(),
-            listLengthSequenceComponent->name(), listLengthSequenceComponent->type()->clone()));
+    updateListLengthEntry(sedsEntry);
 
     auto asn1EntryType = translateEntryType(sedsEntry.type().nameStr());
 
     auto asn1SequenceOfType = std::make_unique<Asn1Acn::Types::SequenceOf>();
     asn1SequenceOfType->setItemsType(std::move(asn1EntryType));
 
-    addListSizeConstraint(asn1SequenceOfType.get(), listLengthSequenceComponent->type());
+    addListSizeConstraint(asn1SequenceOfType.get(), sedsEntry);
 
     const auto entryName = Escaper::escapeAsn1FieldName(sedsEntry.nameStr());
     auto listSequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
@@ -146,25 +143,6 @@ std::unique_ptr<Asn1Acn::Types::UserdefinedType> EntryTranslatorVisitor::transla
     asn1EntryType->setType(asn1ReferencedType->clone());
 
     return asn1EntryType;
-}
-
-std::unique_ptr<Asn1Acn::SequenceComponent> &EntryTranslatorVisitor::getListLengthSequenceComponent(
-        const seds::model::ListEntry &sedsEntry) const
-{
-    auto &containerComponents = m_asn1Sequence->components();
-
-    const auto listLengthFieldName = Escaper::escapeAsn1FieldName(sedsEntry.listLengthField().nameStr());
-    auto foundListLengthSequenceComponent = std::find_if(containerComponents.begin(), containerComponents.end(),
-            [&](const auto &component) { return component->name() == listLengthFieldName; });
-
-    if (foundListLengthSequenceComponent == containerComponents.end()) {
-        auto errorMessage = QString("Entry \"%1\" used as a length of the list entry \"%2\" not found")
-                                    .arg(listLengthFieldName)
-                                    .arg(sedsEntry.type().nameStr());
-        throw TranslationException(std::move(errorMessage));
-    }
-
-    return *foundListLengthSequenceComponent;
 }
 
 void EntryTranslatorVisitor::translateFixedValue(
@@ -280,41 +258,71 @@ void EntryTranslatorVisitor::translateCoreErrorControl(
     }
 }
 
-std::optional<Asn1Acn::Range<int64_t>> EntryTranslatorVisitor::getListLengthRange(
-        const Asn1Acn::Types::Type *asn1Type) const
+void EntryTranslatorVisitor::updateListLengthEntry(const seds::model::ListEntry &sedsEntry) const
 {
-    if (asn1Type->typeEnum() == Asn1Acn::Types::Type::ASN1Type::INTEGER) {
-        const auto asn1IntegerType = dynamic_cast<const Asn1Acn::Types::Integer *>(asn1Type);
+    auto &listLengthSequenceComponent = getListLengthSequenceComponent(sedsEntry);
 
-        const auto &constraints = asn1IntegerType->constraints();
-        return Asn1Acn::Constraints::RangeCombiner<Asn1Acn::IntegerValue>::combineRanges(&constraints);
-    } else if (asn1Type->typeEnum() == Asn1Acn::Types::Type::ASN1Type::USERDEFINED) {
-        const auto asn1UserdefinedType = dynamic_cast<const Asn1Acn::Types::UserdefinedType *>(asn1Type);
+    listLengthSequenceComponent.reset(new Asn1Acn::AcnSequenceComponent(listLengthSequenceComponent->name(),
+            listLengthSequenceComponent->name(), listLengthSequenceComponent->type()->clone()));
+}
 
-        return getListLengthRange(asn1UserdefinedType->type());
-    } else {
-        auto errorMessage = QString("Type \"%1\" used as a list entry length must be an integer type, but is %2")
-                                    .arg(asn1Type->identifier())
-                                    .arg(asn1Type->typeName());
+std::unique_ptr<Asn1Acn::SequenceComponent> &EntryTranslatorVisitor::getListLengthSequenceComponent(
+        const seds::model::ListEntry &sedsEntry) const
+{
+    auto &containerComponents = m_asn1Sequence->components();
+
+    const auto listLengthFieldName = Escaper::escapeAsn1FieldName(sedsEntry.listLengthField().nameStr());
+    auto foundListLengthSequenceComponent = std::find_if(containerComponents.begin(), containerComponents.end(),
+            [&](const auto &component) { return component->name() == listLengthFieldName; });
+
+    if (foundListLengthSequenceComponent == containerComponents.end()) {
+        auto errorMessage = QString("Entry \"%1\" used as a length of the list entry \"%2\" not found")
+                                    .arg(listLengthFieldName)
+                                    .arg(sedsEntry.type().nameStr());
         throw TranslationException(std::move(errorMessage));
-
-        return std::nullopt;
     }
+
+    return *foundListLengthSequenceComponent;
 }
 
 void EntryTranslatorVisitor::addListSizeConstraint(
-        Asn1Acn::Types::SequenceOf *asn1Type, const Asn1Acn::Types::Type *listLengthFieldType) const
+        Asn1Acn::Types::SequenceOf *asn1Type, const seds::model::ListEntry &sedsEntry) const
 {
-    const auto listLengthRange = getListLengthRange(listLengthFieldType);
+    const auto listLengthFieldName = sedsEntry.listLengthField().nameStr();
+    const auto listLengthField = m_sedsParentContainer->entry(listLengthFieldName);
 
-    if (!listLengthRange) {
-        auto errorMessage = QString("Type \"%1\" used as a length of the list entry doesn't have range")
-                                    .arg(listLengthFieldType->identifier());
+    if (listLengthField == nullptr) {
+        auto errorMessage = QString("Entry \"%1\" used as a length of the list entry \"%2\" not found")
+                                    .arg(listLengthFieldName)
+                                    .arg(sedsEntry.type().nameStr());
         throw TranslationException(std::move(errorMessage));
     }
 
-    SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn::IntegerValue> sizeTranslator(asn1Type);
-    sizeTranslator.addSizeConstraint(*listLengthRange);
+    const auto listLengthEntry = std::get_if<seds::model::Entry>(listLengthField);
+
+    if (listLengthEntry == nullptr) {
+        auto errorMessage = QString(
+                "Entry \"%1\" can't be used as a length of the list entry \"%2\". Only plain entry can be used.")
+                                    .arg(listLengthFieldName)
+                                    .arg(sedsEntry.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto &listLengthEntryTypeName = listLengthEntry->type().nameStr();
+    const auto listLengthEntryType = m_sedsPackage->dataType(listLengthEntryTypeName);
+
+    if (const auto listLengthEntryIntegerType = std::get_if<seds::model::IntegerDataType>(listLengthEntryType)) {
+        SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn::IntegerValue> sizeTranslator(asn1Type);
+        std::visit(sizeTranslator, listLengthEntryIntegerType->range());
+    } else {
+        auto errorMessage = QString(
+                "Entry \"%1\" can't be used as a length of the list entry \"%2\" because it's type is not integer")
+                                    .arg(listLengthFieldName)
+                                    .arg(sedsEntry.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    asn1Type->setAcnSize(Escaper::escapeAsn1FieldName(listLengthFieldName));
 }
 
 } // namespace conversion::asn1::translator

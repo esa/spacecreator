@@ -21,8 +21,6 @@
 
 #include "specialized/rangetranslatorvisitor.h"
 
-#include <asn1library/asn1/constraints/rangecombiner.h>
-#include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <conversion/common/translation/exceptions.h>
 #include <cstdint>
 
@@ -108,9 +106,6 @@ private:
     auto applyContainerValueConstraint(
             const seds::model::ContainerValueConstraint &valueConstraint, Asn1Acn::Types::Type *asn1Type) const -> void;
 
-    template<typename Type, typename ValueType>
-    auto addTypeRangeConstraint(Asn1Acn::Types::Type *asn1Type, const Type *referencedType) const -> void;
-
     auto getConstrainedType(const seds::model::EntryRef &entry) const -> Asn1Acn::Types::Type *;
 
 private:
@@ -118,22 +113,5 @@ private:
 
     const seds::model::Package *m_sedsPackage;
 };
-
-template<typename Type, typename ValueType>
-void ContainerConstraintTranslatorVisitor::addTypeRangeConstraint(
-        Asn1Acn::Types::Type *asn1Type, const Type *referencedType) const
-{
-    const auto &constraints = referencedType->constraints();
-    const auto resultRange = Asn1Acn::Constraints::RangeCombiner<ValueType>::combineRanges(&constraints);
-
-    if (!resultRange) {
-        auto errorMessage = QString("Type %1 used as a type constraint doesn't have a range that can be used")
-                                    .arg(referencedType->identifier());
-        throw conversion::translator::TranslationException(std::move(errorMessage));
-    }
-
-    RangeTranslatorVisitor<Type, ValueType> rangeTranslator(asn1Type);
-    rangeTranslator.addRangeConstraint(*resultRange);
-}
 
 } // namespace conversion::asn1::translator

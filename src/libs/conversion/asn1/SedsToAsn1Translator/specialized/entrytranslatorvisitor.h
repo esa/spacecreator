@@ -62,7 +62,7 @@ public:
      * @param   sedsPackage         Parent SEDS package
      */
     EntryTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence, Asn1Acn::Definitions *asn1Definitions,
-            const seds::model::Package *sedsPackage);
+            const seds::model::ContainerDataType *sedsParentContainer, const seds::model::Package *sedsPackage);
     /**
      * @brief   Deleted copy constructor
      */
@@ -129,11 +129,11 @@ private:
     auto translateCoreErrorControl(seds::model::CoreErrorControl coreErrorControl, Asn1Acn::Types::Null *asn1Type) const
             -> void;
 
+    auto updateListLengthEntry(const seds::model::ListEntry &sedsEntry) const -> void;
     auto getListLengthSequenceComponent(const seds::model::ListEntry &sedsEntry) const
             -> std::unique_ptr<Asn1Acn::SequenceComponent> &;
-    auto getListLengthRange(const Asn1Acn::Types::Type *asn1Type) const -> std::optional<Asn1Acn::Range<int64_t>>;
-    auto addListSizeConstraint(
-            Asn1Acn::Types::SequenceOf *asn1Type, const Asn1Acn::Types::Type *listLengthFieldType) const -> void;
+    auto addListSizeConstraint(Asn1Acn::Types::SequenceOf *asn1Type, const seds::model::ListEntry &sedsEntry) const
+            -> void;
 
 private:
     /// @brief  Where translated entry will be saved
@@ -141,6 +141,8 @@ private:
 
     /// @brief  Parent definitions
     Asn1Acn::Definitions *m_asn1Definitions;
+    /// @brief  Parent container
+    const seds::model::ContainerDataType *m_sedsParentContainer;
     /// @brief  Parent package
     const seds::model::Package *m_sedsPackage;
 

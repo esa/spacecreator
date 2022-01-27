@@ -22,9 +22,6 @@
 #include "specialized/rangetranslatorvisitor.h"
 #include "specialized/sizetranslatorvisitor.h"
 
-#include <asn1library/asn1/constraints/logicoperators.h>
-#include <asn1library/asn1/constraints/rangecombiner.h>
-#include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/values.h>
 #include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/package/package.h>
