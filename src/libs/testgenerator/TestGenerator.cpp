@@ -35,6 +35,8 @@
 #include <shared/sharedlibrary.h>
 #include <sstream>
 
+using IfDirection = shared::InterfaceParameter::Direction;
+
 namespace testgenerator {
 
 std::vector<unsigned int> TestGenerator::mappings;
@@ -74,19 +76,25 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
     }
 
     const auto testRecordsSize = testData.records().size();
-    mappings = std::vector<unsigned int>(testRecordsSize, 0);
 
     const auto &headerFields = testData.header().fields();
+
     const auto &ifParams = interface.params();
+    const unsigned int ifParamsSize = static_cast<unsigned int>(ifParams.size());
+    mappings = std::vector<unsigned int>(ifParamsSize, 0);
+
+    const unsigned int outputParameters = std::count_if(
+            ifParams.begin(), ifParams.end(), [](const auto &param) { return param.direction() == IfDirection::OUT; });
+
     if (!headerFields.empty()) {
-        if (static_cast<int>(headerFields.size()) != ifParams.size() - 1) {
+        if (headerFields.size() != ifParamsSize - outputParameters) {
             throw TestGeneratorException("Imported CSV contains invalid number of data columns");
         }
-        std::vector<bool> elementsFound(testRecordsSize, false);
-        for (unsigned int i = 0; i < static_cast<unsigned int>(ifParams.size()); i++) {
+        std::vector<bool> elementsFound(ifParamsSize, false);
+        for (unsigned int i = 0; i < ifParamsSize; i++) {
             const auto &param = ifParams.at(static_cast<int>(i));
             const QString &name = param.name();
-            if (param.direction() == shared::InterfaceParameter::Direction::OUT) {
+            if (param.direction() == IfDirection::OUT) {
                 elementsFound.at(i) = true;
                 continue;
             }
@@ -247,7 +255,8 @@ auto TestGenerator::removePiPrefix(const QString &str) -> QString
     constexpr int prefixLen = 3;
 
     if (str.left(prefixLen).compare("PI_") != 0) {
-        throw TestGeneratorException("Selected interface does not have required 'PI_' prefix");
+        qWarning() << "Selected interface does not have required 'PI_' prefix";
+        return str;
     }
 
     return str.right(str.size() - prefixLen);
