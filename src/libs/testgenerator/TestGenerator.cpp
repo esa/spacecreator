@@ -40,6 +40,7 @@ using IfDirection = shared::InterfaceParameter::Direction;
 namespace testgenerator {
 
 std::vector<unsigned int> TestGenerator::mappings;
+unsigned int TestGenerator::outputParameters = 0;
 
 auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm::IVInterface &interface,
         const Asn1Acn::Asn1Model &asn1Model) -> std::stringstream
@@ -83,7 +84,7 @@ auto TestGenerator::generateTestDriver(const csv::CsvModel &testData, const ivm:
     const unsigned int ifParamsSize = static_cast<unsigned int>(ifParams.size());
     mappings = std::vector<unsigned int>(ifParamsSize, 0);
 
-    const unsigned int outputParameters = std::count_if(
+    outputParameters = std::count_if(
             ifParams.begin(), ifParams.end(), [](const auto &param) { return param.direction() == IfDirection::OUT; });
 
     if (!headerFields.empty()) {
@@ -214,12 +215,16 @@ auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, 
     if (ifParams.isEmpty()) {
         return "";
     }
-    // TODO: map between header position/column and parameter position
-    for (unsigned int j = 0; j < static_cast<unsigned int>(ifParams.size() - 1);
-            j++) { // one of the records is a result field
+
+    for (unsigned int j = 0; j < static_cast<unsigned int>(ifParams.size()); j++) {
         const auto &param = ifParams[static_cast<int>(j)];
 
         result += QString("    testData[%1].%2 = ").arg(index).arg(param.name());
+
+        if (param.direction() == IfDirection::OUT) {
+            result += "0;\n";
+            continue;
+        }
 
         switch (getAsn1Type(param.paramTypeName(), asn1Model)) {
         case Asn1Acn::Types::Type::INTEGER:
@@ -245,8 +250,6 @@ auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, 
         }
     }
 
-    result += QString("    testData[%1].%2 = 0;\n").arg(index).arg(ifParams.last().name());
-
     return result;
 }
 
@@ -255,7 +258,6 @@ auto TestGenerator::removePiPrefix(const QString &str) -> QString
     constexpr int prefixLen = 3;
 
     if (str.left(prefixLen).compare("PI_") != 0) {
-        qWarning() << "Selected interface does not have required 'PI_' prefix";
         return str;
     }
 

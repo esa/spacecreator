@@ -49,6 +49,8 @@ private:
     // mappings index - parameter number
     // mappings value - data column in CSV model
     static std::vector<unsigned int> mappings;
+
+    static unsigned int outputParameters;
 };
 
 } // testgenerator

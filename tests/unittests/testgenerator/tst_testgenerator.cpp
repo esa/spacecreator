@@ -258,7 +258,7 @@ void tst_testgenerator::testNominalTwoOutputs()
             QFAIL("Actual size too short");
         }
         if (actualOutStrList[i].compare(expectedOutStrList[i]) != 0) {
-            qDebug() << (QString("in line no %1").arg(i).toStdString().c_str());
+            qDebug() << (QString("in line no %1").arg(i + 1).toStdString().c_str());
             qDebug() << (QString("expected %1").arg(expectedOutStrList[i]).toStdString().c_str());
             qDebug() << (QString("but was  %1").arg(actualOutStrList[i]).toStdString().c_str());
             QFAIL("Lines not equal");

@@ -38,6 +38,6 @@ configure_file(resources/two_outputs-interfaceview.xml resources/two_outputs-int
 configure_file(resources/testgenerator.asn resources/testgenerator.asn COPYONLY)
 
 configure_file(resources/testdriver.c.out resources/testdriver.c.out)
-configure_file(resources/testdriver.c.out resources/two_outputs-testdriver.c.out)
+configure_file(resources/two_outputs-testdriver.c.out resources/two_outputs-testdriver.c.out)
 
 add_format_target(${TEST_NAME})
