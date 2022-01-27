@@ -67,6 +67,12 @@ public:
      * @param   range   Range to translate
      */
     auto operator()(const seds::model::MinMaxRange &range) -> void;
+    /**
+     * @brief   Translate SEDS float precision range
+     *
+     * @param   range   Range to translate
+     */
+    auto operator()(const seds::model::FloatPrecisionRange &range) -> void;
 
 public:
     /**

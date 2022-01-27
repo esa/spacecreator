@@ -61,8 +61,8 @@ public:
      * @param   asn1Definitions     Parent ASN.1 definitions
      * @param   sedsPackage         Parent SEDS package
      */
-    ContainerConstraintTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence, Asn1Acn::Definitions *asn1Definitions,
-            const seds::model::Package *sedsPackage);
+    ContainerConstraintTranslatorVisitor(
+            Asn1Acn::Types::Sequence *asn1Sequence, const seds::model::Package *sedsPackage);
     /**
      * @brief   Deleted copy constructor
      */
@@ -116,7 +116,6 @@ private:
 private:
     Asn1Acn::Types::Sequence *m_asn1Sequence;
 
-    Asn1Acn::Definitions *m_asn1Definitions;
     const seds::model::Package *m_sedsPackage;
 };
 
