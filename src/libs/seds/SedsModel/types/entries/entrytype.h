@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,31 +19,27 @@
 
 #pragma once
 
+#include "types/entries/entry.h"
+#include "types/entries/errorcontrolentry.h"
+#include "types/entries/fixedvalueentry.h"
+#include "types/entries/lengthentry.h"
+#include "types/entries/listentry.h"
+#include "types/entries/paddingentry.h"
+
 #include <QString>
 #include <variant>
 
 namespace seds::model {
 
-class ArrayDataType;
-class BinaryDataType;
-class BooleanDataType;
-class ContainerDataType;
-class EnumeratedDataType;
-class FloatDataType;
-class IntegerDataType;
-class StringDataType;
-class SubRangeDataType;
-
-using DataType = std::variant<ArrayDataType, BinaryDataType, BooleanDataType, ContainerDataType, EnumeratedDataType,
-        FloatDataType, IntegerDataType, StringDataType, SubRangeDataType>;
+using EntryType = std::variant<Entry, ErrorControlEntry, FixedValueEntry, LengthEntry, ListEntry, PaddingEntry>;
 
 /**
- * @brief   Gets name from data type
+ * @brief   Gets name from entry
  *
- * @param   dataType    Data type
+ * @param   entry   Entry
  *
  * @return  Name
  */
-const QString &dataTypeNameStr(const DataType &dataType);
+const QString &entryNameStr(const EntryType &entryType);
 
 } // namespace seds::model

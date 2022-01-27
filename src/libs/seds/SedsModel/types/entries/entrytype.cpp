@@ -17,33 +17,30 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
-
-#include <QString>
-#include <variant>
+#include "types/entries/entrytype.h"
 
 namespace seds::model {
 
-class ArrayDataType;
-class BinaryDataType;
-class BooleanDataType;
-class ContainerDataType;
-class EnumeratedDataType;
-class FloatDataType;
-class IntegerDataType;
-class StringDataType;
-class SubRangeDataType;
+const QString &entryNameStr(const EntryType &entryType)
+{
+    const QString *entryName = nullptr;
 
-using DataType = std::variant<ArrayDataType, BinaryDataType, BooleanDataType, ContainerDataType, EnumeratedDataType,
-        FloatDataType, IntegerDataType, StringDataType, SubRangeDataType>;
+    const auto visitor = [&entryName](auto &&entry) {
+        using T = std::decay_t<decltype(entry)>;
+        if constexpr (std::is_same_v<T, seds::model::PaddingEntry>) {
+            return;
+        } else {
+            entryName = &entry.nameStr();
+        }
+    };
+    std::visit(visitor, entryType);
 
-/**
- * @brief   Gets name from data type
- *
- * @param   dataType    Data type
- *
- * @return  Name
- */
-const QString &dataTypeNameStr(const DataType &dataType);
+    if (entryName) {
+        return *entryName;
+    } else {
+        static const QString emptyStr = "";
+        return emptyStr;
+    }
+}
 
 } // namespace seds::model

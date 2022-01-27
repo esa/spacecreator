@@ -72,7 +72,7 @@ class DataTypesParser final
 private:
     using DimensionAddingFunction = std::function<void(model::DimensionSize)>;
     using DataTypeAddingFunction = std::function<void(model::DataType)>;
-    using EntryAddingFunction = std::function<void(model::ContainerDataType::EntryListType)>;
+    using EntryAddingFunction = std::function<void(model::EntryType)>;
 
 public:
     /**
