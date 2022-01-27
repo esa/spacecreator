@@ -59,6 +59,7 @@ private Q_SLOTS:
     void testEmpty();
     void testNominal();
     void testNominalSwappedColumns();
+    void testNominalTwoOutputs();
     void testCyclicInterface();
     void testImplementationNotInC();
 };
@@ -131,7 +132,7 @@ void tst_testgenerator::testEmpty()
     const QString ifName = "PI_InterfaceUnderTest";
     const auto ifUnderTest = ivModel->getIfaceByName(ifName, ivm::IVInterface::InterfaceType::Provided);
     if (ifUnderTest == nullptr) {
-        QFAIL(QString("Provided interface named not %1 found in given IV file").arg(ifName).toStdString().c_str());
+        QFAIL(QString("Provided interface named %1 not found in given IV file").arg(ifName).toStdString().c_str());
     }
     const ivm::IVInterface &interface = *ifUnderTest;
 
@@ -156,7 +157,7 @@ void tst_testgenerator::testNominal()
     const QString ifName = "PI_InterfaceUnderTest";
     const auto ifUnderTest = ivModel->getIfaceByName(ifName, ivm::IVInterface::InterfaceType::Provided);
     if (ifUnderTest == nullptr) {
-        QFAIL(QString("provided if named not %1 found in given IV file").arg(ifName).toStdString().c_str());
+        QFAIL(QString("Provided Interface named %1 not found in given IV file").arg(ifName).toStdString().c_str());
     }
     const ivm::IVInterface &interface = *ifUnderTest;
 
@@ -198,13 +199,55 @@ void tst_testgenerator::testNominalSwappedColumns()
     const QString ifName = "PI_InterfaceUnderTest";
     const auto ifUnderTest = ivModel->getIfaceByName(ifName, ivm::IVInterface::InterfaceType::Provided);
     if (ifUnderTest == nullptr) {
-        QFAIL(QString("provided if named not %1 found in given IV file").arg(ifName).toStdString().c_str());
+        QFAIL(QString("Provided Interface named %1 not found in given IV file").arg(ifName).toStdString().c_str());
     }
     const ivm::IVInterface &interface = *ifUnderTest;
 
     auto outStream = TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
 
     auto expectedOutputFile = QFile("resources/testdriver.c.out");
+    expectedOutputFile.open(QFile::ReadOnly | QFile::Text);
+    const QStringList expectedOutStrList = QTextStream(&expectedOutputFile).readAll().split("\n");
+
+    const QStringList actualOutStrList = QString::fromStdString(outStream.str()).split("\n");
+    for (int i = 0; i < expectedOutStrList.size(); i++) {
+        if (actualOutStrList.size() == i) {
+            qDebug() << (QString("missing line: %1").arg(expectedOutStrList[i]).toStdString().c_str());
+            QFAIL("Actual size too short");
+        }
+        if (actualOutStrList[i].compare(expectedOutStrList[i]) != 0) {
+            qDebug() << (QString("in line no %1").arg(i).toStdString().c_str());
+            qDebug() << (QString("expected %1").arg(expectedOutStrList[i]).toStdString().c_str());
+            qDebug() << (QString("but was  %1").arg(actualOutStrList[i]).toStdString().c_str());
+            QFAIL("Lines not equal");
+        }
+    }
+}
+
+void tst_testgenerator::testNominalTwoOutputs()
+{
+    auto csvModel = loadCsvModel("resources/test_data.csv");
+    const csv::CsvModel &csvRef = *csvModel;
+
+    const auto asn1ModelRaw = loadAsn1Model("resources/testgenerator.asn");
+    const auto asn1Model = dynamic_cast<Asn1Acn::Asn1Model *>(asn1ModelRaw.get());
+    QVERIFY(asn1Model != nullptr);
+    const Asn1Acn::Asn1Model &asn1ModelRef = *asn1Model;
+
+    const auto ivModelRaw = loadIvModel("resources/two_outputs-interfaceview.xml", "resources/config.xml");
+    const auto ivModel = dynamic_cast<ivm::IVModel *>(ivModelRaw.get());
+    QVERIFY(ivModel != nullptr);
+
+    const QString ifName = "InterfaceUnderTest";
+    const auto ifUnderTest = ivModel->getIfaceByName(ifName, ivm::IVInterface::InterfaceType::Provided);
+    if (ifUnderTest == nullptr) {
+        QFAIL(QString("Provided Interface named %1 not found in given IV file").arg(ifName).toStdString().c_str());
+    }
+    const ivm::IVInterface &interface = *ifUnderTest;
+
+    auto outStream = TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
+
+    auto expectedOutputFile = QFile("resources/two_outputs-testdriver.c.out");
     expectedOutputFile.open(QFile::ReadOnly | QFile::Text);
     const QStringList expectedOutStrList = QTextStream(&expectedOutputFile).readAll().split("\n");
 
@@ -240,7 +283,7 @@ void tst_testgenerator::testCyclicInterface()
     const QString ifName = "PI_InterfaceUnderTest";
     const auto ifUnderTest = ivModel->getIfaceByName(ifName, ivm::IVInterface::InterfaceType::Provided);
     if (ifUnderTest == nullptr) {
-        QFAIL(QString("provided if named not %1 found in given IV file").arg(ifName).toStdString().c_str());
+        QFAIL(QString("Provided Interface named %1 not found in given IV file").arg(ifName).toStdString().c_str());
     }
     const ivm::IVInterface &interface = *ifUnderTest;
 
@@ -265,7 +308,7 @@ void tst_testgenerator::testImplementationNotInC()
     const QString ifName = "PI_InterfaceUnderTest";
     const auto ifUnderTest = ivModel->getIfaceByName(ifName, ivm::IVInterface::InterfaceType::Provided);
     if (ifUnderTest == nullptr) {
-        QFAIL(QString("provided if named not %1 found in given IV file").arg(ifName).toStdString().c_str());
+        QFAIL(QString("Provided Interface named %1 not found in given IV file").arg(ifName).toStdString().c_str());
     }
     const ivm::IVInterface &interface = *ifUnderTest;
 
