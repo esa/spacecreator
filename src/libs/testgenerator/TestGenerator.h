@@ -35,16 +35,50 @@ using csv::CsvModel;
 
 namespace testgenerator {
 
+/**
+ * @brief Provides a method to generate TestDriver source as a text stream
+ *
+ */
 class TestGenerator final
 {
 public:
+    /**
+     * @brief Name of a header generated for TestDriver
+     *
+     */
     static const QString testDriverHeaderFilename;
+
+    /**
+     * @brief Declaration of a startup function
+     *
+     */
     static const QString testDriverStartupFunctionDeclaration;
+
+    /**
+     * @brief Declaration of test start function
+     *
+     */
     static const QString testDriverStartTestFunctionDeclaration;
 
+    /**
+     * @brief Generate a TestDriver source code text stream
+     *
+     * @param testData  test data containing input test vectors
+     * @param interface interface under test
+     * @param asn1Model ASN.1 datatypes model (with at least definitions of parameter types)
+     *
+     * @return Source code text stream
+     */
     static auto generateTestDriver(const CsvModel &testData, const ivm::IVInterface &interface,
             const Asn1Model &asn1Model) -> std::stringstream;
 
+    /**
+     * @brief Get the TestDriver Required Interface Name
+     *
+     * @param interface interface under test
+     *
+     * @return TestDriver Required Interface Name
+     */
     static auto getTestDriverRiName(const ivm::IVInterface &interface) -> QString;
 
 private:

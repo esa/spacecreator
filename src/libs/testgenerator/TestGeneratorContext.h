@@ -26,22 +26,42 @@ typedef QVector<shared::InterfaceParameter> InterfaceParameters;
 typedef std::vector<unsigned int> Mappings;
 typedef std::vector<csv::Field> Fields;
 
+/**
+ * @brief Context parameters for Test Generator (holds values needed during the current generation)
+ *
+ */
 class TestGeneratorContext final
 {
 public:
+    /**
+     * @brief Construct a new Test Generator Context object in the beginning of TestDriver generation
+     *
+     * @param headerFields  header of the CSV data
+     * @param params        parameters of the interface under test
+     */
     TestGeneratorContext(const Fields &headerFields, const InterfaceParameters &params);
 
+    /**
+     * @brief   Get interface parameter number to data column mapping (which column in CSV model matches which interface
+     *          input parameter:
+     *          mappings index - interface parameter number
+     *          mappings value - data column in CSV model
+     *
+     * @return  Interface parameter number to data column mapping
+     */
     auto mappings() const -> Mappings;
 
+    /**
+     * @brief   Get number of output parameters of the interface
+     *
+     * @return  Number of output parameters of the interface
+     */
     auto outputParametersNum() const -> unsigned int;
 
 private:
     auto countOutputParameters(const InterfaceParameters &params) -> void;
     auto getHeaderFieldsToParamsMappings(const Fields &headerFields, const InterfaceParameters &params) -> void;
 
-    // which column in CSV model matches which interface input parameter
-    // mappings index - interface parameter number
-    // mappings value - data column in CSV model
     Mappings m_mappings;
     unsigned int m_outputParameters; // TODO: change to m_outputParametersNum
 };
