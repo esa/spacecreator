@@ -412,6 +412,10 @@ QTransform IVInterfaceGraphicsItem::typeTransform(Qt::Alignment alignment) const
 
 QTransform IVInterfaceGraphicsItem::ifaceTransform(Qt::Alignment alignment) const
 {
+    if (!entity()) {
+        return {};
+    }
+
     const bool insideOut = entity()->direction() == ivm::IVInterface::InterfaceType::Required;
     qreal rotationDegree = 0.;
     switch (alignment) {
