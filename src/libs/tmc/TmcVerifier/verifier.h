@@ -34,20 +34,29 @@ class TmcVerifier
 public:
     TmcVerifier(const QString &inputIvFilepath, const QString &outputDirectory);
 
+    bool addStopConditionFiles(const QStringList &files);
     bool execute();
 
 private:
+    bool convertSystem();
+    bool convertStopConditions();
+    bool buildVerifier();
+    bool executeVerifier();
+
     bool convertInterfaceview(const QString &inputFilepath, const QString &outputFilepath);
     bool convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath);
     std::unique_ptr<ivm::IVModel> readInterfaceView(const QString &filepath);
     QStringList findIvFunctions(const ivm::IVModel &model);
     bool runSdl2Promela(const QFileInfo &systemStructure, const QFileInfo &functionFile, const QFileInfo &outputFile);
+    bool runSdl2PromelaForScl(const QFileInfo &inputFile, const QFileInfo &outputFile);
 
 private:
     std::unique_ptr<::tmc::converter::TmcConverter> m_converter;
+    ivm::IVPropertyTemplateConfig *m_dynPropConfig;
+
     const QString m_inputIvFilepath;
     const QString m_outputDirectory;
-    ivm::IVPropertyTemplateConfig *m_dynPropConfig;
+    QStringList m_stopConditionsFiles;
 
     QString m_sdl2PromelaCommand;
     QStringList m_sdl2PromelaArgs;

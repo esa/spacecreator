@@ -63,6 +63,7 @@ void PromelaModelVisitor::visit(const PromelaModel &promelaModel)
     if (promelaModel.hasInit()) {
         generateInitProctype(promelaModel.getInit());
     }
+    generateIncludes(promelaModel.getEpilogueIncludes());
 }
 
 void PromelaModelVisitor::generateIncludes(const QList<QString> &includes)

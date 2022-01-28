@@ -75,6 +75,7 @@ private Q_SLOTS:
     void testInitProctype();
     void testProctypeElements();
     void testDoLoop();
+    void testEqilpgueInclude();
 
 private:
     QString getFileContents(const QString &filename);
@@ -539,6 +540,26 @@ void tst_PromelaExporter::testDoLoop()
         QFAIL(ex.what());
     }
     QString out2 = getFileContents("expect_promela_do_loop.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testEqilpgueInclude()
+{
+    PromelaModel model;
+
+    model.addDeclaration(Declaration(DataType(BasicType::INT), "inited"));
+
+    model.addEpilogueInclude("first.pml");
+    model.addEpilogueInclude("second.pml");
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_epilogue_includes.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }

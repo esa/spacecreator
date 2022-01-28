@@ -38,6 +38,7 @@ int main(int argc, char *argv[])
 
     std::optional<QString> inputIvFilepath;
     std::optional<QString> outputDirectory;
+    QStringList stopConditionFiles;
 
     const QStringList args = app.arguments();
 
@@ -65,6 +66,9 @@ int main(int argc, char *argv[])
             }
             ++i;
             outputDirectory = args[i];
+        } else if (arg == "-scl") {
+            ++i;
+            stopConditionFiles.append(args[i]);
         } else if (arg == "-h" || arg == "--help") {
             qInfo("tmc: TASTE Model Chcecker");
             qInfo("Usage: tmc [OPTIONS]");
@@ -88,6 +92,10 @@ int main(int argc, char *argv[])
     }
 
     tmc::verifier::TmcVerifier verifier(inputIvFilepath.value(), outputDirectory.value());
+
+    if (!verifier.addStopConditionFiles(stopConditionFiles)) {
+        return EXIT_FAILURE;
+    }
 
     if (verifier.execute()) {
         return EXIT_SUCCESS;

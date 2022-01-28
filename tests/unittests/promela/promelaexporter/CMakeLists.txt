@@ -28,5 +28,6 @@ configure_file(resources/expect_promela_basic_proctypes.pml expect_promela_basic
 configure_file(resources/expect_promela_init_proctype.pml expect_promela_init_proctype.pml COPYONLY)
 configure_file(resources/expect_promela_proctype_elements.pml expect_promela_proctype_elements.pml COPYONLY)
 configure_file(resources/expect_promela_do_loop.pml expect_promela_do_loop.pml COPYONLY)
+configure_file(resources/expect_promela_epilogue_includes.pml expect_promela_epilogue_includes.pml COPYONLY)
 
 add_format_target(${TEST_NAME})

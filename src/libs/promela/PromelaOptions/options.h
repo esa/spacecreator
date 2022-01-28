@@ -34,6 +34,9 @@ public:
 
     /** @brief Generate promela code for enhanced spin */
     inline static const QString enhancedSpinSupport = "Promela_Export_CodeForEnhancedSpin";
+
+    /** @brief Add additional includes at the end of model */
+    inline static const QString additionalIncludes = "Promela_Convert_AdditionalIncludes";
 };
 
 }

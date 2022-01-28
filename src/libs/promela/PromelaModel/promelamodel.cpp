@@ -135,4 +135,14 @@ void PromelaModel::setInit(InitProctype initProctype)
 {
     m_initProctype = std::move(initProctype);
 }
+
+void PromelaModel::addEpilogueInclude(const QString &file)
+{
+    m_epilogueIncludes.append(file);
+}
+
+const QList<QString> &PromelaModel::getEpilogueIncludes() const noexcept
+{
+    return m_epilogueIncludes;
+}
 }
