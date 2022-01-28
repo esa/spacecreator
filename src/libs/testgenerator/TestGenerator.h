@@ -38,8 +38,14 @@ namespace testgenerator {
 class TestGenerator final
 {
 public:
+    static const QString testDriverHeaderFilename;
+    static const QString testDriverStartupFunctionDeclaration;
+    static const QString testDriverStartTestFunctionDeclaration;
+
     static auto generateTestDriver(const CsvModel &testData, const ivm::IVInterface &interface,
             const Asn1Model &asn1Model) -> std::stringstream;
+
+    static auto getTestDriverRiName(const ivm::IVInterface &interface) -> QString;
 
 private:
     static auto checkTestData(const CsvModel &testData) -> void;

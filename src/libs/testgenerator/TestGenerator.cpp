@@ -38,23 +38,33 @@ using IfDirection = shared::InterfaceParameter::Direction;
 
 namespace testgenerator {
 
+const QString TestGenerator::testDriverHeaderFilename = "testdriver.h";
+const QString TestGenerator::testDriverStartupFunctionDeclaration = "void testdriver_startup(void)";
+const QString TestGenerator::testDriverStartTestFunctionDeclaration = "void testdriver_PI_StartTest(void)";
+
+auto TestGenerator::getTestDriverRiName(const ivm::IVInterface &interface) -> QString
+{
+    return QString("testdriver_RI_%1").arg(removePiPrefix(interface.title()));
+}
+
 auto TestGenerator::generateTestDriver(
         const CsvModel &testData, const ivm::IVInterface &interface, const Asn1Model &asn1Model) -> std::stringstream
 {
     checkTestData(testData);
     checkInterface(interface);
 
-    TestGeneratorContext context(testData.header().fields(), interface.params());
+    const TestGeneratorContext context(testData.header().fields(), interface.params());
 
     const auto testRecordsSize = testData.records().size();
+    const QString testDriverRiName = getTestDriverRiName(interface);
 
     std::stringstream ss;
     ss << "/**\n"
           " * This file was generated automatically by TestGenerator\n"
           " */\n"
-          "\n"
-          "#include \"testdriver.h\"\n"
-          "//#include <stdio.h>"
+          "\n";
+    ss << QString("#include \"%1\"\n").arg(testDriverHeaderFilename).toStdString();
+    ss << "//#include <stdio.h>"
           "\n"
           "\n";
     ss << QString("#define TEST_DATA_SIZE %1").arg(testRecordsSize).toStdString();
@@ -78,9 +88,9 @@ auto TestGenerator::generateTestDriver(
           "        break;\n"
           "    }\n"
           "}\n"
-          "\n"
-          "void testdriver_startup(void)\n"
-          "{\n";
+          "\n";
+    ss << QString("%1\n").arg(testDriverStartupFunctionDeclaration).toStdString();
+    ss << "{\n";
 
     const unsigned long int lastTestRecordIndex = testRecordsSize - 1;
     for (unsigned long int i = 0; i < lastTestRecordIndex; i++) {
@@ -90,12 +100,12 @@ auto TestGenerator::generateTestDriver(
     ss << getAssignmentsForRecords(interface, asn1Model, testData, lastTestRecordIndex, context).toStdString();
 
     ss << "}\n"
-          "\n"
-          "void testdriver_PI_StartTest(void)\n"
-          "{\n"
+          "\n";
+    ss << QString("%1\n").arg(testDriverStartTestFunctionDeclaration).toStdString();
+    ss << "{\n"
           "    for (unsigned int i = 0; i < TEST_DATA_SIZE; i++) {\n"
           "        // clang-format off\n";
-    ss << QString("        testdriver_RI_%1(\n").arg(removePiPrefix(interface.title())).toStdString();
+    ss << QString("        %1(\n").arg(testDriverRiName).toStdString();
     for (auto it = interface.params().begin(); it != std::prev(interface.params().end()); it++) {
         ss << QString("                &(testData[i].%1),\n").arg(it->name()).toStdString();
     }
