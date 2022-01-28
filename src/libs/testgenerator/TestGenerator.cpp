@@ -157,15 +157,6 @@ auto TestGenerator::checkInterface(const ivm::IVInterface &interface) -> void
     if (interface.function() == nullptr) {
         throw TestGeneratorException("Interface without function is invalid");
     }
-
-    const QString functionImplementation =
-            interface.function()
-                    ->entityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::language))
-                    .value()
-                    .toString();
-    if (functionImplementation.compare("C") != 0) {
-        throw TestGeneratorException("Only functions with implementation in C could be tested");
-    }
 }
 
 auto TestGenerator::getAsn1Type(const QString &name, const Asn1Model &model) -> Type::ASN1Type

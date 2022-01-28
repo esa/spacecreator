@@ -286,8 +286,9 @@ void tst_testgenerator::testImplementationNotInC()
     }
     const ivm::IVInterface &interface = *ifUnderTest;
 
-    QVERIFY_EXCEPTION_THROWN(
-            TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef), TestGeneratorException);
+    auto outStream = TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
+
+    checkStreamAgainstExpectedOut(outStream, "resources/testdriver.c.out");
 }
 
 } // namespace tests::testgenerator
