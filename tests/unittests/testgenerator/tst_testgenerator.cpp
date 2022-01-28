@@ -43,6 +43,7 @@
 #include <qtestcase.h>
 #include <shared/common.h>
 #include <shared/sharedlibrary.h>
+#include <sstream>
 #include <testgenerator/TestGenerator.h>
 #include <testgenerator/TestGeneratorException.h>
 
@@ -114,6 +115,27 @@ static std::unique_ptr<csv::CsvModel> loadCsvModel(const QString &filename)
     return csvModel;
 }
 
+static void checkStreamAgainstExpectedOut(const std::stringstream &stream, const QString &expectedOutFilename)
+{
+    auto expectedOutputFile = QFile(expectedOutFilename);
+    expectedOutputFile.open(QFile::ReadOnly | QFile::Text);
+    const QStringList expectedOutStrList = QTextStream(&expectedOutputFile).readAll().split("\n");
+
+    const QStringList actualOutStrList = QString::fromStdString(stream.str()).split("\n");
+    for (int i = 0; i < expectedOutStrList.size(); i++) {
+        if (actualOutStrList.size() == i) {
+            qDebug() << (QString("missing line: %1").arg(expectedOutStrList[i]).toStdString().c_str());
+            QFAIL("Actual size too short");
+        }
+        if (actualOutStrList[i].compare(expectedOutStrList[i]) != 0) {
+            qDebug() << (QString("in line no %1").arg(i + 1).toStdString().c_str());
+            qDebug() << (QString("expected %1").arg(expectedOutStrList[i]).toStdString().c_str());
+            qDebug() << (QString("but was  %1").arg(actualOutStrList[i]).toStdString().c_str());
+            QFAIL("Lines not equal");
+        }
+    }
+}
+
 void tst_testgenerator::testEmpty()
 {
     const auto csvModel = loadCsvModel("resources/empty.csv");
@@ -163,23 +185,7 @@ void tst_testgenerator::testNominal()
 
     auto outStream = TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
 
-    auto expectedOutputFile = QFile("resources/testdriver.c.out");
-    expectedOutputFile.open(QFile::ReadOnly | QFile::Text);
-    const QStringList expectedOutStrList = QTextStream(&expectedOutputFile).readAll().split("\n");
-
-    const QStringList actualOutStrList = QString::fromStdString(outStream.str()).split("\n");
-    for (int i = 0; i < expectedOutStrList.size(); i++) {
-        if (actualOutStrList.size() == i) {
-            qDebug() << (QString("missing line: %1").arg(expectedOutStrList[i]).toStdString().c_str());
-            QFAIL("Actual size too short");
-        }
-        if (actualOutStrList[i].compare(expectedOutStrList[i]) != 0) {
-            qDebug() << (QString("in line no %1").arg(i).toStdString().c_str());
-            qDebug() << (QString("expected %1").arg(expectedOutStrList[i]).toStdString().c_str());
-            qDebug() << (QString("but was  %1").arg(actualOutStrList[i]).toStdString().c_str());
-            QFAIL("Lines not equal");
-        }
-    }
+    checkStreamAgainstExpectedOut(outStream, "resources/testdriver.c.out");
 }
 
 void tst_testgenerator::testNominalSwappedColumns()
@@ -205,23 +211,7 @@ void tst_testgenerator::testNominalSwappedColumns()
 
     auto outStream = TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
 
-    auto expectedOutputFile = QFile("resources/testdriver.c.out");
-    expectedOutputFile.open(QFile::ReadOnly | QFile::Text);
-    const QStringList expectedOutStrList = QTextStream(&expectedOutputFile).readAll().split("\n");
-
-    const QStringList actualOutStrList = QString::fromStdString(outStream.str()).split("\n");
-    for (int i = 0; i < expectedOutStrList.size(); i++) {
-        if (actualOutStrList.size() == i) {
-            qDebug() << (QString("missing line: %1").arg(expectedOutStrList[i]).toStdString().c_str());
-            QFAIL("Actual size too short");
-        }
-        if (actualOutStrList[i].compare(expectedOutStrList[i]) != 0) {
-            qDebug() << (QString("in line no %1").arg(i).toStdString().c_str());
-            qDebug() << (QString("expected %1").arg(expectedOutStrList[i]).toStdString().c_str());
-            qDebug() << (QString("but was  %1").arg(actualOutStrList[i]).toStdString().c_str());
-            QFAIL("Lines not equal");
-        }
-    }
+    checkStreamAgainstExpectedOut(outStream, "resources/testdriver.c.out");
 }
 
 void tst_testgenerator::testNominalTwoOutputs()
@@ -247,23 +237,7 @@ void tst_testgenerator::testNominalTwoOutputs()
 
     auto outStream = TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
 
-    auto expectedOutputFile = QFile("resources/two_outputs-testdriver.c.out");
-    expectedOutputFile.open(QFile::ReadOnly | QFile::Text);
-    const QStringList expectedOutStrList = QTextStream(&expectedOutputFile).readAll().split("\n");
-
-    const QStringList actualOutStrList = QString::fromStdString(outStream.str()).split("\n");
-    for (int i = 0; i < expectedOutStrList.size(); i++) {
-        if (actualOutStrList.size() == i) {
-            qDebug() << (QString("missing line: %1").arg(expectedOutStrList[i]).toStdString().c_str());
-            QFAIL("Actual size too short");
-        }
-        if (actualOutStrList[i].compare(expectedOutStrList[i]) != 0) {
-            qDebug() << (QString("in line no %1").arg(i + 1).toStdString().c_str());
-            qDebug() << (QString("expected %1").arg(expectedOutStrList[i]).toStdString().c_str());
-            qDebug() << (QString("but was  %1").arg(actualOutStrList[i]).toStdString().c_str());
-            QFAIL("Lines not equal");
-        }
-    }
+    checkStreamAgainstExpectedOut(outStream, "resources/two_outputs-testdriver.c.out");
 }
 
 void tst_testgenerator::testCyclicInterface()

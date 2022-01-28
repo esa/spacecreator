@@ -29,6 +29,7 @@
 #include <ivcore/ivinterface.h>
 #include <ivcore/ivmodel.h>
 #include <ivcore/ivobject.h>
+#include <optional>
 #include <qdebug.h>
 #include <shared/common.h>
 #include <shared/sharedlibrary.h>
@@ -38,9 +39,16 @@ using IfDirection = shared::InterfaceParameter::Direction;
 
 namespace testgenerator {
 
-const QString TestGenerator::testDriverHeaderFilename = "testdriver.h";
-const QString TestGenerator::testDriverStartupFunctionDeclaration = "void testdriver_startup(void)";
-const QString TestGenerator::testDriverStartTestFunctionDeclaration = "void testdriver_PI_StartTest(void)";
+const QString TestGenerator::testDriverFunctionName = "testdriver";
+const QString TestGenerator::testDriverTestInterfaceName = "StartTest";
+const QString TestGenerator::notifyFunctionName = "notifyTestFinished";
+const QString TestGenerator::testVectorTypeName = "TestVector";
+const QString TestGenerator::testVectorVariableName = "testData";
+const QString TestGenerator::testDriverHeaderFilename = QString("%1.h").arg(testDriverFunctionName);
+const QString TestGenerator::testDriverStartupFunctionDeclaration =
+        QString("void %1_startup(void)").arg(testDriverFunctionName);
+const QString TestGenerator::testDriverStartTestFunctionDeclaration =
+        QString("void %1_PI_%2(void)").arg(testDriverFunctionName).arg(testDriverTestInterfaceName);
 
 auto TestGenerator::getTestDriverRiName(const ivm::IVInterface &interface) -> QString
 {
@@ -76,12 +84,12 @@ auto TestGenerator::generateTestDriver(
         ss << "    asn1Scc" << param.paramTypeName().toStdString() << " " << param.name().toStdString() << ";\n";
     }
 
-    ss << "} TestVector;\n"
-          "\n"
-          "TestVector testData[TEST_DATA_SIZE] = { 0 };\n"
-          "\n"
-          "void notifyTestFinished(void)\n"
-          "{\n"
+    ss << QString("} %1;\n").arg(testVectorTypeName).toStdString();
+    ss << "\n";
+    ss << QString("%1 %2[TEST_DATA_SIZE] = { 0 };\n").arg(testVectorTypeName).arg(testVectorVariableName).toStdString();
+    ss << "\n";
+    ss << QString("void %1(void)\n").arg(notifyFunctionName).toStdString();
+    ss << "{\n"
           "    volatile int a;\n"
           "    while (true) {\n"
           "        a = 0;\n"
@@ -107,14 +115,17 @@ auto TestGenerator::generateTestDriver(
           "        // clang-format off\n";
     ss << QString("        %1(\n").arg(testDriverRiName).toStdString();
     for (auto it = interface.params().begin(); it != std::prev(interface.params().end()); it++) {
-        ss << QString("                &(testData[i].%1),\n").arg(it->name()).toStdString();
+        ss << QString("                &(%1[i].%2),\n").arg(testVectorVariableName).arg(it->name()).toStdString();
     }
-    ss << QString("                &(testData[i].%1)\n").arg(std::prev(interface.params().end())->name()).toStdString();
+    ss << QString("                &(%1[i].%2)\n")
+                    .arg(testVectorVariableName)
+                    .arg(std::prev(interface.params().end())->name())
+                    .toStdString();
     ss << "        );\n"
           "        // clang-format on\n"
-          "    }\n"
-          "    notifyTestFinished();\n"
-          "}\n"
+          "    }\n";
+    ss << QString("    %1();\n").arg(notifyFunctionName).toStdString();
+    ss << "}\n"
           "\n";
 
     return ss;
@@ -169,7 +180,7 @@ auto TestGenerator::getAsn1Type(const QString &name, const Asn1Model &model) -> 
             }
         }
     }
-    return Type::ASN1Type::UNKNOWN;
+    throw TestGeneratorException("Interface parameter type not present in ASN.1 file");
 }
 
 auto TestGenerator::qstringToBoolSymbol(const QString &str) -> QString
@@ -187,12 +198,12 @@ auto TestGenerator::qstringToBoolSymbol(const QString &str) -> QString
 auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, const Asn1Model &asn1Model,
         const CsvModel &testData, const unsigned int testDataRowIndex, const TestGeneratorContext &context) -> QString
 {
-    QString result;
-
     const auto &ifParams = interface.params();
     if (ifParams.isEmpty()) {
         return "";
     }
+
+    QString result;
 
     for (unsigned int j = 0; j < static_cast<unsigned int>(ifParams.size()); j++) {
         const auto &param = ifParams[static_cast<int>(j)];
@@ -205,8 +216,8 @@ auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, 
         }
 
         const unsigned int srcFieldIndex = testData.header().fields().empty() ? j : context.mappings().at(j);
-
-        switch (getAsn1Type(param.paramTypeName(), asn1Model)) {
+        const auto asn1Type = getAsn1Type(param.paramTypeName(), asn1Model);
+        switch (asn1Type) {
         case Asn1Acn::Types::Type::INTEGER:
             result += QString::number(static_cast<int>(testData.field(testDataRowIndex, srcFieldIndex).toDouble()));
             break;
@@ -216,13 +227,10 @@ auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, 
         case Asn1Acn::Types::Type::BOOLEAN: {
             result += qstringToBoolSymbol(testData.field(testDataRowIndex, srcFieldIndex));
             break;
-        }
-        case Asn1Acn::Types::Type::UNKNOWN:
-            throw TestGeneratorException("Interface parameter type not present in ASN.1 file");
         default:
             throw TestGeneratorException("Interface parameter type not yet implemented");
         }
-
+        }
         result += ";\n";
     }
 

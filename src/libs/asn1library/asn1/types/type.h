@@ -74,8 +74,7 @@ public:
         NUMERICSTRING,
         OCTETSTRING,
         LABELTYPE,
-        USERDEFINED,
-        UNKNOWN
+        USERDEFINED
     };
 
     Type(const QString &identifier = QString());

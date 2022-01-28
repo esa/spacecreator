@@ -26,6 +26,7 @@
 #include <asn1library/asn1/types/type.h>
 #include <csv/CsvModel/csvmodel.h>
 #include <ivcore/ivinterface.h>
+#include <optional>
 #include <sstream>
 #include <vector>
 
@@ -42,6 +43,36 @@ namespace testgenerator {
 class TestGenerator final
 {
 public:
+    /**
+     * @brief Name of a TestDriver function
+     *
+     */
+    static const QString testDriverFunctionName;
+
+    /**
+     * @brief Name of a TestDriver interface
+     *
+     */
+    static const QString testDriverTestInterfaceName;
+
+    /**
+     * @brief Name of a notify function
+     *
+     */
+    static const QString notifyFunctionName;
+
+    /**
+     * @brief Name of a test vector type
+     *
+     */
+    static const QString testVectorTypeName;
+
+    /**
+     * @brief Name of an array with test vectors
+     *
+     */
+    static const QString testVectorVariableName;
+
     /**
      * @brief Name of a header generated for TestDriver
      *

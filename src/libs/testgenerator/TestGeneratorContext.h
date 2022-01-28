@@ -56,14 +56,14 @@ public:
      *
      * @return  Number of output parameters of the interface
      */
-    auto outputParametersNum() const -> unsigned int;
+    auto outputParametersCount() const -> unsigned int;
 
 private:
     auto countOutputParameters(const InterfaceParameters &params) -> void;
-    auto getHeaderFieldsToParamsMappings(const Fields &headerFields, const InterfaceParameters &params) -> void;
+    auto calculateHeaderFieldsToParamsMappings(const Fields &headerFields, const InterfaceParameters &params) -> void;
 
     Mappings m_mappings;
-    unsigned int m_outputParameters; // TODO: change to m_outputParametersNum
+    unsigned int m_outputParametersCount; // TODO: change to m_outputParametersNum
 };
 
 } // namespace testgenerator

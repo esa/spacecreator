@@ -26,7 +26,7 @@ namespace testgenerator {
 TestGeneratorContext::TestGeneratorContext(const Fields &headerFields, const InterfaceParameters &params)
 {
     countOutputParameters(params);
-    getHeaderFieldsToParamsMappings(headerFields, params);
+    calculateHeaderFieldsToParamsMappings(headerFields, params);
 }
 
 auto TestGeneratorContext::mappings() const -> Mappings
@@ -34,18 +34,18 @@ auto TestGeneratorContext::mappings() const -> Mappings
     return m_mappings;
 }
 
-auto TestGeneratorContext::outputParametersNum() const -> unsigned int
+auto TestGeneratorContext::outputParametersCount() const -> unsigned int
 {
-    return m_outputParameters;
+    return m_outputParametersCount;
 }
 
 auto TestGeneratorContext::countOutputParameters(const InterfaceParameters &params) -> void
 {
-    m_outputParameters = std::count_if(params.begin(), params.end(),
+    m_outputParametersCount = std::count_if(params.begin(), params.end(),
             [](const auto &param) { return param.direction() == shared::InterfaceParameter::Direction::OUT; });
 }
 
-auto TestGeneratorContext::getHeaderFieldsToParamsMappings(
+auto TestGeneratorContext::calculateHeaderFieldsToParamsMappings(
         const std::vector<csv::Field> &headerFields, const InterfaceParameters &params) -> void
 {
     const unsigned int paramsSize = static_cast<unsigned int>(params.size());
@@ -53,7 +53,7 @@ auto TestGeneratorContext::getHeaderFieldsToParamsMappings(
     auto mappings = std::vector<unsigned int>(paramsSize, 0);
 
     if (!headerFields.empty()) {
-        if (headerFields.size() != paramsSize - outputParametersNum()) {
+        if (headerFields.size() != paramsSize - outputParametersCount()) {
             throw TestGeneratorException("Imported CSV contains invalid number of data columns");
         }
         std::vector<bool> elementsFound(paramsSize, false);
