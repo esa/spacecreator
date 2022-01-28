@@ -36,4 +36,4 @@ const QString &TestGeneratorException::errorMessage() const noexcept
     return m_message;
 }
 
-} // testgenerator
+} // namespace testgenerator

@@ -54,4 +54,4 @@ private:
     QString m_message;
 };
 
-} // testgenerator
+} // namespace testgenerator

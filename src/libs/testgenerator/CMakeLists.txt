@@ -15,8 +15,8 @@ target_include_directories(TestGenerator
 )
 
 target_link_libraries(TestGenerator
-    PUBLIC      ivcore
-    PRIVATE     CsvImporter
+    PRIVATE     ivcore
+                CsvImporter
                 CommonProjectWarnings
 )
 

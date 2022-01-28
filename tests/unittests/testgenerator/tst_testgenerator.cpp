@@ -64,12 +64,12 @@ private Q_SLOTS:
     void testImplementationNotInC();
 };
 
-static std::unique_ptr<conversion::Model> loadAsn1Model(const QString &file)
+static std::unique_ptr<conversion::Model> loadAsn1Model(const QString &filename)
 {
     std::unique_ptr<conversion::Model> model;
 
     conversion::Options options;
-    options.add(conversion::asn1::Asn1Options::inputFilepath, file);
+    options.add(conversion::asn1::Asn1Options::inputFilepath, filename);
 
     conversion::asn1::importer::Asn1Importer importer;
     try {
@@ -82,13 +82,13 @@ static std::unique_ptr<conversion::Model> loadAsn1Model(const QString &file)
 }
 
 static std::unique_ptr<conversion::Model> loadIvModel(
-        const QString &ivFilename, QString ivConfigFilename = shared::interfaceCustomAttributesFilePath())
+        const QString &filename, QString configFilename = shared::interfaceCustomAttributesFilePath())
 {
     std::unique_ptr<conversion::Model> model;
 
     conversion::Options options;
-    options.add(conversion::iv::IvOptions::inputFilepath, ivFilename);
-    options.add(conversion::iv::IvOptions::configFilepath, std::move(ivConfigFilename));
+    options.add(conversion::iv::IvOptions::inputFilepath, filename);
+    options.add(conversion::iv::IvOptions::configFilepath, std::move(configFilename));
 
     conversion::iv::importer::IvXmlImporter ivImporter;
     try {
