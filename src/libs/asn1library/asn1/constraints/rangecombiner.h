@@ -52,7 +52,7 @@ std::optional<Range<typename ValueType::Type>> RangeCombiner<ValueType>::combine
                 } else if (!range) {
                     return combinedRange;
                 } else {
-                    return std::make_optional(range->merge(*combinedRange));
+                    return std::make_optional(range->intersection(*combinedRange));
                 }
             });
 }

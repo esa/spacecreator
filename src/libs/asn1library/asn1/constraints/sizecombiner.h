@@ -54,7 +54,7 @@ std::optional<Range<int64_t>> SizeCombiner<ValueType>::combineSizes(const Constr
                 } else if (!range) {
                     return combinedRange;
                 } else {
-                    return std::make_optional(range->merge(*combinedRange));
+                    return std::make_optional(range->intersection(*combinedRange));
                 }
             });
 }
