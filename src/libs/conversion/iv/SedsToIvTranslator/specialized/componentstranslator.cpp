@@ -96,8 +96,20 @@ void ComponentsTranslator::translateInterfaceDeclaration(
                 sedsBaseInterface.genericTypeMapSet(), sedsComponent, interfaceType, ivFunction);
     }
 
-    translateParameters(sedsInterfaceName, sedsInterfaceDeclaration, interfaceType, ivFunction);
+    translateParameters(sedsInterfaceName, genericTypeMapSet, sedsInterfaceDeclaration, interfaceType, ivFunction);
     translateCommands(sedsInterfaceName, genericTypeMapSet, sedsInterfaceDeclaration, interfaceType, ivFunction);
+}
+
+void ComponentsTranslator::translateParameters(const QString &sedsInterfaceName,
+        const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
+        const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
+        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const
+{
+    InterfaceParameterTranslator parameterTranslator(sedsInterfaceName, genericTypeMapSet, ivFunction);
+
+    for (const auto &sedsParameter : sedsInterfaceDeclaration.parameters()) {
+        parameterTranslator.translateParameter(sedsParameter, interfaceType);
+    }
 }
 
 void ComponentsTranslator::translateCommands(const QString &sedsInterfaceName,
@@ -122,17 +134,6 @@ void ComponentsTranslator::translateCommands(const QString &sedsInterfaceName,
             throw UnhandledValueException("InterfaceCommandMode");
             break;
         }
-    }
-}
-
-void ComponentsTranslator::translateParameters(const QString &sedsInterfaceName,
-        const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
-        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const
-{
-    InterfaceParameterTranslator parameterTranslator(sedsInterfaceName, ivFunction);
-
-    for (const auto &sedsParameter : sedsInterfaceDeclaration.parameters()) {
-        parameterTranslator.translateParameter(sedsParameter, interfaceType);
     }
 }
 

@@ -21,7 +21,9 @@
 #include "asn1editorconst.h"
 #include "asnsequencecomponent.h"
 #include "constraints/logicoperators.h"
+#include "constraints/rangecombiner.h"
 #include "constraints/rangeconstraint.h"
+#include "constraints/sizecombiner.h"
 #include "constraints/sizeconstraint.h"
 #include "range.h"
 #include "typeassignment.h"
@@ -191,7 +193,8 @@ QStandardItem *Asn1ItemModel::createNumberItem(
     QStandardItem *item = new QStandardItem("");
 
     const auto &constraints = asn1Item->constraints();
-    const auto range = combineRanges<ValueType>(constraints);
+    const auto range = Asn1Acn::Constraints::RangeCombiner<ValueType>::combineRanges(&constraints);
+
     if (range) {
         item->setText(QString::number(range->begin()));
         item->setData(QVariant::fromValue(range->begin()), MIN_RANGE_ROLE);
@@ -226,7 +229,8 @@ QStandardItem *Asn1ItemModel::createStringItem(
     QStandardItem *item = new QStandardItem("");
 
     const auto &constraints = asn1Item->constraints();
-    const auto range = combineSizes<ValueType>(constraints);
+    const auto range = Asn1Acn::Constraints::SizeCombiner<ValueType>::combineSizes(&constraints);
+
     if (range) {
         item->setData(QVariant::fromValue(range->begin()), MIN_RANGE_ROLE);
         item->setData(QVariant::fromValue(range->end()), MAX_RANGE_ROLE);
@@ -297,7 +301,7 @@ QStandardItem *Asn1ItemModel::createSequenceOfItem(
         const Asn1Acn::Types::SequenceOf *asn1Item, QStandardItem *parent, QString &typeLimit)
 {
     const auto &constraints = asn1Item->constraints();
-    const auto range = combineSizes<Asn1Acn::IntegerValue>(constraints);
+    const auto range = Asn1Acn::Constraints::SizeCombiner<Asn1Acn::IntegerValue>::combineSizes(&constraints);
 
     QList<QStandardItem *> typeItems;
     QList<QStandardItem *> valueItems;
@@ -423,112 +427,6 @@ bool Asn1ItemModel::setData(const QModelIndex &index, const QVariant &value, int
         }
     }
     return QStandardItemModel::setData(index, value, role);
-}
-
-template<typename ValueType>
-std::optional<Asn1Acn::Range<typename ValueType::Type>> Asn1ItemModel::combineRanges(
-        const Asn1Acn::Constraints::ConstraintList<ValueType> &constraintList)
-{
-    const auto &constraints = constraintList.constraints();
-
-    if (constraints.empty()) {
-        return std::nullopt;
-    }
-
-    return combineRange<ValueType>(constraints.at(0).get());
-}
-
-template<typename ValueType>
-std::optional<Asn1Acn::Range<typename ValueType::Type>> Asn1ItemModel::combineRange(
-        const Asn1Acn::Constraints::Constraint<ValueType> *constraint)
-{
-    if (const auto *andConstraint = dynamic_cast<const Asn1Acn::Constraints::AndConstraint<ValueType> *>(constraint);
-            andConstraint) {
-        const auto leftRange = combineRange<ValueType>(andConstraint->leftChild());
-        const auto rightRange = combineRange<ValueType>(andConstraint->rightChild());
-
-        if (!leftRange) {
-            return rightRange;
-        }
-        if (!rightRange) {
-            return leftRange;
-        }
-
-        return leftRange->intersection(*rightRange);
-    } else if (const auto *orConstraint =
-                       dynamic_cast<const Asn1Acn::Constraints::OrConstraint<ValueType> *>(constraint);
-               orConstraint) {
-        const auto leftRange = combineRange<ValueType>(andConstraint->leftChild());
-        const auto rightRange = combineRange<ValueType>(andConstraint->rightChild());
-
-        if (!leftRange) {
-            return rightRange;
-        }
-        if (!rightRange) {
-            return leftRange;
-        }
-
-        return leftRange->merge(*rightRange);
-    } else if (const auto *rangeConstraint =
-                       dynamic_cast<const Asn1Acn::Constraints::RangeConstraint<ValueType> *>(constraint);
-               rangeConstraint) {
-        return rangeConstraint->range();
-    } else {
-        return std::nullopt;
-    }
-}
-
-template<typename ValueType>
-std::optional<Asn1Acn::Range<int64_t>> Asn1ItemModel::combineSizes(
-        const Asn1Acn::Constraints::ConstraintList<ValueType> &constraintList)
-{
-    const auto &constraints = constraintList.constraints();
-
-    if (constraints.empty()) {
-        return std::nullopt;
-    }
-
-    return combineSize<ValueType>(constraints.at(0).get());
-}
-
-template<typename ValueType>
-std::optional<Asn1Acn::Range<int64_t>> Asn1ItemModel::combineSize(
-        const Asn1Acn::Constraints::Constraint<ValueType> *constraint)
-{
-    if (const auto *andConstraint = dynamic_cast<const Asn1Acn::Constraints::AndConstraint<ValueType> *>(constraint);
-            andConstraint) {
-        const auto leftSize = combineSize<ValueType>(andConstraint->leftChild());
-        const auto rightSize = combineSize<ValueType>(andConstraint->rightChild());
-
-        if (!leftSize) {
-            return rightSize;
-        }
-        if (!rightSize) {
-            return leftSize;
-        }
-
-        return leftSize->intersection(*rightSize);
-    } else if (const auto *orConstraint =
-                       dynamic_cast<const Asn1Acn::Constraints::OrConstraint<ValueType> *>(constraint);
-               orConstraint) {
-        const auto leftSize = combineSize<ValueType>(andConstraint->leftChild());
-        const auto rightSize = combineSize<ValueType>(andConstraint->rightChild());
-
-        if (!leftSize) {
-            return rightSize;
-        }
-        if (!rightSize) {
-            return leftSize;
-        }
-
-        return leftSize->merge(*rightSize);
-    } else if (const auto *sizeConstraint =
-                       dynamic_cast<const Asn1Acn::Constraints::SizeConstraint<ValueType> *>(constraint);
-               sizeConstraint) {
-        return combineRange<Asn1Acn::IntegerValue>(sizeConstraint->innerConstraints());
-    } else {
-        return std::nullopt;
-    }
 }
 
 } // namespace asn1

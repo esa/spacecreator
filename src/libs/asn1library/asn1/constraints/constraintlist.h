@@ -27,8 +27,10 @@
 #include "constraint.h"
 #include "constraintvisitor.h"
 #include "rangeconstraint.h"
+#include "values.h"
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 namespace Asn1Acn {
@@ -44,7 +46,6 @@ public:
     const std::vector<std::unique_ptr<Constraint<ValueType>>> &constraints() const { return m_constraints; }
 
     void append(std::unique_ptr<Constraint<ValueType>> c) { m_constraints.emplace_back(std::move(c)); }
-
     void append(const Range<typename ValueType::Type> &r) { append(std::make_unique<RangeConstraint<ValueType>>(r)); }
 
     void clear() { m_constraints.clear(); }

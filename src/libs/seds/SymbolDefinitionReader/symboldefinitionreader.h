@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <conversion/common/qstringhash.h>
 #include <seds/SedsCommon/basetypesmappings.h>
+#include <shared/qstringhash.h>
 #include <unordered_map>
 
 namespace seds::symbolreader {

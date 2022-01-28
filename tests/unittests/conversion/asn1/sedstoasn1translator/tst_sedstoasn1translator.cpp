@@ -687,9 +687,13 @@ void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithListEntry()
     const auto &components = sequenceType->components();
     QCOMPARE(components.size(), 2);
 
+    const auto *sizeComponent = sequenceType->component("size");
+    QVERIFY(sizeComponent);
+    QVERIFY(dynamic_cast<const AcnSequenceComponent *>(sizeComponent));
+
     const auto *entryComponent = sequenceType->component("entry");
     QVERIFY(entryComponent);
-    QVERIFY(dynamic_cast<const AcnSequenceComponent *>(entryComponent));
+    QVERIFY(dynamic_cast<const AsnSequenceComponent *>(entryComponent));
 
     const auto *entryComponentType = entryComponent->type();
     QVERIFY(entryComponentType);

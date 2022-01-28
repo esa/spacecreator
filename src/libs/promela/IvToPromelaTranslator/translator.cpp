@@ -292,9 +292,9 @@ size_t IvToPromelaTranslator::getPriority(IVInterface *interface) const
 
 QVariant IvToPromelaTranslator::getInterfaceProperty(ivm::IVInterface *interface, const QString &name) const
 {
-    QVariantList attrs = interface->attributes();
+    const QVariantList attrs = interface->attributes();
     {
-        for (const QVariant attr : attrs) {
+        for (const QVariant &attr : qAsConst(attrs)) {
             if (attr.canConvert<ExportableProperty>()) {
                 ExportableProperty ep = attr.value<ExportableProperty>();
                 if (ep.name() == name) {

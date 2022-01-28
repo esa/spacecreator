@@ -37,10 +37,11 @@ const QString InterfaceParameterTranslator::m_setterInterfacePrefix = "Set";
 const QString InterfaceParameterTranslator::m_ivInterfaceNameTemplate = "%1_%2_%3_%4";
 const QString InterfaceParameterTranslator::m_ivInterfaceParameterName = "Param";
 
-InterfaceParameterTranslator::InterfaceParameterTranslator(
-        const QString &sedsInterfaceName, ivm::IVFunction *ivFunction)
+InterfaceParameterTranslator::InterfaceParameterTranslator(const QString &sedsInterfaceName,
+        const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet, ivm::IVFunction *ivFunction)
     : m_sedsInterfaceName(sedsInterfaceName)
     , m_ivFunction(ivFunction)
+    , m_typeMapper(genericTypeMapSet)
 {
 }
 
@@ -103,8 +104,10 @@ void InterfaceParameterTranslator::createIvInterface(const InterfaceParameterTra
 
     auto ivInterface = ivm::IVInterface::createIface(creationInfo);
 
+    const auto &sedsParameterTypeName = m_typeMapper.findMappedType(sedsParameter.type().nameStr());
+
     auto ivParameter = shared::InterfaceParameter(m_ivInterfaceParameterName, shared::BasicParameter::Type::Other,
-            sedsParameter.type().nameStr(), m_interfaceParameterEncoding, direction);
+            sedsParameterTypeName, m_interfaceParameterEncoding, direction);
     ivInterface->addParam(ivParameter);
 
     m_ivFunction->addChild(ivInterface);

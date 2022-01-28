@@ -242,7 +242,14 @@ void IVFunction::reflectContextParam()
 
 void IVFunction::reflectContextParams(const QVector<shared::ContextParameter> &params)
 {
-    setContextParams(params);
+    QVector<shared::ContextParameter> parameters { params };
+    std::for_each(parameters.begin(), parameters.end(), [this](shared::ContextParameter &param) {
+        const shared::ContextParameter cp = contextParam(param.name());
+        if (!cp.isNull()) {
+            param.setDefaultValue(cp.defaultValue());
+        }
+    });
+    setContextParams(parameters);
 }
 
 void IVFunction::checkDefaultFunctionImplementation()
