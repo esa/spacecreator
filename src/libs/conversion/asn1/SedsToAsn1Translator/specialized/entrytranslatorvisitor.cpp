@@ -99,7 +99,7 @@ void EntryTranslatorVisitor::operator()(const seds::model::LengthEntry &sedsEntr
 void EntryTranslatorVisitor::operator()(const seds::model::ListEntry &sedsEntry)
 {
     auto &listLengthSequenceComponent = getListLengthSequenceComponent(sedsEntry);
-    // We need to make list lenght entry ACN-only
+    // Replace the existing ASN.1 length entry with an ACN-only one
     listLengthSequenceComponent.reset(new Asn1Acn::AcnSequenceComponent(listLengthSequenceComponent->name(),
             listLengthSequenceComponent->name(), listLengthSequenceComponent->type()->clone()));
 
