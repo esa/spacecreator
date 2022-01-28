@@ -5,6 +5,8 @@ add_library(TestGenerator STATIC)
 target_sources(TestGenerator
     PRIVATE     TestGenerator.cpp
                 TestGenerator.h
+                TestGeneratorContext.cpp
+                TestGeneratorContext.h
                 TestGeneratorException.cpp
                 TestGeneratorException.h
 )

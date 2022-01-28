@@ -38,17 +38,13 @@ using IfDirection = shared::InterfaceParameter::Direction;
 
 namespace testgenerator {
 
-std::vector<unsigned int> TestGenerator::m_mappings;
-unsigned int TestGenerator::m_outputParameters = 0;
-
 auto TestGenerator::generateTestDriver(
         const CsvModel &testData, const ivm::IVInterface &interface, const Asn1Model &asn1Model) -> std::stringstream
 {
     checkTestData(testData);
     checkInterface(interface);
 
-    m_outputParameters = countOutputParameters(interface.params());
-    m_mappings = getHeaderFieldsToParamsMappings(testData.header().fields(), interface.params());
+    TestGeneratorContext context(testData.header().fields(), interface.params());
 
     const auto testRecordsSize = testData.records().size();
 
@@ -88,10 +84,10 @@ auto TestGenerator::generateTestDriver(
 
     const unsigned long int lastTestRecordIndex = testRecordsSize - 1;
     for (unsigned long int i = 0; i < lastTestRecordIndex; i++) {
-        ss << getAssignmentsForRecords(interface, asn1Model, testData, i).toStdString();
+        ss << getAssignmentsForRecords(interface, asn1Model, testData, i, context).toStdString();
         ss << "\n";
     }
-    ss << getAssignmentsForRecords(interface, asn1Model, testData, lastTestRecordIndex).toStdString();
+    ss << getAssignmentsForRecords(interface, asn1Model, testData, lastTestRecordIndex, context).toStdString();
 
     ss << "}\n"
           "\n"
@@ -151,52 +147,6 @@ auto TestGenerator::checkInterface(const ivm::IVInterface &interface) -> void
     }
 }
 
-auto TestGenerator::getHeaderFieldsToParamsMappings(
-        const std::vector<csv::Field> &headerFields, const InterfaceParameters &params) -> Mappings
-{
-    const unsigned int paramsSize = static_cast<unsigned int>(params.size());
-
-    auto mappings = std::vector<unsigned int>(paramsSize, 0);
-
-    if (!headerFields.empty()) {
-        if (headerFields.size() != paramsSize - m_outputParameters) {
-            throw TestGeneratorException("Imported CSV contains invalid number of data columns");
-        }
-        std::vector<bool> elementsFound(paramsSize, false);
-        for (unsigned int i = 0; i < paramsSize; i++) {
-            const auto &param = params.at(static_cast<int>(i));
-            const QString &name = param.name();
-            if (param.direction() == IfDirection::OUT) {
-                elementsFound.at(i) = true;
-                continue;
-            }
-            for (unsigned int j = 0; j < headerFields.size(); j++) {
-                const auto &field = headerFields.at(j);
-                if (name.compare(field) == 0) {
-                    elementsFound.at(i) = true;
-                    mappings.at(i) = j;
-                    break;
-                }
-            }
-        }
-        if (std::any_of(elementsFound.begin(), elementsFound.end(), [](const auto &found) -> bool { return !found; })) {
-            throw TestGeneratorException("Header fields do not match interface parameter names");
-        }
-    } else {
-        for (unsigned int i = 0; i < paramsSize; i++) {
-            mappings[i] = i;
-        }
-    }
-
-    return mappings;
-}
-
-auto TestGenerator::countOutputParameters(const InterfaceParameters &params) -> unsigned int
-{
-    return std::count_if(
-            params.begin(), params.end(), [](const auto &param) { return param.direction() == IfDirection::OUT; });
-}
-
 auto TestGenerator::getAsn1Type(const QString &name, const Asn1Model &model) -> Type::ASN1Type
 {
     for (const auto &datum : model.data()) {
@@ -225,7 +175,7 @@ auto TestGenerator::qstringToBoolSymbol(const QString &str) -> QString
 }
 
 auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, const Asn1Model &asn1Model,
-        const CsvModel &testData, const unsigned int testDataRowIndex) -> QString
+        const CsvModel &testData, const unsigned int testDataRowIndex, const TestGeneratorContext &context) -> QString
 {
     QString result;
 
@@ -244,7 +194,7 @@ auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, 
             continue;
         }
 
-        const unsigned int srcFieldIndex = testData.header().fields().empty() ? j : m_mappings.at(j);
+        const unsigned int srcFieldIndex = testData.header().fields().empty() ? j : context.mappings().at(j);
 
         switch (getAsn1Type(param.paramTypeName(), asn1Model)) {
         case Asn1Acn::Types::Type::INTEGER:

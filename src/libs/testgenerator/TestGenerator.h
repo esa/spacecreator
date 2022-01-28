@@ -19,21 +19,19 @@
 
 #pragma once
 
+#include "TestGeneratorContext.h"
+
 #include <QTextStream>
 #include <asn1/asn1model.h>
 #include <asn1library/asn1/types/type.h>
 #include <csv/CsvModel/csvmodel.h>
 #include <ivcore/ivinterface.h>
-#include <shared/parameter.h>
 #include <sstream>
 #include <vector>
 
 using Asn1Acn::Asn1Model;
 using Asn1Acn::Types::Type;
 using csv::CsvModel;
-using InterfaceParameters = QVector<shared::InterfaceParameter>;
-using Mappings = std::vector<unsigned int>;
-using Fields = std::vector<csv::Field>;
 
 namespace testgenerator {
 
@@ -46,20 +44,11 @@ public:
 private:
     static auto checkTestData(const CsvModel &testData) -> void;
     static auto checkInterface(const ivm::IVInterface &interface) -> void;
-    static auto getHeaderFieldsToParamsMappings(const Fields &headerFields, const InterfaceParameters &params)
-            -> Mappings;
-    static auto countOutputParameters(const InterfaceParameters &params) -> unsigned int;
     static auto getAsn1Type(const QString &name, const Asn1Model &model) -> Type::ASN1Type;
     static auto qstringToBoolSymbol(const QString &str) -> QString;
     static auto getAssignmentsForRecords(const ivm::IVInterface &interface, const Asn1Model &asn1Model,
-            const CsvModel &testData, unsigned int index) -> QString;
+            const CsvModel &testData, unsigned int index, const TestGeneratorContext &context) -> QString;
     static auto removePiPrefix(const QString &str) -> QString;
-
-    // which column in CSV model matches which interface input parameter
-    // mappings index - interface parameter number
-    // mappings value - data column in CSV model
-    static Mappings m_mappings;
-    static unsigned int m_outputParameters;
 };
 
 } // namespace testgenerator
