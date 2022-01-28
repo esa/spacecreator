@@ -24,6 +24,7 @@
 #include <asn1library/asn1/types/sequence.h>
 #include <optional>
 #include <seds/SedsModel/types/datatype.h>
+#include <seds/SedsModel/types/entries/entrytype.h>
 
 namespace Asn1Acn {
 class Definitions;
@@ -130,6 +131,8 @@ private:
             -> void;
 
     auto updateListLengthEntry(const seds::model::ListEntry &sedsEntry) const -> void;
+    auto getListLengthField(const QString &listLengthFieldName,
+            const seds::model::ContainerDataType *sedsContainer) const -> const seds::model::EntryType *;
     auto getListLengthSequenceComponent(const seds::model::ListEntry &sedsEntry) const
             -> std::unique_ptr<Asn1Acn::SequenceComponent> &;
     auto addListSizeConstraint(Asn1Acn::Types::SequenceOf *asn1Type, const seds::model::ListEntry &sedsEntry) const

@@ -285,11 +285,29 @@ std::unique_ptr<Asn1Acn::SequenceComponent> &EntryTranslatorVisitor::getListLeng
     return *foundListLengthSequenceComponent;
 }
 
+const seds::model::EntryType *EntryTranslatorVisitor::getListLengthField(
+        const QString &listLengthFieldName, const seds::model::ContainerDataType *sedsContainer) const
+{
+    const auto listLengthField = sedsContainer->entry(listLengthFieldName);
+
+    if (listLengthField != nullptr) {
+        return listLengthField;
+    }
+
+    if (sedsContainer->baseType()) {
+        const auto sedsContainerBase = m_sedsPackage->dataType(sedsContainer->baseType()->nameStr());
+        const auto sedsContainerBaseContainer = std::get_if<seds::model::ContainerDataType>(sedsContainerBase);
+        return getListLengthField(listLengthFieldName, sedsContainerBaseContainer);
+    }
+
+    return nullptr;
+}
+
 void EntryTranslatorVisitor::addListSizeConstraint(
         Asn1Acn::Types::SequenceOf *asn1Type, const seds::model::ListEntry &sedsEntry) const
 {
     const auto listLengthFieldName = sedsEntry.listLengthField().nameStr();
-    const auto listLengthField = m_sedsParentContainer->entry(listLengthFieldName);
+    const auto listLengthField = getListLengthField(listLengthFieldName, m_sedsParentContainer);
 
     if (listLengthField == nullptr) {
         auto errorMessage = QString("Entry \"%1\" used as a length of the list entry \"%2\" not found")
