@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="Parameters">
+    <DataTypeSet>
+      <IntegerDataType name="Number">
+        <LongDescription>Number</LongDescription>
+        <IntegerDataEncoding encoding="twosComplement" sizeInBits="32" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="-1000000" max="1000000" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="IFType">
+        <LongDescription>Interface containing parameters</LongDescription>
+        <ParameterSet>
+          <Parameter name="SyncParam" mode="sync" type="Number" />
+          <Parameter name="AsyncParam" mode="async" type="Number"></Parameter>
+          <Parameter name="SyncRoParam" type="Number" mode="sync" readOnly="true" />
+          <Parameter name="AsyncRoParam" type="Number" mode="async" readOnly="true" />
+        </ParameterSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="ParameterMapHost">
+        <LongDescription></LongDescription>
+        <ProvidedInterfaceSet>
+          <Interface name="IF" type="IFType"></Interface>
+        </ProvidedInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="x" type="Number"></Variable>
+          </VariableSet>
+          <ParameterMapSet>
+            <ParameterMap variableRef="x" interface="IF" parameter="SyncParam" />
+            <ParameterMap variableRef="x" parameter="AsyncParam" interface="IF" />
+            <ParameterMap variableRef="x" parameter="AsyncRoParam" interface="IF" />
+            <ParameterMap variableRef="x" parameter="SyncRoParam" interface="IF" />
+          </ParameterMapSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>
