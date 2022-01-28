@@ -53,8 +53,8 @@ auto TestGeneratorContext::calculateHeaderFieldsToParamsMappings(
     auto mappings = std::vector<unsigned int>(paramsSize, 0);
 
     if (!headerFields.empty()) {
-        if (headerFields.size() != paramsSize - outputParametersCount()) {
-            throw TestGeneratorException("Imported CSV contains invalid number of data columns");
+        if (headerFields.size() < paramsSize) {
+            throw TestGeneratorException("Imported CSV contains too few data columns");
         }
         std::vector<bool> elementsFound(paramsSize, false);
         for (unsigned int i = 0; i < paramsSize; i++) {
@@ -62,13 +62,16 @@ auto TestGeneratorContext::calculateHeaderFieldsToParamsMappings(
             const QString &name = param.name();
             if (param.direction() == shared::InterfaceParameter::Direction::OUT) {
                 elementsFound.at(i) = true;
+                mappings.at(i) = 0;
                 continue;
             }
             for (unsigned int j = 0; j < headerFields.size(); j++) {
                 const auto &field = headerFields.at(j);
                 if (name.compare(field) == 0) {
                     elementsFound.at(i) = true;
-                    mappings.at(i) = j;
+                    if (j < mappings.size()) { // TODO: temporary fix
+                        mappings.at(i) = j;
+                    }
                     break;
                 }
             }

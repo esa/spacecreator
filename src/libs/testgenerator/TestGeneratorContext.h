@@ -63,7 +63,7 @@ private:
     auto calculateHeaderFieldsToParamsMappings(const Fields &headerFields, const InterfaceParameters &params) -> void;
 
     Mappings m_mappings;
-    unsigned int m_outputParametersCount; // TODO: change to m_outputParametersNum
+    unsigned int m_outputParametersCount;
 };
 
 } // namespace testgenerator
