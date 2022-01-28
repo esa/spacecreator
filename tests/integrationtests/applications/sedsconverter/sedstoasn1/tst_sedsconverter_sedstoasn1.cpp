@@ -112,7 +112,6 @@ void tst_SedsConverter_SedsToAsn1::testContainerInheritance()
 /// \SRS  ETB-FUN-10
 /// \SRS  ETB-FUN-110
 /// \SRS  ETB-FUN-230
-/// \SRS  ETB-FUN-240
 /// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-120
 void tst_SedsConverter_SedsToAsn1::testContainerEntries()
