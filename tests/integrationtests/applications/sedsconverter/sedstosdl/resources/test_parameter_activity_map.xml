@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="Parameters">
+    <DataTypeSet>
+      <IntegerDataType name="Number">
+        <LongDescription>Number</LongDescription>
+        <IntegerDataEncoding encoding="twosComplement" sizeInBits="32" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="-1000000" max="1000000" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="IFType">
+        <LongDescription>Interface containing parameters</LongDescription>
+        <ParameterSet>
+          <Parameter name="SyncParam" mode="sync" type="Number" />
+          <Parameter name="AsyncParam" mode="async" type="Number"></Parameter>
+          <Parameter name="SyncRoParam" type="Number" mode="sync" readOnly="true" />
+          <Parameter name="AsyncRoParam" type="Number" mode="async" readOnly="true" />
+        </ParameterSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="ParameterActivityMapHost">
+        <LongDescription></LongDescription>
+        <ProvidedInterfaceSet>
+          <Interface name="InputIF" type="IFType"/>
+        </ProvidedInterfaceSet>
+        <RequiredInterfaceSet>
+          <Interface name="OutputIF" type="IFTYpe" />
+        </RequiredInterfaceSet>
+        <Implementation>
+          <ParameterActivityMapSet>
+            <ParameterActivityMap>
+              <Provided name="SyncParamProvidedVariable" interface="InputIF" parameter="SyncParam" />
+              <Required interface="OutputIF" parameter="SyncParam" name="SyncParamRequiredVariable" />
+              <GetActivity>
+                <MathOperation outputVariableRef="SyncParamProvidedVariable">
+                  <Operator operator="multiply" />
+                  <VariableRef variableRef="SyncParamRequiredVariable"/>
+                  <Value value="2" />
+                </MathOperation>
+              </GetActivity>
+              <SetActivity>
+                <MathOperation outputVariableRef="SyncParamRequiredVariable">
+                  <Operator operator="divide" />
+                  <VariableRef variableRef="SyncParamProvidedVariable"/>
+                  <Value value="3" />
+                </MathOperation>
+              </SetActivity>
+            </ParameterActivityMap>
+            <ParameterActivityMap>
+              <Provided name="AsyncParamProvidedVariable" interface="InputIF" parameter="AsyncParam" />
+              <Required interface="OutputIF" parameter="AsyncParam" name="AsyncParamRequiredVariable" />
+              <GetActivity>
+                <MathOperation outputVariableRef="AsyncParamProvidedVariable">
+                  <Operator operator="multiply" />
+                  <VariableRef variableRef="AsyncParamRequiredVariable"/>
+                  <Value value="2" />
+                </MathOperation>
+              </GetActivity>
+              <SetActivity>
+                <MathOperation outputVariableRef="AsyncParamRequiredVariable">
+                  <Operator operator="divide" />
+                  <VariableRef variableRef="AsyncParamProvidedVariable"/>
+                  <Value value="3" />
+                </MathOperation>
+              </SetActivity>
+            </ParameterActivityMap>
+          </ParameterActivityMapSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>
