@@ -132,12 +132,16 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
             StateMachineTranslator::createTimerVariables(sedsStateMachine, &process);
             StateMachineTranslator::translateStateMachine(sedsStateMachine, &process, stateMachine.get());
         }
-        // Register all timers in the interface view
         const auto function = ivModel->getFunction(process.name(), Qt::CaseInsensitive);
+        StateMachineTranslator::translateParameterMaps(
+                function, implementation.parameterMaps(), &process, stateMachine.get());
+        // Register all timers in the interface view
         for (const auto &timerName : process.timerNames()) {
             shared::ContextParameter timer(timerName, shared::BasicParameter::Type::Timer);
             function->addContextParam(timer);
         }
+
+        StateMachineTranslator::ensureMinimalStateMachineExists(&process, stateMachine.get());
 
         // State machine needs to be moved after processing, because later it cannot be accessed for modification
         process.setStateMachine(std::move(stateMachine));

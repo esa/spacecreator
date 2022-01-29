@@ -258,7 +258,7 @@ model::ParameterMap ComponentsParser::readParameterMap(QXmlStreamReader &xmlRead
         if (ComponentPrimitivesParser::processForParameterRefAttributes(&parameterMap, attribute)) {
             continue;
         } else if (attribute.name() == QStringLiteral("variableRef")) {
-            parameterMap.setVariableRef(attribute.name().toString());
+            parameterMap.setVariableRef(attribute.value().toString());
         } else {
             throw UnhandledAttribute(attribute.name(), xmlReader.name());
         }

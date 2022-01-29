@@ -106,6 +106,18 @@ public:
      */
     static auto timerName(const QString &stateName) -> QString;
 
+    /**
+     * @brief   Ensure that the state machine has at least the start state.
+     *
+     * @param sdlProcess    Target SDL process
+     * @param stateMachine  Target state machine
+     */
+    static auto ensureMinimalStateMachineExists(::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void;
+
+    static auto translateParameterMaps(ivm::IVFunction *function,
+            const seds::model::ComponentImplementation::ParameterMapSet &parameterMaps, ::sdl::Process *sdlProcess,
+            ::sdl::StateMachine *stateMachine) -> void;
+
 private:
     static auto createStartTransition(const seds::model::StateMachine &sedsStateMachine, ::sdl::Process *sdlProcess,
             std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void;
