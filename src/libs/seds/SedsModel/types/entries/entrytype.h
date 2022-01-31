@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,28 +17,29 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "types/integerdatatype.h"
+#pragma once
+
+#include "types/entries/entry.h"
+#include "types/entries/errorcontrolentry.h"
+#include "types/entries/fixedvalueentry.h"
+#include "types/entries/lengthentry.h"
+#include "types/entries/listentry.h"
+#include "types/entries/paddingentry.h"
+
+#include <QString>
+#include <variant>
 
 namespace seds::model {
 
-const std::optional<IntegerDataEncoding> &IntegerDataType::encoding() const
-{
-    return m_encoding;
-}
+using EntryType = std::variant<Entry, ErrorControlEntry, FixedValueEntry, LengthEntry, ListEntry, PaddingEntry>;
 
-void IntegerDataType::setEncoding(IntegerDataEncoding encoding)
-{
-    m_encoding = std::move(encoding);
-}
-
-const IntegerDataType::Range &IntegerDataType::range() const
-{
-    return m_range;
-}
-
-void IntegerDataType::setRange(IntegerDataType::Range minMaxRange)
-{
-    m_range = std::move(minMaxRange);
-}
+/**
+ * @brief   Gets name from entry
+ *
+ * @param   entry   Entry
+ *
+ * @return  Name
+ */
+const QString &entryNameStr(const EntryType &entryType);
 
 } // namespace seds::model

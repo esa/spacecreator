@@ -26,6 +26,7 @@
 #include <ivcore/ivfunction.h>
 #include <seds/SedsModel/interfaces/argumentscombination.h>
 #include <seds/SedsModel/interfaces/interfacecommand.h>
+#include <seds/SedsModel/package/package.h>
 
 using conversion::Escaper;
 using conversion::UnhandledValueException;
@@ -34,10 +35,10 @@ using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator {
 
-SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(const QString &sedsInterfaceName,
-        const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet, Asn1Acn::Definitions *asn1Definitions,
-        const seds::model::Package *sedsPackage, ivm::IVFunction *ivFunction)
-    : InterfaceCommandTranslator(sedsInterfaceName, genericTypeMapSet, asn1Definitions, sedsPackage, ivFunction)
+SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction,
+        const QString &sedsInterfaceName, const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
+        Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage)
+    : InterfaceCommandTranslator(ivFunction, sedsInterfaceName, genericTypeMapSet, asn1Definitions, sedsPackage)
 {
 }
 

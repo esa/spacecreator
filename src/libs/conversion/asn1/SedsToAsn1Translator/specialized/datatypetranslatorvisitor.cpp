@@ -77,7 +77,7 @@ void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
         throw TranslationException("Encountered ArrayDataType without dimensions");
     }
 
-    DimensionTranslator dimensionTranslator(m_asn1Definitions);
+    DimensionTranslator dimensionTranslator(m_sedsPackage);
 
     if (dimensions.size() == 1) { // Sequence of type with one dimension
         auto type = std::make_unique<Asn1Acn::Types::SequenceOf>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
@@ -465,7 +465,7 @@ void DataTypeTranslatorVisitor::cacheContainerType(const ContainerDataType &seds
     }
 
     // Translate own entries
-    EntryTranslatorVisitor entriesTranslator { m_asn1Definitions, asn1SequenceComponents.get() };
+    EntryTranslatorVisitor entriesTranslator(asn1SequenceComponents.get(), m_asn1Definitions, &sedsType, m_sedsPackage);
     for (const auto &sedsEntry : sedsType.entries()) {
         std::visit(entriesTranslator, sedsEntry);
     }
@@ -474,7 +474,8 @@ void DataTypeTranslatorVisitor::cacheContainerType(const ContainerDataType &seds
 
     if (sedsType.isAbstract()) {
         // Translate own trailer entries
-        EntryTranslatorVisitor trailerEntriesTranslator { m_asn1Definitions, asn1SequenceTrailerComponents.get() };
+        EntryTranslatorVisitor trailerEntriesTranslator(
+                asn1SequenceTrailerComponents.get(), m_asn1Definitions, &sedsType, m_sedsPackage);
         for (const auto &sedsTrailerEntry : sedsType.trailerEntries()) {
             std::visit(trailerEntriesTranslator, sedsTrailerEntry);
         }

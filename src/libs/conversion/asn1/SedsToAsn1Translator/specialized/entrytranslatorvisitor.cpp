@@ -20,6 +20,8 @@
 #include "specialized/entrytranslatorvisitor.h"
 
 #include "specialized/datatypetranslatorvisitor.h"
+#include "specialized/rangetranslatorvisitor.h"
+#include "specialized/sizetranslatorvisitor.h"
 
 #include <asn1library/asn1/acnsequencecomponent.h>
 #include <asn1library/asn1/asnsequencecomponent.h>
@@ -35,10 +37,10 @@
 #include <asn1library/asn1/types/real.h>
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
-#include <asn1library/asn1/values.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
+#include <iostream>
 #include <seds/SedsModel/package/package.h>
 
 using conversion::Escaper;
@@ -49,6 +51,16 @@ using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredDataTypeException;
 
 namespace conversion::asn1::translator {
+
+EntryTranslatorVisitor::EntryTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence,
+        Asn1Acn::Definitions *asn1Definitions, const seds::model::ContainerDataType *sedsParentContainer,
+        const seds::model::Package *sedsPackage)
+    : m_asn1Sequence(asn1Sequence)
+    , m_asn1Definitions(asn1Definitions)
+    , m_sedsParentContainer(sedsParentContainer)
+    , m_sedsPackage(sedsPackage)
+{
+}
 
 void EntryTranslatorVisitor::operator()(const seds::model::Entry &sedsEntry)
 {
@@ -93,15 +105,20 @@ void EntryTranslatorVisitor::operator()(const seds::model::LengthEntry &sedsEntr
 
 void EntryTranslatorVisitor::operator()(const seds::model::ListEntry &sedsEntry)
 {
+    // Replace the existing ASN.1 length entry with an ACN-only one
+    updateListLengthEntry(sedsEntry);
+
     auto asn1EntryType = translateEntryType(sedsEntry.type().nameStr());
 
     auto asn1SequenceOfType = std::make_unique<Asn1Acn::Types::SequenceOf>();
     asn1SequenceOfType->setItemsType(std::move(asn1EntryType));
 
+    addListSizeConstraint(asn1SequenceOfType.get(), sedsEntry);
+
     const auto entryName = Escaper::escapeAsn1FieldName(sedsEntry.nameStr());
-    auto sequenceComponent =
-            std::make_unique<Asn1Acn::AcnSequenceComponent>(entryName, entryName, std::move(asn1SequenceOfType));
-    m_asn1Sequence->addComponent(std::move(sequenceComponent));
+    auto listSequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
+            entryName, entryName, false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(asn1SequenceOfType));
+    m_asn1Sequence->addComponent(std::move(listSequenceComponent));
 }
 
 void EntryTranslatorVisitor::operator()(const seds::model::PaddingEntry &sedsEntry)
@@ -136,53 +153,62 @@ void EntryTranslatorVisitor::translateFixedValue(
     }
 
     switch (asn1Type->type()->typeEnum()) {
-    case Asn1Acn::Types::Type::ASN1Type::INTEGER:
-        createValueConstraint<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>(
-                sedsEntry.fixedValue()->value(), asn1Type->type());
-        break;
-    case Asn1Acn::Types::Type::ASN1Type::REAL:
-        createValueConstraint<Asn1Acn::Types::Real, Asn1Acn::RealValue>(
-                sedsEntry.fixedValue()->value(), asn1Type->type());
-        break;
-    case Asn1Acn::Types::Type::ASN1Type::BOOLEAN:
-        createValueConstraint<Asn1Acn::Types::Boolean, Asn1Acn::BooleanValue>(
-                sedsEntry.fixedValue()->value(), asn1Type->type());
-        break;
+    case Asn1Acn::Types::Type::ASN1Type::INTEGER: {
+        const auto value = Asn1Acn::IntegerValue::fromAstValue(sedsEntry.fixedValue()->value());
+        RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue> rangeTranslator(asn1Type->type());
+        rangeTranslator.addValueConstraint(value);
+    } break;
+    case Asn1Acn::Types::Type::ASN1Type::REAL: {
+        const auto value = Asn1Acn::RealValue::fromAstValue(sedsEntry.fixedValue()->value());
+        RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue> rangeTranslator(asn1Type->type());
+        rangeTranslator.addValueConstraint(value);
+    } break;
+    case Asn1Acn::Types::Type::ASN1Type::BOOLEAN: {
+        const auto value = Asn1Acn::BooleanValue::fromAstValue(sedsEntry.fixedValue()->value());
+        RangeTranslatorVisitor<Asn1Acn::Types::Boolean, Asn1Acn::BooleanValue> rangeTranslator(asn1Type->type());
+        rangeTranslator.addValueConstraint(value);
+    } break;
     case Asn1Acn::Types::Type::ASN1Type::SEQUENCE:
         throw UnsupportedValueException("ASN1Type/FixedValueEntry", "SEQUENCE");
         break;
     case Asn1Acn::Types::Type::ASN1Type::SEQUENCEOF:
         throw UnsupportedValueException("ASN1Type/FixedValueEntry", "SEQUENCEOF");
         break;
-    case Asn1Acn::Types::Type::ASN1Type::ENUMERATED:
-        createValueConstraint<Asn1Acn::Types::Enumerated, Asn1Acn::EnumValue>(
-                Escaper::escapeAsn1FieldName(sedsEntry.fixedValue()->value()), asn1Type->type());
-        break;
+    case Asn1Acn::Types::Type::ASN1Type::ENUMERATED: {
+        const auto value = Asn1Acn::EnumValue::fromAstValue(sedsEntry.fixedValue()->value());
+        RangeTranslatorVisitor<Asn1Acn::Types::Enumerated, Asn1Acn::EnumValue> rangeTranslator(asn1Type->type());
+        rangeTranslator.addValueConstraint(value);
+    } break;
     case Asn1Acn::Types::Type::ASN1Type::CHOICE:
         throw UnsupportedValueException("ASN1Type/FixedValueEntry", "CHOICE");
         break;
     case Asn1Acn::Types::Type::ASN1Type::STRING:
         throw UnsupportedValueException("ASN1Type/FixedValueEntry", "STRING");
         break;
-    case Asn1Acn::Types::Type::ASN1Type::IA5STRING:
-        createValueConstraint<Asn1Acn::Types::IA5String, Asn1Acn::StringValue>(
-                sedsEntry.fixedValue()->value(), asn1Type->type());
-        break;
-    case Asn1Acn::Types::Type::ASN1Type::NUMERICSTRING:
-        createValueConstraint<Asn1Acn::Types::NumericString, Asn1Acn::StringValue>(
-                sedsEntry.fixedValue()->value(), asn1Type->type());
-        break;
+    case Asn1Acn::Types::Type::ASN1Type::IA5STRING: {
+        const auto value = Asn1Acn::StringValue::fromAstValue(sedsEntry.fixedValue()->value());
+        RangeTranslatorVisitor<Asn1Acn::Types::IA5String, Asn1Acn::StringValue> rangeTranslator(asn1Type->type());
+        rangeTranslator.addValueConstraint(value);
+    } break;
+    case Asn1Acn::Types::Type::ASN1Type::NUMERICSTRING: {
+        const auto value = Asn1Acn::StringValue::fromAstValue(sedsEntry.fixedValue()->value());
+        RangeTranslatorVisitor<Asn1Acn::Types::NumericString, Asn1Acn::StringValue> rangeTranslator(asn1Type->type());
+        rangeTranslator.addValueConstraint(value);
+    } break;
     case Asn1Acn::Types::Type::ASN1Type::NULLTYPE:
         throw UnsupportedValueException("ASN1Type/FixedValueEntry", "NULLTYPE");
         break;
-    case Asn1Acn::Types::Type::ASN1Type::BITSTRING:
-        createValueConstraint<Asn1Acn::Types::BitString, Asn1Acn::BitStringValue>(
-                sedsEntry.fixedValue()->value(), asn1Type->type());
-        break;
-    case Asn1Acn::Types::Type::ASN1Type::OCTETSTRING:
-        createValueConstraint<Asn1Acn::Types::OctetString, Asn1Acn::OctetStringValue>(
-                sedsEntry.fixedValue()->value(), asn1Type->type());
-        break;
+    case Asn1Acn::Types::Type::ASN1Type::BITSTRING: {
+        const auto value = Asn1Acn::BitStringValue::fromAstValue(sedsEntry.fixedValue()->value());
+        RangeTranslatorVisitor<Asn1Acn::Types::BitString, Asn1Acn::BitStringValue> rangeTranslator(asn1Type->type());
+        rangeTranslator.addValueConstraint(value);
+    } break;
+    case Asn1Acn::Types::Type::ASN1Type::OCTETSTRING: {
+        const auto value = Asn1Acn::OctetStringValue::fromAstValue(sedsEntry.fixedValue()->value());
+        RangeTranslatorVisitor<Asn1Acn::Types::OctetString, Asn1Acn::OctetStringValue> rangeTranslator(
+                asn1Type->type());
+        rangeTranslator.addValueConstraint(value);
+    } break;
     case Asn1Acn::Types::Type::ASN1Type::LABELTYPE:
         throw UnsupportedValueException("ASN1Type/FixedValueEntry", "LABELTYPE");
         break;
@@ -230,6 +256,91 @@ void EntryTranslatorVisitor::translateCoreErrorControl(
         throw UnhandledValueException("CoreErrorControl");
         break;
     }
+}
+
+void EntryTranslatorVisitor::updateListLengthEntry(const seds::model::ListEntry &sedsEntry) const
+{
+    auto &listLengthSequenceComponent = getListLengthSequenceComponent(sedsEntry);
+
+    listLengthSequenceComponent.reset(new Asn1Acn::AcnSequenceComponent(listLengthSequenceComponent->name(),
+            listLengthSequenceComponent->name(), listLengthSequenceComponent->type()->clone()));
+}
+
+std::unique_ptr<Asn1Acn::SequenceComponent> &EntryTranslatorVisitor::getListLengthSequenceComponent(
+        const seds::model::ListEntry &sedsEntry) const
+{
+    auto &containerComponents = m_asn1Sequence->components();
+
+    const auto listLengthFieldName = Escaper::escapeAsn1FieldName(sedsEntry.listLengthField().nameStr());
+    auto foundListLengthSequenceComponent = std::find_if(containerComponents.begin(), containerComponents.end(),
+            [&](const auto &component) { return component->name() == listLengthFieldName; });
+
+    if (foundListLengthSequenceComponent == containerComponents.end()) {
+        auto errorMessage = QString("Entry \"%1\" used as a length of the list entry \"%2\" not found")
+                                    .arg(listLengthFieldName)
+                                    .arg(sedsEntry.type().nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    return *foundListLengthSequenceComponent;
+}
+
+const seds::model::EntryType *EntryTranslatorVisitor::getListLengthField(
+        const QString &listLengthFieldName, const seds::model::ContainerDataType *sedsContainer) const
+{
+    const auto listLengthField = sedsContainer->entry(listLengthFieldName);
+
+    if (listLengthField != nullptr) {
+        return listLengthField;
+    }
+
+    if (sedsContainer->baseType()) {
+        const auto sedsContainerBase = m_sedsPackage->dataType(sedsContainer->baseType()->nameStr());
+        const auto sedsContainerBaseContainer = std::get_if<seds::model::ContainerDataType>(sedsContainerBase);
+        return getListLengthField(listLengthFieldName, sedsContainerBaseContainer);
+    }
+
+    return nullptr;
+}
+
+void EntryTranslatorVisitor::addListSizeConstraint(
+        Asn1Acn::Types::SequenceOf *asn1Type, const seds::model::ListEntry &sedsEntry) const
+{
+    const auto listLengthFieldName = sedsEntry.listLengthField().nameStr();
+    const auto listLengthField = getListLengthField(listLengthFieldName, m_sedsParentContainer);
+
+    if (listLengthField == nullptr) {
+        auto errorMessage = QString("Entry \"%1\" used as a length of the list entry \"%2\" not found")
+                                    .arg(listLengthFieldName)
+                                    .arg(sedsEntry.type().nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto listLengthEntry = std::get_if<seds::model::Entry>(listLengthField);
+
+    if (listLengthEntry == nullptr) {
+        auto errorMessage = QString(
+                "Entry \"%1\" can't be used as a length of the list entry \"%2\". Only plain entry can be used.")
+                                    .arg(listLengthFieldName)
+                                    .arg(sedsEntry.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto &listLengthEntryTypeName = listLengthEntry->type().nameStr();
+    const auto listLengthEntryType = m_sedsPackage->dataType(listLengthEntryTypeName);
+
+    if (const auto listLengthEntryIntegerType = std::get_if<seds::model::IntegerDataType>(listLengthEntryType)) {
+        SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn::IntegerValue> sizeTranslator(asn1Type);
+        std::visit(sizeTranslator, listLengthEntryIntegerType->range());
+    } else {
+        auto errorMessage = QString(
+                "Entry \"%1\" can't be used as a length of the list entry \"%2\" because it's type is not integer")
+                                    .arg(listLengthFieldName)
+                                    .arg(sedsEntry.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    asn1Type->setAcnSize(Escaper::escapeAsn1FieldName(listLengthFieldName));
 }
 
 } // namespace conversion::asn1::translator

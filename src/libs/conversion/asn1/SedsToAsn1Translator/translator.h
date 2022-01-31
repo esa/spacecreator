@@ -108,7 +108,7 @@ private:
      *
      * @param   sedsDataTypes       Data types to translate
      * @param   asn1Definitions     Where translated data types should be added
-     * @param   sedsPackage         Currently translated package
+     * @param   sedsPackage         Parent SEDS package
      */
     auto translateDataTypes(const std::list<const seds::model::DataType *> &sedsDataTypes,
             Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage) const -> void;

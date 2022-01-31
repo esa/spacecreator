@@ -117,6 +117,12 @@ public:
      * @return All Utypes of the model
      */
     const QList<Utype> &getUtypes() const noexcept;
+    /**
+     * @brief Setter for user defined types.
+     *
+     * @param utypes list of Utypes to set
+     */
+    void setUtypes(const QList<Utype> &utypes);
 
     /**
      * @brief Add TypeAlias - alias for type to the model.

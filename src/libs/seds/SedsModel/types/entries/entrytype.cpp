@@ -17,28 +17,30 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "types/integerdatatype.h"
+#include "types/entries/entrytype.h"
 
 namespace seds::model {
 
-const std::optional<IntegerDataEncoding> &IntegerDataType::encoding() const
+const QString &entryNameStr(const EntryType &entryType)
 {
-    return m_encoding;
-}
+    const QString *entryName = nullptr;
 
-void IntegerDataType::setEncoding(IntegerDataEncoding encoding)
-{
-    m_encoding = std::move(encoding);
-}
+    const auto visitor = [&entryName](auto &&entry) {
+        using T = std::decay_t<decltype(entry)>;
+        if constexpr (std::is_same_v<T, seds::model::PaddingEntry>) {
+            return;
+        } else {
+            entryName = &entry.nameStr();
+        }
+    };
+    std::visit(visitor, entryType);
 
-const IntegerDataType::Range &IntegerDataType::range() const
-{
-    return m_range;
-}
-
-void IntegerDataType::setRange(IntegerDataType::Range minMaxRange)
-{
-    m_range = std::move(minMaxRange);
+    if (entryName) {
+        return *entryName;
+    } else {
+        static const QString emptyStr = "";
+        return emptyStr;
+    }
 }
 
 } // namespace seds::model

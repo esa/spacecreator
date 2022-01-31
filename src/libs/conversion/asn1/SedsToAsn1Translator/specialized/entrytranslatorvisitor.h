@@ -20,8 +20,11 @@
 #pragma once
 
 #include <asn1library/asn1/constraints/rangeconstraint.h>
+#include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/types/sequence.h>
+#include <optional>
 #include <seds/SedsModel/types/datatype.h>
+#include <seds/SedsModel/types/entries/entrytype.h>
 
 namespace Asn1Acn {
 class Definitions;
@@ -33,6 +36,7 @@ class Null;
 namespace seds::model {
 class Component;
 class Entry;
+class EntryRef;
 class ErrorControlEntry;
 class FixedValueEntry;
 class LengthEntry;
@@ -50,11 +54,34 @@ namespace conversion::asn1::translator {
  * Translated entry will be added to the passed ASN.1 sequence
  */
 struct EntryTranslatorVisitor final {
-    /// @brief  Parent definitions
-    Asn1Acn::Definitions *m_asn1Definitions;
-    /// @brief  Where translated entry will be saved
-    Asn1Acn::Types::Sequence *m_asn1Sequence;
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   asn1Sequence        ASN.1 sequence to which the translated entries will be added
+     * @param   asn1Definitions     Parent ASN.1 definitions
+     * @param   sedsPackage         Parent SEDS package
+     */
+    EntryTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence, Asn1Acn::Definitions *asn1Definitions,
+            const seds::model::ContainerDataType *sedsParentContainer, const seds::model::Package *sedsPackage);
+    /**
+     * @brief   Deleted copy constructor
+     */
+    EntryTranslatorVisitor(const EntryTranslatorVisitor &) = delete;
+    /**
+     * @brief   Deleted move constructor
+     */
+    EntryTranslatorVisitor(EntryTranslatorVisitor &&) = delete;
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    EntryTranslatorVisitor &operator=(const EntryTranslatorVisitor &) = delete;
+    /**
+     * @brief   Deleted move assignment operator
+     */
+    EntryTranslatorVisitor &operator=(EntryTranslatorVisitor &&) = delete;
 
+public:
     /**
      * @brief   Translates SEDS entry
      *
@@ -94,6 +121,7 @@ struct EntryTranslatorVisitor final {
 
 private:
     auto translateEntryType(const QString &sedsTypeName) const -> std::unique_ptr<Asn1Acn::Types::UserdefinedType>;
+
     auto translateFixedValue(
             const seds::model::FixedValueEntry &sedsEntry, Asn1Acn::Types::UserdefinedType *asn1Type) const -> void;
     auto translateErrorControl(const seds::model::ErrorControlEntry &sedsEntry) const
@@ -102,21 +130,28 @@ private:
     auto translateCoreErrorControl(seds::model::CoreErrorControl coreErrorControl, Asn1Acn::Types::Null *asn1Type) const
             -> void;
 
-    template<typename Type, typename ValueType>
-    auto createValueConstraint(const QString &value, Asn1Acn::Types::Type *asn1Type) const -> void;
+    auto updateListLengthEntry(const seds::model::ListEntry &sedsEntry) const -> void;
+    auto getListLengthField(const QString &listLengthFieldName,
+            const seds::model::ContainerDataType *sedsContainer) const -> const seds::model::EntryType *;
+    auto getListLengthSequenceComponent(const seds::model::ListEntry &sedsEntry) const
+            -> std::unique_ptr<Asn1Acn::SequenceComponent> &;
+    auto addListSizeConstraint(Asn1Acn::Types::SequenceOf *asn1Type, const seds::model::ListEntry &sedsEntry) const
+            -> void;
 
 private:
+    /// @brief  Where translated entry will be saved
+    Asn1Acn::Types::Sequence *m_asn1Sequence;
+
+    /// @brief  Parent definitions
+    Asn1Acn::Definitions *m_asn1Definitions;
+    /// @brief  Parent container
+    const seds::model::ContainerDataType *m_sedsParentContainer;
+    /// @brief  Parent package
+    const seds::model::Package *m_sedsPackage;
+
     const static int m_crc8BitSize = 8;
     const static int m_crc16BitSize = 16;
     const static int m_checksumBitSize = 32;
 };
-
-template<typename Type, typename ValueType>
-void EntryTranslatorVisitor::createValueConstraint(const QString &value, Asn1Acn::Types::Type *asn1Type) const
-{
-    auto *referencedType = dynamic_cast<Type *>(asn1Type);
-    auto constraint = Asn1Acn::Constraints::RangeConstraint<ValueType>::create({ ValueType::fromAstValue(value) });
-    referencedType->constraints().append(std::move(constraint));
-}
 
 } // namespace conversion::asn1::translator

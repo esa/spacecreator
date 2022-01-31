@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "specialized/generictypemapper.h"
+
 #include <ivcore/ivinterface.h>
 #include <optional>
 
@@ -59,13 +61,11 @@ public:
      * @param   sedsInterfaceName   Parent interface name
      * @param   genericTypeMap      Generic type mappings
      * @param   asn1Definitions     ASN.1 type definitions for parent package
-     * @param   sedsPackage         Parent SEDS package
      * @param   ivFunction          Output interface view function
      */
-    InterfaceCommandTranslator(const QString &sedsInterfaceName,
+    InterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
             const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
-            Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
-            ivm::IVFunction *ivFunction);
+            Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage);
     /**
      * @brief   Default destructor
      */
@@ -126,17 +126,6 @@ protected:
     auto handleArgumentType(const seds::model::CommandArgument &sedsArgument) const -> QString;
 
     /**
-     * @brief   Builds ASN.1 sequence of version of command argument type
-     *
-     * @param   sedsArgument            SEDS command argument
-     * @param   sedsArgumentTypeName    Resolved SEDS command argument type name
-     *
-     * @return  Name of the created type
-     */
-    auto buildArrayType(const seds::model::CommandArgument &sedsArgument, const QString &sedsArgumentTypeName) const
-            -> QString;
-
-    /**
      * @brief   Creates new interface view interface
      *
      * @param   sedsCommand     SEDS interface command
@@ -158,6 +147,28 @@ protected:
      */
     auto createAsn1SequenceComponent(
             const QString &name, const QString &typeName, Asn1Acn::Types::Sequence *sequence) const -> void;
+
+    /**
+     * @brief   Swaps between provided and required interface types
+     *
+     * @param   interfaceType   Interface type to switch
+     *
+     * @return  Provided type if required was passed, requried otherwise
+     */
+    static auto switchInterfaceType(ivm::IVInterface::InterfaceType interfaceType) -> ivm::IVInterface::InterfaceType;
+
+private:
+    /**
+     * @brief   Builds ASN.1 sequence of version of command argument type
+     *
+     * @param   sedsArgument            SEDS command argument
+     * @param   sedsArgumentTypeName    Resolved SEDS command argument type name
+     *
+     * @return  Name of the created type
+     */
+    auto buildArrayType(const seds::model::CommandArgument &sedsArgument, const QString &sedsArgumentTypeName) const
+            -> QString;
+
     /**
      * @brief   Creates ASN.1 sequence of version of the seds argument type
      *
@@ -189,14 +200,6 @@ protected:
     auto calculateDimensionsHash(const std::vector<seds::model::DimensionSize> &dimensions) const -> std::size_t;
 
     /**
-     * @brief   Swaps between provided and required interface types
-     *
-     * @param   interfaceType   Interface type to switch
-     *
-     * @return  Provided type if required was passed, requried otherwise
-     */
-    static auto switchInterfaceType(ivm::IVInterface::InterfaceType interfaceType) -> ivm::IVInterface::InterfaceType;
-    /**
      * @brief   Converts interface view interface type to string
      *
      * @param   interfaceType   Interface type to convert
@@ -204,8 +207,6 @@ protected:
      * @return   Interface type name
      */
     static auto interfaceTypeToString(ivm::IVInterface::InterfaceType type) -> const QString &;
-
-private:
     /**
      * @brief   Checks if given type name is mapped in the parent SEDS interface
      *
@@ -216,16 +217,18 @@ private:
     auto findMappedType(const QString &genericTypeName) const -> const QString &;
 
 protected:
+    /// @brief  Output interface view function
+    ivm::IVFunction *m_ivFunction;
+
     /// @brief  Parent SEDS interface name
     const QString &m_sedsInterfaceName;
-    /// @brief  Generic type mappings
-    const std::optional<seds::model::GenericTypeMapSet> &m_genericTypeMapSet;
-    /// @brief  Output ASN.1 type definitions
+    /// @brief  Parent ASN.1 type definitions
     Asn1Acn::Definitions *m_asn1Definitions;
     /// @brief  Parent SEDS package
     const seds::model::Package *m_sedsPackage;
-    /// @brief  Output interface view function
-    ivm::IVFunction *m_ivFunction;
+
+    /// @brief  Mapper for generic command argument types
+    GenericTypeMapper m_typeMapper;
 
     /// @brief  Struct for the array arguments cache
     struct ArrayArgumentsCacheEntry final {

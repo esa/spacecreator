@@ -29,6 +29,9 @@
 
 namespace seds::model {
 class DimensionSize;
+class EnumeratedDataType;
+class IntegerDataType;
+class Package;
 } // namespace seds::model
 
 namespace conversion::asn1::translator {
@@ -42,9 +45,9 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   asn1Definitions     Parent ASN.1 defintions
+     * @param   sedsPackage         Parent SEDS package
      */
-    explicit DimensionTranslator(Asn1Acn::Definitions *asn1Definitions);
+    explicit DimensionTranslator(const seds::model::Package *sedsPackage);
 
     /**
      * @brief   Translate SEDS array dimension
@@ -52,28 +55,22 @@ public:
      * This is translated as ASN.1 range constraint
      *
      * @param   dimension       SEDS array dimension
-     * @param   asn1Sequence    ASN.1 type that will be updated
+     * @param   asn1SequenceOf  ASN.1 type that will be updated
      */
-    auto translateDimension(const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Sequence) const
-            -> void;
+    auto translateDimension(
+            const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1SequenceOf) const -> void;
 
 private:
     auto translateSizeDimension(
-            const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Sequence) const -> void;
+            const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1SequenceOf) const -> void;
     auto translateIndexDimension(
-            const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Sequence) const -> void;
-
-    auto translateIntegerDimensionIndex(
-            const Asn1Acn::Types::Integer *indexType, Asn1Acn::Types::SequenceOf *asn1Sequence) const -> void;
+            const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1SequenceOf) const -> void;
     auto translateEnumDimensionIndex(
-            const Asn1Acn::Types::Enumerated *indexType, Asn1Acn::Types::SequenceOf *asn1Sequence) const -> void;
-
-    auto mergeRanges(const Asn1Acn::Constraints::Constraint<Asn1Acn::IntegerValue> *constraint) const
-            -> std::optional<Asn1Acn::Range<Asn1Acn::IntegerValue::Type>>;
+            const seds::model::EnumeratedDataType &indexType, Asn1Acn::Types::SequenceOf *asn1SequenceOf) const -> void;
 
 private:
-    /// @brief  Parent definitions
-    Asn1Acn::Definitions *m_asn1Definitions;
+    /// @brief  Parent package
+    const seds::model::Package *m_sedsPackage;
 };
 
 } // namespace conversion::asn1::translator

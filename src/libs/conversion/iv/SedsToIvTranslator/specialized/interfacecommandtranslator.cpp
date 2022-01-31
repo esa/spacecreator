@@ -45,14 +45,14 @@ const QString InterfaceCommandTranslator::m_interfaceParameterEncoding = "ACN";
 const QString InterfaceCommandTranslator::m_ivInterfaceNameTemplate = "%1_%2_%3";
 const QString InterfaceCommandTranslator::m_arrayArgumentNameTemplate = "%1_Array%2";
 
-InterfaceCommandTranslator::InterfaceCommandTranslator(const QString &sedsInterfaceName,
+InterfaceCommandTranslator::InterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
         const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet, Asn1Acn::Definitions *asn1Definitions,
-        const seds::model::Package *sedsPackage, ivm::IVFunction *ivFunction)
-    : m_sedsInterfaceName(sedsInterfaceName)
-    , m_genericTypeMapSet(genericTypeMapSet)
+        const seds::model::Package *sedsPackage)
+    : m_ivFunction(ivFunction)
+    , m_sedsInterfaceName(sedsInterfaceName)
     , m_asn1Definitions(asn1Definitions)
     , m_sedsPackage(sedsPackage)
-    , m_ivFunction(ivFunction)
+    , m_typeMapper(genericTypeMapSet)
 {
 }
 
@@ -65,7 +65,7 @@ QString InterfaceCommandTranslator::getCommandName(
 
 QString InterfaceCommandTranslator::handleArgumentType(const seds::model::CommandArgument &sedsArgument) const
 {
-    const auto &sedsArgumentTypeName = findMappedType(sedsArgument.type().nameStr());
+    const auto &sedsArgumentTypeName = m_typeMapper.findMappedType(sedsArgument.type().nameStr());
 
     // Just use type name if the type is not handled as an array
     if (sedsArgument.arrayDimensions().empty()) {
@@ -73,6 +73,39 @@ QString InterfaceCommandTranslator::handleArgumentType(const seds::model::Comman
     }
 
     return buildArrayType(sedsArgument, sedsArgumentTypeName);
+}
+
+ivm::IVInterface *InterfaceCommandTranslator::createIvInterface(const seds::model::InterfaceCommand &sedsCommand,
+        ivm::IVInterface::InterfaceType type, ivm::IVInterface::OperationKind kind) const
+{
+    ivm::IVInterface::CreationInfo creationInfo;
+    creationInfo.function = m_ivFunction;
+    creationInfo.type = type;
+    creationInfo.name = getCommandName(m_sedsInterfaceName, type, sedsCommand.nameStr());
+    creationInfo.kind = kind;
+
+    return ivm::IVInterface::createIface(creationInfo);
+}
+
+void InterfaceCommandTranslator::createAsn1SequenceComponent(
+        const QString &name, const QString &typeName, Asn1Acn::Types::Sequence *sequence) const
+{
+    const auto *referencedTypeAssignment = m_asn1Definitions->type(typeName);
+
+    if (!referencedTypeAssignment) {
+        auto errorMessage =
+                QString("Type %1 not found while creating ASN.1 sequence %2").arg(typeName).arg(sequence->identifier());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto *referencedType = referencedTypeAssignment->type();
+
+    auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(typeName, m_asn1Definitions->name());
+    sequenceComponentType->setType(referencedType->clone());
+
+    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
+            name, name, false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(sequenceComponentType));
+    sequence->addComponent(std::move(sequenceComponent));
 }
 
 QString InterfaceCommandTranslator::buildArrayType(
@@ -127,39 +160,6 @@ std::size_t InterfaceCommandTranslator::calculateDimensionsHash(
     return resultHash;
 }
 
-ivm::IVInterface *InterfaceCommandTranslator::createIvInterface(const seds::model::InterfaceCommand &sedsCommand,
-        ivm::IVInterface::InterfaceType type, ivm::IVInterface::OperationKind kind) const
-{
-    ivm::IVInterface::CreationInfo creationInfo;
-    creationInfo.function = m_ivFunction;
-    creationInfo.type = type;
-    creationInfo.name = getCommandName(m_sedsInterfaceName, type, sedsCommand.nameStr());
-    creationInfo.kind = kind;
-
-    return ivm::IVInterface::createIface(creationInfo);
-}
-
-void InterfaceCommandTranslator::createAsn1SequenceComponent(
-        const QString &name, const QString &typeName, Asn1Acn::Types::Sequence *sequence) const
-{
-    const auto *referencedTypeAssignment = m_asn1Definitions->type(typeName);
-
-    if (!referencedTypeAssignment) {
-        auto errorMessage =
-                QString("Type %1 not found while creating ASN.1 sequence %2").arg(typeName).arg(sequence->identifier());
-        throw TranslationException(std::move(errorMessage));
-    }
-
-    const auto *referencedType = referencedTypeAssignment->type();
-
-    auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(typeName, m_asn1Definitions->name());
-    sequenceComponentType->setType(referencedType->clone());
-
-    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            name, name, false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(sequenceComponentType));
-    sequence->addComponent(std::move(sequenceComponent));
-}
-
 QString InterfaceCommandTranslator::createArrayType(
         const seds::model::CommandArgument &sedsArgument, const QString &sedsArgumentTypeName) const
 {
@@ -174,7 +174,7 @@ QString InterfaceCommandTranslator::createArrayType(
     }
 
     std::unique_ptr<Asn1Acn::Types::Type> asn1ArrayArgument;
-    asn1::translator::DataTypeTranslatorVisitor dataTypeVisitor { asn1ArrayArgument, m_asn1Definitions, m_sedsPackage };
+    asn1::translator::DataTypeTranslatorVisitor dataTypeVisitor(asn1ArrayArgument, m_asn1Definitions, m_sedsPackage);
     dataTypeVisitor(sedsArrayArgument);
 
     auto asn1ArrayArgumentAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
@@ -228,29 +228,6 @@ const QString &InterfaceCommandTranslator::interfaceTypeToString(ivm::IVInterfac
     default:
         throw UnhandledValueException("ivm::InterfaceType");
         break;
-    }
-}
-
-const QString &InterfaceCommandTranslator::findMappedType(const QString &genericTypeName) const
-{
-    if (!m_genericTypeMapSet) {
-        return genericTypeName;
-    }
-
-    const auto &genericTypeMaps = m_genericTypeMapSet->genericTypeMaps();
-
-    if (genericTypeMaps.empty()) {
-        return genericTypeName;
-    }
-
-    const auto foundMapping = std::find_if(genericTypeMaps.begin(), genericTypeMaps.end(),
-            [&genericTypeName](
-                    const seds::model::GenericTypeMap &typeMap) { return typeMap.nameStr() == genericTypeName; });
-
-    if (foundMapping != genericTypeMaps.end()) {
-        return foundMapping->type().nameStr();
-    } else {
-        return genericTypeName;
     }
 }
 

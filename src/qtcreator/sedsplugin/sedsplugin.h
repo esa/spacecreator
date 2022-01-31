@@ -71,6 +71,7 @@ private:
     auto loadAndMergeIvModelIntoCurrent(const QString &ivConfig, const QString &ivFilename) -> bool;
     auto addFunctionToModel(ivm::IVFunction *srcFun, ivm::IVModel *model) -> void;
     auto doesModelContainFunction(ivm::IVModel *model, ivm::IVFunction *function) -> bool;
+    auto addFilesToCurProject(const QStringList &filenames) -> void;
 
     /** @brief  Internal registry */
     conversion::Registry m_registry;

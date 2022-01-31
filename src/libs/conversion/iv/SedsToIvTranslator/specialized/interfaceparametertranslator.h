@@ -19,9 +19,13 @@
 
 #pragma once
 
+#include "specialized/generictypemapper.h"
+
 #include <ivcore/ivinterface.h>
+#include <optional>
 
 namespace seds::model {
+class GenericTypeMapSet;
 class Interface;
 class InterfaceParameter;
 } // namespace seds::model
@@ -42,9 +46,11 @@ public:
      * @brief   Constructor
      *
      * @param   sedsInterfaceName   Parent interface name
+     * @param   genericTypeMap      Generic type mappings
      * @param   ivFunction          Output interface view function
      */
-    InterfaceParameterTranslator(const QString &sedsInterfaceName, ivm::IVFunction *ivFunction);
+    InterfaceParameterTranslator(const QString &sedsInterfaceName,
+            const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet, ivm::IVFunction *ivFunction);
     /**
      * @brief   Deleted copy constructor
      */
@@ -101,6 +107,9 @@ private:
     const QString &m_sedsInterfaceName;
     /// @brief  Output interface view function
     ivm::IVFunction *m_ivFunction;
+
+    /// @brief  Mapper for generic parameter types
+    GenericTypeMapper m_typeMapper;
 
     /// @brief  Interface parameter encoding name
     static const QString m_interfaceParameterEncoding;

@@ -122,6 +122,7 @@ set(SOURCES
     types/encodings/integerdataencoding.cpp
     types/encodings/stringdataencoding.cpp
     types/entries/coreerrorcontrol.cpp
+    types/entries/entrytype.cpp
     types/entries/errorcontrolentry.cpp
     types/entries/fixedvalueentry.cpp
     types/entries/listentry.cpp
@@ -258,6 +259,7 @@ set(INCLUDES
     types/encodings/stringdataencoding.h
     types/entries/coreerrorcontrol.h
     types/entries/entry.h
+    types/entries/entrytype.h
     types/entries/errorcontrolentry.h
     types/entries/fixedvalueentry.h
     types/entries/lengthentry.h
