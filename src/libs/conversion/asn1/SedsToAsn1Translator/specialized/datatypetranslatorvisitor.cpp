@@ -198,8 +198,37 @@ void DataTypeTranslatorVisitor::operator()(const StringDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const SubRangeDataType &sedsType)
 {
-    Q_UNUSED(sedsType);
-    throw TranslationException("SubRangeDataType translation not implemented");
+    const auto &baseTypeName = sedsType.type().nameStr();
+    const auto baseType = m_sedsPackage->dataType(baseTypeName);
+
+    if (baseType == nullptr) {
+        auto errorMessage = QString("SubRangeDataType \"%1\" references unknown type \"%2\"")
+                                    .arg(sedsType.nameStr())
+                                    .arg(baseTypeName);
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    if (const auto integerBaseType = std::get_if<seds::model::IntegerDataType>(baseType)) {
+        std::visit(*this, *baseType);
+
+        m_asn1Type->setIdentifier(sedsType.nameStr());
+
+        auto integerAsn1Type = dynamic_cast<Asn1Acn::Types::Integer *>(m_asn1Type.get());
+        integerAsn1Type->constraints().clear();
+
+        auto rangeTranslator = RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>(m_asn1Type.get());
+        std::visit(rangeTranslator, sedsType.range());
+    } else if (const auto floatBaseType = std::get_if<seds::model::FloatDataType>(baseType)) {
+        Q_UNUSED(floatBaseType);
+    } else if (const auto enumBaseType = std::get_if<seds::model::EnumeratedDataType>(baseType)) {
+        Q_UNUSED(enumBaseType);
+    } else {
+        auto errorMessage =
+                QString("SubRangeDataType \"%1\" references type \"%2\" that is neither numeric nor enumerated")
+                        .arg(sedsType.nameStr())
+                        .arg(baseTypeName);
+        throw TranslationException(std::move(errorMessage));
+    }
 }
 
 void DataTypeTranslatorVisitor::translateIntegerEncoding(

@@ -1,0 +1,4 @@
+COM-N7SPACE-SUBRANGEDATATYPE DEFINITIONS ::= BEGIN
+IntegerData [size 8, encoding pos-int]
+SubRangeIntegerData [size 8, encoding pos-int]
+END

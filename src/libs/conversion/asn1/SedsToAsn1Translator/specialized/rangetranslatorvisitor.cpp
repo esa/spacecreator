@@ -23,6 +23,8 @@
 #include <asn1library/asn1/types/real.h>
 #include <cmath>
 
+using conversion::translator::TranslationException;
+
 namespace conversion::asn1::translator {
 
 template<>
@@ -104,7 +106,7 @@ void RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>::operator(
         auto errorMessage =
                 QString("Exclusive min-max ranges are not supported for floating point values (in type \"%1\")")
                         .arg(m_asn1Type->identifier());
-        throw conversion::translator::TranslationException(std::move(errorMessage));
+        throw TranslationException(std::move(errorMessage));
     } break;
     case seds::model::RangeType::InclusiveMinInclusiveMax: {
         const auto min = getMin(range);
@@ -152,6 +154,14 @@ void RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>::operator(
 }
 
 template<>
+void RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>::operator()(
+        const seds::model::FloatPrecisionRange &range)
+{
+    Q_UNUSED(range);
+    throw TranslationException("Applying FloatPrecisionRange on integer data types is invalid");
+}
+
+template<>
 typename Asn1Acn::IntegerValue::Type
 RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>::getSmallest() const
 {
@@ -167,7 +177,7 @@ RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>::getSmall
     case Asn1Acn::Types::IntegerEncoding::unspecified:
         return std::numeric_limits<Asn1Acn::IntegerValue::Type>::min();
     default:
-        throw conversion::translator::TranslationException("Unhandled IntegerEncoding for container constraint");
+        throw TranslationException("Unhandled IntegerEncoding for container constraint");
         break;
     }
 }
@@ -183,7 +193,7 @@ typename Asn1Acn::RealValue::Type RangeTranslatorVisitor<Asn1Acn::Types::Real, A
     case Asn1Acn::Types::RealEncoding::unspecified:
         return std::numeric_limits<Asn1Acn::RealValue::Type>::min();
     default:
-        throw conversion::translator::TranslationException("Unhandled RealEncoding for container constraint");
+        throw TranslationException("Unhandled RealEncoding for container constraint");
         break;
     }
 }
@@ -204,7 +214,7 @@ RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>::getGreat
     case Asn1Acn::Types::IntegerEncoding::unspecified:
         return std::numeric_limits<Asn1Acn::IntegerValue::Type>::max();
     default:
-        throw conversion::translator::TranslationException("Unhandled IntegerEncoding for container constraint");
+        throw TranslationException("Unhandled IntegerEncoding for container constraint");
         break;
     }
 }
@@ -220,7 +230,7 @@ typename Asn1Acn::RealValue::Type RangeTranslatorVisitor<Asn1Acn::Types::Real, A
     case Asn1Acn::Types::RealEncoding::unspecified:
         return std::numeric_limits<Asn1Acn::RealValue::Type>::max();
     default:
-        throw conversion::translator::TranslationException("Unhandled RealEncoding for container constraint");
+        throw TranslationException("Unhandled RealEncoding for container constraint");
         break;
     }
 }
