@@ -21,7 +21,9 @@
 
 #include "visitors/asn1nodevisitor.h"
 
+#include <algorithm>
 #include <asn1library/asn1/asn1model.h>
+#include <conversion/common/exceptions.h>
 #include <conversion/common/translation/exceptions.h>
 #include <promela/PromelaModel/promelamodel.h>
 #include <promela/PromelaOptions/options.h>
@@ -33,7 +35,11 @@ using conversion::ModelType;
 using conversion::Options;
 using conversion::promela::PromelaOptions;
 using conversion::translator::TranslationException;
+using promela::model::Declaration;
 using promela::model::PromelaModel;
+using promela::model::TypeAlias;
+using promela::model::Utype;
+using promela::model::UtypeRef;
 
 namespace promela::translator {
 std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
@@ -73,6 +79,8 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
         visitAsn1File(file.get(), *promelaModel, enhancedSpinSupport);
     }
 
+    sortTypeDefinitions(*promelaModel);
+
     std::vector<std::unique_ptr<Model>> result;
     result.push_back(std::move(promelaModel));
     return result;
@@ -82,5 +90,79 @@ void Asn1ToPromelaTranslator::visitAsn1File(File *file, PromelaModel &promelaMod
 {
     Asn1NodeVisitor visitor(promelaModel, enhancedSpinSupport);
     visitor.visit(*file);
+}
+
+void Asn1ToPromelaTranslator::sortTypeDefinitions(::promela::model::PromelaModel &promelaModel) const
+{
+    // this algorithm sorts the Utypes
+    // that the dependencies of given utype are defined before.
+
+    // this loop constructs a type alias map
+    std::map<QString, QString> typeAliasMap;
+
+    for (const TypeAlias &alias : promelaModel.getTypeAliases()) {
+        if (std::holds_alternative<UtypeRef>(alias.getType())) {
+            typeAliasMap.emplace(alias.getName(), std::get<UtypeRef>(alias.getType()).getName());
+        }
+    }
+
+    // map of type dependencies
+    std::map<QString, std::set<QString>> dependencies;
+    // map of existing utpyes
+    std::map<QString, Utype> types;
+
+    // populate maps
+    for (const Utype &utype : promelaModel.getUtypes()) {
+        dependencies.emplace(utype.getName(), std::set<QString>());
+        types.emplace(utype.getName(), utype);
+    }
+
+    // populate dependencies
+    // this is required, because dependencies might be other objects
+    for (const Utype &utype : promelaModel.getUtypes()) {
+        for (const Declaration &declaration : utype.getFields()) {
+            if (declaration.getType().isUtypeReference()) {
+                // if field is another utype: add it to the dependencies set
+                const QString &name = declaration.getType().getUtypeReference().getName();
+                if (dependencies.find(name) != dependencies.end()) {
+                    dependencies[utype.getName()].insert(name);
+                } else {
+                    // if field is a type alias which refers to utype, add it to dependencies set
+                    auto iter = typeAliasMap.find(name);
+                    if (iter != typeAliasMap.end() && dependencies.find(iter->second) != dependencies.end()) {
+                        dependencies[utype.getName()].insert(iter->second);
+                    }
+                }
+            }
+        }
+    }
+
+    QList<Utype> sortedTypes;
+    std::set<QString> insertedTypes;
+
+    // Add types to sorted types when dependencies of the type
+    // are subset of sorted types.
+    while (!dependencies.empty()) {
+        bool changed = false;
+
+        auto iter = dependencies.begin();
+        while (iter != dependencies.end()) {
+            if (std::includes(insertedTypes.begin(), insertedTypes.end(), iter->second.begin(), iter->second.end())) {
+
+                sortedTypes.append(types.at(iter->first));
+                insertedTypes.insert(iter->first);
+                types.erase(iter->first);
+                iter = dependencies.erase(iter);
+                changed = true;
+            } else {
+                ++iter;
+            }
+        }
+        if (!changed) {
+            throw conversion::ConversionException("Cyclic type dependencies in model.");
+        }
+    }
+
+    promelaModel.setUtypes(sortedTypes);
 }
 }

@@ -66,6 +66,11 @@ const QList<Utype> &PromelaModel::getUtypes() const noexcept
     return m_userTypes;
 }
 
+void PromelaModel::setUtypes(const QList<Utype> &utypes)
+{
+    m_userTypes = utypes;
+}
+
 void PromelaModel::addTypeAlias(const TypeAlias &alias)
 {
     m_typeAliases.append(alias);

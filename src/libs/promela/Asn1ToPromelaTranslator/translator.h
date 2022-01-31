@@ -70,5 +70,7 @@ private:
             -> std::vector<std::unique_ptr<conversion::Model>>;
     auto visitAsn1File(::Asn1Acn::File *file, ::promela::model::PromelaModel &promelaModel,
             bool enhancedSpinSupport) const -> void;
+
+    auto sortTypeDefinitions(::promela::model::PromelaModel &promelaModel) const -> void;
 };
 }
