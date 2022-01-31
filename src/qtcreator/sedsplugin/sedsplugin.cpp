@@ -218,9 +218,14 @@ auto SedsPlugin::importInterfaceView() -> void
     options.add(conversion::iv::IvOptions::configFilepath, ivConfig);
     options.add(conversion::seds::SedsOptions::inputFilepath, inputFilePath);
 
+    QStringList asn1filenames;
     try {
-        convert({ conversion::ModelType::Seds }, conversion::ModelType::InterfaceView, { conversion::ModelType::Asn1 },
-                options);
+        const auto models = convert({ conversion::ModelType::Seds }, conversion::ModelType::InterfaceView,
+                { conversion::ModelType::Asn1 }, options);
+        auto *const asn1model = conversion::translator::Translator::getModel<Asn1Acn::Asn1Model>(models);
+        if (asn1model != nullptr) {
+            asn1filenames = conversion::asn1::exporter::Asn1Exporter::getFilenamesForModel(asn1model);
+        }
     } catch (conversion::ConverterException &ex) {
         MessageManager::write(GenMsg::msgError.arg(ex.what()));
         QFile(tmpIvFilename).remove();
@@ -236,6 +241,11 @@ auto SedsPlugin::importInterfaceView() -> void
         QFile(tmpIvFilename).remove();
         return;
     }
+
+    for (auto &filename : asn1filenames) {
+        filename = QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg(filename);
+    };
+    addFilesToCurProject(asn1filenames);
 
     MessageManager::write(GenMsg::msgInfo.arg(GenMsg::functionsImported));
 
@@ -263,7 +273,7 @@ auto SedsPlugin::importSdl() -> void
     QStringList asn1Filenames;
     QStringList sdlFilenames;
     try {
-        auto outputModels = convert({ conversion::ModelType::Seds }, conversion::ModelType::Sdl,
+        const auto outputModels = convert({ conversion::ModelType::Seds }, conversion::ModelType::Sdl,
                 { conversion::ModelType::InterfaceView, conversion::ModelType::Asn1 }, options);
         auto *const asn1model = conversion::translator::Translator::getModel<Asn1Acn::Asn1Model>(outputModels);
         if (asn1model != nullptr) {
@@ -294,8 +304,7 @@ auto SedsPlugin::importSdl() -> void
     for (auto &filename : asn1Filenames) {
         filename = QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg(filename);
     };
-    ProjectExplorer::Project *const project = ProjectExplorer::ProjectTree::currentProject();
-    project->rootProjectNode()->addFiles(asn1Filenames);
+    addFilesToCurProject(asn1Filenames);
 
     if (!loadAndMergeIvModelIntoCurrent(ivConfig, tmpIvFilename)) {
         MessageManager::write(GenMsg::msgError.arg("Could not merge imported IV into current one"));
@@ -321,12 +330,14 @@ auto SedsPlugin::importAsn1() -> void
     options.add(conversion::seds::SedsOptions::inputFilepath, inputFilePath);
     options.add(conversion::asn1::Asn1Options::asn1FilepathPrefix, "");
     options.add(conversion::asn1::Asn1Options::acnFilepathPrefix, "");
+    QStringList asn1Filenames;
     try {
-        const auto srcModelTypes = std::set<conversion::ModelType>({ conversion::ModelType::Seds });
-        const auto targetModelType = conversion::ModelType::Asn1;
-        const auto auxModelTypes = std::set<conversion::ModelType>({});
-        Converter converter(m_registry, std::move(options));
-        converter.convert(srcModelTypes, targetModelType, auxModelTypes);
+        const auto outputModels =
+                convert({ conversion::ModelType::Seds }, { conversion::ModelType::Asn1 }, {}, options);
+        auto *const asn1model = conversion::translator::Translator::getModel<Asn1Acn::Asn1Model>(outputModels);
+        if (asn1model != nullptr) {
+            asn1Filenames = conversion::asn1::exporter::Asn1Exporter::getFilenamesForModel(asn1model);
+        }
         MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesImported));
     } catch (conversion::ConverterException &ex) {
         MessageManager::write(GenMsg::msgError.arg(ex.what()));
@@ -335,6 +346,11 @@ auto SedsPlugin::importAsn1() -> void
     } catch (std::exception &ex) {
         MessageManager::write(GenMsg::msgError.arg(ex.what()));
     }
+
+    for (auto &filename : asn1Filenames) {
+        filename = QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg(filename);
+    };
+    addFilesToCurProject(asn1Filenames);
 }
 
 auto SedsPlugin::exportInterfaceView() -> void
@@ -370,11 +386,7 @@ auto SedsPlugin::exportInterfaceView() -> void
             conversion::Options options;
             options.add(conversion::iv::IvOptions::inputFilepath,
                     QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg("interfaceview.xml"));
-            options.add(conversion::iv::IvOptions::configFilepath,
-                    QString("%1%2%3")
-                            .arg(QDir::currentPath())
-                            .arg(QDir::separator())
-                            .arg(shared::interfaceCustomAttributesFilePath()));
+            options.add(conversion::iv::IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
             options.add(conversion::seds::SedsOptions::outputFilepath,
                     QString("%1%2%3.xml").arg(outputDir).arg(QDir::separator()).arg("seds_interfaceview"));
             for (auto &selectedFunction : *selectedFunctions) {
@@ -661,6 +673,12 @@ auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel 
         dstIf->removeEntityAttribute("miat");
         dstIf->removeEntityAttribute("period");
     }
+}
+
+auto SedsPlugin::addFilesToCurProject(const QStringList &filenames) -> void
+{
+    ProjectExplorer::Project *const project = ProjectExplorer::ProjectTree::currentProject();
+    project->rootProjectNode()->addFiles(filenames);
 }
 
 } // namespace spctr
