@@ -71,27 +71,6 @@ std::set<ModelType> Asn1ToPromelaTranslator::getDependencies() const
     return std::set<ModelType> { ModelType::Asn1 };
 }
 
-std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
-        const Asn1Model *model, bool enhancedSpinSupport) const
-{
-    std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
-    for (const std::unique_ptr<File> &file : model->data()) {
-        visitAsn1File(file.get(), *promelaModel, enhancedSpinSupport);
-    }
-
-    sortTypeDefinitions(*promelaModel);
-
-    std::vector<std::unique_ptr<Model>> result;
-    result.push_back(std::move(promelaModel));
-    return result;
-}
-
-void Asn1ToPromelaTranslator::visitAsn1File(File *file, PromelaModel &promelaModel, bool enhancedSpinSupport) const
-{
-    Asn1NodeVisitor visitor(promelaModel, enhancedSpinSupport);
-    visitor.visit(*file);
-}
-
 void Asn1ToPromelaTranslator::sortTypeDefinitions(::promela::model::PromelaModel &promelaModel) const
 {
     // this algorithm sorts the Utypes
@@ -164,5 +143,26 @@ void Asn1ToPromelaTranslator::sortTypeDefinitions(::promela::model::PromelaModel
     }
 
     promelaModel.setUtypes(sortedTypes);
+}
+
+std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
+        const Asn1Model *model, bool enhancedSpinSupport) const
+{
+    std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
+    for (const std::unique_ptr<File> &file : model->data()) {
+        visitAsn1File(file.get(), *promelaModel, enhancedSpinSupport);
+    }
+
+    sortTypeDefinitions(*promelaModel);
+
+    std::vector<std::unique_ptr<Model>> result;
+    result.push_back(std::move(promelaModel));
+    return result;
+}
+
+void Asn1ToPromelaTranslator::visitAsn1File(File *file, PromelaModel &promelaModel, bool enhancedSpinSupport) const
+{
+    Asn1NodeVisitor visitor(promelaModel, enhancedSpinSupport);
+    visitor.visit(*file);
 }
 }
