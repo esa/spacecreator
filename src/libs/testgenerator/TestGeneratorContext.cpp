@@ -53,8 +53,8 @@ auto TestGeneratorContext::calculateHeaderFieldsToParamsMappings(
     auto mappings = std::vector<unsigned int>(paramsSize, 0);
 
     if (!headerFields.empty()) {
-        if (headerFields.size() < paramsSize) {
-            throw TestGeneratorException("Imported CSV contains too few data columns");
+        if (headerFields.size() != paramsSize) {
+            throw TestGeneratorException("Imported CSV contains invalid number of data columns");
         }
         std::vector<bool> elementsFound(paramsSize, false);
         for (unsigned int i = 0; i < paramsSize; i++) {
@@ -69,9 +69,7 @@ auto TestGeneratorContext::calculateHeaderFieldsToParamsMappings(
                 const auto &field = headerFields.at(j);
                 if (name.compare(field) == 0) {
                     elementsFound.at(i) = true;
-                    if (j < mappings.size()) { // TODO: temporary fix
-                        mappings.at(i) = j;
-                    }
+                    mappings.at(i) = j;
                     break;
                 }
             }
