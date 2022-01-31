@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "types/ranges/enumerateddatatyperange.h"
 #include "types/ranges/floatprecisionrange.h"
 #include "types/ranges/minmaxrange.h"
 
@@ -26,7 +27,6 @@
 
 namespace seds::model {
 
-/*, EnumeratedDataTypeRange */
-using DerivedTypeRange = std::variant<std::monostate, MinMaxRange, FloatPrecisionRange>;
+using DerivedTypeRange = std::variant<MinMaxRange, FloatPrecisionRange, EnumeratedDataTypeRange>;
 
 } // namespace seds::model
