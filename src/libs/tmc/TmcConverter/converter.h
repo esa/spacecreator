@@ -19,19 +19,50 @@
 
 #pragma once
 
+#include <QDir>
+#include <QFileInfo>
+#include <QList>
+#include <QStringList>
 #include <conversion/common/modeltype.h>
 #include <conversion/registry/registry.h>
+#include <ivcore/ivmodel.h>
+#include <ivcore/ivpropertytemplateconfig.h>
+#include <memory>
 
 namespace tmc::converter {
 class TmcConverter
 {
 public:
-    TmcConverter();
+    TmcConverter(const QString &inputIvFilepath, const QString &outputDirectory);
 
-    void convert(std::set<conversion::ModelType> sourceModelTypes, conversion::ModelType targetModelType,
-            const std::set<conversion::ModelType> auxilaryModelTypes, conversion::Options options) const;
+    bool convert();
+    bool addStopConditionFiles(const QStringList &files);
 
 private:
+    void convertModel(std::set<conversion::ModelType> sourceModelTypes, conversion::ModelType targetModelType,
+            const std::set<conversion::ModelType> auxilaryModelTypes, conversion::Options options) const;
+
+    bool convertSystem();
+    bool convertStopConditions();
+
+    bool convertInterfaceview(const QString &inputFilepath, const QString &outputFilepath);
+    bool convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath);
+    std::unique_ptr<ivm::IVModel> readInterfaceView(const QString &filepath);
+    QStringList findIvFunctions(const ivm::IVModel &model);
+    bool runSdl2Promela(const QFileInfo &systemStructure, const QFileInfo &functionFile, const QFileInfo &outputFile);
+    bool runSdl2PromelaForScl(const QFileInfo &inputFile, const QFileInfo &outputFile);
+
+private:
+    const QString m_inputIvFilepath;
+    const QString m_outputDirectory;
+    ivm::IVPropertyTemplateConfig *m_dynPropConfig;
+
+    QStringList m_stopConditionsFiles;
+
+    QString m_sdl2PromelaCommand;
+    QStringList m_sdl2PromelaArgs;
+    int m_externalCommandTimeout;
+
     conversion::Registry m_registry;
 };
 }

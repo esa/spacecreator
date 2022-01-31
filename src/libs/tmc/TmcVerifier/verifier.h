@@ -19,13 +19,7 @@
 
 #pragma once
 
-#include <QDir>
-#include <QFileInfo>
-#include <QList>
 #include <QStringList>
-#include <ivcore/ivmodel.h>
-#include <ivcore/ivpropertytemplateconfig.h>
-#include <memory>
 #include <tmc/TmcConverter/converter.h>
 
 namespace tmc::verifier {
@@ -38,28 +32,12 @@ public:
     bool execute();
 
 private:
-    bool convertSystem();
-    bool convertStopConditions();
     bool buildVerifier();
     bool executeVerifier();
 
-    bool convertInterfaceview(const QString &inputFilepath, const QString &outputFilepath);
-    bool convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath);
-    std::unique_ptr<ivm::IVModel> readInterfaceView(const QString &filepath);
-    QStringList findIvFunctions(const ivm::IVModel &model);
-    bool runSdl2Promela(const QFileInfo &systemStructure, const QFileInfo &functionFile, const QFileInfo &outputFile);
-    bool runSdl2PromelaForScl(const QFileInfo &inputFile, const QFileInfo &outputFile);
-
 private:
-    std::unique_ptr<::tmc::converter::TmcConverter> m_converter;
-    ivm::IVPropertyTemplateConfig *m_dynPropConfig;
-
     const QString m_inputIvFilepath;
     const QString m_outputDirectory;
-    QStringList m_stopConditionsFiles;
-
-    QString m_sdl2PromelaCommand;
-    QStringList m_sdl2PromelaArgs;
-    int m_externalCommandTimeout;
+    std::unique_ptr<::tmc::converter::TmcConverter> m_converter;
 };
 }
