@@ -215,8 +215,7 @@ auto SedsPlugin::importInterfaceView() -> void
     conversion::Options options;
     options.add(conversion::iv::IvOptions::outputFilepath,
             QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg(tmpIvFilename));
-    options.add(conversion::iv::IvOptions::configFilepath,
-            QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg(ivConfig));
+    options.add(conversion::iv::IvOptions::configFilepath, ivConfig);
     options.add(conversion::seds::SedsOptions::inputFilepath, inputFilePath);
 
     try {
