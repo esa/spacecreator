@@ -34,6 +34,7 @@
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/typefactory.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
+#include <promela/Asn1ToPromelaTranslator/promelatypesorter.h>
 #include <promela/Asn1ToPromelaTranslator/translator.h>
 #include <promela/Asn1ToPromelaTranslator/visitors/asn1nodevisitor.h>
 #include <promela/PromelaModel/promelamodel.h>
@@ -69,7 +70,7 @@ using promela::model::Utype;
 using promela::model::UtypeRef;
 using promela::model::ValueDefinition;
 using promela::translator::Asn1NodeVisitor;
-using promela::translator::Asn1ToPromelaTranslator;
+using promela::translator::PromelaTypeSorter;
 
 namespace tmc::test {
 
@@ -833,8 +834,8 @@ void tst_Asn1ToPromelaTranslator::testTypeSorting()
     Asn1NodeVisitor visitor(promelaModel, true);
     visitor.visit(*model);
 
-    Asn1ToPromelaTranslator translator;
-    translator.sortTypeDefinitions(promelaModel);
+    PromelaTypeSorter typeSorter;
+    typeSorter.sortTypeDefinitions(promelaModel);
 
     QCOMPARE(promelaModel.getMtypeValues().size(), 0);
     QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);

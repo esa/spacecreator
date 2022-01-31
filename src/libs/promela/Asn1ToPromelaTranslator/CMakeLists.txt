@@ -2,6 +2,7 @@ project(Asn1ToPromelaTranslator VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES
   translator.cpp
+  promelatypesorter.cpp
   visitors/asn1nodevisitor.cpp
   visitors/asn1sequencecomponentvisitor.cpp
   visitors/asn1sizevisitor.cpp
@@ -9,6 +10,7 @@ set(SOURCES
 )
 set(INCLUDES
   translator.h
+  promelatypesorter.h
   visitors/asn1nodevisitor.h
   visitors/asn1sequencecomponentvisitor.h
   visitors/asn1sizevisitor.h

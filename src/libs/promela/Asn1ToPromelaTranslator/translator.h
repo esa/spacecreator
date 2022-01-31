@@ -65,13 +65,6 @@ public:
      */
     auto getDependencies() const -> std::set<conversion::ModelType> override;
 
-    /**
-     * @brief   Sorts Utypes in PromelaModel, that the utype is always declared before use
-     *
-     * @param promelaModel Promela Model to sort utypes
-     */
-    auto sortTypeDefinitions(::promela::model::PromelaModel &promelaModel) const -> void;
-
 private:
     auto translateAsn1Model(const ::Asn1Acn::Asn1Model *model, bool enhancedSpinSupport) const
             -> std::vector<std::unique_ptr<conversion::Model>>;
