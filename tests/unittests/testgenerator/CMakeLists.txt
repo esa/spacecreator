@@ -26,6 +26,7 @@ target_link_libraries(${TEST_NAME}
 configure_file(resources/config.xml resources/config.xml COPYONLY)
 
 configure_file(resources/test_data.csv resources/test_data.csv COPYONLY)
+configure_file(resources/two_outputs-test_data.csv resources/two_outputs-test_data.csv COPYONLY)
 configure_file(resources/test_data_swapped_columns.csv resources/test_data_swapped_columns.csv COPYONLY)
 
 configure_file(resources/empty.csv resources/empty.csv COPYONLY)

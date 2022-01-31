@@ -216,7 +216,7 @@ void tst_testgenerator::testNominalSwappedColumns()
 
 void tst_testgenerator::testNominalTwoOutputs()
 {
-    auto csvModel = loadCsvModel("resources/test_data.csv");
+    auto csvModel = loadCsvModel("resources/two_outputs-test_data.csv");
     const csv::CsvModel &csvRef = *csvModel;
 
     const auto asn1ModelRaw = loadAsn1Model("resources/testgenerator.asn");
