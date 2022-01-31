@@ -19,18 +19,18 @@
 
 #pragma once
 
-#include "iveditorcore.h"
-#include "ivfunction.h"
-#include "ivmodel.h"
-#include "model.h"
-#include "options.h"
 #include "sedspluginconstants.h"
 
 #include <QStandardItemModel>
 #include <QStringList>
+#include <conversion/common/model.h>
+#include <conversion/common/options.h>
 #include <conversion/registry/registry.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <extensionsystem/iplugin.h>
+#include <ivcore/ivfunction.h>
+#include <ivcore/ivmodel.h>
+#include <libiveditor/iveditorcore.h>
 #include <memory>
 #include <shared/ui/listtreedialog.h>
 
