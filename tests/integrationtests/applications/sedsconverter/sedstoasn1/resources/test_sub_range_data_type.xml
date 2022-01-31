@@ -10,7 +10,29 @@
       </IntegerDataType>
       <SubRangeDataType name="SubRangeIntegerData" baseType="IntegerData">
         <Range>
-          <MinMaxRange rangeType="atLeast" min="10" max="50" />
+          <MinMaxRange rangeType="atLeast" min="10" />
+        </Range>
+      </SubRangeDataType>
+      <FloatDataType name="Float32">
+        <FloatDataEncoding encodingAndPrecision="IEEE754_2008_single" sizeInBits="32" />
+        <Range>
+          <PrecisionRange>single</PrecisionRange>
+        </Range>
+      </FloatDataType>
+      <SubRangeDataType name="SubRangeFloat32" baseType="Float32">
+        <Range>
+          <MinMaxRange rangeType="atMost" max="50" />
+        </Range>
+      </SubRangeDataType>
+      <FloatDataType name="Float64">
+        <FloatDataEncoding encodingAndPrecision="IEEE754_2008_double" sizeInBits="64" />
+        <Range>
+          <PrecisionRange>double</PrecisionRange>
+        </Range>
+      </FloatDataType>
+      <SubRangeDataType name="SubRangeFloat64" baseType="Float64">
+        <Range>
+          <PrecisionRange>single</PrecisionRange>
         </Range>
       </SubRangeDataType>
     </DataTypeSet>

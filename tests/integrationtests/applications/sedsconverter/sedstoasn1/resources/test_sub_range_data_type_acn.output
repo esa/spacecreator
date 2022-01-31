@@ -1,4 +1,8 @@
 COM-N7SPACE-SUBRANGEDATATYPE DEFINITIONS ::= BEGIN
 IntegerData [size 8, encoding pos-int]
 SubRangeIntegerData [size 8, encoding pos-int]
+Float32 [encoding IEEE754-1985-32, endianness big]
+SubRangeFloat32 [encoding IEEE754-1985-32, endianness big]
+Float64 [encoding IEEE754-1985-64, endianness big]
+SubRangeFloat64 [encoding IEEE754-1985-64, endianness big]
 END

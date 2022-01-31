@@ -208,7 +208,7 @@ void DataTypeTranslatorVisitor::operator()(const SubRangeDataType &sedsType)
         throw TranslationException(std::move(errorMessage));
     }
 
-    if (const auto integerBaseType = std::get_if<seds::model::IntegerDataType>(baseType)) {
+    if (std::get_if<seds::model::IntegerDataType>(baseType) != nullptr) {
         std::visit(*this, *baseType);
 
         m_asn1Type->setIdentifier(sedsType.nameStr());
@@ -218,10 +218,17 @@ void DataTypeTranslatorVisitor::operator()(const SubRangeDataType &sedsType)
 
         auto rangeTranslator = RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>(m_asn1Type.get());
         std::visit(rangeTranslator, sedsType.range());
-    } else if (const auto floatBaseType = std::get_if<seds::model::FloatDataType>(baseType)) {
-        Q_UNUSED(floatBaseType);
-    } else if (const auto enumBaseType = std::get_if<seds::model::EnumeratedDataType>(baseType)) {
-        Q_UNUSED(enumBaseType);
+    } else if (std::get_if<seds::model::FloatDataType>(baseType) != nullptr) {
+        std::visit(*this, *baseType);
+
+        m_asn1Type->setIdentifier(sedsType.nameStr());
+
+        auto realAsn1Type = dynamic_cast<Asn1Acn::Types::Real *>(m_asn1Type.get());
+        realAsn1Type->constraints().clear();
+
+        auto rangeTranslator = RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>(m_asn1Type.get());
+        std::visit(rangeTranslator, sedsType.range());
+    } else if (std::get_if<seds::model::EnumeratedDataType>(baseType) != nullptr) {
     } else {
         auto errorMessage =
                 QString("SubRangeDataType \"%1\" references type \"%2\" that is neither numeric nor enumerated")
