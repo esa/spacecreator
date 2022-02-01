@@ -114,11 +114,33 @@ public:
      */
     static auto ensureMinimalStateMachineExists(::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void;
 
+    /**
+     * @brief  Translate parameter maps into getter/setter procedures or input/output signals
+     *
+     * @param function          Function exposing the parameters
+     * @param parameterMaps     Parameter maps
+     * @param sdlProcess        Target SDL process
+     * @param stateMachine      Target state machine
+     */
     static auto translateParameterMaps(ivm::IVFunction *function,
             const seds::model::ComponentImplementation::ParameterMapSet &parameterMaps, ::sdl::Process *sdlProcess,
             ::sdl::StateMachine *stateMachine) -> void;
 
 private:
+    static auto getParameterSyncGetterInterface(
+            ivm::IVFunction *function, const QString interfaceName, const QString parameterName) -> ivm::IVInterface *;
+
+    static auto getParameterSyncSetterInterface(
+            ivm::IVFunction *function, const QString interfaceName, const QString parameterName) -> ivm::IVInterface *;
+
+    static auto createParameterSyncGetter(
+            ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::Process *sdlProcess) -> void;
+    static auto createParameterSyncSetter(
+            ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::Process *sdlProcess) -> void;
+
+    static auto translateParameter(ivm::IVFunction *function, const seds::model::ParameterMap &map,
+            ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void;
+
     static auto createStartTransition(const seds::model::StateMachine &sedsStateMachine, ::sdl::Process *sdlProcess,
             std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void;
 

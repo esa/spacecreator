@@ -220,7 +220,7 @@ auto StateMachineTranslator::ensureMinimalStateMachineExists(
     sdlProcess->setStartTransition(std::move(transition));
 }
 
-auto getInterfaceByName(ivm::IVFunction *function, QString name) -> ivm::IVInterface *
+static inline auto getInterfaceByName(ivm::IVFunction *function, QString name) -> ivm::IVInterface *
 {
     for (auto interface : function->allInterfaces()) {
         if (interface->title() == name) {
@@ -230,7 +230,7 @@ auto getInterfaceByName(ivm::IVFunction *function, QString name) -> ivm::IVInter
     return nullptr;
 }
 
-auto getParameterSyncGetterInterface(
+auto StateMachineTranslator::getParameterSyncGetterInterface(
         ivm::IVFunction *function, const QString interfaceName, const QString parameterName) -> ivm::IVInterface *
 {
     const auto name = Escaper::escapeIvName(QString("Get_%1_%2_Pi").arg(interfaceName).arg(parameterName));
@@ -238,11 +238,24 @@ auto getParameterSyncGetterInterface(
     if (interface == nullptr) {
         return nullptr;
     }
+    // We are interested in a sync (protected/unprotected) interface
     return interface->kind() == ivm::IVInterface::OperationKind::Sporadic ? nullptr : interface;
 }
 
-auto createParameterSyncGetter(
-        ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::Process *sdlProcess)
+auto StateMachineTranslator::getParameterSyncSetterInterface(
+        ivm::IVFunction *function, const QString interfaceName, const QString parameterName) -> ivm::IVInterface *
+{
+    const auto name = Escaper::escapeIvName(QString("Set_%1_%2_Pi").arg(interfaceName).arg(parameterName));
+    auto interface = getInterfaceByName(function, name);
+    if (interface == nullptr) {
+        return nullptr;
+    }
+    // We are interested in a sync (protected/unprotected) interface
+    return interface->kind() == ivm::IVInterface::OperationKind::Sporadic ? nullptr : interface;
+}
+
+auto StateMachineTranslator::createParameterSyncGetter(
+        ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::Process *sdlProcess) -> void
 {
     const auto paramName = Escaper::escapeAsn1FieldName(interface->params()[0].name());
     auto procedure = std::make_unique<::sdl::Procedure>(interface->title());
@@ -257,14 +270,34 @@ auto createParameterSyncGetter(
     sdlProcess->addProcedure(std::move(procedure));
 }
 
-auto translateParameter(ivm::IVFunction *function, const seds::model::ParameterMap &map, ::sdl::Process *sdlProcess,
-        ::sdl::StateMachine *stateMachine) -> void
+auto StateMachineTranslator::createParameterSyncSetter(
+        ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::Process *sdlProcess) -> void
+{
+    const auto paramName = Escaper::escapeAsn1FieldName(interface->params()[0].name());
+    auto procedure = std::make_unique<::sdl::Procedure>(interface->title());
+    auto parameter =
+            std::make_unique<::sdl::ProcedureParameter>(paramName, interface->params()[0].paramTypeName(), "in");
+    procedure->addParameter(std::move(parameter));
+    auto transition = std::make_unique<::sdl::Transition>();
+    const auto action =
+            QString("%1 := %2").arg(Escaper::escapeAsn1FieldName(map.variableRef().value().value()), paramName);
+    transition->addAction(std::make_unique<::sdl::Task>("", action));
+    procedure->setTransition(std::move(transition));
+    sdlProcess->addProcedure(std::move(procedure));
+}
+
+auto StateMachineTranslator::translateParameter(ivm::IVFunction *function, const seds::model::ParameterMap &map,
+        ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void
 {
     Q_UNUSED(stateMachine); // Left for handling async parameters
     // We depend on the SEDS -> IV translation
     const auto syncGetter = getParameterSyncGetterInterface(function, map.interface().value(), map.parameter().value());
     if (syncGetter != nullptr) {
         createParameterSyncGetter(syncGetter, map, sdlProcess);
+    }
+    const auto syncSetter = getParameterSyncSetterInterface(function, map.interface().value(), map.parameter().value());
+    if (syncSetter != nullptr) {
+        createParameterSyncSetter(syncSetter, map, sdlProcess);
     }
 }
 
