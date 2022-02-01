@@ -156,10 +156,11 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *
 
     const QString &signalParameterName = "signal_parameter";
 
-    std::unique_ptr<ProctypeElement> variableDecl = std::make_unique<ProctypeElement>(
-            Declaration(parameterType.isEmpty() ? DataType(BasicType::INT) : DataType(UtypeRef(parameterType)),
-                    signalParameterName));
-    sequence.appendElement(std::move(variableDecl));
+    if (!parameterType.isEmpty()) {
+        std::unique_ptr<ProctypeElement> variableDecl =
+                std::make_unique<ProctypeElement>(Declaration(DataType(UtypeRef(parameterType)), signalParameterName));
+        sequence.appendElement(std::move(variableDecl));
+    }
 
     std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>();
 
