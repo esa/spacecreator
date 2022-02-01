@@ -151,6 +151,19 @@ private:
     Type *m_asn1Type;
 };
 
+template<>
+void RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>::operator()(
+        const seds::model::MinMaxRange &range);
+template<>
+void RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>::operator()(
+        const seds::model::MinMaxRange &range);
+template<>
+void RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>::operator()(
+        const seds::model::FloatPrecisionRange &range);
+template<>
+void RangeTranslatorVisitor<Asn1Acn::Types::Enumerated, Asn1Acn::EnumValue>::operator()(
+        const seds::model::EnumeratedDataTypeRange &range);
+
 template<typename Type, typename ValueType>
 RangeTranslatorVisitor<Type, ValueType>::RangeTranslatorVisitor(Asn1Acn::Types::Type *asn1Type)
     : m_asn1Type(dynamic_cast<Type *>(asn1Type))
@@ -158,12 +171,28 @@ RangeTranslatorVisitor<Type, ValueType>::RangeTranslatorVisitor(Asn1Acn::Types::
 }
 
 template<typename Type, typename ValueType>
+void RangeTranslatorVisitor<Type, ValueType>::operator()(const seds::model::MinMaxRange &range)
+{
+    Q_UNUSED(range);
+    throw ::conversion::translator::TranslationException("Applying MinMaxRange on non-numeric data type is invalid");
+}
+
+template<typename Type, typename ValueType>
+void RangeTranslatorVisitor<Type, ValueType>::operator()(const seds::model::FloatPrecisionRange &range)
+{
+    Q_UNUSED(range);
+    throw ::conversion::translator::TranslationException(
+            "Applying FloatPrecisionRange on non-float data type is invalid");
+}
+
+template<typename Type, typename ValueType>
 void RangeTranslatorVisitor<Type, ValueType>::operator()(const seds::model::EnumeratedDataTypeRange &range)
 {
     Q_UNUSED(range);
-
-    throw conversion::translator::TranslationException("EnumeratedDataTypeRange not yet supported");
+    throw ::conversion::translator::TranslationException(
+            "Applying FloatPrecisionRange on non-enum data type is invalid");
 }
+
 template<typename Type, typename ValueType>
 void RangeTranslatorVisitor<Type, ValueType>::addValueConstraint(const typename ValueType::Type &value)
 {

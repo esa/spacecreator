@@ -154,11 +154,11 @@ void RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>::operator(
 }
 
 template<>
-void RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>::operator()(
-        const seds::model::FloatPrecisionRange &range)
+void RangeTranslatorVisitor<Asn1Acn::Types::Enumerated, Asn1Acn::EnumValue>::operator()(
+        const seds::model::EnumeratedDataTypeRange &range)
 {
     Q_UNUSED(range);
-    throw TranslationException("Applying FloatPrecisionRange on integer data types is invalid");
+    throw conversion::translator::TranslationException("EnumeratedDataTypeRange not yet supported");
 }
 
 template<>

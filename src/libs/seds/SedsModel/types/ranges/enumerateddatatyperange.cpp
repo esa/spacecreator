@@ -31,4 +31,12 @@ void EnumeratedDataTypeRange::addItem(Name item)
     m_items.push_back(std::move(item));
 }
 
+bool EnumeratedDataTypeRange::contains(const common::String itemName) const
+{
+    const auto found = std::find_if(
+            m_items.begin(), m_items.end(), [&itemName](const auto &item) { return item.value() == itemName; });
+
+    return found != m_items.end();
+}
+
 } // namespace seds::model

@@ -40,6 +40,8 @@ public:
     auto label() const -> const Name &;
     auto setLabel(common::String label) -> void;
 
+    auto nameStr() const -> const QString &;
+
 private:
     int32_t m_value;
     Name m_label;

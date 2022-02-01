@@ -35,6 +35,22 @@
           <PrecisionRange>single</PrecisionRange>
         </Range>
       </SubRangeDataType>
+      <EnumeratedDataType name="SimpleEnumeration">
+        <IntegerDataEncoding encoding="unsigned" byteOrder="bigEndian" sizeInBits="16" />
+        <EnumerationList>
+          <Enumeration value="12" label="Value1" />
+          <Enumeration value="15" label="Value2" />
+          <Enumeration value="19" label="Value3" />
+        </EnumerationList>
+      </EnumeratedDataType>
+      <SubRangeDataType name="SubRangeEnumeration" baseType="SimpleEnumeration">
+        <Range>
+          <EnumeratedRange>
+            <Label>Value1</Label>
+            <Label>Value3</Label>
+          </EnumeratedRange>
+        </Range>
+      </SubRangeDataType>
     </DataTypeSet>
   </Package>
 </PackageFile>

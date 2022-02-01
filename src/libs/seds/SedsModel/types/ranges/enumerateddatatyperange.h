@@ -39,6 +39,8 @@ public:
     auto items() const -> const Items &;
     auto addItem(Name item) -> void;
 
+    auto contains(const common::String itemName) const -> bool;
+
 private:
     Items m_items;
 };

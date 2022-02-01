@@ -5,4 +5,6 @@ Float32 [encoding IEEE754-1985-32, endianness big]
 SubRangeFloat32 [encoding IEEE754-1985-32, endianness big]
 Float64 [encoding IEEE754-1985-64, endianness big]
 SubRangeFloat64 [encoding IEEE754-1985-64, endianness big]
+SimpleEnumeration [size 16, encoding pos-int, endianness big]
+SubRangeEnumeration [size 16, encoding pos-int, endianness big]
 END

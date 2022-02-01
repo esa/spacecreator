@@ -79,6 +79,7 @@ public:
 
     using Items = QMap<QString, EnumeratedItem>;
 
+    Items &items() { return m_items; }
     const Items &items() const { return m_items; }
     void addItem(const EnumeratedItem &item);
 
