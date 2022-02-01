@@ -18,10 +18,14 @@
  */
 
 #include "../../src/qtcreator/sedsplugin/sedsplugin.h"
+#include "sedspluginwindow.h"
 
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtest.h>
+#include <QtTest/qtestkeyboard.h>
+#include <QtTest/qtestsystem.h>
+#include <qnamespace.h>
 #include <qobject.h>
 #include <qobjectdefs.h>
 
@@ -37,7 +41,38 @@ private slots:
 
 void SedsPlugin::letMeFail()
 {
-    QFAIL("ddd");
+    SedsPluginWindow window;
+    window.showMaximized();
+    window.activateWindow();
+
+    for (const auto &action : window.actions()) {
+        const auto actionMenu = action->menu();
+        if (actionMenu != nullptr) {
+            qDebug() << "action is not null";
+            actionMenu->showMaximized();
+        }
+    }
+    if (window.menuBar() != nullptr) {
+        window.menuBar()->show();
+    }
+
+    QTest::keyClick(&window, Qt::Key_Alt);
+    QTest::keyClick(&window, Qt::Key_T);
+    QTest::keyClick(&window, Qt::Key_E);
+    QTest::keyClick(&window, Qt::Key_Enter);
+
+    qDebug() << qApp->applicationName();
+    for (const auto &window : qApp->allWindows()) {
+        if (window != nullptr) {
+            qDebug() << "window is NOT null";
+            qDebug() << window->title();
+            window->showMaximized();
+        } else {
+            qDebug() << "window is null";
+        }
+    }
+
+    QTest::qWait(3 * 1000);
 }
 
 } // namespace sedsplugin
