@@ -20,6 +20,7 @@ target_link_libraries(TmcConverter
 	           Conversion::IvRegistrar
                Conversion::Asn1Registrar
                Conversion::PromelaRegistrar
+			   Tmc::SdlToPromelaConverter
     PRIVATE    CommonProjectWarnings)
 
 add_format_target(TmcConverter)

@@ -37,6 +37,7 @@
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivxmlreader.h>
 #include <promela/PromelaOptions/options.h>
+#include <tmc/SdlToPromelaConverter/converter.h>
 
 using conversion::ConversionException;
 using conversion::Converter;
@@ -59,6 +60,8 @@ using tmc::converter::TmcConverter;
 namespace tmc::converter {
 TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &outputDirectory)
     : m_inputIvFilepath(inputIvFilepath)
+    , m_outputDirectoryFilepath(outputDirectory)
+    , m_ivBaseDirectory(QFileInfo(m_inputIvFilepath).dir())
     , m_outputDirectory(outputDirectory)
 {
     Asn1Registrar asn1Registrar;
@@ -79,10 +82,6 @@ TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &output
 
     m_dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
     m_dynPropConfig->init(QLatin1String("default_attributes.xml"));
-
-    m_sdl2PromelaCommand = "sdl2promela";
-
-    m_externalCommandTimeout = 12000;
 }
 
 bool TmcConverter::convert()
@@ -133,7 +132,7 @@ bool TmcConverter::convertSystem()
 
     const QDir ivBaseDirectory = ivFileInfo.dir();
 
-    qDebug() << "Reding InterfaceView from " << ivFileInfo.absoluteFilePath();
+    qDebug() << "Reading InterfaceView from " << ivFileInfo.absoluteFilePath();
 
     std::unique_ptr<IVModel> inputIv = readInterfaceView(ivFileInfo.absoluteFilePath());
 
@@ -145,23 +144,21 @@ bool TmcConverter::convertSystem()
     const QStringList ivFunctionNames = findIvFunctions(*inputIv);
 
     for (const QString &ivFunction : ivFunctionNames) {
-        const QFileInfo systemStructure = ivBaseDirectory.absolutePath() + QDir::separator() + "work"
-                + QDir::separator() + ivFunction.toLower() + QDir::separator() + "SDL" + QDir::separator() + "src"
-                + QDir::separator() + "system_structure.pr";
-        const QFileInfo functionFile = ivBaseDirectory.absolutePath() + QDir::separator() + "work" + QDir::separator()
-                + ivFunction.toLower() + QDir::separator() + "SDL" + QDir::separator() + "src" + QDir::separator()
-                + ivFunction.toLower() + ".pr";
-        const QFileInfo outputFile = outputDirectory.absolutePath() + QDir::separator() + ivFunction.toLower() + ".pml";
+        QList<QFileInfo> sdlFiles;
+        sdlFiles.append(sdlSystemStructureLocation(ivFunction));
+        sdlFiles.append(sdlImplementationLocation(ivFunction));
+        const QFileInfo outputFile = outputFilepath(ivFunction.toLower() + ".pml");
 
-        if (!runSdl2Promela(systemStructure, functionFile, outputFile)) {
+        SdlToPromelaConverter sdl2Promela;
+
+        if (!sdl2Promela.convertSdl(sdlFiles, outputFile)) {
             return false;
         }
     }
 
     QStringList asn1Files;
 
-    const QFileInfo dataviewUniq = ivBaseDirectory.absolutePath() + QDir::separator() + "work" + QDir::separator()
-            + "dataview" + QDir::separator() + "dataview-uniq.asn";
+    const QFileInfo dataviewUniq = dataViewUniqLocation();
     if (!dataviewUniq.exists()) {
         qCritical() << "File " << dataviewUniq.absoluteFilePath() << " does not exist.";
         return false;
@@ -170,9 +167,7 @@ bool TmcConverter::convertSystem()
     asn1Files.append(dataviewUniq.absoluteFilePath());
 
     for (const QString &ivFunction : ivFunctionNames) {
-        const QFileInfo functionDatamodel = ivBaseDirectory.absolutePath() + QDir::separator() + "work"
-                + QDir::separator() + ivFunction.toLower() + QDir::separator() + "SDL" + QDir::separator() + "code"
-                + QDir::separator() + ivFunction.toLower() + "_datamodel.asn";
+        const QFileInfo functionDatamodel = sdlFunctionDatamodelLocation(ivFunction);
 
         if (!functionDatamodel.exists()) {
             qCritical() << "File " << functionDatamodel.absoluteFilePath() << " does not exist.";
@@ -182,11 +177,11 @@ bool TmcConverter::convertSystem()
         asn1Files.append(functionDatamodel.absoluteFilePath());
     }
 
-    const QFileInfo outputDataview = outputDirectory.absolutePath() + QDir::separator() + "dataview.pml";
+    const QFileInfo outputDataview = outputFilepath("dataview.pml");
 
     convertDataview(asn1Files, outputDataview.absoluteFilePath());
 
-    const QFileInfo outputSystemFile = outputDirectory.absolutePath() + QDir::separator() + "system.pml";
+    const QFileInfo outputSystemFile = outputFilepath("system.pml");
 
     convertInterfaceview(ivFileInfo.absoluteFilePath(), outputSystemFile.absoluteFilePath());
 
@@ -200,8 +195,10 @@ bool TmcConverter::convertStopConditions()
     for (const QString &filepath : m_stopConditionsFiles) {
         const QFileInfo input(filepath);
         const QString base = input.baseName();
-        const QFileInfo output = outputDirectory.absolutePath() + QDir::separator() + base.toLower() + ".pml";
-        if (runSdl2PromelaForScl(input, output)) {
+        const QFileInfo output = outputFilepath(base.toLower() + ".pml");
+
+        SdlToPromelaConverter sdl2Promela;
+        if (sdl2Promela.convertStopCondition(input, output)) {
             return false;
         }
     }
@@ -317,92 +314,42 @@ QStringList TmcConverter::findIvFunctions(const IVModel &model)
     return functionNames;
 }
 
-bool TmcConverter::runSdl2Promela(
-        const QFileInfo &systemStructure, const QFileInfo &functionFile, const QFileInfo &outputFile)
+QFileInfo TmcConverter::workDirectory() const
 {
-    if (!systemStructure.exists()) {
-        qCritical() << "File " << systemStructure.absoluteFilePath() << " does not exist.";
-        return false;
-    }
-    if (!functionFile.exists()) {
-        qCritical() << "File " << functionFile.absoluteFilePath() << " does not exist.";
-        return false;
-    }
-    qDebug() << "Converting SDL files:";
-    qDebug() << "    " << systemStructure.absoluteFilePath();
-    qDebug() << "    " << functionFile.absoluteFilePath();
-    qDebug() << "  to:";
-    qDebug() << "    " << outputFile.absoluteFilePath();
-    QStringList arguments = QStringList() << systemStructure.absoluteFilePath() << functionFile.absoluteFilePath()
-                                          << "-o" << outputFile.absoluteFilePath();
-
-    arguments.append(m_sdl2PromelaArgs);
-
-    QProcess process = QProcess();
-
-    qDebug() << "Executing: " << m_sdl2PromelaCommand << " with args:";
-    for (const QString &arg : arguments) {
-        qDebug() << "    " << arg;
-    }
-    process.start(m_sdl2PromelaCommand, arguments);
-
-    if (!process.waitForStarted()) {
-        qCritical("Cannot start process.");
-        QByteArray standardError = process.readAllStandardError();
-        QByteArray standardOutput = process.readAllStandardOutput();
-
-        QString str = QString(standardError);
-        qCritical() << "Stderr: " << str;
-        str = QString(standardOutput);
-        qCritical() << "Stdout: " << str;
-
-        process.terminate();
-        return false;
-    }
-
-    if (!process.waitForFinished(m_externalCommandTimeout)) {
-        qCritical() << "Timeout.";
-        process.terminate();
-        return false;
-    }
-
-    if (process.exitCode() != EXIT_SUCCESS) {
-        qCritical() << "Proces finished with code: " << process.exitCode();
-        return false;
-    }
-
-    qDebug() << "Process finished";
-
-    return true;
+    return m_ivBaseDirectory.absolutePath() + QDir::separator() + "work";
 }
 
-bool TmcConverter::runSdl2PromelaForScl(const QFileInfo &inputFile, const QFileInfo &outputFile)
+QFileInfo TmcConverter::dataViewUniqLocation() const
 {
-    qDebug() << "Converting Stop Conditions file: " << inputFile.absoluteFilePath() << " to "
-             << outputFile.absoluteFilePath();
-    QStringList arguments = QStringList()
-            << "--scl" << inputFile.absoluteFilePath() << "-o" << outputFile.absoluteFilePath();
-
-    arguments.append(m_sdl2PromelaArgs);
-
-    QProcess process = QProcess();
-
-    qDebug() << "Executing: " << m_sdl2PromelaCommand << " with args:";
-    for (const QString &arg : arguments) {
-        qDebug() << "    " << arg;
-    }
-    process.start(m_sdl2PromelaCommand, arguments);
-
-    if (!process.waitForFinished(m_externalCommandTimeout)) {
-        process.terminate();
-        return false;
-    }
-
-    if (process.exitCode() != EXIT_SUCCESS) {
-        return false;
-    }
-
-    return true;
+    return workDirectory().absoluteFilePath() + QDir::separator() + "dataview" + QDir::separator()
+            + "dataview-uniq.asn";
 }
 
+QFileInfo TmcConverter::sdlImplementationBaseDirectory(const QString &functionName) const
+{
+    return workDirectory().absoluteFilePath() + QDir::separator() + functionName.toLower() + QDir::separator() + "SDL";
+}
+
+QFileInfo TmcConverter::sdlImplementationLocation(const QString &functionName) const
+{
+    return sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator() + "src"
+            + QDir::separator() + functionName.toLower() + ".pr";
+}
+
+QFileInfo TmcConverter::sdlSystemStructureLocation(const QString &functionName) const
+{
+    return sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator() + "src"
+            + QDir::separator() + "system_structure.pr";
+}
+
+QFileInfo TmcConverter::sdlFunctionDatamodelLocation(const QString &functionName) const
+{
+    return sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator() + "code"
+            + QDir::separator() + functionName.toLower() + "_datamodel.asn";
+}
+
+QFileInfo TmcConverter::outputFilepath(const QString &name)
+{
+    return m_outputDirectory.absolutePath() + QDir::separator() + name;
+}
 }

@@ -73,19 +73,23 @@ private:
     bool convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath);
     std::unique_ptr<ivm::IVModel> readInterfaceView(const QString &filepath);
     QStringList findIvFunctions(const ivm::IVModel &model);
-    bool runSdl2Promela(const QFileInfo &systemStructure, const QFileInfo &functionFile, const QFileInfo &outputFile);
-    bool runSdl2PromelaForScl(const QFileInfo &inputFile, const QFileInfo &outputFile);
+
+    QFileInfo workDirectory() const;
+    QFileInfo dataViewUniqLocation() const;
+    QFileInfo sdlImplementationBaseDirectory(const QString &functionName) const;
+    QFileInfo sdlImplementationLocation(const QString &functionName) const;
+    QFileInfo sdlSystemStructureLocation(const QString &functionName) const;
+    QFileInfo sdlFunctionDatamodelLocation(const QString &functionName) const;
+    QFileInfo outputFilepath(const QString &name);
 
 private:
     const QString m_inputIvFilepath;
-    const QString m_outputDirectory;
+    const QString m_outputDirectoryFilepath;
+    const QDir m_ivBaseDirectory;
+    const QDir m_outputDirectory;
     ivm::IVPropertyTemplateConfig *m_dynPropConfig;
 
     QStringList m_stopConditionsFiles;
-
-    QString m_sdl2PromelaCommand;
-    QStringList m_sdl2PromelaArgs;
-    int m_externalCommandTimeout;
 
     conversion::Registry m_registry;
 };

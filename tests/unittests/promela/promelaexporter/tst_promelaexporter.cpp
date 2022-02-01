@@ -75,7 +75,7 @@ private Q_SLOTS:
     void testInitProctype();
     void testProctypeElements();
     void testDoLoop();
-    void testEqilpgueInclude();
+    void testEpilpgueInclude();
 
 private:
     QString getFileContents(const QString &filename);
@@ -544,7 +544,7 @@ void tst_PromelaExporter::testDoLoop()
     QCOMPARE(out, out2);
 }
 
-void tst_PromelaExporter::testEqilpgueInclude()
+void tst_PromelaExporter::testEpilpgueInclude()
 {
     PromelaModel model;
 
