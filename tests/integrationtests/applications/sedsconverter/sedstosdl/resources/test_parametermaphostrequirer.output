@@ -1,0 +1,16 @@
+/* CIF Process (0, 0), (800, 100) */
+process ParameterMapHostRequirer;
+    /* CIF Text (0, 150), (400, 500) */
+    dcl x Number;
+    dcl io_Get_IF_AsyncParam_Pi Number;
+    dcl io_Get_IF_AsyncRoParam_Pi Number;
+    dcl io_Set_IF_AsyncParam_Ri Number;
+    /* CIF ENDTEXT */
+    /* CIF Start (0, 900), (200, 75) */
+    START;
+        /* CIF NextState (0, 1087), (200, 50) */
+        NEXTSTATE Idle;
+    /* CIF State (0, 1162), (200, 50) */
+    state Idle;
+    endstate;
+endprocess ParameterMapHostRequirer;
