@@ -22,11 +22,28 @@
       </Interface>
     </DeclaredInterfaceSet>
     <ComponentSet>
-      <Component name="ParameterMapHost">
+      <Component name="ParameterMapHostProvider">
         <LongDescription></LongDescription>
         <ProvidedInterfaceSet>
           <Interface name="IF" type="IFType"></Interface>
         </ProvidedInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="x" type="Number"></Variable>
+          </VariableSet>
+          <ParameterMapSet>
+            <ParameterMap variableRef="x" interface="IF" parameter="SyncParam" />
+            <ParameterMap variableRef="x" parameter="AsyncParam" interface="IF" />
+            <ParameterMap variableRef="x" parameter="AsyncRoParam" interface="IF" />
+            <ParameterMap variableRef="x" parameter="SyncRoParam" interface="IF" />
+          </ParameterMapSet>
+        </Implementation>
+      </Component>
+      <Component name="ParameterMapHostRequirer">
+        <LongDescription></LongDescription>
+        <RequiredInterfaceSet>
+          <Interface name="IF" type="IFType"></Interface>
+        </RequiredInterfaceSet>
         <Implementation>
           <VariableSet>
             <Variable name="x" type="Number"></Variable>
