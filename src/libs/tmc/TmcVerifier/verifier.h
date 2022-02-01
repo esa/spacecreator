@@ -23,12 +23,33 @@
 #include <tmc/TmcConverter/converter.h>
 
 namespace tmc::verifier {
-class TmcVerifier
+/**
+ * @brief Main class uses to process formal model verification on TASTE project.
+ *
+ */
+class TmcVerifier final
 {
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param inputIvFilepath Path to XML interface view.
+     * @param outputDirectory Pat to output directory.
+     */
     TmcVerifier(const QString &inputIvFilepath, const QString &outputDirectory);
 
+    /**
+     * @brief Add Stop Condition files to verifier.
+     *
+     * @param files A list of paths with Stop Condition files.
+     * @return true if files exist, otherwise false.
+     */
     bool addStopConditionFiles(const QStringList &files);
+    /**
+     * @brief Prepare the system and process formal model verification.
+     *
+     * @return true if whole process succed, otherwise false
+     */
     bool execute();
 
 private:

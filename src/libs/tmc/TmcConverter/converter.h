@@ -30,12 +30,36 @@
 #include <memory>
 
 namespace tmc::converter {
+/**
+ * @brief Main class used to convert TASTE project to format ready for formal model verification.
+ */
 class TmcConverter
 {
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param inputIvFilepath Path to XML interface view.
+     * @param outputDirectory Pat to output directory for conversion results.
+     */
     TmcConverter(const QString &inputIvFilepath, const QString &outputDirectory);
 
+    /**
+     * @brief Process system conversion.
+     *
+     * This method converts interface view, data view and SDL into promela files.
+     *
+     * @return true if conversion succeed, otherwise false.
+     */
     bool convert();
+    /**
+     * @brief Add Stop Condition files to convert.
+     *
+     * This shall be called before @link{convert}
+     *
+     * @param files A list of paths with Stop Condition files.
+     * @return true if files exist, otherwise false.
+     */
     bool addStopConditionFiles(const QStringList &files);
 
 private:

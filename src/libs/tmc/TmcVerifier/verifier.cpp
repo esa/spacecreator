@@ -50,11 +50,13 @@ bool TmcVerifier::execute()
 
 bool TmcVerifier::buildVerifier()
 {
+    // TODO to implement
     return true;
 }
 
 bool TmcVerifier::executeVerifier()
 {
+    // TODO to implement
     return true;
 }
 
