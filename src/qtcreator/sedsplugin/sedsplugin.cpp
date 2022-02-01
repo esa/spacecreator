@@ -160,41 +160,79 @@ auto SedsPlugin::addSedsImportExport() -> void
     Context allContexts(Core::Constants::C_WELCOME_MODE, Core::Constants::C_EDIT_MODE, Core::Constants::C_DESIGN_MODE);
 
     ActionContainer *const acToolsSeds = createActionContainerInTools(tr("&Electronic Data Sheet"));
+    if (acToolsSeds == nullptr) {
+        // TODO: throw an exception here
+        return;
+    }
 
     const auto ivImportAction = new QAction(tr("Import InterfaceView from EDS"), this);
     connect(ivImportAction, &QAction::triggered, [=]() { this->importInterfaceView(); });
     Command *const ivImport = ActionManager::registerAction(ivImportAction, Constants::IV_IMPORT_ID, allContexts);
+    if (ivImport == nullptr) {
+        // TODO: throw an exception here
+        return;
+    }
     acToolsSeds->addAction(ivImport);
 
     const auto sdlImportAction = new QAction(tr("Import SDL from EDS"), this);
     connect(sdlImportAction, &QAction::triggered, [=]() { this->importSdl(); });
     Command *const sdlImport = ActionManager::registerAction(sdlImportAction, Constants::SDL_IMPORT_ID, allContexts);
+    if (sdlImport == nullptr) {
+        // TODO: throw an exception here
+        return;
+    }
     acToolsSeds->addAction(sdlImport);
 
     const auto asn1ImportAction = new QAction(tr("Import ASN.1 from EDS"), this);
     connect(asn1ImportAction, &QAction::triggered, [=]() { this->importAsn1(); });
     Command *const asn1Import = ActionManager::registerAction(asn1ImportAction, Constants::ASN1_IMPORT_ID, allContexts);
+    if (asn1Import == nullptr) {
+        // TODO: throw an exception here
+        throw "stuff";
+        return;
+    }
     acToolsSeds->addAction(asn1Import);
 
     const auto ivExportAction = new QAction(tr("Export InterfaceView to EDS"), this);
     connect(ivExportAction, &QAction::triggered, [=]() { this->exportInterfaceView(); });
     Command *const ivExport = ActionManager::registerAction(ivExportAction, Constants::IV_EXPORT_ID, allContexts);
+    if (ivExport == nullptr) {
+        // TODO: throw an exception here
+        return;
+    }
     acToolsSeds->addAction(ivExport);
 
     const auto asn1ExportAction = new QAction(tr("Export ASN.1 to EDS"), this);
     connect(asn1ExportAction, &QAction::triggered, [=]() { this->exportAsn1(); });
     Command *const asn1Export = ActionManager::registerAction(asn1ExportAction, Constants::ASN1_EXPORT_ID, allContexts);
+    if (asn1Export == nullptr) {
+        // TODO: throw an exception here
+        return;
+    }
     acToolsSeds->addAction(asn1Export);
 }
 
 auto SedsPlugin::createActionContainerInTools(const QString &title) -> ActionContainer *
 {
+    qDebug() << Constants::M_TOOLS_SEDS;
     ActionContainer *const container = ActionManager::createMenu(Constants::M_TOOLS_SEDS);
+    if (container == nullptr) {
+        // TODO: throw an exception here
+        return nullptr;
+    }
     QMenu *const sedsMenu = container->menu();
+    if (sedsMenu == nullptr) {
+        // TODO: throw an exception here
+        return nullptr;
+    }
     sedsMenu->setTitle(title);
     sedsMenu->setEnabled(true);
 
     ActionContainer *const tools = ActionManager::actionContainer(Core::Constants::M_TOOLS);
+    if (tools == nullptr) {
+        // TODO: throw an exception here
+        return nullptr;
+    }
     tools->addMenu(container);
 
     return container;
