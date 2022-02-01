@@ -79,6 +79,10 @@ TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &output
 
     m_dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
     m_dynPropConfig->init(QLatin1String("default_attributes.xml"));
+
+    m_sdl2PromelaCommand = "sdl2promela";
+
+    m_externalCommandTimeout = 12000;
 }
 
 bool TmcConverter::convert()
