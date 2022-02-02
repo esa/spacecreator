@@ -190,7 +190,7 @@ void RangeTranslatorVisitor<Type, ValueType>::operator()(const seds::model::Enum
 {
     Q_UNUSED(range);
     throw ::conversion::translator::TranslationException(
-            "Applying FloatPrecisionRange on non-enum data type is invalid");
+            "Applying EnumeratedDataTypeRange on non-enum data type is invalid");
 }
 
 template<typename Type, typename ValueType>
