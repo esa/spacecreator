@@ -136,10 +136,10 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     listResults(resultsTopDirWidgetItem, resultsFileInfo);
 
     // Set validators on MC options value fileds
-    d->ui->lineEdit_maxNumEnvRICalls->setValidator( new QIntValidator(0, 50, this) );
-    d->ui->lineEdit_maxNumScenarios->setValidator( new QIntValidator(0, 100, this) );
-    d->ui->lineEdit_maxNumStates->setValidator( new QIntValidator(0, 10000, this) );
-    d->ui->lineEdit_timeLimit->setValidator( new QIntValidator(0, 14400, this) );
+    d->ui->lineEdit_maxNumEnvRICalls->setValidator( new QIntValidator(0, 1000000, this) );
+    d->ui->lineEdit_maxNumScenarios->setValidator( new QIntValidator(0, 1000, this) );
+    d->ui->lineEdit_maxNumStates->setValidator( new QIntValidator(0, 10000000, this) );
+    d->ui->lineEdit_timeLimit->setValidator( new QIntValidator(0, 100000, this) );
 
     // set status bar text color
     statusBar()->setStyleSheet("color: blue");
@@ -1029,6 +1029,11 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
                              warningMsg.append(" Select at least one Function."));
         return;
     }
+    if (d->ui->lineEdit_maxNumEnvRICalls->text().size() > 0 && d->ui->comboBox_expAlgorithm->currentIndex() != 0){
+        QMessageBox::warning(this, tr("Save configuration"),
+                             warningMsg.append(" Environment calls constraint requires a DFS exploration!"));
+        return;
+    }
 
     // create and open configuration file
     if (!configFile.open(QFile::WriteOnly | QFile::Text)){
@@ -1090,6 +1095,11 @@ bool ModelCheckingWindow::saveConfiguration()
     if (functionSelection.size() < 1){
         QMessageBox::warning(this, tr("Save configuration"),
                              warningMsg.append(" Select at least one Function."));
+        return false;
+    }
+    if (d->ui->lineEdit_maxNumEnvRICalls->text().size() > 0 && d->ui->comboBox_expAlgorithm->currentIndex() != 0){
+        QMessageBox::warning(this, tr("Save configuration"),
+                             warningMsg.append(" Environment calls constraint requires a DFS exploration!"));
         return false;
     }
 
@@ -1160,6 +1170,20 @@ void ModelCheckingWindow::on_pushButton_loadConfiguration_clicked()
     setSubtypesSelection(reader.getSubtypesSelected());
     setFunctionsSelection(reader.getFunctionsSelected());
 
+    // check IF options validity
+    if (reader.getIfConfig().at(1) == "false" && reader.getIfConfig().at(2) == "false") {
+        QMessageBox::warning(this, tr("Load configuration"),
+                             tr("Invalid configuration file %1")
+                             .arg(QDir::toNativeSeparators(configFilePath)));
+        return;
+    }
+    if (reader.getIfConfig().at(4).size() > 0 && reader.getIfConfig().at(5) != "dfs") {
+        QMessageBox::warning(this, tr("Load configuration"),
+                             tr("Invalid configuration file %1")
+                             .arg(QDir::toNativeSeparators(configFilePath)));
+        return;
+    }
+
     // set IF config params
     d->ui->lineEdit_maxNumScenarios->setText(reader.getIfConfig().at(0));
     reader.getIfConfig().at(1) == "true" ? d->ui->checkBox_errorScenarios->setCheckState(Qt::Checked) : d->ui->checkBox_errorScenarios->setCheckState(Qt::Unchecked);
@@ -1219,6 +1243,18 @@ void ModelCheckingWindow::setFunctionsSelection(QStringList functionsSelected){
     // rebuild tree with selection
     listModelFunctions(this->functionsTopNodeWidgetItem, functionsSelected);
 
+}
+
+void ModelCheckingWindow::on_checkBox_errorScenarios_stateChanged(int arg1){
+    if(!d->ui->checkBox_errorScenarios->isChecked()){
+        d->ui->checkBox_successScenarios->setCheckState(Qt::CheckState::Checked);
+    }
+}
+
+void ModelCheckingWindow::on_checkBox_successScenarios_stateChanged(int arg1){
+    if(!d->ui->checkBox_successScenarios->isChecked()){
+        d->ui->checkBox_errorScenarios->setCheckState(Qt::CheckState::Checked);
+    }
 }
 
 }

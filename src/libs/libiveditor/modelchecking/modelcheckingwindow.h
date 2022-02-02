@@ -73,6 +73,8 @@ private Q_SLOTS:
     void setPropertiesSelection(QStringList propertiesSelected);
     void setSubtypesSelection(QStringList subtypesSelected);
     void setFunctionsSelection(QStringList functionsSelected);
+    void on_checkBox_errorScenarios_stateChanged(int arg1);
+    void on_checkBox_successScenarios_stateChanged(int arg1);
 
 private:
     QString propertiesPath;
