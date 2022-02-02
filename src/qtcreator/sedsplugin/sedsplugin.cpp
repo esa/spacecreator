@@ -312,8 +312,7 @@ auto SedsPlugin::importAsn1() -> void
     options.add(conversion::asn1::Asn1Options::acnFilepathPrefix, "");
     QStringList asn1Filenames;
     try {
-        const auto outputModels =
-                convert({ conversion::ModelType::Seds }, { conversion::ModelType::Asn1 }, {}, options);
+        const auto outputModels = convert({ conversion::ModelType::Seds }, conversion::ModelType::Asn1, {}, options);
         asn1Filenames = getAsnModelFilenames(outputModels);
     } catch (conversion::ConverterException &ex) {
         MessageManager::write(GenMsg::msgError.arg(ex.what()));
@@ -329,7 +328,7 @@ auto SedsPlugin::importAsn1() -> void
 
 auto SedsPlugin::exportInterfaceView() -> void
 {
-    const auto ivEditorCore = getCurIvEditorCore();
+    const auto ivEditorCore = getCurrentIvEditorCore();
     const auto ivFunctionsNames = ivEditorCore->ivFunctionsNames();
     if (ivFunctionsNames.empty()) {
         MessageManager::write(GenMsg::msgError.arg(GenMsg::ivNoFunctionsInIv));
@@ -425,7 +424,7 @@ auto SedsPlugin::exportAsn1() -> void
         options.add(conversion::seds::SedsOptions::outputFilepath,
                 QString("%1%2%3.xml").arg(outputDir).arg(QDir::separator()).arg(getFileName(asn1Names[i])));
         try {
-            convert({ conversion::ModelType::Asn1 }, { conversion::ModelType::Seds }, {}, options);
+            convert({ conversion::ModelType::Asn1 }, conversion::ModelType::Seds, {}, options);
             MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesExported));
         } catch (conversion::ConverterException &ex) {
             MessageManager::write(GenMsg::msgError.arg(ex.what()));
@@ -490,7 +489,7 @@ auto SedsPlugin::ltdialogUpdateWithItemModel(ListTreeDialog &ltdialog, QStandard
     ltdialog.setWindowTitle("IV functions to be exported");
 }
 
-auto SedsPlugin::getCurIvEditorCore() -> IVEditorCorePtr
+auto SedsPlugin::getCurrentIvEditorCore() -> IVEditorCorePtr
 {
     auto *const currentDocument = EditorManager::currentDocument();
     auto *const currentIvDocument = static_cast<IVEditorDocument *>(currentDocument);
@@ -576,7 +575,7 @@ auto SedsPlugin::loadSedsModel(const QString &sedsFilename) -> std::unique_ptr<c
 
 auto SedsPlugin::getCurrentIvModel() -> ivm::IVModel *
 {
-    const auto curIvEditorCore = getCurIvEditorCore();
+    const auto curIvEditorCore = getCurrentIvEditorCore();
     if (curIvEditorCore == nullptr) {
         MessageManager::write(GenMsg::msgError.arg("IV Editor core could not be read"));
         return nullptr;
@@ -619,7 +618,7 @@ auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel 
         return;
     }
 
-    const auto curIvEditorCore = getCurIvEditorCore();
+    const auto curIvEditorCore = getCurrentIvEditorCore();
     if (curIvEditorCore == nullptr) {
         MessageManager::write(GenMsg::msgError.arg("Current IV Editor Core could not be read"));
         return;

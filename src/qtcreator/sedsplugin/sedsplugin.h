@@ -63,7 +63,7 @@ private:
             const std::set<conversion::ModelType> &auxModelTypes, conversion::Options options)
             -> std::vector<std::unique_ptr<conversion::Model>>;
     auto ltdialogUpdateWithItemModel(ListTreeDialog &ltdialog, QStandardItemModel *model) -> void;
-    auto getCurIvEditorCore() -> IVEditorCorePtr;
+    auto getCurrentIvEditorCore() -> IVEditorCorePtr;
     auto mergeIvModels(ivm::IVModel *dstIvModel, ivm::IVModel *srcIvModel) -> void;
     auto loadIvModel(const QString &ivConfigFilename, const QString &ivFilename) -> std::unique_ptr<conversion::Model>;
     auto loadSedsModel(const QString &sedsFilename) -> std::unique_ptr<conversion::Model>;
