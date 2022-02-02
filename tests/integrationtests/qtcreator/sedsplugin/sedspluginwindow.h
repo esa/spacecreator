@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "coreplugin.h"
 #include "sedsplugin.h"
 
 #include <QtWidgets>
@@ -40,6 +41,7 @@ private:
     bool loadPlugin();
 
     spctr::SedsPlugin m_sedsPlugin;
+    Core::Internal::CorePlugin m_corePlugin;
 };
 
 } // namespace sedsplugin

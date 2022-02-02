@@ -9,11 +9,13 @@ add_executable(${TEST_NAME}
 
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
+# TODO: this should be private linking
 target_link_libraries(${TEST_NAME} PUBLIC
     -L"${QTC_LIB_DIR}"
     -L"${QTC_PLUGINS_DIR}"
     commontestlib
     SedsPlugin
+    Core
     ${QT_CORE}
     ${QT_TEST}
 )

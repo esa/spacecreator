@@ -19,6 +19,7 @@
 
 #include "sedspluginwindow.h"
 
+#include "actionmanager/actionmanager.h"
 #include "sedsplugin.h"
 
 #include <qboxlayout.h>
@@ -47,25 +48,9 @@ SedsPluginWindow::SedsPluginWindow()
     menu->addSeparator();
     menu = menuBar()->addMenu(tr("Tools"));
 
+    // m_corePlugin.initialize({"no args"});
     QString errors;
     m_sedsPlugin.initialize({ "no args" }, &errors);
-
-    // Core::ActionManager::instance();
-
-    // for (const auto &command : Core::ActionManager::commands()) {
-    //     qDebug() << "command id" << command->id();
-    //     qDebug() << command->objectName();
-    //     for (const auto &c : command->context()) {
-    //         qDebug() << c.name();
-    //         qDebug() << c.toString();
-    //     }
-    // }
-
-    // for (const auto &child : Core::ActionManager::instance()->children()) {
-    //     qDebug() << child->objectName();
-    // }
-
-    // Core::ActionManager::createMenu("Menu.Tools");
 }
 
 } // namespace sedsplugin
