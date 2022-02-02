@@ -71,7 +71,7 @@ private:
     auto loadAndMergeIvModelIntoCurrent(const QString &ivConfig, const QString &ivFilename) -> bool;
     auto addFunctionToModel(ivm::IVFunction *srcFun, ivm::IVModel *model) -> void;
     auto doesModelContainFunction(ivm::IVModel *model, ivm::IVFunction *function) -> bool;
-    auto addFilesToCurProject(QStringList filenames, const QString &path) -> void;
+    auto addFilesToCurrentProject(QStringList filenames, const QString &path) -> void;
     auto getAsnModelFilenames(const std::vector<std::unique_ptr<conversion::Model>> &models) -> QStringList;
     auto getSdlModelFilenames(const std::vector<std::unique_ptr<conversion::Model>> &models) -> QStringList;
 

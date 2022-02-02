@@ -239,7 +239,7 @@ auto SedsPlugin::importInterfaceView() -> void
         return;
     }
 
-    addFilesToCurProject(asn1Filenames, QDir::currentPath());
+    addFilesToCurrentProject(asn1Filenames, QDir::currentPath());
     MessageManager::write(GenMsg::msgInfo.arg(GenMsg::functionsImported));
     QFile(tmpIvFilename).remove();
 }
@@ -292,7 +292,7 @@ auto SedsPlugin::importSdl() -> void
         return;
     }
 
-    addFilesToCurProject(asn1Filenames, QDir::currentPath());
+    addFilesToCurrentProject(asn1Filenames, QDir::currentPath());
     MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesImported));
     QFile(tmpIvFilename).remove();
 }
@@ -322,7 +322,7 @@ auto SedsPlugin::importAsn1() -> void
         MessageManager::write(GenMsg::msgError.arg(ex.what()));
     }
 
-    addFilesToCurProject(asn1Filenames, QDir::currentPath());
+    addFilesToCurrentProject(asn1Filenames, QDir::currentPath());
     MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesImported));
 }
 
@@ -644,7 +644,7 @@ auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel 
     }
 }
 
-auto SedsPlugin::addFilesToCurProject(QStringList filenames, const QString &path) -> void
+auto SedsPlugin::addFilesToCurrentProject(QStringList filenames, const QString &path) -> void
 {
     for (auto &filename : filenames) {
         filename = QString("%1%2%3").arg(path).arg(QDir::separator()).arg(filename);
