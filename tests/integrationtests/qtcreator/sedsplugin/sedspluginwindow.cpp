@@ -44,8 +44,11 @@ SedsPluginWindow::SedsPluginWindow()
     menu = menuBar()->addMenu(tr("Edit"));
     menu->addSeparator();
     menu = menuBar()->addMenu(tr("&Help"));
-
+    menu->addSeparator();
     menu = menuBar()->addMenu(tr("Tools"));
+
+    QString errors;
+    m_sedsPlugin.initialize({ "no args" }, &errors);
 
     // Core::ActionManager::instance();
 
@@ -63,38 +66,6 @@ SedsPluginWindow::SedsPluginWindow()
     // }
 
     // Core::ActionManager::createMenu("Menu.Tools");
-
-    if (!loadPlugin()) {
-        QMessageBox::information(this, "ERROR", "plugin could not be loaded");
-    }
-}
-
-bool SedsPluginWindow::loadPlugin()
-{
-    for (const auto &path : QCoreApplication::libraryPaths()) {
-        if (path.contains("plugin")) {
-            QDir pluginsDir(path);
-
-            const QStringList entries = pluginsDir.entryList(QDir::Files);
-            for (const QString &fileName : entries) {
-                QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
-                QObject *plugin = pluginLoader.instance();
-                if (plugin) {
-                    m_sedsPlugin = qobject_cast<spctr::SedsPlugin *>(plugin);
-                    if (m_sedsPlugin != nullptr) {
-                        m_sedsPlugin->dumpObjectInfo();
-                        m_sedsPlugin->dumpObjectTree();
-                        QString errorStr = "x";
-                        m_sedsPlugin->initialize({ "tttt" }, &errorStr);
-                        return true;
-                    }
-                    pluginLoader.unload();
-                }
-            }
-        }
-    }
-
-    return false;
 }
 
 } // namespace sedsplugin

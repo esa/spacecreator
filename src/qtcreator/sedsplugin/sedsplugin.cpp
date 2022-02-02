@@ -214,8 +214,11 @@ auto SedsPlugin::addSedsImportExport() -> void
 
 auto SedsPlugin::createActionContainerInTools(const QString &title) -> ActionContainer *
 {
-    ActionManager::instance()->dumpObjectInfo();
-    ActionManager::instance()->dumpObjectTree();
+    if (ActionManager::instance() == nullptr) {
+        qDebug() << "ActionManager::instance is null";
+        return nullptr;
+    }
+
     ActionContainer *const container = ActionManager::createMenu(Constants::M_TOOLS_SEDS);
     if (container == nullptr) {
         // TODO: throw an exception here

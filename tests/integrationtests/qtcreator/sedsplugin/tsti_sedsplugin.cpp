@@ -44,9 +44,16 @@ void SedsPlugin::letMeFail()
 {
     shared::initSharedLibrary();
 
+    // current application - test runner
+    qDebug() << qApp->applicationName();
+
+    // window with loaded SedsPlugin - software under test
     SedsPluginWindow window;
-    window.showMaximized();
     window.activateWindow();
+    if (window.menuBar() != nullptr) {
+        window.menuBar()->show();
+    }
+    window.showMaximized();
 
     for (const auto &action : window.actions()) {
         const auto actionMenu = action->menu();
@@ -55,25 +62,14 @@ void SedsPlugin::letMeFail()
             actionMenu->showMaximized();
         }
     }
-    if (window.menuBar() != nullptr) {
-        window.menuBar()->show();
-    }
 
-    QTest::keyClick(&window, Qt::Key_Alt);
-    QTest::keyClick(&window, Qt::Key_T);
-    QTest::keyClick(&window, Qt::Key_E);
-    QTest::keyClick(&window, Qt::Key_Enter);
+    // exercise:
+    // QTest::keyClick(&window, Qt::Key_Alt);
+    // QTest::keyClick(&window, Qt::Key_T);
+    // QTest::keyClick(&window, Qt::Key_E);
+    // QTest::keyClick(&window, Qt::Key_Enter);
 
-    qDebug() << qApp->applicationName();
-    for (const auto &window : qApp->allWindows()) {
-        if (window != nullptr) {
-            qDebug() << "window is NOT null";
-            qDebug() << window->title();
-            window->showMaximized();
-        } else {
-            qDebug() << "window is null";
-        }
-    }
+    // check that ASN.1 files were imported
 
     QTest::qWait(3 * 1000);
 }

@@ -39,7 +39,7 @@ public:
 private:
     bool loadPlugin();
 
-    spctr::SedsPlugin *m_sedsPlugin;
+    spctr::SedsPlugin m_sedsPlugin;
 };
 
 } // namespace sedsplugin
