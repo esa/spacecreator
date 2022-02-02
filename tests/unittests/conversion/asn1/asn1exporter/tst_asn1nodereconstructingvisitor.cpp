@@ -412,6 +412,29 @@ void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentNestedSequence()
     QCOMPARE(actual, expected);
 }
 
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentSequenceWithAcn()
+{
+    auto type = std::make_unique<Types::Sequence>();
+    type->addComponent(std::make_unique<AsnSequenceComponent>(QStringLiteral("seq1"), QStringLiteral("seq1"), true,
+            std::nullopt, QStringLiteral(""), SourceLocation(),
+            Types::TypeFactory::createBuiltinType(QStringLiteral("INTEGER"))));
+
+    type->addComponent(std::make_unique<AcnSequenceComponent>(QStringLiteral("seq2"), QStringLiteral("seq2"),
+            Types::TypeFactory::createBuiltinType(QStringLiteral("REAL"))));
+
+    auto actual = createComponentialTypeAssignmentValue(std::move(type));
+
+    // clang-format off
+    QString expected =
+        "MyType ::= SEQUENCE \n"
+        "{ \n"
+        "    seq1 INTEGER\n"
+        "} \n";
+    // clang-format on
+
+    QCOMPARE(actual, expected);
+}
+
 void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentSequenceOf()
 {
     auto type = std::make_unique<Types::SequenceOf>();
