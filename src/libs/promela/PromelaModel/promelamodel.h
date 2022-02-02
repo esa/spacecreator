@@ -117,6 +117,12 @@ public:
      * @return All Utypes of the model
      */
     const QList<Utype> &getUtypes() const noexcept;
+    /**
+     * @brief Setter for user defined types.
+     *
+     * @param utypes list of Utypes to set
+     */
+    void setUtypes(const QList<Utype> &utypes);
 
     /**
      * @brief Add TypeAlias - alias for type to the model.
@@ -205,6 +211,22 @@ public:
      */
     void setInit(InitProctype initProctype);
 
+    /**
+     * @brief Add epilogue include file
+     *
+     * File will be included after other definitions
+     *
+     * @param file filepath to the promela file
+     */
+    void addEpilogueInclude(const QString &file);
+
+    /**
+     * @brief Getter for all epilogue included propmela files
+     *
+     * @return List of all epilogue included promela files
+     */
+    const QList<QString> &getEpilogueIncludes() const noexcept;
+
 private:
     QList<QString> m_includes;
     QSet<QString> m_mtypeValues;
@@ -216,6 +238,7 @@ private:
     std::list<std::unique_ptr<InlineDef>> m_inlineDefs;
     std::list<std::unique_ptr<Proctype>> m_proctypes;
     std::optional<InitProctype> m_initProctype;
+    QList<QString> m_epilogueIncludes;
 };
 }
 

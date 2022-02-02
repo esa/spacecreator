@@ -24,12 +24,14 @@
 #include <ivcore/ivconnection.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
+#include <promela/PromelaOptions/options.h>
 #include <shared/exportableproperty.h>
 
 using conversion::Escaper;
 using conversion::Model;
 using conversion::ModelType;
 using conversion::Options;
+using conversion::promela::PromelaOptions;
 using conversion::translator::TranslationException;
 using ivm::IVConnection;
 using ivm::IVFunction;
@@ -64,7 +66,7 @@ namespace promela::translator {
 std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
         std::vector<Model *> sourceModels, const Options &options) const
 {
-    Q_UNUSED(options);
+    const std::vector<QString> additionalIncludes = options.values(PromelaOptions::additionalIncludes);
 
     std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
 
@@ -99,6 +101,10 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     promelaModel->addDeclaration(Declaration(DataType(UtypeRef("system_state")), "global_state"));
 
     promelaModel->setInit(generateInitProctype(functionNames));
+
+    for (const QString &additionalInclude : additionalIncludes) {
+        promelaModel->addEpilogueInclude(additionalInclude);
+    }
 
     std::vector<std::unique_ptr<Model>> result;
     result.push_back(std::move(promelaModel));
@@ -156,10 +162,11 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *
 
     const QString &signalParameterName = "signal_parameter";
 
-    std::unique_ptr<ProctypeElement> variableDecl = std::make_unique<ProctypeElement>(
-            Declaration(parameterType.isEmpty() ? DataType(BasicType::INT) : DataType(UtypeRef(parameterType)),
-                    signalParameterName));
-    sequence.appendElement(std::move(variableDecl));
+    if (!parameterType.isEmpty()) {
+        std::unique_ptr<ProctypeElement> variableDecl =
+                std::make_unique<ProctypeElement>(Declaration(DataType(UtypeRef(parameterType)), signalParameterName));
+        sequence.appendElement(std::move(variableDecl));
+    }
 
     std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>();
 

@@ -21,10 +21,8 @@
 
 #include "specialized/interfacecommandtranslator.h"
 
-#include <map>
 #include <seds/SedsModel/types/datatype.h>
 #include <shared/qstringhash.h>
-#include <unordered_map>
 
 namespace seds::model {
 class CommandArgument;
@@ -84,6 +82,18 @@ public:
             ivm::IVInterface::InterfaceType interfaceType) -> void override;
 
 private:
+    struct CommandArgumentData final {
+        QString name;
+        QString typeName;
+
+        friend bool operator==(const CommandArgumentData &lhs, const CommandArgumentData &rhs)
+        {
+            return lhs.name == rhs.name && lhs.typeName == rhs.typeName;
+        }
+
+        friend bool operator!=(const CommandArgumentData &lhs, const CommandArgumentData &rhs) { return !(lhs == rhs); }
+    };
+
     /**
      * @brief   Translates arguments of a SEDS interface command
      *
@@ -116,7 +126,7 @@ private:
      *
      * @return  Bundled type name
      */
-    auto createBundledType(const QString &sedsCommandName, const std::unordered_map<QString, QString> &arguments)
+    auto createBundledType(const QString &sedsCommandName, const std::vector<CommandArgumentData> &arguments)
             -> QString;
     /**
      * @brief   Filters all arguments by their mode
@@ -127,7 +137,18 @@ private:
      * @return  Matching arguments
      */
     auto filterArguments(const std::vector<seds::model::CommandArgument> &sedsArguments,
-            seds::model::CommandArgumentMode requestedArgumentMode) const -> std::unordered_map<QString, QString>;
+            seds::model::CommandArgumentMode requestedArgumentMode) const -> std::vector<CommandArgumentData>;
+
+    /**
+     * @brief   Creates ASN.1 sequence component type
+     *
+     * Added the created sequence component to the passed ASN.1 sequence
+     *
+     * @param   argumentData    Argument data from which sequence component should be created
+     * @param   sequence        Sequence to which component should be added
+     */
+    auto createAsn1SequenceComponent(const CommandArgumentData &argumentData, Asn1Acn::Types::Sequence *sequence) const
+            -> void;
 
     /**
      * @brief   Calculates hash from arguments types
@@ -136,7 +157,7 @@ private:
      *
      * @return  Calculated hash
      */
-    auto calculateArgumentsHash(const std::unordered_map<QString, QString> &arguments) const -> std::size_t;
+    auto calculateArgumentsHash(const std::vector<CommandArgumentData> &arguments) const -> std::size_t;
 
     /**
      *  Create a name for the bundled argument type
@@ -151,9 +172,9 @@ private:
     struct ArgumentsCacheEntry final {
         QString asn1TypeName;
         std::size_t typeHash;
-        std::unordered_map<QString, QString> typeArguments;
+        std::vector<CommandArgumentData> typeArguments;
 
-        auto compareArguments(const std::unordered_map<QString, QString> &arguments) const -> bool;
+        auto compareArguments(const std::vector<CommandArgumentData> &arguments) const -> bool;
     };
 
     /// @brief  Cache of the bundled ASN.1 types that was created for given command

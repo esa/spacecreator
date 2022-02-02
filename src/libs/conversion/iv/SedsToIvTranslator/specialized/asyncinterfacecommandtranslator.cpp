@@ -20,6 +20,7 @@
 #include "specialized/asyncinterfacecommandtranslator.h"
 
 #include <QDebug>
+#include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
@@ -146,15 +147,15 @@ QString AsyncInterfaceCommandTranslator::buildBundledType(
     return bundledTypeName;
 }
 
-QString AsyncInterfaceCommandTranslator::createBundledType(
-        const QString &sedsCommandName, const std::unordered_map<QString, QString> &arguments)
+QString AsyncInterfaceCommandTranslator::createBundledType(const QString &sedsCommandName,
+        const std::vector<AsyncInterfaceCommandTranslator::CommandArgumentData> &arguments)
 {
     auto name = createBundledTypeName(sedsCommandName);
 
     auto sequence = std::make_unique<Asn1Acn::Types::Sequence>(name);
 
-    for (const auto &[argumentName, argumentTypeName] : arguments) {
-        createAsn1SequenceComponent(argumentName, argumentTypeName, sequence.get());
+    for (const auto &argumentData : arguments) {
+        createAsn1SequenceComponent(argumentData, sequence.get());
     }
 
     auto typeAssignment =
@@ -164,30 +165,56 @@ QString AsyncInterfaceCommandTranslator::createBundledType(
     return name;
 }
 
-std::unordered_map<QString, QString> AsyncInterfaceCommandTranslator::filterArguments(
+std::vector<AsyncInterfaceCommandTranslator::CommandArgumentData> AsyncInterfaceCommandTranslator::filterArguments(
         const std::vector<seds::model::CommandArgument> &sedsArguments,
         seds::model::CommandArgumentMode requestedArgumentMode) const
 {
-    std::unordered_map<QString, QString> arguments;
+    std::vector<CommandArgumentData> arguments;
 
     for (const auto &sedsArgument : sedsArguments) {
         if (sedsArgument.mode() == requestedArgumentMode) {
             const auto sedsArgumentNameEscaped = Escaper::escapeAsn1FieldName(sedsArgument.nameStr());
             const auto sedsArgumentTypeName = handleArgumentType(sedsArgument);
-            arguments.insert({ sedsArgumentNameEscaped, sedsArgumentTypeName });
+
+            arguments.push_back({ sedsArgumentNameEscaped, sedsArgumentTypeName });
         }
     }
 
     return arguments;
 }
 
+void AsyncInterfaceCommandTranslator::createAsn1SequenceComponent(
+        const AsyncInterfaceCommandTranslator::CommandArgumentData &argumentData,
+        Asn1Acn::Types::Sequence *sequence) const
+{
+    const auto &typeName = argumentData.typeName;
+
+    const auto *referencedTypeAssignment = m_asn1Definitions->type(typeName);
+
+    if (!referencedTypeAssignment) {
+        auto errorMessage =
+                QString("Type %1 not found while creating ASN.1 sequence %2").arg(typeName).arg(sequence->identifier());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto *referencedType = referencedTypeAssignment->type();
+
+    auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(typeName, m_asn1Definitions->name());
+    sequenceComponentType->setType(referencedType->clone());
+
+    const auto &name = argumentData.name;
+    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
+            name, name, false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(sequenceComponentType));
+    sequence->addComponent(std::move(sequenceComponent));
+}
+
 std::size_t AsyncInterfaceCommandTranslator::calculateArgumentsHash(
-        const std::unordered_map<QString, QString> &arguments) const
+        const std::vector<AsyncInterfaceCommandTranslator::CommandArgumentData> &arguments) const
 {
     std::size_t typeHash = 0;
 
-    for (const auto &[name, typeName] : arguments) {
-        const auto typeNameHash = std::hash<QString> {}(typeName);
+    for (const auto &argumentData : arguments) {
+        const auto typeNameHash = std::hash<QString> {}(argumentData.typeName);
 
         if (typeHash == 0) {
             typeHash = typeNameHash;
@@ -212,7 +239,7 @@ QString AsyncInterfaceCommandTranslator::createBundledTypeName(const QString &se
 }
 
 bool AsyncInterfaceCommandTranslator::ArgumentsCacheEntry::compareArguments(
-        const std::unordered_map<QString, QString> &arguments) const
+        const std::vector<AsyncInterfaceCommandTranslator::CommandArgumentData> &arguments) const
 {
     if (typeArguments.size() != arguments.size()) {
         return false;

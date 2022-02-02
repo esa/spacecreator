@@ -19,10 +19,11 @@
 
 #include "translator.h"
 
+#include "promelatypesorter.h"
 #include "visitors/asn1nodevisitor.h"
 
+#include <algorithm>
 #include <asn1library/asn1/asn1model.h>
-#include <conversion/common/translation/exceptions.h>
 #include <promela/PromelaModel/promelamodel.h>
 #include <promela/PromelaOptions/options.h>
 
@@ -32,7 +33,7 @@ using conversion::Model;
 using conversion::ModelType;
 using conversion::Options;
 using conversion::promela::PromelaOptions;
-using conversion::translator::TranslationException;
+
 using promela::model::PromelaModel;
 
 namespace promela::translator {
@@ -72,6 +73,9 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
     for (const std::unique_ptr<File> &file : model->data()) {
         visitAsn1File(file.get(), *promelaModel, enhancedSpinSupport);
     }
+
+    PromelaTypeSorter typeSorter;
+    typeSorter.sortTypeDefinitions(*promelaModel);
 
     std::vector<std::unique_ptr<Model>> result;
     result.push_back(std::move(promelaModel));

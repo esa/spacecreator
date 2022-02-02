@@ -19,7 +19,6 @@
 
 #include "specialized/interfacecommandtranslator.h"
 
-#include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
@@ -85,27 +84,6 @@ ivm::IVInterface *InterfaceCommandTranslator::createIvInterface(const seds::mode
     creationInfo.kind = kind;
 
     return ivm::IVInterface::createIface(creationInfo);
-}
-
-void InterfaceCommandTranslator::createAsn1SequenceComponent(
-        const QString &name, const QString &typeName, Asn1Acn::Types::Sequence *sequence) const
-{
-    const auto *referencedTypeAssignment = m_asn1Definitions->type(typeName);
-
-    if (!referencedTypeAssignment) {
-        auto errorMessage =
-                QString("Type %1 not found while creating ASN.1 sequence %2").arg(typeName).arg(sequence->identifier());
-        throw TranslationException(std::move(errorMessage));
-    }
-
-    const auto *referencedType = referencedTypeAssignment->type();
-
-    auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(typeName, m_asn1Definitions->name());
-    sequenceComponentType->setType(referencedType->clone());
-
-    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            name, name, false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(sequenceComponentType));
-    sequence->addComponent(std::move(sequenceComponent));
 }
 
 QString InterfaceCommandTranslator::buildArrayType(

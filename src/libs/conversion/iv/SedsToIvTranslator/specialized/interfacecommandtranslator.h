@@ -136,17 +136,6 @@ protected:
      */
     auto createIvInterface(const seds::model::InterfaceCommand &sedsCommand, ivm::IVInterface::InterfaceType type,
             ivm::IVInterface::OperationKind kind) const -> ivm::IVInterface *;
-    /**
-     * @brief   Creates ASN.1 sequence component type
-     *
-     * Added the created sequence component to the passed ASN.1 sequence
-     *
-     * @param   name        Name of the component
-     * @param   typeName    Name of the component type
-     * @param   sequence    Sequence to which component should be added
-     */
-    auto createAsn1SequenceComponent(
-            const QString &name, const QString &typeName, Asn1Acn::Types::Sequence *sequence) const -> void;
 
     /**
      * @brief   Swaps between provided and required interface types

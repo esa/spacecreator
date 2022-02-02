@@ -1,0 +1,23 @@
+<InterfaceView asn1file="testgenerator.acn">
+<Function name="FunctionUnderTest" is_type="NO" language="C" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="48200 29800 68200 37800"/>
+<Provided_Interface name="InterfaceUnderTest" kind="Protected" layer="default" wcet="0">
+    <Input_Parameter name="active" type="MyBool" encoding="ACN"/>
+    <Output_Parameter name="result1" type="MyBool" encoding="ACN"/>
+    <Input_Parameter name="temperature" type="MyReal" encoding="ACN"/>
+    <Input_Parameter name="posX" type="MyInteger" encoding="ACN"/>
+    <Input_Parameter name="posY" type="MyInteger" encoding="ACN"/>
+    <Output_Parameter name="result2" type="MyReal" encoding="ACN"/>
+    <Property name="Taste::coordinates" value="48200 33900"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Comment name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3">
+    <Property name="Taste::coordinates" value="4800 5100 46100 20700"/>
+</Comment>
+
+</InterfaceView>

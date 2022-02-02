@@ -13,7 +13,7 @@ target_sources(CsvImporter
 
 target_include_directories(CsvImporter
     PUBLIC      .
-    PRIVATE     ..
+                ..
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs
 )
 
