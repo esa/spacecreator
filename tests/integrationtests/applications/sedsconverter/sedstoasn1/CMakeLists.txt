@@ -19,6 +19,11 @@ configure_file(resources/test_simple_data_types.xml resources/test_simple_data_t
 configure_file(resources/test_simple_data_types_asn.output resources/test_simple_data_types_asn.output COPYONLY)
 configure_file(resources/test_simple_data_types_acn.output resources/test_simple_data_types_acn.output COPYONLY)
 
+configure_file(test_sub_range_data_type.sh test_sub_range_data_type.sh COPYONLY)
+configure_file(resources/test_sub_range_data_type.xml resources/test_sub_range_data_type.xml COPYONLY)
+configure_file(resources/test_sub_range_data_type_asn.output resources/test_sub_range_data_type_asn.output COPYONLY)
+configure_file(resources/test_sub_range_data_type_acn.output resources/test_sub_range_data_type_acn.output COPYONLY)
+
 configure_file(test_arrays.sh test_arrays.sh COPYONLY)
 configure_file(resources/test_arrays.xml resources/test_arrays.xml COPYONLY)
 configure_file(resources/test_arrays_asn.output resources/test_arrays_asn.output COPYONLY)
