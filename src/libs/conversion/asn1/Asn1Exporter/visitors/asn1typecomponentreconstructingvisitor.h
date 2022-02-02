@@ -63,9 +63,6 @@ public:
 private:
     void valueForStraightType(const Types::Type &type);
 
-    template<typename T>
-    void valueForComplexType(const T &type, int indent);
-
     void addIndent(int indent);
     void addWord(const QString &word);
     void finishLine();
