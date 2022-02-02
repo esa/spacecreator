@@ -25,7 +25,6 @@
 #include <QtTest/qtest.h>
 #include <QtTest/qtestkeyboard.h>
 #include <QtTest/qtestsystem.h>
-#include <libiveditor/context/action/actionsmanager.h>
 #include <qnamespace.h>
 #include <qobject.h>
 #include <qobjectdefs.h>
@@ -55,27 +54,22 @@ void SedsPlugin::letMeFail()
             qDebug() << "action is not null";
             actionMenu->showMaximized();
         }
-        ive::ActionsManager::populateMenu(actionMenu, nullptr, nullptr);
     }
     if (window.menuBar() != nullptr) {
         window.menuBar()->show();
     }
 
     QTest::keyClick(&window, Qt::Key_Alt);
-    QTest::qWait(3 * 100);
     QTest::keyClick(&window, Qt::Key_T);
-    QTest::qWait(3 * 100);
     QTest::keyClick(&window, Qt::Key_E);
-    QTest::qWait(3 * 100);
     QTest::keyClick(&window, Qt::Key_Enter);
-    QTest::qWait(3 * 100);
 
     qDebug() << qApp->applicationName();
     for (const auto &window : qApp->allWindows()) {
         if (window != nullptr) {
             qDebug() << "window is NOT null";
             qDebug() << window->title();
-            // window->showMaximized();
+            window->showMaximized();
         } else {
             qDebug() << "window is null";
         }

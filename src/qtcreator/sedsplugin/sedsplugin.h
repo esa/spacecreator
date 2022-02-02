@@ -51,7 +51,7 @@ public:
 
 private:
     auto addSedsImportExport() -> void;
-    // auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
+    auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
     auto importInterfaceView() -> void;
     auto importSdl() -> void;
     auto importAsn1() -> void;
