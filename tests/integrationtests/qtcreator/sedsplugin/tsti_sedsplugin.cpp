@@ -28,6 +28,7 @@
 #include <qnamespace.h>
 #include <qobject.h>
 #include <qobjectdefs.h>
+#include <shared/sharedlibrary.h>
 
 namespace sedsplugin {
 
@@ -41,6 +42,8 @@ private slots:
 
 void SedsPlugin::letMeFail()
 {
+    shared::initSharedLibrary();
+
     SedsPluginWindow window;
     window.showMaximized();
     window.activateWindow();
