@@ -21,6 +21,8 @@
 
 #include "sedsplugin.h"
 
+#include <editormanager/editormanager.h>
+#include <editormanager/ieditor.h>
 #include <qboxlayout.h>
 #include <qlayout.h>
 #include <qmessagebox.h>
@@ -67,6 +69,9 @@ SedsPluginWindow::SedsPluginWindow()
     if (!loadPlugin()) {
         QMessageBox::information(this, "ERROR", "plugin could not be loaded");
     }
+
+    // auto *const currentDocument = Core::EditorManager::currentDocument();
+    // ive::ActionsManager::populateMenu(menu, nullptr, nullptr);
 }
 
 bool SedsPluginWindow::loadPlugin()
