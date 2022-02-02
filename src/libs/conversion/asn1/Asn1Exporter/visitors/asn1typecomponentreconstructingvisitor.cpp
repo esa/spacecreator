@@ -128,9 +128,17 @@ void Asn1TypeComponentReconstructingVisitor::visit(const Types::Sequence &type)
     addLine(QStringLiteral("{"), m_indent);
 
     const auto &components = type.components();
+    auto isFirst = true;
     for (auto it = components.begin(); it != components.end(); it++) {
         if (dynamic_cast<AcnSequenceComponent *>((*it).get()) != nullptr) {
             continue;
+        }
+
+        if (!isFirst) {
+            addWord(QStringLiteral(","));
+            finishLine();
+        } else {
+            isFirst = false;
         }
 
         addIndent(m_indent + INDENT_SIZE);
@@ -138,14 +146,9 @@ void Asn1TypeComponentReconstructingVisitor::visit(const Types::Sequence &type)
 
         Asn1TypeComponentReconstructingVisitor visitor(m_outStream, m_indent + INDENT_SIZE);
         (*it)->type()->accept(visitor);
-
-        if (std::next(it) != components.end()) {
-            addWord(QStringLiteral(","));
-        }
-
-        finishLine();
     }
 
+    finishLine();
     addIndent(m_indent);
     addWord(QStringLiteral("}"));
 }
