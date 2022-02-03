@@ -38,10 +38,28 @@ class SedsPlugin : public QObject
 
 private slots:
     void letMeFail();
+    void initTestCase();
+    void init();
+
+private:
+    QString m_mainDir;
 };
+
+void SedsPlugin::initTestCase()
+{
+    m_mainDir = QDir::currentPath();
+}
+
+void SedsPlugin::init()
+{
+    QDir::setCurrent(m_mainDir);
+}
 
 void SedsPlugin::letMeFail()
 {
+    QDir::setCurrent("resources");
+    QDir::setCurrent("testProject");
+
     shared::initSharedLibrary();
 
     spctr::SedsPlugin plugin;
