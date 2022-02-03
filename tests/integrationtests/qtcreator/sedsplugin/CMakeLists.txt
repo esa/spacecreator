@@ -13,9 +13,10 @@ add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 target_link_libraries(${TEST_NAME} PUBLIC
     -L"${QTC_LIB_DIR}"
     -L"${QTC_PLUGINS_DIR}"
+    -L"/usr/lib/x86_64-linux-gnu/qtcreator/plugins"
     commontestlib
-    SedsPlugin
     Core
+    SedsPlugin
     ${QT_CORE}
     ${QT_TEST}
 )

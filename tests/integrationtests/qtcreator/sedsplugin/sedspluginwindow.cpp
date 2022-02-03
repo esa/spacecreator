@@ -19,9 +19,6 @@
 
 #include "sedspluginwindow.h"
 
-#include "actionmanager/actionmanager.h"
-#include "sedsplugin.h"
-
 #include <qboxlayout.h>
 #include <qlayout.h>
 #include <qmessagebox.h>
