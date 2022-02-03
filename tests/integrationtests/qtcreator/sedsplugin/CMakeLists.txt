@@ -21,4 +21,4 @@ target_link_libraries(${TEST_NAME} PUBLIC
     ${QT_TEST}
 )
 
-# configure_file(../../../../../build-spacecreator/lib/qtcreator/plugins/libSedsPlugin.so libSedsPlugin.so COPYONLY)
+file(COPY resources/testProject DESTINATION resources/testProject)
