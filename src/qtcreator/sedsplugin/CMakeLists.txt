@@ -6,6 +6,9 @@ set(SEDS_PLUGIN_SOURCES
     sedsplugin.h
     messagemanager.cpp
     messagemanager.h
+    modelloader.cpp
+    modelloader.h
+    messagestrings.h
 )
 
 set(SEDS_QTC_LIBRARIES

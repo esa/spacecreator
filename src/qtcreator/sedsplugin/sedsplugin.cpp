@@ -23,6 +23,8 @@
 #include "../spacecreatorplugin/iv/iveditordocument.h"
 #include "../spacecreatorplugin/iv/iveditorfactory.h"
 #include "../spacecreatorplugin/iv/ivqtceditor.h"
+#include "messagestrings.h"
+#include "modelloader.h"
 
 #include <QAction>
 #include <QDir>
@@ -90,22 +92,6 @@ using conversion::asn1::Asn1Registrar;
 using conversion::iv::IvRegistrar;
 using conversion::sdl::SdlRegistrar;
 using conversion::seds::SedsRegistrar;
-
-/// messages for General Messages GUI
-namespace GenMsg {
-const QString msgInfo = "INFO: %1";
-const QString msgWarning = "WARNING: %1";
-const QString msgError = "ERROR: %1";
-const QString fileToImportNotSelected = "File to import not selected";
-const QString ivFileNotSelected = "InterfaceView file not selected";
-const QString ivNoFunctionsInIv = "InterfaceView does not contain functions which could be exported";
-const QString ivNoFunctionsSelected = "No functions selected to export";
-const QString filesExported = "File(s) exported";
-const QString filesImported = "File(s) imported";
-const QString functionsImported = "Function(s) imported";
-const QString ivModelNotRead = "IV model could not be read";
-const QString ivTmpModelNotRead = QString("Temporary %1").arg(ivModelNotRead);
-}
 
 namespace spctr {
 
@@ -603,44 +589,6 @@ auto SedsPlugin::doesModelContainFunction(ivm::IVModel *const model, ivm::IVFunc
     return false;
 }
 
-auto SedsPlugin::loadIvModel(const QString &ivConfigFilename, const QString &ivFilename)
-        -> std::unique_ptr<conversion::Model>
-{
-    std::unique_ptr<conversion::Model> model;
-
-    conversion::Options options;
-    options.add(conversion::iv::IvOptions::inputFilepath, ivFilename);
-    options.add(conversion::iv::IvOptions::configFilepath, ivConfigFilename);
-
-    conversion::iv::importer::IvXmlImporter ivImporter;
-    try {
-        model = ivImporter.importModel(options);
-    } catch (const std::exception &ex) {
-        MessageManager::write(GenMsg::msgError.arg(ex.what()));
-        return nullptr;
-    }
-
-    return model;
-}
-
-auto SedsPlugin::loadSedsModel(const QString &sedsFilename) -> std::unique_ptr<conversion::Model>
-{
-    std::unique_ptr<conversion::Model> model;
-
-    conversion::Options options;
-    options.add(conversion::seds::SedsOptions::inputFilepath, sedsFilename);
-
-    seds::importer::SedsXmlImporter sedsImporter;
-    try {
-        model = sedsImporter.importModel(options);
-    } catch (const std::exception &ex) {
-        MessageManager::write(GenMsg::msgError.arg(ex.what()));
-        return nullptr;
-    }
-
-    return model;
-}
-
 auto SedsPlugin::getCurrentIvModel() -> ivm::IVModel *
 {
     const auto curIvEditorCore = getCurrentIvEditorCore();
@@ -660,7 +608,7 @@ auto SedsPlugin::getCurrentIvModel() -> ivm::IVModel *
 
 auto SedsPlugin::loadAndMergeIvModelIntoCurrent(const QString &ivConfig, const QString &ivFilename) -> bool
 {
-    std::unique_ptr<conversion::Model> model = loadIvModel(ivConfig, ivFilename);
+    std::unique_ptr<conversion::Model> model = ModelLoader::loadIvModel(ivConfig, ivFilename);
 
     ivm::IVModel *const tmpIvModel = dynamic_cast<ivm::IVModel *>(model.get());
     if (tmpIvModel == nullptr) {
