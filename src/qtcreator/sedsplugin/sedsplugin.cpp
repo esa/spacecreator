@@ -125,7 +125,7 @@ auto SedsPlugin::initialize(const QStringList &arguments, QString *errorString) 
     Q_UNUSED(errorString)
 
     initializeRegistry();
-    addSedsImportExport();
+    addAndConnectSedsImportExportActions();
 
     return true;
 }
@@ -139,6 +139,64 @@ auto SedsPlugin::aboutToShutdown() -> ExtensionSystem::IPlugin::ShutdownFlag
 {
     return SynchronousShutdown;
 }
+
+auto SedsPlugin::importInterfaceView(const QString &inputFilePath) -> void
+{
+    const QString tmpIvFilename = "tmp-interfaceview.xml";
+    const QString ivConfig = shared::interfaceCustomAttributesFilePath();
+    qDebug() << ivConfig;
+
+    conversion::Options options;
+    options.add(conversion::iv::IvOptions::outputFilepath,
+            QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg(tmpIvFilename));
+    options.add(conversion::iv::IvOptions::configFilepath, ivConfig);
+    options.add(conversion::seds::SedsOptions::inputFilepath, inputFilePath);
+
+    QStringList asn1Filenames;
+    try {
+        const auto outputModels = convert({ conversion::ModelType::Seds }, conversion::ModelType::InterfaceView,
+                { conversion::ModelType::Asn1 }, options);
+        asn1Filenames = getAsnModelFilenames(outputModels);
+    } catch (conversion::ConverterException &ex) {
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
+        QFile(tmpIvFilename).remove();
+        return;
+    } catch (std::exception &ex) {
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
+        QFile(tmpIvFilename).remove();
+        return;
+    }
+
+    if (!loadAndMergeIvModelIntoCurrent(ivConfig, tmpIvFilename)) {
+        MessageManager::write(GenMsg::msgError.arg("Could not merge imported IV into current one"));
+        QFile(tmpIvFilename).remove();
+        return;
+    }
+
+    addFilesToCurrentProject(asn1Filenames, QDir::currentPath());
+    MessageManager::write(GenMsg::msgInfo.arg(GenMsg::functionsImported));
+    QFile(tmpIvFilename).remove();
+}
+
+// auto SedsPlugin::importSdl() -> void
+// {
+//     //
+// }
+
+// auto SedsPlugin::importAsn1() -> void
+// {
+//     //
+// }
+
+// auto SedsPlugin::exportAsn1() -> void
+// {
+//     //
+// }
+
+// auto SedsPlugin::exportInterfaceView() -> void
+// {
+//     //
+// }
 
 auto SedsPlugin::itemModelUpdateWithFunctionNames(QStandardItemModel &model, const QStringList &ivFunctionsNames)
         -> void
@@ -155,7 +213,7 @@ auto SedsPlugin::itemModelUpdateWithFunctionNames(QStandardItemModel &model, con
     functionsListModel->setHeaderData(0, Qt::Horizontal, "Functions");
 }
 
-auto SedsPlugin::addSedsImportExport() -> void
+auto SedsPlugin::addAndConnectSedsImportExportActions() -> void
 {
     Context allContexts(Core::Constants::C_WELCOME_MODE, Core::Constants::C_EDIT_MODE, Core::Constants::C_DESIGN_MODE);
 
@@ -166,7 +224,7 @@ auto SedsPlugin::addSedsImportExport() -> void
     }
 
     const auto ivImportAction = new QAction(tr("Import InterfaceView from EDS"), this);
-    connect(ivImportAction, &QAction::triggered, [=]() { this->importInterfaceView(); });
+    connect(ivImportAction, &QAction::triggered, [=]() { this->importInterfaceViewGui(); });
     Command *const ivImport = ActionManager::registerAction(ivImportAction, Constants::IV_IMPORT_ID, allContexts);
     if (ivImport == nullptr) {
         // TODO: throw an exception here
@@ -242,11 +300,8 @@ auto SedsPlugin::createActionContainerInTools(const QString &title) -> ActionCon
     return container;
 }
 
-auto SedsPlugin::importInterfaceView() -> void
+auto SedsPlugin::importInterfaceViewGui() -> void
 {
-    const QString tmpIvFilename = "tmp-interfaceview.xml";
-    const QString ivConfig = shared::interfaceCustomAttributesFilePath();
-
     const QString inputFilePath = QFileDialog::getOpenFileName(
             nullptr, "Select EDS file to import InterfaceView from...", QString(), tr("*.xml"));
     if (inputFilePath.isEmpty()) {
@@ -254,36 +309,7 @@ auto SedsPlugin::importInterfaceView() -> void
         return;
     }
 
-    conversion::Options options;
-    options.add(conversion::iv::IvOptions::outputFilepath,
-            QString("%1%2%3").arg(QDir::currentPath()).arg(QDir::separator()).arg(tmpIvFilename));
-    options.add(conversion::iv::IvOptions::configFilepath, ivConfig);
-    options.add(conversion::seds::SedsOptions::inputFilepath, inputFilePath);
-
-    QStringList asn1Filenames;
-    try {
-        const auto outputModels = convert({ conversion::ModelType::Seds }, conversion::ModelType::InterfaceView,
-                { conversion::ModelType::Asn1 }, options);
-        asn1Filenames = getAsnModelFilenames(outputModels);
-    } catch (conversion::ConverterException &ex) {
-        MessageManager::write(GenMsg::msgError.arg(ex.what()));
-        QFile(tmpIvFilename).remove();
-        return;
-    } catch (std::exception &ex) {
-        MessageManager::write(GenMsg::msgError.arg(ex.what()));
-        QFile(tmpIvFilename).remove();
-        return;
-    }
-
-    if (!loadAndMergeIvModelIntoCurrent(ivConfig, tmpIvFilename)) {
-        MessageManager::write(GenMsg::msgError.arg("Could not merge imported IV into current one"));
-        QFile(tmpIvFilename).remove();
-        return;
-    }
-
-    addFilesToCurrentProject(asn1Filenames, QDir::currentPath());
-    MessageManager::write(GenMsg::msgInfo.arg(GenMsg::functionsImported));
-    QFile(tmpIvFilename).remove();
+    importInterfaceView(inputFilePath);
 }
 
 auto SedsPlugin::importSdl() -> void

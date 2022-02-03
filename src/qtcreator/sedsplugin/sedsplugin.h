@@ -49,14 +49,16 @@ public:
     auto extensionsInitialized() -> void override;
     auto aboutToShutdown() -> ShutdownFlag override;
 
-private:
-    auto addSedsImportExport() -> void;
-    auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
-    auto importInterfaceView() -> void;
+    auto importInterfaceView(const QString &inputFilePath) -> void;
     auto importSdl() -> void;
     auto importAsn1() -> void;
     auto exportAsn1() -> void;
     auto exportInterfaceView() -> void;
+
+private:
+    auto addAndConnectSedsImportExportActions() -> void;
+    auto importInterfaceViewGui() -> void;
+    auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
     auto itemModelUpdateWithFunctionNames(QStandardItemModel &model, const QStringList &ivFunctionsNames) -> void;
     auto initializeRegistry() -> void;
     auto convert(const std::set<conversion::ModelType> &srcModelType, conversion::ModelType targetModelType,

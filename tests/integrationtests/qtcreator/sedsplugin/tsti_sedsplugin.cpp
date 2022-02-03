@@ -17,7 +17,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "../../src/qtcreator/sedsplugin/sedsplugin.h"
 #include "sedspluginwindow.h"
 
 #include <QObject>
@@ -28,6 +27,7 @@
 #include <qnamespace.h>
 #include <qobject.h>
 #include <qobjectdefs.h>
+#include <sedsplugin.h>
 #include <shared/sharedlibrary.h>
 
 namespace sedsplugin {
@@ -44,34 +44,10 @@ void SedsPlugin::letMeFail()
 {
     shared::initSharedLibrary();
 
-    // current application - test runner
-    qDebug() << qApp->applicationName();
-
-    // window with loaded SedsPlugin - software under test
-    SedsPluginWindow window;
-    window.activateWindow();
-    if (window.menuBar() != nullptr) {
-        window.menuBar()->show();
-    }
-    window.showMaximized();
-
-    for (const auto &action : window.actions()) {
-        const auto actionMenu = action->menu();
-        if (actionMenu != nullptr) {
-            qDebug() << "action is not null";
-            actionMenu->showMaximized();
-        }
-    }
-
-    // exercise:
-    // QTest::keyClick(&window, Qt::Key_Alt);
-    // QTest::keyClick(&window, Qt::Key_T);
-    // QTest::keyClick(&window, Qt::Key_E);
-    // QTest::keyClick(&window, Qt::Key_Enter);
+    spctr::SedsPlugin plugin;
+    plugin.importInterfaceView("seds_iv.xml");
 
     // check that ASN.1 files were imported
-
-    QTest::qWait(3 * 1000);
 }
 
 } // namespace sedsplugin

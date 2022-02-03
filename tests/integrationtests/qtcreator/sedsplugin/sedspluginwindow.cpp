@@ -44,10 +44,6 @@ SedsPluginWindow::SedsPluginWindow()
     menu = menuBar()->addMenu(tr("&Help"));
     menu->addSeparator();
     menu = menuBar()->addMenu(tr("Tools"));
-
-    // m_corePlugin.initialize({"no args"});
-    QString errors;
-    m_sedsPlugin.initialize({ "no args" }, &errors);
 }
 
 } // namespace sedsplugin

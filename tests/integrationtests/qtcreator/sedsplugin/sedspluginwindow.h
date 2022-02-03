@@ -21,12 +21,11 @@
 
 #include "sedsplugin.h"
 
+#include <QMainWindow>
+#include <QToolBar>
 #include <QtWidgets>
 #include <qlayout.h>
-#include <qmainwindow.h>
-#include <coreplugin.h>
 #include <qobjectdefs.h>
-#include <qtoolbar.h>
 #include <sedsplugin.h>
 
 namespace sedsplugin {
@@ -42,7 +41,6 @@ private:
     bool loadPlugin();
 
     spctr::SedsPlugin m_sedsPlugin;
-    Core::Internal::CorePlugin m_corePlugin;
 };
 
 } // namespace sedsplugin
