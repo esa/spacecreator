@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="Calculator">
+    <DataTypeSet>
+      <IntegerDataType name="Number">
+        <LongDescription>Type for a memory destination address.</LongDescription>
+        <IntegerDataEncoding encoding="twosComplement" sizeInBits="32" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="-1000000" max="1000000" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="AsyncCalculatorType">
+        <LongDescription>Interface for performing async calculations</LongDescription>
+        <CommandSet>
+          <Command name="Add" mode="async">
+            <LongDescription>Add two numbers</LongDescription>
+            <Argument name="x" type="Number" mode="in" />
+            <Argument name="y" type="Number" mode="in" />
+            <Argument name="result" type="Number" mode="notify" />
+          </Command>
+          <Command name="Init" mode="async">
+            <LongDescription>Initialize the calculator</LongDescription>
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="Calculator">
+        <LongDescription></LongDescription>
+        <ProvidedInterfaceSet>
+          <Interface name="AsyncCalculator" type="AsyncCalculatorType" />
+        </ProvidedInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="x" type="Number"></Variable>
+            <Variable name="y" type="Number" />
+            <Variable name="tmp" type="Number" />
+          </VariableSet>
+          <ActivitySet>
+            <Activity name="AddAndNotify">
+              <Argument name="x1" type="Number" />
+              <Argument name="x2" type="Number"></Argument>
+              <Body>
+                <MathOperation outputVariableRef="tmp">
+                  <Operator operator="add" />
+                  <VariableRef variableRef="x1" />
+                  <VariableRef variableRef="x2" />
+                </MathOperation>
+                <SendCommandPrimitive interface="AsyncCalculator" command="Add">
+                  <ArgumentValue name="result">
+                    <VariableRef variableRef="tmp" />
+                  </ArgumentValue>
+                </SendCommandPrimitive>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="Calculator">
+              <EntryState name="Off"></EntryState>
+              <State name="Idle" />
+              <Transition fromState="Idle" toState="Idle" name="Add">
+                <OnCommandPrimitive command="Add" interface="AsyncCalculator">
+                  <ArgumentValue name="x" outputVariableRef="x" />
+                  <ArgumentValue name="y" outputVariableRef="y" />
+                </OnCommandPrimitive>
+                <Do activity="AddAndNotify">
+                  <ArgumentValue name="x">
+                    <VariableRef variableRef="x" />
+                  </ArgumentValue>
+                  <ArgumentValue name="y">
+                    <VariableRef variableRef="y" />
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+              <Transition fromState="Off" toState="Idle" name="Init">
+                <OnCommandPrimitive interface="AsyncCalculator" command="Init" />
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

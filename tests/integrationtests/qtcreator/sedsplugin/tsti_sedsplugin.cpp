@@ -24,6 +24,7 @@
 #include <QtTest/qtest.h>
 #include <QtTest/qtestkeyboard.h>
 #include <QtTest/qtestsystem.h>
+#include <qdir.h>
 #include <qnamespace.h>
 #include <qobject.h>
 #include <qobjectdefs.h>
@@ -37,7 +38,7 @@ class SedsPlugin : public QObject
     Q_OBJECT
 
 private slots:
-    void letMeFail();
+    void testImportInterfaceView();
     void initTestCase();
     void init();
 
@@ -45,8 +46,15 @@ private:
     QString m_mainDir;
 };
 
+static const QString resourcesDir = "resources";
+static const QString testProjectDir = "testProject";
+static const QString inputEdsDir = "input-eds";
+static const QString separator = QDir::separator();
+
 void SedsPlugin::initTestCase()
 {
+    shared::initSharedLibrary();
+
     m_mainDir = QDir::currentPath();
 }
 
@@ -55,17 +63,25 @@ void SedsPlugin::init()
     QDir::setCurrent(m_mainDir);
 }
 
-void SedsPlugin::letMeFail()
+static QString makeIvPath(const QString &ivFilename)
 {
-    QDir::setCurrent("resources");
-    QDir::setCurrent("testProject");
+    return QString("%1%2%3%4%5%6%7")
+            .arg("..")
+            .arg(separator)
+            .arg(resourcesDir)
+            .arg(separator)
+            .arg(inputEdsDir)
+            .arg(separator)
+            .arg(ivFilename);
+}
 
-    shared::initSharedLibrary();
+void SedsPlugin::testImportInterfaceView()
+{
+    QDir::setCurrent(resourcesDir);
+    QDir::setCurrent(testProjectDir);
 
     spctr::SedsPlugin plugin;
-    plugin.importInterfaceView("seds_iv.xml");
-
-    // check that ASN.1 files were imported
+    plugin.importInterfaceView("test_provided_interfaces.xml");
 }
 
 } // namespace sedsplugin

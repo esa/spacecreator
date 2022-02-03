@@ -15,10 +15,11 @@ target_link_libraries(${TEST_NAME} PUBLIC
     -L"${QTC_PLUGINS_DIR}"
     -L"/usr/lib/x86_64-linux-gnu/qtcreator/plugins"
     commontestlib
-    Core
     SedsPlugin
     ${QT_CORE}
     ${QT_TEST}
 )
 
-file(COPY resources/testProject DESTINATION resources/testProject)
+file(COPY resources/testProject DESTINATION resources/)
+file(COPY resources/input-eds DESTINATION resources/)
+file(MAKE_DIRECTORY output/)
