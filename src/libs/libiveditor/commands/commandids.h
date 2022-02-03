@@ -36,10 +36,12 @@ enum Id
     CreateContextParameter,
     ChangeContextParameter,
     RemoveContextParameter,
+    ReorderContextParameter,
 
     CreateIfaceParam,
     RemoveIfaceParam,
     ChangeIfaceParam,
+    ReorderIfaceParam,
 
     ChangeFunctionAttribute,
     ChangeFunctionDefaultImplementation,

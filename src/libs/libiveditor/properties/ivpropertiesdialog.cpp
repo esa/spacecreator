@@ -196,8 +196,7 @@ void IVPropertiesDialog::initContextParams()
 
 void IVPropertiesDialog::initIfaceParams()
 {
-    IfaceParametersModel *modelIfaceParams =
-            new IfaceParametersModel(commandMacro(), m_asn1Checks->allTypeNames(), this);
+    IfaceParametersModel *modelIfaceParams = new IfaceParametersModel(commandMacro(), m_asn1Checks->allTypeNames(), this);
     modelIfaceParams->setDataObject(dataObject());
 
     shared::PropertiesViewBase *viewAttrs = new IfaceParametersView(this);
