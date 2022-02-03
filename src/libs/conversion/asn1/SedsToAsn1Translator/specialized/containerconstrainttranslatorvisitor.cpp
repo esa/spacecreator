@@ -87,13 +87,17 @@ void ContainerConstraintTranslatorVisitor::applyContainerRangeConstraint(
         RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue> rangeTranslator(asn1Type);
         std::visit(rangeTranslator, range);
     } break;
+    case ASN1Type::ENUMERATED: {
+        RangeTranslatorVisitor<Asn1Acn::Types::Enumerated, Asn1Acn::EnumValue> rangeTranslator(asn1Type);
+        std::visit(rangeTranslator, range);
+    } break;
     case ASN1Type::USERDEFINED: {
         auto asn1UserType = dynamic_cast<Asn1Acn::Types::UserdefinedType *>(asn1Type);
         applyContainerRangeConstraint(rangeConstraint, asn1UserType->type());
     } break;
     default:
         throw conversion::translator::TranslationException(
-                "ContainerRangeConstraint can only be applied to the integer and real entries");
+                "ContainerRangeConstraint can only be applied to the numeric and enum entries");
         break;
     }
 }

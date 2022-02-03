@@ -20,6 +20,7 @@
 #pragma once
 
 #include <asn1library/asn1/constraints/constraintlist.h>
+#include <asn1library/asn1/constraints/logicoperators.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <asn1library/asn1/types/type.h>
 #include <asn1library/asn1/values.h>
@@ -37,7 +38,9 @@ namespace conversion::asn1::translator {
 template<typename Type, typename ValueType>
 class RangeTranslatorVisitor final
 {
+    using Constraint = Asn1Acn::Constraints::Constraint<ValueType>;
     using RangeConstraint = Asn1Acn::Constraints::RangeConstraint<ValueType>;
+    using OrConstraint = Asn1Acn::Constraints::OrConstraint<ValueType>;
 
 public:
     /**

@@ -19,9 +19,11 @@
 
 #include "specialized/rangetranslatorvisitor.h"
 
+#include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/real.h>
 #include <cmath>
+#include <conversion/common/escaper/escaper.h>
 
 using conversion::translator::TranslationException;
 
@@ -157,8 +159,23 @@ template<>
 void RangeTranslatorVisitor<Asn1Acn::Types::Enumerated, Asn1Acn::EnumValue>::operator()(
         const seds::model::EnumeratedDataTypeRange &range)
 {
-    Q_UNUSED(range);
-    throw conversion::translator::TranslationException("EnumeratedDataTypeRange not yet supported");
+    const auto &items = range.items();
+
+    if (items.size() == 1) {
+        addValueConstraint(Escaper::escapeAsn1FieldName(items[0].value()));
+    } else {
+        std::unique_ptr<Constraint> leftChild =
+                RangeConstraint::create({ Escaper::escapeAsn1FieldName(items[0].value()) });
+
+        for (auto it = std::next(items.begin()); it != items.end(); ++it) {
+            std::unique_ptr<Constraint> rightChild =
+                    RangeConstraint::create({ Escaper::escapeAsn1FieldName(it->value()) });
+
+            leftChild = std::make_unique<OrConstraint>(std::move(leftChild), std::move(rightChild));
+        }
+
+        m_asn1Type->constraints().append(std::move(leftChild));
+    }
 }
 
 template<>
