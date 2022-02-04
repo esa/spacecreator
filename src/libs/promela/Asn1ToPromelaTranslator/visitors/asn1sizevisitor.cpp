@@ -23,48 +23,44 @@ using Asn1Acn::IntegerValue;
 using Asn1Acn::Range;
 
 namespace promela::translator {
-Asn1SizeVisitor::Asn1SizeVisitor()
-    : m_sizeVisited(false)
-    , m_minSize(0)
-    , m_maxSize(0)
-{
-}
+Asn1SizeVisitor::Asn1SizeVisitor() {}
 
 void Asn1SizeVisitor::visit(const ::Asn1Acn::Constraints::RangeConstraint<IntegerValue> &constraint)
 {
-    // TODO Implement proper range arithmetic
     const Range<IntegerValue::Type> &range = constraint.range();
-    if (!m_sizeVisited) {
-        m_sizeVisited = true;
-        if (range.isSingleItem()) {
-            m_minSize = static_cast<size_t>(range.begin());
-            m_maxSize = m_minSize;
-        } else {
-            m_minSize = static_cast<size_t>(range.begin());
-            m_maxSize = static_cast<size_t>(range.end());
-        }
+    if (range.isSingleItem()) {
+        m_subset = IntegerSubset(range.begin());
     } else {
-        if (range.isSingleItem()) {
-            m_maxSize = std::max(static_cast<size_t>(range.begin()), m_maxSize);
-        } else {
-            m_minSize = std::min(static_cast<size_t>(range.begin()), m_minSize);
-            m_maxSize = std::max(static_cast<size_t>(range.end()), m_maxSize);
-        }
+        m_subset = IntegerSubset(range.begin(), range.end());
     }
 }
 
 void Asn1SizeVisitor::visit(const ::Asn1Acn::Constraints::AndConstraint<IntegerValue> &constraint)
 {
-    // TODO Implement proper range arithmetic
     constraint.leftChild()->accept(*this);
+    std::optional<IntegerSubset> lhs = m_subset;
     constraint.rightChild()->accept(*this);
+    std::optional<IntegerSubset> rhs = m_subset;
+
+    if (!lhs.has_value() || !rhs.has_value()) {
+        m_subset = std::nullopt;
+    }
+
+    m_subset = lhs.value() & rhs.value();
 }
 
 void Asn1SizeVisitor::visit(const ::Asn1Acn::Constraints::OrConstraint<IntegerValue> &constraint)
 {
-    // TODO Implement proper range arithmetic
     constraint.leftChild()->accept(*this);
+    std::optional<IntegerSubset> lhs = m_subset;
     constraint.rightChild()->accept(*this);
+    std::optional<IntegerSubset> rhs = m_subset;
+
+    if (!lhs.has_value() || !rhs.has_value()) {
+        m_subset = std::nullopt;
+    }
+
+    m_subset = lhs.value() | rhs.value();
 }
 
 void Asn1SizeVisitor::visit(const ::Asn1Acn::Constraints::FromConstraint<IntegerValue> &constraint)
@@ -79,23 +75,41 @@ void Asn1SizeVisitor::visit(const ::Asn1Acn::Constraints::SizeConstraint<Integer
 
 void Asn1SizeVisitor::visit(const ::Asn1Acn::Constraints::ConstraintList<IntegerValue> &constraint)
 {
+    std::optional<IntegerSubset> tmp;
     for (const auto &c : constraint.constraints()) {
         c->accept(*this);
+        std::optional<IntegerSubset> rhs = m_subset;
+
+        if (!tmp.has_value()) {
+            tmp = rhs;
+        } else if (rhs.has_value()) {
+            tmp = tmp.value() | rhs.value();
+        }
     }
+
+    m_subset = tmp;
 }
 
 bool Asn1SizeVisitor::isSizeConstraintVisited() const noexcept
 {
-    return m_sizeVisited;
+    return m_subset.has_value();
 }
 
 size_t Asn1SizeVisitor::getMinSize() const noexcept
 {
-    return m_minSize;
+    int min = m_subset.value().getMin().value();
+    if (min < 0) {
+        return 0;
+    }
+    return static_cast<size_t>(min);
 }
 
 size_t Asn1SizeVisitor::getMaxSize() const noexcept
 {
-    return m_maxSize;
+    int max = m_subset.value().getMax().value();
+    if (max < 0) {
+        return 0;
+    }
+    return static_cast<size_t>(max);
 }
 }

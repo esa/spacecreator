@@ -5,7 +5,11 @@ add_executable(${TEST_NAME})
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
 target_sources(${TEST_NAME}
-    PRIVATE     ${TEST_NAME}.cpp)
+    PRIVATE     tst_asn1topromelatranslator.cpp
+	            tst_integersubset.cpp
+	            main.cpp
+				tst_asn1topromelatranslator.h
+				tst_integersubset.h)
 target_include_directories(${TEST_NAME}
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(${TEST_NAME}

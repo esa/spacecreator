@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "integersubset.h"
+
 #include <QtGlobal>
 #include <algorithm>
 #include <asn1library/asn1/constraints/constraintlist.h>
@@ -28,6 +30,7 @@
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/values.h>
+#include <optional>
 
 namespace promela::translator {
 /**
@@ -89,8 +92,6 @@ public:
     size_t getMaxSize() const noexcept;
 
 private:
-    bool m_sizeVisited;
-    size_t m_minSize;
-    size_t m_maxSize;
+    std::optional<IntegerSubset> m_subset;
 };
 }

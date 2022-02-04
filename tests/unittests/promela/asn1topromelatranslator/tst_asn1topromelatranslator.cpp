@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#include "tst_asn1topromelatranslator.h"
+
 #include <QObject>
 #include <QtTest>
 #include <asn1library/asn1/asn1model.h>
@@ -73,38 +75,6 @@ using promela::translator::Asn1NodeVisitor;
 using promela::translator::PromelaTypeSorter;
 
 namespace tmc::test {
-
-class tst_Asn1ToPromelaTranslator : public QObject
-{
-    Q_OBJECT
-
-private Q_SLOTS:
-    void initTestCase();
-    void cleanupTestCase();
-
-    void testBasicTypes();
-    void testEnumerated();
-
-    void testVariableBitString();
-    void testFixedBitString();
-    void testVariableOctetString();
-    void testFixedOctetString();
-    void testVariableIA5String();
-    void testFixedIA5String();
-
-    void testChoice();
-    void testSequence();
-    void testSequenceWithOptional();
-    void testNestedSequence();
-
-    void testVariableSequenceOf();
-    void testFixedSequenceOf();
-
-    void testTypeSorting();
-
-private:
-    std::unique_ptr<Definitions> createModel();
-};
 
 void tst_Asn1ToPromelaTranslator::initTestCase() {}
 
@@ -863,7 +833,3 @@ std::unique_ptr<Definitions> tst_Asn1ToPromelaTranslator::createModel()
     return std::make_unique<Definitions>("myModule", SourceLocation());
 }
 }
-
-QTEST_MAIN(tmc::test::tst_Asn1ToPromelaTranslator)
-
-#include "tst_asn1topromelatranslator.moc"
