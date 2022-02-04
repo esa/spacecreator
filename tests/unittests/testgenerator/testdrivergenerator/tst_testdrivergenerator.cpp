@@ -294,4 +294,4 @@ void tst_testdrivergenerator::testImplementationNotInC()
 
 QTEST_MAIN(tests::testgenerator::tst_testdrivergenerator)
 
-#include "tst_testgenerator.moc"
+#include "tst_testdrivergenerator.moc"
