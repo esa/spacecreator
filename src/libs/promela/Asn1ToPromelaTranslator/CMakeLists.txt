@@ -6,7 +6,7 @@ set(SOURCES
   integersubset.cpp
   visitors/asn1nodevisitor.cpp
   visitors/asn1sequencecomponentvisitor.cpp
-  visitors/asn1sizevisitor.cpp
+  visitors/integerconstraintvisitor.cpp
   visitors/asn1itemtypevisitor.cpp
 )
 set(INCLUDES
@@ -15,7 +15,7 @@ set(INCLUDES
   integersubset.h
   visitors/asn1nodevisitor.h
   visitors/asn1sequencecomponentvisitor.h
-  visitors/asn1sizevisitor.h
+  visitors/integerconstraintvisitor.h
   visitors/asn1constraintvisitor.h
   visitors/asn1itemtypevisitor.h
 )

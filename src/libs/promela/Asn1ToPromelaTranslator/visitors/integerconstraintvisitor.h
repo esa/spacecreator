@@ -34,13 +34,13 @@
 
 namespace promela::translator {
 /**
- * @brief Visitor for ASN.1 size constraints
+ * @brief Visitor for ASN.1 integer constraints
  *
  * This is a part of Asn1ToPromelaTranslator.
  *
- * Visitor finds a size for an array, which is maximum constrained size.
+ * Visitor finds a subset of allowed values for integer or for size constraints
  */
-class Asn1SizeVisitor : public ::Asn1Acn::Constraints::ConstraintVisitor<::Asn1Acn::IntegerValue>
+class IntegerConstraintVisitor : public ::Asn1Acn::Constraints::ConstraintVisitor<::Asn1Acn::IntegerValue>
 {
 public:
     /**
@@ -48,13 +48,13 @@ public:
      *
      * Initializes empty visitor
      */
-    Asn1SizeVisitor();
+    IntegerConstraintVisitor();
 
     /**
      * @brief Visit Asn1Acn::Constraints::RangeConstraint
      *
      * RangeConstraints contains actual sizes
-     * Calculate maximum and minimum size of an array using Constraint
+     * Calculate subset of allowed values or sizes.
      *
      * @param constraint element to visit
      */
@@ -71,23 +71,23 @@ public:
     void visit(const ::Asn1Acn::Constraints::ConstraintList<::Asn1Acn::IntegerValue> &constraint) override;
 
     /**
-     * @brief Check if size constraint was visited.
+     * @brief Check if constraint was calculated.
      *
-     * @return true if size constraint was visited, otherwise false
+     * @return true if constraint was visited, otherwise false
      */
     bool isSizeConstraintVisited() const noexcept;
 
     /**
-     * @brief Getter for found minimal size constraint
+     * @brief Getter for found minimal value constraint
      *
-     * @return minimal size constraint
+     * @return minimal allowed value
      */
     size_t getMinSize() const noexcept;
 
     /**
-     * @brief Getter for found maximal size constraint
+     * @brief Getter for found maximal value constraint
      *
-     * @return maximal size constraint
+     * @return maximal allowed value
      */
     size_t getMaxSize() const noexcept;
 

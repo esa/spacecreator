@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "asn1sizevisitor.h"
+#include "integerconstraintvisitor.h"
 
 #include <QtGlobal>
 #include <algorithm>
@@ -100,6 +100,6 @@ public:
     size_t getMaxSize() const noexcept { return m_sizeVisitor.getMaxSize(); }
 
 private:
-    Asn1SizeVisitor m_sizeVisitor;
+    IntegerConstraintVisitor m_sizeVisitor;
 };
 }
