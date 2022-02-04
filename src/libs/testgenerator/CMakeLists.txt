@@ -9,10 +9,13 @@ target_sources(TestGenerator
                 TestGeneratorContext.h
                 TestGeneratorException.cpp
                 TestGeneratorException.h
+                harness/ivgenerator/ivgenerator.cpp
+                harness/ivgenerator/ivgenerator.h
 )
 
 target_include_directories(TestGenerator
     PUBLIC      .
+                harness/ivgenerator
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs
 )
 
