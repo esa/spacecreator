@@ -53,7 +53,7 @@ void tst_IntegerSubset::testSimpleSumTwoNumbersB()
     QCOMPARE(result.getRanges().back(), std::make_pair(5, 5));
 }
 
-void tst_IntegerSubset::testSimpleSumSameNumver()
+void tst_IntegerSubset::testSimpleSumSameNumber()
 {
     IntegerSubset a(2);
     IntegerSubset b(2);

@@ -37,9 +37,12 @@ void Asn1SizeVisitor::visit(const ::Asn1Acn::Constraints::RangeConstraint<Intege
 
 void Asn1SizeVisitor::visit(const ::Asn1Acn::Constraints::AndConstraint<IntegerValue> &constraint)
 {
-    constraint.leftChild()->accept(*this);
-    std::optional<IntegerSubset> lhs = m_subset;
-    constraint.rightChild()->accept(*this);
+    Asn1SizeVisitor lhsVisitor;
+    constraint.leftChild()->accept(lhsVisitor);
+    std::optional<IntegerSubset> lhs = lhsVisitor.getResultSubset();
+
+    Asn1SizeVisitor rhsVisitor;
+    constraint.rightChild()->accept(rhsVisitor);
     std::optional<IntegerSubset> rhs = m_subset;
 
     if (!lhs.has_value() || !rhs.has_value()) {
@@ -51,9 +54,12 @@ void Asn1SizeVisitor::visit(const ::Asn1Acn::Constraints::AndConstraint<IntegerV
 
 void Asn1SizeVisitor::visit(const ::Asn1Acn::Constraints::OrConstraint<IntegerValue> &constraint)
 {
-    constraint.leftChild()->accept(*this);
-    std::optional<IntegerSubset> lhs = m_subset;
-    constraint.rightChild()->accept(*this);
+    Asn1SizeVisitor lhsVisitor;
+    constraint.leftChild()->accept(lhsVisitor);
+    std::optional<IntegerSubset> lhs = lhsVisitor.getResultSubset();
+
+    Asn1SizeVisitor rhsVisitor;
+    constraint.rightChild()->accept(rhsVisitor);
     std::optional<IntegerSubset> rhs = m_subset;
 
     if (!lhs.has_value() || !rhs.has_value()) {
@@ -77,8 +83,9 @@ void Asn1SizeVisitor::visit(const ::Asn1Acn::Constraints::ConstraintList<Integer
 {
     std::optional<IntegerSubset> tmp;
     for (const auto &c : constraint.constraints()) {
-        c->accept(*this);
-        std::optional<IntegerSubset> rhs = m_subset;
+        Asn1SizeVisitor nestedVisitor;
+        c->accept(nestedVisitor);
+        std::optional<IntegerSubset> rhs = nestedVisitor.getResultSubset();
 
         if (!tmp.has_value()) {
             tmp = rhs;
@@ -111,5 +118,10 @@ size_t Asn1SizeVisitor::getMaxSize() const noexcept
         return 0;
     }
     return static_cast<size_t>(max);
+}
+
+const std::optional<IntegerSubset> &Asn1SizeVisitor::getResultSubset() const
+{
+    return m_subset;
 }
 }

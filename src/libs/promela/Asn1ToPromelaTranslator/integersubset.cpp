@@ -37,34 +37,11 @@ IntegerSubset IntegerSubset::operator|(const IntegerSubset &rhs) const
 {
     IntegerSubset result;
 
-    auto p = m_allowedValues.begin();
-    auto q = rhs.m_allowedValues.begin();
+    std::merge(m_allowedValues.begin(), m_allowedValues.end(), rhs.m_allowedValues.begin(), rhs.m_allowedValues.end(),
+            std::back_inserter(result.m_allowedValues),
+            [](const auto &left, const auto &right) { return left.first < right.first; });
 
-    while (p != m_allowedValues.end() && q != rhs.m_allowedValues.end()) {
-        if (p->first < q->first) {
-            result.m_allowedValues.push_back(*p);
-            ++p;
-        } else {
-            result.m_allowedValues.push_back(*q);
-            ++q;
-        }
-    }
-
-    std::copy(p, m_allowedValues.end(), std::back_inserter(result.m_allowedValues));
-    std::copy(q, rhs.m_allowedValues.end(), std::back_inserter(result.m_allowedValues));
-
-    auto iter = result.m_allowedValues.begin();
-
-    while (iter != result.m_allowedValues.end() && std::next(iter) != result.m_allowedValues.end()) {
-        auto successor = std::next(iter);
-
-        if (iter->second + 1 >= successor->first) {
-            iter->second = std::max(iter->second, successor->second);
-            result.m_allowedValues.erase(successor);
-        } else {
-            ++iter;
-        }
-    }
+    result.mergeOverlappingNeighbours();
 
     return result;
 }
@@ -122,4 +99,20 @@ const std::list<std::pair<int, int>> &IntegerSubset::getRanges() const noexcept
 }
 
 IntegerSubset::IntegerSubset() {}
+
+void IntegerSubset::mergeOverlappingNeighbours()
+{
+    auto iter = m_allowedValues.begin();
+
+    while (iter != m_allowedValues.end() && std::next(iter) != m_allowedValues.end()) {
+        auto successor = std::next(iter);
+
+        if (iter->second + 1 >= successor->first) {
+            iter->second = std::max(iter->second, successor->second);
+            m_allowedValues.erase(successor);
+        } else {
+            ++iter;
+        }
+    }
+}
 }

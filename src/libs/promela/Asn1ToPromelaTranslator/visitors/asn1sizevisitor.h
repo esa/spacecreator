@@ -91,6 +91,13 @@ public:
      */
     size_t getMaxSize() const noexcept;
 
+    /**
+     * @brief Getter for result IntegerSubset which describes allowed size values
+     *
+     * @return IntegerSubset with allowed size values
+     */
+    const std::optional<IntegerSubset> &getResultSubset() const;
+
 private:
     std::optional<IntegerSubset> m_subset;
 };

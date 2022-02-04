@@ -29,7 +29,7 @@ class tst_IntegerSubset : public QObject
 private Q_SLOTS:
     void testSimpleSumTwoNumbersA();
     void testSimpleSumTwoNumbersB();
-    void testSimpleSumSameNumver();
+    void testSimpleSumSameNumber();
 
     void testSumRangeAndNumberSeparatedLeft();
     void testSumRangeAndNumberSeparatedRight();

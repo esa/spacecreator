@@ -108,6 +108,7 @@ public:
 
 private:
     IntegerSubset();
+    void mergeOverlappingNeighbours();
 
 private:
     std::list<std::pair<int, int>> m_allowedValues;
