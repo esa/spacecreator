@@ -638,14 +638,10 @@ void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithLengthEntry()
     const auto *entryComponentType = entryComponent->type();
     QVERIFY(entryComponentType);
 
-    const auto *entryComponentTypeReferenced = dynamic_cast<const Types::UserdefinedType *>(entryComponentType);
+    const auto *entryComponentTypeReferenced = dynamic_cast<const Types::Null *>(entryComponentType);
     QVERIFY(entryComponentTypeReferenced);
-    QVERIFY(entryComponentTypeReferenced->type());
-
-    const auto *entryComponentTypeInteger = dynamic_cast<const Types::Integer *>(entryComponentTypeReferenced->type());
-    QVERIFY(entryComponentTypeInteger);
-    QCOMPARE(entryComponentTypeInteger->identifier(), "Integer");
-    QCOMPARE(entryComponentTypeInteger->typeName(), "INTEGER");
+    QCOMPARE(entryComponentTypeReferenced->identifier(), "entry");
+    QCOMPARE(entryComponentTypeReferenced->typeName(), "NULL");
 }
 
 /// \SRS  ETB-FUN-230

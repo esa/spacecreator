@@ -5,9 +5,25 @@ BasicEntryContainer []
 {
     basicEntry []
 }
+ErrorControlEntryContainer []
+{
+    errorControlEntry NULL [align-to-next byte, pattern '00000000'B]
+}
 FixedValueEntryContainer []
 {
     fixedValueEntry []
+}
+LengthEntryContainer []
+{
+    entry1 [],
+    entry2 [],
+    entry3 [],
+    lengthEntry NULL [align-to-next byte, pattern '00000000000000000000000000000000'B]
+}
+ListEntryContainer []
+{
+    lengthEntry IntegerData [],
+    listEntry [size lengthEntry]
 }
 END
 

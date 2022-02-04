@@ -95,7 +95,7 @@ void EntryTranslatorVisitor::operator()(const seds::model::FixedValueEntry &seds
 
 void EntryTranslatorVisitor::operator()(const seds::model::LengthEntry &sedsEntry)
 {
-    auto asn1EntryType = translateEntryType(sedsEntry.type().nameStr());
+    auto asn1EntryType = translateLengthField(sedsEntry);
 
     const auto entryName = Escaper::escapeAsn1FieldName(sedsEntry.nameStr());
     auto sequenceComponent =
@@ -234,6 +234,16 @@ std::unique_ptr<Asn1Acn::Types::Null> EntryTranslatorVisitor::translateErrorCont
         }
     }, sedsEntry.errorControl());
     // clang-format on
+
+    return nullType;
+}
+
+std::unique_ptr<Asn1Acn::Types::Null> EntryTranslatorVisitor::translateLengthField(
+        const seds::model::LengthEntry &sedsEntry) const
+{
+    auto nullType = std::make_unique<Asn1Acn::Types::Null>(sedsEntry.nameStr());
+    nullType->setAlignToNext(Asn1Acn::Types::AlignToNext::byte);
+    nullType->setPattern(QString(32, '0')); // Fixed 32 bits for now, will be changed in actual implementation
 
     return nullType;
 }

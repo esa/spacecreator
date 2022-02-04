@@ -126,6 +126,7 @@ private:
             const seds::model::FixedValueEntry &sedsEntry, Asn1Acn::Types::UserdefinedType *asn1Type) const -> void;
     auto translateErrorControl(const seds::model::ErrorControlEntry &sedsEntry) const
             -> std::unique_ptr<Asn1Acn::Types::Null>;
+    auto translateLengthField(const seds::model::LengthEntry &sedsEntry) const -> std::unique_ptr<Asn1Acn::Types::Null>;
 
     auto translateCoreErrorControl(seds::model::CoreErrorControl coreErrorControl, Asn1Acn::Types::Null *asn1Type) const
             -> void;
