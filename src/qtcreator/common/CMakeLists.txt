@@ -5,11 +5,14 @@ add_library(PluginCommon STATIC)
 target_sources(PluginCommon
     PRIVATE     modelloader/modelloader.cpp
                 modelloader/modelloader.h
+                ivtools/ivtools.cpp
+                ivtools/ivtools.h
 )
 
 target_include_directories(PluginCommon
     PUBLIC      .
                 ${CMAKE_SOURCE_DIR}/src/qtcreator/common/modelloader
+                ${CMAKE_SOURCE_DIR}/src/qtcreator/common/ivtools
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs
 )
 

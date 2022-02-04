@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -22,13 +22,17 @@
 #include <QTest>
 #include <QtTest/qtestcase.h>
 #include <exception>
+#include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
+#include <ivtools.h>
 #include <modelloader.h>
+#include <qdebug.h>
 #include <qobjectdefs.h>
 #include <shared/sharedlibrary.h>
 #include <stdexcept>
 #include <testgenerator/testgenerator.h>
 
+using plugincommon::IvTools;
 using plugincommon::ModelLoader;
 using testgenerator::IvGenerator;
 
@@ -68,6 +72,11 @@ void tst_ivgenerator::testFail()
     const auto ivModelLoaded = dynamic_cast<ivm::IVModel *>(ivModelLoadedRaw.get());
     if (ivModelLoaded == nullptr) {
         throw std::runtime_error(QString("%1 file could not be read as IV").arg(interfaceviewFilepath).toStdString());
+    }
+
+    std::vector<ivm::IVFunction *> loadedFunctions = IvTools::getFunctions(ivModelLoaded);
+    for (const auto &function : loadedFunctions) {
+        qDebug() << function->title();
     }
 
     // compare ivModels

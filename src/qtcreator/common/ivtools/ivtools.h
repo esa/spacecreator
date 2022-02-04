@@ -17,30 +17,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "ivgenerator.h"
+#pragma once
 
+#include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
-#include <ivcore/ivpropertytemplateconfig.h>
-#include <memory>
-#include <shared/propertytemplateconfig.h>
-#include <stdexcept>
+#include <vector>
 
-namespace testgenerator {
+namespace plugincommon {
 
-auto IvGenerator::generate(const QString &interfaceUnderTestName, const QString &functionUnderTestName,
-        const QString &functionUnderTestLanguage) -> std::unique_ptr<ivm::IVModel>
+class IvTools
 {
-    (void)interfaceUnderTestName;
-    (void)functionUnderTestName;
-    (void)functionUnderTestLanguage;
+public:
+    static auto getFunctions(ivm::IVModel *model) -> std::vector<ivm::IVFunction *>;
+};
 
-    auto *const config = ivm::IVPropertyTemplateConfig::instance();
-    if (config == nullptr) {
-        throw std::runtime_error("config is null");
-    }
-    auto ivModel = std::make_unique<ivm::IVModel>(config);
-
-    return ivModel;
-}
-
-} // namespace testgenerator
+} // namespace plugincommon
