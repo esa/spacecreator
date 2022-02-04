@@ -21,14 +21,14 @@
 
 namespace seds::model {
 
-const GenericTypeMap &GenericAlternate::genericTypeMap() const
+const std::vector<GenericTypeMap> &GenericAlternate::genericTypeMaps() const
 {
-    return m_genericTypeMap;
+    return m_genericTypeMaps;
 }
 
-void GenericAlternate::setGenericTypeMap(GenericTypeMap genericTypeMap)
+void GenericAlternate::addGenericTypeMap(GenericTypeMap genericTypeMap)
 {
-    m_genericTypeMap = std::move(genericTypeMap);
+    m_genericTypeMaps.push_back(std::move(genericTypeMap));
 }
 
 } // namespace seds::model
