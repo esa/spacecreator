@@ -17,35 +17,35 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "TestGeneratorContext.h"
+#include "TestDriverGeneratorContext.h"
 
-#include "TestGeneratorException.h"
+#include "TestDriverGeneratorException.h"
 
 namespace testgenerator {
 
-TestGeneratorContext::TestGeneratorContext(const Fields &headerFields, const InterfaceParameters &params)
+TestDriverGeneratorContext::TestDriverGeneratorContext(const Fields &headerFields, const InterfaceParameters &params)
 {
     countOutputParameters(params);
     calculateHeaderFieldsToParamsMappings(headerFields, params);
 }
 
-auto TestGeneratorContext::mappings() const -> Mappings
+auto TestDriverGeneratorContext::mappings() const -> Mappings
 {
     return m_mappings;
 }
 
-auto TestGeneratorContext::outputParametersCount() const -> unsigned int
+auto TestDriverGeneratorContext::outputParametersCount() const -> unsigned int
 {
     return m_outputParametersCount;
 }
 
-auto TestGeneratorContext::countOutputParameters(const InterfaceParameters &params) -> void
+auto TestDriverGeneratorContext::countOutputParameters(const InterfaceParameters &params) -> void
 {
     m_outputParametersCount = std::count_if(params.begin(), params.end(),
             [](const auto &param) { return param.direction() == shared::InterfaceParameter::Direction::OUT; });
 }
 
-auto TestGeneratorContext::calculateHeaderFieldsToParamsMappings(
+auto TestDriverGeneratorContext::calculateHeaderFieldsToParamsMappings(
         const std::vector<csv::Field> &headerFields, const InterfaceParameters &params) -> void
 {
     const unsigned int paramsSize = static_cast<unsigned int>(params.size());
@@ -54,7 +54,7 @@ auto TestGeneratorContext::calculateHeaderFieldsToParamsMappings(
 
     if (!headerFields.empty()) {
         if (headerFields.size() != paramsSize) {
-            throw TestGeneratorException("Imported CSV contains invalid number of data columns");
+            throw TestDriverGeneratorException("Imported CSV contains invalid number of data columns");
         }
         std::vector<bool> elementsFound(paramsSize, false);
         for (unsigned int i = 0; i < paramsSize; i++) {
@@ -75,7 +75,7 @@ auto TestGeneratorContext::calculateHeaderFieldsToParamsMappings(
             }
         }
         if (std::any_of(elementsFound.begin(), elementsFound.end(), [](const auto &found) -> bool { return !found; })) {
-            throw TestGeneratorException("Header fields do not match interface parameter names");
+            throw TestDriverGeneratorException("Header fields do not match interface parameter names");
         }
     } else {
         for (unsigned int i = 0; i < paramsSize; i++) {

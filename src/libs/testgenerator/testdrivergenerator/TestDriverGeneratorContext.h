@@ -27,19 +27,19 @@ typedef std::vector<unsigned int> Mappings;
 typedef std::vector<csv::Field> Fields;
 
 /**
- * @brief Context parameters for Test Generator (holds values needed during the current generation)
+ * @brief Context parameters for Test Driver Generator (holds values needed during the current generation)
  *
  */
-class TestGeneratorContext final
+class TestDriverGeneratorContext final
 {
 public:
     /**
-     * @brief Construct a new Test Generator Context object in the beginning of TestDriver generation
+     * @brief Construct a new Test Driver Generator Context object in the beginning of TestDriver generation
      *
      * @param headerFields  header of the CSV data
      * @param params        parameters of the interface under test
      */
-    TestGeneratorContext(const Fields &headerFields, const InterfaceParameters &params);
+    TestDriverGeneratorContext(const Fields &headerFields, const InterfaceParameters &params);
 
     /**
      * @brief   Get interface parameter number to data column mapping (which column in CSV model matches which interface

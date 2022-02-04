@@ -17,9 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "TestGenerator.h"
+#include "TestDriverGenerator.h"
 
-#include "TestGeneratorException.h"
+#include "TestDriverGeneratorException.h"
 
 #include <QDebug>
 #include <algorithm>
@@ -39,29 +39,29 @@ using IfDirection = shared::InterfaceParameter::Direction;
 
 namespace testgenerator {
 
-const QString TestGenerator::testDriverFunctionName = "testdriver";
-const QString TestGenerator::testDriverTestInterfaceName = "StartTest";
-const QString TestGenerator::notifyFunctionName = "notifyTestFinished";
-const QString TestGenerator::testVectorTypeName = "TestVector";
-const QString TestGenerator::testVectorVariableName = "testData";
-const QString TestGenerator::testDriverHeaderFilename = QString("%1.h").arg(testDriverFunctionName);
-const QString TestGenerator::testDriverStartupFunctionDeclaration =
+const QString TestDriverGenerator::testDriverFunctionName = "testdriver";
+const QString TestDriverGenerator::testDriverTestInterfaceName = "StartTest";
+const QString TestDriverGenerator::notifyFunctionName = "notifyTestFinished";
+const QString TestDriverGenerator::testVectorTypeName = "TestVector";
+const QString TestDriverGenerator::testVectorVariableName = "testData";
+const QString TestDriverGenerator::testDriverHeaderFilename = QString("%1.h").arg(testDriverFunctionName);
+const QString TestDriverGenerator::testDriverStartupFunctionDeclaration =
         QString("void %1_startup(void)").arg(testDriverFunctionName);
-const QString TestGenerator::testDriverStartTestFunctionDeclaration =
+const QString TestDriverGenerator::testDriverStartTestFunctionDeclaration =
         QString("void %1_PI_%2(void)").arg(testDriverFunctionName).arg(testDriverTestInterfaceName);
 
-auto TestGenerator::getTestDriverRiName(const ivm::IVInterface &interface) -> QString
+auto TestDriverGenerator::getTestDriverRiName(const ivm::IVInterface &interface) -> QString
 {
     return QString("testdriver_RI_%1").arg(removePiPrefix(interface.title()));
 }
 
-auto TestGenerator::generateTestDriver(
+auto TestDriverGenerator::generateTestDriver(
         const CsvModel &testData, const ivm::IVInterface &interface, const Asn1Model &asn1Model) -> std::stringstream
 {
     checkTestData(testData);
     checkInterface(interface);
 
-    const TestGeneratorContext context(testData.header().fields(), interface.params());
+    const TestDriverGeneratorContext context(testData.header().fields(), interface.params());
 
     const auto testRecordsSize = testData.records().size();
     const QString testDriverRiName = getTestDriverRiName(interface);
@@ -131,35 +131,35 @@ auto TestGenerator::generateTestDriver(
     return ss;
 }
 
-auto TestGenerator::checkTestData(const CsvModel &testData) -> void
+auto TestDriverGenerator::checkTestData(const CsvModel &testData) -> void
 {
     if (testData.records().empty()) {
-        throw TestGeneratorException("Given test data is empty");
+        throw TestDriverGeneratorException("Given test data is empty");
     }
 }
 
-auto TestGenerator::checkInterface(const ivm::IVInterface &interface) -> void
+auto TestDriverGenerator::checkInterface(const ivm::IVInterface &interface) -> void
 {
     if (interface.kind() == ivm::IVInterface::OperationKind::Cyclic
             || interface.kind() == ivm::IVInterface::OperationKind::Sporadic
             || interface.kind() == ivm::IVInterface::OperationKind::Any) {
-        throw TestGeneratorException("Tested interface must be of type Protected or Unprotected");
+        throw TestDriverGeneratorException("Tested interface must be of type Protected or Unprotected");
     }
 
     if (interface.params().isEmpty()) {
-        throw TestGeneratorException("No input parameters in selected interface");
+        throw TestDriverGeneratorException("No input parameters in selected interface");
     }
 
     if (!interface.isProvided()) {
-        throw TestGeneratorException("Only provided interface could be tested");
+        throw TestDriverGeneratorException("Only provided interface could be tested");
     }
 
     if (interface.function() == nullptr) {
-        throw TestGeneratorException("Interface without function is invalid");
+        throw TestDriverGeneratorException("Interface without function is invalid");
     }
 }
 
-auto TestGenerator::getAsn1Type(const QString &name, const Asn1Model &model) -> Type::ASN1Type
+auto TestDriverGenerator::getAsn1Type(const QString &name, const Asn1Model &model) -> Type::ASN1Type
 {
     for (const auto &datum : model.data()) {
         const auto &definitionsList = datum->definitionsList();
@@ -171,10 +171,10 @@ auto TestGenerator::getAsn1Type(const QString &name, const Asn1Model &model) -> 
             }
         }
     }
-    throw TestGeneratorException("Interface parameter type not present in ASN.1 file");
+    throw TestDriverGeneratorException("Interface parameter type not present in ASN.1 file");
 }
 
-auto TestGenerator::qstringToBoolSymbol(const QString &str) -> QString
+auto TestDriverGenerator::qstringToBoolSymbol(const QString &str) -> QString
 {
     const int val = str.toInt();
     if (val == 0) {
@@ -186,8 +186,9 @@ auto TestGenerator::qstringToBoolSymbol(const QString &str) -> QString
     }
 }
 
-auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, const Asn1Model &asn1Model,
-        const CsvModel &testData, const unsigned int testDataRowIndex, const TestGeneratorContext &context) -> QString
+auto TestDriverGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, const Asn1Model &asn1Model,
+        const CsvModel &testData, const unsigned int testDataRowIndex, const TestDriverGeneratorContext &context)
+        -> QString
 {
     const auto &ifParams = interface.params();
     if (ifParams.isEmpty()) {
@@ -219,7 +220,7 @@ auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, 
             result += qstringToBoolSymbol(testData.field(testDataRowIndex, srcFieldIndex));
             break;
         default:
-            throw TestGeneratorException("Interface parameter type not yet implemented");
+            throw TestDriverGeneratorException("Interface parameter type not yet implemented");
         }
         }
         result += ";\n";
@@ -228,7 +229,7 @@ auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, 
     return result;
 }
 
-auto TestGenerator::removePiPrefix(const QString &str) -> QString
+auto TestDriverGenerator::removePiPrefix(const QString &str) -> QString
 {
     constexpr int prefixLen = 3;
 

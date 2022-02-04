@@ -17,23 +17,41 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "TestGeneratorException.h"
+#include <QString>
+#include <exception>
 
 namespace testgenerator {
 
-TestGeneratorException::TestGeneratorException(QString message)
-    : m_message(std::move(message))
+/**
+ * @brief Test generator exception class
+ *
+ */
+class TestDriverGeneratorException final : public std::exception
 {
-}
+public:
+    /**
+     * @brief Construct a new Test Generator Exception object
+     *
+     * @param message error message
+     */
+    TestDriverGeneratorException(QString message);
 
-const char *TestGeneratorException::what() const noexcept
-{
-    return m_message.toUtf8().constData();
-}
+    /**
+     * @brief   Returns error message as const char*
+     *
+     * @returns Error message
+     */
+    virtual auto what() const noexcept -> const char * override;
 
-const QString &TestGeneratorException::errorMessage() const noexcept
-{
-    return m_message;
-}
+    /**
+     * @brief   Returns error message as QString
+     *
+     * @returns Error message
+     */
+    auto errorMessage() const noexcept -> const QString &;
+
+private:
+    QString m_message;
+};
 
 } // namespace testgenerator

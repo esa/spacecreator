@@ -44,15 +44,14 @@
 #include <shared/common.h>
 #include <shared/sharedlibrary.h>
 #include <sstream>
-#include <testgenerator/TestGenerator.h>
-#include <testgenerator/TestGeneratorException.h>
+#include <testgenerator/testgenerator.h>
 
-using testgenerator::TestGenerator;
-using testgenerator::TestGeneratorException;
+using testgenerator::TestDriverGenerator;
+using testgenerator::TestDriverGeneratorException;
 
 namespace tests::testgenerator {
 
-class tst_testgenerator : public QObject
+class tst_testdrivergenerator : public QObject
 {
     Q_OBJECT
 
@@ -136,7 +135,7 @@ static void checkStreamAgainstExpectedOut(const std::stringstream &stream, const
     }
 }
 
-void tst_testgenerator::testEmpty()
+void tst_testdrivergenerator::testEmpty()
 {
     const auto csvModel = loadCsvModel("resources/empty.csv");
     const csv::CsvModel &csvRef = *csvModel;
@@ -159,10 +158,10 @@ void tst_testgenerator::testEmpty()
     const ivm::IVInterface &interface = *ifUnderTest;
 
     QVERIFY_EXCEPTION_THROWN(
-            TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef), TestGeneratorException);
+            TestDriverGenerator::generateTestDriver(csvRef, interface, asn1ModelRef), TestDriverGeneratorException);
 }
 
-void tst_testgenerator::testNominal()
+void tst_testdrivergenerator::testNominal()
 {
     auto csvModel = loadCsvModel("resources/test_data.csv");
     const csv::CsvModel &csvRef = *csvModel;
@@ -183,12 +182,12 @@ void tst_testgenerator::testNominal()
     }
     const ivm::IVInterface &interface = *ifUnderTest;
 
-    auto outStream = TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
+    auto outStream = TestDriverGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
 
     checkStreamAgainstExpectedOut(outStream, "resources/testdriver.c.out");
 }
 
-void tst_testgenerator::testNominalSwappedColumns()
+void tst_testdrivergenerator::testNominalSwappedColumns()
 {
     auto csvModel = loadCsvModel("resources/test_data_swapped_columns.csv");
     const csv::CsvModel &csvRef = *csvModel;
@@ -209,12 +208,12 @@ void tst_testgenerator::testNominalSwappedColumns()
     }
     const ivm::IVInterface &interface = *ifUnderTest;
 
-    auto outStream = TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
+    auto outStream = TestDriverGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
 
     checkStreamAgainstExpectedOut(outStream, "resources/testdriver.c.out");
 }
 
-void tst_testgenerator::testNominalTwoOutputs()
+void tst_testdrivergenerator::testNominalTwoOutputs()
 {
     auto csvModel = loadCsvModel("resources/two_outputs-test_data.csv");
     const csv::CsvModel &csvRef = *csvModel;
@@ -235,12 +234,12 @@ void tst_testgenerator::testNominalTwoOutputs()
     }
     const ivm::IVInterface &interface = *ifUnderTest;
 
-    auto outStream = TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
+    auto outStream = TestDriverGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
 
     checkStreamAgainstExpectedOut(outStream, "resources/two_outputs-testdriver.c.out");
 }
 
-void tst_testgenerator::testCyclicInterface()
+void tst_testdrivergenerator::testCyclicInterface()
 {
     auto csvModel = loadCsvModel("resources/test_data.csv");
     const csv::CsvModel &csvRef = *csvModel;
@@ -262,10 +261,10 @@ void tst_testgenerator::testCyclicInterface()
     const ivm::IVInterface &interface = *ifUnderTest;
 
     QVERIFY_EXCEPTION_THROWN(
-            TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef), TestGeneratorException);
+            TestDriverGenerator::generateTestDriver(csvRef, interface, asn1ModelRef), TestDriverGeneratorException);
 }
 
-void tst_testgenerator::testImplementationNotInC()
+void tst_testdrivergenerator::testImplementationNotInC()
 {
     auto csvModel = loadCsvModel("resources/test_data.csv");
     const csv::CsvModel &csvRef = *csvModel;
@@ -286,13 +285,13 @@ void tst_testgenerator::testImplementationNotInC()
     }
     const ivm::IVInterface &interface = *ifUnderTest;
 
-    auto outStream = TestGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
+    auto outStream = TestDriverGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
 
     checkStreamAgainstExpectedOut(outStream, "resources/testdriver.c.out");
 }
 
 } // namespace tests::testgenerator
 
-QTEST_MAIN(tests::testgenerator::tst_testgenerator)
+QTEST_MAIN(tests::testgenerator::tst_testdrivergenerator)
 
 #include "tst_testgenerator.moc"

@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,31 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include <QDebug>
-#include <QObject>
-#include <QTest>
-#include <QtTest/qtestcase.h>
-#include <qobjectdefs.h>
-#include <qtest.h>
-#include <testgenerator/testgenerator.h>
+#pragma once
 
-namespace tests::testgenerator {
-
-class tst_ivgenerator final : public QObject
-{
-    Q_OBJECT
-
-private Q_SLOTS:
-    void testFail();
-};
-
-void tst_ivgenerator::testFail()
-{
-    QFAIL("this shall happen");
-}
-
-} // namespace tests::testgenerator
-
-QTEST_MAIN(tests::testgenerator::tst_ivgenerator)
-
-#include "tst_ivgenerator.moc"
+#include "harness/ivgenerator/ivgenerator.h"
+#include "testdrivergenerator/TestDriverGenerator.h"
+#include "testdrivergenerator/TestDriverGeneratorException.h"

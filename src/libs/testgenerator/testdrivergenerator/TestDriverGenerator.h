@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "TestGeneratorContext.h"
+#include "TestDriverGeneratorContext.h"
 
 #include <QTextStream>
 #include <asn1/asn1model.h>
@@ -40,7 +40,7 @@ namespace testgenerator {
  * @brief Provides a method to generate TestDriver source as a text stream
  *
  */
-class TestGenerator final
+class TestDriverGenerator final
 {
 public:
     /**
@@ -118,7 +118,7 @@ private:
     static auto getAsn1Type(const QString &name, const Asn1Model &model) -> Type::ASN1Type;
     static auto qstringToBoolSymbol(const QString &str) -> QString;
     static auto getAssignmentsForRecords(const ivm::IVInterface &interface, const Asn1Model &asn1Model,
-            const CsvModel &testData, unsigned int index, const TestGeneratorContext &context) -> QString;
+            const CsvModel &testData, unsigned int index, const TestDriverGeneratorContext &context) -> QString;
     static auto removePiPrefix(const QString &str) -> QString;
 };
 

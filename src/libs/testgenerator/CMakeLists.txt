@@ -3,19 +3,18 @@ project(TestGenerator VERSION 1.0.0 LANGUAGES CXX)
 add_library(TestGenerator STATIC)
 
 target_sources(TestGenerator
-    PRIVATE     TestGenerator.cpp
-                TestGenerator.h
-                TestGeneratorContext.cpp
-                TestGeneratorContext.h
-                TestGeneratorException.cpp
-                TestGeneratorException.h
+    PRIVATE     testdrivergenerator/TestDriverGenerator.cpp
+                testdrivergenerator/TestDriverGenerator.h
+                testdrivergenerator/TestDriverGeneratorContext.cpp
+                testdrivergenerator/TestDriverGeneratorContext.h
+                testdrivergenerator/TestDriverGeneratorException.cpp
+                testdrivergenerator/TestDriverGeneratorException.h
                 harness/ivgenerator/ivgenerator.cpp
                 harness/ivgenerator/ivgenerator.h
 )
 
 target_include_directories(TestGenerator
     PUBLIC      .
-                harness/ivgenerator
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs
 )
 
