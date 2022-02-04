@@ -14,7 +14,7 @@ target_include_directories(${TEST_NAME}
 )
 
 target_link_libraries(${TEST_NAME}
-    PRIVATE     
+    PRIVATE     PluginCommon
                 ivcore
                 TestGenerator
                 Qt${QT_VERSION_MAJOR}::Core
@@ -23,3 +23,6 @@ target_link_libraries(${TEST_NAME}
 )
 
 add_format_target(${TEST_NAME})
+
+configure_file(resources/interfaceview.xml resources/interfaceview.xml COPYONLY)
+configure_file(resources/config.xml resources/config.xml COPYONLY)

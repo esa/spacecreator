@@ -21,9 +21,16 @@
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
+#include <exception>
+#include <ivcore/ivmodel.h>
+#include <modelloader.h>
 #include <qobjectdefs.h>
-#include <qtest.h>
+#include <shared/sharedlibrary.h>
+#include <stdexcept>
 #include <testgenerator/testgenerator.h>
+
+using plugincommon::ModelLoader;
+using testgenerator::IvGenerator;
 
 namespace tests::testgenerator {
 
@@ -32,12 +39,38 @@ class tst_ivgenerator final : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void initTestCase();
     void testFail();
+
+private:
+    const QString interfaceviewFilepath = "resources/interfaceview.xml";
+    const QString ivConfig = "resources/config.xml";
+    const QString interfaceUnderTestName = "InterfaceUnderTest";
+    const QString functionUnderTestName = "FunctionUnderTest";
+    const QString functionUnderTestLanguage = "C";
 };
+
+void tst_ivgenerator::initTestCase()
+{
+    shared::initSharedLibrary();
+}
 
 void tst_ivgenerator::testFail()
 {
-    QFAIL("this shall happen");
+    const auto ivModelGenerated =
+            IvGenerator::generate(interfaceUnderTestName, functionUnderTestName, functionUnderTestLanguage);
+
+    if (ivModelGenerated == nullptr) {
+        QFAIL("IV model was not generated");
+    }
+
+    const auto ivModelLoadedRaw = ModelLoader::loadIvModel(ivConfig, interfaceviewFilepath);
+    const auto ivModelLoaded = dynamic_cast<ivm::IVModel *>(ivModelLoadedRaw.get());
+    if (ivModelLoaded == nullptr) {
+        throw std::runtime_error(QString("%1 file could not be read as IV").arg(interfaceviewFilepath).toStdString());
+    }
+
+    // compare ivModels
 }
 
 } // namespace tests::testgenerator

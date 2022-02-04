@@ -19,7 +19,12 @@
 
 #include "ivgenerator.h"
 
+#include "ivmodel.h"
+#include "ivpropertytemplateconfig.h"
+#include "propertytemplateconfig.h"
+
 #include <memory>
+#include <stdexcept>
 
 namespace testgenerator {
 
@@ -30,7 +35,13 @@ auto IvGenerator::generate(const QString &interfaceUnderTestName, const QString 
     (void)functionUnderTestName;
     (void)functionUnderTestLanguage;
 
-    return nullptr;
+    auto *const config = ivm::IVPropertyTemplateConfig::instance();
+    if (config == nullptr) {
+        throw std::runtime_error("config is null");
+    }
+    auto ivModel = std::make_unique<ivm::IVModel>(config);
+
+    return ivModel;
 }
 
 } // namespace testgenerator
