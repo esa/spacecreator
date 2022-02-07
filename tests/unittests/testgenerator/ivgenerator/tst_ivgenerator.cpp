@@ -60,10 +60,9 @@ private:
 static void compareModels(ivm::IVModel *loadedModel, ivm::IVModel *generatedModel);
 static void compareFunctions(ivm::IVFunction *loadedFunction, ivm::IVFunction *generatedFunction);
 static void compareInterfaces(ivm::IVInterface *loadedInterface, ivm::IVInterface *generatedInterface);
-static QVector<int> createLoadedToGeneratedFunctionMap(
-        const QVector<ivm::IVFunction *> &loadedFunctions, const QVector<ivm::IVFunction *> &generatedFunctions);
-static QVector<int> createLoadedToGeneratedInterfaceMap(
-        const QVector<ivm::IVInterface *> &loadedInterfaces, const QVector<ivm::IVInterface *> &generatedInterfaces);
+
+template<typename T>
+QVector<int> createQVectorToQVectorMap(T source, T destination);
 
 void tst_ivgenerator::initTestCase()
 {
@@ -108,7 +107,7 @@ static void compareModels(ivm::IVModel *const loadedModel, ivm::IVModel *const g
     const int generatedFunctionsSize = generatedFunctions.size();
     QCOMPARE(generatedFunctionsSize, loadedFunctionsSize);
 
-    QVector<int> loadedToGeneratedFunctionMap = createLoadedToGeneratedFunctionMap(loadedFunctions, generatedFunctions);
+    QVector<int> loadedToGeneratedFunctionMap = createQVectorToQVectorMap(loadedFunctions, generatedFunctions);
     if (std::any_of(loadedToGeneratedFunctionMap.begin(), loadedToGeneratedFunctionMap.end(),
                 [&loadedFunctionsSize](const auto &el) { return el == loadedFunctionsSize; })) {
         QFAIL(QString("Function not found in generated model").toStdString().c_str());
@@ -131,8 +130,7 @@ static void compareFunctions(ivm::IVFunction *const loadedFunction, ivm::IVFunct
     const int generatedInterfacesSize = generatedInterfaces.size();
     QCOMPARE(generatedInterfacesSize, loadedInterfacesSize);
 
-    QVector<int> loadedToGeneratedInterfaceMap =
-            createLoadedToGeneratedInterfaceMap(loadedInterfaces, generatedInterfaces);
+    QVector<int> loadedToGeneratedInterfaceMap = createQVectorToQVectorMap(loadedInterfaces, generatedInterfaces);
 
     for (int j = 0; j < generatedInterfacesSize; j++) {
         const auto &generatedInterface = generatedInterfaces.at(j);
@@ -147,40 +145,21 @@ static void compareInterfaces(ivm::IVInterface *loadedInterface, ivm::IVInterfac
     QCOMPARE(generatedInterface->title(), loadedInterface->title());
 }
 
-static QVector<int> createLoadedToGeneratedFunctionMap(
-        const QVector<ivm::IVFunction *> &loadedFunctions, const QVector<ivm::IVFunction *> &generatedFunctions)
+// T could be at least QVector<IVInterface*> or QVector<IVFunction*>
+template<typename T>
+QVector<int> createQVectorToQVectorMap(const T source, const T destination)
 {
-    const int loadedFunctionsSize = loadedFunctions.size();
-    const int generatedFunctionsSize = generatedFunctions.size();
+    const int sourceSize = source.size();
+    const int destinationSize = destination.size();
+    assert(sourceSize == destinationSize);
 
-    QVector<int> map(loadedFunctionsSize, loadedFunctionsSize);
+    QVector<int> map(sourceSize, sourceSize);
 
-    for (int i = 0; i < loadedFunctionsSize; i++) {
-        const auto &loadedFunction = loadedFunctions.at(i);
-        for (int j = 0; j < generatedFunctionsSize; j++) {
-            const auto &generatedFunction = generatedFunctions.at(j);
-            if (loadedFunction->title().compare(generatedFunction->title()) == 0) {
-                map[i] = j;
-            }
-        }
-    }
-
-    return map;
-}
-
-static QVector<int> createLoadedToGeneratedInterfaceMap(
-        const QVector<ivm::IVInterface *> &loadedInterfaces, const QVector<ivm::IVInterface *> &generatedInterfaces)
-{
-    const int loadedInterfacesSize = loadedInterfaces.size();
-    const int generatedInterfacesSize = generatedInterfaces.size();
-
-    QVector<int> map(loadedInterfacesSize, loadedInterfacesSize);
-
-    for (int j = 0; j < generatedInterfacesSize; j++) {
-        const auto &generatedInterface = generatedInterfaces.at(j);
-        for (int k = 0; k < loadedInterfacesSize; k++) {
-            const auto &loadedInterface = loadedInterfaces.at(k);
-            if (loadedInterface->title().compare(generatedInterface->title()) == 0) {
+    for (int j = 0; j < destinationSize; j++) {
+        const auto &dst = destination.at(j);
+        for (int k = 0; k < sourceSize; k++) {
+            const auto &src = destination.at(k);
+            if (src->title().compare(dst->title()) == 0) {
                 map[j] = k;
             }
         }
