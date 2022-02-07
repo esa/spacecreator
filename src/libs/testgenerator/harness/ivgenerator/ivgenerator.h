@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <ivcore/ivinterface.h>
 #include <ivcore/ivmodel.h>
 #include <memory>
 
@@ -27,8 +28,7 @@ namespace testgenerator {
 class IvGenerator
 {
 public:
-    static auto generate(const QString &interfaceUnderTestName, const QString &functionUnderTestName,
-            const QString &functionUnderTestLanguage) -> std::unique_ptr<ivm::IVModel>;
+    static auto generate(ivm::IVInterface *interfaceUnderTest) -> std::unique_ptr<ivm::IVModel>;
 };
 
 } // namespace testgenerator

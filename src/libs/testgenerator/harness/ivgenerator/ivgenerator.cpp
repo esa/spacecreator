@@ -19,33 +19,37 @@
 
 #include "ivgenerator.h"
 
-#include "common.h"
-#include "ivinterface.h"
-#include "ivobject.h"
-#include "parameter.h"
-
 #include <QDebug>
+#include <exception>
 #include <ivcore/ivfunction.h>
-#include <ivcore/ivmodel.h>
+#include <ivcore/ivobject.h>
 #include <ivcore/ivpropertytemplateconfig.h>
 #include <memory>
+#include <shared/common.h>
+#include <shared/parameter.h>
 #include <shared/propertytemplateconfig.h>
 #include <stdexcept>
 
 namespace testgenerator {
 
-auto IvGenerator::generate(const QString &interfaceUnderTestName, const QString &functionUnderTestName,
-        const QString &functionUnderTestLanguage) -> std::unique_ptr<ivm::IVModel>
+auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::unique_ptr<ivm::IVModel>
 {
-    (void)interfaceUnderTestName;
-    (void)functionUnderTestName;
-    (void)functionUnderTestLanguage;
-
     auto *const config = ivm::IVPropertyTemplateConfig::instance();
     if (config == nullptr) {
         throw std::runtime_error("config is null");
     }
     auto ivModel = std::make_unique<ivm::IVModel>(config);
+
+    if (interfaceUnderTest == nullptr) {
+        return ivModel;
+    }
+
+    if (interfaceUnderTest->function() == nullptr) {
+        throw std::runtime_error("Selected interface has no function specified");
+    }
+
+    const QString interfaceUnderTestName = interfaceUnderTest->title();
+    const QString functionUnderTestName = interfaceUnderTest->function()->title();
 
     ivm::IVFunction *const testDriverFunction = new ivm::IVFunction;
     testDriverFunction->setTitle("TestDriver");

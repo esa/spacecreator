@@ -17,14 +17,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#include "ivinterface.h"
+
 #include <QDebug>
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
+#include <algorithm>
 #include <exception>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
 #include <ivtools.h>
+#include <memory>
 #include <modelloader.h>
 #include <qdebug.h>
 #include <qobjectdefs.h>
@@ -51,7 +55,6 @@ private:
     const QString ivConfig = "resources/config.xml";
     const QString interfaceUnderTestName = "InterfaceUnderTest";
     const QString functionUnderTestName = "FunctionUnderTest";
-    const QString functionUnderTestLanguage = "C";
 };
 
 void tst_ivgenerator::initTestCase()
@@ -61,8 +64,17 @@ void tst_ivgenerator::initTestCase()
 
 void tst_ivgenerator::testFail()
 {
-    const auto ivModelGenerated =
-            IvGenerator::generate(interfaceUnderTestName, functionUnderTestName, functionUnderTestLanguage);
+    const auto functionUnderTest = std::make_unique<ivm::IVFunction>();
+    functionUnderTest->setTitle(functionUnderTestName);
+
+    ivm::IVInterface::CreationInfo ci;
+    ci.name = interfaceUnderTestName;
+    ci.kind = ivm::IVInterface::OperationKind::Protected;
+    ci.type = ivm::IVInterface::InterfaceType::Provided;
+    ci.function = functionUnderTest.get();
+    ivm::IVInterface *const interfaceUnderTest = ivm::IVInterface::createIface(ci);
+
+    const auto ivModelGenerated = IvGenerator::generate(interfaceUnderTest);
 
     if (ivModelGenerated == nullptr) {
         QFAIL("IV model was not generated");
@@ -74,18 +86,26 @@ void tst_ivgenerator::testFail()
         throw std::runtime_error(QString("%1 file could not be read as IV").arg(interfaceviewFilepath).toStdString());
     }
 
-    // compare ivModels
+    /// compare ivModels
+    // check if they contain functions with equal names
     const std::vector<ivm::IVFunction *> loadedFunctions = IvTools::getFunctions(ivModelLoaded);
+    const unsigned int loadedFunctionsSize = loadedFunctions.size();
     const std::vector<ivm::IVFunction *> generatedFunctions = IvTools::getFunctions(ivModelGenerated.get());
-    (void)generatedFunctions;
-    QCOMPARE(generatedFunctions.size(), loadedFunctions.size());
-    qDebug() << "loaded:";
-    for (const auto &function : loadedFunctions) {
-        qDebug() << function->title();
+    const unsigned int generatedFunctionsSize = generatedFunctions.size();
+    QCOMPARE(generatedFunctionsSize, loadedFunctionsSize);
+    std::vector<unsigned int> loadedToGeneratedMap(loadedFunctionsSize, loadedFunctionsSize);
+    for (unsigned int i = 0; i < loadedFunctionsSize; i++) {
+        const auto &loadedFunction = loadedFunctions.at(i);
+        for (unsigned j = 0; j < generatedFunctionsSize; j++) {
+            const auto &generatedFunction = generatedFunctions.at(j);
+            if (loadedFunction->title().compare(generatedFunction->title()) == 0) {
+                loadedToGeneratedMap.at(i) = j;
+            }
+        }
     }
-    qDebug() << "generated:";
-    for (const auto &function : generatedFunctions) {
-        qDebug() << function->title();
+    if (std::any_of(loadedToGeneratedMap.begin(), loadedToGeneratedMap.end(),
+                [&loadedFunctionsSize](const auto &el) { return el == loadedFunctionsSize; })) {
+        QFAIL(QString("Function not found in generated model").toStdString().c_str());
     }
 }
 
