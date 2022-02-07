@@ -126,6 +126,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
                 SedsComponentBuilder("Component")
                     .declaringInterface(
                         SedsInterfaceDeclarationBuilder("RequiredInterface")
+                            .withGenericType("GenericType")
                             .withCommand(
                                 SedsInterfaceCommandBuilder("ICommand", InterfaceCommandMode::Async)
                                     .withArgument("CmdArg", "GenericType", CommandArgumentMode::In)
@@ -192,6 +193,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
                 SedsComponentBuilder("Component")
                     .declaringInterface(
                         SedsInterfaceDeclarationBuilder("RequiredInterface")
+                            .withGenericType("GenericType")
                             .withCommand(SedsInterfaceCommandBuilder("ICommand", InterfaceCommandMode::Async)
                                 .withArgument("CmdArg", "GenericType", CommandArgumentMode::In)
                                 .build())

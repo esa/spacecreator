@@ -27,13 +27,11 @@
 #include <algorithm>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/overloaded.h>
-#include <conversion/iv/SedsToIvTranslator/specialized/interfacecommandtranslator.h>
-#include <conversion/iv/SedsToIvTranslator/specialized/interfaceparametertranslator.h>
+#include <conversion/iv/SedsToIvTranslator/interfacetranslatorhelper.h>
 #include <ivcore/ivfunction.h>
 
 using conversion::Escaper;
-using conversion::iv::translator::InterfaceCommandTranslator;
-using conversion::iv::translator::InterfaceParameterTranslator;
+using conversion::iv::translator::InterfaceTranslatorHelper;
 using conversion::translator::TranslationException;
 using seds::model::CoreMathOperator;
 using seds::model::Polynomial;
@@ -218,7 +216,7 @@ auto StatementTranslatorVisitor::operator()(const seds::model::SendCommandPrimit
     const auto commandName = sendCommand.command().value();
     const auto interfaceName = sendCommand.interface().value();
 
-    const auto callName = InterfaceCommandTranslator::getCommandName(
+    const auto callName = InterfaceTranslatorHelper::buildCommandInterfaceName(
             interfaceName, ivm::IVInterface::InterfaceType::Required, commandName);
 
     // Check, if this is a sync return call

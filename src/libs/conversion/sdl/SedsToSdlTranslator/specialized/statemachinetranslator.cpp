@@ -27,8 +27,7 @@
 #include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/iv/SedsToIvTranslator/specialized/componentstranslator.h>
-#include <conversion/iv/SedsToIvTranslator/specialized/interfacecommandtranslator.h>
-#include <conversion/iv/SedsToIvTranslator/specialized/interfaceparametertranslator.h>
+#include <conversion/iv/SedsToIvTranslator/interfacetranslatorhelper.h>
 #include <conversion/iv/SedsToIvTranslator/translator.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
@@ -38,8 +37,7 @@
 using conversion::Escaper;
 using conversion::asn1::translator::SedsToAsn1Translator;
 using conversion::iv::translator::ComponentsTranslator;
-using conversion::iv::translator::InterfaceCommandTranslator;
-using conversion::iv::translator::InterfaceParameterTranslator;
+using conversion::iv::translator::InterfaceTranslatorHelper;
 using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::MissingInterfaceViewFunctionException;
 using conversion::translator::TranslationException;
@@ -570,9 +568,10 @@ auto StateMachineTranslator::translatePrimitive(Context &context, const seds::mo
     std::vector<std::unique_ptr<::sdl::Action>> unpackingActions;
 
     // Input signal can be received only via a provided interface
-    const auto name = InterfaceCommandTranslator::getCommandName(
+    const auto &inputName = InterfaceTranslatorHelper::buildCommandInterfaceName(
             command.interface().value(), ivm::IVInterface::InterfaceType::Provided, command.command().value());
-    input->setName(name);
+    input->setName(inputName);
+
     if (command.argumentValues().empty()) {
         return std::make_pair(std::move(input), std::move(unpackingActions));
     }

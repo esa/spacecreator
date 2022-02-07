@@ -1,52 +1,50 @@
 /** @file
- * This file is part of the SpaceCreator.
+ * this file is part of the spacecreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (c) 2022 n7 space sp. z o.o.
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * this library is free software; you can redistribute it and/or
+ * modify it under the terms of the gnu library general public
+ * license as published by the free software foundation; either
+ * version 2 of the license, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
+ * this library is distributed in the hope that it will be useful,
+ * but without any warranty; without even the implied warranty of
+ * merchantability or fitness for a particular purpose.  see the gnu
+ * library general public license for more details.
  *
- * You should have received a copy of the GNU Library General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ * you should have received a copy of the gnu library general public license
+ * along with this program. if not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
 #pragma once
 
-#include "specialized/interfacecommandtranslator.h"
+#include "generictypemapper.h"
 
-#include <shared/parameter.h>
-
-namespace seds::model {
-class CommandArgument;
-enum class ArgumentsCombination : uint8_t;
-} // namespace seds::model
+#include <asn1library/asn1/definitions.h>
+#include <ivcore/ivfunction.h>
+#include <ivcore/ivinterface.h>
+#include <seds/SedsModel/interfaces/interfacecommand.h>
+#include <seds/SedsModel/package/package.h>
 
 namespace conversion::iv::translator {
 
 /**
- * @brief   Translator from SEDS sync interface command to InterfaceView interface
+ * @brief   Translator from SEDS async interface command to InterfaceView interface
  */
-class SyncInterfaceCommandTranslator final : public InterfaceCommandTranslator
+class SyncInterfaceCommandTranslator final
 {
 public:
     /**
      * @brief   Constructor
      *
-     * @param   sedsInterfaceName   Parent interface name
-     * @param   genericTypeMap      Generic type mappings
-     * @param   asn1Definitions     ASN.1 type definitions for parent package
      * @param   ivFunction          Output interface view function
+     * @param   sedsInterfaceName   Parent interface name
+     * @param   genericTypeMapper   Generic type mapper
      */
     SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
-            const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
-            Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage);
+            Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
+            const GenericTypeMapper *typeMapper);
     /**
      * @brief   Deleted copy constructor
      */
@@ -71,32 +69,30 @@ public:
      * This inserts result IV interface into member IV function
      *
      * @param   sedsCommand     SEDS interface command
-     * @param   interfaceType   Interface type
+     * @param   interfaceType   Interface type that will be created
      */
-    virtual auto translateCommand(const seds::model::InterfaceCommand &sedsCommand,
-            ivm::IVInterface::InterfaceType interfaceType) -> void override;
+    auto translateCommand(
+            const seds::model::InterfaceCommand &sedsCommand, ivm::IVInterface::InterfaceType interfaceType) -> void;
 
 private:
-    /**
-     * @brief   Translates arguments of a SEDS interface command
-     *
-     * @param   sedsArguments   Arguments to translate
-     * @param   ivInterface     Output interface view interface
-     */
     auto translateArguments(
             const std::vector<seds::model::CommandArgument> &sedsArguments, ivm::IVInterface *ivInterface) -> void;
+    auto handleArgumentType(const seds::model::CommandArgument &sedsArgument, const QString interfaceName) const
+            -> QString;
 
-    /**
-     * @brief   Creates interface view interface parameter
-     *
-     * @param   name        Name of the parameter
-     * @param   typeName    Name of the type
-     * @param   direction   Parameter direction
-     *
-     * @return  Interface view interface parameter
-     */
-    auto createIvInterfaceParameter(const QString &name, const QString &typeName,
-            shared::InterfaceParameter::Direction direction) -> shared::InterfaceParameter;
+private:
+    /// @brief  Output interface view function
+    ivm::IVFunction *m_ivFunction;
+
+    /// @brief  Parent SEDS interface name
+    const QString &m_sedsInterfaceName;
+    /// @brief  Parent ASN.1 type definitions
+    Asn1Acn::Definitions *m_asn1Definitions;
+    /// @brief  Parent SEDS package
+    const seds::model::Package *m_sedsPackage;
+
+    /// @brief  Generic type mapper
+    const GenericTypeMapper *m_typeMapper;
 };
 
 } // namespace conversion::iv::translator

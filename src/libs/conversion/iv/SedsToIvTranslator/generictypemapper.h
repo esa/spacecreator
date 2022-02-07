@@ -19,24 +19,27 @@
 
 #pragma once
 
+#include "typemapping.h"
+
 #include <QString>
 #include <optional>
+#include <seds/SedsModel/generics/generictypemap.h>
 #include <seds/SedsModel/generics/generictypemapset.h>
+#include <vector>
 
 namespace conversion::iv::translator {
 
-/**
- * @brief   Helper for mapping generic types in interfaces
- */
 class GenericTypeMapper final
 {
 public:
     /**
      * @brief   Constructor
      *
-     * @param   genericTypeMapSet   Optional type mapping
+     * @param   sedsInterfaceName   Parent interface name
+     * @param   genericTypeMapSet   Generic type map set
      */
-    explicit GenericTypeMapper(const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet);
+    GenericTypeMapper(
+            QString sedsInterfaceName, const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet);
     /**
      * @brief   Deleted copy constructor
      */
@@ -56,17 +59,21 @@ public:
 
 public:
     /**
-     * @brief   Checks if given type name is mapped to some concrete type
+     * @brief   Checks if given type name is mapped to any concrete type
      *
-     * @param   genericTypeName     Generic type name
+     * @param   typeName    Generic type name
      *
-     * @return  Mapped type name if given type name was mapped, given type name otherwise
+     * @return  Mapping information if type has mapping to at least one type, nullptr otherwise
      */
-    auto findMappedType(const QString &genericTypeName) const -> const QString &;
+    auto getMapping(const QString &typeName) const -> const TypeMapping *;
 
 private:
-    /// @brief  Generic type mappings
-    const std::optional<seds::model::GenericTypeMapSet> &m_genericTypeMapSet;
+    auto addSimpleMapping(const seds::model::GenericTypeMap &typeMap) -> void;
+
+private:
+    QString m_sedsInterfaceName;
+
+    std::vector<TypeMapping> m_mappings;
 };
 
-} // conversion::iv::translator
+} // namespace conversion::iv::translator {

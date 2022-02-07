@@ -19,6 +19,7 @@
 
 #include "specialized/componentstranslator.h"
 
+#include "generictypemapper.h"
 #include "specialized/asyncinterfacecommandtranslator.h"
 #include "specialized/interfaceparametertranslator.h"
 #include "specialized/syncinterfacecommandtranslator.h"
@@ -90,6 +91,8 @@ void ComponentsTranslator::translateInterfaceDeclaration(
         const seds::model::Component &sedsComponent, const ivm::IVInterface::InterfaceType interfaceType,
         ivm::IVFunction *ivFunction) const
 {
+    GenericTypeMapper typeMapper(sedsInterfaceName, genericTypeMapSet);
+
     for (const auto &sedsBaseInterface : sedsInterfaceDeclaration.baseInterfaces()) {
         const auto &sedsBaseInterfaceDeclaration =
                 findInterfaceDeclaration(sedsBaseInterface.type().nameStr(), sedsComponent, m_sedsPackage);
@@ -97,16 +100,16 @@ void ComponentsTranslator::translateInterfaceDeclaration(
                 sedsBaseInterface.genericTypeMapSet(), sedsComponent, interfaceType, ivFunction);
     }
 
-    translateParameters(sedsInterfaceName, genericTypeMapSet, sedsInterfaceDeclaration, interfaceType, ivFunction);
-    translateCommands(sedsInterfaceName, genericTypeMapSet, sedsInterfaceDeclaration, interfaceType, ivFunction);
+    translateParameters(sedsInterfaceName, sedsInterfaceDeclaration, interfaceType, ivFunction, &typeMapper);
+    translateCommands(sedsInterfaceName, sedsInterfaceDeclaration, interfaceType, ivFunction, &typeMapper);
 }
 
 void ComponentsTranslator::translateParameters(const QString &sedsInterfaceName,
-        const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
         const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
-        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const
+        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
+        const GenericTypeMapper *typeMapper) const
 {
-    InterfaceParameterTranslator parameterTranslator(sedsInterfaceName, genericTypeMapSet, ivFunction);
+    InterfaceParameterTranslator parameterTranslator(ivFunction, sedsInterfaceName, typeMapper);
 
     for (const auto &sedsParameter : sedsInterfaceDeclaration.parameters()) {
         parameterTranslator.translateParameter(sedsParameter, interfaceType);
@@ -114,14 +117,14 @@ void ComponentsTranslator::translateParameters(const QString &sedsInterfaceName,
 }
 
 void ComponentsTranslator::translateCommands(const QString &sedsInterfaceName,
-        const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
         const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
-        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const
+        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
+        const GenericTypeMapper *typeMapper) const
 {
     AsyncInterfaceCommandTranslator asyncCommandTranslator(
-            ivFunction, sedsInterfaceName, genericTypeMapSet, m_asn1Definitions, m_sedsPackage);
+            ivFunction, sedsInterfaceName, m_asn1Definitions, m_sedsPackage, typeMapper);
     SyncInterfaceCommandTranslator syncCommandTranslator(
-            ivFunction, sedsInterfaceName, genericTypeMapSet, m_asn1Definitions, m_sedsPackage);
+            ivFunction, sedsInterfaceName, m_asn1Definitions, m_sedsPackage, typeMapper);
 
     for (const auto &sedsCommand : sedsInterfaceDeclaration.commands()) {
         switch (sedsCommand.mode()) {

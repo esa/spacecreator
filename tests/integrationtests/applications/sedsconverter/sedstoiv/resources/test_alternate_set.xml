@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="AlternateSet">
+  <DataTypeSet>
+    <IntegerDataType name="DeterminantType">
+      <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+      <Range>
+        <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="2" />
+      </Range>
+    </IntegerDataType>
+    <IntegerDataType name="Integer8">
+      <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+      <Range>
+        <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+      </Range>
+    </IntegerDataType>
+    <IntegerDataType name="Integer16">
+      <IntegerDataEncoding encoding="unsigned" sizeInBits="16" />
+      <Range>
+        <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="65535" />
+      </Range>
+    </IntegerDataType>
+    <IntegerDataType name="Integer32">
+      <IntegerDataEncoding encoding="unsigned" sizeInBits="32" />
+      <Range>
+        <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="4294967295" />
+      </Range>
+    </IntegerDataType>
+  </DataTypeSet>
+  <DeclaredInterfaceSet>
+    <Interface name="MegaInterface">
+      <GenericTypeSet>
+        <GenericType name="GenericType1" />
+        <GenericType name="GenericType2" />
+        <GenericType name="GenericType3" />
+        <GenericType name="GenericType4" />
+      </GenericTypeSet>
+      <CommandSet>
+        <Command name="AsyncWithGenericTypes" mode="async">
+          <Argument name="GenericArgument1" type="GenericType1" mode="in" />
+          <Argument name="GenericArgument2" type="GenericType2" mode="in" />
+          <Argument name="GenericArgument3" type="GenericType3" mode="in" />
+          <Argument name="GenericArgument4" type="GenericType4" mode="in">
+            <ArrayDimensions>
+              <Dimension size="10" />
+            </ArrayDimensions>
+          </Argument>
+        </Command>
+    </CommandSet>
+    </Interface>
+  </DeclaredInterfaceSet>
+  <ComponentSet>
+    <Component name="MegaComponent">
+      <ProvidedInterfaceSet>
+        <Interface name="ProvidedInterface" type="MegaInterface">
+          <GenericTypeMapSet>
+            <GenericTypeMap name="GenericType1" type="Integer8" />
+            <AlternateSet>
+              <Alternate>
+                <GenericTypeMap name="GenericType2" type="Integer8" />
+                <GenericTypeMap name="GenericType3" type="DeterminantType" fixedValue="0" />
+                <GenericTypeMap name="GenericType4" type="Integer8" />
+              </Alternate>
+              <Alternate>
+                <GenericTypeMap name="GenericType2" type="Integer16" />
+                <GenericTypeMap name="GenericType3" type="DeterminantType" fixedValue="1" />
+                <GenericTypeMap name="GenericType4" type="Integer16" />
+              </Alternate>
+              <Alternate>
+                <GenericTypeMap name="GenericType2" type="Integer32" />
+                <GenericTypeMap name="GenericType3" type="DeterminantType" fixedValue="2" />
+                <GenericTypeMap name="GenericType4" type="Integer32" />
+              </Alternate>
+            </AlternateSet>
+          </GenericTypeMapSet>
+        </Interface>
+      </ProvidedInterfaceSet>
+    </Component>
+  </ComponentSet>
+  </Package>
+</PackageFile>

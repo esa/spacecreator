@@ -19,26 +19,21 @@
 
 #pragma once
 
-#include "base/literalvalue.h"
-#include "types/field.h"
-
+#include <QString>
 #include <optional>
+#include <vector>
 
-namespace seds::model {
+namespace conversion::iv::translator {
 
-class GenericTypeMap final : public Field
-{
-public:
-    GenericTypeMap() = default;
-    GenericTypeMap(GenericTypeMap &&) = default;
-    GenericTypeMap &operator=(GenericTypeMap &&) = default;
+struct TypeMapping {
+    struct ConcreteType {
+        QString typeName;
+        std::optional<QString> fixedValue;
+    };
 
-public:
-    auto fixedValue() const -> const std::optional<QString> &;
-    auto setFixedValue(QString fixedValue) -> void;
-
-private:
-    std::optional<QString> m_fixedValue;
+    QString genericTypeName;
+    std::vector<ConcreteType> concreteTypes;
+    std::optional<QString> determinant;
 };
 
-} // namespace seds::model
+} // namespace conversion::iv::translator

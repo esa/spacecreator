@@ -1,38 +1,30 @@
 /** @file
- * This file is part of the SpaceCreator.
+ * this file is part of the spacecreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (c) 2022 n7 space sp. z o.o.
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * this library is free software; you can redistribute it and/or
+ * modify it under the terms of the gnu library general public
+ * license as published by the free software foundation; either
+ * version 2 of the license, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
+ * this library is distributed in the hope that it will be useful,
+ * but without any warranty; without even the implied warranty of
+ * merchantability or fitness for a particular purpose.  see the gnu
+ * library general public license for more details.
  *
- * You should have received a copy of the GNU Library General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ * you should have received a copy of the gnu library general public license
+ * along with this program. if not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
 #pragma once
 
-#include "specialized/generictypemapper.h"
+#include "generictypemapper.h"
+#include "interfacetranslatorhelper.h"
 
+#include <ivcore/ivfunction.h>
 #include <ivcore/ivinterface.h>
-#include <optional>
-
-namespace seds::model {
-class GenericTypeMapSet;
-class Interface;
-class InterfaceParameter;
-} // namespace seds::model
-
-namespace ivm {
-class IVFunction;
-} // namespace ivm
+#include <seds/SedsModel/interfaces/interfaceparameter.h>
 
 namespace conversion::iv::translator {
 
@@ -54,12 +46,12 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   sedsInterfaceName   Parent interface name
-     * @param   genericTypeMap      Generic type mappings
      * @param   ivFunction          Output interface view function
+     * @param   sedsInterfaceName   Parent interface name
+     * @param   genericTypeMapper   Generic type mapper
      */
-    InterfaceParameterTranslator(const QString &sedsInterfaceName,
-            const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet, ivm::IVFunction *ivFunction);
+    InterfaceParameterTranslator(
+            ivm::IVFunction *ivFunction, const QString &sedsInterfaceName, const GenericTypeMapper *typeMapper);
     /**
      * @brief   Deleted copy constructor
      */
@@ -87,51 +79,29 @@ public:
      * @param   interfaceType   Interface type that will be created
      */
     auto translateParameter(const seds::model::InterfaceParameter &sedsParameter,
-            const ivm::IVInterface::InterfaceType interfaceType) const -> void;
-
-    /**
-     * @brief   Get name of an interface for handling the given parameter
-     *
-     * @param   mode            Mode of the SEDS interface
-     * @param   interfaceName   Name of the SEDS interface
-     * @param   type            Type of the TASTE interface
-     * @param   parameterName   Name of the SEDS parameter
-     *
-     * @returns TASTE interface name
-     */
-    static auto getParameterName(const InterfaceMode mode, const QString &interfaceName,
-            const ivm::IVInterface::InterfaceType type, const QString &parameterName) -> QString;
+            const ivm::IVInterface::InterfaceType interfaceType) -> void;
 
 private:
     auto translateGetterParameter(const seds::model::InterfaceParameter &sedsParameter,
-            const ivm::IVInterface::InterfaceType interfaceType) const -> void;
+            const ivm::IVInterface::InterfaceType interfaceType) -> void;
     auto translateSetterParameter(const seds::model::InterfaceParameter &sedsParameter,
-            const ivm::IVInterface::InterfaceType interfaceType) const -> void;
+            const ivm::IVInterface::InterfaceType interfaceType) -> void;
 
-    auto createIvInterface(const InterfaceParameterTranslator::InterfaceMode mode,
-            const seds::model::InterfaceParameter &sedsParameter, ivm::IVInterface::InterfaceType type,
-            ivm::IVInterface::OperationKind kind, shared::InterfaceParameter::Direction direction) const -> void;
-    auto switchInterfaceType(ivm::IVInterface::InterfaceType interfaceType) const -> ivm::IVInterface::InterfaceType;
-
-    static auto interfaceTypeToString(ivm::IVInterface::InterfaceType type) -> const QString &;
+    auto buildParameter(const seds::model::InterfaceParameter &sedsParameter,
+            InterfaceTranslatorHelper::InterfaceParameterType interfaceParameterType,
+            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVInterface::OperationKind interfaceKind,
+            shared::InterfaceParameter::Direction interfaceDirection) -> void;
+    auto handleParameterTypeName(const seds::model::InterfaceParameter &sedsParameter) const -> QString;
 
 private:
-    /// @brief  Parent SEDS interface name
-    const QString &m_sedsInterfaceName;
     /// @brief  Output interface view function
     ivm::IVFunction *m_ivFunction;
+    /// @brief  Parent SEDS interface name
+    const QString &m_sedsInterfaceName;
 
-    /// @brief  Mapper for generic parameter types
-    GenericTypeMapper m_typeMapper;
+    /// @brief  Generic type mapper
+    const GenericTypeMapper *m_typeMapper;
 
-    /// @brief  Interface parameter encoding name
-    static const QString m_interfaceParameterEncoding;
-    /// @brief  Prefix for getter interfaces
-    static const QString m_getterInterfacePrefix;
-    /// @brief  Prefix for setter interfaces
-    static const QString m_setterInterfacePrefix;
-    /// @brief  Template for interface view interfaces
-    static const QString m_ivInterfaceNameTemplate;
     /// @brief  Name for the argument in the IV interface
     static const QString m_ivInterfaceParameterName;
 };

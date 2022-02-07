@@ -21,12 +21,12 @@
 
 namespace seds::model {
 
-const std::optional<LiteralValue> &GenericTypeMap::fixedValue() const
+const std::optional<QString> &GenericTypeMap::fixedValue() const
 {
     return m_fixedValue;
 }
 
-void GenericTypeMap::setFixedValue(LiteralValue literalValue)
+void GenericTypeMap::setFixedValue(QString literalValue)
 {
     m_fixedValue = std::move(literalValue);
 }
