@@ -19,6 +19,13 @@
 
 #include "ivgenerator.h"
 
+#include "common.h"
+#include "ivinterface.h"
+#include "ivobject.h"
+#include "parameter.h"
+
+#include <QDebug>
+#include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
 #include <ivcore/ivpropertytemplateconfig.h>
 #include <memory>
@@ -39,6 +46,26 @@ auto IvGenerator::generate(const QString &interfaceUnderTestName, const QString 
         throw std::runtime_error("config is null");
     }
     auto ivModel = std::make_unique<ivm::IVModel>(config);
+
+    ivm::IVFunction *const testDriverFunction = new ivm::IVFunction;
+    testDriverFunction->setTitle("TestDriver");
+
+    // add interface parameters
+    QVector<shared::InterfaceParameter> ifParams;
+    ivm::IVInterface::CreationInfo ifCreationInfo;
+    ifCreationInfo.model = ivModel.get();
+    ifCreationInfo.function = testDriverFunction;
+    ifCreationInfo.name = interfaceUnderTestName;
+    ifCreationInfo.type = ivm::IVInterface::InterfaceType::Required;
+    ifCreationInfo.kind = ivm::IVInterface::OperationKind::Protected;
+    ifCreationInfo.parameters = ifParams;
+    testDriverFunction->addChild(ivm::IVInterface::createIface(ifCreationInfo));
+
+    ivModel->addObject(testDriverFunction);
+
+    ivm::IVFunction *const functionUnderTest = new ivm::IVFunction;
+    functionUnderTest->setTitle(functionUnderTestName);
+    ivModel->addObject(functionUnderTest);
 
     return ivModel;
 }

@@ -79,7 +79,12 @@ void tst_ivgenerator::testFail()
     const std::vector<ivm::IVFunction *> generatedFunctions = IvTools::getFunctions(ivModelGenerated.get());
     (void)generatedFunctions;
     QCOMPARE(generatedFunctions.size(), loadedFunctions.size());
+    qDebug() << "loaded:";
     for (const auto &function : loadedFunctions) {
+        qDebug() << function->title();
+    }
+    qDebug() << "generated:";
+    for (const auto &function : generatedFunctions) {
         qDebug() << function->title();
     }
 }
