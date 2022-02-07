@@ -17,8 +17,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "ivinterface.h"
-
 #include <QDebug>
 #include <QObject>
 #include <QTest>
@@ -26,12 +24,14 @@
 #include <algorithm>
 #include <exception>
 #include <ivcore/ivfunction.h>
+#include <ivcore/ivinterface.h>
 #include <ivcore/ivmodel.h>
 #include <ivtools.h>
 #include <memory>
 #include <modelloader.h>
 #include <qdebug.h>
 #include <qobjectdefs.h>
+#include <shared/parameter.h>
 #include <shared/sharedlibrary.h>
 #include <stdexcept>
 #include <testgenerator/testgenerator.h>
@@ -57,12 +57,16 @@ private:
     const QString functionUnderTestName = "FunctionUnderTest";
 };
 
-static void compareModels(ivm::IVModel *loadedModel, ivm::IVModel *generatedModel);
-static void compareFunctions(ivm::IVFunction *loadedFunction, ivm::IVFunction *generatedFunction);
-static void compareInterfaces(ivm::IVInterface *loadedInterface, ivm::IVInterface *generatedInterface);
+static void compareModels(ivm::IVModel *loaded, ivm::IVModel *generated);
+static void compareFunctions(ivm::IVFunction *loaded, ivm::IVFunction *generated);
+static void compareInterfaces(ivm::IVInterface *loaded, ivm::IVInterface *generated);
+static void compareParameters(const shared::InterfaceParameter &loaded, const shared::InterfaceParameter &generated);
 
 template<typename T>
-QVector<int> createQVectorToQVectorMap(T source, T destination);
+QVector<int> createQVectorToQVectorMapByTitle(T source, T destination);
+
+QVector<int> createQVectorToQVectorMapByName(
+        const QVector<shared::InterfaceParameter> &source, const QVector<shared::InterfaceParameter> &destination);
 
 void tst_ivgenerator::initTestCase()
 {
@@ -96,18 +100,18 @@ void tst_ivgenerator::testNominal()
     compareModels(ivModelLoaded, ivModelGenerated.get());
 }
 
-static void compareModels(ivm::IVModel *const loadedModel, ivm::IVModel *const generatedModel)
+static void compareModels(ivm::IVModel *const loaded, ivm::IVModel *const generated)
 {
     const QVector<ivm::IVFunction *> loadedFunctions =
-            QVector<ivm::IVFunction *>::fromStdVector(IvTools::getFunctions(loadedModel));
+            QVector<ivm::IVFunction *>::fromStdVector(IvTools::getFunctions(loaded));
     const int loadedFunctionsSize = loadedFunctions.size();
 
     const QVector<ivm::IVFunction *> generatedFunctions =
-            QVector<ivm::IVFunction *>::fromStdVector(IvTools::getFunctions(generatedModel));
+            QVector<ivm::IVFunction *>::fromStdVector(IvTools::getFunctions(generated));
     const int generatedFunctionsSize = generatedFunctions.size();
     QCOMPARE(generatedFunctionsSize, loadedFunctionsSize);
 
-    QVector<int> loadedToGeneratedFunctionMap = createQVectorToQVectorMap(loadedFunctions, generatedFunctions);
+    QVector<int> loadedToGeneratedFunctionMap = createQVectorToQVectorMapByTitle(loadedFunctions, generatedFunctions);
     if (std::any_of(loadedToGeneratedFunctionMap.begin(), loadedToGeneratedFunctionMap.end(),
                 [&loadedFunctionsSize](const auto &el) { return el == loadedFunctionsSize; })) {
         QFAIL(QString("Function not found in generated model").toStdString().c_str());
@@ -121,16 +125,17 @@ static void compareModels(ivm::IVModel *const loadedModel, ivm::IVModel *const g
     }
 }
 
-static void compareFunctions(ivm::IVFunction *const loadedFunction, ivm::IVFunction *const generatedFunction)
+static void compareFunctions(ivm::IVFunction *const loaded, ivm::IVFunction *const generated)
 {
-    const auto &loadedInterfaces = loadedFunction->interfaces();
-    const auto &generatedInterfaces = generatedFunction->interfaces();
+    const auto &loadedInterfaces = loaded->interfaces();
+    const auto &generatedInterfaces = generated->interfaces();
 
     const int loadedInterfacesSize = loadedInterfaces.size();
     const int generatedInterfacesSize = generatedInterfaces.size();
     QCOMPARE(generatedInterfacesSize, loadedInterfacesSize);
 
-    QVector<int> loadedToGeneratedInterfaceMap = createQVectorToQVectorMap(loadedInterfaces, generatedInterfaces);
+    QVector<int> loadedToGeneratedInterfaceMap =
+            createQVectorToQVectorMapByTitle(loadedInterfaces, generatedInterfaces);
 
     for (int j = 0; j < generatedInterfacesSize; j++) {
         const auto &generatedInterface = generatedInterfaces.at(j);
@@ -140,14 +145,42 @@ static void compareFunctions(ivm::IVFunction *const loadedFunction, ivm::IVFunct
     }
 }
 
-static void compareInterfaces(ivm::IVInterface *loadedInterface, ivm::IVInterface *generatedInterface)
+static void compareInterfaces(ivm::IVInterface *const loaded, ivm::IVInterface *const generated)
 {
-    QCOMPARE(generatedInterface->title(), loadedInterface->title());
+    QCOMPARE(generated->title(), loaded->title());
+    QCOMPARE(generated->kind(), loaded->kind());
+    QCOMPARE(generated->type(), loaded->type());
+
+    const auto &loadedParams = loaded->params();
+    const auto &generatedParams = generated->params();
+
+    const int generatedParametersSize = generatedParams.size();
+    const int loadedParametersSize = loadedParams.size();
+    QCOMPARE(generatedParametersSize, loadedParametersSize);
+
+    QVector<int> loadedToGeneratedParameterMap = createQVectorToQVectorMapByName(loadedParams, generatedParams);
+
+    const int generatedParamsSize = generatedParams.size();
+    const int loadedParamsSize = loadedParams.size();
+    QCOMPARE(generatedParamsSize, loadedParamsSize);
+
+    for (int i = 0; i < loadedParamsSize; i++) {
+        compareParameters(generatedParams.at(i), loadedParams.at(loadedToGeneratedParameterMap.at(i)));
+    }
+}
+
+static void compareParameters(const shared::InterfaceParameter &loaded, const shared::InterfaceParameter &generated)
+{
+    QCOMPARE(generated.paramType(), loaded.paramType());
+    QCOMPARE(generated.paramTypeName(), loaded.paramTypeName());
+    QCOMPARE(generated.direction(), loaded.direction());
+    QCOMPARE(generated.encoding(), loaded.encoding());
+    QCOMPARE(generated.name(), loaded.name());
 }
 
 // T could be at least QVector<IVInterface*> or QVector<IVFunction*>
 template<typename T>
-QVector<int> createQVectorToQVectorMap(const T source, const T destination)
+QVector<int> createQVectorToQVectorMapByTitle(const T source, const T destination)
 {
     const int sourceSize = source.size();
     const int destinationSize = destination.size();
@@ -160,6 +193,28 @@ QVector<int> createQVectorToQVectorMap(const T source, const T destination)
         for (int k = 0; k < sourceSize; k++) {
             const auto &src = destination.at(k);
             if (src->title().compare(dst->title()) == 0) {
+                map[j] = k;
+            }
+        }
+    }
+
+    return map;
+}
+
+QVector<int> createQVectorToQVectorMapByName(
+        const QVector<shared::InterfaceParameter> &source, const QVector<shared::InterfaceParameter> &destination)
+{
+    const int sourceSize = source.size();
+    const int destinationSize = destination.size();
+    assert(sourceSize == destinationSize);
+
+    QVector<int> map(sourceSize, sourceSize);
+
+    for (int j = 0; j < destinationSize; j++) {
+        const auto &dst = destination.at(j);
+        for (int k = 0; k < sourceSize; k++) {
+            const auto &src = destination.at(k);
+            if (src.name().compare(dst.name()) == 0) {
                 map[j] = k;
             }
         }
