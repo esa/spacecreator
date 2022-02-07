@@ -74,12 +74,14 @@ void tst_ivgenerator::testFail()
         throw std::runtime_error(QString("%1 file could not be read as IV").arg(interfaceviewFilepath).toStdString());
     }
 
-    std::vector<ivm::IVFunction *> loadedFunctions = IvTools::getFunctions(ivModelLoaded);
+    // compare ivModels
+    const std::vector<ivm::IVFunction *> loadedFunctions = IvTools::getFunctions(ivModelLoaded);
+    const std::vector<ivm::IVFunction *> generatedFunctions = IvTools::getFunctions(ivModelGenerated.get());
+    (void)generatedFunctions;
+    QCOMPARE(generatedFunctions.size(), loadedFunctions.size());
     for (const auto &function : loadedFunctions) {
         qDebug() << function->title();
     }
-
-    // compare ivModels
 }
 
 } // namespace tests::testgenerator
