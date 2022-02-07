@@ -48,7 +48,7 @@ class tst_ivgenerator final : public QObject
 
 private Q_SLOTS:
     void initTestCase();
-    void testFail();
+    void testNominal();
 
 private:
     const QString interfaceviewFilepath = "resources/interfaceview.xml";
@@ -57,12 +57,20 @@ private:
     const QString functionUnderTestName = "FunctionUnderTest";
 };
 
+static void compareModels(ivm::IVModel *loadedModel, ivm::IVModel *generatedModel);
+static void compareFunctions(ivm::IVFunction *loadedFunction, ivm::IVFunction *generatedFunction);
+static void compareInterfaces(ivm::IVInterface *loadedInterface, ivm::IVInterface *generatedInterface);
+static QVector<int> createLoadedToGeneratedFunctionMap(
+        const QVector<ivm::IVFunction *> &loadedFunctions, const QVector<ivm::IVFunction *> &generatedFunctions);
+static QVector<int> createLoadedToGeneratedInterfaceMap(
+        const QVector<ivm::IVInterface *> &loadedInterfaces, const QVector<ivm::IVInterface *> &generatedInterfaces);
+
 void tst_ivgenerator::initTestCase()
 {
     shared::initSharedLibrary();
 }
 
-void tst_ivgenerator::testFail()
+void tst_ivgenerator::testNominal()
 {
     const auto functionUnderTest = std::make_unique<ivm::IVFunction>();
     functionUnderTest->setTitle(functionUnderTestName);
@@ -86,27 +94,99 @@ void tst_ivgenerator::testFail()
         throw std::runtime_error(QString("%1 file could not be read as IV").arg(interfaceviewFilepath).toStdString());
     }
 
-    /// compare ivModels
-    // check if they contain functions with equal names
-    const std::vector<ivm::IVFunction *> loadedFunctions = IvTools::getFunctions(ivModelLoaded);
-    const unsigned int loadedFunctionsSize = loadedFunctions.size();
-    const std::vector<ivm::IVFunction *> generatedFunctions = IvTools::getFunctions(ivModelGenerated.get());
-    const unsigned int generatedFunctionsSize = generatedFunctions.size();
+    compareModels(ivModelLoaded, ivModelGenerated.get());
+}
+
+static void compareModels(ivm::IVModel *const loadedModel, ivm::IVModel *const generatedModel)
+{
+    const QVector<ivm::IVFunction *> loadedFunctions =
+            QVector<ivm::IVFunction *>::fromStdVector(IvTools::getFunctions(loadedModel));
+    const int loadedFunctionsSize = loadedFunctions.size();
+
+    const QVector<ivm::IVFunction *> generatedFunctions =
+            QVector<ivm::IVFunction *>::fromStdVector(IvTools::getFunctions(generatedModel));
+    const int generatedFunctionsSize = generatedFunctions.size();
     QCOMPARE(generatedFunctionsSize, loadedFunctionsSize);
-    std::vector<unsigned int> loadedToGeneratedMap(loadedFunctionsSize, loadedFunctionsSize);
-    for (unsigned int i = 0; i < loadedFunctionsSize; i++) {
-        const auto &loadedFunction = loadedFunctions.at(i);
-        for (unsigned j = 0; j < generatedFunctionsSize; j++) {
-            const auto &generatedFunction = generatedFunctions.at(j);
-            if (loadedFunction->title().compare(generatedFunction->title()) == 0) {
-                loadedToGeneratedMap.at(i) = j;
-            }
-        }
-    }
-    if (std::any_of(loadedToGeneratedMap.begin(), loadedToGeneratedMap.end(),
+
+    QVector<int> loadedToGeneratedFunctionMap = createLoadedToGeneratedFunctionMap(loadedFunctions, generatedFunctions);
+    if (std::any_of(loadedToGeneratedFunctionMap.begin(), loadedToGeneratedFunctionMap.end(),
                 [&loadedFunctionsSize](const auto &el) { return el == loadedFunctionsSize; })) {
         QFAIL(QString("Function not found in generated model").toStdString().c_str());
     }
+
+    for (int i = 0; i < generatedFunctionsSize; i++) {
+        const auto &loadedFunction = loadedFunctions.at(loadedToGeneratedFunctionMap.at(i));
+        const auto &generatedFunction = generatedFunctions.at(i);
+
+        compareFunctions(loadedFunction, generatedFunction);
+    }
+}
+
+static void compareFunctions(ivm::IVFunction *const loadedFunction, ivm::IVFunction *const generatedFunction)
+{
+    const auto &loadedInterfaces = loadedFunction->interfaces();
+    const auto &generatedInterfaces = generatedFunction->interfaces();
+
+    const int loadedInterfacesSize = loadedInterfaces.size();
+    const int generatedInterfacesSize = generatedInterfaces.size();
+    QCOMPARE(generatedInterfacesSize, loadedInterfacesSize);
+
+    QVector<int> loadedToGeneratedInterfaceMap =
+            createLoadedToGeneratedInterfaceMap(loadedInterfaces, generatedInterfaces);
+
+    for (int j = 0; j < generatedInterfacesSize; j++) {
+        const auto &generatedInterface = generatedInterfaces.at(j);
+        const auto &loadedInterface = loadedInterfaces.at(loadedToGeneratedInterfaceMap.at(j));
+
+        compareInterfaces(loadedInterface, generatedInterface);
+    }
+}
+
+static void compareInterfaces(ivm::IVInterface *loadedInterface, ivm::IVInterface *generatedInterface)
+{
+    QCOMPARE(generatedInterface->title(), loadedInterface->title());
+}
+
+static QVector<int> createLoadedToGeneratedFunctionMap(
+        const QVector<ivm::IVFunction *> &loadedFunctions, const QVector<ivm::IVFunction *> &generatedFunctions)
+{
+    const int loadedFunctionsSize = loadedFunctions.size();
+    const int generatedFunctionsSize = generatedFunctions.size();
+
+    QVector<int> map(loadedFunctionsSize, loadedFunctionsSize);
+
+    for (int i = 0; i < loadedFunctionsSize; i++) {
+        const auto &loadedFunction = loadedFunctions.at(i);
+        for (int j = 0; j < generatedFunctionsSize; j++) {
+            const auto &generatedFunction = generatedFunctions.at(j);
+            if (loadedFunction->title().compare(generatedFunction->title()) == 0) {
+                map[i] = j;
+            }
+        }
+    }
+
+    return map;
+}
+
+static QVector<int> createLoadedToGeneratedInterfaceMap(
+        const QVector<ivm::IVInterface *> &loadedInterfaces, const QVector<ivm::IVInterface *> &generatedInterfaces)
+{
+    const int loadedInterfacesSize = loadedInterfaces.size();
+    const int generatedInterfacesSize = generatedInterfaces.size();
+
+    QVector<int> map(loadedInterfacesSize, loadedInterfacesSize);
+
+    for (int j = 0; j < generatedInterfacesSize; j++) {
+        const auto &generatedInterface = generatedInterfaces.at(j);
+        for (int k = 0; k < loadedInterfacesSize; k++) {
+            const auto &loadedInterface = loadedInterfaces.at(k);
+            if (loadedInterface->title().compare(generatedInterface->title()) == 0) {
+                map[j] = k;
+            }
+        }
+    }
+
+    return map;
 }
 
 } // namespace tests::testgenerator
