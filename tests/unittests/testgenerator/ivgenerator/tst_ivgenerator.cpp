@@ -17,6 +17,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#include "conversion/iv/IvOptions/options.h"
+#include "conversion/iv/IvXmlExporter/exporter.h"
+#include "options.h"
+
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
@@ -24,8 +28,11 @@
 #include <exception>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivinterface.h>
+#include <ivcore/ivlibrary.h>
 #include <ivcore/ivmodel.h>
+#include <ivcore/ivpropertytemplateconfig.h>
 #include <ivtools.h>
+#include <libiveditor/iveditor.h>
 #include <memory>
 #include <modelloader.h>
 #include <qobjectdefs.h>
@@ -71,6 +78,8 @@ QVector<int> createQVectorToQVectorMapByName(
 void tst_ivgenerator::initTestCase()
 {
     shared::initSharedLibrary();
+    ivm::initIVLibrary();
+    ive::initIVEditor();
 }
 
 void tst_ivgenerator::testNominal()
@@ -94,6 +103,12 @@ void tst_ivgenerator::testNominal()
     }
 
     compareModels(ivModelLoaded, ivModelGenerated.get());
+
+    conversion::iv::exporter::IvXmlExporter exporter;
+    conversion::Options options;
+    options.add(conversion::iv::IvOptions::outputFilepath, "out_iv.xml");
+
+    exporter.exportModel(ivModelGenerated.get(), options);
 }
 
 static std::unique_ptr<ivm::IVFunction> makeFunctionUnderTest(const QString &name)

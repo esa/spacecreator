@@ -17,6 +17,7 @@ target_link_libraries(${TEST_NAME}
     PRIVATE     PluginCommon
                 ivcore
                 TestGenerator
+                IvXmlExporter
                 Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test
                 CommonProjectWarnings
