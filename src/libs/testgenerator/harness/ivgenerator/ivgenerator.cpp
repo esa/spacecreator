@@ -19,6 +19,8 @@
 
 #include "ivgenerator.h"
 
+#include "ivinterface.h"
+
 #include <QDebug>
 #include <exception>
 #include <ivcore/ivfunction.h>
@@ -48,27 +50,38 @@ auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::u
         throw std::runtime_error("Selected interface has no function specified");
     }
 
+    const auto interfaceUnderTestOperationKind = interfaceUnderTest->kind();
+    if (interfaceUnderTestOperationKind == ivm::IVInterface::OperationKind::Any
+            || interfaceUnderTestOperationKind == ivm::IVInterface::OperationKind::Cyclic
+            || interfaceUnderTestOperationKind == ivm::IVInterface::IVInterface::OperationKind::Sporadic) {
+        throw std::runtime_error("Only Protected and Unprotected interfaces can be tested");
+    }
+
     const QString interfaceUnderTestName = interfaceUnderTest->title();
     const QString functionUnderTestName = interfaceUnderTest->function()->title();
 
     ivm::IVFunction *const testDriverFunction = new ivm::IVFunction;
     testDriverFunction->setTitle("TestDriver");
 
-    // add interface parameters
     QVector<shared::InterfaceParameter> ifParams;
     ivm::IVInterface::CreationInfo ifCreationInfo;
     ifCreationInfo.model = ivModel.get();
     ifCreationInfo.function = testDriverFunction;
     ifCreationInfo.name = interfaceUnderTestName;
     ifCreationInfo.type = ivm::IVInterface::InterfaceType::Required;
-    ifCreationInfo.kind = ivm::IVInterface::OperationKind::Protected;
-    ifCreationInfo.parameters = ifParams;
+    ifCreationInfo.kind = interfaceUnderTest->kind();
+    ifCreationInfo.parameters = interfaceUnderTest->params();
     testDriverFunction->addChild(ivm::IVInterface::createIface(ifCreationInfo));
 
     ivModel->addObject(testDriverFunction);
 
     ivm::IVFunction *const functionUnderTest = new ivm::IVFunction;
     functionUnderTest->setTitle(functionUnderTestName);
+
+    ivm::IVInterface *const interface =
+            ivm::IVInterface::createIface(ivm::IVInterface::CreationInfo::fromIface(interfaceUnderTest));
+    functionUnderTest->addChild(interface);
+
     ivModel->addObject(functionUnderTest);
 
     return ivModel;

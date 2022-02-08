@@ -137,9 +137,9 @@ static void compareFunctions(ivm::IVFunction *const loaded, ivm::IVFunction *con
     QVector<int> loadedToGeneratedInterfaceMap =
             createQVectorToQVectorMapByTitle(loadedInterfaces, generatedInterfaces);
 
-    for (int j = 0; j < generatedInterfacesSize; j++) {
-        const auto &generatedInterface = generatedInterfaces.at(j);
-        const auto &loadedInterface = loadedInterfaces.at(loadedToGeneratedInterfaceMap.at(j));
+    for (int i = 0; i < generatedInterfacesSize; i++) {
+        const auto &generatedInterface = generatedInterfaces.at(i);
+        const auto &loadedInterface = loadedInterfaces.at(loadedToGeneratedInterfaceMap.at(i));
 
         compareInterfaces(loadedInterface, generatedInterface);
     }
@@ -165,7 +165,10 @@ static void compareInterfaces(ivm::IVInterface *const loaded, ivm::IVInterface *
     QCOMPARE(generatedParamsSize, loadedParamsSize);
 
     for (int i = 0; i < loadedParamsSize; i++) {
-        compareParameters(generatedParams.at(i), loadedParams.at(loadedToGeneratedParameterMap.at(i)));
+        const auto &generatedParam = generatedParams.at(i);
+        const auto &loadedParam = loadedParams.at(loadedToGeneratedParameterMap.at(i));
+
+        compareParameters(loadedParam, generatedParam);
     }
 }
 
@@ -182,16 +185,16 @@ static void compareParameters(const shared::InterfaceParameter &loaded, const sh
 template<typename T>
 QVector<int> createQVectorToQVectorMapByTitle(const T source, const T destination)
 {
-    const int sourceSize = source.size();
-    const int destinationSize = destination.size();
-    assert(sourceSize == destinationSize);
+    assert(source.size() == destination.size());
 
-    QVector<int> map(sourceSize, sourceSize);
+    const int size = source.size();
 
-    for (int j = 0; j < destinationSize; j++) {
+    QVector<int> map(size, size);
+
+    for (int j = 0; j < size; j++) {
         const auto &dst = destination.at(j);
-        for (int k = 0; k < sourceSize; k++) {
-            const auto &src = destination.at(k);
+        for (int k = 0; k < size; k++) {
+            const auto &src = source.at(k);
             if (src->title().compare(dst->title()) == 0) {
                 map[j] = k;
             }
@@ -204,16 +207,16 @@ QVector<int> createQVectorToQVectorMapByTitle(const T source, const T destinatio
 QVector<int> createQVectorToQVectorMapByName(
         const QVector<shared::InterfaceParameter> &source, const QVector<shared::InterfaceParameter> &destination)
 {
-    const int sourceSize = source.size();
-    const int destinationSize = destination.size();
-    assert(sourceSize == destinationSize);
+    assert(source.size() == destination.size());
 
-    QVector<int> map(sourceSize, sourceSize);
+    const int size = source.size();
 
-    for (int j = 0; j < destinationSize; j++) {
+    QVector<int> map(size, size);
+
+    for (int j = 0; j < size; j++) {
         const auto &dst = destination.at(j);
-        for (int k = 0; k < sourceSize; k++) {
-            const auto &src = destination.at(k);
+        for (int k = 0; k < size; k++) {
+            const auto &src = source.at(k);
             if (src.name().compare(dst.name()) == 0) {
                 map[j] = k;
             }
