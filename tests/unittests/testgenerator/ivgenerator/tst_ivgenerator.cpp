@@ -17,7 +17,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include <QDebug>
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
@@ -29,7 +28,6 @@
 #include <ivtools.h>
 #include <memory>
 #include <modelloader.h>
-#include <qdebug.h>
 #include <qobjectdefs.h>
 #include <shared/parameter.h>
 #include <shared/sharedlibrary.h>
@@ -137,6 +135,11 @@ static void compareFunctions(ivm::IVFunction *const loaded, ivm::IVFunction *con
     QVector<int> loadedToGeneratedInterfaceMap =
             createQVectorToQVectorMapByTitle(loadedInterfaces, generatedInterfaces);
 
+    if (std::any_of(loadedToGeneratedInterfaceMap.begin(), loadedToGeneratedInterfaceMap.end(),
+                [&loadedInterfacesSize](const auto &el) { return el == loadedInterfacesSize; })) {
+        QFAIL(QString("Interface not found in generated function").toStdString().c_str());
+    }
+
     for (int i = 0; i < generatedInterfacesSize; i++) {
         const auto &generatedInterface = generatedInterfaces.at(i);
         const auto &loadedInterface = loadedInterfaces.at(loadedToGeneratedInterfaceMap.at(i));
@@ -159,6 +162,11 @@ static void compareInterfaces(ivm::IVInterface *const loaded, ivm::IVInterface *
     QCOMPARE(generatedParametersSize, loadedParametersSize);
 
     QVector<int> loadedToGeneratedParameterMap = createQVectorToQVectorMapByName(loadedParams, generatedParams);
+
+    if (std::any_of(loadedToGeneratedParameterMap.begin(), loadedToGeneratedParameterMap.end(),
+                [&loadedParametersSize](const auto &el) { return el == loadedParametersSize; })) {
+        QFAIL(QString("Parameter not found in generated interface").toStdString().c_str());
+    }
 
     const int generatedParamsSize = generatedParams.size();
     const int loadedParamsSize = loadedParams.size();

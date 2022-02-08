@@ -63,23 +63,29 @@ auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::u
     ivm::IVFunction *const testDriverFunction = new ivm::IVFunction;
     testDriverFunction->setTitle("TestDriver");
 
-    QVector<shared::InterfaceParameter> ifParams;
-    ivm::IVInterface::CreationInfo ifCreationInfo;
-    ifCreationInfo.model = ivModel.get();
-    ifCreationInfo.function = testDriverFunction;
-    ifCreationInfo.name = interfaceUnderTestName;
-    ifCreationInfo.type = ivm::IVInterface::InterfaceType::Required;
-    ifCreationInfo.kind = interfaceUnderTest->kind();
-    ifCreationInfo.parameters = interfaceUnderTest->params();
-    testDriverFunction->addChild(ivm::IVInterface::createIface(ifCreationInfo));
+    ivm::IVInterface::CreationInfo testDriverRiCi = ivm::IVInterface::CreationInfo::fromIface(interfaceUnderTest);
+    testDriverRiCi.model = ivModel.get();
+    testDriverRiCi.function = testDriverFunction;
+    testDriverRiCi.type = ivm::IVInterface::InterfaceType::Required;
+    testDriverFunction->addChild(ivm::IVInterface::createIface(testDriverRiCi));
+
+    ivm::IVInterface::CreationInfo startTestCiCi;
+    startTestCiCi.name = "StartTest";
+    startTestCiCi.model = ivModel.get();
+    startTestCiCi.function = testDriverFunction;
+    startTestCiCi.kind = ivm::IVInterface::OperationKind::Cyclic;
+    startTestCiCi.type = ivm::IVInterface::InterfaceType::Provided;
+    testDriverFunction->addChild(ivm::IVInterface::createIface(startTestCiCi));
 
     ivModel->addObject(testDriverFunction);
 
     ivm::IVFunction *const functionUnderTest = new ivm::IVFunction;
     functionUnderTest->setTitle(functionUnderTestName);
 
-    ivm::IVInterface *const interface =
-            ivm::IVInterface::createIface(ivm::IVInterface::CreationInfo::fromIface(interfaceUnderTest));
+    ivm::IVInterface::CreationInfo ifUnderTestCi = ivm::IVInterface::CreationInfo::fromIface(interfaceUnderTest);
+    ifUnderTestCi.model = ivModel.get();
+    ifUnderTestCi.function = functionUnderTest;
+    ivm::IVInterface *const interface = ivm::IVInterface::createIface(ifUnderTestCi);
     functionUnderTest->addChild(interface);
 
     ivModel->addObject(functionUnderTest);
