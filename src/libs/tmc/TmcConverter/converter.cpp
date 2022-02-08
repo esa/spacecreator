@@ -110,8 +110,9 @@ bool TmcConverter::addStopConditionFiles(const QStringList &files)
     return true;
 }
 
-bool TmcConverter::convertModel(const std::set<conversion::ModelType> &sourceModelTypes, conversion::ModelType targetModelType,
-        const std::set<conversion::ModelType> &auxilaryModelTypes, conversion::Options options) const
+bool TmcConverter::convertModel(const std::set<conversion::ModelType> &sourceModelTypes,
+        conversion::ModelType targetModelType, const std::set<conversion::ModelType> &auxilaryModelTypes,
+        conversion::Options options) const
 {
     try {
         Converter converter(m_registry, std::move(options));

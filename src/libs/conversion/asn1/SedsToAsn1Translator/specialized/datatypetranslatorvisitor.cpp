@@ -399,14 +399,14 @@ void DataTypeTranslatorVisitor::translateCoreEncodingAndPrecision(
 {
     switch (coreEncoding) {
     case seds::model::CoreEncodingAndPrecision::IeeeSingle: {
-        if (bits != 32) { // NOLINT
+        if (bits != 32) { // NOLINT(readability-magic-numbers)
             auto errorMessage = QString("Wrong number of bits specified (%1) for IEEE754_1985_32 encoding").arg(bits);
             throw TranslationException(std::move(errorMessage));
         }
         asn1Type->setEncoding(Asn1Acn::Types::RealEncoding::IEEE754_1985_32);
     } break;
     case seds::model::CoreEncodingAndPrecision::IeeeDouble: {
-        if (bits != 64) { // NOLINT
+        if (bits != 64) { // NOLINT(readability-magic-numbers)
             auto errorMessage = QString("Wrong number of bits specified (%1) for IEEE754_1985_64 encoding").arg(bits);
             throw TranslationException(std::move(errorMessage));
         }
