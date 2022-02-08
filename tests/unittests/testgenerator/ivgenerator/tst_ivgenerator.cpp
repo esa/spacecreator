@@ -49,11 +49,14 @@ private Q_SLOTS:
     void testNominal();
 
 private:
-    const QString interfaceviewFilepath = "resources/interfaceview.xml";
-    const QString ivConfig = "resources/config.xml";
-    const QString interfaceUnderTestName = "InterfaceUnderTest";
-    const QString functionUnderTestName = "FunctionUnderTest";
+    const QString ivDir = "resources";
+    const QString ivPath = QString("%1%2%3.xml").arg(ivDir).arg(QDir::separator());
+    const QString ivConfig = QString("%1%2config.xml").arg(ivDir).arg(QDir::separator());
 };
+
+static std::unique_ptr<ivm::IVFunction> makeFunctionUnderTest(const QString &name);
+static ivm::IVInterface::CreationInfo createInterfaceUnderTestCreationInfo(
+        const QString &ifName, ivm::IVFunction *function, ivm::IVInterface::OperationKind kind);
 
 static void compareModels(ivm::IVModel *loaded, ivm::IVModel *generated);
 static void compareFunctions(ivm::IVFunction *loaded, ivm::IVFunction *generated);
@@ -62,7 +65,6 @@ static void compareParameters(const shared::InterfaceParameter &loaded, const sh
 
 template<typename T>
 QVector<int> createQVectorToQVectorMapByTitle(T source, T destination);
-
 QVector<int> createQVectorToQVectorMapByName(
         const QVector<shared::InterfaceParameter> &source, const QVector<shared::InterfaceParameter> &destination);
 
@@ -73,14 +75,10 @@ void tst_ivgenerator::initTestCase()
 
 void tst_ivgenerator::testNominal()
 {
-    const auto functionUnderTest = std::make_unique<ivm::IVFunction>();
-    functionUnderTest->setTitle(functionUnderTestName);
+    const auto functionUnderTest = makeFunctionUnderTest("FunctionUnderTest");
 
-    ivm::IVInterface::CreationInfo ci;
-    ci.name = interfaceUnderTestName;
-    ci.kind = ivm::IVInterface::OperationKind::Protected;
-    ci.type = ivm::IVInterface::InterfaceType::Provided;
-    ci.function = functionUnderTest.get();
+    ivm::IVInterface::CreationInfo ci = createInterfaceUnderTestCreationInfo(
+            "InterfaceUnderTest", functionUnderTest.get(), ivm::IVInterface::OperationKind::Protected);
     ivm::IVInterface *const interfaceUnderTest = ivm::IVInterface::createIface(ci);
 
     const auto ivModelGenerated = IvGenerator::generate(interfaceUnderTest);
@@ -89,13 +87,33 @@ void tst_ivgenerator::testNominal()
         QFAIL("IV model was not generated");
     }
 
-    const auto ivModelLoadedRaw = ModelLoader::loadIvModel(ivConfig, interfaceviewFilepath);
+    const auto ivModelLoadedRaw = ModelLoader::loadIvModel(ivConfig, ivPath.arg("interfaceview"));
     const auto ivModelLoaded = dynamic_cast<ivm::IVModel *>(ivModelLoadedRaw.get());
     if (ivModelLoaded == nullptr) {
-        throw std::runtime_error(QString("%1 file could not be read as IV").arg(interfaceviewFilepath).toStdString());
+        throw std::runtime_error(QString("%1 file could not be read as IV").arg(ivDir).toStdString());
     }
 
     compareModels(ivModelLoaded, ivModelGenerated.get());
+}
+
+static std::unique_ptr<ivm::IVFunction> makeFunctionUnderTest(const QString &name)
+{
+    auto function = std::make_unique<ivm::IVFunction>();
+    function->setTitle(name);
+
+    return function;
+}
+
+static ivm::IVInterface::CreationInfo createInterfaceUnderTestCreationInfo(
+        const QString &ifName, ivm::IVFunction *const function, ivm::IVInterface::OperationKind kind)
+{
+    ivm::IVInterface::CreationInfo ci;
+    ci.name = ifName;
+    ci.kind = kind;
+    ci.type = ivm::IVInterface::InterfaceType::Provided;
+    ci.function = function;
+
+    return ci;
 }
 
 static void compareModels(ivm::IVModel *const loaded, ivm::IVModel *const generated)

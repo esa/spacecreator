@@ -19,11 +19,8 @@
 
 #include "ivgenerator.h"
 
-#include "ivinterface.h"
-
 #include <QDebug>
 #include <exception>
-#include <ivcore/ivfunction.h>
 #include <ivcore/ivobject.h>
 #include <ivcore/ivpropertytemplateconfig.h>
 #include <memory>
@@ -34,16 +31,18 @@
 
 namespace testgenerator {
 
+const QString IvGenerator::startTestInterfaceName = "StartTest";
+const QString IvGenerator::testDriverFunctionName = "TestDriver";
+
 auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::unique_ptr<ivm::IVModel>
 {
     auto *const config = ivm::IVPropertyTemplateConfig::instance();
     if (config == nullptr) {
         throw std::runtime_error("config is null");
     }
-    auto ivModel = std::make_unique<ivm::IVModel>(config);
 
     if (interfaceUnderTest == nullptr) {
-        return ivModel;
+        return nullptr;
     }
 
     if (interfaceUnderTest->function() == nullptr) {
@@ -57,40 +56,83 @@ auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::u
         throw std::runtime_error("Only Protected and Unprotected interfaces can be tested");
     }
 
-    const QString interfaceUnderTestName = interfaceUnderTest->title();
-    const QString functionUnderTestName = interfaceUnderTest->function()->title();
+    const auto interfaceUnderTestType = interfaceUnderTest->type();
+    if (interfaceUnderTestType != ivm::IVObject::Type::ProvidedInterface) {
+        throw std::runtime_error("Only Provided Interface can be tested");
+    }
 
-    ivm::IVFunction *const testDriverFunction = new ivm::IVFunction;
-    testDriverFunction->setTitle("TestDriver");
-
-    ivm::IVInterface::CreationInfo testDriverRiCi = ivm::IVInterface::CreationInfo::fromIface(interfaceUnderTest);
-    testDriverRiCi.model = ivModel.get();
-    testDriverRiCi.function = testDriverFunction;
-    testDriverRiCi.type = ivm::IVInterface::InterfaceType::Required;
-    testDriverFunction->addChild(ivm::IVInterface::createIface(testDriverRiCi));
-
-    ivm::IVInterface::CreationInfo startTestCiCi;
-    startTestCiCi.name = "StartTest";
-    startTestCiCi.model = ivModel.get();
-    startTestCiCi.function = testDriverFunction;
-    startTestCiCi.kind = ivm::IVInterface::OperationKind::Cyclic;
-    startTestCiCi.type = ivm::IVInterface::InterfaceType::Provided;
-    testDriverFunction->addChild(ivm::IVInterface::createIface(startTestCiCi));
-
-    ivModel->addObject(testDriverFunction);
-
-    ivm::IVFunction *const functionUnderTest = new ivm::IVFunction;
-    functionUnderTest->setTitle(functionUnderTestName);
-
-    ivm::IVInterface::CreationInfo ifUnderTestCi = ivm::IVInterface::CreationInfo::fromIface(interfaceUnderTest);
-    ifUnderTestCi.model = ivModel.get();
-    ifUnderTestCi.function = functionUnderTest;
-    ivm::IVInterface *const interface = ivm::IVInterface::createIface(ifUnderTestCi);
-    functionUnderTest->addChild(interface);
-
-    ivModel->addObject(functionUnderTest);
+    auto ivModel = std::make_unique<ivm::IVModel>(config);
+    ivModel->addObject(makeTestDriverFunction(ivModel.get(), interfaceUnderTest));
+    ivModel->addObject(makeFunctionUnderTest(interfaceUnderTest));
 
     return ivModel;
+}
+
+auto IvGenerator::makeTestDriverFunction(ivm::IVModel *const model, ivm::IVInterface *const ifaceUnderTest)
+        -> ivm::IVFunction *
+{
+    throwOnNullpointer(model);
+    throwOnNullpointer(ifaceUnderTest);
+
+    ivm::IVFunction *const function = new ivm::IVFunction;
+    function->setTitle(testDriverFunctionName);
+    function->setModel(model);
+    function->addChild(makeTestDriverRequiredIface(ifaceUnderTest, function));
+    function->addChild(makeStartTest(model, function));
+
+    return function;
+}
+
+auto IvGenerator::makeFunctionUnderTest(ivm::IVInterface *const ifaceUnderTest) -> ivm::IVFunction *
+{
+    throwOnNullpointer(ifaceUnderTest);
+
+    ivm::IVFunction *const function = new ivm::IVFunction;
+    function->setTitle(ifaceUnderTest->function()->title());
+    function->addChild(copyIface(ifaceUnderTest));
+
+    return function;
+}
+
+auto IvGenerator::makeStartTest(ivm::IVModel *const model, ivm::IVFunction *const function) -> ivm::IVInterface *
+{
+    throwOnNullpointer(model);
+    throwOnNullpointer(function);
+
+    ivm::IVInterface::CreationInfo ci;
+    ci.name = startTestInterfaceName;
+    ci.model = model;
+    ci.function = function;
+    ci.kind = ivm::IVInterface::OperationKind::Cyclic;
+    ci.type = ivm::IVInterface::InterfaceType::Provided;
+
+    return ivm::IVInterface::createIface(ci);
+}
+
+auto IvGenerator::makeTestDriverRequiredIface(
+        ivm::IVInterface *const ifaceUnderTest, ivm::IVFunction *const testDriverFunction) -> ivm::IVInterface *
+{
+    throwOnNullpointer(ifaceUnderTest);
+    throwOnNullpointer(testDriverFunction);
+
+    ivm::IVInterface::CreationInfo ci = ivm::IVInterface::CreationInfo::fromIface(ifaceUnderTest);
+    ci.model = testDriverFunction->model();
+    ci.function = testDriverFunction;
+    ci.type = ivm::IVInterface::InterfaceType::Required;
+
+    return ivm::IVInterface::createIface(ci);
+}
+
+auto IvGenerator::copyIface(ivm::IVInterface *const ifaceUnderTest) -> ivm::IVInterface *
+{
+    return ivm::IVInterface::createIface(ivm::IVInterface::CreationInfo::fromIface(ifaceUnderTest));
+}
+
+auto IvGenerator::throwOnNullpointer(void *const pointer) -> void
+{
+    if (pointer == nullptr) {
+        throw std::invalid_argument("pointer cannot be null");
+    }
 }
 
 } // namespace testgenerator

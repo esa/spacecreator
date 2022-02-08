@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <ivcore/ivfunction.h>
 #include <ivcore/ivinterface.h>
 #include <ivcore/ivmodel.h>
 #include <memory>
@@ -28,7 +29,19 @@ namespace testgenerator {
 class IvGenerator
 {
 public:
+    static const QString startTestInterfaceName;
+    static const QString testDriverFunctionName;
+
     static auto generate(ivm::IVInterface *interfaceUnderTest) -> std::unique_ptr<ivm::IVModel>;
+
+private:
+    static auto makeTestDriverFunction(ivm::IVModel *model, ivm::IVInterface *ifaceUnderTest) -> ivm::IVFunction *;
+    static auto makeFunctionUnderTest(ivm::IVInterface *ifaceUnderTest) -> ivm::IVFunction *;
+    static auto makeStartTest(ivm::IVModel *model, ivm::IVFunction *function) -> ivm::IVInterface *;
+    static auto makeTestDriverRequiredIface(ivm::IVInterface *ifaceUnderTest, ivm::IVFunction *testDriverFunction)
+            -> ivm::IVInterface *;
+    static auto copyIface(ivm::IVInterface *ifaceUnderTest) -> ivm::IVInterface *;
+    static auto throwOnNullpointer(void *pointer) -> void;
 };
 
 } // namespace testgenerator
