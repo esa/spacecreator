@@ -26,12 +26,31 @@
 
 namespace testgenerator {
 
+/**
+ * @brief Test harness InterfaceView generator
+ *
+ */
 class IvGenerator
 {
 public:
+    /**
+     * @brief name of an interface intended to start (trigger run) of a tests
+     *
+     */
     static const QString startTestInterfaceName;
+
+    /**
+     * @brief name of a function for a test driver (test driver not included)
+     *
+     */
     static const QString testDriverFunctionName;
 
+    /**
+     * @brief generate an IV model with a function under test and a test driver function
+     *
+     * @param interfaceUnderTest  interface which is tested
+     * @return IV model with the function under test and the test driver function
+     */
     static auto generate(ivm::IVInterface *interfaceUnderTest) -> std::unique_ptr<ivm::IVModel>;
 
 private:
