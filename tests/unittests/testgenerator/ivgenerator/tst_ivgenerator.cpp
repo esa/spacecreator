@@ -19,6 +19,7 @@
 
 #include "conversion/iv/IvOptions/options.h"
 #include "conversion/iv/IvXmlExporter/exporter.h"
+#include "ivcommonprops.h"
 #include "options.h"
 
 #include <QObject>
@@ -158,6 +159,10 @@ static void compareModels(ivm::IVModel *const loaded, ivm::IVModel *const genera
 
 static void compareFunctions(ivm::IVFunction *const loaded, ivm::IVFunction *const generated)
 {
+    QCOMPARE(generated->entityAttributeValue("is_type"), loaded->entityAttributeValue("is_type"));
+    QCOMPARE(generated->entityAttributeValue("language"), loaded->entityAttributeValue("language"));
+    QCOMPARE(generated->defaultImplementation(), loaded->defaultImplementation());
+
     const auto &loadedInterfaces = loaded->interfaces();
     const auto &generatedInterfaces = generated->interfaces();
 
