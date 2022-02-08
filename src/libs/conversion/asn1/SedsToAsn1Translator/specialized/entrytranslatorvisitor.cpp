@@ -243,7 +243,7 @@ std::unique_ptr<Asn1Acn::Types::Null> EntryTranslatorVisitor::translateLengthFie
 {
     auto nullType = std::make_unique<Asn1Acn::Types::Null>(sedsEntry.nameStr());
     nullType->setAlignToNext(Asn1Acn::Types::AlignToNext::byte);
-    nullType->setPattern(QString(32, '0')); // Fixed 32 bits for now, will be changed in actual implementation
+    nullType->setPattern(QString(32, '0')); // TODO: Fixed 32 bits for now, will be changed in actual implementation
 
     return nullType;
 }
