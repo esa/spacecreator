@@ -2,57 +2,60 @@ project(PromelaModel VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES
   arraytype.cpp
+  assignment.cpp
+  channelinit.cpp
+  channelrecv.cpp
+  channelsend.cpp
+  conditional.cpp
+  constant.cpp
   datatype.cpp
   declaration.cpp
-  namedmtype.cpp
-  promelamodel.cpp
-  utype.cpp
-  utyperef.cpp
-  mtyperef.cpp
-  typealias.cpp
-  valuedefinition.cpp
-  channelinit.cpp
-  proctype.cpp
-  initproctype.cpp
-  channelsend.cpp
-  channelrecv.cpp
-  expression.cpp
-  proctypeelement.cpp
-  constant.cpp
-  variableref.cpp
   doloop.cpp
-  sequence.cpp
-  assignment.cpp
+  expression.cpp
+  initproctype.cpp
   inlinecall.cpp
   inlinedef.cpp
+  mtyperef.cpp
+  namedmtype.cpp
+  proctype.cpp
+  proctypeelement.cpp
+  promelamodel.cpp
+  sequence.cpp
+  typealias.cpp
+  utype.cpp
+  utyperef.cpp
+  valuedefinition.cpp
+  variableref.cpp
   )
 set(INCLUDES
   arraytype.h
+  assignment.h
   basictypes.h
+  channelinit.h
+  channelrecv.h
+  channelsend.h
+  conditional.h
+  constant.h
   datatype.h
   declaration.h
+  doloop.h
+  expression.h
+  initproctype.h
+  inlinecall.cpp
+  inlinedef.h
+  mtyperef.h
   namedmtype.h
+  proctype.h
+  proctypeelement.h
   promelamodel.h
+  sequence.h
+  skip.h
+  typealias.h
   unsigneddatatype.h
   utype.h
   utyperef.h
-  mtyperef.h
-  typealias.h
   valuedefinition.h
-  channelinit.h
-  proctype.h
-  initproctype.h
-  channelsend.h
-  channelrecv.h
-  expression.h
-  proctypeelement.h
-  constant.h
   variableref.h
-  doloop.h
-  sequence.h
-  assignment.h
-  inlinecall.cpp
-  inlinedef.h
   )
 
 add_library(PromelaModel STATIC)

@@ -34,6 +34,7 @@ using promela::model::BasicType;
 using promela::model::ChannelInit;
 using promela::model::ChannelRecv;
 using promela::model::ChannelSend;
+using promela::model::Conditional;
 using promela::model::Constant;
 using promela::model::DataType;
 using promela::model::Declaration;
@@ -47,6 +48,7 @@ using promela::model::Proctype;
 using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
 using promela::model::Sequence;
+using promela::model::Skip;
 using promela::model::TypeAlias;
 using promela::model::UnsignedDataType;
 using promela::model::Utype;
@@ -76,6 +78,7 @@ private Q_SLOTS:
     void testProctypeElements();
     void testDoLoop();
     void testEpilpgueInclude();
+    void testConditional();
 
 private:
     QString getFileContents(const QString &filename);
@@ -461,6 +464,7 @@ void tst_PromelaExporter::testProctypeElements()
     std::unique_ptr<ProctypeElement> inlineCall = std::make_unique<ProctypeElement>(InlineCall("fn", {}));
     std::unique_ptr<ProctypeElement> inlineCallWithParams =
             std::make_unique<ProctypeElement>(InlineCall("fnParams", params));
+    std::unique_ptr<ProctypeElement> skip = std::make_unique<ProctypeElement>(Skip());
 
     Sequence initSequence;
     initSequence.appendElement(std::move(assignment));
@@ -471,6 +475,7 @@ void tst_PromelaExporter::testProctypeElements()
     initSequence.appendElement(std::move(channelRecv));
     initSequence.appendElement(std::move(inlineCall));
     initSequence.appendElement(std::move(inlineCallWithParams));
+    initSequence.appendElement(std::move(skip));
 
     InitProctype init(std::move(initSequence));
 
@@ -560,6 +565,63 @@ void tst_PromelaExporter::testEpilpgueInclude()
         QFAIL(ex.what());
     }
     QString out2 = getFileContents("expect_promela_epilogue_includes.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testConditional()
+{
+    PromelaModel model;
+
+    model.addDeclaration(Declaration(DataType(BasicType::INT), "reset"));
+    model.addDeclaration(Declaration(DataType(BasicType::INT), "set"));
+
+    std::unique_ptr<Sequence> doLoopFirstSequence = std::make_unique<Sequence>();
+    std::unique_ptr<ProctypeElement> resetRef = std::make_unique<ProctypeElement>(Expression(VariableRef("reset")));
+    std::unique_ptr<ProctypeElement> resetAssignment0 =
+            std::make_unique<ProctypeElement>(Assignment(VariableRef("reset"), Expression(Constant(0))));
+    std::unique_ptr<ProctypeElement> setAssignment1 =
+            std::make_unique<ProctypeElement>(Assignment(VariableRef("set"), Expression(Constant(1))));
+
+    doLoopFirstSequence->appendElement(std::move(resetRef));
+    doLoopFirstSequence->appendElement(std::move(resetAssignment0));
+    doLoopFirstSequence->appendElement(std::move(setAssignment1));
+
+    std::unique_ptr<Sequence> doLoopSecondSequence = std::make_unique<Sequence>();
+    std::unique_ptr<ProctypeElement> setRef = std::make_unique<ProctypeElement>(Expression(VariableRef("set")));
+    std::unique_ptr<ProctypeElement> resetAssignment1 =
+            std::make_unique<ProctypeElement>(Assignment(VariableRef("reset"), Expression(Constant(1))));
+    std::unique_ptr<ProctypeElement> setAssignment0 =
+            std::make_unique<ProctypeElement>(Assignment(VariableRef("set"), Expression(Constant(0))));
+
+    doLoopSecondSequence->appendElement(std::move(setRef));
+    doLoopSecondSequence->appendElement(std::move(resetAssignment1));
+    doLoopSecondSequence->appendElement(std::move(setAssignment0));
+
+    Conditional conditional;
+    conditional.appendAlternative(std::move(doLoopFirstSequence));
+    conditional.appendAlternative(std::move(doLoopSecondSequence));
+
+    std::unique_ptr<ProctypeElement> doLoopElement = std::make_unique<ProctypeElement>(std::move(conditional));
+
+    Sequence initSequence;
+    std::unique_ptr<ProctypeElement> assignment =
+            std::make_unique<ProctypeElement>(Assignment(VariableRef("reset"), Expression(Constant(1))));
+
+    initSequence.appendElement(std::move(assignment));
+    initSequence.appendElement(std::move(doLoopElement));
+
+    InitProctype init(std::move(initSequence));
+
+    model.setInit(std::move(init));
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_conditional.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }

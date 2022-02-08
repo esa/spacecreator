@@ -4,20 +4,26 @@ set(SOURCES
   translator.cpp
   promelatypesorter.cpp
   integersubset.cpp
+  integergenerator.cpp
   visitors/asn1nodevisitor.cpp
   visitors/asn1sequencecomponentvisitor.cpp
   visitors/integerconstraintvisitor.cpp
   visitors/asn1itemtypevisitor.cpp
+  visitors/asn1nodevaluegeneratorvisitor.cpp
+  visitors/asn1typevaluegeneratorvisitor.cpp
 )
 set(INCLUDES
   translator.h
   promelatypesorter.h
   integersubset.h
+  integergenerator.h
   visitors/asn1nodevisitor.h
   visitors/asn1sequencecomponentvisitor.h
   visitors/integerconstraintvisitor.h
   visitors/asn1constraintvisitor.h
   visitors/asn1itemtypevisitor.h
+  visitors/asn1nodevaluegeneratorvisitor.h
+  visitors/asn1typevaluegeneratorvisitor.h
 )
 
 add_library(Asn1ToPromelaTranslator STATIC)

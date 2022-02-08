@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2022 N7 Space Sp. z o.o.
+ * @copyright (C) 2021 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,32 +17,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "tst_asn1topromelatranslator.h"
-#include "tst_asn1topromelatranslator_env.h"
-#include "tst_integergenerator.h"
-#include "tst_integersubset.h"
+#pragma once
 
-#include <QTest>
-
-int main(int argc, char *argv[])
+namespace promela::model {
+/**
+ * @brief Representation of skip statement in promela
+ */
+class Skip
 {
-    int status = 0;
-    {
-        tmc::test::tst_Asn1ToPromelaTranslator test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
-    {
-        tmc::test::tst_IntegerSubset test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
-    {
-        tmc::test::tst_IntegerGenerator test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
-    {
-        tmc::test::tst_Asn1ToPromelaTranslator_Env test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
-
-    return status;
+};
 }

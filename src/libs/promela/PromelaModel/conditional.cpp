@@ -17,32 +17,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "tst_asn1topromelatranslator.h"
-#include "tst_asn1topromelatranslator_env.h"
-#include "tst_integergenerator.h"
-#include "tst_integersubset.h"
+#include "conditional.h"
 
-#include <QTest>
+#include "proctypeelement.h"
 
-int main(int argc, char *argv[])
+namespace promela::model {
+const std::list<std::unique_ptr<Sequence>> &Conditional::getAlternatives() const noexcept
 {
-    int status = 0;
-    {
-        tmc::test::tst_Asn1ToPromelaTranslator test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
-    {
-        tmc::test::tst_IntegerSubset test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
-    {
-        tmc::test::tst_IntegerGenerator test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
-    {
-        tmc::test::tst_Asn1ToPromelaTranslator_Env test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
+    return m_alternatives;
+}
 
-    return status;
+void Conditional::setAlternatives(std::list<std::unique_ptr<Sequence>> sequences)
+{
+    m_alternatives = std::move(sequences);
+}
+
+void Conditional::appendAlternative(std::unique_ptr<Sequence> element)
+{
+    m_alternatives.push_back(std::move(element));
+}
 }

@@ -80,10 +80,11 @@ void tst_IvToPromelaTranslator::testSimple()
     std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel));
     QVERIFY(promelaModel);
 
-    QCOMPARE(promelaModel->getIncludes().size(), 3);
+    QCOMPARE(promelaModel->getIncludes().size(), 4);
     QVERIFY(promelaModel->getIncludes().indexOf("dataview.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("controller.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("actuator.pml") >= 0);
+    QVERIFY(promelaModel->getIncludes().indexOf("env_inlines.pml") >= 0);
 
     QCOMPARE(promelaModel->getUtypes().size(), 1);
 
@@ -210,10 +211,11 @@ void tst_IvToPromelaTranslator::testParameters()
     std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel));
     QVERIFY(promelaModel);
 
-    QCOMPARE(promelaModel->getIncludes().size(), 3);
+    QCOMPARE(promelaModel->getIncludes().size(), 4);
     QVERIFY(promelaModel->getIncludes().indexOf("dataview.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("controller.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("actuator.pml") >= 0);
+    QVERIFY(promelaModel->getIncludes().indexOf("env_inlines.pml") >= 0);
 
     QCOMPARE(promelaModel->getUtypes().size(), 1);
 

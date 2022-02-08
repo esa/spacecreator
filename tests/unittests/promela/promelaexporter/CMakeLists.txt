@@ -29,5 +29,6 @@ configure_file(resources/expect_promela_init_proctype.pml expect_promela_init_pr
 configure_file(resources/expect_promela_proctype_elements.pml expect_promela_proctype_elements.pml COPYONLY)
 configure_file(resources/expect_promela_do_loop.pml expect_promela_do_loop.pml COPYONLY)
 configure_file(resources/expect_promela_epilogue_includes.pml expect_promela_epilogue_includes.pml COPYONLY)
+configure_file(resources/expect_promela_conditional.pml expect_promela_conditional.pml COPYONLY)
 
 add_format_target(${TEST_NAME})

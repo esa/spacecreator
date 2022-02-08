@@ -17,32 +17,44 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "tst_asn1topromelatranslator.h"
-#include "tst_asn1topromelatranslator_env.h"
-#include "tst_integergenerator.h"
-#include "tst_integersubset.h"
+#include "integergenerator.h"
 
-#include <QTest>
-
-int main(int argc, char *argv[])
+namespace promela::translator {
+IntegerGenerator::IntegerGenerator(const IntegerSubset &subset)
+    : m_subset(subset)
 {
-    int status = 0;
-    {
-        tmc::test::tst_Asn1ToPromelaTranslator test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
-    {
-        tmc::test::tst_IntegerSubset test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
-    {
-        tmc::test::tst_IntegerGenerator test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
-    {
-        tmc::test::tst_Asn1ToPromelaTranslator_Env test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
+    reset();
+}
 
-    return status;
+void IntegerGenerator::reset()
+{
+    m_iter = m_subset.getRanges().begin();
+    m_next = std::nullopt;
+    if (m_iter != m_subset.getRanges().end()) {
+        m_next = m_iter->first;
+    }
+}
+
+int IntegerGenerator::next()
+{
+    int result = m_next.value();
+
+    if (result == m_iter->second) {
+        ++m_iter;
+        if (m_iter == m_subset.getRanges().end()) {
+            m_next = std::nullopt;
+        } else {
+            m_next = m_iter->first;
+        }
+    } else {
+        m_next = result + 1;
+    }
+    return result;
+}
+
+bool IntegerGenerator::has_next()
+{
+    return m_next.has_value();
+}
+
 }

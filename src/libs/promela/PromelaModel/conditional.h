@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,46 +19,39 @@
 
 #pragma once
 
-#include "assignment.h"
-#include "channelrecv.h"
-#include "channelsend.h"
-#include "conditional.h"
-#include "declaration.h"
-#include "doloop.h"
-#include "expression.h"
-#include "inlinecall.h"
-#include "skip.h"
+#include "sequence.h"
 
-#include <variant>
+#include <list>
+#include <memory>
 
 namespace promela::model {
 /**
- * @brief Representation of proctype element i.e. step in promela
+ * @brief Representation of if statement in promela
  */
-class ProctypeElement final
+class Conditional final
 {
 public:
     /**
-     * @brief Variant representation of different alternatives of proctype element
+     * @brief Getter for alternatives of conditional
+     *
+     * @return list of sequences
      */
-    using Value = std::variant<Declaration, ChannelSend, ChannelRecv, Expression, DoLoop, Assignment, InlineCall, Skip,
-            Conditional>;
+    const std::list<std::unique_ptr<Sequence>> &getAlternatives() const noexcept;
 
     /**
-     * @brief Constructor
+     * @brief Setter for alternatives
      *
-     * @param value value of proctype element
+     * @param sequences list of sequences
      */
-    ProctypeElement(Value value);
-
+    void setAlternatives(std::list<std::unique_ptr<Sequence>> sequences);
     /**
-     * @brief Getter for value of proctype element
+     * @brief Add alternative to the conditional
      *
-     * @return value of proctype element
+     * @param element sequence to add
      */
-    const Value &getValue() const noexcept;
+    void appendAlternative(std::unique_ptr<Sequence> element);
 
 private:
-    Value m_value;
+    std::list<std::unique_ptr<Sequence>> m_alternatives;
 };
 }

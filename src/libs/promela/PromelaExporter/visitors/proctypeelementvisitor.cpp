@@ -27,12 +27,14 @@
 using promela::model::Assignment;
 using promela::model::ChannelRecv;
 using promela::model::ChannelSend;
+using promela::model::Conditional;
 using promela::model::Declaration;
 using promela::model::DoLoop;
 using promela::model::Expression;
 using promela::model::InlineCall;
 using promela::model::ProctypeElement;
 using promela::model::Sequence;
+using promela::model::Skip;
 using promela::model::VariableRef;
 
 namespace promela::exporter {
@@ -141,4 +143,22 @@ void ProctypeElementVisitor::operator()(const InlineCall &inlineCall)
     }
     m_stream << ");\n";
 }
+
+void ProctypeElementVisitor::operator()(const Skip &skip)
+{
+    Q_UNUSED(skip);
+    m_stream << m_indent;
+    m_stream << "skip;\n";
+}
+
+void ProctypeElementVisitor::operator()(const Conditional &conditional)
+{
+    m_stream << m_indent << "if\n";
+    for (const std::unique_ptr<Sequence> &sequence : conditional.getAlternatives()) {
+        SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
+        visitor.visit(*sequence, true);
+    }
+    m_stream << m_indent << "fi;\n";
+}
+
 }

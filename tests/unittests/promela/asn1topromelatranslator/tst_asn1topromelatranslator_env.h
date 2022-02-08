@@ -17,32 +17,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "tst_asn1topromelatranslator.h"
-#include "tst_asn1topromelatranslator_env.h"
-#include "tst_integergenerator.h"
-#include "tst_integersubset.h"
+#include <QObject>
+#include <QtTest>
+#include <asn1library/asn1/asn1model.h>
+#include <memory>
 
-#include <QTest>
+using Asn1Acn::Definitions;
 
-int main(int argc, char *argv[])
+namespace tmc::test {
+
+class tst_Asn1ToPromelaTranslator_Env : public QObject
 {
-    int status = 0;
-    {
-        tmc::test::tst_Asn1ToPromelaTranslator test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
-    {
-        tmc::test::tst_IntegerSubset test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
-    {
-        tmc::test::tst_IntegerGenerator test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
-    {
-        tmc::test::tst_Asn1ToPromelaTranslator_Env test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
+    Q_OBJECT
 
-    return status;
+private Q_SLOTS:
+    void initTestCase();
+    void cleanupTestCase();
+
+    void testInteger();
+
+private:
+    std::unique_ptr<Definitions> createModel();
+};
 }

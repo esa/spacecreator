@@ -54,7 +54,9 @@ using conversion::promela::PromelaOptions;
 using conversion::promela::PromelaRegistrar;
 using conversion::translator::TranslationException;
 using ivm::IVFunction;
+using ivm::IVInterface;
 using ivm::IVModel;
+using shared::InterfaceParameter;
 using tmc::converter::TmcConverter;
 
 namespace tmc::converter {
@@ -108,11 +110,27 @@ bool TmcConverter::addStopConditionFiles(const QStringList &files)
     return true;
 }
 
-void TmcConverter::convertModel(std::set<conversion::ModelType> sourceModelTypes, conversion::ModelType targetModelType,
+bool TmcConverter::convertModel(std::set<conversion::ModelType> sourceModelTypes, conversion::ModelType targetModelType,
         const std::set<conversion::ModelType> auxilaryModelTypes, conversion::Options options) const
 {
-    Converter converter(m_registry, std::move(options));
-    converter.convert(sourceModelTypes, targetModelType, auxilaryModelTypes);
+    try {
+        Converter converter(m_registry, std::move(options));
+        converter.convert(sourceModelTypes, targetModelType, auxilaryModelTypes);
+        return true;
+    } catch (const ImportException &ex) {
+        const auto errorMessage = QString("Import failure: %1").arg(ex.errorMessage());
+        qFatal("%s", errorMessage.toLatin1().constData());
+    } catch (const TranslationException &ex) {
+        const auto errorMessage = QString("Translation failure: %1").arg(ex.errorMessage());
+        qFatal("%s", errorMessage.toLatin1().constData());
+    } catch (const ExportException &ex) {
+        const auto errorMessage = QString("Export failure: %1").arg(ex.errorMessage());
+        qFatal("%s", errorMessage.toLatin1().constData());
+    } catch (const ConversionException &ex) {
+        const auto errorMessage = QString("Conversion failure: %1").arg(ex.errorMessage());
+        qFatal("%s", errorMessage.toLatin1().constData());
+    }
+    return false;
 }
 
 bool TmcConverter::convertSystem()
@@ -141,9 +159,17 @@ bool TmcConverter::convertSystem()
         return false;
     }
 
-    const QStringList ivFunctionNames = findIvFunctions(*inputIv);
+    QStringList sdlFunctions;
+    QStringList envFunctions;
+    findIvFunctions(*inputIv, sdlFunctions, envFunctions);
+    QStringList envDatatypes;
+    findEnvDatatypes(*inputIv, envFunctions, envDatatypes);
 
-    for (const QString &ivFunction : ivFunctionNames) {
+    qDebug() << "Using the following SDL functions: " << sdlFunctions.join(", ");
+    qDebug() << "Using the following ENV functions: " << envFunctions.join(", ");
+    qDebug() << "Using the following ENV data types: " << envDatatypes.join(", ");
+
+    for (const QString &ivFunction : sdlFunctions) {
         QList<QFileInfo> sdlFiles;
         sdlFiles.append(sdlSystemStructureLocation(ivFunction));
         sdlFiles.append(sdlImplementationLocation(ivFunction));
@@ -166,7 +192,7 @@ bool TmcConverter::convertSystem()
 
     asn1Files.append(dataviewUniq.absoluteFilePath());
 
-    for (const QString &ivFunction : ivFunctionNames) {
+    for (const QString &ivFunction : sdlFunctions) {
         const QFileInfo functionDatamodel = sdlFunctionDatamodelLocation(ivFunction);
 
         if (!functionDatamodel.exists()) {
@@ -180,6 +206,10 @@ bool TmcConverter::convertSystem()
     const QFileInfo outputDataview = outputFilepath("dataview.pml");
 
     convertDataview(asn1Files, outputDataview.absoluteFilePath());
+
+    const QFileInfo outputEnv = outputFilepath("env_inlines.pml");
+
+    createEnvGenerationInlines(dataviewUniq, outputEnv, envDatatypes);
 
     const QFileInfo outputSystemFile = outputFilepath("system.pml");
 
@@ -223,23 +253,7 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
 
     ModelType sourceModelType = ModelType::InterfaceView;
 
-    try {
-        convertModel({ sourceModelType }, ModelType::Promela, {}, std::move(options));
-        return true;
-    } catch (const ImportException &ex) {
-        const auto errorMessage = QString("Import failure: %1").arg(ex.errorMessage());
-        qFatal("%s", errorMessage.toLatin1().constData());
-    } catch (const TranslationException &ex) {
-        const auto errorMessage = QString("Translation failure: %1").arg(ex.errorMessage());
-        qFatal("%s", errorMessage.toLatin1().constData());
-    } catch (const ExportException &ex) {
-        const auto errorMessage = QString("Export failure: %1").arg(ex.errorMessage());
-        qFatal("%s", errorMessage.toLatin1().constData());
-    } catch (const ConversionException &ex) {
-        const auto errorMessage = QString("Conversion failure: %1").arg(ex.errorMessage());
-        qFatal("%s", errorMessage.toLatin1().constData());
-    }
-    return false;
+    return convertModel({ sourceModelType }, ModelType::Promela, {}, std::move(options));
 }
 
 bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath)
@@ -260,23 +274,7 @@ bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, cons
 
     ModelType sourceModelType = ModelType::Asn1;
 
-    try {
-        convertModel({ sourceModelType }, ModelType::Promela, {}, std::move(options));
-        return true;
-    } catch (const ImportException &ex) {
-        const auto errorMessage = QString("Import failure: %1").arg(ex.errorMessage());
-        qFatal("%s", errorMessage.toLatin1().constData());
-    } catch (const TranslationException &ex) {
-        const auto errorMessage = QString("Translation failure: %1").arg(ex.errorMessage());
-        qFatal("%s", errorMessage.toLatin1().constData());
-    } catch (const ExportException &ex) {
-        const auto errorMessage = QString("Export failure: %1").arg(ex.errorMessage());
-        qFatal("%s", errorMessage.toLatin1().constData());
-    } catch (const ConversionException &ex) {
-        const auto errorMessage = QString("Conversion failure: %1").arg(ex.errorMessage());
-        qFatal("%s", errorMessage.toLatin1().constData());
-    }
-    return false;
+    return convertModel({ sourceModelType }, ModelType::Promela, {}, std::move(options));
 }
 
 std::unique_ptr<IVModel> TmcConverter::readInterfaceView(const QString &filepath)
@@ -295,23 +293,81 @@ std::unique_ptr<IVModel> TmcConverter::readInterfaceView(const QString &filepath
     return {};
 }
 
-QStringList TmcConverter::findIvFunctions(const IVModel &model)
+void TmcConverter::findIvFunctions(const IVModel &model, QStringList &sdlFunctions, QStringList &envFunctions)
 {
-    Q_UNUSED(model);
     QStringList functionNames;
 
     QVector<IVFunction *> ivFunctionList = model.allObjectsByType<IVFunction>();
     for (IVFunction *ivFunction : ivFunctionList) {
-        for (const auto &impl : ivFunction->implementations()) {
-            if (impl.value().type() == QVariant::Type::String && impl.value().toString().toLower() == "sdl") {
-                const QString functionName = ivFunction->property("name").toString();
-                functionNames.append(functionName);
-                break;
+        if (isSdlFunction(ivFunction)) {
+            sdlFunctions.append(ivFunction->property("name").toString());
+        } else {
+            envFunctions.append(ivFunction->property("name").toString());
+        }
+    }
+}
+
+bool TmcConverter::isSdlFunction(const ivm::IVFunction *function)
+{
+    const QString defaultImplementation = function->defaultImplementation();
+    for (const auto &impl : function->implementations()) {
+        if (impl.name() == defaultImplementation && impl.value().type() == QVariant::Type::String
+                && impl.value().toString().toLower() == "sdl") {
+            return true;
+        }
+    }
+    return false;
+}
+
+void TmcConverter::findEnvDatatypes(
+        const ivm::IVModel &model, const QStringList &envFunctions, QStringList &envDataTypes)
+{
+    for (const QString &functionName : envFunctions) {
+        IVFunction *function = model.getFunction(functionName, Qt::CaseSensitivity::CaseInsensitive);
+        QVector<IVInterface *> requiredInterfaces = function->ris();
+        for (const IVInterface *interface : requiredInterfaces) {
+            QVector<InterfaceParameter> parameters = interface->params();
+            if (parameters.size() > 1) {
+                // TODO report an error
+            } else if (parameters.size() == 1) {
+                envDataTypes.append(parameters.front().paramTypeName());
             }
         }
     }
+}
 
-    return functionNames;
+bool TmcConverter::createEnvGenerationInlines(
+        const QFileInfo &inputDataView, const QFileInfo &outputFilepath, const QStringList &envDatatypes)
+{
+    qDebug() << "Converting ASN.1 environment value generators using " << inputDataView.absoluteFilePath();
+    Options options;
+
+    options.add(Asn1Options::inputFilepath, inputDataView.absoluteFilePath());
+    options.add(PromelaOptions::outputFilepath, outputFilepath.absoluteFilePath());
+
+    for (const QString &datatype : envDatatypes) {
+        options.add(PromelaOptions::asn1ValueGeneration, datatype);
+    }
+
+    ModelType sourceModelType = ModelType::Asn1;
+
+    try {
+        return convertModel({ sourceModelType }, ModelType::Promela, {}, std::move(options));
+        return true;
+    } catch (const ImportException &ex) {
+        const auto errorMessage = QString("Import failure: %1").arg(ex.errorMessage());
+        qFatal("%s", errorMessage.toLatin1().constData());
+    } catch (const TranslationException &ex) {
+        const auto errorMessage = QString("Translation failure: %1").arg(ex.errorMessage());
+        qFatal("%s", errorMessage.toLatin1().constData());
+    } catch (const ExportException &ex) {
+        const auto errorMessage = QString("Export failure: %1").arg(ex.errorMessage());
+        qFatal("%s", errorMessage.toLatin1().constData());
+    } catch (const ConversionException &ex) {
+        const auto errorMessage = QString("Conversion failure: %1").arg(ex.errorMessage());
+        qFatal("%s", errorMessage.toLatin1().constData());
+    }
+    return false;
 }
 
 QFileInfo TmcConverter::workDirectory() const

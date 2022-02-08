@@ -87,6 +87,18 @@ public:
      * @param inlineCall InlineCall to export
      */
     void operator()(const ::promela::model::InlineCall &inlineCall);
+    /**
+     * @brief Handle Skip
+     *
+     * @param skip Skip to export
+     */
+    void operator()(const ::promela::model::Skip &skip);
+    /**
+     * @brief Handle Conditional
+     *
+     * @param ifStatement Conditional to export
+     */
+    void operator()(const ::promela::model::Conditional &conditional);
 
 private:
     QTextStream &m_stream;

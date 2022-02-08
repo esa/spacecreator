@@ -63,16 +63,21 @@ public:
     bool addStopConditionFiles(const QStringList &files);
 
 private:
-    void convertModel(std::set<conversion::ModelType> sourceModelTypes, conversion::ModelType targetModelType,
+    bool convertModel(std::set<conversion::ModelType> sourceModelTypes, conversion::ModelType targetModelType,
             const std::set<conversion::ModelType> auxilaryModelTypes, conversion::Options options) const;
 
     bool convertSystem();
+
     bool convertStopConditions();
 
     bool convertInterfaceview(const QString &inputFilepath, const QString &outputFilepath);
     bool convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath);
     std::unique_ptr<ivm::IVModel> readInterfaceView(const QString &filepath);
-    QStringList findIvFunctions(const ivm::IVModel &model);
+    void findIvFunctions(const ivm::IVModel &model, QStringList &sdlFunctions, QStringList &envFunctions);
+    bool isSdlFunction(const ivm::IVFunction *function);
+    void findEnvDatatypes(const ivm::IVModel &model, const QStringList &envFunctions, QStringList &envDataTypes);
+    bool createEnvGenerationInlines(
+            const QFileInfo &inputDataView, const QFileInfo &outputFilepath, const QStringList &envDatatypes);
 
     QFileInfo workDirectory() const;
     QFileInfo dataViewUniqLocation() const;

@@ -17,32 +17,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "tst_asn1topromelatranslator.h"
-#include "tst_asn1topromelatranslator_env.h"
-#include "tst_integergenerator.h"
-#include "tst_integersubset.h"
+#include <QObject>
+#include <QtTest>
 
-#include <QTest>
+namespace tmc::test {
 
-int main(int argc, char *argv[])
+class tst_IntegerGenerator : public QObject
 {
-    int status = 0;
-    {
-        tmc::test::tst_Asn1ToPromelaTranslator test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
-    {
-        tmc::test::tst_IntegerSubset test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
-    {
-        tmc::test::tst_IntegerGenerator test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
-    {
-        tmc::test::tst_Asn1ToPromelaTranslator_Env test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
+    Q_OBJECT
 
-    return status;
+private Q_SLOTS:
+    void testEmptySequence();
+    void testContinuousSequence();
+    void testTwoRanges();
+    void testSeparatedNumbers();
+};
 }
