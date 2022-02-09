@@ -137,7 +137,7 @@ std::set<ModelType> IvToPromelaTranslator::getDependencies() const
 
 InitProctype IvToPromelaTranslator::generateInitProctype(const QList<QString> &functionNames) const
 {
-    Sequence sequence;
+    Sequence sequence(Sequence::Type::NORMAL);
 
     for (const QString &functionName : functionNames) {
         QString initFn = QString("%1_0_init").arg(Escaper::escapePromelaIV(functionName));
@@ -164,7 +164,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *
     declaration.setInit(channelInit);
     promelaModel->addDeclaration(declaration);
 
-    Sequence sequence;
+    Sequence sequence(Sequence::Type::NORMAL);
     std::unique_ptr<ProctypeElement> waitForInit = std::make_unique<ProctypeElement>(Expression(VariableRef("inited")));
     sequence.appendElement(std::move(waitForInit));
 
@@ -176,7 +176,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *
         sequence.appendElement(std::move(variableDecl));
     }
 
-    std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>();
+    std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>(Sequence::Type::ATOMIC);
 
     QList<VariableRef> params;
     params.append(VariableRef(parameterType.isEmpty() ? QString("_") : signalParameterName));
@@ -218,7 +218,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *
 std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(const QString &functionName,
         const QString &interfaceName, const QString &parameterType, const QString &sendInline) const
 {
-    Sequence sequence;
+    Sequence sequence(Sequence::Type::NORMAL);
     std::unique_ptr<ProctypeElement> waitForInit = std::make_unique<ProctypeElement>(Expression(VariableRef("inited")));
     sequence.appendElement(std::move(waitForInit));
 
@@ -229,7 +229,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(con
 
     DoLoop loop;
 
-    std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>();
+    std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>(Sequence::Type::ATOMIC);
 
     if (parameterType.isEmpty()) {
         std::unique_ptr<ProctypeElement> inlineCall = std::make_unique<ProctypeElement>(InlineCall(sendInline, {}));
@@ -274,7 +274,7 @@ std::unique_ptr<::promela::model::InlineDef> IvToPromelaTranslator::generateSend
 
     QList<QString> arguments;
     QString argumentName;
-    Sequence sequence;
+    Sequence sequence(Sequence::Type::NORMAL);
 
     if (parameterType.isEmpty()) {
         argumentName = "dummy";

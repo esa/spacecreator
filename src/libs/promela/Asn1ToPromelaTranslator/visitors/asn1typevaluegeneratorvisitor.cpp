@@ -141,7 +141,8 @@ void Asn1TypeValueGeneratorVisitor::visit(const Integer &type)
     while (generator.has_next()) {
         int value = generator.next();
 
-        std::unique_ptr<::promela::model::Sequence> nestedSequence = std::make_unique<::promela::model::Sequence>();
+        std::unique_ptr<::promela::model::Sequence> nestedSequence =
+                std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
 
         nestedSequence->appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("true"))));
         nestedSequence->appendElement(
@@ -150,7 +151,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Integer &type)
         conditional.appendAlternative(std::move(nestedSequence));
     }
 
-    ::promela::model::Sequence sequence;
+    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
     sequence.appendElement(std::make_unique<ProctypeElement>(std::move(conditional)));
 
     const QString inlineName = QString("%1_generate_value").arg(m_name);

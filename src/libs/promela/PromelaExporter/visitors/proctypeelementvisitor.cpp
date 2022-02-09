@@ -109,8 +109,15 @@ void ProctypeElementVisitor::operator()(const DoLoop &doLoop)
 {
     m_stream << m_indent << "do\n";
     for (const std::unique_ptr<Sequence> &sequence : doLoop.getSequences()) {
-        SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
-        visitor.visit(*sequence, true);
+        if (sequence->getType() != Sequence::Type::NORMAL) {
+            SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
+            m_stream << m_indent << m_sequenceIndent << visitor.getSequencePrefix(*sequence) << "{\n";
+            visitor.visit(*sequence, false);
+            m_stream << m_indent << "}\n";
+        } else {
+            SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
+            visitor.visit(*sequence, true);
+        }
     }
     m_stream << m_indent << "od;\n";
 }
@@ -155,10 +162,24 @@ void ProctypeElementVisitor::operator()(const Conditional &conditional)
 {
     m_stream << m_indent << "if\n";
     for (const std::unique_ptr<Sequence> &sequence : conditional.getAlternatives()) {
-        SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
-        visitor.visit(*sequence, true);
+        if (sequence->getType() != Sequence::Type::NORMAL) {
+            SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
+            m_stream << m_indent << m_sequenceIndent << visitor.getSequencePrefix(*sequence) << "{\n";
+            visitor.visit(*sequence, false);
+            m_stream << m_indent << "}\n";
+        } else {
+            SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
+            visitor.visit(*sequence, true);
+        }
     }
     m_stream << m_indent << "fi;\n";
 }
 
+void ProctypeElementVisitor::operator()(const Sequence &sequence)
+{
+    SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
+    m_stream << m_indent << visitor.getSequencePrefix(sequence) << "{\n";
+    visitor.visit(sequence, false);
+    m_stream << m_indent << "};\n";
+}
 }

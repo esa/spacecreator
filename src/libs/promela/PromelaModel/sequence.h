@@ -33,6 +33,30 @@ class Sequence final
 {
 public:
     /**
+     * @brief Type of sequence
+     */
+    enum class Type
+    {
+        NORMAL,
+        ATOMIC,
+        D_STEP,
+    };
+
+    /**
+     * @brief Constructor.
+     *
+     * @param type Sequence type.
+     */
+    Sequence(Type type);
+
+    /**
+     * @brief Getter for sequence type
+     *
+     * @return Sequence type
+     */
+    Type getType() const noexcept;
+
+    /**
      * @brief Getter for content of sequence
      *
      * @return list of sequence elements
@@ -46,6 +70,7 @@ public:
     void appendElement(std::unique_ptr<ProctypeElement> element);
 
 private:
+    Type m_type;
     std::list<std::unique_ptr<ProctypeElement>> m_content;
 };
 }
