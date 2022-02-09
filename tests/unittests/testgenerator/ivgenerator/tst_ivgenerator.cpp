@@ -91,6 +91,11 @@ void tst_ivgenerator::testNominal()
     const ivm::IVInterface::CreationInfo ci = createInterfaceUnderTestCreationInfo(
             "InterfaceUnderTest", functionUnderTest.get(), ivm::IVInterface::OperationKind::Protected);
     ivm::IVInterface *const interfaceUnderTest = ivm::IVInterface::createIface(ci);
+    interfaceUnderTest->setEntityAttribute("wcet", "0");
+    interfaceUnderTest->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::layer), "default");
+    interfaceUnderTest->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::Autonamed), "true");
+    // <Property name="Taste::coordinates" value="12300 18400"/>
+    functionUnderTest->addChild(interfaceUnderTest);
 
     const auto ivModelGenerated = IvGenerator::generate(interfaceUnderTest);
     ivModelGenerated->setProperty(
@@ -203,6 +208,15 @@ static void compareInterfaces(ivm::IVInterface *const loaded, ivm::IVInterface *
     QCOMPARE(generated->type(), loaded->type());
 
     for (const auto &entityAttribute : loaded->entityAttributes()) {
+        if (generated->entityAttributeValue(entityAttribute.name())
+                        .toString()
+                        .compare(entityAttribute.value().toString())
+                != 0) {
+            qDebug() << "fun: " << generated->function()->title();
+            qDebug() << "ifc: " << generated->title();
+            qDebug() << "att: " << entityAttribute.name();
+        }
+
         QCOMPARE(
                 generated->entityAttributeValue(entityAttribute.name()).toString(), entityAttribute.value().toString());
     }

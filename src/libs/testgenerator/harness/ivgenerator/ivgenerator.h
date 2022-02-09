@@ -27,6 +27,42 @@
 namespace testgenerator {
 
 /**
+ * @brief  Constants with coordinates of the generated entities InterfaceView diagram
+ *
+ */
+struct Coordinates {
+    struct Function {
+        /**
+         * @brief  Coordinates of a test driver function
+         *
+         */
+        static const QVector<qint32> testDriver;
+        /**
+         * @brief  Coordinates of a function under test (function to which the interface under test belongs to)
+         *
+         */
+        static const QVector<qint32> functionUnderTest;
+    };
+    struct Interface {
+        /**
+         * @brief  Coordinates of start test cyclic interface
+         *
+         */
+        static const QVector<qint32> startTestCi;
+        /**
+         * @brief  Coordinates of interface under test required interface (present in test driver function)
+         *
+         */
+        static const QVector<qint32> interfaceUnderTestRi;
+        /**
+         * @brief  Coordinates of interface under test provided interface (present in function under test)
+         *
+         */
+        static const QVector<qint32> interfaceUnderTestPi;
+    };
+};
+
+/**
  * @brief Test harness InterfaceView generator
  *
  */
@@ -44,18 +80,6 @@ public:
      *
      */
     static const QString testDriverFunctionName;
-
-    /**
-     * @brief coordinates of the generated test driver function
-     *
-     */
-    static const QVector<qint32> testDriverFunctionCoordinates;
-
-    /**
-     * @brief coordinates of the generated function with an interface under test
-     *
-     */
-    static const QVector<qint32> interfaceUnderTestFunctionCoordinates;
 
     /**
      * @brief generate an IV model with a function under test and a test driver function

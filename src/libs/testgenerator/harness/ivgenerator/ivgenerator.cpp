@@ -20,8 +20,10 @@
 #include "ivgenerator.h"
 
 #include <QDebug>
+#include <dvcore/dvcommonprops.h>
 #include <dvcore/dvobject.h>
 #include <exception>
+#include <ivcore/ivcommonprops.h>
 #include <ivcore/ivobject.h>
 #include <ivcore/ivpropertytemplateconfig.h>
 #include <memory>
@@ -32,10 +34,15 @@
 
 namespace testgenerator {
 
+const QVector<qint32> Coordinates::Function::testDriver = { 75, 184, 275, 264 };
+const QVector<qint32> Coordinates::Function::functionUnderTest = { 462, 106, 662, 186 };
+
+const QVector<qint32> Coordinates::Interface::startTestCi = { 123, 184 };
+const QVector<qint32> Coordinates::Interface::interfaceUnderTestRi = { 275, 218 };
+const QVector<qint32> Coordinates::Interface::interfaceUnderTestPi = { 462, 142 };
+
 const QString IvGenerator::startTestInterfaceName = "StartTest";
 const QString IvGenerator::testDriverFunctionName = "TestDriver";
-const QVector<qint32> IvGenerator::testDriverFunctionCoordinates = { 75, 184, 275, 264 };
-const QVector<qint32> IvGenerator::interfaceUnderTestFunctionCoordinates = { 462, 106, 662, 186 };
 
 auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::unique_ptr<ivm::IVModel>
 {
@@ -87,7 +94,7 @@ auto IvGenerator::makeTestDriverFunction(ivm::IVModel *const model, ivm::IVInter
     function->setDefaultImplementation("default");
 
     function->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::coordinates),
-            dvm::DVObject::coordinatesToString(testDriverFunctionCoordinates));
+            dvm::DVObject::coordinatesToString(Coordinates::Function::testDriver));
 
     return function;
 }
@@ -103,7 +110,7 @@ auto IvGenerator::makeFunctionUnderTest(ivm::IVInterface *const ifaceUnderTest) 
         function->setEntityAttribute(entityAttribute.name(), entityAttribute.value().toString());
     }
     function->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::coordinates),
-            dvm::DVObject::coordinatesToString(interfaceUnderTestFunctionCoordinates));
+            dvm::DVObject::coordinatesToString(Coordinates::Function::functionUnderTest));
 
     return function;
 }
@@ -120,7 +127,16 @@ auto IvGenerator::makeStartTest(ivm::IVModel *const model, ivm::IVFunction *cons
     ci.kind = ivm::IVInterface::OperationKind::Cyclic;
     ci.type = ivm::IVInterface::InterfaceType::Provided;
 
-    return ivm::IVInterface::createIface(ci);
+    auto *const iface = ivm::IVInterface::createIface(ci);
+    iface->setEntityAttribute("period", "999");
+    iface->setEntityAttribute("stack_size", "50");
+    iface->setEntityAttribute("priority", "1");
+    iface->setEntityAttribute("dispatch_offset", "0");
+    iface->setEntityAttribute("wcet", "0");
+    iface->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::coordinates),
+            dvm::DVObject::coordinatesToString(Coordinates::Interface::startTestCi));
+
+    return iface;
 }
 
 auto IvGenerator::makeTestDriverRequiredIface(
@@ -134,12 +150,24 @@ auto IvGenerator::makeTestDriverRequiredIface(
     ci.function = testDriverFunction;
     ci.type = ivm::IVInterface::InterfaceType::Required;
 
-    return ivm::IVInterface::createIface(ci);
+    auto *const iface = ivm::IVInterface::createIface(ci);
+    iface->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::Autonamed), "true");
+    iface->setEntityAttribute("wcet", "0");
+    iface->setEntityProperty(dvm::meta::Props::token(dvm::meta::Props::Token::coordinates),
+            dvm::DVObject::coordinatesToString(Coordinates::Interface::interfaceUnderTestRi));
+    iface->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::InheritPI), "true");
+
+    return iface;
 }
 
 auto IvGenerator::copyIface(ivm::IVInterface *const ifaceUnderTest) -> ivm::IVInterface *
 {
-    return ivm::IVInterface::createIface(ivm::IVInterface::CreationInfo::fromIface(ifaceUnderTest));
+    auto *const iface = ivm::IVInterface::createIface(ivm::IVInterface::CreationInfo::fromIface(ifaceUnderTest));
+    iface->setEntityAttribute("wcet", 0);
+    iface->setEntityProperty(dvm::meta::Props::token(dvm::meta::Props::Token::coordinates),
+            dvm::DVObject::coordinatesToString(Coordinates::Interface::interfaceUnderTestPi));
+
+    return iface;
 }
 
 auto IvGenerator::throwOnNullpointer(void *const pointer) -> void
