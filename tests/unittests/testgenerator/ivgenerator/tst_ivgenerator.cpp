@@ -196,8 +196,10 @@ static void compareModels(ivm::IVModel *const loaded, ivm::IVModel *const genera
 static void compareFunctions(ivm::IVFunction *const loaded, ivm::IVFunction *const generated)
 {
     for (const auto &entityAttribute : loaded->entityAttributes()) {
-        QCOMPARE(
-                generated->entityAttributeValue(entityAttribute.name()).toString(), entityAttribute.value().toString());
+        const auto &generatedValue = generated->entityAttributeValue(entityAttribute.name()).toString();
+        const auto &loadedValue = entityAttribute.value().toString();
+
+        QCOMPARE(generatedValue, loadedValue);
     }
     QCOMPARE(generated->defaultImplementation(), loaded->defaultImplementation());
 
@@ -231,17 +233,10 @@ static void compareInterfaces(ivm::IVInterface *const loaded, ivm::IVInterface *
     QCOMPARE(generated->type(), loaded->type());
 
     for (const auto &entityAttribute : loaded->entityAttributes()) {
-        if (generated->entityAttributeValue(entityAttribute.name())
-                        .toString()
-                        .compare(entityAttribute.value().toString())
-                != 0) {
-            qDebug() << "fun: " << generated->function()->title();
-            qDebug() << "ifc: " << generated->title();
-            qDebug() << "att: " << entityAttribute.name();
-        }
+        const auto &generatedValue = generated->entityAttributeValue(entityAttribute.name()).toString();
+        const auto &loadedValue = entityAttribute.value().toString();
 
-        QCOMPARE(
-                generated->entityAttributeValue(entityAttribute.name()).toString(), entityAttribute.value().toString());
+        QCOMPARE(generatedValue, loadedValue);
     }
 
     const auto &loadedParams = loaded->params();
@@ -281,8 +276,12 @@ static void compareParameters(const shared::InterfaceParameter &loaded, const sh
 
 static void compareConnections(ivm::IVConnection *const loaded, ivm::IVConnection *const generated)
 {
-    (void)loaded;
-    (void)generated;
+    for (const auto &entityAttribute : loaded->entityAttributes()) {
+        const auto &generatedValue = generated->entityAttributeValue(entityAttribute.name()).toString();
+        const auto &loadedValue = entityAttribute.value().toString();
+
+        QCOMPARE(generatedValue, loadedValue);
+    }
 }
 
 // T could be at least QVector<IVInterface*> or QVector<IVFunction*>

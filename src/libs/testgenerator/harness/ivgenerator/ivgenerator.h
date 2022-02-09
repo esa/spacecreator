@@ -61,6 +61,11 @@ struct Coordinates {
          */
         static const QVector<qint32> interfaceUnderTestPi;
     };
+    /**
+     * @brief  Coordinates of connection between PI and RI
+     *
+     */
+    static const QVector<qint32> connection;
 };
 
 /**
@@ -91,13 +96,15 @@ public:
     static auto generate(ivm::IVInterface *interfaceUnderTest) -> std::unique_ptr<ivm::IVModel>;
 
 private:
-    static auto makeTestDriverFunction(ivm::IVModel *model, ivm::IVInterface *ifaceUnderTest) -> ivm::IVFunction *;
-    static auto makeFunctionUnderTest(ivm::IVInterface *ifaceUnderTest) -> ivm::IVFunction *;
+    static auto makeTestDriverFunction(ivm::IVModel *model) -> ivm::IVFunction *;
+    static auto makeFunctionUnderTest(ivm::IVModel *model, ivm::IVInterface *ifaceUnderTest) -> ivm::IVFunction *;
     static auto makeStartTestIface(ivm::IVModel *model, ivm::IVFunction *function) -> ivm::IVInterface *;
     static auto makeTestDriverRequiredIface(ivm::IVInterface *ifaceUnderTest, ivm::IVFunction *testDriverFunction)
             -> ivm::IVInterface *;
-    static auto makeTestDriverProvidedInterface(ivm::IVInterface *ifaceUnderTest) -> ivm::IVInterface *;
-    static auto makeConnection(ivm::IVInterface *required, ivm::IVInterface *provided) -> ivm::IVConnection *;
+    static auto makeTestDriverProvidedInterface(ivm::IVInterface *ifaceUnderTest) -> ivm::IVInterface
+            *; // TODO: this shall accept testDriverFunction as a parameter and write iface.function = function
+    static auto makeConnection(ivm::IVInterface *required, ivm::IVInterface *provided, ivm::IVModel *model)
+            -> ivm::IVConnection *;
     static auto throwOnNullpointer(void *pointer) -> void;
 };
 

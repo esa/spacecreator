@@ -41,6 +41,8 @@ const QVector<qint32> Coordinates::Interface::startTestCi = { 123, 184 };
 const QVector<qint32> Coordinates::Interface::interfaceUnderTestRi = { 275, 218 };
 const QVector<qint32> Coordinates::Interface::interfaceUnderTestPi = { 462, 142 };
 
+const QVector<qint32> Coordinates::connection = { 281, 218, 370, 218, 459, 142 };
+
 const QString IvGenerator::startTestInterfaceName = "StartTest";
 const QString IvGenerator::testDriverFunctionName = "TestDriver";
 
@@ -72,24 +74,35 @@ auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::u
     }
 
     auto ivModel = std::make_unique<ivm::IVModel>(config);
-    ivModel->addObject(makeTestDriverFunction(ivModel.get(), interfaceUnderTest));
-    ivModel->addObject(makeFunctionUnderTest(interfaceUnderTest));
-    ivModel->addObject(makeConnection());
+
+    auto *const testDriverFunction = makeTestDriverFunction(ivModel.get());
+    auto *const testDriverRi = makeTestDriverRequiredIface(interfaceUnderTest, testDriverFunction);
+    auto *const testDriverStartTestCi = makeStartTestIface(ivModel.get(), testDriverFunction);
+
+    testDriverFunction->addChild(testDriverRi);
+    testDriverFunction->addChild(testDriverStartTestCi);
+
+    auto *const functionUnderTest = makeFunctionUnderTest(ivModel.get(), interfaceUnderTest);
+    auto *const interfaceUnderTestPi = makeTestDriverProvidedInterface(interfaceUnderTest);
+
+    functionUnderTest->addChild(interfaceUnderTestPi);
+
+    auto *const connection = makeConnection(testDriverRi, interfaceUnderTestPi, ivModel.get());
+
+    ivModel->addObject(testDriverFunction);
+    ivModel->addObject(functionUnderTest);
+    ivModel->addObject(connection);
 
     return ivModel;
 }
 
-auto IvGenerator::makeTestDriverFunction(ivm::IVModel *const model, ivm::IVInterface *const ifaceUnderTest)
-        -> ivm::IVFunction *
+auto IvGenerator::makeTestDriverFunction(ivm::IVModel *const model) -> ivm::IVFunction *
 {
     throwOnNullpointer(model);
-    throwOnNullpointer(ifaceUnderTest);
 
     ivm::IVFunction *const function = new ivm::IVFunction;
-    function->setTitle(testDriverFunctionName);
     function->setModel(model);
-    function->addChild(makeTestDriverRequiredIface(ifaceUnderTest, function));
-    function->addChild(makeStartTestIf(model, function));
+    function->setTitle(testDriverFunctionName);
     function->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::is_type), "NO");
     function->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::language), "C");
     function->setDefaultImplementation("default");
@@ -100,13 +113,15 @@ auto IvGenerator::makeTestDriverFunction(ivm::IVModel *const model, ivm::IVInter
     return function;
 }
 
-auto IvGenerator::makeFunctionUnderTest(ivm::IVInterface *const ifaceUnderTest) -> ivm::IVFunction *
+auto IvGenerator::makeFunctionUnderTest(ivm::IVModel *const model, ivm::IVInterface *const ifaceUnderTest)
+        -> ivm::IVFunction *
 {
+    throwOnNullpointer(model);
     throwOnNullpointer(ifaceUnderTest);
 
     ivm::IVFunction *const function = new ivm::IVFunction;
+    function->setModel(model);
     function->setTitle(ifaceUnderTest->function()->title());
-    function->addChild(copyIface(ifaceUnderTest));
     for (const auto &entityAttribute : ifaceUnderTest->function()->entityAttributes()) {
         function->setEntityAttribute(entityAttribute.name(), entityAttribute.value().toString());
     }
@@ -116,7 +131,7 @@ auto IvGenerator::makeFunctionUnderTest(ivm::IVInterface *const ifaceUnderTest) 
     return function;
 }
 
-auto IvGenerator::makeStartTestIf(ivm::IVModel *const model, ivm::IVFunction *const function) -> ivm::IVInterface *
+auto IvGenerator::makeStartTestIface(ivm::IVModel *const model, ivm::IVFunction *const function) -> ivm::IVInterface *
 {
     throwOnNullpointer(model);
     throwOnNullpointer(function);
@@ -161,7 +176,7 @@ auto IvGenerator::makeTestDriverRequiredIface(
     return iface;
 }
 
-auto IvGenerator::copyIface(ivm::IVInterface *const ifaceUnderTest) -> ivm::IVInterface *
+auto IvGenerator::makeTestDriverProvidedInterface(ivm::IVInterface *const ifaceUnderTest) -> ivm::IVInterface *
 {
     auto *const iface = ivm::IVInterface::createIface(ivm::IVInterface::CreationInfo::fromIface(ifaceUnderTest));
     iface->setEntityAttribute("wcet", 0);
@@ -169,6 +184,20 @@ auto IvGenerator::copyIface(ivm::IVInterface *const ifaceUnderTest) -> ivm::IVIn
             dvm::DVObject::coordinatesToString(Coordinates::Interface::interfaceUnderTestPi));
 
     return iface;
+}
+
+auto IvGenerator::makeConnection(ivm::IVInterface *const required, ivm::IVInterface *const provided,
+        ivm::IVModel *const model) -> ivm::IVConnection *
+{
+    throwOnNullpointer(required);
+    throwOnNullpointer(provided);
+
+    ivm::IVConnection *const connection = new ivm::IVConnection(required, provided, model);
+
+    connection->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::coordinates),
+            dvm::DVObject::coordinatesToString(Coordinates::connection));
+
+    return connection;
 }
 
 auto IvGenerator::throwOnNullpointer(void *const pointer) -> void
