@@ -1,0 +1,172 @@
+{% comment %}
+Template for generation of XML scheme of function.
+The following tags are available in this sub-template:
+func                    : Instance of function (provided by a top level template)
+func.name               :   |_ Function name
+func.attributes         :   |_ List of all attributes of function
+attr                    :       |_ Instance of attriubute
+attr.name               :           |_ Name of attribute
+attr.value              :           |_ Value of attribute
+func.properties         :   |_ List of all properties of function
+prop                    :       |_ Instance of property
+prop.name               :           |_ Name of property
+prop.value              :           |_ Value of property
+func.contextParameters  :   |_ List of all context parameters of function
+param                   :       |_ Instance of context parameter
+param.name              :           |_ Name of context parameter
+param.type              :           |_ Type name context parameter (from ASN.1 for example)
+param.defaultValue      :           |_ Value of context parameter
+func.interfaces         :   |_ List of all interfaces of function
+iface                   :       |_ Instance of interface
+func.functions          :   |_ List of all nested functions of function
+func                    :       |_ Instance of nested function
+func.comments           :   |_ List of all nested comments of function
+comm                    :       |_ Instance of nested comment
+func.connections        :   |_ List of all nested connections of function
+conn                    :       |_ Instance of nested connections
+func.connectedFunctions :   |_ List of connected functions
+connectedFunc           :       |_ List of parent Functions names
+{% endcomment %}
+
+{% for func in func.functions %}
+    {% include "function.tmplt" %}
+{% endfor %}
+
+PACKAGE interfaceview::IV::{{ func.path|join:"::" }}
+PUBLIC
+
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+{% for connectedFunc in func.connectedFunctions %}
+WITH interfaceview::IV::{{ connectedFunc|join:"::" }};
+{% endfor %}
+
+{% for iface in func.interfaces %}
+    {% include "interface.tmplt" %}
+{% endfor %}
+
+SYSTEM {{ func.name }}
+{% if func.interfaces|length > 0 %}
+FEATURES
+{% endif %}
+{% for iface in func.interfaces %}
+{% if iface.isProvided %}
+{% for endpoint in iface.connectedInterfaces %}
+{% comment %}
+   In nested function we must ensure AADL type consistency, so we have to connect the PI at the border of the nested function
+   so this excludes this pattern:
+   PI_{{ iface.name }} : PROVIDES SUBPROGRAM ACCESS interfaceview::IV::{{ func.path|join:"::" }}::PI_{{ iface.name }}.others {
+   in fact in nested function we should not generate new SUBPROGRAMs as even if they would have the same name and content
+   as the ones in the terminal (connected) functions they would not have the same classifier (type) in AADL
+{% endcomment %}
+{% if forloop.first %}
+   PI_{{ iface.name }} : PROVIDES SUBPROGRAM ACCESS interfaceview::IV::{% for item in endpoint %} {% if not forloop.last %}{{ item }}::{% endif %}{% endfor %}PI_{{ endpoint|last }}.others {
+{% endif %}
+{% endfor %}
+{% else %}
+{% for endpoint in iface.connectedInterfaces %}
+{% comment %}
+   The following works only because there is no multicast, otherwise it would repeat the same RI name multiple times
+   In case of multiple RI->one PI connection there should be a different name for the RI here
+{% endcomment %}
+{% comment %}
+   for the RI there are two possible names, either PI_.. if it is a connected RI, or RI_ if it is a function type
+   we have to iterate over the function attributes to determine it..
+   It is also RI_ if the RI is not connected. Despite the iteration on "connectedInterfaces", unconnected ones are
+   also there and pointing to the current function. This hack is needed to figure this out:
+   {{ func.path|join:"::"|add:"::"|add:iface.name }} {{ endpoint|join:"::" }}
+{% endcomment %}
+{% if forloop.first %}
+{% for attr in func.attributes %}
+   {% if attr.name == "is_type" and attr.value == "YES" or attr.name == "is_type" and func.path|join:"::"|add:"::"|add:iface.name == endpoint|join:"::" %}
+   RI_{{ iface.name }} : REQUIRES SUBPROGRAM ACCESS interfaceview::IV::{% for item in endpoint %} {% if not forloop.last %}{{ item }}::{% endif %}{% endfor %}RI_{{ endpoint|last }}.others {
+   {% elif attr.name == "is_type" and attr.value == "NO" %}
+   RI_{{ iface.name }} : REQUIRES SUBPROGRAM ACCESS interfaceview::IV::{% for item in endpoint %} {% if not forloop.last %}{{ item }}::{% endif %}{% endfor %}PI_{{ endpoint|last }}.others {
+   {% endif %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% for ifprop in iface.properties %}
+      {% if ifprop.name == "Taste::InheritPI" %}
+      Taste::labelInheritance        => "{{ ifprop.value }}";
+      {% elif ifprop.name == "Taste::Autonamed" %}
+      {% elif ifprop.name == "Taste::InnerCoordinates" %}
+      {% elif ifprop.name == "Taste::RootCoordinates" %}
+      {% elif ifprop.name == "Taste::coordinates" %}
+      {% else %}
+      {{ ifprop.name }}              => "{{ ifprop.value }}";
+      {% endif %}
+{% endfor %}
+{% for attr in iface.attributes %}
+      {% if attr.name == "kind" %}      
+       {% if attr.value|lower == "any_operation" %}
+      Taste::RCMoperationKind        => any;
+       {% else %}
+      Taste::RCMoperationKind        => {{ attr.value|lower }};
+       {% endif %}
+      {% elif attr.name == "period" or attr.name == "miat" %}
+      Taste::RCMperiod               => {% if attr.value %}{{ attr.value }} {% else %} 0 {% endif %}ms;
+      {% elif attr.name == "wcet" %}
+      Compute_Execution_Time => {% if attr.value %}{{ attr.value }} ms .. {{ attr.value }} {% else %} 0 ms .. 0 {% endif %}ms;
+      {% elif attr.name == "queue_size" %}
+      Taste::Associated_Queue_Size   => {% if attr.value %}{{ attr.value }}{% else %}1{% endif %};
+      {% elif attr.name == "name" %}
+      Taste::InterfaceName           => "{{ attr.value }}";
+      {% elif attr.name == "stack_size" %}
+      Taste::Interface_Stack_Size    => {{ attr.value }};
+      {% elif attr.name == "priority" %}
+      Taste::Interface_Priority      => {{ attr.value }};
+      {% elif attr.name == "dispatch_offset" %}
+      Taste::Interface_Cyclic_Offset => {{ attr.value }};
+      {% else %}
+      -- Unrecognized property: {{ attr.name }} => {{ attr.value }}
+      {% endif %}      
+{% endfor %}
+   };
+{% endfor %}
+PROPERTIES
+{% for attr in func.attributes %}
+   {% if attr.name == "language" %}
+   Source_Language => ({{ attr.value }});
+   {% elif attr.name == "is_type" %}
+   TASTE::Is_Component_Type => {% if attr.value == "YES" %}true{% else %}false{% endif %};
+   {% elif attr.name == "instance_of" and attr.value != "" %}
+   TASTE_IV_Properties::is_instance_of => "{{ attr.value }}";
+   {% else %}
+   -- unsupported property found: name: "{{ attr.name }}"  value: "{{ attr.value }}"
+   {% endif %}
+{% endfor %}
+{% for prop in func.properties %}
+  {% if prop.name != "Taste::coordinates" and prop.name != "Taste::InnerCoordinates" and prop.name != "Taste::RootCoordinates" %}
+   {{ prop.name }} => {{prop.value}};
+  {% endif %}
+{% endfor %}
+END {{ func.name }};
+
+SYSTEM IMPLEMENTATION {{ func.name }}.others
+{% if func.functions|length > 0  or func.contextParameters|length > 0 %}
+SUBCOMPONENTS
+   {% for func in func.functions %}
+   {{ func.name }} : SYSTEM interfaceview::IV::{{ func.path|join:"::" }}::{{ func.name }}.others;
+   {% endfor %}
+   {% for param in func.contextParameters %}
+   {{ param.underscoredName }} : DATA DataView::{{ param.underscoredType }} {
+      Taste::FS_Default_Value => "{{ param.defaultValue }}";
+   };
+   {% endfor %}
+{% if func.connections|length > 0 %}
+CONNECTIONS
+{% for conn in func.connections %}
+ {% if conn.siIsRequired %}
+   {{ conn.source }}_RI_{{ conn.siName }}_{{ conn.target }}_PI_{{ conn.tiName }} : SUBPROGRAM ACCESS {% if conn.target != func.name %}{{ conn.target }}.PI_{% else %}RI_{% endif %}{{ conn.tiName }} -> {{ conn.source }}.RI_{{ conn.siName }};
+ {% else %}
+   {{ conn.source }}_PI_{{ conn.siName }}_{{ conn.target }}_RI_{{ conn.tiName }} : SUBPROGRAM ACCESS {{ conn.target }}.PI_{{ conn.tiName }} -> {% if conn.source != func.name %}{{ conn.source }}.RI_{% else %}PI_{% endif %}{{ conn.siName }};
+ {% endif %}
+{% endfor %}
+{% endif %}
+{% endif %}
+END {{ func.name }}.others;
+
+END interfaceview::IV::{{ func.path|join:"::" }};

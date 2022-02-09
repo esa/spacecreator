@@ -20,6 +20,7 @@
 #include "commands/cmdcommentitemcreate.h"
 #include "commands/cmdconnectiongroupitemcreate.h"
 #include "commands/cmdconnectionitemcreate.h"
+#include "commands/cmdconnectionlayermanage.h"
 #include "commands/cmdentitiesremove.h"
 #include "commands/cmdentitygeometrychange.h"
 #include "commands/cmdfunctionitemcreate.h"
@@ -76,7 +77,7 @@ IVCreatorTool::IVCreatorTool(QGraphicsView *view, InterfaceDocument *doc)
 {
 }
 
-IVCreatorTool::~IVCreatorTool() { }
+IVCreatorTool::~IVCreatorTool() {}
 
 void IVCreatorTool::removeSelectedItems()
 {
@@ -154,9 +155,9 @@ void IVCreatorTool::groupSelectedItems()
                 QPointF startPoint = sourceItem->sceneBoundingRect().center();
                 QPointF endPoint = targetItem->sceneBoundingRect().center();
                 const bool startAdjusted = shared::graphicsviewutils::intersects(
-                        sourceItem->sceneBoundingRect(), { startPoint, endPoint }, &startPoint);
+                        sourceItem->sceneBoundingRect(), QLineF(startPoint, endPoint), &startPoint);
                 const bool endAdjusted = shared::graphicsviewutils::intersects(
-                        targetItem->sceneBoundingRect(), { startPoint, endPoint }, &endPoint);
+                        targetItem->sceneBoundingRect(), QLineF(startPoint, endPoint), &endPoint);
                 if (!startAdjusted || !endAdjusted) {
                     return;
                 }
@@ -358,7 +359,7 @@ bool IVCreatorTool::onMouseMove(QMouseEvent *e)
 
                     if (item->parentItem() == m_previewItem->parentItem()
                             || (m_previewItem->parentItem() == item
-                                    && !item->sceneBoundingRect().contains(expandedGeometry))) {
+                                       && !item->sceneBoundingRect().contains(expandedGeometry))) {
                         items.insert(iObjItem);
                     }
                 });
@@ -426,6 +427,7 @@ void IVCreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF 
 
         action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/connection_group.svg")), tr("Connection group"),
                 this, [this]() { groupSelectedItems(); });
+
         const auto selectedItems = m_previewItem->scene()->selectedItems();
         const auto it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
                 [](const QGraphicsItem *item) { return item->type() == IVConnectionGraphicsItem::Type; });
@@ -587,11 +589,10 @@ void IVCreatorTool::handleFunction(QGraphicsScene *scene, const QPointF &pos)
         if (!shared::graphicsviewutils::isBounded(m_previewItem, itemSceneRect))
             return;
 
-        if (auto parentItem = m_previewItem->parentItem()) {
+        ivm::IVFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
+        if (parentObject && parentObject->id() != model()->objectsModel()->rootObjectId()) {
             itemSceneRect = {};
         }
-
-        ivm::IVFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
         const shared::Id id = shared::createId();
         auto cmd = new cmd::CmdFunctionItemCreate(model()->objectsModel(), parentObject, itemSceneRect, QString(), id);
         if (m_doc->commandsStack()->push(cmd)) {
@@ -817,8 +818,8 @@ void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints) cons
 
             ifaceCommons.type = info.endIface ? info.endIface->direction()
                                               : (graphicPoints.last() == info.connectionPoints.first()
-                                                              ? ivm::IVInterface::InterfaceType::Required
-                                                              : ivm::IVInterface::InterfaceType::Provided);
+                                                                ? ivm::IVInterface::InterfaceType::Required
+                                                                : ivm::IVInterface::InterfaceType::Provided);
 
             if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
                 return;

@@ -61,6 +61,7 @@ public:
 
     virtual QString prepareTooltip() const;
     virtual void enableEditMode() {};
+    virtual void childBoundingBoxChanged();
 
 Q_SIGNALS:
     void clicked();

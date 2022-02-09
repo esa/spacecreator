@@ -36,7 +36,7 @@ class tst_SedsXmlParser : public QObject
 public:
     virtual ~tst_SedsXmlParser() = default;
 
-public Q_SLOTS:
+private Q_SLOTS:
     void testComponentsParsing();
     void testContainerDataTypesParsing();
     void testDeviceParsing();

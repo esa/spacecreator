@@ -20,6 +20,7 @@
 #include "commandlineparser.h"
 #include "commands/cmdchangeasn1file.h"
 #include "commands/cmdconnectionitemcreate.h"
+#include "commands/cmdconnectionlayermanage.h"
 #include "commands/cmdentityattributeschange.h"
 #include "commands/cmdfunctionitemcreate.h"
 #include "commands/cmdifaceattrchange.h"
@@ -267,6 +268,11 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
 
     Q_EMIT editedExternally(this);
     return true;
+}
+
+ivm::IVConnectionLayerType *IVEditorCore::manageConnectionLayer(const QString &name, ivm::IVConnectionLayerType *parent)
+{
+    return nullptr;
 }
 
 /*!
@@ -573,6 +579,8 @@ void IVEditorCore::updateIVItems()
 
     m_ivFunctions = ivModel->allObjectsByType<ivm::IVFunction>();
     m_ivConnections = ivModel->allObjectsByType<ivm::IVConnection>();
+
+    m_document->updateLayersModel();
 }
 
 QUrl IVEditorCore::helpPage() const

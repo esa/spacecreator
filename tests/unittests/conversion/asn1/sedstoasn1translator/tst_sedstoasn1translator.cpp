@@ -70,13 +70,14 @@ class tst_SedsToAsn1Translator : public QObject
 {
     Q_OBJECT
 
-public Q_SLOTS:
+private Q_SLOTS:
     void testMissingModel();
     void testTooManyModels();
     void testWrongModel();
 
     void testResolvingArrayDataType();
     void testResolvingContainerDataType();
+    void testResolvingUsingGlobal();
     void testResolvingCyclicDependency();
     void testResolvingUndeclaredType();
 
@@ -141,7 +142,7 @@ void tst_SedsToAsn1Translator::testResolvingArrayDataType()
     dataTypes.push_back(&integerDataType);
 
     DataTypesDependencyResolver resolver;
-    auto resolvedDataTypes = resolver.resolve(&dataTypes);
+    auto resolvedDataTypes = resolver.resolve(&dataTypes, nullptr);
 
     QCOMPARE(resolvedDataTypes.size(), 2);
 
@@ -169,7 +170,7 @@ void tst_SedsToAsn1Translator::testResolvingContainerDataType()
     dataTypes.push_back(&dataTypeB);
 
     DataTypesDependencyResolver resolver;
-    auto resolvedDataTypes = resolver.resolve(&dataTypes);
+    auto resolvedDataTypes = resolver.resolve(&dataTypes, nullptr);
 
     QCOMPARE(resolvedDataTypes.size(), 3);
 
@@ -180,6 +181,26 @@ void tst_SedsToAsn1Translator::testResolvingContainerDataType()
     resolvedDataTypes.pop_front();
 
     QCOMPARE(dataTypeNameStr(*resolvedDataTypes.front()), "Container");
+    resolvedDataTypes.pop_front();
+}
+
+void tst_SedsToAsn1Translator::testResolvingUsingGlobal()
+{
+    const seds::model::DataType arrayDataType = SedsDataTypeFactory::createArray("Array", "DataItem", 2);
+    const seds::model::DataType integerDataType = SedsDataTypeFactory::createInteger("DataItem");
+
+    std::vector<const DataType *> dataTypes;
+    dataTypes.push_back(&arrayDataType);
+
+    std::vector<const DataType *> globalDataTypes;
+    globalDataTypes.push_back(&integerDataType);
+
+    DataTypesDependencyResolver resolver;
+    auto resolvedDataTypes = resolver.resolve(&dataTypes, &globalDataTypes);
+
+    QCOMPARE(resolvedDataTypes.size(), 1);
+
+    QCOMPARE(dataTypeNameStr(*resolvedDataTypes.front()), "Array");
     resolvedDataTypes.pop_front();
 }
 
@@ -200,7 +221,7 @@ void tst_SedsToAsn1Translator::testResolvingCyclicDependency()
 
     DataTypesDependencyResolver resolver;
 
-    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes), NotDagException);
+    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes, nullptr), NotDagException);
 }
 
 void tst_SedsToAsn1Translator::testResolvingUndeclaredType()
@@ -216,7 +237,7 @@ void tst_SedsToAsn1Translator::testResolvingUndeclaredType()
 
     DataTypesDependencyResolver resolver;
 
-    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes), UndeclaredDataTypeException);
+    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes, nullptr), UndeclaredDataTypeException);
 }
 
 /// \SRS  ETB-FUN-210
@@ -617,14 +638,10 @@ void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithLengthEntry()
     const auto *entryComponentType = entryComponent->type();
     QVERIFY(entryComponentType);
 
-    const auto *entryComponentTypeReferenced = dynamic_cast<const Types::UserdefinedType *>(entryComponentType);
+    const auto *entryComponentTypeReferenced = dynamic_cast<const Types::Null *>(entryComponentType);
     QVERIFY(entryComponentTypeReferenced);
-    QVERIFY(entryComponentTypeReferenced->type());
-
-    const auto *entryComponentTypeInteger = dynamic_cast<const Types::Integer *>(entryComponentTypeReferenced->type());
-    QVERIFY(entryComponentTypeInteger);
-    QCOMPARE(entryComponentTypeInteger->identifier(), "Integer");
-    QCOMPARE(entryComponentTypeInteger->typeName(), "INTEGER");
+    QCOMPARE(entryComponentTypeReferenced->identifier(), "entry");
+    QCOMPARE(entryComponentTypeReferenced->typeName(), "NULL");
 }
 
 /// \SRS  ETB-FUN-230
@@ -666,9 +683,13 @@ void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithListEntry()
     const auto &components = sequenceType->components();
     QCOMPARE(components.size(), 2);
 
+    const auto *sizeComponent = sequenceType->component("size");
+    QVERIFY(sizeComponent);
+    QVERIFY(dynamic_cast<const AcnSequenceComponent *>(sizeComponent));
+
     const auto *entryComponent = sequenceType->component("entry");
     QVERIFY(entryComponent);
-    QVERIFY(dynamic_cast<const AcnSequenceComponent *>(entryComponent));
+    QVERIFY(dynamic_cast<const AsnSequenceComponent *>(entryComponent));
 
     const auto *entryComponentType = entryComponent->type();
     QVERIFY(entryComponentType);
@@ -872,8 +893,8 @@ void tst_SedsToAsn1Translator::testTranslateFloatDataType()
     QVERIFY(rangeConstraint);
 
     const auto &range = rangeConstraint->range();
-    QCOMPARE(range.begin(), 2.22507e-308);
-    QCOMPARE(range.end(), 1.79769e+308);
+    QCOMPARE(range.begin(), std::numeric_limits<double>::min());
+    QCOMPARE(range.end(), std::numeric_limits<double>::max());
 }
 
 /// \SRS  ETB-FUN-190

@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,6 +20,8 @@
 #include "converter.h"
 
 #include "exceptions.h"
+#include "modeltype.h"
+#include "sdl/SdlModel/sdlmodel.h"
 
 #include <conversion/common/exceptions.h>
 #include <conversion/common/export/modelexporter.h>
@@ -75,6 +77,22 @@ void Converter::convert(const std::set<ModelType> &sourceModelsTypes, ModelType 
     for (const auto &auxiliaryModelType : auxiliaryModelsTypes) {
         exportModel(auxiliaryModelType);
     }
+}
+
+std::vector<std::unique_ptr<Model>> Converter::extractCache()
+{
+    std::vector<std::unique_ptr<Model>> outputModels;
+
+    const std::vector<ModelType> modelTypes { ModelType::Unspecified, ModelType::Asn1, ModelType::InterfaceView,
+        ModelType::Promela, ModelType::Sdl, ModelType::Seds };
+    outputModels.reserve(modelTypes.size());
+    for (auto modelType : modelTypes) {
+        if (m_modelCache[modelType].get() != nullptr) {
+            outputModels.push_back(std::move(m_modelCache.extract(modelType).mapped()));
+        }
+    }
+
+    return outputModels;
 }
 
 void Converter::importModel(ModelType modelType)

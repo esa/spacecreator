@@ -1,0 +1,63 @@
+{% comment %}
+The following tags are available in this sub-template:
+iface                       : Instance of interface (provided by a top level template)
+iface.name                  :   |_ Interface name
+iface.isProvided            :   |_ Whether interface is provided
+iface.isRequired            :   |_ Whether interface is required
+iface.connectedInterfaces   :   |_ List of endpoint interfaces linked to current one
+iface.attributes            :   |_ List of all available attributes
+attr                        :       |_ Instance of attriubute
+attr.name                   :           |_ Name of attribute
+attr.value                  :           |_ Value of attribute
+iface.params                :   |_ List of params of interface
+param                       :       |_ Instance of param
+param.isIn                  :           |_ Whether param is IN
+param.isOut                 :           |_ Whether param is OUT
+param.name                  :           |_ Name of param
+param.underscoredName       :           |_ Name of param with " " replaced by "_" (spaces repladed with underscore)
+param.type                  :           |_ Type of param
+param.underscoredType       :           |_ Type of param with "-" replaced by "_" (dashes repladed with underscore)
+param.encoding              :           |_ Encoding of param
+iface.properties            :   |_ List of all available properties
+prop                        :       |_ Instance of property
+prop.name                   :           |_ Name of property
+prop.value                  :           |_ Value of property
+{% endcomment %}
+{% for allattr in iface.attributes %}
+{% if allattr.name == "name" %}
+{% with allattr.value as name %}
+{% if iface.isProvided %}
+SUBPROGRAM PI_{{ name }}
+{% else %}
+SUBPROGRAM RI_{{ name }}
+{% endif %}
+{% if iface.params|length > 0 %}
+FEATURES
+{% for param in iface.params %}
+{% if param.isIn %}
+    {{ param.underscoredName }} : IN PARAMETER DataView::{{ param.underscoredType }} {
+       Taste::encoding => {{ param.encoding }};
+    };
+{% else %}
+    {{ param.underscoredName }} : OUT PARAMETER DataView::{{ param.underscoredType }} {
+       Taste::encoding => {{ param.encoding }};
+    };
+{% endif %}
+{% endfor %}
+{% endif %}
+{% if iface.isProvided %}
+END PI_{{ name }};
+
+SUBPROGRAM IMPLEMENTATION PI_{{ name }}.others
+END PI_{{ name }}.others;
+
+{% else %}
+END RI_{{ name }};
+
+SUBPROGRAM IMPLEMENTATION RI_{{ name }}.others
+END RI_{{ name }}.others;
+
+{% endif %}
+{% endwith %}
+{% endif %}
+{% endfor %}

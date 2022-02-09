@@ -49,9 +49,23 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   dataTypeName    Name of undeclared the type
+     * @param   dataTypeName    Name of the undeclared type
      */
     explicit UndeclaredDataTypeException(const QString &dataTypeName);
+};
+
+/**
+ * @brief   Exception thrown when translator encounters a data type that is not supported
+ */
+class UnsupportedDataTypeException : public TranslationException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   dataTypeName    Name of the unsupported type
+     */
+    explicit UnsupportedDataTypeException(const QString &dataTypeName);
 };
 
 /**
@@ -96,35 +110,6 @@ public:
      * @param   asn1TypeName    Name of the missing ASN.1 type
      */
     explicit MissingAsn1TypeDefinitionException(const QString &asn1TypeName);
-};
-
-/**
- * @brief   Exception thrown when translator encounters unhandled value while handling enum values
- */
-class UnhandledValueException : public TranslationException
-{
-public:
-    /**
-     * @brief   Constructor
-     *
-     * @param   enumName        Name of the enum
-     */
-    explicit UnhandledValueException(const QString &enumName);
-};
-
-/**
- * @brief   Exception thrown when translator encounters unsupported value while handling enum values
- */
-class UnsupportedValueException : public TranslationException
-{
-public:
-    /**
-     * @brief   Constructor
-     *
-     * @param   enumName        Name of the enum
-     * @param   valueTypeName   Name of the unsupported value type
-     */
-    explicit UnsupportedValueException(const QString &enumName, const QString &valueTypeName);
 };
 
 /**

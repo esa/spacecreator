@@ -40,7 +40,7 @@ CmdFunctionImplementationRemove::CmdFunctionImplementationRemove(
     }
 }
 
-CmdFunctionImplementationRemove::~CmdFunctionImplementationRemove() { }
+CmdFunctionImplementationRemove::~CmdFunctionImplementationRemove() {}
 
 void CmdFunctionImplementationRemove::redo()
 {
@@ -77,7 +77,9 @@ int CmdFunctionImplementationRemove::id() const
 
 QDir CmdFunctionImplementationRemove::implementationDir() const
 {
-    return QStringLiteral("%1/work/%2/%3").arg(m_projectPath, shared::kNonCurrentImplementationPath, m_value.name());
+    return QStringList { m_projectPath, shared::kRootImplementationPath, m_function->title().toLower(),
+        shared::kNonCurrentImplementationPath, m_value.name() }
+            .join(QDir::separator());
 }
 
 } // namespace cmd

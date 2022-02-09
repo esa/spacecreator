@@ -17,6 +17,7 @@
 
 #include "endtoendview.h"
 
+#include "end2endfunctiongraphicsitem.h"
 #include "endtoendconnections.h"
 #include "interfacedocument.h"
 #include "itemeditor/common/ivutils.h"
@@ -30,6 +31,7 @@
 #include "ivconnection.h"
 #include "ivconnectionchain.h"
 #include "ivconnectiongroup.h"
+#include "ivcoreutils.h"
 #include "ivfunction.h"
 #include "ivinterfacegroup.h"
 #include "ivmodel.h"
@@ -178,7 +180,7 @@ bool EndToEndView::refreshView()
     qDeleteAll(d->scene->items());
 
     // Get the visible non-nested objects
-    QList<ivm::IVObject *> objects = d->document->objectsModel()->visibleObjects({});
+    QVector<ivm::IVObject *> objects = d->document->objectsModel()->visibleObjects({}).toVector();
     ivm::IVObject::sortObjectList(objects);
 
     const QList<ivm::IVConnectionChain *> chains = ivm::IVConnectionChain::build(*d->document->objectsModel());
@@ -189,7 +191,7 @@ bool EndToEndView::refreshView()
         doc = currentData.value<msc::MscDocument *>();
     }
     const EndToEndConnections::Dataflow dataflow = doc ? d->dataflow.dataflow(doc) : d->dataflow.dataflow();
-    for (auto c : dataflow.internalConnections) {
+    for (const auto &c : qAsConst(dataflow.internalConnections)) {
         internalConnections << InternalConnection { c };
     };
 
@@ -199,16 +201,32 @@ bool EndToEndView::refreshView()
     // Add new graphics items for each object
     QHash<shared::Id, QGraphicsItem *> items;
     shared::ui::VEInteractiveObject *rootItem = nullptr;
-    for (auto obj : objects) {
-        const int lowestLevel = gi::nestingLevel(d->document->objectsModel()->rootObject()) + 1;
-        const int objectLevel = gi::nestingLevel(obj);
+    for (auto obj : qAsConst(objects)) {
+        const int lowestLevel = ivm::utils::nestingLevel(d->document->objectsModel()->rootObject()) + 1;
+        const int objectLevel = ivm::utils::nestingLevel(obj);
         const bool isRootOrRootChild = obj->id() == d->document->objectsModel()->rootObjectId()
                 || (d->document->objectsModel()->rootObject()
-                        && obj->parentObject() == d->document->objectsModel()->rootObject());
+                           && obj->parentObject() == d->document->objectsModel()->rootObject());
         if ((objectLevel < lowestLevel || objectLevel > (lowestLevel + gi::kNestingVisibilityLevel))
                 && !isRootOrRootChild) {
             continue;
         }
+
+        auto getChain = [&chains](const QVector<EndToEndConnections::Connection> &connections) -> QList<shared::Id> {
+            QList<shared::Id> connectionList;
+            for (auto it = connections.cbegin(); it != connections.cend(); ++it) {
+                auto connectionIt = std::find_if(
+                        chains.cbegin(), chains.cend(), [connection = *it](const ivm::IVConnectionChain *chain) {
+                            return chain->contains(connection.message, connection.from, connection.to);
+                        });
+                if (connectionIt != chains.cend()) {
+                    for (auto connection : (*connectionIt)->connections()) {
+                        connectionList << connection->id();
+                    }
+                }
+            }
+            return connectionList;
+        };
 
         QGraphicsItem *parentItem = obj->parentObject() ? items.value(obj->parentObject()->id()) : nullptr;
 
@@ -363,12 +381,14 @@ bool EndToEndView::refreshView()
                 }
             }
             break;
-        case ivm::IVObject::Type::Function:
-            item = new IVFunctionGraphicsItem(qobject_cast<ivm::IVFunction *>(obj), parentItem);
+        case ivm::IVObject::Type::Function: {
+            auto e2eFunctionItem = new End2EndFunctionGraphicsItem(qobject_cast<ivm::IVFunction *>(obj), parentItem);
+            e2eFunctionItem->setEnd2EndConnections(getChain(dataflow.connections));
+            item = e2eFunctionItem;
             if (obj->isRootObject()) {
                 rootItem = item;
             }
-            break;
+        } break;
         default:
             break;
         }

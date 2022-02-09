@@ -58,7 +58,6 @@ public:
     QString prepareTooltip() const override;
 
     qreal maxWidth() const;
-    static qreal baseLength();
 
 public Q_SLOTS:
     void updateLabel();
@@ -73,16 +72,15 @@ protected:
 
     qreal typeIconHeight() const;
     void updateEntityTitle(const QString &text);
-
-protected Q_SLOTS:
-    virtual void applyColorScheme() override;
-    void updateKind();
-    void updateIface();
-    void onAttrOrPropChanged(const QString &attrName);
-
     virtual QPainterPath ifacePath() const;
     virtual QPainterPath typePath() const;
     QPainterPath itemPath(Qt::Alignment alignment) const override;
+    virtual void applyColorScheme() override;
+
+protected Q_SLOTS:
+    void updateKind();
+    void updateIface();
+    void onAttrOrPropChanged(const QString &attrName);
 
 private:
     QTransform typeTransform(Qt::Alignment alignment) const;

@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#include "tst_asn1topromelatranslator.h"
+
 #include <QObject>
 #include <QtTest>
 #include <asn1library/asn1/asn1model.h>
@@ -33,6 +35,8 @@
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/typefactory.h>
+#include <asn1library/asn1/types/userdefinedtype.h>
+#include <promela/Asn1ToPromelaTranslator/promelatypesorter.h>
 #include <promela/Asn1ToPromelaTranslator/translator.h>
 #include <promela/Asn1ToPromelaTranslator/visitors/asn1nodevisitor.h>
 #include <promela/PromelaModel/promelamodel.h>
@@ -59,6 +63,7 @@ using Asn1Acn::Types::Sequence;
 using Asn1Acn::Types::SequenceOf;
 using Asn1Acn::Types::Type;
 using Asn1Acn::Types::TypeFactory;
+using Asn1Acn::Types::UserdefinedType;
 using promela::model::BasicType;
 using promela::model::Declaration;
 using promela::model::PromelaModel;
@@ -67,39 +72,9 @@ using promela::model::Utype;
 using promela::model::UtypeRef;
 using promela::model::ValueDefinition;
 using promela::translator::Asn1NodeVisitor;
-using promela::translator::Asn1ToPromelaTranslator;
+using promela::translator::PromelaTypeSorter;
 
 namespace tmc::test {
-
-class tst_Asn1ToPromelaTranslator : public QObject
-{
-    Q_OBJECT
-
-private Q_SLOTS:
-    void initTestCase();
-    void cleanupTestCase();
-
-    void testBasicTypes();
-    void testEnumerated();
-
-    void testVariableBitString();
-    void testFixedBitString();
-    void testVariableOctetString();
-    void testFixedOctetString();
-    void testVariableIA5String();
-    void testFixedIA5String();
-
-    void testChoice();
-    void testSequence();
-    void testSequenceWithOptional();
-    void testNestedSequence();
-
-    void testVariableSequenceOf();
-    void testFixedSequenceOf();
-
-private:
-    std::unique_ptr<Definitions> createModel();
-};
 
 void tst_Asn1ToPromelaTranslator::initTestCase() {}
 
@@ -803,12 +778,58 @@ void tst_Asn1ToPromelaTranslator::testFixedSequenceOf()
     QCOMPARE(std::get<BasicType>(promelaModel.getTypeAliases().at(0).getType()), BasicType::INT);
 }
 
+void tst_Asn1ToPromelaTranslator::testTypeSorting()
+{
+    auto model = createModel();
+
+    auto secondType = std::make_unique<Sequence>();
+    auto secondTypeComponent = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"),
+            QStringLiteral("field1"), false, std::nullopt, QStringLiteral(""), SourceLocation(),
+            std::make_unique<UserdefinedType>(QStringLiteral("myTypeFirst"), QStringLiteral("myModule")));
+    secondType->addComponent(std::move(secondTypeComponent));
+    auto secondTypeAssignment = std::make_unique<TypeAssignment>(
+            QStringLiteral("myTypeSecond"), QStringLiteral("myTypeSecondT"), SourceLocation(), std::move(secondType));
+    model->addType(std::move(secondTypeAssignment));
+
+    auto firstType = std::make_unique<Sequence>();
+    auto firstTypeComponent = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"),
+            false, std::nullopt, QStringLiteral(""), SourceLocation(),
+            TypeFactory::createBuiltinType(QStringLiteral("INTEGER")));
+    firstType->addComponent(std::move(firstTypeComponent));
+    auto firstTypeAssignment = std::make_unique<TypeAssignment>(
+            QStringLiteral("myTypeFirst"), QStringLiteral("myTypeSecondT"), SourceLocation(), std::move(firstType));
+    model->addType(std::move(firstTypeAssignment));
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel, true);
+    visitor.visit(*model);
+
+    PromelaTypeSorter typeSorter;
+    typeSorter.sortTypeDefinitions(promelaModel);
+
+    QCOMPARE(promelaModel.getMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 2);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 0);
+    QCOMPARE(promelaModel.getUtypes().size(), 2);
+
+    {
+        const Utype &expectedUtype = promelaModel.getUtypes().front();
+        QCOMPARE(expectedUtype.isUnionType(), false);
+        QCOMPARE(expectedUtype.getName(), "myTypeFirst");
+        QCOMPARE(expectedUtype.getFields().size(), 1);
+    }
+
+    {
+        const Utype &expectedUtype = promelaModel.getUtypes().back();
+        QCOMPARE(expectedUtype.isUnionType(), false);
+        QCOMPARE(expectedUtype.getName(), "myTypeSecond");
+        QCOMPARE(expectedUtype.getFields().size(), 1);
+    }
+}
+
 std::unique_ptr<Definitions> tst_Asn1ToPromelaTranslator::createModel()
 {
     return std::make_unique<Definitions>("myModule", SourceLocation());
 }
 }
-
-QTEST_MAIN(tmc::test::tst_Asn1ToPromelaTranslator)
-
-#include "tst_asn1topromelatranslator.moc"

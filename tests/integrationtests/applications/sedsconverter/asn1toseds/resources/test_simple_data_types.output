@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+ <Package name="SimpleDataTypes">
+  <DataTypeSet>
+   <BooleanDataType name="MyBoolean"/>
+   <BooleanDataType name="MyInvertedBoolean"/>
+   <IntegerDataType name="MyInteger">
+    <Range>
+     <MinMaxRange min="0" max="20" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <IntegerDataType name="MyIntegerWithEncoding">
+    <IntegerDataEncoding byteOrder="bigEndian" sizeInBits="32" encoding="unsigned"/>
+    <Range>
+     <MinMaxRange min="5" max="200" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <FloatDataType name="MyFloat">
+    <Range>
+     <MinMaxRange min="0" max="1" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </FloatDataType>
+   <FloatDataType name="MyFloatWithEncoding">
+    <FloatDataEncoding byteOrder="littleEndian" sizeInBits="64" encodingAndPrecision="IEEE754_2008_double"/>
+    <Range>
+     <MinMaxRange min="32" max="64" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </FloatDataType>
+   <StringDataType fixedLength="false" name="MyString" length="32">
+    <StringDataEncoding encoding="ASCII"/>
+   </StringDataType>
+   <StringDataType fixedLength="true" name="MyFixedSizeString" length="64">
+    <StringDataEncoding encoding="ASCII"/>
+   </StringDataType>
+   <BinaryDataType sizeInBits="24" name="MyBitString" fixedSize="false"/>
+   <BinaryDataType sizeInBits="17" name="MyFixedSizeBitString" fixedSize="true"/>
+   <EnumeratedDataType name="MyEnum">
+    <EnumerationList>
+     <Enumeration value="0" label="val1"/>
+     <Enumeration value="1" label="val2"/>
+     <Enumeration value="2" label="val3"/>
+    </EnumerationList>
+   </EnumeratedDataType>
+   <EnumeratedDataType name="MyValueEnumWithEncoding">
+    <IntegerDataEncoding byteOrder="littleEndian" sizeInBits="16" encoding="unsigned"/>
+    <EnumerationList>
+     <Enumeration value="300" label="a"/>
+     <Enumeration value="20" label="b"/>
+     <Enumeration value="5" label="c"/>
+    </EnumerationList>
+   </EnumeratedDataType>
+   <IntegerDataType name="DerivedInteger">
+    <Range>
+     <MinMaxRange min="10" max="16" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <IntegerDataType name="DerivedIntegerWithEncoding">
+    <IntegerDataEncoding byteOrder="bigEndian" sizeInBits="16" encoding="BCD"/>
+    <Range>
+     <MinMaxRange min="10" max="16" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <FloatDataType name="DerivedFloatWithEncoding">
+    <FloatDataEncoding byteOrder="bigEndian" sizeInBits="32" encodingAndPrecision="IEEE754_2008_single"/>
+    <Range>
+     <MinMaxRange min="50" max="60" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </FloatDataType>
+   <IntegerDataType name="Byte">
+    <IntegerDataEncoding byteOrder="littleEndian" sizeInBits="8" encoding="unsigned"/>
+    <Range>
+     <MinMaxRange min="0" max="255" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ArrayDataType name="FixedSizeOctetString" dataTypeRef="Byte">
+    <DimensionList>
+     <Dimension size="12"/>
+    </DimensionList>
+   </ArrayDataType>
+   <IntegerDataType name="Size_VariableSizeOctetString">
+    <Range>
+     <MinMaxRange min="1" max="12" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType name="VariableSizeOctetString">
+    <EntryList>
+     <Entry type="Size_VariableSizeOctetString" name="count"/>
+     <ListEntry type="Byte" name="elements" listLengthField="count"/>
+    </EntryList>
+   </ContainerDataType>
+  </DataTypeSet>
+ </Package>
+</PackageFile>

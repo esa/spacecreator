@@ -19,6 +19,7 @@
 
 #include "connectioncreationvalidator.h"
 #include "errorhub.h"
+#include "ivconnectionlayertype.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
@@ -32,8 +33,8 @@
 namespace ivm {
 
 struct ConnectionHolder {
-    IVConnection::EndPointInfo *m_from { nullptr };
-    IVConnection::EndPointInfo *m_to { nullptr };
+    IVConnection::EndPointInfo m_from;
+    IVConnection::EndPointInfo m_to;
 };
 
 struct IVConnectionPrivate {
@@ -149,6 +150,19 @@ void IVConnection::unsetInheritPI()
     handleInheritPIChange(IVConnection::InheritPIChange::NotInherit);
 }
 
+IVConnectionLayerType *IVConnection::layer() const
+{
+    if (model() != nullptr) {
+        if (targetInterface() != nullptr && sourceInterface() != nullptr) {
+            if (targetInterface()->layer() == sourceInterface()->layer()) {
+                return sourceInterface()->layer();
+            }
+        }
+        return model()->getConnectionLayerByName(IVConnectionLayerType::DefaultLayerName);
+    }
+    return nullptr;
+}
+
 /*!
    Returns true if the interface(s) are of kind protected. \see IVInterface::OperationKind::Protected
  */
@@ -221,68 +235,75 @@ void IVConnection::handleInheritPIChange(bool enabled)
         unsetInheritPI();
 }
 
-void IVConnection::setDelayedStart(IVConnection::EndPointInfo *start)
+void IVConnection::setDelayedStart(const IVConnection::EndPointInfo &info)
 {
-    d->m_delayedInit.m_from = start;
+    d->m_delayedInit.m_from = info;
 }
 
-void IVConnection::setDelayedEnd(IVConnection::EndPointInfo *end)
+const IVConnection::EndPointInfo &IVConnection::delayedStart() const
 {
-    d->m_delayedInit.m_to = end;
+    return d->m_delayedInit.m_from;
+}
+
+void IVConnection::setDelayedEnd(const IVConnection::EndPointInfo &info)
+{
+    d->m_delayedInit.m_to = info;
+}
+
+const IVConnection::EndPointInfo &IVConnection::delayedEnd() const
+{
+    return d->m_delayedInit.m_to;
+}
+
+IVObject *IVConnection::findFunction(const EndPointInfo &info) const
+{
+    if (!info.isReady())
+        return nullptr;
+
+    IVObject *ivFunction = model()->getObjectByName(info.m_functionName);
+    if (!ivFunction) {
+        // Try with old encoding
+        ivFunction =
+                model()->getObjectByName(IVNameValidator::encodeName(IVObject::Type::Function, info.m_functionName));
+        if (!ivFunction) {
+            shared::ErrorHub::addError(shared::ErrorItem::Warning,
+                    tr("Connection removed - Unable to find Fn/FnType %1").arg(info.m_functionName), "");
+        }
+    }
+    return ivFunction;
+}
+
+IVInterface *IVConnection::findIface(const EndPointInfo &info, IVObject *parentObject) const
+{
+    if (!info.isReady()) {
+        return nullptr;
+    }
+
+    IVFunctionType *parentObj = parentObject ? parentObject->as<IVFunctionType *>() : nullptr;
+    IVInterface *ivIface = model()->getIfaceByName(info.m_interfaceName, info.m_ifaceDirection, parentObj);
+    if (!ivIface) {
+        // Try with old encoding
+        const QString encodedName =
+                IVNameValidator::encodeName(IVObject::Type::RequiredInterface, info.m_interfaceName);
+        ivIface = model()->getIfaceByName(encodedName, info.m_ifaceDirection, parentObj);
+        if (!ivIface) {
+            shared::ErrorHub::addError(shared::ErrorItem::Warning,
+                    tr("Connection removed - Unable to find interface %1").arg(info.m_interfaceName), "");
+        }
+    }
+    return ivIface;
 }
 
 bool IVConnection::lookupEndpointsPostponed()
 {
-    if (!d->m_delayedInit.m_from) {
-        shared::ErrorHub::addError(shared::ErrorItem::Warning, tr("Connection removed - Target source"), "");
+    if (!d->m_delayedInit.m_from.isReady()) {
+        shared::ErrorHub::addError(shared::ErrorItem::Warning, tr("Connection removed - Source missing"), "");
         return false;
     }
-    if (!d->m_delayedInit.m_to) {
+    if (!d->m_delayedInit.m_to.isReady()) {
         shared::ErrorHub::addError(shared::ErrorItem::Warning, tr("Connection removed - Target missing"), "");
         return false;
     }
-
-    Q_ASSERT(d->m_delayedInit.m_to->isReady());
-    Q_ASSERT(d->m_delayedInit.m_from->isReady());
-
-    auto findFunction = [&](const IVConnection::EndPointInfo *const info) -> IVObject * {
-        if (!info || info->m_functionName.isEmpty())
-            return nullptr;
-
-        IVObject *ivFunction = model()->getObjectByName(info->m_functionName);
-        if (!ivFunction) {
-            // Try with old encoding
-            ivFunction = model()->getObjectByName(
-                    IVNameValidator::encodeName(IVObject::Type::Function, info->m_functionName));
-            if (!ivFunction) {
-                QString warningMessage = QStringLiteral("Unable to find Fn/FnType %1").arg(info->m_functionName);
-                shared::ErrorHub::addError(shared::ErrorItem::Warning,
-                        tr("Connection removed - Unable to find Fn/FnType %1").arg(info->m_functionName), "");
-            }
-        }
-        return ivFunction;
-    };
-
-    auto findIface = [&](const IVConnection::EndPointInfo *const info, IVObject *parentObject) -> IVInterface * {
-        if (!info || info->m_interfaceName.isEmpty()) {
-            return nullptr;
-        }
-
-        IVFunctionType *parentObj = parentObject ? parentObject->as<IVFunctionType *>() : nullptr;
-        IVInterface *ivIface = model()->getIfaceByName(info->m_interfaceName, info->m_ifaceDirection, parentObj);
-        if (!ivIface) {
-            // Try with old encoding
-            const QString encodedName =
-                    IVNameValidator::encodeName(IVObject::Type::RequiredInterface, info->m_interfaceName);
-            ivIface = model()->getIfaceByName(encodedName, info->m_ifaceDirection, parentObj);
-            if (!ivIface) {
-                QString warningMessage = QStringLiteral("Unable to find Interface %1").arg(info->m_interfaceName);
-                shared::ErrorHub::addError(shared::ErrorItem::Warning,
-                        tr("Connection removed - Unable to find interface %1").arg(info->m_interfaceName), "");
-            }
-        }
-        return ivIface;
-    };
 
     IVObject *objFrom = findFunction(d->m_delayedInit.m_from);
     IVInterface *ifaceFrom = findIface(d->m_delayedInit.m_from, objFrom);
@@ -327,11 +348,8 @@ bool IVConnection::needPostponedInit() const
 
 void IVConnection::clearPostponedEndpoints()
 {
-    delete d->m_delayedInit.m_from;
-    d->m_delayedInit.m_from = nullptr;
-
-    delete d->m_delayedInit.m_to;
-    d->m_delayedInit.m_to = nullptr;
+    d->m_delayedInit.m_from.reset();
+    d->m_delayedInit.m_to.reset();
 }
 
 bool IVConnection::postInit()

@@ -56,7 +56,7 @@ StatementTranslatorVisitor::Context::Context(const seds::model::Package &sedsPac
     m_labelCount = 0;
 }
 
-auto StatementTranslatorVisitor::Context::uniqueLabelName(const QString prefix) -> QString
+auto StatementTranslatorVisitor::Context::uniqueLabelName(const QString &prefix) -> QString
 {
     m_labelCount++;
     return prefix + QString::number(m_labelCount);
@@ -188,7 +188,7 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Iteration &iterat
 
 auto StatementTranslatorVisitor::operator()(const seds::model::MathOperation &operation) -> void
 {
-    if (operation.elements().size() > 0 && std::holds_alternative<seds::model::Operator>(operation.elements()[0])) {
+    if (!operation.elements().empty() && std::holds_alternative<seds::model::Operator>(operation.elements()[0])) {
         // Check for a special case of the swap operator
         const auto &op = std::get<seds::model::Operator>(operation.elements()[0]);
         if (std::get<CoreMathOperator>(op.mathOperator()) == CoreMathOperator::Swap) {
@@ -245,13 +245,13 @@ auto StatementTranslatorVisitor::translateActivityCall(::sdl::Process *process,
     call->setProcedure(procedure->get());
 
     for (const auto &argument : invocation.argumentValues()) {
-        call->addArgument(std::move(translateArgument(process, nullptr, argument)));
+        call->addArgument(translateArgument(process, nullptr, argument));
     }
     return call;
 }
 
 auto StatementTranslatorVisitor::findInterfaceDeclaration(
-        ivm::IVModel *model, const QString functionName, const QString interfaceName) -> ivm::IVInterface *
+        ivm::IVModel *model, const QString &functionName, const QString &interfaceName) -> ivm::IVInterface *
 {
     const auto &function = model->getFunction(functionName, Qt::CaseSensitive);
     if (function == nullptr) {
@@ -351,20 +351,20 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, ::sd
     call->setProcedure(procedure->get());
 
     for (const auto &argument : sendCommand.argumentValues()) {
-        call->addArgument(std::move(translateArgument(hostProcess, hostProcedure, argument)));
+        call->addArgument(translateArgument(hostProcess, hostProcedure, argument));
     }
-    return std::move(call);
+    return call;
 }
 
 auto StatementTranslatorVisitor::translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-        const QString callName, const seds::model::SendCommandPrimitive &sendCommand)
+        const QString &callName, const seds::model::SendCommandPrimitive &sendCommand)
         -> std::vector<std::unique_ptr<::sdl::Action>>
 {
     std::vector<std::unique_ptr<::sdl::Action>> result;
 
     auto output = std::make_unique<::sdl::Output>();
     output->setName(callName);
-    if (sendCommand.argumentValues().size() > 0) {
+    if (!sendCommand.argumentValues().empty()) {
         const auto ioVariable = StateMachineTranslator::ioVariableName(callName);
         output->setParameter(std::make_unique<::sdl::VariableReference>(
                 findVariableDeclaration(hostProcess, hostProcedure, ioVariable)));
@@ -384,7 +384,7 @@ auto StatementTranslatorVisitor::translateOutput(::sdl::Process *hostProcess, ::
 
     result.emplace_back(std::move(output));
 
-    return std::move(result);
+    return result;
 }
 
 class ExpressionTranslatorVisitor
@@ -502,7 +502,7 @@ auto StatementTranslatorVisitor::comparisonOperatorToString(const seds::model::C
     return "";
 }
 
-auto StatementTranslatorVisitor::translateAnswer(Context &context, ::sdl::Label *joinLabel, const QString value,
+auto StatementTranslatorVisitor::translateAnswer(Context &context, ::sdl::Label *joinLabel, const QString &value,
         const seds::model::Body *body) -> std::unique_ptr<::sdl::Answer>
 {
     auto answer = std::make_unique<::sdl::Answer>();

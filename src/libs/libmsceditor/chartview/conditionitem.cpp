@@ -27,6 +27,7 @@
 #include "mscchartviewconstants.h"
 #include "msccommandsstack.h"
 #include "msccondition.h"
+#include "mscreader.h"
 #include "ui/grippointshandler.h"
 
 #include <QDebug>
@@ -35,11 +36,41 @@
 
 namespace msc {
 
+class ConditionTextItem : public TextItem
+{
+public:
+    ConditionTextItem(QGraphicsItem *parent = nullptr)
+        : TextItem(parent)
+    {
+    }
+
+protected:
+    bool validateText(const QString &text) const override
+    {
+        MscReader reader;
+        QStringList errors;
+        // test plain informal condition, or data statements
+        QString testDoc = QString("msc c1;instance i1;condition %1;endinstance;endmsc;").arg(text);
+        try {
+            reader.parseText(testDoc, &errors);
+        } catch (...) {
+            // test quoted informal condition
+            testDoc = QString("msc c1;instance i1;condition '%1';endinstance;endmsc;").arg(text);
+            try {
+                reader.parseText(testDoc, &errors);
+            } catch (...) {
+                return false;
+            }
+        }
+        return errors.isEmpty();
+    }
+};
+
 ConditionItem::ConditionItem(MscCondition *condition, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
     : EventItem(condition, chartLayoutManager, parent)
     , m_condition(condition)
     , m_polygonItem(new QGraphicsPolygonItem(this))
-    , m_nameItem(new TextItem(this))
+    , m_nameItem(new ConditionTextItem(this))
 {
     Q_ASSERT(m_condition != nullptr);
 

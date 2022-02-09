@@ -39,6 +39,7 @@
 #include "parameter.h"
 #include "ui/textitem.h"
 #include "veobject.h"
+#include "ivcoreutils.h"
 
 #include <QApplication>
 #include <QGraphicsScene>
@@ -72,7 +73,7 @@ void IVFunctionTypeGraphicsItem::enableEditMode()
 void IVFunctionTypeGraphicsItem::rebuildLayout()
 {
     shared::ui::VERectGraphicsItem::rebuildLayout();
-    setVisible(entity() && (gi::nestingLevel(entity()) >= gi::kNestingVisibilityLevel || entity()->isRootObject())
+    setVisible(entity() && (ivm::utils::nestingLevel(entity()) >= gi::kNestingVisibilityLevel || entity()->isRootObject())
             && entity()->isVisible());
 
     updateTextPosition();

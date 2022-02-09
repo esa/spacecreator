@@ -35,7 +35,7 @@ class DVEditorFactory : public Core::IEditorFactory
 public:
     DVEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
 
-#if QTC_VERSION == 48
+#if QTC_VERSION == 408
     Core::IEditor *createEditor() override { return createDVEditor(); }
 #endif
     Core::IEditor *createDVEditor();

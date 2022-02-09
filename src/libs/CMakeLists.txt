@@ -21,10 +21,17 @@ add_subdirectory(libdveditor)
 # SDL metamodel and exporter
 add_subdirectory(sdl)
 
+# CSV metamodel and importer
+add_subdirectory(csv)
+
+# TestDriver generator
+add_subdirectory(testgenerator)
+
 # conversion
 add_subdirectory(conversion)
 add_subdirectory(seds)
 add_subdirectory(promela)
+add_subdirectory(tmc)
 
 # Total SpaceCreator system
 add_subdirectory(spacecreatorsystem)

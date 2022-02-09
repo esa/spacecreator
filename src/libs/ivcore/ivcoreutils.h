@@ -20,13 +20,16 @@
 namespace ivm {
 class IVFunction;
 class IVInterface;
+class IVObject;
 
 namespace utils {
 
 // Detect an iface which has been just created instead of being properly cloned (the XML file loading).
 // For now it's only a name- and direction-based check. In case there are two or more ifaces with the same name,
 // the first one found in IVFunctionType::interfaces is used.
-IVInterface *findExistingClone(IVFunction *function, IVInterface *protoIface);;
+IVInterface *findExistingClone(IVFunction *function, IVInterface *protoIface);
+
+int nestingLevel(ivm::IVObject *object);
 
 } // namespace utils
 } // namespace ivm

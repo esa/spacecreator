@@ -30,6 +30,7 @@ class DimensionSize final
 {
 public:
     DimensionSize() = default;
+    DimensionSize(const DimensionSize &rhs);
     DimensionSize(DimensionSize &&) = default;
     DimensionSize &operator=(DimensionSize &&) = default;
 
@@ -39,6 +40,9 @@ public:
 
     auto indexTypeRef() const -> const std::optional<DataTypeRef> &;
     auto setIndexTypeRef(DataTypeRef indexTypeRef) -> void;
+
+    auto operator==(const DimensionSize &rhs) const -> bool;
+    auto operator!=(const DimensionSize &rhs) const -> bool;
 
 private:
     std::optional<PositiveLong> m_size;

@@ -20,8 +20,10 @@
 #include "commands/cmdifaceparamchange.h"
 #include "commands/cmdifaceparamcreate.h"
 #include "commands/cmdifaceparamremove.h"
+#include "commands/cmdifaceparamreorder.h"
 #include "commandsstack.h"
 #include "ivinterface.h"
+#include "ivnamevalidator.h"
 #include "ivobject.h"
 #include "ivpropertytemplate.h"
 #include "propertytemplateconfig.h"
@@ -106,7 +108,7 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
 
         switch (index.column()) {
         case Column::Name: {
-            if (!paramNew.setName(value.toString()))
+            if (!paramNew.setName(ivm::IVNameValidator::encodeName(entity()->type(), value.toString())))
                 return false;
             break;
         }
@@ -228,8 +230,11 @@ bool IfaceParametersModel::moveRows(const QModelIndex &sourceParent, int sourceR
         const QModelIndex &destinationParent, int destinationChild)
 {
     if (PropertiesModelBase::moveRows(sourceParent, sourceRow, count, destinationParent, destinationChild)) {
-        for (int idx = 0; idx < count; ++idx)
+        for (int idx = 0; idx < count; ++idx) {
             std::swap(m_params[sourceRow + idx], m_params[destinationChild + idx]);
+            auto ifaceParamCmd = new cmd::CmdIfaceParamReorder(entity(), sourceRow + idx, destinationChild + idx);
+            m_cmdMacro->push(ifaceParamCmd);
+        }
         return true;
     }
     return false;

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="Parameters">
+  <DataTypeSet>
+    <IntegerDataType name="MyInteger">
+      <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+      <Range>
+        <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+      </Range>
+    </IntegerDataType>
+  </DataTypeSet>
+  <DeclaredInterfaceSet>
+    <Interface name="MegaInterface">
+      <ParameterSet>
+        <Parameter name="ReadOnlyAsync" type="MyInteger" mode="async" readOnly="true"/>
+        <Parameter name="ReadOnlySync" type="MyInteger" mode="sync" readOnly="true"/>
+        <Parameter name="ReadWriteAsync" type="MyInteger" mode="async" readOnly="false"/>
+        <Parameter name="ReadWriteSync" type="MyInteger" mode="sync" readOnly="false"/>
+      </ParameterSet>
+    </Interface>
+  </DeclaredInterfaceSet>
+  <ComponentSet>
+    <Component name="MegaComponent">
+      <ProvidedInterfaceSet>
+        <Interface name="ProvidedInterface" type="MegaInterface"/>
+      </ProvidedInterfaceSet>
+    </Component>
+  </ComponentSet>
+  </Package>
+</PackageFile>

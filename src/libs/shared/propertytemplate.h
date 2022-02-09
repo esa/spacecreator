@@ -95,7 +95,7 @@ public:
     QString valueValidatorPattern() const;
     void setValueValidatorPattern(const QString &pattern);
 
-    QMap<int, QPair<QString, QString>> attrValidatorPatterns() const;
+    QMultiMap<int, QPair<QString, QString> > attrValidatorPatterns() const;
     void setAttrValidatorPattern(const QMultiMap<int, QPair<QString, QString> > &pattern);
 
     QDomElement toXml(QDomDocument *domDoc) const;

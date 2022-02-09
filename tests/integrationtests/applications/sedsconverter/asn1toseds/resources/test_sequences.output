@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+ <Package name="Sequences">
+  <DataTypeSet>
+   <IntegerDataType name="Type1">
+    <IntegerDataEncoding byteOrder="bigEndian" sizeInBits="16" encoding="unsigned"/>
+    <Range>
+     <MinMaxRange min="0" max="20" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <IntegerDataType name="Type2">
+    <IntegerDataEncoding byteOrder="littleEndian" sizeInBits="32" encoding="unsigned"/>
+    <Range>
+     <MinMaxRange min="21" max="50" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType name="SimpleSequence">
+    <EntryList>
+     <Entry type="Type1" name="a"/>
+     <Entry type="Type2" name="b"/>
+     <Entry type="Type2" name="c"/>
+    </EntryList>
+   </ContainerDataType>
+   <IntegerDataType name="Type_SimpleSequenceWithEncodingOverride_a">
+    <IntegerDataEncoding byteOrder="littleEndian" sizeInBits="64" encoding="unsigned"/>
+    <Range>
+     <MinMaxRange min="0" max="20" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <IntegerDataType name="Type_SimpleSequenceWithEncodingOverride_b">
+    <IntegerDataEncoding byteOrder="bigEndian" sizeInBits="16" encoding="unsigned"/>
+    <Range>
+     <MinMaxRange min="21" max="50" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType name="SimpleSequenceWithEncodingOverride">
+    <EntryList>
+     <Entry type="Type_SimpleSequenceWithEncodingOverride_a" name="a"/>
+     <Entry type="Type_SimpleSequenceWithEncodingOverride_b" name="b"/>
+    </EntryList>
+   </ContainerDataType>
+   <IntegerDataType name="Type_AnonymousTypes_x">
+    <Range>
+     <MinMaxRange min="0" max="100" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <FloatDataType name="Type_AnonymousTypes_y">
+    <Range>
+     <MinMaxRange min="0" max="1" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </FloatDataType>
+   <ContainerDataType name="AnonymousTypes">
+    <EntryList>
+     <Entry type="Type_AnonymousTypes_x" name="x"/>
+     <Entry type="Type_AnonymousTypes_y" name="y"/>
+    </EntryList>
+   </ContainerDataType>
+   <IntegerDataType name="Type_AnonymousTypesWithEncoding_x">
+    <IntegerDataEncoding byteOrder="bigEndian" sizeInBits="16" encoding="unsigned"/>
+    <Range>
+     <MinMaxRange min="0" max="100" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <FloatDataType name="Type_AnonymousTypesWithEncoding_y">
+    <FloatDataEncoding byteOrder="bigEndian" sizeInBits="32" encodingAndPrecision="IEEE754_2008_single"/>
+    <Range>
+     <MinMaxRange min="0" max="1" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </FloatDataType>
+   <ContainerDataType name="AnonymousTypesWithEncoding">
+    <EntryList>
+     <Entry type="Type_AnonymousTypesWithEncoding_x" name="x"/>
+     <Entry type="Type_AnonymousTypesWithEncoding_y" name="y"/>
+    </EntryList>
+   </ContainerDataType>
+   <IntegerDataType name="Type_SequenceWithPattern_pattern1">
+    <IntegerDataEncoding byteOrder="littleEndian" sizeInBits="3" encoding="unsigned"/>
+    <Range>
+     <MinMaxRange min="0" max="7" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <IntegerDataType name="Type_SequenceWithPattern_pattern2">
+    <IntegerDataEncoding byteOrder="littleEndian" sizeInBits="4" encoding="unsigned"/>
+    <Range>
+     <MinMaxRange min="0" max="15" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType name="SequenceWithPattern">
+    <EntryList>
+     <FixedValueEntry type="Type_SequenceWithPattern_pattern1" name="pattern1" fixedValue="000"/>
+     <Entry type="Type1" name="payload"/>
+     <FixedValueEntry type="Type_SequenceWithPattern_pattern2" name="pattern2" fixedValue="1010"/>
+    </EntryList>
+   </ContainerDataType>
+   <BooleanDataType name="IsPresent"/>
+   <ContainerDataType name="SequenceWithOptional">
+    <EntryList>
+     <Entry type="IsPresent" name="is_b_present"/>
+     <Entry type="IsPresent" name="is_c_present"/>
+     <Entry type="Type1" name="a"/>
+     <Entry type="Type2" name="b"/>
+     <Entry type="Type1" name="c"/>
+    </EntryList>
+   </ContainerDataType>
+  </DataTypeSet>
+ </Package>
+</PackageFile>

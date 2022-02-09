@@ -22,6 +22,7 @@
 #include "commands/cmdcontextparameterchange.h"
 #include "commands/cmdcontextparametercreate.h"
 #include "commands/cmdcontextparameterremove.h"
+#include "commands/cmdcontextparameterreorder.h"
 #include "commandsstack.h"
 #include "itemeditor/common/ivutils.h"
 #include "ivcommonprops.h"
@@ -220,10 +221,11 @@ Qt::ItemFlags ContextParametersModel::flags(const QModelIndex &index) const
     if (flags.testFlag(Qt::ItemIsEditable) || flags.testFlag(Qt::ItemIsEnabled)) {
         switch (entity()->type()) {
         case ivm::IVObject::Type::Function: {
-            if (auto fn = m_dataObject->as<const ivm::IVFunction *>())
-                if (fn->inheritsFunctionType())
+            if (auto fn = m_dataObject->as<const ivm::IVFunction *>()) {
+                if (fn->inheritsFunctionType() && index.column() != Column::Value) {
                     flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
-
+                }
+            }
             break;
         }
         default:
@@ -257,10 +259,17 @@ ivm::IVObject *ContextParametersModel::entity() const
 bool ContextParametersModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
         const QModelIndex &destinationParent, int destinationChild)
 {
+    auto entity = qobject_cast<ivm::IVFunctionType *>(m_dataObject);
+    if (!entity) {
+        return false;
+    }
+
     if (PropertiesModelBase::moveRows(sourceParent, sourceRow, count, destinationParent, destinationChild)) {
-        for (int idx = 0; idx < count; ++idx)
+        for (int idx = 0; idx < count; ++idx) {
             std::swap(m_params[sourceRow + idx], m_params[destinationChild + idx]);
-        return true;
+            auto ctxParamCmd = new cmd::CmdContextParameterReorder(entity, sourceRow + idx, destinationChild + idx);
+            m_cmdMacro->push(ctxParamCmd);
+        }
     }
     return false;
 }

@@ -17,16 +17,16 @@
 
 #pragma once
 
+#include "mscchart.h"
 #include "mscentity.h"
+#include "mscmessagedeclaration.h"
+#include "mscmessagedeclarationlist.h"
 
 #include <QObject>
 #include <QString>
 #include <QVector>
 
 namespace msc {
-class MscChart;
-class MscMessageDeclaration;
-class MscMessageDeclarationList;
 
 class MscDocument : public MscEntity
 {

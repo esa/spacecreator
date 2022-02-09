@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,9 +20,11 @@
 #include "exporter.h"
 
 #include "export/exceptions.h"
+#include "file.h"
 #include "visitors/acnnodereconstructingvisitor.h"
 #include "visitors/asn1nodereconstructingvisitor.h"
 
+#include <QDir>
 #include <QSaveFile>
 #include <QString>
 #include <asn1library/asn1/asn1model.h>
@@ -33,13 +35,14 @@ using conversion::asn1::Asn1Options;
 using conversion::exporter::ExportException;
 using conversion::exporter::IncorrectModelException;
 using conversion::exporter::MissingOutputFilenameException;
+using conversion::exporter::NullModelException;
 
 namespace conversion::asn1::exporter {
 
 void Asn1Exporter::exportModel(const Model *const model, const Options &options) const
 {
     if (model == nullptr) {
-        throw ExportException("Model to export is null");
+        throw NullModelException();
     }
 
     const auto *const asn1Model = dynamic_cast<const Asn1Model *>(model);
@@ -53,6 +56,21 @@ void Asn1Exporter::exportModel(const Model *const model, const Options &options)
     }
 }
 
+QStringList Asn1Exporter::getFilenamesForModel(const Asn1Acn::Asn1Model *model)
+{
+    if (model == nullptr) {
+        return QStringList();
+    }
+
+    QStringList names;
+    for (const auto &file : model->data()) {
+        names.append(makeAcnFilename(file.get()));
+        names.append(makeAsn1Filename(file.get()));
+    }
+
+    return names;
+}
+
 void Asn1Exporter::exportAsn1Model(const Asn1Acn::File *file, const Options &options) const
 {
     QString serializedModelData;
@@ -62,10 +80,10 @@ void Asn1Exporter::exportAsn1Model(const Asn1Acn::File *file, const Options &opt
     asn1NodeReconVis.visit(*file);
 
     const auto pathPrefix = options.value(Asn1Options::asn1FilepathPrefix).value_or("");
-    const auto filePath = makeFilePath(pathPrefix, file->name(), "asn");
+    const auto filePath = QString("%1%2").arg(pathPrefix).arg(makeAsn1Filename(file));
 
     QSaveFile outputFile(filePath);
-    writeAndCommit(outputFile, serializedModelData.toStdString());
+    writeAndCommit(outputFile, serializedModelData);
 }
 
 void Asn1Exporter::exportAcnModel(const Asn1Acn::File *file, const Options &options) const
@@ -77,35 +95,35 @@ void Asn1Exporter::exportAcnModel(const Asn1Acn::File *file, const Options &opti
     acnNodeReconVis.visit(*file);
 
     const auto pathPrefix = options.value(Asn1Options::acnFilepathPrefix).value_or("");
-    const auto filePath = makeFilePath(pathPrefix, file->name(), "acn");
+    const auto filePath = QString("%1%2").arg(pathPrefix).arg(makeAcnFilename(file));
 
     QSaveFile outputFile(filePath);
-    const auto data = serializedModelData.toStdString();
-    writeAndCommit(outputFile, data);
+    writeAndCommit(outputFile, serializedModelData);
 }
 
-void Asn1Exporter::writeAndCommit(QSaveFile &outputFile, const std::string &data) const
+QString Asn1Exporter::getFilename(const Asn1Acn::File *const file)
 {
-    if (!outputFile.open(QIODevice::WriteOnly)) {
-        throw ExportException(QString("Failed to open a file %1").arg(outputFile.fileName()));
+    if (file == nullptr) {
+        throw ExportException("File pointer passed to this function cannot be null");
     }
 
-    if (outputFile.write(data.c_str(), qint64(data.size())) == -1) {
-        throw ExportException(QString("Failed to write a file %1").arg(outputFile.fileName()));
-    }
+    QString fileName = file->name();
 
-    if (!outputFile.commit()) {
-        throw ExportException(QString("Failed to commit a transaction in %1").arg(outputFile.fileName()));
-    }
-}
-
-QString Asn1Exporter::makeFilePath(const QString &pathPrefix, const QString &fileName, const QString &extension) const
-{
     if (fileName.isEmpty()) {
         throw MissingOutputFilenameException(ModelType::Asn1);
     }
 
-    return QString("%1%2.%3").arg(pathPrefix, fileName, extension);
+    return fileName;
+}
+
+QString Asn1Exporter::makeAsn1Filename(const Asn1Acn::File *const file)
+{
+    return QString("%1.%2").arg(getFilename(file)).arg("asn");
+}
+
+QString Asn1Exporter::makeAcnFilename(const Asn1Acn::File *const file)
+{
+    return QString("%1.%2").arg(getFilename(file)).arg("acn");
 }
 
 } // namespace conversion::asn1::exporter

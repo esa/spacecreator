@@ -43,6 +43,7 @@ class AbstractSystemChecks;
 class IVInterface;
 class IVModel;
 class IVObject;
+class IVConnectionLayerType;
 class IVPropertyTemplateConfig;
 }
 
@@ -107,11 +108,13 @@ public:
     ivm::IVModel *importModel() const;
     ivm::IVModel *sharedModel() const;
     IVItemModel *itemsModel() const;
+    ivm::IVModel *layersModel() const;
 
     IVVisualizationModelBase *visualisationModel() const;
     QItemSelectionModel *objectsSelectionModel() const;
     IVVisualizationModelBase *importVisualisationModel() const;
     IVVisualizationModelBase *sharedVisualisationModel() const;
+    IVVisualizationModelBase *layerVisualisationModel() const;
 
     void setAsn1Check(Asn1Acn::Asn1SystemChecks *check);
     Asn1Acn::Asn1SystemChecks *asn1Check() const;
@@ -126,6 +129,8 @@ public:
     QList<shared::VEObject *> prepareSelectedObjectsForExport(QString &name, bool silent = false);
 
     ivm::IVPropertyTemplateConfig *dynPropConfig() const;
+
+    auto updateLayersModel() const -> void;
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
@@ -150,6 +155,9 @@ private:
     bool loadImpl(const QString &path);
     QString getComponentName(const QStringList &exportNames);
     bool loadComponentModel(ivm::IVModel *model, const QString &path);
+
+    bool reloadComponentModel();
+    bool reloadSharedTypeModel();
 
     void onSceneSelectionChanged(const QList<shared::Id> &selectedObjects);
     void onViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);

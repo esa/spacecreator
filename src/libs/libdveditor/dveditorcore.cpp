@@ -43,6 +43,7 @@
 #include "settingsmanager.h"
 #include "ui/graphicsviewbase.h"
 
+#include <QActionGroup>
 #include <QBoxLayout>
 #include <QBuffer>
 #include <QDebug>

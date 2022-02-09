@@ -38,11 +38,11 @@ using DataType = std::variant<ArrayDataType, BinaryDataType, BooleanDataType, Co
         FloatDataType, IntegerDataType, StringDataType, SubRangeDataType>;
 
 /**
- * @brief   Gets name string from data type
+ * @brief   Gets name from data type
  *
  * @param   dataType    Data type
  *
- * @return  Name string
+ * @return  Name
  */
 const QString &dataTypeNameStr(const DataType &dataType);
 

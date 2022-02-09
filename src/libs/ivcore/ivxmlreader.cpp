@@ -138,23 +138,23 @@ IVXMLReader::IVXMLReader(QObject *parent)
 {
 }
 
-IVXMLReader::~IVXMLReader() { }
+IVXMLReader::~IVXMLReader() {}
 
 QVector<IVObject *> IVXMLReader::parsedObjects() const
 {
     return d->m_allObjects;
 }
 
-IVConnection::EndPointInfo *addConnectionPart(const EntityAttributes &otherAttrs)
+IVConnection::EndPointInfo addConnectionPart(const EntityAttributes &otherAttrs)
 {
     const bool isRI = otherAttrs.contains(Props::token(Props::Token::ri_name));
 
-    IVConnection::EndPointInfo *info = new IVConnection::EndPointInfo();
-    info->m_functionName = attrValue(otherAttrs, Props::Token::func_name);
-    info->m_interfaceName = attrValue(otherAttrs, isRI ? Props::Token::ri_name : Props::Token::pi_name);
-    info->m_ifaceDirection = isRI ? IVInterface::InterfaceType::Required : IVInterface::InterfaceType::Provided;
+    IVConnection::EndPointInfo info;
+    info.m_functionName = attrValue(otherAttrs, Props::Token::func_name);
+    info.m_interfaceName = attrValue(otherAttrs, isRI ? Props::Token::ri_name : Props::Token::pi_name);
+    info.m_ifaceDirection = isRI ? IVInterface::InterfaceType::Required : IVInterface::InterfaceType::Provided;
 
-    Q_ASSERT(info->isReady());
+    Q_ASSERT(info.isReady());
     return info;
 }
 
@@ -211,7 +211,8 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
         Q_ASSERT(d->m_currentObject.connection() != nullptr);
 
         if (d->m_currentObject.connection()) {
-            if (IVConnection::EndPointInfo *info = addConnectionPart(attrs)) {
+            IVConnection::EndPointInfo info = addConnectionPart(attrs);
+            if (info.isReady()) {
                 if (t == Props::Token::Source) {
                     d->m_currentObject.connection()->setDelayedStart(info);
                 } else {

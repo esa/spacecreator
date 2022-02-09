@@ -22,6 +22,7 @@
 class QString;
 
 #include <QString>
+#include <QStringList>
 #include <set>
 
 namespace conversion {
@@ -33,6 +34,7 @@ enum class ModelType
 {
     Unspecified,
     Asn1,
+    Csv,
     InterfaceView,
     Promela,
     Sdl,
@@ -56,13 +58,13 @@ auto modelTypeToString(ModelType modelType) -> const QString &;
  */
 auto modelTypesToString(const std::set<ModelType> &modelsTypes) -> QString;
 /**
- * @brief   Returns given model type extension
+ * @brief   Returns given model type extensions
  *
  * @param   modelType   Model type
  *
  * @param   String with model type extension
  */
-auto modelTypeExtension(ModelType modelType) -> const QString &;
+auto modelTypeExtensions(ModelType modelType) -> const QStringList &;
 /**
  * @brief   Converts given model type to string
  *
@@ -81,8 +83,8 @@ template<ModelType ModelT>
 struct ModelTypeProperties {
     /// @brief  Model type name
     static inline const QString name = "Unspecified";
-    /// @brief  Model type extension
-    static inline const QString extension = ".none";
+    /// @brief  Model type extensions
+    static inline const QStringList extensions = { ".none" };
 };
 
 /**
@@ -92,8 +94,8 @@ template<>
 struct ModelTypeProperties<ModelType::Asn1> {
     /// @brief  Model name
     static inline const QString name = "ASN.1";
-    /// @brief  Model extension
-    static inline const QString extension = ".asn";
+    /// @brief  Model extensions
+    static inline const QStringList extensions = { ".asn", ".asn1", ".acn" };
 };
 
 /**
@@ -103,8 +105,8 @@ template<>
 struct ModelTypeProperties<ModelType::InterfaceView> {
     /// @brief  Model name
     static inline const QString name = "InterfaceView";
-    /// @brief  Model extension
-    static inline const QString extension = ".xml";
+    /// @brief  Model extensions
+    static inline const QStringList extensions = { ".xml" };
 };
 
 /**
@@ -115,7 +117,7 @@ struct ModelTypeProperties<ModelType::Promela> {
     /// @brief  Model name
     static inline const QString name = "Promela";
     /// @brief  Model extension
-    static inline const QString extension = ".pml";
+    static inline const QStringList extensions = { ".pml" };
 };
 
 /**
@@ -126,7 +128,7 @@ struct ModelTypeProperties<ModelType::Sdl> {
     /// @brief  Model name
     static inline const QString name = "SDL";
     /// @brief  Model extension
-    static inline const QString extension = ".pr";
+    static inline const QStringList extensions = { ".pr" };
 };
 
 /**
@@ -137,7 +139,7 @@ struct ModelTypeProperties<ModelType::Seds> {
     /// @brief  Model name
     static inline const QString name = "SEDS";
     /// @brief  Model extension
-    static inline const QString extension = ".xml";
+    static inline const QStringList extensions = { ".xml" };
 };
 
 } // namespace conversion

@@ -44,6 +44,18 @@ auto SedsStateMachineBuilder::withState(seds::common::String name) -> SedsStateM
     return *this;
 }
 
+auto SedsStateMachineBuilder::withState(seds::common::String name, seds::model::ActivityInvocation onEntry,
+        seds::model::ActivityInvocation onExit) -> SedsStateMachineBuilder &
+{
+    seds::model::State state;
+    state.setName(std::move(name));
+    state.setOnEntry(std::move(onEntry));
+    state.setOnExit(std::move(onExit));
+    m_machine.addElement(std::move(state));
+
+    return *this;
+}
+
 auto SedsStateMachineBuilder::withEntryState(seds::model::EntryState state) -> SedsStateMachineBuilder &
 {
     m_machine.addElement(std::move(state));

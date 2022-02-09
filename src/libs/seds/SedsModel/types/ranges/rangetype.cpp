@@ -22,7 +22,7 @@
 namespace seds::model {
 
 template<>
-auto enumFromString(const QStringRef &enumStr) -> std::optional<RangeType>
+auto enumFromString(const StringRef &enumStr) -> std::optional<RangeType>
 {
     if (enumStr.compare(QStringLiteral("exclusiveminexclusivemax"), Qt::CaseInsensitive) == 0) {
         return RangeType::ExclusiveMinExclusiveMax;
@@ -42,6 +42,49 @@ auto enumFromString(const QStringRef &enumStr) -> std::optional<RangeType>
         return RangeType::AtMost;
     } else {
         return std::nullopt;
+    }
+}
+
+template<>
+auto stringFromEnum(RangeType enumType) -> const QString &
+{
+    switch (enumType) {
+    case RangeType::ExclusiveMinExclusiveMax: {
+        static const QString strValue = "ExclusiveMinExclusiveMax";
+        return strValue;
+    }
+    case RangeType::InclusiveMinInclusiveMax: {
+        static const QString strValue = "InclusiveMinInclusiveMax";
+        return strValue;
+    }
+    case RangeType::InclusiveMinExclusiveMax: {
+        static const QString strValue = "InclusiveMinExclusiveMax";
+        return strValue;
+    }
+    case RangeType::ExclusiveMinInclusiveMax: {
+        static const QString strValue = "ExclusiveMinInclusiveMax";
+        return strValue;
+    }
+    case RangeType::GreaterThan: {
+        static const QString strValue = "GreaterThan";
+        return strValue;
+    }
+    case RangeType::LessThan: {
+        static const QString strValue = "LessThan";
+        return strValue;
+    }
+    case RangeType::AtLeast: {
+        static const QString strValue = "AtLeast";
+        return strValue;
+    }
+    case RangeType::AtMost: {
+        static const QString strValue = "AtMost";
+        return strValue;
+    }
+    default: {
+        static const QString unhandled = "unhandledRangeType";
+        return unhandled;
+    }
     }
 }
 

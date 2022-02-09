@@ -29,16 +29,19 @@ enum Id
     CreateConnectionEntity,
     CreateConnectionGroupEntity,
     ChangeConnectionGroupEntity,
+    ManageConnectionLayer,
     RemoveEntity,
     ChangeRootEntity,
 
     CreateContextParameter,
     ChangeContextParameter,
     RemoveContextParameter,
+    ReorderContextParameter,
 
     CreateIfaceParam,
     RemoveIfaceParam,
     ChangeIfaceParam,
+    ReorderIfaceParam,
 
     ChangeFunctionAttribute,
     ChangeFunctionDefaultImplementation,

@@ -53,23 +53,23 @@ QString modelTypesToString(const std::set<ModelType> &modelsTypes)
             [](const QString &acc, ModelType modelType) { return acc + ", " + modelTypeToString(modelType); });
 }
 
-const QString &modelTypeExtension(ModelType modelType)
+const QStringList &modelTypeExtensions(ModelType modelType)
 {
     switch (modelType) {
     case ModelType::Unspecified:
-        return ModelTypeProperties<ModelType::Unspecified>::extension;
+        return ModelTypeProperties<ModelType::Unspecified>::extensions;
     case ModelType::Asn1:
-        return ModelTypeProperties<ModelType::Asn1>::extension;
+        return ModelTypeProperties<ModelType::Asn1>::extensions;
     case ModelType::InterfaceView:
-        return ModelTypeProperties<ModelType::InterfaceView>::extension;
+        return ModelTypeProperties<ModelType::InterfaceView>::extensions;
     case ModelType::Promela:
-        return ModelTypeProperties<ModelType::Promela>::extension;
+        return ModelTypeProperties<ModelType::Promela>::extensions;
     case ModelType::Sdl:
-        return ModelTypeProperties<ModelType::Sdl>::extension;
+        return ModelTypeProperties<ModelType::Sdl>::extensions;
     case ModelType::Seds:
-        return ModelTypeProperties<ModelType::Seds>::extension;
+        return ModelTypeProperties<ModelType::Seds>::extensions;
     default:
-        static const auto unhandled = QStringLiteral("unhandled model type extension");
+        static const QStringList unhandled = { QStringLiteral("unhandled model type extension") };
         return unhandled;
     }
 }

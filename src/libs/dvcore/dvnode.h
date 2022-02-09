@@ -17,16 +17,16 @@
 
 #pragma once
 
+#include "dvboard.h"
+#include "dvdevice.h"
 #include "dvobject.h"
+#include "dvpartition.h"
+#include "dvsystemfunction.h"
 
 #include <memory>
 
 namespace dvm {
 struct DVNodePrivate;
-class DVBoard;
-class DVDevice;
-class DVPartition;
-class DVSystemFunction;
 
 class DVNode : public DVObject
 {

@@ -1,6 +1,5 @@
 {% comment %}
 {% endcomment %}
-{% if event.instance == instance %}
 {% if event.cifText %}{{ event.cifText }}
 {% endif %}{% if event.actionType == event.Informal %}
 {% if event.isAssignAction %}
@@ -14,5 +13,4 @@ action '{{ event.informalAction}}'{% if event.commentString %}{% if event.commen
 {# Formal action #}
 action {% for stmnt in event.dataStatements %}{% if not forloop.first %}, {% endif %}{% if stmnt.type == stmnt.Define %}def{% else %}undef{% endif %} {{ stmnt.variableString }}{% endfor %}{% if event.commentString %}{% if event.comment.cifText %}
 {{ event.comment.cifText }}{% else %} {% endif %}comment '{{ event.commentString }}'{% endif %};
-{% endif %}
 {% endif %}

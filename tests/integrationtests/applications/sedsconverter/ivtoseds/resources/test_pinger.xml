@@ -1,0 +1,52 @@
+<InterfaceView asn1file="dataview-uniq.asn">
+<Function name="Ponger" is_type="NO" language="SDL" default_implementation="default">
+    <Property name="Taste::coordinates" value="101800 84300 130500 97700"/>
+<Provided_Interface name="PingInterface" kind="Sporadic">
+    <Input_Parameter name="PingArg" type="MyInteger" encoding="ACN"/>
+    <Property name="Taste::coordinates" value="101800 87200"/>
+</Provided_Interface>
+
+<Required_Interface name="PongInterface" kind="Sporadic">
+    <Input_Parameter name="PongArg" type="MyInteger" encoding="ACN"/>
+    <Property name="Taste::coordinates" value="101800 94000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="Pinger" is_type="NO" language="SDL" default_implementation="default">
+    <Property name="Taste::coordinates" value="24800 83800 50400 98500"/>
+<Provided_Interface name="PongInterface" kind="Sporadic">
+    <Input_Parameter name="PongArg" type="MyInteger" encoding="ACN"/>
+    <Property name="Taste::coordinates" value="50400 93700"/>
+</Provided_Interface>
+
+<Required_Interface name="PingInterface" kind="Sporadic">
+    <Input_Parameter name="PingArg" type="MyInteger" encoding="ACN"/>
+    <Property name="Taste::coordinates" value="50400 87000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Connection >
+    <Source func_name="Ponger" ri_name="PongInterface"/>
+    <Target func_name="Pinger" pi_name="PongInterface"/>
+    <Property name="Taste::coordinates" value="101200 94000 50700 93700"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Pinger" ri_name="PingInterface"/>
+    <Target func_name="Ponger" pi_name="PingInterface"/>
+    <Property name="Taste::coordinates" value="51000 87000 101500 87200"/>
+</Connection>
+
+</InterfaceView>

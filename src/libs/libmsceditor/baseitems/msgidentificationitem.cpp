@@ -45,18 +45,17 @@ MscParameterList MsgIdentificationItem::parametersFromText(const QString &text)
     msc::MscParameterList parameters;
     const int idx = text.indexOf('(');
     if (idx > 0) {
-
         const int paramEnd = text.lastIndexOf(')');
         if (paramEnd > 0) {
-            QStringRef paramsText = text.midRef(idx + 1, paramEnd - idx - 1);
-            for (auto param : paramsText.split(',')) {
+            QString paramsText = text.mid(idx + 1, paramEnd - idx - 1);
+            for (QString param : paramsText.split(',')) {
                 param = param.trimmed();
                 if (!param.isEmpty()) {
                     MscParameter mscParam;
                     if (param.contains(":")) {
-                        mscParam.setExpression(param.toString());
+                        mscParam.setExpression(param);
                     } else {
-                        mscParam.setPattern(param.toString());
+                        mscParam.setPattern(param);
                     }
                     parameters.append(mscParam);
                 }

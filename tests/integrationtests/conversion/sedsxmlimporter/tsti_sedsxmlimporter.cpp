@@ -39,7 +39,7 @@ class tsti_SedsXmlImporter : public QObject
 public:
     virtual ~tsti_SedsXmlImporter() = default;
 
-public Q_SLOTS:
+private Q_SLOTS:
     void testValid();
 };
 

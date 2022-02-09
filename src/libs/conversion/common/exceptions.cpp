@@ -43,11 +43,6 @@ FileNotFoundException::FileNotFoundException(const QString &filename, const QStr
 {
 }
 
-RegistrationFailedException::RegistrationFailedException(ModelType modelType)
-    : ConversionException(QString("Unable to register for %1 model").arg(modelTypeToString(modelType)))
-{
-}
-
 ImporterNotRegisteredException::ImporterNotRegisteredException(ModelType modelType)
     : ConversionException(QString("No importer for %1 model registered").arg(modelTypeToString(modelType)))
 {
@@ -66,8 +61,13 @@ ExporterNotRegisteredException::ExporterNotRegisteredException(ModelType modelTy
 {
 }
 
-InvalidModelNameException::InvalidModelNameException(const QString &modelName)
-    : ConversionException(QString("Model name '%1' is not valid").arg(modelName))
+UnhandledValueException::UnhandledValueException(const QString &enumName)
+    : ConversionException(QString("Encountered unhandled enum value %1").arg(enumName))
+{
+}
+
+UnsupportedValueException::UnsupportedValueException(const QString &enumName, const QString &valueTypeName)
+    : ConversionException(QString("Encountered unsupported enum value %1 in %2").arg(valueTypeName).arg(enumName))
 {
 }
 

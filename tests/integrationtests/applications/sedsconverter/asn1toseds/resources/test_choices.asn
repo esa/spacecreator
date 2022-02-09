@@ -1,0 +1,24 @@
+CHOICES DEFINITIONS ::= BEGIN
+
+Type1 ::= INTEGER(100..200)
+Type2 ::= INTEGER(50..100)
+
+SimpleChoice ::= CHOICE 
+{
+    alt1 Type1,
+    alt2 Type2
+}
+
+SimpleChoiceWithAnonymousTypes ::= CHOICE 
+{
+    alt1 INTEGER(0..50),
+    alt2 INTEGER(-1..1)
+}
+
+SimpleChoiceWithEncodingOverride ::= CHOICE 
+{
+    alt1 Type1,
+    alt2 Type2
+}
+
+END

@@ -33,6 +33,7 @@
 #include <id.h>
 #include <projectexplorer/project.h>
 #include <projectexplorer/projectnodes.h>
+#include <qtcreatorutils.h>
 
 using namespace Utils;
 using namespace Core;
@@ -47,9 +48,17 @@ IVEditorDocument::IVEditorDocument(SpaceCreatorProjectManager *projectManager, Q
     setId(Id(spctr::Constants::K_IV_EDITOR_ID));
 }
 
+#if QTC_VERSION < 500
 Core::IDocument::OpenResult IVEditorDocument::open(
         QString *errorString, const QString &fileName, const QString &realFileName)
 {
+    const QFileInfo fi(fileName);
+#else
+Core::IDocument::OpenResult IVEditorDocument::open(
+        QString *errorString, const Utils::FilePath &fileName, const Utils::FilePath &realFileName)
+{
+    const QFileInfo fi = fileName.toFileInfo();
+#endif
     Q_UNUSED(errorString)
     Q_UNUSED(realFileName)
 
@@ -57,7 +66,6 @@ Core::IDocument::OpenResult IVEditorDocument::open(
         return OpenResult::ReadError;
     }
 
-    const QFileInfo fi(fileName);
     const QString absfileName = fi.absoluteFilePath();
 
     SpaceCreatorProjectImpl *project = m_projectManager->project(absfileName);
@@ -69,16 +77,16 @@ Core::IDocument::OpenResult IVEditorDocument::open(
 
     connect(m_plugin->commandsStack(), &ive::cmd::CommandsStack::asn1FilesImported, this,
             [project](const QStringList &asn1FilesAdded) {
-                project->project()->rootProjectNode()->addFiles(asn1FilesAdded);
+                project->project()->rootProjectNode()->addFiles(toProjectsFiles(asn1FilesAdded));
             });
     connect(m_plugin->commandsStack(), &ive::cmd::CommandsStack::asn1FileRemoved, this,
             [project](const QStringList &asn1FilesRemoved) {
-                project->project()->rootProjectNode()->removeFiles(asn1FilesRemoved);
+                project->project()->rootProjectNode()->removeFiles(toProjectsFiles(asn1FilesRemoved));
             });
 
-#if QTC_VERSION == 48
+#if QTC_VERSION < 409
     setFilePath(Utils::FileName::fromString(absfileName));
-#elif QTC_VERSION == 415
+#else
     setFilePath(Utils::FilePath::fromString(absfileName));
 #endif
 
@@ -89,17 +97,25 @@ Core::IDocument::OpenResult IVEditorDocument::open(
     return OpenResult::Success;
 }
 
+#if QTC_VERSION < 500
 bool IVEditorDocument::save(QString *errorString, const QString &name, bool autoSave)
 {
+#else
+bool IVEditorDocument::save(QString *errorString, const Utils::FilePath &name, bool autoSave)
+{
+#endif
     Q_UNUSED(errorString)
     if (m_plugin.isNull()) {
         return false;
     }
-
-#if QTC_VERSION == 48
+#if QTC_VERSION < 500
+#if QTC_VERSION < 409
     const FileName newName = Utils::FileName::fromString(name);
-#elif QTC_VERSION == 415
+#else
     const FilePath newName = Utils::FilePath::fromString(name);
+#endif
+#else
+    const FilePath newName = name;
 #endif
 
     const auto oldFileName = filePath();
@@ -134,13 +150,13 @@ bool IVEditorDocument::save(QString *errorString, const QString &name, bool auto
     return true;
 }
 
-#if QTC_VERSION == 415
-void IVEditorDocument::setFilePath(const FilePath &newName)
+#if QTC_VERSION < 409
+void IVEditorDocument::setFilePath(const FileName &newName)
 {
     IDocument::setFilePath(newName);
 }
-#elif QTC_VERSION == 48
-void IVEditorDocument::setFilePath(const FileName &newName)
+#else
+void IVEditorDocument::setFilePath(const FilePath &newName)
 {
     IDocument::setFilePath(newName);
 }

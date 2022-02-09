@@ -21,6 +21,7 @@
 #include "asn1modelstorage.h"
 #include "asn1systemchecks.h"
 #include "colors/colormanagerdialog.h"
+#include "commands/cmdconnectionlayermanage.h"
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
@@ -78,6 +79,8 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     ivm::IVModel *sharedModel { nullptr };
     IVVisualizationModelBase *sharedVisualisationModel { nullptr };
     IVExporter *exporter { nullptr };
+    ivm::IVModel *layersModel { nullptr };
+    IVVisualizationModelBase *layerSelect { nullptr };
 
     Asn1Acn::Asn1SystemChecks *asnCheck { nullptr };
     ivm::AbstractSystemChecks *ivCheck { nullptr };
@@ -104,6 +107,7 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     d->importModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
     d->sharedModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
     d->objectsModel = new ivm::IVModel(d->dynPropConfig, d->sharedModel, this);
+    d->layersModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
 }
 
 InterfaceDocument::~InterfaceDocument()
@@ -118,6 +122,7 @@ void InterfaceDocument::init()
     visualisationModel();
     importVisualisationModel();
     sharedVisualisationModel();
+    layerVisualisationModel();
 
     QTimer::singleShot(0, this, &InterfaceDocument::loadAvailableComponents);
 }
@@ -179,23 +184,7 @@ bool InterfaceDocument::load(const QString &path)
 
 bool InterfaceDocument::loadAvailableComponents()
 {
-    bool result = true;
-
-    d->sharedModel->clear();
-    QDirIterator instantiatableIt(shared::sharedTypesPath(), QDir::Dirs | QDir::NoDotAndDotDot);
-    while (instantiatableIt.hasNext()) {
-        result |= loadComponentModel(
-                d->sharedModel, instantiatableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName);
-    }
-
-    d->importModel->clear();
-    QDirIterator importableIt(shared::componentsLibraryPath(), QDir::Dirs | QDir::NoDotAndDotDot);
-    while (importableIt.hasNext()) {
-        result |= loadComponentModel(
-                d->importModel, importableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName);
-    }
-
-    return result;
+    return reloadComponentModel() && reloadSharedTypeModel();
 }
 
 QString InterfaceDocument::getComponentName(const QStringList &exportNames)
@@ -255,6 +244,27 @@ ivm::IVPropertyTemplateConfig *InterfaceDocument::dynPropConfig() const
     return d->dynPropConfig;
 }
 
+void InterfaceDocument::updateLayersModel() const
+{
+    if (layersModel() != nullptr) {
+        auto layers = layersModel()->allObjectsByType<ivm::IVConnectionLayerType>();
+        bool isDefaultPresent = false;
+        for (auto * const layer : layers) {
+            if (layer->name() == ivm::IVConnectionLayerType::DefaultLayerName) {
+                isDefaultPresent = true;
+            }
+        }
+        if (!isDefaultPresent) {
+            auto *cmd = new cmd::CmdConnectionLayerCreate(
+                    ivm::IVConnectionLayerType::DefaultLayerName, layersModel(), objectsModel());
+            commandsStack()->push(cmd);
+        }
+        if (objectsModel() != nullptr) {
+            objectsModel()->setConnectionLayersModel(layersModel());
+        }
+    }
+}
+
 bool InterfaceDocument::exportSelectedFunctions()
 {
     QString name;
@@ -262,10 +272,10 @@ bool InterfaceDocument::exportSelectedFunctions()
     if (name.isEmpty()) {
         return false;
     }
-    QString path = shared::componentsLibraryPath() + name;
+    QString path = shared::componentsLibraryPath() + QDir::separator() + name;
     if (exportImpl(path, objects)) {
         d->objectsSelectionModel->clearSelection();
-        return loadComponentModel(d->importModel, path + QDir::separator() + shared::kDefaultInterfaceViewFileName);
+        return reloadComponentModel();
     }
     return false;
 }
@@ -294,7 +304,7 @@ bool InterfaceDocument::exportSelectedType()
     QString path = shared::sharedTypesPath() + QDir::separator() + rootType->title();
     if (exportImpl(path, { rootType })) {
         d->objectsSelectionModel->clearSelection();
-        return loadComponentModel(d->sharedModel, path + QDir::separator() + shared::kDefaultInterfaceViewFileName);
+        return reloadSharedTypeModel();
     }
     return false;
 }
@@ -314,14 +324,41 @@ bool InterfaceDocument::loadComponentModel(ivm::IVModel *model, const QString &p
         return false;
     }
 
-    model->addObjects(parser.parsedObjects());
+    auto objects = parser.parsedObjects();
+    ivm::IVObject::sortObjectList(objects);
+    model->addObjects(objects);
     shared::ErrorHub::clearCurrentFile();
     return true;
+}
+
+bool InterfaceDocument::reloadComponentModel()
+{
+    bool result = true;
+    d->importModel->clear();
+    QDirIterator importableIt(shared::componentsLibraryPath(), QDir::Dirs | QDir::NoDotAndDotDot);
+    while (importableIt.hasNext()) {
+        result |= loadComponentModel(
+                d->importModel, importableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName);
+    }
+    return result;
+}
+
+bool InterfaceDocument::reloadSharedTypeModel()
+{
+    bool result = true;
+    d->sharedModel->clear();
+    QDirIterator instantiatableIt(shared::sharedTypesPath(), QDir::Dirs | QDir::NoDotAndDotDot);
+    while (instantiatableIt.hasNext()) {
+        result |= loadComponentModel(
+                d->sharedModel, instantiatableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName);
+    }
+    return result;
 }
 
 void InterfaceDocument::close()
 {
     d->objectsModel->clear();
+    d->layersModel->clear();
     setPath(QString());
     d->commandsStack->clear();
 }
@@ -345,6 +382,9 @@ void InterfaceDocument::setPath(const QString &path)
  */
 void InterfaceDocument::setAsn1FileName(const QString &newAsnfile, const QString &oldAsnfile)
 {
+    if (d->asnFilesNames.contains(newAsnfile)) {
+        return;
+    }
     if (!oldAsnfile.isEmpty()) {
         d->asnFilesNames.removeAll(oldAsnfile);
     }
@@ -478,6 +518,11 @@ IVItemModel *InterfaceDocument::itemsModel() const
     return d->itemsModel;
 }
 
+ivm::IVModel *InterfaceDocument::layersModel() const
+{
+    return d->layersModel;
+}
+
 IVVisualizationModelBase *InterfaceDocument::visualisationModel() const
 {
     if (!d->objectsVisualizationModel) {
@@ -525,6 +570,18 @@ IVVisualizationModelBase *InterfaceDocument::sharedVisualisationModel() const
     }
 
     return d->sharedVisualisationModel;
+}
+
+IVVisualizationModelBase *InterfaceDocument::layerVisualisationModel() const
+{
+    if (d->layerSelect == nullptr) {
+        d->layerSelect = new IVVisualizationModelBase(
+                layersModel(), d->commandsStack, shared::DropData::Type::None, const_cast<InterfaceDocument *>(this));
+        auto *title = new QStandardItem(tr("Connection Layers"));
+        title->setTextAlignment(Qt::AlignCenter);
+        d->layerSelect->setHorizontalHeaderItem(0, title);
+    }
+    return d->layerSelect;
 }
 
 void InterfaceDocument::setAsn1Check(Asn1Acn::Asn1SystemChecks *check)
@@ -753,6 +810,18 @@ static inline bool resolveNameConflict(QString &targetPath, QWidget *window)
     return true;
 }
 
+static inline void copyImplementation(
+        const QDir &projectDir, const QDir &targetDir, const QVector<ivm::IVObject *> &objects)
+{
+    for (shared::VEObject *object : objects) {
+        if (auto fn = object->as<ivm::IVFunctionType *>()) {
+            const QString subPath = shared::kRootImplementationPath + QDir::separator() + object->title().toLower();
+            shared::copyDir(projectDir.filePath(subPath), targetDir.filePath(subPath));
+            copyImplementation(projectDir, targetDir, fn->children());
+        }
+    }
+}
+
 bool InterfaceDocument::exportImpl(QString &targetPath, const QList<shared::VEObject *> &objects)
 {
     const bool ok = shared::ensureDirExists(targetPath);
@@ -789,13 +858,13 @@ bool InterfaceDocument::exportImpl(QString &targetPath, const QList<shared::VEOb
         }
     }
 
-    for (shared::VEObject *object : objects) {
-        if (auto fn = object->as<ivm::IVFunctionType *>()) {
-            const QString subPath = QStringLiteral("work/%1").arg(object->title());
-            shared::copyDir(ivDir.filePath(subPath), targetDir.filePath(subPath));
+    QVector<ivm::IVObject *> children;
+    std::for_each(objects.cbegin(), objects.cend(), [&children](shared::VEObject *veObj) {
+        if (auto fn = veObj->as<ivm::IVObject *>()) {
+            children.append(fn);
         }
-    }
-
+    });
+    copyImplementation(ivDir, targetDir, children);
     return true;
 }
 
@@ -823,6 +892,7 @@ bool InterfaceDocument::loadImpl(const QString &path)
     }
     setMscFileName(metadata["mscfile"].toString());
     shared::ErrorHub::clearCurrentFile();
+
     return true;
 }
 

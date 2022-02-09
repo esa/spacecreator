@@ -108,6 +108,18 @@ void MscAction::setInstance(MscInstance *instance)
     Q_EMIT dataChanged();
 }
 
+MscEntity *MscAction::instanceObj() const
+{
+    return m_instance;
+}
+
+void MscAction::setInstanceObj(MscEntity *instance)
+{
+    if (auto inst = qobject_cast<MscInstance *>(instance)) {
+        setInstance(inst);
+    }
+}
+
 bool MscAction::relatesTo(const MscInstance *instance) const
 {
     return m_instance == instance;

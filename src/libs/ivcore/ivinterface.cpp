@@ -19,6 +19,7 @@
 
 #include "ivcommonprops.h"
 #include "ivconnection.h"
+#include "ivconnectionlayertype.h"
 #include "ivcoreutils.h"
 #include "ivfunction.h"
 #include "ivmodel.h"
@@ -31,7 +32,8 @@ namespace ivm {
 
 IVInterface::CreationInfo::CreationInfo(IVModel *model, IVFunctionType *function, const QPointF &position,
         IVInterface::InterfaceType type, const shared::Id &id, const QVector<shared::InterfaceParameter> &parameters,
-        OperationKind kind, const QString &name, const CreationInfo::Policy policy, IVInterface *source)
+        OperationKind kind, IVConnectionLayerType *layer, const QString &name, const CreationInfo::Policy policy,
+        IVInterface *source)
     : model(model)
     , function(function)
     , position(position)
@@ -39,10 +41,14 @@ IVInterface::CreationInfo::CreationInfo(IVModel *model, IVFunctionType *function
     , id(id)
     , parameters(parameters)
     , kind(kind)
+    , layer(layer)
     , name(name)
     , policy(policy)
     , toBeCloned(policy == Policy::Clone ? source : nullptr)
 {
+    if (this->layer == nullptr && this->model != nullptr) {
+        this->layer = model->getConnectionLayerByName(IVConnectionLayerType::DefaultLayerName);
+    }
 }
 
 QVariantList IVInterface::CreationInfo::toVarList() const
@@ -61,7 +67,8 @@ IVInterface::CreationInfo IVInterface::CreationInfo::initFromIface(
     };
 
     return { iface->model(), (iface->parentObject() ? iface->parentObject()->as<IVFunctionType *>() : nullptr), {},
-        iface->direction(), iface->id(), iface->params(), iface->kind(), iface->title(), policy, iface };
+        iface->direction(), iface->id(), iface->params(), iface->kind(), iface->layer(), iface->title(), policy,
+        iface };
 }
 
 IVInterface::CreationInfo IVInterface::CreationInfo::fromIface(IVInterface *iface, IVFunctionType *fn)
@@ -119,21 +126,29 @@ IVInterface::IVInterface(IVObject::Type ifaceType, const CreationInfo &ci)
                                                              : IVInterface::InterfaceType::Provided))
 {
     setKind(ci.kind);
+    setLayerName(ci.layer != nullptr ? ci.layer->name() : IVConnectionLayerType::DefaultLayerName);
     setParams(ci.parameters);
 
-    if (ci.toBeCloned)
+    if (ci.toBeCloned) {
         setCloneOrigin(ci.toBeCloned);
+    }
 }
 
 IVInterface::~IVInterface()
 {
-    if (d->m_cloneOf)
+    if (d->m_cloneOf != nullptr) {
         d->m_cloneOf->forgetClone(this);
+    }
 }
 
 IVInterface::InterfaceType IVInterface::direction() const
 {
     return d->m_direction;
+}
+
+void IVInterface::setDirection(IVInterface::InterfaceType type) const
+{
+    d->m_direction = type;
 }
 
 bool IVInterface::postInit()
@@ -168,6 +183,7 @@ bool IVInterface::postInit()
             }
         }
     }
+
     return IVObject::postInit();
 }
 
@@ -221,6 +237,25 @@ IVInterface::OperationKind IVInterface::defaultKind() const
 QString IVInterface::ifaceLabel() const
 {
     return title();
+}
+
+IVConnectionLayerType *IVInterface::layer() const
+{
+    if (model() != nullptr) {
+        return model()->getConnectionLayerByName(layerName());
+    }
+    return nullptr;
+}
+
+QString IVInterface::layerName() const
+{
+    return entityAttributeValue(meta::Props::token(meta::Props::Token::layer)).toString();
+}
+
+void IVInterface::setLayerName(const QString &layerName)
+{
+    setEntityAttribute(meta::Props::token(meta::Props::Token::layer), layerName);
+    Q_EMIT attributeChanged(meta::Props::token(meta::Props::Token::layer));
 }
 
 IVInterface::OperationKind IVInterface::kindFromString(const QString &k) const
@@ -308,6 +343,11 @@ bool IVInterface::isCloned() const
     return d->m_clones.size();
 }
 
+bool IVInterface::isMulticastEnabled() const
+{
+    return entityAttributeValue<bool>(meta::Props::token(meta::Props::Token::enable_multicast), false);
+}
+
 QVector<QPointer<IVInterface>> IVInterface::clones() const
 {
     return d->m_clones;
@@ -376,7 +416,7 @@ IVInterface *IVInterface::createIface(const CreationInfo &descr)
         qFatal("Unsupported interface type");
     iface->setKind(descr.kind);
     iface->setTitle(descr.name);
-
+    iface->setLayerName(descr.layer != nullptr ? descr.layer->name() : IVConnectionLayerType::DefaultLayerName);
     return iface;
 }
 
@@ -529,9 +569,14 @@ void IVInterfaceRequired::setAttributeImpl(
             if (entityAttributeValue<bool>(attributeName) != newVal) {
                 // should be handled in Connection _before_ the actual value change:
                 Q_EMIT inheritedLabelsChanged(inheritedLables());
-
                 IVInterface::setAttributeImpl(attributeName, value, type);
                 Q_EMIT propChanged_InheritPI(newVal);
+            }
+        } break;
+        case meta::Props::Token::enable_multicast: {
+            const bool newVal = value.toBool();
+            if (entityAttributeValue<bool>(attributeName) != newVal) {
+                IVInterface::setAttributeImpl(attributeName, value, type);
             }
         } break;
         case meta::Props::Token::name: {
@@ -562,7 +607,7 @@ void IVInterfaceRequired::setAttributeImpl(
                         }
                     }
                 } else {
-                    autoName = false;
+                    autoName = IVNameValidator::isAutogeneratedName(this, usedName);
                 }
             }
 
@@ -741,13 +786,6 @@ bool IVInterfaceRequired::isInheritPI() const
 bool IVInterfaceRequired::hasPrototypePi() const
 {
     return m_prototypes.size();
-}
-
-bool IVInterfaceRequired::postInit()
-{
-    const bool value = IVInterface::postInit();
-    setEntityProperty(meta::Props::token(meta::Props::Token::Autonamed), IVNameValidator::isAutogeneratedName(this));
-    return value;
 }
 
 void IVInterfaceRequired::cloneInternals(const IVInterface *from)

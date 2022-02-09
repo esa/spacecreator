@@ -41,7 +41,7 @@ const ContainerDataType::EntryList &ContainerDataType::entries() const
     return m_entries;
 }
 
-void ContainerDataType::addEntry(ContainerDataType::EntryListType entry)
+void ContainerDataType::addEntry(EntryType entry)
 {
     m_entries.push_back(std::move(entry));
 }
@@ -51,9 +51,28 @@ const ContainerDataType::EntryList &ContainerDataType::trailerEntries() const
     return m_trailerEntries;
 }
 
-void ContainerDataType::addTrailerEntry(ContainerDataType::EntryListType entry)
+void ContainerDataType::addTrailerEntry(EntryType entry)
 {
     m_trailerEntries.push_back(std::move(entry));
+}
+
+const EntryType *ContainerDataType::entry(const common::String &name) const
+{
+    auto result = std::find_if(
+            m_entries.begin(), m_entries.end(), [&name](const auto &entry) { return entryNameStr(entry) == name; });
+
+    if (result != m_entries.end()) {
+        return &(*result);
+    }
+
+    result = std::find_if(m_trailerEntries.begin(), m_trailerEntries.end(),
+            [&name](const auto &trailerEntry) { return entryNameStr(trailerEntry) == name; });
+
+    if (result != m_trailerEntries.end()) {
+        return &(*result);
+    }
+
+    return nullptr;
 }
 
 const std::optional<DataTypeRef> &ContainerDataType::baseType() const

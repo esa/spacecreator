@@ -64,6 +64,18 @@ void MscCondition::setInstance(MscInstance *instance)
     Q_EMIT dataChanged();
 }
 
+MscEntity *MscCondition::instanceObj() const
+{
+    return m_instance;
+}
+
+void MscCondition::setInstanceObj(MscEntity *instance)
+{
+    if (auto inst = qobject_cast<MscInstance *>(instance)) {
+        setInstance(inst);
+    }
+}
+
 MscEntity::EntityType MscCondition::entityType() const
 {
     return MscEntity::EntityType::Condition;

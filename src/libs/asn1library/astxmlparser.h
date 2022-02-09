@@ -86,7 +86,7 @@ private:
     ValuePtr findAndReadValueAssignmentValue();
     ValuePtr readValueAssignmentValue();
 
-    ValuePtr readSimpleValue(const QStringRef &name);
+    ValuePtr readSimpleValue(const StringRef &name);
     ValuePtr readMultipleValue();
     ValuePtr readSequenceValues();
     std::pair<QString, ValuePtr> readNamedValue();

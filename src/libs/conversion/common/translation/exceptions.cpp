@@ -31,6 +31,11 @@ UndeclaredDataTypeException::UndeclaredDataTypeException(const QString &dataType
 {
 }
 
+UnsupportedDataTypeException::UnsupportedDataTypeException(const QString &dataTypeName)
+    : TranslationException(QString("Unsupported data type '%1'").arg(dataTypeName))
+{
+}
+
 UndeclaredInterfaceException::UndeclaredInterfaceException(const QString &interfaceTypeName)
     : TranslationException(QString("Undeclared interface '%1'").arg(interfaceTypeName))
 {
@@ -45,17 +50,6 @@ MissingGenericTypeMappingException::MissingGenericTypeMappingException(
 
 MissingAsn1TypeDefinitionException::MissingAsn1TypeDefinitionException(const QString &asn1TypeName)
     : TranslationException(QString("Missing ASN.1 type definition '%1'").arg(asn1TypeName))
-{
-}
-
-UnhandledValueException::UnhandledValueException(const QString &enumName)
-    : TranslationException(QString("Translator encountered unhandled value %1").arg(enumName))
-{
-}
-
-UnsupportedValueException::UnsupportedValueException(const QString &enumName, const QString &valueTypeName)
-    : TranslationException(
-              QString("Translator encountered unsupported value %1 in %2").arg(valueTypeName).arg(enumName))
 {
 }
 

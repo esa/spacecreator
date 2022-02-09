@@ -17,6 +17,12 @@
 
 #pragma once
 
+#include "common.h"
+
+#include <QHash>
+#include <QList>
+#include <QPointF>
+#include <QRectF>
 #include <memory>
 
 class QPainter;
@@ -31,15 +37,32 @@ public:
     explicit MiniViewRenderer(const IVFunctionGraphicsItem *item);
     ~MiniViewRenderer();
 
-    void render(QPainter *painter);
+    virtual void render(QPainter *painter);
 
 private:
     void clear();
     void updateData();
-    void drawItemsWithoutCoordinates(QPainter *painter);
     void drawData(QPainter *painter);
 
-private:
+protected:
+    //    struct ConnectionData {
+    //        QPointF outerMappedScenePos;
+    //        QPointF innerScenePos;
+    //        shared::Id innerFunctionId;
+    //        shared::Id connectionId;
+    //    };
+
+    struct MiniViewRendererPrivate {
+        explicit MiniViewRendererPrivate(const IVFunctionGraphicsItem *item)
+            : item(item)
+        {
+        }
+
+        const IVFunctionGraphicsItem *item { nullptr };
+
+        QHash<shared::Id, QRectF> rects;
+        QHash<shared::Id, QPolygonF> polygons;
+    };
     const std::unique_ptr<MiniViewRendererPrivate> d;
 };
 

@@ -46,7 +46,7 @@ VEObject::VEObject(const shared::Id &id, QObject *parent)
         setModel(model);
 }
 
-VEObject::~VEObject() {}
+VEObject::~VEObject() { }
 
 shared::Id VEObject::id() const
 {
@@ -149,7 +149,12 @@ QList<EntityAttribute> VEObject::sortedAttributesValues(const EntityAttributes &
 
 void VEObject::setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type)
 {
-    d->m_attrs[name] = EntityAttribute { name, value, type };
+    EntityAttribute attr { name, value, type };
+    auto it = d->m_attrs.find(name);
+    if (it != d->m_attrs.end()) {
+        attr.setExportable(it->isExportable());
+    }
+    d->m_attrs[name] = attr;
     Q_EMIT attributeChanged(name);
 }
 
@@ -163,7 +168,11 @@ QVector<qint32> VEObject::coordinatesFromString(const QString &strCoordinates)
     if (strCoordinates.isEmpty())
         return {};
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
     const QStringList &strCoords = strCoordinates.split(QLatin1Char(' '), QString::SkipEmptyParts);
+#else
+    const QStringList &strCoords = strCoordinates.split(QLatin1Char(' '), Qt::SkipEmptyParts);
+#endif
     const int coordsCount = strCoords.size();
     QVector<qint32> coords(coordsCount);
     for (int i = 0; i < coordsCount; ++i)
@@ -212,6 +221,14 @@ bool VEObject::isEqual(const VEObject *other) const
     return other && d->m_attrs == other->d->m_attrs;
 }
 
+void VEObject::setAttributeExportable(const QString &attrName, bool isExportable)
+{
+    auto it = d->m_attrs.find(attrName);
+    if (it != d->m_attrs.end()) {
+        it->setExportable(isExportable);
+    }
+}
+
 VEObject *VEObject::parentObject() const
 {
     return qobject_cast<VEObject *>(parent());
@@ -246,5 +263,4 @@ QString toString(VEObject *object)
 {
     return object->titleUI();
 }
-
 }

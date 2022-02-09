@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/hwas">
+    <DataTypeSet>
+      <IntegerDataType name="DestinationAddress">
+        <LongDescription>Type for a memory destination address.</LongDescription>
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="32" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="4294967295" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="SourceAddress">
+        <LongDescription>Type for a memory source address.</LongDescription>
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="32" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="4294967295" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="Word">
+        <LongDescription>Machine word.</LongDescription>
+        <IntegerDataEncoding encoding="unsigned" byteOrder="littleEndian" sizeInBits="32" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="4294967295" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="WordMask">
+        <LongDescription>Mask for a machine word.</LongDescription>
+        <IntegerDataEncoding byteOrder="littleEndian" sizeInBits="32" encoding="unsigned" />
+        <Range>
+          <MinMaxRange min="0" max="4294967295" rangeType="inclusiveMinInclusiveMax" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="BufferSize">
+        <LongDescription>Size of a memory transfer.</LongDescription>
+        <IntegerDataEncoding byteOrder="littleEndian" sizeInBits="16" encoding="unsigned" />
+        <Range>
+          <MinMaxRange max="65535" min="0" rangeType="inclusiveMinInclusiveMax" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="InterruptNumber">
+        <LongDescription>Interrupt number for NVIC.</LongDescription>
+        <IntegerDataEncoding byteOrder="littleEndian" sizeInBits="8" encoding="unsigned" />
+        <Range>
+          <MinMaxRange max="255" min="0" rangeType="inclusiveMinInclusiveMax" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="Byte">
+        <LongDescription>Byte.</LongDescription>
+        <IntegerDataEncoding byteOrder="littleEndian" encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange max="255" min="0" rangeType="inclusiveMinInclusiveMax" />
+        </Range>
+      </IntegerDataType>
+      <ArrayDataType name="ByteBuffer" dataTypeRef="Byte">
+        <LongDescription>Byte buffer.</LongDescription>
+        <DimensionList>
+          <Dimension size="65535" />
+        </DimensionList>
+      </ArrayDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface level="subnetwork" name="InterruptSubscriptionManagementInterfaceType">
+        <LongDescription>Interface for registering to hardware interrupts.</LongDescription>
+        <CommandSet>
+          <Command name="SubscribeToInterrupt" mode="sync">
+            <LongDescription>Subscribe to a hardware interrupt</LongDescription>
+            <Argument name="interrupt" type="InterruptNumber" mode="in" />
+          </Command>
+        </CommandSet>
+      </Interface>
+      <Interface level="subnetwork" name="InterruptSubscriptionInterfaceType">
+        <LongDescription>Interface for receiving interrupt notifications.</LongDescription>
+        <CommandSet>
+          <Command name="Interrupt" mode="async">
+            <LongDescription>Receive a hardware interrupt notification. The notification is asynchronous, as it may not be executed in the interrupt context</LongDescription>
+            <Argument name="interrupt" type="InterruptNumber" mode="in" />
+          </Command>
+        </CommandSet>
+      </Interface>
+      <Interface level="subnetwork" name="InterruptManagementInterfaceType">
+        <LongDescription>Interface for managing hardware interrupts.</LongDescription>
+        <CommandSet>
+          <Command name="EnableInterrupt" mode="sync">
+            <LongDescription>Enable a hardware interrupt.</LongDescription>
+            <Argument name="interrupt" type="InterruptNumber" mode="in" />
+          </Command>
+          <Command name="DisableInterrupt" mode="sync">
+            <LongDescription>Disable a hardware interrupt.</LongDescription>
+            <Argument name="interrupt" type="InterruptNumber" mode="in" />
+          </Command>
+        </CommandSet>
+      </Interface>
+      <Interface level="subnetwork" name="RawMemoryAccessInterfaceType">
+        <LongDescription>Interface for accessing RAW memory.</LongDescription>
+        <CommandSet>
+          <Command name="ReadWord" mode="sync">
+            <LongDescription>Read word from memory, masked by the mask. The address must be word-aligned.</LongDescription>
+            <Argument name="address" type="SourceAddress" mode="in" />
+            <Argument name="mask" type="WordMask" mode="in" />
+            <Argument name="value" type="Word" mode="out" />
+          </Command>
+          <Command name="WriteWord" mode="sync">
+            <LongDescription>Write word to memory, masked by the mask.  The address must be word-aligned.</LongDescription>
+            <Argument name="address" type="DestinationAddress" mode="in" />
+            <Argument name="mask" type="WordMask" mode="in" />
+            <Argument name="value" type="Word" mode="in" />
+          </Command>
+          <Command name="WriteBuffer" mode="sync">
+            <LongDescription>Write Byte Buffer to memory.</LongDescription>
+            <Argument name="address" type="DestinationAddress" mode="in" />
+            <Argument name="buffer" type="ByteBuffer" mode="in" />
+          </Command>
+          <Command name="ReadBuffer" mode="sync">
+            <LongDescription>Read Byte Buffer from memory.</LongDescription>
+            <Argument name="address" type="SourceAddress" mode="in"></Argument>
+            <Argument name="buffer" type="ByteBuffer" mode="out" />
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="HWAS">
+        <LongDescription>Facade for the underlying microprocessor/microcontroller system.</LongDescription>
+        <ProvidedInterfaceSet>
+          <Interface name="InterruptSubscriptionManagement" type="InterruptSubscriptionManagementInterfaceType" />
+          <Interface name="InterruptManagement" type="InterruptManagementInterfaceType" />
+          <Interface name="RawMemoryAccess" type="RawMemoryAccessInterfaceType" />
+        </ProvidedInterfaceSet>
+        <RequiredInterfaceSet>
+          <Interface name="InterruptSubscription" type="InterruptSubscriptionInterfaceType" />
+        </RequiredInterfaceSet>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

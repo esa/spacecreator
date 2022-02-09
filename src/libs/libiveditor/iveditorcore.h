@@ -80,6 +80,9 @@ public:
             const QString &toInstanceName);
     bool renameCyclicInterface(const QString &oldName, const QString &newName, const QString &functionName);
 
+    ivm::IVConnectionLayerType *manageConnectionLayer(
+            const QString &name, ivm::IVConnectionLayerType *parent = nullptr);
+
     QVector<ivm::IVFunction *> allIVFunctions() const;
     QVector<ivm::IVConnection *> allIVConnections() const;
 
@@ -109,6 +112,7 @@ private:
 
     QVector<ivm::IVFunction *> m_ivFunctions;
     QVector<ivm::IVConnection *> m_ivConnections;
+    QVector<ivm::IVConnectionLayerType *> m_ivLayers;
 
     Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
 

@@ -19,7 +19,11 @@
 
 #pragma once
 
+#include "initproctype.h"
+#include "inlinedef.h"
 #include "namedmtype.h"
+#include "proctype.h"
+#include "proctypeelement.h"
 #include "typealias.h"
 #include "utype.h"
 #include "valuedefinition.h"
@@ -29,7 +33,9 @@
 #include <QString>
 #include <conversion/common/model.h>
 #include <conversion/common/modelproperties.h>
+#include <list>
 #include <map>
+#include <memory>
 
 namespace promela::model {
 /**
@@ -111,6 +117,12 @@ public:
      * @return All Utypes of the model
      */
     const QList<Utype> &getUtypes() const noexcept;
+    /**
+     * @brief Setter for user defined types.
+     *
+     * @param utypes list of Utypes to set
+     */
+    void setUtypes(const QList<Utype> &utypes);
 
     /**
      * @brief Add TypeAlias - alias for type to the model.
@@ -153,6 +165,68 @@ public:
      */
     const QList<Declaration> &getDeclarations() const noexcept;
 
+    /**
+     * @brief Add InlineDef to the model
+     *
+     * @param inlineDef InlineDef to add to the model
+     */
+    void addInlineDef(std::unique_ptr<InlineDef> inlineDef);
+    /**
+     * @brief Getter for all inline definitions
+     *
+     * @return All inline definitions of the model
+     */
+    const std::list<std::unique_ptr<InlineDef>> &getInlineDefs() const noexcept;
+
+    /**
+     * @brief Add proctype definition to the model
+     *
+     * @param proctype Proctype to add to the model
+     */
+    void addProctype(std::unique_ptr<Proctype> proctype);
+    /**
+     * @brief Getter for all proctypes of promela model
+     *
+     * @return All proctypes of the model
+     */
+    const std::list<std::unique_ptr<Proctype>> &getProctypes() const noexcept;
+
+    /**
+     * @brief Check if init proctype is present in promela model
+     *
+     * @return true if init proctype is present, otherwise false
+     */
+    bool hasInit() const noexcept;
+    /**
+     * @brief Getter for init proctype of promela model
+     *
+     * @return init proctype if present
+     * @throw std::bad_optional_access if init proctype is not present
+     */
+    const InitProctype &getInit() const noexcept;
+    /**
+     * @brief Setter for init proctype
+     *
+     * @param initProctype init proctype to set in promela model
+     */
+    void setInit(InitProctype initProctype);
+
+    /**
+     * @brief Add epilogue include file
+     *
+     * File will be included after other definitions
+     *
+     * @param file filepath to the promela file
+     */
+    void addEpilogueInclude(const QString &file);
+
+    /**
+     * @brief Getter for all epilogue included propmela files
+     *
+     * @return List of all epilogue included promela files
+     */
+    const QList<QString> &getEpilogueIncludes() const noexcept;
+
 private:
     QList<QString> m_includes;
     QSet<QString> m_mtypeValues;
@@ -161,6 +235,10 @@ private:
     QList<TypeAlias> m_typeAliases;
     QList<ValueDefinition> m_valueDefinitions;
     QList<Declaration> m_declarations;
+    std::list<std::unique_ptr<InlineDef>> m_inlineDefs;
+    std::list<std::unique_ptr<Proctype>> m_proctypes;
+    std::optional<InitProctype> m_initProctype;
+    QList<QString> m_epilogueIncludes;
 };
 }
 
@@ -176,7 +254,7 @@ struct ModelProperties<::promela::model::PromelaModel> {
     /// @brief  Model name
     static inline const QString name = ModelTypeProperties<type>::name;
     /// @brief  Model extension
-    static inline const QString extension = ModelTypeProperties<type>::extension;
+    static inline const QStringList extensions = ModelTypeProperties<type>::extensions;
 };
 
 } // namespace conversion

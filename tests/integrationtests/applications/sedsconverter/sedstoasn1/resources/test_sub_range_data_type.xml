@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/SubRangeDataType">
+    <DataTypeSet>
+      <IntegerDataType name="IntegerData">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <SubRangeDataType name="SubRangeIntegerData" baseType="IntegerData">
+        <Range>
+          <MinMaxRange rangeType="atLeast" min="10" />
+        </Range>
+      </SubRangeDataType>
+      <FloatDataType name="Float32">
+        <FloatDataEncoding encodingAndPrecision="IEEE754_2008_single" sizeInBits="32" />
+        <Range>
+          <PrecisionRange>single</PrecisionRange>
+        </Range>
+      </FloatDataType>
+      <SubRangeDataType name="SubRangeFloat32" baseType="Float32">
+        <Range>
+          <MinMaxRange rangeType="atMost" max="50" />
+        </Range>
+      </SubRangeDataType>
+      <FloatDataType name="Float64">
+        <FloatDataEncoding encodingAndPrecision="IEEE754_2008_double" sizeInBits="64" />
+        <Range>
+          <PrecisionRange>double</PrecisionRange>
+        </Range>
+      </FloatDataType>
+      <SubRangeDataType name="SubRangeFloat64" baseType="Float64">
+        <Range>
+          <PrecisionRange>single</PrecisionRange>
+        </Range>
+      </SubRangeDataType>
+      <EnumeratedDataType name="SimpleEnumeration">
+        <IntegerDataEncoding encoding="unsigned" byteOrder="bigEndian" sizeInBits="16" />
+        <EnumerationList>
+          <Enumeration value="12" label="Value1" />
+          <Enumeration value="15" label="Value2" />
+          <Enumeration value="19" label="Value3" />
+        </EnumerationList>
+      </EnumeratedDataType>
+      <SubRangeDataType name="SubRangeEnumeration" baseType="SimpleEnumeration">
+        <Range>
+          <EnumeratedRange>
+            <Label>Value1</Label>
+            <Label>Value3</Label>
+          </EnumeratedRange>
+        </Range>
+      </SubRangeDataType>
+    </DataTypeSet>
+  </Package>
+</PackageFile>

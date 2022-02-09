@@ -11,8 +11,8 @@ target_include_directories(${TEST_NAME}
 target_link_libraries(${TEST_NAME}
     PRIVATE     Conversion::Common
                 ASN1::Exporter
-                Qt5::Core
-                Qt5::Test)
+                Qt${QT_VERSION_MAJOR}::Core
+                Qt${QT_VERSION_MAJOR}::Test)
 
 configure_file(resources/expect_Acn_file1.acn expect_Acn_file1.acn COPYONLY)
 configure_file(resources/expect_Acn_file2.acn expect_Acn_file2.acn COPYONLY)

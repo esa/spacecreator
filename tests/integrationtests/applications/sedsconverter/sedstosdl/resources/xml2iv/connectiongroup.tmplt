@@ -1,0 +1,18 @@
+{% comment %}
+Template for generation of XML scheme of connection group.
+The following tags are available in this sub-template:
+conngroups              : Instance of connection (provided by a top level template)
+conngroups.attributes   :   |_ List of all attributes of connection group
+attr                    :       |_ Instance of attriubute
+attr.name               :           |_ Name of attribute
+attr.value              :           |_ Value of attribute
+conngroups.properties   :   |_ List of all available properties of connection group
+prop                    :      |_ Instance of property
+prop.name               :          |_ Name of property
+prop.value              :          |_ Value of property
+{% endcomment %}
+<ConnectionGroup{% for attr in conngroups.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+    {% for prop in conngroups.properties %}
+    <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
+    {% endfor %}
+</ConnectionGroup>

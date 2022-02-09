@@ -99,18 +99,7 @@ private:
      * @throws  conversion::importer::FileNotFound
      * @throws  seds::validator::ValidatorException
      */
-    auto validate(const QString &preprocessedFilename, const conversion::Options &options) const -> void;
-
-    /**
-     * @brief   Get schema filename from imported file
-     *
-     * @param   filename    File to search in
-     *
-     * @throws  ImportException
-     *
-     * @returns Schema filename
-     */
-    auto getSchemaFilename(const QString &filename) const -> QString;
+    auto validate(const QString &preprocessedFilepath, const conversion::Options &options) const -> void;
 
 private:
     static const QString preprocessedFilenameTemplate;

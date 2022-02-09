@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QHash>
 #include <QPointer>
 #include <QUndoCommand>
 

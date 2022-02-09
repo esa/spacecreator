@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "ivconnectionlayertype.h"
 #include "ivobject.h"
 #include "parameter.h"
 
@@ -70,8 +71,9 @@ public:
         CreationInfo(IVModel *model = nullptr, IVFunctionType *function = nullptr, const QPointF &position = QPointF(),
                 IVInterface::InterfaceType type = DefaultDirection, const shared::Id &id = shared::createId(),
                 const QVector<shared::InterfaceParameter> &parameters = QVector<shared::InterfaceParameter>(),
-                OperationKind kind = OperationKind::Sporadic, const QString &name = QString(),
-                const CreationInfo::Policy policy = CreationInfo::Policy::Init, IVInterface *toBeCloned = nullptr);
+                OperationKind kind = OperationKind::Sporadic, IVConnectionLayerType *layer = nullptr,
+                const QString &name = QString(), const CreationInfo::Policy policy = CreationInfo::Policy::Init,
+                IVInterface *toBeCloned = nullptr);
         IVModel *model { nullptr };
         IVFunctionType *function { nullptr };
         QPointF position = {};
@@ -79,6 +81,7 @@ public:
         shared::Id id = {};
         QVector<shared::InterfaceParameter> parameters = {};
         OperationKind kind = { OperationKind::Sporadic };
+        IVConnectionLayerType *layer = { nullptr };
         QString name {};
         CreationInfo::Policy policy { CreationInfo::Policy::Init };
         IVInterface *toBeCloned { nullptr };
@@ -100,6 +103,8 @@ public:
 
     IVInterface::InterfaceType direction() const;
 
+    void setDirection(IVInterface::InterfaceType type) const;
+
     bool postInit() override;
 
     bool isProvided() const;
@@ -120,6 +125,7 @@ public:
     IVInterface *cloneOf() const;
     bool isClone() const;
     bool isCloned() const;
+    bool isMulticastEnabled() const;
     QVector<QPointer<IVInterface>> clones() const;
 
     static IVInterface *createIface(const CreationInfo &descr);
@@ -132,6 +138,10 @@ public:
     IVInterface::OperationKind defaultKind() const;
 
     virtual QString ifaceLabel() const;
+
+    auto layer() const ->  IVConnectionLayerType *;
+    auto layerName() const ->  QString;
+    auto setLayerName(const QString &layerName) -> void;
 
 Q_SIGNALS:
     void paramsChanged();
@@ -202,7 +212,6 @@ public:
 
     bool isInheritPI() const;
     bool hasPrototypePi() const;
-    bool postInit() override;
 
     QStringList inheritedLables() const;
     void setPrototype(const IVInterfaceProvided *pi);

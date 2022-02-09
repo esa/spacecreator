@@ -24,12 +24,7 @@
 #include "types/constraints/containertypeconstraint.h"
 #include "types/constraints/containervalueconstraint.h"
 #include "types/datatyperef.h"
-#include "types/entries/entry.h"
-#include "types/entries/errorcontrolentry.h"
-#include "types/entries/fixedvalueentry.h"
-#include "types/entries/lengthentry.h"
-#include "types/entries/listentry.h"
-#include "types/entries/paddingentry.h"
+#include "types/entries/entrytype.h"
 
 #include <optional>
 #include <variant>
@@ -39,8 +34,7 @@ namespace seds::model {
 class ContainerDataType final : public CompositeDataType
 {
 public:
-    using EntryListType = std::variant<Entry, ErrorControlEntry, FixedValueEntry, LengthEntry, ListEntry, PaddingEntry>;
-    using EntryList = std::vector<EntryListType>;
+    using EntryList = std::vector<EntryType>;
     using ContainerConstraintType =
             std::variant<ContainerRangeConstraint, ContainerTypeConstraint, ContainerValueConstraint>;
     using ConstraintSet = std::vector<ContainerConstraintType>;
@@ -55,10 +49,12 @@ public:
     auto addConstraint(ContainerConstraintType constraint) -> void;
 
     auto entries() const -> const EntryList &;
-    auto addEntry(EntryListType entry) -> void;
+    auto addEntry(EntryType entry) -> void;
 
     auto trailerEntries() const -> const EntryList &;
-    auto addTrailerEntry(EntryListType entry) -> void;
+    auto addTrailerEntry(EntryType entry) -> void;
+
+    auto entry(const common::String &name) const -> const EntryType *;
 
     auto baseType() const -> const std::optional<DataTypeRef> &;
     auto setBaseType(DataTypeRef baseType) -> void;

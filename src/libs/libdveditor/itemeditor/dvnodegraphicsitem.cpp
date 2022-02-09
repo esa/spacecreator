@@ -70,6 +70,12 @@ int DVNodeGraphicsItem::itemLevel(bool isSelected) const
     return isSelected ? 1 : 0;
 }
 
+void DVNodeGraphicsItem::childBoundingBoxChanged()
+{
+    rebuildLayout();
+    layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Rebuild);
+}
+
 shared::ColorManager::HandledColors DVNodeGraphicsItem::handledColorType() const
 {
     return shared::ColorManager::HandledColors::Node;
@@ -82,8 +88,11 @@ void DVNodeGraphicsItem::rebuildLayout()
     if (nestedContent.isValid()) {
         const QRectF contentRect = nestedContent.marginsAdded(shared::graphicsviewutils::kContentMargins);
         if (!sceneBoundingRect().contains(contentRect)) {
-            setRect(sceneBoundingRect() | contentRect);
-            mergeGeometry();
+            const QRectF upcomingRect = sceneBoundingRect() | contentRect;
+            if (!shared::graphicsviewutils::isCollided(this, upcomingRect)) {
+                setRect(upcomingRect);
+                mergeGeometry();
+            }
         }
     }
 }

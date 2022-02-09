@@ -80,7 +80,7 @@ void tst_AttributesConfigure::tst_loadImpl()
     dp.setValue(QList<QVariant> { QVariant::fromValue(QString("value1")), QVariant::fromValue(QString("value2")) });
     dp.setValueValidatorPattern(QString("[\\d+]"));
     dp.setAttrValidatorPattern(
-            QMap<int, QPair<QString, QString>> { { scope, qMakePair(QString("attrName"), QString("value")) } });
+            QMultiMap<int, QPair<QString, QString>> { { scope, qMakePair(QString("attrName"), QString("value")) } });
 
     QDomDocument doc;
     doc.appendChild(dp.toXml(&doc));
@@ -338,7 +338,7 @@ void tst_AttributesConfigure::tst_attrValidators()
     ivm::IVConnection connection(&reqIface, &provIface);
     comment.setEntityAttribute(QLatin1String("Custom_Connection_Attribute"), QStringLiteral("0123456789"));
 
-    const QMap<int, QPair<QString, QString>> validators {
+    const QMultiMap<int, QPair<QString, QString>> validators {
         { int(ivm::IVPropertyTemplate::Scope::Function), { "name", "[a-zA-Z_]+[\\d\\w]*" } },
         { int(ivm::IVPropertyTemplate::Scope::Provided_Interface), { "kind", "Protected" } },
         { int(ivm::IVPropertyTemplate::Scope::Required_Interface), { "kind", "Any" } },

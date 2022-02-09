@@ -42,7 +42,7 @@ IVFunction::IVFunction(QObject *parent, const shared::Id &id)
 {
 }
 
-IVFunction::~IVFunction() { }
+IVFunction::~IVFunction() {}
 
 bool IVFunction::postInit()
 {
@@ -162,6 +162,11 @@ void IVFunction::removeImplementation(int idx)
 void IVFunction::setDefaultImplementation(const QString &name)
 {
     setEntityAttribute(meta::Props::token(meta::Props::Token::default_implementation), name);
+    auto it = std::find_if(d->m_implementations.cbegin(), d->m_implementations.cend(),
+            [&name](const EntityAttribute &impl) { return impl.name() == name; });
+    if (it != d->m_implementations.cend()) {
+        setEntityAttribute(meta::Props::token(meta::Props::Token::language), it->value());
+    }
 }
 
 QString IVFunction::defaultImplementation() const
@@ -172,7 +177,7 @@ QString IVFunction::defaultImplementation() const
 bool IVFunction::isPseudoFunction() const
 {
     /// @todo update to multi language support
-    return entityAttributeValue("language").toString() == "Pseudo function";
+    return entityAttributeValue(meta::Props::token(meta::Props::Token::language)).toString() == "Pseudo function";
 }
 
 void IVFunction::reflectAttrs(const EntityAttributes &attributes)
@@ -180,7 +185,7 @@ void IVFunction::reflectAttrs(const EntityAttributes &attributes)
     EntityAttributes prepared { attributes };
     static const QList<meta::Props::Token> excludeTokens = { meta::Props::Token::is_type,
         meta::Props::Token::instance_of, meta::Props::Token::name, meta::Props::Token::RootCoordinates,
-        meta::Props::Token::coordinates };
+        meta::Props::Token::coordinates, meta::Props::Token::enable_multicast };
     for (meta::Props::Token t : excludeTokens) {
         const QString name = meta::Props::token(t);
         prepared[name] = entityAttribute(name);
@@ -206,6 +211,7 @@ void IVFunction::reflectAttr(const QString &attrName)
     case meta::Props::Token::instance_of:
     case meta::Props::Token::RootCoordinates:
     case meta::Props::Token::coordinates:
+    case meta::Props::Token::enable_multicast:
         break;
     case meta::Props::Token::name:
         setEntityAttribute(meta::Props::token(meta::Props::Token::instance_of), d->m_fnType->title());
@@ -236,7 +242,14 @@ void IVFunction::reflectContextParam()
 
 void IVFunction::reflectContextParams(const QVector<shared::ContextParameter> &params)
 {
-    setContextParams(params);
+    QVector<shared::ContextParameter> parameters { params };
+    std::for_each(parameters.begin(), parameters.end(), [this](shared::ContextParameter &param) {
+        const shared::ContextParameter cp = contextParam(param.name());
+        if (!cp.isNull()) {
+            param.setDefaultValue(cp.defaultValue());
+        }
+    });
+    setContextParams(parameters);
 }
 
 void IVFunction::checkDefaultFunctionImplementation()

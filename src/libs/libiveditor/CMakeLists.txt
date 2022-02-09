@@ -16,12 +16,16 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdconnectiongroupitemcreate.h
     commands/cmdconnectionitemcreate.cpp
     commands/cmdconnectionitemcreate.h
+    commands/cmdconnectionlayermanage.cpp
+    commands/cmdconnectionlayermanage.h
     commands/cmdcontextparameterchange.cpp
     commands/cmdcontextparameterchange.h
     commands/cmdcontextparametercreate.cpp
     commands/cmdcontextparametercreate.h
     commands/cmdcontextparameterremove.cpp
     commands/cmdcontextparameterremove.h
+    commands/cmdcontextparameterreorder.cpp
+    commands/cmdcontextparameterreorder.h
     commands/cmdentitiesimport.cpp
     commands/cmdentitiesimport.h
     commands/cmdentitiesinstantiate.cpp
@@ -54,6 +58,8 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdifaceparamcreate.h
     commands/cmdifaceparamremove.cpp
     commands/cmdifaceparamremove.h
+    commands/cmdifaceparamreorder.cpp
+    commands/cmdifaceparamreorder.h
     commands/cmdinterfaceitemcreate.cpp
     commands/cmdinterfaceitemcreate.h
     commands/cmdrequiredifacepropertychange.cpp
@@ -104,6 +110,8 @@ target_sources(${LIB_NAME} PRIVATE
     modelchecking/xmelwriter.cpp
     modelchecking/xmelreader.h
     modelchecking/xmelreader.cpp
+    endtoend/end2endfunctiongraphicsitem.cpp
+    endtoend/end2endfunctiongraphicsitem.h
     interfacedocument.cpp
     interfacedocument.h
     itemeditor/common/ivutils.cpp
@@ -185,8 +193,11 @@ target_sources(${LIB_NAME} PRIVATE
     config/ivlibrarywidget.h
     config/ivlibrarydialog.cpp
     config/ivlibrarydialog.h
-)
+    )
 
+if(${QT_VERSION_MAJOR} STREQUAL "6")
+    set(QT_SVGWIDGETS Qt6::SvgWidgets)
+endif()
 target_link_libraries(${LIB_NAME}
     ivcore
     asn1library
@@ -196,9 +207,10 @@ target_link_libraries(${LIB_NAME}
     ${QT_CONCURRENT}
     ${QT_NETWORK}
     ${QT_SVG}
+    ${QT_SVGWIDGETS}
     ${QT_WIDGETS}
     ${QT_XML}
-)
+    )
 
 target_include_directories(${LIB_NAME} PUBLIC .)
 

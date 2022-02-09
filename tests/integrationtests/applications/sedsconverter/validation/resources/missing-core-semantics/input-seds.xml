@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="SimpleDataTypes">
+    <DataTypeSet>
+      <EnumeratedDataType name="SimpleEnumeration">
+        <LongDescription>A simple enumeration</LongDescription>
+        <IntegerDataEncoding encoding="twosComplement" byteOrder="bigEndian" sizeInBits="16" />
+        <EnumerationList>
+          <Enumeration value="12" label="Value1" />
+          <Enumeration value="15" label="Value2" />
+          <Enumeration value="-12" label="NegativeValue" />
+        </EnumerationList>
+      </EnumeratedDataType>
+    </DataTypeSet>
+  </Package>
+</PackageFile>

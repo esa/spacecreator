@@ -21,6 +21,7 @@
 
 #include <QVector>
 #include <ivcore/ivinterface.h>
+#include <optional>
 
 namespace Asn1Acn {
 class Definitions;
@@ -32,6 +33,7 @@ class IVFunction;
 
 namespace seds::model {
 class Component;
+class GenericTypeMapSet;
 class Interface;
 class InterfaceDeclaration;
 class Package;
@@ -51,7 +53,7 @@ public:
      * @param   sedsPackage         Package with components to translate
      * @param   asn1Definitions     ASN.1 file where types of the packed argument will be saved
      */
-    ComponentsTranslator(const seds::model::Package &sedsPackage, Asn1Acn::Definitions *asn1Definitions);
+    ComponentsTranslator(const seds::model::Package *sedsPackage, Asn1Acn::Definitions *asn1Definitions);
     /**
      * @brief   Deleted copy constructor
      */
@@ -97,6 +99,18 @@ private:
      */
     auto translateInterface(const seds::model::Interface &sedsInterface, const seds::model::Component &sedsComponent,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) -> void;
+    auto translateInterfaceDeclaration(const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
+            const QString &sedsInterfaceName, const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
+            const seds::model::Component &sedsComponent, const ivm::IVInterface::InterfaceType interfaceType,
+            ivm::IVFunction *ivFunction) const -> void;
+    auto translateParameters(const QString &sedsInterfaceName,
+            const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
+            const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
+            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
+    auto translateCommands(const QString &sedsInterfaceName,
+            const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
+            const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
+            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
 
 private:
     /**
@@ -117,7 +131,7 @@ private:
 
 private:
     /// @brief  Parent package
-    const seds::model::Package &m_sedsPackage;
+    const seds::model::Package *m_sedsPackage;
     /// @brief  Target ASN.1 type definitions
     Asn1Acn::Definitions *m_asn1Definitions;
 };

@@ -1,5 +1,6 @@
 #include "graphicsviewutils.h"
 
+#include "positionlookuphelper.h"
 #include "ui/veinteractiveobject.h"
 #include "ui/verectgraphicsitem.h"
 #include "veobject.h"
@@ -211,7 +212,7 @@ QRectF getNearestIntersectedRect(
 Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos)
 {
     if (!boundingArea.isValid())
-        return 0;
+        return Qt::AlignCenter;
 
     Qt::Alignment side = Qt::AlignCenter;
     if (boundingArea.contains(pos)) {
@@ -939,14 +940,14 @@ bool isOnVerticalSide(const QRectF &rect, const QPointF &point)
 {
     return (qFuzzyCompare(rect.left(), point.x()) || qFuzzyCompare(rect.right(), point.x()))
             && ((rect.top() < point.y() && rect.bottom() > point.y()) || qFuzzyCompare(rect.top(), point.y())
-                       || qFuzzyCompare(rect.bottom(), point.y()));
+                    || qFuzzyCompare(rect.bottom(), point.y()));
 }
 
 bool isOnHorizontalSide(const QRectF &rect, const QPointF &point)
 {
     return (qFuzzyCompare(rect.top(), point.y()) || qFuzzyCompare(rect.bottom(), point.y()))
             && ((rect.left() < point.x() && rect.right() > point.x()) || qFuzzyCompare(rect.left(), point.x())
-                       || qFuzzyCompare(rect.right(), point.x()));
+                    || qFuzzyCompare(rect.right(), point.x()));
 }
 
 bool rectContainsPoint(const QRectF &rect, const QPointF &point, bool proper)
@@ -1114,6 +1115,32 @@ void drawText(QPainter *painter, const QRectF &rect, const QString &text, qreal 
         textLayout.endLayout();
         if (complete)
             break;
+    }
+}
+
+void findGeometryForPoint(
+        QPointF &ifacePos, const QRectF &boundedRect, const QList<QRectF> &existingRects, const QMarginsF &margins)
+{
+    const QRectF kBaseRect = adjustFromPoint(QPointF(0, 0), kInterfaceBaseLength);
+    QRectF itemRect = adjustFromPoint(ifacePos, kInterfaceBaseLength + kSiblingMinDistance);
+
+    itemRect.moveCenter(ifacePos);
+    QRectF intersectedRect;
+
+    if (((ifacePos.isNull() && existingRects.isEmpty()) || isCollided(existingRects, itemRect, &intersectedRect))
+            && boundedRect.isValid()) {
+        QPainterPath pp;
+        pp.addRect(kBaseRect);
+        const QList<QPair<Qt::Alignment, QPainterPath>> sidePaths {
+            { Qt::AlignLeft, pp },
+            { Qt::AlignTop, pp },
+            { Qt::AlignRight, pp },
+            { Qt::AlignBottom, pp },
+        };
+        shared::PositionLookupHelper helper(sidePaths, boundedRect, existingRects, ifacePos);
+        if (helper.lookup()) {
+            ifacePos = helper.mappedOriginPoint();
+        }
     }
 }
 

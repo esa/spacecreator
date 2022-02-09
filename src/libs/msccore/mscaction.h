@@ -35,7 +35,7 @@ class MscAction : public MscInstanceEvent
     Q_PROPERTY(QString informalAction READ informalAction WRITE setInformalAction NOTIFY informalActionChanged)
     Q_PROPERTY(bool isAssignAction READ isAssignAction NOTIFY isAssignActionChanged)
     Q_PROPERTY(QVector<msc::DataStatement *> dataStatements READ dataStatements NOTIFY dataStatementsChanged)
-    Q_PROPERTY(msc::MscInstance *instance READ instance WRITE setInstance NOTIFY instanceChanged)
+    Q_PROPERTY(msc::MscEntity *instance READ instanceObj WRITE setInstanceObj NOTIFY instanceChanged)
 
 public:
     enum class ActionType
@@ -63,6 +63,8 @@ public:
 
     MscInstance *instance() const;
     void setInstance(MscInstance *instance);
+    MscEntity *instanceObj() const;
+    void setInstanceObj(MscEntity *instance);
 
     bool relatesTo(const MscInstance *instance) const override;
 

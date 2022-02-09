@@ -40,6 +40,7 @@
 #include "tools/timercreatortool.h"
 #include "ui_mscappwidget.h"
 
+#include <QActionGroup>
 #include <QApplication>
 #include <QClipboard>
 #include <QDebug>

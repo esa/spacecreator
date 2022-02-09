@@ -24,8 +24,8 @@
 #include <QLineEdit>
 #include <QMenu>
 #include <QModelIndexList>
-#include <QRegExp>
-#include <QRegExpValidator>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <QScopedPointer>
 #include <QStyledItemDelegate>
 #include <functional>
@@ -46,7 +46,7 @@ public:
         QWidget *editor = QStyledItemDelegate::createEditor(parent, option, index);
         auto line = qobject_cast<QLineEdit *>(editor);
         if (line) {
-            auto nameValidator = new QRegExpValidator(msc::MscEntity::nameVerifier(), line);
+            auto nameValidator = new QRegularExpressionValidator(msc::MscEntity::nameVerifier(), line);
             line->setValidator(nameValidator);
         }
         return editor;

@@ -18,8 +18,10 @@
 #pragma once
 
 #include "cif/cifblock.h"
+#include "cif/cifline.h"
 
 #include <QPointer>
+#include <QRegularExpression>
 #include <QString>
 #include <QUuid>
 #include <QVector>
@@ -32,7 +34,7 @@ class MscEntity : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
-    Q_PROPERTY(msc::MscComment *comment READ comment WRITE setComment NOTIFY commentChanged)
+    Q_PROPERTY(QObject *comment READ commentObj WRITE setCommentObj NOTIFY commentChanged)
     Q_PROPERTY(QString commentString READ commentString WRITE setCommentString NOTIFY commentChanged)
     Q_PROPERTY(msc::MscEntity::EntityType entityType READ entityType CONSTANT)
     Q_PROPERTY(QString cifText READ cifText NOTIFY cifTextChanged)
@@ -60,7 +62,7 @@ public:
     const QString &name() const;
     void setName(const QString &name);
 
-    static const QRegExp &nameVerifier();
+    static const QRegularExpression &nameVerifier();
 
     QUuid internalId() const;
 
@@ -68,6 +70,8 @@ public:
 
     MscComment *comment() const;
     void setComment(MscComment *comment);
+    QObject *commentObj() const;
+    void setCommentObj(QObject *obj);
 
     QString commentString() const;
     MscComment *setCommentString(const QString &comment);
@@ -99,7 +103,7 @@ private:
     QPointer<MscComment> m_comment;
     QVector<cif::CifBlockShared> m_cifs;
 
-    static const QRegExp m_nameVerify;
+    static const QRegularExpression m_nameVerify;
 };
 
 }

@@ -19,6 +19,7 @@
 
 #include "chartindex.h"
 #include "mscentity.h"
+#include "mscinstance.h"
 #include "mscmessage.h"
 
 #include <QHash>
@@ -33,7 +34,6 @@ class MscAction;
 class MscCondition;
 class MscCoregion;
 class MscDocument;
-class MscInstance;
 class MscInstanceEvent;
 class MscGate;
 class MscTimer;

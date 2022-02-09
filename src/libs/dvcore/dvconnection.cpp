@@ -18,10 +18,7 @@
 #include "dvconnection.h"
 
 #include "connectionvalidator.h"
-#include "dvdevice.h"
-#include "dvmessage.h"
 #include "dvmodel.h"
-#include "dvnode.h"
 #include "errorhub.h"
 
 #include <QDebug>

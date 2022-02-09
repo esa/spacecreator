@@ -21,8 +21,8 @@
 
 #include <QHash>
 #include <QPainterPath>
-#include <qnamespace.h>
 #include <memory>
+#include <qnamespace.h>
 
 namespace shared {
 
@@ -47,8 +47,9 @@ class PositionLookupHelper
 {
 public:
     explicit PositionLookupHelper(const QList<QPair<Qt::Alignment, QPainterPath>> &sidePaths, const QRectF &parentRect,
-            const QList<QRectF> &siblingsRects, const QRectF &itemRect, const QPointF &originPoint,
-            const shared::graphicsviewutils::LookupDirection direction = shared::graphicsviewutils::LookupDirection::Bidirectional);
+            const QList<QRectF> &siblingsRects, const QPointF &pos,
+            const shared::graphicsviewutils::LookupDirection direction =
+                    shared::graphicsviewutils::LookupDirection::Bidirectional);
 
     ~PositionLookupHelper();
 

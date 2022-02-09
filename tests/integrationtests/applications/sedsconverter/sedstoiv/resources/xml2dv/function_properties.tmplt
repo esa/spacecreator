@@ -1,0 +1,9 @@
+{% if func.functions|length > 0 %} 
+{% for func in func.functions %}
+{% include "function_properties.tmplt" %}
+{% endfor %}
+{% else %}
+{% for attr in func.attributes %}
+   {% if attr.name == "is_type" and attr.value == "NO" %}Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_{{ func.name }};{% endif %}
+{% endfor %}
+{% endif %}

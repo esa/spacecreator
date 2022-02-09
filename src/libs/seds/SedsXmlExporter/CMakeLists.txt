@@ -1,8 +1,14 @@
 project(SedsXmlExporter VERSION 1.0.0 LANGUAGES CXX)
 
-set(SOURCES exporter.cpp)
+set(SOURCES     exporter.cpp
+                specialized/datatypeexporter.cpp
+                specialized/componentexporter.cpp
+                specialized/interfaceexporter.cpp)
 
-set(INCLUDES exporter.h)
+set(INCLUDES    exporter.h
+                specialized/datatypeexporter.h
+                specialized/componentexporter.h
+                specialized/interfaceexporter.h)
 
 add_library(SedsXmlExporter STATIC)
 target_sources(SedsXmlExporter
@@ -14,6 +20,7 @@ target_include_directories(SedsXmlExporter
 target_link_libraries(SedsXmlExporter
     PUBLIC      Conversion::Common
                 SEDS::Model
+                Qt${QT_VERSION_MAJOR}::Xml
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(SedsXmlExporter)

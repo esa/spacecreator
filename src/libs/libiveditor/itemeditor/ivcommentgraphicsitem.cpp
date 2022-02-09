@@ -24,6 +24,7 @@
 #include "graphicsviewutils.h"
 #include "itemeditor/common/ivutils.h"
 #include "ivcomment.h"
+#include "ivcoreutils.h"
 #include "ivfunctiongraphicsitem.h"
 #include "ivnamevalidator.h"
 #include "ivpropertytemplateconfig.h"
@@ -94,7 +95,8 @@ void IVCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsI
 void IVCommentGraphicsItem::rebuildLayout()
 {
     shared::ui::VERectGraphicsItem::rebuildLayout();
-    setVisible(entity() && (gi::nestingLevel(entity()) >= gi::kNestingVisibilityLevel || entity()->isRootObject())
+    setVisible(entity()
+            && (ivm::utils::nestingLevel(entity()) >= gi::kNestingVisibilityLevel || entity()->isRootObject())
             && entity()->isVisible());
     update();
 }

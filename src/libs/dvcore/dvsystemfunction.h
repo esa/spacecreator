@@ -18,11 +18,11 @@
 #pragma once
 
 #include "dvobject.h"
+#include "dvsysteminterface.h"
 
 #include <QList>
 
 namespace dvm {
-class DVSystemInterface;
 
 class DVSystemFunction : public DVObject
 {

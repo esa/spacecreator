@@ -98,7 +98,7 @@ class tst_sdlmodel : public QObject
 {
     Q_OBJECT
 
-public Q_SLOTS:
+private Q_SLOTS:
     void testDefaultValuesInModel();
     void testGenerateBasicProcess();
     void testGenerateProcessWithDeclarationsAndTasks();

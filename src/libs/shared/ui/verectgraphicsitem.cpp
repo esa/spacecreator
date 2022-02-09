@@ -365,5 +365,7 @@ void VERectGraphicsItem::layoutConnectionsOnMove(VEConnectionGraphicsItem::Colli
         }
     }
 }
-}
-}
+
+} // namespace ui
+
+} // namespace shared

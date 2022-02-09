@@ -1,0 +1,53 @@
+COM-N7SPACE-CONTAINERINHERITANCE DEFINITIONS ::= BEGIN
+DataType ::= INTEGER(0 .. 10)
+GigaContainer ::= SEQUENCE
+{
+    realization CHOICE
+    {
+        realizationGigaContainer SEQUENCE
+        {
+            gigaEntry DataType(0 .. 10)
+        } ,
+        realizationMegaContainer MegaContainer
+    }
+}
+MegaContainer ::= SEQUENCE
+{
+    realization CHOICE
+    {
+        realizationParentContainer ParentContainer
+    }
+}
+ParentContainer ::= SEQUENCE
+{
+    realization CHOICE
+    {
+        realizationParentContainer SEQUENCE
+        {
+            gigaEntry DataType(0 .. 10),
+            megaEntry DataType(0 .. 10),
+            parentEntry DataType(0 .. 10),
+            megaTrailerEntry DataType(0 .. 10)
+        } ,
+        realizationChildContainer1 ChildContainer1,
+        realizationChildContainer2 ChildContainer2
+    }
+}
+ChildContainer1 ::= SEQUENCE
+{
+    gigaEntry DataType(0 .. 10),
+    megaEntry DataType(0 .. 10),
+    parentEntry DataType(0 .. 10),
+    childEntry1 DataType(0 .. 10),
+    megaTrailerEntry DataType(0 .. 10)
+}
+ChildContainer2 ::= SEQUENCE
+{
+    gigaEntry DataType(0 .. 10),
+    megaEntry DataType(0 .. 10),
+    parentEntry DataType(0 .. 10),
+    childEntry2 DataType(0 .. 10),
+    megaTrailerEntry DataType(0 .. 10)
+}
+END
+

@@ -83,23 +83,9 @@ public:
 };
 
 /**
- * @brief   Exception thrown when registering capabilities for model failed
- */
-class RegistrationFailedException : public ConversionException
-{
-public:
-    /**
-     * @brief   Constructor
-     *
-     * @param   modelType       Type of model for which registration failed
-     */
-    explicit RegistrationFailedException(ModelType modelType);
-};
-
-/**
  * @brief   Exception thrown when importer for given model type wasn't registered
  */
-class ImporterNotRegisteredException : public ConversionException
+class ImporterNotRegisteredException final : public ConversionException
 {
 public:
     /**
@@ -113,7 +99,7 @@ public:
 /**
  * @brief   Exception thrown when translator for given model type wasn't registered
  */
-class TranslatorNotRegisteredException : public ConversionException
+class TranslatorNotRegisteredException final : public ConversionException
 {
 public:
     /**
@@ -131,7 +117,7 @@ private:
 /**
  * @brief   Exception thrown when exporter for given model type wasn't registered
  */
-class ExporterNotRegisteredException : public ConversionException
+class ExporterNotRegisteredException final : public ConversionException
 {
 public:
     /**
@@ -143,17 +129,32 @@ public:
 };
 
 /**
- * @brief   Exception throw when given string name doesn't correspond to any known model type
+ * @brief   Exception thrown when translator encounters unhandled value while handling enum values
  */
-class InvalidModelNameException : public ConversionException
+class UnhandledValueException final : public ConversionException
 {
 public:
     /**
      * @brief   Constructor
      *
-     * @param   modelName   Model name that is invalid
+     * @param   enumName        Name of the enum
      */
-    explicit InvalidModelNameException(const QString &modelName);
+    explicit UnhandledValueException(const QString &enumName);
+};
+
+/**
+ * @brief   Exception thrown when translator encounters unsupported value while handling enum values
+ */
+class UnsupportedValueException final : public ConversionException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   enumName        Name of the enum
+     * @param   valueTypeName   Name of the unsupported value type
+     */
+    explicit UnsupportedValueException(const QString &enumName, const QString &valueTypeName);
 };
 
 } // namespace conversion

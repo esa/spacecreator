@@ -19,6 +19,7 @@
 
 #include "importer.h"
 
+#include <QFileInfo>
 #include <QString>
 #include <conversion/common/exceptions.h>
 #include <conversion/common/import/exceptions.h>
@@ -49,7 +50,13 @@ IVPropertyTemplateConfig *IvXmlImporter::initConfig(const Options &options) cons
 {
     const auto configFilepath = options.value(IvOptions::configFilepath);
     if (!configFilepath) {
-        throw ImportException("Configuration file wasn't specified");
+        throw ImportException("InterfaceView configuration file wasn't specified");
+    }
+
+    QFileInfo configFile(*configFilepath);
+    if (!configFile.exists()) {
+        auto errorMsg = QString("InterfaceView configuration file '%1' doesn't exist").arg(*configFilepath);
+        throw ImportException(std::move(errorMsg));
     }
 
     auto *config = IVPropertyTemplateConfig::instance();

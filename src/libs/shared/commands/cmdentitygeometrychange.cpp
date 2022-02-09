@@ -66,23 +66,23 @@ bool CmdEntityGeometryChange::mergeGeometryData(const QList<QPair<shared::VEObje
         return false;
     }
 
-    QList<ObjectData> data = convertData(objectsData);
+    const QList<ObjectData> data = convertData(objectsData);
     if (data.isEmpty()) {
         return false;
     }
 
-    while (!m_data.isEmpty() && !data.isEmpty()) {
-        if (m_data.last() == data.last()) {
-            data.takeLast();
-        } else if (m_data.last().entity == data.last().entity) {
-            if (data.last().entity->coordinates() != data.last().newCoordinates)
-                data.last().entity->setCoordinates(data.last().newCoordinates);
-            m_data.last() = data.takeLast();
-        } else {
-            break;
-        }
-    }
     for (const ObjectData &objGeometryData : data) {
+        if (!m_data.isEmpty()) {
+            const ObjectData &objData = m_data.last();
+            if (objData.entity == objGeometryData.entity) {
+                if (objData.newCoordinates != objGeometryData.newCoordinates
+                        || objData.prevCoordinates != objGeometryData.prevCoordinates) {
+                    objData.entity->setCoordinates(objGeometryData.newCoordinates);
+                }
+                continue;
+            }
+        }
+
         m_data.append(objGeometryData);
         objGeometryData.entity->setCoordinates(objGeometryData.newCoordinates);
     }

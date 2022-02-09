@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -34,6 +34,7 @@ using conversion::Options;
 using conversion::exporter::ExportException;
 using conversion::exporter::IncorrectModelException;
 using conversion::exporter::MissingOutputFilenameException;
+using conversion::exporter::NullModelException;
 using conversion::sdl::SdlOptions;
 using sdl::SdlModel;
 
@@ -42,7 +43,7 @@ namespace sdl::exporter {
 void SdlExporter::exportModel(const Model *const model, const Options &options) const
 {
     if (model == nullptr) {
-        throw ExportException("Model to export is null");
+        throw NullModelException();
     }
 
     const auto *const sdlModel = dynamic_cast<const SdlModel *>(model);
@@ -51,6 +52,17 @@ void SdlExporter::exportModel(const Model *const model, const Options &options) 
     }
 
     exportSdlModel(sdlModel, options);
+}
+
+QStringList SdlExporter::getFilenamesForModel(const SdlModel *const model)
+{
+    QStringList names;
+
+    for (const auto &process : model->processes()) {
+        names.append(makeSdlFilename(process));
+    }
+
+    return names;
 }
 
 void SdlExporter::exportSdlModel(const SdlModel *const model, const Options &options) const
@@ -65,39 +77,26 @@ void SdlExporter::exportProcess(const Process &process, const Options &options) 
     QString serializedProcess;
     QTextStream outputTextStream(&serializedProcess, QIODevice::WriteOnly);
 
-    sdl::SdlVisitor visitor(outputTextStream);
+    sdl::SdlVisitor::Layouter layouter;
+    sdl::SdlVisitor::IndentingStreamWriter writer(outputTextStream);
+    sdl::SdlVisitor visitor(writer, layouter);
 
     visitor.visit(process);
 
     const auto pathPrefix = options.value(SdlOptions::filepathPrefix).value_or("");
-    const auto filePath = makeFilePath(pathPrefix, process.name(), "pr");
+    const auto filePath = QString("%1%2").arg(pathPrefix).arg(makeSdlFilename(process));
 
     QSaveFile outputFile(filePath);
-    writeAndCommit(outputFile, serializedProcess.toStdString());
+    writeAndCommit(outputFile, serializedProcess);
 }
 
-void SdlExporter::writeAndCommit(QSaveFile &outputFile, const std::string &data) const
+QString SdlExporter::makeSdlFilename(const Process &process)
 {
-    if (!outputFile.open(QIODevice::WriteOnly)) {
-        throw ExportException(QString("Failed to open a file %1").arg(outputFile.fileName()));
-    }
-
-    if (outputFile.write(data.c_str()) == -1) {
-        throw ExportException(QString("Failed to write a file %1").arg(outputFile.fileName()));
-    }
-
-    if (!outputFile.commit()) {
-        throw ExportException(QString("Failed to commit a transaction in %1").arg(outputFile.fileName()));
-    }
-}
-
-QString SdlExporter::makeFilePath(const QString &pathPrefix, const QString &fileName, const QString &extension) const
-{
-    if (fileName.isEmpty()) {
+    if (process.name().isEmpty()) {
         throw MissingOutputFilenameException(ModelType::Sdl);
     }
 
-    return QString("%1%2.%3").arg(pathPrefix, fileName, extension);
+    return QString("%1.%2").arg(process.name().toLower()).arg("pr");
 }
 
 } // namespace sdl::exporter

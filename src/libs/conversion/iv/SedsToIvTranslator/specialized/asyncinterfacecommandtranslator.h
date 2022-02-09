@@ -21,19 +21,8 @@
 
 #include "specialized/interfacecommandtranslator.h"
 
-#include <conversion/common/qstringhash.h>
-#include <map>
 #include <seds/SedsModel/types/datatype.h>
-#include <unordered_map>
-
-namespace Asn1Acn {
-class AsnSequenceComponent;
-class Definitions;
-class SequenceComponent;
-namespace Types {
-class Sequence;
-} // namespace Types
-} // namespace Asn1Acn
+#include <shared/qstringhash.h>
 
 namespace seds::model {
 class CommandArgument;
@@ -55,14 +44,14 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   sedsPackage         Parent SEDS package
-     * @param   sedsComponent       Parent SEDS component
-     * @param   sedsInterface       Parent SEDS interface
+     * @param   sedsInterfaceName   Parent SEDS interface name
+     * @param   genericTypeMap      Generic type mappings
      * @param   asn1Definitions     ASN.1 type definitions for parent package
      * @param   ivFunction          Output interface view function
      */
-    AsyncInterfaceCommandTranslator(const seds::model::Interface &sedsInterface, Asn1Acn::Definitions *asn1Definitions,
-            ivm::IVFunction *ivFunction);
+    AsyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
+            const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
+            Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage);
     /**
      * @brief   Deleted copy constructor
      */
@@ -93,6 +82,18 @@ public:
             ivm::IVInterface::InterfaceType interfaceType) -> void override;
 
 private:
+    struct CommandArgumentData final {
+        QString name;
+        QString typeName;
+
+        friend bool operator==(const CommandArgumentData &lhs, const CommandArgumentData &rhs)
+        {
+            return lhs.name == rhs.name && lhs.typeName == rhs.typeName;
+        }
+
+        friend bool operator!=(const CommandArgumentData &lhs, const CommandArgumentData &rhs) { return !(lhs == rhs); }
+    };
+
     /**
      * @brief   Translates arguments of a SEDS interface command
      *
@@ -113,51 +114,42 @@ private:
      *
      * @return  Name of the created type
      */
-    auto buildAsn1SequenceType(const seds::model::InterfaceCommand &sedsCommand,
+    auto buildBundledType(const seds::model::InterfaceCommand &sedsCommand,
             seds::model::CommandArgumentMode requestedArgumentMode) -> QString;
-
     /**
-     * @brief   Creates ASN.1 sequence type
+     * @brief   Creates ASN.1 sequence type that bundles all argumenst
      *
      * Adds the created sequence to the ASN.1 definitions member
      *
      * @param   name        Name of the sequence
      * @param   arguments   SEDS command arguments
+     *
+     * @return  Bundled type name
      */
-    auto createAsn1Sequence(const QString &name, const std::unordered_map<QString, QString> &arguments) -> void;
+    auto createBundledType(const QString &sedsCommandName, const std::vector<CommandArgumentData> &arguments)
+            -> QString;
+    /**
+     * @brief   Filters all arguments by their mode
+     *
+     * @param   sedsArguments           Arguments to process
+     * @param   requestedArgumentMode   Which arguments should be used
+     *
+     * @return  Matching arguments
+     */
+    auto filterArguments(const std::vector<seds::model::CommandArgument> &sedsArguments,
+            seds::model::CommandArgumentMode requestedArgumentMode) const -> std::vector<CommandArgumentData>;
+
     /**
      * @brief   Creates ASN.1 sequence component type
      *
      * Added the created sequence component to the passed ASN.1 sequence
      *
-     * @param   name        Name of the component
-     * @param   typeName    Name of the component type
-     * @param   sequence    Sequence to which component should be added
+     * @param   argumentData    Argument data from which sequence component should be created
+     * @param   sequence        Sequence to which component should be added
      */
-    auto createAsn1SequenceComponent(
-            const QString &name, const QString &typeName, Asn1Acn::Types::Sequence *sequence) const -> void;
-    /**
-     *  Create a name for the bundled argument type
-     *
-     *  @param  sedsCommandName     SEDS command name
-     *  @param  counter             Additional counter
-     *
-     *  @return Type name
-     */
-    auto createBundledTypeName(const QString &sedsCommandName, const std::size_t counter = 0) const -> QString;
+    auto createAsn1SequenceComponent(const CommandArgumentData &argumentData, Asn1Acn::Types::Sequence *sequence) const
+            -> void;
 
-    /**
-     * @brief   Process SEDS command arguments types
-     *
-     * Maps generic types of the arguments to a concrete type
-     *
-     * @param   sedsArguments   Arguments to process
-     * @param   requestedArgumentMode   Which arguments should be used
-     *
-     * @return  Processed arguments
-     */
-    auto processArgumentsTypes(const std::vector<seds::model::CommandArgument> &sedsArguments,
-            seds::model::CommandArgumentMode requestedArgumentMode) const -> std::unordered_map<QString, QString>;
     /**
      * @brief   Calculates hash from arguments types
      *
@@ -165,37 +157,25 @@ private:
      *
      * @return  Calculated hash
      */
-    auto calculateArgumentsHash(const std::unordered_map<QString, QString> &arguments) const -> std::size_t;
+    auto calculateArgumentsHash(const std::vector<CommandArgumentData> &arguments) const -> std::size_t;
 
     /**
-     * @brief   Checks if given type name is mapped in the parent SEDS interface
+     *  Create a name for the bundled argument type
      *
-     * @param   genericTypeName     Generic type name
+     *  @param  sedsCommandName     SEDS command name
      *
-     * @return  Mapped type name if given type name was mapped, given type name otherwise
+     *  @return Type name
      */
-    auto findMappedType(const QString &genericTypeName) const -> const QString &;
-
-    /**
-     * @brief   Swaps between provided and required interface types
-     *
-     * @param   interfaceType   Interface type to switch
-     *
-     * @return  Provided type if required was passed, requried otherwise
-     */
-    auto switchInterfaceType(ivm::IVInterface::InterfaceType interfaceType) const -> ivm::IVInterface::InterfaceType;
+    auto createBundledTypeName(const QString &sedsCommandName) const -> QString;
 
 private:
     struct ArgumentsCacheEntry final {
         QString asn1TypeName;
         std::size_t typeHash;
-        std::unordered_map<QString, QString> typeArguments;
+        std::vector<CommandArgumentData> typeArguments;
 
-        auto compareArguments(const std::unordered_map<QString, QString> &arguments) const -> bool;
+        auto compareArguments(const std::vector<CommandArgumentData> &arguments) const -> bool;
     };
-
-    /// @brief  Output ASN.1 type definitions
-    Asn1Acn::Definitions *m_asn1Definitions;
 
     /// @brief  Cache of the bundled ASN.1 types that was created for given command
     static std::multimap<QString, ArgumentsCacheEntry> m_commandArgumentsCache;

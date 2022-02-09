@@ -64,6 +64,8 @@ public:
         is_visible,
         language,
         default_implementation,
+        enable_multicast,
+        layer,
 
         // KNOWN TASTE props:
         coordinates,

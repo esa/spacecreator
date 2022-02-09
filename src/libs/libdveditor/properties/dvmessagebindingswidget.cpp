@@ -20,6 +20,7 @@
 #include "dvconnection.h"
 #include "dvmessagebindingsmodel.h"
 
+#include <QLabel>
 #include <QPushButton>
 #include <QTreeView>
 #include <QVBoxLayout>
@@ -32,6 +33,9 @@ DVMessageBindingsWidget::DVMessageBindingsWidget(shared::cmd::CommandsStackBase:
 {
     auto layout = new QVBoxLayout(this);
     setLayout(layout);
+
+    m_sourceTargetName = new QLabel(this);
+    layout->addWidget(m_sourceTargetName);
 
     m_treeView = new QTreeView(this);
     m_treeView->setHeaderHidden(true);
@@ -59,6 +63,25 @@ void DVMessageBindingsWidget::initModel(dvm::DVConnection *connection, dvm::Abst
     }
     m_connection = connection;
     m_model->initModel(m_connection, systemChecker);
+
+    QString sourceNodeName;
+    QString sourceDeviceName;
+    if (m_connection->sourceDevice()) {
+        sourceDeviceName = m_connection->sourceDevice()->titleUI();
+        if (m_connection->sourceDevice()->node()) {
+            sourceNodeName = m_connection->sourceDevice()->node()->titleUI();
+        }
+    }
+    QString targetNodeName;
+    QString targetDeviceName;
+    if (m_connection->targetDevice()) {
+        targetDeviceName = m_connection->targetDevice()->titleUI();
+        if (m_connection->targetDevice()->node()) {
+            targetNodeName = m_connection->targetDevice()->node()->titleUI();
+        }
+    }
+    m_sourceTargetName->setText(
+            QString("%1.%2 <-> %3.%4").arg(sourceNodeName, sourceDeviceName, targetNodeName, targetDeviceName));
 }
 
 void DVMessageBindingsWidget::bindAll()

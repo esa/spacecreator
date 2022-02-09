@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,6 +20,7 @@
 #pragma once
 
 #include <conversion/common/export/modelexporter.h>
+#include <conversion/common/model.h>
 #include <sdl/SdlModel/sdlmodel.h>
 
 class QSaveFile;
@@ -60,13 +61,19 @@ public:
      */
     virtual auto exportModel(const conversion::Model *model, const conversion::Options &options) const -> void override;
 
+    /**
+     * @brief Get the file names which will be generated for processes within
+     *
+     * @param model SDL model
+     *
+     * @return      a list of filenames
+     */
+    static auto getFilenamesForModel(const SdlModel *model) -> QStringList;
+
 private:
     auto exportSdlModel(const SdlModel *model, const conversion::Options &options) const -> void;
-
     auto exportProcess(const Process &process, const conversion::Options &options) const -> void;
 
-    auto writeAndCommit(QSaveFile &outputFile, const std::string &data) const -> void;
-
-    auto makeFilePath(const QString &pathPrefix, const QString &fileName, const QString &extension) const -> QString;
+    static auto makeSdlFilename(const Process &process) -> QString;
 };
 } // namespace sdl::exporter

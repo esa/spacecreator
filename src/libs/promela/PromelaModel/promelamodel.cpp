@@ -66,6 +66,11 @@ const QList<Utype> &PromelaModel::getUtypes() const noexcept
     return m_userTypes;
 }
 
+void PromelaModel::setUtypes(const QList<Utype> &utypes)
+{
+    m_userTypes = utypes;
+}
+
 void PromelaModel::addTypeAlias(const TypeAlias &alias)
 {
     m_typeAliases.append(alias);
@@ -94,5 +99,50 @@ void PromelaModel::addDeclaration(const Declaration &declaration)
 const QList<Declaration> &PromelaModel::getDeclarations() const noexcept
 {
     return m_declarations;
+}
+
+void PromelaModel::addInlineDef(std::unique_ptr<InlineDef> inlineDef)
+{
+    m_inlineDefs.push_back(std::move(inlineDef));
+}
+
+const std::list<std::unique_ptr<InlineDef>> &PromelaModel::getInlineDefs() const noexcept
+{
+    return m_inlineDefs;
+}
+
+void PromelaModel::addProctype(std::unique_ptr<Proctype> proctype)
+{
+    m_proctypes.push_back(std::move(proctype));
+}
+
+const std::list<std::unique_ptr<Proctype>> &PromelaModel::getProctypes() const noexcept
+{
+    return m_proctypes;
+}
+
+bool PromelaModel::hasInit() const noexcept
+{
+    return m_initProctype.has_value();
+}
+
+const InitProctype &PromelaModel::getInit() const noexcept
+{
+    return m_initProctype.value();
+}
+
+void PromelaModel::setInit(InitProctype initProctype)
+{
+    m_initProctype = std::move(initProctype);
+}
+
+void PromelaModel::addEpilogueInclude(const QString &file)
+{
+    m_epilogueIncludes.append(file);
+}
+
+const QList<QString> &PromelaModel::getEpilogueIncludes() const noexcept
+{
+    return m_epilogueIncludes;
 }
 }

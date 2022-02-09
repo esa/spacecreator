@@ -44,16 +44,23 @@ MscEditorDocument::MscEditorDocument(SpaceCreatorProjectManager *projectManager,
     setId(Id(spctr::Constants::K_MSC_EDITOR_ID));
 }
 
+#if QTC_VERSION < 500
 Core::IDocument::OpenResult MscEditorDocument::open(
         QString *errorString, const QString &fileName, const QString &realFileName)
 {
+    const QFileInfo fi(fileName);
+#else
+Core::IDocument::OpenResult MscEditorDocument::open(
+        QString *errorString, const Utils::FilePath &fileName, const Utils::FilePath &realFileName)
+{
+    const QFileInfo fi = fileName.toFileInfo();
+#endif
     Q_UNUSED(realFileName)
 
     if (fileName.isEmpty() || !m_projectManager) {
         return OpenResult::ReadError;
     }
 
-    const QFileInfo fi(fileName);
     const QString absfileName = fi.absoluteFilePath();
 
     SpaceCreatorProjectImpl *project = m_projectManager->project(absfileName);
@@ -66,9 +73,9 @@ Core::IDocument::OpenResult MscEditorDocument::open(
         *errorString = m_plugin->mainModel()->mscErrorMessages().join("\n");
     }
 
-#if QTC_VERSION == 48
+#if QTC_VERSION < 409
     setFilePath(Utils::FileName::fromString(absfileName));
-#elif QTC_VERSION == 415
+#else
     setFilePath(Utils::FilePath::fromString(absfileName));
 #endif
 
@@ -78,16 +85,25 @@ Core::IDocument::OpenResult MscEditorDocument::open(
     return OpenResult::Success;
 }
 
+#if QTC_VERSION < 500
 bool MscEditorDocument::save(QString *errorString, const QString &name, bool autoSave)
 {
+#else
+bool MscEditorDocument::save(QString *errorString, const Utils::FilePath &name, bool autoSave)
+{
+#endif
     if (m_plugin.isNull()) {
         return false;
     }
 
-#if QTC_VERSION == 48
+#if QTC_VERSION < 500
+#if QTC_VERSION < 409
     const FileName newName = Utils::FileName::fromString(name);
-#elif QTC_VERSION == 415
+#else
     const FilePath newName = Utils::FilePath::fromString(name);
+#endif
+#else
+    const FilePath newName = name;
 #endif
 
     const auto oldFileName = filePath();
@@ -122,16 +138,7 @@ bool MscEditorDocument::save(QString *errorString, const QString &name, bool aut
     return true;
 }
 
-#if QTC_VERSION == 415
-void MscEditorDocument::setFilePath(const FilePath &newName)
-{
-    if (!m_plugin.isNull()) {
-        m_plugin->mainModel()->setCurrentFilePath(newName.toString());
-    }
-    IDocument::setFilePath(newName);
-}
-
-#elif QTC_VERSION == 48
+#if QTC_VERSION < 409
 void MscEditorDocument::setFilePath(const FileName &newName)
 {
     if (!m_plugin.isNull()) {
@@ -139,7 +146,14 @@ void MscEditorDocument::setFilePath(const FileName &newName)
     }
     IDocument::setFilePath(newName);
 }
-
+#else
+void MscEditorDocument::setFilePath(const FilePath &newName)
+{
+    if (!m_plugin.isNull()) {
+        m_plugin->mainModel()->setCurrentFilePath(newName.toString());
+    }
+    IDocument::setFilePath(newName);
+}
 #endif
 
 bool MscEditorDocument::shouldAutoSave() const

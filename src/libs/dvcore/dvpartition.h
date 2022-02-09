@@ -32,7 +32,7 @@ class DVPartition : public DVObject
     Q_OBJECT
     Q_PROPERTY(QList<dvm::DVFunction *> functions READ functions)
     Q_PROPERTY(QStringList functionsNames READ functionsNames)
-    Q_PROPERTY(dvm::DVNode *node READ node)
+    Q_PROPERTY(dvm::DVObject *node READ node)
 
 public:
     explicit DVPartition(DVObject *parent = nullptr);

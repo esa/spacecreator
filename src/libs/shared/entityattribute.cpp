@@ -17,12 +17,13 @@
 
 #include "entityattribute.h"
 
-EntityAttribute::EntityAttribute() { }
+EntityAttribute::EntityAttribute() {}
 
 EntityAttribute::EntityAttribute(const QString &attrName, const QVariant &attrValue, EntityAttribute::Type type)
     : m_name(attrName)
     , m_value(attrValue)
     , m_type(type)
+    , m_isExportable(true)
 {
 }
 
@@ -71,7 +72,18 @@ bool EntityAttribute::isNull() const
     return m_value.isNull();
 }
 
+void EntityAttribute::setExportable(bool value)
+{
+    m_isExportable = value;
+}
+
+bool EntityAttribute::isExportable() const
+{
+    return m_isExportable;
+}
+
 bool operator==(const EntityAttribute &lhs, const EntityAttribute &rhs)
 {
-    return lhs.name() == rhs.name() && lhs.value() == rhs.value() && lhs.type() == rhs.type();
+    return lhs.name() == rhs.name() && lhs.value() == rhs.value() && lhs.type() == rhs.type()
+            && lhs.isExportable() == rhs.isExportable();
 }

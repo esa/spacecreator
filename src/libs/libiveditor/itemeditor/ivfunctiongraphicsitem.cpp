@@ -187,4 +187,13 @@ void IVFunctionGraphicsItem::applyColorScheme()
     update();
 }
 
+IVFunctionGraphicsItem::IVFunctionGraphicsItem(
+        ivm::IVFunction *entity, std::unique_ptr<MiniViewRenderer> renderer, QGraphicsItem *parent)
+    : IVFunctionTypeGraphicsItem(entity, parent)
+    , m_miniViewDrawer(std::move(renderer))
+{
+    if (!m_svgRenderer) // TODO: change icon
+        m_svgRenderer = new QSvgRenderer(QLatin1String(":/toolbar/icns/change_root.svg"));
+}
+
 } // namespace ive

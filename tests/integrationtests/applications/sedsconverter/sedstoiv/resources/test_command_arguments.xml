@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/CommandArguments">
+  <DataTypeSet>
+    <IntegerDataType name="MyInteger">
+      <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+      <Range>
+        <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+      </Range>
+    </IntegerDataType>
+    <FloatDataType name="MyFloat">
+      <FloatDataEncoding encodingAndPrecision="IEEE754_2008_single" sizeInBits="32" />
+      <Range>
+        <PrecisionRange>single</PrecisionRange>
+      </Range>
+    </FloatDataType>
+  </DataTypeSet>
+  <DeclaredInterfaceSet>
+    <Interface name="AsyncInterface">
+      <CommandSet>
+        <Command name="AsyncInCommand" mode="async">
+          <Argument name="AsyncInArgument1" type="MyInteger" mode="in" />
+          <Argument name="AsyncInArgument2" type="MyInteger" mode="in" />
+        </Command>
+        <Command name="AsyncOutCommand" mode="async">
+          <Argument name="AsyncOutArgument1" type="MyInteger" mode="out" />
+          <Argument name="AsyncOutArgument2" type="MyInteger" mode="out" />
+        </Command>
+      </CommandSet>
+    </Interface>
+    <Interface name="SyncInterface">
+      <CommandSet>
+        <Command name="SyncInCommand" mode="sync">
+          <Argument name="SyncInArgument1" type="MyInteger" mode="in" />
+          <Argument name="SyncInArgument2" type="MyInteger" mode="in" />
+        </Command>
+        <Command name="SyncOutCommand" mode="sync">
+          <Argument name="SyncOutArgument1" type="MyInteger" mode="out" />
+          <Argument name="SyncOutArgument2" type="MyInteger" mode="out" />
+        </Command>
+      </CommandSet>
+    </Interface>
+    <Interface name="GenericInterface">
+      <CommandSet>
+        <Command name="GenericCommand" mode="async">
+          <Argument name="GenericArgument1" type="GenericType" mode="in" />
+          <Argument name="GenericArgument2" type="GenericType" mode="in" />
+        </Command>
+      </CommandSet>
+    </Interface>
+    <Interface name="ArrayInterface">
+      <CommandSet>
+        <Command name="ArrayCommand1" mode="async">
+          <Argument name="ArrayArgument1" type="MyInteger" mode="in">
+            <ArrayDimensions>
+              <Dimension size="10" />
+            </ArrayDimensions>
+          </Argument>
+        </Command>
+        <Command name="ArrayCommand2" mode="async">
+          <Argument name="ArrayArgument1" type="MyInteger" mode="in">
+            <ArrayDimensions>
+              <Dimension size="20" />
+            </ArrayDimensions>
+          </Argument>
+        </Command>
+        <Command name="ArrayCommand3" mode="async">
+          <Argument name="ArrayArgument1" type="MyInteger" mode="in">
+            <ArrayDimensions>
+              <Dimension size="10" />
+            </ArrayDimensions>
+          </Argument>
+        </Command>
+      </CommandSet>
+    </Interface>
+  </DeclaredInterfaceSet>
+  <ComponentSet>
+    <Component name="Component">
+      <ProvidedInterfaceSet>
+        <Interface name="AsyncInterfacePI" type="AsyncInterface"/>
+        <Interface name="SyncInterfacePI" type="SyncInterface"/>
+        <Interface name="GenericInterfaceIntegerPI" type="GenericInterface">
+          <GenericTypeMapSet>
+            <GenericTypeMap name="GenericType" type="MyInteger"/>
+          </GenericTypeMapSet>
+        </Interface>
+        <Interface name="GenericInterfaceIntegerReusePI" type="GenericInterface">
+          <GenericTypeMapSet>
+            <GenericTypeMap name="GenericType" type="MyInteger"/>
+          </GenericTypeMapSet>
+        </Interface>
+        <Interface name="GenericInterfaceFloatPI" type="GenericInterface">
+          <GenericTypeMapSet>
+            <GenericTypeMap name="GenericType" type="MyFloat"/>
+          </GenericTypeMapSet>
+        </Interface>
+        <Interface name="ArrayInterfacePI" type="ArrayInterface"/>
+      </ProvidedInterfaceSet>
+      <RequiredInterfaceSet>
+        <Interface name="AsyncInterfaceRI" type="AsyncInterface"/>
+        <Interface name="SyncInterfaceRI" type="SyncInterface"/>
+      </RequiredInterfaceSet>
+    </Component>
+  </ComponentSet>
+  </Package>
+</PackageFile>

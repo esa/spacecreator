@@ -59,7 +59,7 @@ IVPropertiesDialog::IVPropertiesDialog(const QString &projectPath, ivm::IVProper
 {
 }
 
-IVPropertiesDialog::~IVPropertiesDialog() { }
+IVPropertiesDialog::~IVPropertiesDialog() {}
 
 QString IVPropertiesDialog::objectTypeName() const
 {
@@ -196,8 +196,7 @@ void IVPropertiesDialog::initContextParams()
 
 void IVPropertiesDialog::initIfaceParams()
 {
-    IfaceParametersModel *modelIfaceParams =
-            new IfaceParametersModel(commandMacro(), m_asn1Checks->allTypeNames(), this);
+    IfaceParametersModel *modelIfaceParams = new IfaceParametersModel(commandMacro(), m_asn1Checks->allTypeNames(), this);
     modelIfaceParams->setDataObject(dataObject());
 
     shared::PropertiesViewBase *viewAttrs = new IfaceParametersView(this);
@@ -238,7 +237,7 @@ void IVPropertiesDialog::initCommentView()
 void IVPropertiesDialog::initLanguageView()
 {
     auto fn = qobject_cast<ivm::IVFunction *>(dataObject());
-    if (!fn) {
+    if (!fn || fn->instanceOf() != nullptr) {
         return;
     }
     auto languagesWidget = new ive::ImplementationsWidget(m_projectPath, fn, m_ivChecks, commandMacro(), this);

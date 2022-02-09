@@ -1,0 +1,45 @@
+SimpleDataTypes DEFINITIONS ::= BEGIN
+
+    MyBoolean ::= BOOLEAN
+
+    MyInvertedBoolean ::= BOOLEAN
+
+    MyInteger ::= INTEGER(0..20)
+
+    MyIntegerWithEncoding ::= INTEGER(5..200)
+
+    MyFloat ::= REAL(0..1)
+
+    MyFloatWithEncoding ::= REAL(32..64)
+
+    MyString ::= IA5String(SIZE(0..32))
+
+    MyFixedSizeString ::= IA5String(SIZE(64))
+
+    MyBitString ::= BIT STRING(SIZE(16..24))
+
+    MyFixedSizeBitString ::= BIT STRING(SIZE(17))
+
+    MyEnum ::= ENUMERATED {
+        val1,
+        val2,
+        val3
+    }
+
+    MyValueEnumWithEncoding ::= ENUMERATED {
+        a (300),
+        b (20),
+        c (5)
+    }
+
+    DerivedInteger ::= MyInteger(10..16)
+
+    DerivedIntegerWithEncoding ::= MyInteger(10..16)
+
+    DerivedFloatWithEncoding ::= MyFloatWithEncoding(50..60)
+
+    FixedSizeOctetString ::= OCTET STRING(SIZE(12))
+
+    VariableSizeOctetString ::= OCTET STRING(SIZE(1..12))
+
+END

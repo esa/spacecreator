@@ -1,0 +1,13 @@
+<InterfaceView asn1file="dataview-uniq.asn">
+<Function name="CyclicFunction" is_type="NO" language="SDL" default_implementation="default">
+    <Property name="Taste::coordinates" value="47900 55800 71300 67900"/>
+<Provided_Interface name="CyclicInterface" kind="Cyclic" period="1000">
+    <Property name="Taste::coordinates" value="57700 55800"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+</InterfaceView>

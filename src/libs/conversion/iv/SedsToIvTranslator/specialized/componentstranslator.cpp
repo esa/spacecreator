@@ -20,6 +20,7 @@
 #include "specialized/componentstranslator.h"
 
 #include "specialized/asyncinterfacecommandtranslator.h"
+#include "specialized/interfaceparametertranslator.h"
 #include "specialized/syncinterfacecommandtranslator.h"
 
 #include <conversion/common/escaper/escaper.h>
@@ -29,14 +30,14 @@
 #include <seds/SedsModel/package/package.h>
 
 using conversion::Escaper;
+using conversion::UnhandledValueException;
 using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredInterfaceException;
-using conversion::translator::UnhandledValueException;
 
 namespace conversion::iv::translator {
 
 ComponentsTranslator::ComponentsTranslator(
-        const seds::model::Package &sedsPackage, Asn1Acn::Definitions *asn1Definitions)
+        const seds::model::Package *sedsPackage, Asn1Acn::Definitions *asn1Definitions)
     : m_sedsPackage(sedsPackage)
     , m_asn1Definitions(asn1Definitions)
 {
@@ -47,7 +48,7 @@ QVector<ivm::IVFunction *> ComponentsTranslator::translateComponents()
     QVector<ivm::IVFunction *> ivComponents;
 
     // Each SEDS component translates to a IV function
-    for (const auto &sedsComponent : m_sedsPackage.components()) {
+    for (const auto &sedsComponent : m_sedsPackage->components()) {
         ivComponents.append(translateComponent(sedsComponent));
     }
 
@@ -75,10 +76,51 @@ void ComponentsTranslator::translateInterface(const seds::model::Interface &seds
         const seds::model::Component &sedsComponent, const ivm::IVInterface::InterfaceType interfaceType,
         ivm::IVFunction *ivFunction)
 {
-    const auto &sedsInterfaceDeclaration = findInterfaceDeclaration(sedsInterface.type().nameStr(), sedsComponent);
+    const auto &sedsInterfaceName = sedsInterface.nameStr();
 
-    AsyncInterfaceCommandTranslator asyncCommandTranslator(sedsInterface, m_asn1Definitions, ivFunction);
-    SyncInterfaceCommandTranslator syncCommandTranslator(sedsInterface, ivFunction);
+    const auto &sedsInterfaceDeclaration = findInterfaceDeclaration(sedsInterface.type().nameStr(), sedsComponent);
+    translateInterfaceDeclaration(sedsInterfaceDeclaration, sedsInterfaceName, sedsInterface.genericTypeMapSet(),
+            sedsComponent, interfaceType, ivFunction);
+}
+
+void ComponentsTranslator::translateInterfaceDeclaration(
+        const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration, const QString &sedsInterfaceName,
+        const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
+        const seds::model::Component &sedsComponent, const ivm::IVInterface::InterfaceType interfaceType,
+        ivm::IVFunction *ivFunction) const
+{
+    for (const auto &sedsBaseInterface : sedsInterfaceDeclaration.baseInterfaces()) {
+        const auto &sedsBaseInterfaceDeclaration =
+                findInterfaceDeclaration(sedsBaseInterface.type().nameStr(), sedsComponent);
+        translateInterfaceDeclaration(sedsBaseInterfaceDeclaration, sedsInterfaceName,
+                sedsBaseInterface.genericTypeMapSet(), sedsComponent, interfaceType, ivFunction);
+    }
+
+    translateParameters(sedsInterfaceName, genericTypeMapSet, sedsInterfaceDeclaration, interfaceType, ivFunction);
+    translateCommands(sedsInterfaceName, genericTypeMapSet, sedsInterfaceDeclaration, interfaceType, ivFunction);
+}
+
+void ComponentsTranslator::translateParameters(const QString &sedsInterfaceName,
+        const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
+        const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
+        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const
+{
+    InterfaceParameterTranslator parameterTranslator(sedsInterfaceName, genericTypeMapSet, ivFunction);
+
+    for (const auto &sedsParameter : sedsInterfaceDeclaration.parameters()) {
+        parameterTranslator.translateParameter(sedsParameter, interfaceType);
+    }
+}
+
+void ComponentsTranslator::translateCommands(const QString &sedsInterfaceName,
+        const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
+        const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
+        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const
+{
+    AsyncInterfaceCommandTranslator asyncCommandTranslator(
+            ivFunction, sedsInterfaceName, genericTypeMapSet, m_asn1Definitions, m_sedsPackage);
+    SyncInterfaceCommandTranslator syncCommandTranslator(
+            ivFunction, sedsInterfaceName, genericTypeMapSet, m_asn1Definitions, m_sedsPackage);
 
     for (const auto &sedsCommand : sedsInterfaceDeclaration.commands()) {
         switch (sedsCommand.mode()) {
@@ -107,7 +149,7 @@ const seds::model::InterfaceDeclaration &ComponentsTranslator::findInterfaceDecl
         return *found;
     }
 
-    const auto &sedsPackageInterfaceDeclarations = m_sedsPackage.declaredInterfaces();
+    const auto &sedsPackageInterfaceDeclarations = m_sedsPackage->declaredInterfaces();
     found = std::find_if(sedsPackageInterfaceDeclarations.begin(), sedsPackageInterfaceDeclarations.end(),
             [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
                 return interfaceDeclaration.nameStr() == name;

@@ -22,7 +22,7 @@
 namespace seds::model {
 
 template<>
-auto enumFromString(const QStringRef &enumStr) -> std::optional<InterfaceCommandMode>
+auto enumFromString(const StringRef &enumStr) -> std::optional<InterfaceCommandMode>
 {
     if (enumStr.compare(QStringLiteral("sync"), Qt::CaseInsensitive) == 0) {
         return InterfaceCommandMode::Sync;
@@ -30,6 +30,25 @@ auto enumFromString(const QStringRef &enumStr) -> std::optional<InterfaceCommand
         return InterfaceCommandMode::Async;
     } else {
         return std::nullopt;
+    }
+}
+
+template<>
+auto stringFromEnum(InterfaceCommandMode enumType) -> const QString &
+{
+    switch (enumType) {
+    case InterfaceCommandMode::Sync: {
+        static const QString sync = "sync";
+        return sync;
+    }
+    case InterfaceCommandMode::Async: {
+        static const QString async = "async";
+        return async;
+    }
+    default: {
+        static const QString unhandled = "unhandledCommandMode";
+        return unhandled;
+    }
     }
 }
 

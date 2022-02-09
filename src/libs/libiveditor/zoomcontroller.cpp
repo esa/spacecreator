@@ -117,7 +117,7 @@ void ZoomController::setView(shared::ui::GraphicsViewBase *view)
         return;
 
     if (m_view) {
-        disconnect(m_combo, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), this,
+        disconnect(m_combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
                 &ZoomController::onCurrentIndexChanged);
         disconnect(m_view, &shared::ui::GraphicsViewBase::zoomChanged, this, &ZoomController::displayZoomLevel);
     }
@@ -134,15 +134,14 @@ void ZoomController::setView(shared::ui::GraphicsViewBase *view)
     refill();
 
     connect(m_view, &shared::ui::GraphicsViewBase::zoomChanged, this, &ZoomController::displayZoomLevel);
-    connect(m_combo, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), this,
-            &ZoomController::onCurrentIndexChanged);
+    connect(m_combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ZoomController::onCurrentIndexChanged);
 
     displayZoomLevel(m_view->zoom());
 }
 
-void ZoomController::onCurrentIndexChanged(const QString &text)
+void ZoomController::onCurrentIndexChanged(int idx)
 {
-    QString strPercent(text);
+    QString strPercent = m_combo->itemText(idx);
     bool ok(false);
     const qreal percent = m_validator->clearSuffix(strPercent).toDouble(&ok);
     if (ok)

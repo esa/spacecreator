@@ -1,0 +1,6 @@
+{# This template is for test purposes only #}
+<Comments>
+{% for comm in Comments %}
+    {% include "comment.tmplt" %}
+{% endfor %}
+</Comments>

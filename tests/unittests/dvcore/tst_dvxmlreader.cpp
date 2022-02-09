@@ -148,8 +148,13 @@ void DVXMLReaderTest::tst_property()
         const EntityAttribute attr =
                 objectsList.front()->entityAttribute(dvm::meta::Props::token(dvm::meta::Props::Token::coordinates));
         QVERIFY(attr.isValid());
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+        QVERIFY(attr.value().toString().split(QChar(' '), Qt::SkipEmptyParts).size()
+                == 4); // rectangular geometry of Node
+#else
         QVERIFY(attr.value().toString().split(QChar(' '), QString::SkipEmptyParts).size()
                 == 4); // rectangular geometry of Node
+#endif
     } else {
         qWarning() << reader.errorString();
     }

@@ -18,16 +18,26 @@
  */
 #pragma once
 
+#include "basetypesmappings.h"
+
 #include <QString>
 #include <optional>
 
 namespace seds::model {
 
 template <typename EnumType>
-auto enumFromString(const QStringRef &enumStr) -> std::optional<EnumType>
+auto enumFromString(const StringRef &enumStr) -> std::optional<EnumType>
 {
     Q_UNUSED(enumStr);
     return std::nullopt;
+}
+
+template <typename EnumType>
+auto stringFromEnum(EnumType enumType) -> const QString&
+{
+    Q_UNUSED(enumType);
+    static const QString unhandled = "unhandled";
+    return unhandled;
 }
 
 } // namespace seds::model

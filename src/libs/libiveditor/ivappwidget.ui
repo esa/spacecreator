@@ -50,6 +50,7 @@
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
+         <widget class="QTreeView" name="layerView"/>
          <widget class="QTreeView" name="objectsView"/>
          <widget class="shared::ui::ObjectsTreeView" name="importView"/>
          <widget class="shared::ui::ObjectsTreeView" name="sharedView"/>

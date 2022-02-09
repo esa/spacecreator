@@ -1,7 +1,7 @@
 <Attrs>
     <Attr label="Name" name="name">
         <Type>
-        <String validator="[a-zA-Z][a-zA-Z0-9_]*"/>
+            <String validator="[a-zA-Z][a-zA-Z0-9_]*"/>
         </Type>
     </Attr>
     <Attr label="Kind" name="kind">
@@ -30,9 +30,9 @@
             <Function/>
         </Scopes>
     </Attr>
-    <Attr name="instance_of">
+    <Attr label="Instance of" name="instance_of">
         <Type>
-        <String validator="[a-zA-Z][a-zA-Z0-9_]*"/>
+            <String validator="[a-zA-Z][a-zA-Z0-9_]*"/>
         </Type>
         <Scopes>
             <Function>

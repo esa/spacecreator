@@ -1,0 +1,42 @@
+SimpleDataTypes DEFINITIONS ::= BEGIN
+
+    MyBoolean []
+
+    -- MyBoolean [size 16]
+
+    MyInvertedBoolean []
+
+    --MyInvertedBoolean [size 3, true-value '000'B]
+
+    MyInteger []
+
+    MyIntegerWithEncoding [size 32, encoding pos-int, endianness big]
+
+    MyFloat []
+
+    MyFloatWithEncoding [encoding IEEE754-1985-64, endianness little]
+
+    MyString []
+
+    MyFixedSizeString []
+
+    MyBitString []
+
+    MyFixedSizeBitString []
+
+    MyEnum []
+
+    MyValueEnumWithEncoding [size 16, encoding pos-int, endianness little, encode-values]
+
+    DerivedInteger []
+
+    DerivedIntegerWithEncoding [size 16, encoding BCD, endianness big]
+
+    DerivedFloatWithEncoding [encoding IEEE754-1985-32, endianness big]
+
+    FixedSizeOctetString []
+
+    VariableSizeOctetString []
+
+
+END

@@ -14,8 +14,9 @@ target_link_libraries(SedsRegistrar
     PRIVATE     SEDS::XmlImporter
                 SEDS::XmlExporter
                 Conversion::IvToSedsTranslator
-    PUBLIC      Conversion::Common
-                CommonProjectWarnings)
+                Conversion::Asn1ToSedsTranslator
+                CommonProjectWarnings
+    PUBLIC      Conversion::Common)
 
 add_format_target(SedsRegistrar)
 add_tidy_target(SedsRegistrar)

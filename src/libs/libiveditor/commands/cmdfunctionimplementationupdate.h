@@ -47,6 +47,7 @@ Q_SIGNALS:
 
 private:
     void moveDirectories(const QString &currentImplName, const QString &nextImplName);
+    void updateSymLink(const EntityAttribute &oldValue, const EntityAttribute &newValue, bool isDefault);
 
 private:
     QPointer<ivm::IVFunction> m_function;

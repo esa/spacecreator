@@ -472,7 +472,7 @@ ValuePtr AstXmlParser::findAndReadValueAssignmentValue()
     return val;
 }
 
-static bool isSingleValueName(const QStringRef &name)
+static bool isSingleValueName(const StringRef &name)
 {
     // clang-format off
     return name == QStringLiteral("IntegerValue")
@@ -485,22 +485,22 @@ static bool isSingleValueName(const QStringRef &name)
     // clang-format on
 }
 
-static bool isMultipleValueName(const QStringRef &name)
+static bool isMultipleValueName(const StringRef &name)
 {
     return name == QStringLiteral("SequenceOfValue");
 }
 
-static bool isSequenceValue(const QStringRef &name)
+static bool isSequenceValue(const StringRef &name)
 {
     return name == QStringLiteral("SequenceValue");
 }
 
-static bool isChoiceValue(const QStringRef &name)
+static bool isChoiceValue(const StringRef &name)
 {
     return name == QStringLiteral("ChoiceValue");
 }
 
-static bool isNullValue(const QStringRef &name)
+static bool isNullValue(const StringRef &name)
 {
     return name == QStringLiteral("NullValue");
 }
@@ -529,7 +529,7 @@ ValuePtr AstXmlParser::readValueAssignmentValue()
     return value;
 }
 
-ValuePtr AstXmlParser::readSimpleValue(const QStringRef &name)
+ValuePtr AstXmlParser::readSimpleValue(const StringRef &name)
 {
     return std::make_unique<SingleValue>(m_xmlReader.readElementText(), getPrinterFunction(name.toString()));
 }
@@ -934,9 +934,14 @@ void AstXmlParser::readAcnComponent(Types::Type &type)
     auto alignToNext = readIsAlignedToNext();
     auto name = readNameAttribute();
     auto id = readIdAttribute(QStringLiteral("Id"));
-    auto component = readTypeDetails(readTypeAttribute(), {}, false, alignToNext);
+    auto reference = readTypeAssignmentAttribute();
 
-    AcnDefinedItemsAddingVisitor visitor(std::make_unique<AcnSequenceComponent>(id, name, std::move(component)));
+    auto component = readTypeDetails(readTypeAttribute(), {}, false, alignToNext);
+    auto acnComponentPointer = std::make_unique<AcnSequenceComponent>(id, name, std::move(component));
+    if (!reference.isEmpty()) {
+        acnComponentPointer->setReference(reference);
+    }
+    AcnDefinedItemsAddingVisitor visitor(std::move(acnComponentPointer));
     type.accept(visitor);
 }
 

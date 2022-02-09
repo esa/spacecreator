@@ -23,13 +23,13 @@
 
 #include <QStringList>
 #include <conversion/asn1/Asn1Options/options.h>
-#include <conversion/common/exceptions.h>
+#include <conversion/converter/exceptions.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <filesystem>
 #include <sdl/SdlOptions/options.h>
 #include <seds/SedsOptions/options.h>
 
-using conversion::ConversionException;
+using conversion::ConverterException;
 using conversion::InvalidModelNameException;
 using conversion::ModelType;
 using conversion::Options;
@@ -97,7 +97,7 @@ void SedsConverterCLI::parseArguments(const QStringList &arguments)
     }
 
     if (m_sourceModels.empty()) {
-        throw ConversionException("No source models passed");
+        throw ConverterException("No source models passed");
     }
 }
 
@@ -159,6 +159,13 @@ void SedsConverterCLI::addIvInputOptions(Options &options)
     }
 }
 
+void SedsConverterCLI::addIVTranslationOptions(Options &options)
+{
+    if (m_arguments.contains(CommandArg::SedsConverterIvGenerateParentFunctions)) {
+        options.add(IvOptions::generateFunctionsForPackages);
+    }
+}
+
 void SedsConverterCLI::addIvOutputOptions(Options &options)
 {
     if (!m_outputFilepath.isEmpty()) {
@@ -186,6 +193,11 @@ void SedsConverterCLI::addSedsInputOptions(Options &options)
 {
     for (const auto &inputFilepath : getInputFilepaths(ModelType::Seds)) {
         options.add(SedsOptions::inputFilepath, std::move(inputFilepath));
+    }
+
+    if (m_arguments.contains(CommandArg::SedsConverterSedsPreprocessedFilepath)) {
+        options.add(
+                SedsOptions::preprocessedFilepath, m_parser.value(CommandArg::SedsConverterSedsPreprocessedFilepath));
     }
 
     if (m_arguments.contains(CommandArg::SedsConverterSedsSchemaFilepath)) {
@@ -223,9 +235,12 @@ QStringList SedsConverterCLI::getInputFilepaths(conversion::ModelType modelType)
 {
     QStringList result;
 
-    const auto extension = conversion::modelTypeExtension(modelType).toStdString();
-    const auto range = m_inputFilepaths.equal_range(extension);
-    std::for_each(range.first, range.second, [&result](auto &&filepath) { result << std::move(filepath.second); });
+    const auto extensions = conversion::modelTypeExtensions(modelType);
+    for (const auto &extension : extensions) {
+        const auto extensionString = extension.toStdString();
+        const auto range = m_inputFilepaths.equal_range(extensionString);
+        std::for_each(range.first, range.second, [&result](auto &&filepath) { result << std::move(filepath.second); });
+    }
 
     return result;
 }

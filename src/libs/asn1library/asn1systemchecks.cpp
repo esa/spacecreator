@@ -51,8 +51,7 @@ QStringList Asn1SystemChecks::allTypeNames() const
 
     QStringList typeNames;
     for (const QString &fileName : m_project->allAsn1Files()) {
-        QSharedPointer<Asn1Acn::File> asn1File = m_storage->asn1DataTypes(fileName);
-        if (asn1File) {
+        if (const Asn1Acn::File *asn1File = m_storage->asn1DataTypes(fileName)) {
             for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : asn1File->definitionsList()) {
                 for (const std::unique_ptr<Asn1Acn::TypeAssignment> &type : definitions->types()) {
                     typeNames << type->name();
@@ -74,8 +73,7 @@ std::vector<Definitions *> Asn1SystemChecks::definitionsList() const
 
     std::vector<Definitions *> defs;
     for (const QString &fileName : m_project->allAsn1Files()) {
-        QSharedPointer<Asn1Acn::File> asn1File = m_storage->asn1DataTypes(fileName);
-        if (asn1File) {
+        if (const Asn1Acn::File *asn1File = m_storage->asn1DataTypes(fileName)) {
             const File::DefinitionsList &list = asn1File->definitionsList();
             for (const std::unique_ptr<Definitions> &d : list) {
                 defs.push_back(d.get());
@@ -92,8 +90,7 @@ bool Asn1SystemChecks::checkAsn1Compliance(const QString &parameter, const QStri
     }
 
     for (const QString &fileName : m_project->allAsn1Files()) {
-        QSharedPointer<Asn1Acn::File> asn1File = m_storage->asn1DataTypes(fileName);
-        if (asn1File) {
+        if (const Asn1Acn::File *asn1File = m_storage->asn1DataTypes(fileName)) {
             if (asn1File->checkAsn1Compliance(parameter, typeName)) {
                 return true;
             }
@@ -112,8 +109,7 @@ const std::unique_ptr<TypeAssignment> &Asn1SystemChecks::typeAssignment(const QS
     }
 
     for (const QString &fileName : m_project->allAsn1Files()) {
-        QSharedPointer<Asn1Acn::File> asn1File = m_storage->asn1DataTypes(fileName);
-        if (asn1File) {
+        if (const Asn1Acn::File *asn1File = m_storage->asn1DataTypes(fileName)) {
             const std::unique_ptr<TypeAssignment> &type = asn1File->typeAssignment(text);
             if (type) {
                 return type;
@@ -133,8 +129,7 @@ const Types::Type *Asn1SystemChecks::typeFromName(const QString &name) const
     }
 
     for (const QString &fileName : m_project->allAsn1Files()) {
-        QSharedPointer<Asn1Acn::File> asn1File = m_storage->asn1DataTypes(fileName);
-        if (asn1File) {
+        if (const Asn1Acn::File *asn1File = m_storage->asn1DataTypes(fileName)) {
             const Types::Type *type = asn1File->typeFromName(name);
             if (type) {
                 return type;
@@ -150,8 +145,7 @@ bool Asn1SystemChecks::hasType(const QString &name) const
         return false;
     }
     for (const QString &fileName : m_project->allAsn1Files()) {
-        QSharedPointer<Asn1Acn::File> asn1File = m_storage->asn1DataTypes(fileName);
-        if (asn1File) {
+        if (const Asn1Acn::File *asn1File = m_storage->asn1DataTypes(fileName)) {
             if (asn1File->hasType(name)) {
                 return true;
             }

@@ -92,16 +92,33 @@ public:
      * @return  Set of required models
      */
     virtual auto getDependencies() const -> std::set<ModelType> = 0;
+    /**
+     * @brief Get the specified model from the vector of models
+     *
+     * @tparam ModelT  type of required model
+     * @param models   vector of models
+     *
+     * @return a model of the required type
+     */
+    template<typename ModelT>
+    static auto getModel(const std::vector<Model *> &models) -> ModelT *;
+    /**
+     * @brief Get the specified model from the vector of models
+     *
+     * @tparam ModelT  type of required model
+     * @param models   vector of models
+     *
+     * @return a model of the required type
+     */
+    template<typename ModelT>
+    static auto getModel(const std::vector<std::unique_ptr<Model>> &models) -> ModelT *;
 
 protected:
     auto checkSourceModelCount(const std::vector<Model *> &models) const -> void;
-
-    template<typename ModelT>
-    static auto getModel(const std::vector<Model *> models) -> ModelT *;
 };
 
 template<typename ModelT>
-ModelT *Translator::getModel(const std::vector<Model *> models)
+ModelT *Translator::getModel(const std::vector<Model *> &models)
 {
     std::vector<Model *> foundModels;
     std::copy_if(models.begin(), models.end(), std::back_inserter(foundModels),
@@ -116,6 +133,15 @@ ModelT *Translator::getModel(const std::vector<Model *> models)
     } else {
         return dynamic_cast<ModelT *>(foundModels[0]);
     }
+}
+
+template<typename ModelT>
+ModelT *Translator::getModel(const std::vector<std::unique_ptr<Model>> &models)
+{
+    std::vector<conversion::Model *> rawOutModels;
+    for_each(models.begin(), models.end(), [&rawOutModels](auto &model) { rawOutModels.push_back(model.get()); });
+
+    return getModel<ModelT>(rawOutModels);
 }
 
 } // namespace conversion::translator

@@ -73,11 +73,14 @@ protected:
     QHash<QString, QVariant> collectObjects(const QList<T *> &objects) const
     {
         QHash<QString, QVariant> grouppedObjects;
-
         for (const auto &object : objects) {
             object->updateForExport();
-            if (object->parentObject() != nullptr)
-                continue;
+            if (object->parentObject() != nullptr) {
+                auto it = std::find(objects.cbegin(), objects.cend(), object->parentObject());
+                if (it != objects.cend()) {
+                    continue;
+                }
+            }
 
             const QVariant &exportedObject = createFrom(object);
             const QString objectGroupName = groupName(object);

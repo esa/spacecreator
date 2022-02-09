@@ -143,6 +143,8 @@ void tst_Escaper::testAsn1TypeNominals()
 
     QCOMPARE(Escaper::escapeAsn1TypeName("*some&thing)"), "Something");
     QCOMPARE(Escaper::escapeAsn1TypeName("μsomeμthingμ)"), "Something");
+
+    QCOMPARE(Escaper::escapeAsn1TypeName("some_thing"), "Some-thing");
 }
 
 void tst_Escaper::testAsn1TypeExceptions()

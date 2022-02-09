@@ -34,11 +34,11 @@ namespace dve {
 DVTreeWidget::DVTreeWidget(QWidget *parent)
     : QWidget(parent)
     , m_treeView(new QTreeView(this))
-    , m_selectionModel(new QItemSelectionModel(nullptr, this))
     , m_dvTreeSortModel(new DVTreeSortProxyModel(this))
+    , m_selectionModel(new SelectionOverProxyModel(m_dvTreeSortModel, this))
 {
     auto layout = new QVBoxLayout(this);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     setLayout(layout);
     layout->addWidget(m_treeView);
 

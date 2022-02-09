@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "ivconnectionlayertype.h"
 #include "ivinterface.h"
 #include "ivobject.h"
 #include "vemodel.h"
@@ -81,6 +82,10 @@ public:
 
     QVector<IVConnection *> getConnectionsForFunction(const shared::Id &id) const;
 
+    auto setConnectionLayersModel(IVModel *layersModel) -> void;
+    auto getConnectionLayersModel() const -> IVModel *;
+    auto getConnectionLayerByName(const QString &name) const -> IVConnectionLayerType *;
+
     QList<IVObject *> visibleObjects() const;
     QList<IVObject *> visibleObjects(shared::Id rootId) const;
 
@@ -111,14 +116,13 @@ namespace conversion {
  * @brief   Specialization for InterfaceView model
  */
 template<>
-struct ModelProperties<ivm::IVModel>
-{
+struct ModelProperties<ivm::IVModel> {
     /// @brief  Model type
     static const ModelType type = ModelType::InterfaceView;
     /// @brief  Model name
     static inline const QString name = ModelTypeProperties<type>::name;
     /// @brief  Model extension
-    static inline const QString extension = ModelTypeProperties<type>::extension;
+    static inline const QStringList extensions = ModelTypeProperties<type>::extensions;
 };
 
 } // namespace conversion

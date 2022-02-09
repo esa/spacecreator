@@ -37,6 +37,7 @@ struct IVModelPrivate {
     shared::Id m_rootObjectId;
     QList<IVObject *> m_visibleObjects;
     QVector<QString> m_headerTitles;
+    IVModel *m_layersModel;
 };
 
 IVModel::IVModel(shared::PropertyTemplateConfig *dynPropConfig, IVModel *sharedModel, QObject *parent)
@@ -45,9 +46,10 @@ IVModel::IVModel(shared::PropertyTemplateConfig *dynPropConfig, IVModel *sharedM
 {
     d->m_dynPropConfig = dynPropConfig;
     d->m_sharedTypesModel = sharedModel;
+    d->m_layersModel = nullptr;
 }
 
-IVModel::~IVModel() { }
+IVModel::~IVModel() {}
 
 bool IVModel::addObjectImpl(shared::VEObject *obj)
 {
@@ -101,6 +103,27 @@ void IVModel::setRootObject(shared::Id rootId)
 
     d->m_rootObjectId = rootId;
     d->m_visibleObjects = visibleObjects(rootId);
+
+    if (auto fnType = qobject_cast<IVFunctionType *>(rootObject())) {
+        for (auto connection : fnType->connections()) {
+            connection->setAttributeExportable(meta::Props::token(meta::Props::Token::coordinates), true);
+        }
+        for (auto interface : fnType->allInterfaces()) {
+            interface->setAttributeExportable(meta::Props::token(meta::Props::Token::RootCoordinates), true);
+        }
+        for (auto fn : fnType->functionTypes()) {
+            fn->setAttributeExportable(meta::Props::token(meta::Props::Token::coordinates), true);
+            for (auto fnInterface : fn->allInterfaces()) {
+                fnInterface->setAttributeExportable(meta::Props::token(meta::Props::Token::coordinates), true);
+            }
+        }
+        for (auto fnt : fnType->functions()) {
+            fnt->setAttributeExportable(meta::Props::token(meta::Props::Token::coordinates), true);
+            for (auto fntInterface : fnt->allInterfaces()) {
+                fntInterface->setAttributeExportable(meta::Props::token(meta::Props::Token::coordinates), true);
+            }
+        }
+    }
 
     Q_EMIT rootObjectChanged(d->m_rootObjectId);
 }
@@ -205,8 +228,8 @@ IVFunctionType *IVModel::getFunctionType(const shared::Id &id) const
 
 IVFunctionType *IVModel::getSharedFunctionType(const QString &name, Qt::CaseSensitivity caseSensitivity) const
 {
-    return d->m_sharedTypesModel ? qobject_cast<IVFunctionType *>(
-                   d->m_sharedTypesModel->getObjectByName(name, IVObject::Type::FunctionType, caseSensitivity))
+    return d->m_sharedTypesModel ? qobject_cast<IVFunctionType *>(d->m_sharedTypesModel->getObjectByName(
+                                           name, IVObject::Type::FunctionType, caseSensitivity))
                                  : nullptr;
 }
 
@@ -311,6 +334,28 @@ QVector<IVConnection *> IVModel::getConnectionsForIface(const shared::Id &id) co
         }
     }
     return result;
+}
+
+void IVModel::setConnectionLayersModel(IVModel *layersModel)
+{
+    d->m_layersModel = layersModel;
+}
+
+IVModel *IVModel::getConnectionLayersModel() const
+{
+    return d->m_layersModel;
+}
+
+IVConnectionLayerType *IVModel::getConnectionLayerByName(const QString &name) const
+{
+    if (d->m_layersModel != nullptr) {
+        for (auto * const layer : d->m_layersModel->allObjectsByType<IVConnectionLayerType>()) {
+            if (layer->name().compare(name) == 0) {
+                return layer;
+            }
+        }
+    }
+    return nullptr;
 }
 
 QVector<IVConnection *> IVModel::getConnectionsForFunction(const shared::Id &id) const

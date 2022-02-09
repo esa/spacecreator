@@ -1,0 +1,20 @@
+/* CIF Keep Specific Geode ASNFilename 'dataview-uniq.asn' */
+use Datamodel;
+
+system Component;
+
+   signal If1_Cmd1_Pi;  
+
+   channel c
+      from env to Component with If1_Cmd1_Pi;      
+   endchannel;
+
+   block Component;
+
+      signalroute r
+      from env to Component with If1_Cmd1_Pi;      
+      connect c and r;
+
+      process Component referenced;
+   endblock;
+endsystem;

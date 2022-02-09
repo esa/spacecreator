@@ -74,7 +74,7 @@ public:
          * @param   prefix   Label name prefix
          * @returns Unique label name
          */
-        auto uniqueLabelName(const QString prefix = "label_") -> QString;
+        auto uniqueLabelName(const QString &prefix = "label_") -> QString;
 
         /**
          * @brief SEDS Package accessor
@@ -188,11 +188,23 @@ public:
     static auto translateActivityCall(::sdl::Process *process, const seds::model::ActivityInvocation &invocation)
             -> std::unique_ptr<::sdl::ProcedureCall>;
 
+    /**
+     * @brief   Translates SEDS BooleanExpression into SDL decision
+     *
+     * @param sdlProcess        Host SDL process
+     * @param sdlProcedure      Host SDL procedure
+     * @param expression        Expression to be translated
+     *
+     * @returns SDL decision
+     */
+    static auto translateBooleanExpression(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
+            const seds::model::BooleanExpression &expression) -> std::unique_ptr<::sdl::Decision>;
+
 private:
     Context &m_context;
     ::sdl::Transition *m_sdlTransition;
 
-    static auto findInterfaceDeclaration(ivm::IVModel *model, const QString functionName, const QString interfaceName)
+    static auto findInterfaceDeclaration(ivm::IVModel *model, const QString &functionName, const QString &interfaceName)
             -> ivm::IVInterface *;
 
     static auto findVariableDeclaration(::sdl::Process *process, ::sdl::Procedure *sdlProcedure, QString name)
@@ -206,11 +218,8 @@ private:
     static auto translateCall(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString callName,
             const seds::model::SendCommandPrimitive &sendCommand) -> std::unique_ptr<::sdl::ProcedureCall>;
 
-    static auto translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString callName,
+    static auto translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString &callName,
             const seds::model::SendCommandPrimitive &sendCommand) -> std::vector<std::unique_ptr<::sdl::Action>>;
-
-    static auto translateBooleanExpression(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-            const seds::model::BooleanExpression &expression) -> std::unique_ptr<::sdl::Decision>;
 
     static auto translateComparison(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
             const seds::model::Comparison &comparison) -> QString;
@@ -224,7 +233,7 @@ private:
     static auto translateTypeCheck(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
             const seds::model::TypeCheck &check) -> QString;
 
-    static auto translateAnswer(Context &context, ::sdl::Label *joinLabel, const QString value,
+    static auto translateAnswer(Context &context, ::sdl::Label *joinLabel, const QString &value,
             const seds::model::Body *body) -> std::unique_ptr<::sdl::Answer>;
 
     static auto comparisonOperatorToString(const seds::model::ComparisonOperator op) -> QString;

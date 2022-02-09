@@ -21,6 +21,19 @@
 
 namespace seds::model {
 
+DimensionSize::DimensionSize(const DimensionSize &rhs)
+    : m_size(std::nullopt)
+    , m_indexTypeRef(std::nullopt)
+{
+    if (rhs.size()) {
+        m_size = rhs.size()->value();
+    }
+
+    if (rhs.indexTypeRef()) {
+        m_indexTypeRef = rhs.indexTypeRef()->nameStr();
+    }
+}
+
 const std::optional<PositiveLong> &DimensionSize::size() const
 {
     return m_size;
@@ -39,6 +52,42 @@ const std::optional<DataTypeRef> &DimensionSize::indexTypeRef() const
 void DimensionSize::setIndexTypeRef(DataTypeRef indexTypeRef)
 {
     m_indexTypeRef = std::move(indexTypeRef);
+}
+
+bool DimensionSize::operator==(const DimensionSize &rhs) const
+{
+    if (m_size.has_value()) {
+        if (!rhs.size().has_value()) {
+            return false;
+        }
+        if (m_size->value() != rhs.size()->value()) {
+            return false;
+        }
+    } else {
+        if (rhs.size().has_value()) {
+            return false;
+        }
+    }
+
+    if (m_indexTypeRef.has_value()) {
+        if (!rhs.indexTypeRef().has_value()) {
+            return false;
+        }
+        if (m_indexTypeRef->nameStr() != rhs.indexTypeRef()->nameStr()) {
+            return false;
+        }
+    } else {
+        if (rhs.indexTypeRef().has_value()) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool DimensionSize::operator!=(const DimensionSize &rhs) const
+{
+    return !(*this == rhs);
 }
 
 } // namespace seds::model

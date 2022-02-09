@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "cif/cifblock.h"
 #include "mscentity.h"
 #include "mscinstanceevent.h"
 
@@ -24,8 +25,6 @@
 #include <QVector>
 
 namespace msc {
-
-class MscInstanceEvent;
 
 class MscInstance : public MscEntity
 {

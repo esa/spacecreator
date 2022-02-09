@@ -21,10 +21,14 @@
 
 #include "datatypeprefixvisitor.h"
 #include "datatypesuffixvisitor.h"
+#include "expressionvisitor.h"
+
+#include <conversion/common/overloaded.h>
 
 using promela::model::ArrayType;
 using promela::model::ChannelInit;
 using promela::model::Declaration;
+using promela::model::Expression;
 using promela::model::UnsignedDataType;
 using promela::model::UtypeRef;
 
@@ -47,13 +51,20 @@ void DeclarationVisitor::visit(const Declaration &declaration)
     suffixVisitor.visit(declaration.getType());
 
     if (declaration.hasInit()) {
-        generateChannelInit(declaration.getInit().value());
+        generateInitExpression(declaration.getInit().value());
     }
 
     m_stream << ";\n";
 }
 
-void DeclarationVisitor::generateChannelInit(const ChannelInit &channelInit)
+void DeclarationVisitor::generateInitExpression(const Declaration::InitExpression &initExpression)
+{
+    std::visit(overloaded { [&](const ChannelInit &expr) { generateChannelInit(expr); },
+                       [&](const Expression &expr) { generateExpression(expr); } },
+            initExpression);
+}
+
+void DeclarationVisitor::generateChannelInit(const ::promela::model::ChannelInit &channelInit)
 {
     m_stream << " = [" << channelInit.getSize() << "] of {";
 
@@ -70,6 +81,13 @@ void DeclarationVisitor::generateChannelInit(const ChannelInit &channelInit)
     m_stream << "}";
 }
 
+void DeclarationVisitor::generateExpression(const ::promela::model::Expression &expression)
+{
+    m_stream << " = ";
+    ExpressionVisitor visitor(m_stream);
+    visitor.visit(expression);
+}
+
 QString DeclarationVisitor::getVisibilityString(const Declaration &declaration)
 {
     switch (declaration.getVisibility()) {
@@ -83,5 +101,4 @@ QString DeclarationVisitor::getVisibilityString(const Declaration &declaration)
 
     return "";
 }
-
 }

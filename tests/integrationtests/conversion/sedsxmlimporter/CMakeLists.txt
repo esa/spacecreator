@@ -12,8 +12,8 @@ target_link_libraries(${TEST_NAME}
     PRIVATE     Conversion::Common
                 SEDS::Model
                 SEDS::XmlImporter
-                Qt5::Core
-                Qt5::Test
+                Qt${QT_VERSION_MAJOR}::Core
+                Qt${QT_VERSION_MAJOR}::Test
                 CommonProjectWarnings)
 
 configure_file(resources/external_references.toml external_references.toml COPYONLY)

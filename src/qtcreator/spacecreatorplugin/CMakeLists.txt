@@ -49,6 +49,7 @@ set(SC_PLUGIN_SOURCES
     options/propertyoptions.h
     options/ivlibraryoption.cpp
     options/ivlibraryoption.h
+    qtcreatorutils.h
     spacecreatorplugin.cpp
     spacecreatorplugin.h
     spacecreatorplugin_global.h

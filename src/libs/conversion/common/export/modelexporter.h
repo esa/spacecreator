@@ -22,6 +22,8 @@
 #include "model.h"
 #include "options.h"
 
+#include <QSaveFile>
+#include <QString>
 #include <memory>
 
 namespace conversion::exporter {
@@ -66,6 +68,9 @@ public:
      * @param   options     Options for export configuration
      */
     virtual auto exportModel(const Model *model, const Options &options) const -> void = 0;
+
+protected:
+    auto writeAndCommit(QSaveFile &outputFile, const QString &data) const -> void;
 };
 
 } // namespace conversion::exporter

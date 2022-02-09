@@ -72,7 +72,7 @@ class DataTypesParser final
 private:
     using DimensionAddingFunction = std::function<void(model::DimensionSize)>;
     using DataTypeAddingFunction = std::function<void(model::DataType)>;
-    using EntryAddingFunction = std::function<void(model::ContainerDataType::EntryListType)>;
+    using EntryAddingFunction = std::function<void(model::EntryType)>;
 
 public:
     /**
@@ -194,20 +194,26 @@ private:
     static auto readIntegerDataRange(QXmlStreamReader &xmlReader) -> model::MinMaxRange;
 
     /**
-     * @brief   Constructs DerivedTypeRange object
-     * @return  DerivedTypeRange
+     * @brief   Constructs MinMaxRange object
+     * @return  MinMaxRange
      */
-    static auto readDerivedTypeRange(QXmlStreamReader &xmlReader) -> model::DerivedTypeRange;
+    static auto readMinMaxRange(QXmlStreamReader &xmlReader) -> model::MinMaxRange;
+    /**
+     * @brief   Parses current element as a float precision range
+     * @param   rangeStr        String to parse
+     * @return  Float precision range
+     */
+    static auto readFloatPrecisionRange(QXmlStreamReader &xmlReader) -> model::FloatPrecisionRange;
     /**
      * @brief   Constructs EnumeratedDataTypeRange object
      * @return  EnumeratedDataTypeRange
      */
     static auto readEnumeratedDataTypeRange(QXmlStreamReader &xmlReader) -> model::EnumeratedDataTypeRange;
     /**
-     * @brief   Constructs MinMaxRange object
-     * @return  MinMaxRange
+     * @brief   Constructs DerivedTypeRange object
+     * @return  DerivedTypeRange
      */
-    static auto readMinMaxRange(QXmlStreamReader &xmlReader) -> model::MinMaxRange;
+    static auto readDerivedTypeRange(QXmlStreamReader &xmlReader) -> model::DerivedTypeRange;
 
     /**
      * @brief   Adds all entries to given container data type
@@ -293,51 +299,44 @@ private:
      * @param   encodingStr     String to parse
      * @return  Float encoding
      */
-    static auto parseFloatEncoding(const QStringRef &encodingStr) -> model::FloatDataEncoding::Encoding;
+    static auto parseFloatEncoding(const StringRef &encodingStr) -> model::FloatDataEncoding::Encoding;
     /**
      * @brief   Parses given string as a integer encoding
      * @param   encodingStr     String to parse
      * @return  Integer encoding
      */
-    static auto parseIntegerEncoding(const QStringRef &encodingStr) -> model::IntegerDataEncoding::Encoding;
+    static auto parseIntegerEncoding(const StringRef &encodingStr) -> model::IntegerDataEncoding::Encoding;
     /**
      * @brief   Parses given string as a string encoding
      * @param   encodingStr     String to parse
      * @return  String encoding
      */
-    static auto parseStringEncoding(const QStringRef &encodingStr) -> model::StringDataEncoding::Encoding;
-
-    /**
-     * @brief   Parses current element as a float precision range
-     * @param   rangeStr        String to parse
-     * @return  Float precision range
-     */
-    static auto parseFloatPrecisionRange(QXmlStreamReader &xmlReader) -> model::FloatPrecisionRange;
+    static auto parseStringEncoding(const StringRef &encodingStr) -> model::StringDataEncoding::Encoding;
 
     /**
      * @brief   Parses given string as a byte order
      * @param   rangeTypeStr    String to parse
      * @return  Byte order
      */
-    static auto parseByteOrder(const QStringRef &byteOrderStr) -> model::ByteOrder;
+    static auto parseByteOrder(const StringRef &byteOrderStr) -> model::ByteOrder;
     /**
      * @brief   Parses given string as a error control
      * @param   errorControlStr     String to parse
      * @return  Error control value
      */
-    static auto parseErrorControl(const QStringRef &errorControlStr) -> model::ErrorControlEntry::ErrorControl;
+    static auto parseErrorControl(const StringRef &errorControlStr) -> model::ErrorControlEntry::ErrorControl;
     /**
      * @brief   Parses given string as a false value
      * @param   falseValueStr   String to parse
      * @return  False value
      */
-    static auto parseFalseValue(const QStringRef &falseValueStr) -> model::FalseValue;
+    static auto parseFalseValue(const StringRef &falseValueStr) -> model::FalseValue;
     /**
      * @brief   Parses given string as a range type
      * @param   rangeTypeStr    String to parse
      * @return  Range type
      */
-    static auto parseRangeType(const QStringRef &rangeTypeStr) -> model::RangeType;
+    static auto parseRangeType(const StringRef &rangeTypeStr) -> model::RangeType;
 
     /**
      * @brief   Processes attribute for ContainerConstraint

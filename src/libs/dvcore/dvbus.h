@@ -17,13 +17,13 @@
 
 #pragma once
 
+#include "dvdevice.h"
 #include "dvobject.h"
 
 #include <QPointer>
 
 namespace dvm {
 class DVConnection;
-class DVDevice;
 
 class DVBus : public DVObject
 {

@@ -106,6 +106,7 @@ target_sources(${LIB_NAME} PRIVATE
     sharedlibrary.h
     sharedresources/colors/default_colors.json
     sharedresources/sharedresources.qrc
+    stringref.h
     ui/drawrectinfo.cpp
     ui/drawrectinfo.h
     ui/graphicsscenebase.cpp
@@ -120,6 +121,8 @@ target_sources(${LIB_NAME} PRIVATE
     ui/highlightrectitem.h
     ui/interactiveobjectbase.cpp
     ui/interactiveobjectbase.h
+    ui/listtreedialog.h
+    ui/listtreedialog.cpp
     ui/textitem.cpp
     ui/textitem.h
     ui/veconnectionendpointgraphicsitem.cpp

@@ -24,7 +24,7 @@
 
 namespace msc {
 
-const QRegExp MscEntity::m_nameVerify("([A-Z]|[a-z]|\\d|_|\\.)+");
+const QRegularExpression MscEntity::m_nameVerify("([A-Z]|[a-z]|\\d|_|\\.)+");
 
 /*!
    \class msc::MscEntity
@@ -64,7 +64,7 @@ void MscEntity::setName(const QString &name)
 /*!
    Returns a regular expression that can be used to check if names are correct for the msc specification
  */
-const QRegExp &MscEntity::nameVerifier()
+const QRegularExpression &MscEntity::nameVerifier()
 {
     return m_nameVerify;
 }
@@ -86,7 +86,7 @@ void MscEntity::setComment(MscComment *comment)
     }
 
     if (m_comment) {
-        disconnect(m_comment, 0, this, 0);
+        disconnect(m_comment, nullptr, this, nullptr);
     }
 
     m_comment = comment;
@@ -94,6 +94,18 @@ void MscEntity::setComment(MscComment *comment)
         connect(m_comment, &MscComment::textChanged, this, &MscEntity::commentChanged);
     }
     Q_EMIT commentChanged();
+}
+
+QObject *MscEntity::commentObj() const
+{
+    return m_comment;
+}
+
+void MscEntity::setCommentObj(QObject *obj)
+{
+    if (auto com = qobject_cast<MscComment *>(obj)) {
+        setComment(com);
+    }
 }
 
 QString MscEntity::commentString() const

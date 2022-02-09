@@ -18,6 +18,7 @@
 #include "ivobject.h"
 
 #include "exportableproperty.h"
+#include "ivcoreutils.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 
@@ -89,10 +90,14 @@ void IVObject::resetTitle()
 
 //! This sorts the objects on type.
 //! \sa ivm::IVObject::Type
-void IVObject::sortObjectList(QList<IVObject *> &objects)
+void IVObject::sortObjectList(QVector<IVObject *> &objects)
 {
-    std::stable_sort(objects.begin(), objects.end(),
-            [](ivm::IVObject *obj1, ivm::IVObject *obj2) { return obj1->type() < obj2->type(); });
+    std::stable_sort(objects.begin(), objects.end(), [](ivm::IVObject *obj1, ivm::IVObject *obj2) {
+        if (utils::nestingLevel(obj1) == utils::nestingLevel(obj2)) {
+            return obj1->type() < obj2->type();
+        }
+        return utils::nestingLevel(obj1) < utils::nestingLevel(obj2);
+    });
 }
 
 QString IVObject::typeToString(Type t)
@@ -129,7 +134,7 @@ QVariantList IVObject::generateProperties(bool isProperty) const
     QVariantList result;
     EntityAttributes attributes = entityAttributes();
     for (auto it = attributes.cbegin(); it != attributes.cend(); ++it) {
-        if (it.value().isProperty() == isProperty) {
+        if (it.value().isExportable() && it.value().isProperty() == isProperty) {
             result << QVariant::fromValue(shared::ExportableProperty(it.key(), it.value().value()));
         }
     }
@@ -256,6 +261,11 @@ bool IVObject::isConnection() const
 bool IVObject::isConnectionGroup() const
 {
     return type() == Type::ConnectionGroup;
+}
+
+bool IVObject::isConnectionLayer() const
+{
+    return type() == Type::ConnectionLayer;
 }
 
 bool IVObject::isNestedInFunction() const

@@ -44,7 +44,7 @@ QString ExportableDVDevice::qualifier() const
 
 QString ExportableDVDevice::nodeName() const
 {
-    dvm::DVNode *node = exportedObject<dvm::DVDevice>()->node();
+    dvm::DVNode *node = qobject_cast<dvm::DVNode *>(exportedObject<dvm::DVDevice>()->node());
     return node ? node->title() : "";
 }
 
@@ -53,7 +53,7 @@ QString ExportableDVDevice::nodeName() const
  */
 QString ExportableDVDevice::nodeLabel() const
 {
-    dvm::DVNode *node = exportedObject<dvm::DVDevice>()->node();
+    dvm::DVNode *node = qobject_cast<dvm::DVNode *>(exportedObject<dvm::DVDevice>()->node());
     return node ? node->nodeLabel() : "";
 }
 

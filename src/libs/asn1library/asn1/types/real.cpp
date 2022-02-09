@@ -52,11 +52,11 @@ std::unique_ptr<Type> Real::clone() const
     return std::make_unique<Real>(*this);
 }
 
-RealEncoding Real::mapEncoding(QStringRef in)
+RealEncoding Real::mapEncoding(StringRef in)
 {
-    if (in == "IEEE754-1985-32")
+    if (in == QLatin1String("IEEE754-1985-32"))
         return RealEncoding::IEEE754_1985_32;
-    if (in == "IEEE754-1985-64")
+    if (in == QLatin1String("IEEE754-1985-64"))
         return RealEncoding::IEEE754_1985_64;
     return RealEncoding::unspecified;
 }

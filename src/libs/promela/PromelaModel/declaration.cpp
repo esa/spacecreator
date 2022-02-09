@@ -47,13 +47,13 @@ bool Declaration::hasInit() const noexcept
     return m_init.has_value();
 }
 
-const std::optional<ChannelInit> &Declaration::getInit() const noexcept
+const std::optional<Declaration::InitExpression> &Declaration::getInit() const noexcept
 {
     return m_init;
 }
 
-void Declaration::setInit(const ChannelInit &channelInit)
+void Declaration::setInit(const InitExpression &initExpression)
 {
-    m_init = channelInit;
+    m_init = initExpression;
 }
 }

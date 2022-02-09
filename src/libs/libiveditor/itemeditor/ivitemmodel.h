@@ -84,6 +84,8 @@ private:
     void setupInterfaceGeometry(ivm::IVObject *obj);
     void setupConnectionGeometry(ivm::IVObject *obj);
 
+    bool isVisible(ivm::IVObject *obj);
+
 private:
     shared::DelayedSignal *m_textUpdate = nullptr;
 };

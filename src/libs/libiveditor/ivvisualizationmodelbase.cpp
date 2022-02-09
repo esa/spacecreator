@@ -21,6 +21,7 @@
 #include "commandsstack.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
+#include "ivconnectionlayertype.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivpropertytemplateconfig.h"
@@ -102,6 +103,10 @@ void IVVisualizationModelBase::updateItemData(QStandardItem *item, shared::VEObj
     } break;
     case ivm::IVObject::Type::ConnectionGroup: {
         static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/connection_group.svg")).pixmap(16, 16);
+        pix = icon;
+    } break;
+    case ivm::IVObject::Type::ConnectionLayer: {
+        static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/connection_layer.svg")).pixmap(16, 16);
         pix = icon;
     } break;
 

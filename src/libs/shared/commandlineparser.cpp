@@ -200,6 +200,15 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
         description = QCoreApplication::translate("CommandLineParser", "Specify config xml <file> for InterfaceView");
         valueName = QCoreApplication::translate("CommandLineParser", "file");
     } break;
+    case CommandLineParser::Positional::SedsConverterIvGenerateParentFunctions: {
+        names << "iv-generate-parent-functions";
+        description = QCoreApplication::translate("CommandLineParser", "Generate parent functions for each SEDS package");
+    } break;
+    case CommandLineParser::Positional::SedsConverterSedsPreprocessedFilepath: {
+        names << "seds-preprocessed-filepath";
+        description = QCoreApplication::translate("CommandLineParser", "Path to the intermediate file that will be created during preprocessing");
+        valueName = QCoreApplication::translate("CommandLineParser", "filepath");
+    } break;
     case CommandLineParser::Positional::SedsConverterSedsSchemaFilepath: {
         names << "seds-schema";
         description = QCoreApplication::translate("CommandLineParser", "Specify schema <file> for SEDS");
@@ -213,7 +222,7 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
     case CommandLineParser::Positional::SedsConverterSedsExtRefFilepath: {
         names << "seds-ext-ref-file";
         description = QCoreApplication::translate("CommandLineParser", "Specify <file> with an external references for SEDS");
-        valueName = QCoreApplication::translate("CommandLineParser", "list");
+        valueName = QCoreApplication::translate("CommandLineParser", "file");
     } break;
     case CommandLineParser::Positional::SedsConverterSkipValidation: {
         names << "skip-validation";

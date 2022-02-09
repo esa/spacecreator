@@ -242,7 +242,7 @@ model::InterfaceParameter InterfacesParser::readInterfaceParameter(QXmlStreamRea
     return parameter;
 }
 
-model::InterfaceCommandMode InterfacesParser::parseInterfaceCommandMode(const QStringRef &commandModeStr)
+model::InterfaceCommandMode InterfacesParser::parseInterfaceCommandMode(const StringRef &commandModeStr)
 {
     auto commandMode = model::enumFromString<model::InterfaceCommandMode>(commandModeStr);
 
@@ -253,7 +253,7 @@ model::InterfaceCommandMode InterfacesParser::parseInterfaceCommandMode(const QS
     }
 }
 
-model::CommandArgumentMode InterfacesParser::parseCommandArgumentMode(const QStringRef &commandArgumentModeStr)
+model::CommandArgumentMode InterfacesParser::parseCommandArgumentMode(const StringRef &commandArgumentModeStr)
 {
     auto commandArgumentMode = model::enumFromString<model::CommandArgumentMode>(commandArgumentModeStr);
 
@@ -264,7 +264,7 @@ model::CommandArgumentMode InterfacesParser::parseCommandArgumentMode(const QStr
     }
 }
 
-model::InterfaceParameterMode InterfacesParser::parseInterfaceParameterMode(const QStringRef &parameterModeStr)
+model::InterfaceParameterMode InterfacesParser::parseInterfaceParameterMode(const StringRef &parameterModeStr)
 {
     auto parameterMode = model::enumFromString<model::InterfaceParameterMode>(parameterModeStr);
 
@@ -275,7 +275,7 @@ model::InterfaceParameterMode InterfacesParser::parseInterfaceParameterMode(cons
     }
 }
 
-model::InterfaceLevel InterfacesParser::parseInterfaceLevel(const QStringRef &interfaceLevelStr)
+model::InterfaceLevel InterfacesParser::parseInterfaceLevel(const StringRef &interfaceLevelStr)
 {
     auto interfaceLevel = model::enumFromString<model::InterfaceLevel>(interfaceLevelStr);
 

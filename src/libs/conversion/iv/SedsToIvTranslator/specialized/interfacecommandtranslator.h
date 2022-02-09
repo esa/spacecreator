@@ -19,20 +19,36 @@
 
 #pragma once
 
+#include "specialized/generictypemapper.h"
+
 #include <ivcore/ivinterface.h>
+#include <optional>
+
+namespace Asn1Acn {
+class Definitions;
+namespace Types {
+class Type;
+class Sequence;
+} // namespace Types
+} // namespace Asn1Acn
 
 namespace ivm {
 class IVFunction;
 } // namespace ivm
 
 namespace seds::model {
+class CommandArgument;
+class DimensionSize;
+class GenericTypeMapSet;
 class Interface;
 class InterfaceCommand;
+class Package;
 } // namespace seds::model
 
 #include <ivcore/ivinterface.h>
 
 namespace conversion::iv::translator {
+
 /**
  * @brief   Interface for translators from SEDS interface command to InterfaceView interface
  */
@@ -42,10 +58,14 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   sedsInterface   Parent interface
-     * @param   ivFunction      Output interface view function
+     * @param   sedsInterfaceName   Parent interface name
+     * @param   genericTypeMap      Generic type mappings
+     * @param   asn1Definitions     ASN.1 type definitions for parent package
+     * @param   ivFunction          Output interface view function
      */
-    InterfaceCommandTranslator(const seds::model::Interface &sedsInterface, ivm::IVFunction *ivFunction);
+    InterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
+            const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
+            Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage);
     /**
      * @brief   Default destructor
      */
@@ -88,10 +108,23 @@ public:
      *
      * @return Assembled name
      */
-    static auto getCommandName(const QString &interfaceName, const ivm::IVInterface::InterfaceType type,
+    static auto getCommandName(const QString &sedsInterfaceName, const ivm::IVInterface::InterfaceType type,
             const QString &commandName) -> QString;
 
 protected:
+    /**
+     * @brief   Process argument to get its concrete type name
+     *
+     * Argument types can
+     * 1. Be mapped from 'generic' to 'concrete' types
+     * 2. Be handled as an array (ASN.1 sequence)
+     *
+     * @param   sedsArgument    SEDS command argument
+     *
+     * @return  Concrete command type name
+     */
+    auto handleArgumentType(const seds::model::CommandArgument &sedsArgument) const -> QString;
+
     /**
      * @brief   Creates new interface view interface
      *
@@ -105,6 +138,57 @@ protected:
             ivm::IVInterface::OperationKind kind) const -> ivm::IVInterface *;
 
     /**
+     * @brief   Swaps between provided and required interface types
+     *
+     * @param   interfaceType   Interface type to switch
+     *
+     * @return  Provided type if required was passed, requried otherwise
+     */
+    static auto switchInterfaceType(ivm::IVInterface::InterfaceType interfaceType) -> ivm::IVInterface::InterfaceType;
+
+private:
+    /**
+     * @brief   Builds ASN.1 sequence of version of command argument type
+     *
+     * @param   sedsArgument            SEDS command argument
+     * @param   sedsArgumentTypeName    Resolved SEDS command argument type name
+     *
+     * @return  Name of the created type
+     */
+    auto buildArrayType(const seds::model::CommandArgument &sedsArgument, const QString &sedsArgumentTypeName) const
+            -> QString;
+
+    /**
+     * @brief   Creates ASN.1 sequence of version of the seds argument type
+     *
+     * Adds the created sequence to the ASN.1 definitions member
+     *
+     * @param   sedsArgument            SEDS command argument
+     * @param   sedsArgumentTypeName    Resolved SEDS command argument type name
+     *
+     * @return  Array type name
+     */
+    auto createArrayType(const seds::model::CommandArgument &sedsArgument, const QString &sedsArgumentTypeName) const
+            -> QString;
+    /**
+     *  Create a name for the array argument type
+     *
+     * @param   sedsArgumentTypeName    Resolved SEDS command argument type name
+     *
+     *  @return Type name
+     */
+    auto createArrayTypeName(const QString &sedsArgumentTypeName) const -> QString;
+
+    /**
+     * @brief   Calculates hash from dimension vector
+     *
+     * @param   dimensions  Dimensions to process
+     *
+     * @return  Calculated hash
+     */
+    auto calculateDimensionsHash(const std::vector<seds::model::DimensionSize> &dimensions) const -> std::size_t;
+
+    /**
      * @brief   Converts interface view interface type to string
      *
      * @param   interfaceType   Interface type to convert
@@ -112,17 +196,46 @@ protected:
      * @return   Interface type name
      */
     static auto interfaceTypeToString(ivm::IVInterface::InterfaceType type) -> const QString &;
+    /**
+     * @brief   Checks if given type name is mapped in the parent SEDS interface
+     *
+     * @param   genericTypeName     Generic type name
+     *
+     * @return  Mapped type name if given type name was mapped, given type name otherwise
+     */
+    auto findMappedType(const QString &genericTypeName) const -> const QString &;
 
 protected:
-    /// @brief  Parent SEDS interface
-    const seds::model::Interface &m_sedsInterface;
     /// @brief  Output interface view function
     ivm::IVFunction *m_ivFunction;
+
+    /// @brief  Parent SEDS interface name
+    const QString &m_sedsInterfaceName;
+    /// @brief  Parent ASN.1 type definitions
+    Asn1Acn::Definitions *m_asn1Definitions;
+    /// @brief  Parent SEDS package
+    const seds::model::Package *m_sedsPackage;
+
+    /// @brief  Mapper for generic command argument types
+    GenericTypeMapper m_typeMapper;
+
+    /// @brief  Struct for the array arguments cache
+    struct ArrayArgumentsCacheEntry final {
+        QString asn1TypeName;
+        std::size_t dimensionsHash;
+        std::vector<seds::model::DimensionSize> arrayDimensions;
+
+        auto compareDimensions(const std::vector<seds::model::DimensionSize> &dimensions) const -> bool;
+    };
+
+    static std::multimap<QString, ArrayArgumentsCacheEntry> m_arrayArgumentsCache;
 
     /// @brief  Interface parameter encoding name
     static const QString m_interfaceParameterEncoding;
     /// @brief  Template for interface view interfaces
     static const QString m_ivInterfaceNameTemplate;
+    /// @brief  Template for name of arguments that have dimensions
+    static const QString m_arrayArgumentNameTemplate;
 };
 
 } // namespace conversion::iv::translator

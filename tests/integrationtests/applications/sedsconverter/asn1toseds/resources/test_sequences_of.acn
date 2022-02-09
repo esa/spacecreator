@@ -1,0 +1,19 @@
+SequencesOf DEFINITIONS ::= BEGIN
+
+Type1 [size 16, encoding pos-int, endianness big]
+
+LengthType [size 32, encoding pos-int, endianness little]
+
+SimpleFixedSizeSequenceOf []
+
+SimpleFixedSizeSequenceOfAnonymousType []
+
+SimpleVariableSizeSequenceOf []
+
+NestedSequenceWithAcnSize [] {
+    someField [],    
+    lengthDeterminant LengthType [],
+    sequenceField [size lengthDeterminant]
+}
+
+END

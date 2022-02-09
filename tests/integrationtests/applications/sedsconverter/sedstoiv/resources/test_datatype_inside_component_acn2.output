@@ -1,0 +1,4 @@
+PKG-CONTAINER DEFINITIONS ::= BEGIN
+InsideInteger []
+END
+

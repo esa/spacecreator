@@ -43,6 +43,7 @@ public:
     using Components = std::vector<std::unique_ptr<T>>;
 
     const Components &components() const { return m_components; }
+    Components &components() { return m_components; }
     const T *component(const QString &name) const;
     T *component(const QString &name);
     void addComponent(std::unique_ptr<T> component);

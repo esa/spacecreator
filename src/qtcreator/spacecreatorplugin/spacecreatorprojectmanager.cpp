@@ -85,12 +85,12 @@ MSCEditorCorePtr SpaceCreatorProjectManager::mscData(const QString &fileName) co
 SpaceCreatorProjectImpl *SpaceCreatorProjectManager::project(const QString &fileName) const
 {
     for (SpaceCreatorProjectImpl *project : m_projects) {
-#if QTC_VERSION == 415
-        if (project->project()->isKnownFile(Utils::FilePath::fromString(fileName))) {
+#if QTC_VERSION < 409
+        if (project->project()->isKnownFile(Utils::FileName::fromString(fileName))) {
             return project;
         }
-#elif QTC_VERSION == 48
-        if (project->project()->isKnownFile(Utils::FileName::fromString(fileName))) {
+#else
+        if (project->project()->isKnownFile(Utils::FilePath::fromString(fileName))) {
             return project;
         }
 #endif

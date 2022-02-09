@@ -65,6 +65,18 @@ void MscCoregion::setInstance(MscInstance *instance)
     Q_EMIT dataChanged();
 }
 
+MscEntity *MscCoregion::instanceObj() const
+{
+    return m_instance;
+}
+
+void MscCoregion::setInstanceObj(MscEntity *instance)
+{
+    if (auto inst = qobject_cast<MscInstance *>(instance)) {
+        setInstance(inst);
+    }
+}
+
 bool MscCoregion::relatesTo(const MscInstance *instance) const
 {
     return m_instance == instance;

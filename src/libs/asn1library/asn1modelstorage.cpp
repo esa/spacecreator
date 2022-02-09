@@ -39,7 +39,11 @@ Asn1ModelStorage::Asn1ModelStorage(QObject *parent)
     , m_asn1Watcher(new QFileSystemWatcher(this))
 {
     m_reloadTimer.setSingleShot(true);
-    connect(&m_reloadTimer, &QTimer::timeout, this, &Asn1Acn::Asn1ModelStorage::loadChangedFiles);
+    connect(&m_reloadTimer, &QTimer::timeout, this, &Asn1Acn::Asn1ModelStorage::invalidateStorage);
+    connect(m_asn1Watcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
+        m_reloadTimer.stop();
+        m_reloadTimer.start(100);
+    });
 }
 
 /*!
@@ -51,22 +55,24 @@ Asn1ModelStorage::~Asn1ModelStorage() {}
    Returns the asn types for the given file (full path).
    If the file can't be loaded a default set of types is returned.
  */
-QSharedPointer<Asn1Acn::File> Asn1ModelStorage::asn1DataTypes(const QString &fileName) const
+Asn1Acn::File *Asn1ModelStorage::asn1DataTypes(const QString &fileName)
 {
     if (fileName.isEmpty()) {
         return {};
     }
 
-    if (!m_store.contains(fileName)) {
-        auto nonConstThis = const_cast<Asn1ModelStorage *>(this);
-        nonConstThis->loadFile(fileName);
+    if (!contains(fileName)) {
+        if (m_asn1Watcher->addPath(fileName)) {
+            invalidateStorage();
+        } else {
+            return {};
+        }
     }
-
-    if (m_store.contains(fileName)) {
-        return m_store[fileName];
-    } else {
-        return {};
+    auto it = m_store.find(fileName);
+    if (m_store.cend() != it) {
+        return it->second.get();
     }
+    return {};
 }
 
 /*!
@@ -74,7 +80,7 @@ QSharedPointer<Asn1Acn::File> Asn1ModelStorage::asn1DataTypes(const QString &fil
  */
 bool Asn1ModelStorage::contains(const QString &fileName) const
 {
-    return m_store.contains(fileName);
+    return m_store.find(fileName) != m_store.cend();
 }
 
 /*!
@@ -83,62 +89,41 @@ bool Asn1ModelStorage::contains(const QString &fileName) const
 void Asn1ModelStorage::clear()
 {
     m_reloadTimer.stop();
-    m_filesToReload.clear();
-    const QStringList files = m_store.keys();
-    if (!files.isEmpty()) {
-        m_asn1Watcher->removePaths(m_store.keys());
-    }
+    m_asn1Watcher->removePaths(m_asn1Watcher->files());
     m_store.clear();
 }
 
 /*!
-   Ensures that the file is watched. So if the file on disk changes, it is reloaded.
+   Ensures that the files are watched. So if files on disk are changed, all of them are reloaded then.
  */
-void Asn1ModelStorage::watchFile(const QString &fileName)
+void Asn1ModelStorage::watchFiles(const QStringList &fileNames)
 {
-    if (QFileInfo::exists(fileName) && !m_asn1Watcher->files().contains(fileName)) {
-        m_asn1Watcher->addPath(fileName);
-        connect(m_asn1Watcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
-            m_reloadTimer.stop();
-            m_reloadTimer.start(20);
-            m_filesToReload.insert(path);
-        });
+    if (fileNames == m_asn1Watcher->files()) {
+        return;
+    }
+
+    const QStringList &exludedPaths = m_asn1Watcher->addPaths(fileNames);
+    if (exludedPaths != fileNames) {
+        invalidateStorage();
     }
 }
 
-/*!
-   Load the data types stored the file \sa fileName
- */
-bool Asn1ModelStorage::loadFile(const QString &fileName)
+void Asn1ModelStorage::invalidateStorage()
 {
-    QSharedPointer<Asn1Acn::File> asn1Data = loadData(fileName);
-
-    m_store[fileName] = asn1Data;
-    Q_EMIT dataTypesChanged(fileName);
-    watchFile(fileName);
-    return !asn1Data.isNull();
-}
-
-QSharedPointer<File> Asn1ModelStorage::loadData(const QString &fileName)
-{
+    m_store.clear();
+    const QStringList fileNames = m_asn1Watcher->files();
     QStringList errorMessages;
     Asn1Acn::Asn1Reader parser;
-    std::unique_ptr<Asn1Acn::File> asn1Data = parser.parseAsn1File(QFileInfo(fileName), &errorMessages);
-    if (!asn1Data) {
-        qWarning() << "Can't read file" << fileName << ":" << errorMessages.join(", ");
-        Q_EMIT error(fileName, errorMessages);
-        return {};
+    QVector<QFileInfo> fileInfos;
+    std::for_each(fileNames.cbegin(), fileNames.cend(),
+            [&fileInfos](const QString &fileName) { fileInfos.append(QFileInfo(fileName)); });
+    m_store = parser.parseAsn1Files(fileInfos, &errorMessages);
+    if (m_store.empty()) {
+        qWarning() << "Can't read file(s)" << fileNames.join(", ") << ":" << errorMessages.join(", ");
+        Q_EMIT error(fileNames, errorMessages);
+        return;
     }
-    Q_EMIT success(fileName);
-    return QSharedPointer<Asn1Acn::File>(asn1Data.release());
+    Q_EMIT success(fileNames);
 }
 
-void Asn1ModelStorage::loadChangedFiles()
-{
-    for (const QString &fileName : m_filesToReload) {
-        loadFile(fileName);
-    }
-    m_filesToReload.clear();
-}
-
-}
+} // namespace Asn1Acn

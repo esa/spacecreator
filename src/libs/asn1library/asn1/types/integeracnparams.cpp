@@ -36,15 +36,15 @@ IntegerAcnParameters::IntegerAcnParameters()
 {
 }
 
-IntegerEncoding IntegerAcnParameters::mapEncoding(QStringRef in)
+IntegerEncoding IntegerAcnParameters::mapEncoding(StringRef in)
 {
-    if (in == "pos-int")
+    if (in == QLatin1String("pos-int"))
         return IntegerEncoding::pos_int;
-    if (in == "twos-complement")
+    if (in == QLatin1String("twos-complement"))
         return IntegerEncoding::twos_complement;
-    if (in == "ASCII")
+    if (in == QLatin1String("ASCII"))
         return IntegerEncoding::ASCII;
-    if (in == "BCD")
+    if (in == QLatin1String("BCD"))
         return IntegerEncoding::BCD;
     return IntegerEncoding::unspecified;
 }

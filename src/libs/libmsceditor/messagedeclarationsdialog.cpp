@@ -35,7 +35,7 @@
 #include <QFileDialog>
 #include <QItemSelectionModel>
 #include <QKeyEvent>
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 #include <QTimer>
 
 MessageDeclarationsDialog::MessageDeclarationsDialog(msc::MscMessageDeclarationList *model, msc::MscModel *mscModel,
@@ -52,8 +52,8 @@ MessageDeclarationsDialog::MessageDeclarationsDialog(msc::MscMessageDeclarationL
     ui->setupUi(this);
     QString regExPattern = msc::MscEntity::nameVerifier().pattern();
     regExPattern.insert(regExPattern.size() - 2, "|(\\s?,\\s?)"); // name as per spec + "," as separator
-    QRegExp rx(regExPattern);
-    QRegExpValidator *nameValidator = new QRegExpValidator(rx, this);
+    QRegularExpression rx(regExPattern);
+    QRegularExpressionValidator *nameValidator = new QRegularExpressionValidator(rx, this);
     ui->nameLineEdit->setValidator(nameValidator);
 
     ui->messagesView->setModel(m_model);

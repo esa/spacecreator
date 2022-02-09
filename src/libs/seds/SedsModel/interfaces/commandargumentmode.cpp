@@ -22,7 +22,7 @@
 namespace seds::model {
 
 template<>
-auto enumFromString(const QStringRef &enumStr) -> std::optional<CommandArgumentMode>
+auto enumFromString(const StringRef &enumStr) -> std::optional<CommandArgumentMode>
 {
     if (enumStr.compare(QStringLiteral("in"), Qt::CaseInsensitive) == 0) {
         return CommandArgumentMode::In;
@@ -34,6 +34,33 @@ auto enumFromString(const QStringRef &enumStr) -> std::optional<CommandArgumentM
         return CommandArgumentMode::Notify;
     } else {
         return std::nullopt;
+    }
+}
+
+template<>
+auto stringFromEnum(CommandArgumentMode enumType) -> const QString &
+{
+    switch (enumType) {
+    case CommandArgumentMode::In: {
+        static const QString in = "in";
+        return in;
+    }
+    case CommandArgumentMode::Out: {
+        static const QString out = "out";
+        return out;
+    }
+    case CommandArgumentMode::InOut: {
+        static const QString inOut = "inOut";
+        return inOut;
+    }
+    case CommandArgumentMode::Notify: {
+        static const QString notify = "notify";
+        return notify;
+    }
+    default: {
+        static const QString unhandled = "unhandledArgumentMode";
+        return unhandled;
+    }
     }
 }
 

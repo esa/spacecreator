@@ -11,9 +11,9 @@ target_include_directories(${TEST_NAME}
 target_link_libraries(${TEST_NAME}
     PRIVATE     Conversion::Common
                 SEDS::XmlParser
-                Qt5::Core
-                Qt5::Test
-                Qt5::Xml
+                Qt${QT_VERSION_MAJOR}::Core
+                Qt${QT_VERSION_MAJOR}::Test
+                Qt${QT_VERSION_MAJOR}::Xml
                 CommonProjectWarnings)
 
 configure_file(resources/Arrays.xml Arrays.xml COPYONLY)

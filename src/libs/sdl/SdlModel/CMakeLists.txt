@@ -60,7 +60,7 @@ target_include_directories(SdlModel
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SdlModel
     PUBLIC      Conversion::Common
-                CommonProjectWarnings)
+    PRIVATE     CommonProjectWarnings)
 
 add_format_target(SdlModel)
 add_tidy_target(SdlModel)

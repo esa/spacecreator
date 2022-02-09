@@ -41,8 +41,7 @@
 #include <QPainter>
 #include <QtDebug>
 
-static const qreal kBase = 12;
-static const qreal kHeight = kBase * 4 / 5;
+static const qreal kHeight = shared::graphicsviewutils::kInterfaceBaseLength * 4 / 5;
 static const QColor kSelectedBackgroundColor = QColor(Qt::magenta);
 static const QColor kDefaultBackgroundColor = QColor(Qt::blue);
 static const int kTextMargin = 2;
@@ -293,10 +292,6 @@ qreal IVInterfaceGraphicsItem::typeIconHeight() const
 {
     return kHeight;
 }
-qreal IVInterfaceGraphicsItem::baseLength()
-{
-    return kBase;
-}
 
 void IVInterfaceGraphicsItem::applyColorScheme()
 {
@@ -394,7 +389,7 @@ void IVInterfaceGraphicsItem::onAttrOrPropChanged(const QString &attrName)
 
 QTransform IVInterfaceGraphicsItem::typeTransform(Qt::Alignment alignment) const
 {
-    const qreal offset = kBase + 2;
+    const qreal offset = shared::graphicsviewutils::kInterfaceBaseLength + 2;
 
     QPointF shift(0., 0.);
     switch (alignment) {
@@ -417,6 +412,10 @@ QTransform IVInterfaceGraphicsItem::typeTransform(Qt::Alignment alignment) const
 
 QTransform IVInterfaceGraphicsItem::ifaceTransform(Qt::Alignment alignment) const
 {
+    if (!entity()) {
+        return {};
+    }
+
     const bool insideOut = entity()->direction() == ivm::IVInterface::InterfaceType::Required;
     qreal rotationDegree = 0.;
     switch (alignment) {
@@ -439,23 +438,21 @@ QTransform IVInterfaceGraphicsItem::ifaceTransform(Qt::Alignment alignment) cons
 
 QTransform IVInterfaceGraphicsItem::textTransform(Qt::Alignment alignment) const
 {
-    const qreal leading = QFontMetricsF(m_textItem->font()).leading();
-    const QPointF leadingOffset = QPointF(0, 4 * leading);
-
+    static const qreal kOffset = 2;
     QRectF textRect = mapRectFromItem(m_textItem, m_textItem->boundingRect());
-    const QRectF ifaceRect = mapRectFromItem(m_iface, m_iface->boundingRect());
+    const QRectF ifaceRect = mapRectFromItem(m_type, m_type->boundingRect());
     switch (alignment) {
     case Qt::AlignLeft:
-        textRect.moveBottomRight(ifaceRect.center() + leadingOffset);
+        textRect.moveBottomRight(QPointF(-kOffset, ifaceRect.top() + kOffset));
         break;
     case Qt::AlignRight:
-        textRect.moveBottomLeft(ifaceRect.center() + leadingOffset);
+        textRect.moveBottomLeft(QPointF(kOffset, ifaceRect.top() + kOffset));
         break;
     case Qt::AlignTop:
-        textRect.moveBottomLeft(ifaceRect.topRight());
+        textRect.moveBottomLeft(QPointF(ifaceRect.right() - kOffset, -kOffset));
         break;
     case Qt::AlignBottom:
-        textRect.moveTopLeft(ifaceRect.bottomRight());
+        textRect.moveTopLeft(QPointF(ifaceRect.right() - kOffset, kOffset));
         break;
     default:
         return {};
@@ -466,6 +463,8 @@ QTransform IVInterfaceGraphicsItem::textTransform(Qt::Alignment alignment) const
 
 QPainterPath IVInterfaceGraphicsItem::ifacePath() const
 {
+    static const qreal kBase = shared::graphicsviewutils::kInterfaceBaseLength;
+
     QPainterPath path;
     path.addPolygon(QVector<QPointF> {
             QPointF(-kHeight / 3, -kBase / 2), QPointF(-kHeight / 3, kBase / 2), QPointF(2 * kHeight / 3, 0) });
@@ -542,7 +541,7 @@ QPainterPath IVInterfaceGraphicsItem::composeShape() const
     QPainterPathStroker pathStroker;
     pathStroker.setCapStyle(Qt::PenCapStyle::RoundCap);
     pathStroker.setJoinStyle(Qt::PenJoinStyle::RoundJoin);
-    pathStroker.setWidth(kBase);
+    pathStroker.setWidth(shared::graphicsviewutils::kInterfaceBaseLength);
     const QPainterPath strokePath = pathStroker.createStroke(strokeBasePath);
     path = path.united(strokePath);
 

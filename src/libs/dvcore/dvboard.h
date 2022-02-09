@@ -18,13 +18,13 @@
 #pragma once
 
 #include "dvobject.h"
+#include "dvport.h"
 
 #include <memory>
 #include <qobjectlistmodelt.h>
 
 namespace dvm {
 struct DVBoardPrivate;
-class DVPort;
 class DVSystemFunction;
 
 class DVBoard : public DVObject

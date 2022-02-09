@@ -44,6 +44,8 @@ QList<int> knownGraphicsItemTypes();
 
 QList<int> rectangularTypes();
 
+QList<int> connectionTypes();
+
 ivm::IVFunction *functionObject(QGraphicsItem *item);
 
 ivm::IVFunctionType *functionTypeObject(QGraphicsItem *item);
@@ -57,8 +59,6 @@ ivm::IVConnection *connectionObject(QGraphicsItem *item);
 ivm::IVObject *object(const QGraphicsItem *item);
 
 qreal itemLevel(const ivm::IVObject *const object, bool itemSelected);
-
-int nestingLevel(ivm::IVObject *object);
 
 /*!
  * \brief Performs the validation to detect if it's possible to connect the \a scene's items located in \a startPos and

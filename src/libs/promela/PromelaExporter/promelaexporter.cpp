@@ -52,7 +52,7 @@ void PromelaExporter::exportModel(const Model *model, const Options &options) co
     QString output;
     QTextStream outputTextStream(&output, QIODevice::WriteOnly);
 
-    PromelaModelVisitor visitor(outputTextStream, m_commonIndent);
+    PromelaModelVisitor visitor(outputTextStream, m_commonIndent, m_sequenceIndent);
 
     visitor.visit(*promelaModel);
 
@@ -79,4 +79,5 @@ void PromelaExporter::exportModel(const Model *model, const Options &options) co
 }
 
 const QString PromelaExporter::m_commonIndent = QString("    ");
+const QString PromelaExporter::m_sequenceIndent = QString("::  ");
 }

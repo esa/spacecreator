@@ -1,0 +1,7 @@
+{% if func.functions|length > 0 %} 
+{% for func in func.functions %}
+{% include "function_with.tmplt" %}
+{% endfor %}
+{% else %}
+WITH interfaceview::IV::{{ func.path|join:"::" }};
+{% endif %}

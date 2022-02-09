@@ -834,7 +834,6 @@ WARN_LOGFILE           =
 INPUT                  = ../src/applications \
                          ../src/libs \
                          ../src/qtcreator \
-                         ../tests \
                          ../doc
 
 # This tag can be used to specify the character encoding of the source files
@@ -2045,7 +2044,7 @@ MAN_LINKS              = NO
 # captures the structure of the code including all documentation.
 # The default value is: NO.
 
-GENERATE_XML           = YES
+GENERATE_XML           = NO
 
 # The XML_OUTPUT tag is used to specify where the XML pages will be put. If a
 # relative path is entered the value of OUTPUT_DIRECTORY will be put in front of
