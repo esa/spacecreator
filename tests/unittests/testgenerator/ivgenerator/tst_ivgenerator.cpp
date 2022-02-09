@@ -19,14 +19,15 @@
 
 #include "conversion/iv/IvOptions/options.h"
 #include "conversion/iv/IvXmlExporter/exporter.h"
-#include "ivcommonprops.h"
 #include "options.h"
 
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
 #include <algorithm>
+#include <dvcore/dvcommonprops.h>
 #include <exception>
+#include <ivcore/ivcommonprops.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivinterface.h>
 #include <ivcore/ivlibrary.h>
@@ -87,11 +88,16 @@ void tst_ivgenerator::testNominal()
 {
     const auto functionUnderTest = makeFunctionUnderTest("FunctionUnderTest");
 
-    ivm::IVInterface::CreationInfo ci = createInterfaceUnderTestCreationInfo(
+    const ivm::IVInterface::CreationInfo ci = createInterfaceUnderTestCreationInfo(
             "InterfaceUnderTest", functionUnderTest.get(), ivm::IVInterface::OperationKind::Protected);
     ivm::IVInterface *const interfaceUnderTest = ivm::IVInterface::createIface(ci);
 
     const auto ivModelGenerated = IvGenerator::generate(interfaceUnderTest);
+    ivModelGenerated->setProperty(
+            dvm::meta::Props::token(dvm::meta::Props::Token::asn1file).toStdString().c_str(), "testDriver.acn");
+    qDebug() << ivModelGenerated
+                        ->property(dvm::meta::Props::token(dvm::meta::Props::Token::asn1file).toStdString().c_str())
+                        .toString();
 
     if (ivModelGenerated == nullptr) {
         QFAIL("IV model was not generated");
@@ -103,19 +109,21 @@ void tst_ivgenerator::testNominal()
         throw std::runtime_error(QString("%1 file could not be read as IV").arg(ivDir).toStdString());
     }
 
-    compareModels(ivModelLoaded, ivModelGenerated.get());
-
     conversion::iv::exporter::IvXmlExporter exporter;
     conversion::Options options;
     options.add(conversion::iv::IvOptions::outputFilepath, "out_iv.xml");
 
     exporter.exportModel(ivModelGenerated.get(), options);
+
+    compareModels(ivModelLoaded, ivModelGenerated.get());
 }
 
 static std::unique_ptr<ivm::IVFunction> makeFunctionUnderTest(const QString &name)
 {
     auto function = std::make_unique<ivm::IVFunction>();
     function->setTitle(name);
+    function->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::language), "SDL");
+    function->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::is_type), "NO");
 
     return function;
 }
@@ -159,8 +167,10 @@ static void compareModels(ivm::IVModel *const loaded, ivm::IVModel *const genera
 
 static void compareFunctions(ivm::IVFunction *const loaded, ivm::IVFunction *const generated)
 {
-    QCOMPARE(generated->entityAttributeValue("is_type"), loaded->entityAttributeValue("is_type"));
-    QCOMPARE(generated->entityAttributeValue("language"), loaded->entityAttributeValue("language"));
+    for (const auto &entityAttribute : loaded->entityAttributes()) {
+        QCOMPARE(
+                generated->entityAttributeValue(entityAttribute.name()).toString(), entityAttribute.value().toString());
+    }
     QCOMPARE(generated->defaultImplementation(), loaded->defaultImplementation());
 
     const auto &loadedInterfaces = loaded->interfaces();

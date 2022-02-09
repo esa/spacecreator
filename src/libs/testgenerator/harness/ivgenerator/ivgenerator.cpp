@@ -19,6 +19,8 @@
 
 #include "ivgenerator.h"
 
+#include "veobject.h"
+
 #include <QDebug>
 #include <exception>
 #include <ivcore/ivobject.h>
@@ -90,6 +92,9 @@ auto IvGenerator::makeFunctionUnderTest(ivm::IVInterface *const ifaceUnderTest) 
     ivm::IVFunction *const function = new ivm::IVFunction;
     function->setTitle(ifaceUnderTest->function()->title());
     function->addChild(copyIface(ifaceUnderTest));
+    for (const auto &entityAttribute : ifaceUnderTest->function()->entityAttributes()) {
+        function->setEntityAttribute(entityAttribute.name(), entityAttribute.value().toString());
+    }
 
     return function;
 }
