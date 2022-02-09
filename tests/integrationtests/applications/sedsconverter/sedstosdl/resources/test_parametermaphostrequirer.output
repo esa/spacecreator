@@ -12,5 +12,17 @@ process ParameterMapHostRequirer;
         NEXTSTATE Idle;
     /* CIF State (0, 1162), (200, 50) */
     state Idle;
+        /* CIF Input (0, 1162), (200, 50) */
+        input Get_IF_AsyncParam_Pi(io_Get_IF_AsyncParam_Pi);
+            /* CIF Task (0, 1237), (100, 50) */
+            task x := io_Get_IF_AsyncParam_Pi;
+            /* CIF NextState (0, 1312), (200, 50) */
+            NEXTSTATE Idle;
+        /* CIF Input (300, 1162), (200, 50) */
+        input Get_IF_AsyncRoParam_Pi(io_Get_IF_AsyncRoParam_Pi);
+            /* CIF Task (300, 1237), (100, 50) */
+            task x := io_Get_IF_AsyncRoParam_Pi;
+            /* CIF NextState (300, 1312), (200, 50) */
+            NEXTSTATE Idle;
     endstate;
 endprocess ParameterMapHostRequirer;
