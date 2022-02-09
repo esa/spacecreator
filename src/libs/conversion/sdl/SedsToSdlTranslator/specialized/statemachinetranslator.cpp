@@ -230,28 +230,24 @@ static inline auto getInterfaceByName(ivm::IVFunction *function, QString name) -
     return nullptr;
 }
 
-auto StateMachineTranslator::getParameterSyncGetterInterface(
-        ivm::IVFunction *function, const QString interfaceName, const QString parameterName) -> ivm::IVInterface *
+auto StateMachineTranslator::getParameterInterface(ivm::IVFunction *function, const ParameterType type,
+        const ParameterMode mode, const QString interfaceName, const QString parameterName) -> ivm::IVInterface *
 {
-    const auto name = Escaper::escapeIvName(QString("Get_%1_%2_Pi").arg(interfaceName).arg(parameterName));
+    const auto typeName = type == ParameterType::Getter ? "Get" : "Set";
+    const auto name = Escaper::escapeIvName(QString("%1_%2_%3_Pi").arg(typeName).arg(interfaceName).arg(parameterName));
     auto interface = getInterfaceByName(function, name);
     if (interface == nullptr) {
         return nullptr;
     }
-    // We are interested in a sync (protected/unprotected) interface
-    return interface->kind() == ivm::IVInterface::OperationKind::Sporadic ? nullptr : interface;
-}
-
-auto StateMachineTranslator::getParameterSyncSetterInterface(
-        ivm::IVFunction *function, const QString interfaceName, const QString parameterName) -> ivm::IVInterface *
-{
-    const auto name = Escaper::escapeIvName(QString("Set_%1_%2_Pi").arg(interfaceName).arg(parameterName));
-    auto interface = getInterfaceByName(function, name);
-    if (interface == nullptr) {
-        return nullptr;
+    switch (mode) {
+    case ParameterMode::Async:
+        // We are interested in an async (sporadic) interface
+        return interface->kind() == ivm::IVInterface::OperationKind::Sporadic ? interface : nullptr;
+    case ParameterMode::Sync:
+        // We are interested in a sync (protected/unprotected) interface
+        return interface->kind() == ivm::IVInterface::OperationKind::Sporadic ? nullptr : interface;
     }
-    // We are interested in a sync (protected/unprotected) interface
-    return interface->kind() == ivm::IVInterface::OperationKind::Sporadic ? nullptr : interface;
+    return nullptr;
 }
 
 auto StateMachineTranslator::createParameterSyncGetter(
@@ -291,11 +287,13 @@ auto StateMachineTranslator::translateParameter(ivm::IVFunction *function, const
 {
     Q_UNUSED(stateMachine); // Left for handling async parameters
     // We depend on the SEDS -> IV translation
-    const auto syncGetter = getParameterSyncGetterInterface(function, map.interface().value(), map.parameter().value());
+    const auto syncGetter = getParameterInterface(
+            function, ParameterType::Getter, ParameterMode::Sync, map.interface().value(), map.parameter().value());
     if (syncGetter != nullptr) {
         createParameterSyncGetter(syncGetter, map, sdlProcess);
     }
-    const auto syncSetter = getParameterSyncSetterInterface(function, map.interface().value(), map.parameter().value());
+    const auto syncSetter = getParameterInterface(
+            function, ParameterType::Setter, ParameterMode::Sync, map.interface().value(), map.parameter().value());
     if (syncSetter != nullptr) {
         createParameterSyncSetter(syncSetter, map, sdlProcess);
     }

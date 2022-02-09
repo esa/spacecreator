@@ -127,11 +127,25 @@ public:
             ::sdl::StateMachine *stateMachine) -> void;
 
 private:
-    static auto getParameterSyncGetterInterface(
-            ivm::IVFunction *function, const QString interfaceName, const QString parameterName) -> ivm::IVInterface *;
+    enum class ParameterType
+    {
+        Getter,
+        Setter
+    };
 
-    static auto getParameterSyncSetterInterface(
-            ivm::IVFunction *function, const QString interfaceName, const QString parameterName) -> ivm::IVInterface *;
+    enum class ParameterMode
+    {
+        Sync,
+        Async
+    };
+
+    static auto getParameterInterface(ivm::IVFunction *function, const ParameterType type, const ParameterMode mode,
+            const QString interfaceName, const QString parameterName) -> ivm::IVInterface *;
+
+    static auto createParameterAsyncGetter(
+            ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::Process *sdlProcess) -> void;
+    static auto createParameterAsyncSetter(
+            ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::Process *sdlProcess) -> void;
 
     static auto createParameterSyncGetter(
             ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::Process *sdlProcess) -> void;
