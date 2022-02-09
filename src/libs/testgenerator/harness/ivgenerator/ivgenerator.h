@@ -46,6 +46,18 @@ public:
     static const QString testDriverFunctionName;
 
     /**
+     * @brief coordinates of the generated test driver function
+     *
+     */
+    static const QVector<qint32> testDriverFunctionCoordinates;
+
+    /**
+     * @brief coordinates of the generated function with an interface under test
+     *
+     */
+    static const QVector<qint32> interfaceUnderTestFunctionCoordinates;
+
+    /**
      * @brief generate an IV model with a function under test and a test driver function
      *
      * @param interfaceUnderTest  interface which is tested

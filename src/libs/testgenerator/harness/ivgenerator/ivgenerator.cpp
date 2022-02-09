@@ -19,9 +19,8 @@
 
 #include "ivgenerator.h"
 
-#include "veobject.h"
-
 #include <QDebug>
+#include <dvcore/dvobject.h>
 #include <exception>
 #include <ivcore/ivobject.h>
 #include <ivcore/ivpropertytemplateconfig.h>
@@ -35,6 +34,8 @@ namespace testgenerator {
 
 const QString IvGenerator::startTestInterfaceName = "StartTest";
 const QString IvGenerator::testDriverFunctionName = "TestDriver";
+const QVector<qint32> IvGenerator::testDriverFunctionCoordinates = { 75, 184, 275, 264 };
+const QVector<qint32> IvGenerator::interfaceUnderTestFunctionCoordinates = { 462, 106, 662, 186 };
 
 auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::unique_ptr<ivm::IVModel>
 {
@@ -81,6 +82,12 @@ auto IvGenerator::makeTestDriverFunction(ivm::IVModel *const model, ivm::IVInter
     function->setModel(model);
     function->addChild(makeTestDriverRequiredIface(ifaceUnderTest, function));
     function->addChild(makeStartTest(model, function));
+    function->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::is_type), "NO");
+    function->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::language), "C");
+    function->setDefaultImplementation("default");
+
+    function->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::coordinates),
+            dvm::DVObject::coordinatesToString(testDriverFunctionCoordinates));
 
     return function;
 }
@@ -95,6 +102,8 @@ auto IvGenerator::makeFunctionUnderTest(ivm::IVInterface *const ifaceUnderTest) 
     for (const auto &entityAttribute : ifaceUnderTest->function()->entityAttributes()) {
         function->setEntityAttribute(entityAttribute.name(), entityAttribute.value().toString());
     }
+    function->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::coordinates),
+            dvm::DVObject::coordinatesToString(interfaceUnderTestFunctionCoordinates));
 
     return function;
 }
