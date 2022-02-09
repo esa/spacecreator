@@ -202,6 +202,11 @@ static void compareInterfaces(ivm::IVInterface *const loaded, ivm::IVInterface *
     QCOMPARE(generated->kind(), loaded->kind());
     QCOMPARE(generated->type(), loaded->type());
 
+    for (const auto &entityAttribute : loaded->entityAttributes()) {
+        QCOMPARE(
+                generated->entityAttributeValue(entityAttribute.name()).toString(), entityAttribute.value().toString());
+    }
+
     const auto &loadedParams = loaded->params();
     const auto &generatedParams = generated->params();
 
