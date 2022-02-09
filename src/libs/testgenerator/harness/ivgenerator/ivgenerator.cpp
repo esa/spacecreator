@@ -74,6 +74,7 @@ auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::u
     auto ivModel = std::make_unique<ivm::IVModel>(config);
     ivModel->addObject(makeTestDriverFunction(ivModel.get(), interfaceUnderTest));
     ivModel->addObject(makeFunctionUnderTest(interfaceUnderTest));
+    ivModel->addObject(makeConnection());
 
     return ivModel;
 }
@@ -88,7 +89,7 @@ auto IvGenerator::makeTestDriverFunction(ivm::IVModel *const model, ivm::IVInter
     function->setTitle(testDriverFunctionName);
     function->setModel(model);
     function->addChild(makeTestDriverRequiredIface(ifaceUnderTest, function));
-    function->addChild(makeStartTest(model, function));
+    function->addChild(makeStartTestIf(model, function));
     function->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::is_type), "NO");
     function->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::language), "C");
     function->setDefaultImplementation("default");
@@ -115,7 +116,7 @@ auto IvGenerator::makeFunctionUnderTest(ivm::IVInterface *const ifaceUnderTest) 
     return function;
 }
 
-auto IvGenerator::makeStartTest(ivm::IVModel *const model, ivm::IVFunction *const function) -> ivm::IVInterface *
+auto IvGenerator::makeStartTestIf(ivm::IVModel *const model, ivm::IVFunction *const function) -> ivm::IVInterface *
 {
     throwOnNullpointer(model);
     throwOnNullpointer(function);

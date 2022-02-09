@@ -19,6 +19,7 @@
 
 #include "conversion/iv/IvOptions/options.h"
 #include "conversion/iv/IvXmlExporter/exporter.h"
+#include "ivconnection.h"
 #include "options.h"
 
 #include <QObject>
@@ -59,7 +60,8 @@ private Q_SLOTS:
 
 private:
     const QString ivDir = "resources";
-    const QString ivPath = QString("%1%2%3.xml").arg(ivDir).arg(QDir::separator());
+    const QString ivPath =
+            QString("%1%2%3.xml").arg(ivDir).arg(QDir::separator()); // for example directory/interfaceview.xml
     const QString ivConfig = QString("%1%2config.xml").arg(ivDir).arg(QDir::separator());
 };
 
@@ -71,6 +73,7 @@ static void compareModels(ivm::IVModel *loaded, ivm::IVModel *generated);
 static void compareFunctions(ivm::IVFunction *loaded, ivm::IVFunction *generated);
 static void compareInterfaces(ivm::IVInterface *loaded, ivm::IVInterface *generated);
 static void compareParameters(const shared::InterfaceParameter &loaded, const shared::InterfaceParameter &generated);
+static void compareConnections(ivm::IVConnection *loaded, ivm::IVConnection *generated);
 
 template<typename T>
 QVector<int> createQVectorToQVectorMapByTitle(T source, T destination);
@@ -94,7 +97,6 @@ void tst_ivgenerator::testNominal()
     interfaceUnderTest->setEntityAttribute("wcet", "0");
     interfaceUnderTest->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::layer), "default");
     interfaceUnderTest->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::Autonamed), "true");
-    // <Property name="Taste::coordinates" value="12300 18400"/>
     functionUnderTest->addChild(interfaceUnderTest);
 
     const auto ivModelGenerated = IvGenerator::generate(interfaceUnderTest);
@@ -167,6 +169,27 @@ static void compareModels(ivm::IVModel *const loaded, ivm::IVModel *const genera
         const auto &generatedFunction = generatedFunctions.at(i);
 
         compareFunctions(loadedFunction, generatedFunction);
+    }
+
+    for (int i = 0; i < generatedFunctionsSize; i++) {
+        const auto &loadedFunction = loadedFunctions.at(loadedToGeneratedFunctionMap.at(i));
+        const auto &generatedFunction = generatedFunctions.at(i);
+
+        const auto &loadedConnections = loaded->getConnectionsForFunction(loadedFunction->id());
+        const auto &generatedConnections = generated->getConnectionsForFunction(generatedFunction->id());
+
+        const auto &loadedConnectionsSize = loadedConnections.size();
+        const auto &generatedConnectionsSize = generatedConnections.size();
+
+        QCOMPARE(generatedConnectionsSize, loadedConnectionsSize);
+
+        for (int j = 0; j < loadedConnectionsSize; j++) {
+            const auto &loadedConnection = loadedConnections.at(j);
+            const auto &generatedConnection = generatedConnections.at(j);
+
+            qDebug() << "connections: " << loadedConnection << generatedConnections;
+            compareConnections(loadedConnection, generatedConnection);
+        }
     }
 }
 
@@ -254,6 +277,12 @@ static void compareParameters(const shared::InterfaceParameter &loaded, const sh
     QCOMPARE(generated.direction(), loaded.direction());
     QCOMPARE(generated.encoding(), loaded.encoding());
     QCOMPARE(generated.name(), loaded.name());
+}
+
+static void compareConnections(ivm::IVConnection *const loaded, ivm::IVConnection *const generated)
+{
+    (void)loaded;
+    (void)generated;
 }
 
 // T could be at least QVector<IVInterface*> or QVector<IVFunction*>

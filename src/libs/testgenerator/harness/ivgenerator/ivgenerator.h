@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <ivcore/ivconnection.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivinterface.h>
 #include <ivcore/ivmodel.h>
@@ -92,10 +93,11 @@ public:
 private:
     static auto makeTestDriverFunction(ivm::IVModel *model, ivm::IVInterface *ifaceUnderTest) -> ivm::IVFunction *;
     static auto makeFunctionUnderTest(ivm::IVInterface *ifaceUnderTest) -> ivm::IVFunction *;
-    static auto makeStartTest(ivm::IVModel *model, ivm::IVFunction *function) -> ivm::IVInterface *;
+    static auto makeStartTestIface(ivm::IVModel *model, ivm::IVFunction *function) -> ivm::IVInterface *;
     static auto makeTestDriverRequiredIface(ivm::IVInterface *ifaceUnderTest, ivm::IVFunction *testDriverFunction)
             -> ivm::IVInterface *;
-    static auto copyIface(ivm::IVInterface *ifaceUnderTest) -> ivm::IVInterface *;
+    static auto makeTestDriverProvidedInterface(ivm::IVInterface *ifaceUnderTest) -> ivm::IVInterface *;
+    static auto makeConnection(ivm::IVInterface *required, ivm::IVInterface *provided) -> ivm::IVConnection *;
     static auto throwOnNullpointer(void *pointer) -> void;
 };
 
