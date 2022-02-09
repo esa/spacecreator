@@ -43,6 +43,15 @@ class InterfaceParameterTranslator final
 {
 public:
     /**
+     * @brief Enumeration indicating whether the interface is a Setter of a Getter
+     */
+    enum class InterfaceMode
+    {
+        Getter,
+        Setter
+    };
+
+    /**
      * @brief   Constructor
      *
      * @param   sedsInterfaceName   Parent interface name
@@ -80,12 +89,18 @@ public:
     auto translateParameter(const seds::model::InterfaceParameter &sedsParameter,
             const ivm::IVInterface::InterfaceType interfaceType) const -> void;
 
-private:
-    enum class InterfaceMode
-    {
-        Getter,
-        Setter
-    };
+    /**
+     * @brief   Get name of an interface for handling the given parameter
+     *
+     * @param   mode            Mode of the SEDS interface
+     * @param   interfaceName   Name of the SEDS interface
+     * @param   type            Type of the TASTE interface
+     * @param   parameterName   Name of the SEDS parameter
+     *
+     * @returns TASTE interface name
+     */
+    static auto getParameterName(const InterfaceMode mode, const QString &interfaceName,
+            const ivm::IVInterface::InterfaceType type, const QString &parameterName) -> QString;
 
 private:
     auto translateGetterParameter(const seds::model::InterfaceParameter &sedsParameter,
@@ -98,8 +113,6 @@ private:
             ivm::IVInterface::OperationKind kind, shared::InterfaceParameter::Direction direction) const -> void;
     auto switchInterfaceType(ivm::IVInterface::InterfaceType interfaceType) const -> ivm::IVInterface::InterfaceType;
 
-    static auto getParameterName(const InterfaceMode mode, const QString &interfaceName,
-            const ivm::IVInterface::InterfaceType type, const QString &parameterName) -> QString;
     static auto interfaceTypeToString(ivm::IVInterface::InterfaceType type) -> const QString &;
 
 private:

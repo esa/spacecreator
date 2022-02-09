@@ -3,34 +3,34 @@ use Datamodel;
 
 system ParameterMapHostRequirer;
 
-   exported procedure Get_IF_SyncParam_Pi;
+   procedure Get_IF_SyncParam_Pi;
    fpar in/out param Number;
-   referenced;
+   external;
 
-   exported procedure Get_IF_SyncRoParam_Pi;
+   procedure Get_IF_SyncRoParam_Pi;
    fpar in/out param Number;
-   referenced;
+   external;
 
-   exported procedure Set_IF_SyncParam_Pi;
+   procedure Set_IF_SyncParam_Pi;
    fpar in param Number;
-   referenced;
+   external;
 
-   signal Get_IF_AsyncParam_Ri(Number);
-   signal Get_IF_AsyncRoParam_Ri(Number);
-   signal Set_IF_AsyncParam_Pi(Number);
+   signal Get_IF_AsyncParam_Pi(Number);
+   signal Get_IF_AsyncRoParam_Pi(Number);
+   signal Set_IF_AsyncParam_Ri(Number);
 
    channel c
-      from env to ParameterMapHostRequirer with Set_IF_AsyncParam_Pi;
-      from ParameterMapHostRequirer to env with Get_IF_AsyncParam_Ri;
-      from ParameterMapHostRequirer to env with Get_IF_AsyncRoParam_Ri;
+      from ParameterMapHostRequirer to env with Set_IF_AsyncParam_Ri;
+      from env to ParameterMapHostRequirer with Get_IF_AsyncParam_Pi;
+      from env to ParameterMapHostRequirer with Get_IF_AsyncRoParam_Pi;
    endchannel;
 
    block ParameterMapHostRequirer;
 
       signalroute r
-      from env to ParameterMapHostRequirer with Set_IF_AsyncParam_Pi;
-      from ParameterMapHostRequirer to env with Get_IF_AsyncParam_Ri;
-      from ParameterMapHostRequirer to env with Get_IF_AsyncRoParam_Ri;
+      from ParameterMapHostRequirer to env with Set_IF_AsyncParam_Ri;
+      from env to ParameterMapHostRequirer with Get_IF_AsyncParam_Pi;
+      from env to ParameterMapHostRequirer with Get_IF_AsyncRoParam_Pi;
       connect c and r;
 
       process ParameterMapHostRequirer referenced;

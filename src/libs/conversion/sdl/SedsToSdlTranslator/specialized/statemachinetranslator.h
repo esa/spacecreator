@@ -139,18 +139,18 @@ private:
         Async
     };
 
+    static auto getAnyState(::sdl::StateMachine *stateMachine) -> ::sdl::State *;
+
     static auto getParameterInterface(ivm::IVFunction *function, const ParameterType type, const ParameterMode mode,
             const QString interfaceName, const QString parameterName) -> ivm::IVInterface *;
-
-    static auto createParameterAsyncGetter(
-            ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::Process *sdlProcess) -> void;
-    static auto createParameterAsyncSetter(
-            ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::Process *sdlProcess) -> void;
 
     static auto createParameterSyncGetter(
             ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::Process *sdlProcess) -> void;
     static auto createParameterSyncSetter(
             ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::Process *sdlProcess) -> void;
+
+    static auto createParameterAsyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
+            ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void;
 
     static auto translateParameter(ivm::IVFunction *function, const seds::model::ParameterMap &map,
             ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void;
@@ -165,6 +165,9 @@ private:
     static auto translateState(const seds::model::EntryState &sedsState) -> std::unique_ptr<::sdl::State>;
 
     static auto translatePrimitive(::sdl::Process *sdlProcess, const seds::model::OnCommandPrimitive &command)
+            -> InputHandler;
+
+    static auto translatePrimitive(::sdl::Process *sdlProcess, const seds::model::OnParameterPrimitive &primitive)
             -> InputHandler;
 
     static auto translatePrimitive(::sdl::State *sdlFromState) -> InputHandler;

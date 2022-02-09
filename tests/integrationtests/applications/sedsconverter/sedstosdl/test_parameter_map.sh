@@ -35,5 +35,5 @@ $DIFF parametermaphostprovider.pr ../resources/test_parametermaphostprovider.out
   && asn1scc -Ada --type-prefix asn1Scc dataview-uniq.asn parametermaphostrequirer_datamodel.asn \
   && gcc -c parametermaphostprovider.adb \
   && gcc -c parametermaphostrequirer.adb \
-  && cd .. 
-  #&& rm -r -f $TEST_OUTPUT_DIR
+  && cd .. \
+  && rm -r -f $TEST_OUTPUT_DIR
