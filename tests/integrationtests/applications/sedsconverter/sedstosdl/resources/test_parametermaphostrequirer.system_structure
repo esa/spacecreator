@@ -3,15 +3,15 @@ use Datamodel;
 
 system ParameterMapHostRequirer;
 
-   procedure Get_IF_SyncParam_Pi;
+   procedure Get_IF_SyncParam_Ri;
    fpar in/out param Number;
    external;
 
-   procedure Get_IF_SyncRoParam_Pi;
+   procedure Get_IF_SyncRoParam_Ri;
    fpar in/out param Number;
    external;
 
-   procedure Set_IF_SyncParam_Pi;
+   procedure Set_IF_SyncParam_Ri;
    fpar in param Number;
    external;
 

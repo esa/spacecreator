@@ -171,11 +171,11 @@ public:
     auto operator()(const seds::model::SendCommandPrimitive &sendCommand) -> void;
 
     /**
-     * @brief   Translates SEDS sendPrimitive
+     * @brief   Translates SEDS sendParameter
      *
-     * @param   sendPrimitive   Statement to translate
+     * @param   sendParameter   Statement to translate
      */
-    auto operator()(const seds::model::SendParameterPrimitive &sendPrimitive) -> void;
+    auto operator()(const seds::model::SendParameterPrimitive &sendParameter) -> void;
 
     /**
      * @brief   Translates SEDS activity invocation into SDL task
@@ -218,8 +218,14 @@ private:
     static auto translateCall(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString callName,
             const seds::model::SendCommandPrimitive &sendCommand) -> std::unique_ptr<::sdl::ProcedureCall>;
 
+    static auto translateCall(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString callName,
+            const seds::model::SendParameterPrimitive &sendParameter) -> std::unique_ptr<::sdl::ProcedureCall>;
+
     static auto translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString &callName,
             const seds::model::SendCommandPrimitive &sendCommand) -> std::vector<std::unique_ptr<::sdl::Action>>;
+
+    static auto translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString &callName,
+            const seds::model::SendParameterPrimitive &sendParameter) -> std::vector<std::unique_ptr<::sdl::Action>>;
 
     static auto translateComparison(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
             const seds::model::Comparison &comparison) -> QString;
