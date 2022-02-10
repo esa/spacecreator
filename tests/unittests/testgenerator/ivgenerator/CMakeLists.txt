@@ -18,7 +18,6 @@ target_link_libraries(${TEST_NAME}
                 ivcore
                 dvcore
                 TestGenerator
-                IvXmlExporter
                 Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test
                 CommonProjectWarnings

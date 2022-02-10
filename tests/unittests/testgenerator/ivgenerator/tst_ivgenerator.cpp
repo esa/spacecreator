@@ -17,12 +17,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "conversion/iv/IvOptions/options.h"
-#include "conversion/iv/IvXmlExporter/exporter.h"
-#include "ivconnection.h"
-#include "ivobject.h"
-#include "options.h"
-
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
@@ -32,11 +26,8 @@
 #include <ivcore/ivcommonprops.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivinterface.h>
-#include <ivcore/ivlibrary.h>
 #include <ivcore/ivmodel.h>
-#include <ivcore/ivpropertytemplateconfig.h>
 #include <ivtools.h>
-#include <libiveditor/iveditor.h>
 #include <memory>
 #include <modelloader.h>
 #include <qobjectdefs.h>
@@ -105,8 +96,6 @@ void compareEntities(entityType loaded, entityType generated,
 void tst_ivgenerator::initTestCase()
 {
     shared::initSharedLibrary();
-    ivm::initIVLibrary();
-    ive::initIVEditor();
 }
 
 void tst_ivgenerator::testNominal()
@@ -129,12 +118,6 @@ void tst_ivgenerator::testNominal()
     if (ivModelLoaded == nullptr) {
         throw std::runtime_error(QString("%1 file could not be read as IV").arg(ivDir).toStdString());
     }
-
-    conversion::iv::exporter::IvXmlExporter exporter;
-    conversion::Options options;
-    options.add(conversion::iv::IvOptions::outputFilepath, "out_iv.xml");
-
-    exporter.exportModel(ivModelGenerated.get(), options);
 
     compareModels(ivModelLoaded, ivModelGenerated.get());
 }
