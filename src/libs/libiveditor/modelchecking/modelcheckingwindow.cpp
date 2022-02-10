@@ -402,7 +402,9 @@ void ModelCheckingWindow::on_treeWidget_properties_itemDoubleClicked(QTreeWidget
     //QProcess *process = new QProcess(this);
     QString cmd;
     if (fileInfo.completeSuffix() == "msc"){
-        cmd = "msceditor -m " + item->text(1);
+        // TODO use standard .AppImage
+        cmd = "/home/taste/spacecreator/package/spacecreator-x86_64-0.12.0.AppImage -client " + item->text(1);
+        //cmd = "msceditor -m " + item->text(1);
     } else{ // then has to be a .pr file
         cmd = "opengeode " + item->text(1);
     }
@@ -413,7 +415,7 @@ void ModelCheckingWindow::on_treeWidget_properties_itemDoubleClicked(QTreeWidget
                              tr("Error when calling '%1'.").arg(cmd));
         return;
     }
-    statusBar()->showMessage("External editor called.", 6000);
+    statusBar()->showMessage("File open.", 6000);
 }
 
 void ModelCheckingWindow::on_treeWidget_subtyping_itemDoubleClicked(QTreeWidgetItem *item, int column)
@@ -422,7 +424,8 @@ void ModelCheckingWindow::on_treeWidget_subtyping_itemDoubleClicked(QTreeWidgetI
         return;
     }
     // is subtyping file
-    QString cmd = "kate " + item->text(1);
+    // TODO use standard .AppImage
+    QString cmd = "/home/taste/spacecreator/package/spacecreator-x86_64-0.12.0.AppImage -client " + item->text(1);
     QProcess *p = new QProcess();
     p->start(cmd);
     if(!p->waitForStarted(10000)) {
@@ -430,7 +433,7 @@ void ModelCheckingWindow::on_treeWidget_subtyping_itemDoubleClicked(QTreeWidgetI
                              tr("Error when calling '%1'.").arg(cmd));
         return;
     }
-    statusBar()->showMessage("External editor called.", 6000);
+    statusBar()->showMessage("File open.", 6000);
 }
 
 void ModelCheckingWindow::on_treeWidget_subtyping_itemChanged(QTreeWidgetItem *item, int column)
@@ -625,7 +628,9 @@ void ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked(QTreeWidgetIte
     QFileInfo fileInfo(item->text(1));
     QString cmd;
     if (fileInfo.completeSuffix() == "msc"){
-        cmd = "msceditor -m " + item->text(1);
+        // TODO use standard .AppImage
+        cmd = "/home/taste/spacecreator/package/spacecreator-x86_64-0.12.0.AppImage -client " + item->text(1);
+        //cmd = "msceditor -m " + item->text(1);
     } else{
         cmd = "kate " + item->text(1);
     }
