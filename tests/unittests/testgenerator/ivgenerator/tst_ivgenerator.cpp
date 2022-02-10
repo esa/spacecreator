@@ -20,6 +20,7 @@
 #include "conversion/iv/IvOptions/options.h"
 #include "conversion/iv/IvXmlExporter/exporter.h"
 #include "ivconnection.h"
+#include "ivobject.h"
 #include "options.h"
 
 #include <QObject>
@@ -66,6 +67,8 @@ private:
 };
 
 static std::unique_ptr<ivm::IVFunction> makeFunctionUnderTest(const QString &name);
+static ivm::IVInterface *makeInterfaceUnderTest(
+        const QString &interfaceName, ivm::IVFunction *function, ivm::IVInterface::OperationKind operationKind);
 static ivm::IVInterface::CreationInfo createInterfaceUnderTestCreationInfo(
         const QString &ifName, ivm::IVFunction *function, ivm::IVInterface::OperationKind kind);
 
@@ -73,12 +76,24 @@ static void compareModels(ivm::IVModel *loaded, ivm::IVModel *generated);
 static void compareFunctions(ivm::IVFunction *loaded, ivm::IVFunction *generated);
 static void compareInterfaces(ivm::IVInterface *loaded, ivm::IVInterface *generated);
 static void compareParameters(const shared::InterfaceParameter &loaded, const shared::InterfaceParameter &generated);
+static void compareConnectionVectors(
+        const QVector<ivm::IVConnection *> &loaded, const QVector<ivm::IVConnection *> &generated);
 static void compareConnections(ivm::IVConnection *loaded, ivm::IVConnection *generated);
 
+static void checkEntityAttributesEqual(ivm::IVObject *expected, ivm::IVObject *actual);
+static void checkAnyOfElementsIsSize(QVector<int> map, int size);
+
+static auto elementsEqualByTitle = [](const auto &srcVector, int i, const auto &dstVector, int j) -> bool {
+    return srcVector.at(i)->title().compare(dstVector.at(j)->title()) == 0;
+};
+
+static auto elementsEqualByName = [](const auto &srcVector, int i, const auto &dstVector, int j) -> bool {
+    return srcVector.at(i).name().compare(dstVector.at(j).name()) == 0;
+};
+
 template<typename T>
-QVector<int> createQVectorToQVectorMapByTitle(T source, T destination);
-QVector<int> createQVectorToQVectorMapByName(
-        const QVector<shared::InterfaceParameter> &source, const QVector<shared::InterfaceParameter> &destination);
+QVector<int> createQVectorToQVectorMap(const T &source, const T &destination,
+        std::function<bool(const T &source, int i, const T &destination, int j)> elementsEqual);
 
 void tst_ivgenerator::initTestCase()
 {
@@ -91,20 +106,12 @@ void tst_ivgenerator::testNominal()
 {
     const auto functionUnderTest = makeFunctionUnderTest("FunctionUnderTest");
 
-    const ivm::IVInterface::CreationInfo ci = createInterfaceUnderTestCreationInfo(
+    ivm::IVInterface *const interfaceUnderTest = makeInterfaceUnderTest(
             "InterfaceUnderTest", functionUnderTest.get(), ivm::IVInterface::OperationKind::Protected);
-    ivm::IVInterface *const interfaceUnderTest = ivm::IVInterface::createIface(ci);
-    interfaceUnderTest->setEntityAttribute("wcet", "0");
-    interfaceUnderTest->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::layer), "default");
-    interfaceUnderTest->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::Autonamed), "true");
+
     functionUnderTest->addChild(interfaceUnderTest);
 
     const auto ivModelGenerated = IvGenerator::generate(interfaceUnderTest);
-    ivModelGenerated->setProperty(
-            dvm::meta::Props::token(dvm::meta::Props::Token::asn1file).toStdString().c_str(), "testDriver.acn");
-    qDebug() << ivModelGenerated
-                        ->property(dvm::meta::Props::token(dvm::meta::Props::Token::asn1file).toStdString().c_str())
-                        .toString();
 
     if (ivModelGenerated == nullptr) {
         QFAIL("IV model was not generated");
@@ -123,6 +130,19 @@ void tst_ivgenerator::testNominal()
     exporter.exportModel(ivModelGenerated.get(), options);
 
     compareModels(ivModelLoaded, ivModelGenerated.get());
+}
+
+static ivm::IVInterface *makeInterfaceUnderTest(const QString &interfaceName, ivm::IVFunction *const function,
+        const ivm::IVInterface::OperationKind operationKind)
+{
+    const ivm::IVInterface::CreationInfo ci =
+            createInterfaceUnderTestCreationInfo(interfaceName, function, operationKind);
+    ivm::IVInterface *const iface = ivm::IVInterface::createIface(ci);
+    iface->setEntityAttribute("wcet", "0");
+    iface->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::layer), "default");
+    iface->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::Autonamed), "true");
+
+    return iface;
 }
 
 static std::unique_ptr<ivm::IVFunction> makeFunctionUnderTest(const QString &name)
@@ -151,18 +171,18 @@ static void compareModels(ivm::IVModel *const loaded, ivm::IVModel *const genera
 {
     const QVector<ivm::IVFunction *> loadedFunctions =
             QVector<ivm::IVFunction *>::fromStdVector(IvTools::getFunctions(loaded));
-    const int loadedFunctionsSize = loadedFunctions.size();
 
     const QVector<ivm::IVFunction *> generatedFunctions =
             QVector<ivm::IVFunction *>::fromStdVector(IvTools::getFunctions(generated));
+
+    const int loadedFunctionsSize = loadedFunctions.size();
     const int generatedFunctionsSize = generatedFunctions.size();
     QCOMPARE(generatedFunctionsSize, loadedFunctionsSize);
 
-    QVector<int> loadedToGeneratedFunctionMap = createQVectorToQVectorMapByTitle(loadedFunctions, generatedFunctions);
-    if (std::any_of(loadedToGeneratedFunctionMap.begin(), loadedToGeneratedFunctionMap.end(),
-                [&loadedFunctionsSize](const auto &el) { return el == loadedFunctionsSize; })) {
-        QFAIL(QString("Function not found in generated model").toStdString().c_str());
-    }
+    const QVector<int> loadedToGeneratedFunctionMap = createQVectorToQVectorMap<QVector<ivm::IVFunction *>>(
+            loadedFunctions, generatedFunctions, elementsEqualByTitle);
+    // if yes, vectors do differ in at least one element
+    checkAnyOfElementsIsSize(loadedToGeneratedFunctionMap, loadedFunctionsSize);
 
     for (int i = 0; i < generatedFunctionsSize; i++) {
         const auto &loadedFunction = loadedFunctions.at(loadedToGeneratedFunctionMap.at(i));
@@ -178,18 +198,7 @@ static void compareModels(ivm::IVModel *const loaded, ivm::IVModel *const genera
         const auto &loadedConnections = loaded->getConnectionsForFunction(loadedFunction->id());
         const auto &generatedConnections = generated->getConnectionsForFunction(generatedFunction->id());
 
-        const auto &loadedConnectionsSize = loadedConnections.size();
-        const auto &generatedConnectionsSize = generatedConnections.size();
-
-        QCOMPARE(generatedConnectionsSize, loadedConnectionsSize);
-
-        for (int j = 0; j < loadedConnectionsSize; j++) {
-            const auto &loadedConnection = loadedConnections.at(j);
-            const auto &generatedConnection = generatedConnections.at(j);
-
-            qDebug() << "connections: " << loadedConnection << generatedConnections;
-            compareConnections(loadedConnection, generatedConnection);
-        }
+        compareConnectionVectors(loadedConnections, generatedConnections);
     }
 }
 
@@ -210,8 +219,8 @@ static void compareFunctions(ivm::IVFunction *const loaded, ivm::IVFunction *con
     const int generatedInterfacesSize = generatedInterfaces.size();
     QCOMPARE(generatedInterfacesSize, loadedInterfacesSize);
 
-    QVector<int> loadedToGeneratedInterfaceMap =
-            createQVectorToQVectorMapByTitle(loadedInterfaces, generatedInterfaces);
+    const QVector<int> loadedToGeneratedInterfaceMap = createQVectorToQVectorMap<QVector<ivm::IVInterface *>>(
+            loadedInterfaces, generatedInterfaces, elementsEqualByTitle);
 
     if (std::any_of(loadedToGeneratedInterfaceMap.begin(), loadedToGeneratedInterfaceMap.end(),
                 [&loadedInterfacesSize](const auto &el) { return el == loadedInterfacesSize; })) {
@@ -232,12 +241,7 @@ static void compareInterfaces(ivm::IVInterface *const loaded, ivm::IVInterface *
     QCOMPARE(generated->kind(), loaded->kind());
     QCOMPARE(generated->type(), loaded->type());
 
-    for (const auto &entityAttribute : loaded->entityAttributes()) {
-        const auto &generatedValue = generated->entityAttributeValue(entityAttribute.name()).toString();
-        const auto &loadedValue = entityAttribute.value().toString();
-
-        QCOMPARE(generatedValue, loadedValue);
-    }
+    checkEntityAttributesEqual(loaded, generated);
 
     const auto &loadedParams = loaded->params();
     const auto &generatedParams = generated->params();
@@ -246,7 +250,8 @@ static void compareInterfaces(ivm::IVInterface *const loaded, ivm::IVInterface *
     const int loadedParametersSize = loadedParams.size();
     QCOMPARE(generatedParametersSize, loadedParametersSize);
 
-    QVector<int> loadedToGeneratedParameterMap = createQVectorToQVectorMapByName(loadedParams, generatedParams);
+    const QVector<int> loadedToGeneratedParameterMap = createQVectorToQVectorMap<QVector<shared::InterfaceParameter>>(
+            loadedParams, generatedParams, elementsEqualByName);
 
     if (std::any_of(loadedToGeneratedParameterMap.begin(), loadedToGeneratedParameterMap.end(),
                 [&loadedParametersSize](const auto &el) { return el == loadedParametersSize; })) {
@@ -274,19 +279,47 @@ static void compareParameters(const shared::InterfaceParameter &loaded, const sh
     QCOMPARE(generated.name(), loaded.name());
 }
 
+static void compareConnectionVectors(
+        const QVector<ivm::IVConnection *> &loadedConnections, const QVector<ivm::IVConnection *> &generatedConnections)
+{
+    const auto &loadedConnectionsSize = loadedConnections.size();
+    const auto &generatedConnectionsSize = generatedConnections.size();
+
+    QCOMPARE(generatedConnectionsSize, loadedConnectionsSize);
+
+    for (int j = 0; j < loadedConnectionsSize; j++) {
+        const auto &loadedConnection = loadedConnections.at(j);
+        const auto &generatedConnection = generatedConnections.at(j);
+
+        compareConnections(loadedConnection, generatedConnection);
+    }
+}
+
 static void compareConnections(ivm::IVConnection *const loaded, ivm::IVConnection *const generated)
 {
-    for (const auto &entityAttribute : loaded->entityAttributes()) {
-        const auto &generatedValue = generated->entityAttributeValue(entityAttribute.name()).toString();
-        const auto &loadedValue = entityAttribute.value().toString();
+    checkEntityAttributesEqual(loaded, generated);
+}
 
-        QCOMPARE(generatedValue, loadedValue);
+static void checkEntityAttributesEqual(ivm::IVObject *const expected, ivm::IVObject *const actual)
+{
+    for (const auto &entityAttribute : expected->entityAttributes()) {
+        const auto &expectedValue = entityAttribute.value().toString();
+        const auto &actualValue = actual->entityAttributeValue(entityAttribute.name()).toString();
+
+        QCOMPARE(actualValue, expectedValue);
     }
 }
 
-// T could be at least QVector<IVInterface*> or QVector<IVFunction*>
-template<typename T>
-QVector<int> createQVectorToQVectorMapByTitle(const T source, const T destination)
+static void checkAnyOfElementsIsSize(QVector<int> map, int size)
+{
+    if (std::any_of(map.begin(), map.end(), [&size](const auto &el) { return el == size; })) {
+        QFAIL(QString("Element not found in generated entity").toStdString().c_str());
+    }
+}
+
+template<typename QVectorT>
+QVector<int> createQVectorToQVectorMap(const QVectorT &source, const QVectorT &destination,
+        std::function<bool(const QVectorT &source, int i, const QVectorT &destination, int j)> elementsEqual)
 {
     assert(source.size() == destination.size());
 
@@ -294,34 +327,10 @@ QVector<int> createQVectorToQVectorMapByTitle(const T source, const T destinatio
 
     QVector<int> map(size, size);
 
-    for (int j = 0; j < size; j++) {
-        const auto &dst = destination.at(j);
-        for (int k = 0; k < size; k++) {
-            const auto &src = source.at(k);
-            if (src->title().compare(dst->title()) == 0) {
-                map[j] = k;
-            }
-        }
-    }
-
-    return map;
-}
-
-QVector<int> createQVectorToQVectorMapByName(
-        const QVector<shared::InterfaceParameter> &source, const QVector<shared::InterfaceParameter> &destination)
-{
-    assert(source.size() == destination.size());
-
-    const int size = source.size();
-
-    QVector<int> map(size, size);
-
-    for (int j = 0; j < size; j++) {
-        const auto &dst = destination.at(j);
-        for (int k = 0; k < size; k++) {
-            const auto &src = source.at(k);
-            if (src.name().compare(dst.name()) == 0) {
-                map[j] = k;
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            if (elementsEqual(source, i, destination, j)) {
+                map[i] = j;
             }
         }
     }
