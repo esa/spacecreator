@@ -641,7 +641,7 @@ void ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked(QTreeWidgetIte
                              tr("Error when calling '%1'.").arg(cmd));
         return;
     }
-    statusBar()->showMessage("External editor called.", 6000);
+    statusBar()->showMessage("File open.", 6000);
 }
 
 void ModelCheckingWindow::convertToObs()
