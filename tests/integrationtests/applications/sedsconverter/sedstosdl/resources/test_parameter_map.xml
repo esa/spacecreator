@@ -48,6 +48,18 @@
               </Body>
             </Activity>
           </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="SM">
+              <EntryState name="s" />
+              <ExitState name="e" />
+              <Transition fromState="s" toState="e" name="t1">
+                <OnParameterPrimitive interface="IF" parameter="AsyncParam" operation="set" />
+              </Transition>
+              <Transition fromState="s" toState="e" name="t2">
+                <OnParameterPrimitive interface="IF" parameter="AsyncParam" operation="set" />
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
         </Implementation>
       </Component>
       <Component name="ParameterMapHostRequirer">

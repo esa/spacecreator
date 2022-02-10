@@ -454,6 +454,7 @@ auto StateMachineTranslator::translatePrimitive(
 auto StateMachineTranslator::translatePrimitive(
         ::sdl::Process *sdlProcess, const seds::model::OnParameterPrimitive &parameter) -> InputHandler
 {
+    // TODO : This needs a complete overhaul, as it needs to be aware of the ParameterMaps
     const auto mode = parameter.operation() == seds::model::ParameterOperation::Set
             ? InterfaceParameterTranslator::InterfaceMode::Setter
             : InterfaceParameterTranslator::InterfaceMode::Getter;
@@ -461,20 +462,35 @@ auto StateMachineTranslator::translatePrimitive(
     std::vector<std::unique_ptr<::sdl::Action>> unpackingActions;
 
     // Input signal can be received only via a provided interface
-    input->setName(InterfaceParameterTranslator::getParameterName(mode, parameter.interface().value(),
-            ivm::IVInterface::InterfaceType::Provided, parameter.parameter().value()));
+    const auto name = InterfaceParameterTranslator::getParameterName(mode, parameter.interface().value(),
+            ivm::IVInterface::InterfaceType::Provided, parameter.parameter().value());
+    std::cout << "Transition for input " << name.toStdString() << std::endl;
+    input->setName(name);
 
-    const auto variableName = ioVariableName(input->name());
-    const auto &variableIterator = std::find_if(sdlProcess->variables().begin(), sdlProcess->variables().end(),
-            [variableName](const auto &variable) { return variable->name() == variableName; });
-    if (variableIterator == sdlProcess->variables().end()) {
-        throw TranslationException(QString("Reception variable %1 not found").arg(variableName));
+    const bool isSporadic = true;
+
+    if (isSporadic) {
+        // This is a sporadic interface, so we must unpack the value.
+        // For protected/unprotected interfaces, the value assignment is done in the associated procedure
+        // and there are no parameters to unpack.
+        std::cout << "Sporadic " << name.toStdString() << std::endl;
+        const auto variableName = ioVariableName(name);
+        const auto &variableIterator = std::find_if(sdlProcess->variables().begin(), sdlProcess->variables().end(),
+                [variableName](const auto &variable) { return variable->name() == variableName; });
+        if (variableIterator == sdlProcess->variables().end()) {
+            throw TranslationException(QString("Reception variable %1 not found").arg(variableName));
+        }
+        std::cout << "Found variable " << variableIterator->get()->name().toStdString() << std::endl;
+        std::cout << "Adding parameter " << name.toStdString() << std::endl;
+        input->addParameter(std::make_unique<::sdl::VariableReference>((*variableIterator).get()));
+        /* const auto targetVariableName = Escaper::escapeAsn1FieldName(parameter.variableRef()->value().value());
+
+         std::cout << "Pushing unpacking action for " << name.toStdString() << std::endl;
+         unpackingActions.push_back(
+                 std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(targetVariableName, variableName)));*/
     }
-    input->addParameter(std::make_unique<::sdl::VariableReference>((*variableIterator).get()));
-    const auto targetVariableName = Escaper::escapeAsn1FieldName(parameter.variableRef()->value().value());
-    unpackingActions.push_back(
-            std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(targetVariableName, variableName)));
 
+    std::cout << "Returning primitive translation " << name.toStdString() << std::endl;
     return std::make_pair(std::move(input), std::move(unpackingActions));
 }
 
