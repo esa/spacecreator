@@ -19,7 +19,6 @@
 
 #include "ivgenerator.h"
 
-#include <QDebug>
 #include <dvcore/dvcommonprops.h>
 #include <dvcore/dvobject.h>
 #include <exception>
@@ -48,6 +47,8 @@ const QString IvGenerator::testDriverFunctionName = "TestDriver";
 
 auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::unique_ptr<ivm::IVModel>
 {
+    checkInputArgument(interfaceUnderTest);
+
     auto *const config = ivm::IVPropertyTemplateConfig::instance();
     if (config == nullptr) {
         throw std::runtime_error("config is null");
@@ -55,22 +56,6 @@ auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::u
 
     if (interfaceUnderTest == nullptr) {
         return nullptr;
-    }
-
-    if (interfaceUnderTest->function() == nullptr) {
-        throw std::runtime_error("Selected interface has no function specified");
-    }
-
-    const auto interfaceUnderTestOperationKind = interfaceUnderTest->kind();
-    if (interfaceUnderTestOperationKind == ivm::IVInterface::OperationKind::Any
-            || interfaceUnderTestOperationKind == ivm::IVInterface::OperationKind::Cyclic
-            || interfaceUnderTestOperationKind == ivm::IVInterface::IVInterface::OperationKind::Sporadic) {
-        throw std::runtime_error("Only Protected and Unprotected interfaces can be tested");
-    }
-
-    const auto interfaceUnderTestType = interfaceUnderTest->type();
-    if (interfaceUnderTestType != ivm::IVObject::Type::ProvidedInterface) {
-        throw std::runtime_error("Only Provided Interface can be tested");
     }
 
     auto ivModel = std::make_unique<ivm::IVModel>(config);
@@ -83,7 +68,7 @@ auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::u
     testDriverFunction->addChild(testDriverStartTestCi);
 
     auto *const functionUnderTest = makeFunctionUnderTest(ivModel.get(), interfaceUnderTest);
-    auto *const interfaceUnderTestPi = makeTestDriverProvidedInterface(interfaceUnderTest);
+    auto *const interfaceUnderTestPi = makeFunctionUnderTestProvidedInterface(interfaceUnderTest, functionUnderTest);
 
     functionUnderTest->addChild(interfaceUnderTestPi);
 
@@ -94,6 +79,24 @@ auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::u
     ivModel->addObject(connection);
 
     return ivModel;
+}
+
+auto IvGenerator::checkInputArgument(ivm::IVInterface *const iface) -> void
+{
+    if (iface->function() == nullptr) {
+        throw std::runtime_error("Selected interface has no function specified");
+    }
+
+    const auto interfaceUnderTestOperationKind = iface->kind();
+    if (interfaceUnderTestOperationKind == ivm::IVInterface::OperationKind::Any
+            || interfaceUnderTestOperationKind == ivm::IVInterface::OperationKind::Cyclic
+            || interfaceUnderTestOperationKind == ivm::IVInterface::IVInterface::OperationKind::Sporadic) {
+        throw std::runtime_error("Only Protected and Unprotected interfaces can be tested");
+    }
+
+    if (iface->type() != ivm::IVObject::Type::ProvidedInterface) {
+        throw std::runtime_error("Only Provided Interface can be tested");
+    }
 }
 
 auto IvGenerator::makeTestDriverFunction(ivm::IVModel *const model) -> ivm::IVFunction *
@@ -107,8 +110,7 @@ auto IvGenerator::makeTestDriverFunction(ivm::IVModel *const model) -> ivm::IVFu
     function->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::language), "C");
     function->setDefaultImplementation("default");
 
-    function->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::coordinates),
-            dvm::DVObject::coordinatesToString(Coordinates::Function::testDriver));
+    setObjectCoordinates(function, Coordinates::Function::testDriver);
 
     return function;
 }
@@ -125,21 +127,21 @@ auto IvGenerator::makeFunctionUnderTest(ivm::IVModel *const model, ivm::IVInterf
     for (const auto &entityAttribute : ifaceUnderTest->function()->entityAttributes()) {
         function->setEntityAttribute(entityAttribute.name(), entityAttribute.value().toString());
     }
-    function->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::coordinates),
-            dvm::DVObject::coordinatesToString(Coordinates::Function::functionUnderTest));
+    setObjectCoordinates(function, Coordinates::Function::functionUnderTest);
 
     return function;
 }
 
-auto IvGenerator::makeStartTestIface(ivm::IVModel *const model, ivm::IVFunction *const function) -> ivm::IVInterface *
+auto IvGenerator::makeStartTestIface(ivm::IVModel *const model, ivm::IVFunction *const testDriverFunction)
+        -> ivm::IVInterface *
 {
     throwOnNullpointer(model);
-    throwOnNullpointer(function);
+    throwOnNullpointer(testDriverFunction);
 
     ivm::IVInterface::CreationInfo ci;
     ci.name = startTestInterfaceName;
     ci.model = model;
-    ci.function = function;
+    ci.function = testDriverFunction;
     ci.kind = ivm::IVInterface::OperationKind::Cyclic;
     ci.type = ivm::IVInterface::InterfaceType::Provided;
 
@@ -149,8 +151,7 @@ auto IvGenerator::makeStartTestIface(ivm::IVModel *const model, ivm::IVFunction 
     iface->setEntityAttribute("priority", "1");
     iface->setEntityAttribute("dispatch_offset", "0");
     iface->setEntityAttribute("wcet", "0");
-    iface->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::coordinates),
-            dvm::DVObject::coordinatesToString(Coordinates::Interface::startTestCi));
+    setObjectCoordinates(iface, Coordinates::Interface::startTestCi);
 
     return iface;
 }
@@ -168,20 +169,22 @@ auto IvGenerator::makeTestDriverRequiredIface(
 
     auto *const iface = ivm::IVInterface::createIface(ci);
     iface->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::Autonamed), "true");
-    iface->setEntityAttribute("wcet", "0");
-    iface->setEntityProperty(dvm::meta::Props::token(dvm::meta::Props::Token::coordinates),
-            dvm::DVObject::coordinatesToString(Coordinates::Interface::interfaceUnderTestRi));
     iface->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::InheritPI), "true");
+    iface->setEntityAttribute("wcet", "0");
+    setObjectCoordinates(iface, Coordinates::Interface::interfaceUnderTestRi);
 
     return iface;
 }
 
-auto IvGenerator::makeTestDriverProvidedInterface(ivm::IVInterface *const ifaceUnderTest) -> ivm::IVInterface *
+auto IvGenerator::makeFunctionUnderTestProvidedInterface(
+        ivm::IVInterface *const ifaceUnderTest, ivm::IVFunction *const functionUnderTest) -> ivm::IVInterface *
 {
-    auto *const iface = ivm::IVInterface::createIface(ivm::IVInterface::CreationInfo::fromIface(ifaceUnderTest));
+    ivm::IVInterface::CreationInfo ci = ivm::IVInterface::CreationInfo::fromIface(ifaceUnderTest);
+    ci.function = functionUnderTest;
+
+    auto *const iface = ivm::IVInterface::createIface(ci);
     iface->setEntityAttribute("wcet", 0);
-    iface->setEntityProperty(dvm::meta::Props::token(dvm::meta::Props::Token::coordinates),
-            dvm::DVObject::coordinatesToString(Coordinates::Interface::interfaceUnderTestPi));
+    setObjectCoordinates(iface, Coordinates::Interface::interfaceUnderTestPi);
 
     return iface;
 }
@@ -194,10 +197,15 @@ auto IvGenerator::makeConnection(ivm::IVInterface *const required, ivm::IVInterf
 
     ivm::IVConnection *const connection = new ivm::IVConnection(required, provided, model);
 
-    connection->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::coordinates),
-            dvm::DVObject::coordinatesToString(Coordinates::connection));
+    setObjectCoordinates(connection, Coordinates::connection);
 
     return connection;
+}
+
+auto IvGenerator::setObjectCoordinates(ivm::IVObject *object, const QVector<qint32> &coordinates) -> void
+{
+    object->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::coordinates),
+            dvm::DVObject::coordinatesToString(coordinates));
 }
 
 auto IvGenerator::throwOnNullpointer(void *const pointer) -> void

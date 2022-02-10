@@ -23,16 +23,17 @@
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivinterface.h>
 #include <ivcore/ivmodel.h>
+#include <ivcore/ivobject.h>
 #include <memory>
 
 namespace testgenerator {
 
 /**
- * @brief  Constants with coordinates of the generated entities InterfaceView diagram
+ * @brief  Constants with coordinates of generated entities on InterfaceView diagram
  *
  */
-struct Coordinates {
-    struct Function {
+struct Coordinates final {
+    struct Function final {
         /**
          * @brief  Coordinates of a test driver function
          *
@@ -44,7 +45,7 @@ struct Coordinates {
          */
         static const QVector<qint32> functionUnderTest;
     };
-    struct Interface {
+    struct Interface final {
         /**
          * @brief  Coordinates of start test cyclic interface
          *
@@ -72,11 +73,11 @@ struct Coordinates {
  * @brief Test harness InterfaceView generator
  *
  */
-class IvGenerator
+class IvGenerator final
 {
 public:
     /**
-     * @brief name of an interface intended to start (trigger run) of a tests
+     * @brief name of an interface intended to start (trigger run of) test
      *
      */
     static const QString startTestInterfaceName;
@@ -96,15 +97,17 @@ public:
     static auto generate(ivm::IVInterface *interfaceUnderTest) -> std::unique_ptr<ivm::IVModel>;
 
 private:
+    static auto checkInputArgument(ivm::IVInterface *ifaceUnderTest) -> void;
     static auto makeTestDriverFunction(ivm::IVModel *model) -> ivm::IVFunction *;
     static auto makeFunctionUnderTest(ivm::IVModel *model, ivm::IVInterface *ifaceUnderTest) -> ivm::IVFunction *;
-    static auto makeStartTestIface(ivm::IVModel *model, ivm::IVFunction *function) -> ivm::IVInterface *;
+    static auto makeStartTestIface(ivm::IVModel *model, ivm::IVFunction *testDriverFunction) -> ivm::IVInterface *;
     static auto makeTestDriverRequiredIface(ivm::IVInterface *ifaceUnderTest, ivm::IVFunction *testDriverFunction)
             -> ivm::IVInterface *;
-    static auto makeTestDriverProvidedInterface(ivm::IVInterface *ifaceUnderTest) -> ivm::IVInterface
-            *; // TODO: this shall accept testDriverFunction as a parameter and write iface.function = function
+    static auto makeFunctionUnderTestProvidedInterface(
+            ivm::IVInterface *ifaceUnderTest, ivm::IVFunction *functionUnderTest) -> ivm::IVInterface *;
     static auto makeConnection(ivm::IVInterface *required, ivm::IVInterface *provided, ivm::IVModel *model)
             -> ivm::IVConnection *;
+    static auto setObjectCoordinates(ivm::IVObject *object, const QVector<qint32> &coordinates) -> void;
     static auto throwOnNullpointer(void *pointer) -> void;
 };
 
