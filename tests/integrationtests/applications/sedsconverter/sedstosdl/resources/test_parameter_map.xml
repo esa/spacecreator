@@ -37,6 +37,17 @@
             <ParameterMap variableRef="x" parameter="AsyncRoParam" interface="IF" />
             <ParameterMap variableRef="x" parameter="SyncRoParam" interface="IF" />
           </ParameterMapSet>
+          <ActivitySet>
+            <Activity name="TestActivity">
+              <Body>
+                <SendParameterPrimitive interface="IF" parameter="AsyncParam" operation="get">
+                  <ArgumentValue>
+                    <VariableRef variableRef="x" />
+                  </ArgumentValue>
+                </SendParameterPrimitive>
+              </Body>
+            </Activity>
+          </ActivitySet>
         </Implementation>
       </Component>
       <Component name="ParameterMapHostRequirer">
@@ -54,6 +65,27 @@
             <ParameterMap variableRef="x" parameter="AsyncRoParam" interface="IF" />
             <ParameterMap variableRef="x" parameter="SyncRoParam" interface="IF" />
           </ParameterMapSet>
+          <ActivitySet>
+            <Activity name="TestActivity">
+              <Body>
+                <SendParameterPrimitive interface="IF" parameter="SyncParam" operation="set">
+                  <ArgumentValue>
+                    <Value value="10" />
+                  </ArgumentValue>
+                </SendParameterPrimitive>
+                <SendParameterPrimitive interface="IF" parameter="SyncParam" operation="get">
+                  <ArgumentValue>
+                    <VariableRef variableRef="x" />
+                  </ArgumentValue>
+                </SendParameterPrimitive>
+                <SendParameterPrimitive interface="IF" parameter="AsyncParam" operation="set">
+                  <ArgumentValue>
+                    <Value value="10" />
+                  </ArgumentValue>
+                </SendParameterPrimitive>
+              </Body>
+            </Activity>
+          </ActivitySet>
         </Implementation>
       </Component>
     </ComponentSet>
