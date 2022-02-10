@@ -99,7 +99,7 @@ bool TmcConverter::convert()
 
 bool TmcConverter::addStopConditionFiles(const QStringList &files)
 {
-    for (const QString &filepath : files) {
+    for (const QString &filepath : files) { // NOLINT(readability-use-anyofallof)
         QFileInfo fileinfo(filepath);
         if (!fileinfo.exists()) {
             return false;
@@ -110,8 +110,9 @@ bool TmcConverter::addStopConditionFiles(const QStringList &files)
     return true;
 }
 
-bool TmcConverter::convertModel(std::set<conversion::ModelType> sourceModelTypes, conversion::ModelType targetModelType,
-        const std::set<conversion::ModelType> auxilaryModelTypes, conversion::Options options) const
+bool TmcConverter::convertModel(const std::set<conversion::ModelType> &sourceModelTypes,
+        conversion::ModelType targetModelType, const std::set<conversion::ModelType> &auxilaryModelTypes,
+        conversion::Options options) const
 {
     try {
         Converter converter(m_registry, std::move(options));
@@ -266,7 +267,7 @@ bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, cons
     qDebug() << "    " << outputFilepath;
     Options options;
 
-    for (const QString inputFileName : inputFilepathList) {
+    for (const QString &inputFileName : inputFilepathList) {
         options.add(Asn1Options::inputFilepath, inputFileName);
     }
 
@@ -310,7 +311,7 @@ void TmcConverter::findIvFunctions(const IVModel &model, QStringList &sdlFunctio
 bool TmcConverter::isSdlFunction(const ivm::IVFunction *function)
 {
     const QString defaultImplementation = function->defaultImplementation();
-    for (const auto &impl : function->implementations()) {
+    for (const auto &impl : function->implementations()) { // NOLINT(readability-use-anyofallof)
         if (impl.name() == defaultImplementation && impl.value().type() == QVariant::Type::String
                 && impl.value().toString().toLower() == "sdl") {
             return true;

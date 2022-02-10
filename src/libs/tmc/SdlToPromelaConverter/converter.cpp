@@ -24,12 +24,7 @@
 
 namespace tmc::converter {
 
-SdlToPromelaConverter::SdlToPromelaConverter()
-{
-    m_sdl2PromelaCommand = "sdl2promela";
-
-    m_externalCommandTimeout = 12000;
-}
+const QString SdlToPromelaConverter::m_sdl2PromelaCommand = QStringLiteral("sdl2promela");
 
 bool SdlToPromelaConverter::convertSdl(const QList<QFileInfo> &inputSdlFiles, const QFileInfo &outputFile)
 {

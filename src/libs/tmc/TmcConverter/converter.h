@@ -63,8 +63,8 @@ public:
     bool addStopConditionFiles(const QStringList &files);
 
 private:
-    bool convertModel(std::set<conversion::ModelType> sourceModelTypes, conversion::ModelType targetModelType,
-            const std::set<conversion::ModelType> auxilaryModelTypes, conversion::Options options) const;
+    bool convertModel(const std::set<conversion::ModelType> &sourceModelTypes, conversion::ModelType targetModelType,
+            const std::set<conversion::ModelType> &auxilaryModelTypes, conversion::Options options) const;
 
     bool convertSystem();
 

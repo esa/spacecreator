@@ -135,7 +135,7 @@ std::optional<QString> XmlValidator::getSchemaFilepath(const QString &filepath)
         return std::nullopt;
     }
 
-    const auto schemaFilename = schemaLocation.at(1);
+    const auto &schemaFilename = schemaLocation.at(1);
 
     auto fsPath = std::filesystem::path(filepath.toStdString());
     return QString::fromStdString(fsPath.replace_filename(schemaFilename.toStdString()));

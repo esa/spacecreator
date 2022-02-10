@@ -213,7 +213,7 @@ auto TestGenerator::getAssignmentsForRecords(const ivm::IVInterface &interface, 
             result += QString::number(static_cast<int>(testData.field(testDataRowIndex, srcFieldIndex).toDouble()));
             break;
         case Asn1Acn::Types::Type::REAL:
-            result += QString::number(testData.field(testDataRowIndex, srcFieldIndex).toFloat());
+            result += QString::number(testData.field(testDataRowIndex, srcFieldIndex).toDouble());
             break;
         case Asn1Acn::Types::Type::BOOLEAN: {
             result += qstringToBoolSymbol(testData.field(testDataRowIndex, srcFieldIndex));

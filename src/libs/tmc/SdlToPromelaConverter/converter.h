@@ -33,11 +33,6 @@ class SdlToPromelaConverter final
 {
 public:
     /**
-     * @brief Constructor.
-     */
-    SdlToPromelaConverter();
-
-    /**
      * @brief Convert SDL files into promela file.
      *
      * @param inputSdlfiles a list of input SDL files.
@@ -60,8 +55,9 @@ private:
     bool waitForSdl2PromelaProcess(QProcess &process);
 
 private:
-    QString m_sdl2PromelaCommand;
     QStringList m_sdl2PromelaArgs;
-    int m_externalCommandTimeout;
+
+    const static QString m_sdl2PromelaCommand;
+    constexpr static int m_externalCommandTimeout = 12000;
 };
 }
