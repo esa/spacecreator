@@ -167,8 +167,7 @@ auto StateMachineTranslator::translateStateMachine(Context &context, const seds:
     // Second pass through transitions
     for (auto &element : sedsStateMachine.elements()) {
         if (std::holds_alternative<seds::model::Transition>(element)) {
-            translateTransition(sedsStateMachine, std::get<seds::model::Transition>(element), context.sdlProcess(),
-                    context.sdlStateMachine(), stateMap);
+            translateTransition(context, sedsStateMachine, std::get<seds::model::Transition>(element), stateMap);
         }
     }
     for (auto &entry : stateMap) {
@@ -446,9 +445,10 @@ auto StateMachineTranslator::translateState(const seds::model::EntryState &sedsS
     return state;
 }
 
-auto StateMachineTranslator::translatePrimitive(
-        ::sdl::Process *sdlProcess, const seds::model::OnCommandPrimitive &command) -> InputHandler
+auto StateMachineTranslator::translatePrimitive(Context &context, const seds::model::OnCommandPrimitive &command)
+        -> InputHandler
 {
+    auto sdlProcess = context.sdlProcess();
     auto input = std::make_unique<::sdl::Input>();
     std::vector<std::unique_ptr<::sdl::Action>> unpackingActions;
 
@@ -477,10 +477,10 @@ auto StateMachineTranslator::translatePrimitive(
     return std::make_pair(std::move(input), std::move(unpackingActions));
 }
 
-auto StateMachineTranslator::translatePrimitive(
-        ::sdl::Process *sdlProcess, const seds::model::OnParameterPrimitive &parameter) -> InputHandler
+auto StateMachineTranslator::translatePrimitive(Context &context, const seds::model::OnParameterPrimitive &parameter)
+        -> InputHandler
 {
-    // TODO : This needs a complete overhaul, as it needs to be aware of the ParameterMaps
+    auto sdlProcess = context.sdlProcess();
     const auto mode = parameter.operation() == seds::model::ParameterOperation::Set
             ? InterfaceParameterTranslator::InterfaceMode::Setter
             : InterfaceParameterTranslator::InterfaceMode::Getter;
@@ -490,33 +490,36 @@ auto StateMachineTranslator::translatePrimitive(
     // Input signal can be received only via a provided interface
     const auto name = InterfaceParameterTranslator::getParameterName(mode, parameter.interface().value(),
             ivm::IVInterface::InterfaceType::Provided, parameter.parameter().value());
-    std::cout << "Transition for input " << name.toStdString() << std::endl;
     input->setName(name);
-
-    const bool isSporadic = true;
+    const auto interface = getInterfaceByName(context.ivFunction(), name);
+    if (interface == nullptr) {
+        throw TranslationException(QString("Interface %1 not found").arg(name));
+    }
+    const bool isSporadic = interface->kind() == ivm::IVInterface::OperationKind::Sporadic;
 
     if (isSporadic) {
         // This is a sporadic interface, so we must unpack the value.
         // For protected/unprotected interfaces, the value assignment is done in the associated procedure
         // and there are no parameters to unpack.
-        std::cout << "Sporadic " << name.toStdString() << std::endl;
         const auto variableName = ioVariableName(name);
         const auto &variableIterator = std::find_if(sdlProcess->variables().begin(), sdlProcess->variables().end(),
                 [variableName](const auto &variable) { return variable->name() == variableName; });
         if (variableIterator == sdlProcess->variables().end()) {
             throw TranslationException(QString("Reception variable %1 not found").arg(variableName));
         }
-        std::cout << "Found variable " << variableIterator->get()->name().toStdString() << std::endl;
-        std::cout << "Adding parameter " << name.toStdString() << std::endl;
         input->addParameter(std::make_unique<::sdl::VariableReference>((*variableIterator).get()));
-        /* const auto targetVariableName = Escaper::escapeAsn1FieldName(parameter.variableRef()->value().value());
-
-         std::cout << "Pushing unpacking action for " << name.toStdString() << std::endl;
-         unpackingActions.push_back(
-                 std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(targetVariableName, variableName)));*/
+        const auto &parameterMaps = context.sedsComponent().implementation().parameterMaps();
+        const auto &map = std::find_if(parameterMaps.begin(), parameterMaps.end(), [&parameter](const auto &m) {
+            return m.interface().value() == parameter.interface().value()
+                    && m.parameter().value() == parameter.parameter().value();
+        });
+        if (map == parameterMaps.end()) {
+            throw TranslationException(QString("Parameter map for input %1 not found").arg(name));
+        }
+        const auto targetVariableName = Escaper::escapeAsn1FieldName(map->variableRef().value().value());
+        unpackingActions.push_back(
+                std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(targetVariableName, variableName)));
     }
-
-    std::cout << "Returning primitive translation " << name.toStdString() << std::endl;
     return std::make_pair(std::move(input), std::move(unpackingActions));
 }
 
@@ -527,17 +530,17 @@ auto StateMachineTranslator::translatePrimitive(::sdl::State *sdlFromState) -> I
     return std::make_pair(std::move(input), std::vector<std::unique_ptr<::sdl::Action>>());
 }
 
-auto StateMachineTranslator::translatePrimitive(::sdl::Process *sdlProcess, ::sdl::State *sdlFromState,
+auto StateMachineTranslator::translatePrimitive(Context &context, ::sdl::State *sdlFromState,
         const seds::model::Transition::Primitive &primitive) -> InputHandler
 {
     // clang-format off
     return std::visit(
             overloaded {
-                [&sdlProcess](const seds::model::OnCommandPrimitive &command) {
-                        return translatePrimitive(sdlProcess, command);
+                [&context](const seds::model::OnCommandPrimitive &command) {
+                        return translatePrimitive(context, command);
                     },
-                [&sdlProcess](const seds::model::OnParameterPrimitive &parameter) {
-                        return translatePrimitive(sdlProcess, parameter);
+                [&context](const seds::model::OnParameterPrimitive &parameter) {
+                        return translatePrimitive(context, parameter);
                     },
                 [&sdlFromState](const seds::model::TimerSink &) {
                         return translatePrimitive(sdlFromState);
@@ -548,9 +551,9 @@ auto StateMachineTranslator::translatePrimitive(::sdl::Process *sdlProcess, ::sd
     // clang-format on
 }
 
-auto StateMachineTranslator::translateTransition(const seds::model::StateMachine &sedsStateMachine,
-        const seds::model::Transition &sedsTransition, ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine,
-        std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void
+auto StateMachineTranslator::translateTransition(Context &context, const seds::model::StateMachine &sedsStateMachine,
+        const seds::model::Transition &sedsTransition, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap)
+        -> void
 {
     const auto fromStateName = Escaper::escapeSdlName(sedsTransition.fromState().nameStr());
     const auto toStateName = Escaper::escapeSdlName(sedsTransition.toState().nameStr());
@@ -567,7 +570,7 @@ auto StateMachineTranslator::translateTransition(const seds::model::StateMachine
     auto sdlFromState = (*fromStateIterator).second.get();
     auto sdlToState = (*toStateIterator).second.get();
 
-    auto inputHandler = translatePrimitive(sdlProcess, sdlFromState, sedsTransition.primitive());
+    auto inputHandler = translatePrimitive(context, sdlFromState, sedsTransition.primitive());
 
     auto mainTransition = std::make_unique<::sdl::Transition>();
     auto currentTransitionPtr = mainTransition.get();
@@ -579,24 +582,27 @@ auto StateMachineTranslator::translateTransition(const seds::model::StateMachine
     }
 
     if (sedsTransition.guard().has_value()) {
-        currentTransitionPtr = translateGuard(sdlProcess, sdlFromState, currentTransitionPtr, *sedsTransition.guard());
+        currentTransitionPtr =
+                translateGuard(context.sdlProcess(), sdlFromState, currentTransitionPtr, *sedsTransition.guard());
     }
 
     if (stateChange) {
         const auto onExit = getOnExit(sedsStateMachine, sedsTransition.fromState().nameStr());
         if (onExit.has_value()) {
-            currentTransitionPtr->addAction(StatementTranslatorVisitor::translateActivityCall(sdlProcess, **onExit));
+            currentTransitionPtr->addAction(
+                    StatementTranslatorVisitor::translateActivityCall(context.sdlProcess(), **onExit));
         }
     }
 
     if (sedsTransition.doActivity().has_value()) {
         currentTransitionPtr->addAction(
-                StatementTranslatorVisitor::translateActivityCall(sdlProcess, *sedsTransition.doActivity()));
+                StatementTranslatorVisitor::translateActivityCall(context.sdlProcess(), *sedsTransition.doActivity()));
     }
     if (stateChange) {
         const auto onEntry = getOnEntry(sedsStateMachine, sedsTransition.toState().nameStr());
         if (onEntry.has_value()) {
-            currentTransitionPtr->addAction(StatementTranslatorVisitor::translateActivityCall(sdlProcess, **onEntry));
+            currentTransitionPtr->addAction(
+                    StatementTranslatorVisitor::translateActivityCall(context.sdlProcess(), **onEntry));
         }
         const auto timerTime = getTimerInvocationTime(sedsStateMachine, sedsTransition.toState().nameStr());
         if (timerTime.has_value()) {
@@ -607,7 +613,7 @@ auto StateMachineTranslator::translateTransition(const seds::model::StateMachine
     // State switch
     currentTransitionPtr->addAction(std::make_unique<::sdl::NextState>("", sdlToState));
 
-    stateMachine->addTransition(std::move(mainTransition));
+    context.sdlStateMachine()->addTransition(std::move(mainTransition));
 }
 
 auto StateMachineTranslator::createIoVariable(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void

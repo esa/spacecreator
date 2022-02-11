@@ -52,10 +52,10 @@
             <StateMachine name="SM">
               <EntryState name="s" />
               <ExitState name="e" />
-              <Transition fromState="s" toState="e" name="t1">
-                <OnParameterPrimitive interface="IF" parameter="AsyncParam" operation="set" />
+              <Transition fromState="s" toState="s" name="t1">
+                <OnParameterPrimitive interface="IF" parameter="SyncParam" operation="set" />
               </Transition>
-              <Transition fromState="s" toState="e" name="t2">
+              <Transition fromState="s" toState="s" name="t2">
                 <OnParameterPrimitive interface="IF" parameter="AsyncParam" operation="set" />
               </Transition>
             </StateMachine>
