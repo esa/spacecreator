@@ -55,14 +55,27 @@ process ParameterMapHostProvider;
     /* CIF Start (0, 1200), (200, 75) */
     START;
         /* CIF NextState (0, 1387), (200, 50) */
-        NEXTSTATE Idle;
+        NEXTSTATE s;
     /* CIF State (0, 1462), (200, 50) */
-    state Idle;
+    state e;
         /* CIF Input (0, 1462), (200, 50) */
         input Set_IF_AsyncParam_Pi(io_Set_IF_AsyncParam_Pi);
             /* CIF Task (0, 1537), (100, 50) */
             task x := io_Set_IF_AsyncParam_Pi;
             /* CIF NextState (0, 1612), (200, 50) */
-            NEXTSTATE Idle;
+            NEXTSTATE e;
+    endstate;
+    /* CIF State (600, 1462), (200, 50) */
+    state s;
+        /* CIF Input (600, 1462), (200, 50) */
+        input Set_IF_SyncParam_Pi;
+            /* CIF NextState (600, 1537), (200, 50) */
+            NEXTSTATE s;
+        /* CIF Input (900, 1462), (200, 50) */
+        input Set_IF_AsyncParam_Pi(io_Set_IF_AsyncParam_Pi);
+            /* CIF Task (900, 1537), (100, 50) */
+            task x := io_Set_IF_AsyncParam_Pi;
+            /* CIF NextState (900, 1612), (200, 50) */
+            NEXTSTATE s;
     endstate;
 endprocess ParameterMapHostProvider;

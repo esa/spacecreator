@@ -215,20 +215,19 @@ private:
 
     static auto translateState(const seds::model::EntryState &sedsState) -> std::unique_ptr<::sdl::State>;
 
-    static auto translatePrimitive(::sdl::Process *sdlProcess, const seds::model::OnCommandPrimitive &command)
+    static auto translatePrimitive(Context &context, const seds::model::OnCommandPrimitive &command) -> InputHandler;
+
+    static auto translatePrimitive(Context &context, const seds::model::OnParameterPrimitive &primitive)
             -> InputHandler;
 
-    static auto translatePrimitive(::sdl::Process *sdlProcess, const seds::model::OnParameterPrimitive &primitive)
-            -> InputHandler;
+    static auto translatePrimitive(Context &context, ::sdl::State *sdlFromState,
+            const seds::model::Transition::Primitive &primitive) -> InputHandler;
 
     static auto translatePrimitive(::sdl::State *sdlFromState) -> InputHandler;
 
-    static auto translatePrimitive(::sdl::Process *sdlProcess, ::sdl::State *sdlFromState,
-            const seds::model::Transition::Primitive &primitive) -> InputHandler;
-
-    static auto translateTransition(const seds::model::StateMachine &sedsStateMachine,
-            const seds::model::Transition &sedsTransition, ::sdl::Process *sdlProcess,
-            ::sdl::StateMachine *stateMachine, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void;
+    static auto translateTransition(Context &context, const seds::model::StateMachine &sedsStateMachine,
+            const seds::model::Transition &sedsTransition, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap)
+            -> void;
 
     static auto createIoVariable(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
 
