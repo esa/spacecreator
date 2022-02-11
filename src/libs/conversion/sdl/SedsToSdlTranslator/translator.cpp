@@ -120,26 +120,30 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
         auto stateMachine = std::make_unique<::sdl::StateMachine>();
         ::sdl::Process process;
         process.setName(Escaper::escapeIvName(sedsComponent.nameStr()));
-        StateMachineTranslator::translateVariables(sedsPackage, asn1Model, implementation.variables(), &process);
-        StateMachineTranslator::createIoVariables(sedsComponent, ivModel, &process);
-        StateMachineTranslator::createExternalProcedures(sedsComponent, ivModel, &process);
+        const auto ivFunction = ivModel->getFunction(process.name(), Qt::CaseInsensitive);
+
+        StateMachineTranslator::Context context(
+                sedsPackage, sedsComponent, asn1Model, ivFunction, &process, stateMachine.get());
+
+        StateMachineTranslator::translateVariables(context, implementation.variables());
+        StateMachineTranslator::createIoVariables(context);
+        StateMachineTranslator::createExternalProcedures(context);
         for (const auto &activity : implementation.activities()) {
             ActivityTranslator::translateActivity(sedsPackage, asn1Model, ivModel, activity, &process);
         }
         // TODO provide additional translation for parameter (activity) maps
         if (stateMachineCount == 1) {
             const auto &sedsStateMachine = implementation.stateMachines()[0];
-            StateMachineTranslator::createTimerVariables(sedsStateMachine, &process);
-            StateMachineTranslator::translateStateMachine(sedsStateMachine, &process, stateMachine.get());
+            StateMachineTranslator::createTimerVariables(context, sedsStateMachine);
+            StateMachineTranslator::translateStateMachine(context, sedsStateMachine);
         }
-        StateMachineTranslator::ensureMinimalStateMachineExists(&process, stateMachine.get());
-        const auto function = ivModel->getFunction(process.name(), Qt::CaseInsensitive);
-        StateMachineTranslator::translateParameterMaps(
-                function, implementation.parameterMaps(), &process, stateMachine.get());
+        StateMachineTranslator::ensureMinimalStateMachineExists(context);
+
+        StateMachineTranslator::translateParameterMaps(context, implementation.parameterMaps());
         // Register all timers in the interface view
         for (const auto &timerName : process.timerNames()) {
             shared::ContextParameter timer(timerName, shared::BasicParameter::Type::Timer);
-            function->addContextParam(timer);
+            ivFunction->addContextParam(timer);
         }
 
         // State machine needs to be moved after processing, because later it cannot be accessed for modification
