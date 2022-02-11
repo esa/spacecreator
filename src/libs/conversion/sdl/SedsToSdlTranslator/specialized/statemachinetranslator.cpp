@@ -54,6 +54,48 @@ static const QString TIMER_NAME_PATTERN = "timer_%1";
 // But a pointer is still needed to the SDL model for call invocation
 static ::sdl::Procedure BUILT_IN_SET_TIMER_PROCEDURE("set_timer");
 
+StateMachineTranslator::Context::Context(const seds::model::Package &sedsPackage,
+        const seds::model::Component &sedsComponent, Asn1Acn::Asn1Model *asn1Model, ivm::IVFunction *ivFunction,
+        ::sdl::Process *sdlProcess, ::sdl::StateMachine *sdlStateMachine)
+    : m_sedsPackage(sedsPackage)
+    , m_sedsComponent(sedsComponent)
+    , m_asn1Model(asn1Model)
+    , m_ivFunction(ivFunction)
+    , m_sdlProcess(sdlProcess)
+    , m_sdlStateMachine(sdlStateMachine)
+{
+}
+
+auto StateMachineTranslator::Context::sedsPackage() -> const seds::model::Package &
+{
+    return m_sedsPackage;
+}
+
+auto StateMachineTranslator::Context::sedsComponent() -> const seds::model::Component &
+{
+    return m_sedsComponent;
+}
+
+auto StateMachineTranslator::Context::asn1Model() -> Asn1Acn::Asn1Model *
+{
+    return m_asn1Model;
+}
+
+auto StateMachineTranslator::Context::ivFunction() -> ivm::IVFunction *
+{
+    return m_ivFunction;
+}
+
+auto StateMachineTranslator::Context::sdlProcess() -> ::sdl::Process *
+{
+    return m_sdlProcess;
+}
+
+auto StateMachineTranslator::Context::sdlStateMachine() -> ::sdl::StateMachine *
+{
+    return m_sdlStateMachine;
+}
+
 template<typename ElementType>
 static inline auto getElementOfName(const seds::model::StateMachine &sedsStateMachine, const QString &name)
         -> std::optional<const ElementType *>
@@ -99,8 +141,8 @@ static inline auto getOnEntry(const seds::model::StateMachine &sedsStateMachine,
     return &(*((*state)->onEntry()));
 }
 
-auto StateMachineTranslator::translateStateMachine(const seds::model::StateMachine &sedsStateMachine,
-        ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void
+auto StateMachineTranslator::translateStateMachine(Context &context, const seds::model::StateMachine &sedsStateMachine)
+        -> void
 {
     // Consider rewriting this to filters when C++20 is supported
     std::map<QString, std::unique_ptr<::sdl::State>> stateMap;
@@ -120,38 +162,38 @@ auto StateMachineTranslator::translateStateMachine(const seds::model::StateMachi
     }
 
     // Setup the start transition
-    createStartTransition(sedsStateMachine, sdlProcess, stateMap);
+    createStartTransition(sedsStateMachine, context.sdlProcess(), stateMap);
 
     // Second pass through transitions
     for (auto &element : sedsStateMachine.elements()) {
         if (std::holds_alternative<seds::model::Transition>(element)) {
-            translateTransition(
-                    sedsStateMachine, std::get<seds::model::Transition>(element), sdlProcess, stateMachine, stateMap);
+            translateTransition(sedsStateMachine, std::get<seds::model::Transition>(element), context.sdlProcess(),
+                    context.sdlStateMachine(), stateMap);
         }
     }
     for (auto &entry : stateMap) {
-        stateMachine->addState(std::move(entry.second));
+        context.sdlStateMachine()->addState(std::move(entry.second));
     }
 }
 
-auto StateMachineTranslator::translateVariables(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
-        const seds::model::ComponentImplementation::VariableSet &variables, ::sdl::Process *sdlProcess) -> void
+auto StateMachineTranslator::translateVariables(
+        Context &context, const seds::model::ComponentImplementation::VariableSet &variables) -> void
 {
     for (const auto &variable : variables) {
         const auto variableName = Escaper::escapeAsn1FieldName(variable.nameStr());
         const auto variableTypeName = Escaper::escapeAsn1TypeName(variable.type().nameStr());
         // TODO implement check for types imported from other packages
-        auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(sedsPackage, asn1Model);
+        auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(context.sedsPackage(), context.asn1Model());
         const auto *referencedType = asn1Definitions->type(variableTypeName);
         if (referencedType == nullptr) {
             throw MissingAsn1TypeDefinitionException(variableTypeName);
         }
-        sdlProcess->addVariable(std::make_unique<::sdl::VariableDeclaration>(variableName, variableTypeName));
+        context.sdlProcess()->addVariable(std::make_unique<::sdl::VariableDeclaration>(variableName, variableTypeName));
     }
 }
 
-auto StateMachineTranslator::createTimerVariables(
-        const seds::model::StateMachine &sedsStateMachine, ::sdl::Process *sdlProcess) -> void
+auto StateMachineTranslator::createTimerVariables(Context &context, const seds::model::StateMachine &sedsStateMachine)
+        -> void
 {
     std::set<QString> statesWithTimers;
     for (auto &element : sedsStateMachine.elements()) {
@@ -161,39 +203,27 @@ auto StateMachineTranslator::createTimerVariables(
                 const auto stateName = transition.fromState().nameStr();
                 if (statesWithTimers.find(stateName) == statesWithTimers.end()) {
                     statesWithTimers.insert(stateName);
-                    sdlProcess->addTimer(timerName(stateName));
+                    context.sdlProcess()->addTimer(timerName(stateName));
                 }
             }
         }
     }
 }
 
-auto StateMachineTranslator::createIoVariables(
-        const seds::model::Component &sedsComponent, ivm::IVModel *ivModel, ::sdl::Process *sdlProcess) -> void
+auto StateMachineTranslator::createIoVariables(Context &context) -> void
 {
-    const auto functionName = Escaper::escapeIvName(sedsComponent.nameStr());
-    const auto function = ivModel->getFunction(functionName, Qt::CaseSensitive);
-    if (function == nullptr) {
-        throw MissingInterfaceViewFunctionException(functionName);
-    }
-    for (const auto &interface : function->interfaces()) {
+    for (const auto &interface : context.ivFunction()->interfaces()) {
         if (interface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
-            createIoVariable(interface, sdlProcess);
+            createIoVariable(interface, context.sdlProcess());
         }
     }
 }
 
-auto StateMachineTranslator::createExternalProcedures(
-        const seds::model::Component &sedsComponent, ivm::IVModel *ivModel, ::sdl::Process *sdlProcess) -> void
+auto StateMachineTranslator::createExternalProcedures(Context &context) -> void
 {
-    const auto functionName = Escaper::escapeIvName(sedsComponent.nameStr());
-    const auto function = ivModel->getFunction(functionName, Qt::CaseSensitive);
-    if (function == nullptr) {
-        throw MissingInterfaceViewFunctionException(functionName);
-    }
-    for (const auto &interface : function->interfaces()) {
+    for (const auto &interface : context.ivFunction()->interfaces()) {
         if (interface->isRequired() && interface->kind() == ivm::IVInterface::OperationKind::Protected) {
-            createExternalProcedure(interface, sdlProcess);
+            createExternalProcedure(interface, context.sdlProcess());
         }
     }
 }
@@ -208,10 +238,9 @@ auto StateMachineTranslator::timerName(const QString &stateName) -> QString
     return Escaper::escapeSdlName(TIMER_NAME_PATTERN.arg(stateName));
 }
 
-auto StateMachineTranslator::ensureMinimalStateMachineExists(
-        ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void
+auto StateMachineTranslator::ensureMinimalStateMachineExists(Context &context) -> void
 {
-    if (stateMachine->states().size() > 0) {
+    if (context.sdlStateMachine()->states().size() > 0) {
         // State machine has at least one state, minimum is ensured.
         return;
     }
@@ -219,8 +248,8 @@ auto StateMachineTranslator::ensureMinimalStateMachineExists(
     state->setName("Idle");
     auto transition = std::make_unique<::sdl::Transition>();
     transition->addAction(std::make_unique<::sdl::NextState>("", state.get()));
-    stateMachine->addState(std::move(state));
-    sdlProcess->setStartTransition(std::move(transition));
+    context.sdlStateMachine()->addState(std::move(state));
+    context.sdlProcess()->setStartTransition(std::move(transition));
 }
 
 static inline auto getInterfaceByName(ivm::IVFunction *function, QString name) -> ivm::IVInterface *
@@ -336,43 +365,40 @@ auto StateMachineTranslator::createParameterAsyncPi(ivm::IVInterface *interface,
     }
 }
 
-auto StateMachineTranslator::translateParameter(ivm::IVFunction *function, const seds::model::ParameterMap &map,
-        ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void
+auto StateMachineTranslator::translateParameter(Context &context, const seds::model::ParameterMap &map) -> void
 {
-    Q_UNUSED(stateMachine);
     // Sync Setters/Getters require a procedure
     // Associated transition (defined as an Input) is optionally translated
     // while handling OnParameterPrimitive
     // We depend on the SEDS -> IV translation
-    const auto syncGetter = getParameterInterface(
-            function, ParameterType::Getter, ParameterMode::Sync, map.interface().value(), map.parameter().value());
+    const auto syncGetter = getParameterInterface(context.ivFunction(), ParameterType::Getter, ParameterMode::Sync,
+            map.interface().value(), map.parameter().value());
     if (syncGetter != nullptr) {
-        createParameterSyncGetter(syncGetter, map, sdlProcess);
+        createParameterSyncGetter(syncGetter, map, context.sdlProcess());
     }
-    const auto syncSetter = getParameterInterface(
-            function, ParameterType::Setter, ParameterMode::Sync, map.interface().value(), map.parameter().value());
+    const auto syncSetter = getParameterInterface(context.ivFunction(), ParameterType::Setter, ParameterMode::Sync,
+            map.interface().value(), map.parameter().value());
     if (syncSetter != nullptr) {
-        createParameterSyncSetter(syncSetter, map, sdlProcess);
+        createParameterSyncSetter(syncSetter, map, context.sdlProcess());
     }
     // Handle all async Setters/Getters not handled during onParameterPrimitiveTranslation
-    const auto asyncSetter = getParameterInterface(
-            function, ParameterType::Setter, ParameterMode::Async, map.interface().value(), map.parameter().value());
+    const auto asyncSetter = getParameterInterface(context.ivFunction(), ParameterType::Setter, ParameterMode::Async,
+            map.interface().value(), map.parameter().value());
     if (asyncSetter != nullptr) {
-        createParameterAsyncPi(asyncSetter, map, sdlProcess, stateMachine);
+        createParameterAsyncPi(asyncSetter, map, context.sdlProcess(), context.sdlStateMachine());
     }
-    const auto asyncGetter = getParameterInterface(
-            function, ParameterType::Getter, ParameterMode::Async, map.interface().value(), map.parameter().value());
+    const auto asyncGetter = getParameterInterface(context.ivFunction(), ParameterType::Getter, ParameterMode::Async,
+            map.interface().value(), map.parameter().value());
     if (asyncGetter != nullptr) {
-        createParameterAsyncPi(asyncGetter, map, sdlProcess, stateMachine);
+        createParameterAsyncPi(asyncGetter, map, context.sdlProcess(), context.sdlStateMachine());
     }
 }
 
-auto StateMachineTranslator::translateParameterMaps(ivm::IVFunction *function,
-        const seds::model::ComponentImplementation::ParameterMapSet &parameterMaps, ::sdl::Process *sdlProcess,
-        ::sdl::StateMachine *stateMachine) -> void
+auto StateMachineTranslator::translateParameterMaps(
+        Context &context, const seds::model::ComponentImplementation::ParameterMapSet &parameterMaps) -> void
 {
     for (const auto &map : parameterMaps) {
-        translateParameter(function, map, sdlProcess, stateMachine);
+        translateParameter(context, map);
     }
 }
 
