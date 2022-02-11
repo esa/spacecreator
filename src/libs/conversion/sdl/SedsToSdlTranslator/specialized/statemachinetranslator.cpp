@@ -497,6 +497,8 @@ auto StateMachineTranslator::translatePrimitive(Context &context, const seds::mo
     }
     const bool isSporadic = interface->kind() == ivm::IVInterface::OperationKind::Sporadic;
 
+    // TODO support variable ref in OnParameterPrimitive
+    // TODO support ParameterActivityMap
     if (isSporadic) {
         // This is a sporadic interface, so we must unpack the value.
         // For protected/unprotected interfaces, the value assignment is done in the associated procedure

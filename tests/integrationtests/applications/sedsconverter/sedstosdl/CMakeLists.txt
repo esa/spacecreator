@@ -66,3 +66,11 @@ configure_file(resources/test_timers.xml resources/test_timers.xml COPYONLY)
 configure_file(resources/test_timers.output resources/test_timers.output COPYONLY)
 configure_file(resources/test_timers.system_structure resources/test_timers.system_structure COPYONLY)
 configure_file(resources/test_timers.interfaceview resources/test_timers.interfaceview COPYONLY)
+
+
+configure_file(test_parameter_map.sh test_parameter_map.sh COPYONLY)
+configure_file(resources/test_parameter_map.xml resources/test_parameter_map.xml COPYONLY)
+configure_file(resources/test_parametermaphostprovider.output resources/test_parametermaphostprovider.output COPYONLY)
+configure_file(resources/test_parametermaphostprovider.system_structure resources/test_parametermaphostprovider.system_structure COPYONLY)
+configure_file(resources/test_parametermaphostrequirer.output resources/test_parametermaphostrequirer.output COPYONLY)
+configure_file(resources/test_parametermaphostrequirer.system_structure resources/test_parametermaphostrequirer.system_structure COPYONLY)
