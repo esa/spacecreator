@@ -27,14 +27,37 @@
 
 namespace promela::translator {
 /**
- * @brief Generator that generates all possible integer values from integer subset.
+ * @brief Generator that generates all possible values of enumerated ASN1 data type.
+ *
+ * Generator generates names and values for all items of enumeration.
+ * The name of enumerated data type is used as a prefix for all items.
  */
 class EnumeratedGenerator final
 {
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param typeName name of enum type.
+     * @param enumerated ASN.1 Enumerated data type.
+     */
     EnumeratedGenerator(QString typeName, const ::Asn1Acn::Types::Enumerated &enumerated);
+
+    /**
+     * @brief Reset the generator to initial state.
+     */
     void reset();
+    /**
+     * @brief Get the current item and generate the next one.
+     *
+     * @return Current item as pair, where first is name of item and the second is value.
+     */
     std::pair<QString, int32_t> next();
+    /**
+     * @brief Check if generator is able to generate next value.
+     *
+     * @return true if generator can generate next value, otherwise false
+     */
     bool has_next() const;
 
 private:
