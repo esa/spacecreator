@@ -86,13 +86,6 @@ template<typename T>
 QVector<int> createQVectorToQVectorMap(const T &source, const T &destination,
         std::function<bool(const T &source, int i, const T &destination, int j)> elementsEqual);
 
-template<typename entityType, typename containedType, typename elementType>
-void compareEntities(entityType loaded, entityType generated,
-        std::function<void(entityType, entityType)> additionalChecks,
-        std::function<containedType(entityType)> accessElements,
-        std::function<void(elementType, elementType)> checkElements,
-        std::function<bool(const containedType &, int, const containedType &, int)> elementsEqualBy);
-
 void tst_ivgenerator::initTestCase()
 {
     shared::initSharedLibrary();
@@ -194,28 +187,70 @@ static void compareModels(ivm::IVModel *const loaded, ivm::IVModel *const genera
 
 static void compareFunctions(ivm::IVFunction *const loaded, ivm::IVFunction *const generated)
 {
-    const auto additionalChecks = [](ivm::IVFunction *const expected, ivm::IVFunction *const actual) {
-        QCOMPARE(actual->defaultImplementation(), expected->defaultImplementation());
-    };
-    const auto accessElements = [](ivm::IVFunction *const function) { return function->interfaces(); };
+    for (const auto &entityAttribute : loaded->entityAttributes()) {
+        const auto &generatedValue = generated->entityAttributeValue(entityAttribute.name()).toString();
+        const auto &loadedValue = entityAttribute.value().toString();
 
-    compareEntities<ivm::IVFunction *, QVector<ivm::IVInterface *>, ivm::IVInterface *>(
-            loaded, generated, additionalChecks, accessElements, compareInterfaces, elementsEqualByTitle);
+        QCOMPARE(generatedValue, loadedValue);
+    }
+    QCOMPARE(generated->defaultImplementation(), loaded->defaultImplementation());
+
+    const auto &loadedInterfaces = loaded->interfaces();
+    const auto &generatedInterfaces = generated->interfaces();
+
+    const int loadedInterfacesSize = loadedInterfaces.size();
+    const int generatedInterfacesSize = generatedInterfaces.size();
+    QCOMPARE(generatedInterfacesSize, loadedInterfacesSize);
+
+    const QVector<int> loadedToGeneratedInterfaceMap = createQVectorToQVectorMap<QVector<ivm::IVInterface *>>(
+            loadedInterfaces, generatedInterfaces, elementsEqualByTitle);
+
+    if (std::any_of(loadedToGeneratedInterfaceMap.begin(), loadedToGeneratedInterfaceMap.end(),
+                [&loadedInterfacesSize](const auto &el) { return el == loadedInterfacesSize; })) {
+        QFAIL(QString("Interface not found in generated function").toStdString().c_str());
+    }
+
+    for (int i = 0; i < generatedInterfacesSize; i++) {
+        const auto &generatedInterface = generatedInterfaces.at(i);
+        const auto &loadedInterface = loadedInterfaces.at(loadedToGeneratedInterfaceMap.at(i));
+
+        compareInterfaces(loadedInterface, generatedInterface);
+    }
 }
 
 static void compareInterfaces(ivm::IVInterface *const loaded, ivm::IVInterface *const generated)
 {
-    const auto additionalChecks = [](ivm::IVInterface *const expected, ivm::IVInterface *const actual) {
-        QCOMPARE(expected->title(), actual->title());
-        QCOMPARE(expected->kind(), actual->kind());
-        QCOMPARE(expected->type(), actual->type());
-    };
-    const auto accessElements = [](ivm::IVInterface *const interface) { return interface->params(); };
+    QCOMPARE(generated->title(), loaded->title());
+    QCOMPARE(generated->kind(), loaded->kind());
+    QCOMPARE(generated->type(), loaded->type());
 
     checkEntityAttributesEqual(loaded, generated);
 
-    compareEntities<ivm::IVInterface *, QVector<shared::InterfaceParameter>, shared::InterfaceParameter>(
-            loaded, generated, additionalChecks, accessElements, compareParameters, elementsEqualByName);
+    const auto &loadedParams = loaded->params();
+    const auto &generatedParams = generated->params();
+
+    const int generatedParametersSize = generatedParams.size();
+    const int loadedParametersSize = loadedParams.size();
+    QCOMPARE(generatedParametersSize, loadedParametersSize);
+
+    const QVector<int> loadedToGeneratedParameterMap = createQVectorToQVectorMap<QVector<shared::InterfaceParameter>>(
+            loadedParams, generatedParams, elementsEqualByName);
+
+    if (std::any_of(loadedToGeneratedParameterMap.begin(), loadedToGeneratedParameterMap.end(),
+                [&loadedParametersSize](const auto &el) { return el == loadedParametersSize; })) {
+        QFAIL(QString("Parameter not found in generated interface").toStdString().c_str());
+    }
+
+    const int generatedParamsSize = generatedParams.size();
+    const int loadedParamsSize = loadedParams.size();
+    QCOMPARE(generatedParamsSize, loadedParamsSize);
+
+    for (int i = 0; i < loadedParamsSize; i++) {
+        const auto &generatedParam = generatedParams.at(i);
+        const auto &loadedParam = loadedParams.at(loadedToGeneratedParameterMap.at(i));
+
+        compareParameters(loadedParam, generatedParam);
+    }
 }
 
 static void compareParameters(const shared::InterfaceParameter &loaded, const shared::InterfaceParameter &generated)
@@ -284,36 +319,6 @@ QVector<int> createQVectorToQVectorMap(const QVectorT &source, const QVectorT &d
     }
 
     return map;
-}
-
-template<typename entityType, typename containedType, typename elementType>
-void compareEntities(entityType loaded, entityType generated,
-        std::function<void(entityType, entityType)> additionalChecks,
-        std::function<containedType(entityType)> accessElements,
-        std::function<void(elementType, elementType)> checkElements,
-        std::function<bool(const containedType &, int, const containedType &, int)> elementsEqualBy)
-{
-    additionalChecks(loaded, generated);
-
-    checkEntityAttributesEqual(loaded, generated);
-
-    const auto &loadedElements = accessElements(loaded);
-    const auto &generatedElements = accessElements(generated);
-
-    const int loadedElementsSize = loadedElements.size();
-    const int generatedElementsSize = generatedElements.size();
-    QCOMPARE(generatedElementsSize, loadedElementsSize);
-
-    const QVector<int> loadedToGeneratedElementsMap =
-            createQVectorToQVectorMap<containedType>(loadedElements, generatedElements, elementsEqualBy);
-    checkAnyOfElementsIsSize(loadedToGeneratedElementsMap, loadedElementsSize);
-
-    for (int i = 0; i < generatedElementsSize; i++) {
-        const auto &generatedElement = generatedElements.at(i);
-        const auto &loadedElement = loadedElements.at(loadedToGeneratedElementsMap.at(i));
-
-        checkElements(loadedElement, generatedElement);
-    }
 }
 
 } // namespace tests::testgenerator
