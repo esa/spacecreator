@@ -83,7 +83,7 @@ public:
     static const QString startTestInterfaceName;
 
     /**
-     * @brief name of a function for a test driver (test driver not included)
+     * @brief name of a function for a test driver (test driver C sources not included)
      *
      */
     static const QString testDriverFunctionName;
@@ -100,7 +100,7 @@ private:
     static auto checkInputArgument(ivm::IVInterface *ifaceUnderTest) -> void;
     static auto makeTestDriverFunction(ivm::IVModel *model) -> ivm::IVFunction *;
     static auto makeFunctionUnderTest(ivm::IVModel *model, ivm::IVInterface *ifaceUnderTest) -> ivm::IVFunction *;
-    static auto makeStartTestIface(ivm::IVModel *model, ivm::IVFunction *testDriverFunction) -> ivm::IVInterface *;
+    static auto makeStartTestIface(ivm::IVFunction *testDriverFunction) -> ivm::IVInterface *;
     static auto makeTestDriverRequiredIface(ivm::IVInterface *ifaceUnderTest, ivm::IVFunction *testDriverFunction)
             -> ivm::IVInterface *;
     static auto makeFunctionUnderTestProvidedInterface(

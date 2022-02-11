@@ -21,7 +21,6 @@
 
 #include <dvcore/dvcommonprops.h>
 #include <dvcore/dvobject.h>
-#include <exception>
 #include <ivcore/ivcommonprops.h>
 #include <ivcore/ivobject.h>
 #include <ivcore/ivpropertytemplateconfig.h>
@@ -51,7 +50,7 @@ auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::u
 
     auto *const config = ivm::IVPropertyTemplateConfig::instance();
     if (config == nullptr) {
-        throw std::runtime_error("config is null");
+        throw std::invalid_argument("config is null");
     }
 
     if (interfaceUnderTest == nullptr) {
@@ -62,7 +61,7 @@ auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::u
 
     auto *const testDriverFunction = makeTestDriverFunction(ivModel.get());
     auto *const testDriverRi = makeTestDriverRequiredIface(interfaceUnderTest, testDriverFunction);
-    auto *const testDriverStartTestCi = makeStartTestIface(ivModel.get(), testDriverFunction);
+    auto *const testDriverStartTestCi = makeStartTestIface(testDriverFunction);
 
     testDriverFunction->addChild(testDriverRi);
     testDriverFunction->addChild(testDriverStartTestCi);
@@ -84,18 +83,18 @@ auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::u
 auto IvGenerator::checkInputArgument(ivm::IVInterface *const iface) -> void
 {
     if (iface->function() == nullptr) {
-        throw std::runtime_error("Selected interface has no function specified");
+        throw std::invalid_argument("Selected interface has no function specified");
     }
 
-    const auto interfaceUnderTestOperationKind = iface->kind();
-    if (interfaceUnderTestOperationKind == ivm::IVInterface::OperationKind::Any
-            || interfaceUnderTestOperationKind == ivm::IVInterface::OperationKind::Cyclic
-            || interfaceUnderTestOperationKind == ivm::IVInterface::IVInterface::OperationKind::Sporadic) {
-        throw std::runtime_error("Only Protected and Unprotected interfaces can be tested");
+    const auto ifaceOperationKind = iface->kind();
+    if (ifaceOperationKind == ivm::IVInterface::OperationKind::Any
+            || ifaceOperationKind == ivm::IVInterface::OperationKind::Cyclic
+            || ifaceOperationKind == ivm::IVInterface::IVInterface::OperationKind::Sporadic) {
+        throw std::invalid_argument("Only Protected and Unprotected interfaces can be tested");
     }
 
     if (iface->type() != ivm::IVObject::Type::ProvidedInterface) {
-        throw std::runtime_error("Only Provided Interface can be tested");
+        throw std::invalid_argument("Only Provided Interface can be tested");
     }
 }
 
@@ -132,15 +131,13 @@ auto IvGenerator::makeFunctionUnderTest(ivm::IVModel *const model, ivm::IVInterf
     return function;
 }
 
-auto IvGenerator::makeStartTestIface(ivm::IVModel *const model, ivm::IVFunction *const testDriverFunction)
-        -> ivm::IVInterface *
+auto IvGenerator::makeStartTestIface(ivm::IVFunction *const testDriverFunction) -> ivm::IVInterface *
 {
-    throwOnNullpointer(model);
     throwOnNullpointer(testDriverFunction);
 
     ivm::IVInterface::CreationInfo ci;
     ci.name = startTestInterfaceName;
-    ci.model = model;
+    ci.model = testDriverFunction->model();
     ci.function = testDriverFunction;
     ci.kind = ivm::IVInterface::OperationKind::Cyclic;
     ci.type = ivm::IVInterface::InterfaceType::Provided;
@@ -202,7 +199,7 @@ auto IvGenerator::makeConnection(ivm::IVInterface *const required, ivm::IVInterf
     return connection;
 }
 
-auto IvGenerator::setObjectCoordinates(ivm::IVObject *object, const QVector<qint32> &coordinates) -> void
+auto IvGenerator::setObjectCoordinates(ivm::IVObject *const object, const QVector<qint32> &coordinates) -> void
 {
     object->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::coordinates),
             dvm::DVObject::coordinatesToString(coordinates));

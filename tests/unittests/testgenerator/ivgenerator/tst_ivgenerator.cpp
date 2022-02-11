@@ -57,34 +57,37 @@ private:
     const QString ivConfig = QString("%1%2config.xml").arg(ivDir).arg(QDir::separator());
 };
 
-static std::unique_ptr<ivm::IVFunction> makeFunctionUnderTest(const QString &name);
-static ivm::IVInterface *makeInterfaceUnderTest(
-        const QString &interfaceName, ivm::IVFunction *function, ivm::IVInterface::OperationKind operationKind);
-static ivm::IVInterface::CreationInfo createInterfaceUnderTestCreationInfo(
-        const QString &ifName, ivm::IVFunction *function, ivm::IVInterface::OperationKind kind);
+static auto makeFunctionUnderTest(const QString &name) -> std::unique_ptr<ivm::IVFunction>;
+static auto makeInterfaceUnderTest(const QString &interfaceName, ivm::IVFunction *function,
+        ivm::IVInterface::OperationKind operationKind) -> ivm::IVInterface *;
+static auto createInterfaceUnderTestCreationInfo(const QString &ifName, ivm::IVFunction *function,
+        ivm::IVInterface::OperationKind kind) -> ivm::IVInterface::CreationInfo;
 
-static void compareModels(ivm::IVModel *loaded, ivm::IVModel *generated);
-static void compareFunctions(ivm::IVFunction *loaded, ivm::IVFunction *generated);
-static void compareInterfaces(ivm::IVInterface *loaded, ivm::IVInterface *generated);
-static void compareParameters(const shared::InterfaceParameter &loaded, const shared::InterfaceParameter &generated);
-static void compareConnectionVectors(
-        const QVector<ivm::IVConnection *> &loaded, const QVector<ivm::IVConnection *> &generated);
-static void compareConnections(ivm::IVConnection *loaded, ivm::IVConnection *generated);
+static auto compareModels(ivm::IVModel *loaded, ivm::IVModel *generated) -> void;
+static auto compareFunctions(ivm::IVFunction *loaded, ivm::IVFunction *generated) -> void;
+static auto compareInterfaces(ivm::IVInterface *loaded, ivm::IVInterface *generated) -> void;
+static auto compareParameters(const shared::InterfaceParameter &loaded, const shared::InterfaceParameter &generated)
+        -> void;
+static auto compareConnectionVectors(
+        const QVector<ivm::IVConnection *> &loaded, const QVector<ivm::IVConnection *> &generated) -> void;
+static auto compareConnections(ivm::IVConnection *loaded, ivm::IVConnection *generated) -> void;
 
-static void checkEntityAttributesEqual(ivm::IVObject *expected, ivm::IVObject *actual);
-static void checkAnyOfElementsIsSize(QVector<int> map, int size);
+static auto checkEntityAttributesEqual(ivm::IVObject *expected, ivm::IVObject *actual) -> void;
+static auto checkAllElementsMapped(const QVector<int> &map, int size) -> void;
 
-static auto elementsEqualByTitle = [](const auto &srcVector, int i, const auto &dstVector, int j) -> bool {
-    return srcVector.at(i)->title().compare(dstVector.at(j)->title()) == 0;
+static auto isAnyElementEqual(const QVector<int> &vector, int number) -> bool;
+
+static auto elementsEqualByTitle = [](const auto &v1, int i, const auto &v2, int j) -> bool {
+    return v1.at(i)->title().compare(v2.at(j)->title()) == 0;
 };
 
-static auto elementsEqualByName = [](const auto &srcVector, int i, const auto &dstVector, int j) -> bool {
-    return srcVector.at(i).name().compare(dstVector.at(j).name()) == 0;
+static auto elementsEqualByName = [](const auto &v1, int i, const auto &v2, int j) -> bool {
+    return v1.at(i).name().compare(v2.at(j).name()) == 0;
 };
 
 template<typename T>
-QVector<int> createQVectorToQVectorMap(const T &source, const T &destination,
-        std::function<bool(const T &source, int i, const T &destination, int j)> elementsEqual);
+auto createQVectorToQVectorMap(const T &source, const T &destination,
+        std::function<bool(const T &source, int i, const T &destination, int j)> elementsEqual) -> QVector<int>;
 
 void tst_ivgenerator::initTestCase()
 {
@@ -164,8 +167,7 @@ static void compareModels(ivm::IVModel *const loaded, ivm::IVModel *const genera
 
     const QVector<int> loadedToGeneratedFunctionMap = createQVectorToQVectorMap<QVector<ivm::IVFunction *>>(
             loadedFunctions, generatedFunctions, elementsEqualByTitle);
-    // if yes, vectors do differ in at least one element
-    checkAnyOfElementsIsSize(loadedToGeneratedFunctionMap, loadedFunctionsSize);
+    checkAllElementsMapped(loadedToGeneratedFunctionMap, loadedFunctionsSize);
 
     for (int i = 0; i < generatedFunctionsSize; i++) {
         const auto &loadedFunction = loadedFunctions.at(loadedToGeneratedFunctionMap.at(i));
@@ -204,11 +206,7 @@ static void compareFunctions(ivm::IVFunction *const loaded, ivm::IVFunction *con
 
     const QVector<int> loadedToGeneratedInterfaceMap = createQVectorToQVectorMap<QVector<ivm::IVInterface *>>(
             loadedInterfaces, generatedInterfaces, elementsEqualByTitle);
-
-    if (std::any_of(loadedToGeneratedInterfaceMap.begin(), loadedToGeneratedInterfaceMap.end(),
-                [&loadedInterfacesSize](const auto &el) { return el == loadedInterfacesSize; })) {
-        QFAIL(QString("Interface not found in generated function").toStdString().c_str());
-    }
+    checkAllElementsMapped(loadedToGeneratedInterfaceMap, loadedInterfacesSize);
 
     for (int i = 0; i < generatedInterfacesSize; i++) {
         const auto &generatedInterface = generatedInterfaces.at(i);
@@ -235,11 +233,7 @@ static void compareInterfaces(ivm::IVInterface *const loaded, ivm::IVInterface *
 
     const QVector<int> loadedToGeneratedParameterMap = createQVectorToQVectorMap<QVector<shared::InterfaceParameter>>(
             loadedParams, generatedParams, elementsEqualByName);
-
-    if (std::any_of(loadedToGeneratedParameterMap.begin(), loadedToGeneratedParameterMap.end(),
-                [&loadedParametersSize](const auto &el) { return el == loadedParametersSize; })) {
-        QFAIL(QString("Parameter not found in generated interface").toStdString().c_str());
-    }
+    checkAllElementsMapped(loadedToGeneratedParameterMap, loadedParametersSize);
 
     const int generatedParamsSize = generatedParams.size();
     const int loadedParamsSize = loadedParams.size();
@@ -293,11 +287,16 @@ static void checkEntityAttributesEqual(ivm::IVObject *const expected, ivm::IVObj
     }
 }
 
-static void checkAnyOfElementsIsSize(QVector<int> map, int size)
+static void checkAllElementsMapped(const QVector<int> &map, int size)
 {
-    if (std::any_of(map.begin(), map.end(), [&size](const auto &el) { return el == size; })) {
+    if (isAnyElementEqual(map, size)) {
         QFAIL(QString("Element not found in generated entity").toStdString().c_str());
     }
+}
+
+static bool isAnyElementEqual(const QVector<int> &vector, int number)
+{
+    return std::any_of(vector.begin(), vector.end(), [&number](const auto &el) { return el == number; });
 }
 
 template<typename QVectorT>
