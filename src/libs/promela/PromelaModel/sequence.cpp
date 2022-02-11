@@ -22,6 +22,16 @@
 #include "proctypeelement.h"
 
 namespace promela::model {
+Sequence::Sequence(Type type)
+    : m_type(type)
+{
+}
+
+Sequence::Type Sequence::getType() const noexcept
+{
+    return m_type;
+}
+
 const std::list<std::unique_ptr<ProctypeElement>> &Sequence::getContent() const noexcept
 {
     return m_content;

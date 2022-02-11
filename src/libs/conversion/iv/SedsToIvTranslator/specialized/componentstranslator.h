@@ -53,7 +53,7 @@ public:
      * @param   sedsPackage         Package with components to translate
      * @param   asn1Definitions     ASN.1 file where types of the packed argument will be saved
      */
-    ComponentsTranslator(const seds::model::Package &sedsPackage, Asn1Acn::Definitions *asn1Definitions);
+    ComponentsTranslator(const seds::model::Package *sedsPackage, Asn1Acn::Definitions *asn1Definitions);
     /**
      * @brief   Deleted copy constructor
      */
@@ -131,7 +131,7 @@ private:
 
 private:
     /// @brief  Parent package
-    const seds::model::Package &m_sedsPackage;
+    const seds::model::Package *m_sedsPackage;
     /// @brief  Target ASN.1 type definitions
     Asn1Acn::Definitions *m_asn1Definitions;
 };

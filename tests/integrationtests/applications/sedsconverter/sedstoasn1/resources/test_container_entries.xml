@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/ContainerEntries">
+    <DataTypeSet>
+      <IntegerDataType name="IntegerData">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <BinaryDataType name="BinaryData" sizeInBits="8" />
+      <ContainerDataType name="BasicEntryContainer">
+        <EntryList>
+          <Entry name="BasicEntry" type="IntegerData"/>
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="ErrorControlEntryContainer">
+        <EntryList>
+          <ErrorControlEntry name="ErrorControlEntry" type="BinaryData" errorControlType="CRC8"/>
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="FixedValueEntryContainer">
+        <EntryList>
+          <FixedValueEntry name="FixedValueEntry" type="BinaryData" fixedValue="00110011"/>
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="LengthEntryContainer">
+        <EntryList>
+          <Entry name="Entry1" type="IntegerData"/>
+          <Entry name="Entry2" type="IntegerData"/>
+          <Entry name="Entry3" type="IntegerData"/>
+          <LengthEntry name="LengthEntry" type="IntegerData"/>
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="ListEntryContainer">
+        <EntryList>
+          <Entry name="LengthEntry" type="IntegerData"/>
+          <ListEntry name="ListEntry" type="BinaryData" listLengthField="LengthEntry"/>
+        </EntryList>
+      </ContainerDataType>
+      <!-- <ContainerDataType> -->
+      <!--   <EntryList> -->
+      <!--     <Entry name="Entry1" type="IntegerData"/> -->
+      <!--     <PaddingEntry sizeinBits="16" /> -->
+      <!--     <Entry name="Entry2" type="IntegerData"/> -->
+      <!--   </EntryList> -->
+      <!-- </ContainerDataType> -->
+    </DataTypeSet>
+  </Package>
+</PackageFile>
+
+<!-- <PaddingEntry> -->

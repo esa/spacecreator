@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,17 +17,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "manageconnectionlayersdialog.h"
+#include <QObject>
+#include <QtTest>
 
-#include <QWidget>
+namespace tmc::test {
 
-namespace ive {
-
-ManageConnectionLayersDialog::ManageConnectionLayersDialog(QWidget *parent)
-    : QDialog(parent)
+class tst_IntegerGenerator : public QObject
 {
+    Q_OBJECT
+
+private Q_SLOTS:
+    void testEmptySequence();
+    void testContinuousSequence();
+    void testTwoRanges();
+    void testSeparatedNumbers();
+};
 }
-
-ManageConnectionLayersDialog::~ManageConnectionLayersDialog() {}
-
-} // namespace ive

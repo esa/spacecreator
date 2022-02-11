@@ -7,7 +7,8 @@ EnumData ::= ENUMERATED
 {
     value1(12),
     value2(15),
-    value3(18)
+    value3(18),
+    value4(22)
 }
 BitStringData ::= BIT STRING(SIZE(4))
 StringData ::= IA5String(SIZE(0 .. 32))
@@ -23,6 +24,7 @@ PayloadA ::= SEQUENCE
     intDataRange IntegerData(0 .. 255) (5 .. 255),
     intDataNoEncodingRange IntegerDataNoEncoding(0 .. 255) (5 .. 9223372036854775807),
     floatDataRange RealData(0 .. 255) (1.17549e-38 .. 3.14),
+    enumDataRange EnumData(((value1 | value3) | value4)),
     intDataType IntegerDataBigger(0 .. 65535) (0 .. 255),
     intDataValue IntegerData(0 .. 255) (42),
     floatDataValue RealData(0 .. 255) (3.14),

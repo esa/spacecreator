@@ -29,10 +29,12 @@ class tst_SedsConverter_SedsToAsn1 : public QObject
 
 private Q_SLOTS:
     void testSimpleDataTypes();
+    void testSubRangeDataType();
     void testArrays();
     void testIndexedArray();
     void testContainers();
     void testContainerConstraints();
+    void testContainerEntries();
     void testContainerInheritance();
     void testMinMaxRange();
 };
@@ -40,9 +42,27 @@ private Q_SLOTS:
 /// \SRS  ETB-FUN-10
 /// \SRS  ETB-FUN-110
 /// \SRS  ETB-FUN-130
+/// \SRS  ETB-FUN-140
+/// \SRS  ETB-FUN-150
+/// \SRS  ETB-FUN-160
+/// \SRS  ETB-FUN-170
+/// \SRS  ETB-FUN-180
+/// \SRS  ETB-FUN-190
 /// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-120
 void tst_SedsConverter_SedsToAsn1::testSimpleDataTypes()
+{
+    const int result = system("./test_simple_data_types.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-110
+/// \SRS  ETB-FUN-130
+/// \SRS  ETB-FUN-200
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-120
+void tst_SedsConverter_SedsToAsn1::testSubRangeDataType()
 {
     const int result = system("./test_simple_data_types.sh");
     QCOMPARE(result, 0);
@@ -105,6 +125,17 @@ void tst_SedsConverter_SedsToAsn1::testContainerConstraints()
 void tst_SedsConverter_SedsToAsn1::testContainerInheritance()
 {
     const int result = system("./test_container_inheritance.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-110
+/// \SRS  ETB-FUN-230
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-120
+void tst_SedsConverter_SedsToAsn1::testContainerEntries()
+{
+    const int result = system("./test_container_entries.sh");
     QCOMPARE(result, 0);
 }
 

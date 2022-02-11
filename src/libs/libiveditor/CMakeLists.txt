@@ -24,6 +24,8 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdcontextparametercreate.h
     commands/cmdcontextparameterremove.cpp
     commands/cmdcontextparameterremove.h
+    commands/cmdcontextparameterreorder.cpp
+    commands/cmdcontextparameterreorder.h
     commands/cmdentitiesimport.cpp
     commands/cmdentitiesimport.h
     commands/cmdentitiesinstantiate.cpp
@@ -56,6 +58,8 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdifaceparamcreate.h
     commands/cmdifaceparamremove.cpp
     commands/cmdifaceparamremove.h
+    commands/cmdifaceparamreorder.cpp
+    commands/cmdifaceparamreorder.h
     commands/cmdinterfaceitemcreate.cpp
     commands/cmdinterfaceitemcreate.h
     commands/cmdrequiredifacepropertychange.cpp
@@ -92,8 +96,6 @@ target_sources(${LIB_NAME} PRIVATE
     context/action/extprocmonitor.h
     createconnectiongroupdialog.cpp
     createconnectiongroupdialog.h
-    manageconnectionlayersdialog.cpp
-    manageconnectionlayersdialog.h
     endtoend/endtoendconnections.cpp
     endtoend/endtoendconnections.h
     endtoend/endtoendview.cpp

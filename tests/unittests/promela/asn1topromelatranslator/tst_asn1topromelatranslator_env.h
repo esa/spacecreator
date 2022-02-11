@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,22 +17,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include <QDialog>
-#include <QSignalMapper>
-#include <ivconnectionlayertype.h>
+#include <QObject>
+#include <QtTest>
+#include <asn1library/asn1/asn1model.h>
+#include <memory>
 
-namespace ive {
+using Asn1Acn::Definitions;
 
-class ManageConnectionLayersDialog : public QDialog
+namespace tmc::test {
+
+class tst_Asn1ToPromelaTranslator_Env : public QObject
 {
     Q_OBJECT
 
-public:
-    ManageConnectionLayersDialog(QWidget *parent = nullptr);
-    ~ManageConnectionLayersDialog();
+private Q_SLOTS:
+    void initTestCase();
+    void cleanupTestCase();
+
+    void testInteger();
 
 private:
-    QSignalMapper *m_signalMapper = nullptr;
+    std::unique_ptr<Definitions> createModel();
 };
-
-} // namespace ive
+}

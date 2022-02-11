@@ -173,6 +173,31 @@ private:
             Asn1Acn::Types::IA5String *asn1Type) const -> void;
 
     /**
+     * @brief   Translate SubRangeDataType that is based on an integer type
+     *
+     * @param   sedsType        Type to translate
+     * @param   sedsBaseType    Base type
+     */
+    auto translateIntegerSubRangeDataType(
+            const seds::model::SubRangeDataType &sedsType, const seds::model::DataType *sedsBaseType) -> void;
+    /**
+     * @brief   Translate SubRangeDataType that is based on a float type
+     *
+     * @param   sedsType        Type to translate
+     * @param   sedsBaseType    Base type
+     */
+    auto translateFloatSubRangeDataType(
+            const seds::model::SubRangeDataType &sedsType, const seds::model::DataType *sedsBaseType) -> void;
+    /**
+     * @brief   Translate SubRangeDataType that is based on an enumerated type
+     *
+     * @param   sedsType        Type to translate
+     * @param   sedsBaseType    Base type
+     */
+    auto translateEnumSubRangeDataType(
+            const seds::model::SubRangeDataType &sedsType, const seds::model::DataType *sedsBaseType) -> void;
+
+    /**
      * @brief   Translate SEDS core integer encoding
      *
      * @param   coreEncoding    Encoding to translatoe

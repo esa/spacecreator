@@ -20,6 +20,7 @@
 #pragma once
 
 #include <asn1library/asn1/constraints/constraintlist.h>
+#include <asn1library/asn1/constraints/logicoperators.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <asn1library/asn1/types/type.h>
 #include <asn1library/asn1/values.h>
@@ -37,17 +38,15 @@ namespace conversion::asn1::translator {
 template<typename Type, typename ValueType>
 class RangeTranslatorVisitor final
 {
+    using Constraint = Asn1Acn::Constraints::Constraint<ValueType>;
     using RangeConstraint = Asn1Acn::Constraints::RangeConstraint<ValueType>;
-    using SizeConstraint = Asn1Acn::Constraints::SizeConstraint<ValueType>;
+    using OrConstraint = Asn1Acn::Constraints::OrConstraint<ValueType>;
 
 public:
     /**
      * @brief   Constructor
      *
      * @param   asn1Type        ASN.1 type that is currently translated
-     * @param   constraints     Constraints of the ASN.1 type that is currently translated
-     * @param   smallestValue   Optional smallest value possible to use in range
-     * @param   greatestValue   Optional greatest value possible to use in range
      */
     explicit RangeTranslatorVisitor(Asn1Acn::Types::Type *asn1Type);
     /**
@@ -67,6 +66,7 @@ public:
      */
     RangeTranslatorVisitor &operator=(RangeTranslatorVisitor &&) = delete;
 
+public:
     /**
      * @brief   Translate SEDS min-max range
      *
@@ -86,6 +86,7 @@ public:
      */
     auto operator()(const seds::model::EnumeratedDataTypeRange &range) -> void;
 
+public:
     /**
      * @brief   Create range constraint from given value
      *
@@ -95,6 +96,14 @@ public:
      */
     auto addValueConstraint(const typename ValueType::Type &value) -> void;
     /**
+     * @brief   Create range constraint from given range
+     *
+     * @param   range   Range
+     *
+     * @return  ASN.1 range constraint
+     */
+    auto addRangeConstraint(const Asn1Acn::Range<typename ValueType::Type> &range) -> void;
+    /**
      * @brief   Create range constraint from given min and max values
      *
      * @param   min     Min range value
@@ -103,14 +112,6 @@ public:
      * @return  ASN.1 range constraint
      */
     auto addRangeConstraint(const typename ValueType::Type &min, const typename ValueType::Type &max) -> void;
-    /**
-     * @brief   Create size constraint from given range
-     *
-     * @param   range   Range
-     *
-     * @return  ASN.1 size constraint
-     */
-    auto addSizeConstraint(const Asn1Acn::Range<Asn1Acn::IntegerValue::Type> &range) -> void;
 
 private:
     /**
@@ -153,6 +154,19 @@ private:
     Type *m_asn1Type;
 };
 
+template<>
+void RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>::operator()(
+        const seds::model::MinMaxRange &range);
+template<>
+void RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>::operator()(
+        const seds::model::MinMaxRange &range);
+template<>
+void RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>::operator()(
+        const seds::model::FloatPrecisionRange &range);
+template<>
+void RangeTranslatorVisitor<Asn1Acn::Types::Enumerated, Asn1Acn::EnumValue>::operator()(
+        const seds::model::EnumeratedDataTypeRange &range);
+
 template<typename Type, typename ValueType>
 RangeTranslatorVisitor<Type, ValueType>::RangeTranslatorVisitor(Asn1Acn::Types::Type *asn1Type)
     : m_asn1Type(dynamic_cast<Type *>(asn1Type))
@@ -160,16 +174,40 @@ RangeTranslatorVisitor<Type, ValueType>::RangeTranslatorVisitor(Asn1Acn::Types::
 }
 
 template<typename Type, typename ValueType>
+void RangeTranslatorVisitor<Type, ValueType>::operator()(const seds::model::MinMaxRange &range)
+{
+    Q_UNUSED(range);
+    throw ::conversion::translator::TranslationException("Applying MinMaxRange on non-numeric data type is invalid");
+}
+
+template<typename Type, typename ValueType>
+void RangeTranslatorVisitor<Type, ValueType>::operator()(const seds::model::FloatPrecisionRange &range)
+{
+    Q_UNUSED(range);
+    throw ::conversion::translator::TranslationException(
+            "Applying FloatPrecisionRange on non-float data type is invalid");
+}
+
+template<typename Type, typename ValueType>
 void RangeTranslatorVisitor<Type, ValueType>::operator()(const seds::model::EnumeratedDataTypeRange &range)
 {
     Q_UNUSED(range);
-
-    throw conversion::translator::TranslationException("EnumeratedDataTypeRange not yet supported");
+    throw ::conversion::translator::TranslationException(
+            "Applying EnumeratedDataTypeRange on non-enum data type is invalid");
 }
+
 template<typename Type, typename ValueType>
 void RangeTranslatorVisitor<Type, ValueType>::addValueConstraint(const typename ValueType::Type &value)
 {
     auto constraint = RangeConstraint::create({ value });
+
+    m_asn1Type->constraints().append(std::move(constraint));
+}
+
+template<typename Type, typename ValueType>
+void RangeTranslatorVisitor<Type, ValueType>::addRangeConstraint(const Asn1Acn::Range<typename ValueType::Type> &range)
+{
+    auto constraint = RangeConstraint::create(range);
 
     m_asn1Type->constraints().append(std::move(constraint));
 }
@@ -182,18 +220,6 @@ void RangeTranslatorVisitor<Type, ValueType>::addRangeConstraint(
     auto constraint = RangeConstraint::create({ min, max });
 
     m_asn1Type->constraints().append(std::move(constraint));
-}
-
-template<typename Type, typename ValueType>
-void RangeTranslatorVisitor<Type, ValueType>::addSizeConstraint(
-        const Asn1Acn::Range<Asn1Acn::IntegerValue::Type> &range)
-{
-    auto rangeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(range);
-
-    auto sizeConstraint = std::make_unique<SizeConstraint>();
-    sizeConstraint->setInnerConstraints(std::move(rangeConstraint));
-
-    m_asn1Type->constraints().append(std::move(sizeConstraint));
 }
 
 template<typename Type, typename ValueType>

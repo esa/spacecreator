@@ -40,11 +40,11 @@ public:
     IntegerDataType &operator=(IntegerDataType &&) = default;
 
 public:
-    auto range() const -> const Range &;
-    auto setRange(Range minMaxRange) -> void;
-
     auto encoding() const -> const std::optional<IntegerDataEncoding> &;
     auto setEncoding(IntegerDataEncoding encoding) -> void;
+
+    auto range() const -> const Range &;
+    auto setRange(Range minMaxRange) -> void;
 
 private:
     std::optional<IntegerDataEncoding> m_encoding;

@@ -63,6 +63,7 @@ void PromelaModelVisitor::visit(const PromelaModel &promelaModel)
     if (promelaModel.hasInit()) {
         generateInitProctype(promelaModel.getInit());
     }
+    generateIncludes(promelaModel.getEpilogueIncludes());
 }
 
 void PromelaModelVisitor::generateIncludes(const QList<QString> &includes)
@@ -179,7 +180,14 @@ void PromelaModelVisitor::generateInitProctype(const InitProctype &init)
 
 void PromelaModelVisitor::generateSequence(const Sequence &sequence)
 {
-    SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, "");
-    visitor.visit(sequence);
+    if (sequence.getType() != Sequence::Type::NORMAL) {
+        SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_baseIndent);
+        m_stream << m_baseIndent << visitor.getSequencePrefix(sequence) << "{\n";
+        visitor.visit(sequence);
+        m_stream << m_baseIndent << "}\n";
+    } else {
+        SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, "");
+        visitor.visit(sequence);
+    }
 }
 }

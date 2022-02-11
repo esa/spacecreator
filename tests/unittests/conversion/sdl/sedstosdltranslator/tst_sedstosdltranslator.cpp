@@ -94,6 +94,7 @@ private Q_SLOTS:
     void testTranslateActivity();
     void testTranslateStateTransitionActivity();
 
+    void testTranslateAddOperationOnValue();
     void testTranslateAddOperation();
     void testTranslateSubOperation();
     void testTranslateMulOperation();
@@ -532,6 +533,22 @@ void tst_SedsToSdlTranslator::testTranslateStateTransitionActivity()
     const auto invocation = dynamic_cast<const ::sdl::ProcedureCall *>(invocationAction);
     QVERIFY(invocation);
     QCOMPARE(invocation->procedure()->name(), "activity1");
+}
+
+/// \SRS  ETB-FUN-2220
+void tst_SedsToSdlTranslator::testTranslateAddOperationOnValue()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    seds::model::ValueOperand value;
+    value.setValue(seds::model::LiteralValue("12"));
+    op.setMathOperator(seds::model::CoreMathOperator::Add);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("a"));
+    operation.push_back(std::move(value));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "a + 12");
 }
 
 /// \SRS  ETB-FUN-2220

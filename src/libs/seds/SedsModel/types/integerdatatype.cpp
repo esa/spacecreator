@@ -21,16 +21,6 @@
 
 namespace seds::model {
 
-const IntegerDataType::Range &IntegerDataType::range() const
-{
-    return m_range;
-}
-
-void IntegerDataType::setRange(IntegerDataType::Range minMaxRange)
-{
-    m_range = std::move(minMaxRange);
-}
-
 const std::optional<IntegerDataEncoding> &IntegerDataType::encoding() const
 {
     return m_encoding;
@@ -39,6 +29,16 @@ const std::optional<IntegerDataEncoding> &IntegerDataType::encoding() const
 void IntegerDataType::setEncoding(IntegerDataEncoding encoding)
 {
     m_encoding = std::move(encoding);
+}
+
+const IntegerDataType::Range &IntegerDataType::range() const
+{
+    return m_range;
+}
+
+void IntegerDataType::setRange(IntegerDataType::Range minMaxRange)
+{
+    m_range = std::move(minMaxRange);
 }
 
 } // namespace seds::model

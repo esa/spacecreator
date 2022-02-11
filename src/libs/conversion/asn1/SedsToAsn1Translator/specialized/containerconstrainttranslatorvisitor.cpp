@@ -19,8 +19,7 @@
 
 #include "specialized/containerconstrainttranslatorvisitor.h"
 
-#include "specialized/rangetranslatorvisitor.h"
-
+#include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
 #include <asn1library/asn1/types/enumerated.h>
@@ -34,7 +33,6 @@
 #include <asn1library/asn1/values.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/overloaded.h>
-#include <conversion/common/translation/exceptions.h>
 #include <iostream>
 #include <seds/SedsModel/components/entryref.h>
 #include <seds/SedsModel/package/package.h>
@@ -89,13 +87,17 @@ void ContainerConstraintTranslatorVisitor::applyContainerRangeConstraint(
         RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue> rangeTranslator(asn1Type);
         std::visit(rangeTranslator, range);
     } break;
+    case ASN1Type::ENUMERATED: {
+        RangeTranslatorVisitor<Asn1Acn::Types::Enumerated, Asn1Acn::EnumValue> rangeTranslator(asn1Type);
+        std::visit(rangeTranslator, range);
+    } break;
     case ASN1Type::USERDEFINED: {
         auto asn1UserType = dynamic_cast<Asn1Acn::Types::UserdefinedType *>(asn1Type);
         applyContainerRangeConstraint(rangeConstraint, asn1UserType->type());
     } break;
     default:
         throw conversion::translator::TranslationException(
-                "ContainerRangeConstraint can only be applied to the integer and real entries");
+                "ContainerRangeConstraint can only be applied to the numeric and enum entries");
         break;
     }
 }
@@ -103,39 +105,48 @@ void ContainerConstraintTranslatorVisitor::applyContainerRangeConstraint(
 void ContainerConstraintTranslatorVisitor::applyContainerTypeConstraint(
         const ContainerTypeConstraint &typeConstraint, Asn1Acn::Types::Type *asn1Type) const
 {
-    Q_UNUSED(asn1Type);
-
     const auto &referencedTypeName = typeConstraint.type().nameStr();
     const auto referencedType = m_sedsPackage->dataType(referencedTypeName);
 
+    if (!referencedType) {
+        auto errorMessage = QString("ContainerTypeConstraint for \"%1\" refers to an unknown type \"%2\"")
+                                    .arg(typeConstraint.entry().nameStr())
+                                    .arg(referencedTypeName);
+        throw conversion::translator::TranslationException(std::move(errorMessage));
+    }
+
     switch (asn1Type->typeEnum()) {
     case ASN1Type::INTEGER: {
-        if (const auto *intDataType = std::get_if<seds::model::IntegerDataType>(referencedType)) {
-            RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue> rangeTranslator(asn1Type);
-            std::visit(rangeTranslator, intDataType->range());
-        } else {
-            auto errorMessage = QString("ContainerTypeConstraint cannot be applied to \"%1\" entry because referenced "
-                                        "type \"%2\" is not of the same type")
+        const auto referencedIntegerType = std::get_if<seds::model::IntegerDataType>(referencedType);
+
+        if (referencedIntegerType == nullptr) {
+            auto errorMessage = QString("ContainerTypeConstraint cannot be applied to integer \"%1\" entry because "
+                                        "referenced type \"%2\" is not an integer")
                                         .arg(typeConstraint.entry().nameStr())
                                         .arg(referencedTypeName);
             throw conversion::translator::TranslationException(std::move(errorMessage));
         }
+
+        RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue> rangeTranslator(asn1Type);
+        std::visit(rangeTranslator, referencedIntegerType->range());
     } break;
     case ASN1Type::REAL: {
-        if (const auto *floatDataType = std::get_if<seds::model::FloatDataType>(referencedType)) {
-            RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue> rangeTranslator(asn1Type);
-            std::visit(rangeTranslator, floatDataType->range());
-        } else {
-            auto errorMessage = QString("ContainerTypeConstraint cannot be applied to \"%1\" entry because referenced "
-                                        "type \"%2\" is not of the same type")
+        const auto referencedFloatType = std::get_if<seds::model::FloatDataType>(referencedType);
+
+        if (referencedFloatType == nullptr) {
+            auto errorMessage = QString("ContainerTypeConstraint cannot be applied to float \"%1\" entry because "
+                                        "referenced type \"%2\" is not a float")
                                         .arg(typeConstraint.entry().nameStr())
                                         .arg(referencedTypeName);
             throw conversion::translator::TranslationException(std::move(errorMessage));
         }
+
+        RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue> rangeTranslator(asn1Type);
+        std::visit(rangeTranslator, referencedFloatType->range());
     } break;
     case ASN1Type::USERDEFINED: {
-        auto asn1UserType = dynamic_cast<Asn1Acn::Types::UserdefinedType *>(asn1Type);
-        applyContainerTypeConstraint(typeConstraint, asn1UserType->type());
+        auto asn1UserdefinedType = dynamic_cast<Asn1Acn::Types::UserdefinedType *>(asn1Type);
+        applyContainerTypeConstraint(typeConstraint, asn1UserdefinedType->type());
     } break;
     default: {
         auto errorMessage = QString("ContainerTypeConstraint cannot be applied to \"%1\" entry because it's neither an "
@@ -144,8 +155,6 @@ void ContainerConstraintTranslatorVisitor::applyContainerTypeConstraint(
         throw conversion::translator::TranslationException(std::move(errorMessage));
     } break;
     }
-
-    Q_UNUSED(referencedType);
 }
 
 void ContainerConstraintTranslatorVisitor::applyContainerValueConstraint(

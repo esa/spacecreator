@@ -22,6 +22,7 @@
 #include "commands/cmdcontextparameterchange.h"
 #include "commands/cmdcontextparametercreate.h"
 #include "commands/cmdcontextparameterremove.h"
+#include "commands/cmdcontextparameterreorder.h"
 #include "commandsstack.h"
 #include "itemeditor/common/ivutils.h"
 #include "ivcommonprops.h"
@@ -258,10 +259,17 @@ ivm::IVObject *ContextParametersModel::entity() const
 bool ContextParametersModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
         const QModelIndex &destinationParent, int destinationChild)
 {
+    auto entity = qobject_cast<ivm::IVFunctionType *>(m_dataObject);
+    if (!entity) {
+        return false;
+    }
+
     if (PropertiesModelBase::moveRows(sourceParent, sourceRow, count, destinationParent, destinationChild)) {
-        for (int idx = 0; idx < count; ++idx)
+        for (int idx = 0; idx < count; ++idx) {
             std::swap(m_params[sourceRow + idx], m_params[destinationChild + idx]);
-        return true;
+            auto ctxParamCmd = new cmd::CmdContextParameterReorder(entity, sourceRow + idx, destinationChild + idx);
+            m_cmdMacro->push(ctxParamCmd);
+        }
     }
     return false;
 }

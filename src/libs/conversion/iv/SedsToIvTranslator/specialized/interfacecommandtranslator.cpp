@@ -19,7 +19,6 @@
 
 #include "specialized/interfacecommandtranslator.h"
 
-#include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
@@ -45,13 +44,13 @@ const QString InterfaceCommandTranslator::m_interfaceParameterEncoding = "ACN";
 const QString InterfaceCommandTranslator::m_ivInterfaceNameTemplate = "%1_%2_%3";
 const QString InterfaceCommandTranslator::m_arrayArgumentNameTemplate = "%1_Array%2";
 
-InterfaceCommandTranslator::InterfaceCommandTranslator(const QString &sedsInterfaceName,
+InterfaceCommandTranslator::InterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
         const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet, Asn1Acn::Definitions *asn1Definitions,
-        const seds::model::Package *sedsPackage, ivm::IVFunction *ivFunction)
-    : m_sedsInterfaceName(sedsInterfaceName)
+        const seds::model::Package *sedsPackage)
+    : m_ivFunction(ivFunction)
+    , m_sedsInterfaceName(sedsInterfaceName)
     , m_asn1Definitions(asn1Definitions)
     , m_sedsPackage(sedsPackage)
-    , m_ivFunction(ivFunction)
     , m_typeMapper(genericTypeMapSet)
 {
 }
@@ -85,27 +84,6 @@ ivm::IVInterface *InterfaceCommandTranslator::createIvInterface(const seds::mode
     creationInfo.kind = kind;
 
     return ivm::IVInterface::createIface(creationInfo);
-}
-
-void InterfaceCommandTranslator::createAsn1SequenceComponent(
-        const QString &name, const QString &typeName, Asn1Acn::Types::Sequence *sequence) const
-{
-    const auto *referencedTypeAssignment = m_asn1Definitions->type(typeName);
-
-    if (!referencedTypeAssignment) {
-        auto errorMessage =
-                QString("Type %1 not found while creating ASN.1 sequence %2").arg(typeName).arg(sequence->identifier());
-        throw TranslationException(std::move(errorMessage));
-    }
-
-    const auto *referencedType = referencedTypeAssignment->type();
-
-    auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(typeName, m_asn1Definitions->name());
-    sequenceComponentType->setType(referencedType->clone());
-
-    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            name, name, false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(sequenceComponentType));
-    sequence->addComponent(std::move(sequenceComponent));
 }
 
 QString InterfaceCommandTranslator::buildArrayType(
@@ -174,7 +152,7 @@ QString InterfaceCommandTranslator::createArrayType(
     }
 
     std::unique_ptr<Asn1Acn::Types::Type> asn1ArrayArgument;
-    asn1::translator::DataTypeTranslatorVisitor dataTypeVisitor { asn1ArrayArgument, m_asn1Definitions, m_sedsPackage };
+    asn1::translator::DataTypeTranslatorVisitor dataTypeVisitor(asn1ArrayArgument, m_asn1Definitions, m_sedsPackage);
     dataTypeVisitor(sedsArrayArgument);
 
     auto asn1ArrayArgumentAssignment = std::make_unique<Asn1Acn::TypeAssignment>(

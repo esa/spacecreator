@@ -26,7 +26,7 @@ namespace csv::importer {
 /**
  * @brief   Possible options for CSV import
  */
-class CsvOptions
+class CsvOptions final
 {
 public:
     /** @brief  Filepath of input file */

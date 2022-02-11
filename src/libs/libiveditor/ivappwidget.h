@@ -23,6 +23,7 @@
 #include <QPointer>
 #include <QVector>
 #include <QWidget>
+#include <QStandardItem>
 
 namespace Ui {
 class IVAppWidget;
@@ -52,6 +53,7 @@ public:
 private Q_SLOTS:
     void showContextMenuForIVModel(const QPoint &pos);
     void showAvailableLayers(const QPoint &pos);
+    void renameSelectedLayer(QStandardItem *item);
     void copyItems();
     void cutItems();
     void pasteItems();

@@ -34,6 +34,8 @@ public:
     IVConnectionLayerType(const QString &name, QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
     ~IVConnectionLayerType();
     inline QString name() const { return m_name; };
+    inline auto title() const -> QString override { return name(); };
+    inline auto titleUI() const -> QString override { return name(); };
     auto rename(const QString &name) -> void;
     static const QString DefaultLayerName;
 

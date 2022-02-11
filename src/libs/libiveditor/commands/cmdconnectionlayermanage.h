@@ -32,7 +32,7 @@ namespace cmd {
 class CmdConnectionLayerManage : public shared::UndoCommand
 {
 public:
-    CmdConnectionLayerManage(ivm::IVModel *layersModel);
+    CmdConnectionLayerManage(ivm::IVModel *layersMode, ivm::IVModel *objectsModell);
 
     virtual ~CmdConnectionLayerManage();
 
@@ -40,23 +40,26 @@ public:
 
     auto model() const -> ivm::IVModel *;
 
+    auto layer() const -> ivm::IVConnectionLayerType *;
+
     auto find(const QString &name) const -> ivm::IVConnectionLayerType *;
 
 protected:
     auto addLayer() -> void;
-    auto renameLayer() -> void;
     auto deleteLayer() -> void;
 
     ivm::IVModel *m_layersModel;
+    ivm::IVModel *m_objectsModel;
     ivm::IVObject *m_parent;
     ivm::IVConnectionLayerType *m_layer;
-    QString m_layerPrevName;
+    QString m_previousName;
+    QString m_currentName;
 };
 
 class CmdConnectionLayerCreate : public CmdConnectionLayerManage
 {
 public:
-    explicit CmdConnectionLayerCreate(const QString &name, ivm::IVModel *layersModel);
+    explicit CmdConnectionLayerCreate(const QString &name, ivm::IVModel *layersModel, ivm::IVModel *objectsModel);
     ~CmdConnectionLayerCreate() override;
 
     void redo() override;
@@ -67,7 +70,8 @@ public:
 class CmdConnectionLayerRename : public CmdConnectionLayerManage
 {
 public:
-    explicit CmdConnectionLayerRename(const QString &newName, const QString &oldName, ivm::IVModel *layersModel);
+    explicit CmdConnectionLayerRename(const QString &previousName, const QString &currentName,
+            ivm::IVModel *layersModel, ivm::IVModel *objectsModel);
     ~CmdConnectionLayerRename() override;
 
     void redo() override;
@@ -78,7 +82,7 @@ public:
 class CmdConnectionLayerDelete : public CmdConnectionLayerManage
 {
 public:
-    explicit CmdConnectionLayerDelete(const QString &name, ivm::IVModel *layersModel);
+    explicit CmdConnectionLayerDelete(const QString &name, ivm::IVModel *layersModel, ivm::IVModel *objectsModel);
     ~CmdConnectionLayerDelete() override;
 
     void redo() override;

@@ -10,4 +10,5 @@ init
     channel1?param;
     fn();
     fnParams(param);
+    skip;
 }

@@ -21,6 +21,7 @@
 
 #include "typeconstraintsreconstructingvisitor.h"
 
+#include <asn1library/asn1/acnsequencecomponent.h>
 #include <asn1library/asn1/constraints/printingvisitor.h>
 
 using namespace Asn1Acn;
@@ -99,12 +100,57 @@ void Asn1TypeComponentReconstructingVisitor::visit(const Types::Enumerated &type
 
 void Asn1TypeComponentReconstructingVisitor::visit(const Types::Choice &type)
 {
-    valueForComplexType<Types::Choice>(type, m_indent);
+    addLine(type.typeName());
+    addLine(QStringLiteral("{"), m_indent);
+
+    const auto &components = type.components();
+    for (auto it = components.begin(); it != components.end(); it++) {
+        addIndent(m_indent + INDENT_SIZE);
+        addWord((*it)->name());
+
+        Asn1TypeComponentReconstructingVisitor visitor(m_outStream, m_indent + INDENT_SIZE);
+        (*it)->type()->accept(visitor);
+
+        if (std::next(it) != components.end()) {
+            addWord(QStringLiteral(","));
+        }
+
+        finishLine();
+    }
+
+    addIndent(m_indent);
+    addWord(QStringLiteral("}"));
 }
 
 void Asn1TypeComponentReconstructingVisitor::visit(const Types::Sequence &type)
 {
-    valueForComplexType<Types::Sequence>(type, m_indent);
+    addLine(type.typeName());
+    addLine(QStringLiteral("{"), m_indent);
+
+    const auto &components = type.components();
+    auto isFirst = true;
+    for (auto it = components.begin(); it != components.end(); it++) {
+        if (dynamic_cast<AcnSequenceComponent *>((*it).get()) != nullptr) {
+            continue;
+        }
+
+        if (!isFirst) {
+            addWord(QStringLiteral(","));
+            finishLine();
+        } else {
+            isFirst = false;
+        }
+
+        addIndent(m_indent + INDENT_SIZE);
+        addWord((*it)->name());
+
+        Asn1TypeComponentReconstructingVisitor visitor(m_outStream, m_indent + INDENT_SIZE);
+        (*it)->type()->accept(visitor);
+    }
+
+    finishLine();
+    addIndent(m_indent);
+    addWord(QStringLiteral("}"));
 }
 
 void Asn1TypeComponentReconstructingVisitor::visit(const Types::SequenceOf &type)
@@ -141,31 +187,6 @@ void Asn1TypeComponentReconstructingVisitor::valueForStraightType(const Types::T
     type.accept(visitor);
 
     m_outStream << type.typeName() << visitor.value();
-}
-
-template<typename T>
-void Asn1TypeComponentReconstructingVisitor::valueForComplexType(const T &type, const int indent)
-{
-    addLine(type.typeName());
-    addLine(QStringLiteral("{"), indent);
-
-    const auto &components = type.components();
-    for (auto it = components.begin(); it != components.end(); it++) {
-        addIndent(indent + INDENT_SIZE);
-        addWord((*it)->name());
-
-        Asn1TypeComponentReconstructingVisitor visitor(m_outStream, indent + INDENT_SIZE);
-        (*it)->type()->accept(visitor);
-
-        if (std::next(it) != components.end()) {
-            addWord(QStringLiteral(","));
-        }
-
-        finishLine();
-    }
-
-    addIndent(indent);
-    addWord(QStringLiteral("}"));
 }
 
 void Asn1TypeComponentReconstructingVisitor::addIndent(int indent)

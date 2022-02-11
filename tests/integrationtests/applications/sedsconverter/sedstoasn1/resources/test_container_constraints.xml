@@ -31,6 +31,7 @@
           <Enumeration value="12" label="Value1" />
           <Enumeration value="15" label="Value2" />
           <Enumeration value="18" label="Value3" />
+          <Enumeration value="22" label="Value4" />
         </EnumerationList>
       </EnumeratedDataType>
       <BinaryDataType name="BitStringData" sizeInBits="4" fixedSize="true" />
@@ -43,6 +44,7 @@
           <Entry name="intDataRange" type="IntegerData" />
           <Entry name="intDataNoEncodingRange" type="IntegerDataNoEncoding" />
           <Entry name="floatDataRange" type="RealData" />
+          <Entry name="enumDataRange" type="EnumData" />
           <Entry name="intDataType" type="IntegerDataBigger" />
           <Entry name="intDataValue" type="IntegerData" />
           <Entry name="floatDataValue" type="RealData" />
@@ -61,6 +63,13 @@
           </RangeConstraint>
           <RangeConstraint entry="floatDataRange">
             <MinMaxRange rangeType="atMost" max="3.14" />
+          </RangeConstraint>
+          <RangeConstraint entry="enumDataRange">
+            <EnumeratedRange>
+              <Label>Value1</Label>
+              <Label>Value3</Label>
+              <Label>Value4</Label>
+            </EnumeratedRange>
           </RangeConstraint>
           <TypeConstraint entry="intDataType" type="IntegerData" />
           <ValueConstraint entry="intDataValue" value="42" />

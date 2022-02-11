@@ -126,7 +126,7 @@ IVInterface::IVInterface(IVObject::Type ifaceType, const CreationInfo &ci)
                                                              : IVInterface::InterfaceType::Provided))
 {
     setKind(ci.kind);
-    setLayer(ci.layer);
+    setLayerName(ci.layer != nullptr ? ci.layer->name() : IVConnectionLayerType::DefaultLayerName);
     setParams(ci.parameters);
 
     if (ci.toBeCloned) {
@@ -183,6 +183,7 @@ bool IVInterface::postInit()
             }
         }
     }
+
     return IVObject::postInit();
 }
 
@@ -241,20 +242,20 @@ QString IVInterface::ifaceLabel() const
 IVConnectionLayerType *IVInterface::layer() const
 {
     if (model() != nullptr) {
-        return model()->getConnectionLayerByName(
-                entityAttributeValue(meta::Props::token(meta::Props::Token::layer)).toString());
+        return model()->getConnectionLayerByName(layerName());
     }
     return nullptr;
 }
 
-bool IVInterface::setLayer(IVConnectionLayerType *layer)
+QString IVInterface::layerName() const
 {
-    if (layer != nullptr) {
-        setEntityAttribute(meta::Props::token(meta::Props::Token::layer), layer->name());
-        return true;
-    }
-    setEntityAttribute(meta::Props::token(meta::Props::Token::layer), IVConnectionLayerType::DefaultLayerName);
-    return false;
+    return entityAttributeValue(meta::Props::token(meta::Props::Token::layer)).toString();
+}
+
+void IVInterface::setLayerName(const QString &layerName)
+{
+    setEntityAttribute(meta::Props::token(meta::Props::Token::layer), layerName);
+    Q_EMIT attributeChanged(meta::Props::token(meta::Props::Token::layer));
 }
 
 IVInterface::OperationKind IVInterface::kindFromString(const QString &k) const
@@ -415,8 +416,7 @@ IVInterface *IVInterface::createIface(const CreationInfo &descr)
         qFatal("Unsupported interface type");
     iface->setKind(descr.kind);
     iface->setTitle(descr.name);
-    iface->setLayer(descr.layer);
-
+    iface->setLayerName(descr.layer != nullptr ? descr.layer->name() : IVConnectionLayerType::DefaultLayerName);
     return iface;
 }
 

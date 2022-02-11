@@ -1,0 +1,102 @@
+/** @file
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2021 N7 Space Sp. z o.o.
+ *`
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+
+#include "tst_asn1topromelatranslator_env.h"
+
+#include <asn1library/asn1/constraints/rangeconstraint.h>
+#include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/values.h>
+#include <promela/Asn1ToPromelaTranslator/visitors/asn1nodevaluegeneratorvisitor.h>
+#include <promela/PromelaModel/promelamodel.h>
+
+using Asn1Acn::IntegerValue;
+using Asn1Acn::SourceLocation;
+using Asn1Acn::TypeAssignment;
+using Asn1Acn::Constraints::RangeConstraint;
+using Asn1Acn::Types::Integer;
+using promela::model::Assignment;
+using promela::model::Conditional;
+using promela::model::Constant;
+using promela::model::InlineDef;
+using promela::model::PromelaModel;
+using promela::model::Sequence;
+using promela::translator::Asn1NodeValueGeneratorVisitor;
+
+namespace tmc::test {
+
+void tst_Asn1ToPromelaTranslator_Env::initTestCase() {}
+
+void tst_Asn1ToPromelaTranslator_Env::cleanupTestCase() {}
+
+void tst_Asn1ToPromelaTranslator_Env::testInteger()
+{
+    auto model = createModel();
+
+    {
+        auto integerType = std::make_unique<Integer>();
+        auto rangeConstraint = RangeConstraint<IntegerValue>::create({ 0, 3 });
+        integerType->constraints().append(std::move(rangeConstraint));
+
+        auto myIntegerAssignment = std::make_unique<TypeAssignment>(
+                QStringLiteral("MyInteger"), QStringLiteral("MyInteger"), SourceLocation(), std::move(integerType));
+        model->addType(std::move(myIntegerAssignment));
+    }
+
+    PromelaModel promelaModel;
+    QStringList typesToTranslate;
+    typesToTranslate.append(QString("MyInteger"));
+    Asn1NodeValueGeneratorVisitor visitor(promelaModel, true, typesToTranslate);
+    visitor.visit(*model);
+
+    QCOMPARE(promelaModel.getInlineDefs().size(), 1);
+
+    const std::unique_ptr<InlineDef> &inlineDef = promelaModel.getInlineDefs().front();
+
+    QCOMPARE(inlineDef->getName(), "MyInteger_generate_value");
+    QCOMPARE(inlineDef->getArguments().size(), 1);
+    const QString &argName = inlineDef->getArguments().front();
+
+    const Sequence &mainSequence = inlineDef->getSequence();
+    QCOMPARE(mainSequence.getContent().size(), 1);
+
+    QVERIFY(std::holds_alternative<Conditional>(mainSequence.getContent().front()->getValue()));
+
+    const Conditional &ifStatement = std::get<Conditional>(mainSequence.getContent().front()->getValue());
+
+    auto iter = ifStatement.getAlternatives().begin();
+    for (int i = 0; i < 4; ++i) {
+        QVERIFY(iter != ifStatement.getAlternatives().end());
+        const std::unique_ptr<Sequence> &nestedSequence = *iter;
+        ++iter;
+        QCOMPARE(nestedSequence->getContent().size(), 2);
+
+        QVERIFY(std::holds_alternative<Assignment>(nestedSequence->getContent().back()->getValue()));
+        const Assignment &assignment = std::get<Assignment>(nestedSequence->getContent().back()->getValue());
+        QCOMPARE(assignment.getVariableRef().getReference(), argName);
+        QVERIFY(std::holds_alternative<Constant>(assignment.getExpression().getContent()));
+        const Constant &constant = std::get<Constant>(assignment.getExpression().getContent());
+        QCOMPARE(constant.getValue(), i);
+    }
+}
+
+std::unique_ptr<Definitions> tst_Asn1ToPromelaTranslator_Env::createModel()
+{
+    return std::make_unique<Definitions>("myModule", SourceLocation());
+}
+}

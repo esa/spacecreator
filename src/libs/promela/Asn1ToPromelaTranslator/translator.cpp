@@ -19,10 +19,12 @@
 
 #include "translator.h"
 
+#include "promelatypesorter.h"
+#include "visitors/asn1nodevaluegeneratorvisitor.h"
 #include "visitors/asn1nodevisitor.h"
 
+#include <algorithm>
 #include <asn1library/asn1/asn1model.h>
-#include <conversion/common/translation/exceptions.h>
 #include <promela/PromelaModel/promelamodel.h>
 #include <promela/PromelaOptions/options.h>
 
@@ -32,22 +34,28 @@ using conversion::Model;
 using conversion::ModelType;
 using conversion::Options;
 using conversion::promela::PromelaOptions;
-using conversion::translator::TranslationException;
+
 using promela::model::PromelaModel;
 
 namespace promela::translator {
 std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
         std::vector<Model *> sourceModels, const Options &options) const
 {
-    Q_UNUSED(options);
-
     checkSourceModelCount(sourceModels);
 
-    bool enhancedSpinSupport = options.isSet(PromelaOptions::enhancedSpinSupport);
+    const bool enhancedSpinSupport = options.isSet(PromelaOptions::enhancedSpinSupport);
+
+    const std::vector<QString> valueGeneration = options.values(PromelaOptions::asn1ValueGeneration);
 
     const auto *asn1Model = getModel<Asn1Model>(sourceModels);
 
-    return translateAsn1Model(asn1Model, enhancedSpinSupport);
+    if (!valueGeneration.empty()) {
+        QStringList typeNames;
+        std::copy(valueGeneration.begin(), valueGeneration.end(), std::back_inserter(typeNames));
+        return generateValueGenerationInlines(asn1Model, enhancedSpinSupport, typeNames);
+    } else {
+        return translateAsn1Model(asn1Model, enhancedSpinSupport);
+    }
 }
 
 ModelType Asn1ToPromelaTranslator::getSourceModelType() const
@@ -73,6 +81,21 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
         visitAsn1File(file.get(), *promelaModel, enhancedSpinSupport);
     }
 
+    PromelaTypeSorter typeSorter;
+    typeSorter.sortTypeDefinitions(*promelaModel);
+
+    std::vector<std::unique_ptr<Model>> result;
+    result.push_back(std::move(promelaModel));
+    return result;
+}
+
+std::vector<std::unique_ptr<conversion::Model>> Asn1ToPromelaTranslator::generateValueGenerationInlines(
+        const ::Asn1Acn::Asn1Model *model, bool enhancedSpinSupport, const QStringList &typeNames) const
+{
+    std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
+    for (const std::unique_ptr<File> &file : model->data()) {
+        visitAsn1FileGenerate(file.get(), *promelaModel, enhancedSpinSupport, typeNames);
+    }
     std::vector<std::unique_ptr<Model>> result;
     result.push_back(std::move(promelaModel));
     return result;
@@ -81,6 +104,13 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
 void Asn1ToPromelaTranslator::visitAsn1File(File *file, PromelaModel &promelaModel, bool enhancedSpinSupport) const
 {
     Asn1NodeVisitor visitor(promelaModel, enhancedSpinSupport);
+    visitor.visit(*file);
+}
+
+void Asn1ToPromelaTranslator::visitAsn1FileGenerate(
+        File *file, PromelaModel &promelaModel, bool enhancedSpinSupport, const QStringList &typeNames) const
+{
+    Asn1NodeValueGeneratorVisitor visitor(promelaModel, enhancedSpinSupport, typeNames);
     visitor.visit(*file);
 }
 }

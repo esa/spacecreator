@@ -41,4 +41,9 @@ void ValueEnumeration::setLabel(common::String label)
     m_label = std::move(label);
 }
 
+const QString &ValueEnumeration::nameStr() const
+{
+    return m_label.value();
+}
+
 } // namespace seds::model

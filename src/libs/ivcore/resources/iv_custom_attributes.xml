@@ -41,6 +41,15 @@
             <Function/>
         </Scopes>
     </Attr>
+    <Attr label="Layer" name="layer" visible="true" editable="true">
+        <Type>
+            <String validator="[a-zA-Z0-9]+" defaultValue="default" />
+        </Type>
+        <Scopes>
+            <Provided_Interface/>
+            <Required_Interface/>
+        </Scopes>
+    </Attr>
     <Attr label="Language" name="type_language">
         <Scopes>
             <Function>

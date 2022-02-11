@@ -66,6 +66,11 @@ const QList<Utype> &PromelaModel::getUtypes() const noexcept
     return m_userTypes;
 }
 
+void PromelaModel::setUtypes(const QList<Utype> &utypes)
+{
+    m_userTypes = utypes;
+}
+
 void PromelaModel::addTypeAlias(const TypeAlias &alias)
 {
     m_typeAliases.append(alias);
@@ -129,5 +134,15 @@ const InitProctype &PromelaModel::getInit() const noexcept
 void PromelaModel::setInit(InitProctype initProctype)
 {
     m_initProctype = std::move(initProctype);
+}
+
+void PromelaModel::addEpilogueInclude(const QString &file)
+{
+    m_epilogueIncludes.append(file);
+}
+
+const QList<QString> &PromelaModel::getEpilogueIncludes() const noexcept
+{
+    return m_epilogueIncludes;
 }
 }

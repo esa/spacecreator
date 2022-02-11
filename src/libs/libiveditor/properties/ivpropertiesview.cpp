@@ -45,8 +45,8 @@ void ContextParametersView::updateButtons()
 }
 
 IfaceParametersView::IfaceParametersView(QWidget *widget)
-    : shared::PropertiesViewBase({ IfaceParametersModel::Column::Type, IfaceParametersModel::Column::Encoding,
-                                         IfaceParametersModel::Column::Direction },
+    : shared::PropertiesViewBase(
+              { IfaceParametersModel::Column::Type, IfaceParametersModel::Column::Encoding, IfaceParametersModel::Column::Direction },
               widget)
 {
 }

@@ -152,12 +152,15 @@ void IVConnection::unsetInheritPI()
 
 IVConnectionLayerType *IVConnection::layer() const
 {
-    if (targetInterface() != nullptr && sourceInterface() != nullptr) {
-        if (targetInterface()->layer() == sourceInterface()->layer()) {
-            return sourceInterface()->layer();
+    if (model() != nullptr) {
+        if (targetInterface() != nullptr && sourceInterface() != nullptr) {
+            if (targetInterface()->layer() == sourceInterface()->layer()) {
+                return sourceInterface()->layer();
+            }
         }
+        return model()->getConnectionLayerByName(IVConnectionLayerType::DefaultLayerName);
     }
-    return model()->getConnectionLayerByName(IVConnectionLayerType::DefaultLayerName);
+    return nullptr;
 }
 
 /*!

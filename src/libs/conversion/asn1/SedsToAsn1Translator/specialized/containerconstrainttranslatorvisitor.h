@@ -19,14 +19,20 @@
 
 #pragma once
 
+#include "specialized/rangetranslatorvisitor.h"
+
+#include <conversion/common/translation/exceptions.h>
 #include <cstdint>
 
-namespace Asn1Acn::Types {
+namespace Asn1Acn {
+class Definitions;
+namespace Types {
 class Integer;
 class Real;
 class Sequence;
 class Type;
-} // namespace Asn1Acn::Types
+} // namespace Asn1Acn
+} // namespace Types
 
 namespace seds::model {
 class EntryRef;
@@ -49,8 +55,9 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   asn1Sequence    ASN.1 sequence to which the translated constraints will be applied
-     * @param   sedsPackage     Parent SEDS package
+     * @param   asn1Sequence        ASN.1 sequence to which the translated constraints will be applied
+     * @param   asn1Definitions     Parent ASN.1 definitions
+     * @param   sedsPackage         Parent SEDS package
      */
     ContainerConstraintTranslatorVisitor(
             Asn1Acn::Types::Sequence *asn1Sequence, const seds::model::Package *sedsPackage);
@@ -103,6 +110,7 @@ private:
 
 private:
     Asn1Acn::Types::Sequence *m_asn1Sequence;
+
     const seds::model::Package *m_sedsPackage;
 };
 

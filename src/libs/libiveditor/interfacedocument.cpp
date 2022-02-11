@@ -21,6 +21,7 @@
 #include "asn1modelstorage.h"
 #include "asn1systemchecks.h"
 #include "colors/colormanagerdialog.h"
+#include "commands/cmdconnectionlayermanage.h"
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
@@ -248,14 +249,18 @@ void InterfaceDocument::updateLayersModel() const
     if (layersModel() != nullptr) {
         auto layers = layersModel()->allObjectsByType<ivm::IVConnectionLayerType>();
         bool isDefaultPresent = false;
-        for (auto *layer : layers) {
-            if (layer->name().compare(ivm::IVConnectionLayerType::DefaultLayerName) == 0) {
+        for (auto * const layer : layers) {
+            if (layer->name() == ivm::IVConnectionLayerType::DefaultLayerName) {
                 isDefaultPresent = true;
             }
         }
         if (!isDefaultPresent) {
-            layersModel()->addObject(new ivm::IVConnectionLayerType(
-                    ivm::IVConnectionLayerType::DefaultLayerName, layersModel()->rootObject(), shared::createId()));
+            auto *cmd = new cmd::CmdConnectionLayerCreate(
+                    ivm::IVConnectionLayerType::DefaultLayerName, layersModel(), objectsModel());
+            commandsStack()->push(cmd);
+        }
+        if (objectsModel() != nullptr) {
+            objectsModel()->setConnectionLayersModel(layersModel());
         }
     }
 }
@@ -678,7 +683,6 @@ void InterfaceDocument::setObjects(const QVector<ivm::IVObject *> &objects)
 {
     d->objectsModel->initFromObjects(objects);
     d->objectsModel->setRootObject({});
-    d->objectsModel->setConnectionLayersModel(d->layersModel);
 }
 
 void InterfaceDocument::onAttributesManagerRequested()

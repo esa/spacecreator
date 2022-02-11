@@ -79,6 +79,7 @@ private slots:
 
     void testTypeAssignmentSequence();
     void testTypeAssignmentNestedSequence();
+    void testTypeAssignmentSequenceWithAcn();
 
     void testTypeAssignmentSequenceOf();
     void testTypeAssignmentSequenceOfWithValue();

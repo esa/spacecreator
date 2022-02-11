@@ -497,7 +497,7 @@ model::FloatDataType::Range DataTypesParser::readFloatDataRange(QXmlStreamReader
         xmlReader.skipCurrentElement();
         return range;
     } else if (xmlReader.name() == QLatin1String("PrecisionRange")) {
-        auto range = parseFloatPrecisionRange(xmlReader);
+        auto range = readFloatPrecisionRange(xmlReader);
         xmlReader.skipCurrentElement();
         return range;
     } else {
@@ -516,38 +516,6 @@ model::MinMaxRange DataTypesParser::readIntegerDataRange(QXmlStreamReader &xmlRe
     } else {
         throw UnhandledElement(xmlReader.name(), "IntegerDataRange");
     }
-}
-
-model::DerivedTypeRange DataTypesParser::readDerivedTypeRange(QXmlStreamReader &xmlReader)
-{
-    xmlReader.readNextStartElement();
-
-    if (xmlReader.name() == QLatin1String("MinMaxRange")) {
-        auto range = readMinMaxRange(xmlReader);
-        xmlReader.skipCurrentElement();
-        return range;
-    } else {
-        throw UnhandledElement(xmlReader.name(), "DerivedTypeRange");
-    }
-}
-
-model::EnumeratedDataTypeRange DataTypesParser::readEnumeratedDataTypeRange(QXmlStreamReader &xmlReader)
-{
-    model::EnumeratedDataTypeRange range;
-
-    for (const auto &attribute : xmlReader.attributes()) {
-        throw UnhandledAttribute(attribute.name(), xmlReader.name());
-    }
-
-    while (xmlReader.readNextStartElement()) {
-        if (xmlReader.name() == QStringLiteral("Label")) {
-            range.addItem(xmlReader.readElementText());
-        } else {
-            throw UnhandledElement(xmlReader.name(), "EnumeratedDataTypeRange");
-        }
-    }
-
-    return range;
 }
 
 model::MinMaxRange DataTypesParser::readMinMaxRange(QXmlStreamReader &xmlReader)
@@ -571,6 +539,62 @@ model::MinMaxRange DataTypesParser::readMinMaxRange(QXmlStreamReader &xmlReader)
     }
 
     return range;
+}
+
+model::FloatPrecisionRange DataTypesParser::readFloatPrecisionRange(QXmlStreamReader &xmlReader)
+{
+    auto rangeStr = xmlReader.readElementText();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    auto range = model::enumFromString<model::FloatPrecisionRange>(StringRef(rangeStr));
+#else
+    auto range = model::enumFromString<model::FloatPrecisionRange>(&rangeStr);
+#endif
+
+    if (range) {
+        return *range;
+    } else {
+        throw ParserException(QString("Unable to parse float precision range '%1'").arg(rangeStr));
+    }
+}
+
+model::EnumeratedDataTypeRange DataTypesParser::readEnumeratedDataTypeRange(QXmlStreamReader &xmlReader)
+{
+    model::EnumeratedDataTypeRange range;
+
+    for (const auto &attribute : xmlReader.attributes()) {
+        throw UnhandledAttribute(attribute.name(), xmlReader.name());
+    }
+
+    while (xmlReader.readNextStartElement()) {
+        if (xmlReader.name() == QStringLiteral("Label")) {
+            range.addItem(xmlReader.readElementText());
+        } else {
+            throw UnhandledElement(xmlReader.name(), "EnumeratedDataTypeRange");
+        }
+    }
+
+    return range;
+}
+
+model::DerivedTypeRange DataTypesParser::readDerivedTypeRange(QXmlStreamReader &xmlReader)
+{
+    xmlReader.readNextStartElement();
+
+    if (xmlReader.name() == QLatin1String("MinMaxRange")) {
+        auto range = readMinMaxRange(xmlReader);
+        xmlReader.skipCurrentElement();
+        return range;
+    } else if (xmlReader.name() == QLatin1String("PrecisionRange")) {
+        auto range = readFloatPrecisionRange(xmlReader);
+        xmlReader.skipCurrentElement();
+        return range;
+    } else if (xmlReader.name() == QStringLiteral("EnumeratedRange")) {
+        auto range = readEnumeratedDataTypeRange(xmlReader);
+        xmlReader.skipCurrentElement();
+        return range;
+    } else {
+        throw UnhandledElement(xmlReader.name(), "DerivedTypeRange");
+    }
 }
 
 void DataTypesParser::readEntryList(const DataTypesParser::EntryAddingFunction &addEntry, QXmlStreamReader &xmlReader)
@@ -949,22 +973,6 @@ model::StringDataEncoding::Encoding DataTypesParser::parseStringEncoding(const S
         return *coreStringEncoding;
     } else {
         throw ParserException(QString("Unable to parse string encoding '%1'").arg(encodingStr));
-    }
-}
-
-model::FloatPrecisionRange DataTypesParser::parseFloatPrecisionRange(QXmlStreamReader &xmlReader)
-{
-    auto rangeStr = xmlReader.readElementText();
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    auto range = model::enumFromString<model::FloatPrecisionRange>(StringRef(rangeStr));
-#else
-    auto range = model::enumFromString<model::FloatPrecisionRange>(&rangeStr);
-#endif
-
-    if (range) {
-        return *range;
-    } else {
-        throw ParserException(QString("Unable to parse float precision range '%1'").arg(rangeStr));
     }
 }
 

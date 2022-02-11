@@ -46,7 +46,6 @@
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
-#include "manageconnectionlayersdialog.h"
 #include "ui/grippointshandler.h"
 
 #include <QAction>
@@ -429,9 +428,6 @@ void IVCreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF 
         action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/connection_group.svg")), tr("Connection group"),
                 this, [this]() { groupSelectedItems(); });
 
-        action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/connection_layer.svg")), tr("Connection layer"),
-                this, [this, scenePos]() { handleToolType(ToolType::ConnectionLayer, scenePos); });
-
         const auto selectedItems = m_previewItem->scene()->selectedItems();
         const auto it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
                 [](const QGraphicsItem *item) { return item->type() == IVConnectionGraphicsItem::Type; });
@@ -516,9 +512,6 @@ bool IVCreatorTool::handleToolType(int type, const QPointF &pos)
             if (!handleConnectionCreate(pos))
                 return false;
             handleConnectionReCreate(m_connectionPoints);
-            break;
-        case ToolType::ConnectionLayer:
-            handleConnectionLayer();
             break;
         default:
             break;
@@ -893,8 +886,6 @@ void IVCreatorTool::handleConnectionReCreate(const QVector<QPointF> &graphicPoin
         }
     }
 }
-
-void IVCreatorTool::handleConnectionLayer() {}
 
 bool IVCreatorTool::warnConnectionPreview(const QPointF &pos)
 {
