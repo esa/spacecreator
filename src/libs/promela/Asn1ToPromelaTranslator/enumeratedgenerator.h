@@ -3,7 +3,7 @@
  *
  * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
- * This library is free software; you can redistribute it and/or
+ * Thips library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
@@ -17,27 +17,29 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include <QObject>
-#include <QtTest>
-#include <asn1library/asn1/asn1model.h>
-#include <memory>
+#pragma once
 
-using Asn1Acn::Definitions;
+#include <QString>
+#include <QVector>
+#include <asn1library/asn1/types/enumerated.h>
+#include <cstdint>
+#include <utility>
 
-namespace tmc::test {
-
-class tst_Asn1ToPromelaTranslator_Env : public QObject
+namespace promela::translator {
+/**
+ * @brief Generator that generates all possible integer values from integer subset.
+ */
+class EnumeratedGenerator final
 {
-    Q_OBJECT
-
-private Q_SLOTS:
-    void initTestCase();
-    void cleanupTestCase();
-
-    void testInteger();
-    void testEnumerated();
+public:
+    EnumeratedGenerator(QString typeName, const ::Asn1Acn::Types::Enumerated &enumerated);
+    void reset();
+    std::pair<QString, int32_t> next();
+    bool has_next() const;
 
 private:
-    std::unique_ptr<Definitions> createModel();
+    const QString m_typeName;
+    QVector<::Asn1Acn::Types::EnumeratedItem> m_items;
+    QVector<::Asn1Acn::Types::EnumeratedItem>::const_iterator m_iter;
 };
 }
