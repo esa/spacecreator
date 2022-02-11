@@ -53,6 +53,12 @@ ChoiceAlternative::ChoiceAlternative(const ChoiceAlternative &other)
 {
 }
 
+const std::vector<QString> &ChoiceAlternative::acnParameters() const
+{
+    static std::vector<QString> stub;
+    return stub;
+}
+
 Choice::Choice(const Choice &other)
     : Type(other)
     , AcnParameterizableCollection<ChoiceAlternative>(other)

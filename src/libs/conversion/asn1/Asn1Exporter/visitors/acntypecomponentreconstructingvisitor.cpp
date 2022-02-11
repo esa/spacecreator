@@ -21,6 +21,8 @@
 
 #include "typeconstraintsreconstructingvisitor.h"
 
+#include <iostream>
+
 using namespace Asn1Acn;
 
 namespace {
@@ -307,6 +309,24 @@ void AcnTypeComponentReconstructingVisitor::reconstructComplexTypeComponents(con
     const auto &components = type.components();
     for (auto it = components.begin(); it != components.end(); it++) {
         m_outStream << addIndent(indent + INDENT_SIZE) << (*it)->definitionAsString() << QStringLiteral(" ");
+
+        std::cerr << (*it)->definitionAsString().toStdString() << "\n";
+
+        const auto &acnParameters = (*it)->acnParameters();
+        std::cerr << acnParameters.size() << "\n";
+        if (!acnParameters.empty()) {
+            m_outStream << QStringLiteral("<");
+
+            for (auto param = acnParameters.begin(); param != acnParameters.end(); param++) {
+                m_outStream << *param;
+
+                if (std::next(param, 1) != acnParameters.end()) {
+                    m_outStream << QStringLiteral(", ");
+                }
+            }
+
+            m_outStream << QStringLiteral(">");
+        }
 
         AcnTypeComponentReconstructingVisitor visitor(m_outStream, indent + INDENT_SIZE, (*it)->presentWhen());
         (*it)->type()->accept(visitor);
