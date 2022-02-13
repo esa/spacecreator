@@ -70,6 +70,7 @@
         <Implementation>
           <VariableSet>
             <Variable name="x" type="Number"></Variable>
+            <Variable name="y" type="Number"></Variable>
           </VariableSet>
           <ParameterMapSet>
             <ParameterMap variableRef="x" interface="IF" parameter="SyncParam" />
@@ -98,6 +99,16 @@
               </Body>
             </Activity>
           </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="SM">
+              <EntryState name="s" />
+              <Transition fromState="s" toState="s" name="t1">
+                <OnParameterPrimitive interface="IF" parameter="AsyncParam" operation="get">
+                  <VariableRef variableRef="y"/>
+                </OnParameterPrimitive> />
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
         </Implementation>
       </Component>
     </ComponentSet>

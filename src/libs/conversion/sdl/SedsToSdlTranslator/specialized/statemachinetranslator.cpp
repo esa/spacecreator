@@ -497,12 +497,8 @@ auto StateMachineTranslator::translatePrimitive(Context &context, const seds::mo
     }
     const bool isSporadic = interface->kind() == ivm::IVInterface::OperationKind::Sporadic;
 
-    // TODO support variable ref in OnParameterPrimitive
-    // TODO support ParameterActivityMap
     if (isSporadic) {
         // This is a sporadic interface, so we must unpack the value.
-        // For protected/unprotected interfaces, the value assignment is done in the associated procedure
-        // and there are no parameters to unpack.
         const auto variableName = ioVariableName(name);
         const auto &variableIterator = std::find_if(sdlProcess->variables().begin(), sdlProcess->variables().end(),
                 [variableName](const auto &variable) { return variable->name() == variableName; });
@@ -510,17 +506,31 @@ auto StateMachineTranslator::translatePrimitive(Context &context, const seds::mo
             throw TranslationException(QString("Reception variable %1 not found").arg(variableName));
         }
         input->addParameter(std::make_unique<::sdl::VariableReference>((*variableIterator).get()));
+        // Handle ParameterMap
         const auto &parameterMaps = context.sedsComponent().implementation().parameterMaps();
         const auto &map = std::find_if(parameterMaps.begin(), parameterMaps.end(), [&parameter](const auto &m) {
             return m.interface().value() == parameter.interface().value()
                     && m.parameter().value() == parameter.parameter().value();
         });
-        if (map == parameterMaps.end()) {
-            throw TranslationException(QString("Parameter map for input %1 not found").arg(name));
+        if (map != parameterMaps.end()) {
+            const auto targetVariableName = Escaper::escapeAsn1FieldName(map->variableRef().value().value());
+            unpackingActions.push_back(
+                    std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(targetVariableName, variableName)));
         }
-        const auto targetVariableName = Escaper::escapeAsn1FieldName(map->variableRef().value().value());
-        unpackingActions.push_back(
-                std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(targetVariableName, variableName)));
+        // Handle variable ref
+        if (parameter.variableRef().has_value()) {
+            const auto targetVariableName = Escaper::escapeAsn1FieldName((*parameter.variableRef()).value().value());
+            unpackingActions.push_back(
+                    std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(targetVariableName, variableName)));
+        }
+        // TODO support ParameterActivityMap
+    } else {
+        // This is a protected/unprotected interface, the value assignment is done in the associated procedure
+        // and there are no parameters to unpack.
+        if (parameter.variableRef().has_value()) {
+            // The assignment must be done in a map.
+            throw TranslationException(QString("VariableRef mapping is not supported for sync parameter %1").arg(name));
+        }
     }
     return std::make_pair(std::move(input), std::move(unpackingActions));
 }
