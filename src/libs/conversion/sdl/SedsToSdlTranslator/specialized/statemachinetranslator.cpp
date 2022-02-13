@@ -453,28 +453,38 @@ auto StateMachineTranslator::translatePrimitive(Context &context, const seds::mo
     std::vector<std::unique_ptr<::sdl::Action>> unpackingActions;
 
     // Input signal can be received only via a provided interface
-    input->setName(InterfaceCommandTranslator::getCommandName(
-            command.interface().value(), ivm::IVInterface::InterfaceType::Provided, command.command().value()));
+    const auto name = InterfaceCommandTranslator::getCommandName(
+            command.interface().value(), ivm::IVInterface::InterfaceType::Provided, command.command().value());
+    input->setName(name);
     if (command.argumentValues().empty()) {
         return std::make_pair(std::move(input), std::move(unpackingActions));
     }
-
-    const auto variableName = ioVariableName(input->name());
-    const auto &variableIterator = std::find_if(sdlProcess->variables().begin(), sdlProcess->variables().end(),
-            [variableName](const auto &variable) { return variable->name() == variableName; });
-    if (variableIterator == sdlProcess->variables().end()) {
-        throw TranslationException(QString("Reception variable %1 not found").arg(variableName));
+    const auto interface = getInterfaceByName(context.ivFunction(), name);
+    if (interface == nullptr) {
+        throw TranslationException(QString("Interface %1 not found").arg(name));
     }
-    input->addParameter(std::make_unique<::sdl::VariableReference>((*variableIterator).get()));
+    const bool isSporadic = interface->kind() == ivm::IVInterface::OperationKind::Sporadic;
+    if (isSporadic) {
+        const auto variableName = ioVariableName(input->name());
+        const auto &variableIterator = std::find_if(sdlProcess->variables().begin(), sdlProcess->variables().end(),
+                [variableName](const auto &variable) { return variable->name() == variableName; });
+        if (variableIterator == sdlProcess->variables().end()) {
+            throw TranslationException(QString("Reception variable %1 not found").arg(variableName));
+        }
+        input->addParameter(std::make_unique<::sdl::VariableReference>((*variableIterator).get()));
 
-    for (const auto &argument : command.argumentValues()) {
-        const auto targetVariableName = Escaper::escapeAsn1FieldName(argument.outputVariableRef().value().value());
-        const auto fieldName = Escaper::escapeAsn1FieldName(argument.name().value());
-        unpackingActions.push_back(std::make_unique<::sdl::Task>(
-                "", QString("%1 := %2.%3").arg(targetVariableName, variableName, fieldName)));
+        for (const auto &argument : command.argumentValues()) {
+            const auto targetVariableName = Escaper::escapeAsn1FieldName(argument.outputVariableRef().value().value());
+            const auto fieldName = Escaper::escapeAsn1FieldName(argument.name().value());
+            unpackingActions.push_back(std::make_unique<::sdl::Task>(
+                    "", QString("%1 := %2.%3").arg(targetVariableName, variableName, fieldName)));
+        }
+
+        return std::make_pair(std::move(input), std::move(unpackingActions));
+    } else {
+        // Protected/unprotected - assignments done in the reception procedure
+        return std::make_pair(std::move(input), std::move(unpackingActions));
     }
-
-    return std::make_pair(std::move(input), std::move(unpackingActions));
 }
 
 auto StateMachineTranslator::translatePrimitive(Context &context, const seds::model::OnParameterPrimitive &parameter)
