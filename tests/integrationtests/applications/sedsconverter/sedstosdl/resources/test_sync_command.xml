@@ -34,6 +34,8 @@
           </VariableSet>
           <ActivitySet>
             <Activity name="AddActivity">
+              <Argument name="x" type="Number" />
+              <Argument name="y" type="Number" />
               <Body>
                 <MathOperation outputVariableRef="r">
                   <Operator operator="add" />
@@ -59,7 +61,14 @@
                   <ArgumentValue name="x" outputVariableRef="x" />
                   <ArgumentValue name="y" outputVariableRef="y" />
                 </OnCommandPrimitive>
-                <Do activity="AddActivity"></Do>
+                <Do activity="AddActivity">
+                  <ArgumentValue name="x">
+                    <VariableRef variableRef="x" />
+                  </ArgumentValue>
+                  <ArgumentValue name="y">
+                    <VariableRef variableRef="y" />
+                  </ArgumentValue>
+                </Do>
               </Transition>
             </StateMachine>
           </StateMachineSet>

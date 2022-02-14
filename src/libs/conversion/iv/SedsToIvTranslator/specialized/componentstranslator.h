@@ -79,6 +79,23 @@ public:
      */
     auto translateComponents() -> QVector<ivm::IVFunction *>;
 
+public:
+    /**
+     * @brief   Searches for interface declaration
+     *
+     * It first searches in the component interface declarations. If no declaration was found
+     * then it searches in the package interface declarations.
+     *
+     * @param   name            Interface declaration name
+     * @param   sedsComponent   Component to search in
+     *
+     * @throw UndeclaredInterfaceException  If interface declaration was not found
+     *
+     * @return  Found interface declarartion
+     */
+    auto findInterfaceDeclaration(const QString &name, const seds::model::Component &sedsComponent) const
+            -> const seds::model::InterfaceDeclaration &;
+
 private:
     /**
      * @brief   Translates SEDS component to InterfaceView function
@@ -111,23 +128,6 @@ private:
             const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
             const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
-
-private:
-    /**
-     * @brief   Searches for interface declaration
-     *
-     * It first searches in the component interface declarations. If no declaration was found
-     * then it searches in the package interface declarations.
-     *
-     * @param   name            Interface declaration name
-     * @param   sedsComponent   Component to search in
-     *
-     * @throw UndeclaredInterfaceException  If interface declaration was not found
-     *
-     * @return  Found interface declarartion
-     */
-    auto findInterfaceDeclaration(const QString &name, const seds::model::Component &sedsComponent) const
-            -> const seds::model::InterfaceDeclaration &;
 
 private:
     /// @brief  Parent package
