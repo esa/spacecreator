@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="SyncCommandDemo">
+    <DataTypeSet>
+      <IntegerDataType name="Number">
+        <LongDescription>Number</LongDescription>
+        <IntegerDataEncoding encoding="twosComplement" sizeInBits="32" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="-1000000" max="1000000" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="IFType">
+        <CommandSet>
+          <Command name="SyncCommand" mode="sync">
+            <Argument name="x" type="Number" mode="in" />
+            <Argument name="y" type="Number" mode="in" />
+            <Argument name="r" type="Number" mode="out" />
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="Component">
+        <ProvidedInterfaceSet>
+          <Interface name="IF" type="IFType"></Interface>
+        </ProvidedInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="x" type="Number"></Variable>
+            <Variable name="y" type="Number"></Variable>
+            <Variable name="r" type="Number"></Variable>
+          </VariableSet>
+          <ActivitySet>
+            <Activity name="AddActivity">
+              <Body>
+                <MathOperation outputVariableRef="r">
+                  <Operator operator="add" />
+                  <Operator operator="multiply" />
+                  <VariableRef variableRef="x" />
+                  <VariableRef variableRef="y" />
+                  <Value value="1" />
+                </MathOperation>
+                <!-- <SendCommandPrimitive interface="IF" command="SyncCommand">
+                  <ArgumentValue name="r">
+                    <VariableRef variableRef="r" />
+                  </ArgumentValue>
+                </SendCommandPrimitive> -->
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="SM">
+              <EntryState name="s1"></EntryState>
+              <State name="s2" />
+              <Transition fromState="s2" toState="s2" name="t1">
+                <OnCommandPrimitive command="SyncCommand" interface="IF">
+                  <ArgumentValue name="x" outputVariableRef="x" />
+                  <ArgumentValue name="y" outputVariableRef="y" />
+                </OnCommandPrimitive>
+                <Do activity="AddActivity"></Do>
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>
