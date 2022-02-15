@@ -48,10 +48,10 @@ static const QString FALSE_LITERAL = "False";
 static const QString TRUE_LITERAL = "True";
 
 StatementTranslatorVisitor::Context::Context(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
-        ivm::IVModel *ivModel, ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure)
+        ivm::IVFunction *ivFunction, ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure)
     : m_sedsPackage(sedsPackage)
     , m_asn1Model(asn1Model)
-    , m_ivModel(ivModel)
+    , m_ivFunction(ivFunction)
     , m_sdlProcess(sdlProcess)
     , m_sdlProcedure(sdlProcedure)
 {
@@ -74,9 +74,9 @@ auto StatementTranslatorVisitor::Context::asn1Model() -> Asn1Acn::Asn1Model *
     return m_asn1Model;
 }
 
-auto StatementTranslatorVisitor::Context::ivModel() -> ivm::IVModel *
+auto StatementTranslatorVisitor::Context::ivFunction() -> ivm::IVFunction *
 {
-    return m_ivModel;
+    return m_ivFunction;
 }
 
 auto StatementTranslatorVisitor::Context::sdlProcess() -> ::sdl::Process *
@@ -213,7 +213,7 @@ auto StatementTranslatorVisitor::operator()(const seds::model::SendCommandPrimit
             interfaceName, ivm::IVInterface::InterfaceType::Required, commandName);
 
     // Process name carries iv-escaped component name
-    const auto interface = findInterfaceDeclaration(m_context.ivModel(), m_context.sdlProcess()->name(), callName);
+    const auto interface = findInterfaceDeclaration(m_context.ivFunction(), callName);
 
     if (interface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
         auto outputActions = translateOutput(m_context.sdlProcess(), m_context.sdlProcedure(), callName, sendCommand);
@@ -240,7 +240,7 @@ auto StatementTranslatorVisitor::operator()(const seds::model::SendParameterPrim
             mode, interfaceName, ivm::IVInterface::InterfaceType::Required, parameterName);
 
     // Process name carries iv-escaped component name
-    const auto interface = findInterfaceDeclaration(m_context.ivModel(), m_context.sdlProcess()->name(), callName);
+    const auto interface = findInterfaceDeclaration(m_context.ivFunction(), callName);
 
     if (interface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
         auto outputActions = translateOutput(m_context.sdlProcess(), m_context.sdlProcedure(), callName, sendParameter);
@@ -273,14 +273,9 @@ auto StatementTranslatorVisitor::translateActivityCall(::sdl::Process *process,
     return call;
 }
 
-auto StatementTranslatorVisitor::findInterfaceDeclaration(
-        ivm::IVModel *model, const QString &functionName, const QString &interfaceName) -> ivm::IVInterface *
+auto StatementTranslatorVisitor::findInterfaceDeclaration(ivm::IVFunction *function, const QString &interfaceName)
+        -> ivm::IVInterface *
 {
-    const auto &function = model->getFunction(functionName, Qt::CaseSensitive);
-    if (function == nullptr) {
-        throw TranslationException(QString("Function %1 not found").arg(functionName));
-    }
-
     // This form is shorter and easier to debug than find_if and for unknown reason works more reliably
     for (const auto &interface : function->interfaces()) {
         if (interface->ifaceLabel() == interfaceName) {
@@ -288,7 +283,7 @@ auto StatementTranslatorVisitor::findInterfaceDeclaration(
         }
     }
 
-    throw TranslationException(QString("Interface %1 not found for function %2").arg(interfaceName, functionName));
+    throw TranslationException(QString("Interface %1 not found for function %2").arg(interfaceName, function->title()));
     return nullptr;
 }
 

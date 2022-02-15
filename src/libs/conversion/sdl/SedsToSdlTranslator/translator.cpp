@@ -20,6 +20,7 @@
 #include "translator.h"
 
 #include "specialized/activitytranslator.h"
+#include "specialized/common.h"
 #include "specialized/statemachinetranslator.h"
 
 #include <conversion/common/escaper/escaper.h>
@@ -122,14 +123,13 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
         process.setName(Escaper::escapeIvName(sedsComponent.nameStr()));
         const auto ivFunction = ivModel->getFunction(process.name(), Qt::CaseInsensitive);
 
-        StateMachineTranslator::Context context(
-                sedsPackage, sedsComponent, asn1Model, ivFunction, &process, stateMachine.get());
+        Context context(sedsPackage, sedsComponent, asn1Model, ivFunction, &process, stateMachine.get());
 
         StateMachineTranslator::translateVariables(context, implementation.variables());
         StateMachineTranslator::createIoVariables(context);
         StateMachineTranslator::createExternalProcedures(context);
         for (const auto &activity : implementation.activities()) {
-            ActivityTranslator::translateActivity(sedsPackage, asn1Model, ivModel, activity, &process);
+            ActivityTranslator::translateActivity(context, activity, &process);
         }
         // TODO provide additional translation for parameter (activity) maps
         if (stateMachineCount == 1) {

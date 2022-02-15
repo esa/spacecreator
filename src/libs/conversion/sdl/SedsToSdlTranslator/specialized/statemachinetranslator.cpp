@@ -56,93 +56,6 @@ static const QString TIMER_NAME_PATTERN = "timer_%1";
 // But a pointer is still needed to the SDL model for call invocation
 static ::sdl::Procedure BUILT_IN_SET_TIMER_PROCEDURE("set_timer");
 
-StateMachineTranslator::AssignmentInfo::AssignmentInfo(QString left, QString right)
-{
-    m_left = left;
-    m_right = right;
-}
-
-StateMachineTranslator::Context::Context(const seds::model::Package &sedsPackage,
-        const seds::model::Component &sedsComponent, Asn1Acn::Asn1Model *asn1Model, ivm::IVFunction *ivFunction,
-        ::sdl::Process *sdlProcess, ::sdl::StateMachine *sdlStateMachine)
-    : m_sedsPackage(sedsPackage)
-    , m_sedsComponent(sedsComponent)
-    , m_asn1Model(asn1Model)
-    , m_ivFunction(ivFunction)
-    , m_sdlProcess(sdlProcess)
-    , m_sdlStateMachine(sdlStateMachine)
-{
-}
-
-auto StateMachineTranslator::Context::sedsPackage() -> const seds::model::Package &
-{
-    return m_sedsPackage;
-}
-
-auto StateMachineTranslator::Context::sedsComponent() -> const seds::model::Component &
-{
-    return m_sedsComponent;
-}
-
-auto StateMachineTranslator::Context::asn1Model() -> Asn1Acn::Asn1Model *
-{
-    return m_asn1Model;
-}
-
-auto StateMachineTranslator::Context::ivFunction() -> ivm::IVFunction *
-{
-    return m_ivFunction;
-}
-
-auto StateMachineTranslator::Context::sdlProcess() -> ::sdl::Process *
-{
-    return m_sdlProcess;
-}
-
-auto StateMachineTranslator::Context::sdlStateMachine() -> ::sdl::StateMachine *
-{
-    return m_sdlStateMachine;
-}
-
-auto StateMachineTranslator::Context::addCommand(
-        const QString interface, const QString name, const seds::model::InterfaceCommand *definition) -> void
-{
-    m_commands[std::make_pair(interface, name)] = definition;
-}
-
-auto StateMachineTranslator::Context::getCommand(const QString interface, const QString name)
-        -> const seds::model::InterfaceCommand *
-{
-    const auto i = m_commands.find(std::make_pair(interface, name));
-    if (i == m_commands.end()) {
-        return nullptr;
-    }
-    return i->second;
-}
-
-auto StateMachineTranslator::Context::commands()
-        -> const std::vector<std::pair<QString, const seds::model::InterfaceCommand *>>
-{
-    std::vector<std::pair<QString, const seds::model::InterfaceCommand *>> result;
-    for (const auto &i : m_commands) {
-        result.push_back(std::make_pair(i.first.first, i.second));
-    }
-    return result;
-}
-
-auto StateMachineTranslator::Context::addActivityInfo(const QString name, ActivityInfo info) -> void
-{
-    m_activityInfos[name] = info;
-}
-
-auto StateMachineTranslator::Context::getActivityInfo(QString name) -> const ActivityInfo *
-{
-    if (m_activityInfos.find(name) != m_activityInfos.end()) {
-        return &m_activityInfos[name];
-    }
-    return nullptr;
-}
-
 template<typename ElementType>
 static inline auto getElementOfName(const seds::model::StateMachine &sedsStateMachine, const QString &name)
         -> std::optional<const ElementType *>
@@ -271,9 +184,8 @@ static inline auto getConsistentUnconditionalActivityInvocation(
     return invocation;
 }
 
-static inline auto generateProcedureForSyncCommand(StateMachineTranslator::Context &context,
-        const seds::model::StateMachine &sedsStateMachine, const QString interfaceName,
-        const seds::model::InterfaceCommand &command) -> void
+static inline auto generateProcedureForSyncCommand(Context &context, const seds::model::StateMachine &sedsStateMachine,
+        const QString interfaceName, const seds::model::InterfaceCommand &command) -> void
 {
     const auto &name = InterfaceCommandTranslator::getCommandName(
             interfaceName, ivm::IVInterface::InterfaceType::Provided, command.nameStr());
@@ -307,8 +219,8 @@ static inline auto generateProcedureForSyncCommand(StateMachineTranslator::Conte
     context.sdlProcess()->addProcedure(std::move(procedure));
 }
 
-static inline auto buildCommandMap(StateMachineTranslator::Context &context, QString interfaceName,
-        const seds::model::InterfaceDeclaration &intefaceDeclaration) -> void
+static inline auto buildCommandMap(
+        Context &context, QString interfaceName, const seds::model::InterfaceDeclaration &intefaceDeclaration) -> void
 {
     // ASN.1 definitions are not needed for the called functions
     ComponentsTranslator ct(&(context.sedsPackage()), NULL);
@@ -324,7 +236,7 @@ static inline auto buildCommandMap(StateMachineTranslator::Context &context, QSt
     }
 }
 
-static inline auto buildCommandMap(StateMachineTranslator::Context &context) -> void
+static inline auto buildCommandMap(Context &context) -> void
 {
     // ASN.1 definitions are not needed for the called functions
     ComponentsTranslator ct(&(context.sedsPackage()), NULL);
@@ -337,7 +249,7 @@ static inline auto buildCommandMap(StateMachineTranslator::Context &context) -> 
 }
 
 static inline auto generateProceduresForSyncCommands(
-        StateMachineTranslator::Context &context, const seds::model::StateMachine &sedsStateMachine) -> void
+        Context &context, const seds::model::StateMachine &sedsStateMachine) -> void
 {
     for (const auto &command : context.commands()) {
         if (command.second->mode() == seds::model::InterfaceCommandMode::Sync) {

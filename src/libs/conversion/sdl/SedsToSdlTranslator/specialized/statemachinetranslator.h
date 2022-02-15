@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "common.h"
+
 #include <asn1library/asn1/asn1model.h>
 #include <ivcore/ivmodel.h>
 #include <map>
@@ -36,110 +38,6 @@ namespace conversion::sdl::translator {
 class StateMachineTranslator final
 {
 public:
-    class AssignmentInfo
-    {
-    public:
-        auto left() -> QString;
-        auto right() -> QString;
-
-        AssignmentInfo(QString left, QString right);
-
-    private:
-        QString m_left;
-        QString m_right;
-    };
-
-    class ActivityInfo
-    {
-    public:
-        auto name() -> QString;
-        auto returnAssignments() -> const std::vector<AssignmentInfo> &;
-
-    private:
-        QString m_name;
-        std::vector<AssignmentInfo> m_returnAssignments;
-    };
-
-    /**
-     *  @brief  Translation context
-     */
-    class Context
-    {
-    public:
-        /**
-         * @brief   Context constructor
-         *
-         * @param sedsPackage       Source SEDS Package
-         * @param sedsComponent     Source SEDS Component
-         * @param asn1Model         ASN.1 Model
-         * @param ivfunction        IV Function
-         * @param sdlProcess        Target SDL Process
-         * @param sdlStateMachine   Target SDL State Machine
-         */
-        Context(const seds::model::Package &sedsPackage, const seds::model::Component &sedsComponent,
-                Asn1Acn::Asn1Model *asn1Model, ivm::IVFunction *ivFunction, ::sdl::Process *sdlProcess,
-                ::sdl::StateMachine *sdlStateMachine);
-
-        /**
-         * @brief SEDS Package accessor
-         *
-         * @returns SEDS Package
-         */
-
-        auto sedsPackage() -> const seds::model::Package &;
-        /**
-         * @brief Component accessor
-         *
-         * @returns Component
-         */
-        auto sedsComponent() -> const seds::model::Component &;
-        /**
-         * @brief IV Function accessor
-         *
-         * @returns IV Function
-         */
-        auto ivFunction() -> ivm::IVFunction *;
-        /**
-         * @brief ASN.1 Model accessor
-         *
-         * @returns ASN.1 Model
-         */
-        auto asn1Model() -> Asn1Acn::Asn1Model *;
-        /**
-         * @brief SDL Process accessor
-         *
-         * @returns SDL Process
-         */
-        auto sdlProcess() -> ::sdl::Process *;
-        /**
-         * @brief SDL State Machine accessor
-         *
-         * @returns SDL State Machine
-         */
-        auto sdlStateMachine() -> ::sdl::StateMachine *;
-
-        auto addCommand(const QString interface, const QString name, const seds::model::InterfaceCommand *definition)
-                -> void;
-
-        auto getCommand(const QString interface, const QString name) -> const seds::model::InterfaceCommand *;
-
-        auto commands() -> const std::vector<std::pair<QString, const seds::model::InterfaceCommand *>>;
-
-        auto addActivityInfo(const QString name, ActivityInfo info) -> void;
-
-        auto getActivityInfo(QString name) -> const ActivityInfo *;
-
-    private:
-        const seds::model::Package &m_sedsPackage;
-        const seds::model::Component &m_sedsComponent;
-        Asn1Acn::Asn1Model *m_asn1Model;
-        ivm::IVFunction *m_ivFunction;
-        ::sdl::Process *m_sdlProcess;
-        ::sdl::StateMachine *m_sdlStateMachine;
-        std::map<std::pair<QString, QString>, const seds::model::InterfaceCommand *> m_commands;
-        std::map<QString, ActivityInfo> m_activityInfos;
-    };
-
     using InputHandler = std::pair<std::unique_ptr<::sdl::Input>, std::vector<std::unique_ptr<::sdl::Action>>>;
 
     /**

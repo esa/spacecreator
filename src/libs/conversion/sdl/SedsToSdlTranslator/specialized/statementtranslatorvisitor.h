@@ -59,13 +59,13 @@ public:
         /**
          * @brief   Context constructor
          *
-         * @param sedsPackage       SEDS package containing the activity
+         * @param sedsPackage       SEDS Package containing the Activity
          * @param asn1Model         Data model
-         * @param ivModel           IV model
-         * @param sdlProcess        Host SDL process
-         * @param sdlProcedure      Host SDL procedure
+         * @param ivFunction        IV Function
+         * @param sdlProcess        Host SDL Process
+         * @param sdlProcedure      Host SDL Procedure
          */
-        Context(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
+        Context(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model, ivm::IVFunction *ivFunction,
                 ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure);
 
         /**
@@ -90,11 +90,11 @@ public:
          */
         auto asn1Model() -> Asn1Acn::Asn1Model *;
         /**
-         * @brief InterfaceView Model accessor
+         * @brief InterfaceView Function accessor
          *
-         * @returns InterfaceView Model Package
+         * @returns InterfaceView Function Package
          */
-        auto ivModel() -> ivm::IVModel *;
+        auto ivFunction() -> ivm::IVFunction *;
         /**
          * @brief SDL Process accessor
          *
@@ -112,7 +112,7 @@ public:
         int m_labelCount;
         const seds::model::Package &m_sedsPackage;
         Asn1Acn::Asn1Model *m_asn1Model;
-        ivm::IVModel *m_ivModel;
+        ivm::IVFunction *m_ivFunction;
         ::sdl::Process *m_sdlProcess;
         ::sdl::Procedure *m_sdlProcedure;
     };
@@ -204,8 +204,7 @@ private:
     Context &m_context;
     ::sdl::Transition *m_sdlTransition;
 
-    static auto findInterfaceDeclaration(ivm::IVModel *model, const QString &functionName, const QString &interfaceName)
-            -> ivm::IVInterface *;
+    static auto findInterfaceDeclaration(ivm::IVFunction *model, const QString &interfaceName) -> ivm::IVInterface *;
 
     static auto findVariableDeclaration(::sdl::Process *process, ::sdl::Procedure *sdlProcedure, QString name)
             -> ::sdl::VariableDeclaration *;

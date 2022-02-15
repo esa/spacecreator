@@ -28,8 +28,8 @@ using conversion::Escaper;
 
 namespace conversion::sdl::translator {
 
-auto ActivityTranslator::translateActivity(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
-        ivm::IVModel *ivModel, const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess) -> void
+auto ActivityTranslator::translateActivity(
+        Context &context, const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess) -> void
 {
 
     const auto name = Escaper::escapeSdlName(sedsActivity.nameStr());
@@ -40,17 +40,17 @@ auto ActivityTranslator::translateActivity(const seds::model::Package &sedsPacka
         auto parameter = std::make_unique<::sdl::ProcedureParameter>(parameterName, parameterType, "in");
         procedure->addParameter(std::move(parameter));
     }
-    translateBody(sedsPackage, asn1Model, ivModel, sedsActivity, sdlProcess, procedure.get());
+    translateBody(context, sedsActivity, sdlProcess, procedure.get());
     sdlProcess->addProcedure(std::move(procedure));
 }
 
-auto ActivityTranslator::translateBody(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
-        ivm::IVModel *ivModel, const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess,
-        ::sdl::Procedure *procedure) -> void
+auto ActivityTranslator::translateBody(Context &context, const seds::model::Activity &sedsActivity,
+        ::sdl::Process *sdlProcess, ::sdl::Procedure *procedure) -> void
 {
     auto transition = std::make_unique<::sdl::Transition>();
-    StatementTranslatorVisitor::Context context(sedsPackage, asn1Model, ivModel, sdlProcess, procedure);
-    StatementTranslatorVisitor visitor(context, transition.get());
+    StatementTranslatorVisitor::Context statementContext(
+            context.sedsPackage(), context.asn1Model(), context.ivFunction(), sdlProcess, procedure);
+    StatementTranslatorVisitor visitor(statementContext, transition.get());
     for (const auto &statement : sedsActivity.body()->statements()) {
         std::visit(visitor, statement);
     }
