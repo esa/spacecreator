@@ -94,6 +94,13 @@ public:
          */
         auto sdlStateMachine() -> ::sdl::StateMachine *;
 
+        auto addCommand(const QString interface, const QString name, const seds::model::InterfaceCommand *definition)
+                -> void;
+
+        auto getCommand(const QString interface, const QString name) -> const seds::model::InterfaceCommand *;
+
+        auto commands() -> const std::vector<std::pair<QString, const seds::model::InterfaceCommand *>>;
+
     private:
         const seds::model::Package &m_sedsPackage;
         const seds::model::Component &m_sedsComponent;
@@ -101,6 +108,7 @@ public:
         ivm::IVFunction *m_ivFunction;
         ::sdl::Process *m_sdlProcess;
         ::sdl::StateMachine *m_sdlStateMachine;
+        std::map<std::pair<QString, QString>, const seds::model::InterfaceCommand *> m_commands;
     };
 
     using InputHandler = std::pair<std::unique_ptr<::sdl::Input>, std::vector<std::unique_ptr<::sdl::Action>>>;

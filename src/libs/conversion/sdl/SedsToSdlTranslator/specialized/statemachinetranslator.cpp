@@ -98,6 +98,32 @@ auto StateMachineTranslator::Context::sdlStateMachine() -> ::sdl::StateMachine *
     return m_sdlStateMachine;
 }
 
+auto StateMachineTranslator::Context::addCommand(
+        const QString interface, const QString name, const seds::model::InterfaceCommand *definition) -> void
+{
+    m_commands[std::make_pair(interface, name)] = definition;
+}
+
+auto StateMachineTranslator::Context::getCommand(const QString interface, const QString name)
+        -> const seds::model::InterfaceCommand *
+{
+    const auto i = m_commands.find(std::make_pair(interface, name));
+    if (i == m_commands.end()) {
+        return nullptr;
+    }
+    return i->second;
+}
+
+auto StateMachineTranslator::Context::commands()
+        -> const std::vector<std::pair<QString, const seds::model::InterfaceCommand *>>
+{
+    std::vector<std::pair<QString, const seds::model::InterfaceCommand *>> result;
+    for (const auto &i : m_commands) {
+        result.push_back(std::make_pair(i.first.first, i.second));
+    }
+    return result;
+}
+
 template<typename ElementType>
 static inline auto getElementOfName(const seds::model::StateMachine &sedsStateMachine, const QString &name)
         -> std::optional<const ElementType *>
@@ -186,9 +212,28 @@ static inline auto getConsistentUnconditionalActivityInvocation(
                     "Sync commands with transitions without associated activities are not supported");
         }
     }
+    // primitive is now guaranteed to be OnCommandPrimitive
+    assert(std::holds_alternative<seds::model::OnCommandPrimitive>(transitions[0]->primitive()));
+    const auto &primitive = std::get<seds::model::OnCommandPrimitive>(transitions[0]->primitive());
+    for (const auto otherTransition : transitions) {
+        assert(std::holds_alternative<seds::model::OnCommandPrimitive>(otherTransition->primitive()));
+        const auto &otherPrimitive = std::get<seds::model::OnCommandPrimitive>(otherTransition->primitive());
+        if (primitive.argumentValues().size() != otherPrimitive.argumentValues().size()) {
+            throw TranslationException("Inconsistent number of arguments associated with a sync command");
+        }
+        for (size_t i = 0; i < primitive.argumentValues().size(); i++) {
+            if ((primitive.argumentValues()[i].name().value() != otherPrimitive.argumentValues()[i].name().value())
+                    || (primitive.argumentValues()[i].outputVariableRef().value().value()
+                               != otherPrimitive.argumentValues()[i].outputVariableRef().value().value())) {
+                throw TranslationException("Inconsistent argument assignments associated with a sync command");
+            }
+        }
+    }
     // doActivity optional is now guaranteed to have a value
+    assert(transitions[0]->doActivity().has_value());
     const auto invocation = &(*(transitions[0]->doActivity()));
     for (const auto transition : transitions) {
+        assert(transition->doActivity().has_value());
         const auto otherInvocation = &(*(transition->doActivity()));
         if (invocation->activity().value() != otherInvocation->activity().value()) {
             throw TranslationException("Inconsistent activities associated with a sync command");
@@ -202,9 +247,6 @@ static inline auto getConsistentUnconditionalActivityInvocation(
             if (argument.name().value() != otherArgument.name().value()) {
                 throw TranslationException("Inconsistent argument names associated with a sync command");
             }
-            /* if (argument.value() != otherArgument.value()) {
-                 throw TranslationException("Inconsistent argument values associated with a sync command");
-             }*/
         }
     }
     return invocation;
@@ -227,8 +269,18 @@ static inline auto generateProcedureForSyncCommand(StateMachineTranslator::Conte
     }
     auto transition = std::make_unique<::sdl::Transition>();
     const auto transitions = getTransitionsForCommand(sedsStateMachine, interfaceName, command.nameStr());
-    // TODO - unpack input
+
     const auto activityInvocation = getConsistentUnconditionalActivityInvocation(transitions);
+    // If a consistent invocation is found, the transitions consistently contain an OnCommandPrimitive
+    // The first one is exactly the same as the other ones
+    assert(std::holds_alternative<seds::model::OnCommandPrimitive>(transitions[0]->primitive()));
+    const auto &primitive = std::get<seds::model::OnCommandPrimitive>(transitions[0]->primitive());
+    for (const auto &argument : primitive.argumentValues()) {
+        const auto targetVariableName = Escaper::escapeAsn1FieldName(argument.outputVariableRef().value().value());
+        const auto fieldName = Escaper::escapeAsn1FieldName(argument.name().value());
+        transition->addAction(
+                std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(targetVariableName, fieldName)));
+    }
     auto call = StatementTranslatorVisitor::translateActivityCall(context.sdlProcess(), *activityInvocation);
     transition->addAction(std::move(call));
     // TODO - pack result
@@ -236,21 +288,42 @@ static inline auto generateProcedureForSyncCommand(StateMachineTranslator::Conte
     context.sdlProcess()->addProcedure(std::move(procedure));
 }
 
-static inline auto generateProceduresForSyncCommands(
-        StateMachineTranslator::Context &context, const seds::model::StateMachine &sedsStateMachine) -> void
+static inline auto buildCommandMap(StateMachineTranslator::Context &context, QString interfaceName,
+        const seds::model::InterfaceDeclaration &intefaceDeclaration) -> void
 {
-    Q_UNUSED(sedsStateMachine);
+    // ASN.1 definitions are not needed for the called functions
+    ComponentsTranslator ct(&(context.sedsPackage()), NULL);
+
+    for (const auto &command : intefaceDeclaration.commands()) {
+        context.addCommand(interfaceName, command.nameStr(), &command);
+    }
+
+    for (const auto &baseInterface : intefaceDeclaration.baseInterfaces()) {
+        const auto &baseIntefaceDeclaration =
+                ct.findInterfaceDeclaration(baseInterface.type().nameStr(), context.sedsComponent());
+        buildCommandMap(context, interfaceName, baseIntefaceDeclaration);
+    }
+}
+
+static inline auto buildCommandMap(StateMachineTranslator::Context &context) -> void
+{
     // ASN.1 definitions are not needed for the called functions
     ComponentsTranslator ct(&(context.sedsPackage()), NULL);
 
     for (const auto &interface : context.sedsComponent().providedInterfaces()) {
         const auto &intefaceDeclaration =
                 ct.findInterfaceDeclaration(interface.type().nameStr(), context.sedsComponent());
-        // TODO - support interface inheritance
-        for (const auto &command : intefaceDeclaration.commands()) {
-            if (command.mode() == seds::model::InterfaceCommandMode::Sync) {
-                generateProcedureForSyncCommand(context, sedsStateMachine, interface.nameStr(), command);
-            }
+        buildCommandMap(context, interface.nameStr(), intefaceDeclaration);
+    }
+}
+
+static inline auto generateProceduresForSyncCommands(
+        StateMachineTranslator::Context &context, const seds::model::StateMachine &sedsStateMachine) -> void
+{
+
+    for (const auto &command : context.commands()) {
+        if (command.second->mode() == seds::model::InterfaceCommandMode::Sync) {
+            generateProcedureForSyncCommand(context, sedsStateMachine, command.first, *command.second);
         }
     }
 }
@@ -275,6 +348,7 @@ auto StateMachineTranslator::translateStateMachine(Context &context, const seds:
         }
     }
 
+    buildCommandMap(context);
     generateProceduresForSyncCommands(context, sedsStateMachine);
 
     // Setup the start transition

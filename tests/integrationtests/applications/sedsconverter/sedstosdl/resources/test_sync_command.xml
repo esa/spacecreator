@@ -14,9 +14,9 @@
       <Interface name="IFType">
         <CommandSet>
           <Command name="SyncCommand" mode="sync">
-            <Argument name="x" type="Number" mode="in" />
-            <Argument name="y" type="Number" mode="in" />
-            <Argument name="r" type="Number" mode="out" />
+            <Argument name="a1" type="Number" mode="in" />
+            <Argument name="a2" type="Number" mode="in" />
+            <Argument name="a3" type="Number" mode="out" />
           </Command>
         </CommandSet>
       </Interface>
@@ -45,7 +45,7 @@
                   <Value value="1" />
                 </MathOperation>
                 <!-- <SendCommandPrimitive interface="IF" command="SyncCommand">
-                  <ArgumentValue name="r">
+                  <ArgumentValue name="a3">
                     <VariableRef variableRef="r" />
                   </ArgumentValue>
                 </SendCommandPrimitive> -->
@@ -58,8 +58,8 @@
               <State name="s2" />
               <Transition fromState="s2" toState="s2" name="t1">
                 <OnCommandPrimitive command="SyncCommand" interface="IF">
-                  <ArgumentValue name="x" outputVariableRef="x" />
-                  <ArgumentValue name="y" outputVariableRef="y" />
+                  <ArgumentValue name="a1" outputVariableRef="x" />
+                  <ArgumentValue name="a2" outputVariableRef="y" />
                 </OnCommandPrimitive>
                 <Do activity="AddActivity">
                   <ArgumentValue name="x">
