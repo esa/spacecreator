@@ -36,6 +36,30 @@ namespace conversion::sdl::translator {
 class StateMachineTranslator final
 {
 public:
+    class AssignmentInfo
+    {
+    public:
+        auto left() -> QString;
+        auto right() -> QString;
+
+        AssignmentInfo(QString left, QString right);
+
+    private:
+        QString m_left;
+        QString m_right;
+    };
+
+    class ActivityInfo
+    {
+    public:
+        auto name() -> QString;
+        auto returnAssignments() -> const std::vector<AssignmentInfo> &;
+
+    private:
+        QString m_name;
+        std::vector<AssignmentInfo> m_returnAssignments;
+    };
+
     /**
      *  @brief  Translation context
      */
@@ -101,6 +125,10 @@ public:
 
         auto commands() -> const std::vector<std::pair<QString, const seds::model::InterfaceCommand *>>;
 
+        auto addActivityInfo(const QString name, ActivityInfo info) -> void;
+
+        auto getActivityInfo(QString name) -> const ActivityInfo *;
+
     private:
         const seds::model::Package &m_sedsPackage;
         const seds::model::Component &m_sedsComponent;
@@ -109,6 +137,7 @@ public:
         ::sdl::Process *m_sdlProcess;
         ::sdl::StateMachine *m_sdlStateMachine;
         std::map<std::pair<QString, QString>, const seds::model::InterfaceCommand *> m_commands;
+        std::map<QString, ActivityInfo> m_activityInfos;
     };
 
     using InputHandler = std::pair<std::unique_ptr<::sdl::Input>, std::vector<std::unique_ptr<::sdl::Action>>>;

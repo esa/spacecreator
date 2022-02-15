@@ -56,6 +56,12 @@ static const QString TIMER_NAME_PATTERN = "timer_%1";
 // But a pointer is still needed to the SDL model for call invocation
 static ::sdl::Procedure BUILT_IN_SET_TIMER_PROCEDURE("set_timer");
 
+StateMachineTranslator::AssignmentInfo::AssignmentInfo(QString left, QString right)
+{
+    m_left = left;
+    m_right = right;
+}
+
 StateMachineTranslator::Context::Context(const seds::model::Package &sedsPackage,
         const seds::model::Component &sedsComponent, Asn1Acn::Asn1Model *asn1Model, ivm::IVFunction *ivFunction,
         ::sdl::Process *sdlProcess, ::sdl::StateMachine *sdlStateMachine)
@@ -122,6 +128,19 @@ auto StateMachineTranslator::Context::commands()
         result.push_back(std::make_pair(i.first.first, i.second));
     }
     return result;
+}
+
+auto StateMachineTranslator::Context::addActivityInfo(const QString name, ActivityInfo info) -> void
+{
+    m_activityInfos[name] = info;
+}
+
+auto StateMachineTranslator::Context::getActivityInfo(QString name) -> const ActivityInfo *
+{
+    if (m_activityInfos.find(name) != m_activityInfos.end()) {
+        return &m_activityInfos[name];
+    }
+    return nullptr;
 }
 
 template<typename ElementType>
@@ -320,7 +339,6 @@ static inline auto buildCommandMap(StateMachineTranslator::Context &context) -> 
 static inline auto generateProceduresForSyncCommands(
         StateMachineTranslator::Context &context, const seds::model::StateMachine &sedsStateMachine) -> void
 {
-
     for (const auto &command : context.commands()) {
         if (command.second->mode() == seds::model::InterfaceCommandMode::Sync) {
             generateProcedureForSyncCommand(context, sedsStateMachine, command.first, *command.second);
@@ -795,8 +813,18 @@ auto StateMachineTranslator::translateTransition(Context &context, const seds::m
                     StatementTranslatorVisitor::translateActivityCall(context.sdlProcess(), **onExit));
         }
     }
+    bool invokeDoActivity = true;
+    if (std::holds_alternative<seds::model::OnCommandPrimitive>(sedsTransition.primitive())) {
+        const auto &onCommandPrimitive = std::get<seds::model::OnCommandPrimitive>(sedsTransition.primitive());
+        const auto command =
+                context.getCommand(onCommandPrimitive.interface().value(), onCommandPrimitive.command().value());
+        assert(command != nullptr);
+        if (command->mode() == seds::model::InterfaceCommandMode::Sync) {
+            invokeDoActivity = false;
+        }
+    }
 
-    if (sedsTransition.doActivity().has_value()) {
+    if (invokeDoActivity && sedsTransition.doActivity().has_value()) {
         currentTransitionPtr->addAction(
                 StatementTranslatorVisitor::translateActivityCall(context.sdlProcess(), *sedsTransition.doActivity()));
     }
