@@ -62,7 +62,7 @@ public:
     auto getDependencies() const -> std::set<conversion::ModelType> override;
 
 private:
-    ::promela::model::InitProctype generateInitProctype(const QList<QString> &functionNames) const;
+    ::promela::model::InitProctype generateInitProctype(const std::vector<QString> &modelFunctions) const;
     std::unique_ptr<::promela::model::Proctype> generateProctype(::promela::model::PromelaModel *promelaModel,
             const QString &functionName, const QString &interfaceName, const QString &parameterType, size_t queueSize,
             size_t priority, bool environment) const;
@@ -77,7 +77,6 @@ private:
             ::ivm::IVFunction *ivFunction, const QString &functionName) const;
 
     auto constructChannelName(const QString &functionName, const QString &interfaceName) const -> QString;
-    auto isEnvironmentFunction(ivm::IVFunction *function) const -> bool;
 
     auto getInterfaceName(const ivm::IVInterface *interface) const -> QString;
     auto getInterfaceFunctionName(const ivm::IVInterface *interface) const -> QString;

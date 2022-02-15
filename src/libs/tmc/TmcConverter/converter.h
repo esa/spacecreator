@@ -70,12 +70,14 @@ private:
 
     bool convertStopConditions();
 
-    bool convertInterfaceview(const QString &inputFilepath, const QString &outputFilepath);
+    bool convertInterfaceview(const QString &inputFilepath, const QString &outputFilepath,
+            const QStringList &modelFunctions, const QStringList &environmentFunctions);
     bool convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath);
     std::unique_ptr<ivm::IVModel> readInterfaceView(const QString &filepath);
-    void findIvFunctions(const ivm::IVModel &model, QStringList &sdlFunctions, QStringList &envFunctions);
+    void findFunctionsToConvert(const ivm::IVModel &model, QStringList &sdlFunctions, QStringList &envFunctions);
     bool isSdlFunction(const ivm::IVFunction *function);
-    void findEnvDatatypes(const ivm::IVModel &model, const QStringList &envFunctions, QStringList &envDataTypes);
+    void findEnvironmentDatatypes(
+            const ivm::IVModel &model, const QStringList &envFunctions, QStringList &envDataTypes);
     bool createEnvGenerationInlines(
             const QFileInfo &inputDataView, const QFileInfo &outputFilepath, const QStringList &envDatatypes);
 

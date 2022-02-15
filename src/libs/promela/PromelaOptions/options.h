@@ -40,6 +40,10 @@ public:
 
     /** @brief Generate promela inlines to generate values of ASN1 type */
     inline static const QString asn1ValueGeneration = "Promela_Convert_Asn1ValueGeneration";
+
+    inline static const QString modelFunctionName = "Promela_Convert_ModelFunction";
+
+    inline static const QString environmentFunctionName = "Promela_Convert_EnvironmentFunction";
 };
 
 }
