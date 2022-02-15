@@ -33,10 +33,10 @@ namespace conversion::sdl::translator {
 class AssignmentInfo
 {
 public:
-    auto left() -> QString;
-    auto right() -> QString;
-
     AssignmentInfo(QString left, QString right);
+
+    auto left() const -> QString;
+    auto right() const -> QString;
 
 private:
     QString m_left;
@@ -47,7 +47,10 @@ class ActivityInfo
 {
 public:
     auto name() -> QString;
-    auto returnAssignments() -> const std::vector<AssignmentInfo> &;
+    auto returnAssignments() const -> const std::vector<AssignmentInfo> &;
+    ActivityInfo() = default;
+    ActivityInfo(QString name);
+    auto addAssignment(AssignmentInfo assignment) -> void;
 
 private:
     QString m_name;

@@ -44,11 +44,11 @@
                   <VariableRef variableRef="y" />
                   <Value value="1" />
                 </MathOperation>
-                <!-- <SendCommandPrimitive interface="IF" command="SyncCommand">
+                <SendCommandPrimitive interface="IF" command="SyncCommand">
                   <ArgumentValue name="a3">
                     <VariableRef variableRef="r" />
                   </ArgumentValue>
-                </SendCommandPrimitive> -->
+                </SendCommandPrimitive>
               </Body>
             </Activity>
           </ActivitySet>

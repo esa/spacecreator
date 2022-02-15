@@ -48,8 +48,7 @@ auto ActivityTranslator::translateBody(Context &context, const seds::model::Acti
         ::sdl::Process *sdlProcess, ::sdl::Procedure *procedure) -> void
 {
     auto transition = std::make_unique<::sdl::Transition>();
-    StatementTranslatorVisitor::Context statementContext(
-            context.sedsPackage(), context.asn1Model(), context.ivFunction(), sdlProcess, procedure);
+    StatementTranslatorVisitor::StatementContext statementContext(context, sdlProcess, procedure);
     StatementTranslatorVisitor visitor(statementContext, transition.get());
     for (const auto &statement : sedsActivity.body()->statements()) {
         std::visit(visitor, statement);

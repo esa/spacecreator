@@ -214,12 +214,20 @@ static inline auto generateProcedureForSyncCommand(Context &context, const seds:
     }
     auto call = StatementTranslatorVisitor::translateActivityCall(context.sdlProcess(), *activityInvocation);
     transition->addAction(std::move(call));
-    // TODO - pack result
+
+    const auto activityInfo = context.getActivityInfo(activityInvocation->activity().value());
+    if (activityInfo != nullptr) {
+        for (const auto &assignment : activityInfo->returnAssignments()) {
+            transition->addAction(std::make_unique<::sdl::Task>(
+                    "", QString("%1 := %2").arg(assignment.left()).arg(assignment.right())));
+        }
+    }
+
     procedure->setTransition(std::move(transition));
     context.sdlProcess()->addProcedure(std::move(procedure));
 }
 
-static inline auto buildCommandMap(
+static inline auto buildCommandMapInternal(
         Context &context, QString interfaceName, const seds::model::InterfaceDeclaration &intefaceDeclaration) -> void
 {
     // ASN.1 definitions are not needed for the called functions
@@ -232,11 +240,11 @@ static inline auto buildCommandMap(
     for (const auto &baseInterface : intefaceDeclaration.baseInterfaces()) {
         const auto &baseIntefaceDeclaration =
                 ct.findInterfaceDeclaration(baseInterface.type().nameStr(), context.sedsComponent());
-        buildCommandMap(context, interfaceName, baseIntefaceDeclaration);
+        buildCommandMapInternal(context, interfaceName, baseIntefaceDeclaration);
     }
 }
 
-static inline auto buildCommandMap(Context &context) -> void
+auto StateMachineTranslator::buildCommandMap(Context &context) -> void
 {
     // ASN.1 definitions are not needed for the called functions
     ComponentsTranslator ct(&(context.sedsPackage()), NULL);
@@ -244,7 +252,7 @@ static inline auto buildCommandMap(Context &context) -> void
     for (const auto &interface : context.sedsComponent().providedInterfaces()) {
         const auto &intefaceDeclaration =
                 ct.findInterfaceDeclaration(interface.type().nameStr(), context.sedsComponent());
-        buildCommandMap(context, interface.nameStr(), intefaceDeclaration);
+        buildCommandMapInternal(context, interface.nameStr(), intefaceDeclaration);
     }
 }
 
@@ -278,7 +286,6 @@ auto StateMachineTranslator::translateStateMachine(Context &context, const seds:
         }
     }
 
-    buildCommandMap(context);
     generateProceduresForSyncCommands(context, sedsStateMachine);
 
     // Setup the start transition

@@ -113,6 +113,8 @@ public:
     static auto translateParameterMaps(
             Context &context, const seds::model::ComponentImplementation::ParameterMapSet &parameterMaps) -> void;
 
+    static auto buildCommandMap(Context &context) -> void;
+
 private:
     enum class ParameterType
     {

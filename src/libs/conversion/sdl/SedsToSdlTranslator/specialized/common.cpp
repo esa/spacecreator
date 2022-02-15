@@ -52,6 +52,34 @@ AssignmentInfo::AssignmentInfo(QString left, QString right)
     m_right = right;
 }
 
+auto AssignmentInfo::left() const -> QString
+{
+    return m_left;
+}
+auto AssignmentInfo::right() const -> QString
+{
+    return m_right;
+}
+
+auto ActivityInfo::name() -> QString
+{
+    return m_name;
+}
+
+auto ActivityInfo::returnAssignments() const -> const std::vector<AssignmentInfo> &
+{
+    return m_returnAssignments;
+}
+
+ActivityInfo::ActivityInfo(QString name)
+{
+    m_name = name;
+}
+auto ActivityInfo::addAssignment(AssignmentInfo assignment) -> void
+{
+    m_returnAssignments.push_back(assignment);
+}
+
 Context::Context(const seds::model::Package &sedsPackage, const seds::model::Component &sedsComponent,
         Asn1Acn::Asn1Model *asn1Model, ivm::IVFunction *ivFunction, ::sdl::Process *sdlProcess,
         ::sdl::StateMachine *sdlStateMachine)

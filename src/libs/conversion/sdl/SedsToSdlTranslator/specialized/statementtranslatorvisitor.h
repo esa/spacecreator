@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "common.h"
 #include "components/activities/polynomial.h"
 #include "components/activities/splinecalibrator.h"
 
@@ -51,22 +52,19 @@ class StatementTranslatorVisitor final
 {
 public:
     /**
-     *  @brief  Translation context which can be shared between visitors
+     *  @brief  Statement translation context which can be shared between visitors
      */
-    class Context
+    class StatementContext
     {
     public:
         /**
-         * @brief   Context constructor
+         * @brief   StatementContext constructor
          *
-         * @param sedsPackage       SEDS Package containing the Activity
-         * @param asn1Model         Data model
-         * @param ivFunction        IV Function
+         * @param masterContext     Master context of the translation
          * @param sdlProcess        Host SDL Process
          * @param sdlProcedure      Host SDL Procedure
          */
-        Context(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model, ivm::IVFunction *ivFunction,
-                ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure);
+        StatementContext(Context &masterContext, ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure);
 
         /**
          * @brief   Returns a unique label name, starting with the given prefix
@@ -108,11 +106,13 @@ public:
          */
         auto sdlProcedure() -> ::sdl::Procedure *;
 
+        auto addActivityInfo(const QString name, ActivityInfo info) -> void;
+
+        auto getCommand(const QString interface, const QString name) -> const seds::model::InterfaceCommand *;
+
     private:
         int m_labelCount;
-        const seds::model::Package &m_sedsPackage;
-        Asn1Acn::Asn1Model *m_asn1Model;
-        ivm::IVFunction *m_ivFunction;
+        Context &m_masterContext;
         ::sdl::Process *m_sdlProcess;
         ::sdl::Procedure *m_sdlProcedure;
     };
@@ -124,7 +124,7 @@ public:
      * @param sdlTransition     Target SDL transition
      */
 
-    StatementTranslatorVisitor(Context &context, ::sdl::Transition *sdlTransition);
+    StatementTranslatorVisitor(StatementContext &context, ::sdl::Transition *sdlTransition);
 
     /**
      * @brief   Translates SEDS activity invocation
@@ -201,7 +201,7 @@ public:
             const seds::model::BooleanExpression &expression) -> std::unique_ptr<::sdl::Decision>;
 
 private:
-    Context &m_context;
+    StatementContext &m_context;
     ::sdl::Transition *m_sdlTransition;
 
     static auto findInterfaceDeclaration(ivm::IVFunction *model, const QString &interfaceName) -> ivm::IVInterface *;
@@ -238,7 +238,7 @@ private:
     static auto translateTypeCheck(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
             const seds::model::TypeCheck &check) -> QString;
 
-    static auto translateAnswer(Context &context, ::sdl::Label *joinLabel, const QString &value,
+    static auto translateAnswer(StatementContext &context, ::sdl::Label *joinLabel, const QString &value,
             const seds::model::Body *body) -> std::unique_ptr<::sdl::Answer>;
 
     static auto comparisonOperatorToString(const seds::model::ComparisonOperator op) -> QString;
@@ -246,12 +246,13 @@ private:
     static auto getOperandValue(
             ::sdl::Process *process, ::sdl::Procedure *sdlProcedure, const seds::model::Operand &operand) -> QString;
 
-    static auto translateBody(Context &context, ::sdl::Transition *transition, const seds::model::Body *body) -> void;
+    static auto translateBody(StatementContext &context, ::sdl::Transition *transition, const seds::model::Body *body)
+            -> void;
 
-    static auto generateLoopStart(Context &context, ::sdl::Transition *transition,
+    static auto generateLoopStart(StatementContext &context, ::sdl::Transition *transition,
             const seds::model::Iteration &iteration, ::sdl::Decision *decision) -> void;
 
-    static auto generateLoopEnd(Context &context, ::sdl::Transition *transition,
+    static auto generateLoopEnd(StatementContext &context, ::sdl::Transition *transition,
             const seds::model::Iteration &iteration, ::sdl::Label *startLabel) -> void;
 
     friend class ExpressionTranslatorVisitor;

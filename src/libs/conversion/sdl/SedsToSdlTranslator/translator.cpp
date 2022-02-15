@@ -125,6 +125,7 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
 
         Context context(sedsPackage, sedsComponent, asn1Model, ivFunction, &process, stateMachine.get());
 
+        StateMachineTranslator::buildCommandMap(context);
         StateMachineTranslator::translateVariables(context, implementation.variables());
         StateMachineTranslator::createIoVariables(context);
         StateMachineTranslator::createExternalProcedures(context);
