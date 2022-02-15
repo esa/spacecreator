@@ -41,7 +41,8 @@ private:
         QString name;
         QString typeName;
         std::optional<QString> fixedValue;
-        std::optional<QString> determinant;
+        std::optional<QString> determinantName;
+        bool isDeterminant;
 
         friend auto operator==(const ArgumentData &lhs, const ArgumentData &rhs) -> bool
         {
@@ -112,12 +113,18 @@ private:
 
     auto processArguments(const std::vector<seds::model::CommandArgument> &sedsArguments,
             seds::model::CommandArgumentMode requestedArgumentMode) -> Arguments;
-    auto processArgument(const seds::model::CommandArgument &sedsArgument)
+    auto processArgument(const seds::model::CommandArgument &sedsArgument, const Arguments &arguments)
             -> AsyncInterfaceCommandTranslator::ArgumentData;
 
     auto handleArgumentSimpleMapping(const seds::model::CommandArgument &sedsArgument,
             const TypeMapping::ConcreteType &concreteType) -> AsyncInterfaceCommandTranslator::ArgumentData;
+    auto handleArgumentAlternateMapping(const seds::model::CommandArgument &sedsArgument,
+            const std::vector<TypeMapping::ConcreteType> &concreteTypes, const QString &determinantTypeName,
+            const Arguments &arguments) -> AsyncInterfaceCommandTranslator::ArgumentData;
     auto handleArrayArgument(const seds::model::CommandArgument &sedsArgument, const QString &typeName) -> QString;
+
+    auto createAlternateType(const QString &genericTypeName,
+            const std::vector<TypeMapping::ConcreteType> &concreteTypes, const QString &determinantName) -> QString;
 
     auto calculateArgumentsHash(const std::vector<AsyncInterfaceCommandTranslator::ArgumentData> &arguments) const
             -> std::size_t;

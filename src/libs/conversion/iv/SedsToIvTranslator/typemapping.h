@@ -29,11 +29,12 @@ struct TypeMapping {
     struct ConcreteType {
         QString typeName;
         std::optional<QString> fixedValue;
+        std::optional<QString> determinantValue;
     };
 
     QString genericTypeName;
     std::vector<ConcreteType> concreteTypes;
-    std::optional<QString> determinant;
+    std::optional<QString> determinantTypeName;
 };
 
 } // namespace conversion::iv::translator

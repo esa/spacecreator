@@ -3,7 +3,7 @@ DeterminantType ::= INTEGER(0 .. 2)
 Integer8 ::= INTEGER(0 .. 255)
 Integer16 ::= INTEGER(0 .. 65535)
 Integer32 ::= INTEGER(0 .. 4294967295)
-ProvidedInterface-GenericType2 ::= CHOICE
+ProvidedInterface-GenericType3 ::= CHOICE
 {
      concrete-Integer8 INTEGER(0 .. 255),
      concrete-Integer16 INTEGER(0 .. 65535),
@@ -15,12 +15,10 @@ ProvidedInterface-GenericType4 ::= CHOICE
      concrete-Integer16 INTEGER(0 .. 65535),
      concrete-Integer32 INTEGER(0 .. 4294967295)
 }
-ProvidedInterface-GenericType4-Array ::= SEQUENCE (SIZE(0 .. 10)) OF ProvidedInterface-GenericType4
 AsyncWithGenericTypes-Type ::= SEQUENCE
 {
      genericArgument1 Integer8(0 .. 255),
-     genericArgument2 ProvidedInterface-GenericType2,
-     genericArgument3 DeterminantType(0 .. 2),
-     genericArgument4 ProvidedInterface-GenericType4-Array(SIZE(0 .. 10))
+     genericArgument3 ProvidedInterface-GenericType3,
+     genericArgument4 ProvidedInterface-GenericType4
 }
 END

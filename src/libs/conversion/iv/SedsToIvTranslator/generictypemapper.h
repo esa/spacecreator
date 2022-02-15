@@ -23,6 +23,7 @@
 
 #include <QString>
 #include <optional>
+#include <seds/SedsModel/generics/genericalternate.h>
 #include <seds/SedsModel/generics/generictypemap.h>
 #include <seds/SedsModel/generics/generictypemapset.h>
 #include <vector>
@@ -69,6 +70,11 @@ public:
 
 private:
     auto addSimpleMapping(const seds::model::GenericTypeMap &typeMap) -> void;
+    auto addAlternateMapping(const seds::model::GenericAlternate &alternate, const QString &determinantName) -> void;
+
+    auto findDeterminant(const std::vector<seds::model::GenericAlternate> &alternates) -> QString;
+    auto getPossibleDeterminants(const seds::model::GenericAlternate &alternate)
+            -> std::vector<const seds::model::GenericTypeMap *>;
 
 private:
     QString m_sedsInterfaceName;

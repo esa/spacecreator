@@ -61,6 +61,7 @@ public:
     static auto buildArrayTypeName(
             const QString &baseTypeName, const std::vector<seds::model::DimensionSize> &dimensions) -> QString;
     static auto buildBundledTypeName(const QString &sedsCommandName, const std::size_t cachedTypesCount) -> QString;
+    static auto buildAlternateTypeName(const QString &sedsInterfaceName, const QString &genericTypeName) -> QString;
 
     static auto switchInterfaceType(ivm::IVInterface::InterfaceType interfaceType) -> ivm::IVInterface::InterfaceType;
 
@@ -78,6 +79,8 @@ private:
     static const QString m_asn1ArrayNameTemplate;
     /// @brief  Template for ASN.1 bundled type name
     static const QString m_bundledTypeNameTemplate;
+    /// @brief  Template for ASN.1 alternate type name
+    static const QString m_alternateTypeNameTemplate;
     /// @brief  Prefix for getter interfaces
     static const QString m_getterInterfacePrefix;
     /// @brief  Prefix for setter interfaces

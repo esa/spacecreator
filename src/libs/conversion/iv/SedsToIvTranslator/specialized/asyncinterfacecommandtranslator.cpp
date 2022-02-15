@@ -21,7 +21,10 @@
 
 #include "interfacetranslatorhelper.h"
 
+#include <asn1library/asn1/acnparameter.h>
+#include <asn1library/asn1/acnsequencecomponent.h>
 #include <asn1library/asn1/asnsequencecomponent.h>
+#include <asn1library/asn1/types/choice.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <conversion/common/escaper/escaper.h>
@@ -119,6 +122,8 @@ void AsyncInterfaceCommandTranslator::translateCommand(
 void AsyncInterfaceCommandTranslator::translateArguments(const seds::model::InterfaceCommand &sedsCommand,
         seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface)
 {
+    // Async commands are translated to sporadic interfaces, which can accept only one argument
+    // To satisfy this we need to pack all command arguments into one
     const auto bundledTypeName = buildBundledType(sedsCommand, requestedArgumentMode);
 
     const auto ivParameter = InterfaceTranslatorHelper::createInterfaceParameter(
@@ -129,11 +134,11 @@ void AsyncInterfaceCommandTranslator::translateArguments(const seds::model::Inte
 QString AsyncInterfaceCommandTranslator::buildBundledType(
         const seds::model::InterfaceCommand &sedsCommand, seds::model::CommandArgumentMode requestedArgumentMode)
 {
-    // Get arguments that have the interesting mode
+    const auto &sedsCommandName = sedsCommand.nameStr();
+
+    // Get arguments that have the requested mode
     auto arguments = processArguments(sedsCommand.arguments(), requestedArgumentMode);
     const auto bundledTypeHash = calculateArgumentsHash(arguments);
-
-    const auto &sedsCommandName = sedsCommand.nameStr();
 
     // Check if the bundled type was already created and saved
     const auto typesForCommand = m_commandArguments.equal_range(sedsCommandName);
@@ -149,7 +154,7 @@ QString AsyncInterfaceCommandTranslator::buildBundledType(
     // Create a new bundled type, add it to the ASN.1 model
     auto bundledTypeName = createBundledType(sedsCommandName, arguments);
 
-    // Save model for later
+    // Save command with its arguments for later
     m_commandArguments.insert({ sedsCommandName, { bundledTypeName, bundledTypeHash, std::move(arguments) } });
 
     return bundledTypeName;
@@ -177,6 +182,7 @@ QString AsyncInterfaceCommandTranslator::createBundledType(
 void AsyncInterfaceCommandTranslator::createBundledTypeComponent(
         const AsyncInterfaceCommandTranslator::ArgumentData &argumentData, Asn1Acn::Types::Sequence *sequence) const
 {
+    const auto &name = argumentData.name;
     const auto &typeName = argumentData.typeName;
 
     const auto *referencedTypeAssignment = m_asn1Definitions->type(typeName);
@@ -192,9 +198,20 @@ void AsyncInterfaceCommandTranslator::createBundledTypeComponent(
     auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(typeName, m_asn1Definitions->name());
     sequenceComponentType->setType(referencedType->clone());
 
-    const auto &name = argumentData.name;
-    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            name, name, false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(sequenceComponentType));
+    std::unique_ptr<Asn1Acn::SequenceComponent> sequenceComponent;
+
+    if (argumentData.isDeterminant) {
+        sequenceComponent =
+                std::make_unique<Asn1Acn::AcnSequenceComponent>(name, name, std::move(sequenceComponentType));
+    } else {
+        sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
+                name, name, false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(sequenceComponentType));
+
+        if (argumentData.determinantName.has_value()) {
+            sequenceComponent->addAcnParameter(*argumentData.determinantName);
+        }
+    }
+
     sequence->addComponent(std::move(sequenceComponent));
 }
 
@@ -206,7 +223,7 @@ AsyncInterfaceCommandTranslator::Arguments AsyncInterfaceCommandTranslator::proc
 
     for (const auto &sedsArgument : sedsArguments) {
         if (sedsArgument.mode() == requestedArgumentMode) {
-            auto argumentData = processArgument(sedsArgument);
+            auto argumentData = processArgument(sedsArgument, arguments);
             arguments.push_back(std::move(argumentData));
         }
     }
@@ -215,26 +232,29 @@ AsyncInterfaceCommandTranslator::Arguments AsyncInterfaceCommandTranslator::proc
 }
 
 AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::processArgument(
-        const seds::model::CommandArgument &sedsArgument)
+        const seds::model::CommandArgument &sedsArgument, const AsyncInterfaceCommandTranslator::Arguments &arguments)
 {
     const auto argumentName = Escaper::escapeAsn1FieldName(sedsArgument.nameStr());
     const auto argumentTypeName = sedsArgument.type().nameStr();
 
     const auto typeMapping = m_typeMapper->getMapping(argumentTypeName);
 
-    // Type was not mapped
+    // Type is not mapped
     if (typeMapping == nullptr) {
+        // Handle optional array dimensions
         const auto typeName = handleArrayArgument(sedsArgument, Escaper::escapeAsn1TypeName(argumentTypeName));
-        return { argumentName, typeName, std::nullopt, std::nullopt };
+        return { argumentName, typeName, std::nullopt, std::nullopt, false };
     }
 
+    // Get all concrete types that this generic type can be mapped to
     const auto &concreteTypes = typeMapping->concreteTypes;
 
     if (concreteTypes.empty()) {
-        auto errorMessage =
-                QString("Type \"%1\" of argument \"%2\" is handled as generic, but no mappings was provided")
-                        .arg(argumentTypeName)
-                        .arg(argumentName);
+        auto errorMessage = QString("Type \"%1\" of argument \"%2\" of interface \"%3\" is handled as generic, but no "
+                                    "mappings was provided")
+                                    .arg(argumentTypeName)
+                                    .arg(argumentName)
+                                    .arg(m_sedsInterfaceName);
 
         throw TranslationException(std::move(errorMessage));
     }
@@ -242,7 +262,17 @@ AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::p
     if (concreteTypes.size() == 1) { // 'Simple' mapping
         return handleArgumentSimpleMapping(sedsArgument, concreteTypes.front());
     } else { // 'Alternate' mapping
-        return { "", "", std::nullopt, std::nullopt };
+        if (!typeMapping->determinantTypeName.has_value()) {
+            auto errorMessage = QString("Type \"%1\" of argument \"%2\" of interface \"%3\" has alternate mapping, but "
+                                        "no determinant was set")
+                                        .arg(argumentTypeName)
+                                        .arg(argumentName)
+                                        .arg(m_sedsInterfaceName);
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        return handleArgumentAlternateMapping(
+                sedsArgument, concreteTypes, *typeMapping->determinantTypeName, arguments);
     }
 }
 
@@ -252,7 +282,49 @@ AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::h
     const auto argumentName = Escaper::escapeAsn1FieldName(sedsArgument.nameStr());
     const auto argumentTypeName = handleArrayArgument(sedsArgument, concreteType.typeName);
 
-    return { argumentName, argumentTypeName, concreteType.fixedValue, std::nullopt };
+    return { argumentName, argumentTypeName, concreteType.fixedValue, std::nullopt, false };
+}
+
+AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::handleArgumentAlternateMapping(
+        const seds::model::CommandArgument &sedsArgument, const std::vector<TypeMapping::ConcreteType> &concreteTypes,
+        const QString &determinantTypeName, const AsyncInterfaceCommandTranslator::Arguments &arguments)
+{
+    const auto argumentName = Escaper::escapeAsn1FieldName(sedsArgument.nameStr());
+
+    // If all of the concrete types are the same, then we can handle this a simple mapping
+    const auto firstConcreteTypeName = concreteTypes.front().typeName;
+    const auto allTheSame = std::all_of(concreteTypes.begin(), concreteTypes.end(),
+            [&](const auto &concreteType) { return concreteType.typeName == firstConcreteTypeName; });
+
+    if (allTheSame) {
+        if (firstConcreteTypeName == determinantTypeName) {
+            return { argumentName, firstConcreteTypeName, std::nullopt, std::nullopt, true };
+        } else {
+            const auto argumentTypeName = handleArrayArgument(sedsArgument, firstConcreteTypeName);
+            return { argumentName, argumentTypeName, std::nullopt, std::nullopt, false };
+        }
+    } else {
+        // Try to find an argument that is a determinant
+        // Limitation is that the determinant has to be present before any of the field that will be using it
+        const auto foundDeterminant = std::find_if(arguments.begin(), arguments.end(),
+                [&](const auto &argument) { return argument.typeName == determinantTypeName; });
+
+        if (foundDeterminant == arguments.end()) {
+            auto errorMessage =
+                    QString("Determinant type \"%1\" of argument \"%2\" of interface \"%3\" couldn't be find")
+                            .arg(determinantTypeName)
+                            .arg(argumentName)
+                            .arg(m_sedsInterfaceName);
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        // Create an ASN.1 choice that will have a generic parameters to choose an alternative based on determinant
+        const auto alternateTypeName =
+                createAlternateType(sedsArgument.type().nameStr(), concreteTypes, determinantTypeName);
+        const auto argumentTypeName = handleArrayArgument(sedsArgument, alternateTypeName);
+
+        return { argumentName, argumentTypeName, std::nullopt, foundDeterminant->name, false };
+    }
 }
 
 QString AsyncInterfaceCommandTranslator::handleArrayArgument(
@@ -264,6 +336,37 @@ QString AsyncInterfaceCommandTranslator::handleArrayArgument(
         return InterfaceTranslatorHelper::createArrayType(
                 typeName, sedsArgument.arrayDimensions(), m_asn1Definitions, m_sedsPackage);
     }
+}
+
+QString AsyncInterfaceCommandTranslator::createAlternateType(const QString &genericTypeName,
+        const std::vector<TypeMapping::ConcreteType> &concreteTypes, const QString &determinantName)
+{
+    const auto name = InterfaceTranslatorHelper::buildAlternateTypeName(m_sedsInterfaceName, genericTypeName);
+
+    auto choice = std::make_unique<Asn1Acn::Types::Choice>(name);
+
+    // Each of the alternative is present-when determinant has given value
+    for (const auto &concreteType : concreteTypes) {
+        const auto asn1ConcreteType = m_asn1Definitions->type(concreteType.typeName)->type();
+        const auto presentWhen = QString("determinant==%1").arg(*concreteType.determinantValue);
+
+        const auto choiceAlternativeName = QString("concrete-%1").arg(concreteType.typeName);
+        auto choiceAlternative = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(choiceAlternativeName,
+                choiceAlternativeName, choiceAlternativeName, choiceAlternativeName, presentWhen,
+                Asn1Acn::SourceLocation(), asn1ConcreteType->clone());
+
+        choice->addComponent(std::move(choiceAlternative));
+    }
+
+    // Add an ACN parameter for determinant
+    auto acnParameter = std::make_unique<Asn1Acn::AcnParameter>("determinant", "determinant", determinantName);
+    choice->addParameter(std::move(acnParameter));
+
+    auto typeAssignment =
+            std::make_unique<Asn1Acn::TypeAssignment>(name, name, Asn1Acn::SourceLocation(), std::move(choice));
+    m_asn1Definitions->addType(std::move(typeAssignment));
+
+    return name;
 }
 
 std::size_t AsyncInterfaceCommandTranslator::calculateArgumentsHash(

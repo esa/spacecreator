@@ -40,11 +40,7 @@
           <Argument name="GenericArgument1" type="GenericType1" mode="in" />
           <Argument name="GenericArgument2" type="GenericType2" mode="in" />
           <Argument name="GenericArgument3" type="GenericType3" mode="in" />
-          <Argument name="GenericArgument4" type="GenericType4" mode="in">
-            <ArrayDimensions>
-              <Dimension size="10" />
-            </ArrayDimensions>
-          </Argument>
+          <Argument name="GenericArgument4" type="GenericType4" mode="in" />
         </Command>
     </CommandSet>
     </Interface>
@@ -57,19 +53,19 @@
             <GenericTypeMap name="GenericType1" type="Integer8" />
             <AlternateSet>
               <Alternate>
-                <GenericTypeMap name="GenericType2" type="Integer8" />
-                <GenericTypeMap name="GenericType3" type="DeterminantType" fixedValue="0" />
-                <GenericTypeMap name="GenericType4" type="Integer8" />
+                <GenericTypeMap name="GenericType2" type="DeterminantType" fixedValue="0" />
+                <GenericTypeMap name="GenericType3" type="Integer8" />
+                <GenericTypeMap name="GenericType4" type="Integer8" fixedValue="10"/>
               </Alternate>
               <Alternate>
-                <GenericTypeMap name="GenericType2" type="Integer16" />
-                <GenericTypeMap name="GenericType3" type="DeterminantType" fixedValue="1" />
-                <GenericTypeMap name="GenericType4" type="Integer16" />
+                <GenericTypeMap name="GenericType2" type="DeterminantType" fixedValue="1" />
+                <GenericTypeMap name="GenericType3" type="Integer16" />
+                <GenericTypeMap name="GenericType4" type="Integer16" fixedValue="20"/>
               </Alternate>
               <Alternate>
-                <GenericTypeMap name="GenericType2" type="Integer32" />
-                <GenericTypeMap name="GenericType3" type="DeterminantType" fixedValue="2" />
-                <GenericTypeMap name="GenericType4" type="Integer32" />
+                <GenericTypeMap name="GenericType2" type="DeterminantType" fixedValue="2" />
+                <GenericTypeMap name="GenericType3" type="Integer32" />
+                <GenericTypeMap name="GenericType4" type="Integer32" fixedValue="30"/>
               </Alternate>
             </AlternateSet>
           </GenericTypeMapSet>

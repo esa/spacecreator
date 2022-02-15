@@ -38,6 +38,7 @@ const QString InterfaceTranslatorHelper::m_ivParameterInterfaceNameTemplate = "%
 const QString InterfaceTranslatorHelper::m_ivCommandInterfaceNameTemplate = "%1_%2_%3";
 const QString InterfaceTranslatorHelper::m_asn1ArrayNameTemplate = "%1Array-%2";
 const QString InterfaceTranslatorHelper::m_bundledTypeNameTemplate = "%1-Type%2";
+const QString InterfaceTranslatorHelper::m_alternateTypeNameTemplate = "%1-%2";
 const QString InterfaceTranslatorHelper::m_getterInterfacePrefix = "Get";
 const QString InterfaceTranslatorHelper::m_setterInterfacePrefix = "Set";
 
@@ -150,6 +151,12 @@ QString InterfaceTranslatorHelper::buildBundledTypeName(
     } else {
         return m_bundledTypeNameTemplate.arg(sedsCommandNameEscaped).arg(cachedTypesCount);
     }
+}
+
+QString InterfaceTranslatorHelper::buildAlternateTypeName(
+        const QString &sedsInterfaceName, const QString &genericTypeName)
+{
+    return m_alternateTypeNameTemplate.arg(sedsInterfaceName).arg(genericTypeName);
 }
 
 ivm::IVInterface::InterfaceType InterfaceTranslatorHelper::switchInterfaceType(
