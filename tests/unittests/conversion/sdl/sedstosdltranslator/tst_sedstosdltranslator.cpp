@@ -299,6 +299,12 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineInputs()
         SedsModelBuilder("Package")
             .withComponent(
                 SedsComponentBuilder("Component")
+                    .declaringInterface(SedsInterfaceDeclarationBuilder("If1Type")
+                        .withCommand(SedsInterfaceCommandBuilder(
+                            "Cmd1", InterfaceCommandMode::Async)
+                                .build())
+                        .build())
+                    .withProvidedInterface( SedsInterfaceBuilder("If1","If1Type").build())
                     .withImplementation(
                         SedsImplementationBuilder()
                         .withStateMachine(
