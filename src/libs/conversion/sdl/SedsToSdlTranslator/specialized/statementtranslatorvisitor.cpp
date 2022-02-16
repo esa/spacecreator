@@ -213,7 +213,7 @@ auto StatementTranslatorVisitor::operator()(const seds::model::SendCommandPrimit
             interfaceName, ivm::IVInterface::InterfaceType::Required, commandName);
 
     // Process name carries iv-escaped component name
-    const auto interface = findInterfaceDeclaration(m_context.ivModel(), m_context.sdlProcess()->name(), callName);
+    const auto interface = findIvInterface(m_context.ivModel(), m_context.sdlProcess()->name(), callName);
 
     if (interface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
         auto outputActions = translateOutput(m_context.sdlProcess(), m_context.sdlProcedure(), callName, sendCommand);
@@ -240,17 +240,24 @@ auto StatementTranslatorVisitor::operator()(const seds::model::SendParameterPrim
             mode, interfaceName, ivm::IVInterface::InterfaceType::Required, parameterName);
 
     // Process name carries iv-escaped component name
-    const auto interface = findInterfaceDeclaration(m_context.ivModel(), m_context.sdlProcess()->name(), callName);
+    const auto interface = findIvInterface(m_context.ivModel(), m_context.sdlProcess()->name(), callName);
 
-    if (interface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
+    switch (interface->kind()) {
+    case ivm::IVInterface::OperationKind::Sporadic: {
         auto outputActions = translateOutput(m_context.sdlProcess(), m_context.sdlProcedure(), callName, sendParameter);
         for (auto &action : outputActions) {
             m_sdlTransition->addAction(std::move(action));
         }
-    } else if (interface->kind() == ivm::IVInterface::OperationKind::Protected
-            || interface->kind() == ivm::IVInterface::OperationKind::Unprotected) {
+        return;
+    }
+    case ivm::IVInterface::OperationKind::Protected:
+    case ivm::IVInterface::OperationKind::Unprotected: {
         auto call = translateCall(m_context.sdlProcess(), m_context.sdlProcedure(), callName, sendParameter);
         m_sdlTransition->addAction(std::move(call));
+        return;
+    }
+    default:
+        throw TranslationException(QString("Unsupported OperationKind for interface %1").arg(callName));
     }
 }
 
@@ -273,7 +280,7 @@ auto StatementTranslatorVisitor::translateActivityCall(::sdl::Process *process,
     return call;
 }
 
-auto StatementTranslatorVisitor::findInterfaceDeclaration(
+auto StatementTranslatorVisitor::findIvInterface(
         ivm::IVModel *model, const QString &functionName, const QString &interfaceName) -> ivm::IVInterface *
 {
     const auto &function = model->getFunction(functionName, Qt::CaseSensitive);
@@ -386,7 +393,7 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, ::sd
     auto call = std::make_unique<::sdl::ProcedureCall>();
 
     const auto &procedure = std::find_if(hostProcess->procedures().begin(), hostProcess->procedures().end(),
-            [callName](const auto &p) { return p->name() == callName; });
+            [&callName](const auto &p) { return p->name() == callName; });
 
     if (procedure == hostProcess->procedures().end()) {
         throw TranslationException(QString("Procedure %1 not found").arg(callName));
@@ -395,17 +402,18 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, ::sd
 
     const auto &value = sendParameter.argumentValue().value().value();
 
-    std::visit(overloaded { [&call](const seds::model::ValueOperand &operand) {
-                               call->addArgument(std::make_unique<::sdl::VariableLiteral>(operand.value().value()));
-                           },
-                       [&call, &hostProcess, &hostProcedure](const seds::model::VariableRefOperand &operand) {
-                           const auto variableName =
-                                   Escaper::escapeAsn1FieldName(operand.variableRef().value().value());
-                           const auto variableDeclaration =
-                                   findVariableDeclaration(hostProcess, hostProcedure, variableName);
-                           call->addArgument(std::make_unique<::sdl::VariableReference>(variableDeclaration));
-                       } },
-            value);
+    // clang-format off
+    std::visit(overloaded {
+        [&call](const seds::model::ValueOperand &operand) {
+            call->addArgument(std::make_unique<::sdl::VariableLiteral>(operand.value().value()));
+        },
+        [&call, &hostProcess, &hostProcedure](const seds::model::VariableRefOperand &operand) {
+            const auto variableName = Escaper::escapeAsn1FieldName(operand.variableRef().value().value());
+            const auto variableDeclaration = findVariableDeclaration(hostProcess, hostProcedure, variableName);
+            call->addArgument(std::make_unique<::sdl::VariableReference>(variableDeclaration));
+        }
+    }, value);
+    // clang-format on
 
     return call;
 }
@@ -460,12 +468,16 @@ auto StatementTranslatorVisitor::translateOutput(::sdl::Process *hostProcess, ::
             findVariableDeclaration(hostProcess, hostProcedure, ioVariable)));
 
     const auto &value = sendParameter.argumentValue().value().value();
-    const auto &source =
-            std::visit(overloaded { [](const seds::model::ValueOperand &operand) { return operand.value().value(); },
-                               [](const seds::model::VariableRefOperand &operand) {
-                                   return Escaper::escapeAsn1FieldName(operand.variableRef().value().value());
-                               } },
-                    value);
+    // clang-format off
+    const auto &source = std::visit(overloaded {
+            [](const seds::model::ValueOperand &operand) {
+                return operand.value().value();
+            },
+            [](const seds::model::VariableRefOperand &operand) {
+                return Escaper::escapeAsn1FieldName(operand.variableRef().value().value());
+            }
+        }, value);
+    // clang-format on
     auto assignment = std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(ioVariable, source));
     result.emplace_back(std::move(assignment));
 

@@ -196,11 +196,8 @@ private:
     static auto getParameterInterface(ivm::IVFunction *function, const ParameterType type, const ParameterMode mode,
             const QString interfaceName, const QString parameterName) -> ivm::IVInterface *;
 
-    static auto createParameterSyncGetter(
-            ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::Process *sdlProcess) -> void;
-    static auto createParameterSyncSetter(
-            ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::Process *sdlProcess) -> void;
-
+    static auto createParameterSyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
+            ::sdl::Process *sdlProcess, const ParameterType type) -> void;
     static auto createParameterAsyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
             ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void;
 

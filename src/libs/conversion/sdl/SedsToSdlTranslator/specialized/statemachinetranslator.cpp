@@ -29,7 +29,6 @@
 #include <conversion/iv/SedsToIvTranslator/specialized/interfacecommandtranslator.h>
 #include <conversion/iv/SedsToIvTranslator/specialized/interfaceparametertranslator.h>
 #include <conversion/iv/SedsToIvTranslator/translator.h>
-#include <iostream>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
 #include <sdl/SdlModel/nextstate.h>
@@ -274,8 +273,10 @@ auto StateMachineTranslator::getAnyState(::sdl::StateMachine *stateMachine) -> :
 auto StateMachineTranslator::getParameterInterface(ivm::IVFunction *function, const ParameterType type,
         const ParameterMode mode, const QString interfaceName, const QString parameterName) -> ivm::IVInterface *
 {
-    const auto typeName = type == ParameterType::Getter ? "Get" : "Set";
-    const auto name = Escaper::escapeIvName(QString("%1_%2_%3_Pi").arg(typeName).arg(interfaceName).arg(parameterName));
+    const auto kind = type == ParameterType::Getter ? InterfaceParameterTranslator::InterfaceMode::Getter
+                                                    : InterfaceParameterTranslator::InterfaceMode::Setter;
+    const auto name = InterfaceParameterTranslator::getParameterName(
+            kind, interfaceName, ivm::IVInterface::InterfaceType::Provided, parameterName);
     auto interface = getInterfaceByName(function, name);
     if (interface == nullptr) {
         return nullptr;
@@ -291,34 +292,30 @@ auto StateMachineTranslator::getParameterInterface(ivm::IVFunction *function, co
     return nullptr;
 }
 
-auto StateMachineTranslator::createParameterSyncGetter(
-        ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::Process *sdlProcess) -> void
+auto StateMachineTranslator::createParameterSyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
+        ::sdl::Process *sdlProcess, const ParameterType type) -> void
 {
     const auto paramName = Escaper::escapeAsn1FieldName(interface->params()[0].name());
-    auto procedure = std::make_unique<::sdl::Procedure>(interface->title());
-    auto parameter =
-            std::make_unique<::sdl::ProcedureParameter>(paramName, interface->params()[0].paramTypeName(), "in/out");
-    procedure->addParameter(std::move(parameter));
     auto transition = std::make_unique<::sdl::Transition>();
-    const auto action =
-            QString("%1 := %2").arg(paramName, Escaper::escapeAsn1FieldName(map.variableRef().value().value()));
-    transition->addAction(std::make_unique<::sdl::Task>("", action));
-    procedure->setTransition(std::move(transition));
-    sdlProcess->addProcedure(std::move(procedure));
-}
+    auto procedure = std::make_unique<::sdl::Procedure>(interface->title());
 
-auto StateMachineTranslator::createParameterSyncSetter(
-        ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::Process *sdlProcess) -> void
-{
-    const auto paramName = Escaper::escapeAsn1FieldName(interface->params()[0].name());
-    auto procedure = std::make_unique<::sdl::Procedure>(interface->title());
-    auto parameter =
-            std::make_unique<::sdl::ProcedureParameter>(paramName, interface->params()[0].paramTypeName(), "in");
-    procedure->addParameter(std::move(parameter));
-    auto transition = std::make_unique<::sdl::Transition>();
-    const auto action =
-            QString("%1 := %2").arg(Escaper::escapeAsn1FieldName(map.variableRef().value().value()), paramName);
+    QString parameterDirection;
+    QString actionTemplate;
+    switch (type) {
+    case ParameterType::Getter:
+        parameterDirection = "in/out";
+        actionTemplate = "%1 := %2";
+        break;
+    case ParameterType::Setter:
+        parameterDirection = "in";
+        actionTemplate = "%2 := %1";
+        break;
+    }
+    auto parameter = std::make_unique<::sdl::ProcedureParameter>(
+            paramName, interface->params()[0].paramTypeName(), parameterDirection);
+    const auto action = actionTemplate.arg(paramName, Escaper::escapeAsn1FieldName(map.variableRef().value().value()));
     transition->addAction(std::make_unique<::sdl::Task>("", action));
+    procedure->addParameter(std::move(parameter));
     procedure->setTransition(std::move(transition));
     sdlProcess->addProcedure(std::move(procedure));
 }
@@ -373,12 +370,12 @@ auto StateMachineTranslator::translateParameter(Context &context, const seds::mo
     const auto syncGetter = getParameterInterface(context.ivFunction(), ParameterType::Getter, ParameterMode::Sync,
             map.interface().value(), map.parameter().value());
     if (syncGetter != nullptr) {
-        createParameterSyncGetter(syncGetter, map, context.sdlProcess());
+        createParameterSyncPi(syncGetter, map, context.sdlProcess(), ParameterType::Getter);
     }
     const auto syncSetter = getParameterInterface(context.ivFunction(), ParameterType::Setter, ParameterMode::Sync,
             map.interface().value(), map.parameter().value());
     if (syncSetter != nullptr) {
-        createParameterSyncSetter(syncSetter, map, context.sdlProcess());
+        createParameterSyncPi(syncSetter, map, context.sdlProcess(), ParameterType::Setter);
     }
     // Handle all async Setters/Getters not handled during onParameterPrimitiveTranslation
     const auto asyncSetter = getParameterInterface(context.ivFunction(), ParameterType::Setter, ParameterMode::Async,
