@@ -65,3 +65,15 @@ configure_file(resources/test_command_arguments.asn resources/test_command_argum
 configure_file(test_parameters.sh test_parameters.sh COPYONLY)
 configure_file(resources/test_parameters.xml resources/test_parameters.xml COPYONLY)
 configure_file(resources/test_parameters.output resources/test_parameters.output COPYONLY)
+
+configure_file(test_generic_type_mapping.sh test_generic_type_mapping.sh COPYONLY)
+configure_file(resources/test_generic_type_mapping.xml resources/test_generic_type_mapping.xml COPYONLY)
+configure_file(resources/test_generic_type_mapping.output resources/test_generic_type_mapping.output COPYONLY)
+configure_file(resources/test_generic_type_mapping_asn.output resources/test_generic_type_mapping_asn.output COPYONLY)
+configure_file(resources/test_generic_type_mapping_acn.output resources/test_generic_type_mapping_acn.output COPYONLY)
+
+configure_file(test_alternate_set.sh test_alternate_set.sh COPYONLY)
+configure_file(resources/test_alternate_set.xml resources/test_alternate_set.xml COPYONLY)
+configure_file(resources/test_alternate_set.output resources/test_alternate_set.output COPYONLY)
+configure_file(resources/test_alternate_set_asn.output resources/test_alternate_set_asn.output COPYONLY)
+configure_file(resources/test_alternate_set_acn.output resources/test_alternate_set_acn.output COPYONLY)
