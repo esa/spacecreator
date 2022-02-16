@@ -5,6 +5,7 @@ set(SOURCES
   promelatypesorter.cpp
   integersubset.cpp
   integergenerator.cpp
+  enumeratedgenerator.cpp
   visitors/asn1nodevisitor.cpp
   visitors/asn1sequencecomponentvisitor.cpp
   visitors/integerconstraintvisitor.cpp
@@ -17,6 +18,7 @@ set(INCLUDES
   promelatypesorter.h
   integersubset.h
   integergenerator.h
+  enumeratedgenerator.h
   visitors/asn1nodevisitor.h
   visitors/asn1sequencecomponentvisitor.h
   visitors/integerconstraintvisitor.h

@@ -35,6 +35,7 @@ private Q_SLOTS:
     void cleanupTestCase();
 
     void testInteger();
+    void testEnumerated();
 
 private:
     std::unique_ptr<Definitions> createModel();

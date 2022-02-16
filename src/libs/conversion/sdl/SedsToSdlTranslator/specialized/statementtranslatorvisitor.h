@@ -226,7 +226,7 @@ private:
     StatementContext &m_context;
     ::sdl::Transition *m_sdlTransition;
 
-    static auto findInterfaceDeclaration(ivm::IVFunction *model, const QString &interfaceName) -> ivm::IVInterface *;
+    static auto findIvInterface(ivm::IVFunction *function, const QString &interfaceName) -> ivm::IVInterface *;
 
     static auto findVariableDeclaration(::sdl::Process *process, ::sdl::Procedure *sdlProcedure, QString name)
             -> ::sdl::VariableDeclaration *;

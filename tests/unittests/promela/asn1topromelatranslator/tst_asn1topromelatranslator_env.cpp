@@ -20,6 +20,7 @@
 #include "tst_asn1topromelatranslator_env.h"
 
 #include <asn1library/asn1/constraints/rangeconstraint.h>
+#include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/values.h>
 #include <promela/Asn1ToPromelaTranslator/visitors/asn1nodevaluegeneratorvisitor.h>
@@ -29,6 +30,8 @@ using Asn1Acn::IntegerValue;
 using Asn1Acn::SourceLocation;
 using Asn1Acn::TypeAssignment;
 using Asn1Acn::Constraints::RangeConstraint;
+using Asn1Acn::Types::Enumerated;
+using Asn1Acn::Types::EnumeratedItem;
 using Asn1Acn::Types::Integer;
 using promela::model::Assignment;
 using promela::model::Conditional;
@@ -36,6 +39,7 @@ using promela::model::Constant;
 using promela::model::InlineDef;
 using promela::model::PromelaModel;
 using promela::model::Sequence;
+using promela::model::VariableRef;
 using promela::translator::Asn1NodeValueGeneratorVisitor;
 
 namespace tmc::test {
@@ -92,6 +96,60 @@ void tst_Asn1ToPromelaTranslator_Env::testInteger()
         QVERIFY(std::holds_alternative<Constant>(assignment.getExpression().getContent()));
         const Constant &constant = std::get<Constant>(assignment.getExpression().getContent());
         QCOMPARE(constant.getValue(), i);
+    }
+}
+
+void tst_Asn1ToPromelaTranslator_Env::testEnumerated()
+{
+    auto model = createModel();
+    std::unique_ptr<Enumerated> type = std::make_unique<Enumerated>();
+
+    type->addItem(EnumeratedItem(0, "zero", 0));
+    type->addItem(EnumeratedItem(1, "one", 1));
+    type->addItem(EnumeratedItem(2, "infinity", 100));
+
+    auto typeAssignment = std::make_unique<TypeAssignment>(
+            QStringLiteral("MyType"), QStringLiteral("MyTypeT"), SourceLocation(), std::move(type));
+    model->addType(std::move(typeAssignment));
+
+    PromelaModel promelaModel;
+    QStringList typesToTranslate;
+    typesToTranslate.append(QString("MyType"));
+    Asn1NodeValueGeneratorVisitor visitor(promelaModel, true, typesToTranslate);
+    visitor.visit(*model);
+
+    QCOMPARE(promelaModel.getInlineDefs().size(), 1);
+
+    const std::unique_ptr<InlineDef> &inlineDef = promelaModel.getInlineDefs().front();
+
+    QCOMPARE(inlineDef->getName(), "MyType_generate_value");
+    QCOMPARE(inlineDef->getArguments().size(), 1);
+    const QString &argName = inlineDef->getArguments().front();
+
+    const Sequence &mainSequence = inlineDef->getSequence();
+    QCOMPARE(mainSequence.getContent().size(), 1);
+
+    QVERIFY(std::holds_alternative<Conditional>(mainSequence.getContent().front()->getValue()));
+
+    const Conditional &ifStatement = std::get<Conditional>(mainSequence.getContent().front()->getValue());
+
+    auto iter = ifStatement.getAlternatives().begin();
+    QStringList expectedValues;
+    expectedValues.append("MyType_zero");
+    expectedValues.append("MyType_one");
+    expectedValues.append("MyType_infinity");
+    for (const auto &element : expectedValues) {
+        QVERIFY(iter != ifStatement.getAlternatives().end());
+        const std::unique_ptr<Sequence> &nestedSequence = *iter;
+        ++iter;
+        QCOMPARE(nestedSequence->getContent().size(), 2);
+
+        QVERIFY(std::holds_alternative<Assignment>(nestedSequence->getContent().back()->getValue()));
+        const Assignment &assignment = std::get<Assignment>(nestedSequence->getContent().back()->getValue());
+        QCOMPARE(assignment.getVariableRef().getReference(), argName);
+        QVERIFY(std::holds_alternative<VariableRef>(assignment.getExpression().getContent()));
+        const VariableRef &ref = std::get<VariableRef>(assignment.getExpression().getContent());
+        QCOMPARE(ref.getReference(), element);
     }
 }
 

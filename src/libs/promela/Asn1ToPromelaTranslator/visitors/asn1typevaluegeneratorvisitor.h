@@ -129,6 +129,9 @@ public:
     void visit(const ::Asn1Acn::Types::UserdefinedType &type) override;
 
 private:
+    void createValueGenerationInline(::promela::model::Sequence sequence);
+
+private:
     ::promela::model::PromelaModel &m_promelaModel;
     const QString m_name;
     const bool m_enhancedSpinSupport;
