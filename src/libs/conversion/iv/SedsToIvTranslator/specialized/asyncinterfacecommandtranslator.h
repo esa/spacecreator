@@ -1,20 +1,20 @@
 /** @file
- * this file is part of the spacecreator.
+ * This file is part of the SpaceCreator.
  *
- * @copyright (c) 2022 n7 space sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
- * this library is free software; you can redistribute it and/or
- * modify it under the terms of the gnu library general public
- * license as published by the free software foundation; either
- * version 2 of the license, or (at your option) any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
  *
- * this library is distributed in the hope that it will be useful,
- * but without any warranty; without even the implied warranty of
- * merchantability or fitness for a particular purpose.  see the gnu
- * library general public license for more details.
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
  *
- * you should have received a copy of the gnu library general public license
- * along with this program. if not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
 #pragma once

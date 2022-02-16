@@ -42,13 +42,6 @@ const QString InterfaceTranslatorHelper::m_alternateTypeNameTemplate = "%1-%2";
 const QString InterfaceTranslatorHelper::m_getterInterfacePrefix = "Get";
 const QString InterfaceTranslatorHelper::m_setterInterfacePrefix = "Set";
 
-shared::InterfaceParameter InterfaceTranslatorHelper::createInterfaceParameter(const QString &parameterName,
-        const QString &sedsParameterTypeName, shared::InterfaceParameter::Direction direction)
-{
-    return shared::InterfaceParameter(parameterName, shared::BasicParameter::Type::Other,
-            Escaper::escapeIvName(sedsParameterTypeName), m_interfaceParameterEncoding, direction);
-}
-
 ivm::IVInterface *InterfaceTranslatorHelper::createIvInterface(const QString &name,
         ivm::IVInterface::InterfaceType type, ivm::IVInterface::OperationKind kind, ivm::IVFunction *m_ivFunction)
 {
@@ -59,6 +52,13 @@ ivm::IVInterface *InterfaceTranslatorHelper::createIvInterface(const QString &na
     creationInfo.function = m_ivFunction;
 
     return ivm::IVInterface::createIface(creationInfo);
+}
+
+shared::InterfaceParameter InterfaceTranslatorHelper::createInterfaceParameter(
+        const QString &name, const QString &typeName, shared::InterfaceParameter::Direction direction)
+{
+    return shared::InterfaceParameter(name, shared::BasicParameter::Type::Other, Escaper::escapeIvName(typeName),
+            m_interfaceParameterEncoding, direction);
 }
 
 QString InterfaceTranslatorHelper::createArrayType(const QString &baseTypeName,
