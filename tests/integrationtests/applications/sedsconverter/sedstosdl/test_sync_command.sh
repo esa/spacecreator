@@ -27,9 +27,9 @@ cd $TEST_OUTPUT_DIR
 # Compare output against reference, and compile to make sure the reference is valid
 # Clean (rm) only if all steps pass
 # This test uses Ada, as C backend in OpenGEODE is too buggy to handle this example
-#$DIFF factorial.pr ../resources/test_factorial.output \
-$OPENGEODE --toAda system_structure.pr component.pr \
+$DIFF component.pr ../resources/test_sync_command.output \
+  && $OPENGEODE --toAda system_structure.pr component.pr \
   && asn1scc -Ada --type-prefix asn1Scc dataview-uniq.asn component_datamodel.asn \
   && gcc -c component.adb \
-  && cd ..
-#  && rm -r -f $TEST_OUTPUT_DIR
+  && cd .. \
+  && rm -r -f $TEST_OUTPUT_DIR

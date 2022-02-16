@@ -67,10 +67,14 @@ configure_file(resources/test_timers.output resources/test_timers.output COPYONL
 configure_file(resources/test_timers.system_structure resources/test_timers.system_structure COPYONLY)
 configure_file(resources/test_timers.interfaceview resources/test_timers.interfaceview COPYONLY)
 
-
 configure_file(test_parameter_map.sh test_parameter_map.sh COPYONLY)
 configure_file(resources/test_parameter_map.xml resources/test_parameter_map.xml COPYONLY)
 configure_file(resources/test_parametermaphostprovider.output resources/test_parametermaphostprovider.output COPYONLY)
 configure_file(resources/test_parametermaphostprovider.system_structure resources/test_parametermaphostprovider.system_structure COPYONLY)
 configure_file(resources/test_parametermaphostrequirer.output resources/test_parametermaphostrequirer.output COPYONLY)
 configure_file(resources/test_parametermaphostrequirer.system_structure resources/test_parametermaphostrequirer.system_structure COPYONLY)
+
+configure_file(test_sync_command.sh test_sync_command.sh COPYONLY)
+configure_file(resources/test_sync_command.xml resources/test_sync_command.xml COPYONLY)
+configure_file(resources/test_sync_command.output resources/test_sync_command.output COPYONLY)
+configure_file(resources/test_sync_command.system_structure resources/test_sync_command.system_structure COPYONLY)
