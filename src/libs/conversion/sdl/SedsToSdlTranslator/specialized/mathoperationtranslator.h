@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -33,6 +33,13 @@ namespace conversion::sdl::translator {
 class MathOperationTranslator final
 {
 public:
+    /**
+     * @brief Tranlate a SEDS Math Operation into an SDL task
+     *
+     * @param elements Elements of the Math Operation
+     *
+     * @returns Text contents of the SDL task
+     */
     static auto translateOperation(const seds::model::MathOperation::Elements &elements) -> QString;
 
 private:

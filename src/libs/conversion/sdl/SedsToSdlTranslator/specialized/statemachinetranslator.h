@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -113,6 +113,11 @@ public:
     static auto translateParameterMaps(
             Context &context, const seds::model::ComponentImplementation::ParameterMapSet &parameterMaps) -> void;
 
+    /**
+     * @brief   Build mapping of names to command declarations
+     *
+     * @param context   Translation context which contains both the source component and the target map
+     */
     static auto buildCommandMap(Context &context) -> void;
 
 private:

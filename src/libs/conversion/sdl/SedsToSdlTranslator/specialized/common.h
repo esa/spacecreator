@@ -30,12 +30,32 @@
 
 namespace conversion::sdl::translator {
 
+/**
+ * @brief A helper class to store both sides of an assignment statement
+ */
 class AssignmentInfo
 {
 public:
+    /**
+     * @brief Constructor
+     *
+     * @param left  Target of the assignment
+     * @param right Source of the assignment
+     */
     AssignmentInfo(QString left, QString right);
 
+    /**
+     * @brief Accessor of the left side of the assignment
+     *
+     * @returns Left side of the assignment
+     */
     auto left() const -> QString;
+
+    /**
+     * @brief Accessor of the right side of the assignment
+     *
+     * @returns Right side of the assignment
+     */
     auto right() const -> QString;
 
 private:
@@ -43,13 +63,44 @@ private:
     QString m_right;
 };
 
+/**
+ * @brief A helper class to store additional extracted Activity information
+ *
+ */
 class ActivityInfo
 {
 public:
+    /**
+     * @brief Name accessor
+     *
+     * @returns Name of the relevant Activity
+     */
     auto name() -> QString;
+
+    /**
+     * @brief Return the return value assignments gathered from SendCommandPrimitive
+     *
+     * @returns Return assignment information
+     */
     auto returnAssignments() const -> const std::vector<AssignmentInfo> &;
+
+    /**
+     * @brief Parameterless constructor
+     */
     ActivityInfo() = default;
+
+    /**
+     * @brief Constructor
+     *
+     * @param name  Name of the relevant Activity
+     */
     ActivityInfo(QString name);
+
+    /**
+     * @brief Store assignment information
+     *
+     * @param assignment Assignment information to be stored
+     */
     auto addAssignment(AssignmentInfo assignment) -> void;
 
 private:
@@ -115,15 +166,48 @@ public:
      */
     auto sdlStateMachine() -> ::sdl::StateMachine *;
 
+    /**
+     * @brief Add Command definition
+     *
+     * @brief interface     Name of the hosting Interface
+     * @brief name          Name of the Command
+     * @brief definition    Command definition
+     */
     auto addCommand(const QString interface, const QString name, const seds::model::InterfaceCommand *definition)
             -> void;
 
+    /**
+     * @brief Get Command definition
+     *
+     * @brief interface     Name of the hosting Interface
+     * @brief name          Name of the Command
+     *
+     * @returns Command definition
+     */
     auto getCommand(const QString interface, const QString name) -> const seds::model::InterfaceCommand *;
 
+    /**
+     * @brief Return a map of Command names to Command definitions
+     *
+     * @return Returns map of Commands
+     */
     auto commands() -> const std::vector<std::pair<QString, const seds::model::InterfaceCommand *>>;
 
+    /**
+     * @brief Add Activity information
+     *
+     * @param name  Name of the Activity
+     * @param into  Activity information
+     */
     auto addActivityInfo(const QString name, ActivityInfo info) -> void;
 
+    /**
+     * @brief Return Activity information
+     *
+     * @param name Name of the Activity
+     *
+     * @returns Activity information
+     */
     auto getActivityInfo(QString name) -> const ActivityInfo *;
 
 private:

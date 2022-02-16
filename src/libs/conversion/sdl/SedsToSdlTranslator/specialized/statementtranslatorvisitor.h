@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -81,24 +81,28 @@ public:
          */
 
         auto sedsPackage() -> const seds::model::Package &;
+
         /**
          * @brief ASN.1 Model accessor
          *
          * @returns ASN.1 Model
          */
         auto asn1Model() -> Asn1Acn::Asn1Model *;
+
         /**
          * @brief InterfaceView Function accessor
          *
          * @returns InterfaceView Function Package
          */
         auto ivFunction() -> ivm::IVFunction *;
+
         /**
          * @brief SDL Process accessor
          *
          * @returns SDL Process
          */
         auto sdlProcess() -> ::sdl::Process *;
+
         /**
          * @brief SDL Procedure accessor
          *
@@ -106,8 +110,22 @@ public:
          */
         auto sdlProcedure() -> ::sdl::Procedure *;
 
+        /**
+         * @brief Add ActivityInfo
+         *
+         * @param name  Name of the Activity
+         * @param info  ActivityInfo to be added
+         */
         auto addActivityInfo(const QString name, ActivityInfo info) -> void;
 
+        /**
+         * @brief Retrieve InterfaceCommand
+         *
+         * @param interface     Name of the interface hosting the command
+         * @param name          Name of the command
+         *
+         * @return InterfaceCommand
+         */
         auto getCommand(const QString interface, const QString name) -> const seds::model::InterfaceCommand *;
 
     private:
@@ -123,7 +141,6 @@ public:
      * @param context           Shared translation context
      * @param sdlTransition     Target SDL transition
      */
-
     StatementTranslatorVisitor(StatementContext &context, ::sdl::Transition *sdlTransition);
 
     /**
@@ -132,30 +149,35 @@ public:
      * @param   invocation   Statement to translate
      */
     auto operator()(const seds::model::ActivityInvocation &invocation) -> void;
+
     /**
      * @brief   Translates SEDS assignment
      *
      * @param   assignment   Statement to translate
      */
     auto operator()(const seds::model::Assignment &assignment) -> void;
+
     /**
      * @brief   Translates SEDS calibration
      *
      * @param   calibration   Statement to translate
      */
     auto operator()(const seds::model::Calibration &calibration) -> void;
+
     /**
      * @brief   Translates SEDS conditional
      *
      * @param   conditional   Statement to translate
      */
     auto operator()(const seds::model::Conditional &conditional) -> void;
+
     /**
      * @brief   Translates SEDS iteration
      *
      * @param   iteration   Statement to translate
      */
     auto operator()(const seds::model::Iteration &iteration) -> void;
+
     /**
      * @brief   Translates SEDS operation
      *
