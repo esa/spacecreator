@@ -44,7 +44,7 @@ void SyncInterfaceCommandTranslator::translateCommand(
         const seds::model::InterfaceCommand &sedsCommand, ivm::IVInterface::InterfaceType interfaceType)
 {
     const auto interfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(
-            m_sedsInterfaceName, interfaceType, sedsCommand.nameStr());
+            m_sedsInterfaceName, sedsCommand.nameStr(), interfaceType);
 
     switch (sedsCommand.argumentsCombination()) {
     case seds::model::ArgumentsCombination::InOnly:

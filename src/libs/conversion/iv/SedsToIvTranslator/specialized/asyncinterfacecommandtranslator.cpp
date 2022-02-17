@@ -59,7 +59,7 @@ void AsyncInterfaceCommandTranslator::translateCommand(
     case seds::model::ArgumentsCombination::InOnly: {
         // In arguments are 'native', so they are handles as-is
         const auto interfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(
-                m_sedsInterfaceName, interfaceType, sedsCommand.nameStr());
+                m_sedsInterfaceName, sedsCommand.nameStr(), interfaceType);
         auto *ivInterface = InterfaceTranslatorHelper::createIvInterface(
                 interfaceName, interfaceType, ivm::IVInterface::OperationKind::Sporadic, m_ivFunction);
         translateArguments(sedsCommand, seds::model::CommandArgumentMode::In, ivInterface);
@@ -69,7 +69,7 @@ void AsyncInterfaceCommandTranslator::translateCommand(
         // Out arguments aren't supported by TASTE sporadic interface.
         // We cannot change the argument direction, so we switch interface type (provided <-> required)
         const auto interfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(m_sedsInterfaceName,
-                InterfaceTranslatorHelper::switchInterfaceType(interfaceType), sedsCommand.nameStr());
+                sedsCommand.nameStr(), InterfaceTranslatorHelper::switchInterfaceType(interfaceType));
         auto *ivInterface = InterfaceTranslatorHelper::createIvInterface(interfaceName,
                 InterfaceTranslatorHelper::switchInterfaceType(interfaceType),
                 ivm::IVInterface::OperationKind::Sporadic, m_ivFunction);
@@ -81,14 +81,14 @@ void AsyncInterfaceCommandTranslator::translateCommand(
         // In arguments - as-is
         // Notify arguments - switched interface type (provided <-> required)
         const auto inInterfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(
-                m_sedsInterfaceName, interfaceType, sedsCommand.nameStr());
+                m_sedsInterfaceName, sedsCommand.nameStr(), interfaceType);
         auto *ivInterfaceIn = InterfaceTranslatorHelper::createIvInterface(
                 inInterfaceName, interfaceType, ivm::IVInterface::OperationKind::Sporadic, m_ivFunction);
         translateArguments(sedsCommand, seds::model::CommandArgumentMode::In, ivInterfaceIn);
         m_ivFunction->addChild(ivInterfaceIn);
 
         const auto notifyInterfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(m_sedsInterfaceName,
-                InterfaceTranslatorHelper::switchInterfaceType(interfaceType), sedsCommand.nameStr());
+                sedsCommand.nameStr(), InterfaceTranslatorHelper::switchInterfaceType(interfaceType));
         auto *ivInterfaceNotify = InterfaceTranslatorHelper::createIvInterface(notifyInterfaceName,
                 InterfaceTranslatorHelper::switchInterfaceType(interfaceType),
                 ivm::IVInterface::OperationKind::Sporadic, m_ivFunction);
@@ -98,7 +98,7 @@ void AsyncInterfaceCommandTranslator::translateCommand(
     case seds::model::ArgumentsCombination::NoArgs: {
         // No arguments, no problems
         const auto interfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(
-                m_sedsInterfaceName, interfaceType, sedsCommand.nameStr());
+                m_sedsInterfaceName, sedsCommand.nameStr(), interfaceType);
         auto *ivInterface = InterfaceTranslatorHelper::createIvInterface(
                 interfaceName, interfaceType, ivm::IVInterface::OperationKind::Sporadic, m_ivFunction);
         m_ivFunction->addChild(ivInterface);

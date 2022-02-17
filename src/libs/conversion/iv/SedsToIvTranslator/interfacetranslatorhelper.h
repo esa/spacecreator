@@ -101,8 +101,8 @@ public:
      *
      * @return  Assembled name
      */
-    static auto buildCommandInterfaceName(const QString &sedsInterfaceName, const ivm::IVInterface::InterfaceType type,
-            const QString &commandName) -> QString;
+    static auto buildCommandInterfaceName(const QString &sedsInterfaceName, const QString &commandName,
+            const ivm::IVInterface::InterfaceType type) -> QString;
     /**
      * @brief   Assemble name for the array type
      *

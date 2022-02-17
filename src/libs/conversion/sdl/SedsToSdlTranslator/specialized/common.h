@@ -20,13 +20,10 @@
 #pragma once
 
 #include <asn1library/asn1/asn1model.h>
-#include <ivcore/ivmodel.h>
+#include <ivcore/ivfunction.h>
 #include <map>
-#include <sdl/SdlModel/procedurecall.h>
 #include <sdl/SdlModel/sdlmodel.h>
-#include <seds/SedsModel/components/states/entrystate.h>
-#include <seds/SedsModel/components/states/exitstate.h>
-#include <seds/SedsModel/sedsmodel.h>
+#include <seds/SedsModel/package/package.h>
 
 namespace conversion::sdl::translator {
 

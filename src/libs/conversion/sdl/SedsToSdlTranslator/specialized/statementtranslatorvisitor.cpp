@@ -217,7 +217,7 @@ auto StatementTranslatorVisitor::operator()(const seds::model::SendCommandPrimit
     const auto interfaceName = sendCommand.interface().value();
 
     const auto callName = InterfaceTranslatorHelper::buildCommandInterfaceName(
-            interfaceName, ivm::IVInterface::InterfaceType::Required, commandName);
+            interfaceName, commandName, ivm::IVInterface::InterfaceType::Required);
 
     // Check, if this is a sync return call
     const auto &command = m_context.getCommand(interfaceName, commandName);
@@ -258,14 +258,14 @@ auto StatementTranslatorVisitor::operator()(const seds::model::SendCommandPrimit
 auto StatementTranslatorVisitor::operator()(const seds::model::SendParameterPrimitive &sendParameter) -> void
 {
 
-    const auto mode = sendParameter.operation() == seds::model::ParameterOperation::Get
-            ? InterfaceParameterTranslator::InterfaceMode::Getter
-            : InterfaceParameterTranslator::InterfaceMode::Setter;
+    const auto parameterType = sendParameter.operation() == seds::model::ParameterOperation::Get
+            ? InterfaceTranslatorHelper::InterfaceParameterType::Getter
+            : InterfaceTranslatorHelper::InterfaceParameterType::Setter;
     const auto parameterName = sendParameter.parameter().value();
     const auto interfaceName = sendParameter.interface().value();
 
-    const auto callName = InterfaceParameterTranslator::getParameterName(
-            mode, interfaceName, ivm::IVInterface::InterfaceType::Required, parameterName);
+    const auto callName = InterfaceTranslatorHelper::buildParameterInterfaceName(
+            interfaceName, parameterName, parameterType, ivm::IVInterface::InterfaceType::Required);
 
     // Process name carries iv-escaped component name
     const auto interface = findIvInterface(m_context.ivFunction(), callName);

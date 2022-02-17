@@ -17,32 +17,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "statemachinetranslator.h"
-#include "statementtranslatorvisitor.h"
+#include "common.h"
 
 #include <algorithm>
-#include <conversion/asn1/SedsToAsn1Translator/translator.h>
-#include <conversion/common/escaper/escaper.h>
-#include <conversion/common/overloaded.h>
-#include <conversion/common/translation/exceptions.h>
-#include <conversion/iv/SedsToIvTranslator/specialized/componentstranslator.h>
-#include <conversion/iv/SedsToIvTranslator/specialized/interfacecommandtranslator.h>
-#include <conversion/iv/SedsToIvTranslator/specialized/interfaceparametertranslator.h>
-#include <conversion/iv/SedsToIvTranslator/translator.h>
-#include <iostream>
 #include <ivcore/ivfunction.h>
-#include <ivcore/ivmodel.h>
-#include <sdl/SdlModel/nextstate.h>
-#include <sdl/SdlModel/task.h>
-
-using conversion::Escaper;
-using conversion::asn1::translator::SedsToAsn1Translator;
-using conversion::iv::translator::ComponentsTranslator;
-using conversion::iv::translator::InterfaceCommandTranslator;
-using conversion::iv::translator::InterfaceParameterTranslator;
-using conversion::translator::MissingAsn1TypeDefinitionException;
-using conversion::translator::MissingInterfaceViewFunctionException;
-using conversion::translator::TranslationException;
 
 namespace conversion::sdl::translator {
 

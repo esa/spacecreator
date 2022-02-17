@@ -26,9 +26,10 @@
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
-#include <conversion/iv/SedsToIvTranslator/specialized/componentstranslator.h>
 #include <conversion/iv/SedsToIvTranslator/interfacetranslatorhelper.h>
+#include <conversion/iv/SedsToIvTranslator/specialized/componentstranslator.h>
 #include <conversion/iv/SedsToIvTranslator/translator.h>
+#include <iostream>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
 #include <sdl/SdlModel/nextstate.h>
@@ -101,7 +102,9 @@ static inline auto getOnEntry(const seds::model::StateMachine &sedsStateMachine,
 static inline auto getInterfaceByName(ivm::IVFunction *function, QString name) -> ivm::IVInterface *
 {
     for (auto interface : function->allInterfaces()) {
+        std::cerr << interface->title().toStdString() << " ?= " << name.toStdString() << "\n";
         if (interface->title() == name) {
+            std::cerr << "ok\n\n";
             return interface;
         }
     }
@@ -189,8 +192,8 @@ static inline auto getConsistentUnconditionalActivityInvocation(
 static inline auto generateProcedureForSyncCommand(Context &context, const seds::model::StateMachine &sedsStateMachine,
         const QString interfaceName, const seds::model::InterfaceCommand &command) -> void
 {
-    const auto &name = InterfaceCommandTranslator::getCommandName(
-            interfaceName, ivm::IVInterface::InterfaceType::Provided, command.nameStr());
+    const auto &name = InterfaceTranslatorHelper::buildCommandInterfaceName(
+            interfaceName, command.nameStr(), ivm::IVInterface::InterfaceType::Provided);
     const auto &ivInterface = getInterfaceByName(context.ivFunction(), name);
     auto procedure = std::make_unique<::sdl::Procedure>(name);
     for (const auto &ivParameter : ivInterface->params()) {
@@ -391,10 +394,11 @@ auto StateMachineTranslator::getAnyState(::sdl::StateMachine *stateMachine) -> :
 auto StateMachineTranslator::getParameterInterface(ivm::IVFunction *function, const ParameterType type,
         const ParameterMode mode, const QString interfaceName, const QString parameterName) -> ivm::IVInterface *
 {
-    const auto kind = type == ParameterType::Getter ? InterfaceParameterTranslator::InterfaceMode::Getter
-                                                    : InterfaceParameterTranslator::InterfaceMode::Setter;
-    const auto name = InterfaceParameterTranslator::getParameterName(
-            kind, interfaceName, ivm::IVInterface::InterfaceType::Provided, parameterName);
+    const auto parameterType = type == ParameterType::Getter
+            ? InterfaceTranslatorHelper::InterfaceParameterType::Getter
+            : InterfaceTranslatorHelper::InterfaceParameterType::Setter;
+    const auto name = InterfaceTranslatorHelper::buildParameterInterfaceName(
+            interfaceName, parameterName, parameterType, ivm::IVInterface::InterfaceType::Provided);
     auto interface = getInterfaceByName(function, name);
     if (interface == nullptr) {
         return nullptr;
@@ -569,15 +573,15 @@ auto StateMachineTranslator::translatePrimitive(Context &context, const seds::mo
 
     // Input signal can be received only via a provided interface
     const auto &inputName = InterfaceTranslatorHelper::buildCommandInterfaceName(
-            command.interface().value(), ivm::IVInterface::InterfaceType::Provided, command.command().value());
+            command.interface().value(), command.command().value(), ivm::IVInterface::InterfaceType::Provided);
     input->setName(inputName);
 
     if (command.argumentValues().empty()) {
         return std::make_pair(std::move(input), std::move(unpackingActions));
     }
-    const auto interface = getInterfaceByName(context.ivFunction(), name);
+    const auto interface = getInterfaceByName(context.ivFunction(), inputName);
     if (interface == nullptr) {
-        throw TranslationException(QString("Interface %1 not found").arg(name));
+        throw TranslationException(QString("Interface %1 not found").arg(inputName));
     }
     const bool isSporadic = interface->kind() == ivm::IVInterface::OperationKind::Sporadic;
     if (isSporadic) {
@@ -607,15 +611,15 @@ auto StateMachineTranslator::translatePrimitive(Context &context, const seds::mo
         -> InputHandler
 {
     auto sdlProcess = context.sdlProcess();
-    const auto mode = parameter.operation() == seds::model::ParameterOperation::Set
-            ? InterfaceParameterTranslator::InterfaceMode::Setter
-            : InterfaceParameterTranslator::InterfaceMode::Getter;
+    const auto parameterType = parameter.operation() == seds::model::ParameterOperation::Set
+            ? InterfaceTranslatorHelper::InterfaceParameterType::Setter
+            : InterfaceTranslatorHelper::InterfaceParameterType::Getter;
     auto input = std::make_unique<::sdl::Input>();
     std::vector<std::unique_ptr<::sdl::Action>> unpackingActions;
 
     // Input signal can be received only via a provided interface
-    const auto name = InterfaceParameterTranslator::getParameterName(mode, parameter.interface().value(),
-            ivm::IVInterface::InterfaceType::Provided, parameter.parameter().value());
+    const auto name = InterfaceTranslatorHelper::buildParameterInterfaceName(parameter.interface().value(),
+            parameter.parameter().value(), parameterType, ivm::IVInterface::InterfaceType::Provided);
     input->setName(name);
     const auto interface = getInterfaceByName(context.ivFunction(), name);
     if (interface == nullptr) {

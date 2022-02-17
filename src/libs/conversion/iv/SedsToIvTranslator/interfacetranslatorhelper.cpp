@@ -114,7 +114,7 @@ QString InterfaceTranslatorHelper::buildParameterInterfaceName(const QString &se
 }
 
 QString InterfaceTranslatorHelper::buildCommandInterfaceName(
-        const QString &sedsInterfaceName, const ivm::IVInterface::InterfaceType type, const QString &commandName)
+        const QString &sedsInterfaceName, const QString &commandName, const ivm::IVInterface::InterfaceType type)
 {
     return Escaper::escapeIvName(
             m_ivCommandInterfaceNameTemplate.arg(sedsInterfaceName).arg(commandName).arg(interfaceTypeToString(type)));
