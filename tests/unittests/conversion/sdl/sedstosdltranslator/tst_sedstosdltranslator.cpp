@@ -56,6 +56,7 @@ using conversion::Options;
 using conversion::sdl::translator::ActivityTranslator;
 using conversion::sdl::translator::MathOperationTranslator;
 using conversion::sdl::translator::SedsToSdlTranslator;
+using conversion::sdl::translator::StatementTranslatorVisitor;
 using conversion::translator::TranslationException;
 
 using tests::conversion::common::Asn1ModelBuilder;
@@ -121,6 +122,7 @@ private Q_SLOTS:
     void testTranslateActivityCallWithReference();
     void testTranslateSendCommand();
     void testTranslateOnEntryAndOnExit();
+    void testTranslateVariableReferences();
 };
 
 void tst_SedsToSdlTranslator::testMissingModel()
@@ -1183,6 +1185,17 @@ void tst_SedsToSdlTranslator::testTranslateOnEntryAndOnExit()
     const auto activityInvocationB = dynamic_cast<const ::sdl::ProcedureCall *>(activityInvocationActionB);
     QVERIFY(activityInvocationB);
     QCOMPARE(activityInvocationB->procedure()->name(), "activity1");
+}
+
+void tst_SedsToSdlTranslator::testTranslateVariableReferences()
+{
+    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("XXX"), "xXX");
+    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("aa[bb]"), "aa(bb)");
+    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("aa.bb"), "aa.bb");
+    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("a1[2]"), "a1(2)");
+    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("111a[2]"), "a(2)");
+    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("111&^%@a[2]"), "a(2)");
+    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("a[b[c.d]]"), "a(b(c.d))");
 }
 
 } // namespace conversion::sdl::test

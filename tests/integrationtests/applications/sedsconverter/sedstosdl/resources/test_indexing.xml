@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="Indexing">
+    <DataTypeSet>
+      <IntegerDataType name="Scalar">
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="100" />
+        </Range>
+      </IntegerDataType>
+      <ArrayDataType name="Vector" dataTypeRef="Scalar">
+        <DimensionList>
+          <Dimension size="10" />
+        </DimensionList>
+      </ArrayDataType>
+      <ContainerDataType name="Container">
+        <EntryList>
+          <Entry name="a" type="Scalar" />
+          <Entry name="b" type="Scalar" />
+          <Entry name="v" type="Vector" />
+        </EntryList>
+      </ContainerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface level="subnetwork" name="TI">
+        <CommandSet>
+          <Command name="C" mode="async">
+            <Argument name="arg" type="Container" />
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="Component">
+        <ProvidedInterfaceSet>
+          <Interface name="I" type="TI" />
+        </ProvidedInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="var1" type="Container" />
+            <Variable name="var2" type="Container" />
+          </VariableSet>
+          <ActivitySet>
+            <Activity name="Activity">
+              <Body>
+                <Assignment outputVariableRef="var2">
+                  <VariableRef variableRef="var1" />
+                </Assignment>
+                <Assignment outputVariableRef="var2.a">
+                  <VariableRef variableRef="var1.b" />
+                </Assignment>
+                <Assignment outputVariableRef="var2.b">
+                  <Value value="2" />
+                </Assignment>
+                <Assignment outputVariableRef="var2.v[1]">
+                  <VariableRef variableRef="var1.v[2]" />
+                </Assignment>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="StateMachine">
+              <State name="s2" />
+              <EntryState name="s1" />
+              <Transition fromState="s1" toState="s2" name="dummy">
+                <OnCommandPrimitive command="C" interface="I">
+                  <ArgumentValue name="arg" outputVariableRef="var1" />
+                </OnCommandPrimitive>
+                <Do activity="Activity" />
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>
