@@ -238,28 +238,22 @@ static inline auto generateProcedureForSyncCommand(Context &context, const seds:
 static inline auto buildCommandMapInternal(
         Context &context, QString interfaceName, const seds::model::InterfaceDeclaration &intefaceDeclaration) -> void
 {
-    // ASN.1 definitions are not needed for the called functions
-    ComponentsTranslator ct(&(context.sedsPackage()), NULL);
-
     for (const auto &command : intefaceDeclaration.commands()) {
         context.addCommand(interfaceName, command.nameStr(), &command);
     }
 
     for (const auto &baseInterface : intefaceDeclaration.baseInterfaces()) {
-        const auto &baseIntefaceDeclaration =
-                ct.findInterfaceDeclaration(baseInterface.type().nameStr(), context.sedsComponent());
+        const auto &baseIntefaceDeclaration = ComponentsTranslator::findInterfaceDeclaration(
+                baseInterface.type().nameStr(), context.sedsComponent(), &context.sedsPackage());
         buildCommandMapInternal(context, interfaceName, baseIntefaceDeclaration);
     }
 }
 
 auto StateMachineTranslator::buildCommandMap(Context &context) -> void
 {
-    // ASN.1 definitions are not needed for the called functions
-    ComponentsTranslator ct(&(context.sedsPackage()), NULL);
-
     for (const auto &interface : context.sedsComponent().providedInterfaces()) {
-        const auto &intefaceDeclaration =
-                ct.findInterfaceDeclaration(interface.type().nameStr(), context.sedsComponent());
+        const auto &intefaceDeclaration = ComponentsTranslator::findInterfaceDeclaration(
+                interface.type().nameStr(), context.sedsComponent(), &context.sedsPackage());
         buildCommandMapInternal(context, interface.nameStr(), intefaceDeclaration);
     }
 }

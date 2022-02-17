@@ -88,13 +88,14 @@ public:
      *
      * @param   name            Interface declaration name
      * @param   sedsComponent   Component to search in
+     * @param   sedsPackage     Package to search in, if the search in the component fails
      *
      * @throw UndeclaredInterfaceException  If interface declaration was not found
      *
      * @return  Found interface declarartion
      */
-    auto findInterfaceDeclaration(const QString &name, const seds::model::Component &sedsComponent) const
-            -> const seds::model::InterfaceDeclaration &;
+    static auto findInterfaceDeclaration(const QString &name, const seds::model::Component &sedsComponent,
+            const seds::model::Package *sedsPackage) -> const seds::model::InterfaceDeclaration &;
 
 private:
     /**
