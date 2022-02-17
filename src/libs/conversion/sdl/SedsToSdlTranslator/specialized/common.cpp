@@ -48,8 +48,8 @@ namespace conversion::sdl::translator {
 
 AssignmentInfo::AssignmentInfo(QString left, QString right)
 {
-    m_left = left;
-    m_right = right;
+    m_left = std::move(left);
+    m_right = std::move(right);
 }
 
 auto AssignmentInfo::left() const -> QString
@@ -59,6 +59,11 @@ auto AssignmentInfo::left() const -> QString
 auto AssignmentInfo::right() const -> QString
 {
     return m_right;
+}
+
+ActivityInfo::ActivityInfo(QString name)
+{
+    m_name = name;
 }
 
 auto ActivityInfo::name() -> QString
@@ -71,10 +76,6 @@ auto ActivityInfo::returnAssignments() const -> const std::vector<AssignmentInfo
     return m_returnAssignments;
 }
 
-ActivityInfo::ActivityInfo(QString name)
-{
-    m_name = name;
-}
 auto ActivityInfo::addAssignment(AssignmentInfo assignment) -> void
 {
     m_returnAssignments.push_back(assignment);

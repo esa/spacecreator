@@ -71,6 +71,18 @@ class ActivityInfo
 {
 public:
     /**
+     * @brief Parameterless constructor
+     */
+    ActivityInfo() = default;
+
+    /**
+     * @brief Constructor
+     *
+     * @param name  Name of the relevant Activity
+     */
+    ActivityInfo(QString name);
+
+    /**
      * @brief Name accessor
      *
      * @returns Name of the relevant Activity
@@ -83,18 +95,6 @@ public:
      * @returns Return assignment information
      */
     auto returnAssignments() const -> const std::vector<AssignmentInfo> &;
-
-    /**
-     * @brief Parameterless constructor
-     */
-    ActivityInfo() = default;
-
-    /**
-     * @brief Constructor
-     *
-     * @param name  Name of the relevant Activity
-     */
-    ActivityInfo(QString name);
 
     /**
      * @brief Store assignment information

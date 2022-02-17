@@ -142,27 +142,34 @@ static inline auto getConsistentUnconditionalActivityInvocation(
         }
     }
     // primitive is now guaranteed to be OnCommandPrimitive
-    assert(std::holds_alternative<seds::model::OnCommandPrimitive>(transitions[0]->primitive()));
+    if (!std::holds_alternative<seds::model::OnCommandPrimitive>(transitions[0]->primitive())) {
+        throw TranslationException("Uknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
+                                   "a transition which is not OnCommandPrimitive");
+    }
     const auto &primitive = std::get<seds::model::OnCommandPrimitive>(transitions[0]->primitive());
     for (const auto otherTransition : transitions) {
-        assert(std::holds_alternative<seds::model::OnCommandPrimitive>(otherTransition->primitive()));
+        if (!std::holds_alternative<seds::model::OnCommandPrimitive>(otherTransition->primitive())) {
+            throw TranslationException(
+                    "Uknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
+                    "a transition which is not OnCommandPrimitive");
+        }
         const auto &otherPrimitive = std::get<seds::model::OnCommandPrimitive>(otherTransition->primitive());
         if (primitive.argumentValues().size() != otherPrimitive.argumentValues().size()) {
             throw TranslationException("Inconsistent number of arguments associated with a sync command");
         }
         for (size_t i = 0; i < primitive.argumentValues().size(); i++) {
-            if ((primitive.argumentValues()[i].name().value() != otherPrimitive.argumentValues()[i].name().value())
-                    || (primitive.argumentValues()[i].outputVariableRef().value().value()
-                               != otherPrimitive.argumentValues()[i].outputVariableRef().value().value())) {
+            const auto &argumentName = primitive.argumentValues()[i].name().value();
+            const auto &otherArgumentName = otherPrimitive.argumentValues()[i].name().value();
+            const auto &outputVariable = primitive.argumentValues()[i].outputVariableRef().value().value();
+            const auto &otherOutputVariable = otherPrimitive.argumentValues()[i].outputVariableRef().value().value();
+            if ((argumentName != otherArgumentName) || (outputVariable != otherOutputVariable)) {
                 throw TranslationException("Inconsistent argument assignments associated with a sync command");
             }
         }
     }
     // doActivity optional is now guaranteed to have a value
-    assert(transitions[0]->doActivity().has_value());
     const auto invocation = &(*(transitions[0]->doActivity()));
     for (const auto transition : transitions) {
-        assert(transition->doActivity().has_value());
         const auto otherInvocation = &(*(transition->doActivity()));
         if (invocation->activity().value() != otherInvocation->activity().value()) {
             throw TranslationException("Inconsistent activities associated with a sync command");
@@ -201,7 +208,11 @@ static inline auto generateProcedureForSyncCommand(Context &context, const seds:
     const auto activityInvocation = getConsistentUnconditionalActivityInvocation(transitions);
     // If a consistent invocation is found, the transitions consistently contain an OnCommandPrimitive
     // The first one is exactly the same as the other ones
-    assert(std::holds_alternative<seds::model::OnCommandPrimitive>(transitions[0]->primitive()));
+    if (!std::holds_alternative<seds::model::OnCommandPrimitive>(transitions[0]->primitive())) {
+        throw TranslationException("Uknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
+                                   "a transition which is not OnCommandPrimitive");
+    }
+
     const auto &primitive = std::get<seds::model::OnCommandPrimitive>(transitions[0]->primitive());
     for (const auto &argument : primitive.argumentValues()) {
         const auto targetVariableName = Escaper::escapeAsn1FieldName(argument.outputVariableRef().value().value());
@@ -732,7 +743,10 @@ auto StateMachineTranslator::translateTransition(Context &context, const seds::m
         const auto &onCommandPrimitive = std::get<seds::model::OnCommandPrimitive>(sedsTransition.primitive());
         const auto command =
                 context.getCommand(onCommandPrimitive.interface().value(), onCommandPrimitive.command().value());
-        assert(command != nullptr);
+        if (command == nullptr) {
+            throw TranslationException(
+                    QString("Transition on undefined command %1").arg(onCommandPrimitive.command().value()));
+        }
         if (command->mode() == seds::model::InterfaceCommandMode::Sync) {
             invokeDoActivity = false;
         }
