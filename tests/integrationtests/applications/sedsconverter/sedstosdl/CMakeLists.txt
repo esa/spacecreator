@@ -79,3 +79,8 @@ configure_file(test_sync_command.sh test_sync_command.sh COPYONLY)
 configure_file(resources/test_sync_command.xml resources/test_sync_command.xml COPYONLY)
 configure_file(resources/test_sync_command.output resources/test_sync_command.output COPYONLY)
 configure_file(resources/test_sync_command.system_structure resources/test_sync_command.system_structure COPYONLY)
+
+configure_file(test_indexing.sh test_indexing.sh COPYONLY)
+configure_file(resources/test_indexing.xml resources/test_indexing.xml COPYONLY)
+configure_file(resources/test_indexing.output resources/test_indexing.output COPYONLY)
+configure_file(resources/test_indexing.system_structure resources/test_indexing.system_structure COPYONLY)
