@@ -38,11 +38,44 @@ class SizeTranslatorVisitor final
 
 public:
     /**
+     * @brief Length type
+     */
+    enum class LengthType
+    {
+        /**
+         * @brief Fixed length (e.g. for SEDS Arrays)
+         */
+        FixedLength,
+        /**
+         * @brief Variable length (e.g. for SEDS List Entries)
+         */
+        VariableLength
+    };
+
+    /**
+     * @brief Type of the source for size derivation
+     */
+    enum class SourceType
+    {
+        /**
+         * @brief Length is determined by an index
+         */
+        Index,
+        /**
+         * @brief Length is determined by a field with a range
+         */
+        Determinant
+    };
+
+    /**
      * @brief   Constructor
      *
      * @param   asn1Type        ASN.1 type that is currently translated
+     * @param   lengthType      Type of the desired constraint
+     * @param   sourceType      Type of the source to derive the size from
      */
-    explicit SizeTranslatorVisitor(Asn1Acn::Types::Type *asn1Type);
+    explicit SizeTranslatorVisitor(
+            Asn1Acn::Types::Type *asn1Type, const LengthType lengthType, const SourceType sourceType);
     /**
      * @brief   Deleted copy constructor
      */
@@ -60,6 +93,13 @@ public:
      */
     SizeTranslatorVisitor &operator=(SizeTranslatorVisitor &&) = delete;
 
+    /**
+     * @brief   Returns last set minimum
+     *
+     * @returns Last set minimum
+     */
+    auto getLastSetMin() const -> typename Asn1Acn::IntegerValue::Type;
+
 public:
     /**
      * @brief   Translate SEDS min-max range
@@ -76,17 +116,18 @@ public:
 
 public:
     /**
-     * @brief   Create size constraint from given range
+     * @brief   Create size constraint from given maximum value
      *
-     * @param   range   Range
+     * @param   max   Maximum value
      *
      * @return  ASN.1 size constraint
      */
-    auto addSizeConstraint(const Asn1Acn::Range<typename Asn1Acn::IntegerValue::Type> &range) -> void;
+    auto addSizeConstraint(const typename Asn1Acn::IntegerValue::Type max) -> void;
     /**
      * @brief   Create size constraint from given min and max values
      *
-     * @param   range   Range
+     * @param   min   Minimum value
+     * @param   max   Maximum value
      *
      * @return  ASN.1 size constraint
      */
@@ -113,12 +154,24 @@ private:
 
 private:
     Type *m_asn1Type;
+    typename Asn1Acn::IntegerValue::Type m_lastSetMin;
+    LengthType m_lengthType;
+    SourceType m_sourceType;
 };
 
 template<typename Type, typename ValueType>
-SizeTranslatorVisitor<Type, ValueType>::SizeTranslatorVisitor(Asn1Acn::Types::Type *asn1Type)
+SizeTranslatorVisitor<Type, ValueType>::SizeTranslatorVisitor(
+        Asn1Acn::Types::Type *asn1Type, const LengthType lengthType, const SourceType sourceType)
     : m_asn1Type(dynamic_cast<Type *>(asn1Type))
+    , m_lengthType(lengthType)
+    , m_sourceType(sourceType)
 {
+}
+
+template<typename Type, typename ValueType>
+auto SizeTranslatorVisitor<Type, ValueType>::getLastSetMin() const -> typename Asn1Acn::IntegerValue::Type
+{
+    return m_lastSetMin;
 }
 
 template<typename Type, typename ValueType>
@@ -175,23 +228,32 @@ void SizeTranslatorVisitor<Type, ValueType>::operator()(const seds::model::MinMa
     } break;
     }
 }
+
 template<typename Type, typename ValueType>
-void SizeTranslatorVisitor<Type, ValueType>::addSizeConstraint(
-        const Asn1Acn::Range<typename Asn1Acn::IntegerValue::Type> &range)
+void SizeTranslatorVisitor<Type, ValueType>::addSizeConstraint(const typename Asn1Acn::IntegerValue::Type max)
 {
-    auto rangeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(range);
-
-    auto sizeConstraint = std::make_unique<SizeConstraint>();
-    sizeConstraint->setInnerConstraints(std::move(rangeConstraint));
-
-    m_asn1Type->constraints().append(std::move(sizeConstraint));
+    addSizeConstraint(Asn1Acn::IntegerValue::Type(), max);
 }
 
 template<typename Type, typename ValueType>
 void SizeTranslatorVisitor<Type, ValueType>::addSizeConstraint(
         const typename Asn1Acn::IntegerValue::Type &min, const typename Asn1Acn::IntegerValue::Type &max)
 {
-    auto rangeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create({ min, max });
+    // This is currently a NOP, but in theory, there should be a difference whether the size
+    // is derived from index o a determinant field. Let's consider the following examples:
+    // length field with range 0..255 -> implies size 0..255
+    // index field with range 0..255 -> implies size 0..256 (so that 255 is the last valid index)
+    // However, CCSDS 876.0-B-1 explicitly states that:
+    // "The maximum length of an array with a specified index type can be found by looking
+    // at the maximum value of the index range (e.g., an array with index type ‘8 bit
+    // unsigned’ has a maximum size of 255)."
+    // Index type "8-bit" has valid values of 0..255, and if the maximum size of an array is 255,
+    // then index 255 is invalid. Therefore it is assumed that the last index value is treated
+    // as an invalid/length identifier, similarly in concept to end().
+    const auto actualMax = max;
+    m_lastSetMin = min;
+    auto rangeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
+            { m_lengthType == LengthType::FixedLength ? actualMax : min, actualMax });
 
     auto sizeConstraint = std::make_unique<SizeConstraint>();
     sizeConstraint->setInnerConstraints(std::move(rangeConstraint));

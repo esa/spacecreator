@@ -64,7 +64,7 @@ void tst_SedsConverter_SedsToAsn1::testSimpleDataTypes()
 /// \SRS  ETB-IF-120
 void tst_SedsConverter_SedsToAsn1::testSubRangeDataType()
 {
-    const int result = system("./test_simple_data_types.sh");
+    const int result = system("./test_sub_range_data_type.sh");
     QCOMPARE(result, 0);
 }
 

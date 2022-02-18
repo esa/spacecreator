@@ -52,6 +52,8 @@ using conversion::translator::UndeclaredDataTypeException;
 
 namespace conversion::asn1::translator {
 
+using SizeTranslator = SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn::IntegerValue>;
+
 EntryTranslatorVisitor::EntryTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence,
         Asn1Acn::Definitions *asn1Definitions, const seds::model::ContainerDataType *sedsParentContainer,
         const seds::model::Package *sedsPackage)
@@ -340,7 +342,8 @@ void EntryTranslatorVisitor::addListSizeConstraint(
     const auto listLengthEntryType = m_sedsPackage->dataType(listLengthEntryTypeName);
 
     if (const auto listLengthEntryIntegerType = std::get_if<seds::model::IntegerDataType>(listLengthEntryType)) {
-        SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn::IntegerValue> sizeTranslator(asn1Type);
+        SizeTranslator sizeTranslator(
+                asn1Type, SizeTranslator::LengthType::VariableLength, SizeTranslator::SourceType::Determinant);
         std::visit(sizeTranslator, listLengthEntryIntegerType->range());
     } else {
         auto errorMessage = QString(

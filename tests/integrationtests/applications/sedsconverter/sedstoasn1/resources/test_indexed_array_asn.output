@@ -1,7 +1,7 @@
 COM-N7SPACE-INDEXEDARRAY DEFINITIONS ::= BEGIN
 DataItem ::= INTEGER(0 .. 255)
 IndexItem ::= INTEGER(0 .. 65535)
-IntegerIndexedArray ::= SEQUENCE (SIZE(65536)) OF DataItem(0 .. 255)
+IntegerIndexedArray ::= SEQUENCE (SIZE(65535)) OF DataItem(0 .. 255)
 EnumItem ::= ENUMERATED
 {
     value1(12),

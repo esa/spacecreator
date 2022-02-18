@@ -27,8 +27,7 @@ target_link_libraries(SedsToAsn1Translator
     PUBLIC      Conversion::Common
                 asn1library
                 SEDS::Model
-    PRIVATE     CommonProjectWarnings
-                Asn1ToPromelaTranslator)
+    PRIVATE     CommonProjectWarnings)
 
 add_format_target(SedsToAsn1Translator)
 add_tidy_target(SedsToAsn1Translator)

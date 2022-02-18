@@ -24,7 +24,6 @@
 
 #include <asn1library/asn1/values.h>
 #include <conversion/common/translation/exceptions.h>
-#include <promela/Asn1ToPromelaTranslator/visitors/integerconstraintvisitor.h>
 #include <seds/SedsModel/package/package.h>
 #include <seds/SedsModel/types/dimensionsize.h>
 #include <seds/SedsModel/types/enumerateddatatype.h>
@@ -34,6 +33,8 @@ using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::TranslationException;
 
 namespace conversion::asn1::translator {
+
+using SizeTranslator = SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn::IntegerValue>;
 
 DimensionTranslator::DimensionTranslator(const seds::model::Package *sedsPackage)
     : m_sedsPackage(sedsPackage)
@@ -87,18 +88,11 @@ void DimensionTranslator::translateIndexDimension(
     }
 
     if (const auto integerIndexType = std::get_if<seds::model::IntegerDataType>(indexType); integerIndexType) {
-        SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn::IntegerValue> sizeTranslator(asn1SequenceOf);
+        SizeTranslator sizeTranslator(
+                asn1SequenceOf, SizeTranslator::LengthType::FixedLength, SizeTranslator::SourceType::Index);
         std::visit(sizeTranslator, integerIndexType->range());
 
-        promela::translator::IntegerConstraintVisitor integerConstraintVisitor;
-        asn1SequenceOf->constraints().accept(integerConstraintVisitor);
-        if (!integerConstraintVisitor.isSizeConstraintVisited()) {
-            auto errorMessage = QString("Minimum value of %1 used as an index type for %2 not found")
-                                        .arg(integerIndexType->nameStr())
-                                        .arg(asn1SequenceOf->identifier());
-            throw TranslationException(std::move(errorMessage));
-        }
-        if (integerConstraintVisitor.getMinSize() != 0) {
+        if (sizeTranslator.getLastSetMin() != 0) {
             auto errorMessage = QString("The lowest value of integer %1 used as an index type for %2 is not 0, and due "
                                         "to ASN.1 limitations it is not supported")
                                         .arg(integerIndexType->nameStr())
@@ -137,7 +131,8 @@ void DimensionTranslator::translateEnumDimensionIndex(
         throw TranslationException(std::move(errorMessage));
     }
 
-    SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn::IntegerValue> sizeTranslator(asn1SequenceOf);
+    SizeTranslator sizeTranslator(
+            asn1SequenceOf, SizeTranslator::LengthType::FixedLength, SizeTranslator::SourceType::Index);
     if (enumValues.front() != 0) {
         auto errorMessage = QString("The lowest value of enumeration %1 used as an index type for %2 is not 0, and due "
                                     "to ASN.1 limitations it is not supported")
