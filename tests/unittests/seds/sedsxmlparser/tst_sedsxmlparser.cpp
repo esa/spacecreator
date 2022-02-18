@@ -101,7 +101,7 @@ void tst_SedsXmlParser::testContainerDataTypesParsing()
 
         const auto &arrayType = std::get<model::ArrayDataType>(dataTypeSet.at(3));
         QCOMPARE(arrayType.name().value(), "ArrayType");
-        QCOMPARE(arrayType.type().value().name().value(), "DataItemA");
+        QCOMPARE(arrayType.typeRef().value().name().value(), "DataItemA");
         QCOMPARE(arrayType.dimensions().size(), 1);
 
         const auto &dimension = arrayType.dimensions().at(0);

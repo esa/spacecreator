@@ -66,7 +66,7 @@ auto DataTypeExporter::exportArrayDataType(
 {
     auto typeElement = sedsDocument.createElement(QStringLiteral("ArrayDataType"));
     typeElement.setAttribute(QStringLiteral("name"), dataType.nameStr());
-    typeElement.setAttribute(QStringLiteral("dataTypeRef"), dataType.type().nameStr());
+    typeElement.setAttribute(QStringLiteral("dataTypeRef"), dataType.typeRef().nameStr());
 
     auto dimensionsElement = sedsDocument.createElement(QStringLiteral("DimensionList"));
 

@@ -21,6 +21,8 @@
 
 #include "base/qualifiedname.h"
 
+#include <optional>
+
 namespace seds::model {
 
 class DataTypeRef final
@@ -33,11 +35,13 @@ public:
 
 public:
     auto value() const -> const QualifiedName &;
+    auto package() const -> const std::optional<common::String> &;
 
 public:
     auto nameStr() const -> const QString &;
 
 private:
+    std::optional<common::String> m_package;
     QualifiedName m_value;
 };
 

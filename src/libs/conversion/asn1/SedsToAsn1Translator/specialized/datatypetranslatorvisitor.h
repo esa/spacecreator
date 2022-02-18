@@ -241,10 +241,11 @@ private:
     /**
      * @brief   Translate SEDS array type
      *
-     * @param   sedsTypeName    SEDS array element type name
+     * @param   sedsTypeRef     SEDS array element type ref
      * @param   asn1Type        ASN.1 type that will be updated
      */
-    auto translateArrayType(const QString &sedsTypeName, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
+    auto translateArrayType(const seds::model::DataTypeRef &sedsTypeRef, Asn1Acn::Types::SequenceOf *asn1Type) const
+            -> void;
     /**
      * @brief   Translate SEDS enumeration list
      *

@@ -31,7 +31,7 @@ void ArrayDataType::addDimension(DimensionSize dimension)
     m_dimensions.push_back(std::move(dimension));
 }
 
-const DataTypeRef &ArrayDataType::type() const
+const DataTypeRef &ArrayDataType::typeRef() const
 {
     return m_type;
 }

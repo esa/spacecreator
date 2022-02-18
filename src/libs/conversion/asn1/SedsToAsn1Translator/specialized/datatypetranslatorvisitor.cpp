@@ -83,7 +83,7 @@ void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
 
     if (dimensions.size() == 1) { // Sequence of type with one dimension
         auto type = std::make_unique<Asn1Acn::Types::SequenceOf>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
-        translateArrayType(Escaper::escapeAsn1TypeName(sedsType.type().nameStr()), type.get());
+        translateArrayType(sedsType.typeRef(), type.get());
         dimensionTranslator.translateDimension(dimensions[0], type.get());
 
         m_asn1Type = std::move(type);
@@ -103,7 +103,7 @@ void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
         });
 
         // Add item type to the last element
-        translateArrayType(Escaper::escapeAsn1TypeName(sedsType.type().nameStr()), lastType);
+        translateArrayType(sedsType.typeRef(), lastType);
 
         m_asn1Type = std::move(rootType);
     }
@@ -488,8 +488,10 @@ void DataTypeTranslatorVisitor::translateStringLength(
 }
 
 void DataTypeTranslatorVisitor::translateArrayType(
-        const QString &sedsTypeName, Asn1Acn::Types::SequenceOf *asn1Type) const
+        const seds::model::DataTypeRef &sedsTypeRef, Asn1Acn::Types::SequenceOf *asn1Type) const
 {
+    const auto sedsTypeName = Escaper::escapeAsn1TypeName(sedsTypeRef.nameStr());
+
     const auto *asn1ReferencedTypeAssignment = m_asn1Definitions->type(sedsTypeName);
     if (!asn1ReferencedTypeAssignment) {
         throw MissingAsn1TypeDefinitionException(sedsTypeName);

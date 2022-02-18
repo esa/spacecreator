@@ -80,8 +80,12 @@ void DataTypesDependencyResolver::visit(const seds::model::DataType *dataType)
 
 void DataTypesDependencyResolver::visitArray(const seds::model::ArrayDataType &arrayDataType)
 {
-    const auto &itemDataTypeRef = arrayDataType.type();
+    const auto &itemDataTypeRef = arrayDataType.typeRef();
     const auto *itemDataType = findDataType(itemDataTypeRef);
+
+    if (itemDataType == nullptr) {
+        return;
+    }
 
     visit(itemDataType);
 
@@ -124,8 +128,14 @@ void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDat
 
 const seds::model::DataType *DataTypesDependencyResolver::findDataType(const seds::model::DataTypeRef &dataTypeRef)
 {
+    if(dataTypeRef.package()) {
+        return nullptr;
+    }
+
+    const auto &dataTypeName = dataTypeRef.nameStr();
+
     auto result = std::find_if(m_dataTypes->begin(), m_dataTypes->end(),
-            [&dataTypeRef](const auto *dataType) { return dataTypeNameStr(*dataType) == dataTypeRef.nameStr(); });
+            [&dataTypeName](const auto *dataType) { return dataTypeNameStr(*dataType) == dataTypeName; });
 
     if (result != m_dataTypes->end()) {
         return *result;
@@ -133,14 +143,14 @@ const seds::model::DataType *DataTypesDependencyResolver::findDataType(const sed
 
     if (m_globalDataTypes) {
         result = std::find_if(m_globalDataTypes->begin(), m_globalDataTypes->end(),
-                [&dataTypeRef](const auto *dataType) { return dataTypeNameStr(*dataType) == dataTypeRef.nameStr(); });
+                [&dataTypeName](const auto *dataType) { return dataTypeNameStr(*dataType) == dataTypeName; });
 
         if (result != m_globalDataTypes->end()) {
             return *result;
         }
     }
 
-    throw UndeclaredDataTypeException(dataTypeRef.nameStr());
+    throw UndeclaredDataTypeException(dataTypeName);
     return nullptr;
 }
 
