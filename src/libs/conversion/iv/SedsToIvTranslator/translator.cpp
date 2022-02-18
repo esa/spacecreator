@@ -113,7 +113,7 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(const
 void SedsToIvTranslator::translatePackage(
         const seds::model::Package &sedsPackage, Asn1Model *asn1Model, IVModel *ivModel, bool generateFunction) const
 {
-    auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(sedsPackage, asn1Model);
+    auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(sedsPackage, asn1Model->data());
 
     ComponentsTranslator componentsTranslator(&sedsPackage, asn1Definitions);
     auto ivFunctions = componentsTranslator.translateComponents();

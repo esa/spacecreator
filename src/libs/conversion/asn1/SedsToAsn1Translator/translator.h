@@ -19,13 +19,13 @@
 
 #pragma once
 
+#include <asn1library/asn1/asn1model.h>
 #include <conversion/common/translation/translator.h>
 #include <list>
 #include <seds/SedsModel/types/datatype.h>
 #include <vector>
 
 namespace Asn1Acn {
-class Asn1Model;
 class Definitions;
 class File;
 } // namespace Asn1Acn
@@ -78,11 +78,11 @@ public:
      * @brief   Gets ASN.1 definitions for given SEDS package from given ASN.1 model
      *
      * @param   sedsPackage     SEDS package
-     * @param   asn1Model       ASN.1 model
+     * @param   asn1Files       ASN.1 files
      *
      * @return  Asn1 definitions
      */
-    static auto getAsn1Definitions(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model)
+    static auto getAsn1Definitions(const seds::model::Package &sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files)
             -> Asn1Acn::Definitions *;
 
 private:

@@ -326,7 +326,8 @@ auto StateMachineTranslator::translateVariables(
         const auto variableName = Escaper::escapeSdlVariableName(variable.nameStr());
         const auto variableTypeName = Escaper::escapeAsn1TypeName(variable.type().nameStr());
         // TODO implement check for types imported from other packages
-        auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(context.sedsPackage(), context.asn1Model());
+        auto asn1Definitions =
+                SedsToAsn1Translator::getAsn1Definitions(context.sedsPackage(), context.asn1Model()->data());
         const auto *referencedType = asn1Definitions->type(variableTypeName);
         if (referencedType == nullptr) {
             throw MissingAsn1TypeDefinitionException(variableTypeName);

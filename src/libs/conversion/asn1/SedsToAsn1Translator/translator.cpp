@@ -22,7 +22,6 @@
 #include "datatypesdependencyresolver.h"
 #include "specialized/datatypetranslatorvisitor.h"
 
-#include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/file.h>
 #include <asn1library/asn1/sourcelocation.h>
@@ -178,10 +177,9 @@ std::vector<const seds::model::DataType *> SedsToAsn1Translator::collectDataType
 }
 
 Asn1Acn::Definitions *SedsToAsn1Translator::getAsn1Definitions(
-        const seds::model::Package &sedsPackage, Asn1Model *asn1Model)
+        const seds::model::Package &sedsPackage, const Asn1Model::Data &asn1Files)
 {
     const auto asn1FileName = Escaper::escapeAsn1PackageName(sedsPackage.nameStr());
-    auto &asn1Files = asn1Model->data();
     auto asn1File = std::find_if(
             std::begin(asn1Files), std::end(asn1Files), [&](const auto &file) { return file->name() == asn1FileName; });
     if (asn1File == asn1Files.end()) {

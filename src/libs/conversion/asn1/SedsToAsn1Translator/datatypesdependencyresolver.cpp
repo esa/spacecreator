@@ -128,7 +128,7 @@ void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDat
 
 const seds::model::DataType *DataTypesDependencyResolver::findDataType(const seds::model::DataTypeRef &dataTypeRef)
 {
-    if(dataTypeRef.package()) {
+    if (dataTypeRef.package()) {
         return nullptr;
     }
 
