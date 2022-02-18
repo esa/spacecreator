@@ -12,6 +12,7 @@ set(SOURCES
   declaration.cpp
   doloop.cpp
   expression.cpp
+  forloop.cpp
   initproctype.cpp
   inlinecall.cpp
   inlinedef.cpp
@@ -40,6 +41,7 @@ set(INCLUDES
   declaration.h
   doloop.h
   expression.h
+  forloop.h
   initproctype.h
   inlinecall.cpp
   inlinedef.h

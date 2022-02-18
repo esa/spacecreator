@@ -20,14 +20,23 @@
 #pragma once
 
 #include <QString>
+#include <list>
+#include <memory>
 
 namespace promela::model {
+class Expression;
 /**
  * @brief Representation of variable reference in promela
  */
 class VariableRef
 {
 public:
+    struct Element {
+        Element(QString name, std::unique_ptr<Expression> index);
+        QString m_name;
+        std::unique_ptr<Expression> m_index;
+    };
+
     /**
      * @brief Constructor
      *
@@ -35,14 +44,30 @@ public:
      */
     VariableRef(QString ref);
 
+    VariableRef(QString ref, std::unique_ptr<Expression> indexExpression);
+
+    VariableRef(const VariableRef &other);
+
+    VariableRef(VariableRef &&other);
+
+    const VariableRef &operator=(const VariableRef &rhs);
+
+    const VariableRef &operator=(VariableRef &&rhs);
+
+    void appendElement(QString ref);
+
+    void appendElement(QString ref, std::unique_ptr<Expression> indexExpression);
+
     /**
      * @brief Getter for reference to variable
      *
      * @retun Name of the variable
      */
-    const QString &getReference() const noexcept;
+
+    const std::list<Element> &getElements() const noexcept;
 
 private:
-    QString m_ref;
+    // QString m_ref;
+    std::list<Element> m_elements;
 };
 }

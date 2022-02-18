@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,42 +19,46 @@
 
 #pragma once
 
-#include "expression.h"
+#include "sequence.h"
 #include "variableref.h"
 
-#include <QList>
-#include <QString>
+#include <list>
+#include <memory>
+#include <variant>
 
 namespace promela::model {
 /**
- * @brief Representation of inline call in promela
+ * @brief Representation of for loop in promela
  */
-class InlineCall
+class ForLoop final
 {
 public:
     /**
-     * @brief Constructor
      *
-     * @param name name of inline
-     * @param arguments list of arguments
      */
-    InlineCall(QString name, const QList<VariableRef> &arguments);
+    enum class Type
+    {
+        RANGE,
+        FOR_EACH,
+    };
+    ForLoop(VariableRef var, int first, int last, std::unique_ptr<Sequence> sequence);
 
-    /**
-     * @brief Getter for name of inline
-     *
-     * @return Name of inline
-     */
-    const QString &getName() const noexcept;
-    /**
-     * @brief Getter for arguments of inline call
-     *
-     * @return List of inline arguments.
-     */
-    const QList<VariableRef> &getArguments() const noexcept;
+    ForLoop(VariableRef var, VariableRef array, std::unique_ptr<Sequence> sequence);
+
+    Type getType() const;
+
+    const VariableRef &getForVariable() const noexcept;
+
+    int getFirstValue() const;
+    int getLastValue() const;
+
+    const VariableRef &getArrayRef() const;
+
+    const std::unique_ptr<Sequence> &getSequence() const noexcept;
 
 private:
-    QString m_name;
-    QList<VariableRef> m_arguments;
+    VariableRef m_variable;
+    std::variant<std::pair<int, int>, VariableRef> m_data;
+    std::unique_ptr<Sequence> m_sequence;
 };
 }
