@@ -37,10 +37,11 @@ using conversion::translator::UndeclaredInterfaceException;
 
 namespace conversion::iv::translator {
 
-ComponentsTranslator::ComponentsTranslator(
-        const seds::model::Package *sedsPackage, Asn1Acn::Definitions *asn1Definitions)
+ComponentsTranslator::ComponentsTranslator(const seds::model::Package *sedsPackage,
+        Asn1Acn::Definitions *asn1Definitions, const Asn1Acn::Asn1Model::Data &asn1Files)
     : m_sedsPackage(sedsPackage)
     , m_asn1Definitions(asn1Definitions)
+    , m_asn1Files(asn1Files)
 {
 }
 
@@ -122,9 +123,9 @@ void ComponentsTranslator::translateCommands(const QString &sedsInterfaceName,
         const GenericTypeMapper *typeMapper) const
 {
     AsyncInterfaceCommandTranslator asyncCommandTranslator(
-            ivFunction, sedsInterfaceName, m_asn1Definitions, m_sedsPackage, typeMapper);
+            ivFunction, sedsInterfaceName, m_asn1Definitions, m_sedsPackage, m_asn1Files, typeMapper);
     SyncInterfaceCommandTranslator syncCommandTranslator(
-            ivFunction, sedsInterfaceName, m_asn1Definitions, m_sedsPackage, typeMapper);
+            ivFunction, sedsInterfaceName, m_asn1Definitions, m_sedsPackage, m_asn1Files, typeMapper);
 
     for (const auto &sedsCommand : sedsInterfaceDeclaration.commands()) {
         switch (sedsCommand.mode()) {

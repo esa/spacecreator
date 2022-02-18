@@ -22,6 +22,7 @@
 #include "generictypemapper.h"
 
 #include <QVector>
+#include <asn1library/asn1/asn1model.h>
 #include <ivcore/ivinterface.h>
 #include <optional>
 
@@ -54,8 +55,10 @@ public:
      *
      * @param   sedsPackage         Package with components to translate
      * @param   asn1Definitions     ASN.1 file where types of the packed argument will be saved
+     * @param   asn1Files           List of all ASN.1 files
      */
-    ComponentsTranslator(const seds::model::Package *sedsPackage, Asn1Acn::Definitions *asn1Definitions);
+    ComponentsTranslator(const seds::model::Package *sedsPackage, Asn1Acn::Definitions *asn1Definitions,
+            const Asn1Acn::Asn1Model::Data &asn1Files);
     /**
      * @brief   Deleted copy constructor
      */
@@ -137,6 +140,8 @@ private:
     const seds::model::Package *m_sedsPackage;
     /// @brief  Target ASN.1 type definitions
     Asn1Acn::Definitions *m_asn1Definitions;
+    /// @brief  List of all ASN.1 files
+    const Asn1Acn::Asn1Model::Data &m_asn1Files;
 };
 
 } // namespace conversion::iv::translator

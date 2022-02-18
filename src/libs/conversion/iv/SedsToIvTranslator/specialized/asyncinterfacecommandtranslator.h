@@ -21,6 +21,7 @@
 
 #include "generictypemapper.h"
 
+#include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/definitions.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivinterface.h>
@@ -68,11 +69,13 @@ public:
      * @param   sedsInterfaceName   Parent interface name
      * @param   asn1Definitions     Parent ASN.1 definitions
      * @param   sedsPackage         Parent SEDS package
+     * @param   asn1Files           List of all ASN.1 files
+     * @param   genericTypeMapper   Generic type mapper
      * @param   typeMapper          Generic type mapper
      */
     AsyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
             Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
-            const GenericTypeMapper *typeMapper);
+            const Asn1Acn::Asn1Model::Data &asn1Files, const GenericTypeMapper *typeMapper);
     /**
      * @brief   Deleted copy constructor
      */
@@ -139,6 +142,8 @@ private:
     Asn1Acn::Definitions *m_asn1Definitions;
     /// @brief  Parent SEDS package
     const seds::model::Package *m_sedsPackage;
+    /// @brief  List of all ASN.1 files
+    const Asn1Acn::Asn1Model::Data &m_asn1Files;
 
     /// @brief  Generic type mapper
     const GenericTypeMapper *m_typeMapper;

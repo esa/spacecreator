@@ -42,11 +42,13 @@ std::multimap<QString, AsyncInterfaceCommandTranslator::CommandArgumentEntry>
 
 AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction,
         const QString &sedsInterfaceName, Asn1Acn::Definitions *asn1Definitions,
-        const seds::model::Package *sedsPackage, const GenericTypeMapper *typeMapper)
+        const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
+        const GenericTypeMapper *typeMapper)
     : m_ivFunction(ivFunction)
     , m_sedsInterfaceName(sedsInterfaceName)
     , m_asn1Definitions(asn1Definitions)
     , m_sedsPackage(sedsPackage)
+    , m_asn1Files(asn1Files)
     , m_typeMapper(typeMapper)
 {
 }
@@ -334,7 +336,7 @@ QString AsyncInterfaceCommandTranslator::handleArrayArgument(
         return typeName;
     } else {
         return InterfaceTranslatorHelper::createArrayType(
-                typeName, sedsArgument.arrayDimensions(), m_asn1Definitions, m_sedsPackage);
+                typeName, sedsArgument.arrayDimensions(), m_asn1Definitions, m_sedsPackage, m_asn1Files);
     }
 }
 

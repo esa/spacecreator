@@ -77,12 +77,12 @@ public:
     /**
      * @brief   Gets ASN.1 definitions for given SEDS package from given ASN.1 model
      *
-     * @param   sedsPackage     SEDS package
-     * @param   asn1Files       ASN.1 files
+     * @param   sedsPackageName     SEDS package name
+     * @param   asn1Files           ASN.1 files
      *
      * @return  Asn1 definitions
      */
-    static auto getAsn1Definitions(const seds::model::Package &sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files)
+    static auto getAsn1Definitions(const QString &sedsPackageName, const Asn1Acn::Asn1Model::Data &asn1Files)
             -> Asn1Acn::Definitions *;
 
 private:
@@ -102,7 +102,8 @@ private:
      *
      * @return  Result ASN.1 files
      */
-    auto translatePackage(const seds::model::Package &sedsPackage) const -> std::vector<std::unique_ptr<Asn1Acn::File>>;
+    auto translatePackage(const seds::model::Package &sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files) const
+            -> std::vector<std::unique_ptr<Asn1Acn::File>>;
     /**
      * @brief   Translate SEDS data types
      *
@@ -111,7 +112,8 @@ private:
      * @param   sedsPackage         Parent SEDS package
      */
     auto translateDataTypes(const std::list<const seds::model::DataType *> &sedsDataTypes,
-            Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage) const -> void;
+            Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
+            const Asn1Acn::Asn1Model::Data &asn1Files) const -> void;
 
     /**
      * @brief   Collects all data types declared directly in given package

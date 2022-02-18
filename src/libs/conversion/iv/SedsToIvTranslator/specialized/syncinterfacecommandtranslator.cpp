@@ -31,11 +31,13 @@ namespace conversion::iv::translator {
 
 SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction,
         const QString &sedsInterfaceName, Asn1Acn::Definitions *asn1Definitions,
-        const seds::model::Package *sedsPackage, const GenericTypeMapper *typeMapper)
+        const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
+        const GenericTypeMapper *typeMapper)
     : m_ivFunction(ivFunction)
     , m_sedsInterfaceName(sedsInterfaceName)
     , m_asn1Definitions(asn1Definitions)
     , m_sedsPackage(sedsPackage)
+    , m_asn1Files(asn1Files)
     , m_typeMapper(typeMapper)
 {
 }
@@ -139,8 +141,8 @@ QString SyncInterfaceCommandTranslator::handleArgumentType(
     if (sedsArgument.arrayDimensions().empty()) {
         return Escaper::escapeAsn1TypeName(argumentConcreteTypeName);
     } else {
-        return InterfaceTranslatorHelper::createArrayType(
-                argumentConcreteTypeName, sedsArgument.arrayDimensions(), m_asn1Definitions, m_sedsPackage);
+        return InterfaceTranslatorHelper::createArrayType(argumentConcreteTypeName, sedsArgument.arrayDimensions(),
+                m_asn1Definitions, m_sedsPackage, m_asn1Files);
     }
 }
 

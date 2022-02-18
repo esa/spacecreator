@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/type.h>
 #include <optional>
@@ -79,9 +80,10 @@ struct DataTypeTranslatorVisitor final {
      * @param   asn1Type            Type where translated types are saved
      * @param   asn1Definitions     Parent ASN.1 defintions
      * @param   sedsPackage         Parent SEDS package
+     * @param   asn1Files           List of already translated ASN.1 files
      */
     DataTypeTranslatorVisitor(std::unique_ptr<Asn1Acn::Types::Type> &asn1Type, Asn1Acn::Definitions *asn1Definitions,
-            const seds::model::Package *sedsPackage);
+            const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files);
 
     /**
      * @brief   Translates SEDS array data type
@@ -314,6 +316,9 @@ private:
     Asn1Acn::Definitions *m_asn1Definitions;
     /// @brief  Parent package
     const seds::model::Package *m_sedsPackage;
+
+    /// @brief  List of alerady translated ASN.1 files
+    const Asn1Acn::Asn1Model::Data &m_asn1Files;
 
     /// @brief  Cache for sequence components
     ContainerEntriesCacheMap m_asn1SequenceComponentsCache;

@@ -113,9 +113,9 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(const
 void SedsToIvTranslator::translatePackage(
         const seds::model::Package &sedsPackage, Asn1Model *asn1Model, IVModel *ivModel, bool generateFunction) const
 {
-    auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(sedsPackage, asn1Model->data());
+    auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(sedsPackage.nameStr(), asn1Model->data());
 
-    ComponentsTranslator componentsTranslator(&sedsPackage, asn1Definitions);
+    ComponentsTranslator componentsTranslator(&sedsPackage, asn1Definitions, asn1Model->data());
     auto ivFunctions = componentsTranslator.translateComponents();
 
     if (generateFunction) {

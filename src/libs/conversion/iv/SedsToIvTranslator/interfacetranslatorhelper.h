@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/types/type.h>
 #include <ivcore/ivfunction.h>
@@ -77,7 +78,8 @@ public:
      * @return  Create type name
      */
     static auto createArrayType(const QString &baseTypeName, const std::vector<seds::model::DimensionSize> &dimensions,
-            Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage) -> QString;
+            Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
+            const Asn1Acn::Asn1Model::Data &asn1Files) -> QString;
 
     /**
      * @brief   Assemble name for the parameter
