@@ -79,3 +79,8 @@ configure_file(test_sync_command.sh test_sync_command.sh COPYONLY)
 configure_file(resources/test_sync_command.xml resources/test_sync_command.xml COPYONLY)
 configure_file(resources/test_sync_command.output resources/test_sync_command.output COPYONLY)
 configure_file(resources/test_sync_command.system_structure resources/test_sync_command.system_structure COPYONLY)
+
+configure_file(test_initial_values.sh test_initial_values.sh COPYONLY)
+configure_file(resources/test_initial_values.xml resources/test_initial_values.xml COPYONLY)
+configure_file(resources/test_initial_values.output resources/test_initial_values.output COPYONLY)
+configure_file(resources/test_initial_values.system_structure resources/test_initial_values.system_structure COPYONLY)

@@ -247,6 +247,22 @@ static inline auto buildCommandMapInternal(
     }
 }
 
+auto StateMachineTranslator::setInitialVariableValues(
+        const seds::model::ComponentImplementation::VariableSet &variables, ::sdl::Transition *transition) -> void
+{
+    if (variables.size() == 0) {
+        return;
+    }
+    for (const auto &variable : variables) {
+        if (variable.initialValue().has_value()) {
+            const auto name = Escaper::escapeAsn1FieldName(variable.nameStr());
+            const auto value = variable.initialValue()->value();
+            auto assignment = std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(name, value));
+            transition->addAction(std::move(assignment));
+        }
+    }
+}
+
 auto StateMachineTranslator::buildCommandMap(Context &context) -> void
 {
     for (const auto &interface : context.sedsComponent().providedInterfaces()) {
@@ -289,7 +305,7 @@ auto StateMachineTranslator::translateStateMachine(Context &context, const seds:
     generateProceduresForSyncCommands(context, sedsStateMachine);
 
     // Setup the start transition
-    createStartTransition(sedsStateMachine, context.sdlProcess(), stateMap);
+    createStartTransition(context, sedsStateMachine, stateMap);
 
     // Second pass through transitions
     for (auto &element : sedsStateMachine.elements()) {
@@ -373,6 +389,7 @@ auto StateMachineTranslator::ensureMinimalStateMachineExists(Context &context) -
     auto state = std::make_unique<::sdl::State>();
     state->setName("Idle");
     auto transition = std::make_unique<::sdl::Transition>();
+    setInitialVariableValues(context.sedsComponent().implementation().variables(), transition.get());
     transition->addAction(std::make_unique<::sdl::NextState>("", state.get()));
     context.sdlStateMachine()->addState(std::move(state));
     context.sdlProcess()->setStartTransition(std::move(transition));
@@ -517,22 +534,23 @@ auto StateMachineTranslator::translateParameterMaps(
     }
 }
 
-auto StateMachineTranslator::createStartTransition(const seds::model::StateMachine &sedsStateMachine,
-        ::sdl::Process *sdlProcess, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void
+auto StateMachineTranslator::createStartTransition(Context &context, const seds::model::StateMachine &sedsStateMachine,
+        std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void
 {
     for (auto &element : sedsStateMachine.elements()) {
         if (std::holds_alternative<seds::model::EntryState>(element)) {
-            if (sdlProcess->startTransition() != nullptr) {
+            if (context.sdlProcess()->startTransition() != nullptr) {
                 throw TranslationException("Multiple entry states are not supported");
             }
             auto transition = std::make_unique<::sdl::Transition>();
+            setInitialVariableValues(context.sedsComponent().implementation().variables(), transition.get());
             const auto &state = std::get<seds::model::EntryState>(element);
             const auto timerTime = getTimerInvocationTime(sedsStateMachine, state.nameStr());
             if (timerTime.has_value()) {
                 transition->addAction(createTimerSetCall(timerName(state.nameStr()), *timerTime));
             }
             transition->addAction(std::make_unique<::sdl::NextState>("", stateMap[state.nameStr()].get()));
-            sdlProcess->setStartTransition(std::move(transition));
+            context.sdlProcess()->setStartTransition(std::move(transition));
         }
     }
 }
