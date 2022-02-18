@@ -38,6 +38,7 @@ public:
      *
      * @param promelaModel target promela model
      * @param baseTypeName base name for nested types
+     * @param enhancedSpinSupport  if true, then generate model for enhanced spin
      */
     Asn1SequenceComponentVisitor(
             ::promela::model::PromelaModel &promelaModel, QString baseTypeName, bool enhancedSpinSupport);
@@ -55,9 +56,31 @@ public:
      */
     void visit(const ::Asn1Acn::AcnSequenceComponent &component) override;
 
+    /**
+     * @brief Check if ASN.1 Sequence component was visited.
+     *
+     * @return true if component was visited, otherwise false.
+     */
     bool isComponentPresent() const;
+    /**
+     * @brief Getter for name of visited sequence component.
+     *
+     * @return Name of sequence component.
+     * @throws std::bad_optional_access if component was not visited.
+     */
     QString getComponentName() const;
+    /**
+     * @brief Getter for type of visited sequence component.
+     *
+     * @return Type of sequence component.
+     * @throws std::bad_optional_access if component was not visited.
+     */
     ::promela::model::DataType getComponentType() const;
+    /**
+     * @brief Check if visited component is optional in SEQUENCE.
+     *
+     * @return true if component is optional, false if component is mandatory of component was not visited.
+     */
     bool isComponentOptional() const;
 
 private:
