@@ -28,7 +28,9 @@
 #include <promela/IvToPromelaTranslator/translator.h>
 #include <promela/PromelaModel/proctypeelement.h>
 #include <promela/PromelaModel/promelamodel.h>
+#include <promela/PromelaOptions/options.h>
 
+using conversion::promela::PromelaOptions;
 using promela::model::BasicType;
 using promela::model::ChannelSend;
 using promela::model::DataType;
@@ -54,7 +56,8 @@ private Q_SLOTS:
 
 private:
     std::unique_ptr<ivm::IVModel> importIvModel(const QString &filepath);
-    std::unique_ptr<PromelaModel> translateIvToPromela(std::unique_ptr<ivm::IVModel> ivModel);
+    std::unique_ptr<PromelaModel> translateIvToPromela(
+            std::unique_ptr<ivm::IVModel> ivModel, const QStringList &functions);
 
     const Declaration *findDeclaration(const QList<Declaration> &list, const QString &name);
     const InlineDef *findInline(const std::list<std::unique_ptr<InlineDef>> &list, const QString &name);
@@ -77,7 +80,10 @@ void tst_IvToPromelaTranslator::testSimple()
 {
     std::unique_ptr<ivm::IVModel> ivModel = importIvModel("parameterless.xml");
     QVERIFY(ivModel);
-    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel));
+    QStringList functions;
+    functions.append("controller");
+    functions.append("actuator");
+    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), functions);
     QVERIFY(promelaModel);
 
     QCOMPARE(promelaModel->getIncludes().size(), 4);
@@ -107,7 +113,7 @@ void tst_IvToPromelaTranslator::testSimple()
         QCOMPARE(actuator->getVisibility(), Declaration::Visibility::NORMAL);
     }
 
-    QCOMPARE(promelaModel->getDeclarations().size(), 5);
+    QCOMPARE(promelaModel->getDeclarations().size(), 7);
 
     {
         const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "global_state");
@@ -145,6 +151,24 @@ void tst_IvToPromelaTranslator::testSimple()
 
     {
         const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "controller_fail_channel");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+
+    {
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "controller_lock");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+
+    {
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "actuator_lock");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -208,7 +232,10 @@ void tst_IvToPromelaTranslator::testParameters()
 {
     std::unique_ptr<ivm::IVModel> ivModel = importIvModel("interface_params.xml");
     QVERIFY(ivModel);
-    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel));
+    QStringList functions;
+    functions.append("controller");
+    functions.append("actuator");
+    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), functions);
     QVERIFY(promelaModel);
 
     QCOMPARE(promelaModel->getIncludes().size(), 4);
@@ -238,7 +265,7 @@ void tst_IvToPromelaTranslator::testParameters()
         QCOMPARE(actuator->getVisibility(), Declaration::Visibility::NORMAL);
     }
 
-    QCOMPARE(promelaModel->getDeclarations().size(), 5);
+    QCOMPARE(promelaModel->getDeclarations().size(), 7);
 
     {
         const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "global_state");
@@ -276,6 +303,24 @@ void tst_IvToPromelaTranslator::testParameters()
 
     {
         const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "controller_error_channel");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+
+    {
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "controller_lock");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+
+    {
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "actuator_lock");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -351,10 +396,14 @@ std::unique_ptr<ivm::IVModel> tst_IvToPromelaTranslator::importIvModel(const QSt
     return {};
 }
 
-std::unique_ptr<PromelaModel> tst_IvToPromelaTranslator::translateIvToPromela(std::unique_ptr<ivm::IVModel> ivModel)
+std::unique_ptr<PromelaModel> tst_IvToPromelaTranslator::translateIvToPromela(
+        std::unique_ptr<ivm::IVModel> ivModel, const QStringList &functions)
 {
     IvToPromelaTranslator translator;
     conversion::Options options;
+    for (const QString &function : functions) {
+        options.add(PromelaOptions::modelFunctionName, function);
+    }
     std::vector<conversion::Model *> inputs;
     inputs.push_back(ivModel.get());
     auto result = translator.translateModels(std::move(inputs), options);

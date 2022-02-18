@@ -160,17 +160,17 @@ bool TmcConverter::convertSystem()
         return false;
     }
 
-    QStringList sdlFunctions;
-    QStringList envFunctions;
-    findIvFunctions(*inputIv, sdlFunctions, envFunctions);
-    QStringList envDatatypes;
-    findEnvDatatypes(*inputIv, envFunctions, envDatatypes);
+    QStringList modelFunctions;
+    QStringList environmentFunctions;
+    findFunctionsToConvert(*inputIv, modelFunctions, environmentFunctions);
+    QStringList environmentDatatypes;
+    findEnvironmentDatatypes(*inputIv, environmentFunctions, environmentDatatypes);
 
-    qDebug() << "Using the following SDL functions: " << sdlFunctions.join(", ");
-    qDebug() << "Using the following ENV functions: " << envFunctions.join(", ");
-    qDebug() << "Using the following ENV data types: " << envDatatypes.join(", ");
+    qDebug() << "Using the following SDL functions: " << modelFunctions.join(", ");
+    qDebug() << "Using the following ENV functions: " << environmentFunctions.join(", ");
+    qDebug() << "Using the following ENV data types: " << environmentDatatypes.join(", ");
 
-    for (const QString &ivFunction : sdlFunctions) {
+    for (const QString &ivFunction : modelFunctions) {
         QList<QFileInfo> sdlFiles;
         sdlFiles.append(sdlSystemStructureLocation(ivFunction));
         sdlFiles.append(sdlImplementationLocation(ivFunction));
@@ -193,7 +193,7 @@ bool TmcConverter::convertSystem()
 
     asn1Files.append(dataviewUniq.absoluteFilePath());
 
-    for (const QString &ivFunction : sdlFunctions) {
+    for (const QString &ivFunction : modelFunctions) {
         const QFileInfo functionDatamodel = sdlFunctionDatamodelLocation(ivFunction);
 
         if (!functionDatamodel.exists()) {
@@ -210,11 +210,12 @@ bool TmcConverter::convertSystem()
 
     const QFileInfo outputEnv = outputFilepath("env_inlines.pml");
 
-    createEnvGenerationInlines(dataviewUniq, outputEnv, envDatatypes);
+    createEnvGenerationInlines(dataviewUniq, outputEnv, environmentDatatypes);
 
     const QFileInfo outputSystemFile = outputFilepath("system.pml");
 
-    convertInterfaceview(ivFileInfo.absoluteFilePath(), outputSystemFile.absoluteFilePath());
+    convertInterfaceview(
+            ivFileInfo.absoluteFilePath(), outputSystemFile.absoluteFilePath(), modelFunctions, environmentFunctions);
 
     return true;
 }
@@ -235,7 +236,8 @@ bool TmcConverter::convertStopConditions()
     }
     return true;
 }
-bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QString &outputFilepath)
+bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QString &outputFilepath,
+        const QStringList &modelFunctions, const QStringList &environmentFunctions)
 {
     qDebug() << "Converting InterfaceView " << inputFilepath << " to " << outputFilepath;
 
@@ -244,6 +246,14 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
     options.add(IvOptions::inputFilepath, inputFilepath);
     options.add(IvOptions::configFilepath, IvOptions::defaultConfigFilename);
     options.add(PromelaOptions::outputFilepath, outputFilepath);
+
+    for (const QString &function : modelFunctions) {
+        options.add(PromelaOptions::modelFunctionName, function);
+    }
+
+    for (const QString &function : environmentFunctions) {
+        options.add(PromelaOptions::environmentFunctionName, function);
+    }
 
     for (const QString &filepath : m_stopConditionsFiles) {
         const QFileInfo input(filepath);
@@ -294,7 +304,7 @@ std::unique_ptr<IVModel> TmcConverter::readInterfaceView(const QString &filepath
     return {};
 }
 
-void TmcConverter::findIvFunctions(const IVModel &model, QStringList &sdlFunctions, QStringList &envFunctions)
+void TmcConverter::findFunctionsToConvert(const IVModel &model, QStringList &sdlFunctions, QStringList &envFunctions)
 {
     QStringList functionNames;
 
@@ -320,7 +330,7 @@ bool TmcConverter::isSdlFunction(const ivm::IVFunction *function)
     return false;
 }
 
-void TmcConverter::findEnvDatatypes(
+void TmcConverter::findEnvironmentDatatypes(
         const ivm::IVModel &model, const QStringList &envFunctions, QStringList &envDataTypes)
 {
     for (const QString &functionName : envFunctions) {
