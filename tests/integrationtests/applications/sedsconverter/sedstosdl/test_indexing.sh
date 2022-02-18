@@ -31,5 +31,5 @@ $DIFF component.pr ../resources/test_indexing.output \
   && $OPENGEODE --toAda system_structure.pr component.pr \
   && asn1scc -Ada --type-prefix asn1Scc dataview-uniq.asn component_datamodel.asn \
   && gcc -c component.adb \
-  && cd .. 
- # && rm -r -f $TEST_OUTPUT_DIR
+  && cd .. \
+  && rm -r -f $TEST_OUTPUT_DIR
