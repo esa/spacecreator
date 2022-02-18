@@ -181,7 +181,7 @@ void ProctypeElementVisitor::operator()(const Sequence &sequence)
     SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
     m_stream << m_indent << visitor.getSequencePrefix(sequence) << "{\n";
     visitor.visit(sequence, false);
-    m_stream << m_indent << "};\n";
+    m_stream << m_indent << "}\n";
 }
 
 void ProctypeElementVisitor::operator()(const ForLoop &loop)
@@ -201,6 +201,6 @@ void ProctypeElementVisitor::operator()(const ForLoop &loop)
     SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
     m_stream << m_indent << visitor.getSequencePrefix(*loop.getSequence()) << "{\n";
     visitor.visit(*loop.getSequence(), false);
-    m_stream << m_indent << "};\n";
+    m_stream << m_indent << "}\n";
 }
 }

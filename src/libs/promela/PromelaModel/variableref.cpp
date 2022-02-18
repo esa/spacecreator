@@ -52,7 +52,7 @@ VariableRef::VariableRef(const VariableRef &other)
 VariableRef::VariableRef(VariableRef &&other)
 {
     for (auto &element : other.m_elements) {
-        m_elements.emplace_back(element.m_name, std::move(element.m_index));
+        m_elements.emplace_back(std::move(element.m_name), std::move(element.m_index));
     }
 }
 
@@ -76,7 +76,7 @@ const VariableRef &VariableRef::operator=(VariableRef &&rhs)
     m_elements.clear();
 
     for (auto &element : rhs.m_elements) {
-        m_elements.emplace_back(element.m_name, std::move(element.m_index));
+        m_elements.emplace_back(std::move(element.m_name), std::move(element.m_index));
     }
 
     return *this;

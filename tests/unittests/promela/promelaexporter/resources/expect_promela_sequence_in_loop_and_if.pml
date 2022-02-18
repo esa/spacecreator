@@ -2,13 +2,13 @@ proctype testProctype()
 {
     {
         1;
-    };
+    }
     atomic {
         1;
-    };
+    }
     d_step {
         1;
-    };
+    }
     do
     ::  1;
         2;

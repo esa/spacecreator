@@ -40,6 +40,7 @@ using promela::model::DataType;
 using promela::model::Declaration;
 using promela::model::DoLoop;
 using promela::model::Expression;
+using promela::model::ForLoop;
 using promela::model::InitProctype;
 using promela::model::InlineCall;
 using promela::model::InlineDef;
@@ -84,6 +85,8 @@ private Q_SLOTS:
     void testSequenceTypesInLoopAndConditional();
     void testAtomicInitSequence();
     void testDstepInitSequence();
+    void testForRangeLoop();
+    void testForEachLoop();
 
 private:
     QString getFileContents(const QString &filename);
@@ -831,6 +834,68 @@ void tst_PromelaExporter::testDstepInitSequence()
         QFAIL(ex.what());
     }
     QString out2 = getFileContents("expect_promela_dstep_init_proctype.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testForRangeLoop()
+{
+    PromelaModel model;
+
+    Sequence initSequence(Sequence::Type::NORMAL);
+
+    initSequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "i")));
+
+    std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>(Sequence::Type::NORMAL);
+    loopSequence->appendElement(std::make_unique<ProctypeElement>(Skip()));
+
+    ForLoop forLoop(VariableRef("i"), 0, 10, std::move(loopSequence));
+
+    initSequence.appendElement(std::make_unique<ProctypeElement>(std::move(forLoop)));
+
+    InitProctype init(std::move(initSequence));
+
+    model.setInit(std::move(init));
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_for_range_loop.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testForEachLoop()
+{
+    PromelaModel model;
+
+    model.addDeclaration(Declaration(DataType(ArrayType(10, BasicType::INT)), "array"));
+
+    Sequence initSequence(Sequence::Type::NORMAL);
+
+    initSequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "i")));
+
+    std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>(Sequence::Type::NORMAL);
+    loopSequence->appendElement(std::make_unique<ProctypeElement>(Skip()));
+
+    ForLoop forLoop(VariableRef("i"), VariableRef("array"), std::move(loopSequence));
+
+    initSequence.appendElement(std::make_unique<ProctypeElement>(std::move(forLoop)));
+
+    InitProctype init(std::move(initSequence));
+
+    model.setInit(std::move(init));
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_for_each_loop.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }

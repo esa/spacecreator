@@ -34,26 +34,80 @@ class ForLoop final
 {
 public:
     /**
+     * @brief Loop Type.
      *
+     * For loop in Promela has two kinds: range based and for each.
+     * The range based loop is in the form for(i : 0 .. 10).
+     * The for each loop is in the form for(i in array).
      */
     enum class Type
     {
         RANGE,
         FOR_EACH,
     };
+
+    /**
+     * @brief Constructor for range based for loop.
+     *
+     * @param var loop variable.
+     * @param first First element or range.
+     * @param last Last element of range.
+     * @param sequence body.
+     */
     ForLoop(VariableRef var, int first, int last, std::unique_ptr<Sequence> sequence);
 
+    /**
+     * @brief Constructor for array based for loop.
+     *
+     * @param var loop variable.
+     * @param array array to iterate.
+     * @param sequence body.
+     */
     ForLoop(VariableRef var, VariableRef array, std::unique_ptr<Sequence> sequence);
 
+    /**
+     * @brief Getter for type of for loop.
+     *
+     * @return Type of loop.
+     */
     Type getType() const;
 
+    /**
+     * @brief Getter for loop variable.
+     *
+     * @return Loop variable.
+     */
     const VariableRef &getForVariable() const noexcept;
 
+    /**
+     * @brief Getter for first value of range based loop.
+     *
+     * @return First value in range.
+     * @throws std::bad_optional_access if loop is not range based.
+     */
     int getFirstValue() const;
+
+    /**
+     * @brief Getter for last value of range based loop.
+     *
+     * @return Last value in range.
+     * @throws std::bad_optional_access if loop is not range based.
+     */
     int getLastValue() const;
 
+    /**
+     * @brief Getter for array of array based loop.
+     *
+     * @return reference to array.
+     * @throws std::bad_optional_access if loop is array based.
+     */
     const VariableRef &getArrayRef() const;
 
+    /**
+     * @brief Getter for body of for loop.
+     *
+     * @return Sequence witch is a body of for loop.
+     */
     const std::unique_ptr<Sequence> &getSequence() const noexcept;
 
 private:
