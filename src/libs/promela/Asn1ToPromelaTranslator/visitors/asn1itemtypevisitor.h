@@ -137,9 +137,13 @@ public:
     void visit(const ::Asn1Acn::Types::UserdefinedType &type) override;
 
 private:
+    const QString assignValueInlineSuffix = "_assign_value";
+
+private:
     QString constructTypeName(QString name);
     void addSimpleValueAssignmentInline(const QString &typeName);
     void addAssignValueInline(const QString &typeName, ::promela::model::Sequence sequence);
+    void addSimpleArrayAssignInlineValue(const QString &typeName, int length, bool lengthFieldPresent);
 
 private:
     ::promela::model::PromelaModel &m_promelaModel;

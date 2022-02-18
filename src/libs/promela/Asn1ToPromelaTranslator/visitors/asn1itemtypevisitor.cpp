@@ -132,32 +132,8 @@ void Asn1ItemTypeVisitor::visit(const BitString &type)
 
     m_promelaModel.addUtype(utype);
 
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
-
-    sequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "i")));
-
-    std::unique_ptr<::promela::model::Sequence> loopSequence =
-            std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
-
-    VariableRef dst("dst");
-    dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
-    VariableRef src("src");
-    src.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
-
-    loopSequence->appendElement(std::make_unique<ProctypeElement>(Assignment(dst, Expression(src))));
-
-    sequence.appendElement(std::make_unique<ProctypeElement>(
-            ForLoop(VariableRef("i"), 0, constraintVisitor.getMaxSize() - 1, std::move(loopSequence))));
-
-    if (constraintVisitor.getMaxSize() != constraintVisitor.getMinSize()) {
-        VariableRef dst_length = VariableRef("dst");
-        dst_length.appendElement("length");
-        VariableRef src_length = VariableRef("src");
-        src_length.appendElement("length");
-        sequence.appendElement(std::make_unique<ProctypeElement>(Assignment(dst_length, Expression(src_length))));
-    }
-
-    addAssignValueInline(utypeName, std::move(sequence));
+    addSimpleArrayAssignInlineValue(utypeName, constraintVisitor.getMaxSize(),
+            constraintVisitor.getMinSize() != constraintVisitor.getMaxSize());
 
     m_resultDataType = DataType(UtypeRef(utypeName));
 }
@@ -177,32 +153,8 @@ void Asn1ItemTypeVisitor::visit(const OctetString &type)
 
     m_promelaModel.addUtype(utype);
 
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
-
-    sequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "i")));
-
-    std::unique_ptr<::promela::model::Sequence> loopSequence =
-            std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
-
-    VariableRef dst("dst");
-    dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
-    VariableRef src("src");
-    src.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
-
-    loopSequence->appendElement(std::make_unique<ProctypeElement>(Assignment(dst, Expression(src))));
-
-    sequence.appendElement(std::make_unique<ProctypeElement>(
-            ForLoop(VariableRef("i"), 0, constraintVisitor.getMaxSize() - 1, std::move(loopSequence))));
-
-    if (constraintVisitor.getMaxSize() != constraintVisitor.getMinSize()) {
-        VariableRef dst_length = VariableRef("dst");
-        dst_length.appendElement("length");
-        VariableRef src_length = VariableRef("src");
-        src_length.appendElement("length");
-        sequence.appendElement(std::make_unique<ProctypeElement>(Assignment(dst_length, Expression(src_length))));
-    }
-
-    addAssignValueInline(utypeName, std::move(sequence));
+    addSimpleArrayAssignInlineValue(utypeName, constraintVisitor.getMaxSize(),
+            constraintVisitor.getMinSize() != constraintVisitor.getMaxSize());
 
     m_resultDataType = DataType(UtypeRef(utypeName));
 }
@@ -222,32 +174,8 @@ void Asn1ItemTypeVisitor::visit(const IA5String &type)
 
     m_promelaModel.addUtype(utype);
 
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
-
-    sequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "i")));
-
-    std::unique_ptr<::promela::model::Sequence> loopSequence =
-            std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
-
-    VariableRef dst("dst");
-    dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
-    VariableRef src("src");
-    src.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
-
-    loopSequence->appendElement(std::make_unique<ProctypeElement>(Assignment(dst, Expression(src))));
-
-    sequence.appendElement(std::make_unique<ProctypeElement>(
-            ForLoop(VariableRef("i"), 0, constraintVisitor.getMaxSize() - 1, std::move(loopSequence))));
-
-    if (constraintVisitor.getMaxSize() != constraintVisitor.getMinSize()) {
-        VariableRef dst_length = VariableRef("dst");
-        dst_length.appendElement("length");
-        VariableRef src_length = VariableRef("src");
-        src_length.appendElement("length");
-        sequence.appendElement(std::make_unique<ProctypeElement>(Assignment(dst_length, Expression(src_length))));
-    }
-
-    addAssignValueInline(utypeName, std::move(sequence));
+    addSimpleArrayAssignInlineValue(utypeName, constraintVisitor.getMaxSize(),
+            constraintVisitor.getMinSize() != constraintVisitor.getMaxSize());
 
     m_resultDataType = DataType(UtypeRef(utypeName));
 }
@@ -301,7 +229,7 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
         dst.appendElement(componentName);
         VariableRef src("src");
         src.appendElement(componentName);
-        const QString inlineName = utypeName + "_" + componentName + "_assign_value";
+        const QString inlineName = utypeName + "_" + componentName + assignValueInlineSuffix;
         QList<VariableRef> inlineArguments;
         inlineArguments.append(dst);
         inlineArguments.append(src);
@@ -353,7 +281,7 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
         src.appendElement(componentVisitor.getComponentName());
 
         const QString inlineName = constructTypeName(m_name) + "_"
-                + Escaper::escapePromelaName(componentVisitor.getComponentName()) + "_assign_value";
+                + Escaper::escapePromelaName(componentVisitor.getComponentName()) + assignValueInlineSuffix;
         QList<VariableRef> arguments;
         arguments.append(dst);
         arguments.append(src);
@@ -434,7 +362,7 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
     inlineArguments.append(dst);
     inlineArguments.append(src);
 
-    const QString inlineName = utypeName + "_item_assign_value";
+    const QString inlineName = utypeName + assignValueInlineSuffix;
 
     loopSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineName, inlineArguments)));
 
@@ -479,10 +407,6 @@ void Asn1ItemTypeVisitor::visit(const Integer &type)
     Q_UNUSED(type);
     const QString typeName = constructTypeName(m_name);
     m_promelaModel.addTypeAlias(TypeAlias(typeName, BasicType::INT));
-    const QString assignValueInline = QString("%1_assign_value").arg(typeName);
-    QList<QString> arguments;
-    arguments.append("dst");
-    arguments.append("src");
 
     addSimpleValueAssignmentInline(typeName);
 
@@ -516,11 +440,41 @@ void Asn1ItemTypeVisitor::addSimpleValueAssignmentInline(const QString &typeName
 
 void Asn1ItemTypeVisitor::addAssignValueInline(const QString &typeName, ::promela::model::Sequence sequence)
 {
-    const QString assignValueInline = QString("%1_assign_value").arg(typeName);
+    const QString assignValueInline = QString("%1%2").arg(typeName).arg(assignValueInlineSuffix);
     QList<QString> arguments;
     arguments.append("dst");
     arguments.append("src");
 
     m_promelaModel.addInlineDef(std::make_unique<InlineDef>(assignValueInline, arguments, std::move(sequence)));
+}
+
+void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeName, int length, bool lengthFieldPresent)
+{
+    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+
+    sequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "i")));
+
+    std::unique_ptr<::promela::model::Sequence> loopSequence =
+            std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
+
+    VariableRef dst("dst");
+    dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+    VariableRef src("src");
+    src.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+
+    loopSequence->appendElement(std::make_unique<ProctypeElement>(Assignment(dst, Expression(src))));
+
+    sequence.appendElement(
+            std::make_unique<ProctypeElement>(ForLoop(VariableRef("i"), 0, length - 1, std::move(loopSequence))));
+
+    if (lengthFieldPresent) {
+        VariableRef dst_length = VariableRef("dst");
+        dst_length.appendElement("length");
+        VariableRef src_length = VariableRef("src");
+        src_length.appendElement("length");
+        sequence.appendElement(std::make_unique<ProctypeElement>(Assignment(dst_length, Expression(src_length))));
+    }
+
+    addAssignValueInline(typeName, std::move(sequence));
 }
 }
