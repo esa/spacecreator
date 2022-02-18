@@ -23,6 +23,7 @@
 #include "specialized/dimensiontranslator.h"
 #include "specialized/entrytranslatorvisitor.h"
 #include "specialized/rangetranslatorvisitor.h"
+#include "translator.h"
 
 #include <QDebug>
 #include <asn1library/asn1/asnsequencecomponent.h>
@@ -494,7 +495,11 @@ void DataTypeTranslatorVisitor::translateArrayType(
 {
     const auto sedsTypeName = Escaper::escapeAsn1TypeName(sedsTypeRef.nameStr());
 
-    const auto *asn1ReferencedTypeAssignment = m_asn1Definitions->type(sedsTypeName);
+    Asn1Acn::Definitions *asn1Definitions = sedsTypeRef.packageStr()
+            ? SedsToAsn1Translator::getAsn1Definitions(*sedsTypeRef.packageStr(), m_asn1Files)
+            : m_asn1Definitions;
+
+    const auto *asn1ReferencedTypeAssignment = asn1Definitions->type(sedsTypeName);
     if (!asn1ReferencedTypeAssignment) {
         throw MissingAsn1TypeDefinitionException(sedsTypeName);
     }

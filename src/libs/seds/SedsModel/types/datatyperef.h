@@ -35,14 +35,16 @@ public:
 
 public:
     auto value() const -> const QualifiedName &;
-    auto package() const -> const std::optional<common::String> &;
 
 public:
     auto nameStr() const -> const QString &;
+    auto packageStr() const -> const std::optional<common::String> &;
 
 private:
-    std::optional<common::String> m_package;
     QualifiedName m_value;
+
+    QString m_name;
+    std::optional<QString> m_package;
 };
 
 } // namespace seds::model

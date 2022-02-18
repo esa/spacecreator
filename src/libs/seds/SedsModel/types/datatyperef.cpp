@@ -26,11 +26,13 @@ DataTypeRef::DataTypeRef(common::String name) noexcept
     const auto index = name.lastIndexOf('/');
 
     if (index == -1) {
-        m_value = std::move(name);
+        m_name = name;
     } else {
+        m_name = name.mid(index + 1);
         m_package = name.left(index);
-        m_value = name.mid(index + 1);
     }
+
+    m_value = std::move(name);
 }
 
 const QualifiedName &DataTypeRef::value() const
@@ -38,14 +40,14 @@ const QualifiedName &DataTypeRef::value() const
     return m_value;
 }
 
-const std::optional<common::String> &DataTypeRef::package() const
-{
-    return m_package;
-}
-
 const QString &DataTypeRef::nameStr() const
 {
-    return m_value.name().value();
+    return m_name;
+}
+
+const std::optional<QString> &DataTypeRef::packageStr() const
+{
+    return m_package;
 }
 
 } // namespace seds::model

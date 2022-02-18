@@ -20,6 +20,7 @@
 #include "translator.h"
 
 #include "datatypesdependencyresolver.h"
+#include "packagesdependencyresolver.h"
 #include "specialized/datatypetranslatorvisitor.h"
 
 #include <asn1library/asn1/definitions.h>
@@ -27,6 +28,7 @@
 #include <asn1library/asn1/sourcelocation.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
+#include <iostream>
 #include <seds/SedsModel/sedsmodel.h>
 
 using Asn1Acn::Asn1Model;
@@ -71,13 +73,19 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(con
     const auto &sedsModelData = sedsModel->data();
     if (std::holds_alternative<seds::model::PackageFile>(sedsModelData)) {
         const auto &sedsPackage = std::get<seds::model::PackageFile>(sedsModelData).package();
-        auto packageFiles = translatePackage(sedsPackage, asn1Files);
+
+        auto packageFiles = translatePackage(sedsPackage, {}, asn1Files);
+
         asn1Files.insert(asn1Files.end(), std::make_move_iterator(packageFiles.begin()),
                 std::make_move_iterator(packageFiles.end()));
     } else if (std::holds_alternative<seds::model::DataSheet>(sedsModelData)) {
         const auto &sedsPackages = std::get<seds::model::DataSheet>(sedsModelData).packages();
-        for (const auto &sedsPackage : sedsPackages) {
-            auto packageFiles = translatePackage(sedsPackage, asn1Files);
+
+        PackagesDependencyResolver packagesDependencyResolver;
+        const auto resolvedSedsPackages = packagesDependencyResolver.resolve(&sedsPackages);
+
+        for (const auto &[sedsPackage, importedTypes] : resolvedSedsPackages) {
+            auto packageFiles = translatePackage(*sedsPackage, importedTypes, asn1Files);
             asn1Files.insert(asn1Files.end(), std::make_move_iterator(packageFiles.begin()),
                     std::make_move_iterator(packageFiles.end()));
         }
@@ -94,15 +102,21 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(con
 }
 
 std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePackage(
-        const seds::model::Package &sedsPackage, const Asn1Model::Data &asn1Files) const
+        const seds::model::Package &sedsPackage, const std::set<Asn1Acn::ImportedType> &importedTypes,
+        const Asn1Model::Data &asn1Files) const
 {
-    DataTypesDependencyResolver dependencyResolver;
+    DataTypesDependencyResolver typesDependencyResolver;
 
     const auto packageDataTypes = collectDataTypes(sedsPackage);
-    const auto resolvedPackageDataTypes = dependencyResolver.resolve(&packageDataTypes, nullptr);
+    const auto resolvedPackageDataTypes = typesDependencyResolver.resolve(&packageDataTypes, nullptr);
 
     auto packageAsn1Definitions = std::make_unique<Asn1Acn::Definitions>(
             Escaper::escapeAsn1PackageName(sedsPackage.nameStr()), Asn1Acn::SourceLocation());
+
+    for (const auto &importedType : importedTypes) {
+        packageAsn1Definitions->addImportedType(importedType);
+    }
+
     translateDataTypes(resolvedPackageDataTypes, packageAsn1Definitions.get(), &sedsPackage, asn1Files);
 
     std::vector<std::unique_ptr<Asn1Acn::File>> result;
@@ -118,12 +132,17 @@ std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePacka
         }
 
         const auto componentDataTypes = collectDataTypes(sedsComponent);
-        const auto resolvedComponentDataTypes = dependencyResolver.resolve(&componentDataTypes, &packageDataTypes);
+        const auto resolvedComponentDataTypes = typesDependencyResolver.resolve(&componentDataTypes, &packageDataTypes);
 
         const auto componentPackageName =
                 Escaper::escapeAsn1PackageName(sedsPackage.nameStr() + "-" + sedsComponent.nameStr());
         auto componentAsn1Definitions =
                 std::make_unique<Asn1Acn::Definitions>(componentPackageName, Asn1Acn::SourceLocation());
+
+        for (const auto &importedType : importedTypes) {
+            componentAsn1Definitions->addImportedType(importedType);
+        }
+
         translateDataTypes(resolvedComponentDataTypes, componentAsn1Definitions.get(), &sedsPackage, asn1Files);
 
         auto componentAsn1File = std::make_unique<Asn1Acn::File>(componentPackageName);

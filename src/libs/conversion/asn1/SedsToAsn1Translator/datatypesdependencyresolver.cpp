@@ -33,6 +33,16 @@
 
 namespace conversion::asn1::translator {
 
+DataTypesDependencyResolver::NotDagException::NotDagException()
+    : ConversionException("Data types doesn't make a DAG")
+{
+}
+
+DataTypesDependencyResolver::UndeclaredDataTypeException::UndeclaredDataTypeException(const QString &dataTypeName)
+    : ConversionException(QString("Undeclared data type '%1'").arg(dataTypeName))
+{
+}
+
 DataTypesDependencyResolver::ResultList DataTypesDependencyResolver::resolve(
         const DataTypesDependencyResolver::DataTypes *dataTypes,
         const DataTypesDependencyResolver::DataTypes *globalDataTypes)
@@ -128,7 +138,7 @@ void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDat
 
 const seds::model::DataType *DataTypesDependencyResolver::findDataType(const seds::model::DataTypeRef &dataTypeRef)
 {
-    if (dataTypeRef.package()) {
+    if (dataTypeRef.packageStr()) {
         return nullptr;
     }
 
@@ -180,16 +190,6 @@ bool DataTypesDependencyResolver::isPermanentlyMarked(const seds::model::DataTyp
     }
 
     return m_marks.at(dataType) == MarkType::Permanent;
-}
-
-NotDagException::NotDagException()
-    : ConversionException("Data types doesn't make a DAG")
-{
-}
-
-UndeclaredDataTypeException::UndeclaredDataTypeException(const QString &dataTypeName)
-    : ConversionException(QString("Undeclared data type '%1'").arg(dataTypeName))
-{
 }
 
 } // namespace conversion::asn1::translator

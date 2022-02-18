@@ -20,6 +20,7 @@
 #pragma once
 
 #include <asn1library/asn1/asn1model.h>
+#include <asn1library/asn1/importedtype.h>
 #include <conversion/common/translation/translator.h>
 #include <list>
 #include <seds/SedsModel/types/datatype.h>
@@ -102,8 +103,8 @@ private:
      *
      * @return  Result ASN.1 files
      */
-    auto translatePackage(const seds::model::Package &sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files) const
-            -> std::vector<std::unique_ptr<Asn1Acn::File>>;
+    auto translatePackage(const seds::model::Package &sedsPackage, const std::set<Asn1Acn::ImportedType> &importedTypes,
+            const Asn1Acn::Asn1Model::Data &asn1Files) const -> std::vector<std::unique_ptr<Asn1Acn::File>>;
     /**
      * @brief   Translate SEDS data types
      *
