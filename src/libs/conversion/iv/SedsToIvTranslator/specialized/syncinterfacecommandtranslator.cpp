@@ -110,7 +110,7 @@ void SyncInterfaceCommandTranslator::translateArguments(
 QString SyncInterfaceCommandTranslator::handleArgumentType(
         const seds::model::CommandArgument &sedsArgument, const QString &interfaceName) const
 {
-    const auto &argumentTypeName = sedsArgument.type().nameStr();
+    const auto &argumentTypeName = sedsArgument.typeRef().nameStr();
 
     const auto typeMapping = m_typeMapper->getMapping(argumentTypeName);
 

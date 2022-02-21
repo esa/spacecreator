@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/types/sequence.h>
@@ -35,6 +36,7 @@ class Null;
 
 namespace seds::model {
 class Component;
+class DataTypeRef;
 class Entry;
 class EntryRef;
 class ErrorControlEntry;
@@ -63,7 +65,8 @@ public:
      * @param   sedsPackage         Parent SEDS package
      */
     EntryTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence, Asn1Acn::Definitions *asn1Definitions,
-            const seds::model::ContainerDataType *sedsParentContainer, const seds::model::Package *sedsPackage);
+            const seds::model::ContainerDataType *sedsParentContainer, const seds::model::Package *sedsPackage,
+            const Asn1Acn::Asn1Model::Data &asn1Files);
     /**
      * @brief   Deleted copy constructor
      */
@@ -120,7 +123,8 @@ public:
     auto operator()(const seds::model::PaddingEntry &sedsEntry) -> void;
 
 private:
-    auto translateEntryType(const QString &sedsTypeName) const -> std::unique_ptr<Asn1Acn::Types::UserdefinedType>;
+    auto translateEntryType(const seds::model::DataTypeRef &sedsTypeRef) const
+            -> std::unique_ptr<Asn1Acn::Types::UserdefinedType>;
 
     auto translateFixedValue(
             const seds::model::FixedValueEntry &sedsEntry, Asn1Acn::Types::UserdefinedType *asn1Type) const -> void;
@@ -149,6 +153,9 @@ private:
     const seds::model::ContainerDataType *m_sedsParentContainer;
     /// @brief  Parent package
     const seds::model::Package *m_sedsPackage;
+
+    /// @brief  List of alerady translated ASN.1 files
+    const Asn1Acn::Asn1Model::Data &m_asn1Files;
 
     const static int m_crc8BitSize = 8;
     const static int m_crc16BitSize = 16;

@@ -105,7 +105,7 @@ void InterfaceParameterTranslator::buildParameter(const seds::model::InterfacePa
 QString InterfaceParameterTranslator::handleParameterTypeName(
         const seds::model::InterfaceParameter &sedsParameter) const
 {
-    const auto &parameterTypeName = sedsParameter.type().nameStr();
+    const auto &parameterTypeName = sedsParameter.typeRef().nameStr();
 
     const auto typeMapping = m_typeMapper->getMapping(parameterTypeName);
 

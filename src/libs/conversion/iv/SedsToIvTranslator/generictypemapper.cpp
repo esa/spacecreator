@@ -70,7 +70,7 @@ const TypeMapping *GenericTypeMapper::getMapping(const QString &typeName) const
 void GenericTypeMapper::addSimpleMapping(const GenericTypeMap &typeMap)
 {
     const auto &genericTypeName = typeMap.nameStr();
-    const auto &concreteTypeName = typeMap.type().nameStr();
+    const auto &concreteTypeName = typeMap.typeRef().nameStr();
 
     TypeMapping::ConcreteType concreteType { concreteTypeName, typeMap.fixedValue(), std::nullopt };
 
@@ -95,12 +95,12 @@ void GenericTypeMapper::addAlternateMapping(const GenericAlternate &alternate, c
         throw TranslationException(std::move(errorMessage));
     }
 
-    const auto &determinantTypeName = foundDeterminant->type().nameStr();
+    const auto &determinantTypeName = foundDeterminant->typeRef().nameStr();
     const auto &determinantValue = foundDeterminant->fixedValue();
 
     for (const auto &typeMap : typeMaps) {
         const auto &genericTypeName = typeMap.nameStr();
-        const auto &concreteTypeName = typeMap.type().nameStr();
+        const auto &concreteTypeName = typeMap.typeRef().nameStr();
 
         const auto foundMapping = std::find_if(m_mappings.begin(), m_mappings.end(),
                 [&](const auto &mapping) { return mapping.genericTypeName == genericTypeName; });
@@ -130,7 +130,8 @@ QString GenericTypeMapper::findDeterminant(const std::vector<GenericAlternate> &
 
                 std::set_intersection(acc.begin(), acc.end(), possibleDeterminants.begin(), possibleDeterminants.end(),
                         std::back_inserter(result), [&](const auto lhs, const auto rhs) {
-                            return lhs->nameStr() != rhs->nameStr() || lhs->type().nameStr() != rhs->type().nameStr();
+                            return lhs->nameStr() != rhs->nameStr()
+                                    || lhs->typeRef().nameStr() != rhs->typeRef().nameStr();
                         });
 
                 return result;

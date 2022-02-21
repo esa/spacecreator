@@ -91,17 +91,18 @@ void DataTypesDependencyResolver::visit(const seds::model::DataType *dataType)
 void DataTypesDependencyResolver::visitArray(const seds::model::ArrayDataType &arrayDataType)
 {
     const auto &itemDataTypeRef = arrayDataType.typeRef();
-    const auto *itemDataType = findDataType(itemDataTypeRef);
 
-    if (itemDataType == nullptr) {
+    if (itemDataTypeRef.packageStr().has_value()) {
         return;
     }
 
+    const auto *itemDataType = findDataType(itemDataTypeRef.nameStr());
     visit(itemDataType);
 
     for (const auto &dimension : arrayDataType.dimensions()) {
-        if (dimension.indexTypeRef()) {
-            const auto *indexType = findDataType(*dimension.indexTypeRef());
+        const auto &indexTypeRef = dimension.indexTypeRef();
+        if (indexTypeRef) {
+            const auto *indexType = findDataType(indexTypeRef->nameStr());
             visit(indexType);
         }
     }
@@ -114,9 +115,13 @@ void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDat
         if constexpr (std::is_same_v<T, seds::model::PaddingEntry>) {
             return;
         } else {
-            const auto &entryDataTypeRef = entry.type();
-            const auto *entryDataType = findDataType(entryDataTypeRef);
+            const auto &entryTypeRef = entry.typeRef();
 
+            if (entryTypeRef.packageStr().has_value()) {
+                return;
+            }
+
+            const auto *entryDataType = findDataType(entryTypeRef.nameStr());
             visit(entryDataType);
         }
     };
@@ -130,20 +135,13 @@ void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDat
 
     const auto &baseTypeRef = containerDataType.baseType();
     if (baseTypeRef) {
-        const auto *baseType = findDataType(*baseTypeRef);
-
+        const auto *baseType = findDataType(baseTypeRef->nameStr());
         visit(baseType);
     }
 }
 
-const seds::model::DataType *DataTypesDependencyResolver::findDataType(const seds::model::DataTypeRef &dataTypeRef)
+const seds::model::DataType *DataTypesDependencyResolver::findDataType(const QString &dataTypeName)
 {
-    if (dataTypeRef.packageStr()) {
-        return nullptr;
-    }
-
-    const auto &dataTypeName = dataTypeRef.nameStr();
-
     auto result = std::find_if(m_dataTypes->begin(), m_dataTypes->end(),
             [&dataTypeName](const auto *dataType) { return dataTypeNameStr(*dataType) == dataTypeName; });
 

@@ -113,7 +113,7 @@ void tst_SedsXmlParser::testContainerDataTypesParsing()
 
         const auto &entry = std::get<model::Entry>(containerType.entries().at(0));
         QCOMPARE(entry.name().value(), "fieldA");
-        QCOMPARE(entry.type().value().name().value(), "DataItemA");
+        QCOMPARE(entry.typeRef().value().name().value(), "DataItemA");
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
@@ -177,7 +177,7 @@ void tst_SedsXmlParser::testInterfacesParsing()
 
         const auto &parameter = parameters.at(0);
         QCOMPARE(parameter.name().value(), "SynchronousParameter");
-        QCOMPARE(parameter.type().value().name().value(), "DataItem");
+        QCOMPARE(parameter.typeRef().value().name().value(), "DataItem");
         QCOMPARE(parameter.mode(), model::InterfaceParameterMode::Sync);
     } catch (const std::exception &ex) {
         QFAIL(ex.what());

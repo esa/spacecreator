@@ -23,7 +23,7 @@ namespace seds::model {
 
 Field::~Field() = default;
 
-const DataTypeRef &Field::type() const
+const DataTypeRef &Field::typeRef() const
 {
     return m_type;
 }

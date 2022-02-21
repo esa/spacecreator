@@ -79,8 +79,11 @@ public:
 
 private:
     auto visit(const seds::model::Package *package) -> void;
-    auto visitArray(const seds::model::ArrayDataType &arrayDataType) -> std::optional<Asn1Acn::ImportedType>;
-    auto visitContainer(const seds::model::ContainerDataType &containerDataType) -> void;
+
+    auto handleArray(const seds::model::ArrayDataType &arrayDataType) -> std::optional<Asn1Acn::ImportedType>;
+    auto handleContainer(const seds::model::ContainerDataType &containerDataType) -> std::set<Asn1Acn::ImportedType>;
+
+    auto createImportedType(const seds::model::DataTypeRef &typeRef) -> Asn1Acn::ImportedType;
 
     auto findPackage(const QString &packageName) const -> const seds::model::Package *;
 

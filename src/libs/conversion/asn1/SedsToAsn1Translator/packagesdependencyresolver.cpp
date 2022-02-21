@@ -68,13 +68,15 @@ void PackagesDependencyResolver::visit(const seds::model::Package *package)
 
     for (const auto &dataType : package->dataTypes()) {
         if (const auto *arrayDataType = std::get_if<seds::model::ArrayDataType>(&dataType)) {
-            auto importedType = visitArray(*arrayDataType);
+            auto importedType = handleArray(*arrayDataType);
 
             if (importedType) {
                 importedTypes.insert(std::move(*importedType));
             }
         } else if (const auto *containerDataType = std::get_if<seds::model::ContainerDataType>(&dataType)) {
-            visitContainer(*containerDataType);
+            auto containerImportedTypes = handleContainer(*containerDataType);
+            std::copy(containerImportedTypes.begin(), containerImportedTypes.end(),
+                    std::inserter(importedTypes, importedTypes.end()));
         }
     }
 
@@ -83,27 +85,59 @@ void PackagesDependencyResolver::visit(const seds::model::Package *package)
     m_result.push_back({ package, std::move(importedTypes) });
 }
 
-std::optional<Asn1Acn::ImportedType> PackagesDependencyResolver::visitArray(
+std::optional<Asn1Acn::ImportedType> PackagesDependencyResolver::handleArray(
         const seds::model::ArrayDataType &arrayDataType)
 {
-    const auto &itemTypeRef = arrayDataType.typeRef();
+    const auto &typeRef = arrayDataType.typeRef();
 
-    if (itemTypeRef.packageStr()) {
-        const auto &packageName = *itemTypeRef.packageStr();
-        const auto package = findPackage(packageName);
-
-        visit(package);
-
-        const auto asn1ModuleName = Escaper::escapeAsn1PackageName(packageName);
-        const auto asn1TypeName = Escaper::escapeAsn1TypeName(itemTypeRef.nameStr());
-
-        return Asn1Acn::ImportedType(asn1ModuleName, asn1TypeName);
+    if (typeRef.packageStr()) {
+        return createImportedType(typeRef);
     }
 
     return std::nullopt;
 }
 
-void PackagesDependencyResolver::visitContainer(const seds::model::ContainerDataType &containerDataType) {}
+std::set<Asn1Acn::ImportedType> PackagesDependencyResolver::handleContainer(
+        const seds::model::ContainerDataType &containerDataType)
+{
+    std::set<Asn1Acn::ImportedType> importedTypes;
+
+    const auto visitor = [&](auto &&entry) {
+        using T = std::decay_t<decltype(entry)>;
+        if constexpr (std::is_same_v<T, seds::model::PaddingEntry>) {
+            return;
+        } else {
+            const auto &typeRef = entry.typeRef();
+
+            if (typeRef.packageStr()) {
+                auto importedType = createImportedType(typeRef);
+                importedTypes.insert(std::move(importedType));
+            }
+        }
+    };
+
+    for (const auto &containerEntry : containerDataType.entries()) {
+        std::visit(visitor, containerEntry);
+    }
+    for (const auto &containerTrailerEntry : containerDataType.trailerEntries()) {
+        std::visit(visitor, containerTrailerEntry);
+    }
+
+    return importedTypes;
+}
+
+Asn1Acn::ImportedType PackagesDependencyResolver::createImportedType(const seds::model::DataTypeRef &typeRef)
+{
+    const auto &packageName = *typeRef.packageStr();
+    const auto package = findPackage(packageName);
+
+    visit(package);
+
+    const auto asn1ModuleName = Escaper::escapeAsn1PackageName(packageName);
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(typeRef.nameStr());
+
+    return Asn1Acn::ImportedType(asn1ModuleName, asn1TypeName);
+}
 
 const seds::model::Package *PackagesDependencyResolver::findPackage(const QString &packageName) const
 {

@@ -82,7 +82,7 @@ void InterfaceExporter::exportCommandArgument(
 
     const auto &commandArgumentName = commandArgument.nameStr();
     commandArgumentElement.setAttribute(QStringLiteral("name"), commandArgumentName);
-    const auto &commandArgumentType = commandArgument.type().nameStr();
+    const auto &commandArgumentType = commandArgument.typeRef().nameStr();
     commandArgumentElement.setAttribute(QStringLiteral("type"), commandArgumentType);
     commandArgumentElement.setAttribute(QStringLiteral("mode"), stringFromEnum(commandArgument.mode()));
 
