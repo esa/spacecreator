@@ -71,6 +71,7 @@ using promela::model::ForLoop;
 using promela::model::InlineCall;
 using promela::model::InlineDef;
 using promela::model::PromelaModel;
+using promela::model::Skip;
 using promela::model::TypeAlias;
 using promela::model::Utype;
 using promela::model::UtypeRef;
@@ -175,7 +176,8 @@ void tst_Asn1ToPromelaTranslator::testBasicTypes()
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyNull_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 0);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
+        QVERIFY(std::holds_alternative<Skip>(inlineDef->getSequence().getContent().front()->getValue()));
     }
 }
 
