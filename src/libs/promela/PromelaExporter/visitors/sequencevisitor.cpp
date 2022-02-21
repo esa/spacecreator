@@ -47,4 +47,16 @@ void SequenceVisitor::visit(const Sequence &sequence, bool useSequenceIndent)
         }
     }
 }
+
+QString SequenceVisitor::getSequencePrefix(const Sequence &sequence)
+{
+    if (sequence.getType() == Sequence::Type::ATOMIC) {
+        return "atomic ";
+    }
+    if (sequence.getType() == Sequence::Type::D_STEP) {
+        return "d_step ";
+    }
+
+    return "";
+}
 }

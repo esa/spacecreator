@@ -46,6 +46,14 @@ public:
      */
     void visit(const ::promela::model::Sequence &sequence, bool useSequenceIndent = false);
 
+    /**
+     * @brief Get string prefix for sequence based on sequence type
+     *
+     * @param sequence sequence
+     * @return prefix of sequence e.g. atomic or d_step
+     */
+    QString getSequencePrefix(const ::promela::model::Sequence &sequence);
+
 private:
     QTextStream &m_stream;
     const QString m_baseIndent;

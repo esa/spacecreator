@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "common.h"
+
 #include <asn1library/asn1/asn1model.h>
 #include <ivcore/ivmodel.h>
 #include <sdl/SdlModel/sdlmodel.h>
@@ -35,18 +37,16 @@ public:
     /**
      * @brief   Translate the given SEDS activity into SDL procedure and add it to the target process
      *
-     * @param sedsPackage       SEDS package containing the activity
-     * @param asn1Model         Data model
-     * @param ivModel           IV model
+     * @param context           Translation context
      * @param sedsStateMachine  Source SEDS activity
+     * @param sedsActivity      Source SEDS activity
      * @param sdlProcess        Target SDL process
      */
-    static auto translateActivity(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
-            ivm::IVModel *ivModel, const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess) -> void;
+    static auto translateActivity(
+            Context &context, const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess) -> void;
 
 private:
-    static auto translateBody(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
-            ivm::IVModel *ivModel, const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess,
+    static auto translateBody(Context &context, const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess,
             ::sdl::Procedure *procedure) -> void;
 };
 

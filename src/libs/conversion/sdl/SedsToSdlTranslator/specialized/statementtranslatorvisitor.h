@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "common.h"
 #include "components/activities/polynomial.h"
 #include "components/activities/splinecalibrator.h"
 
@@ -51,22 +52,19 @@ class StatementTranslatorVisitor final
 {
 public:
     /**
-     *  @brief  Translation context which can be shared between visitors
+     *  @brief  Statement translation context which can be shared between visitors
      */
-    class Context
+    class StatementContext
     {
     public:
         /**
-         * @brief   Context constructor
+         * @brief   StatementContext constructor
          *
-         * @param sedsPackage       SEDS package containing the activity
-         * @param asn1Model         Data model
-         * @param ivModel           IV model
-         * @param sdlProcess        Host SDL process
-         * @param sdlProcedure      Host SDL procedure
+         * @param masterContext     Master context of the translation
+         * @param sdlProcess        Host SDL Process
+         * @param sdlProcedure      Host SDL Procedure
          */
-        Context(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
-                ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure);
+        StatementContext(Context &masterContext, ::sdl::Process *sdlProcess, ::sdl::Procedure *sdlProcedure);
 
         /**
          * @brief   Returns a unique label name, starting with the given prefix
@@ -83,24 +81,28 @@ public:
          */
 
         auto sedsPackage() -> const seds::model::Package &;
+
         /**
          * @brief ASN.1 Model accessor
          *
          * @returns ASN.1 Model
          */
         auto asn1Model() -> Asn1Acn::Asn1Model *;
+
         /**
-         * @brief InterfaceView Model accessor
+         * @brief InterfaceView Function accessor
          *
-         * @returns InterfaceView Model Package
+         * @returns InterfaceView Function Package
          */
-        auto ivModel() -> ivm::IVModel *;
+        auto ivFunction() -> ivm::IVFunction *;
+
         /**
          * @brief SDL Process accessor
          *
          * @returns SDL Process
          */
         auto sdlProcess() -> ::sdl::Process *;
+
         /**
          * @brief SDL Procedure accessor
          *
@@ -108,11 +110,27 @@ public:
          */
         auto sdlProcedure() -> ::sdl::Procedure *;
 
+        /**
+         * @brief Add ActivityInfo
+         *
+         * @param name  Name of the Activity
+         * @param info  ActivityInfo to be added
+         */
+        auto addActivityInfo(const QString name, ActivityInfo info) -> void;
+
+        /**
+         * @brief Retrieve InterfaceCommand
+         *
+         * @param interface     Name of the interface hosting the command
+         * @param name          Name of the command
+         *
+         * @return InterfaceCommand
+         */
+        auto getCommand(const QString interface, const QString name) -> const seds::model::InterfaceCommand *;
+
     private:
         int m_labelCount;
-        const seds::model::Package &m_sedsPackage;
-        Asn1Acn::Asn1Model *m_asn1Model;
-        ivm::IVModel *m_ivModel;
+        Context &m_masterContext;
         ::sdl::Process *m_sdlProcess;
         ::sdl::Procedure *m_sdlProcedure;
     };
@@ -123,8 +141,7 @@ public:
      * @param context           Shared translation context
      * @param sdlTransition     Target SDL transition
      */
-
-    StatementTranslatorVisitor(Context &context, ::sdl::Transition *sdlTransition);
+    StatementTranslatorVisitor(StatementContext &context, ::sdl::Transition *sdlTransition);
 
     /**
      * @brief   Translates SEDS activity invocation
@@ -132,30 +149,35 @@ public:
      * @param   invocation   Statement to translate
      */
     auto operator()(const seds::model::ActivityInvocation &invocation) -> void;
+
     /**
      * @brief   Translates SEDS assignment
      *
      * @param   assignment   Statement to translate
      */
     auto operator()(const seds::model::Assignment &assignment) -> void;
+
     /**
      * @brief   Translates SEDS calibration
      *
      * @param   calibration   Statement to translate
      */
     auto operator()(const seds::model::Calibration &calibration) -> void;
+
     /**
      * @brief   Translates SEDS conditional
      *
      * @param   conditional   Statement to translate
      */
     auto operator()(const seds::model::Conditional &conditional) -> void;
+
     /**
      * @brief   Translates SEDS iteration
      *
      * @param   iteration   Statement to translate
      */
     auto operator()(const seds::model::Iteration &iteration) -> void;
+
     /**
      * @brief   Translates SEDS operation
      *
@@ -171,11 +193,11 @@ public:
     auto operator()(const seds::model::SendCommandPrimitive &sendCommand) -> void;
 
     /**
-     * @brief   Translates SEDS sendPrimitive
+     * @brief   Translates SEDS sendParameter
      *
-     * @param   sendPrimitive   Statement to translate
+     * @param   sendParameter   Statement to translate
      */
-    auto operator()(const seds::model::SendParameterPrimitive &sendPrimitive) -> void;
+    auto operator()(const seds::model::SendParameterPrimitive &sendParameter) -> void;
 
     /**
      * @brief   Translates SEDS activity invocation into SDL task
@@ -201,11 +223,10 @@ public:
             const seds::model::BooleanExpression &expression) -> std::unique_ptr<::sdl::Decision>;
 
 private:
-    Context &m_context;
+    StatementContext &m_context;
     ::sdl::Transition *m_sdlTransition;
 
-    static auto findInterfaceDeclaration(ivm::IVModel *model, const QString &functionName, const QString &interfaceName)
-            -> ivm::IVInterface *;
+    static auto findIvInterface(ivm::IVFunction *function, const QString &interfaceName) -> ivm::IVInterface *;
 
     static auto findVariableDeclaration(::sdl::Process *process, ::sdl::Procedure *sdlProcedure, QString name)
             -> ::sdl::VariableDeclaration *;
@@ -218,8 +239,14 @@ private:
     static auto translateCall(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString callName,
             const seds::model::SendCommandPrimitive &sendCommand) -> std::unique_ptr<::sdl::ProcedureCall>;
 
+    static auto translateCall(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString callName,
+            const seds::model::SendParameterPrimitive &sendParameter) -> std::unique_ptr<::sdl::ProcedureCall>;
+
     static auto translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString &callName,
             const seds::model::SendCommandPrimitive &sendCommand) -> std::vector<std::unique_ptr<::sdl::Action>>;
+
+    static auto translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString &callName,
+            const seds::model::SendParameterPrimitive &sendParameter) -> std::vector<std::unique_ptr<::sdl::Action>>;
 
     static auto translateComparison(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
             const seds::model::Comparison &comparison) -> QString;
@@ -233,7 +260,7 @@ private:
     static auto translateTypeCheck(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
             const seds::model::TypeCheck &check) -> QString;
 
-    static auto translateAnswer(Context &context, ::sdl::Label *joinLabel, const QString &value,
+    static auto translateAnswer(StatementContext &context, ::sdl::Label *joinLabel, const QString &value,
             const seds::model::Body *body) -> std::unique_ptr<::sdl::Answer>;
 
     static auto comparisonOperatorToString(const seds::model::ComparisonOperator op) -> QString;
@@ -241,12 +268,13 @@ private:
     static auto getOperandValue(
             ::sdl::Process *process, ::sdl::Procedure *sdlProcedure, const seds::model::Operand &operand) -> QString;
 
-    static auto translateBody(Context &context, ::sdl::Transition *transition, const seds::model::Body *body) -> void;
+    static auto translateBody(StatementContext &context, ::sdl::Transition *transition, const seds::model::Body *body)
+            -> void;
 
-    static auto generateLoopStart(Context &context, ::sdl::Transition *transition,
+    static auto generateLoopStart(StatementContext &context, ::sdl::Transition *transition,
             const seds::model::Iteration &iteration, ::sdl::Decision *decision) -> void;
 
-    static auto generateLoopEnd(Context &context, ::sdl::Transition *transition,
+    static auto generateLoopEnd(StatementContext &context, ::sdl::Transition *transition,
             const seds::model::Iteration &iteration, ::sdl::Label *startLabel) -> void;
 
     friend class ExpressionTranslatorVisitor;

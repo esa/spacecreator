@@ -451,7 +451,7 @@ model::MathOperation ComponentActivitiesParser::readMathOperation(QXmlStreamRead
     while (xmlReader.readNextStartElement()) {
         if (processForStatement(&mathOperation, xmlReader)) {
             continue;
-        } else if (xmlReader.name() == QStringLiteral("ValueOperand")) {
+        } else if (xmlReader.name() == QStringLiteral("Value")) {
             mathOperation.addElement(readValueOperand(xmlReader));
         } else if (xmlReader.name() == QStringLiteral("VariableRef")) {
             mathOperation.addElement(ComponentsParser::readVariableRef(xmlReader));

@@ -550,7 +550,7 @@ asnValue
 // ASN1 type choice
 // choice1 : FALSE
 asnChoice
-    : name COLON asnValue
+    : name COLON (asnItem | asnValue)
     ;
 // Allow something like for ASN.1
 // CHOICE { act CHOICE { heater ENUMERATED { nominal, redundant } } }

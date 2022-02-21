@@ -78,7 +78,8 @@ void ComponentsTranslator::translateInterface(const seds::model::Interface &seds
 {
     const auto &sedsInterfaceName = sedsInterface.nameStr();
 
-    const auto &sedsInterfaceDeclaration = findInterfaceDeclaration(sedsInterface.type().nameStr(), sedsComponent);
+    const auto &sedsInterfaceDeclaration =
+            findInterfaceDeclaration(sedsInterface.type().nameStr(), sedsComponent, m_sedsPackage);
     translateInterfaceDeclaration(sedsInterfaceDeclaration, sedsInterfaceName, sedsInterface.genericTypeMapSet(),
             sedsComponent, interfaceType, ivFunction);
 }
@@ -91,7 +92,7 @@ void ComponentsTranslator::translateInterfaceDeclaration(
 {
     for (const auto &sedsBaseInterface : sedsInterfaceDeclaration.baseInterfaces()) {
         const auto &sedsBaseInterfaceDeclaration =
-                findInterfaceDeclaration(sedsBaseInterface.type().nameStr(), sedsComponent);
+                findInterfaceDeclaration(sedsBaseInterface.type().nameStr(), sedsComponent, m_sedsPackage);
         translateInterfaceDeclaration(sedsBaseInterfaceDeclaration, sedsInterfaceName,
                 sedsBaseInterface.genericTypeMapSet(), sedsComponent, interfaceType, ivFunction);
     }
@@ -138,7 +139,7 @@ void ComponentsTranslator::translateCommands(const QString &sedsInterfaceName,
 }
 
 const seds::model::InterfaceDeclaration &ComponentsTranslator::findInterfaceDeclaration(
-        const QString &name, const seds::model::Component &sedsComponent) const
+        const QString &name, const seds::model::Component &sedsComponent, const seds::model::Package *sedsPackage)
 {
     const auto &sedsComponentInterfaceDeclarations = sedsComponent.declaredInterfaces();
     auto found = std::find_if(sedsComponentInterfaceDeclarations.begin(), sedsComponentInterfaceDeclarations.end(),
@@ -149,7 +150,7 @@ const seds::model::InterfaceDeclaration &ComponentsTranslator::findInterfaceDecl
         return *found;
     }
 
-    const auto &sedsPackageInterfaceDeclarations = m_sedsPackage->declaredInterfaces();
+    const auto &sedsPackageInterfaceDeclarations = sedsPackage->declaredInterfaces();
     found = std::find_if(sedsPackageInterfaceDeclarations.begin(), sedsPackageInterfaceDeclarations.end(),
             [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
                 return interfaceDeclaration.nameStr() == name;

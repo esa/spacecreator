@@ -21,6 +21,7 @@
 
 #include "asn1constraintvisitor.h"
 #include "asn1sequencecomponentvisitor.h"
+#include "enumeratedgenerator.h"
 
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
@@ -163,13 +164,11 @@ void Asn1ItemTypeVisitor::visit(const Enumerated &type)
 {
     const QString typeName = constructTypeName(m_name);
 
-    QList<EnumeratedItem> elements = type.items().values();
-    std::sort(elements.begin(), elements.end(),
-            [](const EnumeratedItem &lhs, const EnumeratedItem &rhs) { return lhs.index() < rhs.index(); });
+    EnumeratedGenerator generator(typeName, type);
 
-    for (const EnumeratedItem &element : elements) {
-        QString enumName = QString("%1_%2").arg(typeName).arg(Escaper::escapePromelaName(element.name()));
-        m_promelaModel.addValueDefinition(ValueDefinition(enumName, element.value()));
+    while (generator.has_next()) {
+        auto element = generator.next();
+        m_promelaModel.addValueDefinition(ValueDefinition(element.first, element.second));
     }
 
     m_promelaModel.addTypeAlias(TypeAlias(typeName, BasicType::INT));
