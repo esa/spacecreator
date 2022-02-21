@@ -22,9 +22,12 @@
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
+#include <dvcore/dvmodel.h>
 #include <dvcore/dvobject.h>
 #include <harness/dvgenerator/dvgenerator.h>
 #include <ivcore/ivfunction.h>
+#include <libdveditor/dvexporter.h>
+#include <memory>
 #include <qobjectdefs.h>
 #include <testgenerator/testgenerator.h>
 
@@ -45,6 +48,8 @@ private:
     const QString dvPath =
             QString("%1%2%3.dv.xml").arg(dvDir).arg(QDir::separator()); // for example resources/deploymentview.dv.xml
     const QString dvConfig = QString("%1%2config.xml").arg(dvDir).arg(QDir::separator());
+
+    std::unique_ptr<dve::DVExporter> m_exporter;
 };
 
 void tst_dvgenerator::initTestCase()
@@ -58,17 +63,23 @@ void tst_dvgenerator::testNominal()
     std::vector<ivm::IVFunction *> functionsToBind;
     auto generatedXml = DvGenerator::generate(functionsToBind);
 
-    auto generatedXmlQba = QByteArray::fromStdString(generatedXml.str());
-    const std::unique_ptr<QVector<dvm::DVObject *>> actualDvObjects = dvtools::getDvObjectsFromXml(generatedXmlQba);
+    const std::unique_ptr<QVector<dvm::DVObject *>> generatedDvObjects;
+    for (const auto &obj : generatedXml->objects()) {
+        generatedDvObjects->append(static_cast<dvm::DVObject *>(obj));
+    }
 
-    // check generated deployment view against read expected model
+    // read expected DeploymentView
     QFile file(dvPath.arg("deploymentview"));
     file.open(QIODevice::ReadOnly);
     QByteArray expectedXml(file.readAll());
     file.close();
-
     const std::unique_ptr<QVector<dvm::DVObject *>> expectedDvObjects = dvtools::getDvObjectsFromXml(expectedXml);
+
+    // TODO: compare expected and generated dvobjects
     (void)expectedDvObjects;
+    (void)generatedDvObjects;
+
+    QFAIL("this shall happen");
 }
 
 } // namespace tests::testgenerator

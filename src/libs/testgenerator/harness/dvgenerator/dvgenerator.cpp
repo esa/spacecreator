@@ -20,6 +20,7 @@
 #include "dvgenerator.h"
 
 #include <dvcore/dvcommonprops.h>
+#include <dvcore/dvmodel.h>
 #include <dvcore/dvobject.h>
 #include <memory>
 #include <shared/common.h>
@@ -30,11 +31,13 @@
 
 namespace testgenerator {
 
-auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind) -> std::stringstream
+auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind) -> std::unique_ptr<dvm::DVModel>
 {
+    auto model = std::make_unique<dvm::DVModel>();
+
     (void)functionsToBind;
 
-    return std::stringstream();
+    return model;
 }
 
 auto DvGenerator::setObjectCoordinates(dvm::DVObject *const object, const QVector<qint32> &coordinates) -> void

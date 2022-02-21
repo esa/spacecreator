@@ -56,7 +56,7 @@ public:
     static const QString startTestInterfaceName;
     static const QString testDriverFunctionName;
 
-    static auto generate(const std::vector<ivm::IVFunction *> &functionsToBind) -> std::stringstream;
+    static auto generate(const std::vector<ivm::IVFunction *> &functionsToBind) -> std::unique_ptr<dvm::DVModel>;
 
 private:
     static auto makeNode() -> void;
