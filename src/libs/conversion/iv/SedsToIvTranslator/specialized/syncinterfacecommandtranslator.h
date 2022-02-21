@@ -40,7 +40,9 @@ public:
      *
      * @param   ivFunction          Output interface view function
      * @param   sedsInterfaceName   Parent interface name
-     * @param   genericTypeMapper   Generic type mapper
+     * @param   asn1Definitions     Parent ASN.1 definitions
+     * @param   sedsPackage         Parent SEDS package
+     * @param   typeMapper          Generic type mapper
      */
     SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
             Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,

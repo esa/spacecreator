@@ -68,7 +68,7 @@ public:
      * @param   sedsInterfaceName   Parent interface name
      * @param   asn1Definitions     Parent ASN.1 definitions
      * @param   sedsPackage         Parent SEDS package
-     * @param   genericTypeMapper   Generic type mapper
+     * @param   typeMapper          Generic type mapper
      */
     AsyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
             Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
