@@ -19,21 +19,20 @@
 
 #pragma once
 
-#include <seds/SedsModel/components/interface.h>
+#include <seds/SedsModel/generics/genericalternateset.h>
 
 namespace tests::conversion::common {
 
-class SedsInterfaceBuilder final
+class SedsAlternateSetBuilder final
 {
 public:
-    SedsInterfaceBuilder(QString name, QString type);
-    seds::model::Interface build();
+    seds::model::GenericAlternateSet build();
 
 public:
-    auto withMappings(seds::model::GenericTypeMapSet typeMapSet) -> SedsInterfaceBuilder &;
+    auto withAlternate(seds::model::GenericAlternate alternate) -> SedsAlternateSetBuilder &;
 
 private:
-    seds::model::Interface m_interface;
+    seds::model::GenericAlternateSet m_alternateSet;
 };
 
 } // namespace tests::conversion::common

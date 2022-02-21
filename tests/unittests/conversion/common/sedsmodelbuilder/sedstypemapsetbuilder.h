@@ -19,21 +19,21 @@
 
 #pragma once
 
-#include <seds/SedsModel/components/interface.h>
+#include <seds/SedsModel/generics/generictypemapset.h>
 
 namespace tests::conversion::common {
 
-class SedsInterfaceBuilder final
+class SedsTypeMapSetBuilder final
 {
 public:
-    SedsInterfaceBuilder(QString name, QString type);
-    seds::model::Interface build();
+    seds::model::GenericTypeMapSet build();
 
 public:
-    auto withMappings(seds::model::GenericTypeMapSet typeMapSet) -> SedsInterfaceBuilder &;
+    auto withMapping(QString name, QString type) -> SedsTypeMapSetBuilder &;
+    auto withAlternateSet(seds::model::GenericAlternateSet alternateSet) -> SedsTypeMapSetBuilder &;
 
 private:
-    seds::model::Interface m_interface;
+    seds::model::GenericTypeMapSet m_typeMapSet;
 };
 
 } // namespace tests::conversion::common

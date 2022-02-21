@@ -17,23 +17,22 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "sedsalternatesetbuilder.h"
 
-#include <seds/SedsModel/components/interface.h>
+using namespace seds::model;
 
 namespace tests::conversion::common {
 
-class SedsInterfaceBuilder final
+GenericAlternateSet SedsAlternateSetBuilder::build()
 {
-public:
-    SedsInterfaceBuilder(QString name, QString type);
-    seds::model::Interface build();
+    return std::move(m_alternateSet);
+}
 
-public:
-    auto withMappings(seds::model::GenericTypeMapSet typeMapSet) -> SedsInterfaceBuilder &;
+SedsAlternateSetBuilder &SedsAlternateSetBuilder::withAlternate(seds::model::GenericAlternate alternate)
+{
+    m_alternateSet.addAlternate(std::move(alternate));
 
-private:
-    seds::model::Interface m_interface;
-};
+    return *this;
+}
 
 } // namespace tests::conversion::common
