@@ -17,6 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#include "dvcore/dvobject.h"
+#include "dvtools.h"
+
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
@@ -38,7 +41,7 @@ private Q_SLOTS:
 private:
     const QString dvDir = "resources";
     const QString dvPath =
-            QString("%1%2%3.xml").arg(dvDir).arg(QDir::separator()); // for example directory/interfaceview.xml
+            QString("%1%2%3.dv.xml").arg(dvDir).arg(QDir::separator()); // for example resources/deploymentview.dv.xml
     const QString dvConfig = QString("%1%2config.xml").arg(dvDir).arg(QDir::separator());
 };
 
@@ -49,6 +52,16 @@ void tst_dvgenerator::initTestCase()
 
 void tst_dvgenerator::testNominal()
 {
+    // generate deplyment view
+
+    // check generated deployment view against read expected model
+    QFile file(dvPath.arg("deploymentview"));
+    file.open(QIODevice::ReadOnly);
+    QByteArray expectedXml(file.readAll());
+    file.close();
+
+    const std::unique_ptr<QVector<dvm::DVObject *>> dvobjects = dvtools::getDvObjectsFromXml(expectedXml);
+
     QFAIL("this shall fail");
 }
 

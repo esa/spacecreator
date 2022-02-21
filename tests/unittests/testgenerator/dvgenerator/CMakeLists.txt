@@ -6,6 +6,8 @@ add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
 target_sources(${TEST_NAME}
     PRIVATE     ${TEST_NAME}.cpp
+                dvtools.cpp
+                dvtools.h
 )
 
 target_include_directories(${TEST_NAME}
@@ -25,5 +27,5 @@ target_link_libraries(${TEST_NAME}
 
 add_format_target(${TEST_NAME})
 
-# configure_file(resources/interfaceview.xml resources/interfaceview.xml COPYONLY)
+configure_file(resources/deploymentview.dv.xml.out resources/deploymentview.dv.xml COPYONLY)
 # configure_file(resources/config.xml resources/config.xml COPYONLY)
