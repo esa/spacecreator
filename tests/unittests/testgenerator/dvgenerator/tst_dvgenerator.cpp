@@ -17,16 +17,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "dvcore/dvobject.h"
 #include "dvtools.h"
 
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
+#include <dvcore/dvobject.h>
+#include <harness/dvgenerator/dvgenerator.h>
+#include <ivcore/ivfunction.h>
 #include <qobjectdefs.h>
 #include <testgenerator/testgenerator.h>
 
-// using testgenerator::DvGenerator;
+using testgenerator::DvGenerator;
 
 namespace tests::testgenerator {
 
@@ -53,6 +55,11 @@ void tst_dvgenerator::initTestCase()
 void tst_dvgenerator::testNominal()
 {
     // generate deplyment view
+    std::vector<ivm::IVFunction *> functionsToBind;
+    auto generatedXml = DvGenerator::generate(functionsToBind);
+
+    auto generatedXmlQba = QByteArray::fromStdString(generatedXml.str());
+    const std::unique_ptr<QVector<dvm::DVObject *>> actualDvObjects = dvtools::getDvObjectsFromXml(generatedXmlQba);
 
     // check generated deployment view against read expected model
     QFile file(dvPath.arg("deploymentview"));
@@ -60,9 +67,8 @@ void tst_dvgenerator::testNominal()
     QByteArray expectedXml(file.readAll());
     file.close();
 
-    const std::unique_ptr<QVector<dvm::DVObject *>> dvobjects = dvtools::getDvObjectsFromXml(expectedXml);
-
-    QFAIL("this shall fail");
+    const std::unique_ptr<QVector<dvm::DVObject *>> expectedDvObjects = dvtools::getDvObjectsFromXml(expectedXml);
+    (void)expectedDvObjects;
 }
 
 } // namespace tests::testgenerator

@@ -11,6 +11,8 @@ target_sources(TestGenerator
                 testdrivergenerator/TestDriverGeneratorException.h
                 harness/ivgenerator/ivgenerator.cpp
                 harness/ivgenerator/ivgenerator.h
+                harness/dvgenerator/dvgenerator.cpp
+                harness/dvgenerator/dvgenerator.h
 )
 
 target_include_directories(TestGenerator

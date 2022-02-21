@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "harness/dvgenerator/dvgenerator.h"
 #include "harness/ivgenerator/ivgenerator.h"
 #include "testdrivergenerator/TestDriverGenerator.h"
 #include "testdrivergenerator/TestDriverGeneratorException.h"
