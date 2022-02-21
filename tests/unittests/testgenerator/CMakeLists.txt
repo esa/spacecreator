@@ -1,2 +1,3 @@
+add_subdirectory(dvgenerator)
 add_subdirectory(ivgenerator)
 add_subdirectory(testdrivergenerator)
