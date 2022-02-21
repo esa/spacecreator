@@ -21,7 +21,6 @@
 
 #include <algorithm>
 #include <conversion/common/translation/exceptions.h>
-#include <iostream>
 #include <numeric>
 
 using conversion::translator::TranslationException;

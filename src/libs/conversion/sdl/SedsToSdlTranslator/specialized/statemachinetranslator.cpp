@@ -29,7 +29,6 @@
 #include <conversion/iv/SedsToIvTranslator/interfacetranslatorhelper.h>
 #include <conversion/iv/SedsToIvTranslator/specialized/componentstranslator.h>
 #include <conversion/iv/SedsToIvTranslator/translator.h>
-#include <iostream>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
 #include <sdl/SdlModel/nextstate.h>
@@ -102,9 +101,7 @@ static inline auto getOnEntry(const seds::model::StateMachine &sedsStateMachine,
 static inline auto getInterfaceByName(ivm::IVFunction *function, QString name) -> ivm::IVInterface *
 {
     for (auto interface : function->allInterfaces()) {
-        std::cerr << interface->title().toStdString() << " ?= " << name.toStdString() << "\n";
         if (interface->title() == name) {
-            std::cerr << "ok\n\n";
             return interface;
         }
     }
