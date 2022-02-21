@@ -72,6 +72,7 @@ using promela::model::InlineCall;
 using promela::model::InlineDef;
 using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
+using promela::model::Skip;
 using promela::model::TypeAlias;
 using promela::model::Utype;
 using promela::model::UtypeRef;
@@ -111,6 +112,8 @@ void Asn1ItemTypeVisitor::visit(const Null &type)
     m_promelaModel.addTypeAlias(TypeAlias(typeName, BasicType::BIT));
 
     ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+
+    sequence.appendElement(std::make_unique<ProctypeElement>(Skip()));
 
     addAssignValueInline(typeName, std::move(sequence));
 
@@ -310,6 +313,7 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
 
     if (nestedUtype.getFields().isEmpty()) {
         nestedUtype.addField(Declaration(DataType(BasicType::BIT), "dummy"));
+        sequence.appendElement(std::make_unique<ProctypeElement>(Skip()));
     }
 
     m_promelaModel.addUtype(nestedUtype);
