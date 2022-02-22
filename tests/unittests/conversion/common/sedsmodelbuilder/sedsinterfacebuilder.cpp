@@ -34,19 +34,9 @@ Interface SedsInterfaceBuilder::build()
     return std::move(m_interface);
 }
 
-SedsInterfaceBuilder &SedsInterfaceBuilder::withMappings(std::vector<std::pair<QString, QString>> mappings)
+SedsInterfaceBuilder &SedsInterfaceBuilder::withMappings(GenericTypeMapSet typeMapSet)
 {
-    GenericTypeMapSet genericTypeMapSet;
-
-    for (const auto &mapping : mappings) {
-        GenericTypeMap genericTypeMap;
-        genericTypeMap.setName(mapping.first);
-        genericTypeMap.setType(mapping.second);
-
-        genericTypeMapSet.addGenericTypeMap(std::move(genericTypeMap));
-    }
-
-    m_interface.setGenericTypeMapSet(std::move(genericTypeMapSet));
+    m_interface.setGenericTypeMapSet(std::move(typeMapSet));
 
     return *this;
 }

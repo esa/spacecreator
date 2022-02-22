@@ -48,6 +48,7 @@ public:
     const QString &adaName() const { return m_adaName; }
     const QString &cName() const { return m_cName; }
     const QString &presentWhen() const { return m_presentWhen; }
+    const std::vector<QString> &acnParameters() const;
     const SourceLocation &location() const { return m_location; }
 
     const Type *type() const { return m_type.get(); }

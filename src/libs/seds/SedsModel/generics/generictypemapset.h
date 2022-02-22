@@ -39,12 +39,12 @@ public:
     auto genericTypeMaps() const -> const std::vector<GenericTypeMap> &;
     auto addGenericTypeMap(GenericTypeMap genericTypeMap) -> void;
 
-    auto alternateSet() const -> const GenericAlternateSet &;
+    auto alternateSet() const -> const std::optional<GenericAlternateSet> &;
     auto setAlternateSet(GenericAlternateSet alternateSet) -> void;
 
 private:
     std::vector<GenericTypeMap> m_genericTypeMaps;
-    GenericAlternateSet m_alternateSet;
+    std::optional<GenericAlternateSet> m_alternateSet;
 };
 
 } // namespace seds::model

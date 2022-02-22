@@ -17,37 +17,22 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "sedsinterfacedeclarationbuilder.h"
+#pragma once
 
-using namespace seds::model;
+#include <seds/SedsModel/generics/genericalternateset.h>
 
 namespace tests::conversion::common {
 
-SedsInterfaceDeclarationBuilder::SedsInterfaceDeclarationBuilder(QString name)
+class SedsAlternateSetBuilder final
 {
-    m_interfaceDeclaration.setName(std::move(name));
-}
+public:
+    seds::model::GenericAlternateSet build();
 
-InterfaceDeclaration SedsInterfaceDeclarationBuilder::build()
-{
-    return std::move(m_interfaceDeclaration);
-}
+public:
+    auto withAlternate(seds::model::GenericAlternate alternate) -> SedsAlternateSetBuilder &;
 
-SedsInterfaceDeclarationBuilder &SedsInterfaceDeclarationBuilder::withGenericType(QString name)
-{
-    seds::model::GenericType genericType;
-    genericType.setName(std::move(name));
-
-    m_interfaceDeclaration.addGenericType(std::move(genericType));
-
-    return *this;
-}
-
-SedsInterfaceDeclarationBuilder &SedsInterfaceDeclarationBuilder::withCommand(InterfaceCommand command)
-{
-    m_interfaceDeclaration.addCommand(std::move(command));
-
-    return *this;
-}
+private:
+    seds::model::GenericAlternateSet m_alternateSet;
+};
 
 } // namespace tests::conversion::common

@@ -57,6 +57,9 @@ public:
     virtual QString definitionAsString() const = 0;
     virtual QString presentWhen() const = 0;
 
+    const std::vector<QString> &acnParameters() const { return m_asn1Parameters; }
+    void addAcnParameter(QString acnParameter) { m_asn1Parameters.push_back(std::move(acnParameter)); }
+
     virtual void accept(SequenceComponentVisitor &visitor) = 0;
 
     const QString &name() const { return m_name; }
@@ -69,6 +72,7 @@ private:
     QString m_name;
     QString m_cName;
     std::unique_ptr<Types::Type> m_type;
+    std::vector<QString> m_asn1Parameters;
 };
 
 }

@@ -25,7 +25,6 @@
 
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/overloaded.h>
-#include <conversion/iv/SedsToIvTranslator/specialized/interfacecommandtranslator.h>
 
 using conversion::Escaper;
 using conversion::translator::TranslationException;

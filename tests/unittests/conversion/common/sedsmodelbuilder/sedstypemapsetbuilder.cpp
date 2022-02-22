@@ -17,35 +17,31 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "sedsinterfacedeclarationbuilder.h"
+#include "sedstypemapsetbuilder.h"
 
 using namespace seds::model;
 
 namespace tests::conversion::common {
 
-SedsInterfaceDeclarationBuilder::SedsInterfaceDeclarationBuilder(QString name)
+GenericTypeMapSet SedsTypeMapSetBuilder::build()
 {
-    m_interfaceDeclaration.setName(std::move(name));
+    return std::move(m_typeMapSet);
 }
 
-InterfaceDeclaration SedsInterfaceDeclarationBuilder::build()
+SedsTypeMapSetBuilder &SedsTypeMapSetBuilder::withMapping(QString name, QString type)
 {
-    return std::move(m_interfaceDeclaration);
-}
+    GenericTypeMap typeMap;
+    typeMap.setName(std::move(name));
+    typeMap.setType(std::move(type));
 
-SedsInterfaceDeclarationBuilder &SedsInterfaceDeclarationBuilder::withGenericType(QString name)
-{
-    seds::model::GenericType genericType;
-    genericType.setName(std::move(name));
-
-    m_interfaceDeclaration.addGenericType(std::move(genericType));
+    m_typeMapSet.addGenericTypeMap(std::move(typeMap));
 
     return *this;
 }
 
-SedsInterfaceDeclarationBuilder &SedsInterfaceDeclarationBuilder::withCommand(InterfaceCommand command)
+SedsTypeMapSetBuilder &SedsTypeMapSetBuilder::withAlternateSet(seds::model::GenericAlternateSet alternateSet)
 {
-    m_interfaceDeclaration.addCommand(std::move(command));
+    m_typeMapSet.setAlternateSet(std::move(alternateSet));
 
     return *this;
 }

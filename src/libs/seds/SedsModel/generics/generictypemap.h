@@ -34,11 +34,11 @@ public:
     GenericTypeMap &operator=(GenericTypeMap &&) = default;
 
 public:
-    auto fixedValue() const -> const std::optional<LiteralValue> &;
-    auto setFixedValue(LiteralValue literalValue) -> void;
+    auto fixedValue() const -> const std::optional<QString> &;
+    auto setFixedValue(QString fixedValue) -> void;
 
 private:
-    std::optional<LiteralValue> m_fixedValue;
+    std::optional<QString> m_fixedValue;
 };
 
 } // namespace seds::model

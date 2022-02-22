@@ -218,7 +218,7 @@ model::Variable ComponentsParser::readVariable(QXmlStreamReader &xmlReader)
         if (DataTypesParser::processForField(&variable, attribute)) {
             continue;
         } else if (attribute.name() == QStringLiteral("initialValue")) {
-            variable.setInitialValue(attribute.name().toString());
+            variable.setInitialValue(attribute.value().toString());
         } else {
             throw UnhandledAttribute(attribute.name(), xmlReader.name());
         }

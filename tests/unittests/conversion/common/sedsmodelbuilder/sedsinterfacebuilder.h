@@ -30,7 +30,7 @@ public:
     seds::model::Interface build();
 
 public:
-    auto withMappings(std::vector<std::pair<QString, QString>> mappings) -> SedsInterfaceBuilder &;
+    auto withMappings(seds::model::GenericTypeMapSet typeMapSet) -> SedsInterfaceBuilder &;
 
 private:
     seds::model::Interface m_interface;

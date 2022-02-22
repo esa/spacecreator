@@ -111,13 +111,14 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
     const auto parameterActivityMapCount = implementation.parameterActivityMaps().size();
     const auto stateMachineCount = implementation.stateMachines().size();
     const auto activityCount = implementation.activities().size();
+    const auto variableCount = implementation.variables().size();
 
     if (stateMachineCount > 1) {
         throw new TranslationException("Only a single state machine is supported per SEDS component");
     }
 
-    if (parameterMapCount + parameterActivityMapCount + stateMachineCount + activityCount > 0) {
-        // There is at least one active element in the implementation
+    if (parameterMapCount + parameterActivityMapCount + stateMachineCount + activityCount + variableCount > 0) {
+        // There is at least one element in the implementation
         auto stateMachine = std::make_unique<::sdl::StateMachine>();
         ::sdl::Process process;
         process.setName(Escaper::escapeIvName(sedsComponent.nameStr()));

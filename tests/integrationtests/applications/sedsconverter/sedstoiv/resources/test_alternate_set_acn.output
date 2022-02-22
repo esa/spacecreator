@@ -1,0 +1,25 @@
+ALTERNATESET DEFINITIONS ::= BEGIN
+DeterminantType [size 8, encoding pos-int, endianness big]
+Integer8 [size 8, encoding pos-int, endianness big]
+Integer16 [size 16, encoding pos-int, endianness big]
+Integer32 [size 32, encoding pos-int, endianness big]
+ProvidedInterface-GenericType3 <DeterminantType:determinant> []
+{
+    concrete-Integer8 [size 8, encoding pos-int, endianness big, present-when determinant==0],
+    concrete-Integer16 [size 16, encoding pos-int, endianness big, present-when determinant==1],
+    concrete-Integer32 [size 32, encoding pos-int, endianness big, present-when determinant==2]
+}
+ProvidedInterface-GenericType4 <DeterminantType:determinant> []
+{
+    concrete-Integer8 [size 8, encoding pos-int, endianness big, present-when determinant==0],
+    concrete-Integer16 [size 16, encoding pos-int, endianness big, present-when determinant==1],
+    concrete-Integer32 [size 32, encoding pos-int, endianness big, present-when determinant==2]
+}
+AsyncWithGenericTypes-Type []
+{
+    genericArgument1 [],
+    genericArgument2 DeterminantType [],
+    genericArgument3 <genericArgument2>[],
+    genericArgument4 <genericArgument2>[]
+}
+END
