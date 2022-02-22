@@ -34,5 +34,7 @@ configure_file(resources/expect_promela_sequences_in_proctypes_and_inlines.pml e
 configure_file(resources/expect_promela_sequence_in_loop_and_if.pml expect_promela_sequence_in_loop_and_if.pml COPYONLY)
 configure_file(resources/expect_promela_atomic_init_proctype.pml expect_promela_atomic_init_proctype.pml COPYONLY)
 configure_file(resources/expect_promela_dstep_init_proctype.pml expect_promela_dstep_init_proctype.pml COPYONLY)
+configure_file(resources/expect_promela_for_range_loop.pml expect_promela_for_range_loop.pml COPYONLY)
+configure_file(resources/expect_promela_for_each_loop.pml expect_promela_for_each_loop.pml COPYONLY)
 
 add_format_target(${TEST_NAME})

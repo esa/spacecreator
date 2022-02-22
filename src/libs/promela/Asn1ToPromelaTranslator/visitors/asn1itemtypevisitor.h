@@ -27,7 +27,8 @@ namespace promela::translator {
 /**
  * @brief Visitor for type in SequenceOf
  *
- * This is a part of Asn1ToPromelaTranslator
+ * This is a part of Asn1ToPromelaTranslator.
+ *
  */
 class Asn1ItemTypeVisitor : public ::Asn1Acn::Types::TypeReadingVisitor
 {
@@ -136,7 +137,14 @@ public:
     void visit(const ::Asn1Acn::Types::UserdefinedType &type) override;
 
 private:
+    const QString assignValueInlineSuffix = "_assign_value";
+
+private:
     QString constructTypeName(QString name);
+    void addSimpleValueAssignmentInline(const QString &typeName);
+    void addAssignValueInline(const QString &typeName, ::promela::model::Sequence sequence);
+    void addSimpleArrayAssignInlineValue(const QString &typeName, int length, bool lengthFieldPresent);
+    QString getAssignValueInlineNameForNestedType(QString utype, QString field) const;
 
 private:
     ::promela::model::PromelaModel &m_promelaModel;

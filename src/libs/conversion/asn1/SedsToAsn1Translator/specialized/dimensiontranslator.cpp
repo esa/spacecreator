@@ -34,6 +34,8 @@ using conversion::translator::TranslationException;
 
 namespace conversion::asn1::translator {
 
+using SizeTranslator = SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn::IntegerValue>;
+
 DimensionTranslator::DimensionTranslator(const seds::model::Package *sedsPackage)
     : m_sedsPackage(sedsPackage)
 {
@@ -67,7 +69,8 @@ void DimensionTranslator::translateSizeDimension(
     }
 
     auto rangeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
-            { 0, static_cast<Asn1Acn::IntegerValue::Type>(dimensionSize) });
+            { static_cast<Asn1Acn::IntegerValue::Type>(dimensionSize),
+                    static_cast<Asn1Acn::IntegerValue::Type>(dimensionSize) });
 
     auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::IntegerValue>>();
     sizeConstraint->setInnerConstraints(std::move(rangeConstraint));
@@ -85,8 +88,18 @@ void DimensionTranslator::translateIndexDimension(
     }
 
     if (const auto integerIndexType = std::get_if<seds::model::IntegerDataType>(indexType); integerIndexType) {
-        SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn::IntegerValue> sizeTranslator(asn1SequenceOf);
+        SizeTranslator sizeTranslator(
+                asn1SequenceOf, SizeTranslator::LengthType::FixedLength, SizeTranslator::SourceType::Index);
         std::visit(sizeTranslator, integerIndexType->range());
+
+        if (sizeTranslator.getLastSetMin() != 0) {
+            auto errorMessage = QString("The lowest value of integer %1 used as an index type for %2 is not 0, and due "
+                                        "to ASN.1 limitations it is not supported")
+                                        .arg(integerIndexType->nameStr())
+                                        .arg(asn1SequenceOf->identifier());
+            throw TranslationException(std::move(errorMessage));
+        }
+
     } else if (const auto enumIndexType = std::get_if<seds::model::EnumeratedDataType>(indexType); enumIndexType) {
         translateEnumDimensionIndex(*enumIndexType, asn1SequenceOf);
     } else {
@@ -118,8 +131,16 @@ void DimensionTranslator::translateEnumDimensionIndex(
         throw TranslationException(std::move(errorMessage));
     }
 
-    SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn::IntegerValue> sizeTranslator(asn1SequenceOf);
-    sizeTranslator.addSizeConstraint(enumValues.front(), enumValues.back());
+    SizeTranslator sizeTranslator(
+            asn1SequenceOf, SizeTranslator::LengthType::FixedLength, SizeTranslator::SourceType::Index);
+    if (enumValues.front() != 0) {
+        auto errorMessage = QString("The lowest value of enumeration %1 used as an index type for %2 is not 0, and due "
+                                    "to ASN.1 limitations it is not supported")
+                                    .arg(indexType.nameStr())
+                                    .arg(asn1SequenceOf->identifier());
+        throw TranslationException(std::move(errorMessage));
+    }
+    sizeTranslator.addSizeConstraint(enumValues.back() - enumValues.front());
 }
 
 } // namespace conversion::asn1::translator

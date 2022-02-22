@@ -31,6 +31,7 @@ using promela::model::Conditional;
 using promela::model::Declaration;
 using promela::model::DoLoop;
 using promela::model::Expression;
+using promela::model::ForLoop;
 using promela::model::InlineCall;
 using promela::model::ProctypeElement;
 using promela::model::Sequence;
@@ -180,6 +181,26 @@ void ProctypeElementVisitor::operator()(const Sequence &sequence)
     SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
     m_stream << m_indent << visitor.getSequencePrefix(sequence) << "{\n";
     visitor.visit(sequence, false);
-    m_stream << m_indent << "};\n";
+    m_stream << m_indent << "}\n";
+}
+
+void ProctypeElementVisitor::operator()(const ForLoop &loop)
+{
+    VariableRefVisitor variableRefVisitor(m_stream);
+    if (loop.getType() == ForLoop::Type::RANGE) {
+        m_stream << m_indent << "for(";
+        variableRefVisitor.visit(loop.getForVariable());
+        m_stream << " : " << loop.getFirstValue() << " .. " << loop.getLastValue() << ")\n";
+    } else {
+        m_stream << m_indent << "for(";
+        variableRefVisitor.visit(loop.getForVariable());
+        m_stream << " in ";
+        variableRefVisitor.visit(loop.getArrayRef());
+        m_stream << ")\n";
+    }
+    SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
+    m_stream << m_indent << visitor.getSequencePrefix(*loop.getSequence()) << "{\n";
+    visitor.visit(*loop.getSequence(), false);
+    m_stream << m_indent << "}\n";
 }
 }

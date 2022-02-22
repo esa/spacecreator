@@ -222,6 +222,15 @@ public:
     static auto translateBooleanExpression(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
             const seds::model::BooleanExpression &expression) -> std::unique_ptr<::sdl::Decision>;
 
+    /**
+     * @brief Translate SEDS variable reference to an SDL one
+     *
+     * @param reference Variable reference to be translated
+     *
+     * @returns Translated variable reference
+     */
+    static auto translateVariableReference(QString reference) -> QString;
+
 private:
     StatementContext &m_context;
     ::sdl::Transition *m_sdlTransition;
@@ -265,17 +274,16 @@ private:
 
     static auto comparisonOperatorToString(const seds::model::ComparisonOperator op) -> QString;
 
-    static auto getOperandValue(
-            ::sdl::Process *process, ::sdl::Procedure *sdlProcedure, const seds::model::Operand &operand) -> QString;
+    static auto getOperandValue(const seds::model::Operand &operand) -> QString;
 
     static auto translateBody(StatementContext &context, ::sdl::Transition *transition, const seds::model::Body *body)
             -> void;
 
-    static auto generateLoopStart(StatementContext &context, ::sdl::Transition *transition,
-            const seds::model::Iteration &iteration, ::sdl::Decision *decision) -> void;
+    static auto generateLoopStart(
+            ::sdl::Transition *transition, const seds::model::Iteration &iteration, ::sdl::Decision *decision) -> void;
 
-    static auto generateLoopEnd(StatementContext &context, ::sdl::Transition *transition,
-            const seds::model::Iteration &iteration, ::sdl::Label *startLabel) -> void;
+    static auto generateLoopEnd(
+            ::sdl::Transition *transition, const seds::model::Iteration &iteration, ::sdl::Label *startLabel) -> void;
 
     friend class ExpressionTranslatorVisitor;
 };

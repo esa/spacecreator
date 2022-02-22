@@ -23,7 +23,7 @@
       <IntegerDataType name="IndexItem">
         <IntegerDataEncoding encoding="unsigned" sizeInBits="16" />
         <Range>
-          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="65000" max="65535" />
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="65535" />
         </Range>
       </IntegerDataType>
       <EnumeratedDataType name="EnumItem">
@@ -31,7 +31,7 @@
         <EnumerationList>
           <Enumeration value="12" label="Value1" />
           <Enumeration value="15" label="Value2" />
-          <Enumeration value="6" label="Value3" />
+          <Enumeration value="0" label="Value3" />
           <Enumeration value="42" label="Value4" />
         </EnumerationList>
       </EnumeratedDataType>

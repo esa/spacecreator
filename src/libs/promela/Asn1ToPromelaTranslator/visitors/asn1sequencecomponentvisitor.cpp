@@ -35,13 +35,12 @@ using promela::model::PromelaModel;
 using promela::model::Utype;
 
 namespace promela::translator {
-Asn1SequenceComponentVisitor::Asn1SequenceComponentVisitor(PromelaModel &promelaModel, Utype &utype,
-        QString baseTypeName, QList<QString> &optionalFields, bool enhancedSpinSupport)
+Asn1SequenceComponentVisitor::Asn1SequenceComponentVisitor(
+        PromelaModel &promelaModel, QString baseTypeName, bool enhancedSpinSupport)
     : m_promelaModel(promelaModel)
-    , m_utype(utype)
     , m_baseTypeName(std::move(baseTypeName))
-    , m_optionalFields(optionalFields)
     , m_enhancedSpinSupport(enhancedSpinSupport)
+    , m_optionalComponent(false)
 {
 }
 
@@ -49,14 +48,33 @@ void Asn1SequenceComponentVisitor::visit(const AsnSequenceComponent &component)
 {
     Asn1ItemTypeVisitor visitor(m_promelaModel, m_baseTypeName, component.name(), m_enhancedSpinSupport);
     component.type()->accept(visitor);
-    m_utype.addField(Declaration(visitor.getResultDataType().value(), Escaper::escapePromelaName(component.name())));
-    if (component.isOptional()) {
-        m_optionalFields.append(Escaper::escapePromelaName(component.name()));
-    }
+    m_componentName = Escaper::escapePromelaName(component.name());
+    m_componentType = visitor.getResultDataType();
+    m_optionalComponent = component.isOptional();
 }
 
 void Asn1SequenceComponentVisitor::visit(const AcnSequenceComponent &component)
 {
     Q_UNUSED(component);
+}
+
+bool Asn1SequenceComponentVisitor::wasComponentVisited() const
+{
+    return m_componentName.has_value();
+}
+
+QString Asn1SequenceComponentVisitor::getComponentName() const
+{
+    return m_componentName.value();
+}
+
+DataType Asn1SequenceComponentVisitor::getComponentType() const
+{
+    return m_componentType.value();
+}
+
+bool Asn1SequenceComponentVisitor::isComponentOptional() const
+{
+    return m_optionalComponent;
 }
 }

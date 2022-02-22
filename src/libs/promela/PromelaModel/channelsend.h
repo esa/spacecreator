@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "expression.h"
 #include "variableref.h"
 
 #include <QList>
