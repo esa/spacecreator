@@ -133,6 +133,9 @@ private:
         Async
     };
 
+    static auto setInitialVariableValues(
+            const seds::model::ComponentImplementation::VariableSet &variables, ::sdl::Transition *transition) -> void;
+
     static auto getAnyState(::sdl::StateMachine *stateMachine) -> ::sdl::State *;
 
     static auto getParameterInterface(ivm::IVFunction *function, const ParameterType type, const ParameterMode mode,
@@ -145,7 +148,7 @@ private:
 
     static auto translateParameter(Context &context, const seds::model::ParameterMap &map) -> void;
 
-    static auto createStartTransition(const seds::model::StateMachine &sedsStateMachine, ::sdl::Process *sdlProcess,
+    static auto createStartTransition(Context &context, const seds::model::StateMachine &sedsStateMachine,
             std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void;
 
     static auto translateState(const seds::model::State &sedsState) -> std::unique_ptr<::sdl::State>;

@@ -17,18 +17,24 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "generics/genericalternate.h"
+#pragma once
 
-namespace seds::model {
+#include <QString>
+#include <optional>
+#include <vector>
 
-const std::vector<GenericTypeMap> &GenericAlternate::genericTypeMaps() const
-{
-    return m_genericTypeMaps;
-}
+namespace conversion::iv::translator {
 
-void GenericAlternate::addGenericTypeMap(GenericTypeMap genericTypeMap)
-{
-    m_genericTypeMaps.push_back(std::move(genericTypeMap));
-}
+struct TypeMapping {
+    struct ConcreteType {
+        QString typeName;
+        std::optional<QString> fixedValue;
+        std::optional<QString> determinantValue;
+    };
 
-} // namespace seds::model
+    QString genericTypeName;
+    std::vector<ConcreteType> concreteTypes;
+    std::optional<QString> determinantTypeName;
+};
+
+} // namespace conversion::iv::translator

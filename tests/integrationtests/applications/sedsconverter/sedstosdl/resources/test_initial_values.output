@@ -1,0 +1,18 @@
+/* CIF Process (0, 0), (800, 100) */
+process Component;
+    /* CIF Text (0, 150), (400, 500) */
+    dcl i TInt;
+    dcl f TFloat;
+    /* CIF ENDTEXT */
+    /* CIF Start (0, 900), (200, 75) */
+    START;
+        /* CIF Task (0, 1087), (100, 50) */
+        task i := 5;
+        /* CIF Task (0, 1162), (100, 50) */
+        task f := 12.4;
+        /* CIF NextState (0, 1237), (200, 50) */
+        NEXTSTATE Idle;
+    /* CIF State (0, 1312), (200, 50) */
+    state Idle;
+    endstate;
+endprocess Component;

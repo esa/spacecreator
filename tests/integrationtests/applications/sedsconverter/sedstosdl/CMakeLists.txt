@@ -84,3 +84,8 @@ configure_file(test_indexing.sh test_indexing.sh COPYONLY)
 configure_file(resources/test_indexing.xml resources/test_indexing.xml COPYONLY)
 configure_file(resources/test_indexing.output resources/test_indexing.output COPYONLY)
 configure_file(resources/test_indexing.system_structure resources/test_indexing.system_structure COPYONLY)
+
+configure_file(test_initial_values.sh test_initial_values.sh COPYONLY)
+configure_file(resources/test_initial_values.xml resources/test_initial_values.xml COPYONLY)
+configure_file(resources/test_initial_values.output resources/test_initial_values.output COPYONLY)
+configure_file(resources/test_initial_values.system_structure resources/test_initial_values.system_structure COPYONLY)

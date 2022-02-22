@@ -154,7 +154,7 @@ model::GenericAlternate GenericsParser::readGenericAlternate(QXmlStreamReader &x
 
     while (xmlReader.readNextStartElement()) {
         if (xmlReader.name() == QStringLiteral("GenericTypeMap")) {
-            genericAlternate.setGenericTypeMap(readGenericTypeMap(xmlReader));
+            genericAlternate.addGenericTypeMap(readGenericTypeMap(xmlReader));
         } else {
             throw UnhandledElement(xmlReader.name(), "GenericAlternate");
         }

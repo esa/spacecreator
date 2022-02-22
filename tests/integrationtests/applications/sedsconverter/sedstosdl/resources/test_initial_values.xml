@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="Component">
+    <DataTypeSet>
+      <IntegerDataType name="TInt">
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="100" />
+        </Range>
+      </IntegerDataType>
+      <FloatDataType name="TFloat">
+        <Range>
+          <PrecisionRange>single</PrecisionRange>
+        </Range>
+      </FloatDataType>
+    </DataTypeSet>
+    <ComponentSet>
+      <Component name="Component">
+        <Implementation>
+          <VariableSet>
+            <Variable name="i" type="TInt" initialValue="5" />
+            <Variable name="f" type="TFloat" initialValue="12.4" />
+          </VariableSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

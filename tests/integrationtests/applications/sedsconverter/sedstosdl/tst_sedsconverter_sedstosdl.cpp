@@ -39,6 +39,7 @@ private Q_SLOTS:
     void testParameterMap();
     void testSyncCommand();
     void testIndexing();
+    void testInitialValues();
 };
 
 /// \SRS  ETB-FUN-10
@@ -236,6 +237,14 @@ void tst_SedsConverter_SedsToSdl::testSyncCommand()
 void tst_SedsConverter_SedsToSdl::testIndexing()
 {
     const int result = system("./test_indexing.sh");
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-2010
+/// \SRS  ETB-FUN-2020
+void tst_SedsConverter_SedsToSdl::testInitialValues()
+{
+    const int result = system("./test_initial_values.sh");
     QCOMPARE(result, 0);
 }
 

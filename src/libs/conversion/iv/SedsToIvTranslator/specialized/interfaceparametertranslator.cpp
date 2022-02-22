@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,53 +19,46 @@
 
 #include "specialized/interfaceparametertranslator.h"
 
-#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
-#include <ivcore/ivfunction.h>
-#include <seds/SedsModel/components/interface.h>
-#include <seds/SedsModel/interfaces/interfaceparameter.h>
-#include <shared/parameter.h>
 
 using conversion::UnhandledValueException;
 using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator {
 
-const QString InterfaceParameterTranslator::m_interfaceParameterEncoding = "ACN";
-const QString InterfaceParameterTranslator::m_getterInterfacePrefix = "Get";
-const QString InterfaceParameterTranslator::m_setterInterfacePrefix = "Set";
-const QString InterfaceParameterTranslator::m_ivInterfaceNameTemplate = "%1_%2_%3_%4";
 const QString InterfaceParameterTranslator::m_ivInterfaceParameterName = "Param";
 
-InterfaceParameterTranslator::InterfaceParameterTranslator(const QString &sedsInterfaceName,
-        const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet, ivm::IVFunction *ivFunction)
-    : m_sedsInterfaceName(sedsInterfaceName)
-    , m_ivFunction(ivFunction)
-    , m_typeMapper(genericTypeMapSet)
+InterfaceParameterTranslator::InterfaceParameterTranslator(
+        ivm::IVFunction *ivFunction, const QString &sedsInterfaceName, const GenericTypeMapper *typeMapper)
+    : m_ivFunction(ivFunction)
+    , m_sedsInterfaceName(sedsInterfaceName)
+    , m_typeMapper(typeMapper)
 {
 }
 
 void InterfaceParameterTranslator::translateParameter(
-        const seds::model::InterfaceParameter &sedsParameter, const ivm::IVInterface::InterfaceType interfaceType) const
+        const seds::model::InterfaceParameter &sedsParameter, const ivm::IVInterface::InterfaceType interfaceType)
 {
     translateGetterParameter(sedsParameter, interfaceType);
+
     if (!sedsParameter.isReadOnly()) {
         translateSetterParameter(sedsParameter, interfaceType);
     }
 }
 
 void InterfaceParameterTranslator::translateGetterParameter(
-        const seds::model::InterfaceParameter &sedsParameter, const ivm::IVInterface::InterfaceType interfaceType) const
+        const seds::model::InterfaceParameter &sedsParameter, const ivm::IVInterface::InterfaceType interfaceType)
 {
     switch (sedsParameter.mode()) {
-    case seds::model::InterfaceParameterMode::Sync:
-        createIvInterface(InterfaceMode::Getter, sedsParameter, interfaceType,
+    case seds::model::InterfaceParameterMode::Sync: {
+        buildParameter(sedsParameter, InterfaceTranslatorHelper::InterfaceParameterType::Getter, interfaceType,
                 ivm::IVInterface::OperationKind::Protected, shared::InterfaceParameter::Direction::OUT);
-        break;
-    case seds::model::InterfaceParameterMode::Async:
-        createIvInterface(InterfaceMode::Getter, sedsParameter, switchInterfaceType(interfaceType),
+    } break;
+    case seds::model::InterfaceParameterMode::Async: {
+        buildParameter(sedsParameter, InterfaceTranslatorHelper::InterfaceParameterType::Getter,
+                InterfaceTranslatorHelper::switchInterfaceType(interfaceType),
                 ivm::IVInterface::OperationKind::Sporadic, shared::InterfaceParameter::Direction::IN);
-        break;
+    } break;
     default:
         throw UnhandledValueException("InterfaceParameterMode");
         break;
@@ -73,102 +66,70 @@ void InterfaceParameterTranslator::translateGetterParameter(
 }
 
 void InterfaceParameterTranslator::translateSetterParameter(
-        const seds::model::InterfaceParameter &sedsParameter, const ivm::IVInterface::InterfaceType interfaceType) const
+        const seds::model::InterfaceParameter &sedsParameter, const ivm::IVInterface::InterfaceType interfaceType)
 {
     switch (sedsParameter.mode()) {
-    case seds::model::InterfaceParameterMode::Sync:
-        createIvInterface(InterfaceMode::Setter, sedsParameter, interfaceType,
+    case seds::model::InterfaceParameterMode::Sync: {
+        buildParameter(sedsParameter, InterfaceTranslatorHelper::InterfaceParameterType::Setter, interfaceType,
                 ivm::IVInterface::OperationKind::Protected, shared::InterfaceParameter::Direction::IN);
-        break;
-    case seds::model::InterfaceParameterMode::Async:
-        createIvInterface(InterfaceMode::Setter, sedsParameter, interfaceType,
+    } break;
+    case seds::model::InterfaceParameterMode::Async: {
+        buildParameter(sedsParameter, InterfaceTranslatorHelper::InterfaceParameterType::Setter, interfaceType,
                 ivm::IVInterface::OperationKind::Sporadic, shared::InterfaceParameter::Direction::IN);
-        break;
+    } break;
     default:
         throw UnhandledValueException("InterfaceParameterMode");
         break;
     }
 }
 
-void InterfaceParameterTranslator::createIvInterface(const InterfaceParameterTranslator::InterfaceMode mode,
-        const seds::model::InterfaceParameter &sedsParameter, ivm::IVInterface::InterfaceType type,
-        ivm::IVInterface::OperationKind kind, shared::InterfaceParameter::Direction direction) const
+void InterfaceParameterTranslator::buildParameter(const seds::model::InterfaceParameter &sedsParameter,
+        InterfaceTranslatorHelper::InterfaceParameterType interfaceParameterType,
+        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVInterface::OperationKind interfaceKind,
+        shared::InterfaceParameter::Direction interfaceDirection)
 {
-    const auto name = getParameterName(mode, m_sedsInterfaceName, type, sedsParameter.nameStr());
+    const auto &parameterTypeName = handleParameterTypeName(sedsParameter);
 
-    ivm::IVInterface::CreationInfo creationInfo;
-    creationInfo.function = m_ivFunction;
-    creationInfo.type = type;
-    creationInfo.name = name;
-    creationInfo.kind = kind;
+    const auto ivParameter = InterfaceTranslatorHelper::createInterfaceParameter(
+            m_ivInterfaceParameterName, parameterTypeName, interfaceDirection);
 
-    auto ivInterface = ivm::IVInterface::createIface(creationInfo);
-
-    const auto &sedsParameterTypeName = m_typeMapper.findMappedType(sedsParameter.type().nameStr());
-
-    auto ivParameter = shared::InterfaceParameter(m_ivInterfaceParameterName, shared::BasicParameter::Type::Other,
-            sedsParameterTypeName, m_interfaceParameterEncoding, direction);
+    const auto interfaceName = InterfaceTranslatorHelper::buildParameterInterfaceName(
+            m_sedsInterfaceName, sedsParameter.nameStr(), interfaceParameterType, interfaceType);
+    const auto ivInterface =
+            InterfaceTranslatorHelper::createIvInterface(interfaceName, interfaceType, interfaceKind, m_ivFunction);
     ivInterface->addParam(ivParameter);
 
     m_ivFunction->addChild(ivInterface);
 }
 
-ivm::IVInterface::InterfaceType InterfaceParameterTranslator::switchInterfaceType(
-        ivm::IVInterface::InterfaceType interfaceType) const
+QString InterfaceParameterTranslator::handleParameterTypeName(
+        const seds::model::InterfaceParameter &sedsParameter) const
 {
-    switch (interfaceType) {
-    case ivm::IVInterface::InterfaceType::Required:
-        return ivm::IVInterface::InterfaceType::Provided;
-    case ivm::IVInterface::InterfaceType::Provided:
-        return ivm::IVInterface::InterfaceType::Required;
-    default:
-        throw UnhandledValueException("InterfaceType");
-        break;
-    }
-}
+    const auto parameterTypeName = sedsParameter.type().nameStr();
 
-const QString &InterfaceParameterTranslator::interfaceTypeToString(ivm::IVInterface::InterfaceType type)
-{
-    switch (type) {
-    case ivm::IVInterface::InterfaceType::Required: {
-        static QString name = "Ri";
-        return name;
-    }
-    case ivm::IVInterface::InterfaceType::Provided: {
-        static QString name = "Pi";
-        return name;
-    }
-    case ivm::IVInterface::InterfaceType::Grouped: {
-        static QString name = "Grp";
-        return name;
-    }
-    default:
-        throw UnhandledValueException("ivm::InterfaceType");
-        break;
-    }
-}
+    const auto typeMapping = m_typeMapper->getMapping(parameterTypeName);
 
-QString InterfaceParameterTranslator::getParameterName(const InterfaceParameterTranslator::InterfaceMode mode,
-        const QString &interfaceName, const ivm::IVInterface::InterfaceType type, const QString &parameterName)
-{
-    QString namePrefix;
-
-    switch (mode) {
-    case InterfaceMode::Getter:
-        namePrefix = m_getterInterfacePrefix;
-        break;
-    case InterfaceMode::Setter:
-        namePrefix = m_setterInterfacePrefix;
-        break;
-    default:
-        throw UnhandledValueException("InterfaceMode");
-        break;
+    if (typeMapping == nullptr) {
+        return parameterTypeName;
     }
 
-    return Escaper::escapeIvName(m_ivInterfaceNameTemplate.arg(namePrefix)
-                                         .arg(interfaceName)
-                                         .arg(parameterName)
-                                         .arg(interfaceTypeToString(type)));
+    const auto &concreteTypes = typeMapping->concreteTypes;
+
+    if (concreteTypes.empty()) {
+        auto errorMessage =
+                QString("Type \"%1\" of the parameter \"%2\" is handled as generic, but no mappings was provided")
+                        .arg(parameterTypeName)
+                        .arg(sedsParameter.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    } else if (concreteTypes.size() != 1) {
+        auto errorMessage = QString(
+                "Generic type \"%1\" of the parameter \"%2\" can only be simply mapped (AlternateSet not supported)")
+                                    .arg(parameterTypeName)
+                                    .arg(sedsParameter.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    return concreteTypes.front().typeName;
 }
 
 } // namespace conversion::iv::translator

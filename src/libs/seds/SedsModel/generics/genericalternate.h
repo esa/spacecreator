@@ -31,11 +31,11 @@ public:
     GenericAlternate &operator=(GenericAlternate &&) = default;
 
 public:
-    auto genericTypeMap() const -> const GenericTypeMap &;
-    auto setGenericTypeMap(GenericTypeMap genericTypeMap) -> void;
+    auto genericTypeMaps() const -> const std::vector<GenericTypeMap> &;
+    auto addGenericTypeMap(GenericTypeMap genericTypeMap) -> void;
 
 private:
-    GenericTypeMap m_genericTypeMap;
+    std::vector<GenericTypeMap> m_genericTypeMaps;
 };
 
 } // namespace seds::model

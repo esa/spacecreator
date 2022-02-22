@@ -1,29 +1,35 @@
 project(SedsModelBuilder VERSION 1.0.0 LANGUAGES CXX)
 
-set(SOURCES sedscomponentbuilder.cpp
+set(SOURCES sedsactivitybuilder.cpp
+            sedsalternatebuilder.cpp
+            sedsalternatesetbuilder.cpp
+            sedscommandprimitivebuilder.cpp
+            sedscomponentbuilder.cpp
             sedscontainerdatatypebuilder.cpp
             sedsdatatypefactory.cpp
+            sedsimplementationbuilder.cpp
             sedsinterfacebuilder.cpp
             sedsinterfacecommandbuilder.cpp
             sedsinterfacedeclarationbuilder.cpp
+            sedsinvocationbuilder.cpp
             sedsmodelbuilder.cpp
-            sedsimplementationbuilder.cpp
             sedsstatemachinebuilder.cpp
-            sedsactivitybuilder.cpp
-            sedscommandprimitivebuilder.cpp
-            sedsinvocationbuilder.cpp)
-set(INCLUDES sedscomponentbuilder.h
+            sedstypemapsetbuilder.cpp)
+set(INCLUDES sedsactivitybuilder.h
+             sedsalternatebuilder.h
+             sedsalternatesetbuilder.h
+             sedscommandprimitivebuilder.h
+             sedscomponentbuilder.h
              sedscontainerdatatypebuilder.h
              sedsdatatypefactory.h
+             sedsimplementationbuilder.h
              sedsinterfacebuilder.h
              sedsinterfacecommandbuilder.h
              sedsinterfacedeclarationbuilder.h
+             sedsinvocationbuilder.h
              sedsmodelbuilder.h
-             sedsimplementationbuilder.h
              sedsstatemachinebuilder.h
-             sedsactivitybuilder.h
-             sedscommandprimitivebuilder.h
-             sedsinvocationbuilder.h)
+             sedstypemapsetbuilder.h)
 
 add_library(SedsModelBuilder STATIC)
 target_sources(SedsModelBuilder

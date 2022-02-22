@@ -1,0 +1,16 @@
+TYPEMAPPING DEFINITIONS ::= BEGIN
+MyInteger [size 8, encoding pos-int, endianness big]
+MyIntegerArray-10 []
+AsyncCommandNoMapping-Type []
+{
+    argumentNoMapping []
+}
+AsyncCommandSimpleMapping-Type []
+{
+    argumentSimpleMapping []
+}
+AsyncCommandSimpleMappingArray-Type []
+{
+    arrayArgumentSimpleMapping []
+}
+END
