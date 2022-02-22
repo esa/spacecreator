@@ -113,15 +113,15 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Assignment &assig
     const auto targetName = translateVariableReference(assignment.outputVariableRef().value().value());
     const auto &element = assignment.element();
     if (std::holds_alternative<seds::model::VariableRef>(element)) {
-        const auto action = QString("%1 := %2")
-                                    .arg(targetName,
-                                            translateVariableReference(
-                                                    std::get<seds::model::VariableRef>(element).value().value()));
+        const auto &reference = std::get<seds::model::VariableRef>(element);
+        const auto referenceDefinition = reference.value().value();
+        const auto action = QString("%1 := %2").arg(targetName, translateVariableReference(referenceDefinition));
         m_sdlTransition->addAction(std::make_unique<::sdl::Task>("", action));
 
     } else if (std::holds_alternative<seds::model::ValueOperand>(element)) {
-        const auto action =
-                QString("%1 := %2").arg(targetName, std::get<seds::model::ValueOperand>(element).value().value());
+        const auto &operand = std::get<seds::model::ValueOperand>(element);
+        const auto operandValue = operand.value().value();
+        const auto action = QString("%1 := %2").arg(targetName, operandValue);
         m_sdlTransition->addAction(std::make_unique<::sdl::Task>("", action));
     } else {
         throw TranslationException("Assignment not implemented");
