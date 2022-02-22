@@ -270,7 +270,7 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
         Asn1SequenceComponentVisitor componentVisitor(m_promelaModel, nestedUtypeName, m_enhancedSpinSupport);
         component->accept(componentVisitor);
 
-        if (componentVisitor.isComponentPresent()) {
+        if (componentVisitor.wasComponentVisited()) {
             nestedUtype.addField(Declaration(componentVisitor.getComponentType(), componentVisitor.getComponentName()));
 
             if (componentVisitor.isComponentOptional()) {

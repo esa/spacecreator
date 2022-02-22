@@ -58,7 +58,7 @@ void Asn1SequenceComponentVisitor::visit(const AcnSequenceComponent &component)
     Q_UNUSED(component);
 }
 
-bool Asn1SequenceComponentVisitor::isComponentPresent() const
+bool Asn1SequenceComponentVisitor::wasComponentVisited() const
 {
     return m_componentName.has_value();
 }

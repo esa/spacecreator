@@ -61,7 +61,7 @@ public:
      *
      * @return true if component was visited, otherwise false.
      */
-    bool isComponentPresent() const;
+    bool wasComponentVisited() const;
     /**
      * @brief Getter for name of visited sequence component.
      *
