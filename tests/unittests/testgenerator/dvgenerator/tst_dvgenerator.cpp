@@ -63,7 +63,7 @@ void tst_dvgenerator::testNominal()
     std::vector<ivm::IVFunction *> functionsToBind;
     auto generatedXml = DvGenerator::generate(functionsToBind);
 
-    const std::unique_ptr<QVector<dvm::DVObject *>> generatedDvObjects;
+    const auto generatedDvObjects = std::make_unique<QVector<dvm::DVObject *>>();
     for (const auto &obj : generatedXml->objects()) {
         generatedDvObjects->append(static_cast<dvm::DVObject *>(obj));
     }
@@ -74,10 +74,10 @@ void tst_dvgenerator::testNominal()
     QByteArray expectedXml(file.readAll());
     file.close();
     const std::unique_ptr<QVector<dvm::DVObject *>> expectedDvObjects = dvtools::getDvObjectsFromXml(expectedXml);
+    QVERIFY(expectedDvObjects != nullptr);
 
     // TODO: compare expected and generated dvobjects
-    (void)expectedDvObjects;
-    (void)generatedDvObjects;
+    QCOMPARE(generatedDvObjects->size(), expectedDvObjects->size());
 
     QFAIL("this shall happen");
 }
