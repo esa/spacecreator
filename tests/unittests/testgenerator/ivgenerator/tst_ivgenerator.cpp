@@ -114,9 +114,18 @@ void tst_ivgenerator::testNominal()
 static ivm::IVInterface *makeInterfaceUnderTest(const QString &interfaceName, ivm::IVFunction *const function,
         const ivm::IVInterface::OperationKind operationKind)
 {
-    const ivm::IVInterface::CreationInfo ci =
-            createInterfaceUnderTestCreationInfo(interfaceName, function, operationKind);
+    ivm::IVInterface::CreationInfo ci = createInterfaceUnderTestCreationInfo(interfaceName, function, operationKind);
+
+    QVector<shared::InterfaceParameter> parameters = {
+        shared::InterfaceParameter("p1", shared::BasicParameter::Type::Other, "MyInteger", "ACN",
+                shared::InterfaceParameter::Direction::IN),
+        shared::InterfaceParameter("p2", shared::BasicParameter::Type::Other, "MyInteger", "ACN",
+                shared::InterfaceParameter::Direction::OUT),
+    };
+    ci.parameters = std::move(parameters);
+
     ivm::IVInterface *const iface = ivm::IVInterface::createIface(ci);
+
     iface->setEntityAttribute("wcet", "0");
     const auto layerToken = ivm::meta::Props::token(ivm::meta::Props::Token::layer);
     iface->setEntityAttribute(layerToken, "default");

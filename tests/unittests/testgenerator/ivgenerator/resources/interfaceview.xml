@@ -1,7 +1,9 @@
-<InterfaceView asn1file="testDriver.acn">
+<InterfaceView asn1file="INTERFACES.acn">
 <Function name="FunctionUnderTest" is_type="NO" language="SDL" default_implementation="default" FPGA_Configurations="">
     <Property name="Taste::coordinates" value="46200 10600 66200 18600"/>
 <Provided_Interface name="InterfaceUnderTest" kind="Protected" layer="default" wcet="0">
+    <Input_Parameter name="p1" type="MyInteger" encoding="ACN"/>
+    <Output_Parameter name="p2" type="MyInteger" encoding="ACN"/>
     <Property name="Taste::coordinates" value="46200 14200"/>
 </Provided_Interface>
 
@@ -12,11 +14,13 @@
 
 <Function name="TestDriver" is_type="NO" language="C" default_implementation="default" FPGA_Configurations="">
     <Property name="Taste::coordinates" value="7500 18400 27500 26400"/>
-<Provided_Interface name="StartTest" kind="Cyclic" layer="default" priority="1" dispatch_offset="0" period="999" stack_size="50" wcet="0">
+<Provided_Interface name="StartTest" kind="Cyclic" layer="default" dispatch_offset="0" wcet="0" period="999" priority="1" stack_size="50">
     <Property name="Taste::coordinates" value="12300 18400"/>
 </Provided_Interface>
 
 <Required_Interface name="InterfaceUnderTest" kind="Protected" layer="default" wcet="0">
+    <Input_Parameter name="p1" type="MyInteger" encoding="ACN"/>
+    <Output_Parameter name="p2" type="MyInteger" encoding="ACN"/>
     <Property name="Taste::coordinates" value="27500 21800"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="true"/>
