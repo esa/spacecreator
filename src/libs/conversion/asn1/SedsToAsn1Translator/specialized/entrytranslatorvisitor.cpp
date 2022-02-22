@@ -111,8 +111,6 @@ void EntryTranslatorVisitor::operator()(const seds::model::LengthEntry &sedsEntr
 
 void EntryTranslatorVisitor::operator()(const seds::model::ListEntry &sedsEntry)
 {
-    // Replace the existing ASN.1 length entry with an ACN-only one
-    updateListLengthEntry(sedsEntry);
 
     auto asn1EntryType = translateEntryType(sedsEntry.typeRef());
 
@@ -138,7 +136,7 @@ std::unique_ptr<Asn1Acn::Types::UserdefinedType> EntryTranslatorVisitor::transla
 {
     const auto sedsTypeName = Escaper::escapeAsn1TypeName(sedsTypeRef.nameStr());
 
-    Asn1Acn::Definitions *asn1Definitions = sedsTypeRef.packageStr()
+    const auto asn1Definitions = sedsTypeRef.packageStr()
             ? SedsToAsn1Translator::getAsn1Definitions(*sedsTypeRef.packageStr(), m_asn1Files)
             : m_asn1Definitions;
 
@@ -280,27 +278,38 @@ void EntryTranslatorVisitor::translateCoreErrorControl(
     }
 }
 
-void EntryTranslatorVisitor::updateListLengthEntry(const seds::model::ListEntry &sedsEntry) const
+void EntryTranslatorVisitor::updateListLengthEntry(const seds::model::Entry *sedsEntry) const
 {
     auto &listLengthSequenceComponent = getListLengthSequenceComponent(sedsEntry);
 
-    listLengthSequenceComponent.reset(new Asn1Acn::AcnSequenceComponent(listLengthSequenceComponent->name(),
-            listLengthSequenceComponent->name(), listLengthSequenceComponent->type()->clone()));
+    auto name = listLengthSequenceComponent->name();
+    auto type = listLengthSequenceComponent->type()->clone();
+
+    const auto &sedsTypeRef = sedsEntry->typeRef();
+    if (sedsTypeRef.packageStr().has_value()) {
+        auto userdefinedType = dynamic_cast<Asn1Acn::Types::UserdefinedType *>(type.get());
+
+        const auto qualifiedName =
+                QString("%1.%2").arg(Escaper::escapeAsn1PackageName(*sedsTypeRef.packageStr())).arg(type->typeName());
+        userdefinedType->setTypeName(qualifiedName);
+    }
+
+    listLengthSequenceComponent.reset(new Asn1Acn::AcnSequenceComponent(name, name, std::move(type)));
 }
 
 std::unique_ptr<Asn1Acn::SequenceComponent> &EntryTranslatorVisitor::getListLengthSequenceComponent(
-        const seds::model::ListEntry &sedsEntry) const
+        const seds::model::Entry *sedsEntry) const
 {
     auto &containerComponents = m_asn1Sequence->components();
 
-    const auto listLengthFieldName = Escaper::escapeAsn1FieldName(sedsEntry.listLengthField().nameStr());
+    const auto listLengthFieldName = Escaper::escapeAsn1FieldName(sedsEntry->nameStr());
     auto foundListLengthSequenceComponent = std::find_if(containerComponents.begin(), containerComponents.end(),
             [&](const auto &component) { return component->name() == listLengthFieldName; });
 
     if (foundListLengthSequenceComponent == containerComponents.end()) {
         auto errorMessage = QString("Entry \"%1\" used as a length of the list entry \"%2\" not found")
                                     .arg(listLengthFieldName)
-                                    .arg(sedsEntry.nameStr());
+                                    .arg(sedsEntry->nameStr());
         throw TranslationException(std::move(errorMessage));
     }
 
@@ -348,8 +357,16 @@ void EntryTranslatorVisitor::addListSizeConstraint(
         throw TranslationException(std::move(errorMessage));
     }
 
-    const auto &listLengthEntryTypeName = listLengthEntry->typeRef().nameStr();
-    const auto listLengthEntryType = m_sedsPackage->dataType(listLengthEntryTypeName);
+    // Replace the existing ASN.1 length entry with an ACN-only one
+    updateListLengthEntry(listLengthEntry);
+
+    const auto &listLengthEntryTypeRef = listLengthEntry->typeRef();
+
+    const auto sedsPackage = listLengthEntryTypeRef.packageStr()
+            ? SedsToAsn1Translator::getSedsPackage(*listLengthEntryTypeRef.packageStr(), m_sedsPackages)
+            : m_sedsPackage;
+
+    const auto listLengthEntryType = sedsPackage->dataType(listLengthEntryTypeRef.nameStr());
 
     if (const auto listLengthEntryIntegerType = std::get_if<seds::model::IntegerDataType>(listLengthEntryType)) {
         SizeTranslator sizeTranslator(

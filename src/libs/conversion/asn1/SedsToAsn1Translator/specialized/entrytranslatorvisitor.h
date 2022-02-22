@@ -135,10 +135,10 @@ private:
     auto translateCoreErrorControl(seds::model::CoreErrorControl coreErrorControl, Asn1Acn::Types::Null *asn1Type) const
             -> void;
 
-    auto updateListLengthEntry(const seds::model::ListEntry &sedsEntry) const -> void;
+    auto updateListLengthEntry(const seds::model::Entry *sedsEntry) const -> void;
     auto getListLengthField(const QString &listLengthFieldName,
             const seds::model::ContainerDataType *sedsContainer) const -> const seds::model::EntryType *;
-    auto getListLengthSequenceComponent(const seds::model::ListEntry &sedsEntry) const
+    auto getListLengthSequenceComponent(const seds::model::Entry *sedsEntry) const
             -> std::unique_ptr<Asn1Acn::SequenceComponent> &;
     auto addListSizeConstraint(Asn1Acn::Types::SequenceOf *asn1Type, const seds::model::ListEntry &sedsEntry) const
             -> void;

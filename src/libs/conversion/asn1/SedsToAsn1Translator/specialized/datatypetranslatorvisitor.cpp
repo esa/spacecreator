@@ -496,7 +496,7 @@ void DataTypeTranslatorVisitor::translateArrayType(
 {
     const auto sedsTypeName = Escaper::escapeAsn1TypeName(sedsTypeRef.nameStr());
 
-    Asn1Acn::Definitions *asn1Definitions = sedsTypeRef.packageStr()
+    const auto asn1Definitions = sedsTypeRef.packageStr()
             ? SedsToAsn1Translator::getAsn1Definitions(*sedsTypeRef.packageStr(), m_asn1Files)
             : m_asn1Definitions;
 

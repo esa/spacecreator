@@ -41,6 +41,7 @@ public:
     UserdefinedType(const UserdefinedType &other);
 
     QString typeName() const override;
+    void setTypeName(QString typeName);
     QString label() const override;
     ASN1Type typeEnum() const override;
     const QString &module() const;
