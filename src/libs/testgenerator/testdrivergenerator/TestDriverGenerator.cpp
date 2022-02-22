@@ -93,7 +93,6 @@ auto TestDriverGenerator::generateTestDriver(
           "    volatile int a;\n"
           "    while (true) {\n"
           "        a = 0;\n"
-          "        break;\n"
           "    }\n"
           "}\n"
           "\n";

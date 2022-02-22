@@ -22,7 +22,6 @@ void notifyTestFinished(void)
     volatile int a;
     while (true) {
         a = 0;
-        break;
     }
 }
 
