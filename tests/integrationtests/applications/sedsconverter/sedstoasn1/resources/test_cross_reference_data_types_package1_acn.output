@@ -1,0 +1,15 @@
+COM-N7SPACE-PACKAGE1 DEFINITIONS ::= BEGIN
+IndexItem [size 8, encoding pos-int, endianness big]
+BasicArray1D []
+Matrix4x4 []
+ArrayWithIndexDataRef []
+BasicContainer []
+{
+    fieldA [],
+    fieldB [],
+    fieldC [],
+    lengthEntry COM-N7SPACE-PACKAGE2.LengthItem [],
+    listEntry [size lengthEntry]
+}
+END
+

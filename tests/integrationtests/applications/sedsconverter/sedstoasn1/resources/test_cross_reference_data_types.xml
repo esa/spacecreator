@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DataSheet xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/Package1">
+    <DataTypeSet>
+      <IntegerDataType name="IndexItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="16" />
+        </Range>
+      </IntegerDataType>
+      <ArrayDataType name="BasicArray1D" dataTypeRef="com/n7space/Package2/DataItem">
+        <LongDescription>A 1-D array with maximum size</LongDescription>
+        <DimensionList>
+          <Dimension size="15" />
+        </DimensionList>
+      </ArrayDataType>
+      <ArrayDataType name="Matrix4x4" dataTypeRef="com/n7space/Package2/DataItem">
+        <LongDescription>A 2D array</LongDescription>
+        <DimensionList>
+          <Dimension size="4" />
+          <Dimension size="4" />
+        </DimensionList>
+      </ArrayDataType>
+      <ArrayDataType name="ArrayWithIndexDataRef" dataTypeRef="com/n7space/Package2/DataItem">
+        <DimensionList>
+          <Dimension indexTypeRef="IndexItem" />
+        </DimensionList>
+      </ArrayDataType>
+      <ContainerDataType name="BasicContainer">
+        <LongDescription>A basic container data type</LongDescription>
+        <EntryList>
+          <Entry name="fieldA" type="com/n7space/Package2/DataItem" />
+          <Entry name="fieldB" type="com/n7space/Package2/DataItem" />
+          <Entry name="fieldC" type="com/n7space/Package2/DataItem" />
+          <Entry name="lengthEntry" type="com/n7space/Package2/LengthItem" />
+          <ListEntry name="ListEntry" type="com/n7space/Package2/DataItem" listLengthField="lengthEntry"/>
+        </EntryList>
+      </ContainerDataType>
+    </DataTypeSet>
+  </Package>
+  <Package name="com/n7space/Package2">
+    <DataTypeSet>
+      <IntegerDataType name="DataItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="LengthItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="10" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+  </Package>
+</DataSheet>

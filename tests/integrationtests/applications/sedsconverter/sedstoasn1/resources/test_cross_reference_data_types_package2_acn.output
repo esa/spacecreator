@@ -1,0 +1,5 @@
+COM-N7SPACE-PACKAGE2 DEFINITIONS ::= BEGIN
+DataItem [size 8, encoding pos-int, endianness big]
+LengthItem [size 8, encoding pos-int, endianness big]
+END
+
