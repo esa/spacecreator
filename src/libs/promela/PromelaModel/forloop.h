@@ -112,7 +112,8 @@ public:
 
 private:
     VariableRef m_variable;
-    std::variant<std::pair<int, int>, VariableRef> m_data;
+    using Range = std::pair<int, int>;
+    std::variant<Range, VariableRef> m_data;
     std::unique_ptr<Sequence> m_sequence;
 };
 }

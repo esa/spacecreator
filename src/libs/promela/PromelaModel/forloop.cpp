@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -49,12 +49,12 @@ const VariableRef &ForLoop::getForVariable() const noexcept
 
 int ForLoop::getFirstValue() const
 {
-    return std::get<0>(m_data).first;
+    return std::get<Range>(m_data).first;
 }
 
 int ForLoop::getLastValue() const
 {
-    return std::get<0>(m_data).second;
+    return std::get<Range>(m_data).second;
 }
 
 const VariableRef &ForLoop::getArrayRef() const

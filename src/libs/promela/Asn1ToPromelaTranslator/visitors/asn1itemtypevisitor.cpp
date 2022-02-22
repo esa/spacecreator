@@ -232,7 +232,7 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
         dst.appendElement(componentName);
         VariableRef src("src");
         src.appendElement(componentName);
-        const QString inlineName = utypeName + "_" + componentName + assignValueInlineSuffix;
+        const QString inlineName = getAssignValueInlineNameForNestedType(utypeName, componentName);
         QList<VariableRef> inlineArguments;
         inlineArguments.append(dst);
         inlineArguments.append(src);
@@ -283,8 +283,8 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
         VariableRef src("src");
         src.appendElement(componentVisitor.getComponentName());
 
-        const QString inlineName = constructTypeName(m_name) + "_"
-                + Escaper::escapePromelaName(componentVisitor.getComponentName()) + assignValueInlineSuffix;
+        const QString inlineName = getAssignValueInlineNameForNestedType(
+                nestedUtypeName, Escaper::escapePromelaName(componentVisitor.getComponentName()));
         QList<VariableRef> arguments;
         arguments.append(dst);
         arguments.append(src);
@@ -480,5 +480,10 @@ void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeNam
     }
 
     addAssignValueInline(typeName, std::move(sequence));
+}
+
+QString Asn1ItemTypeVisitor::getAssignValueInlineNameForNestedType(QString utype, QString field) const
+{
+    return utype + "_" + field + assignValueInlineSuffix;
 }
 }
