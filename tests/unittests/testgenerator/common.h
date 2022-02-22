@@ -20,14 +20,46 @@
 #include <QVector>
 #include <functional>
 
+namespace testgenerator {
+
+/**
+ * @brief  determine if elements pointed to by pointers from vector are equal, based on title()
+ *
+ * @param v1  vector of pointers to elements
+ * @param i   index of the pointer from v1 to be compared
+ * @param v2  vector of pointers to elements
+ * @param j   index of the pointer from v2 to be compared
+ *
+ * @return  true if equal, false otherwise
+ */
 static auto elementsEqualByTitle = [](const auto &v1, int i, const auto &v2, int j) -> bool {
     return v1.at(i)->title().compare(v2.at(j)->title()) == 0;
 };
 
+/**
+ * @brief  determine if given vector elements are equal, based on name()
+ *
+ * @param v1  vector of elements
+ * @param i   index of the element from v1 to be compared
+ * @param v2  vector of elements
+ * @param j   index of the element from v2 to be compare
+ *
+ * @return  true if equal, false otherwise
+ */
 static auto elementsEqualByName = [](const auto &v1, int i, const auto &v2, int j) -> bool {
     return v1.at(i).name().compare(v2.at(j).name()) == 0;
 };
 
+/**
+ * @brief  create map from one QVector to another, using provided function
+ *
+ * @tparam QVectorT     type of QVector
+ * @param source        source vector (mapping FROM)
+ * @param destination   destination vector (mapping TO)
+ * @param elementsEqual comparison function
+ *
+ * @return map (a vector with indexes of corresponding `destination` elements on `source` indexes)
+ */
 template<typename QVectorT>
 static QVector<int> createQVectorToQVectorMap(const QVectorT &source, const QVectorT &destination,
         std::function<bool(const QVectorT &source, int i, const QVectorT &destination, int j)> elementsEqual)
@@ -48,3 +80,5 @@ static QVector<int> createQVectorToQVectorMap(const QVectorT &source, const QVec
 
     return map;
 }
+
+} // namespace testgenerator

@@ -50,7 +50,7 @@ struct Coordinates final {
          * @brief  Coordinates of start test cyclic interface
          *
          */
-        static const QVector<qint32> startTestCi;
+        static const QVector<qint32> startTestIf;
         /**
          * @brief  Coordinates of interface under test required interface (present in test driver function)
          *

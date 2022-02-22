@@ -25,9 +25,20 @@
 
 namespace plugincommon {
 
+/**
+ * @brief  Class to store utility functions facilitating easier work with InterfaceView data model
+ *
+ */
 class IvTools
 {
 public:
+    /**
+     * @brief Get functions stored in a given model
+     *
+     * @param model InterfaceView model
+     *
+     * @return functions stored in the given model
+     */
     static auto getFunctions(ivm::IVModel *model) -> std::vector<ivm::IVFunction *>;
 };
 

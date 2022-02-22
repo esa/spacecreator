@@ -40,6 +40,9 @@
 
 using plugincommon::IvTools;
 using plugincommon::ModelLoader;
+using testgenerator::createQVectorToQVectorMap;
+using testgenerator::elementsEqualByName;
+using testgenerator::elementsEqualByTitle;
 using testgenerator::IvGenerator;
 
 namespace tests::testgenerator {
@@ -99,13 +102,13 @@ void tst_ivgenerator::testNominal()
         QFAIL("IV model was not generated");
     }
 
-    const auto ivModelLoadedRaw = ModelLoader::loadIvModel(ivConfig, ivPath.arg("interfaceview"));
-    const auto ivModelLoaded = dynamic_cast<ivm::IVModel *>(ivModelLoadedRaw.get());
-    if (ivModelLoaded == nullptr) {
+    const auto ivModelLoadedUniquePtr = ModelLoader::loadIvModel(ivConfig, ivPath.arg("interfaceview"));
+    const auto ivModelLoadedRaw = dynamic_cast<ivm::IVModel *>(ivModelLoadedUniquePtr.get());
+    if (ivModelLoadedRaw == nullptr) {
         throw std::runtime_error(QString("%1 file could not be read as IV").arg(ivDir).toStdString());
     }
 
-    compareModels(ivModelLoaded, ivModelGenerated.get());
+    compareModels(ivModelLoadedRaw, ivModelGenerated.get());
 }
 
 static ivm::IVInterface *makeInterfaceUnderTest(const QString &interfaceName, ivm::IVFunction *const function,
@@ -115,8 +118,10 @@ static ivm::IVInterface *makeInterfaceUnderTest(const QString &interfaceName, iv
             createInterfaceUnderTestCreationInfo(interfaceName, function, operationKind);
     ivm::IVInterface *const iface = ivm::IVInterface::createIface(ci);
     iface->setEntityAttribute("wcet", "0");
-    iface->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::layer), "default");
-    iface->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::Autonamed), "true");
+    const auto layerToken = ivm::meta::Props::token(ivm::meta::Props::Token::layer);
+    iface->setEntityAttribute(layerToken, "default");
+    const auto autonamedToken = ivm::meta::Props::token(ivm::meta::Props::Token::Autonamed);
+    iface->setEntityAttribute(autonamedToken, "true");
 
     return iface;
 }
@@ -125,8 +130,10 @@ static std::unique_ptr<ivm::IVFunction> makeFunctionUnderTest(const QString &nam
 {
     auto function = std::make_unique<ivm::IVFunction>();
     function->setTitle(name);
-    function->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::language), "SDL");
-    function->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::is_type), "NO");
+    const auto languageToken = ivm::meta::Props::token(ivm::meta::Props::Token::language);
+    function->setEntityAttribute(languageToken, "SDL");
+    const auto isTypeToken = ivm::meta::Props::token(ivm::meta::Props::Token::is_type);
+    function->setEntityAttribute(isTypeToken, "NO");
 
     return function;
 }

@@ -35,7 +35,7 @@ namespace testgenerator {
 const QVector<qint32> Coordinates::Function::testDriver = { 75, 184, 275, 264 };
 const QVector<qint32> Coordinates::Function::functionUnderTest = { 462, 106, 662, 186 };
 
-const QVector<qint32> Coordinates::Interface::startTestCi = { 123, 184 };
+const QVector<qint32> Coordinates::Interface::startTestIf = { 123, 184 };
 const QVector<qint32> Coordinates::Interface::interfaceUnderTestRi = { 275, 218 };
 const QVector<qint32> Coordinates::Interface::interfaceUnderTestPi = { 462, 142 };
 
@@ -61,10 +61,10 @@ auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::u
 
     auto *const testDriverFunction = makeTestDriverFunction(ivModel.get());
     auto *const testDriverRi = makeTestDriverRequiredIface(interfaceUnderTest, testDriverFunction);
-    auto *const testDriverStartTestCi = makeStartTestIface(testDriverFunction);
+    auto *const testDriverStartTestIf = makeStartTestIface(testDriverFunction);
 
     testDriverFunction->addChild(testDriverRi);
-    testDriverFunction->addChild(testDriverStartTestCi);
+    testDriverFunction->addChild(testDriverStartTestIf);
 
     auto *const functionUnderTest = makeFunctionUnderTest(ivModel.get(), interfaceUnderTest);
     auto *const interfaceUnderTestPi = makeFunctionUnderTestProvidedInterface(interfaceUnderTest, functionUnderTest);
@@ -148,7 +148,7 @@ auto IvGenerator::makeStartTestIface(ivm::IVFunction *const testDriverFunction) 
     iface->setEntityAttribute("priority", "1");
     iface->setEntityAttribute("dispatch_offset", "0");
     iface->setEntityAttribute("wcet", "0");
-    setObjectCoordinates(iface, Coordinates::Interface::startTestCi);
+    setObjectCoordinates(iface, Coordinates::Interface::startTestIf);
 
     return iface;
 }
