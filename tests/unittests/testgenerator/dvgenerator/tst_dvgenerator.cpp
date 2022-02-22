@@ -61,7 +61,9 @@ void tst_dvgenerator::initTestCase()
 void tst_dvgenerator::testNominal()
 {
     std::vector<ivm::IVFunction *> functionsToBind;
+
     const auto generatedModel = DvGenerator::generate(functionsToBind);
+
     QVERIFY(generatedModel != nullptr);
 
     const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());
@@ -69,17 +71,18 @@ void tst_dvgenerator::testNominal()
     QVERIFY(generatedDvObjects != nullptr);
     QVERIFY(expectedDvObjects != nullptr);
 
-    // TODO: compare expected and generated dvobjects
-    for (const auto &obj : *expectedDvObjects) {
-        qDebug() << obj->title();
-    }
     QCOMPARE(generatedDvObjects->size(), expectedDvObjects->size());
+    const int dvObjectsSize = generatedDvObjects->size();
 
-    const auto map =
+    const QVector<int> map =
             createQVectorToQVectorMap<dvm::DVObject *>(*generatedDvObjects, *expectedDvObjects, elementsEqualByTitle);
-    (void)map;
+    for (int i = 0; i < dvObjectsSize; i++) {
+        const auto &generatedDvObj = *generatedDvObjects->at(i);
+        const auto &expectedDvObj = *expectedDvObjects->at(map.at(i));
 
-    QFAIL("this shall happen");
+        QCOMPARE(generatedDvObj.title(), expectedDvObj.title());
+        // TODO: compare other members of objects: object type, parameters etc.
+    }
 }
 
 } // namespace tests::testgenerator
