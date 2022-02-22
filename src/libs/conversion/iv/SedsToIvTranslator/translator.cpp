@@ -94,11 +94,11 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(const
     const auto &sedsModelData = sedsModel->data();
     if (std::holds_alternative<seds::model::PackageFile>(sedsModelData)) {
         const auto &sedsPackage = std::get<seds::model::PackageFile>(sedsModelData).package();
-        translatePackage(sedsPackage, asn1Model, ivModel.get(), generateFunctionsForPackages);
+        translatePackage(sedsPackage, asn1Model, ivModel.get(), {}, generateFunctionsForPackages);
     } else if (std::holds_alternative<seds::model::DataSheet>(sedsModelData)) {
         const auto &sedsPackages = std::get<seds::model::DataSheet>(sedsModelData).packages();
         for (const auto &sedsPackage : sedsPackages) {
-            translatePackage(sedsPackage, asn1Model, ivModel.get(), generateFunctionsForPackages);
+            translatePackage(sedsPackage, asn1Model, ivModel.get(), sedsPackages, generateFunctionsForPackages);
         }
     } else {
         throw TranslationException("Unhandled SEDS model data type");
@@ -110,12 +110,12 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(const
     return resultModels;
 }
 
-void SedsToIvTranslator::translatePackage(
-        const seds::model::Package &sedsPackage, Asn1Model *asn1Model, IVModel *ivModel, bool generateFunction) const
+void SedsToIvTranslator::translatePackage(const seds::model::Package &sedsPackage, Asn1Model *asn1Model,
+        IVModel *ivModel, const std::vector<seds::model::Package> &sedsPackages, bool generateFunction) const
 {
     auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(sedsPackage.nameStr(), asn1Model->data());
 
-    ComponentsTranslator componentsTranslator(&sedsPackage, asn1Definitions, asn1Model->data());
+    ComponentsTranslator componentsTranslator(&sedsPackage, asn1Definitions, asn1Model->data(), sedsPackages);
     auto ivFunctions = componentsTranslator.translateComponents();
 
     if (generateFunction) {

@@ -57,12 +57,14 @@ using SizeTranslator = SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn
 
 EntryTranslatorVisitor::EntryTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence,
         Asn1Acn::Definitions *asn1Definitions, const seds::model::ContainerDataType *sedsParentContainer,
-        const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files)
+        const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
+        const std::vector<seds::model::Package> &sedsPackages)
     : m_asn1Sequence(asn1Sequence)
     , m_asn1Definitions(asn1Definitions)
     , m_sedsParentContainer(sedsParentContainer)
     , m_sedsPackage(sedsPackage)
     , m_asn1Files(asn1Files)
+    , m_sedsPackages(sedsPackages)
 {
 }
 
@@ -298,7 +300,7 @@ std::unique_ptr<Asn1Acn::SequenceComponent> &EntryTranslatorVisitor::getListLeng
     if (foundListLengthSequenceComponent == containerComponents.end()) {
         auto errorMessage = QString("Entry \"%1\" used as a length of the list entry \"%2\" not found")
                                     .arg(listLengthFieldName)
-                                    .arg(sedsEntry.typeRef().nameStr());
+                                    .arg(sedsEntry.nameStr());
         throw TranslationException(std::move(errorMessage));
     }
 
@@ -332,7 +334,7 @@ void EntryTranslatorVisitor::addListSizeConstraint(
     if (listLengthField == nullptr) {
         auto errorMessage = QString("Entry \"%1\" used as a length of the list entry \"%2\" not found")
                                     .arg(listLengthFieldName)
-                                    .arg(sedsEntry.typeRef().nameStr());
+                                    .arg(sedsEntry.nameStr());
         throw TranslationException(std::move(errorMessage));
     }
 

@@ -58,7 +58,7 @@ public:
      * @param   asn1Files           List of all ASN.1 files
      */
     ComponentsTranslator(const seds::model::Package *sedsPackage, Asn1Acn::Definitions *asn1Definitions,
-            const Asn1Acn::Asn1Model::Data &asn1Files);
+            const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages);
     /**
      * @brief   Deleted copy constructor
      */
@@ -140,8 +140,11 @@ private:
     const seds::model::Package *m_sedsPackage;
     /// @brief  Target ASN.1 type definitions
     Asn1Acn::Definitions *m_asn1Definitions;
+
     /// @brief  List of all ASN.1 files
     const Asn1Acn::Asn1Model::Data &m_asn1Files;
+    /// @brief  List of SEDS packages
+    const std::vector<seds::model::Package> &m_sedsPackages;
 };
 
 } // namespace conversion::iv::translator

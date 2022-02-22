@@ -66,7 +66,7 @@ public:
      */
     EntryTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence, Asn1Acn::Definitions *asn1Definitions,
             const seds::model::ContainerDataType *sedsParentContainer, const seds::model::Package *sedsPackage,
-            const Asn1Acn::Asn1Model::Data &asn1Files);
+            const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages);
     /**
      * @brief   Deleted copy constructor
      */
@@ -156,6 +156,8 @@ private:
 
     /// @brief  List of alerady translated ASN.1 files
     const Asn1Acn::Asn1Model::Data &m_asn1Files;
+    /// @brief  List of SEDS packages
+    const std::vector<seds::model::Package> &m_sedsPackages;
 
     const static int m_crc8BitSize = 8;
     const static int m_crc16BitSize = 16;

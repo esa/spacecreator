@@ -98,7 +98,7 @@ private:
      * @param   generateFunction    Generate parent function for the translated components
      */
     auto translatePackage(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
-            bool generateFunction) const -> void;
+            const std::vector<seds::model::Package> &sedsPackages, bool generateFunction) const -> void;
 };
 
 } // namespace conversion::iv::translator

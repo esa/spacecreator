@@ -74,7 +74,7 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(con
     if (std::holds_alternative<seds::model::PackageFile>(sedsModelData)) {
         const auto &sedsPackage = std::get<seds::model::PackageFile>(sedsModelData).package();
 
-        auto packageFiles = translatePackage(sedsPackage, {}, asn1Files);
+        auto packageFiles = translatePackage(sedsPackage, {}, asn1Files, {});
 
         asn1Files.insert(asn1Files.end(), std::make_move_iterator(packageFiles.begin()),
                 std::make_move_iterator(packageFiles.end()));
@@ -85,7 +85,7 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(con
         const auto resolvedSedsPackages = packagesDependencyResolver.resolve(&sedsPackages);
 
         for (const auto &[sedsPackage, importedTypes] : resolvedSedsPackages) {
-            auto packageFiles = translatePackage(*sedsPackage, importedTypes, asn1Files);
+            auto packageFiles = translatePackage(*sedsPackage, importedTypes, asn1Files, sedsPackages);
             asn1Files.insert(asn1Files.end(), std::make_move_iterator(packageFiles.begin()),
                     std::make_move_iterator(packageFiles.end()));
         }
@@ -103,7 +103,7 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(con
 
 std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePackage(
         const seds::model::Package &sedsPackage, const std::set<Asn1Acn::ImportedType> &importedTypes,
-        const Asn1Model::Data &asn1Files) const
+        const Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages) const
 {
     DataTypesDependencyResolver typesDependencyResolver;
 
@@ -117,7 +117,7 @@ std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePacka
         packageAsn1Definitions->addImportedType(importedType);
     }
 
-    translateDataTypes(resolvedPackageDataTypes, packageAsn1Definitions.get(), &sedsPackage, asn1Files);
+    translateDataTypes(resolvedPackageDataTypes, packageAsn1Definitions.get(), &sedsPackage, asn1Files, sedsPackages);
 
     std::vector<std::unique_ptr<Asn1Acn::File>> result;
 
@@ -143,7 +143,8 @@ std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePacka
             componentAsn1Definitions->addImportedType(importedType);
         }
 
-        translateDataTypes(resolvedComponentDataTypes, componentAsn1Definitions.get(), &sedsPackage, asn1Files);
+        translateDataTypes(
+                resolvedComponentDataTypes, componentAsn1Definitions.get(), &sedsPackage, asn1Files, sedsPackages);
 
         auto componentAsn1File = std::make_unique<Asn1Acn::File>(componentPackageName);
         componentAsn1File->add(std::move(componentAsn1Definitions));
@@ -155,10 +156,10 @@ std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePacka
 
 void SedsToAsn1Translator::translateDataTypes(const std::list<const seds::model::DataType *> &sedsDataTypes,
         Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
-        const Asn1Model::Data &asn1Files) const
+        const Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages) const
 {
     std::unique_ptr<Asn1Acn::Types::Type> asn1Type;
-    DataTypeTranslatorVisitor dataTypeVisitor(asn1Type, asn1Definitions, sedsPackage, asn1Files);
+    DataTypeTranslatorVisitor dataTypeVisitor(asn1Type, asn1Definitions, sedsPackage, asn1Files, sedsPackages);
 
     for (const auto *sedsDataType : sedsDataTypes) {
         std::visit(dataTypeVisitor, *sedsDataType);
@@ -197,9 +198,10 @@ std::vector<const seds::model::DataType *> SedsToAsn1Translator::collectDataType
 }
 
 Asn1Acn::Definitions *SedsToAsn1Translator::getAsn1Definitions(
-        const QString &sedsPackageName, const Asn1Model::Data &asn1Files)
+        const QString &definitionsName, const Asn1Model::Data &asn1Files)
 {
-    const auto asn1FileName = Escaper::escapeAsn1PackageName(sedsPackageName);
+    const auto asn1FileName = Escaper::escapeAsn1PackageName(definitionsName);
+
     auto asn1File = std::find_if(
             std::begin(asn1Files), std::end(asn1Files), [&](const auto &file) { return file->name() == asn1FileName; });
     if (asn1File == asn1Files.end()) {
@@ -214,6 +216,19 @@ Asn1Acn::Definitions *SedsToAsn1Translator::getAsn1Definitions(
     }
 
     return asn1Definitions;
+}
+
+const seds::model::Package *SedsToAsn1Translator::getSedsPackage(
+        const QString &packageName, const std::vector<seds::model::Package> &sedsPackages)
+{
+    const auto sedsPackage = std::find_if(sedsPackages.begin(), sedsPackages.end(),
+            [&](const auto &sedsPackage) { return sedsPackage.nameStr() == packageName; });
+    if (sedsPackage == sedsPackages.end()) {
+        auto message = QString("Unable to find package \"%1\"").arg(packageName);
+        throw TranslationException(std::move(message));
+    }
+
+    return &(*sedsPackage);
 }
 
 } // namespace conversion::asn1::translator

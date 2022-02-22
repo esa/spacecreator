@@ -76,15 +76,25 @@ public:
     virtual auto getDependencies() const -> std::set<ModelType> override;
 
     /**
-     * @brief   Gets ASN.1 definitions for given SEDS package from given ASN.1 model
+     * @brief   Gets ASN.1 definitions from given ASN.1 model
      *
-     * @param   sedsPackageName     SEDS package name
+     * @param   definitionsName     Definitions name
      * @param   asn1Files           ASN.1 files
      *
-     * @return  Asn1 definitions
+     * @return  ASN.1 definitions
      */
-    static auto getAsn1Definitions(const QString &sedsPackageName, const Asn1Acn::Asn1Model::Data &asn1Files)
+    static auto getAsn1Definitions(const QString &definitionsName, const Asn1Acn::Asn1Model::Data &asn1Files)
             -> Asn1Acn::Definitions *;
+    /**
+     * @brief   Gets SEDS package from given vector
+     *
+     * @param   packageName     Package name
+     * @param   sedsPackages    SEDS packages
+     *
+     * @return  SEDS package
+     */
+    static auto getSedsPackage(const QString &packageName, const std::vector<seds::model::Package> &sedsPackages)
+            -> const seds::model::Package *;
 
 private:
     /**
@@ -104,7 +114,8 @@ private:
      * @return  Result ASN.1 files
      */
     auto translatePackage(const seds::model::Package &sedsPackage, const std::set<Asn1Acn::ImportedType> &importedTypes,
-            const Asn1Acn::Asn1Model::Data &asn1Files) const -> std::vector<std::unique_ptr<Asn1Acn::File>>;
+            const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages) const
+            -> std::vector<std::unique_ptr<Asn1Acn::File>>;
     /**
      * @brief   Translate SEDS data types
      *
@@ -114,7 +125,8 @@ private:
      */
     auto translateDataTypes(const std::list<const seds::model::DataType *> &sedsDataTypes,
             Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
-            const Asn1Acn::Asn1Model::Data &asn1Files) const -> void;
+            const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages) const
+            -> void;
 
     /**
      * @brief   Collects all data types declared directly in given package

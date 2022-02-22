@@ -79,7 +79,8 @@ public:
      */
     static auto createArrayType(const QString &baseTypeName, const std::vector<seds::model::DimensionSize> &dimensions,
             Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
-            const Asn1Acn::Asn1Model::Data &asn1Files) -> QString;
+            const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages)
+            -> QString;
 
     /**
      * @brief   Assemble name for the parameter

@@ -48,7 +48,8 @@ public:
      */
     SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
             Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
-            const Asn1Acn::Asn1Model::Data &m_asn1Files, const GenericTypeMapper *typeMapper);
+            const Asn1Acn::Asn1Model::Data &m_asn1Files, const std::vector<seds::model::Package> &sedsPackages,
+            const GenericTypeMapper *typeMapper);
     /**
      * @brief   Deleted copy constructor
      */
@@ -94,8 +95,11 @@ private:
     Asn1Acn::Definitions *m_asn1Definitions;
     /// @brief  Parent SEDS package
     const seds::model::Package *m_sedsPackage;
+
     /// @brief  List of all ASN.1 files
     const Asn1Acn::Asn1Model::Data &m_asn1Files;
+    /// @brief  List of SEDS packages
+    const std::vector<seds::model::Package> &m_sedsPackages;
 
     /// @brief  Generic type mapper
     const GenericTypeMapper *m_typeMapper;
