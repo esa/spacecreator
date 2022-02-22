@@ -21,13 +21,15 @@
 
 #include <QByteArray>
 #include <QVector>
+#include <dvcore/dvmodel.h>
 #include <dvcore/dvobject.h>
 #include <memory>
 
 namespace tests {
 namespace dvtools {
 
-auto getDvObjectsFromXml(const QByteArray &content) -> std::unique_ptr<QVector<dvm::DVObject *>>;
+auto getDvObjectsFromFile(const QString &filepath) -> std::unique_ptr<QVector<dvm::DVObject *>>;
+auto getDvObjectsFromModel(dvm::DVModel *model) -> std::unique_ptr<QVector<dvm::DVObject *>>;
 
 } // namespace dvtools
 } // namespace tests

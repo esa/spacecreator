@@ -40,9 +40,6 @@
 
 using plugincommon::IvTools;
 using plugincommon::ModelLoader;
-using testgenerator::createQVectorToQVectorMap;
-using testgenerator::elementsEqualByName;
-using testgenerator::elementsEqualByTitle;
 using testgenerator::IvGenerator;
 
 namespace tests::testgenerator {
@@ -171,8 +168,8 @@ static void compareModels(ivm::IVModel *const loaded, ivm::IVModel *const genera
     const int generatedFunctionsSize = generatedFunctions.size();
     QCOMPARE(generatedFunctionsSize, loadedFunctionsSize);
 
-    const QVector<int> loadedToGeneratedFunctionMap = createQVectorToQVectorMap<QVector<ivm::IVFunction *>>(
-            loadedFunctions, generatedFunctions, elementsEqualByTitle);
+    const QVector<int> loadedToGeneratedFunctionMap =
+            createQVectorToQVectorMap<ivm::IVFunction *>(loadedFunctions, generatedFunctions, elementsEqualByTitle);
     checkAllElementsMapped(loadedToGeneratedFunctionMap, loadedFunctionsSize);
 
     for (int i = 0; i < generatedFunctionsSize; i++) {
@@ -210,8 +207,8 @@ static void compareFunctions(ivm::IVFunction *const loaded, ivm::IVFunction *con
     const int generatedInterfacesSize = generatedInterfaces.size();
     QCOMPARE(generatedInterfacesSize, loadedInterfacesSize);
 
-    const QVector<int> loadedToGeneratedInterfaceMap = createQVectorToQVectorMap<QVector<ivm::IVInterface *>>(
-            loadedInterfaces, generatedInterfaces, elementsEqualByTitle);
+    const QVector<int> loadedToGeneratedInterfaceMap =
+            createQVectorToQVectorMap<ivm::IVInterface *>(loadedInterfaces, generatedInterfaces, elementsEqualByTitle);
     checkAllElementsMapped(loadedToGeneratedInterfaceMap, loadedInterfacesSize);
 
     for (int i = 0; i < generatedInterfacesSize; i++) {
@@ -237,8 +234,8 @@ static void compareInterfaces(ivm::IVInterface *const loaded, ivm::IVInterface *
     const int loadedParametersSize = loadedParams.size();
     QCOMPARE(generatedParametersSize, loadedParametersSize);
 
-    const QVector<int> loadedToGeneratedParameterMap = createQVectorToQVectorMap<QVector<shared::InterfaceParameter>>(
-            loadedParams, generatedParams, elementsEqualByName);
+    const QVector<int> loadedToGeneratedParameterMap =
+            createQVectorToQVectorMap<shared::InterfaceParameter>(loadedParams, generatedParams, elementsEqualByName);
     checkAllElementsMapped(loadedToGeneratedParameterMap, loadedParametersSize);
 
     const int generatedParamsSize = generatedParams.size();

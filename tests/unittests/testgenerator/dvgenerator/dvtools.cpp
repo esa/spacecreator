@@ -21,6 +21,7 @@
 
 #include <QBuffer>
 #include <QDebug>
+#include <QFile>
 #include <dvcore/dvobject.h>
 #include <dvcore/dvxmlreader.h>
 #include <memory>
@@ -29,7 +30,7 @@
 namespace tests {
 namespace dvtools {
 
-auto getDvObjectsFromXml(const QByteArray &content) -> std::unique_ptr<QVector<dvm::DVObject *>>
+static auto getDvObjectsFromXml(const QByteArray &content) -> std::unique_ptr<QVector<dvm::DVObject *>>
 {
     QBuffer buffer;
     buffer.setData(content);
@@ -46,6 +47,32 @@ auto getDvObjectsFromXml(const QByteArray &content) -> std::unique_ptr<QVector<d
     auto objects = std::make_unique<QVector<dvm::DVObject *>>(reader.parsedObjects());
 
     return objects;
+}
+
+static auto readFileAsQByteArray(const QString &filepath) -> QByteArray
+{
+    QFile file(filepath);
+    file.open(QIODevice::ReadOnly);
+    QByteArray array(file.readAll());
+    file.close();
+
+    return array;
+}
+
+auto getDvObjectsFromFile(const QString &filepath) -> std::unique_ptr<QVector<dvm::DVObject *>>
+{
+    const auto expectedXml = readFileAsQByteArray(filepath);
+    return getDvObjectsFromXml(expectedXml);
+}
+
+auto getDvObjectsFromModel(dvm::DVModel *const model) -> std::unique_ptr<QVector<dvm::DVObject *>>
+{
+    auto generatedDvObjects = std::make_unique<QVector<dvm::DVObject *>>();
+    for (const auto &obj : model->objects()) {
+        generatedDvObjects->append(static_cast<dvm::DVObject *>(obj));
+    }
+
+    return generatedDvObjects;
 }
 
 } // namespace dvtools
