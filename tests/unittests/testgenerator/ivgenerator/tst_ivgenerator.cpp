@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#include "../common.h"
+
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
@@ -76,18 +78,6 @@ static auto checkEntityAttributesEqual(ivm::IVObject *expected, ivm::IVObject *a
 static auto checkAllElementsMapped(const QVector<int> &map, int size) -> void;
 
 static auto isAnyElementEqual(const QVector<int> &vector, int number) -> bool;
-
-static auto elementsEqualByTitle = [](const auto &v1, int i, const auto &v2, int j) -> bool {
-    return v1.at(i)->title().compare(v2.at(j)->title()) == 0;
-};
-
-static auto elementsEqualByName = [](const auto &v1, int i, const auto &v2, int j) -> bool {
-    return v1.at(i).name().compare(v2.at(j).name()) == 0;
-};
-
-template<typename T>
-auto createQVectorToQVectorMap(const T &source, const T &destination,
-        std::function<bool(const T &source, int i, const T &destination, int j)> elementsEqual) -> QVector<int>;
 
 void tst_ivgenerator::initTestCase()
 {
@@ -297,27 +287,6 @@ static void checkAllElementsMapped(const QVector<int> &map, int size)
 static bool isAnyElementEqual(const QVector<int> &vector, int number)
 {
     return std::any_of(vector.begin(), vector.end(), [&number](const auto &el) { return el == number; });
-}
-
-template<typename QVectorT>
-QVector<int> createQVectorToQVectorMap(const QVectorT &source, const QVectorT &destination,
-        std::function<bool(const QVectorT &source, int i, const QVectorT &destination, int j)> elementsEqual)
-{
-    assert(source.size() == destination.size());
-
-    const int size = source.size();
-
-    QVector<int> map(size, size);
-
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
-            if (elementsEqual(source, i, destination, j)) {
-                map[i] = j;
-            }
-        }
-    }
-
-    return map;
 }
 
 } // namespace tests::testgenerator
