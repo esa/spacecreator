@@ -77,6 +77,9 @@ void tst_dvgenerator::testNominal()
     QVERIFY(expectedDvObjects != nullptr);
 
     // TODO: compare expected and generated dvobjects
+    for (const auto &obj : *expectedDvObjects) {
+        qDebug() << obj->title();
+    }
     QCOMPARE(generatedDvObjects->size(), expectedDvObjects->size());
 
     QFAIL("this shall happen");

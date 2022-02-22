@@ -20,8 +20,12 @@
 #include "dvgenerator.h"
 
 #include <dvcore/dvcommonprops.h>
+#include <dvcore/dvfunction.h>
 #include <dvcore/dvmodel.h>
+#include <dvcore/dvnode.h>
 #include <dvcore/dvobject.h>
+#include <dvcore/dvpartition.h>
+#include <dvcore/dvport.h>
 #include <memory>
 #include <shared/common.h>
 #include <shared/parameter.h>
@@ -35,7 +39,37 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
 {
     auto model = std::make_unique<dvm::DVModel>();
 
+    dvm::DVObject *const node = new dvm::DVNode;
+    node->setTitle("x86_Linux_TestRunner");
+    node->setModel(model.get());
+    model->addObject(node);
+
+    dvm::DVObject *const partition = new dvm::DVPartition;
+    partition->setTitle("hostPartition");
+    partition->setModel(model.get());
+    model->addObject(partition);
+
     (void)functionsToBind;
+
+    dvm::DVObject *const fun1 = new dvm::DVFunction;
+    fun1->setTitle("TestDriver");
+    fun1->setModel(model.get());
+    model->addObject(fun1);
+
+    dvm::DVObject *const fun2 = new dvm::DVFunction;
+    fun2->setTitle("FunctionUnderTest");
+    fun2->setModel(model.get());
+    model->addObject(fun2);
+
+    dvm::DVObject *const port1 = new dvm::DVPort;
+    port1->setTitle("eth0");
+    port1->setModel(model.get());
+    model->addObject(port1);
+
+    dvm::DVObject *const port2 = new dvm::DVPort;
+    port2->setTitle("uart0");
+    port2->setModel(model.get());
+    model->addObject(port2);
 
     return model;
 }
