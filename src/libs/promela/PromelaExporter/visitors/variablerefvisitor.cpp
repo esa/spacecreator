@@ -19,6 +19,8 @@
 
 #include "variablerefvisitor.h"
 
+#include "expressionvisitor.h"
+
 using promela::model::VariableRef;
 
 namespace promela::exporter {
@@ -29,6 +31,21 @@ VariableRefVisitor::VariableRefVisitor(QTextStream &stream)
 
 void VariableRefVisitor::visit(const VariableRef &variableRef)
 {
-    m_stream << variableRef.getReference();
+    const std::list<VariableRef::Element> &elements = variableRef.getElements();
+
+    bool first = true;
+    for (const auto &element : elements) {
+        if (!first) {
+            m_stream << ".";
+        }
+        first = false;
+        m_stream << element.m_name;
+        if (element.m_index) {
+            m_stream << "[";
+            ExpressionVisitor expressionVisitor(m_stream);
+            expressionVisitor.visit(*element.m_index);
+            m_stream << "]";
+        }
+    }
 }
 }

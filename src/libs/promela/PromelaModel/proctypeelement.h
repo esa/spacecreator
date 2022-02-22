@@ -26,6 +26,7 @@
 #include "declaration.h"
 #include "doloop.h"
 #include "expression.h"
+#include "forloop.h"
 #include "inlinecall.h"
 #include "sequence.h"
 #include "skip.h"
@@ -43,7 +44,7 @@ public:
      * @brief Variant representation of different alternatives of proctype element
      */
     using Value = std::variant<Declaration, ChannelSend, ChannelRecv, Expression, DoLoop, Assignment, InlineCall, Skip,
-            Conditional, Sequence>;
+            Conditional, Sequence, ForLoop>;
 
     /**
      * @brief Constructor

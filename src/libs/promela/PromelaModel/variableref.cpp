@@ -19,14 +19,81 @@
 
 #include "variableref.h"
 
+#include "expression.h"
+
 namespace promela::model {
-VariableRef::VariableRef(QString ref)
-    : m_ref(std::move(ref))
+VariableRef::Element::Element(QString name, std::unique_ptr<Expression> index)
+    : m_name(std::move(name))
+    , m_index(std::move(index))
 {
 }
 
-const QString &VariableRef::getReference() const noexcept
+VariableRef::VariableRef(QString ref)
 {
-    return m_ref;
+    m_elements.emplace_back(std::move(ref), std::unique_ptr<Expression>());
+}
+
+VariableRef::VariableRef(QString ref, std::unique_ptr<Expression> indexExpression)
+{
+    m_elements.emplace_back(std::move(ref), std::move(indexExpression));
+}
+
+VariableRef::VariableRef(const VariableRef &other)
+{
+    for (const auto &element : other.m_elements) {
+        if (element.m_index) {
+            m_elements.emplace_back(element.m_name, std::make_unique<Expression>(*element.m_index));
+        } else {
+            m_elements.emplace_back(element.m_name, std::unique_ptr<Expression>());
+        }
+    }
+}
+
+VariableRef::VariableRef(VariableRef &&other)
+{
+    for (auto &element : other.m_elements) {
+        m_elements.emplace_back(std::move(element.m_name), std::move(element.m_index));
+    }
+}
+
+const VariableRef &VariableRef::operator=(const VariableRef &rhs)
+{
+    m_elements.clear();
+
+    for (const auto &element : rhs.m_elements) {
+        if (element.m_index) {
+            m_elements.emplace_back(element.m_name, std::make_unique<Expression>(*element.m_index));
+        } else {
+            m_elements.emplace_back(element.m_name, std::unique_ptr<Expression>());
+        }
+    }
+
+    return *this;
+}
+
+const VariableRef &VariableRef::operator=(VariableRef &&rhs)
+{
+    m_elements.clear();
+
+    for (auto &element : rhs.m_elements) {
+        m_elements.emplace_back(std::move(element.m_name), std::move(element.m_index));
+    }
+
+    return *this;
+}
+
+void VariableRef::appendElement(QString ref)
+{
+    m_elements.emplace_back(std::move(ref), std::unique_ptr<Expression>());
+}
+
+void VariableRef::appendElement(QString ref, std::unique_ptr<Expression> indexExpression)
+{
+    m_elements.emplace_back(std::move(ref), std::move(indexExpression));
+}
+
+const std::list<VariableRef::Element> &VariableRef::getElements() const noexcept
+{
+    return m_elements;
 }
 }

@@ -92,7 +92,9 @@ void tst_Asn1ToPromelaTranslator_Env::testInteger()
 
         QVERIFY(std::holds_alternative<Assignment>(nestedSequence->getContent().back()->getValue()));
         const Assignment &assignment = std::get<Assignment>(nestedSequence->getContent().back()->getValue());
-        QCOMPARE(assignment.getVariableRef().getReference(), argName);
+        QCOMPARE(assignment.getVariableRef().getElements().size(), 1);
+        QCOMPARE(assignment.getVariableRef().getElements().front().m_name, argName);
+        QVERIFY(assignment.getVariableRef().getElements().front().m_index.get() == nullptr);
         QVERIFY(std::holds_alternative<Constant>(assignment.getExpression().getContent()));
         const Constant &constant = std::get<Constant>(assignment.getExpression().getContent());
         QCOMPARE(constant.getValue(), i);
@@ -146,10 +148,14 @@ void tst_Asn1ToPromelaTranslator_Env::testEnumerated()
 
         QVERIFY(std::holds_alternative<Assignment>(nestedSequence->getContent().back()->getValue()));
         const Assignment &assignment = std::get<Assignment>(nestedSequence->getContent().back()->getValue());
-        QCOMPARE(assignment.getVariableRef().getReference(), argName);
+        QCOMPARE(assignment.getVariableRef().getElements().size(), 1);
+        QCOMPARE(assignment.getVariableRef().getElements().front().m_name, argName);
+        QVERIFY(assignment.getVariableRef().getElements().front().m_index.get() == nullptr);
         QVERIFY(std::holds_alternative<VariableRef>(assignment.getExpression().getContent()));
         const VariableRef &ref = std::get<VariableRef>(assignment.getExpression().getContent());
-        QCOMPARE(ref.getReference(), element);
+        QCOMPARE(ref.getElements().size(), 1);
+        QCOMPARE(ref.getElements().front().m_name, element);
+        QVERIFY(ref.getElements().front().m_index.get() == nullptr);
     }
 }
 
