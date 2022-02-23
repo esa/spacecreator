@@ -289,6 +289,7 @@ void EntryTranslatorVisitor::updateListLengthEntry(const seds::model::Entry *sed
     if (sedsTypeRef.packageStr().has_value()) {
         auto userdefinedType = dynamic_cast<Asn1Acn::Types::UserdefinedType *>(type.get());
 
+        // We need to add a package qualified to the type name for the ACN-only fields
         const auto qualifiedName =
                 QString("%1.%2").arg(Escaper::escapeAsn1PackageName(*sedsTypeRef.packageStr())).arg(type->typeName());
         userdefinedType->setTypeName(qualifiedName);

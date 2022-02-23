@@ -46,6 +46,7 @@ public:
      * @brief   Constructor
      *
      * @param   sedsPackage         Parent SEDS package
+     * @param   sedsPackages        List of SEDS packages
      */
     DimensionTranslator(const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages);
 

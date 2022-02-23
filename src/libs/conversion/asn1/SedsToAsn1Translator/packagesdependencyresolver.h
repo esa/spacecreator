@@ -27,6 +27,14 @@
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Utility used for resolving dependencies between SEDS packages
+ *
+ * SEDS allows to reference a type from other package before it's defined.
+ * ASN.1 model on the other hand requires Type object to be passed while creating a UserdefinedType
+ * Because of that we have to sort packages topologically so that we are sure that references
+ * are already valid
+ */
 class PackagesDependencyResolver final
 {
 public:
@@ -66,6 +74,7 @@ private:
         Permanent
     };
 
+    /// @brief  Package with types that it imports
     struct Result final {
         const seds::model::Package *package;
         std::set<Asn1Acn::ImportedType> importedTypes;
@@ -75,6 +84,13 @@ private:
     using ResultList = std::list<Result>;
 
 public:
+    /**
+     * @brief   Resolve dependencies between given packages
+     *
+     * @param   packages    Data types to sort
+     *
+     * @return  Sorted list of packages
+     */
     auto resolve(const std::vector<seds::model::Package> *packages) -> ResultList;
 
 private:

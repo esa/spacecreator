@@ -30,9 +30,20 @@
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Keeps track of containers that are visible in given scope
+ */
 class ContainerEntriesScope final
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   asn1Definitions     Parent ASN.1 defintions
+     * @param   sedsPackage         Parent SEDS package
+     * @param   asn1Files           List of already translated ASN.1 files
+     * @param   sedsPackages        List of SEDS packages
+     */
     ContainerEntriesScope(Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
             const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages);
 
@@ -44,9 +55,24 @@ public:
      */
     auto addContainer(const seds::model::ContainerDataType &sedsType) -> void;
 
+    /**
+     * @brief   Get components of given component
+     *
+     * @param   sedsTypeName    Container name
+     *
+     * @param   Vector of components
+     */
     auto fetchComponents(const QString &sedsTypeName) const -> const Asn1Acn::Types::Sequence::Components &;
+    /**
+     * @brief   Get trailer components of given component
+     *
+     * @param   sedsTypeName    Container name
+     *
+     * @param   Vector of trailer components
+     */
     auto fetchTrailerComponents(const QString &sedsTypeName) const -> const Asn1Acn::Types::Sequence::Components &;
 
+private:
     auto assertPresent(const QString &sedsTypeName) const -> void;
 
 private:
@@ -65,6 +91,7 @@ private:
     /// @brief  List of SEDS packages
     const std::vector<seds::model::Package> &m_sedsPackages;
 
+    /// @brief  Scope
     std::unordered_map<QString, ScopeEntry> m_scope;
 };
 

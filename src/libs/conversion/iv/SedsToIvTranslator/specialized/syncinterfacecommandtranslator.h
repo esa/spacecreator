@@ -44,6 +44,7 @@ public:
      * @param   asn1Definitions     Parent ASN.1 definitions
      * @param   sedsPackage         Parent SEDS package
      * @param   asn1Files           List of all ASN.1 files
+     * @param   sedsPackages        List of SEDS packages
      * @param   typeMapper          Generic type mapper
      */
     SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,

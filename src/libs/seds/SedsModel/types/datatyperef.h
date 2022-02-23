@@ -29,7 +29,7 @@ class DataTypeRef final
 {
 public:
     DataTypeRef() = default;
-    DataTypeRef(common::String name) noexcept;
+    DataTypeRef(common::String value) noexcept;
     DataTypeRef(DataTypeRef &&) = default;
     DataTypeRef &operator=(DataTypeRef &&) = default;
 

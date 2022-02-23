@@ -58,6 +58,7 @@ public:
      * @param   asn1Sequence        ASN.1 sequence to which the translated constraints will be applied
      * @param   asn1Definitions     Parent ASN.1 definitions
      * @param   sedsPackage         Parent SEDS package
+     * @param   sedsPackages        List of SEDS packages
      */
     ContainerConstraintTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence,
             const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages);

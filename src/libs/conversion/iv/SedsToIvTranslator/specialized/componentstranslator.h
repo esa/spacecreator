@@ -56,6 +56,7 @@ public:
      * @param   sedsPackage         Package with components to translate
      * @param   asn1Definitions     ASN.1 file where types of the packed argument will be saved
      * @param   asn1Files           List of all ASN.1 files
+     * @param   sedsPackages        List of SEDS packages
      */
     ComponentsTranslator(const seds::model::Package *sedsPackage, Asn1Acn::Definitions *asn1Definitions,
             const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages);

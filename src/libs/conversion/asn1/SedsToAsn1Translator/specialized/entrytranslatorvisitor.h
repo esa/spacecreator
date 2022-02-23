@@ -62,7 +62,10 @@ public:
      *
      * @param   asn1Sequence        ASN.1 sequence to which the translated entries will be added
      * @param   asn1Definitions     Parent ASN.1 definitions
+     * @param   sedsParentContainer Parent SEDS container
      * @param   sedsPackage         Parent SEDS package
+     * @param   asn1Files           List of already translated ASN.1 files
+     * @param   sedsPackages        List of SEDS packages
      */
     EntryTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence, Asn1Acn::Definitions *asn1Definitions,
             const seds::model::ContainerDataType *sedsParentContainer, const seds::model::Package *sedsPackage,

@@ -110,6 +110,9 @@ private:
      * @brief   Translate SEDS package
      *
      * @param   sedsPackage     Package to translate
+     * @param   importedTypes   Set of types that this package imports
+     * @param   asn1Files       List of already translated ASN.1 files
+     * @param   sedsPackages    List of SEDS packages
      *
      * @return  Result ASN.1 files
      */
@@ -122,6 +125,8 @@ private:
      * @param   sedsDataTypes       Data types to translate
      * @param   asn1Definitions     Where translated data types should be added
      * @param   sedsPackage         Parent SEDS package
+     * @param   asn1Files           List of already translated ASN.1 files
+     * @param   sedsPackages        List of SEDS packages
      */
     auto translateDataTypes(const std::list<const seds::model::DataType *> &sedsDataTypes,
             Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
@@ -138,7 +143,6 @@ private:
      * @return  Vector with all data types declared in the given package
      */
     std::vector<const seds::model::DataType *> collectDataTypes(const seds::model::Package &sedsPackage) const;
-
     /**
      * @brief   Collects all data types declared in given component
      *

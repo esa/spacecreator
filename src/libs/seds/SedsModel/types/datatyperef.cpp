@@ -21,18 +21,18 @@
 
 namespace seds::model {
 
-DataTypeRef::DataTypeRef(common::String name) noexcept
+DataTypeRef::DataTypeRef(common::String value) noexcept
 {
-    const auto index = name.lastIndexOf('/');
+    const auto index = value.lastIndexOf('/');
 
     if (index == -1) {
-        m_name = name;
+        m_name = value;
     } else {
-        m_name = name.mid(index + 1);
-        m_package = name.left(index);
+        m_name = value.mid(index + 1);
+        m_package = value.left(index);
     }
 
-    m_value = std::move(name);
+    m_value = std::move(value);
 }
 
 const QualifiedName &DataTypeRef::value() const

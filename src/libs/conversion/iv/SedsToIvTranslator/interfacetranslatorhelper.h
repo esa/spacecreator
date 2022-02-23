@@ -74,6 +74,8 @@ public:
      * @param   dimensions          Array dimensions
      * @param   asn1Definitions     Where the created type will be added
      * @param   sedsPackage         Parent SEDS package
+     * @param   asn1Files           List of all ASN.1 files
+     * @param   sedsPackages        List of SEDS packages
      *
      * @return  Create type name
      */
