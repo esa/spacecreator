@@ -19,6 +19,7 @@
 
 #include "dvgenerator.h"
 
+#include <QDebug>
 #include <dvcore/dvcommonprops.h>
 #include <dvcore/dvfunction.h>
 #include <dvcore/dvmodel.h>
@@ -28,6 +29,8 @@
 #include <dvcore/dvport.h>
 #include <memory>
 #include <shared/common.h>
+#include <shared/entityattribute.h>
+#include <shared/exportableproperty.h>
 #include <shared/parameter.h>
 #include <shared/propertytemplateconfig.h>
 #include <sstream>
@@ -42,11 +45,15 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
     dvm::DVObject *const node = new dvm::DVNode;
     node->setTitle("x86_Linux_TestRunner");
     node->setModel(model.get());
+    const auto nodeToken = dvm::meta::Props::token(dvm::meta::Props::Token::Node);
+    node->setEntityProperty(nodeToken, "");
     model->addObject(node);
 
     dvm::DVObject *const partition = new dvm::DVPartition;
     partition->setTitle("hostPartition");
     partition->setModel(model.get());
+    const auto partitionToken = dvm::meta::Props::token(dvm::meta::Props::Token::Partition);
+    partition->setEntityProperty(partitionToken, "");
     model->addObject(partition);
 
     (void)functionsToBind;
@@ -61,14 +68,18 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
     fun2->setModel(model.get());
     model->addObject(fun2);
 
+    const auto deviceToken = dvm::meta::Props::token(dvm::meta::Props::Token::Device);
+
     dvm::DVObject *const dev1 = new dvm::DVDevice;
     dev1->setTitle("eth0");
     dev1->setModel(model.get());
+    dev1->setEntityProperty(deviceToken, "");
     model->addObject(dev1);
 
     dvm::DVObject *const dev2 = new dvm::DVDevice;
     dev2->setTitle("uart0");
     dev2->setModel(model.get());
+    dev2->setEntityProperty(deviceToken, "");
     model->addObject(dev2);
 
     return model;

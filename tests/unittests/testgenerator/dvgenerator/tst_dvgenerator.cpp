@@ -53,6 +53,9 @@ private:
     std::unique_ptr<dve::DVExporter> m_exporter;
 };
 
+static auto checkEntityProperties(const dvm::DVObject &actual, const dvm::DVObject &expected) -> void;
+static auto checkObjVectors(QVector<dvm::DVObject *> *actual, QVector<dvm::DVObject *> *expected) -> void;
+
 void tst_dvgenerator::initTestCase()
 {
     //
@@ -71,38 +74,46 @@ void tst_dvgenerator::testNominal()
     QVERIFY(generatedDvObjects != nullptr);
     QVERIFY(expectedDvObjects != nullptr);
 
-    QCOMPARE(generatedDvObjects->size(), expectedDvObjects->size());
-    const int dvObjectsSize = generatedDvObjects->size();
+    checkObjVectors(generatedDvObjects.get(), expectedDvObjects.get());
+}
+
+static void checkObjVectors(QVector<dvm::DVObject *> *actualObjs, QVector<dvm::DVObject *> *expectedObjs)
+{
+    QCOMPARE(actualObjs->size(), expectedObjs->size());
+    const int objsSize = actualObjs->size();
 
     const QVector<int> map =
-            createQVectorToQVectorMap<dvm::DVObject *>(*generatedDvObjects, *expectedDvObjects, elementsEqualByTitle);
-    for (int i = 0; i < dvObjectsSize; i++) {
-        const auto &generatedDvObj = *generatedDvObjects->at(i);
-        const auto &expectedDvObj = *expectedDvObjects->at(map.at(i));
+            createQVectorToQVectorMap<dvm::DVObject *>(*actualObjs, *expectedObjs, elementsEqualByTitle);
+    for (int i = 0; i < objsSize; i++) {
+        const auto &generatedObj = *actualObjs->at(i);
+        const auto &expectedObj = *expectedObjs->at(map.at(i));
 
-        QCOMPARE(generatedDvObj.title(), expectedDvObj.title());
-        QCOMPARE(generatedDvObj.type(), expectedDvObj.type());
+        QCOMPARE(generatedObj.title(), expectedObj.title());
+        QCOMPARE(generatedObj.type(), expectedObj.type());
+        // qDebug() << "obj title:    " << generatedDvObj.title();
 
-        // compare obj properties
-        const auto &generatedProperties = generatedDvObj.properties();
-        const auto &expectedProperties = expectedDvObj.properties();
+        checkEntityProperties(generatedObj, expectedObj);
 
-        qDebug() << "gp: " << generatedProperties;
-        qDebug() << "ep: " << expectedProperties;
-
-        QCOMPARE(generatedProperties.size(), expectedProperties.size());
-        const int propertiesSize = generatedProperties.size();
-
-        for (int j = 0; j < propertiesSize; j++) {
-            const auto &generatedProperty = generatedProperties.at(j);
-            const auto &expectedProperty = expectedProperties.at(j);
-
-            qDebug() << expectedProperty.toString();
-            QCOMPARE(generatedProperty.toString(), expectedProperty.toString());
-            QCOMPARE(generatedProperty.typeName(), expectedProperty.typeName());
-            QCOMPARE(generatedProperty.type(), expectedProperty.type());
-        }
         // TODO: compare other members of objects: object type, parameters etc.
+    }
+}
+
+static void checkEntityProperties(const dvm::DVObject &actual, const dvm::DVObject &expected)
+{
+    const auto &actualProperties = actual.properties();
+    const auto &expectedProperties = expected.properties();
+
+    QCOMPARE(actualProperties.size(), expectedProperties.size());
+    const int propertiesSize = actualProperties.size();
+
+    for (int j = 0; j < propertiesSize; j++) {
+        const auto &actualProperty = actualProperties.at(j);
+        const auto &expectedProperty = expectedProperties.at(j);
+
+        QCOMPARE(actualProperty.toString(), expectedProperty.toString());
+        QCOMPARE(actualProperty.typeName(), expectedProperty.typeName());
+        QCOMPARE(actualProperty.type(), expectedProperty.type());
+        QCOMPARE(actualProperty.value<QString>(), expectedProperty.value<QString>());
     }
 }
 
