@@ -90,11 +90,16 @@ static void checkObjVectors(QVector<dvm::DVObject *> *actualObjs, QVector<dvm::D
 
         QCOMPARE(generatedObj.title(), expectedObj.title());
         QCOMPARE(generatedObj.type(), expectedObj.type());
-        // qDebug() << "obj title:    " << generatedDvObj.title();
+        qDebug() << "obj title:    " << generatedObj.title();
 
         checkEntityProperties(generatedObj, expectedObj);
 
-        // TODO: compare other members of objects: object type, parameters etc.
+        qDebug() << generatedObj.coordinates();
+        qDebug() << expectedObj.coordinates();
+        QCOMPARE(generatedObj.coordinates(), expectedObj.coordinates());
+
+        // checkEntityAttributes
+        // check parameters?
     }
 }
 
