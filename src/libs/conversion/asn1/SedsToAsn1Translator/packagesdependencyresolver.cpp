@@ -77,6 +77,12 @@ void PackagesDependencyResolver::visit(const seds::model::Package *package)
             auto containerImportedTypes = handleContainer(*containerDataType);
             std::copy(containerImportedTypes.begin(), containerImportedTypes.end(),
                     std::inserter(importedTypes, importedTypes.end()));
+        } else if (const auto *subRangeDataType = std::get_if<seds::model::SubRangeDataType>(&dataType)) {
+            auto importedType = handleSubRangeDataType(*subRangeDataType);
+
+            if (importedType) {
+                importedTypes.insert(std::move(*importedType));
+            }
         }
     }
 
@@ -124,6 +130,18 @@ std::set<Asn1Acn::ImportedType> PackagesDependencyResolver::handleContainer(
     }
 
     return importedTypes;
+}
+
+std::optional<Asn1Acn::ImportedType> PackagesDependencyResolver::handleSubRangeDataType(
+        const seds::model::SubRangeDataType &subRangeDataType)
+{
+    const auto &typeRef = subRangeDataType.type();
+
+    if (typeRef.packageStr()) {
+        return createImportedType(typeRef);
+    }
+
+    return std::nullopt;
 }
 
 Asn1Acn::ImportedType PackagesDependencyResolver::createImportedType(const seds::model::DataTypeRef &typeRef)

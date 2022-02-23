@@ -204,8 +204,14 @@ void DataTypeTranslatorVisitor::operator()(const StringDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const SubRangeDataType &sedsType)
 {
-    const auto &baseTypeName = sedsType.type().nameStr();
-    const auto sedsBaseType = m_sedsPackage->dataType(baseTypeName);
+    const auto &baseTypeRef = sedsType.type();
+    const auto &baseTypeName = baseTypeRef.nameStr();
+
+    const auto sedsPackage = baseTypeRef.packageStr()
+            ? SedsToAsn1Translator::getSedsPackage(*baseTypeRef.packageStr(), m_sedsPackages)
+            : m_sedsPackage;
+
+    const auto sedsBaseType = sedsPackage->dataType(baseTypeName);
 
     if (sedsBaseType == nullptr) {
         auto errorMessage = QString("SubRangeDataType \"%1\" references unknown type \"%2\"")

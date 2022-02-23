@@ -82,6 +82,8 @@ private:
 
     auto handleArray(const seds::model::ArrayDataType &arrayDataType) -> std::optional<Asn1Acn::ImportedType>;
     auto handleContainer(const seds::model::ContainerDataType &containerDataType) -> std::set<Asn1Acn::ImportedType>;
+    auto handleSubRangeDataType(const seds::model::SubRangeDataType &subRangeDataType)
+            -> std::optional<Asn1Acn::ImportedType>;
 
     auto createImportedType(const seds::model::DataTypeRef &typeRef) -> Asn1Acn::ImportedType;
 

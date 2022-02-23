@@ -13,5 +13,6 @@ BasicContainer ::= SEQUENCE
     fieldC DataItem(0 .. 255),
     listEntry SEQUENCE (SIZE(0 .. 10)) OF DataItem(0 .. 255)
 }
+SubRangeData ::= INTEGER(10 .. 255)
 END
 
