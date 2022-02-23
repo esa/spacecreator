@@ -221,7 +221,7 @@ const seds::model::Package *SedsToAsn1Translator::getSedsPackage(
         const QString &packageName, const std::vector<seds::model::Package> &sedsPackages)
 {
     const auto sedsPackage = std::find_if(sedsPackages.begin(), sedsPackages.end(),
-            [&](const auto &sedsPackage) { return sedsPackage.nameStr() == packageName; });
+            [&](const auto &package) { return package.nameStr() == packageName; });
     if (sedsPackage == sedsPackages.end()) {
         auto message = QString("Unable to find package \"%1\"").arg(packageName);
         throw TranslationException(std::move(message));
