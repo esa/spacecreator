@@ -81,6 +81,27 @@ void tst_dvgenerator::testNominal()
         const auto &expectedDvObj = *expectedDvObjects->at(map.at(i));
 
         QCOMPARE(generatedDvObj.title(), expectedDvObj.title());
+        QCOMPARE(generatedDvObj.type(), expectedDvObj.type());
+
+        // compare obj properties
+        const auto &generatedProperties = generatedDvObj.properties();
+        const auto &expectedProperties = expectedDvObj.properties();
+
+        qDebug() << "gp: " << generatedProperties;
+        qDebug() << "ep: " << expectedProperties;
+
+        QCOMPARE(generatedProperties.size(), expectedProperties.size());
+        const int propertiesSize = generatedProperties.size();
+
+        for (int j = 0; j < propertiesSize; j++) {
+            const auto &generatedProperty = generatedProperties.at(j);
+            const auto &expectedProperty = expectedProperties.at(j);
+
+            qDebug() << expectedProperty.toString();
+            QCOMPARE(generatedProperty.toString(), expectedProperty.toString());
+            QCOMPARE(generatedProperty.typeName(), expectedProperty.typeName());
+            QCOMPARE(generatedProperty.type(), expectedProperty.type());
+        }
         // TODO: compare other members of objects: object type, parameters etc.
     }
 }
