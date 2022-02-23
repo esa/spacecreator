@@ -61,15 +61,15 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
     fun2->setModel(model.get());
     model->addObject(fun2);
 
-    dvm::DVObject *const port1 = new dvm::DVPort;
-    port1->setTitle("eth0");
-    port1->setModel(model.get());
-    model->addObject(port1);
+    dvm::DVObject *const dev1 = new dvm::DVDevice;
+    dev1->setTitle("eth0");
+    dev1->setModel(model.get());
+    model->addObject(dev1);
 
-    dvm::DVObject *const port2 = new dvm::DVPort;
-    port2->setTitle("uart0");
-    port2->setModel(model.get());
-    model->addObject(port2);
+    dvm::DVObject *const dev2 = new dvm::DVDevice;
+    dev2->setTitle("uart0");
+    dev2->setModel(model.get());
+    model->addObject(dev2);
 
     return model;
 }
