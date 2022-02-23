@@ -4,6 +4,21 @@ Matrix4x4 []
 ArrayWithIndexDataRef []
 BasicContainer []
 {
+    realization []
+    {
+        realizationBasicContainer []
+        {
+            fieldA [],
+            fieldB [],
+            fieldC [],
+            lengthEntry COM-N7SPACE-PACKAGE2.LengthItem [],
+            listEntry [size lengthEntry]
+        },
+        realizationChildContainer []
+    }
+}
+ChildContainer []
+{
     fieldA [],
     fieldB [],
     fieldC [],

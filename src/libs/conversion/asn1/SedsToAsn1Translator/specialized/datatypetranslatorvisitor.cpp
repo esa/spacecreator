@@ -578,7 +578,7 @@ void DataTypeTranslatorVisitor::createRealizationContainerField(Asn1Acn::Types::
 void DataTypeTranslatorVisitor::applyContainerConstraints(
         const ContainerDataType &sedsType, Asn1Acn::Types::Sequence *asn1Type) const
 {
-    ContainerConstraintTranslatorVisitor translatorVisitor(asn1Type, m_sedsPackage);
+    ContainerConstraintTranslatorVisitor translatorVisitor(asn1Type, m_sedsPackage, m_sedsPackages);
 
     for (const auto &constraint : sedsType.constraints()) {
         std::visit(translatorVisitor, constraint);

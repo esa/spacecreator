@@ -30,6 +30,11 @@
           <ListEntry name="ListEntry" type="com/n7space/Package2/DataItem" listLengthField="lengthEntry"/>
         </EntryList>
       </ContainerDataType>
+      <ContainerDataType name="ChildContainer" abstract="false" baseType="BasicContainer">
+        <ConstraintSet>
+          <TypeConstraint entry="fieldA" type="com/n7space/Package2/LengthItem" />
+        </ConstraintSet>
+      </ContainerDataType>
       <SubRangeDataType name="SubRangeData" baseType="com/n7space/Package2/DataItem">
         <Range>
           <MinMaxRange rangeType="atLeast" min="10" />

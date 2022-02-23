@@ -8,7 +8,21 @@ Matrix4x4 ::= SEQUENCE (SIZE(4)) OF SEQUENCE (SIZE(4)) OF DataItem(0 .. 255)
 ArrayWithIndexDataRef ::= SEQUENCE (SIZE(16)) OF DataItem(0 .. 255)
 BasicContainer ::= SEQUENCE
 {
-    fieldA DataItem(0 .. 255),
+    realization CHOICE
+    {
+        realizationBasicContainer SEQUENCE
+        {
+            fieldA DataItem(0 .. 255),
+            fieldB DataItem(0 .. 255),
+            fieldC DataItem(0 .. 255),
+            listEntry SEQUENCE (SIZE(0 .. 10)) OF DataItem(0 .. 255)
+        } ,
+        realizationChildContainer ChildContainer
+    }
+}
+ChildContainer ::= SEQUENCE
+{
+    fieldA DataItem(0 .. 255) (0 .. 10),
     fieldB DataItem(0 .. 255),
     fieldC DataItem(0 .. 255),
     listEntry SEQUENCE (SIZE(0 .. 10)) OF DataItem(0 .. 255)

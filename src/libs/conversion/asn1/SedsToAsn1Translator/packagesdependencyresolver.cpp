@@ -129,6 +129,17 @@ std::set<Asn1Acn::ImportedType> PackagesDependencyResolver::handleContainer(
         std::visit(visitor, containerTrailerEntry);
     }
 
+    for (const auto &containerConstraint : containerDataType.constraints()) {
+        if (auto typeConstraint = std::get_if<seds::model::ContainerTypeConstraint>(&containerConstraint)) {
+            const auto &typeRef = typeConstraint->type();
+
+            if (typeRef.packageStr()) {
+                auto importedType = createImportedType(typeRef);
+                importedTypes.insert(std::move(importedType));
+            }
+        }
+    }
+
     return importedTypes;
 }
 
