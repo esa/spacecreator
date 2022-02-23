@@ -106,8 +106,8 @@ const Asn1Acn::Types::Sequence::Components &ContainerEntriesScope::fetchTrailerC
 void ContainerEntriesScope::assertPresent(const QString &sedsTypeName) const
 {
     if (m_scope.count(sedsTypeName) == 0) {
-        auto errorMessage = QString("Unable to find type \"%1\" in the current scope.")
-                                    .arg(sedsTypeName); throw TranslationException(std::move(errorMessage));
+        auto errorMessage = QString("Unable to find type \"%1\" in the current scope.").arg(sedsTypeName);
+        throw TranslationException(std::move(errorMessage));
     }
 }
 

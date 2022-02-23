@@ -105,6 +105,10 @@ void DataTypesDependencyResolver::visitArray(const seds::model::ArrayDataType &a
     for (const auto &dimension : arrayDataType.dimensions()) {
         const auto &indexTypeRef = dimension.indexTypeRef();
         if (indexTypeRef) {
+            if (indexTypeRef->packageStr()) {
+                return;
+            }
+
             const auto *indexType = findDataType(indexTypeRef->nameStr());
             visit(indexType);
         }

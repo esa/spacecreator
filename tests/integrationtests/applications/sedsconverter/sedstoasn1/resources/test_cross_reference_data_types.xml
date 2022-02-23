@@ -2,12 +2,6 @@
 <DataSheet xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
   <Package name="com/n7space/Package1">
     <DataTypeSet>
-      <IntegerDataType name="IndexItem">
-        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
-        <Range>
-          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="16" />
-        </Range>
-      </IntegerDataType>
       <ArrayDataType name="BasicArray1D" dataTypeRef="com/n7space/Package2/DataItem">
         <LongDescription>A 1-D array with maximum size</LongDescription>
         <DimensionList>
@@ -23,7 +17,7 @@
       </ArrayDataType>
       <ArrayDataType name="ArrayWithIndexDataRef" dataTypeRef="com/n7space/Package2/DataItem">
         <DimensionList>
-          <Dimension indexTypeRef="IndexItem" />
+          <Dimension indexTypeRef="com/n7space/Package2/IndexItem" />
         </DimensionList>
       </ArrayDataType>
       <ContainerDataType name="BasicContainer">
@@ -50,6 +44,12 @@
         <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
         <Range>
           <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="10" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="IndexItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="16" />
         </Range>
       </IntegerDataType>
     </DataTypeSet>

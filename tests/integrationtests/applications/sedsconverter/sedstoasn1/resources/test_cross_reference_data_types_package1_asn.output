@@ -3,10 +3,9 @@ IMPORTS
 DataItem FROM COM-N7SPACE-PACKAGE2
 LengthItem FROM COM-N7SPACE-PACKAGE2
 ;
-IndexItem ::= INTEGER(0 .. 16)
-BasicArray1D ::= SEQUENCE (SIZE(0 .. 15)) OF DataItem(0 .. 255)
-Matrix4x4 ::= SEQUENCE (SIZE(0 .. 4)) OF SEQUENCE (SIZE(0 .. 4)) OF DataItem(0 .. 255)
-ArrayWithIndexDataRef ::= SEQUENCE (SIZE(0 .. 16)) OF DataItem(0 .. 255)
+BasicArray1D ::= SEQUENCE (SIZE(15)) OF DataItem(0 .. 255)
+Matrix4x4 ::= SEQUENCE (SIZE(4)) OF SEQUENCE (SIZE(4)) OF DataItem(0 .. 255)
+ArrayWithIndexDataRef ::= SEQUENCE (SIZE(16)) OF DataItem(0 .. 255)
 BasicContainer ::= SEQUENCE
 {
     fieldA DataItem(0 .. 255),

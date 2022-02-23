@@ -310,6 +310,8 @@ private:
     const seds::model::Package *m_sedsPackage;
     /// @brief  List of already translated ASN.1 files
     const Asn1Acn::Asn1Model::Data &m_asn1Files;
+    /// @brief  List of SEDS packages
+    const std::vector<seds::model::Package> &m_sedsPackages;
 
     /// @brief  Containers that is in the current scope
     ContainerEntriesScope m_containersScope;

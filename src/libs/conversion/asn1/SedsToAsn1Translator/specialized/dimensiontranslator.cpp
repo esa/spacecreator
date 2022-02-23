@@ -21,6 +21,7 @@
 
 #include "specialized/rangetranslatorvisitor.h"
 #include "specialized/sizetranslatorvisitor.h"
+#include "translator.h"
 
 #include <asn1library/asn1/values.h>
 #include <conversion/common/translation/exceptions.h>
@@ -36,8 +37,10 @@ namespace conversion::asn1::translator {
 
 using SizeTranslator = SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn::IntegerValue>;
 
-DimensionTranslator::DimensionTranslator(const seds::model::Package *sedsPackage)
+DimensionTranslator::DimensionTranslator(
+        const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages)
     : m_sedsPackage(sedsPackage)
+    , m_sedsPackages(sedsPackages)
 {
 }
 
@@ -80,8 +83,14 @@ void DimensionTranslator::translateSizeDimension(
 void DimensionTranslator::translateIndexDimension(
         const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1SequenceOf) const
 {
-    const auto indexTypeName = dimension.indexTypeRef()->nameStr();
-    const auto indexType = m_sedsPackage->dataType(indexTypeName);
+    const auto &indexTypeRef = dimension.indexTypeRef();
+    const auto &indexTypeName = indexTypeRef->nameStr();
+
+    const auto sedsPackage = indexTypeRef->packageStr()
+            ? SedsToAsn1Translator::getSedsPackage(*indexTypeRef->packageStr(), m_sedsPackages)
+            : m_sedsPackage;
+
+    const auto indexType = sedsPackage->dataType(indexTypeName);
 
     if (!indexType) {
         throw MissingAsn1TypeDefinitionException(indexTypeName);

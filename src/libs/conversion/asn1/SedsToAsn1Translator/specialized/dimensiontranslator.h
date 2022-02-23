@@ -47,7 +47,7 @@ public:
      *
      * @param   sedsPackage         Parent SEDS package
      */
-    explicit DimensionTranslator(const seds::model::Package *sedsPackage);
+    DimensionTranslator(const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages);
 
     /**
      * @brief   Translate SEDS array dimension
@@ -71,6 +71,8 @@ private:
 private:
     /// @brief  Parent package
     const seds::model::Package *m_sedsPackage;
+    /// @brief  List of SEDS packages
+    const std::vector<seds::model::Package> &m_sedsPackages;
 };
 
 } // namespace conversion::asn1::translator

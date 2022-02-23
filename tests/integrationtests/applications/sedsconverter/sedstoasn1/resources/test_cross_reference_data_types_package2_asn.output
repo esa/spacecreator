@@ -1,5 +1,6 @@
 COM-N7SPACE-PACKAGE2 DEFINITIONS ::= BEGIN
 DataItem ::= INTEGER(0 .. 255)
 LengthItem ::= INTEGER(0 .. 10)
+IndexItem ::= INTEGER(0 .. 16)
 END
 
