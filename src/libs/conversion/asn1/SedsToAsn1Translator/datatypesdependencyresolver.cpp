@@ -20,6 +20,7 @@
 #include "datatypesdependencyresolver.h"
 
 #include <algorithm>
+#include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/types/arraydatatype.h>
 #include <seds/SedsModel/types/binarydatatype.h>
 #include <seds/SedsModel/types/booleandatatype.h>
@@ -30,6 +31,8 @@
 #include <seds/SedsModel/types/stringdatatype.h>
 #include <seds/SedsModel/types/subrangedatatype.h>
 #include <unordered_map>
+
+using conversion::translator::TranslationException;
 
 namespace conversion::asn1::translator {
 
@@ -110,6 +113,19 @@ void DataTypesDependencyResolver::visitArray(const seds::model::ArrayDataType &a
 
 void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDataType &containerDataType)
 {
+    const auto &baseTypeRef = containerDataType.baseType();
+    if (baseTypeRef) {
+        if (baseTypeRef->packageStr().has_value()) {
+            auto errorMessage = QString("Cross-package reference inheritance in type \"%1\" is not supported because "
+                                        "of the ASN.1 limitations")
+                                        .arg(containerDataType.nameStr());
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        const auto *baseType = findDataType(baseTypeRef->nameStr());
+        visit(baseType);
+    }
+
     const auto visitor = [this](auto &&entry) {
         using T = std::decay_t<decltype(entry)>;
         if constexpr (std::is_same_v<T, seds::model::PaddingEntry>) {
@@ -131,12 +147,6 @@ void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDat
     }
     for (const auto &containerTrailerEntry : containerDataType.trailerEntries()) {
         std::visit(visitor, containerTrailerEntry);
-    }
-
-    const auto &baseTypeRef = containerDataType.baseType();
-    if (baseTypeRef) {
-        const auto *baseType = findDataType(baseTypeRef->nameStr());
-        visit(baseType);
     }
 }
 
