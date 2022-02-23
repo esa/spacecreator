@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
+#include <algorithm>
 #include <dvcore/dvmodel.h>
 #include <dvcore/dvobject.h>
 #include <harness/dvgenerator/dvgenerator.h>
@@ -63,12 +64,20 @@ void tst_dvgenerator::initTestCase()
 
 void tst_dvgenerator::testNominal()
 {
+    std::vector<std::shared_ptr<ivm::IVFunction>> functions {
+        std::make_shared<ivm::IVFunction>(),
+        std::make_shared<ivm::IVFunction>(),
+    };
+    functions.front()->setTitle("TestDriver");
+    functions.back()->setTitle("FunctionUnderTest");
+
     std::vector<ivm::IVFunction *> functionsToBind;
+    std::for_each(functions.begin(), functions.end(),
+            [&functionsToBind](const auto &f) { functionsToBind.push_back(f.get()); });
 
     const auto generatedModel = DvGenerator::generate(functionsToBind);
 
     QVERIFY(generatedModel != nullptr);
-
     const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());
     const auto expectedDvObjects = dvtools::getDvObjectsFromFile(dvPath.arg("deploymentview"));
     QVERIFY(generatedDvObjects != nullptr);

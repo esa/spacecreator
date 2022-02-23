@@ -56,17 +56,12 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
     partition->setEntityProperty(partitionToken, "");
     model->addObject(partition);
 
-    (void)functionsToBind;
-
-    dvm::DVObject *const fun1 = new dvm::DVFunction;
-    fun1->setTitle("TestDriver");
-    fun1->setModel(model.get());
-    model->addObject(fun1);
-
-    dvm::DVObject *const fun2 = new dvm::DVFunction;
-    fun2->setTitle("FunctionUnderTest");
-    fun2->setModel(model.get());
-    model->addObject(fun2);
+    for (const auto &function : functionsToBind) {
+        dvm::DVObject *const funToAdd = new dvm::DVFunction;
+        funToAdd->setTitle(function->title());
+        funToAdd->setModel(model.get());
+        model->addObject(funToAdd);
+    }
 
     const auto deviceToken = dvm::meta::Props::token(dvm::meta::Props::Token::Device);
 
