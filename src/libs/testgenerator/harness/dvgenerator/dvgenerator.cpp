@@ -21,6 +21,7 @@
 
 #include <QDebug>
 #include <dvcore/dvcommonprops.h>
+#include <dvcore/dvdevice.h>
 #include <dvcore/dvfunction.h>
 #include <dvcore/dvmodel.h>
 #include <dvcore/dvnode.h>
@@ -38,43 +39,43 @@
 
 namespace testgenerator {
 
+template<typename T>
+static auto addToModel(dvm::DVModel *const model, const QString &title, const QString &token = "",
+        const QVariant &value = QVariant()) -> dvm::DVObject *
+{
+    dvm::DVObject *const object = new T;
+    object->setTitle(title);
+    if (!token.isEmpty()) {
+        object->setEntityProperty(token, value);
+    }
+    object->setModel(model);
+
+    return object;
+}
+
 auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind) -> std::unique_ptr<dvm::DVModel>
 {
     auto model = std::make_unique<dvm::DVModel>();
 
-    dvm::DVObject *const node = new dvm::DVNode;
-    node->setTitle("x86_Linux_TestRunner");
-    node->setModel(model.get());
     const auto nodeToken = dvm::meta::Props::token(dvm::meta::Props::Token::Node);
-    node->setEntityProperty(nodeToken, "");
+    const auto partitionToken = dvm::meta::Props::token(dvm::meta::Props::Token::Partition);
+    const auto deviceToken = dvm::meta::Props::token(dvm::meta::Props::Token::Device);
+
+    auto *const node = addToModel<dvm::DVNode>(model.get(), "x86_Linux_TestRunner", nodeToken, "");
     model->addObject(node);
 
-    dvm::DVObject *const partition = new dvm::DVPartition;
-    partition->setTitle("hostPartition");
-    partition->setModel(model.get());
-    const auto partitionToken = dvm::meta::Props::token(dvm::meta::Props::Token::Partition);
-    partition->setEntityProperty(partitionToken, "");
+    auto *const partition = addToModel<dvm::DVPartition>(model.get(), "hostPartition", partitionToken, "");
     model->addObject(partition);
 
     for (const auto &function : functionsToBind) {
-        dvm::DVObject *const funToAdd = new dvm::DVFunction;
-        funToAdd->setTitle(function->title());
-        funToAdd->setModel(model.get());
-        model->addObject(funToAdd);
+        auto *const fun = addToModel<dvm::DVFunction>(model.get(), function->title());
+        model->addObject(fun);
     }
 
-    const auto deviceToken = dvm::meta::Props::token(dvm::meta::Props::Token::Device);
-
-    dvm::DVObject *const dev1 = new dvm::DVDevice;
-    dev1->setTitle("eth0");
-    dev1->setModel(model.get());
-    dev1->setEntityProperty(deviceToken, "");
+    auto *const dev1 = addToModel<dvm::DVDevice>(model.get(), "eth0", deviceToken, "");
     model->addObject(dev1);
 
-    dvm::DVObject *const dev2 = new dvm::DVDevice;
-    dev2->setTitle("uart0");
-    dev2->setModel(model.get());
-    dev2->setEntityProperty(deviceToken, "");
+    auto *const dev2 = addToModel<dvm::DVDevice>(model.get(), "uart0", deviceToken, "");
     model->addObject(dev2);
 
     return model;
