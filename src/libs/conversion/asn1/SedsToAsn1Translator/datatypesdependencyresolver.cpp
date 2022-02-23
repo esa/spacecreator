@@ -93,7 +93,7 @@ void DataTypesDependencyResolver::visit(const seds::model::DataType *dataType)
 
 void DataTypesDependencyResolver::visitArray(const seds::model::ArrayDataType &arrayDataType)
 {
-    const auto &itemDataTypeRef = arrayDataType.typeRef();
+    const auto &itemDataTypeRef = arrayDataType.type();
 
     if (itemDataTypeRef.packageStr().has_value()) {
         return;
@@ -135,7 +135,7 @@ void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDat
         if constexpr (std::is_same_v<T, seds::model::PaddingEntry>) {
             return;
         } else {
-            const auto &entryTypeRef = entry.typeRef();
+            const auto &entryTypeRef = entry.type();
 
             if (entryTypeRef.packageStr().has_value()) {
                 return;

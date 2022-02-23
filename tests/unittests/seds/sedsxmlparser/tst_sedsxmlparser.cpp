@@ -101,7 +101,7 @@ void tst_SedsXmlParser::testContainerDataTypesParsing()
 
         const auto &arrayType = std::get<model::ArrayDataType>(dataTypeSet.at(3));
         QCOMPARE(arrayType.name().value(), "ArrayType");
-        QCOMPARE(arrayType.typeRef().value().name().value(), "DataItemA");
+        QCOMPARE(arrayType.type().value().name().value(), "DataItemA");
         QCOMPARE(arrayType.dimensions().size(), 1);
 
         const auto &dimension = arrayType.dimensions().at(0);
@@ -113,7 +113,7 @@ void tst_SedsXmlParser::testContainerDataTypesParsing()
 
         const auto &entry = std::get<model::Entry>(containerType.entries().at(0));
         QCOMPARE(entry.name().value(), "fieldA");
-        QCOMPARE(entry.typeRef().value().name().value(), "DataItemA");
+        QCOMPARE(entry.type().value().name().value(), "DataItemA");
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
@@ -177,7 +177,7 @@ void tst_SedsXmlParser::testInterfacesParsing()
 
         const auto &parameter = parameters.at(0);
         QCOMPARE(parameter.name().value(), "SynchronousParameter");
-        QCOMPARE(parameter.typeRef().value().name().value(), "DataItem");
+        QCOMPARE(parameter.type().value().name().value(), "DataItem");
         QCOMPARE(parameter.mode(), model::InterfaceParameterMode::Sync);
     } catch (const std::exception &ex) {
         QFAIL(ex.what());

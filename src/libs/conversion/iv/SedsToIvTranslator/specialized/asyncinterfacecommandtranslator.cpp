@@ -238,7 +238,7 @@ AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::p
         const seds::model::CommandArgument &sedsArgument, const AsyncInterfaceCommandTranslator::Arguments &arguments)
 {
     const auto argumentName = Escaper::escapeAsn1FieldName(sedsArgument.nameStr());
-    const auto argumentTypeName = sedsArgument.typeRef().nameStr();
+    const auto argumentTypeName = sedsArgument.type().nameStr();
 
     const auto typeMapping = m_typeMapper->getMapping(argumentTypeName);
 
@@ -323,7 +323,7 @@ AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::h
 
         // Create an ASN.1 choice that will have a generic parameters to choose an alternative based on determinant
         const auto alternateTypeName =
-                createAlternateType(sedsArgument.typeRef().nameStr(), concreteTypes, determinantTypeName);
+                createAlternateType(sedsArgument.type().nameStr(), concreteTypes, determinantTypeName);
         const auto argumentTypeName = handleArrayArgument(sedsArgument, alternateTypeName);
 
         return { argumentName, argumentTypeName, std::nullopt, foundDeterminant->name, false };

@@ -70,7 +70,7 @@ EntryTranslatorVisitor::EntryTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Seq
 
 void EntryTranslatorVisitor::operator()(const seds::model::Entry &sedsEntry)
 {
-    auto asn1EntryType = translateEntryType(sedsEntry.typeRef());
+    auto asn1EntryType = translateEntryType(sedsEntry.type());
 
     const auto entryName = Escaper::escapeAsn1FieldName(sedsEntry.nameStr());
     auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
@@ -90,7 +90,7 @@ void EntryTranslatorVisitor::operator()(const seds::model::ErrorControlEntry &se
 
 void EntryTranslatorVisitor::operator()(const seds::model::FixedValueEntry &sedsEntry)
 {
-    auto asn1EntryType = translateEntryType(sedsEntry.typeRef());
+    auto asn1EntryType = translateEntryType(sedsEntry.type());
     translateFixedValue(sedsEntry, asn1EntryType.get());
 
     const auto entryName = Escaper::escapeAsn1FieldName(sedsEntry.nameStr());
@@ -112,7 +112,7 @@ void EntryTranslatorVisitor::operator()(const seds::model::LengthEntry &sedsEntr
 void EntryTranslatorVisitor::operator()(const seds::model::ListEntry &sedsEntry)
 {
 
-    auto asn1EntryType = translateEntryType(sedsEntry.typeRef());
+    auto asn1EntryType = translateEntryType(sedsEntry.type());
 
     auto asn1SequenceOfType = std::make_unique<Asn1Acn::Types::SequenceOf>();
     asn1SequenceOfType->setItemsType(std::move(asn1EntryType));
@@ -285,7 +285,7 @@ void EntryTranslatorVisitor::updateListLengthEntry(const seds::model::Entry *sed
     auto name = listLengthSequenceComponent->name();
     auto type = listLengthSequenceComponent->type()->clone();
 
-    const auto &sedsTypeRef = sedsEntry->typeRef();
+    const auto &sedsTypeRef = sedsEntry->type();
     if (sedsTypeRef.packageStr().has_value()) {
         auto userdefinedType = dynamic_cast<Asn1Acn::Types::UserdefinedType *>(type.get());
 
@@ -360,7 +360,7 @@ void EntryTranslatorVisitor::addListSizeConstraint(
     // Replace the existing ASN.1 length entry with an ACN-only one
     updateListLengthEntry(listLengthEntry);
 
-    const auto &listLengthEntryTypeRef = listLengthEntry->typeRef();
+    const auto &listLengthEntryTypeRef = listLengthEntry->type();
 
     const auto sedsPackage = listLengthEntryTypeRef.packageStr()
             ? SedsToAsn1Translator::getSedsPackage(*listLengthEntryTypeRef.packageStr(), m_sedsPackages)

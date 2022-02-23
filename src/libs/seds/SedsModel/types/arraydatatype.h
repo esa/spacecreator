@@ -41,7 +41,7 @@ public:
     auto dimensions() const -> const ArrayDimensions &;
     auto addDimension(DimensionSize dimensions) -> void;
 
-    auto typeRef() const -> const DataTypeRef &;
+    auto type() const -> const DataTypeRef &;
     auto setType(DataTypeRef type) -> void;
 
 private:

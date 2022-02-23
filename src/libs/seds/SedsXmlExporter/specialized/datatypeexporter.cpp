@@ -66,7 +66,7 @@ auto DataTypeExporter::exportArrayDataType(
 {
     auto typeElement = sedsDocument.createElement(QStringLiteral("ArrayDataType"));
     typeElement.setAttribute(QStringLiteral("name"), dataType.nameStr());
-    typeElement.setAttribute(QStringLiteral("dataTypeRef"), dataType.typeRef().nameStr());
+    typeElement.setAttribute(QStringLiteral("dataTypeRef"), dataType.type().nameStr());
 
     auto dimensionsElement = sedsDocument.createElement(QStringLiteral("DimensionList"));
 
@@ -160,13 +160,13 @@ static inline auto exportContainerEntries(
         std::visit(overloaded { [&sedsDocument, &entryListElement](const model::Entry &castEntry) {
                                    auto entryElement = sedsDocument.createElement(QStringLiteral("Entry"));
                                    entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
-                                   entryElement.setAttribute(QStringLiteral("type"), castEntry.typeRef().nameStr());
+                                   entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
                                    entryListElement.appendChild(entryElement);
                                },
                            [&sedsDocument, &entryListElement](const model::FixedValueEntry &castEntry) {
                                auto entryElement = sedsDocument.createElement(QStringLiteral("FixedValueEntry"));
                                entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
-                               entryElement.setAttribute(QStringLiteral("type"), castEntry.typeRef().nameStr());
+                               entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
                                entryElement.setAttribute(QStringLiteral("fixedValue"), castEntry.fixedValue()->value());
                                entryListElement.appendChild(entryElement);
                            },
@@ -181,7 +181,7 @@ static inline auto exportContainerEntries(
                            [&sedsDocument, &entryListElement](const model::ListEntry &castEntry) {
                                auto entryElement = sedsDocument.createElement(QStringLiteral("ListEntry"));
                                entryElement.setAttribute(QStringLiteral("name"), castEntry.nameStr());
-                               entryElement.setAttribute(QStringLiteral("type"), castEntry.typeRef().nameStr());
+                               entryElement.setAttribute(QStringLiteral("type"), castEntry.type().nameStr());
                                entryElement.setAttribute(
                                        QStringLiteral("listLengthField"), castEntry.listLengthField().value().value());
                                entryListElement.appendChild(entryElement);

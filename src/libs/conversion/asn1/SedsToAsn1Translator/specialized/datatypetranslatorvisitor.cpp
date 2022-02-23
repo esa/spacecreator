@@ -87,7 +87,7 @@ void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
 
     if (dimensions.size() == 1) { // Sequence of type with one dimension
         auto type = std::make_unique<Asn1Acn::Types::SequenceOf>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
-        translateArrayType(sedsType.typeRef(), type.get());
+        translateArrayType(sedsType.type(), type.get());
         dimensionTranslator.translateDimension(dimensions[0], type.get());
 
         m_asn1Type = std::move(type);
@@ -107,7 +107,7 @@ void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
         });
 
         // Add item type to the last element
-        translateArrayType(sedsType.typeRef(), lastType);
+        translateArrayType(sedsType.type(), lastType);
 
         m_asn1Type = std::move(rootType);
     }

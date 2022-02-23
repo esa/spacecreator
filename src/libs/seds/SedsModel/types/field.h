@@ -48,7 +48,7 @@ public:
     Field &operator=(Field &&) = default;
 
 public:
-    auto typeRef() const -> const DataTypeRef &;
+    auto type() const -> const DataTypeRef &;
     auto setType(DataTypeRef type) -> void;
 
     auto encoding() const -> const FieldEncoding &;

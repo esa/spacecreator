@@ -94,7 +94,7 @@ void PackagesDependencyResolver::visit(const seds::model::Package *package)
 std::optional<Asn1Acn::ImportedType> PackagesDependencyResolver::handleArray(
         const seds::model::ArrayDataType &arrayDataType)
 {
-    const auto &typeRef = arrayDataType.typeRef();
+    const auto &typeRef = arrayDataType.type();
 
     if (typeRef.packageStr()) {
         return createImportedType(typeRef);
@@ -113,7 +113,7 @@ std::set<Asn1Acn::ImportedType> PackagesDependencyResolver::handleContainer(
         if constexpr (std::is_same_v<T, seds::model::PaddingEntry>) {
             return;
         } else {
-            const auto &typeRef = entry.typeRef();
+            const auto &typeRef = entry.type();
 
             if (typeRef.packageStr()) {
                 auto importedType = createImportedType(typeRef);
