@@ -28,7 +28,8 @@ target_link_libraries(SedsToIvTranslator
                 ivcore
                 asn1library
                 SEDS::Model
-    PRIVATE     CommonProjectWarnings)
+    PRIVATE     CommonProjectWarnings
+                Conversion::SedsToAsn1Translator)
 
 add_format_target(SedsToIvTranslator)
 add_tidy_target(SedsToIvTranslator)

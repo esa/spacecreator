@@ -19,13 +19,13 @@
 
 #pragma once
 
+#include "containerentriesscope.h"
+
 #include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/type.h>
 #include <optional>
 #include <seds/SedsModel/types/datatype.h>
-#include <shared/qstringhash.h>
-#include <unordered_map>
 
 namespace Asn1Acn {
 class Definitions;
@@ -267,12 +267,6 @@ private:
     auto translateFalseValue(seds::model::FalseValue falseValue, Asn1Acn::Types::Boolean *asn1Type) const -> void;
 
     /**
-     * @brief   Adds entries from given container data type to the entries cache
-     *
-     * @param   sedsType    Type which entries should be cached
-     */
-    auto cacheContainerType(const seds::model::ContainerDataType &sedsType) -> void;
-    /**
      * @brief   Adds a choice field to the passed ASN.1 sequence for realization fields
      *
      * @param   asn1Sequence    Sequence to which field should be added
@@ -307,10 +301,6 @@ private:
     auto convertByteOrder(seds::model::ByteOrder sedsByteOrder) const -> Asn1Acn::Types::Endianness;
 
 private:
-    using ContainerEntriesCacheValue =
-            std::pair<std::unique_ptr<Asn1Acn::Types::Sequence>, std::unique_ptr<Asn1Acn::Types::Sequence>>;
-    using ContainerEntriesCacheMap = std::unordered_map<QString, ContainerEntriesCacheValue>;
-
     /// @brief  Where translated data type will be saved
     std::unique_ptr<Asn1Acn::Types::Type> &m_asn1Type;
 
@@ -318,14 +308,11 @@ private:
     Asn1Acn::Definitions *m_asn1Definitions;
     /// @brief  Parent package
     const seds::model::Package *m_sedsPackage;
-
     /// @brief  List of already translated ASN.1 files
     const Asn1Acn::Asn1Model::Data &m_asn1Files;
-    /// @brief  List of SEDS packages
-    const std::vector<seds::model::Package> &m_sedsPackages;
 
-    /// @brief  Cache for sequence components
-    ContainerEntriesCacheMap m_asn1SequenceComponentsCache;
+    /// @brief  Containers that is in the current scope
+    ContainerEntriesScope m_containersScope;
 
     inline static const QString m_realizationComponentsName = "realization";
     inline static const QString m_realizationComponentsAlternativeNameTemplate = "realization%1";
