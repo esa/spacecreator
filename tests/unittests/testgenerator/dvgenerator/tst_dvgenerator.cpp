@@ -56,6 +56,7 @@ private:
 
 static auto checkEntityProperties(const dvm::DVObject &actual, const dvm::DVObject &expected) -> void;
 static auto checkObjVectors(QVector<dvm::DVObject *> *actual, QVector<dvm::DVObject *> *expected) -> void;
+static auto checkEntityAttributes(const dvm::DVObject &actual, const dvm::DVObject &expected) -> void;
 
 void tst_dvgenerator::initTestCase()
 {
@@ -99,15 +100,12 @@ static void checkObjVectors(QVector<dvm::DVObject *> *actualObjs, QVector<dvm::D
 
         QCOMPARE(generatedObj.title(), expectedObj.title());
         QCOMPARE(generatedObj.type(), expectedObj.type());
-        qDebug() << "obj title:    " << generatedObj.title();
 
         checkEntityProperties(generatedObj, expectedObj);
 
-        qDebug() << generatedObj.coordinates();
-        qDebug() << expectedObj.coordinates();
         QCOMPARE(generatedObj.coordinates(), expectedObj.coordinates());
-
-        // checkEntityAttributes
+        qDebug() << "object: " << generatedObj.title();
+        checkEntityAttributes(generatedObj, expectedObj);
         // check parameters?
     }
 }
@@ -128,6 +126,31 @@ static void checkEntityProperties(const dvm::DVObject &actual, const dvm::DVObje
         QCOMPARE(actualProperty.typeName(), expectedProperty.typeName());
         QCOMPARE(actualProperty.type(), expectedProperty.type());
         QCOMPARE(actualProperty.value<QString>(), expectedProperty.value<QString>());
+    }
+}
+
+static void checkEntityAttributes(const dvm::DVObject &actual, const dvm::DVObject &expected)
+{
+    const auto &actualEntityAttributes = actual.entityAttributes();
+    const auto &expectedEntityAttributes = expected.entityAttributes();
+
+    qDebug() << "";
+    qDebug() << "expected  entity attributes: ";
+    for (const auto &expectedEntityAttribute : expectedEntityAttributes) {
+        qDebug() << expectedEntityAttribute.name() << expectedEntityAttribute.value();
+    }
+
+    qDebug() << "";
+    qDebug() << "generated entity attributes: ";
+    for (const auto &generatedEntityAttribute : actualEntityAttributes) {
+        qDebug() << generatedEntityAttribute.name() << generatedEntityAttribute.value();
+    }
+
+    QCOMPARE(actualEntityAttributes.size(), expectedEntityAttributes.size());
+
+    for (const auto &expectedEntityAttribute : expectedEntityAttributes) {
+        (void)expectedEntityAttribute;
+        // QCOMPARE(actualEntityAttributes.value(expectedEntityAttribute.name()), expectedEntityAttribute.value());
     }
 }
 
