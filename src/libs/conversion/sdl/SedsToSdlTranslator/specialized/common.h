@@ -170,7 +170,7 @@ public:
      * @brief name          Name of the Command
      * @brief definition    Command definition
      */
-    auto addCommand(const QString interface, const QString name, const seds::model::InterfaceCommand *definition)
+    auto addCommand(const QString &interface, const QString &name, const seds::model::InterfaceCommand *definition)
             -> void;
 
     /**
@@ -181,14 +181,14 @@ public:
      *
      * @returns Command definition
      */
-    auto getCommand(const QString interface, const QString name) -> const seds::model::InterfaceCommand *;
+    auto getCommand(const QString &interface, const QString &name) -> const seds::model::InterfaceCommand *;
 
     /**
      * @brief Return a map of Command names to Command definitions
      *
      * @return Returns map of Commands
      */
-    auto commands() -> const std::vector<std::pair<QString, const seds::model::InterfaceCommand *>>;
+    auto commands() -> std::vector<std::pair<QString, const seds::model::InterfaceCommand *>>;
 
     /**
      * @brief Add Activity information
@@ -196,7 +196,7 @@ public:
      * @param name  Name of the Activity
      * @param into  Activity information
      */
-    auto addActivityInfo(const QString name, ActivityInfo info) -> void;
+    auto addActivityInfo(const QString &name, ActivityInfo info) -> void;
 
     /**
      * @brief Return Activity information
@@ -205,7 +205,7 @@ public:
      *
      * @returns Activity information
      */
-    auto getActivityInfo(QString name) -> const ActivityInfo *;
+    auto getActivityInfo(const QString &name) -> const ActivityInfo *;
 
 private:
     const seds::model::Package &m_sedsPackage;

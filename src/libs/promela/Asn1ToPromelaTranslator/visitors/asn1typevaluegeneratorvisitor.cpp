@@ -58,11 +58,9 @@ using promela::model::UtypeRef;
 using promela::model::VariableRef;
 
 namespace promela::translator {
-Asn1TypeValueGeneratorVisitor::Asn1TypeValueGeneratorVisitor(
-        PromelaModel &promelaModel, QString name, bool enhancedSpinSupport)
+Asn1TypeValueGeneratorVisitor::Asn1TypeValueGeneratorVisitor(PromelaModel &promelaModel, QString name)
     : m_promelaModel(promelaModel)
     , m_name(std::move(name))
-    , m_enhancedSpinSupport(enhancedSpinSupport)
 {
 }
 

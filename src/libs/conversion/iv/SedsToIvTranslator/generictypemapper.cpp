@@ -136,7 +136,7 @@ QString GenericTypeMapper::findDeterminant(const std::vector<GenericAlternate> &
                 return result;
             });
 
-    if (determinants.size() == 0) {
+    if (determinants.empty()) {
         auto errorMessage =
                 QString("No alternate determinant could be found in the interface \"%1\"").arg(m_sedsInterfaceName);
         throw TranslationException(std::move(errorMessage));

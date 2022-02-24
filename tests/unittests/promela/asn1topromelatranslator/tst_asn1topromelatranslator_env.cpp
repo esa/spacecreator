@@ -65,7 +65,7 @@ void tst_Asn1ToPromelaTranslator_Env::testInteger()
     PromelaModel promelaModel;
     QStringList typesToTranslate;
     typesToTranslate.append(QString("MyInteger"));
-    Asn1NodeValueGeneratorVisitor visitor(promelaModel, true, typesToTranslate);
+    Asn1NodeValueGeneratorVisitor visitor(promelaModel, typesToTranslate);
     visitor.visit(*model);
 
     QCOMPARE(promelaModel.getInlineDefs().size(), 1);
@@ -117,7 +117,7 @@ void tst_Asn1ToPromelaTranslator_Env::testEnumerated()
     PromelaModel promelaModel;
     QStringList typesToTranslate;
     typesToTranslate.append(QString("MyType"));
-    Asn1NodeValueGeneratorVisitor visitor(promelaModel, true, typesToTranslate);
+    Asn1NodeValueGeneratorVisitor visitor(promelaModel, typesToTranslate);
     visitor.visit(*model);
 
     QCOMPARE(promelaModel.getInlineDefs().size(), 1);

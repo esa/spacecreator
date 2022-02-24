@@ -482,7 +482,7 @@ void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeNam
     addAssignValueInline(typeName, std::move(sequence));
 }
 
-QString Asn1ItemTypeVisitor::getAssignValueInlineNameForNestedType(QString utype, QString field) const
+QString Asn1ItemTypeVisitor::getAssignValueInlineNameForNestedType(const QString &utype, const QString &field) const
 {
     return utype + "_" + field + assignValueInlineSuffix;
 }

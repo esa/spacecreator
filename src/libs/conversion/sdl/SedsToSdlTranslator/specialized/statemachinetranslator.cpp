@@ -98,7 +98,7 @@ static inline auto getOnEntry(const seds::model::StateMachine &sedsStateMachine,
     return &(*((*state)->onEntry()));
 }
 
-static inline auto getInterfaceByName(ivm::IVFunction *function, QString name) -> ivm::IVInterface *
+static inline auto getInterfaceByName(ivm::IVFunction *function, const QString &name) -> ivm::IVInterface *
 {
     for (auto interface : function->allInterfaces()) {
         if (interface->title() == name) {
@@ -108,8 +108,8 @@ static inline auto getInterfaceByName(ivm::IVFunction *function, QString name) -
     return nullptr;
 }
 
-static inline auto getTransitionsForCommand(const seds::model::StateMachine &sedsStateMachine, const QString interface,
-        const QString command) -> std::vector<const seds::model::Transition *>
+static inline auto getTransitionsForCommand(const seds::model::StateMachine &sedsStateMachine, const QString &interface,
+        const QString &command) -> std::vector<const seds::model::Transition *>
 {
     std::vector<const seds::model::Transition *> result;
     for (const auto &element : sedsStateMachine.elements()) {
@@ -127,13 +127,14 @@ static inline auto getTransitionsForCommand(const seds::model::StateMachine &sed
     return result;
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 static inline auto getConsistentUnconditionalActivityInvocation(
         std::vector<const seds::model::Transition *> transitions) -> const seds::model::ActivityInvocation *
 {
-    if (transitions.size() == 0) {
+    if (transitions.empty()) {
         throw TranslationException("Sync commands with no associated transitions are not supported");
     }
-    for (const auto transition : transitions) {
+    for (const auto &transition : transitions) {
         if (!transition->doActivity().has_value()) {
             throw TranslationException(
                     "Sync commands with transitions without associated activities are not supported");
@@ -145,7 +146,7 @@ static inline auto getConsistentUnconditionalActivityInvocation(
                                    "a transition which is not OnCommandPrimitive");
     }
     const auto &primitive = std::get<seds::model::OnCommandPrimitive>(transitions[0]->primitive());
-    for (const auto otherTransition : transitions) {
+    for (const auto &otherTransition : transitions) {
         if (!std::holds_alternative<seds::model::OnCommandPrimitive>(otherTransition->primitive())) {
             throw TranslationException(
                     "Uknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
@@ -167,7 +168,7 @@ static inline auto getConsistentUnconditionalActivityInvocation(
     }
     // doActivity optional is now guaranteed to have a value
     const auto invocation = &(*(transitions[0]->doActivity()));
-    for (const auto transition : transitions) {
+    for (const auto &transition : transitions) {
         const auto otherInvocation = &(*(transition->doActivity()));
         if (invocation->activity().value() != otherInvocation->activity().value()) {
             throw TranslationException("Inconsistent activities associated with a sync command");
@@ -187,7 +188,7 @@ static inline auto getConsistentUnconditionalActivityInvocation(
 }
 
 static inline auto generateProcedureForSyncCommand(Context &context, const seds::model::StateMachine &sedsStateMachine,
-        const QString interfaceName, const seds::model::InterfaceCommand &command) -> void
+        const QString &interfaceName, const seds::model::InterfaceCommand &command) -> void
 {
     const auto &name = InterfaceTranslatorHelper::buildCommandInterfaceName(
             interfaceName, command.nameStr(), ivm::IVInterface::InterfaceType::Provided);
@@ -233,8 +234,8 @@ static inline auto generateProcedureForSyncCommand(Context &context, const seds:
     context.sdlProcess()->addProcedure(std::move(procedure));
 }
 
-static inline auto buildCommandMapInternal(
-        Context &context, QString interfaceName, const seds::model::InterfaceDeclaration &intefaceDeclaration) -> void
+static inline auto buildCommandMapInternal(Context &context, const QString &interfaceName,
+        const seds::model::InterfaceDeclaration &intefaceDeclaration) -> void
 {
     for (const auto &command : intefaceDeclaration.commands()) {
         context.addCommand(interfaceName, command.nameStr(), &command);
@@ -250,9 +251,6 @@ static inline auto buildCommandMapInternal(
 auto StateMachineTranslator::setInitialVariableValues(
         const seds::model::ComponentImplementation::VariableSet &variables, ::sdl::Transition *transition) -> void
 {
-    if (variables.size() == 0) {
-        return;
-    }
     for (const auto &variable : variables) {
         if (variable.initialValue().has_value()) {
             const auto name = Escaper::escapeAsn1FieldName(variable.nameStr());
@@ -382,7 +380,7 @@ auto StateMachineTranslator::timerName(const QString &stateName) -> QString
 
 auto StateMachineTranslator::ensureMinimalStateMachineExists(Context &context) -> void
 {
-    if (context.sdlStateMachine()->states().size() > 0) {
+    if (!context.sdlStateMachine()->states().empty()) {
         // State machine has at least one state, minimum is ensured.
         return;
     }
@@ -406,7 +404,7 @@ auto StateMachineTranslator::getAnyState(::sdl::StateMachine *stateMachine) -> :
 }
 
 auto StateMachineTranslator::getParameterInterface(ivm::IVFunction *function, const ParameterType type,
-        const ParameterMode mode, const QString interfaceName, const QString parameterName) -> ivm::IVInterface *
+        const ParameterMode mode, const QString &interfaceName, const QString &parameterName) -> ivm::IVInterface *
 {
     const auto parameterType = type == ParameterType::Getter
             ? InterfaceTranslatorHelper::InterfaceParameterType::Getter

@@ -79,7 +79,7 @@ public:
 private:
     auto translateArguments(
             const std::vector<seds::model::CommandArgument> &sedsArguments, ivm::IVInterface *ivInterface) -> void;
-    auto handleArgumentType(const seds::model::CommandArgument &sedsArgument, const QString interfaceName) const
+    auto handleArgumentType(const seds::model::CommandArgument &sedsArgument, const QString &interfaceName) const
             -> QString;
 
 private:

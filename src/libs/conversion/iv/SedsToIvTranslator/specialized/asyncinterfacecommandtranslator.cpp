@@ -341,7 +341,7 @@ QString AsyncInterfaceCommandTranslator::handleArrayArgument(
 QString AsyncInterfaceCommandTranslator::createAlternateType(const QString &genericTypeName,
         const std::vector<TypeMapping::ConcreteType> &concreteTypes, const QString &determinantName)
 {
-    const auto name = InterfaceTranslatorHelper::buildAlternateTypeName(m_sedsInterfaceName, genericTypeName);
+    auto name = InterfaceTranslatorHelper::buildAlternateTypeName(m_sedsInterfaceName, genericTypeName);
 
     auto choice = std::make_unique<Asn1Acn::Types::Choice>(name);
 

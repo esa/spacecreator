@@ -65,7 +65,7 @@ QString InterfaceTranslatorHelper::createArrayType(const QString &baseTypeName,
         const std::vector<seds::model::DimensionSize> &dimensions, Asn1Acn::Definitions *asn1Definitions,
         const seds::model::Package *sedsPackage)
 {
-    const auto name = buildArrayTypeName(baseTypeName, dimensions);
+    auto name = buildArrayTypeName(baseTypeName, dimensions);
 
     const auto foundAsn1Array = asn1Definitions->type(name);
     if (foundAsn1Array != nullptr) {

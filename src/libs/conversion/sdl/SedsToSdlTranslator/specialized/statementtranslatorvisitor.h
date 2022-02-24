@@ -116,7 +116,7 @@ public:
          * @param name  Name of the Activity
          * @param info  ActivityInfo to be added
          */
-        auto addActivityInfo(const QString name, ActivityInfo info) -> void;
+        auto addActivityInfo(const QString &name, ActivityInfo info) -> void;
 
         /**
          * @brief Retrieve InterfaceCommand
@@ -126,7 +126,7 @@ public:
          *
          * @return InterfaceCommand
          */
-        auto getCommand(const QString interface, const QString name) -> const seds::model::InterfaceCommand *;
+        auto getCommand(const QString &interface, const QString &name) -> const seds::model::InterfaceCommand *;
 
     private:
         int m_labelCount;
@@ -229,7 +229,7 @@ public:
      *
      * @returns Translated variable reference
      */
-    static auto translateVariableReference(QString reference) -> QString;
+    static auto translateVariableReference(const QString &reference) -> QString;
 
 private:
     StatementContext &m_context;
@@ -257,8 +257,7 @@ private:
     static auto translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString &callName,
             const seds::model::SendParameterPrimitive &sendParameter) -> std::vector<std::unique_ptr<::sdl::Action>>;
 
-    static auto translateComparison(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-            const seds::model::Comparison &comparison) -> QString;
+    static auto translateComparison(const seds::model::Comparison &comparison) -> QString;
 
     static auto translateAndedConditions(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
             const seds::model::AndedConditions &conditions) -> QString;

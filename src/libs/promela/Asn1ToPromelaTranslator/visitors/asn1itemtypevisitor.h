@@ -144,7 +144,7 @@ private:
     void addSimpleValueAssignmentInline(const QString &typeName);
     void addAssignValueInline(const QString &typeName, ::promela::model::Sequence sequence);
     void addSimpleArrayAssignInlineValue(const QString &typeName, int length, bool lengthFieldPresent);
-    QString getAssignValueInlineNameForNestedType(QString utype, QString field) const;
+    QString getAssignValueInlineNameForNestedType(const QString &utype, const QString &field) const;
 
 private:
     ::promela::model::PromelaModel &m_promelaModel;

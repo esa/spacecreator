@@ -41,7 +41,7 @@ auto AssignmentInfo::right() const -> QString
 
 ActivityInfo::ActivityInfo(QString name)
 {
-    m_name = name;
+    m_name = std::move(name);
 }
 
 auto ActivityInfo::name() -> QString
@@ -56,7 +56,7 @@ auto ActivityInfo::returnAssignments() const -> const std::vector<AssignmentInfo
 
 auto ActivityInfo::addAssignment(AssignmentInfo assignment) -> void
 {
-    m_returnAssignments.push_back(assignment);
+    m_returnAssignments.push_back(std::move(assignment));
 }
 
 Context::Context(const seds::model::Package &sedsPackage, const seds::model::Component &sedsComponent,
@@ -101,13 +101,13 @@ auto Context::sdlStateMachine() -> ::sdl::StateMachine *
     return m_sdlStateMachine;
 }
 
-auto Context::addCommand(const QString interface, const QString name, const seds::model::InterfaceCommand *definition)
+auto Context::addCommand(const QString &interface, const QString &name, const seds::model::InterfaceCommand *definition)
         -> void
 {
     m_commands[std::make_pair(interface, name)] = definition;
 }
 
-auto Context::getCommand(const QString interface, const QString name) -> const seds::model::InterfaceCommand *
+auto Context::getCommand(const QString &interface, const QString &name) -> const seds::model::InterfaceCommand *
 {
     const auto i = m_commands.find(std::make_pair(interface, name));
     if (i == m_commands.end()) {
@@ -116,7 +116,7 @@ auto Context::getCommand(const QString interface, const QString name) -> const s
     return i->second;
 }
 
-auto Context::commands() -> const std::vector<std::pair<QString, const seds::model::InterfaceCommand *>>
+auto Context::commands() -> std::vector<std::pair<QString, const seds::model::InterfaceCommand *>>
 {
     std::vector<std::pair<QString, const seds::model::InterfaceCommand *>> result;
     for (const auto &i : m_commands) {
@@ -125,12 +125,12 @@ auto Context::commands() -> const std::vector<std::pair<QString, const seds::mod
     return result;
 }
 
-auto Context::addActivityInfo(const QString name, ActivityInfo info) -> void
+auto Context::addActivityInfo(const QString &name, ActivityInfo info) -> void
 {
-    m_activityInfos[name] = info;
+    m_activityInfos[name] = std::move(info);
 }
 
-auto Context::getActivityInfo(QString name) -> const ActivityInfo *
+auto Context::getActivityInfo(const QString &name) -> const ActivityInfo *
 {
     if (m_activityInfos.find(name) != m_activityInfos.end()) {
         return &m_activityInfos[name];

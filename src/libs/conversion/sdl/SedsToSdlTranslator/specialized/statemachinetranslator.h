@@ -139,7 +139,7 @@ private:
     static auto getAnyState(::sdl::StateMachine *stateMachine) -> ::sdl::State *;
 
     static auto getParameterInterface(ivm::IVFunction *function, const ParameterType type, const ParameterMode mode,
-            const QString interfaceName, const QString parameterName) -> ivm::IVInterface *;
+            const QString &interfaceName, const QString &parameterName) -> ivm::IVInterface *;
 
     static auto createParameterSyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
             ::sdl::Process *sdlProcess, const ParameterType type) -> void;
@@ -159,7 +159,7 @@ private:
 
     static auto translatePrimitive(Context &context, const seds::model::OnCommandPrimitive &command) -> InputHandler;
 
-    static auto translatePrimitive(Context &context, const seds::model::OnParameterPrimitive &primitive)
+    static auto translatePrimitive(Context &context, const seds::model::OnParameterPrimitive &parameter)
             -> InputHandler;
 
     static auto translatePrimitive(Context &context, ::sdl::State *sdlFromState,

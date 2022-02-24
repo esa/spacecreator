@@ -85,12 +85,12 @@ auto StatementTranslatorVisitor::StatementContext::sdlProcedure() -> ::sdl::Proc
     return m_sdlProcedure;
 }
 
-auto StatementTranslatorVisitor::StatementContext::addActivityInfo(const QString name, ActivityInfo info) -> void
+auto StatementTranslatorVisitor::StatementContext::addActivityInfo(const QString &name, ActivityInfo info) -> void
 {
-    m_masterContext.addActivityInfo(name, info);
+    m_masterContext.addActivityInfo(name, std::move(info));
 }
 
-auto StatementTranslatorVisitor::StatementContext::getCommand(const QString interface, const QString name)
+auto StatementTranslatorVisitor::StatementContext::getCommand(const QString &interface, const QString &name)
         -> const seds::model::InterfaceCommand *
 {
     return m_masterContext.getCommand(interface, name);
@@ -311,7 +311,7 @@ auto StatementTranslatorVisitor::translateActivityCall(::sdl::Process *process,
     return call;
 }
 
-auto StatementTranslatorVisitor::translateVariableReference(QString reference) -> QString
+auto StatementTranslatorVisitor::translateVariableReference(const QString &reference) -> QString
 {
     std::regex pattern("[^\\[\\]\\.]+");
     const auto input = reference.toStdString();
@@ -548,7 +548,7 @@ public:
 
     auto operator()(const seds::model::Comparison &comparison) -> QString
     {
-        return StatementTranslatorVisitor::translateComparison(m_process, m_procedure, comparison);
+        return StatementTranslatorVisitor::translateComparison(comparison);
     }
     auto operator()(const std::unique_ptr<seds::model::AndedConditions> &conditions) -> QString
     {
@@ -580,13 +580,12 @@ auto StatementTranslatorVisitor::translateBooleanExpression(
     return decision;
 }
 
-auto StatementTranslatorVisitor::translateComparison(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-        const seds::model::Comparison &comparison) -> QString
+auto StatementTranslatorVisitor::translateComparison(const seds::model::Comparison &comparison) -> QString
 {
     const auto left = translateVariableReference(comparison.firstOperand().variableRef().value().value());
     const auto &right = std::visit(
             overloaded {
-                    [&hostProcess, &hostProcedure](const seds::model::VariableRefOperand &reference) {
+                    [](const seds::model::VariableRefOperand &reference) {
                         return translateVariableReference(reference.variableRef().value().value());
                     },
                     [](const seds::model::ValueOperand &value) { return value.value().value(); },
@@ -675,8 +674,7 @@ auto StatementTranslatorVisitor::getOperandValue(const seds::model::Operand &ope
         return value.value().value();
     } else if (std::holds_alternative<seds::model::VariableRefOperand>(operand.value())) {
         const auto &value = std::get<seds::model::VariableRefOperand>(operand.value());
-        const auto variableName = translateVariableReference(value.variableRef().value().value());
-        return variableName;
+        return translateVariableReference(value.variableRef().value().value());
     }
     throw TranslationException("Operand not implemented");
     return "";

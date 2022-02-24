@@ -26,9 +26,9 @@ const std::optional<QString> &GenericTypeMap::fixedValue() const
     return m_fixedValue;
 }
 
-void GenericTypeMap::setFixedValue(QString literalValue)
+void GenericTypeMap::setFixedValue(QString fixedValue)
 {
-    m_fixedValue = std::move(literalValue);
+    m_fixedValue = std::move(fixedValue);
 }
 
 } // namespace seds::model
