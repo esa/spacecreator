@@ -20,6 +20,7 @@
 #include "../common.h"
 #include "dvtools.h"
 
+#include <QBuffer>
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
@@ -28,9 +29,11 @@
 #include <dvcore/dvobject.h>
 #include <harness/dvgenerator/dvgenerator.h>
 #include <ivcore/ivfunction.h>
+#include <libdveditor/dveditor.h>
 #include <libdveditor/dvexporter.h>
 #include <memory>
 #include <qobjectdefs.h>
+#include <shared/veobject.h>
 #include <testgenerator/testgenerator.h>
 
 using testgenerator::DvGenerator;
@@ -60,7 +63,7 @@ static auto checkEntityAttributes(const dvm::DVObject &actual, const dvm::DVObje
 
 void tst_dvgenerator::initTestCase()
 {
-    //
+    dve::initDvEditor();
 }
 
 void tst_dvgenerator::testNominal()
@@ -76,10 +79,26 @@ void tst_dvgenerator::testNominal()
     std::for_each(functions.begin(), functions.end(),
             [&functionsToBind](const auto &f) { functionsToBind.push_back(f.get()); });
 
-    const auto generatedModel = DvGenerator::generate(functionsToBind);
+    const std::unique_ptr<dvm::DVModel> generatedModel = DvGenerator::generate(functionsToBind);
 
     QVERIFY(generatedModel != nullptr);
     const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());
+
+    // export generated model
+    dve::DVExporter exporter;
+    QList<shared::VEObject *> objects;
+    std::for_each(generatedDvObjects->begin(), generatedDvObjects->end(),
+            [&objects](const auto &obj) { objects.push_back(obj); });
+
+    QByteArray qba(10000, '\00');
+    QBuffer buf = QBuffer(&qba);
+    exporter.exportObjects(objects, &buf);
+
+    QFile file("dv_out.xml");
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+    file.write(qba);
+
     const auto expectedDvObjects = dvtools::getDvObjectsFromFile(dvPath.arg("deploymentview"));
     QVERIFY(generatedDvObjects != nullptr);
     QVERIFY(expectedDvObjects != nullptr);

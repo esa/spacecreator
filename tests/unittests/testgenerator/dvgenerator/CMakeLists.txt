@@ -20,6 +20,7 @@ target_link_libraries(${TEST_NAME}
                 ivcore
                 dvcore
                 libiveditor
+                libdveditor
                 TestGenerator
                 Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test
