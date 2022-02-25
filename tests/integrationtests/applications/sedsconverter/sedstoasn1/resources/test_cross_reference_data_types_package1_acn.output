@@ -1,6 +1,5 @@
 COM-N7SPACE-PACKAGE1 DEFINITIONS ::= BEGIN
 BasicArray1D []
-Matrix4x4 []
 ArrayWithIndexDataRef []
 BasicContainer []
 {
