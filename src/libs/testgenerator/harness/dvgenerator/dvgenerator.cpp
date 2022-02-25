@@ -58,19 +58,10 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
     node->setEntityAttribute("node_label", "Node_1");
     node->setEntityAttribute("type", "ocarina_processors_x86::x86.generic_linux");
     node->setEntityAttribute("namespace", "ocarina_processors_x86");
-    model->addObject(node);
 
     auto *const partition = makeDvObject<dvm::DVPartition>(model.get(), "hostPartition");
     partition->setCoordinates({ 236, 237, 356, 317 });
     partition->setParentObject(node);
-    model->addObject(partition);
-
-    for (const auto &function : functionsToBind) {
-        auto *const fun = makeDvObject<dvm::DVFunction>(model.get(), function->title());
-        fun->setEntityAttribute("path", function->title());
-        fun->setParentObject(partition);
-        model->addObject(fun);
-    }
 
     auto *const dev1 = makeDvObject<dvm::DVDevice>(model.get(), "eth0");
     dev1->setCoordinates({ 192, 210 });
@@ -85,7 +76,6 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
     dev1->setEntityAttribute("impl_extends", "ocarina_drivers::ip_socket.linux");
     dev1->setEntityAttribute("port", "eth0");
     dev1->setParentObject(node);
-    model->addObject(dev1);
 
     auto *const dev2 = makeDvObject<dvm::DVDevice>(model.get(), "uart0");
     dev2->setCoordinates({ 192, 251 });
@@ -100,7 +90,28 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
     dev2->setEntityAttribute("impl_extends", "ocarina_drivers::serial_ccsds.linux");
     dev2->setEntityAttribute("port", "uart0");
     dev2->setParentObject(node);
+
+    auto *const dvNode = static_cast<dvm::DVNode *>(node);
+    auto *const dvPartition = static_cast<dvm::DVPartition *>(partition);
+    if (dvNode == nullptr || dvPartition == nullptr) {
+        throw std::runtime_error("DVObject could not be converted to DVType");
+    }
+
+    for (const auto &function : functionsToBind) {
+        auto *const fun = makeDvObject<dvm::DVFunction>(model.get(), function->title());
+        fun->setEntityAttribute("path", function->title());
+        fun->setParentObject(partition);
+        dvPartition->addFunction(static_cast<dvm::DVFunction *>(fun));
+        model->addObject(fun);
+    }
+
+    dvNode->addPartition(dvPartition);
+
+    model->addObject(node);
+    model->addObject(partition);
+    model->addObject(dev1);
     model->addObject(dev2);
+
     return model;
 }
 

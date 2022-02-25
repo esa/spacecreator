@@ -26,8 +26,11 @@
 #include <QtTest/qtestcase.h>
 #include <algorithm>
 #include <cstddef>
+#include <dvcore/dvfunction.h>
 #include <dvcore/dvmodel.h>
 #include <dvcore/dvobject.h>
+#include <dvcore/dvpartition.h>
+#include <dvcore/dvport.h>
 #include <harness/dvgenerator/dvgenerator.h>
 #include <ivcore/ivfunction.h>
 #include <libdveditor/dveditor.h>
@@ -94,12 +97,6 @@ void tst_dvgenerator::testNominal()
     QByteArray qba(objects.size() * 1'000, '\00');
     QBuffer buf = QBuffer(&qba);
 
-    qDebug() << "number of objects: " << objects.size();
-    for (const auto &obj : objects) {
-        qDebug() << obj->title();
-    }
-    qDebug() << buf.size();
-
     exporter.exportObjects(objects, &buf);
 
     QFile file("dv_out.xml");
@@ -143,6 +140,47 @@ static void checkObjVectors(QVector<dvm::DVObject *> *actualObjs, QVector<dvm::D
         QCOMPARE(generatedObj.coordinates(), expectedObj.coordinates());
         checkEntityProperties(generatedObj, expectedObj);
         checkEntityAttributes(generatedObj, expectedObj);
+
+        switch (generatedObj.type()) {
+        case dvm::DVObject::Type::Node: // TODO
+        case dvm::DVObject::Type::Function: // TODO
+        case dvm::DVObject::Type::Connection: // TODO
+        case dvm::DVObject::Type::Message: // TODO
+        case dvm::DVObject::Type::Bus: // TODO
+        case dvm::DVObject::Type::Board: // TODO
+        case dvm::DVObject::Type::Port: // TODO
+        case dvm::DVObject::Type::SystemInterface: // TODO
+        case dvm::DVObject::Type::SystemFunction: // TODO
+        case dvm::DVObject::Type::Unknown:
+            // QFAIL("Unknown type in generated object");
+        case dvm::DVObject::Type::Device:
+            continue;
+        case dvm::DVObject::Type::Partition: {
+            // check partitions
+            const auto *const generatedPartition = static_cast<const dvm::DVPartition *>(&generatedObj);
+            const auto *const expectedPartition = static_cast<const dvm::DVPartition *>(&expectedObj);
+
+            QVERIFY(generatedPartition != nullptr);
+            QVERIFY(expectedPartition != nullptr);
+
+            const auto &generatedFunctions = generatedPartition->functions();
+            const auto &expectedFunctions = expectedPartition->functions();
+
+            QCOMPARE(generatedFunctions.size(), expectedFunctions.size());
+            const int functionsSize = generatedPartition->functions().size();
+
+            for (int j = 0; j < functionsSize; j++) {
+                const auto &generatedFunction = generatedFunctions.at(j);
+                const auto &expectedFunction = expectedFunctions.at(j);
+
+                QVERIFY(generatedFunction != nullptr);
+                QVERIFY(expectedFunction != nullptr);
+
+                QCOMPARE(generatedFunction->title(), expectedFunction->title());
+                QCOMPARE(generatedFunction->implementation(), expectedFunction->implementation());
+            }
+        }
+        }
     }
 }
 
