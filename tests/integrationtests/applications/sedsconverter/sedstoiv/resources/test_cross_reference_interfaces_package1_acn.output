@@ -1,0 +1,4 @@
+COM-N7SPACE-PACKAGE1 DEFINITIONS ::= BEGIN
+NiceItem [size 8, encoding pos-int, endianness big]
+END
+

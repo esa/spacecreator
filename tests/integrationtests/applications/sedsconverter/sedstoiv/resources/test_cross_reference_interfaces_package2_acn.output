@@ -1,0 +1,4 @@
+COM-N7SPACE-PACKAGE2 DEFINITIONS ::= BEGIN
+ParameterItem [size 8, encoding pos-int, endianness big]
+END
+

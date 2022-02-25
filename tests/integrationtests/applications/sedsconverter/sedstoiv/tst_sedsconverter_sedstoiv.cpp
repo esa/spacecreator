@@ -37,6 +37,7 @@ private Q_SLOTS:
     void testParameters();
     void testGenericTypeMapping();
     void testAlternateSet();
+    void testCrossReferenceInterfaces();
 };
 
 /// \SRS  ETB-FUN-10
@@ -132,6 +133,12 @@ void tst_SedsConverter_SedsToIv::testGenericTypeMapping()
 void tst_SedsConverter_SedsToIv::testAlternateSet()
 {
     const int result = system("./test_alternate_set.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_SedsConverter_SedsToIv::testCrossReferenceInterfaces()
+{
+    const int result = system("./test_cross_reference_interfaces.sh");
     QCOMPARE(result, 0);
 }
 

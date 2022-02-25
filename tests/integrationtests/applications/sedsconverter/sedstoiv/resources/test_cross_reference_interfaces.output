@@ -1,0 +1,11 @@
+<InterfaceView>
+<Function name="MegaComponent" is_type="NO" language="SDL" default_implementation="default">
+<Provided_Interface name="Get_ProvidedInterface_FunParameter_Pi" kind="Protected" layer="default">
+    <Output_Parameter name="Param" type="ParameterItem" encoding="ACN"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+</InterfaceView>

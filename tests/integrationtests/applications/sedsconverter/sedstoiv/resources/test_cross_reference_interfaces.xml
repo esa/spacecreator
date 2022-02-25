@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DataSheet xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/Package1">
+    <DataTypeSet>
+      <IntegerDataType name="NiceItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="MegaInterface">
+        <ParameterSet>
+          <Parameter name="FunParameter" type="com/n7space/Package2/ParameterItem" mode="sync" readOnly="true"/>
+        </ParameterSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="MegaComponent">
+        <ProvidedInterfaceSet>
+          <Interface name="ProvidedInterface" type="MegaInterface"/>
+        </ProvidedInterfaceSet>
+      </Component>
+    </ComponentSet>
+  </Package>
+  <Package name="com/n7space/Package2">
+    <DataTypeSet>
+      <IntegerDataType name="ParameterItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+  </Package>
+</DataSheet>
