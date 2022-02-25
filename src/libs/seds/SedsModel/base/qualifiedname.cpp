@@ -22,24 +22,49 @@
 namespace seds::model {
 
 QualifiedName::QualifiedName(common::String value) noexcept
-    : m_name(std::move(value))
+    : m_path(std::move(value))
 {
-    const int index = value.lastIndexOf("/");
+    const auto index = m_path.lastIndexOf('/');
 
-    if (index != -1) {
-        m_name = value.left(index);
-        m_namespaceName = value.mid(index + 1, value.size());
+    if (index == -1) {
+        m_name = m_path;
+    } else {
+        m_name = m_path.mid(index + 1);
+        m_namespaceName = m_path.left(index);
     }
-}
-
-const common::String &QualifiedName::namespaceName() const
-{
-    return m_namespaceName;
 }
 
 const Name &QualifiedName::name() const
 {
     return m_name;
+}
+
+const std::optional<common::String> &QualifiedName::namespaceName() const
+{
+    return m_namespaceName;
+}
+
+const QString &QualifiedName::pathStr() const
+{
+    return m_path;
+}
+
+bool operator==(const QualifiedName &lhs, const QualifiedName &rhs)
+{
+    if (lhs.namespaceName().has_value() != rhs.namespaceName().has_value()) {
+        return false;
+    } else if (lhs.namespaceName().value() != rhs.namespaceName().value()) {
+        return false;
+    } else if (lhs.name() != rhs.name()) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+bool operator!=(const QualifiedName &lhs, const QualifiedName &rhs)
+{
+    return !(lhs == rhs);
 }
 
 } // namespace seds::model

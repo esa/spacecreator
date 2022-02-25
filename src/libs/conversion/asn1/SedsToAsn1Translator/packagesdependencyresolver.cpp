@@ -21,8 +21,11 @@
 
 #include <algorithm>
 #include <conversion/common/escaper/escaper.h>
+#include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/types/arraydatatype.h>
 #include <seds/SedsModel/types/containerdatatype.h>
+
+using conversion::translator::TranslationException;
 
 namespace conversion::asn1::translator {
 
@@ -33,7 +36,7 @@ PackagesDependencyResolver::NotDagException::NotDagException()
 
 PackagesDependencyResolver::UnknownPackageReferenceException::UnknownPackageReferenceException(
         const QString &packageName)
-    : ConversionException(QString("Reference to unknown package '%1'").arg(packageName))
+    : ConversionException(QString("Reference to an unknown package '%1'").arg(packageName))
 {
 }
 
@@ -157,12 +160,18 @@ std::optional<Asn1Acn::ImportedType> PackagesDependencyResolver::handleSubRangeD
 
 Asn1Acn::ImportedType PackagesDependencyResolver::createImportedType(const seds::model::DataTypeRef &typeRef)
 {
-    const auto &packageName = *typeRef.packageStr();
-    const auto package = findPackage(packageName);
+    if (!typeRef.packageStr().has_value()) {
+        auto errorMessage = QString("Failure in creation of an imported type \"%1\" because no package name is present "
+                                    "in the data type reference")
+                                    .arg(typeRef.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto package = findPackage(*typeRef.packageStr());
 
     visit(package);
 
-    const auto asn1ModuleName = Escaper::escapeAsn1PackageName(packageName);
+    const auto asn1ModuleName = Escaper::escapeAsn1PackageName(*typeRef.packageStr());
     const auto asn1TypeName = Escaper::escapeAsn1TypeName(typeRef.nameStr());
 
     return Asn1Acn::ImportedType(asn1ModuleName, asn1TypeName);

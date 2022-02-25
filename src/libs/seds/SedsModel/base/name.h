@@ -34,6 +34,10 @@ public:
 public:
     auto value() const -> const common::String &;
 
+public:
+    friend auto operator==(const Name &lhs, const Name &rhs) -> bool;
+    friend auto operator!=(const Name &lhs, const Name &rhs) -> bool;
+
 private:
     common::String m_value;
 };

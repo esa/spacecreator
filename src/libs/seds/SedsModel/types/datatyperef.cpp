@@ -22,17 +22,8 @@
 namespace seds::model {
 
 DataTypeRef::DataTypeRef(common::String value) noexcept
+    : m_value(std::move(value))
 {
-    const auto index = value.lastIndexOf('/');
-
-    if (index == -1) {
-        m_name = value;
-    } else {
-        m_name = value.mid(index + 1);
-        m_package = value.left(index);
-    }
-
-    m_value = std::move(value);
 }
 
 const QualifiedName &DataTypeRef::value() const
@@ -42,12 +33,12 @@ const QualifiedName &DataTypeRef::value() const
 
 const QString &DataTypeRef::nameStr() const
 {
-    return m_name;
+    return m_value.name().value();
 }
 
 const std::optional<QString> &DataTypeRef::packageStr() const
 {
-    return m_package;
+    return m_value.namespaceName();
 }
 
 } // namespace seds::model
