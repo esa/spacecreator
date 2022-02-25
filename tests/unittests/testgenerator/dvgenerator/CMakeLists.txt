@@ -30,4 +30,4 @@ target_link_libraries(${TEST_NAME}
 add_format_target(${TEST_NAME})
 
 configure_file(resources/deploymentview.dv.xml.out resources/deploymentview.dv.xml COPYONLY)
-# configure_file(resources/config.xml resources/config.xml COPYONLY)
+configure_file(../../../../src/libs/libdveditor/templating/xml_templates/deploymentview.tmplt deploymentmentview.tmplt COPYONLY)

@@ -62,11 +62,13 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
 
     auto *const partition = makeDvObject<dvm::DVPartition>(model.get(), "hostPartition");
     partition->setCoordinates({ 236, 237, 356, 317 });
+    partition->setParentObject(node);
     model->addObject(partition);
 
     for (const auto &function : functionsToBind) {
         auto *const fun = makeDvObject<dvm::DVFunction>(model.get(), function->title());
         fun->setEntityAttribute("path", function->title());
+        fun->setParentObject(partition);
         model->addObject(fun);
     }
 
@@ -82,7 +84,7 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
     dev1->setEntityAttribute("asn1type", "Socket-IP-Conf-T");
     dev1->setEntityAttribute("impl_extends", "ocarina_drivers::ip_socket.linux");
     dev1->setEntityAttribute("port", "eth0");
-
+    dev1->setParentObject(node);
     model->addObject(dev1);
 
     auto *const dev2 = makeDvObject<dvm::DVDevice>(model.get(), "uart0");
@@ -97,8 +99,8 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
     dev2->setEntityAttribute("asn1type", "Serial-CCSDS-Linux-Conf-T");
     dev2->setEntityAttribute("impl_extends", "ocarina_drivers::serial_ccsds.linux");
     dev2->setEntityAttribute("port", "uart0");
+    dev2->setParentObject(node);
     model->addObject(dev2);
-
     return model;
 }
 

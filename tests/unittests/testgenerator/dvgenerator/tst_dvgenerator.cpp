@@ -25,6 +25,7 @@
 #include <QTest>
 #include <QtTest/qtestcase.h>
 #include <algorithm>
+#include <cstddef>
 #include <dvcore/dvmodel.h>
 #include <dvcore/dvobject.h>
 #include <harness/dvgenerator/dvgenerator.h>
@@ -90,8 +91,15 @@ void tst_dvgenerator::testNominal()
     std::for_each(generatedDvObjects->begin(), generatedDvObjects->end(),
             [&objects](const auto &obj) { objects.push_back(obj); });
 
-    QByteArray qba(10000, '\00');
+    QByteArray qba(objects.size() * 1'000, '\00');
     QBuffer buf = QBuffer(&qba);
+
+    qDebug() << "number of objects: " << objects.size();
+    for (const auto &obj : objects) {
+        qDebug() << obj->title();
+    }
+    qDebug() << buf.size();
+
     exporter.exportObjects(objects, &buf);
 
     QFile file("dv_out.xml");
@@ -120,10 +128,21 @@ static void checkObjVectors(QVector<dvm::DVObject *> *actualObjs, QVector<dvm::D
         QCOMPARE(generatedObj.title(), expectedObj.title());
         QCOMPARE(generatedObj.type(), expectedObj.type());
 
-        checkEntityProperties(generatedObj, expectedObj);
+        if (expectedObj.parentObject() != nullptr) {
+            if (generatedObj.parentObject() != nullptr) {
+                QCOMPARE(generatedObj.parentObject()->title(), expectedObj.parentObject()->title());
+            } else {
+                QFAIL("generated parent object set to nullptr but expected non-nullptr");
+            }
+        } else {
+            if (generatedObj.parentObject() != nullptr) {
+                QFAIL("generated parent object is non-nullptr but expected nullptr");
+            }
+        }
+
         QCOMPARE(generatedObj.coordinates(), expectedObj.coordinates());
+        checkEntityProperties(generatedObj, expectedObj);
         checkEntityAttributes(generatedObj, expectedObj);
-        // check parameters?
     }
 }
 
