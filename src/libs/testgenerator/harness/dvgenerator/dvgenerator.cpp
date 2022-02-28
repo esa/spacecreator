@@ -93,7 +93,9 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
 
     auto *const dvNode = static_cast<dvm::DVNode *>(node);
     auto *const dvPartition = static_cast<dvm::DVPartition *>(partition);
-    if (dvNode == nullptr || dvPartition == nullptr) {
+    auto *const dvDev1 = static_cast<dvm::DVDevice *>(dev1);
+    auto *const dvDev2 = static_cast<dvm::DVDevice *>(dev2);
+    if (dvNode == nullptr || dvPartition == nullptr || dev1 == nullptr || dev2 == nullptr) {
         throw std::runtime_error("DVObject could not be converted to DVType");
     }
 
@@ -106,6 +108,8 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
     }
 
     dvNode->addPartition(dvPartition);
+    dvNode->addDevice(dvDev1);
+    dvNode->addDevice(dvDev2);
 
     model->addObject(node);
     model->addObject(partition);
