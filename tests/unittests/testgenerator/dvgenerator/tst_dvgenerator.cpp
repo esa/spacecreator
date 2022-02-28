@@ -98,7 +98,7 @@ void tst_dvgenerator::testNominal()
 
     exportModel(generatedDvObjects.get(), nominalOutputFileName);
 
-    const auto expectedDvObjects = dvtools::getDvObjectsFromFile(dvPath.arg("deploymentview"));
+    const auto expectedDvObjects = dvtools::getDvObjectsFromFile(dvPath.arg("deploymentview-linux-x86"));
     QVERIFY(expectedDvObjects != nullptr);
     checkObjVectors(generatedDvObjects.get(), expectedDvObjects.get());
 }
