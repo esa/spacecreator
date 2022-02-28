@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<snippets>
+<snippet group="SLIM" trigger="sequence" id="slim_sequence">SEQUENCE
+{
+    $$
+}
+</snippet>
+<snippet group="SLIM" trigger="sequence" id="slim_sequence_with_assignment" complement="with assignment" >$Name$ ::= SEQUENCE
+{
+    $$
+}
+</snippet>
+<snippet group="SLIM" trigger="enumerated" id="slim_enumerated">ENUMERATED
+{
+    $$
+}
+</snippet>
+<snippet group="SLIM" trigger="enumerated" id="slim_enumerated_with_assignment" complement="with assignment" >$Name$ ::= ENUMERATED
+{
+    $$
+}
+</snippet>
+<snippet group="SLIM" trigger="choice" id="slim_choice">CHOICE
+{
+    $$
+}
+</snippet>
+<snippet group="SLIM" trigger="choice" id="slim_choice_with_assignment" complement="with assignment" >$Name$ ::= CHOICE
+{
+    $$
+}
+</snippet>
+<snippet group="SLIM" trigger="set" id="slim_set">SET
+{
+    $$
+}
+</snippet>
+<snippet group="SLIM" trigger="set" id="slim_set_with_assignment" complement="with assignment" >$Name$ ::= SET
+{
+    $$
+}
+</snippet>
+<snippet group="SLIM" trigger="setof" id="slim_setof">SET (SIZE($constraint$)) OF $Type$</snippet>
+<snippet group="SLIM" trigger="setof" id="slim_setof_with_assignment" complement="with assignment" >$name$ ::= SET (SIZE($constraint$)) OF $Type$</snippet>
+<snippet group="SLIM" trigger="sequenceof" id="slim_sequenceof">SEQUENCE (SIZE($constraint$)) OF $Type$</snippet>
+<snippet group="SLIM" trigger="sequenceof" id="slim_sequenceof_with_assignment" complement="with assignment" >$name$ ::= SEQUENCE (SIZE($constraint$)) OF $Type$</snippet>
+<snippet group="SLIM" trigger="definitions" id="slim_definitions">$Name$ DEFINITIONS ::= BEGIN
+    $$
+END
+</snippet>
+<snippet group="SLIM" trigger="imports" id="slim_imports">IMPORTS $Type$ FROM $Module$;</snippet>
+</snippets>
