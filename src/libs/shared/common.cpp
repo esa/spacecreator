@@ -231,9 +231,25 @@ QString deploymentCustomAttributesFilePath()
 
 QString hwLibraryPath()
 {
-    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
-            + QDir::separator() + QLatin1String("HWlibrary");
-    QString hwFile = shared::SettingsManager::load<QString>(shared::SettingsManager::DVE::HwLibraryFile, kDefaultPath);
+    static const QString qtLocalDataPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+    static const QString kDefaultPath = QString("%1%2%3").arg(qtLocalDataPath).arg(QDir::separator()).arg("HWLibrary");
+
+    QString hwFile;
+    const auto strList = kDefaultPath.split(QDir::separator());
+    for (const auto &str : strList) {
+        hwFile += str;
+        hwFile += QDir::separator();
+        if (str.compare("share") == 0) {
+            hwFile += QString("%1%2%3%4%5%6")
+                              .arg(QDir::separator())
+                              .arg("QtProject")
+                              .arg(QDir::separator())
+                              .arg("QtCreator")
+                              .arg(QDir::separator())
+                              .arg("HWlibrary");
+            break;
+        }
+    }
 
     return qEnvironmentVariable(env::kDeploymentLibrary, hwFile);
 }

@@ -19,32 +19,14 @@
 
 #pragma once
 
-#include <QVector>
+#include <dvcore/dvboard.h>
+#include <dvcore/dvmodel.h>
 #include <dvcore/dvobject.h>
 #include <ivcore/ivfunction.h>
 #include <memory>
-#include <sstream>
+#include <vector>
 
 namespace testgenerator {
-
-/**
- * @brief  Constants with coordinates of generated entities on DeploymentView diagram
- *
- */
-struct DvCoordinates final {
-    struct Node final {
-        static const QVector<qint32> node;
-        struct Partition final {
-            static const QVector<qint32> partition;
-            struct Eth0 final {
-                static const QVector<qint32> device;
-            };
-            struct Uart0 final {
-                static const QVector<qint32> device;
-            };
-        };
-    };
-};
 
 /**
  * @brief Test harness DeploymentView generator
@@ -53,28 +35,30 @@ struct DvCoordinates final {
 class DvGenerator final
 {
 public:
-    enum Platform
+    template<class T>
+    static auto generate(const std::vector<ivm::IVFunction *> &functionsToBind) -> std::unique_ptr<dvm::DVModel>
     {
-        X86_LINUX_CPP,
-        SAM_V71_FREERTOS_N7S,
-        X86_LINUX_POHIC,
-        GR740_RTEMS_POHIC,
-        RASPBERRY_PI_LINUX_POHIC,
-        ZYNQ_ZC706_RTEMS_POHIC,
-        BRAVE_LARGE_FREERTOS,
-        LINUX_ARM_RUNTIME,
-    };
-    static const QString startTestInterfaceName;
-    static const QString testDriverFunctionName;
+        return T::generate(functionsToBind);
+    }
 
-    static auto generate(const std::vector<ivm::IVFunction *> &functionsToBind) -> std::unique_ptr<dvm::DVModel>;
+    static auto generate(const std::vector<ivm::IVFunction *> &functionsToBind, const QVector<dvm::DVObject *> &hw)
+            -> std::unique_ptr<dvm::DVModel>;
 
 private:
-    static auto makeNode() -> void;
-    static auto makePartition() -> void;
-    static auto makeDevice() -> void;
-    static auto setObjectCoordinates(dvm::DVObject *object, const QVector<qint32> &coordinates) -> void;
-    static auto throwOnNullpointer(void *pointer) -> void;
+    static auto findBoard(const QVector<dvm::DVObject *> &objects) -> dvm::DVBoard *;
+    static auto setDvObjModelAndTitle(dvm::DVObject *obj, dvm::DVModel *model, const QString &title) -> void;
+    static auto copyDvObject(dvm::DVObject *obj) -> dvm::DVObject *;
+    static auto getDevices(const QVector<dvm::DVObject *> &objects) -> QVector<dvm::DVObject *>;
+
+    template<typename T>
+    static auto makeDvObject(dvm::DVModel *const model, const QString &title) -> dvm::DVObject *
+    {
+        dvm::DVObject *const object = new T;
+        object->setTitle(title);
+        object->setModel(model);
+
+        return object;
+    }
 };
 
 } // namespace testgenerator

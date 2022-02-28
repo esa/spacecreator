@@ -20,50 +20,39 @@
 #include "dvgenerator.h"
 
 #include <QDebug>
-#include <dvcore/dvcommonprops.h>
+#include <algorithm>
+#include <cstddef>
+#include <dvcore/dvboard.h>
 #include <dvcore/dvdevice.h>
 #include <dvcore/dvfunction.h>
 #include <dvcore/dvmodel.h>
 #include <dvcore/dvnode.h>
 #include <dvcore/dvobject.h>
 #include <dvcore/dvpartition.h>
-#include <dvcore/dvport.h>
 #include <memory>
-#include <shared/common.h>
 #include <shared/entityattribute.h>
-#include <shared/exportableproperty.h>
-#include <shared/parameter.h>
-#include <shared/propertytemplateconfig.h>
-#include <sstream>
-#include <stdexcept>
 
 namespace testgenerator {
 
-template<typename T>
-static auto makeDvObject(dvm::DVModel *const model, const QString &title) -> dvm::DVObject *
-{
-    dvm::DVObject *const object = new T;
-    object->setTitle(title);
-    object->setModel(model);
-
-    return object;
-}
-
-auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind) -> std::unique_ptr<dvm::DVModel>
+auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind, const QVector<dvm::DVObject *> &hw)
+        -> std::unique_ptr<dvm::DVModel>
 {
     auto model = std::make_unique<dvm::DVModel>();
+
+    dvm::DVBoard *const board = findBoard(hw);
 
     auto *const node = makeDvObject<dvm::DVNode>(model.get(), "x86_Linux_TestRunner");
     node->setCoordinates({ 192, 193, 396, 353 });
     node->setEntityAttribute("node_label", "Node_1");
-    node->setEntityAttribute("type", "ocarina_processors_x86::x86.generic_linux");
-    node->setEntityAttribute("namespace", "ocarina_processors_x86");
+    node->setEntityAttribute("type", board->entityAttributeValue("type"));
+    node->setEntityAttribute("namespace", board->entityAttributeValue("namespace"));
 
     auto *const partition = makeDvObject<dvm::DVPartition>(model.get(), "hostPartition");
     partition->setCoordinates({ 236, 237, 356, 317 });
     partition->setParentObject(node);
 
     auto *const dev1 = makeDvObject<dvm::DVDevice>(model.get(), "eth0");
+    dev1->setParentObject(node);
     dev1->setCoordinates({ 192, 210 });
     dev1->setEntityAttribute("asn1module", "LINUX-SOCKET-IP-DRIVER");
     dev1->setEntityAttribute("namespace", "ocarina_drivers");
@@ -75,9 +64,9 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
     dev1->setEntityAttribute("asn1type", "Socket-IP-Conf-T");
     dev1->setEntityAttribute("impl_extends", "ocarina_drivers::ip_socket.linux");
     dev1->setEntityAttribute("port", "eth0");
-    dev1->setParentObject(node);
 
     auto *const dev2 = makeDvObject<dvm::DVDevice>(model.get(), "uart0");
+    dev2->setParentObject(node);
     dev2->setCoordinates({ 192, 251 });
     dev2->setEntityAttribute("asn1module", "LINUX-SERIAL-CCSDS-DRIVER");
     dev2->setEntityAttribute("namespace", "ocarina_drivers");
@@ -95,7 +84,7 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
     auto *const dvPartition = static_cast<dvm::DVPartition *>(partition);
     auto *const dvDev1 = static_cast<dvm::DVDevice *>(dev1);
     auto *const dvDev2 = static_cast<dvm::DVDevice *>(dev2);
-    if (dvNode == nullptr || dvPartition == nullptr || dev1 == nullptr || dev2 == nullptr) {
+    if (dvNode == nullptr || dvPartition == nullptr || dvDev1 == nullptr || dvDev2 == nullptr) {
         throw std::runtime_error("DVObject could not be converted to DVType");
     }
 
@@ -119,17 +108,45 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
     return model;
 }
 
-auto DvGenerator::setObjectCoordinates(dvm::DVObject *const object, const QVector<qint32> &coordinates) -> void
+auto DvGenerator::findBoard(const QVector<dvm::DVObject *> &objects) -> dvm::DVBoard *
 {
-    object->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::coordinates),
-            dvm::DVObject::coordinatesToString(coordinates));
+    for (const auto &obj : objects) {
+        if (obj->type() == dvm::DVObject::Type::Board) {
+            return static_cast<dvm::DVBoard *>(obj);
+        }
+    }
+    return nullptr;
 }
 
-auto DvGenerator::throwOnNullpointer(void *const pointer) -> void
+auto DvGenerator::setDvObjModelAndTitle(dvm::DVObject *obj, dvm::DVModel *const model, const QString &title) -> void
 {
-    if (pointer == nullptr) {
-        throw std::invalid_argument("pointer cannot be null");
+    obj->setTitle(title);
+    obj->setModel(model);
+}
+
+auto DvGenerator::copyDvObject(dvm::DVObject *obj) -> dvm::DVObject *
+{
+    dvm::DVObject *const copy = new dvm::DVObject(obj->type(), obj->title());
+    for (const auto &entityAttribute : obj->entityAttributes()) {
+        copy->setEntityAttribute(entityAttribute.name(), entityAttribute.value());
     }
+    // TODO: copy attributes
+    // TODO: copy properties
+
+    return copy;
+}
+
+auto DvGenerator::getDevices(const QVector<dvm::DVObject *> &objects) -> QVector<dvm::DVObject *>
+{
+    QVector<dvm::DVObject *> devices;
+
+    std::for_each(objects.begin(), objects.end(), [&devices](const auto &obj) {
+        if (obj->type() == dvm::DVObject::Type::Device) {
+            devices << obj;
+        }
+    });
+
+    return devices;
 }
 
 } // namespace testgenerator

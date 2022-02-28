@@ -31,6 +31,7 @@
 #include "templating/exportabledvpartition.h"
 
 #include <QBuffer>
+#include <QDebug>
 
 namespace dve {
 

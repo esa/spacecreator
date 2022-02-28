@@ -23,9 +23,15 @@
 #include <QSharedPointer>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
+#include <dvcore/dvfunction.h>
+#include <grantlee/node.h>
 #include <grantlee/outputstream.h>
 #include <grantlee_templates.h>
+#include <libdveditor/templating/exportabledvnode.h>
+#include <libdveditor/templating/exportabledvpartition.h>
 #include <memory>
+
+using dve::ExportableDVNode;
 
 namespace templating {
 
@@ -123,6 +129,7 @@ bool StringTemplate::parseFile(
     for (auto it = grouppedObjects.cbegin(); it != grouppedObjects.cend(); ++it) {
         const QString &name = it.key();
         const QVariant v = it.value();
+
         if (v.canConvert<QVariantList>()) {
             const QVariantList list = v.value<QVariantList>();
             if (list.size() == 1 && list[0].canConvert<QObject *>()) {
@@ -131,10 +138,12 @@ bool StringTemplate::parseFile(
                 continue;
             }
         }
+
         context.insert(name, v);
     }
 
     const Grantlee::Template stringTemplate = m_engine->loadByName(fileInfo.fileName());
+
     if (stringTemplate->error()) {
         // Tokenizing or parsing error, or couldn't find custom tags or filters.
         qWarning() << Q_FUNC_INFO << stringTemplate->errorString();
@@ -149,6 +158,7 @@ bool StringTemplate::parseFile(
     const QString result = output.trimmed();
 
     const QString formatted = formatText(result);
+
     if (!out->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
         qWarning() << "Can't open device for writing:" << out->errorString();
         Q_EMIT errorOccurred(out->errorString());
