@@ -53,6 +53,17 @@ struct DvCoordinates final {
 class DvGenerator final
 {
 public:
+    enum Platform
+    {
+        X86_LINUX_CPP,
+        SAM_V71_FREERTOS_N7S,
+        X86_LINUX_POHIC,
+        GR740_RTEMS_POHIC,
+        RASPBERRY_PI_LINUX_POHIC,
+        ZYNQ_ZC706_RTEMS_POHIC,
+        BRAVE_LARGE_FREERTOS,
+        LINUX_ARM_RUNTIME,
+    };
     static const QString startTestInterfaceName;
     static const QString testDriverFunctionName;
 

@@ -50,7 +50,8 @@ class tst_dvgenerator final : public QObject
 
 private Q_SLOTS:
     void initTestCase();
-    void testNominal();
+    void testLinuxX86();
+    void testArmV71();
 
 private:
     const QString dvDir = "resources";
@@ -75,9 +76,9 @@ void tst_dvgenerator::initTestCase()
     dve::initDvEditor();
 }
 
-void tst_dvgenerator::testNominal()
+void tst_dvgenerator::testLinuxX86()
 {
-    const QString &nominalOutputFileName = "nominal.dv.xml";
+    const QString &outputFileName = "deploymentview-linux-x86.dv.xml";
     const std::vector<QString> functionTitles = {
         "TestDriver",
         "FunctionUnderTest",
@@ -96,9 +97,37 @@ void tst_dvgenerator::testNominal()
     const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());
     QVERIFY(generatedDvObjects != nullptr);
 
-    exportModel(generatedDvObjects.get(), nominalOutputFileName);
+    exportModel(generatedDvObjects.get(), outputFileName);
 
     const auto expectedDvObjects = dvtools::getDvObjectsFromFile(dvPath.arg("deploymentview-linux-x86"));
+    QVERIFY(expectedDvObjects != nullptr);
+    checkObjVectors(generatedDvObjects.get(), expectedDvObjects.get());
+}
+
+void tst_dvgenerator::testArmV71()
+{
+    const QString &outputFileName = "deploymentview-samv71.dv.xml";
+    const std::vector<QString> functionTitles = {
+        "TestDriver",
+        "FunctionUnderTest",
+    };
+
+    std::vector<std::unique_ptr<ivm::IVFunction>> functions;
+    functions.push_back(std::make_unique<ivm::IVFunction>());
+    functions.push_back(std::make_unique<ivm::IVFunction>());
+    functions.front()->setTitle(functionTitles.front());
+    functions.back()->setTitle(functionTitles.back());
+
+    std::vector<ivm::IVFunction *> functionsToBind = getRawPointersVector(functions);
+
+    const std::unique_ptr<dvm::DVModel> generatedModel = DvGenerator::generate(functionsToBind);
+    QVERIFY(generatedModel != nullptr);
+    const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());
+    QVERIFY(generatedDvObjects != nullptr);
+
+    exportModel(generatedDvObjects.get(), outputFileName);
+
+    const auto expectedDvObjects = dvtools::getDvObjectsFromFile(dvPath.arg("deploymentview-samv71"));
     QVERIFY(expectedDvObjects != nullptr);
     checkObjVectors(generatedDvObjects.get(), expectedDvObjects.get());
 }
