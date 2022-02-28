@@ -67,14 +67,39 @@ public:
 private:
     auto visit(const seds::model::Package *package) -> void;
 
+    auto handleDataTypes(const std::vector<seds::model::DataType> &dataTypes,
+            std::set<Asn1Acn::ImportedType> &importedTypes) -> void;
     auto handleArray(const seds::model::ArrayDataType &arrayDataType) -> std::optional<Asn1Acn::ImportedType>;
     auto handleContainer(const seds::model::ContainerDataType &containerDataType) -> std::set<Asn1Acn::ImportedType>;
     auto handleSubRangeDataType(const seds::model::SubRangeDataType &subRangeDataType)
             -> std::optional<Asn1Acn::ImportedType>;
 
+    auto handleComponents(const std::vector<seds::model::Component> &components, const seds::model::Package *package,
+            std::set<Asn1Acn::ImportedType> &importedTypes) -> void;
+    auto handleInterfaces(const std::vector<seds::model::Interface> &interfaces,
+            const seds::model::Component &component, const seds::model::Package *package,
+            std::set<Asn1Acn::ImportedType> &importedTypes) -> void;
+    auto handleTypeMapSet(const std::optional<seds::model::GenericTypeMapSet> &typeMapSet,
+            std::set<Asn1Acn::ImportedType> &importedTypes) -> void;
+    auto handleTypeMap(const seds::model::GenericTypeMap &typeMap, std::set<Asn1Acn::ImportedType> &importedTypes)
+            -> void;
+    auto handleAlternateSet(const std::optional<seds::model::GenericAlternateSet> &alternateSet,
+            std::set<Asn1Acn::ImportedType> &importedTypes) -> void;
+    auto handleInterfaceDeclaration(const seds::model::InterfaceDeclaration &interfaceDeclaration,
+            std::set<Asn1Acn::ImportedType> &importedTypes) -> void;
+    auto handleParameters(const std::vector<seds::model::InterfaceParameter> &parameters,
+            std::set<Asn1Acn::ImportedType> &importedTypes) -> void;
+    auto handleCommands(const std::vector<seds::model::InterfaceCommand> &commands,
+            std::set<Asn1Acn::ImportedType> &importedTypes) -> void;
+
+    auto handleArrayDimensions(const std::vector<seds::model::DimensionSize> &dimensions,
+            std::set<Asn1Acn::ImportedType> &importedTypes) -> void;
+
     auto createImportedType(const seds::model::DataTypeRef &typeRef) -> Asn1Acn::ImportedType;
 
     auto findPackage(const QString &packageName) const -> const seds::model::Package *;
+    auto findInterfaceDeclaration(const QString &name, const seds::model::Component &sedsComponent,
+            const seds::model::Package *sedsPackage) -> const seds::model::InterfaceDeclaration &;
 
     auto markTemporary(const seds::model::Package *package) -> void;
     auto markPermanent(const seds::model::Package *package) -> void;

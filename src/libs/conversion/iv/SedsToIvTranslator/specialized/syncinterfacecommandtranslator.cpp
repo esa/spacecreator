@@ -111,12 +111,18 @@ void SyncInterfaceCommandTranslator::translateArguments(
 QString SyncInterfaceCommandTranslator::handleArgumentType(
         const seds::model::CommandArgument &sedsArgument, const QString &interfaceName) const
 {
-    const auto &argumentTypeName = sedsArgument.type().nameStr();
+    const auto &argumentTypeRef = sedsArgument.type();
+    const auto &argumentTypeName = argumentTypeRef.nameStr();
 
     const auto typeMapping = m_typeMapper->getMapping(argumentTypeName);
 
     if (typeMapping == nullptr) {
-        return argumentTypeName;
+        if (sedsArgument.arrayDimensions().empty()) {
+            return Escaper::escapeAsn1TypeName(argumentTypeName);
+        } else {
+            return InterfaceTranslatorHelper::createArrayType(argumentTypeRef, sedsArgument.arrayDimensions(),
+                    m_asn1Definitions, m_sedsPackage, m_asn1Files, m_sedsPackages);
+        }
     }
 
     const auto &concreteTypes = typeMapping->concreteTypes;
@@ -137,12 +143,13 @@ QString SyncInterfaceCommandTranslator::handleArgumentType(
         throw TranslationException(std::move(errorMessage));
     }
 
-    const auto argumentConcreteTypeName = concreteTypes.front().typeName;
+    const auto &argumentConcreteTypeRef = concreteTypes.front().typeRef;
 
     if (sedsArgument.arrayDimensions().empty()) {
+        const auto &argumentConcreteTypeName = argumentConcreteTypeRef.nameStr();
         return Escaper::escapeAsn1TypeName(argumentConcreteTypeName);
     } else {
-        return InterfaceTranslatorHelper::createArrayType(argumentConcreteTypeName, sedsArgument.arrayDimensions(),
+        return InterfaceTranslatorHelper::createArrayType(argumentConcreteTypeRef, sedsArgument.arrayDimensions(),
                 m_asn1Definitions, m_sedsPackage, m_asn1Files, m_sedsPackages);
     }
 }

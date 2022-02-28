@@ -61,12 +61,13 @@ shared::InterfaceParameter InterfaceTranslatorHelper::createInterfaceParameter(
             m_interfaceParameterEncoding, direction);
 }
 
-QString InterfaceTranslatorHelper::createArrayType(const QString &baseTypeName,
+QString InterfaceTranslatorHelper::createArrayType(const seds::model::DataTypeRef &baseTypeRef,
         const std::vector<seds::model::DimensionSize> &dimensions, Asn1Acn::Definitions *asn1Definitions,
         const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
         const std::vector<seds::model::Package> &sedsPackages)
 {
-    auto name = buildArrayTypeName(baseTypeName, dimensions);
+    const auto &baseTypeName = baseTypeRef.nameStr();
+    const auto name = buildArrayTypeName(baseTypeName, dimensions);
 
     const auto foundAsn1Array = asn1Definitions->type(name);
     if (foundAsn1Array != nullptr) {
@@ -75,7 +76,7 @@ QString InterfaceTranslatorHelper::createArrayType(const QString &baseTypeName,
 
     seds::model::ArrayDataType sedsArray;
     sedsArray.setName(name);
-    sedsArray.setType(baseTypeName);
+    sedsArray.setType(baseTypeRef);
 
     for (auto dimension : dimensions) {
         sedsArray.addDimension(std::move(dimension));

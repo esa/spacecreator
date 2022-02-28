@@ -70,9 +70,9 @@ const TypeMapping *GenericTypeMapper::getMapping(const QString &typeName) const
 void GenericTypeMapper::addSimpleMapping(const GenericTypeMap &typeMap)
 {
     const auto &genericTypeName = typeMap.nameStr();
-    const auto &concreteTypeName = typeMap.type().nameStr();
+    const auto &concreteTypeRef = typeMap.type();
 
-    TypeMapping::ConcreteType concreteType { concreteTypeName, typeMap.fixedValue(), std::nullopt };
+    TypeMapping::ConcreteType concreteType { concreteTypeRef, typeMap.fixedValue(), std::nullopt };
 
     TypeMapping typeMapping;
     typeMapping.genericTypeName = genericTypeName;
@@ -100,12 +100,12 @@ void GenericTypeMapper::addAlternateMapping(const GenericAlternate &alternate, c
 
     for (const auto &typeMap : typeMaps) {
         const auto &genericTypeName = typeMap.nameStr();
-        const auto &concreteTypeName = typeMap.type().nameStr();
+        const auto &concreteTypeRef = typeMap.type();
 
         const auto foundMapping = std::find_if(m_mappings.begin(), m_mappings.end(),
                 [&](const auto &mapping) { return mapping.genericTypeName == genericTypeName; });
 
-        TypeMapping::ConcreteType concreteType { concreteTypeName, typeMap.fixedValue(), determinantValue };
+        TypeMapping::ConcreteType concreteType { concreteTypeRef, typeMap.fixedValue(), determinantValue };
 
         if (foundMapping == m_mappings.end()) {
             TypeMapping typeMapping;

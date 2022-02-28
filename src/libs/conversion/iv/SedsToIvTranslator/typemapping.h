@@ -21,13 +21,14 @@
 
 #include <QString>
 #include <optional>
+#include <seds/SedsModel/types/datatyperef.h>
 #include <vector>
 
 namespace conversion::iv::translator {
 
 struct TypeMapping {
     struct ConcreteType {
-        QString typeName;
+        seds::model::DataTypeRef typeRef;
         std::optional<QString> fixedValue;
         std::optional<QString> determinantValue;
     };

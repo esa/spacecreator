@@ -302,17 +302,17 @@ void tst_SedsToIvTranslator::testGenericTypeMapping()
     QCOMPARE(typeMapping->concreteTypes.size(), 3);
 
     const auto concreteType1 = typeMapping->concreteTypes.at(0);
-    QCOMPARE(concreteType1.typeName, "DeterminantType");
+    QCOMPARE(concreteType1.typeRef.nameStr(), "DeterminantType");
     QVERIFY(concreteType1.determinantValue.has_value());
     QCOMPARE(concreteType1.determinantValue.value(), "1");
 
     const auto concreteType2 = typeMapping->concreteTypes.at(1);
-    QCOMPARE(concreteType2.typeName, "DeterminantType");
+    QCOMPARE(concreteType2.typeRef.nameStr(), "DeterminantType");
     QVERIFY(concreteType2.determinantValue.has_value());
     QCOMPARE(concreteType2.determinantValue.value(), "2");
 
     const auto concreteType3 = typeMapping->concreteTypes.at(2);
-    QCOMPARE(concreteType3.typeName, "ConcreteType3");
+    QCOMPARE(concreteType3.typeRef.nameStr(), "ConcreteType3");
     QVERIFY(concreteType3.determinantValue.has_value());
     QCOMPARE(concreteType3.determinantValue.value(), "3");
 }

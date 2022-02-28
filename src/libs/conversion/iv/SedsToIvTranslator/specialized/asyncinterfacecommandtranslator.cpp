@@ -283,7 +283,7 @@ AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::h
         const seds::model::CommandArgument &sedsArgument, const TypeMapping::ConcreteType &concreteType)
 {
     const auto argumentName = Escaper::escapeAsn1FieldName(sedsArgument.nameStr());
-    const auto argumentTypeName = handleArrayArgument(sedsArgument, concreteType.typeName);
+    const auto argumentTypeName = handleArrayArgument(sedsArgument, concreteType.typeRef.nameStr());
 
     return { argumentName, argumentTypeName, concreteType.fixedValue, std::nullopt, false };
 }
@@ -295,9 +295,9 @@ AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::h
     const auto argumentName = Escaper::escapeAsn1FieldName(sedsArgument.nameStr());
 
     // If all of the concrete types are the same, then we can handle this a simple mapping
-    const auto firstConcreteTypeName = concreteTypes.front().typeName;
+    const auto firstConcreteTypeName = concreteTypes.front().typeRef.nameStr();
     const auto allTheSame = std::all_of(concreteTypes.begin(), concreteTypes.end(),
-            [&](const auto &concreteType) { return concreteType.typeName == firstConcreteTypeName; });
+            [&](const auto &concreteType) { return concreteType.typeRef.nameStr() == firstConcreteTypeName; });
 
     if (allTheSame) {
         if (firstConcreteTypeName == determinantTypeName) {
@@ -350,10 +350,10 @@ QString AsyncInterfaceCommandTranslator::createAlternateType(const QString &gene
 
     // Each of the alternative is present-when determinant has given value
     for (const auto &concreteType : concreteTypes) {
-        const auto asn1ConcreteType = m_asn1Definitions->type(concreteType.typeName)->type();
+        const auto asn1ConcreteType = m_asn1Definitions->type(concreteType.typeRef.nameStr())->type();
         const auto presentWhen = QString("determinant==%1").arg(*concreteType.determinantValue);
 
-        const auto choiceAlternativeName = QString("concrete-%1").arg(concreteType.typeName);
+        const auto choiceAlternativeName = QString("concrete-%1").arg(concreteType.typeRef.nameStr());
         auto choiceAlternative = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(choiceAlternativeName,
                 choiceAlternativeName, choiceAlternativeName, choiceAlternativeName, presentWhen,
                 Asn1Acn::SourceLocation(), asn1ConcreteType->clone());

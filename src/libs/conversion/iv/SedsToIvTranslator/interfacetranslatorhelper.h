@@ -70,7 +70,7 @@ public:
     /**
      * @brief   Create ASN.1 SEQUENCE OF with given dimensions
      *
-     * @param   baseTypeName        Name of type that is the base of the array
+     * @param   baseTypeRef         Type that is the base of the array
      * @param   dimensions          Array dimensions
      * @param   asn1Definitions     Where the created type will be added
      * @param   sedsPackage         Parent SEDS package
@@ -79,10 +79,10 @@ public:
      *
      * @return  Create type name
      */
-    static auto createArrayType(const QString &baseTypeName, const std::vector<seds::model::DimensionSize> &dimensions,
-            Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
-            const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages)
-            -> QString;
+    static auto createArrayType(const seds::model::DataTypeRef &baseTypeRef,
+            const std::vector<seds::model::DimensionSize> &dimensions, Asn1Acn::Definitions *asn1Definitions,
+            const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
+            const std::vector<seds::model::Package> &sedsPackages) -> QString;
 
     /**
      * @brief   Assemble name for the parameter

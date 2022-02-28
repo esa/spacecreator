@@ -129,7 +129,7 @@ QString InterfaceParameterTranslator::handleParameterTypeName(
         throw TranslationException(std::move(errorMessage));
     }
 
-    return concreteTypes.front().typeName;
+    return concreteTypes.front().typeRef.nameStr();
 }
 
 } // namespace conversion::iv::translator

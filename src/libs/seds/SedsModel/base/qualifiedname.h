@@ -31,7 +31,9 @@ class QualifiedName final
 public:
     QualifiedName() = default;
     QualifiedName(common::String value) noexcept;
+    QualifiedName(const QualifiedName &) = default;
     QualifiedName(QualifiedName &&) = default;
+    QualifiedName &operator=(const QualifiedName &) = default;
     QualifiedName &operator=(QualifiedName &&) = default;
 
 public:

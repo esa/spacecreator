@@ -11,15 +11,44 @@
     </DataTypeSet>
     <DeclaredInterfaceSet>
       <Interface name="MegaInterface">
+        <GenericTypeSet>
+          <GenericType name="GenericType" />
+        </GenericTypeSet>
         <ParameterSet>
           <Parameter name="FunParameter" type="com/n7space/Package2/ParameterItem" mode="sync" readOnly="true"/>
         </ParameterSet>
+        <CommandSet>
+          <Command name="SyncCommandNoMapping" mode="sync">
+            <Argument name="ArgumentNoMapping" type="com/n7space/Package2/SyncItem" mode="in" />
+          </Command>
+          <Command name="SyncCommandNoMappingArray" mode="sync">
+            <Argument name="ArrayArgumentNoMapping" type="com/n7space/Package2/SyncItemArray" mode="in">
+              <ArrayDimensions>
+                <Dimension size="10" />
+              </ArrayDimensions>
+            </Argument>
+          </Command>
+          <Command name="SyncCommandSimpleMapping" mode="sync">
+            <Argument name="ArgumentSimpleMapping" type="GenericType" mode="in" />
+          </Command>
+          <Command name="SyncCommandSimpleMappingArray" mode="sync">
+            <Argument name="ArrayArgumentSimpleMapping" type="GenericType" mode="in">
+              <ArrayDimensions>
+                <Dimension size="10" />
+              </ArrayDimensions>
+            </Argument>
+          </Command>
+        </CommandSet>
       </Interface>
     </DeclaredInterfaceSet>
     <ComponentSet>
       <Component name="MegaComponent">
         <ProvidedInterfaceSet>
-          <Interface name="ProvidedInterface" type="MegaInterface"/>
+          <Interface name="ProvidedInterface" type="MegaInterface">
+            <GenericTypeMapSet>
+                <GenericTypeMap name="GenericType" type="com/n7space/Package2/MappedSyncItem" />
+            </GenericTypeMapSet>
+          </Interface>
         </ProvidedInterfaceSet>
       </Component>
     </ComponentSet>
@@ -27,6 +56,24 @@
   <Package name="com/n7space/Package2">
     <DataTypeSet>
       <IntegerDataType name="ParameterItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="SyncItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="SyncItemArray">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="MappedSyncItem">
         <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
         <Range>
           <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />

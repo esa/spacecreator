@@ -30,7 +30,9 @@ class DataTypeRef final
 public:
     DataTypeRef() = default;
     DataTypeRef(common::String value) noexcept;
+    DataTypeRef(const DataTypeRef &) = default;
     DataTypeRef(DataTypeRef &&) = default;
+    DataTypeRef &operator=(const DataTypeRef &) = default;
     DataTypeRef &operator=(DataTypeRef &&) = default;
 
 public:

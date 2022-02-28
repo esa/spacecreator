@@ -28,7 +28,9 @@ class Name final
 public:
     Name() = default;
     Name(common::String value) noexcept;
+    Name(const Name &) = default;
     Name(Name &&) = default;
+    Name &operator=(const Name &) = default;
     Name &operator=(Name &&) = default;
 
 public:
