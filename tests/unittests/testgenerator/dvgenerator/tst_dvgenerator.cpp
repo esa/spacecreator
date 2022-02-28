@@ -64,6 +64,11 @@ private:
 static auto checkEntityProperties(const dvm::DVObject &actual, const dvm::DVObject &expected) -> void;
 static auto checkObjVectors(QVector<dvm::DVObject *> *actual, QVector<dvm::DVObject *> *expected) -> void;
 static auto checkEntityAttributes(const dvm::DVObject &actual, const dvm::DVObject &expected) -> void;
+static auto checkPartitions(const dvm::DVObject &actualObj, const dvm::DVObject &expectedObj) -> void;
+static auto checkTypeSpecificMembers(const dvm::DVObject &generatedObj, const dvm::DVObject &expectedObj) -> void;
+static auto exportModel(QVector<dvm::DVObject *> *objects, const QString &outputFilename) -> void;
+static auto getRawPointersVector(const std::vector<std::unique_ptr<ivm::IVFunction>> &functions)
+        -> std::vector<ivm::IVFunction *>;
 
 void tst_dvgenerator::initTestCase()
 {
@@ -72,46 +77,33 @@ void tst_dvgenerator::initTestCase()
 
 void tst_dvgenerator::testNominal()
 {
-    std::vector<std::shared_ptr<ivm::IVFunction>> functions {
-        std::make_shared<ivm::IVFunction>(),
-        std::make_shared<ivm::IVFunction>(),
+    const QString &nominalOutputFileName = "nominal.dv.xml";
+    const std::vector<QString> functionTitles = {
+        "TestDriver",
+        "FunctionUnderTest",
     };
-    functions.front()->setTitle("TestDriver");
-    functions.back()->setTitle("FunctionUnderTest");
 
-    std::vector<ivm::IVFunction *> functionsToBind;
-    std::for_each(functions.begin(), functions.end(),
-            [&functionsToBind](const auto &f) { functionsToBind.push_back(f.get()); });
+    std::vector<std::unique_ptr<ivm::IVFunction>> functions;
+    functions.push_back(std::make_unique<ivm::IVFunction>());
+    functions.push_back(std::make_unique<ivm::IVFunction>());
+    functions.front()->setTitle(functionTitles.front());
+    functions.back()->setTitle(functionTitles.back());
+
+    std::vector<ivm::IVFunction *> functionsToBind = getRawPointersVector(functions);
 
     const std::unique_ptr<dvm::DVModel> generatedModel = DvGenerator::generate(functionsToBind);
-
     QVERIFY(generatedModel != nullptr);
     const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());
+    QVERIFY(generatedDvObjects != nullptr);
 
-    // export generated model
-    dve::DVExporter exporter;
-    QList<shared::VEObject *> objects;
-    std::for_each(generatedDvObjects->begin(), generatedDvObjects->end(),
-            [&objects](const auto &obj) { objects.push_back(obj); });
-
-    QByteArray qba(objects.size() * 1'000, '\00');
-    QBuffer buf = QBuffer(&qba);
-
-    exporter.exportObjects(objects, &buf);
-
-    QFile file("dv_out.xml");
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-        return;
-    file.write(qba);
+    exportModel(generatedDvObjects.get(), nominalOutputFileName);
 
     const auto expectedDvObjects = dvtools::getDvObjectsFromFile(dvPath.arg("deploymentview"));
-    QVERIFY(generatedDvObjects != nullptr);
     QVERIFY(expectedDvObjects != nullptr);
-
     checkObjVectors(generatedDvObjects.get(), expectedDvObjects.get());
 }
 
-static void checkObjVectors(QVector<dvm::DVObject *> *actualObjs, QVector<dvm::DVObject *> *expectedObjs)
+void checkObjVectors(QVector<dvm::DVObject *> *actualObjs, QVector<dvm::DVObject *> *expectedObjs)
 {
     QCOMPARE(actualObjs->size(), expectedObjs->size());
     const int objsSize = actualObjs->size();
@@ -140,51 +132,11 @@ static void checkObjVectors(QVector<dvm::DVObject *> *actualObjs, QVector<dvm::D
         QCOMPARE(generatedObj.coordinates(), expectedObj.coordinates());
         checkEntityProperties(generatedObj, expectedObj);
         checkEntityAttributes(generatedObj, expectedObj);
-
-        switch (generatedObj.type()) {
-        case dvm::DVObject::Type::Node: // TODO
-        case dvm::DVObject::Type::Function: // TODO
-        case dvm::DVObject::Type::Connection: // TODO
-        case dvm::DVObject::Type::Message: // TODO
-        case dvm::DVObject::Type::Bus: // TODO
-        case dvm::DVObject::Type::Board: // TODO
-        case dvm::DVObject::Type::Port: // TODO
-        case dvm::DVObject::Type::SystemInterface: // TODO
-        case dvm::DVObject::Type::SystemFunction: // TODO
-        case dvm::DVObject::Type::Unknown:
-            // QFAIL("Unknown type in generated object");
-        case dvm::DVObject::Type::Device:
-            continue;
-        case dvm::DVObject::Type::Partition: {
-            // check partitions
-            const auto *const generatedPartition = static_cast<const dvm::DVPartition *>(&generatedObj);
-            const auto *const expectedPartition = static_cast<const dvm::DVPartition *>(&expectedObj);
-
-            QVERIFY(generatedPartition != nullptr);
-            QVERIFY(expectedPartition != nullptr);
-
-            const auto &generatedFunctions = generatedPartition->functions();
-            const auto &expectedFunctions = expectedPartition->functions();
-
-            QCOMPARE(generatedFunctions.size(), expectedFunctions.size());
-            const int functionsSize = generatedPartition->functions().size();
-
-            for (int j = 0; j < functionsSize; j++) {
-                const auto &generatedFunction = generatedFunctions.at(j);
-                const auto &expectedFunction = expectedFunctions.at(j);
-
-                QVERIFY(generatedFunction != nullptr);
-                QVERIFY(expectedFunction != nullptr);
-
-                QCOMPARE(generatedFunction->title(), expectedFunction->title());
-                QCOMPARE(generatedFunction->implementation(), expectedFunction->implementation());
-            }
-        }
-        }
+        checkTypeSpecificMembers(generatedObj, expectedObj);
     }
 }
 
-static void checkEntityProperties(const dvm::DVObject &actual, const dvm::DVObject &expected)
+void checkEntityProperties(const dvm::DVObject &actual, const dvm::DVObject &expected)
 {
     const auto &actualProperties = actual.properties();
     const auto &expectedProperties = expected.properties();
@@ -203,7 +155,7 @@ static void checkEntityProperties(const dvm::DVObject &actual, const dvm::DVObje
     }
 }
 
-static void checkEntityAttributes(const dvm::DVObject &actual, const dvm::DVObject &expected)
+void checkEntityAttributes(const dvm::DVObject &actual, const dvm::DVObject &expected)
 {
     const auto &actualEntityAttributes = actual.entityAttributes();
     const auto &expectedEntityAttributes = expected.entityAttributes();
@@ -216,6 +168,92 @@ static void checkEntityAttributes(const dvm::DVObject &actual, const dvm::DVObje
 
         QCOMPARE(actualValue, expectedValue);
     }
+}
+
+void checkTypeSpecificMembers(const dvm::DVObject &actualObj, const dvm::DVObject &expectedObj)
+{
+    switch (actualObj.type()) {
+    case dvm::DVObject::Type::Node:
+        break;
+    case dvm::DVObject::Type::Function:
+        break;
+    case dvm::DVObject::Type::Connection:
+        break;
+    case dvm::DVObject::Type::Message:
+        break;
+    case dvm::DVObject::Type::Bus:
+        break;
+    case dvm::DVObject::Type::Board:
+        break;
+    case dvm::DVObject::Type::Port:
+        break;
+    case dvm::DVObject::Type::SystemInterface:
+        break;
+    case dvm::DVObject::Type::SystemFunction:
+        break;
+    case dvm::DVObject::Type::Device:
+        break;
+    case dvm::DVObject::Type::Partition:
+        checkPartitions(actualObj, expectedObj);
+        break;
+    case dvm::DVObject::Type::Unknown:
+        QFAIL("Unknown type in generated object");
+    }
+}
+
+void checkPartitions(const dvm::DVObject &actualObj, const dvm::DVObject &expectedObj)
+{
+    const auto *const actualPartition = static_cast<const dvm::DVPartition *>(&actualObj);
+    const auto *const expectedPartition = static_cast<const dvm::DVPartition *>(&expectedObj);
+
+    QVERIFY(actualPartition != nullptr);
+    QVERIFY(expectedPartition != nullptr);
+
+    const auto &actualFunctions = actualPartition->functions();
+    const auto &expectedFunctions = expectedPartition->functions();
+
+    QCOMPARE(actualFunctions.size(), expectedFunctions.size());
+    const int functionsSize = actualPartition->functions().size();
+
+    for (int j = 0; j < functionsSize; j++) {
+        const auto &actualFunction = actualFunctions.at(j);
+        const auto &expectedFunction = expectedFunctions.at(j);
+
+        QVERIFY(actualFunction != nullptr);
+        QVERIFY(expectedFunction != nullptr);
+
+        QCOMPARE(actualFunction->title(), expectedFunction->title());
+        QCOMPARE(actualFunction->implementation(), expectedFunction->implementation());
+    }
+}
+
+void exportModel(QVector<dvm::DVObject *> *const generatedDvObjects, const QString &outputFilename)
+{
+    dve::DVExporter exporter;
+    QList<shared::VEObject *> objects;
+    std::for_each(generatedDvObjects->begin(), generatedDvObjects->end(),
+            [&objects](const auto &obj) { objects.push_back(obj); });
+
+    QByteArray qba(objects.size() * 1'000, '\00');
+    QBuffer buf = QBuffer(&qba);
+
+    exporter.exportObjects(objects, &buf);
+
+    QFile file(outputFilename);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+    file.write(qba);
+}
+
+std::vector<ivm::IVFunction *> getRawPointersVector(
+        const std::vector<std::unique_ptr<ivm::IVFunction>> &uniquePointersVector)
+{
+    std::vector<ivm::IVFunction *> rawePointersVector;
+
+    std::for_each(uniquePointersVector.begin(), uniquePointersVector.end(),
+            [&rawePointersVector](const auto &f) { rawePointersVector.push_back(f.get()); });
+
+    return rawePointersVector;
 }
 
 } // namespace tests::testgenerator
