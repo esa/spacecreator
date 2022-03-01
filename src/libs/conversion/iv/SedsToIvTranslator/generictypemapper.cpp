@@ -95,7 +95,7 @@ void GenericTypeMapper::addAlternateMapping(const GenericAlternate &alternate, c
         throw TranslationException(std::move(errorMessage));
     }
 
-    const auto &determinantTypeName = foundDeterminant->type().nameStr();
+    const auto &determinantTypeRef = foundDeterminant->type();
     const auto &determinantValue = foundDeterminant->fixedValue();
 
     for (const auto &typeMap : typeMaps) {
@@ -110,7 +110,7 @@ void GenericTypeMapper::addAlternateMapping(const GenericAlternate &alternate, c
         if (foundMapping == m_mappings.end()) {
             TypeMapping typeMapping;
             typeMapping.genericTypeName = genericTypeName;
-            typeMapping.determinantTypeName = determinantTypeName;
+            typeMapping.determinantTypeRef = determinantTypeRef;
             typeMapping.concreteTypes.push_back(std::move(concreteType));
 
             m_mappings.push_back(std::move(typeMapping));

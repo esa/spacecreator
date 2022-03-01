@@ -35,7 +35,7 @@ struct TypeMapping {
 
     QString genericTypeName;
     std::vector<ConcreteType> concreteTypes;
-    std::optional<QString> determinantTypeName;
+    std::optional<seds::model::DataTypeRef> determinantTypeRef;
 };
 
 } // namespace conversion::iv::translator

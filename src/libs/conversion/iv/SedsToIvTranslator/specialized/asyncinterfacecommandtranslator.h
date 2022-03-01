@@ -42,7 +42,7 @@ private:
         QString name;
         seds::model::DataTypeRef typeRef;
         std::optional<QString> fixedValue;
-        std::optional<QString> determinantName;
+        std::optional<seds::model::DataTypeRef> determinantRef;
         bool isDeterminant;
 
         friend auto operator==(const ArgumentData &lhs, const ArgumentData &rhs) -> bool
@@ -123,13 +123,15 @@ private:
     auto handleArgumentSimpleMapping(const seds::model::CommandArgument &sedsArgument,
             const TypeMapping::ConcreteType &concreteType) -> AsyncInterfaceCommandTranslator::ArgumentData;
     auto handleArgumentAlternateMapping(const seds::model::CommandArgument &sedsArgument,
-            const std::vector<TypeMapping::ConcreteType> &concreteTypes, const QString &determinantTypeName,
-            const Arguments &arguments) -> AsyncInterfaceCommandTranslator::ArgumentData;
+            const std::vector<TypeMapping::ConcreteType> &concreteTypes,
+            const seds::model::DataTypeRef &determinantTypeRef, const Arguments &arguments)
+            -> AsyncInterfaceCommandTranslator::ArgumentData;
     auto handleArrayArgument(const seds::model::CommandArgument &sedsArgument, const seds::model::DataTypeRef &typeRef)
             -> seds::model::DataTypeRef;
 
     auto createAlternateType(const QString &genericTypeName,
-            const std::vector<TypeMapping::ConcreteType> &concreteTypes, const QString &determinantName) -> QString;
+            const std::vector<TypeMapping::ConcreteType> &concreteTypes, const seds::model::DataTypeRef &determinantRef)
+            -> QString;
 
     auto calculateArgumentsHash(const std::vector<AsyncInterfaceCommandTranslator::ArgumentData> &arguments) const
             -> std::size_t;

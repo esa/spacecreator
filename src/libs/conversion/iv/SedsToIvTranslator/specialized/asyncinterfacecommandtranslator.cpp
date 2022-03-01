@@ -217,8 +217,8 @@ void AsyncInterfaceCommandTranslator::createBundledTypeComponent(
         sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
                 name, name, false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(sequenceComponentType));
 
-        if (argumentData.determinantName.has_value()) {
-            sequenceComponent->addAcnParameter(*argumentData.determinantName);
+        if (argumentData.determinantRef.has_value()) {
+            sequenceComponent->addAcnParameter(argumentData.determinantRef->nameStr());
         }
     }
 
@@ -273,7 +273,7 @@ AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::p
     if (concreteTypes.size() == 1) { // 'Simple' mapping
         return handleArgumentSimpleMapping(sedsArgument, concreteTypes.front());
     } else { // 'Alternate' mapping
-        if (!typeMapping->determinantTypeName.has_value()) {
+        if (!typeMapping->determinantTypeRef.has_value()) {
             auto errorMessage = QString("Type \"%1\" of argument \"%2\" of interface \"%3\" has alternate mapping, but "
                                         "no determinant was set")
                                         .arg(argumentTypeName)
@@ -282,8 +282,7 @@ AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::p
             throw TranslationException(std::move(errorMessage));
         }
 
-        return handleArgumentAlternateMapping(
-                sedsArgument, concreteTypes, *typeMapping->determinantTypeName, arguments);
+        return handleArgumentAlternateMapping(sedsArgument, concreteTypes, *typeMapping->determinantTypeRef, arguments);
     }
 }
 
@@ -298,32 +297,32 @@ AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::h
 
 AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::handleArgumentAlternateMapping(
         const seds::model::CommandArgument &sedsArgument, const std::vector<TypeMapping::ConcreteType> &concreteTypes,
-        const QString &determinantTypeName, const AsyncInterfaceCommandTranslator::Arguments &arguments)
+        const seds::model::DataTypeRef &determinantTypeRef, const AsyncInterfaceCommandTranslator::Arguments &arguments)
 {
     const auto argumentName = Escaper::escapeAsn1FieldName(sedsArgument.nameStr());
 
     // If all of the concrete types are the same, then we can handle this a simple mapping
-    const auto firstConcreteTypeName = concreteTypes.front().typeRef.nameStr();
+    const auto firstConcreteTypeRef = concreteTypes.front().typeRef;
     const auto allTheSame = std::all_of(concreteTypes.begin(), concreteTypes.end(),
-            [&](const auto &concreteType) { return concreteType.typeRef.nameStr() == firstConcreteTypeName; });
+            [&](const auto &concreteType) { return concreteType.typeRef.nameStr() == firstConcreteTypeRef; });
 
     if (allTheSame) {
-        if (firstConcreteTypeName == determinantTypeName) {
-            return { argumentName, firstConcreteTypeName, std::nullopt, std::nullopt, true };
+        if (firstConcreteTypeRef == determinantTypeRef) {
+            return { argumentName, firstConcreteTypeRef, std::nullopt, std::nullopt, true };
         } else {
-            const auto argumentTypeName = handleArrayArgument(sedsArgument, firstConcreteTypeName);
-            return { argumentName, argumentTypeName, std::nullopt, std::nullopt, false };
+            const auto argumentTypeRef = handleArrayArgument(sedsArgument, firstConcreteTypeRef);
+            return { argumentName, argumentTypeRef, std::nullopt, std::nullopt, false };
         }
     } else {
         // Try to find an argument that is a determinant
         // Limitation is that the determinant has to be present before any of the field that will be using it
         const auto foundDeterminant = std::find_if(arguments.begin(), arguments.end(),
-                [&](const auto &argument) { return argument.typeRef.nameStr() == determinantTypeName; });
+                [&](const auto &argument) { return argument.typeRef == determinantTypeRef; });
 
         if (foundDeterminant == arguments.end()) {
             auto errorMessage =
                     QString("Determinant type \"%1\" of argument \"%2\" of interface \"%3\" couldn't be find")
-                            .arg(determinantTypeName)
+                            .arg(determinantTypeRef.nameStr())
                             .arg(argumentName)
                             .arg(m_sedsInterfaceName);
             throw TranslationException(std::move(errorMessage));
@@ -331,10 +330,10 @@ AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::h
 
         // Create an ASN.1 choice that will have a generic parameters to choose an alternative based on determinant
         const auto alternateTypeName =
-                createAlternateType(sedsArgument.type().nameStr(), concreteTypes, determinantTypeName);
-        const auto argumentTypeName = handleArrayArgument(sedsArgument, alternateTypeName);
+                createAlternateType(sedsArgument.type().nameStr(), concreteTypes, determinantTypeRef);
+        const auto argumentTypeRef = handleArrayArgument(sedsArgument, alternateTypeName);
 
-        return { argumentName, argumentTypeName, std::nullopt, foundDeterminant->name, false };
+        return { argumentName, argumentTypeRef, std::nullopt, foundDeterminant->name, false };
     }
 }
 
@@ -350,7 +349,7 @@ seds::model::DataTypeRef AsyncInterfaceCommandTranslator::handleArrayArgument(
 }
 
 QString AsyncInterfaceCommandTranslator::createAlternateType(const QString &genericTypeName,
-        const std::vector<TypeMapping::ConcreteType> &concreteTypes, const QString &determinantName)
+        const std::vector<TypeMapping::ConcreteType> &concreteTypes, const seds::model::DataTypeRef &determinantRef)
 {
     auto name = InterfaceTranslatorHelper::buildAlternateTypeName(m_sedsInterfaceName, genericTypeName);
 
@@ -370,7 +369,7 @@ QString AsyncInterfaceCommandTranslator::createAlternateType(const QString &gene
     }
 
     // Add an ACN parameter for determinant
-    auto acnParameter = std::make_unique<Asn1Acn::AcnParameter>("determinant", "determinant", determinantName);
+    auto acnParameter = std::make_unique<Asn1Acn::AcnParameter>("determinant", "determinant", determinantRef.nameStr());
     choice->addParameter(std::move(acnParameter));
 
     auto typeAssignment =
