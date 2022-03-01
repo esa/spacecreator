@@ -1,5 +1,8 @@
 COM-N7SPACE-PACKAGE1 DEFINITIONS ::= BEGIN
 IMPORTS
+AsyncItem FROM COM-N7SPACE-PACKAGE2
+AsyncItemArray FROM COM-N7SPACE-PACKAGE2
+MappedAsyncItem FROM COM-N7SPACE-PACKAGE2
 MappedSyncItem FROM COM-N7SPACE-PACKAGE2
 ParameterItem FROM COM-N7SPACE-PACKAGE2
 SyncItem FROM COM-N7SPACE-PACKAGE2
@@ -8,5 +11,18 @@ SyncItemArray FROM COM-N7SPACE-PACKAGE2
 NiceItem ::= INTEGER(0 .. 255)
 SyncItemArrayArray-10 ::= SEQUENCE (SIZE(10)) OF SyncItemArray(0 .. 255)
 MappedSyncItemArray-10 ::= SEQUENCE (SIZE(10)) OF MappedSyncItem(0 .. 255)
+AsyncCommandNoMapping-Type ::= SEQUENCE
+{
+    argumentNoMapping AsyncItem(0 .. 255)
+}
+AsyncItemArrayArray-10 ::= SEQUENCE (SIZE(10)) OF AsyncItemArray(0 .. 255)
+AsyncCommandNoMappingArray-Type ::= SEQUENCE
+{
+    arrayArgumentNoMapping AsyncItemArrayArray-10(SIZE(10))
+}
+AsyncCommandSimpleMapping-Type ::= SEQUENCE
+{
+    argumentSimpleMapping MappedAsyncItem(0 .. 255)
+}
 END
 

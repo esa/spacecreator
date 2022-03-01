@@ -42,6 +42,9 @@ public:
     auto nameStr() const -> const QString &;
     auto packageStr() const -> const std::optional<QString> &;
 
+    friend auto operator==(const DataTypeRef &lhs, const DataTypeRef &rhs) -> bool;
+    friend auto operator!=(const DataTypeRef &lhs, const DataTypeRef &rhs) -> bool;
+
 private:
     QualifiedName m_value;
 };

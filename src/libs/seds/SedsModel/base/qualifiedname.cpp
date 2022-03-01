@@ -51,9 +51,7 @@ const QString &QualifiedName::pathStr() const
 
 bool operator==(const QualifiedName &lhs, const QualifiedName &rhs)
 {
-    if (lhs.namespaceName().has_value() != rhs.namespaceName().has_value()) {
-        return false;
-    } else if (lhs.namespaceName().value() != rhs.namespaceName().value()) {
+    if (lhs.namespaceName() != rhs.namespaceName()) {
         return false;
     } else if (lhs.name() != rhs.name()) {
         return false;

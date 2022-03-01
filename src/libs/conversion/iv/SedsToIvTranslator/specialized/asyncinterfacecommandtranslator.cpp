@@ -27,10 +27,12 @@
 #include <asn1library/asn1/types/choice.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
+#include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <iostream>
 
+using conversion::asn1::translator::SedsToAsn1Translator;
 using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator {
@@ -186,9 +188,14 @@ void AsyncInterfaceCommandTranslator::createBundledTypeComponent(
         const AsyncInterfaceCommandTranslator::ArgumentData &argumentData, Asn1Acn::Types::Sequence *sequence) const
 {
     const auto &name = argumentData.name;
-    const auto &typeName = argumentData.typeName;
+    const auto &typeRef = argumentData.typeRef;
 
-    const auto *referencedTypeAssignment = m_asn1Definitions->type(typeName);
+    const auto asn1Definitions = typeRef.packageStr()
+            ? SedsToAsn1Translator::getAsn1Definitions(*typeRef.packageStr(), m_asn1Files)
+            : m_asn1Definitions;
+
+    const auto &typeName = typeRef.nameStr();
+    const auto *referencedTypeAssignment = asn1Definitions->type(typeName);
 
     if (!referencedTypeAssignment) {
         auto errorMessage =
@@ -238,14 +245,15 @@ AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::p
         const seds::model::CommandArgument &sedsArgument, const AsyncInterfaceCommandTranslator::Arguments &arguments)
 {
     const auto argumentName = Escaper::escapeAsn1FieldName(sedsArgument.nameStr());
-    const auto argumentTypeName = sedsArgument.type().nameStr();
+    const auto argumentTypeRef = sedsArgument.type();
+    const auto argumentTypeName = argumentTypeRef.nameStr();
 
     const auto typeMapping = m_typeMapper->getMapping(argumentTypeName);
 
     // Type is not mapped
     if (typeMapping == nullptr) {
         // Handle optional array dimensions
-        const auto typeName = handleArrayArgument(sedsArgument, Escaper::escapeAsn1TypeName(argumentTypeName));
+        const auto typeName = handleArrayArgument(sedsArgument, argumentTypeRef);
         return { argumentName, typeName, std::nullopt, std::nullopt, false };
     }
 
@@ -283,7 +291,7 @@ AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::h
         const seds::model::CommandArgument &sedsArgument, const TypeMapping::ConcreteType &concreteType)
 {
     const auto argumentName = Escaper::escapeAsn1FieldName(sedsArgument.nameStr());
-    const auto argumentTypeName = handleArrayArgument(sedsArgument, concreteType.typeRef.nameStr());
+    const auto argumentTypeName = handleArrayArgument(sedsArgument, concreteType.typeRef);
 
     return { argumentName, argumentTypeName, concreteType.fixedValue, std::nullopt, false };
 }
@@ -310,7 +318,7 @@ AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::h
         // Try to find an argument that is a determinant
         // Limitation is that the determinant has to be present before any of the field that will be using it
         const auto foundDeterminant = std::find_if(arguments.begin(), arguments.end(),
-                [&](const auto &argument) { return argument.typeName == determinantTypeName; });
+                [&](const auto &argument) { return argument.typeRef.nameStr() == determinantTypeName; });
 
         if (foundDeterminant == arguments.end()) {
             auto errorMessage =
@@ -330,14 +338,14 @@ AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::h
     }
 }
 
-QString AsyncInterfaceCommandTranslator::handleArrayArgument(
-        const seds::model::CommandArgument &sedsArgument, const QString &typeName)
+seds::model::DataTypeRef AsyncInterfaceCommandTranslator::handleArrayArgument(
+        const seds::model::CommandArgument &sedsArgument, const seds::model::DataTypeRef &typeRef)
 {
     if (sedsArgument.arrayDimensions().empty()) {
-        return typeName;
+        return typeRef;
     } else {
-        return InterfaceTranslatorHelper::createArrayType(typeName, sedsArgument.arrayDimensions(), m_asn1Definitions,
-                m_sedsPackage, m_asn1Files, m_sedsPackages);
+        return InterfaceTranslatorHelper::createArrayType(
+                typeRef, sedsArgument.arrayDimensions(), m_asn1Definitions, m_sedsPackage, m_asn1Files, m_sedsPackages);
     }
 }
 
@@ -378,7 +386,7 @@ std::size_t AsyncInterfaceCommandTranslator::calculateArgumentsHash(
     std::size_t typeHash = 0;
 
     for (const auto &argumentData : arguments) {
-        const auto typeNameHash = std::hash<QString> {}(argumentData.typeName);
+        const auto typeNameHash = std::hash<QString> {}(argumentData.typeRef.value().pathStr());
 
         if (typeHash == 0) {
             typeHash = typeNameHash;

@@ -12,7 +12,8 @@
     <DeclaredInterfaceSet>
       <Interface name="MegaInterface">
         <GenericTypeSet>
-          <GenericType name="GenericType" />
+          <GenericType name="SyncGenericType" />
+          <GenericType name="AsyncGenericType" />
         </GenericTypeSet>
         <ParameterSet>
           <Parameter name="FunParameter" type="com/n7space/Package2/ParameterItem" mode="sync" readOnly="true"/>
@@ -29,14 +30,27 @@
             </Argument>
           </Command>
           <Command name="SyncCommandSimpleMapping" mode="sync">
-            <Argument name="ArgumentSimpleMapping" type="GenericType" mode="in" />
+            <Argument name="ArgumentSimpleMapping" type="SyncGenericType" mode="in" />
           </Command>
           <Command name="SyncCommandSimpleMappingArray" mode="sync">
-            <Argument name="ArrayArgumentSimpleMapping" type="GenericType" mode="in">
+            <Argument name="ArrayArgumentSimpleMapping" type="SyncGenericType" mode="in">
               <ArrayDimensions>
                 <Dimension size="10" />
               </ArrayDimensions>
             </Argument>
+          </Command>
+          <Command name="AsyncCommandNoMapping" mode="async">
+            <Argument name="ArgumentNoMapping" type="com/n7space/Package2/AsyncItem" mode="in" />
+          </Command>
+          <Command name="AsyncCommandNoMappingArray" mode="async">
+            <Argument name="ArrayArgumentNoMapping" type="com/n7space/Package2/AsyncItemArray" mode="in">
+              <ArrayDimensions>
+                <Dimension size="10" />
+              </ArrayDimensions>
+            </Argument>
+          </Command>
+          <Command name="AsyncCommandSimpleMapping" mode="async">
+            <Argument name="ArgumentSimpleMapping" type="AsyncGenericType" mode="in" />
           </Command>
         </CommandSet>
       </Interface>
@@ -46,7 +60,8 @@
         <ProvidedInterfaceSet>
           <Interface name="ProvidedInterface" type="MegaInterface">
             <GenericTypeMapSet>
-                <GenericTypeMap name="GenericType" type="com/n7space/Package2/MappedSyncItem" />
+                <GenericTypeMap name="SyncGenericType" type="com/n7space/Package2/MappedSyncItem" />
+                <GenericTypeMap name="AsyncGenericType" type="com/n7space/Package2/MappedAsyncItem" />
             </GenericTypeMapSet>
           </Interface>
         </ProvidedInterfaceSet>
@@ -74,6 +89,24 @@
         </Range>
       </IntegerDataType>
       <IntegerDataType name="MappedSyncItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="AsyncItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="AsyncItemArray">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="MappedAsyncItem">
         <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
         <Range>
           <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />

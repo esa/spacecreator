@@ -41,4 +41,14 @@ const std::optional<QString> &DataTypeRef::packageStr() const
     return m_value.namespaceName();
 }
 
+bool operator==(const DataTypeRef &lhs, const DataTypeRef &rhs)
+{
+    return lhs.m_value == rhs.m_value;
+}
+
+bool operator!=(const DataTypeRef &lhs, const DataTypeRef &rhs)
+{
+    return !(lhs == rhs);
+}
+
 } // namespace seds::model

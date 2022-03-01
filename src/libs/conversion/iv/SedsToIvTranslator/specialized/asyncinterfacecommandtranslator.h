@@ -40,14 +40,14 @@ class AsyncInterfaceCommandTranslator final
 private:
     struct ArgumentData {
         QString name;
-        QString typeName;
+        seds::model::DataTypeRef typeRef;
         std::optional<QString> fixedValue;
         std::optional<QString> determinantName;
         bool isDeterminant;
 
         friend auto operator==(const ArgumentData &lhs, const ArgumentData &rhs) -> bool
         {
-            return lhs.name == rhs.name && lhs.typeName == rhs.typeName;
+            return lhs.name == rhs.name && lhs.typeRef == rhs.typeRef;
         }
 
         friend auto operator!=(const ArgumentData &lhs, const ArgumentData &rhs) -> bool { return !(lhs == rhs); }
@@ -125,7 +125,8 @@ private:
     auto handleArgumentAlternateMapping(const seds::model::CommandArgument &sedsArgument,
             const std::vector<TypeMapping::ConcreteType> &concreteTypes, const QString &determinantTypeName,
             const Arguments &arguments) -> AsyncInterfaceCommandTranslator::ArgumentData;
-    auto handleArrayArgument(const seds::model::CommandArgument &sedsArgument, const QString &typeName) -> QString;
+    auto handleArrayArgument(const seds::model::CommandArgument &sedsArgument, const seds::model::DataTypeRef &typeRef)
+            -> seds::model::DataTypeRef;
 
     auto createAlternateType(const QString &genericTypeName,
             const std::vector<TypeMapping::ConcreteType> &concreteTypes, const QString &determinantName) -> QString;

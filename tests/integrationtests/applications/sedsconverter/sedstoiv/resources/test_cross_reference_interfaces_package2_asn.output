@@ -3,5 +3,8 @@ ParameterItem ::= INTEGER(0 .. 255)
 SyncItem ::= INTEGER(0 .. 255)
 SyncItemArray ::= INTEGER(0 .. 255)
 MappedSyncItem ::= INTEGER(0 .. 255)
+AsyncItem ::= INTEGER(0 .. 255)
+AsyncItemArray ::= INTEGER(0 .. 255)
+MappedAsyncItem ::= INTEGER(0 .. 255)
 END
 
