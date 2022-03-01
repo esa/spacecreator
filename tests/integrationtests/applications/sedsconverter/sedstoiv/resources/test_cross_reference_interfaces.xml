@@ -52,6 +52,13 @@
           <Command name="AsyncCommandSimpleMapping" mode="async">
             <Argument name="ArgumentSimpleMapping" type="AsyncGenericType" mode="in" />
           </Command>
+          <Command name="AsyncCommandSimpleMappingArray" mode="async">
+            <Argument name="ArrayArgumentSimpleMapping" type="AsyncGenericType" mode="in">
+              <ArrayDimensions>
+                <Dimension size="10" />
+              </ArrayDimensions>
+            </Argument>
+          </Command>
         </CommandSet>
       </Interface>
     </DeclaredInterfaceSet>

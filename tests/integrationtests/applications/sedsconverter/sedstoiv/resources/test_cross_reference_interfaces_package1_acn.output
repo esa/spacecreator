@@ -15,5 +15,10 @@ AsyncCommandSimpleMapping-Type []
 {
     argumentSimpleMapping []
 }
+MappedAsyncItemArray-10 []
+AsyncCommandSimpleMappingArray-Type []
+{
+    arrayArgumentSimpleMapping []
+}
 END
 

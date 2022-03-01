@@ -24,5 +24,10 @@ AsyncCommandSimpleMapping-Type ::= SEQUENCE
 {
     argumentSimpleMapping MappedAsyncItem(0 .. 255)
 }
+MappedAsyncItemArray-10 ::= SEQUENCE (SIZE(10)) OF MappedAsyncItem(0 .. 255)
+AsyncCommandSimpleMappingArray-Type ::= SEQUENCE
+{
+    arrayArgumentSimpleMapping MappedAsyncItemArray-10(SIZE(10))
+}
 END
 
