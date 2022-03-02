@@ -634,7 +634,7 @@ auto StatementTranslatorVisitor::comparisonOperatorToString(const seds::model::C
     case seds::model::ComparisonOperator::Equals:
         return "=";
     case seds::model::ComparisonOperator::NotEquals:
-        return "<>";
+        return "/=";
     case seds::model::ComparisonOperator::LessThan:
         return "<";
     case seds::model::ComparisonOperator::LessThanEquals:

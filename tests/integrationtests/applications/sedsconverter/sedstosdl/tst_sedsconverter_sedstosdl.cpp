@@ -40,6 +40,7 @@ private Q_SLOTS:
     void testSyncCommand();
     void testIndexing();
     void testInitialValues();
+    void testNamedValues();
 };
 
 /// \SRS  ETB-FUN-10
@@ -246,6 +247,14 @@ void tst_SedsConverter_SedsToSdl::testInitialValues()
 {
     const int result = system("./test_initial_values.sh");
     QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-2020
+/// \SRS  ETB-FUN-2060
+/// \SRS  ETB-FUN-2400
+void tst_SedsConverter_SedsToSdl::testNamedValues()
+{
+    const int result = system("./test_named_values.sh");
 }
 
 } // namespace sedsconverter

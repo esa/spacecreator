@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="Values">
+    <DataTypeSet>
+      <ContainerDataType name="TContainer">
+        <EntryList>
+          <Entry name="a" type="TEnum" />
+          <Entry name="b" type="TEnum" />
+        </EntryList>
+      </ContainerDataType>
+      <EnumeratedDataType name="TEnum">
+        <EnumerationList>
+          <Enumeration label="value_A" value="10" />
+          <Enumeration label="value_B" value="20" />
+        </EnumerationList>
+      </EnumeratedDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface level="subnetwork" name="TI">
+        <CommandSet>
+          <Command name="C" mode="async"></Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="Component">
+        <ProvidedInterfaceSet>
+          <Interface name="I" type="TI" />
+        </ProvidedInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="var1" type="TContainer" />
+          </VariableSet>
+          <ActivitySet>
+            <Activity name="Activity">
+              <Body>
+                <Assignment outputVariableRef="var1.a">
+                  <Value value="value_A" />
+                </Assignment>
+                <Assignment outputVariableRef="var1.b">
+                  <Value value="value_B" />
+                </Assignment>
+                <Conditional>
+                  <Condition>
+                    <Condition>
+                      <FirstOperand variableRef="var1.a" />
+                      <ComparisonOperator>notEquals</ComparisonOperator>
+                      <Value value="value_B" />
+                    </Condition>
+                  </Condition>
+                  <OnConditionTrue>
+                    <Assignment outputVariableRef="var1.a">
+                      <VariableRef variableRef="var1.b" />
+                    </Assignment>
+                  </OnConditionTrue>
+                </Conditional>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="StateMachine">
+              <State name="s2" />
+              <EntryState name="s1" />
+              <Transition fromState="s1" toState="s2" name="dummy">
+                <OnCommandPrimitive command="C" interface="I"></OnCommandPrimitive>
+                <Do activity="Activity" />
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>
