@@ -94,8 +94,6 @@ void ComponentsTranslator::translateInterfaceDeclaration(
         const seds::model::Component &sedsComponent, const ivm::IVInterface::InterfaceType interfaceType,
         ivm::IVFunction *ivFunction) const
 {
-    GenericTypeMapper typeMapper(sedsInterfaceName, genericTypeMapSet);
-
     for (const auto &sedsBaseInterface : sedsInterfaceDeclaration.baseInterfaces()) {
         const auto &sedsBaseInterfaceDeclaration =
                 findInterfaceDeclaration(sedsBaseInterface.type().nameStr(), sedsComponent, m_sedsPackage);
@@ -103,6 +101,7 @@ void ComponentsTranslator::translateInterfaceDeclaration(
                 sedsBaseInterface.genericTypeMapSet(), sedsComponent, interfaceType, ivFunction);
     }
 
+    GenericTypeMapper typeMapper(sedsInterfaceName, genericTypeMapSet);
     translateParameters(sedsInterfaceName, sedsInterfaceDeclaration, interfaceType, ivFunction, &typeMapper);
     translateCommands(sedsInterfaceName, sedsInterfaceDeclaration, interfaceType, ivFunction, &typeMapper);
 }

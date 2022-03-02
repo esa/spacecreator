@@ -86,6 +86,7 @@ private:
     auto handleAlternateSet(const std::optional<seds::model::GenericAlternateSet> &alternateSet,
             std::set<Asn1Acn::ImportedType> &importedTypes) -> void;
     auto handleInterfaceDeclaration(const seds::model::InterfaceDeclaration &interfaceDeclaration,
+            const seds::model::Component &component, const seds::model::Package *package,
             std::set<Asn1Acn::ImportedType> &importedTypes) -> void;
     auto handleParameters(const std::vector<seds::model::InterfaceParameter> &parameters,
             std::set<Asn1Acn::ImportedType> &importedTypes) -> void;

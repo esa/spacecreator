@@ -16,7 +16,7 @@ rm -r -f $TEST_OUTPUT_DIR
 mkdir -p $TEST_OUTPUT_DIR
 # Translate
 # gdb --args \
-$SEDS_CONVERTER --from SEDS --to InterfaceView --aux-models ASN.1 --skip-validation -i resources/test_cross_reference_interfaces.xml \
+$SEDS_CONVERTER --from SEDS --to InterfaceView --aux-models ASN.1 --skip-validation -i resources/test_cross_reference_arguments.xml \
   --out $TEST_OUTPUT_DIR/interfaceview.xml --iv-config resources/config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/
 
 cd $TEST_OUTPUT_DIR
@@ -33,11 +33,11 @@ sed -e '$s/$/\n/' -s package1.acn package2.acn > dataview-uniq.acn
 
 # Execute commands in chain to make sure that the generated interface view matches
 # the reference and allows to succesfully generate derived artefacts
-$DIFF interfaceview.xml ../resources/test_cross_reference_interfaces.output \
-  && $DIFF package1.asn ../resources/test_cross_reference_interfaces_package1_asn.output \
-  && $DIFF package1.acn ../resources/test_cross_reference_interfaces_package1_acn.output \
-  && $DIFF package2.asn ../resources/test_cross_reference_interfaces_package2_asn.output \
-  && $DIFF package2.acn ../resources/test_cross_reference_interfaces_package2_acn.output \
+$DIFF interfaceview.xml ../resources/test_cross_reference_arguments.output \
+  && $DIFF package1.asn ../resources/test_cross_reference_arguments_package1_asn.output \
+  && $DIFF package1.acn ../resources/test_cross_reference_arguments_package1_acn.output \
+  && $DIFF package2.asn ../resources/test_cross_reference_arguments_package2_asn.output \
+  && $DIFF package2.acn ../resources/test_cross_reference_arguments_package2_acn.output \
   && $UPDATE_DATAVIEW \
   && $AADL_CONVERTER -o interfaceview.xml \
   -t ../resources/xml2dv/interfaceview.tmplt \

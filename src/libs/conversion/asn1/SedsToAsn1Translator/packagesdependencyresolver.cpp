@@ -177,7 +177,7 @@ void PackagesDependencyResolver::handleInterfaces(const std::vector<seds::model:
         handleTypeMapSet(interface.genericTypeMapSet(), importedTypes);
 
         const auto &interfaceDeclaration = findInterfaceDeclaration(interface.type().nameStr(), component, package);
-        handleInterfaceDeclaration(interfaceDeclaration, importedTypes);
+        handleInterfaceDeclaration(interfaceDeclaration, component, package, importedTypes);
     }
 }
 
@@ -221,8 +221,17 @@ void PackagesDependencyResolver::handleAlternateSet(const std::optional<seds::mo
 }
 
 void PackagesDependencyResolver::handleInterfaceDeclaration(
-        const seds::model::InterfaceDeclaration &interfaceDeclaration, std::set<Asn1Acn::ImportedType> &importedTypes)
+        const seds::model::InterfaceDeclaration &interfaceDeclaration, const seds::model::Component &component,
+        const seds::model::Package *package, std::set<Asn1Acn::ImportedType> &importedTypes)
 {
+    for (const auto &baseInterface : interfaceDeclaration.baseInterfaces()) {
+        handleTypeMapSet(baseInterface.genericTypeMapSet(), importedTypes);
+
+        const auto &baseInterfaceDeclaration =
+                findInterfaceDeclaration(baseInterface.type().nameStr(), component, package);
+        handleInterfaceDeclaration(baseInterfaceDeclaration, component, package, importedTypes);
+    }
+
     handleParameters(interfaceDeclaration.parameters(), importedTypes);
     handleCommands(interfaceDeclaration.commands(), importedTypes);
 }
