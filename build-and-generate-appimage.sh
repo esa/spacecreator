@@ -5,8 +5,6 @@
 export PROJECT_ROOT=$(pwd)
 export ENV_QTC_VERSION_SHORT=4.8
 export ENV_QTC_VERSION=4.8.2
-##export ENV_QTC_VERSION_SHORT=6.0
-##export ENV_QTC_VERSION=6.0.2
 export ENV_QT_VERSION=5.12.1
 export DOWNLOAD_DIR=/opt/qt-creator-dev
 export BUILD_DIR=${PROJECT_ROOT}/build
