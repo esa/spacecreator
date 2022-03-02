@@ -1,0 +1,4 @@
+COM-N7SPACE-PACKAGE3 DEFINITIONS ::= BEGIN
+MappedItem [size 8, encoding pos-int, endianness big]
+ParamItem [size 8, encoding pos-int, endianness big]
+END

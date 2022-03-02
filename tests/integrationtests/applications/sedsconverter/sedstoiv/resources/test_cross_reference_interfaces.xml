@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DataSheet xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/Package1">
+    <ComponentSet>
+      <Component name="Component">
+        <ProvidedInterfaceSet>
+            <Interface name="ProvidedInterface" type="com/n7space/Package2/ChildInterface">
+          </Interface>
+        </ProvidedInterfaceSet>
+      </Component>
+    </ComponentSet>
+  </Package>
+  <Package name="com/n7space/Package2">
+    <DeclaredInterfaceSet>
+      <Interface name="ChildInterface">
+      <BaseInterfaceSet>
+        <Interface type="com/n7space/Package3/ParentInterface">
+          <GenericTypeMapSet>
+            <GenericTypeMap name="GenericType" type="com/n7space/Package3/MappedItem" />
+          </GenericTypeMapSet>
+        </Interface>
+      </BaseInterfaceSet>
+      <ParameterSet>
+        <Parameter name="BaseParam" type="com/n7space/Package3/ParamItem" mode="sync" readOnly="true"/>
+      </ParameterSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+  </Package>
+  <Package name="com/n7space/Package3">
+    <DataTypeSet>
+      <IntegerDataType name="MappedItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="ParamItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="ParentInterface">
+        <GenericTypeSet>
+          <GenericType name="GenericType" />
+        </GenericTypeSet>
+        <CommandSet>
+          <Command name="SyncCommandSimpleMapping" mode="sync">
+            <Argument name="ArgumentSimpleMapping" type="GenericType" mode="in" />
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+  </Package>
+</DataSheet>
+

@@ -73,6 +73,17 @@ public:
      */
     virtual auto getDependencies() const -> std::set<ModelType> override;
 
+    /**
+     * @brief   Gets SEDS package from given vector
+     *
+     * @param   packageName     Package name
+     * @param   sedsPackages    SEDS packages
+     *
+     * @return  SEDS package
+     */
+    static auto getSedsPackage(const QString &packageName, const std::vector<seds::model::Package> &sedsPackages)
+            -> const seds::model::Package *;
+
 private:
     /**
      * @brief   Translate SEDS model

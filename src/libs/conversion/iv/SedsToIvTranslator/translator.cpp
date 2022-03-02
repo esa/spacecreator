@@ -134,4 +134,17 @@ void SedsToIvTranslator::translatePackage(const seds::model::Package &sedsPackag
     }
 }
 
+const seds::model::Package *SedsToIvTranslator::getSedsPackage(
+        const QString &packageName, const std::vector<seds::model::Package> &sedsPackages)
+{
+    const auto sedsPackage = std::find_if(sedsPackages.begin(), sedsPackages.end(),
+            [&](const auto &package) { return package.nameStr() == packageName; });
+    if (sedsPackage == sedsPackages.end()) {
+        auto message = QString("Unable to find package \"%1\"").arg(packageName);
+        throw TranslationException(std::move(message));
+    }
+
+    return &(*sedsPackage);
+}
+
 } // namespace conversion::iv::translator

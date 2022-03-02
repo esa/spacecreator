@@ -36,4 +36,9 @@ const QString &InterfaceDeclarationRef::nameStr() const
     return m_value.name().value();
 }
 
+const std::optional<QString> &InterfaceDeclarationRef::packageStr() const
+{
+    return m_value.namespaceName();
+}
+
 } // namespace seds::model

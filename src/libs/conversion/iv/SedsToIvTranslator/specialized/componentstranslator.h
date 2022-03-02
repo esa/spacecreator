@@ -25,6 +25,7 @@
 #include <asn1library/asn1/asn1model.h>
 #include <ivcore/ivinterface.h>
 #include <optional>
+#include <seds/SedsModel/interfaces/interfacedeclarationref.h>
 
 namespace Asn1Acn {
 class Definitions;
@@ -92,16 +93,18 @@ public:
      * It first searches in the component interface declarations. If no declaration was found
      * then it searches in the package interface declarations.
      *
-     * @param   name            Interface declaration name
-     * @param   sedsComponent   Component to search in
-     * @param   sedsPackage     Package to search in, if the search in the component fails
+     * @param   interfaceDeclarationRef     Interface declaration to find
+     * @param   sedsComponent               Component to search in
+     * @param   sedsPackage                 Package to search in, if the search in the component fails
+     * @param   sedsPackages                List of SEDS packages
      *
      * @throw UndeclaredInterfaceException  If interface declaration was not found
      *
      * @return  Found interface declarartion
      */
-    static auto findInterfaceDeclaration(const QString &name, const seds::model::Component &sedsComponent,
-            const seds::model::Package *sedsPackage) -> const seds::model::InterfaceDeclaration &;
+    static auto findInterfaceDeclaration(const seds::model::InterfaceDeclarationRef &interfaceDeclarationRef,
+            const seds::model::Component &sedsComponent, const seds::model::Package *sedsPackage,
+            const std::vector<seds::model::Package> &sedsPackages) -> const seds::model::InterfaceDeclaration &;
 
 private:
     /**

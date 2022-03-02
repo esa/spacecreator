@@ -246,7 +246,7 @@ static inline auto buildCommandMapInternal(Context &context, const QString &inte
 
     for (const auto &baseInterface : intefaceDeclaration.baseInterfaces()) {
         const auto &baseIntefaceDeclaration = ComponentsTranslator::findInterfaceDeclaration(
-                baseInterface.type().nameStr(), context.sedsComponent(), &context.sedsPackage());
+                baseInterface.type().nameStr(), context.sedsComponent(), &context.sedsPackage(), {});
         buildCommandMapInternal(context, interfaceName, baseIntefaceDeclaration);
     }
 }
@@ -268,7 +268,7 @@ auto StateMachineTranslator::buildCommandMap(Context &context) -> void
 {
     for (const auto &interface : context.sedsComponent().providedInterfaces()) {
         const auto &intefaceDeclaration = ComponentsTranslator::findInterfaceDeclaration(
-                interface.type().nameStr(), context.sedsComponent(), &context.sedsPackage());
+                interface.type().nameStr(), context.sedsComponent(), &context.sedsPackage(), {});
         buildCommandMapInternal(context, interface.nameStr(), intefaceDeclaration);
     }
 }
