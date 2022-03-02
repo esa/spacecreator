@@ -1,7 +1,10 @@
 COM-N7SPACE-PACKAGE1 DEFINITIONS ::= BEGIN
 IMPORTS
+AlternateItem1 FROM COM-N7SPACE-PACKAGE2
+AlternateItem2 FROM COM-N7SPACE-PACKAGE2
 AsyncItem FROM COM-N7SPACE-PACKAGE2
 AsyncItemArray FROM COM-N7SPACE-PACKAGE2
+DeterminantItem FROM COM-N7SPACE-PACKAGE2
 MappedAsyncItem FROM COM-N7SPACE-PACKAGE2
 MappedSyncItem FROM COM-N7SPACE-PACKAGE2
 ParameterItem FROM COM-N7SPACE-PACKAGE2
@@ -29,5 +32,20 @@ AsyncCommandSimpleMappingArray-Type ::= SEQUENCE
 {
     arrayArgumentSimpleMapping MappedAsyncItemArray-10(SIZE(10))
 }
+ProvidedInterface-AlternateGenericType ::= CHOICE
+{
+    concrete-AlternateItem1 INTEGER(0 .. 255),
+    concrete-AlternateItem2 INTEGER(0 .. 255)
+}
+AsyncCommandAlternateMapping-Type ::= SEQUENCE
+{
+    genericArgument2 ProvidedInterface-AlternateGenericType
+}
+ProvidedInterface-AlternateGenericTypeArray-10 ::= SEQUENCE (SIZE(10)) OF ProvidedInterface-AlternateGenericType
+AsyncCommandAlternateMappingArray-Type ::= SEQUENCE
+{
+    genericArgument2 ProvidedInterface-AlternateGenericTypeArray-10(SIZE(10))
+}
+
 END
 

@@ -296,8 +296,8 @@ void tst_SedsToIvTranslator::testGenericTypeMapping()
     const auto typeMapping = typeMapper.getMapping("GenericType3");
     QCOMPARE(typeMapping->genericTypeName, "GenericType3");
 
-    QVERIFY(typeMapping->determinantTypeName.has_value());
-    QCOMPARE(typeMapping->determinantTypeName.value(), "DeterminantType");
+    QVERIFY(typeMapping->determinantTypeRef.has_value());
+    QCOMPARE(typeMapping->determinantTypeRef->nameStr(), "DeterminantType");
 
     QCOMPARE(typeMapping->concreteTypes.size(), 3);
 

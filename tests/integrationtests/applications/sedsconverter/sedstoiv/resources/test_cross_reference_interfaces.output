@@ -27,6 +27,12 @@
 <Provided_Interface name="ProvidedInterface_AsyncCommandSimpleMappingArray_Pi" layer="default">
     <Input_Parameter name="InputParam" type="AsyncCommandSimpleMappingArray_Type" encoding="ACN"/>
 </Provided_Interface>
+<Provided_Interface name="ProvidedInterface_AsyncCommandAlternateMapping_Pi" layer="default">
+    <Input_Parameter name="InputParam" type="AsyncCommandAlternateMapping_Type" encoding="ACN"/>
+</Provided_Interface>
+<Provided_Interface name="ProvidedInterface_AsyncCommandAlternateMappingArray_Pi" layer="default">
+    <Input_Parameter name="InputParam" type="AsyncCommandAlternateMappingArray_Type" encoding="ACN"/>
+</Provided_Interface>
 
     <Implementations>
         <Implementation name="default" language="SDL"/>

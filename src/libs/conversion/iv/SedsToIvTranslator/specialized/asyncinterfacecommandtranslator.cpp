@@ -33,6 +33,7 @@
 #include <iostream>
 
 using conversion::asn1::translator::SedsToAsn1Translator;
+using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator {
@@ -211,6 +212,12 @@ void AsyncInterfaceCommandTranslator::createBundledTypeComponent(
     std::unique_ptr<Asn1Acn::SequenceComponent> sequenceComponent;
 
     if (argumentData.isDeterminant) {
+        if (typeRef.packageStr()) {
+            const auto qualifiedName =
+                    QString("%1.%2").arg(Escaper::escapeAsn1PackageName(*typeRef.packageStr())).arg(typeName);
+            sequenceComponentType->setTypeName(qualifiedName);
+        }
+
         sequenceComponent =
                 std::make_unique<Asn1Acn::AcnSequenceComponent>(name, name, std::move(sequenceComponentType));
     } else {
@@ -304,7 +311,7 @@ AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::h
     // If all of the concrete types are the same, then we can handle this a simple mapping
     const auto firstConcreteTypeRef = concreteTypes.front().typeRef;
     const auto allTheSame = std::all_of(concreteTypes.begin(), concreteTypes.end(),
-            [&](const auto &concreteType) { return concreteType.typeRef.nameStr() == firstConcreteTypeRef; });
+            [&](const auto &concreteType) { return concreteType.typeRef == firstConcreteTypeRef; });
 
     if (allTheSame) {
         if (firstConcreteTypeRef == determinantTypeRef) {
@@ -314,6 +321,7 @@ AsyncInterfaceCommandTranslator::ArgumentData AsyncInterfaceCommandTranslator::h
             return { argumentName, argumentTypeRef, std::nullopt, std::nullopt, false };
         }
     } else {
+
         // Try to find an argument that is a determinant
         // Limitation is that the determinant has to be present before any of the field that will be using it
         const auto foundDeterminant = std::find_if(arguments.begin(), arguments.end(),
@@ -353,17 +361,34 @@ QString AsyncInterfaceCommandTranslator::createAlternateType(const QString &gene
 {
     auto name = InterfaceTranslatorHelper::buildAlternateTypeName(m_sedsInterfaceName, genericTypeName);
 
+    const auto existingAlternateType = m_asn1Definitions->type(name);
+    if (existingAlternateType != nullptr) {
+        return name;
+    }
+
     auto choice = std::make_unique<Asn1Acn::Types::Choice>(name);
 
     // Each of the alternative is present-when determinant has given value
     for (const auto &concreteType : concreteTypes) {
-        const auto asn1ConcreteType = m_asn1Definitions->type(concreteType.typeRef.nameStr())->type();
+        const auto &concreteTypeRef = concreteType.typeRef;
+
+        const auto asn1Definitions = concreteTypeRef.packageStr()
+                ? SedsToAsn1Translator::getAsn1Definitions(*concreteTypeRef.packageStr(), m_asn1Files)
+                : m_asn1Definitions;
+
+        const auto &concreteTypeName = concreteTypeRef.nameStr();
+        const auto asn1ConcreteType = asn1Definitions->type(concreteTypeName);
+
+        if (!asn1ConcreteType || !asn1ConcreteType->type()) {
+            throw MissingAsn1TypeDefinitionException(concreteTypeName);
+        }
+
         const auto presentWhen = QString("determinant==%1").arg(*concreteType.determinantValue);
 
         const auto choiceAlternativeName = QString("concrete-%1").arg(concreteType.typeRef.nameStr());
         auto choiceAlternative = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(choiceAlternativeName,
                 choiceAlternativeName, choiceAlternativeName, choiceAlternativeName, presentWhen,
-                Asn1Acn::SourceLocation(), asn1ConcreteType->clone());
+                Asn1Acn::SourceLocation(), asn1ConcreteType->type()->clone());
 
         choice->addComponent(std::move(choiceAlternative));
     }

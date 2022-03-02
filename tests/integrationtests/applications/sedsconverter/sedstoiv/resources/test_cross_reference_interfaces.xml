@@ -14,6 +14,8 @@
         <GenericTypeSet>
           <GenericType name="SyncGenericType" />
           <GenericType name="AsyncGenericType" />
+          <GenericType name="AlternateGenericType1" />
+          <GenericType name="DeterminantGenericType" />
         </GenericTypeSet>
         <ParameterSet>
           <Parameter name="FunParameter" type="com/n7space/Package2/ParameterItem" mode="sync" readOnly="true"/>
@@ -59,6 +61,18 @@
               </ArrayDimensions>
             </Argument>
           </Command>
+          <Command name="AsyncCommandAlternateMapping" mode="async">
+            <Argument name="GenericArgument1" type="DeterminantGenericType" mode="in" />
+            <Argument name="GenericArgument2" type="AlternateGenericType" mode="in" />
+          </Command>
+          <Command name="AsyncCommandAlternateMappingArray" mode="async">
+            <Argument name="GenericArgument1" type="DeterminantGenericType" mode="in" />
+            <Argument name="GenericArgument2" type="AlternateGenericType" mode="in">
+              <ArrayDimensions>
+                <Dimension size="10" />
+              </ArrayDimensions>
+            </Argument>
+          </Command>
         </CommandSet>
       </Interface>
     </DeclaredInterfaceSet>
@@ -69,6 +83,16 @@
             <GenericTypeMapSet>
                 <GenericTypeMap name="SyncGenericType" type="com/n7space/Package2/MappedSyncItem" />
                 <GenericTypeMap name="AsyncGenericType" type="com/n7space/Package2/MappedAsyncItem" />
+                <AlternateSet>
+                  <Alternate>
+                    <GenericTypeMap name="DeterminantGenericType" type="com/n7space/Package2/DeterminantItem" fixedValue="0" />
+                    <GenericTypeMap name="AlternateGenericType" type="com/n7space/Package2/AlternateItem1" />
+                  </Alternate>
+                  <Alternate>
+                    <GenericTypeMap name="DeterminantGenericType" type="com/n7space/Package2/DeterminantItem" fixedValue="1" />
+                    <GenericTypeMap name="AlternateGenericType" type="com/n7space/Package2/AlternateItem2" />
+                  </Alternate>
+                </AlternateSet>
             </GenericTypeMapSet>
           </Interface>
         </ProvidedInterfaceSet>
@@ -114,6 +138,24 @@
         </Range>
       </IntegerDataType>
       <IntegerDataType name="MappedAsyncItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="DeterminantItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="1" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="AlternateItem1">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="AlternateItem2">
         <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
         <Range>
           <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />

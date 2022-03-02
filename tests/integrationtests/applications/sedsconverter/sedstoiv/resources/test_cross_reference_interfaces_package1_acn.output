@@ -20,5 +20,21 @@ AsyncCommandSimpleMappingArray-Type []
 {
     arrayArgumentSimpleMapping []
 }
+ProvidedInterface-AlternateGenericType <DeterminantItem:determinant> []
+{
+    concrete-AlternateItem1 [size 8, encoding pos-int, endianness big, present-when determinant==0],
+    concrete-AlternateItem2 [size 8, encoding pos-int, endianness big, present-when determinant==1]
+}
+AsyncCommandAlternateMapping-Type []
+{
+    genericArgument1 COM-N7SPACE-PACKAGE2.DeterminantItem [],
+    genericArgument2 <genericArgument1>[]
+}
+ProvidedInterface-AlternateGenericTypeArray-10 []
+AsyncCommandAlternateMappingArray-Type []
+{
+    genericArgument1 COM-N7SPACE-PACKAGE2.DeterminantItem [],
+    genericArgument2 <genericArgument1>[]
+}
 END
 
