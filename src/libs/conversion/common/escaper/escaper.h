@@ -44,6 +44,8 @@ public:
      */
     static auto escapeSdlName(QString name) -> QString;
 
+    static auto escapeSdlVariableName(QString name) -> QString;
+
     /**
      * @brief   Convert the input name to an id acceptable in InterfaceView
      *

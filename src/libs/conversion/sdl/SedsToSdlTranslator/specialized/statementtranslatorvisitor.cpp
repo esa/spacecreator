@@ -327,7 +327,7 @@ auto StatementTranslatorVisitor::translateVariableReference(const QString &refer
         if (isNumber) {
             escaped += identifier.toStdString();
         } else {
-            escaped += Escaper::escapeAsn1FieldName(identifier).toStdString();
+            escaped += Escaper::escapeSdlVariableName(identifier).toStdString();
         }
     }
     escaped.append(i, end);

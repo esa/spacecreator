@@ -421,7 +421,7 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineInputsWithVariables()
 
     const auto unpackAction = stateA->inputs()[0]->transition()->actions()[0].get();
     const auto unpack = dynamic_cast<const ::sdl::Task *>(unpackAction);
-    QCOMPARE(unpack->content(), "var1 := io_If1_Cmd1_Pi.arg1");
+    QCOMPARE(unpack->content(), "Var1 := Io_if1_cmd1_pi.Arg1");
 
     const auto nextStateAction = stateA->inputs()[0]->transition()->actions()[1].get();
     const auto nextState = dynamic_cast<const ::sdl::NextState *>(nextStateAction);
@@ -472,12 +472,12 @@ void tst_SedsToSdlTranslator::testTranslateActivity()
     const auto &procedure = process.procedures()[0];
     QCOMPARE(procedure->name(), "activity1");
     QCOMPARE(procedure->parameters().size(), 1);
-    QCOMPARE(procedure->parameters()[0]->name(), "arg1");
+    QCOMPARE(procedure->parameters()[0]->name(), "Arg1");
     const auto &transition = procedure->transition();
     QCOMPARE(transition->actions().size(), 1);
     const auto action = dynamic_cast<::sdl::Task *>(transition->actions()[0].get());
     QVERIFY(action);
-    QCOMPARE(action->content(), "var1 := 1969");
+    QCOMPARE(action->content(), "Var1 := 1969");
 }
 
 /// \SRS  ETB-FUN-2550
@@ -556,7 +556,7 @@ void tst_SedsToSdlTranslator::testTranslateAddOperationOnValue()
     operation.push_back(std::move(value));
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "a + 12");
+    QCOMPARE(result, "A + 12");
 }
 
 /// \SRS  ETB-FUN-2220
@@ -570,7 +570,7 @@ void tst_SedsToSdlTranslator::testTranslateAddOperation()
     operation.push_back(seds::model::VariableRef("b"));
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "a + b");
+    QCOMPARE(result, "A + B");
 }
 
 /// \SRS  ETB-FUN-2230
@@ -584,7 +584,7 @@ void tst_SedsToSdlTranslator::testTranslateSubOperation()
     operation.push_back(seds::model::VariableRef("b"));
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "a - b");
+    QCOMPARE(result, "A - B");
 }
 
 /// \SRS  ETB-FUN-2240
@@ -598,7 +598,7 @@ void tst_SedsToSdlTranslator::testTranslateMulOperation()
     operation.push_back(seds::model::VariableRef("b"));
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "a * b");
+    QCOMPARE(result, "A * B");
 }
 
 /// \SRS  ETB-FUN-2250
@@ -612,7 +612,7 @@ void tst_SedsToSdlTranslator::testTranslateDivOperation()
     operation.push_back(seds::model::VariableRef("b"));
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "a / b");
+    QCOMPARE(result, "A / B");
 }
 
 /// \SRS  ETB-FUN-2260
@@ -626,7 +626,7 @@ void tst_SedsToSdlTranslator::testTranslateModOperation()
     operation.push_back(seds::model::VariableRef("b"));
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "mod(a, b)");
+    QCOMPARE(result, "mod(A, B)");
 }
 
 /// \SRS  ETB-FUN-2270
@@ -640,7 +640,7 @@ void tst_SedsToSdlTranslator::testTranslatePowOperation()
     operation.push_back(seds::model::VariableRef("b"));
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "power(a, b)");
+    QCOMPARE(result, "power(A, B)");
 }
 
 /// \SRS  ETB-FUN-2280
@@ -653,7 +653,7 @@ void tst_SedsToSdlTranslator::testTranslateInvOperation()
     operation.push_back(seds::model::VariableRef("a"));
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "1/a");
+    QCOMPARE(result, "1/A");
 }
 
 /// \SRS  ETB-FUN-2290
@@ -666,7 +666,7 @@ void tst_SedsToSdlTranslator::testTranslateTanOperation()
     operation.push_back(seds::model::VariableRef("a"));
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "tan(a)");
+    QCOMPARE(result, "tan(A)");
 }
 
 /// \SRS  ETB-FUN-2300
@@ -679,7 +679,7 @@ void tst_SedsToSdlTranslator::testTranslateSinOperation()
     operation.push_back(seds::model::VariableRef("a"));
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "sin(a)");
+    QCOMPARE(result, "sin(A)");
 }
 
 /// \SRS  ETB-FUN-2310
@@ -692,7 +692,7 @@ void tst_SedsToSdlTranslator::testTranslateCosOperation()
     operation.push_back(seds::model::VariableRef("a"));
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "cos(a)");
+    QCOMPARE(result, "cos(A)");
 }
 
 /// \SRS  ETB-FUN-2330
@@ -705,7 +705,7 @@ void tst_SedsToSdlTranslator::testTranslateCeilOperation()
     operation.push_back(seds::model::VariableRef("a"));
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "ceil(a)");
+    QCOMPARE(result, "ceil(A)");
 }
 
 /// \SRS  ETB-FUN-2340
@@ -718,7 +718,7 @@ void tst_SedsToSdlTranslator::testTranslateFloorOperation()
     operation.push_back(seds::model::VariableRef("a"));
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "floor(a)");
+    QCOMPARE(result, "floor(A)");
 }
 
 /// \SRS  ETB-FUN-2350
@@ -731,7 +731,7 @@ void tst_SedsToSdlTranslator::testTranslateRoundOperation()
     operation.push_back(seds::model::VariableRef("a"));
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "round(a)");
+    QCOMPARE(result, "round(A)");
 }
 
 /// \SRS  ETB-FUN-2360
@@ -744,7 +744,7 @@ void tst_SedsToSdlTranslator::testTranslateAbsOperation()
     operation.push_back(seds::model::VariableRef("a"));
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "abs(a)");
+    QCOMPARE(result, "abs(A)");
 }
 
 /// \SRS  ETB-FUN-2370
@@ -758,7 +758,7 @@ void tst_SedsToSdlTranslator::testTranslateMinOperation()
     operation.push_back(seds::model::VariableRef("b"));
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "min(a, b)");
+    QCOMPARE(result, "min(A, B)");
 }
 
 /// \SRS  ETB-FUN-2380
@@ -772,7 +772,7 @@ void tst_SedsToSdlTranslator::testTranslateMaxOperation()
     operation.push_back(seds::model::VariableRef("b"));
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "max(a, b)");
+    QCOMPARE(result, "max(A, B)");
 }
 
 /// \SRS  ETB-FUN-2390
@@ -785,7 +785,7 @@ void tst_SedsToSdlTranslator::testTranslateSqrtOperation()
     operation.push_back(seds::model::VariableRef("a"));
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "sqrt(a)");
+    QCOMPARE(result, "sqrt(A)");
 }
 
 /// \SRS  ETB-FUN-2220
@@ -819,7 +819,7 @@ void tst_SedsToSdlTranslator::testTranslateComplexOperation()
 
     const auto result = MathOperationTranslator::translateOperation(operation);
 
-    QCOMPARE(result, "(((s1 - s2) * m2) + a2) / d2");
+    QCOMPARE(result, "(((S1 - S2) * M2) + A2) / D2");
 }
 
 static inline auto translateAndVerifyActivityContainsAction(const std::unique_ptr<seds::model::SedsModel> model,
@@ -869,7 +869,7 @@ void tst_SedsToSdlTranslator::testTranslateAssignment()
                                     .build())
                     .build();
 
-    translateAndVerifyActivityContainsAction(std::move(sedsModel), "activity1", "a := 12");
+    translateAndVerifyActivityContainsAction(std::move(sedsModel), "activity1", "A := 12");
 }
 
 /// \SRS  ETB-FUN-2210
@@ -891,7 +891,7 @@ void tst_SedsToSdlTranslator::testTranslateMathOperation()
                                            .build())
                     .build();
 
-    translateAndVerifyActivityContainsAction(std::move(sedsModel), "activity1", "x := sin(y)");
+    translateAndVerifyActivityContainsAction(std::move(sedsModel), "activity1", "X := sin(Y)");
 }
 
 /// \SRS  ETB-FUN-2200
@@ -914,7 +914,7 @@ void tst_SedsToSdlTranslator::testTranslatePolynomialCalibrator()
                                            .build())
                     .build();
 
-    translateAndVerifyActivityContainsAction(std::move(sedsModel), "activity1", "x := 2 + 4 * y * y + 5 * power(y, 4)");
+    translateAndVerifyActivityContainsAction(std::move(sedsModel), "activity1", "X := 2 + 4 * Y * Y + 5 * power(Y, 4)");
 }
 
 /// \SRS  ETB-FUN-2430
@@ -970,7 +970,7 @@ void tst_SedsToSdlTranslator::testTranslateActivityCallWithReference()
     QCOMPARE(call->arguments().size(), 1);
     const auto &argument = call->arguments()[0];
     QVERIFY(std::holds_alternative<std::unique_ptr<VariableReference>>(argument));
-    QCOMPARE(std::get<std::unique_ptr<VariableReference>>(argument)->declaration()->name(), "x");
+    QCOMPARE(std::get<std::unique_ptr<VariableReference>>(argument)->declaration()->name(), "X");
 }
 
 /// \SRS  ETB-FUN-2430
@@ -1082,8 +1082,8 @@ void tst_SedsToSdlTranslator::testTranslateSendCommand()
     const auto &process = sdlModel->processes()[0];
 
     QCOMPARE(process.variables().size(), 2);
-    QCOMPARE(process.variables()[0]->name(), "x");
-    QCOMPARE(process.variables()[1]->name(), "io_If1_Cmd1_Ri");
+    QCOMPARE(process.variables()[0]->name(), "X");
+    QCOMPARE(process.variables()[1]->name(), "Io_if1_cmd1_ri");
 
     QCOMPARE(process.procedures().size(), 1);
     const auto &procedure = process.procedures()[0];
@@ -1093,12 +1093,12 @@ void tst_SedsToSdlTranslator::testTranslateSendCommand()
 
     const auto pack = dynamic_cast<::sdl::Task *>(transition->actions()[0].get());
     QVERIFY(pack);
-    QCOMPARE(pack->content(), "io_If1_Cmd1_Ri.arg1 := x");
+    QCOMPARE(pack->content(), "Io_if1_cmd1_ri.Arg1 := X");
 
     const auto output = dynamic_cast<::sdl::Output *>(transition->actions()[1].get());
     QVERIFY(output);
     QCOMPARE(output->name(), "If1_Cmd1_Ri");
-    QCOMPARE(output->parameter()->declaration()->name(), "io_If1_Cmd1_Ri");
+    QCOMPARE(output->parameter()->declaration()->name(), "Io_if1_cmd1_ri");
 }
 
 /// \SRS  ETB-FUN-2530
@@ -1189,13 +1189,13 @@ void tst_SedsToSdlTranslator::testTranslateOnEntryAndOnExit()
 
 void tst_SedsToSdlTranslator::testTranslateVariableReferences()
 {
-    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("XXX"), "xXX");
-    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("aa[bb]"), "aa(bb)");
-    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("aa.bb"), "aa.bb");
-    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("a1[2]"), "a1(2)");
-    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("111a[2]"), "a(2)");
-    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("111&^%@a[2]"), "a(2)");
-    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("a[b[c.d]]"), "a(b(c.d))");
+    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("XXX"), "Xxx");
+    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("aa[bb]"), "Aa(Bb)");
+    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("aa.bb"), "Aa.Bb");
+    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("a1[2]"), "A1(2)");
+    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("111a[2]"), "A(2)");
+    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("111&^%@a[2]"), "A(2)");
+    QCOMPARE(StatementTranslatorVisitor::translateVariableReference("a[b[c.d]]"), "A(B(C.D))");
 }
 
 } // namespace conversion::sdl::test

@@ -60,7 +60,7 @@ auto MathOperationTranslator::translateMutableExpression(Expression &expression,
                                   },
                               [&outIsComplexValue](const seds::model::VariableRef &value) {
                                   outIsComplexValue = false;
-                                  return Escaper::escapeAsn1FieldName(value.value().value());
+                                  return Escaper::escapeSdlVariableName(value.value().value());
                               },
                               [&outIsComplexValue, &expression](const seds::model::Operator &value) {
                                   return translateOperator(value, expression, outIsComplexValue);

@@ -44,7 +44,7 @@ using conversion::translator::TranslationException;
 
 namespace conversion::sdl::translator {
 
-static const QString IO_VARIABLE_PATTERN = "io_%1";
+static const QString IO_VARIABLE_PATTERN = "IO_%1";
 static const QString FALSE_LITERAL = "False";
 static const QString TRUE_LITERAL = "True";
 static const QString TIMER_NAME_PATTERN = "timer_%1";
@@ -214,8 +214,8 @@ static inline auto generateProcedureForSyncCommand(Context &context, const seds:
 
     const auto &primitive = std::get<seds::model::OnCommandPrimitive>(transitions[0]->primitive());
     for (const auto &argument : primitive.argumentValues()) {
-        const auto targetVariableName = Escaper::escapeAsn1FieldName(argument.outputVariableRef().value().value());
-        const auto fieldName = Escaper::escapeAsn1FieldName(argument.name().value());
+        const auto targetVariableName = Escaper::escapeSdlVariableName(argument.outputVariableRef().value().value());
+        const auto fieldName = Escaper::escapeSdlVariableName(argument.name().value());
         transition->addAction(
                 std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(targetVariableName, fieldName)));
     }
@@ -253,7 +253,7 @@ auto StateMachineTranslator::setInitialVariableValues(
 {
     for (const auto &variable : variables) {
         if (variable.initialValue().has_value()) {
-            const auto name = Escaper::escapeAsn1FieldName(variable.nameStr());
+            const auto name = Escaper::escapeSdlVariableName(variable.nameStr());
             const auto value = variable.initialValue()->value();
             auto assignment = std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(name, value));
             transition->addAction(std::move(assignment));
@@ -320,7 +320,7 @@ auto StateMachineTranslator::translateVariables(
         Context &context, const seds::model::ComponentImplementation::VariableSet &variables) -> void
 {
     for (const auto &variable : variables) {
-        const auto variableName = Escaper::escapeAsn1FieldName(variable.nameStr());
+        const auto variableName = Escaper::escapeSdlVariableName(variable.nameStr());
         const auto variableTypeName = Escaper::escapeAsn1TypeName(variable.type().nameStr());
         // TODO implement check for types imported from other packages
         auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(context.sedsPackage(), context.asn1Model());
@@ -370,7 +370,7 @@ auto StateMachineTranslator::createExternalProcedures(Context &context) -> void
 
 auto StateMachineTranslator::ioVariableName(const QString &interfaceName) -> QString
 {
-    return IO_VARIABLE_PATTERN.arg(interfaceName);
+    return Escaper::escapeSdlVariableName(IO_VARIABLE_PATTERN.arg(interfaceName));
 }
 
 auto StateMachineTranslator::timerName(const QString &stateName) -> QString
@@ -429,7 +429,7 @@ auto StateMachineTranslator::getParameterInterface(ivm::IVFunction *function, co
 auto StateMachineTranslator::createParameterSyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
         ::sdl::Process *sdlProcess, const ParameterType type) -> void
 {
-    const auto paramName = Escaper::escapeAsn1FieldName(interface->params()[0].name());
+    const auto paramName = Escaper::escapeSdlVariableName(interface->params()[0].name());
     auto transition = std::make_unique<::sdl::Transition>();
     auto procedure = std::make_unique<::sdl::Procedure>(interface->title());
 
@@ -447,7 +447,8 @@ auto StateMachineTranslator::createParameterSyncPi(ivm::IVInterface *interface, 
     }
     auto parameter = std::make_unique<::sdl::ProcedureParameter>(
             paramName, interface->params()[0].paramTypeName(), parameterDirection);
-    const auto action = actionTemplate.arg(paramName, Escaper::escapeAsn1FieldName(map.variableRef().value().value()));
+    const auto action =
+            actionTemplate.arg(paramName, Escaper::escapeSdlVariableName(map.variableRef().value().value()));
     transition->addAction(std::make_unique<::sdl::Task>("", action));
     procedure->addParameter(std::move(parameter));
     procedure->setTransition(std::move(transition));
@@ -482,7 +483,7 @@ auto StateMachineTranslator::createParameterAsyncPi(ivm::IVInterface *interface,
             throw TranslationException(QString("Reception variable %1 not found").arg(variableName));
         }
         input->addParameter(std::make_unique<::sdl::VariableReference>((*variableIterator).get()));
-        const auto targetVariableName = Escaper::escapeAsn1FieldName(map.variableRef().value().value());
+        const auto targetVariableName = Escaper::escapeSdlVariableName(map.variableRef().value().value());
 
         auto transition = std::make_unique<::sdl::Transition>();
         auto transitionPtr = transition.get();
@@ -607,8 +608,9 @@ auto StateMachineTranslator::translatePrimitive(Context &context, const seds::mo
         input->addParameter(std::make_unique<::sdl::VariableReference>((*variableIterator).get()));
 
         for (const auto &argument : command.argumentValues()) {
-            const auto targetVariableName = Escaper::escapeAsn1FieldName(argument.outputVariableRef().value().value());
-            const auto fieldName = Escaper::escapeAsn1FieldName(argument.name().value());
+            const auto targetVariableName =
+                    Escaper::escapeSdlVariableName(argument.outputVariableRef().value().value());
+            const auto fieldName = Escaper::escapeSdlVariableName(argument.name().value());
             unpackingActions.push_back(std::make_unique<::sdl::Task>(
                     "", QString("%1 := %2.%3").arg(targetVariableName, variableName, fieldName)));
         }
@@ -656,13 +658,13 @@ auto StateMachineTranslator::translatePrimitive(Context &context, const seds::mo
                     && m.parameter().value() == parameter.parameter().value();
         });
         if (map != parameterMaps.end()) {
-            const auto targetVariableName = Escaper::escapeAsn1FieldName(map->variableRef().value().value());
+            const auto targetVariableName = Escaper::escapeSdlVariableName(map->variableRef().value().value());
             unpackingActions.push_back(
                     std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(targetVariableName, variableName)));
         }
         // Handle variable ref
         if (parameter.variableRef().has_value()) {
-            const auto targetVariableName = Escaper::escapeAsn1FieldName((*parameter.variableRef()).value().value());
+            const auto targetVariableName = Escaper::escapeSdlVariableName((*parameter.variableRef()).value().value());
             unpackingActions.push_back(
                     std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(targetVariableName, variableName)));
         }

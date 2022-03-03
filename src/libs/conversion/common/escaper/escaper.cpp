@@ -35,6 +35,16 @@ QString Escaper::escapeSdlName(QString name)
     return name;
 }
 
+QString Escaper::escapeSdlVariableName(QString name)
+{
+    escapeName(name, '_');
+
+    name = name.toLower();
+    name[0] = name[0].toUpper();
+
+    return name;
+}
+
 QString Escaper::escapeIvName(QString name)
 {
     escapeName(name, '_');
