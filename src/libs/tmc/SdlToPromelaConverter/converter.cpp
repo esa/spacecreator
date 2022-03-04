@@ -42,6 +42,7 @@ bool SdlToPromelaConverter::convertSdl(const QList<QFileInfo> &inputSdlFiles, co
     qDebug() << "    " << outputFile.absoluteFilePath();
 
     QStringList arguments = QStringList();
+    arguments.append("--sdl");
     for (const QFileInfo &fileInfo : inputSdlFiles) {
         arguments.append(fileInfo.absoluteFilePath());
     }

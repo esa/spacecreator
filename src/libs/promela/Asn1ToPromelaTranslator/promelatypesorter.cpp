@@ -101,11 +101,16 @@ void PromelaTypeSorter::populateTypeDependencies(const PromelaModel &promelaMode
     // this is required, because dependencies might be other objects
     for (const Utype &utype : promelaModel.getUtypes()) {
         for (const Declaration &declaration : utype.getFields()) {
-            if (!declaration.getType().isUtypeReference()) {
-                continue;
+            QString name;
+            if (declaration.getType().isUtypeReference()) {
+                // if field is another utype: add it to the dependencies set
+                name = declaration.getType().getUtypeReference().getName();
+            } else if (declaration.getType().isArrayType()) {
+                if (!std::holds_alternative<UtypeRef>(declaration.getType().getArrayType().getType())) {
+                    continue;
+                }
+                name = std::get<UtypeRef>(declaration.getType().getArrayType().getType()).getName();
             }
-            // if field is another utype: add it to the dependencies set
-            const QString &name = declaration.getType().getUtypeReference().getName();
             if (dependencies.find(name) != dependencies.end()) {
                 dependencies[utype.getName()].insert(name);
             } else if (typeAliasMap.count(name)) {

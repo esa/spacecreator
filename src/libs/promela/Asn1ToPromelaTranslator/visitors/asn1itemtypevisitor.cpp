@@ -331,7 +331,7 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
 
-    Asn1ItemTypeVisitor itemTypeVisitor(m_promelaModel, utypeName, "item", m_enhancedSpinSupport);
+    Asn1ItemTypeVisitor itemTypeVisitor(m_promelaModel, utypeName, "elem", m_enhancedSpinSupport);
     type.itemsType()->accept(itemTypeVisitor);
     DataType dataType = itemTypeVisitor.getResultDataType().value();
 
@@ -427,7 +427,7 @@ void Asn1ItemTypeVisitor::visit(const UserdefinedType &type)
 QString Asn1ItemTypeVisitor::constructTypeName(QString name)
 {
     if (m_baseTypeName.has_value()) {
-        return QString("%1_%2").arg(m_baseTypeName.value()).arg(Escaper::escapePromelaName(m_name));
+        return QString("%1_%2").arg(m_baseTypeName.value()).arg(Escaper::escapePromelaName(name));
     }
     return Escaper::escapePromelaName(std::move(name));
 }

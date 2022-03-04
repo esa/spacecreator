@@ -357,7 +357,7 @@ bool TmcConverter::createEnvGenerationInlines(
     options.add(PromelaOptions::outputFilepath, outputFilepath.absoluteFilePath());
 
     for (const QString &datatype : envDatatypes) {
-        options.add(PromelaOptions::asn1ValueGeneration, datatype);
+        options.add(PromelaOptions::asn1ValueGenerationForType, datatype);
     }
 
     ModelType sourceModelType = ModelType::Asn1;
