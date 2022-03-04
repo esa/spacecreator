@@ -566,26 +566,6 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     // Output folder was generated and it is not empty
     statusBar()->showMessage("Scenarios were found!", 6000);
 
-    // CREATE scn2msc.sh
-    QDir::setCurrent(this->outputPath+"/");
-    // TODO remove python3 and script path
-    QString scn2mscCmd = "python3 /home/taste/tool-src/if-model-checking/modules/scn2msc/scn2msc.py *.scn " + this->configurationsPath + "/.mcconfig.xml";
-    QFile callScn2MscFile("scn2msc.sh");
-    if(callScn2MscFile.open(QIODevice::ReadWrite)){
-        QTextStream stream(&callScn2MscFile);
-        stream << "#!/bin/bash" << endl;
-        stream << scn2mscCmd << endl;
-    } else {
-        QMessageBox::information(this, tr("Call IF"),
-                             "Error opening scn2msc.sh!");
-    }
-    // CALL scn2msc.sh
-    if (QProcess::execute("sh scn2msc.sh") != 0) {
-        QMessageBox::warning(this, tr("Call IF"),
-                             "Error executing scn2msc.sh!");
-
-    }
-
     // ask user to save scenarios
     ret = QMessageBox::warning(this, tr("Call IF"),
                                    "Do you want to copy somewhere the generated scenarios?",
@@ -604,8 +584,6 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
                                                              QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
         }
         if(!saveDirectoryName.isEmpty()){
-            // discard scn2msc.sh
-            QProcess::execute("rm -f scn2msc.sh");
             // copy output directory
             if (QProcess::execute("cp -r . " + saveDirectoryName) != 0) {
                 QMessageBox::warning(this, tr("Call IF"),
