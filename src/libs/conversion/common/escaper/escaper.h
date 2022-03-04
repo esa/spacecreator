@@ -44,6 +44,13 @@ public:
      */
     static auto escapeSdlName(QString name) -> QString;
 
+    /**
+     * @brief   Convert the input name to an id acceptable as an SDL variable name
+     *
+     * @param   name    input name
+     *
+     * @return  Name for SDL variable
+     */
     static auto escapeSdlVariableName(QString name) -> QString;
 
     /**
