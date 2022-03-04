@@ -44,7 +44,7 @@ using conversion::translator::TranslationException;
 
 namespace conversion::sdl::translator {
 
-static const QString IO_VARIABLE_PATTERN = "IO_%1";
+static const QString IO_VARIABLE_PATTERN = "io_%1";
 static const QString FALSE_LITERAL = "False";
 static const QString TRUE_LITERAL = "True";
 static const QString TIMER_NAME_PATTERN = "timer_%1";
