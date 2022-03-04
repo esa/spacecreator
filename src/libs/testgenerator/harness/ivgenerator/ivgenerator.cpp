@@ -32,14 +32,14 @@
 
 namespace testgenerator {
 
-const QVector<qint32> Coordinates::Function::testDriver = { 75, 184, 275, 264 };
-const QVector<qint32> Coordinates::Function::functionUnderTest = { 462, 106, 662, 186 };
+const QVector<qint32> IvCoordinates::Function::testDriver = { 75, 184, 275, 264 };
+const QVector<qint32> IvCoordinates::Function::functionUnderTest = { 462, 106, 662, 186 };
 
-const QVector<qint32> Coordinates::Interface::startTestIf = { 123, 184 };
-const QVector<qint32> Coordinates::Interface::interfaceUnderTestRi = { 275, 218 };
-const QVector<qint32> Coordinates::Interface::interfaceUnderTestPi = { 462, 142 };
+const QVector<qint32> IvCoordinates::Interface::startTestIf = { 123, 184 };
+const QVector<qint32> IvCoordinates::Interface::interfaceUnderTestRi = { 275, 218 };
+const QVector<qint32> IvCoordinates::Interface::interfaceUnderTestPi = { 462, 142 };
 
-const QVector<qint32> Coordinates::connection = { 281, 218, 370, 218, 459, 142 };
+const QVector<qint32> IvCoordinates::connection = { 281, 218, 370, 218, 459, 142 };
 
 const QString IvGenerator::startTestInterfaceName = "StartTest";
 const QString IvGenerator::testDriverFunctionName = "TestDriver";
@@ -109,7 +109,7 @@ auto IvGenerator::makeTestDriverFunction(ivm::IVModel *const model) -> ivm::IVFu
     function->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::language), "C");
     function->setDefaultImplementation("default");
 
-    setObjectCoordinates(function, Coordinates::Function::testDriver);
+    setObjectCoordinates(function, IvCoordinates::Function::testDriver);
 
     return function;
 }
@@ -126,7 +126,7 @@ auto IvGenerator::makeFunctionUnderTest(ivm::IVModel *const model, ivm::IVInterf
     for (const auto &entityAttribute : ifaceUnderTest->function()->entityAttributes()) {
         function->setEntityAttribute(entityAttribute.name(), entityAttribute.value().toString());
     }
-    setObjectCoordinates(function, Coordinates::Function::functionUnderTest);
+    setObjectCoordinates(function, IvCoordinates::Function::functionUnderTest);
 
     return function;
 }
@@ -148,7 +148,7 @@ auto IvGenerator::makeStartTestIface(ivm::IVFunction *const testDriverFunction) 
     iface->setEntityAttribute("priority", "1");
     iface->setEntityAttribute("dispatch_offset", "0");
     iface->setEntityAttribute("wcet", "0");
-    setObjectCoordinates(iface, Coordinates::Interface::startTestIf);
+    setObjectCoordinates(iface, IvCoordinates::Interface::startTestIf);
 
     return iface;
 }
@@ -168,7 +168,7 @@ auto IvGenerator::makeTestDriverRequiredIface(
     iface->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::Autonamed), "true");
     iface->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::InheritPI), "true");
     iface->setEntityAttribute("wcet", "0");
-    setObjectCoordinates(iface, Coordinates::Interface::interfaceUnderTestRi);
+    setObjectCoordinates(iface, IvCoordinates::Interface::interfaceUnderTestRi);
 
     return iface;
 }
@@ -181,7 +181,7 @@ auto IvGenerator::makeFunctionUnderTestProvidedInterface(
 
     auto *const iface = ivm::IVInterface::createIface(ci);
     iface->setEntityAttribute("wcet", 0);
-    setObjectCoordinates(iface, Coordinates::Interface::interfaceUnderTestPi);
+    setObjectCoordinates(iface, IvCoordinates::Interface::interfaceUnderTestPi);
 
     return iface;
 }
@@ -194,7 +194,7 @@ auto IvGenerator::makeConnection(ivm::IVInterface *const required, ivm::IVInterf
 
     ivm::IVConnection *const connection = new ivm::IVConnection(required, provided, model);
 
-    setObjectCoordinates(connection, Coordinates::connection);
+    setObjectCoordinates(connection, IvCoordinates::connection);
 
     return connection;
 }

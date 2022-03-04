@@ -19,7 +19,6 @@
 
 #include "dvgenerator.h"
 
-#include <QDebug>
 #include <algorithm>
 #include <cstddef>
 #include <dvcore/dvboard.h>
@@ -34,14 +33,20 @@
 
 namespace testgenerator {
 
-auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind, const QVector<dvm::DVObject *> &hw)
-        -> std::unique_ptr<dvm::DVModel>
+QVector<QVector<qint32>> DvCoordinates::devices;
+
+auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind, const QVector<dvm::DVObject *> &hw,
+        const QString &modelName) -> std::unique_ptr<dvm::DVModel>
 {
     auto model = std::make_unique<dvm::DVModel>();
+    DvCoordinates::devices = {
+        { 192, 210 },
+        { 192, 251 },
+    };
 
     dvm::DVBoard *const board = findBoard(hw);
 
-    auto *const node = makeDvObject<dvm::DVNode>(model.get(), "x86_Linux_TestRunner");
+    auto *const node = makeDvObject<dvm::DVNode>(model.get(), modelName);
     node->setCoordinates({ 192, 193, 396, 353 });
     node->setEntityAttribute("node_label", "Node_1");
     node->setEntityAttribute("type", board->entityAttributeValue("type"));
@@ -51,40 +56,40 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
     partition->setCoordinates({ 236, 237, 356, 317 });
     partition->setParentObject(node);
 
-    auto *const dev1 = makeDvObject<dvm::DVDevice>(model.get(), "eth0");
-    dev1->setParentObject(node);
-    dev1->setCoordinates({ 192, 210 });
-    dev1->setEntityAttribute("asn1module", "LINUX-SOCKET-IP-DRIVER");
-    dev1->setEntityAttribute("namespace", "ocarina_drivers");
-    dev1->setEntityAttribute("requires_bus_access", "ocarina_buses::ip.generic");
-    dev1->setEntityAttribute("extends", "ocarina_drivers::ip_socket");
-    dev1->setEntityAttribute("bus_namespace", "ocarina_buses");
-    dev1->setEntityAttribute(
-            "asn1file", "/home/taste/tool-inst/include/TASTE-Linux-Drivers/configurations/linux-socket-ip-driver.asn");
-    dev1->setEntityAttribute("asn1type", "Socket-IP-Conf-T");
-    dev1->setEntityAttribute("impl_extends", "ocarina_drivers::ip_socket.linux");
-    dev1->setEntityAttribute("port", "eth0");
+    const auto devices = getDevices(hw);
+    std::for_each(devices.begin(), devices.end(), [&model, &node](const auto device) {
+        const QString devName = device->entityAttributeValue("name").toString();
+        const QString asn1Module = device->entityAttributeValue("asn1module").toString();
+        const QString devNamespace = device->entityAttributeValue("namespace").toString();
+        const QString requiresBusAccess = device->entityAttributeValue("requiresBusAccess").toString();
+        const QString extends = device->entityAttributeValue("extends").toString();
+        const QString busNamespace = device->entityAttributeValue("bus_namespace").toString();
+        const QString asn1File = device->entityAttributeValue("asn1file").toString();
+        const QString asn1Type = device->entityAttributeValue("asn1type").toString();
+        const QString implExtends = device->entityAttributeValue("impl_extends").toString();
 
-    auto *const dev2 = makeDvObject<dvm::DVDevice>(model.get(), "uart0");
-    dev2->setParentObject(node);
-    dev2->setCoordinates({ 192, 251 });
-    dev2->setEntityAttribute("asn1module", "LINUX-SERIAL-CCSDS-DRIVER");
-    dev2->setEntityAttribute("namespace", "ocarina_drivers");
-    dev2->setEntityAttribute("requires_bus_access", "ocarina_buses::serial.ccsds");
-    dev2->setEntityAttribute("extends", "ocarina_drivers::serial_ccsds");
-    dev2->setEntityAttribute("bus_namespace", "ocarina_buses");
-    dev2->setEntityAttribute("asn1file",
-            "/home/taste/tool-inst/include/TASTE-Linux-Drivers/configurations/linux-serial-ccsds-driver.asn");
-    dev2->setEntityAttribute("asn1type", "Serial-CCSDS-Linux-Conf-T");
-    dev2->setEntityAttribute("impl_extends", "ocarina_drivers::serial_ccsds.linux");
-    dev2->setEntityAttribute("port", "uart0");
-    dev2->setParentObject(node);
+        auto *const dev = makeDvObject<dvm::DVDevice>(model.get(), devName);
+
+        dev->setParentObject(node);
+        dev->setCoordinates(DvCoordinates::devices.first());
+        DvCoordinates::devices.removeFirst();
+        dev->setEntityAttribute("asn1module", asn1Module);
+        dev->setEntityAttribute("namespace", devNamespace);
+        dev->setEntityAttribute("requires_bus_access", requiresBusAccess);
+        dev->setEntityAttribute("extends", extends);
+        dev->setEntityAttribute("bus_namespace", busNamespace);
+        dev->setEntityAttribute("asn1file", asn1File);
+        dev->setEntityAttribute("asn1type", asn1Type);
+        dev->setEntityAttribute("impl_extends", implExtends);
+        dev->setEntityAttribute("port", devName);
+
+        static_cast<dvm::DVNode *>(node)->addDevice(static_cast<dvm::DVDevice *>(dev));
+        model->addObject(dev);
+    });
 
     auto *const dvNode = static_cast<dvm::DVNode *>(node);
     auto *const dvPartition = static_cast<dvm::DVPartition *>(partition);
-    auto *const dvDev1 = static_cast<dvm::DVDevice *>(dev1);
-    auto *const dvDev2 = static_cast<dvm::DVDevice *>(dev2);
-    if (dvNode == nullptr || dvPartition == nullptr || dvDev1 == nullptr || dvDev2 == nullptr) {
+    if (dvNode == nullptr || dvPartition == nullptr) {
         throw std::runtime_error("DVObject could not be converted to DVType");
     }
 
@@ -97,13 +102,9 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
     }
 
     dvNode->addPartition(dvPartition);
-    dvNode->addDevice(dvDev1);
-    dvNode->addDevice(dvDev2);
 
     model->addObject(node);
     model->addObject(partition);
-    model->addObject(dev1);
-    model->addObject(dev2);
 
     return model;
 }
@@ -141,7 +142,7 @@ auto DvGenerator::getDevices(const QVector<dvm::DVObject *> &objects) -> QVector
     QVector<dvm::DVObject *> devices;
 
     std::for_each(objects.begin(), objects.end(), [&devices](const auto &obj) {
-        if (obj->type() == dvm::DVObject::Type::Device) {
+        if (obj->type() == dvm::DVObject::Type::Port) {
             devices << obj;
         }
     });

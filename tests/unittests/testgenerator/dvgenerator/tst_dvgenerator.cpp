@@ -64,7 +64,7 @@ class tst_dvgenerator final : public QObject
 private Q_SLOTS:
     void initTestCase();
     void testLinuxX86();
-    // void testArmV71();
+    void testArmV71();
 
 private:
     const QString dvDir = "resources";
@@ -103,23 +103,22 @@ void tst_dvgenerator::initTestCase()
     }
 }
 
-void tst_dvgenerator::testLinuxX86()
+QVector<dvm::DVObject *> getSelectedHwObjects(const QVector<dvm::DVObject *> &hwObjects, const QString &hwTitle)
 {
-    const QString hwTitle = "x86 Linux CPP";
-
-    // get pointers to specified HW
-    QVector<dvm::DVObject *> hw;
+    QVector<dvm::DVObject *> selectedHwObjects;
     for (const auto &obj : hwObjects) {
         if (obj->title().compare(hwTitle) == 0) {
-            qDebug() << "obj type (title): " << obj->type() << obj->title();
-            hw << obj;
+            selectedHwObjects << obj;
         } else if (obj->parentObject() != nullptr && obj->parentObject()->title().compare(hwTitle) == 0) {
-            hw << obj;
+            selectedHwObjects << obj;
         }
     }
-    QVERIFY(!hw.isEmpty());
 
-    const QString &outputFileName = "deploymentview-linux-x86.dv.xml";
+    return selectedHwObjects;
+}
+
+std::vector<std::unique_ptr<ivm::IVFunction>> makeIvFunctionsForDv()
+{
     const std::vector<QString> functionTitles = {
         "TestDriver",
         "FunctionUnderTest",
@@ -131,13 +130,23 @@ void tst_dvgenerator::testLinuxX86()
     functions.front()->setTitle(functionTitles.front());
     functions.back()->setTitle(functionTitles.back());
 
-    std::vector<ivm::IVFunction *> functionsToBind = getRawPointersVector(functions);
+    return functions;
+}
 
-    const std::unique_ptr<dvm::DVModel> generatedModel = DvGenerator::generate(functionsToBind, hw);
+void tst_dvgenerator::testLinuxX86()
+{
+    const QString outputFileName = "deploymentview-linux-x86.dv.xml";
+    const QString hwTitle = "x86 Linux CPP";
+    const QVector<dvm::DVObject *> selectedHwObjects = getSelectedHwObjects(hwObjects, hwTitle);
+    QVERIFY(!selectedHwObjects.isEmpty());
+    const std::vector<std::unique_ptr<ivm::IVFunction>> ivFunctions = makeIvFunctionsForDv();
+    const std::vector<ivm::IVFunction *> functionsToBind = getRawPointersVector(ivFunctions);
+
+    const std::unique_ptr<dvm::DVModel> generatedModel =
+            DvGenerator::generate(functionsToBind, selectedHwObjects, "x86_Linux_TestRunner");
     QVERIFY(generatedModel != nullptr);
     const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());
     QVERIFY(generatedDvObjects != nullptr);
-    qDebug() << "generated DV objects size: " << generatedDvObjects->size();
 
     exportModel(generatedDvObjects.get(), outputFileName);
 
@@ -147,27 +156,22 @@ void tst_dvgenerator::testLinuxX86()
     checkObjVectors(generatedDvObjects.get(), expectedDvObjects.get());
 }
 
-/*
 void tst_dvgenerator::testArmV71()
 {
-    const QString &outputFileName = "deploymentview-samv71.dv.xml";
-    const std::vector<QString> functionTitles = {
-        "TestDriver",
-        "FunctionUnderTest",
-    };
+    const QString outputFileName = "deploymentview-samv71.dv.xml";
+    const QString hwTitle = "SAM V71 FreeRTOS N7S";
+    const QVector<dvm::DVObject *> selectedHwObjects = getSelectedHwObjects(hwObjects, hwTitle);
+    QVERIFY(!selectedHwObjects.isEmpty());
+    const std::vector<std::unique_ptr<ivm::IVFunction>> functions = makeIvFunctionsForDv();
+    const std::vector<ivm::IVFunction *> functionsToBind = getRawPointersVector(functions);
 
-    std::vector<std::unique_ptr<ivm::IVFunction>> functions;
-    functions.push_back(std::make_unique<ivm::IVFunction>());
-    functions.push_back(std::make_unique<ivm::IVFunction>());
-    functions.front()->setTitle(functionTitles.front());
-    functions.back()->setTitle(functionTitles.back());
+    const std::unique_ptr<dvm::DVModel> generatedModel =
+            DvGenerator::generate(functionsToBind, selectedHwObjects, "SAM V71 FreeRTOS N7S_1");
 
-    std::vector<ivm::IVFunction *> functionsToBind = getRawPointersVector(functions);
-
-    const std::unique_ptr<dvm::DVModel> generatedModel = nullptr; // TODO: SamV71FreeRtosN7S
     QVERIFY(generatedModel != nullptr);
     const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());
     QVERIFY(generatedDvObjects != nullptr);
+    QVERIFY(!generatedDvObjects->isEmpty());
 
     exportModel(generatedDvObjects.get(), outputFileName);
 
@@ -175,7 +179,6 @@ void tst_dvgenerator::testArmV71()
     QVERIFY(expectedDvObjects != nullptr);
     checkObjVectors(generatedDvObjects.get(), expectedDvObjects.get());
 }
-*/
 
 void checkObjVectors(QVector<dvm::DVObject *> *actualObjs, QVector<dvm::DVObject *> *expectedObjs)
 {
@@ -195,22 +198,16 @@ void checkObjVectors(QVector<dvm::DVObject *> *actualObjs, QVector<dvm::DVObject
             if (generatedObj.parentObject() != nullptr) {
                 QCOMPARE(generatedObj.parentObject()->title(), expectedObj.parentObject()->title());
             } else {
-                qDebug() << "title: " << generatedObj.title();
-                qDebug() << "  \\-- parentObject: " << generatedObj.parentObject();
-                qDebug() << "expected parentObject" << expectedObj.parentObject()->title();
                 QFAIL("generated parent object set to nullptr but expected non-nullptr");
             }
         } else {
             if (generatedObj.parentObject() != nullptr) {
-                qDebug() << "title: " << generatedObj.title();
-                qDebug() << "  \\-- parentObject: " << generatedObj.parentObject();
                 QFAIL("generated parent object is non-nullptr but expected nullptr");
             }
         }
 
         // QCOMPARE(generatedObj.coordinates(), expectedObj.coordinates());
         checkEntityProperties(generatedObj, expectedObj);
-        qDebug() << "obj title: " << generatedObj.title();
         checkEntityAttributes(generatedObj, expectedObj);
         checkTypeSpecificMembers(generatedObj, expectedObj);
     }

@@ -32,7 +32,7 @@ namespace testgenerator {
  * @brief  Constants with coordinates of generated entities on InterfaceView diagram
  *
  */
-struct Coordinates final {
+struct IvCoordinates final {
     struct Function final {
         /**
          * @brief  Coordinates of a test driver function

@@ -28,6 +28,12 @@
 
 namespace testgenerator {
 
+typedef QVector<qint32> Coordinates;
+
+struct DvCoordinates {
+    static QVector<Coordinates> devices;
+};
+
 /**
  * @brief Test harness DeploymentView generator
  *
@@ -41,8 +47,8 @@ public:
         return T::generate(functionsToBind);
     }
 
-    static auto generate(const std::vector<ivm::IVFunction *> &functionsToBind, const QVector<dvm::DVObject *> &hw)
-            -> std::unique_ptr<dvm::DVModel>;
+    static auto generate(const std::vector<ivm::IVFunction *> &functionsToBind, const QVector<dvm::DVObject *> &hw,
+            const QString &modelName) -> std::unique_ptr<dvm::DVModel>;
 
 private:
     static auto findBoard(const QVector<dvm::DVObject *> &objects) -> dvm::DVBoard *;
