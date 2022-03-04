@@ -14,6 +14,7 @@ add_subdirectory(sdl)
 add_subdirectory(seds)
 add_subdirectory(shared)
 add_subdirectory(spacecreatorsystem)
+add_subdirectory(testgenerator)
 
 if (${QTC_FOUND} AND QTC_VERSION EQUAL 408)
     add_subdirectory(asn1plugin)
