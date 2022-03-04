@@ -1,22 +1,22 @@
 /* CIF Process (0, 0), (800, 100) */
 process Component;
     /* CIF Text (0, 150), (400, 500) */
-    dcl var1 TContainer;
+    dcl Var1 TContainer;
     /* CIF ENDTEXT */
     /* CIF Procedure (0, 900), (800, 50) */
     procedure Activity;
         /* CIF Start (0, 0), (200, 75) */
         START;
             /* CIF Task (0, 187), (100, 50) */
-            task var1.a := value_A;
+            task Var1.A := value_A;
             /* CIF Task (0, 262), (100, 50) */
-            task var1.b := value_B;
+            task Var1.B := value_B;
             /* CIF Decision (0, 262), (400, 50) */
-            decision var1.a /= value_B;
+            decision Var1.A /= value_B;
                 /* CIF Answer (0, 337), (400, 50) */
                 (True):
                     /* CIF Task (0, 412), (100, 50) */
-                    task var1.a := var1.b;
+                    task Var1.A := Var1.B;
                     /* CIF Join (0, 487), (100, 50) */
                     join condition_1;
                 /* CIF Answer (600, 337), (400, 50) */

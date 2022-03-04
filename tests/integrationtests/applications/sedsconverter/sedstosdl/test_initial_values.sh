@@ -4,6 +4,7 @@ set -euo pipefail
 
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 OPENGEODE=$HOME/.local/bin/opengeode
+
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
 TEST_OUTPUT_DIR=output
@@ -20,13 +21,15 @@ $SEDS_CONVERTER --from SEDS --to SDL --aux-models ASN.1,InterfaceView --skip-val
 # Setup additional data
 cp resources/test_initial_values.system_structure output/system_structure.pr
 cp $TEST_OUTPUT_DIR/COMPONENT.asn $TEST_OUTPUT_DIR/dataview-uniq.asn
+# Rename the module to avoid naming conflicts
 sed -i 's/COMPONENT/SYSTEM-DATAVIEW/g' $TEST_OUTPUT_DIR/dataview-uniq.asn
 cd $TEST_OUTPUT_DIR
 # Compare output against reference, and compile to make sure the reference is valid
 # Clean (rm) only if all steps pass
+# This test uses Ada, as C backend in OpenGEODE is too buggy to handle this example
 $DIFF component.pr ../resources/test_initial_values.output \
-  && $OPENGEODE --toC system_structure.pr component.pr \
-  && asn1scc -c --type-prefix asn1Scc dataview-uniq.asn \
-  && gcc -c Component.c \
+  && $OPENGEODE --toAda system_structure.pr component.pr \
+  && asn1scc -Ada --type-prefix asn1Scc dataview-uniq.asn component_datamodel.asn \
+  && gcc -c component.adb \
   && cd .. \
   && rm -r -f $TEST_OUTPUT_DIR
