@@ -196,9 +196,12 @@ static inline auto generateProcedureForSyncCommand(Context &context, const seds:
     auto procedure = std::make_unique<::sdl::Procedure>(name);
     for (const auto &ivParameter : ivInterface->params()) {
         // TASTE skeleton generator generates upper-case names
+        const auto parameterName = Escaper::escapeSdlVariableName(ivParameter.name());
+        const auto &parameterType = ivParameter.paramTypeName();
+        const auto &parameterDirection =
+                ivParameter.direction() == shared::InterfaceParameter::Direction::IN ? "in" : "in/out";
         auto sdlParameter =
-                std::make_unique<::sdl::ProcedureParameter>(ivParameter.name().toUpper(), ivParameter.paramTypeName(),
-                        ivParameter.direction() == shared::InterfaceParameter::Direction::IN ? "in" : "in/out");
+                std::make_unique<::sdl::ProcedureParameter>(parameterName, parameterType, parameterDirection);
         procedure->addParameter(std::move(sdlParameter));
     }
     auto transition = std::make_unique<::sdl::Transition>();
