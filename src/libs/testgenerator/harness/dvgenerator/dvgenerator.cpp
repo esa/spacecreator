@@ -33,7 +33,11 @@
 
 namespace testgenerator {
 
-QVector<QVector<qint32>> DvCoordinates::devices;
+QVector<QVector<qint32>> DvGenerator::DvCoordinates::devices;
+DvGenerator::Coordinates DvGenerator::DvCoordinates::node = { 192, 193, 396, 353 };
+DvGenerator::Coordinates DvGenerator::DvCoordinates::partition = { 236, 237, 356, 317 };
+const QString DvGenerator::hostPartitionName = "hostPartition";
+const QString DvGenerator::nodeName = "Node_1";
 
 auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind, const QVector<dvm::DVObject *> &hw,
         const QString &modelName) -> std::unique_ptr<dvm::DVModel>
@@ -47,13 +51,13 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
     dvm::DVBoard *const board = findBoard(hw);
 
     auto *const node = makeDvObject<dvm::DVNode>(model.get(), modelName);
-    node->setCoordinates({ 192, 193, 396, 353 });
-    node->setEntityAttribute("node_label", "Node_1");
+    node->setCoordinates(DvCoordinates::node);
+    node->setEntityAttribute("node_label", nodeName);
     node->setEntityAttribute("type", board->entityAttributeValue("type"));
     node->setEntityAttribute("namespace", board->entityAttributeValue("namespace"));
 
-    auto *const partition = makeDvObject<dvm::DVPartition>(model.get(), "hostPartition");
-    partition->setCoordinates({ 236, 237, 356, 317 });
+    auto *const partition = makeDvObject<dvm::DVPartition>(model.get(), hostPartitionName);
+    partition->setCoordinates(DvCoordinates::partition);
     partition->setParentObject(node);
 
     const auto devices = getDevices(hw);
@@ -87,11 +91,7 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
         model->addObject(dev);
     });
 
-    auto *const dvNode = static_cast<dvm::DVNode *>(node);
     auto *const dvPartition = static_cast<dvm::DVPartition *>(partition);
-    if (dvNode == nullptr || dvPartition == nullptr) {
-        throw std::runtime_error("DVObject could not be converted to DVType");
-    }
 
     for (const auto &function : functionsToBind) {
         auto *const fun = makeDvObject<dvm::DVFunction>(model.get(), function->title());
@@ -101,6 +101,7 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
         model->addObject(fun);
     }
 
+    auto *const dvNode = static_cast<dvm::DVNode *>(node);
     dvNode->addPartition(dvPartition);
 
     model->addObject(node);
@@ -111,28 +112,31 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
 
 auto DvGenerator::findBoard(const QVector<dvm::DVObject *> &objects) -> dvm::DVBoard *
 {
-    for (const auto &obj : objects) {
-        if (obj->type() == dvm::DVObject::Type::Board) {
-            return static_cast<dvm::DVBoard *>(obj);
+    for (const auto &object : objects) {
+        if (object->type() == dvm::DVObject::Type::Board) {
+            return static_cast<dvm::DVBoard *>(object);
         }
     }
     return nullptr;
 }
 
-auto DvGenerator::setDvObjModelAndTitle(dvm::DVObject *obj, dvm::DVModel *const model, const QString &title) -> void
+auto DvGenerator::setDvObjectModelAndTitle(dvm::DVObject *const object, dvm::DVModel *const model, const QString &title)
+        -> void
 {
-    obj->setTitle(title);
-    obj->setModel(model);
+    object->setTitle(title);
+    object->setModel(model);
 }
 
-auto DvGenerator::copyDvObject(dvm::DVObject *obj) -> dvm::DVObject *
+auto DvGenerator::copyDvObject(dvm::DVObject *const object) -> dvm::DVObject *
 {
-    dvm::DVObject *const copy = new dvm::DVObject(obj->type(), obj->title());
-    for (const auto &entityAttribute : obj->entityAttributes()) {
+    dvm::DVObject *const copy = new dvm::DVObject(object->type(), object->title());
+
+    for (const auto &entityAttribute : object->entityAttributes()) {
         copy->setEntityAttribute(entityAttribute.name(), entityAttribute.value());
     }
-    // TODO: copy attributes
-    // TODO: copy properties
+    for (const auto &propertyName : object->dynamicPropertyNames()) {
+        copy->setProperty(propertyName, object->property(propertyName));
+    }
 
     return copy;
 }
@@ -141,9 +145,9 @@ auto DvGenerator::getDevices(const QVector<dvm::DVObject *> &objects) -> QVector
 {
     QVector<dvm::DVObject *> devices;
 
-    std::for_each(objects.begin(), objects.end(), [&devices](const auto &obj) {
-        if (obj->type() == dvm::DVObject::Type::Port) {
-            devices << obj;
+    std::for_each(objects.begin(), objects.end(), [&devices](const auto &object) {
+        if (object->type() == dvm::DVObject::Type::Port) {
+            devices << object;
         }
     });
 

@@ -28,12 +28,6 @@
 
 namespace testgenerator {
 
-typedef QVector<qint32> Coordinates;
-
-struct DvCoordinates {
-    static QVector<Coordinates> devices;
-};
-
 /**
  * @brief Test harness DeploymentView generator
  *
@@ -41,19 +35,24 @@ struct DvCoordinates {
 class DvGenerator final
 {
 public:
-    template<class T>
-    static auto generate(const std::vector<ivm::IVFunction *> &functionsToBind) -> std::unique_ptr<dvm::DVModel>
-    {
-        return T::generate(functionsToBind);
-    }
+    typedef QVector<qint32> Coordinates;
+
+    struct DvCoordinates {
+        static QVector<Coordinates> devices;
+        static Coordinates node;
+        static Coordinates partition;
+    };
+
+    static const QString hostPartitionName;
+    static const QString nodeName;
 
     static auto generate(const std::vector<ivm::IVFunction *> &functionsToBind, const QVector<dvm::DVObject *> &hw,
             const QString &modelName) -> std::unique_ptr<dvm::DVModel>;
 
 private:
     static auto findBoard(const QVector<dvm::DVObject *> &objects) -> dvm::DVBoard *;
-    static auto setDvObjModelAndTitle(dvm::DVObject *obj, dvm::DVModel *model, const QString &title) -> void;
-    static auto copyDvObject(dvm::DVObject *obj) -> dvm::DVObject *;
+    static auto setDvObjectModelAndTitle(dvm::DVObject *object, dvm::DVModel *model, const QString &title) -> void;
+    static auto copyDvObject(dvm::DVObject *object) -> dvm::DVObject *;
     static auto getDevices(const QVector<dvm::DVObject *> &objects) -> QVector<dvm::DVObject *>;
 
     template<typename T>

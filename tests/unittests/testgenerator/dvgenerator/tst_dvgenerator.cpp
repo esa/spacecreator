@@ -20,9 +20,13 @@
 #include "../common.h"
 #include "dvtools.h"
 
+#include <QAbstractItemModel>
 #include <QBuffer>
+#include <QCoreApplication>
 #include <QDirIterator>
 #include <QObject>
+#include <QStandardItemModel>
+#include <QStandardPaths>
 #include <QTest>
 #include <QtTest/qtestcase.h>
 #include <algorithm>
@@ -34,23 +38,21 @@
 #include <dvcore/dvobject.h>
 #include <dvcore/dvpartition.h>
 #include <dvcore/dvport.h>
+#include <exception>
 #include <harness/dvgenerator/dvgenerator.h>
 #include <ivcore/ivfunction.h>
 #include <libdveditor/dveditor.h>
 #include <libdveditor/dveditorcore.h>
 #include <libdveditor/dvexporter.h>
 #include <memory>
-#include <qabstractitemmodel.h>
-#include <qcoreapplication.h>
 #include <qobjectdefs.h>
-#include <qstandarditemmodel.h>
-#include <qstandardpaths.h>
 #include <shared/abstractvisualizationmodel.h>
 #include <shared/entityattribute.h>
 #include <shared/errorhub.h>
 #include <shared/settingsmanager.h>
 #include <shared/veobject.h>
 #include <sharedlibrary.h>
+#include <stdexcept>
 #include <testgenerator/testgenerator.h>
 
 using testgenerator::DvGenerator;
@@ -67,92 +69,69 @@ private Q_SLOTS:
     void testArmV71();
 
 private:
+    void initHwLibrary();
+
     const QString dvDir = "resources";
     const QString dvPath =
             QString("%1%2%3.dv.xml").arg(dvDir).arg(QDir::separator()); // for example resources/deploymentview.dv.xml
     const QString dvConfig = QString("%1%2config.xml").arg(dvDir).arg(QDir::separator());
 
     QVector<dvm::DVObject *> hwObjects;
+
+public:
+    static const std::vector<QString> functionTitles;
+};
+
+const std::vector<QString> tst_dvgenerator::functionTitles = {
+    "TestDriver",
+    "FunctionUnderTest",
 };
 
 static auto checkEntityProperties(const dvm::DVObject &actual, const dvm::DVObject &expected) -> void;
-static auto checkObjVectors(QVector<dvm::DVObject *> *actual, QVector<dvm::DVObject *> *expected) -> void;
 static auto checkEntityAttributes(const dvm::DVObject &actual, const dvm::DVObject &expected) -> void;
-static auto checkPartitions(const dvm::DVObject &actualObj, const dvm::DVObject &expectedObj) -> void;
+static auto checkObjVectors(QVector<dvm::DVObject *> *actual, QVector<dvm::DVObject *> *expected) -> void;
+static auto checkParentObject(dvm::DVObject *actual, dvm::DVObject *expected) -> void;
+static auto checkPartitions(const dvm::DVPartition &actualPartition, const dvm::DVPartition &expectedPartition) -> void;
 static auto checkTypeSpecificMembers(const dvm::DVObject &actualObj, const dvm::DVObject &expectedObj) -> void;
+
 static auto exportModel(QVector<dvm::DVObject *> *objects, const QString &outputFilename) -> void;
 static auto getRawPointersVector(const std::vector<std::unique_ptr<ivm::IVFunction>> &uniquePointersVector)
         -> std::vector<ivm::IVFunction *>;
+static auto getSelectedHwObjects(const QVector<dvm::DVObject *> &hwObjects, const QString &hwTitle)
+        -> QVector<dvm::DVObject *>;
+static auto makeIvFunctionsForDv() -> std::vector<std::unique_ptr<ivm::IVFunction>>;
 
 void tst_dvgenerator::initTestCase()
 {
     dve::initDvEditor();
     shared::initSharedLibrary();
     dvm::initDVLibrary();
-
-    const QString directory = shared::hwLibraryPath();
-    QDirIterator it(directory, QStringList() << "*.xml", QDir::Files, QDirIterator::Subdirectories);
-    while (it.hasNext()) {
-        QString fileName = it.next();
-        shared::ErrorHub::setCurrentFile(fileName);
-        dvm::DVHWLibraryReader reader;
-        bool ok = reader.readFile(fileName);
-        if (ok) {
-            hwObjects << reader.parsedObjects();
-        }
-    }
-}
-
-QVector<dvm::DVObject *> getSelectedHwObjects(const QVector<dvm::DVObject *> &hwObjects, const QString &hwTitle)
-{
-    QVector<dvm::DVObject *> selectedHwObjects;
-    for (const auto &obj : hwObjects) {
-        if (obj->title().compare(hwTitle) == 0) {
-            selectedHwObjects << obj;
-        } else if (obj->parentObject() != nullptr && obj->parentObject()->title().compare(hwTitle) == 0) {
-            selectedHwObjects << obj;
-        }
-    }
-
-    return selectedHwObjects;
-}
-
-std::vector<std::unique_ptr<ivm::IVFunction>> makeIvFunctionsForDv()
-{
-    const std::vector<QString> functionTitles = {
-        "TestDriver",
-        "FunctionUnderTest",
-    };
-
-    std::vector<std::unique_ptr<ivm::IVFunction>> functions;
-    functions.push_back(std::make_unique<ivm::IVFunction>());
-    functions.push_back(std::make_unique<ivm::IVFunction>());
-    functions.front()->setTitle(functionTitles.front());
-    functions.back()->setTitle(functionTitles.back());
-
-    return functions;
+    initHwLibrary();
 }
 
 void tst_dvgenerator::testLinuxX86()
 {
     const QString outputFileName = "deploymentview-linux-x86.dv.xml";
     const QString hwTitle = "x86 Linux CPP";
+    const QString rootNodeName = "x86_Linux_TestRunner";
+    const QString expectedOutputFilename = dvPath.arg("deploymentview-linux-x86");
+
     const QVector<dvm::DVObject *> selectedHwObjects = getSelectedHwObjects(hwObjects, hwTitle);
     QVERIFY(!selectedHwObjects.isEmpty());
     const std::vector<std::unique_ptr<ivm::IVFunction>> ivFunctions = makeIvFunctionsForDv();
     const std::vector<ivm::IVFunction *> functionsToBind = getRawPointersVector(ivFunctions);
 
     const std::unique_ptr<dvm::DVModel> generatedModel =
-            DvGenerator::generate(functionsToBind, selectedHwObjects, "x86_Linux_TestRunner");
+            DvGenerator::generate(functionsToBind, selectedHwObjects, rootNodeName);
+
     QVERIFY(generatedModel != nullptr);
     const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());
     QVERIFY(generatedDvObjects != nullptr);
 
     exportModel(generatedDvObjects.get(), outputFileName);
 
-    const auto expectedDvObjects = dvtools::getDvObjectsFromFile(dvPath.arg("deploymentview-linux-x86"));
+    const auto expectedDvObjects = dvtools::getDvObjectsFromFile(expectedOutputFilename);
     QVERIFY(expectedDvObjects != nullptr);
-
     checkObjVectors(generatedDvObjects.get(), expectedDvObjects.get());
 }
 
@@ -160,13 +139,16 @@ void tst_dvgenerator::testArmV71()
 {
     const QString outputFileName = "deploymentview-samv71.dv.xml";
     const QString hwTitle = "SAM V71 FreeRTOS N7S";
+    const QString rootNodeName = "SAM V71 FreeRTOS N7S_1";
+    const QString expectedOutputFilename = dvPath.arg("deploymentview-samv71");
+
     const QVector<dvm::DVObject *> selectedHwObjects = getSelectedHwObjects(hwObjects, hwTitle);
     QVERIFY(!selectedHwObjects.isEmpty());
     const std::vector<std::unique_ptr<ivm::IVFunction>> functions = makeIvFunctionsForDv();
     const std::vector<ivm::IVFunction *> functionsToBind = getRawPointersVector(functions);
 
     const std::unique_ptr<dvm::DVModel> generatedModel =
-            DvGenerator::generate(functionsToBind, selectedHwObjects, "SAM V71 FreeRTOS N7S_1");
+            DvGenerator::generate(functionsToBind, selectedHwObjects, rootNodeName);
 
     QVERIFY(generatedModel != nullptr);
     const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());
@@ -175,41 +157,23 @@ void tst_dvgenerator::testArmV71()
 
     exportModel(generatedDvObjects.get(), outputFileName);
 
-    const auto expectedDvObjects = dvtools::getDvObjectsFromFile(dvPath.arg("deploymentview-samv71"));
+    const auto expectedDvObjects = dvtools::getDvObjectsFromFile(expectedOutputFilename);
     QVERIFY(expectedDvObjects != nullptr);
     checkObjVectors(generatedDvObjects.get(), expectedDvObjects.get());
 }
 
-void checkObjVectors(QVector<dvm::DVObject *> *actualObjs, QVector<dvm::DVObject *> *expectedObjs)
+void tst_dvgenerator::initHwLibrary()
 {
-    QCOMPARE(actualObjs->size(), expectedObjs->size());
-    const int objsSize = actualObjs->size();
-
-    const QVector<int> map =
-            createQVectorToQVectorMap<dvm::DVObject *>(*actualObjs, *expectedObjs, elementsEqualByTitle);
-    for (int i = 0; i < objsSize; i++) {
-        const auto &generatedObj = *actualObjs->at(i);
-        const auto &expectedObj = *expectedObjs->at(map.at(i));
-
-        QCOMPARE(generatedObj.title(), expectedObj.title());
-        QCOMPARE(generatedObj.type(), expectedObj.type());
-
-        if (expectedObj.parentObject() != nullptr) {
-            if (generatedObj.parentObject() != nullptr) {
-                QCOMPARE(generatedObj.parentObject()->title(), expectedObj.parentObject()->title());
-            } else {
-                QFAIL("generated parent object set to nullptr but expected non-nullptr");
-            }
-        } else {
-            if (generatedObj.parentObject() != nullptr) {
-                QFAIL("generated parent object is non-nullptr but expected nullptr");
-            }
+    const QString directory = shared::hwLibraryPath();
+    QDirIterator it(directory, QStringList() << "*.xml", QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        const QString fileName = it.next();
+        shared::ErrorHub::setCurrentFile(fileName);
+        dvm::DVHWLibraryReader reader;
+        const bool ok = reader.readFile(fileName);
+        if (ok) {
+            hwObjects << reader.parsedObjects();
         }
-
-        // QCOMPARE(generatedObj.coordinates(), expectedObj.coordinates());
-        checkEntityProperties(generatedObj, expectedObj);
-        checkEntityAttributes(generatedObj, expectedObj);
-        checkTypeSpecificMembers(generatedObj, expectedObj);
     }
 }
 
@@ -232,18 +196,24 @@ void checkEntityProperties(const dvm::DVObject &actual, const dvm::DVObject &exp
     }
 }
 
-void checkEntityAttributes(const dvm::DVObject &actual, const dvm::DVObject &expected)
+void checkObjVectors(QVector<dvm::DVObject *> *actualObjs, QVector<dvm::DVObject *> *expectedObjs)
 {
-    const auto &actualEntityAttributes = actual.entityAttributes();
-    const auto &expectedEntityAttributes = expected.entityAttributes();
+    QCOMPARE(actualObjs->size(), expectedObjs->size());
+    const int objsSize = actualObjs->size();
 
-    QCOMPARE(actualEntityAttributes.size(), expectedEntityAttributes.size());
+    const QVector<int> map =
+            createQVectorToQVectorMap<dvm::DVObject *>(*actualObjs, *expectedObjs, elementsEqualByTitle);
+    for (int i = 0; i < objsSize; i++) {
+        const auto &generatedObj = *actualObjs->at(i);
+        const auto &expectedObj = *expectedObjs->at(map.at(i));
 
-    for (const auto &expectedEntityAttribute : expectedEntityAttributes) {
-        const auto &expectedValue = expectedEntityAttribute.value().value<QString>();
-        const auto &actualValue = actualEntityAttributes.value(expectedEntityAttribute.name()).value<QString>();
+        QCOMPARE(generatedObj.title(), expectedObj.title());
+        QCOMPARE(generatedObj.type(), expectedObj.type());
 
-        QCOMPARE(actualValue, expectedValue);
+        checkParentObject(generatedObj.parentObject(), expectedObj.parentObject());
+        checkEntityProperties(generatedObj, expectedObj);
+        checkEntityAttributes(generatedObj, expectedObj);
+        checkTypeSpecificMembers(generatedObj, expectedObj);
     }
 }
 
@@ -270,27 +240,42 @@ void checkTypeSpecificMembers(const dvm::DVObject &actualObj, const dvm::DVObjec
         break;
     case dvm::DVObject::Type::Device:
         break;
-    case dvm::DVObject::Type::Partition:
-        checkPartitions(actualObj, expectedObj);
+    case dvm::DVObject::Type::Partition: {
+        const auto *const actualPartition = static_cast<const dvm::DVPartition *>(&actualObj);
+        const auto *const expectedPartition = static_cast<const dvm::DVPartition *>(&expectedObj);
+        if (actualPartition == nullptr || expectedPartition == nullptr) {
+            throw std::runtime_error("Specified DV object type is Partition, but cannot cast to DVPartition type");
+        }
+        checkPartitions(*actualPartition, *expectedPartition);
         break;
+    }
     case dvm::DVObject::Type::Unknown:
         QFAIL("Unknown type in generated object");
     }
 }
 
-void checkPartitions(const dvm::DVObject &actualObj, const dvm::DVObject &expectedObj)
+void checkEntityAttributes(const dvm::DVObject &actual, const dvm::DVObject &expected)
 {
-    const auto *const actualPartition = static_cast<const dvm::DVPartition *>(&actualObj);
-    const auto *const expectedPartition = static_cast<const dvm::DVPartition *>(&expectedObj);
+    const auto &actualEntityAttributes = actual.entityAttributes();
+    const auto &expectedEntityAttributes = expected.entityAttributes();
 
-    QVERIFY(actualPartition != nullptr);
-    QVERIFY(expectedPartition != nullptr);
+    QCOMPARE(actualEntityAttributes.size(), expectedEntityAttributes.size());
 
-    const auto &actualFunctions = actualPartition->functions();
-    const auto &expectedFunctions = expectedPartition->functions();
+    for (const auto &expectedEntityAttribute : expectedEntityAttributes) {
+        const auto &expectedValue = expectedEntityAttribute.value().value<QString>();
+        const auto &actualValue = actualEntityAttributes.value(expectedEntityAttribute.name()).value<QString>();
+
+        QCOMPARE(actualValue, expectedValue);
+    }
+}
+
+void checkPartitions(const dvm::DVPartition &actualPartition, const dvm::DVPartition &expectedPartition)
+{
+    const auto &actualFunctions = actualPartition.functions();
+    const auto &expectedFunctions = expectedPartition.functions();
 
     QCOMPARE(actualFunctions.size(), expectedFunctions.size());
-    const int functionsSize = actualPartition->functions().size();
+    const int functionsSize = actualPartition.functions().size();
 
     for (int j = 0; j < functionsSize; j++) {
         const auto &actualFunction = actualFunctions.at(j);
@@ -304,14 +289,30 @@ void checkPartitions(const dvm::DVObject &actualObj, const dvm::DVObject &expect
     }
 }
 
-void exportModel(QVector<dvm::DVObject *> *const generatedDvObjects, const QString &outputFilename)
+void checkParentObject(dvm::DVObject *const actual, dvm::DVObject *const expected)
+{
+    if (expected != nullptr) {
+        if (actual != nullptr) {
+            QCOMPARE(actual->title(), expected->title());
+        } else {
+            QFAIL("generated parent object set to nullptr but expected non-nullptr");
+        }
+    } else {
+        if (actual != nullptr) {
+            QFAIL("generated parent object is non-nullptr but expected nullptr");
+        }
+    }
+}
+
+void exportModel(QVector<dvm::DVObject *> *const dvObjects, const QString &outputFilename)
 {
     dve::DVExporter exporter;
     QList<shared::VEObject *> objects;
-    std::for_each(generatedDvObjects->begin(), generatedDvObjects->end(),
+    std::for_each(dvObjects->begin(), dvObjects->end(), //
             [&objects](const auto &obj) { objects.push_back(obj); });
 
-    QByteArray qba(objects.size() * 1'000, '\00');
+    const int objectMaxSize = 1'000;
+    QByteArray qba(objects.size() * objectMaxSize, '\00');
     QBuffer buf = QBuffer(&qba);
 
     exporter.exportObjects(objects, &buf);
@@ -332,6 +333,31 @@ std::vector<ivm::IVFunction *> getRawPointersVector(
             [&rawPtrsVector](const auto &f) { rawPtrsVector.push_back(f.get()); });
 
     return rawPtrsVector;
+}
+
+QVector<dvm::DVObject *> getSelectedHwObjects(const QVector<dvm::DVObject *> &hwObjects, const QString &hwTitle)
+{
+    QVector<dvm::DVObject *> selectedHwObjects;
+    for (const auto &obj : hwObjects) {
+        if (obj->title().compare(hwTitle) == 0) {
+            selectedHwObjects << obj;
+        } else if (obj->parentObject() != nullptr && obj->parentObject()->title().compare(hwTitle) == 0) {
+            selectedHwObjects << obj;
+        }
+    }
+
+    return selectedHwObjects;
+}
+
+std::vector<std::unique_ptr<ivm::IVFunction>> makeIvFunctionsForDv()
+{
+    std::vector<std::unique_ptr<ivm::IVFunction>> functions;
+    functions.push_back(std::make_unique<ivm::IVFunction>());
+    functions.push_back(std::make_unique<ivm::IVFunction>());
+    functions.front()->setTitle(tst_dvgenerator::functionTitles.front());
+    functions.back()->setTitle(tst_dvgenerator::functionTitles.back());
+
+    return functions;
 }
 
 } // namespace tests::testgenerator
