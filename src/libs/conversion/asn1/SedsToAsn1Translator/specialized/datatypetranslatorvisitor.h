@@ -313,7 +313,7 @@ private:
     /// @brief  List of SEDS packages
     const std::vector<seds::model::Package> &m_sedsPackages;
 
-    /// @brief  Containers that is in the current scope
+    /// @brief  Containers that are in the current scope
     ContainerEntriesScope m_containersScope;
 
     inline static const QString m_realizationComponentsName = "realization";

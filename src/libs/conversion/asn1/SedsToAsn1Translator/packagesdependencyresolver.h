@@ -39,7 +39,7 @@ class PackagesDependencyResolver final
 {
 public:
     /**
-     * @brief   Exception thrown when data types to sort doesn't create a DAG
+     * @brief   Exception thrown when packages to sort don't create a DAG
      *
      * Exception for cyclic dependency
      */
@@ -67,7 +67,7 @@ public:
     };
 
 private:
-    /// @brief  Type of the mark for the soring
+    /// @brief  Type of the mark for the sorting
     enum class MarkType
     {
         Temporary,

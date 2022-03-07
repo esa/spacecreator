@@ -56,7 +56,7 @@ public:
     auto addContainer(const seds::model::ContainerDataType &sedsType) -> void;
 
     /**
-     * @brief   Get components of given component
+     * @brief   Get components of given container
      *
      * @param   sedsTypeName    Container name
      *

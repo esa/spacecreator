@@ -43,7 +43,7 @@ class DataTypesDependencyResolver final
 {
 public:
     /**
-     * @brief   Exception thrown when data types to sort doesn't create a DAG
+     * @brief   Exception thrown when data types to sort don't create a DAG
      *
      * Exception for cyclic dependency
      */
