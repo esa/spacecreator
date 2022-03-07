@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DataSheet xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/Package1">
+    <DataTypeSet>
+      <ArrayDataType name="BasicArray1D" dataTypeRef="com/n7space/Package2/ArrayItem">
+        <LongDescription>A 1-D array with maximum size</LongDescription>
+        <DimensionList>
+          <Dimension size="15" />
+        </DimensionList>
+      </ArrayDataType>
+      <ArrayDataType name="ArrayWithIndexDataRef" dataTypeRef="com/n7space/Package2/ArrayItem">
+        <DimensionList>
+          <Dimension indexTypeRef="com/n7space/Package2/IndexItem" />
+        </DimensionList>
+      </ArrayDataType>
+      <ContainerDataType name="BasicContainer">
+        <LongDescription>A basic container data type</LongDescription>
+        <EntryList>
+          <Entry name="fieldA" type="com/n7space/Package2/FieldItem" />
+          <Entry name="fieldB" type="com/n7space/Package2/FieldItem" />
+          <Entry name="fieldC" type="com/n7space/Package2/FieldItem" />
+          <Entry name="lengthEntry" type="com/n7space/Package2/LengthItem" />
+          <ListEntry name="listEntry" type="com/n7space/Package2/ListItem" listLengthField="lengthEntry"/>
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="ChildContainer" abstract="false" baseType="BasicContainer">
+        <ConstraintSet>
+          <TypeConstraint entry="fieldA" type="com/n7space/Package2/ConstraintItem" />
+        </ConstraintSet>
+      </ContainerDataType>
+      <SubRangeDataType name="SubRangeData" baseType="com/n7space/Package2/SubRangeItem">
+        <Range>
+          <MinMaxRange rangeType="atLeast" min="10" />
+        </Range>
+      </SubRangeDataType>
+    </DataTypeSet>
+  </Package>
+  <xi:include href="test_cross_reference_data_types_package2.xml" xpointer="element(/1/1)" />
+</DataSheet>

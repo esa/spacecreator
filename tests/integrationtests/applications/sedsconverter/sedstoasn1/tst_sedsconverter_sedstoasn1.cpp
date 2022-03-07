@@ -158,6 +158,7 @@ void tst_SedsConverter_SedsToAsn1::testMinMaxRange()
 /// \SRS  ETB-FUN-210
 /// \SRS  ETB-FUN-230
 /// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-50
 /// \SRS  ETB-IF-120
 void tst_SedsConverter_SedsToAsn1::testCrossReferenceDataTypes()
 {
