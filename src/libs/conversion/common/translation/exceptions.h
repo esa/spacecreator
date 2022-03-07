@@ -41,7 +41,7 @@ public:
 };
 
 /**
- * @brief   Exception thrown when can find referenced package
+ * @brief   Exception thrown when translator encounters a package that wasn't declared
  */
 class UndeclaredPackageReferenceException final : public TranslationException
 {
