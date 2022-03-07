@@ -52,7 +52,9 @@ using namespace seds::model;
 using conversion::Options;
 using conversion::asn1::translator::DataTypesDependencyResolver;
 using conversion::asn1::translator::SedsToAsn1Translator;
+using conversion::translator::NotDagException;
 using conversion::translator::TranslationException;
+using conversion::translator::UndeclaredDataTypeException;
 using tests::conversion::common::SedsContainerDataTypeBuilder;
 using tests::conversion::common::SedsDataTypeFactory;
 using tests::conversion::common::SedsModelBuilder;
@@ -219,7 +221,7 @@ void tst_SedsToAsn1Translator::testResolvingCyclicDependency()
 
     DataTypesDependencyResolver resolver;
 
-    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes, nullptr), DataTypesDependencyResolver::NotDagException);
+    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes, nullptr), NotDagException);
 }
 
 void tst_SedsToAsn1Translator::testResolvingUndeclaredType()
@@ -235,8 +237,7 @@ void tst_SedsToAsn1Translator::testResolvingUndeclaredType()
 
     DataTypesDependencyResolver resolver;
 
-    QVERIFY_EXCEPTION_THROWN(
-            resolver.resolve(&dataTypes, nullptr), DataTypesDependencyResolver::UndeclaredDataTypeException);
+    QVERIFY_EXCEPTION_THROWN(resolver.resolve(&dataTypes, nullptr), UndeclaredDataTypeException);
 }
 
 /// \SRS  ETB-FUN-210

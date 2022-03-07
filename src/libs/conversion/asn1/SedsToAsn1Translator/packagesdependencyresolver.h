@@ -37,35 +37,6 @@ namespace conversion::asn1::translator {
  */
 class PackagesDependencyResolver final
 {
-public:
-    /**
-     * @brief   Exception thrown when packages to sort don't create a DAG
-     *
-     * Exception for cyclic dependency
-     */
-    class NotDagException final : public ConversionException
-    {
-    public:
-        /**
-         * @brief   Constructor
-         */
-        NotDagException();
-    };
-
-    /**
-     * @brief   Exception thrown when can find referenced package
-     */
-    class UnknownPackageReferenceException final : public ConversionException
-    {
-    public:
-        /**
-         * @brief   Constructor
-         *
-         * @param   packageName     Name of the referenced package
-         */
-        UnknownPackageReferenceException(const QString &dataTypeName);
-    };
-
 private:
     /// @brief  Type of the mark for the sorting
     enum class MarkType

@@ -25,20 +25,11 @@
 #include <seds/SedsModel/types/arraydatatype.h>
 #include <seds/SedsModel/types/containerdatatype.h>
 
+using conversion::translator::NotDagException;
 using conversion::translator::TranslationException;
+using conversion::translator::UndeclaredPackageReferenceException;
 
 namespace conversion::asn1::translator {
-
-PackagesDependencyResolver::NotDagException::NotDagException()
-    : ConversionException("Packages doesn't make a DAG")
-{
-}
-
-PackagesDependencyResolver::UnknownPackageReferenceException::UnknownPackageReferenceException(
-        const QString &packageName)
-    : ConversionException(QString("Reference to an unknown package '%1'").arg(packageName))
-{
-}
 
 PackagesDependencyResolver::ResultList PackagesDependencyResolver::resolve(
         const std::vector<seds::model::Package> *packages)
@@ -62,7 +53,7 @@ void PackagesDependencyResolver::visit(const seds::model::Package *package)
     }
 
     if (isTemporarilyMarked(package)) {
-        throw NotDagException();
+        throw NotDagException(package->qualifiedName().pathStr());
     }
 
     markTemporary(package);
@@ -186,7 +177,7 @@ const seds::model::Package *PackagesDependencyResolver::findPackage(const QStrin
         return &(*foundPackage);
     }
 
-    throw UnknownPackageReferenceException(packageName);
+    throw UndeclaredPackageReferenceException(packageName);
     return nullptr;
 }
 

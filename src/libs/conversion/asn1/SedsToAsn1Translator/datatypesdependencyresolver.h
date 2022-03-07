@@ -41,35 +41,6 @@ namespace conversion::asn1::translator {
  */
 class DataTypesDependencyResolver final
 {
-public:
-    /**
-     * @brief   Exception thrown when data types to sort don't create a DAG
-     *
-     * Exception for cyclic dependency
-     */
-    class NotDagException final : public ConversionException
-    {
-    public:
-        /**
-         * @brief   Constructor
-         */
-        NotDagException();
-    };
-
-    /**
-     * @brief   Exception thrown when can find referenced data type
-     */
-    class UndeclaredDataTypeException final : public ConversionException
-    {
-    public:
-        /**
-         * @brief   Constructor
-         *
-         * @param   dataTypeName    Name of the referenced undeclared type
-         */
-        UndeclaredDataTypeException(const QString &dataTypeName);
-    };
-
 private:
     /// @brief  Type of the mark for the soring
     enum class MarkType

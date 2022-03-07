@@ -32,19 +32,11 @@
 #include <seds/SedsModel/types/subrangedatatype.h>
 #include <unordered_map>
 
+using conversion::translator::NotDagException;
 using conversion::translator::TranslationException;
+using conversion::translator::UndeclaredDataTypeException;
 
 namespace conversion::asn1::translator {
-
-DataTypesDependencyResolver::NotDagException::NotDagException()
-    : ConversionException("Data types doesn't make a DAG")
-{
-}
-
-DataTypesDependencyResolver::UndeclaredDataTypeException::UndeclaredDataTypeException(const QString &dataTypeName)
-    : ConversionException(QString("Undeclared data type '%1'").arg(dataTypeName))
-{
-}
 
 DataTypesDependencyResolver::ResultList DataTypesDependencyResolver::resolve(
         const DataTypesDependencyResolver::DataTypes *dataTypes,
@@ -76,7 +68,7 @@ void DataTypesDependencyResolver::visit(const seds::model::DataType *dataType)
     }
 
     if (isTemporarilyMarked(dataType)) {
-        throw NotDagException();
+        throw NotDagException(dataTypeNameStr(*dataType));
     }
 
     markTemporary(dataType);

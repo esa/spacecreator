@@ -26,6 +26,11 @@ TranslationException::TranslationException(QString message)
 {
 }
 
+UndeclaredPackageReferenceException::UndeclaredPackageReferenceException(const QString &packageName)
+    : TranslationException(QString("Undeclared package '%1'").arg(packageName))
+{
+}
+
 UndeclaredDataTypeException::UndeclaredDataTypeException(const QString &dataTypeName)
     : TranslationException(QString("Undeclared data type '%1'").arg(dataTypeName))
 {
@@ -55,6 +60,11 @@ MissingAsn1TypeDefinitionException::MissingAsn1TypeDefinitionException(const QSt
 
 MissingInterfaceViewFunctionException::MissingInterfaceViewFunctionException(const QString &functionName)
     : TranslationException(QString("Function %1 not found in the InterfaceView").arg(functionName))
+{
+}
+
+NotDagException::NotDagException(const QString &entityName)
+    : TranslationException(QString("Detected cyclic dependency while handling entity \"%1\"").arg(entityName))
 {
 }
 
