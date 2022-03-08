@@ -19,18 +19,21 @@
 
 #include "dvgenerator.h"
 
+#include <QDirIterator>
 #include <algorithm>
 #include <cstddef>
 #include <dvcore/dvboard.h>
 #include <dvcore/dvcommonprops.h>
 #include <dvcore/dvdevice.h>
 #include <dvcore/dvfunction.h>
+#include <dvcore/dvhwlibraryreader.h>
 #include <dvcore/dvmodel.h>
 #include <dvcore/dvnode.h>
 #include <dvcore/dvobject.h>
 #include <dvcore/dvpartition.h>
 #include <memory>
 #include <shared/entityattribute.h>
+#include <shared/errorhub.h>
 
 namespace testgenerator {
 
@@ -38,18 +41,9 @@ QVector<QVector<qint32>> DvGenerator::DvCoordinates::devices;
 DvGenerator::Coordinates DvGenerator::DvCoordinates::node = { 192, 193, 396, 353 };
 DvGenerator::Coordinates DvGenerator::DvCoordinates::partition = { 236, 237, 356, 317 };
 
-const QString DvGenerator::X86_LINUX_CPP = "x86 Linux CPP";
-const QString DvGenerator::SAM_V71_FREERTOS_N7S = "SAM V71 FreeRTOS N7S";
-const QString DvGenerator::X86_LINUX_POHIC = "x86 Linux POHIC";
-const QString DvGenerator::GR740_RTEMS_POHIC = "GR740 RTEMS POHIC";
-const QString DvGenerator::RASPBERRY_PI_LINUX_POHIC = "Raspberry PI Linux POHIC";
-const QString DvGenerator::ZYNQ_ZC706_RTEMS_POHIC = "ZynQ ZC706 RTEMS POHIC";
-const QString DvGenerator::BRAVE_LARGE_FREERTOS = "BRAVE_Large FreeRTOS";
-const QString DvGenerator::LINUX_ARM_RUNTIME = "Linux ARM Runtime";
-
-auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind,
-        const QVector<dvm::DVObject *> &hwObjects, const QString &nodeName, const QString &nodeLabel,
-        const QString &hostPartitionName) -> std::unique_ptr<dvm::DVModel>
+auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind, const Hardware &hw,
+        const QString &nodeTitle, const QString &nodeLabel, const QString &hostPartitionName)
+        -> std::unique_ptr<dvm::DVModel>
 {
     DvCoordinates::devices = {
         { 192, 210 },
@@ -58,10 +52,13 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
 
     auto model = std::make_unique<dvm::DVModel>();
 
-    dvm::DVNode *const node = makeNodeAndAddToModel(nodeName, nodeLabel, model.get(), getBoard(hwObjects));
+    const QVector<dvm::DVObject *> loadedLib = getAllHwObjectsFromLib();
+    const QVector<dvm::DVObject *> selectedObjects = getSelectedHwObjects(loadedLib, hardwareTitle(hw));
+
+    dvm::DVNode *const node = makeNodeAndAddToModel(nodeTitle, nodeLabel, model.get(), getBoard(selectedObjects));
     makePartitionAndAddToNode(hostPartitionName, model.get(), node);
 
-    const QVector<dvm::DVObject *> hwDevices = getDevices(hwObjects);
+    const QVector<dvm::DVObject *> hwDevices = getDevices(selectedObjects);
     std::for_each(hwDevices.begin(), hwDevices.end(),
             [&](const auto &device) { cloneDeviceAndAddToModelAndNode(device, model.get(), node); });
 
@@ -69,6 +66,30 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
             [&](const auto &function) { cloneFunctionAndAddToModel(function, model.get(), node, hostPartitionName); });
 
     return model;
+}
+
+auto DvGenerator::hardwareTitle(const Hardware &hw) -> QString
+{
+    switch (hw) {
+    case X86_LINUX_CPP:
+        return "x86 Linux CPP";
+    case SAM_V71_FREERTOS_N7S:
+        return "SAM V71 FreeRTOS N7S";
+    case X86_LINUX_POHIC:
+        return "x86 Linux POHIC";
+    case GR740_RTEMS_POHIC:
+        return "GR740 RTEMS POHIC";
+    case RASPBERRY_PI_LINUX_POHIC:
+        return "Raspberry PI Linux POHIC";
+    case ZYNQ_ZC706_RTEMS_POHIC:
+        return "ZynQ ZC706 RTEMS POHIC";
+    case BRAVE_LARGE_FREERTOS:
+        return "BRAVE_Large FreeRTOS";
+    case LINUX_ARM_RUNTIME:
+        return "Linux ARM Runtime";
+    default:
+        return "unknown";
+    }
 }
 
 auto DvGenerator::getBoard(const QVector<dvm::DVObject *> &objects) -> dvm::DVBoard *
@@ -165,12 +186,12 @@ auto DvGenerator::cloneFunctionAndAddToModel(ivm::IVFunction *function, dvm::DVM
     }
 }
 
-auto DvGenerator::makeNodeAndAddToModel(const QString &nodeName, const QString &nodeLabel, dvm::DVModel *const model,
+auto DvGenerator::makeNodeAndAddToModel(const QString &nodeTitle, const QString &nodeLabel, dvm::DVModel *const model,
         dvm::DVBoard *const board) -> dvm::DVNode *
 {
-    auto *const node = makeDvObject<dvm::DVNode>(model, nodeName);
+    auto *const node = makeDvObject<dvm::DVNode>(model, nodeTitle);
     node->setCoordinates(DvCoordinates::node);
-    node->setEntityAttribute(nameToken, nodeName);
+    node->setEntityAttribute(nameToken, nodeTitle);
     node->setEntityAttribute(nodeLabelToken, nodeLabel);
     node->setEntityAttribute(typeToken, board->entityAttributeValue(typeToken));
     node->setEntityAttribute(devNamespaceToken, board->entityAttributeValue(devNamespaceToken));
@@ -193,6 +214,40 @@ auto DvGenerator::makePartitionAndAddToNode(
     node->addPartition(partition);
 
     return partition;
+}
+
+auto DvGenerator::getAllHwObjectsFromLib() -> QVector<dvm::DVObject *>
+{
+    QVector<dvm::DVObject *> hwObjects;
+
+    const QString directory = shared::hwLibraryPath();
+    QDirIterator it(directory, QStringList() << "*.xml", QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        const QString fileName = it.next();
+        shared::ErrorHub::setCurrentFile(fileName);
+        dvm::DVHWLibraryReader reader;
+        const bool ok = reader.readFile(fileName);
+        if (ok) {
+            hwObjects << reader.parsedObjects();
+        }
+    }
+
+    return hwObjects;
+}
+
+auto DvGenerator::getSelectedHwObjects(const QVector<dvm::DVObject *> &hwObjects, const QString &hwTitle)
+        -> QVector<dvm::DVObject *>
+{
+    QVector<dvm::DVObject *> selectedHwObjects;
+    for (const auto &obj : hwObjects) {
+        if (obj->title().compare(hwTitle) == 0) {
+            selectedHwObjects << obj;
+        } else if (obj->parentObject() != nullptr && obj->parentObject()->title().compare(hwTitle) == 0) {
+            selectedHwObjects << obj;
+        }
+    }
+
+    return selectedHwObjects;
 }
 
 const QString DvGenerator::nodeLabelToken = dvm::meta::Props::token(dvm::meta::Props::Token::node_label);

@@ -24,7 +24,6 @@
 #include <QBuffer>
 #include <QCoreApplication>
 #include <QDebug>
-#include <QDirIterator>
 #include <QObject>
 #include <QStandardItemModel>
 #include <QStandardPaths>
@@ -33,7 +32,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <dvcore/dvfunction.h>
-#include <dvcore/dvhwlibraryreader.h>
 #include <dvcore/dvlibrary.h>
 #include <dvcore/dvmodel.h>
 #include <dvcore/dvobject.h>
@@ -49,7 +47,6 @@
 #include <qobjectdefs.h>
 #include <shared/abstractvisualizationmodel.h>
 #include <shared/entityattribute.h>
-#include <shared/errorhub.h>
 #include <shared/settingsmanager.h>
 #include <shared/veobject.h>
 #include <sharedlibrary.h>
@@ -70,22 +67,23 @@ private Q_SLOTS:
     void testArmV71();
 
 private:
-    void initHwLibrary();
-
     const QString dvDir = "resources";
     const QString dvPath =
             QString("%1%2%3.dv.xml").arg(dvDir).arg(QDir::separator()); // for example resources/deploymentview.dv.xml
     const QString dvConfig = QString("%1%2config.xml").arg(dvDir).arg(QDir::separator());
 
-    QVector<dvm::DVObject *> hwObjects;
+    std::vector<std::unique_ptr<ivm::IVFunction>> ivFunctions;
+    std::vector<ivm::IVFunction *> ivFunctionsRaw;
+
+    auto makeIvFunctionsForDv() -> std::vector<std::unique_ptr<ivm::IVFunction>>;
+    auto getRawPointersVector(const std::vector<std::unique_ptr<ivm::IVFunction>> &uniquePointersVector)
+            -> std::vector<ivm::IVFunction *>;
 
 public:
-    static const std::vector<QString> functionTitles;
-};
-
-const std::vector<QString> tst_dvgenerator::functionTitles = {
-    "TestDriver",
-    "FunctionUnderTest",
+    const std::vector<QString> functionTitles = {
+        "TestDriver",
+        "FunctionUnderTest",
+    };
 };
 
 static auto checkEntityProperties(const dvm::DVObject &actual, const dvm::DVObject &expected) -> void;
@@ -93,21 +91,13 @@ static auto checkEntityAttributes(const dvm::DVObject &actual, const dvm::DVObje
 static auto checkObjVectors(QVector<dvm::DVObject *> *actual, QVector<dvm::DVObject *> *expected) -> void;
 static auto checkParentObject(dvm::DVObject *actual, dvm::DVObject *expected) -> void;
 static auto checkPartitions(const dvm::DVPartition &actualPartition, const dvm::DVPartition &expectedPartition) -> void;
-static auto checkTypeSpecificMembers(const dvm::DVObject &actualObj, const dvm::DVObject &expectedObj) -> void;
 
 static auto exportModel(QVector<dvm::DVObject *> *objects, const QString &outputFilename) -> void;
-static auto getRawPointersVector(const std::vector<std::unique_ptr<ivm::IVFunction>> &uniquePointersVector)
-        -> std::vector<ivm::IVFunction *>;
-static auto getSelectedHwObjects(const QVector<dvm::DVObject *> &hwObjects, const QString &hwTitle)
-        -> QVector<dvm::DVObject *>;
-static auto makeIvFunctionsForDv() -> std::vector<std::unique_ptr<ivm::IVFunction>>;
 
 void tst_dvgenerator::initTestCase()
 {
-    dve::initDvEditor();
-    shared::initSharedLibrary();
-    dvm::initDVLibrary();
-    initHwLibrary();
+    ivFunctions = makeIvFunctionsForDv();
+    ivFunctionsRaw = getRawPointersVector(ivFunctions);
 }
 
 void tst_dvgenerator::testLinuxX86()
@@ -115,13 +105,8 @@ void tst_dvgenerator::testLinuxX86()
     const QString outputFileName = "deploymentview-linux-x86.dv.xml";
     const QString expectedOutputFilename = dvPath.arg("deploymentview-linux-x86");
 
-    const QVector<dvm::DVObject *> selectedHwObjects = getSelectedHwObjects(hwObjects, DvGenerator::X86_LINUX_CPP);
-    QVERIFY(!selectedHwObjects.isEmpty());
-    const std::vector<std::unique_ptr<ivm::IVFunction>> ivFunctions = makeIvFunctionsForDv();
-    const std::vector<ivm::IVFunction *> ivFunctionsRaw = getRawPointersVector(ivFunctions);
-
-    const std::unique_ptr<dvm::DVModel> generatedModel =
-            DvGenerator::generate(ivFunctionsRaw, selectedHwObjects, "x86_Linux_TestRunner", "Node_1", "hostPartition");
+    const std::unique_ptr<dvm::DVModel> generatedModel = DvGenerator::generate(
+            ivFunctionsRaw, DvGenerator::X86_LINUX_CPP, "x86_Linux_TestRunner", "Node_1", "hostPartition");
 
     QVERIFY(generatedModel != nullptr);
     const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());
@@ -140,14 +125,8 @@ void tst_dvgenerator::testArmV71()
     const QString outputFileName = "deploymentview-samv71.dv.xml";
     const QString expectedOutputFilename = dvPath.arg("deploymentview-samv71");
 
-    const QVector<dvm::DVObject *> selectedHwObjects =
-            getSelectedHwObjects(hwObjects, DvGenerator::SAM_V71_FREERTOS_N7S);
-    QVERIFY(!selectedHwObjects.isEmpty());
-    const std::vector<std::unique_ptr<ivm::IVFunction>> functions = makeIvFunctionsForDv();
-    const std::vector<ivm::IVFunction *> functionsToBind = getRawPointersVector(functions);
-
     const std::unique_ptr<dvm::DVModel> generatedModel = DvGenerator::generate(
-            functionsToBind, selectedHwObjects, "SAM V71 FreeRTOS N7S_1", "Node_1", "hostPartition");
+            ivFunctionsRaw, DvGenerator::SAM_V71_FREERTOS_N7S, "SAM V71 FreeRTOS N7S_1", "Node_1", "hostPartition");
 
     QVERIFY(generatedModel != nullptr);
     const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());
@@ -159,21 +138,6 @@ void tst_dvgenerator::testArmV71()
     const auto expectedDvObjects = dvtools::getDvObjectsFromFile(expectedOutputFilename);
     QVERIFY(expectedDvObjects != nullptr);
     checkObjVectors(generatedDvObjects.get(), expectedDvObjects.get());
-}
-
-void tst_dvgenerator::initHwLibrary()
-{
-    const QString directory = shared::hwLibraryPath();
-    QDirIterator it(directory, QStringList() << "*.xml", QDir::Files, QDirIterator::Subdirectories);
-    while (it.hasNext()) {
-        const QString fileName = it.next();
-        shared::ErrorHub::setCurrentFile(fileName);
-        dvm::DVHWLibraryReader reader;
-        const bool ok = reader.readFile(fileName);
-        if (ok) {
-            hwObjects << reader.parsedObjects();
-        }
-    }
 }
 
 void checkEntityProperties(const dvm::DVObject &actual, const dvm::DVObject &expected)
@@ -212,44 +176,14 @@ void checkObjVectors(QVector<dvm::DVObject *> *actualObjs, QVector<dvm::DVObject
         checkParentObject(generatedObj.parentObject(), expectedObj.parentObject());
         checkEntityProperties(generatedObj, expectedObj);
         checkEntityAttributes(generatedObj, expectedObj);
-        checkTypeSpecificMembers(generatedObj, expectedObj);
-    }
-}
-
-void checkTypeSpecificMembers(const dvm::DVObject &actualObj, const dvm::DVObject &expectedObj)
-{
-    switch (actualObj.type()) {
-    case dvm::DVObject::Type::Node:
-        break;
-    case dvm::DVObject::Type::Function:
-        break;
-    case dvm::DVObject::Type::Connection:
-        break;
-    case dvm::DVObject::Type::Message:
-        break;
-    case dvm::DVObject::Type::Bus:
-        break;
-    case dvm::DVObject::Type::Board:
-        break;
-    case dvm::DVObject::Type::Port:
-        break;
-    case dvm::DVObject::Type::SystemInterface:
-        break;
-    case dvm::DVObject::Type::SystemFunction:
-        break;
-    case dvm::DVObject::Type::Device:
-        break;
-    case dvm::DVObject::Type::Partition: {
-        const auto *const actualPartition = static_cast<const dvm::DVPartition *>(&actualObj);
-        const auto *const expectedPartition = static_cast<const dvm::DVPartition *>(&expectedObj);
-        if (actualPartition == nullptr || expectedPartition == nullptr) {
-            throw std::runtime_error("Specified DV object type is Partition, but cannot cast to DVPartition type");
+        if (generatedObj.type() == dvm::DVObject::Type::Partition) {
+            const auto *const actualPartition = static_cast<const dvm::DVPartition *>(&generatedObj);
+            const auto *const expectedPartition = static_cast<const dvm::DVPartition *>(&expectedObj);
+            if (actualPartition == nullptr || expectedPartition == nullptr) {
+                throw std::runtime_error("Specified DV object type is Partition, but cannot cast to DVPartition type");
+            }
+            checkPartitions(*actualPartition, *expectedPartition);
         }
-        checkPartitions(*actualPartition, *expectedPartition);
-        break;
-    }
-    case dvm::DVObject::Type::Unknown:
-        QFAIL("Unknown type in generated object");
     }
 }
 
@@ -323,7 +257,7 @@ void exportModel(QVector<dvm::DVObject *> *const dvObjects, const QString &outpu
     file.write(qba);
 }
 
-std::vector<ivm::IVFunction *> getRawPointersVector(
+std::vector<ivm::IVFunction *> tst_dvgenerator::getRawPointersVector(
         const std::vector<std::unique_ptr<ivm::IVFunction>> &uniquePointersVector)
 {
     std::vector<ivm::IVFunction *> rawPtrsVector;
@@ -334,21 +268,7 @@ std::vector<ivm::IVFunction *> getRawPointersVector(
     return rawPtrsVector;
 }
 
-QVector<dvm::DVObject *> getSelectedHwObjects(const QVector<dvm::DVObject *> &hwObjects, const QString &hwTitle)
-{
-    QVector<dvm::DVObject *> selectedHwObjects;
-    for (const auto &obj : hwObjects) {
-        if (obj->title().compare(hwTitle) == 0) {
-            selectedHwObjects << obj;
-        } else if (obj->parentObject() != nullptr && obj->parentObject()->title().compare(hwTitle) == 0) {
-            selectedHwObjects << obj;
-        }
-    }
-
-    return selectedHwObjects;
-}
-
-std::vector<std::unique_ptr<ivm::IVFunction>> makeIvFunctionsForDv()
+std::vector<std::unique_ptr<ivm::IVFunction>> tst_dvgenerator::makeIvFunctionsForDv()
 {
     std::vector<std::unique_ptr<ivm::IVFunction>> functions;
     functions.push_back(std::make_unique<ivm::IVFunction>());

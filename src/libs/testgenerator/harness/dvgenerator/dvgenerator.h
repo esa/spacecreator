@@ -19,13 +19,12 @@
 
 #pragma once
 
-#include "dvnode.h"
-#include "dvpartition.h"
-
 #include <dvcore/dvboard.h>
 #include <dvcore/dvdevice.h>
 #include <dvcore/dvmodel.h>
+#include <dvcore/dvnode.h>
 #include <dvcore/dvobject.h>
+#include <dvcore/dvpartition.h>
 #include <ivcore/ivfunction.h>
 #include <memory>
 #include <vector>
@@ -47,19 +46,21 @@ public:
         static Coordinates partition;
     };
 
-    static const QString X86_LINUX_CPP;
-    static const QString SAM_V71_FREERTOS_N7S;
-    static const QString X86_LINUX_POHIC;
-    static const QString GR740_RTEMS_POHIC;
-    static const QString RASPBERRY_PI_LINUX_POHIC;
-    static const QString ZYNQ_ZC706_RTEMS_POHIC;
-    static const QString BRAVE_LARGE_FREERTOS;
-    static const QString LINUX_ARM_RUNTIME;
+    enum Hardware
+    {
+        X86_LINUX_CPP,
+        SAM_V71_FREERTOS_N7S,
+        X86_LINUX_POHIC,
+        GR740_RTEMS_POHIC,
+        RASPBERRY_PI_LINUX_POHIC,
+        ZYNQ_ZC706_RTEMS_POHIC,
+        BRAVE_LARGE_FREERTOS,
+        LINUX_ARM_RUNTIME,
+    };
 
-    static auto generate(const std::vector<ivm::IVFunction *> &functionsToBind,
-            const QVector<dvm::DVObject *> &hwObjects, const QString &nodeName = "Node",
-            const QString &nodeLabel = "Node_1", const QString &hostPartitionName = "hostPartition")
-            -> std::unique_ptr<dvm::DVModel>;
+    static auto generate(const std::vector<ivm::IVFunction *> &functionsToBind, const Hardware &hw,
+            const QString &nodeTitle = "Node", const QString &nodeLabel = "Node_1",
+            const QString &hostPartitionName = "hostPartition") -> std::unique_ptr<dvm::DVModel>;
 
 private:
     static auto cloneDvObject(dvm::DVObject *object) -> dvm::DVObject *;
@@ -68,10 +69,15 @@ private:
     static auto cloneFunctionAndAddToModel(
             ivm::IVFunction *function, dvm::DVModel *model, dvm::DVObject *node, const QString &partitionTitle) -> void;
 
+    static auto getAllHwObjectsFromLib() -> QVector<dvm::DVObject *>;
     static auto getBoard(const QVector<dvm::DVObject *> &objects) -> dvm::DVBoard *;
     static auto getDevices(const QVector<dvm::DVObject *> &objects) -> QVector<dvm::DVObject *>;
+    static auto getSelectedHwObjects(const QVector<dvm::DVObject *> &hwObjects, const QString &hwTitle)
+            -> QVector<dvm::DVObject *>;
 
-    static auto makeNodeAndAddToModel(const QString &nodeName, const QString &nodeLabel, dvm::DVModel *model,
+    static auto hardwareTitle(const Hardware &hw) -> QString;
+
+    static auto makeNodeAndAddToModel(const QString &nodeTitle, const QString &nodeLabel, dvm::DVModel *model,
             dvm::DVBoard *board) -> dvm::DVNode *;
     static auto makePartitionAndAddToNode(const QString &hostPartitionName, dvm::DVModel *model, dvm::DVNode *node)
             -> dvm::DVPartition *;
