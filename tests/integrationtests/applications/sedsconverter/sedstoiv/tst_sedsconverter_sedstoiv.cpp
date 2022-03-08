@@ -137,12 +137,20 @@ void tst_SedsConverter_SedsToIv::testAlternateSet()
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-1040
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-120
 void tst_SedsConverter_SedsToIv::testCrossReferenceArguments()
 {
     const int result = system("./test_cross_reference_arguments.sh");
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-1040
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-120
 void tst_SedsConverter_SedsToIv::testCrossReferenceInterfaces()
 {
     const int result = system("./test_cross_reference_interfaces.sh");

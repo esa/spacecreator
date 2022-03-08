@@ -15,8 +15,7 @@ echo "Running SedsConverter test: ${0##*/}'"
 rm -r -f $TEST_OUTPUT_DIR
 mkdir -p $TEST_OUTPUT_DIR
 # Translate
-# gdb --args \
-$SEDS_CONVERTER --from SEDS --to InterfaceView --aux-models ASN.1 --skip-validation -i resources/test_cross_reference_interfaces.xml \
+$SEDS_CONVERTER --from SEDS --to InterfaceView --aux-models ASN.1 --skip-validation -i resources/test_cross_reference_interfaces_package1.xml \
   --out $TEST_OUTPUT_DIR/interfaceview.xml --iv-config resources/config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/
 
 cd $TEST_OUTPUT_DIR

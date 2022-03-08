@@ -13,7 +13,6 @@ echo "Running SedsConverter test: ${0##*/}'"
 rm -r -f $TEST_OUTPUT_DIR
 mkdir -p $TEST_OUTPUT_DIR
 # Translate
-# gdb --args \
 $SEDS_CONVERTER --from SEDS --to ASN.1 --skip-validation -i resources/test_cross_reference_data_types_package1.xml \
     --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/
 # Compare and clean-up on success
