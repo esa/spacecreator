@@ -23,6 +23,7 @@
 #include <QAbstractItemModel>
 #include <QBuffer>
 #include <QCoreApplication>
+#include <QDebug>
 #include <QDirIterator>
 #include <QObject>
 #include <QStandardItemModel>
@@ -112,17 +113,15 @@ void tst_dvgenerator::initTestCase()
 void tst_dvgenerator::testLinuxX86()
 {
     const QString outputFileName = "deploymentview-linux-x86.dv.xml";
-    const QString hwTitle = "x86 Linux CPP";
-    const QString rootNodeName = "x86_Linux_TestRunner";
     const QString expectedOutputFilename = dvPath.arg("deploymentview-linux-x86");
 
-    const QVector<dvm::DVObject *> selectedHwObjects = getSelectedHwObjects(hwObjects, hwTitle);
+    const QVector<dvm::DVObject *> selectedHwObjects = getSelectedHwObjects(hwObjects, DvGenerator::X86_LINUX_CPP);
     QVERIFY(!selectedHwObjects.isEmpty());
     const std::vector<std::unique_ptr<ivm::IVFunction>> ivFunctions = makeIvFunctionsForDv();
-    const std::vector<ivm::IVFunction *> functionsToBind = getRawPointersVector(ivFunctions);
+    const std::vector<ivm::IVFunction *> ivFunctionsRaw = getRawPointersVector(ivFunctions);
 
     const std::unique_ptr<dvm::DVModel> generatedModel =
-            DvGenerator::generate(functionsToBind, selectedHwObjects, rootNodeName);
+            DvGenerator::generate(ivFunctionsRaw, selectedHwObjects, "x86_Linux_TestRunner", "Node_1", "hostPartition");
 
     QVERIFY(generatedModel != nullptr);
     const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());
@@ -132,23 +131,23 @@ void tst_dvgenerator::testLinuxX86()
 
     const auto expectedDvObjects = dvtools::getDvObjectsFromFile(expectedOutputFilename);
     QVERIFY(expectedDvObjects != nullptr);
+
     checkObjVectors(generatedDvObjects.get(), expectedDvObjects.get());
 }
 
 void tst_dvgenerator::testArmV71()
 {
     const QString outputFileName = "deploymentview-samv71.dv.xml";
-    const QString hwTitle = "SAM V71 FreeRTOS N7S";
-    const QString rootNodeName = "SAM V71 FreeRTOS N7S_1";
     const QString expectedOutputFilename = dvPath.arg("deploymentview-samv71");
 
-    const QVector<dvm::DVObject *> selectedHwObjects = getSelectedHwObjects(hwObjects, hwTitle);
+    const QVector<dvm::DVObject *> selectedHwObjects =
+            getSelectedHwObjects(hwObjects, DvGenerator::SAM_V71_FREERTOS_N7S);
     QVERIFY(!selectedHwObjects.isEmpty());
     const std::vector<std::unique_ptr<ivm::IVFunction>> functions = makeIvFunctionsForDv();
     const std::vector<ivm::IVFunction *> functionsToBind = getRawPointersVector(functions);
 
-    const std::unique_ptr<dvm::DVModel> generatedModel =
-            DvGenerator::generate(functionsToBind, selectedHwObjects, rootNodeName);
+    const std::unique_ptr<dvm::DVModel> generatedModel = DvGenerator::generate(
+            functionsToBind, selectedHwObjects, "SAM V71 FreeRTOS N7S_1", "Node_1", "hostPartition");
 
     QVERIFY(generatedModel != nullptr);
     const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());
