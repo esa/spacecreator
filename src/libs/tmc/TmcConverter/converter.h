@@ -66,9 +66,9 @@ private:
     bool convertModel(const std::set<conversion::ModelType> &sourceModelTypes, conversion::ModelType targetModelType,
             const std::set<conversion::ModelType> &auxilaryModelTypes, conversion::Options options) const;
 
-    bool convertSystem();
+    bool convertSystem(QList<QFileInfo> &allSdlFiles);
 
-    bool convertStopConditions();
+    bool convertStopConditions(const QList<QFileInfo> &allSdlFiles);
 
     bool convertInterfaceview(const QString &inputFilepath, const QString &outputFilepath,
             const QStringList &modelFunctions, const QStringList &environmentFunctions);
