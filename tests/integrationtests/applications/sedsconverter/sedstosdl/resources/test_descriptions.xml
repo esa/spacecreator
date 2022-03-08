@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="Descriptions">
+    <DataTypeSet>
+      <IntegerDataType name="IntegerType">
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="100" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="MegaInterface">
+        <ParameterSet>
+          <Parameter name="Param" mode="sync" type="IntegerType" />
+        </ParameterSet>
+        <CommandSet>
+          <Command name="MegaCommand" mode="sync">
+            <Argument name="arg" type="IntegerType" mode="in"/>
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="Component">
+        <ProvidedInterfaceSet>
+          <Interface name="InterfacePi" type="MegaInterface" />
+        </ProvidedInterfaceSet>
+        <RequiredInterfaceSet>
+          <Interface name="InterfaceRi" type="MegaInterface" />
+        </RequiredInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="var1" type="IntegerType" shortDescription="Var1 short description">
+              <LongDescription>Var1
+long description</LongDescription>
+            </Variable>
+          </VariableSet>
+          <ParameterMapSet>
+            <ParameterMap variableRef="var1" parameter="Param" interface="InterfacePi" />
+          </ParameterMapSet>
+          <ActivitySet>
+            <Activity name="MegaActivity" shortDescription="MegaActivity short description">
+            <LongDescription>MegaActivity
+long description</LongDescription>
+              <Argument name="arg1" type="IntegerType" />
+              <Argument name="arg2" type="IntegerType" />
+              <Body>
+                <SendParameterPrimitive interface="InterfaceRi" parameter="Param" operation="get" shortDescription="SPP short description">
+                  <LongDescription>SPP
+long description</LongDescription>
+                  <ArgumentValue>
+                    <VariableRef variableRef="var1" />
+                  </ArgumentValue>
+                </SendParameterPrimitive>
+                <Assignment outputVariableRef="arg" shortDescription="Assignment short description">
+                  <LongDescription>Assignment
+long description</LongDescription>
+                  <Value value="1"/>
+                </Assignment>
+                <Conditional shortDescription="Conditional short description">
+                  <LongDescription>Conditional
+long description</LongDescription>
+                  <Condition>
+                    <Condition>
+                      <FirstOperand variableRef="arg1" />
+                      <ComparisonOperator>lessThan</ComparisonOperator>
+                      <SecondOperand variableRef="arg2" />
+                    </Condition>
+                  </Condition>
+                  <OnConditionTrue>
+                    <SendCommandPrimitive interface="InterfaceRi" command="MegaCommand" shortDescription="SCP short description">
+                      <LongDescription>SCP
+long description</LongDescription>
+                      <ArgumentValue name="arg">
+                        <Value value="0" />
+                      </ArgumentValue>
+                    </SendCommandPrimitive>
+                  </OnConditionTrue>
+                  <OnConditionFalse>
+                    <SendCommandPrimitive interface="InterfaceRi" command="MegaCommand">
+                      <ArgumentValue name="arg">
+                        <Value value="1" />
+                      </ArgumentValue>
+                    </SendCommandPrimitive>
+                  </OnConditionFalse>
+                </Conditional>
+                <MathOperation outputVariableRef="var1" shortDescription="Math short description">
+                  <LongDescription>Math
+long description</LongDescription>
+                  <Operator operator="add" />
+                  <VariableRef variableRef="var1" />
+                  <Value value="1" />
+                </MathOperation>
+                <Calibration inputVariableRef="var1" outputVariableRef="var1" shortDescription="Calibration short description">
+                  <LongDescription>Calibration
+long description</LongDescription>
+                  <PolynomialCalibrator>
+                    <Term coefficient="2" exponent="0" />
+                    <Term coefficient="4" exponent="1" />
+                  </PolynomialCalibrator>
+                </Calibration>
+              </Body>
+            </Activity>
+          </ActivitySet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

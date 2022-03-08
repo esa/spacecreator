@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,35 +17,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "node.h"
+#pragma once
 
-#include <memory>
+#include <sdl/SdlModel/node.h>
+#include <seds/SedsModel/base/description.h>
+#include <seds/SedsModel/types/datatype.h>
 
-namespace sdl {
+namespace conversion::sdl::translator {
 
-Node::Node(QString name)
-    : m_name(std::move(name))
+class DescriptionTranslator final
 {
-}
+public:
+    DescriptionTranslator() = delete;
 
-const QString &Node::name() const
-{
-    return m_name;
-}
+public:
+    static auto translate(const seds::model::Description &sedsDescription, ::sdl::Node *sdlNode) -> void;
+};
 
-void Node::setName(QString name)
-{
-    m_name = std::move(name);
-}
-
-const QString &Node::comment() const
-{
-    return m_comment;
-}
-
-void Node::setComment(QString comment)
-{
-    m_comment = std::move(comment);
-}
-
-} // sdl
+} // namespace conversion::asn1::translator

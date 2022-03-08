@@ -183,6 +183,13 @@ public:
         auto writeLine(const QString &line) -> void;
 
         /**
+         * @brief   Write a comment line - indent, comment and newline
+         *
+         * @param   comment   comment to write
+         */
+        auto writeComment(const QString &line) -> void;
+
+        /**
          * @brief   Push indent onto the top of the indent stack
          *
          * @param   indent   additional indent amount

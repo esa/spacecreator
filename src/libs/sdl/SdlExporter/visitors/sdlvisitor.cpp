@@ -156,6 +156,17 @@ auto SdlVisitor::IndentingStreamWriter::writeLine(const QString &line) -> void
     m_stream << getIndent() << line << "\n";
 }
 
+auto SdlVisitor::IndentingStreamWriter::writeComment(const QString &comment) -> void
+{
+    if (comment.isEmpty()) {
+        return;
+    }
+
+    for (const auto &commentPart : comment.split("\n", Qt::SkipEmptyParts)) {
+        m_stream << getIndent() << "-- " << commentPart << "\n";
+    }
+}
+
 auto SdlVisitor::IndentingStreamWriter::pushIndent(const QString &indent) -> void
 {
     m_indent.push_back(indent);
@@ -285,6 +296,7 @@ void SdlVisitor::visit(const Output &output)
 
     m_layouter.moveDown(Layouter::ElementType::Output);
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Output));
+    m_writer.writeComment(output.comment());
     m_writer.beginLine("output " + output.name());
     const auto &outputParamRef = output.parameter();
     if (outputParamRef != nullptr) {
@@ -320,6 +332,7 @@ void SdlVisitor::visit(const Task &task)
 
     m_layouter.moveDown(Layouter::ElementType::Task);
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Task));
+    m_writer.writeComment(task.comment());
     m_writer.writeLine("task " + task.content() + ";");
 }
 
@@ -332,6 +345,7 @@ void SdlVisitor::visit(const VariableDeclaration &declaration)
         throw ExportException("Variable declaration shall have a specified type but it doesn't");
     }
 
+    m_writer.writeComment(declaration.comment());
     m_writer.writeLine("dcl " + declaration.name() + " " + declaration.type() + ";");
 }
 
@@ -396,6 +410,7 @@ void SdlVisitor::visit(const Decision &decision)
     }
 
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Decision));
+    m_writer.writeComment(decision.comment());
     m_writer.writeLine("decision " + decision.expression()->content() + ";");
     m_layouter.moveDown(Layouter::ElementType::Decision);
     m_layouter.pushPosition();
@@ -416,6 +431,7 @@ void SdlVisitor::visit(const Procedure &procedure)
     m_layouter.pushPosition();
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Procedure));
     m_layouter.moveDown(Layouter::ElementType::Procedure);
+    m_writer.writeComment(procedure.comment());
     m_writer.writeLine("procedure " + procedure.name() + ";");
     m_writer.pushIndent(INDENT);
     m_layouter.resetPosition();
@@ -489,6 +505,7 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall)
 
     m_layouter.moveDown(Layouter::ElementType::ProcedureCall);
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::ProcedureCall));
+    m_writer.writeComment(procedureCall.comment());
     m_writer.beginLine("call " + procedureCall.procedure()->name());
 
     const auto &procedureCallArgs = procedureCall.arguments();

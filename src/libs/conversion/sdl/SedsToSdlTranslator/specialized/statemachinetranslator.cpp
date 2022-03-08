@@ -19,6 +19,7 @@
 
 #include "statemachinetranslator.h"
 
+#include "descriptiontranslator.h"
 #include "statementtranslatorvisitor.h"
 
 #include <algorithm>
@@ -332,7 +333,11 @@ auto StateMachineTranslator::translateVariables(
         if (referencedType == nullptr) {
             throw MissingAsn1TypeDefinitionException(variableTypeName);
         }
-        context.sdlProcess()->addVariable(std::make_unique<::sdl::VariableDeclaration>(variableName, variableTypeName));
+
+        auto sdlVariable = std::make_unique<::sdl::VariableDeclaration>(variableName, variableTypeName);
+        DescriptionTranslator::translate(variable, sdlVariable.get());
+
+        context.sdlProcess()->addVariable(std::move(sdlVariable));
     }
 }
 
