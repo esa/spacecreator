@@ -22,6 +22,7 @@
 #include "datatypesdependencyresolver.h"
 #include "packagesdependencyresolver.h"
 #include "specialized/datatypetranslatorvisitor.h"
+#include "specialized/descriptiontranslator.h"
 
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/file.h>
@@ -111,6 +112,7 @@ std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePacka
 
     auto packageAsn1Definitions = std::make_unique<Asn1Acn::Definitions>(
             Escaper::escapeAsn1PackageName(sedsPackage.nameStr()), Asn1Acn::SourceLocation());
+    DescriptionTranslator::translate(sedsPackage, packageAsn1Definitions.get());
 
     for (const auto &importedType : importedTypes) {
         packageAsn1Definitions->addImportedType(importedType);
@@ -166,6 +168,9 @@ void SedsToAsn1Translator::translateDataTypes(const std::list<const seds::model:
         const auto &asn1TypeIdentifier = asn1Type->identifier();
         auto asn1TypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
                 asn1TypeIdentifier, asn1TypeIdentifier, Asn1Acn::SourceLocation(), std::move(asn1Type));
+
+        DescriptionTranslator::translate(*sedsDataType, asn1TypeAssignment.get());
+
         asn1Definitions->addType(std::move(asn1TypeAssignment));
     }
 }

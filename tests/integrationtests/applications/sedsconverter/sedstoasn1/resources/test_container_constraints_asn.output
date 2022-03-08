@@ -12,6 +12,7 @@ EnumData ::= ENUMERATED
 }
 BitStringData ::= BIT STRING(SIZE(4))
 StringData ::= IA5String(SIZE(0 .. 32))
+-- Base for the packet payload data
 PayloadBase ::= SEQUENCE
 {
     realization CHOICE

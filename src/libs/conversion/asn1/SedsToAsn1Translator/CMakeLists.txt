@@ -6,6 +6,7 @@ set(SOURCES     containerentriesscope.cpp
                 translator.cpp
                 specialized/containerconstrainttranslatorvisitor.cpp
                 specialized/datatypetranslatorvisitor.cpp
+                specialized/descriptiontranslator.cpp
                 specialized/dimensiontranslator.cpp
                 specialized/entrytranslatorvisitor.cpp
                 specialized/rangetranslatorvisitor.cpp)
@@ -15,6 +16,7 @@ set(INCLUDES    containerentriesscope.h
                 translator.h
                 specialized/containerconstrainttranslatorvisitor.h
                 specialized/datatypetranslatorvisitor.h
+                specialized/descriptiontranslator.h
                 specialized/dimensiontranslator.h
                 specialized/entrytranslatorvisitor.h
                 specialized/rangetranslatorvisitor.h

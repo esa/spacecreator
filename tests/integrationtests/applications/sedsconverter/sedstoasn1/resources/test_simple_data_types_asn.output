@@ -1,16 +1,27 @@
 COM-N7SPACE-SIMPLEDATATYPES DEFINITIONS ::= BEGIN
+-- A simple 8-bit unsigned integer
 UnsignedInteger8Little ::= INTEGER(0 .. 255)
+-- A simple 8-bit unsigned integer
 UnsignedInteger8Big ::= INTEGER(0 .. 255)
+-- A simple 16-bit signed integer
 SignedInteger16Little ::= INTEGER(-32768 .. 32767)
+-- A simple 16-bit signed integer
 SignedInteger16Big ::= INTEGER(-32768 .. 32767)
+-- Basic boolean
 BasicBoolean ::= BOOLEAN
+-- A boolean with inverted encoding
 InvertedBoolean ::= BOOLEAN
+-- A simple 32-bit float
 Float32 ::= REAL(1.17549e-38 .. 3.40282e+38)
 VariableSizeBLOB ::= BIT STRING(SIZE(0 .. 128))
 FixedSizeBLOB ::= BIT STRING(SIZE(64))
+-- A simple fixed-length ASCII string
 FixedSizeAsciiString ::= IA5String(SIZE(32))
+-- A simple variable-length C-style NULL terminated ASCII string
 CString ::= IA5String(SIZE(0 .. 64))
+-- A simple variable-length ASCII string
 ASCIIString ::= IA5String(SIZE(0 .. 32))
+-- A simple enumeration
 SimpleEnumeration ::= ENUMERATED
 {
     value1(12),
