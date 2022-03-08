@@ -123,6 +123,7 @@ private Q_SLOTS:
     void testTranslateSendCommand();
     void testTranslateOnEntryAndOnExit();
     void testTranslateVariableReferences();
+    void testTranslateIndexingInMathOperation();
 };
 
 void tst_SedsToSdlTranslator::testMissingModel()
@@ -1196,6 +1197,19 @@ void tst_SedsToSdlTranslator::testTranslateVariableReferences()
     QCOMPARE(StatementTranslatorVisitor::translateVariableReference("111a[2]"), "A(2)");
     QCOMPARE(StatementTranslatorVisitor::translateVariableReference("111&^%@a[2]"), "A(2)");
     QCOMPARE(StatementTranslatorVisitor::translateVariableReference("a[b[c.d]]"), "A(B(C.D))");
+}
+
+void tst_SedsToSdlTranslator::testTranslateIndexingInMathOperation()
+{
+    seds::model::MathOperation::Elements operation;
+    seds::model::Operator op;
+    op.setMathOperator(seds::model::CoreMathOperator::Add);
+    operation.push_back(std::move(op));
+    operation.push_back(seds::model::VariableRef("seq.a"));
+    operation.push_back(seds::model::VariableRef("seq.b"));
+    const auto result = MathOperationTranslator::translateOperation(operation);
+
+    QCOMPARE(result, "Seq.A + Seq.B");
 }
 
 } // namespace conversion::sdl::test

@@ -21,6 +21,7 @@
 
 #include "components/activities/coremathoperator.h"
 #include "components/activities/operator.h"
+#include "specialized/statementtranslatorvisitor.h"
 #include "translation/exceptions.h"
 
 #include <conversion/common/escaper/escaper.h>
@@ -60,7 +61,7 @@ auto MathOperationTranslator::translateMutableExpression(Expression &expression,
                                   },
                               [&outIsComplexValue](const seds::model::VariableRef &value) {
                                   outIsComplexValue = false;
-                                  return Escaper::escapeSdlVariableName(value.value().value());
+                                  return StatementTranslatorVisitor::translateVariableReference(value.value().value());
                               },
                               [&outIsComplexValue, &expression](const seds::model::Operator &value) {
                                   return translateOperator(value, expression, outIsComplexValue);
