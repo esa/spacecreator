@@ -259,7 +259,6 @@ void tst_SedsConverter_SedsToSdl::testNamedValues()
 }
 
 /// \SRS  ETB-FUN-10
-/// \SRS  ETB-FUN-1030
 void tst_SedsConverter_SedsToSdl::testDescriptions()
 {
     const int result = system("./test_descriptions.sh");

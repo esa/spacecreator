@@ -41,6 +41,7 @@ auto ActivityTranslator::translateActivity(
         const auto parameterName = Escaper::escapeSdlVariableName(argument.nameStr());
         const auto parameterType = Escaper::escapeAsn1TypeName(argument.type().nameStr());
         auto parameter = std::make_unique<::sdl::ProcedureParameter>(parameterName, parameterType, "in");
+        DescriptionTranslator::translate(argument, parameter.get());
         procedure->addParameter(std::move(parameter));
     }
 

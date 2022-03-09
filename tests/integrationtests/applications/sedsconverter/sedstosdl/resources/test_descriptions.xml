@@ -3,8 +3,9 @@
   <Package name="Descriptions">
     <DataTypeSet>
       <IntegerDataType name="IntegerType">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
         <Range>
-          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="100" />
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
         </Range>
       </IntegerDataType>
     </DataTypeSet>
@@ -42,7 +43,10 @@ long description</LongDescription>
             <Activity name="MegaActivity" shortDescription="MegaActivity short description">
             <LongDescription>MegaActivity
 long description</LongDescription>
-              <Argument name="activityArg" type="IntegerType" />
+              <Argument name="activityArg" type="IntegerType" shortDescription="ActivityArg short description">
+                <LongDescription>ActivityArg
+long description</LongDescription>
+              </Argument>
               <Body>
                 <SendParameterPrimitive interface="InterfaceRi" parameter="Param" operation="get" shortDescription="SPP short description">
                   <LongDescription>SPP
@@ -51,7 +55,7 @@ long description</LongDescription>
                     <VariableRef variableRef="megaVariable" />
                   </ArgumentValue>
                 </SendParameterPrimitive>
-                <Assignment outputVariableRef="activityArg" shortDescription="Assignment short description">
+                <Assignment outputVariableRef="megaVariable" shortDescription="Assignment short description">
                   <LongDescription>Assignment
 long description</LongDescription>
                   <Value value="1"/>

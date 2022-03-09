@@ -452,12 +452,14 @@ void SdlVisitor::visit(const Procedure &procedure)
     if (parametersPresent) {
         m_writer.writeLine("fpar");
         m_writer.pushIndent(INDENT);
+        m_writer.writeComment(procedureParameters[0]->comment());
         m_writer.beginLine(QString("%1 %2 %3")
                                    .arg(procedureParameters[0]->direction())
                                    .arg(procedureParameters[0]->name())
                                    .arg(procedureParameters[0]->type()));
         for (auto it = std::next(procedureParameters.begin()); it != procedureParameters.end(); it++) {
             m_writer.endLine(",");
+            m_writer.writeComment(it->get()->comment());
             m_writer.beginLine(
                     QString("%1 %2 %3").arg(it->get()->direction()).arg(it->get()->name()).arg(it->get()->type()));
         }

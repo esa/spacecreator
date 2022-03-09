@@ -13,6 +13,9 @@ process Component;
     procedure MegaActivity;
         /* CIF Text (0, 0), (400, 500) */
         fpar
+            -- ActivityArg short description
+            -- ActivityArg
+            -- long description
             in Activityarg IntegerType;
 
         /* CIF ENDTEXT */
@@ -27,7 +30,7 @@ process Component;
             -- Assignment
             -- long description
             /* CIF Task (0, 1012), (100, 50) */
-            task Activityarg := 1;
+            task Megavariable := 1;
             -- Conditional short description
             -- Conditional
             -- long description
