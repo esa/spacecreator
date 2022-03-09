@@ -162,7 +162,7 @@ auto SdlVisitor::IndentingStreamWriter::writeComment(const QString &comment) -> 
         return;
     }
 
-    for (const auto &commentPart : comment.split("\n", Qt::SkipEmptyParts)) {
+    for (const auto &commentPart : comment.split("\n")) {
         m_stream << getIndent() << "-- " << commentPart << "\n";
     }
 }
