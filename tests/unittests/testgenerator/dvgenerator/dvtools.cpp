@@ -24,6 +24,7 @@
 #include <QFile>
 #include <dvcore/dvobject.h>
 #include <dvcore/dvxmlreader.h>
+#include <libdveditor/dvexporter.h>
 #include <memory>
 #include <stdexcept>
 
@@ -73,6 +74,26 @@ auto getDvObjectsFromModel(dvm::DVModel *const model) -> std::unique_ptr<QVector
     }
 
     return generatedDvObjects;
+}
+
+void exportModel(QVector<dvm::DVObject *> *const dvObjects, const QString &outputFilename)
+{
+    dve::DVExporter exporter;
+    QList<shared::VEObject *> objects;
+    std::for_each(dvObjects->begin(), dvObjects->end(), //
+            [&objects](const auto &obj) { objects.push_back(obj); });
+
+    const int objectMaxSize = 1'000;
+    QByteArray qba(objects.size() * objectMaxSize, '\00');
+    QBuffer buf = QBuffer(&qba);
+
+    exporter.exportObjects(objects, &buf);
+
+    QFile file(outputFilename);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        return;
+    }
+    file.write(qba);
 }
 
 } // namespace dvtools

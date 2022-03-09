@@ -26,7 +26,6 @@
 #include <dvcore/dvfunction.h>
 #include <exception>
 #include <ivcore/ivfunction.h>
-#include <libdveditor/dvexporter.h>
 #include <memory>
 #include <qobjectdefs.h>
 #include <stdexcept>
@@ -71,8 +70,6 @@ static auto checkObjVectors(QVector<dvm::DVObject *> *actual, QVector<dvm::DVObj
 static auto checkParentObject(dvm::DVObject *actual, dvm::DVObject *expected) -> void;
 static auto checkPartitions(const dvm::DVPartition &actualPartition, const dvm::DVPartition &expectedPartition) -> void;
 
-static auto exportModel(QVector<dvm::DVObject *> *objects, const QString &outputFilename) -> void;
-
 void tst_dvgenerator::initTestCase()
 {
     ivFunctions = makeIvFunctionsForDv();
@@ -91,7 +88,7 @@ void tst_dvgenerator::testLinuxX86()
     const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());
     QVERIFY(generatedDvObjects != nullptr);
 
-    exportModel(generatedDvObjects.get(), outputFileName);
+    dvtools::exportModel(generatedDvObjects.get(), outputFileName);
 
     const auto expectedDvObjects = dvtools::getDvObjectsFromFile(expectedOutputFilename);
     QVERIFY(expectedDvObjects != nullptr);
@@ -112,7 +109,7 @@ void tst_dvgenerator::testArmV71()
     QVERIFY(generatedDvObjects != nullptr);
     QVERIFY(!generatedDvObjects->isEmpty());
 
-    exportModel(generatedDvObjects.get(), outputFileName);
+    dvtools::exportModel(generatedDvObjects.get(), outputFileName);
 
     const auto expectedDvObjects = dvtools::getDvObjectsFromFile(expectedOutputFilename);
     QVERIFY(expectedDvObjects != nullptr);
@@ -214,26 +211,6 @@ void checkParentObject(dvm::DVObject *const actual, dvm::DVObject *const expecte
             QFAIL("generated parent object is non-nullptr but expected nullptr");
         }
     }
-}
-
-void exportModel(QVector<dvm::DVObject *> *const dvObjects, const QString &outputFilename)
-{
-    dve::DVExporter exporter;
-    QList<shared::VEObject *> objects;
-    std::for_each(dvObjects->begin(), dvObjects->end(), //
-            [&objects](const auto &obj) { objects.push_back(obj); });
-
-    const int objectMaxSize = 1'000;
-    QByteArray qba(objects.size() * objectMaxSize, '\00');
-    QBuffer buf = QBuffer(&qba);
-
-    exporter.exportObjects(objects, &buf);
-
-    QFile file(outputFilename);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        return;
-    }
-    file.write(qba);
 }
 
 std::vector<ivm::IVFunction *> tst_dvgenerator::getRawPointersVector(

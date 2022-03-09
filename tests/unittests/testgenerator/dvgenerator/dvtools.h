@@ -46,5 +46,13 @@ auto getDvObjectsFromFile(const QString &filepath) -> std::unique_ptr<QVector<dv
  */
 auto getDvObjectsFromModel(dvm::DVModel *model) -> std::unique_ptr<QVector<dvm::DVObject *>>;
 
+/**
+ * @brief Export DV model
+ *
+ * @param objects         vector of DVObjects
+ * @param outputFilename  filename of the output
+ */
+auto exportModel(QVector<dvm::DVObject *> *objects, const QString &outputFilename) -> void;
+
 } // namespace dvtools
 } // namespace tests
