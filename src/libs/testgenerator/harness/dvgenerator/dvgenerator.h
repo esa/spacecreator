@@ -40,12 +40,23 @@ class DvGenerator final
 public:
     typedef QVector<qint32> Coordinates;
 
+    /**
+     * @brief Coordinates of Deployment View diagram entities
+     *
+     */
     struct DvCoordinates {
+        /** Coordinates of devices (ports) **/
         static QVector<Coordinates> devices;
+        /** Coordinates of main node **/
         static Coordinates node;
+        /** Coordinates of partition present in the node **/
         static Coordinates partition;
     };
 
+    /**
+     * @brief Identifiers of hardware platform
+     *
+     */
     enum Hardware
     {
         X86_LINUX_CPP,
@@ -58,6 +69,17 @@ public:
         LINUX_ARM_RUNTIME,
     };
 
+    /**
+     * @brief Generate DeploymentView model
+     *
+     * @param functionsToBind   functions to be included on the partition
+     * @param hw                deployment hardware identifier
+     * @param nodeTitle         title of a node to be generated
+     * @param nodeLabel         label of a node to be generated
+     * @param hostPartitionName name of a host partition (partition present on a node)
+     *
+     * @return required DeploymentView model
+     */
     static auto generate(const std::vector<ivm::IVFunction *> &functionsToBind, const Hardware &hw,
             const QString &nodeTitle = "Node", const QString &nodeLabel = "Node_1",
             const QString &hostPartitionName = "hostPartition") -> std::unique_ptr<dvm::DVModel>;
