@@ -26,13 +26,31 @@
 
 namespace conversion::sdl::translator {
 
+/**
+ * @brief   Translator for SEDS short and long descriptions
+ */
 class DescriptionTranslator final
 {
 public:
+    /**
+     * @brief   Deleted constructor
+     */
     DescriptionTranslator() = delete;
 
 public:
+    /**
+     * @brief   Translate SEDS description to SDL comment
+     *
+     * @param   sedsDescription     Description to translate
+     * @param   sdlNode             Node that should contain the comment
+     */
     static auto translate(const seds::model::Description &sedsDescription, ::sdl::Node *sdlNode) -> void;
+    /**
+     * @brief   Translate SEDS description to SDL comment
+     *
+     * @param   sedsDescription     Data type containing description
+     * @param   sdlTransition       Transition that should contain the comment
+     */
     static auto translate(const seds::model::Description &sedsDescription, ::sdl::Transition *sdlTransition) -> void;
 
 private:
