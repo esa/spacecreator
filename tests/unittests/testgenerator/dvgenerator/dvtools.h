@@ -28,7 +28,22 @@
 namespace tests {
 namespace dvtools {
 
+/**
+ * @brief Get the DVObjects from requested file
+ *
+ * @param filepath  path to the file to be read
+ *
+ * @return DVObjects
+ */
 auto getDvObjectsFromFile(const QString &filepath) -> std::unique_ptr<QVector<dvm::DVObject *>>;
+
+/**
+ * @brief Get the DVObjects from Model
+ *
+ * @param model DeploymentView data model
+ *
+ * @return DVObjects
+ */
 auto getDvObjectsFromModel(dvm::DVModel *model) -> std::unique_ptr<QVector<dvm::DVObject *>>;
 
 } // namespace dvtools

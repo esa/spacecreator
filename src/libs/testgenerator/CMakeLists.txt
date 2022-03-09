@@ -23,7 +23,7 @@ target_include_directories(TestGenerator
 target_link_libraries(TestGenerator
     PRIVATE     ivcore
                 dvcore
-                libdveditor
+                qobjectlistmodel
                 CsvImporter
                 CommonProjectWarnings
 )

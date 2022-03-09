@@ -37,15 +37,15 @@
 
 namespace testgenerator {
 
-QVector<QVector<qint32>> DvGenerator::DvCoordinates::devices;
-DvGenerator::Coordinates DvGenerator::DvCoordinates::node = { 192, 193, 396, 353 };
-DvGenerator::Coordinates DvGenerator::DvCoordinates::partition = { 236, 237, 356, 317 };
+QVector<QVector<qint32>> DvGenerator::Coordinates::devices;
+QVector<qint32> DvGenerator::Coordinates::node = { 192, 193, 396, 353 };
+QVector<qint32> DvGenerator::Coordinates::partition = { 236, 237, 356, 317 };
 
 auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind, const Hardware &hw,
         const QString &nodeTitle, const QString &nodeLabel, const QString &hostPartitionName)
         -> std::unique_ptr<dvm::DVModel>
 {
-    DvCoordinates::devices = {
+    Coordinates::devices = {
         { 192, 210 },
         { 192, 251 },
     };
@@ -152,8 +152,8 @@ auto DvGenerator::cloneDeviceAndAddToModelAndNode(
     auto *const dev = makeDvObject<dvm::DVDevice>(model, devName);
     dev->setParentObject(node);
 
-    dev->setCoordinates(DvCoordinates::devices.first());
-    DvCoordinates::devices.removeFirst();
+    dev->setCoordinates(Coordinates::devices.first());
+    Coordinates::devices.removeFirst();
     dev->setEntityAttribute(asn1moduleToken, asn1Module);
     dev->setEntityAttribute(devNamespaceToken, devNamespace);
     dev->setEntityAttribute(requires_bus_accessToken, requiresBusAccess);
@@ -190,7 +190,7 @@ auto DvGenerator::makeNodeAndAddToModel(const QString &nodeTitle, const QString 
         dvm::DVBoard *const board) -> dvm::DVNode *
 {
     auto *const node = makeDvObject<dvm::DVNode>(model, nodeTitle);
-    node->setCoordinates(DvCoordinates::node);
+    node->setCoordinates(Coordinates::node);
     node->setEntityAttribute(nameToken, nodeTitle);
     node->setEntityAttribute(nodeLabelToken, nodeLabel);
     node->setEntityAttribute(typeToken, board->entityAttributeValue(typeToken));
@@ -206,7 +206,7 @@ auto DvGenerator::makePartitionAndAddToNode(
 {
     auto *const partition = makeDvObject<dvm::DVPartition>(model, hostPartitionName);
 
-    partition->setCoordinates(DvCoordinates::partition);
+    partition->setCoordinates(Coordinates::partition);
     partition->setParentObject(node);
     partition->setParent(node);
 

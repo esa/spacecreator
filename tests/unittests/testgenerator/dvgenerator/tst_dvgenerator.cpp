@@ -20,36 +20,15 @@
 #include "../common.h"
 #include "dvtools.h"
 
-#include <QAbstractItemModel>
 #include <QBuffer>
-#include <QCoreApplication>
-#include <QDebug>
-#include <QObject>
-#include <QStandardItemModel>
-#include <QStandardPaths>
 #include <QTest>
 #include <QtTest/qtestcase.h>
-#include <algorithm>
-#include <cstddef>
 #include <dvcore/dvfunction.h>
-#include <dvcore/dvlibrary.h>
-#include <dvcore/dvmodel.h>
-#include <dvcore/dvobject.h>
-#include <dvcore/dvpartition.h>
-#include <dvcore/dvport.h>
 #include <exception>
-#include <harness/dvgenerator/dvgenerator.h>
 #include <ivcore/ivfunction.h>
-#include <libdveditor/dveditor.h>
-#include <libdveditor/dveditorcore.h>
 #include <libdveditor/dvexporter.h>
 #include <memory>
 #include <qobjectdefs.h>
-#include <shared/abstractvisualizationmodel.h>
-#include <shared/entityattribute.h>
-#include <shared/settingsmanager.h>
-#include <shared/veobject.h>
-#include <sharedlibrary.h>
 #include <stdexcept>
 #include <testgenerator/testgenerator.h>
 

@@ -19,15 +19,18 @@
 
 #pragma once
 
-#include <dvcore/dvboard.h>
 #include <dvcore/dvdevice.h>
 #include <dvcore/dvmodel.h>
-#include <dvcore/dvnode.h>
 #include <dvcore/dvobject.h>
 #include <dvcore/dvpartition.h>
 #include <ivcore/ivfunction.h>
 #include <memory>
 #include <vector>
+
+namespace dvm {
+class DVBoard;
+class DVNode;
+}
 
 namespace testgenerator {
 
@@ -38,19 +41,17 @@ namespace testgenerator {
 class DvGenerator final
 {
 public:
-    typedef QVector<qint32> Coordinates;
-
     /**
      * @brief Coordinates of Deployment View diagram entities
      *
      */
-    struct DvCoordinates {
+    struct Coordinates {
         /** Coordinates of devices (ports) **/
-        static QVector<Coordinates> devices;
+        static QVector<QVector<qint32>> devices;
         /** Coordinates of main node **/
-        static Coordinates node;
+        static QVector<qint32> node;
         /** Coordinates of partition present in the node **/
-        static Coordinates partition;
+        static QVector<qint32> partition;
     };
 
     /**

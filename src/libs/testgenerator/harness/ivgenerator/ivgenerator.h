@@ -29,53 +29,53 @@
 namespace testgenerator {
 
 /**
- * @brief  Constants with coordinates of generated entities on InterfaceView diagram
- *
- */
-struct IvCoordinates final {
-    struct Function final {
-        /**
-         * @brief  Coordinates of a test driver function
-         *
-         */
-        static const QVector<qint32> testDriver;
-        /**
-         * @brief  Coordinates of a function under test (function to which the interface under test belongs to)
-         *
-         */
-        static const QVector<qint32> functionUnderTest;
-    };
-    struct Interface final {
-        /**
-         * @brief  Coordinates of start test cyclic interface
-         *
-         */
-        static const QVector<qint32> startTestIf;
-        /**
-         * @brief  Coordinates of interface under test required interface (present in test driver function)
-         *
-         */
-        static const QVector<qint32> interfaceUnderTestRi;
-        /**
-         * @brief  Coordinates of interface under test provided interface (present in function under test)
-         *
-         */
-        static const QVector<qint32> interfaceUnderTestPi;
-    };
-    /**
-     * @brief  Coordinates of connection between PI and RI
-     *
-     */
-    static const QVector<qint32> connection;
-};
-
-/**
  * @brief Test harness InterfaceView generator
  *
  */
 class IvGenerator final
 {
 public:
+    /**
+     * @brief  Constants with coordinates of generated entities on InterfaceView diagram
+     *
+     */
+    struct Coordinates final {
+        struct Function final {
+            /**
+             * @brief  Coordinates of a test driver function
+             *
+             */
+            static const QVector<qint32> testDriver;
+            /**
+             * @brief  Coordinates of a function under test (function to which the interface under test belongs to)
+             *
+             */
+            static const QVector<qint32> functionUnderTest;
+        };
+        struct Interface final {
+            /**
+             * @brief  Coordinates of start test cyclic interface
+             *
+             */
+            static const QVector<qint32> startTestIf;
+            /**
+             * @brief  Coordinates of interface under test required interface (present in test driver function)
+             *
+             */
+            static const QVector<qint32> interfaceUnderTestRi;
+            /**
+             * @brief  Coordinates of interface under test provided interface (present in function under test)
+             *
+             */
+            static const QVector<qint32> interfaceUnderTestPi;
+        };
+        /**
+         * @brief  Coordinates of connection between PI and RI
+         *
+         */
+        static const QVector<qint32> connection;
+    };
+
     /**
      * @brief name of an interface intended to start (trigger run of) test
      *

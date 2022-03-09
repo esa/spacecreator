@@ -17,11 +17,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include <QDebug>
+#include <QDirIterator>
 #include <QObject>
+#include <QStandardPaths>
 #include <QTest>
 #include <QtTest/qtestcase.h>
-#include <algorithm>
 #include <asn1library/asn1/asn1model.h>
 #include <conversion/asn1/Asn1Importer/importer.h>
 #include <conversion/asn1/Asn1Options/options.h>
@@ -37,9 +37,6 @@
 #include <ivcore/ivmodel.h>
 #include <ivcore/ivobject.h>
 #include <memory>
-#include <qdebug.h>
-#include <qdiriterator.h>
-#include <qstandardpaths.h>
 #include <qtestcase.h>
 #include <shared/common.h>
 #include <shared/sharedlibrary.h>
