@@ -19,6 +19,8 @@
 
 #include "interfacetranslatorhelper.h"
 
+#include "specialized/descriptiontranslator.h"
+
 #include <asn1library/asn1/typeassignment.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <conversion/asn1/SedsToAsn1Translator/specialized/datatypetranslatorvisitor.h>
@@ -43,7 +45,8 @@ const QString InterfaceTranslatorHelper::m_getterInterfacePrefix = "Get";
 const QString InterfaceTranslatorHelper::m_setterInterfacePrefix = "Set";
 
 ivm::IVInterface *InterfaceTranslatorHelper::createIvInterface(const QString &name,
-        ivm::IVInterface::InterfaceType type, ivm::IVInterface::OperationKind kind, ivm::IVFunction *m_ivFunction)
+        ivm::IVInterface::InterfaceType type, ivm::IVInterface::OperationKind kind,
+        const seds::model::Description &sedsDescription, ivm::IVFunction *m_ivFunction)
 {
     ivm::IVInterface::CreationInfo creationInfo;
     creationInfo.name = name;
@@ -51,7 +54,10 @@ ivm::IVInterface *InterfaceTranslatorHelper::createIvInterface(const QString &na
     creationInfo.kind = kind;
     creationInfo.function = m_ivFunction;
 
-    return ivm::IVInterface::createIface(creationInfo);
+    auto interface = ivm::IVInterface::createIface(creationInfo);
+    DescriptionTranslator::translate(sedsDescription, interface);
+
+    return interface;
 }
 
 shared::InterfaceParameter InterfaceTranslatorHelper::createInterfaceParameter(

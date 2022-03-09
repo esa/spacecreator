@@ -19,18 +19,26 @@
 
 #include "specialized/descriptiontranslator.h"
 
-namespace conversion::sdl::translator {
+namespace conversion::iv::translator {
 
-void DescriptionTranslator::translate(const seds::model::Description &sedsDescription, ::sdl::Node *sdlNode)
+void DescriptionTranslator::translate(const seds::model::Description &sedsDescription, ivm::IVFunction *ivFunction)
 {
     auto description = combineDescriptions(sedsDescription);
-    sdlNode->setComment(std::move(description));
+
+    if (!description.isEmpty()) {
+        ivFunction->setEntityAttribute(
+                ivm::meta::Props::token(ivm::meta::Props::Token::comment), std::move(description));
+    }
 }
 
-void DescriptionTranslator::translate(const seds::model::Description &sedsDescription, ::sdl::Transition *sdlTransition)
+void DescriptionTranslator::translate(const seds::model::Description &sedsDescription, ivm::IVInterface *ivInterface)
 {
     auto description = combineDescriptions(sedsDescription);
-    sdlTransition->setComment(std::move(description));
+
+    if (!description.isEmpty()) {
+        ivInterface->setEntityAttribute(
+                ivm::meta::Props::token(ivm::meta::Props::Token::comment), std::move(description));
+    }
 }
 
 QString DescriptionTranslator::combineDescriptions(const seds::model::Description &sedsDescription)
@@ -39,13 +47,15 @@ QString DescriptionTranslator::combineDescriptions(const seds::model::Descriptio
 
     if (sedsDescription.longDescription()) {
         if (!description.isEmpty()) {
-            description += "\n";
+            description += " ";
         }
 
         description += sedsDescription.longDescription().value();
     }
 
-    return description;
+    description.replace("\n", " ");
+
+    return description.toHtmlEscaped();
 }
 
-} // namespace conversion::sdl::translator
+} // namespace conversion::iv::translator

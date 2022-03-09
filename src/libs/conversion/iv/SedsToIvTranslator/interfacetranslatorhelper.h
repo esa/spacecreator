@@ -53,7 +53,8 @@ public:
      * @return  InterfaceView interface
      */
     static auto createIvInterface(const QString &name, ivm::IVInterface::InterfaceType type,
-            ivm::IVInterface::OperationKind kind, ivm::IVFunction *ivFunction) -> ivm::IVInterface *;
+            ivm::IVInterface::OperationKind kind, const seds::model::Description &sedsDescription,
+            ivm::IVFunction *ivFunction) -> ivm::IVInterface *;
     /**
      * @brief   Create InterfaceView parameter
      *

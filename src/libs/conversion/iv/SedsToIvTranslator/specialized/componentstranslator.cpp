@@ -21,6 +21,7 @@
 
 #include "generictypemapper.h"
 #include "specialized/asyncinterfacecommandtranslator.h"
+#include "specialized/descriptiontranslator.h"
 #include "specialized/interfaceparametertranslator.h"
 #include "specialized/syncinterfacecommandtranslator.h"
 #include "translator.h"
@@ -65,6 +66,8 @@ ivm::IVFunction *ComponentsTranslator::translateComponent(const seds::model::Com
     auto *ivFunction = new ivm::IVFunction();
     ivFunction->setEntityAttribute(
             ivm::meta::Props::token(ivm::meta::Props::Token::name), Escaper::escapeIvName(sedsComponent.nameStr()));
+
+    DescriptionTranslator::translate(sedsComponent, ivFunction);
 
     for (const auto &sedsInterface : sedsComponent.providedInterfaces()) {
         translateInterface(sedsInterface, sedsComponent, ivm::IVInterface::InterfaceType::Provided, ivFunction);

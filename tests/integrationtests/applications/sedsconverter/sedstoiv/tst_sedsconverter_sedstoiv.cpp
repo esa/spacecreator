@@ -39,6 +39,7 @@ private Q_SLOTS:
     void testAlternateSet();
     void testCrossReferenceArguments();
     void testCrossReferenceInterfaces();
+    void testDescriptions();
 };
 
 /// \SRS  ETB-FUN-10
@@ -154,6 +155,14 @@ void tst_SedsConverter_SedsToIv::testCrossReferenceArguments()
 void tst_SedsConverter_SedsToIv::testCrossReferenceInterfaces()
 {
     const int result = system("./test_cross_reference_interfaces.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-1030
+void tst_SedsConverter_SedsToIv::testDescriptions()
+{
+    const int result = system("./test_descriptions.sh");
     QCOMPARE(result, 0);
 }
 

@@ -67,7 +67,7 @@ void AsyncInterfaceCommandTranslator::translateCommand(
         const auto interfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(
                 m_sedsInterfaceName, sedsCommand.nameStr(), interfaceType);
         auto *ivInterface = InterfaceTranslatorHelper::createIvInterface(
-                interfaceName, interfaceType, ivm::IVInterface::OperationKind::Sporadic, m_ivFunction);
+                interfaceName, interfaceType, ivm::IVInterface::OperationKind::Sporadic, sedsCommand, m_ivFunction);
         translateArguments(sedsCommand, seds::model::CommandArgumentMode::In, ivInterface);
         m_ivFunction->addChild(ivInterface);
     } break;
@@ -78,7 +78,7 @@ void AsyncInterfaceCommandTranslator::translateCommand(
                 sedsCommand.nameStr(), InterfaceTranslatorHelper::switchInterfaceType(interfaceType));
         auto *ivInterface = InterfaceTranslatorHelper::createIvInterface(interfaceName,
                 InterfaceTranslatorHelper::switchInterfaceType(interfaceType),
-                ivm::IVInterface::OperationKind::Sporadic, m_ivFunction);
+                ivm::IVInterface::OperationKind::Sporadic, sedsCommand, m_ivFunction);
         translateArguments(sedsCommand, seds::model::CommandArgumentMode::Out, ivInterface);
         m_ivFunction->addChild(ivInterface);
     } break;
@@ -89,7 +89,7 @@ void AsyncInterfaceCommandTranslator::translateCommand(
         const auto inInterfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(
                 m_sedsInterfaceName, sedsCommand.nameStr(), interfaceType);
         auto *ivInterfaceIn = InterfaceTranslatorHelper::createIvInterface(
-                inInterfaceName, interfaceType, ivm::IVInterface::OperationKind::Sporadic, m_ivFunction);
+                inInterfaceName, interfaceType, ivm::IVInterface::OperationKind::Sporadic, sedsCommand, m_ivFunction);
         translateArguments(sedsCommand, seds::model::CommandArgumentMode::In, ivInterfaceIn);
         m_ivFunction->addChild(ivInterfaceIn);
 
@@ -97,7 +97,7 @@ void AsyncInterfaceCommandTranslator::translateCommand(
                 sedsCommand.nameStr(), InterfaceTranslatorHelper::switchInterfaceType(interfaceType));
         auto *ivInterfaceNotify = InterfaceTranslatorHelper::createIvInterface(notifyInterfaceName,
                 InterfaceTranslatorHelper::switchInterfaceType(interfaceType),
-                ivm::IVInterface::OperationKind::Sporadic, m_ivFunction);
+                ivm::IVInterface::OperationKind::Sporadic, sedsCommand, m_ivFunction);
         translateArguments(sedsCommand, seds::model::CommandArgumentMode::Notify, ivInterfaceNotify);
         m_ivFunction->addChild(ivInterfaceNotify);
     } break;
@@ -106,7 +106,7 @@ void AsyncInterfaceCommandTranslator::translateCommand(
         const auto interfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(
                 m_sedsInterfaceName, sedsCommand.nameStr(), interfaceType);
         auto *ivInterface = InterfaceTranslatorHelper::createIvInterface(
-                interfaceName, interfaceType, ivm::IVInterface::OperationKind::Sporadic, m_ivFunction);
+                interfaceName, interfaceType, ivm::IVInterface::OperationKind::Sporadic, sedsCommand, m_ivFunction);
         m_ivFunction->addChild(ivInterface);
         break;
     }

@@ -1,40 +1,40 @@
 <InterfaceView>
-<Function name="HWAS" is_type="NO" language="C" default_implementation="default">
-<Provided_Interface name="InterruptSubscriptionManagement_SubscribeToInterrupt_Pi" kind="Protected" layer="default">
+<Function name="HWAS" comment="Facade for the underlying microprocessor/microcontroller system." is_type="NO" language="C" default_implementation="default">
+<Provided_Interface name="InterruptSubscriptionManagement_SubscribeToInterrupt_Pi" comment="Subscribe to a hardware interrupt" kind="Protected" layer="default">
     <Input_Parameter name="interrupt" type="InterruptNumber" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="InterruptManagement_EnableInterrupt_Pi" kind="Protected" layer="default">
+<Provided_Interface name="InterruptManagement_EnableInterrupt_Pi" comment="Enable a hardware interrupt." kind="Protected" layer="default">
     <Input_Parameter name="interrupt" type="InterruptNumber" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="InterruptManagement_DisableInterrupt_Pi" kind="Protected" layer="default">
+<Provided_Interface name="InterruptManagement_DisableInterrupt_Pi" comment="Disable a hardware interrupt." kind="Protected" layer="default">
     <Input_Parameter name="interrupt" type="InterruptNumber" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="RawMemoryAccess_ReadWord_Pi" kind="Protected" layer="default">
+<Provided_Interface name="RawMemoryAccess_ReadWord_Pi" comment="Read word from memory, masked by the mask. The address must be word-aligned." kind="Protected" layer="default">
     <Input_Parameter name="address" type="SourceAddress" encoding="ACN"/>
     <Input_Parameter name="mask" type="WordMask" encoding="ACN"/>
     <Output_Parameter name="value" type="Word" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="RawMemoryAccess_WriteWord_Pi" kind="Protected" layer="default">
+<Provided_Interface name="RawMemoryAccess_WriteWord_Pi" comment="Write word to memory, masked by the mask.  The address must be word-aligned." kind="Protected" layer="default">
     <Input_Parameter name="address" type="DestinationAddress" encoding="ACN"/>
     <Input_Parameter name="mask" type="WordMask" encoding="ACN"/>
     <Input_Parameter name="value" type="Word" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="RawMemoryAccess_WriteBuffer_Pi" kind="Protected" layer="default">
+<Provided_Interface name="RawMemoryAccess_WriteBuffer_Pi" comment="Write Byte Buffer to memory." kind="Protected" layer="default">
     <Input_Parameter name="address" type="DestinationAddress" encoding="ACN"/>
     <Input_Parameter name="buffer" type="ByteBuffer" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="RawMemoryAccess_ReadBuffer_Pi" kind="Protected" layer="default">
+<Provided_Interface name="RawMemoryAccess_ReadBuffer_Pi" comment="Read Byte Buffer from memory." kind="Protected" layer="default">
     <Input_Parameter name="address" type="SourceAddress" encoding="ACN"/>
     <Output_Parameter name="buffer" type="ByteBuffer" encoding="ACN"/>
 </Provided_Interface>
 
-<Required_Interface name="InterruptSubscription_Interrupt_Ri" kind="Sporadic" layer="default">
+<Required_Interface name="InterruptSubscription_Interrupt_Ri" comment="Receive a hardware interrupt notification. The notification is asynchronous, as it may not be executed in the interrupt context" kind="Sporadic" layer="default">
     <Input_Parameter name="InputParam" type="Interrupt_Type" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
