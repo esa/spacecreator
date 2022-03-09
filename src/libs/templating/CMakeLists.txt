@@ -24,7 +24,6 @@ target_link_libraries(${LIB_NAME}
     ${QT_GUI}
     ${QT_WIDGETS}
     Grantlee5::Templates
-    libdveditor
     shared
 )
 
