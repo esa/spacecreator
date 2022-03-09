@@ -94,3 +94,7 @@ configure_file(test_named_values.sh test_named_values.sh COPYONLY)
 configure_file(resources/test_named_values.xml resources/test_named_values.xml COPYONLY)
 configure_file(resources/test_named_values.output resources/test_named_values.output COPYONLY)
 configure_file(resources/test_named_values.system_structure resources/test_named_values.system_structure COPYONLY)
+
+configure_file(test_descriptions.sh test_descriptions.sh COPYONLY)
+configure_file(resources/test_descriptions.xml resources/test_descriptions.xml COPYONLY)
+configure_file(resources/test_descriptions.output resources/test_descriptions.output COPYONLY)
