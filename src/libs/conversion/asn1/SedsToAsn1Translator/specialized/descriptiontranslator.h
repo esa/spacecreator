@@ -25,13 +25,31 @@
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Translator for SEDS short and long descriptions
+ */
 class DescriptionTranslator final
 {
 public:
+    /**
+     * @brief   Deleted constructor
+     */
     DescriptionTranslator() = delete;
 
 public:
+    /**
+     * @brief   Translate SEDS description to ASN.1 comment
+     *
+     * @param   sedsDescription     Description to translate
+     * @param   asn1Node            Node that should contain the comment
+     */
     static auto translate(const seds::model::Description &sedsDescription, Asn1Acn::Node *asn1Node) -> void;
+    /**
+     * @brief   Translate description of SEDS data type to ASN.1 comment
+     *
+     * @param   sedsDataType        Data type containing description
+     * @param   asn1Node            Node that should contain the comment
+     */
     static auto translate(const seds::model::DataType &sedsDataType, Asn1Acn::Node *asn1Node) -> void;
 };
 
