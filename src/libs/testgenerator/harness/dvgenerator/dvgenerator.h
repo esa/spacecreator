@@ -55,33 +55,17 @@ public:
     };
 
     /**
-     * @brief Identifiers of hardware platform
-     *
-     */
-    enum Hardware
-    {
-        X86_LINUX_CPP,
-        SAM_V71_FREERTOS_N7S,
-        X86_LINUX_POHIC,
-        GR740_RTEMS_POHIC,
-        RASPBERRY_PI_LINUX_POHIC,
-        ZYNQ_ZC706_RTEMS_POHIC,
-        BRAVE_LARGE_FREERTOS,
-        LINUX_ARM_RUNTIME,
-    };
-
-    /**
      * @brief Generate DeploymentView model
      *
      * @param functionsToBind   functions to be included on the partition
-     * @param hw                deployment hardware identifier
+     * @param hw                deployment hardware name
      * @param nodeTitle         title of a node to be generated
      * @param nodeLabel         label of a node to be generated
      * @param hostPartitionName name of a host partition (partition present on a node)
      *
      * @return required DeploymentView model
      */
-    static auto generate(const std::vector<ivm::IVFunction *> &functionsToBind, const Hardware &hw,
+    static auto generate(const std::vector<ivm::IVFunction *> &functionsToBind, const QString &hw,
             const QString &nodeTitle = "Node", const QString &nodeLabel = "Node_1",
             const QString &hostPartitionName = "hostPartition") -> std::unique_ptr<dvm::DVModel>;
 
@@ -97,8 +81,6 @@ private:
     static auto getDevices(const QVector<dvm::DVObject *> &objects) -> QVector<dvm::DVObject *>;
     static auto getSelectedHwObjects(const QVector<dvm::DVObject *> &hwObjects, const QString &hwTitle)
             -> QVector<dvm::DVObject *>;
-
-    static auto hardwareTitle(const Hardware &hw) -> QString;
 
     static auto makeNodeAndAddToModel(const QString &nodeTitle, const QString &nodeLabel, dvm::DVModel *model,
             dvm::DVBoard *board) -> dvm::DVNode *;

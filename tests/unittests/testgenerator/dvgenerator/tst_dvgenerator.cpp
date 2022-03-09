@@ -81,8 +81,8 @@ void tst_dvgenerator::testLinuxX86()
     const QString outputFileName = "deploymentview-linux-x86.dv.xml";
     const QString expectedOutputFilename = dvPath.arg("deploymentview-linux-x86");
 
-    const std::unique_ptr<dvm::DVModel> generatedModel = DvGenerator::generate(
-            ivFunctionsRaw, DvGenerator::X86_LINUX_CPP, "x86_Linux_TestRunner", "Node_1", "hostPartition");
+    const std::unique_ptr<dvm::DVModel> generatedModel =
+            DvGenerator::generate(ivFunctionsRaw, "x86 Linux CPP", "x86_Linux_TestRunner", "Node_1", "hostPartition");
 
     QVERIFY(generatedModel != nullptr);
     const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());
@@ -102,7 +102,7 @@ void tst_dvgenerator::testArmV71()
     const QString expectedOutputFilename = dvPath.arg("deploymentview-samv71");
 
     const std::unique_ptr<dvm::DVModel> generatedModel = DvGenerator::generate(
-            ivFunctionsRaw, DvGenerator::SAM_V71_FREERTOS_N7S, "SAM V71 FreeRTOS N7S_1", "Node_1", "hostPartition");
+            ivFunctionsRaw, "SAM V71 FreeRTOS N7S", "SAM V71 FreeRTOS N7S_1", "Node_1", "hostPartition");
 
     QVERIFY(generatedModel != nullptr);
     const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());

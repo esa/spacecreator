@@ -41,7 +41,7 @@ QVector<QVector<qint32>> DvGenerator::Coordinates::devices;
 QVector<qint32> DvGenerator::Coordinates::node = { 192, 193, 396, 353 };
 QVector<qint32> DvGenerator::Coordinates::partition = { 236, 237, 356, 317 };
 
-auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind, const Hardware &hw,
+auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind, const QString &hw,
         const QString &nodeTitle, const QString &nodeLabel, const QString &hostPartitionName)
         -> std::unique_ptr<dvm::DVModel>
 {
@@ -53,7 +53,7 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
     auto model = std::make_unique<dvm::DVModel>();
 
     const QVector<dvm::DVObject *> loadedLib = getAllHwObjectsFromLib();
-    const QVector<dvm::DVObject *> selectedObjects = getSelectedHwObjects(loadedLib, hardwareTitle(hw));
+    const QVector<dvm::DVObject *> selectedObjects = getSelectedHwObjects(loadedLib, hw);
 
     dvm::DVNode *const node = makeNodeAndAddToModel(nodeTitle, nodeLabel, model.get(), getBoard(selectedObjects));
     makePartitionAndAddToNode(hostPartitionName, model.get(), node);
@@ -66,30 +66,6 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
             [&](const auto &function) { cloneFunctionAndAddToModel(function, model.get(), node, hostPartitionName); });
 
     return model;
-}
-
-auto DvGenerator::hardwareTitle(const Hardware &hw) -> QString
-{
-    switch (hw) {
-    case X86_LINUX_CPP:
-        return "x86 Linux CPP";
-    case SAM_V71_FREERTOS_N7S:
-        return "SAM V71 FreeRTOS N7S";
-    case X86_LINUX_POHIC:
-        return "x86 Linux POHIC";
-    case GR740_RTEMS_POHIC:
-        return "GR740 RTEMS POHIC";
-    case RASPBERRY_PI_LINUX_POHIC:
-        return "Raspberry PI Linux POHIC";
-    case ZYNQ_ZC706_RTEMS_POHIC:
-        return "ZynQ ZC706 RTEMS POHIC";
-    case BRAVE_LARGE_FREERTOS:
-        return "BRAVE_Large FreeRTOS";
-    case LINUX_ARM_RUNTIME:
-        return "Linux ARM Runtime";
-    default:
-        return "unknown";
-    }
 }
 
 auto DvGenerator::getBoard(const QVector<dvm::DVObject *> &objects) -> dvm::DVBoard *
