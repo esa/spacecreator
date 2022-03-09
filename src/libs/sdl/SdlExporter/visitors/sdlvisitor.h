@@ -45,7 +45,7 @@ class SdlVisitor final : public Visitor
 {
 public:
     /**
-     * @brief   Simple layouter for ensuring that SLD entities do not overlap and therefore do not crash OpenGEODE
+     * @brief   Simple layouter for ensuring that SDL entities do not overlap and therefore do not crash OpenGEODE
      */
     class Layouter
     {

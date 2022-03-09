@@ -33,26 +33,32 @@ namespace conversion::asn1::translator {
 
 void DescriptionTranslator::translate(const seds::model::Description &sedsDescription, Asn1Acn::Node *asn1Node)
 {
-    auto result = sedsDescription.shortDescription().value_or("");
-
-    if (sedsDescription.longDescription()) {
-        if (!result.isEmpty()) {
-            result += "\n";
-        }
-
-        result += sedsDescription.longDescription().value();
-    }
-
-    asn1Node->setComment(std::move(result));
+    auto description = combineDescriptions(sedsDescription);
+    asn1Node->setComment(std::move(description));
 }
 
 void DescriptionTranslator::translate(const seds::model::DataType &sedsDataType, Asn1Acn::Node *asn1Node)
 {
-    const seds::model::Description *description = nullptr;
+    const seds::model::Description *sedsDescription = nullptr;
+    std::visit([&](const auto &type) { sedsDescription = &type; }, sedsDataType);
 
-    std::visit([&](const auto &type) { description = &type; }, sedsDataType);
+    auto description = combineDescriptions(*sedsDescription);
+    asn1Node->setComment(std::move(description));
+}
 
-    translate(*description, asn1Node);
+QString DescriptionTranslator::combineDescriptions(const seds::model::Description &sedsDescription)
+{
+    auto description = sedsDescription.shortDescription().value_or("");
+
+    if (sedsDescription.longDescription()) {
+        if (!description.isEmpty()) {
+            description += "\n";
+        }
+
+        description += sedsDescription.longDescription().value();
+    }
+
+    return description;
 }
 
 } // namespace conversion::asn1::translator

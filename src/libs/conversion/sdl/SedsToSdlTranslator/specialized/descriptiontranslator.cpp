@@ -33,17 +33,29 @@ namespace conversion::sdl::translator {
 
 void DescriptionTranslator::translate(const seds::model::Description &sedsDescription, ::sdl::Node *sdlNode)
 {
-    auto result = sedsDescription.shortDescription().value_or("");
+    auto description = combineDescriptions(sedsDescription);
+    sdlNode->setComment(std::move(description));
+}
+
+void DescriptionTranslator::translate(const seds::model::Description &sedsDescription, ::sdl::Transition *sdlTransition)
+{
+    auto description = combineDescriptions(sedsDescription);
+    sdlTransition->setComment(std::move(description));
+}
+
+QString DescriptionTranslator::combineDescriptions(const seds::model::Description &sedsDescription)
+{
+    auto description = sedsDescription.shortDescription().value_or("");
 
     if (sedsDescription.longDescription()) {
-        if (!result.isEmpty()) {
-            result += "\n";
+        if (!description.isEmpty()) {
+            description += "\n";
         }
 
-        result += sedsDescription.longDescription().value();
+        description += sedsDescription.longDescription().value();
     }
 
-    sdlNode->setComment(std::move(result));
+    return description;
 }
 
 } // namespace conversion::sdl::translator

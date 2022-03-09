@@ -211,6 +211,7 @@ void SdlVisitor::visit(const Process &process)
     }
 
     if (process.startTransition() != nullptr) {
+        m_writer.writeComment(process.startTransition()->comment());
         m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Start));
         m_writer.writeLine("START;");
         m_writer.pushIndent(INDENT);
@@ -242,6 +243,7 @@ void SdlVisitor::visit(const State &state)
     }
 
     m_layouter.pushPosition();
+    m_writer.writeComment(state.comment());
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::State));
     m_writer.writeLine("state " + state.name() + ";");
     m_writer.pushIndent(INDENT);
@@ -279,6 +281,7 @@ void SdlVisitor::visit(const Input &input)
 
     if (input.transition() != nullptr) {
         m_writer.pushIndent(INDENT);
+        m_writer.writeComment(input.transition()->comment());
         exportCollection(input.transition()->actions());
         m_writer.popIndent();
     } else {
@@ -295,8 +298,8 @@ void SdlVisitor::visit(const Output &output)
     }
 
     m_layouter.moveDown(Layouter::ElementType::Output);
-    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Output));
     m_writer.writeComment(output.comment());
+    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Output));
     m_writer.beginLine("output " + output.name());
     const auto &outputParamRef = output.parameter();
     if (outputParamRef != nullptr) {
@@ -331,8 +334,8 @@ void SdlVisitor::visit(const Task &task)
     }
 
     m_layouter.moveDown(Layouter::ElementType::Task);
-    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Task));
     m_writer.writeComment(task.comment());
+    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Task));
     m_writer.writeLine("task " + task.content() + ";");
 }
 
@@ -409,8 +412,8 @@ void SdlVisitor::visit(const Decision &decision)
         throw ExportException("No Answers in Decision");
     }
 
-    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Decision));
     m_writer.writeComment(decision.comment());
+    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Decision));
     m_writer.writeLine("decision " + decision.expression()->content() + ";");
     m_layouter.moveDown(Layouter::ElementType::Decision);
     m_layouter.pushPosition();
@@ -429,9 +432,9 @@ void SdlVisitor::visit(const Procedure &procedure)
         return;
     }
     m_layouter.pushPosition();
+    m_writer.writeComment(procedure.comment());
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Procedure));
     m_layouter.moveDown(Layouter::ElementType::Procedure);
-    m_writer.writeComment(procedure.comment());
     m_writer.writeLine("procedure " + procedure.name() + ";");
     m_writer.pushIndent(INDENT);
     m_layouter.resetPosition();
@@ -504,8 +507,8 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall)
     }
 
     m_layouter.moveDown(Layouter::ElementType::ProcedureCall);
-    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::ProcedureCall));
     m_writer.writeComment(procedureCall.comment());
+    m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::ProcedureCall));
     m_writer.beginLine("call " + procedureCall.procedure()->name());
 
     const auto &procedureCallArgs = procedureCall.arguments();

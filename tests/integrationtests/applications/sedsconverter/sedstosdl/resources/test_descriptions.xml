@@ -15,7 +15,7 @@
         </ParameterSet>
         <CommandSet>
           <Command name="MegaCommand" mode="sync">
-            <Argument name="arg" type="IntegerType" mode="in"/>
+            <Argument name="commandArg" type="IntegerType" mode="in"/>
           </Command>
         </CommandSet>
       </Interface>
@@ -30,29 +30,28 @@
         </RequiredInterfaceSet>
         <Implementation>
           <VariableSet>
-            <Variable name="var1" type="IntegerType" shortDescription="Var1 short description">
-              <LongDescription>Var1
+            <Variable name="megaVariable" type="IntegerType" shortDescription="MegaVariable short description">
+              <LongDescription>MegaVariable
 long description</LongDescription>
             </Variable>
           </VariableSet>
           <ParameterMapSet>
-            <ParameterMap variableRef="var1" parameter="Param" interface="InterfacePi" />
+            <ParameterMap variableRef="megaVariable" parameter="Param" interface="InterfacePi" />
           </ParameterMapSet>
           <ActivitySet>
             <Activity name="MegaActivity" shortDescription="MegaActivity short description">
             <LongDescription>MegaActivity
 long description</LongDescription>
-              <Argument name="arg1" type="IntegerType" />
-              <Argument name="arg2" type="IntegerType" />
+              <Argument name="activityArg" type="IntegerType" />
               <Body>
                 <SendParameterPrimitive interface="InterfaceRi" parameter="Param" operation="get" shortDescription="SPP short description">
                   <LongDescription>SPP
 long description</LongDescription>
                   <ArgumentValue>
-                    <VariableRef variableRef="var1" />
+                    <VariableRef variableRef="megaVariable" />
                   </ArgumentValue>
                 </SendParameterPrimitive>
-                <Assignment outputVariableRef="arg" shortDescription="Assignment short description">
+                <Assignment outputVariableRef="activityArg" shortDescription="Assignment short description">
                   <LongDescription>Assignment
 long description</LongDescription>
                   <Value value="1"/>
@@ -62,36 +61,36 @@ long description</LongDescription>
 long description</LongDescription>
                   <Condition>
                     <Condition>
-                      <FirstOperand variableRef="arg1" />
+                      <FirstOperand variableRef="activityArg" />
                       <ComparisonOperator>lessThan</ComparisonOperator>
-                      <SecondOperand variableRef="arg2" />
+                      <SecondOperand variableRef="activityArg" />
                     </Condition>
                   </Condition>
                   <OnConditionTrue>
                     <SendCommandPrimitive interface="InterfaceRi" command="MegaCommand" shortDescription="SCP short description">
                       <LongDescription>SCP
 long description</LongDescription>
-                      <ArgumentValue name="arg">
+                      <ArgumentValue name="commandArg">
                         <Value value="0" />
                       </ArgumentValue>
                     </SendCommandPrimitive>
                   </OnConditionTrue>
                   <OnConditionFalse>
                     <SendCommandPrimitive interface="InterfaceRi" command="MegaCommand">
-                      <ArgumentValue name="arg">
+                      <ArgumentValue name="commandArg">
                         <Value value="1" />
                       </ArgumentValue>
                     </SendCommandPrimitive>
                   </OnConditionFalse>
                 </Conditional>
-                <MathOperation outputVariableRef="var1" shortDescription="Math short description">
+                <MathOperation outputVariableRef="megaVariable" shortDescription="Math short description">
                   <LongDescription>Math
 long description</LongDescription>
                   <Operator operator="add" />
-                  <VariableRef variableRef="var1" />
+                  <VariableRef variableRef="megaVariable" />
                   <Value value="1" />
                 </MathOperation>
-                <Calibration inputVariableRef="var1" outputVariableRef="var1" shortDescription="Calibration short description">
+                <Calibration inputVariableRef="megaVariable" outputVariableRef="megaVariable" shortDescription="Calibration short description">
                   <LongDescription>Calibration
 long description</LongDescription>
                   <PolynomialCalibrator>
@@ -102,6 +101,38 @@ long description</LongDescription>
               </Body>
             </Activity>
           </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="StateMachine" shortDescription="StateMachine short description">
+              <LongDescription>StateMachine
+long description</LongDescription>
+              <EntryState name="State1" shortDescription="EntryState short description">
+                <LongDescription>EntryState
+long description</LongDescription>
+              </EntryState>
+              <State name="State2" shortDescription="State short description">
+                <LongDescription>State
+long description</LongDescription>
+              </State>
+              <ExitState name="State3" shortDescription="ExitState short description">
+                <LongDescription>ExitState
+long description</LongDescription>
+              </ExitState>
+              <Transition fromState="State2" toState="State2" name="Transition1" shortDescription="Transition short description">
+                <LongDescription>Transition
+long description</LongDescription>
+                <OnCommandPrimitive command="MegaCommand" interface="InterfacePi">
+                  <ArgumentValue name="commandArg" outputVariableRef="megaVariable" />
+                </OnCommandPrimitive>
+                <Do activity="MegaActivity" shortDescription="Do short description">
+                  <LongDescription>Do
+long description</LongDescription>
+                  <ArgumentValue name="activityArg">
+                    <VariableRef variableRef="megaVariable" />
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
         </Implementation>
       </Component>
     </ComponentSet>

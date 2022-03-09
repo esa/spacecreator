@@ -290,18 +290,20 @@ auto StateMachineTranslator::translateStateMachine(Context &context, const seds:
     // Consider rewriting this to filters when C++20 is supported
     std::map<QString, std::unique_ptr<::sdl::State>> stateMap;
     // First pass through states
-    for (auto &element : sedsStateMachine.elements()) {
-        // Tried to rewrite it with std::visit and overload - this is the simpler way
-        if (std::holds_alternative<seds::model::State>(element)) {
-            const auto &state = std::get<seds::model::State>(element);
-            stateMap[state.nameStr()] = translateState(state);
-        } else if (std::holds_alternative<seds::model::EntryState>(element)) {
-            const auto &state = std::get<seds::model::EntryState>(element);
-            stateMap[state.name().value()] = translateState(state);
-        } else if (std::holds_alternative<seds::model::ExitState>(element)) {
-            const auto &state = std::get<seds::model::ExitState>(element);
-            stateMap[state.name().value()] = translateState(state);
-        }
+    for (auto &sedsElement : sedsStateMachine.elements()) {
+        // clang-format off
+        std::visit(
+            overloaded {
+                [&](auto &&element) {
+                    auto state = translateState(element);
+                    DescriptionTranslator::translate(element, state.get());
+                    stateMap.insert({ element.nameStr(), std::move(state) });
+                },
+                [&](const seds::model::Transition &transition) {
+                    Q_UNUSED(transition);
+                }
+            }, sedsElement);
+        // clang-format on
     }
 
     generateProceduresForSyncCommands(context, sedsStateMachine);
@@ -551,6 +553,7 @@ auto StateMachineTranslator::createStartTransition(Context &context, const seds:
                 throw TranslationException("Multiple entry states are not supported");
             }
             auto transition = std::make_unique<::sdl::Transition>();
+            DescriptionTranslator::translate(sedsStateMachine, transition.get());
             setInitialVariableValues(context.sedsComponent().implementation().variables(), transition.get());
             const auto &state = std::get<seds::model::EntryState>(element);
             const auto timerTime = getTimerInvocationTime(sedsStateMachine, state.nameStr());
@@ -739,6 +742,7 @@ auto StateMachineTranslator::translateTransition(Context &context, const seds::m
     auto inputHandler = translatePrimitive(context, sdlFromState, sedsTransition.primitive());
 
     auto mainTransition = std::make_unique<::sdl::Transition>();
+    DescriptionTranslator::translate(sedsTransition, mainTransition.get());
     auto currentTransitionPtr = mainTransition.get();
     inputHandler.first->setTransition(mainTransition.get());
     sdlFromState->addInput(std::move(inputHandler.first));

@@ -77,7 +77,7 @@ public:
      */
     auto comment() const -> const QString &;
     /**
-     * @brief   Setter for this model comment
+     * @brief   Setter for this node comment
      *
      * @param   comment     comment to set
      */

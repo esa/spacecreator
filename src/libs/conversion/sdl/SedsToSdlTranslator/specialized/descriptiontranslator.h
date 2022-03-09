@@ -20,6 +20,7 @@
 #pragma once
 
 #include <sdl/SdlModel/node.h>
+#include <sdl/SdlModel/transition.h>
 #include <seds/SedsModel/base/description.h>
 #include <seds/SedsModel/types/datatype.h>
 
@@ -32,6 +33,10 @@ public:
 
 public:
     static auto translate(const seds::model::Description &sedsDescription, ::sdl::Node *sdlNode) -> void;
+    static auto translate(const seds::model::Description &sedsDescription, ::sdl::Transition *sdlTransition) -> void;
+
+private:
+    static auto combineDescriptions(const seds::model::Description &sedsDescription) -> QString;
 };
 
 } // namespace conversion::asn1::translator

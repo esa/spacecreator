@@ -51,6 +51,9 @@ public:
      * @param   asn1Node            Node that should contain the comment
      */
     static auto translate(const seds::model::DataType &sedsDataType, Asn1Acn::Node *asn1Node) -> void;
+
+private:
+    static auto combineDescriptions(const seds::model::Description &sedsDescription) -> QString;
 };
 
 } // namespace conversion::asn1::translator
