@@ -31,7 +31,9 @@
 #include <dvcore/dvnode.h>
 #include <dvcore/dvobject.h>
 #include <dvcore/dvpartition.h>
+#include <initializer_list>
 #include <memory>
+#include <shared/common.h>
 #include <shared/entityattribute.h>
 #include <shared/errorhub.h>
 

@@ -28,6 +28,7 @@
 #include <ivcore/ivfunction.h>
 #include <memory>
 #include <qobjectdefs.h>
+#include <shared/common.h>
 #include <stdexcept>
 #include <testgenerator/testgenerator.h>
 
@@ -84,6 +85,7 @@ void tst_dvgenerator::testLinuxX86()
     const std::unique_ptr<dvm::DVModel> generatedModel =
             DvGenerator::generate(ivFunctionsRaw, "x86 Linux CPP", "x86_Linux_TestRunner", "Node_1", "hostPartition");
 
+    qDebug() << shared::hwLibraryPath();
     QVERIFY(generatedModel != nullptr);
     const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());
     QVERIFY(generatedDvObjects != nullptr);

@@ -31,4 +31,6 @@ add_format_target(${TEST_NAME})
 
 configure_file(resources/deploymentview-linux-x86.dv.xml.out resources/deploymentview-linux-x86.dv.xml COPYONLY)
 configure_file(resources/deploymentview-samv71.dv.xml.out resources/deploymentview-samv71.dv.xml COPYONLY)
+configure_file(resources/Board1.xml "$ENV{HOME}/.local/share/${TEST_NAME}/HWlibrary" COPYONLY)
+configure_file(resources/Board1.xml BOARD.xml COPYONLY)
 configure_file(../../../../src/libs/libdveditor/templating/xml_templates/deploymentview.tmplt deploymentmentview.tmplt COPYONLY)
