@@ -45,7 +45,7 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
 
     const bool enhancedSpinSupport = options.isSet(PromelaOptions::enhancedSpinSupport);
 
-    bool asn1ValueGeneration = options.isSet(PromelaOptions::asn1ValueGeneration);
+    const bool asn1ValueGeneration = options.isSet(PromelaOptions::asn1ValueGeneration);
 
     const std::vector<QString> valueGeneration = options.values(PromelaOptions::asn1ValueGenerationForType);
 

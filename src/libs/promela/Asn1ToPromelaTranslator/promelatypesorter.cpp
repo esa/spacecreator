@@ -111,6 +111,9 @@ void PromelaTypeSorter::populateTypeDependencies(const PromelaModel &promelaMode
                 }
                 name = std::get<UtypeRef>(declaration.getType().getArrayType().getType()).getName();
             }
+            if (name.isEmpty()) {
+                continue;
+            }
             if (dependencies.find(name) != dependencies.end()) {
                 dependencies[utype.getName()].insert(name);
             } else if (typeAliasMap.count(name)) {
