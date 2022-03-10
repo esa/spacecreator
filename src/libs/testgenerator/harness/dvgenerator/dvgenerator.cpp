@@ -40,6 +40,12 @@ namespace testgenerator {
 QVector<qint32> DvGenerator::Coordinates::node = { 192, 193, 396, 353 };
 QVector<qint32> DvGenerator::Coordinates::partition = { 236, 237, 356, 317 };
 
+const QString DvGenerator::nodeLabelToken = dvm::meta::Props::token(dvm::meta::Props::Token::node_label);
+const QString DvGenerator::nameToken = dvm::meta::Props::token(dvm::meta::Props::Token::name);
+const QString DvGenerator::devNamespaceToken = "namespace";
+const QString DvGenerator::typeToken = dvm::meta::Props::token(dvm::meta::Props::Token::type);
+const QString DvGenerator::pathToken = dvm::meta::Props::token(dvm::meta::Props::Token::path);
+
 auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind, const QString &hw,
         const QString &nodeTitle, const QString &nodeLabel, const QString &hostPartitionName)
         -> std::unique_ptr<dvm::DVModel>
@@ -170,11 +176,5 @@ auto DvGenerator::getSelectedHwObjects(const QVector<dvm::DVObject *> &hwObjects
 
     return selectedHwObjects;
 }
-
-const QString DvGenerator::nodeLabelToken = dvm::meta::Props::token(dvm::meta::Props::Token::node_label);
-const QString DvGenerator::nameToken = dvm::meta::Props::token(dvm::meta::Props::Token::name);
-const QString DvGenerator::devNamespaceToken = "namespace";
-const QString DvGenerator::typeToken = dvm::meta::Props::token(dvm::meta::Props::Token::type);
-const QString DvGenerator::pathToken = dvm::meta::Props::token(dvm::meta::Props::Token::path);
 
 } // namespace testgenerator

@@ -40,6 +40,13 @@ namespace testgenerator {
  */
 class DvGenerator final
 {
+private:
+    static const QString nodeLabelToken;
+    static const QString nameToken;
+    static const QString devNamespaceToken;
+    static const QString typeToken;
+    static const QString pathToken;
+
 public:
     /**
      * @brief Coordinates of Deployment View diagram entities
@@ -93,12 +100,6 @@ private:
 
         return object;
     }
-
-    static const QString nodeLabelToken;
-    static const QString nameToken;
-    static const QString devNamespaceToken;
-    static const QString typeToken;
-    static const QString pathToken;
 };
 
 } // namespace testgenerator
