@@ -37,7 +37,6 @@
 
 namespace testgenerator {
 
-QVector<QVector<qint32>> DvGenerator::Coordinates::devices;
 QVector<qint32> DvGenerator::Coordinates::node = { 192, 193, 396, 353 };
 QVector<qint32> DvGenerator::Coordinates::partition = { 236, 237, 356, 317 };
 
@@ -45,11 +44,6 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
         const QString &nodeTitle, const QString &nodeLabel, const QString &hostPartitionName)
         -> std::unique_ptr<dvm::DVModel>
 {
-    Coordinates::devices = {
-        { 192, 210 },
-        { 192, 251 },
-    };
-
     auto model = std::make_unique<dvm::DVModel>();
 
     const QVector<dvm::DVObject *> loadedLib = getAllHwObjectsFromLib();
@@ -57,10 +51,6 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
 
     dvm::DVNode *const node = makeNodeAndAddToModel(nodeTitle, nodeLabel, model.get(), getBoard(selectedObjects));
     makePartitionAndAddToNode(hostPartitionName, model.get(), node);
-
-    const QVector<dvm::DVObject *> hwDevices = getDevices(selectedObjects);
-    std::for_each(hwDevices.begin(), hwDevices.end(),
-            [&](const auto &device) { cloneDeviceAndAddToModelAndNode(device, model.get(), node); });
 
     std::for_each(functionsToBind.begin(), functionsToBind.end(),
             [&](const auto &function) { cloneFunctionAndAddToModel(function, model.get(), node, hostPartitionName); });
@@ -97,51 +87,6 @@ auto DvGenerator::cloneDvObject(dvm::DVObject *const object) -> dvm::DVObject *
     }
 
     return copy;
-}
-
-auto DvGenerator::getDevices(const QVector<dvm::DVObject *> &objects) -> QVector<dvm::DVObject *>
-{
-    QVector<dvm::DVObject *> devices;
-
-    std::for_each(objects.begin(), objects.end(), [&devices](const auto &object) {
-        if (object->type() == dvm::DVObject::Type::Port) {
-            devices << object;
-        }
-    });
-
-    return devices;
-}
-
-auto DvGenerator::cloneDeviceAndAddToModelAndNode(
-        dvm::DVObject *const device, dvm::DVModel *const model, dvm::DVObject *const node) -> void
-{
-    const QString devName = device->entityAttributeValue(nameToken).toString();
-    const QString asn1Module = device->entityAttributeValue(asn1moduleToken).toString();
-    const QString devNamespace = device->entityAttributeValue(devNamespaceToken).toString();
-    const QString requiresBusAccess = device->entityAttributeValue(requiresBusAccessToken).toString();
-    const QString extends = device->entityAttributeValue(extendsToken).toString();
-    const QString busNamespace = device->entityAttributeValue(busNamespaceToken).toString();
-    const QString asn1File = device->entityAttributeValue(asn1fileToken).toString();
-    const QString asn1Type = device->entityAttributeValue(asn1typeToken).toString();
-    const QString implExtends = device->entityAttributeValue(implExtendsToken).toString();
-
-    auto *const dev = makeDvObject<dvm::DVDevice>(model, devName);
-    dev->setParentObject(node);
-
-    dev->setCoordinates(Coordinates::devices.first());
-    Coordinates::devices.removeFirst();
-    dev->setEntityAttribute(asn1moduleToken, asn1Module);
-    dev->setEntityAttribute(devNamespaceToken, devNamespace);
-    dev->setEntityAttribute(requires_bus_accessToken, requiresBusAccess);
-    dev->setEntityAttribute(extendsToken, extends);
-    dev->setEntityAttribute(busNamespaceToken, busNamespace);
-    dev->setEntityAttribute(asn1fileToken, asn1File);
-    dev->setEntityAttribute(asn1typeToken, asn1Type);
-    dev->setEntityAttribute(implExtendsToken, implExtends);
-    dev->setEntityAttribute(portToken, devName);
-
-    static_cast<dvm::DVNode *>(node)->addDevice(static_cast<dvm::DVDevice *>(dev));
-    model->addObject(dev);
 }
 
 auto DvGenerator::cloneFunctionAndAddToModel(ivm::IVFunction *function, dvm::DVModel *model, dvm::DVObject *const node,
@@ -228,17 +173,7 @@ auto DvGenerator::getSelectedHwObjects(const QVector<dvm::DVObject *> &hwObjects
 
 const QString DvGenerator::nodeLabelToken = dvm::meta::Props::token(dvm::meta::Props::Token::node_label);
 const QString DvGenerator::nameToken = dvm::meta::Props::token(dvm::meta::Props::Token::name);
-const QString DvGenerator::asn1moduleToken = dvm::meta::Props::token(dvm::meta::Props::Token::asn1module);
 const QString DvGenerator::devNamespaceToken = "namespace";
-const QString DvGenerator::requiresBusAccessToken = "requiresBusAccess";
-const QString DvGenerator::requires_bus_accessToken =
-        dvm::meta::Props::token(dvm::meta::Props::Token::requires_bus_access);
-const QString DvGenerator::extendsToken = "extends";
-const QString DvGenerator::busNamespaceToken = "bus_namespace";
-const QString DvGenerator::asn1fileToken = dvm::meta::Props::token(dvm::meta::Props::Token::asn1file);
-const QString DvGenerator::asn1typeToken = dvm::meta::Props::token(dvm::meta::Props::Token::asn1type);
-const QString DvGenerator::implExtendsToken = "impl_extends";
-const QString DvGenerator::portToken = dvm::meta::Props::token(dvm::meta::Props::Token::port);
 const QString DvGenerator::typeToken = dvm::meta::Props::token(dvm::meta::Props::Token::type);
 const QString DvGenerator::pathToken = dvm::meta::Props::token(dvm::meta::Props::Token::path);
 

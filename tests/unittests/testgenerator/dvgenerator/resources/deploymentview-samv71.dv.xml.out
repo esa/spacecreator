@@ -6,8 +6,5 @@
             <Function name="TestDriver" path="TestDriver"/>
             <Function name="FunctionUnderTest" path="FunctionUnderTest"/>
         </Partition>
-        <Device name="uart0" requires_bus_access="ocarina_buses::serial.ccsds" port="uart0" asn1file="/home/taste/tool-inst/include/TASTE-SAMV71-Drivers/configurations/samv71-serial-ccsds-driver.asn" asn1type="Serial-CCSDS-SamV71-Conf-T" asn1module="SAMV71-SERIAL-CCSDS-DRIVER" impl_extends="ocarina_drivers::serial_ccsds.samv71" bus_namespace="ocarina_buses" namespace="ocarina_drivers" extends="ocarina_drivers::serial_ccsds">
-            <Property name="Taste::coordinates" value="19200 21000"/>
-        </Device>
     </Node>
 </DeploymentView>

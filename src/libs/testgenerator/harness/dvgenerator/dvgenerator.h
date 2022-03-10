@@ -46,8 +46,6 @@ public:
      *
      */
     struct Coordinates {
-        /** Coordinates of devices (ports) **/
-        static QVector<QVector<qint32>> devices;
         /** Coordinates of main node **/
         static QVector<qint32> node;
         /** Coordinates of partition present in the node **/
@@ -71,14 +69,11 @@ public:
 
 private:
     static auto cloneDvObject(dvm::DVObject *object) -> dvm::DVObject *;
-    static auto cloneDeviceAndAddToModelAndNode(dvm::DVObject *device, dvm::DVModel *model, dvm::DVObject *node)
-            -> void;
     static auto cloneFunctionAndAddToModel(
             ivm::IVFunction *function, dvm::DVModel *model, dvm::DVObject *node, const QString &partitionTitle) -> void;
 
     static auto getAllHwObjectsFromLib() -> QVector<dvm::DVObject *>;
     static auto getBoard(const QVector<dvm::DVObject *> &objects) -> dvm::DVBoard *;
-    static auto getDevices(const QVector<dvm::DVObject *> &objects) -> QVector<dvm::DVObject *>;
     static auto getSelectedHwObjects(const QVector<dvm::DVObject *> &hwObjects, const QString &hwTitle)
             -> QVector<dvm::DVObject *>;
 
@@ -101,16 +96,7 @@ private:
 
     static const QString nodeLabelToken;
     static const QString nameToken;
-    static const QString asn1moduleToken;
     static const QString devNamespaceToken;
-    static const QString requiresBusAccessToken;
-    static const QString requires_bus_accessToken;
-    static const QString extendsToken;
-    static const QString busNamespaceToken;
-    static const QString asn1fileToken;
-    static const QString asn1typeToken;
-    static const QString implExtendsToken;
-    static const QString portToken;
     static const QString typeToken;
     static const QString pathToken;
 };
