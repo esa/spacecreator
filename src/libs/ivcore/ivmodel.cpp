@@ -89,6 +89,7 @@ bool IVModel::removeObject(shared::VEObject *obj)
     if (shared::VEModel::removeObject(obj)) {
         if (auto parentObj = qobject_cast<ivm::IVFunctionType *>(obj->parentObject())) {
             parentObj->removeChild(obj->as<ivm::IVObject *>());
+            d->m_visibleObjects.removeOne(obj->as<ivm::IVObject *>());
         }
         return true;
     }
@@ -349,7 +350,7 @@ IVModel *IVModel::getConnectionLayersModel() const
 IVConnectionLayerType *IVModel::getConnectionLayerByName(const QString &name) const
 {
     if (d->m_layersModel != nullptr) {
-        for (auto * const layer : d->m_layersModel->allObjectsByType<IVConnectionLayerType>()) {
+        for (auto *const layer : d->m_layersModel->allObjectsByType<IVConnectionLayerType>()) {
             if (layer->name().compare(name) == 0) {
                 return layer;
             }
