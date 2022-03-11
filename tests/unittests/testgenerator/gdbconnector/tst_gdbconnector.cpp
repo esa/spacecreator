@@ -47,7 +47,10 @@ void tst_gdbconnector::testNominal()
     QFAIL("this shall happen");
 
     // to check:
-    // 1. load a given script file
+    // 0. run gdb server on target:
+    //       gdbserver host:1234 hostpartition
+    // 1. load a given script file:
+    //       gdb -x x86-linux-cpp.gdb
     // 2. execute script on a specified console application
     // 3. retrieve the returned result
 }
