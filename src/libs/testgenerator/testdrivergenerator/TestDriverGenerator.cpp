@@ -75,7 +75,7 @@ auto TestDriverGenerator::generateTestDriver(
     ss << "//#include <stdio.h>"
           "\n"
           "\n";
-    ss << QString("#define TEST_DATA_SIZE %1").arg(testRecordsSize).toStdString();
+    ss << QString("const unsigned int kTestDataSize = %1;").arg(testRecordsSize).toStdString();
     ss << "\n"
           "\n"
           "typedef struct {\n";
@@ -86,7 +86,7 @@ auto TestDriverGenerator::generateTestDriver(
 
     ss << QString("} %1;\n").arg(testVectorTypeName).toStdString();
     ss << "\n";
-    ss << QString("%1 %2[TEST_DATA_SIZE] = { 0 };\n").arg(testVectorTypeName).arg(testVectorVariableName).toStdString();
+    ss << QString("%1* %2 = NULL;\n").arg(testVectorTypeName).arg(testVectorVariableName).toStdString();
     ss << "\n";
     ss << QString("void %1(void)\n").arg(notifyFunctionName).toStdString();
     ss << "{\n"
@@ -94,10 +94,17 @@ auto TestDriverGenerator::generateTestDriver(
           "    while (true) {\n"
           "        a = 0;\n"
           "    }\n"
-          "}\n"
+          "\n";
+    ss << QString("    free(%1);\n").arg(testVectorVariableName).toStdString();
+    ss << "}\n"
           "\n";
     ss << QString("%1\n").arg(testDriverStartupFunctionDeclaration).toStdString();
     ss << "{\n";
+    ss << QString("    %1 = malloc(kTestDataSize * sizeof(%2));\n")
+                    .arg(testVectorVariableName)
+                    .arg(testVectorTypeName)
+                    .toStdString();
+    ss << "\n";
 
     const unsigned long int lastTestRecordIndex = testRecordsSize - 1;
     for (unsigned long int i = 0; i < lastTestRecordIndex; i++) {
@@ -109,8 +116,8 @@ auto TestDriverGenerator::generateTestDriver(
     ss << "}\n"
           "\n";
     ss << QString("%1\n").arg(testDriverStartTestFunctionDeclaration).toStdString();
-    ss << "{\n"
-          "    for (unsigned int i = 0; i < TEST_DATA_SIZE; i++) {\n"
+    ss << "{\n";
+    ss << "    for (unsigned int i = 0; i < kTestDataSize; i++) {\n"
           "        // clang-format off\n";
     ss << QString("        %1(\n").arg(testDriverRiName).toStdString();
     for (auto it = interface.params().begin(); it != std::prev(interface.params().end()); it++) {
