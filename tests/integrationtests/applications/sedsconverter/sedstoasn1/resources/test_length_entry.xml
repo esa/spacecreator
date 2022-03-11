@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/LengthEntry">
+    <DataTypeSet>
+      <IntegerDataType name="IntegerData">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <FloatDataType name="FloatData">
+        <FloatDataEncoding encodingAndPrecision="IEEE754_2008_single" sizeInBits="32" />
+        <Range>
+          <PrecisionRange>single</PrecisionRange>
+        </Range>
+      </FloatDataType>
+      <ArrayDataType name="ArrayData" dataTypeRef="IntegerData">
+        <DimensionList>
+          <Dimension size="20" />
+        </DimensionList>
+      </ArrayDataType>
+      <IntegerDataType name="LengthType">
+        <IntegerDataEncoding encoding="unsigned" byteOrder="littleEndian" sizeInBits="16" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="65535" />
+        </Range>
+      </IntegerDataType>
+      <BinaryDataType name="BinaryPattern" sizeInBits="8" />
+      <ContainerDataType name="PacketHeader">
+        <EntryList>
+          <Entry name="version" type="IntegerData"/>
+          <Entry name="release" type="IntegerData"/>
+          <Entry name="info" type="ArrayData"/>
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="PacketBody">
+        <EntryList>
+          <Entry name="aReal" type="FloatData"/>
+          <Entry name="anInteger" type="IntegerData"/>
+          <Entry name="data" type="ArrayData"/>
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="Packet">
+        <EntryList>
+          <Entry name="pHeader" type="PacketHeader"/>
+          <LengthEntry name="lengthEntry" type="LengthType"/>
+          <Entry name="pBody" type="PacketBody"/>
+        </EntryList>
+        <TrailerEntryList>
+          <ErrorControlEntry name="errorControlEntry" errorControlType="CRC8" type="BinaryPattern" />
+        </TrailerEntryList>
+      </ContainerDataType>
+    </DataTypeSet>
+  </Package>
+</PackageFile>
+
+<!-- <PaddingEntry> -->

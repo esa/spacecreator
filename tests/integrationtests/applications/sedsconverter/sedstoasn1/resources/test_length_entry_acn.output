@@ -1,0 +1,25 @@
+COM-N7SPACE-LENGTHENTRY DEFINITIONS ::= BEGIN
+IntegerData [size 8, encoding pos-int, endianness big]
+FloatData [encoding IEEE754-1985-32, endianness big]
+ArrayData []
+LengthType [size 16, encoding pos-int, endianness little]
+BinaryPattern []
+PacketHeader []
+{
+    version [],
+    release [],
+    info []
+}
+PacketBody []
+{
+    aReal [],
+    anInteger [],
+    data []
+}
+Packet []
+{
+    pHeader [],
+    lengthEntry NULL [align-to-next byte, pattern '00000000000000000000000000000000'B],
+    pBody []
+}
+END
