@@ -16,10 +16,11 @@ PacketBody []
     anInteger [],
     data []
 }
-Packet []
+Packet [post-encoding-function packet-encoding-function, post-decoding-validator packet-decoding-validator]
 {
     pHeader [],
-    lengthEntry NULL [align-to-next byte, pattern '00000000000000000000000000000000'B],
-    pBody []
+    lengthEntry NULL [align-to-next byte, pattern '00000000000000000000000000000000'B, save-position],
+    pBody [],
+    errorControlEntry NULL [align-to-next byte, pattern '00000000'B, save-position]
 }
 END

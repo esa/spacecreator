@@ -43,14 +43,9 @@ void ContainerEntriesScope::addContainer(const ContainerDataType &sedsType)
 {
     auto asn1SequenceComponents = std::make_unique<Asn1Acn::Types::Sequence>();
 
-    // Check if base type is visible
-    if (sedsType.baseType()) {
-        const auto sedsBaseTypeName = sedsType.baseType()->nameStr();
-    }
-
     // Get parent entries
     if (sedsType.baseType()) {
-        const auto sedsBaseTypeName = sedsType.baseType()->nameStr();
+        const auto &sedsBaseTypeName = sedsType.baseType()->nameStr();
         const auto &asn1ParentComponents = fetchComponents(sedsBaseTypeName);
 
         for (const auto &asn1Component : asn1ParentComponents) {
@@ -78,7 +73,7 @@ void ContainerEntriesScope::addContainer(const ContainerDataType &sedsType)
 
     // Get parent trailer entries
     if (sedsType.baseType()) {
-        const auto sedsBaseTypeName = sedsType.baseType()->nameStr();
+        const auto &sedsBaseTypeName = sedsType.baseType()->nameStr();
         const auto &asn1ParentTrailerComponents = fetchTrailerComponents(sedsBaseTypeName);
 
         for (const auto &asn1TrailerComponent : asn1ParentTrailerComponents) {
@@ -86,8 +81,10 @@ void ContainerEntriesScope::addContainer(const ContainerDataType &sedsType)
         }
     }
 
+    const auto patcherFunctions = hasPatcherFunctions(sedsType);
+
     // Save this type
-    ScopeEntry entry { std::move(asn1SequenceComponents), std::move(asn1SequenceTrailerComponents) };
+    ScopeEntry entry { std::move(asn1SequenceComponents), std::move(asn1SequenceTrailerComponents), patcherFunctions };
     m_scope.insert({ sedsType.nameStr(), std::move(entry) });
 }
 
@@ -102,6 +99,42 @@ const Asn1Acn::Types::Sequence::Components &ContainerEntriesScope::fetchTrailerC
 {
     assertPresent(sedsTypeName);
     return m_scope.at(sedsTypeName).trailerEntries->components();
+}
+
+bool ContainerEntriesScope::hasPatcherFunctions(const QString &sedsTypeName) const
+{
+    assertPresent(sedsTypeName);
+    return m_scope.at(sedsTypeName).hasPatcherFunctions;
+}
+
+bool ContainerEntriesScope::hasPatcherFunctions(const ContainerDataType &sedsType) const
+{
+    if (sedsType.baseType()) {
+        const auto &sedsBaseTypeName = sedsType.baseType()->nameStr();
+        const auto basePatcherFunctions = hasPatcherFunctions(sedsBaseTypeName);
+
+        if (basePatcherFunctions) {
+            return true;
+        }
+    }
+
+    for (const auto &sedsEntry : sedsType.entries()) {
+        if (std::holds_alternative<seds::model::ErrorControlEntry>(sedsEntry)
+                || std::holds_alternative<seds::model::LengthEntry>(sedsEntry)) {
+            return true;
+        }
+    }
+
+    if (sedsType.isAbstract()) {
+        for (const auto &sedsEntry : sedsType.trailerEntries()) {
+            if (std::holds_alternative<seds::model::ErrorControlEntry>(sedsEntry)
+                    || std::holds_alternative<seds::model::LengthEntry>(sedsEntry)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 void ContainerEntriesScope::assertPresent(const QString &sedsTypeName) const

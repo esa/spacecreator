@@ -284,6 +284,7 @@ private:
      */
     auto updateParentContainer(const QString &sedsBaseTypeName, Asn1Acn::Types::Sequence *asn1RealizationSequence)
             -> void;
+    auto addPatcherFunctions(Asn1Acn::Types::Sequence *asn1Type) -> void;
 
     /**
      * @brief   Translates container constraints and applies them to the ASN.1 sequence

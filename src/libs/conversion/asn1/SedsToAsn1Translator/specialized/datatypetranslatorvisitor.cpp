@@ -151,6 +151,10 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
         for (const auto &asn1TrailerComponent : asn1TrailerComponents) {
             type->addComponent(asn1TrailerComponent->clone());
         }
+
+        if (m_containersScope.hasPatcherFunctions(sedsTypeName)) {
+            addPatcherFunctions(type.get());
+        }
     }
 
     // Add realization to the parent component
@@ -613,6 +617,15 @@ void DataTypeTranslatorVisitor::updateParentContainer(
             asn1RealizationChoiceAlternativeName, asn1RealizationChoiceAlternativeName, "", Asn1Acn::SourceLocation(),
             std::move(asn1SequenceReference));
     asn1RealizationChoice->addComponent(std::move(asn1RealizationChoiceAlternative));
+}
+
+void DataTypeTranslatorVisitor::addPatcherFunctions(Asn1Acn::Types::Sequence *asn1Type)
+{
+    auto postEncodingFunction = QString("%1-encoding-function").arg(asn1Type->identifier().toLower());
+    asn1Type->setPostEncodingFunction(std::move(postEncodingFunction));
+
+    auto postDecodingValidator = QString("%1-decoding-validator").arg(asn1Type->identifier().toLower());
+    asn1Type->setPostDecodingValidator(std::move(postDecodingValidator));
 }
 
 Asn1Acn::Types::Endianness DataTypeTranslatorVisitor::convertByteOrder(seds::model::ByteOrder sedsByteOrder) const

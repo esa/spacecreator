@@ -36,6 +36,7 @@ class Null : public Type
 public:
     Null(const QString &identifier = QString())
         : Type(identifier)
+        , m_savePosition(false)
     {
     }
     Null(const Null &other) = default;
@@ -53,8 +54,12 @@ public:
     void setPattern(const QString &pattern) { m_pattern = pattern; }
     const QString &pattern() const { return m_pattern; }
 
+    void setSavePosition(bool savePosition) { m_savePosition = savePosition; }
+    bool savePosition() const { return m_savePosition; }
+
 private:
     QString m_pattern;
+    bool m_savePosition;
 };
 
 }

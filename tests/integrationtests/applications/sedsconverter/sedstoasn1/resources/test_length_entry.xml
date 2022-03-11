@@ -45,10 +45,8 @@
           <Entry name="pHeader" type="PacketHeader"/>
           <LengthEntry name="lengthEntry" type="LengthType"/>
           <Entry name="pBody" type="PacketBody"/>
-        </EntryList>
-        <TrailerEntryList>
           <ErrorControlEntry name="errorControlEntry" errorControlType="CRC8" type="BinaryPattern" />
-        </TrailerEntryList>
+        </EntryList>
       </ContainerDataType>
     </DataTypeSet>
   </Package>

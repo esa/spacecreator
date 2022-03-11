@@ -29,6 +29,7 @@
 #include "type.h"
 
 #include <QString>
+#include <optional>
 
 namespace Asn1Acn {
 namespace Types {
@@ -51,6 +52,16 @@ public:
     std::unique_ptr<Type> clone() const override;
 
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/sequence.png"); }
+
+    std::optional<QString> postEncodingFunction() const;
+    void setPostEncodingFunction(QString postEncodingFunction);
+
+    std::optional<QString> postDecodingValidator() const;
+    void setPostDecodingValidator(QString postDecodingValidator);
+
+private:
+    std::optional<QString> m_postEncodingFunction;
+    std::optional<QString> m_postDecodingValidator;
 };
 
 }

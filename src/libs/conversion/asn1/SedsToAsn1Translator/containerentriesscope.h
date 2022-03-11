@@ -73,14 +73,25 @@ public:
      * @param   Vector of trailer components
      */
     auto fetchTrailerComponents(const QString &sedsTypeName) const -> const Asn1Acn::Types::Sequence::Components &;
+    /**
+     * @brief   Check if given components has patcher functions
+     *
+     * @param   sedsTypeName    Container name
+     *
+     * @param   True if patcher functions are required for given components
+     */
+    auto hasPatcherFunctions(const QString &sedsTypeName) const -> bool;
 
 private:
+    auto hasPatcherFunctions(const seds::model::ContainerDataType &sedsType) const -> bool;
+
     auto assertPresent(const QString &sedsTypeName) const -> void;
 
 private:
     struct ScopeEntry final {
         std::unique_ptr<Asn1Acn::Types::Sequence> entries;
         std::unique_ptr<Asn1Acn::Types::Sequence> trailerEntries;
+        bool hasPatcherFunctions;
     };
 
     /// @brief  Parent definitions

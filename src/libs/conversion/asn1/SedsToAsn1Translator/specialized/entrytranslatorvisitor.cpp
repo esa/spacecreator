@@ -82,6 +82,7 @@ void EntryTranslatorVisitor::operator()(const seds::model::Entry &sedsEntry)
 void EntryTranslatorVisitor::operator()(const seds::model::ErrorControlEntry &sedsEntry)
 {
     auto asn1EntryType = translateErrorControl(sedsEntry);
+    asn1EntryType->setSavePosition(true);
 
     const auto entryName = Escaper::escapeAsn1FieldName(sedsEntry.nameStr());
     auto sequenceComponent =
@@ -103,6 +104,7 @@ void EntryTranslatorVisitor::operator()(const seds::model::FixedValueEntry &seds
 void EntryTranslatorVisitor::operator()(const seds::model::LengthEntry &sedsEntry)
 {
     auto asn1EntryType = translateLengthField(sedsEntry);
+    asn1EntryType->setSavePosition(true);
 
     const auto entryName = Escaper::escapeAsn1FieldName(sedsEntry.nameStr());
     auto sequenceComponent =
@@ -112,7 +114,6 @@ void EntryTranslatorVisitor::operator()(const seds::model::LengthEntry &sedsEntr
 
 void EntryTranslatorVisitor::operator()(const seds::model::ListEntry &sedsEntry)
 {
-
     auto asn1EntryType = translateEntryType(sedsEntry.type());
 
     auto asn1SequenceOfType = std::make_unique<Asn1Acn::Types::SequenceOf>();
