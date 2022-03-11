@@ -1,16 +1,18 @@
 project(SedsToSdlTranslator VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES translator.cpp
-            specialized/common.cpp
-            specialized/statemachinetranslator.cpp
             specialized/activitytranslator.cpp
+            specialized/descriptiontranslator.cpp
+            specialized/common.cpp
             specialized/mathoperationtranslator.cpp
+            specialized/statemachinetranslator.cpp
             specialized/statementtranslatorvisitor.cpp)
 set(INCLUDES translator.h
-             specialized/common.h
-             specialized/statemachinetranslator.h
              specialized/activitytranslator.h
+             specialized/common.h
+             specialized/descriptiontranslator.h
              specialized/mathoperationtranslator.h
+             specialized/statemachinetranslator.h
              specialized/statementtranslatorvisitor.h)
 
 add_library(SedsToSdlTranslator STATIC)

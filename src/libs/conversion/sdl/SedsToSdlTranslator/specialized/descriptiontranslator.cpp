@@ -19,31 +19,18 @@
 
 #include "specialized/descriptiontranslator.h"
 
-#include <seds/SedsModel/types/arraydatatype.h>
-#include <seds/SedsModel/types/binarydatatype.h>
-#include <seds/SedsModel/types/booleandatatype.h>
-#include <seds/SedsModel/types/containerdatatype.h>
-#include <seds/SedsModel/types/enumerateddatatype.h>
-#include <seds/SedsModel/types/floatdatatype.h>
-#include <seds/SedsModel/types/integerdatatype.h>
-#include <seds/SedsModel/types/stringdatatype.h>
-#include <seds/SedsModel/types/subrangedatatype.h>
+namespace conversion::sdl::translator {
 
-namespace conversion::asn1::translator {
-
-void DescriptionTranslator::translate(const seds::model::Description &sedsDescription, Asn1Acn::Node *asn1Node)
+void DescriptionTranslator::translate(const seds::model::Description &sedsDescription, ::sdl::Node *sdlNode)
 {
     auto description = combineDescriptions(sedsDescription);
-    asn1Node->setComment(std::move(description));
+    sdlNode->setComment(std::move(description));
 }
 
-void DescriptionTranslator::translate(const seds::model::DataType &sedsDataType, Asn1Acn::Node *asn1Node)
+void DescriptionTranslator::translate(const seds::model::Description &sedsDescription, ::sdl::Transition *sdlTransition)
 {
-    const seds::model::Description *sedsDescription = nullptr;
-    std::visit([&](const auto &type) { sedsDescription = &type; }, sedsDataType);
-
-    auto description = combineDescriptions(*sedsDescription);
-    asn1Node->setComment(std::move(description));
+    auto description = combineDescriptions(sedsDescription);
+    sdlTransition->setComment(std::move(description));
 }
 
 QString DescriptionTranslator::combineDescriptions(const seds::model::Description &sedsDescription)
@@ -61,4 +48,4 @@ QString DescriptionTranslator::combineDescriptions(const seds::model::Descriptio
     return description;
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::sdl::translator

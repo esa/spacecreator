@@ -19,31 +19,26 @@
 
 #include "specialized/descriptiontranslator.h"
 
-#include <seds/SedsModel/types/arraydatatype.h>
-#include <seds/SedsModel/types/binarydatatype.h>
-#include <seds/SedsModel/types/booleandatatype.h>
-#include <seds/SedsModel/types/containerdatatype.h>
-#include <seds/SedsModel/types/enumerateddatatype.h>
-#include <seds/SedsModel/types/floatdatatype.h>
-#include <seds/SedsModel/types/integerdatatype.h>
-#include <seds/SedsModel/types/stringdatatype.h>
-#include <seds/SedsModel/types/subrangedatatype.h>
+namespace conversion::iv::translator {
 
-namespace conversion::asn1::translator {
-
-void DescriptionTranslator::translate(const seds::model::Description &sedsDescription, Asn1Acn::Node *asn1Node)
+void DescriptionTranslator::translate(const seds::model::Description &sedsDescription, ivm::IVFunction *ivFunction)
 {
     auto description = combineDescriptions(sedsDescription);
-    asn1Node->setComment(std::move(description));
+
+    if (!description.isEmpty()) {
+        ivFunction->setEntityAttribute(
+                ivm::meta::Props::token(ivm::meta::Props::Token::comment), std::move(description));
+    }
 }
 
-void DescriptionTranslator::translate(const seds::model::DataType &sedsDataType, Asn1Acn::Node *asn1Node)
+void DescriptionTranslator::translate(const seds::model::Description &sedsDescription, ivm::IVInterface *ivInterface)
 {
-    const seds::model::Description *sedsDescription = nullptr;
-    std::visit([&](const auto &type) { sedsDescription = &type; }, sedsDataType);
+    auto description = combineDescriptions(sedsDescription);
 
-    auto description = combineDescriptions(*sedsDescription);
-    asn1Node->setComment(std::move(description));
+    if (!description.isEmpty()) {
+        ivInterface->setEntityAttribute(
+                ivm::meta::Props::token(ivm::meta::Props::Token::comment), std::move(description));
+    }
 }
 
 QString DescriptionTranslator::combineDescriptions(const seds::model::Description &sedsDescription)
@@ -52,13 +47,15 @@ QString DescriptionTranslator::combineDescriptions(const seds::model::Descriptio
 
     if (sedsDescription.longDescription()) {
         if (!description.isEmpty()) {
-            description += "\n";
+            description += " ";
         }
 
         description += sedsDescription.longDescription().value();
     }
 
-    return description;
+    description.replace("\n", " ");
+
+    return description.toHtmlEscaped();
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::iv::translator

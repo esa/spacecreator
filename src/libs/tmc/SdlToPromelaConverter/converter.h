@@ -46,9 +46,11 @@ public:
      *
      * @param inputFile filepath to input stop condition file
      * @param outputFile output promela file
+     * @param inputSdlFiles a list of SDL files, which are context for stop condition file
      * @return true if execution was successful, otherwise false
      */
-    bool convertStopCondition(const QFileInfo &inputFile, const QFileInfo &outputFile);
+    bool convertStopCondition(
+            const QFileInfo &inputFile, const QFileInfo &outputFile, const QList<QFileInfo> &inputSdlFiles);
 
 private:
     bool startSdl2PromelaProcess(QProcess &process, const QStringList &arguments);

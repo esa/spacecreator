@@ -95,8 +95,8 @@ void InterfaceParameterTranslator::buildParameter(const seds::model::InterfacePa
 
     const auto interfaceName = InterfaceTranslatorHelper::buildParameterInterfaceName(
             m_sedsInterfaceName, sedsParameter.nameStr(), interfaceParameterType, interfaceType);
-    const auto ivInterface =
-            InterfaceTranslatorHelper::createIvInterface(interfaceName, interfaceType, interfaceKind, m_ivFunction);
+    const auto ivInterface = InterfaceTranslatorHelper::createIvInterface(
+            interfaceName, interfaceType, interfaceKind, sedsParameter, m_ivFunction);
     ivInterface->addParam(ivParameter);
 
     m_ivFunction->addChild(ivInterface);

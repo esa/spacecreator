@@ -45,11 +45,13 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
 
     const bool enhancedSpinSupport = options.isSet(PromelaOptions::enhancedSpinSupport);
 
-    const std::vector<QString> valueGeneration = options.values(PromelaOptions::asn1ValueGeneration);
+    const bool asn1ValueGeneration = options.isSet(PromelaOptions::asn1ValueGeneration);
+
+    const std::vector<QString> valueGeneration = options.values(PromelaOptions::asn1ValueGenerationForType);
 
     const auto *asn1Model = getModel<Asn1Model>(sourceModels);
 
-    if (!valueGeneration.empty()) {
+    if (asn1ValueGeneration) {
         QStringList typeNames;
         std::copy(valueGeneration.begin(), valueGeneration.end(), std::back_inserter(typeNames));
         return generateValueGenerationInlines(asn1Model, typeNames);

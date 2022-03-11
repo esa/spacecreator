@@ -28,14 +28,24 @@ Node::Node(QString name)
 {
 }
 
+const QString &Node::name() const
+{
+    return m_name;
+}
+
 void Node::setName(QString name)
 {
     m_name = std::move(name);
 }
 
-const QString &Node::name() const
+const QString &Node::comment() const
 {
-    return m_name;
+    return m_comment;
+}
+
+void Node::setComment(QString comment)
+{
+    m_comment = std::move(comment);
 }
 
 } // sdl

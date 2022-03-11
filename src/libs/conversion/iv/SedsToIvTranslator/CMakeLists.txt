@@ -5,6 +5,7 @@ set(SOURCES     generictypemapper.cpp
                 translator.cpp
                 specialized/asyncinterfacecommandtranslator.cpp
                 specialized/componentstranslator.cpp
+                specialized/descriptiontranslator.cpp
                 specialized/interfaceparametertranslator.cpp
                 specialized/syncinterfacecommandtranslator.cpp)
 set(INCLUDES    generictypemapper.h
@@ -13,6 +14,7 @@ set(INCLUDES    generictypemapper.h
                 typemapping.h
                 specialized/asyncinterfacecommandtranslator.h
                 specialized/componentstranslator.h
+                specialized/descriptiontranslator.h
                 specialized/interfaceparametertranslator.h
                 specialized/syncinterfacecommandtranslator.h)
 

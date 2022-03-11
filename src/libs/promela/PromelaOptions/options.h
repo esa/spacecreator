@@ -38,11 +38,16 @@ public:
     /** @brief Add additional includes at the end of model */
     inline static const QString additionalIncludes = "Promela_Convert_AdditionalIncludes";
 
-    /** @brief Generate promela inlines to generate values of ASN1 type */
+    /** @brief Enable generation of inlines for environment */
     inline static const QString asn1ValueGeneration = "Promela_Convert_Asn1ValueGeneration";
 
+    /** @brief Generate promela inlines to generate values of ASN1 type */
+    inline static const QString asn1ValueGenerationForType = "Promela_Convert_Asn1ValueGenerationForType";
+
+    /** @brief Use function name as part of model under verification */
     inline static const QString modelFunctionName = "Promela_Convert_ModelFunction";
 
+    /** @brief Use function name as part of environment  */
     inline static const QString environmentFunctionName = "Promela_Convert_EnvironmentFunction";
 };
 

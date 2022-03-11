@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include <asn1library/asn1/node.h>
+#include <ivcore/ivfunction.h>
+#include <ivcore/ivinterface.h>
 #include <seds/SedsModel/base/description.h>
-#include <seds/SedsModel/types/datatype.h>
 
-namespace conversion::asn1::translator {
+namespace conversion::iv::translator {
 
 /**
  * @brief   Translator for SEDS short and long descriptions
@@ -38,22 +38,22 @@ public:
 
 public:
     /**
-     * @brief   Translate SEDS description to ASN.1 comment
+     * @brief   Translate SEDS description to IV function comment
      *
      * @param   sedsDescription     Description to translate
-     * @param   asn1Node            Node that should contain the comment
+     * @param   ivFunction          Function that should contain the comment
      */
-    static auto translate(const seds::model::Description &sedsDescription, Asn1Acn::Node *asn1Node) -> void;
+    static auto translate(const seds::model::Description &sedsDescription, ivm::IVFunction *ivFunction) -> void;
     /**
-     * @brief   Translate description of SEDS data type to ASN.1 comment
+     * @brief   Translate SEDS description to IV interface comment
      *
-     * @param   sedsDataType        Data type containing description
-     * @param   asn1Node            Node that should contain the comment
+     * @param   sedsDescription     Description to translate
+     * @param   ivFunction          Interface that should contain the comment
      */
-    static auto translate(const seds::model::DataType &sedsDataType, Asn1Acn::Node *asn1Node) -> void;
+    static auto translate(const seds::model::Description &sedsDescription, ivm::IVInterface *ivInterface) -> void;
 
 private:
     static auto combineDescriptions(const seds::model::Description &sedsDescription) -> QString;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::iv::translator

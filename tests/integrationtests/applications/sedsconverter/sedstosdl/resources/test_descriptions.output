@@ -1,0 +1,142 @@
+/* CIF Process (0, 0), (800, 100) */
+process Component;
+    /* CIF Text (0, 150), (400, 500) */
+    -- MegaVariable short description
+    -- MegaVariable
+    -- long description
+    dcl Megavariable IntegerType;
+    /* CIF ENDTEXT */
+    -- MegaActivity short description
+    -- MegaActivity
+    -- long description
+    /* CIF Procedure (0, 900), (800, 50) */
+    procedure MegaActivity;
+        /* CIF Text (0, 0), (400, 500) */
+        fpar
+            -- ActivityArg short description
+            -- ActivityArg
+            -- long description
+            in Activityarg IntegerType;
+
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            -- SPP short description
+            -- SPP
+            -- long description
+            /* CIF ProcedureCall (0, 937), (100, 50) */
+            call Get_InterfaceRi_Param_Ri(Megavariable);
+            -- Assignment short description
+            -- Assignment
+            -- long description
+            /* CIF Task (0, 1012), (100, 50) */
+            task Megavariable := 1;
+            -- Conditional short description
+            -- Conditional
+            -- long description
+            /* CIF Decision (0, 1012), (400, 50) */
+            decision Activityarg < Activityarg;
+                /* CIF Answer (0, 1087), (400, 50) */
+                (True):
+                    -- SCP short description
+                    -- SCP
+                    -- long description
+                    /* CIF ProcedureCall (0, 1162), (100, 50) */
+                    call InterfaceRi_MegaCommand_Ri(0);
+                    /* CIF Join (0, 1237), (100, 50) */
+                    join condition_1;
+                /* CIF Answer (600, 1087), (400, 50) */
+                (False):
+                    /* CIF ProcedureCall (600, 1162), (100, 50) */
+                    call InterfaceRi_MegaCommand_Ri(1);
+                    /* CIF Join (600, 1237), (100, 50) */
+                    join condition_1;
+            enddecision;
+            /* CIF Label (1200, 1162), (100, 50) */
+            condition_1:
+            -- Math short description
+            -- Math
+            -- long description
+            /* CIF Task (1200, 1237), (100, 50) */
+            task Megavariable := Megavariable + 1;
+            -- Calibration short description
+            -- Calibration
+            -- long description
+            /* CIF Task (1200, 1312), (100, 50) */
+            task Megavariable := 2 + 4 * Megavariable;
+        return ;
+    endprocedure;
+    /* CIF Procedure (0, 975), (800, 50) */
+    procedure InterfacePi_MegaCommand_Pi;
+        /* CIF Text (0, 0), (400, 500) */
+        fpar
+            in Commandarg IntegerType;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Task (0, 937), (100, 50) */
+            task Megavariable := Commandarg;
+            -- Do short description
+            -- Do
+            -- long description
+            /* CIF ProcedureCall (0, 1012), (100, 50) */
+            call MegaActivity(Megavariable);
+        return ;
+    endprocedure;
+      /* CIF Procedure (0, 1050), (800, 50) */
+    procedure Get_InterfacePi_Param_Pi;
+        /* CIF Text (0, 0), (400, 500) */
+        fpar
+            in/out Param IntegerType;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Task (0, 937), (100, 50) */
+            task Param := Megavariable;
+        return ;
+    endprocedure;
+    /* CIF Procedure (0, 1125), (800, 50) */
+    procedure Set_InterfacePi_Param_Pi;
+        /* CIF Text (0, 0), (400, 500) */
+        fpar
+            in Param IntegerType;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Task (0, 937), (100, 50) */
+            task Megavariable := Param;
+        return ;
+    endprocedure;
+    -- StateMachine short description
+    -- StateMachine
+    -- long description
+    /* CIF Start (0, 1200), (200, 75) */
+    START;
+        /* CIF NextState (0, 1387), (200, 50) */
+        NEXTSTATE State1;
+    -- EntryState short description
+    -- EntryState
+    -- long description
+    /* CIF State (0, 1462), (200, 50) */
+    state State1;
+    endstate;
+    -- State short description
+    -- State
+    -- long description
+    /* CIF State (300, 1462), (200, 50) */
+    state State2;
+        /* CIF Input (300, 1462), (200, 50) */
+        input InterfacePi_MegaCommand_Pi;
+            -- Transition short description
+            -- Transition
+            -- long description
+            /* CIF NextState (300, 1537), (200, 50) */
+            NEXTSTATE State2;
+    endstate;
+    -- ExitState short description
+    -- ExitState
+    -- long description
+    /* CIF State (900, 1462), (200, 50) */
+    state State3;
+    endstate;
+endprocess Component;

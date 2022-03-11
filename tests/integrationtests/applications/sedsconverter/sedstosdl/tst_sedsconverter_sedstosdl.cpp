@@ -41,6 +41,7 @@ private Q_SLOTS:
     void testIndexing();
     void testInitialValues();
     void testNamedValues();
+    void testDescriptions();
 };
 
 /// \SRS  ETB-FUN-10
@@ -255,6 +256,12 @@ void tst_SedsConverter_SedsToSdl::testInitialValues()
 void tst_SedsConverter_SedsToSdl::testNamedValues()
 {
     const int result = system("./test_named_values.sh");
+}
+
+/// \SRS  ETB-FUN-10
+void tst_SedsConverter_SedsToSdl::testDescriptions()
+{
+    const int result = system("./test_descriptions.sh");
 }
 
 } // namespace sedsconverter

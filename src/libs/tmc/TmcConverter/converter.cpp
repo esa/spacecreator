@@ -88,10 +88,11 @@ TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &output
 
 bool TmcConverter::convert()
 {
-    if (!convertSystem()) {
+    QList<QFileInfo> allSdlFiles;
+    if (!convertSystem(allSdlFiles)) {
         return false;
     }
-    if (!convertStopConditions()) {
+    if (!convertStopConditions(allSdlFiles)) {
         return false;
     }
     return true;
@@ -134,7 +135,7 @@ bool TmcConverter::convertModel(const std::set<conversion::ModelType> &sourceMod
     return false;
 }
 
-bool TmcConverter::convertSystem()
+bool TmcConverter::convertSystem(QList<QFileInfo> &allSdlFiles)
 {
     const QFileInfo ivFileInfo(m_inputIvFilepath);
 
@@ -171,9 +172,16 @@ bool TmcConverter::convertSystem()
     qDebug() << "Using the following ENV data types: " << environmentDatatypes.join(", ");
 
     for (const QString &ivFunction : modelFunctions) {
+        const QFileInfo &systemStructure = sdlSystemStructureLocation(ivFunction);
+        const QFileInfo &sdlProcess = sdlImplementationLocation(ivFunction);
+
         QList<QFileInfo> sdlFiles;
-        sdlFiles.append(sdlSystemStructureLocation(ivFunction));
-        sdlFiles.append(sdlImplementationLocation(ivFunction));
+        sdlFiles.append(systemStructure);
+        sdlFiles.append(sdlProcess);
+
+        allSdlFiles.append(systemStructure);
+        allSdlFiles.append(sdlProcess);
+
         const QFileInfo outputFile = outputFilepath(ivFunction.toLower() + ".pml");
 
         SdlToPromelaConverter sdl2Promela;
@@ -220,7 +228,7 @@ bool TmcConverter::convertSystem()
     return true;
 }
 
-bool TmcConverter::convertStopConditions()
+bool TmcConverter::convertStopConditions(const QList<QFileInfo> &allSdlFiles)
 {
     const QDir outputDirectory = QDir(m_outputDirectory);
 
@@ -230,7 +238,7 @@ bool TmcConverter::convertStopConditions()
         const QFileInfo output = outputFilepath(base.toLower() + ".pml");
 
         SdlToPromelaConverter sdl2Promela;
-        if (sdl2Promela.convertStopCondition(input, output)) {
+        if (sdl2Promela.convertStopCondition(input, output, allSdlFiles)) {
             return false;
         }
     }
@@ -356,8 +364,10 @@ bool TmcConverter::createEnvGenerationInlines(
     options.add(Asn1Options::inputFilepath, inputDataView.absoluteFilePath());
     options.add(PromelaOptions::outputFilepath, outputFilepath.absoluteFilePath());
 
+    options.add(PromelaOptions::asn1ValueGeneration);
+
     for (const QString &datatype : envDatatypes) {
-        options.add(PromelaOptions::asn1ValueGeneration, datatype);
+        options.add(PromelaOptions::asn1ValueGenerationForType, datatype);
     }
 
     ModelType sourceModelType = ModelType::Asn1;

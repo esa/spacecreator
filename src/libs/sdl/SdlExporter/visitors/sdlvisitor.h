@@ -45,7 +45,7 @@ class SdlVisitor final : public Visitor
 {
 public:
     /**
-     * @brief   Simple layouter for ensuring that SLD entities do not overlap and therefore do not crash OpenGEODE
+     * @brief   Simple layouter for ensuring that SDL entities do not overlap and therefore do not crash OpenGEODE
      */
     class Layouter
     {
@@ -181,6 +181,13 @@ public:
          * @param   line   text to write
          */
         auto writeLine(const QString &line) -> void;
+
+        /**
+         * @brief   Write a comment line - indent, comment and newline
+         *
+         * @param   comment   comment to write
+         */
+        auto writeComment(const QString &line) -> void;
 
         /**
          * @brief   Push indent onto the top of the indent stack

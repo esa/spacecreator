@@ -20,6 +20,7 @@
 #include "statementtranslatorvisitor.h"
 
 #include "components/activities/coremathoperator.h"
+#include "descriptiontranslator.h"
 #include "mathoperationtranslator.h"
 #include "statemachinetranslator.h"
 #include "translation/exceptions.h"
@@ -116,13 +117,21 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Assignment &assig
         const auto &reference = std::get<seds::model::VariableRef>(element);
         const auto referenceDefinition = reference.value().value();
         const auto action = QString("%1 := %2").arg(targetName, translateVariableReference(referenceDefinition));
-        m_sdlTransition->addAction(std::make_unique<::sdl::Task>("", action));
+
+        auto sdlTask = std::make_unique<::sdl::Task>("", action);
+        DescriptionTranslator::translate(assignment, sdlTask.get());
+
+        m_sdlTransition->addAction(std::move(sdlTask));
 
     } else if (std::holds_alternative<seds::model::ValueOperand>(element)) {
         const auto &operand = std::get<seds::model::ValueOperand>(element);
         const auto operandValue = operand.value().value();
         const auto action = QString("%1 := %2").arg(targetName, operandValue);
-        m_sdlTransition->addAction(std::make_unique<::sdl::Task>("", action));
+
+        auto sdlTask = std::make_unique<::sdl::Task>("", action);
+        DescriptionTranslator::translate(assignment, sdlTask.get());
+
+        m_sdlTransition->addAction(std::move(sdlTask));
     } else {
         throw TranslationException("Assignment not implemented");
     }
@@ -136,7 +145,11 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Calibration &cali
     if (std::holds_alternative<Polynomial>(calibrator)) {
         const auto &polynomial = std::get<Polynomial>(calibrator);
         const auto action = QString("%1 := %2").arg(targetName, translatePolynomial(sourceName, polynomial));
-        m_sdlTransition->addAction(std::make_unique<::sdl::Task>("", action));
+
+        auto sdlTask = std::make_unique<::sdl::Task>("", action);
+        DescriptionTranslator::translate(calibration, sdlTask.get());
+
+        m_sdlTransition->addAction(std::move(sdlTask));
     } else {
         // TODO Spline calibrator - postponed, as it requires generation of a custom procedure,
         // and possibly a custom type
@@ -154,6 +167,8 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Conditional &cond
     auto falseAnswer = translateAnswer(m_context, label.get(), FALSE_LITERAL, conditional.onConditionFalse());
     decision->addAnswer(std::move(trueAnswer));
     decision->addAnswer(std::move(falseAnswer));
+
+    DescriptionTranslator::translate(conditional, decision.get());
 
     m_sdlTransition->addAction(std::move(decision));
     m_sdlTransition->addAction(std::move(label));
@@ -211,7 +226,11 @@ auto StatementTranslatorVisitor::operator()(const seds::model::MathOperation &op
     const auto targetName = translateVariableReference(operation.outputVariableRef().value().value());
     const auto value = MathOperationTranslator::translateOperation(operation.elements());
     const auto action = QString("%1 := %2").arg(targetName, value);
-    m_sdlTransition->addAction(std::make_unique<::sdl::Task>("", action));
+
+    auto sdlTask = std::make_unique<::sdl::Task>("", action);
+    DescriptionTranslator::translate(operation, sdlTask.get());
+
+    m_sdlTransition->addAction(std::move(sdlTask));
 }
 
 auto StatementTranslatorVisitor::operator()(const seds::model::SendCommandPrimitive &sendCommand) -> void
@@ -296,6 +315,9 @@ auto StatementTranslatorVisitor::translateActivityCall(::sdl::Process *process,
         const seds::model::ActivityInvocation &invocation) -> std::unique_ptr<::sdl::ProcedureCall>
 {
     auto call = std::make_unique<::sdl::ProcedureCall>();
+
+    DescriptionTranslator::translate(invocation, call.get());
+
     const auto procedureName = Escaper::escapeSdlName(invocation.activity().value());
     const auto &procedure = std::find_if(process->procedures().begin(), process->procedures().end(),
             [procedureName](const auto &p) { return p->name() == procedureName; });
@@ -423,6 +445,8 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, ::sd
 {
     auto call = std::make_unique<::sdl::ProcedureCall>();
 
+    DescriptionTranslator::translate(sendCommand, call.get());
+
     const auto &procedure = std::find_if(hostProcess->procedures().begin(), hostProcess->procedures().end(),
             [callName](const auto &p) { return p->name() == callName; });
 
@@ -442,6 +466,8 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, ::sd
         -> std::unique_ptr<::sdl::ProcedureCall>
 {
     auto call = std::make_unique<::sdl::ProcedureCall>();
+
+    DescriptionTranslator::translate(sendParameter, call.get());
 
     const auto &procedure = std::find_if(hostProcess->procedures().begin(), hostProcess->procedures().end(),
             [&callName](const auto &p) { return p->name() == callName; });
@@ -481,6 +507,7 @@ auto StatementTranslatorVisitor::translateOutput(::sdl::Process *hostProcess, ::
         const auto ioVariable = StateMachineTranslator::ioVariableName(callName);
         output->setParameter(std::make_unique<::sdl::VariableReference>(
                 findVariableDeclaration(hostProcess, hostProcedure, ioVariable)));
+        DescriptionTranslator::translate(sendCommand, output.get());
         for (const auto &argument : sendCommand.argumentValues()) {
             const auto fieldName = translateVariableReference(argument.name().value());
             const auto source = std::visit(

@@ -54,7 +54,7 @@ void SyncInterfaceCommandTranslator::translateCommand(
     case seds::model::ArgumentsCombination::OutOnly:
     case seds::model::ArgumentsCombination::InAndOut: {
         auto *ivInterface = InterfaceTranslatorHelper::createIvInterface(
-                interfaceName, interfaceType, ivm::IVInterface::OperationKind::Protected, m_ivFunction);
+                interfaceName, interfaceType, ivm::IVInterface::OperationKind::Protected, sedsCommand, m_ivFunction);
         translateArguments(sedsCommand.arguments(), ivInterface);
         m_ivFunction->addChild(ivInterface);
     } break;
