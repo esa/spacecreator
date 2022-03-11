@@ -1,3 +1,4 @@
 add_subdirectory(dvgenerator)
+add_subdirectory(gdbconnector)
 add_subdirectory(ivgenerator)
 add_subdirectory(testdrivergenerator)
