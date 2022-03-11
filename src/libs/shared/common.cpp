@@ -233,32 +233,7 @@ QString hwLibraryPath()
 {
     static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
             + QDir::separator() + QLatin1String("HWlibrary");
-    qDebug() << "kedfaultPath: " << kDefaultPath;
-    // QString hwFile = shared::SettingsManager::load<QString>(shared::SettingsManager::DVE::HwLibraryFile,
-    // kDefaultPath); qDebug() << hwFile; return qEnvironmentVariable(env::kDeploymentLibrary, hwFile);
-
-    static const QString qtLocalDataPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
-
-    static const QString kLocalHwPath = QString("%1%2%3").arg(qtLocalDataPath).arg(QDir::separator()).arg("HWLibrary");
-
-    const auto strList = kLocalHwPath.split(QDir::separator());
-    QString path;
-    for (const auto &str : strList) {
-        path += str;
-        path += QDir::separator();
-        if (str.compare("share") == 0) {
-            path += QString("%1%2%3%4%5%6")
-                            .arg(QDir::separator())
-                            .arg("QtProject")
-                            .arg(QDir::separator())
-                            .arg("QtCreator")
-                            .arg(QDir::separator())
-                            .arg("HWlibrary");
-            break;
-        }
-    }
-
-    const QString hwFile = shared::SettingsManager::load<QString>(shared::SettingsManager::DVE::HwLibraryFile, path);
+    QString hwFile = shared::SettingsManager::load<QString>(shared::SettingsManager::DVE::HwLibraryFile, kDefaultPath);
 
     return qEnvironmentVariable(env::kDeploymentLibrary, hwFile);
 }
