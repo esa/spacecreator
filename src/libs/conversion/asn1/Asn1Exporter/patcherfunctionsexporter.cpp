@@ -19,10 +19,8 @@
 
 #include "patcherfunctionsexporter.h"
 
-#include <QTextStream>
 #include <conversion/asn1/Asn1Options/options.h>
 #include <conversion/common/export/exceptions.h>
-#include <iostream>
 
 using Asn1Acn::Asn1Model;
 using Asn1Acn::Types::Sequence;
@@ -47,7 +45,7 @@ void PatcherFunctionsExporter::exportModel(const Asn1Model *model, const Options
     }
 
     if (!patcherFunctionsFileNames.empty()) {
-        createPatcherFunctionsHeader(patcherFunctionsFileNames, options);
+        exportPatcherFunctionsHeader(patcherFunctionsFileNames, options);
     }
 }
 
@@ -91,14 +89,13 @@ QString PatcherFunctionsExporter::exportPatcherFunctions(
     return patcherFunctionFileName;
 }
 
-void PatcherFunctionsExporter::createPatcherFunctionsHeader(
+void PatcherFunctionsExporter::exportPatcherFunctionsHeader(
         const std::vector<QString> &patcherFunctionsFileNames, const Options &options)
 {
-    Q_UNUSED(patcherFunctionsFileNames);
-    Q_UNUSED(options);
-
     QString buffer;
-    QTextStream outputTextStream(&buffer, QIODevice::WriteOnly);
+    QTextStream stream(&buffer, QIODevice::WriteOnly);
+
+    generatePatcherFunctionsHeader(patcherFunctionsFileNames, stream);
 
     const auto pathPrefix = options.value(Asn1Options::patcherFunctionsFilepathPrefix).value_or("");
     const auto outputFileName =
@@ -107,6 +104,16 @@ void PatcherFunctionsExporter::createPatcherFunctionsHeader(
 
     QSaveFile outputFile(outputFilePath);
     writeAndCommit(outputFile, buffer);
+}
+
+void PatcherFunctionsExporter::generatePatcherFunctionsHeader(
+        const std::vector<QString> &patcherFunctionsFileNames, QTextStream &stream)
+{
+    stream << "#pragma once\n\n";
+
+    for (const auto &patcherFunctionFileName : patcherFunctionsFileNames) {
+        stream << "#include <" << patcherFunctionFileName << ".h>\n";
+    }
 }
 
 void PatcherFunctionsExporter::writeAndCommit(QSaveFile &outputFile, const QString &data)

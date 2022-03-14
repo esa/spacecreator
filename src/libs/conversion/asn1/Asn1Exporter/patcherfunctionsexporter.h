@@ -20,6 +20,7 @@
 #pragma once
 
 #include <QSaveFile>
+#include <QTextStream>
 #include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <conversion/common/options.h>
@@ -35,10 +36,14 @@ public:
 
 private:
     static auto getPatcherFunctions(const Asn1Acn::File *file) -> std::vector<QString>;
+
     static auto exportPatcherFunctions(const std::vector<QString> &patcherFunctions, const QString &asn1FileName)
             -> QString;
-    static auto createPatcherFunctionsHeader(
+    static auto exportPatcherFunctionsHeader(
             const std::vector<QString> &patcherFunctionsFileNames, const Options &options) -> void;
+
+    static auto generatePatcherFunctionsHeader(
+            const std::vector<QString> &patcherFunctionsFileNames, QTextStream &stream) -> void;
 
     static auto writeAndCommit(QSaveFile &outputFile, const QString &data) -> void;
 };
