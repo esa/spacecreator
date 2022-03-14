@@ -13,7 +13,7 @@ PacketBody []
     aReal [],
     anInteger []
 }
-Packet [post-encoding-function packet-encoding-function, post-decoding-validator packet-decoding-validator]
+Nice-Packet [post-encoding-function nice-packet-encoding-function, post-decoding-validator nice-packet-decoding-validator]
 {
     pHeader [],
     lengthEntry NULL [align-to-next byte, pattern '00000000000000000000000000000000'B, save-position],

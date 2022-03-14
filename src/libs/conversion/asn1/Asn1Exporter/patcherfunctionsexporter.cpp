@@ -34,24 +34,28 @@ void PatcherFunctionsExporter::exportModel(const Asn1Model *model, const Options
     std::vector<QString> patcherFunctionsFileNames;
 
     for (const auto &file : model->data()) {
-        auto patcherFunctions = getPatcherFunctions(file.get());
+        auto patcherFunctionsFileName = exportPatcherFunctions(file.get(), options);
 
-        if (patcherFunctions.empty()) {
-            continue;
+        if (patcherFunctionsFileName.has_value()) {
+            patcherFunctionsFileNames.push_back(std::move(*patcherFunctionsFileName));
         }
-
-        auto patcherFunctionsFileName = exportPatcherFunctions(patcherFunctions, file->name());
-        patcherFunctionsFileNames.push_back(std::move(patcherFunctionsFileName));
     }
 
     if (!patcherFunctionsFileNames.empty()) {
-        exportPatcherFunctionsHeader(patcherFunctionsFileNames, options);
+        exportMappingFunctionsModule(patcherFunctionsFileNames, options);
     }
 }
 
-std::vector<QString> PatcherFunctionsExporter::getPatcherFunctions(const Asn1Acn::File *file)
+std::optional<QString> PatcherFunctionsExporter::exportPatcherFunctions(
+        const Asn1Acn::File *file, const Options &options)
 {
-    std::vector<QString> patcherFunctions;
+    QString headerData;
+    QTextStream headerStream(&headerData, QIODevice::WriteOnly);
+
+    QString bodyData;
+    QTextStream bodyStream(&bodyData, QIODevice::WriteOnly);
+
+    auto createFile = false;
 
     for (const auto &definitions : file->definitionsList()) {
         const auto &types = definitions->types();
@@ -64,55 +68,92 @@ std::vector<QString> PatcherFunctionsExporter::getPatcherFunctions(const Asn1Acn
             const auto sequence = dynamic_cast<const Sequence *>(type->type());
 
             if (sequence->postEncodingFunction()) {
-                auto postEncodingFunctionName = QString("%1-encoding-function").arg(sequence->identifier().toLower());
-                patcherFunctions.push_back(std::move(postEncodingFunctionName));
+                auto postEncodingFunctionName = QString("%1_encoding_function").arg(sequence->identifier().toLower());
+                generateEncodingFunctionHeader(postEncodingFunctionName, headerStream);
+                generateEncodingFunctionBody(postEncodingFunctionName, bodyStream);
+
+                createFile = true;
             }
 
             if (sequence->postDecodingValidator()) {
-                auto postDecodingValidatorName = QString("%1-decoding-validator").arg(sequence->identifier().toLower());
-                patcherFunctions.push_back(std::move(postDecodingValidatorName));
+                auto postDecodingValidatorName = QString("%1_decoding_validator").arg(sequence->identifier().toLower());
+                generateDecodingValidatorHeader(postDecodingValidatorName, headerStream);
+                generateDecodingValidatorBody(postDecodingValidatorName, bodyStream);
+
+                createFile = true;
             }
         }
     }
 
-    return patcherFunctions;
-}
-
-QString PatcherFunctionsExporter::exportPatcherFunctions(
-        const std::vector<QString> &patcherFunctions, const QString &asn1FileName)
-{
-    Q_UNUSED(patcherFunctions);
-    Q_UNUSED(asn1FileName);
-
-    auto patcherFunctionFileName = QString("%1-post-encoding").arg(asn1FileName).toLower();
-
-    return patcherFunctionFileName;
-}
-
-void PatcherFunctionsExporter::exportPatcherFunctionsHeader(
-        const std::vector<QString> &patcherFunctionsFileNames, const Options &options)
-{
-    QString buffer;
-    QTextStream stream(&buffer, QIODevice::WriteOnly);
-
-    generatePatcherFunctionsHeader(patcherFunctionsFileNames, stream);
+    if (!createFile) {
+        return std::nullopt;
+    }
 
     const auto pathPrefix = options.value(Asn1Options::patcherFunctionsFilepathPrefix).value_or("");
-    const auto outputFileName =
-            options.value(Asn1Options::outputPatcherFunctionsHeaderFileName).value_or("postEncoding");
-    const auto outputFilePath = QString("%1%2.h").arg(pathPrefix).arg(outputFileName);
+    auto outputFileName = QString("%1-postencoding").arg(file->name()).toLower();
 
-    QSaveFile outputFile(outputFilePath);
-    writeAndCommit(outputFile, buffer);
+    const auto outputHeaderFilePath = QString("%1%2.h").arg(pathPrefix).arg(outputFileName);
+    QSaveFile outputHeaderFile(outputHeaderFilePath);
+    writeAndCommit(outputHeaderFile, headerData);
+
+    const auto outputBodyFilePath = QString("%1%2.c").arg(pathPrefix).arg(outputFileName);
+    QSaveFile outputBodyFile(outputBodyFilePath);
+    writeAndCommit(outputBodyFile, bodyData);
+
+    return outputFileName;
 }
 
-void PatcherFunctionsExporter::generatePatcherFunctionsHeader(
+void PatcherFunctionsExporter::exportMappingFunctionsModule(
+        const std::vector<QString> &patcherFunctionsFileNames, const Options &options)
+{
+    QString data;
+    QTextStream stream(&data, QIODevice::WriteOnly);
+
+    generateMappingFunctionsModule(patcherFunctionsFileNames, stream);
+
+    const auto pathPrefix = options.value(Asn1Options::patcherFunctionsFilepathPrefix).value_or("");
+    const auto outputFileName = options.value(Asn1Options::mappingFunctionsModuleFileName).value_or("postEncoding");
+
+    const auto outputFilePath = QString("%1%2.h").arg(pathPrefix).arg(outputFileName);
+    QSaveFile outputFile(outputFilePath);
+    writeAndCommit(outputFile, data);
+}
+
+void PatcherFunctionsExporter::generateEncodingFunctionHeader(
+        const QString &postEncodingFunctionName, QTextStream &stream)
+{
+    Q_UNUSED(postEncodingFunctionName);
+    Q_UNUSED(stream);
+}
+
+void PatcherFunctionsExporter::generateEncodingFunctionBody(
+        const QString &postEncodingFunctionName, QTextStream &stream)
+{
+    Q_UNUSED(postEncodingFunctionName);
+    Q_UNUSED(stream);
+}
+
+void PatcherFunctionsExporter::generateDecodingValidatorHeader(
+        const QString &postDecodingValidatorName, QTextStream &stream)
+{
+    Q_UNUSED(postDecodingValidatorName);
+    Q_UNUSED(stream);
+}
+
+void PatcherFunctionsExporter::generateDecodingValidatorBody(
+        const QString &postDecodingValidatorName, QTextStream &stream)
+{
+    Q_UNUSED(postDecodingValidatorName);
+    Q_UNUSED(stream);
+}
+
+void PatcherFunctionsExporter::generateMappingFunctionsModule(
         const std::vector<QString> &patcherFunctionsFileNames, QTextStream &stream)
 {
     stream << "#pragma once\n\n";
 
     for (const auto &patcherFunctionFileName : patcherFunctionsFileNames) {
-        stream << "#include <" << patcherFunctionFileName << ".h>\n";
+        stream << "#include \"" << patcherFunctionFileName << ".h\"\n";
     }
 }
 

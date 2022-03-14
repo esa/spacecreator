@@ -24,6 +24,7 @@
 #include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <conversion/common/options.h>
+#include <optional>
 
 namespace conversion::asn1::exporter {
 
@@ -35,14 +36,15 @@ public:
     static auto exportModel(const Asn1Acn::Asn1Model *model, const Options &options) -> void;
 
 private:
-    static auto getPatcherFunctions(const Asn1Acn::File *file) -> std::vector<QString>;
-
-    static auto exportPatcherFunctions(const std::vector<QString> &patcherFunctions, const QString &asn1FileName)
-            -> QString;
-    static auto exportPatcherFunctionsHeader(
+    static auto exportPatcherFunctions(const Asn1Acn::File *file, const Options &options) -> std::optional<QString>;
+    static auto exportMappingFunctionsModule(
             const std::vector<QString> &patcherFunctionsFileNames, const Options &options) -> void;
 
-    static auto generatePatcherFunctionsHeader(
+    static auto generateEncodingFunctionHeader(const QString &postEncodingFunctionName, QTextStream &stream) -> void;
+    static auto generateEncodingFunctionBody(const QString &postEncodingFunctionName, QTextStream &stream) -> void;
+    static auto generateDecodingValidatorHeader(const QString &postDecodingValidatorName, QTextStream &stream) -> void;
+    static auto generateDecodingValidatorBody(const QString &postDecodingValidatorName, QTextStream &stream) -> void;
+    static auto generateMappingFunctionsModule(
             const std::vector<QString> &patcherFunctionsFileNames, QTextStream &stream) -> void;
 
     static auto writeAndCommit(QSaveFile &outputFile, const QString &data) -> void;

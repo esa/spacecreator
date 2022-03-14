@@ -59,7 +59,7 @@ void SedsConverterCLI::parseArguments(const QStringList &arguments)
     m_parser.handlePositional(CommandArg::SedsConverterAsn1FilepathPrefix);
     m_parser.handlePositional(CommandArg::SedsConverterAsn1SequenceSizeThreshold);
     m_parser.handlePositional(CommandArg::SedsConverterPatcherFunctionsFilepathPrefix);
-    m_parser.handlePositional(CommandArg::SedsConverterOutputPatcherFunctionsHeaderFileName);
+    m_parser.handlePositional(CommandArg::SedsConverterMappingFunctionsModuleFileName);
     m_parser.handlePositional(CommandArg::SedsConverterSdlFilepathPrefix);
 
     m_parser.process(arguments);
@@ -162,9 +162,9 @@ void SedsConverterCLI::addAsn1OutputOptions(Options &options)
         options.add(Asn1Options::patcherFunctionsFilepathPrefix,
                 m_parser.value(CommandArg::SedsConverterPatcherFunctionsFilepathPrefix));
     }
-    if (m_arguments.contains(CommandArg::SedsConverterOutputPatcherFunctionsHeaderFileName)) {
-        options.add(Asn1Options::outputPatcherFunctionsHeaderFileName,
-                m_parser.value(CommandArg::SedsConverterOutputPatcherFunctionsHeaderFileName));
+    if (m_arguments.contains(CommandArg::SedsConverterMappingFunctionsModuleFileName)) {
+        options.add(Asn1Options::mappingFunctionsModuleFileName,
+                m_parser.value(CommandArg::SedsConverterMappingFunctionsModuleFileName));
     }
 }
 

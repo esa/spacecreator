@@ -33,7 +33,7 @@
           <Entry name="anInteger" type="IntegerData"/>
         </EntryList>
       </ContainerDataType>
-      <ContainerDataType name="Packet">
+      <ContainerDataType name="Nice-Packet">
         <EntryList>
           <Entry name="pHeader" type="PacketHeader"/>
           <LengthEntry name="lengthEntry" type="LengthType"/>

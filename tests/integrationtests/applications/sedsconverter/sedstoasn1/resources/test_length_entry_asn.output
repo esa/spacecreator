@@ -13,7 +13,7 @@ PacketBody ::= SEQUENCE
     aReal FloatData(1.17549e-38 .. 3.40282e+38),
     anInteger IntegerData(0 .. 255)
 }
-Packet ::= SEQUENCE
+Nice-Packet ::= SEQUENCE
 {
     pHeader PacketHeader,
     pBody PacketBody

@@ -40,7 +40,7 @@ public:
     /** @brief  Prefix to add at the beginning of the patcher functions output filepath */
     inline static const QString patcherFunctionsFilepathPrefix = "Acn_Export_PatcherFunctionsFilepathPrefix";
     /** @brief  Filename of the output patcher functions header file */
-    inline static const QString outputPatcherFunctionsHeaderFileName = "Acn_Export_OutputPatcherFunctionsHeaderFileName";
+    inline static const QString mappingFunctionsModuleFileName = "Acn_Export_MappingFunctionsModuleFileName";
 };
 
 } // namespace conversion::asn1

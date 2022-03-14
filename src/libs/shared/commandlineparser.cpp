@@ -252,8 +252,8 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
         description = QCoreApplication::translate("CommandLineParser", "<prefix> to add at the beginning of the patcher functions output filepath");
         valueName = QCoreApplication::translate("CommandLineParser", "prefix");
     } break;
-    case CommandLineParser::Positional::SedsConverterOutputPatcherFunctionsHeaderFileName: {
-        names << "patcher-functions-header-filename";
+    case CommandLineParser::Positional::SedsConverterMappingFunctionsModuleFileName: {
+        names << "mapping-functions-module-filename";
         description = QCoreApplication::translate("CommandLineParser", "Name of the header including all other patcher function files");
         valueName = QCoreApplication::translate("CommandLineParser", "prefix");
     } break;
