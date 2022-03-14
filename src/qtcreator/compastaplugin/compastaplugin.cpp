@@ -24,6 +24,7 @@
 #include <QDir>
 #include <QFile>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QMenu>
 #include <QMessageBox>
 #include <QProcess>
@@ -40,6 +41,8 @@
 #include <projectexplorer/project.h>
 #include <projectexplorer/projecttree.h>
 #include <utils/fileutils.h>
+#include <cstdlib>
+#include <cstdio>
 
 using namespace Core;
 using namespace Slim::Internal::Completion;
@@ -143,42 +146,53 @@ auto CompastaPlugin::editFaults() -> void
 {
     MessageManager::write(GenMsg::msgInfo.arg(EvtMsg::editFaultsClicked));
     QString prjdir = ProjectExplorer::ProjectTree::currentProject()->projectDirectory().toString();
-    QString filename = prjdir + QString("/faults.slim");
-    this->openFile(filename);
+    QString filename = QString("faults.slim");
+    this->openSlimFile(prjdir, filename);
 }
 
 auto CompastaPlugin::editContracts() -> void
 {
     MessageManager::write(GenMsg::msgInfo.arg(EvtMsg::editContractsClicked));
     QString prjdir = ProjectExplorer::ProjectTree::currentProject()->projectDirectory().toString();
-    QString filename = prjdir + QString("/contracts.slim");
-    this->openFile(filename);
+    QString filename = QString("contracts.slim");
+    this->openSlimFile(prjdir, filename);
 }
 
 auto CompastaPlugin::editRequirements() -> void
 {
     MessageManager::write(GenMsg::msgInfo.arg(EvtMsg::editRequirementsClicked));
     QString prjdir = ProjectExplorer::ProjectTree::currentProject()->projectDirectory().toString();
-    QString filename = prjdir + QString("/requirements.slim");
-    this->openFile(filename);
+    QString filename = QString("requirements.slim");
+    this->openSlimFile(prjdir, filename);
 }
 
 auto CompastaPlugin::editProperties() -> void
 {
     MessageManager::write(GenMsg::msgInfo.arg(EvtMsg::editPropertiesClicked));
     QString prjdir = ProjectExplorer::ProjectTree::currentProject()->projectDirectory().toString();
-    QString filename = prjdir + QString("/properties.slim");
-    this->openFile(filename);
+    QString filename = QString("properties.slim");
+    this->openSlimFile(prjdir, filename);
 }
 
-auto CompastaPlugin::openFile(const QString fname) -> void
+auto CompastaPlugin::createSlimSkeleton(const QString prjdir, const QString filename) -> void
 {
-    QFile fp(fname);
-    // create file if doesn't exist
+    const QString prog = "~/tool-inst/bin/compasta-create-slim-skeleton";
+    QString command = prog + " " + prjdir + " " + filename;
+    system(command.toStdString().c_str());
+}
+
+auto CompastaPlugin::openSlimFile(const QString prjdir, const QString filename) -> void
+{
+    if (!QFileInfo::exists(prjdir + "/" + filename)) {
+        // CREATE SLIM SKELETON
+        this->createSlimSkeleton(prjdir, filename);
+    }
+    QFile fp(prjdir + "/" + filename);
+    // CREATE FILE IF DOESN'T EXIST (I.E. WASN'T GENERATED)
     fp.open(QIODevice::ReadWrite);
     fp.close();
-    // open file in qt creator
-    EditorManager::openEditor(fname);
+    // OPEN FILE IN QT CREATOR
+    EditorManager::openEditor(filename);
 }
 
 } // namespace spctr

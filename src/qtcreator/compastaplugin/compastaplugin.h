@@ -47,7 +47,8 @@ private:
     auto editContracts() -> void;
     auto editRequirements() -> void;
     auto editProperties() -> void;
-    auto openFile(const QString fname) -> void;
+    auto openSlimFile(const QString prjdir, const QString filename) -> void;
+    auto createSlimSkeleton(const QString prjdir, const QString filename) -> void;
 };
 
 }
