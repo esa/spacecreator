@@ -21,6 +21,7 @@
 
 #include "export/exceptions.h"
 #include "file.h"
+#include "patcherfunctionsexporter.h"
 #include "visitors/acnnodereconstructingvisitor.h"
 #include "visitors/asn1nodereconstructingvisitor.h"
 
@@ -54,6 +55,8 @@ void Asn1Exporter::exportModel(const Model *const model, const Options &options)
         exportAsn1Model(file.get(), options);
         exportAcnModel(file.get(), options);
     }
+
+    PatcherFunctionsExporter::exportModel(asn1Model, options);
 }
 
 QStringList Asn1Exporter::getFilenamesForModel(const Asn1Acn::Asn1Model *model)
