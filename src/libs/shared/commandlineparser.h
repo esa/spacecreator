@@ -66,6 +66,8 @@ public:
         SedsConverterAcnFilepathPrefix,
         SedsConverterAsn1FilepathPrefix,
         SedsConverterAsn1SequenceSizeThreshold,
+        SedsConverterPatcherFunctionsFilepathPrefix,
+        SedsConverterOutputPatcherFunctionsHeaderFileName,
         SedsConverterSdlFilepathPrefix,
 
         Unknown

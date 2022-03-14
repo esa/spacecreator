@@ -37,6 +37,10 @@ public:
     inline static const QString asn1FilepathPrefix = "Asn1_Export_FilepathPrefix";
     /** @brief Prefix to add at the beginning of the ACN output filepath */
     inline static const QString acnFilepathPrefix = "Acn_Export_FilepathPrefix";
+    /** @brief  Prefix to add at the beginning of the patcher functions output filepath */
+    inline static const QString patcherFunctionsFilepathPrefix = "Acn_Export_PatcherFunctionsFilepathPrefix";
+    /** @brief  Filename of the output patcher functions header file */
+    inline static const QString outputPatcherFunctionsHeaderFileName = "Acn_Export_OutputPatcherFunctionsHeaderFileName";
 };
 
 } // namespace conversion::asn1
