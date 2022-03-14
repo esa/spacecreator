@@ -176,7 +176,7 @@ auto CompastaPlugin::editProperties() -> void
 
 auto CompastaPlugin::createSlimSkeleton(const QString prjdir, const QString filename) -> void
 {
-    const QString prog = "~/tool-inst/bin/compasta-create-slim-skeleton";
+    const QString prog = "compasta-create-slim-skeleton";
     QString command = prog + " " + prjdir + " " + filename;
     system(command.toStdString().c_str());
 }
