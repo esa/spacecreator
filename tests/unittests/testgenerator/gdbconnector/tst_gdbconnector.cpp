@@ -22,7 +22,14 @@
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
+#include <memory>
 #include <qobjectdefs.h>
+
+// GdbConnector includes
+#include <QProcess>
+
+// TODO: remove this include
+#include <QDebug>
 
 namespace tests::testgenerator {
 
@@ -42,17 +49,67 @@ void tst_gdbconnector::initTestCase()
     //
 }
 
+namespace gdbconnector {
+
+std::unique_ptr<QProcess> makeAndStartGdbServer(
+        const QString &server, const QStringList &serverArgs, const QString &binaryLocalization)
+{
+    // 0. run gdb server on target:
+    auto gdbserver = std::make_unique<QProcess>();
+    gdbserver->setProgram(server);
+    gdbserver->setArguments(serverArgs);
+    gdbserver->setWorkingDirectory(binaryLocalization);
+    gdbserver->start();
+    gdbserver->waitForStarted();
+
+    return gdbserver;
+}
+
+} // namespace gdbconnector
+
+QString getTestResults()
+{
+    const QString server = "gdbserver";
+    const QString serverNamePort = "host:1234";
+    const QString programToRun = "hostpartition";
+    const QString binaryLocalization = "/home/taste/example-projects/testharness/work/binaries";
+
+    const QString debugger = "gdb";
+    const QString script = "x86-linux-cpp.gdb";
+    const QStringList clientArgs({ "-batch", "-x", script });
+
+    const std::unique_ptr<QProcess> gdbserver =
+            gdbconnector::makeAndStartGdbServer(server, { serverNamePort, programToRun }, binaryLocalization);
+
+    // 1. execute script on a specified console application
+    QProcess client;
+    client.setProgram(debugger);
+    client.setArguments(clientArgs);
+    client.start();
+    client.waitForFinished();
+
+    gdbserver->close();
+
+    const auto out = QString(client.readAllStandardOutput());
+    client.close();
+
+    const QStringList outList = out.split("\n");
+
+    if (outList.length() > 2) {
+        const int oneBeforeLast = outList.length() - 2;
+        return outList.at(oneBeforeLast);
+    } else {
+        return "";
+    }
+}
+
 void tst_gdbconnector::testNominal()
 {
-    QFAIL("this shall happen");
+    const auto res = getTestResults();
 
-    // to check:
-    // 0. run gdb server on target:
-    //       gdbserver host:1234 hostpartition
-    // 1. load a given script file:
-    //       gdb -x x86-linux-cpp.gdb
-    // 2. execute script on a specified console application
-    // 3. retrieve the returned result
+    qDebug() << " >>> results: " << res;
+
+    QFAIL("this shall happen");
 }
 
 } // namespace tests::testgenerator

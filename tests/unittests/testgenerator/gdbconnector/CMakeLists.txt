@@ -20,3 +20,5 @@ target_link_libraries(${TEST_NAME}
 )
 
 add_format_target(${TEST_NAME})
+
+configure_file(x86-linux-cpp.gdb x86-linux-cpp.gdb COPYONLY)
