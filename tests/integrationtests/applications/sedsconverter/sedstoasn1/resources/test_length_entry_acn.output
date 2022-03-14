@@ -1,20 +1,17 @@
 COM-N7SPACE-LENGTHENTRY DEFINITIONS ::= BEGIN
 IntegerData [size 8, encoding pos-int, endianness big]
 FloatData [encoding IEEE754-1985-32, endianness big]
-ArrayData []
 LengthType [size 16, encoding pos-int, endianness little]
 BinaryPattern []
 PacketHeader []
 {
     version [],
-    release [],
-    info []
+    release []
 }
 PacketBody []
 {
     aReal [],
-    anInteger [],
-    data []
+    anInteger []
 }
 Packet [post-encoding-function packet-encoding-function, post-decoding-validator packet-decoding-validator]
 {
