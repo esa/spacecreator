@@ -107,6 +107,15 @@ public:
      */
     static auto escapePromelaIV(QString name) -> QString;
 
+    /**
+     * @brief   Convert the input name to an id acceptable as a patcher function name
+     *
+     * @param   name    input name
+     *
+     * @returns Patcher function name
+     */
+    static auto escapePatcherFunctionName(QString name) -> QString;
+
 private:
     static auto escapeName(QString &name, const QChar &delimeter) -> void;
 
