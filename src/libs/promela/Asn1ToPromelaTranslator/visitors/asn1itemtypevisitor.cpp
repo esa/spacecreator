@@ -298,14 +298,15 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
             existUtype.addField(Declaration(DataType(BasicType::BOOLEAN), field));
         }
         m_promelaModel.addUtype(existUtype);
-        nestedUtype.addField(Declaration(DataType(UtypeRef(existUtypeName)), "exist"));
+        const QString existFieldName = "exist";
+        nestedUtype.addField(Declaration(DataType(UtypeRef(existUtypeName)), existFieldName));
 
         for (const QString &field : optionalFields) {
             VariableRef dst("dst");
-            dst.appendElement(existUtypeName);
+            dst.appendElement(existFieldName);
             dst.appendElement(field);
             VariableRef src("src");
-            src.appendElement(existUtypeName);
+            src.appendElement(existFieldName);
             src.appendElement(field);
             sequence.appendElement(std::make_unique<ProctypeElement>(Assignment(dst, Expression(src))));
         }

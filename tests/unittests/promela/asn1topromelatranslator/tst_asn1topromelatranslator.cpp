@@ -76,6 +76,7 @@ using promela::model::TypeAlias;
 using promela::model::Utype;
 using promela::model::UtypeRef;
 using promela::model::ValueDefinition;
+using promela::model::VariableRef;
 using promela::translator::Asn1NodeVisitor;
 using promela::translator::PromelaTypeSorter;
 
@@ -820,8 +821,67 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
         QVERIFY(inlineCall != nullptr);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 2);
         QVERIFY(assignment != nullptr);
+        {
+            QCOMPARE(assignment->getVariableRef().getElements().size(), 3);
+            auto iter = assignment->getVariableRef().getElements().begin();
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "dst");
+            ++iter;
+
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "exist");
+            ++iter;
+
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "field1");
+
+            QVERIFY(std::holds_alternative<VariableRef>(assignment->getExpression().getContent()));
+            const VariableRef &rhs = std::get<VariableRef>(assignment->getExpression().getContent());
+            QCOMPARE(rhs.getElements().size(), 3);
+            iter = rhs.getElements().begin();
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "src");
+            ++iter;
+
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "exist");
+            ++iter;
+
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "field1");
+        }
+
         assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 3);
         QVERIFY(assignment != nullptr);
+        {
+            QCOMPARE(assignment->getVariableRef().getElements().size(), 3);
+            auto iter = assignment->getVariableRef().getElements().begin();
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "dst");
+            ++iter;
+
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "exist");
+            ++iter;
+
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "field2");
+
+            QVERIFY(std::holds_alternative<VariableRef>(assignment->getExpression().getContent()));
+            const VariableRef &rhs = std::get<VariableRef>(assignment->getExpression().getContent());
+            QCOMPARE(rhs.getElements().size(), 3);
+            iter = rhs.getElements().begin();
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "src");
+            ++iter;
+
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "exist");
+            ++iter;
+
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "field2");
+        }
     }
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field1_assign_value");
