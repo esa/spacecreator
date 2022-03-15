@@ -52,6 +52,7 @@ private Q_SLOTS:
 
     void testVariableSequenceOf();
     void testFixedSequenceOf();
+    void testUserDefinedType();
 
     void testTypeSorting();
 

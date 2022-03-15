@@ -1095,6 +1095,65 @@ void tst_Asn1ToPromelaTranslator::testFixedSequenceOf()
     }
 }
 
+void tst_Asn1ToPromelaTranslator::testUserDefinedType()
+{
+    auto model = createModel();
+
+    {
+        auto integerType = TypeFactory::createBuiltinType("INTEGER");
+        auto myIntegerAssignment = std::make_unique<TypeAssignment>(
+                QStringLiteral("MyInteger"), QStringLiteral("MyIntegerT"), SourceLocation(), std::move(integerType));
+        model->addType(std::move(myIntegerAssignment));
+    }
+
+    {
+        auto typeAlias = std::make_unique<UserdefinedType>("MyInteger", "");
+        auto typeAliasAssignment = std::make_unique<TypeAssignment>(QStringLiteral("MyIntegerAlias"),
+                QStringLiteral("MyIntegerAliasT"), SourceLocation(), std::move(typeAlias));
+        model->addType(std::move(typeAliasAssignment));
+    }
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel, true);
+    visitor.visit(*model);
+
+    QCOMPARE(promelaModel.getMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getUtypes().size(), 0);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 0);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 2);
+
+    const QList<TypeAlias> aliases = promelaModel.getTypeAliases();
+
+    const TypeAlias &expectedInteger = aliases.at(0);
+    QCOMPARE(expectedInteger.getName(), "MyInteger");
+    QVERIFY(std::holds_alternative<BasicType>(expectedInteger.getType()));
+    QCOMPARE(std::get<BasicType>(expectedInteger.getType()), BasicType::INT);
+
+    const TypeAlias &expectedAlias = aliases.at(1);
+    QCOMPARE(expectedAlias.getName(), "MyIntegerAlias");
+    QVERIFY(std::holds_alternative<UtypeRef>(expectedAlias.getType()));
+    QCOMPARE(std::get<UtypeRef>(expectedAlias.getType()).getName(), "MyInteger");
+
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyInteger_assign_value");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 2);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
+        QVERIFY(std::holds_alternative<Assignment>(inlineDef->getSequence().getContent().front()->getValue()));
+    }
+
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyIntegerAlias_assign_value");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 2);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
+        QVERIFY(std::holds_alternative<InlineCall>(inlineDef->getSequence().getContent().front()->getValue()));
+        QCOMPARE(std::get<InlineCall>(inlineDef->getSequence().getContent().front()->getValue()).getName(),
+                "MyInteger_assign_value");
+    }
+}
+
 void tst_Asn1ToPromelaTranslator::testTypeSorting()
 {
     auto model = createModel();
