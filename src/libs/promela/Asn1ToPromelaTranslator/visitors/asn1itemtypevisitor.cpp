@@ -276,19 +276,19 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
             if (componentVisitor.isComponentOptional()) {
                 optionalFields.append(componentVisitor.getComponentName());
             }
+
+            VariableRef dst("dst");
+            dst.appendElement(componentVisitor.getComponentName());
+            VariableRef src("src");
+            src.appendElement(componentVisitor.getComponentName());
+
+            const QString inlineName = getAssignValueInlineNameForNestedType(
+                    nestedUtypeName, Escaper::escapePromelaName(componentVisitor.getComponentName()));
+            QList<VariableRef> arguments;
+            arguments.append(dst);
+            arguments.append(src);
+            sequence.appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineName, arguments)));
         }
-
-        VariableRef dst("dst");
-        dst.appendElement(componentVisitor.getComponentName());
-        VariableRef src("src");
-        src.appendElement(componentVisitor.getComponentName());
-
-        const QString inlineName = getAssignValueInlineNameForNestedType(
-                nestedUtypeName, Escaper::escapePromelaName(componentVisitor.getComponentName()));
-        QList<VariableRef> arguments;
-        arguments.append(dst);
-        arguments.append(src);
-        sequence.appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineName, arguments)));
     }
 
     if (!optionalFields.isEmpty()) {
@@ -422,6 +422,17 @@ void Asn1ItemTypeVisitor::visit(const UserdefinedType &type)
     const QString typeName = constructTypeName(m_name);
     m_promelaModel.addTypeAlias(TypeAlias(typeName, UtypeRef(Escaper::escapePromelaName(type.typeName()))));
     m_resultDataType = DataType(UtypeRef(typeName));
+
+    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+
+    const QString inlineName = type.typeName() + assignValueInlineSuffix;
+    QList<VariableRef> inlineArguments;
+    inlineArguments.append(VariableRef("dst"));
+    inlineArguments.append(VariableRef("src"));
+
+    sequence.appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineName, inlineArguments)));
+
+    addAssignValueInline(typeName, std::move(sequence));
 }
 
 QString Asn1ItemTypeVisitor::constructTypeName(QString name)
