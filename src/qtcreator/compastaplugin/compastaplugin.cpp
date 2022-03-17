@@ -97,12 +97,6 @@ auto CompastaPlugin::addCompastaMenu() -> void
 
     ActionContainer *const acToolsCompasta = createActionContainerInTools(tr("COM&PASTA Tools"));
 
-    const auto verificationGUIAction = new QAction(tr("&Open Verification GUI"), this);
-    connect(verificationGUIAction, &QAction::triggered, [=]() { this->verificationGUI(); });
-    Command *const verificationGUIMenuItem = ActionManager::registerAction(verificationGUIAction, Constants::COMPASTA_OPEN_VERIFICATION_GUI_ID, allContexts);
-    acToolsCompasta->addAction(verificationGUIMenuItem);
-    acToolsCompasta->addSeparator();
-
     const auto editFaultsAction = new QAction(tr("Edit &Faults"), this);
     connect(editFaultsAction, &QAction::triggered, [=]() { this->editFaults(); });
     Command *const editFaultsMenuItem = ActionManager::registerAction(editFaultsAction, Constants::COMPASTA_EDIT_FAULTS_ID, allContexts);
@@ -122,6 +116,13 @@ auto CompastaPlugin::addCompastaMenu() -> void
     connect(editPropertiesAction, &QAction::triggered, [=]() { this->editProperties(); });
     Command *const editPropertiesMenuItem = ActionManager::registerAction(editPropertiesAction, Constants::COMPASTA_EDIT_PROPERTIES_ID, allContexts);
     acToolsCompasta->addAction(editPropertiesMenuItem);
+
+    acToolsCompasta->addSeparator();
+
+    const auto verificationGUIAction = new QAction(tr("&Open Verification GUI"), this);
+    connect(verificationGUIAction, &QAction::triggered, [=]() { this->verificationGUI(); });
+    Command *const verificationGUIMenuItem = ActionManager::registerAction(verificationGUIAction, Constants::COMPASTA_OPEN_VERIFICATION_GUI_ID, allContexts);
+    acToolsCompasta->addAction(verificationGUIMenuItem);
 }
 
 auto CompastaPlugin::createActionContainerInTools(const QString &title) -> ActionContainer *
@@ -140,6 +141,7 @@ auto CompastaPlugin::createActionContainerInTools(const QString &title) -> Actio
 auto CompastaPlugin::verificationGUI() -> void
 {
     MessageManager::write(GenMsg::msgInfo.arg(EvtMsg::openVerificationGUIClicked));
+    system("compasta-verification-gui");
 }
 
 auto CompastaPlugin::editFaults() -> void
