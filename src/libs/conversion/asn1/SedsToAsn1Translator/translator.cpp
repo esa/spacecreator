@@ -118,21 +118,17 @@ std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePacka
     const auto packageDataTypes = collectDataTypes(sedsPackage);
     const auto resolvedPackageDataTypes = typesDependencyResolver.resolve(&packageDataTypes, nullptr);
 
-    auto packageAsn1Definitions = std::make_unique<Asn1Acn::Definitions>(
-            Escaper::escapeAsn1PackageName(sedsPackage.nameStr()), Asn1Acn::SourceLocation());
-    DescriptionTranslator::translate(sedsPackage, packageAsn1Definitions.get());
+    const auto packageName = Escaper::escapeAsn1PackageName(sedsPackage.nameStr());
+    auto packageAsn1File = std::make_unique<Asn1Acn::File>(packageName);
 
+    auto packageAsn1Definitions = translateDataTypes(resolvedPackageDataTypes, &sedsPackage, packageAsn1File.get(),
+            asn1Files, sedsPackages, sequenceSizeThreshold);
     for (const auto &importedType : importedTypes) {
         packageAsn1Definitions->addImportedType(importedType);
     }
-
-    translateDataTypes(resolvedPackageDataTypes, packageAsn1Definitions.get(), &sedsPackage, asn1Files, sedsPackages,
-            sequenceSizeThreshold);
+    packageAsn1File->add(std::move(packageAsn1Definitions));
 
     std::vector<std::unique_ptr<Asn1Acn::File>> result;
-
-    auto packageAsn1File = std::make_unique<Asn1Acn::File>(Escaper::escapeAsn1PackageName(sedsPackage.nameStr()));
-    packageAsn1File->add(std::move(packageAsn1Definitions));
     result.push_back(std::move(packageAsn1File));
 
     for (const auto &sedsComponent : sedsPackage.components()) {
@@ -146,35 +142,37 @@ std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePacka
 
         const auto componentPackageName =
                 Escaper::escapeAsn1PackageName(sedsPackage.nameStr() + "-" + sedsComponent.nameStr());
-        auto componentAsn1Definitions =
-                std::make_unique<Asn1Acn::Definitions>(componentPackageName, Asn1Acn::SourceLocation());
+        auto componentAsn1File = std::make_unique<Asn1Acn::File>(componentPackageName);
 
+        auto componentAsn1Definitions = translateDataTypes(resolvedComponentDataTypes, &sedsPackage,
+                componentAsn1File.get(), asn1Files, sedsPackages, sequenceSizeThreshold);
         for (const auto &importedType : importedTypes) {
             componentAsn1Definitions->addImportedType(importedType);
         }
-
-        translateDataTypes(resolvedComponentDataTypes, componentAsn1Definitions.get(), &sedsPackage, asn1Files,
-                sedsPackages, sequenceSizeThreshold);
-
-        auto componentAsn1File = std::make_unique<Asn1Acn::File>(componentPackageName);
         componentAsn1File->add(std::move(componentAsn1Definitions));
+
         result.push_back(std::move(componentAsn1File));
     }
 
     return result;
 }
 
-void SedsToAsn1Translator::translateDataTypes(const std::list<const seds::model::DataType *> &sedsDataTypes,
-        Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
-        const Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages,
+std::unique_ptr<Asn1Acn::Definitions> SedsToAsn1Translator::translateDataTypes(
+        const std::list<const seds::model::DataType *> &sedsDataTypes, const seds::model::Package *sedsPackage,
+        Asn1Acn::File *asn1File, const Asn1Model::Data &asn1Files,
+        const std::vector<seds::model::Package> &sedsPackages,
         const std::optional<uint64_t> &sequenceSizeThreshold) const
 {
-    std::unique_ptr<Asn1Acn::Types::Type> asn1Type;
+    auto asn1Definitions = std::make_unique<Asn1Acn::Definitions>(
+            Escaper::escapeAsn1PackageName(sedsPackage->nameStr()), Asn1Acn::SourceLocation());
+    DescriptionTranslator::translate(*sedsPackage, asn1Definitions.get());
+
     DataTypeTranslatorVisitor dataTypeVisitor(
-            asn1Type, asn1Definitions, sedsPackage, asn1Files, sedsPackages, sequenceSizeThreshold);
+            asn1Definitions.get(), sedsPackage, asn1File, asn1Files, sedsPackages, sequenceSizeThreshold);
 
     for (const auto *sedsDataType : sedsDataTypes) {
         std::visit(dataTypeVisitor, *sedsDataType);
+        auto asn1Type = dataTypeVisitor.consumeResultType();
 
         const auto &asn1TypeIdentifier = asn1Type->identifier();
         auto asn1TypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
@@ -184,6 +182,8 @@ void SedsToAsn1Translator::translateDataTypes(const std::list<const seds::model:
 
         asn1Definitions->addType(std::move(asn1TypeAssignment));
     }
+
+    return asn1Definitions;
 }
 
 std::vector<const seds::model::DataType *> SedsToAsn1Translator::collectDataTypes(

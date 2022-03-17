@@ -78,15 +78,14 @@ struct DataTypeTranslatorVisitor final {
     /**
      * @brief   Constructor
      *
-     * @param   asn1Type                Type where translated types are saved
      * @param   asn1Definitions         Parent ASN.1 defintions
      * @param   sedsPackage             Parent SEDS package
      * @param   asn1Files               List of already translated ASN.1 files
      * @param   sedsPackages            List of SEDS packages
      * @param   sequenceSizeThreshold   ASN.1 sequence size threshold
      */
-    DataTypeTranslatorVisitor(std::unique_ptr<Asn1Acn::Types::Type> &asn1Type, Asn1Acn::Definitions *asn1Definitions,
-            const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
+    DataTypeTranslatorVisitor(Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
+            Asn1Acn::File *asn1File, const Asn1Acn::Asn1Model::Data &asn1Files,
             const std::vector<seds::model::Package> &sedsPackages,
             const std::optional<uint64_t> &sequenceSizeThreshold);
 
@@ -144,6 +143,8 @@ struct DataTypeTranslatorVisitor final {
      * @param   sedsType    Type to translate
      */
     auto operator()(const seds::model::SubRangeDataType &sedsType) -> void;
+
+    auto consumeResultType() -> std::unique_ptr<Asn1Acn::Types::Type>;
 
 private:
     /**
@@ -306,12 +307,14 @@ private:
 
 private:
     /// @brief  Where translated data type will be saved
-    std::unique_ptr<Asn1Acn::Types::Type> &m_asn1Type;
+    std::unique_ptr<Asn1Acn::Types::Type> m_asn1Type;
 
     /// @brief  Parent definitions
     Asn1Acn::Definitions *m_asn1Definitions;
     /// @brief  Parent package
     const seds::model::Package *m_sedsPackage;
+    /// @brief  Parent file
+    Asn1Acn::File *m_asn1File;
     /// @brief  List of already translated ASN.1 files
     const Asn1Acn::Asn1Model::Data &m_asn1Files;
     /// @brief  List of SEDS packages

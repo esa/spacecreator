@@ -88,13 +88,12 @@ QString InterfaceTranslatorHelper::createArrayType(const seds::model::DataTypeRe
         sedsArray.addDimension(std::move(dimension));
     }
 
-    std::unique_ptr<Asn1Acn::Types::Type> asn1Array;
     asn1::translator::DataTypeTranslatorVisitor dataTypeVisitor(
-            asn1Array, asn1Definitions, sedsPackage, asn1Files, sedsPackages, sequenceSizeThreshold);
+            asn1Definitions, sedsPackage, nullptr, asn1Files, sedsPackages, sequenceSizeThreshold);
     dataTypeVisitor(sedsArray);
 
-    auto asn1ArrayAssignment =
-            std::make_unique<Asn1Acn::TypeAssignment>(name, name, Asn1Acn::SourceLocation(), std::move(asn1Array));
+    auto asn1ArrayAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
+            name, name, Asn1Acn::SourceLocation(), dataTypeVisitor.consumeResultType());
     asn1Definitions->addType(std::move(asn1ArrayAssignment));
 
     return name;

@@ -50,9 +50,7 @@ void PatcherFunctionsExporter::exportModel(const Asn1Model *model, const Options
 std::optional<QString> PatcherFunctionsExporter::exportPatcherFunctions(
         const Asn1Acn::File *asn1File, const Options &options)
 {
-    const auto patcherFunctions = collectPatcherFunctions(asn1File);
-
-    if (patcherFunctions.empty()) {
+    if (asn1File->patcherFunctions().empty()) {
         return std::nullopt;
     }
 
@@ -62,7 +60,7 @@ std::optional<QString> PatcherFunctionsExporter::exportPatcherFunctions(
     QString bodyData;
     QTextStream bodyStream(&bodyData, QIODevice::WriteOnly);
 
-    generatePatcherFunctions(asn1File, patcherFunctions, headerStream, bodyStream);
+    generatePatcherFunctions(asn1File, headerStream, bodyStream);
 
     const auto pathPrefix = options.value(Asn1Options::patcherFunctionsFilepathPrefix).value_or("");
     auto outputFileName = QString("%1-postencoding").arg(asn1File->name()).toLower();
@@ -78,17 +76,17 @@ std::optional<QString> PatcherFunctionsExporter::exportPatcherFunctions(
     return outputFileName;
 }
 
-void PatcherFunctionsExporter::generatePatcherFunctions(const Asn1Acn::File *asn1File,
-        const std::vector<PatcherFunctionInfo> &patcherFunctions, QTextStream &headerStream, QTextStream &bodyStream)
+void PatcherFunctionsExporter::generatePatcherFunctions(
+        const Asn1Acn::File *asn1File, QTextStream &headerStream, QTextStream &bodyStream)
 {
     initializePatcherFunctionsHeader(headerStream, asn1File);
     initializePatcherFunctionsBody(bodyStream, asn1File);
 
-    for (const auto &patcherFunctionInfo : patcherFunctions) {
-        if (patcherFunctionInfo.type == PatcherFunctionType::EncodingFunction) {
+    for (const auto &patcherFunctionInfo : asn1File->patcherFunctions()) {
+        if (patcherFunctionInfo.type == Asn1Acn::PatcherFunctionType::EncodingFunction) {
             generateEncodingFunctionHeader(patcherFunctionInfo, headerStream);
             generateEncodingFunctionBody(patcherFunctionInfo, bodyStream);
-        } else if (patcherFunctionInfo.type == PatcherFunctionType::DecodingValidator) {
+        } else if (patcherFunctionInfo.type == Asn1Acn::PatcherFunctionType::DecodingValidator) {
             generateDecodingValidatorHeader(patcherFunctionInfo, headerStream);
             generateDecodingValidatorBody(patcherFunctionInfo, bodyStream);
         }
@@ -115,7 +113,7 @@ void PatcherFunctionsExporter::initializePatcherFunctionsBody(QTextStream &strea
 }
 
 void PatcherFunctionsExporter::generateEncodingFunctionHeader(
-        const PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream)
+        const Asn1Acn::PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream)
 {
     stream << "\n";
     generateEncodingFunctionDeclaration(patcherFunctionInfo, stream);
@@ -123,7 +121,7 @@ void PatcherFunctionsExporter::generateEncodingFunctionHeader(
 }
 
 void PatcherFunctionsExporter::generateEncodingFunctionBody(
-        const PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream)
+        const Asn1Acn::PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream)
 {
     stream << "\n";
     generateEncodingFunctionDeclaration(patcherFunctionInfo, stream);
@@ -133,7 +131,7 @@ void PatcherFunctionsExporter::generateEncodingFunctionBody(
 }
 
 void PatcherFunctionsExporter::generateEncodingFunctionDeclaration(
-        const PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream)
+        const Asn1Acn::PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream)
 {
     const auto &name = patcherFunctionInfo.name;
     const auto &sequenceName = patcherFunctionInfo.sequenceName;
@@ -149,7 +147,7 @@ void PatcherFunctionsExporter::generateEncodingFunctionDeclaration(
 }
 
 void PatcherFunctionsExporter::generateDecodingValidatorHeader(
-        const PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream)
+        const Asn1Acn::PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream)
 {
     stream << "\n";
     generateDecodingValidatorDeclaration(patcherFunctionInfo, stream);
@@ -157,7 +155,7 @@ void PatcherFunctionsExporter::generateDecodingValidatorHeader(
 }
 
 void PatcherFunctionsExporter::generateDecodingValidatorBody(
-        const PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream)
+        const Asn1Acn::PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream)
 {
     stream << "\n";
     generateDecodingValidatorDeclaration(patcherFunctionInfo, stream);
@@ -168,7 +166,7 @@ void PatcherFunctionsExporter::generateDecodingValidatorBody(
 }
 
 void PatcherFunctionsExporter::generateDecodingValidatorDeclaration(
-        const PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream)
+        const Asn1Acn::PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream)
 {
     const auto &name = patcherFunctionInfo.name;
     const auto &sequenceName = patcherFunctionInfo.sequenceName;
@@ -208,39 +206,6 @@ void PatcherFunctionsExporter::generateMappingFunctionsModule(
     for (const auto &patcherFunctionFileName : patcherFunctionsFileNames) {
         stream << "#include \"" << patcherFunctionFileName << ".h\"\n";
     }
-}
-
-std::vector<PatcherFunctionsExporter::PatcherFunctionInfo> PatcherFunctionsExporter::collectPatcherFunctions(
-        const Asn1Acn::File *asn1File)
-{
-    std::vector<PatcherFunctionInfo> result;
-
-    for (const auto &definitions : asn1File->definitionsList()) {
-        const auto &types = definitions->types();
-
-        for (const auto &type : types) {
-            if (type->typeEnum() != Type::ASN1Type::SEQUENCE) {
-                continue;
-            }
-
-            const auto sequence = dynamic_cast<const Sequence *>(type->type());
-            const auto sequenceName = QString(sequence->identifier()).replace('-', '_');
-
-            if (sequence->postEncodingFunction()) {
-                auto info = PatcherFunctionInfo { PatcherFunctionType::EncodingFunction,
-                    QString(*sequence->postEncodingFunction()).replace('-', '_'), sequenceName };
-                result.push_back(std::move(info));
-            }
-
-            if (sequence->postDecodingValidator()) {
-                auto info = PatcherFunctionInfo { PatcherFunctionType::DecodingValidator,
-                    QString(*sequence->postDecodingValidator()).replace('-', '_'), sequenceName };
-                result.push_back(std::move(info));
-            }
-        }
-    }
-
-    return result;
 }
 
 void PatcherFunctionsExporter::writeAndCommit(QSaveFile &outputFile, const QString &data)

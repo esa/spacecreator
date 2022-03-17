@@ -64,13 +64,12 @@ using seds::model::SubRangeDataType;
 
 namespace conversion::asn1::translator {
 
-DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(std::unique_ptr<Asn1Acn::Types::Type> &asn1Type,
-        Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
-        const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages,
-        const std::optional<uint64_t> &sequenceSizeThreshold)
-    : m_asn1Type(asn1Type)
-    , m_asn1Definitions(asn1Definitions)
+DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(Asn1Acn::Definitions *asn1Definitions,
+        const seds::model::Package *sedsPackage, Asn1Acn::File *asn1File, const Asn1Acn::Asn1Model::Data &asn1Files,
+        const std::vector<seds::model::Package> &sedsPackages, const std::optional<uint64_t> &sequenceSizeThreshold)
+    : m_asn1Definitions(asn1Definitions)
     , m_sedsPackage(sedsPackage)
+    , m_asn1File(asn1File)
     , m_asn1Files(asn1Files)
     , m_sedsPackages(sedsPackages)
     , m_containersScope(asn1Definitions, sedsPackage, asn1Files, sedsPackages, sequenceSizeThreshold)
@@ -150,10 +149,6 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
         const auto &asn1TrailerComponents = m_containersScope.fetchTrailerComponents(sedsTypeName);
         for (const auto &asn1TrailerComponent : asn1TrailerComponents) {
             type->addComponent(asn1TrailerComponent->clone());
-        }
-
-        if (m_containersScope.hasPatcherFunctions(sedsTypeName)) {
-            addPatcherFunctions(type.get());
         }
     }
 
@@ -239,6 +234,11 @@ void DataTypeTranslatorVisitor::operator()(const SubRangeDataType &sedsType)
                         .arg(baseTypeName);
         throw TranslationException(std::move(errorMessage));
     }
+}
+
+std::unique_ptr<Asn1Acn::Types::Type> DataTypeTranslatorVisitor::consumeResultType()
+{
+    return std::move(m_asn1Type);
 }
 
 void DataTypeTranslatorVisitor::translateIntegerEncoding(

@@ -36,45 +36,30 @@ public:
     static auto exportModel(const Asn1Acn::Asn1Model *model, const Options &options) -> void;
 
 private:
-    enum class PatcherFunctionType
-    {
-        EncodingFunction,
-        DecodingValidator
-    };
-
-    struct PatcherFunctionInfo {
-        PatcherFunctionType type;
-        QString name;
-        QString sequenceName;
-    };
-
     static auto exportPatcherFunctions(const Asn1Acn::File *asn1File, const Options &options) -> std::optional<QString>;
-    static auto generatePatcherFunctions(const Asn1Acn::File *asn1File,
-            const std::vector<PatcherFunctionInfo> &patcherFunctions, QTextStream &headerStream,
-            QTextStream &bodyStream) -> void;
+    static auto generatePatcherFunctions(
+            const Asn1Acn::File *asn1File, QTextStream &headerStream, QTextStream &bodyStream) -> void;
     static auto initializePatcherFunctionsHeader(QTextStream &stream, const Asn1Acn::File *asn1File) -> void;
     static auto initializePatcherFunctionsBody(QTextStream &stream, const Asn1Acn::File *asn1File) -> void;
 
-    static auto generateEncodingFunctionHeader(const PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream)
-            -> void;
-    static auto generateEncodingFunctionBody(const PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream)
-            -> void;
-    static auto generateEncodingFunctionDeclaration(const PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream)
-            -> void;
+    static auto generateEncodingFunctionHeader(
+            const Asn1Acn::PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream) -> void;
+    static auto generateEncodingFunctionBody(
+            const Asn1Acn::PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream) -> void;
+    static auto generateEncodingFunctionDeclaration(
+            const Asn1Acn::PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream) -> void;
 
-    static auto generateDecodingValidatorHeader(const PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream)
-            -> void;
-    static auto generateDecodingValidatorBody(const PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream)
-            -> void;
+    static auto generateDecodingValidatorHeader(
+            const Asn1Acn::PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream) -> void;
+    static auto generateDecodingValidatorBody(
+            const Asn1Acn::PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream) -> void;
     static auto generateDecodingValidatorDeclaration(
-            const PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream) -> void;
+            const Asn1Acn::PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream) -> void;
 
     static auto exportMappingFunctionsModule(
             const std::vector<QString> &patcherFunctionsFileNames, const Options &options) -> void;
     static auto generateMappingFunctionsModule(
             const std::vector<QString> &patcherFunctionsFileNames, QTextStream &stream) -> void;
-
-    static auto collectPatcherFunctions(const Asn1Acn::File *asn1File) -> std::vector<PatcherFunctionInfo>;
 
     static auto writeAndCommit(QSaveFile &outputFile, const QString &data) -> void;
 };

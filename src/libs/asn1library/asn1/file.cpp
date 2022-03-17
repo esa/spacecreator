@@ -91,6 +91,11 @@ void File::addErrorMessage(const ErrorMessage &message)
     m_errorList.push_back(message);
 }
 
+void File::addPatcherFunction(PatcherFunctionInfo patcherFunctionInfo)
+{
+    m_patcherFunctions.push_back(std::move(patcherFunctionInfo));
+}
+
 void File::clearReferences()
 {
     m_referencesMap.clear();
