@@ -28,14 +28,12 @@
 #include <cstdarg>
 #include <cstdint>
 #include <memory>
-#include <qdebug.h>
 #include <qobjectdefs.h>
 
 // GdbConnector includes
 #include <QProcess>
 
 // TODO: remove this include
-#include <QDebug>
 #include <stdexcept>
 
 namespace tests::testgenerator {
@@ -193,73 +191,26 @@ QByteArray getTestResults()
 
 } // namespace gdbconnector
 
-void printQByteArrayInHex(const QByteArray &array);
-
 void tst_gdbconnector::testNominal()
 {
-    QByteArray rawTestResults = gdbconnector::getTestResults();
+    const TestVector expectedTestData[] = {
+        { true, 2.3000, -2, 3, true },
+        { true, 5.3444, -2, 3, true },
+        { false, 2.3000, -8, 3, true },
+        { false, 2.3000, -1, -1, true },
+        { true, 2.3000, 4, 1, true },
+    };
 
-    printQByteArrayInHex(rawTestResults);
+    QByteArray rawTestResults = gdbconnector::getTestResults();
 
     // reconstruct results:
     const TestVector *data = reinterpret_cast<const TestVector *>(rawTestResults.data());
     for (int i = 0; i < static_cast<int>(kTestDataSize); i++) {
         testData[i] = *data;
         data++;
-
-        qDebug() << "i = " << i;
-        qDebug() << "testData[i] active = " << testData[i].active;
-        qDebug() << "testData[i] temperature = " << testData[i].temperature;
-        qDebug() << "testData[i] posX = " << testData[i].posX;
-        qDebug() << "testData[i] posY = " << testData[i].posY;
-        qDebug() << "testData[i] result = " << testData[i].result;
-        qDebug() << "";
     }
 
     QFAIL("this shall happen");
-}
-
-QString byteToHexStr(char byte)
-{
-    const auto number = static_cast<uint_least8_t>(byte);
-    if (number < 16) {
-        return QString("0%1").arg(number, 1, 16);
-    } else {
-        return QString("%1").arg(number, 2, 16);
-    }
-}
-
-void printQByteArrayInHex(const QByteArray &array)
-{
-    QString arrayInHex = QString("QByteArray size: %1\n").arg(array.size());
-    for (int i = 0; i < array.size(); i++) {
-        arrayInHex += byteToHexStr(array.at(i));
-        arrayInHex += " ";
-
-        if ((i + 1) % 8 == 0) {
-            arrayInHex += "| ";
-        }
-
-        if ((i + 1) % 16 == 0) {
-            arrayInHex += "\n";
-        }
-    }
-    qDebug().noquote() << arrayInHex;
-
-    QString elements;
-    for (int i = 0; i < array.size(); i++) {
-        elements += byteToHexStr(array.at(i));
-        if ((i + 1) % 8 == 0) {
-            elements += " - ";
-        } else {
-            elements += " ";
-        }
-        if ((i + 1) % 40 == 0) {
-            qInfo().noquote() << elements;
-            qInfo().noquote() << "";
-            elements.clear();
-        }
-    }
 }
 
 } // namespace tests::testgenerator
