@@ -32,35 +32,38 @@ namespace conversion::asn1::exporter {
 
 void PatcherFunctionsExporter::exportModel(const Asn1Model *model, const Options &options)
 {
+    std::vector<QString> patcherFunctionsFileNames;
+
     for (const auto &asn1File : model->data()) {
-        const auto sequencesToPatch = collectSequencesToPatch(asn1File.get());
+        auto patcherFunctionsFileName = exportPatcherFunctions(asn1File.get(), options);
 
-        std::vector<QString> patcherFunctionsFileNames;
-
-        for (const auto sequence : sequencesToPatch) {
-            /* auto patcherFunctionsFileName = exportPatcherFunctions(sequence, options); */
-
-            /* if (patcherFunctionsFileName.has_value()) { */
-            /*     patcherFunctionsFileNames.push_back(std::move(*patcherFunctionsFileName)); */
-            /* } */
+        if (patcherFunctionsFileName.has_value()) {
+            patcherFunctionsFileNames.push_back(std::move(*patcherFunctionsFileName));
         }
+    }
 
-        if (!patcherFunctionsFileNames.empty()) {
-            exportMappingFunctionsModule(patcherFunctionsFileNames, options);
-        }
+    if (!patcherFunctionsFileNames.empty()) {
+        exportMappingFunctionsModule(patcherFunctionsFileNames, options);
+        exportCommonLibrary(options);
     }
 }
 
 std::optional<QString> PatcherFunctionsExporter::exportPatcherFunctions(
         const Asn1Acn::File *asn1File, const Options &options)
 {
+    const auto sequencesToPatch = collectSequencesToPatch(asn1File);
+
+    if (sequencesToPatch.empty()) {
+        return std::nullopt;
+    }
+
     QString headerData;
     QTextStream headerStream(&headerData, QIODevice::WriteOnly);
 
     QString bodyData;
     QTextStream bodyStream(&bodyData, QIODevice::WriteOnly);
 
-    generatePatcherFunctions(asn1File, headerStream, bodyStream);
+    generatePatcherFunctions(asn1File, sequencesToPatch, headerStream, bodyStream);
 
     const auto pathPrefix = options.value(Asn1Options::patcherFunctionsFilepathPrefix).value_or("");
     auto outputFileName = QString("%1-postencoding").arg(asn1File->name()).toLower();
@@ -76,11 +79,19 @@ std::optional<QString> PatcherFunctionsExporter::exportPatcherFunctions(
     return outputFileName;
 }
 
-void PatcherFunctionsExporter::generatePatcherFunctions(
-        const Asn1Acn::File *asn1File, QTextStream &headerStream, QTextStream &bodyStream)
+void PatcherFunctionsExporter::generatePatcherFunctions(const Asn1Acn::File *asn1File,
+        const std::vector<const Sequence *> sequencesToPatch, QTextStream &headerStream, QTextStream &bodyStream)
 {
     initializePatcherFunctionsHeader(headerStream, asn1File);
     initializePatcherFunctionsBody(bodyStream, asn1File);
+
+    for (const auto sequence : sequencesToPatch) {
+        generateEncodingFunctionHeader(sequence, headerStream);
+        generateEncodingFunctionBody(sequence, bodyStream);
+
+        generateDecodingValidatorHeader(sequence, headerStream);
+        generateDecodingValidatorBody(sequence, bodyStream);
+    }
 }
 
 void PatcherFunctionsExporter::initializePatcherFunctionsHeader(QTextStream &stream, const Asn1Acn::File *asn1File)
@@ -98,71 +109,84 @@ void PatcherFunctionsExporter::initializePatcherFunctionsBody(QTextStream &strea
     stream << "#include \"asn1crt.h\"\n"
            << "#include \"asn1crt_encoding.h\"\n"
            << "#include \"asn1crt_encoding_acn.h\"\n"
-           << "#include \"" << asn1File->name() << ".h\"\n";
+           << "#include \"" << asn1File->name() << ".h\"\n"
+           << "#include \"patchingCommonLibrary.h\"\n";
     // clang-format on
 }
 
-void PatcherFunctionsExporter::generateEncodingFunctionHeader(QTextStream &stream)
+void PatcherFunctionsExporter::generateEncodingFunctionHeader(const Sequence *sequence, QTextStream &stream)
 {
     stream << "\n";
-    generateEncodingFunctionDeclaration(stream);
+    generateEncodingFunctionDeclaration(sequence, stream);
     stream << ";\n";
 }
 
-void PatcherFunctionsExporter::generateEncodingFunctionBody(QTextStream &stream)
+void PatcherFunctionsExporter::generateEncodingFunctionBody(const Sequence *sequence, QTextStream &stream)
 {
     stream << "\n";
-    generateEncodingFunctionDeclaration(stream);
+    generateEncodingFunctionDeclaration(sequence, stream);
     stream << "\n"
            << "{\n"
            << "}\n";
 }
 
-void PatcherFunctionsExporter::generateEncodingFunctionDeclaration(QTextStream &stream)
+void PatcherFunctionsExporter::generateEncodingFunctionDeclaration(const Sequence *sequence, QTextStream &stream)
 {
-    /* const auto &name = patcherFunctionInfo.name; */
-    /* const auto &sequenceName = patcherFunctionInfo.sequenceName; */
+    if (!sequence->postEncodingFunction().has_value()) {
+        return;
+    }
+
+    auto name = sequence->postEncodingFunction().value();
+    name.replace('-', '_');
+    auto sequenceName = sequence->identifier();
+    sequenceName.replace('-', '_');
 
     // clang-format off
-    /* stream << "void " << name << "(" */
-    /*                   << "const " << sequenceName << "* pSeq, " */
-    /*                   << "BitStream* pStartBitStrm, " */
-    /*                   << sequenceName << "_extension_function_positions* pNullPos, " */
-    /*                   << "BitStream* pEndBitStrm" */
-    /*                   << ")"; */
+    stream << "void " << name << "("
+                      << "const " << sequenceName << "* pSeq, "
+                      << "BitStream* pStartBitStrm, "
+                      << sequenceName << "_extension_function_positions* pNullPos, "
+                      << "BitStream* pEndBitStrm"
+                      << ")";
     // clang-format on
 }
 
-void PatcherFunctionsExporter::generateDecodingValidatorHeader(QTextStream &stream)
+void PatcherFunctionsExporter::generateDecodingValidatorHeader(const Sequence *sequence, QTextStream &stream)
 {
     stream << "\n";
-    generateDecodingValidatorDeclaration(stream);
+    generateDecodingValidatorDeclaration(sequence, stream);
     stream << ";\n";
 }
 
-void PatcherFunctionsExporter::generateDecodingValidatorBody(QTextStream &stream)
+void PatcherFunctionsExporter::generateDecodingValidatorBody(const Sequence *sequence, QTextStream &stream)
 {
     stream << "\n";
-    generateDecodingValidatorDeclaration(stream);
+    generateDecodingValidatorDeclaration(sequence, stream);
     stream << "\n"
            << "{\n"
            << "\treturn true;"
            << "}\n";
 }
 
-void PatcherFunctionsExporter::generateDecodingValidatorDeclaration(QTextStream &stream)
+void PatcherFunctionsExporter::generateDecodingValidatorDeclaration(const Sequence *sequence, QTextStream &stream)
 {
-    /* const auto &name = patcherFunctionInfo.name; */
-    /* const auto &sequenceName = patcherFunctionInfo.sequenceName; */
+    if (!sequence->postDecodingValidator().has_value()) {
+        return;
+    }
+
+    auto name = sequence->postDecodingValidator().value();
+    name.replace('-', '_');
+    auto sequenceName = sequence->identifier();
+    sequenceName.replace('-', '_');
 
     // clang-format off
-    /* stream << "\nflag " << name << "(" */
-    /*                   << "const " << sequenceName << " *pSeq, " */
-    /*                   << "BitStream* pStartBitStrm, " */
-    /*                   << sequenceName << "_extension_function_positions* pNullPos, " */
-    /*                   << "BitStream* pEndBitStrm, " */
-    /*                   << "int* pErrCode" */
-    /*                   << ")"; */
+    stream << "\nflag " << name << "("
+                      << "const " << sequenceName << " *pSeq, "
+                      << "BitStream* pStartBitStrm, "
+                      << sequenceName << "_extension_function_positions* pNullPos, "
+                      << "BitStream* pEndBitStrm, "
+                      << "int* pErrCode"
+                      << ")";
     // clang-format on
 }
 
@@ -192,9 +216,55 @@ void PatcherFunctionsExporter::generateMappingFunctionsModule(
     }
 }
 
-std::vector<Sequence *> PatcherFunctionsExporter::collectSequencesToPatch(const Asn1Acn::File *asn1File)
+void PatcherFunctionsExporter::exportCommonLibrary(const Options &options)
 {
-    std::vector<Sequence *> result;
+    exportCommonLibraryHeader(options);
+    exportCommonLibraryBody(options);
+}
+
+void PatcherFunctionsExporter::exportCommonLibraryHeader(const Options &options)
+{
+    QString data;
+    QTextStream stream(&data, QIODevice::WriteOnly);
+
+    generateCommonLibraryHeader(stream);
+
+    const auto pathPrefix = options.value(Asn1Options::patcherFunctionsFilepathPrefix).value_or("");
+    const auto outputFileName = "patchingCommonLibrary";
+
+    const auto outputFilePath = QString("%1%2.h").arg(pathPrefix).arg(outputFileName);
+    QSaveFile outputFile(outputFilePath);
+    writeAndCommit(outputFile, data);
+}
+
+void PatcherFunctionsExporter::exportCommonLibraryBody(const Options &options)
+{
+    QString data;
+    QTextStream stream(&data, QIODevice::WriteOnly);
+
+    generateCommonLibraryBody(stream);
+
+    const auto pathPrefix = options.value(Asn1Options::patcherFunctionsFilepathPrefix).value_or("");
+    const auto outputFileName = "patchingCommonLibrary";
+
+    const auto outputFilePath = QString("%1%2.c").arg(pathPrefix).arg(outputFileName);
+    QSaveFile outputFile(outputFilePath);
+    writeAndCommit(outputFile, data);
+}
+
+void PatcherFunctionsExporter::generateCommonLibraryHeader(QTextStream &stream)
+{
+    stream << "#pragma once\n\n";
+}
+
+void PatcherFunctionsExporter::generateCommonLibraryBody(QTextStream &stream)
+{
+    stream << "#include \"patchingCommonLibrary.h\"\n\n";
+}
+
+std::vector<const Sequence *> PatcherFunctionsExporter::collectSequencesToPatch(const Asn1Acn::File *asn1File)
+{
+    std::vector<const Sequence *> result;
 
     for (const auto &definition : asn1File->definitionsList()) {
         for (const auto &type : definition->types()) {
@@ -204,7 +274,7 @@ std::vector<Sequence *> PatcherFunctionsExporter::collectSequencesToPatch(const 
 
             const auto sequence = dynamic_cast<Sequence *>(type->type());
 
-            if (sequence->postEncodingFunction().has_value() || sequence->postDecodingValidator().has_value()) {
+            if (!sequence->patchingFunctions().empty()) {
                 result.push_back(sequence);
             }
         }
