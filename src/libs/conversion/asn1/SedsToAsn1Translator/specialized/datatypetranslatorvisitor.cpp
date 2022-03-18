@@ -65,11 +65,10 @@ using seds::model::SubRangeDataType;
 namespace conversion::asn1::translator {
 
 DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(Asn1Acn::Definitions *asn1Definitions,
-        const seds::model::Package *sedsPackage, Asn1Acn::File *asn1File, const Asn1Acn::Asn1Model::Data &asn1Files,
+        const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
         const std::vector<seds::model::Package> &sedsPackages, const std::optional<uint64_t> &sequenceSizeThreshold)
     : m_asn1Definitions(asn1Definitions)
     , m_sedsPackage(sedsPackage)
-    , m_asn1File(asn1File)
     , m_asn1Files(asn1Files)
     , m_sedsPackages(sedsPackages)
     , m_containersScope(asn1Definitions, sedsPackage, asn1Files, sedsPackages, sequenceSizeThreshold)
@@ -132,7 +131,8 @@ void DataTypeTranslatorVisitor::operator()(const BooleanDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 {
-    auto type = std::make_unique<Asn1Acn::Types::Sequence>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
+    const auto sequenceName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto type = std::make_unique<Asn1Acn::Types::Sequence>(sequenceName);
 
     // Add this type to the scope
     m_containersScope.addContainer(sedsType);
@@ -149,6 +149,16 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
         const auto &asn1TrailerComponents = m_containersScope.fetchTrailerComponents(sedsTypeName);
         for (const auto &asn1TrailerComponent : asn1TrailerComponents) {
             type->addComponent(asn1TrailerComponent->clone());
+        }
+
+        const auto &patcherFunctions = m_containersScope.fetchPatcherFunctions(sedsTypeName);
+        for (const auto &patcherFunction : patcherFunctions) {
+            type->addPatchingFunction(patcherFunction);
+        }
+
+        if (!patcherFunctions.empty()) {
+            type->setPostEncodingFunction(QString("%1-encoding-function").arg(sequenceName.toLower()));
+            type->setPostDecodingValidator(QString("%1-decoding-validator").arg(sequenceName).toLower());
         }
     }
 

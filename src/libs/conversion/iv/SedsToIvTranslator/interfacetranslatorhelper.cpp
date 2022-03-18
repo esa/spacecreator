@@ -89,7 +89,7 @@ QString InterfaceTranslatorHelper::createArrayType(const seds::model::DataTypeRe
     }
 
     asn1::translator::DataTypeTranslatorVisitor dataTypeVisitor(
-            asn1Definitions, sedsPackage, nullptr, asn1Files, sedsPackages, sequenceSizeThreshold);
+            asn1Definitions, sedsPackage, asn1Files, sedsPackages, sequenceSizeThreshold);
     dataTypeVisitor(sedsArray);
 
     auto asn1ArrayAssignment = std::make_unique<Asn1Acn::TypeAssignment>(

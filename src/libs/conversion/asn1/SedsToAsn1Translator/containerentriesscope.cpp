@@ -20,6 +20,7 @@
 #include "containerentriesscope.h"
 
 #include "specialized/entrytranslatorvisitor.h"
+#include "specialized/patcherfunctionstranslator.h"
 
 #include <conversion/common/translation/exceptions.h>
 
@@ -81,8 +82,20 @@ void ContainerEntriesScope::addContainer(const ContainerDataType &sedsType)
         }
     }
 
+    auto patcherFunctions = PatcherFunctionsTranslator::translate(sedsType);
+
+    if (sedsType.baseType()) {
+        const auto &sedsBaseTypeName = sedsType.baseType()->nameStr();
+        const auto &parentPatcherFunctions = fetchPatcherFunctions(sedsBaseTypeName);
+
+        for (const auto &parentPatcherFunction : parentPatcherFunctions) {
+            patcherFunctions.push_back(parentPatcherFunction);
+        }
+    }
+
     // Save this type
-    ScopeEntry entry { std::move(asn1SequenceComponents), std::move(asn1SequenceTrailerComponents) };
+    ScopeEntry entry { std::move(asn1SequenceComponents), std::move(asn1SequenceTrailerComponents),
+        std::move(patcherFunctions) };
     m_scope.insert({ sedsType.nameStr(), std::move(entry) });
 }
 
@@ -97,6 +110,12 @@ const Asn1Acn::Types::Sequence::Components &ContainerEntriesScope::fetchTrailerC
 {
     assertPresent(sedsTypeName);
     return m_scope.at(sedsTypeName).trailerEntries->components();
+}
+
+const std::vector<QString> &ContainerEntriesScope::fetchPatcherFunctions(const QString &sedsTypeName) const
+{
+    assertPresent(sedsTypeName);
+    return m_scope.at(sedsTypeName).patcherFunctions;
 }
 
 void ContainerEntriesScope::assertPresent(const QString &sedsTypeName) const

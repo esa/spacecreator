@@ -42,24 +42,20 @@ private:
     static auto initializePatcherFunctionsHeader(QTextStream &stream, const Asn1Acn::File *asn1File) -> void;
     static auto initializePatcherFunctionsBody(QTextStream &stream, const Asn1Acn::File *asn1File) -> void;
 
-    static auto generateEncodingFunctionHeader(
-            const Asn1Acn::PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream) -> void;
-    static auto generateEncodingFunctionBody(
-            const Asn1Acn::PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream) -> void;
-    static auto generateEncodingFunctionDeclaration(
-            const Asn1Acn::PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream) -> void;
+    static auto generateEncodingFunctionHeader(QTextStream &stream) -> void;
+    static auto generateEncodingFunctionBody(QTextStream &stream) -> void;
+    static auto generateEncodingFunctionDeclaration(QTextStream &stream) -> void;
 
-    static auto generateDecodingValidatorHeader(
-            const Asn1Acn::PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream) -> void;
-    static auto generateDecodingValidatorBody(
-            const Asn1Acn::PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream) -> void;
-    static auto generateDecodingValidatorDeclaration(
-            const Asn1Acn::PatcherFunctionInfo &patcherFunctionInfo, QTextStream &stream) -> void;
+    static auto generateDecodingValidatorHeader(QTextStream &stream) -> void;
+    static auto generateDecodingValidatorBody(QTextStream &stream) -> void;
+    static auto generateDecodingValidatorDeclaration(QTextStream &stream) -> void;
 
     static auto exportMappingFunctionsModule(
             const std::vector<QString> &patcherFunctionsFileNames, const Options &options) -> void;
     static auto generateMappingFunctionsModule(
             const std::vector<QString> &patcherFunctionsFileNames, QTextStream &stream) -> void;
+
+    static auto collectSequencesToPatch(const Asn1Acn::File *asn1File) -> std::vector<Asn1Acn::Types::Sequence *>;
 
     static auto writeAndCommit(QSaveFile &outputFile, const QString &data) -> void;
 };

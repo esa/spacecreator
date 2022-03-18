@@ -59,9 +59,13 @@ public:
     std::optional<QString> postDecodingValidator() const;
     void setPostDecodingValidator(QString postDecodingValidator);
 
+    std::vector<QString> patchingFunctions() const;
+    void addPatchingFunction(QString patchingFunction);
+
 private:
     std::optional<QString> m_postEncodingFunction;
     std::optional<QString> m_postDecodingValidator;
+    std::vector<QString> m_patchingFunctions;
 };
 
 }

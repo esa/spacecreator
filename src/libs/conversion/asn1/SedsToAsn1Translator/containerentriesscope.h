@@ -73,6 +73,7 @@ public:
      * @param   Vector of trailer components
      */
     auto fetchTrailerComponents(const QString &sedsTypeName) const -> const Asn1Acn::Types::Sequence::Components &;
+    auto fetchPatcherFunctions(const QString &sedsTypeName) const -> const std::vector<QString> &;
 
 private:
     auto assertPresent(const QString &sedsTypeName) const -> void;
@@ -81,6 +82,7 @@ private:
     struct ScopeEntry final {
         std::unique_ptr<Asn1Acn::Types::Sequence> entries;
         std::unique_ptr<Asn1Acn::Types::Sequence> trailerEntries;
+        std::vector<QString> patcherFunctions;
     };
 
     /// @brief  Parent definitions

@@ -64,3 +64,13 @@ void Sequence::setPostDecodingValidator(QString postDecodingValidator)
 {
     m_postDecodingValidator = std::move(postDecodingValidator);
 }
+
+std::vector<QString> Sequence::patchingFunctions() const
+{
+    return m_patchingFunctions;
+}
+
+void Sequence::addPatchingFunction(QString patchingFunction)
+{
+    m_patchingFunctions.push_back(std::move(patchingFunction));
+}

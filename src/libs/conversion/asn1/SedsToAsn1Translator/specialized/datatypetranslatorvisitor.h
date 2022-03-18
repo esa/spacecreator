@@ -85,8 +85,7 @@ struct DataTypeTranslatorVisitor final {
      * @param   sequenceSizeThreshold   ASN.1 sequence size threshold
      */
     DataTypeTranslatorVisitor(Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
-            Asn1Acn::File *asn1File, const Asn1Acn::Asn1Model::Data &asn1Files,
-            const std::vector<seds::model::Package> &sedsPackages,
+            const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages,
             const std::optional<uint64_t> &sequenceSizeThreshold);
 
     /**
@@ -313,8 +312,6 @@ private:
     Asn1Acn::Definitions *m_asn1Definitions;
     /// @brief  Parent package
     const seds::model::Package *m_sedsPackage;
-    /// @brief  Parent file
-    Asn1Acn::File *m_asn1File;
     /// @brief  List of already translated ASN.1 files
     const Asn1Acn::Asn1Model::Data &m_asn1Files;
     /// @brief  List of SEDS packages

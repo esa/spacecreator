@@ -127,7 +127,6 @@ private:
      *
      * @param   sedsDataTypes       Data types to translate
      * @param   sedsPackage         Parent SEDS package
-     * @param   asn1File            Parent ASN.1 file
      * @param   asn1Files           List of already translated ASN.1 files
      * @param   sedsPackages        List of SEDS packages
      * @param   sequenceSizeThreshold   ASN.1 sequence size threshold
@@ -135,7 +134,7 @@ private:
      * @return  ASN.1 definitions with translated data types
      */
     auto translateDataTypes(const std::list<const seds::model::DataType *> &sedsDataTypes,
-            const seds::model::Package *sedsPackage, Asn1Acn::File *asn1File, const Asn1Acn::Asn1Model::Data &asn1Files,
+            const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
             const std::vector<seds::model::Package> &sedsPackages,
             const std::optional<uint64_t> &sequenceSizeThreshold) const -> std::unique_ptr<Asn1Acn::Definitions>;
 

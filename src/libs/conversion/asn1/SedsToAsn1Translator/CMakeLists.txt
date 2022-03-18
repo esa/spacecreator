@@ -9,6 +9,7 @@ set(SOURCES     containerentriesscope.cpp
                 specialized/descriptiontranslator.cpp
                 specialized/dimensiontranslator.cpp
                 specialized/entrytranslatorvisitor.cpp
+                specialized/patcherfunctionstranslator.cpp
                 specialized/rangetranslatorvisitor.cpp)
 set(INCLUDES    containerentriesscope.h
                 datatypesdependencyresolver.h
@@ -19,6 +20,7 @@ set(INCLUDES    containerentriesscope.h
                 specialized/descriptiontranslator.h
                 specialized/dimensiontranslator.h
                 specialized/entrytranslatorvisitor.h
+                specialized/patcherfunctionstranslator.h
                 specialized/rangetranslatorvisitor.h
                 specialized/sizetranslatorvisitor.h)
 

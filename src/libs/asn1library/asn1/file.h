@@ -27,7 +27,6 @@
 #include "definitions.h"
 #include "errormessage.h"
 #include "node.h"
-#include "patcherfunctioninfo.h"
 #include "typereference.h"
 #include "types/type.h"
 
@@ -52,7 +51,6 @@ public:
     void add(std::unique_ptr<Definitions> defs);
     void addTypeReference(std::unique_ptr<TypeReference> ref);
     void addErrorMessage(const ErrorMessage &message);
-    void addPatcherFunction(PatcherFunctionInfo patcherFunctionInfo);
 
     using DefinitionsList = std::vector<std::unique_ptr<Definitions>>;
     using References = std::vector<std::unique_ptr<TypeReference>>;
@@ -66,8 +64,6 @@ public:
     const ReferencesMap &referencesMap() const { return m_referencesMap; }
     const References &references() const { return m_references; }
     const ErrorList &errors() const { return m_errorList; }
-
-    const std::vector<PatcherFunctionInfo> &patcherFunctions() const { return m_patcherFunctions; }
 
     void setPolluted() { m_polluted = true; }
     bool isPolluted() const { return m_polluted; }
@@ -87,8 +83,6 @@ private:
     ReferencesMap m_referencesMap;
     References m_references;
     ErrorList m_errorList;
-
-    std::vector<PatcherFunctionInfo> m_patcherFunctions;
 
     std::map<QString, Definitions *> m_definitionsByNameMap;
 
