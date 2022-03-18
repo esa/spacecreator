@@ -38,6 +38,14 @@
 
 namespace tests::testgenerator {
 
+typedef struct {
+    asn1SccMyBool active;
+    asn1SccMyReal temperature;
+    asn1SccMyInteger posX;
+    asn1SccMyInteger posY;
+    asn1SccMyBool result;
+} TestVector;
+
 class tst_gdbconnector final : public QObject
 {
     Q_OBJECT
@@ -48,14 +56,6 @@ private Q_SLOTS:
 
 private:
     const unsigned int kTestDataSize = 5;
-
-    typedef struct {
-        asn1SccMyBool active;
-        asn1SccMyReal temperature;
-        asn1SccMyInteger posX;
-        asn1SccMyInteger posY;
-        asn1SccMyBool result;
-    } TestVector;
 
     TestVector *testData = NULL;
 };
@@ -191,6 +191,15 @@ QByteArray getTestResults()
 
 } // namespace gdbconnector
 
+void compareTestVectors(const TestVector &actual, const TestVector &expected)
+{
+    QCOMPARE(actual.active, expected.active);
+    QCOMPARE(actual.temperature, expected.temperature);
+    QCOMPARE(actual.posX, expected.posX);
+    QCOMPARE(actual.posY, expected.posY);
+    QCOMPARE(actual.result, expected.result);
+}
+
 void tst_gdbconnector::testNominal()
 {
     const TestVector expectedTestData[] = {
@@ -201,7 +210,7 @@ void tst_gdbconnector::testNominal()
         { true, 2.3000, 4, 1, true },
     };
 
-    QByteArray rawTestResults = gdbconnector::getTestResults();
+    const QByteArray rawTestResults = gdbconnector::getTestResults();
 
     // reconstruct results:
     const TestVector *data = reinterpret_cast<const TestVector *>(rawTestResults.data());
@@ -210,7 +219,9 @@ void tst_gdbconnector::testNominal()
         data++;
     }
 
-    QFAIL("this shall happen");
+    for (unsigned int i = 0; i < kTestDataSize; i++) {
+        compareTestVectors(testData[i], expectedTestData[i]);
+    }
 }
 
 } // namespace tests::testgenerator
