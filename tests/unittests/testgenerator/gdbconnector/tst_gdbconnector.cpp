@@ -29,12 +29,7 @@
 #include <cstdint>
 #include <memory>
 #include <qobjectdefs.h>
-
-// GdbConnector includes
-#include <QProcess>
-
-// TODO: remove this include
-#include <stdexcept>
+#include <testgenerator/gdbconnector/gdbconnector.h>
 
 namespace tests::testgenerator {
 
@@ -59,145 +54,15 @@ private:
 
     TestVector *testData = NULL;
 };
+static auto compareTestVectors(const TestVector &actual, const TestVector &expected) -> void;
+static auto copyRawBytesIntoTestVector(const QByteArray &source, TestVector *const testData, unsigned int testDataSize)
+        -> void;
 
 void tst_gdbconnector::initTestCase()
 {
     const unsigned int testDataBytesNum = kTestDataSize * sizeof(TestVector);
     testData = static_cast<TestVector *>(malloc(testDataBytesNum));
     memset(testData, 0, testDataBytesNum);
-}
-
-namespace gdbconnector {
-
-// private:
-std::unique_ptr<QProcess> makeAndStartProgramWithArgs(
-        const QString &programPath, const QStringList &args, const QString &workingDir = QDir::currentPath())
-{
-    auto program = std::make_unique<QProcess>();
-    program->setProgram(programPath);
-    program->setArguments(args);
-    program->setWorkingDirectory(workingDir);
-    program->start();
-
-    return program;
-}
-
-QString getProgramOutput(const QString &programPath, const QStringList &args)
-{
-    const auto client = makeAndStartProgramWithArgs(programPath, args);
-    client->waitForFinished();
-    const auto output = QString(client->readAllStandardOutput());
-    client->close();
-
-    return output;
-}
-
-QString getOneBeforeLastLine(const QString &src, const QString &newlineCharacter = "\n")
-{
-    QString results;
-    const QStringList srcList = src.split(newlineCharacter);
-    if (srcList.length() >= 2) {
-        const int oneBeforeLast = srcList.length() - 2;
-        results = srcList.at(oneBeforeLast);
-    } else {
-        throw std::runtime_error("Cannot get one line before last because the size is lower than 2");
-    }
-
-    return results;
-}
-
-QString splitAndExtractSrecData(const QString &strings, const QString &delimeter = "\r\n")
-{
-    QString srecData;
-
-    const int checksumBytes = 2;
-    const std::vector<QString> srecHeaders = { "S3150000", "S30D00000100" };
-    const int srecHeaderLen = 12; // number of character (number of bytes / 2)
-
-    for (auto srecDataString : strings.split(delimeter)) {
-        const auto srecPrefixIt = std::find_if(
-                srecHeaders.begin(), srecHeaders.end(), [&srecDataString](const QString &prefix) -> bool { //
-                    return srecDataString.startsWith(prefix);
-                });
-        if (srecPrefixIt != srecHeaders.end()) {
-            srecDataString = srecDataString.left(srecDataString.size() - checksumBytes);
-            srecDataString = srecDataString.right(srecDataString.size() - srecHeaderLen);
-            srecData += srecDataString;
-        }
-    }
-
-    return srecData;
-}
-
-// public:
-std::unique_ptr<QProcess> makeAndStartGdbServer(
-        const QString &server, const QStringList &serverArgs, const QString &binaryUnderTestDir)
-{
-    auto gdbserver = makeAndStartProgramWithArgs(server, serverArgs, binaryUnderTestDir);
-    gdbserver->waitForStarted();
-
-    return gdbserver;
-}
-
-QString getGdbBatchScriptOutput(const QString &debuggerPath, const QString &scriptPath)
-{
-    return getProgramOutput(debuggerPath, { "-batch", "-x", scriptPath });
-}
-
-QByteArray string2byteArray(QString str)
-{
-    const int charsInByte = 2;
-    QByteArray array;
-
-    while (!str.isEmpty()) {
-        const QString hexStr = str.left(charsInByte);
-        str.remove(0, charsInByte);
-
-        bool ok = false;
-        const char byte = hexStr.toUShort(&ok, 16);
-        array.append(byte);
-    }
-
-    return array;
-}
-
-QByteArray getTestResults()
-{
-    const QString server = "gdbserver";
-    const QString serverNamePort = "host:1234";
-    const QString programToRun = "hostpartition";
-    const QString binaryLocalization = "/home/taste/example-projects/testharness/work/binaries";
-
-    std::unique_ptr<QProcess> gdbserver;
-    if (!server.isEmpty()) {
-        gdbserver = makeAndStartGdbServer(server, { serverNamePort, programToRun }, binaryLocalization);
-        gdbserver->waitForStarted();
-    }
-
-    const QString debugger = "gdb";
-    const QString script = "x86-linux-cpp.gdb";
-    const QString outStr = getGdbBatchScriptOutput(debugger, script);
-
-    if (gdbserver != nullptr && gdbserver->isOpen()) {
-        gdbserver->close();
-    }
-
-    const QString outQba = splitAndExtractSrecData(outStr);
-
-    const QByteArray qba = string2byteArray(outQba);
-
-    return qba;
-}
-
-} // namespace gdbconnector
-
-void compareTestVectors(const TestVector &actual, const TestVector &expected)
-{
-    QCOMPARE(actual.active, expected.active);
-    QCOMPARE(actual.temperature, expected.temperature);
-    QCOMPARE(actual.posX, expected.posX);
-    QCOMPARE(actual.posY, expected.posY);
-    QCOMPARE(actual.result, expected.result);
 }
 
 void tst_gdbconnector::testNominal()
@@ -210,17 +75,32 @@ void tst_gdbconnector::testNominal()
         { true, 2.3000, 4, 1, true },
     };
 
-    const QByteArray rawTestResults = gdbconnector::getTestResults();
+    const QString programToRun = "hostpartition";
+    const QByteArray rawTestResults =
+            GdbConnector::getTestResults("hostpartition", "/home/taste/example-projects/testharness/work/binaries");
 
-    // reconstruct results:
-    const TestVector *data = reinterpret_cast<const TestVector *>(rawTestResults.data());
-    for (int i = 0; i < static_cast<int>(kTestDataSize); i++) {
-        testData[i] = *data;
-        data++;
-    }
-
+    copyRawBytesIntoTestVector(rawTestResults, testData, kTestDataSize);
     for (unsigned int i = 0; i < kTestDataSize; i++) {
         compareTestVectors(testData[i], expectedTestData[i]);
+    }
+}
+
+static void compareTestVectors(const TestVector &actual, const TestVector &expected)
+{
+    QCOMPARE(actual.active, expected.active);
+    QCOMPARE(actual.temperature, expected.temperature);
+    QCOMPARE(actual.posX, expected.posX);
+    QCOMPARE(actual.posY, expected.posY);
+    QCOMPARE(actual.result, expected.result);
+}
+
+static auto copyRawBytesIntoTestVector(const QByteArray &source, TestVector *const testData, unsigned int testDataSize)
+        -> void
+{
+    const TestVector *data = reinterpret_cast<const TestVector *>(source.data());
+    for (int i = 0; i < static_cast<int>(testDataSize); i++) {
+        testData[i] = *data;
+        data++;
     }
 }
 

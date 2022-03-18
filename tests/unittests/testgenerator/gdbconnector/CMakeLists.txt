@@ -16,9 +16,10 @@ target_include_directories(${TEST_NAME}
 target_link_libraries(${TEST_NAME}
     PRIVATE     Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test
+                TestGenerator
                 CommonProjectWarnings
 )
 
 add_format_target(${TEST_NAME})
 
-configure_file(x86-linux-cpp.gdb x86-linux-cpp.gdb COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/src/libs/testgenerator/gdbconnector/scripts/x86-linux-cpp.gdb x86-linux-cpp.gdb COPYONLY)

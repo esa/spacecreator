@@ -3,7 +3,9 @@ project(TestGenerator VERSION 1.0.0 LANGUAGES CXX)
 add_library(TestGenerator STATIC)
 
 target_sources(TestGenerator
-    PRIVATE     testdrivergenerator/TestDriverGenerator.cpp
+    PRIVATE     gdbconnector/gdbconnector.cpp
+                gdbconnector/gdbconnector.h
+                testdrivergenerator/TestDriverGenerator.cpp
                 testdrivergenerator/TestDriverGenerator.h
                 testdrivergenerator/TestDriverGeneratorContext.cpp
                 testdrivergenerator/TestDriverGeneratorContext.h
