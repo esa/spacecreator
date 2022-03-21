@@ -23,11 +23,14 @@
 #include <QProcess>
 #include <memory>
 
+namespace testgenerator {
+
 class GdbConnector final
 {
 public:
-    static auto getTestResults(const QString &programToRun, const QString &binaryLocalization,
-            const QString &serverNamePort = "host:1234", const QString &server = "gdbserver") -> QByteArray;
+    static auto getRawTestResults(const QString &programToRun, const QString &binaryLocalization, const QString &script,
+            const QString &debugger = "gdb", const QString &serverNamePort = "host:1234",
+            const QString &server = "gdbserver") -> QByteArray;
 
 private:
     static auto makeAndStartGdbServer(const QString &server, const QStringList &serverArgs,
@@ -42,3 +45,5 @@ private:
     static auto splitAndExtractSrecData(const QString &strings, const QString &delimeter = "\r\n") -> QString;
     static auto string2byteArray(QString str) -> QByteArray;
 };
+
+} // namespace testgenerator

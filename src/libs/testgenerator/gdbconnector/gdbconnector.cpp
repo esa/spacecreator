@@ -19,8 +19,10 @@
 
 #include "gdbconnector.h"
 
-QByteArray GdbConnector::getTestResults(const QString &programToRun, const QString &binaryLocalization,
-        const QString &serverNamePort, const QString &server)
+namespace testgenerator {
+
+QByteArray GdbConnector::getRawTestResults(const QString &programToRun, const QString &binaryLocalization,
+        const QString &script, const QString &debugger, const QString &serverNamePort, const QString &server)
 {
     std::unique_ptr<QProcess> gdbserver;
     if (!server.isEmpty()) {
@@ -28,19 +30,15 @@ QByteArray GdbConnector::getTestResults(const QString &programToRun, const QStri
         gdbserver->waitForStarted();
     }
 
-    const QString debugger = "gdb";
-    const QString script = "x86-linux-cpp.gdb";
     const QString outStr = getGdbBatchScriptOutput(debugger, script);
 
     if (gdbserver != nullptr && gdbserver->isOpen()) {
         gdbserver->close();
     }
 
-    const QString outQba = splitAndExtractSrecData(outStr);
+    const QString srecData = splitAndExtractSrecData(outStr);
 
-    QByteArray qba = string2byteArray(outQba);
-
-    return qba;
+    return string2byteArray(srecData);
 }
 
 std::unique_ptr<QProcess> GdbConnector::makeAndStartGdbServer(
@@ -132,3 +130,5 @@ QByteArray GdbConnector::string2byteArray(QString str)
 
     return array;
 }
+
+} // namespace testgenerator

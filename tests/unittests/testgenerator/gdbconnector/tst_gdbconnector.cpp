@@ -31,6 +31,8 @@
 #include <qobjectdefs.h>
 #include <testgenerator/gdbconnector/gdbconnector.h>
 
+using testgenerator::GdbConnector;
+
 namespace tests::testgenerator {
 
 typedef struct {
@@ -51,8 +53,7 @@ private Q_SLOTS:
 
 private:
     const unsigned int kTestDataSize = 5;
-
-    TestVector *testData = NULL;
+    TestVector *testData = nullptr;
 };
 static auto compareTestVectors(const TestVector &actual, const TestVector &expected) -> void;
 static auto copyRawBytesIntoTestVector(const QByteArray &source, TestVector *const testData, unsigned int testDataSize)
@@ -76,8 +77,9 @@ void tst_gdbconnector::testNominal()
     };
 
     const QString programToRun = "hostpartition";
-    const QByteArray rawTestResults =
-            GdbConnector::getTestResults("hostpartition", "/home/taste/example-projects/testharness/work/binaries");
+    const QString binLocalization = "/home/taste/example-projects/testharness/work/binaries";
+    const QString script = "x86-linux-cpp.gdb";
+    const QByteArray rawTestResults = GdbConnector::getRawTestResults(programToRun, binLocalization, script);
 
     copyRawBytesIntoTestVector(rawTestResults, testData, kTestDataSize);
     for (unsigned int i = 0; i < kTestDataSize; i++) {
