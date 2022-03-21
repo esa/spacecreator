@@ -28,9 +28,10 @@ namespace testgenerator {
 class GdbConnector final
 {
 public:
-    static auto getRawTestResults(const QString &programToRun, const QString &binaryLocalization, const QString &script,
-            const QString &debugger = "gdb", const QString &serverNamePort = "host:1234",
-            const QString &server = "gdbserver") -> QByteArray;
+    static auto getRawTestResults(const QString &binaryUnderTestDir,
+            const QStringList &debuggerArgs = QStringList({ "-batch", "-x", "x86-linux-cpp.gdb" }),
+            const QStringList &serverArgs = QStringList({ "host:1234", "binaryUnderTest" }),
+            const QString &debugger = "gdb", const QString &server = "gdbserver") -> QByteArray;
 
 private:
     static auto makeAndStartGdbServer(const QString &server, const QStringList &serverArgs,
@@ -38,7 +39,6 @@ private:
     static auto makeAndStartProgramWithArgs(const QString &programPath, const QStringList &args,
             const QString &workingDir = QDir::currentPath()) -> std::unique_ptr<QProcess>;
 
-    static auto getGdbBatchScriptOutput(const QString &debuggerPath, const QString &scriptPath) -> QString;
     static auto getOneBeforeLastLine(const QString &src, const QString &newlineCharacter = "\n") -> QString;
     static auto getProgramOutput(const QString &programPath, const QStringList &args) -> QString;
 

@@ -79,7 +79,8 @@ void tst_gdbconnector::testNominal()
     const QString programToRun = "hostpartition";
     const QString binLocalization = "/home/taste/example-projects/testharness/work/binaries";
     const QString script = "x86-linux-cpp.gdb";
-    const QByteArray rawTestResults = GdbConnector::getRawTestResults(programToRun, binLocalization, script);
+    const QByteArray rawTestResults = GdbConnector::getRawTestResults(
+            binLocalization, { "-batch", "-x", "x86-linux-cpp.gdb" }, { "host:1234", "hostpartition" });
 
     copyRawBytesIntoTestVector(rawTestResults, testData, kTestDataSize);
     for (unsigned int i = 0; i < kTestDataSize; i++) {

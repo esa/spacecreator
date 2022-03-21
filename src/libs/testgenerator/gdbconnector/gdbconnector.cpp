@@ -21,16 +21,16 @@
 
 namespace testgenerator {
 
-QByteArray GdbConnector::getRawTestResults(const QString &programToRun, const QString &binaryLocalization,
-        const QString &script, const QString &debugger, const QString &serverNamePort, const QString &server)
+QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, const QStringList &debuggerArgs,
+        const QStringList &serverArgs, const QString &debugger, const QString &server)
 {
     std::unique_ptr<QProcess> gdbserver;
     if (!server.isEmpty()) {
-        gdbserver = makeAndStartGdbServer(server, { serverNamePort, programToRun }, binaryLocalization);
+        gdbserver = makeAndStartGdbServer(server, serverArgs, binaryUnderTestDir);
         gdbserver->waitForStarted();
     }
 
-    const QString outStr = getGdbBatchScriptOutput(debugger, script);
+    const QString outStr = getProgramOutput(debugger, debuggerArgs);
 
     if (gdbserver != nullptr && gdbserver->isOpen()) {
         gdbserver->close();
@@ -62,11 +62,6 @@ std::unique_ptr<QProcess> GdbConnector::makeAndStartProgramWithArgs(
     return program;
 }
 
-QString GdbConnector::getGdbBatchScriptOutput(const QString &debuggerPath, const QString &scriptPath)
-{
-    return getProgramOutput(debuggerPath, { "-batch", "-x", scriptPath });
-}
-
 QString GdbConnector::getOneBeforeLastLine(const QString &src, const QString &newlineCharacter)
 {
     QString results;
@@ -91,6 +86,7 @@ QString GdbConnector::getProgramOutput(const QString &programPath, const QString
     return output;
 }
 
+// TODO: this extraction function shall be supplied as lambda expression with constant default
 QString GdbConnector::splitAndExtractSrecData(const QString &strings, const QString &delimeter)
 {
     QString srecData;
