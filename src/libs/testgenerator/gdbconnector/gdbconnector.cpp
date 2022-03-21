@@ -19,47 +19,29 @@
 
 #include "gdbconnector.h"
 
+#include "process.h"
+
+#include <stdexcept>
+#include <utility>
+
 namespace testgenerator {
 
 QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, const QStringList &clientArgs,
         const QStringList &serverArgs, const QString &client, const QString &server)
 {
-    std::unique_ptr<QProcess> gdbserver;
     if (!server.isEmpty()) {
-        gdbserver = makeAndStartGdbServer(server, serverArgs, binaryUnderTestDir);
-        gdbserver->waitForStarted();
+        Process gdbserver(server, serverArgs, binaryUnderTestDir);
+        Process gdbclient(client, clientArgs, QDir::currentPath());
+
+        QProcess *const clientProcess = gdbclient.get();
+        clientProcess->waitForFinished();
+        const QString outStr = clientProcess->readAllStandardOutput();
+        const QString srecData = splitAndExtractSrecData(outStr);
+
+        return string2byteArray(srecData);
+    } else {
+        throw std::invalid_argument("debugging server program name shall not be empty");
     }
-
-    const QString outStr = getProgramOutput(client, clientArgs);
-
-    if (gdbserver != nullptr && gdbserver->isOpen()) {
-        gdbserver->close();
-    }
-
-    const QString srecData = splitAndExtractSrecData(outStr);
-
-    return string2byteArray(srecData);
-}
-
-std::unique_ptr<QProcess> GdbConnector::makeAndStartGdbServer(
-        const QString &server, const QStringList &serverArgs, const QString &binaryUnderTestDir)
-{
-    auto gdbserver = makeAndStartProgramWithArgs(server, serverArgs, binaryUnderTestDir);
-    gdbserver->waitForStarted();
-
-    return gdbserver;
-}
-
-std::unique_ptr<QProcess> GdbConnector::makeAndStartProgramWithArgs(
-        const QString &programPath, const QStringList &args, const QString &workingDir)
-{
-    auto program = std::make_unique<QProcess>();
-    program->setProgram(programPath);
-    program->setArguments(args);
-    program->setWorkingDirectory(workingDir);
-    program->start();
-
-    return program;
 }
 
 QString GdbConnector::getOneBeforeLastLine(const QString &src, const QString &newlineCharacter)
@@ -74,16 +56,6 @@ QString GdbConnector::getOneBeforeLastLine(const QString &src, const QString &ne
     }
 
     return results;
-}
-
-QString GdbConnector::getProgramOutput(const QString &programPath, const QStringList &args)
-{
-    const auto client = makeAndStartProgramWithArgs(programPath, args);
-    client->waitForFinished();
-    auto output = QString(client->readAllStandardOutput());
-    client->close();
-
-    return output;
 }
 
 // TODO: this extraction function shall be supplied as lambda expression with constant default

@@ -5,6 +5,8 @@ add_library(TestGenerator STATIC)
 target_sources(TestGenerator
     PRIVATE     gdbconnector/gdbconnector.cpp
                 gdbconnector/gdbconnector.h
+                gdbconnector/process.cpp
+                gdbconnector/process.h
                 testdrivergenerator/TestDriverGenerator.cpp
                 testdrivergenerator/TestDriverGenerator.h
                 testdrivergenerator/TestDriverGeneratorContext.cpp

@@ -26,14 +26,14 @@
 namespace testgenerator {
 
 /**
- * @brief  wrapper for running client and server with specified arguments
+ * @brief  Wrapper for running client and server with specified arguments ant retrieving specific data from server
  *
  */
 class GdbConnector final
 {
 public:
     /**
-     * @brief Get the Raw Test Results object
+     * @brief Get raw test results (as an array of bytes)
      *
      * @param binaryUnderTestDir directory where binary under test is localized (binary compiled with debug symbols)
      * @param clientArgs         arguments for debugger client
@@ -49,13 +49,7 @@ public:
             const QString &client = "gdb", const QString &server = "gdbserver") -> QByteArray;
 
 private:
-    static auto makeAndStartGdbServer(const QString &server, const QStringList &serverArgs,
-            const QString &binaryUnderTestDir) -> std::unique_ptr<QProcess>;
-    static auto makeAndStartProgramWithArgs(const QString &programPath, const QStringList &args,
-            const QString &workingDir = QDir::currentPath()) -> std::unique_ptr<QProcess>;
-
     static auto getOneBeforeLastLine(const QString &src, const QString &newlineCharacter = "\n") -> QString;
-    static auto getProgramOutput(const QString &programPath, const QStringList &args) -> QString;
 
     static auto splitAndExtractSrecData(const QString &strings, const QString &delimeter = "\r\n") -> QString;
     static auto string2byteArray(QString str) -> QByteArray;
