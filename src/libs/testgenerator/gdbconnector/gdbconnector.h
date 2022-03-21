@@ -25,13 +25,28 @@
 
 namespace testgenerator {
 
+/**
+ * @brief  wrapper for running client and server with specified arguments
+ *
+ */
 class GdbConnector final
 {
 public:
+    /**
+     * @brief Get the Raw Test Results object
+     *
+     * @param binaryUnderTestDir directory where binary under test is localized (binary compiled with debug symbols)
+     * @param clientArgs         arguments for debugger client
+     * @param serverArgs         arguments for debugger server
+     * @param client             name of debugger client
+     * @param server             name of debugger server
+     *
+     * @return contents of TestData array in binary form
+     */
     static auto getRawTestResults(const QString &binaryUnderTestDir,
-            const QStringList &debuggerArgs = QStringList({ "-batch", "-x", "x86-linux-cpp.gdb" }),
+            const QStringList &clientArgs = QStringList({ "-batch", "-x", "x86-linux-cpp.gdb" }),
             const QStringList &serverArgs = QStringList({ "host:1234", "binaryUnderTest" }),
-            const QString &debugger = "gdb", const QString &server = "gdbserver") -> QByteArray;
+            const QString &client = "gdb", const QString &server = "gdbserver") -> QByteArray;
 
 private:
     static auto makeAndStartGdbServer(const QString &server, const QStringList &serverArgs,

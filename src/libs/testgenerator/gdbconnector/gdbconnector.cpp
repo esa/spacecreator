@@ -21,8 +21,8 @@
 
 namespace testgenerator {
 
-QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, const QStringList &debuggerArgs,
-        const QStringList &serverArgs, const QString &debugger, const QString &server)
+QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, const QStringList &clientArgs,
+        const QStringList &serverArgs, const QString &client, const QString &server)
 {
     std::unique_ptr<QProcess> gdbserver;
     if (!server.isEmpty()) {
@@ -30,7 +30,7 @@ QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, co
         gdbserver->waitForStarted();
     }
 
-    const QString outStr = getProgramOutput(debugger, debuggerArgs);
+    const QString outStr = getProgramOutput(client, clientArgs);
 
     if (gdbserver != nullptr && gdbserver->isOpen()) {
         gdbserver->close();
