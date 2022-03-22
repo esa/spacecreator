@@ -229,8 +229,10 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
         nestedUtype.addField(Declaration(nestedDataType.value(), componentName));
 
         VariableRef dst("dst");
+        dst.appendElement("data");
         dst.appendElement(componentName);
         VariableRef src("src");
+        src.appendElement("data");
         src.appendElement(componentName);
         const QString inlineName = getAssignValueInlineNameForNestedType(utypeName, componentName);
         QList<VariableRef> inlineArguments;
@@ -367,7 +369,7 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
     inlineArguments.append(dst);
     inlineArguments.append(src);
 
-    const QString inlineName = utypeName + assignValueInlineSuffix;
+    const QString inlineName = utypeName + "_elem" + assignValueInlineSuffix;
 
     loopSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineName, inlineArguments)));
 

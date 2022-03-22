@@ -83,7 +83,7 @@ TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &output
     }
 
     m_dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
-    m_dynPropConfig->init(QLatin1String("default_attributes.xml"));
+    m_dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
 }
 
 bool TmcConverter::convert()
@@ -238,7 +238,7 @@ bool TmcConverter::convertStopConditions(const QList<QFileInfo> &allSdlFiles)
         const QFileInfo output = outputFilepath(base.toLower() + ".pml");
 
         SdlToPromelaConverter sdl2Promela;
-        if (sdl2Promela.convertStopCondition(input, output, allSdlFiles)) {
+        if (!sdl2Promela.convertStopCondition(input, output, allSdlFiles)) {
             return false;
         }
     }
@@ -252,7 +252,7 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
     Options options;
 
     options.add(IvOptions::inputFilepath, inputFilepath);
-    options.add(IvOptions::configFilepath, IvOptions::defaultConfigFilename);
+    options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
     options.add(PromelaOptions::outputFilepath, outputFilepath);
 
     for (const QString &function : modelFunctions) {
