@@ -265,6 +265,11 @@ void PatcherFunctionsExporter::generateCommonLibraryHeader(QTextStream &stream)
            << "#include \"asn1crt.h\"\n"
            << '\n'
            << "asn1SccUint calculateLengthInBytes(BitStream* pStartBitStream, BitStream* pEndBitStream);\n"
+           << '\n'
+           << "asn1SccUint calculateCrc8(uint8_t* data, long size);\n"
+           << "asn1SccUint calculateCrc16(uint8_t* data, long size);\n"
+           << "asn1SccUint calculateChecksum(uint8_t* data, long size);\n"
+           << "asn1SccUint calculateChecksumLongitundinal(uint8_t* data, long size);\n"
            ;
     // clang-format on
 }
@@ -279,6 +284,26 @@ void PatcherFunctionsExporter::generateCommonLibraryBody(QTextStream &stream)
            << "\tasn1SccUint endPosInBits = pEndBitStream->currentByte * 8 + pStartBitStream->currentBit;\n"
            << '\n'
            << "\treturn (endPosInBits - startPosInBits) / 8;\n"
+           << "}\n"
+           << '\n'
+           << "asn1SccUint calculateCrc8(uint8_t* data, long size)\n"
+           << "{\n"
+           << "\treturn 0;\n"
+           << "}\n"
+           << '\n'
+           << "asn1SccUint calculateCrc16(uint8_t* data, long size)\n"
+           << "{\n"
+           << "\treturn 0;\n"
+           << "}\n"
+           << '\n'
+           << "asn1SccUint calculateChecksum(uint8_t* data, long size)\n"
+           << "{\n"
+           << "\treturn 0;\n"
+           << "}\n"
+           << '\n'
+           << "asn1SccUint calculateChecksumLongitundinal(uint8_t* data, long size)\n"
+           << "{\n"
+           << "\treturn 0;\n"
            << "}\n"
            ;
     // clang-format on
