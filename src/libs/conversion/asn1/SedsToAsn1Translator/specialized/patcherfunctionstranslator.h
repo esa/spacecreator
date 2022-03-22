@@ -36,10 +36,16 @@ public:
     static auto translate(const seds::model::ContainerDataType &sedsType) -> std::vector<Asn1Acn::PatcherFunction>;
 
 private:
-    static auto buildErrorControlEntryPatcherFunction(const seds::model::ErrorControlEntry &errorControlEntry)
+    static auto buildErrorControlEntryFunction(const seds::model::ErrorControlEntry &errorControlEntry)
             -> Asn1Acn::PatcherFunction;
-    static auto buildLengthEntryPatcherFunction(const seds::model::LengthEntry &lengthEntry)
-            -> Asn1Acn::PatcherFunction;
+    static auto buildLengthEntryFunction(const seds::model::LengthEntry &lengthEntry) -> Asn1Acn::PatcherFunction;
+
+    static auto buildErrorControlEntryEncodingFunction(const seds::model::ErrorControlEntry &errorControlEntry)
+            -> QString;
+    static auto buildErrorControlEntryDecodingValidator(const seds::model::ErrorControlEntry &errorControlEntry)
+            -> QString;
+    static auto buildLengthEntryEncodingFunction(const seds::model::LengthEntry &lengthEntry) -> QString;
+    static auto buildLengthEntryDecodingValidator(const seds::model::LengthEntry &lengthEntry) -> QString;
 };
 
 } // namespace conversion::asn1::translator

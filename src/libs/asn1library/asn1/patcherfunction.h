@@ -30,7 +30,7 @@ namespace Asn1Acn {
 
 struct PatcherFunction final {
     QString encodingFunction;
-    QString decodingFunction;
+    QString decodingValidator;
 };
 
 }

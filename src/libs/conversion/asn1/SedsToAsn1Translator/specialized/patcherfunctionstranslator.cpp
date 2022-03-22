@@ -32,11 +32,11 @@ std::vector<Asn1Acn::PatcherFunction> PatcherFunctionsTranslator::translate(
         // clang-format off
         std::visit(overloaded {
             [&](const seds::model::ErrorControlEntry &errorControlEntry) {
-                auto patcherFunction = buildErrorControlEntryPatcherFunction(errorControlEntry);
+                auto patcherFunction = buildErrorControlEntryFunction(errorControlEntry);
                 result.push_back(std::move(patcherFunction));
             },
             [&](const seds::model::LengthEntry &lengthEntry) {
-                auto patcherFunction = buildLengthEntryPatcherFunction(lengthEntry);
+                auto patcherFunction = buildLengthEntryFunction(lengthEntry);
                 result.push_back(std::move(patcherFunction));
             },
             [&](const auto &e) {
@@ -49,18 +49,48 @@ std::vector<Asn1Acn::PatcherFunction> PatcherFunctionsTranslator::translate(
     return result;
 }
 
-Asn1Acn::PatcherFunction PatcherFunctionsTranslator::buildErrorControlEntryPatcherFunction(
+Asn1Acn::PatcherFunction PatcherFunctionsTranslator::buildErrorControlEntryFunction(
+        const seds::model::ErrorControlEntry &errorControlEntry)
+{
+    auto encodingFunction = buildErrorControlEntryEncodingFunction(errorControlEntry);
+    auto decodingValidator = buildErrorControlEntryDecodingValidator(errorControlEntry);
+
+    return { std::move(encodingFunction), std::move(decodingValidator) };
+}
+
+Asn1Acn::PatcherFunction PatcherFunctionsTranslator::buildLengthEntryFunction(
+        const seds::model::LengthEntry &lengthEntry)
+{
+    auto encodingFunction = buildLengthEntryEncodingFunction(lengthEntry);
+    auto decodingValidator = buildLengthEntryDecodingValidator(lengthEntry);
+
+    return { std::move(encodingFunction), std::move(decodingValidator) };
+}
+
+QString PatcherFunctionsTranslator::buildErrorControlEntryEncodingFunction(
         const seds::model::ErrorControlEntry &errorControlEntry)
 {
     Q_UNUSED(errorControlEntry);
-    return { "encodeError", "decodeError" };
+    return "";
 }
 
-Asn1Acn::PatcherFunction PatcherFunctionsTranslator::buildLengthEntryPatcherFunction(
-        const seds::model::LengthEntry &lengthEntry)
+QString PatcherFunctionsTranslator::buildErrorControlEntryDecodingValidator(
+        const seds::model::ErrorControlEntry &errorControlEntry)
+{
+    Q_UNUSED(errorControlEntry);
+    return "";
+}
+
+QString PatcherFunctionsTranslator::buildLengthEntryEncodingFunction(const seds::model::LengthEntry &lengthEntry)
 {
     Q_UNUSED(lengthEntry);
-    return { "encodeLength", "decodeLength" };
+    return "";
+}
+
+QString PatcherFunctionsTranslator::buildLengthEntryDecodingValidator(const seds::model::LengthEntry &lengthEntry)
+{
+    Q_UNUSED(lengthEntry);
+    return "";
 }
 
 } // namespace conversion::asn1::translator

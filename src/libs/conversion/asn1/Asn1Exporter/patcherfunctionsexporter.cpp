@@ -168,18 +168,22 @@ void PatcherFunctionsExporter::initializePatcherFunctionsBody(QTextStream &strea
 
 void PatcherFunctionsExporter::generateEncodingFunctionHeader(const Sequence *sequence, QTextStream &stream)
 {
-    stream << "\n";
+    stream << '\n';
     generateEncodingFunctionDeclaration(sequence, stream);
     stream << ";\n";
 }
 
 void PatcherFunctionsExporter::generateEncodingFunctionBody(const Sequence *sequence, QTextStream &stream)
 {
-    stream << "\n";
+    stream << '\n';
     generateEncodingFunctionDeclaration(sequence, stream);
-    stream << "\n"
+    stream << '\n'
            << "{\n"
-           << "\tasn1SccUint lengthInBytes = calculateLenghtInBytes(pStartBitStream, pEndBitStream);\n";
+           << "\tasn1SccUint lengthInBytes = calculateLengthInBytes(pStartBitStream, pEndBitStream);\n";
+
+    for (const auto &patcherFunction : sequence->patcherFunctions()) {
+        stream << "\n\t" << patcherFunction.encodingFunction;
+    }
 
     stream << "}\n";
 }
@@ -207,18 +211,22 @@ void PatcherFunctionsExporter::generateEncodingFunctionDeclaration(const Sequenc
 
 void PatcherFunctionsExporter::generateDecodingValidatorHeader(const Sequence *sequence, QTextStream &stream)
 {
-    stream << "\n";
+    stream << '\n';
     generateDecodingValidatorDeclaration(sequence, stream);
     stream << ";\n";
 }
 
 void PatcherFunctionsExporter::generateDecodingValidatorBody(const Sequence *sequence, QTextStream &stream)
 {
-    stream << "\n";
+    stream << '\n';
     generateDecodingValidatorDeclaration(sequence, stream);
-    stream << "\n"
-           << "{\n"
-           << "\treturn true;"
+    stream << '\n' << "{\n";
+
+    for (const auto &patcherFunction : sequence->patcherFunctions()) {
+        stream << "\n\t" << patcherFunction.decodingValidator;
+    }
+
+    stream << "\n\treturn true;\n"
            << "}\n";
 }
 
@@ -259,7 +267,7 @@ void PatcherFunctionsExporter::generateCommonLibraryHeader(QTextStream &stream)
     // clang-format off
     stream << "#pragma once\n\n"
            << "#include \"asn1crt.h\"\n"
-           << "\n"
+           << '\n'
            << "asn1SccUint calculateLengthInBytes(BitStream* pStartBitStream, BitStream* pEndBitStream);\n"
            ;
     // clang-format on
@@ -273,7 +281,7 @@ void PatcherFunctionsExporter::generateCommonLibraryBody(QTextStream &stream)
            << "{\n"
            << "\tasn1SccUint startPosInBits = pStartBitStream->currentByte * 8 + pStartBitStream->currentBit;\n"
            << "\tasn1SccUint endPosInBits = pEndBitStream->currentByte * 8 + pStartBitStream->currentBit;\n"
-           << "\n"
+           << '\n'
            << "\treturn (endPosInBits - startPosInBits) / 8;\n"
            << "}\n"
            ;
