@@ -29,6 +29,7 @@ $DIFF COM-N7SPACE-LENGTHENTRY.asn ../resources/test_length_entry_asn.output \
     && gcc -o lengthentry \
         test_length_entry_main.c \
         COM-N7SPACE-LENGTHENTRY.c \
+        patchingCommonLibrary.c \
         com-n7space-lengthentry-postencoding.c \
         asn1crt.c \
         asn1crt_encoding_acn.c \

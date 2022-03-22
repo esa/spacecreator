@@ -112,7 +112,8 @@ const Asn1Acn::Types::Sequence::Components &ContainerEntriesScope::fetchTrailerC
     return m_scope.at(sedsTypeName).trailerEntries->components();
 }
 
-const std::vector<QString> &ContainerEntriesScope::fetchPatcherFunctions(const QString &sedsTypeName) const
+const std::vector<Asn1Acn::PatcherFunction> &ContainerEntriesScope::fetchPatcherFunctions(
+        const QString &sedsTypeName) const
 {
     assertPresent(sedsTypeName);
     return m_scope.at(sedsTypeName).patcherFunctions;

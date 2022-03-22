@@ -153,7 +153,7 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 
         const auto &patcherFunctions = m_containersScope.fetchPatcherFunctions(sedsTypeName);
         for (const auto &patcherFunction : patcherFunctions) {
-            type->addPatchingFunction(patcherFunction);
+            type->addPatcherFunction(patcherFunction);
         }
 
         if (!patcherFunctions.empty()) {

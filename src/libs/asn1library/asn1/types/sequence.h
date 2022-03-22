@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2017-2021 N7 Space sp. z o. o.
+** Copyright (C) 2017-2022 N7 Space sp. z o. o.
 ** Contact: http://n7space.com
 **
 ** This file is part of ASN.1/ACN Library.
@@ -24,6 +24,7 @@
 ****************************************************************************/
 #pragma once
 
+#include "../patcherfunction.h"
 #include "../sequencecomponent.h"
 #include "acnparameterizablecomposite.h"
 #include "type.h"
@@ -32,6 +33,7 @@
 #include <optional>
 
 namespace Asn1Acn {
+
 namespace Types {
 
 class Sequence : public Type, public AcnParameterizableCollection<SequenceComponent>
@@ -59,13 +61,13 @@ public:
     std::optional<QString> postDecodingValidator() const;
     void setPostDecodingValidator(QString postDecodingValidator);
 
-    std::vector<QString> patchingFunctions() const;
-    void addPatchingFunction(QString patchingFunction);
+    std::vector<Asn1Acn::PatcherFunction> patcherFunctions() const;
+    void addPatcherFunction(Asn1Acn::PatcherFunction patcherFunction);
 
 private:
     std::optional<QString> m_postEncodingFunction;
     std::optional<QString> m_postDecodingValidator;
-    std::vector<QString> m_patchingFunctions;
+    std::vector<PatcherFunction> m_patcherFunctions;
 };
 
 }

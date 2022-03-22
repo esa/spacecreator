@@ -23,9 +23,10 @@
 
 namespace conversion::asn1::translator {
 
-std::vector<QString> PatcherFunctionsTranslator::translate(const seds::model::ContainerDataType &sedsType)
+std::vector<Asn1Acn::PatcherFunction> PatcherFunctionsTranslator::translate(
+        const seds::model::ContainerDataType &sedsType)
 {
-    std::vector<QString> result;
+    std::vector<Asn1Acn::PatcherFunction> result;
 
     for (const auto &entry : sedsType.entries()) {
         // clang-format off
@@ -48,17 +49,18 @@ std::vector<QString> PatcherFunctionsTranslator::translate(const seds::model::Co
     return result;
 }
 
-QString PatcherFunctionsTranslator::buildErrorControlEntryPatcherFunction(
+Asn1Acn::PatcherFunction PatcherFunctionsTranslator::buildErrorControlEntryPatcherFunction(
         const seds::model::ErrorControlEntry &errorControlEntry)
 {
     Q_UNUSED(errorControlEntry);
-    return "ERROR CONTROL ENTRY";
+    return { "encodeError", "decodeError" };
 }
 
-QString PatcherFunctionsTranslator::buildLengthEntryPatcherFunction(const seds::model::LengthEntry &lengthEntry)
+Asn1Acn::PatcherFunction PatcherFunctionsTranslator::buildLengthEntryPatcherFunction(
+        const seds::model::LengthEntry &lengthEntry)
 {
     Q_UNUSED(lengthEntry);
-    return "LENGTH ENTRY";
+    return { "encodeLength", "decodeLength" };
 }
 
 } // namespace conversion::asn1::translator

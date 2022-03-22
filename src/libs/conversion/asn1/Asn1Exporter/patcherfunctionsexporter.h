@@ -40,6 +40,15 @@ private:
     static auto generatePatcherFunctions(const Asn1Acn::File *asn1File,
             const std::vector<const Asn1Acn::Types::Sequence *> sequencesToPatch, QTextStream &headerStream,
             QTextStream &bodyStream) -> void;
+
+    static auto exportMappingFunctionsModule(
+            const std::vector<QString> &patcherFunctionsFileNames, const Options &options) -> void;
+
+    static auto exportCommonLibrary(const Options &options) -> void;
+    static auto exportCommonLibraryHeader(const Options &options) -> void;
+    static auto exportCommonLibraryBody(const Options &options) -> void;
+
+private:
     static auto initializePatcherFunctionsHeader(QTextStream &stream, const Asn1Acn::File *asn1File) -> void;
     static auto initializePatcherFunctionsBody(QTextStream &stream, const Asn1Acn::File *asn1File) -> void;
 
@@ -53,17 +62,13 @@ private:
     static auto generateDecodingValidatorDeclaration(const Asn1Acn::Types::Sequence *sequence, QTextStream &stream)
             -> void;
 
-    static auto exportMappingFunctionsModule(
-            const std::vector<QString> &patcherFunctionsFileNames, const Options &options) -> void;
     static auto generateMappingFunctionsModule(
             const std::vector<QString> &patcherFunctionsFileNames, QTextStream &stream) -> void;
 
-    static auto exportCommonLibrary(const Options &options) -> void;
-    static auto exportCommonLibraryHeader(const Options &options) -> void;
-    static auto exportCommonLibraryBody(const Options &options) -> void;
     static auto generateCommonLibraryHeader(QTextStream &stream) -> void;
     static auto generateCommonLibraryBody(QTextStream &stream) -> void;
 
+private:
     static auto collectSequencesToPatch(const Asn1Acn::File *asn1File) -> std::vector<const Asn1Acn::Types::Sequence *>;
 
     static auto writeAndCommit(QSaveFile &outputFile, const QString &data) -> void;

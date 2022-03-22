@@ -20,6 +20,7 @@
 #pragma once
 
 #include <QString>
+#include <asn1library/asn1/patcherfunction.h>
 #include <seds/SedsModel/types/containerdatatype.h>
 #include <seds/SedsModel/types/entries/entrytype.h>
 #include <vector>
@@ -32,12 +33,13 @@ public:
     PatcherFunctionsTranslator() = delete;
 
 public:
-    static auto translate(const seds::model::ContainerDataType &sedsType) -> std::vector<QString>;
+    static auto translate(const seds::model::ContainerDataType &sedsType) -> std::vector<Asn1Acn::PatcherFunction>;
 
 private:
     static auto buildErrorControlEntryPatcherFunction(const seds::model::ErrorControlEntry &errorControlEntry)
-            -> QString;
-    static auto buildLengthEntryPatcherFunction(const seds::model::LengthEntry &lengthEntry) -> QString;
+            -> Asn1Acn::PatcherFunction;
+    static auto buildLengthEntryPatcherFunction(const seds::model::LengthEntry &lengthEntry)
+            -> Asn1Acn::PatcherFunction;
 };
 
 } // namespace conversion::asn1::translator

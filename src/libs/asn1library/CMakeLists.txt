@@ -65,6 +65,7 @@ target_sources(${LIB_NAME} PRIVATE
     asn1/constraints/rangelistingvisitor.h
     asn1/constraints/sizeconstraint.h
     asn1/constraints/withconstraints.h
+    asn1/patcherfunction.h
     asn1/types/acnparameterizablecomposite.h
     asn1/types/asciistringacnparameters.cpp
     asn1/types/asciistringacnparameters.h

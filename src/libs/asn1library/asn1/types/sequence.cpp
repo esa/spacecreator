@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2017-2021 N7 Space sp. z o. o.
+** Copyright (C) 2017-2022 N7 Space sp. z o. o.
 ** Contact: http://n7space.com
 **
 ** This file is part of ASN.1/ACN Library.
@@ -65,12 +65,12 @@ void Sequence::setPostDecodingValidator(QString postDecodingValidator)
     m_postDecodingValidator = std::move(postDecodingValidator);
 }
 
-std::vector<QString> Sequence::patchingFunctions() const
+std::vector<Asn1Acn::PatcherFunction> Sequence::patcherFunctions() const
 {
-    return m_patchingFunctions;
+    return m_patcherFunctions;
 }
 
-void Sequence::addPatchingFunction(QString patchingFunction)
+void Sequence::addPatcherFunction(Asn1Acn::PatcherFunction patcherFunctions)
 {
-    m_patchingFunctions.push_back(std::move(patchingFunction));
+    m_patcherFunctions.push_back(std::move(patcherFunctions));
 }
