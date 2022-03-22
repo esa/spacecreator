@@ -3,24 +3,24 @@ project(SedsToAsn1Translator VERSION 1.0.0 LANGUAGES CXX)
 set(SOURCES     containerentriesscope.cpp
                 datatypesdependencyresolver.cpp
                 packagesdependencyresolver.cpp
+                patcherfunctionsgenerator.cpp
                 translator.cpp
                 specialized/containerconstrainttranslatorvisitor.cpp
                 specialized/datatypetranslatorvisitor.cpp
                 specialized/descriptiontranslator.cpp
                 specialized/dimensiontranslator.cpp
                 specialized/entrytranslatorvisitor.cpp
-                specialized/patcherfunctionstranslator.cpp
                 specialized/rangetranslatorvisitor.cpp)
 set(INCLUDES    containerentriesscope.h
                 datatypesdependencyresolver.h
                 packagesdependencyresolver.h
+                patcherfunctionsgenerator.h
                 translator.h
                 specialized/containerconstrainttranslatorvisitor.h
                 specialized/datatypetranslatorvisitor.h
                 specialized/descriptiontranslator.h
                 specialized/dimensiontranslator.h
                 specialized/entrytranslatorvisitor.h
-                specialized/patcherfunctionstranslator.h
                 specialized/rangetranslatorvisitor.h
                 specialized/sizetranslatorvisitor.h)
 

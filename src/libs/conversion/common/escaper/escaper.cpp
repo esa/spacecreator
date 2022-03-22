@@ -101,9 +101,18 @@ QString Escaper::escapePromelaIV(QString name)
     return name;
 }
 
-QString Escaper::escapePatcherFunctionName(QString name)
+QString Escaper::escapeCName(QString name)
 {
     escapeName(name, '_');
+
+    return name;
+}
+
+QString Escaper::escapeCSequenceName(QString name)
+{
+    escapeName(name, '_');
+
+    name[0] = name[0].toUpper();
 
     return name;
 }

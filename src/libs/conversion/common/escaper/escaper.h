@@ -108,13 +108,22 @@ public:
     static auto escapePromelaIV(QString name) -> QString;
 
     /**
-     * @brief   Convert the input name to an id acceptable as a patcher function name
+     * @brief   Convert the input name to an id acceptable in the C code
      *
      * @param   name    input name
      *
-     * @returns Patcher function name
+     * @returns Escaped name
      */
-    static auto escapePatcherFunctionName(QString name) -> QString;
+    static auto escapeCName(QString name) -> QString;
+
+    /**
+     * @brief   Convert the input name to an id for ASN.1 sequence in the C code
+     *
+     * @param   name    input name
+     *
+     * @returns Escaped name
+     */
+    static auto escapeCSequenceName(QString name) -> QString;
 
 private:
     static auto escapeName(QString &name, const QChar &delimeter) -> void;

@@ -19,8 +19,8 @@
 
 #include "containerentriesscope.h"
 
+#include "patcherfunctionsgenerator.h"
 #include "specialized/entrytranslatorvisitor.h"
-#include "specialized/patcherfunctionstranslator.h"
 
 #include <conversion/common/translation/exceptions.h>
 
@@ -82,7 +82,8 @@ void ContainerEntriesScope::addContainer(const ContainerDataType &sedsType)
         }
     }
 
-    auto patcherFunctions = PatcherFunctionsTranslator::translate(sedsType);
+    PatcherFunctionsGenerator patcherFunctionsGenerator(m_sedsPackage, m_sedsPackages);
+    auto patcherFunctions = patcherFunctionsGenerator.generate(sedsType);
 
     if (sedsType.baseType()) {
         const auto &sedsBaseTypeName = sedsType.baseType()->nameStr();

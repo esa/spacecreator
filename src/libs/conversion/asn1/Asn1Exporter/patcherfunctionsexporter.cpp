@@ -194,10 +194,8 @@ void PatcherFunctionsExporter::generateEncodingFunctionDeclaration(const Sequenc
         return;
     }
 
-    auto name = sequence->postEncodingFunction().value();
-    name.replace('-', '_');
-    auto sequenceName = sequence->identifier();
-    sequenceName.replace('-', '_');
+    auto name = Escaper::escapeCName(sequence->postEncodingFunction().value());
+    auto sequenceName = Escaper::escapeCName(sequence->identifier());
 
     // clang-format off
     stream << "void " << name << "("
@@ -236,10 +234,8 @@ void PatcherFunctionsExporter::generateDecodingValidatorDeclaration(const Sequen
         return;
     }
 
-    auto name = sequence->postDecodingValidator().value();
-    name.replace('-', '_');
-    auto sequenceName = sequence->identifier();
-    sequenceName.replace('-', '_');
+    auto name = Escaper::escapeCName(sequence->postDecodingValidator().value());
+    auto sequenceName = Escaper::escapeCName(sequence->identifier());
 
     // clang-format off
     stream << "\nflag " << name << "("
