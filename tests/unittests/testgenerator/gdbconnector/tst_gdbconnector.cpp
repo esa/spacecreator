@@ -28,6 +28,7 @@
 #include <cstdarg>
 #include <cstdint>
 #include <memory>
+#include <qglobal.h>
 #include <qobjectdefs.h>
 #include <testgenerator/gdbconnector/gdbconnector.h>
 
@@ -76,7 +77,7 @@ void tst_gdbconnector::testNominal()
         { true, 2.3000, 4, 1, true },
     };
 
-    const QString binLocalization = "/home/taste/example-projects/testharness/work/binaries";
+    const QString binLocalization = qEnvironmentVariable("$HOME/testBinaries/");
     const QString script = "x86-linux-cpp.gdb";
     const QString binToRun = "hostpartition";
     const QByteArray rawTestResults =
