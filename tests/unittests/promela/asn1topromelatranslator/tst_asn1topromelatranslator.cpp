@@ -641,8 +641,14 @@ void tst_Asn1ToPromelaTranslator::testChoice()
         QCOMPARE(inlineDef->getSequence().getContent().size(), 3);
         const InlineCall *inlineCall = findProctypeElement<InlineCall>(inlineDef->getSequence(), 0);
         QVERIFY(inlineCall != nullptr);
+        QCOMPARE(inlineCall->getName(), "MyType_ch1_assign_value");
+        QCOMPARE(inlineCall->getArguments().size(), 2);
+        QCOMPARE(inlineCall->getArguments().first().getElements().size(), 3);
         inlineCall = findProctypeElement<InlineCall>(inlineDef->getSequence(), 1);
         QVERIFY(inlineCall != nullptr);
+        QCOMPARE(inlineCall->getName(), "MyType_ch2_assign_value");
+        QCOMPARE(inlineCall->getArguments().size(), 2);
+        QCOMPARE(inlineCall->getArguments().first().getElements().size(), 3);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 2);
         QVERIFY(assignment != nullptr);
     }
@@ -1073,6 +1079,9 @@ void tst_Asn1ToPromelaTranslator::testVariableSequenceOf()
         QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
         QCOMPARE(loop->getFirstValue(), 0);
         QCOMPARE(loop->getLastValue(), EXPECTED_SIZE - 1);
+        const InlineCall *inlineCall = findProctypeElement<InlineCall>(*loop->getSequence(), 0);
+        QVERIFY(inlineCall != nullptr);
+        QCOMPARE(inlineCall->getName(), "MyType_elem_assign_value");
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 2);
         QVERIFY(assignment != nullptr);
     }
