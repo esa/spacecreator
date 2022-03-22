@@ -49,7 +49,7 @@ std::vector<Asn1Acn::PatcherFunction> PatcherFunctionsGenerator::generate(
         // clang-format off
         std::visit(overloaded {
             [&](const seds::model::ErrorControlEntry &errorControlEntry) {
-                auto patcherFunction = buildErrorControlEntryFunction(errorControlEntry);
+                auto patcherFunction = buildErrorControlEntryFunction(errorControlEntry, sequenceName);
                 result.push_back(std::move(patcherFunction));
             },
             [&](const seds::model::LengthEntry &lengthEntry) {
@@ -67,10 +67,12 @@ std::vector<Asn1Acn::PatcherFunction> PatcherFunctionsGenerator::generate(
 }
 
 Asn1Acn::PatcherFunction PatcherFunctionsGenerator::buildErrorControlEntryFunction(
-        const seds::model::ErrorControlEntry &errorControlEntry) const
+        const seds::model::ErrorControlEntry &errorControlEntry, const QString &sequenceName) const
 {
-    auto encodingFunction = buildErrorControlEntryEncodingFunction(errorControlEntry);
-    auto decodingValidator = buildErrorControlEntryDecodingValidator(errorControlEntry);
+    const auto bits = getErrorControlBitsCount(errorControlEntry);
+
+    auto encodingFunction = buildErrorControlEntryEncodingFunction(errorControlEntry, bits, sequenceName);
+    auto decodingValidator = buildErrorControlEntryDecodingValidator(errorControlEntry, bits);
 
     return { std::move(encodingFunction), std::move(decodingValidator) };
 }
@@ -78,7 +80,7 @@ Asn1Acn::PatcherFunction PatcherFunctionsGenerator::buildErrorControlEntryFuncti
 Asn1Acn::PatcherFunction PatcherFunctionsGenerator::buildLengthEntryFunction(
         const seds::model::LengthEntry &lengthEntry, const QString &sequenceName) const
 {
-    const auto &encoding = getLengthEntryEncoding(lengthEntry);
+    const auto &encoding = getLengthEncoding(lengthEntry);
 
     auto encodingFunction = buildLengthEntryEncodingFunction(encoding, sequenceName, lengthEntry.nameStr());
     auto decodingValidator = buildLengthEntryDecodingValidator(encoding);
@@ -87,21 +89,60 @@ Asn1Acn::PatcherFunction PatcherFunctionsGenerator::buildLengthEntryFunction(
 }
 
 QString PatcherFunctionsGenerator::buildErrorControlEntryEncodingFunction(
-        const seds::model::ErrorControlEntry &errorControlEntry) const
+        const seds::model::ErrorControlEntry &entry, const uint64_t bits, const QString &sequenceName) const
 {
-    Q_UNUSED(errorControlEntry);
-    return "";
+    Q_UNUSED(bits);
+
+    QString buffer;
+    QTextStream stream(&buffer, QIODevice::WriteOnly);
+
+    stream << "asn1SccUint crcResult = calculate";
+
+    // clang-format off
+    std::visit(overloaded {
+        [&](const seds::model::CoreErrorControl &coreErrorControl) {
+            switch(coreErrorControl) {
+                case seds::model::CoreErrorControl::Crc16:
+                    stream << "Crc16";
+                    break;
+                case seds::model::CoreErrorControl::Crc8:
+                    stream << "Crc8";
+                    break;
+                case seds::model::CoreErrorControl::Checksum:
+                    stream << "Checksum";
+                    break;
+                case seds::model::CoreErrorControl::ChecksumLongitundinal:
+                    stream << "ChecksumLongitundinal";
+                    break;
+                default: {
+                    auto errorMessage = QString("Unsupported encoding for error control entry entry \"%1\" - use unsigned, two's complement or BCD").arg(entry.nameStr());
+                    throw TranslationException(std::move(errorMessage));
+                } break;
+            }
+        }
+    }, entry.errorControl());
+    // clang-format on
+
+    stream << "(pNullPos->" << sequenceName << "_" + entry.nameStr() << ".buf, "
+           << "pNullPos->" << sequenceName << "_" + entry.nameStr() << ".currentByte);\n"
+           << '\n'
+           << "Acn_Enc_Int_PositiveInteger_ConstSize("
+           << "&pNullPos->" << sequenceName << "_" << entry.nameStr() << ", "
+           << "crcResult, " << bits << ");\n";
+
+    return buffer;
 }
 
 QString PatcherFunctionsGenerator::buildErrorControlEntryDecodingValidator(
-        const seds::model::ErrorControlEntry &errorControlEntry) const
+        const seds::model::ErrorControlEntry &entry, const uint64_t bits) const
 {
-    Q_UNUSED(errorControlEntry);
+    Q_UNUSED(entry);
+    Q_UNUSED(bits);
     return "";
 }
 
-QString PatcherFunctionsGenerator::buildLengthEntryEncodingFunction(const seds::model::IntegerDataEncoding &encoding,
-        const QString &sequenceName, const QString &lengthEntryName) const
+QString PatcherFunctionsGenerator::buildLengthEntryEncodingFunction(
+        const seds::model::IntegerDataEncoding &encoding, const QString &sequenceName, const QString &entryName) const
 {
     QString buffer;
     QTextStream stream(&buffer, QIODevice::WriteOnly);
@@ -121,11 +162,8 @@ QString PatcherFunctionsGenerator::buildLengthEntryEncodingFunction(const seds::
                 case seds::model::CoreIntegerEncoding::Bcd:
                     stream << "BCD";
                     break;
-                case seds::model::CoreIntegerEncoding::OnesComplement:
-                case seds::model::CoreIntegerEncoding::PackedBcd:
-                case seds::model::CoreIntegerEncoding::SignMagnitude:
                 default: {
-                    auto errorMessage = QString("Unsupported encoding for length entry \"%1\" - use unsigned, two's complement or BCD").arg(lengthEntryName);
+                    auto errorMessage = QString("Unsupported encoding for length entry \"%1\" - use unsigned, two's complement or BCD").arg(entryName);
                     throw TranslationException(std::move(errorMessage));
                 } break;
             }
@@ -135,7 +173,7 @@ QString PatcherFunctionsGenerator::buildLengthEntryEncodingFunction(const seds::
 
     // clang-format off
     stream << "_ConstSize("
-           << "&pNullPos->" << sequenceName << "_" << lengthEntryName << ", "
+           << "&pNullPos->" << sequenceName << "_" << entryName << ", "
            << "lengthInBytes, "
            << encoding.bits()
            << ");\n";
@@ -151,33 +189,60 @@ QString PatcherFunctionsGenerator::buildLengthEntryDecodingValidator(
     return "";
 }
 
-const seds::model::IntegerDataEncoding &PatcherFunctionsGenerator::getLengthEntryEncoding(
-        const seds::model::LengthEntry &lengthEntry) const
+uint64_t PatcherFunctionsGenerator::getErrorControlBitsCount(const seds::model::ErrorControlEntry &entry) const
 {
-    const auto &lengthEntryTypeRef = lengthEntry.type();
+    const auto &entryTypeRef = entry.type();
 
-    const auto sedsPackage = lengthEntryTypeRef.packageStr()
-            ? SedsToAsn1Translator::getSedsPackage(*lengthEntryTypeRef.packageStr(), m_sedsPackages)
+    const auto sedsPackage = entryTypeRef.packageStr()
+            ? SedsToAsn1Translator::getSedsPackage(*entryTypeRef.packageStr(), m_sedsPackages)
             : m_sedsPackage;
 
-    const auto lengthEntryType = sedsPackage->dataType(lengthEntryTypeRef.nameStr());
+    const auto entryType = sedsPackage->dataType(entryTypeRef.nameStr());
 
-    const auto lengthEntryIntegerType = std::get_if<seds::model::IntegerDataType>(lengthEntryType);
+    const auto entryBinaryType = std::get_if<seds::model::BinaryDataType>(entryType);
 
-    if (!lengthEntryIntegerType) {
+    if (!entryBinaryType) {
         auto errorMessage =
-                QString("Length entry \"%1\" has to have integer as an underlying type").arg(lengthEntry.nameStr());
+                QString("Error control entry \"%1\" has to have binary as an underlying type").arg(entry.nameStr());
         throw TranslationException(std::move(errorMessage));
     }
 
-    const auto &lengthEntryIntegerEncoding = lengthEntryIntegerType->encoding();
-
-    if (!lengthEntryIntegerEncoding.has_value()) {
-        auto errorMessage = QString("Length entry \"%1\" has to have encoding").arg(lengthEntry.nameStr());
+    if (!entryBinaryType->hasFixedSize()) {
+        auto errorMessage =
+                QString("Error control entry \"%1\" underlying type has to be fixed size").arg(entry.nameStr());
         throw TranslationException(std::move(errorMessage));
     }
 
-    return lengthEntryIntegerEncoding.value();
+    return entryBinaryType->bits();
+}
+
+const seds::model::IntegerDataEncoding &PatcherFunctionsGenerator::getLengthEncoding(
+        const seds::model::LengthEntry &entry) const
+{
+    const auto &entryTypeRef = entry.type();
+
+    const auto sedsPackage = entryTypeRef.packageStr()
+            ? SedsToAsn1Translator::getSedsPackage(*entryTypeRef.packageStr(), m_sedsPackages)
+            : m_sedsPackage;
+
+    const auto entryType = sedsPackage->dataType(entryTypeRef.nameStr());
+
+    const auto entryIntegerType = std::get_if<seds::model::IntegerDataType>(entryType);
+
+    if (!entryIntegerType) {
+        auto errorMessage =
+                QString("Length entry \"%1\" has to have integer as an underlying type").arg(entry.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto &entryIntegerEncoding = entryIntegerType->encoding();
+
+    if (!entryIntegerEncoding.has_value()) {
+        auto errorMessage = QString("Entry \"%1\" has to have encoding").arg(entry.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    return entryIntegerEncoding.value();
 }
 
 } // namespace conversion::asn1::translator

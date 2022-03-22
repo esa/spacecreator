@@ -2,7 +2,7 @@ COM-N7SPACE-LENGTHENTRY DEFINITIONS ::= BEGIN
 IntegerData ::= INTEGER(0 .. 255)
 FloatData ::= REAL(1.17549e-38 .. 3.40282e+38)
 LengthType ::= INTEGER(0 .. 65535)
-BinaryPattern ::= BIT STRING(SIZE(0 .. 8))
+BinaryPattern ::= BIT STRING(SIZE(8))
 PacketHeader ::= SEQUENCE
 {
     version IntegerData(0 .. 255),

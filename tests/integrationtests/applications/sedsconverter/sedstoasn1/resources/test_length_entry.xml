@@ -20,7 +20,7 @@
           <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="65535" />
         </Range>
       </IntegerDataType>
-      <BinaryDataType name="BinaryPattern" sizeInBits="8" />
+      <BinaryDataType name="BinaryPattern" sizeInBits="8" fixedSize="true"/>
       <ContainerDataType name="PacketHeader">
         <EntryList>
           <Entry name="version" type="IntegerData"/>

@@ -55,20 +55,21 @@ public:
     auto generate(const seds::model::ContainerDataType &sedsType) const -> std::vector<Asn1Acn::PatcherFunction>;
 
 private:
-    auto buildErrorControlEntryFunction(const seds::model::ErrorControlEntry &errorControlEntry) const
-            -> Asn1Acn::PatcherFunction;
+    auto buildErrorControlEntryFunction(const seds::model::ErrorControlEntry &errorControlEntry,
+            const QString &sequenceName) const -> Asn1Acn::PatcherFunction;
     auto buildLengthEntryFunction(const seds::model::LengthEntry &lengthEntry, const QString &sequenceName) const
             -> Asn1Acn::PatcherFunction;
 
-    auto buildErrorControlEntryEncodingFunction(const seds::model::ErrorControlEntry &errorControlEntry) const
+    auto buildErrorControlEntryEncodingFunction(const seds::model::ErrorControlEntry &entry, const uint64_t bits,
+            const QString &sequenceName) const -> QString;
+    auto buildErrorControlEntryDecodingValidator(const seds::model::ErrorControlEntry &entry, const uint64_t bits) const
             -> QString;
-    auto buildErrorControlEntryDecodingValidator(const seds::model::ErrorControlEntry &errorControlEntry) const
-            -> QString;
-    auto buildLengthEntryEncodingFunction(const seds::model::IntegerDataEncoding &lengthEntry,
-            const QString &sequenceName, const QString &lengthEntryName) const -> QString;
-    auto buildLengthEntryDecodingValidator(const seds::model::IntegerDataEncoding &lengthEntry) const -> QString;
+    auto buildLengthEntryEncodingFunction(const seds::model::IntegerDataEncoding &encoding, const QString &sequenceName,
+            const QString &entryName) const -> QString;
+    auto buildLengthEntryDecodingValidator(const seds::model::IntegerDataEncoding &encoding) const -> QString;
 
-    auto getLengthEntryEncoding(const seds::model::LengthEntry &lengthEntry) const
+    auto getErrorControlBitsCount(const seds::model::ErrorControlEntry &lengthEntry) const -> uint64_t;
+    auto getLengthEncoding(const seds::model::LengthEntry &lengthEntry) const
             -> const seds::model::IntegerDataEncoding &;
 
 private:
