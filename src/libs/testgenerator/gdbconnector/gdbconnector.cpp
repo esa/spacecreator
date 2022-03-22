@@ -29,7 +29,7 @@ namespace testgenerator {
 QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, const QStringList &clientArgs,
         const QStringList &serverArgs, const QString &client, const QString &server)
 {
-    if (!server.isEmpty()) {
+    if (!server.isEmpty() && !client.isEmpty()) {
         Process gdbserver(server, serverArgs, binaryUnderTestDir);
         Process gdbclient(client, clientArgs, QDir::currentPath());
 
@@ -40,7 +40,7 @@ QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, co
 
         return string2byteArray(srecData);
     } else {
-        throw std::invalid_argument("debugging server program name shall not be empty");
+        throw std::invalid_argument("debugging server/client program names shall not be empty");
     }
 }
 
@@ -58,7 +58,6 @@ QString GdbConnector::getOneBeforeLastLine(const QString &src, const QString &ne
     return results;
 }
 
-// TODO: this extraction function shall be supplied as lambda expression with constant default
 QString GdbConnector::splitAndExtractSrecData(const QString &strings, const QString &delimeter)
 {
     QString srecData;

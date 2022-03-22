@@ -26,7 +26,7 @@
 namespace testgenerator {
 
 /**
- * @brief  Wrapper for running client and server with specified arguments ant retrieving specific data from server
+ * @brief  Wrapper for running client and server with specified arguments and retrieving specific data from server
  *
  */
 class GdbConnector final
@@ -50,7 +50,6 @@ public:
 
 private:
     static auto getOneBeforeLastLine(const QString &src, const QString &newlineCharacter = "\n") -> QString;
-
     static auto splitAndExtractSrecData(const QString &strings, const QString &delimeter = "\r\n") -> QString;
     static auto string2byteArray(QString str) -> QByteArray;
 };
