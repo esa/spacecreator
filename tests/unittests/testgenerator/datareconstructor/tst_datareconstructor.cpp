@@ -18,9 +18,9 @@
  */
 
 #include "../common.h"
+#include "dataview-uniq.h"
 #include "gdbconnectorstub.h"
 #include "testdriver.h"
-#include "testgenerator/gdbconnector/dataview-uniq.h"
 
 #include <QDebug>
 #include <QObject>
@@ -47,7 +47,7 @@ typedef struct {
     asn1SccMyBool result;
 } TestVector;
 
-class tst_gdbconnector final : public QObject
+class tst_datareconstructor final : public QObject
 {
     Q_OBJECT
 
@@ -63,7 +63,7 @@ static auto compareTestVectors(const TestVector &actual, const TestVector &expec
 static auto copyRawBytesIntoTestVector(const QByteArray &source, TestVector *const testData, unsigned int testDataSize)
         -> void;
 
-void tst_gdbconnector::initTestCase()
+void tst_datareconstructor::initTestCase()
 {
     const unsigned int testDataBytesNum = kTestDataSize * sizeof(TestVector);
     testData = static_cast<TestVector *>(malloc(testDataBytesNum));
@@ -98,7 +98,7 @@ void printQByteArrayInHex(const QByteArray &array)
     std::cerr << arrayInHex.toStdString();
 }
 
-void tst_gdbconnector::testNominal()
+void tst_datareconstructor::testNominal()
 {
     const TestVector expectedTestData[] = {
         { true, 2.3000, -2, 3, true },
@@ -144,6 +144,6 @@ static auto copyRawBytesIntoTestVector(const QByteArray &source, TestVector *con
 
 } // namespace tests::testgenerator
 
-QTEST_MAIN(tests::testgenerator::tst_gdbconnector)
+QTEST_MAIN(tests::testgenerator::tst_datareconstructor)
 
-#include "tst_gdbconnector.moc"
+#include "tst_datareconstructor.moc"

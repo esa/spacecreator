@@ -1,4 +1,4 @@
-set(TEST_NAME tst_gdbconnector)
+set(TEST_NAME tst_datareconstructor)
 project(${TEST_NAME})
 
 add_executable(${TEST_NAME})
