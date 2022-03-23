@@ -50,6 +50,8 @@ public:
      * @return  SEDS model
      */
     static auto loadSedsModel(const QString &sedsFilename) -> std::unique_ptr<conversion::Model>;
+
+    static auto loadAsn1Model(const QString &filename) -> std::unique_ptr<conversion::Model>;
 };
 
 } // namespace plugincommon

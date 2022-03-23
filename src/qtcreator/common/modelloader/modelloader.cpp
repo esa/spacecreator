@@ -21,6 +21,9 @@
 
 #include "../messagestrings.h"
 
+#include <asn1library/asn1/asn1model.h>
+#include <conversion/asn1/Asn1Importer/importer.h>
+#include <conversion/asn1/Asn1Options/options.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/IvXmlImporter/importer.h>
 #include <memory>
@@ -57,6 +60,23 @@ auto ModelLoader::loadSedsModel(const QString &sedsFilename) -> std::unique_ptr<
 
     seds::importer::SedsXmlImporter sedsImporter;
     model = sedsImporter.importModel(options);
+
+    return model;
+}
+
+auto ModelLoader::loadAsn1Model(const QString &filename) -> std::unique_ptr<conversion::Model>
+{
+    std::unique_ptr<conversion::Model> model;
+
+    conversion::Options options;
+    options.add(conversion::asn1::Asn1Options::inputFilepath, filename);
+
+    conversion::asn1::importer::Asn1Importer importer;
+    try {
+        model = importer.importModel(options);
+    } catch (const std::exception &ex) {
+        return nullptr;
+    }
 
     return model;
 }
