@@ -35,4 +35,6 @@ $DIFF COM-N7SPACE-LENGTHENTRY.asn ../resources/test_length_entry_asn.output \
         asn1crt_encoding_acn.c \
         asn1crt_encoding.c \
         asn1crt_encoding_uper.c \
+    && ./lengthentry \
+    && echo "ok" \
     && rm -r -f $TEST_OUTPUT_DIR

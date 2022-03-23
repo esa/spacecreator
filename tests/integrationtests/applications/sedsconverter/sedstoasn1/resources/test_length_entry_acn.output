@@ -2,7 +2,7 @@ COM-N7SPACE-LENGTHENTRY DEFINITIONS ::= BEGIN
 IntegerData [size 8, encoding pos-int, endianness big]
 FloatData [encoding IEEE754-1985-32, endianness big]
 LengthType [size 16, encoding pos-int, endianness little]
-BinaryPattern []
+Crc8Pattern []
 PacketHeader []
 {
     version [],
@@ -12,10 +12,10 @@ PacketBody []
 {
     data []
 }
-Nice-Packet [post-encoding-function nice-packet-encoding-function, post-decoding-validator nice-packet-decoding-validator]
+Crc8-Packet [post-encoding-function nice-packet-encoding-function, post-decoding-validator nice-packet-decoding-validator]
 {
     nice-Packet-header [],
-    nice-Packet-lengthEntry NULL [align-to-next byte, pattern '00000000000000000000000000000000'B, save-position],
+    nice-Packet-lengthEntry NULL [align-to-next byte, pattern '0000000000000000'B, save-position],
     nice-Packet-body [],
     nice-Packet-errorControlEntry NULL [align-to-next byte, pattern '00000000'B, save-position]
 }

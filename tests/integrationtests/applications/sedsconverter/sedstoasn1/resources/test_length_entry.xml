@@ -20,7 +20,7 @@
           <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="65535" />
         </Range>
       </IntegerDataType>
-      <BinaryDataType name="BinaryPattern" sizeInBits="8" fixedSize="true"/>
+      <BinaryDataType name="Crc8Pattern" sizeInBits="8" fixedSize="true"/>
       <ContainerDataType name="PacketHeader">
         <EntryList>
           <Entry name="version" type="IntegerData"/>
@@ -32,12 +32,12 @@
           <Entry name="data" type="IntegerData"/>
         </EntryList>
       </ContainerDataType>
-      <ContainerDataType name="Nice-Packet">
+      <ContainerDataType name="Crc8-Packet">
         <EntryList>
           <Entry name="Nice-Packet-header" type="PacketHeader"/>
           <LengthEntry name="Nice-Packet-lengthEntry" type="LengthType"/>
           <Entry name="Nice-Packet-body" type="PacketBody"/>
-          <ErrorControlEntry name="Nice-Packet-errorControlEntry" errorControlType="CRC8" type="BinaryPattern" />
+          <ErrorControlEntry name="Nice-Packet-errorControlEntry" errorControlType="CRC8" type="Crc8Pattern" />
         </EntryList>
       </ContainerDataType>
     </DataTypeSet>
