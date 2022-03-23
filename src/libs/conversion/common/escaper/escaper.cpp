@@ -117,6 +117,15 @@ QString Escaper::escapeCSequenceName(QString name)
     return name;
 }
 
+QString Escaper::escapeCFieldName(QString name)
+{
+    escapeName(name, '_');
+
+    name[0] = name[0].toLower();
+
+    return name;
+}
+
 void Escaper::escapeName(QString &name, const QChar &delimeter)
 {
     name = name.trimmed();

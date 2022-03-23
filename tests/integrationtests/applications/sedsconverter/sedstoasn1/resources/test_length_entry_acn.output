@@ -10,14 +10,13 @@ PacketHeader []
 }
 PacketBody []
 {
-    aReal [],
-    anInteger []
+    data []
 }
 Nice-Packet [post-encoding-function nice-packet-encoding-function, post-decoding-validator nice-packet-decoding-validator]
 {
-    pHeader [],
-    lengthEntry NULL [align-to-next byte, pattern '00000000000000000000000000000000'B, save-position],
-    pBody [],
-    errorControlEntry NULL [align-to-next byte, pattern '00000000'B, save-position]
+    nice-Packet-header [],
+    nice-Packet-lengthEntry NULL [align-to-next byte, pattern '00000000000000000000000000000000'B, save-position],
+    nice-Packet-body [],
+    nice-Packet-errorControlEntry NULL [align-to-next byte, pattern '00000000'B, save-position]
 }
 END

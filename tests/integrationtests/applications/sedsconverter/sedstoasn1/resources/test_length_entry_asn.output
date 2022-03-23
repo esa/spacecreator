@@ -10,12 +10,11 @@ PacketHeader ::= SEQUENCE
 }
 PacketBody ::= SEQUENCE
 {
-    aReal FloatData(1.17549e-38 .. 3.40282e+38),
-    anInteger IntegerData(0 .. 255)
+    data IntegerData(0 .. 255)
 }
 Nice-Packet ::= SEQUENCE
 {
-    pHeader PacketHeader,
-    pBody PacketBody
+    nice-Packet-header PacketHeader,
+    nice-Packet-body PacketBody
 }
 END

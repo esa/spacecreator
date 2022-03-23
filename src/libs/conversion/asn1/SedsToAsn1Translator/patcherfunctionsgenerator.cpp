@@ -82,7 +82,9 @@ Asn1Acn::PatcherFunction PatcherFunctionsGenerator::buildLengthEntryFunction(
 {
     const auto &encoding = getLengthEncoding(lengthEntry);
 
-    auto encodingFunction = buildLengthEntryEncodingFunction(encoding, sequenceName, lengthEntry.nameStr());
+    const auto entryName = Escaper::escapeCFieldName(lengthEntry.nameStr());
+
+    auto encodingFunction = buildLengthEntryEncodingFunction(encoding, sequenceName, entryName);
     auto decodingValidator = buildLengthEntryDecodingValidator(encoding);
 
     return { std::move(encodingFunction), std::move(decodingValidator) };
@@ -123,11 +125,13 @@ QString PatcherFunctionsGenerator::buildErrorControlEntryEncodingFunction(
     }, entry.errorControl());
     // clang-format on
 
-    stream << "(pNullPos->" << sequenceName << "_" + entry.nameStr() << ".buf, "
-           << "pNullPos->" << sequenceName << "_" + entry.nameStr() << ".currentByte);\n"
+    const auto entryName = Escaper::escapeCFieldName(entry.nameStr());
+
+    stream << "(pNullPos->" << sequenceName << "_" + entryName << ".buf, "
+           << "pNullPos->" << sequenceName << "_" + entryName << ".currentByte);\n"
            << '\n'
            << "Acn_Enc_Int_PositiveInteger_ConstSize("
-           << "&pNullPos->" << sequenceName << "_" << entry.nameStr() << ", "
+           << "&pNullPos->" << sequenceName << "_" << entryName << ", "
            << "crcResult, " << bits << ");\n";
 
     return buffer;

@@ -125,6 +125,15 @@ public:
      */
     static auto escapeCSequenceName(QString name) -> QString;
 
+    /**
+     * @brief   Convert the input name to an id for ASN.1 entry in the C code
+     *
+     * @param   name    input name
+     *
+     * @returns Escaped name
+     */
+    static auto escapeCFieldName(QString name) -> QString;
+
 private:
     static auto escapeName(QString &name, const QChar &delimeter) -> void;
 

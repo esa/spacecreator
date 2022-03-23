@@ -29,16 +29,15 @@
       </ContainerDataType>
       <ContainerDataType name="PacketBody">
         <EntryList>
-          <Entry name="aReal" type="FloatData"/>
-          <Entry name="anInteger" type="IntegerData"/>
+          <Entry name="data" type="IntegerData"/>
         </EntryList>
       </ContainerDataType>
       <ContainerDataType name="Nice-Packet">
         <EntryList>
-          <Entry name="pHeader" type="PacketHeader"/>
-          <LengthEntry name="lengthEntry" type="LengthType"/>
-          <Entry name="pBody" type="PacketBody"/>
-          <ErrorControlEntry name="errorControlEntry" errorControlType="CRC8" type="BinaryPattern" />
+          <Entry name="Nice-Packet-header" type="PacketHeader"/>
+          <LengthEntry name="Nice-Packet-lengthEntry" type="LengthType"/>
+          <Entry name="Nice-Packet-body" type="PacketBody"/>
+          <ErrorControlEntry name="Nice-Packet-errorControlEntry" errorControlType="CRC8" type="BinaryPattern" />
         </EntryList>
       </ContainerDataType>
     </DataTypeSet>
