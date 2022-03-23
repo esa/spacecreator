@@ -18,6 +18,7 @@
  */
 
 #include "../common.h"
+#include "gdbconnectorstub.h"
 #include "testdriver.h"
 #include "testgenerator/gdbconnector/dataview-uniq.h"
 
@@ -30,9 +31,9 @@
 #include <cstdint>
 #include <iostream>
 #include <memory>
+#include <qdebug.h>
 #include <qglobal.h>
 #include <qobjectdefs.h>
-#include <testgenerator/gdbconnector/gdbconnector.h>
 
 using testgenerator::GdbConnector;
 
@@ -113,8 +114,6 @@ void tst_gdbconnector::testNominal()
     const QByteArray rawTestResults =
             GdbConnector::getRawTestResults(binLocalization, { "-batch", "-x", script }, { "host:1234", binToRun });
 
-    printQByteArrayInHex(rawTestResults);
-
     copyRawBytesIntoTestVector(rawTestResults, testData, kTestDataSize);
     for (unsigned int i = 0; i < kTestDataSize; i++) {
         compareTestVectors(testData[i], expectedTestData[i]);
@@ -123,7 +122,7 @@ void tst_gdbconnector::testNominal()
 
 static void compareTestVectors(const TestVector &actual, const TestVector &expected)
 {
-    // QCOMPARE(actual.active, expected.active);
+    QCOMPARE(actual.active, expected.active);
     QCOMPARE(actual.temperature, expected.temperature);
     QCOMPARE(actual.posX, expected.posX);
     QCOMPARE(actual.posY, expected.posY);
@@ -133,7 +132,7 @@ static void compareTestVectors(const TestVector &actual, const TestVector &expec
 static auto copyRawBytesIntoTestVector(const QByteArray &source, TestVector *const testData, unsigned int testDataSize)
         -> void
 {
-    if (static_cast<unsigned int>(source.size()) != testDataSize) {
+    if (static_cast<unsigned int>(source.size()) != testDataSize * sizeof(TestVector)) {
         return;
     }
     const TestVector *data = reinterpret_cast<const TestVector *>(source.data());

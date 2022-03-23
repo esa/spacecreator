@@ -6,6 +6,8 @@ add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
 target_sources(${TEST_NAME}
     PRIVATE     ${TEST_NAME}.cpp
+                gdbconnectorstub.cpp
+                gdbconnectorstub.h
 )
 
 target_include_directories(${TEST_NAME}
@@ -21,6 +23,3 @@ target_link_libraries(${TEST_NAME}
 )
 
 add_format_target(${TEST_NAME})
-
-configure_file(${CMAKE_SOURCE_DIR}/src/libs/testgenerator/gdbconnector/scripts/x86-linux-cpp.gdb x86-linux-cpp.gdb COPYONLY)
-configure_file(hostpartition hostpartition COPYONLY)

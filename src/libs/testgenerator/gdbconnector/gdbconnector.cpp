@@ -21,6 +21,8 @@
 
 #include "process.h"
 
+#include <QDebug>
+#include <memory>
 #include <stdexcept>
 #include <utility>
 
@@ -29,8 +31,11 @@ namespace testgenerator {
 QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, const QStringList &clientArgs,
         const QStringList &serverArgs, const QString &client, const QString &server)
 {
-    if (!server.isEmpty() && !client.isEmpty()) {
-        Process gdbserver(server, serverArgs, binaryUnderTestDir);
+    std::unique_ptr<Process> gdbserver = nullptr;
+    if (!server.isEmpty()) {
+        gdbserver = std::make_unique<Process>(server, serverArgs, binaryUnderTestDir);
+    }
+    if (!client.isEmpty()) {
         Process gdbclient(client, clientArgs, QDir::currentPath());
 
         QProcess *const clientProcess = gdbclient.get();
