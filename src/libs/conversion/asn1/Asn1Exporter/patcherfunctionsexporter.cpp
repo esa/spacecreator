@@ -336,7 +336,26 @@ uint16_t calculateCrc16(uint8_t* data, long size)
 
 uint32_t calculateChecksum(uint8_t* data, long size)
 {
-    return 0;
+    uint64_t checksum = 0;
+
+    for(long i = 0; i < size; i += 4) {
+        uint64_t value = ((uint64_t)data[i] << 24);
+
+        if(i+1 < size) {
+            value += ((uint64_t)data[i+1] << 16);
+        }
+        if(i+2 < size) {
+            value += ((uint64_t)data[i+2] << 8);
+        }
+        if(i+3 < size) {
+            value += (uint64_t)data[i+3];
+        }
+
+        checksum += value;
+        checksum %= 4294967296;
+    }
+
+    return checksum;
 }
 
 uint32_t calculateChecksumLongitundinal(uint8_t* data, long size)

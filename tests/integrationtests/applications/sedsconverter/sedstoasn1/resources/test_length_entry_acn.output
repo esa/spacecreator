@@ -5,6 +5,7 @@ LengthType [size 16, encoding pos-int, endianness little]
 GigaLengthType [size 32, encoding pos-int, endianness little]
 Crc8Pattern []
 Crc16Pattern []
+ChecksumPattern []
 PacketHeader []
 {
     version [],
@@ -27,5 +28,12 @@ Crc16-Packet [post-encoding-function crc16-packet-encoding-function, post-decodi
     nice-Packet-lengthEntry NULL [align-to-next byte, pattern '00000000000000000000000000000000'B, save-position],
     nice-Packet-body [],
     nice-Packet-errorControlEntry NULL [align-to-next byte, pattern '0000000000000000'B, save-position]
+}
+Checksum-Packet [post-encoding-function checksum-packet-encoding-function, post-decoding-validator checksum-packet-decoding-validator]
+{
+    nice-Packet-header [],
+    nice-Packet-lengthEntry NULL [align-to-next byte, pattern '0000000000000000'B, save-position],
+    nice-Packet-body [],
+    nice-Packet-errorControlEntry NULL [align-to-next byte, pattern '00000000000000000000000000000000'B, save-position]
 }
 END

@@ -86,6 +86,48 @@ int testCrc16Packet()
     }
 }
 
+int testChecksumPacket()
+{
+    Checksum_Packet packet;
+    Checksum_Packet_Initialize((&(packet)));
+    packet.nice_Packet_header.version = 31;
+    packet.nice_Packet_header.release = 41;
+    packet.nice_Packet_body.data = 59;
+
+    int errCode;
+
+    BitStream bitStream;
+    uint8_t encBuff[Checksum_Packet_REQUIRED_BYTES_FOR_ACN_ENCODING + 1];
+    BitStream_Init(&bitStream, encBuff, Checksum_Packet_REQUIRED_BYTES_FOR_ACN_ENCODING);
+
+    bool ret = Checksum_Packet_ACN_Encode(&packet, &bitStream, &errCode, TRUE);
+    if(!ret) {
+        return errCode;
+    }
+
+    const uint8_t encodedLength = bitStream.buf[3];
+    const uint8_t expectedLength = 9;
+    if(encodedLength != expectedLength) { // check length
+        printf("Checksum packet length mismatch. %d != %d\n", encodedLength, expectedLength);
+        return 1;
+    }
+
+    const uint32_t encodedChecksum = (bitStream.buf[5] << 24) | (bitStream.buf[6] << 16) | bitStream.buf[7] << 8 | bitStream.buf[8];
+    const uint32_t expectedChecksum = 1512636425;
+    if(encodedChecksum != expectedChecksum) { // check checksum
+        printf("Checksum packet CRC mismatch. %d != %d\n", encodedChecksum, expectedChecksum);
+        return 1;
+    }
+
+    BitStream_AttachBuffer(&bitStream, encBuff, Checksum_Packet_REQUIRED_BYTES_FOR_ACN_ENCODING);
+
+    Checksum_Packet decodedPacket;
+    ret = Checksum_Packet_ACN_Decode(&decodedPacket, &bitStream, &errCode);
+    if(!ret) {
+        return errCode;
+    }
+}
+
 int main()
 {
     int ret = testCrc8Packet();
@@ -94,6 +136,11 @@ int main()
     }
 
     ret = testCrc16Packet();
+    if(ret != 0) {
+        return ret;
+    }
+
+    ret = testChecksumPacket();
     if(ret != 0) {
         return ret;
     }

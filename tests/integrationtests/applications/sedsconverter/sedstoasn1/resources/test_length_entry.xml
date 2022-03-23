@@ -28,6 +28,7 @@
       </IntegerDataType>
       <BinaryDataType name="Crc8Pattern" sizeInBits="8" fixedSize="true"/>
       <BinaryDataType name="Crc16Pattern" sizeInBits="16" fixedSize="true"/>
+      <BinaryDataType name="ChecksumPattern" sizeInBits="32" fixedSize="true"/>
       <ContainerDataType name="PacketHeader">
         <EntryList>
           <Entry name="version" type="IntegerData"/>
@@ -53,6 +54,14 @@
           <LengthEntry name="Nice-Packet-lengthEntry" type="GigaLengthType"/>
           <Entry name="Nice-Packet-body" type="PacketBody"/>
           <ErrorControlEntry name="Nice-Packet-errorControlEntry" errorControlType="CRC16_ccitt" type="Crc16Pattern" />
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="Checksum-Packet">
+        <EntryList>
+          <Entry name="Nice-Packet-header" type="PacketHeader"/>
+          <LengthEntry name="Nice-Packet-lengthEntry" type="LengthType"/>
+          <Entry name="Nice-Packet-body" type="PacketBody"/>
+          <ErrorControlEntry name="Nice-Packet-errorControlEntry" errorControlType="checksum" type="ChecksumPattern" />
         </EntryList>
       </ContainerDataType>
     </DataTypeSet>
