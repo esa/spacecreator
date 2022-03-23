@@ -20,6 +20,9 @@
 #include "../common.h"
 #include "dataview-uniq.h"
 #include "gdbconnectorstub.h"
+#include "ivinterface.h"
+#include "ivmodel.h"
+#include "modelloader.h"
 #include "testdriver.h"
 
 #include <QDebug>
@@ -30,11 +33,12 @@
 #include <cstdarg>
 #include <cstdint>
 #include <iostream>
+#include <ivtools.h>
 #include <memory>
-#include <qdebug.h>
 #include <qglobal.h>
 #include <qobjectdefs.h>
 
+using plugincommon::ModelLoader;
 using testgenerator::GdbConnector;
 
 namespace tests::testgenerator {
@@ -113,6 +117,16 @@ void tst_datareconstructor::testNominal()
     const QString binToRun = "hostpartition";
     const QByteArray rawTestResults =
             GdbConnector::getRawTestResults(binLocalization, { "-batch", "-x", script }, { "host:1234", binToRun });
+
+    const QString ifUnderTestName = "InterfaceUnderTest";
+    const auto model = plugincommon::ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview.xml");
+    const auto ivModel = static_cast<ivm::IVModel *>(model.get());
+    const auto *const iface = ivModel->getIfaceByName(ifUnderTestName, ivm::IVInterface::InterfaceType::Provided);
+    qDebug() << iface->title();
+    qDebug() << iface->function()->title();
+    for (const auto &param : iface->params()) {
+        qDebug() << param.paramTypeName();
+    }
 
     copyRawBytesIntoTestVector(rawTestResults, testData, kTestDataSize);
     for (unsigned int i = 0; i < kTestDataSize; i++) {

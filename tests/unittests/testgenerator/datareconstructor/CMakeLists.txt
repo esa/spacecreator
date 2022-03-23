@@ -19,7 +19,11 @@ target_link_libraries(${TEST_NAME}
     PRIVATE     Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test
                 TestGenerator
+                PluginCommon
                 CommonProjectWarnings
 )
 
 add_format_target(${TEST_NAME})
+
+configure_file(resources/config.xml resources/config.xml COPYONLY)
+configure_file(resources/interfaceview.xml resources/interfaceview.xml COPYONLY)

@@ -17,11 +17,11 @@ target_include_directories(PluginCommon
 )
 
 target_link_libraries(PluginCommon
+    PUBLIC      ivcore
     PRIVATE     ConversionCommon
                 CommonProjectWarnings
                 IvXmlImporter
                 SedsXmlImporter
-                ivcore
                 SedsModel
 )
 
