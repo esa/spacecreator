@@ -21,6 +21,7 @@
 
 #include <QString>
 #include <conversion/common/model.h>
+#include <csv/CsvModel/csvmodel.h>
 #include <memory>
 
 namespace plugincommon {
@@ -52,6 +53,8 @@ public:
     static auto loadSedsModel(const QString &sedsFilename) -> std::unique_ptr<conversion::Model>;
 
     static auto loadAsn1Model(const QString &filename) -> std::unique_ptr<conversion::Model>;
+
+    static auto loadCsvModel(const QString &filename) -> std::unique_ptr<csv::CsvModel>;
 };
 
 } // namespace plugincommon

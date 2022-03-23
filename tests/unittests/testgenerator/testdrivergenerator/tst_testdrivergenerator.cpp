@@ -26,9 +26,6 @@
 #include <conversion/common/options.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/IvXmlImporter/importer.h>
-#include <csv/CsvImporter/csvimporter.h>
-#include <csv/CsvModel/csvmodel.h>
-#include <csv/CsvOptions/options.h>
 #include <ivcore/ivinterface.h>
 #include <ivcore/ivlibrary.h>
 #include <ivcore/ivmodel.h>
@@ -60,20 +57,6 @@ private Q_SLOTS:
     void testImplementationNotInC();
 };
 
-static std::unique_ptr<csv::CsvModel> loadCsvModel(const QString &filename)
-{
-    csv::importer::CsvImporter importer;
-    csv::importer::Options options;
-    options.add(csv::importer::CsvOptions::inputFilepath, filename);
-
-    auto csvModel = importer.importModel(options);
-    if (csvModel == nullptr) {
-        throw "CSV file could not be read";
-    }
-
-    return csvModel;
-}
-
 static void checkStreamAgainstExpectedOut(const std::stringstream &stream, const QString &expectedOutFilename)
 {
     auto expectedOutputFile = QFile(expectedOutFilename);
@@ -97,7 +80,7 @@ static void checkStreamAgainstExpectedOut(const std::stringstream &stream, const
 
 void tst_testdrivergenerator::testEmpty()
 {
-    const auto csvModel = loadCsvModel("resources/empty.csv");
+    const auto csvModel = ModelLoader::loadCsvModel("resources/empty.csv");
     const csv::CsvModel &csvRef = *csvModel;
 
     const auto asn1ModelRaw = ModelLoader::loadAsn1Model("resources/testgenerator.asn");
@@ -123,7 +106,7 @@ void tst_testdrivergenerator::testEmpty()
 
 void tst_testdrivergenerator::testNominal()
 {
-    auto csvModel = loadCsvModel("resources/test_data.csv");
+    auto csvModel = ModelLoader::loadCsvModel("resources/test_data.csv");
     const csv::CsvModel &csvRef = *csvModel;
 
     const auto asn1ModelRaw = ModelLoader::loadAsn1Model("resources/testgenerator.asn");
@@ -149,7 +132,7 @@ void tst_testdrivergenerator::testNominal()
 
 void tst_testdrivergenerator::testNominalSwappedColumns()
 {
-    auto csvModel = loadCsvModel("resources/test_data_swapped_columns.csv");
+    auto csvModel = ModelLoader::loadCsvModel("resources/test_data_swapped_columns.csv");
     const csv::CsvModel &csvRef = *csvModel;
 
     const auto asn1ModelRaw = ModelLoader::loadAsn1Model("resources/testgenerator.asn");
@@ -175,7 +158,7 @@ void tst_testdrivergenerator::testNominalSwappedColumns()
 
 void tst_testdrivergenerator::testNominalTwoOutputs()
 {
-    auto csvModel = loadCsvModel("resources/two_outputs-test_data.csv");
+    auto csvModel = ModelLoader::loadCsvModel("resources/two_outputs-test_data.csv");
     const csv::CsvModel &csvRef = *csvModel;
 
     const auto asn1ModelRaw = ModelLoader::loadAsn1Model("resources/testgenerator.asn");
@@ -201,7 +184,7 @@ void tst_testdrivergenerator::testNominalTwoOutputs()
 
 void tst_testdrivergenerator::testCyclicInterface()
 {
-    auto csvModel = loadCsvModel("resources/test_data.csv");
+    auto csvModel = ModelLoader::loadCsvModel("resources/test_data.csv");
     const csv::CsvModel &csvRef = *csvModel;
 
     const auto asn1ModelRaw = ModelLoader::loadAsn1Model("resources/testgenerator.asn");
@@ -226,7 +209,7 @@ void tst_testdrivergenerator::testCyclicInterface()
 
 void tst_testdrivergenerator::testImplementationNotInC()
 {
-    auto csvModel = loadCsvModel("resources/test_data.csv");
+    auto csvModel = ModelLoader::loadCsvModel("resources/test_data.csv");
     const csv::CsvModel &csvRef = *csvModel;
 
     const auto asn1ModelRaw = ModelLoader::loadAsn1Model("resources/testgenerator.asn");

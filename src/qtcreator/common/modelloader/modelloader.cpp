@@ -26,6 +26,8 @@
 #include <conversion/asn1/Asn1Options/options.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/IvXmlImporter/importer.h>
+#include <csv/CsvImporter/csvimporter.h>
+#include <csv/CsvOptions/options.h>
 #include <memory>
 #include <modeltype.h>
 #include <seds/SedsModel/sedsmodel.h>
@@ -79,6 +81,20 @@ auto ModelLoader::loadAsn1Model(const QString &filename) -> std::unique_ptr<conv
     }
 
     return model;
+}
+
+auto ModelLoader::loadCsvModel(const QString &filename) -> std::unique_ptr<csv::CsvModel>
+{
+    csv::importer::CsvImporter importer;
+    csv::importer::Options options;
+    options.add(csv::importer::CsvOptions::inputFilepath, filename);
+
+    auto csvModel = importer.importModel(options);
+    if (csvModel == nullptr) {
+        throw "CSV file could not be read";
+    }
+
+    return csvModel;
 }
 
 } // namespace plugincommon
