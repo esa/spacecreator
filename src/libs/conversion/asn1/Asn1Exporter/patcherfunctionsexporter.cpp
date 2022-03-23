@@ -261,51 +261,70 @@ void PatcherFunctionsExporter::generateMappingFunctionsModule(
 void PatcherFunctionsExporter::generateCommonLibraryHeader(QTextStream &stream)
 {
     // clang-format off
-    stream << "#pragma once\n\n"
-           << "#include \"asn1crt.h\"\n"
-           << '\n'
-           << "asn1SccUint calculateLengthInBytes(BitStream* pStartBitStream, BitStream* pEndBitStream);\n"
-           << '\n'
-           << "asn1SccUint calculateCrc8(uint8_t* data, long size);\n"
-           << "asn1SccUint calculateCrc16(uint8_t* data, long size);\n"
-           << "asn1SccUint calculateChecksum(uint8_t* data, long size);\n"
-           << "asn1SccUint calculateChecksumLongitundinal(uint8_t* data, long size);\n"
-           ;
+    stream <<
+R"(#pragma once
+#include "asn1crt.h"
+
+asn1SccUint calculateLengthInBytes(BitStream* pStartBitStream, BitStream* pEndBitStream);
+
+uint8_t calculateCrc8(uint8_t* data, long size);
+uint16_t calculateCrc16(uint8_t* data, long size);
+uint32_t calculateChecksum(uint8_t* data, long size);
+uint32_t calculateChecksumLongitundinal(uint8_t* data, long size);
+)";
     // clang-format on
 }
 
 void PatcherFunctionsExporter::generateCommonLibraryBody(QTextStream &stream)
 {
     // clang-format off
-    stream << "#include \"patchingCommonLibrary.h\"\n\n"
-           << "asn1SccUint calculateLengthInBytes(BitStream* pStartBitStream, BitStream* pEndBitStream)\n"
-           << "{\n"
-           << "\tasn1SccUint startPosInBits = pStartBitStream->currentByte * 8 + pStartBitStream->currentBit;\n"
-           << "\tasn1SccUint endPosInBits = pEndBitStream->currentByte * 8 + pStartBitStream->currentBit;\n"
-           << '\n'
-           << "\treturn (endPosInBits - startPosInBits) / 8;\n"
-           << "}\n"
-           << '\n'
-           << "asn1SccUint calculateCrc8(uint8_t* data, long size)\n"
-           << "{\n"
-           << "\treturn 0;\n"
-           << "}\n"
-           << '\n'
-           << "asn1SccUint calculateCrc16(uint8_t* data, long size)\n"
-           << "{\n"
-           << "\treturn 0;\n"
-           << "}\n"
-           << '\n'
-           << "asn1SccUint calculateChecksum(uint8_t* data, long size)\n"
-           << "{\n"
-           << "\treturn 0;\n"
-           << "}\n"
-           << '\n'
-           << "asn1SccUint calculateChecksumLongitundinal(uint8_t* data, long size)\n"
-           << "{\n"
-           << "\treturn 0;\n"
-           << "}\n"
-           ;
+    stream <<
+R"(#include <stdio.h>
+#include "patchingCommonLibrary.h"
+
+asn1SccUint calculateLengthInBytes(BitStream* pStartBitStream, BitStream* pEndBitStream)
+{
+    asn1SccUint startPosInBits = pStartBitStream->currentByte * 8 + pStartBitStream->currentBit;
+    asn1SccUint endPosInBits = pEndBitStream->currentByte * 8 + pStartBitStream->currentBit;
+
+    return (endPosInBits - startPosInBits) / 8;
+}
+
+uint8_t calculateCrc8(uint8_t* data, long size)
+{
+    const uint8_t* pData = data;
+    unsigned char crc = 0;
+
+    for(long i = 0; i < size; ++i, ++pData) {
+        crc ^= *pData;
+
+        for(uint8_t bit = 0; bit < 8; ++bit) {
+            if(crc & 0x80) {
+                crc <<= 1;
+                crc = crc ^ 0x07;
+            } else {
+                crc <<= 1;
+            }
+        }
+    }
+
+    return crc;
+}
+
+uint16_t calculateCrc16(uint8_t* data, long size)
+{
+}
+
+uint32_t calculateChecksum(uint8_t* data, long size)
+{
+    return 0;
+}
+
+uint32_t calculateChecksumLongitundinal(uint8_t* data, long size)
+{
+    return 0;
+}
+)";
     // clang-format on
 }
 
