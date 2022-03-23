@@ -2,7 +2,9 @@ COM-N7SPACE-LENGTHENTRY DEFINITIONS ::= BEGIN
 IntegerData ::= INTEGER(0 .. 255)
 FloatData ::= REAL(1.17549e-38 .. 3.40282e+38)
 LengthType ::= INTEGER(0 .. 65535)
+GigaLengthType ::= INTEGER(0 .. 4294967295)
 Crc8Pattern ::= BIT STRING(SIZE(8))
+Crc16Pattern ::= BIT STRING(SIZE(16))
 PacketHeader ::= SEQUENCE
 {
     version IntegerData(0 .. 255),
@@ -13,6 +15,11 @@ PacketBody ::= SEQUENCE
     data IntegerData(0 .. 255)
 }
 Crc8-Packet ::= SEQUENCE
+{
+    nice-Packet-header PacketHeader,
+    nice-Packet-body PacketBody
+}
+Crc16-Packet ::= SEQUENCE
 {
     nice-Packet-header PacketHeader,
     nice-Packet-body PacketBody

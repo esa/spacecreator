@@ -20,7 +20,14 @@
           <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="65535" />
         </Range>
       </IntegerDataType>
+      <IntegerDataType name="GigaLengthType">
+        <IntegerDataEncoding encoding="unsigned" byteOrder="littleEndian" sizeInBits="32" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="4294967295" />
+        </Range>
+      </IntegerDataType>
       <BinaryDataType name="Crc8Pattern" sizeInBits="8" fixedSize="true"/>
+      <BinaryDataType name="Crc16Pattern" sizeInBits="16" fixedSize="true"/>
       <ContainerDataType name="PacketHeader">
         <EntryList>
           <Entry name="version" type="IntegerData"/>
@@ -38,6 +45,14 @@
           <LengthEntry name="Nice-Packet-lengthEntry" type="LengthType"/>
           <Entry name="Nice-Packet-body" type="PacketBody"/>
           <ErrorControlEntry name="Nice-Packet-errorControlEntry" errorControlType="CRC8" type="Crc8Pattern" />
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="Crc16-Packet">
+        <EntryList>
+          <Entry name="Nice-Packet-header" type="PacketHeader"/>
+          <LengthEntry name="Nice-Packet-lengthEntry" type="GigaLengthType"/>
+          <Entry name="Nice-Packet-body" type="PacketBody"/>
+          <ErrorControlEntry name="Nice-Packet-errorControlEntry" errorControlType="CRC16_ccitt" type="Crc16Pattern" />
         </EntryList>
       </ContainerDataType>
     </DataTypeSet>

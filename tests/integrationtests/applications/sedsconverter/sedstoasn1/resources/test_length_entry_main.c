@@ -21,15 +21,17 @@ int testCrc8Packet()
         return errCode;
     }
 
-    uint8_t encodedLength = bitStream.buf[3];
-    if(encodedLength != 6) { // check length
-        printf("Crc8 packet length mismatch. %d != 8\n", encodedLength);
+    const uint8_t encodedLength = bitStream.buf[3];
+    const uint8_t expectedLength = 6;
+    if(encodedLength != expectedLength) { // check length
+        printf("Crc8 packet length mismatch. %d != %d\n", encodedLength, expectedLength);
         return 1;
     }
 
-    uint8_t encodedCrc = bitStream.buf[5];
-    if(encodedCrc != 0x90) { // check CRC8
-        printf("Crc8 packet CRC mismatch. 0x%02x != 0x90\n", encodedCrc);
+    const uint8_t encodedCrc = bitStream.buf[5];
+    const uint8_t expectedCrc = 0x90;
+    if(encodedCrc != expectedCrc) { // check CRC8
+        printf("Crc8 packet CRC mismatch. 0x%02X != 0x%02X\n", encodedCrc, expectedCrc);
         return 1;
     }
 
@@ -42,10 +44,56 @@ int testCrc8Packet()
     }
 }
 
+int testCrc16Packet()
+{
+    Crc16_Packet packet;
+    Crc16_Packet_Initialize((&(packet)));
+    packet.nice_Packet_header.version = 31;
+    packet.nice_Packet_header.release = 41;
+    packet.nice_Packet_body.data = 59;
+
+    int errCode;
+
+    BitStream bitStream;
+    uint8_t encBuff[Crc16_Packet_REQUIRED_BYTES_FOR_ACN_ENCODING + 1];
+    BitStream_Init(&bitStream, encBuff, Crc16_Packet_REQUIRED_BYTES_FOR_ACN_ENCODING);
+
+    bool ret = Crc16_Packet_ACN_Encode(&packet, &bitStream, &errCode, TRUE);
+    if(!ret) {
+        return errCode;
+    }
+
+    const uint8_t encodedLength = bitStream.buf[5];
+    const uint8_t expectedLength = 9;
+    if(encodedLength != expectedLength) { // check length
+        printf("Crc16 packet length mismatch. %d != %d\n", encodedLength, expectedLength);
+        return 1;
+    }
+
+    const uint16_t encodedCrc = bitStream.buf[8] | bitStream.buf[7] << 8;
+    const uint16_t expectedCrc = 0x0C16;
+    if(encodedCrc != expectedCrc) { // check CRC16
+        printf("Crc16 packet CRC mismatch. 0x%04X != 0x%04X\n", encodedCrc, expectedCrc);
+        return 1;
+    }
+
+    BitStream_AttachBuffer(&bitStream, encBuff, Crc16_Packet_REQUIRED_BYTES_FOR_ACN_ENCODING);
+
+    Crc16_Packet decodedPacket;
+    ret = Crc16_Packet_ACN_Decode(&decodedPacket, &bitStream, &errCode);
+    if(!ret) {
+        return errCode;
+    }
+}
+
 int main()
 {
     int ret = testCrc8Packet();
+    if(ret != 0) {
+        return ret;
+    }
 
+    ret = testCrc16Packet();
     if(ret != 0) {
         return ret;
     }

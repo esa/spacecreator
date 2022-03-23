@@ -301,7 +301,7 @@ uint8_t calculateCrc8(uint8_t* data, long size)
         for(uint8_t bit = 0; bit < 8; ++bit) {
             if(crc & 0x80) {
                 crc <<= 1;
-                crc = crc ^ 0x07;
+                crc ^= 0x07;
             } else {
                 crc <<= 1;
             }
@@ -313,6 +313,25 @@ uint8_t calculateCrc8(uint8_t* data, long size)
 
 uint16_t calculateCrc16(uint8_t* data, long size)
 {
+    const uint8_t* pData = data;
+    uint16_t crc = 0xFFFF;
+
+    for(long i = 0; i < size; ++i, ++pData) {
+        uint8_t currentByte = *pData;
+
+        for(uint8_t bit = 0; bit < 8; ++bit) {
+            if(((crc & 0x8000) >> 8) ^ (currentByte & 0x80)) {
+                crc <<= 1;
+                crc ^= 0x1021;
+            } else {
+                crc <<= 1;
+            }
+
+            currentByte <<= 1;
+        }
+    }
+
+    return crc;
 }
 
 uint32_t calculateChecksum(uint8_t* data, long size)
