@@ -69,10 +69,10 @@ std::vector<Asn1Acn::PatcherFunction> PatcherFunctionsGenerator::generate(
 Asn1Acn::PatcherFunction PatcherFunctionsGenerator::buildErrorControlEntryFunction(
         const seds::model::ErrorControlEntry &errorControlEntry, const QString &sequenceName) const
 {
-    const auto bits = getErrorControlBitsCount(errorControlEntry);
+    const auto bitCount = getErrorControlBitCount(errorControlEntry);
 
-    auto encodingFunction = buildErrorControlEntryEncodingFunction(errorControlEntry, bits, sequenceName);
-    auto decodingValidator = buildErrorControlEntryDecodingValidator(errorControlEntry, bits);
+    auto encodingFunction = buildErrorControlEntryEncodingFunction(errorControlEntry, bitCount, sequenceName);
+    auto decodingValidator = buildErrorControlEntryDecodingValidator(errorControlEntry, bitCount);
 
     return { std::move(encodingFunction), std::move(decodingValidator) };
 }
@@ -91,10 +91,8 @@ Asn1Acn::PatcherFunction PatcherFunctionsGenerator::buildLengthEntryFunction(
 }
 
 QString PatcherFunctionsGenerator::buildErrorControlEntryEncodingFunction(
-        const seds::model::ErrorControlEntry &entry, const uint64_t bits, const QString &sequenceName) const
+        const seds::model::ErrorControlEntry &entry, const uint64_t bitCount, const QString &sequenceName) const
 {
-    Q_UNUSED(bits);
-
     QString buffer;
     QTextStream stream(&buffer, QIODevice::WriteOnly);
 
@@ -132,16 +130,16 @@ QString PatcherFunctionsGenerator::buildErrorControlEntryEncodingFunction(
            << '\n'
            << "Acn_Enc_Int_PositiveInteger_ConstSize("
            << "&pNullPos->" << sequenceName << "_" << entryName << ", "
-           << "crcResult, " << bits << ");\n";
+           << "crcResult, " << bitCount << ");\n";
 
     return buffer;
 }
 
 QString PatcherFunctionsGenerator::buildErrorControlEntryDecodingValidator(
-        const seds::model::ErrorControlEntry &entry, const uint64_t bits) const
+        const seds::model::ErrorControlEntry &entry, const uint64_t bitCount) const
 {
     Q_UNUSED(entry);
-    Q_UNUSED(bits);
+    Q_UNUSED(bitCount);
     return "";
 }
 
@@ -193,7 +191,7 @@ QString PatcherFunctionsGenerator::buildLengthEntryDecodingValidator(
     return "";
 }
 
-uint64_t PatcherFunctionsGenerator::getErrorControlBitsCount(const seds::model::ErrorControlEntry &entry) const
+uint64_t PatcherFunctionsGenerator::getErrorControlBitCount(const seds::model::ErrorControlEntry &entry) const
 {
     const auto &entryTypeRef = entry.type();
 

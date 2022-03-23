@@ -1,10 +1,11 @@
 #include "COM-N7SPACE-LENGTHENTRY.h"
 #include "asn1crt.h"
+#include <stdio.h>
 
-int main()
+int testCrc8Packet()
 {
-    Nice_Packet packet;
-    Nice_Packet_Initialize((&(packet)));
+    Crc8_Packet packet;
+    Crc8_Packet_Initialize((&(packet)));
     packet.nice_Packet_header.version = 42;
     packet.nice_Packet_header.release = 19;
     packet.nice_Packet_body.data = 111;
@@ -12,28 +13,41 @@ int main()
     int errCode;
 
     BitStream bitStream;
-    uint8_t encBuff[Nice_Packet_REQUIRED_BYTES_FOR_ACN_ENCODING + 1];
-    BitStream_Init(&bitStream, encBuff, Nice_Packet_REQUIRED_BYTES_FOR_ACN_ENCODING);
+    uint8_t encBuff[Crc8_Packet_REQUIRED_BYTES_FOR_ACN_ENCODING + 1];
+    BitStream_Init(&bitStream, encBuff, Crc8_Packet_REQUIRED_BYTES_FOR_ACN_ENCODING);
 
-    bool ret = Nice_Packet_ACN_Encode(&packet, &bitStream, &errCode, TRUE);
+    bool ret = Crc8_Packet_ACN_Encode(&packet, &bitStream, &errCode, TRUE);
     if(!ret) {
         return errCode;
     }
 
-    if(bitStream.buf[3] != 8) { // check length
+    uint8_t encodedLength = bitStream.buf[3];
+    if(encodedLength != 6) { // check length
+        printf("Crc8 packet length mismatch. %d != 8\n", encodedLength);
         return 1;
     }
 
-    if(bitStream.buf[7] != 0xAD) { // check CRC8
+    uint8_t encodedCrc = bitStream.buf[5];
+    if(encodedCrc != 0x90) { // check CRC8
+        printf("Crc8 packet CRC mismatch. 0x%02x != 0x90\n", encodedCrc);
         return 1;
     }
 
-    BitStream_AttachBuffer(&bitStream, encBuff, Nice_Packet_REQUIRED_BYTES_FOR_ACN_ENCODING);
+    BitStream_AttachBuffer(&bitStream, encBuff, Crc8_Packet_REQUIRED_BYTES_FOR_ACN_ENCODING);
 
-    Nice_Packet decodedPacket;
-    ret = Nice_Packet_ACN_Decode(&decodedPacket, &bitStream, &errCode);
+    Crc8_Packet decodedPacket;
+    ret = Crc8_Packet_ACN_Decode(&decodedPacket, &bitStream, &errCode);
     if(!ret) {
         return errCode;
+    }
+}
+
+int main()
+{
+    int ret = testCrc8Packet();
+
+    if(ret != 0) {
+        return ret;
     }
 
     return 0;

@@ -12,7 +12,7 @@ PacketBody []
 {
     data []
 }
-Crc8-Packet [post-encoding-function nice-packet-encoding-function, post-decoding-validator nice-packet-decoding-validator]
+Crc8-Packet [post-encoding-function crc8-packet-encoding-function, post-decoding-validator crc8-packet-decoding-validator]
 {
     nice-Packet-header [],
     nice-Packet-lengthEntry NULL [align-to-next byte, pattern '0000000000000000'B, save-position],

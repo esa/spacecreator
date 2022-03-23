@@ -137,8 +137,12 @@ private:
             -> std::unique_ptr<Asn1Acn::Types::Null>;
     auto translateLengthField(const seds::model::LengthEntry &sedsEntry) const -> std::unique_ptr<Asn1Acn::Types::Null>;
 
-    auto translateCoreErrorControl(seds::model::CoreErrorControl coreErrorControl, Asn1Acn::Types::Null *asn1Type) const
-            -> void;
+    auto translateCoreErrorControl(seds::model::CoreErrorControl coreErrorControl,
+            const seds::model::ErrorControlEntry &sedsEntry, Asn1Acn::Types::Null *asn1Type) const -> void;
+
+    auto getLengthEntryEncoding(const seds::model::LengthEntry &lengthEntry) const
+            -> const seds::model::IntegerDataEncoding &;
+    auto getErrorControlEntryBitCount(const seds::model::ErrorControlEntry &entry) const -> uint64_t;
 
     auto updateListLengthEntry(const seds::model::Entry *sedsEntry) const -> void;
     auto getListLengthField(const QString &listLengthFieldName,
@@ -167,9 +171,9 @@ private:
     /// @brief  ASN.1 sequence size threshold
     const std::optional<uint64_t> &m_sequenceSizeThreshold;
 
-    const static int m_crc8BitSize = 8;
-    const static int m_crc16BitSize = 16;
-    const static int m_checksumBitSize = 32;
+    const static uint64_t m_crc8BitSize = 8;
+    const static uint64_t m_crc16BitSize = 16;
+    const static uint64_t m_checksumBitSize = 32;
 };
 
 } // namespace conversion::asn1::translator

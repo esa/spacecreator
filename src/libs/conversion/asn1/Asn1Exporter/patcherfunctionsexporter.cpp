@@ -285,7 +285,7 @@ R"(#include <stdio.h>
 asn1SccUint calculateLengthInBytes(BitStream* pStartBitStream, BitStream* pEndBitStream)
 {
     asn1SccUint startPosInBits = pStartBitStream->currentByte * 8 + pStartBitStream->currentBit;
-    asn1SccUint endPosInBits = pEndBitStream->currentByte * 8 + pStartBitStream->currentBit;
+    asn1SccUint endPosInBits = pEndBitStream->currentByte * 8 + pEndBitStream->currentBit;
 
     return (endPosInBits - startPosInBits) / 8;
 }

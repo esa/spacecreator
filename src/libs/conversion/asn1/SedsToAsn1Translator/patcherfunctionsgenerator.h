@@ -68,7 +68,7 @@ private:
             const QString &entryName) const -> QString;
     auto buildLengthEntryDecodingValidator(const seds::model::IntegerDataEncoding &encoding) const -> QString;
 
-    auto getErrorControlBitsCount(const seds::model::ErrorControlEntry &lengthEntry) const -> uint64_t;
+    auto getErrorControlBitCount(const seds::model::ErrorControlEntry &lengthEntry) const -> uint64_t;
     auto getLengthEncoding(const seds::model::LengthEntry &lengthEntry) const
             -> const seds::model::IntegerDataEncoding &;
 
