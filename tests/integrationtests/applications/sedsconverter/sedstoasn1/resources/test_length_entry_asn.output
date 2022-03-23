@@ -6,6 +6,7 @@ GigaLengthType ::= INTEGER(0 .. 4294967295)
 Crc8Pattern ::= BIT STRING(SIZE(8))
 Crc16Pattern ::= BIT STRING(SIZE(16))
 ChecksumPattern ::= BIT STRING(SIZE(32))
+ChecksumLongitudinalPattern ::= BIT STRING(SIZE(8))
 PacketHeader ::= SEQUENCE
 {
     version IntegerData(0 .. 255),
@@ -26,6 +27,11 @@ Crc16-Packet ::= SEQUENCE
     nice-Packet-body PacketBody
 }
 Checksum-Packet ::= SEQUENCE
+{
+    nice-Packet-header PacketHeader,
+    nice-Packet-body PacketBody
+}
+ChecksumLongitudinal-Packet ::= SEQUENCE
 {
     nice-Packet-header PacketHeader,
     nice-Packet-body PacketBody

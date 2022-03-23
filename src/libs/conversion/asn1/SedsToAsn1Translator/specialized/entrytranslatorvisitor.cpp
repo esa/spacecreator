@@ -274,8 +274,10 @@ void EntryTranslatorVisitor::translateCoreErrorControl(seds::model::CoreErrorCon
         expectedBitCount = m_crc16BitSize;
         break;
     case seds::model::CoreErrorControl::Checksum:
-    case seds::model::CoreErrorControl::ChecksumLongitundinal:
         expectedBitCount = m_checksumBitSize;
+        break;
+    case seds::model::CoreErrorControl::ChecksumLongitundinal:
+        expectedBitCount = m_checksumLongitundinalSize;
         break;
     default:
         throw UnhandledValueException("CoreErrorControl");

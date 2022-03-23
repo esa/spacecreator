@@ -128,6 +128,48 @@ int testChecksumPacket()
     }
 }
 
+int testChecksumLongitudinalPacket()
+{
+    ChecksumLongitudinal_Packet packet;
+    ChecksumLongitudinal_Packet_Initialize((&(packet)));
+    packet.nice_Packet_header.version = 31;
+    packet.nice_Packet_header.release = 41;
+    packet.nice_Packet_body.data = 59;
+
+    int errCode;
+
+    BitStream bitStream;
+    uint8_t encBuff[ChecksumLongitudinal_Packet_REQUIRED_BYTES_FOR_ACN_ENCODING + 1];
+    BitStream_Init(&bitStream, encBuff, ChecksumLongitudinal_Packet_REQUIRED_BYTES_FOR_ACN_ENCODING);
+
+    bool ret = ChecksumLongitudinal_Packet_ACN_Encode(&packet, &bitStream, &errCode, TRUE);
+    if(!ret) {
+        return errCode;
+    }
+
+    const uint8_t encodedLength = bitStream.buf[3];
+    const uint8_t expectedLength = 6;
+    if(encodedLength != expectedLength) { // check length
+        printf("ChecksumLongitudinal packet length mismatch. %d != %d\n", encodedLength, expectedLength);
+        return 1;
+    }
+
+    const uint32_t encodedChecksumLongitudinal = bitStream.buf[5];
+    const uint32_t expectedChecksumLongitudinal = 0x77;
+    if(encodedChecksumLongitudinal != expectedChecksumLongitudinal) { // check checksum
+        printf("ChecksumLongitudinal packet CRC mismatch. %02x != %02x\n", encodedChecksumLongitudinal, expectedChecksumLongitudinal);
+        return 1;
+    }
+
+    BitStream_AttachBuffer(&bitStream, encBuff, ChecksumLongitudinal_Packet_REQUIRED_BYTES_FOR_ACN_ENCODING);
+
+    ChecksumLongitudinal_Packet decodedPacket;
+    ret = ChecksumLongitudinal_Packet_ACN_Decode(&decodedPacket, &bitStream, &errCode);
+    if(!ret) {
+        return errCode;
+    }
+}
+
 int main()
 {
     int ret = testCrc8Packet();
@@ -141,6 +183,11 @@ int main()
     }
 
     ret = testChecksumPacket();
+    if(ret != 0) {
+        return ret;
+    }
+
+    ret = testChecksumLongitudinalPacket();
     if(ret != 0) {
         return ret;
     }

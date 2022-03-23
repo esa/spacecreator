@@ -174,6 +174,7 @@ private:
     const static uint64_t m_crc8BitSize = 8;
     const static uint64_t m_crc16BitSize = 16;
     const static uint64_t m_checksumBitSize = 32;
+    const static uint64_t m_checksumLongitundinalSize = 8;
 };
 
 } // namespace conversion::asn1::translator

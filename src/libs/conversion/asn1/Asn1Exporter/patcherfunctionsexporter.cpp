@@ -270,7 +270,7 @@ asn1SccUint calculateLengthInBytes(BitStream* pStartBitStream, BitStream* pEndBi
 uint8_t calculateCrc8(uint8_t* data, long size);
 uint16_t calculateCrc16(uint8_t* data, long size);
 uint32_t calculateChecksum(uint8_t* data, long size);
-uint32_t calculateChecksumLongitundinal(uint8_t* data, long size);
+uint8_t calculateChecksumLongitundinal(uint8_t* data, long size);
 )";
     // clang-format on
 }
@@ -352,15 +352,23 @@ uint32_t calculateChecksum(uint8_t* data, long size)
         }
 
         checksum += value;
-        checksum %= 4294967296;
+        checksum &= 0xFFFFFFFF;
     }
 
     return checksum;
 }
 
-uint32_t calculateChecksumLongitundinal(uint8_t* data, long size)
+uint8_t calculateChecksumLongitundinal(uint8_t* data, long size)
 {
-    return 0;
+    uint8_t checksum = 0;
+
+    for(long i = 0; i < size; ++i) {
+        checksum = (checksum + data[i]) & 0xFF;
+    }
+
+    checksum = (((checksum ^ 0xFF) + 1) & 0xFF);
+
+    return checksum;
 }
 )";
     // clang-format on
