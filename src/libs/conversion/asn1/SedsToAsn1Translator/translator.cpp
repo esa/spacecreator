@@ -121,8 +121,8 @@ std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePacka
     const auto packageName = Escaper::escapeAsn1PackageName(sedsPackage.nameStr());
     auto packageAsn1File = std::make_unique<Asn1Acn::File>(packageName);
 
-    auto packageAsn1Definitions =
-            translateDataTypes(resolvedPackageDataTypes, &sedsPackage, asn1Files, sedsPackages, sequenceSizeThreshold);
+    auto packageAsn1Definitions = translateDataTypes(
+            resolvedPackageDataTypes, packageName, &sedsPackage, asn1Files, sedsPackages, sequenceSizeThreshold);
     for (const auto &importedType : importedTypes) {
         packageAsn1Definitions->addImportedType(importedType);
     }
@@ -144,8 +144,8 @@ std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePacka
                 Escaper::escapeAsn1PackageName(sedsPackage.nameStr() + "-" + sedsComponent.nameStr());
         auto componentAsn1File = std::make_unique<Asn1Acn::File>(componentPackageName);
 
-        auto componentAsn1Definitions = translateDataTypes(
-                resolvedComponentDataTypes, &sedsPackage, asn1Files, sedsPackages, sequenceSizeThreshold);
+        auto componentAsn1Definitions = translateDataTypes(resolvedComponentDataTypes, componentPackageName,
+                &sedsPackage, asn1Files, sedsPackages, sequenceSizeThreshold);
         for (const auto &importedType : importedTypes) {
             componentAsn1Definitions->addImportedType(importedType);
         }
@@ -158,12 +158,12 @@ std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePacka
 }
 
 std::unique_ptr<Asn1Acn::Definitions> SedsToAsn1Translator::translateDataTypes(
-        const std::list<const seds::model::DataType *> &sedsDataTypes, const seds::model::Package *sedsPackage,
-        const Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages,
+        const std::list<const seds::model::DataType *> &sedsDataTypes, const QString &asn1DefinitionsName,
+        const seds::model::Package *sedsPackage, const Asn1Model::Data &asn1Files,
+        const std::vector<seds::model::Package> &sedsPackages,
         const std::optional<uint64_t> &sequenceSizeThreshold) const
 {
-    auto asn1Definitions = std::make_unique<Asn1Acn::Definitions>(
-            Escaper::escapeAsn1PackageName(sedsPackage->nameStr()), Asn1Acn::SourceLocation());
+    auto asn1Definitions = std::make_unique<Asn1Acn::Definitions>(asn1DefinitionsName, Asn1Acn::SourceLocation());
     DescriptionTranslator::translate(*sedsPackage, asn1Definitions.get());
 
     DataTypeTranslatorVisitor dataTypeVisitor(
