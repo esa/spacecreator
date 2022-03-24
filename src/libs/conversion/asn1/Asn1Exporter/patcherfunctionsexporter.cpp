@@ -184,7 +184,7 @@ void PatcherFunctionsExporter::generateEncodingFunctionBody(const Sequence *sequ
     for (const auto &patcherFunction : sequence->patcherFunctions()) {
         stream << '\n';
 
-        for (const auto &line : patcherFunction.encodingFunction.split('\n', Qt::SkipEmptyParts)) {
+        for (const auto &line : patcherFunction.encodingFunction.split('\n', QString::SkipEmptyParts)) {
             stream << "\n\t" << line;
         }
     }
@@ -230,7 +230,7 @@ void PatcherFunctionsExporter::generateDecodingValidatorBody(const Sequence *seq
     for (const auto &patcherFunction : sequence->patcherFunctions()) {
         stream << '\n';
 
-        for (const auto &line : patcherFunction.decodingValidator.split('\n', Qt::SkipEmptyParts)) {
+        for (const auto &line : patcherFunction.decodingValidator.split('\n', QString::SkipEmptyParts)) {
             stream << "\n\t" << line;
         }
     }
