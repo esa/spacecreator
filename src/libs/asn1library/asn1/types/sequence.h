@@ -33,7 +33,6 @@
 #include <optional>
 
 namespace Asn1Acn {
-
 namespace Types {
 
 class Sequence : public Type, public AcnParameterizableCollection<SequenceComponent>

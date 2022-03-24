@@ -32,6 +32,9 @@ class Package;
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Generator for functions for patching ErrorControlEntry and LengthEntry
+ */
 class PatcherFunctionsGenerator final
 {
 public:

@@ -28,11 +28,27 @@
 
 namespace conversion::asn1::exporter {
 
+/**
+ * @brief   Exporter for C files needed for patching ASN.1 sequence fields
+ */
 class PatcherFunctionsExporter final
 {
 public:
+    /**
+     * @brief   Deleted constructor
+     */
     PatcherFunctionsExporter() = delete;
 
+    /**
+     * @brief   Export model
+     *
+     * Creates pairs of .h and .c files for each ASN.1 file
+     * Creates a bundle header that includes the previous headers
+     * Creates a pair of .h and .c files with common functions for patching
+     *
+     * @param   model       Model to export
+     * @param   options     Options
+     */
     static auto exportModel(const Asn1Acn::Asn1Model *model, const Options &options) -> void;
 
 private:
