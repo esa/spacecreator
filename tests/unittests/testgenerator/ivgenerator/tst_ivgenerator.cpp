@@ -99,13 +99,12 @@ void tst_ivgenerator::testNominal()
         QFAIL("IV model was not generated");
     }
 
-    const auto ivModelLoadedUniquePtr = ModelLoader::loadIvModel(ivConfig, ivPath.arg("interfaceview"));
-    const auto ivModelLoadedRaw = dynamic_cast<ivm::IVModel *>(ivModelLoadedUniquePtr.get());
-    if (ivModelLoadedRaw == nullptr) {
+    const auto ivModelLoaded = ModelLoader::loadIvModel(ivConfig, ivPath.arg("interfaceview"));
+    if (ivModelLoaded == nullptr) {
         throw std::runtime_error(QString("%1 file could not be read as IV").arg(ivDir).toStdString());
     }
 
-    compareModels(ivModelLoadedRaw, ivModelGenerated.get());
+    compareModels(ivModelLoaded.get(), ivModelGenerated.get());
 }
 
 static ivm::IVInterface *makeInterfaceUnderTest(const QString &interfaceName, ivm::IVFunction *const function,

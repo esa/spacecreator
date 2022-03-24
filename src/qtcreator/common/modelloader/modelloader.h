@@ -20,8 +20,10 @@
 #pragma once
 
 #include <QString>
+#include <asn1model.h>
 #include <conversion/common/model.h>
 #include <csv/CsvModel/csvmodel.h>
+#include <ivmodel.h>
 #include <memory>
 
 namespace plugincommon {
@@ -42,7 +44,7 @@ public:
      * @return  InterfaceView model
      */
     static auto loadIvModel(const QString &ivConfigFilename, const QString &ivFilename)
-            -> std::unique_ptr<conversion::Model>;
+            -> std::unique_ptr<ivm::IVModel>;
     /**
      * @brief   load SOIS Electronic Datasheet model from a file
      *
@@ -52,7 +54,7 @@ public:
      */
     static auto loadSedsModel(const QString &sedsFilename) -> std::unique_ptr<conversion::Model>;
 
-    static auto loadAsn1Model(const QString &filename) -> std::unique_ptr<conversion::Model>;
+    static auto loadAsn1Model(const QString &filename) -> std::unique_ptr<Asn1Acn::Asn1Model>;
 
     static auto loadCsvModel(const QString &filename) -> std::unique_ptr<csv::CsvModel>;
 };

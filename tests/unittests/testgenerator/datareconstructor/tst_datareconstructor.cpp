@@ -20,6 +20,7 @@
 #include "../common.h"
 #include "dataview-uniq.h"
 #include "gdbconnectorstub.h"
+#include "ivcommonprops.h"
 #include "ivinterface.h"
 #include "ivmodel.h"
 #include "modelloader.h"
@@ -64,7 +65,7 @@ private:
     TestVector *testData = nullptr;
 };
 static auto compareTestVectors(const TestVector &actual, const TestVector &expected) -> void;
-static auto copyRawBytesIntoTestVector(const QByteArray &source, TestVector *const testData, unsigned int testDataSize)
+static auto copyRawBytesIntoTestVector(const QByteArray &source, TestVector *testData, unsigned int testDataSize)
         -> void;
 
 void tst_datareconstructor::initTestCase()
@@ -112,6 +113,7 @@ void tst_datareconstructor::testNominal()
         { true, 2.3000, 4, 1, true },
     };
 
+    // these are just dummy values
     const QString binLocalization = qEnvironmentVariable("$HOME/testBinaries/");
     const QString script = "x86-linux-cpp.gdb";
     const QString binToRun = "hostpartition";
@@ -119,14 +121,20 @@ void tst_datareconstructor::testNominal()
             GdbConnector::getRawTestResults(binLocalization, { "-batch", "-x", script }, { "host:1234", binToRun });
 
     const QString ifUnderTestName = "InterfaceUnderTest";
-    const auto model = plugincommon::ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview.xml");
-    const auto ivModel = static_cast<ivm::IVModel *>(model.get());
+    const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview.xml");
+    if (ivModel == nullptr) {
+        QFAIL("could not load IV model");
+    }
     const auto *const iface = ivModel->getIfaceByName(ifUnderTestName, ivm::IVInterface::InterfaceType::Provided);
     qDebug() << iface->title();
     qDebug() << iface->function()->title();
     for (const auto &param : iface->params()) {
         qDebug() << param.paramTypeName();
     }
+
+    const QString asnFilename = ivModel->property("asn1file").toString();
+    const auto asn1Model = ModelLoader::loadAsn1Model(asnFilename);
+    (void)asn1Model;
 
     copyRawBytesIntoTestVector(rawTestResults, testData, kTestDataSize);
     for (unsigned int i = 0; i < kTestDataSize; i++) {

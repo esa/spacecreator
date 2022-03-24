@@ -39,7 +39,7 @@ using conversion::ModelType;
 namespace plugincommon {
 
 auto ModelLoader::loadIvModel(const QString &ivConfigFilename, const QString &ivFilename)
-        -> std::unique_ptr<conversion::Model>
+        -> std::unique_ptr<ivm::IVModel>
 {
     std::unique_ptr<conversion::Model> model;
 
@@ -50,7 +50,11 @@ auto ModelLoader::loadIvModel(const QString &ivConfigFilename, const QString &iv
     conversion::iv::importer::IvXmlImporter ivImporter;
     model = ivImporter.importModel(options);
 
-    return model;
+    std::unique_ptr<ivm::IVModel> output;
+    output.reset(static_cast<ivm::IVModel *>(model.get()));
+    model.release();
+
+    return output;
 }
 
 auto ModelLoader::loadSedsModel(const QString &sedsFilename) -> std::unique_ptr<conversion::Model>
@@ -66,7 +70,7 @@ auto ModelLoader::loadSedsModel(const QString &sedsFilename) -> std::unique_ptr<
     return model;
 }
 
-auto ModelLoader::loadAsn1Model(const QString &filename) -> std::unique_ptr<conversion::Model>
+auto ModelLoader::loadAsn1Model(const QString &filename) -> std::unique_ptr<Asn1Acn::Asn1Model>
 {
     std::unique_ptr<conversion::Model> model;
 
@@ -80,7 +84,11 @@ auto ModelLoader::loadAsn1Model(const QString &filename) -> std::unique_ptr<conv
         return nullptr;
     }
 
-    return model;
+    std::unique_ptr<Asn1Acn::Asn1Model> output;
+    output.reset(static_cast<Asn1Acn::Asn1Model *>(model.get()));
+    model.release();
+
+    return output;
 }
 
 auto ModelLoader::loadCsvModel(const QString &filename) -> std::unique_ptr<csv::CsvModel>
