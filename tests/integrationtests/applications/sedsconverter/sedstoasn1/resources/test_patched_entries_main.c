@@ -42,6 +42,8 @@ int testCrc8Packet()
     if(!ret) {
         return errCode;
     }
+
+    return 0;
 }
 
 int testCrc16Packet()
@@ -84,6 +86,8 @@ int testCrc16Packet()
     if(!ret) {
         return errCode;
     }
+
+    return 0;
 }
 
 int testChecksumPacket()
@@ -126,6 +130,8 @@ int testChecksumPacket()
     if(!ret) {
         return errCode;
     }
+
+    return 0;
 }
 
 int testChecksumLongitudinalPacket()
@@ -168,6 +174,8 @@ int testChecksumLongitudinalPacket()
     if(!ret) {
         return errCode;
     }
+
+    return 0;
 }
 
 int main()

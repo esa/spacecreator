@@ -65,11 +65,12 @@ private:
 
     auto buildErrorControlEntryEncodingFunction(const seds::model::ErrorControlEntry &entry, const uint64_t bits,
             const QString &sequenceName) const -> QString;
-    auto buildErrorControlEntryDecodingValidator(const seds::model::ErrorControlEntry &entry, const uint64_t bits) const
-            -> QString;
+    auto buildErrorControlEntryDecodingValidator(const seds::model::ErrorControlEntry &entry, const uint64_t bits,
+            const QString &sequenceName) const -> QString;
     auto buildLengthEntryEncodingFunction(const seds::model::IntegerDataEncoding &encoding, const QString &sequenceName,
             const QString &entryName) const -> QString;
-    auto buildLengthEntryDecodingValidator(const seds::model::IntegerDataEncoding &encoding) const -> QString;
+    auto buildLengthEntryDecodingValidator(const seds::model::IntegerDataEncoding &encoding,
+            const QString &sequenceName, const QString &entryName) const -> QString;
 
     auto getErrorControlBitCount(const seds::model::ErrorControlEntry &lengthEntry) const -> uint64_t;
     auto getLengthEncoding(const seds::model::LengthEntry &lengthEntry) const

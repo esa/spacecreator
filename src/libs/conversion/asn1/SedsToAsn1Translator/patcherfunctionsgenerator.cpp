@@ -72,7 +72,7 @@ Asn1Acn::PatcherFunction PatcherFunctionsGenerator::buildErrorControlEntryFuncti
     const auto bitCount = getErrorControlBitCount(errorControlEntry);
 
     auto encodingFunction = buildErrorControlEntryEncodingFunction(errorControlEntry, bitCount, sequenceName);
-    auto decodingValidator = buildErrorControlEntryDecodingValidator(errorControlEntry, bitCount);
+    auto decodingValidator = buildErrorControlEntryDecodingValidator(errorControlEntry, bitCount, sequenceName);
 
     return { std::move(encodingFunction), std::move(decodingValidator) };
 }
@@ -85,7 +85,7 @@ Asn1Acn::PatcherFunction PatcherFunctionsGenerator::buildLengthEntryFunction(
     const auto entryName = Escaper::escapeCFieldName(lengthEntry.nameStr());
 
     auto encodingFunction = buildLengthEntryEncodingFunction(encoding, sequenceName, entryName);
-    auto decodingValidator = buildLengthEntryDecodingValidator(encoding);
+    auto decodingValidator = buildLengthEntryDecodingValidator(encoding, sequenceName, entryName);
 
     return { std::move(encodingFunction), std::move(decodingValidator) };
 }
@@ -93,6 +93,8 @@ Asn1Acn::PatcherFunction PatcherFunctionsGenerator::buildLengthEntryFunction(
 QString PatcherFunctionsGenerator::buildErrorControlEntryEncodingFunction(
         const seds::model::ErrorControlEntry &entry, const uint64_t bitCount, const QString &sequenceName) const
 {
+    const auto entryName = Escaper::escapeCFieldName(entry.nameStr());
+
     QString buffer;
     QTextStream stream(&buffer, QIODevice::WriteOnly);
 
@@ -123,24 +125,70 @@ QString PatcherFunctionsGenerator::buildErrorControlEntryEncodingFunction(
     }, entry.errorControl());
     // clang-format on
 
-    const auto entryName = Escaper::escapeCFieldName(entry.nameStr());
-
+    // clang-format off
     stream << "(pNullPos->" << sequenceName << "_" + entryName << ".buf, "
            << "pNullPos->" << sequenceName << "_" + entryName << ".currentByte);\n"
-           << '\n'
            << "Acn_Enc_Int_PositiveInteger_ConstSize("
            << "&pNullPos->" << sequenceName << "_" << entryName << ", "
-           << "crcResult, " << bitCount << ");\n";
+           << "crcResult, "
+           << bitCount
+           << ");\n";
+    // clang-format on
 
     return buffer;
 }
 
 QString PatcherFunctionsGenerator::buildErrorControlEntryDecodingValidator(
-        const seds::model::ErrorControlEntry &entry, const uint64_t bitCount) const
+        const seds::model::ErrorControlEntry &entry, const uint64_t bitCount, const QString &sequenceName) const
 {
-    Q_UNUSED(entry);
-    Q_UNUSED(bitCount);
-    return "";
+    const auto entryName = Escaper::escapeCFieldName(entry.nameStr());
+
+    QString buffer;
+    QTextStream stream(&buffer, QIODevice::WriteOnly);
+
+    stream << "asn1SccUint crcResult = calculate";
+
+    // clang-format off
+    std::visit(overloaded {
+        [&](const seds::model::CoreErrorControl &coreErrorControl) {
+            switch(coreErrorControl) {
+                case seds::model::CoreErrorControl::Crc16:
+                    stream << "Crc16";
+                    break;
+                case seds::model::CoreErrorControl::Crc8:
+                    stream << "Crc8";
+                    break;
+                case seds::model::CoreErrorControl::Checksum:
+                    stream << "Checksum";
+                    break;
+                case seds::model::CoreErrorControl::ChecksumLongitundinal:
+                    stream << "ChecksumLongitundinal";
+                    break;
+                default: {
+                    auto errorMessage = QString("Unsupported encoding for error control entry entry \"%1\" - use unsigned, two's complement or BCD").arg(entry.nameStr());
+                    throw TranslationException(std::move(errorMessage));
+                } break;
+            }
+        }
+    }, entry.errorControl());
+    // clang-format on
+
+    // clang-format off
+    stream << "(pNullPos->" << sequenceName << "_" + entryName << ".buf, "
+           << "pNullPos->" << sequenceName << "_" + entryName << ".currentByte);\n"
+           << "asn1SccUint decodedCrc = 0;\n"
+           << "ret = Acn_Dec_Int_PositiveInteger_ConstSize("
+           << "&pNullPos->" << sequenceName << "_" << entryName << ", "
+           << "&decodedCrc, "
+           << bitCount
+           << ");\n"
+           << "if(!ret || crcResult != decodedCrc) {\n"
+           << "\t*pErrCode = 1;\n"
+           << "\treturn false;\n"
+           << "}\n";
+    // clang-format on
+
+    return buffer;
 }
 
 QString PatcherFunctionsGenerator::buildLengthEntryEncodingFunction(
@@ -185,10 +233,50 @@ QString PatcherFunctionsGenerator::buildLengthEntryEncodingFunction(
 }
 
 QString PatcherFunctionsGenerator::buildLengthEntryDecodingValidator(
-        const seds::model::IntegerDataEncoding &encoding) const
+        const seds::model::IntegerDataEncoding &encoding, const QString &sequenceName, const QString &entryName) const
 {
-    Q_UNUSED(encoding);
-    return "";
+    QString buffer;
+    QTextStream stream(&buffer, QIODevice::WriteOnly);
+
+    stream << "asn1SccUint decodedLengthInBytes = 0;\n"
+           << "ret = Acn_Dec_Int_";
+
+    // clang-format off
+    std::visit(overloaded {
+        [&](const seds::model::CoreIntegerEncoding &coreEncoding) {
+            switch(coreEncoding) {
+                case seds::model::CoreIntegerEncoding::Unsigned:
+                    stream << "PositiveInteger";
+                    break;
+                case seds::model::CoreIntegerEncoding::TwosComplement:
+                    stream << "TwosComplement";
+                    break;
+                case seds::model::CoreIntegerEncoding::Bcd:
+                    stream << "BCD";
+                    break;
+                default: {
+                    auto errorMessage = QString("Unsupported encoding for length entry \"%1\" - use unsigned, two's complement or BCD").arg(entryName);
+                    throw TranslationException(std::move(errorMessage));
+                } break;
+            }
+        }
+    }, encoding.encoding());
+    // clang-format on
+
+    // clang-format off
+    stream << "_ConstSize("
+           << "&pNullPos->" << sequenceName << "_" << entryName << ", "
+           << "&decodedLengthInBytes, "
+           << encoding.bits()
+           << ");\n"
+           << "if(!ret || lengthInBytes != decodedLengthInBytes) {\n"
+           << "\t*pErrCode = 1;\n"
+           << "\treturn false;\n"
+           << "}\n"
+          ;
+    // clang-format on
+
+    return buffer;
 }
 
 uint64_t PatcherFunctionsGenerator::getErrorControlBitCount(const seds::model::ErrorControlEntry &entry) const

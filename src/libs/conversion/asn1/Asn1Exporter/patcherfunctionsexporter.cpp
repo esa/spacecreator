@@ -222,7 +222,10 @@ void PatcherFunctionsExporter::generateDecodingValidatorBody(const Sequence *seq
 {
     stream << '\n';
     generateDecodingValidatorDeclaration(sequence, stream);
-    stream << '\n' << "{";
+    stream << '\n'
+           << "{"
+           << "\tasn1SccUint lengthInBytes = calculateLengthInBytes(pStartBitStream, pEndBitStream);\n"
+           << "\tbool ret = true;";
 
     for (const auto &patcherFunction : sequence->patcherFunctions()) {
         stream << '\n';
