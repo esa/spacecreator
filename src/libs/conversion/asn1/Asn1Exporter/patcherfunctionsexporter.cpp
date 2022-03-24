@@ -179,13 +179,17 @@ void PatcherFunctionsExporter::generateEncodingFunctionBody(const Sequence *sequ
     generateEncodingFunctionDeclaration(sequence, stream);
     stream << '\n'
            << "{\n"
-           << "\tasn1SccUint lengthInBytes = calculateLengthInBytes(pStartBitStream, pEndBitStream);\n";
+           << "\tasn1SccUint lengthInBytes = calculateLengthInBytes(pStartBitStream, pEndBitStream);";
 
     for (const auto &patcherFunction : sequence->patcherFunctions()) {
-        stream << "\n\t" << patcherFunction.encodingFunction;
+        stream << '\n';
+
+        for (const auto &line : patcherFunction.encodingFunction.split('\n', Qt::SkipEmptyParts)) {
+            stream << "\n\t" << line;
+        }
     }
 
-    stream << "}\n";
+    stream << "\n}\n";
 }
 
 void PatcherFunctionsExporter::generateEncodingFunctionDeclaration(const Sequence *sequence, QTextStream &stream)
@@ -218,10 +222,14 @@ void PatcherFunctionsExporter::generateDecodingValidatorBody(const Sequence *seq
 {
     stream << '\n';
     generateDecodingValidatorDeclaration(sequence, stream);
-    stream << '\n' << "{\n";
+    stream << '\n' << "{";
 
     for (const auto &patcherFunction : sequence->patcherFunctions()) {
-        stream << "\n\t" << patcherFunction.decodingValidator;
+        stream << '\n';
+
+        for (const auto &line : patcherFunction.decodingValidator.split('\n', Qt::SkipEmptyParts)) {
+            stream << "\n\t" << line;
+        }
     }
 
     stream << "\n\treturn true;\n"
