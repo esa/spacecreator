@@ -72,6 +72,8 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterAcnFilepathPrefix();
     void testCmdArgumentSedsConverterAsn1FilepathPrefix();
     void testCmdArgumentSedsConverterAsn1SequenceSizeThreshold();
+    void testCmdArgumentSedsConverterPatcherFunctionsFilepathPrefix();
+    void testCmdArgumentSedsConverterMappingFunctionsModuleFileName();
     void testCmdArgumentSedsConverterSdlFilepathPrefix();
 
     void initTestCase();
@@ -515,6 +517,44 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterAsn1SequenceSizeThreshol
 
     const QString value = parser.value(CommandArg::SedsConverterAsn1SequenceSizeThreshold);
     QCOMPARE(value, threshold);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterPatcherFunctionsFilepathPrefix()
+{
+    const QCommandLineOption cmdExportToFile =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterPatcherFunctionsFilepathPrefix);
+    const QString prefix("patcher_function_prefix_");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdExportToFile.names().first(), prefix) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterPatcherFunctionsFilepathPrefix);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterPatcherFunctionsFilepathPrefix));
+
+    const QString value = parser.value(CommandArg::SedsConverterPatcherFunctionsFilepathPrefix);
+    QCOMPARE(value, prefix);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterMappingFunctionsModuleFileName()
+{
+    const QCommandLineOption cmdExportToFile =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterMappingFunctionsModuleFileName);
+    const QString prefix("mfm_module_name");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdExportToFile.names().first(), prefix) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterMappingFunctionsModuleFileName);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterMappingFunctionsModuleFileName));
+
+    const QString value = parser.value(CommandArg::SedsConverterMappingFunctionsModuleFileName);
+    QCOMPARE(value, prefix);
 }
 
 void tst_CommandLineParser::testCmdArgumentSedsConverterSdlFilepathPrefix()

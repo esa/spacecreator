@@ -349,7 +349,7 @@ void tst_SedsToAsn1Translator::testTranslateArrayDataTypeMultiDimension()
 /// \SRS  ETB-FUN-140
 void tst_SedsToAsn1Translator::testTranslateBinaryDataType()
 {
-    const auto sedsModel = SedsModelBuilder("Model").withBinaryDataType("Bitstring").build();
+    const auto sedsModel = SedsModelBuilder("Model").withBinaryDataType("Bitstring", 42).build();
 
     Options options;
     SedsToAsn1Translator translator;
@@ -486,7 +486,7 @@ void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithErrorControlEntry
     // clang-format off
     const auto &sedsModel = SedsModelBuilder("Model")
                                 .withContainerDataType(std::move(container))
-                                .withIntegerDataType("CrcData")
+                                .withBinaryDataType("CrcData", 16, true)
                             .build();
     // clang-format on
 
