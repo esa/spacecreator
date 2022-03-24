@@ -132,9 +132,24 @@ void tst_datareconstructor::testNominal()
         qDebug() << param.paramTypeName();
     }
 
-    const QString asnFilename = ivModel->property("asn1file").toString();
+    // auto properties = ivModel->p;
+    const QString asnFilename =
+            QString("%1%2%3").arg("resources").arg(QDir::separator()).arg(ivModel->property("asn1file").toString());
+    qDebug() << "asn file: " << asnFilename;
+    if (asnFilename.isEmpty()) {
+        QFAIL("Could not read name of ASN.1 file");
+    }
+
     const auto asn1Model = ModelLoader::loadAsn1Model(asnFilename);
-    (void)asn1Model;
+    if (asn1Model == nullptr) {
+        QFAIL("Could not load ASN.1 model");
+    }
+
+    for (const auto &file : asn1Model->data()) {
+        if (file != nullptr) {
+            qDebug() << "file from model" << file->name();
+        }
+    }
 
     copyRawBytesIntoTestVector(rawTestResults, testData, kTestDataSize);
     for (unsigned int i = 0; i < kTestDataSize; i++) {
