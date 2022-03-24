@@ -36,6 +36,7 @@ private Q_SLOTS:
     void testContainers();
     void testContainerConstraints();
     void testContainerEntries();
+    void testPatchedEntries();
     void testContainerInheritance();
     void testMinMaxRange();
     void testCrossReferenceDataTypes();
@@ -152,6 +153,19 @@ void tst_SedsConverter_SedsToAsn1::testContainerInheritance()
 void tst_SedsConverter_SedsToAsn1::testContainerEntries()
 {
     const int result = system("./test_container_entries.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-110
+/// \SRS  ETB-FUN-230
+/// \SRS  ETB-FUN-250
+/// \SRS  ETB-FUN-260
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-120
+void tst_SedsConverter_SedsToAsn1::testPatchedEntries()
+{
+    const int result = system("./test_patched_entries.sh");
     QCOMPARE(result, 0);
 }
 

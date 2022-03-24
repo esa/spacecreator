@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
-  <Package name="com/n7space/LengthEntry">
+  <Package name="com/n7space/Patched">
     <DataTypeSet>
       <IntegerDataType name="IntegerData">
         <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />

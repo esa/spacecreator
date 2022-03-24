@@ -1,4 +1,4 @@
-COM-N7SPACE-LENGTHENTRY DEFINITIONS ::= BEGIN
+COM-N7SPACE-PATCHED DEFINITIONS ::= BEGIN
 IntegerData [size 8, encoding pos-int, endianness big]
 FloatData [encoding IEEE754-1985-32, endianness big]
 LengthType [size 16, encoding pos-int, endianness little]
