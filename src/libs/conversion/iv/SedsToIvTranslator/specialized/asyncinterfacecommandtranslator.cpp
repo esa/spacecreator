@@ -46,7 +46,8 @@ std::multimap<QString, AsyncInterfaceCommandTranslator::CommandArgumentEntry>
 AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction,
         const QString &sedsInterfaceName, Asn1Acn::Definitions *asn1Definitions,
         const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
-        const std::vector<seds::model::Package> &sedsPackages, const GenericTypeMapper *typeMapper)
+        const std::vector<seds::model::Package> &sedsPackages, const GenericTypeMapper *typeMapper,
+        const std::optional<uint64_t> &sequenceSizeThreshold)
     : m_ivFunction(ivFunction)
     , m_sedsInterfaceName(sedsInterfaceName)
     , m_asn1Definitions(asn1Definitions)
@@ -54,6 +55,7 @@ AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(ivm::IVFunction
     , m_asn1Files(asn1Files)
     , m_sedsPackages(sedsPackages)
     , m_typeMapper(typeMapper)
+    , m_sequenceSizeThreshold(sequenceSizeThreshold)
 {
 }
 
@@ -351,8 +353,8 @@ seds::model::DataTypeRef AsyncInterfaceCommandTranslator::handleArrayArgument(
     if (sedsArgument.arrayDimensions().empty()) {
         return typeRef;
     } else {
-        return InterfaceTranslatorHelper::createArrayType(
-                typeRef, sedsArgument.arrayDimensions(), m_asn1Definitions, m_sedsPackage, m_asn1Files, m_sedsPackages);
+        return InterfaceTranslatorHelper::createArrayType(typeRef, sedsArgument.arrayDimensions(), m_asn1Definitions,
+                m_sedsPackage, m_asn1Files, m_sedsPackages, m_sequenceSizeThreshold);
     }
 }
 

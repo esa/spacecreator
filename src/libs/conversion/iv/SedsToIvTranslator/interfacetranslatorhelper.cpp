@@ -70,7 +70,7 @@ shared::InterfaceParameter InterfaceTranslatorHelper::createInterfaceParameter(
 QString InterfaceTranslatorHelper::createArrayType(const seds::model::DataTypeRef &baseTypeRef,
         const std::vector<seds::model::DimensionSize> &dimensions, Asn1Acn::Definitions *asn1Definitions,
         const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
-        const std::vector<seds::model::Package> &sedsPackages)
+        const std::vector<seds::model::Package> &sedsPackages, const std::optional<uint64_t> &sequenceSizeThreshold)
 {
     const auto &baseTypeName = baseTypeRef.nameStr();
     const auto name = buildArrayTypeName(baseTypeName, dimensions);
@@ -90,7 +90,7 @@ QString InterfaceTranslatorHelper::createArrayType(const seds::model::DataTypeRe
 
     std::unique_ptr<Asn1Acn::Types::Type> asn1Array;
     asn1::translator::DataTypeTranslatorVisitor dataTypeVisitor(
-            asn1Array, asn1Definitions, sedsPackage, asn1Files, sedsPackages);
+            asn1Array, asn1Definitions, sedsPackage, asn1Files, sedsPackages, sequenceSizeThreshold);
     dataTypeVisitor(sedsArray);
 
     auto asn1ArrayAssignment =

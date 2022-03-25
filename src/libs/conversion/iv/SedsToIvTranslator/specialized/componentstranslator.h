@@ -60,7 +60,8 @@ public:
      * @param   sedsPackages        List of SEDS packages
      */
     ComponentsTranslator(const seds::model::Package *sedsPackage, Asn1Acn::Definitions *asn1Definitions,
-            const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages);
+            const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages,
+            const std::optional<uint64_t> &sequenceSizeThreshold);
     /**
      * @brief   Deleted copy constructor
      */
@@ -149,6 +150,9 @@ private:
     const Asn1Acn::Asn1Model::Data &m_asn1Files;
     /// @brief  List of SEDS packages
     const std::vector<seds::model::Package> &m_sedsPackages;
+
+    /// @brief  ASN.1 sequence size threshold
+    const std::optional<uint64_t> &m_sequenceSizeThreshold;
 };
 
 } // namespace conversion::iv::translator

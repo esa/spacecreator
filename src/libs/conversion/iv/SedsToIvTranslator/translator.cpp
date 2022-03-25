@@ -23,6 +23,7 @@
 
 #include <QFileInfo>
 #include <asn1library/asn1/asn1model.h>
+#include <conversion/asn1/Asn1Options/options.h>
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
@@ -89,16 +90,24 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(const
 {
     const auto generateFunctionsForPackages = options.isSet(IvOptions::generateFunctionsForPackages);
 
+    std::optional<uint64_t> sequenceSizeThreshold = std::nullopt;
+    if (options.isSet(asn1::Asn1Options::sequenceSizeThreshold)) {
+        const auto thresholdStr = options.value(asn1::Asn1Options::sequenceSizeThreshold);
+        sequenceSizeThreshold = thresholdStr->toLongLong();
+    }
+
     auto ivModel = std::make_unique<IVModel>(ivConfig);
 
     const auto &sedsModelData = sedsModel->data();
     if (std::holds_alternative<seds::model::PackageFile>(sedsModelData)) {
         const auto &sedsPackage = std::get<seds::model::PackageFile>(sedsModelData).package();
-        translatePackage(sedsPackage, asn1Model, ivModel.get(), {}, generateFunctionsForPackages);
+        translatePackage(
+                sedsPackage, asn1Model, ivModel.get(), {}, generateFunctionsForPackages, sequenceSizeThreshold);
     } else if (std::holds_alternative<seds::model::DataSheet>(sedsModelData)) {
         const auto &sedsPackages = std::get<seds::model::DataSheet>(sedsModelData).packages();
         for (const auto &sedsPackage : sedsPackages) {
-            translatePackage(sedsPackage, asn1Model, ivModel.get(), sedsPackages, generateFunctionsForPackages);
+            translatePackage(sedsPackage, asn1Model, ivModel.get(), sedsPackages, generateFunctionsForPackages,
+                    sequenceSizeThreshold);
         }
     } else {
         throw TranslationException("Unhandled SEDS model data type");
@@ -111,11 +120,13 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(const
 }
 
 void SedsToIvTranslator::translatePackage(const seds::model::Package &sedsPackage, Asn1Model *asn1Model,
-        IVModel *ivModel, const std::vector<seds::model::Package> &sedsPackages, bool generateFunction) const
+        IVModel *ivModel, const std::vector<seds::model::Package> &sedsPackages, bool generateFunction,
+        const std::optional<uint64_t> &sequenceSizeThreshold) const
 {
     auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(sedsPackage.nameStr(), asn1Model->data());
 
-    ComponentsTranslator componentsTranslator(&sedsPackage, asn1Definitions, asn1Model->data(), sedsPackages);
+    ComponentsTranslator componentsTranslator(
+            &sedsPackage, asn1Definitions, asn1Model->data(), sedsPackages, sequenceSizeThreshold);
     auto ivFunctions = componentsTranslator.translateComponents();
 
     if (generateFunction) {

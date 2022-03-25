@@ -66,13 +66,15 @@ namespace conversion::asn1::translator {
 
 DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(std::unique_ptr<Asn1Acn::Types::Type> &asn1Type,
         Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
-        const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages)
+        const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages,
+        const std::optional<uint64_t> &sequenceSizeThreshold)
     : m_asn1Type(asn1Type)
     , m_asn1Definitions(asn1Definitions)
     , m_sedsPackage(sedsPackage)
     , m_asn1Files(asn1Files)
     , m_sedsPackages(sedsPackages)
-    , m_containersScope(asn1Definitions, sedsPackage, asn1Files, sedsPackages)
+    , m_containersScope(asn1Definitions, sedsPackage, asn1Files, sedsPackages, sequenceSizeThreshold)
+    , m_sequenceSizeThreshold(sequenceSizeThreshold)
 {
 }
 
@@ -83,7 +85,7 @@ void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
         throw TranslationException("Encountered ArrayDataType without dimensions");
     }
 
-    DimensionTranslator dimensionTranslator(m_sedsPackage, m_sedsPackages);
+    DimensionTranslator dimensionTranslator(m_sedsPackage, m_sedsPackages, m_sequenceSizeThreshold);
 
     if (dimensions.size() == 1) { // Sequence of type with one dimension
         auto type = std::make_unique<Asn1Acn::Types::SequenceOf>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));

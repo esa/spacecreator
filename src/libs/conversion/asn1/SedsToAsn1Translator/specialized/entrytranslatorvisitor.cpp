@@ -58,13 +58,14 @@ using SizeTranslator = SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn
 EntryTranslatorVisitor::EntryTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence,
         Asn1Acn::Definitions *asn1Definitions, const seds::model::ContainerDataType *sedsParentContainer,
         const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
-        const std::vector<seds::model::Package> &sedsPackages)
+        const std::vector<seds::model::Package> &sedsPackages, const std::optional<uint64_t> &sequenceSizeThreshold)
     : m_asn1Sequence(asn1Sequence)
     , m_asn1Definitions(asn1Definitions)
     , m_sedsParentContainer(sedsParentContainer)
     , m_sedsPackage(sedsPackage)
     , m_asn1Files(asn1Files)
     , m_sedsPackages(sedsPackages)
+    , m_sequenceSizeThreshold(sequenceSizeThreshold)
 {
 }
 
@@ -370,8 +371,8 @@ void EntryTranslatorVisitor::addListSizeConstraint(
     const auto listLengthEntryType = sedsPackage->dataType(listLengthEntryTypeRef.nameStr());
 
     if (const auto listLengthEntryIntegerType = std::get_if<seds::model::IntegerDataType>(listLengthEntryType)) {
-        SizeTranslator sizeTranslator(
-                asn1Type, SizeTranslator::LengthType::VariableLength, SizeTranslator::SourceType::Determinant);
+        SizeTranslator sizeTranslator(asn1Type, SizeTranslator::LengthType::VariableLength,
+                SizeTranslator::SourceType::Determinant, m_sequenceSizeThreshold);
         std::visit(sizeTranslator, listLengthEntryIntegerType->range());
     } else {
         auto errorMessage = QString(

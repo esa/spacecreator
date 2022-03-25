@@ -41,11 +41,12 @@ namespace conversion::iv::translator {
 
 ComponentsTranslator::ComponentsTranslator(const seds::model::Package *sedsPackage,
         Asn1Acn::Definitions *asn1Definitions, const Asn1Acn::Asn1Model::Data &asn1Files,
-        const std::vector<seds::model::Package> &sedsPackages)
+        const std::vector<seds::model::Package> &sedsPackages, const std::optional<uint64_t> &sequenceSizeThreshold)
     : m_sedsPackage(sedsPackage)
     , m_asn1Definitions(asn1Definitions)
     , m_asn1Files(asn1Files)
     , m_sedsPackages(sedsPackages)
+    , m_sequenceSizeThreshold(sequenceSizeThreshold)
 {
 }
 
@@ -127,10 +128,10 @@ void ComponentsTranslator::translateCommands(const QString &sedsInterfaceName,
         const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
         const GenericTypeMapper *typeMapper) const
 {
-    AsyncInterfaceCommandTranslator asyncCommandTranslator(
-            ivFunction, sedsInterfaceName, m_asn1Definitions, m_sedsPackage, m_asn1Files, m_sedsPackages, typeMapper);
-    SyncInterfaceCommandTranslator syncCommandTranslator(
-            ivFunction, sedsInterfaceName, m_asn1Definitions, m_sedsPackage, m_asn1Files, m_sedsPackages, typeMapper);
+    AsyncInterfaceCommandTranslator asyncCommandTranslator(ivFunction, sedsInterfaceName, m_asn1Definitions,
+            m_sedsPackage, m_asn1Files, m_sedsPackages, typeMapper, m_sequenceSizeThreshold);
+    SyncInterfaceCommandTranslator syncCommandTranslator(ivFunction, sedsInterfaceName, m_asn1Definitions,
+            m_sedsPackage, m_asn1Files, m_sedsPackages, typeMapper, m_sequenceSizeThreshold);
 
     for (const auto &sedsCommand : sedsInterfaceDeclaration.commands()) {
         switch (sedsCommand.mode()) {

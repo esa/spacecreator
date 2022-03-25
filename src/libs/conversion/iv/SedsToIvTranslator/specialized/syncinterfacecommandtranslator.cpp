@@ -32,7 +32,8 @@ namespace conversion::iv::translator {
 SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction,
         const QString &sedsInterfaceName, Asn1Acn::Definitions *asn1Definitions,
         const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
-        const std::vector<seds::model::Package> &sedsPackages, const GenericTypeMapper *typeMapper)
+        const std::vector<seds::model::Package> &sedsPackages, const GenericTypeMapper *typeMapper,
+        const std::optional<uint64_t> &sequenceSizeThreshold)
     : m_ivFunction(ivFunction)
     , m_sedsInterfaceName(sedsInterfaceName)
     , m_asn1Definitions(asn1Definitions)
@@ -40,6 +41,7 @@ SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(ivm::IVFunction *
     , m_asn1Files(asn1Files)
     , m_sedsPackages(sedsPackages)
     , m_typeMapper(typeMapper)
+    , m_sequenceSizeThreshold(sequenceSizeThreshold)
 {
 }
 
@@ -121,7 +123,7 @@ QString SyncInterfaceCommandTranslator::handleArgumentType(
             return Escaper::escapeAsn1TypeName(argumentTypeName);
         } else {
             return InterfaceTranslatorHelper::createArrayType(argumentTypeRef, sedsArgument.arrayDimensions(),
-                    m_asn1Definitions, m_sedsPackage, m_asn1Files, m_sedsPackages);
+                    m_asn1Definitions, m_sedsPackage, m_asn1Files, m_sedsPackages, m_sequenceSizeThreshold);
         }
     }
 
@@ -150,7 +152,7 @@ QString SyncInterfaceCommandTranslator::handleArgumentType(
         return Escaper::escapeAsn1TypeName(argumentConcreteTypeName);
     } else {
         return InterfaceTranslatorHelper::createArrayType(argumentConcreteTypeRef, sedsArgument.arrayDimensions(),
-                m_asn1Definitions, m_sedsPackage, m_asn1Files, m_sedsPackages);
+                m_asn1Definitions, m_sedsPackage, m_asn1Files, m_sedsPackages, m_sequenceSizeThreshold);
     }
 }
 

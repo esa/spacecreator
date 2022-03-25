@@ -50,7 +50,7 @@ public:
     SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
             Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
             const Asn1Acn::Asn1Model::Data &m_asn1Files, const std::vector<seds::model::Package> &sedsPackages,
-            const GenericTypeMapper *typeMapper);
+            const GenericTypeMapper *typeMapper, const std::optional<uint64_t> &sequenceSizeThreshold);
     /**
      * @brief   Deleted copy constructor
      */
@@ -104,6 +104,9 @@ private:
 
     /// @brief  Generic type mapper
     const GenericTypeMapper *m_typeMapper;
+
+    /// @brief  ASN.1 sequence size threshold
+    const std::optional<uint64_t> &m_sequenceSizeThreshold;
 };
 
 } // namespace conversion::iv::translator

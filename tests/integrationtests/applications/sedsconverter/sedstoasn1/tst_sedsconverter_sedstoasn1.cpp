@@ -31,6 +31,7 @@ private Q_SLOTS:
     void testSimpleDataTypes();
     void testSubRangeDataType();
     void testArrays();
+    void testArraySizeThreshold();
     void testIndexedArray();
     void testContainers();
     void testContainerConstraints();
@@ -79,6 +80,19 @@ void tst_SedsConverter_SedsToAsn1::testSubRangeDataType()
 void tst_SedsConverter_SedsToAsn1::testArrays()
 {
     const int result = system("./test_arrays.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-110
+/// \SRS  ETB-FUN-130
+/// \SRS  ETB-FUN-210
+/// \SRS  ETB-FUN-220
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-120
+void tst_SedsConverter_SedsToAsn1::testArraySizeThreshold()
+{
+    const int result = system("./test_array_size_threshold.sh");
     QCOMPARE(result, 0);
 }
 

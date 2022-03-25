@@ -37,10 +37,11 @@ namespace conversion::asn1::translator {
 
 using SizeTranslator = SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn::IntegerValue>;
 
-DimensionTranslator::DimensionTranslator(
-        const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages)
+DimensionTranslator::DimensionTranslator(const seds::model::Package *sedsPackage,
+        const std::vector<seds::model::Package> &sedsPackages, const std::optional<uint64_t> &threshold)
     : m_sedsPackage(sedsPackage)
     , m_sedsPackages(sedsPackages)
+    , m_threshold(threshold)
 {
 }
 
@@ -59,7 +60,11 @@ void DimensionTranslator::translateDimension(
 void DimensionTranslator::translateSizeDimension(
         const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1SequenceOf) const
 {
-    const auto dimensionSize = dimension.size()->value();
+    auto dimensionSize = dimension.size()->value();
+
+    if (m_threshold.has_value() && dimensionSize > *m_threshold) {
+        dimensionSize = *m_threshold;
+    }
 
     if (dimensionSize > std::numeric_limits<Asn1Acn::IntegerValue::Type>::max()) {
         const auto message = QString("Dimension size (%1) overflows ASN.1 range").arg(dimensionSize);
@@ -97,8 +102,8 @@ void DimensionTranslator::translateIndexDimension(
     }
 
     if (const auto integerIndexType = std::get_if<seds::model::IntegerDataType>(indexType); integerIndexType) {
-        SizeTranslator sizeTranslator(
-                asn1SequenceOf, SizeTranslator::LengthType::FixedLength, SizeTranslator::SourceType::Index);
+        SizeTranslator sizeTranslator(asn1SequenceOf, SizeTranslator::LengthType::FixedLength,
+                SizeTranslator::SourceType::Index, m_threshold);
         std::visit(sizeTranslator, integerIndexType->range());
 
         if (sizeTranslator.getLastSetMin() != 0) {
@@ -141,7 +146,7 @@ void DimensionTranslator::translateEnumDimensionIndex(
     }
 
     SizeTranslator sizeTranslator(
-            asn1SequenceOf, SizeTranslator::LengthType::FixedLength, SizeTranslator::SourceType::Index);
+            asn1SequenceOf, SizeTranslator::LengthType::FixedLength, SizeTranslator::SourceType::Index, m_threshold);
     if (enumValues.front() != 0) {
         auto errorMessage = QString("The lowest value of enumeration %1 used as an index type for %2 is not 0, and due "
                                     "to ASN.1 limitations it is not supported")

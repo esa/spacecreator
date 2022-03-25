@@ -27,6 +27,7 @@
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/file.h>
 #include <asn1library/asn1/sourcelocation.h>
+#include <conversion/asn1/Asn1Options/options.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/sedsmodel.h>
@@ -41,13 +42,17 @@ namespace conversion::asn1::translator {
 std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateModels(
         std::vector<Model *> sourceModels, const Options &options) const
 {
-    Q_UNUSED(options);
-
     checkSourceModelCount(sourceModels);
 
     const auto *sedsModel = getModel<SedsModel>(sourceModels);
 
-    return translateSedsModel(sedsModel);
+    std::optional<uint64_t> sequenceSizeThreshold = std::nullopt;
+    if (options.isSet(Asn1Options::sequenceSizeThreshold)) {
+        const auto thresholdStr = options.value(Asn1Options::sequenceSizeThreshold);
+        sequenceSizeThreshold = thresholdStr->toLongLong();
+    }
+
+    return translateSedsModel(sedsModel, sequenceSizeThreshold);
 }
 
 ModelType SedsToAsn1Translator::getSourceModelType() const
@@ -66,7 +71,8 @@ std::set<ModelType> SedsToAsn1Translator::getDependencies() const
     return dependencies;
 }
 
-std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(const SedsModel *sedsModel) const
+std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(
+        const SedsModel *sedsModel, const std::optional<uint64_t> &sequenceSizeThreshold) const
 {
     std::vector<std::unique_ptr<Asn1Acn::File>> asn1Files;
 
@@ -74,7 +80,7 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(con
     if (std::holds_alternative<seds::model::PackageFile>(sedsModelData)) {
         const auto &sedsPackage = std::get<seds::model::PackageFile>(sedsModelData).package();
 
-        auto packageFiles = translatePackage(sedsPackage, {}, asn1Files, {});
+        auto packageFiles = translatePackage(sedsPackage, {}, asn1Files, {}, sequenceSizeThreshold);
 
         asn1Files.insert(asn1Files.end(), std::make_move_iterator(packageFiles.begin()),
                 std::make_move_iterator(packageFiles.end()));
@@ -85,7 +91,8 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(con
         const auto resolvedSedsPackages = packagesDependencyResolver.resolve(&sedsPackages);
 
         for (const auto &[sedsPackage, importedTypes] : resolvedSedsPackages) {
-            auto packageFiles = translatePackage(*sedsPackage, importedTypes, asn1Files, sedsPackages);
+            auto packageFiles =
+                    translatePackage(*sedsPackage, importedTypes, asn1Files, sedsPackages, sequenceSizeThreshold);
             asn1Files.insert(asn1Files.end(), std::make_move_iterator(packageFiles.begin()),
                     std::make_move_iterator(packageFiles.end()));
         }
@@ -103,7 +110,8 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(con
 
 std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePackage(
         const seds::model::Package &sedsPackage, const std::set<Asn1Acn::ImportedType> &importedTypes,
-        const Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages) const
+        const Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages,
+        const std::optional<uint64_t> &sequenceSizeThreshold) const
 {
     DataTypesDependencyResolver typesDependencyResolver;
 
@@ -118,7 +126,8 @@ std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePacka
         packageAsn1Definitions->addImportedType(importedType);
     }
 
-    translateDataTypes(resolvedPackageDataTypes, packageAsn1Definitions.get(), &sedsPackage, asn1Files, sedsPackages);
+    translateDataTypes(resolvedPackageDataTypes, packageAsn1Definitions.get(), &sedsPackage, asn1Files, sedsPackages,
+            sequenceSizeThreshold);
 
     std::vector<std::unique_ptr<Asn1Acn::File>> result;
 
@@ -144,8 +153,8 @@ std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePacka
             componentAsn1Definitions->addImportedType(importedType);
         }
 
-        translateDataTypes(
-                resolvedComponentDataTypes, componentAsn1Definitions.get(), &sedsPackage, asn1Files, sedsPackages);
+        translateDataTypes(resolvedComponentDataTypes, componentAsn1Definitions.get(), &sedsPackage, asn1Files,
+                sedsPackages, sequenceSizeThreshold);
 
         auto componentAsn1File = std::make_unique<Asn1Acn::File>(componentPackageName);
         componentAsn1File->add(std::move(componentAsn1Definitions));
@@ -157,10 +166,12 @@ std::vector<std::unique_ptr<Asn1Acn::File>> SedsToAsn1Translator::translatePacka
 
 void SedsToAsn1Translator::translateDataTypes(const std::list<const seds::model::DataType *> &sedsDataTypes,
         Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
-        const Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages) const
+        const Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages,
+        const std::optional<uint64_t> &sequenceSizeThreshold) const
 {
     std::unique_ptr<Asn1Acn::Types::Type> asn1Type;
-    DataTypeTranslatorVisitor dataTypeVisitor(asn1Type, asn1Definitions, sedsPackage, asn1Files, sedsPackages);
+    DataTypeTranslatorVisitor dataTypeVisitor(
+            asn1Type, asn1Definitions, sedsPackage, asn1Files, sedsPackages, sequenceSizeThreshold);
 
     for (const auto *sedsDataType : sedsDataTypes) {
         std::visit(dataTypeVisitor, *sedsDataType);

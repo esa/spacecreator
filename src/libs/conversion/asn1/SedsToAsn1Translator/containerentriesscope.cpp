@@ -30,11 +30,12 @@ namespace conversion::asn1::translator {
 
 ContainerEntriesScope::ContainerEntriesScope(Asn1Acn::Definitions *asn1Definitions,
         const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
-        const std::vector<seds::model::Package> &sedsPackages)
+        const std::vector<seds::model::Package> &sedsPackages, const std::optional<uint64_t> &sequenceSizeThreshold)
     : m_asn1Definitions(asn1Definitions)
     , m_sedsPackage(sedsPackage)
     , m_asn1Files(asn1Files)
     , m_sedsPackages(sedsPackages)
+    , m_sequenceSizeThreshold(sequenceSizeThreshold)
 {
 }
 
@@ -58,8 +59,8 @@ void ContainerEntriesScope::addContainer(const ContainerDataType &sedsType)
     }
 
     // Translate own entries
-    EntryTranslatorVisitor entriesTranslator(
-            asn1SequenceComponents.get(), m_asn1Definitions, &sedsType, m_sedsPackage, m_asn1Files, m_sedsPackages);
+    EntryTranslatorVisitor entriesTranslator(asn1SequenceComponents.get(), m_asn1Definitions, &sedsType, m_sedsPackage,
+            m_asn1Files, m_sedsPackages, m_sequenceSizeThreshold);
     for (const auto &sedsEntry : sedsType.entries()) {
         std::visit(entriesTranslator, sedsEntry);
     }
@@ -69,7 +70,7 @@ void ContainerEntriesScope::addContainer(const ContainerDataType &sedsType)
     if (sedsType.isAbstract()) {
         // Translate own trailer entries
         EntryTranslatorVisitor trailerEntriesTranslator(asn1SequenceTrailerComponents.get(), m_asn1Definitions,
-                &sedsType, m_sedsPackage, m_asn1Files, m_sedsPackages);
+                &sedsType, m_sedsPackage, m_asn1Files, m_sedsPackages, m_sequenceSizeThreshold);
         for (const auto &sedsTrailerEntry : sedsType.trailerEntries()) {
             std::visit(trailerEntriesTranslator, sedsTrailerEntry);
         }

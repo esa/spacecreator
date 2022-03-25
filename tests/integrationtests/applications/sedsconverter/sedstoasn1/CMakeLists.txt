@@ -29,6 +29,11 @@ configure_file(resources/test_arrays.xml resources/test_arrays.xml COPYONLY)
 configure_file(resources/test_arrays_asn.output resources/test_arrays_asn.output COPYONLY)
 configure_file(resources/test_arrays_acn.output resources/test_arrays_acn.output COPYONLY)
 
+configure_file(test_array_size_threshold.sh test_array_size_threshold.sh COPYONLY)
+configure_file(resources/test_array_size_threshold.xml resources/test_array_size_threshold.xml COPYONLY)
+configure_file(resources/test_array_size_threshold_asn.output resources/test_array_size_threshold_asn.output COPYONLY)
+configure_file(resources/test_array_size_threshold_acn.output resources/test_array_size_threshold_acn.output COPYONLY)
+
 configure_file(test_indexed_array.sh test_indexed_array.sh COPYONLY)
 configure_file(resources/test_indexed_array.xml resources/test_indexed_array.xml COPYONLY)
 configure_file(resources/test_indexed_array_asn.output resources/test_indexed_array_asn.output COPYONLY)

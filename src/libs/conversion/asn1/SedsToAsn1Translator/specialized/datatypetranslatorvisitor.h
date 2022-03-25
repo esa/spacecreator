@@ -24,6 +24,7 @@
 #include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/type.h>
+#include <conversion/common/options.h>
 #include <optional>
 #include <seds/SedsModel/types/datatype.h>
 
@@ -77,15 +78,17 @@ struct DataTypeTranslatorVisitor final {
     /**
      * @brief   Constructor
      *
-     * @param   asn1Type            Type where translated types are saved
-     * @param   asn1Definitions     Parent ASN.1 defintions
-     * @param   sedsPackage         Parent SEDS package
-     * @param   asn1Files           List of already translated ASN.1 files
-     * @param   sedsPackages        List of SEDS packages
+     * @param   asn1Type                Type where translated types are saved
+     * @param   asn1Definitions         Parent ASN.1 defintions
+     * @param   sedsPackage             Parent SEDS package
+     * @param   asn1Files               List of already translated ASN.1 files
+     * @param   sedsPackages            List of SEDS packages
+     * @param   sequenceSizeThreshold   ASN.1 sequence size threshold
      */
     DataTypeTranslatorVisitor(std::unique_ptr<Asn1Acn::Types::Type> &asn1Type, Asn1Acn::Definitions *asn1Definitions,
             const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
-            const std::vector<seds::model::Package> &sedsPackages);
+            const std::vector<seds::model::Package> &sedsPackages,
+            const std::optional<uint64_t> &sequenceSizeThreshold);
 
     /**
      * @brief   Translates SEDS array data type
@@ -315,6 +318,9 @@ private:
 
     /// @brief  Containers that are in the current scope
     ContainerEntriesScope m_containersScope;
+
+    /// @brief  ASN.1 sequence size threshold
+    const std::optional<uint64_t> &m_sequenceSizeThreshold;
 
     inline static const QString m_realizationComponentsName = "realization";
     inline static const QString m_realizationComponentsAlternativeNameTemplate = "realization%1";
