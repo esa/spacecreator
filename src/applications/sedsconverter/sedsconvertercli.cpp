@@ -57,6 +57,7 @@ void SedsConverterCLI::parseArguments(const QStringList &arguments)
     m_parser.handlePositional(CommandArg::SedsConverterKeepIntermediateFiles);
     m_parser.handlePositional(CommandArg::SedsConverterAcnFilepathPrefix);
     m_parser.handlePositional(CommandArg::SedsConverterAsn1FilepathPrefix);
+    m_parser.handlePositional(CommandArg::SedsConverterAsn1SequenceSizeThreshold);
     m_parser.handlePositional(CommandArg::SedsConverterSdlFilepathPrefix);
 
     m_parser.process(arguments);
@@ -108,6 +109,9 @@ void SedsConverterCLI::processOptions(Options &options)
     addSdlInputOptions(options);
     addSedsInputOptions(options);
 
+    addAsn1TranslationOptions(options);
+    addIvTranslationOptions(options);
+
     addAsn1OutputOptions(options);
     addIvOutputOptions(options);
     addSdlOutputOptions(options);
@@ -136,6 +140,14 @@ void SedsConverterCLI::addAsn1InputOptions(Options &options)
     }
 }
 
+void SedsConverterCLI::addAsn1TranslationOptions(Options &options)
+{
+    if (m_arguments.contains(CommandArg::SedsConverterAsn1SequenceSizeThreshold)) {
+        options.add(
+                Asn1Options::sequenceSizeThreshold, m_parser.value(CommandArg::SedsConverterAsn1SequenceSizeThreshold));
+    }
+}
+
 void SedsConverterCLI::addAsn1OutputOptions(Options &options)
 {
     if (m_arguments.contains(CommandArg::SedsConverterAcnFilepathPrefix)) {
@@ -159,7 +171,7 @@ void SedsConverterCLI::addIvInputOptions(Options &options)
     }
 }
 
-void SedsConverterCLI::addIVTranslationOptions(Options &options)
+void SedsConverterCLI::addIvTranslationOptions(Options &options)
 {
     if (m_arguments.contains(CommandArg::SedsConverterIvGenerateParentFunctions)) {
         options.add(IvOptions::generateFunctionsForPackages);

@@ -71,6 +71,7 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterKeepIntermediateFiles();
     void testCmdArgumentSedsConverterAcnFilepathPrefix();
     void testCmdArgumentSedsConverterAsn1FilepathPrefix();
+    void testCmdArgumentSedsConverterAsn1SequenceSizeThreshold();
     void testCmdArgumentSedsConverterSdlFilepathPrefix();
 
     void initTestCase();
@@ -495,6 +496,25 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterAsn1FilepathPrefix()
 
     const QString value = parser.value(CommandArg::SedsConverterAsn1FilepathPrefix);
     QCOMPARE(value, prefix);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterAsn1SequenceSizeThreshold()
+{
+    const QCommandLineOption cmdExportToFile =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterAsn1SequenceSizeThreshold);
+    const QString threshold("42");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdExportToFile.names().first(), threshold) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterAsn1SequenceSizeThreshold);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterAsn1SequenceSizeThreshold));
+
+    const QString value = parser.value(CommandArg::SedsConverterAsn1SequenceSizeThreshold);
+    QCOMPARE(value, threshold);
 }
 
 void tst_CommandLineParser::testCmdArgumentSedsConverterSdlFilepathPrefix()

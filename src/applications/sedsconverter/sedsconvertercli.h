@@ -72,6 +72,10 @@ private:
      */
     void addAsn1InputOptions(conversion::Options &options);
     /**
+     * @brief   Process options for translating to ASN.1 model
+     */
+    void addAsn1TranslationOptions(conversion::Options &options);
+    /**
      * @brief   Process options for output ASN.1 model
      */
     void addAsn1OutputOptions(conversion::Options &options);
@@ -88,9 +92,9 @@ private:
      */
     void addIvInputOptions(conversion::Options &options);
     /**
-     * @brief   Process options for translation IV model
+     * @brief   Process options for translating to IV model
      */
-    void addIVTranslationOptions(conversion::Options &options);
+    void addIvTranslationOptions(conversion::Options &options);
     /**
      * @brief   Process options for output IV model
      */
