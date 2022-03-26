@@ -1,0 +1,11 @@
+WithComponents DEFINITIONS ::= BEGIN
+
+MySequence ::= SEQUENCE
+{
+    firstEntry INTEGER (0..10) OPTIONAL,
+    secondEntry INTEGER (0..10) OPTIONAL
+}
+
+ConcreteSequence ::= MySequence (WITH COMPONENTS { firstEntry PRESENT, secondEntry ABSENT })
+
+END

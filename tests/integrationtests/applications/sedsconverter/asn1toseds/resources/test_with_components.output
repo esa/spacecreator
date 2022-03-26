@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+ <Package name="WithComponents">
+  <DataTypeSet>
+   <BooleanDataType name="IsPresent"/>
+   <IntegerDataType name="Type_MySequence_firstEntry">
+    <Range>
+     <MinMaxRange min="0" max="10" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <IntegerDataType name="Type_MySequence_secondEntry">
+    <Range>
+     <MinMaxRange min="0" max="10" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType name="MySequence">
+    <EntryList>
+     <Entry type="IsPresent" name="is_firstEntry_present"/>
+     <Entry type="IsPresent" name="is_secondEntry_present"/>
+     <Entry type="Type_MySequence_firstEntry" name="firstEntry"/>
+     <Entry type="Type_MySequence_secondEntry" name="secondEntry"/>
+    </EntryList>
+   </ContainerDataType>
+  </DataTypeSet>
+ </Package>
+</PackageFile>
