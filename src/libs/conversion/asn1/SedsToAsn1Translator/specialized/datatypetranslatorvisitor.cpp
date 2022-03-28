@@ -585,9 +585,9 @@ void DataTypeTranslatorVisitor::createRealizationContainerField(Asn1Acn::Types::
         realizationChoice->addComponent(std::move(ownRealizationChoiceAlternative));
     }
 
-    auto realizationComponent =
-            std::make_unique<Asn1Acn::AsnSequenceComponent>(m_realizationComponentsName, m_realizationComponentsName,
-                    false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(realizationChoice));
+    auto realizationComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(m_realizationComponentsName,
+            m_realizationComponentsName, false, std::nullopt, "", Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
+            Asn1Acn::SourceLocation(), std::move(realizationChoice));
     asn1Sequence->addComponent(std::move(realizationComponent));
 }
 

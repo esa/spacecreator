@@ -223,8 +223,9 @@ void AsyncInterfaceCommandTranslator::createBundledTypeComponent(
         sequenceComponent =
                 std::make_unique<Asn1Acn::AcnSequenceComponent>(name, name, std::move(sequenceComponentType));
     } else {
-        sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-                name, name, false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(sequenceComponentType));
+        sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(name, name, false, std::nullopt, "",
+                Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
+                std::move(sequenceComponentType));
 
         if (argumentData.determinantRef.has_value()) {
             sequenceComponent->addAcnParameter(argumentData.determinantRef->nameStr());

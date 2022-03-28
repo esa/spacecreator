@@ -675,11 +675,12 @@ void tst_Asn1ToPromelaTranslator::testSequence()
     auto model = createModel();
     auto type = std::make_unique<Sequence>();
     auto component1 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"), false,
-            std::nullopt, QStringLiteral(""), SourceLocation(),
+            std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
             TypeFactory::createBuiltinType(QStringLiteral("INTEGER")));
     type->addComponent(std::move(component1));
     auto component2 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field2"), QStringLiteral("field2"), false,
-            std::nullopt, QStringLiteral(""), SourceLocation(), TypeFactory::createBuiltinType(QStringLiteral("REAL")));
+            std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
+            TypeFactory::createBuiltinType(QStringLiteral("REAL")));
     type->addComponent(std::move(component2));
     auto typeAssignment = std::make_unique<TypeAssignment>(
             QStringLiteral("MyType"), QStringLiteral("MyTypeT"), SourceLocation(), std::move(type));
@@ -754,11 +755,12 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
     auto model = createModel();
     auto type = std::make_unique<Sequence>();
     auto component1 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"), true,
-            std::nullopt, QStringLiteral(""), SourceLocation(),
+            std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
             TypeFactory::createBuiltinType(QStringLiteral("INTEGER")));
     type->addComponent(std::move(component1));
     auto component2 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field2"), QStringLiteral("field2"), true,
-            std::nullopt, QStringLiteral(""), SourceLocation(), TypeFactory::createBuiltinType(QStringLiteral("REAL")));
+            std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
+            TypeFactory::createBuiltinType(QStringLiteral("REAL")));
     type->addComponent(std::move(component2));
     auto typeAssignment = std::make_unique<TypeAssignment>(
             QStringLiteral("MyType"), QStringLiteral("MyTypeT"), SourceLocation(), std::move(type));
@@ -915,18 +917,20 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
     auto level2 = std::make_unique<Sequence>();
 
     auto level2Component = std::make_unique<AsnSequenceComponent>(QStringLiteral("field"), QStringLiteral("field"),
-            false, std::nullopt, QStringLiteral(""), SourceLocation(),
+            false, std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
             TypeFactory::createBuiltinType(QStringLiteral("INTEGER")));
 
     level2->addComponent(std::move(level2Component));
 
     auto level1Component = std::make_unique<AsnSequenceComponent>(QStringLiteral("level2"), QStringLiteral("level2"),
-            false, std::nullopt, QStringLiteral(""), SourceLocation(), std::move(level2));
+            false, std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
+            std::move(level2));
 
     level1->addComponent(std::move(level1Component));
 
     auto level0Component = std::make_unique<AsnSequenceComponent>(QStringLiteral("level1"), QStringLiteral("level1"),
-            false, std::nullopt, QStringLiteral(""), SourceLocation(), std::move(level1));
+            false, std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
+            std::move(level1));
 
     level0->addComponent(std::move(level0Component));
 
@@ -1228,9 +1232,10 @@ void tst_Asn1ToPromelaTranslator::testTypeSorting()
     auto model = createModel();
 
     auto secondType = std::make_unique<Sequence>();
-    auto secondTypeComponent = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"),
-            QStringLiteral("field1"), false, std::nullopt, QStringLiteral(""), SourceLocation(),
-            std::make_unique<UserdefinedType>(QStringLiteral("MyTypeFirst"), QStringLiteral("myModule")));
+    auto secondTypeComponent =
+            std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"), false,
+                    std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
+                    std::make_unique<UserdefinedType>(QStringLiteral("MyTypeFirst"), QStringLiteral("myModule")));
     secondType->addComponent(std::move(secondTypeComponent));
     auto secondTypeAssignment = std::make_unique<TypeAssignment>(
             QStringLiteral("MyTypeSecond"), QStringLiteral("MyTypeSecondT"), SourceLocation(), std::move(secondType));
@@ -1238,7 +1243,7 @@ void tst_Asn1ToPromelaTranslator::testTypeSorting()
 
     auto firstType = std::make_unique<Sequence>();
     auto firstTypeComponent = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"),
-            false, std::nullopt, QStringLiteral(""), SourceLocation(),
+            false, std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
             TypeFactory::createBuiltinType(QStringLiteral("INTEGER")));
     firstType->addComponent(std::move(firstTypeComponent));
     auto firstTypeAssignment = std::make_unique<TypeAssignment>(

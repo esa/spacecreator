@@ -563,7 +563,6 @@ static inline auto addFixedValueEntry(TypeVisitor::Context &context, ComponentTy
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
 {
-    Q_UNUSED(type);
     ::seds::model::ContainerDataType sedsType;
     addOptionalIndicators(m_context, type, sedsType);
 

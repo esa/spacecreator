@@ -364,6 +364,7 @@ void tst_Asn1ValueParser::testSequenceValueWithString()
             false,
             std::nullopt,
             "",
+            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
             Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::IA5String>("strVal"));
     type->addComponent(std::move(sequence1));
@@ -394,6 +395,7 @@ void tst_Asn1ValueParser::testSequenceValue()
             false,
             std::nullopt,
             "",
+            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
             Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Integer>("intVal"));
     type->addComponent(std::move(sequence1));
@@ -403,6 +405,7 @@ void tst_Asn1ValueParser::testSequenceValue()
             false,
             std::nullopt,
             "",
+            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
             Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Real>("realVal"));
     type->addComponent(std::move(sequence2));
@@ -412,6 +415,7 @@ void tst_Asn1ValueParser::testSequenceValue()
             false,
             std::nullopt,
             "",
+            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
             Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Boolean>("boolVal"));
     type->addComponent(std::move(sequence3));
@@ -440,6 +444,7 @@ void tst_Asn1ValueParser::testSequenceValue()
             false,
             std::nullopt,
             "",
+            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
             Asn1Acn::SourceLocation(),
             std::move(choice));
     type->addComponent(std::move(sequence4));
@@ -490,6 +495,7 @@ void tst_Asn1ValueParser::testSequenceValueError()
             false,
             std::nullopt,
             "",
+            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
             Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Integer>("intVal"));
     type->addComponent(std::move(sequence1));
@@ -499,6 +505,7 @@ void tst_Asn1ValueParser::testSequenceValueError()
             false,
             std::nullopt,
             "",
+            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
             Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Real>("realVal"));
     type->addComponent(std::move(sequence2));
@@ -508,6 +515,7 @@ void tst_Asn1ValueParser::testSequenceValueError()
             false,
             std::nullopt,
             "",
+            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
             Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Boolean>("boolVal"));
     type->addComponent(std::move(sequence3));

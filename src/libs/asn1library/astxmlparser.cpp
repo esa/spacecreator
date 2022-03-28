@@ -123,7 +123,7 @@ public:
         setIntegerAcnParameters(type);
 
         const auto encodeValues = m_attributes.value(QStringLiteral("encode-values"));
-        type.setEncodeValues(encodeValues.toString().toLower() == "true");
+        type.setEncodeValues(encodeValues.toString().toLower() == QStringLiteral("true"));
     }
 
     void visit(Types::Choice &type) override
@@ -217,10 +217,24 @@ public:
         SourceLocation location(m_currentFile, readIntegerAttribute(QStringLiteral("Line")),
                 readIntegerAttribute(QStringLiteral("CharPositionInLine")));
 
+        auto precense = AsnSequenceComponent::Presence::NotSpecified;
+        if (hasAttribute(QStringLiteral("ALWAYS-PRESENT"))) {
+            const auto alwaysPresent = readStringAttribute(QStringLiteral("ALWAYS-PRESENT")).toLower();
+            if (alwaysPresent == QStringLiteral("true")) {
+                precense = AsnSequenceComponent::Presence::AlwaysPresent;
+            }
+        }
+        if (hasAttribute(QStringLiteral("ALWAYS-ABSENT"))) {
+            const auto alwaysAbsent = readStringAttribute(QStringLiteral("ALWAYS-ABSENT")).toLower();
+            if (alwaysAbsent == QStringLiteral("true")) {
+                precense = AsnSequenceComponent::Presence::AlwaysAbsent;
+            }
+        }
+
         m_childType->setIdentifier(name);
 
-        type.addComponent(std::make_unique<AsnSequenceComponent>(
-                name, cName, optional == "true", defaultValue, presentWhen, location, std::move(m_childType)));
+        type.addComponent(std::make_unique<AsnSequenceComponent>(name, cName, optional == QStringLiteral("true"),
+                defaultValue, presentWhen, precense, location, std::move(m_childType)));
     }
 
     void visit(Types::SequenceOf &type) override { type.setItemsType(std::move(m_childType)); }

@@ -74,8 +74,9 @@ void EntryTranslatorVisitor::operator()(const seds::model::Entry &sedsEntry)
     auto asn1EntryType = translateEntryType(sedsEntry.type());
 
     const auto entryName = Escaper::escapeAsn1FieldName(sedsEntry.nameStr());
-    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            entryName, entryName, false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(asn1EntryType));
+    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(entryName, entryName, false, std::nullopt,
+            "", Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
+            std::move(asn1EntryType));
     m_asn1Sequence->addComponent(std::move(sequenceComponent));
 }
 
@@ -96,8 +97,9 @@ void EntryTranslatorVisitor::operator()(const seds::model::FixedValueEntry &seds
     translateFixedValue(sedsEntry, asn1EntryType.get());
 
     const auto entryName = Escaper::escapeAsn1FieldName(sedsEntry.nameStr());
-    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            entryName, entryName, false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(asn1EntryType));
+    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(entryName, entryName, false, std::nullopt,
+            "", Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
+            std::move(asn1EntryType));
     m_asn1Sequence->addComponent(std::move(sequenceComponent));
 }
 
@@ -122,8 +124,9 @@ void EntryTranslatorVisitor::operator()(const seds::model::ListEntry &sedsEntry)
     addListSizeConstraint(asn1SequenceOfType.get(), sedsEntry);
 
     const auto entryName = Escaper::escapeAsn1FieldName(sedsEntry.nameStr());
-    auto listSequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            entryName, entryName, false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(asn1SequenceOfType));
+    auto listSequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(entryName, entryName, false,
+            std::nullopt, "", Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
+            std::move(asn1SequenceOfType));
     m_asn1Sequence->addComponent(std::move(listSequenceComponent));
 }
 
