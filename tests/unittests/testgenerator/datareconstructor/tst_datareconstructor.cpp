@@ -125,17 +125,10 @@ void tst_datareconstructor::testNominal()
     if (ivModel == nullptr) {
         QFAIL("could not load IV model");
     }
-    const auto *const iface = ivModel->getIfaceByName(ifUnderTestName, ivm::IVInterface::InterfaceType::Provided);
-    qDebug() << iface->title();
-    qDebug() << iface->function()->title();
-    for (const auto &param : iface->params()) {
-        qDebug() << param.paramTypeName();
-    }
 
-    // auto properties = ivModel->p;
-    const QString asnFilename =
-            QString("%1%2%3").arg("resources").arg(QDir::separator()).arg(ivModel->property("asn1file").toString());
-    qDebug() << "asn file: " << asnFilename;
+    const QString name = "testharness.asn";
+    const QString asnFilename = QString("%1%2%3").arg("resources").arg(QDir::separator()).arg(name);
+    qDebug() << "asn filename: " << asnFilename;
     if (asnFilename.isEmpty()) {
         QFAIL("Could not read name of ASN.1 file");
     }
@@ -146,8 +139,31 @@ void tst_datareconstructor::testNominal()
     }
 
     for (const auto &file : asn1Model->data()) {
-        if (file != nullptr) {
-            qDebug() << "file from model" << file->name();
+        if (file == nullptr) {
+            continue;
+        }
+
+        qDebug() << "file from model" << file->name();
+        for (const auto &definition : file->definitionsList()) {
+            if (definition == nullptr) {
+                continue;
+            }
+            if (definition->typeAssignmentNames().isEmpty()) {
+                continue;
+            }
+
+            const auto &definitionTypeAssignmentNames = definition->typeAssignmentNames();
+
+            if (definitionTypeAssignmentNames.isEmpty()) {
+                continue;
+            }
+            if (definitionTypeAssignmentNames.size() == 1) {
+                qDebug() << definition->name() << definitionTypeAssignmentNames.first();
+            }
+
+            const QString names = std::accumulate(
+                    definitionTypeAssignmentNames.cbegin(), definitionTypeAssignmentNames.cend(), QString {});
+            qDebug() << definition->name() << names;
         }
     }
 
