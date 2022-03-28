@@ -627,8 +627,15 @@ static inline auto createChoiceIndexType(
 {
     ::seds::model::EnumeratedDataType sedsType;
 
+    const auto &withComponentConstraints = type.withComponentConstraints();
+    const auto hasConstraints = !withComponentConstraints.empty();
+
     int computedValue = 0;
     for (const auto &component : type.components()) {
+        if (hasConstraints && withComponentConstraints.count(component->name()) == 0) {
+            continue;
+        }
+
         ::seds::model::ValueEnumeration valueEnumeration;
         valueEnumeration.setLabel(component->name());
         valueEnumeration.setValue(computedValue++);
@@ -650,8 +657,15 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Choice &type)
     parentSedsType.setName(m_context.name());
     m_context.package()->addDataType(std::move(parentSedsType));
 
+    const auto &withComponentConstraints = type.withComponentConstraints();
+    const auto hasConstraints = !withComponentConstraints.empty();
+
     int computedValue = 0;
     for (const auto &component : type.components()) {
+        if (hasConstraints && withComponentConstraints.count(component->name()) == 0) {
+            continue;
+        }
+
         ::seds::model::ContainerDataType innerSedsType;
         ::seds::model::DataTypeRef baseTypeReference(m_context.name());
         innerSedsType.setBaseType(std::move(baseTypeReference));
