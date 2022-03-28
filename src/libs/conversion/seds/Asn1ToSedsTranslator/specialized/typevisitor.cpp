@@ -40,6 +40,7 @@
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
+#include <iostream>
 #include <seds/SedsModel/types/arraydatatype.h>
 #include <seds/SedsModel/types/binarydatatype.h>
 #include <seds/SedsModel/types/booleandatatype.h>
@@ -567,8 +568,17 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
     addOptionalIndicators(m_context, type, sedsType);
 
     for (const auto &component : type.components()) {
+        const auto asnComponent = dynamic_cast<Asn1Acn::AsnSequenceComponent *>(component.get());
         const auto acnComponent = dynamic_cast<Asn1Acn::AcnSequenceComponent *>(component.get());
         const auto isAcnComponent = acnComponent != nullptr;
+
+        if (!isAcnComponent) {
+            // Skip absent components
+            if (asnComponent->presence() == Asn1Acn::AsnSequenceComponent::Presence::AlwaysAbsent) {
+                continue;
+            }
+        }
+
         if (component->type()->typeEnum() == Asn1Acn::Types::Type::NULLTYPE) {
             addFixedValueEntry(m_context, component.get(), sedsType);
             continue;

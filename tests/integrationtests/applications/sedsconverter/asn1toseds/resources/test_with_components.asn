@@ -3,9 +3,19 @@ WithComponents DEFINITIONS ::= BEGIN
 MySequence ::= SEQUENCE
 {
     firstEntry INTEGER (0..10) OPTIONAL,
-    secondEntry INTEGER (0..10) OPTIONAL
+    secondEntry INTEGER (0..10),
+    thirdEntry INTEGER (0..10) OPTIONAL
 }
 
-ConcreteSequence ::= MySequence (WITH COMPONENTS { firstEntry PRESENT, secondEntry ABSENT })
+ConcreteSequence ::= MySequence (WITH COMPONENTS { firstEntry PRESENT, thirdEntry ABSENT })
+
+MyChoice ::= CHOICE
+{
+    firstOption INTEGER (0..20),
+    secondOption INTEGER(0..25),
+    thirdOption INTEGER(0..30)
+}
+
+ConcreteChoice ::= MyChoice (WITH COMPONENTS { firstOption, thirdOption })
 
 END

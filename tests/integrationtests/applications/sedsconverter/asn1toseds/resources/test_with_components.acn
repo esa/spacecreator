@@ -3,7 +3,8 @@ WithComponents DEFINITIONS ::= BEGIN
 MySequence []
 {
     firstEntry [],
-    secondEntry []
+    secondEntry [],
+    thirdEntry []
 }
 
 ConcreteSequence []
