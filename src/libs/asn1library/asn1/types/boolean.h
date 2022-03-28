@@ -37,6 +37,7 @@ class Boolean : public Type, public Constraints::WithConstraints<BooleanValue>
 public:
     Boolean(const QString &identifier = QString())
         : Type(identifier)
+        , m_size(1)
     {
     }
     Boolean(const Boolean &other) = default;
@@ -51,6 +52,9 @@ public:
 
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/boolean.png"); }
 
+    void setSize(const int size) { m_size = size; }
+    int size() const { return m_size; }
+
     void setTrueValue(const QString &trueValue) { m_trueValue = trueValue; }
     const QString &trueValue() const { return m_trueValue; }
 
@@ -58,6 +62,7 @@ public:
     const QString &falseValue() const { return m_falseValue; }
 
 private:
+    int m_size;
     QString m_trueValue;
     QString m_falseValue;
 };
