@@ -786,13 +786,17 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Real &type)
 
     ::seds::model::FloatDataType sedsType;
 
-    if (constraintVisitor.isRangeConstraintVisited()) {
-        ::seds::model::MinMaxRange range;
-        range.setType(::seds::model::RangeType::InclusiveMinInclusiveMax);
-        range.setMax(RealValue::asString(constraintVisitor.getRange().end()));
-        range.setMin(RealValue::asString(constraintVisitor.getRange().begin()));
-        sedsType.setRange(std::move(range));
+    // Range in SEDS is required
+    if (!constraintVisitor.isRangeConstraintVisited()) {
+        auto errorMessage = QString("Real type \"%1\" doesn't contain a range").arg(type.identifier());
+        throw TranslationException(std::move(errorMessage));
     }
+
+    ::seds::model::MinMaxRange range;
+    range.setType(::seds::model::RangeType::InclusiveMinInclusiveMax);
+    range.setMax(RealValue::asString(constraintVisitor.getRange().end()));
+    range.setMin(RealValue::asString(constraintVisitor.getRange().begin()));
+    sedsType.setRange(std::move(range));
 
     // Encoding in ASN.1 model is not optional, but may be unset
     if (type.encoding() != Asn1Acn::Types::RealEncoding::unspecified) {
@@ -831,13 +835,17 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Integer &type)
 
     ::seds::model::IntegerDataType sedsType;
 
-    if (constraintVisitor.isRangeConstraintVisited()) {
-        ::seds::model::MinMaxRange range;
-        range.setType(::seds::model::RangeType::InclusiveMinInclusiveMax);
-        range.setMax(IntegerValue::asString(constraintVisitor.getRange().end()));
-        range.setMin(IntegerValue::asString(constraintVisitor.getRange().begin()));
-        sedsType.setRange(std::move(range));
+    // Range in SEDS is required
+    if (!constraintVisitor.isRangeConstraintVisited()) {
+        auto errorMessage = QString("Integer type \"%1\" doesn't contain a range").arg(type.identifier());
+        throw TranslationException(std::move(errorMessage));
     }
+
+    ::seds::model::MinMaxRange range;
+    range.setType(::seds::model::RangeType::InclusiveMinInclusiveMax);
+    range.setMax(IntegerValue::asString(constraintVisitor.getRange().end()));
+    range.setMin(IntegerValue::asString(constraintVisitor.getRange().begin()));
+    sedsType.setRange(std::move(range));
 
     // Encoding in ASN.1 model is not optional, but may be unset
     if (type.size() > 0) {
