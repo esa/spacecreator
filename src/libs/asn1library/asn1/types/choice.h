@@ -29,6 +29,7 @@
 #include "type.h"
 
 #include <QString>
+#include <set>
 
 namespace Asn1Acn {
 namespace Types {
@@ -87,8 +88,12 @@ public:
     void setDeterminant(const QString &determinant) { m_determinant = determinant; }
     const QString &determinant() const { return m_determinant; }
 
+    void addWithComponentConstraint(QString name) { m_withComponentConstraints.insert(std::move(name)); }
+    std::set<QString> withComponentConstraints() const { return m_withComponentConstraints; }
+
 private:
     QString m_determinant;
+    std::set<QString> m_withComponentConstraints;
 };
 
 }

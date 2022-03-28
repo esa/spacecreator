@@ -978,14 +978,20 @@ void AstXmlParser::readSequenceOf(Types::Type &type)
 
 void AstXmlParser::readChoice(Types::Type &type)
 {
-    while (skipToChildElement(QStringLiteral("CHOICE_ALTERNATIVE"))) {
-        auto attributes = m_xmlReader.attributes();
-        auto childType = findAndReadType();
+    while (m_xmlReader.readNextStartElement()) {
+        if (m_xmlReader.name() == QStringLiteral("CHOICE_ALTERNATIVE")) {
+            auto attributes = m_xmlReader.attributes();
+            auto childType = findAndReadType();
 
-        ChildItemAddingVisitor visitor(attributes, m_currentFile, std::move(childType));
-        type.accept(visitor);
+            ChildItemAddingVisitor visitor(attributes, m_currentFile, std::move(childType));
+            type.accept(visitor);
 
-        m_xmlReader.skipCurrentElement();
+            m_xmlReader.skipCurrentElement();
+        } else if (m_xmlReader.name() == QStringLiteral("Constraints")) {
+            readConstraints(type);
+        } else {
+            m_xmlReader.skipCurrentElement();
+        }
     }
 }
 
@@ -1081,7 +1087,7 @@ public:
 
     void visit(Types::Enumerated &type) override { readConstraints<EnumValue>(type); }
 
-    void visit(Types::Choice &type) override { Q_UNUSED(type); }
+    void visit(Types::Choice &type) override { readWithComponentConstraints(type); }
 
     void visit(Types::Sequence &type) override { Q_UNUSED(type); }
 
@@ -1105,6 +1111,27 @@ private:
     {
         AstXmlConstraintParser<T> parser(m_xmlReader, type.constraints());
         parser.parse();
+    }
+
+    void readWithComponentConstraints(Types::Choice &choice) const
+    {
+        m_xmlReader.readNextStartElement();
+
+        if (m_xmlReader.name() != QStringLiteral("WithComponentConstraints")) {
+            return;
+        }
+
+        while (m_xmlReader.readNextStartElement()) {
+            if (m_xmlReader.name() == QStringLiteral("WithComponent")) {
+                auto name = m_xmlReader.attributes().value(QStringLiteral("Name")).toString();
+                choice.addWithComponentConstraint(std::move(name));
+                m_xmlReader.skipCurrentElement();
+            } else {
+                m_xmlReader.skipCurrentElement();
+            }
+        }
+
+        m_xmlReader.skipCurrentElement();
     }
 
     QXmlStreamReader &m_xmlReader;
