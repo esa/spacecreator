@@ -29,6 +29,7 @@
 #include <QTextStream>
 #include <QUuid>
 #include <QtTest>
+#include <array>
 #include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/file.h>
 #include <asn1library/asn1/singlevalue.h>
