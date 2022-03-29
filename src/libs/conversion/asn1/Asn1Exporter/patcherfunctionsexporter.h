@@ -88,6 +88,10 @@ private:
     static auto collectSequencesToPatch(const Asn1Acn::File *asn1File) -> std::vector<const Asn1Acn::Types::Sequence *>;
 
     static auto writeAndCommit(QSaveFile &outputFile, const QString &data) -> void;
+
+private:
+    static const QString m_commonLibraryHeader;
+    static const QString m_commonLibraryBody;
 };
 
 } // namespace conversion::asn1::exporter

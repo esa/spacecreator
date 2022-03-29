@@ -280,8 +280,52 @@ void PatcherFunctionsExporter::generateMappingFunctionsModule(
 
 void PatcherFunctionsExporter::generateCommonLibraryHeader(QTextStream &stream)
 {
-    // clang-format off
-    stream <<
+    stream << m_commonLibraryHeader;
+}
+
+void PatcherFunctionsExporter::generateCommonLibraryBody(QTextStream &stream)
+{
+    stream << m_commonLibraryBody;
+}
+
+std::vector<const Sequence *> PatcherFunctionsExporter::collectSequencesToPatch(const Asn1Acn::File *asn1File)
+{
+    std::vector<const Sequence *> result;
+
+    for (const auto &definition : asn1File->definitionsList()) {
+        for (const auto &type : definition->types()) {
+            if (type->typeEnum() != Type::ASN1Type::SEQUENCE) {
+                continue;
+            }
+
+            const auto sequence = dynamic_cast<Sequence *>(type->type());
+
+            if (!sequence->patcherFunctions().empty()) {
+                result.push_back(sequence);
+            }
+        }
+    }
+
+    return result;
+}
+
+void PatcherFunctionsExporter::writeAndCommit(QSaveFile &outputFile, const QString &data)
+{
+    if (!outputFile.open(QIODevice::WriteOnly)) {
+        throw ExportException(QString("Failed to open a file %1").arg(outputFile.fileName()));
+    }
+
+    if (outputFile.write(data.toUtf8()) == -1) {
+        throw ExportException(QString("Failed to write a file %1").arg(outputFile.fileName()));
+    }
+
+    if (!outputFile.commit()) {
+        throw ExportException(QString("Failed to commit a transaction in %1").arg(outputFile.fileName()));
+    }
+}
+
+// clang-format off
+const QString PatcherFunctionsExporter::m_commonLibraryHeader =
 R"(#ifndef PATCHING_COMMON_LIBRARY_H
 #define PATCHING_COMMON_LIBRARY_H
 
@@ -296,13 +340,8 @@ uint8_t calculateChecksumLongitundinal(uint8_t* data, long size);
 
 #endif
 )";
-    // clang-format on
-}
 
-void PatcherFunctionsExporter::generateCommonLibraryBody(QTextStream &stream)
-{
-    // clang-format off
-    stream <<
+const QString PatcherFunctionsExporter::m_commonLibraryBody =
 R"(#include <stdio.h>
 #include "patchingCommonLibrary.h"
 
@@ -395,43 +434,6 @@ uint8_t calculateChecksumLongitundinal(uint8_t* data, long size)
     return checksum;
 }
 )";
-    // clang-format on
-}
-
-std::vector<const Sequence *> PatcherFunctionsExporter::collectSequencesToPatch(const Asn1Acn::File *asn1File)
-{
-    std::vector<const Sequence *> result;
-
-    for (const auto &definition : asn1File->definitionsList()) {
-        for (const auto &type : definition->types()) {
-            if (type->typeEnum() != Type::ASN1Type::SEQUENCE) {
-                continue;
-            }
-
-            const auto sequence = dynamic_cast<Sequence *>(type->type());
-
-            if (!sequence->patcherFunctions().empty()) {
-                result.push_back(sequence);
-            }
-        }
-    }
-
-    return result;
-}
-
-void PatcherFunctionsExporter::writeAndCommit(QSaveFile &outputFile, const QString &data)
-{
-    if (!outputFile.open(QIODevice::WriteOnly)) {
-        throw ExportException(QString("Failed to open a file %1").arg(outputFile.fileName()));
-    }
-
-    if (outputFile.write(data.toUtf8()) == -1) {
-        throw ExportException(QString("Failed to write a file %1").arg(outputFile.fileName()));
-    }
-
-    if (!outputFile.commit()) {
-        throw ExportException(QString("Failed to commit a transaction in %1").arg(outputFile.fileName()));
-    }
-}
+// clang-format on
 
 } // namespace conversion::asn1::exporter
