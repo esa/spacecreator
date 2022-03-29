@@ -21,8 +21,8 @@ int testCrc8Packet()
         return errCode;
     }
 
-    const uint8_t encodedLength = bitStream.buf[3];
-    const uint8_t expectedLength = 6;
+    const uint16_t encodedLength = (bitStream.buf[2] << 8) | bitStream.buf[3];
+    const uint16_t expectedLength = 6;
     if(encodedLength != expectedLength) { // check length
         printf("Crc8 packet length mismatch. %d != %d\n", encodedLength, expectedLength);
         return 1;
@@ -65,8 +65,8 @@ int testCrc16Packet()
         return errCode;
     }
 
-    const uint8_t encodedLength = bitStream.buf[5];
-    const uint8_t expectedLength = 9;
+    const uint32_t encodedLength = (bitStream.buf[2] << 24) | (bitStream.buf[3] << 16) | bitStream.buf[4] << 8 | bitStream.buf[5];
+    const uint32_t expectedLength = 9;
     if(encodedLength != expectedLength) { // check length
         printf("Crc16 packet length mismatch. %d != %d\n", encodedLength, expectedLength);
         return 1;
@@ -109,8 +109,8 @@ int testChecksumPacket()
         return errCode;
     }
 
-    const uint8_t encodedLength = bitStream.buf[3];
-    const uint8_t expectedLength = 9;
+    const uint16_t encodedLength = (bitStream.buf[2] << 8) | bitStream.buf[3];
+    const uint16_t expectedLength = 9;
     if(encodedLength != expectedLength) { // check length
         printf("Checksum packet length mismatch. %d != %d\n", encodedLength, expectedLength);
         return 1;
@@ -153,8 +153,8 @@ int testChecksumLongitudinalPacket()
         return errCode;
     }
 
-    const uint8_t encodedLength = bitStream.buf[3];
-    const uint8_t expectedLength = 6;
+    const uint16_t encodedLength = (bitStream.buf[2] << 8) | bitStream.buf[3];
+    const uint16_t expectedLength = 6;
     if(encodedLength != expectedLength) { // check length
         printf("ChecksumLongitudinal packet length mismatch. %d != %d\n", encodedLength, expectedLength);
         return 1;
