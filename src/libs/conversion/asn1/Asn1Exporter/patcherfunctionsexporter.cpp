@@ -82,13 +82,19 @@ std::optional<QString> PatcherFunctionsExporter::exportPatcherFunctions(
 void PatcherFunctionsExporter::exportMappingFunctionsModule(
         const std::vector<QString> &patcherFunctionsFileNames, const Options &options)
 {
+    const auto outputFileName = options.value(Asn1Options::mappingFunctionsModuleFileName).value_or("postEncoding");
+
     QString data;
     QTextStream stream(&data, QIODevice::WriteOnly);
 
+    const auto headerGuard = QString("%1_H").arg(Escaper::escapeCName(outputFileName).toUpper());
+
+    stream << "#ifndef " << headerGuard << '\n';
+    stream << "#define " << headerGuard << "\n\n";
     generateMappingFunctionsModule(patcherFunctionsFileNames, stream);
+    stream << "#endif";
 
     const auto pathPrefix = options.value(Asn1Options::patcherFunctionsFilepathPrefix).value_or("");
-    const auto outputFileName = options.value(Asn1Options::mappingFunctionsModuleFileName).value_or("postEncoding");
 
     const auto outputFilePath = QString("%1%2.h").arg(pathPrefix).arg(outputFileName);
     QSaveFile outputFile(outputFilePath);
@@ -144,12 +150,17 @@ void PatcherFunctionsExporter::generatePatcherFunctions(const Asn1Acn::File *asn
         generateDecodingValidatorHeader(sequence, headerStream);
         generateDecodingValidatorBody(sequence, bodyStream);
     }
+
+    headerStream << "#endif";
 }
 
 void PatcherFunctionsExporter::initializePatcherFunctionsHeader(QTextStream &stream, const Asn1Acn::File *asn1File)
 {
+    const auto headerGuard = QString("%1_POSTENCODING_H").arg(Escaper::escapeCName(asn1File->name()).toUpper());
+
     // clang-format off
-    stream << "#pragma once\n\n"
+    stream << "#ifndef " << headerGuard << '\n'
+           << "#define " << headerGuard << "\n\n"
            << "#include \"asn1crt.h\"\n"
            << "#include \"" << asn1File->name() << ".h\"\n";
     // clang-format on
@@ -262,8 +273,6 @@ void PatcherFunctionsExporter::generateDecodingValidatorDeclaration(const Sequen
 void PatcherFunctionsExporter::generateMappingFunctionsModule(
         const std::vector<QString> &patcherFunctionsFileNames, QTextStream &stream)
 {
-    stream << "#pragma once\n\n";
-
     for (const auto &patcherFunctionFileName : patcherFunctionsFileNames) {
         stream << "#include \"" << patcherFunctionFileName << ".h\"\n";
     }
@@ -273,7 +282,9 @@ void PatcherFunctionsExporter::generateCommonLibraryHeader(QTextStream &stream)
 {
     // clang-format off
     stream <<
-R"(#pragma once
+R"(#ifndef PATCHING_COMMON_LIBRARY_H
+#define PATCHING_COMMON_LIBRARY_H
+
 #include "asn1crt.h"
 
 asn1SccUint calculateLengthInBytes(BitStream* pStartBitStream, BitStream* pEndBitStream);
@@ -282,6 +293,8 @@ uint8_t calculateCrc8(uint8_t* data, long size);
 uint16_t calculateCrc16(uint8_t* data, long size);
 uint32_t calculateChecksum(uint8_t* data, long size);
 uint8_t calculateChecksumLongitundinal(uint8_t* data, long size);
+
+#endif
 )";
     // clang-format on
 }
