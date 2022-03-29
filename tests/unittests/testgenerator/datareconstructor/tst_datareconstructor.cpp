@@ -17,31 +17,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "../common.h"
-#include "dataview-uniq.h"
 #include "gdbconnectorstub.h"
-#include "ivcommonprops.h"
-#include "ivinterface.h"
-#include "ivmodel.h"
-#include "modelloader.h"
-#include "testdriver.h"
-#include "types/type.h"
 
-#include <QDebug>
 #include <QObject>
 #include <QTest>
 #include <QVariant>
 #include <QtTest/qtestcase.h>
-#include <algorithm>
-#include <cstdarg>
-#include <cstdint>
-#include <iostream>
 #include <ivtools.h>
-#include <memory>
-#include <qglobal.h>
+#include <modelloader.h>
 #include <qobjectdefs.h>
-#include <qvariant.h>
-#include <stdexcept>
 #include <testgenerator/datareconstructor/DataReconstructor.h>
 
 using plugincommon::IvTools;
@@ -51,63 +35,18 @@ using testgenerator::GdbConnector;
 
 namespace tests::testgenerator {
 
-typedef struct {
-    asn1SccMyBool active;
-    asn1SccMyReal temperature;
-    asn1SccMyInteger posX;
-    asn1SccMyInteger posY;
-    asn1SccMyBool result;
-} TestVector;
-
 class tst_datareconstructor final : public QObject
 {
     Q_OBJECT
 
 private Q_SLOTS:
-    void initTestCase();
-    void testNominal();
+    void testNominal() const;
 
 private:
-    const unsigned int TestVectorsNumber = 5;
-    TestVector *testData = nullptr;
+    const unsigned int numberOfTestVectors = 5;
 };
 
-void tst_datareconstructor::initTestCase()
-{
-    const unsigned int testDataBytesNum = TestVectorsNumber * sizeof(TestVector);
-    testData = static_cast<TestVector *>(malloc(testDataBytesNum));
-    memset(testData, 0, testDataBytesNum);
-}
-
-QString byteToHexStr(char byte)
-{
-    const auto number = static_cast<uint_least8_t>(byte);
-    if (number < 16) {
-        return QString("0%1").arg(number, 1, 16);
-    } else {
-        return QString("%1").arg(number, 2, 16);
-    }
-}
-
-void printQByteArrayInHex(const QByteArray &array)
-{
-    QString arrayInHex = QString("QByteArray size: %1\n").arg(array.size());
-    for (int i = 0; i < array.size(); i++) {
-        arrayInHex += byteToHexStr(array.at(i));
-        arrayInHex += " ";
-
-        if ((i + 1) % 8 == 0) {
-            arrayInHex += "| ";
-        }
-
-        if ((i + 1) % 16 == 0) {
-            arrayInHex += "\n";
-        }
-    }
-    std::cerr << arrayInHex.toStdString();
-}
-
-void tst_datareconstructor::testNominal()
+void tst_datareconstructor::testNominal() const
 {
     const QVector<QVariant> expectedTestData = {
         true, 2.3000, -2, 3, true, //
@@ -121,24 +60,22 @@ void tst_datareconstructor::testNominal()
     const QString binLocalization = qEnvironmentVariable("$HOME/testBinaries/");
     const QString script = "x86-linux-cpp.gdb";
     const QString binToRun = "hostpartition";
-    const QByteArray rawTestResults =
+    const QByteArray rawTestData =
             GdbConnector::getRawTestResults(binLocalization, { "-batch", "-x", script }, { "host:1234", binToRun });
 
     const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview.xml");
-    const QString ifaceUnderTest = "InterfaceUnderTest";
-    ivm::IVInterface *const ivIface = IvTools::getIfaceFromModel(ifaceUnderTest, ivModel.get());
+    ivm::IVInterface *const ivIface = IvTools::getIfaceFromModel("InterfaceUnderTest", ivModel.get());
 
-    const QString asn1Filename = "testharness.asn";
-    const QString asn1Filepath = QString("%1%2%3").arg("resources").arg(QDir::separator()).arg(asn1Filename);
+    const QString asn1Filepath = QString("%1%2%3").arg("resources").arg(QDir::separator()).arg("testharness.asn");
     const auto asn1Model = ModelLoader::loadAsn1Model(asn1Filepath);
 
-    const QVector<QVariant> allReadData =
-            DataReconstructor::getVariantVectorFromRawData(rawTestResults, TestVectorsNumber, ivIface, asn1Model.get());
+    const QVector<QVariant> readTestData =
+            DataReconstructor::getVariantVectorFromRawData(rawTestData, numberOfTestVectors, ivIface, asn1Model.get());
 
-    QCOMPARE(allReadData.size(), expectedTestData.size());
-    const int dataSize = allReadData.size();
+    QCOMPARE(readTestData.size(), expectedTestData.size());
+    const int dataSize = readTestData.size();
     for (int i = 0; i < dataSize; i++) {
-        QCOMPARE(allReadData.at(i), expectedTestData.at(i));
+        QCOMPARE(readTestData.at(i), expectedTestData.at(i));
     }
 }
 
