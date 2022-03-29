@@ -18,6 +18,7 @@
  */
 
 #include "../common.h"
+#include "asn1model.h"
 #include "dataview-uniq.h"
 #include "gdbconnectorstub.h"
 #include "ivcommonprops.h"
@@ -25,10 +26,12 @@
 #include "ivmodel.h"
 #include "modelloader.h"
 #include "testdriver.h"
+#include "types/type.h"
 
 #include <QDebug>
 #include <QObject>
 #include <QTest>
+#include <QVariant>
 #include <QtTest/qtestcase.h>
 #include <algorithm>
 #include <cstdarg>
@@ -38,6 +41,8 @@
 #include <memory>
 #include <qglobal.h>
 #include <qobjectdefs.h>
+#include <qvariant.h>
+#include <stdexcept>
 
 using plugincommon::ModelLoader;
 using testgenerator::GdbConnector;
@@ -61,16 +66,13 @@ private Q_SLOTS:
     void testNominal();
 
 private:
-    const unsigned int kTestDataSize = 5;
+    const unsigned int TestVectorsNumber = 5;
     TestVector *testData = nullptr;
 };
-static auto compareTestVectors(const TestVector &actual, const TestVector &expected) -> void;
-static auto copyRawBytesIntoTestVector(const QByteArray &source, TestVector *testData, unsigned int testDataSize)
-        -> void;
 
 void tst_datareconstructor::initTestCase()
 {
-    const unsigned int testDataBytesNum = kTestDataSize * sizeof(TestVector);
+    const unsigned int testDataBytesNum = TestVectorsNumber * sizeof(TestVector);
     testData = static_cast<TestVector *>(malloc(testDataBytesNum));
     memset(testData, 0, testDataBytesNum);
 }
@@ -103,30 +105,11 @@ void printQByteArrayInHex(const QByteArray &array)
     std::cerr << arrayInHex.toStdString();
 }
 
-void tst_datareconstructor::testNominal()
+QMap<QString, Asn1Acn::Types::Type *> mapAsnTypesToPlatformTypes(Asn1Acn::Asn1Model *const model)
 {
-    const TestVector expectedTestData[] = {
-        { true, 2.3000, -2, 3, true },
-        { true, 5.3444, -2, 3, true },
-        { false, 2.3000, -8, 3, true },
-        { false, 2.3000, -1, -1, true },
-        { true, 2.3000, 4, 1, true },
-    };
+    QMap<QString, Asn1Acn::Types::Type *> output;
 
-    // these are just dummy values
-    const QString binLocalization = qEnvironmentVariable("$HOME/testBinaries/");
-    const QString script = "x86-linux-cpp.gdb";
-    const QString binToRun = "hostpartition";
-    const QByteArray rawTestResults =
-            GdbConnector::getRawTestResults(binLocalization, { "-batch", "-x", script }, { "host:1234", binToRun });
-
-    const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview.xml");
-
-    const QString asn1Filename = "testharness.asn";
-    const QString asn1Filepath = QString("%1%2%3").arg("resources").arg(QDir::separator()).arg(asn1Filename);
-    const auto asn1Model = ModelLoader::loadAsn1Model(asn1Filepath);
-
-    for (const auto &file : asn1Model->data()) {
+    for (const auto &file : model->data()) {
         if (file == nullptr) {
             continue;
         }
@@ -140,47 +123,128 @@ void tst_datareconstructor::testNominal()
                 continue;
             }
             if (definitionTypeAssignmentNames.size() == 1) {
-                qDebug() << definition->name() << definitionTypeAssignmentNames.first();
+                output.insert(definition->types().front()->name(), definition->types().front()->type());
             }
 
-            const QString names = std::accumulate(
-                    definitionTypeAssignmentNames.cbegin(), definitionTypeAssignmentNames.cend(), QString {});
-            qDebug() << definition->name() << names;
-
             for (const auto &type : definition->types()) {
-                qDebug() << "type def: " << type->name() << type->type()->typeName();
+                Asn1Acn::Types::Type *const typeType = type->type();
+                if (typeType == nullptr) {
+                    continue;
+                }
+                output.insert(type->name(), typeType);
             }
         }
     }
 
-    QVector<QVariant> readData;
-    (void)readData;
+    return output;
+}
 
-    copyRawBytesIntoTestVector(rawTestResults, testData, kTestDataSize);
-    for (unsigned int i = 0; i < kTestDataSize; i++) {
-        compareTestVectors(testData[i], expectedTestData[i]);
+// these values shall be configurable by a user
+const int sizeOfInteger = 8;
+const int sizeOfReal = 8;
+const int sizeOfBoolean = 8;
+
+int getSizeOfType(const Asn1Acn::Types::Type::ASN1Type &type)
+{
+    switch (type) {
+    case Asn1Acn::Types::Type::ASN1Type::INTEGER:
+        return sizeOfInteger;
+    case Asn1Acn::Types::Type::ASN1Type::REAL:
+        return sizeOfReal;
+    case Asn1Acn::Types::Type::ASN1Type::BOOLEAN:
+        return sizeOfBoolean;
+    default:
+        return 0;
     }
 }
 
-static void compareTestVectors(const TestVector &actual, const TestVector &expected)
+ivm::IVInterface *getIfaceFromModel(const QString &ifaceName, ivm::IVModel *const model)
 {
-    QCOMPARE(actual.active, expected.active);
-    QCOMPARE(actual.temperature, expected.temperature);
-    QCOMPARE(actual.posX, expected.posX);
-    QCOMPARE(actual.posY, expected.posY);
-    QCOMPARE(actual.result, expected.result);
+    ivm::IVInterface *const ivIface = model->getIfaceByName(ifaceName, ivm::IVInterface::InterfaceType::Provided);
+    if (ivIface == nullptr) {
+        throw std::logic_error("requested interface not found");
+    }
+    return ivIface;
 }
 
-static auto copyRawBytesIntoTestVector(const QByteArray &source, TestVector *const testData, unsigned int testDataSize)
-        -> void
+QByteArray popFrontQByteArray(int howMany, QByteArray &array)
 {
-    if (static_cast<unsigned int>(source.size()) != testDataSize * sizeof(TestVector)) {
-        return;
+    QByteArray output = array.left(howMany);
+    array.remove(0, howMany);
+    return output;
+}
+
+template<typename T>
+void pushBackCopyToVariantVector(QVector<QVariant> &vv, QByteArray rawData)
+{
+    const T *const var = reinterpret_cast<const T *>(rawData.data());
+    vv.push_back(QVariant(*var));
+}
+
+QVector<QVariant> getVariantVectorFromRawData(QByteArray rawData, const unsigned int TestVectorsNumber,
+        ivm::IVInterface *const iface, Asn1Acn::Asn1Model *const asn1Model)
+{
+    QVector<QVariant> output;
+    output.reserve(static_cast<int>(TestVectorsNumber));
+
+    const auto map = mapAsnTypesToPlatformTypes(asn1Model);
+
+    for (unsigned int i = 0; i < TestVectorsNumber; i++) {
+        for (const auto &param : iface->params()) {
+            const auto &type = map.value(param.paramTypeName());
+            if (type == nullptr) {
+                throw std::runtime_error("requested type cannot be found");
+            }
+
+            const int sizeOfVar = getSizeOfType(type->typeEnum());
+            const QByteArray rawVar = popFrontQByteArray(sizeOfVar, rawData);
+
+            const auto typeEnum = type->typeEnum();
+            if (typeEnum == Asn1Acn::Types::Type::ASN1Type::INTEGER) {
+                pushBackCopyToVariantVector<int>(output, rawVar);
+            } else if (typeEnum == Asn1Acn::Types::Type::ASN1Type::REAL) {
+                pushBackCopyToVariantVector<double>(output, rawVar);
+            } else if (typeEnum == Asn1Acn::Types::Type::ASN1Type::BOOLEAN) {
+                pushBackCopyToVariantVector<bool>(output, rawVar);
+            }
+        }
     }
-    const TestVector *data = reinterpret_cast<const TestVector *>(source.data());
-    for (int i = 0; i < static_cast<int>(testDataSize); i++) {
-        testData[i] = *data;
-        data++;
+
+    return output;
+}
+
+void tst_datareconstructor::testNominal()
+{
+    const QVector<QVariant> expectedTestData = {
+        true, 2.3000, -2, 3, true, //
+        true, 5.3444, -2, 3, true, //
+        false, 2.3000, -8, 3, true, //
+        false, 2.3000, -1, -1, true, //
+        true, 2.3000, 4, 1, true, //
+    };
+
+    // these are just dummy values
+    const QString binLocalization = qEnvironmentVariable("$HOME/testBinaries/");
+    const QString script = "x86-linux-cpp.gdb";
+    const QString binToRun = "hostpartition";
+    const QByteArray rawTestResults =
+            GdbConnector::getRawTestResults(binLocalization, { "-batch", "-x", script }, { "host:1234", binToRun });
+
+    const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview.xml");
+    const QString ifaceUnderTest = "InterfaceUnderTest";
+    ivm::IVInterface *const ivIface = getIfaceFromModel(ifaceUnderTest, ivModel.get());
+
+    const QString asn1Filename = "testharness.asn";
+    const QString asn1Filepath = QString("%1%2%3").arg("resources").arg(QDir::separator()).arg(asn1Filename);
+    const auto asn1Model = ModelLoader::loadAsn1Model(asn1Filepath);
+
+    const QVector<QVariant> allReadData =
+            getVariantVectorFromRawData(rawTestResults, TestVectorsNumber, ivIface, asn1Model.get());
+
+    QCOMPARE(allReadData.size(), expectedTestData.size());
+    const int dataSize = allReadData.size();
+    for (int i = 0; i < dataSize; i++) {
+        QCOMPARE(allReadData.at(i), expectedTestData.at(i));
     }
 }
 
