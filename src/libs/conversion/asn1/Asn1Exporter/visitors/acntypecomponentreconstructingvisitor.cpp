@@ -281,7 +281,7 @@ void AcnTypeComponentReconstructingVisitor::tryAppendSize(const T &type, QString
 
 void AcnTypeComponentReconstructingVisitor::tryAppendSize(const Types::Boolean &type, QStringList &params) const
 {
-    const auto size = type.size();
+    const auto size = type.acnSize();
     if (size != 0) {
         params << QStringLiteral("size ") + QString::number(size);
     }
