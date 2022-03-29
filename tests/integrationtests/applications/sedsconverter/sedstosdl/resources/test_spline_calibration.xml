@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="SplineCalibration">
+    <DataTypeSet>
+      <IntegerDataType name="IntegerType">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="MegaInterface">
+        <ParameterSet>
+          <Parameter name="Param" mode="sync" type="IntegerType" />
+        </ParameterSet>
+        <CommandSet>
+          <Command name="MegaCommand" mode="sync">
+            <Argument name="commandArg" type="IntegerType" mode="in"/>
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="Component">
+        <ProvidedInterfaceSet>
+          <Interface name="InterfacePi" type="MegaInterface" />
+        </ProvidedInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="megaVariable" type="IntegerType"/>
+          </VariableSet>
+          <ParameterMapSet>
+            <ParameterMap variableRef="megaVariable" parameter="Param" interface="InterfacePi" />
+          </ParameterMapSet>
+          <ActivitySet>
+            <Activity name="MegaActivity">
+              <Argument name="activityArg" type="IntegerType"/>
+              <Body>
+                <Calibration inputVariableRef="megaVariable" outputVariableRef="megaVariable">
+                  <SplineCalibrator>
+                    <SplinePoint raw="2" calibrated="40" />
+                    <SplinePoint raw="10" calibrated="200" />
+                  </SplineCalibrator>
+                </Calibration>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="StateMachine">
+              <EntryState name="State1"/>
+              <State name="State2"/>
+              <ExitState name="State3"/>
+              <Transition fromState="State2" toState="State2" name="Transition1">
+                <OnCommandPrimitive command="MegaCommand" interface="InterfacePi">
+                  <ArgumentValue name="commandArg" outputVariableRef="megaVariable" />
+                </OnCommandPrimitive>
+                <Do activity="MegaActivity">
+                  <ArgumentValue name="activityArg">
+                    <VariableRef variableRef="megaVariable" />
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

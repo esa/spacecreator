@@ -150,9 +150,14 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Calibration &cali
         DescriptionTranslator::translate(calibration, sdlTask.get());
 
         m_sdlTransition->addAction(std::move(sdlTask));
+    } else if (std::holds_alternative<SplineCalibrator>(calibrator)) {
+        const auto action = QString("%1 := %2").arg(targetName, targetName);
+
+        auto sdlTask = std::make_unique<::sdl::Task>("", action);
+        DescriptionTranslator::translate(calibration, sdlTask.get());
+
+        m_sdlTransition->addAction(std::move(sdlTask));
     } else {
-        // TODO Spline calibrator - postponed, as it requires generation of a custom procedure,
-        // and possibly a custom type
         throw TranslationException("Calibration activity not implemented");
     }
 }
