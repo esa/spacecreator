@@ -217,24 +217,24 @@ public:
         SourceLocation location(m_currentFile, readIntegerAttribute(QStringLiteral("Line")),
                 readIntegerAttribute(QStringLiteral("CharPositionInLine")));
 
-        auto precense = AsnSequenceComponent::Presence::NotSpecified;
+        auto presence = AsnSequenceComponent::Presence::NotSpecified;
         if (hasAttribute(QStringLiteral("ALWAYS-PRESENT"))) {
             const auto alwaysPresent = readStringAttribute(QStringLiteral("ALWAYS-PRESENT")).toLower();
             if (alwaysPresent == QStringLiteral("true")) {
-                precense = AsnSequenceComponent::Presence::AlwaysPresent;
+                presence = AsnSequenceComponent::Presence::AlwaysPresent;
             }
         }
         if (hasAttribute(QStringLiteral("ALWAYS-ABSENT"))) {
             const auto alwaysAbsent = readStringAttribute(QStringLiteral("ALWAYS-ABSENT")).toLower();
             if (alwaysAbsent == QStringLiteral("true")) {
-                precense = AsnSequenceComponent::Presence::AlwaysAbsent;
+                presence = AsnSequenceComponent::Presence::AlwaysAbsent;
             }
         }
 
         m_childType->setIdentifier(name);
 
         type.addComponent(std::make_unique<AsnSequenceComponent>(name, cName, optional == QStringLiteral("true"),
-                defaultValue, presentWhen, precense, location, std::move(m_childType)));
+                defaultValue, presentWhen, presence, location, std::move(m_childType)));
     }
 
     void visit(Types::SequenceOf &type) override { type.setItemsType(std::move(m_childType)); }

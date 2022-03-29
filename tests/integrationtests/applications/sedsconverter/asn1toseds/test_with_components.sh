@@ -13,7 +13,6 @@ echo "Running SedsConverter test: ${0##*/}'"
 rm -r -f $TEST_OUTPUT_DIR
 mkdir -p $TEST_OUTPUT_DIR
 # Translate
-# gdb --args \
 $SEDS_CONVERTER --from ASN.1 --to SEDS -i resources/test_with_components.asn,resources/test_with_components.acn \
     --out $TEST_OUTPUT_DIR/package.xml
 

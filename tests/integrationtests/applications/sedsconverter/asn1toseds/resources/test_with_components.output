@@ -94,6 +94,43 @@
      <Entry type="Type_MyChoice_thirdOption" name="element"/>
     </EntryList>
    </ContainerDataType>
+   <EnumeratedDataType name="Index_ConcreteChoice">
+    <EnumerationList>
+     <Enumeration value="0" label="firstOption"/>
+     <Enumeration value="1" label="thirdOption"/>
+    </EnumerationList>
+   </EnumeratedDataType>
+   <ContainerDataType name="ConcreteChoice" abstract="true">
+    <EntryList>
+     <Entry type="Index_ConcreteChoice" name="index"/>
+    </EntryList>
+   </ContainerDataType>
+   <IntegerDataType name="Type_ConcreteChoice_firstOption">
+    <Range>
+     <MinMaxRange min="0" max="20" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType baseType="ConcreteChoice" name="ConcreteChoice_firstOption">
+    <ConstraintSet>
+     <ValueConstraint value="0" entry="index"/>
+    </ConstraintSet>
+    <EntryList>
+     <Entry type="Type_ConcreteChoice_firstOption" name="element"/>
+    </EntryList>
+   </ContainerDataType>
+   <IntegerDataType name="Type_ConcreteChoice_thirdOption">
+    <Range>
+     <MinMaxRange min="0" max="30" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType baseType="ConcreteChoice" name="ConcreteChoice_thirdOption">
+    <ConstraintSet>
+     <ValueConstraint value="1" entry="index"/>
+    </ConstraintSet>
+    <EntryList>
+     <Entry type="Type_ConcreteChoice_thirdOption" name="element"/>
+    </EntryList>
+   </ContainerDataType>
   </DataTypeSet>
  </Package>
 </PackageFile>
