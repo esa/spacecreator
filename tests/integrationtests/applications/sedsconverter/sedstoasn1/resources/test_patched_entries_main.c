@@ -178,6 +178,80 @@ int testChecksumLongitudinalPacket()
     return 0;
 }
 
+int testOnlyErrorControlEntry()
+{
+    OnlyErrorControl packet;
+    OnlyErrorControl_Initialize((&(packet)));
+    packet.nice_Packet_header.version = 42;
+    packet.nice_Packet_header.release = 19;
+    packet.nice_Packet_body.data = 111;
+
+    int errCode;
+
+    BitStream bitStream;
+    uint8_t encBuff[OnlyErrorControl_REQUIRED_BYTES_FOR_ACN_ENCODING + 1];
+    BitStream_Init(&bitStream, encBuff, OnlyErrorControl_REQUIRED_BYTES_FOR_ACN_ENCODING);
+
+    bool ret = OnlyErrorControl_ACN_Encode(&packet, &bitStream, &errCode, TRUE);
+    if(!ret) {
+        return errCode;
+    }
+
+    const uint8_t encodedCrc = bitStream.buf[3];
+    const uint8_t expectedCrc = 0xA6;
+    if(encodedCrc != expectedCrc) { // check CRC8
+        printf("Crc8 packet CRC mismatch. 0x%02X != 0x%02X\n", encodedCrc, expectedCrc);
+        return 1;
+    }
+
+    BitStream_AttachBuffer(&bitStream, encBuff, OnlyErrorControl_REQUIRED_BYTES_FOR_ACN_ENCODING);
+
+    OnlyErrorControl decodedPacket;
+    ret = OnlyErrorControl_ACN_Decode(&decodedPacket, &bitStream, &errCode);
+    if(!ret) {
+        return errCode;
+    }
+
+    return 0;
+}
+
+int testOnlyLengthEntry()
+{
+    OnlyLength packet;
+    OnlyLength_Initialize((&(packet)));
+    packet.nice_Packet_header.version = 42;
+    packet.nice_Packet_header.release = 19;
+    packet.nice_Packet_body.data = 111;
+
+    int errCode;
+
+    BitStream bitStream;
+    uint8_t encBuff[OnlyLength_REQUIRED_BYTES_FOR_ACN_ENCODING + 1];
+    BitStream_Init(&bitStream, encBuff, OnlyLength_REQUIRED_BYTES_FOR_ACN_ENCODING);
+
+    bool ret = OnlyLength_ACN_Encode(&packet, &bitStream, &errCode, TRUE);
+    if(!ret) {
+        return errCode;
+    }
+
+    const uint16_t encodedLength = (bitStream.buf[2] << 8) | bitStream.buf[3];
+    const uint16_t expectedLength = 5;
+    if(encodedLength != expectedLength) { // check length
+        printf("OnlyLength length mismatch. %d != %d\n", encodedLength, expectedLength);
+        return 1;
+    }
+
+    BitStream_AttachBuffer(&bitStream, encBuff, OnlyLength_REQUIRED_BYTES_FOR_ACN_ENCODING);
+
+    OnlyLength decodedPacket;
+    ret = OnlyLength_ACN_Decode(&decodedPacket, &bitStream, &errCode);
+    if(!ret) {
+        return errCode;
+    }
+
+    return 0;
+}
+
 int main()
 {
     int ret = testCrc8Packet();
@@ -196,6 +270,16 @@ int main()
     }
 
     ret = testChecksumLongitudinalPacket();
+    if(ret != 0) {
+        return ret;
+    }
+
+    ret = testOnlyErrorControlEntry();
+    if(ret != 0) {
+        return ret;
+    }
+
+    ret = testOnlyLengthEntry();
     if(ret != 0) {
         return ret;
     }

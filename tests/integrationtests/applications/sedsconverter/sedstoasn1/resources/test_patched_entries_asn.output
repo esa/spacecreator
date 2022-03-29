@@ -36,4 +36,14 @@ ChecksumLongitudinal-Packet ::= SEQUENCE
     nice-Packet-header PacketHeader,
     nice-Packet-body PacketBody
 }
+OnlyErrorControl ::= SEQUENCE
+{
+    nice-Packet-header PacketHeader,
+    nice-Packet-body PacketBody
+}
+OnlyLength ::= SEQUENCE
+{
+    nice-Packet-header PacketHeader,
+    nice-Packet-body PacketBody
+}
 END

@@ -44,4 +44,16 @@ ChecksumLongitudinal-Packet [post-encoding-function checksumlongitudinal-packet-
     nice-Packet-body [],
     nice-Packet-errorControlEntry NULL [align-to-next byte, pattern '00000000'B, save-position]
 }
+OnlyErrorControl [post-encoding-function onlyerrorcontrol-encoding-function, post-decoding-validator onlyerrorcontrol-decoding-validator]
+{
+    nice-Packet-header [],
+    nice-Packet-body [],
+    nice-Packet-errorControlEntry NULL [align-to-next byte, pattern '00000000'B, save-position]
+}
+OnlyLength [post-encoding-function onlylength-encoding-function, post-decoding-validator onlylength-decoding-validator]
+{
+    nice-Packet-header [],
+    nice-Packet-lengthEntry NULL [align-to-next byte, pattern '0000000000000000'B, save-position],
+    nice-Packet-body []
+}
 END

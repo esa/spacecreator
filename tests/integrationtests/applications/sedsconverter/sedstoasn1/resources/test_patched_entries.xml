@@ -73,6 +73,20 @@
           <ErrorControlEntry name="Nice-Packet-errorControlEntry" errorControlType="checksum_longitudinal" type="ChecksumLongitudinalPattern" />
         </EntryList>
       </ContainerDataType>
+      <ContainerDataType name="OnlyErrorControl">
+        <EntryList>
+          <Entry name="Nice-Packet-header" type="PacketHeader"/>
+          <Entry name="Nice-Packet-body" type="PacketBody"/>
+          <ErrorControlEntry name="Nice-Packet-errorControlEntry" errorControlType="CRC8" type="Crc8Pattern" />
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="OnlyLength">
+        <EntryList>
+          <Entry name="Nice-Packet-header" type="PacketHeader"/>
+          <LengthEntry name="Nice-Packet-lengthEntry" type="LengthType"/>
+          <Entry name="Nice-Packet-body" type="PacketBody"/>
+        </EntryList>
+      </ContainerDataType>
     </DataTypeSet>
   </Package>
 </PackageFile>
