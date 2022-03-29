@@ -21,10 +21,13 @@
 
 #include "asn1model.h"
 
+#include <QDataStream>
 #include <QString>
 #include <QVariant>
+#include <endian.h>
 #include <ivcore/ivinterface.h>
 #include <ivcore/ivmodel.h>
+#include <qglobal.h>
 
 namespace testgenerator {
 
@@ -33,6 +36,7 @@ class DataReconstructor final
 public:
     static auto getVariantVectorFromRawData(QByteArray rawData, unsigned int numberOfTestVectors,
             ivm::IVInterface *iface, Asn1Acn::Asn1Model *asn1Model,
+            QDataStream::ByteOrder endianness = QDataStream::LittleEndian,
             const QMap<QString, int> &typeSizes = {
                     { "INTEGER", 8 },
                     { "BOOLEAN", 8 },

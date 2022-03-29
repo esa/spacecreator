@@ -19,11 +19,13 @@
 
 #include "datareconstructor.h"
 
+#include <qglobal.h>
+
 namespace testgenerator {
 
 QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(QByteArray rawData,
         const unsigned int numberOfTestVectors, ivm::IVInterface *const iface, Asn1Acn::Asn1Model *const asn1Model,
-        const QMap<QString, int> &typeSizes)
+        QDataStream::ByteOrder endianness, const QMap<QString, int> &typeSizes)
 {
     QVector<QVariant> output;
     output.reserve(static_cast<int>(numberOfTestVectors));
@@ -38,7 +40,10 @@ QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(QByteArray rawD
             }
 
             const int bytesInVariable = typeSizes.value(type->typeName());
-            const QByteArray rawVariable = popFrontQByteArray(bytesInVariable, rawData);
+            QByteArray rawVariable = popFrontQByteArray(bytesInVariable, rawData);
+            if (endianness == QDataStream::BigEndian) {
+                std::reverse(rawVariable.begin(), rawVariable.end());
+            }
 
             const auto typeEnum = type->typeEnum();
             if (typeEnum == Asn1Acn::Types::Type::ASN1Type::INTEGER) {

@@ -75,7 +75,7 @@ void tst_datareconstructor::testNominal() const
         { "REAL", 8 },
     };
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
-            rawTestData, numberOfTestVectors, ivIface, asn1Model.get(), typeSizes);
+            rawTestData, numberOfTestVectors, ivIface, asn1Model.get(), QDataStream::LittleEndian, typeSizes);
 
     QCOMPARE(readTestData.size(), expectedTestData.size());
     const int dataSize = readTestData.size();
