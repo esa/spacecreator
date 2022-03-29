@@ -151,12 +151,12 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
             type->addComponent(asn1TrailerComponent->clone());
         }
 
-        const auto &patcherFunctions = m_containersScope.fetchPatcherFunctions(sedsTypeName);
-        for (const auto &patcherFunction : patcherFunctions) {
-            type->addPatcherFunction(patcherFunction);
+        const auto &patcherSnippets = m_containersScope.fetchPatcherSnippets(sedsTypeName);
+        for (const auto &patcherSnippet : patcherSnippets) {
+            type->addPatcherSnippet(patcherSnippet);
         }
 
-        if (!patcherFunctions.empty()) {
+        if (!patcherSnippets.empty()) {
             type->setPostEncodingFunction(QString("%1-encoding-function").arg(sequenceName.toLower()));
             type->setPostDecodingValidator(QString("%1-decoding-validator").arg(sequenceName).toLower());
         }

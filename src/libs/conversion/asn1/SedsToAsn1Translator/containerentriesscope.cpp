@@ -19,7 +19,7 @@
 
 #include "containerentriesscope.h"
 
-#include "patcherfunctionsgenerator.h"
+#include "patchersnippetsgenerator.h"
 #include "specialized/entrytranslatorvisitor.h"
 
 #include <conversion/common/translation/exceptions.h>
@@ -82,21 +82,21 @@ void ContainerEntriesScope::addContainer(const ContainerDataType &sedsType)
         }
     }
 
-    PatcherFunctionsGenerator patcherFunctionsGenerator(m_sedsPackage, m_sedsPackages);
-    auto patcherFunctions = patcherFunctionsGenerator.generate(sedsType);
+    PatcherSnippetsGenerator patcherSnippetsGenerator(m_sedsPackage, m_sedsPackages);
+    auto patcherSnippets = patcherSnippetsGenerator.generate(sedsType);
 
     if (sedsType.baseType()) {
         const auto &sedsBaseTypeName = sedsType.baseType()->nameStr();
-        const auto &parentPatcherFunctions = fetchPatcherFunctions(sedsBaseTypeName);
+        const auto &parentPatcherSnippets = fetchPatcherSnippets(sedsBaseTypeName);
 
-        for (const auto &parentPatcherFunction : parentPatcherFunctions) {
-            patcherFunctions.push_back(parentPatcherFunction);
+        for (const auto &parentPatcherSnippet : parentPatcherSnippets) {
+            patcherSnippets.push_back(parentPatcherSnippet);
         }
     }
 
     // Save this type
     ScopeEntry entry { std::move(asn1SequenceComponents), std::move(asn1SequenceTrailerComponents),
-        std::move(patcherFunctions) };
+        std::move(patcherSnippets) };
     m_scope.insert({ sedsType.nameStr(), std::move(entry) });
 }
 
@@ -113,11 +113,11 @@ const Asn1Acn::Types::Sequence::Components &ContainerEntriesScope::fetchTrailerC
     return m_scope.at(sedsTypeName).trailerEntries->components();
 }
 
-const std::vector<Asn1Acn::PatcherFunction> &ContainerEntriesScope::fetchPatcherFunctions(
+const std::vector<Asn1Acn::PatcherSnippet> &ContainerEntriesScope::fetchPatcherSnippets(
         const QString &sedsTypeName) const
 {
     assertPresent(sedsTypeName);
-    return m_scope.at(sedsTypeName).patcherFunctions;
+    return m_scope.at(sedsTypeName).patcherSnippets;
 }
 
 void ContainerEntriesScope::assertPresent(const QString &sedsTypeName) const

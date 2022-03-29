@@ -28,7 +28,7 @@
 
 namespace Asn1Acn {
 
-struct PatcherFunction final {
+struct PatcherSnippet final {
     QString encodingFunction;
     QString decodingValidator;
 };

@@ -20,7 +20,7 @@
 #pragma once
 
 #include <QString>
-#include <asn1library/asn1/patcherfunction.h>
+#include <asn1library/asn1/patchersnippet.h>
 #include <seds/SedsModel/types/containerdatatype.h>
 #include <seds/SedsModel/types/encodings/integerdataencoding.h>
 #include <seds/SedsModel/types/entries/entrytype.h>
@@ -35,7 +35,7 @@ namespace conversion::asn1::translator {
 /**
  * @brief   Generator for functions for patching ErrorControlEntry and LengthEntry
  */
-class PatcherFunctionsGenerator final
+class PatcherSnippetsGenerator final
 {
 public:
     /**
@@ -44,7 +44,7 @@ public:
      * @param   sedsPackage         Parent SEDS package
      * @param   sedsPackages        List of SEDS packages
      */
-    PatcherFunctionsGenerator(
+    PatcherSnippetsGenerator(
             const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages);
 
 public:
@@ -55,13 +55,13 @@ public:
      *
      * @return  Patcher functions
      */
-    auto generate(const seds::model::ContainerDataType &sedsType) const -> std::vector<Asn1Acn::PatcherFunction>;
+    auto generate(const seds::model::ContainerDataType &sedsType) const -> std::vector<Asn1Acn::PatcherSnippet>;
 
 private:
     auto buildErrorControlEntryFunction(const seds::model::ErrorControlEntry &errorControlEntry,
-            const QString &sequenceName) const -> Asn1Acn::PatcherFunction;
+            const QString &sequenceName) const -> Asn1Acn::PatcherSnippet;
     auto buildLengthEntryFunction(const seds::model::LengthEntry &lengthEntry, const QString &sequenceName) const
-            -> Asn1Acn::PatcherFunction;
+            -> Asn1Acn::PatcherSnippet;
 
     auto buildErrorControlEntryEncodingFunction(const seds::model::ErrorControlEntry &entry, const uint64_t bits,
             const QString &sequenceName) const -> QString;

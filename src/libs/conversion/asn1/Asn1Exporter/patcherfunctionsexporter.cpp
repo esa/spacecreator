@@ -192,10 +192,10 @@ void PatcherFunctionsExporter::generateEncodingFunctionBody(const Sequence *sequ
            << "{\n"
            << "\tasn1SccUint lengthInBytes = calculateLengthInBytes(pStartBitStream, pEndBitStream);";
 
-    for (const auto &patcherFunction : sequence->patcherFunctions()) {
+    for (const auto &patcherSnippet : sequence->patcherSnippets()) {
         stream << '\n';
 
-        for (const auto &line : patcherFunction.encodingFunction.split('\n', QString::SkipEmptyParts)) {
+        for (const auto &line : patcherSnippet.encodingFunction.split('\n', QString::SkipEmptyParts)) {
             stream << "\n\t" << line;
         }
     }
@@ -238,10 +238,10 @@ void PatcherFunctionsExporter::generateDecodingValidatorBody(const Sequence *seq
            << "\tasn1SccUint lengthInBytes = calculateLengthInBytes(pStartBitStream, pEndBitStream);\n"
            << "\tbool ret = true;";
 
-    for (const auto &patcherFunction : sequence->patcherFunctions()) {
+    for (const auto &patcherSnippet : sequence->patcherSnippets()) {
         stream << '\n';
 
-        for (const auto &line : patcherFunction.decodingValidator.split('\n', QString::SkipEmptyParts)) {
+        for (const auto &line : patcherSnippet.decodingValidator.split('\n', QString::SkipEmptyParts)) {
             stream << "\n\t" << line;
         }
     }
@@ -300,7 +300,7 @@ std::vector<const Sequence *> PatcherFunctionsExporter::collectSequencesToPatch(
 
             const auto sequence = dynamic_cast<Sequence *>(type->type());
 
-            if (!sequence->patcherFunctions().empty()) {
+            if (!sequence->patcherSnippets().empty()) {
                 result.push_back(sequence);
             }
         }

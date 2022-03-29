@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "patcherfunctionsgenerator.h"
+#include "patchersnippetsgenerator.h"
 
 #include <QTextStream>
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
@@ -31,30 +31,30 @@ using conversion::translator::TranslationException;
 
 namespace conversion::asn1::translator {
 
-PatcherFunctionsGenerator::PatcherFunctionsGenerator(
+PatcherSnippetsGenerator::PatcherSnippetsGenerator(
         const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages)
     : m_sedsPackage(sedsPackage)
     , m_sedsPackages(sedsPackages)
 {
 }
 
-std::vector<Asn1Acn::PatcherFunction> PatcherFunctionsGenerator::generate(
+std::vector<Asn1Acn::PatcherSnippet> PatcherSnippetsGenerator::generate(
         const seds::model::ContainerDataType &sedsType) const
 {
     const auto sequenceName = Escaper::escapeCSequenceName(sedsType.nameStr());
 
-    std::vector<Asn1Acn::PatcherFunction> result;
+    std::vector<Asn1Acn::PatcherSnippet> result;
 
     for (const auto &entry : sedsType.entries()) {
         // clang-format off
         std::visit(overloaded {
             [&](const seds::model::ErrorControlEntry &errorControlEntry) {
-                auto patcherFunction = buildErrorControlEntryFunction(errorControlEntry, sequenceName);
-                result.push_back(std::move(patcherFunction));
+                auto patcherSnippet = buildErrorControlEntryFunction(errorControlEntry, sequenceName);
+                result.push_back(std::move(patcherSnippet));
             },
             [&](const seds::model::LengthEntry &lengthEntry) {
-                auto patcherFunction = buildLengthEntryFunction(lengthEntry, sequenceName);
-                result.push_back(std::move(patcherFunction));
+                auto patcherSnippet = buildLengthEntryFunction(lengthEntry, sequenceName);
+                result.push_back(std::move(patcherSnippet));
             },
             [&](const auto &e) {
                 Q_UNUSED(e)
@@ -66,7 +66,7 @@ std::vector<Asn1Acn::PatcherFunction> PatcherFunctionsGenerator::generate(
     return result;
 }
 
-Asn1Acn::PatcherFunction PatcherFunctionsGenerator::buildErrorControlEntryFunction(
+Asn1Acn::PatcherSnippet PatcherSnippetsGenerator::buildErrorControlEntryFunction(
         const seds::model::ErrorControlEntry &errorControlEntry, const QString &sequenceName) const
 {
     const auto bitCount = getErrorControlBitCount(errorControlEntry);
@@ -77,7 +77,7 @@ Asn1Acn::PatcherFunction PatcherFunctionsGenerator::buildErrorControlEntryFuncti
     return { std::move(encodingFunction), std::move(decodingValidator) };
 }
 
-Asn1Acn::PatcherFunction PatcherFunctionsGenerator::buildLengthEntryFunction(
+Asn1Acn::PatcherSnippet PatcherSnippetsGenerator::buildLengthEntryFunction(
         const seds::model::LengthEntry &lengthEntry, const QString &sequenceName) const
 {
     const auto &encoding = getLengthEncoding(lengthEntry);
@@ -90,7 +90,7 @@ Asn1Acn::PatcherFunction PatcherFunctionsGenerator::buildLengthEntryFunction(
     return { std::move(encodingFunction), std::move(decodingValidator) };
 }
 
-QString PatcherFunctionsGenerator::buildErrorControlEntryEncodingFunction(
+QString PatcherSnippetsGenerator::buildErrorControlEntryEncodingFunction(
         const seds::model::ErrorControlEntry &entry, const uint64_t bitCount, const QString &sequenceName) const
 {
     const auto entryName = Escaper::escapeCFieldName(entry.nameStr());
@@ -138,7 +138,7 @@ QString PatcherFunctionsGenerator::buildErrorControlEntryEncodingFunction(
     return buffer;
 }
 
-QString PatcherFunctionsGenerator::buildErrorControlEntryDecodingValidator(
+QString PatcherSnippetsGenerator::buildErrorControlEntryDecodingValidator(
         const seds::model::ErrorControlEntry &entry, const uint64_t bitCount, const QString &sequenceName) const
 {
     const auto entryName = Escaper::escapeCFieldName(entry.nameStr());
@@ -191,7 +191,7 @@ QString PatcherFunctionsGenerator::buildErrorControlEntryDecodingValidator(
     return buffer;
 }
 
-QString PatcherFunctionsGenerator::buildLengthEntryEncodingFunction(
+QString PatcherSnippetsGenerator::buildLengthEntryEncodingFunction(
         const seds::model::IntegerDataEncoding &encoding, const QString &sequenceName, const QString &entryName) const
 {
     QString buffer;
@@ -232,7 +232,7 @@ QString PatcherFunctionsGenerator::buildLengthEntryEncodingFunction(
     return buffer;
 }
 
-QString PatcherFunctionsGenerator::buildLengthEntryDecodingValidator(
+QString PatcherSnippetsGenerator::buildLengthEntryDecodingValidator(
         const seds::model::IntegerDataEncoding &encoding, const QString &sequenceName, const QString &entryName) const
 {
     QString buffer;
@@ -279,7 +279,7 @@ QString PatcherFunctionsGenerator::buildLengthEntryDecodingValidator(
     return buffer;
 }
 
-uint64_t PatcherFunctionsGenerator::getErrorControlBitCount(const seds::model::ErrorControlEntry &entry) const
+uint64_t PatcherSnippetsGenerator::getErrorControlBitCount(const seds::model::ErrorControlEntry &entry) const
 {
     const auto &entryTypeRef = entry.type();
 
@@ -306,7 +306,7 @@ uint64_t PatcherFunctionsGenerator::getErrorControlBitCount(const seds::model::E
     return entryBinaryType->bits();
 }
 
-const seds::model::IntegerDataEncoding &PatcherFunctionsGenerator::getLengthEncoding(
+const seds::model::IntegerDataEncoding &PatcherSnippetsGenerator::getLengthEncoding(
         const seds::model::LengthEntry &entry) const
 {
     const auto &entryTypeRef = entry.type();

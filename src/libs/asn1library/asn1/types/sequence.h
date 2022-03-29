@@ -24,7 +24,7 @@
 ****************************************************************************/
 #pragma once
 
-#include "../patcherfunction.h"
+#include "../patchersnippet.h"
 #include "../sequencecomponent.h"
 #include "acnparameterizablecomposite.h"
 #include "type.h"
@@ -60,13 +60,13 @@ public:
     std::optional<QString> postDecodingValidator() const;
     void setPostDecodingValidator(QString postDecodingValidator);
 
-    std::vector<Asn1Acn::PatcherFunction> patcherFunctions() const;
-    void addPatcherFunction(Asn1Acn::PatcherFunction patcherFunction);
+    std::vector<PatcherSnippet> patcherSnippets() const;
+    void addPatcherSnippet(PatcherSnippet patcherSnippet);
 
 private:
     std::optional<QString> m_postEncodingFunction;
     std::optional<QString> m_postDecodingValidator;
-    std::vector<PatcherFunction> m_patcherFunctions;
+    std::vector<PatcherSnippet> m_patcherSnippets;
 };
 
 }

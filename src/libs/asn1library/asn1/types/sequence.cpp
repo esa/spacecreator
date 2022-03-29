@@ -65,12 +65,12 @@ void Sequence::setPostDecodingValidator(QString postDecodingValidator)
     m_postDecodingValidator = std::move(postDecodingValidator);
 }
 
-std::vector<Asn1Acn::PatcherFunction> Sequence::patcherFunctions() const
+std::vector<PatcherSnippet> Sequence::patcherSnippets() const
 {
-    return m_patcherFunctions;
+    return m_patcherSnippets;
 }
 
-void Sequence::addPatcherFunction(Asn1Acn::PatcherFunction patcherFunctions)
+void Sequence::addPatcherSnippet(PatcherSnippet patcherSnippet)
 {
-    m_patcherFunctions.push_back(std::move(patcherFunctions));
+    m_patcherSnippets.push_back(std::move(patcherSnippet));
 }
