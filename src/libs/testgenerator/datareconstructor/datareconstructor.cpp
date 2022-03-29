@@ -22,30 +22,31 @@
 namespace testgenerator {
 
 QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(QByteArray rawData,
-        const unsigned int TestVectorsNumber, ivm::IVInterface *const iface, Asn1Acn::Asn1Model *const asn1Model)
+        const unsigned int numberOfTestVectors, ivm::IVInterface *const iface, Asn1Acn::Asn1Model *const asn1Model,
+        const QMap<QString, int> &typeSizes)
 {
     QVector<QVariant> output;
-    output.reserve(static_cast<int>(TestVectorsNumber));
+    output.reserve(static_cast<int>(numberOfTestVectors));
 
-    const auto map = mapAsnTypesToPlatformTypes(asn1Model);
+    const auto definitionNameToTypeMap = mapDefinitionNameToType(asn1Model);
 
-    for (unsigned int i = 0; i < TestVectorsNumber; i++) {
+    for (unsigned int i = 0; i < numberOfTestVectors; i++) {
         for (const auto &param : iface->params()) {
-            const auto &type = map.value(param.paramTypeName());
+            const auto &type = definitionNameToTypeMap.value(param.paramTypeName());
             if (type == nullptr) {
                 throw std::runtime_error("requested type cannot be found");
             }
 
-            const int sizeOfVar = getSizeOfType(type->typeEnum());
-            const QByteArray rawVar = popFrontQByteArray(sizeOfVar, rawData);
+            const int bytesInVariable = typeSizes.value(type->typeName());
+            const QByteArray rawVariable = popFrontQByteArray(bytesInVariable, rawData);
 
             const auto typeEnum = type->typeEnum();
             if (typeEnum == Asn1Acn::Types::Type::ASN1Type::INTEGER) {
-                pushBackCopyToVariantVector<int>(output, rawVar);
+                pushBackCopyToVariantVector<int>(output, rawVariable);
             } else if (typeEnum == Asn1Acn::Types::Type::ASN1Type::REAL) {
-                pushBackCopyToVariantVector<double>(output, rawVar);
+                pushBackCopyToVariantVector<double>(output, rawVariable);
             } else if (typeEnum == Asn1Acn::Types::Type::ASN1Type::BOOLEAN) {
-                pushBackCopyToVariantVector<bool>(output, rawVar);
+                pushBackCopyToVariantVector<bool>(output, rawVariable);
             }
         }
     }
@@ -53,7 +54,7 @@ QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(QByteArray rawD
     return output;
 }
 
-QMap<QString, Asn1Acn::Types::Type *> DataReconstructor::mapAsnTypesToPlatformTypes(Asn1Acn::Asn1Model *const model)
+QMap<QString, Asn1Acn::Types::Type *> DataReconstructor::mapDefinitionNameToType(Asn1Acn::Asn1Model *const model)
 {
     QMap<QString, Asn1Acn::Types::Type *> output;
 
@@ -66,20 +67,19 @@ QMap<QString, Asn1Acn::Types::Type *> DataReconstructor::mapAsnTypesToPlatformTy
             if (definition == nullptr) {
                 continue;
             }
-            const auto &definitionTypeAssignmentNames = definition->typeAssignmentNames();
-            if (definitionTypeAssignmentNames.isEmpty()) {
+            if (definition->typeAssignmentNames().isEmpty()) {
                 continue;
             }
-            if (definitionTypeAssignmentNames.size() == 1) {
-                output.insert(definition->types().front()->name(), definition->types().front()->type());
-            }
 
-            for (const auto &type : definition->types()) {
-                Asn1Acn::Types::Type *const typeType = type->type();
-                if (typeType == nullptr) {
+            for (const auto &definitionType : definition->types()) {
+                Asn1Acn::Types::Type *const type = definitionType->type();
+                const QString &name = definitionType->name();
+
+                if (type == nullptr || name.isEmpty()) {
                     continue;
                 }
-                output.insert(type->name(), typeType);
+
+                output.insert(name, type);
             }
         }
     }
@@ -87,24 +87,11 @@ QMap<QString, Asn1Acn::Types::Type *> DataReconstructor::mapAsnTypesToPlatformTy
     return output;
 }
 
-int DataReconstructor::getSizeOfType(const Asn1Acn::Types::Type::ASN1Type &type)
-{
-    switch (type) {
-    case Asn1Acn::Types::Type::ASN1Type::INTEGER:
-        return sizeOfInteger;
-    case Asn1Acn::Types::Type::ASN1Type::REAL:
-        return sizeOfReal;
-    case Asn1Acn::Types::Type::ASN1Type::BOOLEAN:
-        return sizeOfBoolean;
-    default:
-        return 0;
-    }
-}
-
-QByteArray DataReconstructor::popFrontQByteArray(int howMany, QByteArray &array)
+QByteArray DataReconstructor::popFrontQByteArray(const int howMany, QByteArray &array)
 {
     QByteArray output = array.left(howMany);
     array.remove(0, howMany);
+
     return output;
 }
 

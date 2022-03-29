@@ -31,17 +31,16 @@ namespace testgenerator {
 class DataReconstructor final
 {
 public:
-    static auto getVariantVectorFromRawData(QByteArray rawData, unsigned int TestVectorsNumber, ivm::IVInterface *iface,
-            Asn1Acn::Asn1Model *asn1Model) -> QVector<QVariant>;
+    static auto getVariantVectorFromRawData(QByteArray rawData, unsigned int numberOfTestVectors,
+            ivm::IVInterface *iface, Asn1Acn::Asn1Model *asn1Model,
+            const QMap<QString, int> &typeSizes = {
+                    { "INTEGER", 8 },
+                    { "BOOLEAN", 8 },
+                    { "REAL", 8 },
+            }) -> QVector<QVariant>;
 
 private:
-    // these values shall be configurable by a user
-    static const int sizeOfInteger = 8;
-    static const int sizeOfReal = 8;
-    static const int sizeOfBoolean = 8;
-
-    static auto mapAsnTypesToPlatformTypes(Asn1Acn::Asn1Model *model) -> QMap<QString, Asn1Acn::Types::Type *>;
-    static auto getSizeOfType(const Asn1Acn::Types::Type::ASN1Type &type) -> int;
+    static auto mapDefinitionNameToType(Asn1Acn::Asn1Model *model) -> QMap<QString, Asn1Acn::Types::Type *>;
     static auto popFrontQByteArray(int howMany, QByteArray &array) -> QByteArray;
 
     template<typename T>
