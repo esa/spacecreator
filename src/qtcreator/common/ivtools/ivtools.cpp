@@ -51,4 +51,13 @@ auto IvTools::getFunctions(ivm::IVModel *const model) -> std::vector<ivm::IVFunc
     return functions;
 }
 
+auto IvTools::getIfaceFromModel(const QString &ifaceName, ivm::IVModel *const model) -> ivm::IVInterface *
+{
+    ivm::IVInterface *const ivIface = model->getIfaceByName(ifaceName, ivm::IVInterface::InterfaceType::Provided);
+    if (ivIface == nullptr) {
+        throw std::logic_error("requested interface not found");
+    }
+    return ivIface;
+}
+
 } // namespace plugincommon

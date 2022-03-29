@@ -3,7 +3,9 @@ project(TestGenerator VERSION 1.0.0 LANGUAGES CXX)
 add_library(TestGenerator STATIC)
 
 target_sources(TestGenerator
-    PRIVATE     gdbconnector/gdbconnector.cpp
+    PRIVATE     datareconstructor/DataReconstructor.cpp
+                datareconstructor/DataReconstructor.h
+                gdbconnector/gdbconnector.cpp
                 gdbconnector/gdbconnector.h
                 gdbconnector/process.cpp
                 gdbconnector/process.h

@@ -18,7 +18,6 @@
  */
 
 #include "../common.h"
-#include "asn1model.h"
 #include "dataview-uniq.h"
 #include "gdbconnectorstub.h"
 #include "ivcommonprops.h"
@@ -43,8 +42,11 @@
 #include <qobjectdefs.h>
 #include <qvariant.h>
 #include <stdexcept>
+#include <testgenerator/datareconstructor/DataReconstructor.h>
 
+using plugincommon::IvTools;
 using plugincommon::ModelLoader;
+using testgenerator::DataReconstructor;
 using testgenerator::GdbConnector;
 
 namespace tests::testgenerator {
@@ -105,114 +107,6 @@ void printQByteArrayInHex(const QByteArray &array)
     std::cerr << arrayInHex.toStdString();
 }
 
-QMap<QString, Asn1Acn::Types::Type *> mapAsnTypesToPlatformTypes(Asn1Acn::Asn1Model *const model)
-{
-    QMap<QString, Asn1Acn::Types::Type *> output;
-
-    for (const auto &file : model->data()) {
-        if (file == nullptr) {
-            continue;
-        }
-
-        for (const auto &definition : file->definitionsList()) {
-            if (definition == nullptr) {
-                continue;
-            }
-            const auto &definitionTypeAssignmentNames = definition->typeAssignmentNames();
-            if (definitionTypeAssignmentNames.isEmpty()) {
-                continue;
-            }
-            if (definitionTypeAssignmentNames.size() == 1) {
-                output.insert(definition->types().front()->name(), definition->types().front()->type());
-            }
-
-            for (const auto &type : definition->types()) {
-                Asn1Acn::Types::Type *const typeType = type->type();
-                if (typeType == nullptr) {
-                    continue;
-                }
-                output.insert(type->name(), typeType);
-            }
-        }
-    }
-
-    return output;
-}
-
-// these values shall be configurable by a user
-const int sizeOfInteger = 8;
-const int sizeOfReal = 8;
-const int sizeOfBoolean = 8;
-
-int getSizeOfType(const Asn1Acn::Types::Type::ASN1Type &type)
-{
-    switch (type) {
-    case Asn1Acn::Types::Type::ASN1Type::INTEGER:
-        return sizeOfInteger;
-    case Asn1Acn::Types::Type::ASN1Type::REAL:
-        return sizeOfReal;
-    case Asn1Acn::Types::Type::ASN1Type::BOOLEAN:
-        return sizeOfBoolean;
-    default:
-        return 0;
-    }
-}
-
-ivm::IVInterface *getIfaceFromModel(const QString &ifaceName, ivm::IVModel *const model)
-{
-    ivm::IVInterface *const ivIface = model->getIfaceByName(ifaceName, ivm::IVInterface::InterfaceType::Provided);
-    if (ivIface == nullptr) {
-        throw std::logic_error("requested interface not found");
-    }
-    return ivIface;
-}
-
-QByteArray popFrontQByteArray(int howMany, QByteArray &array)
-{
-    QByteArray output = array.left(howMany);
-    array.remove(0, howMany);
-    return output;
-}
-
-template<typename T>
-void pushBackCopyToVariantVector(QVector<QVariant> &vv, QByteArray rawData)
-{
-    const T *const var = reinterpret_cast<const T *>(rawData.data());
-    vv.push_back(QVariant(*var));
-}
-
-QVector<QVariant> getVariantVectorFromRawData(QByteArray rawData, const unsigned int TestVectorsNumber,
-        ivm::IVInterface *const iface, Asn1Acn::Asn1Model *const asn1Model)
-{
-    QVector<QVariant> output;
-    output.reserve(static_cast<int>(TestVectorsNumber));
-
-    const auto map = mapAsnTypesToPlatformTypes(asn1Model);
-
-    for (unsigned int i = 0; i < TestVectorsNumber; i++) {
-        for (const auto &param : iface->params()) {
-            const auto &type = map.value(param.paramTypeName());
-            if (type == nullptr) {
-                throw std::runtime_error("requested type cannot be found");
-            }
-
-            const int sizeOfVar = getSizeOfType(type->typeEnum());
-            const QByteArray rawVar = popFrontQByteArray(sizeOfVar, rawData);
-
-            const auto typeEnum = type->typeEnum();
-            if (typeEnum == Asn1Acn::Types::Type::ASN1Type::INTEGER) {
-                pushBackCopyToVariantVector<int>(output, rawVar);
-            } else if (typeEnum == Asn1Acn::Types::Type::ASN1Type::REAL) {
-                pushBackCopyToVariantVector<double>(output, rawVar);
-            } else if (typeEnum == Asn1Acn::Types::Type::ASN1Type::BOOLEAN) {
-                pushBackCopyToVariantVector<bool>(output, rawVar);
-            }
-        }
-    }
-
-    return output;
-}
-
 void tst_datareconstructor::testNominal()
 {
     const QVector<QVariant> expectedTestData = {
@@ -232,14 +126,14 @@ void tst_datareconstructor::testNominal()
 
     const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview.xml");
     const QString ifaceUnderTest = "InterfaceUnderTest";
-    ivm::IVInterface *const ivIface = getIfaceFromModel(ifaceUnderTest, ivModel.get());
+    ivm::IVInterface *const ivIface = IvTools::getIfaceFromModel(ifaceUnderTest, ivModel.get());
 
     const QString asn1Filename = "testharness.asn";
     const QString asn1Filepath = QString("%1%2%3").arg("resources").arg(QDir::separator()).arg(asn1Filename);
     const auto asn1Model = ModelLoader::loadAsn1Model(asn1Filepath);
 
     const QVector<QVariant> allReadData =
-            getVariantVectorFromRawData(rawTestResults, TestVectorsNumber, ivIface, asn1Model.get());
+            DataReconstructor::getVariantVectorFromRawData(rawTestResults, TestVectorsNumber, ivIface, asn1Model.get());
 
     QCOMPARE(allReadData.size(), expectedTestData.size());
     const int dataSize = allReadData.size();

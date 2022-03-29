@@ -40,6 +40,16 @@ public:
      * @return functions stored in the given model
      */
     static auto getFunctions(ivm::IVModel *model) -> std::vector<ivm::IVFunction *>;
+
+    /**
+     * @brief Get the requested interface from IVModel
+     *
+     * @param ifaceName name of the requested interface
+     * @param model     interfaceview data model
+     *
+     * @return IV interface
+     */
+    static auto getIfaceFromModel(const QString &ifaceName, ivm::IVModel *model) -> ivm::IVInterface *;
 };
 
 } // namespace plugincommon
