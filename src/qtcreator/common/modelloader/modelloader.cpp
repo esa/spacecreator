@@ -33,6 +33,7 @@
 #include <seds/SedsModel/sedsmodel.h>
 #include <seds/SedsOptions/options.h>
 #include <seds/SedsXmlImporter/importer.h>
+#include <stdexcept>
 
 using conversion::ModelType;
 
@@ -54,6 +55,10 @@ auto ModelLoader::loadIvModel(const QString &ivConfigFilename, const QString &iv
     output.reset(static_cast<ivm::IVModel *>(model.get()));
     model.release();
 
+    if (output == nullptr) {
+        throw std::runtime_error("could not load IV model");
+    }
+
     return output;
 }
 
@@ -66,6 +71,10 @@ auto ModelLoader::loadSedsModel(const QString &sedsFilename) -> std::unique_ptr<
 
     seds::importer::SedsXmlImporter sedsImporter;
     model = sedsImporter.importModel(options);
+
+    if (model == nullptr) {
+        throw std::runtime_error("could not load SEDS model");
+    }
 
     return model;
 }
@@ -88,6 +97,10 @@ auto ModelLoader::loadAsn1Model(const QString &filename) -> std::unique_ptr<Asn1
     output.reset(static_cast<Asn1Acn::Asn1Model *>(model.get()));
     model.release();
 
+    if (output == nullptr) {
+        throw std::runtime_error("could not load ASN.1 model");
+    }
+
     return output;
 }
 
@@ -100,6 +113,10 @@ auto ModelLoader::loadCsvModel(const QString &filename) -> std::unique_ptr<csv::
     auto csvModel = importer.importModel(options);
     if (csvModel == nullptr) {
         throw "CSV file could not be read";
+    }
+
+    if (csvModel == nullptr) {
+        throw std::runtime_error("could not load CSV model");
     }
 
     return csvModel;

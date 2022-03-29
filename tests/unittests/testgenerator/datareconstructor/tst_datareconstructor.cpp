@@ -120,40 +120,22 @@ void tst_datareconstructor::testNominal()
     const QByteArray rawTestResults =
             GdbConnector::getRawTestResults(binLocalization, { "-batch", "-x", script }, { "host:1234", binToRun });
 
-    const QString ifUnderTestName = "InterfaceUnderTest";
     const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview.xml");
-    if (ivModel == nullptr) {
-        QFAIL("could not load IV model");
-    }
 
-    const QString name = "testharness.asn";
-    const QString asnFilename = QString("%1%2%3").arg("resources").arg(QDir::separator()).arg(name);
-    qDebug() << "asn filename: " << asnFilename;
-    if (asnFilename.isEmpty()) {
-        QFAIL("Could not read name of ASN.1 file");
-    }
-
-    const auto asn1Model = ModelLoader::loadAsn1Model(asnFilename);
-    if (asn1Model == nullptr) {
-        QFAIL("Could not load ASN.1 model");
-    }
+    const QString asn1Filename = "testharness.asn";
+    const QString asn1Filepath = QString("%1%2%3").arg("resources").arg(QDir::separator()).arg(asn1Filename);
+    const auto asn1Model = ModelLoader::loadAsn1Model(asn1Filepath);
 
     for (const auto &file : asn1Model->data()) {
         if (file == nullptr) {
             continue;
         }
 
-        qDebug() << "file from model" << file->name();
         for (const auto &definition : file->definitionsList()) {
             if (definition == nullptr) {
                 continue;
             }
-            if (definition->typeAssignmentNames().isEmpty()) {
-                continue;
-            }
-
             const auto &definitionTypeAssignmentNames = definition->typeAssignmentNames();
-
             if (definitionTypeAssignmentNames.isEmpty()) {
                 continue;
             }
@@ -164,8 +146,15 @@ void tst_datareconstructor::testNominal()
             const QString names = std::accumulate(
                     definitionTypeAssignmentNames.cbegin(), definitionTypeAssignmentNames.cend(), QString {});
             qDebug() << definition->name() << names;
+
+            for (const auto &type : definition->types()) {
+                qDebug() << "type def: " << type->name() << type->type()->typeName();
+            }
         }
     }
+
+    QVector<QVariant> readData;
+    (void)readData;
 
     copyRawBytesIntoTestVector(rawTestResults, testData, kTestDataSize);
     for (unsigned int i = 0; i < kTestDataSize; i++) {
