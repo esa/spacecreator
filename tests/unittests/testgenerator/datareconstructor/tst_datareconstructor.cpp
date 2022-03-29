@@ -26,7 +26,7 @@
 #include <ivtools.h>
 #include <modelloader.h>
 #include <qobjectdefs.h>
-#include <testgenerator/datareconstructor/DataReconstructor.h>
+#include <testgenerator/datareconstructor/datareconstructor.h>
 
 using plugincommon::IvTools;
 using plugincommon::ModelLoader;

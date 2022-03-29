@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "TestDriverGeneratorContext.h"
+#include "testdrivergeneratorcontext.h"
 
 #include <QTextStream>
 #include <asn1/asn1model.h>

@@ -3,18 +3,18 @@ project(TestGenerator VERSION 1.0.0 LANGUAGES CXX)
 add_library(TestGenerator STATIC)
 
 target_sources(TestGenerator
-    PRIVATE     datareconstructor/DataReconstructor.cpp
-                datareconstructor/DataReconstructor.h
+    PRIVATE     datareconstructor/datareconstructor.cpp
+                datareconstructor/datareconstructor.h
                 gdbconnector/gdbconnector.cpp
                 gdbconnector/gdbconnector.h
                 gdbconnector/process.cpp
                 gdbconnector/process.h
-                testdrivergenerator/TestDriverGenerator.cpp
-                testdrivergenerator/TestDriverGenerator.h
-                testdrivergenerator/TestDriverGeneratorContext.cpp
-                testdrivergenerator/TestDriverGeneratorContext.h
-                testdrivergenerator/TestDriverGeneratorException.cpp
-                testdrivergenerator/TestDriverGeneratorException.h
+                testdrivergenerator/testdrivergenerator.cpp
+                testdrivergenerator/testdrivergenerator.h
+                testdrivergenerator/testdrivergeneratorcontext.cpp
+                testdrivergenerator/testdrivergeneratorcontext.h
+                testdrivergenerator/testdrivergeneratorexception.cpp
+                testdrivergenerator/testdrivergeneratorexception.h
                 harness/ivgenerator/ivgenerator.cpp
                 harness/ivgenerator/ivgenerator.h
                 harness/dvgenerator/dvgenerator.cpp
