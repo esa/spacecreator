@@ -231,7 +231,7 @@ void tst_AcnNodeReconstructingVisitor::testChoiceNested()
                                          "{\n"
                                          "    choiceAlt1 [present-when presWhen1]\n"
                                          "    {\n"
-                                         "        seqItem1 BOOLEAN [size 1],\n"
+                                         "        seqItem1 BOOLEAN [size 8],\n"
                                          "        seqItem2 [present-when seqItem1]\n"
                                          "    },\n"
                                          "    choiceAlt2 []\n"

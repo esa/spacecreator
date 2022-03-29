@@ -37,7 +37,7 @@ class Boolean : public Type, public Constraints::WithConstraints<BooleanValue>
 public:
     Boolean(const QString &identifier = QString())
         : Type(identifier)
-        , m_size(1)
+        , m_size(8)
     {
     }
     Boolean(const Boolean &other) = default;
