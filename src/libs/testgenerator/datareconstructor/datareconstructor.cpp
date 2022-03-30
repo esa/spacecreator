@@ -19,13 +19,18 @@
 
 #include "datareconstructor.h"
 
-#include <qglobal.h>
-
 namespace testgenerator {
+
+DataReconstructor::TypeLayoutInfos::TypeLayoutInfos(std::initializer_list<TypeLayoutInfo> infos)
+{
+    for (const auto &info : infos) {
+        this->insert(std::get<0>(info), QPair<TypeDataLength, TypePaddingLength>(std::get<1>(info), std::get<2>(info)));
+    }
+}
 
 QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(QByteArray rawData,
         const unsigned int numberOfTestVectors, ivm::IVInterface *const iface, Asn1Acn::Asn1Model *const asn1Model,
-        QDataStream::ByteOrder endianness, const QMap<QString, int> &typeSizes)
+        QDataStream::ByteOrder endianness, const TypeLayoutInfos &typeLayoutInfos)
 {
     QVector<QVariant> output;
     output.reserve(static_cast<int>(numberOfTestVectors));
@@ -36,11 +41,13 @@ QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(QByteArray rawD
         for (const auto &param : iface->params()) {
             const auto &type = definitionNameToTypeMap.value(param.paramTypeName());
             if (type == nullptr) {
-                throw std::runtime_error("requested type cannot be found");
+                throw std::runtime_error("Requested type cannot be found");
             }
 
-            const int bytesInVariable = typeSizes.value(type->typeName());
-            QByteArray rawVariable = popFrontQByteArray(bytesInVariable, rawData);
+            const int dataLength = typeLayoutInfos.value(type->typeName()).first;
+            const int paddingLength = typeLayoutInfos.value(type->typeName()).second;
+            const int variableLength = dataLength + paddingLength;
+            QByteArray rawVariable = popFrontQByteArray(variableLength, rawData);
             if (endianness == QDataStream::BigEndian) {
                 std::reverse(rawVariable.begin(), rawVariable.end());
             }

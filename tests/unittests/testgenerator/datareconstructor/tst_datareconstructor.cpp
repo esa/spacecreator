@@ -69,13 +69,13 @@ void tst_datareconstructor::testNominal() const
     const QString asn1Filepath = QString("%1%2%3").arg("resources").arg(QDir::separator()).arg("testharness.asn");
     const auto asn1Model = ModelLoader::loadAsn1Model(asn1Filepath);
 
-    const QMap<QString, int> typeSizes = {
-        { "INTEGER", 8 },
-        { "BOOLEAN", 8 },
-        { "REAL", 8 },
+    const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
+        { "INTEGER", 4, 4 },
+        { "BOOLEAN", 1, 7 },
+        { "REAL", 8, 0 },
     };
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
-            rawTestData, numberOfTestVectors, ivIface, asn1Model.get(), QDataStream::LittleEndian, typeSizes);
+            rawTestData, numberOfTestVectors, ivIface, asn1Model.get(), QDataStream::LittleEndian, typeLayoutInfos);
 
     QCOMPARE(readTestData.size(), expectedTestData.size());
     const int dataSize = readTestData.size();

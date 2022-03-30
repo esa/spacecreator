@@ -25,8 +25,8 @@
 namespace testgenerator {
 
 /**
- * @brief  RAII implementing wrapper for QProcess
- *
+ * @brief  RAII implementing wrapper for QProcess. It is used to simplify code in GdbConnector class, as the required
+ *         behavior is present in the destructor, called automatically when the object is destroyed
  */
 class Process
 {

@@ -63,6 +63,8 @@ QString GdbConnector::getOneBeforeLastLine(const QString &src, const QString &ne
     return results;
 }
 
+// this data extraction function could be supplied as lambda expression with constant default, because it is very
+// specific - it is usable only when SREC data format is utilized
 QString GdbConnector::splitAndExtractSrecData(const QString &strings, const QString &delimeter)
 {
     QString srecData;

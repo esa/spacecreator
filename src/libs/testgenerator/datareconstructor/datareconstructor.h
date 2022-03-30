@@ -22,6 +22,8 @@
 #include "asn1model.h"
 
 #include <QDataStream>
+#include <QMap>
+#include <QPair>
 #include <QString>
 #include <QVariant>
 #include <endian.h>
@@ -31,9 +33,34 @@
 
 namespace testgenerator {
 
+/**
+ * @brief Class for reconstructing values according to specified information
+ *
+ */
 class DataReconstructor final
 {
 public:
+    typedef int TypePaddingLength; // bytes
+    typedef int TypeDataLength; // bytes
+    typedef QString TypePaddingName;
+
+    typedef std::tuple<TypePaddingName, TypeDataLength, TypePaddingLength> TypeLayoutInfo;
+
+    /**
+     * @brief Container to store user-supplied information about datatypes to be reconstructed
+     *
+     */
+    class TypeLayoutInfos final : public QMap<TypePaddingName, QPair<TypeDataLength, TypePaddingLength>>
+    {
+    public:
+        /**
+         * @brief Construct a new object storing user-supplied information about datatypes
+         *
+         * @param infos list of information about datatypes
+         */
+        TypeLayoutInfos(std::initializer_list<TypeLayoutInfo> infos);
+    };
+
     /**
      * @brief Get the vector of variants of values from raw data array, based on information about tested interface and
      *        data format
@@ -43,17 +70,17 @@ public:
      * @param iface                interface under test
      * @param asn1Model            ASN.1 model describing required types
      * @param endianness           big endian or little endian
-     * @param typeSizes            map of sizes (in bytes) of different types, on a remote target
+     * @param typeLayoutInfos      map of length and padding of data on a remote target
      *
      * @return vector of variants of values read from raw data
      */
     static auto getVariantVectorFromRawData(QByteArray rawData, unsigned int numberOfTestVectors,
             ivm::IVInterface *iface, Asn1Acn::Asn1Model *asn1Model,
             QDataStream::ByteOrder endianness = QDataStream::LittleEndian,
-            const QMap<QString, int> &typeSizes = {
-                    { "INTEGER", 8 },
-                    { "BOOLEAN", 8 },
-                    { "REAL", 8 },
+            const TypeLayoutInfos &typeLayoutInfos = {
+                    { "INTEGER", 4, 4 },
+                    { "BOOLEAN", 1, 7 },
+                    { "REAL", 8, 0 },
             }) -> QVector<QVariant>;
 
 private:
