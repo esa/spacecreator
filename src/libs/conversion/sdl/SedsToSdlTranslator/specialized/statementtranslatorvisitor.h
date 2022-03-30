@@ -73,6 +73,18 @@ public:
          * @returns Unique label name
          */
         auto uniqueLabelName(const QString &prefix = "label_") -> QString;
+        /**
+         * @brief   Returns a unique raw spline points array name
+         *
+         * @returns Unique array name
+         */
+        auto uniqueRawSplinePointsVariableName() -> QString;
+        /**
+         * @brief   Returns a unique calibrated spline points array name
+         *
+         * @returns Unique array name
+         */
+        auto uniqueCalibratedSplinePointsVariableName() -> QString;
 
         /**
          * @brief SEDS Package accessor
@@ -130,6 +142,8 @@ public:
 
     private:
         int m_labelCount;
+        int m_rawSplinePointsVariableCount;
+        int m_calibratedSplinePointsVariableCount;
         Context &m_masterContext;
         ::sdl::Process *m_sdlProcess;
         ::sdl::Procedure *m_sdlProcedure;
@@ -277,6 +291,8 @@ private:
 
     static auto translateBody(StatementContext &context, ::sdl::Transition *transition, const seds::model::Body *body)
             -> void;
+
+    auto generateSplineCalibratorBoilerplate(const seds::model::SplineCalibrator &splineCalibrator) const -> void;
 
     static auto generateLoopStart(
             ::sdl::Transition *transition, const seds::model::Iteration &iteration, ::sdl::Decision *decision) -> void;
