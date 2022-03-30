@@ -5,6 +5,7 @@ set(SOURCES translator.cpp
             specialized/descriptiontranslator.cpp
             specialized/common.cpp
             specialized/mathoperationtranslator.cpp
+            specialized/splinecalibratortranslator.cpp
             specialized/statemachinetranslator.cpp
             specialized/statementtranslatorvisitor.cpp)
 set(INCLUDES translator.h
@@ -12,6 +13,7 @@ set(INCLUDES translator.h
              specialized/common.h
              specialized/descriptiontranslator.h
              specialized/mathoperationtranslator.h
+             specialized/splinecalibratortranslator.h
              specialized/statemachinetranslator.h
              specialized/statementtranslatorvisitor.h)
 

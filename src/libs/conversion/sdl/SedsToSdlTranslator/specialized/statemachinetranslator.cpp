@@ -562,12 +562,11 @@ auto StateMachineTranslator::createStartTransition(Context &context, const seds:
 
             if (context.sdlProcess()->startTransition() == nullptr) {
                 auto transition = std::make_unique<::sdl::Transition>();
-                DescriptionTranslator::translate(sedsStateMachine, transition.get());
-
                 context.sdlProcess()->setStartTransition(std::move(transition));
             }
 
             auto transition = context.sdlProcess()->startTransition();
+            DescriptionTranslator::translate(sedsStateMachine, transition);
 
             setInitialVariableValues(context.sedsComponent().implementation().variables(), transition);
             const auto &state = std::get<seds::model::EntryState>(element);

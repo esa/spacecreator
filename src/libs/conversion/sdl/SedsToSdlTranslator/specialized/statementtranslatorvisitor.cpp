@@ -22,6 +22,7 @@
 #include "components/activities/coremathoperator.h"
 #include "descriptiontranslator.h"
 #include "mathoperationtranslator.h"
+#include "splinecalibratortranslator.h"
 #include "statemachinetranslator.h"
 #include "translation/exceptions.h"
 
@@ -150,10 +151,11 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Assignment &assig
 
 auto StatementTranslatorVisitor::operator()(const seds::model::Calibration &calibration) -> void
 {
-    const auto targetName = translateVariableReference(calibration.outputVariableRef().value().value());
-    const auto sourceName = translateVariableReference(calibration.inputVariableRef().value().value());
     const auto &calibrator = calibration.calibrator();
     if (std::holds_alternative<Polynomial>(calibrator)) {
+        const auto targetName = translateVariableReference(calibration.outputVariableRef().value().value());
+        const auto sourceName = translateVariableReference(calibration.inputVariableRef().value().value());
+
         const auto &polynomial = std::get<Polynomial>(calibrator);
         const auto action = QString("%1 := %2").arg(targetName, translatePolynomial(sourceName, polynomial));
 
@@ -162,63 +164,13 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Calibration &cali
 
         m_sdlTransition->addAction(std::move(sdlTask));
     } else if (std::holds_alternative<SplineCalibrator>(calibrator)) {
-        const auto &spline = std::get<SplineCalibrator>(calibrator);
+        const auto &splineCalibrator = std::get<SplineCalibrator>(calibrator);
 
-        generateSplineCalibratorBoilerplate(spline);
-
-        const auto action = QString("%1 := %2").arg(targetName, targetName);
-
-        auto sdlTask = std::make_unique<::sdl::Task>("", action);
-        DescriptionTranslator::translate(calibration, sdlTask.get());
-
-        m_sdlTransition->addAction(std::move(sdlTask));
+        SplineCalibratorTranslator splineCalibratorTranslator(m_context, calibration, m_sdlTransition);
+        splineCalibratorTranslator.translate(splineCalibrator);
     } else {
         throw TranslationException("Calibration activity not implemented");
     }
-}
-
-auto StatementTranslatorVisitor::generateSplineCalibratorBoilerplate(
-        const seds::model::SplineCalibrator &splineCalibrator) const -> void
-{
-    Q_UNUSED(splineCalibrator);
-
-    const auto rawPointsVariableName = m_context.uniqueRawSplinePointsVariableName();
-    const auto calibratedPointsVariableName = m_context.uniqueCalibratedSplinePointsVariableName();
-
-    auto rawPointsVariable = std::make_unique<::sdl::VariableDeclaration>(rawPointsVariableName, "SplinePointsArray");
-    m_context.sdlProcess()->addVariable(std::move(rawPointsVariable));
-
-    auto rawPointsInitTransition = std::make_unique<::sdl::Transition>();
-
-    const auto rawPointsInitProcName = QString("Init%1").arg(rawPointsVariableName);
-    auto rawPointsInitProc = std::make_unique<::sdl::Procedure>(rawPointsInitProcName);
-    rawPointsInitProc->setTransition(std::move(rawPointsInitTransition));
-
-    m_context.sdlProcess()->addProcedure(std::move(rawPointsInitProc));
-
-    auto calibratedPointsVariable =
-            std::make_unique<::sdl::VariableDeclaration>(calibratedPointsVariableName, "SplinePointsArray");
-    m_context.sdlProcess()->addVariable(std::move(calibratedPointsVariable));
-
-    auto calibratedPointsInitTransition = std::make_unique<::sdl::Transition>();
-
-    const auto calibratedPointsInitProcName = QString("Init%1").arg(calibratedPointsVariableName);
-    auto calibratedPointsInitProc = std::make_unique<::sdl::Procedure>(calibratedPointsInitProcName);
-    calibratedPointsInitProc->setTransition(std::move(calibratedPointsInitTransition));
-
-    m_context.sdlProcess()->addProcedure(std::move(calibratedPointsInitProc));
-
-    auto startTransition = std::make_unique<::sdl::Transition>();
-
-    const auto rawPointsInitAction = QString("call %1").arg(rawPointsInitProcName);
-    auto rawPointsInitTask = std::make_unique<::sdl::Task>("", rawPointsInitAction);
-    startTransition->addAction(std::move(rawPointsInitTask));
-
-    const auto calibratedPointsInitAction = QString("call %1").arg(calibratedPointsInitProcName);
-    auto calibratedPointsInitTask = std::make_unique<::sdl::Task>("", calibratedPointsInitAction);
-    startTransition->addAction(std::move(calibratedPointsInitTask));
-
-    m_context.sdlProcess()->setStartTransition(std::move(startTransition));
 }
 
 auto StatementTranslatorVisitor::operator()(const seds::model::Conditional &conditional) -> void
