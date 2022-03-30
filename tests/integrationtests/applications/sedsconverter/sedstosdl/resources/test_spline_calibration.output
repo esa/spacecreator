@@ -3,6 +3,27 @@ process Component;
     dcl RawSplinePoints1 SplinePointsArray;
     dcl CalibratedSplinePoints1 SplinePointsArray;
 
+    procedure FindInterval;
+        START;
+        return ;
+    endprocedure;
+
+    procedure LinearCalibration;
+        START;
+            call FindInterval;
+        return ;
+    endprocedure;
+
+    procedure SquareCalibration;
+        START;
+        return ;
+    endprocedure;
+
+    procedure CubicCalibration;
+        START;
+        return ;
+    endprocedure;
+
     procedure InitRawSplinePoints1;
         START;
             task RawSplinePoints1 := {2.000000, 10.000000};

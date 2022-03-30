@@ -36,11 +36,12 @@ SplineCalibratorTranslator::SplineCalibratorTranslator(StatementTranslatorVisito
 
 auto SplineCalibratorTranslator::translate(const seds::model::SplineCalibrator &splineCalibrator) -> void
 {
-    buildSplineCalibratorBoilerplate(splineCalibrator);
+    buildSplineCalibratorBoilerplate(m_context);
+    buildSplineCalibratorVariables(splineCalibrator);
 
     const auto targetName =
             StatementTranslatorVisitor::translateVariableReference(m_calibration.outputVariableRef().value().value());
-    const auto action = QString("%1 := %2").arg(targetName, targetName);
+    const auto action = QString("%1 := %2").arg(targetName).arg(targetName);
 
     auto sdlTask = std::make_unique<::sdl::Task>("", action);
     DescriptionTranslator::translate(m_calibration, sdlTask.get());
@@ -48,7 +49,7 @@ auto SplineCalibratorTranslator::translate(const seds::model::SplineCalibrator &
     m_sdlTransition->addAction(std::move(sdlTask));
 }
 
-auto SplineCalibratorTranslator::buildSplineCalibratorBoilerplate(const seds::model::SplineCalibrator &splineCalibrator)
+auto SplineCalibratorTranslator::buildSplineCalibratorVariables(const seds::model::SplineCalibrator &splineCalibrator)
         -> void
 {
     if (m_context.sdlProcess()->startTransition() == nullptr) {
@@ -72,13 +73,13 @@ auto SplineCalibratorTranslator::buildSplineCalibratorBoilerplate(const seds::mo
     }
 
     const auto rawPointsVariableName = m_context.uniqueRawSplinePointsVariableName();
-    buildSplinePointsBoilerplate(rawPointsVariableName, rawValues, startTransition);
+    buildSplinePointsVariable(rawPointsVariableName, rawValues, startTransition);
 
     const auto calibratedPointsVariableName = m_context.uniqueCalibratedSplinePointsVariableName();
-    buildSplinePointsBoilerplate(calibratedPointsVariableName, calibratedValues, startTransition);
+    buildSplinePointsVariable(calibratedPointsVariableName, calibratedValues, startTransition);
 }
 
-auto SplineCalibratorTranslator::buildSplinePointsBoilerplate(
+auto SplineCalibratorTranslator::buildSplinePointsVariable(
         const QString &variableName, const std::vector<double> &values, ::sdl::Transition *startTransition) -> void
 {
     // Create a variable to hold spline values
@@ -113,6 +114,79 @@ auto SplineCalibratorTranslator::buildSplinePointsBoilerplate(
     startTransition->addAction(std::move(initCall));
 
     m_context.sdlProcess()->addProcedure(std::move(initProc));
+}
+
+auto SplineCalibratorTranslator::buildSplineCalibratorBoilerplate(StatementTranslatorVisitor::StatementContext &context)
+        -> void
+{
+    static bool alreadyCreated = false;
+
+    if (alreadyCreated) {
+        return;
+    }
+
+    buildLinearCalibrationProcedure(context);
+    buildSquareCalibrationProcedure(context);
+    buildCubicCalibrationProcedure(context);
+
+    alreadyCreated = true;
+}
+
+auto SplineCalibratorTranslator::buildFindLinearIntervalProcedure(StatementTranslatorVisitor::StatementContext &context)
+        -> ::sdl::Procedure *
+{
+    const QString procedureName("FindInterval");
+    auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
+    auto procedurePtr = procedure.get();
+
+    auto transition = std::make_unique<::sdl::Transition>();
+    procedure->setTransition(std::move(transition));
+
+    context.sdlProcess()->addProcedure(std::move(procedure));
+
+    return procedurePtr;
+}
+
+auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context)
+        -> void
+{
+    auto findIntervalProc = buildFindLinearIntervalProcedure(context);
+
+    auto transition = std::make_unique<::sdl::Transition>();
+
+    auto findIntervalCall = std::make_unique<::sdl::ProcedureCall>("");
+    findIntervalCall->setProcedure(findIntervalProc);
+    transition->addAction(std::move(findIntervalCall));
+
+    const QString procedureName("LinearCalibration");
+    auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
+    procedure->setTransition(std::move(transition));
+
+    context.sdlProcess()->addProcedure(std::move(procedure));
+}
+
+auto SplineCalibratorTranslator::buildSquareCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context)
+        -> void
+{
+    auto transition = std::make_unique<::sdl::Transition>();
+
+    const QString procedureName("SquareCalibration");
+    auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
+    procedure->setTransition(std::move(transition));
+
+    context.sdlProcess()->addProcedure(std::move(procedure));
+}
+
+auto SplineCalibratorTranslator::buildCubicCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context)
+        -> void
+{
+    auto transition = std::make_unique<::sdl::Transition>();
+
+    const QString procedureName("CubicCalibration");
+    auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
+    procedure->setTransition(std::move(transition));
+
+    context.sdlProcess()->addProcedure(std::move(procedure));
 }
 
 } // namespace conversion::sdl::translator
