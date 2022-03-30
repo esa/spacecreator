@@ -16,9 +16,7 @@ target_include_directories(${TEST_NAME}
 target_link_libraries(${TEST_NAME}
     PRIVATE     PluginCommon
                 ivcore
-                libiveditor
                 dvcore
-                templating
                 TestGenerator
                 Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test

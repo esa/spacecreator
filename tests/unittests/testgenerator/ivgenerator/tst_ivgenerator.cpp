@@ -29,13 +29,9 @@
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivinterface.h>
 #include <ivcore/ivmodel.h>
-#include <ivcore/ivxmlreader.h>
 #include <ivtools.h>
-#include <libiveditor/ivexporter.h>
 #include <memory>
 #include <modelloader.h>
-#include <qdebug.h>
-#include <qobject.h>
 #include <qobjectdefs.h>
 #include <shared/parameter.h>
 #include <shared/sharedlibrary.h>
@@ -159,41 +155,8 @@ static ivm::IVInterface::CreationInfo createInterfaceUnderTestCreationInfo(
     return ci;
 }
 
-static QVariantMap getMetadata(ivm::IVModel *const model)
-{
-    if (model == nullptr) {
-        throw "model shall not be nullptr";
-    }
-
-    QByteArray modelData;
-    QBuffer modelDataBuffer(&modelData);
-    modelDataBuffer.open(QIODevice::WriteOnly);
-
-    ive::IVExporter exporter;
-    exporter.exportObjects(model->objects().values(), &modelDataBuffer);
-    ivm::IVXMLReader parser;
-
-    modelDataBuffer.open(QIODevice::ReadOnly | QIODevice::Text);
-    qDebug() << "###############################################";
-    qDebug().noquote() << QString::fromStdString(modelDataBuffer.readAll().toStdString());
-    qDebug() << "###############################################";
-
-    parser.read(&modelDataBuffer);
-    return parser.metaData();
-}
-
 static void compareModels(ivm::IVModel *const loaded, ivm::IVModel *const generated)
 {
-    const auto loadedMetadata = getMetadata(loaded);
-    const auto generatedMetadata = getMetadata(generated);
-
-    qDebug() << "size of metadata: "
-             << "loaded: " << loadedMetadata.size() //
-             << "generated: " << generatedMetadata.size();
-
-    qDebug() << loadedMetadata["asn1file"].toString();
-    qDebug() << generatedMetadata["asn1file"].toString();
-
     const QVector<ivm::IVFunction *> loadedFunctions =
             QVector<ivm::IVFunction *>::fromStdVector(IvTools::getFunctions(loaded));
 
