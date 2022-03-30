@@ -34,6 +34,19 @@ namespace testgenerator {
 class DataReconstructor final
 {
 public:
+    /**
+     * @brief Get the vector of variants of values from raw data array, based on information about tested interface and
+     *        data format
+     *
+     * @param rawData              raw data bytes array
+     * @param numberOfTestVectors  number of test vectors
+     * @param iface                interface under test
+     * @param asn1Model            ASN.1 model describing required types
+     * @param endianness           big endian or little endian
+     * @param typeSizes            map of sizes (in bytes) of different types, on a remote target
+     *
+     * @return vector of variants of values read from raw data
+     */
     static auto getVariantVectorFromRawData(QByteArray rawData, unsigned int numberOfTestVectors,
             ivm::IVInterface *iface, Asn1Acn::Asn1Model *asn1Model,
             QDataStream::ByteOrder endianness = QDataStream::LittleEndian,

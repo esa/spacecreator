@@ -36,26 +36,41 @@ class ModelLoader
 {
 public:
     /**
-     * @brief   load InterfaceView model from a file
+     * @brief  load InterfaceView model from a file
      *
-     * @param ivConfigFilename  name of InterfaceView configuration file
-     * @param ivFilename        name of the file describing InterfaceView
+     * @param  ivConfigFilename  name of InterfaceView configuration file
+     * @param  ivFilename        name of the file describing InterfaceView
      *
-     * @return  InterfaceView model
+     * @return InterfaceView model
      */
     static auto loadIvModel(const QString &ivConfigFilename, const QString &ivFilename)
             -> std::unique_ptr<ivm::IVModel>;
+
     /**
-     * @brief   load SOIS Electronic Datasheet model from a file
+     * @brief  load SOIS Electronic Datasheet model from a file
      *
-     * @param sedsFilename  name of the file with SEDS
+     * @param  sedsFilename  name of the file with SEDS
      *
-     * @return  SEDS model
+     * @return SEDS model
      */
     static auto loadSedsModel(const QString &sedsFilename) -> std::unique_ptr<conversion::Model>;
 
+    /**
+     * @brief  load ASN.1 model from a file
+     *
+     * @param  filename  name of the file with ASN.1 definitions
+     *
+     * @return ASN.1 model
+     */
     static auto loadAsn1Model(const QString &filename) -> std::unique_ptr<Asn1Acn::Asn1Model>;
 
+    /**
+     * @brief  load CSV data model from a file
+     *
+     * @param  filename  name of the file with CSV data
+     *
+     * @return CSV model
+     */
     static auto loadCsvModel(const QString &filename) -> std::unique_ptr<csv::CsvModel>;
 };
 
