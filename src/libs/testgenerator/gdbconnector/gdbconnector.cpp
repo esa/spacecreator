@@ -43,9 +43,9 @@ QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, co
         const QString outStr = clientProcess->readAllStandardOutput();
         const QString srecData = splitAndExtractSrecData(outStr);
 
-        return string2byteArray(srecData);
+        return stringToByteArray(srecData);
     } else {
-        throw std::invalid_argument("debugging server/client program names shall not be empty");
+        throw std::invalid_argument("Debugging client program name shall not be empty");
     }
 }
 
@@ -57,7 +57,7 @@ QString GdbConnector::getOneBeforeLastLine(const QString &src, const QString &ne
         const int oneBeforeLast = srcList.length() - 2;
         results = srcList.at(oneBeforeLast);
     } else {
-        throw std::runtime_error("Cannot get one line before last because the size is lower than 2");
+        throw std::runtime_error("Cannot get one line before last because the size is less than 2");
     }
 
     return results;
@@ -88,7 +88,7 @@ QString GdbConnector::splitAndExtractSrecData(const QString &strings, const QStr
     return srecData;
 }
 
-QByteArray GdbConnector::string2byteArray(QString str)
+QByteArray GdbConnector::stringToByteArray(const QString &str)
 {
     const int charsInByte = 2;
     QByteArray array;
