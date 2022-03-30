@@ -5,11 +5,13 @@ process Component;
 
     procedure InitRawSplinePoints1;
         START;
+            task RawSplinePoints1 := {2.000000, 10.000000};
         return ;
     endprocedure;
 
     procedure InitCalibratedSplinePoints1;
         START;
+            task CalibratedSplinePoints1 := {40.000000, 200.000000};
         return ;
     endprocedure;
 
@@ -43,8 +45,8 @@ process Component;
         return ;
     endprocedure;
     START;
-        task call InitRawSplinePoints1;
-        task call InitCalibratedSplinePoints1;
+        call InitRawSplinePoints1;
+        call InitCalibratedSplinePoints1;
         NEXTSTATE State1;
     state State1;
     endstate;

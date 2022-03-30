@@ -36,7 +36,8 @@ public:
 
 private:
     auto buildSplineCalibratorBoilerplate(const seds::model::SplineCalibrator &splineCalibrator) -> void;
-    auto buildSplinePointsBoilerplate(const QString &variableName, ::sdl::Transition *startTransition) -> void;
+    auto buildSplinePointsBoilerplate(
+            const QString &variableName, const std::vector<double> &values, ::sdl::Transition *startTransition) -> void;
 
 private:
     StatementTranslatorVisitor::StatementContext &m_context;

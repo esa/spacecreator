@@ -502,7 +502,7 @@ void SdlVisitor::visit(const Procedure &procedure)
 
 void SdlVisitor::visit(const ProcedureCall &procedureCall)
 {
-    if (procedureCall.procedure() == nullptr || procedureCall.procedure()->name().isEmpty()) {
+    if (procedureCall.procedure() == nullptr && procedureCall.procedure()->name().isEmpty()) {
         throw ExportException("Procedure to call not specified");
     }
     if (procedureCall.procedure()->returnVariableDeclaration() != nullptr) {

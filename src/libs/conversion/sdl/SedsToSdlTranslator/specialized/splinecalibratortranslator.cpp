@@ -21,6 +21,9 @@
 
 #include "descriptiontranslator.h"
 
+#include <QTextStream>
+#include <iostream>
+
 namespace conversion::sdl::translator {
 
 SplineCalibratorTranslator::SplineCalibratorTranslator(StatementTranslatorVisitor::StatementContext &context,
@@ -55,30 +58,61 @@ auto SplineCalibratorTranslator::buildSplineCalibratorBoilerplate(const seds::mo
 
     auto startTransition = m_context.sdlProcess()->startTransition();
 
+    const auto &splinePoints = splineCalibrator.splinePoints();
+
+    std::vector<double> rawValues;
+    rawValues.reserve(splinePoints.size());
+
+    std::vector<double> calibratedValues;
+    calibratedValues.reserve(splinePoints.size());
+
+    for (const auto &splinePoint : splinePoints) {
+        rawValues.push_back(splinePoint.raw());
+        calibratedValues.push_back(splinePoint.calibrated());
+    }
+
     const auto rawPointsVariableName = m_context.uniqueRawSplinePointsVariableName();
-    buildSplinePointsBoilerplate(rawPointsVariableName, startTransition);
+    buildSplinePointsBoilerplate(rawPointsVariableName, rawValues, startTransition);
 
     const auto calibratedPointsVariableName = m_context.uniqueCalibratedSplinePointsVariableName();
-    buildSplinePointsBoilerplate(calibratedPointsVariableName, startTransition);
+    buildSplinePointsBoilerplate(calibratedPointsVariableName, calibratedValues, startTransition);
 }
 
 auto SplineCalibratorTranslator::buildSplinePointsBoilerplate(
-        const QString &variableName, ::sdl::Transition *startTransition) -> void
+        const QString &variableName, const std::vector<double> &values, ::sdl::Transition *startTransition) -> void
 {
+    // Create a variable to hold spline values
     auto variable = std::make_unique<::sdl::VariableDeclaration>(variableName, "SplinePointsArray");
     m_context.sdlProcess()->addVariable(std::move(variable));
 
+    // Create a procedure that initializes sequence values
     auto initTransition = std::make_unique<::sdl::Transition>();
+
+    QString initAction;
+    QTextStream initActionStream(&initAction, QIODevice::WriteOnly);
+    initActionStream.setRealNumberNotation(QTextStream::FixedNotation);
+
+    initActionStream << variableName << " := {";
+
+    initActionStream << values[0];
+    for (std::size_t i = 1; i < values.size(); ++i) {
+        initActionStream << ", " << values[i];
+    }
+    initActionStream << "}";
+
+    auto initTask = std::make_unique<::sdl::Task>("", initAction);
+    initTransition->addAction(std::move(initTask));
 
     const auto initProcName = QString("Init%1").arg(variableName);
     auto initProc = std::make_unique<::sdl::Procedure>(initProcName);
     initProc->setTransition(std::move(initTransition));
 
-    m_context.sdlProcess()->addProcedure(std::move(initProc));
+    // Add call to the processes start transition
+    auto initCall = std::make_unique<::sdl::ProcedureCall>("");
+    initCall->setProcedure(initProc.get());
+    startTransition->addAction(std::move(initCall));
 
-    const auto initAction = QString("call %1").arg(initProcName);
-    auto initTask = std::make_unique<::sdl::Task>("", initAction);
-    startTransition->addAction(std::move(initTask));
+    m_context.sdlProcess()->addProcedure(std::move(initProc));
 }
 
 } // namespace conversion::sdl::translator
