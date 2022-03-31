@@ -40,6 +40,7 @@ private:
             const QString &variableName, const std::vector<double> &values, ::sdl::Transition *startTransition) -> void;
 
     static auto buildSplineCalibratorBoilerplate(StatementTranslatorVisitor::StatementContext &context) -> void;
+    static auto createAsn1Types(StatementTranslatorVisitor::StatementContext &context) -> void;
     static auto buildLinearCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
     static auto buildFindLinearIntervalProcedure(StatementTranslatorVisitor::StatementContext &context)
             -> ::sdl::Procedure *;

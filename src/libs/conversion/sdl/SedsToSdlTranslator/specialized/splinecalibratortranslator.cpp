@@ -22,7 +22,19 @@
 #include "descriptiontranslator.h"
 
 #include <QTextStream>
+#include <asn1library/asn1/constraints/rangeconstraint.h>
+#include <asn1library/asn1/constraints/sizeconstraint.h>
+#include <asn1library/asn1/typeassignment.h>
+#include <asn1library/asn1/types/real.h>
+#include <asn1library/asn1/types/sequenceof.h>
+#include <asn1library/asn1/values.h>
+#include <conversion/asn1/SedsToAsn1Translator/specialized/rangetranslatorvisitor.h>
+#include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <iostream>
+#include <seds/SedsModel/types/ranges/floatprecisionrange.h>
+
+using conversion::asn1::translator::RangeTranslatorVisitor;
+using conversion::asn1::translator::SedsToAsn1Translator;
 
 namespace conversion::sdl::translator {
 
@@ -128,11 +140,44 @@ auto SplineCalibratorTranslator::buildSplineCalibratorBoilerplate(StatementTrans
         return;
     }
 
+    createAsn1Types(context);
+
     buildLinearCalibrationProcedure(context);
     buildSquareCalibrationProcedure(context);
     buildCubicCalibrationProcedure(context);
 
     alreadyCreated = true;
+}
+
+auto SplineCalibratorTranslator::createAsn1Types(StatementTranslatorVisitor::StatementContext &context) -> void
+{
+    auto asn1Definitions =
+            SedsToAsn1Translator::getAsn1Definitions(context.sedsPackage().nameStr(), context.asn1Model()->data());
+    Q_UNUSED(asn1Definitions);
+
+    auto splinePointType = std::make_unique<Asn1Acn::Types::Real>("SplinePointValue");
+    splinePointType->setEncoding(Asn1Acn::Types::RealEncoding::IEEE754_1985_64);
+    splinePointType->setEndianness(Asn1Acn::Types::Endianness::little);
+    auto splinePointTypeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::RealValue>::create(
+            { std::numeric_limits<double>::min(), std::numeric_limits<double>::max() });
+    splinePointType->constraints().append(std::move(splinePointTypeConstraint));
+
+    auto splinePointsArrayType = std::make_unique<Asn1Acn::Types::SequenceOf>("SplinePointsArray");
+    splinePointsArrayType->setItemsType(splinePointType->clone());
+    auto splinePointsArrayTypeInnerConstraint =
+            Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create({ 0, 20 });
+    auto splinePointsArrayTypeConstraint =
+            std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::IntegerValue>>();
+    splinePointsArrayTypeConstraint->setInnerConstraints(std::move(splinePointsArrayTypeInnerConstraint));
+    splinePointsArrayType->constraints().append(std::move(splinePointsArrayTypeConstraint));
+
+    auto splinePointTypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
+            "SplinePointValue", "SplinePointValue", Asn1Acn::SourceLocation(), std::move(splinePointType));
+    asn1Definitions->addType(std::move(splinePointTypeAssignment));
+
+    auto splinePointsArrayTypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
+            "SplinePointsArray", "SplinePointsArray", Asn1Acn::SourceLocation(), std::move(splinePointsArrayType));
+    asn1Definitions->addType(std::move(splinePointsArrayTypeAssignment));
 }
 
 auto SplineCalibratorTranslator::buildFindLinearIntervalProcedure(StatementTranslatorVisitor::StatementContext &context)
