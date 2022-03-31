@@ -51,7 +51,7 @@ public:
 private:
     static auto getOneBeforeLastLine(const QString &src, const QString &newlineCharacter = "\n") -> QString;
     static auto splitAndExtractSrecData(const QString &strings, const QString &delimeter = "\r\n") -> QString;
-    static auto stringToByteArray(const QString &str) -> QByteArray;
+    static auto stringToByteArray(QString str) -> QByteArray;
 };
 
 } // namespace testgenerator

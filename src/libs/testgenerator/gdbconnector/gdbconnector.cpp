@@ -88,7 +88,7 @@ QString GdbConnector::splitAndExtractSrecData(const QString &strings, const QStr
     return srecData;
 }
 
-QByteArray GdbConnector::stringToByteArray(const QString &str)
+QByteArray GdbConnector::stringToByteArray(QString str)
 {
     const int charsInByte = 2;
     QByteArray array;
