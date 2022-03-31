@@ -111,17 +111,20 @@ QString GdbConnector::splitAndExtractSrecData(const QString &packetizedData, con
     return rawData;
 }
 
-QByteArray GdbConnector::stringToByteArray(QString str)
+QByteArray GdbConnector::stringToByteArray(const QString &str)
 {
-    const int charsInByte = 2;
     QByteArray array;
+    const int charsInByte = 2;
 
-    while (!str.isEmpty()) {
-        const QString hexStr = str.left(charsInByte);
-        str.remove(0, charsInByte);
+    for (int i = 0; i < str.size(); i += charsInByte) {
+        const QString hexStr = str.mid(i, charsInByte);
 
-        bool ok = false;
-        const char byteChar = hexStr.toUShort(&ok, 16);
+        bool conversionSuccessfull = false;
+        const char byteChar = hexStr.toUShort(&conversionSuccessfull, 16);
+        if (!conversionSuccessfull) {
+            throw std::runtime_error(
+                    QString("Conversion of string: %1 to raw byte value failed").arg(hexStr).toStdString());
+        }
         array.append(byteChar);
     }
 

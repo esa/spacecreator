@@ -32,7 +32,7 @@ class Process
 {
 public:
     /**
-     * @brief Construct a new Process
+     * @brief Construct a Process and start a specified program as a process
      *
      * @param programPath path to program to be run
      * @param args        arguments for the program to be run
