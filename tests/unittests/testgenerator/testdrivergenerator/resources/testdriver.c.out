@@ -5,7 +5,7 @@
 #include "testdriver.h"
 //#include <stdio.h>
 
-const unsigned int kTestDataSize = 5;
+const unsigned int testDataSize = 5;
 
 typedef struct {
     asn1SccMyBool active;
@@ -29,7 +29,7 @@ void notifyTestFinished(void)
 
 void testdriver_startup(void)
 {
-    testData = malloc(kTestDataSize * sizeof(TestVector));
+    testData = malloc(testDataSize * sizeof(TestVector));
 
     testData[0].active = 1;
     testData[0].temperature = 2.3;
@@ -64,7 +64,7 @@ void testdriver_startup(void)
 
 void testdriver_PI_StartTest(void)
 {
-    for (unsigned int i = 0; i < kTestDataSize; i++) {
+    for (unsigned int i = 0; i < testDataSize; i++) {
         // clang-format off
         testdriver_RI_InterfaceUnderTest(
                 &(testData[i].active),

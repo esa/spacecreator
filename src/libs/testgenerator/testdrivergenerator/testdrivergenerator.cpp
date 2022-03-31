@@ -75,7 +75,7 @@ auto TestDriverGenerator::generateTestDriver(
     ss << "//#include <stdio.h>"
           "\n"
           "\n";
-    ss << QString("const unsigned int kTestDataSize = %1;").arg(testRecordsSize).toStdString();
+    ss << QString("const unsigned int testDataSize = %1;").arg(testRecordsSize).toStdString();
     ss << "\n"
           "\n"
           "typedef struct {\n";
@@ -100,7 +100,7 @@ auto TestDriverGenerator::generateTestDriver(
           "\n";
     ss << QString("%1\n").arg(testDriverStartupFunctionDeclaration).toStdString();
     ss << "{\n";
-    ss << QString("    %1 = malloc(kTestDataSize * sizeof(%2));\n")
+    ss << QString("    %1 = malloc(testDataSize * sizeof(%2));\n")
                     .arg(testVectorVariableName)
                     .arg(testVectorTypeName)
                     .toStdString();
@@ -117,7 +117,7 @@ auto TestDriverGenerator::generateTestDriver(
           "\n";
     ss << QString("%1\n").arg(testDriverStartTestFunctionDeclaration).toStdString();
     ss << "{\n";
-    ss << "    for (unsigned int i = 0; i < kTestDataSize; i++) {\n"
+    ss << "    for (unsigned int i = 0; i < testDataSize; i++) {\n"
           "        // clang-format off\n";
     ss << QString("        %1(\n").arg(testDriverRiName).toStdString();
     for (auto it = interface.params().begin(); it != std::prev(interface.params().end()); it++) {
