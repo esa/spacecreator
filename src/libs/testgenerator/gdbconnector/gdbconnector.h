@@ -50,8 +50,9 @@ public:
 
 private:
     static auto getOneBeforeLastLine(const QString &src, const QString &newlineCharacter = "\n") -> QString;
-    static auto splitAndExtractSrecData(const QString &strings, const QString &delimeter = "\r\n") -> QString;
+    static auto splitAndExtractSrecData(const QString &packetizedData, const QString &delimeter = "\r\n") -> QString;
     static auto stringToByteArray(QString str) -> QByteArray;
+    static auto dumpProcessErrorsToFile(QProcess &process, const QString &filename) -> void;
 };
 
 } // namespace testgenerator

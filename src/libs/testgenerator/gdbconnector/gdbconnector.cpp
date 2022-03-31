@@ -22,8 +22,11 @@
 #include "process.h"
 
 #include <QDebug>
+#include <filesystem>
+#include <fstream>
 #include <memory>
 #include <stdexcept>
+#include <system_error>
 #include <utility>
 
 namespace testgenerator {
@@ -39,8 +42,19 @@ QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, co
         Process gdbclient(client, clientArgs, QDir::currentPath());
 
         QProcess *const clientProcess = gdbclient.get();
+        if (clientProcess->state() != QProcess::Running) {
+            throw std::runtime_error("client is not running");
+        }
         clientProcess->waitForFinished();
+
+        const QString errorLogFilename = "gdbclient-errors.log";
+        dumpProcessErrorsToFile(*clientProcess, errorLogFilename);
+
         const QString outStr = clientProcess->readAllStandardOutput();
+        if (outStr.isEmpty()) {
+            throw std::runtime_error(
+                    QString("gdb client returned errors. Errors dumped to %1").arg(errorLogFilename).toStdString());
+        }
         const QString srecData = splitAndExtractSrecData(outStr);
 
         return stringToByteArray(srecData);
@@ -65,27 +79,36 @@ QString GdbConnector::getOneBeforeLastLine(const QString &src, const QString &ne
 
 // this data extraction function could be supplied as lambda expression with constant default, because it is very
 // specific - it is usable only when SREC data format is utilized
-QString GdbConnector::splitAndExtractSrecData(const QString &strings, const QString &delimeter)
+// implemented based on http://www.amelek.gda.pl/avr/uisp/srecord.htm
+QString GdbConnector::splitAndExtractSrecData(const QString &packetizedData, const QString &delimeter)
 {
-    QString srecData;
+    const QMap<QString, int> startBytesToLen = {
+        { "S1", 2 },
+        { "S2", 3 },
+        { "S3", 4 },
+        { "S5", 2 },
+    }; // S4 and S6 are reserved; S7, S8, S9 have no data fields
 
-    const int checksumBytes = 2;
-    const std::vector<QString> srecHeaders = { "S3150000", "S30D00000100" };
-    const int srecHeaderLen = 12; // number of character (number of bytes / 2)
+    const int recordStartByteLen = 1; // 1 byte; 4 bits: start character, 4 bits: record type number
+    const int remainingCharactersLen = 1;
+    const int checksumLen = 1;
 
-    for (auto srecDataString : strings.split(delimeter)) {
-        const auto srecPrefixIt = std::find_if(
-                srecHeaders.begin(), srecHeaders.end(), [&srecDataString](const QString &prefix) -> bool { //
-                    return srecDataString.startsWith(prefix);
-                });
-        if (srecPrefixIt != srecHeaders.end()) {
-            srecDataString = srecDataString.left(srecDataString.size() - checksumBytes);
-            srecDataString = srecDataString.right(srecDataString.size() - srecHeaderLen);
-            srecData += srecDataString;
+    const int checksumCharacters = 2 * checksumLen;
+
+    QString rawData;
+    rawData.reserve(packetizedData.size());
+    for (auto dataLine : packetizedData.split(delimeter)) {
+        const int addressFieldLen = startBytesToLen.value(dataLine.at(0));
+        const int headerCharacters = 2 * (recordStartByteLen + remainingCharactersLen + addressFieldLen);
+
+        if (addressFieldLen != 0) {
+            dataLine = dataLine.left(dataLine.size() - checksumCharacters);
+            dataLine = dataLine.right(dataLine.size() - headerCharacters);
+            rawData.append(dataLine);
         }
     }
 
-    return srecData;
+    return rawData;
 }
 
 QByteArray GdbConnector::stringToByteArray(QString str)
@@ -103,6 +126,20 @@ QByteArray GdbConnector::stringToByteArray(QString str)
     }
 
     return array;
+}
+
+auto GdbConnector::dumpProcessErrorsToFile(QProcess &process, const QString &filename) -> void
+{
+    const QString errors = process.readAllStandardError();
+    if (!errors.isEmpty()) {
+        QFile errorLog(filename);
+        if (!errorLog.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            throw std::filesystem::filesystem_error("could not create requested log text file", std::error_code());
+        }
+        QTextStream out(&errorLog);
+        out << errors;
+        errorLog.close();
+    }
 }
 
 } // namespace testgenerator
