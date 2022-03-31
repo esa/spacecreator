@@ -28,7 +28,7 @@ cd $TEST_OUTPUT_DIR
 # Compare output against reference, and compile to make sure the reference is valid
 # Clean (rm) only if all steps pass
 # This test uses Ada, as C backend in OpenGEODE is too buggy to handle this example
-$DIFF component.pr ../resources/test_spline_calibration.output \
+$DIFF calibration.pr ../resources/test_spline_calibration.output \
 
   # && $OPENGEODE --toAda system_structure.pr component.pr \
   # && asn1scc -Ada --type-prefix asn1Scc dataview-uniq.asn component_datamodel.asn \

@@ -1,5 +1,6 @@
-process Component;
-    dcl Megavariable IntegerType;
+process Calibration;
+    dcl Calibratedvalue IntegerType;
+    dcl Iterator IntegerType;
     dcl RawSplinePoints1 SplinePointsArray;
     dcl CalibratedSplinePoints1 SplinePointsArray;
 
@@ -26,55 +27,46 @@ process Component;
 
     procedure InitRawSplinePoints1;
         START;
-            task RawSplinePoints1 := {2.000000, 10.000000};
+            task RawSplinePoints1 := {1.000000, 5.000000, 20.000000};
         return ;
     endprocedure;
 
     procedure InitCalibratedSplinePoints1;
         START;
-            task CalibratedSplinePoints1 := {40.000000, 200.000000};
+            task CalibratedSplinePoints1 := {20.000000, 200.000000, 4000.000000};
         return ;
     endprocedure;
 
-    procedure MegaActivity;
-        fpar
-            in Activityarg IntegerType;
+    procedure CalibrateActivity;
         START;
-            task Megavariable := Megavariable;
+            task Iterator := 1;
+
+            loop_start_1:
+            decision Iterator <= 20;
+                (False):
+                    join loop_end_2;
+                (True):
+                    task Calibratedvalue := Iterator;
+                    task Iterator := Iterator + 1;
+                    join loop_start_1;
+            enddecision;
+
+            loop_end_2:
         return ;
     endprocedure;
-    procedure InterfacePi_MegaCommand_Pi;
-        fpar
-            in Commandarg IntegerType;
-        START;
-            task Megavariable := Commandarg;
-            call MegaActivity(Megavariable);
-        return ;
-    endprocedure;
-    procedure Get_InterfacePi_Param_Pi;
-        fpar
-            in/out Param IntegerType;
-        START;
-            task Param := Megavariable;
-        return ;
-    endprocedure;
-    procedure Set_InterfacePi_Param_Pi;
-        fpar
-            in Param IntegerType;
-        START;
-            task Megavariable := Param;
-        return ;
-    endprocedure;
+
     START;
         call InitRawSplinePoints1;
         call InitCalibratedSplinePoints1;
-        NEXTSTATE State1;
-    state State1;
+        NEXTSTATE Idle;
+
+    state DoCalibration;
     endstate;
-    state State2;
-        input InterfacePi_MegaCommand_Pi;
-            NEXTSTATE State2;
+
+    state Idle;
+        input ComponentInterface_Tick_Pi;
+            call CalibrateActivity;
+            NEXTSTATE DoCalibration;
     endstate;
-    state State3;
-    endstate;
-endprocess Component;
+
+endprocess Calibration;

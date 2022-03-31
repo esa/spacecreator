@@ -41,7 +41,10 @@ auto SplineCalibratorTranslator::translate(const seds::model::SplineCalibrator &
 
     const auto targetName =
             StatementTranslatorVisitor::translateVariableReference(m_calibration.outputVariableRef().value().value());
-    const auto action = QString("%1 := %2").arg(targetName).arg(targetName);
+    const auto sourceName =
+            StatementTranslatorVisitor::translateVariableReference(m_calibration.inputVariableRef().value().value());
+
+    const auto action = QString("%1 := %2").arg(targetName).arg(sourceName);
 
     auto sdlTask = std::make_unique<::sdl::Task>("", action);
     DescriptionTranslator::translate(m_calibration, sdlTask.get());
