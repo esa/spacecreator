@@ -5,6 +5,10 @@ process Calibration;
     dcl CalibratedSplinePoints1 SplinePointsArray;
 
     procedure FindInterval;
+        fpar
+            in value SplinePointValue,
+            out start SplinePointValue,
+            out end SplinePointValue;
         START;
         return ;
     endprocedure;

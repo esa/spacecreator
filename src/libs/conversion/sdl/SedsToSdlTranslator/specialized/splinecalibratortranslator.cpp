@@ -101,34 +101,37 @@ auto SplineCalibratorTranslator::buildSplinePointsVariable(
     auto variable = std::make_unique<::sdl::VariableDeclaration>(variableName, "SplinePointsArray");
     m_context.sdlProcess()->addVariable(std::move(variable));
 
-    // Create a procedure that initializes sequence values
+    // Create a procedure
+    const auto initProcName = QString("Init%1").arg(variableName);
+    auto initProc = std::make_unique<::sdl::Procedure>(initProcName);
+
+    // Create a transition
     auto initTransition = std::make_unique<::sdl::Transition>();
 
+    // Add initialization action
     QString initAction;
     QTextStream initActionStream(&initAction, QIODevice::WriteOnly);
     initActionStream.setRealNumberNotation(QTextStream::FixedNotation);
 
-    initActionStream << variableName << " := {";
-
-    initActionStream << values[0];
+    initActionStream << variableName << " := { " << values[0];
     for (std::size_t i = 1; i < values.size(); ++i) {
         initActionStream << ", " << values[i];
     }
-    initActionStream << "}";
+    initActionStream << " }";
 
     auto initTask = std::make_unique<::sdl::Task>("", initAction);
     initTransition->addAction(std::move(initTask));
 
-    const auto initProcName = QString("Init%1").arg(variableName);
-    auto initProc = std::make_unique<::sdl::Procedure>(initProcName);
+    // Add transition to procedure
     initProc->setTransition(std::move(initTransition));
 
-    // Add call to the processes start transition
+    // Add procedure to process
+    m_context.sdlProcess()->addProcedure(std::move(initProc));
+
+    // Add call to Init function at the state machine start
     auto initCall = std::make_unique<::sdl::ProcedureCall>("");
     initCall->setProcedure(initProc.get());
     startTransition->addAction(std::move(initCall));
-
-    m_context.sdlProcess()->addProcedure(std::move(initProc));
 }
 
 auto SplineCalibratorTranslator::buildSplineCalibratorBoilerplate(StatementTranslatorVisitor::StatementContext &context)
@@ -155,6 +158,7 @@ auto SplineCalibratorTranslator::createAsn1Types(StatementTranslatorVisitor::Sta
             SedsToAsn1Translator::getAsn1Definitions(context.sedsPackage().nameStr(), context.asn1Model()->data());
     Q_UNUSED(asn1Definitions);
 
+    // Create type for spline points values
     auto splinePointType = std::make_unique<Asn1Acn::Types::Real>("SplinePointValue");
     splinePointType->setEncoding(Asn1Acn::Types::RealEncoding::IEEE754_1985_64);
     splinePointType->setEndianness(Asn1Acn::Types::Endianness::little);
@@ -162,6 +166,7 @@ auto SplineCalibratorTranslator::createAsn1Types(StatementTranslatorVisitor::Sta
             { std::numeric_limits<double>::min(), std::numeric_limits<double>::max() });
     splinePointType->constraints().append(std::move(splinePointTypeConstraint));
 
+    // Create type for array of spline points values
     auto splinePointsArrayType = std::make_unique<Asn1Acn::Types::SequenceOf>("SplinePointsArray");
     splinePointsArrayType->setItemsType(splinePointType->clone());
     auto splinePointsArrayTypeInnerConstraint =
@@ -183,13 +188,26 @@ auto SplineCalibratorTranslator::createAsn1Types(StatementTranslatorVisitor::Sta
 auto SplineCalibratorTranslator::buildFindLinearIntervalProcedure(StatementTranslatorVisitor::StatementContext &context)
         -> ::sdl::Procedure *
 {
+    // Create procedure
     const QString procedureName("FindInterval");
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
     auto procedurePtr = procedure.get();
 
+    // Create transition
     auto transition = std::make_unique<::sdl::Transition>();
+
+    // Create parameters
+    auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", "SplinePointValue", "in");
+    procedure->addParameter(std::move(valueParameter));
+    auto startParameter = std::make_unique<::sdl::ProcedureParameter>("intervalStart", "SplinePointValue", "in/out");
+    procedure->addParameter(std::move(startParameter));
+    auto endParameter = std::make_unique<::sdl::ProcedureParameter>("intervalEnd", "SplinePointValue", "in/out");
+    procedure->addParameter(std::move(endParameter));
+
+    // Add transition to procedure
     procedure->setTransition(std::move(transition));
 
+    // Add procedure to process
     context.sdlProcess()->addProcedure(std::move(procedure));
 
     return procedurePtr;
@@ -198,42 +216,63 @@ auto SplineCalibratorTranslator::buildFindLinearIntervalProcedure(StatementTrans
 auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context)
         -> void
 {
-    auto findIntervalProc = buildFindLinearIntervalProcedure(context);
+    // Create procedure
+    const QString procedureName("LinearCalibration");
+    auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
 
+    // Create transition
     auto transition = std::make_unique<::sdl::Transition>();
 
+    // Create helper procedures
+    auto findIntervalProc = buildFindLinearIntervalProcedure(context);
+
+    // Add call to FindInterval
     auto findIntervalCall = std::make_unique<::sdl::ProcedureCall>("");
     findIntervalCall->setProcedure(findIntervalProc);
     transition->addAction(std::move(findIntervalCall));
 
-    const QString procedureName("LinearCalibration");
-    auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
+    // Create parameters
+    auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", "SplinePointValue", "in");
+    procedure->addParameter(std::move(valueParameter));
+
+    // Add transition to procedure
     procedure->setTransition(std::move(transition));
 
+    // Add procedure to process
     context.sdlProcess()->addProcedure(std::move(procedure));
 }
 
 auto SplineCalibratorTranslator::buildSquareCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context)
         -> void
 {
-    auto transition = std::make_unique<::sdl::Transition>();
-
+    // Create procedure
     const QString procedureName("SquareCalibration");
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
+
+    // Create transition
+    auto transition = std::make_unique<::sdl::Transition>();
+
+    // Add transition to procedure
     procedure->setTransition(std::move(transition));
 
+    // Add procedure to process
     context.sdlProcess()->addProcedure(std::move(procedure));
 }
 
 auto SplineCalibratorTranslator::buildCubicCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context)
         -> void
 {
-    auto transition = std::make_unique<::sdl::Transition>();
-
+    // Create procedure
     const QString procedureName("CubicCalibration");
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
+
+    // Create transition
+    auto transition = std::make_unique<::sdl::Transition>();
+
+    // Add transition to procedure
     procedure->setTransition(std::move(transition));
 
+    // Add procedure to process
     context.sdlProcess()->addProcedure(std::move(procedure));
 }
 
