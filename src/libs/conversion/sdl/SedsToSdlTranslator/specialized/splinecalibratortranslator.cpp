@@ -56,10 +56,8 @@ auto SplineCalibratorTranslator::translate(const seds::model::SplineCalibrator &
     const auto sourceName =
             StatementTranslatorVisitor::translateVariableReference(m_calibration.inputVariableRef().value().value());
 
-    const auto action = QString("%1 := %2").arg(targetName).arg(sourceName);
-
+    const auto action = QString("%1 := call LinearCalibration(%2)").arg(targetName).arg(sourceName);
     auto sdlTask = std::make_unique<::sdl::Task>("", action);
-    DescriptionTranslator::translate(m_calibration, sdlTask.get());
 
     m_sdlTransition->addAction(std::move(sdlTask));
 }
@@ -223,6 +221,7 @@ auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(StatementTransl
     // Create procedure local variables
     auto intervalStartVar = std::make_unique<::sdl::VariableDeclaration>("intervalStart", "SplinePointValue");
     auto intervalEndVar = std::make_unique<::sdl::VariableDeclaration>("intervalEnd", "SplinePointValue");
+    auto resultVar = std::make_unique<::sdl::VariableDeclaration>("result", "SplinePointValue");
 
     // Create procedure parameters
     auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", "SplinePointValue", "in");
@@ -246,9 +245,19 @@ auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(StatementTransl
 
     transition->addAction(std::move(findIntervalCall));
 
+    // Assign to result
+    const auto assignToResultAction = QString("result := value");
+    auto assignToResultTask = std::make_unique<::sdl::Task>("", assignToResultAction);
+    transition->addAction(std::move(assignToResultTask));
+
+    // Set return variable to procedure
+    auto resultVarRef = std::make_unique<::sdl::VariableReference>(resultVar.get());
+    procedure->setReturnVariableReference(std::move(resultVarRef));
+
     // Add variables and parameters to procedure
     procedure->addVariable(std::move(intervalStartVar));
     procedure->addVariable(std::move(intervalEndVar));
+    procedure->addVariable(std::move(resultVar));
     procedure->addParameter(std::move(valueParameter));
 
     // Add transition to procedure

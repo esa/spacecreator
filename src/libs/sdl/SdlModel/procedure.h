@@ -22,6 +22,7 @@
 #include "node.h"
 #include "procedureparameter.h"
 #include "transition.h"
+#include "variablereference.h"
 
 #include <QString>
 #include <memory>
@@ -103,13 +104,13 @@ public:
      *
      * @return  return variable declaration
      */
-    auto returnVariableDeclaration() const -> VariableDeclaration *;
+    auto returnVariableReference() const -> VariableReference *;
     /**
      * @brief   Setter for the return variable declaration
      *
      * @param   declaration     return variable declaration
      */
-    auto setReturnVariableDeclaration(std::unique_ptr<VariableDeclaration> declaration) -> void;
+    auto setReturnVariableReference(std::unique_ptr<VariableReference> declaration) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
@@ -120,7 +121,7 @@ private:
     std::unique_ptr<Transition> m_implementation; // Null if external
     std::vector<std::unique_ptr<VariableDeclaration>> m_variables;
     std::vector<std::unique_ptr<ProcedureParameter>> m_parameters;
-    std::unique_ptr<VariableDeclaration> m_returnVariableDeclaration;
+    std::unique_ptr<VariableReference> m_returnVariableReference;
 };
 
 } // namespace sdl

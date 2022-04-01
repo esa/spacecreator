@@ -58,14 +58,14 @@ void Procedure::addParameter(std::unique_ptr<ProcedureParameter> parameter)
     m_parameters.push_back(std::move(parameter));
 }
 
-VariableDeclaration *Procedure::returnVariableDeclaration() const
+VariableReference *Procedure::returnVariableReference() const
 {
-    return m_returnVariableDeclaration.get();
+    return m_returnVariableReference.get();
 }
 
-void Procedure::setReturnVariableDeclaration(std::unique_ptr<VariableDeclaration> declaration)
+void Procedure::setReturnVariableReference(std::unique_ptr<VariableReference> declaration)
 {
-    m_returnVariableDeclaration = std::move(declaration);
+    m_returnVariableReference = std::move(declaration);
 }
 
 void Procedure::accept(Visitor &visitor) const

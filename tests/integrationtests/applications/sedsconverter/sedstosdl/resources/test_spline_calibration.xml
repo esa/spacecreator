@@ -8,6 +8,12 @@
           <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
         </Range>
       </IntegerDataType>
+      <FloatDataType name="RealType">
+        <FloatDataEncoding encodingAndPrecision="IEEE754_2008_double" sizeInBits="64" />
+        <Range>
+          <PrecisionRange>double</PrecisionRange>
+        </Range>
+      </FloatDataType>
     </DataTypeSet>
     <DeclaredInterfaceSet>
       <Interface name="CalibrationInterface">
@@ -24,7 +30,7 @@
         <Implementation>
           <VariableSet>
             <Variable name="calibratedValue" type="IntegerType" />
-            <Variable name="iterator" type="IntegerType" />
+            <Variable name="iterator" type="RealType" />
           </VariableSet>
           <ActivitySet>
             <Activity name="CalibrateActivity">

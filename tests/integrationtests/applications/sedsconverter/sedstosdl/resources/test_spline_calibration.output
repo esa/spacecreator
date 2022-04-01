@@ -1,6 +1,6 @@
 process Calibration;
     dcl Calibratedvalue IntegerType;
-    dcl Iterator IntegerType;
+    dcl Iterator RealType;
     dcl RawSplinePoints1 SplinePointsArray;
     dcl CalibratedSplinePoints1 SplinePointsArray;
 
@@ -16,11 +16,14 @@ process Calibration;
     procedure LinearCalibration;
         dcl intervalStart SplinePointValue;
         dcl intervalEnd SplinePointValue;
+        dcl result SplinePointValue;
         fpar
             in value SplinePointValue;
+        returns SplinePointValue;
         START;
             call FindInterval(value, intervalStart, intervalEnd);
-        return ;
+            task result := value;
+        return result;
     endprocedure;
 
     procedure SquareCalibration;
@@ -54,7 +57,7 @@ process Calibration;
                 (False):
                     join loop_end_2;
                 (True):
-                    task Calibratedvalue := Iterator;
+                    task Calibratedvalue := call LinearCalibration(Iterator);
                     task Iterator := Iterator + 1;
                     join loop_start_1;
             enddecision;

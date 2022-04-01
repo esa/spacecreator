@@ -446,7 +446,7 @@ void SdlVisitor::visit(const Procedure &procedure)
 
     const bool variablesPresent = !procedureVariables.empty();
     const bool parametersPresent = !procedureParameters.empty();
-    const bool returnVarPresent = procedure.returnVariableDeclaration() != nullptr;
+    const bool returnVarPresent = procedure.returnVariableReference() != nullptr;
 
     if (variablesPresent || parametersPresent || returnVarPresent) {
         m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
@@ -476,9 +476,7 @@ void SdlVisitor::visit(const Procedure &procedure)
     }
 
     if (returnVarPresent) {
-        m_writer.writeLine("returns " + procedure.returnVariableDeclaration()->type() + ";");
-
-        visit(*procedure.returnVariableDeclaration());
+        m_writer.writeLine("returns " + procedure.returnVariableReference()->declaration()->type() + ";");
     }
 
     if (parametersPresent || returnVarPresent) {
@@ -496,8 +494,8 @@ void SdlVisitor::visit(const Procedure &procedure)
         m_writer.popIndent();
     }
     m_writer.beginLine("return ");
-    if (procedure.returnVariableDeclaration() != nullptr) {
-        m_writer.write(procedure.returnVariableDeclaration()->name());
+    if (procedure.returnVariableReference() != nullptr) {
+        m_writer.write(procedure.returnVariableReference()->declaration()->name());
     }
     m_writer.endLine(";");
     m_writer.popIndent();
@@ -511,7 +509,7 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall)
     if (procedureCall.procedure() == nullptr || procedureCall.procedure()->name().isEmpty()) {
         throw ExportException("Procedure to call not specified");
     }
-    if (procedureCall.procedure()->returnVariableDeclaration() != nullptr) {
+    if (procedureCall.procedure()->returnVariableReference() != nullptr) {
         throw ExportException("Procedure with a return variable cannot be called from a Procedure Call. "
                               "It must be called from a Task");
     }
