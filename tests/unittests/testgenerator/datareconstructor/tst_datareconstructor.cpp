@@ -41,9 +41,6 @@ class tst_datareconstructor final : public QObject
 
 private Q_SLOTS:
     void testNominal() const;
-
-private:
-    const unsigned int numberOfTestVectors = 5;
 };
 auto printQByteArrayInHex(const QByteArray &array) -> void;
 static auto byteToHexStr(char byte) -> QString;
@@ -59,12 +56,15 @@ void tst_datareconstructor::testNominal() const
     };
 
     // these are just dummy values
-    const QString binLocalization = qEnvironmentVariable("$HOME/testBinaries/");
+    const QString binLocalization = QString("%1%2%3%4")
+                                            .arg(qEnvironmentVariable("HOME"))
+                                            .arg(QDir::separator())
+                                            .arg("testBinaries")
+                                            .arg(QDir::separator());
     const QString script = "x86-linux-cpp.gdb";
     const QString binToRun = "hostpartition";
     const QByteArray rawTestData =
             GdbConnector::getRawTestResults(binLocalization, { "-batch", "-x", script }, { "host:1234", binToRun });
-    printQByteArrayInHex(rawTestData);
 
     const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview.xml");
     ivm::IVInterface *const ivIface = IvTools::getIfaceFromModel("InterfaceUnderTest", ivModel.get());
@@ -78,15 +78,18 @@ void tst_datareconstructor::testNominal() const
         { "REAL", 8, 0 },
     };
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
-            rawTestData, numberOfTestVectors, ivIface, asn1Model.get(), QDataStream::LittleEndian, typeLayoutInfos);
+            rawTestData, ivIface, asn1Model.get(), QDataStream::LittleEndian, typeLayoutInfos);
 
     QCOMPARE(readTestData.size(), expectedTestData.size());
     const int dataSize = readTestData.size();
     for (int i = 0; i < dataSize; i++) {
-        const char readChar = readTestData.at(i).toChar().toLatin1();
-        const char expectedChar = expectedTestData.at(i).toChar().toLatin1();
+        if (readTestData.at(i) != expectedTestData.at(i)) {
+            printQByteArrayInHex(rawTestData);
 
-        qDebug().noquote() << i << byteToHexStr(readChar) << byteToHexStr(expectedChar);
+            const char readChar = readTestData.at(i).toChar().toLatin1();
+            const char expectedChar = expectedTestData.at(i).toChar().toLatin1();
+            qDebug().noquote() << i << byteToHexStr(readChar) << byteToHexStr(expectedChar);
+        }
 
         QCOMPARE(readTestData.at(i), expectedTestData.at(i));
     }

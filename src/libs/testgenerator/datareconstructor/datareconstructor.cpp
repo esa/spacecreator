@@ -28,16 +28,17 @@ DataReconstructor::TypeLayoutInfos::TypeLayoutInfos(std::initializer_list<TypeLa
     }
 }
 
-QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(QByteArray rawData,
-        const unsigned int numberOfTestVectors, ivm::IVInterface *const iface, Asn1Acn::Asn1Model *const asn1Model,
-        QDataStream::ByteOrder endianness, const TypeLayoutInfos &typeLayoutInfos)
+QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(const QByteArray &rawData,
+        ivm::IVInterface *const iface, Asn1Acn::Asn1Model *const asn1Model, QDataStream::ByteOrder endianness,
+        const TypeLayoutInfos &typeLayoutInfos)
 {
     QVector<QVariant> output;
     output.reserve(rawData.size());
 
     const auto definitionNameToTypeMap = mapDefinitionNameToType(asn1Model);
 
-    for (unsigned int i = 0; i < numberOfTestVectors; i++) {
+    int i = 0;
+    while (i < rawData.size()) {
         for (const auto &param : iface->params()) {
             const auto &type = definitionNameToTypeMap.value(param.paramTypeName());
             if (type == nullptr) {
@@ -47,7 +48,10 @@ QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(QByteArray rawD
             const int dataLength = typeLayoutInfos.value(type->typeName()).first;
             const int paddingLength = typeLayoutInfos.value(type->typeName()).second;
             const int variableLength = dataLength + paddingLength;
-            QByteArray rawVariable = popFrontQByteArray(variableLength, rawData);
+
+            QByteArray rawVariable = rawData.mid(i, variableLength);
+            i += variableLength;
+
             if (endianness == QDataStream::BigEndian) {
                 std::reverse(rawVariable.begin(), rawVariable.end());
             }
@@ -95,14 +99,6 @@ QMap<QString, Asn1Acn::Types::Type *> DataReconstructor::mapDefinitionNameToType
             }
         }
     }
-
-    return output;
-}
-
-QByteArray DataReconstructor::popFrontQByteArray(const int howMany, QByteArray &array)
-{
-    QByteArray output = array.left(howMany);
-    array.remove(0, howMany);
 
     return output;
 }
