@@ -7,15 +7,19 @@ process Calibration;
     procedure FindInterval;
         fpar
             in value SplinePointValue,
-            out start SplinePointValue,
-            out end SplinePointValue;
+            in/out intervalStart SplinePointValue,
+            in/out intervalEnd SplinePointValue;
         START;
         return ;
     endprocedure;
 
     procedure LinearCalibration;
+        dcl intervalStart SplinePointValue;
+        dcl intervalEnd SplinePointValue;
+        fpar
+            in value SplinePointValue;
         START;
-            call FindInterval;
+            call FindInterval(value, intervalStart, intervalEnd);
         return ;
     endprocedure;
 

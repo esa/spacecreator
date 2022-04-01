@@ -122,16 +122,16 @@ auto SplineCalibratorTranslator::buildSplinePointsVariable(
     auto initTask = std::make_unique<::sdl::Task>("", initAction);
     initTransition->addAction(std::move(initTask));
 
+    // Add call to Init function at the state machine start
+    auto initCall = std::make_unique<::sdl::ProcedureCall>("");
+    initCall->setProcedure(initProc.get());
+    startTransition->addAction(std::move(initCall));
+
     // Add transition to procedure
     initProc->setTransition(std::move(initTransition));
 
     // Add procedure to process
     m_context.sdlProcess()->addProcedure(std::move(initProc));
-
-    // Add call to Init function at the state machine start
-    auto initCall = std::make_unique<::sdl::ProcedureCall>("");
-    initCall->setProcedure(initProc.get());
-    startTransition->addAction(std::move(initCall));
 }
 
 auto SplineCalibratorTranslator::buildSplineCalibratorBoilerplate(StatementTranslatorVisitor::StatementContext &context)
@@ -220,6 +220,13 @@ auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(StatementTransl
     const QString procedureName("LinearCalibration");
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
 
+    // Create procedure local variables
+    auto intervalStartVar = std::make_unique<::sdl::VariableDeclaration>("intervalStart", "SplinePointValue");
+    auto intervalEndVar = std::make_unique<::sdl::VariableDeclaration>("intervalEnd", "SplinePointValue");
+
+    // Create procedure parameters
+    auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", "SplinePointValue", "in");
+
     // Create transition
     auto transition = std::make_unique<::sdl::Transition>();
 
@@ -229,10 +236,19 @@ auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(StatementTransl
     // Add call to FindInterval
     auto findIntervalCall = std::make_unique<::sdl::ProcedureCall>("");
     findIntervalCall->setProcedure(findIntervalProc);
+
+    auto valueParamRef = std::make_unique<::sdl::VariableReference>(valueParameter.get());
+    findIntervalCall->addArgument(std::move(valueParamRef));
+    auto intervalStartVarRef = std::make_unique<::sdl::VariableReference>(intervalStartVar.get());
+    findIntervalCall->addArgument(std::move(intervalStartVarRef));
+    auto intervalEndVarRef = std::make_unique<::sdl::VariableReference>(intervalEndVar.get());
+    findIntervalCall->addArgument(std::move(intervalEndVarRef));
+
     transition->addAction(std::move(findIntervalCall));
 
-    // Create parameters
-    auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", "SplinePointValue", "in");
+    // Add variables and parameters to procedure
+    procedure->addVariable(std::move(intervalStartVar));
+    procedure->addVariable(std::move(intervalEndVar));
     procedure->addParameter(std::move(valueParameter));
 
     // Add transition to procedure
