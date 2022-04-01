@@ -48,9 +48,19 @@ public:
             const QStringList &serverArgs = QStringList({ "host:1234", "binaryUnderTest" }),
             const QString &client = "gdb", const QString &server = "gdbserver") -> QByteArray;
 
+    /**
+     * @brief Split and extract data from serialized SREC packets
+     *        implemented based on http://www.amelek.gda.pl/avr/uisp/srecord.htm
+     *
+     * @param  packetizedData
+     * @param  delimeter
+     *
+     * @return string of data stripped of headers and checksums
+     */
+    static auto splitAndExtractSrecData(const QString &packetizedData, const QString &delimeter = "\r\n") -> QString;
+
 private:
     static auto getOneBeforeLastLine(const QString &src, const QString &newlineCharacter = "\n") -> QString;
-    static auto splitAndExtractSrecData(const QString &packetizedData, const QString &delimeter = "\r\n") -> QString;
     static auto stringToByteArray(const QString &str) -> QByteArray;
     static auto dumpProcessErrorsToFile(QProcess &process, const QString &filename) -> void;
 };

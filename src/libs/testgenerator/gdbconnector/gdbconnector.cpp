@@ -63,6 +63,42 @@ QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, co
     }
 }
 
+QString GdbConnector::splitAndExtractSrecData(const QString &packetizedData, const QString &delimeter)
+{
+    const QMap<QString, int> startBytesToLength = {
+        { "S1", 2 }, // TODO: remove Ss
+        { "S2", 3 },
+        { "S3", 4 },
+        { "S5", 2 },
+    }; // S4 and S6 are reserved; S7, S8, S9 have no data fields
+
+    const int recordStartByteLength = 1; // 1 character ('S')
+    // const int recordTypeByteLength = 1;
+    const int remainingCharactersLength = 1;
+    const int checksumLength = 1;
+
+    const int checksumCharacters = 2 * checksumLength;
+
+    QString rawData;
+    rawData.reserve(packetizedData.size());
+    for (auto dataLine : packetizedData.split(delimeter)) {
+        if (dataLine.isEmpty()) {
+            continue;
+        }
+
+        const int addressFieldLength = startBytesToLength.value(dataLine.at(0));
+        const int headerCharacters = 2 * (recordStartByteLength + remainingCharactersLength + addressFieldLength);
+
+        if (addressFieldLength != 0) {
+            dataLine = dataLine.left(dataLine.size() - checksumCharacters);
+            dataLine = dataLine.right(dataLine.size() - headerCharacters);
+            rawData.append(dataLine);
+        }
+    }
+
+    return rawData;
+}
+
 QString GdbConnector::getOneBeforeLastLine(const QString &src, const QString &newlineCharacter)
 {
     QString results;
@@ -75,40 +111,6 @@ QString GdbConnector::getOneBeforeLastLine(const QString &src, const QString &ne
     }
 
     return results;
-}
-
-// this data extraction function could be supplied as lambda expression with constant default, because it is very
-// specific - it is usable only when SREC data format is utilized
-// implemented based on http://www.amelek.gda.pl/avr/uisp/srecord.htm
-QString GdbConnector::splitAndExtractSrecData(const QString &packetizedData, const QString &delimeter)
-{
-    const QMap<QString, int> startBytesToLength = {
-        { "S1", 2 },
-        { "S2", 3 },
-        { "S3", 4 },
-        { "S5", 2 },
-    }; // S4 and S6 are reserved; S7, S8, S9 have no data fields
-
-    const int recordStartByteLength = 1; // 1 byte; 4 bits: start character, 4 bits: record type number
-    const int remainingCharactersLength = 1;
-    const int checksumLength = 1;
-
-    const int checksumCharacters = 2 * checksumLength;
-
-    QString rawData;
-    rawData.reserve(packetizedData.size());
-    for (auto dataLine : packetizedData.split(delimeter)) {
-        const int addressFieldLength = startBytesToLength.value(dataLine.at(0));
-        const int headerCharacters = 2 * (recordStartByteLength + remainingCharactersLength + addressFieldLength);
-
-        if (addressFieldLength != 0) {
-            dataLine = dataLine.left(dataLine.size() - checksumCharacters);
-            dataLine = dataLine.right(dataLine.size() - headerCharacters);
-            rawData.append(dataLine);
-        }
-    }
-
-    return rawData;
 }
 
 QByteArray GdbConnector::stringToByteArray(const QString &str)
