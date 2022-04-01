@@ -66,7 +66,7 @@ QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, co
 QString GdbConnector::splitAndExtractSrecData(const QString &packetizedData, const QString &delimeter)
 {
     const QMap<QString, int> startBytesToLength = {
-        { "S1", 2 }, // TODO: remove Ss
+        { "S1", 2 },
         { "S2", 3 },
         { "S3", 4 },
         { "S5", 2 },
@@ -81,19 +81,23 @@ QString GdbConnector::splitAndExtractSrecData(const QString &packetizedData, con
 
     QString rawData;
     rawData.reserve(packetizedData.size());
-    for (auto dataLine : packetizedData.split(delimeter)) {
+    const QStringList datalines = packetizedData.split(delimeter); // TODO: change name
+    qDebug() << "datas" << datalines;
+    for (auto dataLine : datalines) {
         if (dataLine.isEmpty()) {
             continue;
         }
 
         const int addressFieldLength = startBytesToLength.value(dataLine.at(0));
+        if (addressFieldLength == 0) {
+            continue;
+        }
+
         const int headerCharacters = 2 * (recordStartByteLength + remainingCharactersLength + addressFieldLength);
 
-        if (addressFieldLength != 0) {
-            dataLine = dataLine.left(dataLine.size() - checksumCharacters);
-            dataLine = dataLine.right(dataLine.size() - headerCharacters);
-            rawData.append(dataLine);
-        }
+        dataLine = dataLine.left(dataLine.size() - checksumCharacters);
+        dataLine = dataLine.right(dataLine.size() - headerCharacters);
+        rawData.append(dataLine);
     }
 
     return rawData;

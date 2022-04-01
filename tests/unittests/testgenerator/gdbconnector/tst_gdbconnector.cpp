@@ -43,11 +43,55 @@ static auto byteToHexStr(char byte) -> QString;
 
 void tst_gdbconnector::testNominal() const
 {
-    const QString packetizedData = "";
+    const QString packetizedData = "S00E00002F6465762F7374646F7574B1\r\n" //
+                                   "S315555681800100000000000000666666666666024097\r\n"
+                                   "S31555568190FEFFFFFFFFFFFFFF030000000000000034\r\n"
+                                   "S315555681A0010000000000000001000000000000001C\r\n"
+                                   "S315555681B038F8C264AA601540FEFFFFFFFFFFFFFF62\r\n"
+                                   "S315555681C003000000000000000100000000000000FA\r\n"
+                                   "S315555681D00000000000000000666666666666024048\r\n"
+                                   "S315555681E0F8FFFFFFFFFFFFFF0300000000000000EA\r\n"
+                                   "S315555681F001000000000000000000000000000000CD\r\n"
+                                   "S315555682006666666666660240FFFFFFFFFFFFFFFF1F\r\n"
+                                   "S31555568210FFFFFFFFFFFFFFFF0100000000000000B4\r\n"
+                                   "S3155556822001000000000000006666666666660240F6\r\n"
+                                   "S315555682300400000000000000010000000000000088\r\n"
+                                   "S30D55568240010000000000000084\r\n"
+                                   "S70500000000FA\r\n";
 
     const QString extractedData = GdbConnector::splitAndExtractSrecData(packetizedData);
+    qDebug() << "extracted: " << extractedData;
+    qDebug() << "";
 
-    const QString expectedData = "";
+    const QString expectedData = "\x01\xbe\xbe\xbe\xbe\xbe\xbe\xbe" //
+                                 "\x66\x66\x66\x66\x66\x66\x02\x40"
+                                 "\xfe\xff\xff\xff\xff\xff\xff\xff"
+                                 "\x03\x00\x00\x00\x00\x00\x00\x00"
+                                 "\x01\xbe\xbe\xbe\xbe\xbe\xbe\xbe"
+
+                                 "\x01\xbe\xbe\xbe\xbe\xbe\xbe\xbe"
+                                 "\x38\xf8\xc2\x64\xaa\x60\x15\x40"
+                                 "\xfe\xff\xff\xff\xff\xff\xff\xff"
+                                 "\x03\x00\x00\x00\x00\x00\x00\x00"
+                                 "\x01\xbe\xbe\xbe\xbe\xbe\xbe\xbe"
+
+                                 "\x00\xbe\xbe\xbe\xbe\xbe\xbe\xbe"
+                                 "\x66\x66\x66\x66\x66\x66\x02\x40"
+                                 "\xf8\xff\xff\xff\xff\xff\xff\xff"
+                                 "\x03\x00\x00\x00\x00\x00\x00\x00"
+                                 "\x01\xbe\xbe\xbe\xbe\xbe\xbe\xbe"
+
+                                 "\x00\xbe\xbe\xbe\xbe\xbe\xbe\xbe"
+                                 "\x66\x66\x66\x66\x66\x66\x02\x40"
+                                 "\xff\xff\xff\xff\xff\xff\xff\xff"
+                                 "\xff\xff\xff\xff\xff\xff\xff\xff"
+                                 "\x01\xbe\xbe\xbe\xbe\xbe\xbe\xbe"
+
+                                 "\x01\xbe\xbe\xbe\xbe\xbe\xbe\xbe"
+                                 "\x66\x66\x66\x66\x66\x66\x02\x40"
+                                 "\x04\x00\x00\x00\x00\x00\x00\x00"
+                                 "\x01\x00\x00\x00\x00\x00\x00\x00"
+                                 "\x01\xbe\xbe\xbe\xbe\xbe\xbe\xbe";
 
     const int comparisonResult = expectedData.compare(extractedData);
     if (comparisonResult != 0) {

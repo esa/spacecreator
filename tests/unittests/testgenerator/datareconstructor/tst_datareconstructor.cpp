@@ -65,6 +65,7 @@ void tst_datareconstructor::testNominal() const
     const QString binToRun = "hostpartition";
     const QByteArray rawTestData =
             GdbConnector::getRawTestResults(binLocalization, { "-batch", "-x", script }, { "host:1234", binToRun });
+    qDebug() << rawTestData;
 
     const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview.xml");
     ivm::IVInterface *const ivIface = IvTools::getIfaceFromModel("InterfaceUnderTest", ivModel.get());
