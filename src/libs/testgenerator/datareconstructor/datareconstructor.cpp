@@ -33,7 +33,7 @@ QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(QByteArray rawD
         QDataStream::ByteOrder endianness, const TypeLayoutInfos &typeLayoutInfos)
 {
     QVector<QVariant> output;
-    output.reserve(static_cast<int>(numberOfTestVectors));
+    output.reserve(rawData.size());
 
     const auto definitionNameToTypeMap = mapDefinitionNameToType(asn1Model);
 

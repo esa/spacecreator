@@ -83,6 +83,11 @@ void tst_datareconstructor::testNominal() const
     QCOMPARE(readTestData.size(), expectedTestData.size());
     const int dataSize = readTestData.size();
     for (int i = 0; i < dataSize; i++) {
+        const char readChar = readTestData.at(i).toChar().toLatin1();
+        const char expectedChar = expectedTestData.at(i).toChar().toLatin1();
+
+        qDebug().noquote() << i << byteToHexStr(readChar) << byteToHexStr(expectedChar);
+
         QCOMPARE(readTestData.at(i), expectedTestData.at(i));
     }
 }
