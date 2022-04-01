@@ -35,6 +35,7 @@ using promela::model::BasicType;
 using promela::model::ChannelSend;
 using promela::model::DataType;
 using promela::model::Declaration;
+using promela::model::Expression;
 using promela::model::InlineDef;
 using promela::model::Proctype;
 using promela::model::ProctypeElement;
@@ -201,7 +202,7 @@ void tst_IvToPromelaTranslator::testSimple()
         QCOMPARE(proctype->getInstancesCount(), 1);
     }
 
-    QCOMPARE(promelaModel->getInlineDefs().size(), 3);
+    QCOMPARE(promelaModel->getInlineDefs().size(), 5);
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_test");
@@ -225,6 +226,22 @@ void tst_IvToPromelaTranslator::testSimple()
         QCOMPARE(inlineDef->getArguments().size(), 0);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
         QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
+    }
+
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_check_queue");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 0);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Expression>(content.back()->getValue()));
+    }
+
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_check_queue");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 0);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Expression>(content.back()->getValue()));
     }
 }
 
@@ -353,7 +370,7 @@ void tst_IvToPromelaTranslator::testParameters()
         QCOMPARE(proctype->getInstancesCount(), 1);
     }
 
-    QCOMPARE(promelaModel->getInlineDefs().size(), 3);
+    QCOMPARE(promelaModel->getInlineDefs().size(), 5);
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_work");
@@ -377,6 +394,22 @@ void tst_IvToPromelaTranslator::testParameters()
         QCOMPARE(inlineDef->getArguments().size(), 0);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
         QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
+    }
+
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_check_queue");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 0);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Expression>(content.back()->getValue()));
+    }
+
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_check_queue");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 0);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Expression>(content.back()->getValue()));
     }
 }
 

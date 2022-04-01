@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,23 +17,33 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "inlinecall.h"
+#pragma once
 
-#include "expression.h"
+#include <QTextStream>
+#include <promela/PromelaModel/inlinecall.h>
 
-namespace promela::model {
-InlineCall::InlineCall(QString name, const QList<VariableRef> &arguments)
-    : m_name(std::move(name))
-    , m_arguments(arguments)
+namespace promela::exporter {
+/**
+ * @brief Visitor for exporting @link{::promela::model::InlineCall}
+ */
+class InlineCallVisitor final
 {
-}
-const QString &InlineCall::getName() const noexcept
-{
-    return m_name;
-}
+public:
+    /**
+     * @brief Constructor
+     *
+     * @param stream stream to append exported expression
+     */
+    InlineCallVisitor(QTextStream &stream);
 
-const QList<VariableRef> &InlineCall::getArguments() const noexcept
-{
-    return m_arguments;
-}
+    /**
+     * @brief Visit InlineCall
+     *
+     * @param inlineCall InlineCall to visit
+     */
+    void visit(const ::promela::model::InlineCall &inlineCall);
+
+private:
+    QTextStream &m_stream;
+};
 }

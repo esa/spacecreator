@@ -31,6 +31,7 @@ using promela::exporter::PromelaExporter;
 using promela::model::ArrayType;
 using promela::model::Assignment;
 using promela::model::BasicType;
+using promela::model::BinaryExpression;
 using promela::model::ChannelInit;
 using promela::model::ChannelRecv;
 using promela::model::ChannelSend;
@@ -87,6 +88,7 @@ private Q_SLOTS:
     void testDstepInitSequence();
     void testForRangeLoop();
     void testForEachLoop();
+    void testExpressions();
 
 private:
     QString getFileContents(const QString &filename);
@@ -896,6 +898,135 @@ void tst_PromelaExporter::testForEachLoop()
         QFAIL(ex.what());
     }
     QString out2 = getFileContents("expect_promela_for_each_loop.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+void tst_PromelaExporter::testExpressions()
+{
+    PromelaModel model;
+
+    Declaration channel1 = Declaration(DataType(BasicType::CHAN), "channel1");
+    QList<ChannelInit::Type> channel1Type;
+    channel1Type.append(ChannelInit::Type(BasicType::INT));
+    channel1.setInit(ChannelInit(2, std::move(channel1Type)));
+    model.addDeclaration(channel1);
+
+    Sequence initSequence(Sequence::Type::NORMAL);
+
+    initSequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "a")));
+    initSequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "b")));
+    initSequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::BOOLEAN), "m")));
+    initSequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::BOOLEAN), "n")));
+
+    initSequence.appendElement(
+            std::make_unique<ProctypeElement>(Assignment(VariableRef("a"), Expression(Constant(20)))));
+    initSequence.appendElement(
+            std::make_unique<ProctypeElement>(Assignment(VariableRef("b"), Expression(Constant(5)))));
+    initSequence.appendElement(
+            std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(Constant(0)))));
+    initSequence.appendElement(
+            std::make_unique<ProctypeElement>(Assignment(VariableRef("n"), Expression(Constant(1)))));
+
+    {
+        BinaryExpression add(BinaryExpression::Operator::ADD, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("a"), Expression(std::move(add)))));
+    }
+
+    {
+        BinaryExpression substract(BinaryExpression::Operator::SUBTRACT, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("a"), Expression(std::move(substract)))));
+    }
+    {
+        BinaryExpression multiply(BinaryExpression::Operator::MULTIPLY, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("a"), Expression(std::move(multiply)))));
+    }
+    {
+        BinaryExpression divide(BinaryExpression::Operator::DIVIDE, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("a"), Expression(std::move(divide)))));
+    }
+    {
+        BinaryExpression equal(BinaryExpression::Operator::EQUAL, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(std::move(equal)))));
+    }
+    {
+        BinaryExpression less(BinaryExpression::Operator::LESS, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(std::move(less)))));
+    }
+    {
+        BinaryExpression greater(BinaryExpression::Operator::GREATER, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(std::move(greater)))));
+    }
+    {
+        BinaryExpression lequal(BinaryExpression::Operator::LEQUAL, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(std::move(lequal)))));
+    }
+    {
+        BinaryExpression gequal(BinaryExpression::Operator::GEQUAL, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(std::move(gequal)))));
+    }
+    {
+        BinaryExpression modulo(BinaryExpression::Operator::MODULO, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("a"), Expression(std::move(modulo)))));
+    }
+    {
+        BinaryExpression nequal(BinaryExpression::Operator::NEQUAL, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(std::move(nequal)))));
+    }
+    {
+        BinaryExpression andExpression(BinaryExpression::Operator::AND, std::make_unique<Expression>(VariableRef("m")),
+                std::make_unique<Expression>(VariableRef("n")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(std::move(andExpression)))));
+    }
+    {
+        BinaryExpression orExpression(BinaryExpression::Operator::OR, std::make_unique<Expression>(VariableRef("m")),
+                std::make_unique<Expression>(VariableRef("n")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(std::move(orExpression)))));
+    }
+
+    {
+        QList<VariableRef> args;
+        args.append(VariableRef("channel1"));
+
+        InlineCall emptyCall = InlineCall("empty", args);
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(emptyCall))));
+    }
+
+    InitProctype init(std::move(initSequence));
+
+    model.setInit(std::move(init));
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_expressions.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }

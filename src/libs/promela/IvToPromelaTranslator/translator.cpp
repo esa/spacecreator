@@ -40,6 +40,7 @@ using ivm::IVInterfaceRequired;
 using ivm::IVModel;
 using promela::model::Assignment;
 using promela::model::BasicType;
+using promela::model::BinaryExpression;
 using promela::model::ChannelInit;
 using promela::model::ChannelRecv;
 using promela::model::ChannelSend;
@@ -336,6 +337,9 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(
         PromelaModel *promelaModel, const IVModel *ivModel, IVFunction *ivFunction, const QString &functionName) const
 {
     QVector<IVInterface *> providedInterfaceList = ivFunction->pis();
+
+    QList<QString> channelNames;
+
     for (IVInterface *providedInterface : providedInterfaceList) {
 
         if (providedInterface->kind() != IVInterface::OperationKind::Cyclic
@@ -365,7 +369,44 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(
 
         promelaModel->addProctype(
                 generateProctype(promelaModel, functionName, interfaceName, parameterType, queueSize, priority, false));
+
+        channelNames.append(constructChannelName(functionName, interfaceName));
     }
+
+    if (channelNames.empty()) {
+        auto message = QString("No sporadic nor cyclic interfaces in function %1").arg(functionName);
+        throw TranslationException(message);
+    }
+
+    Sequence sequence(Sequence::Type::ATOMIC);
+
+    std::unique_ptr<Expression> expr;
+    {
+        QList<VariableRef> arguments;
+        arguments.append(VariableRef(channelNames.last()));
+
+        expr = std::make_unique<Expression>(InlineCall("empty", arguments));
+
+        channelNames.pop_back();
+    }
+
+    while (!channelNames.empty()) {
+        QList<VariableRef> arguments;
+        arguments.append(VariableRef(channelNames.last()));
+
+        std::unique_ptr<Expression> left = std::make_unique<Expression>(InlineCall("empty", arguments));
+
+        expr = std::make_unique<Expression>(
+                BinaryExpression(BinaryExpression::Operator::AND, std::move(left), std::move(expr)));
+
+        channelNames.pop_back();
+    }
+
+    sequence.appendElement(std::make_unique<ProctypeElement>(*expr));
+
+    const QString checkQueueInlineName = QString("%1_check_queue").arg(Escaper::escapePromelaIV(functionName));
+    promelaModel->addInlineDef(
+            std::make_unique<InlineDef>(checkQueueInlineName, QList<QString>(), std::move(sequence)));
 }
 
 void IvToPromelaTranslator::createPromelaObjectsForEnvironment(

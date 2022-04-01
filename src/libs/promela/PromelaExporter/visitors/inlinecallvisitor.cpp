@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,23 +17,33 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "inlinecall.h"
+#include "visitors/inlinecallvisitor.h"
 
-#include "expression.h"
+#include "visitors/variablerefvisitor.h"
 
-namespace promela::model {
-InlineCall::InlineCall(QString name, const QList<VariableRef> &arguments)
-    : m_name(std::move(name))
-    , m_arguments(arguments)
+using promela::model::InlineCall;
+using promela::model::VariableRef;
+
+namespace promela::exporter {
+InlineCallVisitor::InlineCallVisitor(QTextStream &stream)
+    : m_stream(stream)
 {
 }
-const QString &InlineCall::getName() const noexcept
-{
-    return m_name;
-}
 
-const QList<VariableRef> &InlineCall::getArguments() const noexcept
+void InlineCallVisitor::visit(const InlineCall &inlineCall)
 {
-    return m_arguments;
+    m_stream << inlineCall.getName() << "(";
+    VariableRefVisitor variableRefVisitor(m_stream);
+
+    bool first = true;
+    for (const VariableRef &variableRef : inlineCall.getArguments()) {
+        if (!first) {
+            m_stream << ", ";
+        } else {
+            first = false;
+        }
+        variableRefVisitor.visit(variableRef);
+    }
+    m_stream << ")";
 }
 }

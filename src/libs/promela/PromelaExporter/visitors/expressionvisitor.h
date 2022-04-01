@@ -24,7 +24,7 @@
 
 namespace promela::exporter {
 /**
- * @brief Visitor for exporting @link{::romela::model::Expression}
+ * @brief Visitor for exporting @link{::promela::model::Expression}
  */
 class ExpressionVisitor final
 {
@@ -39,7 +39,7 @@ public:
     /**
      * @brief Visit Expression
      *
-     * @param expression to visit
+     * @param expression expression to visit
      */
     void visit(const ::promela::model::Expression &expression);
 
@@ -55,6 +55,18 @@ public:
      * @param constant constant to export
      */
     void operator()(const ::promela::model::Constant &constant);
+    /**
+     * @brief Handle Binary Expression
+     *
+     * @param expression expression to export
+     */
+    void operator()(const ::promela::model::BinaryExpression &expression);
+    /**
+     * @brief Handle Inline Call
+     *
+     * @param expression inlineCall InlineCall to export
+     */
+    void operator()(const ::promela::model::InlineCall &inlineCall);
 
 private:
     QTextStream &m_stream;

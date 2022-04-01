@@ -21,6 +21,7 @@
 
 #include "declarationvisitor.h"
 #include "expressionvisitor.h"
+#include "inlinecallvisitor.h"
 #include "sequencevisitor.h"
 #include "variablerefvisitor.h"
 
@@ -137,19 +138,9 @@ void ProctypeElementVisitor::operator()(const Assignment &assignment)
 void ProctypeElementVisitor::operator()(const InlineCall &inlineCall)
 {
     m_stream << m_indent;
-    m_stream << inlineCall.getName() << "(";
-    VariableRefVisitor variableRefVisitor(m_stream);
-
-    bool first = true;
-    for (const VariableRef &variableRef : inlineCall.getArguments()) {
-        if (!first) {
-            m_stream << ", ";
-        } else {
-            first = false;
-        }
-        variableRefVisitor.visit(variableRef);
-    }
-    m_stream << ");\n";
+    InlineCallVisitor visitor(m_stream);
+    visitor.visit(inlineCall);
+    m_stream << ";\n";
 }
 
 void ProctypeElementVisitor::operator()(const Skip &skip)

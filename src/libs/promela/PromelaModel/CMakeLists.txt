@@ -3,6 +3,7 @@ project(PromelaModel VERSION 1.0.0 LANGUAGES CXX)
 set(SOURCES
   arraytype.cpp
   assignment.cpp
+  binaryexpression.cpp
   channelinit.cpp
   channelrecv.cpp
   channelsend.cpp
@@ -32,6 +33,7 @@ set(INCLUDES
   arraytype.h
   assignment.h
   basictypes.h
+  binaryexpression.h
   channelinit.h
   channelrecv.h
   channelsend.h
