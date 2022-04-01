@@ -45,6 +45,8 @@ private Q_SLOTS:
 private:
     const unsigned int numberOfTestVectors = 5;
 };
+auto printQByteArrayInHex(const QByteArray &array) -> void;
+static auto byteToHexStr(char byte) -> QString;
 
 void tst_datareconstructor::testNominal() const
 {
@@ -62,6 +64,7 @@ void tst_datareconstructor::testNominal() const
     const QString binToRun = "hostpartition";
     const QByteArray rawTestData =
             GdbConnector::getRawTestResults(binLocalization, { "-batch", "-x", script }, { "host:1234", binToRun });
+    printQByteArrayInHex(rawTestData);
 
     const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview.xml");
     ivm::IVInterface *const ivIface = IvTools::getIfaceFromModel("InterfaceUnderTest", ivModel.get());
@@ -81,6 +84,37 @@ void tst_datareconstructor::testNominal() const
     const int dataSize = readTestData.size();
     for (int i = 0; i < dataSize; i++) {
         QCOMPARE(readTestData.at(i), expectedTestData.at(i));
+    }
+}
+
+void printQByteArrayInHex(const QByteArray &array)
+{
+    QString arrayInHex = QString("QByteArray size: %1\n").arg(array.size());
+    for (int i = 0; i < array.size(); i++) {
+        arrayInHex += byteToHexStr(array.at(i));
+        arrayInHex += " ";
+
+        if ((i + 1) % 8 == 0) {
+            arrayInHex += "| ";
+        }
+
+        if ((i + 1) % 16 == 0) {
+            arrayInHex += "\n";
+        }
+    }
+
+    qDebug().noquote() << arrayInHex;
+}
+
+QString byteToHexStr(const char byte)
+{
+    const int hexBase = 16;
+
+    const auto number = static_cast<uint_least8_t>(byte);
+    if (number < hexBase) {
+        return QString("0%1").arg(number, 1, hexBase);
+    } else {
+        return QString("%1").arg(number, 2, hexBase);
     }
 }
 
