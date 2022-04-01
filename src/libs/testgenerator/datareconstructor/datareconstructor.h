@@ -42,15 +42,15 @@ class DataReconstructor final
 public:
     typedef int TypePaddingLength; // bytes
     typedef int TypeDataLength; // bytes
-    typedef QString TypePaddingName;
+    typedef QString TypeName;
 
-    typedef std::tuple<TypePaddingName, TypeDataLength, TypePaddingLength> TypeLayoutInfo;
+    typedef std::tuple<TypeName, TypeDataLength, TypePaddingLength> TypeLayoutInfo;
 
     /**
      * @brief Container to store user-supplied information about datatypes to be reconstructed
      *
      */
-    class TypeLayoutInfos final : public QMap<TypePaddingName, QPair<TypeDataLength, TypePaddingLength>>
+    class TypeLayoutInfos final : public QMap<TypeName, QPair<TypeDataLength, TypePaddingLength>>
     {
     public:
         /**
