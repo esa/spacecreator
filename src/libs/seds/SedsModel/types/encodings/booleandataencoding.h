@@ -35,7 +35,6 @@ public:
     BooleanDataEncoding &operator=(BooleanDataEncoding &&) = default;
 
 public:
-public:
     auto bits() const -> PositiveLong::Value;
     auto setBits(PositiveLong::Value bits) -> void;
 

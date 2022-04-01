@@ -418,7 +418,7 @@ void tst_SedsToAsn1Translator::testTranslateBooleanDataType()
 
     QCOMPARE(booleanType->identifier(), "Boolean");
     QCOMPARE(booleanType->typeName(), "BOOLEAN");
-    QCOMPARE(booleanType->trueValue(), "0");
+    QCOMPARE(booleanType->trueValue(), "0000000000000000");
 }
 
 /// \SRS  ETB-FUN-230

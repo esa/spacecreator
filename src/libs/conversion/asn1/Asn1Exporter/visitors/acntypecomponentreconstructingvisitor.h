@@ -72,6 +72,7 @@ private:
     void tryAppendTerminationPattern(const Types::AsciiStringAcnParameters &type, QStringList &params) const;
 
     void tryAppendPresentWhen(QStringList &params) const;
+    void tryAppendSize(const Types::Boolean &type, QStringList &params) const;
     void tryAppendSize(const Types::IntegerAcnParameters &type, QStringList &params) const;
 
     template<typename T>

@@ -41,6 +41,7 @@ void AcnTypeComponentReconstructingVisitor::visit(const Types::Boolean &type)
 
     tryAppendAlignToNext(type, params);
 
+    tryAppendSize(type, params);
     tryAppendTrueValue(type, params);
     tryAppendFalseValue(type, params);
 
@@ -275,6 +276,14 @@ void AcnTypeComponentReconstructingVisitor::tryAppendSize(const T &type, QString
     const auto size = type.acnSize();
     if (!size.isEmpty()) {
         params << QStringLiteral("size ") + size;
+    }
+}
+
+void AcnTypeComponentReconstructingVisitor::tryAppendSize(const Types::Boolean &type, QStringList &params) const
+{
+    const auto size = type.acnSize();
+    if (size != 0) {
+        params << QStringLiteral("size ") + QString::number(size);
     }
 }
 

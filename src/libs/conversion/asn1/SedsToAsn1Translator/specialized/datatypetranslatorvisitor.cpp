@@ -294,6 +294,7 @@ void DataTypeTranslatorVisitor::translateBooleanEncoding(
         const std::optional<seds::model::BooleanDataEncoding> &encoding, Asn1Acn::Types::Boolean *asn1Type) const
 {
     if (encoding) {
+        asn1Type->setAcnSize(encoding->bits());
         translateFalseValue(encoding->falseValue(), asn1Type);
     } else {
         asn1Type->setFalseValue("0");
@@ -554,10 +555,10 @@ void DataTypeTranslatorVisitor::translateFalseValue(
 {
     switch (falseValue) {
     case seds::model::FalseValue::ZeroIsFalse:
-        asn1Type->setFalseValue("0");
+        asn1Type->setFalseValue(QString(asn1Type->acnSize(), '0'));
         break;
     case seds::model::FalseValue::NonZeroIsFalse:
-        asn1Type->setTrueValue("0");
+        asn1Type->setTrueValue(QString(asn1Type->acnSize(), '0'));
         break;
     default:
         throw UnhandledValueException("FalseValue");
