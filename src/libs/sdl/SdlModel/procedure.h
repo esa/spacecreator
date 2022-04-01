@@ -40,12 +40,10 @@ public:
      * @param   name   name of the element
      */
     Procedure(QString name = "");
-
     /**
      * @brief   Deleted copy constructor
      */
     Procedure(const Procedure &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -55,19 +53,18 @@ public:
      * @brief   Deleted copy assignment operator
      */
     Procedure &operator=(const Procedure &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     Procedure &operator=(Procedure &&) = default;
 
+public:
     /**
      * @brief   Getter for the transition
      *
      * @return  a pointer to transition which should be triggered when this procedure is called
      */
     auto transition() const -> Transition *;
-
     /**
      * @brief   Setter for the transition
      *
@@ -76,12 +73,24 @@ public:
     auto setTransition(std::unique_ptr<Transition> transition) -> void;
 
     /**
+     * @brief   Getter for the variables declared in this procedure
+     *
+     * @return  Procedure variables
+     */
+    auto variables() const -> const std::vector<std::unique_ptr<VariableDeclaration>> &;
+    /**
+     * @brief   Adds variable declaration to this procedure
+     *
+     * @param   variable    Variable to add
+     */
+    auto addVariable(std::unique_ptr<VariableDeclaration> variable) -> void;
+
+    /**
      * @brief   Getter for the parameters
      *
      * @return  a vector of parameters
      */
     auto parameters() const -> const std::vector<std::unique_ptr<ProcedureParameter>> &;
-
     /**
      * @brief   Add a procedure parameter
      *
@@ -95,7 +104,6 @@ public:
      * @return  return variable declaration
      */
     auto returnVariableDeclaration() const -> VariableDeclaration *;
-
     /**
      * @brief   Setter for the return variable declaration
      *
@@ -110,6 +118,7 @@ public:
 
 private:
     std::unique_ptr<Transition> m_implementation; // Null if external
+    std::vector<std::unique_ptr<VariableDeclaration>> m_variables;
     std::vector<std::unique_ptr<ProcedureParameter>> m_parameters;
     std::unique_ptr<VariableDeclaration> m_returnVariableDeclaration;
 };

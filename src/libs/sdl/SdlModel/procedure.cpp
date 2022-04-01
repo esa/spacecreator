@@ -38,6 +38,16 @@ void Procedure::setTransition(std::unique_ptr<Transition> transition)
     m_implementation = std::move(transition);
 }
 
+const std::vector<std::unique_ptr<VariableDeclaration>> &Procedure::variables() const
+{
+    return m_variables;
+}
+
+void Procedure::addVariable(std::unique_ptr<VariableDeclaration> variable)
+{
+    m_variables.push_back(std::move(variable));
+}
+
 const std::vector<std::unique_ptr<ProcedureParameter>> &Procedure::parameters() const
 {
     return m_parameters;

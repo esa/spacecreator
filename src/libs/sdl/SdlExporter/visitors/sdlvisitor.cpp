@@ -441,14 +441,20 @@ void SdlVisitor::visit(const Procedure &procedure)
     m_writer.pushIndent(INDENT);
     m_layouter.resetPosition();
 
-    auto &procedureParameters = procedure.parameters();
+    const auto &procedureParameters = procedure.parameters();
+    const auto &procedureVariables = procedure.variables();
 
+    const bool variablesPresent = !procedureVariables.empty();
     const bool parametersPresent = !procedureParameters.empty();
     const bool returnVarPresent = procedure.returnVariableDeclaration() != nullptr;
 
-    if (parametersPresent || returnVarPresent) {
+    if (variablesPresent || parametersPresent || returnVarPresent) {
         m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
         m_layouter.moveDown(Layouter::ElementType::Text);
+    }
+
+    if (variablesPresent) {
+        exportCollection(procedureVariables);
     }
 
     if (parametersPresent) {
@@ -502,7 +508,7 @@ void SdlVisitor::visit(const Procedure &procedure)
 
 void SdlVisitor::visit(const ProcedureCall &procedureCall)
 {
-    if (procedureCall.procedure() == nullptr && procedureCall.procedure()->name().isEmpty()) {
+    if (procedureCall.procedure() == nullptr || procedureCall.procedure()->name().isEmpty()) {
         throw ExportException("Procedure to call not specified");
     }
     if (procedureCall.procedure()->returnVariableDeclaration() != nullptr) {
