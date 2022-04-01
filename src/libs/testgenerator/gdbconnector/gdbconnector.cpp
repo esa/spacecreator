@@ -82,26 +82,26 @@ QString GdbConnector::getOneBeforeLastLine(const QString &src, const QString &ne
 // implemented based on http://www.amelek.gda.pl/avr/uisp/srecord.htm
 QString GdbConnector::splitAndExtractSrecData(const QString &packetizedData, const QString &delimeter)
 {
-    const QMap<QString, int> startBytesToLen = {
+    const QMap<QString, int> startBytesToLength = {
         { "S1", 2 },
         { "S2", 3 },
         { "S3", 4 },
         { "S5", 2 },
     }; // S4 and S6 are reserved; S7, S8, S9 have no data fields
 
-    const int recordStartByteLen = 1; // 1 byte; 4 bits: start character, 4 bits: record type number
-    const int remainingCharactersLen = 1;
-    const int checksumLen = 1;
+    const int recordStartByteLength = 1; // 1 byte; 4 bits: start character, 4 bits: record type number
+    const int remainingCharactersLength = 1;
+    const int checksumLength = 1;
 
-    const int checksumCharacters = 2 * checksumLen;
+    const int checksumCharacters = 2 * checksumLength;
 
     QString rawData;
     rawData.reserve(packetizedData.size());
     for (auto dataLine : packetizedData.split(delimeter)) {
-        const int addressFieldLen = startBytesToLen.value(dataLine.at(0));
-        const int headerCharacters = 2 * (recordStartByteLen + remainingCharactersLen + addressFieldLen);
+        const int addressFieldLength = startBytesToLength.value(dataLine.at(0));
+        const int headerCharacters = 2 * (recordStartByteLength + remainingCharactersLength + addressFieldLength);
 
-        if (addressFieldLen != 0) {
+        if (addressFieldLength != 0) {
             dataLine = dataLine.left(dataLine.size() - checksumCharacters);
             dataLine = dataLine.right(dataLine.size() - headerCharacters);
             rawData.append(dataLine);

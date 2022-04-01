@@ -230,13 +230,13 @@ auto TestDriverGenerator::getAssignmentsForRecords(const ivm::IVInterface &inter
 
 auto TestDriverGenerator::removePiPrefix(const QString &str) -> QString
 {
-    constexpr int prefixLen = 3;
+    constexpr int prefixLength = 3;
 
-    if (str.left(prefixLen).compare("PI_") != 0) {
+    if (str.left(prefixLength).compare("PI_") != 0) {
         return str;
     }
 
-    return str.right(str.size() - prefixLen);
+    return str.right(str.size() - prefixLength);
 }
 
 } // namespace testgenerator
