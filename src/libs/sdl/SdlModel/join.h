@@ -63,14 +63,14 @@ public:
      *
      * @return  label
      */
-    auto label() const -> Label *;
+    auto label() const -> const QString &;
 
     /**
      * @brief   Setter for label
      *
      * @param   label  label
      */
-    auto setLabel(Label *label) -> void;
+    auto setLabel(QString label) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
@@ -78,7 +78,7 @@ public:
     virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
-    Label *m_label;
+    QString m_label;
 };
 
 } // namespace sdl

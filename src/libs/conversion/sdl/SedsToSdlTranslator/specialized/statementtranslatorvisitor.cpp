@@ -202,7 +202,7 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Iteration &iterat
     auto continueTransition = std::make_unique<::sdl::Transition>();
     auto transitionPointer = continueTransition.get();
     auto exitJoin = std::make_unique<::sdl::Join>();
-    exitJoin->setLabel(endLabel.get());
+    exitJoin->setLabel(endLabel->name());
 
     // Loop condition not met - jump to exit
     exitTransition->addAction(std::move(exitJoin));
@@ -703,7 +703,7 @@ auto StatementTranslatorVisitor::translateAnswer(StatementContext &context, ::sd
         }
     }
     auto join = std::make_unique<::sdl::Join>();
-    join->setLabel(joinLabel);
+    join->setLabel(joinLabel->name());
     transition->addAction(std::move(join));
     answer->setTransition(std::move(transition));
 
@@ -763,7 +763,7 @@ auto StatementTranslatorVisitor::generateLoopEnd(
         throw TranslationException("Variable range not implemented");
     }
     auto loopBackJoin = std::make_unique<::sdl::Join>();
-    loopBackJoin->setLabel(startLabel);
+    loopBackJoin->setLabel(startLabel->name());
     transition->addAction(std::move(loopBackJoin));
 }
 

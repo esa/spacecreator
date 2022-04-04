@@ -370,8 +370,8 @@ void SdlVisitor::visit(const Join &join)
     m_layouter.moveDown(Layouter::ElementType::Join);
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Join));
     m_writer.beginLine("join ");
-    if (join.label() != nullptr) {
-        m_writer.write(join.label()->name());
+    if (!join.label().isEmpty()) {
+        m_writer.write(join.label());
     } else {
         throw ExportException("Label is not set in Join, but Join without specified Label is ill-formed");
     }

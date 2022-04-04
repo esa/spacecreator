@@ -23,14 +23,14 @@
 
 namespace sdl {
 
-Label *Join::label() const
+const QString &Join::label() const
 {
     return m_label;
 }
 
-void Join::setLabel(Label *label)
+void Join::setLabel(QString label)
 {
-    m_label = label;
+    m_label = std::move(label);
 }
 
 void Join::accept(Visitor &visitor) const
