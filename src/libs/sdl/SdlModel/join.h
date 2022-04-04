@@ -39,6 +39,11 @@ public:
     Join() = default;
 
     /**
+     * @brief   Constructor with label
+     */
+    explicit Join(QString label);
+
+    /**
      * @brief   Deleted copy constructor
      */
     Join(const Join &) = delete;

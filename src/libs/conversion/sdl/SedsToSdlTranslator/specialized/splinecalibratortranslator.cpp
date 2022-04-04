@@ -219,12 +219,41 @@ auto SplineCalibratorTranslator::buildFindIntervalProcedure(StatementTranslatorV
     // Create procedure parameters
     auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", "SplinePointValue", "in");
 
+    // Create iteration start
+    auto iterationStartLabel = std::make_unique<::sdl::Label>("find_interval_start");
+    transition->addAction(std::move(iterationStartLabel));
+
     // Iterate over raw points
-    const auto iterateAction = QString(R"(for rawPoint in rawPoints:
-    call writeln(rawPoint);
-endfor)");
-    auto iterateTask = std::make_unique<::sdl::Task>("", iterateAction);
-    transition->addAction(std::move(iterateTask));
+    auto iterationDecision = std::make_unique<::sdl::Decision>();
+    auto iterationDecisionExpression = std::make_unique<::sdl::Expression>("currentIndex < length(rawPoints)");
+    iterationDecision->setExpression(std::move(iterationDecisionExpression));
+
+    // Exit iteration
+    auto iterationDecisionFalseTransition = std::make_unique<::sdl::Transition>();
+    auto iterationDecisionFalseJoin = std::make_unique<::sdl::Join>("find_interval_end");
+    iterationDecisionFalseTransition->addAction(std::move(iterationDecisionFalseJoin));
+
+    // Do iteration
+    auto iterationDecisionTrueTransition = std::make_unique<::sdl::Transition>();
+    auto iterationDecisionTrueJoin = std::make_unique<::sdl::Join>("find_interval_start");
+    iterationDecisionTrueTransition->addAction(std::move(iterationDecisionTrueJoin));
+
+    // Add iteration to transition
+    auto iterationDecisionTrue = std::make_unique<::sdl::Answer>();
+    iterationDecisionTrue->setLiteral(::sdl::VariableLiteral("True"));
+    iterationDecisionTrue->setTransition(std::move(iterationDecisionTrueTransition));
+    iterationDecision->addAnswer(std::move(iterationDecisionTrue));
+
+    auto iterationDecisionFalse = std::make_unique<::sdl::Answer>();
+    iterationDecisionFalse->setLiteral(::sdl::VariableLiteral("False"));
+    iterationDecisionFalse->setTransition(std::move(iterationDecisionFalseTransition));
+    iterationDecision->addAnswer(std::move(iterationDecisionFalse));
+
+    transition->addAction(std::move(iterationDecision));
+
+    // Create iteration exit
+    auto iterationEndLabel = std::make_unique<::sdl::Label>("find_interval_end");
+    transition->addAction(std::move(iterationEndLabel));
 
     // Assign to result
     const auto assignToResultAction = QString("result := -1");

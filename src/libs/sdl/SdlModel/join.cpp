@@ -23,6 +23,11 @@
 
 namespace sdl {
 
+Join::Join(QString label)
+    : m_label(std::move(label))
+{
+}
+
 const QString &Join::label() const
 {
     return m_label;
