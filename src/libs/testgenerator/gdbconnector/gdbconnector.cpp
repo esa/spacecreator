@@ -25,6 +25,7 @@
 #include <filesystem>
 #include <fstream>
 #include <memory>
+#include <qdebug.h>
 #include <stdexcept>
 #include <system_error>
 #include <utility>
@@ -66,10 +67,10 @@ QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, co
 QString GdbConnector::splitAndExtractSrecData(const QString &packetizedData, const QString &delimeter)
 {
     const QMap<QString, int> startBytesToLength = {
-        { "S1", 2 },
-        { "S2", 3 },
-        { "S3", 4 },
-        { "S5", 2 },
+        { "1", 2 },
+        { "2", 3 },
+        { "3", 4 },
+        { "5", 2 },
     }; // S4 and S6 are reserved; S7, S8, S9 have no data fields
 
     const int recordStartByteLength = 1; // 1 character ('S')
@@ -82,13 +83,12 @@ QString GdbConnector::splitAndExtractSrecData(const QString &packetizedData, con
     QString rawData;
     rawData.reserve(packetizedData.size());
     const QStringList datalines = packetizedData.split(delimeter); // TODO: change name
-    qDebug() << "datas" << datalines;
     for (auto dataLine : datalines) {
         if (dataLine.isEmpty()) {
             continue;
         }
 
-        const int addressFieldLength = startBytesToLength.value(dataLine.at(0));
+        const int addressFieldLength = startBytesToLength.value(dataLine.at(1));
         if (addressFieldLength == 0) {
             continue;
         }

@@ -17,6 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#include <QDebug>
 #include <QObject>
 #include <QTest>
 #include <QVariant>
@@ -36,72 +37,161 @@ class tst_gdbconnector final : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
-    void testNominal() const;
+    void splitAndExtractSrecData() const;
+    void stringToByteArray() const;
 };
 auto printQByteArrayInHex(const QByteArray &array) -> void;
 static auto byteToHexStr(char byte) -> QString;
 
-void tst_gdbconnector::testNominal() const
+void tst_gdbconnector::splitAndExtractSrecData() const
 {
-    const QString packetizedData = "S00E00002F6465762F7374646F7574B1\r\n" //
-                                   "S315555681800100000000000000666666666666024097\r\n"
-                                   "S31555568190FEFFFFFFFFFFFFFF030000000000000034\r\n"
-                                   "S315555681A0010000000000000001000000000000001C\r\n"
-                                   "S315555681B038F8C264AA601540FEFFFFFFFFFFFFFF62\r\n"
-                                   "S315555681C003000000000000000100000000000000FA\r\n"
-                                   "S315555681D00000000000000000666666666666024048\r\n"
-                                   "S315555681E0F8FFFFFFFFFFFFFF0300000000000000EA\r\n"
-                                   "S315555681F001000000000000000000000000000000CD\r\n"
-                                   "S315555682006666666666660240FFFFFFFFFFFFFFFF1F\r\n"
-                                   "S31555568210FFFFFFFFFFFFFFFF0100000000000000B4\r\n"
-                                   "S3155556822001000000000000006666666666660240F6\r\n"
-                                   "S315555682300400000000000000010000000000000088\r\n"
-                                   "S30D55568240010000000000000084\r\n"
+    // clang-format off
+    const QString srecPacketizedData = "S00E00002F6465762F7374646F7574B1\r\n"
+                                   /* SREC header       data         checksum */
+                                   "S31555568180" "0100000000000000"
+                                                  "6666666666660240" "97\r\n"
+                                   "S31555568190" "FEFFFFFFFFFFFFFF"
+                                                  "0300000000000000" "34\r\n"
+                                   "S315555681A0" "0100000000000000"
+
+                                                  "0100000000000000" "1C\r\n"
+                                   "S315555681B0" "38F8C264AA601540"
+                                                  "FEFFFFFFFFFFFFFF" "62\r\n"
+                                   "S315555681C0" "0300000000000000"
+                                                  "0100000000000000" "FA\r\n"
+
+                                   "S315555681D0" "0000000000000000"
+                                                  "6666666666660240" "48\r\n"
+                                   "S315555681E0" "F8FFFFFFFFFFFFFF"
+                                                  "0300000000000000" "EA\r\n"
+                                   "S315555681F0" "0100000000000000"
+
+                                                  "0000000000000000" "CD\r\n"
+                                   "S31555568200" "6666666666660240"
+                                                  "FFFFFFFFFFFFFFFF" "1F\r\n"
+                                   "S31555568210" "FFFFFFFFFFFFFFFF"
+                                                  "0100000000000000" "B4\r\n"
+
+                                   "S31555568220" "0100000000000000"
+                                                  "6666666666660240" "F6\r\n"
+                                   "S31555568230" "0400000000000000"
+                                                  "0100000000000000" "88\r\n"
+                                   "S30D55568240" "0100000000000000" "84\r\n"
+
                                    "S70500000000FA\r\n";
+    // clang-format on
 
-    const QString extractedData = GdbConnector::splitAndExtractSrecData(packetizedData);
-    qDebug() << "extracted: " << extractedData;
-    qDebug() << "";
+    const QString extractedStringData = GdbConnector::splitAndExtractSrecData(srecPacketizedData);
 
-    const QString expectedData = "\x01\xbe\xbe\xbe\xbe\xbe\xbe\xbe" //
-                                 "\x66\x66\x66\x66\x66\x66\x02\x40"
-                                 "\xfe\xff\xff\xff\xff\xff\xff\xff"
-                                 "\x03\x00\x00\x00\x00\x00\x00\x00"
-                                 "\x01\xbe\xbe\xbe\xbe\xbe\xbe\xbe"
+    const QString expectedStringData = "0100000000000000" //
+                                       "6666666666660240"
+                                       "FEFFFFFFFFFFFFFF"
+                                       "0300000000000000"
+                                       "0100000000000000"
 
-                                 "\x01\xbe\xbe\xbe\xbe\xbe\xbe\xbe"
-                                 "\x38\xf8\xc2\x64\xaa\x60\x15\x40"
-                                 "\xfe\xff\xff\xff\xff\xff\xff\xff"
-                                 "\x03\x00\x00\x00\x00\x00\x00\x00"
-                                 "\x01\xbe\xbe\xbe\xbe\xbe\xbe\xbe"
+                                       "0100000000000000"
+                                       "38F8C264AA601540"
+                                       "FEFFFFFFFFFFFFFF"
+                                       "0300000000000000"
+                                       "0100000000000000"
 
-                                 "\x00\xbe\xbe\xbe\xbe\xbe\xbe\xbe"
-                                 "\x66\x66\x66\x66\x66\x66\x02\x40"
-                                 "\xf8\xff\xff\xff\xff\xff\xff\xff"
-                                 "\x03\x00\x00\x00\x00\x00\x00\x00"
-                                 "\x01\xbe\xbe\xbe\xbe\xbe\xbe\xbe"
+                                       "0000000000000000"
+                                       "6666666666660240"
+                                       "F8FFFFFFFFFFFFFF"
+                                       "0300000000000000"
+                                       "0100000000000000"
 
-                                 "\x00\xbe\xbe\xbe\xbe\xbe\xbe\xbe"
-                                 "\x66\x66\x66\x66\x66\x66\x02\x40"
-                                 "\xff\xff\xff\xff\xff\xff\xff\xff"
-                                 "\xff\xff\xff\xff\xff\xff\xff\xff"
-                                 "\x01\xbe\xbe\xbe\xbe\xbe\xbe\xbe"
+                                       "0000000000000000"
+                                       "6666666666660240"
+                                       "FFFFFFFFFFFFFFFF"
+                                       "FFFFFFFFFFFFFFFF"
+                                       "0100000000000000"
 
-                                 "\x01\xbe\xbe\xbe\xbe\xbe\xbe\xbe"
-                                 "\x66\x66\x66\x66\x66\x66\x02\x40"
-                                 "\x04\x00\x00\x00\x00\x00\x00\x00"
-                                 "\x01\x00\x00\x00\x00\x00\x00\x00"
-                                 "\x01\xbe\xbe\xbe\xbe\xbe\xbe\xbe";
+                                       "0100000000000000"
+                                       "6666666666660240"
+                                       "0400000000000000"
+                                       "0100000000000000"
+                                       "0100000000000000";
 
-    const int comparisonResult = expectedData.compare(extractedData);
+    const int comparisonResult = expectedStringData.compare(extractedStringData);
     if (comparisonResult != 0) {
-        qDebug() << "expected: " << expectedData;
-        qDebug() << "but was:  " << extractedData;
-
-        QCOMPARE(extractedData, expectedData);
+        QCOMPARE(extractedStringData, expectedStringData);
     }
+}
 
-    QFAIL("this should happen");
+void tst_gdbconnector::stringToByteArray() const
+{
+    const QString stringData = "0100000000000000" //
+                               "6666666666660240"
+                               "FEFFFFFFFFFFFFFF"
+                               "0300000000000000"
+                               "0100000000000000"
+
+                               "0100000000000000"
+                               "38F8C264AA601540"
+                               "FEFFFFFFFFFFFFFF"
+                               "0300000000000000"
+                               "0100000000000000"
+
+                               "0000000000000000"
+                               "6666666666660240"
+                               "F8FFFFFFFFFFFFFF"
+                               "0300000000000000"
+                               "0100000000000000"
+
+                               "0000000000000000"
+                               "6666666666660240"
+                               "FFFFFFFFFFFFFFFF"
+                               "FFFFFFFFFFFFFFFF"
+                               "0100000000000000"
+
+                               "0100000000000000"
+                               "6666666666660240"
+                               "0400000000000000"
+                               "0100000000000000"
+                               "0100000000000000";
+
+    const QByteArray convertedData = GdbConnector::stringToByteArray(stringData);
+
+    const QByteArray expectedData = QByteArrayLiteral("\x01\x00\x00\x00\x00\x00\x00\x00" //
+                                                      "\x66\x66\x66\x66\x66\x66\x02\x40"
+                                                      "\xFE\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
+                                                      "\x03\x00\x00\x00\x00\x00\x00\x00"
+                                                      "\x01\x00\x00\x00\x00\x00\x00\x00"
+
+                                                      "\x01\x00\x00\x00\x00\x00\x00\x00"
+                                                      "\x38\xF8\xC2\x64\xAA\x60\x15\x40"
+                                                      "\xFE\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
+                                                      "\x03\x00\x00\x00\x00\x00\x00\x00"
+                                                      "\x01\x00\x00\x00\x00\x00\x00\x00"
+
+                                                      "\x00\x00\x00\x00\x00\x00\x00\x00"
+                                                      "\x66\x66\x66\x66\x66\x66\x02\x40"
+                                                      "\xF8\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
+                                                      "\x03\x00\x00\x00\x00\x00\x00\x00"
+                                                      "\x01\x00\x00\x00\x00\x00\x00\x00"
+
+                                                      "\x00\x00\x00\x00\x00\x00\x00\x00"
+                                                      "\x66\x66\x66\x66\x66\x66\x02\x40"
+                                                      "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
+                                                      "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
+                                                      "\x01\x00\x00\x00\x00\x00\x00\x00"
+
+                                                      "\x01\x00\x00\x00\x00\x00\x00\x00"
+                                                      "\x66\x66\x66\x66\x66\x66\x02\x40"
+                                                      "\x04\x00\x00\x00\x00\x00\x00\x00"
+                                                      "\x01\x00\x00\x00\x00\x00\x00\x00"
+                                                      "\x01\x00\x00\x00\x00\x00\x00\x00");
+
+    QCOMPARE(convertedData.size(), expectedData.size());
+
+    const auto dataSize = convertedData.size();
+    for (int i = 0; i < dataSize; i++) {
+        if (convertedData.at(i) != expectedData.at(i)) {
+            qDebug() << QString("Failed comparison (i = %1)").arg(i);
+        }
+        QCOMPARE(convertedData.at(i), expectedData.at(i));
+    }
 }
 
 void printQByteArrayInHex(const QByteArray &array)

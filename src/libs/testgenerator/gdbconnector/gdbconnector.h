@@ -59,9 +59,17 @@ public:
      */
     static auto splitAndExtractSrecData(const QString &packetizedData, const QString &delimeter = "\r\n") -> QString;
 
+    /**
+     * @brief Convert QString to QByteArray
+     *
+     * @param str  string to be converted to byte array
+     *
+     * @return QByteArray
+     */
+    static auto stringToByteArray(const QString &str) -> QByteArray;
+
 private:
     static auto getOneBeforeLastLine(const QString &src, const QString &newlineCharacter = "\n") -> QString;
-    static auto stringToByteArray(const QString &str) -> QByteArray;
     static auto dumpProcessErrorsToFile(QProcess &process, const QString &filename) -> void;
 };
 
