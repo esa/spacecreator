@@ -29,22 +29,32 @@
         </ProvidedInterfaceSet>
         <Implementation>
           <VariableSet>
-            <Variable name="rawValue" type="RealType" />
+            <Variable name="iterator" type="RealType" />
             <Variable name="calibratedValue" type="RealType" />
           </VariableSet>
           <ActivitySet>
             <Activity name="CalibrateActivity">
               <Body>
-                <Assignment outputVariableRef="rawValue">
-                  <Value value="1.0"/>
-                </Assignment>
-                <Calibration inputVariableRef="rawValue" outputVariableRef="calibratedValue">
-                    <SplineCalibrator>
-                    <SplinePoint raw="1" calibrated="20" />
-                    <SplinePoint raw="5" calibrated="200" />
-                    <SplinePoint raw="20" calibrated="4000" />
-                    </SplineCalibrator>
-                </Calibration>
+                <Iteration iteratorVariableRef="iterator">
+                  <StartAt>
+                    <Value value="1.0" />
+                  </StartAt>
+                  <Step>
+                    <Value value="1.0" />
+                  </Step>
+                  <EndAt>
+                    <Value value="20.0" />
+                  </EndAt>
+                  <Do>
+                    <Calibration inputVariableRef="iterator" outputVariableRef="calibratedValue">
+                      <SplineCalibrator>
+                        <SplinePoint raw="1" calibrated="20" />
+                        <SplinePoint raw="5" calibrated="200" />
+                        <SplinePoint raw="20" calibrated="4000" />
+                      </SplineCalibrator>
+                    </Calibration>
+                  </Do>
+                </Iteration>
               </Body>
             </Activity>
           </ActivitySet>

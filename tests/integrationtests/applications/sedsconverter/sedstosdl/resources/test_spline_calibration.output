@@ -1,5 +1,5 @@
 process Calibration;
-    dcl Rawvalue RealType;
+    dcl Iterator RealType;
     dcl Calibratedvalue RealType;
     dcl RawSplinePoints1 SplinePointsArray;
     dcl CalibratedSplinePoints1 SplinePointsArray;
@@ -50,8 +50,18 @@ process Calibration;
 
     procedure CalibrateActivity;
         START;
-            task Rawvalue := 1.0;
-            task Calibratedvalue := call LinearCalibration(Rawvalue);
+            task Iterator := 1.0;
+
+            loop_start_1:
+            decision Iterator <= 20.0;
+                (False):
+                    join loop_end_2;
+                (True):
+                    task Calibratedvalue := call LinearCalibration(Iterator);
+                    task Iterator := Iterator + 1.0;
+                    join loop_start_1;
+            enddecision;
+            loop_end_2:
         return ;
     endprocedure;
 
