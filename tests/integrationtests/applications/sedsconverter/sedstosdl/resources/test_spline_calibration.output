@@ -11,6 +11,9 @@ process Calibration;
             in rawPoints SplinePointsArray;
         returns SplinePointsArrayIndex;
         START;
+            task for rawPoint in rawPoints:
+                call writeln(rawPoint);
+            endfor;
             task result := -1;
         return result;
     endprocedure;

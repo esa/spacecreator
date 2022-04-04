@@ -219,6 +219,13 @@ auto SplineCalibratorTranslator::buildFindIntervalProcedure(StatementTranslatorV
     // Create procedure parameters
     auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", "SplinePointValue", "in");
 
+    // Iterate over raw points
+    const auto iterateAction = QString(R"(for rawPoint in rawPoints:
+    call writeln(rawPoint);
+endfor)");
+    auto iterateTask = std::make_unique<::sdl::Task>("", iterateAction);
+    transition->addAction(std::move(iterateTask));
+
     // Assign to result
     const auto assignToResultAction = QString("result := -1");
     auto assignToResultTask = std::make_unique<::sdl::Task>("", assignToResultAction);
