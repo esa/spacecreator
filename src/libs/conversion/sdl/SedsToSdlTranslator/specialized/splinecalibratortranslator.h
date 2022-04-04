@@ -35,7 +35,8 @@ public:
     auto translate(const seds::model::SplineCalibrator &splineCalibrator) -> void;
 
 private:
-    auto buildSplineCalibratorVariables(const seds::model::SplineCalibrator &splineCalibrator) -> void;
+    auto buildSplineCalibratorVariables(const seds::model::SplineCalibrator &splineCalibrator,
+            const QString &rawPointsVariableName, const QString &calibratedPointsVariableName) -> void;
     auto buildSplinePointsVariable(
             const QString &variableName, const std::vector<double> &values, ::sdl::Transition *startTransition) -> void;
 
