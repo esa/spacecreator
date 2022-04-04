@@ -5,23 +5,23 @@ process Calibration;
     dcl CalibratedSplinePoints1 SplinePointsArray;
 
     procedure FindInterval;
+        dcl result SplinePointArrayIndex;
         fpar
-            in value SplinePointValue,
-            in/out intervalStart SplinePointValue,
-            in/out intervalEnd SplinePointValue;
+            in value SplinePointValue;
+        returns SplinePointArrayIndex;
         START;
-        return ;
+            task result := -1;
+        return result;
     endprocedure;
 
     procedure LinearCalibration;
-        dcl intervalStart SplinePointValue;
-        dcl intervalEnd SplinePointValue;
+        dcl intervalIndex SplinePointArrayIndex;
         dcl result SplinePointValue;
         fpar
             in value SplinePointValue;
         returns SplinePointValue;
         START;
-            call FindInterval(value, intervalStart, intervalEnd);
+            task intervalIndex := call FindInterval(value);
             task result := value;
         return result;
     endprocedure;

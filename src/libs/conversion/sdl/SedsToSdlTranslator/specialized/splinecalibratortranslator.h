@@ -42,8 +42,7 @@ private:
     static auto buildSplineCalibratorBoilerplate(StatementTranslatorVisitor::StatementContext &context) -> void;
     static auto createAsn1Types(StatementTranslatorVisitor::StatementContext &context) -> void;
     static auto buildLinearCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
-    static auto buildFindLinearIntervalProcedure(StatementTranslatorVisitor::StatementContext &context)
-            -> ::sdl::Procedure *;
+    static auto buildFindIntervalProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
     static auto buildSquareCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
     static auto buildCubicCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
 
@@ -51,6 +50,8 @@ private:
     StatementTranslatorVisitor::StatementContext &m_context;
     const seds::model::Calibration &m_calibration;
     ::sdl::Transition *m_sdlTransition;
+
+    static constexpr int m_maxSplinePointsArraySize = 20;
 };
 
 } // namespace conversion::sdl::translator

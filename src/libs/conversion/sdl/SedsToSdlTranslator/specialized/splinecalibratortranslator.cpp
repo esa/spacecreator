@@ -25,6 +25,7 @@
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/typeassignment.h>
+#include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/real.h>
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/values.h>
@@ -143,6 +144,8 @@ auto SplineCalibratorTranslator::buildSplineCalibratorBoilerplate(StatementTrans
 
     createAsn1Types(context);
 
+    buildFindIntervalProcedure(context);
+
     buildLinearCalibrationProcedure(context);
     buildSquareCalibrationProcedure(context);
     buildCubicCalibrationProcedure(context);
@@ -159,7 +162,6 @@ auto SplineCalibratorTranslator::createAsn1Types(StatementTranslatorVisitor::Sta
     // Create type for spline points values
     auto splinePointType = std::make_unique<Asn1Acn::Types::Real>("SplinePointValue");
     splinePointType->setEncoding(Asn1Acn::Types::RealEncoding::IEEE754_1985_64);
-    splinePointType->setEndianness(Asn1Acn::Types::Endianness::little);
     auto splinePointTypeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::RealValue>::create(
             { std::numeric_limits<double>::min(), std::numeric_limits<double>::max() });
     splinePointType->constraints().append(std::move(splinePointTypeConstraint));
@@ -168,12 +170,21 @@ auto SplineCalibratorTranslator::createAsn1Types(StatementTranslatorVisitor::Sta
     auto splinePointsArrayType = std::make_unique<Asn1Acn::Types::SequenceOf>("SplinePointsArray");
     splinePointsArrayType->setItemsType(splinePointType->clone());
     auto splinePointsArrayTypeInnerConstraint =
-            Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create({ 0, 20 });
+            Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create({ 0, m_maxSplinePointsArraySize });
     auto splinePointsArrayTypeConstraint =
             std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::IntegerValue>>();
     splinePointsArrayTypeConstraint->setInnerConstraints(std::move(splinePointsArrayTypeInnerConstraint));
     splinePointsArrayType->constraints().append(std::move(splinePointsArrayTypeConstraint));
 
+    // Create type for index of array of spline points values
+    auto splinePointsArrayIndexType = std::make_unique<Asn1Acn::Types::Integer>("SplinePointArrayIndex");
+    splinePointsArrayIndexType->setSize(8);
+    splinePointsArrayIndexType->setEncoding(Asn1Acn::Types::IntegerEncoding::twos_complement);
+    auto splinePointsArrayIndexTypeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
+            { -1, m_maxSplinePointsArraySize - 1 });
+    splinePointsArrayIndexType->constraints().append(std::move(splinePointsArrayIndexTypeConstraint));
+
+    // Add types to ASN.1 definitions
     auto splinePointTypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
             "SplinePointValue", "SplinePointValue", Asn1Acn::SourceLocation(), std::move(splinePointType));
     asn1Definitions->addType(std::move(splinePointTypeAssignment));
@@ -181,34 +192,46 @@ auto SplineCalibratorTranslator::createAsn1Types(StatementTranslatorVisitor::Sta
     auto splinePointsArrayTypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
             "SplinePointsArray", "SplinePointsArray", Asn1Acn::SourceLocation(), std::move(splinePointsArrayType));
     asn1Definitions->addType(std::move(splinePointsArrayTypeAssignment));
+
+    auto splinePointsArrayIndexTypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>("SplinePointsArrayIndex",
+            "SplinePointsArrayIndex", Asn1Acn::SourceLocation(), std::move(splinePointsArrayIndexType));
+    asn1Definitions->addType(std::move(splinePointsArrayIndexTypeAssignment));
 }
 
-auto SplineCalibratorTranslator::buildFindLinearIntervalProcedure(StatementTranslatorVisitor::StatementContext &context)
-        -> ::sdl::Procedure *
+auto SplineCalibratorTranslator::buildFindIntervalProcedure(StatementTranslatorVisitor::StatementContext &context)
+        -> void
 {
     // Create procedure
     const QString procedureName("FindInterval");
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
-    auto procedurePtr = procedure.get();
 
     // Create transition
     auto transition = std::make_unique<::sdl::Transition>();
 
-    // Create parameters
+    // Create procedure local variables
+    auto resultVar = std::make_unique<::sdl::VariableDeclaration>("result", "SplinePointArrayIndex");
+
+    // Assign to result
+    const auto assignToResultAction = QString("result := -1");
+    auto assignToResultTask = std::make_unique<::sdl::Task>("", assignToResultAction);
+    transition->addAction(std::move(assignToResultTask));
+
+    // Create procedure parameters
     auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", "SplinePointValue", "in");
+
+    // Set procedure return variable
+    auto resultVarRef = std::make_unique<::sdl::VariableReference>(resultVar.get());
+    procedure->setReturnVariableReference(std::move(resultVarRef));
+
+    // Add variables and parameters to procedure
+    procedure->addVariable(std::move(resultVar));
     procedure->addParameter(std::move(valueParameter));
-    auto startParameter = std::make_unique<::sdl::ProcedureParameter>("intervalStart", "SplinePointValue", "in/out");
-    procedure->addParameter(std::move(startParameter));
-    auto endParameter = std::make_unique<::sdl::ProcedureParameter>("intervalEnd", "SplinePointValue", "in/out");
-    procedure->addParameter(std::move(endParameter));
 
     // Add transition to procedure
     procedure->setTransition(std::move(transition));
 
     // Add procedure to process
     context.sdlProcess()->addProcedure(std::move(procedure));
-
-    return procedurePtr;
 }
 
 auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context)
@@ -219,8 +242,7 @@ auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(StatementTransl
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
 
     // Create procedure local variables
-    auto intervalStartVar = std::make_unique<::sdl::VariableDeclaration>("intervalStart", "SplinePointValue");
-    auto intervalEndVar = std::make_unique<::sdl::VariableDeclaration>("intervalEnd", "SplinePointValue");
+    auto intervalIndexVar = std::make_unique<::sdl::VariableDeclaration>("intervalIndex", "SplinePointArrayIndex");
     auto resultVar = std::make_unique<::sdl::VariableDeclaration>("result", "SplinePointValue");
 
     // Create procedure parameters
@@ -229,34 +251,22 @@ auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(StatementTransl
     // Create transition
     auto transition = std::make_unique<::sdl::Transition>();
 
-    // Create helper procedures
-    auto findIntervalProc = buildFindLinearIntervalProcedure(context);
-
     // Add call to FindInterval
-    auto findIntervalCall = std::make_unique<::sdl::ProcedureCall>("");
-    findIntervalCall->setProcedure(findIntervalProc);
-
-    auto valueParamRef = std::make_unique<::sdl::VariableReference>(valueParameter.get());
-    findIntervalCall->addArgument(std::move(valueParamRef));
-    auto intervalStartVarRef = std::make_unique<::sdl::VariableReference>(intervalStartVar.get());
-    findIntervalCall->addArgument(std::move(intervalStartVarRef));
-    auto intervalEndVarRef = std::make_unique<::sdl::VariableReference>(intervalEndVar.get());
-    findIntervalCall->addArgument(std::move(intervalEndVarRef));
-
-    transition->addAction(std::move(findIntervalCall));
+    const auto callFindIntervalAction = QString("intervalIndex := call FindInterval(value)");
+    auto callFindIntervalTask = std::make_unique<::sdl::Task>("", callFindIntervalAction);
+    transition->addAction(std::move(callFindIntervalTask));
 
     // Assign to result
     const auto assignToResultAction = QString("result := value");
     auto assignToResultTask = std::make_unique<::sdl::Task>("", assignToResultAction);
     transition->addAction(std::move(assignToResultTask));
 
-    // Set return variable to procedure
+    // Set procedure return variable
     auto resultVarRef = std::make_unique<::sdl::VariableReference>(resultVar.get());
     procedure->setReturnVariableReference(std::move(resultVarRef));
 
     // Add variables and parameters to procedure
-    procedure->addVariable(std::move(intervalStartVar));
-    procedure->addVariable(std::move(intervalEndVar));
+    procedure->addVariable(std::move(intervalIndexVar));
     procedure->addVariable(std::move(resultVar));
     procedure->addParameter(std::move(valueParameter));
 
