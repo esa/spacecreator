@@ -52,8 +52,8 @@ public:
      * @brief Split and extract data from serialized SREC packets
      *        implemented based on http://www.amelek.gda.pl/avr/uisp/srecord.htm
      *
-     * @param  packetizedData
-     * @param  delimeter
+     * @param packetizedData string containing SREC packets
+     * @param delimeter      character delimiting packets
      *
      * @return string of data stripped of headers and checksums
      */

@@ -21,7 +21,7 @@
 
 #include "process.h"
 
-#include <QDebug>
+#include <QMap>
 #include <filesystem>
 #include <fstream>
 #include <memory>
@@ -73,31 +73,29 @@ QString GdbConnector::splitAndExtractSrecData(const QString &packetizedData, con
         { "5", 2 },
     }; // S4 and S6 are reserved; S7, S8, S9 have no data fields
 
-    const int recordStartByteLength = 1; // 1 character ('S')
-    // const int recordTypeByteLength = 1;
-    const int remainingCharactersLength = 1;
+    const QChar startCharacter = 'S';
+    const int recordStartByteLength = 1; // first byte contains start character and record type
+    const int byteCount = 1;
     const int checksumLength = 1;
-
-    const int checksumCharacters = 2 * checksumLength;
 
     QString rawData;
     rawData.reserve(packetizedData.size());
-    const QStringList datalines = packetizedData.split(delimeter); // TODO: change name
-    for (auto dataLine : datalines) {
-        if (dataLine.isEmpty()) {
+    const QStringList dataRows = packetizedData.split(delimeter);
+    for (auto dataRow : dataRows) {
+        if (dataRow.isEmpty() || dataRow.at(0) != startCharacter) {
             continue;
         }
 
-        const int addressFieldLength = startBytesToLength.value(dataLine.at(1));
+        const int addressFieldLength = startBytesToLength.value(dataRow.at(1));
         if (addressFieldLength == 0) {
             continue;
         }
 
-        const int headerCharacters = 2 * (recordStartByteLength + remainingCharactersLength + addressFieldLength);
+        const int headerCharacters = 2 * (recordStartByteLength + byteCount + addressFieldLength);
 
-        dataLine = dataLine.left(dataLine.size() - checksumCharacters);
-        dataLine = dataLine.right(dataLine.size() - headerCharacters);
-        rawData.append(dataLine);
+        dataRow = dataRow.left(dataRow.size() - 2 * checksumLength); // remove checksum byte
+        dataRow = dataRow.right(dataRow.size() - headerCharacters); // remove header bytes
+        rawData.append(dataRow);
     }
 
     return rawData;

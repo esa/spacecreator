@@ -20,12 +20,8 @@
 #include <QDebug>
 #include <QObject>
 #include <QTest>
-#include <QVariant>
 #include <QtTest/qtestcase.h>
-#include <ivtools.h>
-#include <modelloader.h>
 #include <qobjectdefs.h>
-#include <testgenerator/datareconstructor/datareconstructor.h>
 #include <testgenerator/gdbconnector/gdbconnector.h>
 
 using testgenerator::GdbConnector;
