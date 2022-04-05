@@ -29,6 +29,7 @@
 #include <sdl/SdlModel/procedure.h>
 #include <sdl/SdlModel/procedurecall.h>
 #include <sdl/SdlModel/process.h>
+#include <sdl/SdlModel/return.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/signal.h>
 #include <sdl/SdlModel/state.h>
@@ -136,6 +137,13 @@ public:
      * @param   join   join to be visited
      */
     virtual auto visit(const Join &join) -> void = 0;
+
+    /**
+     * @brief   Return visitor
+     *
+     * @param   ret   return to be visited
+     */
+    virtual auto visit(const Return &ret) -> void = 0;
 
     /**
      * @brief   Answer visitor

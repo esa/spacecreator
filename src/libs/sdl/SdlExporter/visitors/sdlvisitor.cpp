@@ -378,6 +378,15 @@ void SdlVisitor::visit(const Join &join)
     m_writer.endLine(";");
 }
 
+void SdlVisitor::visit(const Return &ret)
+{
+    m_writer.beginLine("return ");
+    if (!ret.content().isEmpty()) {
+        m_writer.write(ret.content());
+    }
+    m_writer.endLine(";");
+}
+
 void SdlVisitor::visit(const Answer &answer)
 {
     if (answer.transition() == nullptr) {

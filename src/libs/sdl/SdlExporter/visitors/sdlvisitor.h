@@ -30,6 +30,7 @@
 #include <sdl/SdlModel/procedure.h>
 #include <sdl/SdlModel/procedurecall.h>
 #include <sdl/SdlModel/process.h>
+#include <sdl/SdlModel/return.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/signal.h>
 #include <sdl/SdlModel/state.h>
@@ -297,7 +298,14 @@ public:
      *
      * @param   join   join to be serialized
      */
-    virtual auto visit(const Join &join) -> void override;
+    auto visit(const Join &join) -> void override;
+
+    /**
+     * @brief   Return visitor
+     *
+     * @param   ret   return to be serialized
+     */
+    auto visit(const Return &ret) -> void override;
 
     /**
      * @brief   Answer visitor
