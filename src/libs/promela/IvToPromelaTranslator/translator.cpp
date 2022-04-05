@@ -373,40 +373,7 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(
         channelNames.append(constructChannelName(functionName, interfaceName));
     }
 
-    if (channelNames.empty()) {
-        auto message = QString("No sporadic nor cyclic interfaces in function %1").arg(functionName);
-        throw TranslationException(message);
-    }
-
-    Sequence sequence(Sequence::Type::ATOMIC);
-
-    std::unique_ptr<Expression> expr;
-    {
-        QList<VariableRef> arguments;
-        arguments.append(VariableRef(channelNames.last()));
-
-        expr = std::make_unique<Expression>(InlineCall("empty", arguments));
-
-        channelNames.pop_back();
-    }
-
-    while (!channelNames.empty()) {
-        QList<VariableRef> arguments;
-        arguments.append(VariableRef(channelNames.last()));
-
-        std::unique_ptr<Expression> left = std::make_unique<Expression>(InlineCall("empty", arguments));
-
-        expr = std::make_unique<Expression>(
-                BinaryExpression(BinaryExpression::Operator::AND, std::move(left), std::move(expr)));
-
-        channelNames.pop_back();
-    }
-
-    sequence.appendElement(std::make_unique<ProctypeElement>(*expr));
-
-    const QString checkQueueInlineName = QString("%1_check_queue").arg(Escaper::escapePromelaIV(functionName));
-    promelaModel->addInlineDef(
-            std::make_unique<InlineDef>(checkQueueInlineName, QList<QString>(), std::move(sequence)));
+    createCheckQueueInline(promelaModel, functionName, channelNames);
 }
 
 void IvToPromelaTranslator::createPromelaObjectsForEnvironment(
@@ -463,6 +430,45 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(
 
         promelaModel->addProctype(generateEnvironmentProctype(functionName, interfaceName, parameterType, sendInline));
     }
+}
+
+void IvToPromelaTranslator::createCheckQueueInline(
+        PromelaModel *promelaModel, const QString &functionName, QList<QString> &channelNames) const
+{
+    if (channelNames.empty()) {
+        auto message = QString("No sporadic nor cyclic interfaces in function %1").arg(functionName);
+        throw TranslationException(message);
+    }
+
+    Sequence sequence(Sequence::Type::ATOMIC);
+
+    std::unique_ptr<Expression> expr;
+    {
+        QList<VariableRef> arguments;
+        arguments.append(VariableRef(channelNames.last()));
+
+        expr = std::make_unique<Expression>(InlineCall("empty", arguments));
+
+        channelNames.pop_back();
+    }
+
+    while (!channelNames.empty()) {
+        QList<VariableRef> arguments;
+        arguments.append(VariableRef(channelNames.last()));
+
+        std::unique_ptr<Expression> left = std::make_unique<Expression>(InlineCall("empty", arguments));
+
+        expr = std::make_unique<Expression>(
+                BinaryExpression(BinaryExpression::Operator::AND, std::move(left), std::move(expr)));
+
+        channelNames.pop_back();
+    }
+
+    sequence.appendElement(std::make_unique<ProctypeElement>(*expr));
+
+    const QString checkQueueInlineName = QString("%1_check_queue").arg(Escaper::escapePromelaIV(functionName));
+    promelaModel->addInlineDef(
+            std::make_unique<InlineDef>(checkQueueInlineName, QList<QString>(), std::move(sequence)));
 }
 
 QString IvToPromelaTranslator::constructChannelName(const QString &functionName, const QString &interfaceName) const

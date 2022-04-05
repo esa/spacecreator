@@ -64,7 +64,7 @@ public:
     /**
      * @brief Handle Inline Call
      *
-     * @param expression inlineCall InlineCall to export
+     * @param inlineCall InlineCall to export
      */
     void operator()(const ::promela::model::InlineCall &inlineCall);
 
