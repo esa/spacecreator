@@ -15,8 +15,9 @@ process Calibration;
             find_interval_start:
             decision result < length(rawPoints);
                 (True):
-                    decision rawPoints(result) > value;
+                    decision rawPoints(result) >= value;
                         (True):
+                            return result;
                         (False):
                             task result := result + 1;
                             join find_interval_start;

@@ -32,6 +32,7 @@
 #include <conversion/asn1/SedsToAsn1Translator/specialized/rangetranslatorvisitor.h>
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <iostream>
+#include <sdl/SdlModel/return.h>
 #include <seds/SedsModel/types/ranges/floatprecisionrange.h>
 
 using conversion::asn1::translator::RangeTranslatorVisitor;
@@ -247,6 +248,8 @@ auto SplineCalibratorTranslator::buildFindIntervalProcedure(StatementTranslatorV
 
     // Return current index
     auto comparisonDecisionReturnTransition = std::make_unique<::sdl::Transition>();
+    auto comparisonDecisionReturnReturn = std::make_unique<::sdl::Return>("result");
+    comparisonDecisionReturnTransition->addAction(std::move(comparisonDecisionReturnReturn));
 
     auto comparisonDecisionTrue = std::make_unique<::sdl::Answer>();
     comparisonDecisionTrue->setLiteral(::sdl::VariableLiteral("True"));
