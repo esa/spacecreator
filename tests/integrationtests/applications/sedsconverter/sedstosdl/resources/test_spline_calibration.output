@@ -32,6 +32,12 @@ process Calibration;
 
     procedure LinearCalibration;
         dcl intervalIndex SplinePointsArrayIndex;
+        dcl x0 SplinePointValue;
+        dcl x1 SplinePointValue;
+        dcl y0 SplinePointValue;
+        dcl y1 SplinePointValue;
+        dcl l0 SplinePointValue;
+        dcl l1 SplinePointValue;
         dcl result SplinePointValue;
         fpar
             in value SplinePointValue,
@@ -40,7 +46,13 @@ process Calibration;
         returns SplinePointValue;
         START;
             task intervalIndex := call FindInterval(value, rawPoints);
-            task result := value;
+            task x0 := rawPoints(intervalIndex-1);
+            task x1 := rawPoints(intervalIndex);
+            task y0 := calibratedPoints(intervalIndex-1);
+            task y1 := calibratedPoints(intervalIndex);
+            task l0 := (value - x1) / (x0 - x1);
+            task l1 := (value - x0) / (x1 - x0);
+            task result := l0 * y0 + l1 * y1;
         return result;
     endprocedure;
 

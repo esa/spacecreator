@@ -324,6 +324,12 @@ auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(StatementTransl
 
     // Create procedure local variables
     auto intervalIndexVar = std::make_unique<::sdl::VariableDeclaration>("intervalIndex", "SplinePointsArrayIndex");
+    auto x0Var = std::make_unique<::sdl::VariableDeclaration>("x0", "SplinePointValue");
+    auto x1Var = std::make_unique<::sdl::VariableDeclaration>("x1", "SplinePointValue");
+    auto y0Var = std::make_unique<::sdl::VariableDeclaration>("y0", "SplinePointValue");
+    auto y1Var = std::make_unique<::sdl::VariableDeclaration>("y1", "SplinePointValue");
+    auto l0Var = std::make_unique<::sdl::VariableDeclaration>("l0", "SplinePointValue");
+    auto l1Var = std::make_unique<::sdl::VariableDeclaration>("l1", "SplinePointValue");
     auto resultVar = std::make_unique<::sdl::VariableDeclaration>("result", "SplinePointValue");
 
     // Create procedure parameters
@@ -340,10 +346,40 @@ auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(StatementTransl
     auto callFindIntervalTask = std::make_unique<::sdl::Task>("", callFindIntervalAction);
     transition->addAction(std::move(callFindIntervalTask));
 
-    // Assign to result
-    const auto assignToResultAction = QString("result := value");
-    auto assignToResultTask = std::make_unique<::sdl::Task>("", assignToResultAction);
-    transition->addAction(std::move(assignToResultTask));
+    // Get x0
+    const auto getX0Action = QString("x0 := rawPoints(intervalIndex-1)");
+    auto getX0Task = std::make_unique<::sdl::Task>("", getX0Action);
+    transition->addAction(std::move(getX0Task));
+
+    // Get x1
+    const auto getX1Action = QString("x1 := rawPoints(intervalIndex)");
+    auto getX1Task = std::make_unique<::sdl::Task>("", getX1Action);
+    transition->addAction(std::move(getX1Task));
+
+    // Get y0
+    const auto getY0Action = QString("y0 := calibratedPoints(intervalIndex-1)");
+    auto getY0Task = std::make_unique<::sdl::Task>("", getY0Action);
+    transition->addAction(std::move(getY0Task));
+
+    // Get y1
+    const auto getY1Action = QString("y1 := calibratedPoints(intervalIndex)");
+    auto getY1Task = std::make_unique<::sdl::Task>("", getY1Action);
+    transition->addAction(std::move(getY1Task));
+
+    // Calculate L0
+    const auto calculateL0Action = QString("l0 := (value - x1) / (x0 - x1)");
+    auto calculateL0Task = std::make_unique<::sdl::Task>("", calculateL0Action);
+    transition->addAction(std::move(calculateL0Task));
+
+    // Calculate L1
+    const auto calculateL1Action = QString("l1 := (value - x0) / (x1 - x0)");
+    auto calculateL1Task = std::make_unique<::sdl::Task>("", calculateL1Action);
+    transition->addAction(std::move(calculateL1Task));
+
+    // Calculate result
+    const auto calculateResultAction = QString("result := l0 * y0 + l1 * y1");
+    auto calculateResultTask = std::make_unique<::sdl::Task>("", calculateResultAction);
+    transition->addAction(std::move(calculateResultTask));
 
     // Set procedure return variable
     auto resultVarRef = std::make_unique<::sdl::VariableReference>(resultVar.get());
@@ -351,6 +387,12 @@ auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(StatementTransl
 
     // Add variables to procedure
     procedure->addVariable(std::move(intervalIndexVar));
+    procedure->addVariable(std::move(x0Var));
+    procedure->addVariable(std::move(x1Var));
+    procedure->addVariable(std::move(y0Var));
+    procedure->addVariable(std::move(y1Var));
+    procedure->addVariable(std::move(l0Var));
+    procedure->addVariable(std::move(l1Var));
     procedure->addVariable(std::move(resultVar));
 
     // Add paramters to procedure
