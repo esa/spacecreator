@@ -24,11 +24,14 @@
 #include "integergenerator.h"
 #include "integersubset.h"
 
+#include <algorithm>
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/integer.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
+#include <list>
 #include <optional>
+#include <promela/PromelaModel/constant.h>
 
 using Asn1Acn::Types::BitString;
 using Asn1Acn::Types::Boolean;
@@ -58,6 +61,7 @@ using promela::model::UtypeRef;
 using promela::model::VariableRef;
 
 namespace promela::translator {
+
 Asn1TypeValueGeneratorVisitor::Asn1TypeValueGeneratorVisitor(PromelaModel &promelaModel, QString name)
     : m_promelaModel(promelaModel)
     , m_name(std::move(name))
@@ -67,6 +71,24 @@ Asn1TypeValueGeneratorVisitor::Asn1TypeValueGeneratorVisitor(PromelaModel &prome
 void Asn1TypeValueGeneratorVisitor::visit(const Boolean &type)
 {
     Q_UNUSED(type);
+
+    Conditional conditional;
+    const std::list<bool> possibleValues = { true, false };
+
+    std::for_each(possibleValues.begin(), possibleValues.end(), [&conditional](const bool &value) {
+        auto nestedSequence = std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
+
+        nestedSequence->appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("true"))));
+        nestedSequence->appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("value"), Expression(Constant(value)))));
+
+        conditional.appendAlternative(std::move(nestedSequence));
+    });
+
+    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(conditional)));
+
+    createValueGenerationInline(std::move(sequence));
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const Null &type)
@@ -193,4 +215,5 @@ void Asn1TypeValueGeneratorVisitor::createValueGenerationInline(::promela::model
 
     m_promelaModel.addInlineDef(std::move(inlineDef));
 }
-}
+
+} // namespace promela::translator

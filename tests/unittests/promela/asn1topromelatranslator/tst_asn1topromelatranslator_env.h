@@ -34,10 +34,11 @@ private Q_SLOTS:
     void initTestCase();
     void cleanupTestCase();
 
-    void testInteger();
-    void testEnumerated();
+    void testBoolean() const;
+    void testInteger() const;
+    void testEnumerated() const;
 
 private:
-    std::unique_ptr<Definitions> createModel();
+    std::unique_ptr<Definitions> createModel() const;
 };
 }
