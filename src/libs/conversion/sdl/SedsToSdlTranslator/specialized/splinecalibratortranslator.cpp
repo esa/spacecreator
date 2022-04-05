@@ -346,6 +346,28 @@ auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(StatementTransl
     auto callFindIntervalTask = std::make_unique<::sdl::Task>("", callFindIntervalAction);
     transition->addAction(std::move(callFindIntervalTask));
 
+    // Return calibrated value is value is a raw point
+    auto isValueEqualRawDecision = std::make_unique<::sdl::Decision>();
+    auto isValueEqualRawDecisionExpression = std::make_unique<::sdl::Expression>("value = rawPoints(intervalIndex)");
+    isValueEqualRawDecision->setExpression(std::move(isValueEqualRawDecisionExpression));
+
+    auto isValueEqualRawDecisionTrueTransition = std::make_unique<::sdl::Transition>();
+    auto isValueEqualRawDecisionTrueTransitionReturn =
+            std::make_unique<::sdl::Return>("calibratedPoints(intervalIndex)");
+    isValueEqualRawDecisionTrueTransition->addAction(std::move(isValueEqualRawDecisionTrueTransitionReturn));
+    auto isValueEqualRawDecisionTrue = std::make_unique<::sdl::Answer>();
+    isValueEqualRawDecisionTrue->setLiteral(::sdl::VariableLiteral("True"));
+    isValueEqualRawDecisionTrue->setTransition(std::move(isValueEqualRawDecisionTrueTransition));
+    isValueEqualRawDecision->addAnswer(std::move(isValueEqualRawDecisionTrue));
+
+    auto isValueEqualRawDecisionFalseTransition = std::make_unique<::sdl::Transition>();
+    auto isValueEqualRawDecisionFalse = std::make_unique<::sdl::Answer>();
+    isValueEqualRawDecisionFalse->setLiteral(::sdl::VariableLiteral("False"));
+    isValueEqualRawDecisionFalse->setTransition(std::move(isValueEqualRawDecisionFalseTransition));
+    isValueEqualRawDecision->addAnswer(std::move(isValueEqualRawDecisionFalse));
+
+    transition->addAction(std::move(isValueEqualRawDecision));
+
     // Get x0
     const auto getX0Action = QString("x0 := rawPoints(intervalIndex-1)");
     auto getX0Task = std::make_unique<::sdl::Task>("", getX0Action);

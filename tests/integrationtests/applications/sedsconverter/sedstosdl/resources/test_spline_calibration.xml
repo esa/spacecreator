@@ -48,9 +48,11 @@
                   <Do>
                     <Calibration inputVariableRef="iterator" outputVariableRef="calibratedValue">
                       <SplineCalibrator>
+                        <SplinePoint raw="-5" calibrated="-100" />
                         <SplinePoint raw="1" calibrated="20" />
-                        <SplinePoint raw="5" calibrated="200" />
+                        <SplinePoint raw="5" calibrated="100" />
                         <SplinePoint raw="20" calibrated="4000" />
+                        <SplinePoint raw="100" calibrated="20000" />
                       </SplineCalibrator>
                     </Calibration>
                   </Do>
