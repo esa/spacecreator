@@ -84,6 +84,12 @@ process Calibration;
         START;
             task intervalIndex := call FindInterval(value, rawPoints);
 
+            decision value = rawPoints(intervalIndex);
+                (True):
+                    return calibratedPoints(intervalIndex);
+                (False):
+            enddecision;
+
             task x0 := rawPoints(intervalIndex-1);
             task x1 := rawPoints(intervalIndex);
             task x2 := rawPoints(intervalIndex+1);
@@ -98,19 +104,59 @@ process Calibration;
     endprocedure;
 
     procedure CubicCalibration;
+        dcl intervalIndex SplinePointsArrayIndex;
+        dcl x_1 SplinePointValue;
+        dcl x0 SplinePointValue;
+        dcl x1 SplinePointValue;
+        dcl x2 SplinePointValue;
+        dcl y_1 SplinePointValue;
+        dcl y0 SplinePointValue;
+        dcl y1 SplinePointValue;
+        dcl y2 SplinePointValue;
+        dcl l_1 SplinePointValue;
+        dcl l0 SplinePointValue;
+        dcl l1 SplinePointValue;
+        dcl l2 SplinePointValue;
+        dcl result SplinePointValue;
+        fpar
+            in value SplinePointValue,
+            in rawPoints SplinePointsArray,
+            in calibratedPoints SplinePointsArray;
+        returns SplinePointValue;
         START;
-        return ;
+            task intervalIndex := call FindInterval(value, rawPoints);
+
+            decision value = rawPoints(intervalIndex);
+                (True):
+                    return calibratedPoints(intervalIndex);
+                (False):
+            enddecision;
+
+            task x_1 := rawPoints(intervalIndex-2);
+            task x0 := rawPoints(intervalIndex-1);
+            task x1 := rawPoints(intervalIndex);
+            task x2 := rawPoints(intervalIndex+1);
+            task y_1 := calibratedPoints(intervalIndex-2);
+            task y0 := calibratedPoints(intervalIndex-1);
+            task y1 := calibratedPoints(intervalIndex);
+            task y2 := calibratedPoints(intervalIndex+1);
+            task l_1 := ((value - x0) * (value - x1) * (value - x2)) / ((x_1 - x0) * (x_1 - x1) * (x_1 - x2));
+            task l0 := ((value - x_1) * (value - x1) * (value - x2)) / ((x0 - x_1) * (x0 - x1) * (x0 - x2));
+            task l1 := ((value - x_1) * (value - x0) * (value - x2)) / ((x1 - x_1) * (x1 - x0) * (x1 - x2));
+            task l2 := ((value - x_1) * (value - x0) * (value - x1)) / ((x2 - x_1) * (x2 - x0) * (x2 - x1));
+            task result := l_1 * y_1 + l0 * y0 + l1 * y1 + l2 * y2;
+        return result;
     endprocedure;
 
     procedure InitRawSplinePoints1;
         START;
-            task RawSplinePoints1 := { -5.000000, 1.000000, 5.000000, 20.000000, 100.000000 };
+            task RawSplinePoints1 := { -20.000000, -5.000000, 1.000000, 5.000000, 10.000000, 20.000000, 30.000000, 100.000000 };
         return ;
     endprocedure;
 
     procedure InitCalibratedSplinePoints1;
         START;
-            task CalibratedSplinePoints1 := { -100.000000, 20.000000, 100.000000, 4000.000000, 20000.000000 };
+            task CalibratedSplinePoints1 := { 40.000000, 10.000000, 2.000000, 10.000000, -20.000000, 40.000000, -60.000000, 200.000000 };
         return ;
     endprocedure;
 
