@@ -11,10 +11,21 @@ process Calibration;
             in rawPoints SplinePointsArray;
         returns SplinePointsArrayIndex;
         START;
-            task for rawPoint in rawPoints:
-                call writeln(rawPoint);
-            endfor;
-            task result := -1;
+            task result := 0;
+            find_interval_start:
+            decision result < length(rawPoints);
+                (True):
+                    decision rawPoints(result) > value;
+                        (True):
+                        (False):
+                            task result := result + 1;
+                            join find_interval_start;
+                    enddecision;
+                (False):
+                    join find_interval_end;
+            enddecision;
+            find_interval_end:
+            task result := result + 1;
         return result;
     endprocedure;
 

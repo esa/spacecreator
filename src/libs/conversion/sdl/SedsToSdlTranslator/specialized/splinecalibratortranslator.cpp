@@ -184,8 +184,8 @@ auto SplineCalibratorTranslator::createAsn1Types(StatementTranslatorVisitor::Sta
     auto splinePointsArrayIndexType = std::make_unique<Asn1Acn::Types::Integer>("SplinePointsArrayIndex");
     splinePointsArrayIndexType->setSize(8);
     splinePointsArrayIndexType->setEncoding(Asn1Acn::Types::IntegerEncoding::twos_complement);
-    auto splinePointsArrayIndexTypeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
-            { -1, m_maxSplinePointsArraySize - 1 });
+    auto splinePointsArrayIndexTypeConstraint =
+            Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create({ -1, m_maxSplinePointsArraySize });
     splinePointsArrayIndexType->constraints().append(std::move(splinePointsArrayIndexTypeConstraint));
 
     // Add types to ASN.1 definitions
@@ -213,11 +213,16 @@ auto SplineCalibratorTranslator::buildFindIntervalProcedure(StatementTranslatorV
     auto transition = std::make_unique<::sdl::Transition>();
 
     // Create procedure local variables
-    auto rawPointsParameter = std::make_unique<::sdl::ProcedureParameter>("rawPoints", "SplinePointsArray", "in");
     auto resultVar = std::make_unique<::sdl::VariableDeclaration>("result", "SplinePointsArrayIndex");
 
     // Create procedure parameters
     auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", "SplinePointValue", "in");
+    auto rawPointsParameter = std::make_unique<::sdl::ProcedureParameter>("rawPoints", "SplinePointsArray", "in");
+
+    // Initialize result variable
+    auto resultVarInitAction = QString("result := 0");
+    auto resultVarInitTask = std::make_unique<::sdl::Task>("", resultVarInitAction);
+    transition->addAction(std::move(resultVarInitTask));
 
     // Create iteration start
     auto iterationStartLabel = std::make_unique<::sdl::Label>("find_interval_start");
@@ -225,28 +230,57 @@ auto SplineCalibratorTranslator::buildFindIntervalProcedure(StatementTranslatorV
 
     // Iterate over raw points
     auto iterationDecision = std::make_unique<::sdl::Decision>();
-    auto iterationDecisionExpression = std::make_unique<::sdl::Expression>("currentIndex < length(rawPoints)");
+    auto iterationDecisionExpression = std::make_unique<::sdl::Expression>("result < length(rawPoints)");
     iterationDecision->setExpression(std::move(iterationDecisionExpression));
 
     // Exit iteration
-    auto iterationDecisionFalseTransition = std::make_unique<::sdl::Transition>();
-    auto iterationDecisionFalseJoin = std::make_unique<::sdl::Join>("find_interval_end");
-    iterationDecisionFalseTransition->addAction(std::move(iterationDecisionFalseJoin));
+    auto iterationDecisionExitTransition = std::make_unique<::sdl::Transition>();
+    auto iterationDecisionExitJoin = std::make_unique<::sdl::Join>("find_interval_end");
+    iterationDecisionExitTransition->addAction(std::move(iterationDecisionExitJoin));
 
-    // Do iteration
-    auto iterationDecisionTrueTransition = std::make_unique<::sdl::Transition>();
-    auto iterationDecisionTrueJoin = std::make_unique<::sdl::Join>("find_interval_start");
-    iterationDecisionTrueTransition->addAction(std::move(iterationDecisionTrueJoin));
+    // Compare value with current raw value
+    auto iterationDecisionDoTransition = std::make_unique<::sdl::Transition>();
+
+    auto comparisonDecision = std::make_unique<::sdl::Decision>();
+    auto comparisonDecisionExpression = std::make_unique<::sdl::Expression>("rawPoints(result) >= value");
+    comparisonDecision->setExpression(std::move(comparisonDecisionExpression));
+
+    // Return current index
+    auto comparisonDecisionReturnTransition = std::make_unique<::sdl::Transition>();
+
+    auto comparisonDecisionTrue = std::make_unique<::sdl::Answer>();
+    comparisonDecisionTrue->setLiteral(::sdl::VariableLiteral("True"));
+    comparisonDecisionTrue->setTransition(std::move(comparisonDecisionReturnTransition));
+    comparisonDecision->addAnswer(std::move(comparisonDecisionTrue));
+
+    // Continue iteration
+    auto comparisonDecisionContinueTransition = std::make_unique<::sdl::Transition>();
+
+    const auto iterationDecisionContinueIncrementAction = QString("result := result + 1");
+    auto iterationDecisionContinueIncrementTask =
+            std::make_unique<::sdl::Task>("", iterationDecisionContinueIncrementAction);
+    comparisonDecisionContinueTransition->addAction(std::move(iterationDecisionContinueIncrementTask));
+
+    auto iterationDecisionContinueJoin = std::make_unique<::sdl::Join>("find_interval_start");
+    comparisonDecisionContinueTransition->addAction(std::move(iterationDecisionContinueJoin));
+
+    auto comparisonDecisionFalse = std::make_unique<::sdl::Answer>();
+    comparisonDecisionFalse->setLiteral(::sdl::VariableLiteral("False"));
+    comparisonDecisionFalse->setTransition(std::move(comparisonDecisionContinueTransition));
+    comparisonDecision->addAnswer(std::move(comparisonDecisionFalse));
+
+    // Add comparison to do transition
+    iterationDecisionDoTransition->addAction(std::move(comparisonDecision));
 
     // Add iteration to transition
     auto iterationDecisionTrue = std::make_unique<::sdl::Answer>();
     iterationDecisionTrue->setLiteral(::sdl::VariableLiteral("True"));
-    iterationDecisionTrue->setTransition(std::move(iterationDecisionTrueTransition));
+    iterationDecisionTrue->setTransition(std::move(iterationDecisionDoTransition));
     iterationDecision->addAnswer(std::move(iterationDecisionTrue));
 
     auto iterationDecisionFalse = std::make_unique<::sdl::Answer>();
     iterationDecisionFalse->setLiteral(::sdl::VariableLiteral("False"));
-    iterationDecisionFalse->setTransition(std::move(iterationDecisionFalseTransition));
+    iterationDecisionFalse->setTransition(std::move(iterationDecisionExitTransition));
     iterationDecision->addAnswer(std::move(iterationDecisionFalse));
 
     transition->addAction(std::move(iterationDecision));
@@ -256,7 +290,7 @@ auto SplineCalibratorTranslator::buildFindIntervalProcedure(StatementTranslatorV
     transition->addAction(std::move(iterationEndLabel));
 
     // Assign to result
-    const auto assignToResultAction = QString("result := -1");
+    const auto assignToResultAction = QString("result := result + 1");
     auto assignToResultTask = std::make_unique<::sdl::Task>("", assignToResultAction);
     transition->addAction(std::move(assignToResultTask));
 
