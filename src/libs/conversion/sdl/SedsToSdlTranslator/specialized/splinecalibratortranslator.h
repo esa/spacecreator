@@ -47,6 +47,9 @@ private:
     static auto buildSquareCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
     static auto buildCubicCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
 
+    static auto addCallToFindInterval(::sdl::Transition *transition) -> void;
+    static auto addValueEqualRawCheck(::sdl::Transition *transition) -> void;
+
 private:
     StatementTranslatorVisitor::StatementContext &m_context;
     const seds::model::Calibration &m_calibration;

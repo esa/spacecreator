@@ -342,31 +342,10 @@ auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(StatementTransl
     auto transition = std::make_unique<::sdl::Transition>();
 
     // Add call to FindInterval
-    const auto callFindIntervalAction = QString("intervalIndex := call FindInterval(value, rawPoints)");
-    auto callFindIntervalTask = std::make_unique<::sdl::Task>("", callFindIntervalAction);
-    transition->addAction(std::move(callFindIntervalTask));
+    addCallToFindInterval(transition.get());
 
     // Return calibrated value is value is a raw point
-    auto isValueEqualRawDecision = std::make_unique<::sdl::Decision>();
-    auto isValueEqualRawDecisionExpression = std::make_unique<::sdl::Expression>("value = rawPoints(intervalIndex)");
-    isValueEqualRawDecision->setExpression(std::move(isValueEqualRawDecisionExpression));
-
-    auto isValueEqualRawDecisionTrueTransition = std::make_unique<::sdl::Transition>();
-    auto isValueEqualRawDecisionTrueTransitionReturn =
-            std::make_unique<::sdl::Return>("calibratedPoints(intervalIndex)");
-    isValueEqualRawDecisionTrueTransition->addAction(std::move(isValueEqualRawDecisionTrueTransitionReturn));
-    auto isValueEqualRawDecisionTrue = std::make_unique<::sdl::Answer>();
-    isValueEqualRawDecisionTrue->setLiteral(::sdl::VariableLiteral("True"));
-    isValueEqualRawDecisionTrue->setTransition(std::move(isValueEqualRawDecisionTrueTransition));
-    isValueEqualRawDecision->addAnswer(std::move(isValueEqualRawDecisionTrue));
-
-    auto isValueEqualRawDecisionFalseTransition = std::make_unique<::sdl::Transition>();
-    auto isValueEqualRawDecisionFalse = std::make_unique<::sdl::Answer>();
-    isValueEqualRawDecisionFalse->setLiteral(::sdl::VariableLiteral("False"));
-    isValueEqualRawDecisionFalse->setTransition(std::move(isValueEqualRawDecisionFalseTransition));
-    isValueEqualRawDecision->addAnswer(std::move(isValueEqualRawDecisionFalse));
-
-    transition->addAction(std::move(isValueEqualRawDecision));
+    addValueEqualRawCheck(transition.get());
 
     // Get x0
     const auto getX0Action = QString("x0 := rawPoints(intervalIndex-1)");
@@ -436,8 +415,105 @@ auto SplineCalibratorTranslator::buildSquareCalibrationProcedure(StatementTransl
     const QString procedureName("SquareCalibration");
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
 
+    // Create procedure local variables
+    auto intervalIndexVar = std::make_unique<::sdl::VariableDeclaration>("intervalIndex", "SplinePointsArrayIndex");
+    auto x0Var = std::make_unique<::sdl::VariableDeclaration>("x0", "SplinePointValue");
+    auto x1Var = std::make_unique<::sdl::VariableDeclaration>("x1", "SplinePointValue");
+    auto x2Var = std::make_unique<::sdl::VariableDeclaration>("x2", "SplinePointValue");
+    auto y0Var = std::make_unique<::sdl::VariableDeclaration>("y0", "SplinePointValue");
+    auto y1Var = std::make_unique<::sdl::VariableDeclaration>("y1", "SplinePointValue");
+    auto y2Var = std::make_unique<::sdl::VariableDeclaration>("y2", "SplinePointValue");
+    auto l0Var = std::make_unique<::sdl::VariableDeclaration>("l0", "SplinePointValue");
+    auto l1Var = std::make_unique<::sdl::VariableDeclaration>("l1", "SplinePointValue");
+    auto l2Var = std::make_unique<::sdl::VariableDeclaration>("l2", "SplinePointValue");
+    auto resultVar = std::make_unique<::sdl::VariableDeclaration>("result", "SplinePointValue");
+
+    // Create procedure parameters
+    auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", "SplinePointValue", "in");
+    auto rawPointsParameter = std::make_unique<::sdl::ProcedureParameter>("rawPoints", "SplinePointsArray", "in");
+    auto calibratedPointsParameter =
+            std::make_unique<::sdl::ProcedureParameter>("calibratedPoints", "SplinePointsArray", "in");
+
     // Create transition
     auto transition = std::make_unique<::sdl::Transition>();
+
+    // Add call to FindInterval
+    addCallToFindInterval(transition.get());
+
+    // Return calibrated value is value is a raw point
+    /* addValueEqualRawCheck(transition.get()); */
+
+    // Get x0
+    const auto getX0Action = QString("x0 := rawPoints(intervalIndex-1)");
+    auto getX0Task = std::make_unique<::sdl::Task>("", getX0Action);
+    transition->addAction(std::move(getX0Task));
+
+    // Get x1
+    const auto getX1Action = QString("x1 := rawPoints(intervalIndex)");
+    auto getX1Task = std::make_unique<::sdl::Task>("", getX1Action);
+    transition->addAction(std::move(getX1Task));
+
+    // Get x2
+    const auto getX2Action = QString("x2 := rawPoints(intervalIndex+1)");
+    auto getX2Task = std::make_unique<::sdl::Task>("", getX2Action);
+    transition->addAction(std::move(getX2Task));
+
+    // Get y0
+    const auto getY0Action = QString("y0 := calibratedPoints(intervalIndex-1)");
+    auto getY0Task = std::make_unique<::sdl::Task>("", getY0Action);
+    transition->addAction(std::move(getY0Task));
+
+    // Get y1
+    const auto getY1Action = QString("y1 := calibratedPoints(intervalIndex)");
+    auto getY1Task = std::make_unique<::sdl::Task>("", getY1Action);
+    transition->addAction(std::move(getY1Task));
+
+    // Get y2
+    const auto getY2Action = QString("y2 := calibratedPoints(intervalIndex+1)");
+    auto getY2Task = std::make_unique<::sdl::Task>("", getY2Action);
+    transition->addAction(std::move(getY2Task));
+
+    // Calculate L0
+    const auto calculateL0Action = QString("l0 := ((value - x1) * (value - x2)) / ((x0 - x1) * (x0 - x2))");
+    auto calculateL0Task = std::make_unique<::sdl::Task>("", calculateL0Action);
+    transition->addAction(std::move(calculateL0Task));
+
+    // Calculate L1
+    const auto calculateL1Action = QString("l1 := ((value - x0) * (value - x2)) / ((x1 - x0) * (x1 - x2))");
+    auto calculateL1Task = std::make_unique<::sdl::Task>("", calculateL1Action);
+    transition->addAction(std::move(calculateL1Task));
+
+    // Calculate L2
+    const auto calculateL2Action = QString("l2 := ((value - x0) * (value - x1)) / ((x2 - x0) * (x2 - x1))");
+    auto calculateL2Task = std::make_unique<::sdl::Task>("", calculateL2Action);
+    transition->addAction(std::move(calculateL2Task));
+
+    // Calculate result
+    const auto calculateResultAction = QString("result := l0 * y0 + l1 * y1 + l2 * y2");
+    auto calculateResultTask = std::make_unique<::sdl::Task>("", calculateResultAction);
+    transition->addAction(std::move(calculateResultTask));
+
+    // Set procedure return variable
+    auto resultVarRef = std::make_unique<::sdl::VariableReference>(resultVar.get());
+    procedure->setReturnVariableReference(std::move(resultVarRef));
+
+    // Add variables to procedure
+    procedure->addVariable(std::move(intervalIndexVar));
+    procedure->addVariable(std::move(x0Var));
+    procedure->addVariable(std::move(x1Var));
+    procedure->addVariable(std::move(x2Var));
+    procedure->addVariable(std::move(y0Var));
+    procedure->addVariable(std::move(y1Var));
+    procedure->addVariable(std::move(y2Var));
+    procedure->addVariable(std::move(l0Var));
+    procedure->addVariable(std::move(l1Var));
+    procedure->addVariable(std::move(l2Var));
+    procedure->addVariable(std::move(resultVar));
+
+    // Add paramters to procedure
+    procedure->addParameter(std::move(valueParameter));
+    procedure->addParameter(std::move(rawPointsParameter));
+    procedure->addParameter(std::move(calibratedPointsParameter));
 
     // Add transition to procedure
     procedure->setTransition(std::move(transition));
@@ -461,6 +537,37 @@ auto SplineCalibratorTranslator::buildCubicCalibrationProcedure(StatementTransla
 
     // Add procedure to process
     context.sdlProcess()->addProcedure(std::move(procedure));
+}
+
+auto SplineCalibratorTranslator::addCallToFindInterval(::sdl::Transition *transition) -> void
+{
+    const auto callFindIntervalAction = QString("intervalIndex := call FindInterval(value, rawPoints)");
+    auto callFindIntervalTask = std::make_unique<::sdl::Task>("", callFindIntervalAction);
+    transition->addAction(std::move(callFindIntervalTask));
+}
+
+auto SplineCalibratorTranslator::addValueEqualRawCheck(::sdl::Transition *transition) -> void
+{
+    auto isValueEqualRawDecision = std::make_unique<::sdl::Decision>();
+    auto isValueEqualRawDecisionExpression = std::make_unique<::sdl::Expression>("value = rawPoints(intervalIndex)");
+    isValueEqualRawDecision->setExpression(std::move(isValueEqualRawDecisionExpression));
+
+    auto isValueEqualRawDecisionTrueTransition = std::make_unique<::sdl::Transition>();
+    auto isValueEqualRawDecisionTrueTransitionReturn =
+            std::make_unique<::sdl::Return>("calibratedPoints(intervalIndex)");
+    isValueEqualRawDecisionTrueTransition->addAction(std::move(isValueEqualRawDecisionTrueTransitionReturn));
+    auto isValueEqualRawDecisionTrue = std::make_unique<::sdl::Answer>();
+    isValueEqualRawDecisionTrue->setLiteral(::sdl::VariableLiteral("True"));
+    isValueEqualRawDecisionTrue->setTransition(std::move(isValueEqualRawDecisionTrueTransition));
+    isValueEqualRawDecision->addAnswer(std::move(isValueEqualRawDecisionTrue));
+
+    auto isValueEqualRawDecisionFalseTransition = std::make_unique<::sdl::Transition>();
+    auto isValueEqualRawDecisionFalse = std::make_unique<::sdl::Answer>();
+    isValueEqualRawDecisionFalse->setLiteral(::sdl::VariableLiteral("False"));
+    isValueEqualRawDecisionFalse->setTransition(std::move(isValueEqualRawDecisionFalseTransition));
+    isValueEqualRawDecision->addAnswer(std::move(isValueEqualRawDecisionFalse));
+
+    transition->addAction(std::move(isValueEqualRawDecision));
 }
 
 } // namespace conversion::sdl::translator
