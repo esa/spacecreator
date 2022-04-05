@@ -61,14 +61,21 @@ auto SplineCalibratorTranslator::translate(const seds::model::SplineCalibrator &
     const auto sourceName =
             StatementTranslatorVisitor::translateVariableReference(m_calibration.inputVariableRef().value().value());
 
-    const auto action = QString("%1 := call LinearCalibration(%2, %3, %4)")
-                                .arg(targetName)
-                                .arg(sourceName)
-                                .arg(rawPointsVariableName)
-                                .arg(calibratedPointsVariableName);
-    auto sdlTask = std::make_unique<::sdl::Task>("", action);
+    const auto linearAction = QString("%1 := call LinearCalibration(%2, %3, %4)")
+                                      .arg(targetName)
+                                      .arg(sourceName)
+                                      .arg(rawPointsVariableName)
+                                      .arg(calibratedPointsVariableName);
+    auto linearTask = std::make_unique<::sdl::Task>("", linearAction);
+    m_sdlTransition->addAction(std::move(linearTask));
 
-    m_sdlTransition->addAction(std::move(sdlTask));
+    const auto squareAction = QString("%1 := call SquareCalibration(%2, %3, %4)")
+                                      .arg(targetName)
+                                      .arg(sourceName)
+                                      .arg(rawPointsVariableName)
+                                      .arg(calibratedPointsVariableName);
+    auto squareTask = std::make_unique<::sdl::Task>("", squareAction);
+    m_sdlTransition->addAction(std::move(squareTask));
 }
 
 auto SplineCalibratorTranslator::buildSplineCalibratorVariables(const seds::model::SplineCalibrator &splineCalibrator,
