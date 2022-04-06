@@ -171,6 +171,7 @@ process Calibration;
                 (True):
                     task Calibratedvalue := call LinearCalibration(Iterator, RawSplinePoints1, CalibratedSplinePoints1);
                     task Calibratedvalue := call SquareCalibration(Iterator, RawSplinePoints1, CalibratedSplinePoints1);
+                    task Calibratedvalue := call CubicCalibration(Iterator, RawSplinePoints1, CalibratedSplinePoints1);
                     task Iterator := Iterator + 1.0;
                     join loop_start_1;
             enddecision;

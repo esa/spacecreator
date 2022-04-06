@@ -76,6 +76,14 @@ auto SplineCalibratorTranslator::translate(const seds::model::SplineCalibrator &
                                       .arg(calibratedPointsVariableName);
     auto squareTask = std::make_unique<::sdl::Task>("", squareAction);
     m_sdlTransition->addAction(std::move(squareTask));
+
+    const auto cubicAction = QString("%1 := call CubicCalibration(%2, %3, %4)")
+                                     .arg(targetName)
+                                     .arg(sourceName)
+                                     .arg(rawPointsVariableName)
+                                     .arg(calibratedPointsVariableName);
+    auto cubicTask = std::make_unique<::sdl::Task>("", cubicAction);
+    m_sdlTransition->addAction(std::move(cubicTask));
 }
 
 auto SplineCalibratorTranslator::buildSplineCalibratorVariables(const seds::model::SplineCalibrator &splineCalibrator,
