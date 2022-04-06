@@ -31,12 +31,14 @@
 #include <asn1library/asn1/values.h>
 #include <conversion/asn1/SedsToAsn1Translator/specialized/rangetranslatorvisitor.h>
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
+#include <conversion/common/translation/exceptions.h>
 #include <iostream>
 #include <sdl/SdlModel/return.h>
 #include <seds/SedsModel/types/ranges/floatprecisionrange.h>
 
 using conversion::asn1::translator::RangeTranslatorVisitor;
 using conversion::asn1::translator::SedsToAsn1Translator;
+using conversion::translator::TranslationException;
 
 namespace conversion::sdl::translator {
 
@@ -50,6 +52,8 @@ SplineCalibratorTranslator::SplineCalibratorTranslator(StatementTranslatorVisito
 
 auto SplineCalibratorTranslator::translate(const seds::model::SplineCalibrator &splineCalibrator) -> void
 {
+    const auto splineOrder = getSplineOrder(splineCalibrator);
+
     const auto rawPointsVariableName = m_context.uniqueRawSplinePointsVariableName();
     const auto calibratedPointsVariableName = m_context.uniqueCalibratedSplinePointsVariableName();
 
@@ -61,29 +65,17 @@ auto SplineCalibratorTranslator::translate(const seds::model::SplineCalibrator &
     const auto sourceName =
             StatementTranslatorVisitor::translateVariableReference(m_calibration.inputVariableRef().value().value());
 
-    const auto linearAction = QString("%1 := call LinearCalibration(%2, %3, %4)")
-                                      .arg(targetName)
-                                      .arg(sourceName)
-                                      .arg(rawPointsVariableName)
-                                      .arg(calibratedPointsVariableName);
-    auto linearTask = std::make_unique<::sdl::Task>("", linearAction);
-    m_sdlTransition->addAction(std::move(linearTask));
-
-    const auto squareAction = QString("%1 := call SquareCalibration(%2, %3, %4)")
-                                      .arg(targetName)
-                                      .arg(sourceName)
-                                      .arg(rawPointsVariableName)
-                                      .arg(calibratedPointsVariableName);
-    auto squareTask = std::make_unique<::sdl::Task>("", squareAction);
-    m_sdlTransition->addAction(std::move(squareTask));
-
-    const auto cubicAction = QString("%1 := call CubicCalibration(%2, %3, %4)")
-                                     .arg(targetName)
-                                     .arg(sourceName)
-                                     .arg(rawPointsVariableName)
-                                     .arg(calibratedPointsVariableName);
-    auto cubicTask = std::make_unique<::sdl::Task>("", cubicAction);
-    m_sdlTransition->addAction(std::move(cubicTask));
+    switch (splineOrder) {
+    case 1: {
+        addCallToLinearCalibration(targetName, sourceName, rawPointsVariableName, calibratedPointsVariableName);
+    } break;
+    case 2: {
+        addCallToSquareCalibration(targetName, sourceName, rawPointsVariableName, calibratedPointsVariableName);
+    } break;
+    case 3: {
+        addCallToCubicCalibration(targetName, sourceName, rawPointsVariableName, calibratedPointsVariableName);
+    } break;
+    }
 }
 
 auto SplineCalibratorTranslator::buildSplineCalibratorVariables(const seds::model::SplineCalibrator &splineCalibrator,
@@ -676,6 +668,42 @@ auto SplineCalibratorTranslator::buildCubicCalibrationProcedure(StatementTransla
     context.sdlProcess()->addProcedure(std::move(procedure));
 }
 
+auto SplineCalibratorTranslator::addCallToLinearCalibration(const QString &targetName, const QString &sourceName,
+        const QString &rawPointsVariableName, const QString &calibratedPointsVariableName) -> void
+{
+    const auto linearAction = QString("%1 := call LinearCalibration(%2, %3, %4)")
+                                      .arg(targetName)
+                                      .arg(sourceName)
+                                      .arg(rawPointsVariableName)
+                                      .arg(calibratedPointsVariableName);
+    auto linearTask = std::make_unique<::sdl::Task>("", linearAction);
+    m_sdlTransition->addAction(std::move(linearTask));
+}
+
+auto SplineCalibratorTranslator::addCallToSquareCalibration(const QString &targetName, const QString &sourceName,
+        const QString &rawPointsVariableName, const QString &calibratedPointsVariableName) -> void
+{
+    const auto squareAction = QString("%1 := call SquareCalibration(%2, %3, %4)")
+                                      .arg(targetName)
+                                      .arg(sourceName)
+                                      .arg(rawPointsVariableName)
+                                      .arg(calibratedPointsVariableName);
+    auto squareTask = std::make_unique<::sdl::Task>("", squareAction);
+    m_sdlTransition->addAction(std::move(squareTask));
+}
+
+auto SplineCalibratorTranslator::addCallToCubicCalibration(const QString &targetName, const QString &sourceName,
+        const QString &rawPointsVariableName, const QString &calibratedPointsVariableName) -> void
+{
+    const auto cubicAction = QString("%1 := call CubicCalibration(%2, %3, %4)")
+                                     .arg(targetName)
+                                     .arg(sourceName)
+                                     .arg(rawPointsVariableName)
+                                     .arg(calibratedPointsVariableName);
+    auto cubicTask = std::make_unique<::sdl::Task>("", cubicAction);
+    m_sdlTransition->addAction(std::move(cubicTask));
+}
+
 auto SplineCalibratorTranslator::addCallToFindInterval(::sdl::Transition *transition) -> void
 {
     const auto callFindIntervalAction = QString("intervalIndex := call FindInterval(value, rawPoints)");
@@ -705,6 +733,42 @@ auto SplineCalibratorTranslator::addValueEqualRawCheck(::sdl::Transition *transi
     isValueEqualRawDecision->addAnswer(std::move(isValueEqualRawDecisionFalse));
 
     transition->addAction(std::move(isValueEqualRawDecision));
+}
+
+auto SplineCalibratorTranslator::getSplineOrder(const seds::model::SplineCalibrator &splineCalibrator) -> uint8_t
+{
+    const auto &splinePoints = splineCalibrator.splinePoints();
+
+    if (splinePoints.empty()) {
+        throw TranslationException("Encountered spline calibrator without points");
+    }
+
+    const uint8_t splineOrder = splinePoints[0].order();
+    for (const auto &splinePoint : splinePoints) {
+        if (splinePoint.order() != splineOrder) {
+            throw TranslationException("Each spline point of the spline calibrator has to have the same order");
+        }
+    }
+
+    switch (splineOrder) {
+    case 1:
+        if (splinePoints.size() < 2) {
+            throw TranslationException("Linear calibration requires at least 2 points");
+        }
+        break;
+    case 2:
+        if (splinePoints.size() < 3) {
+            throw TranslationException("Square calibration requires at least 2 points");
+        }
+        break;
+    case 3:
+        if (splinePoints.size() < 4) {
+            throw TranslationException("Cubic calibration requires at least 2 points");
+        }
+        break;
+    }
+
+    return splineOrder;
 }
 
 } // namespace conversion::sdl::translator

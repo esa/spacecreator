@@ -150,13 +150,13 @@ process Calibration;
 
     procedure InitRawSplinePoints1;
         START;
-            task RawSplinePoints1 := { -20.000000, -5.000000, 1.000000, 5.000000, 10.000000, 20.000000, 30.000000, 100.000000 };
+            task RawSplinePoints1 := { 1.000000, 5.000000, 10.000000, 20.000000 };
         return ;
     endprocedure;
 
     procedure InitCalibratedSplinePoints1;
         START;
-            task CalibratedSplinePoints1 := { 40.000000, 10.000000, 2.000000, 10.000000, -20.000000, 40.000000, -60.000000, 200.000000 };
+            task CalibratedSplinePoints1 := { 2.000000, 10.000000, -20.000000, 40.000000 };
         return ;
     endprocedure;
 
@@ -170,8 +170,6 @@ process Calibration;
                     join loop_end_2;
                 (True):
                     task Calibratedvalue := call LinearCalibration(Iterator, RawSplinePoints1, CalibratedSplinePoints1);
-                    task Calibratedvalue := call SquareCalibration(Iterator, RawSplinePoints1, CalibratedSplinePoints1);
-                    task Calibratedvalue := call CubicCalibration(Iterator, RawSplinePoints1, CalibratedSplinePoints1);
                     task Iterator := Iterator + 1.0;
                     join loop_start_1;
             enddecision;

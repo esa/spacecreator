@@ -47,8 +47,16 @@ private:
     static auto buildSquareCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
     static auto buildCubicCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
 
+    auto addCallToLinearCalibration(const QString &targetName, const QString &sourceName,
+            const QString &rawPointsVariableName, const QString &calibratedPointsVariableName) -> void;
+    auto addCallToSquareCalibration(const QString &targetName, const QString &sourceName,
+            const QString &rawPointsVariableName, const QString &calibratedPointsVariableName) -> void;
+    auto addCallToCubicCalibration(const QString &targetName, const QString &sourceName,
+            const QString &rawPointsVariableName, const QString &calibratedPointsVariableName) -> void;
     static auto addCallToFindInterval(::sdl::Transition *transition) -> void;
     static auto addValueEqualRawCheck(::sdl::Transition *transition) -> void;
+
+    static auto getSplineOrder(const seds::model::SplineCalibrator &splineCalibrator) -> uint8_t;
 
 private:
     StatementTranslatorVisitor::StatementContext &m_context;

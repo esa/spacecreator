@@ -26,12 +26,12 @@ SplinePoint::SplinePoint() noexcept
 {
 }
 
-int SplinePoint::order() const
+uint8_t SplinePoint::order() const
 {
     return m_order;
 }
 
-void SplinePoint::setOrder(int order)
+void SplinePoint::setOrder(uint8_t order)
 {
     m_order = order;
 }
