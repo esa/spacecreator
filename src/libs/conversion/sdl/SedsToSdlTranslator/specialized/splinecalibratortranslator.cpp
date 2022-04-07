@@ -167,6 +167,8 @@ auto SplineCalibratorTranslator::buildSplineCalibratorBoilerplate(StatementTrans
     buildSquareCalibrationProcedure(context);
     buildCubicCalibrationProcedure(context);
 
+    buildLinearExtrapolationProcedure(context);
+
     alreadyCreated = true;
 }
 
@@ -652,6 +654,47 @@ auto SplineCalibratorTranslator::buildCubicCalibrationProcedure(StatementTransla
     procedure->addVariable(std::move(l1Var));
     procedure->addVariable(std::move(l2Var));
     procedure->addVariable(std::move(l3Var));
+    procedure->addVariable(std::move(resultVar));
+
+    // Add parameters to procedure
+    procedure->addParameter(std::move(intervalIndexParameter));
+    procedure->addParameter(std::move(valueParameter));
+    procedure->addParameter(std::move(rawPointsParameter));
+    procedure->addParameter(std::move(calibratedPointsParameter));
+
+    // Add transition to procedure
+    procedure->setTransition(std::move(transition));
+
+    // Add procedure to process
+    context.sdlProcess()->addProcedure(std::move(procedure));
+}
+
+auto SplineCalibratorTranslator::buildLinearExtrapolationProcedure(
+        StatementTranslatorVisitor::StatementContext &context) -> void
+{
+    // Create procedure
+    const QString procedureName("LinearExtrapolation");
+    auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
+
+    // Create procedure local variables
+    auto resultVar = std::make_unique<::sdl::VariableDeclaration>("result", "SplinePointValue");
+
+    // Create procedure parameters
+    auto intervalIndexParameter =
+            std::make_unique<::sdl::ProcedureParameter>("intervalIndex", "SplinePointsArrayIndex", "in");
+    auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", "SplinePointValue", "in");
+    auto rawPointsParameter = std::make_unique<::sdl::ProcedureParameter>("rawPoints", "SplinePointsArray", "in");
+    auto calibratedPointsParameter =
+            std::make_unique<::sdl::ProcedureParameter>("calibratedPoints", "SplinePointsArray", "in");
+
+    // Create transition
+    auto transition = std::make_unique<::sdl::Transition>();
+
+    // Set procedure return variable
+    auto resultVarRef = std::make_unique<::sdl::VariableReference>(resultVar.get());
+    procedure->setReturnVariableReference(std::move(resultVarRef));
+
+    // Add variables to procedure
     procedure->addVariable(std::move(resultVar));
 
     // Add parameters to procedure

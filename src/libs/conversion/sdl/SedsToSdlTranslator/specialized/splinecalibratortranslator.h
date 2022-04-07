@@ -46,6 +46,7 @@ private:
     static auto buildFindIntervalProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
     static auto buildSquareCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
     static auto buildCubicCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
+    static auto buildLinearExtrapolationProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
 
     auto addCallToFindInterval(const QString &sourceName, const QString rawPointsVariableName) -> void;
     auto addCallToLinearCalibration(const QString &targetName, const QString &sourceName,
