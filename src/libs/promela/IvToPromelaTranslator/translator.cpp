@@ -83,6 +83,9 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
 
     for (IVFunction *ivFunction : ivFunctionList) {
         const QString functionName = ivFunction->property("name").toString();
+        if (ivFunction->instanceOf() != nullptr) {
+            const QString functionTypeName = ivFunction->instanceOf()->property("name").toString();
+        }
 
         if (std::find(modelFunctions.begin(), modelFunctions.end(), functionName) != modelFunctions.end()) {
             promelaModel->addInclude(QString("%1.pml").arg(functionName.toLower()));

@@ -19,11 +19,14 @@
 
 #pragma once
 
+#include "processmetadata.h"
+
 #include <QFileInfo>
 #include <QList>
 #include <QProcess>
 #include <QString>
 #include <QStringList>
+#include <map>
 
 namespace tmc::converter {
 /**
@@ -39,7 +42,7 @@ public:
      * @param outputFile output promela file
      * @return true if execution was successful, otherwise false
      */
-    bool convertSdl(const QList<QFileInfo> &inputSdlFiles, const QFileInfo &outputFile);
+    bool convertSdl(const ProcessMetadata &processMetadata, const QFileInfo &outputFile);
 
     /**
      * @brief Convert stop condition file into promela file.
@@ -49,8 +52,8 @@ public:
      * @param inputSdlFiles a list of SDL files, which are context for stop condition file
      * @return true if execution was successful, otherwise false
      */
-    bool convertStopCondition(
-            const QFileInfo &inputFile, const QFileInfo &outputFile, const QList<QFileInfo> &inputSdlFiles);
+    bool convertStopCondition(const QFileInfo &inputFile, const QFileInfo &outputFile,
+            const std::map<QString, ProcessMetadata> &inputSdlFiles);
 
 private:
     bool startSdl2PromelaProcess(QProcess &process, const QStringList &arguments);

@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "processmetadata.h"
+
 #include <QDir>
 #include <QFileInfo>
 #include <QList>
@@ -27,7 +29,9 @@
 #include <conversion/registry/registry.h>
 #include <ivcore/ivmodel.h>
 #include <ivcore/ivpropertytemplateconfig.h>
+#include <map>
 #include <memory>
+#include <tmc/SdlToPromelaConverter/processmetadata.h>
 
 namespace tmc::converter {
 /**
@@ -66,15 +70,16 @@ private:
     bool convertModel(const std::set<conversion::ModelType> &sourceModelTypes, conversion::ModelType targetModelType,
             const std::set<conversion::ModelType> &auxilaryModelTypes, conversion::Options options) const;
 
-    bool convertSystem(QList<QFileInfo> &allSdlFiles);
+    bool convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles);
 
-    bool convertStopConditions(const QList<QFileInfo> &allSdlFiles);
+    bool convertStopConditions(const std::map<QString, ProcessMetadata> &allSdlFiles);
 
     bool convertInterfaceview(const QString &inputFilepath, const QString &outputFilepath,
             const QStringList &modelFunctions, const QStringList &environmentFunctions);
     bool convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath);
     std::unique_ptr<ivm::IVModel> readInterfaceView(const QString &filepath);
-    void findFunctionsToConvert(const ivm::IVModel &model, QStringList &sdlFunctions, QStringList &envFunctions);
+    void findFunctionsToConvert(const ivm::IVModel &model, QStringList &sdlFunctions,
+            std::map<QString, ProcessMetadata> &sdlProcesses, QStringList &envFunctions);
     bool isSdlFunction(const ivm::IVFunction *function);
     void findEnvironmentDatatypes(
             const ivm::IVModel &model, const QStringList &envFunctions, QStringList &envDataTypes);
