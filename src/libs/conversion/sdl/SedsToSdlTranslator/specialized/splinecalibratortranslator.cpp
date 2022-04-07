@@ -677,6 +677,10 @@ auto SplineCalibratorTranslator::buildLinearExtrapolationProcedure(
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
 
     // Create procedure local variables
+    auto x0Var = std::make_unique<::sdl::VariableDeclaration>("x0", "SplinePointValue");
+    auto x1Var = std::make_unique<::sdl::VariableDeclaration>("x1", "SplinePointValue");
+    auto y0Var = std::make_unique<::sdl::VariableDeclaration>("y0", "SplinePointValue");
+    auto y1Var = std::make_unique<::sdl::VariableDeclaration>("y1", "SplinePointValue");
     auto resultVar = std::make_unique<::sdl::VariableDeclaration>("result", "SplinePointValue");
 
     // Create procedure parameters
@@ -690,11 +694,84 @@ auto SplineCalibratorTranslator::buildLinearExtrapolationProcedure(
     // Create transition
     auto transition = std::make_unique<::sdl::Transition>();
 
+    // Check whether extrapolate at the start or at the end of the spline
+    auto sideDecision = std::make_unique<::sdl::Decision>();
+    auto sideDecisionExpression = std::make_unique<::sdl::Expression>("intervalIndex = -1");
+    sideDecision->setExpression(std::move(sideDecisionExpression));
+
+    // Extrapolate at the start
+    auto sideDecisionStartTransition = std::make_unique<::sdl::Transition>();
+
+    // Get x0
+    const auto getStartX0Action = QString("x0 := rawPoints(0)");
+    auto getStartX0Task = std::make_unique<::sdl::Task>("", getStartX0Action);
+    sideDecisionStartTransition->addAction(std::move(getStartX0Task));
+
+    // Get x1
+    const auto getStartX1Action = QString("x1 := rawPoints(1)");
+    auto getStartX1Task = std::make_unique<::sdl::Task>("", getStartX1Action);
+    sideDecisionStartTransition->addAction(std::move(getStartX1Task));
+
+    // Get y0
+    const auto getStartY0Action = QString("y0 := calibratedPoints(0)");
+    auto getStartY0Task = std::make_unique<::sdl::Task>("", getStartY0Action);
+    sideDecisionStartTransition->addAction(std::move(getStartY0Task));
+
+    // Get y1
+    const auto getStartY1Action = QString("y1 := calibratedPoints(1)");
+    auto getStartY1Task = std::make_unique<::sdl::Task>("", getStartY1Action);
+    sideDecisionStartTransition->addAction(std::move(getStartY1Task));
+
+    // Extrapolate at the end
+    auto sideDecisionEndTransition = std::make_unique<::sdl::Transition>();
+
+    // Get x0
+    const auto getEndX0Action = QString("x0 := rawPoints(intervalIndex-1)");
+    auto getEndX0Task = std::make_unique<::sdl::Task>("", getEndX0Action);
+    sideDecisionEndTransition->addAction(std::move(getEndX0Task));
+
+    // Get x1
+    const auto getEndX1Action = QString("x1 := rawPoints(intervalIndex-2)");
+    auto getEndX1Task = std::make_unique<::sdl::Task>("", getEndX1Action);
+    sideDecisionEndTransition->addAction(std::move(getEndX1Task));
+
+    // Get y0
+    const auto getEndY0Action = QString("y0 := calibratedPoints(intervalIndex-1)");
+    auto getEndY0Task = std::make_unique<::sdl::Task>("", getEndY0Action);
+    sideDecisionEndTransition->addAction(std::move(getEndY0Task));
+
+    // Get y1
+    const auto getEndY1Action = QString("y1 := calibratedPoints(intervalIndex-2)");
+    auto getEndY1Task = std::make_unique<::sdl::Task>("", getEndY1Action);
+    sideDecisionEndTransition->addAction(std::move(getEndY1Task));
+
+    // Add decision to transition
+    auto sideDecisionStart = std::make_unique<::sdl::Answer>();
+    sideDecisionStart->setLiteral(::sdl::VariableLiteral("True"));
+    sideDecisionStart->setTransition(std::move(sideDecisionStartTransition));
+    sideDecision->addAnswer(std::move(sideDecisionStart));
+
+    auto sideDecisionEnd = std::make_unique<::sdl::Answer>();
+    sideDecisionEnd->setLiteral(::sdl::VariableLiteral("False"));
+    sideDecisionEnd->setTransition(std::move(sideDecisionEndTransition));
+    sideDecision->addAnswer(std::move(sideDecisionEnd));
+
+    transition->addAction(std::move(sideDecision));
+
+    // Calculate result
+    const auto calculateResultAction = QString("result := y1 + ((value - x1) / (x0 - x1)) * (y0 - y1)");
+    auto calculateResultTask = std::make_unique<::sdl::Task>("", calculateResultAction);
+    transition->addAction(std::move(calculateResultTask));
+
     // Set procedure return variable
     auto resultVarRef = std::make_unique<::sdl::VariableReference>(resultVar.get());
     procedure->setReturnVariableReference(std::move(resultVarRef));
 
     // Add variables to procedure
+    procedure->addVariable(std::move(x0Var));
+    procedure->addVariable(std::move(x1Var));
+    procedure->addVariable(std::move(y0Var));
+    procedure->addVariable(std::move(y1Var));
     procedure->addVariable(std::move(resultVar));
 
     // Add parameters to procedure

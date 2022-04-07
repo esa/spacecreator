@@ -143,6 +143,10 @@ process Calibration;
     endprocedure;
 
     procedure LinearExtrapolation;
+        dcl x0 SplinePointValue;
+        dcl x1 SplinePointValue;
+        dcl y0 SplinePointValue;
+        dcl y1 SplinePointValue;
         dcl result SplinePointValue;
         fpar
             in intervalIndex SplinePointsArrayIndex,
@@ -151,6 +155,19 @@ process Calibration;
             in calibratedPoints SplinePointsArray;
         returns SplinePointValue;
         START;
+            decision intervalIndex = -1;
+                (True):
+                    task x0 := rawPoints(0);
+                    task x1 := rawPoints(1);
+                    task y0 := calibratedPoints(0);
+                    task y1 := calibratedPoints(1);
+                (False):
+                    task x0 := rawPoints(intervalIndex-1);
+                    task x1 := rawPoints(intervalIndex-2);
+                    task y0 := calibratedPoints(intervalIndex-1);
+                    task y1 := calibratedPoints(intervalIndex-2);
+            enddecision;
+            task result := y1 + ((value - x1) / (x0 - x1)) * (y0 - y1);
         return result;
     endprocedure;
 
