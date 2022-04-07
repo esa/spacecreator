@@ -182,7 +182,7 @@ auto SplineCalibratorTranslator::createAsn1Types(StatementTranslatorVisitor::Sta
     auto splinePointType = std::make_unique<Asn1Acn::Types::Real>("SplinePointValue");
     splinePointType->setEncoding(Asn1Acn::Types::RealEncoding::IEEE754_1985_64);
     auto splinePointTypeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::RealValue>::create(
-            { std::numeric_limits<double>::min(), std::numeric_limits<double>::max() });
+            { std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max() });
     splinePointType->constraints().append(std::move(splinePointTypeConstraint));
 
     // Create type for array of spline points values
@@ -233,6 +233,32 @@ auto SplineCalibratorTranslator::buildFindIntervalProcedure(StatementTranslatorV
     // Create procedure parameters
     auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", "SplinePointValue", "in");
     auto rawPointsParameter = std::make_unique<::sdl::ProcedureParameter>("rawPoints", "SplinePointsArray", "in");
+
+    // Check if given value is smaller than the first point
+    auto valueSmallerDecision = std::make_unique<::sdl::Decision>();
+    auto valueSmallerDecisionExpression = std::make_unique<::sdl::Expression>("value < rawPoints(0)");
+    valueSmallerDecision->setExpression(std::move(valueSmallerDecisionExpression));
+
+    // Return -1
+    auto valueSmallerDecisionTrueTransition = std::make_unique<::sdl::Transition>();
+    auto valueSmallerDecisionTrueReturn = std::make_unique<::sdl::Return>("-1");
+    valueSmallerDecisionTrueTransition->addAction(std::move(valueSmallerDecisionTrueReturn));
+
+    // Continue
+    auto valueSmallerDecisionFalseTransition = std::make_unique<::sdl::Transition>();
+
+    // Add decision to transition
+    auto valueSmallerDecisionTrue = std::make_unique<::sdl::Answer>();
+    valueSmallerDecisionTrue->setLiteral(::sdl::VariableLiteral("True"));
+    valueSmallerDecisionTrue->setTransition(std::move(valueSmallerDecisionTrueTransition));
+    valueSmallerDecision->addAnswer(std::move(valueSmallerDecisionTrue));
+
+    auto valueSmallerDecisionFalse = std::make_unique<::sdl::Answer>();
+    valueSmallerDecisionFalse->setLiteral(::sdl::VariableLiteral("False"));
+    valueSmallerDecisionFalse->setTransition(std::move(valueSmallerDecisionFalseTransition));
+    valueSmallerDecision->addAnswer(std::move(valueSmallerDecisionFalse));
+
+    transition->addAction(std::move(valueSmallerDecision));
 
     // Initialize result variable
     auto resultVarInitAction = QString("result := 0");
@@ -791,8 +817,8 @@ auto SplineCalibratorTranslator::addCallToLinearCalibration(const QString &targe
         const QString &rawPointsVariableName, const QString &calibratedPointsVariableName) -> void
 {
     auto extrapolationDecision = std::make_unique<::sdl::Decision>();
-    auto extrapolationDecisionExpression =
-            std::make_unique<::sdl::Expression>("intervalIndex = -1 or intervalIndex = length(rawPoints)");
+    auto extrapolationDecisionExpression = std::make_unique<::sdl::Expression>(
+            QString("intervalIndex = -1 or intervalIndex = length(%1)").arg(rawPointsVariableName));
     extrapolationDecision->setExpression(std::move(extrapolationDecisionExpression));
 
     auto extrapolationDecisionTrueTransition = std::make_unique<::sdl::Transition>();

@@ -11,6 +11,11 @@ process Calibration;
             in rawPoints SplinePointsArray;
         returns SplinePointsArrayIndex;
         START;
+            decision value < rawPoints(0);
+                (True):
+                    return -1;
+                (False):
+            enddecision;
             task result := 0;
             find_interval_start:
             decision result < length(rawPoints);
@@ -196,7 +201,7 @@ process Calibration;
                 (True):
                     task intervalIndex := call FindInterval(Iterator, RawSplinePoints1);
 
-                    decision intervalIndex = -1 or intervalIndex = length(rawPoints);
+                    decision intervalIndex = -1 or intervalIndex = length(RawSplinePoints1);
                         (True):
                             task Calibratedvalue := call LinearExtrapolation(intervalIndex, Iterator, RawSplinePoints1, CalibratedSplinePoints1);
                         (False):
