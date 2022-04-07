@@ -31,7 +31,6 @@ process Calibration;
     endprocedure;
 
     procedure LinearCalibration;
-        dcl intervalIndex SplinePointsArrayIndex;
         dcl x0 SplinePointValue;
         dcl x1 SplinePointValue;
         dcl y0 SplinePointValue;
@@ -40,13 +39,12 @@ process Calibration;
         dcl l1 SplinePointValue;
         dcl result SplinePointValue;
         fpar
+            in intervalIndex SplinePointsArrayIndex,
             in value SplinePointValue,
             in rawPoints SplinePointsArray,
             in calibratedPoints SplinePointsArray;
         returns SplinePointValue;
         START;
-            task intervalIndex := call FindInterval(value, rawPoints);
-
             decision value = rawPoints(intervalIndex);
                 (True):
                     return calibratedPoints(intervalIndex);
@@ -65,7 +63,6 @@ process Calibration;
     endprocedure;
 
     procedure SquareCalibration;
-        dcl intervalIndex SplinePointsArrayIndex;
         dcl x0 SplinePointValue;
         dcl x1 SplinePointValue;
         dcl x2 SplinePointValue;
@@ -77,13 +74,12 @@ process Calibration;
         dcl l2 SplinePointValue;
         dcl result SplinePointValue;
         fpar
+            in intervalIndex SplinePointsArrayIndex,
             in value SplinePointValue,
             in rawPoints SplinePointsArray,
             in calibratedPoints SplinePointsArray;
         returns SplinePointValue;
         START;
-            task intervalIndex := call FindInterval(value, rawPoints);
-
             decision value = rawPoints(intervalIndex);
                 (True):
                     return calibratedPoints(intervalIndex);
@@ -104,7 +100,6 @@ process Calibration;
     endprocedure;
 
     procedure CubicCalibration;
-        dcl intervalIndex SplinePointsArrayIndex;
         dcl x0 SplinePointValue;
         dcl x1 SplinePointValue;
         dcl x2 SplinePointValue;
@@ -119,13 +114,12 @@ process Calibration;
         dcl l3 SplinePointValue;
         dcl result SplinePointValue;
         fpar
+            in intervalIndex SplinePointsArrayIndex,
             in value SplinePointValue,
             in rawPoints SplinePointsArray,
             in calibratedPoints SplinePointsArray;
         returns SplinePointValue;
         START;
-            task intervalIndex := call FindInterval(value, rawPoints);
-
             decision value = rawPoints(intervalIndex);
                 (True):
                     return calibratedPoints(intervalIndex);
@@ -161,7 +155,9 @@ process Calibration;
     endprocedure;
 
     procedure CalibrateActivity;
+        dcl intervalIndex SplinePointsArrayIndex;
         START;
+
             task Iterator := 1.0;
 
             loop_start_1:
@@ -169,7 +165,8 @@ process Calibration;
                 (False):
                     join loop_end_2;
                 (True):
-                    task Calibratedvalue := call LinearCalibration(Iterator, RawSplinePoints1, CalibratedSplinePoints1);
+                    task intervalIndex := call FindInterval(Iterator, RawSplinePoints1);
+                    task Calibratedvalue := call LinearCalibration(intervalIndex, Iterator, RawSplinePoints1, CalibratedSplinePoints1);
                     task Iterator := Iterator + 1.0;
                     join loop_start_1;
             enddecision;

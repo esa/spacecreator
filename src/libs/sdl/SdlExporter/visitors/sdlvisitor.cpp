@@ -488,7 +488,7 @@ void SdlVisitor::visit(const Procedure &procedure)
         m_writer.writeLine("returns " + procedure.returnVariableReference()->declaration()->type() + ";");
     }
 
-    if (parametersPresent || returnVarPresent) {
+    if (variablesPresent || parametersPresent || returnVarPresent) {
         // m_writer.writeLine("/* CIF ENDTEXT */");
     }
 
