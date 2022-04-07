@@ -187,15 +187,22 @@ process Calibration;
         dcl intervalIndex SplinePointsArrayIndex;
         START;
 
-            task Iterator := 1.0;
+            task Iterator := -5.0;
 
             loop_start_1:
-            decision Iterator <= 20.0;
+            decision Iterator <= 25.0;
                 (False):
                     join loop_end_2;
                 (True):
                     task intervalIndex := call FindInterval(Iterator, RawSplinePoints1);
-                    task Calibratedvalue := call LinearCalibration(intervalIndex, Iterator, RawSplinePoints1, CalibratedSplinePoints1);
+
+                    decision intervalIndex = -1 or intervalIndex = length(rawPoints);
+                        (True):
+                            task Calibratedvalue := call LinearExtrapolation(intervalIndex, Iterator, RawSplinePoints1, CalibratedSplinePoints1);
+                        (False):
+                            task Calibratedvalue := call LinearCalibration(intervalIndex, Iterator, RawSplinePoints1, CalibratedSplinePoints1);
+                    enddecision;
+
                     task Iterator := Iterator + 1.0;
                     join loop_start_1;
             enddecision;
