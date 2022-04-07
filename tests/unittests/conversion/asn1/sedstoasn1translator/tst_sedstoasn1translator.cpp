@@ -893,7 +893,7 @@ void tst_SedsToAsn1Translator::testTranslateFloatDataType()
     QVERIFY(rangeConstraint);
 
     const auto &range = rangeConstraint->range();
-    QCOMPARE(range.begin(), std::numeric_limits<double>::min());
+    QCOMPARE(range.begin(), std::numeric_limits<double>::lowest());
     QCOMPARE(range.end(), std::numeric_limits<double>::max());
 }
 
