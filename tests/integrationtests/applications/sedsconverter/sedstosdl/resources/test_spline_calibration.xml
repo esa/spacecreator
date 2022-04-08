@@ -77,6 +77,27 @@
                     </Calibration>
                   </Do>
                 </Iteration>
+                <Iteration iteratorVariableRef="iterator">
+                  <StartAt>
+                    <Value value="-5.0" />
+                  </StartAt>
+                  <Step>
+                    <Value value="1.0" />
+                  </Step>
+                  <EndAt>
+                    <Value value="25.0" />
+                  </EndAt>
+                  <Do>
+                    <Calibration inputVariableRef="iterator" outputVariableRef="calibratedValue">
+                      <SplineCalibrator>
+                        <SplinePoint raw="1" calibrated="2" order="3"/>
+                        <SplinePoint raw="5" calibrated="10" order="3"/>
+                        <SplinePoint raw="10" calibrated="-20" order="3"/>
+                        <SplinePoint raw="20" calibrated="40" order="3"/>
+                      </SplineCalibrator>
+                    </Calibration>
+                  </Do>
+                </Iteration>
               </Body>
             </Activity>
           </ActivitySet>
