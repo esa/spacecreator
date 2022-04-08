@@ -961,7 +961,7 @@ auto SplineCalibratorTranslator::getSplineOrder(const seds::model::SplineCalibra
         throw TranslationException("Encountered spline calibrator without points");
     }
 
-    const uint8_t splineOrder = splinePoints[0].order();
+    const uint8_t splineOrder = splinePoints.begin()->order();
     for (const auto &splinePoint : splinePoints) {
         if (splinePoint.order() != splineOrder) {
             throw TranslationException("Each spline point of the spline calibrator has to have the same order");

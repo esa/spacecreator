@@ -40,6 +40,8 @@ public:
     auto calibrated() const -> double;
     auto setCalibrated(double calibrated) -> void;
 
+    bool operator<(const SplinePoint &rhs) const;
+
 private:
     uint8_t m_order;
     double m_raw;

@@ -56,4 +56,9 @@ void SplinePoint::setCalibrated(double calibrated)
     m_calibrated = calibrated;
 }
 
+bool SplinePoint::operator<(const SplinePoint &rhs) const
+{
+    return m_raw < rhs.raw();
+}
+
 } // namespace seds::model

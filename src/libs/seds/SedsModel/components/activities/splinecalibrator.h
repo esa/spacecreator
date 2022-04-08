@@ -21,7 +21,7 @@
 
 #include "components/activities/splinepoint.h"
 
-#include <vector>
+#include <set>
 
 namespace seds::model {
 
@@ -33,14 +33,14 @@ public:
     SplineCalibrator &operator=(SplineCalibrator &&) = default;
 
 public:
-    auto splinePoints() const -> const std::vector<SplinePoint> &;
+    auto splinePoints() const -> const std::set<SplinePoint> &;
     auto addSplinePoint(SplinePoint splinePoint) -> void;
 
     auto extrapolate() const -> bool;
     auto setExtrapolate(bool extrapolate) -> void;
 
 private:
-    std::vector<SplinePoint> m_splinePoints;
+    std::set<SplinePoint> m_splinePoints;
     bool m_extrapolate;
 };
 
