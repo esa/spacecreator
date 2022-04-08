@@ -621,8 +621,20 @@ auto SplineCalibratorTranslator::buildCubicCalibrationProcedure(StatementTransla
     auto setIntervalIndexTask = std::make_unique<::sdl::Task>("", setIntervalIndexAction);
     transition->addAction(std::move(setIntervalIndexTask));
 
+    // Handle left extrapolation
+    handleLeftExtrapolation(2, transition.get());
+
+    // Handle right extrapolation
+    handleRightExtrapolation("length(rawPoints) - 2", transition.get());
+
     // Return calibrated value is value is a raw point
     addValueEqualRawCheck(transition.get());
+
+    // Handle last right interval
+    handleFirstLeftInterval(transition.get());
+
+    // Handle last right interval
+    handleLastRightInterval(transition.get());
 
     // Get x0
     const auto getX0Action = QString("x0 := rawPoints(intervalIndex-2)");
@@ -886,6 +898,32 @@ auto SplineCalibratorTranslator::handleRightExtrapolation(const QString &newInde
     rightExtrapolationDecision->addAnswer(std::move(rightExtrapolationDecisionFalse));
 
     transition->addAction(std::move(rightExtrapolationDecision));
+}
+
+auto SplineCalibratorTranslator::handleFirstLeftInterval(::sdl::Transition *transition) -> void
+{
+    auto lastRightIntervalDecision = std::make_unique<::sdl::Decision>();
+    auto lastRightIntervalDecisionExpression = std::make_unique<::sdl::Expression>("intervalIndex = 1");
+    lastRightIntervalDecision->setExpression(std::move(lastRightIntervalDecisionExpression));
+
+    auto lastRightIntervalDecisionTrueTransition = std::make_unique<::sdl::Transition>();
+
+    const auto lastRightIntervalDecisionTrueAction = QString("intervalIndex := 2");
+    auto lastRightIntervalDecisionTrueTask = std::make_unique<::sdl::Task>("", lastRightIntervalDecisionTrueAction);
+    lastRightIntervalDecisionTrueTransition->addAction(std::move(lastRightIntervalDecisionTrueTask));
+
+    auto lastRightIntervalDecisionTrue = std::make_unique<::sdl::Answer>();
+    lastRightIntervalDecisionTrue->setLiteral(::sdl::VariableLiteral("True"));
+    lastRightIntervalDecisionTrue->setTransition(std::move(lastRightIntervalDecisionTrueTransition));
+    lastRightIntervalDecision->addAnswer(std::move(lastRightIntervalDecisionTrue));
+
+    auto lastRightIntervalDecisionFalseTransition = std::make_unique<::sdl::Transition>();
+    auto lastRightIntervalDecisionFalse = std::make_unique<::sdl::Answer>();
+    lastRightIntervalDecisionFalse->setLiteral(::sdl::VariableLiteral("False"));
+    lastRightIntervalDecisionFalse->setTransition(std::move(lastRightIntervalDecisionFalseTransition));
+    lastRightIntervalDecision->addAnswer(std::move(lastRightIntervalDecisionFalse));
+
+    transition->addAction(std::move(lastRightIntervalDecision));
 }
 
 auto SplineCalibratorTranslator::handleLastRightInterval(::sdl::Transition *transition) -> void
