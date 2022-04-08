@@ -57,6 +57,8 @@ private:
     auto addCallToFindInterval(const QString &sourceName, const QString rawPointsVariableName) -> void;
     auto addExtrapolationCheck(const QString &calibratedPointsVariableName) -> void;
     static auto addValueEqualRawCheck(::sdl::Transition *transition) -> void;
+    static auto handleLeftExtrapolation(const uint8_t newIndex, ::sdl::Transition *transition) -> void;
+    static auto handleRightExtrapolation(const QString &newIndex, ::sdl::Transition *transition) -> void;
 
     static auto getSplineOrder(const seds::model::SplineCalibrator &splineCalibrator) -> uint8_t;
 
