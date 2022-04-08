@@ -104,9 +104,27 @@ process Calibration;
         START;
             task intervalIndex := index;
 
+            decision intervalIndex = -1;
+                (True):
+                    task intervalIndex := 1;
+                (False):
+            enddecision;
+
+            decision intervalIndex = length(rawPoints);
+                (True):
+                    task intervalIndex := length(rawPoints) - 2;
+                (False):
+            enddecision;
+
             decision value = rawPoints(intervalIndex);
                 (True):
                     return calibratedPoints(intervalIndex);
+                (False):
+            enddecision;
+
+            decision intervalIndex = length(rawPoints) - 1;
+                (True):
+                    task intervalIndex := length(rawPoints) - 2;
                 (False):
             enddecision;
 
