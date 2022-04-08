@@ -23,14 +23,45 @@
 #include <QString>
 
 namespace tmc::converter {
+/**
+ * @brief Process Metadata contains information about SDL process.
+ */
 class ProcessMetadata
 {
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param name SDL process name.
+     * @param systemStructure system_structure.pr file location
+     * @param process location of process implementation file
+     * @param datamodel location of process datamodel ASN.1 file
+     */
     ProcessMetadata(QString name, QFileInfo systemStructure, QFileInfo process, QFileInfo datamodel);
 
+    /**
+     * @brief Getter for process name.
+     *
+     * @return Name of SDL process.
+     */
     const QString &getName() const noexcept;
+    /**
+     * @brief Getter for system structure location.
+     *
+     * @return Location of system_structure.pr file.
+     */
     const QFileInfo &getSystemStructure() const noexcept;
+    /**
+     * @brief Getter for process implementation location.
+     *
+     * @return Location of process implementation file.
+     */
     const QFileInfo &getProcess() const noexcept;
+    /**
+     * @brief Getter for process datamodel.
+     *
+     * @return Location fo process datamodel ASN.1 file.
+     */
     const QFileInfo &getDatamodel() const noexcept;
 
 private:

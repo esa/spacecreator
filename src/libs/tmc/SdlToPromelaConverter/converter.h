@@ -38,9 +38,9 @@ public:
     /**
      * @brief Convert SDL files into promela file.
      *
-     * @param inputSdlfiles a list of input SDL files.
-     * @param outputFile output promela file
-     * @return true if execution was successful, otherwise false
+     * @param processMetadata process metadata, contains location of input SDL files.
+     * @param outputFile output promela file.
+     * @return true if execution was successful, otherwise false.
      */
     bool convertSdl(const ProcessMetadata &processMetadata, const QFileInfo &outputFile);
 
@@ -49,7 +49,7 @@ public:
      *
      * @param inputFile filepath to input stop condition file
      * @param outputFile output promela file
-     * @param inputSdlFiles a list of SDL files, which are context for stop condition file
+     * @param inputSdlFiles a map of ProcessMetadata objects, which are context for stop condition file
      * @return true if execution was successful, otherwise false
      */
     bool convertStopCondition(const QFileInfo &inputFile, const QFileInfo &outputFile,
