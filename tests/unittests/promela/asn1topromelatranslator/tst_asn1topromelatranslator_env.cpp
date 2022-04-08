@@ -19,16 +19,36 @@
 
 #include "tst_asn1topromelatranslator_env.h"
 
+#include "asn1model.h"
+#include "assignment.h"
+#include "conversion/asn1/Asn1Exporter/exporter.h"
+#include "conversion/asn1/Asn1Options/options.h"
+#include "declaration.h"
+#include "definitions.h"
+#include "file.h"
+#include "options.h"
+#include "promela/PromelaExporter/promelaexporter.h"
+#include "promela/PromelaOptions/options.h"
+#include "variableref.h"
+
+#include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <asn1library/asn1/types/boolean.h>
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/values.h>
+#include <memory>
 #include <promela/Asn1ToPromelaTranslator/visitors/asn1nodevaluegeneratorvisitor.h>
 #include <promela/PromelaModel/constant.h>
 #include <promela/PromelaModel/promelamodel.h>
+#include <promela/PromelaModel/sequence.h>
+#include <qtestcase.h>
+#include <qvariant.h>
+#include <utility>
 #include <variant>
 
+using Asn1Acn::AsnSequenceComponent;
 using Asn1Acn::IntegerValue;
 using Asn1Acn::SourceLocation;
 using Asn1Acn::TypeAssignment;
@@ -40,6 +60,7 @@ using Asn1Acn::Types::Integer;
 using promela::model::Assignment;
 using promela::model::Conditional;
 using promela::model::Constant;
+using promela::model::Declaration;
 using promela::model::InlineDef;
 using promela::model::PromelaModel;
 using promela::model::Sequence;
@@ -223,8 +244,108 @@ void tst_Asn1ToPromelaTranslator_Env::testEnumerated() const
     }
 }
 
+void exportPromelaModel(const PromelaModel &model, const QString &filename)
+{
+    conversion::Options options;
+    options.add(conversion::promela::PromelaOptions::outputFilepath, filename);
+    promela::exporter::PromelaExporter exporter;
+    exporter.exportModel(&model, options);
+}
+
+std::unique_ptr<Asn1Acn::Asn1Model> makeModelFromDefinitions(
+        std::unique_ptr<Asn1Acn::Definitions> asnModel, const QString &name)
+{
+    Asn1Acn::File file(name);
+    file.add(std::move(asnModel));
+
+    std::vector<std::unique_ptr<Asn1Acn::File>> files;
+    auto filePtr = std::make_unique<Asn1Acn::File>(file);
+    files.push_back(std::move(filePtr));
+
+    return std::make_unique<Asn1Acn::Asn1Model>(std::move(files));
+}
+
+void exportAsnModel(const Asn1Acn::Asn1Model *const model)
+{
+    conversion::Options options;
+    options.add(conversion::asn1::Asn1Options::asn1FilepathPrefix, "asn_");
+    conversion::asn1::exporter::Asn1Exporter exporter;
+    exporter.exportModel(model, options);
+}
+
+void checkInlineDefs(InlineDef *const promelaInlineDefs, const QString &name)
+{
+    QCOMPARE(promelaInlineDefs->getName(), name);
+    QCOMPARE(promelaInlineDefs->getArguments().size(), 2);
+    const auto &firstInlineFirstArg = promelaInlineDefs->getArguments().front();
+    QCOMPARE(firstInlineFirstArg, "dst");
+    const auto &firstInlineSecondArg = promelaInlineDefs->getArguments().back();
+    QCOMPARE(firstInlineSecondArg, "src");
+
+    const QString &argName = promelaInlineDefs->getArguments().front();
+    const Sequence &mainSequence = promelaInlineDefs->getSequence();
+    QCOMPARE(mainSequence.getContent().size(), 1);
+    QCOMPARE(mainSequence.getType(), Sequence::Type::NORMAL);
+
+    for (const auto &content : mainSequence.getContent()) {
+        QVERIFY(std::holds_alternative<Assignment>(content->getValue()));
+        const auto &assignment = std::get<Assignment>(content->getValue());
+
+        QVERIFY(std::holds_alternative<VariableRef>(assignment.getExpression().getContent()));
+        const auto &variableRef = std::get<VariableRef>(assignment.getExpression().getContent());
+        for (const auto &var : variableRef.getElements()) {
+            qDebug() << "var name: " << var.m_name;
+            if (var.m_index != nullptr) {
+                qDebug() << "getcontent variable ref index: " << var.m_index->getContent().index();
+            } else {
+                qDebug() << "m_index is NULL";
+            }
+            qDebug() << "";
+        }
+    }
+}
+
+void tst_Asn1ToPromelaTranslator_Env::testSequence() const
+{
+    auto asnDefinitions = createModel();
+    {
+        Asn1Acn::SourceLocation location;
+        auto type = std::make_unique<Asn1Acn::Types::Sequence>();
+        auto intSeq = std::make_unique<Asn1Acn::AsnSequenceComponent>("intVal", "intVal", false, std::nullopt, "",
+                Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
+                std::make_unique<Asn1Acn::Types::Integer>("intVal"));
+        type->addComponent(std::move(intSeq));
+        auto boolSeq = std::make_unique<Asn1Acn::AsnSequenceComponent>("boolVal", "boolVal", true, std::nullopt, "",
+                Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
+                std::make_unique<Asn1Acn::Types::Boolean>("boolVal"));
+        type->addComponent(std::move(boolSeq));
+        auto assignment =
+                std::make_unique<Asn1Acn::TypeAssignment>("MySequence", "MySequence", location, std::move(type));
+        asnDefinitions->addType(std::move(assignment));
+    }
+
+    auto asnModel = makeModelFromDefinitions(std::move(asnDefinitions), "testSequence");
+    exportAsnModel(asnModel.get());
+
+    PromelaModel promelaModel;
+    QStringList typesToTranslate = { "MySequence" };
+    Asn1NodeValueGeneratorVisitor visitor(promelaModel, typesToTranslate);
+    QVERIFY(!asnModel->data().empty());
+    const auto &sequence = *asnModel->data().front();
+    visitor.visit(sequence);
+
+    auto &promelaInlineDefs = promelaModel.getInlineDefs();
+    QCOMPARE(promelaInlineDefs.size(), 2);
+
+    checkInlineDefs(promelaInlineDefs.front().get(), "_intVal_assign_value");
+    checkInlineDefs(promelaInlineDefs.back().get(), "_boolVal_assign_value");
+
+    exportPromelaModel(promelaModel, "sequences.txt");
+}
+
 std::unique_ptr<Definitions> tst_Asn1ToPromelaTranslator_Env::createModel() const
 {
     return std::make_unique<Definitions>("myModule", SourceLocation());
 }
-}
+
+} // namespace tmc::test

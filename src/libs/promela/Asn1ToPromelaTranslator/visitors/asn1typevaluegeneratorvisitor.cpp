@@ -19,19 +19,28 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
+#include "asnsequencecomponent.h"
 #include "enumeratedgenerator.h"
 #include "integerconstraintvisitor.h"
 #include "integergenerator.h"
 #include "integersubset.h"
+#include "sequencecomponent.h"
+#include "types/type.h"
 
+#include <QDebug>
 #include <algorithm>
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/sequence.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <list>
 #include <optional>
+#include <promela/Asn1ToPromelaTranslator/visitors/asn1sequencecomponentvisitor.h>
 #include <promela/PromelaModel/constant.h>
+#include <qdebug.h>
+#include <qglobal.h>
+#include <stdexcept>
 
 using Asn1Acn::Types::BitString;
 using Asn1Acn::Types::Boolean;
@@ -148,7 +157,30 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
 
 void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 {
-    Q_UNUSED(type);
+    if (type.typeName().compare("SEQUENCE") != 0 || type.typeEnum() != Asn1Acn::Types::Type::SEQUENCE) {
+        throw std::runtime_error("Invalid type");
+    }
+
+    // TODO:
+    // type.acnParameters()
+    // type.identifier()
+    // type.label()
+
+    // Asn1SequenceComponentVisitor visitor(m_promelaModel, "", false);
+
+    for (const auto &component : type.components()) {
+        if (component == nullptr || component->type() == nullptr) {
+            throw std::runtime_error("Component type not specified");
+        }
+        const auto &componentTypeEnum = component->type()->typeEnum();
+        if (componentTypeEnum == Asn1Acn::Types::Type::ASN1Type::BOOLEAN) {
+            qDebug() << "type is bool";
+        } else if (componentTypeEnum == Asn1Acn::Types::Type::ASN1Type::INTEGER) {
+            qDebug() << "type is int";
+        } else {
+            throw std::runtime_error("Unknown component type");
+        }
+    }
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)

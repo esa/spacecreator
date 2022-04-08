@@ -20,6 +20,8 @@ target_include_directories(${TEST_NAME}
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(${TEST_NAME}
     PRIVATE     Conversion::Common
+                Asn1Exporter
+                PromelaExporter
                 Conversion::Asn1ToPromelaTranslator
                 Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test)

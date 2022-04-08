@@ -38,8 +38,7 @@ public:
      * @brief Constructor
      *
      * @param promelaModel target promela model
-     * @param name name of type
-     * @param enhancedSpinSupport  if true, then generate model for enhanced spin
+     * @param name name of ASN.1 type
      */
     Asn1TypeValueGeneratorVisitor(::promela::model::PromelaModel &promelaModel, QString name);
 
