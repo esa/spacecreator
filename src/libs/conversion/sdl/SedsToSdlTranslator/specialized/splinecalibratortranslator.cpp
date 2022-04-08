@@ -335,11 +335,6 @@ auto SplineCalibratorTranslator::buildFindIntervalProcedure(StatementTranslatorV
     auto iterationEndLabel = std::make_unique<::sdl::Label>("find_interval_end");
     transition->addAction(std::move(iterationEndLabel));
 
-    // Assign to result
-    const auto assignToResultAction = QString("result := result + 1");
-    auto assignToResultTask = std::make_unique<::sdl::Task>("", assignToResultAction);
-    transition->addAction(std::move(assignToResultTask));
-
     // Set procedure return variable
     auto resultVarRef = std::make_unique<::sdl::VariableReference>(resultVar.get());
     procedure->setReturnVariableReference(std::move(resultVarRef));
@@ -390,14 +385,14 @@ auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(StatementTransl
     auto setIntervalIndexTask = std::make_unique<::sdl::Task>("", setIntervalIndexAction);
     transition->addAction(std::move(setIntervalIndexTask));
 
-    // Return calibrated value is value is a raw point
-    addValueEqualRawCheck(transition.get());
-
     // Handle left extrapolation
     handleLeftExtrapolation(1, transition.get());
 
     // Handle right extrapolation
     handleRightExtrapolation("length(rawPoints) - 1", transition.get());
+
+    // Return calibrated value is value is a raw point
+    addValueEqualRawCheck(transition.get());
 
     // Get x0
     const auto getX0Action = QString("x0 := rawPoints(intervalIndex-1)");
@@ -767,7 +762,7 @@ auto SplineCalibratorTranslator::addCallToCalibration(const QString &calibration
         auto isExtrapolationRightTrueTransition = std::make_unique<::sdl::Transition>();
 
         const auto isExtrapolationRightTrueSetAction =
-                QString("%1 := %2(length(%2))").arg(targetName).arg(calibratedPointsVariableName);
+                QString("%1 := %2(length(%2) - 1)").arg(targetName).arg(calibratedPointsVariableName);
         auto isExtrapolationRightTrueTask = std::make_unique<::sdl::Task>("", isExtrapolationRightTrueSetAction);
         isExtrapolationRightTrueTransition->addAction(std::move(isExtrapolationRightTrueTask));
 

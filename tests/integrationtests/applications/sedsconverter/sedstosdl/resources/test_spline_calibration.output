@@ -31,7 +31,6 @@ process Calibration;
                     join find_interval_end;
             enddecision;
             find_interval_end:
-            task result := result + 1;
         return result;
     endprocedure;
 
@@ -53,12 +52,6 @@ process Calibration;
         START;
             task intervalIndex := index;
 
-            decision value = rawPoints(intervalIndex);
-                (True):
-                    return calibratedPoints(intervalIndex);
-                (False):
-            enddecision;
-
             decision intervalIndex = -1;
                 (True):
                     task intervalIndex := 1;
@@ -68,6 +61,12 @@ process Calibration;
             decision intervalIndex = length(rawPoints);
                 (True):
                     task intervalIndex := length(rawPoints) - 1;
+                (False):
+            enddecision;
+
+            decision value = rawPoints(intervalIndex);
+                (True):
+                    return calibratedPoints(intervalIndex);
                 (False):
             enddecision;
 
@@ -198,7 +197,7 @@ process Calibration;
                         (False):
                             decision intervalIndex = length(RawSplinePoints1);
                                 (True):
-                                    task Calibratedvalue := CalibratedSplinePoints1(length(CalibratedSplinePoints1));
+                                    task Calibratedvalue := CalibratedSplinePoints1(length(CalibratedSplinePoints1) - 1);
                                 (False):
                                     task Calibratedvalue := call LinearCalibration(intervalIndex, Iterator, RawSplinePoints1, CalibratedSplinePoints1);
                             enddecision;
