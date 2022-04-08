@@ -78,6 +78,8 @@ private:
             ::ivm::IVFunction *ivFunction, const QString &functionName) const -> void;
     auto createCheckQueueInline(::promela::model::PromelaModel *promelaModel, const QString &functionName,
             QList<QString> &channelNames) const -> void;
+    auto createSystemState(::promela::model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,
+            const std::vector<QString> &modelFunctions) const -> void;
 
     auto constructChannelName(const QString &functionName, const QString &interfaceName) const -> QString;
 

@@ -174,10 +174,13 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
     qDebug() << "Using the following ENV functions: " << environmentFunctions.join(", ");
     qDebug() << "Using the following ENV data types: " << environmentDatatypes.join(", ");
 
-    QSet<QString> uniqueAsn1Files;
+    QMap<QString, QString> uniqueAsn1Files;
     for (const QString &ivFunction : modelFunctions) {
         const ProcessMetadata &processMetadata = allSdlFiles.at(ivFunction);
-        uniqueAsn1Files.insert(processMetadata.getDatamodel().absoluteFilePath());
+        if (!uniqueAsn1Files.contains(processMetadata.getDatamodel().fileName())) {
+            uniqueAsn1Files.insert(
+                    processMetadata.getDatamodel().fileName(), processMetadata.getDatamodel().absoluteFilePath());
+        }
         const QFileInfo outputFile = outputFilepath(processMetadata.getName().toLower() + ".pml");
 
         SdlToPromelaConverter sdl2Promela;
@@ -332,7 +335,7 @@ void TmcConverter::findFunctionsToConvert(const IVModel &model, QStringList &sdl
             if (ivFunction->instanceOf() != nullptr) {
                 const QString ivFunctionTypeName = ivFunction->instanceOf()->property("name").toString();
                 const QFileInfo sdlProcess = sdlImplementationLocation(ivFunctionTypeName);
-                const QFileInfo functionDatamodel = sdlFunctionDatamodelLocation(ivFunctionTypeName);
+                const QFileInfo functionDatamodel = sdlFunctionDatamodelLocation(ivFunctionName, ivFunctionTypeName);
 
                 sdlProcesses.emplace(ivFunctionName,
                         ProcessMetadata(ivFunctionName, systemStructure, sdlProcess, functionDatamodel));
@@ -446,6 +449,12 @@ QFileInfo TmcConverter::sdlFunctionDatamodelLocation(const QString &functionName
 {
     return sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator() + "code"
             + QDir::separator() + functionName.toLower() + "_datamodel.asn";
+}
+
+QFileInfo TmcConverter::sdlFunctionDatamodelLocation(const QString &functionName, const QString &functionTypeName) const
+{
+    return sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator() + "code"
+            + QDir::separator() + functionTypeName.toLower() + "_datamodel.asn";
 }
 
 QFileInfo TmcConverter::outputFilepath(const QString &name)

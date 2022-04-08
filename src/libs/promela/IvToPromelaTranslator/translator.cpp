@@ -83,9 +83,6 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
 
     for (IVFunction *ivFunction : ivFunctionList) {
         const QString functionName = ivFunction->property("name").toString();
-        if (ivFunction->instanceOf() != nullptr) {
-            const QString functionTypeName = ivFunction->instanceOf()->property("name").toString();
-        }
 
         if (std::find(modelFunctions.begin(), modelFunctions.end(), functionName) != modelFunctions.end()) {
             promelaModel->addInclude(QString("%1.pml").arg(functionName.toLower()));
@@ -98,17 +95,7 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
 
     promelaModel->addInclude("env_inlines.pml");
 
-    Utype systemState("system_state");
-
-    for (const QString &functionName : modelFunctions) {
-        QString dataType = QString("%1_Context").arg(Escaper::escapePromelaIV(functionName));
-        QString fieldName = functionName;
-        systemState.addField(Declaration(DataType(UtypeRef(dataType)), fieldName));
-    }
-
-    promelaModel->addUtype(systemState);
-
-    promelaModel->addDeclaration(Declaration(DataType(UtypeRef("system_state")), "global_state"));
+    createSystemState(promelaModel.get(), ivModel, modelFunctions);
 
     for (const QString &function : modelFunctions) {
         QList<ChannelInit::Type> channelType;
@@ -472,6 +459,35 @@ void IvToPromelaTranslator::createCheckQueueInline(
     const QString checkQueueInlineName = QString("%1_check_queue").arg(Escaper::escapePromelaIV(functionName));
     promelaModel->addInlineDef(
             std::make_unique<InlineDef>(checkQueueInlineName, QList<QString>(), std::move(sequence)));
+}
+
+void IvToPromelaTranslator::createSystemState(
+        PromelaModel *promelaModel, const IVModel *ivModel, const std::vector<QString> &modelFunctions) const
+{
+    QVector<IVFunction *> ivFunctionList = ivModel->allObjectsByType<IVFunction>();
+
+    Utype systemState("system_state");
+
+    for (IVFunction *ivFunction : ivFunctionList) {
+        const QString functionName = ivFunction->property("name").toString();
+        if (std::find(modelFunctions.begin(), modelFunctions.end(), functionName) == modelFunctions.end()) {
+            continue;
+        }
+        if (ivFunction->instanceOf() != nullptr) {
+            const QString functionTypeName = ivFunction->instanceOf()->property("name").toString();
+            QString dataType = QString("%1_Context").arg(Escaper::escapePromelaIV(functionTypeName));
+            QString fieldName = functionName;
+            systemState.addField(Declaration(DataType(UtypeRef(dataType)), fieldName));
+        } else {
+            QString dataType = QString("%1_Context").arg(Escaper::escapePromelaIV(functionName));
+            QString fieldName = functionName;
+            systemState.addField(Declaration(DataType(UtypeRef(dataType)), fieldName));
+        }
+    }
+
+    promelaModel->addUtype(systemState);
+
+    promelaModel->addDeclaration(Declaration(DataType(UtypeRef("system_state")), "global_state"));
 }
 
 QString IvToPromelaTranslator::constructChannelName(const QString &functionName, const QString &interfaceName) const
