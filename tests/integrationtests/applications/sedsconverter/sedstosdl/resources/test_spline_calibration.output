@@ -147,35 +147,6 @@ process Calibration;
         return result;
     endprocedure;
 
-    procedure LinearExtrapolation;
-        dcl x0 SplinePointValue;
-        dcl x1 SplinePointValue;
-        dcl y0 SplinePointValue;
-        dcl y1 SplinePointValue;
-        dcl result SplinePointValue;
-        fpar
-            in intervalIndex SplinePointsArrayIndex,
-            in value SplinePointValue,
-            in rawPoints SplinePointsArray,
-            in calibratedPoints SplinePointsArray;
-        returns SplinePointValue;
-        START;
-            decision intervalIndex = -1;
-                (True):
-                    task x0 := rawPoints(0);
-                    task x1 := rawPoints(1);
-                    task y0 := calibratedPoints(0);
-                    task y1 := calibratedPoints(1);
-                (False):
-                    task x0 := rawPoints(intervalIndex-1);
-                    task x1 := rawPoints(intervalIndex-2);
-                    task y0 := calibratedPoints(intervalIndex-1);
-                    task y1 := calibratedPoints(intervalIndex-2);
-            enddecision;
-            task result := y1 + ((value - x1) / (x0 - x1)) * (y0 - y1);
-        return result;
-    endprocedure;
-
     procedure InitRawSplinePoints1;
         START;
             task RawSplinePoints1 := { 1.000000, 5.000000, 10.000000, 20.000000 };
@@ -191,7 +162,6 @@ process Calibration;
     procedure CalibrateActivity;
         dcl intervalIndex SplinePointsArrayIndex;
         START;
-
             task Iterator := -5.0;
 
             loop_start_1:
@@ -201,12 +171,19 @@ process Calibration;
                 (True):
                     task intervalIndex := call FindInterval(Iterator, RawSplinePoints1);
 
-                    decision intervalIndex = -1 or intervalIndex = length(RawSplinePoints1);
+                    decision intervalIndex = -1;
                         (True):
-                            task Calibratedvalue := call LinearExtrapolation(intervalIndex, Iterator, RawSplinePoints1, CalibratedSplinePoints1);
+                            return CalibratedSplinePoints1(0);
                         (False):
-                            task Calibratedvalue := call LinearCalibration(intervalIndex, Iterator, RawSplinePoints1, CalibratedSplinePoints1);
                     enddecision;
+
+                    decision intervalIndex = length(CalibratedSplinePoints1);
+                        (True):
+                            return CalibratedSplinePoints1(length(CalibratedSplinePoints1) - 1);
+                        (False):
+                    enddecision;
+
+                    task Calibratedvalue := call LinearCalibration(intervalIndex, Iterator, RawSplinePoints1, CalibratedSplinePoints1);
 
                     task Iterator := Iterator + 1.0;
                     join loop_start_1;

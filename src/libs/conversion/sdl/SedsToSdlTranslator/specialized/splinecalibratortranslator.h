@@ -48,13 +48,14 @@ private:
     static auto buildCubicCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
     static auto buildLinearExtrapolationProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
 
-    auto addCallToFindInterval(const QString &sourceName, const QString rawPointsVariableName) -> void;
     auto addCallToLinearCalibration(const QString &targetName, const QString &sourceName,
             const QString &rawPointsVariableName, const QString &calibratedPointsVariableName) -> void;
     auto addCallToSquareCalibration(const QString &targetName, const QString &sourceName,
             const QString &rawPointsVariableName, const QString &calibratedPointsVariableName) -> void;
     auto addCallToCubicCalibration(const QString &targetName, const QString &sourceName,
             const QString &rawPointsVariableName, const QString &calibratedPointsVariableName) -> void;
+    auto addCallToFindInterval(const QString &sourceName, const QString rawPointsVariableName) -> void;
+    auto addExtrapolationCheck(const QString &calibratedPointsVariableName) -> void;
     static auto addValueEqualRawCheck(::sdl::Transition *transition) -> void;
 
     static auto getSplineOrder(const seds::model::SplineCalibrator &splineCalibrator) -> uint8_t;

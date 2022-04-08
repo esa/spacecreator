@@ -36,7 +36,7 @@ void SplineCalibrator::addSplinePoint(SplinePoint splinePoint)
     m_splinePoints.push_back(std::move(splinePoint));
 }
 
-bool SplineCalibrator::isExtrapolate() const
+bool SplineCalibrator::extrapolate() const
 {
     return m_extrapolate;
 }

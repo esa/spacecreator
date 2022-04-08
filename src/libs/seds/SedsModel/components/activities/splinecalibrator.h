@@ -36,7 +36,7 @@ public:
     auto splinePoints() const -> const std::vector<SplinePoint> &;
     auto addSplinePoint(SplinePoint splinePoint) -> void;
 
-    auto isExtrapolate() const -> bool;
+    auto extrapolate() const -> bool;
     auto setExtrapolate(bool extrapolate) -> void;
 
 private:

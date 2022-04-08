@@ -67,6 +67,10 @@ auto SplineCalibratorTranslator::translate(const seds::model::SplineCalibrator &
 
     addCallToFindInterval(sourceName, rawPointsVariableName);
 
+    if (!splineCalibrator.extrapolate()) {
+        addExtrapolationCheck(calibratedPointsVariableName);
+    }
+
     switch (splineOrder) {
     case 1: {
         addCallToLinearCalibration(targetName, sourceName, rawPointsVariableName, calibratedPointsVariableName);
@@ -166,8 +170,6 @@ auto SplineCalibratorTranslator::buildSplineCalibratorBoilerplate(StatementTrans
     buildLinearCalibrationProcedure(context);
     buildSquareCalibrationProcedure(context);
     buildCubicCalibrationProcedure(context);
-
-    buildLinearExtrapolationProcedure(context);
 
     alreadyCreated = true;
 }
@@ -695,163 +697,16 @@ auto SplineCalibratorTranslator::buildCubicCalibrationProcedure(StatementTransla
     context.sdlProcess()->addProcedure(std::move(procedure));
 }
 
-auto SplineCalibratorTranslator::buildLinearExtrapolationProcedure(
-        StatementTranslatorVisitor::StatementContext &context) -> void
-{
-    // Create procedure
-    const QString procedureName("LinearExtrapolation");
-    auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
-
-    // Create procedure local variables
-    auto x0Var = std::make_unique<::sdl::VariableDeclaration>("x0", "SplinePointValue");
-    auto x1Var = std::make_unique<::sdl::VariableDeclaration>("x1", "SplinePointValue");
-    auto y0Var = std::make_unique<::sdl::VariableDeclaration>("y0", "SplinePointValue");
-    auto y1Var = std::make_unique<::sdl::VariableDeclaration>("y1", "SplinePointValue");
-    auto resultVar = std::make_unique<::sdl::VariableDeclaration>("result", "SplinePointValue");
-
-    // Create procedure parameters
-    auto intervalIndexParameter =
-            std::make_unique<::sdl::ProcedureParameter>("intervalIndex", "SplinePointsArrayIndex", "in");
-    auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", "SplinePointValue", "in");
-    auto rawPointsParameter = std::make_unique<::sdl::ProcedureParameter>("rawPoints", "SplinePointsArray", "in");
-    auto calibratedPointsParameter =
-            std::make_unique<::sdl::ProcedureParameter>("calibratedPoints", "SplinePointsArray", "in");
-
-    // Create transition
-    auto transition = std::make_unique<::sdl::Transition>();
-
-    // Check whether extrapolate at the start or at the end of the spline
-    auto sideDecision = std::make_unique<::sdl::Decision>();
-    auto sideDecisionExpression = std::make_unique<::sdl::Expression>("intervalIndex = -1");
-    sideDecision->setExpression(std::move(sideDecisionExpression));
-
-    // Extrapolate at the start
-    auto sideDecisionStartTransition = std::make_unique<::sdl::Transition>();
-
-    // Get x0
-    const auto getStartX0Action = QString("x0 := rawPoints(0)");
-    auto getStartX0Task = std::make_unique<::sdl::Task>("", getStartX0Action);
-    sideDecisionStartTransition->addAction(std::move(getStartX0Task));
-
-    // Get x1
-    const auto getStartX1Action = QString("x1 := rawPoints(1)");
-    auto getStartX1Task = std::make_unique<::sdl::Task>("", getStartX1Action);
-    sideDecisionStartTransition->addAction(std::move(getStartX1Task));
-
-    // Get y0
-    const auto getStartY0Action = QString("y0 := calibratedPoints(0)");
-    auto getStartY0Task = std::make_unique<::sdl::Task>("", getStartY0Action);
-    sideDecisionStartTransition->addAction(std::move(getStartY0Task));
-
-    // Get y1
-    const auto getStartY1Action = QString("y1 := calibratedPoints(1)");
-    auto getStartY1Task = std::make_unique<::sdl::Task>("", getStartY1Action);
-    sideDecisionStartTransition->addAction(std::move(getStartY1Task));
-
-    // Extrapolate at the end
-    auto sideDecisionEndTransition = std::make_unique<::sdl::Transition>();
-
-    // Get x0
-    const auto getEndX0Action = QString("x0 := rawPoints(intervalIndex-1)");
-    auto getEndX0Task = std::make_unique<::sdl::Task>("", getEndX0Action);
-    sideDecisionEndTransition->addAction(std::move(getEndX0Task));
-
-    // Get x1
-    const auto getEndX1Action = QString("x1 := rawPoints(intervalIndex-2)");
-    auto getEndX1Task = std::make_unique<::sdl::Task>("", getEndX1Action);
-    sideDecisionEndTransition->addAction(std::move(getEndX1Task));
-
-    // Get y0
-    const auto getEndY0Action = QString("y0 := calibratedPoints(intervalIndex-1)");
-    auto getEndY0Task = std::make_unique<::sdl::Task>("", getEndY0Action);
-    sideDecisionEndTransition->addAction(std::move(getEndY0Task));
-
-    // Get y1
-    const auto getEndY1Action = QString("y1 := calibratedPoints(intervalIndex-2)");
-    auto getEndY1Task = std::make_unique<::sdl::Task>("", getEndY1Action);
-    sideDecisionEndTransition->addAction(std::move(getEndY1Task));
-
-    // Add decision to transition
-    auto sideDecisionStart = std::make_unique<::sdl::Answer>();
-    sideDecisionStart->setLiteral(::sdl::VariableLiteral("True"));
-    sideDecisionStart->setTransition(std::move(sideDecisionStartTransition));
-    sideDecision->addAnswer(std::move(sideDecisionStart));
-
-    auto sideDecisionEnd = std::make_unique<::sdl::Answer>();
-    sideDecisionEnd->setLiteral(::sdl::VariableLiteral("False"));
-    sideDecisionEnd->setTransition(std::move(sideDecisionEndTransition));
-    sideDecision->addAnswer(std::move(sideDecisionEnd));
-
-    transition->addAction(std::move(sideDecision));
-
-    // Calculate result
-    const auto calculateResultAction = QString("result := y1 + ((value - x1) / (x0 - x1)) * (y0 - y1)");
-    auto calculateResultTask = std::make_unique<::sdl::Task>("", calculateResultAction);
-    transition->addAction(std::move(calculateResultTask));
-
-    // Set procedure return variable
-    auto resultVarRef = std::make_unique<::sdl::VariableReference>(resultVar.get());
-    procedure->setReturnVariableReference(std::move(resultVarRef));
-
-    // Add variables to procedure
-    procedure->addVariable(std::move(x0Var));
-    procedure->addVariable(std::move(x1Var));
-    procedure->addVariable(std::move(y0Var));
-    procedure->addVariable(std::move(y1Var));
-    procedure->addVariable(std::move(resultVar));
-
-    // Add parameters to procedure
-    procedure->addParameter(std::move(intervalIndexParameter));
-    procedure->addParameter(std::move(valueParameter));
-    procedure->addParameter(std::move(rawPointsParameter));
-    procedure->addParameter(std::move(calibratedPointsParameter));
-
-    // Add transition to procedure
-    procedure->setTransition(std::move(transition));
-
-    // Add procedure to process
-    context.sdlProcess()->addProcedure(std::move(procedure));
-}
-
 auto SplineCalibratorTranslator::addCallToLinearCalibration(const QString &targetName, const QString &sourceName,
         const QString &rawPointsVariableName, const QString &calibratedPointsVariableName) -> void
 {
-    auto extrapolationDecision = std::make_unique<::sdl::Decision>();
-    auto extrapolationDecisionExpression = std::make_unique<::sdl::Expression>(
-            QString("intervalIndex = -1 or intervalIndex = length(%1)").arg(rawPointsVariableName));
-    extrapolationDecision->setExpression(std::move(extrapolationDecisionExpression));
-
-    auto extrapolationDecisionTrueTransition = std::make_unique<::sdl::Transition>();
-
-    const auto extrapolationAction = QString("%1 := call LinearExtrapolation(intervalIndex, %2, %3, %4)")
-                                             .arg(targetName)
-                                             .arg(sourceName)
-                                             .arg(rawPointsVariableName)
-                                             .arg(calibratedPointsVariableName);
-    auto extrapolationTask = std::make_unique<::sdl::Task>("", extrapolationAction);
-    extrapolationDecisionTrueTransition->addAction(std::move(extrapolationTask));
-
-    auto extrapolationDecisionTrue = std::make_unique<::sdl::Answer>();
-    extrapolationDecisionTrue->setLiteral(::sdl::VariableLiteral("True"));
-    extrapolationDecisionTrue->setTransition(std::move(extrapolationDecisionTrueTransition));
-    extrapolationDecision->addAnswer(std::move(extrapolationDecisionTrue));
-
-    auto extrapolationDecisionFalseTransition = std::make_unique<::sdl::Transition>();
-
     const auto linearAction = QString("%1 := call LinearCalibration(intervalIndex, %2, %3, %4)")
                                       .arg(targetName)
                                       .arg(sourceName)
                                       .arg(rawPointsVariableName)
                                       .arg(calibratedPointsVariableName);
     auto linearTask = std::make_unique<::sdl::Task>("", linearAction);
-    extrapolationDecisionFalseTransition->addAction(std::move(linearTask));
-
-    auto extrapolationDecisionFalse = std::make_unique<::sdl::Answer>();
-    extrapolationDecisionFalse->setLiteral(::sdl::VariableLiteral("False"));
-    extrapolationDecisionFalse->setTransition(std::move(extrapolationDecisionFalseTransition));
-    extrapolationDecision->addAnswer(std::move(extrapolationDecisionFalse));
-
-    m_sdlTransition->addAction(std::move(extrapolationDecision));
+    m_sdlTransition->addAction(std::move(linearTask));
 }
 
 auto SplineCalibratorTranslator::addCallToSquareCalibration(const QString &targetName, const QString &sourceName,
@@ -885,6 +740,58 @@ auto SplineCalibratorTranslator::addCallToFindInterval(const QString &sourceName
             QString("intervalIndex := call FindInterval(%1, %2)").arg(sourceName).arg(rawPointsVariableName);
     auto callFindIntervalTask = std::make_unique<::sdl::Task>("", callFindIntervalAction);
     m_sdlTransition->addAction(std::move(callFindIntervalTask));
+}
+
+auto SplineCalibratorTranslator::addExtrapolationCheck(const QString &calibratedPointsVariableName) -> void
+{
+    // Left interpolation
+    auto isExtrapolationLeftDecision = std::make_unique<::sdl::Decision>();
+    auto isExtrapolationLeftDecisionExpression = std::make_unique<::sdl::Expression>("intervalIndex = -1");
+    isExtrapolationLeftDecision->setExpression(std::move(isExtrapolationLeftDecisionExpression));
+
+    auto isExtrapolationLeftDecisionTrueTransition = std::make_unique<::sdl::Transition>();
+
+    auto isExtrapolationLeftDecisionTrueReturn =
+            std::make_unique<::sdl::Return>(QString("%1(0)").arg(calibratedPointsVariableName));
+    isExtrapolationLeftDecisionTrueTransition->addAction(std::move(isExtrapolationLeftDecisionTrueReturn));
+
+    auto isExtrapolationLeftDecisionTrue = std::make_unique<::sdl::Answer>();
+    isExtrapolationLeftDecisionTrue->setLiteral(::sdl::VariableLiteral("True"));
+    isExtrapolationLeftDecisionTrue->setTransition(std::move(isExtrapolationLeftDecisionTrueTransition));
+    isExtrapolationLeftDecision->addAnswer(std::move(isExtrapolationLeftDecisionTrue));
+
+    auto isExtrapolationLeftDecisionFalseTransition = std::make_unique<::sdl::Transition>();
+    auto isExtrapolationLeftDecisionFalse = std::make_unique<::sdl::Answer>();
+    isExtrapolationLeftDecisionFalse->setLiteral(::sdl::VariableLiteral("False"));
+    isExtrapolationLeftDecisionFalse->setTransition(std::move(isExtrapolationLeftDecisionFalseTransition));
+    isExtrapolationLeftDecision->addAnswer(std::move(isExtrapolationLeftDecisionFalse));
+
+    m_sdlTransition->addAction(std::move(isExtrapolationLeftDecision));
+
+    // Right interpolation
+    auto isExtrapolationRightDecision = std::make_unique<::sdl::Decision>();
+    auto isExtrapolationRightDecisionExpression = std::make_unique<::sdl::Expression>(
+            QString("intervalIndex = length(%1)").arg(calibratedPointsVariableName));
+    isExtrapolationRightDecision->setExpression(std::move(isExtrapolationRightDecisionExpression));
+
+    auto isExtrapolationRightDecisionTrueTransition = std::make_unique<::sdl::Transition>();
+
+    auto isExtrapolationRightDecisionTrueReturn =
+            std::make_unique<::sdl::Return>(QString("%1(length(%1) - 1)").arg(calibratedPointsVariableName));
+    isExtrapolationRightDecisionTrueTransition->addAction(std::move(isExtrapolationRightDecisionTrueReturn));
+
+    auto isExtrapolationRightDecisionTrue = std::make_unique<::sdl::Answer>();
+    isExtrapolationRightDecisionTrue->setLiteral(::sdl::VariableLiteral("True"));
+    isExtrapolationRightDecisionTrue->setTransition(std::move(isExtrapolationRightDecisionTrueTransition));
+    isExtrapolationRightDecision->addAnswer(std::move(isExtrapolationRightDecisionTrue));
+
+    auto isExtrapolationRightDecisionFalseTransition = std::make_unique<::sdl::Transition>();
+    auto isExtrapolationRightDecisionFalse = std::make_unique<::sdl::Answer>();
+    isExtrapolationRightDecisionFalse->setLiteral(::sdl::VariableLiteral("False"));
+    isExtrapolationRightDecisionFalse->setTransition(std::move(isExtrapolationRightDecisionFalseTransition));
+    isExtrapolationRightDecision->addAnswer(std::move(isExtrapolationRightDecisionFalse));
+
+    m_sdlTransition->addAction(std::move(isExtrapolationRightDecision));
 }
 
 auto SplineCalibratorTranslator::addValueEqualRawCheck(::sdl::Transition *transition) -> void
