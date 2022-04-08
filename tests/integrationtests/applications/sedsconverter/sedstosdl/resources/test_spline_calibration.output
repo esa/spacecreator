@@ -3,6 +3,8 @@ process Calibration;
     dcl Calibratedvalue RealType;
     dcl RawSplinePoints1 SplinePointsArray;
     dcl CalibratedSplinePoints1 SplinePointsArray;
+    dcl RawSplinePoints2 SplinePointsArray;
+    dcl CalibratedSplinePoints2 SplinePointsArray;
 
     procedure FindInterval;
         dcl result SplinePointsArrayIndex;
@@ -179,6 +181,18 @@ process Calibration;
         return ;
     endprocedure;
 
+    procedure InitRawSplinePoints2;
+        START;
+            task RawSplinePoints2 := { 1.000000, 5.000000, 10.000000, 20.000000 };
+        return ;
+    endprocedure;
+
+    procedure InitCalibratedSplinePoints2;
+        START;
+            task CalibratedSplinePoints2 := { 2.000000, 10.000000, -20.000000, 40.000000 };
+        return ;
+    endprocedure;
+
     procedure CalibrateActivity;
         dcl intervalIndex SplinePointsArrayIndex;
         START;
@@ -207,12 +221,40 @@ process Calibration;
                 join loop_start_1;
             enddecision;
             loop_end_2:
+
+            task Iterator := -5.0;
+
+            loop_start_3:
+            decision Iterator <= 25.0;
+                (False):
+                    join loop_end_4;
+                (True):
+                    task intervalIndex := call FindInterval(Iterator, RawSplinePoints2);
+
+                    decision intervalIndex = -1;
+                        (True):
+                            task Calibratedvalue := CalibratedSplinePoints2(0);
+                        (False):
+                            decision intervalIndex = length(RawSplinePoints2);
+                                (True):
+                                    task Calibratedvalue := CalibratedSplinePoints2(length(CalibratedSplinePoints2) - 1);
+                                (False):
+                                    task Calibratedvalue := call SquareCalibration(intervalIndex, Iterator, RawSplinePoints2, CalibratedSplinePoints2);
+                            enddecision;
+                    enddecision;
+
+                task Iterator := Iterator + 1.0;
+                join loop_start_3;
+            enddecision;
+            loop_end_4:
         return ;
     endprocedure;
 
     START;
         call InitRawSplinePoints1;
         call InitCalibratedSplinePoints1;
+        call InitRawSplinePoints2;
+        call InitCalibratedSplinePoints2;
         NEXTSTATE Idle;
 
     state DoCalibration;
