@@ -49,16 +49,19 @@ private:
     static auto buildLinearExtrapolationProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
 
     auto addCallToLinearCalibration(const QString &targetName, const QString &sourceName,
-            const QString &rawPointsVariableName, const QString &calibratedPointsVariableName) -> void;
+            const QString &rawPointsVariableName, const QString &calibratedPointsVariableName, const bool extrapolate)
+            -> void;
     auto addCallToSquareCalibration(const QString &targetName, const QString &sourceName,
             const QString &rawPointsVariableName, const QString &calibratedPointsVariableName) -> void;
     auto addCallToCubicCalibration(const QString &targetName, const QString &sourceName,
             const QString &rawPointsVariableName, const QString &calibratedPointsVariableName) -> void;
     auto addCallToFindInterval(const QString &sourceName, const QString rawPointsVariableName) -> void;
-    auto addExtrapolationCheck(const QString &calibratedPointsVariableName) -> void;
     static auto addValueEqualRawCheck(::sdl::Transition *transition) -> void;
     static auto handleLeftExtrapolation(const uint8_t newIndex, ::sdl::Transition *transition) -> void;
     static auto handleRightExtrapolation(const QString &newIndex, ::sdl::Transition *transition) -> void;
+
+    auto buildExtrapolationCheck(const QString &targetName, const QString &calibratedPointsVariableName)
+            -> std::unique_ptr<::sdl::Decision>;
 
     static auto getSplineOrder(const seds::model::SplineCalibrator &splineCalibrator) -> uint8_t;
 

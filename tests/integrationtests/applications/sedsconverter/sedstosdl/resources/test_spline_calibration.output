@@ -183,19 +183,14 @@ process Calibration;
                 (True):
                     task intervalIndex := call FindInterval(Iterator, RawSplinePoints1);
 
-                    decision intervalIndex = -1;
-                        (True):
-                            return CalibratedSplinePoints1(0);
-                        (False):
+                    decision intervalIndex;
+                        (= -1):
+                            task Calibratedvalue := CalibratedSplinePoints1(0);
+                        (= length(CalibratedSplinePoints1)):
+                            task Calibratedvalue := CalibratedSplinePoints1(length(CalibratedSplinePoints1) - 1);
+                        (ELSE):
+                            task Calibratedvalue := call LinearCalibration(intervalIndex, Iterator, RawSplinePoints1, CalibratedSplinePoints1);
                     enddecision;
-
-                    decision intervalIndex = length(CalibratedSplinePoints1);
-                        (True):
-                            return CalibratedSplinePoints1(length(CalibratedSplinePoints1) - 1);
-                        (False):
-                    enddecision;
-
-                    task Calibratedvalue := call LinearCalibration(intervalIndex, Iterator, RawSplinePoints1, CalibratedSplinePoints1);
 
                     task Iterator := Iterator + 1.0;
                     join loop_start_1;
