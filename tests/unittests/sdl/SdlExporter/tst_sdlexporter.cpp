@@ -645,9 +645,10 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
 
     auto procedure = SdlProcedureBuilder()
                              .withName("myProcedure")
+                             .withReturnVariableReference(std::make_unique<VariableReference>(returnVariable.get()))
+                             .withVariable(std::move(returnVariable))
                              .withParameter(makeProcedureParameter("a", "MyInteger", "in/out"))
                              .withParameter(makeProcedureParameter("b", "MyInteger", "in"))
-                             .withReturnVariableReference(std::make_unique<VariableReference>(returnVariable.get()))
                              .withTransition(SdlTransitionBuilder()
                                                      .withAction(SdlTaskBuilder().withContents("ret := a + b;").build())
                                                      .withAction(SdlTaskBuilder().withContents("a := a + 1;").build())
@@ -707,11 +708,11 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
         "dcl y MyInteger;",
 
         "procedure myProcedure;",
+        "dcl ret MyInteger;",
         "fpar",
         "in/out a MyInteger,",
         "in b MyInteger;",
         "returns MyInteger;",
-        "dcl ret MyInteger;",
         "START;",
         "task ret := a + b;",
         "task a := a + 1;",

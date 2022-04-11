@@ -47,6 +47,13 @@ SdlProcedureBuilder &SdlProcedureBuilder::withTransition(std::unique_ptr<Transit
     return *this;
 }
 
+SdlProcedureBuilder &SdlProcedureBuilder::withVariable(std::unique_ptr<VariableDeclaration> variable)
+{
+    m_procedure->addVariable(std::move(variable));
+
+    return *this;
+}
+
 SdlProcedureBuilder &SdlProcedureBuilder::withParameter(std::unique_ptr<ProcedureParameter> parameter)
 {
     m_procedure->addParameter(std::move(parameter));
