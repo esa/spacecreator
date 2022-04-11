@@ -25,13 +25,28 @@
 
 namespace conversion::sdl::translator {
 
+/**
+ * @brief   Translator for spline calibrators
+ */
 class SplineCalibratorTranslator final
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   context         Statement context
+     * @param   calibration     Parent calibration
+     * @param   sdlTransition   Current SDL transition
+     */
     SplineCalibratorTranslator(StatementTranslatorVisitor::StatementContext &context,
             const seds::model::Calibration &calibration, ::sdl::Transition *sdlTransition);
 
 public:
+    /**
+     * @brief   Translate spline calibrator
+     *
+     * @param   splineCalibrator    Calibrator to translate
+     */
     auto translate(const seds::model::SplineCalibrator &splineCalibrator) -> void;
 
 private:
