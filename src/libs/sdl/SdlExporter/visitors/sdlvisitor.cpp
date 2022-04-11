@@ -119,12 +119,10 @@ auto SdlVisitor::Layouter::moveRightToHighWatermark() -> void
 
 auto SdlVisitor::Layouter::getPositionString(const SdlVisitor::Layouter::ElementType element) -> QString
 {
-    /* const auto &position = getPosition(); */
-    /* return POSITION_STRING_PATTERN.arg(CIF_NAMES.at(element), QString::number(position.first), */
-    /*         QString::number(position.second), QString::number(CIF_SIZES.at(element).first), */
-    /*         QString::number(CIF_SIZES.at(element).second)); */
-    Q_UNUSED(element);
-    return "";
+    const auto &position = getPosition();
+    return POSITION_STRING_PATTERN.arg(CIF_NAMES.at(element), QString::number(position.first),
+            QString::number(position.second), QString::number(CIF_SIZES.at(element).first),
+            QString::number(CIF_SIZES.at(element).second));
 }
 
 auto SdlVisitor::IndentingStreamWriter::getIndent() -> QString
@@ -205,7 +203,7 @@ void SdlVisitor::visit(const Process &process)
             m_writer.writeLine("Timer " + timer + ";");
         }
         exportCollection(process.variables());
-        // m_writer.writeLine("/* CIF ENDTEXT */");
+        m_writer.writeLine("/* CIF ENDTEXT */");
     }
 
     if (!process.procedures().empty()) {
@@ -489,7 +487,7 @@ void SdlVisitor::visit(const Procedure &procedure)
     }
 
     if (variablesPresent || parametersPresent || returnVarPresent) {
-        // m_writer.writeLine("/* CIF ENDTEXT */");
+        m_writer.writeLine("/* CIF ENDTEXT */");
     }
 
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Start));
