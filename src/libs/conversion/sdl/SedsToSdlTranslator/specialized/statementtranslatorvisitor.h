@@ -267,25 +267,21 @@ private:
 
     static auto findIvInterface(ivm::IVFunction *function, const QString &interfaceName) -> ivm::IVInterface *;
 
-    static auto findVariableDeclaration(::sdl::Process *process, ::sdl::Procedure *sdlProcedure, QString name)
-            -> ::sdl::VariableDeclaration *;
-
-    static auto translateArgument(::sdl::Process *process, ::sdl::Procedure *sdlProcedure,
-            const seds::model::NamedArgumentValue &argument) -> ::sdl::ProcedureCall::Argument;
+    static auto translateArgument(const seds::model::NamedArgumentValue &argument) -> ::sdl::ProcedureCall::Argument;
 
     static auto translatePolynomial(const QString variable, const seds::model::Polynomial &polynomial) -> QString;
 
-    static auto translateCall(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString callName,
+    static auto translateCall(::sdl::Process *hostProcess, const QString callName,
             const seds::model::SendCommandPrimitive &sendCommand) -> std::unique_ptr<::sdl::ProcedureCall>;
 
-    static auto translateCall(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString callName,
+    static auto translateCall(::sdl::Process *hostProcess, const QString callName,
             const seds::model::SendParameterPrimitive &sendParameter) -> std::unique_ptr<::sdl::ProcedureCall>;
 
-    static auto translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString &callName,
-            const seds::model::SendCommandPrimitive &sendCommand) -> std::vector<std::unique_ptr<::sdl::Action>>;
+    static auto translateOutput(const QString &callName, const seds::model::SendCommandPrimitive &sendCommand)
+            -> std::vector<std::unique_ptr<::sdl::Action>>;
 
-    static auto translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString &callName,
-            const seds::model::SendParameterPrimitive &sendParameter) -> std::vector<std::unique_ptr<::sdl::Action>>;
+    static auto translateOutput(const QString &callName, const seds::model::SendParameterPrimitive &sendParameter)
+            -> std::vector<std::unique_ptr<::sdl::Action>>;
 
     static auto translateComparison(const seds::model::Comparison &comparison) -> QString;
 

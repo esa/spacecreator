@@ -49,7 +49,7 @@ public:
 
     auto withParameter(std::unique_ptr<ProcedureParameter> parameter) -> SdlProcedureBuilder &;
 
-    auto withReturnVariableReference(std::unique_ptr<VariableReference> variable) -> SdlProcedureBuilder &;
+    auto withReturnType(QString returnType) -> SdlProcedureBuilder &;
 
 private:
     std::unique_ptr<Procedure> m_procedure;

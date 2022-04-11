@@ -16,7 +16,6 @@ process Calibration;
         START;
             /* CIF Task (0, 187), (100, 50) */
             task RawSplinePoints1 := { 1.000000, 5.000000, 10.000000, 20.000000 };
-        return ;
     endprocedure;
     /* CIF Procedure (0, 975), (800, 50) */
     procedure InitCalibratedSplinePoints1;
@@ -24,7 +23,6 @@ process Calibration;
         START;
             /* CIF Task (0, 187), (100, 50) */
             task CalibratedSplinePoints1 := { 2.000000, 10.000000, -20.000000, 40.000000 };
-        return ;
     endprocedure;
     /* CIF Procedure (0, 1050), (800, 50) */
     procedure InitRawSplinePoints2;
@@ -32,7 +30,6 @@ process Calibration;
         START;
             /* CIF Task (0, 187), (100, 50) */
             task RawSplinePoints2 := { 1.000000, 5.000000, 10.000000, 20.000000 };
-        return ;
     endprocedure;
     /* CIF Procedure (0, 1125), (800, 50) */
     procedure InitCalibratedSplinePoints2;
@@ -40,7 +37,6 @@ process Calibration;
         START;
             /* CIF Task (0, 187), (100, 50) */
             task CalibratedSplinePoints2 := { 2.000000, 10.000000, -20.000000, 40.000000 };
-        return ;
     endprocedure;
     /* CIF Procedure (0, 1200), (800, 50) */
     procedure InitRawSplinePoints3;
@@ -48,7 +44,6 @@ process Calibration;
         START;
             /* CIF Task (0, 187), (100, 50) */
             task RawSplinePoints3 := { 1.000000, 5.000000, 10.000000, 20.000000 };
-        return ;
     endprocedure;
     /* CIF Procedure (0, 1275), (800, 50) */
     procedure InitCalibratedSplinePoints3;
@@ -56,7 +51,6 @@ process Calibration;
         START;
             /* CIF Task (0, 187), (100, 50) */
             task CalibratedSplinePoints3 := { 2.000000, 10.000000, -20.000000, 40.000000 };
-        return ;
     endprocedure;
     /* CIF Procedure (0, 1350), (800, 50) */
     procedure CalibrateActivity;
@@ -188,7 +182,6 @@ process Calibration;
             enddecision;
             /* CIF Label (10800, 1762), (100, 50) */
             loop_end_6:
-        return ;
     endprocedure;
     /* CIF Procedure (0, 1425), (800, 50) */
     procedure FindInterval;

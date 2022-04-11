@@ -100,17 +100,17 @@ public:
     auto addParameter(std::unique_ptr<ProcedureParameter> parameter) -> void;
 
     /**
-     * @brief   Getter for the return variable declaration
+     * @brief   Getter for the return type
      *
-     * @return  return variable declaration
+     * @return  return type
      */
-    auto returnVariableReference() const -> VariableReference *;
+    auto returnType() const -> const QString &;
     /**
-     * @brief   Setter for the return variable declaration
+     * @brief   Setter for the return type
      *
-     * @param   variableReference     return variable reference
+     * @param   returnType      return type
      */
-    auto setReturnVariableReference(std::unique_ptr<VariableReference> variableReference) -> void;
+    auto setReturnType(QString returnType) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
@@ -121,7 +121,7 @@ private:
     std::unique_ptr<Transition> m_implementation; // Null if external
     std::vector<std::unique_ptr<VariableDeclaration>> m_variables;
     std::vector<std::unique_ptr<ProcedureParameter>> m_parameters;
-    std::unique_ptr<VariableReference> m_returnVariableReference;
+    QString m_returnType;
 };
 
 } // namespace sdl

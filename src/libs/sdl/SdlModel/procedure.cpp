@@ -58,14 +58,14 @@ void Procedure::addParameter(std::unique_ptr<ProcedureParameter> parameter)
     m_parameters.push_back(std::move(parameter));
 }
 
-VariableReference *Procedure::returnVariableReference() const
+const QString &Procedure::returnType() const
 {
-    return m_returnVariableReference.get();
+    return m_returnType;
 }
 
-void Procedure::setReturnVariableReference(std::unique_ptr<VariableReference> variableReference)
+void Procedure::setReturnType(QString returnType)
 {
-    m_returnVariableReference = std::move(variableReference);
+    m_returnType = std::move(returnType);
 }
 
 void Procedure::accept(Visitor &visitor) const

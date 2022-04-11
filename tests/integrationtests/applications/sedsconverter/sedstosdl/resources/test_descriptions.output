@@ -64,7 +64,6 @@ process Component;
             -- long description
             /* CIF Task (1200, 1312), (100, 50) */
             task Megavariable := 2 + 4 * Megavariable;
-        return ;
     endprocedure;
     /* CIF Procedure (0, 975), (800, 50) */
     procedure InterfacePi_MegaCommand_Pi;
@@ -81,7 +80,6 @@ process Component;
             -- long description
             /* CIF ProcedureCall (0, 1012), (100, 50) */
             call MegaActivity(Megavariable);
-        return ;
     endprocedure;
       /* CIF Procedure (0, 1050), (800, 50) */
     procedure Get_InterfacePi_Param_Pi;
@@ -93,7 +91,6 @@ process Component;
         START;
             /* CIF Task (0, 937), (100, 50) */
             task Param := Megavariable;
-        return ;
     endprocedure;
     /* CIF Procedure (0, 1125), (800, 50) */
     procedure Set_InterfacePi_Param_Pi;
@@ -105,7 +102,6 @@ process Component;
         START;
             /* CIF Task (0, 937), (100, 50) */
             task Megavariable := Param;
-        return ;
     endprocedure;
     -- StateMachine short description
     -- StateMachine

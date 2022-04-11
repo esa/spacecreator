@@ -272,8 +272,8 @@ void SdlVisitor::visit(const Input &input)
         m_writer.write("(");
 
         QString parameters = std::accumulate(std::next(inputParameters.begin()), inputParameters.end(),
-                inputParameters[0]->declaration()->name(),
-                [](const auto &a, const auto &b) { return std::move(a) + ", " + b->declaration()->name(); });
+                inputParameters[0]->variableName(),
+                [](const auto &a, const auto &b) { return std::move(a) + ", " + b->variableName(); });
         m_writer.write(parameters);
         m_writer.write(")");
     }
@@ -303,7 +303,7 @@ void SdlVisitor::visit(const Output &output)
     m_writer.beginLine("output " + output.name());
     const auto &outputParamRef = output.parameter();
     if (outputParamRef != nullptr) {
-        m_writer.write(QString("(%1)").arg(outputParamRef->declaration()->name()));
+        m_writer.write(QString("(%1)").arg(outputParamRef->variableName()));
     }
     m_writer.endLine(";");
 }
@@ -453,7 +453,7 @@ void SdlVisitor::visit(const Procedure &procedure)
 
     const bool variablesPresent = !procedureVariables.empty();
     const bool parametersPresent = !procedureParameters.empty();
-    const bool returnVarPresent = procedure.returnVariableReference() != nullptr;
+    const bool returnVarPresent = !procedure.returnType().isEmpty();
     const bool generateVarCif = variablesPresent || parametersPresent || returnVarPresent;
 
     if (generateVarCif) {
@@ -484,7 +484,7 @@ void SdlVisitor::visit(const Procedure &procedure)
     }
 
     if (returnVarPresent) {
-        m_writer.writeLine("returns " + procedure.returnVariableReference()->declaration()->type() + ";");
+        m_writer.writeLine("returns " + procedure.returnType() + ";");
     }
 
     if (generateVarCif) {
@@ -501,11 +501,6 @@ void SdlVisitor::visit(const Procedure &procedure)
         exportCollection(procedure.transition()->actions());
         m_writer.popIndent();
     }
-    m_writer.beginLine("return ");
-    if (procedure.returnVariableReference() != nullptr) {
-        m_writer.write(procedure.returnVariableReference()->declaration()->name());
-    }
-    m_writer.endLine(";");
     m_writer.popIndent();
     m_writer.writeLine("endprocedure;");
     m_layouter.popPosition();
@@ -517,7 +512,7 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall)
     if (procedureCall.procedure() == nullptr || procedureCall.procedure()->name().isEmpty()) {
         throw ExportException("Procedure to call not specified");
     }
-    if (procedureCall.procedure()->returnVariableReference() != nullptr) {
+    if (!procedureCall.procedure()->returnType().isEmpty()) {
         throw ExportException("Procedure with a return variable cannot be called from a Procedure Call. "
                               "It must be called from a Task");
     }
@@ -534,7 +529,7 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall)
             if (std::holds_alternative<std::unique_ptr<VariableLiteral>>(argument)) {
                 arg += std::get<std::unique_ptr<VariableLiteral>>(argument)->value();
             } else if (std::holds_alternative<std::unique_ptr<VariableReference>>(argument)) {
-                arg += std::get<std::unique_ptr<VariableReference>>(argument)->declaration()->name();
+                arg += std::get<std::unique_ptr<VariableReference>>(argument)->variableName();
             } else {
                 throw ExportException("Unknown Argument type");
             }

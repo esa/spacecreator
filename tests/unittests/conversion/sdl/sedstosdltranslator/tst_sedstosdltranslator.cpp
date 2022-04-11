@@ -971,7 +971,7 @@ void tst_SedsToSdlTranslator::testTranslateActivityCallWithReference()
     QCOMPARE(call->arguments().size(), 1);
     const auto &argument = call->arguments()[0];
     QVERIFY(std::holds_alternative<std::unique_ptr<VariableReference>>(argument));
-    QCOMPARE(std::get<std::unique_ptr<VariableReference>>(argument)->declaration()->name(), "X");
+    QCOMPARE(std::get<std::unique_ptr<VariableReference>>(argument)->variableName(), "X");
 }
 
 /// \SRS  ETB-FUN-2430
@@ -1099,7 +1099,7 @@ void tst_SedsToSdlTranslator::testTranslateSendCommand()
     const auto output = dynamic_cast<::sdl::Output *>(transition->actions()[1].get());
     QVERIFY(output);
     QCOMPARE(output->name(), "If1_Cmd1_Ri");
-    QCOMPARE(output->parameter()->declaration()->name(), "Io_if1_cmd1_ri");
+    QCOMPARE(output->parameter()->variableName(), "Io_if1_cmd1_ri");
 }
 
 /// \SRS  ETB-FUN-2530

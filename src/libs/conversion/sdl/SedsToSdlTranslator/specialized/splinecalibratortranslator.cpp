@@ -221,6 +221,9 @@ auto SplineCalibratorTranslator::buildFindIntervalProcedure(Context &context) ->
     const QString procedureName(m_findIntervalProcedureName);
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
 
+    // Set procedure return variable
+    procedure->setReturnType("SplinePointsArrayIndex");
+
     // Create transition
     auto transition = std::make_unique<::sdl::Transition>();
 
@@ -330,9 +333,9 @@ auto SplineCalibratorTranslator::buildFindIntervalProcedure(Context &context) ->
     auto iterationEndLabel = std::make_unique<::sdl::Label>("find_interval_end");
     transition->addAction(std::move(iterationEndLabel));
 
-    // Set procedure return variable
-    auto resultVarRef = std::make_unique<::sdl::VariableReference>(resultVar.get());
-    procedure->setReturnVariableReference(std::move(resultVarRef));
+    // Return result
+    auto endResultReturn = std::make_unique<::sdl::Return>("result");
+    transition->addAction(std::move(endResultReturn));
 
     // Add variables to procedure
     procedure->addVariable(std::move(resultVar));
@@ -353,6 +356,9 @@ auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(Context &contex
     // Create procedure
     const QString procedureName(m_linearCalibrationProcedureName);
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
+
+    // Set procedure return variable
+    procedure->setReturnType("SplinePointValue");
 
     // Create procedure local variables
     auto intervalIndexVar =
@@ -425,9 +431,9 @@ auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(Context &contex
     auto calculateResultTask = std::make_unique<::sdl::Task>("", calculateResultAction);
     transition->addAction(std::move(calculateResultTask));
 
-    // Set procedure return variable
-    auto resultVarRef = std::make_unique<::sdl::VariableReference>(resultVar.get());
-    procedure->setReturnVariableReference(std::move(resultVarRef));
+    // Return result
+    auto endResultReturn = std::make_unique<::sdl::Return>("result");
+    transition->addAction(std::move(endResultReturn));
 
     // Add variables to procedure
     procedure->addVariable(std::move(intervalIndexVar));
@@ -457,6 +463,9 @@ auto SplineCalibratorTranslator::buildSquareCalibrationProcedure(Context &contex
     // Create procedure
     const QString procedureName(m_squareCalibrationProcedureName);
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
+
+    // Set procedure return variable
+    procedure->setReturnType("SplinePointValue");
 
     // Create procedure local variables
     auto intervalIndexVar =
@@ -550,9 +559,9 @@ auto SplineCalibratorTranslator::buildSquareCalibrationProcedure(Context &contex
     auto calculateResultTask = std::make_unique<::sdl::Task>("", calculateResultAction);
     transition->addAction(std::move(calculateResultTask));
 
-    // Set procedure return variable
-    auto resultVarRef = std::make_unique<::sdl::VariableReference>(resultVar.get());
-    procedure->setReturnVariableReference(std::move(resultVarRef));
+    // Return result
+    auto endResultReturn = std::make_unique<::sdl::Return>("result");
+    transition->addAction(std::move(endResultReturn));
 
     // Add variables to procedure
     procedure->addVariable(std::move(intervalIndexVar));
@@ -585,6 +594,9 @@ auto SplineCalibratorTranslator::buildCubicCalibrationProcedure(Context &context
     // Create procedure
     const QString procedureName(m_cubicCalibrationProcedureName);
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
+
+    // Set procedure return variable
+    procedure->setReturnType("SplinePointValue");
 
     // Create procedure local variables
     auto intervalIndexVar =
@@ -703,9 +715,9 @@ auto SplineCalibratorTranslator::buildCubicCalibrationProcedure(Context &context
     auto calculateResultTask = std::make_unique<::sdl::Task>("", calculateResultAction);
     transition->addAction(std::move(calculateResultTask));
 
-    // Set procedure return variable
-    auto resultVarRef = std::make_unique<::sdl::VariableReference>(resultVar.get());
-    procedure->setReturnVariableReference(std::move(resultVarRef));
+    // Return result
+    auto endResultReturn = std::make_unique<::sdl::Return>("result");
+    transition->addAction(std::move(endResultReturn));
 
     // Add variables to procedure
     procedure->addVariable(std::move(intervalIndexVar));

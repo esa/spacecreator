@@ -284,10 +284,10 @@ auto StatementTranslatorVisitor::operator()(const seds::model::SendCommandPrimit
         ActivityInfo info(m_context.sdlProcedure()->name());
 
         for (const auto &argument : sendCommand.argumentValues()) {
-            const auto argumentValue = translateArgument(m_context.sdlProcess(), m_context.sdlProcedure(), argument);
+            const auto argumentValue = translateArgument(argument);
             if (std::holds_alternative<std::unique_ptr<::sdl::VariableReference>>(argumentValue)) {
                 info.addAssignment(AssignmentInfo(translateVariableReference(argument.name().value()),
-                        std::get<std::unique_ptr<::sdl::VariableReference>>(argumentValue)->declaration()->name()));
+                        std::get<std::unique_ptr<::sdl::VariableReference>>(argumentValue)->variableName()));
             } else if (std::holds_alternative<std::unique_ptr<::sdl::VariableLiteral>>(argumentValue)) {
                 info.addAssignment(AssignmentInfo(translateVariableReference(argument.name().value()),
                         std::get<std::unique_ptr<::sdl::VariableLiteral>>(argumentValue)->value()));
@@ -300,14 +300,14 @@ auto StatementTranslatorVisitor::operator()(const seds::model::SendCommandPrimit
     // Process name carries iv-escaped component name
     const auto interface = findIvInterface(m_context.ivFunction(), callName);
     if (interface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
-        auto outputActions = translateOutput(m_context.sdlProcess(), m_context.sdlProcedure(), callName, sendCommand);
+        auto outputActions = translateOutput(callName, sendCommand);
         for (auto &action : outputActions) {
             m_sdlTransition->addAction(std::move(action));
         }
     } else if (interface->kind() == ivm::IVInterface::OperationKind::Protected
             || interface->kind() == ivm::IVInterface::OperationKind::Unprotected) {
 
-        auto call = translateCall(m_context.sdlProcess(), m_context.sdlProcedure(), callName, sendCommand);
+        auto call = translateCall(m_context.sdlProcess(), callName, sendCommand);
         m_sdlTransition->addAction(std::move(call));
     }
 }
@@ -329,7 +329,7 @@ auto StatementTranslatorVisitor::operator()(const seds::model::SendParameterPrim
 
     switch (interface->kind()) {
     case ivm::IVInterface::OperationKind::Sporadic: {
-        auto outputActions = translateOutput(m_context.sdlProcess(), m_context.sdlProcedure(), callName, sendParameter);
+        auto outputActions = translateOutput(callName, sendParameter);
         for (auto &action : outputActions) {
             m_sdlTransition->addAction(std::move(action));
         }
@@ -337,7 +337,7 @@ auto StatementTranslatorVisitor::operator()(const seds::model::SendParameterPrim
     }
     case ivm::IVInterface::OperationKind::Protected:
     case ivm::IVInterface::OperationKind::Unprotected: {
-        auto call = translateCall(m_context.sdlProcess(), m_context.sdlProcedure(), callName, sendParameter);
+        auto call = translateCall(m_context.sdlProcess(), callName, sendParameter);
         m_sdlTransition->addAction(std::move(call));
         return;
     }
@@ -363,7 +363,7 @@ auto StatementTranslatorVisitor::translateActivityCall(::sdl::Process *process,
     call->setProcedure(procedure->get());
 
     for (const auto &argument : invocation.argumentValues()) {
-        call->addArgument(translateArgument(process, nullptr, argument));
+        call->addArgument(translateArgument(argument));
     }
     return call;
 }
@@ -407,28 +407,8 @@ auto StatementTranslatorVisitor::findIvInterface(ivm::IVFunction *function, cons
     return nullptr;
 }
 
-auto StatementTranslatorVisitor::findVariableDeclaration(
-        ::sdl::Process *process, ::sdl::Procedure *sdlProcedure, QString name) -> ::sdl::VariableDeclaration *
-{
-    const auto processVariableDeclaration = std::find_if(process->variables().begin(), process->variables().end(),
-            [name](const auto &variable) { return variable->name() == name; });
-    if (processVariableDeclaration != process->variables().end()) {
-        return (*processVariableDeclaration).get();
-    }
-    if (sdlProcedure != nullptr) {
-        const auto procedureVariableDeclaration = std::find_if(sdlProcedure->parameters().begin(),
-                sdlProcedure->parameters().end(), [name](const auto &variable) { return variable->name() == name; });
-        if (procedureVariableDeclaration != sdlProcedure->parameters().end()) {
-            return (*procedureVariableDeclaration).get();
-        }
-    }
-
-    throw TranslationException(QString("Variable %1 not found").arg(name));
-    return nullptr;
-}
-
-auto StatementTranslatorVisitor::translateArgument(::sdl::Process *process, ::sdl::Procedure *sdlProcedure,
-        const seds::model::NamedArgumentValue &argument) -> ::sdl::ProcedureCall::Argument
+auto StatementTranslatorVisitor::translateArgument(const seds::model::NamedArgumentValue &argument)
+        -> ::sdl::ProcedureCall::Argument
 {
     if (std::holds_alternative<seds::model::ValueOperand>(argument.value())) {
         const auto &value = std::get<seds::model::ValueOperand>(argument.value());
@@ -436,8 +416,7 @@ auto StatementTranslatorVisitor::translateArgument(::sdl::Process *process, ::sd
     } else if (std::holds_alternative<seds::model::VariableRefOperand>(argument.value())) {
         const auto &value = std::get<seds::model::VariableRefOperand>(argument.value());
         const auto variableName = translateVariableReference(value.variableRef().value().value());
-        const auto variableDeclaration = findVariableDeclaration(process, sdlProcedure, variableName);
-        return std::make_unique<::sdl::VariableReference>(variableDeclaration);
+        return std::make_unique<::sdl::VariableReference>(variableName);
     } else {
         throw TranslationException("Argument not implemented");
         return std::unique_ptr<::sdl::VariableReference>();
@@ -474,9 +453,8 @@ auto StatementTranslatorVisitor::translatePolynomial(const QString variable, con
             });
 }
 
-auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-        const QString callName, const seds::model::SendCommandPrimitive &sendCommand)
-        -> std::unique_ptr<::sdl::ProcedureCall>
+auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, const QString callName,
+        const seds::model::SendCommandPrimitive &sendCommand) -> std::unique_ptr<::sdl::ProcedureCall>
 {
     auto call = std::make_unique<::sdl::ProcedureCall>();
 
@@ -491,14 +469,13 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, ::sd
     call->setProcedure(procedure->get());
 
     for (const auto &argument : sendCommand.argumentValues()) {
-        call->addArgument(translateArgument(hostProcess, hostProcedure, argument));
+        call->addArgument(translateArgument(argument));
     }
     return call;
 }
 
-auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-        const QString callName, const seds::model::SendParameterPrimitive &sendParameter)
-        -> std::unique_ptr<::sdl::ProcedureCall>
+auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, const QString callName,
+        const seds::model::SendParameterPrimitive &sendParameter) -> std::unique_ptr<::sdl::ProcedureCall>
 {
     auto call = std::make_unique<::sdl::ProcedureCall>();
 
@@ -519,10 +496,9 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, ::sd
         [&call](const seds::model::ValueOperand &operand) {
             call->addArgument(std::make_unique<::sdl::VariableLiteral>(operand.value().value()));
         },
-        [&call, &hostProcess, &hostProcedure](const seds::model::VariableRefOperand &operand) {
+        [&call](const seds::model::VariableRefOperand &operand) {
             const auto variableName = translateVariableReference(operand.variableRef().value().value());
-            const auto variableDeclaration = findVariableDeclaration(hostProcess, hostProcedure, variableName);
-            call->addArgument(std::make_unique<::sdl::VariableReference>(variableDeclaration));
+            call->addArgument(std::make_unique<::sdl::VariableReference>(variableName));
         }
     }, value);
     // clang-format on
@@ -530,9 +506,8 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, ::sd
     return call;
 }
 
-auto StatementTranslatorVisitor::translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-        const QString &callName, const seds::model::SendCommandPrimitive &sendCommand)
-        -> std::vector<std::unique_ptr<::sdl::Action>>
+auto StatementTranslatorVisitor::translateOutput(const QString &callName,
+        const seds::model::SendCommandPrimitive &sendCommand) -> std::vector<std::unique_ptr<::sdl::Action>>
 {
     std::vector<std::unique_ptr<::sdl::Action>> result;
 
@@ -540,8 +515,7 @@ auto StatementTranslatorVisitor::translateOutput(::sdl::Process *hostProcess, ::
     output->setName(callName);
     if (!sendCommand.argumentValues().empty()) {
         const auto ioVariable = StateMachineTranslator::ioVariableName(callName);
-        output->setParameter(std::make_unique<::sdl::VariableReference>(
-                findVariableDeclaration(hostProcess, hostProcedure, ioVariable)));
+        output->setParameter(std::make_unique<::sdl::VariableReference>(ioVariable));
         DescriptionTranslator::translate(sendCommand, output.get());
         for (const auto &argument : sendCommand.argumentValues()) {
             const auto fieldName = translateVariableReference(argument.name().value());
@@ -562,9 +536,8 @@ auto StatementTranslatorVisitor::translateOutput(::sdl::Process *hostProcess, ::
     return result;
 }
 
-auto StatementTranslatorVisitor::translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-        const QString &callName, const seds::model::SendParameterPrimitive &sendParameter)
-        -> std::vector<std::unique_ptr<::sdl::Action>>
+auto StatementTranslatorVisitor::translateOutput(const QString &callName,
+        const seds::model::SendParameterPrimitive &sendParameter) -> std::vector<std::unique_ptr<::sdl::Action>>
 {
     std::vector<std::unique_ptr<::sdl::Action>> result;
 
@@ -577,8 +550,7 @@ auto StatementTranslatorVisitor::translateOutput(::sdl::Process *hostProcess, ::
     auto output = std::make_unique<::sdl::Output>();
     output->setName(callName);
     const auto ioVariable = StateMachineTranslator::ioVariableName(callName);
-    output->setParameter(std::make_unique<::sdl::VariableReference>(
-            findVariableDeclaration(hostProcess, hostProcedure, ioVariable)));
+    output->setParameter(std::make_unique<::sdl::VariableReference>(ioVariable));
 
     const auto &value = sendParameter.argumentValue().value().value();
     // clang-format off

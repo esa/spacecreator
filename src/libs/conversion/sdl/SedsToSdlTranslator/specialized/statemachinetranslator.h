@@ -144,7 +144,7 @@ private:
     static auto createParameterSyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
             ::sdl::Process *sdlProcess, const ParameterType type) -> void;
     static auto createParameterAsyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
-            ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void;
+            ::sdl::StateMachine *stateMachine) -> void;
 
     static auto translateParameter(Context &context, const seds::model::ParameterMap &map) -> void;
 

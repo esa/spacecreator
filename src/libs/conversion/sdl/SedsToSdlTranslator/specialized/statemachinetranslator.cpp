@@ -481,8 +481,8 @@ static inline auto getInputOfName(::sdl::State *state, const QString name) -> ::
     return input->get();
 }
 
-auto StateMachineTranslator::createParameterAsyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
-        ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void
+auto StateMachineTranslator::createParameterAsyncPi(
+        ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::StateMachine *stateMachine) -> void
 {
     for (const auto &state : stateMachine->states()) {
         const auto &existingInput = getInputOfName(state.get(), interface->title());
@@ -493,12 +493,7 @@ auto StateMachineTranslator::createParameterAsyncPi(ivm::IVInterface *interface,
         auto input = std::make_unique<::sdl::Input>();
         input->setName(interface->title());
         const auto variableName = ioVariableName(input->name());
-        const auto &variableIterator = std::find_if(sdlProcess->variables().begin(), sdlProcess->variables().end(),
-                [variableName](const auto &variable) { return variable->name() == variableName; });
-        if (variableIterator == sdlProcess->variables().end()) {
-            throw TranslationException(QString("Reception variable %1 not found").arg(variableName));
-        }
-        input->addParameter(std::make_unique<::sdl::VariableReference>((*variableIterator).get()));
+        input->addParameter(std::make_unique<::sdl::VariableReference>(variableName));
         const auto targetVariableName = Escaper::escapeSdlVariableName(map.variableRef().value().value());
 
         auto transition = std::make_unique<::sdl::Transition>();
@@ -532,12 +527,12 @@ auto StateMachineTranslator::translateParameter(Context &context, const seds::mo
     const auto asyncSetter = getParameterInterface(context.ivFunction(), ParameterType::Setter, ParameterMode::Async,
             map.interface().value(), map.parameter().value());
     if (asyncSetter != nullptr) {
-        createParameterAsyncPi(asyncSetter, map, context.sdlProcess(), context.sdlStateMachine());
+        createParameterAsyncPi(asyncSetter, map, context.sdlStateMachine());
     }
     const auto asyncGetter = getParameterInterface(context.ivFunction(), ParameterType::Getter, ParameterMode::Async,
             map.interface().value(), map.parameter().value());
     if (asyncGetter != nullptr) {
-        createParameterAsyncPi(asyncGetter, map, context.sdlProcess(), context.sdlStateMachine());
+        createParameterAsyncPi(asyncGetter, map, context.sdlStateMachine());
     }
 }
 
@@ -608,7 +603,6 @@ auto StateMachineTranslator::translateState(const seds::model::EntryState &sedsS
 auto StateMachineTranslator::translatePrimitive(Context &context, const seds::model::OnCommandPrimitive &command)
         -> InputHandler
 {
-    auto sdlProcess = context.sdlProcess();
     auto input = std::make_unique<::sdl::Input>();
     std::vector<std::unique_ptr<::sdl::Action>> unpackingActions;
 
@@ -627,12 +621,7 @@ auto StateMachineTranslator::translatePrimitive(Context &context, const seds::mo
     const bool isSporadic = interface->kind() == ivm::IVInterface::OperationKind::Sporadic;
     if (isSporadic) {
         const auto variableName = ioVariableName(input->name());
-        const auto &variableIterator = std::find_if(sdlProcess->variables().begin(), sdlProcess->variables().end(),
-                [variableName](const auto &variable) { return variable->name() == variableName; });
-        if (variableIterator == sdlProcess->variables().end()) {
-            throw TranslationException(QString("Reception variable %1 not found").arg(variableName));
-        }
-        input->addParameter(std::make_unique<::sdl::VariableReference>((*variableIterator).get()));
+        input->addParameter(std::make_unique<::sdl::VariableReference>(variableName));
 
         for (const auto &argument : command.argumentValues()) {
             const auto targetVariableName =
@@ -652,7 +641,6 @@ auto StateMachineTranslator::translatePrimitive(Context &context, const seds::mo
 auto StateMachineTranslator::translatePrimitive(Context &context, const seds::model::OnParameterPrimitive &parameter)
         -> InputHandler
 {
-    auto sdlProcess = context.sdlProcess();
     const auto parameterType = parameter.operation() == seds::model::ParameterOperation::Set
             ? InterfaceTranslatorHelper::InterfaceParameterType::Setter
             : InterfaceTranslatorHelper::InterfaceParameterType::Getter;
@@ -672,12 +660,7 @@ auto StateMachineTranslator::translatePrimitive(Context &context, const seds::mo
     if (isSporadic) {
         // This is a sporadic interface, so we must unpack the value.
         const auto variableName = ioVariableName(name);
-        const auto &variableIterator = std::find_if(sdlProcess->variables().begin(), sdlProcess->variables().end(),
-                [variableName](const auto &variable) { return variable->name() == variableName; });
-        if (variableIterator == sdlProcess->variables().end()) {
-            throw TranslationException(QString("Reception variable %1 not found").arg(variableName));
-        }
-        input->addParameter(std::make_unique<::sdl::VariableReference>((*variableIterator).get()));
+        input->addParameter(std::make_unique<::sdl::VariableReference>(variableName));
         // Handle ParameterMap
         const auto &parameterMaps = context.sedsComponent().implementation().parameterMaps();
         const auto &map = std::find_if(parameterMaps.begin(), parameterMaps.end(), [&parameter](const auto &m) {

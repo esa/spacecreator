@@ -22,7 +22,6 @@ process Calculator;
             task Io_asynccalculator_add_ri.Result := Tmp;
             /* CIF Output (0, 1087), (200, 50) */
             output AsyncCalculator_Add_Ri(Io_asynccalculator_add_ri);
-        return ;
     endprocedure;
     /* CIF Start (0, 975), (200, 75) */
     START;

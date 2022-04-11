@@ -42,7 +42,6 @@ process Factorial;
             task Io_asyncfactorial_calculatefactorial_ri.Result := Tmp;
             /* CIF Output (1200, 1387), (200, 50) */
             output AsyncFactorial_CalculateFactorial_Ri(Io_asyncfactorial_calculatefactorial_ri);
-        return ;
     endprocedure;
     /* CIF Start (0, 975), (200, 75) */
     START;

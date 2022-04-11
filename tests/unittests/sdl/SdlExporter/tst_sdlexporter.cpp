@@ -46,6 +46,7 @@
 #include <sdl/SdlModel/procedurecall.h>
 #include <sdl/SdlModel/procedureparameter.h>
 #include <sdl/SdlModel/process.h>
+#include <sdl/SdlModel/return.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/statemachine.h>
 #include <sdl/SdlModel/task.h>
@@ -70,6 +71,7 @@ using sdl::Output;
 using sdl::Procedure;
 using sdl::ProcedureParameter;
 using sdl::Process;
+using sdl::Return;
 using sdl::SdlModel;
 using sdl::State;
 using sdl::StateMachine;
@@ -261,7 +263,7 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
     auto someInput = SdlInputBuilder()
                              .withName("some_input_name")
                              .withTransition(transition1.get())
-                             .withParameter(std::make_unique<VariableReference>(variable.get()))
+                             .withParameter(std::make_unique<VariableReference>(variable->name()))
                              .build();
     auto state1 = SdlStateBuilder("Looping")
                           .withInput(std::move(someInput))
@@ -270,7 +272,7 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
 
     auto referenceOutput = SdlOutputBuilder()
                                    .withName("referenceOutput")
-                                   .withParameter(std::make_unique<VariableReference>(variable.get()))
+                                   .withParameter(std::make_unique<VariableReference>(variable->name()))
                                    .build();
 
     auto transition2 = SdlTransitionBuilder()
@@ -436,7 +438,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
                                                                                         .withName("sendOutput")
                                                                                         .withParameter(std::make_unique<
                                                                                                 VariableReference>(
-                                                                                                variableX.get()))
+                                                                                                variableX->name()))
                                                                                         .build())
                                                                     .withTask(
                                                                             SdlTaskBuilder()
@@ -461,7 +463,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     auto waitState = SdlStateBuilder("Wait")
                              .withInput(SdlInputBuilder()
                                                 .withName("startProcess")
-                                                .withParameter(std::make_unique<VariableReference>(variableX.get()))
+                                                .withParameter(std::make_unique<VariableReference>(variableX->name()))
                                                 .withTransition(transition.get())
                                                 .build())
                              .build();
@@ -586,7 +588,6 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
         "START;",
         "task 'TASK INSIDE PROCEDURE';",
         "task 'SECOND TASK INSIDE PROCEDURE';",
-        "return ;",
         "endprocedure;",
 
         "START;",
@@ -645,13 +646,14 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
 
     auto procedure = SdlProcedureBuilder()
                              .withName("myProcedure")
-                             .withReturnVariableReference(std::make_unique<VariableReference>(returnVariable.get()))
+                             .withReturnType(returnVariable->type())
                              .withVariable(std::move(returnVariable))
                              .withParameter(makeProcedureParameter("a", "MyInteger", "in/out"))
                              .withParameter(makeProcedureParameter("b", "MyInteger", "in"))
                              .withTransition(SdlTransitionBuilder()
                                                      .withAction(SdlTaskBuilder().withContents("ret := a + b;").build())
                                                      .withAction(SdlTaskBuilder().withContents("a := a + 1;").build())
+                                                     .withAction(std::make_unique<Return>("ret"))
                                                      .build())
                              .build();
 
@@ -667,7 +669,7 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
                          .withInput(SdlInputBuilder()
                                             .withName("startProcess")
                                             .withTransition(transition.get())
-                                            .withParameter(std::make_unique<VariableReference>(variableX.get()))
+                                            .withParameter(std::make_unique<VariableReference>(variableX->name()))
                                             .build())
                          .build();
 
@@ -754,7 +756,7 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
                               .withAction(SdlProcedureCallBuilder()
                                                   .withProcedure(procedure.get())
                                                   .withArgument(std::make_unique<VariableLiteral>("2"))
-                                                  .withArgument(std::make_unique<VariableReference>(variableX.get()))
+                                                  .withArgument(std::make_unique<VariableReference>(variableX->name()))
                                                   .build())
                               .withNextStateAction()
                               .build();
@@ -762,7 +764,7 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
     auto state = SdlStateBuilder("Wait")
                          .withInput(SdlInputBuilder()
                                             .withName("startProcess")
-                                            .withParameter(std::make_unique<VariableReference>(variableX.get()))
+                                            .withParameter(std::make_unique<VariableReference>(variableX->name()))
                                             .withTransition(transition.get())
                                             .build())
                          .build();
@@ -807,7 +809,6 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
         "in b MyInteger;",
         "START;",
         "task 'EXAMPLE'",
-        "return ;",
         "endprocedure;",
 
         "START;",

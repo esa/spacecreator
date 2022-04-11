@@ -37,13 +37,11 @@ public:
      *
      * @param   declaration   referenced variable declaration pointer
      */
-    VariableReference(VariableDeclaration *declaration = nullptr);
-
+    VariableReference(QString variableName);
     /**
      * @brief   Deleted copy constructor
      */
     VariableReference(const VariableReference &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -53,28 +51,27 @@ public:
      * @brief   Deleted copy assignment operator
      */
     VariableReference &operator=(const VariableReference &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     VariableReference &operator=(VariableReference &&) = default;
 
+public:
     /**
-     * @brief    Getter for the referenced variable declaration
+     * @brief    Getter for the referenced variable name
      *
-     * @return   const reference to pointer to variable declaration
+     * @return   Referenced variable name
      */
-    auto declaration() const -> const VariableDeclaration *;
-
+    auto variableName() const -> const QString &;
     /**
-     * @brief    Setter for the referenced variable declaration
+     * @brief    Setter for the referenced variable name
      *
-     * @param    declaration   pointer to variable declaration
+     * @param    variableNaem   Referenced variable name
      */
-    auto setDeclaration(VariableDeclaration *declaration) -> void;
+    auto setVariableName(QString variableName) -> void;
 
 private:
-    VariableDeclaration *m_declaration;
+    QString m_variableName;
 };
 
 } // namespace sdl

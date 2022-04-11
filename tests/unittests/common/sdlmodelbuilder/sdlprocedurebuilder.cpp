@@ -61,9 +61,9 @@ SdlProcedureBuilder &SdlProcedureBuilder::withParameter(std::unique_ptr<Procedur
     return *this;
 }
 
-SdlProcedureBuilder &SdlProcedureBuilder::withReturnVariableReference(std::unique_ptr<VariableReference> variable)
+SdlProcedureBuilder &SdlProcedureBuilder::withReturnType(QString returnType)
 {
-    m_procedure->setReturnVariableReference(std::move(variable));
+    m_procedure->setReturnType(std::move(returnType));
 
     return *this;
 }
