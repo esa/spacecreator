@@ -108,9 +108,9 @@ public:
     /**
      * @brief   Setter for the return variable declaration
      *
-     * @param   declaration     return variable declaration
+     * @param   variableReference     return variable reference
      */
-    auto setReturnVariableReference(std::unique_ptr<VariableReference> declaration) -> void;
+    auto setReturnVariableReference(std::unique_ptr<VariableReference> variableReference) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)

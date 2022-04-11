@@ -63,9 +63,9 @@ VariableReference *Procedure::returnVariableReference() const
     return m_returnVariableReference.get();
 }
 
-void Procedure::setReturnVariableReference(std::unique_ptr<VariableReference> declaration)
+void Procedure::setReturnVariableReference(std::unique_ptr<VariableReference> variableReference)
 {
-    m_returnVariableReference = std::move(declaration);
+    m_returnVariableReference = std::move(variableReference);
 }
 
 void Procedure::accept(Visitor &visitor) const

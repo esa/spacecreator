@@ -20,18 +20,17 @@ $SEDS_CONVERTER --from SEDS --to SDL --aux-models ASN.1,InterfaceView --skip-val
   --out $TEST_OUTPUT_DIR/interfaceview.xml --iv-config resources/config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/ \
   --sdl-filepath-prefix $TEST_OUTPUT_DIR/
 # Setup additional data
-# cp resources/test_indexing.system_structure output/system_structure.pr
-# cp $TEST_OUTPUT_DIR/INDEXING.asn $TEST_OUTPUT_DIR/dataview-uniq.asn
+cp resources/test_splline_calibration.system_structure output/system_structure.pr
+cp $TEST_OUTPUT_DIR/SPLINECALIBRATION.asn $TEST_OUTPUT_DIR/dataview-uniq.asn
 # Rename the module to avoid naming conflicts
-# sed -i 's/INDEXING/SYSTEM-DATAVIEW/g' $TEST_OUTPUT_DIR/dataview-uniq.asn
+sed -i 's/SPLINECALIBRATION/SYSTEM-DATAVIEW/g' $TEST_OUTPUT_DIR/dataview-uniq.asn
 cd $TEST_OUTPUT_DIR
 # Compare output against reference, and compile to make sure the reference is valid
 # Clean (rm) only if all steps pass
 # This test uses Ada, as C backend in OpenGEODE is too buggy to handle this example
 $DIFF calibration.pr ../resources/test_spline_calibration.output \
-
-  # && $OPENGEODE --toAda system_structure.pr component.pr \
-  # && asn1scc -Ada --type-prefix asn1Scc dataview-uniq.asn component_datamodel.asn \
-  # && gcc -c component.adb \
-  # && cd .. \
-  # && rm -r -f $TEST_OUTPUT_DIR
+  && $OPENGEODE --toAda system_structure.pr calibration.pr \
+  && asn1scc -Ada --type-prefix asn1Scc dataview-uniq.asn component_datamodel.asn \
+  && gcc -c component.adb \
+  && cd .. \
+  && rm -r -f $TEST_OUTPUT_DIR

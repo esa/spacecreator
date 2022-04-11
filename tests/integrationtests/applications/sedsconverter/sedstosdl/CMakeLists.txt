@@ -101,3 +101,8 @@ configure_file(resources/test_descriptions.output resources/test_descriptions.ou
 configure_file(test_cross_reference.sh test_cross_reference.sh COPYONLY)
 configure_file(resources/test_cross_reference.xml resources/test_cross_reference.xml COPYONLY)
 configure_file(resources/test_cross_reference.output resources/test_cross_reference.output COPYONLY)
+
+configure_file(test_spline_calibration.sh test_spline_calibration.sh COPYONLY)
+configure_file(resources/test_spline_calibration.xml resources/test_spline_calibration.xml COPYONLY)
+configure_file(resources/test_spline_calibration.output resources/test_spline_calibration.output COPYONLY)
+configure_file(resources/test_spline_calibration.system_structure resources/test_spline_calibration.system_structure COPYONLY)

@@ -353,7 +353,7 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
     auto fromStartLabel = std::make_unique<Label>("fromStart");
 
     auto joinFromStart = std::make_unique<Join>();
-    joinFromStart->setLabel(fromStartLabel.get());
+    joinFromStart->setLabel("fromStart");
     auto transition = SdlTransitionBuilder() //
                               .withAction(std::move(joinFromStart))
                               .build();
@@ -641,11 +641,13 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
     QString modelPrefix = "Sdl_";
     QString processName = modelName.toLower(); // NOLINT
 
+    auto returnVariable = makeVariableDeclaration("ret", "MyInteger");
+
     auto procedure = SdlProcedureBuilder()
                              .withName("myProcedure")
                              .withParameter(makeProcedureParameter("a", "MyInteger", "in/out"))
                              .withParameter(makeProcedureParameter("b", "MyInteger", "in"))
-                             .withReturnVariableDeclaration(makeVariableDeclaration("ret", "MyInteger"))
+                             .withReturnVariableReference(std::make_unique<VariableReference>(returnVariable.get()))
                              .withTransition(SdlTransitionBuilder()
                                                      .withAction(SdlTaskBuilder().withContents("ret := a + b;").build())
                                                      .withAction(SdlTaskBuilder().withContents("a := a + 1;").build())
