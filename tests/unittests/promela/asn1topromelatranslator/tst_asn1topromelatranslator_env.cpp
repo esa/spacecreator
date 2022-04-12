@@ -23,6 +23,7 @@
 #include "assignment.h"
 #include "conditional.h"
 #include "conversion/asn1/Asn1Exporter/exporter.h"
+#include "conversion/asn1/Asn1Importer/importer.h"
 #include "conversion/asn1/Asn1Options/options.h"
 #include "declaration.h"
 #include "definitions.h"
@@ -30,6 +31,7 @@
 #include "options.h"
 #include "promela/PromelaExporter/promelaexporter.h"
 #include "promela/PromelaOptions/options.h"
+#include "types/userdefinedtype.h"
 #include "variableref.h"
 
 #include <asn1library/asn1/asnsequencecomponent.h>
@@ -310,9 +312,12 @@ void tst_Asn1ToPromelaTranslator_Env::testSequence() const
         auto intAsnType = std::make_unique<Asn1Acn::Types::Integer>("intVal");
         auto rangeConstraint = RangeConstraint<IntegerValue>::create({ 0, 3 });
         intAsnType->constraints().append(std::move(rangeConstraint));
+
+        auto myInt = std::make_unique<Asn1Acn::Types::UserdefinedType>("MyInt", "myModule");
+        myInt->setType(std::move(intAsnType));
+
         auto intSequence = std::make_unique<Asn1Acn::AsnSequenceComponent>("intVal", "intVal", false, std::nullopt, "",
-                Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
-                std::move(intAsnType));
+                Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(), std::move(myInt));
 
         sequence->addComponent(std::move(intSequence));
 
@@ -335,6 +340,11 @@ void tst_Asn1ToPromelaTranslator_Env::testSequence() const
 
     auto asnModel = makeModelFromDefinitions(std::move(asnDefinitions), "testSequence");
     exportAsnModel(asnModel.get());
+
+    // conversion::asn1::importer::Asn1Importer importer;
+    // conversion::Options asnImportOptions;
+    // asnImportOptions.add(conversion::asn1::Asn1Options::asn1FilepathPrefix, input )
+    // importer.importModel(asnImportOptions);
 
     PromelaModel promelaModel;
     QStringList typesToTranslate = { "MySequence" };
