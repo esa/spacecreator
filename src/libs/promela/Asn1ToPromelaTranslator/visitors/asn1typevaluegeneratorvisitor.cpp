@@ -26,6 +26,8 @@
 #include "integersubset.h"
 #include "sequencecomponent.h"
 #include "types/type.h"
+#include "types/typereadingvisitor.h"
+#include "values.h"
 
 #include <QDebug>
 #include <algorithm>
@@ -166,18 +168,26 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
     // type.identifier()
     // type.label()
 
-    // Asn1SequenceComponentVisitor visitor(m_promelaModel, "", false);
+    auto *const typeReadingVisitorPtr = static_cast<Asn1Acn::Types::TypeReadingVisitor *>(this);
+    if (typeReadingVisitorPtr == nullptr) {
+        throw std::runtime_error("Asn1TypeValueGeneratorVisitor could not be casted to TypeReadingVisitor");
+    }
 
     for (const auto &component : type.components()) {
         if (component == nullptr || component->type() == nullptr) {
             throw std::runtime_error("Component type not specified");
         }
-        const auto &componentTypeEnum = component->type()->typeEnum();
-        if (componentTypeEnum == Asn1Acn::Types::Type::ASN1Type::BOOLEAN) {
-            qDebug() << "type is bool";
-        } else if (componentTypeEnum == Asn1Acn::Types::Type::ASN1Type::INTEGER) {
-            qDebug() << "type is int";
+
+        const auto &componentType = component->type();
+        if (componentType != nullptr) {
+            componentType->accept(*typeReadingVisitorPtr);
         } else {
+            throw std::runtime_error("Type not specified in Component");
+        }
+
+        const auto &componentTypeEnum = component->type()->typeEnum();
+        if (componentTypeEnum != Asn1Acn::Types::Type::ASN1Type::BOOLEAN
+                && componentTypeEnum != Asn1Acn::Types::Type::ASN1Type::INTEGER) {
             throw std::runtime_error("Unknown component type");
         }
     }

@@ -21,6 +21,7 @@
 
 #include "asn1model.h"
 #include "assignment.h"
+#include "conditional.h"
 #include "conversion/asn1/Asn1Exporter/exporter.h"
 #include "conversion/asn1/Asn1Options/options.h"
 #include "declaration.h"
@@ -276,11 +277,9 @@ void exportAsnModel(const Asn1Acn::Asn1Model *const model)
 void checkInlineDefs(InlineDef *const promelaInlineDefs, const QString &name)
 {
     QCOMPARE(promelaInlineDefs->getName(), name);
-    QCOMPARE(promelaInlineDefs->getArguments().size(), 2);
-    const auto &firstInlineFirstArg = promelaInlineDefs->getArguments().front();
-    QCOMPARE(firstInlineFirstArg, "dst");
-    const auto &firstInlineSecondArg = promelaInlineDefs->getArguments().back();
-    QCOMPARE(firstInlineSecondArg, "src");
+    QCOMPARE(promelaInlineDefs->getArguments().size(), 1);
+    const auto &inlineArg = promelaInlineDefs->getArguments().front();
+    QCOMPARE(inlineArg, "value");
 
     const QString &argName = promelaInlineDefs->getArguments().front();
     const Sequence &mainSequence = promelaInlineDefs->getSequence();
@@ -288,20 +287,16 @@ void checkInlineDefs(InlineDef *const promelaInlineDefs, const QString &name)
     QCOMPARE(mainSequence.getType(), Sequence::Type::NORMAL);
 
     for (const auto &content : mainSequence.getContent()) {
-        QVERIFY(std::holds_alternative<Assignment>(content->getValue()));
-        const auto &assignment = std::get<Assignment>(content->getValue());
+        (void)content;
+        // if (!std::holds_alternative<Conditional>(content->getValue())) {
+        //     qDebug() << "value index: " << content->getValue().index();
+        //     QVERIFY(std::holds_alternative<Conditional>(content->getValue()));
+        // }
+        // const auto &conditional = std::get<Conditional>(content->getValue());
 
-        QVERIFY(std::holds_alternative<VariableRef>(assignment.getExpression().getContent()));
-        const auto &variableRef = std::get<VariableRef>(assignment.getExpression().getContent());
-        for (const auto &var : variableRef.getElements()) {
-            qDebug() << "var name: " << var.m_name;
-            if (var.m_index != nullptr) {
-                qDebug() << "getcontent variable ref index: " << var.m_index->getContent().index();
-            } else {
-                qDebug() << "m_index is NULL";
-            }
-            qDebug() << "";
-        }
+        // for (const auto &alternative : conditional.getAlternatives()) {
+        //     qDebug() << alternative->getContent();
+        // }
     }
 }
 
@@ -310,17 +305,31 @@ void tst_Asn1ToPromelaTranslator_Env::testSequence() const
     auto asnDefinitions = createModel();
     {
         Asn1Acn::SourceLocation location;
-        auto type = std::make_unique<Asn1Acn::Types::Sequence>();
-        auto intSeq = std::make_unique<Asn1Acn::AsnSequenceComponent>("intVal", "intVal", false, std::nullopt, "",
+        auto sequence = std::make_unique<Asn1Acn::Types::Sequence>();
+
+        auto intAsnType = std::make_unique<Asn1Acn::Types::Integer>("intVal");
+        auto rangeConstraint = RangeConstraint<IntegerValue>::create({ 0, 3 });
+        intAsnType->constraints().append(std::move(rangeConstraint));
+        auto intSequence = std::make_unique<Asn1Acn::AsnSequenceComponent>("intVal", "intVal", false, std::nullopt, "",
                 Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
-                std::make_unique<Asn1Acn::Types::Integer>("intVal"));
-        type->addComponent(std::move(intSeq));
-        auto boolSeq = std::make_unique<Asn1Acn::AsnSequenceComponent>("boolVal", "boolVal", true, std::nullopt, "",
-                Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
+                std::move(intAsnType));
+
+        sequence->addComponent(std::move(intSequence));
+
+        auto boolComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>("boolVal", "boolVal", false, std::nullopt,
+                "", Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
                 std::make_unique<Asn1Acn::Types::Boolean>("boolVal"));
-        type->addComponent(std::move(boolSeq));
+
+        sequence->addComponent(std::move(boolComponent));
+
+        auto optionalBoolComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>("optBoolVal", "optBoolVal", true,
+                std::nullopt, "", Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
+                std::make_unique<Asn1Acn::Types::Boolean>("boolVal"));
+
+        sequence->addComponent(std::move(optionalBoolComponent));
+
         auto assignment =
-                std::make_unique<Asn1Acn::TypeAssignment>("MySequence", "MySequence", location, std::move(type));
+                std::make_unique<Asn1Acn::TypeAssignment>("MySequence", "MySequence", location, std::move(sequence));
         asnDefinitions->addType(std::move(assignment));
     }
 
@@ -335,12 +344,13 @@ void tst_Asn1ToPromelaTranslator_Env::testSequence() const
     visitor.visit(sequence);
 
     auto &promelaInlineDefs = promelaModel.getInlineDefs();
-    QCOMPARE(promelaInlineDefs.size(), 2);
+    QCOMPARE(promelaInlineDefs.size(), 3);
 
-    checkInlineDefs(promelaInlineDefs.front().get(), "_intVal_assign_value");
-    checkInlineDefs(promelaInlineDefs.back().get(), "_boolVal_assign_value");
+    for (const auto &def : promelaInlineDefs) {
+        checkInlineDefs(def.get(), "MySequence_generate_value");
+    }
 
-    exportPromelaModel(promelaModel, "sequences.txt");
+    exportPromelaModel(promelaModel, "sequences.pr");
 }
 
 std::unique_ptr<Definitions> tst_Asn1ToPromelaTranslator_Env::createModel() const

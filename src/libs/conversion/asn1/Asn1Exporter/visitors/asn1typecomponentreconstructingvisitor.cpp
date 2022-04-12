@@ -40,6 +40,7 @@ void Asn1TypeComponentReconstructingVisitor::visit(const Types::Boolean &type)
 {
     valueForStraightType(type);
 }
+
 void Asn1TypeComponentReconstructingVisitor::visit(const Types::Null &type)
 {
     valueForStraightType(type);
