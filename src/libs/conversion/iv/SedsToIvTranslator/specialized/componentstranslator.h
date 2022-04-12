@@ -55,13 +55,11 @@ public:
      * @brief   Constructor
      *
      * @param   sedsPackage         Package with components to translate
-     * @param   asn1Definitions     ASN.1 file where types of the packed argument will be saved
-     * @param   asn1Files           List of all ASN.1 files
      * @param   sedsPackages        List of SEDS packages
+     * @param   asn1Files           List of all ASN.1 files
      */
-    ComponentsTranslator(const seds::model::Package *sedsPackage, Asn1Acn::Definitions *asn1Definitions,
-            const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages,
-            const std::optional<uint64_t> &sequenceSizeThreshold);
+    ComponentsTranslator(const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages,
+            const Asn1Acn::Asn1Model::Data &asn1Files, const std::optional<uint64_t> &sequenceSizeThreshold);
     /**
      * @brief   Deleted copy constructor
      */
@@ -130,7 +128,7 @@ private:
     auto translateInterfaceDeclaration(const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
             const QString &sedsInterfaceName, const std::optional<seds::model::GenericTypeMapSet> &typeMapSet,
             const seds::model::Component &sedsComponent, const ivm::IVInterface::InterfaceType interfaceType,
-            ivm::IVFunction *ivFunction) const -> void;
+            ivm::IVFunction *ivFunction, const QString &currentPackageName) const -> void;
     auto translateParameters(const QString &sedsInterfaceName,
             const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
@@ -138,18 +136,15 @@ private:
     auto translateCommands(const QString &sedsInterfaceName,
             const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
-            const GenericTypeMapper *typeMapper) const -> void;
+            const QString &currentPackageName, const GenericTypeMapper *typeMapper) const -> void;
 
 private:
     /// @brief  Parent package
     const seds::model::Package *m_sedsPackage;
-    /// @brief  Target ASN.1 type definitions
-    Asn1Acn::Definitions *m_asn1Definitions;
-
-    /// @brief  List of all ASN.1 files
-    const Asn1Acn::Asn1Model::Data &m_asn1Files;
     /// @brief  List of SEDS packages
     const std::vector<seds::model::Package> &m_sedsPackages;
+    /// @brief  List of all ASN.1 files
+    const Asn1Acn::Asn1Model::Data &m_asn1Files;
 
     /// @brief  ASN.1 sequence size threshold
     const std::optional<uint64_t> &m_sequenceSizeThreshold;

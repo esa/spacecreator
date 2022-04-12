@@ -123,10 +123,7 @@ void SedsToIvTranslator::translatePackage(const seds::model::Package &sedsPackag
         IVModel *ivModel, const std::vector<seds::model::Package> &sedsPackages, bool generateFunction,
         const std::optional<uint64_t> &sequenceSizeThreshold) const
 {
-    auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(sedsPackage.nameStr(), asn1Model->data());
-
-    ComponentsTranslator componentsTranslator(
-            &sedsPackage, asn1Definitions, asn1Model->data(), sedsPackages, sequenceSizeThreshold);
+    ComponentsTranslator componentsTranslator(&sedsPackage, sedsPackages, asn1Model->data(), sequenceSizeThreshold);
     auto ivFunctions = componentsTranslator.translateComponents();
 
     if (generateFunction) {
