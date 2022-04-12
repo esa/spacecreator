@@ -187,7 +187,8 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 
         const auto &componentTypeEnum = component->type()->typeEnum();
         if (componentTypeEnum != Asn1Acn::Types::Type::ASN1Type::BOOLEAN
-                && componentTypeEnum != Asn1Acn::Types::Type::ASN1Type::INTEGER) {
+                && componentTypeEnum != Asn1Acn::Types::Type::ASN1Type::INTEGER
+                && componentTypeEnum != Asn1Acn::Types::Type::ASN1Type::USERDEFINED) {
             throw std::runtime_error("Unknown component type");
         }
     }

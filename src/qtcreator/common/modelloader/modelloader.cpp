@@ -87,11 +87,7 @@ auto ModelLoader::loadAsn1Model(const QString &filename) -> std::unique_ptr<Asn1
     options.add(conversion::asn1::Asn1Options::inputFilepath, filename);
 
     conversion::asn1::importer::Asn1Importer importer;
-    try {
-        model = importer.importModel(options);
-    } catch (const std::exception &ex) {
-        return nullptr;
-    }
+    model = importer.importModel(options);
 
     std::unique_ptr<Asn1Acn::Asn1Model> output;
     output.reset(static_cast<Asn1Acn::Asn1Model *>(model.get()));
