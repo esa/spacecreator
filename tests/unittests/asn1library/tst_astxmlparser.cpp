@@ -263,10 +263,11 @@ void AstXmlParserTests::test_importedType()
           R"(  </Asn1File>)"
           R"(</AstRoot>)");
 
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->importedTypes().size(), std::size_t(1));
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->importedTypes().at(0).module(),
-            QStringLiteral("OtherDefinitions"));
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->importedTypes().at(0).name(), QStringLiteral("Imported"));
+
+    const auto &importedTypes = m_parsedData["X.asn"]->definitions("Defs")->importedTypes();
+
+    QCOMPARE(importedTypes.size(), std::size_t(1));
+    QVERIFY(importedTypes.find(ImportedType("OtherDefinitions", "Imported")) != importedTypes.end());
 }
 
 void AstXmlParserTests::test_multipleImportedType()
@@ -290,11 +291,11 @@ void AstXmlParserTests::test_multipleImportedType()
           R"(  </Asn1File>)"
           R"(</AstRoot>)");
 
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->importedTypes().size(), std::size_t(2));
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->importedTypes().at(0).name(), QStringLiteral("Imported1"));
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->importedTypes().at(1).name(), QStringLiteral("Imported2"));
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->importedTypes().at(1).module(),
-            QStringLiteral("OtherDefinitions"));
+    const auto &importedTypes = m_parsedData["X.asn"]->definitions("Defs")->importedTypes();
+
+    QCOMPARE(importedTypes.size(), std::size_t(2));
+    QVERIFY(importedTypes.find(ImportedType("OtherDefinitions", "Imported1")) != importedTypes.end());
+    QVERIFY(importedTypes.find(ImportedType("OtherDefinitions", "Imported2")) != importedTypes.end());
 }
 
 void AstXmlParserTests::test_assignmentsAreTypeReferences()

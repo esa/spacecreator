@@ -44,6 +44,8 @@ public:
     const QString &fullPath() const { return m_fullPath; }
 
     bool operator<(const ImportedType &rhs) const { return m_fullPath < rhs.m_fullPath; }
+    bool operator==(const ImportedType &rhs) const { return m_fullPath == rhs.m_fullPath; }
+    bool operator!=(const ImportedType &rhs) const { return !(*this == rhs); }
 
 private:
     QString m_module;

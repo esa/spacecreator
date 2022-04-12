@@ -75,7 +75,7 @@ void Definitions::addValue(std::unique_ptr<ValueAssignment> value)
 
 void Definitions::addImportedType(const ImportedType &type)
 {
-    m_importedTypes.push_back(type);
+    m_importedTypes.insert(type);
 }
 
 void Definitions::addImportedValue(const ImportedValue &value)
