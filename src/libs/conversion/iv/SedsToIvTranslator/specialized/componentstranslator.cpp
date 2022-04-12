@@ -128,10 +128,10 @@ void ComponentsTranslator::translateCommands(const QString &sedsInterfaceName,
         const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
         const GenericTypeMapper *typeMapper) const
 {
-    AsyncInterfaceCommandTranslator asyncCommandTranslator(ivFunction, sedsInterfaceName, m_asn1Definitions,
-            m_sedsPackage, m_asn1Files, m_sedsPackages, typeMapper, m_sequenceSizeThreshold);
-    SyncInterfaceCommandTranslator syncCommandTranslator(ivFunction, sedsInterfaceName, m_asn1Definitions,
-            m_sedsPackage, m_asn1Files, m_sedsPackages, typeMapper, m_sequenceSizeThreshold);
+    AsyncInterfaceCommandTranslator asyncCommandTranslator(ivFunction, sedsInterfaceName, m_sedsPackage, m_sedsPackages,
+            m_asn1Definitions, m_asn1Files, typeMapper, m_sequenceSizeThreshold);
+    SyncInterfaceCommandTranslator syncCommandTranslator(ivFunction, sedsInterfaceName, m_sedsPackage, m_sedsPackages,
+            m_asn1Definitions, m_asn1Files, typeMapper, m_sequenceSizeThreshold);
 
     for (const auto &sedsCommand : sedsInterfaceDeclaration.commands()) {
         switch (sedsCommand.mode()) {
