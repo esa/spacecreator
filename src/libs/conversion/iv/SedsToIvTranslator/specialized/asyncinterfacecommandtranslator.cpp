@@ -193,7 +193,9 @@ void AsyncInterfaceCommandTranslator::createBundledTypeComponent(
     const auto &name = argumentData.name;
     const auto &typeRef = argumentData.typeRef;
 
-    const auto asn1Definitions = typeRef.packageStr()
+    const auto typeIsForeign = typeRef.packageStr().has_value();
+
+    const auto asn1Definitions = typeIsForeign
             ? SedsToAsn1Translator::getAsn1Definitions(*typeRef.packageStr(), m_asn1Files)
             : m_asn1Definitions;
 
@@ -207,6 +209,11 @@ void AsyncInterfaceCommandTranslator::createBundledTypeComponent(
     }
 
     const auto *referencedType = referencedTypeAssignment->type();
+
+    if (typeIsForeign) {
+        auto referencedTypeImport = Asn1Acn::ImportedType(asn1Definitions->name(), referencedType->identifier());
+        m_asn1Definitions->addImportedType(std::move(referencedTypeImport));
+    }
 
     auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(typeName, m_asn1Definitions->name());
     sequenceComponentType->setType(referencedType->clone());
