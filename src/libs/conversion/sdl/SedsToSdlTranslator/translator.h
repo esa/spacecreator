@@ -77,24 +77,28 @@ private:
     /**
      * @brief   Translate SEDS package
      *
-     * @param   package             Package to translate
+     * @param   sedsPackage         Package to translate
+     * @param   sedsPackages        List of SEDS packages
      * @param   asn1Model           Relevant ASN.1/ACN model
      * @param   ivModel             Relevant Interface View model
      * @param   model               Target SDL model to add the translated component implementations
      */
-    auto translatePackage(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
+    auto translatePackage(const seds::model::Package &sedsPackage,
+            const std::vector<seds::model::Package> &sedsPackages, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
             ::sdl::SdlModel *model) const -> void;
 
     /**
      * @brief   Translate SEDS component
      *
      * @param   sedsPackage         Package containing the component to be translated
+     * @param   sedsPackages        List of SEDS packages
      * @param   component           Component to translate
      * @param   asn1Model           Relevant ASN.1/ACN model
      * @param   ivModel             Relevant Interface View model
      * @param   model               Target SDL model to add the translated component implementation
      */
-    auto translateComponent(const seds::model::Package &sedsPackage, const seds::model::Component &sedsComponent,
+    auto translateComponent(const seds::model::Package &sedsPackage,
+            const std::vector<seds::model::Package> &sedsPackages, const seds::model::Component &sedsComponent,
             Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel, ::sdl::SdlModel *model) const -> void;
 };
 

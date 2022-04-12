@@ -59,10 +59,11 @@ auto ActivityInfo::addAssignment(AssignmentInfo assignment) -> void
     m_returnAssignments.push_back(std::move(assignment));
 }
 
-Context::Context(const seds::model::Package &sedsPackage, const seds::model::Component &sedsComponent,
-        Asn1Acn::Asn1Model *asn1Model, ivm::IVFunction *ivFunction, ::sdl::Process *sdlProcess,
-        ::sdl::StateMachine *sdlStateMachine)
+Context::Context(const seds::model::Package &sedsPackage, const std::vector<seds::model::Package> &sedsPackages,
+        const seds::model::Component &sedsComponent, Asn1Acn::Asn1Model *asn1Model, ivm::IVFunction *ivFunction,
+        ::sdl::Process *sdlProcess, ::sdl::StateMachine *sdlStateMachine)
     : m_sedsPackage(sedsPackage)
+    , m_sedsPackages(sedsPackages)
     , m_sedsComponent(sedsComponent)
     , m_asn1Model(asn1Model)
     , m_ivFunction(ivFunction)
@@ -74,6 +75,11 @@ Context::Context(const seds::model::Package &sedsPackage, const seds::model::Com
 auto Context::sedsPackage() -> const seds::model::Package &
 {
     return m_sedsPackage;
+}
+
+auto Context::sedsPackages() -> const std::vector<seds::model::Package> &
+{
+    return m_sedsPackages;
 }
 
 auto Context::sedsComponent() -> const seds::model::Component &

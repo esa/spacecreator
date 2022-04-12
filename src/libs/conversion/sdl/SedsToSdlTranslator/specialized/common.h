@@ -121,17 +121,22 @@ public:
      * @param sdlProcess        Target SDL Process
      * @param sdlStateMachine   Target SDL State Machine
      */
-    Context(const seds::model::Package &sedsPackage, const seds::model::Component &sedsComponent,
-            Asn1Acn::Asn1Model *asn1Model, ivm::IVFunction *ivFunction, ::sdl::Process *sdlProcess,
-            ::sdl::StateMachine *sdlStateMachine);
+    Context(const seds::model::Package &sedsPackage, const std::vector<seds::model::Package> &sedsPackages,
+            const seds::model::Component &sedsComponent, Asn1Acn::Asn1Model *asn1Model, ivm::IVFunction *ivFunction,
+            ::sdl::Process *sdlProcess, ::sdl::StateMachine *sdlStateMachine);
 
     /**
      * @brief SEDS Package accessor
      *
      * @returns SEDS Package
      */
-
     auto sedsPackage() -> const seds::model::Package &;
+    /**
+     * @brief SEDS packages accessor
+     *
+     * @returns SEDS packages
+     */
+    auto sedsPackages() -> const std::vector<seds::model::Package> &;
     /**
      * @brief Component accessor
      *
@@ -209,6 +214,7 @@ public:
 
 private:
     const seds::model::Package &m_sedsPackage;
+    const std::vector<seds::model::Package> &m_sedsPackages;
     const seds::model::Component &m_sedsComponent;
     Asn1Acn::Asn1Model *m_asn1Model;
     ivm::IVFunction *m_ivFunction;

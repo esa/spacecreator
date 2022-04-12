@@ -247,7 +247,7 @@ static inline auto buildCommandMapInternal(Context &context, const QString &inte
 
     for (const auto &baseInterface : intefaceDeclaration.baseInterfaces()) {
         const auto &baseIntefaceDeclaration = ComponentsTranslator::findInterfaceDeclaration(
-                baseInterface.type().nameStr(), context.sedsComponent(), &context.sedsPackage(), {});
+                baseInterface.type(), context.sedsComponent(), &context.sedsPackage(), context.sedsPackages());
         buildCommandMapInternal(context, interfaceName, baseIntefaceDeclaration);
     }
 }
@@ -269,7 +269,7 @@ auto StateMachineTranslator::buildCommandMap(Context &context) -> void
 {
     for (const auto &interface : context.sedsComponent().providedInterfaces()) {
         const auto &intefaceDeclaration = ComponentsTranslator::findInterfaceDeclaration(
-                interface.type().nameStr(), context.sedsComponent(), &context.sedsPackage(), {});
+                interface.type(), context.sedsComponent(), &context.sedsPackage(), context.sedsPackages());
         buildCommandMapInternal(context, interface.nameStr(), intefaceDeclaration);
     }
 }
@@ -327,10 +327,14 @@ auto StateMachineTranslator::translateVariables(
 {
     for (const auto &variable : variables) {
         const auto variableName = Escaper::escapeSdlVariableName(variable.nameStr());
-        const auto variableTypeName = Escaper::escapeAsn1TypeName(variable.type().nameStr());
-        // TODO implement check for types imported from other packages
-        auto asn1Definitions =
-                SedsToAsn1Translator::getAsn1Definitions(context.sedsPackage().nameStr(), context.asn1Model()->data());
+        const auto variableType = variable.type();
+        const auto variableTypeName = Escaper::escapeAsn1TypeName(variableType.nameStr());
+
+        const auto asn1Definitions = variableType.packageStr()
+                ? SedsToAsn1Translator::getAsn1Definitions(*variableType.packageStr(), context.asn1Model()->data())
+                : SedsToAsn1Translator::getAsn1Definitions(
+                          context.sedsPackage().nameStr(), context.asn1Model()->data());
+
         const auto *referencedType = asn1Definitions->type(variableTypeName);
         if (referencedType == nullptr) {
             throw MissingAsn1TypeDefinitionException(variableTypeName);
