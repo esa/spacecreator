@@ -20,7 +20,7 @@ $SEDS_CONVERTER --from SEDS --to SDL --aux-models ASN.1,InterfaceView --skip-val
   --out $TEST_OUTPUT_DIR/interfaceview.xml --iv-config resources/config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/ \
   --sdl-filepath-prefix $TEST_OUTPUT_DIR/
 # Setup additional data
-cp resources/test_splline_calibration.system_structure output/system_structure.pr
+cp resources/test_spline_calibration.system_structure output/system_structure.pr
 cp $TEST_OUTPUT_DIR/SPLINECALIBRATION.asn $TEST_OUTPUT_DIR/dataview-uniq.asn
 # Rename the module to avoid naming conflicts
 sed -i 's/SPLINECALIBRATION/SYSTEM-DATAVIEW/g' $TEST_OUTPUT_DIR/dataview-uniq.asn
