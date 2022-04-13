@@ -192,7 +192,7 @@ RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>::getSmall
     case Asn1Acn::Types::IntegerEncoding::BCD:
         return 0;
     case Asn1Acn::Types::IntegerEncoding::unspecified:
-        return std::numeric_limits<Asn1Acn::IntegerValue::Type>::lowest();
+        return std::numeric_limits<Asn1Acn::IntegerValue::Type>::min();
     default:
         throw TranslationException("Unhandled IntegerEncoding for container constraint");
         break;

@@ -93,9 +93,20 @@ auto StatementTranslatorVisitor::StatementContext::sdlProcess() -> ::sdl::Proces
 {
     return m_sdlProcess;
 }
+
 auto StatementTranslatorVisitor::StatementContext::sdlProcedure() -> ::sdl::Procedure *
 {
     return m_sdlProcedure;
+}
+
+auto StatementTranslatorVisitor::StatementContext::splineBoilerplateCreated() const -> bool
+{
+    return m_masterContext.splineBoilerplateCreated();
+}
+
+auto StatementTranslatorVisitor::StatementContext::setSplineBoilerplateCreated(const bool created) -> void
+{
+    m_masterContext.setSplineBoilerplateCreated(created);
 }
 
 auto StatementTranslatorVisitor::StatementContext::addActivityInfo(const QString &name, ActivityInfo info) -> void

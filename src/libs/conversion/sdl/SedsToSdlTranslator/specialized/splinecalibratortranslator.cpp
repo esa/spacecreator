@@ -56,7 +56,11 @@ auto SplineCalibratorTranslator::translate(const seds::model::SplineCalibrator &
     const auto rawPointsVariableName = m_context.uniqueRawSplinePointsVariableName();
     const auto calibratedPointsVariableName = m_context.uniqueCalibratedSplinePointsVariableName();
 
-    buildSplineCalibratorBoilerplate(m_context);
+    if (!m_context.splineBoilerplateCreated()) {
+        buildSplineCalibratorBoilerplate(m_context);
+        m_context.setSplineBoilerplateCreated(true);
+    }
+
     buildSplineCalibratorVariables(splineCalibrator, rawPointsVariableName, calibratedPointsVariableName);
 
     const auto targetName =
@@ -154,12 +158,6 @@ auto SplineCalibratorTranslator::buildSplinePointsVariable(
 auto SplineCalibratorTranslator::buildSplineCalibratorBoilerplate(StatementTranslatorVisitor::StatementContext &context)
         -> void
 {
-    static bool alreadyCreated = false;
-
-    if (alreadyCreated) {
-        return;
-    }
-
     createAsn1Types(context);
 
     buildFindIntervalProcedure(context);
@@ -170,8 +168,6 @@ auto SplineCalibratorTranslator::buildSplineCalibratorBoilerplate(StatementTrans
 
     auto intervalIndexVar = std::make_unique<::sdl::VariableDeclaration>("intervalIndex", "SplinePointsArrayIndex");
     context.sdlProcedure()->addVariable(std::move(intervalIndexVar));
-
-    alreadyCreated = true;
 }
 
 auto SplineCalibratorTranslator::createAsn1Types(StatementTranslatorVisitor::StatementContext &context) -> void

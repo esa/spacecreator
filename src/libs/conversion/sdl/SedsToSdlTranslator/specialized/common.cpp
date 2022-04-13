@@ -69,6 +69,7 @@ Context::Context(const seds::model::Package &sedsPackage, const std::vector<seds
     , m_ivFunction(ivFunction)
     , m_sdlProcess(sdlProcess)
     , m_sdlStateMachine(sdlStateMachine)
+    , m_splineBoilerplateCreated(false)
 {
 }
 
@@ -105,6 +106,16 @@ auto Context::sdlProcess() -> ::sdl::Process *
 auto Context::sdlStateMachine() -> ::sdl::StateMachine *
 {
     return m_sdlStateMachine;
+}
+
+auto Context::splineBoilerplateCreated() const -> bool
+{
+    return m_splineBoilerplateCreated;
+}
+
+auto Context::setSplineBoilerplateCreated(const bool created) -> void
+{
+    m_splineBoilerplateCreated = created;
 }
 
 auto Context::addCommand(const QString &interface, const QString &name, const seds::model::InterfaceCommand *definition)

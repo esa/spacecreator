@@ -169,6 +169,19 @@ public:
     auto sdlStateMachine() -> ::sdl::StateMachine *;
 
     /**
+     * @brief Check if spline calibrator boilerplate was created for this component
+     *
+     * @returns True if created, false otherwise
+     */
+    auto splineBoilerplateCreated() const -> bool;
+    /**
+     * @brief   Set status of the spline calibration boilerplate
+     *
+     * @param   created     Status of spline calibrator boilerplate
+     */
+    auto setSplineBoilerplateCreated(const bool created) -> void;
+
+    /**
      * @brief Add Command definition
      *
      * @brief interface     Name of the hosting Interface
@@ -177,7 +190,6 @@ public:
      */
     auto addCommand(const QString &interface, const QString &name, const seds::model::InterfaceCommand *definition)
             -> void;
-
     /**
      * @brief Get Command definition
      *
@@ -187,7 +199,6 @@ public:
      * @returns Command definition
      */
     auto getCommand(const QString &interface, const QString &name) -> const seds::model::InterfaceCommand *;
-
     /**
      * @brief Return a map of Command names to Command definitions
      *
@@ -202,7 +213,6 @@ public:
      * @param into  Activity information
      */
     auto addActivityInfo(const QString &name, ActivityInfo info) -> void;
-
     /**
      * @brief Return Activity information
      *
@@ -220,6 +230,7 @@ private:
     ivm::IVFunction *m_ivFunction;
     ::sdl::Process *m_sdlProcess;
     ::sdl::StateMachine *m_sdlStateMachine;
+    bool m_splineBoilerplateCreated;
     std::map<std::pair<QString, QString>, const seds::model::InterfaceCommand *> m_commands;
     std::map<QString, ActivityInfo> m_activityInfos;
 };

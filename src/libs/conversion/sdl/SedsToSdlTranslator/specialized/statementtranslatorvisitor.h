@@ -93,34 +93,43 @@ public:
          */
 
         auto sedsPackage() -> const seds::model::Package &;
-
         /**
          * @brief ASN.1 Model accessor
          *
          * @returns ASN.1 Model
          */
         auto asn1Model() -> Asn1Acn::Asn1Model *;
-
         /**
          * @brief InterfaceView Function accessor
          *
          * @returns InterfaceView Function Package
          */
         auto ivFunction() -> ivm::IVFunction *;
-
         /**
          * @brief SDL Process accessor
          *
          * @returns SDL Process
          */
         auto sdlProcess() -> ::sdl::Process *;
-
         /**
          * @brief SDL Procedure accessor
          *
          * @returns SDL Procedure
          */
         auto sdlProcedure() -> ::sdl::Procedure *;
+
+        /**
+         * @brief Check if spline calibrator boilerplate was created for this component
+         *
+         * @returns True if created, false otherwise
+         */
+        auto splineBoilerplateCreated() const -> bool;
+        /**
+         * @brief   Set status of the spline calibration boilerplate
+         *
+         * @param   created     Status of spline calibrator boilerplate
+         */
+        auto setSplineBoilerplateCreated(const bool created) -> void;
 
         /**
          * @brief Add ActivityInfo
