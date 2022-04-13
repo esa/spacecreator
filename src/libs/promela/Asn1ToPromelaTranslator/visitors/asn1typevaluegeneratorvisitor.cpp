@@ -20,14 +20,19 @@
 #include "asn1typevaluegeneratorvisitor.h"
 
 #include "asnsequencecomponent.h"
+#include "assignment.h"
 #include "enumeratedgenerator.h"
+#include "inlinedef.h"
 #include "integerconstraintvisitor.h"
 #include "integergenerator.h"
 #include "integersubset.h"
+#include "proctypeelement.h"
+#include "sequence.h"
 #include "sequencecomponent.h"
 #include "types/type.h"
 #include "types/typereadingvisitor.h"
 #include "values.h"
+#include "variableref.h"
 
 #include <QDebug>
 #include <algorithm>
@@ -37,12 +42,14 @@
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <list>
+#include <memory>
 #include <optional>
 #include <promela/Asn1ToPromelaTranslator/visitors/asn1sequencecomponentvisitor.h>
 #include <promela/PromelaModel/constant.h>
 #include <qdebug.h>
 #include <qglobal.h>
 #include <stdexcept>
+#include <utility>
 
 using Asn1Acn::Types::BitString;
 using Asn1Acn::Types::Boolean;
@@ -157,41 +164,105 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
     Q_UNUSED(type);
 }
 
+Asn1Acn::Types::Type *Asn1TypeValueGeneratorVisitor::getAsnSequenceComponentType(
+        Asn1Acn::AsnSequenceComponent *const component)
+{
+    if (component == nullptr) {
+        throw std::runtime_error("Component cannot be null");
+    }
+
+    Asn1Acn::Types::Type *const componentType = component->type();
+    if (componentType == nullptr) {
+        throw std::runtime_error("Type not specified in Component");
+    }
+
+    const auto &componentTypeEnum = componentType->typeEnum();
+    if (componentTypeEnum != Asn1Acn::Types::Type::ASN1Type::BOOLEAN
+            && componentTypeEnum != Asn1Acn::Types::Type::ASN1Type::INTEGER
+            && componentTypeEnum != Asn1Acn::Types::Type::ASN1Type::USERDEFINED) {
+        throw std::runtime_error("Unknown component type");
+    }
+
+    return componentType;
+}
+
+std::unique_ptr<ProctypeElement> makeInlineCall(
+        Asn1Acn::AsnSequenceComponent *const envGeneratorInline, const QString &callArgumentName)
+{
+    const QString inlineCallArgument = QString("%1.%2").arg(callArgumentName).arg(envGeneratorInline->name());
+    const QString componentTypeLabel = envGeneratorInline->type()->label();
+    const QString componentAsnTypeName = componentTypeLabel.split(".").last();
+    const QString generatorInlineName = QString("%1_generate_value").arg(componentAsnTypeName);
+
+    auto inlineCall = promela::model::InlineCall(generatorInlineName, QList<VariableRef>({ inlineCallArgument }));
+    return std::make_unique<ProctypeElement>(std::move(inlineCall));
+}
+
+std::unique_ptr<promela::model::Sequence> makeNormalSequence()
+{
+    return std::make_unique<promela::model::Sequence>(promela::model::Sequence::Type::NORMAL);
+}
+
+std::unique_ptr<promela::model::ProctypeElement> makeTrueExpressionProctypeElement()
+{
+    return std::make_unique<ProctypeElement>(Expression(VariableRef("true")));
+}
+
+std::unique_ptr<promela::model::ProctypeElement> makeAssignmentProctypeElement(
+        const QString &valueName, const int32_t value)
+{
+    Assignment valueExistAssignment((VariableRef(valueName)), Expression(Constant(value)));
+
+    return std::make_unique<ProctypeElement>(std::move(valueExistAssignment));
+}
+
 void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 {
     if (type.typeName().compare("SEQUENCE") != 0 || type.typeEnum() != Asn1Acn::Types::Type::SEQUENCE) {
         throw std::runtime_error("Invalid type");
     }
 
-    // TODO:
-    // type.acnParameters()
-    // type.identifier()
-    // type.label()
-
     auto *const typeReadingVisitorPtr = static_cast<Asn1Acn::Types::TypeReadingVisitor *>(this);
     if (typeReadingVisitorPtr == nullptr) {
         throw std::runtime_error("Asn1TypeValueGeneratorVisitor could not be casted to TypeReadingVisitor");
     }
 
-    for (const auto &component : type.components()) {
-        if (component == nullptr || component->type() == nullptr) {
-            throw std::runtime_error("Component type not specified");
-        }
+    const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(type.identifier());
+    const QString argumentName = "value";
+    const QList<QString> inlineArguments = { argumentName };
+    promela::model::Sequence sequence(promela::model::Sequence::Type::NORMAL);
 
-        const auto &componentType = component->type();
-        if (componentType != nullptr) {
-            componentType->accept(*typeReadingVisitorPtr);
-        } else {
-            throw std::runtime_error("Type not specified in Component");
-        }
+    for (auto &sequenceComponent : type.components()) {
+        auto *const asnSequenceComponent = static_cast<Asn1Acn::AsnSequenceComponent *>(sequenceComponent.get());
+        if (asnSequenceComponent != nullptr) {
+            auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
+            asnSequenceComponentType->accept(*typeReadingVisitorPtr);
 
-        const auto &componentTypeEnum = component->type()->typeEnum();
-        if (componentTypeEnum != Asn1Acn::Types::Type::ASN1Type::BOOLEAN
-                && componentTypeEnum != Asn1Acn::Types::Type::ASN1Type::INTEGER
-                && componentTypeEnum != Asn1Acn::Types::Type::ASN1Type::USERDEFINED) {
-            throw std::runtime_error("Unknown component type");
+            if (asnSequenceComponent->isOptional()) {
+                auto sequenceToGenerateValue = makeNormalSequence();
+                sequenceToGenerateValue->appendElement(makeTrueExpressionProctypeElement());
+                sequenceToGenerateValue->appendElement(makeInlineCall(asnSequenceComponent, argumentName));
+                const QString valueExistName = QString("%1.exist.%2").arg(argumentName).arg(sequenceComponent->name());
+                sequenceToGenerateValue->appendElement(makeAssignmentProctypeElement(valueExistName, 1));
+
+                auto emptySequenceOptionalIsOff = makeNormalSequence();
+                emptySequenceOptionalIsOff->appendElement(makeTrueExpressionProctypeElement());
+                emptySequenceOptionalIsOff->appendElement(makeAssignmentProctypeElement(valueExistName, 0));
+
+                Conditional conditional;
+                conditional.appendAlternative(std::move(sequenceToGenerateValue));
+                conditional.appendAlternative(std::move(emptySequenceOptionalIsOff));
+
+                sequence.appendElement(std::make_unique<ProctypeElement>(std::move(conditional)));
+            } else {
+                sequence.appendElement(makeInlineCall(asnSequenceComponent, argumentName));
+            }
         }
     }
+
+    auto inlineDef = std::make_unique<InlineDef>(inlineSeqGeneratorName, inlineArguments, std::move(sequence));
+
+    m_promelaModel.addInlineDef(std::move(inlineDef));
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)

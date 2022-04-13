@@ -19,13 +19,15 @@
 
 #pragma once
 
+#include <asn1library/asn1/types/type.h>
 #include <asn1library/asn1/types/typereadingvisitor.h>
+#include <asnsequencecomponent.h>
 #include <optional>
 #include <promela/PromelaModel/promelamodel.h>
 
 namespace promela::translator {
 /**
- * @brief Visitor for asn.1 toplevel types
+ * @brief Visitor for ASN.1 toplevel types
  *
  * Visitor generates Promela inlines responsible for value generation for inlines
  *
@@ -129,6 +131,7 @@ public:
 
 private:
     void createValueGenerationInline(::promela::model::Sequence sequence);
+    Asn1Acn::Types::Type *getAsnSequenceComponentType(Asn1Acn::AsnSequenceComponent *component);
 
 private:
     ::promela::model::PromelaModel &m_promelaModel;

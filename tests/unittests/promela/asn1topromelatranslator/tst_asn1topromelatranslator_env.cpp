@@ -34,6 +34,8 @@
 #include "options.h"
 #include "promela/PromelaExporter/promelaexporter.h"
 #include "promela/PromelaOptions/options.h"
+#include "typeassignment.h"
+#include "types/type.h"
 #include "types/userdefinedtype.h"
 #include "variableref.h"
 
@@ -122,14 +124,16 @@ void tst_Asn1ToPromelaTranslator_Env::testBoolean() const
         QCOMPARE(sequence->getContent().size(), 2);
 
         for (const auto &content : sequence->getContent()) {
-            if (!std::holds_alternative<Assignment>(content->getValue())) {
+            const auto &contentValue = content->getValue();
+            if (!std::holds_alternative<Assignment>(contentValue)) {
                 continue;
             }
 
-            const Assignment &assignment = std::get<Assignment>(content->getValue());
-            QCOMPARE(assignment.getVariableRef().getElements().size(), 1);
-            QCOMPARE(assignment.getVariableRef().getElements().front().m_name, argName);
-            QVERIFY(assignment.getVariableRef().getElements().front().m_index.get() == nullptr);
+            const Assignment &assignment = std::get<Assignment>(contentValue);
+            const std::list<VariableRef::Element> &assignmentElements = assignment.getVariableRef().getElements();
+            QCOMPARE(assignmentElements.size(), 1);
+            QCOMPARE(assignmentElements.front().m_name, argName);
+            QVERIFY(assignmentElements.front().m_index.get() == nullptr);
 
             const Constant &constant = std::get<Constant>(assignment.getExpression().getContent());
             valuesFound.push_back(static_cast<bool>(constant.getValue()));
@@ -187,9 +191,13 @@ void tst_Asn1ToPromelaTranslator_Env::testInteger() const
 
         QVERIFY(std::holds_alternative<Assignment>(nestedSequence->getContent().back()->getValue()));
         const Assignment &assignment = std::get<Assignment>(nestedSequence->getContent().back()->getValue());
-        QCOMPARE(assignment.getVariableRef().getElements().size(), 1);
-        QCOMPARE(assignment.getVariableRef().getElements().front().m_name, argName);
-        QVERIFY(assignment.getVariableRef().getElements().front().m_index.get() == nullptr);
+        const VariableRef &variableRef = assignment.getVariableRef();
+
+        const std::list<VariableRef::Element> &variableRefElements = variableRef.getElements();
+        QCOMPARE(variableRefElements.size(), 1);
+        QCOMPARE(variableRefElements.front().m_name, argName);
+        QVERIFY(variableRefElements.front().m_index.get() == nullptr);
+
         QVERIFY(std::holds_alternative<Constant>(assignment.getExpression().getContent()));
         const Constant &constant = std::get<Constant>(assignment.getExpression().getContent());
         QCOMPARE(constant.getValue(), i);
@@ -283,56 +291,93 @@ void exportAsnModel(const Asn1Acn::Asn1Model *const model)
     exporter.exportModel(model, options);
 }
 
-void checkInlineDefs(InlineDef *const definition, const QString &definitionName, const QString &argumentName = "value")
+void checkAlternativeContent(const promela::model::ProctypeElement::Value &contentValue)
 {
-    QVERIFY(definition != nullptr);
-    QCOMPARE(definition->getName(), definitionName);
-    QCOMPARE(definition->getArguments().size(), 1);
-    const auto &argument = definition->getArguments().front();
-    QCOMPARE(argument, argumentName);
-
-    const Sequence &mainSequence = definition->getSequence();
-    QCOMPARE(mainSequence.getContent().size(), 1);
-    QCOMPARE(mainSequence.getType(), Sequence::Type::NORMAL);
-
-    for (const auto &content : mainSequence.getContent()) {
-        if (!std::holds_alternative<Conditional>(content->getValue())) {
-            qDebug() << "value index: " << content->getValue().index();
-            QVERIFY(std::holds_alternative<Conditional>(content->getValue()));
-        }
-        const auto &conditional = std::get<Conditional>(content->getValue());
-        for (const auto &alternative : conditional.getAlternatives()) {
-            for (const auto &content : alternative->getContent()) {
-                if (std::holds_alternative<Expression>(content->getValue())) {
-                    qDebug() << "holds Expression";
-                    auto &expression = std::get<Expression>(content->getValue());
-                    auto &declaration = expression.getContent();
-                    auto &varRef = std::get<VariableRef>(declaration);
-                    (void)varRef;
-                    for (const auto &el : varRef.getElements()) {
-                        qDebug() << "el " << el.m_name;
-                        // printing expressions is recursive
-                        if (el.m_index != nullptr) {
-                            const auto &content = el.m_index->getContent();
-                            if (std::holds_alternative<VariableRef>(content)) {
-                                // auto &elContent = std::get<VariableRef>(content);
-                                // (void)elContent;
-                                // TODO
-                            } else if (std::holds_alternative<Constant>(content)) {
-                                // TODO
-                            } else if (std::holds_alternative<BinaryExpression>(content)) {
-                                // TODO
-                            } else if (std::holds_alternative<InlineCall>(content)) {
-                                // TODO
-                            }
-                        }
-                    }
-                    qDebug() << "";
-                } else if (std::holds_alternative<Assignment>(content->getValue())) {
-                    qDebug() << "holds Assignment";
+    if (std::holds_alternative<Expression>(contentValue)) {
+        const auto &expression = std::get<Expression>(contentValue);
+        const auto &declaration = expression.getContent();
+        const auto &varRef = std::get<VariableRef>(declaration);
+        for (const auto &el : varRef.getElements()) {
+            // printing expressions is recursive
+            if (el.m_index != nullptr) {
+                const auto &content = el.m_index->getContent();
+                if (std::holds_alternative<VariableRef>(content)) {
+                    // auto &elContent = std::get<VariableRef>(content);
+                    // (void)elContent;
+                    // TODO
+                } else if (std::holds_alternative<Constant>(content)) {
+                    // TODO
+                } else if (std::holds_alternative<BinaryExpression>(content)) {
+                    // TODO
+                } else if (std::holds_alternative<InlineCall>(content)) {
+                    // TODO
                 }
             }
         }
+    }
+}
+
+void checkConditional(const Conditional &conditional)
+{
+    for (const auto &alternative : conditional.getAlternatives()) {
+        for (const auto &content : alternative->getContent()) {
+            checkAlternativeContent(content->getValue());
+        }
+    }
+}
+
+void checkSequence(const Sequence &sequence, const int expectedContentSize = 1)
+{
+    QCOMPARE(sequence.getType(), Sequence::Type::NORMAL);
+    const auto &sequenceContent = sequence.getContent();
+    QCOMPARE(sequenceContent.size(), expectedContentSize);
+
+    for (const auto &content : sequenceContent) {
+        const auto &contentValue = content->getValue();
+
+        const bool contentIsConditional = std::holds_alternative<Conditional>(contentValue);
+        const bool contentIsSequence = std::holds_alternative<Sequence>(contentValue);
+        const bool contentIsInlineCall = std::holds_alternative<InlineCall>(contentValue);
+
+        if (!contentIsConditional && !contentIsSequence && !contentIsInlineCall) {
+            QFAIL("Unknown content type in sequence");
+        }
+
+        if (contentIsConditional) {
+            const auto &conditional = std::get<Conditional>(contentValue);
+            checkConditional(conditional);
+        } else if (contentIsSequence) {
+            const auto &nestedSequence = std::get<Sequence>(contentValue);
+            // checkSequence(sequence);
+            (void)nestedSequence;
+        } else if (contentIsInlineCall) {
+            const auto &inlineCall = std::get<InlineCall>(contentValue);
+            // checkInlineCall()
+            (void)inlineCall;
+        }
+    }
+}
+
+void checkInlineDefinition(InlineDef *const definition, Asn1Acn::TypeAssignment *const typeAssignment)
+{
+    QVERIFY(definition != nullptr);
+    QVERIFY(typeAssignment != nullptr);
+
+    const QString expectedName = QString("%1_generate_value").arg(typeAssignment->name());
+    QCOMPARE(definition->getName(), expectedName);
+
+    const auto &definitionArguments = definition->getArguments();
+    QCOMPARE(definitionArguments.size(), 1);
+    const auto &argument = definitionArguments.front();
+    QCOMPARE(argument, "value");
+
+    const Sequence &mainSequence = definition->getSequence();
+    if (typeAssignment->typeEnum() == Asn1Acn::Types::Type::SEQUENCE) {
+        auto *const parentNode = static_cast<Asn1Acn::Definitions *>(typeAssignment->parent());
+        QVERIFY(parentNode);
+        checkSequence(mainSequence, parentNode->types().size());
+    } else {
+        checkSequence(mainSequence);
     }
 }
 
@@ -343,22 +388,28 @@ void tst_Asn1ToPromelaTranslator_Env::testSequence() const
     QVERIFY(!asnModel->data().empty());
 
     PromelaModel promelaModel;
-    QStringList typesToTranslate = { "EnvIntParam", "EnvBoolParam", "EnvParamSeq" };
+    const QStringList typesToTranslate = { "EnvIntParam", "EnvBoolParam", "EnvParamSeq" };
     Asn1NodeValueGeneratorVisitor visitor(promelaModel, typesToTranslate);
     QVERIFY(!asnModel->data().empty());
-    const auto &sequence = *asnModel->data().front();
-    visitor.visit(sequence);
+    const auto &asnFile = *asnModel->data().front();
+    visitor.visit(asnFile);
+    exportPromelaModel(promelaModel, "sequences.pr"); // TODO: this line shall be removed
 
-    auto &promelaInlineDefs = promelaModel.getInlineDefs();
-    // QCOMPARE(promelaInlineDefs.size(), 3); // when uncommenting this, remove check below
-    QVERIFY(!promelaInlineDefs.empty());
+    const auto &asnDefinitionsList = asnFile.definitionsList();
+    const auto &promelaInlineDefs = promelaModel.getInlineDefs();
+    QCOMPARE(promelaInlineDefs.size(), asnDefinitionsList.front()->types().size());
+    const int defsSize = promelaInlineDefs.size();
 
-    const auto &inlineIterator = promelaInlineDefs.begin();
-    checkInlineDefs((*inlineIterator).get(), "EnvIntParam_generate_value");
-    checkInlineDefs((*std::next(inlineIterator, 1)).get(), "EnvBoolParam_generate_value");
-    // checkInlineDefs((*std::next(inlineIterator, 2)).get(), "EnvParamSeq_generate_value");
+    for (int i = 0; i < defsSize; i++) {
+        if (std::next(promelaInlineDefs.begin(), i) == promelaInlineDefs.end() //
+                || asnDefinitionsList.at(0) == nullptr) {
+            break;
+        }
+        auto *const inlineDefPtr = (*std::next(promelaInlineDefs.begin(), i)).get();
+        auto *asnTypeAssignmentPtr = asnDefinitionsList.at(0)->types().at(i).get();
 
-    exportPromelaModel(promelaModel, "sequences.pr");
+        checkInlineDefinition(inlineDefPtr, asnTypeAssignmentPtr);
+    }
 }
 
 std::unique_ptr<Definitions> tst_Asn1ToPromelaTranslator_Env::createModel() const
