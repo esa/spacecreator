@@ -181,6 +181,10 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
             uniqueAsn1Files.insert(
                     processMetadata.getDatamodel().fileName(), processMetadata.getDatamodel().absoluteFilePath());
         }
+        if (allSdlFiles.at(ivFunction).getContext().exists()) {
+            uniqueAsn1Files.insert(allSdlFiles.at(ivFunction).getContext().fileName(),
+                    allSdlFiles.at(ivFunction).getContext().absoluteFilePath());
+        }
         const QFileInfo outputFile = outputFilepath(processMetadata.getName().toLower() + ".pml");
 
         SdlToPromelaConverter sdl2Promela;
@@ -330,7 +334,8 @@ void TmcConverter::findFunctionsToConvert(const IVModel &model, QStringList &sdl
             const QString ivFunctionName = ivFunction->property("name").toString();
             sdlFunctions.append(ivFunctionName);
 
-            const QFileInfo &systemStructure = sdlSystemStructureLocation(ivFunctionName);
+            const QFileInfo systemStructure = sdlSystemStructureLocation(ivFunctionName);
+            const QFileInfo contextLocation = sdlFunctionContextLocation(ivFunctionName);
 
             if (ivFunction->instanceOf() != nullptr) {
                 const QString ivFunctionTypeName = ivFunction->instanceOf()->property("name").toString();
@@ -338,12 +343,14 @@ void TmcConverter::findFunctionsToConvert(const IVModel &model, QStringList &sdl
                 const QFileInfo functionDatamodel = sdlFunctionDatamodelLocation(ivFunctionName, ivFunctionTypeName);
 
                 sdlProcesses.emplace(ivFunctionName,
-                        ProcessMetadata(ivFunctionName, systemStructure, sdlProcess, functionDatamodel));
+                        ProcessMetadata(
+                                ivFunctionName, systemStructure, sdlProcess, functionDatamodel, contextLocation));
             } else {
                 const QFileInfo sdlProcess = sdlImplementationLocation(ivFunctionName);
                 const QFileInfo functionDatamodel = sdlFunctionDatamodelLocation(ivFunctionName);
                 sdlProcesses.emplace(ivFunctionName,
-                        ProcessMetadata(ivFunctionName, systemStructure, sdlProcess, functionDatamodel));
+                        ProcessMetadata(
+                                ivFunctionName, systemStructure, sdlProcess, functionDatamodel, contextLocation));
             }
 
         } else {
@@ -455,6 +462,17 @@ QFileInfo TmcConverter::sdlFunctionDatamodelLocation(const QString &functionName
 {
     return sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator() + "code"
             + QDir::separator() + functionTypeName.toLower() + "_datamodel.asn";
+}
+
+QFileInfo TmcConverter::sdlFunctionContextLocation(const QString &functionName) const
+{
+    QFileInfo contextLocation = sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator()
+            + "Context-" + functionName.toLower() + ".asn";
+    if (contextLocation.exists()) {
+        return contextLocation;
+    } else {
+        return QFileInfo();
+    }
 }
 
 QFileInfo TmcConverter::outputFilepath(const QString &name)

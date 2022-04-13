@@ -19,10 +19,12 @@
 
 #pragma once
 
+#include "constant.h"
 #include "variableref.h"
 
 #include <QList>
 #include <QString>
+#include <variant>
 
 namespace promela::model {
 /**
@@ -37,7 +39,8 @@ public:
      * @param name name of inline
      * @param arguments list of arguments
      */
-    InlineCall(QString name, const QList<VariableRef> &arguments);
+    using Argument = std::variant<VariableRef, Constant>;
+    InlineCall(QString name, const QList<Argument> &arguments);
 
     /**
      * @brief Getter for name of inline
@@ -50,10 +53,10 @@ public:
      *
      * @return List of inline arguments.
      */
-    const QList<VariableRef> &getArguments() const noexcept;
+    const QList<Argument> &getArguments() const noexcept;
 
 private:
     QString m_name;
-    QList<VariableRef> m_arguments;
+    QList<Argument> m_arguments;
 };
 }

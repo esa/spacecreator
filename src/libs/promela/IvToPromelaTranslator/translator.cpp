@@ -106,7 +106,7 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
         promelaModel->addDeclaration(channelDeclaration);
     }
 
-    promelaModel->setInit(generateInitProctype(modelFunctions));
+    promelaModel->setInit(generateInitProctype(modelFunctions, ivModel));
 
     for (const QString &additionalInclude : additionalIncludes) {
         promelaModel->addEpilogueInclude(additionalInclude);
@@ -132,8 +132,24 @@ std::set<ModelType> IvToPromelaTranslator::getDependencies() const
     return std::set<ModelType> { ModelType::InterfaceView };
 }
 
-InitProctype IvToPromelaTranslator::generateInitProctype(const std::vector<QString> &modelFunctions) const
+InitProctype IvToPromelaTranslator::generateInitProctype(
+        const std::vector<QString> &modelFunctions, const IVModel *ivModel) const
 {
+    QSet<QString> functionsWithContextVariables;
+
+    QVector<IVFunction *> ivFunctionList = ivModel->allObjectsByType<IVFunction>();
+
+    for (IVFunction *ivFunction : ivFunctionList) {
+        const QString functionName = ivFunction->property("name").toString();
+        QVector<shared::ContextParameter> contextParameters = ivFunction->contextParams();
+
+        if (std::any_of(contextParameters.begin(), contextParameters.end(), [](const shared::ContextParameter &param) {
+                return param.paramType() == shared::BasicParameter::Type::Other;
+            })) {
+            functionsWithContextVariables.insert(functionName);
+        }
+    }
+
     Sequence sequence(Sequence::Type::ATOMIC);
 
     {
@@ -142,6 +158,14 @@ InitProctype IvToPromelaTranslator::generateInitProctype(const std::vector<QStri
         std::unique_ptr<ProctypeElement> element = std::make_unique<ProctypeElement>(std::move(initTokenDeclaration));
 
         sequence.appendElement(std::move(element));
+    }
+
+    for (const QString &functionName : modelFunctions) {
+        if (functionsWithContextVariables.contains(functionName)) {
+            const QString ctxtInitInline =
+                    QString("%1_ctxt_init").arg(Escaper::escapePromelaIV(functionName).toLower());
+            sequence.appendElement(std::make_unique<ProctypeElement>(InlineCall(ctxtInitInline, {})));
+        }
     }
 
     for (const QString &functionName : modelFunctions) {
@@ -215,7 +239,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *
         if (parameterType.isEmpty()) {
             loopSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(piName, {})));
         } else {
-            QList<VariableRef> arguments;
+            QList<InlineCall::Argument> arguments;
             arguments.append(VariableRef(signalParameterName));
             loopSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(piName, arguments)));
         }
@@ -264,7 +288,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(con
         loopSequence->appendElement(std::move(inlineCall));
     } else {
         const QString generateValueInlineName = QString("%1_generate_value").arg(parameterType);
-        QList<VariableRef> arguments;
+        QList<InlineCall::Argument> arguments;
         arguments.append(VariableRef("value"));
         std::unique_ptr<ProctypeElement> valueGeneration =
                 std::make_unique<ProctypeElement>(InlineCall(generateValueInlineName, arguments));
@@ -434,7 +458,7 @@ void IvToPromelaTranslator::createCheckQueueInline(
 
     std::unique_ptr<Expression> expr;
     {
-        QList<VariableRef> arguments;
+        QList<InlineCall::Argument> arguments;
         arguments.append(VariableRef(channelNames.last()));
 
         expr = std::make_unique<Expression>(InlineCall("empty", arguments));
@@ -443,7 +467,7 @@ void IvToPromelaTranslator::createCheckQueueInline(
     }
 
     while (!channelNames.empty()) {
-        QList<VariableRef> arguments;
+        QList<InlineCall::Argument> arguments;
         arguments.append(VariableRef(channelNames.last()));
 
         std::unique_ptr<Expression> left = std::make_unique<Expression>(InlineCall("empty", arguments));

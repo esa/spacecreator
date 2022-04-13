@@ -21,6 +21,7 @@
 
 #include "visitors/variablerefvisitor.h"
 
+using promela::model::Constant;
 using promela::model::InlineCall;
 using promela::model::VariableRef;
 
@@ -36,13 +37,17 @@ void InlineCallVisitor::visit(const InlineCall &inlineCall)
     VariableRefVisitor variableRefVisitor(m_stream);
 
     bool first = true;
-    for (const VariableRef &variableRef : inlineCall.getArguments()) {
+    for (const InlineCall::Argument &argument : inlineCall.getArguments()) {
         if (!first) {
             m_stream << ", ";
         } else {
             first = false;
         }
-        variableRefVisitor.visit(variableRef);
+        if (std::holds_alternative<VariableRef>(argument)) {
+            variableRefVisitor.visit(std::get<VariableRef>(argument));
+        } else if (std::holds_alternative<Constant>(argument)) {
+            m_stream << std::get<Constant>(argument).getValue();
+        }
     }
     m_stream << ")";
 }

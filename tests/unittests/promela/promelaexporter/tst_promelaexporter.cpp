@@ -472,8 +472,10 @@ void tst_PromelaExporter::testProctypeElements()
     std::unique_ptr<ProctypeElement> channelRecv =
             std::make_unique<ProctypeElement>(ChannelRecv(VariableRef("channel1"), params));
     std::unique_ptr<ProctypeElement> inlineCall = std::make_unique<ProctypeElement>(InlineCall("fn", {}));
+    QList<InlineCall::Argument> inlineParams;
+    inlineParams.append(VariableRef("param"));
     std::unique_ptr<ProctypeElement> inlineCallWithParams =
-            std::make_unique<ProctypeElement>(InlineCall("fnParams", params));
+            std::make_unique<ProctypeElement>(InlineCall("fnParams", inlineParams));
     std::unique_ptr<ProctypeElement> skip = std::make_unique<ProctypeElement>(Skip());
 
     Sequence initSequence(Sequence::Type::NORMAL);
@@ -1008,7 +1010,7 @@ void tst_PromelaExporter::testExpressions()
     }
 
     {
-        QList<VariableRef> args;
+        QList<InlineCall::Argument> args;
         args.append(VariableRef("channel1"));
 
         InlineCall emptyCall = InlineCall("empty", args);

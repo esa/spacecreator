@@ -93,6 +93,7 @@ private:
     QFileInfo sdlSystemStructureLocation(const QString &functionName) const;
     QFileInfo sdlFunctionDatamodelLocation(const QString &functionName) const;
     QFileInfo sdlFunctionDatamodelLocation(const QString &functionName, const QString &functionTypeName) const;
+    QFileInfo sdlFunctionContextLocation(const QString &functionName) const;
     QFileInfo outputFilepath(const QString &name);
 
 private:

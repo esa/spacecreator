@@ -235,7 +235,7 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
         src.appendElement("data");
         src.appendElement(componentName);
         const QString inlineName = getAssignValueInlineNameForNestedType(utypeName, componentName);
-        QList<VariableRef> inlineArguments;
+        QList<InlineCall::Argument> inlineArguments;
         inlineArguments.append(dst);
         inlineArguments.append(src);
         sequence.appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineName, inlineArguments)));
@@ -286,7 +286,7 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
 
             const QString inlineName = getAssignValueInlineNameForNestedType(
                     nestedUtypeName, Escaper::escapePromelaName(componentVisitor.getComponentName()));
-            QList<VariableRef> arguments;
+            QList<InlineCall::Argument> arguments;
             arguments.append(dst);
             arguments.append(src);
             sequence.appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineName, arguments)));
@@ -365,7 +365,7 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
     VariableRef src("src");
     src.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
 
-    QList<VariableRef> inlineArguments;
+    QList<InlineCall::Argument> inlineArguments;
     inlineArguments.append(dst);
     inlineArguments.append(src);
 
@@ -429,7 +429,7 @@ void Asn1ItemTypeVisitor::visit(const UserdefinedType &type)
     ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
 
     const QString inlineName = type.typeName() + assignValueInlineSuffix;
-    QList<VariableRef> inlineArguments;
+    QList<InlineCall::Argument> inlineArguments;
     inlineArguments.append(VariableRef("dst"));
     inlineArguments.append(VariableRef("src"));
 

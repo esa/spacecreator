@@ -12,6 +12,8 @@ set(SOURCES
   visitors/asn1itemtypevisitor.cpp
   visitors/asn1nodevaluegeneratorvisitor.cpp
   visitors/asn1typevaluegeneratorvisitor.cpp
+  visitors/asn1valuetypevisitor.cpp
+  visitors/asn1valuetypecomponentvisitor.cpp
 )
 set(INCLUDES
   translator.h
@@ -26,6 +28,8 @@ set(INCLUDES
   visitors/asn1itemtypevisitor.h
   visitors/asn1nodevaluegeneratorvisitor.h
   visitors/asn1typevaluegeneratorvisitor.h
+  visitors/asn1valuetypevisitor.h
+  visitors/asn1valuetypecomponentvisitor.h
 )
 
 add_library(Asn1ToPromelaTranslator STATIC)
@@ -38,6 +42,7 @@ target_include_directories(Asn1ToPromelaTranslator
   PRIVATE                  "${CMAKE_SOURCE_DIR}/src/libs")
 target_link_libraries(Asn1ToPromelaTranslator
   PUBLIC              Conversion::Common
+                      Conversion::Converter
                       asn1library
                       Promela::Model
   PRIVATE             CommonProjectWarnings)

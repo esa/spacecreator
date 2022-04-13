@@ -61,3 +61,13 @@ void NamedValue::addValue(const QString &name, ValuePtr value)
 {
     m_values.push_back(std::pair<QString, ValuePtr>(name, std::move(value)));
 }
+
+Value::ValueType NamedValue::typeEnum() const
+{
+    return Value::NAMED_VALUE;
+}
+
+const NamedValue::Components &NamedValue::getComponents() const
+{
+    return m_values;
+}

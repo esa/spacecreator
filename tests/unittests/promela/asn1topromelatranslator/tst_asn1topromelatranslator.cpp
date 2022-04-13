@@ -643,12 +643,14 @@ void tst_Asn1ToPromelaTranslator::testChoice()
         QVERIFY(inlineCall != nullptr);
         QCOMPARE(inlineCall->getName(), "MyType_ch1_assign_value");
         QCOMPARE(inlineCall->getArguments().size(), 2);
-        QCOMPARE(inlineCall->getArguments().first().getElements().size(), 3);
+        QVERIFY(std::holds_alternative<VariableRef>(inlineCall->getArguments().first()));
+        QCOMPARE(std::get<VariableRef>(inlineCall->getArguments().first()).getElements().size(), 3);
         inlineCall = findProctypeElement<InlineCall>(inlineDef->getSequence(), 1);
         QVERIFY(inlineCall != nullptr);
         QCOMPARE(inlineCall->getName(), "MyType_ch2_assign_value");
         QCOMPARE(inlineCall->getArguments().size(), 2);
-        QCOMPARE(inlineCall->getArguments().first().getElements().size(), 3);
+        QVERIFY(std::holds_alternative<VariableRef>(inlineCall->getArguments().first()));
+        QCOMPARE(std::get<VariableRef>(inlineCall->getArguments().first()).getElements().size(), 3);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 2);
         QVERIFY(assignment != nullptr);
     }
