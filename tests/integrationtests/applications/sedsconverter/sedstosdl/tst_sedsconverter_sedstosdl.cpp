@@ -42,6 +42,7 @@ private Q_SLOTS:
     void testInitialValues();
     void testNamedValues();
     void testDescriptions();
+    void testCrossReference();
 };
 
 /// \SRS  ETB-FUN-10
@@ -262,6 +263,13 @@ void tst_SedsConverter_SedsToSdl::testNamedValues()
 void tst_SedsConverter_SedsToSdl::testDescriptions()
 {
     const int result = system("./test_descriptions.sh");
+}
+
+/// \SRS  ETB-FUN-10
+void tst_SedsConverter_SedsToSdl::testCrossReference()
+{
+    const int result = system("./test_cross_reference.sh");
+    QCOMPARE(result, 0);
 }
 
 } // namespace sedsconverter

@@ -1,0 +1,15 @@
+/* CIF Process (0, 0), (800, 100) */
+process FunComponent;
+    /* CIF Text (0, 150), (400, 500) */
+    dcl X IntegerType;
+    dcl Y IntegerType;
+    dcl Io_funcomponentinterface_funcommand_pi FunCommand_Type;
+    /* CIF ENDTEXT */
+    /* CIF Start (0, 900), (200, 75) */
+    START;
+        /* CIF NextState (0, 1087), (200, 50) */
+        NEXTSTATE Idle;
+    /* CIF State (0, 1162), (200, 50) */
+    state Idle;
+    endstate;
+endprocess FunComponent;

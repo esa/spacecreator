@@ -67,7 +67,6 @@ configure_file(resources/test_timers.output resources/test_timers.output COPYONL
 configure_file(resources/test_timers.system_structure resources/test_timers.system_structure COPYONLY)
 configure_file(resources/test_timers.interfaceview resources/test_timers.interfaceview COPYONLY)
 
-
 configure_file(test_parameter_map.sh test_parameter_map.sh COPYONLY)
 configure_file(resources/test_parameter_map.xml resources/test_parameter_map.xml COPYONLY)
 configure_file(resources/test_parametermaphostprovider.output resources/test_parametermaphostprovider.output COPYONLY)
@@ -98,3 +97,7 @@ configure_file(resources/test_named_values.system_structure resources/test_named
 configure_file(test_descriptions.sh test_descriptions.sh COPYONLY)
 configure_file(resources/test_descriptions.xml resources/test_descriptions.xml COPYONLY)
 configure_file(resources/test_descriptions.output resources/test_descriptions.output COPYONLY)
+
+configure_file(test_cross_reference.sh test_cross_reference.sh COPYONLY)
+configure_file(resources/test_cross_reference.xml resources/test_cross_reference.xml COPYONLY)
+configure_file(resources/test_cross_reference.output resources/test_cross_reference.output COPYONLY)
