@@ -9,7 +9,7 @@
 </Provided_Interface>
 
 <Provided_Interface name="ProvidedInterface_AsyncCommand_Pi" comment="Async command short description Async command long description" layer="default">
-    <Input_Parameter name="InputParam" type="AsyncCommand_Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="AsyncCommand-Type" encoding="ACN"/>
 </Provided_Interface>
 
     <Implementations>

@@ -63,8 +63,8 @@ ivm::IVInterface *InterfaceTranslatorHelper::createIvInterface(const QString &na
 shared::InterfaceParameter InterfaceTranslatorHelper::createInterfaceParameter(
         const QString &name, const QString &typeName, shared::InterfaceParameter::Direction direction)
 {
-    return shared::InterfaceParameter(name, shared::BasicParameter::Type::Other, Escaper::escapeIvName(typeName),
-            m_interfaceParameterEncoding, direction);
+    return shared::InterfaceParameter(
+            name, shared::BasicParameter::Type::Other, typeName, m_interfaceParameterEncoding, direction);
 }
 
 QString InterfaceTranslatorHelper::createArrayType(const seds::model::DataTypeRef &baseTypeRef,

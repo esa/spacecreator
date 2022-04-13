@@ -35,7 +35,7 @@
 </Provided_Interface>
 
 <Required_Interface name="InterruptSubscription_Interrupt_Ri" comment="Receive a hardware interrupt notification. The notification is asynchronous, as it may not be executed in the interrupt context" kind="Sporadic" layer="default">
-    <Input_Parameter name="InputParam" type="Interrupt_Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="Interrupt-Type" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 

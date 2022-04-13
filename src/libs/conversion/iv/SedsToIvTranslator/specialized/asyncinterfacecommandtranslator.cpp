@@ -30,7 +30,6 @@
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
-#include <iostream>
 
 using conversion::asn1::translator::SedsToAsn1Translator;
 using conversion::translator::MissingAsn1TypeDefinitionException;

@@ -340,7 +340,8 @@ auto StateMachineTranslator::translateVariables(
             throw MissingAsn1TypeDefinitionException(variableTypeName);
         }
 
-        auto sdlVariable = std::make_unique<::sdl::VariableDeclaration>(variableName, variableTypeName);
+        auto sdlVariable =
+                std::make_unique<::sdl::VariableDeclaration>(variableName, Escaper::escapeSdlName(variableTypeName));
         DescriptionTranslator::translate(variable, sdlVariable.get());
 
         context.sdlProcess()->addVariable(std::move(sdlVariable));
@@ -815,7 +816,8 @@ auto StateMachineTranslator::createIoVariable(ivm::IVInterface const *interface,
     }
     const auto variableName = ioVariableName(interfaceName);
     const auto &param = interface->params()[0];
-    sdlProcess->addVariable(std::make_unique<::sdl::VariableDeclaration>(variableName, param.paramTypeName()));
+    sdlProcess->addVariable(
+            std::make_unique<::sdl::VariableDeclaration>(variableName, Escaper::escapeSdlName(param.paramTypeName())));
 }
 
 auto StateMachineTranslator::createExternalProcedure(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess)

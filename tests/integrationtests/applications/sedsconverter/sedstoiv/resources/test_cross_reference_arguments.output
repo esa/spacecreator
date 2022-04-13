@@ -7,31 +7,31 @@
     <Input_Parameter name="ArgumentNoMapping" type="SyncItem" encoding="ACN"/>
 </Provided_Interface>
 <Provided_Interface name="ProvidedInterface_SyncCommandNoMappingArray_Pi" kind="Protected" layer="default">
-    <Input_Parameter name="ArrayArgumentNoMapping" type="SyncItemArrayArray_10" encoding="ACN"/>
+    <Input_Parameter name="ArrayArgumentNoMapping" type="SyncItemArrayArray-10" encoding="ACN"/>
 </Provided_Interface>
 <Provided_Interface name="ProvidedInterface_SyncCommandSimpleMapping_Pi" kind="Protected" layer="default">
     <Input_Parameter name="ArgumentSimpleMapping" type="MappedSyncItem" encoding="ACN"/>
 </Provided_Interface>
 <Provided_Interface name="ProvidedInterface_SyncCommandSimpleMappingArray_Pi" kind="Protected" layer="default">
-    <Input_Parameter name="ArrayArgumentSimpleMapping" type="MappedSyncItemArray_10" encoding="ACN"/>
+    <Input_Parameter name="ArrayArgumentSimpleMapping" type="MappedSyncItemArray-10" encoding="ACN"/>
 </Provided_Interface>
 <Provided_Interface name="ProvidedInterface_AsyncCommandNoMapping_Pi" layer="default">
-    <Input_Parameter name="InputParam" type="AsyncCommandNoMapping_Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="AsyncCommandNoMapping-Type" encoding="ACN"/>
 </Provided_Interface>
 <Provided_Interface name="ProvidedInterface_AsyncCommandNoMappingArray_Pi" layer="default">
-    <Input_Parameter name="InputParam" type="AsyncCommandNoMappingArray_Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="AsyncCommandNoMappingArray-Type" encoding="ACN"/>
 </Provided_Interface>
 <Provided_Interface name="ProvidedInterface_AsyncCommandSimpleMapping_Pi" layer="default">
-    <Input_Parameter name="InputParam" type="AsyncCommandSimpleMapping_Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="AsyncCommandSimpleMapping-Type" encoding="ACN"/>
 </Provided_Interface>
 <Provided_Interface name="ProvidedInterface_AsyncCommandSimpleMappingArray_Pi" layer="default">
-    <Input_Parameter name="InputParam" type="AsyncCommandSimpleMappingArray_Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="AsyncCommandSimpleMappingArray-Type" encoding="ACN"/>
 </Provided_Interface>
 <Provided_Interface name="ProvidedInterface_AsyncCommandAlternateMapping_Pi" layer="default">
-    <Input_Parameter name="InputParam" type="AsyncCommandAlternateMapping_Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="AsyncCommandAlternateMapping-Type" encoding="ACN"/>
 </Provided_Interface>
 <Provided_Interface name="ProvidedInterface_AsyncCommandAlternateMappingArray_Pi" layer="default">
-    <Input_Parameter name="InputParam" type="AsyncCommandAlternateMappingArray_Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="AsyncCommandAlternateMappingArray-Type" encoding="ACN"/>
 </Provided_Interface>
 
     <Implementations>
