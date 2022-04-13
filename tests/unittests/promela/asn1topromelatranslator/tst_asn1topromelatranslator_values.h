@@ -21,17 +21,34 @@
 
 #include <QObject>
 #include <QtTest>
+#include <asn1library/asn1/asn1model.h>
+#include <memory>
+#include <promela/PromelaModel/inlinedef.h>
+#include <promela/PromelaModel/proctypeelement.h>
+
+using Asn1Acn::Definitions;
 
 namespace tmc::test {
 
-class tst_IntegerGenerator : public QObject
+class tst_Asn1ToPromelaTranslator_Values : public QObject
 {
     Q_OBJECT
 
 private Q_SLOTS:
-    void testEmptySequence();
-    void testContinuousSequence();
-    void testTwoRanges();
-    void testSeparatedNumbers();
+    void initTestCase();
+    void cleanupTestCase();
+
+    void testSequence() const;
+    void testInteger() const;
+    void testEnumerated() const;
+    void testBoolean() const;
+
+private:
+    std::unique_ptr<Definitions> createModel() const;
+    const ::promela::model::InlineDef *findInline(
+            const std::list<std::unique_ptr<::promela::model::InlineDef>> &list, const QString &name) const;
+
+    template<typename T>
+    const T *findProctypeElement(const ::promela::model::Sequence &sequence, size_t index) const;
 };
 }

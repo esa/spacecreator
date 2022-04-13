@@ -71,7 +71,7 @@ void Asn1ValueTypeVisitor::visit(const Boolean &type)
     }
     const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value.get());
 
-    int value = singleValue->getValue().compare("true", Qt::CaseInsensitive) ? 1 : 0;
+    int value = singleValue->getValue().compare("true", Qt::CaseInsensitive) == 0 ? 1 : 0;
 
     const QString inlineCallName = QString("%1_assign_value").arg(m_typeName);
 
