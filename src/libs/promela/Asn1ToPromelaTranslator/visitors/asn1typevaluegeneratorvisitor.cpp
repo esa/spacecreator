@@ -186,14 +186,33 @@ Asn1Acn::Types::Type *Asn1TypeValueGeneratorVisitor::getAsnSequenceComponentType
     return componentType;
 }
 
+QString getName(Asn1Acn::AsnSequenceComponent *const envGeneratorInline, const QString &componentAsnTypeName)
+{
+    QString generatorInlineName;
+
+    const QString &inlineTypeName = envGeneratorInline->type()->typeName();
+    qDebug() << "inlinetypename: " << inlineTypeName;
+    if (inlineTypeName.compare("INTEGER") == 0) {
+        qDebug() << "is integer xd";
+        generatorInlineName = "INTEGER";
+    } else if (inlineTypeName.compare("BOOLEAN") == 0) {
+        generatorInlineName = "BOOLEAN";
+    } else {
+        generatorInlineName = componentAsnTypeName;
+    }
+
+    return QString("%1_generate_value").arg(generatorInlineName);
+}
+
 std::unique_ptr<ProctypeElement> makeInlineCall(
         Asn1Acn::AsnSequenceComponent *const envGeneratorInline, const QString &callArgumentName)
 {
     const QString inlineCallArgument = QString("%1.%2").arg(callArgumentName).arg(envGeneratorInline->name());
     const QString componentTypeLabel = envGeneratorInline->type()->label();
-    const QString componentAsnTypeName = componentTypeLabel.split(".").last();
-    const QString generatorInlineName = QString("%1_generate_value").arg(componentAsnTypeName);
+    const QString componentAsnTypeName = componentTypeLabel.split(".").last().split(" ").last();
+    const QString generatorInlineName = getName(envGeneratorInline, componentAsnTypeName);
 
+    qDebug() << "makeInlineCall: inline name: " << generatorInlineName;
     auto inlineCall = promela::model::InlineCall(generatorInlineName, QList<VariableRef>({ inlineCallArgument }));
     return std::make_unique<ProctypeElement>(std::move(inlineCall));
 }
@@ -236,6 +255,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
         auto *const asnSequenceComponent = static_cast<Asn1Acn::AsnSequenceComponent *>(sequenceComponent.get());
         if (asnSequenceComponent != nullptr) {
             auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
+            qDebug() << "asn sequence component type name: " << asnSequenceComponentType->typeName();
             asnSequenceComponentType->accept(*typeReadingVisitorPtr);
 
             if (asnSequenceComponent->isOptional()) {
