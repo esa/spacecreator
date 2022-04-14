@@ -73,7 +73,7 @@ bool SdlToPromelaConverter::convertStopCondition(const QFileInfo &inputFile, con
     QStringList arguments = QStringList()
             << "--scl" << inputFile.absoluteFilePath() << "-o" << outputFile.absoluteFilePath();
 
-    for (const auto iter : inputSdlFiles) {
+    for (const auto &iter : inputSdlFiles) {
         arguments.append("--sdl");
         arguments.append(iter.second.getSystemStructure().absoluteFilePath());
         arguments.append(iter.second.getProcess().absoluteFilePath());

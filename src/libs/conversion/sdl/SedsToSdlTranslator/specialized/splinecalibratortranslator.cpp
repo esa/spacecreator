@@ -777,7 +777,7 @@ auto SplineCalibratorTranslator::addCallToCalibration(const QString &calibration
 
         auto isExtrapolationLeftFalseTransition = std::make_unique<::sdl::Transition>();
 
-        // Check for right extrapolaction
+        // Check for right extrapolation
         auto isExtrapolationRight = std::make_unique<::sdl::Decision>();
         auto isExtrapolationRightExpression =
                 std::make_unique<::sdl::Expression>(QString("intervalIndex = length(%1)").arg(rawPointsVariableName));
@@ -970,7 +970,8 @@ auto SplineCalibratorTranslator::getSplineOrder(const seds::model::SplineCalibra
     const uint8_t splineOrder = splinePoints.begin()->order();
     for (const auto &splinePoint : splinePoints) {
         if (splinePoint.order() != splineOrder) {
-            throw TranslationException("Each spline point of the spline calibrator has to have the same order");
+            throw TranslationException(
+                    "Calibration splines with varying point orders are not supported to avoid numerical issues");
         }
     }
 
@@ -982,12 +983,12 @@ auto SplineCalibratorTranslator::getSplineOrder(const seds::model::SplineCalibra
         break;
     case 2:
         if (splinePoints.size() < 3) {
-            throw TranslationException("Square calibration requires at least 2 points");
+            throw TranslationException("Square calibration requires at least 3 points");
         }
         break;
     case 3:
         if (splinePoints.size() < 4) {
-            throw TranslationException("Cubic calibration requires at least 2 points");
+            throw TranslationException("Cubic calibration requires at least 4 points");
         }
         break;
     }

@@ -39,7 +39,7 @@ public:
     Join() = default;
 
     /**
-     * @brief   Constructor with label
+     * @brief   Constructor with label name
      */
     explicit Join(QString label);
 
@@ -64,16 +64,16 @@ public:
     Join &operator=(Join &&) = default;
 
     /**
-     * @brief   Getter for label
+     * @brief   Getter for label name
      *
-     * @return  label
+     * @return  label name
      */
     auto label() const -> const QString &;
 
     /**
-     * @brief   Setter for label
+     * @brief   Setter for label name
      *
-     * @param   label  label
+     * @param   label  label name
      */
     auto setLabel(QString label) -> void;
 

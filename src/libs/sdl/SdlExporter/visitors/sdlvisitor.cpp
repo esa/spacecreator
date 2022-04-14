@@ -454,8 +454,9 @@ void SdlVisitor::visit(const Procedure &procedure)
     const bool variablesPresent = !procedureVariables.empty();
     const bool parametersPresent = !procedureParameters.empty();
     const bool returnVarPresent = procedure.returnVariableReference() != nullptr;
+    const bool generateVarCif = variablesPresent || parametersPresent || returnVarPresent;
 
-    if (variablesPresent || parametersPresent || returnVarPresent) {
+    if (generateVarCif) {
         m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
         m_layouter.moveDown(Layouter::ElementType::Text);
     }
@@ -486,7 +487,7 @@ void SdlVisitor::visit(const Procedure &procedure)
         m_writer.writeLine("returns " + procedure.returnVariableReference()->declaration()->type() + ";");
     }
 
-    if (variablesPresent || parametersPresent || returnVarPresent) {
+    if (generateVarCif) {
         m_writer.writeLine("/* CIF ENDTEXT */");
     }
 
