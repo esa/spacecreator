@@ -194,7 +194,7 @@ auto SplineCalibratorTranslator::createAsn1Types(Context &context) -> void
 
     // Create type for index of array of spline points values
     auto splinePointsArrayIndexType = std::make_unique<Asn1Acn::Types::Integer>(m_splinePointsArrayIndexTypeName);
-    splinePointsArrayIndexType->setSize(8);
+    splinePointsArrayIndexType->setSize(8 * sizeof(std::size_t));
     splinePointsArrayIndexType->setEncoding(Asn1Acn::Types::IntegerEncoding::twos_complement);
     auto splinePointsArrayIndexTypeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
             { -1, static_cast<Asn1Acn::IntegerValue::Type>(context.maxSplinePointCount()) });
