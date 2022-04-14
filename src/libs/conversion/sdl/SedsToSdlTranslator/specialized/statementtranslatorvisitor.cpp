@@ -56,6 +56,7 @@ StatementTranslatorVisitor::StatementContext::StatementContext(
     , m_masterContext(masterContext)
     , m_sdlProcess(sdlProcess)
     , m_sdlProcedure(sdlProcedure)
+    , m_intervalIndexVariableCreated(false)
 {
 }
 
@@ -99,14 +100,19 @@ auto StatementTranslatorVisitor::StatementContext::sdlProcedure() -> ::sdl::Proc
     return m_sdlProcedure;
 }
 
-auto StatementTranslatorVisitor::StatementContext::splineBoilerplateCreated() const -> bool
+auto StatementTranslatorVisitor::StatementContext::intervalIndexVariableCreated() const -> bool
 {
-    return m_masterContext.splineBoilerplateCreated();
+    return m_intervalIndexVariableCreated;
 }
 
-auto StatementTranslatorVisitor::StatementContext::setSplineBoilerplateCreated(const bool created) -> void
+auto StatementTranslatorVisitor::StatementContext::setIntervalIndexVariableCreated(bool created) -> void
 {
-    m_masterContext.setSplineBoilerplateCreated(created);
+    m_intervalIndexVariableCreated = created;
+}
+
+auto StatementTranslatorVisitor::StatementContext::handleSplinePointCount(const std::size_t count) -> void
+{
+    m_masterContext.handleSplinePointCount(count);
 }
 
 auto StatementTranslatorVisitor::StatementContext::addActivityInfo(const QString &name, ActivityInfo info) -> void
@@ -179,6 +185,8 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Calibration &cali
 
         SplineCalibratorTranslator splineCalibratorTranslator(m_context, calibration, m_sdlTransition);
         splineCalibratorTranslator.translate(splineCalibrator);
+
+        m_context.handleSplinePointCount(splineCalibrator.splinePoints().size());
     } else {
         throw TranslationException("Calibration activity not implemented");
     }

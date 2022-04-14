@@ -169,17 +169,17 @@ public:
     auto sdlStateMachine() -> ::sdl::StateMachine *;
 
     /**
-     * @brief Check if spline calibrator boilerplate was created for this component
+     * @brief   Get maximum encountered count of spline points
      *
-     * @returns True if created, false otherwise
+     * @returns Spline point count
      */
-    auto splineBoilerplateCreated() const -> bool;
+    auto maxSplinePointCount() const -> std::size_t;
     /**
-     * @brief   Set status of the spline calibration boilerplate
+     * @brief   Set new count as max if bigger than current max
      *
-     * @param   created     Status of spline calibrator boilerplate
+     * @param   count   Point count
      */
-    auto setSplineBoilerplateCreated(const bool created) -> void;
+    auto handleSplinePointCount(const std::size_t count) -> void;
 
     /**
      * @brief Add Command definition
@@ -230,7 +230,7 @@ private:
     ivm::IVFunction *m_ivFunction;
     ::sdl::Process *m_sdlProcess;
     ::sdl::StateMachine *m_sdlStateMachine;
-    bool m_splineBoilerplateCreated;
+    std::size_t m_maxSplinePointCount;
     std::map<std::pair<QString, QString>, const seds::model::InterfaceCommand *> m_commands;
     std::map<QString, ActivityInfo> m_activityInfos;
 };

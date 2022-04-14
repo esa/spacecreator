@@ -49,19 +49,20 @@ public:
      */
     auto translate(const seds::model::SplineCalibrator &splineCalibrator) -> void;
 
+    static auto buildSplineCalibratorBoilerplate(Context &context) -> void;
+
 private:
     auto buildSplineCalibratorVariables(const seds::model::SplineCalibrator &splineCalibrator,
             const QString &rawPointsVariableName, const QString &calibratedPointsVariableName) -> void;
     auto buildSplinePointsVariable(
             const QString &variableName, const std::vector<double> &values, ::sdl::Transition *startTransition) -> void;
 
-    static auto buildSplineCalibratorBoilerplate(StatementTranslatorVisitor::StatementContext &context) -> void;
-    static auto createAsn1Types(StatementTranslatorVisitor::StatementContext &context) -> void;
-    static auto buildLinearCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
-    static auto buildFindIntervalProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
-    static auto buildSquareCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
-    static auto buildCubicCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
-    static auto buildLinearExtrapolationProcedure(StatementTranslatorVisitor::StatementContext &context) -> void;
+    static auto createAsn1Types(Context &context) -> void;
+    static auto buildLinearCalibrationProcedure(Context &context) -> void;
+    static auto buildFindIntervalProcedure(Context &context) -> void;
+    static auto buildSquareCalibrationProcedure(Context &context) -> void;
+    static auto buildCubicCalibrationProcedure(Context &context) -> void;
+    static auto buildLinearExtrapolationProcedure(Context &context) -> void;
 
     auto addCallToCalibration(const QString &calibrationName, const QString &targetName, const QString &sourceName,
             const QString &rawPointsVariableName, const QString &calibratedPointsVariableName, const bool extrapolate)

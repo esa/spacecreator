@@ -21,6 +21,7 @@
 
 #include "specialized/activitytranslator.h"
 #include "specialized/common.h"
+#include "specialized/splinecalibratortranslator.h"
 #include "specialized/statemachinetranslator.h"
 
 #include <conversion/common/escaper/escaper.h>
@@ -147,6 +148,9 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
         for (const auto &timerName : process.timerNames()) {
             shared::ContextParameter timer(timerName, shared::BasicParameter::Type::Timer);
             ivFunction->addContextParam(timer);
+        }
+        if (context.maxSplinePointCount() > 0) {
+            SplineCalibratorTranslator::buildSplineCalibratorBoilerplate(context);
         }
 
         // State machine needs to be moved after processing, because later it cannot be accessed for modification

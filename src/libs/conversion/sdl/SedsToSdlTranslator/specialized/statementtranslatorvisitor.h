@@ -91,7 +91,6 @@ public:
          *
          * @returns SEDS Package
          */
-
         auto sedsPackage() -> const seds::model::Package &;
         /**
          * @brief ASN.1 Model accessor
@@ -119,17 +118,24 @@ public:
         auto sdlProcedure() -> ::sdl::Procedure *;
 
         /**
-         * @brief Check if spline calibrator boilerplate was created for this component
+         * @brief   Check if interval index variable was already created for current procedure
          *
-         * @returns True if created, false otherwise
+         * @param   True if variable was created, false otherwise
          */
-        auto splineBoilerplateCreated() const -> bool;
+        auto intervalIndexVariableCreated() const -> bool;
         /**
-         * @brief   Set status of the spline calibration boilerplate
+         * @brief   Set creation status of the interval index variable
          *
-         * @param   created     Status of spline calibrator boilerplate
+         * @param   created     Interval index variable creation status
          */
-        auto setSplineBoilerplateCreated(const bool created) -> void;
+        auto setIntervalIndexVariableCreated(bool created) -> void;
+
+        /**
+         * @brief   Set new count as max if bigger than current max
+         *
+         * @param   count   Point count
+         */
+        auto handleSplinePointCount(const std::size_t count) -> void;
 
         /**
          * @brief Add ActivityInfo
@@ -156,6 +162,7 @@ public:
         Context &m_masterContext;
         ::sdl::Process *m_sdlProcess;
         ::sdl::Procedure *m_sdlProcedure;
+        bool m_intervalIndexVariableCreated;
     };
 
     /**

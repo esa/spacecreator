@@ -69,7 +69,7 @@ Context::Context(const seds::model::Package &sedsPackage, const std::vector<seds
     , m_ivFunction(ivFunction)
     , m_sdlProcess(sdlProcess)
     , m_sdlStateMachine(sdlStateMachine)
-    , m_splineBoilerplateCreated(false)
+    , m_maxSplinePointCount(0)
 {
 }
 
@@ -108,14 +108,16 @@ auto Context::sdlStateMachine() -> ::sdl::StateMachine *
     return m_sdlStateMachine;
 }
 
-auto Context::splineBoilerplateCreated() const -> bool
+auto Context::maxSplinePointCount() const -> std::size_t
 {
-    return m_splineBoilerplateCreated;
+    return m_maxSplinePointCount;
 }
 
-auto Context::setSplineBoilerplateCreated(const bool created) -> void
+auto Context::handleSplinePointCount(const std::size_t count) -> void
 {
-    m_splineBoilerplateCreated = created;
+    if (count > m_maxSplinePointCount) {
+        m_maxSplinePointCount = count;
+    }
 }
 
 auto Context::addCommand(const QString &interface, const QString &name, const seds::model::InterfaceCommand *definition)

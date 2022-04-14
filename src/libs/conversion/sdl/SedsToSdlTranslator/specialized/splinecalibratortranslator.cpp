@@ -56,11 +56,6 @@ auto SplineCalibratorTranslator::translate(const seds::model::SplineCalibrator &
     const auto rawPointsVariableName = m_context.uniqueRawSplinePointsVariableName();
     const auto calibratedPointsVariableName = m_context.uniqueCalibratedSplinePointsVariableName();
 
-    if (!m_context.splineBoilerplateCreated()) {
-        buildSplineCalibratorBoilerplate(m_context);
-        m_context.setSplineBoilerplateCreated(true);
-    }
-
     buildSplineCalibratorVariables(splineCalibrator, rawPointsVariableName, calibratedPointsVariableName);
 
     const auto targetName =
@@ -88,6 +83,17 @@ auto SplineCalibratorTranslator::translate(const seds::model::SplineCalibrator &
     }
 }
 
+auto SplineCalibratorTranslator::buildSplineCalibratorBoilerplate(Context &context) -> void
+{
+    createAsn1Types(context);
+
+    buildFindIntervalProcedure(context);
+
+    buildLinearCalibrationProcedure(context);
+    buildSquareCalibrationProcedure(context);
+    buildCubicCalibrationProcedure(context);
+}
+
 auto SplineCalibratorTranslator::buildSplineCalibratorVariables(const seds::model::SplineCalibrator &splineCalibrator,
         const QString &rawPointsVariableName, const QString &calibratedPointsVariableName) -> void
 {
@@ -113,6 +119,14 @@ auto SplineCalibratorTranslator::buildSplineCalibratorVariables(const seds::mode
 
     buildSplinePointsVariable(rawPointsVariableName, rawValues, startTransition);
     buildSplinePointsVariable(calibratedPointsVariableName, calibratedValues, startTransition);
+
+    if (!m_context.intervalIndexVariableCreated()) {
+        auto intervalIndexVar =
+                std::make_unique<::sdl::VariableDeclaration>("intervalIndex", m_splinePointsArrayIndexTypeName);
+        m_context.sdlProcedure()->addVariable(std::move(intervalIndexVar));
+
+        m_context.setIntervalIndexVariableCreated(true);
+    }
 }
 
 auto SplineCalibratorTranslator::buildSplinePointsVariable(
@@ -155,23 +169,7 @@ auto SplineCalibratorTranslator::buildSplinePointsVariable(
     m_context.sdlProcess()->addProcedure(std::move(initProc));
 }
 
-auto SplineCalibratorTranslator::buildSplineCalibratorBoilerplate(StatementTranslatorVisitor::StatementContext &context)
-        -> void
-{
-    createAsn1Types(context);
-
-    buildFindIntervalProcedure(context);
-
-    buildLinearCalibrationProcedure(context);
-    buildSquareCalibrationProcedure(context);
-    buildCubicCalibrationProcedure(context);
-
-    auto intervalIndexVar =
-            std::make_unique<::sdl::VariableDeclaration>("intervalIndex", m_splinePointsArrayIndexTypeName);
-    context.sdlProcedure()->addVariable(std::move(intervalIndexVar));
-}
-
-auto SplineCalibratorTranslator::createAsn1Types(StatementTranslatorVisitor::StatementContext &context) -> void
+auto SplineCalibratorTranslator::createAsn1Types(Context &context) -> void
 {
     auto asn1Definitions =
             SedsToAsn1Translator::getAsn1Definitions(context.sedsPackage().nameStr(), context.asn1Model()->data());
@@ -217,8 +215,7 @@ auto SplineCalibratorTranslator::createAsn1Types(StatementTranslatorVisitor::Sta
     asn1Definitions->addType(std::move(splinePointsArrayIndexTypeAssignment));
 }
 
-auto SplineCalibratorTranslator::buildFindIntervalProcedure(StatementTranslatorVisitor::StatementContext &context)
-        -> void
+auto SplineCalibratorTranslator::buildFindIntervalProcedure(Context &context) -> void
 {
     // Create procedure
     const QString procedureName(m_findIntervalProcedureName);
@@ -351,8 +348,7 @@ auto SplineCalibratorTranslator::buildFindIntervalProcedure(StatementTranslatorV
     context.sdlProcess()->addProcedure(std::move(procedure));
 }
 
-auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context)
-        -> void
+auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(Context &context) -> void
 {
     // Create procedure
     const QString procedureName(m_linearCalibrationProcedureName);
@@ -456,8 +452,7 @@ auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(StatementTransl
     context.sdlProcess()->addProcedure(std::move(procedure));
 }
 
-auto SplineCalibratorTranslator::buildSquareCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context)
-        -> void
+auto SplineCalibratorTranslator::buildSquareCalibrationProcedure(Context &context) -> void
 {
     // Create procedure
     const QString procedureName(m_squareCalibrationProcedureName);
@@ -585,8 +580,7 @@ auto SplineCalibratorTranslator::buildSquareCalibrationProcedure(StatementTransl
     context.sdlProcess()->addProcedure(std::move(procedure));
 }
 
-auto SplineCalibratorTranslator::buildCubicCalibrationProcedure(StatementTranslatorVisitor::StatementContext &context)
-        -> void
+auto SplineCalibratorTranslator::buildCubicCalibrationProcedure(Context &context) -> void
 {
     // Create procedure
     const QString procedureName(m_cubicCalibrationProcedureName);
