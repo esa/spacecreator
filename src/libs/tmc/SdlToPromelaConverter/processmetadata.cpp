@@ -21,7 +21,7 @@
 
 namespace tmc::converter {
 ProcessMetadata::ProcessMetadata(
-        QString name, QFileInfo systemStructure, QFileInfo process, QFileInfo datamodel, QFileInfo context)
+        QString name, QFileInfo systemStructure, QFileInfo process, QFileInfo datamodel, QList<QFileInfo> context)
     : m_name(std::move(name))
     , m_systemStructure(std::move(systemStructure))
     , m_process(std::move(process))
@@ -50,7 +50,7 @@ const QFileInfo &ProcessMetadata::getDatamodel() const noexcept
     return m_datamodel;
 }
 
-const QFileInfo &ProcessMetadata::getContext() const noexcept
+const QList<QFileInfo> &ProcessMetadata::getContext() const noexcept
 {
     return m_context;
 }

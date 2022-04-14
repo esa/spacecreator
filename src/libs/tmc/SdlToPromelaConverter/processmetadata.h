@@ -36,9 +36,10 @@ public:
      * @param systemStructure system_structure.pr file location
      * @param process location of process implementation file
      * @param datamodel location of process datamodel ASN.1 file
-     * @param context location of process context ASN.1 file
+     * @param context location of process context ASN.1 files
      */
-    ProcessMetadata(QString name, QFileInfo systemStructure, QFileInfo process, QFileInfo datamodel, QFileInfo context);
+    ProcessMetadata(
+            QString name, QFileInfo systemStructure, QFileInfo process, QFileInfo datamodel, QList<QFileInfo> context);
 
     /**
      * @brief Getter for process name.
@@ -67,15 +68,15 @@ public:
     /**
      * @brief Getter for process context.
      *
-     * @return Location of process context ASN.1 file.
+     * @return Location of process context ASN.1 files.
      */
-    const QFileInfo &getContext() const noexcept;
+    const QList<QFileInfo> &getContext() const noexcept;
 
 private:
     const QString m_name;
     const QFileInfo m_systemStructure;
     const QFileInfo m_process;
     const QFileInfo m_datamodel;
-    const QFileInfo m_context;
+    const QList<QFileInfo> m_context;
 };
 }

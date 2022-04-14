@@ -181,9 +181,10 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
             uniqueAsn1Files.insert(
                     processMetadata.getDatamodel().fileName(), processMetadata.getDatamodel().absoluteFilePath());
         }
-        if (allSdlFiles.at(ivFunction).getContext().exists()) {
-            uniqueAsn1Files.insert(allSdlFiles.at(ivFunction).getContext().fileName(),
-                    allSdlFiles.at(ivFunction).getContext().absoluteFilePath());
+        for (const QFileInfo &fileInfo : allSdlFiles.at(ivFunction).getContext()) {
+            if (fileInfo.exists()) {
+                uniqueAsn1Files.insert(fileInfo.fileName(), fileInfo.absoluteFilePath());
+            }
         }
         const QFileInfo outputFile = outputFilepath(processMetadata.getName().toLower() + ".pml");
 
@@ -335,22 +336,24 @@ void TmcConverter::findFunctionsToConvert(const IVModel &model, QStringList &sdl
             sdlFunctions.append(ivFunctionName);
 
             const QFileInfo systemStructure = sdlSystemStructureLocation(ivFunctionName);
-            const QFileInfo contextLocation = sdlFunctionContextLocation(ivFunctionName);
+            QList<QFileInfo> contextLocations;
+            contextLocations.append(sdlFunctionContextLocation(ivFunctionName));
 
             if (ivFunction->instanceOf() != nullptr) {
                 const QString ivFunctionTypeName = ivFunction->instanceOf()->property("name").toString();
+                contextLocations.append(sdlFunctionContextLocation(ivFunctionTypeName));
                 const QFileInfo sdlProcess = sdlImplementationLocation(ivFunctionTypeName);
                 const QFileInfo functionDatamodel = sdlFunctionDatamodelLocation(ivFunctionName, ivFunctionTypeName);
 
                 sdlProcesses.emplace(ivFunctionName,
-                        ProcessMetadata(
-                                ivFunctionName, systemStructure, sdlProcess, functionDatamodel, contextLocation));
+                        ProcessMetadata(ivFunctionName, systemStructure, sdlProcess, functionDatamodel,
+                                std::move(contextLocations)));
             } else {
                 const QFileInfo sdlProcess = sdlImplementationLocation(ivFunctionName);
                 const QFileInfo functionDatamodel = sdlFunctionDatamodelLocation(ivFunctionName);
                 sdlProcesses.emplace(ivFunctionName,
-                        ProcessMetadata(
-                                ivFunctionName, systemStructure, sdlProcess, functionDatamodel, contextLocation));
+                        ProcessMetadata(ivFunctionName, systemStructure, sdlProcess, functionDatamodel,
+                                std::move(contextLocations)));
             }
 
         } else {
