@@ -81,8 +81,6 @@ private:
     const seds::model::Calibration &m_calibration;
     ::sdl::Transition *m_sdlTransition;
 
-    static constexpr int m_maxSplinePointsArraySize = 20;
-
     static inline const QString m_splinePointValueTypeName = "SplinePointValue";
     static inline const QString m_splinePointsArrayTypeName = "SplinePointsArray";
     static inline const QString m_splinePointsArrayIndexTypeName = "SplinePointsArrayIndex";
