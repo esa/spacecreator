@@ -61,13 +61,13 @@ public:
     /**
      * @brief Getter for process datamodel.
      *
-     * @return Location fo process datamodel ASN.1 file.
+     * @return Location of process datamodel ASN.1 file.
      */
     const QFileInfo &getDatamodel() const noexcept;
     /**
      * @brief Getter for process context.
      *
-     * @return Location fo process context ASN.1 file.
+     * @return Location of process context ASN.1 file.
      */
     const QFileInfo &getContext() const noexcept;
 

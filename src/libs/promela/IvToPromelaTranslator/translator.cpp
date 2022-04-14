@@ -140,12 +140,8 @@ InitProctype IvToPromelaTranslator::generateInitProctype(
     QVector<IVFunction *> ivFunctionList = ivModel->allObjectsByType<IVFunction>();
 
     for (IVFunction *ivFunction : ivFunctionList) {
-        const QString functionName = ivFunction->property("name").toString();
-        QVector<shared::ContextParameter> contextParameters = ivFunction->contextParams();
-
-        if (std::any_of(contextParameters.begin(), contextParameters.end(), [](const shared::ContextParameter &param) {
-                return param.paramType() == shared::BasicParameter::Type::Other;
-            })) {
+        if (containsContextVariables(ivFunction->contextParams())) {
+            const QString functionName = ivFunction->property("name").toString();
             functionsWithContextVariables.insert(functionName);
         }
     }
@@ -512,6 +508,13 @@ void IvToPromelaTranslator::createSystemState(
     promelaModel->addUtype(systemState);
 
     promelaModel->addDeclaration(Declaration(DataType(UtypeRef("system_state")), "global_state"));
+}
+
+bool IvToPromelaTranslator::containsContextVariables(const QVector<shared::ContextParameter> &parameters) const
+{
+    return std::any_of(parameters.begin(), parameters.end(), [](const shared::ContextParameter &param) {
+        return param.paramType() == shared::BasicParameter::Type::Other;
+    });
 }
 
 QString IvToPromelaTranslator::constructChannelName(const QString &functionName, const QString &interfaceName) const
