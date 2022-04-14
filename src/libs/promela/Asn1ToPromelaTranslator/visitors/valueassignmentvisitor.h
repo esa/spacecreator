@@ -30,7 +30,7 @@ namespace promela::translator {
 /**
  * @brief Visitor to generate value assignments.
  */
-class Asn1ValueTypeVisitor : public ::Asn1Acn::Types::TypeReadingVisitor
+class ValueAssignmentVisitor : public ::Asn1Acn::Types::TypeReadingVisitor
 {
 public:
     /**
@@ -41,7 +41,7 @@ public:
      * @param target target variable to assign the value
      * @param typeName name of the type of variable
      */
-    Asn1ValueTypeVisitor(::Asn1Acn::ValuePtr value, ::promela::model::Sequence &sequence,
+    ValueAssignmentVisitor(::Asn1Acn::ValuePtr value, ::promela::model::Sequence &sequence,
             const ::promela::model::VariableRef &target, QString typeName);
     /**
      * @brief Visit ::Asn1Acn::Types::Boolean

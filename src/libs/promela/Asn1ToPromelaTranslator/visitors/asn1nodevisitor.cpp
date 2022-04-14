@@ -20,7 +20,7 @@
 #include "asn1nodevisitor.h"
 
 #include "asn1itemtypevisitor.h"
-#include "asn1valuetypevisitor.h"
+#include "valueassignmentvisitor.h"
 
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/file.h>
@@ -89,7 +89,7 @@ void Asn1NodeVisitor::visit(const ValueAssignment &value)
         Sequence initInlineSequence(Sequence::Type::D_STEP);
 
         VariableRef target(valueName);
-        Asn1ValueTypeVisitor visitor(value.value()->clone(), initInlineSequence, target, typeName);
+        ValueAssignmentVisitor visitor(value.value()->clone(), initInlineSequence, target, typeName);
 
         value.type()->accept(visitor);
 

@@ -17,9 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "asn1valuetypevisitor.h"
+#include "valueassignmentvisitor.h"
 
-#include "asn1valuetypecomponentvisitor.h"
+#include "sequencecomponentvaluevisitor.h"
 
 #include <asn1library/asn1/namedvalue.h>
 #include <asn1library/asn1/singlevalue.h>
@@ -54,7 +54,7 @@ using promela::model::ProctypeElement;
 using promela::model::VariableRef;
 
 namespace promela::translator {
-Asn1ValueTypeVisitor::Asn1ValueTypeVisitor(
+ValueAssignmentVisitor::ValueAssignmentVisitor(
         ValuePtr value, ::promela::model::Sequence &sequence, const VariableRef &target, QString typeName)
     : m_value(std::move(value))
     , m_sequence(sequence)
@@ -63,7 +63,7 @@ Asn1ValueTypeVisitor::Asn1ValueTypeVisitor(
 {
 }
 
-void Asn1ValueTypeVisitor::visit(const Boolean &type)
+void ValueAssignmentVisitor::visit(const Boolean &type)
 {
     Q_UNUSED(type);
     if (m_value->typeEnum() != Value::SINGLE_VALUE) {
@@ -81,37 +81,37 @@ void Asn1ValueTypeVisitor::visit(const Boolean &type)
     m_sequence.appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineCallName, inlineArguments)));
 }
 
-void Asn1ValueTypeVisitor::visit(const Null &type)
+void ValueAssignmentVisitor::visit(const Null &type)
 {
     Q_UNUSED(type);
     throw ConverterException("Value generation is not implemented for NULL datatype");
 }
 
-void Asn1ValueTypeVisitor::visit(const BitString &type)
+void ValueAssignmentVisitor::visit(const BitString &type)
 {
     Q_UNUSED(type);
     throw ConverterException("Value generation is not implemented for BIT STRING datatype");
 }
 
-void Asn1ValueTypeVisitor::visit(const OctetString &type)
+void ValueAssignmentVisitor::visit(const OctetString &type)
 {
     Q_UNUSED(type);
     throw ConverterException("Value generation is not implemented for OCTET STRING datatype");
 }
 
-void Asn1ValueTypeVisitor::visit(const IA5String &type)
+void ValueAssignmentVisitor::visit(const IA5String &type)
 {
     Q_UNUSED(type);
     throw ConverterException("Value generation is not implemented for IA5String datatype");
 }
 
-void Asn1ValueTypeVisitor::visit(const NumericString &type)
+void ValueAssignmentVisitor::visit(const NumericString &type)
 {
     Q_UNUSED(type);
     throw ConverterException("Value generation is not implemented for NUMERIC STRING datatype");
 }
 
-void Asn1ValueTypeVisitor::visit(const Enumerated &type)
+void ValueAssignmentVisitor::visit(const Enumerated &type)
 {
     if (m_value->typeEnum() != Value::SINGLE_VALUE) {
         throw ConverterException("Invalid value for ENUMERATED datatype");
@@ -129,43 +129,43 @@ void Asn1ValueTypeVisitor::visit(const Enumerated &type)
     m_sequence.appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineCallName, inlineArguments)));
 }
 
-void Asn1ValueTypeVisitor::visit(const Choice &type)
+void ValueAssignmentVisitor::visit(const Choice &type)
 {
     Q_UNUSED(type);
     throw ConverterException("Value generation is not implemented for CHOICE datatype");
 }
 
-void Asn1ValueTypeVisitor::visit(const Sequence &type)
+void ValueAssignmentVisitor::visit(const Sequence &type)
 {
     if (m_value->typeEnum() != Value::NAMED_VALUE) {
         throw ConverterException("Invalid value for SEQUENCE datatype");
     }
     const NamedValue *namedValue = dynamic_cast<const NamedValue *>(m_value.get());
     for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : type.components()) {
-        Asn1ValueTypeComponentVisitor visitor(namedValue, m_sequence, m_target, m_typeName);
+        SequenceComponentValueVisitor visitor(namedValue, m_sequence, m_target, m_typeName);
         component->accept(visitor);
     }
 }
 
-void Asn1ValueTypeVisitor::visit(const SequenceOf &type)
+void ValueAssignmentVisitor::visit(const SequenceOf &type)
 {
     Q_UNUSED(type);
     throw ConverterException("Value generation is not implemented for SEQUENCE OF datatype");
 }
 
-void Asn1ValueTypeVisitor::visit(const Real &type)
+void ValueAssignmentVisitor::visit(const Real &type)
 {
     Q_UNUSED(type);
     throw ConverterException("Value generation is not implemented for REAL datatype");
 }
 
-void Asn1ValueTypeVisitor::visit(const LabelType &type)
+void ValueAssignmentVisitor::visit(const LabelType &type)
 {
     Q_UNUSED(type);
     throw ConverterException("Value generation is not implemented for LabelType");
 }
 
-void Asn1ValueTypeVisitor::visit(const Integer &type)
+void ValueAssignmentVisitor::visit(const Integer &type)
 {
     Q_UNUSED(type);
     if (m_value->typeEnum() != Value::SINGLE_VALUE) {
@@ -182,9 +182,9 @@ void Asn1ValueTypeVisitor::visit(const Integer &type)
     m_sequence.appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineCallName, inlineArguments)));
 }
 
-void Asn1ValueTypeVisitor::visit(const UserdefinedType &type)
+void ValueAssignmentVisitor::visit(const UserdefinedType &type)
 {
-    Asn1ValueTypeVisitor visitor(m_value->clone(), m_sequence, m_target, type.typeName());
+    ValueAssignmentVisitor visitor(m_value->clone(), m_sequence, m_target, type.typeName());
 
     type.type()->accept(visitor);
 }

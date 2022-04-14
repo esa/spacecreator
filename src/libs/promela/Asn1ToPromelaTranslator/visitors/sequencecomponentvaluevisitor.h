@@ -29,7 +29,7 @@ namespace promela::translator {
 /**
  * @brief Visitor for ASN.1 SequenceComponent, for generation of value assignments
  */
-class Asn1ValueTypeComponentVisitor final : public ::Asn1Acn::SequenceComponentVisitor
+class SequenceComponentValueVisitor final : public ::Asn1Acn::SequenceComponentVisitor
 {
 public:
     /**
@@ -40,7 +40,7 @@ public:
      * @param target target variable to assign value
      * @param sequenceTypeName name of SEQUENCE datatype
      */
-    Asn1ValueTypeComponentVisitor(const ::Asn1Acn::NamedValue *value, ::promela::model::Sequence &sequence,
+    SequenceComponentValueVisitor(const ::Asn1Acn::NamedValue *value, ::promela::model::Sequence &sequence,
             const ::promela::model::VariableRef &target, QString sequenceTypeName);
     /**
      * @brief Visit ::Asn1Acn::AsnSequenceComponent

@@ -17,9 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "asn1valuetypecomponentvisitor.h"
+#include "sequencecomponentvaluevisitor.h"
 
-#include "asn1valuetypevisitor.h"
+#include "valueassignmentvisitor.h"
 
 #include <QString>
 #include <asn1library/asn1/acnsequencecomponent.h>
@@ -43,7 +43,7 @@ using promela::model::ProctypeElement;
 using promela::model::VariableRef;
 
 namespace promela::translator {
-Asn1ValueTypeComponentVisitor::Asn1ValueTypeComponentVisitor(const NamedValue *value,
+SequenceComponentValueVisitor::SequenceComponentValueVisitor(const NamedValue *value,
         ::promela::model::Sequence &sequence, const VariableRef &target, QString sequenceTypeName)
     : m_value(value)
     , m_sequence(sequence)
@@ -52,7 +52,7 @@ Asn1ValueTypeComponentVisitor::Asn1ValueTypeComponentVisitor(const NamedValue *v
 {
 }
 
-void Asn1ValueTypeComponentVisitor::visit(const AsnSequenceComponent &component)
+void SequenceComponentValueVisitor::visit(const AsnSequenceComponent &component)
 {
     const QString &componentName = component.name();
     const NamedValue::Components &values = m_value->components();
@@ -81,13 +81,13 @@ void Asn1ValueTypeComponentVisitor::visit(const AsnSequenceComponent &component)
 
     m_target.appendElement(Escaper::escapePromelaName(componentName));
 
-    Asn1ValueTypeVisitor visitor(
+    ValueAssignmentVisitor visitor(
             iter->second->clone(), m_sequence, m_target, QString("%1_%2").arg(m_sequenceTypeName).arg(componentName));
 
     component.type()->accept(visitor);
 }
 
-void Asn1ValueTypeComponentVisitor::visit(const AcnSequenceComponent &component)
+void SequenceComponentValueVisitor::visit(const AcnSequenceComponent &component)
 {
     Q_UNUSED(component);
 }
