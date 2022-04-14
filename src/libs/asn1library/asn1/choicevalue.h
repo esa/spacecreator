@@ -41,8 +41,8 @@ public:
 
     ValueType typeEnum() const override;
 
-    const QString &getName() const;
-    const ValuePtr &getValue() const;
+    const QString &name() const;
+    const ValuePtr &value() const;
 
 private:
     QString m_name;

@@ -71,7 +71,7 @@ void Asn1ValueTypeVisitor::visit(const Boolean &type)
     }
     const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value.get());
 
-    int value = singleValue->getValue().compare("true", Qt::CaseInsensitive) == 0 ? 1 : 0;
+    int value = singleValue->value().compare("true", Qt::CaseInsensitive) == 0 ? 1 : 0;
 
     const QString inlineCallName = QString("%1_assign_value").arg(m_typeName);
 
@@ -119,7 +119,7 @@ void Asn1ValueTypeVisitor::visit(const Enumerated &type)
     const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value.get());
     Q_UNUSED(type);
 
-    const QString value = QString("%1_%2").arg(m_typeName).arg(singleValue->getValue());
+    const QString value = QString("%1_%2").arg(m_typeName).arg(singleValue->value());
 
     const QString inlineCallName = QString("%1_assign_value").arg(m_typeName);
 
@@ -172,7 +172,7 @@ void Asn1ValueTypeVisitor::visit(const Integer &type)
         throw ConverterException("Invalid value for SEQUENCE datatype");
     }
     const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value.get());
-    int value = singleValue->getValue().toInt();
+    int value = singleValue->value().toInt();
 
     const QString inlineCallName = QString("%1_assign_value").arg(m_typeName);
 

@@ -45,7 +45,7 @@ public:
 
     ValueType typeEnum() const override;
 
-    const std::vector<ValuePtr> &getValues() const;
+    const std::vector<ValuePtr> &values() const;
 
 private:
     std::vector<ValuePtr> m_values;

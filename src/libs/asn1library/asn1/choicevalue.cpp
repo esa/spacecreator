@@ -53,12 +53,12 @@ Value::ValueType ChoiceValue::typeEnum() const
     return Value::CHOICE_VALUE;
 }
 
-const QString &ChoiceValue::getName() const
+const QString &ChoiceValue::name() const
 {
     return m_name;
 }
 
-const ValuePtr &ChoiceValue::getValue() const
+const ValuePtr &ChoiceValue::value() const
 {
     return m_value;
 }

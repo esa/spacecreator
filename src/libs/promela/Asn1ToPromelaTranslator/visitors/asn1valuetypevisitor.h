@@ -64,7 +64,7 @@ public:
     /**
      * @brief Visit ::Asn1Acn::Types::OctetString
      *
-     * @param type octest string value
+     * @param type octet string value
      */
     void visit(const ::Asn1Acn::Types::OctetString &type) override;
     /**

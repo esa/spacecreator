@@ -43,7 +43,7 @@ public:
 
     ValueType typeEnum() const override;
 
-    const QString &getValue() const;
+    const QString &value() const;
 
 private:
     QString m_value;

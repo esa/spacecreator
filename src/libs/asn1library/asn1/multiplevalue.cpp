@@ -65,7 +65,7 @@ Value::ValueType MultipleValue::typeEnum() const
     return Value::MULTIPLE_VALUE;
 }
 
-const std::vector<ValuePtr> &MultipleValue::getValues() const
+const std::vector<ValuePtr> &MultipleValue::values() const
 {
     return m_values;
 }

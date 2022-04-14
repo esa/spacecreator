@@ -49,7 +49,7 @@ public:
 
     ValueType typeEnum() const override;
 
-    const Components &getComponents() const;
+    const Components &components() const;
 
 private:
     Components m_values;

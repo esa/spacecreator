@@ -50,7 +50,7 @@ Value::ValueType SingleValue::typeEnum() const
     return Value::SINGLE_VALUE;
 }
 
-const QString &SingleValue::getValue() const
+const QString &SingleValue::value() const
 {
     return m_value;
 }

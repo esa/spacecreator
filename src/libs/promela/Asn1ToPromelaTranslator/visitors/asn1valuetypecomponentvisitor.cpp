@@ -55,7 +55,7 @@ Asn1ValueTypeComponentVisitor::Asn1ValueTypeComponentVisitor(const NamedValue *v
 void Asn1ValueTypeComponentVisitor::visit(const AsnSequenceComponent &component)
 {
     const QString &componentName = component.name();
-    const NamedValue::Components &values = m_value->getComponents();
+    const NamedValue::Components &values = m_value->components();
 
     auto iter = std::find_if(
             values.begin(), values.end(), [componentName](const auto &data) { return data.first == componentName; });

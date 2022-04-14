@@ -67,7 +67,7 @@ Value::ValueType NamedValue::typeEnum() const
     return Value::NAMED_VALUE;
 }
 
-const NamedValue::Components &NamedValue::getComponents() const
+const NamedValue::Components &NamedValue::components() const
 {
     return m_values;
 }

@@ -34,12 +34,15 @@ class InlineCall
 {
 public:
     /**
+     * @brief Argument type definition.
+     */
+    using Argument = std::variant<VariableRef, Constant>;
+    /**
      * @brief Constructor
      *
      * @param name name of inline
      * @param arguments list of arguments
      */
-    using Argument = std::variant<VariableRef, Constant>;
     InlineCall(QString name, const QList<Argument> &arguments);
 
     /**
