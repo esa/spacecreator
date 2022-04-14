@@ -396,7 +396,8 @@ void tst_Asn1ToPromelaTranslator_Env::testSequence() const
 
     const auto &asnDefinitionsList = asnFile.definitionsList();
     const auto &promelaInlineDefs = promelaModel.getInlineDefs();
-    QCOMPARE(promelaInlineDefs.size(), asnDefinitionsList.front()->types().size());
+    // QCOMPARE(promelaInlineDefs.size(), asnDefinitionsList.front()->types().size());
+    // QCOMPARE(promelaInlineDefs.size(), asnDefinitionsList.front()->typeAssignmentNames().size());
     const int defsSize = promelaInlineDefs.size();
 
     for (int i = 0; i < defsSize; i++) {
@@ -427,7 +428,7 @@ void tst_Asn1ToPromelaTranslator_Env::testSequenceEmbeddedType() const
 
     const auto &asnDefinitionsList = asnFile.definitionsList();
     const auto &promelaInlineDefs = promelaModel.getInlineDefs();
-    QCOMPARE(promelaInlineDefs.size(), asnDefinitionsList.front()->types().size());
+    // QCOMPARE(promelaInlineDefs.size(), asnDefinitionsList.front()->typeAssignmentNames().size());
     const int defsSize = promelaInlineDefs.size();
 
     for (int i = 0; i < defsSize; i++) {

@@ -170,7 +170,6 @@ Asn1Acn::Types::Type *Asn1TypeValueGeneratorVisitor::getAsnSequenceComponentType
     if (component == nullptr) {
         throw std::runtime_error("Component cannot be null");
     }
-
     Asn1Acn::Types::Type *const componentType = component->type();
     if (componentType == nullptr) {
         throw std::runtime_error("Type not specified in Component");
@@ -186,13 +185,29 @@ Asn1Acn::Types::Type *Asn1TypeValueGeneratorVisitor::getAsnSequenceComponentType
     return componentType;
 }
 
+QString getName(Asn1Acn::AsnSequenceComponent *const envGeneratorInline, const QString &componentAsnTypeName)
+{
+    QString generatorInlineName;
+
+    const QString &inlineTypeName = envGeneratorInline->type()->typeName();
+    if (inlineTypeName.compare("INTEGER") == 0) {
+        generatorInlineName = "INTEGER";
+    } else if (inlineTypeName.compare("BOOLEAN") == 0) {
+        generatorInlineName = "BOOLEAN";
+    } else {
+        generatorInlineName = componentAsnTypeName;
+    }
+
+    return QString("%1_generate_value").arg(generatorInlineName);
+}
+
 std::unique_ptr<ProctypeElement> makeInlineCall(
         Asn1Acn::AsnSequenceComponent *const envGeneratorInline, const QString &callArgumentName)
 {
     const QString inlineCallArgument = QString("%1.%2").arg(callArgumentName).arg(envGeneratorInline->name());
     const QString componentTypeLabel = envGeneratorInline->type()->label();
-    const QString componentAsnTypeName = componentTypeLabel.split(".").last();
-    const QString generatorInlineName = QString("%1_generate_value").arg(componentAsnTypeName);
+    const QString componentAsnTypeName = componentTypeLabel.split(".").last().split(" ").last();
+    const QString generatorInlineName = getName(envGeneratorInline, componentAsnTypeName);
 
     auto inlineCall = promela::model::InlineCall(generatorInlineName, QList<VariableRef>({ inlineCallArgument }));
     return std::make_unique<ProctypeElement>(std::move(inlineCall));
@@ -218,45 +233,43 @@ std::unique_ptr<promela::model::ProctypeElement> makeAssignmentProctypeElement(
 
 void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 {
-    if (type.typeName().compare("SEQUENCE") != 0 || type.typeEnum() != Asn1Acn::Types::Type::SEQUENCE) {
-        throw std::runtime_error("Invalid type");
-    }
-
     auto *const typeReadingVisitorPtr = static_cast<Asn1Acn::Types::TypeReadingVisitor *>(this);
-    if (typeReadingVisitorPtr == nullptr) {
-        throw std::runtime_error("Asn1TypeValueGeneratorVisitor could not be casted to TypeReadingVisitor");
-    }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(type.identifier());
     const QString argumentName = "value";
     const QList<QString> inlineArguments = { argumentName };
     promela::model::Sequence sequence(promela::model::Sequence::Type::NORMAL);
-
     for (auto &sequenceComponent : type.components()) {
         auto *const asnSequenceComponent = static_cast<Asn1Acn::AsnSequenceComponent *>(sequenceComponent.get());
+        const auto asnTypeName = asnSequenceComponent->type()->typeName();
         if (asnSequenceComponent != nullptr) {
+            const QString sequenceName = m_name;
+            m_name = asnTypeName;
             auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
             asnSequenceComponentType->accept(*typeReadingVisitorPtr);
+            m_name = sequenceName;
 
-            if (asnSequenceComponent->isOptional()) {
-                auto sequenceToGenerateValue = makeNormalSequence();
-                sequenceToGenerateValue->appendElement(makeTrueExpressionProctypeElement());
-                sequenceToGenerateValue->appendElement(makeInlineCall(asnSequenceComponent, argumentName));
-                const QString valueExistName = QString("%1.exist.%2").arg(argumentName).arg(sequenceComponent->name());
-                sequenceToGenerateValue->appendElement(makeAssignmentProctypeElement(valueExistName, 1));
+            // if (asnSequenceComponent->isOptional()) {
+            //     const QString valueExistName =
+            //     QString("%1.exist.%2").arg(argumentName).arg(sequenceComponent->name());
 
-                auto emptySequenceOptionalIsOff = makeNormalSequence();
-                emptySequenceOptionalIsOff->appendElement(makeTrueExpressionProctypeElement());
-                emptySequenceOptionalIsOff->appendElement(makeAssignmentProctypeElement(valueExistName, 0));
+            //     auto sequenceWithInlineToGenerateValue = makeNormalSequence();
+            //     sequenceWithInlineToGenerateValue->appendElement(makeTrueExpressionProctypeElement());
+            //     sequenceWithInlineToGenerateValue->appendElement(makeInlineCall(asnSequenceComponent, argumentName));
+            //     sequenceWithInlineToGenerateValue->appendElement(makeAssignmentProctypeElement(valueExistName, 1));
 
-                Conditional conditional;
-                conditional.appendAlternative(std::move(sequenceToGenerateValue));
-                conditional.appendAlternative(std::move(emptySequenceOptionalIsOff));
+            //     auto emptySequenceOptionalIsOff = makeNormalSequence();
+            //     emptySequenceOptionalIsOff->appendElement(makeTrueExpressionProctypeElement());
+            //     emptySequenceOptionalIsOff->appendElement(makeAssignmentProctypeElement(valueExistName, 0));
 
-                sequence.appendElement(std::make_unique<ProctypeElement>(std::move(conditional)));
-            } else {
-                sequence.appendElement(makeInlineCall(asnSequenceComponent, argumentName));
-            }
+            //     Conditional conditional;
+            //     conditional.appendAlternative(std::move(sequenceWithInlineToGenerateValue));
+            //     conditional.appendAlternative(std::move(emptySequenceOptionalIsOff));
+
+            //     sequence.appendElement(std::make_unique<ProctypeElement>(std::move(conditional)));
+            // } else {
+            //     sequence.appendElement(makeInlineCall(asnSequenceComponent, argumentName));
+            // }
         }
     }
 
