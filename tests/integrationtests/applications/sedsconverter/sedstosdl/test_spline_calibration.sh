@@ -29,7 +29,7 @@ cd $TEST_OUTPUT_DIR
 # This test uses Ada, as C backend in OpenGEODE is too buggy to handle this example
 $DIFF calibration.pr ../resources/test_spline_calibration.output \
   && $OPENGEODE --toAda system_structure.pr calibration.pr \
-  && asn1scc -Ada --type-prefix asn1Scc dataview-uniq.asn component_datamodel.asn \
-  && gcc -c component.adb \
+  && asn1scc -Ada --type-prefix asn1Scc -equal dataview-uniq.asn calibration_datamodel.asn \
+  && gcc -c calibration.adb \
   && cd .. \
   && rm -r -f $TEST_OUTPUT_DIR

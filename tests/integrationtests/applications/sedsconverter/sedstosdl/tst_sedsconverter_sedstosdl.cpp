@@ -43,6 +43,7 @@ private Q_SLOTS:
     void testNamedValues();
     void testDescriptions();
     void testCrossReference();
+    void testSplineCalibrators();
 };
 
 /// \SRS  ETB-FUN-10
@@ -269,6 +270,14 @@ void tst_SedsConverter_SedsToSdl::testDescriptions()
 void tst_SedsConverter_SedsToSdl::testCrossReference()
 {
     const int result = system("./test_cross_reference.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-2470
+void tst_SedsConverter_SedsToSdl::testSplineCalibrators()
+{
+    const int result = system("./test_spline_calibration.sh");
     QCOMPARE(result, 0);
 }
 
