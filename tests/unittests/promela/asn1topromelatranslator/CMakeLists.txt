@@ -30,3 +30,4 @@ target_link_libraries(${TEST_NAME}
 add_format_target(${TEST_NAME})
 
 configure_file(resources/myModule.asn resources/myModule.asn COPYONLY)
+configure_file(resources/myModule_typesInSeq.asn resources/myModule_typesInSeq.asn COPYONLY)

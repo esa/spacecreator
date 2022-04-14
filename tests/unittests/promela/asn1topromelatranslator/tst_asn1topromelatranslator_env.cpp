@@ -393,6 +393,36 @@ void tst_Asn1ToPromelaTranslator_Env::testSequence() const
     QVERIFY(!asnModel->data().empty());
     const auto &asnFile = *asnModel->data().front();
     visitor.visit(asnFile);
+
+    const auto &asnDefinitionsList = asnFile.definitionsList();
+    const auto &promelaInlineDefs = promelaModel.getInlineDefs();
+    QCOMPARE(promelaInlineDefs.size(), asnDefinitionsList.front()->types().size());
+    const int defsSize = promelaInlineDefs.size();
+
+    for (int i = 0; i < defsSize; i++) {
+        if (std::next(promelaInlineDefs.begin(), i) == promelaInlineDefs.end() //
+                || asnDefinitionsList.at(0) == nullptr) {
+            break;
+        }
+        auto *const inlineDefPtr = (*std::next(promelaInlineDefs.begin(), i)).get();
+        auto *asnTypeAssignmentPtr = asnDefinitionsList.at(0)->types().at(i).get();
+
+        checkInlineDefinition(inlineDefPtr, asnTypeAssignmentPtr);
+    }
+}
+
+void tst_Asn1ToPromelaTranslator_Env::testSequenceEmbeddedType() const
+{
+    auto asnModel = plugincommon::ModelLoader::loadAsn1Model("resources/myModule_typesInSeq.asn");
+    QVERIFY(asnModel != nullptr);
+    QVERIFY(!asnModel->data().empty());
+
+    PromelaModel promelaModel;
+    const QStringList typesToTranslate = { "EnvParamSeq" };
+    Asn1NodeValueGeneratorVisitor visitor(promelaModel, typesToTranslate);
+    QVERIFY(!asnModel->data().empty());
+    const auto &asnFile = *asnModel->data().front();
+    visitor.visit(asnFile);
     exportPromelaModel(promelaModel, "sequences.pr"); // TODO: this line shall be removed
 
     const auto &asnDefinitionsList = asnFile.definitionsList();
