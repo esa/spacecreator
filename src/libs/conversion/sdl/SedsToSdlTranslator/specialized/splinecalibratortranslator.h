@@ -81,6 +81,14 @@ private:
     ::sdl::Transition *m_sdlTransition;
 
     static constexpr int m_maxSplinePointsArraySize = 20;
+
+    static inline const QString m_splinePointValueTypeName = "SplinePointValue";
+    static inline const QString m_splinePointsArrayTypeName = "SplinePointsArray";
+    static inline const QString m_splinePointsArrayIndexTypeName = "SplinePointsArrayIndex";
+    static inline const QString m_findIntervalProcedureName = "FindInterval";
+    static inline const QString m_linearCalibrationProcedureName = "LinearCalibration";
+    static inline const QString m_squareCalibrationProcedureName = "SquareCalibration";
+    static inline const QString m_cubicCalibrationProcedureName = "CubicCalibration";
 };
 
 } // namespace conversion::sdl::translator

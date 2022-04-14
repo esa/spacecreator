@@ -74,15 +74,15 @@ auto SplineCalibratorTranslator::translate(const seds::model::SplineCalibrator &
 
     switch (splineOrder) {
     case 1: {
-        addCallToCalibration("LinearCalibration", targetName, sourceName, rawPointsVariableName,
+        addCallToCalibration(m_linearCalibrationProcedureName, targetName, sourceName, rawPointsVariableName,
                 calibratedPointsVariableName, extrapolate);
     } break;
     case 2: {
-        addCallToCalibration("SquareCalibration", targetName, sourceName, rawPointsVariableName,
+        addCallToCalibration(m_squareCalibrationProcedureName, targetName, sourceName, rawPointsVariableName,
                 calibratedPointsVariableName, extrapolate);
     } break;
     case 3: {
-        addCallToCalibration("CubicCalibration", targetName, sourceName, rawPointsVariableName,
+        addCallToCalibration(m_cubicCalibrationProcedureName, targetName, sourceName, rawPointsVariableName,
                 calibratedPointsVariableName, extrapolate);
     } break;
     }
@@ -119,7 +119,7 @@ auto SplineCalibratorTranslator::buildSplinePointsVariable(
         const QString &variableName, const std::vector<double> &values, ::sdl::Transition *startTransition) -> void
 {
     // Create a variable to hold spline values
-    auto variable = std::make_unique<::sdl::VariableDeclaration>(variableName, "SplinePointsArray");
+    auto variable = std::make_unique<::sdl::VariableDeclaration>(variableName, m_splinePointsArrayTypeName);
     m_context.sdlProcess()->addVariable(std::move(variable));
 
     // Create a procedure
@@ -166,7 +166,8 @@ auto SplineCalibratorTranslator::buildSplineCalibratorBoilerplate(StatementTrans
     buildSquareCalibrationProcedure(context);
     buildCubicCalibrationProcedure(context);
 
-    auto intervalIndexVar = std::make_unique<::sdl::VariableDeclaration>("intervalIndex", "SplinePointsArrayIndex");
+    auto intervalIndexVar =
+            std::make_unique<::sdl::VariableDeclaration>("intervalIndex", m_splinePointsArrayIndexTypeName);
     context.sdlProcedure()->addVariable(std::move(intervalIndexVar));
 }
 
@@ -177,14 +178,14 @@ auto SplineCalibratorTranslator::createAsn1Types(StatementTranslatorVisitor::Sta
     Q_UNUSED(asn1Definitions);
 
     // Create type for spline points values
-    auto splinePointType = std::make_unique<Asn1Acn::Types::Real>("SplinePointValue");
+    auto splinePointType = std::make_unique<Asn1Acn::Types::Real>(m_splinePointValueTypeName);
     splinePointType->setEncoding(Asn1Acn::Types::RealEncoding::IEEE754_1985_64);
     auto splinePointTypeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::RealValue>::create(
             { std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max() });
     splinePointType->constraints().append(std::move(splinePointTypeConstraint));
 
     // Create type for array of spline points values
-    auto splinePointsArrayType = std::make_unique<Asn1Acn::Types::SequenceOf>("SplinePointsArray");
+    auto splinePointsArrayType = std::make_unique<Asn1Acn::Types::SequenceOf>(m_splinePointsArrayTypeName);
     splinePointsArrayType->setItemsType(splinePointType->clone());
     auto splinePointsArrayTypeInnerConstraint =
             Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create({ 0, m_maxSplinePointsArraySize });
@@ -194,7 +195,7 @@ auto SplineCalibratorTranslator::createAsn1Types(StatementTranslatorVisitor::Sta
     splinePointsArrayType->constraints().append(std::move(splinePointsArrayTypeConstraint));
 
     // Create type for index of array of spline points values
-    auto splinePointsArrayIndexType = std::make_unique<Asn1Acn::Types::Integer>("SplinePointsArrayIndex");
+    auto splinePointsArrayIndexType = std::make_unique<Asn1Acn::Types::Integer>(m_splinePointsArrayIndexTypeName);
     splinePointsArrayIndexType->setSize(8);
     splinePointsArrayIndexType->setEncoding(Asn1Acn::Types::IntegerEncoding::twos_complement);
     auto splinePointsArrayIndexTypeConstraint =
@@ -202,16 +203,17 @@ auto SplineCalibratorTranslator::createAsn1Types(StatementTranslatorVisitor::Sta
     splinePointsArrayIndexType->constraints().append(std::move(splinePointsArrayIndexTypeConstraint));
 
     // Add types to ASN.1 definitions
-    auto splinePointTypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
-            "SplinePointValue", "SplinePointValue", Asn1Acn::SourceLocation(), std::move(splinePointType));
+    auto splinePointTypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(m_splinePointValueTypeName,
+            m_splinePointValueTypeName, Asn1Acn::SourceLocation(), std::move(splinePointType));
     asn1Definitions->addType(std::move(splinePointTypeAssignment));
 
-    auto splinePointsArrayTypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
-            "SplinePointsArray", "SplinePointsArray", Asn1Acn::SourceLocation(), std::move(splinePointsArrayType));
+    auto splinePointsArrayTypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(m_splinePointsArrayTypeName,
+            m_splinePointsArrayTypeName, Asn1Acn::SourceLocation(), std::move(splinePointsArrayType));
     asn1Definitions->addType(std::move(splinePointsArrayTypeAssignment));
 
-    auto splinePointsArrayIndexTypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>("SplinePointsArrayIndex",
-            "SplinePointsArrayIndex", Asn1Acn::SourceLocation(), std::move(splinePointsArrayIndexType));
+    auto splinePointsArrayIndexTypeAssignment =
+            std::make_unique<Asn1Acn::TypeAssignment>(m_splinePointsArrayIndexTypeName,
+                    m_splinePointsArrayIndexTypeName, Asn1Acn::SourceLocation(), std::move(splinePointsArrayIndexType));
     asn1Definitions->addType(std::move(splinePointsArrayIndexTypeAssignment));
 }
 
@@ -219,18 +221,19 @@ auto SplineCalibratorTranslator::buildFindIntervalProcedure(StatementTranslatorV
         -> void
 {
     // Create procedure
-    const QString procedureName("FindInterval");
+    const QString procedureName(m_findIntervalProcedureName);
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
 
     // Create transition
     auto transition = std::make_unique<::sdl::Transition>();
 
     // Create procedure local variables
-    auto resultVar = std::make_unique<::sdl::VariableDeclaration>("result", "SplinePointsArrayIndex");
+    auto resultVar = std::make_unique<::sdl::VariableDeclaration>("result", m_splinePointsArrayIndexTypeName);
 
     // Create procedure parameters
-    auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", "SplinePointValue", "in");
-    auto rawPointsParameter = std::make_unique<::sdl::ProcedureParameter>("rawPoints", "SplinePointsArray", "in");
+    auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", m_splinePointValueTypeName, "in");
+    auto rawPointsParameter =
+            std::make_unique<::sdl::ProcedureParameter>("rawPoints", m_splinePointsArrayTypeName, "in");
 
     // Check if given value is smaller than the first point
     auto valueSmallerDecision = std::make_unique<::sdl::Decision>();
@@ -352,25 +355,27 @@ auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(StatementTransl
         -> void
 {
     // Create procedure
-    const QString procedureName("LinearCalibration");
+    const QString procedureName(m_linearCalibrationProcedureName);
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
 
     // Create procedure local variables
-    auto intervalIndexVar = std::make_unique<::sdl::VariableDeclaration>("intervalIndex", "SplinePointsArrayIndex");
-    auto x0Var = std::make_unique<::sdl::VariableDeclaration>("x0", "SplinePointValue");
-    auto x1Var = std::make_unique<::sdl::VariableDeclaration>("x1", "SplinePointValue");
-    auto y0Var = std::make_unique<::sdl::VariableDeclaration>("y0", "SplinePointValue");
-    auto y1Var = std::make_unique<::sdl::VariableDeclaration>("y1", "SplinePointValue");
-    auto l0Var = std::make_unique<::sdl::VariableDeclaration>("l0", "SplinePointValue");
-    auto l1Var = std::make_unique<::sdl::VariableDeclaration>("l1", "SplinePointValue");
-    auto resultVar = std::make_unique<::sdl::VariableDeclaration>("result", "SplinePointValue");
+    auto intervalIndexVar =
+            std::make_unique<::sdl::VariableDeclaration>("intervalIndex", m_splinePointsArrayIndexTypeName);
+    auto x0Var = std::make_unique<::sdl::VariableDeclaration>("x0", m_splinePointValueTypeName);
+    auto x1Var = std::make_unique<::sdl::VariableDeclaration>("x1", m_splinePointValueTypeName);
+    auto y0Var = std::make_unique<::sdl::VariableDeclaration>("y0", m_splinePointValueTypeName);
+    auto y1Var = std::make_unique<::sdl::VariableDeclaration>("y1", m_splinePointValueTypeName);
+    auto l0Var = std::make_unique<::sdl::VariableDeclaration>("l0", m_splinePointValueTypeName);
+    auto l1Var = std::make_unique<::sdl::VariableDeclaration>("l1", m_splinePointValueTypeName);
+    auto resultVar = std::make_unique<::sdl::VariableDeclaration>("result", m_splinePointValueTypeName);
 
     // Create procedure parameters
-    auto indexParameter = std::make_unique<::sdl::ProcedureParameter>("index", "SplinePointsArrayIndex", "in");
-    auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", "SplinePointValue", "in");
-    auto rawPointsParameter = std::make_unique<::sdl::ProcedureParameter>("rawPoints", "SplinePointsArray", "in");
+    auto indexParameter = std::make_unique<::sdl::ProcedureParameter>("index", m_splinePointsArrayIndexTypeName, "in");
+    auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", m_splinePointValueTypeName, "in");
+    auto rawPointsParameter =
+            std::make_unique<::sdl::ProcedureParameter>("rawPoints", m_splinePointsArrayTypeName, "in");
     auto calibratedPointsParameter =
-            std::make_unique<::sdl::ProcedureParameter>("calibratedPoints", "SplinePointsArray", "in");
+            std::make_unique<::sdl::ProcedureParameter>("calibratedPoints", m_splinePointsArrayTypeName, "in");
 
     // Create transition
     auto transition = std::make_unique<::sdl::Transition>();
@@ -455,28 +460,30 @@ auto SplineCalibratorTranslator::buildSquareCalibrationProcedure(StatementTransl
         -> void
 {
     // Create procedure
-    const QString procedureName("SquareCalibration");
+    const QString procedureName(m_squareCalibrationProcedureName);
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
 
     // Create procedure local variables
-    auto intervalIndexVar = std::make_unique<::sdl::VariableDeclaration>("intervalIndex", "SplinePointsArrayIndex");
-    auto x0Var = std::make_unique<::sdl::VariableDeclaration>("x0", "SplinePointValue");
-    auto x1Var = std::make_unique<::sdl::VariableDeclaration>("x1", "SplinePointValue");
-    auto x2Var = std::make_unique<::sdl::VariableDeclaration>("x2", "SplinePointValue");
-    auto y0Var = std::make_unique<::sdl::VariableDeclaration>("y0", "SplinePointValue");
-    auto y1Var = std::make_unique<::sdl::VariableDeclaration>("y1", "SplinePointValue");
-    auto y2Var = std::make_unique<::sdl::VariableDeclaration>("y2", "SplinePointValue");
-    auto l0Var = std::make_unique<::sdl::VariableDeclaration>("l0", "SplinePointValue");
-    auto l1Var = std::make_unique<::sdl::VariableDeclaration>("l1", "SplinePointValue");
-    auto l2Var = std::make_unique<::sdl::VariableDeclaration>("l2", "SplinePointValue");
-    auto resultVar = std::make_unique<::sdl::VariableDeclaration>("result", "SplinePointValue");
+    auto intervalIndexVar =
+            std::make_unique<::sdl::VariableDeclaration>("intervalIndex", m_splinePointsArrayIndexTypeName);
+    auto x0Var = std::make_unique<::sdl::VariableDeclaration>("x0", m_splinePointValueTypeName);
+    auto x1Var = std::make_unique<::sdl::VariableDeclaration>("x1", m_splinePointValueTypeName);
+    auto x2Var = std::make_unique<::sdl::VariableDeclaration>("x2", m_splinePointValueTypeName);
+    auto y0Var = std::make_unique<::sdl::VariableDeclaration>("y0", m_splinePointValueTypeName);
+    auto y1Var = std::make_unique<::sdl::VariableDeclaration>("y1", m_splinePointValueTypeName);
+    auto y2Var = std::make_unique<::sdl::VariableDeclaration>("y2", m_splinePointValueTypeName);
+    auto l0Var = std::make_unique<::sdl::VariableDeclaration>("l0", m_splinePointValueTypeName);
+    auto l1Var = std::make_unique<::sdl::VariableDeclaration>("l1", m_splinePointValueTypeName);
+    auto l2Var = std::make_unique<::sdl::VariableDeclaration>("l2", m_splinePointValueTypeName);
+    auto resultVar = std::make_unique<::sdl::VariableDeclaration>("result", m_splinePointValueTypeName);
 
     // Create procedure parameters
-    auto indexParameter = std::make_unique<::sdl::ProcedureParameter>("index", "SplinePointsArrayIndex", "in");
-    auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", "SplinePointValue", "in");
-    auto rawPointsParameter = std::make_unique<::sdl::ProcedureParameter>("rawPoints", "SplinePointsArray", "in");
+    auto indexParameter = std::make_unique<::sdl::ProcedureParameter>("index", m_splinePointsArrayIndexTypeName, "in");
+    auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", m_splinePointValueTypeName, "in");
+    auto rawPointsParameter =
+            std::make_unique<::sdl::ProcedureParameter>("rawPoints", m_splinePointsArrayTypeName, "in");
     auto calibratedPointsParameter =
-            std::make_unique<::sdl::ProcedureParameter>("calibratedPoints", "SplinePointsArray", "in");
+            std::make_unique<::sdl::ProcedureParameter>("calibratedPoints", m_splinePointsArrayTypeName, "in");
 
     // Create transition
     auto transition = std::make_unique<::sdl::Transition>();
@@ -582,31 +589,33 @@ auto SplineCalibratorTranslator::buildCubicCalibrationProcedure(StatementTransla
         -> void
 {
     // Create procedure
-    const QString procedureName("CubicCalibration");
+    const QString procedureName(m_cubicCalibrationProcedureName);
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
 
     // Create procedure local variables
-    auto intervalIndexVar = std::make_unique<::sdl::VariableDeclaration>("intervalIndex", "SplinePointsArrayIndex");
-    auto x0Var = std::make_unique<::sdl::VariableDeclaration>("x0", "SplinePointValue");
-    auto x1Var = std::make_unique<::sdl::VariableDeclaration>("x1", "SplinePointValue");
-    auto x2Var = std::make_unique<::sdl::VariableDeclaration>("x2", "SplinePointValue");
-    auto x3Var = std::make_unique<::sdl::VariableDeclaration>("x3", "SplinePointValue");
-    auto y0Var = std::make_unique<::sdl::VariableDeclaration>("y0", "SplinePointValue");
-    auto y1Var = std::make_unique<::sdl::VariableDeclaration>("y1", "SplinePointValue");
-    auto y2Var = std::make_unique<::sdl::VariableDeclaration>("y2", "SplinePointValue");
-    auto y3Var = std::make_unique<::sdl::VariableDeclaration>("y3", "SplinePointValue");
-    auto l0Var = std::make_unique<::sdl::VariableDeclaration>("l0", "SplinePointValue");
-    auto l1Var = std::make_unique<::sdl::VariableDeclaration>("l1", "SplinePointValue");
-    auto l2Var = std::make_unique<::sdl::VariableDeclaration>("l2", "SplinePointValue");
-    auto l3Var = std::make_unique<::sdl::VariableDeclaration>("l3", "SplinePointValue");
-    auto resultVar = std::make_unique<::sdl::VariableDeclaration>("result", "SplinePointValue");
+    auto intervalIndexVar =
+            std::make_unique<::sdl::VariableDeclaration>("intervalIndex", m_splinePointsArrayIndexTypeName);
+    auto x0Var = std::make_unique<::sdl::VariableDeclaration>("x0", m_splinePointValueTypeName);
+    auto x1Var = std::make_unique<::sdl::VariableDeclaration>("x1", m_splinePointValueTypeName);
+    auto x2Var = std::make_unique<::sdl::VariableDeclaration>("x2", m_splinePointValueTypeName);
+    auto x3Var = std::make_unique<::sdl::VariableDeclaration>("x3", m_splinePointValueTypeName);
+    auto y0Var = std::make_unique<::sdl::VariableDeclaration>("y0", m_splinePointValueTypeName);
+    auto y1Var = std::make_unique<::sdl::VariableDeclaration>("y1", m_splinePointValueTypeName);
+    auto y2Var = std::make_unique<::sdl::VariableDeclaration>("y2", m_splinePointValueTypeName);
+    auto y3Var = std::make_unique<::sdl::VariableDeclaration>("y3", m_splinePointValueTypeName);
+    auto l0Var = std::make_unique<::sdl::VariableDeclaration>("l0", m_splinePointValueTypeName);
+    auto l1Var = std::make_unique<::sdl::VariableDeclaration>("l1", m_splinePointValueTypeName);
+    auto l2Var = std::make_unique<::sdl::VariableDeclaration>("l2", m_splinePointValueTypeName);
+    auto l3Var = std::make_unique<::sdl::VariableDeclaration>("l3", m_splinePointValueTypeName);
+    auto resultVar = std::make_unique<::sdl::VariableDeclaration>("result", m_splinePointValueTypeName);
 
     // Create procedure parameters
-    auto indexParameter = std::make_unique<::sdl::ProcedureParameter>("index", "SplinePointsArrayIndex", "in");
-    auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", "SplinePointValue", "in");
-    auto rawPointsParameter = std::make_unique<::sdl::ProcedureParameter>("rawPoints", "SplinePointsArray", "in");
+    auto indexParameter = std::make_unique<::sdl::ProcedureParameter>("index", m_splinePointsArrayIndexTypeName, "in");
+    auto valueParameter = std::make_unique<::sdl::ProcedureParameter>("value", m_splinePointValueTypeName, "in");
+    auto rawPointsParameter =
+            std::make_unique<::sdl::ProcedureParameter>("rawPoints", m_splinePointsArrayTypeName, "in");
     auto calibratedPointsParameter =
-            std::make_unique<::sdl::ProcedureParameter>("calibratedPoints", "SplinePointsArray", "in");
+            std::make_unique<::sdl::ProcedureParameter>("calibratedPoints", m_splinePointsArrayTypeName, "in");
 
     // Create transition
     auto transition = std::make_unique<::sdl::Transition>();
@@ -811,8 +820,10 @@ auto SplineCalibratorTranslator::addCallToCalibration(const QString &calibration
 auto SplineCalibratorTranslator::addCallToFindInterval(const QString &sourceName, const QString rawPointsVariableName)
         -> void
 {
-    const auto callFindIntervalAction =
-            QString("intervalIndex := call FindInterval(%1, %2)").arg(sourceName).arg(rawPointsVariableName);
+    const auto callFindIntervalAction = QString("intervalIndex := call %1(%2, %3)")
+                                                .arg(m_findIntervalProcedureName)
+                                                .arg(sourceName)
+                                                .arg(rawPointsVariableName);
     auto callFindIntervalTask = std::make_unique<::sdl::Task>("", callFindIntervalAction);
     m_sdlTransition->addAction(std::move(callFindIntervalTask));
 }
