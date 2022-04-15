@@ -145,10 +145,11 @@ private:
     class ChangeNameTo final
     {
     public:
-        ChangeNameTo(QString *nameToTemporarilyChange, const QString &temporaryName)
-            : m_initialName(*nameToTemporarilyChange)
+        ChangeNameTo(QString *targetNamePtr, const QString &temporaryName)
+            : m_nameToChange(targetNamePtr)
+            , m_initialName(*targetNamePtr)
         {
-            *nameToTemporarilyChange = temporaryName;
+            *targetNamePtr = temporaryName;
         }
         ~ChangeNameTo() { *m_nameToChange = m_initialName; }
 
@@ -157,7 +158,7 @@ private:
 
     private:
         QString *m_nameToChange;
-        const QString m_initialName;
+        QString m_initialName;
     };
 };
 

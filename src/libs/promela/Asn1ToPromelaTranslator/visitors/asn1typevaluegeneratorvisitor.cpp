@@ -237,12 +237,10 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
             // TODO: pack as function
             auto *const asnSequenceComponent = static_cast<Asn1Acn::AsnSequenceComponent *>(sequenceComponent.get());
 
-            const QString sequenceName = m_name;
-            const QString typeToGenerate = getSequenceComponentTypeName(*asnSequenceComponent, sequenceName);
-            m_name = typeToGenerate;
+            const QString typeToGenerate = getSequenceComponentTypeName(*asnSequenceComponent, m_name);
             auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
+            ChangeNameTo changeName(&m_name, typeToGenerate);
             asnSequenceComponentType->accept(*this);
-            m_name = sequenceName;
 
             const QString typeGeneratorToCallName = QString("%1_generate_value").arg(typeToGenerate);
             if (asnSequenceComponent->isOptional()) {
