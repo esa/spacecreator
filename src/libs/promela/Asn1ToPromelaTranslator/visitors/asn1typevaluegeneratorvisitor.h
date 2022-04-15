@@ -138,12 +138,22 @@ private:
     ::promela::model::PromelaModel &m_promelaModel;
     QString m_name;
 
-    /* change name temporarily and automatically restore its value to start value when this object gets removed */
-    class NameChanger final
+    /*
+     * change string value temporarily and automatically restore its value to start value when this object gets
+     * destroyed
+     */
+    class ChangeNameTo final
     {
     public:
-        NameChanger(QString *nameToTemporarilyChange, const QString &temporaryName);
-        ~NameChanger();
+        ChangeNameTo(QString *nameToTemporarilyChange, const QString &temporaryName)
+            : m_initialName(*nameToTemporarilyChange)
+        {
+            *nameToTemporarilyChange = temporaryName;
+        }
+        ~ChangeNameTo() { *m_nameToChange = m_initialName; }
+
+        ChangeNameTo() = delete;
+        ChangeNameTo(ChangeNameTo &&) = delete;
 
     private:
         QString *m_nameToChange;

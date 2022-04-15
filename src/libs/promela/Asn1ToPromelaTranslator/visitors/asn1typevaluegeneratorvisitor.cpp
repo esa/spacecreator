@@ -343,15 +343,4 @@ void Asn1TypeValueGeneratorVisitor::createValueGenerationInline(::promela::model
     m_promelaModel.addInlineDef(std::move(inlineDef));
 }
 
-Asn1TypeValueGeneratorVisitor::NameChanger::NameChanger(QString *nameToTemporarilyChange, const QString &temporaryName)
-    : m_initialName(*nameToTemporarilyChange)
-{
-    *nameToTemporarilyChange = temporaryName;
-}
-
-Asn1TypeValueGeneratorVisitor::NameChanger::~NameChanger()
-{
-    *m_nameToChange = m_initialName;
-}
-
 } // namespace promela::translator
