@@ -170,7 +170,6 @@ Asn1Acn::Types::Type *Asn1TypeValueGeneratorVisitor::getAsnSequenceComponentType
     if (component == nullptr) {
         throw std::runtime_error("Component cannot be null");
     }
-
     Asn1Acn::Types::Type *const componentType = component->type();
     if (componentType == nullptr) {
         throw std::runtime_error("Type not specified in Component");
@@ -234,14 +233,7 @@ std::unique_ptr<promela::model::ProctypeElement> makeAssignmentProctypeElement(
 
 void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 {
-    if (type.typeName().compare("SEQUENCE") != 0 || type.typeEnum() != Asn1Acn::Types::Type::SEQUENCE) {
-        throw std::runtime_error("Invalid type");
-    }
-
     auto *const typeReadingVisitorPtr = static_cast<Asn1Acn::Types::TypeReadingVisitor *>(this);
-    if (typeReadingVisitorPtr == nullptr) {
-        throw std::runtime_error("Asn1TypeValueGeneratorVisitor could not be casted to TypeReadingVisitor");
-    }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(type.identifier());
     const QString argumentName = "value";
