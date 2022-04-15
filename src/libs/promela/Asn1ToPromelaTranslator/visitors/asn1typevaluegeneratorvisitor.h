@@ -26,6 +26,7 @@
 #include <promela/PromelaModel/promelamodel.h>
 
 namespace promela::translator {
+
 /**
  * @brief Visitor for ASN.1 toplevel types
  *
@@ -135,6 +136,19 @@ private:
 
 private:
     ::promela::model::PromelaModel &m_promelaModel;
-    const QString m_name;
+    QString m_name;
+
+    /* change name temporarily and automatically restore its value to start value when this object gets removed */
+    class NameChanger final
+    {
+    public:
+        NameChanger(QString *nameToTemporarilyChange, const QString &temporaryName);
+        ~NameChanger();
+
+    private:
+        QString *m_nameToChange;
+        const QString m_initialName;
+    };
 };
-}
+
+} // namespace promela::translator

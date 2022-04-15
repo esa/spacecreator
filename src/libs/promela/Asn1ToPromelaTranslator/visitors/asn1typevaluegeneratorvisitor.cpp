@@ -191,9 +191,7 @@ QString getName(Asn1Acn::AsnSequenceComponent *const envGeneratorInline, const Q
     QString generatorInlineName;
 
     const QString &inlineTypeName = envGeneratorInline->type()->typeName();
-    qDebug() << "inlinetypename: " << inlineTypeName;
     if (inlineTypeName.compare("INTEGER") == 0) {
-        qDebug() << "is integer xd";
         generatorInlineName = "INTEGER";
     } else if (inlineTypeName.compare("BOOLEAN") == 0) {
         generatorInlineName = "BOOLEAN";
@@ -212,7 +210,6 @@ std::unique_ptr<ProctypeElement> makeInlineCall(
     const QString componentAsnTypeName = componentTypeLabel.split(".").last().split(" ").last();
     const QString generatorInlineName = getName(envGeneratorInline, componentAsnTypeName);
 
-    qDebug() << "makeInlineCall: inline name: " << generatorInlineName;
     auto inlineCall = promela::model::InlineCall(generatorInlineName, QList<VariableRef>({ inlineCallArgument }));
     return std::make_unique<ProctypeElement>(std::move(inlineCall));
 }
@@ -250,33 +247,37 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
     const QString argumentName = "value";
     const QList<QString> inlineArguments = { argumentName };
     promela::model::Sequence sequence(promela::model::Sequence::Type::NORMAL);
-
     for (auto &sequenceComponent : type.components()) {
         auto *const asnSequenceComponent = static_cast<Asn1Acn::AsnSequenceComponent *>(sequenceComponent.get());
+        const auto asnTypeName = asnSequenceComponent->type()->typeName();
         if (asnSequenceComponent != nullptr) {
+            const QString sequenceName = m_name;
+            m_name = asnTypeName;
             auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
-            qDebug() << "asn sequence component type name: " << asnSequenceComponentType->typeName();
             asnSequenceComponentType->accept(*typeReadingVisitorPtr);
+            m_name = sequenceName;
 
-            if (asnSequenceComponent->isOptional()) {
-                auto sequenceToGenerateValue = makeNormalSequence();
-                sequenceToGenerateValue->appendElement(makeTrueExpressionProctypeElement());
-                sequenceToGenerateValue->appendElement(makeInlineCall(asnSequenceComponent, argumentName));
-                const QString valueExistName = QString("%1.exist.%2").arg(argumentName).arg(sequenceComponent->name());
-                sequenceToGenerateValue->appendElement(makeAssignmentProctypeElement(valueExistName, 1));
+            // if (asnSequenceComponent->isOptional()) {
+            //     const QString valueExistName =
+            //     QString("%1.exist.%2").arg(argumentName).arg(sequenceComponent->name());
 
-                auto emptySequenceOptionalIsOff = makeNormalSequence();
-                emptySequenceOptionalIsOff->appendElement(makeTrueExpressionProctypeElement());
-                emptySequenceOptionalIsOff->appendElement(makeAssignmentProctypeElement(valueExistName, 0));
+            //     auto sequenceWithInlineToGenerateValue = makeNormalSequence();
+            //     sequenceWithInlineToGenerateValue->appendElement(makeTrueExpressionProctypeElement());
+            //     sequenceWithInlineToGenerateValue->appendElement(makeInlineCall(asnSequenceComponent, argumentName));
+            //     sequenceWithInlineToGenerateValue->appendElement(makeAssignmentProctypeElement(valueExistName, 1));
 
-                Conditional conditional;
-                conditional.appendAlternative(std::move(sequenceToGenerateValue));
-                conditional.appendAlternative(std::move(emptySequenceOptionalIsOff));
+            //     auto emptySequenceOptionalIsOff = makeNormalSequence();
+            //     emptySequenceOptionalIsOff->appendElement(makeTrueExpressionProctypeElement());
+            //     emptySequenceOptionalIsOff->appendElement(makeAssignmentProctypeElement(valueExistName, 0));
 
-                sequence.appendElement(std::make_unique<ProctypeElement>(std::move(conditional)));
-            } else {
-                sequence.appendElement(makeInlineCall(asnSequenceComponent, argumentName));
-            }
+            //     Conditional conditional;
+            //     conditional.appendAlternative(std::move(sequenceWithInlineToGenerateValue));
+            //     conditional.appendAlternative(std::move(emptySequenceOptionalIsOff));
+
+            //     sequence.appendElement(std::make_unique<ProctypeElement>(std::move(conditional)));
+            // } else {
+            //     sequence.appendElement(makeInlineCall(asnSequenceComponent, argumentName));
+            // }
         }
     }
 
@@ -348,6 +349,17 @@ void Asn1TypeValueGeneratorVisitor::createValueGenerationInline(::promela::model
             std::make_unique<InlineDef>(inlineName, inlineArguments, std::move(sequence));
 
     m_promelaModel.addInlineDef(std::move(inlineDef));
+}
+
+Asn1TypeValueGeneratorVisitor::NameChanger::NameChanger(QString *nameToTemporarilyChange, const QString &temporaryName)
+    : m_initialName(*nameToTemporarilyChange)
+{
+    *nameToTemporarilyChange = temporaryName;
+}
+
+Asn1TypeValueGeneratorVisitor::NameChanger::~NameChanger()
+{
+    *m_nameToChange = m_initialName;
 }
 
 } // namespace promela::translator
