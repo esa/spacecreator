@@ -222,7 +222,7 @@ auto SplineCalibratorTranslator::buildFindIntervalProcedure(Context &context) ->
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
 
     // Set procedure return variable
-    procedure->setReturnType("SplinePointsArrayIndex");
+    procedure->setReturnType(m_splinePointsArrayIndexTypeName);
 
     // Create transition
     auto transition = std::make_unique<::sdl::Transition>();
@@ -358,7 +358,7 @@ auto SplineCalibratorTranslator::buildLinearCalibrationProcedure(Context &contex
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
 
     // Set procedure return variable
-    procedure->setReturnType("SplinePointValue");
+    procedure->setReturnType(m_splinePointValueTypeName);
 
     // Create procedure local variables
     auto intervalIndexVar =
@@ -465,7 +465,7 @@ auto SplineCalibratorTranslator::buildSquareCalibrationProcedure(Context &contex
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
 
     // Set procedure return variable
-    procedure->setReturnType("SplinePointValue");
+    procedure->setReturnType(m_splinePointValueTypeName);
 
     // Create procedure local variables
     auto intervalIndexVar =
@@ -596,7 +596,7 @@ auto SplineCalibratorTranslator::buildCubicCalibrationProcedure(Context &context
     auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
 
     // Set procedure return variable
-    procedure->setReturnType("SplinePointValue");
+    procedure->setReturnType(m_splinePointValueTypeName);
 
     // Create procedure local variables
     auto intervalIndexVar =
