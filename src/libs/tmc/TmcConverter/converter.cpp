@@ -113,6 +113,12 @@ bool TmcConverter::addStopConditionFiles(const QStringList &files)
     return true;
 }
 
+bool TmcConverter::attachInputObserver(const QString &attachmentSpecification)
+{
+    m_inputObserverAttachments.append(attachmentSpecification);
+    return true;
+}
+
 bool TmcConverter::convertModel(const std::set<conversion::ModelType> &sourceModelTypes,
         conversion::ModelType targetModelType, const std::set<conversion::ModelType> &auxilaryModelTypes,
         conversion::Options options) const
@@ -257,6 +263,9 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
     options.add(IvOptions::inputFilepath, inputFilepath);
     options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
     options.add(PromelaOptions::outputFilepath, outputFilepath);
+    for (auto &attachment : m_inputObserverAttachments) {
+        options.add(PromelaOptions::inputObserverAttachment, attachment);
+    }
 
     for (const QString &function : modelFunctions) {
         options.add(PromelaOptions::modelFunctionName, function);

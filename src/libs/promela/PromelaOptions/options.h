@@ -49,6 +49,9 @@ public:
 
     /** @brief Use function name as part of environment  */
     inline static const QString environmentFunctionName = "Promela_Convert_EnvironmentFunction";
+
+    /** @brief Interface to be observed as input (post-delivery); format is FunctionName:InterfaceName:ObserverName */
+    inline static const QString inputObserverAttachment = "Promela_Convert_inputObserverAttachment";
 };
 
 }

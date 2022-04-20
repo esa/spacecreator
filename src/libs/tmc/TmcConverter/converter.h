@@ -66,6 +66,17 @@ public:
      */
     bool addStopConditionFiles(const QStringList &files);
 
+    /**
+     * @brief Attach input Observer specification
+     *
+     * It shall have the format FunctionName:InterfaceName:ObserverName.
+     * The entire specification is passed as a single string for simplicity.
+     *
+     * @param attachmentSpecification Input Observer Attachment Specification
+     * @return true if the operation succeeded, false otherwise.
+     */
+    bool attachInputObserver(const QString &attachmentSpecification);
+
 private:
     bool convertModel(const std::set<conversion::ModelType> &sourceModelTypes, conversion::ModelType targetModelType,
             const std::set<conversion::ModelType> &auxilaryModelTypes, conversion::Options options) const;
@@ -104,6 +115,7 @@ private:
     ivm::IVPropertyTemplateConfig *m_dynPropConfig;
 
     QStringList m_stopConditionsFiles;
+    QStringList m_inputObserverAttachments;
 
     conversion::Registry m_registry;
 };

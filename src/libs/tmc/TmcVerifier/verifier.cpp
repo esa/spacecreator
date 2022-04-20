@@ -34,6 +34,11 @@ bool TmcVerifier::addStopConditionFiles(const QStringList &files)
     return m_converter->addStopConditionFiles(files);
 }
 
+bool TmcVerifier::attachInputObserver(const QString &attachmentSpecification)
+{
+    return m_converter->attachInputObserver(attachmentSpecification);
+}
+
 bool TmcVerifier::execute()
 {
     if (!m_converter->convert()) {

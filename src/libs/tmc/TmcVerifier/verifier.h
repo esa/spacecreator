@@ -45,6 +45,18 @@ public:
      * @return true if files exist, otherwise false.
      */
     bool addStopConditionFiles(const QStringList &files);
+
+    /**
+     * @brief Attach input Observer specification
+     *
+     * It shall have the format FunctionName:InterfaceName:ObserverName.
+     * The entire specification is passed as a single string for simplicity.
+     *
+     * @param attachmentSpecification Input Observer Attachment Specification
+     * @return true if the operation succeeded, false otherwise.
+     */
+    bool attachInputObserver(const QString &attachmentSpecification);
+
     /**
      * @brief Prepare the system and process formal model verification.
      *
