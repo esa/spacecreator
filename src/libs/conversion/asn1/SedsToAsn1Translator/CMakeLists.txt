@@ -1,28 +1,13 @@
 project(SedsToAsn1Translator VERSION 1.0.0 LANGUAGES CXX)
 
-set(SOURCES     containerentriesscope.cpp
-                datatypesdependencyresolver.cpp
+set(SOURCES     datatypesdependencyresolver.cpp
                 packagesdependencyresolver.cpp
                 patchersnippetsgenerator.cpp
-                translator.cpp
-                specialized/containerconstrainttranslatorvisitor.cpp
-                specialized/datatypetranslatorvisitor.cpp
-                specialized/descriptiontranslator.cpp
-                specialized/dimensiontranslator.cpp
-                specialized/entrytranslatorvisitor.cpp
-                specialized/rangetranslatorvisitor.cpp)
-set(INCLUDES    containerentriesscope.h
-                datatypesdependencyresolver.h
+                translator.cpp)
+set(INCLUDES    datatypesdependencyresolver.h
                 packagesdependencyresolver.h
                 patchersnippetsgenerator.h
-                translator.h
-                specialized/containerconstrainttranslatorvisitor.h
-                specialized/datatypetranslatorvisitor.h
-                specialized/descriptiontranslator.h
-                specialized/dimensiontranslator.h
-                specialized/entrytranslatorvisitor.h
-                specialized/rangetranslatorvisitor.h
-                specialized/sizetranslatorvisitor.h)
+                translator.h)
 
 add_library(SedsToAsn1Translator STATIC)
 target_sources(SedsToAsn1Translator

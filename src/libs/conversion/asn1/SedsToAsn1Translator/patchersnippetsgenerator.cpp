@@ -36,6 +36,8 @@ PatcherSnippetsGenerator::PatcherSnippetsGenerator(
     : m_sedsPackage(sedsPackage)
     , m_sedsPackages(sedsPackages)
 {
+    Q_UNUSED(m_sedsPackage);
+    Q_UNUSED(m_sedsPackages);
 }
 
 std::vector<Asn1Acn::PatcherSnippet> PatcherSnippetsGenerator::generate(
@@ -281,58 +283,66 @@ QString PatcherSnippetsGenerator::buildLengthEntryDecodingValidator(
 
 uint64_t PatcherSnippetsGenerator::getErrorControlBitCount(const seds::model::ErrorControlEntry &entry) const
 {
-    const auto &entryTypeRef = entry.type();
+    // TODO
+    Q_UNUSED(entry);
+    return 0;
+    /* const auto &entryTypeRef = entry.type(); */
 
-    const auto sedsPackage = entryTypeRef.packageStr()
-            ? SedsToAsn1Translator::getSedsPackage(*entryTypeRef.packageStr(), m_sedsPackages)
-            : m_sedsPackage;
+    /* const auto sedsPackage = entryTypeRef.packageStr() */
+    /*         ? SedsToAsn1Translator::getSedsPackage(*entryTypeRef.packageStr(), m_sedsPackages) */
+    /*         : m_sedsPackage; */
 
-    const auto entryType = sedsPackage->dataType(entryTypeRef.nameStr());
+    /* const auto entryType = sedsPackage->dataType(entryTypeRef.nameStr()); */
 
-    const auto entryBinaryType = std::get_if<seds::model::BinaryDataType>(entryType);
+    /* const auto entryBinaryType = std::get_if<seds::model::BinaryDataType>(entryType); */
 
-    if (!entryBinaryType) {
-        auto errorMessage =
-                QString("Error control entry \"%1\" has to have binary as an underlying type").arg(entry.nameStr());
-        throw TranslationException(std::move(errorMessage));
-    }
+    /* if (!entryBinaryType) { */
+    /*     auto errorMessage = */
+    /*             QString("Error control entry \"%1\" has to have binary as an underlying type").arg(entry.nameStr());
+     */
+    /*     throw TranslationException(std::move(errorMessage)); */
+    /* } */
 
-    if (!entryBinaryType->hasFixedSize()) {
-        auto errorMessage =
-                QString("Error control entry \"%1\" underlying type has to be fixed size").arg(entry.nameStr());
-        throw TranslationException(std::move(errorMessage));
-    }
+    /* if (!entryBinaryType->hasFixedSize()) { */
+    /*     auto errorMessage = */
+    /*             QString("Error control entry \"%1\" underlying type has to be fixed size").arg(entry.nameStr()); */
+    /*     throw TranslationException(std::move(errorMessage)); */
+    /* } */
 
-    return entryBinaryType->bits();
+    /* return entryBinaryType->bits(); */
 }
 
 const seds::model::IntegerDataEncoding &PatcherSnippetsGenerator::getLengthEncoding(
         const seds::model::LengthEntry &entry) const
 {
-    const auto &entryTypeRef = entry.type();
+    // TODO
+    Q_UNUSED(entry);
+    static auto encoding = seds::model::IntegerDataEncoding();
+    return encoding;
+    /* const auto &entryTypeRef = entry.type(); */
 
-    const auto sedsPackage = entryTypeRef.packageStr()
-            ? SedsToAsn1Translator::getSedsPackage(*entryTypeRef.packageStr(), m_sedsPackages)
-            : m_sedsPackage;
+    /* const auto sedsPackage = entryTypeRef.packageStr() */
+    /*         ? SedsToAsn1Translator::getSedsPackage(*entryTypeRef.packageStr(), m_sedsPackages) */
+    /*         : m_sedsPackage; */
 
-    const auto entryType = sedsPackage->dataType(entryTypeRef.nameStr());
+    /* const auto entryType = sedsPackage->dataType(entryTypeRef.nameStr()); */
 
-    const auto entryIntegerType = std::get_if<seds::model::IntegerDataType>(entryType);
+    /* const auto entryIntegerType = std::get_if<seds::model::IntegerDataType>(entryType); */
 
-    if (!entryIntegerType) {
-        auto errorMessage =
-                QString("Length entry \"%1\" has to have integer as an underlying type").arg(entry.nameStr());
-        throw TranslationException(std::move(errorMessage));
-    }
+    /* if (!entryIntegerType) { */
+    /*     auto errorMessage = */
+    /*             QString("Length entry \"%1\" has to have integer as an underlying type").arg(entry.nameStr()); */
+    /*     throw TranslationException(std::move(errorMessage)); */
+    /* } */
 
-    const auto &entryIntegerEncoding = entryIntegerType->encoding();
+    /* const auto &entryIntegerEncoding = entryIntegerType->encoding(); */
 
-    if (!entryIntegerEncoding.has_value()) {
-        auto errorMessage = QString("Entry \"%1\" has to have encoding").arg(entry.nameStr());
-        throw TranslationException(std::move(errorMessage));
-    }
+    /* if (!entryIntegerEncoding.has_value()) { */
+    /*     auto errorMessage = QString("Entry \"%1\" has to have encoding").arg(entry.nameStr()); */
+    /*     throw TranslationException(std::move(errorMessage)); */
+    /* } */
 
-    return entryIntegerEncoding.value();
+    /* return entryIntegerEncoding.value(); */
 }
 
 } // namespace conversion::asn1::translator

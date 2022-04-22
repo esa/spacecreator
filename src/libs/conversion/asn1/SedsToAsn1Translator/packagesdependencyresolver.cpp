@@ -59,70 +59,58 @@ void PackagesDependencyResolver::visit(const seds::model::Package *package)
 
     markTemporary(package);
 
-    std::set<Asn1Acn::ImportedType> importedTypes;
-
-    handleDataTypes(package->dataTypes(), importedTypes);
-    handleComponents(package->components(), package, importedTypes);
+    handleDataTypes(package->dataTypes());
+    handleComponents(package->components(), package);
 
     markPermanent(package);
 
-    m_result.push_back({ package, std::move(importedTypes) });
+    m_result.push_back(package);
 }
 
-void PackagesDependencyResolver::handleDataTypes(
-        const std::vector<seds::model::DataType> &dataTypes, std::set<Asn1Acn::ImportedType> &importedTypes)
+void PackagesDependencyResolver::handleDataTypes(const std::vector<seds::model::DataType> &dataTypes)
 {
     for (const auto &dataType : dataTypes) {
         if (const auto *arrayDataType = std::get_if<seds::model::ArrayDataType>(&dataType)) {
-            auto importedType = handleArray(*arrayDataType);
-
-            if (importedType) {
-                importedTypes.insert(std::move(*importedType));
-            }
-
-            handleArrayDimensions(arrayDataType->dimensions(), importedTypes);
+            handleArray(*arrayDataType);
+            handleArrayDimensions(arrayDataType->dimensions());
         } else if (const auto *containerDataType = std::get_if<seds::model::ContainerDataType>(&dataType)) {
-            auto containerImportedTypes = handleContainer(*containerDataType);
-            std::copy(containerImportedTypes.begin(), containerImportedTypes.end(),
-                    std::inserter(importedTypes, importedTypes.end()));
+            handleContainer(*containerDataType);
         } else if (const auto *subRangeDataType = std::get_if<seds::model::SubRangeDataType>(&dataType)) {
-            auto importedType = handleSubRangeDataType(*subRangeDataType);
-
-            if (importedType) {
-                importedTypes.insert(std::move(*importedType));
-            }
+            handleSubRangeDataType(*subRangeDataType);
         }
     }
 }
 
-std::optional<Asn1Acn::ImportedType> PackagesDependencyResolver::handleArray(
-        const seds::model::ArrayDataType &arrayDataType)
+void PackagesDependencyResolver::handleDataTypeRef(const seds::model::DataTypeRef &dataTypeRef)
 {
-    const auto &typeRef = arrayDataType.type();
-
-    if (typeRef.packageStr()) {
-        return createImportedType(typeRef);
+    if (dataTypeRef.packageStr()) {
+        const auto package = findPackage(*dataTypeRef.packageStr());
+        visit(package);
     }
-
-    return std::nullopt;
 }
 
-std::set<Asn1Acn::ImportedType> PackagesDependencyResolver::handleContainer(
-        const seds::model::ContainerDataType &containerDataType)
+void PackagesDependencyResolver::handleArray(const seds::model::ArrayDataType &arrayDataType)
 {
-    std::set<Asn1Acn::ImportedType> importedTypes;
+    handleDataTypeRef(arrayDataType.type());
+}
 
+void PackagesDependencyResolver::handleArrayDimensions(const std::vector<seds::model::DimensionSize> &dimensions)
+{
+    for (const auto &dimension : dimensions) {
+        if (dimension.indexTypeRef()) {
+            handleDataTypeRef(*dimension.indexTypeRef());
+        }
+    }
+}
+
+void PackagesDependencyResolver::handleContainer(const seds::model::ContainerDataType &containerDataType)
+{
     const auto visitor = [&](auto &&entry) {
         using T = std::decay_t<decltype(entry)>;
         if constexpr (std::is_same_v<T, seds::model::PaddingEntry>) {
             return;
         } else {
-            const auto &typeRef = entry.type();
-
-            if (typeRef.packageStr()) {
-                auto importedType = createImportedType(typeRef);
-                importedTypes.insert(std::move(importedType));
-            }
+            handleDataTypeRef(entry.type());
         }
     };
 
@@ -135,87 +123,91 @@ std::set<Asn1Acn::ImportedType> PackagesDependencyResolver::handleContainer(
 
     for (const auto &containerConstraint : containerDataType.constraints()) {
         if (auto typeConstraint = std::get_if<seds::model::ContainerTypeConstraint>(&containerConstraint)) {
-            const auto &typeRef = typeConstraint->type();
-
-            if (typeRef.packageStr()) {
-                auto importedType = createImportedType(typeRef);
-                importedTypes.insert(std::move(importedType));
-            }
+            handleDataTypeRef(typeConstraint->type());
         }
     }
-
-    return importedTypes;
 }
 
-std::optional<Asn1Acn::ImportedType> PackagesDependencyResolver::handleSubRangeDataType(
-        const seds::model::SubRangeDataType &subRangeDataType)
+void PackagesDependencyResolver::handleSubRangeDataType(const seds::model::SubRangeDataType &subRangeDataType)
 {
-    const auto &typeRef = subRangeDataType.type();
-
-    if (typeRef.packageStr()) {
-        return createImportedType(typeRef);
-    }
-
-    return std::nullopt;
+    handleDataTypeRef(subRangeDataType.type());
 }
 
-void PackagesDependencyResolver::handleComponents(const std::vector<seds::model::Component> &components,
-        const seds::model::Package *package, std::set<Asn1Acn::ImportedType> &importedTypes)
+void PackagesDependencyResolver::handleComponents(
+        const std::vector<seds::model::Component> &components, const seds::model::Package *package)
 {
     for (const auto &component : components) {
-        handleDataTypes(component.dataTypes(), importedTypes);
-        handleInterfaces(component.providedInterfaces(), component, package, importedTypes);
-        handleInterfaces(component.requiredInterfaces(), component, package, importedTypes);
+        handleDataTypes(component.dataTypes());
+        handleInterfaces(component.providedInterfaces(), component, package);
+        handleInterfaces(component.requiredInterfaces(), component, package);
     }
 }
 
 void PackagesDependencyResolver::handleInterfaces(const std::vector<seds::model::Interface> &interfaces,
-        const seds::model::Component &component, const seds::model::Package *package,
-        std::set<Asn1Acn::ImportedType> &importedTypes)
+        const seds::model::Component &component, const seds::model::Package *package)
 {
     for (const auto &interface : interfaces) {
         const auto &interfaceDeclarationRef = interface.type();
         if (interfaceDeclarationRef.packageStr()) {
             const auto otherPackage = findPackage(*interfaceDeclarationRef.packageStr());
             visit(otherPackage);
-
             continue;
         }
 
-        handleTypeMapSet(interface.genericTypeMapSet(), importedTypes);
+        const auto &interfaceDeclaration =
+                findInterfaceDeclaration(interfaceDeclarationRef.nameStr(), component, package);
+        handleInterfaceDeclaration(interfaceDeclaration);
 
-        const auto &interfaceDeclaration = findInterfaceDeclaration(interface.type().nameStr(), component, package);
-        handleInterfaceDeclaration(interfaceDeclaration, component, package, importedTypes);
+        handleTypeMapSet(interface.genericTypeMapSet());
     }
 }
 
-void PackagesDependencyResolver::handleTypeMapSet(
-        const std::optional<seds::model::GenericTypeMapSet> &typeMapSet, std::set<Asn1Acn::ImportedType> &importedTypes)
+void PackagesDependencyResolver::handleInterfaceDeclaration(
+        const seds::model::InterfaceDeclaration &interfaceDeclaration)
+{
+    for (const auto &baseInterface : interfaceDeclaration.baseInterfaces()) {
+        const auto &baseInterfaceDeclarationRef = baseInterface.type();
+        if (baseInterfaceDeclarationRef.packageStr()) {
+            const auto otherPackage = findPackage(*baseInterfaceDeclarationRef.packageStr());
+            visit(otherPackage);
+            continue;
+        }
+    }
+
+    handleParameters(interfaceDeclaration.parameters());
+    handleCommands(interfaceDeclaration.commands());
+}
+
+void PackagesDependencyResolver::handleParameters(const std::vector<seds::model::InterfaceParameter> &parameters)
+{
+    for (const auto &parameter : parameters) {
+        handleDataTypeRef(parameter.type());
+    }
+}
+
+void PackagesDependencyResolver::handleCommands(const std::vector<seds::model::InterfaceCommand> &commands)
+{
+    for (const auto &command : commands) {
+        for (const auto &argument : command.arguments()) {
+            handleDataTypeRef(argument.type());
+        }
+    }
+}
+
+void PackagesDependencyResolver::handleTypeMapSet(const std::optional<seds::model::GenericTypeMapSet> &typeMapSet)
 {
     if (!typeMapSet) {
         return;
     }
 
     for (const auto &typeMap : typeMapSet->genericTypeMaps()) {
-        handleTypeMap(typeMap, importedTypes);
+        handleDataTypeRef(typeMap.type());
     }
 
-    handleAlternateSet(typeMapSet->alternateSet(), importedTypes);
+    handleAlternateSet(typeMapSet->alternateSet());
 }
 
-void PackagesDependencyResolver::handleTypeMap(
-        const seds::model::GenericTypeMap &typeMap, std::set<Asn1Acn::ImportedType> &importedTypes)
-{
-    const auto concreteTypeRef = typeMap.type();
-
-    if (concreteTypeRef.packageStr()) {
-        auto importedType = createImportedType(concreteTypeRef);
-        importedTypes.insert(std::move(importedType));
-    }
-}
-
-void PackagesDependencyResolver::handleAlternateSet(const std::optional<seds::model::GenericAlternateSet> &alternateSet,
-        std::set<Asn1Acn::ImportedType> &importedTypes)
+void PackagesDependencyResolver::handleAlternateSet(const std::optional<seds::model::GenericAlternateSet> &alternateSet)
 {
     if (!alternateSet) {
         return;
@@ -223,90 +215,9 @@ void PackagesDependencyResolver::handleAlternateSet(const std::optional<seds::mo
 
     for (const auto &alternate : alternateSet->alternates()) {
         for (const auto &typeMap : alternate.genericTypeMaps()) {
-            handleTypeMap(typeMap, importedTypes);
+            handleDataTypeRef(typeMap.type());
         }
     }
-}
-
-void PackagesDependencyResolver::handleInterfaceDeclaration(
-        const seds::model::InterfaceDeclaration &interfaceDeclaration, const seds::model::Component &component,
-        const seds::model::Package *package, std::set<Asn1Acn::ImportedType> &importedTypes)
-{
-    for (const auto &baseInterface : interfaceDeclaration.baseInterfaces()) {
-        const auto &baseInterfaceDeclarationRef = baseInterface.type();
-        if (baseInterfaceDeclarationRef.packageStr()) {
-            const auto otherPackage = findPackage(*baseInterfaceDeclarationRef.packageStr());
-            visit(otherPackage);
-
-            continue;
-        }
-
-        handleTypeMapSet(baseInterface.genericTypeMapSet(), importedTypes);
-
-        const auto &baseInterfaceDeclaration =
-                findInterfaceDeclaration(baseInterface.type().nameStr(), component, package);
-        handleInterfaceDeclaration(baseInterfaceDeclaration, component, package, importedTypes);
-    }
-
-    handleParameters(interfaceDeclaration.parameters(), importedTypes);
-    handleCommands(interfaceDeclaration.commands(), importedTypes);
-}
-
-void PackagesDependencyResolver::handleParameters(
-        const std::vector<seds::model::InterfaceParameter> &parameters, std::set<Asn1Acn::ImportedType> &importedTypes)
-{
-    for (const auto &parameter : parameters) {
-        const auto typeRef = parameter.type();
-
-        if (typeRef.packageStr()) {
-            auto importedType = createImportedType(typeRef);
-            importedTypes.insert(std::move(importedType));
-        }
-    }
-}
-
-void PackagesDependencyResolver::handleCommands(
-        const std::vector<seds::model::InterfaceCommand> &commands, std::set<Asn1Acn::ImportedType> &importedTypes)
-{
-    for (const auto &command : commands) {
-        for (const auto &argument : command.arguments()) {
-            const auto typeRef = argument.type();
-
-            if (typeRef.packageStr()) {
-                auto importedType = createImportedType(typeRef);
-                importedTypes.insert(std::move(importedType));
-            }
-        }
-    }
-}
-
-void PackagesDependencyResolver::handleArrayDimensions(
-        const std::vector<seds::model::DimensionSize> &dimensions, std::set<Asn1Acn::ImportedType> &importedTypes)
-{
-    Q_UNUSED(importedTypes);
-
-    for (const auto &dimension : dimensions) {
-        Q_UNUSED(dimension);
-    }
-}
-
-Asn1Acn::ImportedType PackagesDependencyResolver::createImportedType(const seds::model::DataTypeRef &typeRef)
-{
-    if (!typeRef.packageStr().has_value()) {
-        auto errorMessage = QString("Failure in creation of an imported type \"%1\" because no package name is present "
-                                    "in the data type reference")
-                                    .arg(typeRef.nameStr());
-        throw TranslationException(std::move(errorMessage));
-    }
-
-    const auto package = findPackage(*typeRef.packageStr());
-
-    visit(package);
-
-    const auto asn1ModuleName = Escaper::escapeAsn1PackageName(*typeRef.packageStr());
-    const auto asn1TypeName = Escaper::escapeAsn1TypeName(typeRef.nameStr());
-
-    return Asn1Acn::ImportedType(asn1ModuleName, asn1TypeName);
 }
 
 const seds::model::Package *PackagesDependencyResolver::findPackage(const QString &packageName) const
