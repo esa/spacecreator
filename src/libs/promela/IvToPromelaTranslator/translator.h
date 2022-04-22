@@ -31,6 +31,50 @@ namespace promela::translator {
 class IvToPromelaTranslator final : public ::conversion::translator::Translator
 {
 public:
+    class ObserverAttachment
+    {
+    public:
+        typedef enum
+        {
+            Kind_Input,
+            Kind_Output,
+        } Kind;
+
+        using Priority = uint32_t;
+
+        ObserverAttachment(QString specification);
+
+        auto function() const -> QString;
+        auto interface() const -> QString;
+        auto observer() const -> QString;
+        auto kind() const -> Kind;
+        auto priority() const -> Priority;
+
+    private:
+        QString m_functionName;
+        QString m_interfaceName;
+        QString m_observerName;
+        Priority m_priority;
+        Kind m_kind;
+    };
+
+    using ObserverAttachments = std::vector<ObserverAttachment>;
+
+    class Context
+    {
+    public:
+        Context(::promela::model::PromelaModel *promelaModel);
+
+        auto addObserverAttachment(ObserverAttachment attachment) -> void;
+        auto getObserverAttachments(QString function, QString interface, const ObserverAttachment::Kind kind)
+                -> const ObserverAttachments;
+        auto model() -> ::promela::model::PromelaModel *;
+
+    private:
+        ::promela::model::PromelaModel *m_promelaModel;
+        std::map<QString, std::map<QString, ObserverAttachments>> m_observerAttachments;
+    };
+
     /**
      * @brief   Translate given InterfaceView model into an Promela model
      *
@@ -64,18 +108,18 @@ public:
 private:
     auto generateInitProctype(const std::vector<QString> &modelFunctions, const ::ivm::IVModel *ivModel) const
             -> ::promela::model::InitProctype;
-    auto generateProctype(::promela::model::PromelaModel *promelaModel, const QString &functionName,
-            const QString &interfaceName, const QString &parameterType, size_t queueSize, size_t priority,
-            bool environment) const -> std::unique_ptr<::promela::model::Proctype>;
+    auto generateProctype(Context &context, const QString &functionName, const QString &interfaceName,
+            const QString &parameterType, size_t queueSize, size_t priority, bool environment) const
+            -> std::unique_ptr<::promela::model::Proctype>;
     auto generateEnvironmentProctype(const QString &functionName, const QString &interfaceName,
             const QString &parameterType, const QString &sendInline) const
             -> std::unique_ptr<::promela::model::Proctype>;
     auto generateSendInline(const QString &functionName, const QString &interfaceName, const QString &parameterName,
             const QString &parameterType, const QString &sourceFunctionName, const QString &sourceInterfaceName) const
             -> std::unique_ptr<::promela::model::InlineDef>;
-    auto createPromelaObjectsForFunction(::promela::model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,
-            ::ivm::IVFunction *ivFunction, const QString &functionName) const -> void;
-    auto createPromelaObjectsForEnvironment(::promela::model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,
+    auto createPromelaObjectsForFunction(Context &context, const ::ivm::IVModel *ivModel, ::ivm::IVFunction *ivFunction,
+            const QString &functionName) const -> void;
+    auto createPromelaObjectsForEnvironment(Context &context, const ::ivm::IVModel *ivModel,
             ::ivm::IVFunction *ivFunction, const QString &functionName) const -> void;
     auto createCheckQueueInline(::promela::model::PromelaModel *promelaModel, const QString &functionName,
             QList<QString> &channelNames) const -> void;

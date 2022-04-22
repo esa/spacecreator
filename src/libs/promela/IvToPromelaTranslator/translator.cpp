@@ -64,6 +64,84 @@ using shared::InterfaceParameter;
 using shared::VEObject;
 
 namespace promela::translator {
+
+IvToPromelaTranslator::ObserverAttachment::ObserverAttachment(QString specification)
+{
+    const auto separator = ":";
+    const auto kindIn = "in";
+    const auto elements = specification.split(separator, QString::KeepEmptyParts);
+    if (elements.size() < 3) {
+        throw ""; // TODO
+    }
+    m_observerName = elements[0];
+    m_functionName = elements[1];
+    m_interfaceName = elements[2];
+    m_kind = elements[3].toLower() == kindIn ? ObserverAttachment::Kind::Kind_Input
+                                             : ObserverAttachment::Kind::Kind_Output;
+    if (elements.size() == 5) {
+        bool ok;
+        m_priority = static_cast<IvToPromelaTranslator::ObserverAttachment::Priority>(elements[4].toInt(&ok));
+        if (!ok) {
+            throw ""; // TODO
+        }
+    } else {
+        m_priority = 1;
+    }
+    if (elements.size() > 5) {
+        throw ""; // TODO
+    }
+}
+
+auto IvToPromelaTranslator::ObserverAttachment::function() const -> QString
+{
+    return m_functionName;
+}
+auto IvToPromelaTranslator::ObserverAttachment::interface() const -> QString
+{
+    return m_interfaceName;
+}
+auto IvToPromelaTranslator::ObserverAttachment::observer() const -> QString
+{
+    return m_observerName;
+}
+auto IvToPromelaTranslator::ObserverAttachment::kind() const -> Kind
+{
+    return m_kind;
+}
+auto IvToPromelaTranslator::ObserverAttachment::priority() const -> IvToPromelaTranslator::ObserverAttachment::Priority
+{
+    return m_priority;
+}
+
+IvToPromelaTranslator::Context::Context(::promela::model::PromelaModel *promelaModel)
+{
+    m_promelaModel = promelaModel;
+}
+
+auto IvToPromelaTranslator::Context::addObserverAttachment(IvToPromelaTranslator::ObserverAttachment attachment) -> void
+{
+    m_observerAttachments[attachment.function()][attachment.interface()].push_back(attachment);
+}
+
+auto IvToPromelaTranslator::Context::getObserverAttachments(QString function, QString interface,
+        const ObserverAttachment::Kind kind) -> const IvToPromelaTranslator::ObserverAttachments
+{
+    ObserverAttachments result;
+    // [] may create new keys, but performance penalty is negligible and code is more terse
+    // The best way to implement this would be to use LINQ-like C++20 ranges
+    for (const auto attachment : m_observerAttachments[function][interface]) {
+        if (attachment.kind() == kind) {
+            result.push_back(attachment);
+        }
+    }
+    return result;
+}
+
+auto IvToPromelaTranslator::Context::model() -> ::promela::model::PromelaModel *
+{
+    return m_promelaModel;
+}
+
 std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
         std::vector<Model *> sourceModels, const Options &options) const
 {
@@ -72,6 +150,8 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     const std::vector<QString> environmentFunctions = options.values(PromelaOptions::environmentFunctionName);
 
     std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
+
+    Context context(promelaModel.get());
 
     const auto *ivModel = getModel<IVModel>(sourceModels);
 
@@ -86,10 +166,10 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
 
         if (std::find(modelFunctions.begin(), modelFunctions.end(), functionName) != modelFunctions.end()) {
             promelaModel->addInclude(QString("%1.pml").arg(functionName.toLower()));
-            createPromelaObjectsForFunction(promelaModel.get(), ivModel, ivFunction, functionName);
+            createPromelaObjectsForFunction(context, ivModel, ivFunction, functionName);
         } else if (std::find(environmentFunctions.begin(), environmentFunctions.end(), functionName)
                 != environmentFunctions.end()) {
-            createPromelaObjectsForEnvironment(promelaModel.get(), ivModel, ivFunction, functionName);
+            createPromelaObjectsForEnvironment(context, ivModel, ivFunction, functionName);
         }
     }
 
@@ -183,9 +263,35 @@ InitProctype IvToPromelaTranslator::generateInitProctype(
     return InitProctype(std::move(sequence));
 }
 
-std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *promelaModel,
-        const QString &functionName, const QString &interfaceName, const QString &parameterType, size_t queueSize,
-        size_t priority, bool environment) const
+static auto observerInputSignalName(QString observer, QString function, QString interface) -> QString
+{
+    return QString("%1_0_%2_0_PI_0_%3")
+            .arg(Escaper::escapePromelaIV(observer))
+            .arg(Escaper::escapePromelaIV(function))
+            .arg(Escaper::escapePromelaIV(interface));
+}
+
+static auto attachInputObservers(IvToPromelaTranslator::Context &context, QString functionName, QString interfaceName,
+        QString parameterName, const QString &parameterType, Sequence *sequence) -> void
+{
+    auto attachments = context.getObserverAttachments(
+            functionName, interfaceName, IvToPromelaTranslator::ObserverAttachment::Kind::Kind_Input);
+    std::sort(attachments.begin(), attachments.end(),
+            [](const auto &a, const auto &b) -> bool { return a.priority() > b.priority(); });
+    for (const auto &attachment : attachments) {
+        QList<InlineCall::Argument> arguments;
+        if (!parameterType.isEmpty()) {
+            arguments.append(VariableRef(parameterName));
+        }
+        sequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(
+                observerInputSignalName(attachment.observer(), attachment.function(), attachment.interface()),
+                arguments)));
+    }
+}
+
+std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(Context &context, const QString &functionName,
+        const QString &interfaceName, const QString &parameterType, size_t queueSize, size_t priority,
+        bool environment) const
 {
     QString channelName = constructChannelName(functionName, interfaceName);
     QList<ChannelInit::Type> channelType;
@@ -194,7 +300,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *
     ChannelInit channelInit(queueSize, std::move(channelType));
     Declaration declaration(DataType(BasicType::CHAN), channelName);
     declaration.setInit(channelInit);
-    promelaModel->addDeclaration(declaration);
+    context.model()->addDeclaration(declaration);
 
     Sequence sequence(Sequence::Type::NORMAL);
     std::unique_ptr<ProctypeElement> waitForInit = std::make_unique<ProctypeElement>(Expression(VariableRef("inited")));
@@ -243,6 +349,9 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *
         loopSequence->appendElement(
                 std::make_unique<ProctypeElement>(ChannelSend(VariableRef(lockChannelName), lockChannelArguments)));
     }
+
+    // Observers can be also attached to environment
+    attachInputObservers(context, functionName, interfaceName, signalParameterName, parameterType, loopSequence.get());
 
     DoLoop loop;
 
@@ -343,8 +452,8 @@ std::unique_ptr<::promela::model::InlineDef> IvToPromelaTranslator::generateSend
     return std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
 }
 
-void IvToPromelaTranslator::createPromelaObjectsForFunction(
-        PromelaModel *promelaModel, const IVModel *ivModel, IVFunction *ivFunction, const QString &functionName) const
+void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslator::Context &context,
+        const IVModel *ivModel, IVFunction *ivFunction, const QString &functionName) const
 {
     QVector<IVInterface *> providedInterfaceList = ivFunction->pis();
 
@@ -374,20 +483,20 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(
         const QString parameterName = parameter.first;
         const QString parameterType = parameter.second;
 
-        promelaModel->addInlineDef(generateSendInline(
+        context.model()->addInlineDef(generateSendInline(
                 functionName, interfaceName, parameterName, parameterType, sourceFunctionName, sourceInterfaceName));
 
-        promelaModel->addProctype(
-                generateProctype(promelaModel, functionName, interfaceName, parameterType, queueSize, priority, false));
+        context.model()->addProctype(
+                generateProctype(context, functionName, interfaceName, parameterType, queueSize, priority, false));
 
         channelNames.append(constructChannelName(functionName, interfaceName));
     }
 
-    createCheckQueueInline(promelaModel, functionName, channelNames);
+    createCheckQueueInline(context.model(), functionName, channelNames);
 }
 
-void IvToPromelaTranslator::createPromelaObjectsForEnvironment(
-        PromelaModel *promelaModel, const IVModel *ivModel, IVFunction *ivFunction, const QString &functionName) const
+void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTranslator::Context &context,
+        const IVModel *ivModel, IVFunction *ivFunction, const QString &functionName) const
 {
     QVector<IVInterface *> providedInterfaceList = ivFunction->pis();
     for (IVInterface *providedInterface : providedInterfaceList) {
@@ -410,14 +519,14 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(
         const QString parameterName = parameter.first;
         const QString parameterType = parameter.second;
 
-        promelaModel->addInlineDef(generateSendInline(
+        context.model()->addInlineDef(generateSendInline(
                 functionName, interfaceName, parameterName, parameterType, sourceFunctionName, sourceInterfaceName));
 
         const size_t queueSize = getInterfaceQueueSize(providedInterface);
         const size_t priority = getInterfacePriority(providedInterface);
 
-        promelaModel->addProctype(
-                generateProctype(promelaModel, functionName, interfaceName, parameterType, queueSize, priority, true));
+        context.model()->addProctype(
+                generateProctype(context, functionName, interfaceName, parameterType, queueSize, priority, true));
     }
 
     QVector<IVInterface *> requiredInterfaceList = ivFunction->ris();
@@ -438,7 +547,8 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(
         const QString sendInline =
                 QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
 
-        promelaModel->addProctype(generateEnvironmentProctype(functionName, interfaceName, parameterType, sendInline));
+        context.model()->addProctype(
+                generateEnvironmentProctype(functionName, interfaceName, parameterType, sendInline));
     }
 }
 
