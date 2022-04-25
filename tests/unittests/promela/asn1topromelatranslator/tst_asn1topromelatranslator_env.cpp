@@ -34,6 +34,7 @@
 #include "options.h"
 #include "promela/PromelaExporter/promelaexporter.h"
 #include "promela/PromelaOptions/options.h"
+#include "sequencecomponent.h"
 #include "typeassignment.h"
 #include "types/type.h"
 #include "types/userdefinedtype.h"
@@ -412,24 +413,44 @@ void tst_Asn1ToPromelaTranslator_Env::testSequence() const
     }
 }
 
+unsigned int countNestedDefinitionsInAsnSequences(const Asn1Acn::File &asnFile)
+{
+    unsigned int nestedDefinitions = 0;
+
+    for (const auto &definition : asnFile.definitionsList()) {
+        for (const auto &type : definition->types()) {
+            const auto &typeType = type->type();
+            if (typeType->typeEnum() == Asn1Acn::Types::Type::SEQUENCE) {
+                const auto &typeTypeSeq = reinterpret_cast<Asn1Acn::Types::Sequence *>(typeType);
+                nestedDefinitions += typeTypeSeq->components().size();
+            }
+        }
+    }
+
+    return nestedDefinitions;
+}
+
 void tst_Asn1ToPromelaTranslator_Env::testSequenceEmbeddedType() const
 {
-    // auto asnModel = plugincommon::ModelLoader::loadAsn1Model("resources/myModule_typesInSeq.asn");
-    // QVERIFY(asnModel != nullptr);
-    // QVERIFY(!asnModel->data().empty());
+    auto asnModel = plugincommon::ModelLoader::loadAsn1Model("resources/myModule_typesInSeq.asn");
+    QVERIFY(asnModel != nullptr);
+    QVERIFY(!asnModel->data().empty());
 
-    // PromelaModel promelaModel;
-    // const QStringList typesToTranslate = { "EnvParamSeq" };
-    // Asn1NodeValueGeneratorVisitor visitor(promelaModel, typesToTranslate);
-    // QVERIFY(!asnModel->data().empty());
-    // const auto &asnFile = *asnModel->data().front();
-    // visitor.visit(asnFile);
-    // exportPromelaModel(promelaModel, "sequences.pr"); // TODO: this line shall be removed
+    PromelaModel promelaModel;
+    const QStringList typesToTranslate = { "EnvParamSeq" };
+    Asn1NodeValueGeneratorVisitor visitor(promelaModel, typesToTranslate);
+    QVERIFY(!asnModel->data().empty());
+    const auto &asnFile = *asnModel->data().front();
+    visitor.visit(asnFile);
+    exportPromelaModel(promelaModel, "sequences.pr"); // TODO: this line shall be removed
 
-    // const auto &asnDefinitionsList = asnFile.definitionsList();
-    // const auto &promelaInlineDefs = promelaModel.getInlineDefs();
-    // // QCOMPARE(promelaInlineDefs.size(), asnDefinitionsList.front()->typeAssignmentNames().size());
-    // const int defsSize = promelaInlineDefs.size();
+    const auto &asnDefinitionsList = asnFile.definitionsList();
+    const auto &promelaInlineDefs = promelaModel.getInlineDefs();
+    const unsigned int promelaInlineDefinitionsNumber = promelaInlineDefs.size();
+    const unsigned int asnDefinitionsNumber =
+            asnDefinitionsList.front()->typeAssignmentNames().size() + countNestedDefinitionsInAsnSequences(asnFile);
+    QCOMPARE(promelaInlineDefinitionsNumber, asnDefinitionsNumber);
+    const int defsSize = promelaInlineDefs.size();
 
     // for (int i = 0; i < defsSize; i++) {
     //     if (std::next(promelaInlineDefs.begin(), i) == promelaInlineDefs.end() //
