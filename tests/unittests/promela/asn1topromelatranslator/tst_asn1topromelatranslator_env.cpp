@@ -40,6 +40,7 @@
 #include "types/typereadingvisitor.h"
 #include "types/userdefinedtype.h"
 #include "variableref.h"
+#include "visitors/asn1constraintvisitor.h"
 
 #include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
@@ -437,6 +438,32 @@ unsigned int countNestedDefinitionsInAsnSequences(const Asn1Acn::File &asnFile)
     return nestedDefinitions;
 }
 
+void checkSequenceInlineDefinitions(const std::list<std::unique_ptr<promela::model::InlineDef>> &promelaInlineDefs,
+        Asn1Acn::TypeAssignment *const asnTypeAssignmentPtr, const QStringList &expectedDefNames)
+{
+    QStringList::ConstIterator expectedDefNameIt = expectedDefNames.begin();
+
+    for (const auto &promelaInlineDef : promelaInlineDefs) {
+        auto *const inlineDefPtr = promelaInlineDef.get();
+
+        QCOMPARE(inlineDefPtr->getName(), *expectedDefNameIt++);
+
+        const auto &definitionArguments = inlineDefPtr->getArguments();
+        QCOMPARE(definitionArguments.size(), 1);
+        const auto &argument = definitionArguments.front();
+        QCOMPARE(argument, "value");
+
+        const Sequence &mainSequence = inlineDefPtr->getSequence();
+        if (asnTypeAssignmentPtr->typeEnum() == Asn1Acn::Types::Type::SEQUENCE) {
+            auto *const parentNode = static_cast<Asn1Acn::Definitions *>(asnTypeAssignmentPtr->parent());
+            QVERIFY(parentNode);
+            checkSequence(mainSequence, parentNode->types().size());
+        } else {
+            checkSequence(mainSequence);
+        }
+    }
+}
+
 void tst_Asn1ToPromelaTranslator_Env::testSequenceEmbeddedType() const
 {
     auto asnModel = plugincommon::ModelLoader::loadAsn1Model("resources/myModule_typesInSeq.asn");
@@ -466,15 +493,12 @@ void tst_Asn1ToPromelaTranslator_Env::testSequenceEmbeddedType() const
         "EnvParamSeq_generate_value",
     };
 
-    auto *const inlineDefPtr = promelaInlineDefs.begin()->get();
-
     const auto &asnDefinition = asnDefinitionsList.at(0);
     const auto &types = asnDefinition->types();
     const auto &type = types.at(0);
     auto *const asnTypeAssignmentPtr = type.get();
 
-    // todo: ta funkcja powinna wyluskiwac skladowe z asn-owego typu zlozonego
-    checkInlineDefinition(inlineDefPtr, asnTypeAssignmentPtr, expectedDefNames.at(0));
+    checkSequenceInlineDefinitions(promelaInlineDefs, asnTypeAssignmentPtr, expectedDefNames);
 }
 
 std::unique_ptr<Definitions> tst_Asn1ToPromelaTranslator_Env::createModel() const
