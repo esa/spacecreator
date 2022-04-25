@@ -37,6 +37,7 @@ public:
      * @brief Argument type definition.
      */
     using Argument = std::variant<VariableRef, Constant>;
+
     /**
      * @brief Constructor
      *
