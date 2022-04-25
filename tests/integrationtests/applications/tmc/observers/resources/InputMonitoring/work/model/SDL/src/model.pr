@@ -1,8 +1,8 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Model;
     /* CIF TEXT (830, 16), (132, 44) */
-    dcl x T_int32;
-    dcl y T_int32;
+    dcl x MyInteger;
+    dcl y MyInteger;
     /* CIF ENDTEXT */
     /* CIF START (320, 10), (70, 35) */
     START;

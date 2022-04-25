@@ -6,14 +6,16 @@
 
 **/wrappers/*
 **/code/*
+**/cache/*
 
 work/binaries
 work/build
 work/dataview
 work/Debug
 work/sql_db
+work/glue_simu
+work/simulation
 work/glue_debug
 work/Makefile
 work/skeletons_built
 work/taste.pro
-work/glue_debug
