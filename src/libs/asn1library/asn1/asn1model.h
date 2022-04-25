@@ -38,6 +38,10 @@ public:
 
 public:
     /**
+     * @brief   Default constructor
+     */
+    Asn1Model() = default;
+    /**
      * @brief   Constructor
      *
      * @param   data    Model data
@@ -82,6 +86,13 @@ public:
      * @returns Model data
      */
     auto data() -> Data &;
+
+    /**
+     * @brief   Adds an ASN.1 file to the data
+     *
+     * @param   asn1File    File to add
+     */
+    auto addAsn1File(std::unique_ptr<File> asn1File) -> void;
 
 private:
     /** @brief  Model data */

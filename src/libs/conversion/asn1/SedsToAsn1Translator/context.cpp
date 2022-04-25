@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,33 +17,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "asn1model.h"
+#include "context.h"
 
-namespace Asn1Acn {
+namespace conversion::asn1::translator {
 
-Asn1Model::Asn1Model(Asn1Model::Data data)
-    : m_data(std::move(data))
+Context::Context(const Asn1Acn::Definitions *definitions, const Context *parentContext)
+    : m_definitions(definitions)
+    , m_parentContext(parentContext)
 {
 }
 
-conversion::ModelType Asn1Model::modelType() const
-{
-    return conversion::ModelProperties<Asn1Model>::type;
-}
-
-const Asn1Model::Data &Asn1Model::data() const
-{
-    return m_data;
-}
-
-Asn1Model::Data &Asn1Model::data()
-{
-    return m_data;
-}
-
-void Asn1Model::addAsn1File(std::unique_ptr<File> asn1File)
-{
-    m_data.push_back(std::move(asn1File));
-}
-
-} // namespace Asn1Acn
+} // namespace conversion::asn1::translator

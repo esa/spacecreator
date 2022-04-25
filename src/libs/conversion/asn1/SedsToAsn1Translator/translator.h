@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -18,6 +18,8 @@
  */
 
 #pragma once
+
+#include "context.h"
 
 #include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/importedtype.h>
@@ -79,7 +81,14 @@ private:
     auto translateSedsModel(const seds::model::SedsModel *sedsModel, const Options &options) const
             -> std::vector<std::unique_ptr<Model>>;
 
-    auto translatePackage(const seds::model::Package *sedsPackage) const -> void;
+    auto translatePackage(const seds::model::Package *sedsPackage, Asn1Acn::Asn1Model *asn1Model) const -> void;
+
+    auto translateDataTypeSet(const std::list<const seds::model::DataType *> &sedsDataTypes,
+            Asn1Acn::Definitions *outputAsn1Definitions, const Context &context) const -> void;
+
+private:
+    auto collectDataTypes(const seds::model::Package *package) const -> std::vector<const seds::model::DataType *>;
+    auto collectDataTypes(const seds::model::Component &component) const -> std::vector<const seds::model::DataType *>;
 };
 
 } // namespace conversion::asn1::translator

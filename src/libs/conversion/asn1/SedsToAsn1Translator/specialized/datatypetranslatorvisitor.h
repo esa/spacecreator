@@ -1,0 +1,117 @@
+/** @file
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+
+#pragma once
+
+#include "context.h"
+
+#include <seds/SedsModel/base/description.h>
+#include <seds/SedsModel/types/datatype.h>
+
+namespace Asn1Acn {
+namespace Types {
+class BitString;
+} // namespace Types
+} // namespace Asn1Acn
+
+namespace conversion::asn1::translator {
+
+/**
+ * @brief   Translator visitor for SEDS data type
+ *
+ * Translated data type will be added to the passed ASN.1 Definitions
+ */
+class DataTypeTranslatorVisitor final
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   outputAsn1Definitions   Where created types will be placed
+     * @param   context                 Current translation context
+     */
+    DataTypeTranslatorVisitor(Asn1Acn::Definitions *outputAsn1Definitions, const Context &context);
+
+    /**
+     * @brief   Translates SEDS array data type
+     *
+     * @param   sedsType    Type to translate
+     */
+    auto operator()(const seds::model::ArrayDataType &sedsType) -> void;
+    /**
+     * @brief   Translates SEDS binary data type
+     *
+     * @param   sedsType    Type to translate
+     */
+    auto operator()(const seds::model::BinaryDataType &sedsType) -> void;
+    /**
+     * @brief   Translates SEDS boolean data type
+     *
+     * @param   sedsType    Type to translate
+     */
+    auto operator()(const seds::model::BooleanDataType &sedsType) -> void;
+    /**
+     * @brief   Translates SEDS container data type
+     *
+     * @param   sedsType    Type to translate
+     */
+    auto operator()(const seds::model::ContainerDataType &sedsType) -> void;
+    /**
+     * @brief   Translates SEDS enumerated data type
+     *
+     * @param   sedsType    Type to translate
+     */
+    auto operator()(const seds::model::EnumeratedDataType &sedsType) -> void;
+    /**
+     * @brief   Translates SEDS float data type
+     *
+     * @param   sedsType    Type to translate
+     */
+    auto operator()(const seds::model::FloatDataType &sedsType) -> void;
+    /**
+     * @brief   Translates SEDS integer data type
+     *
+     * @param   sedsType    Type to translate
+     */
+    auto operator()(const seds::model::IntegerDataType &sedsType) -> void;
+    /**
+     * @brief   Translates SEDS string data type
+     *
+     * @param   sedsType    Type to translate
+     */
+    auto operator()(const seds::model::StringDataType &sedsType) -> void;
+    /**
+     * @brief   Translates SEDS subrange data type
+     *
+     * @param   sedsType    Type to translate
+     */
+    auto operator()(const seds::model::SubRangeDataType &sedsType) -> void;
+
+private:
+    auto addType(std::unique_ptr<Asn1Acn::Types::Type> type, const seds::model::Description *sedsDescription) -> void;
+
+    auto translateBitStringLength(
+            const seds::model::BinaryDataType &sedsType, Asn1Acn::Types::BitString *asn1Type) const -> void;
+
+private:
+    Asn1Acn::Definitions *m_outputAsn1Definitions;
+    const Context &m_context;
+};
+
+} // namespace conversion::asn1::translator

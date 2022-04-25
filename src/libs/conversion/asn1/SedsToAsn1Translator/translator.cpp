@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -21,6 +21,8 @@
 
 #include "datatypesdependencyresolver.h"
 #include "packagesdependencyresolver.h"
+#include "specialized/datatypetranslatorvisitor.h"
+#include "specialized/descriptiontranslator.h"
 
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/file.h>
@@ -68,14 +70,13 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(
 {
     Q_UNUSED(options);
 
-    std::vector<std::unique_ptr<Asn1Acn::File>> asn1Files;
+    auto asn1Model = std::make_unique<Asn1Model>();
 
     const auto &sedsModelData = sedsModel->data();
 
     if (std::holds_alternative<seds::model::PackageFile>(sedsModelData)) {
         const auto &sedsPackage = std::get<seds::model::PackageFile>(sedsModelData).package();
-
-        translatePackage(&sedsPackage);
+        translatePackage(&sedsPackage, asn1Model.get());
     } else if (std::holds_alternative<seds::model::DataSheet>(sedsModelData)) {
         const auto &sedsPackages = std::get<seds::model::DataSheet>(sedsModelData).packages();
 
@@ -83,13 +84,11 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(
         const auto resolvedSedsPackages = packagesDependencyResolver.resolve(&sedsPackages);
 
         for (const auto sedsPackage : resolvedSedsPackages) {
-            translatePackage(sedsPackage);
+            translatePackage(sedsPackage, asn1Model.get());
         }
     } else {
         throw TranslationException("Unhandled SEDS model data type");
     }
-
-    auto asn1Model = std::make_unique<Asn1Model>(std::move(asn1Files));
 
     std::vector<std::unique_ptr<Model>> result;
     result.push_back(std::move(asn1Model));
@@ -97,9 +96,90 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(
     return result;
 }
 
-void SedsToAsn1Translator::translatePackage(const seds::model::Package *sedsPackage) const
+void SedsToAsn1Translator::translatePackage(
+        const seds::model::Package *sedsPackage, Asn1Acn::Asn1Model *asn1Model) const
 {
-    Q_UNUSED(sedsPackage);
+    DataTypesDependencyResolver typesDependencyResolver;
+
+    // Create package ASN.1 definitions
+    const auto packageAsn1DefinitionsName = Escaper::escapeAsn1PackageName(sedsPackage->nameStr());
+    auto packageAsn1Definitions =
+            std::make_unique<Asn1Acn::Definitions>(packageAsn1DefinitionsName, Asn1Acn::SourceLocation());
+    DescriptionTranslator::translate(sedsPackage, packageAsn1Definitions.get());
+
+    // Create package context
+    const Context packageContext(packageAsn1Definitions.get(), nullptr);
+
+    // Translate package data types
+    const auto packageSedsTypes = collectDataTypes(sedsPackage);
+    const auto packageResolvedSedsTypes = typesDependencyResolver.resolve(&packageSedsTypes, nullptr);
+    translateDataTypeSet(packageResolvedSedsTypes, packageAsn1Definitions.get(), packageContext);
+
+    for (const auto &sedsComponent : sedsPackage->components()) {
+        // Create component ASN.1 definitions
+        const auto componentAsn1DefinitionsName = QString("%1-%2")
+                                                          .arg(packageAsn1DefinitionsName)
+                                                          .arg(Escaper::escapeAsn1PackageName(sedsComponent.nameStr()));
+        auto componentAsn1Definitions =
+                std::make_unique<Asn1Acn::Definitions>(componentAsn1DefinitionsName, Asn1Acn::SourceLocation());
+        DescriptionTranslator::translate(&sedsComponent, componentAsn1Definitions.get());
+
+        // Create component context
+        const Context componentContext(componentAsn1Definitions.get(), &packageContext);
+
+        // Translate component data types
+        const auto componentSedsTypes = collectDataTypes(sedsComponent);
+        const auto componentResolvedSedsTypes = typesDependencyResolver.resolve(&componentSedsTypes, &packageSedsTypes);
+        translateDataTypeSet(componentResolvedSedsTypes, componentAsn1Definitions.get(), componentContext);
+
+        // Create and add component ASN.1 file
+        auto componentAsn1File = std::make_unique<Asn1Acn::File>(componentAsn1DefinitionsName);
+        componentAsn1File->add(std::move(componentAsn1Definitions));
+
+        asn1Model->addAsn1File(std::move(componentAsn1File));
+    }
+
+    // Create and add package ASN.1 file
+    auto packageAsn1File = std::make_unique<Asn1Acn::File>(packageAsn1DefinitionsName);
+    packageAsn1File->add(std::move(packageAsn1Definitions));
+
+    asn1Model->addAsn1File(std::move(packageAsn1File));
+}
+
+void SedsToAsn1Translator::translateDataTypeSet(const std::list<const seds::model::DataType *> &sedsDataTypes,
+        Asn1Acn::Definitions *outputAsn1Definitions, const Context &context) const
+{
+    DataTypeTranslatorVisitor dataTypeVisitor(outputAsn1Definitions, context);
+
+    for (const auto sedsDataType : sedsDataTypes) {
+        std::visit(dataTypeVisitor, *sedsDataType);
+    }
+}
+
+std::vector<const seds::model::DataType *> SedsToAsn1Translator::collectDataTypes(
+        const seds::model::Package *package) const
+{
+    const auto extractPointer = [](const auto &dataType) { return &dataType; };
+
+    std::vector<const seds::model::DataType *> sedsDataTypes;
+
+    std::transform(package->dataTypes().begin(), package->dataTypes().end(), std::back_inserter(sedsDataTypes),
+            extractPointer);
+
+    return sedsDataTypes;
+}
+
+std::vector<const seds::model::DataType *> SedsToAsn1Translator::collectDataTypes(
+        const seds::model::Component &component) const
+{
+    const auto extractPointer = [](const auto &dataType) { return &dataType; };
+
+    std::vector<const seds::model::DataType *> sedsDataTypes;
+
+    std::transform(component.dataTypes().begin(), component.dataTypes().end(), std::back_inserter(sedsDataTypes),
+            extractPointer);
+
+    return sedsDataTypes;
 }
 
 } // namespace conversion::asn1::translator
