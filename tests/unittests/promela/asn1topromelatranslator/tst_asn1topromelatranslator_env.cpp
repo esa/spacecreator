@@ -333,6 +333,7 @@ void checkSequence(const Sequence &sequence, const int expectedContentSize = 1)
 {
     QCOMPARE(sequence.getType(), Sequence::Type::NORMAL);
     const auto &sequenceContent = sequence.getContent();
+    qDebug() << "sequence content index: " << sequenceContent.begin()->get()->getValue().index();
     QCOMPARE(sequenceContent.size(), expectedContentSize);
 
     for (const auto &content : sequenceContent) {
@@ -429,7 +430,7 @@ unsigned int countNestedDefinitionsInAsnSequences(const Asn1Acn::File &asnFile)
         for (const auto &type : definition->types()) {
             const auto &typeType = type->type();
             if (typeType->typeEnum() == Asn1Acn::Types::Type::SEQUENCE) {
-                const auto &typeTypeSeq = reinterpret_cast<Asn1Acn::Types::Sequence *>(typeType);
+                const auto &typeTypeSeq = static_cast<Asn1Acn::Types::Sequence *>(typeType);
                 nestedDefinitions += typeTypeSeq->components().size();
             }
         }
@@ -453,13 +454,22 @@ void checkSequenceInlineDefinitions(const std::list<std::unique_ptr<promela::mod
         const auto &argument = definitionArguments.front();
         QCOMPARE(argument, "value");
 
-        const Sequence &mainSequence = inlineDefPtr->getSequence();
-        if (asnTypeAssignmentPtr->typeEnum() == Asn1Acn::Types::Type::SEQUENCE) {
-            auto *const parentNode = static_cast<Asn1Acn::Definitions *>(asnTypeAssignmentPtr->parent());
-            QVERIFY(parentNode);
-            checkSequence(mainSequence, parentNode->types().size());
+        const auto &promelaSequence = inlineDefPtr->getSequence();
+        const auto &asnTypeEnum = asnTypeAssignmentPtr->typeEnum();
+        if (asnTypeEnum == Asn1Acn::Types::Type::SEQUENCE) {
+            auto *const asnSequence = static_cast<Asn1Acn::Types::Sequence *>(asnTypeAssignmentPtr->type());
+            qDebug() << "promela sequence ind: " << promelaSequence.getContent().begin()->get()->getValue().index();
+            // using Value = std::variant<Declaration, ChannelSend, ChannelRecv, Expression, DoLoop, Assignment,
+            //                            InlineCall, Skip, Conditional, Sequence, ForLoop>
+            const auto &val = promelaSequence.getContent().begin()->get()->getValue();
+            if (std::holds_alternative<InlineCall>(val)) {
+                const auto &ic = std::get<InlineCall>(val);
+                qDebug() << "inlinecall: " << ic.getName();
+            }
+
+            checkSequence(promelaSequence, asnSequence->components().size());
         } else {
-            checkSequence(mainSequence);
+            checkSequence(promelaSequence);
         }
     }
 }
