@@ -29,13 +29,11 @@
 #include <asn1library/asn1/types/real.h>
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/values.h>
-#include <conversion/asn1/SedsToAsn1Translator/specialized/rangetranslatorvisitor.h>
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/translation/exceptions.h>
 #include <sdl/SdlModel/return.h>
 #include <seds/SedsModel/types/ranges/floatprecisionrange.h>
 
-using conversion::asn1::translator::RangeTranslatorVisitor;
 using conversion::asn1::translator::SedsToAsn1Translator;
 using conversion::translator::TranslationException;
 
@@ -171,48 +169,53 @@ auto SplineCalibratorTranslator::buildSplinePointsVariable(
 
 auto SplineCalibratorTranslator::createAsn1Types(Context &context) -> void
 {
-    auto asn1Definitions =
-            SedsToAsn1Translator::getAsn1Definitions(context.sedsPackage().nameStr(), context.asn1Model()->data());
-    Q_UNUSED(asn1Definitions);
+    // TODO
+    /* auto asn1Definitions = */
+    /*         SedsToAsn1Translator::getAsn1Definitions(context.sedsPackage().nameStr(), context.asn1Model()->data());
+     */
+    /* Q_UNUSED(asn1Definitions); */
 
-    // Create type for spline points values
-    auto splinePointType = std::make_unique<Asn1Acn::Types::Real>(m_splinePointValueTypeName);
-    splinePointType->setEncoding(Asn1Acn::Types::RealEncoding::IEEE754_1985_64);
-    auto splinePointTypeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::RealValue>::create(
-            { std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max() });
-    splinePointType->constraints().append(std::move(splinePointTypeConstraint));
+    /* // Create type for spline points values */
+    /* auto splinePointType = std::make_unique<Asn1Acn::Types::Real>(m_splinePointValueTypeName); */
+    /* splinePointType->setEncoding(Asn1Acn::Types::RealEncoding::IEEE754_1985_64); */
+    /* auto splinePointTypeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::RealValue>::create( */
+    /*         { std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max() }); */
+    /* splinePointType->constraints().append(std::move(splinePointTypeConstraint)); */
 
-    // Create type for array of spline points values
-    auto splinePointsArrayType = std::make_unique<Asn1Acn::Types::SequenceOf>(m_splinePointsArrayTypeName);
-    splinePointsArrayType->setItemsType(splinePointType->clone());
-    auto splinePointsArrayTypeInnerConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
-            { 0, static_cast<Asn1Acn::IntegerValue::Type>(context.maxSplinePointCount()) });
-    auto splinePointsArrayTypeConstraint =
-            std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::IntegerValue>>();
-    splinePointsArrayTypeConstraint->setInnerConstraints(std::move(splinePointsArrayTypeInnerConstraint));
-    splinePointsArrayType->constraints().append(std::move(splinePointsArrayTypeConstraint));
+    /* // Create type for array of spline points values */
+    /* auto splinePointsArrayType = std::make_unique<Asn1Acn::Types::SequenceOf>(m_splinePointsArrayTypeName); */
+    /* splinePointsArrayType->setItemsType(splinePointType->clone()); */
+    /* auto splinePointsArrayTypeInnerConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
+     */
+    /*         { 0, static_cast<Asn1Acn::IntegerValue::Type>(context.maxSplinePointCount()) }); */
+    /* auto splinePointsArrayTypeConstraint = */
+    /*         std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::IntegerValue>>(); */
+    /* splinePointsArrayTypeConstraint->setInnerConstraints(std::move(splinePointsArrayTypeInnerConstraint)); */
+    /* splinePointsArrayType->constraints().append(std::move(splinePointsArrayTypeConstraint)); */
 
-    // Create type for index of array of spline points values
-    auto splinePointsArrayIndexType = std::make_unique<Asn1Acn::Types::Integer>(m_splinePointsArrayIndexTypeName);
-    splinePointsArrayIndexType->setSize(8 * sizeof(std::size_t));
-    splinePointsArrayIndexType->setEncoding(Asn1Acn::Types::IntegerEncoding::twos_complement);
-    auto splinePointsArrayIndexTypeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
-            { -1, static_cast<Asn1Acn::IntegerValue::Type>(context.maxSplinePointCount()) });
-    splinePointsArrayIndexType->constraints().append(std::move(splinePointsArrayIndexTypeConstraint));
+    /* // Create type for index of array of spline points values */
+    /* auto splinePointsArrayIndexType = std::make_unique<Asn1Acn::Types::Integer>(m_splinePointsArrayIndexTypeName); */
+    /* splinePointsArrayIndexType->setSize(8 * sizeof(std::size_t)); */
+    /* splinePointsArrayIndexType->setEncoding(Asn1Acn::Types::IntegerEncoding::twos_complement); */
+    /* auto splinePointsArrayIndexTypeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
+     */
+    /*         { -1, static_cast<Asn1Acn::IntegerValue::Type>(context.maxSplinePointCount()) }); */
+    /* splinePointsArrayIndexType->constraints().append(std::move(splinePointsArrayIndexTypeConstraint)); */
 
-    // Add types to ASN.1 definitions
-    auto splinePointTypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(m_splinePointValueTypeName,
-            m_splinePointValueTypeName, Asn1Acn::SourceLocation(), std::move(splinePointType));
-    asn1Definitions->addType(std::move(splinePointTypeAssignment));
+    /* // Add types to ASN.1 definitions */
+    /* auto splinePointTypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(m_splinePointValueTypeName, */
+    /*         m_splinePointValueTypeName, Asn1Acn::SourceLocation(), std::move(splinePointType)); */
+    /* asn1Definitions->addType(std::move(splinePointTypeAssignment)); */
 
-    auto splinePointsArrayTypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(m_splinePointsArrayTypeName,
-            m_splinePointsArrayTypeName, Asn1Acn::SourceLocation(), std::move(splinePointsArrayType));
-    asn1Definitions->addType(std::move(splinePointsArrayTypeAssignment));
+    /* auto splinePointsArrayTypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(m_splinePointsArrayTypeName, */
+    /*         m_splinePointsArrayTypeName, Asn1Acn::SourceLocation(), std::move(splinePointsArrayType)); */
+    /* asn1Definitions->addType(std::move(splinePointsArrayTypeAssignment)); */
 
-    auto splinePointsArrayIndexTypeAssignment =
-            std::make_unique<Asn1Acn::TypeAssignment>(m_splinePointsArrayIndexTypeName,
-                    m_splinePointsArrayIndexTypeName, Asn1Acn::SourceLocation(), std::move(splinePointsArrayIndexType));
-    asn1Definitions->addType(std::move(splinePointsArrayIndexTypeAssignment));
+    /* auto splinePointsArrayIndexTypeAssignment = */
+    /*         std::make_unique<Asn1Acn::TypeAssignment>(m_splinePointsArrayIndexTypeName, */
+    /*                 m_splinePointsArrayIndexTypeName, Asn1Acn::SourceLocation(),
+     * std::move(splinePointsArrayIndexType)); */
+    /* asn1Definitions->addType(std::move(splinePointsArrayIndexTypeAssignment)); */
 }
 
 auto SplineCalibratorTranslator::buildFindIntervalProcedure(Context &context) -> void

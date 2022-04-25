@@ -6,14 +6,16 @@ set(SOURCES     context.cpp
                 patchersnippetsgenerator.cpp
                 translator.cpp
                 specialized/datatypetranslatorvisitor.cpp
-                specialized/descriptiontranslator.cpp)
+                specialized/descriptiontranslator.cpp
+                specialized/rangetranslatorvisitor.cpp)
 set(INCLUDES    context.h
                 datatypesdependencyresolver.h
                 packagesdependencyresolver.h
                 patchersnippetsgenerator.h
                 translator.h
                 specialized/datatypetranslatorvisitor.h
-                specialized/descriptiontranslator.h)
+                specialized/descriptiontranslator.h
+                specialized/rangetranslatorvisitor.h)
 
 add_library(SedsToAsn1Translator STATIC)
 target_sources(SedsToAsn1Translator

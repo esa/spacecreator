@@ -20,6 +20,7 @@
 #include "specialized/datatypetranslatorvisitor.h"
 
 #include "specialized/descriptiontranslator.h"
+#include "specialized/rangetranslatorvisitor.h"
 
 #include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
@@ -76,6 +77,7 @@ void DataTypeTranslatorVisitor::operator()(const seds::model::BinaryDataType &se
 {
     const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
     auto asn1Type = std::make_unique<Asn1Acn::Types::BitString>(asn1TypeName);
+
     translateBitStringLength(sedsType, asn1Type.get());
 
     addType(std::move(asn1Type), &sedsType);
@@ -83,7 +85,12 @@ void DataTypeTranslatorVisitor::operator()(const seds::model::BinaryDataType &se
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::BooleanDataType &sedsType)
 {
-    Q_UNUSED(sedsType);
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto asn1Type = std::make_unique<Asn1Acn::Types::Boolean>(asn1TypeName);
+
+    translateBooleanEncoding(sedsType, asn1Type.get());
+
+    addType(std::move(asn1Type), &sedsType);
 }
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::ContainerDataType &sedsType)
@@ -93,22 +100,50 @@ void DataTypeTranslatorVisitor::operator()(const seds::model::ContainerDataType 
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::EnumeratedDataType &sedsType)
 {
-    Q_UNUSED(sedsType);
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto asn1Type = std::make_unique<Asn1Acn::Types::Enumerated>(asn1TypeName);
+
+    translateIntegerEncoding(sedsType.encoding(), asn1Type.get());
+    translateEnumerationList(sedsType, asn1Type.get());
+
+    addType(std::move(asn1Type), &sedsType);
 }
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::FloatDataType &sedsType)
 {
-    Q_UNUSED(sedsType);
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto asn1Type = std::make_unique<Asn1Acn::Types::Real>(asn1TypeName);
+
+    translateFloatEncoding(sedsType, asn1Type.get());
+
+    RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue> rangeTranslator(asn1Type.get());
+    std::visit(rangeTranslator, sedsType.range());
+
+    addType(std::move(asn1Type), &sedsType);
 }
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::IntegerDataType &sedsType)
 {
-    Q_UNUSED(sedsType);
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto asn1Type = std::make_unique<Asn1Acn::Types::Integer>(asn1TypeName);
+
+    translateIntegerEncoding(sedsType.encoding(), asn1Type.get());
+
+    RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue> rangeTranslator(asn1Type.get());
+    std::visit(rangeTranslator, sedsType.range());
+
+    addType(std::move(asn1Type), &sedsType);
 }
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::StringDataType &sedsType)
 {
-    Q_UNUSED(sedsType);
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto asn1Type = std::make_unique<Asn1Acn::Types::IA5String>(asn1TypeName);
+
+    translateStringLength(sedsType, asn1Type.get());
+    translateStringEncoding(sedsType, asn1Type.get());
+
+    addType(std::move(asn1Type), &sedsType);
 }
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::SubRangeDataType &sedsType)
@@ -147,6 +182,219 @@ void DataTypeTranslatorVisitor::translateBitStringLength(
     }
 
     asn1Type->constraints().append(std::move(sizeConstraint));
+}
+
+void DataTypeTranslatorVisitor::translateStringLength(
+        const StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
+{
+    if (sedsType.length() > std::numeric_limits<Asn1Acn::IntegerValue::Type>::max()) {
+        throw TranslationException("String length size overflows ASN.1 range");
+    }
+
+    auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::StringValue>>();
+
+    if (sedsType.hasFixedLength()) {
+        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
+                { static_cast<Asn1Acn::IntegerValue::Type>(sedsType.length()) });
+        sizeConstraint->setInnerConstraints(std::move(constraint));
+    } else {
+        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
+                { 0, static_cast<Asn1Acn::IntegerValue::Type>(sedsType.length()) });
+        sizeConstraint->setInnerConstraints(std::move(constraint));
+    }
+
+    asn1Type->constraints().append(std::move(sizeConstraint));
+}
+
+void DataTypeTranslatorVisitor::translateBooleanEncoding(
+        const seds::model::BooleanDataType &sedsType, Asn1Acn::Types::Boolean *asn1Type) const
+{
+    if (const auto &encoding = sedsType.encoding(); encoding.has_value()) {
+        asn1Type->setAcnSize(encoding->bits());
+        translateFalseValue(encoding->falseValue(), asn1Type);
+    } else {
+        asn1Type->setFalseValue("0");
+    }
+}
+
+void DataTypeTranslatorVisitor::translateIntegerEncoding(
+        const std::optional<seds::model::IntegerDataEncoding> &encoding,
+        Asn1Acn::Types::IntegerAcnParameters *asn1Type) const
+{
+    if (encoding) {
+        // clang-format off
+        std::visit(overloaded {
+            [&](seds::model::CoreIntegerEncoding coreEncoding) {
+                translateCoreIntegerEncoding(coreEncoding, asn1Type);
+            }
+        }, encoding->encoding());
+        // clang-format on
+        asn1Type->setEndianness(convertByteOrder(encoding->byteOrder()));
+        asn1Type->setSize(encoding->bits());
+    } else {
+        asn1Type->setEncoding(Asn1Acn::Types::IntegerEncoding::unspecified);
+        asn1Type->setEndianness(Asn1Acn::Types::Endianness::unspecified);
+        asn1Type->setSize(0);
+    }
+}
+
+void DataTypeTranslatorVisitor::translateFloatEncoding(
+        const seds::model::FloatDataType &sedsType, Asn1Acn::Types::Real *asn1Type) const
+{
+    if (const auto &encoding = sedsType.encoding(); encoding.has_value()) {
+        // clang-format off
+        std::visit(overloaded {
+            [&](seds::model::CoreEncodingAndPrecision coreEncoding) {
+                translateCoreEncodingAndPrecision(coreEncoding, encoding->bits(), asn1Type);
+            }
+        }, encoding->encoding());
+        // clang-format on
+        asn1Type->setEndianness(convertByteOrder(encoding->byteOrder()));
+    } else {
+        asn1Type->setEndianness(Asn1Acn::Types::Endianness::unspecified);
+        asn1Type->setEncoding(Asn1Acn::Types::RealEncoding::unspecified);
+    }
+}
+
+void DataTypeTranslatorVisitor::translateStringEncoding(
+        const seds::model::StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
+{
+    if (const auto &encoding = sedsType.encoding(); encoding.has_value()) {
+        // clang-format off
+        std::visit(overloaded {
+            [&](seds::model::CoreStringEncoding coreEncoding) {
+                translateCoreStringEncoding(coreEncoding, asn1Type);
+            }
+        }, encoding->encoding());
+        // clang-format on
+
+        if (encoding->terminationByte()) {
+            asn1Type->setTerminationPattern(QString::fromStdString(std::to_string(*encoding->terminationByte())));
+        }
+    } else {
+        asn1Type->setEncoding(Asn1Acn::Types::AsciiStringEncoding::unspecified);
+    }
+}
+
+void DataTypeTranslatorVisitor::translateEnumerationList(
+        const seds::model::EnumeratedDataType &sedsType, Asn1Acn::Types::Enumerated *asn1Type) const
+{
+    const auto &items = sedsType.enumerationList();
+
+    for (std::size_t index = 0; index < items.size(); ++index) {
+        const auto &item = items[index];
+        const auto name = Escaper::escapeAsn1FieldName(item.label().value());
+        const auto enumeratedItem =
+                Asn1Acn::Types::EnumeratedItem(index, name, item.value(), Asn1Acn::SourceLocation());
+
+        asn1Type->addItem(enumeratedItem);
+    }
+}
+
+void DataTypeTranslatorVisitor::translateCoreIntegerEncoding(
+        seds::model::CoreIntegerEncoding coreEncoding, Asn1Acn::Types::IntegerAcnParameters *asn1Type) const
+{
+    switch (coreEncoding) {
+    case seds::model::CoreIntegerEncoding::Unsigned:
+        asn1Type->setEncoding(Asn1Acn::Types::IntegerEncoding::pos_int);
+        break;
+    case seds::model::CoreIntegerEncoding::TwosComplement:
+        asn1Type->setEncoding(Asn1Acn::Types::IntegerEncoding::twos_complement);
+        break;
+    case seds::model::CoreIntegerEncoding::Bcd:
+        asn1Type->setEncoding(Asn1Acn::Types::IntegerEncoding::BCD);
+        break;
+    case seds::model::CoreIntegerEncoding::SignMagnitude:
+        throw UnsupportedValueException("CoreIntegerEncoding", "SignMagnitude");
+        break;
+    case seds::model::CoreIntegerEncoding::OnesComplement:
+        throw UnsupportedValueException("CoreIntegerEncoding", "OnesComplement");
+        break;
+    case seds::model::CoreIntegerEncoding::PackedBcd:
+        throw UnsupportedValueException("CoreIntegerEncoding", "PackedBcd");
+        break;
+    default:
+        throw UnhandledValueException("CoreIntegerEncoding");
+        break;
+    }
+}
+
+void DataTypeTranslatorVisitor::translateCoreEncodingAndPrecision(
+        seds::model::CoreEncodingAndPrecision coreEncoding, uint64_t bits, Asn1Acn::Types::Real *asn1Type) const
+{
+    switch (coreEncoding) {
+    case seds::model::CoreEncodingAndPrecision::IeeeSingle: {
+        if (bits != 32) { // NOLINT(readability-magic-numbers)
+            auto errorMessage = QString("Wrong number of bits specified (%1) for IEEE754_1985_32 encoding").arg(bits);
+            throw TranslationException(std::move(errorMessage));
+        }
+        asn1Type->setEncoding(Asn1Acn::Types::RealEncoding::IEEE754_1985_32);
+    } break;
+    case seds::model::CoreEncodingAndPrecision::IeeeDouble: {
+        if (bits != 64) { // NOLINT(readability-magic-numbers)
+            auto errorMessage = QString("Wrong number of bits specified (%1) for IEEE754_1985_64 encoding").arg(bits);
+            throw TranslationException(std::move(errorMessage));
+        }
+        asn1Type->setEncoding(Asn1Acn::Types::RealEncoding::IEEE754_1985_64);
+    } break;
+    case seds::model::CoreEncodingAndPrecision::IeeeQuad:
+        throw UnsupportedValueException("CoreEncodingAndPrecision", "IeeeQuad");
+        break;
+    case seds::model::CoreEncodingAndPrecision::MilstdSimple:
+        throw UnsupportedValueException("CoreEncodingAndPrecision", "MilstdSimple");
+        break;
+    case seds::model::CoreEncodingAndPrecision::MilstdExtended:
+        throw UnsupportedValueException("CoreEncodingAndPrecision", "MilstdExtended");
+        break;
+    default:
+        throw UnhandledValueException("CoreEncodingAndPrecision");
+        break;
+    }
+}
+
+void DataTypeTranslatorVisitor::translateCoreStringEncoding(
+        seds::model::CoreStringEncoding coreEncoding, Asn1Acn::Types::IA5String *asn1Type) const
+{
+    switch (coreEncoding) {
+    case seds::model::CoreStringEncoding::Ascii:
+        asn1Type->setEncoding(Asn1Acn::Types::AsciiStringEncoding::ASCII);
+        break;
+    case seds::model::CoreStringEncoding::Utf8:
+        throw UnsupportedValueException("CoreStringEncoding", "Utf8");
+        break;
+    default:
+        throw UnhandledValueException("CoreStringEncoding");
+        break;
+    }
+}
+
+void DataTypeTranslatorVisitor::translateFalseValue(
+        seds::model::FalseValue falseValue, Asn1Acn::Types::Boolean *asn1Type) const
+{
+    switch (falseValue) {
+    case seds::model::FalseValue::ZeroIsFalse:
+        asn1Type->setFalseValue(QString(asn1Type->acnSize(), '0'));
+        break;
+    case seds::model::FalseValue::NonZeroIsFalse:
+        asn1Type->setTrueValue(QString(asn1Type->acnSize(), '0'));
+        break;
+    default:
+        throw UnhandledValueException("FalseValue");
+        break;
+    }
+}
+
+Asn1Acn::Types::Endianness DataTypeTranslatorVisitor::convertByteOrder(seds::model::ByteOrder sedsByteOrder) const
+{
+    switch (sedsByteOrder) {
+    case seds::model::ByteOrder::BigEndian:
+        return Asn1Acn::Types::Endianness::big;
+    case seds::model::ByteOrder::LittleEndian:
+        return Asn1Acn::Types::Endianness::little;
+    default:
+        throw UnhandledValueException("ByteOrder");
+        break;
+    }
 }
 
 } // namespace conversion::asn1::translator

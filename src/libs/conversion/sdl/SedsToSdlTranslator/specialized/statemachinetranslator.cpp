@@ -341,16 +341,6 @@ auto StateMachineTranslator::translateVariables(
         const auto variableType = variable.type();
         const auto variableTypeName = Escaper::escapeAsn1TypeName(variableType.nameStr());
 
-        const auto asn1Definitions = variableType.packageStr()
-                ? SedsToAsn1Translator::getAsn1Definitions(*variableType.packageStr(), context.asn1Model()->data())
-                : SedsToAsn1Translator::getAsn1Definitions(
-                          context.sedsPackage().nameStr(), context.asn1Model()->data());
-
-        const auto *referencedType = asn1Definitions->type(variableTypeName);
-        if (referencedType == nullptr) {
-            throw MissingAsn1TypeDefinitionException(variableTypeName);
-        }
-
         auto sdlVariable =
                 std::make_unique<::sdl::VariableDeclaration>(variableName, Escaper::escapeSdlName(variableTypeName));
         DescriptionTranslator::translate(variable, sdlVariable.get());

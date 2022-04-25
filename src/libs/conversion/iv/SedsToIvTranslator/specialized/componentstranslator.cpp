@@ -140,7 +140,9 @@ void ComponentsTranslator::translateCommands(const QString &sedsInterfaceName,
         const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
         const QString &currentPackageName, const GenericTypeMapper *typeMapper) const
 {
-    const auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(currentPackageName, m_asn1Files);
+    // TODO
+    Asn1Acn::Definitions *asn1Definitions = nullptr;
+    /* const auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(currentPackageName, m_asn1Files); */
 
     AsyncInterfaceCommandTranslator asyncCommandTranslator(ivFunction, sedsInterfaceName, m_sedsPackage, m_sedsPackages,
             asn1Definitions, m_asn1Files, typeMapper, m_sequenceSizeThreshold);

@@ -189,56 +189,59 @@ QString AsyncInterfaceCommandTranslator::createBundledType(
 void AsyncInterfaceCommandTranslator::createBundledTypeComponent(
         const AsyncInterfaceCommandTranslator::ArgumentData &argumentData, Asn1Acn::Types::Sequence *sequence) const
 {
-    const auto &name = argumentData.name;
-    const auto &typeRef = argumentData.typeRef;
+    // TODO
+    /* const auto &name = argumentData.name; */
+    /* const auto &typeRef = argumentData.typeRef; */
 
-    const auto typeIsForeign = typeRef.packageStr().has_value();
+    /* const auto typeIsForeign = typeRef.packageStr().has_value(); */
 
-    const auto asn1Definitions = typeIsForeign
-            ? SedsToAsn1Translator::getAsn1Definitions(*typeRef.packageStr(), m_asn1Files)
-            : m_asn1Definitions;
+    /* const auto asn1Definitions = typeIsForeign */
+    /*         ? SedsToAsn1Translator::getAsn1Definitions(*typeRef.packageStr(), m_asn1Files) */
+    /*         : m_asn1Definitions; */
 
-    const auto &typeName = Escaper::escapeAsn1TypeName(typeRef.nameStr());
-    const auto *referencedTypeAssignment = asn1Definitions->type(typeName);
+    /* const auto &typeName = typeRef.nameStr(); */
+    /* const auto *referencedTypeAssignment = asn1Definitions->type(typeName); */
 
-    if (!referencedTypeAssignment) {
-        auto errorMessage =
-                QString("Type %1 not found while creating ASN.1 sequence %2").arg(typeName).arg(sequence->identifier());
-        throw TranslationException(std::move(errorMessage));
-    }
+    /* if (!referencedTypeAssignment) { */
+    /*     auto errorMessage = */
+    /*             QString("Type %1 not found while creating ASN.1 sequence
+     * %2").arg(typeName).arg(sequence->identifier()); */
+    /*     throw TranslationException(std::move(errorMessage)); */
+    /* } */
 
-    const auto *referencedType = referencedTypeAssignment->type();
+    /* const auto *referencedType = referencedTypeAssignment->type(); */
 
-    if (typeIsForeign) {
-        auto referencedTypeImport = Asn1Acn::ImportedType(asn1Definitions->name(), referencedType->identifier());
-        m_asn1Definitions->addImportedType(std::move(referencedTypeImport));
-    }
+    /* if (typeIsForeign) { */
+    /*     auto referencedTypeImport = Asn1Acn::ImportedType(asn1Definitions->name(), referencedType->identifier()); */
+    /*     m_asn1Definitions->addImportedType(std::move(referencedTypeImport)); */
+    /* } */
 
-    auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(typeName, m_asn1Definitions->name());
-    sequenceComponentType->setType(referencedType->clone());
+    /* auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(typeName,
+     * m_asn1Definitions->name()); */
+    /* sequenceComponentType->setType(referencedType->clone()); */
 
-    std::unique_ptr<Asn1Acn::SequenceComponent> sequenceComponent;
+    /* std::unique_ptr<Asn1Acn::SequenceComponent> sequenceComponent; */
 
-    if (argumentData.isDeterminant) {
-        if (typeRef.packageStr()) {
-            const auto qualifiedName =
-                    QString("%1.%2").arg(Escaper::escapeAsn1PackageName(*typeRef.packageStr())).arg(typeName);
-            sequenceComponentType->setTypeName(qualifiedName);
-        }
+    /* if (argumentData.isDeterminant) { */
+    /*     if (typeRef.packageStr()) { */
+    /*         const auto qualifiedName = */
+    /*                 QString("%1.%2").arg(Escaper::escapeAsn1PackageName(*typeRef.packageStr())).arg(typeName); */
+    /*         sequenceComponentType->setTypeName(qualifiedName); */
+    /*     } */
 
-        sequenceComponent =
-                std::make_unique<Asn1Acn::AcnSequenceComponent>(name, name, std::move(sequenceComponentType));
-    } else {
-        sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(name, name, false, std::nullopt, "",
-                Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
-                std::move(sequenceComponentType));
+    /*     sequenceComponent = */
+    /*             std::make_unique<Asn1Acn::AcnSequenceComponent>(name, name, std::move(sequenceComponentType)); */
+    /* } else { */
+    /*     sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(name, name, false, std::nullopt, "", */
+    /*             Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(), */
+    /*             std::move(sequenceComponentType)); */
 
-        if (argumentData.determinantRef.has_value()) {
-            sequenceComponent->addAcnParameter(argumentData.determinantRef->nameStr());
-        }
-    }
+    /*     if (argumentData.determinantRef.has_value()) { */
+    /*         sequenceComponent->addAcnParameter(argumentData.determinantRef->nameStr()); */
+    /*     } */
+    /* } */
 
-    sequence->addComponent(std::move(sequenceComponent));
+    /* sequence->addComponent(std::move(sequenceComponent)); */
 }
 
 AsyncInterfaceCommandTranslator::Arguments AsyncInterfaceCommandTranslator::processArguments(
@@ -368,49 +371,52 @@ seds::model::DataTypeRef AsyncInterfaceCommandTranslator::handleArrayArgument(
 QString AsyncInterfaceCommandTranslator::createAlternateType(const QString &genericTypeName,
         const std::vector<TypeMapping::ConcreteType> &concreteTypes, const seds::model::DataTypeRef &determinantRef)
 {
-    auto name = InterfaceTranslatorHelper::buildAlternateTypeName(m_sedsInterfaceName, genericTypeName);
+    // TODO
+    return "";
+    /* auto name = InterfaceTranslatorHelper::buildAlternateTypeName(m_sedsInterfaceName, genericTypeName); */
 
-    const auto existingAlternateType = m_asn1Definitions->type(name);
-    if (existingAlternateType != nullptr) {
-        return name;
-    }
+    /* const auto existingAlternateType = m_asn1Definitions->type(name); */
+    /* if (existingAlternateType != nullptr) { */
+    /*     return name; */
+    /* } */
 
-    auto choice = std::make_unique<Asn1Acn::Types::Choice>(name);
+    /* auto choice = std::make_unique<Asn1Acn::Types::Choice>(name); */
 
-    // Each of the alternative is present-when determinant has given value
-    for (const auto &concreteType : concreteTypes) {
-        const auto &concreteTypeRef = concreteType.typeRef;
+    /* // Each of the alternative is present-when determinant has given value */
+    /* for (const auto &concreteType : concreteTypes) { */
+    /*     const auto &concreteTypeRef = concreteType.typeRef; */
 
-        const auto asn1Definitions = concreteTypeRef.packageStr()
-                ? SedsToAsn1Translator::getAsn1Definitions(*concreteTypeRef.packageStr(), m_asn1Files)
-                : m_asn1Definitions;
+    /*     const auto asn1Definitions = concreteTypeRef.packageStr() */
+    /*             ? SedsToAsn1Translator::getAsn1Definitions(*concreteTypeRef.packageStr(), m_asn1Files) */
+    /*             : m_asn1Definitions; */
 
-        const auto &concreteTypeName = concreteTypeRef.nameStr();
-        const auto asn1ConcreteType = asn1Definitions->type(concreteTypeName);
+    /*     const auto &concreteTypeName = concreteTypeRef.nameStr(); */
+    /*     const auto asn1ConcreteType = asn1Definitions->type(concreteTypeName); */
 
-        if (!asn1ConcreteType || !asn1ConcreteType->type()) {
-            throw MissingAsn1TypeDefinitionException(concreteTypeName);
-        }
+    /*     if (!asn1ConcreteType || !asn1ConcreteType->type()) { */
+    /*         throw MissingAsn1TypeDefinitionException(concreteTypeName); */
+    /*     } */
 
-        const auto presentWhen = QString("determinant==%1").arg(*concreteType.determinantValue);
+    /*     const auto presentWhen = QString("determinant==%1").arg(*concreteType.determinantValue); */
 
-        const auto choiceAlternativeName = QString("concrete-%1").arg(concreteType.typeRef.nameStr());
-        auto choiceAlternative = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(choiceAlternativeName,
-                choiceAlternativeName, choiceAlternativeName, choiceAlternativeName, presentWhen,
-                Asn1Acn::SourceLocation(), asn1ConcreteType->type()->clone());
+    /*     const auto choiceAlternativeName = QString("concrete-%1").arg(concreteType.typeRef.nameStr()); */
+    /*     auto choiceAlternative = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(choiceAlternativeName, */
+    /*             choiceAlternativeName, choiceAlternativeName, choiceAlternativeName, presentWhen, */
+    /*             Asn1Acn::SourceLocation(), asn1ConcreteType->type()->clone()); */
 
-        choice->addComponent(std::move(choiceAlternative));
-    }
+    /*     choice->addComponent(std::move(choiceAlternative)); */
+    /* } */
 
-    // Add an ACN parameter for determinant
-    auto acnParameter = std::make_unique<Asn1Acn::AcnParameter>("determinant", "determinant", determinantRef.nameStr());
-    choice->addParameter(std::move(acnParameter));
+    /* // Add an ACN parameter for determinant */
+    /* auto acnParameter = std::make_unique<Asn1Acn::AcnParameter>("determinant", "determinant",
+     * determinantRef.nameStr()); */
+    /* choice->addParameter(std::move(acnParameter)); */
 
-    auto typeAssignment =
-            std::make_unique<Asn1Acn::TypeAssignment>(name, name, Asn1Acn::SourceLocation(), std::move(choice));
-    m_asn1Definitions->addType(std::move(typeAssignment));
+    /* auto typeAssignment = */
+    /*         std::make_unique<Asn1Acn::TypeAssignment>(name, name, Asn1Acn::SourceLocation(), std::move(choice)); */
+    /* m_asn1Definitions->addType(std::move(typeAssignment)); */
 
-    return name;
+    /* return name; */
 }
 
 std::size_t AsyncInterfaceCommandTranslator::calculateArgumentsHash(

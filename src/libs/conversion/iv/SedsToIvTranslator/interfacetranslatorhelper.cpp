@@ -72,31 +72,33 @@ QString InterfaceTranslatorHelper::createArrayType(const seds::model::DataTypeRe
         const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
         const std::vector<seds::model::Package> &sedsPackages, const std::optional<uint64_t> &sequenceSizeThreshold)
 {
-    const auto &baseTypeName = baseTypeRef.nameStr();
-    const auto name = buildArrayTypeName(baseTypeName, dimensions);
+    // TODO
+    return "";
+    /* const auto &baseTypeName = baseTypeRef.nameStr(); */
+    /* const auto name = buildArrayTypeName(baseTypeName, dimensions); */
 
-    const auto foundAsn1Array = asn1Definitions->type(name);
-    if (foundAsn1Array != nullptr) {
-        return name;
-    }
+    /* const auto foundAsn1Array = asn1Definitions->type(name); */
+    /* if (foundAsn1Array != nullptr) { */
+    /*     return name; */
+    /* } */
 
-    seds::model::ArrayDataType sedsArray;
-    sedsArray.setName(name);
-    sedsArray.setType(baseTypeRef);
+    /* seds::model::ArrayDataType sedsArray; */
+    /* sedsArray.setName(name); */
+    /* sedsArray.setType(baseTypeRef); */
 
-    for (auto dimension : dimensions) {
-        sedsArray.addDimension(std::move(dimension));
-    }
+    /* for (auto dimension : dimensions) { */
+    /*     sedsArray.addDimension(std::move(dimension)); */
+    /* } */
 
-    asn1::translator::DataTypeTranslatorVisitor dataTypeVisitor(
-            asn1Definitions, sedsPackage, asn1Files, sedsPackages, sequenceSizeThreshold);
-    dataTypeVisitor(sedsArray);
+    /* asn1::translator::DataTypeTranslatorVisitor dataTypeVisitor( */
+    /*         asn1Definitions, sedsPackage, asn1Files, sedsPackages, sequenceSizeThreshold); */
+    /* dataTypeVisitor(sedsArray); */
 
-    auto asn1ArrayAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
-            name, name, Asn1Acn::SourceLocation(), dataTypeVisitor.consumeResultType());
-    asn1Definitions->addType(std::move(asn1ArrayAssignment));
+    /* auto asn1ArrayAssignment = std::make_unique<Asn1Acn::TypeAssignment>( */
+    /*         name, name, Asn1Acn::SourceLocation(), dataTypeVisitor.consumeResultType()); */
+    /* asn1Definitions->addType(std::move(asn1ArrayAssignment)); */
 
-    return name;
+    /* return name; */
 }
 
 QString InterfaceTranslatorHelper::buildParameterInterfaceName(const QString &sedsInterfaceName,

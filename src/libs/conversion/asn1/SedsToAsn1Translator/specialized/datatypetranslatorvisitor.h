@@ -21,14 +21,16 @@
 
 #include "context.h"
 
+#include <asn1library/asn1/types/bitstring.h>
+#include <asn1library/asn1/types/integeracnparams.h>
+#include <optional>
 #include <seds/SedsModel/base/description.h>
 #include <seds/SedsModel/types/datatype.h>
-
-namespace Asn1Acn {
-namespace Types {
-class BitString;
-} // namespace Types
-} // namespace Asn1Acn
+#include <seds/SedsModel/types/encodings/coreencodingandprecision.h>
+#include <seds/SedsModel/types/encodings/coreintegerencoding.h>
+#include <seds/SedsModel/types/encodings/corestringencoding.h>
+#include <seds/SedsModel/types/encodings/falsevalue.h>
+#include <seds/SedsModel/types/encodings/integerdataencoding.h>
 
 namespace conversion::asn1::translator {
 
@@ -108,6 +110,28 @@ private:
 
     auto translateBitStringLength(
             const seds::model::BinaryDataType &sedsType, Asn1Acn::Types::BitString *asn1Type) const -> void;
+    auto translateStringLength(const seds::model::StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
+            -> void;
+    auto translateBooleanEncoding(const seds::model::BooleanDataType &sedsType, Asn1Acn::Types::Boolean *asn1Type) const
+            -> void;
+    auto translateIntegerEncoding(const std::optional<seds::model::IntegerDataEncoding> &encoding,
+            Asn1Acn::Types::IntegerAcnParameters *asn1Type) const -> void;
+    auto translateFloatEncoding(const seds::model::FloatDataType &sedsType, Asn1Acn::Types::Real *asn1Type) const
+            -> void;
+    auto translateStringEncoding(const seds::model::StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
+            -> void;
+    auto translateEnumerationList(
+            const seds::model::EnumeratedDataType &sedsType, Asn1Acn::Types::Enumerated *asn1Type) const -> void;
+
+    auto translateCoreIntegerEncoding(seds::model::CoreIntegerEncoding coreEncoding,
+            Asn1Acn::Types::IntegerAcnParameters *asn1Type) const -> void;
+    auto translateCoreEncodingAndPrecision(seds::model::CoreEncodingAndPrecision coreEncoding, uint64_t bits,
+            Asn1Acn::Types::Real *asn1Type) const -> void;
+    auto translateCoreStringEncoding(
+            seds::model::CoreStringEncoding coreEncoding, Asn1Acn::Types::IA5String *asn1Type) const -> void;
+    auto translateFalseValue(seds::model::FalseValue falseValue, Asn1Acn::Types::Boolean *asn1Type) const -> void;
+
+    auto convertByteOrder(seds::model::ByteOrder sedsByteOrder) const -> Asn1Acn::Types::Endianness;
 
 private:
     Asn1Acn::Definitions *m_outputAsn1Definitions;
