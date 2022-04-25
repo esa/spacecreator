@@ -22,6 +22,7 @@
 #include "asnsequencecomponent.h"
 #include "assignment.h"
 #include "enumeratedgenerator.h"
+#include "inlinecall.h"
 #include "inlinedef.h"
 #include "integerconstraintvisitor.h"
 #include "integergenerator.h"
@@ -48,6 +49,7 @@
 #include <promela/PromelaModel/constant.h>
 #include <qdebug.h>
 #include <qglobal.h>
+#include <qlist.h>
 #include <stdexcept>
 #include <utility>
 
@@ -208,8 +210,9 @@ std::unique_ptr<ProctypeElement> makeInlineCall(
     const QString componentTypeLabel = envGeneratorInline->type()->label();
     const QString componentAsnTypeName = componentTypeLabel.split(".").last().split(" ").last();
     const QString generatorInlineName = getName(envGeneratorInline, componentAsnTypeName);
+    QList<promela::model::InlineCall::Argument> args({ promela::model::InlineCall::Argument(inlineCallArgument) });
 
-    auto inlineCall = promela::model::InlineCall(generatorInlineName, QList<VariableRef>({ inlineCallArgument }));
+    auto inlineCall = promela::model::InlineCall(generatorInlineName, args);
     return std::make_unique<ProctypeElement>(std::move(inlineCall));
 }
 
