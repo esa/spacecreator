@@ -19,6 +19,7 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
+#include "acnsequencecomponent.h"
 #include "asnsequencecomponent.h"
 #include "assignment.h"
 #include "enumeratedgenerator.h"
@@ -47,7 +48,6 @@
 #include <optional>
 #include <promela/Asn1ToPromelaTranslator/visitors/asn1sequencecomponentvisitor.h>
 #include <promela/PromelaModel/constant.h>
-#include <qdebug.h>
 #include <qglobal.h>
 #include <qlist.h>
 #include <stdexcept>
@@ -187,29 +187,10 @@ Asn1Acn::Types::Type *Asn1TypeValueGeneratorVisitor::getAsnSequenceComponentType
     return componentType;
 }
 
-QString getName(Asn1Acn::AsnSequenceComponent *const envGeneratorInline, const QString &componentAsnTypeName)
-{
-    QString generatorInlineName;
-
-    const QString &inlineTypeName = envGeneratorInline->type()->typeName();
-    if (inlineTypeName.compare("INTEGER") == 0) {
-        generatorInlineName = "INTEGER";
-    } else if (inlineTypeName.compare("BOOLEAN") == 0) {
-        generatorInlineName = "BOOLEAN";
-    } else {
-        generatorInlineName = componentAsnTypeName;
-    }
-
-    return QString("%1_generate_value").arg(generatorInlineName);
-}
-
-std::unique_ptr<ProctypeElement> makeInlineCall(
-        Asn1Acn::AsnSequenceComponent *const envGeneratorInline, const QString &callArgumentName)
+std::unique_ptr<ProctypeElement> makeInlineCall(Asn1Acn::AsnSequenceComponent *const envGeneratorInline,
+        const QString &callArgumentName, const QString &generatorInlineName)
 {
     const QString inlineCallArgument = QString("%1.%2").arg(callArgumentName).arg(envGeneratorInline->name());
-    const QString componentTypeLabel = envGeneratorInline->type()->label();
-    const QString componentAsnTypeName = componentTypeLabel.split(".").last().split(" ").last();
-    const QString generatorInlineName = getName(envGeneratorInline, componentAsnTypeName);
     QList<promela::model::InlineCall::Argument> args({ promela::model::InlineCall::Argument(inlineCallArgument) });
 
     auto inlineCall = promela::model::InlineCall(generatorInlineName, args);
@@ -234,29 +215,43 @@ std::unique_ptr<promela::model::ProctypeElement> makeAssignmentProctypeElement(
     return std::make_unique<ProctypeElement>(std::move(valueExistAssignment));
 }
 
+QString getGeneratorToCall(const Asn1Acn::AsnSequenceComponent &asnType, const QString &sequenceName)
+{
+    const auto &type = asnType.type();
+    if (type->label().contains(".")) {
+        return type->typeName();
+    } else {
+        return QString("%1_%2").arg(sequenceName).arg(asnType.name());
+    }
+}
+
 void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 {
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(type.identifier());
     const QString argumentName = "value";
     const QList<QString> inlineArguments = { argumentName };
     promela::model::Sequence sequence(promela::model::Sequence::Type::NORMAL);
-    for (auto &sequenceComponent : type.components()) {
-        auto *const asnSequenceComponent = static_cast<Asn1Acn::AsnSequenceComponent *>(sequenceComponent.get());
-        const auto asnTypeName = asnSequenceComponent->type()->typeName();
 
+    for (auto &sequenceComponent : type.components()) {
         if (sequenceComponent != nullptr) {
+            // TODO: pack as function
+            auto *const asnSequenceComponent = static_cast<Asn1Acn::AsnSequenceComponent *>(sequenceComponent.get());
+
             const QString sequenceName = m_name;
-            m_name = QString("%1_%2").arg(m_name).arg(sequenceComponent->name());
+            const QString generatorToCall = getGeneratorToCall(*asnSequenceComponent, sequenceName);
+            m_name = generatorToCall;
             auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
             asnSequenceComponentType->accept(*this);
             m_name = sequenceName;
 
+            const QString generatorToCallName = QString("%1_generate_value").arg(generatorToCall);
             if (asnSequenceComponent->isOptional()) {
                 const QString valueExistName = QString("%1.exist.%2").arg(argumentName).arg(sequenceComponent->name());
 
                 auto sequenceWithInlineToGenerateValue = makeNormalSequence();
                 sequenceWithInlineToGenerateValue->appendElement(makeTrueExpressionProctypeElement());
-                sequenceWithInlineToGenerateValue->appendElement(makeInlineCall(asnSequenceComponent, argumentName));
+                sequenceWithInlineToGenerateValue->appendElement(
+                        makeInlineCall(asnSequenceComponent, argumentName, generatorToCallName));
                 sequenceWithInlineToGenerateValue->appendElement(makeAssignmentProctypeElement(valueExistName, 1));
 
                 auto emptySequenceOptionalIsOff = makeNormalSequence();
@@ -269,8 +264,10 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 
                 sequence.appendElement(std::make_unique<ProctypeElement>(std::move(conditional)));
             } else {
-                sequence.appendElement(makeInlineCall(asnSequenceComponent, argumentName));
+                sequence.appendElement(makeInlineCall(asnSequenceComponent, argumentName, generatorToCallName));
             }
+
+            // TODO: add alternative generation from ACN type definitions
         }
     }
 
