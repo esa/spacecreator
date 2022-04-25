@@ -48,7 +48,6 @@
 #include <optional>
 #include <promela/Asn1ToPromelaTranslator/visitors/asn1sequencecomponentvisitor.h>
 #include <promela/PromelaModel/constant.h>
-#include <qdebug.h>
 #include <qglobal.h>
 #include <qlist.h>
 #include <stdexcept>
@@ -188,30 +187,9 @@ Asn1Acn::Types::Type *Asn1TypeValueGeneratorVisitor::getAsnSequenceComponentType
     return componentType;
 }
 
-QString getName(Asn1Acn::AsnSequenceComponent *const envGeneratorInline, const QString &componentAsnTypeName)
-{
-    QString generatorInlineName;
-
-    const QString &inlineTypeName = envGeneratorInline->type()->typeName();
-    if (inlineTypeName.compare("INTEGER") == 0) {
-        generatorInlineName = "INTEGER";
-    } else if (inlineTypeName.compare("BOOLEAN") == 0) {
-        generatorInlineName = "BOOLEAN";
-    } else {
-        generatorInlineName = componentAsnTypeName;
-    }
-
-    return QString("%1_generate_value").arg(generatorInlineName);
-}
-
 std::unique_ptr<ProctypeElement> makeInlineCall(Asn1Acn::AsnSequenceComponent *const envGeneratorInline,
-        const QString &callArgumentName, QString generatorInlineName = "")
+        const QString &callArgumentName, const QString &generatorInlineName)
 {
-    if (generatorInlineName.isEmpty()) {
-        const QString componentTypeLabel = envGeneratorInline->type()->label();
-        const QString componentAsnTypeName = componentTypeLabel.split(".").last().split(" ").last();
-        generatorInlineName = getName(envGeneratorInline, componentAsnTypeName);
-    }
     const QString inlineCallArgument = QString("%1.%2").arg(callArgumentName).arg(envGeneratorInline->name());
     QList<promela::model::InlineCall::Argument> args({ promela::model::InlineCall::Argument(inlineCallArgument) });
 
@@ -237,6 +215,16 @@ std::unique_ptr<promela::model::ProctypeElement> makeAssignmentProctypeElement(
     return std::make_unique<ProctypeElement>(std::move(valueExistAssignment));
 }
 
+QString getGeneratorToCall(const Asn1Acn::AsnSequenceComponent &asnType, const QString &sequenceName)
+{
+    const auto &type = asnType.type();
+    if (type->label().contains(".")) {
+        return type->typeName();
+    } else {
+        return QString("%1_%2").arg(sequenceName).arg(asnType.name());
+    }
+}
+
 void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 {
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(type.identifier());
@@ -248,10 +236,9 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
         if (sequenceComponent != nullptr) {
             // TODO: pack as function
             auto *const asnSequenceComponent = static_cast<Asn1Acn::AsnSequenceComponent *>(sequenceComponent.get());
-            const auto asnTypeName = asnSequenceComponent->type()->typeName();
 
             const QString sequenceName = m_name;
-            const QString generatorToCall = QString("%1_%2").arg(m_name).arg(sequenceComponent->name());
+            const QString generatorToCall = getGeneratorToCall(*asnSequenceComponent, sequenceName);
             m_name = generatorToCall;
             auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
             asnSequenceComponentType->accept(*this);
