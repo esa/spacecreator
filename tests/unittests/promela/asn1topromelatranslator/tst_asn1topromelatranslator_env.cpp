@@ -452,16 +452,16 @@ void tst_Asn1ToPromelaTranslator_Env::testSequenceEmbeddedType() const
     QCOMPARE(promelaInlineDefinitionsNumber, asnDefinitionsNumber);
     const int defsSize = promelaInlineDefs.size();
 
-    // for (int i = 0; i < defsSize; i++) {
-    //     if (std::next(promelaInlineDefs.begin(), i) == promelaInlineDefs.end() //
-    //             || asnDefinitionsList.at(0) == nullptr) {
-    //         break;
-    //     }
-    //     auto *const inlineDefPtr = (*std::next(promelaInlineDefs.begin(), i)).get();
-    //     auto *asnTypeAssignmentPtr = asnDefinitionsList.at(0)->types().at(i).get();
+    for (int i = 0; i < defsSize; i++) {
+        if (std::next(promelaInlineDefs.begin(), i) == promelaInlineDefs.end() //
+                || asnDefinitionsList.at(0) == nullptr) {
+            break;
+        }
+        auto *const inlineDefPtr = (*std::next(promelaInlineDefs.begin(), i)).get();
+        auto *asnTypeAssignmentPtr = asnDefinitionsList.at(0)->types().at(i).get();
 
-    //     checkInlineDefinition(inlineDefPtr, asnTypeAssignmentPtr);
-    // }
+        checkInlineDefinition(inlineDefPtr, asnTypeAssignmentPtr);
+    }
 }
 
 std::unique_ptr<Definitions> tst_Asn1ToPromelaTranslator_Env::createModel() const
