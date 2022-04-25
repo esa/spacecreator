@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     std::optional<QString> inputIvFilepath;
     std::optional<QString> outputDirectory;
     QStringList stopConditionFiles;
-    QStringList inputObserverAttachments;
+    QStringList observerAttachments;
 
     const QStringList args = app.arguments();
 
@@ -73,17 +73,17 @@ int main(int argc, char *argv[])
         } else if (arg == "-scl") {
             ++i;
             stopConditionFiles.append(args[i]);
-        } else if (arg == "-io") {
+        } else if (arg == "-os") {
             ++i;
-            inputObserverAttachments.append(args[i]);
+            observerAttachments.append(args[i]);
         } else if (arg == "-h" || arg == "--help") {
             qInfo("tmc: TASTE Model Chcecker");
             qInfo("Usage: tmc [OPTIONS]");
             qInfo("  -iv <filepath>       Use <filepath> as input InterfaceView");
             qInfo("  -o <dir>             Use <dir> as output directory.");
             qInfo("  -scl <filepath>      Use <filepath> as input Stop Condition source file.");
-            qInfo("  -io <FunctionName>:<InterfaceName>:<ObserverName>");
-            qInfo("                       Observe <InterfaceName> input of <FunctionName> by <ObserverName>");
+            qInfo("  -os TODO");
+            qInfo("                       TODO");
             qInfo("  -h, --help           Print this message and exit.");
             exit(EXIT_SUCCESS);
         } else {
@@ -106,8 +106,8 @@ int main(int argc, char *argv[])
     if (!verifier.addStopConditionFiles(stopConditionFiles)) {
         return EXIT_FAILURE;
     }
-    for (auto &attachment : inputObserverAttachments) {
-        if (!verifier.attachInputObserver(attachment)) {
+    for (auto &attachment : observerAttachments) {
+        if (!verifier.attachObserver(attachment)) {
             return EXIT_FAILURE;
         }
     }

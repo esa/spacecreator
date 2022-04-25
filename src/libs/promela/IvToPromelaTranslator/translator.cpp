@@ -68,34 +68,48 @@ namespace promela::translator {
 IvToPromelaTranslator::ObserverAttachment::ObserverAttachment(QString specification)
 {
     const auto separator = ":";
-    const auto kindIn = "in";
+    const auto kindIn = "ObservedSignalKind.INPUT";
     const auto elements = specification.split(separator, QString::KeepEmptyParts);
-    if (elements.size() < 3) {
+    if (elements.size() < 4) {
         throw ""; // TODO
     }
     m_observerName = elements[0];
-    m_functionName = elements[1];
-    m_interfaceName = elements[2];
-    m_kind = elements[3].toLower() == kindIn ? ObserverAttachment::Kind::Kind_Input
-                                             : ObserverAttachment::Kind::Kind_Output;
-    if (elements.size() == 5) {
-        bool ok;
-        m_priority = static_cast<IvToPromelaTranslator::ObserverAttachment::Priority>(elements[4].toInt(&ok));
-        if (!ok) {
-            throw ""; // TODO
+    m_kind = elements[1] == kindIn ? ObserverAttachment::Kind::Kind_Input : ObserverAttachment::Kind::Kind_Output;
+    m_observerInterfaceName = elements[2];
+    m_interfaceName = elements[3];
+    m_priority = 1;
+
+    for (auto i = 4; i < elements.size(); i++) {
+        if (elements[i].startsWith(">")) {
+            m_toFunctionName = elements[i].right(elements[i].length() - 1);
+        } else if (elements[i].startsWith("<")) {
+            m_fromFunctionName = elements[i].right(elements[i].length() - 1);
+        } else if (elements[i].startsWith("p")) {
+            bool ok = false;
+            m_priority = static_cast<IvToPromelaTranslator::ObserverAttachment::Priority>(
+                    elements[i].right(elements[i].length() - 1).toInt(&ok));
+            if (!ok) {
+                throw "";
+            }
         }
-    } else {
-        m_priority = 1;
-    }
-    if (elements.size() > 5) {
-        throw ""; // TODO
     }
 }
 
-auto IvToPromelaTranslator::ObserverAttachment::function() const -> QString
+auto IvToPromelaTranslator::ObserverAttachment::toFunction() const -> std::optional<QString>
 {
-    return m_functionName;
+    return m_toFunctionName;
 }
+
+auto IvToPromelaTranslator::ObserverAttachment::fromFunction() const -> std::optional<QString>
+{
+    return m_fromFunctionName;
+}
+
+auto IvToPromelaTranslator::ObserverAttachment::observerInterface() const -> QString
+{
+    return m_observerInterfaceName;
+}
+
 auto IvToPromelaTranslator::ObserverAttachment::interface() const -> QString
 {
     return m_interfaceName;
@@ -118,9 +132,15 @@ IvToPromelaTranslator::Context::Context(::promela::model::PromelaModel *promelaM
     m_promelaModel = promelaModel;
 }
 
-auto IvToPromelaTranslator::Context::addObserverAttachment(IvToPromelaTranslator::ObserverAttachment attachment) -> void
+auto IvToPromelaTranslator::Context::addObserverAttachment(const IvToPromelaTranslator::ObserverAttachment &attachment)
+        -> void
 {
-    m_observerAttachments[attachment.function()][attachment.interface()].push_back(attachment);
+    if (attachment.fromFunction().has_value()) {
+        m_observerAttachments[*attachment.fromFunction()][attachment.interface()].push_back(attachment);
+    }
+    if (attachment.toFunction().has_value()) {
+        m_observerAttachments[*attachment.toFunction()][attachment.interface()].push_back(attachment);
+    }
 }
 
 auto IvToPromelaTranslator::Context::getObserverAttachments(QString function, QString interface,
@@ -263,12 +283,11 @@ InitProctype IvToPromelaTranslator::generateInitProctype(
     return InitProctype(std::move(sequence));
 }
 
-static auto observerInputSignalName(QString observer, QString function, QString interface) -> QString
+static auto observerInputSignalName(const IvToPromelaTranslator::ObserverAttachment &attachment) -> QString
 {
-    return QString("%1_0_%2_0_PI_0_%3")
-            .arg(Escaper::escapePromelaIV(observer))
-            .arg(Escaper::escapePromelaIV(function))
-            .arg(Escaper::escapePromelaIV(interface));
+    return QString("%1_0_PI_0_%2")
+            .arg(Escaper::escapePromelaIV(attachment.observer()))
+            .arg(Escaper::escapePromelaIV(attachment.observerInterface()));
 }
 
 static auto attachInputObservers(IvToPromelaTranslator::Context &context, QString functionName, QString interfaceName,
@@ -283,9 +302,8 @@ static auto attachInputObservers(IvToPromelaTranslator::Context &context, QStrin
         if (!parameterType.isEmpty()) {
             arguments.append(VariableRef(parameterName));
         }
-        sequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(
-                observerInputSignalName(attachment.observer(), attachment.function(), attachment.interface()),
-                arguments)));
+        sequence->appendElement(
+                std::make_unique<ProctypeElement>(InlineCall(observerInputSignalName(attachment), arguments)));
     }
 }
 

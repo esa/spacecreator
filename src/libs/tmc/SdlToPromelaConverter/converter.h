@@ -45,6 +45,17 @@ public:
     bool convertSdl(const ProcessMetadata &processMetadata, const QFileInfo &outputFile);
 
     /**
+     * @brief Convert SDL Observer files into promela file.
+     *
+     * @param processMetadata process metadata, contains location of input SDL files.
+     * @param outputFile output promela file.
+     * @param outputInfoFile output info file.
+     * @return true if execution was successful, otherwise false.
+     */
+    bool convertObserverSdl(
+            const ProcessMetadata &processMetadata, const QFileInfo &outputFile, const QFileInfo &outputInfoFile);
+
+    /**
      * @brief Convert stop condition file into promela file.
      *
      * @param inputFile filepath to input stop condition file

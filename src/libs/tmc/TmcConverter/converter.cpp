@@ -25,6 +25,7 @@
 #include <QtGlobal>
 #include <conversion/asn1/Asn1Options/options.h>
 #include <conversion/asn1/Asn1Registrar/registrar.h>
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/exceptions.h>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/import/exceptions.h>
@@ -34,6 +35,7 @@
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/IvRegistrar/registrar.h>
 #include <conversion/promela/PromelaRegistrar/registrar.h>
+#include <iostream>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivxmlreader.h>
 #include <promela/PromelaOptions/options.h>
@@ -41,6 +43,7 @@
 
 using conversion::ConversionException;
 using conversion::Converter;
+using conversion::Escaper;
 using conversion::ModelType;
 using conversion::Options;
 using conversion::RegistrationFailedException;
@@ -113,9 +116,9 @@ bool TmcConverter::addStopConditionFiles(const QStringList &files)
     return true;
 }
 
-bool TmcConverter::attachInputObserver(const QString &attachmentSpecification)
+bool TmcConverter::attachObserver(const QString &attachmentSpecification)
 {
-    m_inputObserverAttachments.append(attachmentSpecification);
+    m_observerAttachments.append(attachmentSpecification);
     return true;
 }
 
@@ -141,6 +144,50 @@ bool TmcConverter::convertModel(const std::set<conversion::ModelType> &sourceMod
         qFatal("%s", errorMessage.toLatin1().constData());
     }
     return false;
+}
+
+auto TmcConverter::integrateObserver(QString observerSpecification, QStringList observerFilenames,
+        QStringList &asn1Files, QStringList attachmentInfos)
+{
+    std::cout << "spec -> " << observerSpecification.toStdString() << "\n";
+    const auto separator = ":";
+    const auto elements = observerSpecification.split(separator, QString::KeepEmptyParts);
+    std::cout << "size -> " << elements.size() << "\n";
+    for (const auto &element : elements) {
+        std::cout << "element -> " << element.toStdString() << "\n";
+    }
+    const auto processPath = elements[0];
+    bool ok = true;
+    const auto priority = elements.size() > 1 ? elements[1].toInt(&ok) : 1;
+    if (!ok) {
+        throw "";
+    }
+
+    const auto process = QFileInfo(processPath);
+    const auto processName = process.baseName();
+    const auto directory = process.absoluteDir();
+    const auto structure = QFileInfo(directory.absolutePath() + QDir::separator() + "system_structure.pr");
+    const auto datamodel =
+            QFileInfo(directory.absolutePath() + QDir::separator() + processName.toLower() + "_datamodel.asn");
+    const auto dataview = QFileInfo(directory.absolutePath() + QDir::separator() + "dataview-uniq.asn");
+
+    ProcessMetadata meta(processName, structure, process, datamodel, QList<QFileInfo>());
+    SdlToPromelaConverter sdl2Promela;
+
+    const auto promelaFilename = processName + ".pml";
+    const auto infoPath = outputFilepath(processName + ".info");
+    observerFilenames.append(promelaFilename);
+    sdl2Promela.convertObserverSdl(meta, outputFilepath(promelaFilename), infoPath);
+    QFile infoFile(infoPath.absoluteFilePath());
+    if (infoFile.open(QIODevice::ReadOnly)) {
+        QTextStream in(&infoFile);
+        while (!in.atEnd()) {
+            attachmentInfos.append(in.readLine() + ":" + priority);
+        }
+        infoFile.close();
+    }
+    asn1Files.append(dataview.absoluteFilePath());
+    asn1Files.append(datamodel.absoluteFilePath());
 }
 
 bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles)
@@ -203,6 +250,10 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
 
     QStringList asn1Files;
 
+    for (auto &attachment : m_observerAttachments) {
+        integrateObserver(attachment, m_observerFiles, asn1Files, m_observerAttachmentInfos);
+    }
+
     const QFileInfo dataviewUniq = dataViewUniqLocation();
     if (!dataviewUniq.exists()) {
         qCritical() << "File " << dataviewUniq.absoluteFilePath() << " does not exist.";
@@ -263,9 +314,6 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
     options.add(IvOptions::inputFilepath, inputFilepath);
     options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
     options.add(PromelaOptions::outputFilepath, outputFilepath);
-    for (auto &attachment : m_inputObserverAttachments) {
-        options.add(PromelaOptions::inputObserverAttachment, attachment);
-    }
 
     for (const QString &function : modelFunctions) {
         options.add(PromelaOptions::modelFunctionName, function);
@@ -273,6 +321,14 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
 
     for (const QString &function : environmentFunctions) {
         options.add(PromelaOptions::environmentFunctionName, function);
+    }
+
+    for (auto &observerFilename : m_observerFiles) {
+        options.add(PromelaOptions::additionalIncludes, observerFilename);
+    }
+
+    for (auto &info : m_observerAttachmentInfos) {
+        options.add(PromelaOptions::observerAttachment, info);
     }
 
     for (const QString &filepath : m_stopConditionsFiles) {

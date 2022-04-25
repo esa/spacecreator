@@ -34,9 +34,9 @@ bool TmcVerifier::addStopConditionFiles(const QStringList &files)
     return m_converter->addStopConditionFiles(files);
 }
 
-bool TmcVerifier::attachInputObserver(const QString &attachmentSpecification)
+bool TmcVerifier::attachObserver(const QString &attachmentSpecification)
 {
-    return m_converter->attachInputObserver(attachmentSpecification);
+    return m_converter->attachObserver(attachmentSpecification);
 }
 
 bool TmcVerifier::execute()

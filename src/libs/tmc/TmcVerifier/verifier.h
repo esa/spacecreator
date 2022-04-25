@@ -55,7 +55,7 @@ public:
      * @param attachmentSpecification Input Observer Attachment Specification
      * @return true if the operation succeeded, false otherwise.
      */
-    bool attachInputObserver(const QString &attachmentSpecification);
+    bool attachObserver(const QString &attachmentSpecification);
 
     /**
      * @brief Prepare the system and process formal model verification.

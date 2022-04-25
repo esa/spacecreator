@@ -75,12 +75,14 @@ public:
      * @param attachmentSpecification Input Observer Attachment Specification
      * @return true if the operation succeeded, false otherwise.
      */
-    bool attachInputObserver(const QString &attachmentSpecification);
+    bool attachObserver(const QString &attachmentSpecification);
 
 private:
     bool convertModel(const std::set<conversion::ModelType> &sourceModelTypes, conversion::ModelType targetModelType,
             const std::set<conversion::ModelType> &auxilaryModelTypes, conversion::Options options) const;
 
+    auto integrateObserver(QString observerSpecification, QStringList observerFilenames, QStringList &asn1Files,
+            QStringList attachmentInfos);
     bool convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles);
 
     bool convertStopConditions(const std::map<QString, ProcessMetadata> &allSdlFiles);
@@ -115,7 +117,9 @@ private:
     ivm::IVPropertyTemplateConfig *m_dynPropConfig;
 
     QStringList m_stopConditionsFiles;
-    QStringList m_inputObserverAttachments;
+    QStringList m_observerAttachments;
+    QStringList m_observerAttachmentInfos;
+    QStringList m_observerFiles;
 
     conversion::Registry m_registry;
 };

@@ -44,16 +44,20 @@ public:
 
         ObserverAttachment(QString specification);
 
-        auto function() const -> QString;
+        auto toFunction() const -> std::optional<QString>;
+        auto fromFunction() const -> std::optional<QString>;
         auto interface() const -> QString;
         auto observer() const -> QString;
+        auto observerInterface() const -> QString;
         auto kind() const -> Kind;
         auto priority() const -> Priority;
 
     private:
-        QString m_functionName;
+        std::optional<QString> m_fromFunctionName;
+        std::optional<QString> m_toFunctionName;
         QString m_interfaceName;
         QString m_observerName;
+        QString m_observerInterfaceName;
         Priority m_priority;
         Kind m_kind;
     };
@@ -65,7 +69,7 @@ public:
     public:
         Context(::promela::model::PromelaModel *promelaModel);
 
-        auto addObserverAttachment(ObserverAttachment attachment) -> void;
+        auto addObserverAttachment(const ObserverAttachment &attachment) -> void;
         auto getObserverAttachments(QString function, QString interface, const ObserverAttachment::Kind kind)
                 -> const ObserverAttachments;
         auto model() -> ::promela::model::PromelaModel *;
