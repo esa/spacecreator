@@ -465,6 +465,27 @@ void checkSequenceInlineDefinitions(const std::list<std::unique_ptr<promela::mod
             if (std::holds_alternative<InlineCall>(val)) {
                 const auto &ic = std::get<InlineCall>(val);
                 qDebug() << "inlinecall: " << ic.getName();
+            } else if (std::holds_alternative<Conditional>(val)) {
+                const auto &ic = std::get<Conditional>(val);
+                for (const auto &alternative : ic.getAlternatives()) {
+                    for (const auto &content : alternative->getContent()) {
+                        const auto &contentValue = content->getValue();
+                        qDebug() << contentValue.index();
+                        // using Value = std::variant<Declaration, ChannelSend, ChannelRecv, Expression, DoLoop,
+                        // Assignment, InlineCall, Skip,
+                        //        Conditional, Sequence, ForLoop>;
+                        if (std::holds_alternative<Expression>(contentValue)) {
+                            const auto &x = std::get<Expression>(contentValue);
+                            (void)x;
+                            // using Value = std::variant<VariableRef, Constant, BinaryExpression, InlineCall>;
+                            // if(std::holds_alternative<VariableRef>(const variant<_Types...> &__v))
+                            // qDebug() << "" << x.getContent();
+                        } else if (std::holds_alternative<Assignment>(contentValue)) {
+                            const auto &assignment = std::get<Assignment>(contentValue);
+                            (void)assignment;
+                        }
+                    }
+                }
             }
 
             checkSequence(promelaSequence, asnSequence->components().size());
