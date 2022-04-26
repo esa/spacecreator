@@ -423,12 +423,13 @@ void Asn1ItemTypeVisitor::visit(const Integer &type)
 void Asn1ItemTypeVisitor::visit(const UserdefinedType &type)
 {
     const QString typeName = constructTypeName(m_name);
-    m_promelaModel.addTypeAlias(TypeAlias(typeName, UtypeRef(Escaper::escapePromelaName(type.typeName()))));
+    const auto escapedTypeName = Escaper::escapePromelaName(type.typeName());
+    m_promelaModel.addTypeAlias(TypeAlias(typeName, UtypeRef(escapedTypeName)));
     m_resultDataType = DataType(UtypeRef(typeName));
 
     ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
 
-    const QString inlineName = type.typeName() + assignValueInlineSuffix;
+    const QString inlineName = escapedTypeName + assignValueInlineSuffix;
     QList<InlineCall::Argument> inlineArguments;
     inlineArguments.append(VariableRef("dst"));
     inlineArguments.append(VariableRef("src"));
@@ -458,7 +459,8 @@ void Asn1ItemTypeVisitor::addSimpleValueAssignmentInline(const QString &typeName
 
 void Asn1ItemTypeVisitor::addAssignValueInline(const QString &typeName, ::promela::model::Sequence sequence)
 {
-    const QString assignValueInline = QString("%1%2").arg(typeName).arg(assignValueInlineSuffix);
+    const QString assignValueInline =
+            QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(assignValueInlineSuffix);
     QList<QString> arguments;
     arguments.append("dst");
     arguments.append("src");
@@ -498,6 +500,6 @@ void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeNam
 
 QString Asn1ItemTypeVisitor::getAssignValueInlineNameForNestedType(const QString &utype, const QString &field) const
 {
-    return utype + "_" + field + assignValueInlineSuffix;
+    return Escaper::escapePromelaName(utype) + "_" + Escaper::escapePromelaName(field) + assignValueInlineSuffix;
 }
 }

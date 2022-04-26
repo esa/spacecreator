@@ -260,7 +260,7 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
         return false;
     }
 
-    asn1Files.append(dataviewUniq.absoluteFilePath());
+    /*asn1Files.append(dataviewUniq.absoluteFilePath());
 
     for (const QString &datamodel : uniqueAsn1Files) {
         if (!QFileInfo(datamodel).exists()) {
@@ -269,7 +269,7 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
         }
 
         asn1Files.append(datamodel);
-    }
+    }*/
 
     const QFileInfo outputDataview = outputFilepath("dataview.pml");
 

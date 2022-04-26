@@ -21,14 +21,19 @@
 
 #include "sequencecomponentvaluevisitor.h"
 
+#include <asn1library/asn1/choicevalue.h>
 #include <asn1library/asn1/namedvalue.h>
 #include <asn1library/asn1/singlevalue.h>
+#include <asn1library/asn1/types/choice.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/converter/exceptions.h>
+#include <iostream>
 #include <promela/PromelaModel/proctypeelement.h>
 
+using Asn1Acn::ChoiceValue;
 using Asn1Acn::NamedValue;
 using Asn1Acn::SingleValue;
 using Asn1Acn::Value;
@@ -48,7 +53,10 @@ using Asn1Acn::Types::Sequence;
 using Asn1Acn::Types::SequenceOf;
 using Asn1Acn::Types::UserdefinedType;
 using conversion::ConverterException;
+using conversion::Escaper;
+using promela::model::Assignment;
 using promela::model::Constant;
+using promela::model::Expression;
 using promela::model::InlineCall;
 using promela::model::ProctypeElement;
 using promela::model::VariableRef;
@@ -73,7 +81,7 @@ void ValueAssignmentVisitor::visit(const Boolean &type)
 
     int value = singleValue->value().compare("true", Qt::CaseInsensitive) == 0 ? 1 : 0;
 
-    const QString inlineCallName = QString("%1_assign_value").arg(m_typeName);
+    const QString inlineCallName = QString("%1_assign_value").arg(Escaper::escapePromelaName(m_typeName));
 
     QList<InlineCall::Argument> inlineArguments;
     inlineArguments.append(m_target);
@@ -119,9 +127,11 @@ void ValueAssignmentVisitor::visit(const Enumerated &type)
     const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value.get());
     Q_UNUSED(type);
 
-    const QString value = QString("%1_%2").arg(m_typeName).arg(singleValue->value());
+    const QString value = QString("%1_%2")
+                                  .arg(Escaper::escapePromelaName(m_typeName))
+                                  .arg(Escaper::escapePromelaName(singleValue->value()));
 
-    const QString inlineCallName = QString("%1_assign_value").arg(m_typeName);
+    const QString inlineCallName = QString("%1_assign_value").arg(Escaper::escapePromelaName(m_typeName));
 
     QList<InlineCall::Argument> inlineArguments;
     inlineArguments.append(m_target);
@@ -131,8 +141,28 @@ void ValueAssignmentVisitor::visit(const Enumerated &type)
 
 void ValueAssignmentVisitor::visit(const Choice &type)
 {
-    Q_UNUSED(type);
-    throw ConverterException("Value generation is not implemented for CHOICE datatype");
+    if (m_value->typeEnum() != Value::CHOICE_VALUE) {
+        throw ConverterException("Invalid value for Choice datatype");
+    }
+    const ChoiceValue *choiceValue = dynamic_cast<const ChoiceValue *>(m_value.get());
+
+    const auto escapedTypeName = Escaper::escapePromelaName(m_typeName);
+    const auto escapedSelectionName = Escaper::escapePromelaName(choiceValue->name());
+
+    auto selectionMember = m_target;
+    selectionMember.appendElement("selection");
+
+    auto dataMember = m_target;
+    dataMember.appendElement("data");
+
+    const auto selectionValue = Expression(QString("%1_%2_PRESENT").arg(escapedTypeName).arg(escapedSelectionName));
+
+    m_sequence.appendElement(std::make_unique<ProctypeElement>(Assignment(selectionMember, selectionValue)));
+
+    auto component = type.component(choiceValue->name());
+    ValueAssignmentVisitor visitor(choiceValue->value()->clone(), m_sequence, dataMember,
+            QString("%1_%2").arg(escapedTypeName).arg(escapedSelectionName));
+    component->type()->accept(visitor);
 }
 
 void ValueAssignmentVisitor::visit(const Sequence &type)
@@ -174,7 +204,7 @@ void ValueAssignmentVisitor::visit(const Integer &type)
     const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value.get());
     int value = singleValue->value().toInt();
 
-    const QString inlineCallName = QString("%1_assign_value").arg(m_typeName);
+    const QString inlineCallName = QString("%1_assign_value").arg(Escaper::escapePromelaName(m_typeName));
 
     QList<InlineCall::Argument> inlineArguments;
     inlineArguments.append(m_target);
