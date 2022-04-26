@@ -20,22 +20,59 @@
 #pragma once
 
 #include <asn1library/asn1/definitions.h>
+#include <asn1library/asn1/file.h>
+#include <asn1library/asn1/types/type.h>
+#include <conversion/common/options.h>
+#include <cstdint>
+#include <list>
+#include <memory>
+#include <optional>
+#include <seds/SedsModel/base/description.h>
+#include <seds/SedsModel/types/datatype.h>
+#include <seds/SedsModel/types/datatyperef.h>
+#include <vector>
+
+namespace seds::model {
+class Package;
+} // namespace seds::model
 
 namespace conversion::asn1::translator {
 
 class Context final
 {
 public:
-    Context(const Asn1Acn::Definitions *definitions, const Context *parentContext);
+    Context(const seds::model::Package *sedsPackage, Asn1Acn::Definitions *definitions,
+            const Asn1Acn::Definitions *parentDefinitions, const std::list<const seds::model::Package *> &sedsPackages,
+            const std::vector<std::unique_ptr<Asn1Acn::File>> &asn1Files, const Options &options);
     Context(const Context &) = delete;
     Context(Context &&) = delete;
 
     Context &operator=(const Context &) = delete;
     Context &operator=(Context &&) = delete;
 
+public:
+    auto addAsn1Type(std::unique_ptr<Asn1Acn::Types::Type> asn1Type, const seds::model::Description *sedsDescription)
+            -> void;
+
+    auto findSedsType(const seds::model::DataTypeRef &typeRef) -> const seds::model::DataType *;
+    auto findAsn1Type(const seds::model::DataTypeRef &typeRef) -> const Asn1Acn::Types::Type *;
+
+    auto definitionsName() const -> const QString &;
+    auto arraySizeThreshold() const -> std::optional<uint64_t>;
+
 private:
-    const Asn1Acn::Definitions *m_definitions;
-    const Context *m_parentContext;
+    auto getSedsPackage(const QString &packageName) const -> const seds::model::Package *;
+    auto getAsn1Definitions(const QString &asn1FileName) const -> Asn1Acn::Definitions *;
+
+private:
+    const seds::model::Package *m_sedsPackage;
+    Asn1Acn::Definitions *m_definitions;
+    const Asn1Acn::Definitions *m_parentDefinitions;
+
+    const std::list<const seds::model::Package *> &m_sedsPackages;
+    const std::vector<std::unique_ptr<Asn1Acn::File>> &m_asn1Files;
+
+    const Options &m_options;
 };
 
 } // namespace conversion::asn1::translator

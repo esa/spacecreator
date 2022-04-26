@@ -5,17 +5,22 @@ set(SOURCES     context.cpp
                 packagesdependencyresolver.cpp
                 patchersnippetsgenerator.cpp
                 translator.cpp
+                specialized/arraydatatypetranslator.cpp
                 specialized/datatypetranslatorvisitor.cpp
                 specialized/descriptiontranslator.cpp
+                specialized/dimensiontranslator.cpp
                 specialized/rangetranslatorvisitor.cpp)
 set(INCLUDES    context.h
                 datatypesdependencyresolver.h
                 packagesdependencyresolver.h
                 patchersnippetsgenerator.h
                 translator.h
+                specialized/arraydatatypetranslator.h
                 specialized/datatypetranslatorvisitor.h
                 specialized/descriptiontranslator.h
-                specialized/rangetranslatorvisitor.h)
+                specialized/dimensiontranslator.h
+                specialized/rangetranslatorvisitor.h
+                specialized/sizetranslatorvisitor.h)
 
 add_library(SedsToAsn1Translator STATIC)
 target_sources(SedsToAsn1Translator

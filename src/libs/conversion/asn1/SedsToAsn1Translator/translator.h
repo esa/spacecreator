@@ -81,10 +81,11 @@ private:
     auto translateSedsModel(const seds::model::SedsModel *sedsModel, const Options &options) const
             -> std::vector<std::unique_ptr<Model>>;
 
-    auto translatePackage(const seds::model::Package *sedsPackage, Asn1Acn::Asn1Model *asn1Model) const -> void;
+    auto translatePackage(const seds::model::Package *sedsPackage, Asn1Acn::Asn1Model *asn1Model,
+            const std::list<const seds::model::Package *> &sedsPackages, const Options &options) const -> void;
 
-    auto translateDataTypeSet(const std::list<const seds::model::DataType *> &sedsDataTypes,
-            Asn1Acn::Definitions *outputAsn1Definitions, const Context &context) const -> void;
+    auto translateDataTypeSet(const std::list<const seds::model::DataType *> &sedsDataTypes, Context &context) const
+            -> void;
 
 private:
     auto collectDataTypes(const seds::model::Package *package) const -> std::vector<const seds::model::DataType *>;

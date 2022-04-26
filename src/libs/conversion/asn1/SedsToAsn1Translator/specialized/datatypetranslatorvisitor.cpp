@@ -19,7 +19,6 @@
 
 #include "specialized/datatypetranslatorvisitor.h"
 
-#include "specialized/descriptiontranslator.h"
 #include "specialized/rangetranslatorvisitor.h"
 
 #include <asn1library/asn1/asnsequencecomponent.h>
@@ -61,16 +60,15 @@ using seds::model::SubRangeDataType;
 
 namespace conversion::asn1::translator {
 
-DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(
-        Asn1Acn::Definitions *outputAsn1Definitions, const Context &context)
-    : m_outputAsn1Definitions(outputAsn1Definitions)
-    , m_context(context)
+DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(Context &context)
+    : m_context(context)
+    , m_arrayTranslator(m_context)
 {
 }
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::ArrayDataType &sedsType)
 {
-    Q_UNUSED(sedsType);
+    m_arrayTranslator.translate(sedsType);
 }
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::BinaryDataType &sedsType)
@@ -80,7 +78,7 @@ void DataTypeTranslatorVisitor::operator()(const seds::model::BinaryDataType &se
 
     translateBitStringLength(sedsType, asn1Type.get());
 
-    addType(std::move(asn1Type), &sedsType);
+    m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::BooleanDataType &sedsType)
@@ -90,7 +88,7 @@ void DataTypeTranslatorVisitor::operator()(const seds::model::BooleanDataType &s
 
     translateBooleanEncoding(sedsType, asn1Type.get());
 
-    addType(std::move(asn1Type), &sedsType);
+    m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::ContainerDataType &sedsType)
@@ -106,7 +104,7 @@ void DataTypeTranslatorVisitor::operator()(const seds::model::EnumeratedDataType
     translateIntegerEncoding(sedsType.encoding(), asn1Type.get());
     translateEnumerationList(sedsType, asn1Type.get());
 
-    addType(std::move(asn1Type), &sedsType);
+    m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::FloatDataType &sedsType)
@@ -119,7 +117,7 @@ void DataTypeTranslatorVisitor::operator()(const seds::model::FloatDataType &sed
     RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue> rangeTranslator(asn1Type.get());
     std::visit(rangeTranslator, sedsType.range());
 
-    addType(std::move(asn1Type), &sedsType);
+    m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::IntegerDataType &sedsType)
@@ -132,7 +130,7 @@ void DataTypeTranslatorVisitor::operator()(const seds::model::IntegerDataType &s
     RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue> rangeTranslator(asn1Type.get());
     std::visit(rangeTranslator, sedsType.range());
 
-    addType(std::move(asn1Type), &sedsType);
+    m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::StringDataType &sedsType)
@@ -143,23 +141,12 @@ void DataTypeTranslatorVisitor::operator()(const seds::model::StringDataType &se
     translateStringLength(sedsType, asn1Type.get());
     translateStringEncoding(sedsType, asn1Type.get());
 
-    addType(std::move(asn1Type), &sedsType);
+    m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::SubRangeDataType &sedsType)
 {
     Q_UNUSED(sedsType);
-}
-
-void DataTypeTranslatorVisitor::addType(
-        std::unique_ptr<Asn1Acn::Types::Type> asn1Type, const seds::model::Description *sedsDescription)
-{
-    const auto &asn1TypeName = asn1Type->identifier();
-    auto asn1TypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
-            asn1TypeName, asn1TypeName, Asn1Acn::SourceLocation(), std::move(asn1Type));
-    DescriptionTranslator::translate(sedsDescription, asn1TypeAssignment.get());
-
-    m_outputAsn1Definitions->addType(std::move(asn1TypeAssignment));
 }
 
 void DataTypeTranslatorVisitor::translateBitStringLength(

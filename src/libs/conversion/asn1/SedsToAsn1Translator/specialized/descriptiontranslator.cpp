@@ -33,6 +33,10 @@ namespace conversion::asn1::translator {
 
 void DescriptionTranslator::translate(const seds::model::Description *sedsDescription, Asn1Acn::Node *asn1Node)
 {
+    if (sedsDescription == nullptr) {
+        return;
+    }
+
     auto description = combineDescriptions(sedsDescription);
     asn1Node->setComment(std::move(description));
 }

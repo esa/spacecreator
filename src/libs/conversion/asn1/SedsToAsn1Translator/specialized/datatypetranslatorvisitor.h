@@ -20,11 +20,11 @@
 #pragma once
 
 #include "context.h"
+#include "specialized/arraydatatypetranslator.h"
 
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/integeracnparams.h>
 #include <optional>
-#include <seds/SedsModel/base/description.h>
 #include <seds/SedsModel/types/datatype.h>
 #include <seds/SedsModel/types/encodings/coreencodingandprecision.h>
 #include <seds/SedsModel/types/encodings/coreintegerencoding.h>
@@ -45,11 +45,28 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   outputAsn1Definitions   Where created types will be placed
      * @param   context                 Current translation context
      */
-    DataTypeTranslatorVisitor(Asn1Acn::Definitions *outputAsn1Definitions, const Context &context);
+    explicit DataTypeTranslatorVisitor(Context &context);
+    /**
+     * @brief   Deleted copy constructor
+     */
+    DataTypeTranslatorVisitor(const DataTypeTranslatorVisitor &) = delete;
+    /**
+     * @brief   Deleted move constructor
+     */
+    DataTypeTranslatorVisitor(DataTypeTranslatorVisitor &&) = delete;
 
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    DataTypeTranslatorVisitor &operator=(const DataTypeTranslatorVisitor &) = delete;
+    /**
+     * @brief   Deleted move assignment operator
+     */
+    DataTypeTranslatorVisitor &operator=(DataTypeTranslatorVisitor &&) = delete;
+
+public:
     /**
      * @brief   Translates SEDS array data type
      *
@@ -106,8 +123,6 @@ public:
     auto operator()(const seds::model::SubRangeDataType &sedsType) -> void;
 
 private:
-    auto addType(std::unique_ptr<Asn1Acn::Types::Type> type, const seds::model::Description *sedsDescription) -> void;
-
     auto translateBitStringLength(
             const seds::model::BinaryDataType &sedsType, Asn1Acn::Types::BitString *asn1Type) const -> void;
     auto translateStringLength(const seds::model::StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
@@ -134,8 +149,9 @@ private:
     auto convertByteOrder(seds::model::ByteOrder sedsByteOrder) const -> Asn1Acn::Types::Endianness;
 
 private:
-    Asn1Acn::Definitions *m_outputAsn1Definitions;
-    const Context &m_context;
+    Context &m_context;
+
+    ArrayDataTypeTranslator m_arrayTranslator;
 };
 
 } // namespace conversion::asn1::translator
