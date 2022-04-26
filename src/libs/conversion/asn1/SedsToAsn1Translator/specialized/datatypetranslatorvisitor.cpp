@@ -63,6 +63,7 @@ namespace conversion::asn1::translator {
 DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(Context &context)
     : m_context(context)
     , m_arrayTranslator(m_context)
+    , m_containerTranslator(m_context)
 {
 }
 
@@ -93,7 +94,7 @@ void DataTypeTranslatorVisitor::operator()(const seds::model::BooleanDataType &s
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::ContainerDataType &sedsType)
 {
-    Q_UNUSED(sedsType);
+    m_containerTranslator.translate(sedsType);
 }
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::EnumeratedDataType &sedsType)

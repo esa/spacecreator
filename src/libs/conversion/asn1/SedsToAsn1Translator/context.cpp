@@ -33,7 +33,7 @@ using conversion::translator::UndeclaredDataTypeException;
 namespace conversion::asn1::translator {
 
 Context::Context(const seds::model::Package *sedsPackage, Asn1Acn::Definitions *definitions,
-        const Asn1Acn::Definitions *parentDefinitions, const std::list<const seds::model::Package *> &sedsPackages,
+        Asn1Acn::Definitions *parentDefinitions, const std::list<const seds::model::Package *> &sedsPackages,
         const std::vector<std::unique_ptr<Asn1Acn::File>> &asn1Files, const Options &options)
     : m_sedsPackage(sedsPackage)
     , m_definitions(definitions)
@@ -67,14 +67,14 @@ const seds::model::DataType *Context::findSedsType(const seds::model::DataTypeRe
     return type;
 }
 
-const Asn1Acn::Types::Type *Context::findAsn1Type(const seds::model::DataTypeRef &typeRef)
+Asn1Acn::Types::Type *Context::findAsn1Type(const seds::model::DataTypeRef &typeRef)
 {
     const auto &typeName = typeRef.nameStr();
 
     if (typeRef.packageStr()) {
         const auto asn1DefinitionsName = Escaper::escapeAsn1PackageName(*typeRef.packageStr());
-        const auto definitions = getAsn1Definitions(asn1DefinitionsName);
-        const auto typeAssignment = definitions->type(typeName);
+        auto definitions = getAsn1Definitions(asn1DefinitionsName);
+        auto typeAssignment = definitions->type(typeName);
 
         if (typeAssignment != nullptr) {
             Asn1Acn::ImportedType importedType(asn1DefinitionsName, typeName);
@@ -84,7 +84,7 @@ const Asn1Acn::Types::Type *Context::findAsn1Type(const seds::model::DataTypeRef
         }
 
     } else {
-        const auto *typeAssignment = m_definitions->type(typeName);
+        auto *typeAssignment = m_definitions->type(typeName);
         if (typeAssignment != nullptr) {
             return typeAssignment->type();
         }

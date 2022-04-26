@@ -84,5 +84,22 @@
         </ConstraintSet>
       </ContainerDataType>
     </DataTypeSet>
+    <ComponentSet>
+      <Component name="Component">
+        <DataTypeSet>
+          <ContainerDataType name="PackageContainer">
+            <EntryList>
+              <Entry name="fieldA" type="DataItemA" />
+              <Entry name="fieldB" type="DataItemB" />
+            </EntryList>
+          </ContainerDataType>
+          <ContainerDataType name="PackageChildContainer" baseType="PackageContainer">
+            <ConstraintSet>
+              <ValueConstraint entry="fieldA" value="0" />
+            </ConstraintSet>
+          </ContainerDataType>
+        </DataTypeSet>
+      </Component>
+    </ComponentSet>
   </Package>
 </PackageFile>

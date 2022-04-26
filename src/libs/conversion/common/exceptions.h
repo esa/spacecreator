@@ -23,8 +23,6 @@
 #include <set>
 #include <stdexcept>
 
-class QString;
-
 namespace conversion {
 
 enum class ModelType;

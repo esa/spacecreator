@@ -21,6 +21,7 @@
 
 #include "context.h"
 #include "specialized/arraydatatypetranslator.h"
+#include "specialized/containerdatatypetranslator.h"
 
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/integeracnparams.h>
@@ -152,6 +153,7 @@ private:
     Context &m_context;
 
     ArrayDataTypeTranslator m_arrayTranslator;
+    ContainerDataTypeTranslator m_containerTranslator;
 };
 
 } // namespace conversion::asn1::translator

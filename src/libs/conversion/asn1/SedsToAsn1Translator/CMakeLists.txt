@@ -6,9 +6,12 @@ set(SOURCES     context.cpp
                 patchersnippetsgenerator.cpp
                 translator.cpp
                 specialized/arraydatatypetranslator.cpp
+                specialized/containerconstrainttranslatorvisitor.cpp
+                specialized/containerdatatypetranslator.cpp
                 specialized/datatypetranslatorvisitor.cpp
                 specialized/descriptiontranslator.cpp
                 specialized/dimensiontranslator.cpp
+                specialized/entrytranslatorvisitor.cpp
                 specialized/rangetranslatorvisitor.cpp)
 set(INCLUDES    context.h
                 datatypesdependencyresolver.h
@@ -16,9 +19,12 @@ set(INCLUDES    context.h
                 patchersnippetsgenerator.h
                 translator.h
                 specialized/arraydatatypetranslator.h
+                specialized/containerconstrainttranslatorvisitor.h
+                specialized/containerdatatypetranslator.h
                 specialized/datatypetranslatorvisitor.h
                 specialized/descriptiontranslator.h
                 specialized/dimensiontranslator.h
+                specialized/entrytranslatorvisitor.h
                 specialized/rangetranslatorvisitor.h
                 specialized/sizetranslatorvisitor.h)
 

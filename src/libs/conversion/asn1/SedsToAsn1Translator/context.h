@@ -42,7 +42,7 @@ class Context final
 {
 public:
     Context(const seds::model::Package *sedsPackage, Asn1Acn::Definitions *definitions,
-            const Asn1Acn::Definitions *parentDefinitions, const std::list<const seds::model::Package *> &sedsPackages,
+            Asn1Acn::Definitions *parentDefinitions, const std::list<const seds::model::Package *> &sedsPackages,
             const std::vector<std::unique_ptr<Asn1Acn::File>> &asn1Files, const Options &options);
     Context(const Context &) = delete;
     Context(Context &&) = delete;
@@ -55,7 +55,7 @@ public:
             -> void;
 
     auto findSedsType(const seds::model::DataTypeRef &typeRef) -> const seds::model::DataType *;
-    auto findAsn1Type(const seds::model::DataTypeRef &typeRef) -> const Asn1Acn::Types::Type *;
+    auto findAsn1Type(const seds::model::DataTypeRef &typeRef) -> Asn1Acn::Types::Type *;
 
     auto definitionsName() const -> const QString &;
     auto arraySizeThreshold() const -> std::optional<uint64_t>;
@@ -67,7 +67,7 @@ private:
 private:
     const seds::model::Package *m_sedsPackage;
     Asn1Acn::Definitions *m_definitions;
-    const Asn1Acn::Definitions *m_parentDefinitions;
+    Asn1Acn::Definitions *m_parentDefinitions;
 
     const std::list<const seds::model::Package *> &m_sedsPackages;
     const std::vector<std::unique_ptr<Asn1Acn::File>> &m_asn1Files;
