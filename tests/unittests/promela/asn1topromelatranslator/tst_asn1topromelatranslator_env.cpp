@@ -329,12 +329,11 @@ void checkConditional(const Conditional &conditional)
     }
 }
 
-void checkSequence(const Sequence &sequence, const int expectedContentSize = 1)
+void checkSequence(const Sequence &sequence)
 {
     QCOMPARE(sequence.getType(), Sequence::Type::NORMAL);
-    const auto &sequenceContent = sequence.getContent();
-    // QCOMPARE(sequenceContent.size(), expectedContentSize);
 
+    const auto &sequenceContent = sequence.getContent();
     for (const auto &content : sequenceContent) {
         const auto &contentValue = content->getValue();
 
@@ -351,8 +350,7 @@ void checkSequence(const Sequence &sequence, const int expectedContentSize = 1)
             checkConditional(conditional);
         } else if (contentIsSequence) {
             const auto &nestedSequence = std::get<Sequence>(contentValue);
-            // checkSequence(sequence);
-            (void)nestedSequence;
+            checkSequence(nestedSequence);
         } else if (contentIsInlineCall) {
             const auto &inlineCall = std::get<InlineCall>(contentValue);
             // checkInlineCall()
@@ -368,17 +366,11 @@ void checkInlineDefinition(InlineDef *const definition, Asn1Acn::TypeAssignment 
 
     const auto &definitionArguments = definition->getArguments();
     QCOMPARE(definitionArguments.size(), 1);
+
     const auto &argument = definitionArguments.front();
     QCOMPARE(argument, "value");
 
-    const Sequence &promelaSequence = definition->getSequence();
-    if (typeAssignment->typeEnum() == Asn1Acn::Types::Type::SEQUENCE) {
-        auto *const asnParentNode = static_cast<Asn1Acn::Definitions *>(typeAssignment->parent());
-        QVERIFY(asnParentNode);
-        checkSequence(promelaSequence, asnParentNode->types().size());
-    } else {
-        checkSequence(promelaSequence);
-    }
+    checkSequence(definition->getSequence());
 }
 
 void tst_Asn1ToPromelaTranslator_Env::testSequence() const
@@ -449,49 +441,11 @@ void checkSequenceInlineDefinitions(const std::list<std::unique_ptr<promela::mod
 
         const auto &definitionArguments = inlineDefPtr->getArguments();
         QCOMPARE(definitionArguments.size(), 1);
+
         const auto &argument = definitionArguments.front();
         QCOMPARE(argument, "value");
 
-        const auto &promelaSequence = inlineDefPtr->getSequence();
-        const auto &asnTypeEnum = asnTypeAssignmentPtr->typeEnum();
-        if (asnTypeEnum == Asn1Acn::Types::Type::SEQUENCE) {
-            auto *const asnSequence = static_cast<Asn1Acn::Types::Sequence *>(asnTypeAssignmentPtr->type());
-            (void)asnSequence;
-            // qDebug() << "promela sequence ind: " << promelaSequence.getContent().begin()->get()->getValue().index();
-            // using Value = std::variant<Declaration, ChannelSend, ChannelRecv, Expression, DoLoop, Assignment,
-            //                            InlineCall, Skip, Conditional, Sequence, ForLoop>
-            const auto &val = promelaSequence.getContent().begin()->get()->getValue();
-            if (std::holds_alternative<InlineCall>(val)) {
-                const auto &ic = std::get<InlineCall>(val);
-                (void)ic;
-                // qDebug() << "inlinecall: " << ic.getName();
-            } else if (std::holds_alternative<Conditional>(val)) {
-                const auto &ic = std::get<Conditional>(val);
-                for (const auto &alternative : ic.getAlternatives()) {
-                    for (const auto &content : alternative->getContent()) {
-                        const auto &contentValue = content->getValue();
-                        (void)contentValue;
-                        // qDebug() << contentValue.index();
-                        // using Value = std::variant<Declaration, ChannelSend, ChannelRecv, Expression, DoLoop,
-                        // Assignment, InlineCall, Skip,
-                        //        Conditional, Sequence, ForLoop>;
-                        if (std::holds_alternative<Expression>(contentValue)) {
-                            const auto &x = std::get<Expression>(contentValue);
-                            (void)x;
-                            // using Value = std::variant<VariableRef, Constant, BinaryExpression, InlineCall>;
-                            // if(std::holds_alternative<VariableRef>(const variant<_Types...> &__v))
-                            // qDebug() << "" << x.getContent();
-                        } else if (std::holds_alternative<Assignment>(contentValue)) {
-                            const auto &assignment = std::get<Assignment>(contentValue);
-                            (void)assignment;
-                        }
-                    }
-                }
-            }
-            checkSequence(promelaSequence, asnSequence->components().size());
-        } else {
-            checkSequence(promelaSequence);
-        }
+        checkSequence(inlineDefPtr->getSequence());
     }
 }
 

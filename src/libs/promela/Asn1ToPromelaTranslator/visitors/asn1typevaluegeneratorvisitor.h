@@ -139,7 +139,7 @@ private:
     QString m_name;
 
     /*
-     * change string value temporarily and automatically restore its value to start value when this object gets
+     * Change string value temporarily and automatically restore its value to start value when this object gets
      * destroyed
      */
     class ChangeNameTo final
