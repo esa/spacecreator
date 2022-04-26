@@ -28,7 +28,6 @@
 #include "integerconstraintvisitor.h"
 #include "integergenerator.h"
 #include "integersubset.h"
-#include "proctypeelement.h"
 #include "sequence.h"
 #include "sequencecomponent.h"
 #include "types/type.h"
@@ -225,47 +224,57 @@ QString getSequenceComponentTypeName(const Asn1Acn::AsnSequenceComponent &asnCom
     }
 }
 
+std::unique_ptr<ProctypeElement> Asn1TypeValueGeneratorVisitor::generateAsnSequenceComponentInline(
+        Asn1Acn::AsnSequenceComponent *asnSequenceComponent, const QString &argumentName)
+{
+    const QString typeToGenerateName = getSequenceComponentTypeName(*asnSequenceComponent, m_name);
+    auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
+    ChangeStringInScope changeName(&m_name, typeToGenerateName);
+    asnSequenceComponentType->accept(*this);
+
+    const QString typeGeneratorToCallName = QString("%1_generate_value").arg(typeToGenerateName);
+    if (asnSequenceComponent->isOptional()) {
+        const QString valueExistAssignmentName =
+                QString("%1.exist.%2").arg(argumentName).arg(asnSequenceComponent->name());
+
+        auto valueExistsSequence = makeNormalSequence();
+        valueExistsSequence->appendElement(makeTrueExpressionProctypeElement());
+        valueExistsSequence->appendElement(makeInlineCall(asnSequenceComponent, argumentName, typeGeneratorToCallName));
+        valueExistsSequence->appendElement(makeAssignmentProctypeElement(valueExistAssignmentName, 1));
+
+        auto valueNotExistSequence = makeNormalSequence();
+        valueNotExistSequence->appendElement(makeTrueExpressionProctypeElement());
+        valueNotExistSequence->appendElement(makeAssignmentProctypeElement(valueExistAssignmentName, 0));
+
+        Conditional conditional;
+        conditional.appendAlternative(std::move(valueExistsSequence));
+        conditional.appendAlternative(std::move(valueNotExistSequence));
+
+        return std::make_unique<ProctypeElement>(std::move(conditional));
+    } else {
+        return makeInlineCall(asnSequenceComponent, argumentName, typeGeneratorToCallName);
+    }
+}
+
 void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 {
-    const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(type.identifier());
     const QString argumentName = "value";
-    const QList<QString> inlineArguments = { argumentName };
+
+    const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(type.identifier());
+    const QStringList inlineArguments = { argumentName };
     promela::model::Sequence sequence(promela::model::Sequence::Type::NORMAL);
-
-    for (auto &sequenceComponent : type.components()) {
-        if (sequenceComponent != nullptr) {
-            // TODO: pack as function
+    {
+        for (auto &sequenceComponent : type.components()) {
             auto *const asnSequenceComponent = static_cast<Asn1Acn::AsnSequenceComponent *>(sequenceComponent.get());
+            auto *const acnSequenceComponent = static_cast<Asn1Acn::AcnSequenceComponent *>(sequenceComponent.get());
 
-            const QString typeToGenerate = getSequenceComponentTypeName(*asnSequenceComponent, m_name);
-            auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
-            ChangeNameTo changeName(&m_name, typeToGenerate);
-            asnSequenceComponentType->accept(*this);
-
-            const QString typeGeneratorToCallName = QString("%1_generate_value").arg(typeToGenerate);
-            if (asnSequenceComponent->isOptional()) {
-                const QString valueExistName = QString("%1.exist.%2").arg(argumentName).arg(sequenceComponent->name());
-
-                auto sequenceWithInlineToGenerateValue = makeNormalSequence();
-                sequenceWithInlineToGenerateValue->appendElement(makeTrueExpressionProctypeElement());
-                sequenceWithInlineToGenerateValue->appendElement(
-                        makeInlineCall(asnSequenceComponent, argumentName, typeGeneratorToCallName));
-                sequenceWithInlineToGenerateValue->appendElement(makeAssignmentProctypeElement(valueExistName, 1));
-
-                auto emptySequenceOptionalIsOff = makeNormalSequence();
-                emptySequenceOptionalIsOff->appendElement(makeTrueExpressionProctypeElement());
-                emptySequenceOptionalIsOff->appendElement(makeAssignmentProctypeElement(valueExistName, 0));
-
-                Conditional conditional;
-                conditional.appendAlternative(std::move(sequenceWithInlineToGenerateValue));
-                conditional.appendAlternative(std::move(emptySequenceOptionalIsOff));
-
-                sequence.appendElement(std::make_unique<ProctypeElement>(std::move(conditional)));
-            } else {
-                sequence.appendElement(makeInlineCall(asnSequenceComponent, argumentName, typeGeneratorToCallName));
+            if (asnSequenceComponent != nullptr) {
+                sequence.appendElement(generateAsnSequenceComponentInline(asnSequenceComponent, argumentName));
+            } else if (acnSequenceComponent != nullptr) {
+                // TODO: add alternative generation from ACN type definitions
+                // sequence.appendElement(generateAcnSequenceComponentInline(acnSequenceComponent, argumentName));
+                (void)0;
             }
-
-            // TODO: add alternative generation from ACN type definitions
         }
     }
 

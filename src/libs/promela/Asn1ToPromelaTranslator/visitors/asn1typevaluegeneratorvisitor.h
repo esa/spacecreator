@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "proctypeelement.h"
+
 #include <asn1library/asn1/types/type.h>
 #include <asn1library/asn1/types/typereadingvisitor.h>
 #include <asnsequencecomponent.h>
@@ -131,30 +133,32 @@ public:
     void visit(const ::Asn1Acn::Types::UserdefinedType &type) override;
 
 private:
-    void createValueGenerationInline(::promela::model::Sequence sequence);
-    Asn1Acn::Types::Type *getAsnSequenceComponentType(Asn1Acn::AsnSequenceComponent *component);
+    auto createValueGenerationInline(::promela::model::Sequence sequence) -> void;
+    auto getAsnSequenceComponentType(Asn1Acn::AsnSequenceComponent *component) -> Asn1Acn::Types::Type *;
+    auto generateAsnSequenceComponentInline(Asn1Acn::AsnSequenceComponent *asnSequenceComponent,
+            const QString &argumentName) -> std::unique_ptr<model::ProctypeElement>;
 
 private:
     ::promela::model::PromelaModel &m_promelaModel;
     QString m_name;
 
     /*
-     * Change string value temporarily and automatically restore its value to start value when this object gets
+     * Change string value in current scope; automatically restore its value to initial value when this object gets
      * destroyed
      */
-    class ChangeNameTo final
+    class ChangeStringInScope final
     {
     public:
-        ChangeNameTo(QString *targetNamePtr, const QString &temporaryName)
+        ChangeStringInScope(QString *targetNamePtr, const QString &temporaryName)
             : m_nameToChange(targetNamePtr)
             , m_initialName(*targetNamePtr)
         {
             *targetNamePtr = temporaryName;
         }
-        ~ChangeNameTo() { *m_nameToChange = m_initialName; }
+        ~ChangeStringInScope() { *m_nameToChange = m_initialName; }
 
-        ChangeNameTo() = delete;
-        ChangeNameTo(ChangeNameTo &&) = delete;
+        ChangeStringInScope() = delete;
+        ChangeStringInScope(ChangeStringInScope &&) = delete;
 
     private:
         QString *m_nameToChange;
