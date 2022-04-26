@@ -19,7 +19,6 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
-#include "acnsequencecomponent.h"
 #include "asnsequencecomponent.h"
 #include "assignment.h"
 #include "enumeratedgenerator.h"
@@ -35,7 +34,6 @@
 #include "values.h"
 #include "variableref.h"
 
-#include <QDebug>
 #include <algorithm>
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/integer.h>
@@ -80,6 +78,15 @@ using promela::model::UtypeRef;
 using promela::model::VariableRef;
 
 namespace promela::translator {
+
+static auto makeInlineCall(Asn1Acn::AsnSequenceComponent *envGeneratorInline, const QString &callArgumentName,
+        const QString &generatorInlineName) -> std::unique_ptr<ProctypeElement>;
+static auto makeNormalSequence() -> std::unique_ptr<promela::model::Sequence>;
+static auto makeTrueExpressionProctypeElement() -> std::unique_ptr<promela::model::ProctypeElement>;
+static auto makeAssignmentProctypeElement(const QString &valueName, int32_t value)
+        -> std::unique_ptr<promela::model::ProctypeElement>;
+static auto getSequenceComponentTypeName(const Asn1Acn::AsnSequenceComponent &asnComponent, const QString &sequenceName)
+        -> QString;
 
 Asn1TypeValueGeneratorVisitor::Asn1TypeValueGeneratorVisitor(PromelaModel &promelaModel, QString name)
     : m_promelaModel(promelaModel)
@@ -163,6 +170,92 @@ void Asn1TypeValueGeneratorVisitor::visit(const Enumerated &type)
 void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
 {
     Q_UNUSED(type);
+}
+
+void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
+{
+    const QString argumentName = "value";
+
+    const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(type.identifier());
+    const QStringList inlineArguments = { argumentName };
+    promela::model::Sequence sequence(promela::model::Sequence::Type::NORMAL);
+    {
+        for (auto &sequenceComponent : type.components()) {
+            auto *const asnSequenceComponent = static_cast<Asn1Acn::AsnSequenceComponent *>(sequenceComponent.get());
+            if (asnSequenceComponent != nullptr) {
+                sequence.appendElement(generateAsnSequenceComponentInline(asnSequenceComponent, argumentName));
+            }
+        }
+    }
+
+    auto inlineDef = std::make_unique<InlineDef>(inlineSeqGeneratorName, inlineArguments, std::move(sequence));
+
+    m_promelaModel.addInlineDef(std::move(inlineDef));
+}
+
+void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
+{
+    Q_UNUSED(type);
+}
+
+void Asn1TypeValueGeneratorVisitor::visit(const Real &type)
+{
+    Q_UNUSED(type);
+}
+
+void Asn1TypeValueGeneratorVisitor::visit(const LabelType &type)
+{
+    Q_UNUSED(type);
+}
+
+void Asn1TypeValueGeneratorVisitor::visit(const Integer &type)
+{
+    IntegerConstraintVisitor constraintVisitor;
+    type.constraints().accept(constraintVisitor);
+
+    std::optional<IntegerSubset> integerSubset = constraintVisitor.getResultSubset();
+
+    if (!integerSubset.has_value()) {
+        auto message =
+                QString("Unable to generate values for type %1: unable to determine available subset").arg(m_name);
+        throw TranslationException(message);
+    }
+
+    Conditional conditional;
+    IntegerGenerator generator(integerSubset.value());
+
+    while (generator.has_next()) {
+        int value = generator.next();
+
+        std::unique_ptr<::promela::model::Sequence> nestedSequence =
+                std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
+
+        nestedSequence->appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("true"))));
+        nestedSequence->appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("value"), Expression(Constant(value)))));
+
+        conditional.appendAlternative(std::move(nestedSequence));
+    }
+
+    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(conditional)));
+
+    createValueGenerationInline(std::move(sequence));
+}
+
+void Asn1TypeValueGeneratorVisitor::visit(const UserdefinedType &type)
+{
+    Q_UNUSED(type);
+}
+
+void Asn1TypeValueGeneratorVisitor::createValueGenerationInline(::promela::model::Sequence sequence)
+{
+    const QString inlineName = QString("%1_generate_value").arg(m_name);
+    const QList<QString> inlineArguments = { QString("value") };
+    std::unique_ptr<InlineDef> inlineDef =
+            std::make_unique<InlineDef>(inlineName, inlineArguments, std::move(sequence));
+
+    m_promelaModel.addInlineDef(std::move(inlineDef));
 }
 
 Asn1Acn::Types::Type *Asn1TypeValueGeneratorVisitor::getAsnSequenceComponentType(
@@ -254,98 +347,6 @@ std::unique_ptr<ProctypeElement> Asn1TypeValueGeneratorVisitor::generateAsnSeque
     } else {
         return makeInlineCall(asnSequenceComponent, argumentName, typeGeneratorToCallName);
     }
-}
-
-void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
-{
-    const QString argumentName = "value";
-
-    const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(type.identifier());
-    const QStringList inlineArguments = { argumentName };
-    promela::model::Sequence sequence(promela::model::Sequence::Type::NORMAL);
-    {
-        for (auto &sequenceComponent : type.components()) {
-            auto *const asnSequenceComponent = static_cast<Asn1Acn::AsnSequenceComponent *>(sequenceComponent.get());
-            auto *const acnSequenceComponent = static_cast<Asn1Acn::AcnSequenceComponent *>(sequenceComponent.get());
-
-            if (asnSequenceComponent != nullptr) {
-                sequence.appendElement(generateAsnSequenceComponentInline(asnSequenceComponent, argumentName));
-            } else if (acnSequenceComponent != nullptr) {
-                // TODO: add alternative generation from ACN type definitions
-                // sequence.appendElement(generateAcnSequenceComponentInline(acnSequenceComponent, argumentName));
-                (void)0;
-            }
-        }
-    }
-
-    auto inlineDef = std::make_unique<InlineDef>(inlineSeqGeneratorName, inlineArguments, std::move(sequence));
-
-    m_promelaModel.addInlineDef(std::move(inlineDef));
-}
-
-void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
-{
-    Q_UNUSED(type);
-}
-
-void Asn1TypeValueGeneratorVisitor::visit(const Real &type)
-{
-    Q_UNUSED(type);
-}
-
-void Asn1TypeValueGeneratorVisitor::visit(const LabelType &type)
-{
-    Q_UNUSED(type);
-}
-
-void Asn1TypeValueGeneratorVisitor::visit(const Integer &type)
-{
-    IntegerConstraintVisitor constraintVisitor;
-    type.constraints().accept(constraintVisitor);
-
-    std::optional<IntegerSubset> integerSubset = constraintVisitor.getResultSubset();
-
-    if (!integerSubset.has_value()) {
-        auto message =
-                QString("Unable to generate values for type %1: unable to determine available subset").arg(m_name);
-        throw TranslationException(message);
-    }
-
-    Conditional conditional;
-    IntegerGenerator generator(integerSubset.value());
-
-    while (generator.has_next()) {
-        int value = generator.next();
-
-        std::unique_ptr<::promela::model::Sequence> nestedSequence =
-                std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
-
-        nestedSequence->appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("true"))));
-        nestedSequence->appendElement(
-                std::make_unique<ProctypeElement>(Assignment(VariableRef("value"), Expression(Constant(value)))));
-
-        conditional.appendAlternative(std::move(nestedSequence));
-    }
-
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
-    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(conditional)));
-
-    createValueGenerationInline(std::move(sequence));
-}
-
-void Asn1TypeValueGeneratorVisitor::visit(const UserdefinedType &type)
-{
-    Q_UNUSED(type);
-}
-
-void Asn1TypeValueGeneratorVisitor::createValueGenerationInline(::promela::model::Sequence sequence)
-{
-    const QString inlineName = QString("%1_generate_value").arg(m_name);
-    const QList<QString> inlineArguments = { QString("value") };
-    std::unique_ptr<InlineDef> inlineDef =
-            std::make_unique<InlineDef>(inlineName, inlineArguments, std::move(sequence));
-
-    m_promelaModel.addInlineDef(std::move(inlineDef));
 }
 
 } // namespace promela::translator

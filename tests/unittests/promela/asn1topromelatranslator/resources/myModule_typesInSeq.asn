@@ -2,7 +2,7 @@ MYMODULE DEFINITIONS ::= BEGIN
 
 EnvParamSeq ::= SEQUENCE {
    x INTEGER(0 .. 9),
-   y INTEGER(0 .. 9) OPTIONAL,
+   y INTEGER(0 .. 7) OPTIONAL,
    z BOOLEAN
 }
 
