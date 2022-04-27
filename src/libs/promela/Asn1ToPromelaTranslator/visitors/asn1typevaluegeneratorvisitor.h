@@ -19,12 +19,11 @@
 
 #pragma once
 
-#include "proctypeelement.h"
-
+#include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/types/type.h>
 #include <asn1library/asn1/types/typereadingvisitor.h>
-#include <asnsequencecomponent.h>
 #include <optional>
+#include <promela/PromelaModel/proctypeelement.h>
 #include <promela/PromelaModel/promelamodel.h>
 
 namespace promela::translator {

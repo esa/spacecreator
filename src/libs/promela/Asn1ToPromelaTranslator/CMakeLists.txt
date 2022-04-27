@@ -3,6 +3,7 @@ project(Asn1ToPromelaTranslator VERSION 1.0.0 LANGUAGES CXX)
 set(SOURCES
   translator.cpp
   promelatypesorter.cpp
+  proctypemaker.cpp
   integersubset.cpp
   integergenerator.cpp
   enumeratedgenerator.cpp
@@ -18,6 +19,7 @@ set(SOURCES
 set(INCLUDES
   translator.h
   promelatypesorter.h
+  proctypemaker.h
   integersubset.h
   integergenerator.h
   enumeratedgenerator.h
