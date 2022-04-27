@@ -99,6 +99,15 @@ public:
     static auto escapePromelaName(QString name) -> QString;
 
     /**
+     * @brief   Convert the input name to a Promela field identifier
+     *
+     * @param   name    input name
+     *
+     * @returns identifier for Promela
+     */
+    static auto escapePromelaField(QString name) -> QString;
+
+    /**
      * @brief   Convert the input IV name to an id acceptable as a Promela identifier
      *
      * @param   name    input name

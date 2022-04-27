@@ -169,7 +169,7 @@ auto TmcConverter::integrateObserver(QString observerSpecification, QStringList 
     const auto structure = QFileInfo(directory.absolutePath() + QDir::separator() + "system_structure.pr");
     const auto datamodel =
             QFileInfo(directory.absolutePath() + QDir::separator() + processName.toLower() + "_datamodel.asn");
-    const auto dataview = QFileInfo(directory.absolutePath() + QDir::separator() + "dataview-uniq.asn");
+    // const auto dataview = QFileInfo(directory.absolutePath() + QDir::separator() + "dataview-uniq.asn");
 
     ProcessMetadata meta(processName, structure, process, datamodel, QList<QFileInfo>());
     SdlToPromelaConverter sdl2Promela;
@@ -186,7 +186,7 @@ auto TmcConverter::integrateObserver(QString observerSpecification, QStringList 
         }
         infoFile.close();
     }
-    asn1Files.append(dataview.absoluteFilePath());
+    // asn1Files.append(dataview.absoluteFilePath());
     asn1Files.append(datamodel.absoluteFilePath());
 }
 
@@ -230,7 +230,7 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
     QMap<QString, QString> uniqueAsn1Files;
     for (const QString &ivFunction : modelFunctions) {
         const ProcessMetadata &processMetadata = allSdlFiles.at(ivFunction);
-        if (!uniqueAsn1Files.contains(processMetadata.getDatamodel().fileName())) {
+        /*if (!uniqueAsn1Files.contains(processMetadata.getDatamodel().fileName())) {
             uniqueAsn1Files.insert(
                     processMetadata.getDatamodel().fileName(), processMetadata.getDatamodel().absoluteFilePath());
         }
@@ -238,7 +238,7 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
             if (fileInfo.exists()) {
                 uniqueAsn1Files.insert(fileInfo.fileName(), fileInfo.absoluteFilePath());
             }
-        }
+        }*/
         const QFileInfo outputFile = outputFilepath(processMetadata.getName().toLower() + ".pml");
 
         SdlToPromelaConverter sdl2Promela;
@@ -254,13 +254,13 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
         integrateObserver(attachment, m_observerFiles, asn1Files, m_observerAttachmentInfos);
     }
 
-    const QFileInfo dataviewUniq = dataViewUniqLocation();
-    if (!dataviewUniq.exists()) {
-        qCritical() << "File " << dataviewUniq.absoluteFilePath() << " does not exist.";
+    const QFileInfo simuDataView = simuDataViewLocation();
+    if (!simuDataView.exists()) {
+        qCritical() << "File " << simuDataView.absoluteFilePath() << " does not exist.";
         return false;
     }
 
-    /*asn1Files.append(dataviewUniq.absoluteFilePath());
+    asn1Files.append(simuDataView.absoluteFilePath());
 
     for (const QString &datamodel : uniqueAsn1Files) {
         if (!QFileInfo(datamodel).exists()) {
@@ -269,7 +269,7 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
         }
 
         asn1Files.append(datamodel);
-    }*/
+    }
 
     const QFileInfo outputDataview = outputFilepath("dataview.pml");
 
@@ -277,7 +277,7 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
 
     const QFileInfo outputEnv = outputFilepath("env_inlines.pml");
 
-    createEnvGenerationInlines(dataviewUniq, outputEnv, environmentDatatypes);
+    createEnvGenerationInlines(simuDataView, outputEnv, environmentDatatypes);
 
     const QFileInfo outputSystemFile = outputFilepath("system.pml");
 
@@ -501,6 +501,11 @@ QFileInfo TmcConverter::dataViewUniqLocation() const
 {
     return workDirectory().absoluteFilePath() + QDir::separator() + "dataview" + QDir::separator()
             + "dataview-uniq.asn";
+}
+
+QFileInfo TmcConverter::simuDataViewLocation() const
+{
+    return workDirectory().absoluteFilePath() + QDir::separator() + "simulation" + QDir::separator() + "observer.asn";
 }
 
 QFileInfo TmcConverter::sdlImplementationBaseDirectory(const QString &functionName) const

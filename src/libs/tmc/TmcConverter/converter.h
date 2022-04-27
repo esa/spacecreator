@@ -100,6 +100,7 @@ private:
             const QFileInfo &inputDataView, const QFileInfo &outputFilepath, const QStringList &envDatatypes);
 
     QFileInfo workDirectory() const;
+    QFileInfo simuDataViewLocation() const;
     QFileInfo dataViewUniqLocation() const;
     QFileInfo sdlImplementationBaseDirectory(const QString &functionName) const;
     QFileInfo sdlImplementationLocation(const QString &functionName) const;

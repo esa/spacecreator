@@ -96,7 +96,17 @@ QString Escaper::escapePromelaIV(QString name)
 {
     escapeName(name, '_');
 
+    name = name.toLower();
     name[0] = name[0].toUpper();
+
+    return name;
+}
+
+QString Escaper::escapePromelaField(QString name)
+{
+    escapeName(name, '_');
+
+    name = name.toLower();
 
     return name;
 }

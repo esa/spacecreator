@@ -201,7 +201,8 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
         QList<ChannelInit::Type> channelType;
         channelType.append(BasicType::INT);
         ChannelInit channelInit(1, std::move(channelType));
-        Declaration channelDeclaration(DataType(BasicType::CHAN), QString("%1_lock").arg(function));
+        Declaration channelDeclaration(
+                DataType(BasicType::CHAN), QString("%1_lock").arg(Escaper::escapePromelaIV(function)));
         channelDeclaration.setInit(channelInit);
         promelaModel->addDeclaration(channelDeclaration);
     }
@@ -269,7 +270,7 @@ InitProctype IvToPromelaTranslator::generateInitProctype(
         std::unique_ptr<ProctypeElement> initCall = std::make_unique<ProctypeElement>(InlineCall(initFn, {}));
         sequence.appendElement(std::move(initCall));
 
-        const VariableRef lockChannelName = VariableRef(QString("%1_lock").arg(functionName));
+        const VariableRef lockChannelName = VariableRef(QString("%1_lock").arg(Escaper::escapePromelaIV(functionName)));
         QList<VariableRef> lockChannelArguments;
         lockChannelArguments.append(VariableRef("init_token"));
 
@@ -349,7 +350,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(Context &conte
 
     if (!environment) {
         const QString piName = QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
-        const VariableRef lockChannelName = VariableRef(QString("%1_lock").arg(functionName));
+        const VariableRef lockChannelName = VariableRef(QString("%1_lock").arg(Escaper::escapePromelaIV(functionName)));
         QList<VariableRef> lockChannelArguments;
         lockChannelArguments.append(VariableRef("token"));
 
@@ -379,7 +380,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(Context &conte
 
     sequence.appendElement(std::move(loopElement));
 
-    const QString proctypeName = QString("%1_%2").arg(functionName).arg(interfaceName);
+    const QString proctypeName = QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
     std::unique_ptr<Proctype> proctype = std::make_unique<Proctype>(proctypeName, std::move(sequence));
 
     proctype->setActive(true);
@@ -428,7 +429,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(con
 
     sequence.appendElement(std::move(loopElement));
 
-    const QString proctypeName = QString("%1_%2").arg(functionName).arg(interfaceName);
+    const QString proctypeName = QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
 
     std::unique_ptr<Proctype> proctype = std::make_unique<Proctype>(proctypeName, std::move(sequence));
 
@@ -624,11 +625,11 @@ void IvToPromelaTranslator::createSystemState(
         if (ivFunction->instanceOf() != nullptr) {
             const QString functionTypeName = ivFunction->instanceOf()->property("name").toString();
             QString dataType = QString("%1_Context").arg(Escaper::escapePromelaIV(functionTypeName));
-            QString fieldName = functionName;
+            QString fieldName = Escaper::escapePromelaField(functionName);
             systemState.addField(Declaration(DataType(UtypeRef(dataType)), fieldName));
         } else {
             QString dataType = QString("%1_Context").arg(Escaper::escapePromelaIV(functionName));
-            QString fieldName = functionName;
+            QString fieldName = Escaper::escapePromelaField(functionName);
             systemState.addField(Declaration(DataType(UtypeRef(dataType)), fieldName));
         }
     }
@@ -647,7 +648,7 @@ bool IvToPromelaTranslator::containsContextVariables(const QVector<shared::Conte
 
 QString IvToPromelaTranslator::constructChannelName(const QString &functionName, const QString &interfaceName) const
 {
-    return QString("%1_%2_channel").arg(functionName).arg(interfaceName);
+    return QString("%1_%2_channel").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
 }
 
 QString IvToPromelaTranslator::getInterfaceName(const ivm::IVInterface *interface) const
