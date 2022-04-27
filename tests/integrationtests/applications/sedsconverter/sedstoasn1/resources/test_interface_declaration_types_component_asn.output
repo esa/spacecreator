@@ -1,0 +1,24 @@
+COM-N7SPACE-INTERFACEDECLARATIONS-COMPONENT DEFINITIONS ::= BEGIN
+IMPORTS
+PackageInteger FROM COM-N7SPACE-INTERFACEDECLARATIONS
+;
+ComponentInteger ::= INTEGER(0 .. 255)
+InArgsOnly-Type ::= SEQUENCE
+{
+    argA PackageInteger(0 .. 255),
+    argB ComponentInteger(0 .. 255)
+}
+OutArgsOnly-Type ::= SEQUENCE
+{
+    argA PackageInteger(0 .. 255),
+    argB ComponentInteger(0 .. 255)
+}
+InAndNotify-TypeIn ::= SEQUENCE
+{
+    inputArg PackageInteger(0 .. 255)
+}
+InAndNotify-TypeNotify ::= SEQUENCE
+{
+    notifyArg ComponentInteger(0 .. 255)
+}
+END

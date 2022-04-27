@@ -23,6 +23,7 @@
 #include "packagesdependencyresolver.h"
 #include "specialized/datatypetranslatorvisitor.h"
 #include "specialized/descriptiontranslator.h"
+#include "specialized/interfacedeclarationtypecreator.h"
 
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/file.h>
@@ -113,6 +114,10 @@ void SedsToAsn1Translator::translatePackage(const seds::model::Package *sedsPack
     const auto packageResolvedSedsTypes = typesDependencyResolver.resolve(&packageSedsTypes, nullptr);
     translateDataTypeSet(packageResolvedSedsTypes, packageContext);
 
+    // Translate package interface declarations
+    const auto &packageInterfaceDeclarations = sedsPackage->declaredInterfaces();
+    translateInterfaceDeclarations(packageInterfaceDeclarations, packageContext);
+
     // Create and add package ASN.1 file
     auto packageAsn1File = std::make_unique<Asn1Acn::File>(packageAsn1DefinitionsName);
     packageAsn1File->add(std::move(packageAsn1Definitions));
@@ -137,6 +142,10 @@ void SedsToAsn1Translator::translatePackage(const seds::model::Package *sedsPack
         const auto componentResolvedSedsTypes = typesDependencyResolver.resolve(&componentSedsTypes, &packageSedsTypes);
         translateDataTypeSet(componentResolvedSedsTypes, componentContext);
 
+        // Translate component interface declarations
+        const auto &componentInterfaceDeclarations = sedsComponent.declaredInterfaces();
+        translateInterfaceDeclarations(componentInterfaceDeclarations, componentContext);
+
         // Create and add component ASN.1 file
         auto componentAsn1File = std::make_unique<Asn1Acn::File>(componentAsn1DefinitionsName);
         componentAsn1File->add(std::move(componentAsn1Definitions));
@@ -146,12 +155,22 @@ void SedsToAsn1Translator::translatePackage(const seds::model::Package *sedsPack
 }
 
 void SedsToAsn1Translator::translateDataTypeSet(
-        const std::list<const seds::model::DataType *> &sedsDataTypes, Context &context) const
+        const std::list<const seds::model::DataType *> &dataTypes, Context &context) const
 {
-    DataTypeTranslatorVisitor dataTypeVisitor(context);
+    DataTypeTranslatorVisitor dataTypeTranslator(context);
 
-    for (const auto sedsDataType : sedsDataTypes) {
-        std::visit(dataTypeVisitor, *sedsDataType);
+    for (const auto dataType : dataTypes) {
+        std::visit(dataTypeTranslator, *dataType);
+    }
+}
+
+void SedsToAsn1Translator::translateInterfaceDeclarations(
+        const std::vector<seds::model::InterfaceDeclaration> &interfaceDeclarations, Context &context) const
+{
+    InterfaceDeclarationTypeCreator typeCreator(context);
+
+    for (const auto &interfaceDeclaration : interfaceDeclarations) {
+        typeCreator.createTypes(interfaceDeclaration);
     }
 }
 

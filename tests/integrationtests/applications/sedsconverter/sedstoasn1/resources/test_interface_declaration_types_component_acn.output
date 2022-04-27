@@ -1,0 +1,21 @@
+COM-N7SPACE-INTERFACEDECLARATIONS-COMPONENT DEFINITIONS ::= BEGIN
+ComponentInteger [size 8, encoding pos-int]
+InArgsOnly-Type []
+{
+    argA [],
+    argB []
+}
+OutArgsOnly-Type []
+{
+    argA [],
+    argB []
+}
+InAndNotify-TypeIn []
+{
+    inputArg []
+}
+InAndNotify-TypeNotify []
+{
+    notifyArg []
+}
+END

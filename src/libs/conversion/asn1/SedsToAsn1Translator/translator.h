@@ -25,6 +25,7 @@
 #include <asn1library/asn1/importedtype.h>
 #include <conversion/common/translation/translator.h>
 #include <list>
+#include <seds/SedsModel/interfaces/interfacedeclaration.h>
 #include <seds/SedsModel/types/datatype.h>
 #include <vector>
 
@@ -86,6 +87,8 @@ private:
 
     auto translateDataTypeSet(const std::list<const seds::model::DataType *> &sedsDataTypes, Context &context) const
             -> void;
+    auto translateInterfaceDeclarations(const std::vector<seds::model::InterfaceDeclaration> &interfaceDeclarations,
+            Context &context) const -> void;
 
 private:
     auto collectDataTypes(const seds::model::Package *package) const -> std::vector<const seds::model::DataType *>;
