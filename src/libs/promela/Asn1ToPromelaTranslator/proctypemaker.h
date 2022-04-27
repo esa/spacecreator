@@ -21,10 +21,14 @@
 
 #include <QString>
 #include <memory>
+#include <promela/PromelaModel/basictypes.h>
 #include <promela/PromelaModel/proctypeelement.h>
 #include <promela/PromelaModel/sequence.h>
+#include <promela/PromelaModel/variableref.h>
 
+using promela::model::BasicType;
 using promela::model::ProctypeElement;
+using promela::model::VariableRef;
 
 namespace promela::translator {
 /**
@@ -34,15 +38,27 @@ class ProctypeMaker final
 {
 public:
     /**
-     * @brief make ProctypeElement with InlineCall
+     * @brief make ProctypeElement with InlineCall with one argument
      *
      * @param inlineName     name of selected inline
-     * @param structureName  name of a variable to be passed as call argument
-     * @param memberName     name of a member of the structure
+     * @param argumentName   name of a variable to be passed as call argument
+     * @param memberName     name of a member of the structure (optional)
      *
      * @return  ProctypeElement with specified InlineCall
      */
-    static auto makeInlineCall(const QString &inlineName, const QString &structureName, const QString &memberName)
+    static auto makeMonadicInlineCall(const QString &inlineName, const QString &argumentName,
+            const QString &memberName = "") -> std::unique_ptr<ProctypeElement>;
+
+    /**
+     * @brief make ProctypeElement with InlineCall with two arguments
+     *
+     * @param inlineName name of required inline
+     * @param arg1       name of a first argument
+     * @param arg2       name of a second argument
+     *
+     * @return  ProctypeElement with specified InlineCall
+     */
+    static auto makeDyadicInlineCall(const QString &inlineName, const QString &arg1, const QString &arg2)
             -> std::unique_ptr<ProctypeElement>;
 
     /**
@@ -68,6 +84,30 @@ public:
      * @return ProctypeElement with specified Assignment
      */
     static auto makeAssignmentProctypeElement(const QString &variableName, int32_t value)
+            -> std::unique_ptr<ProctypeElement>;
+
+    /**
+     * @brief make ProctypeElement with a variable declaration
+     *
+     * @param variableType type of the variable
+     * @param variableName name of the variable
+     *
+     * @return ProctypeElement with specified specified variable declaration
+     */
+    static auto makeVariableDeclaration(const model::BasicType &variableType, const QString &variableName)
+            -> std::unique_ptr<ProctypeElement>;
+
+    /**
+     * @brief make ProctypeElement with a for loop
+     *
+     * @param var      reference to iterator variable
+     * @param first    start value of iterator value
+     * @param last     end value of iterator value (inclusive)
+     * @param sequence loop's body
+     *
+     * @return ProctypeElement with specified specified variable declaration
+     */
+    static auto makeForLoop(const VariableRef &var, int first, int last, std::unique_ptr<model::Sequence> sequence)
             -> std::unique_ptr<ProctypeElement>;
 };
 

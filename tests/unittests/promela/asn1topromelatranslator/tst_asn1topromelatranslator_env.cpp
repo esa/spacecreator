@@ -48,6 +48,7 @@
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/sequence.h>
+#include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/values.h>
 #include <common/textcheckerandconsumer/textcheckerandconsumer.h>
 #include <exception>
@@ -290,6 +291,17 @@ void tst_Asn1ToPromelaTranslator_Env::testSequenceEmbeddedType() const
     const QString inputAsnFilename = "sequence-embedded.asn";
     const QStringList asnTypesToTranslate = { "EnvParamSeq" };
     const QString actualOutputFilename = "sequence-embedded.pml";
+    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
+
+    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
+    compareTextFiles(actualOutputFilename, expectedOutputFilename);
+}
+
+void tst_Asn1ToPromelaTranslator_Env::testSequenceOf() const
+{
+    const QString inputAsnFilename = "sequenceof.asn";
+    const QStringList asnTypesToTranslate = { "Type1", "SimpleFixedSizeSequenceOf" };
+    const QString actualOutputFilename = "sequenceof.pml";
     const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
 
     translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);

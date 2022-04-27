@@ -35,3 +35,6 @@ configure_file(resources/sequence-embedded.asn resources/sequence-embedded.asn C
 
 configure_file(resources/sequence.pml.out resources/sequence.pml.out COPYONLY)
 configure_file(resources/sequence-embedded.pml.out resources/sequence-embedded.pml.out COPYONLY)
+
+configure_file(resources/sequenceof.asn resources/sequenceof.asn COPYONLY)
+configure_file(resources/sequenceof.pml.out resources/sequenceof.pml.out COPYONLY)

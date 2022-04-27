@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021 - 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -75,21 +75,21 @@ public:
      *
      * @return true if constraint was visited, otherwise false
      */
-    bool isSizeConstraintVisited() const noexcept;
+    bool isRangeConstraintVisited() const noexcept;
 
     /**
      * @brief Getter for found minimal value constraint
      *
      * @return minimal allowed value
      */
-    size_t getMinSize() const noexcept;
+    size_t getMinValue() const noexcept;
 
     /**
      * @brief Getter for found maximal value constraint
      *
      * @return maximal allowed value
      */
-    size_t getMaxSize() const noexcept;
+    size_t getMaxValue() const noexcept;
 
     /**
      * @brief Getter for result IntegerSubset which describes allowed size values
@@ -101,4 +101,4 @@ public:
 private:
     std::optional<IntegerSubset> m_subset;
 };
-}
+} // promela::translator

@@ -40,6 +40,7 @@ private Q_SLOTS:
     void testInteger() const;
     void testSequence() const;
     void testSequenceEmbeddedType() const;
+    void testSequenceOf() const;
     void testEnumerated() const;
 
 private:

@@ -83,21 +83,23 @@ public:
      *
      * @return true if size constraint was visited, otherwise false
      */
-    bool isSizeConstraintVisited() const noexcept { return m_sizeVisitor.isSizeConstraintVisited(); }
+    bool isSizeConstraintVisited() const noexcept { return m_sizeVisitor.isRangeConstraintVisited(); }
 
     /**
      * @brief Getter for found minimal size constraint
      *
      * @return minimal size constraint
      */
-    size_t getMinSize() const noexcept { return m_sizeVisitor.getMinSize(); }
+    size_t getMinSize() const noexcept { return m_sizeVisitor.getMinValue(); }
 
     /**
      * @brief Getter for found maximal size constraint
      *
      * @return maximal size constraint
      */
-    size_t getMaxSize() const noexcept { return m_sizeVisitor.getMaxSize(); }
+    size_t getMaxSize() const noexcept { return m_sizeVisitor.getMaxValue(); }
+
+    IntegerConstraintVisitor *getSizeVisitor() { return &m_sizeVisitor; }
 
 private:
     IntegerConstraintVisitor m_sizeVisitor;
