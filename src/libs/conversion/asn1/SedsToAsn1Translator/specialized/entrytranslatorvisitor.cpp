@@ -29,11 +29,13 @@
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/ia5string.h>
 #include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/null.h>
 #include <asn1library/asn1/types/numericstring.h>
 #include <asn1library/asn1/types/octetstring.h>
 #include <asn1library/asn1/types/real.h>
 #include <asn1library/asn1/values.h>
 #include <conversion/common/escaper/escaper.h>
+#include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/package/package.h>
 
@@ -63,7 +65,16 @@ void EntryTranslatorVisitor::operator()(const seds::model::Entry &sedsEntry)
     m_sequence->addComponent(std::move(sequenceComponent));
 }
 
-void EntryTranslatorVisitor::operator()(const seds::model::ErrorControlEntry &sedsEntry) {}
+void EntryTranslatorVisitor::operator()(const seds::model::ErrorControlEntry &sedsEntry)
+{
+    const auto entryName = Escaper::escapeAsn1FieldName(sedsEntry.nameStr());
+    auto entryType = translateErrorControl(sedsEntry);
+    entryType->setSavePosition(true);
+
+    auto sequenceComponent =
+            std::make_unique<Asn1Acn::AcnSequenceComponent>(entryName, entryName, std::move(entryType));
+    m_sequence->addComponent(std::move(sequenceComponent));
+}
 
 void EntryTranslatorVisitor::operator()(const seds::model::FixedValueEntry &sedsEntry)
 {
@@ -77,7 +88,16 @@ void EntryTranslatorVisitor::operator()(const seds::model::FixedValueEntry &seds
     m_sequence->addComponent(std::move(sequenceComponent));
 }
 
-void EntryTranslatorVisitor::operator()(const seds::model::LengthEntry &sedsEntry) {}
+void EntryTranslatorVisitor::operator()(const seds::model::LengthEntry &sedsEntry)
+{
+    const auto entryName = Escaper::escapeAsn1FieldName(sedsEntry.nameStr());
+    auto entryType = translateLengthEntry(sedsEntry);
+    entryType->setSavePosition(true);
+
+    auto sequenceComponent =
+            std::make_unique<Asn1Acn::AcnSequenceComponent>(entryName, entryName, std::move(entryType));
+    m_sequence->addComponent(std::move(sequenceComponent));
+}
 
 void EntryTranslatorVisitor::operator()(const seds::model::ListEntry &sedsEntry)
 {
@@ -111,6 +131,35 @@ std::unique_ptr<Asn1Acn::Types::UserdefinedType> EntryTranslatorVisitor::transla
     asn1EntryType->setType(asn1ReferencedType->clone());
 
     return asn1EntryType;
+}
+
+std::unique_ptr<Asn1Acn::Types::Null> EntryTranslatorVisitor::translateErrorControl(
+        const seds::model::ErrorControlEntry &sedsEntry) const
+{
+    auto nullType = std::make_unique<Asn1Acn::Types::Null>(sedsEntry.nameStr());
+    nullType->setAlignToNext(Asn1Acn::Types::AlignToNext::byte);
+
+    // clang-format off
+    std::visit(overloaded {
+        [&](seds::model::CoreErrorControl coreErrorControl) {
+            translateCoreErrorControl(coreErrorControl, sedsEntry, nullType.get());
+        }
+    }, sedsEntry.errorControl());
+    // clang-format on
+
+    return nullType;
+}
+
+std::unique_ptr<Asn1Acn::Types::Null> EntryTranslatorVisitor::translateLengthEntry(
+        const seds::model::LengthEntry &sedsEntry) const
+{
+    const auto &encoding = getLengthEntryEncoding(sedsEntry);
+
+    auto nullType = std::make_unique<Asn1Acn::Types::Null>(sedsEntry.nameStr());
+    nullType->setAlignToNext(Asn1Acn::Types::AlignToNext::byte);
+    nullType->setPattern(QString(encoding.bits(), '0'));
+
+    return nullType;
 }
 
 void EntryTranslatorVisitor::translateFixedValue(
@@ -189,11 +238,89 @@ void EntryTranslatorVisitor::translateFixedValue(
     }
 }
 
+void EntryTranslatorVisitor::translateCoreErrorControl(seds::model::CoreErrorControl coreErrorControl,
+        const seds::model::ErrorControlEntry &sedsEntry, Asn1Acn::Types::Null *asn1Type) const
+{
+    uint64_t expectedBitCount = 0;
+
+    switch (coreErrorControl) {
+    case seds::model::CoreErrorControl::Crc8:
+        expectedBitCount = m_crc8BitSize;
+        break;
+    case seds::model::CoreErrorControl::Crc16:
+        expectedBitCount = m_crc16BitSize;
+        break;
+    case seds::model::CoreErrorControl::Checksum:
+        expectedBitCount = m_checksumBitSize;
+        break;
+    case seds::model::CoreErrorControl::ChecksumLongitundinal:
+        expectedBitCount = m_checksumLongitundinalSize;
+        break;
+    default:
+        throw UnhandledValueException("CoreErrorControl");
+        break;
+    }
+
+    const auto bitCount = getErrorControlEntryBitCount(sedsEntry);
+
+    if (bitCount != expectedBitCount) {
+        auto errorMessage = QString("Error control entry \"%1\" underlying type doesn't have the same bit size as the "
+                                    "requested error control")
+                                    .arg(sedsEntry.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    asn1Type->setPattern(QString(bitCount, '0'));
+}
+
+uint64_t EntryTranslatorVisitor::getErrorControlEntryBitCount(const seds::model::ErrorControlEntry &entry) const
+{
+    const auto entryType = m_context.findSedsType(entry.type());
+    const auto entryBinaryType = std::get_if<seds::model::BinaryDataType>(entryType);
+
+    if (!entryBinaryType) {
+        auto errorMessage =
+                QString("Error control entry \"%1\" has to have binary as an underlying type").arg(entry.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    if (!entryBinaryType->hasFixedSize()) {
+        auto errorMessage =
+                QString("Error control entry \"%1\" underlying type has to be fixed size").arg(entry.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    return entryBinaryType->bits();
+}
+
+const seds::model::IntegerDataEncoding &EntryTranslatorVisitor::getLengthEntryEncoding(
+        const seds::model::LengthEntry &entry) const
+{
+    const auto entryType = m_context.findSedsType(entry.type());
+
+    const auto entryIntegerType = std::get_if<seds::model::IntegerDataType>(entryType);
+
+    if (!entryIntegerType) {
+        auto errorMessage =
+                QString("Length entry \"%1\" has to have integer as an underlying type").arg(entry.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto &entryIntegerEncoding = entryIntegerType->encoding();
+
+    if (!entryIntegerEncoding.has_value()) {
+        auto errorMessage = QString("Entry \"%1\" has to have encoding").arg(entry.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    return entryIntegerEncoding.value();
+}
+
 void EntryTranslatorVisitor::addListSizeConstraint(
         Asn1Acn::Types::SequenceOf *asn1Type, const seds::model::ListEntry &sedsEntry) const
 {
     const auto listLengthFieldName = sedsEntry.listLengthField().nameStr();
-    const auto listLengthField = getListLengthField(listLengthFieldName, m_container);
+    const auto listLengthField = getListLengthEntry(listLengthFieldName, m_container);
 
     if (listLengthField == nullptr) {
         auto errorMessage = QString("Entry \"%1\" used as a length of the list entry \"%2\" not found")
@@ -232,7 +359,7 @@ void EntryTranslatorVisitor::addListSizeConstraint(
     asn1Type->setAcnSize(Escaper::escapeAsn1FieldName(listLengthFieldName));
 }
 
-const seds::model::EntryType *EntryTranslatorVisitor::getListLengthField(
+const seds::model::EntryType *EntryTranslatorVisitor::getListLengthEntry(
         const QString &entryName, const seds::model::ContainerDataType &container) const
 {
     const auto listLengthField = container.entry(entryName);
@@ -245,7 +372,7 @@ const seds::model::EntryType *EntryTranslatorVisitor::getListLengthField(
         const auto baseType = m_context.findSedsType(*container.baseType());
         const auto baseContainer = std::get_if<seds::model::ContainerDataType>(baseType);
 
-        return getListLengthField(entryName, *baseContainer);
+        return getListLengthEntry(entryName, *baseContainer);
     }
 
     return nullptr;

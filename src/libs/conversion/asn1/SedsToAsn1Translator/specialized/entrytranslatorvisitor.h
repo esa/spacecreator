@@ -107,13 +107,20 @@ public:
 private:
     auto translateEntryType(const seds::model::DataTypeRef &sedsTypeRef)
             -> std::unique_ptr<Asn1Acn::Types::UserdefinedType>;
+    auto translateErrorControl(const seds::model::ErrorControlEntry &sedsEntry) const
+            -> std::unique_ptr<Asn1Acn::Types::Null>;
+    auto translateLengthEntry(const seds::model::LengthEntry &sedsEntry) const -> std::unique_ptr<Asn1Acn::Types::Null>;
 
     auto translateFixedValue(
             const seds::model::FixedValueEntry &sedsEntry, Asn1Acn::Types::UserdefinedType *asn1Type) const -> void;
-
+    auto translateCoreErrorControl(seds::model::CoreErrorControl coreErrorControl,
+            const seds::model::ErrorControlEntry &sedsEntry, Asn1Acn::Types::Null *asn1Type) const -> void;
+    auto getErrorControlEntryBitCount(const seds::model::ErrorControlEntry &entry) const -> uint64_t;
+    auto getLengthEntryEncoding(const seds::model::LengthEntry &entry) const
+            -> const seds::model::IntegerDataEncoding &;
     auto addListSizeConstraint(Asn1Acn::Types::SequenceOf *asn1Type, const seds::model::ListEntry &sedsEntry) const
             -> void;
-    auto getListLengthField(const QString &entryName, const seds::model::ContainerDataType &container) const
+    auto getListLengthEntry(const QString &entryName, const seds::model::ContainerDataType &container) const
             -> const seds::model::EntryType *;
     auto updateListLengthEntry(const seds::model::Entry *sedsEntry) const -> void;
     auto getListLengthSequenceComponent(const seds::model::Entry *sedsEntry) const
@@ -124,6 +131,11 @@ private:
 
     const seds::model::ContainerDataType &m_container;
     Asn1Acn::Types::Sequence *m_sequence;
+
+    const static uint64_t m_crc8BitSize = 8;
+    const static uint64_t m_crc16BitSize = 16;
+    const static uint64_t m_checksumBitSize = 32;
+    const static uint64_t m_checksumLongitundinalSize = 8;
 };
 
 } // namespace conversion::asn1::translator
