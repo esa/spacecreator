@@ -627,11 +627,12 @@ void ModelCheckingWindow::convertToObs()
     // Get msc property name
     QFileInfo fileInfo(d->ui->treeWidget_properties->currentItem()->text(0));
     QString fileName = fileInfo.baseName()+".pr";
+    QString propDirName = d->ui->treeWidget_properties->currentItem()->parent()->text(0);
 
     // CALL MAKE RULE
     // set path to property dir
     QString qDirAppPath = QDir::currentPath();
-    QDir::setCurrent(this->projectDir+"/work/modelchecking/properties/" + fileInfo.baseName());
+    QDir::setCurrent(this->projectDir+"/work/modelchecking/properties/" + propDirName);
     if (QProcess::execute("make " + fileName) != 0) {
         QMessageBox::warning(this, tr("Convert to Observer"),
                              "Error when calling make rule!");
