@@ -147,7 +147,21 @@ void DataTypeTranslatorVisitor::operator()(const seds::model::StringDataType &se
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::SubRangeDataType &sedsType)
 {
-    Q_UNUSED(sedsType);
+    const auto baseType = m_context.findSedsType(sedsType.type());
+
+    if (std::holds_alternative<IntegerDataType>(*baseType)) {
+        translateIntegerSubRangeDataType(sedsType, std::get<seds::model::IntegerDataType>(*baseType));
+    } else if (std::holds_alternative<FloatDataType>(*baseType)) {
+        translateFloatSubRangeDataType(sedsType, std::get<seds::model::FloatDataType>(*baseType));
+    } else if (std::holds_alternative<EnumeratedDataType>(*baseType)) {
+        translateEnumSubRangeDataType(sedsType, std::get<seds::model::EnumeratedDataType>(*baseType));
+    } else {
+        auto errorMessage =
+                QString("SubRangeDataType \"%1\" references type \"%2\" that is neither numeric nor enumerated")
+                        .arg(sedsType.nameStr())
+                        .arg(sedsType.type().value().pathStr());
+        throw TranslationException(std::move(errorMessage));
+    }
 }
 
 void DataTypeTranslatorVisitor::translateBitStringLength(
@@ -277,6 +291,88 @@ void DataTypeTranslatorVisitor::translateEnumerationList(
 
         asn1Type->addItem(enumeratedItem);
     }
+}
+
+void DataTypeTranslatorVisitor::translateIntegerSubRangeDataType(
+        const seds::model::SubRangeDataType &sedsType, const seds::model::IntegerDataType &sedsBaseType)
+{
+    if (!std::holds_alternative<seds::model::MinMaxRange>(sedsType.range())) {
+        auto errorMessage = QString("Only MinMaxRange can be used as a range in SubRangeDataType \"%1\" because it's "
+                                    "base type is an integer")
+                                    .arg(sedsType.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto asn1Type = std::make_unique<Asn1Acn::Types::Integer>(asn1TypeName);
+
+    translateIntegerEncoding(sedsBaseType.encoding(), asn1Type.get());
+
+    auto rangeTranslator = RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>(asn1Type.get());
+    std::visit(rangeTranslator, sedsType.range());
+
+    m_context.addAsn1Type(std::move(asn1Type), &sedsType);
+}
+
+void DataTypeTranslatorVisitor::translateFloatSubRangeDataType(
+        const seds::model::SubRangeDataType &sedsType, const seds::model::FloatDataType &sedsBaseType)
+{
+    if (std::holds_alternative<EnumeratedDataTypeRange>(sedsType.range())) {
+        auto errorMessage = QString("EnumeratedDataTypeRange can't be used as a range in SubRangeDataType \"%1\" "
+                                    "because it's base type is a float")
+                                    .arg(sedsType.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto asn1Type = std::make_unique<Asn1Acn::Types::Real>(asn1TypeName);
+
+    translateFloatEncoding(sedsBaseType, asn1Type.get());
+
+    auto rangeTranslator = RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>(asn1Type.get());
+    std::visit(rangeTranslator, sedsType.range());
+
+    m_context.addAsn1Type(std::move(asn1Type), &sedsType);
+}
+
+void DataTypeTranslatorVisitor::translateEnumSubRangeDataType(
+        const seds::model::SubRangeDataType &sedsType, const seds::model::EnumeratedDataType &sedsBaseType)
+{
+    if (!std::holds_alternative<EnumeratedDataTypeRange>(sedsType.range())) {
+        auto errorMessage = QString("Only EnumeratedDataTypeRange can be used as a range in SubRangeDataType "
+                                    "\"%1\" because it's base type is an enum")
+                                    .arg(sedsType.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto asn1Type = std::make_unique<Asn1Acn::Types::Enumerated>(asn1TypeName);
+
+    translateIntegerEncoding(sedsBaseType.encoding(), asn1Type.get());
+
+    const auto &enumRange = std::get<EnumeratedDataTypeRange>(sedsType.range());
+    const auto &items = sedsBaseType.enumerationList();
+
+    for (std::size_t index = 0; index < items.size(); ++index) {
+        const auto &item = items[index];
+        const auto itemName = item.label().value();
+
+        if (!enumRange.contains(itemName)) {
+            continue;
+        }
+
+        const auto enumeratedItem = Asn1Acn::Types::EnumeratedItem(
+                index, Escaper::escapeAsn1FieldName(itemName), item.value(), Asn1Acn::SourceLocation());
+        asn1Type->addItem(enumeratedItem);
+    }
+
+    if (asn1Type->items().empty()) {
+        auto errorMessage = QString("EnumeratedDataTypeRange on SubRangeDataType \"%1\" doesn't allow for any items")
+                                    .arg(sedsBaseType.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
 void DataTypeTranslatorVisitor::translateCoreIntegerEncoding(

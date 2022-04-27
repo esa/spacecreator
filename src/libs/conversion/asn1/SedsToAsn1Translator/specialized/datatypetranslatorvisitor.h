@@ -138,6 +138,12 @@ private:
             -> void;
     auto translateEnumerationList(
             const seds::model::EnumeratedDataType &sedsType, Asn1Acn::Types::Enumerated *asn1Type) const -> void;
+    auto translateIntegerSubRangeDataType(
+            const seds::model::SubRangeDataType &sedsType, const seds::model::IntegerDataType &sedsBaseType) -> void;
+    auto translateFloatSubRangeDataType(
+            const seds::model::SubRangeDataType &sedsType, const seds::model::FloatDataType &sedsBaseType) -> void;
+    auto translateEnumSubRangeDataType(
+            const seds::model::SubRangeDataType &sedsType, const seds::model::EnumeratedDataType &sedsBaseType) -> void;
 
     auto translateCoreIntegerEncoding(seds::model::CoreIntegerEncoding coreEncoding,
             Asn1Acn::Types::IntegerAcnParameters *asn1Type) const -> void;
