@@ -47,3 +47,18 @@ ValuePtr ChoiceValue::clone() const
 {
     return std::make_unique<ChoiceValue>(*this);
 }
+
+Value::ValueType ChoiceValue::typeEnum() const
+{
+    return Value::CHOICE_VALUE;
+}
+
+const QString &ChoiceValue::name() const
+{
+    return m_name;
+}
+
+const ValuePtr &ChoiceValue::value() const
+{
+    return m_value;
+}

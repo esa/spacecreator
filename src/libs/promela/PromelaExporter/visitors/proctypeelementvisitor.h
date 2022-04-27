@@ -99,6 +99,18 @@ public:
      * @param ifStatement Conditional to export
      */
     void operator()(const ::promela::model::Conditional &conditional);
+    /**
+     * @brief Handle Sequence
+     *
+     * @param sequence Sequence to export
+     */
+    void operator()(const ::promela::model::Sequence &sequence);
+    /**
+     * @brief Handle For Loop
+     *
+     * @param loop ForLoop to export
+     */
+    void operator()(const ::promela::model::ForLoop &loop);
 
 private:
     QTextStream &m_stream;

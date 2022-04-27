@@ -45,14 +45,16 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
 
     const bool enhancedSpinSupport = options.isSet(PromelaOptions::enhancedSpinSupport);
 
-    const std::vector<QString> valueGeneration = options.values(PromelaOptions::asn1ValueGeneration);
+    const bool asn1ValueGeneration = options.isSet(PromelaOptions::asn1ValueGeneration);
+
+    const std::vector<QString> valueGeneration = options.values(PromelaOptions::asn1ValueGenerationForType);
 
     const auto *asn1Model = getModel<Asn1Model>(sourceModels);
 
-    if (!valueGeneration.empty()) {
+    if (asn1ValueGeneration) {
         QStringList typeNames;
         std::copy(valueGeneration.begin(), valueGeneration.end(), std::back_inserter(typeNames));
-        return generateValueGenerationInlines(asn1Model, enhancedSpinSupport, typeNames);
+        return generateValueGenerationInlines(asn1Model, typeNames);
     } else {
         return translateAsn1Model(asn1Model, enhancedSpinSupport);
     }
@@ -90,11 +92,11 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
 }
 
 std::vector<std::unique_ptr<conversion::Model>> Asn1ToPromelaTranslator::generateValueGenerationInlines(
-        const ::Asn1Acn::Asn1Model *model, bool enhancedSpinSupport, const QStringList &typeNames) const
+        const ::Asn1Acn::Asn1Model *model, const QStringList &typeNames) const
 {
     std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
     for (const std::unique_ptr<File> &file : model->data()) {
-        visitAsn1FileGenerate(file.get(), *promelaModel, enhancedSpinSupport, typeNames);
+        visitAsn1FileGenerate(file.get(), *promelaModel, typeNames);
     }
     std::vector<std::unique_ptr<Model>> result;
     result.push_back(std::move(promelaModel));
@@ -108,9 +110,9 @@ void Asn1ToPromelaTranslator::visitAsn1File(File *file, PromelaModel &promelaMod
 }
 
 void Asn1ToPromelaTranslator::visitAsn1FileGenerate(
-        File *file, PromelaModel &promelaModel, bool enhancedSpinSupport, const QStringList &typeNames) const
+        File *file, PromelaModel &promelaModel, const QStringList &typeNames) const
 {
-    Asn1NodeValueGeneratorVisitor visitor(promelaModel, enhancedSpinSupport, typeNames);
+    Asn1NodeValueGeneratorVisitor visitor(promelaModel, typeNames);
     visitor.visit(*file);
 }
 }

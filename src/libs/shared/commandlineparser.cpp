@@ -242,6 +242,21 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
         description = QCoreApplication::translate("CommandLineParser", "<prefix> to add at the beginning of the ASN1 output filepath");
         valueName = QCoreApplication::translate("CommandLineParser", "prefix");
     } break;
+    case CommandLineParser::Positional::SedsConverterAsn1SequenceSizeThreshold: {
+        names << "asn1-sequence-size-threshold";
+        description = QCoreApplication::translate("CommandLineParser", "Maximum SEQUENCE size (values will be clamped)");
+        valueName = QCoreApplication::translate("CommandLineParser", "threshold");
+    } break;
+    case CommandLineParser::Positional::SedsConverterPatcherFunctionsFilepathPrefix: {
+        names << "patcher-functions-filepath-prefix";
+        description = QCoreApplication::translate("CommandLineParser", "<prefix> to add at the beginning of the patcher functions output filepath");
+        valueName = QCoreApplication::translate("CommandLineParser", "prefix");
+    } break;
+    case CommandLineParser::Positional::SedsConverterMappingFunctionsModuleFileName: {
+        names << "mapping-functions-module-filename";
+        description = QCoreApplication::translate("CommandLineParser", "Name of the header including all other patcher function files");
+        valueName = QCoreApplication::translate("CommandLineParser", "prefix");
+    } break;
     case CommandLineParser::Positional::SedsConverterSdlFilepathPrefix: {
         names << "sdl-filepath-prefix";
         description = QCoreApplication::translate("CommandLineParser", "SDL filepath <prefix>");

@@ -156,6 +156,17 @@ auto SdlVisitor::IndentingStreamWriter::writeLine(const QString &line) -> void
     m_stream << getIndent() << line << "\n";
 }
 
+auto SdlVisitor::IndentingStreamWriter::writeComment(const QString &comment) -> void
+{
+    if (comment.isEmpty()) {
+        return;
+    }
+
+    for (const auto &commentPart : comment.split("\n")) {
+        m_stream << getIndent() << "-- " << commentPart << "\n";
+    }
+}
+
 auto SdlVisitor::IndentingStreamWriter::pushIndent(const QString &indent) -> void
 {
     m_indent.push_back(indent);
@@ -200,6 +211,7 @@ void SdlVisitor::visit(const Process &process)
     }
 
     if (process.startTransition() != nullptr) {
+        m_writer.writeComment(process.startTransition()->comment());
         m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Start));
         m_writer.writeLine("START;");
         m_writer.pushIndent(INDENT);
@@ -231,6 +243,7 @@ void SdlVisitor::visit(const State &state)
     }
 
     m_layouter.pushPosition();
+    m_writer.writeComment(state.comment());
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::State));
     m_writer.writeLine("state " + state.name() + ";");
     m_writer.pushIndent(INDENT);
@@ -259,8 +272,8 @@ void SdlVisitor::visit(const Input &input)
         m_writer.write("(");
 
         QString parameters = std::accumulate(std::next(inputParameters.begin()), inputParameters.end(),
-                inputParameters[0]->declaration()->name(),
-                [](const auto &a, const auto &b) { return std::move(a) + ", " + b->declaration()->name(); });
+                inputParameters[0]->variableName(),
+                [](const auto &a, const auto &b) { return std::move(a) + ", " + b->variableName(); });
         m_writer.write(parameters);
         m_writer.write(")");
     }
@@ -268,6 +281,7 @@ void SdlVisitor::visit(const Input &input)
 
     if (input.transition() != nullptr) {
         m_writer.pushIndent(INDENT);
+        m_writer.writeComment(input.transition()->comment());
         exportCollection(input.transition()->actions());
         m_writer.popIndent();
     } else {
@@ -284,11 +298,12 @@ void SdlVisitor::visit(const Output &output)
     }
 
     m_layouter.moveDown(Layouter::ElementType::Output);
+    m_writer.writeComment(output.comment());
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Output));
     m_writer.beginLine("output " + output.name());
     const auto &outputParamRef = output.parameter();
     if (outputParamRef != nullptr) {
-        m_writer.write(QString("(%1)").arg(outputParamRef->declaration()->name()));
+        m_writer.write(QString("(%1)").arg(outputParamRef->variableName()));
     }
     m_writer.endLine(";");
 }
@@ -319,6 +334,7 @@ void SdlVisitor::visit(const Task &task)
     }
 
     m_layouter.moveDown(Layouter::ElementType::Task);
+    m_writer.writeComment(task.comment());
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Task));
     m_writer.writeLine("task " + task.content() + ";");
 }
@@ -332,6 +348,7 @@ void SdlVisitor::visit(const VariableDeclaration &declaration)
         throw ExportException("Variable declaration shall have a specified type but it doesn't");
     }
 
+    m_writer.writeComment(declaration.comment());
     m_writer.writeLine("dcl " + declaration.name() + " " + declaration.type() + ";");
 }
 
@@ -351,10 +368,19 @@ void SdlVisitor::visit(const Join &join)
     m_layouter.moveDown(Layouter::ElementType::Join);
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Join));
     m_writer.beginLine("join ");
-    if (join.label() != nullptr) {
-        m_writer.write(join.label()->name());
+    if (!join.label().isEmpty()) {
+        m_writer.write(join.label());
     } else {
         throw ExportException("Label is not set in Join, but Join without specified Label is ill-formed");
+    }
+    m_writer.endLine(";");
+}
+
+void SdlVisitor::visit(const Return &ret)
+{
+    m_writer.beginLine("return ");
+    if (!ret.content().isEmpty()) {
+        m_writer.write(ret.content());
     }
     m_writer.endLine(";");
 }
@@ -395,6 +421,7 @@ void SdlVisitor::visit(const Decision &decision)
         throw ExportException("No Answers in Decision");
     }
 
+    m_writer.writeComment(decision.comment());
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Decision));
     m_writer.writeLine("decision " + decision.expression()->content() + ";");
     m_layouter.moveDown(Layouter::ElementType::Decision);
@@ -414,31 +441,41 @@ void SdlVisitor::visit(const Procedure &procedure)
         return;
     }
     m_layouter.pushPosition();
+    m_writer.writeComment(procedure.comment());
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Procedure));
     m_layouter.moveDown(Layouter::ElementType::Procedure);
     m_writer.writeLine("procedure " + procedure.name() + ";");
     m_writer.pushIndent(INDENT);
     m_layouter.resetPosition();
 
-    auto &procedureParameters = procedure.parameters();
+    const auto &procedureParameters = procedure.parameters();
+    const auto &procedureVariables = procedure.variables();
 
+    const bool variablesPresent = !procedureVariables.empty();
     const bool parametersPresent = !procedureParameters.empty();
-    const bool returnVarPresent = procedure.returnVariableDeclaration() != nullptr;
+    const bool returnVarPresent = !procedure.returnType().isEmpty();
+    const bool generateVarCif = variablesPresent || parametersPresent || returnVarPresent;
 
-    if (parametersPresent || returnVarPresent) {
+    if (generateVarCif) {
         m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
         m_layouter.moveDown(Layouter::ElementType::Text);
+    }
+
+    if (variablesPresent) {
+        exportCollection(procedureVariables);
     }
 
     if (parametersPresent) {
         m_writer.writeLine("fpar");
         m_writer.pushIndent(INDENT);
+        m_writer.writeComment(procedureParameters[0]->comment());
         m_writer.beginLine(QString("%1 %2 %3")
                                    .arg(procedureParameters[0]->direction())
                                    .arg(procedureParameters[0]->name())
                                    .arg(procedureParameters[0]->type()));
         for (auto it = std::next(procedureParameters.begin()); it != procedureParameters.end(); it++) {
             m_writer.endLine(",");
+            m_writer.writeComment(it->get()->comment());
             m_writer.beginLine(
                     QString("%1 %2 %3").arg(it->get()->direction()).arg(it->get()->name()).arg(it->get()->type()));
         }
@@ -447,12 +484,10 @@ void SdlVisitor::visit(const Procedure &procedure)
     }
 
     if (returnVarPresent) {
-        m_writer.writeLine("returns " + procedure.returnVariableDeclaration()->type() + ";");
-
-        visit(*procedure.returnVariableDeclaration());
+        m_writer.writeLine("returns " + procedure.returnType() + ";");
     }
 
-    if (parametersPresent || returnVarPresent) {
+    if (generateVarCif) {
         m_writer.writeLine("/* CIF ENDTEXT */");
     }
 
@@ -466,11 +501,6 @@ void SdlVisitor::visit(const Procedure &procedure)
         exportCollection(procedure.transition()->actions());
         m_writer.popIndent();
     }
-    m_writer.beginLine("return ");
-    if (procedure.returnVariableDeclaration() != nullptr) {
-        m_writer.write(procedure.returnVariableDeclaration()->name());
-    }
-    m_writer.endLine(";");
     m_writer.popIndent();
     m_writer.writeLine("endprocedure;");
     m_layouter.popPosition();
@@ -482,12 +512,13 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall)
     if (procedureCall.procedure() == nullptr || procedureCall.procedure()->name().isEmpty()) {
         throw ExportException("Procedure to call not specified");
     }
-    if (procedureCall.procedure()->returnVariableDeclaration() != nullptr) {
+    if (!procedureCall.procedure()->returnType().isEmpty()) {
         throw ExportException("Procedure with a return variable cannot be called from a Procedure Call. "
                               "It must be called from a Task");
     }
 
     m_layouter.moveDown(Layouter::ElementType::ProcedureCall);
+    m_writer.writeComment(procedureCall.comment());
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::ProcedureCall));
     m_writer.beginLine("call " + procedureCall.procedure()->name());
 
@@ -498,7 +529,7 @@ void SdlVisitor::visit(const ProcedureCall &procedureCall)
             if (std::holds_alternative<std::unique_ptr<VariableLiteral>>(argument)) {
                 arg += std::get<std::unique_ptr<VariableLiteral>>(argument)->value();
             } else if (std::holds_alternative<std::unique_ptr<VariableReference>>(argument)) {
-                arg += std::get<std::unique_ptr<VariableReference>>(argument)->declaration()->name();
+                arg += std::get<std::unique_ptr<VariableReference>>(argument)->variableName();
             } else {
                 throw ExportException("Unknown Argument type");
             }

@@ -1,0 +1,20 @@
+<InterfaceView>
+<Function name="MegaComponent" comment="Component short description Component long description" is_type="NO" language="SDL" default_implementation="default">
+<Provided_Interface name="Get_ProvidedInterface_ReadOnlySync_Pi" comment="Parameter short description Parameter long description" kind="Protected" layer="default">
+    <Output_Parameter name="Param" type="MyInteger" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="ProvidedInterface_SyncCommand_Pi" comment="Sync command short description Sync command long description" kind="Protected" layer="default">
+    <Input_Parameter name="arg" type="MyInteger" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="ProvidedInterface_AsyncCommand_Pi" comment="Async command short description Async command long description" layer="default">
+    <Input_Parameter name="InputParam" type="AsyncCommand-Type" encoding="ACN"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+</InterfaceView>

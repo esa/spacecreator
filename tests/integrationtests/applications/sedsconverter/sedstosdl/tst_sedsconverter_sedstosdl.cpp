@@ -36,6 +36,14 @@ private Q_SLOTS:
     void testGuard();
     void testComplexGuard();
     void testTimers();
+    void testParameterMap();
+    void testSyncCommand();
+    void testIndexing();
+    void testInitialValues();
+    void testNamedValues();
+    void testDescriptions();
+    void testCrossReference();
+    void testSplineCalibrators();
 };
 
 /// \SRS  ETB-FUN-10
@@ -190,6 +198,86 @@ void tst_SedsConverter_SedsToSdl::testComplexGuard()
 void tst_SedsConverter_SedsToSdl::testTimers()
 {
     const int result = system("./test_timers.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-2040
+/// \SRS  ETB-FUN-2080
+/// \SRS  ETB-FUN-2090
+/// \SRS  ETB-FUN-2100
+/// \SRS  ETB-FUN-2110
+/// \SRS  ETB-FUN-2550
+/// \SRS  ETB-FUN-2600
+void tst_SedsConverter_SedsToSdl::testParameterMap()
+{
+    const int result = system("./test_parameter_map.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-2010
+/// \SRS  ETB-FUN-2020
+/// \SRS  ETB-FUN-2060
+/// \SRS  ETB-FUN-2070
+/// \SRS  ETB-FUN-2140
+/// \SRS  ETB-FUN-2150
+/// \SRS  ETB-FUN-2170
+/// \SRS  ETB-FUN-2210
+/// \SRS  ETB-FUN-2490
+/// \SRS  ETB-FUN-2520
+/// \SRS  ETB-FUN-2550
+/// \SRS  ETB-FUN-2560
+/// \SRS  ETB-FUN-2570
+void tst_SedsConverter_SedsToSdl::testSyncCommand()
+{
+    const int result = system("./test_sync_command.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-2020
+/// \SRS  ETB-FUN-2060
+/// \SRS  ETB-FUN-2400
+void tst_SedsConverter_SedsToSdl::testIndexing()
+{
+    const int result = system("./test_indexing.sh");
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-2010
+/// \SRS  ETB-FUN-2020
+void tst_SedsConverter_SedsToSdl::testInitialValues()
+{
+    const int result = system("./test_initial_values.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-2020
+/// \SRS  ETB-FUN-2060
+/// \SRS  ETB-FUN-2400
+void tst_SedsConverter_SedsToSdl::testNamedValues()
+{
+    const int result = system("./test_named_values.sh");
+}
+
+/// \SRS  ETB-FUN-10
+void tst_SedsConverter_SedsToSdl::testDescriptions()
+{
+    const int result = system("./test_descriptions.sh");
+}
+
+/// \SRS  ETB-FUN-10
+void tst_SedsConverter_SedsToSdl::testCrossReference()
+{
+    const int result = system("./test_cross_reference.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-2470
+void tst_SedsConverter_SedsToSdl::testSplineCalibrators()
+{
+    const int result = system("./test_spline_calibration.sh");
     QCOMPARE(result, 0);
 }
 

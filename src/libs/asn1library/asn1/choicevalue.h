@@ -39,6 +39,11 @@ public:
     QString asString() const override;
     ValuePtr clone() const override;
 
+    ValueType typeEnum() const override;
+
+    const QString &name() const;
+    const ValuePtr &value() const;
+
 private:
     QString m_name;
     ValuePtr m_value;

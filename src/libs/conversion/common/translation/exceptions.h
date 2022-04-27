@@ -41,6 +41,20 @@ public:
 };
 
 /**
+ * @brief   Exception thrown when translator encounters a package that wasn't declared
+ */
+class UndeclaredPackageReferenceException final : public TranslationException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   packageName     Name of the referenced package
+     */
+    explicit UndeclaredPackageReferenceException(const QString &packageName);
+};
+
+/**
  * @brief   Exception thrown when translator encounters a data type that wasn't declared
  */
 class UndeclaredDataTypeException : public TranslationException
@@ -124,6 +138,20 @@ public:
      * @param   functionName    Name of the missing Function
      */
     explicit MissingInterfaceViewFunctionException(const QString &functionName);
+};
+
+/**
+ * @brief   Exception thrown when sorted entities don't create a DAG
+ *
+ * Exception for cyclic dependency
+ */
+class NotDagException final : public TranslationException
+{
+public:
+    /**
+     * @brief   Constructor
+     */
+    NotDagException(const QString &entityName);
 };
 
 } // namespace conversion::translator

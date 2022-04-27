@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,37 +19,44 @@
 
 #include "specialized/syncinterfacecommandtranslator.h"
 
-#include <asn1library/asn1/definitions.h>
+#include "interfacetranslatorhelper.h"
+
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
-#include <iostream>
-#include <ivcore/ivfunction.h>
-#include <seds/SedsModel/interfaces/argumentscombination.h>
-#include <seds/SedsModel/interfaces/interfacecommand.h>
-#include <seds/SedsModel/package/package.h>
+#include <shared/parameter.h>
 
-using conversion::Escaper;
-using conversion::UnhandledValueException;
-using conversion::UnsupportedValueException;
 using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator {
 
 SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction,
-        const QString &sedsInterfaceName, const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
-        Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage)
-    : InterfaceCommandTranslator(ivFunction, sedsInterfaceName, genericTypeMapSet, asn1Definitions, sedsPackage)
+        const QString &sedsInterfaceName, const seds::model::Package *sedsPackage,
+        const std::vector<seds::model::Package> &sedsPackages, Asn1Acn::Definitions *asn1Definitions,
+        const Asn1Acn::Asn1Model::Data &asn1Files, const GenericTypeMapper *typeMapper,
+        const std::optional<uint64_t> &sequenceSizeThreshold)
+    : m_ivFunction(ivFunction)
+    , m_sedsInterfaceName(sedsInterfaceName)
+    , m_sedsPackage(sedsPackage)
+    , m_sedsPackages(sedsPackages)
+    , m_asn1Definitions(asn1Definitions)
+    , m_asn1Files(asn1Files)
+    , m_typeMapper(typeMapper)
+    , m_sequenceSizeThreshold(sequenceSizeThreshold)
 {
 }
 
 void SyncInterfaceCommandTranslator::translateCommand(
         const seds::model::InterfaceCommand &sedsCommand, ivm::IVInterface::InterfaceType interfaceType)
 {
+    const auto interfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(
+            m_sedsInterfaceName, sedsCommand.nameStr(), interfaceType);
+
     switch (sedsCommand.argumentsCombination()) {
     case seds::model::ArgumentsCombination::InOnly:
     case seds::model::ArgumentsCombination::OutOnly:
     case seds::model::ArgumentsCombination::InAndOut: {
-        auto *ivInterface = createIvInterface(sedsCommand, interfaceType, ivm::IVInterface::OperationKind::Protected);
+        auto *ivInterface = InterfaceTranslatorHelper::createIvInterface(
+                interfaceName, interfaceType, ivm::IVInterface::OperationKind::Protected, sedsCommand, m_ivFunction);
         translateArguments(sedsCommand.arguments(), ivInterface);
         m_ivFunction->addChild(ivInterface);
     } break;
@@ -73,25 +80,27 @@ void SyncInterfaceCommandTranslator::translateArguments(
         const std::vector<seds::model::CommandArgument> &sedsArguments, ivm::IVInterface *ivInterface)
 {
     for (const auto &sedsArgument : sedsArguments) {
-        const auto sedsArgumentTypeName = handleArgumentType(sedsArgument);
+        const auto sedsArgumentTypeName = handleArgumentType(sedsArgument, ivInterface->title());
 
         switch (sedsArgument.mode()) {
         case seds::model::CommandArgumentMode::In: {
-            const auto ivParameter = createIvInterfaceParameter(
+            const auto ivParameter = InterfaceTranslatorHelper::createInterfaceParameter(
                     sedsArgument.nameStr(), sedsArgumentTypeName, shared::InterfaceParameter::Direction::IN);
             ivInterface->addParam(ivParameter);
         } break;
         case seds::model::CommandArgumentMode::Out: {
-            const auto ivParameter = createIvInterfaceParameter(
+            const auto ivParameter = InterfaceTranslatorHelper::createInterfaceParameter(
                     sedsArgument.nameStr(), sedsArgumentTypeName, shared::InterfaceParameter::Direction::OUT);
             ivInterface->addParam(ivParameter);
         } break;
         case seds::model::CommandArgumentMode::InOut: {
-            const auto ivParameterIn = createIvInterfaceParameter(QString("%1_In").arg(sedsArgument.nameStr()),
-                    sedsArgumentTypeName, shared::InterfaceParameter::Direction::IN);
+            const auto ivParameterIn =
+                    InterfaceTranslatorHelper::createInterfaceParameter(QString("%1_In").arg(sedsArgument.nameStr()),
+                            sedsArgumentTypeName, shared::InterfaceParameter::Direction::IN);
             ivInterface->addParam(ivParameterIn);
-            const auto ivParameterOut = createIvInterfaceParameter(QString("%2_Out").arg(sedsArgument.nameStr()),
-                    sedsArgumentTypeName, shared::InterfaceParameter::Direction::OUT);
+            const auto ivParameterOut =
+                    InterfaceTranslatorHelper::createInterfaceParameter(QString("%2_Out").arg(sedsArgument.nameStr()),
+                            sedsArgumentTypeName, shared::InterfaceParameter::Direction::OUT);
             ivInterface->addParam(ivParameterOut);
         } break;
         case seds::model::CommandArgumentMode::Notify:
@@ -101,11 +110,50 @@ void SyncInterfaceCommandTranslator::translateArguments(
     }
 }
 
-shared::InterfaceParameter SyncInterfaceCommandTranslator::createIvInterfaceParameter(
-        const QString &name, const QString &typeName, shared::InterfaceParameter::Direction direction)
+QString SyncInterfaceCommandTranslator::handleArgumentType(
+        const seds::model::CommandArgument &sedsArgument, const QString &interfaceName) const
 {
-    return shared::InterfaceParameter(Escaper::escapeIvName(name), shared::BasicParameter::Type::Other,
-            Escaper::escapeIvName(typeName), m_interfaceParameterEncoding, direction);
+    const auto &argumentTypeRef = sedsArgument.type();
+    const auto &argumentTypeName = argumentTypeRef.nameStr();
+
+    const auto typeMapping = m_typeMapper->getMapping(argumentTypeName);
+
+    if (typeMapping == nullptr) {
+        if (sedsArgument.arrayDimensions().empty()) {
+            return Escaper::escapeAsn1TypeName(argumentTypeName);
+        } else {
+            return InterfaceTranslatorHelper::createArrayType(argumentTypeRef, sedsArgument.arrayDimensions(),
+                    m_asn1Definitions, m_sedsPackage, m_asn1Files, m_sedsPackages, m_sequenceSizeThreshold);
+        }
+    }
+
+    const auto &concreteTypes = typeMapping->concreteTypes;
+
+    if (concreteTypes.empty()) {
+        auto errorMessage = QString("Type \"%1\" of the argument \"%2\" in the sync interface \"%3\" is handled as "
+                                    "generic, but no mappings was provided")
+                                    .arg(argumentTypeName)
+                                    .arg(sedsArgument.nameStr())
+                                    .arg(interfaceName);
+        throw TranslationException(std::move(errorMessage));
+    } else if (concreteTypes.size() != 1) {
+        auto errorMessage = QString("Generic type \"%1\" of the argument \"%2\" in the sync interface \"%3\" can only "
+                                    "be simply mapped (AlternateSet not supported)")
+                                    .arg(argumentTypeName)
+                                    .arg(sedsArgument.nameStr())
+                                    .arg(interfaceName);
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto &argumentConcreteTypeRef = concreteTypes.front().typeRef;
+
+    if (sedsArgument.arrayDimensions().empty()) {
+        const auto &argumentConcreteTypeName = argumentConcreteTypeRef.nameStr();
+        return Escaper::escapeAsn1TypeName(argumentConcreteTypeName);
+    } else {
+        return InterfaceTranslatorHelper::createArrayType(argumentConcreteTypeRef, sedsArgument.arrayDimensions(),
+                m_asn1Definitions, m_sedsPackage, m_asn1Files, m_sedsPackages, m_sequenceSizeThreshold);
+    }
 }
 
 } // namespace conversion::iv::translator

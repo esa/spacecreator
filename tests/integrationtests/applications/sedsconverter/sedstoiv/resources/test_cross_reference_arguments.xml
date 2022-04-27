@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DataSheet xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/Package1">
+    <DataTypeSet>
+      <IntegerDataType name="NiceItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="MegaInterface">
+        <GenericTypeSet>
+          <GenericType name="SyncGenericType" />
+          <GenericType name="AsyncGenericType" />
+          <GenericType name="AlternateGenericType1" />
+          <GenericType name="DeterminantGenericType" />
+        </GenericTypeSet>
+        <ParameterSet>
+          <Parameter name="FunParameter" type="com/n7space/Package2/ParameterItem" mode="sync" readOnly="true"/>
+        </ParameterSet>
+        <CommandSet>
+          <Command name="SyncCommandNoMapping" mode="sync">
+            <Argument name="ArgumentNoMapping" type="com/n7space/Package2/SyncItem" mode="in" />
+          </Command>
+          <Command name="SyncCommandNoMappingArray" mode="sync">
+            <Argument name="ArrayArgumentNoMapping" type="com/n7space/Package2/SyncItemArray" mode="in">
+              <ArrayDimensions>
+                <Dimension size="10" />
+              </ArrayDimensions>
+            </Argument>
+          </Command>
+          <Command name="SyncCommandSimpleMapping" mode="sync">
+            <Argument name="ArgumentSimpleMapping" type="SyncGenericType" mode="in" />
+          </Command>
+          <Command name="SyncCommandSimpleMappingArray" mode="sync">
+            <Argument name="ArrayArgumentSimpleMapping" type="SyncGenericType" mode="in">
+              <ArrayDimensions>
+                <Dimension size="10" />
+              </ArrayDimensions>
+            </Argument>
+          </Command>
+          <Command name="AsyncCommandNoMapping" mode="async">
+            <Argument name="ArgumentNoMapping" type="com/n7space/Package2/AsyncItem" mode="in" />
+          </Command>
+          <Command name="AsyncCommandNoMappingArray" mode="async">
+            <Argument name="ArrayArgumentNoMapping" type="com/n7space/Package2/AsyncItemArray" mode="in">
+              <ArrayDimensions>
+                <Dimension size="10" />
+              </ArrayDimensions>
+            </Argument>
+          </Command>
+          <Command name="AsyncCommandSimpleMapping" mode="async">
+            <Argument name="ArgumentSimpleMapping" type="AsyncGenericType" mode="in" />
+          </Command>
+          <Command name="AsyncCommandSimpleMappingArray" mode="async">
+            <Argument name="ArrayArgumentSimpleMapping" type="AsyncGenericType" mode="in">
+              <ArrayDimensions>
+                <Dimension size="10" />
+              </ArrayDimensions>
+            </Argument>
+          </Command>
+          <Command name="AsyncCommandAlternateMapping" mode="async">
+            <Argument name="GenericArgument1" type="DeterminantGenericType" mode="in" />
+            <Argument name="GenericArgument2" type="AlternateGenericType" mode="in" />
+          </Command>
+          <Command name="AsyncCommandAlternateMappingArray" mode="async">
+            <Argument name="GenericArgument1" type="DeterminantGenericType" mode="in" />
+            <Argument name="GenericArgument2" type="AlternateGenericType" mode="in">
+              <ArrayDimensions>
+                <Dimension size="10" />
+              </ArrayDimensions>
+            </Argument>
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="MegaComponent">
+        <ProvidedInterfaceSet>
+          <Interface name="ProvidedInterface" type="MegaInterface">
+            <GenericTypeMapSet>
+                <GenericTypeMap name="SyncGenericType" type="com/n7space/Package2/MappedSyncItem" />
+                <GenericTypeMap name="AsyncGenericType" type="com/n7space/Package2/MappedAsyncItem" />
+                <AlternateSet>
+                  <Alternate>
+                    <GenericTypeMap name="DeterminantGenericType" type="com/n7space/Package2/DeterminantItem" fixedValue="0" />
+                    <GenericTypeMap name="AlternateGenericType" type="com/n7space/Package2/AlternateItem1" />
+                  </Alternate>
+                  <Alternate>
+                    <GenericTypeMap name="DeterminantGenericType" type="com/n7space/Package2/DeterminantItem" fixedValue="1" />
+                    <GenericTypeMap name="AlternateGenericType" type="com/n7space/Package2/AlternateItem2" />
+                  </Alternate>
+                </AlternateSet>
+            </GenericTypeMapSet>
+          </Interface>
+        </ProvidedInterfaceSet>
+      </Component>
+    </ComponentSet>
+  </Package>
+  <Package name="com/n7space/Package2">
+    <DataTypeSet>
+      <IntegerDataType name="ParameterItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="SyncItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="SyncItemArray">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="MappedSyncItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="AsyncItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="AsyncItemArray">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="MappedAsyncItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="DeterminantItem">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="1" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="AlternateItem1">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="AlternateItem2">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+  </Package>
+</DataSheet>

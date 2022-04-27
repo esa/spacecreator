@@ -21,6 +21,7 @@
 
 #include "declarationvisitor.h"
 #include "expressionvisitor.h"
+#include "inlinecallvisitor.h"
 #include "sequencevisitor.h"
 #include "variablerefvisitor.h"
 
@@ -31,6 +32,7 @@ using promela::model::Conditional;
 using promela::model::Declaration;
 using promela::model::DoLoop;
 using promela::model::Expression;
+using promela::model::ForLoop;
 using promela::model::InlineCall;
 using promela::model::ProctypeElement;
 using promela::model::Sequence;
@@ -109,8 +111,15 @@ void ProctypeElementVisitor::operator()(const DoLoop &doLoop)
 {
     m_stream << m_indent << "do\n";
     for (const std::unique_ptr<Sequence> &sequence : doLoop.getSequences()) {
-        SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
-        visitor.visit(*sequence, true);
+        if (sequence->getType() != Sequence::Type::NORMAL) {
+            SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
+            m_stream << m_indent << m_sequenceIndent << visitor.getSequencePrefix(*sequence) << "{\n";
+            visitor.visit(*sequence, false);
+            m_stream << m_indent << "}\n";
+        } else {
+            SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
+            visitor.visit(*sequence, true);
+        }
     }
     m_stream << m_indent << "od;\n";
 }
@@ -129,19 +138,9 @@ void ProctypeElementVisitor::operator()(const Assignment &assignment)
 void ProctypeElementVisitor::operator()(const InlineCall &inlineCall)
 {
     m_stream << m_indent;
-    m_stream << inlineCall.getName() << "(";
-    VariableRefVisitor variableRefVisitor(m_stream);
-
-    bool first = true;
-    for (const VariableRef &variableRef : inlineCall.getArguments()) {
-        if (!first) {
-            m_stream << ", ";
-        } else {
-            first = false;
-        }
-        variableRefVisitor.visit(variableRef);
-    }
-    m_stream << ");\n";
+    InlineCallVisitor visitor(m_stream);
+    visitor.visit(inlineCall);
+    m_stream << ";\n";
 }
 
 void ProctypeElementVisitor::operator()(const Skip &skip)
@@ -155,10 +154,44 @@ void ProctypeElementVisitor::operator()(const Conditional &conditional)
 {
     m_stream << m_indent << "if\n";
     for (const std::unique_ptr<Sequence> &sequence : conditional.getAlternatives()) {
-        SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
-        visitor.visit(*sequence, true);
+        if (sequence->getType() != Sequence::Type::NORMAL) {
+            SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
+            m_stream << m_indent << m_sequenceIndent << visitor.getSequencePrefix(*sequence) << "{\n";
+            visitor.visit(*sequence, false);
+            m_stream << m_indent << "}\n";
+        } else {
+            SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
+            visitor.visit(*sequence, true);
+        }
     }
     m_stream << m_indent << "fi;\n";
 }
 
+void ProctypeElementVisitor::operator()(const Sequence &sequence)
+{
+    SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
+    m_stream << m_indent << visitor.getSequencePrefix(sequence) << "{\n";
+    visitor.visit(sequence, false);
+    m_stream << m_indent << "}\n";
+}
+
+void ProctypeElementVisitor::operator()(const ForLoop &loop)
+{
+    VariableRefVisitor variableRefVisitor(m_stream);
+    if (loop.getType() == ForLoop::Type::RANGE) {
+        m_stream << m_indent << "for(";
+        variableRefVisitor.visit(loop.getForVariable());
+        m_stream << " : " << loop.getFirstValue() << " .. " << loop.getLastValue() << ")\n";
+    } else {
+        m_stream << m_indent << "for(";
+        variableRefVisitor.visit(loop.getForVariable());
+        m_stream << " in ";
+        variableRefVisitor.visit(loop.getArrayRef());
+        m_stream << ")\n";
+    }
+    SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
+    m_stream << m_indent << visitor.getSequencePrefix(*loop.getSequence()) << "{\n";
+    visitor.visit(*loop.getSequence(), false);
+    m_stream << m_indent << "}\n";
+}
 }

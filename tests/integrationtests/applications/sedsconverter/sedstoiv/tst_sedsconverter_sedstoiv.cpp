@@ -35,6 +35,12 @@ private Q_SLOTS:
     void testHwas();
     void testCommandArguments();
     void testParameters();
+    void testGenericTypeMapping();
+    void testAlternateSet();
+    void testCrossReferenceArguments();
+    void testCrossReferenceComplex();
+    void testCrossReferenceInterfaces();
+    void testDescriptions();
 };
 
 /// \SRS  ETB-FUN-10
@@ -94,6 +100,9 @@ void tst_SedsConverter_SedsToIv::testHwas()
 }
 
 /// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-4030
+/// \SRS  ETB-FUN-4040
+/// \SRS  ETB-IF-10
 void tst_SedsConverter_SedsToIv::testCommandArguments()
 {
     const int result = system("./test_command_arguments.sh");
@@ -102,9 +111,69 @@ void tst_SedsConverter_SedsToIv::testCommandArguments()
 
 /// \SRS  ETB-FUN-10
 /// \SRS  ETB-FUN-4050
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-130
 void tst_SedsConverter_SedsToIv::testParameters()
 {
     const int result = system("./test_parameters.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-1090
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-120
+void tst_SedsConverter_SedsToIv::testGenericTypeMapping()
+{
+    const int result = system("./test_generic_type_mapping.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-1100
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-120
+void tst_SedsConverter_SedsToIv::testAlternateSet()
+{
+    const int result = system("./test_alternate_set.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-1040
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-120
+void tst_SedsConverter_SedsToIv::testCrossReferenceArguments()
+{
+    const int result = system("./test_cross_reference_arguments.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-1040
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-120
+void tst_SedsConverter_SedsToIv::testCrossReferenceComplex()
+{
+    const int result = system("./test_cross_reference_complex.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-1040
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-120
+void tst_SedsConverter_SedsToIv::testCrossReferenceInterfaces()
+{
+    const int result = system("./test_cross_reference_interfaces.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-1030
+void tst_SedsConverter_SedsToIv::testDescriptions()
+{
+    const int result = system("./test_descriptions.sh");
     QCOMPARE(result, 0);
 }
 

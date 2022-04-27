@@ -33,6 +33,16 @@ InterfaceDeclaration SedsInterfaceDeclarationBuilder::build()
     return std::move(m_interfaceDeclaration);
 }
 
+SedsInterfaceDeclarationBuilder &SedsInterfaceDeclarationBuilder::withGenericType(QString name)
+{
+    seds::model::GenericType genericType;
+    genericType.setName(std::move(name));
+
+    m_interfaceDeclaration.addGenericType(std::move(genericType));
+
+    return *this;
+}
+
 SedsInterfaceDeclarationBuilder &SedsInterfaceDeclarationBuilder::withCommand(InterfaceCommand command)
 {
     m_interfaceDeclaration.addCommand(std::move(command));

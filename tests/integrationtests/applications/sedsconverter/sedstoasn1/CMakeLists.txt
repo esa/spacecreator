@@ -29,6 +29,11 @@ configure_file(resources/test_arrays.xml resources/test_arrays.xml COPYONLY)
 configure_file(resources/test_arrays_asn.output resources/test_arrays_asn.output COPYONLY)
 configure_file(resources/test_arrays_acn.output resources/test_arrays_acn.output COPYONLY)
 
+configure_file(test_array_size_threshold.sh test_array_size_threshold.sh COPYONLY)
+configure_file(resources/test_array_size_threshold.xml resources/test_array_size_threshold.xml COPYONLY)
+configure_file(resources/test_array_size_threshold_asn.output resources/test_array_size_threshold_asn.output COPYONLY)
+configure_file(resources/test_array_size_threshold_acn.output resources/test_array_size_threshold_acn.output COPYONLY)
+
 configure_file(test_indexed_array.sh test_indexed_array.sh COPYONLY)
 configure_file(resources/test_indexed_array.xml resources/test_indexed_array.xml COPYONLY)
 configure_file(resources/test_indexed_array_asn.output resources/test_indexed_array_asn.output COPYONLY)
@@ -48,6 +53,12 @@ configure_file(resources/test_container_entries.xml resources/test_container_ent
 configure_file(resources/test_container_entries_asn.output resources/test_container_entries_asn.output COPYONLY)
 configure_file(resources/test_container_entries_acn.output resources/test_container_entries_acn.output COPYONLY)
 
+configure_file(test_patched_entries.sh test_patched_entries.sh COPYONLY)
+configure_file(resources/test_patched_entries.xml resources/test_patched_entries.xml COPYONLY)
+configure_file(resources/test_patched_entries_asn.output resources/test_patched_entries_asn.output COPYONLY)
+configure_file(resources/test_patched_entries_acn.output resources/test_patched_entries_acn.output COPYONLY)
+configure_file(resources/test_patched_entries_main.c resources/test_patched_entries_main.c COPYONLY)
+
 configure_file(test_container_inheritance.sh test_container_inheritance.sh COPYONLY)
 configure_file(resources/test_container_inheritance.xml resources/test_container_inheritance.xml COPYONLY)
 configure_file(resources/test_container_inheritance_asn.output resources/test_container_inheritance_asn.output COPYONLY)
@@ -56,3 +67,15 @@ configure_file(resources/test_container_inheritance_acn.output resources/test_co
 configure_file(test_min_max_range.sh test_min_max_range.sh COPYONLY)
 configure_file(resources/test_min_max_range.xml resources/test_min_max_range.xml COPYONLY)
 configure_file(resources/test_min_max_range_asn.output resources/test_min_max_range_asn.output COPYONLY)
+
+configure_file(test_cross_reference_data_types.sh test_cross_reference_data_types.sh COPYONLY)
+configure_file(resources/test_cross_reference_data_types_package1.xml resources/test_cross_reference_data_types_package1.xml COPYONLY)
+configure_file(resources/test_cross_reference_data_types_package2.xml resources/test_cross_reference_data_types_package2.xml COPYONLY)
+configure_file(resources/test_cross_reference_data_types_package1_acn.output resources/test_cross_reference_data_types_package1_acn.output COPYONLY)
+configure_file(resources/test_cross_reference_data_types_package1_asn.output resources/test_cross_reference_data_types_package1_asn.output COPYONLY)
+configure_file(resources/test_cross_reference_data_types_package2_acn.output resources/test_cross_reference_data_types_package2_acn.output COPYONLY)
+configure_file(resources/test_cross_reference_data_types_package2_asn.output resources/test_cross_reference_data_types_package2_asn.output COPYONLY)
+
+configure_file(test_descriptions.sh test_descriptions.sh COPYONLY)
+configure_file(resources/test_descriptions.xml resources/test_descriptions.xml COPYONLY)
+configure_file(resources/test_descriptions_asn.output resources/test_descriptions_asn.output COPYONLY)

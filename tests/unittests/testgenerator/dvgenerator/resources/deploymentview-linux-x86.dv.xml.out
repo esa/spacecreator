@@ -1,0 +1,10 @@
+<DeploymentView>
+    <Node name="x86_Linux_TestRunner" type="ocarina_processors_x86::x86.generic_linux" node_label="Node_1" namespace="ocarina_processors_x86">
+        <Property name="Taste::coordinates" value="19200 19300 39600 35300"/>
+        <Partition name="hostPartition">
+            <Property name="Taste::coordinates" value="23600 23700 35600 31700"/>
+            <Function name="TestDriver" path="TestDriver"/>
+            <Function name="FunctionUnderTest" path="FunctionUnderTest"/>
+        </Partition>
+    </Node>
+</DeploymentView>

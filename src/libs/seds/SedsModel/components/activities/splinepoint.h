@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace seds::model {
 
 class SplinePoint
@@ -29,8 +31,8 @@ public:
     SplinePoint &operator=(SplinePoint &&) = default;
 
 public:
-    auto order() const -> int;
-    auto setOrder(int order) -> void;
+    auto order() const -> uint8_t;
+    auto setOrder(uint8_t order) -> void;
 
     auto raw() const -> double;
     auto setRaw(double raw) -> void;
@@ -38,8 +40,10 @@ public:
     auto calibrated() const -> double;
     auto setCalibrated(double calibrated) -> void;
 
+    bool operator<(const SplinePoint &rhs) const;
+
 private:
-    int m_order;
+    uint8_t m_order;
     double m_raw;
     double m_calibrated;
 };

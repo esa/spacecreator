@@ -5,18 +5,22 @@ set(SOURCES
   promelatypesorter.cpp
   integersubset.cpp
   integergenerator.cpp
+  enumeratedgenerator.cpp
   visitors/asn1nodevisitor.cpp
   visitors/asn1sequencecomponentvisitor.cpp
   visitors/integerconstraintvisitor.cpp
   visitors/asn1itemtypevisitor.cpp
   visitors/asn1nodevaluegeneratorvisitor.cpp
   visitors/asn1typevaluegeneratorvisitor.cpp
+  visitors/valueassignmentvisitor.cpp
+  visitors/sequencecomponentvaluevisitor.cpp
 )
 set(INCLUDES
   translator.h
   promelatypesorter.h
   integersubset.h
   integergenerator.h
+  enumeratedgenerator.h
   visitors/asn1nodevisitor.h
   visitors/asn1sequencecomponentvisitor.h
   visitors/integerconstraintvisitor.h
@@ -24,6 +28,8 @@ set(INCLUDES
   visitors/asn1itemtypevisitor.h
   visitors/asn1nodevaluegeneratorvisitor.h
   visitors/asn1typevaluegeneratorvisitor.h
+  visitors/valueassignmentvisitor.h
+  visitors/sequencecomponentvaluevisitor.h
 )
 
 add_library(Asn1ToPromelaTranslator STATIC)
@@ -36,6 +42,7 @@ target_include_directories(Asn1ToPromelaTranslator
   PRIVATE                  "${CMAKE_SOURCE_DIR}/src/libs")
 target_link_libraries(Asn1ToPromelaTranslator
   PUBLIC              Conversion::Common
+                      Conversion::Converter
                       asn1library
                       Promela::Model
   PRIVATE             CommonProjectWarnings)

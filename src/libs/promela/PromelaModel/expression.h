@@ -19,7 +19,9 @@
 
 #pragma once
 
+#include "binaryexpression.h"
 #include "constant.h"
+#include "inlinecall.h"
 #include "variableref.h"
 
 #include <QString>
@@ -34,10 +36,8 @@ class Expression final
 public:
     /**
      * @brief Variant to represent alternatives of expression
-     *
-     * TODO: implement full support for expressions
      */
-    using Value = std::variant<VariableRef, Constant>;
+    using Value = std::variant<VariableRef, Constant, BinaryExpression, InlineCall>;
 
     /**
      * @brief Constructor.

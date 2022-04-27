@@ -8,7 +8,7 @@
         <Range>
           <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
         </Range>
-      </IntegerDataType>      
+      </IntegerDataType>
     </DataTypeSet>
     <DeclaredInterfaceSet>
       <Interface name="InterfaceWithSynchronousCommands">
@@ -18,7 +18,7 @@
             <LongDescription>Execute a synchronous action with arguments</LongDescription>
             <Argument name="InputArg" type="DataItem" mode="in" defaultValue="15" />
             <Argument name="OutputArg" type="DataItem" mode="out" defaultValue="20" />
-          </Command>          
+          </Command>
           <Command name="ExecuteSynchronousActionWithInOutArg" mode="sync">
             <LongDescription>Execute a synchronous action with an in/out argument</LongDescription>
             <Argument name="InOutArg" type="DataItem" mode="inout" />
@@ -46,7 +46,7 @@
         </CommandSet>
       </Interface>
     </DeclaredInterfaceSet>
-    <ComponentSet>     
+    <ComponentSet>
       <Component name="Provider">
         <LongDescription>Host for provided interfaces</LongDescription>
         <ProvidedInterfaceSet>

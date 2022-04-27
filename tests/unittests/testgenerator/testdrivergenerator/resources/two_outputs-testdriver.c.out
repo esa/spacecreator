@@ -1,0 +1,83 @@
+/**
+ * This file was generated automatically by TestGenerator
+ */
+
+#include "testdriver.h"
+//#include <stdio.h>
+
+#define TEST_DATA_SIZE 5
+const int testDataSize = TEST_DATA_SIZE;
+
+typedef struct {
+    asn1SccMyBool active;
+    asn1SccMyBool result1;
+    asn1SccMyReal temperature;
+    asn1SccMyInteger posX;
+    asn1SccMyInteger posY;
+    asn1SccMyReal result2;
+} TestVector;
+
+TestVector testData[TEST_DATA_SIZE] = { 0 };
+
+void notifyTestFinished(void)
+{
+    volatile int a;
+    while (true) {
+        a = 0;
+    }
+}
+
+void testdriver_startup(void)
+{
+    testData[0].active = 1;
+    testData[0].result1 = 0;
+    testData[0].temperature = 2.3;
+    testData[0].posX = -2;
+    testData[0].posY = 3;
+    testData[0].result2 = 0;
+
+    testData[1].active = 1;
+    testData[1].result1 = 0;
+    testData[1].temperature = 5.3444;
+    testData[1].posX = -2;
+    testData[1].posY = 3;
+    testData[1].result2 = 0;
+
+    testData[2].active = 0;
+    testData[2].result1 = 0;
+    testData[2].temperature = 2.3;
+    testData[2].posX = -8;
+    testData[2].posY = 3;
+    testData[2].result2 = 0;
+
+    testData[3].active = 0;
+    testData[3].result1 = 0;
+    testData[3].temperature = 2.3;
+    testData[3].posX = -1;
+    testData[3].posY = -1;
+    testData[3].result2 = 0;
+
+    testData[4].active = 1;
+    testData[4].result1 = 0;
+    testData[4].temperature = 2.3;
+    testData[4].posX = 4;
+    testData[4].posY = 1;
+    testData[4].result2 = 0;
+}
+
+void testdriver_PI_StartTest(void)
+{
+    for (unsigned int i = 0; i < testDataSize; i++) {
+        // clang-format off
+        testdriver_RI_InterfaceUnderTest(
+                &(testData[i].active),
+                &(testData[i].result1),
+                &(testData[i].temperature),
+                &(testData[i].posX),
+                &(testData[i].posY),
+                &(testData[i].result2)
+        );
+        // clang-format on
+    }
+    notifyTestFinished();
+}

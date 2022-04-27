@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#pragma once
+
 #include <QObject>
 #include <QtTest>
 #include <asn1library/asn1/asn1model.h>
@@ -34,9 +36,11 @@ private Q_SLOTS:
     void initTestCase();
     void cleanupTestCase();
 
-    void testInteger();
+    void testBoolean() const;
+    void testInteger() const;
+    void testEnumerated() const;
 
 private:
-    std::unique_ptr<Definitions> createModel();
+    std::unique_ptr<Definitions> createModel() const;
 };
 }

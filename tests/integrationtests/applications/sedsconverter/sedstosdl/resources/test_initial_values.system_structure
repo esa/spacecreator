@@ -1,0 +1,14 @@
+/* CIF Keep Specific Geode ASNFilename 'dataview-uniq.asn' */
+use Datamodel;
+
+system Component;
+
+ 
+
+
+   block Component;
+
+
+      process Component referenced;
+   endblock;
+endsystem;

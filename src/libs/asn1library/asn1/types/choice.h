@@ -29,6 +29,7 @@
 #include "type.h"
 
 #include <QString>
+#include <set>
 
 namespace Asn1Acn {
 namespace Types {
@@ -48,6 +49,7 @@ public:
     const QString &adaName() const { return m_adaName; }
     const QString &cName() const { return m_cName; }
     const QString &presentWhen() const { return m_presentWhen; }
+    const std::vector<QString> &acnParameters() const;
     const SourceLocation &location() const { return m_location; }
 
     const Type *type() const { return m_type.get(); }
@@ -86,8 +88,12 @@ public:
     void setDeterminant(const QString &determinant) { m_determinant = determinant; }
     const QString &determinant() const { return m_determinant; }
 
+    void addWithComponentConstraint(QString name) { m_withComponentConstraints.insert(std::move(name)); }
+    std::set<QString> withComponentConstraints() const { return m_withComponentConstraints; }
+
 private:
     QString m_determinant;
+    std::set<QString> m_withComponentConstraints;
 };
 
 }

@@ -1,0 +1,44 @@
+/* CIF Process (0, 0), (800, 100) */
+process ParameterMapHostRequirer;
+    /* CIF Text (0, 150), (400, 500) */
+    dcl X Number;
+    dcl Y Number;
+    dcl Io_get_if_asyncparam_pi Number;
+    dcl Io_get_if_asyncroparam_pi Number;
+    dcl Io_set_if_asyncparam_ri Number;
+    /* CIF ENDTEXT */
+    /* CIF Procedure (0, 900), (800, 50) */
+    procedure TestActivity;
+        /* CIF Start (0, 0), (200, 75) */
+        START;
+            /* CIF ProcedureCall (0, 187), (100, 50) */
+            call Set_IF_SyncParam_Ri(10);
+            /* CIF ProcedureCall (0, 262), (100, 50) */
+            call Get_IF_SyncParam_Ri(X);
+            /* CIF Task (0, 337), (100, 50) */
+            task Io_set_if_asyncparam_ri := 10;
+            /* CIF Output (0, 412), (200, 50) */
+            output Set_IF_AsyncParam_Ri(Io_set_if_asyncparam_ri);
+    endprocedure;
+    /* CIF Start (0, 975), (200, 75) */
+    START;
+        /* CIF NextState (0, 1162), (200, 50) */
+        NEXTSTATE s;
+    /* CIF State (0, 1237), (200, 50) */
+    state s;
+        /* CIF Input (0, 1237), (200, 50) */
+        input Get_IF_AsyncParam_Pi(Io_get_if_asyncparam_pi);
+            /* CIF Task (0, 1312), (100, 50) */
+            task X := Io_get_if_asyncparam_pi;
+            /* CIF Task (0, 1387), (100, 50) */
+            task Y := Io_get_if_asyncparam_pi;
+            /* CIF NextState (0, 1462), (200, 50) */
+            NEXTSTATE s;
+        /* CIF Input (300, 1237), (200, 50) */
+        input Get_IF_AsyncRoParam_Pi(Io_get_if_asyncroparam_pi);
+            /* CIF Task (300, 1312), (100, 50) */
+            task X := Io_get_if_asyncroparam_pi;
+            /* CIF NextState (300, 1387), (200, 50) */
+            NEXTSTATE s;
+    endstate;
+endprocess ParameterMapHostRequirer;

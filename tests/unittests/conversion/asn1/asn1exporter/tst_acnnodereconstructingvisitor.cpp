@@ -214,9 +214,10 @@ void tst_AcnNodeReconstructingVisitor::testChoiceNested()
     sequenceType->addComponent(std::make_unique<AcnSequenceComponent>(QStringLiteral("id1"), QStringLiteral("seqItem1"),
             Types::TypeFactory::createBuiltinType(QStringLiteral("BOOLEAN"))));
 
-    sequenceType->addComponent(std::make_unique<AsnSequenceComponent>(QStringLiteral("seqItem2"),
-            QStringLiteral("seqItem2"), true, std::nullopt, QStringLiteral("seqItem1"), SourceLocation(),
-            Types::TypeFactory::createBuiltinType(QStringLiteral("INTEGER"))));
+    sequenceType->addComponent(
+            std::make_unique<AsnSequenceComponent>(QStringLiteral("seqItem2"), QStringLiteral("seqItem2"), true,
+                    std::nullopt, QStringLiteral("seqItem1"), Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
+                    SourceLocation(), Types::TypeFactory::createBuiltinType(QStringLiteral("INTEGER"))));
 
     choiceType->addComponent(std::make_unique<Types::ChoiceAlternative>(QStringLiteral("choiceAlt1"),
             QStringLiteral(""), QStringLiteral("ada-name-attr"), QStringLiteral("c-name-attr"),
@@ -297,11 +298,12 @@ void tst_AcnNodeReconstructingVisitor::testSequenceNested()
             SourceLocation(), Types::TypeFactory::createBuiltinType(QStringLiteral("INTEGER"))));
 
     sequenceType->addComponent(std::make_unique<AsnSequenceComponent>(QStringLiteral("seq1"), QStringLiteral("seq1"),
-            true, std::nullopt, QStringLiteral("preWhenValue"), SourceLocation(),
-            Types::TypeFactory::createBuiltinType(QStringLiteral("INTEGER"))));
+            true, std::nullopt, QStringLiteral("preWhenValue"), Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
+            SourceLocation(), Types::TypeFactory::createBuiltinType(QStringLiteral("INTEGER"))));
 
     sequenceType->addComponent(std::make_unique<AsnSequenceComponent>(QStringLiteral("seq2"), QStringLiteral("seq2"),
-            false, std::nullopt, QStringLiteral(""), SourceLocation(), std::move(choiceType)));
+            false, std::nullopt, QStringLiteral(""), Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
+            SourceLocation(), std::move(choiceType)));
 
     auto expectedResult = QStringLiteral("MySequence []\n"
                                          "{\n"

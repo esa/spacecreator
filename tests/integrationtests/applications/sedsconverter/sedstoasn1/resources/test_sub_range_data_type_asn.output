@@ -1,10 +1,10 @@
 COM-N7SPACE-SUBRANGEDATATYPE DEFINITIONS ::= BEGIN
 IntegerData ::= INTEGER(0 .. 255)
 SubRangeIntegerData ::= INTEGER(10 .. 255)
-Float32 ::= REAL(1.17549e-38 .. 3.40282e+38)
-SubRangeFloat32 ::= REAL(1.17549e-38 .. 50)
-Float64 ::= REAL(2.22507e-308 .. 1.79769e+308)
-SubRangeFloat64 ::= REAL(1.17549e-38 .. 3.40282e+38)
+Float32 ::= REAL(-3.40282e+38 .. 3.40282e+38)
+SubRangeFloat32 ::= REAL(-3.40282e+38 .. 50)
+Float64 ::= REAL(-1.79769e+308 .. 1.79769e+308)
+SubRangeFloat64 ::= REAL(-3.40282e+38 .. 3.40282e+38)
 SimpleEnumeration ::= ENUMERATED
 {
     value1(12),

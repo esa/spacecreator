@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DataSheet xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/Package1">
+    <ComponentSet>
+      <Component name="Component">
+        <ProvidedInterfaceSet>
+            <Interface name="ProvidedInterface" type="com/n7space/Package2/ChildInterface">
+          </Interface>
+        </ProvidedInterfaceSet>
+      </Component>
+    </ComponentSet>
+  </Package>
+  <xi:include href="test_cross_reference_interfaces_package2.xml" xpointer="element(/1/1)" />
+  <xi:include href="test_cross_reference_interfaces_package3.xml" xpointer="element(/1/1)" />
+</DataSheet>
+

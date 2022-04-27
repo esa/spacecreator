@@ -31,12 +31,16 @@ private Q_SLOTS:
     void testSimpleDataTypes();
     void testSubRangeDataType();
     void testArrays();
+    void testArraySizeThreshold();
     void testIndexedArray();
     void testContainers();
     void testContainerConstraints();
     void testContainerEntries();
+    void testPatchedEntries();
     void testContainerInheritance();
     void testMinMaxRange();
+    void testCrossReferenceDataTypes();
+    void testDescriptions();
 };
 
 /// \SRS  ETB-FUN-10
@@ -64,7 +68,7 @@ void tst_SedsConverter_SedsToAsn1::testSimpleDataTypes()
 /// \SRS  ETB-IF-120
 void tst_SedsConverter_SedsToAsn1::testSubRangeDataType()
 {
-    const int result = system("./test_simple_data_types.sh");
+    const int result = system("./test_sub_range_data_type.sh");
     QCOMPARE(result, 0);
 }
 
@@ -77,6 +81,19 @@ void tst_SedsConverter_SedsToAsn1::testSubRangeDataType()
 void tst_SedsConverter_SedsToAsn1::testArrays()
 {
     const int result = system("./test_arrays.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-110
+/// \SRS  ETB-FUN-130
+/// \SRS  ETB-FUN-210
+/// \SRS  ETB-FUN-220
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-120
+void tst_SedsConverter_SedsToAsn1::testArraySizeThreshold()
+{
+    const int result = system("./test_array_size_threshold.sh");
     QCOMPARE(result, 0);
 }
 
@@ -141,12 +158,50 @@ void tst_SedsConverter_SedsToAsn1::testContainerEntries()
 
 /// \SRS  ETB-FUN-10
 /// \SRS  ETB-FUN-110
+/// \SRS  ETB-FUN-230
+/// \SRS  ETB-FUN-250
+/// \SRS  ETB-FUN-260
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-120
+void tst_SedsConverter_SedsToAsn1::testPatchedEntries()
+{
+    const int result = system("./test_patched_entries.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-110
 /// \SRS  ETB-FUN-180
 /// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-120
 void tst_SedsConverter_SedsToAsn1::testMinMaxRange()
 {
     const int result = system("./test_min_max_range.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-180
+/// \SRS  ETB-FUN-200
+/// \SRS  ETB-FUN-210
+/// \SRS  ETB-FUN-230
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-50
+/// \SRS  ETB-IF-120
+void tst_SedsConverter_SedsToAsn1::testCrossReferenceDataTypes()
+{
+    const int result = system("./test_cross_reference_data_types.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-110
+/// \SRS  ETB-FUN-120
+/// \SRS  ETB-FUN-180
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-120
+void tst_SedsConverter_SedsToAsn1::testDescriptions()
+{
+    const int result = system("./test_descriptions.sh");
     QCOMPARE(result, 0);
 }
 

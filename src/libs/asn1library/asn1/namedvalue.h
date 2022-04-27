@@ -35,6 +35,10 @@ namespace Asn1Acn {
 class NamedValue : public Value
 {
 public:
+    using Component = std::pair<QString, ValuePtr>;
+    using Components = std::vector<Component>;
+    using ComponentIterator = Components::const_iterator;
+
     NamedValue() = default;
     NamedValue(const NamedValue &other);
 
@@ -43,8 +47,12 @@ public:
 
     void addValue(const QString &name, ValuePtr value);
 
+    ValueType typeEnum() const override;
+
+    const Components &components() const;
+
 private:
-    std::vector<std::pair<QString, ValuePtr>> m_values;
+    Components m_values;
 };
 
 }

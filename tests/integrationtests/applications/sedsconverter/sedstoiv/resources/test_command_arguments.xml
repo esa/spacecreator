@@ -41,6 +41,9 @@
       </CommandSet>
     </Interface>
     <Interface name="GenericInterface">
+      <GenericTypeSet>
+        <GenericType name="GenericType" />
+      </GenericTypeSet>
       <CommandSet>
         <Command name="GenericCommand" mode="async">
           <Argument name="GenericArgument1" type="GenericType" mode="in" />

@@ -31,6 +31,7 @@ using promela::exporter::PromelaExporter;
 using promela::model::ArrayType;
 using promela::model::Assignment;
 using promela::model::BasicType;
+using promela::model::BinaryExpression;
 using promela::model::ChannelInit;
 using promela::model::ChannelRecv;
 using promela::model::ChannelSend;
@@ -40,8 +41,10 @@ using promela::model::DataType;
 using promela::model::Declaration;
 using promela::model::DoLoop;
 using promela::model::Expression;
+using promela::model::ForLoop;
 using promela::model::InitProctype;
 using promela::model::InlineCall;
+using promela::model::InlineDef;
 using promela::model::MtypeRef;
 using promela::model::NamedMtype;
 using promela::model::Proctype;
@@ -79,6 +82,13 @@ private Q_SLOTS:
     void testDoLoop();
     void testEpilpgueInclude();
     void testConditional();
+    void testSequenceTypesInProctypesAndInlines();
+    void testSequenceTypesInLoopAndConditional();
+    void testAtomicInitSequence();
+    void testDstepInitSequence();
+    void testForRangeLoop();
+    void testForEachLoop();
+    void testExpressions();
 
 private:
     QString getFileContents(const QString &filename);
@@ -375,19 +385,19 @@ void tst_PromelaExporter::testBasicProctypes()
 
     model.addDeclaration(Declaration(DataType(BasicType::INT), "inited"));
 
-    Sequence basicSequence;
+    Sequence basicSequence(Sequence::Type::NORMAL);
     basicSequence.appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("inited"))));
     std::unique_ptr<Proctype> basicProctype = std::make_unique<Proctype>("basic", std::move(basicSequence));
     model.addProctype(std::move(basicProctype));
 
-    Sequence activeSequence;
+    Sequence activeSequence(Sequence::Type::NORMAL);
     activeSequence.appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("inited"))));
     std::unique_ptr<Proctype> activeProctype = std::make_unique<Proctype>("activeProctype", std::move(activeSequence));
     activeProctype->setActive(true);
     activeProctype->setInstancesCount(1);
     model.addProctype(std::move(activeProctype));
 
-    Sequence activeManyInstancesSequence;
+    Sequence activeManyInstancesSequence(Sequence::Type::NORMAL);
     activeManyInstancesSequence.appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("inited"))));
     std::unique_ptr<Proctype> activeProctypeManyInstances =
             std::make_unique<Proctype>("activeProctypeMany", std::move(activeManyInstancesSequence));
@@ -395,7 +405,7 @@ void tst_PromelaExporter::testBasicProctypes()
     activeProctypeManyInstances->setInstancesCount(2);
     model.addProctype(std::move(activeProctypeManyInstances));
 
-    Sequence sequenceWithPriority;
+    Sequence sequenceWithPriority(Sequence::Type::NORMAL);
     sequenceWithPriority.appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("inited"))));
     std::unique_ptr<Proctype> proctypeWithPriority =
             std::make_unique<Proctype>("withPriority", std::move(sequenceWithPriority));
@@ -419,7 +429,7 @@ void tst_PromelaExporter::testInitProctype()
 
     model.addDeclaration(Declaration(DataType(BasicType::INT), "inited"));
 
-    Sequence initSequence;
+    Sequence initSequence(Sequence::Type::NORMAL);
     initSequence.appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("inited"))));
     InitProctype init(std::move(initSequence));
 
@@ -462,11 +472,13 @@ void tst_PromelaExporter::testProctypeElements()
     std::unique_ptr<ProctypeElement> channelRecv =
             std::make_unique<ProctypeElement>(ChannelRecv(VariableRef("channel1"), params));
     std::unique_ptr<ProctypeElement> inlineCall = std::make_unique<ProctypeElement>(InlineCall("fn", {}));
+    QList<InlineCall::Argument> inlineParams;
+    inlineParams.append(VariableRef("param"));
     std::unique_ptr<ProctypeElement> inlineCallWithParams =
-            std::make_unique<ProctypeElement>(InlineCall("fnParams", params));
+            std::make_unique<ProctypeElement>(InlineCall("fnParams", inlineParams));
     std::unique_ptr<ProctypeElement> skip = std::make_unique<ProctypeElement>(Skip());
 
-    Sequence initSequence;
+    Sequence initSequence(Sequence::Type::NORMAL);
     initSequence.appendElement(std::move(assignment));
     initSequence.appendElement(std::move(expressionVariableRef));
     initSequence.appendElement(std::move(expressionConstant));
@@ -499,7 +511,7 @@ void tst_PromelaExporter::testDoLoop()
     model.addDeclaration(Declaration(DataType(BasicType::INT), "reset"));
     model.addDeclaration(Declaration(DataType(BasicType::INT), "set"));
 
-    std::unique_ptr<Sequence> doLoopFirstSequence = std::make_unique<Sequence>();
+    std::unique_ptr<Sequence> doLoopFirstSequence = std::make_unique<Sequence>(Sequence::Type::NORMAL);
     std::unique_ptr<ProctypeElement> resetRef = std::make_unique<ProctypeElement>(Expression(VariableRef("reset")));
     std::unique_ptr<ProctypeElement> resetAssignment0 =
             std::make_unique<ProctypeElement>(Assignment(VariableRef("reset"), Expression(Constant(0))));
@@ -510,7 +522,7 @@ void tst_PromelaExporter::testDoLoop()
     doLoopFirstSequence->appendElement(std::move(resetAssignment0));
     doLoopFirstSequence->appendElement(std::move(setAssignment1));
 
-    std::unique_ptr<Sequence> doLoopSecondSequence = std::make_unique<Sequence>();
+    std::unique_ptr<Sequence> doLoopSecondSequence = std::make_unique<Sequence>(Sequence::Type::NORMAL);
     std::unique_ptr<ProctypeElement> setRef = std::make_unique<ProctypeElement>(Expression(VariableRef("set")));
     std::unique_ptr<ProctypeElement> resetAssignment1 =
             std::make_unique<ProctypeElement>(Assignment(VariableRef("reset"), Expression(Constant(1))));
@@ -527,7 +539,7 @@ void tst_PromelaExporter::testDoLoop()
 
     std::unique_ptr<ProctypeElement> doLoopElement = std::make_unique<ProctypeElement>(std::move(doLoop));
 
-    Sequence initSequence;
+    Sequence initSequence(Sequence::Type::NORMAL);
     std::unique_ptr<ProctypeElement> assignment =
             std::make_unique<ProctypeElement>(Assignment(VariableRef("reset"), Expression(Constant(1))));
 
@@ -576,7 +588,7 @@ void tst_PromelaExporter::testConditional()
     model.addDeclaration(Declaration(DataType(BasicType::INT), "reset"));
     model.addDeclaration(Declaration(DataType(BasicType::INT), "set"));
 
-    std::unique_ptr<Sequence> doLoopFirstSequence = std::make_unique<Sequence>();
+    std::unique_ptr<Sequence> doLoopFirstSequence = std::make_unique<Sequence>(Sequence::Type::NORMAL);
     std::unique_ptr<ProctypeElement> resetRef = std::make_unique<ProctypeElement>(Expression(VariableRef("reset")));
     std::unique_ptr<ProctypeElement> resetAssignment0 =
             std::make_unique<ProctypeElement>(Assignment(VariableRef("reset"), Expression(Constant(0))));
@@ -587,7 +599,7 @@ void tst_PromelaExporter::testConditional()
     doLoopFirstSequence->appendElement(std::move(resetAssignment0));
     doLoopFirstSequence->appendElement(std::move(setAssignment1));
 
-    std::unique_ptr<Sequence> doLoopSecondSequence = std::make_unique<Sequence>();
+    std::unique_ptr<Sequence> doLoopSecondSequence = std::make_unique<Sequence>(Sequence::Type::NORMAL);
     std::unique_ptr<ProctypeElement> setRef = std::make_unique<ProctypeElement>(Expression(VariableRef("set")));
     std::unique_ptr<ProctypeElement> resetAssignment1 =
             std::make_unique<ProctypeElement>(Assignment(VariableRef("reset"), Expression(Constant(1))));
@@ -604,7 +616,7 @@ void tst_PromelaExporter::testConditional()
 
     std::unique_ptr<ProctypeElement> doLoopElement = std::make_unique<ProctypeElement>(std::move(conditional));
 
-    Sequence initSequence;
+    Sequence initSequence(Sequence::Type::NORMAL);
     std::unique_ptr<ProctypeElement> assignment =
             std::make_unique<ProctypeElement>(Assignment(VariableRef("reset"), Expression(Constant(1))));
 
@@ -622,6 +634,401 @@ void tst_PromelaExporter::testConditional()
         QFAIL(ex.what());
     }
     QString out2 = getFileContents("expect_promela_conditional.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testSequenceTypesInProctypesAndInlines()
+{
+    PromelaModel model;
+
+    {
+        Sequence sequence(Sequence::Type::NORMAL);
+        sequence.appendElement(std::make_unique<ProctypeElement>(Expression(Constant(1))));
+
+        const QList<QString> arguments;
+        std::unique_ptr<InlineDef> normalInline =
+                std::make_unique<InlineDef>("normalInline", arguments, std::move(sequence));
+
+        model.addInlineDef(std::move(normalInline));
+    }
+    {
+        Sequence sequence(Sequence::Type::ATOMIC);
+        sequence.appendElement(std::make_unique<ProctypeElement>(Expression(Constant(1))));
+
+        const QList<QString> arguments;
+        std::unique_ptr<InlineDef> normalInline =
+                std::make_unique<InlineDef>("atomicInline", arguments, std::move(sequence));
+
+        model.addInlineDef(std::move(normalInline));
+    }
+    {
+        Sequence sequence(Sequence::Type::D_STEP);
+        sequence.appendElement(std::make_unique<ProctypeElement>(Expression(Constant(1))));
+
+        const QList<QString> arguments;
+        std::unique_ptr<InlineDef> normalInline =
+                std::make_unique<InlineDef>("dstepInline", arguments, std::move(sequence));
+
+        model.addInlineDef(std::move(normalInline));
+    }
+
+    {
+        Sequence sequence(Sequence::Type::NORMAL);
+        sequence.appendElement(std::make_unique<ProctypeElement>(Expression(Constant(1))));
+        std::unique_ptr<Proctype> normalProctype = std::make_unique<Proctype>("normalProctype", std::move(sequence));
+        model.addProctype(std::move(normalProctype));
+    }
+    {
+        Sequence sequence(Sequence::Type::ATOMIC);
+        sequence.appendElement(std::make_unique<ProctypeElement>(Expression(Constant(1))));
+        std::unique_ptr<Proctype> normalProctype = std::make_unique<Proctype>("atomicProctype", std::move(sequence));
+        model.addProctype(std::move(normalProctype));
+    }
+    {
+        Sequence sequence(Sequence::Type::D_STEP);
+        sequence.appendElement(std::make_unique<ProctypeElement>(Expression(Constant(1))));
+        std::unique_ptr<Proctype> normalProctype = std::make_unique<Proctype>("dstepProctype", std::move(sequence));
+        model.addProctype(std::move(normalProctype));
+    }
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_sequences_in_proctypes_and_inlines.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testSequenceTypesInLoopAndConditional()
+{
+    PromelaModel model;
+
+    Sequence mainSequence(Sequence::Type::NORMAL);
+
+    {
+        Sequence sequence(Sequence::Type::NORMAL);
+        sequence.appendElement(std::make_unique<ProctypeElement>(Expression(Constant(1))));
+
+        mainSequence.appendElement(std::make_unique<ProctypeElement>(std::move(sequence)));
+    }
+
+    {
+        Sequence sequence(Sequence::Type::ATOMIC);
+        sequence.appendElement(std::make_unique<ProctypeElement>(Expression(Constant(1))));
+
+        mainSequence.appendElement(std::make_unique<ProctypeElement>(std::move(sequence)));
+    }
+
+    {
+        Sequence sequence(Sequence::Type::D_STEP);
+        sequence.appendElement(std::make_unique<ProctypeElement>(Expression(Constant(1))));
+
+        mainSequence.appendElement(std::make_unique<ProctypeElement>(std::move(sequence)));
+    }
+
+    {
+        DoLoop doLoop;
+        {
+            std::unique_ptr<Sequence> sequence = std::make_unique<Sequence>(Sequence::Type::NORMAL);
+            sequence->appendElement(std::make_unique<ProctypeElement>(Expression(Constant(1))));
+            sequence->appendElement(std::make_unique<ProctypeElement>(Expression(Constant(2))));
+
+            doLoop.appendSequence(std::move(sequence));
+        }
+        {
+            std::unique_ptr<Sequence> sequence = std::make_unique<Sequence>(Sequence::Type::ATOMIC);
+            sequence->appendElement(std::make_unique<ProctypeElement>(Expression(Constant(1))));
+            sequence->appendElement(std::make_unique<ProctypeElement>(Expression(Constant(2))));
+
+            doLoop.appendSequence(std::move(sequence));
+        }
+        {
+            std::unique_ptr<Sequence> sequence = std::make_unique<Sequence>(Sequence::Type::D_STEP);
+            sequence->appendElement(std::make_unique<ProctypeElement>(Expression(Constant(1))));
+            sequence->appendElement(std::make_unique<ProctypeElement>(Expression(Constant(2))));
+
+            doLoop.appendSequence(std::move(sequence));
+        }
+        mainSequence.appendElement(std::make_unique<ProctypeElement>(std::move(doLoop)));
+    }
+
+    {
+        Conditional conditional;
+        {
+            std::unique_ptr<Sequence> sequence = std::make_unique<Sequence>(Sequence::Type::NORMAL);
+            sequence->appendElement(std::make_unique<ProctypeElement>(Expression(Constant(1))));
+            sequence->appendElement(std::make_unique<ProctypeElement>(Expression(Constant(2))));
+
+            conditional.appendAlternative(std::move(sequence));
+        }
+        {
+            std::unique_ptr<Sequence> sequence = std::make_unique<Sequence>(Sequence::Type::ATOMIC);
+            sequence->appendElement(std::make_unique<ProctypeElement>(Expression(Constant(1))));
+            sequence->appendElement(std::make_unique<ProctypeElement>(Expression(Constant(2))));
+
+            conditional.appendAlternative(std::move(sequence));
+        }
+        {
+            std::unique_ptr<Sequence> sequence = std::make_unique<Sequence>(Sequence::Type::D_STEP);
+            sequence->appendElement(std::make_unique<ProctypeElement>(Expression(Constant(1))));
+            sequence->appendElement(std::make_unique<ProctypeElement>(Expression(Constant(2))));
+
+            conditional.appendAlternative(std::move(sequence));
+        }
+        mainSequence.appendElement(std::make_unique<ProctypeElement>(std::move(conditional)));
+    }
+
+    std::unique_ptr<Proctype> normalProctype = std::make_unique<Proctype>("testProctype", std::move(mainSequence));
+    model.addProctype(std::move(normalProctype));
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_sequence_in_loop_and_if.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testAtomicInitSequence()
+{
+    PromelaModel model;
+
+    model.addDeclaration(Declaration(DataType(BasicType::INT), "inited"));
+
+    Sequence initSequence(Sequence::Type::ATOMIC);
+    initSequence.appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("inited"))));
+    InitProctype init(std::move(initSequence));
+
+    model.setInit(std::move(init));
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_atomic_init_proctype.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testDstepInitSequence()
+{
+    PromelaModel model;
+
+    model.addDeclaration(Declaration(DataType(BasicType::INT), "inited"));
+
+    Sequence initSequence(Sequence::Type::D_STEP);
+    initSequence.appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("inited"))));
+    InitProctype init(std::move(initSequence));
+
+    model.setInit(std::move(init));
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_dstep_init_proctype.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testForRangeLoop()
+{
+    PromelaModel model;
+
+    Sequence initSequence(Sequence::Type::NORMAL);
+
+    initSequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "i")));
+
+    std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>(Sequence::Type::NORMAL);
+    loopSequence->appendElement(std::make_unique<ProctypeElement>(Skip()));
+
+    ForLoop forLoop(VariableRef("i"), 0, 10, std::move(loopSequence));
+
+    initSequence.appendElement(std::make_unique<ProctypeElement>(std::move(forLoop)));
+
+    InitProctype init(std::move(initSequence));
+
+    model.setInit(std::move(init));
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_for_range_loop.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testForEachLoop()
+{
+    PromelaModel model;
+
+    model.addDeclaration(Declaration(DataType(ArrayType(10, BasicType::INT)), "array"));
+
+    Sequence initSequence(Sequence::Type::NORMAL);
+
+    initSequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "i")));
+
+    std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>(Sequence::Type::NORMAL);
+    loopSequence->appendElement(std::make_unique<ProctypeElement>(Skip()));
+
+    ForLoop forLoop(VariableRef("i"), VariableRef("array"), std::move(loopSequence));
+
+    initSequence.appendElement(std::make_unique<ProctypeElement>(std::move(forLoop)));
+
+    InitProctype init(std::move(initSequence));
+
+    model.setInit(std::move(init));
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_for_each_loop.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+void tst_PromelaExporter::testExpressions()
+{
+    PromelaModel model;
+
+    Declaration channel1 = Declaration(DataType(BasicType::CHAN), "channel1");
+    QList<ChannelInit::Type> channel1Type;
+    channel1Type.append(ChannelInit::Type(BasicType::INT));
+    channel1.setInit(ChannelInit(2, std::move(channel1Type)));
+    model.addDeclaration(channel1);
+
+    Sequence initSequence(Sequence::Type::NORMAL);
+
+    initSequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "a")));
+    initSequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "b")));
+    initSequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::BOOLEAN), "m")));
+    initSequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::BOOLEAN), "n")));
+
+    initSequence.appendElement(
+            std::make_unique<ProctypeElement>(Assignment(VariableRef("a"), Expression(Constant(20)))));
+    initSequence.appendElement(
+            std::make_unique<ProctypeElement>(Assignment(VariableRef("b"), Expression(Constant(5)))));
+    initSequence.appendElement(
+            std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(Constant(0)))));
+    initSequence.appendElement(
+            std::make_unique<ProctypeElement>(Assignment(VariableRef("n"), Expression(Constant(1)))));
+
+    {
+        BinaryExpression add(BinaryExpression::Operator::ADD, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("a"), Expression(std::move(add)))));
+    }
+
+    {
+        BinaryExpression substract(BinaryExpression::Operator::SUBTRACT, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("a"), Expression(std::move(substract)))));
+    }
+    {
+        BinaryExpression multiply(BinaryExpression::Operator::MULTIPLY, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("a"), Expression(std::move(multiply)))));
+    }
+    {
+        BinaryExpression divide(BinaryExpression::Operator::DIVIDE, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("a"), Expression(std::move(divide)))));
+    }
+    {
+        BinaryExpression equal(BinaryExpression::Operator::EQUAL, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(std::move(equal)))));
+    }
+    {
+        BinaryExpression less(BinaryExpression::Operator::LESS, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(std::move(less)))));
+    }
+    {
+        BinaryExpression greater(BinaryExpression::Operator::GREATER, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(std::move(greater)))));
+    }
+    {
+        BinaryExpression lequal(BinaryExpression::Operator::LEQUAL, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(std::move(lequal)))));
+    }
+    {
+        BinaryExpression gequal(BinaryExpression::Operator::GEQUAL, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(std::move(gequal)))));
+    }
+    {
+        BinaryExpression modulo(BinaryExpression::Operator::MODULO, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("a"), Expression(std::move(modulo)))));
+    }
+    {
+        BinaryExpression nequal(BinaryExpression::Operator::NEQUAL, std::make_unique<Expression>(VariableRef("a")),
+                std::make_unique<Expression>(VariableRef("b")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(std::move(nequal)))));
+    }
+    {
+        BinaryExpression andExpression(BinaryExpression::Operator::AND, std::make_unique<Expression>(VariableRef("m")),
+                std::make_unique<Expression>(VariableRef("n")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(std::move(andExpression)))));
+    }
+    {
+        BinaryExpression orExpression(BinaryExpression::Operator::OR, std::make_unique<Expression>(VariableRef("m")),
+                std::make_unique<Expression>(VariableRef("n")));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(std::move(orExpression)))));
+    }
+
+    {
+        QList<InlineCall::Argument> args;
+        args.append(VariableRef("channel1"));
+
+        InlineCall emptyCall = InlineCall("empty", args);
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(emptyCall))));
+    }
+
+    InitProctype init(std::move(initSequence));
+
+    model.setInit(std::move(init));
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_expressions.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }

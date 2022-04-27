@@ -43,6 +43,10 @@ public:
 
     void addValue(ValuePtr value);
 
+    ValueType typeEnum() const override;
+
+    const std::vector<ValuePtr> &values() const;
+
 private:
     std::vector<ValuePtr> m_values;
 };

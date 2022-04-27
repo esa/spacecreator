@@ -27,9 +27,12 @@
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication app(argc, argv);
+    Q_INIT_RESOURCE(asn1_resources);
+
     shared::initSharedLibrary();
     ivm::initIVLibrary();
+
+    QCoreApplication app(argc, argv);
 
     app.setOrganizationName(SC_ORGANISATION);
     app.setOrganizationDomain(SC_ORGANISATION_DOMAIN);

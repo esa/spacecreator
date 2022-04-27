@@ -68,9 +68,11 @@ private:
     void tryAppendTrueValue(const Types::Boolean &type, QStringList &params) const;
     void tryAppendFalseValue(const Types::Boolean &type, QStringList &params) const;
     void tryAppendPattern(const Types::Null &type, QStringList &params) const;
+    void tryAppendSavePosition(const Types::Null &type, QStringList &params) const;
     void tryAppendTerminationPattern(const Types::AsciiStringAcnParameters &type, QStringList &params) const;
 
     void tryAppendPresentWhen(QStringList &params) const;
+    void tryAppendSize(const Types::Boolean &type, QStringList &params) const;
     void tryAppendSize(const Types::IntegerAcnParameters &type, QStringList &params) const;
 
     template<typename T>
@@ -79,9 +81,9 @@ private:
     void tryAppendEncoding(const T &type, QStringList &params) const;
     template<typename T>
     void tryAppendEndianness(const T &type, QStringList &params) const;
+    void tryAppendPostEncodingFunction(const Types::Sequence &type, QStringList &params) const;
+    void tryAppendPostDecodingValidator(const Types::Sequence &type, QStringList &params) const;
 
-    template<typename T>
-    void reconstructComplexType(const T &type, int indent);
     template<typename T>
     void appendParamsFromComplexType(const T &type);
     template<typename T>

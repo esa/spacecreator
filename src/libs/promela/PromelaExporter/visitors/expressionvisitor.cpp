@@ -19,7 +19,14 @@
 
 #include "expressionvisitor.h"
 
+#include "inlinecallvisitor.h"
 #include "variablerefvisitor.h"
+
+using promela::model::BinaryExpression;
+using promela::model::Constant;
+using promela::model::Expression;
+using promela::model::InlineCall;
+using promela::model::VariableRef;
 
 namespace promela::exporter {
 ExpressionVisitor::ExpressionVisitor(QTextStream &stream)
@@ -27,19 +34,79 @@ ExpressionVisitor::ExpressionVisitor(QTextStream &stream)
 {
 }
 
-void ExpressionVisitor::visit(const ::promela::model::Expression &expression)
+void ExpressionVisitor::visit(const Expression &expression)
 {
     std::visit(*this, expression.getContent());
 }
 
-void ExpressionVisitor::operator()(const ::promela::model::VariableRef &variableRef)
+void ExpressionVisitor::operator()(const VariableRef &variableRef)
 {
     VariableRefVisitor visitor(m_stream);
     visitor.visit(variableRef);
 }
 
-void ExpressionVisitor::operator()(const ::promela::model::Constant &constant)
+void ExpressionVisitor::operator()(const Constant &constant)
 {
     m_stream << constant.getValue();
+}
+
+void ExpressionVisitor::operator()(const BinaryExpression &expression)
+{
+    ExpressionVisitor leftVisitor(m_stream);
+    leftVisitor.visit(*expression.getLeft());
+
+    m_stream << " ";
+    switch (expression.getOperator()) {
+    case BinaryExpression::Operator::ADD:
+        m_stream << "+";
+        break;
+    case BinaryExpression::Operator::SUBTRACT:
+        m_stream << "-";
+        break;
+    case BinaryExpression::Operator::MULTIPLY:
+        m_stream << "*";
+        break;
+    case BinaryExpression::Operator::DIVIDE:
+        m_stream << "/";
+        break;
+    case BinaryExpression::Operator::EQUAL:
+        m_stream << "==";
+        break;
+    case BinaryExpression::Operator::LESS:
+        m_stream << "<";
+        break;
+    case BinaryExpression::Operator::GREATER:
+        m_stream << ">";
+        break;
+    case BinaryExpression::Operator::LEQUAL:
+        m_stream << "<=";
+        break;
+    case BinaryExpression::Operator::GEQUAL:
+        m_stream << ">=";
+        break;
+    case BinaryExpression::Operator::MODULO:
+        m_stream << "%";
+        break;
+    case BinaryExpression::Operator::NEQUAL:
+        m_stream << "!=";
+        break;
+    case BinaryExpression::Operator::AND:
+        m_stream << "&&";
+        break;
+    case BinaryExpression::Operator::OR:
+        m_stream << "||";
+        break;
+    }
+
+    m_stream << " ";
+
+    ExpressionVisitor rightVisitor(m_stream);
+    rightVisitor.visit(*expression.getRight());
+}
+
+void ExpressionVisitor::operator()(const InlineCall &inlineCall)
+{
+    InlineCallVisitor visitor(m_stream);
+    visitor.visit(inlineCall);
 }
 }

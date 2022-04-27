@@ -41,6 +41,10 @@ public:
     QString asString() const override;
     ValuePtr clone() const override;
 
+    ValueType typeEnum() const override;
+
+    const QString &value() const;
+
 private:
     QString m_value;
     std::function<QString(const QString &)> m_printer;

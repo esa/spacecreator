@@ -1,0 +1,11 @@
+COM-N7SPACE-PACKAGE2 DEFINITIONS ::= BEGIN
+ArrayItem [size 8, encoding pos-int, endianness big]
+IndexItem [size 8, encoding pos-int, endianness big]
+FieldItem [size 8, encoding pos-int, endianness big]
+LengthItem [size 8, encoding pos-int, endianness big]
+ListItem [size 8, encoding pos-int, endianness big]
+ConstraintItem [size 8, encoding pos-int, endianness big]
+ChildItem [size 8, encoding pos-int, endianness big]
+SubRangeItem [size 8, encoding pos-int, endianness big]
+END
+

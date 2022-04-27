@@ -61,6 +61,10 @@ public:
 
     void setName(const QString &name) { m_name = name; }
     const QString &name() const { return m_name; }
+
+    void setComment(QString comment) { m_comment = std::move(comment); }
+    const QString &comment() const { return m_comment; }
+
     const SourceLocation &location() const { return m_location; }
 
     Node *parent() const { return m_parent; }
@@ -68,6 +72,7 @@ public:
 
 private:
     QString m_name;
+    QString m_comment;
     SourceLocation m_location;
     Node *m_parent;
 };

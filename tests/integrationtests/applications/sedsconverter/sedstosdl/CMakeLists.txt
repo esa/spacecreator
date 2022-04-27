@@ -66,3 +66,43 @@ configure_file(resources/test_timers.xml resources/test_timers.xml COPYONLY)
 configure_file(resources/test_timers.output resources/test_timers.output COPYONLY)
 configure_file(resources/test_timers.system_structure resources/test_timers.system_structure COPYONLY)
 configure_file(resources/test_timers.interfaceview resources/test_timers.interfaceview COPYONLY)
+
+configure_file(test_parameter_map.sh test_parameter_map.sh COPYONLY)
+configure_file(resources/test_parameter_map.xml resources/test_parameter_map.xml COPYONLY)
+configure_file(resources/test_parametermaphostprovider.output resources/test_parametermaphostprovider.output COPYONLY)
+configure_file(resources/test_parametermaphostprovider.system_structure resources/test_parametermaphostprovider.system_structure COPYONLY)
+configure_file(resources/test_parametermaphostrequirer.output resources/test_parametermaphostrequirer.output COPYONLY)
+configure_file(resources/test_parametermaphostrequirer.system_structure resources/test_parametermaphostrequirer.system_structure COPYONLY)
+
+configure_file(test_sync_command.sh test_sync_command.sh COPYONLY)
+configure_file(resources/test_sync_command.xml resources/test_sync_command.xml COPYONLY)
+configure_file(resources/test_sync_command.output resources/test_sync_command.output COPYONLY)
+configure_file(resources/test_sync_command.system_structure resources/test_sync_command.system_structure COPYONLY)
+
+configure_file(test_indexing.sh test_indexing.sh COPYONLY)
+configure_file(resources/test_indexing.xml resources/test_indexing.xml COPYONLY)
+configure_file(resources/test_indexing.output resources/test_indexing.output COPYONLY)
+configure_file(resources/test_indexing.system_structure resources/test_indexing.system_structure COPYONLY)
+
+configure_file(test_initial_values.sh test_initial_values.sh COPYONLY)
+configure_file(resources/test_initial_values.xml resources/test_initial_values.xml COPYONLY)
+configure_file(resources/test_initial_values.output resources/test_initial_values.output COPYONLY)
+configure_file(resources/test_initial_values.system_structure resources/test_initial_values.system_structure COPYONLY)
+
+configure_file(test_named_values.sh test_named_values.sh COPYONLY)
+configure_file(resources/test_named_values.xml resources/test_named_values.xml COPYONLY)
+configure_file(resources/test_named_values.output resources/test_named_values.output COPYONLY)
+configure_file(resources/test_named_values.system_structure resources/test_named_values.system_structure COPYONLY)
+
+configure_file(test_descriptions.sh test_descriptions.sh COPYONLY)
+configure_file(resources/test_descriptions.xml resources/test_descriptions.xml COPYONLY)
+configure_file(resources/test_descriptions.output resources/test_descriptions.output COPYONLY)
+
+configure_file(test_cross_reference.sh test_cross_reference.sh COPYONLY)
+configure_file(resources/test_cross_reference.xml resources/test_cross_reference.xml COPYONLY)
+configure_file(resources/test_cross_reference.output resources/test_cross_reference.output COPYONLY)
+
+configure_file(test_spline_calibration.sh test_spline_calibration.sh COPYONLY)
+configure_file(resources/test_spline_calibration.xml resources/test_spline_calibration.xml COPYONLY)
+configure_file(resources/test_spline_calibration.output resources/test_spline_calibration.output COPYONLY)
+configure_file(resources/test_spline_calibration.system_structure resources/test_spline_calibration.system_structure COPYONLY)

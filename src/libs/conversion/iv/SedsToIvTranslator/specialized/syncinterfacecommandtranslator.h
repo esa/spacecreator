@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,34 +19,38 @@
 
 #pragma once
 
-#include "specialized/interfacecommandtranslator.h"
+#include "generictypemapper.h"
 
-#include <shared/parameter.h>
-
-namespace seds::model {
-class CommandArgument;
-enum class ArgumentsCombination : uint8_t;
-} // namespace seds::model
+#include <asn1library/asn1/asn1model.h>
+#include <asn1library/asn1/definitions.h>
+#include <ivcore/ivfunction.h>
+#include <ivcore/ivinterface.h>
+#include <seds/SedsModel/interfaces/interfacecommand.h>
+#include <seds/SedsModel/package/package.h>
 
 namespace conversion::iv::translator {
 
 /**
- * @brief   Translator from SEDS sync interface command to InterfaceView interface
+ * @brief   Translator from SEDS async interface command to InterfaceView interface
  */
-class SyncInterfaceCommandTranslator final : public InterfaceCommandTranslator
+class SyncInterfaceCommandTranslator final
 {
 public:
     /**
      * @brief   Constructor
      *
-     * @param   sedsInterfaceName   Parent interface name
-     * @param   genericTypeMap      Generic type mappings
-     * @param   asn1Definitions     ASN.1 type definitions for parent package
      * @param   ivFunction          Output interface view function
+     * @param   sedsInterfaceName   Parent interface name
+     * @param   sedsPackage         Parent SEDS package
+     * @param   sedsPackages        List of SEDS packages
+     * @param   asn1Definitions     Parent ASN.1 definitions
+     * @param   asn1Files           List of all ASN.1 files
+     * @param   typeMapper          Generic type mapper
      */
     SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
-            const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
-            Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage);
+            const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages,
+            Asn1Acn::Definitions *asn1Definitions, const Asn1Acn::Asn1Model::Data &m_asn1Files,
+            const GenericTypeMapper *typeMapper, const std::optional<uint64_t> &sequenceSizeThreshold);
     /**
      * @brief   Deleted copy constructor
      */
@@ -71,32 +75,38 @@ public:
      * This inserts result IV interface into member IV function
      *
      * @param   sedsCommand     SEDS interface command
-     * @param   interfaceType   Interface type
+     * @param   interfaceType   Interface type that will be created
      */
-    virtual auto translateCommand(const seds::model::InterfaceCommand &sedsCommand,
-            ivm::IVInterface::InterfaceType interfaceType) -> void override;
+    auto translateCommand(
+            const seds::model::InterfaceCommand &sedsCommand, ivm::IVInterface::InterfaceType interfaceType) -> void;
 
 private:
-    /**
-     * @brief   Translates arguments of a SEDS interface command
-     *
-     * @param   sedsArguments   Arguments to translate
-     * @param   ivInterface     Output interface view interface
-     */
     auto translateArguments(
             const std::vector<seds::model::CommandArgument> &sedsArguments, ivm::IVInterface *ivInterface) -> void;
+    auto handleArgumentType(const seds::model::CommandArgument &sedsArgument, const QString &interfaceName) const
+            -> QString;
 
-    /**
-     * @brief   Creates interface view interface parameter
-     *
-     * @param   name        Name of the parameter
-     * @param   typeName    Name of the type
-     * @param   direction   Parameter direction
-     *
-     * @return  Interface view interface parameter
-     */
-    auto createIvInterfaceParameter(const QString &name, const QString &typeName,
-            shared::InterfaceParameter::Direction direction) -> shared::InterfaceParameter;
+private:
+    /// @brief  Output interface view function
+    ivm::IVFunction *m_ivFunction;
+
+    /// @brief  Parent SEDS interface name
+    const QString &m_sedsInterfaceName;
+
+    /// @brief  Parent SEDS package
+    const seds::model::Package *m_sedsPackage;
+    /// @brief  List of SEDS packages
+    const std::vector<seds::model::Package> &m_sedsPackages;
+    /// @brief  Parent ASN.1 type definitions
+    Asn1Acn::Definitions *m_asn1Definitions;
+    /// @brief  List of all ASN.1 files
+    const Asn1Acn::Asn1Model::Data &m_asn1Files;
+
+    /// @brief  Generic type mapper
+    const GenericTypeMapper *m_typeMapper;
+
+    /// @brief  ASN.1 sequence size threshold
+    const std::optional<uint64_t> &m_sequenceSizeThreshold;
 };
 
 } // namespace conversion::iv::translator

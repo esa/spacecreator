@@ -1,14 +1,20 @@
 COM-N7SPACE-CONTAINERS DEFINITIONS ::= BEGIN
+-- A sample data item to be embedded within other structures
 DataItemA ::= INTEGER(0 .. 255)
+-- A sample data item to be embedded within other structures
 DataItemB ::= INTEGER(0 .. 255)
+-- Type used for array length specification
 LengthType ::= INTEGER(0 .. 65535)
-ArrayType ::= SEQUENCE (SIZE(0 .. 15)) OF DataItemA(0 .. 255)
-BasicContainer ::= SEQUENCE 
-{ 
-    fieldA DataItemA(0 .. 255), 
+-- A simple array type
+ArrayType ::= SEQUENCE (SIZE(15)) OF DataItemA(0 .. 255)
+-- A basic container data type
+BasicContainer ::= SEQUENCE
+{
+    fieldA DataItemA(0 .. 255),
     fieldB DataItemB(0 .. 255)
-} 
+}
 BinaryPattern ::= BIT STRING(SIZE(0 .. 8))
+-- Packet ID to distinguish between packets
 PacketId ::= ENUMERATED
 {
     packetA(1),
@@ -20,39 +26,45 @@ EmptyContainer ::= SEQUENCE
 EmptyAbstractContainer ::= SEQUENCE
 {
 }
-PayloadBase ::= SEQUENCE 
-{ 
-    realization CHOICE 
-    { 
-        realizationPayloadA PayloadA, 
+-- Base for the packet payload data
+PayloadBase ::= SEQUENCE
+{
+    realization CHOICE
+    {
+        realizationPayloadA PayloadA,
         realizationPayloadB PayloadB
-    } 
-} 
-PayloadA ::= SEQUENCE 
-{ 
+    }
+}
+-- Payload A for a data packet
+PayloadA ::= SEQUENCE
+{
     data DataItemA(0 .. 255)
-} 
-PayloadB ::= SEQUENCE 
-{ 
+}
+-- Payload B for a data packet
+PayloadB ::= SEQUENCE
+{
     data DataItemB(0 .. 255)
-} 
-DataPacket ::= SEQUENCE 
-{ 
-    realization CHOICE 
-    { 
-        realizationDataPacketA DataPacketA, 
+}
+-- A data packet
+DataPacket ::= SEQUENCE
+{
+    realization CHOICE
+    {
+        realizationDataPacketA DataPacketA,
         realizationDataPacketB DataPacketB
-    } 
-} 
-DataPacketA ::= SEQUENCE 
-{ 
-    id PacketId(packetA), 
+    }
+}
+-- Concrete packet implementation A
+DataPacketA ::= SEQUENCE
+{
+    id PacketId(packetA),
     payload PayloadBase
-} 
-DataPacketB ::= SEQUENCE 
-{ 
-    id PacketId(packetB), 
+}
+-- Concrete packet implementation B
+DataPacketB ::= SEQUENCE
+{
+    id PacketId(packetB),
     payload PayloadBase
-} 
+}
 END
 

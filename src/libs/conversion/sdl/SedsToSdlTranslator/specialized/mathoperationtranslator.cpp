@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -21,11 +21,11 @@
 
 #include "components/activities/coremathoperator.h"
 #include "components/activities/operator.h"
+#include "specialized/statementtranslatorvisitor.h"
 #include "translation/exceptions.h"
 
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/overloaded.h>
-#include <conversion/iv/SedsToIvTranslator/specialized/interfacecommandtranslator.h>
 
 using conversion::Escaper;
 using conversion::translator::TranslationException;
@@ -61,7 +61,7 @@ auto MathOperationTranslator::translateMutableExpression(Expression &expression,
                                   },
                               [&outIsComplexValue](const seds::model::VariableRef &value) {
                                   outIsComplexValue = false;
-                                  return Escaper::escapeAsn1FieldName(value.value().value());
+                                  return StatementTranslatorVisitor::translateVariableReference(value.value().value());
                               },
                               [&outIsComplexValue, &expression](const seds::model::Operator &value) {
                                   return translateOperator(value, expression, outIsComplexValue);

@@ -17,10 +17,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#pragma once
+
 #include <QObject>
 #include <QtTest>
 #include <asn1library/asn1/asn1model.h>
 #include <memory>
+#include <promela/PromelaModel/inlinedef.h>
 
 using Asn1Acn::Definitions;
 
@@ -51,10 +54,16 @@ private Q_SLOTS:
 
     void testVariableSequenceOf();
     void testFixedSequenceOf();
+    void testUserDefinedType();
 
     void testTypeSorting();
 
 private:
     std::unique_ptr<Definitions> createModel();
+    const ::promela::model::InlineDef *findInline(
+            const std::list<std::unique_ptr<::promela::model::InlineDef>> &list, const QString &name);
+
+    template<typename T>
+    const T *findProctypeElement(const ::promela::model::Sequence &sequence, size_t index);
 };
 }

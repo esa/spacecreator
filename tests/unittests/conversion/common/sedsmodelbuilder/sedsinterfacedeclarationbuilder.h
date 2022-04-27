@@ -30,6 +30,7 @@ public:
     seds::model::InterfaceDeclaration build();
 
 public:
+    auto withGenericType(QString name) -> SedsInterfaceDeclarationBuilder &;
     auto withCommand(seds::model::InterfaceCommand command) -> SedsInterfaceDeclarationBuilder &;
 
 private:

@@ -34,6 +34,7 @@
 #include <QStringList>
 #include <map>
 #include <memory>
+#include <set>
 #include <vector>
 
 namespace Asn1Acn {
@@ -55,7 +56,7 @@ public:
 
     using Types = std::vector<std::unique_ptr<TypeAssignment>>;
     using Values = std::vector<std::unique_ptr<ValueAssignment>>;
-    using ImportedTypes = std::vector<ImportedType>;
+    using ImportedTypes = std::set<ImportedType>;
     using ImportedValues = std::vector<ImportedValue>;
 
     const Types &types() const { return m_types; }

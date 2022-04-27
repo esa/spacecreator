@@ -32,6 +32,7 @@ private Q_SLOTS:
     void testSequences();
     void testSequencesOf();
     void testChoices();
+    void testWithComponents();
 };
 
 /// \SRS  ETB-FUN-3010
@@ -86,6 +87,20 @@ void tst_SedsConverter_Asn1ToSeds::testSequencesOf()
 void tst_SedsConverter_Asn1ToSeds::testChoices()
 {
     const int result = system("./test_choices.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-3080
+/// \SRS  ETB-FUN-3082
+/// \SRS  ETB-FUN-3090
+/// \SRS  ETB-FUN-3092
+/// \SRS  ETB-FUN-3094
+/// \SRS  ETB-IF-160
+/// \SRS  ETB-IF-170
+/// \SRS  ETB-IF-180
+void tst_SedsConverter_Asn1ToSeds::testWithComponents()
+{
+    const int result = system("./test_with_components.sh");
     QCOMPARE(result, 0);
 }
 

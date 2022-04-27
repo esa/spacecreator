@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -18,6 +18,8 @@
  */
 
 #pragma once
+
+#include "common.h"
 
 #include <asn1library/asn1/asn1model.h>
 #include <ivcore/ivmodel.h>
@@ -41,52 +43,41 @@ public:
     /**
      * @brief   Translate the given SEDS state machine into SDL state machine
      *
-     * @param sedsStateMachine  Source SEDS state machine
-     * @param sdlProcess        Containing SDL process
-     * @param stateMachine      Target SDL state machine
+     * @param context           Translation context
+     * @param sedsStateMachine  State machine to be translated
      */
-    static auto translateStateMachine(const seds::model::StateMachine &sedsStateMachine, ::sdl::Process *sdlProcess,
-            ::sdl::StateMachine *stateMachine) -> void;
+    static auto translateStateMachine(Context &context, const seds::model::StateMachine &sedsStateMachine) -> void;
 
     /**
      * @brief   Extract SEDS component implementation's variables into SDL variable declarations
      *
-     * @param sedsPackage       SEDS package containing the component
-     * @param asn1Model         Data model
+     * @param context           Translation context
      * @param variables         Variables to be translated
-     * @param sdlProcess        Target SDL process
      */
-    static auto translateVariables(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
-            const seds::model::ComponentImplementation::VariableSet &variables, ::sdl::Process *sdlProcess) -> void;
+    static auto translateVariables(Context &context, const seds::model::ComponentImplementation::VariableSet &variables)
+            -> void;
 
     /**
      * @brief   Create timer variables
      *
-     * @param sedsStateMachine  Source SEDS state machine
-     * @param sdlProcess        Target SDL process
+     * @param context           Translation context
+     * @param sedsStateMachine  State machine to derive the timers from
      */
-    static auto createTimerVariables(const seds::model::StateMachine &sedsStateMachine, ::sdl::Process *sdlProcess)
-            -> void;
+    static auto createTimerVariables(Context &context, const seds::model::StateMachine &sedsStateMachine) -> void;
 
     /**
      * @brief   Create variables for storing input and output signal parameters
      *
-     * @param sedsComponent     SEDS component
-     * @param ivModel           InterfaceView model
-     * @param sdlProcess        Target SDL process
+     * @param context           Translation context
      */
-    static auto createIoVariables(
-            const seds::model::Component &sedsComponent, ivm::IVModel *ivModel, ::sdl::Process *sdlProcess) -> void;
+    static auto createIoVariables(Context &context) -> void;
 
     /**
      * @brief   Create declarations of external procedures
      *
-     * @param sedsComponent     SEDS component
-     * @param ivModel           InterfaceView model
-     * @param sdlProcess        Target SDL process
+     * @param context           Translation context
      */
-    static auto createExternalProcedures(
-            const seds::model::Component &sedsComponent, ivm::IVModel *ivModel, ::sdl::Process *sdlProcess) -> void;
+    static auto createExternalProcedures(Context &context) -> void;
 
     /**
      * @brief   Get name of the variable used for packing parameters of the given interface
@@ -106,8 +97,58 @@ public:
      */
     static auto timerName(const QString &stateName) -> QString;
 
+    /**
+     * @brief   Ensure that the state machine has at least the start state.
+     *
+     * @param context           Translation context
+     */
+    static auto ensureMinimalStateMachineExists(Context &context) -> void;
+
+    /**
+     * @brief  Translate parameter maps into getter/setter procedures or input/output signals
+     *
+     * @param context           Translation context
+     * @param parameterMaps     Parameter maps
+     */
+    static auto translateParameterMaps(
+            Context &context, const seds::model::ComponentImplementation::ParameterMapSet &parameterMaps) -> void;
+
+    /**
+     * @brief   Build mapping of names to command declarations
+     *
+     * @param context   Translation context which contains both the source component and the target map
+     */
+    static auto buildCommandMap(Context &context) -> void;
+
 private:
-    static auto createStartTransition(const seds::model::StateMachine &sedsStateMachine, ::sdl::Process *sdlProcess,
+    enum class ParameterType
+    {
+        Getter,
+        Setter
+    };
+
+    enum class ParameterMode
+    {
+        Sync,
+        Async
+    };
+
+    static auto setInitialVariableValues(
+            const seds::model::ComponentImplementation::VariableSet &variables, ::sdl::Transition *transition) -> void;
+
+    static auto getAnyState(::sdl::StateMachine *stateMachine) -> ::sdl::State *;
+
+    static auto getParameterInterface(ivm::IVFunction *function, const ParameterType type, const ParameterMode mode,
+            const QString &interfaceName, const QString &parameterName) -> ivm::IVInterface *;
+
+    static auto createParameterSyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
+            ::sdl::Process *sdlProcess, const ParameterType type) -> void;
+    static auto createParameterAsyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
+            ::sdl::StateMachine *stateMachine) -> void;
+
+    static auto translateParameter(Context &context, const seds::model::ParameterMap &map) -> void;
+
+    static auto createStartTransition(Context &context, const seds::model::StateMachine &sedsStateMachine,
             std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void;
 
     static auto translateState(const seds::model::State &sedsState) -> std::unique_ptr<::sdl::State>;
@@ -116,17 +157,19 @@ private:
 
     static auto translateState(const seds::model::EntryState &sedsState) -> std::unique_ptr<::sdl::State>;
 
-    static auto translatePrimitive(::sdl::Process *sdlProcess, const seds::model::OnCommandPrimitive &command)
+    static auto translatePrimitive(Context &context, const seds::model::OnCommandPrimitive &command) -> InputHandler;
+
+    static auto translatePrimitive(Context &context, const seds::model::OnParameterPrimitive &parameter)
             -> InputHandler;
+
+    static auto translatePrimitive(Context &context, ::sdl::State *sdlFromState,
+            const seds::model::Transition::Primitive &primitive) -> InputHandler;
 
     static auto translatePrimitive(::sdl::State *sdlFromState) -> InputHandler;
 
-    static auto translatePrimitive(::sdl::Process *sdlProcess, ::sdl::State *sdlFromState,
-            const seds::model::Transition::Primitive &primitive) -> InputHandler;
-
-    static auto translateTransition(const seds::model::StateMachine &sedsStateMachine,
-            const seds::model::Transition &sedsTransition, ::sdl::Process *sdlProcess,
-            ::sdl::StateMachine *stateMachine, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void;
+    static auto translateTransition(Context &context, const seds::model::StateMachine &sedsStateMachine,
+            const seds::model::Transition &sedsTransition, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap)
+            -> void;
 
     static auto createIoVariable(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
 

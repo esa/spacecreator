@@ -1,0 +1,11 @@
+PACKAGE3 DEFINITIONS ::= BEGIN
+IMPORTS
+Integer4 FROM PACKAGE4
+;
+Integer3 ::= INTEGER(0 .. 255)
+ParentInterface1Command-Type ::= SEQUENCE
+{
+    arg1 Integer3(0 .. 255),
+    arg2 Integer4(0 .. 255)
+}
+END

@@ -40,6 +40,7 @@ using ivm::IVInterfaceRequired;
 using ivm::IVModel;
 using promela::model::Assignment;
 using promela::model::BasicType;
+using promela::model::BinaryExpression;
 using promela::model::ChannelInit;
 using promela::model::ChannelRecv;
 using promela::model::ChannelSend;
@@ -67,15 +68,14 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
         std::vector<Model *> sourceModels, const Options &options) const
 {
     const std::vector<QString> additionalIncludes = options.values(PromelaOptions::additionalIncludes);
+    const std::vector<QString> modelFunctions = options.values(PromelaOptions::modelFunctionName);
+    const std::vector<QString> environmentFunctions = options.values(PromelaOptions::environmentFunctionName);
 
     std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
 
     const auto *ivModel = getModel<IVModel>(sourceModels);
 
     QVector<IVFunction *> ivFunctionList = ivModel->allObjectsByType<IVFunction>();
-
-    QList<QString> functionNames;
-    QList<QString> environmentFunctionNames;
 
     promelaModel->addInclude("dataview.pml");
 
@@ -84,32 +84,29 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     for (IVFunction *ivFunction : ivFunctionList) {
         const QString functionName = ivFunction->property("name").toString();
 
-        bool environment = isEnvironmentFunction(ivFunction);
-        if (environment) {
-            environmentFunctionNames.append(functionName);
-            createPromelaObjectsForEnvironment(promelaModel.get(), ivModel, ivFunction, functionName);
-        } else {
-            functionNames.append(functionName);
+        if (std::find(modelFunctions.begin(), modelFunctions.end(), functionName) != modelFunctions.end()) {
             promelaModel->addInclude(QString("%1.pml").arg(functionName.toLower()));
             createPromelaObjectsForFunction(promelaModel.get(), ivModel, ivFunction, functionName);
+        } else if (std::find(environmentFunctions.begin(), environmentFunctions.end(), functionName)
+                != environmentFunctions.end()) {
+            createPromelaObjectsForEnvironment(promelaModel.get(), ivModel, ivFunction, functionName);
         }
     }
 
     promelaModel->addInclude("env_inlines.pml");
 
-    Utype systemState("system_state");
+    createSystemState(promelaModel.get(), ivModel, modelFunctions);
 
-    for (const QString &functionName : functionNames) {
-        QString dataType = QString("%1_Context").arg(Escaper::escapePromelaIV(functionName));
-        QString fieldName = functionName;
-        systemState.addField(Declaration(DataType(UtypeRef(dataType)), fieldName));
+    for (const QString &function : modelFunctions) {
+        QList<ChannelInit::Type> channelType;
+        channelType.append(BasicType::INT);
+        ChannelInit channelInit(1, std::move(channelType));
+        Declaration channelDeclaration(DataType(BasicType::CHAN), QString("%1_lock").arg(function));
+        channelDeclaration.setInit(channelInit);
+        promelaModel->addDeclaration(channelDeclaration);
     }
 
-    promelaModel->addUtype(systemState);
-
-    promelaModel->addDeclaration(Declaration(DataType(UtypeRef("system_state")), "global_state"));
-
-    promelaModel->setInit(generateInitProctype(functionNames));
+    promelaModel->setInit(generateInitProctype(modelFunctions, ivModel));
 
     for (const QString &additionalInclude : additionalIncludes) {
         promelaModel->addEpilogueInclude(additionalInclude);
@@ -135,14 +132,49 @@ std::set<ModelType> IvToPromelaTranslator::getDependencies() const
     return std::set<ModelType> { ModelType::InterfaceView };
 }
 
-InitProctype IvToPromelaTranslator::generateInitProctype(const QList<QString> &functionNames) const
+InitProctype IvToPromelaTranslator::generateInitProctype(
+        const std::vector<QString> &modelFunctions, const IVModel *ivModel) const
 {
-    Sequence sequence;
+    QSet<QString> functionsWithContextVariables;
 
-    for (const QString &functionName : functionNames) {
+    QVector<IVFunction *> ivFunctionList = ivModel->allObjectsByType<IVFunction>();
+
+    for (IVFunction *ivFunction : ivFunctionList) {
+        if (containsContextVariables(ivFunction->contextParams())) {
+            const QString functionName = ivFunction->property("name").toString();
+            functionsWithContextVariables.insert(functionName);
+        }
+    }
+
+    Sequence sequence(Sequence::Type::ATOMIC);
+
+    {
+        Declaration initTokenDeclaration = Declaration(DataType(BasicType::INT), "init_token");
+        initTokenDeclaration.setInit(Expression(Constant(1)));
+        std::unique_ptr<ProctypeElement> element = std::make_unique<ProctypeElement>(std::move(initTokenDeclaration));
+
+        sequence.appendElement(std::move(element));
+    }
+
+    for (const QString &functionName : modelFunctions) {
+        if (functionsWithContextVariables.contains(functionName)) {
+            const QString ctxtInitInline =
+                    QString("%1_ctxt_init").arg(Escaper::escapePromelaIV(functionName).toLower());
+            sequence.appendElement(std::make_unique<ProctypeElement>(InlineCall(ctxtInitInline, {})));
+        }
+    }
+
+    for (const QString &functionName : modelFunctions) {
         QString initFn = QString("%1_0_init").arg(Escaper::escapePromelaIV(functionName));
         std::unique_ptr<ProctypeElement> initCall = std::make_unique<ProctypeElement>(InlineCall(initFn, {}));
         sequence.appendElement(std::move(initCall));
+
+        const VariableRef lockChannelName = VariableRef(QString("%1_lock").arg(functionName));
+        QList<VariableRef> lockChannelArguments;
+        lockChannelArguments.append(VariableRef("init_token"));
+
+        sequence.appendElement(
+                std::make_unique<ProctypeElement>(ChannelSend(VariableRef(lockChannelName), lockChannelArguments)));
     }
 
     std::unique_ptr<ProctypeElement> setInited =
@@ -164,9 +196,15 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *
     declaration.setInit(channelInit);
     promelaModel->addDeclaration(declaration);
 
-    Sequence sequence;
+    Sequence sequence(Sequence::Type::NORMAL);
     std::unique_ptr<ProctypeElement> waitForInit = std::make_unique<ProctypeElement>(Expression(VariableRef("inited")));
     sequence.appendElement(std::move(waitForInit));
+
+    if (!environment) {
+        std::unique_ptr<ProctypeElement> tokenDeclaration =
+                std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "token"));
+        sequence.appendElement(std::move(tokenDeclaration));
+    }
 
     const QString &signalParameterName = "signal_parameter";
 
@@ -176,7 +214,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *
         sequence.appendElement(std::move(variableDecl));
     }
 
-    std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>();
+    std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>(Sequence::Type::ATOMIC);
 
     QList<VariableRef> params;
     params.append(VariableRef(parameterType.isEmpty() ? QString("_") : signalParameterName));
@@ -187,14 +225,23 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *
 
     if (!environment) {
         const QString piName = QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
+        const VariableRef lockChannelName = VariableRef(QString("%1_lock").arg(functionName));
+        QList<VariableRef> lockChannelArguments;
+        lockChannelArguments.append(VariableRef("token"));
+
+        loopSequence->appendElement(
+                std::make_unique<ProctypeElement>(ChannelRecv(lockChannelName, lockChannelArguments)));
 
         if (parameterType.isEmpty()) {
             loopSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(piName, {})));
         } else {
-            QList<VariableRef> arguments;
+            QList<InlineCall::Argument> arguments;
             arguments.append(VariableRef(signalParameterName));
             loopSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(piName, arguments)));
         }
+
+        loopSequence->appendElement(
+                std::make_unique<ProctypeElement>(ChannelSend(VariableRef(lockChannelName), lockChannelArguments)));
     }
 
     DoLoop loop;
@@ -218,7 +265,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(PromelaModel *
 std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(const QString &functionName,
         const QString &interfaceName, const QString &parameterType, const QString &sendInline) const
 {
-    Sequence sequence;
+    Sequence sequence(Sequence::Type::NORMAL);
     std::unique_ptr<ProctypeElement> waitForInit = std::make_unique<ProctypeElement>(Expression(VariableRef("inited")));
     sequence.appendElement(std::move(waitForInit));
 
@@ -229,7 +276,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(con
 
     DoLoop loop;
 
-    std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>();
+    std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>(Sequence::Type::ATOMIC);
 
     if (parameterType.isEmpty()) {
         std::unique_ptr<ProctypeElement> inlineCall = std::make_unique<ProctypeElement>(InlineCall(sendInline, {}));
@@ -237,7 +284,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(con
         loopSequence->appendElement(std::move(inlineCall));
     } else {
         const QString generateValueInlineName = QString("%1_generate_value").arg(parameterType);
-        QList<VariableRef> arguments;
+        QList<InlineCall::Argument> arguments;
         arguments.append(VariableRef("value"));
         std::unique_ptr<ProctypeElement> valueGeneration =
                 std::make_unique<ProctypeElement>(InlineCall(generateValueInlineName, arguments));
@@ -274,7 +321,7 @@ std::unique_ptr<::promela::model::InlineDef> IvToPromelaTranslator::generateSend
 
     QList<QString> arguments;
     QString argumentName;
-    Sequence sequence;
+    Sequence sequence(Sequence::Type::NORMAL);
 
     if (parameterType.isEmpty()) {
         argumentName = "dummy";
@@ -300,6 +347,9 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(
         PromelaModel *promelaModel, const IVModel *ivModel, IVFunction *ivFunction, const QString &functionName) const
 {
     QVector<IVInterface *> providedInterfaceList = ivFunction->pis();
+
+    QList<QString> channelNames;
+
     for (IVInterface *providedInterface : providedInterfaceList) {
 
         if (providedInterface->kind() != IVInterface::OperationKind::Cyclic
@@ -329,7 +379,11 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(
 
         promelaModel->addProctype(
                 generateProctype(promelaModel, functionName, interfaceName, parameterType, queueSize, priority, false));
+
+        channelNames.append(constructChannelName(functionName, interfaceName));
     }
+
+    createCheckQueueInline(promelaModel, functionName, channelNames);
 }
 
 void IvToPromelaTranslator::createPromelaObjectsForEnvironment(
@@ -388,21 +442,84 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(
     }
 }
 
-QString IvToPromelaTranslator::constructChannelName(const QString &functionName, const QString &interfaceName) const
+void IvToPromelaTranslator::createCheckQueueInline(
+        PromelaModel *promelaModel, const QString &functionName, QList<QString> &channelNames) const
 {
-    return QString("%1_%2_channel").arg(functionName).arg(interfaceName);
+    if (channelNames.empty()) {
+        auto message = QString("No sporadic nor cyclic interfaces in function %1").arg(functionName);
+        throw TranslationException(message);
+    }
+
+    Sequence sequence(Sequence::Type::ATOMIC);
+
+    std::unique_ptr<Expression> expr;
+    {
+        QList<InlineCall::Argument> arguments;
+        arguments.append(VariableRef(channelNames.last()));
+
+        expr = std::make_unique<Expression>(InlineCall("empty", arguments));
+
+        channelNames.pop_back();
+    }
+
+    while (!channelNames.empty()) {
+        QList<InlineCall::Argument> arguments;
+        arguments.append(VariableRef(channelNames.last()));
+
+        std::unique_ptr<Expression> left = std::make_unique<Expression>(InlineCall("empty", arguments));
+
+        expr = std::make_unique<Expression>(
+                BinaryExpression(BinaryExpression::Operator::AND, std::move(left), std::move(expr)));
+
+        channelNames.pop_back();
+    }
+
+    sequence.appendElement(std::make_unique<ProctypeElement>(*expr));
+
+    const QString checkQueueInlineName = QString("%1_check_queue").arg(Escaper::escapePromelaIV(functionName));
+    promelaModel->addInlineDef(
+            std::make_unique<InlineDef>(checkQueueInlineName, QList<QString>(), std::move(sequence)));
 }
 
-bool IvToPromelaTranslator::isEnvironmentFunction(IVFunction *function) const
+void IvToPromelaTranslator::createSystemState(
+        PromelaModel *promelaModel, const IVModel *ivModel, const std::vector<QString> &modelFunctions) const
 {
-    const QString &defaultImplementation = function->defaultImplementation();
-    for (const auto &implementation : function->implementations()) {
-        if (implementation.name() == defaultImplementation) {
-            return implementation.value().toString().toLower() != "sdl";
+    QVector<IVFunction *> ivFunctionList = ivModel->allObjectsByType<IVFunction>();
+
+    Utype systemState("system_state");
+
+    for (IVFunction *ivFunction : ivFunctionList) {
+        const QString functionName = ivFunction->property("name").toString();
+        if (std::find(modelFunctions.begin(), modelFunctions.end(), functionName) == modelFunctions.end()) {
+            continue;
+        }
+        if (ivFunction->instanceOf() != nullptr) {
+            const QString functionTypeName = ivFunction->instanceOf()->property("name").toString();
+            QString dataType = QString("%1_Context").arg(Escaper::escapePromelaIV(functionTypeName));
+            QString fieldName = functionName;
+            systemState.addField(Declaration(DataType(UtypeRef(dataType)), fieldName));
+        } else {
+            QString dataType = QString("%1_Context").arg(Escaper::escapePromelaIV(functionName));
+            QString fieldName = functionName;
+            systemState.addField(Declaration(DataType(UtypeRef(dataType)), fieldName));
         }
     }
 
-    return true;
+    promelaModel->addUtype(systemState);
+
+    promelaModel->addDeclaration(Declaration(DataType(UtypeRef("system_state")), "global_state"));
+}
+
+bool IvToPromelaTranslator::containsContextVariables(const QVector<shared::ContextParameter> &parameters) const
+{
+    return std::any_of(parameters.begin(), parameters.end(), [](const shared::ContextParameter &param) {
+        return param.paramType() == shared::BasicParameter::Type::Other;
+    });
+}
+
+QString IvToPromelaTranslator::constructChannelName(const QString &functionName, const QString &interfaceName) const
+{
+    return QString("%1_%2_channel").arg(functionName).arg(interfaceName);
 }
 
 QString IvToPromelaTranslator::getInterfaceName(const ivm::IVInterface *interface) const

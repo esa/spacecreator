@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="Descriptions">
+  <DataTypeSet>
+    <IntegerDataType name="MyInteger">
+      <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+      <Range>
+        <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+      </Range>
+    </IntegerDataType>
+  </DataTypeSet>
+  <DeclaredInterfaceSet>
+    <Interface name="MegaInterface">
+      <ParameterSet>
+        <Parameter name="ReadOnlySync" type="MyInteger" mode="sync" readOnly="true" shortDescription="Parameter short description">
+          <LongDescription>Parameter
+long description</LongDescription>
+        </Parameter>
+      </ParameterSet>
+      <CommandSet>
+        <Command name="SyncCommand" mode="sync" shortDescription="Sync command short description">
+          <LongDescription>Sync command
+long description</LongDescription>
+          <Argument name="arg" type="MyInteger" mode="in" />
+        </Command>
+        <Command name="AsyncCommand" mode="async" shortDescription="Async command short description">
+          <LongDescription>Async command
+long description</LongDescription>
+          <Argument name="arg" type="MyInteger" mode="in" />
+        </Command>
+      </CommandSet>
+    </Interface>
+  </DeclaredInterfaceSet>
+  <ComponentSet>
+    <Component name="MegaComponent" shortDescription="Component short description">
+      <LongDescription>Component
+long description</LongDescription>
+      <ProvidedInterfaceSet>
+        <Interface name="ProvidedInterface" type="MegaInterface"/>
+      </ProvidedInterfaceSet>
+    </Component>
+  </ComponentSet>
+  </Package>
+</PackageFile>

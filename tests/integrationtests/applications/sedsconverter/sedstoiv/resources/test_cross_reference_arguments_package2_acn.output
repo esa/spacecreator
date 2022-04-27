@@ -1,0 +1,13 @@
+COM-N7SPACE-PACKAGE2 DEFINITIONS ::= BEGIN
+ParameterItem [size 8, encoding pos-int, endianness big]
+SyncItem [size 8, encoding pos-int, endianness big]
+SyncItemArray [size 8, encoding pos-int, endianness big]
+MappedSyncItem [size 8, encoding pos-int, endianness big]
+AsyncItem [size 8, encoding pos-int, endianness big]
+AsyncItemArray [size 8, encoding pos-int, endianness big]
+MappedAsyncItem [size 8, encoding pos-int, endianness big]
+DeterminantItem [size 8, encoding pos-int, endianness big]
+AlternateItem1 [size 8, encoding pos-int, endianness big]
+AlternateItem2 [size 8, encoding pos-int, endianness big]
+END
+

@@ -21,6 +21,7 @@
 
 #include <QString>
 #include <QTextStream>
+#include <asn1library/asn1/node.h>
 #include <asn1library/asn1/visitor.h>
 
 namespace Asn1Acn {
@@ -45,6 +46,8 @@ private:
     void reconstructCollection(const T &collection) const;
 
     void reconstructImports(const Definitions &defs) const;
+
+    void reconstructComment(const Node &node) const;
 
     QTextStream &m_outStream;
 };

@@ -31,4 +31,14 @@ const common::String &Name::value() const
     return m_value;
 }
 
+bool operator==(const Name &lhs, const Name &rhs)
+{
+    return lhs.value() == rhs.value();
+}
+
+bool operator!=(const Name &lhs, const Name &rhs)
+{
+    return !(lhs == rhs);
+}
+
 } // namespace seds::model

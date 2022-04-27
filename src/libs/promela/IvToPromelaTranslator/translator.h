@@ -62,22 +62,28 @@ public:
     auto getDependencies() const -> std::set<conversion::ModelType> override;
 
 private:
-    ::promela::model::InitProctype generateInitProctype(const QList<QString> &functionNames) const;
-    std::unique_ptr<::promela::model::Proctype> generateProctype(::promela::model::PromelaModel *promelaModel,
-            const QString &functionName, const QString &interfaceName, const QString &parameterType, size_t queueSize,
-            size_t priority, bool environment) const;
-    std::unique_ptr<::promela::model::Proctype> generateEnvironmentProctype(const QString &functionName,
-            const QString &interfaceName, const QString &parameterType, const QString &sendInline) const;
-    std::unique_ptr<::promela::model::InlineDef> generateSendInline(const QString &functionName,
-            const QString &interfaceName, const QString &parameterName, const QString &parameterType,
-            const QString &sourceFunctionName, const QString &sourceInterfaceName) const;
-    void createPromelaObjectsForFunction(::promela::model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,
-            ::ivm::IVFunction *ivFunction, const QString &functionName) const;
-    void createPromelaObjectsForEnvironment(::promela::model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,
-            ::ivm::IVFunction *ivFunction, const QString &functionName) const;
+    auto generateInitProctype(const std::vector<QString> &modelFunctions, const ::ivm::IVModel *ivModel) const
+            -> ::promela::model::InitProctype;
+    auto generateProctype(::promela::model::PromelaModel *promelaModel, const QString &functionName,
+            const QString &interfaceName, const QString &parameterType, size_t queueSize, size_t priority,
+            bool environment) const -> std::unique_ptr<::promela::model::Proctype>;
+    auto generateEnvironmentProctype(const QString &functionName, const QString &interfaceName,
+            const QString &parameterType, const QString &sendInline) const
+            -> std::unique_ptr<::promela::model::Proctype>;
+    auto generateSendInline(const QString &functionName, const QString &interfaceName, const QString &parameterName,
+            const QString &parameterType, const QString &sourceFunctionName, const QString &sourceInterfaceName) const
+            -> std::unique_ptr<::promela::model::InlineDef>;
+    auto createPromelaObjectsForFunction(::promela::model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,
+            ::ivm::IVFunction *ivFunction, const QString &functionName) const -> void;
+    auto createPromelaObjectsForEnvironment(::promela::model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,
+            ::ivm::IVFunction *ivFunction, const QString &functionName) const -> void;
+    auto createCheckQueueInline(::promela::model::PromelaModel *promelaModel, const QString &functionName,
+            QList<QString> &channelNames) const -> void;
+    auto createSystemState(::promela::model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,
+            const std::vector<QString> &modelFunctions) const -> void;
 
+    auto containsContextVariables(const QVector<shared::ContextParameter> &parameters) const -> bool;
     auto constructChannelName(const QString &functionName, const QString &interfaceName) const -> QString;
-    auto isEnvironmentFunction(ivm::IVFunction *function) const -> bool;
 
     auto getInterfaceName(const ivm::IVInterface *interface) const -> QString;
     auto getInterfaceFunctionName(const ivm::IVInterface *interface) const -> QString;

@@ -45,4 +45,14 @@ void Transition::addAction(std::unique_ptr<Action> action)
     m_actions.push_back(std::move(action));
 }
 
+const QString &Transition::comment() const
+{
+    return m_comment;
+}
+
+void Transition::setComment(QString comment)
+{
+    m_comment = std::move(comment);
+}
+
 } // namespace sdl

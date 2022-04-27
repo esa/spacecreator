@@ -1,0 +1,10 @@
+-- Package short description
+-- Package
+-- long description
+COM-N7SPACE-DESCRIPTIONS DEFINITIONS ::= BEGIN
+-- Integer short description
+-- Integer
+-- long description
+IntegerType ::= INTEGER(-32768 .. 32767)
+END
+

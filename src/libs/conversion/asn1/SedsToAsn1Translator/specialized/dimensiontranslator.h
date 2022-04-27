@@ -46,8 +46,11 @@ public:
      * @brief   Constructor
      *
      * @param   sedsPackage         Parent SEDS package
+     * @param   sedsPackages        List of SEDS packages
+     * @param   threshold           Optional ASN.1 sequence size threshold
      */
-    explicit DimensionTranslator(const seds::model::Package *sedsPackage);
+    DimensionTranslator(const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages,
+            const std::optional<uint64_t> &threshold);
 
     /**
      * @brief   Translate SEDS array dimension
@@ -71,6 +74,10 @@ private:
 private:
     /// @brief  Parent package
     const seds::model::Package *m_sedsPackage;
+    /// @brief  List of SEDS packages
+    const std::vector<seds::model::Package> &m_sedsPackages;
+    /// @brief  Optional ASN.1 sequence size threshold
+    const std::optional<uint64_t> &m_threshold;
 };
 
 } // namespace conversion::asn1::translator

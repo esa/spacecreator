@@ -37,7 +37,7 @@ public:
 
 public:
     auto withArrayDataType(QString name, QString itemTypeName, uint32_t dimensionsCount) -> SedsModelBuilder &;
-    auto withBinaryDataType(QString name) -> SedsModelBuilder &;
+    auto withBinaryDataType(QString name, uint64_t bits, bool fixedSize = false) -> SedsModelBuilder &;
     auto withBooleanDataType(QString name) -> SedsModelBuilder &;
     auto withContainerDataType(seds::model::ContainerDataType dataType) -> SedsModelBuilder &;
     auto withEnumeratedDataType(QString name, QStringList elems) -> SedsModelBuilder &;

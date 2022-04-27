@@ -19,13 +19,14 @@
 
 #pragma once
 
+#include <asn1library/asn1/asn1model.h>
+#include <asn1library/asn1/importedtype.h>
 #include <conversion/common/translation/translator.h>
 #include <list>
 #include <seds/SedsModel/types/datatype.h>
 #include <vector>
 
 namespace Asn1Acn {
-class Asn1Model;
 class Definitions;
 class File;
 } // namespace Asn1Acn
@@ -75,43 +76,68 @@ public:
     virtual auto getDependencies() const -> std::set<ModelType> override;
 
     /**
-     * @brief   Gets ASN.1 definitions for given SEDS package from given ASN.1 model
+     * @brief   Gets ASN.1 definitions from given ASN.1 model
      *
-     * @param   sedsPackage     SEDS package
-     * @param   asn1Model       ASN.1 model
+     * @param   definitionsName     Definitions name
+     * @param   asn1Files           ASN.1 files
      *
-     * @return  Asn1 definitions
+     * @return  ASN.1 definitions
      */
-    static auto getAsn1Definitions(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model)
+    static auto getAsn1Definitions(const QString &definitionsName, const Asn1Acn::Asn1Model::Data &asn1Files)
             -> Asn1Acn::Definitions *;
+    /**
+     * @brief   Gets SEDS package from given vector
+     *
+     * @param   packageName     Package name
+     * @param   sedsPackages    SEDS packages
+     *
+     * @return  SEDS package
+     */
+    static auto getSedsPackage(const QString &packageName, const std::vector<seds::model::Package> &sedsPackages)
+            -> const seds::model::Package *;
 
 private:
     /**
      * @brief   Translate SEDS model
      *
-     * @param   sedsModel   SEDS model to translate
+     * @param   sedsModel               SEDS model to translate
+     * @param   sequenceSizeThreshold   ASN.1 sequence size threshold
      *
      * @return  Result ASN.1 model
      */
-    auto translateSedsModel(const seds::model::SedsModel *sedsModel) const -> std::vector<std::unique_ptr<Model>>;
+    auto translateSedsModel(const seds::model::SedsModel *sedsModel,
+            const std::optional<uint64_t> &sequenceSizeThreshold) const -> std::vector<std::unique_ptr<Model>>;
 
     /**
      * @brief   Translate SEDS package
      *
-     * @param   sedsPackage     Package to translate
+     * @param   sedsPackage             Package to translate
+     * @param   importedTypes           Set of types that this package imports
+     * @param   asn1Files               List of already translated ASN.1 files
+     * @param   sedsPackages            List of SEDS packages
+     * @param   sequenceSizeThreshold   ASN.1 sequence size threshold
      *
      * @return  Result ASN.1 files
      */
-    auto translatePackage(const seds::model::Package &sedsPackage) const -> std::vector<std::unique_ptr<Asn1Acn::File>>;
+    auto translatePackage(const seds::model::Package &sedsPackage, const std::set<Asn1Acn::ImportedType> &importedTypes,
+            const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages,
+            const std::optional<uint64_t> &sequenceSizeThreshold) const -> std::vector<std::unique_ptr<Asn1Acn::File>>;
     /**
      * @brief   Translate SEDS data types
      *
      * @param   sedsDataTypes       Data types to translate
-     * @param   asn1Definitions     Where translated data types should be added
+     * @param   asn1DefinitionsName Name for the ASN.1 definitions
      * @param   sedsPackage         Parent SEDS package
+     * @param   asn1Files           List of already translated ASN.1 files
+     * @param   sedsPackages        List of SEDS packages
+     * @param   sequenceSizeThreshold   ASN.1 sequence size threshold
+     *
+     * @return  ASN.1 definitions with translated data types
      */
     auto translateDataTypes(const std::list<const seds::model::DataType *> &sedsDataTypes,
-            Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage) const -> void;
+            const QString &asn1DefinitionsName, const seds::model::Package *sedsPackage,
+            const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages,
+            const std::optional<uint64_t> &sequenceSizeThreshold) const -> std::unique_ptr<Asn1Acn::Definitions>;
 
     /**
      * @brief   Collects all data types declared directly in given package
@@ -123,7 +149,6 @@ private:
      * @return  Vector with all data types declared in the given package
      */
     std::vector<const seds::model::DataType *> collectDataTypes(const seds::model::Package &sedsPackage) const;
-
     /**
      * @brief   Collects all data types declared in given component
      *

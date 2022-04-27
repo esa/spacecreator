@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DataSheet xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Device name="FunDevice" />
+  <Package name="Package1">
+    <DataTypeSet>
+      <IntegerDataType name="IntegerType">
+        <IntegerDataEncoding encoding="twosComplement" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+  </Package>
+  <Package name="Package2">
+    <DeclaredInterfaceSet>
+      <Interface name="FunInterface">
+        <CommandSet>
+          <Command name="FunCommand" mode="async">
+             <Argument name="x" type="Package1/IntegerType" mode="in" />
+             <Argument name="y" type="Package1/IntegerType" mode="in" />
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+  </Package>
+  <Package name="Package3">
+    <ComponentSet>
+      <Component name="FunComponent">
+        <ProvidedInterfaceSet>
+          <Interface name="FunComponentInterface" type="Package2/FunInterface" />
+        </ProvidedInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="x" type="Package1/IntegerType" />
+            <Variable name="y" type="Package1/IntegerType" />
+          </VariableSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</DataSheet>

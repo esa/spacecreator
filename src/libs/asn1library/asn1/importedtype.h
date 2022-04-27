@@ -24,6 +24,7 @@
 ****************************************************************************/
 #pragma once
 
+#include <QHash>
 #include <QString>
 
 namespace Asn1Acn {
@@ -35,14 +36,33 @@ public:
         : m_module(module)
         , m_name(name)
     {
+        m_fullPath = QString("%1.%2").arg(m_module).arg(m_name);
     }
 
     const QString &module() const { return m_module; }
     const QString &name() const { return m_name; }
+    const QString &fullPath() const { return m_fullPath; }
+
+    bool operator<(const ImportedType &rhs) const { return m_fullPath < rhs.m_fullPath; }
+    bool operator==(const ImportedType &rhs) const { return m_fullPath == rhs.m_fullPath; }
+    bool operator!=(const ImportedType &rhs) const { return !(*this == rhs); }
 
 private:
     QString m_module;
     QString m_name;
+    QString m_fullPath;
 };
 
 }
+
+namespace std {
+
+template<>
+struct hash<Asn1Acn::ImportedType> {
+    std::size_t operator()(const Asn1Acn::ImportedType &it) const noexcept
+    {
+        return static_cast<size_t>(qHash(it.fullPath()));
+    }
+};
+
+} // namespace std

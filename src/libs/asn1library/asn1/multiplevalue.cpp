@@ -59,3 +59,13 @@ void MultipleValue::addValue(ValuePtr value)
 {
     m_values.push_back(std::move(value));
 }
+
+Value::ValueType MultipleValue::typeEnum() const
+{
+    return Value::MULTIPLE_VALUE;
+}
+
+const std::vector<ValuePtr> &MultipleValue::values() const
+{
+    return m_values;
+}

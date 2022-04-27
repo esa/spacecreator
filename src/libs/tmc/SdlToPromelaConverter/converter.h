@@ -19,11 +19,14 @@
 
 #pragma once
 
+#include "processmetadata.h"
+
 #include <QFileInfo>
 #include <QList>
 #include <QProcess>
 #include <QString>
 #include <QStringList>
+#include <map>
 
 namespace tmc::converter {
 /**
@@ -33,35 +36,33 @@ class SdlToPromelaConverter final
 {
 public:
     /**
-     * @brief Constructor.
-     */
-    SdlToPromelaConverter();
-
-    /**
      * @brief Convert SDL files into promela file.
      *
-     * @param inputSdlfiles a list of input SDL files.
-     * @param outputFile output promela file
-     * @return true if execution was successful, otherwise false
+     * @param processMetadata process metadata, contains location of input SDL files.
+     * @param outputFile output promela file.
+     * @return true if execution was successful, otherwise false.
      */
-    bool convertSdl(const QList<QFileInfo> &inputSdlFiles, const QFileInfo &outputFile);
+    bool convertSdl(const ProcessMetadata &processMetadata, const QFileInfo &outputFile);
 
     /**
      * @brief Convert stop condition file into promela file.
      *
      * @param inputFile filepath to input stop condition file
      * @param outputFile output promela file
+     * @param inputSdlFiles a map of ProcessMetadata objects, which are context for stop condition file
      * @return true if execution was successful, otherwise false
      */
-    bool convertStopCondition(const QFileInfo &inputFile, const QFileInfo &outputFile);
+    bool convertStopCondition(const QFileInfo &inputFile, const QFileInfo &outputFile,
+            const std::map<QString, ProcessMetadata> &inputSdlFiles);
 
 private:
     bool startSdl2PromelaProcess(QProcess &process, const QStringList &arguments);
     bool waitForSdl2PromelaProcess(QProcess &process);
 
 private:
-    QString m_sdl2PromelaCommand;
     QStringList m_sdl2PromelaArgs;
-    int m_externalCommandTimeout;
+
+    const static QString m_sdl2PromelaCommand;
+    constexpr static int m_externalCommandTimeout = 12000;
 };
 }

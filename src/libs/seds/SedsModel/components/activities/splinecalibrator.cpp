@@ -26,17 +26,17 @@ SplineCalibrator::SplineCalibrator() noexcept
 {
 }
 
-const std::vector<SplinePoint> &SplineCalibrator::splinePoints() const
+const std::set<SplinePoint> &SplineCalibrator::splinePoints() const
 {
     return m_splinePoints;
 }
 
 void SplineCalibrator::addSplinePoint(SplinePoint splinePoint)
 {
-    m_splinePoints.push_back(std::move(splinePoint));
+    m_splinePoints.insert(std::move(splinePoint));
 }
 
-bool SplineCalibrator::isExtrapolate() const
+bool SplineCalibrator::extrapolate() const
 {
     return m_extrapolate;
 }

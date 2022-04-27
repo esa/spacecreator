@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/types/sequence.h>
@@ -35,6 +36,7 @@ class Null;
 
 namespace seds::model {
 class Component;
+class DataTypeRef;
 class Entry;
 class EntryRef;
 class ErrorControlEntry;
@@ -58,12 +60,18 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   asn1Sequence        ASN.1 sequence to which the translated entries will be added
-     * @param   asn1Definitions     Parent ASN.1 definitions
-     * @param   sedsPackage         Parent SEDS package
+     * @param   asn1Sequence            ASN.1 sequence to which the translated entries will be added
+     * @param   asn1Definitions         Parent ASN.1 definitions
+     * @param   sedsParentContainer     Parent SEDS container
+     * @param   sedsPackage             Parent SEDS package
+     * @param   asn1Files               List of already translated ASN.1 files
+     * @param   sedsPackages            List of SEDS packages
+     * @param   sequenceSizeThreshold   ASN.1 sequence size threshold
      */
     EntryTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence, Asn1Acn::Definitions *asn1Definitions,
-            const seds::model::ContainerDataType *sedsParentContainer, const seds::model::Package *sedsPackage);
+            const seds::model::ContainerDataType *sedsParentContainer, const seds::model::Package *sedsPackage,
+            const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages,
+            const std::optional<uint64_t> &sequenceSizeThreshold);
     /**
      * @brief   Deleted copy constructor
      */
@@ -120,7 +128,8 @@ public:
     auto operator()(const seds::model::PaddingEntry &sedsEntry) -> void;
 
 private:
-    auto translateEntryType(const QString &sedsTypeName) const -> std::unique_ptr<Asn1Acn::Types::UserdefinedType>;
+    auto translateEntryType(const seds::model::DataTypeRef &sedsTypeRef) const
+            -> std::unique_ptr<Asn1Acn::Types::UserdefinedType>;
 
     auto translateFixedValue(
             const seds::model::FixedValueEntry &sedsEntry, Asn1Acn::Types::UserdefinedType *asn1Type) const -> void;
@@ -128,13 +137,17 @@ private:
             -> std::unique_ptr<Asn1Acn::Types::Null>;
     auto translateLengthField(const seds::model::LengthEntry &sedsEntry) const -> std::unique_ptr<Asn1Acn::Types::Null>;
 
-    auto translateCoreErrorControl(seds::model::CoreErrorControl coreErrorControl, Asn1Acn::Types::Null *asn1Type) const
-            -> void;
+    auto translateCoreErrorControl(seds::model::CoreErrorControl coreErrorControl,
+            const seds::model::ErrorControlEntry &sedsEntry, Asn1Acn::Types::Null *asn1Type) const -> void;
 
-    auto updateListLengthEntry(const seds::model::ListEntry &sedsEntry) const -> void;
+    auto getLengthEntryEncoding(const seds::model::LengthEntry &lengthEntry) const
+            -> const seds::model::IntegerDataEncoding &;
+    auto getErrorControlEntryBitCount(const seds::model::ErrorControlEntry &entry) const -> uint64_t;
+
+    auto updateListLengthEntry(const seds::model::Entry *sedsEntry) const -> void;
     auto getListLengthField(const QString &listLengthFieldName,
             const seds::model::ContainerDataType *sedsContainer) const -> const seds::model::EntryType *;
-    auto getListLengthSequenceComponent(const seds::model::ListEntry &sedsEntry) const
+    auto getListLengthSequenceComponent(const seds::model::Entry *sedsEntry) const
             -> std::unique_ptr<Asn1Acn::SequenceComponent> &;
     auto addListSizeConstraint(Asn1Acn::Types::SequenceOf *asn1Type, const seds::model::ListEntry &sedsEntry) const
             -> void;
@@ -150,9 +163,18 @@ private:
     /// @brief  Parent package
     const seds::model::Package *m_sedsPackage;
 
-    const static int m_crc8BitSize = 8;
-    const static int m_crc16BitSize = 16;
-    const static int m_checksumBitSize = 32;
+    /// @brief  List of alerady translated ASN.1 files
+    const Asn1Acn::Asn1Model::Data &m_asn1Files;
+    /// @brief  List of SEDS packages
+    const std::vector<seds::model::Package> &m_sedsPackages;
+
+    /// @brief  ASN.1 sequence size threshold
+    const std::optional<uint64_t> &m_sequenceSizeThreshold;
+
+    const static uint64_t m_crc8BitSize = 8;
+    const static uint64_t m_crc16BitSize = 16;
+    const static uint64_t m_checksumBitSize = 32;
+    const static uint64_t m_checksumLongitundinalSize = 8;
 };
 
 } // namespace conversion::asn1::translator

@@ -1,0 +1,38 @@
+/* CIF Keep Specific Geode ASNFilename 'dataview-uniq.asn' */
+use Datamodel;
+
+system ParameterMapHostRequirer;
+
+   procedure Get_IF_SyncParam_Ri;
+   fpar in/out Param Number;
+   external;
+
+   procedure Get_IF_SyncRoParam_Ri;
+   fpar in/out Param Number;
+   external;
+
+   procedure Set_IF_SyncParam_Ri;
+   fpar in Param Number;
+   external;
+
+   signal Get_IF_AsyncParam_Pi(Number);
+   signal Get_IF_AsyncRoParam_Pi(Number);
+   signal Set_IF_AsyncParam_Ri(Number);
+
+   channel c
+      from ParameterMapHostRequirer to env with Set_IF_AsyncParam_Ri;
+      from env to ParameterMapHostRequirer with Get_IF_AsyncParam_Pi;
+      from env to ParameterMapHostRequirer with Get_IF_AsyncRoParam_Pi;
+   endchannel;
+
+   block ParameterMapHostRequirer;
+
+      signalroute r
+      from ParameterMapHostRequirer to env with Set_IF_AsyncParam_Ri;
+      from env to ParameterMapHostRequirer with Get_IF_AsyncParam_Pi;
+      from env to ParameterMapHostRequirer with Get_IF_AsyncRoParam_Pi;
+      connect c and r;
+
+      process ParameterMapHostRequirer referenced;
+   endblock;
+endsystem;

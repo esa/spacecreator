@@ -19,12 +19,14 @@
 
 #pragma once
 
+#include "containerentriesscope.h"
+
+#include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/type.h>
+#include <conversion/common/options.h>
 #include <optional>
 #include <seds/SedsModel/types/datatype.h>
-#include <shared/qstringhash.h>
-#include <unordered_map>
 
 namespace Asn1Acn {
 class Definitions;
@@ -76,12 +78,15 @@ struct DataTypeTranslatorVisitor final {
     /**
      * @brief   Constructor
      *
-     * @param   asn1Type            Type where translated types are saved
-     * @param   asn1Definitions     Parent ASN.1 defintions
-     * @param   sedsPackage         Parent SEDS package
+     * @param   asn1Definitions         Parent ASN.1 defintions
+     * @param   sedsPackage             Parent SEDS package
+     * @param   asn1Files               List of already translated ASN.1 files
+     * @param   sedsPackages            List of SEDS packages
+     * @param   sequenceSizeThreshold   ASN.1 sequence size threshold
      */
-    DataTypeTranslatorVisitor(std::unique_ptr<Asn1Acn::Types::Type> &asn1Type, Asn1Acn::Definitions *asn1Definitions,
-            const seds::model::Package *sedsPackage);
+    DataTypeTranslatorVisitor(Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
+            const Asn1Acn::Asn1Model::Data &asn1Files, const std::vector<seds::model::Package> &sedsPackages,
+            const std::optional<uint64_t> &sequenceSizeThreshold);
 
     /**
      * @brief   Translates SEDS array data type
@@ -137,6 +142,8 @@ struct DataTypeTranslatorVisitor final {
      * @param   sedsType    Type to translate
      */
     auto operator()(const seds::model::SubRangeDataType &sedsType) -> void;
+
+    auto consumeResultType() -> std::unique_ptr<Asn1Acn::Types::Type>;
 
 private:
     /**
@@ -241,10 +248,11 @@ private:
     /**
      * @brief   Translate SEDS array type
      *
-     * @param   sedsTypeName    SEDS array element type name
+     * @param   sedsTypeRef     SEDS array element type ref
      * @param   asn1Type        ASN.1 type that will be updated
      */
-    auto translateArrayType(const QString &sedsTypeName, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
+    auto translateArrayType(const seds::model::DataTypeRef &sedsTypeRef, Asn1Acn::Types::SequenceOf *asn1Type) const
+            -> void;
     /**
      * @brief   Translate SEDS enumeration list
      *
@@ -262,12 +270,6 @@ private:
     auto translateFalseValue(seds::model::FalseValue falseValue, Asn1Acn::Types::Boolean *asn1Type) const -> void;
 
     /**
-     * @brief   Adds entries from given container data type to the entries cache
-     *
-     * @param   sedsType    Type which entries should be cached
-     */
-    auto cacheContainerType(const seds::model::ContainerDataType &sedsType) -> void;
-    /**
      * @brief   Adds a choice field to the passed ASN.1 sequence for realization fields
      *
      * @param   asn1Sequence    Sequence to which field should be added
@@ -282,6 +284,7 @@ private:
      */
     auto updateParentContainer(const QString &sedsBaseTypeName, Asn1Acn::Types::Sequence *asn1RealizationSequence)
             -> void;
+    auto addPatcherFunctions(Asn1Acn::Types::Sequence *asn1Type) -> void;
 
     /**
      * @brief   Translates container constraints and applies them to the ASN.1 sequence
@@ -302,20 +305,23 @@ private:
     auto convertByteOrder(seds::model::ByteOrder sedsByteOrder) const -> Asn1Acn::Types::Endianness;
 
 private:
-    using ContainerEntriesCacheValue =
-            std::pair<std::unique_ptr<Asn1Acn::Types::Sequence>, std::unique_ptr<Asn1Acn::Types::Sequence>>;
-    using ContainerEntriesCacheMap = std::unordered_map<QString, ContainerEntriesCacheValue>;
-
     /// @brief  Where translated data type will be saved
-    std::unique_ptr<Asn1Acn::Types::Type> &m_asn1Type;
+    std::unique_ptr<Asn1Acn::Types::Type> m_asn1Type;
 
     /// @brief  Parent definitions
     Asn1Acn::Definitions *m_asn1Definitions;
     /// @brief  Parent package
     const seds::model::Package *m_sedsPackage;
+    /// @brief  List of already translated ASN.1 files
+    const Asn1Acn::Asn1Model::Data &m_asn1Files;
+    /// @brief  List of SEDS packages
+    const std::vector<seds::model::Package> &m_sedsPackages;
 
-    /// @brief  Cache for sequence components
-    ContainerEntriesCacheMap m_asn1SequenceComponentsCache;
+    /// @brief  Containers that are in the current scope
+    ContainerEntriesScope m_containersScope;
+
+    /// @brief  ASN.1 sequence size threshold
+    const std::optional<uint64_t> &m_sequenceSizeThreshold;
 
     inline static const QString m_realizationComponentsName = "realization";
     inline static const QString m_realizationComponentsAlternativeNameTemplate = "realization%1";

@@ -21,8 +21,8 @@
 
 #include "specialized/containerconstrainttranslatorvisitor.h"
 #include "specialized/dimensiontranslator.h"
-#include "specialized/entrytranslatorvisitor.h"
 #include "specialized/rangetranslatorvisitor.h"
+#include "translator.h"
 
 #include <QDebug>
 #include <asn1library/asn1/asnsequencecomponent.h>
@@ -64,11 +64,15 @@ using seds::model::SubRangeDataType;
 
 namespace conversion::asn1::translator {
 
-DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(std::unique_ptr<Asn1Acn::Types::Type> &asn1Type,
-        Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage)
-    : m_asn1Type(asn1Type)
-    , m_asn1Definitions(asn1Definitions)
+DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(Asn1Acn::Definitions *asn1Definitions,
+        const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
+        const std::vector<seds::model::Package> &sedsPackages, const std::optional<uint64_t> &sequenceSizeThreshold)
+    : m_asn1Definitions(asn1Definitions)
     , m_sedsPackage(sedsPackage)
+    , m_asn1Files(asn1Files)
+    , m_sedsPackages(sedsPackages)
+    , m_containersScope(asn1Definitions, sedsPackage, asn1Files, sedsPackages, sequenceSizeThreshold)
+    , m_sequenceSizeThreshold(sequenceSizeThreshold)
 {
 }
 
@@ -79,11 +83,11 @@ void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
         throw TranslationException("Encountered ArrayDataType without dimensions");
     }
 
-    DimensionTranslator dimensionTranslator(m_sedsPackage);
+    DimensionTranslator dimensionTranslator(m_sedsPackage, m_sedsPackages, m_sequenceSizeThreshold);
 
     if (dimensions.size() == 1) { // Sequence of type with one dimension
         auto type = std::make_unique<Asn1Acn::Types::SequenceOf>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
-        translateArrayType(Escaper::escapeAsn1TypeName(sedsType.type().nameStr()), type.get());
+        translateArrayType(sedsType.type(), type.get());
         dimensionTranslator.translateDimension(dimensions[0], type.get());
 
         m_asn1Type = std::move(type);
@@ -103,7 +107,7 @@ void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
         });
 
         // Add item type to the last element
-        translateArrayType(Escaper::escapeAsn1TypeName(sedsType.type().nameStr()), lastType);
+        translateArrayType(sedsType.type(), lastType);
 
         m_asn1Type = std::move(rootType);
     }
@@ -127,23 +131,34 @@ void DataTypeTranslatorVisitor::operator()(const BooleanDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 {
-    auto type = std::make_unique<Asn1Acn::Types::Sequence>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
+    const auto sequenceName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto type = std::make_unique<Asn1Acn::Types::Sequence>(sequenceName);
 
-    // Add this type to the cache for future inheritance
-    cacheContainerType(sedsType);
+    // Add this type to the scope
+    m_containersScope.addContainer(sedsType);
 
     // If type is not abstract, then we want it's entries in the ASN.1 type
     if (!sedsType.isAbstract()) {
-        const auto &cachedAsn1Type = m_asn1SequenceComponentsCache[sedsType.nameStr()];
+        const QString &sedsTypeName = sedsType.nameStr();
 
-        const auto &cachedAsn1Components = cachedAsn1Type.first->components();
-        for (const auto &asn1Component : cachedAsn1Components) {
+        const auto &asn1Components = m_containersScope.fetchComponents(sedsTypeName);
+        for (const auto &asn1Component : asn1Components) {
             type->addComponent(asn1Component->clone());
         }
 
-        const auto &cachedAsn1TrailerComponents = cachedAsn1Type.second->components();
-        for (const auto &asn1TrailerComponent : cachedAsn1TrailerComponents) {
+        const auto &asn1TrailerComponents = m_containersScope.fetchTrailerComponents(sedsTypeName);
+        for (const auto &asn1TrailerComponent : asn1TrailerComponents) {
             type->addComponent(asn1TrailerComponent->clone());
+        }
+
+        const auto &patcherSnippets = m_containersScope.fetchPatcherSnippets(sedsTypeName);
+        for (const auto &patcherSnippet : patcherSnippets) {
+            type->addPatcherSnippet(patcherSnippet);
+        }
+
+        if (!patcherSnippets.empty()) {
+            type->setPostEncodingFunction(QString("%1-encoding-function").arg(sequenceName.toLower()));
+            type->setPostDecodingValidator(QString("%1-decoding-validator").arg(sequenceName).toLower());
         }
     }
 
@@ -200,8 +215,14 @@ void DataTypeTranslatorVisitor::operator()(const StringDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const SubRangeDataType &sedsType)
 {
-    const auto &baseTypeName = sedsType.type().nameStr();
-    const auto sedsBaseType = m_sedsPackage->dataType(baseTypeName);
+    const auto &baseTypeRef = sedsType.type();
+    const auto &baseTypeName = baseTypeRef.nameStr();
+
+    const auto sedsPackage = baseTypeRef.packageStr()
+            ? SedsToAsn1Translator::getSedsPackage(*baseTypeRef.packageStr(), m_sedsPackages)
+            : m_sedsPackage;
+
+    const auto sedsBaseType = sedsPackage->dataType(baseTypeName);
 
     if (sedsBaseType == nullptr) {
         auto errorMessage = QString("SubRangeDataType \"%1\" references unknown type \"%2\"")
@@ -223,6 +244,11 @@ void DataTypeTranslatorVisitor::operator()(const SubRangeDataType &sedsType)
                         .arg(baseTypeName);
         throw TranslationException(std::move(errorMessage));
     }
+}
+
+std::unique_ptr<Asn1Acn::Types::Type> DataTypeTranslatorVisitor::consumeResultType()
+{
+    return std::move(m_asn1Type);
 }
 
 void DataTypeTranslatorVisitor::translateIntegerEncoding(
@@ -268,6 +294,7 @@ void DataTypeTranslatorVisitor::translateBooleanEncoding(
         const std::optional<seds::model::BooleanDataEncoding> &encoding, Asn1Acn::Types::Boolean *asn1Type) const
 {
     if (encoding) {
+        asn1Type->setAcnSize(encoding->bits());
         translateFalseValue(encoding->falseValue(), asn1Type);
     } else {
         asn1Type->setFalseValue("0");
@@ -399,14 +426,14 @@ void DataTypeTranslatorVisitor::translateCoreEncodingAndPrecision(
 {
     switch (coreEncoding) {
     case seds::model::CoreEncodingAndPrecision::IeeeSingle: {
-        if (bits != 32) {
+        if (bits != 32) { // NOLINT(readability-magic-numbers)
             auto errorMessage = QString("Wrong number of bits specified (%1) for IEEE754_1985_32 encoding").arg(bits);
             throw TranslationException(std::move(errorMessage));
         }
         asn1Type->setEncoding(Asn1Acn::Types::RealEncoding::IEEE754_1985_32);
     } break;
     case seds::model::CoreEncodingAndPrecision::IeeeDouble: {
-        if (bits != 64) {
+        if (bits != 64) { // NOLINT(readability-magic-numbers)
             auto errorMessage = QString("Wrong number of bits specified (%1) for IEEE754_1985_64 encoding").arg(bits);
             throw TranslationException(std::move(errorMessage));
         }
@@ -488,9 +515,15 @@ void DataTypeTranslatorVisitor::translateStringLength(
 }
 
 void DataTypeTranslatorVisitor::translateArrayType(
-        const QString &sedsTypeName, Asn1Acn::Types::SequenceOf *asn1Type) const
+        const seds::model::DataTypeRef &sedsTypeRef, Asn1Acn::Types::SequenceOf *asn1Type) const
 {
-    const auto *asn1ReferencedTypeAssignment = m_asn1Definitions->type(sedsTypeName);
+    const auto sedsTypeName = Escaper::escapeAsn1TypeName(sedsTypeRef.nameStr());
+
+    const auto asn1Definitions = sedsTypeRef.packageStr()
+            ? SedsToAsn1Translator::getAsn1Definitions(*sedsTypeRef.packageStr(), m_asn1Files)
+            : m_asn1Definitions;
+
+    const auto *asn1ReferencedTypeAssignment = asn1Definitions->type(sedsTypeName);
     if (!asn1ReferencedTypeAssignment) {
         throw MissingAsn1TypeDefinitionException(sedsTypeName);
     }
@@ -522,73 +555,15 @@ void DataTypeTranslatorVisitor::translateFalseValue(
 {
     switch (falseValue) {
     case seds::model::FalseValue::ZeroIsFalse:
-        asn1Type->setFalseValue("0");
+        asn1Type->setFalseValue(QString(asn1Type->acnSize(), '0'));
         break;
     case seds::model::FalseValue::NonZeroIsFalse:
-        asn1Type->setTrueValue("0");
+        asn1Type->setTrueValue(QString(asn1Type->acnSize(), '0'));
         break;
     default:
         throw UnhandledValueException("FalseValue");
         break;
     }
-}
-
-void DataTypeTranslatorVisitor::cacheContainerType(const ContainerDataType &sedsType)
-{
-    auto asn1SequenceComponents = std::make_unique<Asn1Acn::Types::Sequence>();
-
-    // Check if base type is visible
-    if (sedsType.baseType()) {
-        const auto sedsBaseTypeName = sedsType.baseType()->nameStr();
-
-        if (m_asn1SequenceComponentsCache.count(sedsBaseTypeName) == 0) {
-            auto errorMessage = QString("Unable to find base type \"%1\" for container \"%2\" in the current scope")
-                                        .arg(sedsBaseTypeName)
-                                        .arg(sedsType.nameStr());
-            throw TranslationException(std::move(errorMessage));
-        }
-    }
-
-    // Get parent entries from cache
-    if (sedsType.baseType()) {
-        const auto sedsBaseTypeName = sedsType.baseType()->nameStr();
-        const auto &asn1ParentComponents = m_asn1SequenceComponentsCache[sedsBaseTypeName].first->components();
-
-        for (const auto &asn1Component : asn1ParentComponents) {
-            asn1SequenceComponents->addComponent(asn1Component->clone());
-        }
-    }
-
-    // Translate own entries
-    EntryTranslatorVisitor entriesTranslator(asn1SequenceComponents.get(), m_asn1Definitions, &sedsType, m_sedsPackage);
-    for (const auto &sedsEntry : sedsType.entries()) {
-        std::visit(entriesTranslator, sedsEntry);
-    }
-
-    auto asn1SequenceTrailerComponents = std::make_unique<Asn1Acn::Types::Sequence>();
-
-    if (sedsType.isAbstract()) {
-        // Translate own trailer entries
-        EntryTranslatorVisitor trailerEntriesTranslator(
-                asn1SequenceTrailerComponents.get(), m_asn1Definitions, &sedsType, m_sedsPackage);
-        for (const auto &sedsTrailerEntry : sedsType.trailerEntries()) {
-            std::visit(trailerEntriesTranslator, sedsTrailerEntry);
-        }
-    }
-
-    // Get parent trailer entries from cache
-    if (sedsType.baseType()) {
-        const auto sedsBaseTypeName = sedsType.baseType()->nameStr();
-        const auto &asn1ParentTrailerComponents = m_asn1SequenceComponentsCache[sedsBaseTypeName].second->components();
-
-        for (const auto &asn1TrailerComponent : asn1ParentTrailerComponents) {
-            asn1SequenceTrailerComponents->addComponent(asn1TrailerComponent->clone());
-        }
-    }
-
-    // Cache this type
-    m_asn1SequenceComponentsCache.insert({ sedsType.nameStr(),
-            std::make_pair(std::move(asn1SequenceComponents), std::move(asn1SequenceTrailerComponents)) });
 }
 
 void DataTypeTranslatorVisitor::createRealizationContainerField(Asn1Acn::Types::Sequence *asn1Sequence)
@@ -611,16 +586,16 @@ void DataTypeTranslatorVisitor::createRealizationContainerField(Asn1Acn::Types::
         realizationChoice->addComponent(std::move(ownRealizationChoiceAlternative));
     }
 
-    auto realizationComponent =
-            std::make_unique<Asn1Acn::AsnSequenceComponent>(m_realizationComponentsName, m_realizationComponentsName,
-                    false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(realizationChoice));
+    auto realizationComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(m_realizationComponentsName,
+            m_realizationComponentsName, false, std::nullopt, "", Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
+            Asn1Acn::SourceLocation(), std::move(realizationChoice));
     asn1Sequence->addComponent(std::move(realizationComponent));
 }
 
 void DataTypeTranslatorVisitor::applyContainerConstraints(
         const ContainerDataType &sedsType, Asn1Acn::Types::Sequence *asn1Type) const
 {
-    ContainerConstraintTranslatorVisitor translatorVisitor(asn1Type, m_sedsPackage);
+    ContainerConstraintTranslatorVisitor translatorVisitor(asn1Type, m_sedsPackage, m_sedsPackages);
 
     for (const auto &constraint : sedsType.constraints()) {
         std::visit(translatorVisitor, constraint);
@@ -653,6 +628,15 @@ void DataTypeTranslatorVisitor::updateParentContainer(
             asn1RealizationChoiceAlternativeName, asn1RealizationChoiceAlternativeName, "", Asn1Acn::SourceLocation(),
             std::move(asn1SequenceReference));
     asn1RealizationChoice->addComponent(std::move(asn1RealizationChoiceAlternative));
+}
+
+void DataTypeTranslatorVisitor::addPatcherFunctions(Asn1Acn::Types::Sequence *asn1Type)
+{
+    auto postEncodingFunction = QString("%1-encoding-function").arg(asn1Type->identifier().toLower());
+    asn1Type->setPostEncodingFunction(std::move(postEncodingFunction));
+
+    auto postDecodingValidator = QString("%1-decoding-validator").arg(asn1Type->identifier().toLower());
+    asn1Type->setPostDecodingValidator(std::move(postDecodingValidator));
 }
 
 Asn1Acn::Types::Endianness DataTypeTranslatorVisitor::convertByteOrder(seds::model::ByteOrder sedsByteOrder) const

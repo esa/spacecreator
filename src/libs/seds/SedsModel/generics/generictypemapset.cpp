@@ -31,7 +31,7 @@ void GenericTypeMapSet::addGenericTypeMap(GenericTypeMap genericTypeMap)
     m_genericTypeMaps.push_back(std::move(genericTypeMap));
 }
 
-const GenericAlternateSet &GenericTypeMapSet::alternateSet() const
+const std::optional<GenericAlternateSet> &GenericTypeMapSet::alternateSet() const
 {
     return m_alternateSet;
 }

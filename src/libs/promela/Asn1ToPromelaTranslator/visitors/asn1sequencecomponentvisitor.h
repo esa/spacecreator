@@ -37,12 +37,11 @@ public:
      * @brief Contructor.
      *
      * @param promelaModel target promela model
-     * @param utype target utype
      * @param baseTypeName base name for nested types
-     * @param optionalFields list to add found optional component names
+     * @param enhancedSpinSupport  if true, then generate model for enhanced spin
      */
-    Asn1SequenceComponentVisitor(::promela::model::PromelaModel &promelaModel, ::promela::model::Utype &utype,
-            QString baseTypeName, QList<QString> &optionalFields, bool enhancedSpinSupport);
+    Asn1SequenceComponentVisitor(
+            ::promela::model::PromelaModel &promelaModel, QString baseTypeName, bool enhancedSpinSupport);
 
     /**
      * @brief Visit ::Asn1Acn::AsnSequenceComponent
@@ -57,11 +56,40 @@ public:
      */
     void visit(const ::Asn1Acn::AcnSequenceComponent &component) override;
 
+    /**
+     * @brief Check if ASN.1 Sequence component was visited.
+     *
+     * @return true if component was visited, otherwise false.
+     */
+    bool wasComponentVisited() const;
+    /**
+     * @brief Getter for name of visited sequence component.
+     *
+     * @return Name of sequence component.
+     * @throws std::bad_optional_access if component was not visited.
+     */
+    QString getComponentName() const;
+    /**
+     * @brief Getter for type of visited sequence component.
+     *
+     * @return Type of sequence component.
+     * @throws std::bad_optional_access if component was not visited.
+     */
+    ::promela::model::DataType getComponentType() const;
+    /**
+     * @brief Check if visited component is optional in SEQUENCE.
+     *
+     * @return true if component is optional, false if component is mandatory of component was not visited.
+     */
+    bool isComponentOptional() const;
+
 private:
     ::promela::model::PromelaModel &m_promelaModel;
-    ::promela::model::Utype &m_utype;
     const QString m_baseTypeName;
-    QList<QString> &m_optionalFields;
     const bool m_enhancedSpinSupport;
+
+    std::optional<QString> m_componentName;
+    std::optional<::promela::model::DataType> m_componentType;
+    bool m_optionalComponent;
 };
 }

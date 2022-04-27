@@ -1,32 +1,32 @@
 <InterfaceView>
-<Function name="Requirer" is_type="NO" language="C" default_implementation="default">
-<Provided_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithOutArgs_Pi" layer="default">
-    <Input_Parameter name="InputParam" type="ExecuteAsynchronousActionWithOutArgs_Type" encoding="ACN"/>
+<Function name="Requirer" comment="Host for required interfaces" is_type="NO" language="C" default_implementation="default">
+<Provided_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithOutArgs_Pi" comment="Execute an asynchronous action with output arguments" layer="default">
+    <Input_Parameter name="InputParam" type="ExecuteAsynchronousActionWithOutArgs-Type" encoding="ACN"/>
 </Provided_Interface>
 
-<Provided_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithNotification_Pi" layer="default">
-    <Input_Parameter name="InputParam" type="ExecuteAsynchronousActionWithNotification_Type1" encoding="ACN"/>
+<Provided_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithNotification_Pi" comment="Execute an asynchronous action with output arguments" layer="default">
+    <Input_Parameter name="InputParam" type="ExecuteAsynchronousActionWithNotification-Type1" encoding="ACN"/>
 </Provided_Interface>
 
-<Required_Interface name="InterfaceWithSynchronousCommandsInstance_ExecuteSynchronousAction_Ri" kind="Protected" layer="default">
+<Required_Interface name="InterfaceWithSynchronousCommandsInstance_ExecuteSynchronousAction_Ri" comment="Execute a synchronous action with arguments" kind="Protected" layer="default">
     <Input_Parameter name="InputArg" type="DataItem" encoding="ACN"/>
     <Output_Parameter name="OutputArg" type="DataItem" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
-<Required_Interface name="InterfaceWithSynchronousCommandsInstance_ExecuteSynchronousActionWithInOutArg_Ri" kind="Protected" layer="default">
+<Required_Interface name="InterfaceWithSynchronousCommandsInstance_ExecuteSynchronousActionWithInOutArg_Ri" comment="Execute a synchronous action with an in/out argument" kind="Protected" layer="default">
     <Input_Parameter name="InOutArg_In" type="DataItem" encoding="ACN"/>
     <Output_Parameter name="InOutArg_Out" type="DataItem" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
-<Required_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousAction_Ri" kind="Sporadic" layer="default">
-    <Input_Parameter name="InputParam" type="ExecuteAsynchronousAction_Type" encoding="ACN"/>
+<Required_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousAction_Ri" comment="Execute an asynchronous action with input arguments" kind="Sporadic" layer="default">
+    <Input_Parameter name="InputParam" type="ExecuteAsynchronousAction-Type" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
-<Required_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithNotification_Ri" kind="Sporadic" layer="default">
-    <Input_Parameter name="InputParam" type="ExecuteAsynchronousActionWithNotification_Type" encoding="ACN"/>
+<Required_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithNotification_Ri" comment="Execute an asynchronous action with output arguments" kind="Sporadic" layer="default">
+    <Input_Parameter name="InputParam" type="ExecuteAsynchronousActionWithNotification-Type" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 

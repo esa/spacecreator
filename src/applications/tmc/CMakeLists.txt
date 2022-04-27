@@ -17,4 +17,9 @@ target_link_libraries(tmc
 
 add_format_target(tmc)
 
+set_target_properties(tmc PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    OUTPUT_NAME "tmc"
+)
+
 install(TARGETS tmc DESTINATION bin)

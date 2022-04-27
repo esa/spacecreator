@@ -1,12 +1,14 @@
 project(Asn1Exporter VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES exporter.cpp
+            patcherfunctionsexporter.cpp
             visitors/acnnodereconstructingvisitor.cpp
             visitors/acntypecomponentreconstructingvisitor.cpp
             visitors/asn1nodereconstructingvisitor.cpp
             visitors/asn1typecomponentreconstructingvisitor.cpp
             visitors/typeconstraintsreconstructingvisitor.cpp)
 set(INCLUDES exporter.h
+             patcherfunctionsexporter.h
              visitors/acnnodereconstructingvisitor.h
              visitors/acntypecomponentreconstructingvisitor.h
              visitors/asn1nodereconstructingvisitor.h

@@ -1,0 +1,9 @@
+TESTHARNESS-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   MyInteger   ::= INTEGER (-10000 .. 10000)
+   MyReal      ::= REAL (0.0 .. 1000.0)
+   MyBool      ::= BOOLEAN
+
+END
+

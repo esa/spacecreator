@@ -45,8 +45,10 @@
               <Body>
                 <MathOperation outputVariableRef="tmp">
                   <Operator operator="add" />
+                  <Operator operator="add" />
                   <VariableRef variableRef="x1" />
                   <VariableRef variableRef="x2" />
+                  <Value value="2" />
                 </MathOperation>
                 <SendCommandPrimitive interface="AsyncCalculator" command="Add">
                   <ArgumentValue name="result">

@@ -43,7 +43,7 @@ void IntegerConstraintVisitor::visit(const ::Asn1Acn::Constraints::AndConstraint
 
     IntegerConstraintVisitor rhsVisitor;
     constraint.rightChild()->accept(rhsVisitor);
-    std::optional<IntegerSubset> rhs = m_subset;
+    std::optional<IntegerSubset> rhs = rhsVisitor.getResultSubset();
 
     if (!lhs.has_value() || !rhs.has_value()) {
         m_subset = std::nullopt;
@@ -60,7 +60,7 @@ void IntegerConstraintVisitor::visit(const ::Asn1Acn::Constraints::OrConstraint<
 
     IntegerConstraintVisitor rhsVisitor;
     constraint.rightChild()->accept(rhsVisitor);
-    std::optional<IntegerSubset> rhs = m_subset;
+    std::optional<IntegerSubset> rhs = rhsVisitor.getResultSubset();
 
     if (!lhs.has_value() || !rhs.has_value()) {
         m_subset = std::nullopt;

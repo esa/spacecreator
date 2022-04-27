@@ -1,0 +1,11 @@
+COM-N7SPACE-PACKAGE2 DEFINITIONS ::= BEGIN
+ArrayItem ::= INTEGER(0 .. 255)
+IndexItem ::= INTEGER(0 .. 16)
+FieldItem ::= INTEGER(0 .. 255)
+LengthItem ::= INTEGER(0 .. 10)
+ListItem ::= INTEGER(0 .. 255)
+ConstraintItem ::= INTEGER(0 .. 10)
+ChildItem ::= INTEGER(0 .. 255)
+SubRangeItem ::= INTEGER(0 .. 255)
+END
+

@@ -50,6 +50,7 @@ public:
 
         // attrs:
         name,
+        comment,
         url,
         is_type,
         instance_of,

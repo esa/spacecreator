@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DataSheet xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Device name="CoolDevice" />
+  <Package name="Package1">
+    <ComponentSet>
+      <Component name="Component1">
+        <ProvidedInterfaceSet>
+          <Interface name="Component1Pi" type="Package2/Interface1" />
+        </ProvidedInterfaceSet>
+        <RequiredInterfaceSet>
+          <Interface name="Component2Ri" type="Package2/Interface2" />
+        </RequiredInterfaceSet>
+      </Component>
+    </ComponentSet>
+  </Package>
+  <Package name="Package2">
+    <DataTypeSet>
+      <IntegerDataType name="Integer2">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="Interface1">
+        <CommandSet>
+          <Command name="Interface1Command" mode="sync">
+            <Argument name="arg1" type="Integer2" mode="in" />
+            <Argument name="arg2" type="Package3/Integer3" mode="in" />
+          </Command>
+        </CommandSet>
+      </Interface>
+      <Interface name="Interface2">
+        <BaseInterfaceSet>
+          <Interface type="Package3/ParentInterface1" />
+          <Interface type="Package4/ParentInterface2" />
+        </BaseInterfaceSet>
+        <CommandSet>
+          <Command name="Interface2Command" mode="async">
+            <Argument name="arg1" type="Integer2" mode="in" />
+            <Argument name="arg2" type="Package3/Integer3" mode="in" />
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+  </Package>
+  <Package name="Package3">
+    <DataTypeSet>
+      <IntegerDataType name="Integer3">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="ParentInterface1">
+        <CommandSet>
+          <Command name="ParentInterface1Command" mode="async">
+            <Argument name="arg1" type="Integer3" mode="in" />
+            <Argument name="arg2" type="Package4/Integer4" mode="in" />
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+  </Package>
+  <Package name="Package4">
+    <DataTypeSet>
+      <IntegerDataType name="Integer4">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="ParentInterface2">
+        <CommandSet>
+          <Command name="ParentInterface2Command" mode="async">
+            <Argument name="arg1" type="Integer4" mode="in" />
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+  </Package>
+</DataSheet>

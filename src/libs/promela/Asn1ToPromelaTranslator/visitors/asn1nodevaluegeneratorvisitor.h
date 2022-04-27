@@ -38,8 +38,7 @@ public:
      * @param enhancedSpinSupport  if true, then generate model for enhanced spin
      * @param typeNames            list of top-level type names to generate value generation inlines
      */
-    Asn1NodeValueGeneratorVisitor(
-            ::promela::model::PromelaModel &promelaModel, bool enhancedSpinSupport, const QStringList &typeNames);
+    Asn1NodeValueGeneratorVisitor(::promela::model::PromelaModel &promelaModel, const QStringList &typeNames);
 
     /// @brief Visit Asn1Acn::Definitions
     void visit(const ::Asn1Acn::Definitions &defs) override;
@@ -56,7 +55,6 @@ public:
 
 private:
     ::promela::model::PromelaModel &m_promelaModel;
-    const bool m_enhancedSpinSupport;
     const QStringList &m_typeNames;
 };
 }

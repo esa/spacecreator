@@ -40,6 +40,7 @@
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
+#include <iostream>
 #include <seds/SedsModel/types/arraydatatype.h>
 #include <seds/SedsModel/types/binarydatatype.h>
 #include <seds/SedsModel/types/booleandatatype.h>
@@ -563,13 +564,21 @@ static inline auto addFixedValueEntry(TypeVisitor::Context &context, ComponentTy
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
 {
-    Q_UNUSED(type);
     ::seds::model::ContainerDataType sedsType;
     addOptionalIndicators(m_context, type, sedsType);
 
     for (const auto &component : type.components()) {
+        const auto asnComponent = dynamic_cast<Asn1Acn::AsnSequenceComponent *>(component.get());
         const auto acnComponent = dynamic_cast<Asn1Acn::AcnSequenceComponent *>(component.get());
         const auto isAcnComponent = acnComponent != nullptr;
+
+        if (!isAcnComponent) {
+            // Skip absent components
+            if (asnComponent->presence() == Asn1Acn::AsnSequenceComponent::Presence::AlwaysAbsent) {
+                continue;
+            }
+        }
+
         if (component->type()->typeEnum() == Asn1Acn::Types::Type::NULLTYPE) {
             addFixedValueEntry(m_context, component.get(), sedsType);
             continue;
@@ -618,8 +627,15 @@ static inline auto createChoiceIndexType(
 {
     ::seds::model::EnumeratedDataType sedsType;
 
+    const auto &withComponentConstraints = type.withComponentConstraints();
+    const auto hasConstraints = !withComponentConstraints.empty();
+
     int computedValue = 0;
     for (const auto &component : type.components()) {
+        if (hasConstraints && withComponentConstraints.count(component->name()) == 0) {
+            continue;
+        }
+
         ::seds::model::ValueEnumeration valueEnumeration;
         valueEnumeration.setLabel(component->name());
         valueEnumeration.setValue(computedValue++);
@@ -641,8 +657,15 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Choice &type)
     parentSedsType.setName(m_context.name());
     m_context.package()->addDataType(std::move(parentSedsType));
 
+    const auto &withComponentConstraints = type.withComponentConstraints();
+    const auto hasConstraints = !withComponentConstraints.empty();
+
     int computedValue = 0;
     for (const auto &component : type.components()) {
+        if (hasConstraints && withComponentConstraints.count(component->name()) == 0) {
+            continue;
+        }
+
         ::seds::model::ContainerDataType innerSedsType;
         ::seds::model::DataTypeRef baseTypeReference(m_context.name());
         innerSedsType.setBaseType(std::move(baseTypeReference));
@@ -787,13 +810,17 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Real &type)
 
     ::seds::model::FloatDataType sedsType;
 
-    if (constraintVisitor.isRangeConstraintVisited()) {
-        ::seds::model::MinMaxRange range;
-        range.setType(::seds::model::RangeType::InclusiveMinInclusiveMax);
-        range.setMax(RealValue::asString(constraintVisitor.getRange().end()));
-        range.setMin(RealValue::asString(constraintVisitor.getRange().begin()));
-        sedsType.setRange(std::move(range));
+    // Range in SEDS is required
+    if (!constraintVisitor.isRangeConstraintVisited()) {
+        auto errorMessage = QString("Real type \"%1\" doesn't contain a range").arg(type.identifier());
+        throw TranslationException(std::move(errorMessage));
     }
+
+    ::seds::model::MinMaxRange range;
+    range.setType(::seds::model::RangeType::InclusiveMinInclusiveMax);
+    range.setMax(RealValue::asString(constraintVisitor.getRange().end()));
+    range.setMin(RealValue::asString(constraintVisitor.getRange().begin()));
+    sedsType.setRange(std::move(range));
 
     // Encoding in ASN.1 model is not optional, but may be unset
     if (type.encoding() != Asn1Acn::Types::RealEncoding::unspecified) {
@@ -832,13 +859,17 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Integer &type)
 
     ::seds::model::IntegerDataType sedsType;
 
-    if (constraintVisitor.isRangeConstraintVisited()) {
-        ::seds::model::MinMaxRange range;
-        range.setType(::seds::model::RangeType::InclusiveMinInclusiveMax);
-        range.setMax(IntegerValue::asString(constraintVisitor.getRange().end()));
-        range.setMin(IntegerValue::asString(constraintVisitor.getRange().begin()));
-        sedsType.setRange(std::move(range));
+    // Range in SEDS is required
+    if (!constraintVisitor.isRangeConstraintVisited()) {
+        auto errorMessage = QString("Integer type \"%1\" doesn't contain a range").arg(type.identifier());
+        throw TranslationException(std::move(errorMessage));
     }
+
+    ::seds::model::MinMaxRange range;
+    range.setType(::seds::model::RangeType::InclusiveMinInclusiveMax);
+    range.setMax(IntegerValue::asString(constraintVisitor.getRange().end()));
+    range.setMin(IntegerValue::asString(constraintVisitor.getRange().begin()));
+    sedsType.setRange(std::move(range));
 
     // Encoding in ASN.1 model is not optional, but may be unset
     if (type.size() > 0) {

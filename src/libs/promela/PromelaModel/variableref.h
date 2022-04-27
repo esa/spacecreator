@@ -20,8 +20,11 @@
 #pragma once
 
 #include <QString>
+#include <list>
+#include <memory>
 
 namespace promela::model {
+class Expression;
 /**
  * @brief Representation of variable reference in promela
  */
@@ -29,20 +32,98 @@ class VariableRef
 {
 public:
     /**
-     * @brief Constructor
+     * @brief Variable reference element.
      *
-     * @param ref name of the variable
+     * Element contains a name and an optional index expression.
      */
-    VariableRef(QString ref);
+    struct Element {
+        /**
+         * @brief Constructor.
+         *
+         * @param name Name of variable reference element.
+         * @param index Index expression.
+         */
+        Element(QString name, std::unique_ptr<Expression> index);
+
+        /**
+         * @brief Name of variable reference element.
+         */
+        QString m_name;
+        /**
+         * @brief Optional index expression of variable reference element.
+         */
+        std::unique_ptr<Expression> m_index;
+    };
 
     /**
-     * @brief Getter for reference to variable
+     * @brief Constructor.
      *
-     * @retun Name of the variable
+     * Construct Variable reference with single element.
+     *
+     * @param ref name of the variable.
      */
-    const QString &getReference() const noexcept;
+    VariableRef(QString ref);
+    /**
+     * @brief Constructor.
+     *
+     * Construct Variable reference with single element with index expression.
+     *
+     * @param ref name of the variable (array).
+     * @param indexExpression index expression
+     */
+    VariableRef(QString ref, std::unique_ptr<Expression> indexExpression);
+    /**
+     * @brief Copy constructor.
+     *
+     * @param other Other instance of VariableRef.
+     */
+    VariableRef(const VariableRef &other);
+    /**
+     * @brief Move constructor.
+     *
+     * @param other Other instance of VariableRef.
+     */
+    VariableRef(VariableRef &&other) noexcept;
+
+    /**
+     * @brief Copy assignment operator.
+     *
+     * @param rhs right hand side instance of VariableRef.
+     * @return reference to self.
+     */
+    const VariableRef &operator=(const VariableRef &rhs);
+    /**
+     * @brief Move assignment operator.
+     *
+     * @param rhs right hand side instance of VariableRef.
+     * @return reference to self.
+     */
+    const VariableRef &operator=(VariableRef &&rhs) noexcept;
+
+    /**
+     * @brief Append single name element to the variable reference.
+     *
+     * @param ref Name of element to append.
+     */
+    void appendElement(QString ref);
+
+    /**
+     * @brief Append single name element to the variable reference.
+     *
+     * @param ref Name of element to append.
+     * @param indexExpression index expression of element to append.
+     */
+    void appendElement(QString ref, std::unique_ptr<Expression> indexExpression);
+
+    /**
+     * @brief Getter for elements to variable reference.
+     *
+     * @retun List of variable reference elements.
+     */
+    const std::list<Element> &getElements() const noexcept;
 
 private:
-    QString m_ref;
+    // QString m_ref;
+    std::list<Element> m_elements;
 };
 }

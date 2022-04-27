@@ -24,11 +24,13 @@
 #include <sdl/SdlModel/procedureparameter.h>
 #include <sdl/SdlModel/transition.h>
 #include <sdl/SdlModel/variabledeclaration.h>
+#include <sdl/SdlModel/variablereference.h>
 
 using sdl::Procedure;
 using sdl::ProcedureParameter;
 using sdl::Transition;
 using sdl::VariableDeclaration;
+using sdl::VariableReference;
 
 namespace tests::common {
 
@@ -43,9 +45,11 @@ public:
 
     auto withTransition(std::unique_ptr<Transition> transition) -> SdlProcedureBuilder &;
 
+    auto withVariable(std::unique_ptr<VariableDeclaration> variable) -> SdlProcedureBuilder &;
+
     auto withParameter(std::unique_ptr<ProcedureParameter> parameter) -> SdlProcedureBuilder &;
 
-    auto withReturnVariableDeclaration(std::unique_ptr<VariableDeclaration> variable) -> SdlProcedureBuilder &;
+    auto withReturnType(QString returnType) -> SdlProcedureBuilder &;
 
 private:
     std::unique_ptr<Procedure> m_procedure;

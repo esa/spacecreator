@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="Parameters">
+    <DataTypeSet>
+      <IntegerDataType name="Number">
+        <LongDescription>Number</LongDescription>
+        <IntegerDataEncoding encoding="twosComplement" sizeInBits="32" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="-1000000" max="1000000" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="IFType">
+        <LongDescription>Interface containing parameters</LongDescription>
+        <ParameterSet>
+          <Parameter name="SyncParam" mode="sync" type="Number" />
+          <Parameter name="AsyncParam" mode="async" type="Number"></Parameter>
+          <Parameter name="SyncRoParam" type="Number" mode="sync" readOnly="true" />
+          <Parameter name="AsyncRoParam" type="Number" mode="async" readOnly="true" />
+        </ParameterSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="ParameterMapHostProvider">
+        <LongDescription></LongDescription>
+        <ProvidedInterfaceSet>
+          <Interface name="IF" type="IFType"></Interface>
+        </ProvidedInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="x" type="Number"></Variable>
+          </VariableSet>
+          <ParameterMapSet>
+            <ParameterMap variableRef="x" interface="IF" parameter="SyncParam" />
+            <ParameterMap variableRef="x" parameter="AsyncParam" interface="IF" />
+            <ParameterMap variableRef="x" parameter="AsyncRoParam" interface="IF" />
+            <ParameterMap variableRef="x" parameter="SyncRoParam" interface="IF" />
+          </ParameterMapSet>
+          <ActivitySet>
+            <Activity name="TestActivity">
+              <Body>
+                <SendParameterPrimitive interface="IF" parameter="AsyncParam" operation="get">
+                  <ArgumentValue>
+                    <VariableRef variableRef="x" />
+                  </ArgumentValue>
+                </SendParameterPrimitive>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="SM">
+              <EntryState name="s" />
+              <ExitState name="e" />
+              <Transition fromState="s" toState="s" name="t1">
+                <OnParameterPrimitive interface="IF" parameter="SyncParam" operation="set" />
+              </Transition>
+              <Transition fromState="s" toState="s" name="t2">
+                <OnParameterPrimitive interface="IF" parameter="AsyncParam" operation="set" />
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+      <Component name="ParameterMapHostRequirer">
+        <LongDescription></LongDescription>
+        <RequiredInterfaceSet>
+          <Interface name="IF" type="IFType"></Interface>
+        </RequiredInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="x" type="Number"></Variable>
+            <Variable name="y" type="Number"></Variable>
+          </VariableSet>
+          <ParameterMapSet>
+            <ParameterMap variableRef="x" interface="IF" parameter="SyncParam" />
+            <ParameterMap variableRef="x" parameter="AsyncParam" interface="IF" />
+            <ParameterMap variableRef="x" parameter="AsyncRoParam" interface="IF" />
+            <ParameterMap variableRef="x" parameter="SyncRoParam" interface="IF" />
+          </ParameterMapSet>
+          <ActivitySet>
+            <Activity name="TestActivity">
+              <Body>
+                <SendParameterPrimitive interface="IF" parameter="SyncParam" operation="set">
+                  <ArgumentValue>
+                    <Value value="10" />
+                  </ArgumentValue>
+                </SendParameterPrimitive>
+                <SendParameterPrimitive interface="IF" parameter="SyncParam" operation="get">
+                  <ArgumentValue>
+                    <VariableRef variableRef="x" />
+                  </ArgumentValue>
+                </SendParameterPrimitive>
+                <SendParameterPrimitive interface="IF" parameter="AsyncParam" operation="set">
+                  <ArgumentValue>
+                    <Value value="10" />
+                  </ArgumentValue>
+                </SendParameterPrimitive>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="SM">
+              <EntryState name="s" />
+              <Transition fromState="s" toState="s" name="t1">
+                <OnParameterPrimitive interface="IF" parameter="AsyncParam" operation="get">
+                  <VariableRef variableRef="y"/>
+                </OnParameterPrimitive> />
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

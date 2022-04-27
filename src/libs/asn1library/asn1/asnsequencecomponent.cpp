@@ -30,12 +30,13 @@
 using namespace Asn1Acn;
 
 AsnSequenceComponent::AsnSequenceComponent(const QString &name, const QString &cName, bool optional,
-        std::optional<QString> defaultValue, const QString &presentWhen, const SourceLocation &location,
-        std::unique_ptr<Types::Type> type)
+        std::optional<QString> defaultValue, const QString &presentWhen, const Presence presence,
+        const SourceLocation &location, std::unique_ptr<Types::Type> type)
     : SequenceComponent(name, cName, std::move(type))
     , m_optional(optional)
     , m_defaultValue(std::move(defaultValue))
     , m_presentWhen(presentWhen)
+    , m_presence(presence)
     , m_location(location)
 {
 }
@@ -45,6 +46,7 @@ AsnSequenceComponent::AsnSequenceComponent(const AsnSequenceComponent &other)
     , m_optional(other.m_optional)
     , m_defaultValue(other.m_defaultValue)
     , m_presentWhen(other.m_presentWhen)
+    , m_presence(other.m_presence)
     , m_location(other.m_location)
 {
 }
@@ -57,6 +59,11 @@ QString AsnSequenceComponent::definitionAsString() const
 QString AsnSequenceComponent::presentWhen() const
 {
     return m_presentWhen;
+}
+
+AsnSequenceComponent::Presence AsnSequenceComponent::presence() const
+{
+    return m_presence;
 }
 
 void AsnSequenceComponent::accept(SequenceComponentVisitor &visitor)

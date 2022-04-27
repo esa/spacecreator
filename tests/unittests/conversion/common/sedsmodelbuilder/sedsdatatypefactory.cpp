@@ -50,12 +50,12 @@ ArrayDataType SedsDataTypeFactory::createArray(QString name, QString itemTypeNam
     return dataType;
 }
 
-BinaryDataType SedsDataTypeFactory::createBinary(QString name)
+BinaryDataType SedsDataTypeFactory::createBinary(QString name, uint64_t bits, bool fixedSize)
 {
     BinaryDataType dataType;
     dataType.setName(std::move(name));
-    dataType.setBits(42);
-    dataType.setFixedSize(false);
+    dataType.setBits(bits);
+    dataType.setFixedSize(fixedSize);
 
     return dataType;
 }

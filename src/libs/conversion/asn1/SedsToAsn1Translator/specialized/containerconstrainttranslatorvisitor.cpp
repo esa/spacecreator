@@ -19,6 +19,8 @@
 
 #include "specialized/containerconstrainttranslatorvisitor.h"
 
+#include "translator.h"
+
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
@@ -48,10 +50,11 @@ using seds::model::ContainerValueConstraint;
 
 namespace conversion::asn1::translator {
 
-ContainerConstraintTranslatorVisitor::ContainerConstraintTranslatorVisitor(
-        Asn1Acn::Types::Sequence *asn1Sequence, const seds::model::Package *sedsPackage)
+ContainerConstraintTranslatorVisitor::ContainerConstraintTranslatorVisitor(Asn1Acn::Types::Sequence *asn1Sequence,
+        const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages)
     : m_asn1Sequence(asn1Sequence)
     , m_sedsPackage(sedsPackage)
+    , m_sedsPackages(sedsPackages)
 {
 }
 
@@ -105,8 +108,14 @@ void ContainerConstraintTranslatorVisitor::applyContainerRangeConstraint(
 void ContainerConstraintTranslatorVisitor::applyContainerTypeConstraint(
         const ContainerTypeConstraint &typeConstraint, Asn1Acn::Types::Type *asn1Type) const
 {
-    const auto &referencedTypeName = typeConstraint.type().nameStr();
-    const auto referencedType = m_sedsPackage->dataType(referencedTypeName);
+    const auto &referencedTypeRef = typeConstraint.type();
+    const auto &referencedTypeName = referencedTypeRef.nameStr();
+
+    const auto sedsPackage = referencedTypeRef.packageStr()
+            ? SedsToAsn1Translator::getSedsPackage(*referencedTypeRef.packageStr(), m_sedsPackages)
+            : m_sedsPackage;
+
+    const auto referencedType = sedsPackage->dataType(referencedTypeName);
 
     if (!referencedType) {
         auto errorMessage = QString("ContainerTypeConstraint for \"%1\" refers to an unknown type \"%2\"")

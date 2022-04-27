@@ -218,7 +218,7 @@ model::Variable ComponentsParser::readVariable(QXmlStreamReader &xmlReader)
         if (DataTypesParser::processForField(&variable, attribute)) {
             continue;
         } else if (attribute.name() == QStringLiteral("initialValue")) {
-            variable.setInitialValue(attribute.name().toString());
+            variable.setInitialValue(attribute.value().toString());
         } else {
             throw UnhandledAttribute(attribute.name(), xmlReader.name());
         }
@@ -258,7 +258,7 @@ model::ParameterMap ComponentsParser::readParameterMap(QXmlStreamReader &xmlRead
         if (ComponentPrimitivesParser::processForParameterRefAttributes(&parameterMap, attribute)) {
             continue;
         } else if (attribute.name() == QStringLiteral("variableRef")) {
-            parameterMap.setVariableRef(attribute.name().toString());
+            parameterMap.setVariableRef(attribute.value().toString());
         } else {
             throw UnhandledAttribute(attribute.name(), xmlReader.name());
         }

@@ -21,14 +21,18 @@
 
 #include "base/qualifiedname.h"
 
+#include <optional>
+
 namespace seds::model {
 
 class DataTypeRef final
 {
 public:
     DataTypeRef() = default;
-    DataTypeRef(common::String name) noexcept;
+    DataTypeRef(common::String value) noexcept;
+    DataTypeRef(const DataTypeRef &) = default;
     DataTypeRef(DataTypeRef &&) = default;
+    DataTypeRef &operator=(const DataTypeRef &) = default;
     DataTypeRef &operator=(DataTypeRef &&) = default;
 
 public:
@@ -36,6 +40,10 @@ public:
 
 public:
     auto nameStr() const -> const QString &;
+    auto packageStr() const -> const std::optional<QString> &;
+
+    friend auto operator==(const DataTypeRef &lhs, const DataTypeRef &rhs) -> bool;
+    friend auto operator!=(const DataTypeRef &lhs, const DataTypeRef &rhs) -> bool;
 
 private:
     QualifiedName m_value;

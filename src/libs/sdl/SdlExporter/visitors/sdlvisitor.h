@@ -30,6 +30,7 @@
 #include <sdl/SdlModel/procedure.h>
 #include <sdl/SdlModel/procedurecall.h>
 #include <sdl/SdlModel/process.h>
+#include <sdl/SdlModel/return.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/signal.h>
 #include <sdl/SdlModel/state.h>
@@ -45,7 +46,7 @@ class SdlVisitor final : public Visitor
 {
 public:
     /**
-     * @brief   Simple layouter for ensuring that SLD entities do not overlap and therefore do not crash OpenGEODE
+     * @brief   Simple layouter for ensuring that SDL entities do not overlap and therefore do not crash OpenGEODE
      */
     class Layouter
     {
@@ -183,6 +184,13 @@ public:
         auto writeLine(const QString &line) -> void;
 
         /**
+         * @brief   Write a comment line - indent, comment and newline
+         *
+         * @param   comment   comment to write
+         */
+        auto writeComment(const QString &line) -> void;
+
+        /**
          * @brief   Push indent onto the top of the indent stack
          *
          * @param   indent   additional indent amount
@@ -290,7 +298,14 @@ public:
      *
      * @param   join   join to be serialized
      */
-    virtual auto visit(const Join &join) -> void override;
+    auto visit(const Join &join) -> void override;
+
+    /**
+     * @brief   Return visitor
+     *
+     * @param   ret   return to be serialized
+     */
+    auto visit(const Return &ret) -> void override;
 
     /**
      * @brief   Answer visitor

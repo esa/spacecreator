@@ -22,6 +22,7 @@
 #include "node.h"
 #include "procedureparameter.h"
 #include "transition.h"
+#include "variablereference.h"
 
 #include <QString>
 #include <memory>
@@ -40,12 +41,10 @@ public:
      * @param   name   name of the element
      */
     Procedure(QString name = "");
-
     /**
      * @brief   Deleted copy constructor
      */
     Procedure(const Procedure &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -55,19 +54,18 @@ public:
      * @brief   Deleted copy assignment operator
      */
     Procedure &operator=(const Procedure &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     Procedure &operator=(Procedure &&) = default;
 
+public:
     /**
      * @brief   Getter for the transition
      *
      * @return  a pointer to transition which should be triggered when this procedure is called
      */
     auto transition() const -> Transition *;
-
     /**
      * @brief   Setter for the transition
      *
@@ -76,12 +74,24 @@ public:
     auto setTransition(std::unique_ptr<Transition> transition) -> void;
 
     /**
+     * @brief   Getter for the variables declared in this procedure
+     *
+     * @return  Procedure variables
+     */
+    auto variables() const -> const std::vector<std::unique_ptr<VariableDeclaration>> &;
+    /**
+     * @brief   Adds variable declaration to this procedure
+     *
+     * @param   variable    Variable to add
+     */
+    auto addVariable(std::unique_ptr<VariableDeclaration> variable) -> void;
+
+    /**
      * @brief   Getter for the parameters
      *
      * @return  a vector of parameters
      */
     auto parameters() const -> const std::vector<std::unique_ptr<ProcedureParameter>> &;
-
     /**
      * @brief   Add a procedure parameter
      *
@@ -90,18 +100,17 @@ public:
     auto addParameter(std::unique_ptr<ProcedureParameter> parameter) -> void;
 
     /**
-     * @brief   Getter for the return variable declaration
+     * @brief   Getter for the return type
      *
-     * @return  return variable declaration
+     * @return  return type
      */
-    auto returnVariableDeclaration() const -> VariableDeclaration *;
-
+    auto returnType() const -> const QString &;
     /**
-     * @brief   Setter for the return variable declaration
+     * @brief   Setter for the return type
      *
-     * @param   declaration     return variable declaration
+     * @param   returnType      return type
      */
-    auto setReturnVariableDeclaration(std::unique_ptr<VariableDeclaration> declaration) -> void;
+    auto setReturnType(QString returnType) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
@@ -110,8 +119,9 @@ public:
 
 private:
     std::unique_ptr<Transition> m_implementation; // Null if external
+    std::vector<std::unique_ptr<VariableDeclaration>> m_variables;
     std::vector<std::unique_ptr<ProcedureParameter>> m_parameters;
-    std::unique_ptr<VariableDeclaration> m_returnVariableDeclaration;
+    QString m_returnType;
 };
 
 } // namespace sdl

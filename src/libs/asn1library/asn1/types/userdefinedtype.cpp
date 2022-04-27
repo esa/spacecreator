@@ -53,6 +53,11 @@ QString UserdefinedType::typeName() const
     return m_name;
 }
 
+void UserdefinedType::setTypeName(QString name)
+{
+    m_name = std::move(name);
+}
+
 QString UserdefinedType::label() const
 {
     return ": " + m_module + "." + typeName();
