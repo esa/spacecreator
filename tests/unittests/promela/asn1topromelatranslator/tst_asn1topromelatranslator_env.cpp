@@ -492,7 +492,6 @@ static void checkSequenceInlineDefinitions(
 
     for (const auto &promelaInlineDef : promelaInlineDefs) {
         auto *const inlineDefPtr = promelaInlineDef.get();
-
         QCOMPARE(inlineDefPtr->getName(), *expectedDefNameIt++);
 
         const auto &definitionArguments = inlineDefPtr->getArguments();

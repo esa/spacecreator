@@ -32,13 +32,13 @@ using promela::model::VariableRef;
 
 namespace promela::translator {
 
-std::unique_ptr<ProctypeElement> ProctypeMaker::makeInlineCall(Asn1Acn::AsnSequenceComponent *const envGeneratorInline,
-        const QString &callArgumentName, const QString &generatorInlineName)
+std::unique_ptr<ProctypeElement> ProctypeMaker::makeInlineCall(
+        const QString &inlineName, const QString &structureName, const QString &memberName)
 {
-    const QString inlineCallArgument = QString("%1.%2").arg(callArgumentName).arg(envGeneratorInline->name());
+    const QString inlineCallArgument = QString("%1.%2").arg(structureName).arg(memberName);
     QList<promela::model::InlineCall::Argument> args({ promela::model::InlineCall::Argument(inlineCallArgument) });
 
-    auto inlineCall = promela::model::InlineCall(generatorInlineName, args);
+    auto inlineCall = promela::model::InlineCall(inlineName, args);
     return std::make_unique<ProctypeElement>(std::move(inlineCall));
 }
 
@@ -53,9 +53,9 @@ std::unique_ptr<ProctypeElement> ProctypeMaker::makeTrueExpressionProctypeElemen
 }
 
 std::unique_ptr<ProctypeElement> ProctypeMaker::makeAssignmentProctypeElement(
-        const QString &valueName, const int32_t value)
+        const QString &variableName, const int32_t value)
 {
-    Assignment valueExistAssignment((VariableRef(valueName)), Expression(Constant(value)));
+    Assignment valueExistAssignment((VariableRef(variableName)), Expression(Constant(value)));
 
     return std::make_unique<ProctypeElement>(std::move(valueExistAssignment));
 }

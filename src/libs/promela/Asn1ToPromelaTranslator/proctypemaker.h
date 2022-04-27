@@ -20,26 +20,54 @@
 #pragma once
 
 #include <QString>
-#include <asnsequencecomponent.h>
 #include <memory>
 #include <promela/PromelaModel/proctypeelement.h>
 #include <promela/PromelaModel/sequence.h>
 
-using Asn1Acn::AsnSequenceComponent;
 using promela::model::ProctypeElement;
 
 namespace promela::translator {
 /**
- * @brief Make promela proctype entities
+ * @brief Make promela proctype element entities
  */
 class ProctypeMaker final
 {
 public:
-    static auto makeInlineCall(AsnSequenceComponent *envGeneratorInline, const QString &callArgumentName,
-            const QString &generatorInlineName) -> std::unique_ptr<ProctypeElement>;
+    /**
+     * @brief make ProctypeElement with InlineCall
+     *
+     * @param inlineName     name of selected inline
+     * @param structureName  name of a variable to be passed as call argument
+     * @param memberName     name of a member of the structure
+     *
+     * @return  ProctypeElement with specified InlineCall
+     */
+    static auto makeInlineCall(const QString &inlineName, const QString &structureName, const QString &memberName)
+            -> std::unique_ptr<ProctypeElement>;
+
+    /**
+     * @brief make empty promela Sequence of NORMAL type
+     *
+     * @return promela Sequence
+     */
     static auto makeNormalSequence() -> std::unique_ptr<promela::model::Sequence>;
+
+    /**
+     * @brief make ProctypeElement with Expression with value "true"
+     *
+     * @return ProctypeElement with Expression with value "true"
+     */
     static auto makeTrueExpressionProctypeElement() -> std::unique_ptr<ProctypeElement>;
-    static auto makeAssignmentProctypeElement(const QString &valueName, int32_t value)
+
+    /**
+     * @brief make ProctypeElement with Assignment
+     *
+     * @param variableName variable to which the value will be assigned
+     * @param value        value which will be assigned to the variable
+     *
+     * @return ProctypeElement with specified Assignment
+     */
+    static auto makeAssignmentProctypeElement(const QString &variableName, int32_t value)
             -> std::unique_ptr<ProctypeElement>;
 };
 

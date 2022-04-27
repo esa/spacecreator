@@ -134,6 +134,8 @@ public:
 private:
     auto createValueGenerationInline(::promela::model::Sequence sequence) -> void;
     auto getAsnSequenceComponentType(Asn1Acn::AsnSequenceComponent *component) -> Asn1Acn::Types::Type *;
+    auto getSequenceComponentTypeName(const Asn1Acn::AsnSequenceComponent &asnComponent, const QString &sequenceName)
+            -> QString;
     auto generateAsnSequenceComponentInline(Asn1Acn::AsnSequenceComponent *asnSequenceComponent,
             const QString &argumentName) -> std::unique_ptr<model::ProctypeElement>;
 
