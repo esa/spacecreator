@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2022 N7 Space Sp. z o.o.
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,68 +19,73 @@
 
 #pragma once
 
-#include <QString>
-#include <asn1library/asn1/patchersnippet.h>
-#include <seds/SedsModel/types/containerdatatype.h>
-#include <seds/SedsModel/types/encodings/integerdataencoding.h>
-#include <seds/SedsModel/types/entries/entrytype.h>
-#include <vector>
+#include "context.h"
 
-namespace seds::model {
-class Package;
-} // namespace seds::model
+#include <asn1library/asn1/types/sequence.h>
+#include <seds/SedsModel/types/containerdatatype.h>
+#include <vector>
 
 namespace conversion::asn1::translator {
 
-/**
- * @brief   Generator for functions for patching ErrorControlEntry and LengthEntry
- */
 class PatcherSnippetsGenerator final
 {
 public:
     /**
      * @brief   Constructor
      *
-     * @param   sedsPackage         Parent SEDS package
-     * @param   sedsPackages        List of SEDS packages
+     * @param   context     Current translation context
+     * @param   container   Parent SEDS container
+     * @param   sequence    ASN.1 sequence where translated entries will be added
      */
     PatcherSnippetsGenerator(
-            const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages);
+            Context &context, const seds::model::ContainerDataType &container, Asn1Acn::Types::Sequence *sequence);
+    /**
+     * @brief   Deleted copy constructor
+     */
+    PatcherSnippetsGenerator(const PatcherSnippetsGenerator &) = delete;
+    /**
+     * @brief   Deleted move constructor
+     */
+    PatcherSnippetsGenerator(PatcherSnippetsGenerator &&) = delete;
+
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    PatcherSnippetsGenerator &operator=(const PatcherSnippetsGenerator &) = delete;
+    /**
+     * @brief   Deleted move assignment operator
+     */
+    PatcherSnippetsGenerator &operator=(PatcherSnippetsGenerator &&) = delete;
 
 public:
-    /**
-     * @brief   Generate patcher functions for given container
-     *
-     * @param   sedsType        Source container
-     *
-     * @return  Patcher functions
-     */
-    auto generate(const seds::model::ContainerDataType &sedsType) const -> std::vector<Asn1Acn::PatcherSnippet>;
+    auto generate() -> void;
 
 private:
-    auto buildErrorControlEntryFunction(const seds::model::ErrorControlEntry &errorControlEntry,
-            const QString &sequenceName) const -> Asn1Acn::PatcherSnippet;
-    auto buildLengthEntryFunction(const seds::model::LengthEntry &lengthEntry, const QString &sequenceName) const
-            -> Asn1Acn::PatcherSnippet;
+    auto generatePatcherSnippets(const seds::model::ContainerDataType &container) -> void;
 
-    auto buildErrorControlEntryEncodingFunction(const seds::model::ErrorControlEntry &entry, const uint64_t bits,
-            const QString &sequenceName) const -> QString;
-    auto buildErrorControlEntryDecodingValidator(const seds::model::ErrorControlEntry &entry, const uint64_t bits,
-            const QString &sequenceName) const -> QString;
-    auto buildLengthEntryEncodingFunction(const seds::model::IntegerDataEncoding &encoding, const QString &sequenceName,
-            const QString &entryName) const -> QString;
-    auto buildLengthEntryDecodingValidator(const seds::model::IntegerDataEncoding &encoding,
-            const QString &sequenceName, const QString &entryName) const -> QString;
+    auto buildErrorControlEntryFunction(const seds::model::ErrorControlEntry &errorControlEntry) -> void;
+    auto buildLengthEntryFunction(const seds::model::LengthEntry &lengthEntry) -> void;
 
-    auto getErrorControlBitCount(const seds::model::ErrorControlEntry &lengthEntry) const -> uint64_t;
-    auto getLengthEncoding(const seds::model::LengthEntry &lengthEntry) const
-            -> const seds::model::IntegerDataEncoding &;
+    auto buildErrorControlEntryEncodingFunction(
+            const seds::model::ErrorControlEntry &entry, const uint64_t bitCount) const -> QString;
+    auto buildErrorControlEntryDecodingValidator(
+            const seds::model::ErrorControlEntry &entry, const uint64_t bitCount) const -> QString;
+    auto buildLengthEntryEncodingFunction(
+            const seds::model::IntegerDataEncoding &encoding, const QString &entryName) const -> QString;
+    auto buildLengthEntryDecodingValidator(
+            const seds::model::IntegerDataEncoding &encoding, const QString &entryName) const -> QString;
+
+    auto getErrorControlBitCount(const seds::model::ErrorControlEntry &entry) const -> uint64_t;
+    auto getLengthEncoding(const seds::model::LengthEntry &entry) const -> const seds::model::IntegerDataEncoding &;
 
 private:
-    /// @brief  Parent package
-    const seds::model::Package *m_sedsPackage;
-    /// @brief  List of SEDS packages
-    const std::vector<seds::model::Package> &m_sedsPackages;
+    Context &m_context;
+
+    const seds::model::ContainerDataType &m_container;
+    Asn1Acn::Types::Sequence *m_sequence;
+
+    inline static const QString m_encodingFunctionTemplate = "%1-encoding-function";
+    inline static const QString m_decodingValidatorTemplate = "%1-decoding-validator";
 };
 
 } // namespace conversion::asn1::translator

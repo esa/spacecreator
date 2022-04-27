@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2022 N7 Space Sp. z o.o.
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,43 +20,59 @@
 #include "patchersnippetsgenerator.h"
 
 #include <QTextStream>
-#include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/package/package.h>
-#include <seds/SedsModel/types/integerdatatype.h>
 
 using conversion::translator::TranslationException;
 
 namespace conversion::asn1::translator {
 
 PatcherSnippetsGenerator::PatcherSnippetsGenerator(
-        const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages)
-    : m_sedsPackage(sedsPackage)
-    , m_sedsPackages(sedsPackages)
+        Context &context, const seds::model::ContainerDataType &container, Asn1Acn::Types::Sequence *sequence)
+    : m_context(context)
+    , m_container(container)
+    , m_sequence(sequence)
 {
-    Q_UNUSED(m_sedsPackage);
-    Q_UNUSED(m_sedsPackages);
 }
 
-std::vector<Asn1Acn::PatcherSnippet> PatcherSnippetsGenerator::generate(
-        const seds::model::ContainerDataType &sedsType) const
+void PatcherSnippetsGenerator::generate()
 {
-    const auto sequenceName = Escaper::escapeCSequenceName(sedsType.nameStr());
+    generatePatcherSnippets(m_container);
 
-    std::vector<Asn1Acn::PatcherSnippet> result;
+    if (!m_sequence->patcherSnippets().empty()) {
+        const auto &sequenceName = m_sequence->identifier();
 
-    for (const auto &entry : sedsType.entries()) {
+        m_sequence->setPostEncodingFunction(m_encodingFunctionTemplate.arg(sequenceName.toLower()));
+        m_sequence->setPostDecodingValidator(m_decodingValidatorTemplate.arg(sequenceName).toLower());
+    }
+}
+
+void PatcherSnippetsGenerator::generatePatcherSnippets(const seds::model::ContainerDataType &container)
+{
+    if (container.baseType()) {
+        const auto baseType = m_context.findSedsType(*container.baseType());
+        const auto baseContainerType = std::get_if<seds::model::ContainerDataType>(baseType);
+
+        if (baseContainerType == nullptr) {
+            auto errorMessage = QString("Container '%1' has a base type '%2' that is not a container")
+                                        .arg(container.nameStr())
+                                        .arg(dataTypeNameStr(*baseType));
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        generatePatcherSnippets(*baseContainerType);
+    }
+
+    for (const auto &entry : container.entries()) {
         // clang-format off
         std::visit(overloaded {
             [&](const seds::model::ErrorControlEntry &errorControlEntry) {
-                auto patcherSnippet = buildErrorControlEntryFunction(errorControlEntry, sequenceName);
-                result.push_back(std::move(patcherSnippet));
+                buildErrorControlEntryFunction(errorControlEntry);
             },
             [&](const seds::model::LengthEntry &lengthEntry) {
-                auto patcherSnippet = buildLengthEntryFunction(lengthEntry, sequenceName);
-                result.push_back(std::move(patcherSnippet));
+                buildLengthEntryFunction(lengthEntry);
             },
             [&](const auto &e) {
                 Q_UNUSED(e)
@@ -64,37 +80,33 @@ std::vector<Asn1Acn::PatcherSnippet> PatcherSnippetsGenerator::generate(
         }, entry);
         // clang-format on
     }
-
-    return result;
 }
 
-Asn1Acn::PatcherSnippet PatcherSnippetsGenerator::buildErrorControlEntryFunction(
-        const seds::model::ErrorControlEntry &errorControlEntry, const QString &sequenceName) const
+void PatcherSnippetsGenerator::buildErrorControlEntryFunction(const seds::model::ErrorControlEntry &errorControlEntry)
 {
     const auto bitCount = getErrorControlBitCount(errorControlEntry);
 
-    auto encodingFunction = buildErrorControlEntryEncodingFunction(errorControlEntry, bitCount, sequenceName);
-    auto decodingValidator = buildErrorControlEntryDecodingValidator(errorControlEntry, bitCount, sequenceName);
+    auto encodingFunction = buildErrorControlEntryEncodingFunction(errorControlEntry, bitCount);
+    auto decodingValidator = buildErrorControlEntryDecodingValidator(errorControlEntry, bitCount);
 
-    return { std::move(encodingFunction), std::move(decodingValidator) };
+    m_sequence->addPatcherSnippet({ std::move(encodingFunction), std::move(decodingValidator) });
 }
 
-Asn1Acn::PatcherSnippet PatcherSnippetsGenerator::buildLengthEntryFunction(
-        const seds::model::LengthEntry &lengthEntry, const QString &sequenceName) const
+void PatcherSnippetsGenerator::buildLengthEntryFunction(const seds::model::LengthEntry &lengthEntry)
 {
+    const auto entryName = Escaper::escapeCFieldName(lengthEntry.nameStr());
     const auto &encoding = getLengthEncoding(lengthEntry);
 
-    const auto entryName = Escaper::escapeCFieldName(lengthEntry.nameStr());
+    auto encodingFunction = buildLengthEntryEncodingFunction(encoding, entryName);
+    auto decodingValidator = buildLengthEntryDecodingValidator(encoding, entryName);
 
-    auto encodingFunction = buildLengthEntryEncodingFunction(encoding, sequenceName, entryName);
-    auto decodingValidator = buildLengthEntryDecodingValidator(encoding, sequenceName, entryName);
-
-    return { std::move(encodingFunction), std::move(decodingValidator) };
+    m_sequence->addPatcherSnippet({ std::move(encodingFunction), std::move(decodingValidator) });
 }
 
 QString PatcherSnippetsGenerator::buildErrorControlEntryEncodingFunction(
-        const seds::model::ErrorControlEntry &entry, const uint64_t bitCount, const QString &sequenceName) const
+        const seds::model::ErrorControlEntry &entry, const uint64_t bitCount) const
 {
+    const auto sequenceName = Escaper::escapeCSequenceName(m_container.nameStr());
     const auto entryName = Escaper::escapeCFieldName(entry.nameStr());
 
     QString buffer;
@@ -141,8 +153,9 @@ QString PatcherSnippetsGenerator::buildErrorControlEntryEncodingFunction(
 }
 
 QString PatcherSnippetsGenerator::buildErrorControlEntryDecodingValidator(
-        const seds::model::ErrorControlEntry &entry, const uint64_t bitCount, const QString &sequenceName) const
+        const seds::model::ErrorControlEntry &entry, const uint64_t bitCount) const
 {
+    const auto sequenceName = Escaper::escapeCSequenceName(m_container.nameStr());
     const auto entryName = Escaper::escapeCFieldName(entry.nameStr());
 
     QString buffer;
@@ -194,8 +207,10 @@ QString PatcherSnippetsGenerator::buildErrorControlEntryDecodingValidator(
 }
 
 QString PatcherSnippetsGenerator::buildLengthEntryEncodingFunction(
-        const seds::model::IntegerDataEncoding &encoding, const QString &sequenceName, const QString &entryName) const
+        const seds::model::IntegerDataEncoding &encoding, const QString &entryName) const
 {
+    const auto sequenceName = Escaper::escapeCSequenceName(m_container.nameStr());
+
     QString buffer;
     QTextStream stream(&buffer, QIODevice::WriteOnly);
 
@@ -235,8 +250,10 @@ QString PatcherSnippetsGenerator::buildLengthEntryEncodingFunction(
 }
 
 QString PatcherSnippetsGenerator::buildLengthEntryDecodingValidator(
-        const seds::model::IntegerDataEncoding &encoding, const QString &sequenceName, const QString &entryName) const
+        const seds::model::IntegerDataEncoding &encoding, const QString &entryName) const
 {
+    const auto sequenceName = Escaper::escapeCSequenceName(m_container.nameStr());
+
     QString buffer;
     QTextStream stream(&buffer, QIODevice::WriteOnly);
 
@@ -283,66 +300,43 @@ QString PatcherSnippetsGenerator::buildLengthEntryDecodingValidator(
 
 uint64_t PatcherSnippetsGenerator::getErrorControlBitCount(const seds::model::ErrorControlEntry &entry) const
 {
-    // TODO
-    Q_UNUSED(entry);
-    return 0;
-    /* const auto &entryTypeRef = entry.type(); */
+    const auto entryType = m_context.findSedsType(entry.type());
+    const auto entryBinaryType = std::get_if<seds::model::BinaryDataType>(entryType);
 
-    /* const auto sedsPackage = entryTypeRef.packageStr() */
-    /*         ? SedsToAsn1Translator::getSedsPackage(*entryTypeRef.packageStr(), m_sedsPackages) */
-    /*         : m_sedsPackage; */
+    if (!entryBinaryType) {
+        auto errorMessage =
+                QString("Error control entry \"%1\" has to have binary as an underlying type").arg(entry.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
 
-    /* const auto entryType = sedsPackage->dataType(entryTypeRef.nameStr()); */
+    if (!entryBinaryType->hasFixedSize()) {
+        auto errorMessage =
+                QString("Error control entry \"%1\" underlying type has to be fixed size").arg(entry.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
 
-    /* const auto entryBinaryType = std::get_if<seds::model::BinaryDataType>(entryType); */
-
-    /* if (!entryBinaryType) { */
-    /*     auto errorMessage = */
-    /*             QString("Error control entry \"%1\" has to have binary as an underlying type").arg(entry.nameStr());
-     */
-    /*     throw TranslationException(std::move(errorMessage)); */
-    /* } */
-
-    /* if (!entryBinaryType->hasFixedSize()) { */
-    /*     auto errorMessage = */
-    /*             QString("Error control entry \"%1\" underlying type has to be fixed size").arg(entry.nameStr()); */
-    /*     throw TranslationException(std::move(errorMessage)); */
-    /* } */
-
-    /* return entryBinaryType->bits(); */
+    return entryBinaryType->bits();
 }
-
 const seds::model::IntegerDataEncoding &PatcherSnippetsGenerator::getLengthEncoding(
         const seds::model::LengthEntry &entry) const
 {
-    // TODO
-    Q_UNUSED(entry);
-    static auto encoding = seds::model::IntegerDataEncoding();
-    return encoding;
-    /* const auto &entryTypeRef = entry.type(); */
+    const auto entryType = m_context.findSedsType(entry.type());
+    const auto entryIntegerType = std::get_if<seds::model::IntegerDataType>(entryType);
 
-    /* const auto sedsPackage = entryTypeRef.packageStr() */
-    /*         ? SedsToAsn1Translator::getSedsPackage(*entryTypeRef.packageStr(), m_sedsPackages) */
-    /*         : m_sedsPackage; */
+    if (!entryIntegerType) {
+        auto errorMessage =
+                QString("Length entry \"%1\" has to have integer as an underlying type").arg(entry.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
 
-    /* const auto entryType = sedsPackage->dataType(entryTypeRef.nameStr()); */
+    const auto &entryIntegerEncoding = entryIntegerType->encoding();
 
-    /* const auto entryIntegerType = std::get_if<seds::model::IntegerDataType>(entryType); */
+    if (!entryIntegerEncoding.has_value()) {
+        auto errorMessage = QString("Entry \"%1\" has to have encoding").arg(entry.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
 
-    /* if (!entryIntegerType) { */
-    /*     auto errorMessage = */
-    /*             QString("Length entry \"%1\" has to have integer as an underlying type").arg(entry.nameStr()); */
-    /*     throw TranslationException(std::move(errorMessage)); */
-    /* } */
-
-    /* const auto &entryIntegerEncoding = entryIntegerType->encoding(); */
-
-    /* if (!entryIntegerEncoding.has_value()) { */
-    /*     auto errorMessage = QString("Entry \"%1\" has to have encoding").arg(entry.nameStr()); */
-    /*     throw TranslationException(std::move(errorMessage)); */
-    /* } */
-
-    /* return entryIntegerEncoding.value(); */
+    return entryIntegerEncoding.value();
 }
 
 } // namespace conversion::asn1::translator

@@ -19,6 +19,7 @@
 
 #include "specialized/containerdatatypetranslator.h"
 
+#include "patchersnippetsgenerator.h"
 #include "specialized/containerconstrainttranslatorvisitor.h"
 
 #include <asn1library/asn1/asnsequencecomponent.h>
@@ -49,6 +50,9 @@ void ContainerDataTypeTranslator::translate(const seds::model::ContainerDataType
         handleEntries(sedsType.entries(), entryTranslator);
         handleTrailerEntries(sedsType.trailerEntries(), entryTranslator);
         handleBaseTypeTrailerEntries(sedsType, entryTranslator);
+
+        PatcherSnippetsGenerator patcherSnippetsGenerator(m_context, sedsType, asn1Type.get());
+        patcherSnippetsGenerator.generate();
     }
 
     if (sedsType.baseType()) {
