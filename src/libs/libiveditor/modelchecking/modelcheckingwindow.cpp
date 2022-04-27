@@ -153,7 +153,6 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     if (makeSleletonsCallerProcess->execute(makeSkeletonsCall) != 0) {
         QMessageBox::warning(this, tr("Make skeletons call"),
                              "Error when making skeletons!");
-        //return;
     }
     // reset path
     QDir::setCurrent(qDirAppPath);
@@ -167,7 +166,6 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     if (kazooCallerProcess->execute(kazooCall) != 0) {
         QMessageBox::warning(this, tr("Kazoo call"),
                              "Error when calling kazoo!");
-        //return;
     }
     // reset path
     QDir::setCurrent(qDirAppPath);
@@ -399,12 +397,10 @@ void ModelCheckingWindow::on_treeWidget_properties_itemDoubleClicked(QTreeWidget
     }
     // is property file
     QFileInfo fileInfo(item->text(1)); // text(1) of file hosts the file absolute path
-    //QProcess *process = new QProcess(this);
     QString cmd;
     if (fileInfo.completeSuffix() == "msc"){
         // TODO use standard .AppImage
         cmd = "/home/taste/spacecreator/package/spacecreator-x86_64-0.12.0.AppImage -client " + item->text(1);
-        //cmd = "msceditor -m " + item->text(1);
     } else{ // then has to be a .pr file
         cmd = "opengeode " + item->text(1);
     }
@@ -518,9 +514,6 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     if (QProcess::execute(callIFCmd) != 0) {
         QMessageBox::warning(this, tr("Call IF"),
                              "Error executing: " + callIFCmd);
-        // reset path
-        // QDir::setCurrent(qDirAppPath);
-        // return;
     }
 
     // READ statusfile with make return value
@@ -533,16 +526,10 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
         if (makeReturn != 0) {
             QMessageBox::warning(this, tr("Call IF"),
                                  "Error executing: make model-check - make return: " + QString::number(makeReturn));
-            // reset path and return
-            // QDir::setCurrent(qDirAppPath);
-            // return;
         }
     } else {
         QMessageBox::warning(this, tr("Call IF"),
                              "Error opening status file!");
-        // reset path
-        // QDir::setCurrent(qDirAppPath);
-        // return;
     }
 
     // CHECK output dir exists
@@ -608,7 +595,6 @@ void ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked(QTreeWidgetIte
     if (fileInfo.completeSuffix() == "msc"){
         // TODO use standard .AppImage
         cmd = "/home/taste/spacecreator/package/spacecreator-x86_64-0.12.0.AppImage -client " + item->text(1);
-        //cmd = "msceditor -m " + item->text(1);
     } else{
         cmd = "kate " + item->text(1);
     }
@@ -833,7 +819,6 @@ void ModelCheckingWindow::addSubtypes()
         QStringList fileColumn;
         QFileInfo fileInfo = filePath;
         fileColumn.append(fileInfo.fileName());
-        //fileColumn.append("Abstract Syntax Notation One (ASN.1)");
         fileColumn.append(fileInfo.filePath());
         QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
         child->setIcon(0, this->style()->standardIcon(QStyle::SP_TitleBarNormalButton));
@@ -998,11 +983,6 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
 
     // check if current configuration is valid
     QString warningMsg = "Current invalid configuration.";
-    /*if (propsSelection.size() < 1) {
-        QMessageBox::warning(this, tr("Save configuration"),
-                             warningMsg.append(" Select at least one property."));
-        return;
-    }*/
     if (subtypesSelection.size() > 1){
         QMessageBox::warning(this, tr("Save configuration"),
                              warningMsg.append(" Select up to one subtyping."));
@@ -1066,11 +1046,6 @@ bool ModelCheckingWindow::saveConfiguration()
 
     // check if current configuration is valid
     QString warningMsg = "Current invalid configuration.";
-    /*if (propsSelection.size() < 1) {
-        QMessageBox::warning(this, tr("Save configuration"),
-                             warningMsg.append(" Select at least one property."));
-        return false;
-    }*/
     if (subtypesSelection.size() > 1){
         QMessageBox::warning(this, tr("Save configuration"),
                              warningMsg.append(" Select up to one subtyping."));
@@ -1105,7 +1080,6 @@ bool ModelCheckingWindow::saveConfiguration()
     ifOptions.append(d->ui->lineEdit_maxNumStates->text());
     XmelWriter writer(propsSelection, subtypesSelection, functionSelection, ifOptions);
     if (writer.writeFile(&file, fileName + ".xml")){
-        //statusBar()->showMessage("Configuration file saved as " + fileName + ".xml", 6000);
         return true;
     } else {
         QMessageBox::warning(this, tr("Save configuration"),
