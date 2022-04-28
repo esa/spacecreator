@@ -146,8 +146,8 @@ bool TmcConverter::convertModel(const std::set<conversion::ModelType> &sourceMod
     return false;
 }
 
-auto TmcConverter::integrateObserver(QString observerSpecification, QStringList observerFilenames,
-        QStringList &asn1Files, QStringList attachmentInfos)
+auto TmcConverter::integrateObserver(
+        QString observerSpecification, QStringList &observerNames, QStringList &asn1Files, QStringList &attachmentInfos)
 {
     std::cout << "spec -> " << observerSpecification.toStdString() << "\n";
     const auto separator = ":";
@@ -171,20 +171,23 @@ auto TmcConverter::integrateObserver(QString observerSpecification, QStringList 
             QFileInfo(directory.absolutePath() + QDir::separator() + processName.toLower() + "_datamodel.asn");
     // const auto dataview = QFileInfo(directory.absolutePath() + QDir::separator() + "dataview-uniq.asn");
 
-    ProcessMetadata meta(processName, structure, process, datamodel, QList<QFileInfo>());
+    ProcessMetadata meta(Escaper::escapePromelaName(processName), structure, process, datamodel, QList<QFileInfo>());
     SdlToPromelaConverter sdl2Promela;
 
-    const auto promelaFilename = processName + ".pml";
-    const auto infoPath = outputFilepath(processName + ".info");
-    observerFilenames.append(promelaFilename);
+    const auto promelaFilename = Escaper::escapePromelaName(processName) + ".pml";
+    const auto infoPath = outputFilepath(Escaper::escapePromelaName(processName) + ".info");
+    observerNames.append(Escaper::escapePromelaName(processName));
     sdl2Promela.convertObserverSdl(meta, outputFilepath(promelaFilename), infoPath);
     QFile infoFile(infoPath.absoluteFilePath());
     if (infoFile.open(QIODevice::ReadOnly)) {
         QTextStream in(&infoFile);
         while (!in.atEnd()) {
-            attachmentInfos.append(in.readLine() + ":" + priority);
+            attachmentInfos.append(in.readLine() + ":" + QString::number(priority));
+            std::cout << "Appended -> " << attachmentInfos.last().toStdString() << std::endl;
         }
         infoFile.close();
+    } else {
+        throw "";
     }
     // asn1Files.append(dataview.absoluteFilePath());
     asn1Files.append(datamodel.absoluteFilePath());
@@ -251,7 +254,7 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
     QStringList asn1Files;
 
     for (auto &attachment : m_observerAttachments) {
-        integrateObserver(attachment, m_observerFiles, asn1Files, m_observerAttachmentInfos);
+        integrateObserver(attachment, m_observerNames, asn1Files, m_observerAttachmentInfos);
     }
 
     const QFileInfo simuDataView = simuDataViewLocation();
@@ -323,11 +326,12 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
         options.add(PromelaOptions::environmentFunctionName, function);
     }
 
-    for (auto &observerFilename : m_observerFiles) {
-        options.add(PromelaOptions::additionalIncludes, observerFilename);
+    for (const QString &observer : m_observerNames) {
+        options.add(PromelaOptions::observerFunctionName, observer);
     }
 
     for (auto &info : m_observerAttachmentInfos) {
+        std::cout << "Attaching observer info -> " << info.toStdString() << std::endl;
         options.add(PromelaOptions::observerAttachment, info);
     }
 

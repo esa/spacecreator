@@ -8,7 +8,7 @@ TMC=$SPACECREATOR_BUILD_DIR/bin/tmc
 DIFF="diff -w -B"
 TEST_OUTPUT_DIR=output
 RESOURCE_DIR=resources/InputMonitoring
-PROPERTIES_DIR=$RESOURCE_DIR/work/modelchecking/properties/
+PROPERTIES_DIR=$RESOURCE_DIR/work/modelchecking/properties
 
 echo "Running TMC test: ${0##*/}'"
 

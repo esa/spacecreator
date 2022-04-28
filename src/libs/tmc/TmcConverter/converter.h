@@ -81,8 +81,8 @@ private:
     bool convertModel(const std::set<conversion::ModelType> &sourceModelTypes, conversion::ModelType targetModelType,
             const std::set<conversion::ModelType> &auxilaryModelTypes, conversion::Options options) const;
 
-    auto integrateObserver(QString observerSpecification, QStringList observerFilenames, QStringList &asn1Files,
-            QStringList attachmentInfos);
+    auto integrateObserver(QString observerSpecification, QStringList &observerNames, QStringList &asn1Files,
+            QStringList &attachmentInfos);
     bool convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles);
 
     bool convertStopConditions(const std::map<QString, ProcessMetadata> &allSdlFiles);
@@ -120,7 +120,7 @@ private:
     QStringList m_stopConditionsFiles;
     QStringList m_observerAttachments;
     QStringList m_observerAttachmentInfos;
-    QStringList m_observerFiles;
+    QStringList m_observerNames;
 
     conversion::Registry m_registry;
 };

@@ -128,7 +128,7 @@ private:
     auto createCheckQueueInline(::promela::model::PromelaModel *promelaModel, const QString &functionName,
             QList<QString> &channelNames) const -> void;
     auto createSystemState(::promela::model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,
-            const std::vector<QString> &modelFunctions) const -> void;
+            const std::vector<QString> &modelFunctions, const std::vector<QString> &observers) const -> void;
 
     auto containsContextVariables(const QVector<shared::ContextParameter> &parameters) const -> bool;
     auto constructChannelName(const QString &functionName, const QString &interfaceName) const -> QString;

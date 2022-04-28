@@ -21,6 +21,7 @@
 
 #include <QDebug>
 #include <conversion/common/escaper/escaper.h>
+#include <iostream>
 #include <ivcore/ivconnection.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
@@ -168,10 +169,16 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     const std::vector<QString> additionalIncludes = options.values(PromelaOptions::additionalIncludes);
     const std::vector<QString> modelFunctions = options.values(PromelaOptions::modelFunctionName);
     const std::vector<QString> environmentFunctions = options.values(PromelaOptions::environmentFunctionName);
-
+    const std::vector<QString> observerAttachmentInfos = options.values(PromelaOptions::observerAttachment);
+    const std::vector<QString> observerNames = options.values(PromelaOptions::observerFunctionName);
     std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
 
     Context context(promelaModel.get());
+
+    for (const auto &info : observerAttachmentInfos) {
+        std::cout << "Adding -> " << info.toStdString() << std::endl;
+        context.addObserverAttachment(ObserverAttachment(info));
+    }
 
     const auto *ivModel = getModel<IVModel>(sourceModels);
 
@@ -193,9 +200,13 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
         }
     }
 
+    for (const auto &observerName : observerNames) {
+        promelaModel->addInclude(QString("%1.pml").arg(observerName));
+    }
+
     promelaModel->addInclude("env_inlines.pml");
 
-    createSystemState(promelaModel.get(), ivModel, modelFunctions);
+    createSystemState(promelaModel.get(), ivModel, modelFunctions, observerNames);
 
     for (const QString &function : modelFunctions) {
         QList<ChannelInit::Type> channelType;
@@ -287,8 +298,8 @@ InitProctype IvToPromelaTranslator::generateInitProctype(
 static auto observerInputSignalName(const IvToPromelaTranslator::ObserverAttachment &attachment) -> QString
 {
     return QString("%1_0_PI_0_%2")
-            .arg(Escaper::escapePromelaIV(attachment.observer()))
-            .arg(Escaper::escapePromelaIV(attachment.observerInterface()));
+            .arg(Escaper::escapePromelaName(attachment.observer()))
+            .arg(Escaper::escapePromelaName(attachment.observerInterface()));
 }
 
 static auto attachInputObservers(IvToPromelaTranslator::Context &context, QString functionName, QString interfaceName,
@@ -610,12 +621,18 @@ void IvToPromelaTranslator::createCheckQueueInline(
             std::make_unique<InlineDef>(checkQueueInlineName, QList<QString>(), std::move(sequence)));
 }
 
-void IvToPromelaTranslator::createSystemState(
-        PromelaModel *promelaModel, const IVModel *ivModel, const std::vector<QString> &modelFunctions) const
+void IvToPromelaTranslator::createSystemState(PromelaModel *promelaModel, const IVModel *ivModel,
+        const std::vector<QString> &modelFunctions, const std::vector<QString> &observers) const
 {
     QVector<IVFunction *> ivFunctionList = ivModel->allObjectsByType<IVFunction>();
 
     Utype systemState("system_state");
+
+    for (const auto &observer : observers) {
+        QString dataType = QString("%1_Context").arg(Escaper::escapePromelaIV(observer));
+        QString fieldName = Escaper::escapePromelaField(observer);
+        systemState.addField(Declaration(DataType(UtypeRef(dataType)), fieldName));
+    }
 
     for (IVFunction *ivFunction : ivFunctionList) {
         const QString functionName = ivFunction->property("name").toString();

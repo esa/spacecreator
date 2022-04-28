@@ -52,6 +52,9 @@ public:
 
     /** @brief TODO */
     inline static const QString observerAttachment = "Promela_Convert_ObserverAttachment";
+
+        /** @brief Use function name as part of model under verification */
+    inline static const QString observerFunctionName = "Promela_Convert_ObserverFunction";
 };
 
 }
