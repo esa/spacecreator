@@ -161,7 +161,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     QDir::setCurrent(qDirAppPath);
 
     // CALL KAZOO
-    QString kazooCall = "kazoo -t MOCHECK";
+    QString kazooCall = "kazoo -gw --glue -t MOCHECK";
     QProcess *kazooCallerProcess = new QProcess(this);
     // set path to project dir
     qDirAppPath = QDir::currentPath();
