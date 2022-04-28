@@ -19,30 +19,61 @@
 
 #include "textcheckerandconsumer.h"
 
+#include <QDebug>
+#include <QDir>
+#include <QFile>
+#include <QString>
+#include <QVector>
+#include <vector>
+
 namespace tests::common {
 
 void TextCheckerAndConsumer::checkSequenceAndConsume(
-        const std::vector<QString> &expectedOutput, QTextStream &consumableOutput)
+        const std::vector<QString> &expectedOutput, QTextStream &actualConsumableOutput)
 {
     for (const auto &expectedLine : expectedOutput) {
-        if (verifyAndConsume(consumableOutput, expectedLine)) {
+        if (verifyAndConsume(actualConsumableOutput, expectedLine)) {
             continue;
         } else {
-            QString message = QString("the generated file does not contain '%1' substring").arg(expectedLine);
+            const QString message = QString("the generated file does not contain '%1' substring").arg(expectedLine);
             throw std::logic_error(message.toStdString().c_str());
         }
     }
 }
 
-bool TextCheckerAndConsumer::verifyAndConsume(QTextStream &stream, const QString &string)
+std::vector<QString> TextCheckerAndConsumer::readLinesFromFile(const QString &filename)
+{
+    QFile expectedOutFile(filename);
+    if (!expectedOutFile.open(QIODevice::ReadOnly)) {
+        const QString message = (QString("requested file (%1) cannot be found").arg(filename).toStdString().c_str());
+        throw std::logic_error(message.toStdString().c_str());
+    }
+
+    const QByteArray expectedData = expectedOutFile.readAll();
+    const QString expectedText = QString::fromStdString(expectedData.toStdString());
+    const QStringList expectedStringList = expectedText.split("\n");
+    const QVector<QString> expectedStringVector = expectedStringList.toVector();
+    std::vector<QString> expectedOutput = expectedStringVector.toStdVector();
+
+    for (auto &out : expectedOutput) {
+        out = out.trimmed();
+    }
+
+    return expectedOutput;
+}
+
+bool TextCheckerAndConsumer::verifyAndConsume(QTextStream &streamToRansack, const QString &actual)
 {
     QString line;
     do {
-        line = stream.readLine();
-        if (line.contains(string)) {
+        line = streamToRansack.readLine();
+        if (line.contains(actual)) {
             return true;
+        } else {
+            qDebug() << line;
+            qDebug() << actual;
         }
-    } while ((!line.isEmpty() || !line.contains(string)) && !stream.atEnd());
+    } while ((!line.isEmpty() || !line.contains(actual)) && !streamToRansack.atEnd());
 
     return false;
 }

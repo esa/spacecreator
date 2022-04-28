@@ -32,17 +32,26 @@ class TextCheckerAndConsumer
 {
 public:
     /**
-     * @brief Check if consumableOutput contains all strings from expectedOutput in correct order. Throws an exception
-     *        if not.
+     * @brief Check if actualConsumableOutput contains all strings from expectedOutput in correct order. Throws
+     *        an exception if not.
      *
-     * @param expectedOutput   expected strings
-     * @param consumableOutput actual text stream to be checked
+     * @param expectedOutput         expected strings
+     * @param actualConsumableOutput actual text stream to be checked
      */
-    static auto checkSequenceAndConsume(const std::vector<QString> &expectedOutput, QTextStream &consumableOutput)
+    static auto checkSequenceAndConsume(const std::vector<QString> &expectedOutput, QTextStream &actualConsumableOutput)
             -> void;
 
+    /**
+     * @brief  Read file and return its contents as a vector of strings. Each string is a separate line, trimmed.
+     *
+     * @param  filename name of file to load
+     *
+     * @return vector of read strings
+     */
+    static auto readLinesFromFile(const QString &filename) -> std::vector<QString>;
+
 private:
-    static auto verifyAndConsume(QTextStream &stream, const QString &string) -> bool;
+    static auto verifyAndConsume(QTextStream &streamToRansack, const QString &actual) -> bool;
 };
 
 } // namespace tests::common

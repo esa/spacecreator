@@ -17,13 +17,15 @@ target_sources(${TEST_NAME}
                 tst_asn1topromelatranslator_env.h
                 tst_asn1topromelatranslator_values.h)
 target_include_directories(${TEST_NAME}
-    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
+    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs
+                ${CMAKE_SOURCE_DIR}/tests/unittests)
 target_link_libraries(${TEST_NAME}
     PRIVATE     Conversion::Common
                 Conversion::Asn1ToPromelaTranslator
                 Asn1Exporter
                 PromelaExporter
                 PluginCommon
+                TextCheckerAndConsumer
                 Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test)
 

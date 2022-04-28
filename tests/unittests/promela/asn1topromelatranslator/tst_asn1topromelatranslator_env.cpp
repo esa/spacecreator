@@ -49,12 +49,15 @@
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/values.h>
+#include <common/textcheckerandconsumer/textcheckerandconsumer.h>
+#include <exception>
 #include <memory>
 #include <modelloader.h>
 #include <promela/Asn1ToPromelaTranslator/visitors/asn1nodevaluegeneratorvisitor.h>
 #include <promela/PromelaModel/constant.h>
 #include <promela/PromelaModel/promelamodel.h>
 #include <promela/PromelaModel/sequence.h>
+#include <qdir.h>
 #include <qtestcase.h>
 #include <qvariant.h>
 #include <utility>
@@ -81,24 +84,18 @@ using promela::model::PromelaModel;
 using promela::model::Sequence;
 using promela::model::VariableRef;
 using promela::translator::Asn1NodeValueGeneratorVisitor;
+using tests::common::TextCheckerAndConsumer;
 
 namespace tmc::test {
 
-static auto countAllAssignmentsNestedInSequences(const Asn1Acn::File &asnFile) -> unsigned int;
-
 static auto exportPromelaModel(const PromelaModel &model, const QString &filename) -> void;
-static auto exportAsnModel(const Asn1Acn::Asn1Model *model) -> void;
 
-static auto makeModelFromDefinitions(std::unique_ptr<Asn1Acn::Definitions> asnModel, const QString &name)
+static auto makeAsnModelFromDefinitions(std::unique_ptr<Asn1Acn::Definitions> asnModel, const QString &name)
         -> std::unique_ptr<Asn1Acn::Asn1Model>;
 
-static auto checkAlternativeContent(const promela::model::ProctypeElement::Value &contentValue) -> void;
-static auto checkConditional(const Conditional &conditional) -> void;
-static auto checkInlineDefinition(
-        InlineDef *definition, Asn1Acn::TypeAssignment *typeAssignment, const QString &expectedDefinitionName) -> void;
-static auto checkSequenceInlineDefinitions(
-        const std::list<std::unique_ptr<promela::model::InlineDef>> &promelaInlineDefs,
-        Asn1Acn::TypeAssignment *asnTypeAssignmentPtr, const QStringList &expectedDefNames) -> void;
+static auto translateAsnToPromela(const QString &inputAsnFilename, const QStringList &asnTypesToTranslate,
+        const QString &actualOutputFilename) -> void;
+static auto compareTextFiles(const QString &actualOutputFilename, const QString &expectedOutputFilename) -> void;
 
 void tst_Asn1ToPromelaTranslator_Env::initTestCase() {}
 
@@ -283,76 +280,24 @@ void tst_Asn1ToPromelaTranslator_Env::testEnumerated() const
 
 void tst_Asn1ToPromelaTranslator_Env::testSequence() const
 {
-    auto asnModel = plugincommon::ModelLoader::loadAsn1Model("resources/sequence.asn");
-    QVERIFY(asnModel != nullptr);
-    QVERIFY(!asnModel->data().empty());
+    const QString inputAsnFilename = "sequence.asn";
+    const QStringList asnTypesToTranslate = { "EnvIntParam", "EnvBoolParam", "EnvParamSeq" };
+    const QString actualOutputFilename = "sequence.pml";
+    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
 
-    PromelaModel promelaModel;
-    const QStringList typesToTranslate = { "EnvIntParam", "EnvBoolParam", "EnvParamSeq" };
-    Asn1NodeValueGeneratorVisitor visitor(promelaModel, typesToTranslate);
-    QVERIFY(!asnModel->data().empty());
-    const auto &asnFile = *asnModel->data().front();
-    visitor.visit(asnFile);
-
-    const auto &asnDefinitionsList = asnFile.definitionsList();
-    const auto &asnDefinition = asnDefinitionsList.front();
-    const auto &asnTypeAssignments = asnDefinition->types();
-    const auto &promelaInlineDefs = promelaModel.getInlineDefs();
-    QCOMPARE(promelaInlineDefs.size(), asnDefinitionsList.front()->types().size());
-
-    {
-        QVERIFY(promelaInlineDefs.begin() != promelaInlineDefs.end());
-        auto *const inlineDef = (*promelaInlineDefs.begin()).get();
-        auto *const asnTypeAssignment = asnTypeAssignments.at(0).get();
-        checkInlineDefinition(inlineDef, asnTypeAssignment, "EnvIntParam_generate_value");
-    }
-    {
-        QVERIFY(std::next(promelaInlineDefs.begin(), 1) != promelaInlineDefs.end());
-        auto *const inlineDef = (*std::next(promelaInlineDefs.begin(), 1)).get();
-        auto *const asnTypeAssignment = asnTypeAssignments.at(1).get();
-        checkInlineDefinition(inlineDef, asnTypeAssignment, "EnvBoolParam_generate_value");
-    }
-    {
-        QVERIFY(std::next(promelaInlineDefs.begin(), 2) != promelaInlineDefs.end());
-        auto *const inlineDef = (*std::next(promelaInlineDefs.begin(), 2)).get();
-        auto *const asnTypeAssignment = asnTypeAssignments.at(2).get();
-        checkInlineDefinition(inlineDef, asnTypeAssignment, "EnvParamSeq_generate_value");
-    }
+    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
+    compareTextFiles(actualOutputFilename, expectedOutputFilename);
 }
 
 void tst_Asn1ToPromelaTranslator_Env::testSequenceEmbeddedType() const
 {
-    auto asnModel = plugincommon::ModelLoader::loadAsn1Model("resources/sequence-embedded.asn");
-    QVERIFY(asnModel != nullptr);
-    QVERIFY(!asnModel->data().empty());
+    const QString inputAsnFilename = "sequence-embedded.asn";
+    const QStringList asnTypesToTranslate = { "EnvParamSeq" };
+    const QString actualOutputFilename = "sequence-embedded.pml";
+    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
 
-    PromelaModel promelaModel;
-    const QStringList typesToTranslate = { "EnvParamSeq" };
-    Asn1NodeValueGeneratorVisitor visitor(promelaModel, typesToTranslate);
-    QVERIFY(!asnModel->data().empty());
-    const auto &asnFile = *asnModel->data().front();
-    visitor.visit(asnFile);
-
-    const auto &asnDefinitionsList = asnFile.definitionsList();
-    const auto &asnDefinition = asnDefinitionsList.front();
-    const auto &promelaInlineDefs = promelaModel.getInlineDefs();
-    const unsigned int promelaInlineDefinitionsNumber = promelaInlineDefs.size();
-    const unsigned int asnDefinitionsNumber =
-            asnDefinition->typeAssignmentNames().size() + countAllAssignmentsNestedInSequences(asnFile);
-    QCOMPARE(promelaInlineDefinitionsNumber, asnDefinitionsNumber);
-
-    const QStringList expectedDefNames = {
-        "EnvParamSeq_x_generate_value",
-        "EnvParamSeq_y_generate_value",
-        "EnvParamSeq_z_generate_value",
-        "EnvParamSeq_generate_value",
-    };
-
-    const auto &types = asnDefinition->types();
-    const auto &type = types.at(0);
-    auto *const asnTypeAssignmentPtr = type.get();
-
-    checkSequenceInlineDefinitions(promelaInlineDefs, asnTypeAssignmentPtr, expectedDefNames);
+    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
+    compareTextFiles(actualOutputFilename, expectedOutputFilename);
 }
 
 std::unique_ptr<Definitions> tst_Asn1ToPromelaTranslator_Env::createModel() const
@@ -360,24 +305,7 @@ std::unique_ptr<Definitions> tst_Asn1ToPromelaTranslator_Env::createModel() cons
     return std::make_unique<Definitions>("myModule", SourceLocation());
 }
 
-static unsigned int countAllAssignmentsNestedInSequences(const Asn1Acn::File &asnFile)
-{
-    unsigned int nestedDefinitions = 0;
-
-    for (const auto &definition : asnFile.definitionsList()) {
-        for (const auto &type : definition->types()) {
-            const auto &typeType = type->type();
-            if (typeType->typeEnum() == Asn1Acn::Types::Type::SEQUENCE) {
-                const auto &typeTypeSeq = static_cast<Asn1Acn::Types::Sequence *>(typeType);
-                nestedDefinitions += typeTypeSeq->components().size();
-            }
-        }
-    }
-
-    return nestedDefinitions;
-}
-
-static void exportPromelaModel(const PromelaModel &model, const QString &filename)
+void exportPromelaModel(const PromelaModel &model, const QString &filename)
 {
     conversion::Options options;
     options.add(conversion::promela::PromelaOptions::outputFilepath, filename);
@@ -385,15 +313,7 @@ static void exportPromelaModel(const PromelaModel &model, const QString &filenam
     exporter.exportModel(&model, options);
 }
 
-static void exportAsnModel(const Asn1Acn::Asn1Model *const model)
-{
-    conversion::Options options;
-    options.add(conversion::asn1::Asn1Options::asn1FilepathPrefix, "asn_");
-    conversion::asn1::exporter::Asn1Exporter exporter;
-    exporter.exportModel(model, options);
-}
-
-static std::unique_ptr<Asn1Acn::Asn1Model> makeModelFromDefinitions(
+std::unique_ptr<Asn1Acn::Asn1Model> makeAsnModelFromDefinitions(
         std::unique_ptr<Asn1Acn::Definitions> asnModel, const QString &name)
 {
     Asn1Acn::File file(name);
@@ -406,101 +326,36 @@ static std::unique_ptr<Asn1Acn::Asn1Model> makeModelFromDefinitions(
     return std::make_unique<Asn1Acn::Asn1Model>(std::move(files));
 }
 
-static void checkAlternativeContent(const promela::model::ProctypeElement::Value &contentValue)
+void translateAsnToPromela(
+        const QString &inputAsnFilename, const QStringList &asnTypesToTranslate, const QString &actualOutputFilename)
 {
-    if (std::holds_alternative<Expression>(contentValue)) {
-        const auto &expression = std::get<Expression>(contentValue);
-        const auto &varRef = std::get<VariableRef>(expression.getContent());
+    auto asnModel = plugincommon::ModelLoader::loadAsn1Model(
+            QString("resources%1%2").arg(QDir::separator()).arg(inputAsnFilename));
+    QVERIFY(asnModel != nullptr);
+    QVERIFY(!asnModel->data().empty());
 
-        for (const auto &element : varRef.getElements()) {
-            QCOMPARE(element.m_name.compare("true"), 0);
-            QVERIFY(element.m_index.get() == nullptr);
-        }
-    } else if (std::holds_alternative<Assignment>(contentValue)) {
-        const auto &assignment = std::get<Assignment>(contentValue);
-        const auto &assignmentExpressionContent = assignment.getExpression().getContent();
-        QVERIFY(std::holds_alternative<Constant>(assignmentExpressionContent));
-    } else if (std::holds_alternative<InlineCall>(contentValue)) {
-        const auto &inlineCall = std::get<InlineCall>(contentValue);
+    PromelaModel promelaModel;
+    Asn1NodeValueGeneratorVisitor visitor(promelaModel, asnTypesToTranslate);
+    const auto &asnFile = *asnModel->data().front();
+    visitor.visit(asnFile);
 
-        for (const auto &argument : inlineCall.getArguments()) {
-            if (std::holds_alternative<VariableRef>(argument)) {
-                const auto &argVarRef = std::get<VariableRef>(argument);
-                QCOMPARE(argVarRef.getElements().size(), 1);
-            }
-        }
+    exportPromelaModel(promelaModel, actualOutputFilename);
+}
+
+void compareTextFiles(const QString &actualOutputFilename, const QString &expectedOutputFilename)
+{
+    QFile outputFile(actualOutputFilename);
+    if (!outputFile.open(QIODevice::ReadOnly)) {
+        QFAIL(QString("requested file (%1) cannot be found").arg(actualOutputFilename).toStdString().c_str());
     }
-}
+    QTextStream consumableOutput(&outputFile);
 
-static void checkConditional(const Conditional &conditional)
-{
-    for (const auto &alternative : conditional.getAlternatives()) {
-        for (const auto &content : alternative->getContent()) {
-            checkAlternativeContent(content->getValue());
-        }
-    }
-}
-
-static void checkSequence(const Sequence &sequence)
-{
-    QCOMPARE(sequence.getType(), Sequence::Type::NORMAL);
-
-    const auto &sequenceContent = sequence.getContent();
-    for (const auto &content : sequenceContent) {
-        const auto &contentValue = content->getValue();
-
-        const bool contentIsConditional = std::holds_alternative<Conditional>(contentValue);
-        const bool contentIsSequence = std::holds_alternative<Sequence>(contentValue);
-        const bool contentIsInlineCall = std::holds_alternative<InlineCall>(contentValue);
-
-        if (!contentIsConditional && !contentIsSequence && !contentIsInlineCall) {
-            QFAIL("Unknown content type in sequence");
-        }
-
-        if (contentIsConditional) {
-            const auto &conditional = std::get<Conditional>(contentValue);
-            checkConditional(conditional);
-        } else if (contentIsSequence) {
-            const auto &nestedSequence = std::get<Sequence>(contentValue);
-            checkSequence(nestedSequence);
-        } else if (contentIsInlineCall) {
-            const auto &inlineCall = std::get<InlineCall>(contentValue);
-            QVERIFY(!inlineCall.getName().isEmpty());
-        }
-    }
-}
-
-static void checkInlineDefinition(InlineDef *const definition, Asn1Acn::TypeAssignment *const typeAssignment,
-        const QString &expectedDefinitionName)
-{
-    QCOMPARE(definition->getName(), expectedDefinitionName);
-
-    const auto &definitionArguments = definition->getArguments();
-    QCOMPARE(definitionArguments.size(), 1);
-
-    const auto &argument = definitionArguments.front();
-    QCOMPARE(argument, "value");
-
-    checkSequence(definition->getSequence());
-}
-
-static void checkSequenceInlineDefinitions(
-        const std::list<std::unique_ptr<promela::model::InlineDef>> &promelaInlineDefs,
-        Asn1Acn::TypeAssignment *const asnTypeAssignmentPtr, const QStringList &expectedDefNames)
-{
-    QStringList::ConstIterator expectedDefNameIt = expectedDefNames.begin();
-
-    for (const auto &promelaInlineDef : promelaInlineDefs) {
-        auto *const inlineDefPtr = promelaInlineDef.get();
-        QCOMPARE(inlineDefPtr->getName(), *expectedDefNameIt++);
-
-        const auto &definitionArguments = inlineDefPtr->getArguments();
-        QCOMPARE(definitionArguments.size(), 1);
-
-        const auto &argument = definitionArguments.front();
-        QCOMPARE(argument, "value");
-
-        checkSequence(inlineDefPtr->getSequence());
+    const QString expectedFilepath = QString("resources%1%2").arg(QDir::separator()).arg(expectedOutputFilename);
+    try {
+        const std::vector<QString> expectedOutput = TextCheckerAndConsumer::readLinesFromFile(expectedFilepath);
+        TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
+    } catch (const std::exception &e) {
+        QFAIL(e.what());
     }
 }
 
