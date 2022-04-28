@@ -110,8 +110,8 @@ public:
     auto getDependencies() const -> std::set<conversion::ModelType> override;
 
 private:
-    auto generateInitProctype(const std::vector<QString> &modelFunctions, const ::ivm::IVModel *ivModel) const
-            -> ::promela::model::InitProctype;
+    auto generateInitProctype(const std::vector<QString> &modelFunctions, const std::vector<QString> &observers,
+            const ::ivm::IVModel *ivModel) const -> ::promela::model::InitProctype;
     auto generateProctype(Context &context, const QString &functionName, const QString &interfaceName,
             const QString &parameterType, size_t queueSize, size_t priority, bool environment) const
             -> std::unique_ptr<::promela::model::Proctype>;
