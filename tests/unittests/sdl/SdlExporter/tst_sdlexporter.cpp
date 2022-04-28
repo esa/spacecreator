@@ -31,6 +31,7 @@
 #include <common/sdlmodelbuilder/sdlstatemachinebuilder.h>
 #include <common/sdlmodelbuilder/sdltaskbuilder.h>
 #include <common/sdlmodelbuilder/sdltransitionbuilder.h>
+#include <common/textcheckerandconsumer/textcheckerandconsumer.h>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/options.h>
 #include <memory>
@@ -93,6 +94,7 @@ using tests::common::SdlStateBuilder;
 using tests::common::SdlStateMachineBuilder;
 using tests::common::SdlTaskBuilder;
 using tests::common::SdlTransitionBuilder;
+using tests::common::TextCheckerAndConsumer;
 
 namespace tests::Sdl {
 
@@ -129,31 +131,6 @@ static std::unique_ptr<ProcedureParameter> makeProcedureParameter(QString name, 
     parameter->setDirection(std::move(direction));
 
     return parameter;
-}
-
-static bool verifyAndConsume(QTextStream &stream, const QString &string)
-{
-    QString line;
-    do {
-        line = stream.readLine();
-        if (line.contains(string)) {
-            return true;
-        }
-    } while ((!line.isEmpty() || !line.contains(string)) && !stream.atEnd());
-
-    return false;
-}
-
-static void checkSequenceAndConsume(std::vector<QString> &expectedOutput, QTextStream &consumableOutput)
-{
-    for (const auto &expectedLine : expectedOutput) {
-        if (verifyAndConsume(consumableOutput, expectedLine)) {
-            continue;
-        } else {
-            QString message = QString("the generated file does not contain '%1' substring").arg(expectedLine);
-            QFAIL(message.toStdString().c_str());
-        }
-    }
 }
 
 void tst_sdlmodel::testDefaultValuesInModel()
@@ -245,7 +222,7 @@ void tst_sdlmodel::testGenerateBasicProcess()
 
         QString("endprocess %1;").arg(processName),
     };
-    checkSequenceAndConsume(expectedOutput, consumableOutput);
+    TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
 void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
@@ -343,7 +320,7 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
 
         QString("endprocess %1;").arg(processName),
     };
-    checkSequenceAndConsume(expectedOutput, consumableOutput);
+    TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
 void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
@@ -406,7 +383,7 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
 
         QString("endprocess %1;").arg(processName),
     };
-    checkSequenceAndConsume(expectedOutput, consumableOutput);
+    TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
 void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
@@ -525,7 +502,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
 
         QString("endprocess %1;").arg(processName),
     };
-    checkSequenceAndConsume(expectedOutput, consumableOutput);
+    TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
 void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
@@ -602,7 +579,7 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
 
         QString("endprocess %1;").arg(processName),
     };
-    checkSequenceAndConsume(expectedOutput, consumableOutput);
+    TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
 void tst_sdlmodel::testJoinWithoutSpecifiedLabel()
@@ -732,7 +709,7 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
 
         QString("endprocess %1;").arg(processName),
     };
-    checkSequenceAndConsume(expectedOutput, consumableOutput);
+    TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
 void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
@@ -822,7 +799,7 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
 
         QString("endprocess %1;").arg(processName),
     };
-    checkSequenceAndConsume(expectedOutput, consumableOutput);
+    TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
 } // namespace tests::sdl
