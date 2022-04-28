@@ -29,5 +29,8 @@ target_link_libraries(${TEST_NAME}
 
 add_format_target(${TEST_NAME})
 
-configure_file(resources/myModule.asn resources/myModule.asn COPYONLY)
-configure_file(resources/myModule_typesInSeq.asn resources/myModule_typesInSeq.asn COPYONLY)
+configure_file(resources/sequence.asn resources/sequence.asn COPYONLY)
+configure_file(resources/sequence-embedded.asn resources/sequence-embedded.asn COPYONLY)
+
+configure_file(resources/sequence.pml.out resources/sequence.pml.out COPYONLY)
+configure_file(resources/sequence-embedded.pml.out resources/sequence-embedded.pml.out COPYONLY)

@@ -283,7 +283,7 @@ void tst_Asn1ToPromelaTranslator_Env::testEnumerated() const
 
 void tst_Asn1ToPromelaTranslator_Env::testSequence() const
 {
-    auto asnModel = plugincommon::ModelLoader::loadAsn1Model("resources/myModule.asn");
+    auto asnModel = plugincommon::ModelLoader::loadAsn1Model("resources/sequence.asn");
     QVERIFY(asnModel != nullptr);
     QVERIFY(!asnModel->data().empty());
 
@@ -322,7 +322,7 @@ void tst_Asn1ToPromelaTranslator_Env::testSequence() const
 
 void tst_Asn1ToPromelaTranslator_Env::testSequenceEmbeddedType() const
 {
-    auto asnModel = plugincommon::ModelLoader::loadAsn1Model("resources/myModule_typesInSeq.asn");
+    auto asnModel = plugincommon::ModelLoader::loadAsn1Model("resources/sequence-embedded.asn");
     QVERIFY(asnModel != nullptr);
     QVERIFY(!asnModel->data().empty());
 
