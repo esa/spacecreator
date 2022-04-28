@@ -236,12 +236,12 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
         /*if (!uniqueAsn1Files.contains(processMetadata.getDatamodel().fileName())) {
             uniqueAsn1Files.insert(
                     processMetadata.getDatamodel().fileName(), processMetadata.getDatamodel().absoluteFilePath());
-        }
+        }*/
         for (const QFileInfo &fileInfo : allSdlFiles.at(ivFunction).getContext()) {
             if (fileInfo.exists()) {
                 uniqueAsn1Files.insert(fileInfo.fileName(), fileInfo.absoluteFilePath());
             }
-        }*/
+        }
         const QFileInfo outputFile = outputFilepath(processMetadata.getName().toLower() + ".pml");
 
         SdlToPromelaConverter sdl2Promela;
