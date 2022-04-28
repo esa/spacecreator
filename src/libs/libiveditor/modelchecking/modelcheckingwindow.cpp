@@ -142,7 +142,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     d->ui->lineEdit_timeLimit->setValidator( new QIntValidator(0, 100000, this) );
 
     // set status bar text color
-    statusBar()->setStyleSheet("color: blue");
+    statusBar()->setStyleSheet("color: white");
 
     // CALL MAKE SKELETONS
     QString makeSkeletonsCall = "make skeletons";
