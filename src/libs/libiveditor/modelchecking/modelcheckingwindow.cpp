@@ -41,6 +41,9 @@ struct ModelCheckingWindow::ModelCheckingWindowPrivate {
     InterfaceDocument *document { nullptr };   
 };
 
+/*!
+ * \brief ModelCheckingWindow::ModelCheckingWindow Initializes the MC window, performing initial checks, window setup configuration and window population with the model elements.
+ */
 ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QString projectDir, QWidget *parent) :
     QMainWindow(parent)
     , d(new ModelCheckingWindowPrivate)
@@ -179,6 +182,10 @@ ModelCheckingWindow::~ModelCheckingWindow()
     d = nullptr;
 }
 
+/*!
+ * \brief ModelCheckingWindow::listProperties Recursive function creating a tree of QTreeWidgetItem reflecting the properties directory, with memory for node (property directory or property) expansion and selection states.
+ * \return The recursion subtree top node selection state.
+ */
 Qt::CheckState ModelCheckingWindow::listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parentFileInfo, QStringList preSelection, QStringList expanded) {
     QDir dir;
     dir.setPath(parentFileInfo.filePath());
@@ -232,6 +239,10 @@ Qt::CheckState ModelCheckingWindow::listProperties(QTreeWidgetItem *parentWidget
 
 }
 
+/*!
+ * \brief ModelCheckingWindow::isExpanded Checks if node (property directory) corresponding to 'dirName' is in the list 'expanded' of expanded (property directory) nodes.
+ * \return 'true' if node is in the list (i.e. was expanded); 'false' otherwise.
+ */
 bool ModelCheckingWindow::isExpanded(QStringList expanded, QString dirName){
     for (QString expand : expanded){
         if (expand == dirName) {return true;}
@@ -239,13 +250,20 @@ bool ModelCheckingWindow::isExpanded(QStringList expanded, QString dirName){
     return false;
 }
 
-Qt::CheckState ModelCheckingWindow::getCheckState(QStringList selections, QString path){
+/*!
+ * \brief ModelCheckingWindow::getCheckState Checks if node corresponding to 'stringId' is in the list 'selections' of selected nodes.
+ * \return 'Qt::Checked' if node is in the list (i.e. was selected); 'Qt::Unchecked' otherwise.
+ */
+Qt::CheckState ModelCheckingWindow::getCheckState(QStringList selections, QString stringId){
     for (QString selection : selections){
-        if (path.contains(selection, Qt::CaseSensitive)) {return Qt::Checked;}
+        if (stringId.contains(selection, Qt::CaseSensitive)) {return Qt::Checked;}
     }
     return Qt::Unchecked;
 }
 
+/*!
+ * \brief ModelCheckingWindow::listSubtypes Function creating a tree of QTreeWidgetItem reflecting the subtypes directory, with memory for node (subtype file) selection state.
+ */
 void ModelCheckingWindow::listSubtypes(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent, QStringList preSelection) {
     QDir dir;
     dir.setPath(parent.filePath());
@@ -274,6 +292,9 @@ void ModelCheckingWindow::listSubtypes(QTreeWidgetItem *parentWidgetItem, QFileI
     }
 }
 
+/*!
+ * \brief ModelCheckingWindow::listModelFunctions Function creating a tree of QTreeWidgetItem reflecting the model Functions, with memory for node (Function) selection state.
+ */
 void ModelCheckingWindow::listModelFunctions(QTreeWidgetItem *parentWidgetItem, QStringList preSelection) {
     for (ivm::IVFunction *function : d->document->objectsModel()->allObjectsByType<ivm::IVFunction>()) {
         if(!function->hasNestedChildren()){
@@ -291,6 +312,9 @@ void ModelCheckingWindow::listModelFunctions(QTreeWidgetItem *parentWidgetItem, 
     }
 }
 
+/*!
+ * \brief ModelCheckingWindow::listModelFunctions Function creating a tree of QTreeWidgetItem reflecting the results/output directory.
+ */
 void ModelCheckingWindow::listResults(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent) {
     QDir dir;
     dir.setPath(parent.filePath());
@@ -324,6 +348,9 @@ void ModelCheckingWindow::listResults(QTreeWidgetItem *parentWidgetItem, QFileIn
     }
 }
 
+/*!
+ * \brief ModelCheckingWindow::on_treeWidget_properties_itemChanged Checks or unchecks child tree nodes as per parent resulting check state upon change.
+ */
 void ModelCheckingWindow::on_treeWidget_properties_itemChanged(QTreeWidgetItem *item, int column)
 {
     if (item ==nullptr)
@@ -358,6 +385,9 @@ void ModelCheckingWindow::on_treeWidget_properties_itemChanged(QTreeWidgetItem *
     }
 }
 
+/*!
+ * \brief ModelCheckingWindow::updateParentItem Updates parent tree node check state as per children check states upon child 'item' check state change.
+ */
 void ModelCheckingWindow::updateParentItem(QTreeWidgetItem *item)
 {
     QTreeWidgetItem *parent = item->parent();
@@ -390,6 +420,9 @@ void ModelCheckingWindow::updateParentItem(QTreeWidgetItem *item)
     }
 }
 
+/*!
+ * \brief ModelCheckingWindow::on_treeWidget_properties_itemDoubleClicked Opens property file in respective editor, upon file node double click.
+ */
 void ModelCheckingWindow::on_treeWidget_properties_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     if (item->text(1) == "") { // is directory node
@@ -414,6 +447,9 @@ void ModelCheckingWindow::on_treeWidget_properties_itemDoubleClicked(QTreeWidget
     statusBar()->showMessage("File open.", 6000);
 }
 
+/*!
+ * \brief ModelCheckingWindow::on_treeWidget_subtyping_itemDoubleClicked Opens subtypes file in respective editor, upon file node double click.
+ */
 void ModelCheckingWindow::on_treeWidget_subtyping_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     if (item->text(1) == "") { // is dir node
@@ -432,6 +468,9 @@ void ModelCheckingWindow::on_treeWidget_subtyping_itemDoubleClicked(QTreeWidgetI
     statusBar()->showMessage("File open.", 6000);
 }
 
+/*!
+ * \brief ModelCheckingWindow::on_treeWidget_subtyping_itemChanged Ensures only one subtyping file if selected, upon new selection.
+ */
 void ModelCheckingWindow::on_treeWidget_subtyping_itemChanged(QTreeWidgetItem *item, int column)
 {
     if (item ==nullptr)
@@ -461,6 +500,9 @@ void ModelCheckingWindow::on_treeWidget_subtyping_itemChanged(QTreeWidgetItem *i
     }
 }
 
+/*!
+ * \brief ModelCheckingWindow::on_pushButton_callIF_clicked Calls the model checker engine (IF), performing necessary operations before (e.g. save current configuration) and after (e.g. results translation) the call.
+ */
 void ModelCheckingWindow::on_pushButton_callIF_clicked()
 {
     // CONFIRM MC call with user
@@ -587,6 +629,9 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     listResults(resultsTopDirWidgetItem, resultsFileInfo);
 }
 
+/*!
+ * \brief ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked Opens output files in respective editor, upon file node double click.
+ */
 void ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     if (item->text(1) == "") {return;}
@@ -608,6 +653,9 @@ void ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked(QTreeWidgetIte
     statusBar()->showMessage("File open.", 6000);
 }
 
+/*!
+ * \brief ModelCheckingWindow::convertToObs Converts an .msc property file into a semantically equivalent observer property file, and then rebuilds the properties tree keeping node selection and expansion.
+ */
 void ModelCheckingWindow::convertToObs()
 {
     // Get msc property name
@@ -646,6 +694,9 @@ void ModelCheckingWindow::convertToObs()
     statusBar()->showMessage("Observer generated.", 6000);
 }
 
+/*!
+ * \brief ModelCheckingWindow::addProperty Presents the user with dialogs to select a property type and provide its name, creates the property file and then rebuilds the properties tree keeping node selection and expansion.
+ */
 void ModelCheckingWindow::addProperty()
 {
     bool ok1;
@@ -719,6 +770,10 @@ void ModelCheckingWindow::addProperty()
     }
 }
 
+/*!
+ * \brief ModelCheckingWindow::getPropertiesSelection Saves the properties that are selected ('Qt::Checked') under a tree node.
+ * \return The list 'selections' with the properties selected, each including its parent name.
+*/
 QStringList ModelCheckingWindow::getPropertiesSelection(QTreeWidgetItem *propertyWidgetItem, QStringList selections){
     for (int i = 0; i < propertyWidgetItem->childCount(); i++)
     {
@@ -735,6 +790,10 @@ QStringList ModelCheckingWindow::getPropertiesSelection(QTreeWidgetItem *propert
     return selections;
 }
 
+/*!
+ * \brief ModelCheckingWindow::getExpandedNodes Saves the property directories that are expanded under a tree node.
+ * \return The list 'expanded' with the expanded directory names.
+*/
 QStringList ModelCheckingWindow::getExpandedNodes(QTreeWidgetItem *propertyWidgetItem, QStringList expanded){
 
     for (int i = 0; i < propertyWidgetItem->childCount(); i++)
@@ -751,6 +810,10 @@ QStringList ModelCheckingWindow::getExpandedNodes(QTreeWidgetItem *propertyWidge
     return expanded;
 }
 
+/*!
+ * \brief ModelCheckingWindow::getSubtypesSelection Saves the subtyping file selected ('Qt::Checked').
+ * \return The one element list 'selections' with the selected subtyping file name.
+*/
 QStringList ModelCheckingWindow::getSubtypesSelection(){
     QStringList selections = {};
     for (int i = 0; i < this->subtypesTopDirWidgetItem->childCount(); i++)
@@ -768,6 +831,10 @@ QStringList ModelCheckingWindow::getSubtypesSelection(){
     return selections;
 }
 
+/*!
+ * \brief ModelCheckingWindow::getFunctionsSelection Saves the model Functions selected ('Qt::Checked').
+ * \return The list 'selections' with the names of the selected Functions.
+*/
 QStringList ModelCheckingWindow::getFunctionsSelection(){
     QStringList selections = {};
     for (int i = 0; i < this->functionsTopNodeWidgetItem->childCount(); i++)
@@ -780,6 +847,9 @@ QStringList ModelCheckingWindow::getFunctionsSelection(){
     return selections;
 }
 
+/*!
+ * \brief ModelCheckingWindow::addSubtypes Presents the user with a dialog to provide a new subtyping file name, generates the subtyping file and then adds its node to the subtypes tree.
+ */
 void ModelCheckingWindow::addSubtypes()
 {
     bool ok;
@@ -829,6 +899,9 @@ void ModelCheckingWindow::addSubtypes()
     }
 }
 
+/*!
+ * \brief ModelCheckingWindow::deleteSubtypes Deletes subtyping file and respective node, asking user confirmation.
+ */
 void ModelCheckingWindow::deleteSubtypes()
 {
     QFileInfo fileInfo(d->ui->treeWidget_subtyping->currentItem()->text(0));
@@ -853,9 +926,8 @@ void ModelCheckingWindow::deleteSubtypes()
     }
 }
 
-// TODO write code documentation
 /*!
- * \brief Deletes a property file or property directory/folder.
+ * \brief ModelCheckingWindow::deleteProperty Deletes a property file or property directory (and respective node), asking user confirmation.
  */
 void ModelCheckingWindow::deleteProperty()
 {
@@ -897,6 +969,9 @@ void ModelCheckingWindow::deleteProperty()
     }
 }
 
+/*!
+ * \brief ModelCheckingWindow::on_treeWidget_properties_customContextMenuRequested Shows respective context menu when right-clicking a properties tree node.
+ */
 void ModelCheckingWindow::on_treeWidget_properties_customContextMenuRequested(const QPoint &pos)
 {
     QModelIndex index = d->ui->treeWidget_properties->indexAt(pos);
@@ -918,6 +993,9 @@ void ModelCheckingWindow::on_treeWidget_properties_customContextMenuRequested(co
     }
 }
 
+/*!
+ * \brief ModelCheckingWindow::on_treeWidget_subtyping_customContextMenuRequested Shows respective context menu when right-clicking a subtypes tree node.
+ */
 void ModelCheckingWindow::on_treeWidget_subtyping_customContextMenuRequested(const QPoint &pos)
 {
     QModelIndex index = d->ui->treeWidget_subtyping->indexAt(pos);
@@ -945,12 +1023,15 @@ void ModelCheckingWindow::setVisible(bool visible)
         }
     }
 }
-
+//! Needed by ModelCheckingWindow::setVisible
 void ModelCheckingWindow::refreshView()
 {
     return;
 }
 
+/*!
+ * \brief ModelCheckingWindow::on_pushButton_saveConfiguration_clicked Saves configuration (all user selections) to file (user provided name via dialog), performing necessary checks.
+ */
 void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
 {
     // check if configurations dir exists and create it otherwise
@@ -1025,6 +1106,9 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
     }
 }
 
+/*!
+ * \brief ModelCheckingWindow::saveConfiguration Saves configuration (all user selections) to hidden default file '.mcconfig', performing necessary checks. Used when calling the MC engine.
+ */
 bool ModelCheckingWindow::saveConfiguration()
 {
     QString fileName = ".mcconfig";
@@ -1088,6 +1172,9 @@ bool ModelCheckingWindow::saveConfiguration()
     }
 }
 
+/*!
+ * \brief ModelCheckingWindow::on_pushButton_loadConfiguration_clicked Loads configuration (all user selections) from file (user provided name via dialog), performing necessary checks.
+ */
 void ModelCheckingWindow::on_pushButton_loadConfiguration_clicked()
 {
     // check if configurations dir exists and create it otherwise
@@ -1154,7 +1241,9 @@ void ModelCheckingWindow::on_pushButton_loadConfiguration_clicked()
     statusBar()->showMessage("Configuration file " + file.fileName() + " loaded", 6000);
 }
 
-
+/*!
+ * \brief ModelCheckingWindow::setPropertiesSelection Rebuilds properties tree with property selection provided, keeping expanded nodes. Needed when loading configuration.
+ */
 void ModelCheckingWindow::setPropertiesSelection(QStringList propertiesSelected){
 
     Q_ASSERT(propertiesSelected.size() > 0);
@@ -1174,6 +1263,9 @@ void ModelCheckingWindow::setPropertiesSelection(QStringList propertiesSelected)
 
 }
 
+/*!
+ * \brief ModelCheckingWindow::setSubtypesSelection Rebuilds subtypes tree with subtyping selection provided. Needed when loading configuration.
+ */
 void ModelCheckingWindow::setSubtypesSelection(QStringList subtypesSelected){
 
     Q_ASSERT(subtypesSelected.size() <= 1);
@@ -1189,6 +1281,9 @@ void ModelCheckingWindow::setSubtypesSelection(QStringList subtypesSelected){
 
 }
 
+/*!
+ * \brief ModelCheckingWindow::setFunctionsSelection Rebuilds Functions tree with Function selection provided. Needed when loading configuration.
+ */
 void ModelCheckingWindow::setFunctionsSelection(QStringList functionsSelected){
 
     Q_ASSERT(functionsSelected.size() > 0);
@@ -1203,12 +1298,18 @@ void ModelCheckingWindow::setFunctionsSelection(QStringList functionsSelected){
 
 }
 
+/*!
+ * \brief ModelCheckingWindow::on_checkBox_errorScenarios_stateChanged Ensures at least one type of scenarios is checked.
+ */
 void ModelCheckingWindow::on_checkBox_errorScenarios_stateChanged(int arg1){
     if(!d->ui->checkBox_errorScenarios->isChecked()){
         d->ui->checkBox_successScenarios->setCheckState(Qt::CheckState::Checked);
     }
 }
 
+/*!
+ * \brief ModelCheckingWindow::on_checkBox_successScenarios_stateChanged Ensures at least one type of scenarios is checked.
+ */
 void ModelCheckingWindow::on_checkBox_successScenarios_stateChanged(int arg1){
     if(!d->ui->checkBox_successScenarios->isChecked()){
         d->ui->checkBox_errorScenarios->setCheckState(Qt::CheckState::Checked);
