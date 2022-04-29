@@ -6,12 +6,13 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID, Mmi-Event, Model-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView;
 
-Inputobserver-States ::= ENUMERATED {wait}
+Inputobserver-States ::= ENUMERATED {waitfortrigger, done, waitforaction}
 
 Inputobserver-Context ::= SEQUENCE {
    state Inputobserver-States,
    init-done BOOLEAN,
-   y T-Int32
+   received-action T-Boolean,
+   received-trigger T-Boolean
 }
 
 Inputobserver-Mmi-Event-Msg-In-Selection  ::= ENUMERATED {action-present(1)}

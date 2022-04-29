@@ -3,10 +3,13 @@
 *.autosave
 *.ini
 *.gpr
+Makefile.*
 
 **/wrappers/*
 **/code/*
 **/cache/*
+**/modelchecking/**/*.adb
+**/modelchecking/**/*.ads
 
 work/binaries
 work/build

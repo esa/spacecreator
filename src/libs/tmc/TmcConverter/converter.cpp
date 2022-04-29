@@ -146,8 +146,8 @@ bool TmcConverter::convertModel(const std::set<conversion::ModelType> &sourceMod
     return false;
 }
 
-auto TmcConverter::integrateObserver(
-        QString observerSpecification, QStringList &observerNames, QStringList &asn1Files, QStringList &attachmentInfos)
+auto TmcConverter::integrateObserver(QString observerSpecification, QStringList &observerNames, QStringList &asn1Files,
+        std::map<QString, ProcessMetadata> &allSdlFiles, QStringList &attachmentInfos)
 {
     std::cout << "spec -> " << observerSpecification.toStdString() << "\n";
     const auto separator = ":";
@@ -190,6 +190,9 @@ auto TmcConverter::integrateObserver(
         throw "";
     }
     // asn1Files.append(dataview.absoluteFilePath());
+
+    allSdlFiles.emplace(processName, meta);
+
     asn1Files.append(datamodel.absoluteFilePath());
 }
 
@@ -254,7 +257,7 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
     QStringList asn1Files;
 
     for (auto &attachment : m_observerAttachments) {
-        integrateObserver(attachment, m_observerNames, asn1Files, m_observerAttachmentInfos);
+        integrateObserver(attachment, m_observerNames, asn1Files, allSdlFiles, m_observerAttachmentInfos);
     }
 
     const QFileInfo simuDataView = simuDataViewLocation();

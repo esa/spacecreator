@@ -1,31 +1,22 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Model;
-    /* CIF TEXT (830, 16), (132, 44) */
+    /* CIF TEXT (536, 12), (132, 44) */
     dcl x MyInteger;
     dcl y MyInteger;
     /* CIF ENDTEXT */
     /* CIF START (320, 10), (70, 35) */
     START;
         /* CIF NEXTSTATE (320, 60), (70, 35) */
-        NEXTSTATE One;
-    /* CIF state (580, 10), (70, 35) */
-    state Two;
-        /* CIF input (575, 65), (78, 35) */
-        input trigger(x);
-            /* CIF task (578, 120), (72, 35) */
-            task y := x * 2;
-            /* CIF output (574, 175), (81, 35) */
-            output action(y);
-            /* CIF NEXTSTATE (580, 230), (70, 35) */
-            NEXTSTATE One;
-    endstate;
+        NEXTSTATE S1;
     /* CIF state (450, 10), (70, 35) */
-    state One;
-        /* CIF input (445, 65), (78, 35) */
+    state S1;
+        /* CIF input (444, 65), (78, 35) */
         input trigger(x);
-            /* CIF output (447, 120), (74, 35) */
-            output action(x);
-            /* CIF NEXTSTATE (450, 175), (70, 35) */
-            NEXTSTATE Two;
+            /* CIF task (447, 120), (72, 35) */
+            task y := x * 2;
+            /* CIF output (446, 170), (74, 35) */
+            output action(y);
+            /* CIF NEXTSTATE (449, 225), (70, 35) */
+            NEXTSTATE S1;
     endstate;
 endprocess Model;

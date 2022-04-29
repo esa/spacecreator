@@ -82,7 +82,7 @@ private:
             const std::set<conversion::ModelType> &auxilaryModelTypes, conversion::Options options) const;
 
     auto integrateObserver(QString observerSpecification, QStringList &observerNames, QStringList &asn1Files,
-            QStringList &attachmentInfos);
+            std::map<QString, ProcessMetadata> &allSdlFiles, QStringList &attachmentInfos);
     bool convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles);
 
     bool convertStopConditions(const std::map<QString, ProcessMetadata> &allSdlFiles);

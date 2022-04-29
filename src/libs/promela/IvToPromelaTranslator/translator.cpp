@@ -369,7 +369,12 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(Context &conte
     std::unique_ptr<ProctypeElement> waitForInit = std::make_unique<ProctypeElement>(Expression(VariableRef("inited")));
     sequence.appendElement(std::move(waitForInit));
 
-    if (!environment) {
+    const auto hasInputObservers = context.getObserverAttachments(functionName, interfaceName,
+                                                  IvToPromelaTranslator::ObserverAttachment::Kind::Kind_Input)
+                                           .size()
+            > 0;
+
+    if (hasInputObservers || !environment) {
         std::unique_ptr<ProctypeElement> tokenDeclaration =
                 std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "token"));
         sequence.appendElement(std::move(tokenDeclaration));
