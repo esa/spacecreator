@@ -283,8 +283,10 @@ std::unique_ptr<ProctypeElement> Asn1TypeValueGeneratorVisitor::generateAsnSeque
 {
     const QString typeToGenerateName = getSequenceComponentTypeName(*asnSequenceComponent, m_name);
     auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
-    ChangeStringInScope changeName(&m_name, typeToGenerateName);
-    asnSequenceComponentType->accept(*this);
+
+    Asn1TypeValueGeneratorVisitor visitor(*this);
+    visitor.m_name = typeToGenerateName;
+    asnSequenceComponentType->accept(visitor);
 
     const QString typeGeneratorToCallName = QString("%1_generate_value").arg(typeToGenerateName);
     const QString &componentName = asnSequenceComponent->name();

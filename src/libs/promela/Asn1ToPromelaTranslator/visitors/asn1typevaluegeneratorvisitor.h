@@ -142,29 +142,6 @@ private:
 private:
     ::promela::model::PromelaModel &m_promelaModel;
     QString m_name;
-
-    /*
-     * Change string value in current scope; automatically restore its value to initial value when this object gets
-     * destroyed
-     */
-    class ChangeStringInScope final
-    {
-    public:
-        ChangeStringInScope(QString *targetNamePtr, const QString &temporaryName)
-            : m_nameToChange(targetNamePtr)
-            , m_initialName(*targetNamePtr)
-        {
-            *targetNamePtr = temporaryName;
-        }
-        ~ChangeStringInScope() { *m_nameToChange = m_initialName; }
-
-        ChangeStringInScope() = delete;
-        ChangeStringInScope(ChangeStringInScope &&) = delete;
-
-    private:
-        QString *m_nameToChange;
-        QString m_initialName;
-    };
 };
 
 } // namespace promela::translator
