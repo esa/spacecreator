@@ -18,6 +18,7 @@ work/Debug
 work/sql_db
 work/glue_simu
 work/simulation
+!work/simulation/observer.asn
 work/glue_debug
 work/Makefile
 work/skeletons_built
