@@ -25,6 +25,7 @@
 #include <asn1library/asn1/importedtype.h>
 #include <conversion/common/translation/translator.h>
 #include <list>
+#include <seds/SedsModel/components/interface.h>
 #include <seds/SedsModel/interfaces/interfacedeclaration.h>
 #include <seds/SedsModel/types/datatype.h>
 #include <vector>
@@ -85,10 +86,16 @@ private:
     auto translatePackage(const seds::model::Package *sedsPackage, Asn1Acn::Asn1Model *asn1Model,
             const std::list<const seds::model::Package *> &sedsPackages, const Options &options) const -> void;
 
+    auto translateComponent(const seds::model::Component &sedsComponent, const seds::model::Package *sedsPackage,
+            Asn1Acn::Definitions *packageAsn1Definitions, Asn1Acn::Asn1Model *asn1Model,
+            const std::list<const seds::model::Package *> &sedsPackages, const Options &options) const -> void;
+
     auto translateDataTypeSet(const std::list<const seds::model::DataType *> &sedsDataTypes, Context &context) const
             -> void;
     auto translateInterfaceDeclarations(const std::vector<seds::model::InterfaceDeclaration> &interfaceDeclarations,
             Context &context) const -> void;
+    auto translateInterfaceImplementations(const std::vector<seds::model::Interface> &providedInterfaces,
+            const seds::model::Component &component, Context &context) const -> void;
 
 private:
     auto collectDataTypes(const seds::model::Package *package) const -> std::vector<const seds::model::DataType *>;

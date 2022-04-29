@@ -23,6 +23,7 @@
 #include "packagesdependencyresolver.h"
 #include "specialized/datatypetranslatorvisitor.h"
 #include "specialized/descriptiontranslator.h"
+#include "specialized/genericinterfacetypecreator.h"
 #include "specialized/interfacedeclarationtypecreator.h"
 
 #include <asn1library/asn1/definitions.h>
@@ -146,6 +147,12 @@ void SedsToAsn1Translator::translatePackage(const seds::model::Package *sedsPack
         const auto &componentInterfaceDeclarations = sedsComponent.declaredInterfaces();
         translateInterfaceDeclarations(componentInterfaceDeclarations, componentContext);
 
+        // Translate component interface implementations
+        const auto &providedInterfaces = sedsComponent.providedInterfaces();
+        translateInterfaceImplementations(providedInterfaces, sedsComponent, componentContext);
+        const auto &requiredInterfaces = sedsComponent.requiredInterfaces();
+        translateInterfaceImplementations(requiredInterfaces, sedsComponent, componentContext);
+
         // Create and add component ASN.1 file
         auto componentAsn1File = std::make_unique<Asn1Acn::File>(componentAsn1DefinitionsName);
         componentAsn1File->add(std::move(componentAsn1Definitions));
@@ -171,6 +178,15 @@ void SedsToAsn1Translator::translateInterfaceDeclarations(
 
     for (const auto &interfaceDeclaration : interfaceDeclarations) {
         typeCreator.createTypes(interfaceDeclaration);
+    }
+}
+
+void SedsToAsn1Translator::translateInterfaceImplementations(const std::vector<seds::model::Interface> &interfaces,
+        const seds::model::Component &component, Context &context) const
+{
+    for (const auto &interface : interfaces) {
+        GenericInterfaceTypeCreator typeCreator(context, interface, component);
+        typeCreator.createTypes();
     }
 }
 

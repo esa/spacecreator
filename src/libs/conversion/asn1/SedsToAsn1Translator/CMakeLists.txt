@@ -2,6 +2,7 @@ project(SedsToAsn1Translator VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES     context.cpp
                 datatypesdependencyresolver.cpp
+                generictypemapper.cpp
                 packagesdependencyresolver.cpp
                 patchersnippetsgenerator.cpp
                 translator.cpp
@@ -12,10 +13,12 @@ set(SOURCES     context.cpp
                 specialized/descriptiontranslator.cpp
                 specialized/dimensiontranslator.cpp
                 specialized/entrytranslatorvisitor.cpp
+                specialized/genericinterfacetypecreator.cpp
                 specialized/interfacedeclarationtypecreator.cpp
                 specialized/rangetranslatorvisitor.cpp)
 set(INCLUDES    context.h
                 datatypesdependencyresolver.h
+                generictypemapper.h
                 packagesdependencyresolver.h
                 patchersnippetsgenerator.h
                 translator.h
@@ -26,6 +29,7 @@ set(INCLUDES    context.h
                 specialized/descriptiontranslator.h
                 specialized/dimensiontranslator.h
                 specialized/entrytranslatorvisitor.h
+                specialized/genericinterfacetypecreator.h
                 specialized/interfacedeclarationtypecreator.h
                 specialized/rangetranslatorvisitor.h
                 specialized/sizetranslatorvisitor.h)

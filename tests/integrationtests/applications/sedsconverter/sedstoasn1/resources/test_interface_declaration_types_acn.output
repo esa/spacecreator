@@ -1,20 +1,20 @@
 COM-N7SPACE-INTERFACEDECLARATIONS DEFINITIONS ::= BEGIN
 PackageInteger [size 8, encoding pos-int]
-InArgsOnly-Type []
+PackageInterfaceDecl-InArgsOnly-Type []
 {
     argA [],
     argB []
 }
-OutArgsOnly-Type []
+PackageInterfaceDecl-OutArgsOnly-Type []
 {
     argA [],
     argB []
 }
-InAndNotify-TypeIn []
+PackageInterfaceDecl-InAndNotify-TypeIn []
 {
     inputArg []
 }
-InAndNotify-TypeNotify []
+PackageInterfaceDecl-InAndNotify-TypeNotify []
 {
     notifyArg []
 }

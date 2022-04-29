@@ -26,6 +26,37 @@
           </Command>
         </CommandSet>
       </Interface>
+      <Interface name="PackageGenericInterfaceDecl">
+        <GenericTypeSet>
+          <GenericType name="GenericDeterminant" />
+          <GenericType name="Generic1" />
+          <GenericType name="Generic2" />
+          <GenericType name="Generic3" />
+        </GenericTypeSet>
+        <CommandSet>
+          <Command name="InArgsOnly" mode="async">
+            <Argument name="ArgX" type="PackageInteger" mode="in" />
+            <Argument name="ArgA" type="Generic1" mode="in" />
+            <Argument name="DeterminantArg" type="GenericDeterminant" mode="in" />
+            <Argument name="ArgB" type="Generic2" mode="in" />
+            <Argument name="ArgC" type="Generic3" mode="in" />
+          </Command>
+          <Command name="OutArgsOnly" mode="async">
+            <Argument name="ArgX" type="PackageInteger" mode="out" />
+            <Argument name="ArgA" type="Generic1" mode="out" />
+            <Argument name="DeterminantArg" type="GenericDeterminant" mode="out" />
+            <Argument name="ArgB" type="Generic2" mode="out" />
+            <Argument name="ArgC" type="Generic3" mode="out" />
+          </Command>
+          <Command name="InAndNotify" mode="async">
+            <Argument name="ArgX" type="PackageInteger" mode="in" />
+            <Argument name="ArgA" type="Generic1" mode="in" />
+            <Argument name="DeterminantArg" type="GenericDeterminant" mode="in" />
+            <Argument name="ArgB" type="Generic2" mode="notify" />
+            <Argument name="ArgC" type="Generic3" mode="in" />
+          </Command>
+        </CommandSet>
+      </Interface>
     </DeclaredInterfaceSet>
     <ComponentSet>
       <Component name="Component">
@@ -34,6 +65,12 @@
             <IntegerDataEncoding encoding="unsigned" sizeInBits="8" byteOrder="littleEndian" />
             <Range>
               <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+            </Range>
+          </IntegerDataType>
+          <IntegerDataType name="DeterminantType">
+            <IntegerDataEncoding encoding="unsigned" sizeInBits="8" byteOrder="littleEndian" />
+            <Range>
+              <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="1" />
             </Range>
           </IntegerDataType>
         </DataTypeSet>
@@ -55,6 +92,25 @@
             </CommandSet>
           </Interface>
         </DeclaredInterfaceSet>
+        <ProvidedInterfaceSet>
+          <Interface name="GenericInterfaceImpl" type="PackageGenericInterfaceDecl">
+            <GenericTypeMapSet>
+              <GenericTypeMap name="Generic1" type="PackageInteger"/>
+              <AlternateSet>
+                <Alternate>
+                  <GenericTypeMap name="Generic2" type="ComponentInteger" fixedValue="12"/>
+                  <GenericTypeMap name="GenericDeterminant" type="DeterminantType" fixedValue="0"/>
+                  <GenericTypeMap name="Generic3" type="PackageInteger"/>
+                </Alternate>
+                <Alternate>
+                  <GenericTypeMap name="Generic2" type="PackageInteger" fixedValue="42"/>
+                  <GenericTypeMap name="GenericDeterminant" type="DeterminantType" fixedValue="1"/>
+                  <GenericTypeMap name="Generic3" type="ComponentInteger"/>
+                </Alternate>
+              </AlternateSet>
+            </GenericTypeMapSet>
+          </Interface>
+        </ProvidedInterfaceSet>
       </Component>
     </ComponentSet>
   </Package>

@@ -104,18 +104,9 @@ Asn1Acn::Types::Type *Context::findAsn1Type(const seds::model::DataTypeRef &type
     throw MissingAsn1TypeDefinitionException(typeRef.value().pathStr());
 }
 
-const QString &Context::definitionsName() const
+const seds::model::Package *Context::getSedsPackage() const
 {
-    return m_definitions->name();
-}
-
-std::optional<uint64_t> Context::arraySizeThreshold() const
-{
-    if (m_options.isSet(Asn1Options::sequenceSizeThreshold)) {
-        return m_options.value(Asn1Options::sequenceSizeThreshold)->toLongLong();
-    } else {
-        return std::nullopt;
-    }
+    return m_sedsPackage;
 }
 
 const seds::model::Package *Context::getSedsPackage(const QString &packageName) const
@@ -129,6 +120,11 @@ const seds::model::Package *Context::getSedsPackage(const QString &packageName) 
     }
 
     return *sedsPackage;
+}
+
+Asn1Acn::Definitions *Context::getAsn1Definitions() const
+{
+    return m_definitions;
 }
 
 Asn1Acn::Definitions *Context::getAsn1Definitions(const QString &asn1FileName) const
@@ -147,6 +143,20 @@ Asn1Acn::Definitions *Context::getAsn1Definitions(const QString &asn1FileName) c
     }
 
     return asn1Definitions;
+}
+
+const QString &Context::definitionsName() const
+{
+    return m_definitions->name();
+}
+
+std::optional<uint64_t> Context::arraySizeThreshold() const
+{
+    if (m_options.isSet(Asn1Options::sequenceSizeThreshold)) {
+        return m_options.value(Asn1Options::sequenceSizeThreshold)->toLongLong();
+    } else {
+        return std::nullopt;
+    }
 }
 
 } // namespace conversion::asn1::translator

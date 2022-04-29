@@ -1,20 +1,20 @@
 COM-N7SPACE-INTERFACEDECLARATIONS DEFINITIONS ::= BEGIN
 PackageInteger ::= INTEGER(0 .. 255)
-InArgsOnly-Type ::= SEQUENCE
+PackageInterfaceDecl-InArgsOnly-Type ::= SEQUENCE
 {
     argA PackageInteger(0 .. 255),
     argB PackageInteger(0 .. 255)
 }
-OutArgsOnly-Type ::= SEQUENCE
+PackageInterfaceDecl-OutArgsOnly-Type ::= SEQUENCE
 {
     argA PackageInteger(0 .. 255),
     argB PackageInteger(0 .. 255)
 }
-InAndNotify-TypeIn ::= SEQUENCE
+PackageInterfaceDecl-InAndNotify-TypeIn ::= SEQUENCE
 {
     inputArg PackageInteger(0 .. 255)
 }
-InAndNotify-TypeNotify ::= SEQUENCE
+PackageInterfaceDecl-InAndNotify-TypeNotify ::= SEQUENCE
 {
     notifyArg PackageInteger(0 .. 255)
 }

@@ -56,16 +56,19 @@ public:
     auto createTypes(const seds::model::InterfaceDeclaration &interfaceDeclaration) -> void;
 
 private:
-    auto createTypesForAsyncCommand(const seds::model::InterfaceCommand &command) -> void;
+    auto createTypesForAsyncCommand(const seds::model::InterfaceCommand &command, const QString &interfaceName) -> void;
     auto createAsyncCommandBundledType(const seds::model::InterfaceCommand &command, const QString &bundledTypeName,
             const seds::model::CommandArgumentMode requestedArgumentMode) -> void;
     auto createAsyncCommandBundledTypeComponent(
             const seds::model::CommandArgument &argument, Asn1Acn::Types::Sequence *bundledType) -> void;
 
+    auto buildBundledTypeName(const QString &commandName, const QString &interfaceName, QString postfix = "")
+            -> QString;
+
 private:
     Context &m_context;
 
-    inline static const QString m_bundledTypeNameTemplate = "%1-Type%2";
+    inline static const QString m_bundledTypeNameTemplate = "%1-%2-Type%3";
 };
 
 } // namespace conversion::asn1::translator

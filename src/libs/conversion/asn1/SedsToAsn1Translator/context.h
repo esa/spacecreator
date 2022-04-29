@@ -57,12 +57,13 @@ public:
     auto findSedsType(const seds::model::DataTypeRef &typeRef) -> const seds::model::DataType *;
     auto findAsn1Type(const seds::model::DataTypeRef &typeRef) -> Asn1Acn::Types::Type *;
 
+    auto getSedsPackage() const -> const seds::model::Package *;
+    auto getSedsPackage(const QString &packageName) const -> const seds::model::Package *;
+    auto getAsn1Definitions() const -> Asn1Acn::Definitions *;
+    auto getAsn1Definitions(const QString &asn1FileName) const -> Asn1Acn::Definitions *;
+
     auto definitionsName() const -> const QString &;
     auto arraySizeThreshold() const -> std::optional<uint64_t>;
-
-private:
-    auto getSedsPackage(const QString &packageName) const -> const seds::model::Package *;
-    auto getAsn1Definitions(const QString &asn1FileName) const -> Asn1Acn::Definitions *;
 
 private:
     const seds::model::Package *m_sedsPackage;

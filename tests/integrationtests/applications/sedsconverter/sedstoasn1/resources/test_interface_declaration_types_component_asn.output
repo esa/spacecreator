@@ -3,22 +3,35 @@ IMPORTS
 PackageInteger FROM COM-N7SPACE-INTERFACEDECLARATIONS
 ;
 ComponentInteger ::= INTEGER(0 .. 255)
-InArgsOnly-Type ::= SEQUENCE
+DeterminantType ::= INTEGER(0 .. 1)
+ComponentInterfaceDecl-InArgsOnly-Type ::= SEQUENCE
 {
     argA PackageInteger(0 .. 255),
     argB ComponentInteger(0 .. 255)
 }
-OutArgsOnly-Type ::= SEQUENCE
+ComponentInterfaceDecl-OutArgsOnly-Type ::= SEQUENCE
 {
     argA PackageInteger(0 .. 255),
     argB ComponentInteger(0 .. 255)
 }
-InAndNotify-TypeIn ::= SEQUENCE
+ComponentInterfaceDecl-InAndNotify-TypeIn ::= SEQUENCE
 {
     inputArg PackageInteger(0 .. 255)
 }
-InAndNotify-TypeNotify ::= SEQUENCE
+ComponentInterfaceDecl-InAndNotify-TypeNotify ::= SEQUENCE
 {
     notifyArg ComponentInteger(0 .. 255)
+}
+Component-GenericInterfaceImpl-GenericDeterminant ::= INTEGER(0 .. 1)
+Component-GenericInterfaceImpl-Generic1 ::= INTEGER(0 .. 255)
+Component-GenericInterfaceImpl-Generic2 ::= CHOICE
+{
+    concrete0 INTEGER(0 .. 255) (12),
+    concrete1 INTEGER(0 .. 255) (42)
+}
+Component-GenericInterfaceImpl-Generic3::= CHOICE
+{
+    concrete0 INTEGER(0 .. 255),
+    concrete1 INTEGER(0 .. 255)
 }
 END

@@ -1,21 +1,34 @@
 COM-N7SPACE-INTERFACEDECLARATIONS-COMPONENT DEFINITIONS ::= BEGIN
 ComponentInteger [size 8, encoding pos-int]
-InArgsOnly-Type []
+DeterminantType [size 8, encoding pos-int]
+ComponentInterfaceDecl-InArgsOnly-Type []
 {
     argA [],
     argB []
 }
-OutArgsOnly-Type []
+ComponentInterfaceDecl-OutArgsOnly-Type []
 {
     argA [],
     argB []
 }
-InAndNotify-TypeIn []
+ComponentInterfaceDecl-InAndNotify-TypeIn []
 {
     inputArg []
 }
-InAndNotify-TypeNotify []
+ComponentInterfaceDecl-InAndNotify-TypeNotify []
 {
     notifyArg []
+}
+Component-GenericInterfaceImpl-GenericDeterminant [size 8, encoding pos-int]
+Component-GenericInterfaceImpl-Generic1 [size 8, encoding pos-int]
+Component-GenericInterfaceImpl-Generic2 <DeterminantType:determinant> []
+{
+    concrete0 [size 8, encoding pos-int, present-when determinant==0],
+    concrete1 [size 8, encoding pos-int, present-when determinant==1]
+}
+Component-GenericInterfaceImpl-Generic3 <DeterminantType:determinant> []
+{
+    concrete0 [size 8, encoding pos-int, present-when determinant==0],
+    concrete1 [size 8, encoding pos-int, present-when determinant==1]
 }
 END
