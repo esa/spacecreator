@@ -1,0 +1,26 @@
+Inputobserver-Datamodel DEFINITIONS ::=
+BEGIN
+IMPORTS
+   Model-States, Model-Context FROM Model-Datamodel
+   MyInteger FROM INPUTMONITORING-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   PID, Mmi-Event, Model-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView;
+
+Inputobserver-States ::= ENUMERATED {waitfortrigger, done, waitforaction}
+
+Inputobserver-Context ::= SEQUENCE {
+   state Inputobserver-States,
+   init-done BOOLEAN,
+   received-action T-Boolean,
+   received-trigger T-Boolean
+}
+
+Inputobserver-Mmi-Event-Msg-In-Selection  ::= ENUMERATED {action-present(1)}
+Inputobserver-Mmi-Event-Msg-Out-Selection  ::= ENUMERATED {trigger-present(1)}
+Inputobserver-Mmi-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Inputobserver-Model-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), trigger-present(2)}
+Inputobserver-Model-Event-Msg-Out-Selection  ::= ENUMERATED {action-present(1)}
+Inputobserver-Model-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Inputobserver-Function-Event-Selection  ::= ENUMERATED {mmi-present(1), model-present(2)}
+Inputobserver-Observable-Event-Selection  ::= ENUMERATED {no-event-present(1), system-startup-present(2), input-event-present(3), output-event-present(4), unhandled-input-present(5)}
+END
