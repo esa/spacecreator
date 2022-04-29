@@ -7,6 +7,7 @@ Makefile.*
 
 **/wrappers/*
 **/cache/*
+**/model/**/*.ad*
 **/modelchecking/**/*.adb
 **/modelchecking/**/*.ads
 
@@ -20,3 +21,16 @@ work/glue_debug
 work/Makefile
 work/skeletons_built
 work/taste.pro
+work/simulation/cache
+work/simulation/include
+work/simulation/lib
+work/simulation/mcsrc
+work/simulation/obj
+work/simulation/observers
+work/simulation/python
+work/simulation/share
+work/simulation/*.ali
+work/simulation/*.so
+work/simulation/*.ui
+work/simulation/*.cfg
+work/simulation/*.sqlite
