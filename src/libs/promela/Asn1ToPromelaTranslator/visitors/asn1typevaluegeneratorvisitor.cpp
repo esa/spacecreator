@@ -108,26 +108,36 @@ void Asn1TypeValueGeneratorVisitor::visit(const Boolean &type)
 void Asn1TypeValueGeneratorVisitor::visit(const Null &type)
 {
     Q_UNUSED(type);
+    const QString message = QString("This type is not implemented yet (%1, %2)").arg(__LINE__).arg(__FILE__);
+    throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const BitString &type)
 {
     Q_UNUSED(type);
+    const QString message = QString("This type is not implemented yet (%1, %2)").arg(__LINE__).arg(__FILE__);
+    throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
 {
     Q_UNUSED(type);
+    const QString message = QString("This type is not implemented yet (%1, %2)").arg(__LINE__).arg(__FILE__);
+    throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const IA5String &type)
 {
     Q_UNUSED(type);
+    const QString message = QString("This type is not implemented yet (%1, %2)").arg(__LINE__).arg(__FILE__);
+    throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const NumericString &type)
 {
     Q_UNUSED(type);
+    const QString message = QString("This type is not implemented yet (%1, %2)").arg(__LINE__).arg(__FILE__);
+    throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const Enumerated &type)
@@ -158,6 +168,8 @@ void Asn1TypeValueGeneratorVisitor::visit(const Enumerated &type)
 void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
 {
     Q_UNUSED(type);
+    const QString message = QString("This type is not implemented yet (%1, %2)").arg(__LINE__).arg(__FILE__);
+    throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
@@ -184,16 +196,22 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
 {
     Q_UNUSED(type);
+    const QString message = QString("This type is not implemented yet (%1, %2)").arg(__LINE__).arg(__FILE__);
+    throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const Real &type)
 {
     Q_UNUSED(type);
+    const QString message = QString("This type is not implemented yet (%1, %2)").arg(__LINE__).arg(__FILE__);
+    throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const LabelType &type)
 {
     Q_UNUSED(type);
+    const QString message = QString("This type is not implemented yet (%1, %2)").arg(__LINE__).arg(__FILE__);
+    throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const Integer &type)
@@ -255,13 +273,6 @@ Asn1Acn::Types::Type *Asn1TypeValueGeneratorVisitor::getAsnSequenceComponentType
     Asn1Acn::Types::Type *const componentType = component->type();
     if (componentType == nullptr) {
         throw std::runtime_error("Type not specified in Component");
-    }
-
-    const auto &componentTypeEnum = componentType->typeEnum();
-    if (componentTypeEnum != Asn1Acn::Types::Type::ASN1Type::BOOLEAN
-            && componentTypeEnum != Asn1Acn::Types::Type::ASN1Type::INTEGER
-            && componentTypeEnum != Asn1Acn::Types::Type::ASN1Type::USERDEFINED) {
-        throw std::runtime_error("Unknown component type");
     }
 
     return componentType;
