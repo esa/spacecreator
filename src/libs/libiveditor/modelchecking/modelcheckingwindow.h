@@ -42,7 +42,7 @@ Q_SIGNALS:
     void visibleChanged(bool visible);
 
 private Q_SLOTS:
-    Qt::CheckState listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent, QStringList preSelection, QStringList expanded);
+    Qt::CheckState listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent, QStringList preSelection, QStringList expanded, int recLevel);
     QStringList getPropertiesSelection(QTreeWidgetItem *propertyWidgetItem, QStringList selections);
     QStringList getExpandedNodes(QTreeWidgetItem *propertyWidgetItem, QStringList expanded);
     bool isExpanded(QStringList expanded, QString dirName);

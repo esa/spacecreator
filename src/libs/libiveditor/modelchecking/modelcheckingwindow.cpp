@@ -110,7 +110,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     this->propertiesTopDirWidgetItem = new QTreeWidgetItem(fileColumnProps);
     this->propertiesTopDirWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
     d->ui->treeWidget_properties->addTopLevelItem(this->propertiesTopDirWidgetItem);
-    this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, {}, {}));
+    this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, {}, {}, 0));
 
     // Build subtyping tree view
     QFileInfo subtypesFileInfo(this->subtypesPath);
@@ -184,9 +184,10 @@ ModelCheckingWindow::~ModelCheckingWindow()
 
 /*!
  * \brief ModelCheckingWindow::listProperties Recursive function creating a tree of QTreeWidgetItem reflecting the properties directory, with memory for node (property directory or property) expansion and selection states.
+ * Up to 1 level hierarchy supported.
  * \return The recursion subtree top node selection state.
  */
-Qt::CheckState ModelCheckingWindow::listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parentFileInfo, QStringList preSelection, QStringList expanded) {
+Qt::CheckState ModelCheckingWindow::listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parentFileInfo, QStringList preSelection, QStringList expanded, int recLevel) {
     QDir dir;
     dir.setPath(parentFileInfo.filePath());
     dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoSymLinks);
@@ -203,13 +204,15 @@ Qt::CheckState ModelCheckingWindow::listProperties(QTreeWidgetItem *parentWidget
         childWidgetInfo.append(childFileInfo.fileName());
         if (childFileInfo.fileName() == "." || childFileInfo.fileName() == ".." ); // nothing
         else if(childFileInfo.isDir()) { // is directory
-            QTreeWidgetItem *childWidgetItem = new QTreeWidgetItem(childWidgetInfo);
-            childWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
-            parentWidgetItem->addChild(childWidgetItem);
-            checkState = listProperties(childWidgetItem, childFileInfo, preSelection, expanded);
-            childWidgetItem->setCheckState(0, checkState);
-            if (checkState == Qt::Unchecked){parentIsFullyChecked = false;}
-            if (checkState == Qt::Checked || checkState == Qt::PartiallyChecked){parentIsUnchecked = false;}
+            if(recLevel == 0){ // constrain to 1 level hierarchy
+                QTreeWidgetItem *childWidgetItem = new QTreeWidgetItem(childWidgetInfo);
+                childWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
+                parentWidgetItem->addChild(childWidgetItem);
+                checkState = listProperties(childWidgetItem, childFileInfo, preSelection, expanded, recLevel + 1); // constrain to 1 level hierarchy
+                childWidgetItem->setCheckState(0, checkState);
+                if (checkState == Qt::Unchecked){parentIsFullyChecked = false;}
+                if (checkState == Qt::Checked || checkState == Qt::PartiallyChecked){parentIsUnchecked = false;}
+            }
         }
         else { // is file
             if (childFileInfo.suffix() == "msc" || childFileInfo.suffix() == "pr"){
@@ -686,7 +689,7 @@ void ModelCheckingWindow::convertToObs()
         treeRoot->removeChild(treeRoot->child(i-1));
     }
     // rebuild tree with saved selection
-    this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, preSelection, expandedNodes));
+    this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, preSelection, expandedNodes, 0));
 
     statusBar()->showMessage("Observer generated.", 6000);
 }
@@ -755,7 +758,7 @@ void ModelCheckingWindow::addProperty()
                 treeRoot->removeChild(treeRoot->child(i-1));
             }
             // rebuild tree with saved selection
-            this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, preSelection, expandedNodes));
+            this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, preSelection, expandedNodes, 0));
 
             if (QDir(filePath).exists() && !QDir(filePath).isEmpty()){
                 statusBar()->showMessage("Property " + propertyName + " added.", 6000);
@@ -1256,7 +1259,7 @@ void ModelCheckingWindow::setPropertiesSelection(QStringList propertiesSelected)
         treeRoot->removeChild(treeRoot->child(i-1));
     }
     // rebuild tree with selection
-    this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, propertiesSelected, expandedNodes));
+    this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, propertiesSelected, expandedNodes, 0));
 
 }
 
