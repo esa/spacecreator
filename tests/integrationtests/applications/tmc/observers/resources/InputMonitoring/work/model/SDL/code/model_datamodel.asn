@@ -1,0 +1,16 @@
+Model-Datamodel DEFINITIONS ::=
+BEGIN
+IMPORTS
+   MyInteger FROM INPUTMONITORING-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
+
+Model-States ::= ENUMERATED {s1}
+
+Model-Context ::= SEQUENCE {
+   state Model-States,
+   init-done BOOLEAN,
+   x MyInteger,
+   y MyInteger
+}
+
+END
