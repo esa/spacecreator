@@ -134,7 +134,7 @@ void tst_IvToPromelaTranslator::testSimple()
     }
 
     {
-        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "actuator_test_channel");
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Actuator_test_channel");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -143,7 +143,7 @@ void tst_IvToPromelaTranslator::testSimple()
     }
 
     {
-        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "controller_success_channel");
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Controller_success_channel");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -152,7 +152,7 @@ void tst_IvToPromelaTranslator::testSimple()
     }
 
     {
-        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "controller_fail_channel");
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Controller_fail_channel");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -161,7 +161,7 @@ void tst_IvToPromelaTranslator::testSimple()
     }
 
     {
-        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "controller_lock");
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Controller_lock");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -170,7 +170,7 @@ void tst_IvToPromelaTranslator::testSimple()
     }
 
     {
-        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "actuator_lock");
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Actuator_lock");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -183,21 +183,21 @@ void tst_IvToPromelaTranslator::testSimple()
     QCOMPARE(promelaModel->getProctypes().size(), 3);
 
     {
-        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "actuator_test");
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Actuator_test");
         QVERIFY(proctype != nullptr);
         QVERIFY(proctype->isActive());
         QCOMPARE(proctype->getInstancesCount(), 1);
     }
 
     {
-        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "controller_success");
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Controller_success");
         QVERIFY(proctype != nullptr);
         QVERIFY(proctype->isActive());
         QCOMPARE(proctype->getInstancesCount(), 1);
     }
 
     {
-        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "controller_fail");
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Controller_fail");
         QVERIFY(proctype != nullptr);
         QVERIFY(proctype->isActive());
         QCOMPARE(proctype->getInstancesCount(), 1);
@@ -302,7 +302,7 @@ void tst_IvToPromelaTranslator::testParameters()
     }
 
     {
-        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "actuator_work_channel");
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Actuator_work_channel");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -311,7 +311,7 @@ void tst_IvToPromelaTranslator::testParameters()
     }
 
     {
-        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "controller_result_channel");
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Controller_result_channel");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -320,7 +320,7 @@ void tst_IvToPromelaTranslator::testParameters()
     }
 
     {
-        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "controller_error_channel");
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Controller_error_channel");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -329,7 +329,7 @@ void tst_IvToPromelaTranslator::testParameters()
     }
 
     {
-        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "controller_lock");
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Controller_lock");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -338,7 +338,7 @@ void tst_IvToPromelaTranslator::testParameters()
     }
 
     {
-        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "actuator_lock");
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Actuator_lock");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -351,21 +351,21 @@ void tst_IvToPromelaTranslator::testParameters()
     QCOMPARE(promelaModel->getProctypes().size(), 3);
 
     {
-        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "actuator_work");
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Actuator_work");
         QVERIFY(proctype != nullptr);
         QVERIFY(proctype->isActive());
         QCOMPARE(proctype->getInstancesCount(), 1);
     }
 
     {
-        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "controller_result");
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Controller_result");
         QVERIFY(proctype != nullptr);
         QVERIFY(proctype->isActive());
         QCOMPARE(proctype->getInstancesCount(), 1);
     }
 
     {
-        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "controller_error");
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Controller_error");
         QVERIFY(proctype != nullptr);
         QVERIFY(proctype->isActive());
         QCOMPARE(proctype->getInstancesCount(), 1);
@@ -479,7 +479,7 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
     }
 
     {
-        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "controller_test_channel");
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Controller_test_channel");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -489,7 +489,7 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
 
     {
         const Declaration *declaration =
-                findDeclaration(promelaModel->getDeclarations(), "controller_up_result_channel");
+                findDeclaration(promelaModel->getDeclarations(), "Controller_up_result_channel");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -499,7 +499,7 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
 
     {
         const Declaration *declaration =
-                findDeclaration(promelaModel->getDeclarations(), "controller_down_result_channel");
+                findDeclaration(promelaModel->getDeclarations(), "Controller_down_result_channel");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -508,7 +508,7 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
     }
 
     {
-        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "up_check_channel");
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Up_check_channel");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -517,7 +517,7 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
     }
 
     {
-        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "down_check_channel");
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Down_check_channel");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -526,7 +526,7 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
     }
 
     {
-        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "controller_lock");
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Controller_lock");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -535,7 +535,7 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
     }
 
     {
-        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "up_lock");
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Up_lock");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -544,7 +544,7 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
     }
 
     {
-        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "down_lock");
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Down_lock");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
@@ -557,35 +557,35 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
     QCOMPARE(promelaModel->getProctypes().size(), 5);
 
     {
-        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "controller_test");
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Controller_test");
         QVERIFY(proctype != nullptr);
         QVERIFY(proctype->isActive());
         QCOMPARE(proctype->getInstancesCount(), 1);
     }
 
     {
-        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "controller_up_result");
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Controller_up_result");
         QVERIFY(proctype != nullptr);
         QVERIFY(proctype->isActive());
         QCOMPARE(proctype->getInstancesCount(), 1);
     }
 
     {
-        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "controller_down_result");
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Controller_down_result");
         QVERIFY(proctype != nullptr);
         QVERIFY(proctype->isActive());
         QCOMPARE(proctype->getInstancesCount(), 1);
     }
 
     {
-        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "up_check");
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Up_check");
         QVERIFY(proctype != nullptr);
         QVERIFY(proctype->isActive());
         QCOMPARE(proctype->getInstancesCount(), 1);
     }
 
     {
-        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "down_check");
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Down_check");
         QVERIFY(proctype != nullptr);
         QVERIFY(proctype->isActive());
         QCOMPARE(proctype->getInstancesCount(), 1);
