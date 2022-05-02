@@ -23,12 +23,14 @@ default:
     - mkdir -p ${BUILD_DIR}
     - mkdir -p ${PACKAGE_DIR}
     # dependencies
-    - apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format spin
+    - apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format spin python3-pygraphviz python3-singledispatch python3-stringtemplate3 python3-pexpec 
     # install qtcreator sources
     - ./scripts/download_qtcreator.sh
     - ./scripts/build_grantlee.sh
     # install OpenGEODE dependencies
-    #  Hack antlr3 as required by opengeode
+    # *Python (both for OpenGEODE and sdl2promela)
+    - pip3 install black==21.10b0 multipledispatch pyside2 pytest
+    # *Hack antlr3 as required by opengeode
     - wget -q -O - https://download.tuxfamily.org/taste/antlr3_python3_runtime_3.4.tar.bz2 | tar jxpvf - && cd antlr3_python3_runtime_3.4 && python3 -m pip install --upgrade . && cd .. && rm -rf antlr3_python3_runtime_3.4
     # install newest OpenGEODE
     - git clone https://gitrepos.estec.esa.int/taste/opengeode.git && cd opengeode && pyside2-rcc opengeode.qrc -o opengeode/icons.py && python3 -m pip install --upgrade .
