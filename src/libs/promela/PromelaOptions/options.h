@@ -50,10 +50,14 @@ public:
     /** @brief Use function name as part of environment  */
     inline static const QString environmentFunctionName = "Promela_Convert_EnvironmentFunction";
 
-    /** @brief TODO */
-    inline static const QString observerAttachment = "Promela_Convert_ObserverAttachment";
+    /**
+     *  @brief Specification of an observer attachment
+     *  Contains information regarding the name of the observer, as well as the location
+     *  where it should be attached.
+     */
+    inline static const QString observerAttachment = "Promela_Convert_ObserverAttachmentSpecification";
 
-        /** @brief Use function name as part of model under verification */
+    /** @brief Use observer name as part of model of requirements */
     inline static const QString observerFunctionName = "Promela_Convert_ObserverFunction";
 };
 

@@ -35,7 +35,6 @@
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/IvRegistrar/registrar.h>
 #include <conversion/promela/PromelaRegistrar/registrar.h>
-#include <iostream>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivxmlreader.h>
 #include <promela/PromelaOptions/options.h>
@@ -116,9 +115,9 @@ bool TmcConverter::addStopConditionFiles(const QStringList &files)
     return true;
 }
 
-bool TmcConverter::attachObserver(const QString &attachmentSpecification)
+bool TmcConverter::attachObserver(const QString &observerPath)
 {
-    m_observerAttachments.append(attachmentSpecification);
+    m_observerFiles.append(observerPath);
     return true;
 }
 
@@ -146,30 +145,28 @@ bool TmcConverter::convertModel(const std::set<conversion::ModelType> &sourceMod
     return false;
 }
 
-auto TmcConverter::integrateObserver(QString observerSpecification, QStringList &observerNames, QStringList &asn1Files,
+auto TmcConverter::integrateObserver(QString observerPath, QStringList &observerNames, QStringList &asn1Files,
         std::map<QString, ProcessMetadata> &allSdlFiles, QStringList &attachmentInfos)
 {
-    std::cout << "spec -> " << observerSpecification.toStdString() << "\n";
     const auto separator = ":";
-    const auto elements = observerSpecification.split(separator, QString::KeepEmptyParts);
-    std::cout << "size -> " << elements.size() << "\n";
-    for (const auto &element : elements) {
-        std::cout << "element -> " << element.toStdString() << "\n";
-    }
+    // Path can contain additional priority information
+    const auto elements = observerPath.split(separator, QString::KeepEmptyParts);
     const auto processPath = elements[0];
     bool ok = true;
     const auto priority = elements.size() > 1 ? elements[1].toInt(&ok) : 1;
     if (!ok) {
-        throw "";
+        const auto message = QString("Priority %1 could not be parsed as an integer").arg(elements[1]);
+        throw TranslationException(message);
     }
 
     const auto process = QFileInfo(processPath);
     const auto processName = process.baseName();
     const auto directory = process.absoluteDir();
+    // Observers require separate system_stucture, because OpenGEODE does not save
+    // some "renames" declarations.
     const auto structure = QFileInfo(directory.absolutePath() + QDir::separator() + "system_structure.pr");
     const auto datamodel =
             QFileInfo(directory.absolutePath() + QDir::separator() + processName.toLower() + "_datamodel.asn");
-    // const auto dataview = QFileInfo(directory.absolutePath() + QDir::separator() + "dataview-uniq.asn");
 
     ProcessMetadata meta(Escaper::escapePromelaName(processName), structure, process, datamodel, QList<QFileInfo>());
     SdlToPromelaConverter sdl2Promela;
@@ -183,16 +180,15 @@ auto TmcConverter::integrateObserver(QString observerSpecification, QStringList 
         QTextStream in(&infoFile);
         while (!in.atEnd()) {
             attachmentInfos.append(in.readLine() + ":" + QString::number(priority));
-            std::cout << "Appended -> " << attachmentInfos.last().toStdString() << std::endl;
+            qDebug() << "Appended observer specification " << attachmentInfos.last();
         }
         infoFile.close();
     } else {
-        throw "";
+        const auto message = QString("Could not open observer info file %1").arg(infoPath.absoluteFilePath());
+        throw TranslationException(message);
     }
-    // asn1Files.append(dataview.absoluteFilePath());
 
     allSdlFiles.emplace(processName, meta);
-
     asn1Files.append(datamodel.absoluteFilePath());
 }
 
@@ -236,10 +232,6 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
     QMap<QString, QString> uniqueAsn1Files;
     for (const QString &ivFunction : modelFunctions) {
         const ProcessMetadata &processMetadata = allSdlFiles.at(ivFunction);
-        /*if (!uniqueAsn1Files.contains(processMetadata.getDatamodel().fileName())) {
-            uniqueAsn1Files.insert(
-                    processMetadata.getDatamodel().fileName(), processMetadata.getDatamodel().absoluteFilePath());
-        }*/
         for (const QFileInfo &fileInfo : allSdlFiles.at(ivFunction).getContext()) {
             if (fileInfo.exists()) {
                 uniqueAsn1Files.insert(fileInfo.fileName(), fileInfo.absoluteFilePath());
@@ -256,8 +248,8 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
 
     QStringList asn1Files;
 
-    for (auto &attachment : m_observerAttachments) {
-        integrateObserver(attachment, m_observerNames, asn1Files, allSdlFiles, m_observerAttachmentInfos);
+    for (auto &path : m_observerFiles) {
+        integrateObserver(path, m_observerNames, asn1Files, allSdlFiles, m_observerAttachmentInfos);
     }
 
     const QFileInfo simuDataView = simuDataViewLocation();
@@ -334,7 +326,6 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
     }
 
     for (auto &info : m_observerAttachmentInfos) {
-        std::cout << "Attaching observer info -> " << info.toStdString() << std::endl;
         options.add(PromelaOptions::observerAttachment, info);
     }
 

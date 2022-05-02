@@ -47,15 +47,15 @@ public:
     bool addStopConditionFiles(const QStringList &files);
 
     /**
-     * @brief Attach input Observer specification
+     * @brief Attach an Observer
      *
-     * It shall have the format FunctionName:InterfaceName:ObserverName.
-     * The entire specification is passed as a single string for simplicity.
+     * It shall point to the main SDL process file, followed by an optional priority, separated from the file by ":"
+     * (lower number is higher priority).
      *
-     * @param attachmentSpecification Input Observer Attachment Specification
+     * @param observerPath Path to the observer process file
      * @return true if the operation succeeded, false otherwise.
      */
-    bool attachObserver(const QString &attachmentSpecification);
+    bool attachObserver(const QString &observerPath);
 
     /**
      * @brief Prepare the system and process formal model verification.

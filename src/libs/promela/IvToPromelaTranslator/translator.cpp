@@ -21,7 +21,6 @@
 
 #include <QDebug>
 #include <conversion/common/escaper/escaper.h>
-#include <iostream>
 #include <ivcore/ivconnection.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
@@ -66,16 +65,32 @@ using shared::VEObject;
 
 namespace promela::translator {
 
+auto IvToPromelaTranslator::ObserverAttachment::stringToKind(const QString kind)
+        -> IvToPromelaTranslator::ObserverAttachment::Kind
+{
+    const auto kindIn = "ObservedSignalKind.INPUT";
+    const auto kindOut = "ObservedSignalKind.OUTPUT";
+    if (kind == kindIn) {
+        return ObserverAttachment::Kind::Kind_Input;
+    } else if (kind == kindOut) {
+        return ObserverAttachment::Kind::Kind_Output;
+    } else {
+        const auto message = QString("Observer kind %1 is unknown").arg(kind);
+        throw TranslationException(message);
+    }
+}
+
 IvToPromelaTranslator::ObserverAttachment::ObserverAttachment(QString specification)
 {
     const auto separator = ":";
-    const auto kindIn = "ObservedSignalKind.INPUT";
     const auto elements = specification.split(separator, QString::KeepEmptyParts);
     if (elements.size() < 4) {
-        throw ""; // TODO
+        const auto message =
+                QString("Observer attachment specification <%1> contains too few elements").arg(specification);
+        throw TranslationException(message);
     }
     m_observerName = elements[0];
-    m_kind = elements[1] == kindIn ? ObserverAttachment::Kind::Kind_Input : ObserverAttachment::Kind::Kind_Output;
+    m_kind = stringToKind(elements[1]);
     m_observerInterfaceName = elements[2];
     m_interfaceName = elements[3];
     m_priority = 1;
@@ -87,10 +102,11 @@ IvToPromelaTranslator::ObserverAttachment::ObserverAttachment(QString specificat
             m_fromFunctionName = elements[i].right(elements[i].length() - 1);
         } else if (elements[i].startsWith("p")) {
             bool ok = false;
-            m_priority = static_cast<IvToPromelaTranslator::ObserverAttachment::Priority>(
-                    elements[i].right(elements[i].length() - 1).toInt(&ok));
+            const auto priorityString = elements[i].right(elements[i].length() - 1);
+            m_priority = static_cast<IvToPromelaTranslator::ObserverAttachment::Priority>(priorityString.toInt(&ok));
             if (!ok) {
-                throw "";
+                const auto message = QString("Priority %1 could not be parsed as an integer").arg(priorityString);
+                throw TranslationException(message);
             }
         }
     }
@@ -144,7 +160,7 @@ auto IvToPromelaTranslator::Context::addObserverAttachment(const IvToPromelaTran
     }
 }
 
-auto IvToPromelaTranslator::Context::getObserverAttachments(QString function, QString interface,
+auto IvToPromelaTranslator::Context::getObserverAttachments(const QString &function, const QString &interface,
         const ObserverAttachment::Kind kind) -> const IvToPromelaTranslator::ObserverAttachments
 {
     ObserverAttachments result;
@@ -176,7 +192,7 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     Context context(promelaModel.get());
 
     for (const auto &info : observerAttachmentInfos) {
-        std::cout << "Adding -> " << info.toStdString() << std::endl;
+        qDebug() << "Attaching  " << info;
         context.addObserverAttachment(ObserverAttachment(info));
     }
 
