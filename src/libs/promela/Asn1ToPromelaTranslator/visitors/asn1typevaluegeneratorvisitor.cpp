@@ -108,35 +108,45 @@ void Asn1TypeValueGeneratorVisitor::visit(const Boolean &type)
 void Asn1TypeValueGeneratorVisitor::visit(const Null &type)
 {
     Q_UNUSED(type);
-    const QString message = QString("This type is not implemented yet (%1, %2)").arg(__LINE__).arg(__FILE__);
+    const QString message = QString("This ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
+                                    .arg(__FILE__)
+                                    .arg(__LINE__);
     throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const BitString &type)
 {
     Q_UNUSED(type);
-    const QString message = QString("This type is not implemented yet (%1, %2)").arg(__LINE__).arg(__FILE__);
+    const QString message = QString("This ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
+                                    .arg(__FILE__)
+                                    .arg(__LINE__);
     throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
 {
     Q_UNUSED(type);
-    const QString message = QString("This type is not implemented yet (%1, %2)").arg(__LINE__).arg(__FILE__);
+    const QString message = QString("This ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
+                                    .arg(__FILE__)
+                                    .arg(__LINE__);
     throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const IA5String &type)
 {
     Q_UNUSED(type);
-    const QString message = QString("This type is not implemented yet (%1, %2)").arg(__LINE__).arg(__FILE__);
+    const QString message = QString("This ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
+                                    .arg(__FILE__)
+                                    .arg(__LINE__);
     throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const NumericString &type)
 {
     Q_UNUSED(type);
-    const QString message = QString("This type is not implemented yet (%1, %2)").arg(__LINE__).arg(__FILE__);
+    const QString message = QString("This ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
+                                    .arg(__FILE__)
+                                    .arg(__LINE__);
     throw std::logic_error(message.toStdString().c_str());
 }
 
@@ -168,7 +178,9 @@ void Asn1TypeValueGeneratorVisitor::visit(const Enumerated &type)
 void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
 {
     Q_UNUSED(type);
-    const QString message = QString("This type is not implemented yet (%1, %2)").arg(__LINE__).arg(__FILE__);
+    const QString message = QString("This ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
+                                    .arg(__FILE__)
+                                    .arg(__LINE__);
     throw std::logic_error(message.toStdString().c_str());
 }
 
@@ -196,21 +208,27 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
 {
     Q_UNUSED(type);
-    const QString message = QString("This type is not implemented yet (%1, %2)").arg(__LINE__).arg(__FILE__);
+    const QString message = QString("This ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
+                                    .arg(__FILE__)
+                                    .arg(__LINE__);
     throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const Real &type)
 {
     Q_UNUSED(type);
-    const QString message = QString("This type is not implemented yet (%1, %2)").arg(__LINE__).arg(__FILE__);
+    const QString message = QString("This ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
+                                    .arg(__FILE__)
+                                    .arg(__LINE__);
     throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const LabelType &type)
 {
     Q_UNUSED(type);
-    const QString message = QString("This type is not implemented yet (%1, %2)").arg(__LINE__).arg(__FILE__);
+    const QString message = QString("This ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
+                                    .arg(__FILE__)
+                                    .arg(__LINE__);
     throw std::logic_error(message.toStdString().c_str());
 }
 

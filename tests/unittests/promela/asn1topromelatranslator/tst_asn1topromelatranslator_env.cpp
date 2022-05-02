@@ -89,10 +89,6 @@ using tests::common::TextCheckerAndConsumer;
 namespace tmc::test {
 
 static auto exportPromelaModel(const PromelaModel &model, const QString &filename) -> void;
-
-static auto makeAsnModelFromDefinitions(std::unique_ptr<Asn1Acn::Definitions> asnModel, const QString &name)
-        -> std::unique_ptr<Asn1Acn::Asn1Model>;
-
 static auto translateAsnToPromela(const QString &inputAsnFilename, const QStringList &asnTypesToTranslate,
         const QString &actualOutputFilename) -> void;
 static auto compareTextFiles(const QString &actualOutputFilename, const QString &expectedOutputFilename) -> void;
@@ -311,19 +307,6 @@ void exportPromelaModel(const PromelaModel &model, const QString &filename)
     options.add(conversion::promela::PromelaOptions::outputFilepath, filename);
     promela::exporter::PromelaExporter exporter;
     exporter.exportModel(&model, options);
-}
-
-std::unique_ptr<Asn1Acn::Asn1Model> makeAsnModelFromDefinitions(
-        std::unique_ptr<Asn1Acn::Definitions> asnModel, const QString &name)
-{
-    Asn1Acn::File file(name);
-    file.add(std::move(asnModel));
-
-    std::vector<std::unique_ptr<Asn1Acn::File>> files;
-    auto filePtr = std::make_unique<Asn1Acn::File>(file);
-    files.push_back(std::move(filePtr));
-
-    return std::make_unique<Asn1Acn::Asn1Model>(std::move(files));
 }
 
 void translateAsnToPromela(

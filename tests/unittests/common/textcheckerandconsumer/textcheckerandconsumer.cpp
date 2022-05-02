@@ -31,7 +31,7 @@ void TextCheckerAndConsumer::checkSequenceAndConsume(
         const std::vector<QString> &expectedOutput, QTextStream &actualConsumableOutput)
 {
     for (const auto &expectedLine : expectedOutput) {
-        if (verifyAndConsume(actualConsumableOutput, expectedLine)) {
+        if (doesStreamContainRequested(actualConsumableOutput, expectedLine)) {
             continue;
         } else {
             const QString message = QString("the generated file does not contain '%1' substring").arg(expectedLine);
@@ -61,15 +61,15 @@ std::vector<QString> TextCheckerAndConsumer::readLinesFromFile(const QString &fi
     return expectedOutput;
 }
 
-bool TextCheckerAndConsumer::verifyAndConsume(QTextStream &streamToRansack, const QString &actual)
+bool TextCheckerAndConsumer::doesStreamContainRequested(QTextStream &streamToVerify, const QString &requestedString)
 {
     QString line;
     do {
-        line = streamToRansack.readLine();
-        if (line.contains(actual)) {
+        line = streamToVerify.readLine();
+        if (line.contains(requestedString)) {
             return true;
         }
-    } while ((!line.isEmpty() || !line.contains(actual)) && !streamToRansack.atEnd());
+    } while (!streamToVerify.atEnd());
 
     return false;
 }

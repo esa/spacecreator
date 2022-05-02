@@ -51,7 +51,16 @@ public:
     static auto readLinesFromFile(const QString &filename) -> std::vector<QString>;
 
 private:
-    static auto verifyAndConsume(QTextStream &streamToRansack, const QString &actual) -> bool;
+    /**
+     * @brief check if stream contain a requested string. If yes, remove everything before that string as well as the
+     *        string itself
+     *
+     * @param streamToVerify  text stream to be checked and modified
+     * @param requestedString requested string
+     *
+     * @return true if stream contains required value, false if not
+     */
+    static auto doesStreamContainRequested(QTextStream &streamToVerify, const QString &requestedString) -> bool;
 };
 
 } // namespace tests::common
