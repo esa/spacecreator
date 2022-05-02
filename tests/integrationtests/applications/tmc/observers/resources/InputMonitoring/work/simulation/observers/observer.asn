@@ -13,7 +13,6 @@ Model-Context ::= SEQUENCE {
    y MyInteger
 }
 
-
 END
 
 INPUTMONITORING-DATAVIEW DEFINITIONS ::=
