@@ -29,7 +29,7 @@ default:
     - ./scripts/build_grantlee.sh
     # install OpenGEODE dependencies
     # *Python (both for OpenGEODE and sdl2promela)
-    - pip3 install black==21.10b0 multipledispatch pyside2 pytest
+    - pip3 install black==21.10b0 multipledispatch pyside6 pytest
     # *Hack antlr3 as required by opengeode
     - wget -q -O - https://download.tuxfamily.org/taste/antlr3_python3_runtime_3.4.tar.bz2 | tar jxpvf - && cd antlr3_python3_runtime_3.4 && python3 -m pip install --upgrade . && cd .. && rm -rf antlr3_python3_runtime_3.4
     # install newest OpenGEODE
