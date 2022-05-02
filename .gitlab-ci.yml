@@ -28,10 +28,10 @@ default:
     # *Python (both for OpenGEODE and sdl2promela)
     - pip3 install black==21.10b0 multipledispatch pyside6 pytest
     # install newest OpenGEODE (must be intalled in the same directory, removal is more robust than git clean/checkout/force)
-    - pushd; cd $HOME/tool-src; rm -r opengeode ; git clone https://gitrepos.estec.esa.int/taste/opengeode.git ; cd opengeode ; make install; popd
+    - pushd $HOME/tool-src; rm -r opengeode ; git clone https://gitrepos.estec.esa.int/taste/opengeode.git ; cd opengeode ; make install; popd
     # install sdl2promela
     - git clone https://github.com/n7space/sdl2promela.git
-    - pushd; cd sdl2promela ; make install ; popd
+    - pushd sdl2promela ; make install ; popd
     # install qtcreator sources
     - ./scripts/download_qtcreator.sh
     - ./scripts/build_grantlee.sh
