@@ -3,11 +3,15 @@
 *.autosave
 *.ini
 *.gpr
+*.md5
 Makefile.*
 
 **/wrappers/*
 **/cache/*
 **/model/**/*.ad*
+**/model/**/*.md5
+**/model/**/Makefile
+**/model/**/*.pro
 **/modelchecking/**/*.adb
 **/modelchecking/**/*.ads
 
