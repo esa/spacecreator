@@ -19,7 +19,6 @@
 
 #include "textcheckerandconsumer.h"
 
-#include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QString>
@@ -69,9 +68,6 @@ bool TextCheckerAndConsumer::verifyAndConsume(QTextStream &streamToRansack, cons
         line = streamToRansack.readLine();
         if (line.contains(actual)) {
             return true;
-        } else {
-            qDebug() << line;
-            qDebug() << actual;
         }
     } while ((!line.isEmpty() || !line.contains(actual)) && !streamToRansack.atEnd());
 
