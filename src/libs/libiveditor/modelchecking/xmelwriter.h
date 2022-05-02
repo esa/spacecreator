@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2021-2022 GMV - <tiago.jorge@gmv.com>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -14,41 +14,30 @@
    You should have received a copy of the GNU Library General Public License
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
+#ifndef XMELWRITER_H
+#define XMELWRITER_H
 
-#pragma once
+#include "modelcheckingwindow.h"
 
-#include "iveditorcore.h"
+#include <QTreeWidget>
+#include <QXmlStreamWriter>
 
-#include <QSharedPointer>
-#include <QVector>
-#include <QWidget>
-
-class QAction;
-
-namespace spctr {
-
-class IVMainWidget : public QWidget
+class XmelWriter
 {
-    Q_OBJECT
 public:
-    IVMainWidget(QWidget *parent = nullptr);
-    ~IVMainWidget();
-
-    bool init(IVEditorCorePtr data);
-
-    IVEditorCorePtr ivPlugin() const;
-
-Q_SIGNALS:
-    void requestE2EDataflow();
-    void requestModelCheckingWindow();
-
-public Q_SLOTS:
-    void setMinimapVisible(bool visible);
+    explicit XmelWriter(QStringList propertiesSelected, QStringList subtypesSelected, QStringList functionsSelected,  QStringList ifConfiguration);
+    bool writeFile(QIODevice *device, QString fileName);
 
 private:
-    void init();
+    void writeItem(QString str, QString type);
+    QXmlStreamWriter xml;
 
-    IVEditorCorePtr m_plugin;
+    QStringList propertiesSelected;
+    QStringList subtypesSelected;
+    QStringList functionsSelected;
+
+    struct IFConfig;
+    IFConfig *ifConfig;
 };
 
-}
+#endif // XMELWRITER_H

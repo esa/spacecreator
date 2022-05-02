@@ -20,6 +20,7 @@
 #include "commands/cmdchangeasn1file.h"
 #include "commandsstack.h"
 #include "endtoend/endtoendview.h"
+#include "modelchecking/modelcheckingwindow.h"
 #include "interfacedocument.h"
 #include "iveditordocument.h"
 #include "ivmainwidget.h"
@@ -34,6 +35,8 @@
 #include <QUndoCommand>
 #include <editormanager/editormanager.h>
 #include <utils/qtcassert.h>
+#include <projectexplorer/project.h>
+#include <projectexplorer/projecttree.h>
 
 namespace spctr {
 
@@ -49,6 +52,7 @@ IVQtCEditor::IVQtCEditor(SpaceCreatorProjectManager *projectManager)
     connect(m_document, &spctr::IVEditorDocument::ivDataLoaded, this,
             [this](const QString &, IVEditorCorePtr data) { m_editorWidget->init(data); });
     connect(m_editorWidget, &IVMainWidget::requestE2EDataflow, this, &IVQtCEditor::showCurrentE2EDataflow);
+    connect(m_editorWidget, &IVMainWidget::requestModelCheckingWindow, this, &IVQtCEditor::showCurrentModelCheckingWindow);
 }
 
 IVQtCEditor::~IVQtCEditor()
@@ -81,6 +85,32 @@ QWidget *IVQtCEditor::toolBar()
     }
 
     return m_toolbar;
+}
+
+void IVQtCEditor::showCurrentModelCheckingWindow()
+{
+    if (auto ivEditor = qobject_cast<spctr::IVQtCEditor *>(Core::EditorManager::currentEditor())) {
+        SpaceCreatorProjectImpl *project = m_projectManager->project(ivEditor->ivPlugin());
+        if (project) {
+            ivEditor->showModelCheckingWindow(ProjectExplorer::ProjectTree::currentProject()->projectDirectory().toString());
+        }
+    }
+}
+
+void IVQtCEditor::showModelCheckingWindow(const QString projectDir)
+{
+    if (ivPlugin().isNull()) {
+        return;
+    }
+
+    IVEditorCorePtr plugin = ivPlugin();
+    if (m_modelCheckingWindow.isNull()) {
+        m_modelCheckingWindow = new ive::ModelCheckingWindow(plugin->document(), projectDir, nullptr);
+        m_modelCheckingWindow->setAttribute(Qt::WA_DeleteOnClose);
+        connect(plugin->document(), &QObject::destroyed, m_modelCheckingWindow.data(), &QObject::deleteLater);
+    }
+    m_modelCheckingWindow->show();
+    m_modelCheckingWindow->raise();
 }
 
 void IVQtCEditor::showCurrentE2EDataflow()

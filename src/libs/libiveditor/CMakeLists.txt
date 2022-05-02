@@ -103,6 +103,13 @@ target_sources(${LIB_NAME} PRIVATE
     endtoend/endtoendview.ui
     endtoend/leafdocumentsmodel.cpp
     endtoend/leafdocumentsmodel.h
+    modelchecking/modelcheckingwindow.cpp
+    modelchecking/modelcheckingwindow.h
+    modelchecking/modelcheckingwindow.ui
+    modelchecking/xmelwriter.h
+    modelchecking/xmelwriter.cpp
+    modelchecking/xmelreader.h
+    modelchecking/xmelreader.cpp
     endtoend/end2endfunctiongraphicsitem.cpp
     endtoend/end2endfunctiongraphicsitem.h
     interfacedocument.cpp
