@@ -35,7 +35,6 @@ public:
      * @brief Constructor.
      *
      * @param promelaModel         target promela model
-     * @param enhancedSpinSupport  if true, then generate model for enhanced spin
      * @param typeNames            list of top-level type names to generate value generation inlines
      */
     Asn1NodeValueGeneratorVisitor(::promela::model::PromelaModel &promelaModel, const QStringList &typeNames);

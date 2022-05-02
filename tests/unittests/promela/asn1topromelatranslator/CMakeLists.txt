@@ -17,11 +17,21 @@ target_sources(${TEST_NAME}
                 tst_asn1topromelatranslator_env.h
                 tst_asn1topromelatranslator_values.h)
 target_include_directories(${TEST_NAME}
-    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
+    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs
+                ${CMAKE_SOURCE_DIR}/tests/unittests)
 target_link_libraries(${TEST_NAME}
     PRIVATE     Conversion::Common
                 Conversion::Asn1ToPromelaTranslator
+                PromelaExporter
+                PluginCommon
+                TextCheckerAndConsumer
                 Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test)
 
 add_format_target(${TEST_NAME})
+
+configure_file(resources/sequence.asn resources/sequence.asn COPYONLY)
+configure_file(resources/sequence-embedded.asn resources/sequence-embedded.asn COPYONLY)
+
+configure_file(resources/sequence.pml.out resources/sequence.pml.out COPYONLY)
+configure_file(resources/sequence-embedded.pml.out resources/sequence-embedded.pml.out COPYONLY)

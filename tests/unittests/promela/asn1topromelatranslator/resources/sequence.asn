@@ -1,0 +1,12 @@
+MYMODULE DEFINITIONS ::= BEGIN
+
+EnvIntParam ::= INTEGER(0 .. 9)
+EnvBoolParam ::= BOOLEAN
+
+EnvParamSeq ::= SEQUENCE {
+   x EnvIntParam,
+   y EnvIntParam OPTIONAL,
+   z EnvBoolParam
+}
+
+END

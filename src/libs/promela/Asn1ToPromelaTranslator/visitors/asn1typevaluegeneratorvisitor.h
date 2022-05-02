@@ -19,13 +19,17 @@
 
 #pragma once
 
+#include <asn1library/asn1/asnsequencecomponent.h>
+#include <asn1library/asn1/types/type.h>
 #include <asn1library/asn1/types/typereadingvisitor.h>
 #include <optional>
+#include <promela/PromelaModel/proctypeelement.h>
 #include <promela/PromelaModel/promelamodel.h>
 
 namespace promela::translator {
+
 /**
- * @brief Visitor for asn.1 toplevel types
+ * @brief Visitor for ASN.1 toplevel types
  *
  * Visitor generates Promela inlines responsible for value generation for inlines
  *
@@ -38,8 +42,7 @@ public:
      * @brief Constructor
      *
      * @param promelaModel target promela model
-     * @param name name of type
-     * @param enhancedSpinSupport  if true, then generate model for enhanced spin
+     * @param name name of ASN.1 type
      */
     Asn1TypeValueGeneratorVisitor(::promela::model::PromelaModel &promelaModel, QString name);
 
@@ -129,10 +132,16 @@ public:
     void visit(const ::Asn1Acn::Types::UserdefinedType &type) override;
 
 private:
-    void createValueGenerationInline(::promela::model::Sequence sequence);
+    auto createValueGenerationInline(::promela::model::Sequence sequence) -> void;
+    auto getAsnSequenceComponentType(Asn1Acn::AsnSequenceComponent *component) -> Asn1Acn::Types::Type *;
+    auto getSequenceComponentTypeName(const Asn1Acn::AsnSequenceComponent &asnComponent, const QString &sequenceName)
+            -> QString;
+    auto generateAsnSequenceComponentInline(Asn1Acn::AsnSequenceComponent *asnSequenceComponent,
+            const QString &argumentName) -> std::unique_ptr<model::ProctypeElement>;
 
 private:
     ::promela::model::PromelaModel &m_promelaModel;
-    const QString m_name;
+    QString m_name;
 };
-}
+
+} // namespace promela::translator

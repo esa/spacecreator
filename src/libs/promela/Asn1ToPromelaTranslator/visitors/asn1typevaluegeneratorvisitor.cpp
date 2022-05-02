@@ -19,19 +19,33 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
-#include "enumeratedgenerator.h"
 #include "integerconstraintvisitor.h"
-#include "integergenerator.h"
-#include "integersubset.h"
+#include "proctypemaker.h"
 
+#include <QList>
 #include <algorithm>
+#include <asn1library/asn1/asnsequencecomponent.h>
+#include <asn1library/asn1/sequencecomponent.h>
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/sequence.h>
+#include <asn1library/asn1/types/type.h>
+#include <asn1library/asn1/types/typereadingvisitor.h>
+#include <asn1library/asn1/values.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <list>
+#include <memory>
 #include <optional>
-#include <promela/PromelaModel/constant.h>
+#include <promela/Asn1ToPromelaTranslator/enumeratedgenerator.h>
+#include <promela/Asn1ToPromelaTranslator/integergenerator.h>
+#include <promela/Asn1ToPromelaTranslator/integersubset.h>
+#include <promela/Asn1ToPromelaTranslator/visitors/asn1sequencecomponentvisitor.h>
+#include <promela/PromelaModel/inlinecall.h>
+#include <promela/PromelaModel/inlinedef.h>
+#include <qglobal.h>
+#include <stdexcept>
+#include <utility>
 
 using Asn1Acn::Types::BitString;
 using Asn1Acn::Types::Boolean;
@@ -94,26 +108,46 @@ void Asn1TypeValueGeneratorVisitor::visit(const Boolean &type)
 void Asn1TypeValueGeneratorVisitor::visit(const Null &type)
 {
     Q_UNUSED(type);
+    const QString message = QString("Null ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
+                                    .arg(__FILE__)
+                                    .arg(__LINE__);
+    throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const BitString &type)
 {
     Q_UNUSED(type);
+    const QString message = QString("BitString ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
+                                    .arg(__FILE__)
+                                    .arg(__LINE__);
+    throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
 {
     Q_UNUSED(type);
+    const QString message = QString("OctetString ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
+                                    .arg(__FILE__)
+                                    .arg(__LINE__);
+    throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const IA5String &type)
 {
     Q_UNUSED(type);
+    const QString message = QString("IA5String ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
+                                    .arg(__FILE__)
+                                    .arg(__LINE__);
+    throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const NumericString &type)
 {
     Q_UNUSED(type);
+    const QString message = QString("NumericString ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
+                                    .arg(__FILE__)
+                                    .arg(__LINE__);
+    throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const Enumerated &type)
@@ -144,26 +178,58 @@ void Asn1TypeValueGeneratorVisitor::visit(const Enumerated &type)
 void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
 {
     Q_UNUSED(type);
+    const QString message = QString("Choice ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
+                                    .arg(__FILE__)
+                                    .arg(__LINE__);
+    throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 {
-    Q_UNUSED(type);
+    const QString argumentName = "value";
+
+    const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(type.identifier());
+    const QStringList inlineArguments = { argumentName };
+    promela::model::Sequence sequence(promela::model::Sequence::Type::NORMAL);
+    {
+        for (auto &sequenceComponent : type.components()) {
+            auto *const asnSequenceComponent = static_cast<Asn1Acn::AsnSequenceComponent *>(sequenceComponent.get());
+            if (asnSequenceComponent != nullptr) {
+                sequence.appendElement(generateAsnSequenceComponentInline(asnSequenceComponent, argumentName));
+            }
+        }
+    }
+
+    auto inlineDef = std::make_unique<InlineDef>(inlineSeqGeneratorName, inlineArguments, std::move(sequence));
+
+    m_promelaModel.addInlineDef(std::move(inlineDef));
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
 {
     Q_UNUSED(type);
+    const QString message = QString("SequenceOf ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
+                                    .arg(__FILE__)
+                                    .arg(__LINE__);
+    throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const Real &type)
 {
     Q_UNUSED(type);
+    const QString message = QString("Real ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
+                                    .arg(__FILE__)
+                                    .arg(__LINE__);
+    throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const LabelType &type)
 {
     Q_UNUSED(type);
+    const QString message = QString("LabelType ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
+                                    .arg(__FILE__)
+                                    .arg(__LINE__);
+    throw std::logic_error(message.toStdString().c_str());
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const Integer &type)
@@ -214,6 +280,66 @@ void Asn1TypeValueGeneratorVisitor::createValueGenerationInline(::promela::model
             std::make_unique<InlineDef>(inlineName, inlineArguments, std::move(sequence));
 
     m_promelaModel.addInlineDef(std::move(inlineDef));
+}
+
+Asn1Acn::Types::Type *Asn1TypeValueGeneratorVisitor::getAsnSequenceComponentType(
+        Asn1Acn::AsnSequenceComponent *const component)
+{
+    if (component == nullptr) {
+        throw std::runtime_error("Component cannot be null");
+    }
+    Asn1Acn::Types::Type *const componentType = component->type();
+    if (componentType == nullptr) {
+        throw std::runtime_error("Type not specified in Component");
+    }
+
+    return componentType;
+}
+
+QString Asn1TypeValueGeneratorVisitor::getSequenceComponentTypeName(
+        const Asn1Acn::AsnSequenceComponent &asnComponent, const QString &sequenceName)
+{
+    const auto &type = asnComponent.type();
+    if (type->label().contains(".")) {
+        return type->typeName();
+    } else {
+        return QString("%1_%2").arg(sequenceName).arg(asnComponent.name());
+    }
+}
+
+std::unique_ptr<ProctypeElement> Asn1TypeValueGeneratorVisitor::generateAsnSequenceComponentInline(
+        Asn1Acn::AsnSequenceComponent *const asnSequenceComponent, const QString &argumentName)
+{
+    const QString typeToGenerateName = getSequenceComponentTypeName(*asnSequenceComponent, m_name);
+    auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
+
+    Asn1TypeValueGeneratorVisitor visitor(*this);
+    visitor.m_name = typeToGenerateName;
+    asnSequenceComponentType->accept(visitor);
+
+    const QString typeGeneratorToCallName = QString("%1_generate_value").arg(typeToGenerateName);
+    const QString &componentName = asnSequenceComponent->name();
+    if (asnSequenceComponent->isOptional()) {
+        const QString valueExistAssignmentName = QString("%1.exist.%2").arg(argumentName).arg(componentName);
+
+        auto valueExistsSequence = ProctypeMaker::makeNormalSequence();
+        valueExistsSequence->appendElement(ProctypeMaker::makeTrueExpressionProctypeElement());
+        valueExistsSequence->appendElement(
+                ProctypeMaker::makeInlineCall(typeGeneratorToCallName, argumentName, componentName));
+        valueExistsSequence->appendElement(ProctypeMaker::makeAssignmentProctypeElement(valueExistAssignmentName, 1));
+
+        auto valueNotExistSequence = ProctypeMaker::makeNormalSequence();
+        valueNotExistSequence->appendElement(ProctypeMaker::makeTrueExpressionProctypeElement());
+        valueNotExistSequence->appendElement(ProctypeMaker::makeAssignmentProctypeElement(valueExistAssignmentName, 0));
+
+        Conditional conditional;
+        conditional.appendAlternative(std::move(valueExistsSequence));
+        conditional.appendAlternative(std::move(valueNotExistSequence));
+
+        return std::make_unique<ProctypeElement>(std::move(conditional));
+    } else {
+        return ProctypeMaker::makeInlineCall(typeGeneratorToCallName, argumentName, componentName);
+    }
 }
 
 } // namespace promela::translator

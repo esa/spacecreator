@@ -18,9 +18,10 @@ target_include_directories(PluginCommon
 
 target_link_libraries(PluginCommon
     PUBLIC      ivcore
-    PRIVATE     ConversionCommon
-                Asn1Importer
+    PRIVATE     Asn1Importer
                 CommonProjectWarnings
+                ConversionCommon
+                CsvImporter
                 IvXmlImporter
                 SedsXmlImporter
                 SedsModel

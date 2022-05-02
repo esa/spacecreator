@@ -19,16 +19,51 @@
 
 #include "tst_asn1topromelatranslator_env.h"
 
+#include "asn1model.h"
+#include "assignment.h"
+#include "binaryexpression.h"
+#include "conditional.h"
+#include "conversion/asn1/Asn1Exporter/exporter.h"
+#include "conversion/asn1/Asn1Importer/importer.h"
+#include "conversion/asn1/Asn1Options/options.h"
+#include "declaration.h"
+#include "definitions.h"
+#include "expression.h"
+#include "file.h"
+#include "inlinecall.h"
+#include "options.h"
+#include "promela/PromelaExporter/promelaexporter.h"
+#include "promela/PromelaOptions/options.h"
+#include "sequencecomponent.h"
+#include "typeassignment.h"
+#include "types/type.h"
+#include "types/typereadingvisitor.h"
+#include "types/userdefinedtype.h"
+#include "variableref.h"
+#include "visitors/asn1constraintvisitor.h"
+
+#include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <asn1library/asn1/types/boolean.h>
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/values.h>
+#include <common/textcheckerandconsumer/textcheckerandconsumer.h>
+#include <exception>
+#include <memory>
+#include <modelloader.h>
 #include <promela/Asn1ToPromelaTranslator/visitors/asn1nodevaluegeneratorvisitor.h>
 #include <promela/PromelaModel/constant.h>
 #include <promela/PromelaModel/promelamodel.h>
+#include <promela/PromelaModel/sequence.h>
+#include <qdir.h>
+#include <qtestcase.h>
+#include <qvariant.h>
+#include <utility>
 #include <variant>
 
+using Asn1Acn::AsnSequenceComponent;
 using Asn1Acn::IntegerValue;
 using Asn1Acn::SourceLocation;
 using Asn1Acn::TypeAssignment;
@@ -38,15 +73,25 @@ using Asn1Acn::Types::Enumerated;
 using Asn1Acn::Types::EnumeratedItem;
 using Asn1Acn::Types::Integer;
 using promela::model::Assignment;
+using promela::model::BinaryExpression;
 using promela::model::Conditional;
 using promela::model::Constant;
+using promela::model::Declaration;
+using promela::model::Expression;
+using promela::model::InlineCall;
 using promela::model::InlineDef;
 using promela::model::PromelaModel;
 using promela::model::Sequence;
 using promela::model::VariableRef;
 using promela::translator::Asn1NodeValueGeneratorVisitor;
+using tests::common::TextCheckerAndConsumer;
 
 namespace tmc::test {
+
+static auto exportPromelaModel(const PromelaModel &model, const QString &filename) -> void;
+static auto translateAsnToPromela(const QString &inputAsnFilename, const QStringList &asnTypesToTranslate,
+        const QString &actualOutputFilename) -> void;
+static auto compareTextFiles(const QString &actualOutputFilename, const QString &expectedOutputFilename) -> void;
 
 void tst_Asn1ToPromelaTranslator_Env::initTestCase() {}
 
@@ -91,14 +136,16 @@ void tst_Asn1ToPromelaTranslator_Env::testBoolean() const
         QCOMPARE(sequence->getContent().size(), 2);
 
         for (const auto &content : sequence->getContent()) {
-            if (!std::holds_alternative<Assignment>(content->getValue())) {
+            const auto &contentValue = content->getValue();
+            if (!std::holds_alternative<Assignment>(contentValue)) {
                 continue;
             }
 
-            const Assignment &assignment = std::get<Assignment>(content->getValue());
-            QCOMPARE(assignment.getVariableRef().getElements().size(), 1);
-            QCOMPARE(assignment.getVariableRef().getElements().front().m_name, argName);
-            QVERIFY(assignment.getVariableRef().getElements().front().m_index.get() == nullptr);
+            const Assignment &assignment = std::get<Assignment>(contentValue);
+            const std::list<VariableRef::Element> &assignmentElements = assignment.getVariableRef().getElements();
+            QCOMPARE(assignmentElements.size(), 1);
+            QCOMPARE(assignmentElements.front().m_name, argName);
+            QVERIFY(assignmentElements.front().m_index.get() == nullptr);
 
             const Constant &constant = std::get<Constant>(assignment.getExpression().getContent());
             valuesFound.push_back(static_cast<bool>(constant.getValue()));
@@ -156,9 +203,13 @@ void tst_Asn1ToPromelaTranslator_Env::testInteger() const
 
         QVERIFY(std::holds_alternative<Assignment>(nestedSequence->getContent().back()->getValue()));
         const Assignment &assignment = std::get<Assignment>(nestedSequence->getContent().back()->getValue());
-        QCOMPARE(assignment.getVariableRef().getElements().size(), 1);
-        QCOMPARE(assignment.getVariableRef().getElements().front().m_name, argName);
-        QVERIFY(assignment.getVariableRef().getElements().front().m_index.get() == nullptr);
+        const VariableRef &variableRef = assignment.getVariableRef();
+
+        const std::list<VariableRef::Element> &variableRefElements = variableRef.getElements();
+        QCOMPARE(variableRefElements.size(), 1);
+        QCOMPARE(variableRefElements.front().m_name, argName);
+        QVERIFY(variableRefElements.front().m_index.get() == nullptr);
+
         QVERIFY(std::holds_alternative<Constant>(assignment.getExpression().getContent()));
         const Constant &constant = std::get<Constant>(assignment.getExpression().getContent());
         QCOMPARE(constant.getValue(), i);
@@ -223,8 +274,72 @@ void tst_Asn1ToPromelaTranslator_Env::testEnumerated() const
     }
 }
 
+void tst_Asn1ToPromelaTranslator_Env::testSequence() const
+{
+    const QString inputAsnFilename = "sequence.asn";
+    const QStringList asnTypesToTranslate = { "EnvIntParam", "EnvBoolParam", "EnvParamSeq" };
+    const QString actualOutputFilename = "sequence.pml";
+    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
+
+    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
+    compareTextFiles(actualOutputFilename, expectedOutputFilename);
+}
+
+void tst_Asn1ToPromelaTranslator_Env::testSequenceEmbeddedType() const
+{
+    const QString inputAsnFilename = "sequence-embedded.asn";
+    const QStringList asnTypesToTranslate = { "EnvParamSeq" };
+    const QString actualOutputFilename = "sequence-embedded.pml";
+    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
+
+    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
+    compareTextFiles(actualOutputFilename, expectedOutputFilename);
+}
+
 std::unique_ptr<Definitions> tst_Asn1ToPromelaTranslator_Env::createModel() const
 {
     return std::make_unique<Definitions>("myModule", SourceLocation());
 }
+
+void exportPromelaModel(const PromelaModel &model, const QString &filename)
+{
+    conversion::Options options;
+    options.add(conversion::promela::PromelaOptions::outputFilepath, filename);
+    promela::exporter::PromelaExporter exporter;
+    exporter.exportModel(&model, options);
 }
+
+void translateAsnToPromela(
+        const QString &inputAsnFilename, const QStringList &asnTypesToTranslate, const QString &actualOutputFilename)
+{
+    auto asnModel = plugincommon::ModelLoader::loadAsn1Model(
+            QString("resources%1%2").arg(QDir::separator()).arg(inputAsnFilename));
+    QVERIFY(asnModel != nullptr);
+    QVERIFY(!asnModel->data().empty());
+
+    PromelaModel promelaModel;
+    Asn1NodeValueGeneratorVisitor visitor(promelaModel, asnTypesToTranslate);
+    const auto &asnFile = *asnModel->data().front();
+    visitor.visit(asnFile);
+
+    exportPromelaModel(promelaModel, actualOutputFilename);
+}
+
+void compareTextFiles(const QString &actualOutputFilename, const QString &expectedOutputFilename)
+{
+    QFile outputFile(actualOutputFilename);
+    if (!outputFile.open(QIODevice::ReadOnly)) {
+        QFAIL(QString("requested file (%1) cannot be found").arg(actualOutputFilename).toStdString().c_str());
+    }
+    QTextStream consumableOutput(&outputFile);
+
+    const QString expectedFilepath = QString("resources%1%2").arg(QDir::separator()).arg(expectedOutputFilename);
+    try {
+        const std::vector<QString> expectedOutput = TextCheckerAndConsumer::readLinesFromFile(expectedFilepath);
+        TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
+    } catch (const std::exception &e) {
+        QFAIL(e.what());
+    }
+}
+
+} // namespace tmc::test
