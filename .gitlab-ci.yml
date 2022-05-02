@@ -27,6 +27,11 @@ default:
     # install qtcreator sources
     - ./scripts/download_qtcreator.sh
     - ./scripts/build_grantlee.sh
+    # install OpenGEODE dependencies
+    #  Hack antlr3 as required by opengeode
+    - wget -q -O - https://download.tuxfamily.org/taste/antlr3_python3_runtime_3.4.tar.bz2 | tar jxpvf - && cd antlr3_python3_runtime_3.4 && python3 -m pip install --upgrade . && cd .. && rm -rf antlr3_python3_runtime_3.4
+    # install newest OpenGEODE
+    - git clone https://gitrepos.estec.esa.int/taste/opengeode.git && cd opengeode && pyside2-rcc opengeode.qrc -o opengeode/icons.py && python3 -m pip install --upgrade .
     # install sdl2promela
     - git clone https://github.com/n7space/sdl2promela.git
     - cd sdl2promela ; make install
