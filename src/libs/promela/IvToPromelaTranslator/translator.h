@@ -195,6 +195,9 @@ public:
     auto getDependencies() const -> std::set<conversion::ModelType> override;
 
 private:
+    auto attachInputObservers(IvToPromelaTranslator::Context &context, const QString &functionName,
+            const QString &interfaceName, const QString &parameterName, const QString &parameterType,
+            promela::model::Sequence *sequence) const -> void;
     auto generateInitProctype(const std::vector<QString> &modelFunctions, const std::vector<QString> &observers,
             const ::ivm::IVModel *ivModel) const -> ::promela::model::InitProctype;
     auto generateProctype(Context &context, const QString &functionName, const QString &interfaceName,

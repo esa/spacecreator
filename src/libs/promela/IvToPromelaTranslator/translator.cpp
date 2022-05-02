@@ -341,8 +341,9 @@ static auto observerInputSignalName(const IvToPromelaTranslator::ObserverAttachm
             .arg(Escaper::escapePromelaName(attachment.observerInterface()));
 }
 
-static auto attachInputObservers(IvToPromelaTranslator::Context &context, QString functionName, QString interfaceName,
-        QString parameterName, const QString &parameterType, Sequence *sequence) -> void
+auto IvToPromelaTranslator::attachInputObservers(IvToPromelaTranslator::Context &context, const QString &functionName,
+        const QString &interfaceName, const QString &parameterName, const QString &parameterType,
+        Sequence *sequence) const -> void
 {
     auto attachments = context.getObserverAttachments(
             functionName, interfaceName, IvToPromelaTranslator::ObserverAttachment::Kind::Kind_Input);
