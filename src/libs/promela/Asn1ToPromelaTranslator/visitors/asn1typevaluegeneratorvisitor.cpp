@@ -188,7 +188,8 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 {
     const QString argumentName = "value";
 
-    const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(type.identifier());
+    const QString inlineSeqGeneratorName =
+            QString("%1_generate_value").arg(Escaper::escapePromelaName(Escaper::escapePromelaName(type.identifier())));
     const QStringList inlineArguments = { argumentName };
     promela::model::Sequence sequence(promela::model::Sequence::Type::NORMAL);
     {
@@ -274,7 +275,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const UserdefinedType &type)
 
 void Asn1TypeValueGeneratorVisitor::createValueGenerationInline(::promela::model::Sequence sequence)
 {
-    const QString inlineName = QString("%1_generate_value").arg(m_name);
+    const QString inlineName = QString("%1_generate_value").arg(Escaper::escapePromelaName(m_name));
     const QList<QString> inlineArguments = { QString("value") };
     std::unique_ptr<InlineDef> inlineDef =
             std::make_unique<InlineDef>(inlineName, inlineArguments, std::move(sequence));
@@ -317,15 +318,16 @@ std::unique_ptr<ProctypeElement> Asn1TypeValueGeneratorVisitor::generateAsnSeque
     visitor.m_name = typeToGenerateName;
     asnSequenceComponentType->accept(visitor);
 
-    const QString typeGeneratorToCallName = QString("%1_generate_value").arg(typeToGenerateName);
+    const QString typeGeneratorToCallName =
+            QString("%1_generate_value").arg(Escaper::escapePromelaName(typeToGenerateName));
     const QString &componentName = asnSequenceComponent->name();
     if (asnSequenceComponent->isOptional()) {
         const QString valueExistAssignmentName = QString("%1.exist.%2").arg(argumentName).arg(componentName);
 
         auto valueExistsSequence = ProctypeMaker::makeNormalSequence();
         valueExistsSequence->appendElement(ProctypeMaker::makeTrueExpressionProctypeElement());
-        valueExistsSequence->appendElement(
-                ProctypeMaker::makeInlineCall(typeGeneratorToCallName, argumentName, componentName));
+        valueExistsSequence->appendElement(ProctypeMaker::makeInlineCall(typeGeneratorToCallName,
+                Escaper::escapePromelaName(argumentName), Escaper::escapePromelaName(componentName)));
         valueExistsSequence->appendElement(ProctypeMaker::makeAssignmentProctypeElement(valueExistAssignmentName, 1));
 
         auto valueNotExistSequence = ProctypeMaker::makeNormalSequence();
@@ -338,7 +340,8 @@ std::unique_ptr<ProctypeElement> Asn1TypeValueGeneratorVisitor::generateAsnSeque
 
         return std::make_unique<ProctypeElement>(std::move(conditional));
     } else {
-        return ProctypeMaker::makeInlineCall(typeGeneratorToCallName, argumentName, componentName);
+        return ProctypeMaker::makeInlineCall(
+                typeGeneratorToCallName, argumentName, Escaper::escapePromelaName(componentName));
     }
 }
 

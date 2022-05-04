@@ -375,8 +375,9 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(Context &conte
 {
     QString channelName = constructChannelName(functionName, interfaceName);
     QList<ChannelInit::Type> channelType;
-    channelType.append(
-            parameterType.isEmpty() ? ChannelInit::Type(BasicType::INT) : ChannelInit::Type(UtypeRef(parameterType)));
+    channelType.append(parameterType.isEmpty()
+                    ? ChannelInit::Type(BasicType::INT)
+                    : ChannelInit::Type(UtypeRef(Escaper::escapePromelaName(parameterType))));
     ChannelInit channelInit(queueSize, std::move(channelType));
     Declaration declaration(DataType(BasicType::CHAN), channelName);
     declaration.setInit(channelInit);
@@ -400,8 +401,8 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(Context &conte
     const QString &signalParameterName = "signal_parameter";
 
     if (!parameterType.isEmpty()) {
-        std::unique_ptr<ProctypeElement> variableDecl =
-                std::make_unique<ProctypeElement>(Declaration(DataType(UtypeRef(parameterType)), signalParameterName));
+        std::unique_ptr<ProctypeElement> variableDecl = std::make_unique<ProctypeElement>(
+                Declaration(DataType(UtypeRef(Escaper::escapePromelaName(parameterType))), signalParameterName));
         sequence.appendElement(std::move(variableDecl));
     }
 
@@ -464,8 +465,8 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(con
     sequence.appendElement(std::move(waitForInit));
 
     if (!parameterType.isEmpty()) {
-        sequence.appendElement(
-                std::make_unique<ProctypeElement>(Declaration(DataType(UtypeRef(parameterType)), "value")));
+        sequence.appendElement(std::make_unique<ProctypeElement>(
+                Declaration(DataType(UtypeRef(Escaper::escapePromelaName(parameterType))), "value")));
     }
 
     DoLoop loop;
@@ -477,7 +478,8 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(con
 
         loopSequence->appendElement(std::move(inlineCall));
     } else {
-        const QString generateValueInlineName = QString("%1_generate_value").arg(parameterType);
+        const QString generateValueInlineName =
+                QString("%1_generate_value").arg(Escaper::escapePromelaName(parameterType));
         QList<InlineCall::Argument> arguments;
         arguments.append(VariableRef("value"));
         std::unique_ptr<ProctypeElement> valueGeneration =
