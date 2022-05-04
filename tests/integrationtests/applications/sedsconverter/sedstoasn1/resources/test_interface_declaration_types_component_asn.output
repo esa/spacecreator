@@ -34,4 +34,18 @@ Component-GenericInterfaceImpl-Generic3::= CHOICE
     concrete0 INTEGER(0 .. 255),
     concrete1 INTEGER(0 .. 255)
 }
+Component-GenericInterfaceImpl-InArgsOnlyType ::= SEQUENCE
+{
+    argX PackageInteger(0 .. 255),
+    argA Component-GenericInterfaceImpl-Generic1(0 .. 255),
+    argB Component-GenericInterfaceImpl-Generic2,
+    argC Component-GenericInterfaceImpl-Generic3
+}
+Component-GenericInterfaceImpl-OutArgsOnlyType ::= SEQUENCE
+{
+    argX PackageInteger(0 .. 255),
+    argA Component-GenericInterfaceImpl-Generic1(0 .. 255),
+    argB Component-GenericInterfaceImpl-Generic2,
+    argC Component-GenericInterfaceImpl-Generic3
+}
 END

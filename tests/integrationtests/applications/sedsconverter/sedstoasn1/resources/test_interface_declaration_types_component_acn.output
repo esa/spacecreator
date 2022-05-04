@@ -31,4 +31,20 @@ Component-GenericInterfaceImpl-Generic3 <DeterminantType:determinant> []
     concrete0 [size 8, encoding pos-int, present-when determinant==0],
     concrete1 [size 8, encoding pos-int, present-when determinant==1]
 }
+Component-GenericInterfaceImpl-InArgsOnlyType []
+{
+    argX [],
+    argA [],
+    determinantArg Component-GenericInterfaceImpl-GenericDeterminant [],
+    argB <determinantArg>[],
+    argC <determinantArg>[]
+}
+Component-GenericInterfaceImpl-OutArgsOnlyType []
+{
+    argX [],
+    argA [],
+    determinantArg Component-GenericInterfaceImpl-GenericDeterminant [],
+    argB <determinantArg>[],
+    argC <determinantArg>[]
+}
 END

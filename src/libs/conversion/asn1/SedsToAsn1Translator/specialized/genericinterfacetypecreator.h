@@ -71,10 +71,18 @@ private:
             const TypeMapping::Concrete &concreteType, Asn1Acn::Types::Choice *choice, const std::size_t count) -> void;
     auto handleFixedValue(Asn1Acn::Types::Type *type, const QString &fixedValue) -> void;
 
+    auto createTypesForAsyncCommand(const seds::model::InterfaceCommand &command) -> void;
+    auto createAsyncCommandBundledType(const seds::model::InterfaceCommand &command, const QString &bundledTypeName,
+            const seds::model::CommandArgumentMode requestedArgumentMode) -> void;
+    auto createAsyncCommandBundledTypeComponent(const seds::model::CommandArgument &argument,
+            Asn1Acn::Types::Sequence *bundledType, const QString &determinantArgumentName) -> void;
+
     auto findInterfaceDeclaration(const seds::model::InterfaceDeclarationRef &interfaceRef)
             -> const seds::model::InterfaceDeclaration *;
+    auto findDeterminantArgument(const std::vector<seds::model::CommandArgument> &arguments) -> QString;
+    auto isTypeGeneric(const seds::model::DataTypeRef &typeRef) -> bool;
 
-    auto buildBundledTypeName(const QString &commandName, QString postfix = "") -> QString;
+    auto buildBundledTypeName(const QString &commandName) -> QString;
     auto buildConcreteTypeName(const QString &genericName) -> QString;
 
 private:
@@ -86,7 +94,7 @@ private:
 
     GenericTypeMapper m_typeMapper;
 
-    inline static const QString m_bundledTypeNameTemplate = "%1-%2-Type%3";
+    inline static const QString m_bundledTypeNameTemplate = "%1-%2-%3Type";
     inline static const QString m_concreteTypeNameTemplate = "%1-%2-%3";
 };
 

@@ -48,13 +48,6 @@
             <Argument name="ArgB" type="Generic2" mode="out" />
             <Argument name="ArgC" type="Generic3" mode="out" />
           </Command>
-          <Command name="InAndNotify" mode="async">
-            <Argument name="ArgX" type="PackageInteger" mode="in" />
-            <Argument name="ArgA" type="Generic1" mode="in" />
-            <Argument name="DeterminantArg" type="GenericDeterminant" mode="in" />
-            <Argument name="ArgB" type="Generic2" mode="notify" />
-            <Argument name="ArgC" type="Generic3" mode="in" />
-          </Command>
         </CommandSet>
       </Interface>
     </DeclaredInterfaceSet>

@@ -22,6 +22,7 @@
 #include "generictypemapper.h"
 #include "specialized/rangetranslatorvisitor.h"
 
+#include <asn1library/asn1/acnsequencecomponent.h>
 #include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/typeassignment.h>
 #include <asn1library/asn1/types/bitstring.h>
@@ -75,6 +76,12 @@ void GenericInterfaceTypeCreator::createTypes()
     for (const auto &genericType : genericTypes) {
         createTypeForGeneric(genericType);
     }
+
+    for (const auto &command : m_interfaceDeclaration->commands()) {
+        if (command.mode() == InterfaceCommandMode::Async) {
+            createTypesForAsyncCommand(command);
+        }
+    }
 }
 
 void GenericInterfaceTypeCreator::createTypeForGeneric(const seds::model::GenericType &genericType)
@@ -83,8 +90,9 @@ void GenericInterfaceTypeCreator::createTypeForGeneric(const seds::model::Generi
 
     const auto mapping = m_typeMapper.getMapping(genericName);
     if (mapping == nullptr || mapping->concreteMappings.empty()) {
-        auto errorMessage =
-                QString("Missing mapping for generic type '%1' in interface '%2'").arg(genericName).arg(m_interface.nameStr());
+        auto errorMessage = QString("Missing mapping for generic type '%1' in interface '%2'")
+                                    .arg(genericName)
+                                    .arg(m_interface.nameStr());
         throw TranslationException(std::move(errorMessage));
     }
 
@@ -232,6 +240,110 @@ void GenericInterfaceTypeCreator::handleFixedValue(Asn1Acn::Types::Type *type, c
     }
 }
 
+void GenericInterfaceTypeCreator::createTypesForAsyncCommand(const seds::model::InterfaceCommand &command)
+{
+    const auto commandName = Escaper::escapeAsn1TypeName(command.nameStr());
+
+    // Process command based on its commands
+    switch (command.argumentsCombination()) {
+    case seds::model::ArgumentsCombination::InOnly: {
+        // In arguments are 'native', so they are handles as-is
+        const auto bundledTypeName = buildBundledTypeName(commandName);
+        createAsyncCommandBundledType(command, bundledTypeName, seds::model::CommandArgumentMode::In);
+    } break;
+    case seds::model::ArgumentsCombination::OutOnly: {
+        // Out arguments aren't supported by TASTE sporadic interface.
+        // We cannot change the argument direction, so we switch interface type (provided <-> required)
+        const auto bundledTypeName = buildBundledTypeName(commandName);
+        createAsyncCommandBundledType(command, bundledTypeName, seds::model::CommandArgumentMode::Out);
+    } break;
+    case seds::model::ArgumentsCombination::NoArgs: {
+        // No arguments, no problems
+        break;
+    }
+    case seds::model::ArgumentsCombination::InAndNotify:
+    case seds::model::ArgumentsCombination::NotifyOnly:
+    case seds::model::ArgumentsCombination::InAndOut:
+    case seds::model::ArgumentsCombination::OutAndNotify:
+    case seds::model::ArgumentsCombination::All: {
+        const auto message = QString("Interface command arguments combination '%1' is not supported for TASTE "
+                                     "InterfaceView async generic interface")
+                                     .arg(argumentsCombinationToString(command.argumentsCombination()));
+        throw TranslationException(message);
+    } break;
+    default:
+        throw UnhandledValueException("ArgumentsCombination");
+        break;
+    }
+}
+
+void GenericInterfaceTypeCreator::createAsyncCommandBundledType(const seds::model::InterfaceCommand &command,
+        const QString &bundledTypeName, const seds::model::CommandArgumentMode requestedArgumentMode)
+{
+    auto bundledType = std::make_unique<Asn1Acn::Types::Sequence>(bundledTypeName);
+
+    const auto determinantArgumentName = findDeterminantArgument(command.arguments());
+
+    for (const auto &argument : command.arguments()) {
+        if (argument.mode() != requestedArgumentMode) {
+            continue;
+        }
+
+        createAsyncCommandBundledTypeComponent(argument, bundledType.get(), determinantArgumentName);
+    }
+
+    m_context.addAsn1Type(std::move(bundledType), nullptr);
+}
+
+void GenericInterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const seds::model::CommandArgument &argument,
+        Asn1Acn::Types::Sequence *bundledType, const QString &determinantArgumentName)
+{
+    const auto argumentName = Escaper::escapeAsn1FieldName(argument.nameStr());
+    const auto argumentTypeRef = argument.type();
+
+    Asn1Acn::Types::Type *argumentType = nullptr;
+
+    const auto isGeneric = isTypeGeneric(argumentTypeRef);
+
+    if (isGeneric) {
+        const auto argumentConcreteTypeName = buildConcreteTypeName(argumentTypeRef.nameStr());
+        argumentType = m_context.findAsn1Type(argumentConcreteTypeName);
+
+        auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
+                argumentType->identifier(), m_context.definitionsName());
+        sequenceComponentType->setType(argumentType->clone());
+
+        if (argumentName == determinantArgumentName) {
+            auto sequenceComponent = std::make_unique<Asn1Acn::AcnSequenceComponent>(
+                    argumentName, argumentName, std::move(sequenceComponentType));
+
+            bundledType->addComponent(std::move(sequenceComponent));
+        } else {
+            auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(argumentName, argumentName, false,
+                    std::nullopt, "", Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
+                    std::move(sequenceComponentType));
+
+            if (argumentType->typeEnum() == Asn1Acn::Types::Type::ASN1Type::CHOICE) {
+                sequenceComponent->addAcnParameter(determinantArgumentName);
+            }
+
+            bundledType->addComponent(std::move(sequenceComponent));
+        }
+    } else {
+        argumentType = m_context.findAsn1Type(argumentTypeRef);
+
+        auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
+                argumentType->identifier(), m_context.definitionsName());
+        sequenceComponentType->setType(argumentType->clone());
+
+        auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(argumentName, argumentName, false,
+                std::nullopt, "", Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
+                std::move(sequenceComponentType));
+
+        bundledType->addComponent(std::move(sequenceComponent));
+    }
+}
+
 const seds::model::InterfaceDeclaration *GenericInterfaceTypeCreator::findInterfaceDeclaration(
         const seds::model::InterfaceDeclarationRef &interfaceRef)
 {
@@ -268,12 +380,33 @@ const seds::model::InterfaceDeclaration *GenericInterfaceTypeCreator::findInterf
     throw UndeclaredInterfaceException(interfaceRef.value().pathStr());
 }
 
-QString GenericInterfaceTypeCreator::buildBundledTypeName(const QString &commandName, QString postfix)
+QString GenericInterfaceTypeCreator::findDeterminantArgument(const std::vector<seds::model::CommandArgument> &arguments)
 {
-    return m_bundledTypeNameTemplate.arg(m_component.nameStr())
-            .arg(m_interface.nameStr())
-            .arg(commandName)
-            .arg(postfix);
+    const auto &determinantName = m_typeMapper.determinantName();
+    const auto foundArgument = std::find_if(arguments.begin(), arguments.end(),
+            [&](const seds::model::CommandArgument &argument) { return argument.type().nameStr() == determinantName; });
+
+    return Escaper::escapeAsn1FieldName(foundArgument->nameStr());
+}
+
+bool GenericInterfaceTypeCreator::isTypeGeneric(const seds::model::DataTypeRef &typeRef)
+{
+    if (typeRef.packageStr()) {
+        return false;
+    }
+
+    const auto &typeName = typeRef.nameStr();
+    const auto &genericTypes = m_interfaceDeclaration->genericTypes();
+
+    const auto found = std::find_if(genericTypes.begin(), genericTypes.end(),
+            [&](const seds::model::GenericType &genericType) { return genericType.nameStr() == typeName; });
+
+    return found != genericTypes.end();
+}
+
+QString GenericInterfaceTypeCreator::buildBundledTypeName(const QString &commandName)
+{
+    return m_bundledTypeNameTemplate.arg(m_component.nameStr()).arg(m_interface.nameStr()).arg(commandName);
 }
 
 QString GenericInterfaceTypeCreator::buildConcreteTypeName(const QString &genericName)
