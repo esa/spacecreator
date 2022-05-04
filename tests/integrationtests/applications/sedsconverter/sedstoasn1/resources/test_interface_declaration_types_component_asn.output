@@ -5,6 +5,7 @@ PackageIntegerArray-3x3x3 FROM COM-N7SPACE-INTERFACEDECLARATIONS
 ;
 ComponentInteger ::= INTEGER(0 .. 255)
 DeterminantType ::= INTEGER(0 .. 1)
+PackageIntegerArray-13 ::= SEQUENCE (SIZE(13)) OF PackageInteger(0 .. 255)
 PackageIntegerArray-3 ::= SEQUENCE (SIZE(3)) OF PackageInteger(0 .. 255)
 ComponentInterfaceDecl-InArgsOnly-Type ::= SEQUENCE
 {
@@ -39,6 +40,7 @@ Component-GenericInterfaceImpl-Generic3::= CHOICE
     concrete0 INTEGER(0 .. 255),
     concrete1 INTEGER(0 .. 255)
 }
+PackageIntegerArray-2 ::= SEQUENCE (SIZE(2)) OF PackageInteger(0 .. 255)
 Component-GenericInterfaceImpl-InArgsOnlyType ::= SEQUENCE
 {
     argX PackageInteger(0 .. 255),

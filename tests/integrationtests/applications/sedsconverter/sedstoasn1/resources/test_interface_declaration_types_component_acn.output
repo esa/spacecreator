@@ -1,6 +1,7 @@
 COM-N7SPACE-INTERFACEDECLARATIONS-COMPONENT DEFINITIONS ::= BEGIN
 ComponentInteger [size 8, encoding pos-int]
 DeterminantType [size 8, encoding pos-int]
+PackageIntegerArray-13 []
 PackageIntegerArray-3 []
 ComponentInterfaceDecl-InArgsOnly-Type []
 {
@@ -35,6 +36,7 @@ Component-GenericInterfaceImpl-Generic3 <DeterminantType:determinant> []
     concrete0 [size 8, encoding pos-int, present-when determinant==0],
     concrete1 [size 8, encoding pos-int, present-when determinant==1]
 }
+PackageIntegerArray-2 []
 Component-GenericInterfaceImpl-InArgsOnlyType []
 {
     argX [],

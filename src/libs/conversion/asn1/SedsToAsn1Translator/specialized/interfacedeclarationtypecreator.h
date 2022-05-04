@@ -56,6 +56,8 @@ public:
     auto createTypes(const seds::model::InterfaceDeclaration &interfaceDeclaration) -> void;
 
 private:
+    auto createTypesForSyncCommand(const seds::model::InterfaceCommand &command) -> void;
+
     auto createTypesForAsyncCommand(const seds::model::InterfaceCommand &command, const QString &interfaceName) -> void;
     auto createAsyncCommandBundledType(const seds::model::InterfaceCommand &command, const QString &bundledTypeName,
             const seds::model::CommandArgumentMode requestedArgumentMode) -> void;

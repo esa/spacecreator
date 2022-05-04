@@ -71,6 +71,9 @@ private:
             const TypeMapping::Concrete &concreteType, Asn1Acn::Types::Choice *choice, const std::size_t count) -> void;
     auto handleFixedValue(Asn1Acn::Types::Type *type, const QString &fixedValue) -> void;
 
+    auto createTypesForSyncCommand(const seds::model::InterfaceCommand &command) -> void;
+    auto createSyncArgumentType(const seds::model::CommandArgument &argument) -> void;
+
     auto createTypesForAsyncCommand(const seds::model::InterfaceCommand &command) -> void;
     auto createAsyncCommandBundledType(const seds::model::InterfaceCommand &command, const QString &bundledTypeName,
             const seds::model::CommandArgumentMode requestedArgumentMode) -> void;

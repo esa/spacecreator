@@ -1,5 +1,6 @@
 COM-N7SPACE-INTERFACEDECLARATIONS DEFINITIONS ::= BEGIN
 PackageInteger [size 8, encoding pos-int]
+PackageIntegerArray-12 []
 PackageIntegerArray-3x3x3 []
 PackageInterfaceDecl-InArgsOnly-Type []
 {

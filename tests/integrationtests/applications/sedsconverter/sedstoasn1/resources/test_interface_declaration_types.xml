@@ -12,6 +12,15 @@
     <DeclaredInterfaceSet>
       <Interface name="PackageInterfaceDecl">
         <CommandSet>
+          <Command name="SyncCommand" mode="sync">
+            <Argument name="ArgA" type="PackageInteger" mode="in" />
+            <Argument name="ArgB" type="PackageInteger" mode="in" />
+            <Argument name="ArrayArg" type="PackageInteger" mode="out">
+              <ArrayDimensions>
+                <Dimension size="12" />
+              </ArrayDimensions>
+            </Argument>
+          </Command>
           <Command name="InArgsOnly" mode="async">
             <Argument name="ArgA" type="PackageInteger" mode="in" />
             <Argument name="ArgB" type="PackageInteger" mode="in" />
@@ -48,6 +57,15 @@
           <GenericType name="Generic3" />
         </GenericTypeSet>
         <CommandSet>
+          <Command name="SyncCommand" mode="sync">
+            <Argument name="ArgX" type="PackageInteger" mode="in">
+              <ArrayDimensions>
+                <Dimension size="2" />
+              </ArrayDimensions>
+            </Argument>
+            <Argument name="ArgA" type="Generic1" mode="in" />
+            <Argument name="ArgB" type="Generic2" mode="in" />
+          </Command>
           <Command name="InArgsOnly" mode="async">
             <Argument name="ArgX" type="PackageInteger" mode="in" />
             <Argument name="ArgA" type="Generic1" mode="in" />
@@ -84,6 +102,15 @@
         <DeclaredInterfaceSet>
           <Interface name="ComponentInterfaceDecl">
             <CommandSet>
+              <Command name="SyncCommand" mode="sync">
+                <Argument name="ArgA" type="PackageInteger" mode="in" />
+                <Argument name="ArgB" type="PackageInteger" mode="in" />
+                <Argument name="ArrayArg" type="PackageInteger" mode="out">
+                  <ArrayDimensions>
+                    <Dimension size="13" />
+                  </ArrayDimensions>
+                </Argument>
+              </Command>
               <Command name="InArgsOnly" mode="async">
                 <Argument name="ArgA" type="PackageInteger" mode="in">
                   <ArrayDimensions>

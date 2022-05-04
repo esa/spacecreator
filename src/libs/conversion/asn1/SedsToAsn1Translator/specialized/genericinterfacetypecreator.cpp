@@ -81,8 +81,15 @@ void GenericInterfaceTypeCreator::createTypes()
     }
 
     for (const auto &command : m_interfaceDeclaration->commands()) {
-        if (command.mode() == InterfaceCommandMode::Async) {
+        switch (command.mode()) {
+        case InterfaceCommandMode::Sync:
+            createTypesForSyncCommand(command);
+            break;
+        case InterfaceCommandMode::Async:
             createTypesForAsyncCommand(command);
+            break;
+        default:
+            throw UnhandledValueException("InterfaceCommandMode");
         }
     }
 }
@@ -242,6 +249,31 @@ void GenericInterfaceTypeCreator::handleFixedValue(Asn1Acn::Types::Type *type, c
     default:
         throw UnhandledValueException("ASN1Type/GenericTypeMapFixedValue");
         break;
+    }
+}
+
+void GenericInterfaceTypeCreator::createTypesForSyncCommand(const seds::model::InterfaceCommand &command)
+{
+    for (const auto &argument : command.arguments()) {
+        createSyncArgumentType(argument);
+    }
+}
+
+void GenericInterfaceTypeCreator::createSyncArgumentType(const seds::model::CommandArgument &argument)
+{
+    const auto argumentTypeRef = argument.type();
+
+    const auto isGeneric = isTypeGeneric(argumentTypeRef);
+
+    if (isGeneric) {
+        if (!argument.arrayDimensions().empty()) {
+            auto errorMessage = QString("Command argument '%1' could not be translated, array arguments with generic "
+                                        "types are not supported because of the ACN limitations")
+                                        .arg(argument.nameStr());
+            throw TranslationException(std::move(errorMessage));
+        }
+    } else {
+        DataTypeTranslationHelper::handleArrayArgumentType(m_context, argumentTypeRef, argument.arrayDimensions());
     }
 }
 

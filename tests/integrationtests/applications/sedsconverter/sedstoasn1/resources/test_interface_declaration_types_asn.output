@@ -1,5 +1,6 @@
 COM-N7SPACE-INTERFACEDECLARATIONS DEFINITIONS ::= BEGIN
 PackageInteger ::= INTEGER(0 .. 255)
+PackageIntegerArray-12 ::= SEQUENCE (SIZE(12)) OF PackageInteger(0 .. 255)
 PackageIntegerArray-3x3x3 ::= SEQUENCE (SIZE(3)) OF SEQUENCE (SIZE(3)) OF SEQUENCE (SIZE(3)) OF PackageInteger(0 .. 255)
 PackageInterfaceDecl-InArgsOnly-Type ::= SEQUENCE
 {

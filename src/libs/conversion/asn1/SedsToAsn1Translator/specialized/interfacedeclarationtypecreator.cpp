@@ -27,8 +27,10 @@
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <conversion/common/escaper/escaper.h>
+#include <conversion/common/exceptions.h>
 #include <conversion/common/translation/exceptions.h>
 
+using conversion::UnhandledValueException;
 using conversion::translator::TranslationException;
 using seds::model::InterfaceCommandMode;
 
@@ -49,8 +51,25 @@ void InterfaceDeclarationTypeCreator::createTypes(const seds::model::InterfaceDe
     const auto &commands = interfaceDeclaration.commands();
 
     for (const auto &command : commands) {
-        if (command.mode() == InterfaceCommandMode::Async) {
+        switch (command.mode()) {
+        case InterfaceCommandMode::Sync:
+            createTypesForSyncCommand(command);
+            break;
+        case InterfaceCommandMode::Async:
             createTypesForAsyncCommand(command, interfaceDeclaration.nameStr());
+            break;
+        default:
+            throw UnhandledValueException("InterfaceCommandMode");
+        }
+    }
+}
+
+void InterfaceDeclarationTypeCreator::createTypesForSyncCommand(const seds::model::InterfaceCommand &command)
+{
+    for (const auto &argument : command.arguments()) {
+        const auto &arrayDimensions = argument.arrayDimensions();
+        if (!arrayDimensions.empty()) {
+            DataTypeTranslationHelper::handleArrayArgumentType(m_context, argument.type(), arrayDimensions);
         }
     }
 }

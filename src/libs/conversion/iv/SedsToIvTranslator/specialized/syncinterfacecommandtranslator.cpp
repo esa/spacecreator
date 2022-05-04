@@ -66,7 +66,7 @@ void SyncInterfaceCommandTranslator::translateCommand(
     case seds::model::ArgumentsCombination::OutAndNotify:
     case seds::model::ArgumentsCombination::All: {
         const auto message = QString(
-                "Interface command arguments combination '%1' is not supported for TASTE InterfaceView async interface")
+                "Interface command arguments combination '%1' is not supported for TASTE InterfaceView sync interface")
                                      .arg(argumentsCombinationToString(sedsCommand.argumentsCombination()));
         throw TranslationException(message);
     } break;
