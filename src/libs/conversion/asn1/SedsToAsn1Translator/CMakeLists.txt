@@ -1,6 +1,7 @@
 project(SedsToAsn1Translator VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES     context.cpp
+                datatypetranslationhelper.cpp
                 datatypesdependencyresolver.cpp
                 generictypemapper.cpp
                 packagesdependencyresolver.cpp
@@ -17,6 +18,7 @@ set(SOURCES     context.cpp
                 specialized/interfacedeclarationtypecreator.cpp
                 specialized/rangetranslatorvisitor.cpp)
 set(INCLUDES    context.h
+                datatypetranslationhelper.h
                 datatypesdependencyresolver.h
                 generictypemapper.h
                 packagesdependencyresolver.h

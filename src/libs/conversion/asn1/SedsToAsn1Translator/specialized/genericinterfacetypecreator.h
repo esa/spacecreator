@@ -82,9 +82,6 @@ private:
     auto findDeterminantArgument(const std::vector<seds::model::CommandArgument> &arguments) -> QString;
     auto isTypeGeneric(const seds::model::DataTypeRef &typeRef) -> bool;
 
-    auto buildBundledTypeName(const QString &commandName) -> QString;
-    auto buildConcreteTypeName(const QString &genericName) -> QString;
-
 private:
     Context &m_context;
 
@@ -93,9 +90,6 @@ private:
     const seds::model::Component &m_component;
 
     GenericTypeMapper m_typeMapper;
-
-    inline static const QString m_bundledTypeNameTemplate = "%1-%2-%3Type";
-    inline static const QString m_concreteTypeNameTemplate = "%1-%2-%3";
 };
 
 } // namespace conversion::asn1::translator

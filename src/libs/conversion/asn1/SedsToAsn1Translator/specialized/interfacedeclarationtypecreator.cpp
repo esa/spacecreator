@@ -19,6 +19,9 @@
 
 #include "specialized/interfacedeclarationtypecreator.h"
 
+#include "datatypetranslationhelper.h"
+#include "specialized/datatypetranslatorvisitor.h"
+
 #include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/typeassignment.h>
 #include <asn1library/asn1/types/sequence.h>
@@ -61,22 +64,24 @@ void InterfaceDeclarationTypeCreator::createTypesForAsyncCommand(
     switch (command.argumentsCombination()) {
     case seds::model::ArgumentsCombination::InOnly: {
         // In arguments are 'native', so they are handles as-is
-        const auto bundledTypeName = buildBundledTypeName(commandName, interfaceName);
+        const auto bundledTypeName = DataTypeTranslationHelper::buildBundledTypeName(commandName, interfaceName);
         createAsyncCommandBundledType(command, bundledTypeName, seds::model::CommandArgumentMode::In);
     } break;
     case seds::model::ArgumentsCombination::OutOnly: {
         // Out arguments aren't supported by TASTE sporadic interface.
         // We cannot change the argument direction, so we switch interface type (provided <-> required)
-        const auto bundledTypeName = buildBundledTypeName(commandName, interfaceName);
+        const auto bundledTypeName = DataTypeTranslationHelper::buildBundledTypeName(commandName, interfaceName);
         createAsyncCommandBundledType(command, bundledTypeName, seds::model::CommandArgumentMode::Out);
     } break;
     case seds::model::ArgumentsCombination::InAndNotify: {
         // InAndNotify arguments are separated onto two interfaces
         // In arguments - as-is
-        const auto inBundledTypeName = buildBundledTypeName(commandName, interfaceName, "In");
+        const auto inBundledTypeName =
+                DataTypeTranslationHelper::buildBundledTypeName(commandName, interfaceName, "In");
         createAsyncCommandBundledType(command, inBundledTypeName, seds::model::CommandArgumentMode::In);
         // Notify arguments - switched interface type (provided <-> required)
-        const auto notifyBundledTypeName = buildBundledTypeName(commandName, interfaceName, "Notify");
+        const auto notifyBundledTypeName =
+                DataTypeTranslationHelper::buildBundledTypeName(commandName, interfaceName, "Notify");
         createAsyncCommandBundledType(command, notifyBundledTypeName, seds::model::CommandArgumentMode::Notify);
     } break;
     case seds::model::ArgumentsCombination::NoArgs: {
@@ -118,7 +123,8 @@ void InterfaceDeclarationTypeCreator::createAsyncCommandBundledTypeComponent(
         const seds::model::CommandArgument &argument, Asn1Acn::Types::Sequence *bundledType)
 {
     const auto argumentName = Escaper::escapeAsn1FieldName(argument.nameStr());
-    const auto argumentType = m_context.findAsn1Type(argument.type());
+    const auto argumentType =
+            DataTypeTranslationHelper::handleArrayArgumentType(m_context, argument.type(), argument.arrayDimensions());
 
     auto sequenceComponentType =
             std::make_unique<Asn1Acn::Types::UserdefinedType>(argumentType->identifier(), m_context.definitionsName());
@@ -129,12 +135,6 @@ void InterfaceDeclarationTypeCreator::createAsyncCommandBundledTypeComponent(
             Asn1Acn::SourceLocation(), std::move(sequenceComponentType));
 
     bundledType->addComponent(std::move(sequenceComponent));
-}
-
-QString InterfaceDeclarationTypeCreator::buildBundledTypeName(
-        const QString &commandName, const QString &interfaceName, QString postfix)
-{
-    return m_bundledTypeNameTemplate.arg(interfaceName).arg(commandName).arg(postfix);
 }
 
 } // namespace conversion::asn1::translator

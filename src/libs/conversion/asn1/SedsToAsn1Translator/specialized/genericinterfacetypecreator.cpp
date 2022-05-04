@@ -19,7 +19,9 @@
 
 #include "specialized/genericinterfacetypecreator.h"
 
+#include "datatypetranslationhelper.h"
 #include "generictypemapper.h"
+#include "specialized/datatypetranslatorvisitor.h"
 #include "specialized/rangetranslatorvisitor.h"
 
 #include <asn1library/asn1/acnsequencecomponent.h>
@@ -46,6 +48,7 @@
 
 using conversion::UnhandledValueException;
 using conversion::UnsupportedValueException;
+using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredInterfaceException;
 using seds::model::InterfaceCommandMode;
@@ -117,7 +120,8 @@ void GenericInterfaceTypeCreator::createConcreteTypeAlias(
         const seds::model::GenericType &genericType, const TypeMapping::Concrete &concreteMapping)
 {
     const auto &genericName = genericType.nameStr();
-    const auto concreteTypeName = buildConcreteTypeName(genericName);
+    const auto concreteTypeName =
+            DataTypeTranslationHelper::buildConcreteTypeName(m_component.nameStr(), m_interface.nameStr(), genericName);
     const auto concreteType = concreteMapping.type;
 
     auto aliasType = std::make_unique<Asn1Acn::TypeAssignment>(
@@ -130,7 +134,8 @@ void GenericInterfaceTypeCreator::createConcreteChoice(
         const seds::model::GenericType &genericType, const TypeMapping *mapping)
 {
     const auto &genericName = genericType.nameStr();
-    const auto concreteTypeName = buildConcreteTypeName(genericName);
+    const auto concreteTypeName =
+            DataTypeTranslationHelper::buildConcreteTypeName(m_component.nameStr(), m_interface.nameStr(), genericName);
 
     const auto &concreteMappings = mapping->concreteMappings;
 
@@ -248,13 +253,15 @@ void GenericInterfaceTypeCreator::createTypesForAsyncCommand(const seds::model::
     switch (command.argumentsCombination()) {
     case seds::model::ArgumentsCombination::InOnly: {
         // In arguments are 'native', so they are handles as-is
-        const auto bundledTypeName = buildBundledTypeName(commandName);
+        const auto bundledTypeName = DataTypeTranslationHelper::buildGenericBundledTypeName(
+                m_component.nameStr(), m_interface.nameStr(), commandName);
         createAsyncCommandBundledType(command, bundledTypeName, seds::model::CommandArgumentMode::In);
     } break;
     case seds::model::ArgumentsCombination::OutOnly: {
         // Out arguments aren't supported by TASTE sporadic interface.
         // We cannot change the argument direction, so we switch interface type (provided <-> required)
-        const auto bundledTypeName = buildBundledTypeName(commandName);
+        const auto bundledTypeName = DataTypeTranslationHelper::buildGenericBundledTypeName(
+                m_component.nameStr(), m_interface.nameStr(), commandName);
         createAsyncCommandBundledType(command, bundledTypeName, seds::model::CommandArgumentMode::Out);
     } break;
     case seds::model::ArgumentsCombination::NoArgs: {
@@ -306,7 +313,15 @@ void GenericInterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const s
     const auto isGeneric = isTypeGeneric(argumentTypeRef);
 
     if (isGeneric) {
-        const auto argumentConcreteTypeName = buildConcreteTypeName(argumentTypeRef.nameStr());
+        if (!argument.arrayDimensions().empty()) {
+            auto errorMessage = QString("Command argument '%1' could not be translated, array arguments with generic "
+                                        "types are not supported because of the ACN limitations")
+                                        .arg(argument.nameStr());
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        const auto argumentConcreteTypeName = DataTypeTranslationHelper::buildConcreteTypeName(
+                m_component.nameStr(), m_interface.nameStr(), argumentTypeRef.nameStr());
         argumentType = m_context.findAsn1Type(argumentConcreteTypeName);
 
         auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
@@ -330,7 +345,8 @@ void GenericInterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const s
             bundledType->addComponent(std::move(sequenceComponent));
         }
     } else {
-        argumentType = m_context.findAsn1Type(argumentTypeRef);
+        argumentType = DataTypeTranslationHelper::handleArrayArgumentType(
+                m_context, argumentTypeRef, argument.arrayDimensions());
 
         auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
                 argumentType->identifier(), m_context.definitionsName());
@@ -402,16 +418,6 @@ bool GenericInterfaceTypeCreator::isTypeGeneric(const seds::model::DataTypeRef &
             [&](const seds::model::GenericType &genericType) { return genericType.nameStr() == typeName; });
 
     return found != genericTypes.end();
-}
-
-QString GenericInterfaceTypeCreator::buildBundledTypeName(const QString &commandName)
-{
-    return m_bundledTypeNameTemplate.arg(m_component.nameStr()).arg(m_interface.nameStr()).arg(commandName);
-}
-
-QString GenericInterfaceTypeCreator::buildConcreteTypeName(const QString &genericName)
-{
-    return m_concreteTypeNameTemplate.arg(m_component.nameStr()).arg(m_interface.nameStr()).arg(genericName);
 }
 
 } // namespace conversion::asn1::translator

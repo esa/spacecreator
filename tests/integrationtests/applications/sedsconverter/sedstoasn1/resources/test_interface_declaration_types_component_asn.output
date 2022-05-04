@@ -1,18 +1,23 @@
 COM-N7SPACE-INTERFACEDECLARATIONS-COMPONENT DEFINITIONS ::= BEGIN
 IMPORTS
 PackageInteger FROM COM-N7SPACE-INTERFACEDECLARATIONS
+PackageIntegerArray-3x3x3 FROM COM-N7SPACE-INTERFACEDECLARATIONS
 ;
 ComponentInteger ::= INTEGER(0 .. 255)
 DeterminantType ::= INTEGER(0 .. 1)
+PackageIntegerArray-3 ::= SEQUENCE (SIZE(3)) OF PackageInteger(0 .. 255)
 ComponentInterfaceDecl-InArgsOnly-Type ::= SEQUENCE
 {
-    argA PackageInteger(0 .. 255),
-    argB ComponentInteger(0 .. 255)
+    argA PackageIntegerArray-3(SIZE(3)),
+    argB ComponentInteger(0 .. 255),
+    arrayArg PackageIntegerArray-3x3x3(SIZE(3))
 }
+PackageIntegerArray-10 ::= SEQUENCE (SIZE(10)) OF PackageInteger(0 .. 255)
 ComponentInterfaceDecl-OutArgsOnly-Type ::= SEQUENCE
 {
     argA PackageInteger(0 .. 255),
-    argB ComponentInteger(0 .. 255)
+    argB ComponentInteger(0 .. 255),
+    arrayArg PackageIntegerArray-10(SIZE(10))
 }
 ComponentInterfaceDecl-InAndNotify-TypeIn ::= SEQUENCE
 {

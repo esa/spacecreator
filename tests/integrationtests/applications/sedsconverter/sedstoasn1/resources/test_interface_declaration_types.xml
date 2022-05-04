@@ -15,10 +15,24 @@
           <Command name="InArgsOnly" mode="async">
             <Argument name="ArgA" type="PackageInteger" mode="in" />
             <Argument name="ArgB" type="PackageInteger" mode="in" />
+            <Argument name="ArrayArg" type="PackageInteger" mode="in">
+              <ArrayDimensions>
+                <Dimension size="3" />
+                <Dimension size="3" />
+                <Dimension size="3" />
+              </ArrayDimensions>
+            </Argument>
           </Command>
           <Command name="OutArgsOnly" mode="async">
             <Argument name="ArgA" type="PackageInteger" mode="out" />
             <Argument name="ArgB" type="PackageInteger" mode="out" />
+            <Argument name="ArrayArg" type="PackageInteger" mode="out">
+              <ArrayDimensions>
+                <Dimension size="3" />
+                <Dimension size="3" />
+                <Dimension size="3" />
+              </ArrayDimensions>
+            </Argument>
           </Command>
           <Command name="InAndNotify" mode="async">
             <Argument name="InputArg" type="PackageInteger" mode="in" />
@@ -71,12 +85,28 @@
           <Interface name="ComponentInterfaceDecl">
             <CommandSet>
               <Command name="InArgsOnly" mode="async">
-                <Argument name="ArgA" type="PackageInteger" mode="in" />
+                <Argument name="ArgA" type="PackageInteger" mode="in">
+                  <ArrayDimensions>
+                    <Dimension size="3" />
+                  </ArrayDimensions>
+                </Argument>
                 <Argument name="ArgB" type="ComponentInteger" mode="in" />
+                <Argument name="ArrayArg" type="PackageInteger" mode="in">
+                  <ArrayDimensions>
+                    <Dimension size="3" />
+                    <Dimension size="3" />
+                    <Dimension size="3" />
+                  </ArrayDimensions>
+                </Argument>
               </Command>
               <Command name="OutArgsOnly" mode="async">
                 <Argument name="ArgA" type="PackageInteger" mode="out" />
                 <Argument name="ArgB" type="ComponentInteger" mode="out" />
+                <Argument name="ArrayArg" type="PackageInteger" mode="out">
+                  <ArrayDimensions>
+                    <Dimension size="10" />
+                  </ArrayDimensions>
+                </Argument>
               </Command>
               <Command name="InAndNotify" mode="async">
                 <Argument name="InputArg" type="PackageInteger" mode="in" />

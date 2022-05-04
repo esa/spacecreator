@@ -1,15 +1,19 @@
 COM-N7SPACE-INTERFACEDECLARATIONS-COMPONENT DEFINITIONS ::= BEGIN
 ComponentInteger [size 8, encoding pos-int]
 DeterminantType [size 8, encoding pos-int]
+PackageIntegerArray-3 []
 ComponentInterfaceDecl-InArgsOnly-Type []
 {
     argA [],
-    argB []
+    argB [],
+    arrayArg []
 }
+PackageIntegerArray-10 []
 ComponentInterfaceDecl-OutArgsOnly-Type []
 {
     argA [],
-    argB []
+    argB [],
+    arrayArg []
 }
 ComponentInterfaceDecl-InAndNotify-TypeIn []
 {
