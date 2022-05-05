@@ -277,7 +277,7 @@ void tst_Asn1ToPromelaTranslator_Env::testEnumerated() const
 void tst_Asn1ToPromelaTranslator_Env::testSequence() const
 {
     const QString inputAsnFilename = "sequence.asn";
-    const QStringList asnTypesToTranslate = { "EnvIntParam", "EnvBoolParam", "EnvParamSeq" };
+    const QStringList asnTypesToTranslate = { "EnvIntParam", "EnvParamSeq" };
     const QString actualOutputFilename = "sequence.pml";
     const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
 
