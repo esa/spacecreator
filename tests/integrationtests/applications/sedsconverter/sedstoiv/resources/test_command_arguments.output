@@ -4,6 +4,9 @@
     <Input_Parameter name="InputParam" type="AsyncInCommand-Type" encoding="ACN"/>
 </Provided_Interface>
 
+<Provided_Interface name="SyncInterfacePI_SyncNoArgsCommand_Pi" kind="Protected" layer="default">
+</Provided_Interface>
+
 <Provided_Interface name="SyncInterfacePI_SyncInCommand_Pi" kind="Protected" layer="default">
     <Input_Parameter name="SyncInArgument1" type="MyInteger" encoding="ACN"/>
     <Input_Parameter name="SyncInArgument2" type="MyInteger" encoding="ACN"/>
@@ -49,6 +52,10 @@
 
 <Required_Interface name="AsyncInterfaceRI_AsyncInCommand_Ri" kind="Sporadic" layer="default">
     <Input_Parameter name="InputParam" type="AsyncInCommand-Type" encoding="ACN"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="SyncInterfaceRI_SyncNoArgsCommand_Ri" kind="Protected" layer="default">
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
