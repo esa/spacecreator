@@ -1,6 +1,5 @@
 COM-N7SPACE-INTERFACEDECLARATIONS-COMPONENT DEFINITIONS ::= BEGIN
 ComponentInteger [size 8, encoding pos-int]
-DeterminantType [size 8, encoding pos-int]
 PackageIntegerArray-13 []
 PackageIntegerArray-3 []
 ComponentInterfaceDecl-InArgsOnly-Type []
@@ -24,14 +23,14 @@ ComponentInterfaceDecl-InAndNotify-TypeNotify []
 {
     notifyArg []
 }
-Component-GenericInterfaceImpl-GenericDeterminant [size 8, encoding pos-int]
-Component-GenericInterfaceImpl-Generic1 [size 8, encoding pos-int]
-Component-GenericInterfaceImpl-Generic2 <DeterminantType:determinant> []
+Component-GenericInterfaceImpl-GenericDeterminant []
+Component-GenericInterfaceImpl-Generic1 []
+Component-GenericInterfaceImpl-Generic2 <COM-N7SPACE-INTERFACEDECLARATIONS.DeterminantType:determinant> []
 {
     concrete0 [present-when determinant==0],
     concrete1 [present-when determinant==1]
 }
-Component-GenericInterfaceImpl-Generic3 <DeterminantType:determinant> []
+Component-GenericInterfaceImpl-Generic3 <COM-N7SPACE-INTERFACEDECLARATIONS.DeterminantType:determinant> []
 {
     concrete0 [present-when determinant==0],
     concrete1 [present-when determinant==1]

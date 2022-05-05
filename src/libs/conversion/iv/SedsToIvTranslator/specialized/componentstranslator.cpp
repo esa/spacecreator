@@ -19,7 +19,6 @@
 
 #include "specialized/componentstranslator.h"
 
-#include "generictypemapper.h"
 #include "specialized/asyncinterfacecommandtranslator.h"
 #include "specialized/descriptiontranslator.h"
 #include "specialized/interfaceparametertranslator.h"

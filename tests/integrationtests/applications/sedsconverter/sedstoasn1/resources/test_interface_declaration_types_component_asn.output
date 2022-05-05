@@ -1,10 +1,10 @@
 COM-N7SPACE-INTERFACEDECLARATIONS-COMPONENT DEFINITIONS ::= BEGIN
 IMPORTS
+DeterminantType FROM COM-N7SPACE-INTERFACEDECLARATIONS
 PackageInteger FROM COM-N7SPACE-INTERFACEDECLARATIONS
 PackageIntegerArray-3x3x3 FROM COM-N7SPACE-INTERFACEDECLARATIONS
 ;
 ComponentInteger ::= INTEGER(0 .. 255)
-DeterminantType ::= INTEGER(0 .. 1)
 PackageIntegerArray-13 ::= SEQUENCE (SIZE(13)) OF PackageInteger(0 .. 255)
 PackageIntegerArray-3 ::= SEQUENCE (SIZE(3)) OF PackageInteger(0 .. 255)
 ComponentInterfaceDecl-InArgsOnly-Type ::= SEQUENCE
@@ -28,8 +28,8 @@ ComponentInterfaceDecl-InAndNotify-TypeNotify ::= SEQUENCE
 {
     notifyArg ComponentInteger(0 .. 255)
 }
-Component-GenericInterfaceImpl-GenericDeterminant ::= INTEGER(0 .. 1)
-Component-GenericInterfaceImpl-Generic1 ::= INTEGER(0 .. 255)
+Component-GenericInterfaceImpl-GenericDeterminant ::= DeterminantType(0 .. 1)
+Component-GenericInterfaceImpl-Generic1 ::= PackageInteger(0 .. 255)
 Component-GenericInterfaceImpl-Generic2 ::= CHOICE
 {
     concrete0 ComponentInteger(0 .. 255) (12),

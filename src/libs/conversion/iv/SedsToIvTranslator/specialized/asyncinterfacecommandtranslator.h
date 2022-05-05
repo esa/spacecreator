@@ -78,9 +78,10 @@ public:
 
 private:
     auto translateArguments(const seds::model::InterfaceCommand &sedsCommand,
-            seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface) -> void;
+            const seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface) -> void;
 
-    auto handleArgumentTypeName(const seds::model::InterfaceCommand &sedsCommand) -> QString;
+    auto handleArgumentTypeName(const seds::model::InterfaceCommand &sedsCommand,
+            const seds::model::CommandArgumentMode requestedArgumentMode) -> QString;
 
 private:
     /// @brief  Output interface view function

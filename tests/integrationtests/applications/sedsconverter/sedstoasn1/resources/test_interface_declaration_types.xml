@@ -8,6 +8,12 @@
           <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
         </Range>
       </IntegerDataType>
+      <IntegerDataType name="DeterminantType">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="1" />
+        </Range>
+      </IntegerDataType>
     </DataTypeSet>
     <DeclaredInterfaceSet>
       <Interface name="PackageInterfaceDecl">
@@ -90,12 +96,6 @@
             <IntegerDataEncoding encoding="unsigned" sizeInBits="8" byteOrder="littleEndian" />
             <Range>
               <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
-            </Range>
-          </IntegerDataType>
-          <IntegerDataType name="DeterminantType">
-            <IntegerDataEncoding encoding="unsigned" sizeInBits="8" byteOrder="littleEndian" />
-            <Range>
-              <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="1" />
             </Range>
           </IntegerDataType>
         </DataTypeSet>

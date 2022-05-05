@@ -12,7 +12,7 @@ echo "Running SedsConverter test: ${0##*/}'"
 # Setup output dir and project
 rm -r -f $TEST_OUTPUT_DIR
 mkdir -p $TEST_OUTPUT_DIR
-# Translate
+# # Translate
 $SEDS_CONVERTER --from SEDS --to InterfaceView --aux-models ASN.1 --skip-validation -i resources/test_alternate_set.xml \
   --out $TEST_OUTPUT_DIR/interfaceview.xml --iv-config resources/config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/
 
@@ -27,4 +27,5 @@ $DIFF interfaceview.xml ../resources/test_alternate_set.output \
   && $DIFF ALTERNATESET-MEGACOMPONENT.acn ../resources/test_alternate_set_component_acn.output \
   && asn1scc -c ALTERNATESET.asn ALTERNATESET.acn ALTERNATESET-MEGACOMPONENT.asn ALTERNATESET-MEGACOMPONENT.acn\
   && cd .. \
-  && rm -r -f $TEST_OUTPUT_DIR
+
+  # && rm -r -f $TEST_OUTPUT_DIR

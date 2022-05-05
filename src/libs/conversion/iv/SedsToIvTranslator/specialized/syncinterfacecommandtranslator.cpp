@@ -21,10 +21,12 @@
 
 #include "interfacetranslatorhelper.h"
 
+#include <conversion/asn1/SedsToAsn1Translator/datatypetranslationhelper.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <shared/parameter.h>
 
+using conversion::asn1::translator::DataTypeTranslationHelper;
 using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator {
@@ -71,7 +73,7 @@ void SyncInterfaceCommandTranslator::translateArguments(
         const std::vector<seds::model::CommandArgument> &sedsArguments, ivm::IVInterface *ivInterface)
 {
     for (const auto &sedsArgument : sedsArguments) {
-        const auto sedsArgumentTypeName = handleArgumentTypeName(sedsArgument, ivInterface->title());
+        const auto sedsArgumentTypeName = handleArgumentTypeName(sedsArgument);
 
         switch (sedsArgument.mode()) {
         case seds::model::CommandArgumentMode::In: {
@@ -101,10 +103,16 @@ void SyncInterfaceCommandTranslator::translateArguments(
     }
 }
 
-QString SyncInterfaceCommandTranslator::handleArgumentTypeName(
-        const seds::model::CommandArgument &sedsArgument, const QString &interfaceName) const
+QString SyncInterfaceCommandTranslator::handleArgumentTypeName(const seds::model::CommandArgument &sedsArgument) const
 {
-    return "STUB_SYNC";
+    const auto &typeName = sedsArgument.type().nameStr();
+    const auto &dimensions = sedsArgument.arrayDimensions();
+
+    if (dimensions.empty()) {
+        return typeName;
+    } else {
+        return DataTypeTranslationHelper::buildArrayTypeName(typeName, dimensions);
+    }
 }
 
 } // namespace conversion::iv::translator

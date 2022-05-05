@@ -75,8 +75,7 @@ public:
 private:
     auto translateArguments(
             const std::vector<seds::model::CommandArgument> &sedsArguments, ivm::IVInterface *ivInterface) -> void;
-    auto handleArgumentTypeName(const seds::model::CommandArgument &sedsArgument, const QString &interfaceName) const
-            -> QString;
+    auto handleArgumentTypeName(const seds::model::CommandArgument &sedsArgument) const -> QString;
 
 private:
     /// @brief  Output interface view function

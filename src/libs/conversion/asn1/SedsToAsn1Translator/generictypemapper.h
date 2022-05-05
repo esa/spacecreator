@@ -45,7 +45,6 @@ struct TypeMapping final {
         friend auto operator!=(const Concrete &lhs, const Concrete &rhs) -> bool { return !(lhs == rhs); }
     };
 
-    std::optional<QString> determinantTypeName;
     std::vector<Concrete> concreteMappings;
 };
 
@@ -82,19 +81,23 @@ public:
     auto getMapping(const QString &genericTypeName) -> const TypeMapping *;
 
     auto determinantName() const -> const std::optional<QString> &;
+    auto determinantTypePath() const -> const std::optional<QString> &;
 
 private:
     auto addSimpleMapping(const seds::model::GenericTypeMap &typeMap) -> void;
     auto addAlternateMapping(const seds::model::GenericAlternate &alternate) -> void;
 
-    auto findDeterminant(const std::vector<seds::model::GenericAlternate> &alternates) -> QString;
+    auto findDeterminant(const std::vector<seds::model::GenericAlternate> &alternates)
+            -> std::pair<QString, seds::model::DataTypeRef>;
     auto getPossibleDeterminants(const seds::model::GenericAlternate &alternate)
-            -> std::vector<std::pair<QString, QString>>;
+            -> std::vector<std::pair<QString, seds::model::DataTypeRef>>;
+    auto handleDeterminantTypePath(const seds::model::DataTypeRef &determinantTypeRef) -> QString;
 
 private:
     Context &m_context;
     QString m_interfaceName;
     std::optional<QString> m_determinantName;
+    std::optional<QString> m_determinantTypePath;
 
     std::unordered_map<QString, TypeMapping> m_mappings;
 };

@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include "generictypemapper.h"
-
 #include <QVector>
 #include <asn1library/asn1/asn1model.h>
 #include <ivcore/ivinterface.h>

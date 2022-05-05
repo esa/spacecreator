@@ -42,12 +42,12 @@ public:
 public:
     static auto buildArrayTypeName(
             const QString &baseTypeName, const std::vector<seds::model::DimensionSize> &dimensions) -> QString;
-    static auto buildBundledTypeName(const QString &commandName, const QString &interfaceName, QString postfix = "")
-            -> QString;
+    static auto buildBundledTypeName(
+            const QString &interfaceDeclarationName, const QString &commandName, QString postfix = "") -> QString;
     static auto buildGenericBundledTypeName(
             const QString &componentName, const QString &interfaceName, const QString &commandName) -> QString;
     static auto buildConcreteTypeName(
-            const QString &componentName, const QString &interfaceName, const QString &genericName) -> QString;
+            const QString &componentName, const QString &interfaceName, const QString &commandName) -> QString;
 
     static auto handleArrayArgumentType(Context &context, const seds::model::DataTypeRef &argumentTypeRef,
             const std::vector<seds::model::DimensionSize> &dimensions) -> Asn1Acn::Types::Type *;

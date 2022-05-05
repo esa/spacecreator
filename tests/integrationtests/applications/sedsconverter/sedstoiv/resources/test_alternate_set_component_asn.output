@@ -5,8 +5,8 @@ Integer16 FROM ALTERNATESET
 Integer32 FROM ALTERNATESET
 Integer8 FROM ALTERNATESET
 ;
-MegaComponent-ProvidedInterface-GenericType1 ::= INTEGER(0 .. 255)
-MegaComponent-ProvidedInterface-GenericType2 ::= INTEGER(0 .. 2)
+MegaComponent-ProvidedInterface-GenericType1 ::= Integer8(0 .. 255)
+MegaComponent-ProvidedInterface-GenericType2 ::= DeterminantType(0 .. 2)
 MegaComponent-ProvidedInterface-GenericType3 ::= CHOICE
 {
     concrete0 Integer8(0 .. 255),

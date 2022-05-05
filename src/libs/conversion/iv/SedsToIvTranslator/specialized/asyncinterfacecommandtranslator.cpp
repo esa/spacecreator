@@ -34,6 +34,8 @@
 using conversion::asn1::translator::DataTypeTranslationHelper;
 using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::TranslationException;
+using seds::model::ArgumentsCombination;
+using seds::model::CommandArgumentMode;
 
 namespace conversion::iv::translator {
 
@@ -52,16 +54,16 @@ void AsyncInterfaceCommandTranslator::translateCommand(
 {
     // Process command based on its commands
     switch (sedsCommand.argumentsCombination()) {
-    case seds::model::ArgumentsCombination::InOnly: {
+    case ArgumentsCombination::InOnly: {
         // In arguments are 'native', so they are handles as-is
         const auto interfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(
                 m_sedsInterfaceName, sedsCommand.nameStr(), interfaceType);
         auto *ivInterface = InterfaceTranslatorHelper::createIvInterface(
                 interfaceName, interfaceType, ivm::IVInterface::OperationKind::Sporadic, sedsCommand, m_ivFunction);
-        translateArguments(sedsCommand, seds::model::CommandArgumentMode::In, ivInterface);
+        translateArguments(sedsCommand, CommandArgumentMode::In, ivInterface);
         m_ivFunction->addChild(ivInterface);
     } break;
-    case seds::model::ArgumentsCombination::OutOnly: {
+    case ArgumentsCombination::OutOnly: {
         // Out arguments aren't supported by TASTE sporadic interface.
         // We cannot change the argument direction, so we switch interface type (provided <-> required)
         const auto interfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(m_sedsInterfaceName,
@@ -69,10 +71,10 @@ void AsyncInterfaceCommandTranslator::translateCommand(
         auto *ivInterface = InterfaceTranslatorHelper::createIvInterface(interfaceName,
                 InterfaceTranslatorHelper::switchInterfaceType(interfaceType),
                 ivm::IVInterface::OperationKind::Sporadic, sedsCommand, m_ivFunction);
-        translateArguments(sedsCommand, seds::model::CommandArgumentMode::Out, ivInterface);
+        translateArguments(sedsCommand, CommandArgumentMode::Out, ivInterface);
         m_ivFunction->addChild(ivInterface);
     } break;
-    case seds::model::ArgumentsCombination::InAndNotify: {
+    case ArgumentsCombination::InAndNotify: {
         // InAndNotify arguments are separated onto two interfaces
         // In arguments - as-is
         // Notify arguments - switched interface type (provided <-> required)
@@ -80,7 +82,7 @@ void AsyncInterfaceCommandTranslator::translateCommand(
                 m_sedsInterfaceName, sedsCommand.nameStr(), interfaceType);
         auto *ivInterfaceIn = InterfaceTranslatorHelper::createIvInterface(
                 inInterfaceName, interfaceType, ivm::IVInterface::OperationKind::Sporadic, sedsCommand, m_ivFunction);
-        translateArguments(sedsCommand, seds::model::CommandArgumentMode::In, ivInterfaceIn);
+        translateArguments(sedsCommand, CommandArgumentMode::In, ivInterfaceIn);
         m_ivFunction->addChild(ivInterfaceIn);
 
         const auto notifyInterfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(m_sedsInterfaceName,
@@ -88,10 +90,10 @@ void AsyncInterfaceCommandTranslator::translateCommand(
         auto *ivInterfaceNotify = InterfaceTranslatorHelper::createIvInterface(notifyInterfaceName,
                 InterfaceTranslatorHelper::switchInterfaceType(interfaceType),
                 ivm::IVInterface::OperationKind::Sporadic, sedsCommand, m_ivFunction);
-        translateArguments(sedsCommand, seds::model::CommandArgumentMode::Notify, ivInterfaceNotify);
+        translateArguments(sedsCommand, CommandArgumentMode::Notify, ivInterfaceNotify);
         m_ivFunction->addChild(ivInterfaceNotify);
     } break;
-    case seds::model::ArgumentsCombination::NoArgs: {
+    case ArgumentsCombination::NoArgs: {
         // No arguments, no problems
         const auto interfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(
                 m_sedsInterfaceName, sedsCommand.nameStr(), interfaceType);
@@ -100,10 +102,10 @@ void AsyncInterfaceCommandTranslator::translateCommand(
         m_ivFunction->addChild(ivInterface);
         break;
     }
-    case seds::model::ArgumentsCombination::NotifyOnly:
-    case seds::model::ArgumentsCombination::InAndOut:
-    case seds::model::ArgumentsCombination::OutAndNotify:
-    case seds::model::ArgumentsCombination::All: {
+    case ArgumentsCombination::NotifyOnly:
+    case ArgumentsCombination::InAndOut:
+    case ArgumentsCombination::OutAndNotify:
+    case ArgumentsCombination::All: {
         const auto message = QString(
                 "Interface command arguments combination '%1' is not supported for TASTE InterfaceView async interface")
                                      .arg(argumentsCombinationToString(sedsCommand.argumentsCombination()));
@@ -116,23 +118,55 @@ void AsyncInterfaceCommandTranslator::translateCommand(
 }
 
 void AsyncInterfaceCommandTranslator::translateArguments(const seds::model::InterfaceCommand &sedsCommand,
-        seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface)
+        const CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface)
 {
     // Async commands are translated to sporadic interfaces, which can accept only one argument
     // To satisfy this we need to pack all command arguments into one
-    const auto bundledTypeName = handleArgumentTypeName(sedsCommand);
+    const auto bundledTypeName = handleArgumentTypeName(sedsCommand, requestedArgumentMode);
 
     const auto ivParameter = InterfaceTranslatorHelper::createInterfaceParameter(
             m_ivInterfaceParameterName, bundledTypeName, shared::InterfaceParameter::Direction::IN);
     ivInterface->addParam(ivParameter);
 }
 
-QString AsyncInterfaceCommandTranslator::handleArgumentTypeName(const seds::model::InterfaceCommand &sedsCommand)
+QString AsyncInterfaceCommandTranslator::handleArgumentTypeName(
+        const seds::model::InterfaceCommand &sedsCommand, const CommandArgumentMode requestedArgumentMode)
 {
     const auto &genericTypes = m_sedsInterfaceDeclaration.genericTypes();
+
     if (genericTypes.empty()) {
-        return DataTypeTranslationHelper::buildBundledTypeName(
-                m_sedsComponentName, m_sedsInterfaceName, sedsCommand.nameStr());
+        const auto &sedsCommandName = sedsCommand.nameStr();
+
+        switch (sedsCommand.argumentsCombination()) {
+        case ArgumentsCombination::InOnly:
+        case ArgumentsCombination::OutOnly:
+            return DataTypeTranslationHelper::buildBundledTypeName(
+                    m_sedsInterfaceDeclaration.nameStr(), sedsCommandName);
+        case seds::model::ArgumentsCombination::InAndNotify:
+            if (requestedArgumentMode == CommandArgumentMode::In) {
+                return DataTypeTranslationHelper::buildBundledTypeName(
+                        m_sedsInterfaceDeclaration.nameStr(), sedsCommandName, "In");
+            } else {
+                return DataTypeTranslationHelper::buildBundledTypeName(
+                        m_sedsInterfaceDeclaration.nameStr(), sedsCommandName, "Notify");
+            }
+        case ArgumentsCombination::NoArgs:
+            break;
+        case ArgumentsCombination::NotifyOnly:
+        case ArgumentsCombination::InAndOut:
+        case ArgumentsCombination::OutAndNotify:
+        case ArgumentsCombination::All: {
+            const auto message = QString("Interface command arguments combination '%1' is not supported for TASTE "
+                                         "InterfaceView async interface")
+                                         .arg(argumentsCombinationToString(sedsCommand.argumentsCombination()));
+            throw TranslationException(message);
+        } break;
+        default:
+            throw UnhandledValueException("ArgumentsCombination");
+            break;
+        }
+
+        return "";
     } else {
         return DataTypeTranslationHelper::buildGenericBundledTypeName(
                 m_sedsComponentName, m_sedsInterfaceName, sedsCommand.nameStr());

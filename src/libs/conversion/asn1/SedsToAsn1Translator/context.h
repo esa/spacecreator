@@ -56,6 +56,7 @@ public:
 
     auto findSedsType(const seds::model::DataTypeRef &typeRef) -> const seds::model::DataType *;
     auto findAsn1Type(const seds::model::DataTypeRef &typeRef) -> Asn1Acn::Types::Type *;
+    auto findAsn1TypeDefinitions(const seds::model::DataTypeRef &typeRef) -> Asn1Acn::Definitions *;
 
     auto getSedsPackage() const -> const seds::model::Package *;
     auto getSedsPackage(const QString &packageName) const -> const seds::model::Package *;

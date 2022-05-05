@@ -45,6 +45,7 @@ public:
 
     friend auto operator==(const QualifiedName &lhs, const QualifiedName &rhs) -> bool;
     friend auto operator!=(const QualifiedName &lhs, const QualifiedName &rhs) -> bool;
+    friend auto operator<(const QualifiedName &lhs, const QualifiedName &rhs) -> bool;
 
 private:
     Name m_name;

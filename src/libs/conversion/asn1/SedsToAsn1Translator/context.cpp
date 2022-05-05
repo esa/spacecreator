@@ -82,7 +82,6 @@ Asn1Acn::Types::Type *Context::findAsn1Type(const seds::model::DataTypeRef &type
 
             return typeAssignment->type();
         }
-
     } else {
         auto *typeAssignment = m_definitions->type(typeName);
         if (typeAssignment != nullptr) {
@@ -97,6 +96,36 @@ Asn1Acn::Types::Type *Context::findAsn1Type(const seds::model::DataTypeRef &type
                 m_definitions->addImportedType(importedType);
 
                 return typeAssignment->type();
+            }
+        }
+    }
+
+    throw MissingAsn1TypeDefinitionException(typeRef.value().pathStr());
+}
+
+Asn1Acn::Definitions *Context::findAsn1TypeDefinitions(const seds::model::DataTypeRef &typeRef)
+{
+    const auto &typeName = typeRef.nameStr();
+
+    if (typeRef.packageStr()) {
+        const auto asn1DefinitionsName = Escaper::escapeAsn1PackageName(*typeRef.packageStr());
+        auto definitions = getAsn1Definitions(asn1DefinitionsName);
+        auto typeAssignment = definitions->type(typeName);
+
+        if (typeAssignment != nullptr) {
+            return definitions;
+        }
+    } else {
+
+        auto *typeAssignment = m_definitions->type(typeName);
+        if (typeAssignment != nullptr) {
+            return m_definitions;
+        }
+
+        if (m_parentDefinitions != nullptr) {
+            typeAssignment = m_parentDefinitions->type(typeName);
+            if (typeAssignment != nullptr) {
+                return m_parentDefinitions;
             }
         }
     }

@@ -1,13 +1,13 @@
 ALTERNATESET-MEGACOMPONENT DEFINITIONS ::= BEGIN
-MegaComponent-ProvidedInterface-GenericType1 [size 8, encoding pos-int, endianness big]
-MegaComponent-ProvidedInterface-GenericType2 [size 8, encoding pos-int, endianness big]
-MegaComponent-ProvidedInterface-GenericType3 <DeterminantType:determinant> []
+MegaComponent-ProvidedInterface-GenericType1 []
+MegaComponent-ProvidedInterface-GenericType2 []
+MegaComponent-ProvidedInterface-GenericType3 <ALTERNATESET.DeterminantType:determinant> []
 {
     concrete0 [present-when determinant==0],
     concrete1 [present-when determinant==1],
     concrete2 [present-when determinant==2]
 }
-MegaComponent-ProvidedInterface-GenericType4 <DeterminantType:determinant> []
+MegaComponent-ProvidedInterface-GenericType4 <ALTERNATESET.DeterminantType:determinant> []
 {
     concrete0 [present-when determinant==0],
     concrete1 [present-when determinant==1],

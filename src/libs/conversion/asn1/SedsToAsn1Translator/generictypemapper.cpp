@@ -19,6 +19,7 @@
 
 #include "generictypemapper.h"
 
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 
 using conversion::translator::TranslationException;
@@ -44,7 +45,10 @@ void GenericTypeMapper::addMappings(const seds::model::GenericTypeMapSet &typeMa
     if (typeMapSet.alternateSet()) {
         const auto &alternates = typeMapSet.alternateSet()->alternates();
 
-        m_determinantName = findDeterminant(alternates);
+        seds::model::DataTypeRef determinantTypeRef;
+        std::tie(m_determinantName, determinantTypeRef) = findDeterminant(alternates);
+
+        m_determinantTypePath = handleDeterminantTypePath(determinantTypeRef);
 
         for (const auto &alternate : alternates) {
             addAlternateMapping(alternate);
@@ -64,6 +68,11 @@ const TypeMapping *GenericTypeMapper::getMapping(const QString &genericTypeName)
 const std::optional<QString> &GenericTypeMapper::determinantName() const
 {
     return m_determinantName;
+}
+
+const std::optional<QString> &GenericTypeMapper::determinantTypePath() const
+{
+    return m_determinantTypePath;
 }
 
 void GenericTypeMapper::addSimpleMapping(const GenericTypeMap &typeMap)
@@ -103,7 +112,6 @@ void GenericTypeMapper::addAlternateMapping(const GenericAlternate &alternate)
 
         if (m_mappings.count(genericTypeName) == 0) {
             TypeMapping mapping;
-            mapping.determinantTypeName = foundDeterminant->type().nameStr();
             mapping.concreteMappings.push_back(std::move(concreteMapping));
 
             m_mappings.insert({ genericTypeName, std::move(mapping) });
@@ -114,11 +122,12 @@ void GenericTypeMapper::addAlternateMapping(const GenericAlternate &alternate)
     }
 }
 
-QString GenericTypeMapper::findDeterminant(const std::vector<GenericAlternate> &alternates)
+std::pair<QString, seds::model::DataTypeRef> GenericTypeMapper::findDeterminant(
+        const std::vector<GenericAlternate> &alternates)
 {
     const auto determinants = std::accumulate(std::next(alternates.begin()), alternates.end(),
             getPossibleDeterminants(alternates.front()), [&](const auto &acc, const auto &alternate) {
-                std::vector<std::pair<QString, QString>> result;
+                std::vector<std::pair<QString, seds::model::DataTypeRef>> result;
 
                 const auto possibleDeterminants = getPossibleDeterminants(alternate);
 
@@ -138,16 +147,17 @@ QString GenericTypeMapper::findDeterminant(const std::vector<GenericAlternate> &
         throw TranslationException(std::move(errorMessage));
     }
 
-    return determinants.front().first;
+    return determinants.front();
 }
 
-std::vector<std::pair<QString, QString>> GenericTypeMapper::getPossibleDeterminants(const GenericAlternate &alternate)
+std::vector<std::pair<QString, seds::model::DataTypeRef>> GenericTypeMapper::getPossibleDeterminants(
+        const GenericAlternate &alternate)
 {
-    std::vector<std::pair<QString, QString>> possibleDeterminants;
+    std::vector<std::pair<QString, seds::model::DataTypeRef>> possibleDeterminants;
 
     for (const auto &typeMap : alternate.genericTypeMaps()) {
         if (typeMap.fixedValue().has_value()) {
-            possibleDeterminants.push_back({ typeMap.nameStr(), typeMap.type().value().pathStr() });
+            possibleDeterminants.push_back({ typeMap.nameStr(), typeMap.type() });
         }
     }
 
@@ -155,6 +165,19 @@ std::vector<std::pair<QString, QString>> GenericTypeMapper::getPossibleDetermina
             [&](const auto lhs, const auto rhs) { return lhs < rhs; });
 
     return possibleDeterminants;
+}
+
+QString GenericTypeMapper::handleDeterminantTypePath(const seds::model::DataTypeRef &determinantTypeRef)
+{
+    const auto determinantTypeName = Escaper::escapeAsn1TypeName(determinantTypeRef.nameStr());
+    const auto determinantTypeDefinitions = m_context.findAsn1TypeDefinitions(determinantTypeRef);
+    const auto determinantTypeDefinitionsName = determinantTypeDefinitions->name();
+
+    if (determinantTypeDefinitionsName == m_context.definitionsName()) {
+        return determinantTypeName;
+    } else {
+        return QString("%1.%2").arg(determinantTypeDefinitionsName).arg(determinantTypeName);
+    }
 }
 
 } // namespace conversion::asn1::translator

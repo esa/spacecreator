@@ -44,6 +44,7 @@ public:
 
     friend auto operator==(const DataTypeRef &lhs, const DataTypeRef &rhs) -> bool;
     friend auto operator!=(const DataTypeRef &lhs, const DataTypeRef &rhs) -> bool;
+    friend auto operator<(const DataTypeRef &lhs, const DataTypeRef &rhs) -> bool;
 
 private:
     QualifiedName m_value;

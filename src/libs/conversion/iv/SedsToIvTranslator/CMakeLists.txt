@@ -1,17 +1,14 @@
 project(SedsToIvTranslator VERSION 1.0.0 LANGUAGES CXX)
 
-set(SOURCES     generictypemapper.cpp
-                interfacetranslatorhelper.cpp
+set(SOURCES     interfacetranslatorhelper.cpp
                 translator.cpp
                 specialized/asyncinterfacecommandtranslator.cpp
                 specialized/componentstranslator.cpp
                 specialized/descriptiontranslator.cpp
                 specialized/interfaceparametertranslator.cpp
                 specialized/syncinterfacecommandtranslator.cpp)
-set(INCLUDES    generictypemapper.h
-                interfacetranslatorhelper.h
+set(INCLUDES    interfacetranslatorhelper.h
                 translator.h
-                typemapping.h
                 specialized/asyncinterfacecommandtranslator.h
                 specialized/componentstranslator.h
                 specialized/descriptiontranslator.h

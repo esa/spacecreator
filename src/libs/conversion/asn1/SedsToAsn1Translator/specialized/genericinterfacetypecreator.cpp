@@ -125,10 +125,14 @@ void GenericInterfaceTypeCreator::createConcreteTypeAlias(
             DataTypeTranslationHelper::buildConcreteTypeName(m_component.nameStr(), m_interface.nameStr(), genericName);
     const auto concreteType = concreteMapping.type;
 
-    auto aliasType = std::make_unique<Asn1Acn::TypeAssignment>(
-            concreteTypeName, concreteTypeName, Asn1Acn::SourceLocation(), concreteType->clone());
+    auto aliasType =
+            std::make_unique<Asn1Acn::Types::UserdefinedType>(concreteType->identifier(), m_context.definitionsName());
+    aliasType->setType(concreteType->clone());
 
-    m_context.getAsn1Definitions()->addType(std::move(aliasType));
+    auto aliasTypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
+            concreteTypeName, concreteTypeName, Asn1Acn::SourceLocation(), std::move(aliasType));
+
+    m_context.getAsn1Definitions()->addType(std::move(aliasTypeAssignment));
 }
 
 void GenericInterfaceTypeCreator::createConcreteChoice(
@@ -148,8 +152,8 @@ void GenericInterfaceTypeCreator::createConcreteChoice(
     }
 
     // Add an ACN parameter for determinant
-    const auto &determinantTypeName = mapping->determinantTypeName.value();
-    auto acnParameter = std::make_unique<Asn1Acn::AcnParameter>("determinant", "determinant", determinantTypeName);
+    auto acnParameter =
+            std::make_unique<Asn1Acn::AcnParameter>("determinant", "determinant", *m_typeMapper.determinantTypePath());
     choice->addParameter(std::move(acnParameter));
 
     m_context.addAsn1Type(std::move(choice), nullptr);

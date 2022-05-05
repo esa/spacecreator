@@ -50,9 +50,9 @@ QString DataTypeTranslationHelper::buildArrayTypeName(
 }
 
 QString DataTypeTranslationHelper::buildBundledTypeName(
-        const QString &commandName, const QString &interfaceName, QString postfix)
+        const QString &interfaceDeclarationName, const QString &commandName, QString postfix)
 {
-    return m_bundledTypeNameTemplate.arg(interfaceName).arg(commandName).arg(postfix);
+    return m_bundledTypeNameTemplate.arg(interfaceDeclarationName).arg(commandName).arg(postfix);
 }
 
 QString DataTypeTranslationHelper::buildGenericBundledTypeName(
