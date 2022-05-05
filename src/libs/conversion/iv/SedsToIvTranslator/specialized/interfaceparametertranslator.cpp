@@ -26,13 +26,10 @@ using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator {
 
-const QString InterfaceParameterTranslator::m_ivInterfaceParameterName = "Param";
-
 InterfaceParameterTranslator::InterfaceParameterTranslator(
-        ivm::IVFunction *ivFunction, const QString &sedsInterfaceName, const GenericTypeMapper *typeMapper)
+        ivm::IVFunction *ivFunction, const QString &sedsInterfaceName)
     : m_ivFunction(ivFunction)
     , m_sedsInterfaceName(sedsInterfaceName)
-    , m_typeMapper(typeMapper)
 {
 }
 
@@ -105,31 +102,7 @@ void InterfaceParameterTranslator::buildParameter(const seds::model::InterfacePa
 QString InterfaceParameterTranslator::handleParameterTypeName(
         const seds::model::InterfaceParameter &sedsParameter) const
 {
-    const auto &parameterTypeName = sedsParameter.type().nameStr();
-
-    const auto typeMapping = m_typeMapper->getMapping(parameterTypeName);
-
-    if (typeMapping == nullptr) {
-        return parameterTypeName;
-    }
-
-    const auto &concreteTypes = typeMapping->concreteTypes;
-
-    if (concreteTypes.empty()) {
-        auto errorMessage =
-                QString("Type \"%1\" of the parameter \"%2\" is handled as generic, but no mappings was provided")
-                        .arg(parameterTypeName)
-                        .arg(sedsParameter.nameStr());
-        throw TranslationException(std::move(errorMessage));
-    } else if (concreteTypes.size() != 1) {
-        auto errorMessage = QString(
-                "Generic type \"%1\" of the parameter \"%2\" can only be simply mapped (AlternateSet not supported)")
-                                    .arg(parameterTypeName)
-                                    .arg(sedsParameter.nameStr());
-        throw TranslationException(std::move(errorMessage));
-    }
-
-    return concreteTypes.front().typeRef.nameStr();
+    return "STUB_PARAMETER";
 }
 
 } // namespace conversion::iv::translator

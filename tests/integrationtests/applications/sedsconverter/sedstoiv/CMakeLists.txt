@@ -77,6 +77,8 @@ configure_file(resources/test_alternate_set.xml resources/test_alternate_set.xml
 configure_file(resources/test_alternate_set.output resources/test_alternate_set.output COPYONLY)
 configure_file(resources/test_alternate_set_asn.output resources/test_alternate_set_asn.output COPYONLY)
 configure_file(resources/test_alternate_set_acn.output resources/test_alternate_set_acn.output COPYONLY)
+configure_file(resources/test_alternate_set_component_asn.output resources/test_alternate_set_component_asn.output COPYONLY)
+configure_file(resources/test_alternate_set_component_acn.output resources/test_alternate_set_component_acn.output COPYONLY)
 
 configure_file(test_cross_reference_arguments.sh test_cross_reference_arguments.sh COPYONLY)
 configure_file(resources/test_cross_reference_arguments.xml resources/test_cross_reference_arguments.xml COPYONLY)

@@ -29,19 +29,10 @@ using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator {
 
-SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction,
-        const QString &sedsInterfaceName, const seds::model::Package *sedsPackage,
-        const std::vector<seds::model::Package> &sedsPackages, Asn1Acn::Definitions *asn1Definitions,
-        const Asn1Acn::Asn1Model::Data &asn1Files, const GenericTypeMapper *typeMapper,
-        const std::optional<uint64_t> &sequenceSizeThreshold)
+SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(
+        ivm::IVFunction *ivFunction, const QString &sedsInterfaceName)
     : m_ivFunction(ivFunction)
     , m_sedsInterfaceName(sedsInterfaceName)
-    , m_sedsPackage(sedsPackage)
-    , m_sedsPackages(sedsPackages)
-    , m_asn1Definitions(asn1Definitions)
-    , m_asn1Files(asn1Files)
-    , m_typeMapper(typeMapper)
-    , m_sequenceSizeThreshold(sequenceSizeThreshold)
 {
 }
 
@@ -80,7 +71,7 @@ void SyncInterfaceCommandTranslator::translateArguments(
         const std::vector<seds::model::CommandArgument> &sedsArguments, ivm::IVInterface *ivInterface)
 {
     for (const auto &sedsArgument : sedsArguments) {
-        const auto sedsArgumentTypeName = handleArgumentType(sedsArgument, ivInterface->title());
+        const auto sedsArgumentTypeName = handleArgumentTypeName(sedsArgument, ivInterface->title());
 
         switch (sedsArgument.mode()) {
         case seds::model::CommandArgumentMode::In: {
@@ -110,50 +101,10 @@ void SyncInterfaceCommandTranslator::translateArguments(
     }
 }
 
-QString SyncInterfaceCommandTranslator::handleArgumentType(
+QString SyncInterfaceCommandTranslator::handleArgumentTypeName(
         const seds::model::CommandArgument &sedsArgument, const QString &interfaceName) const
 {
-    const auto &argumentTypeRef = sedsArgument.type();
-    const auto &argumentTypeName = argumentTypeRef.nameStr();
-
-    const auto typeMapping = m_typeMapper->getMapping(argumentTypeName);
-
-    if (typeMapping == nullptr) {
-        if (sedsArgument.arrayDimensions().empty()) {
-            return Escaper::escapeAsn1TypeName(argumentTypeName);
-        } else {
-            return InterfaceTranslatorHelper::createArrayType(argumentTypeRef, sedsArgument.arrayDimensions(),
-                    m_asn1Definitions, m_sedsPackage, m_asn1Files, m_sedsPackages, m_sequenceSizeThreshold);
-        }
-    }
-
-    const auto &concreteTypes = typeMapping->concreteTypes;
-
-    if (concreteTypes.empty()) {
-        auto errorMessage = QString("Type \"%1\" of the argument \"%2\" in the sync interface \"%3\" is handled as "
-                                    "generic, but no mappings was provided")
-                                    .arg(argumentTypeName)
-                                    .arg(sedsArgument.nameStr())
-                                    .arg(interfaceName);
-        throw TranslationException(std::move(errorMessage));
-    } else if (concreteTypes.size() != 1) {
-        auto errorMessage = QString("Generic type \"%1\" of the argument \"%2\" in the sync interface \"%3\" can only "
-                                    "be simply mapped (AlternateSet not supported)")
-                                    .arg(argumentTypeName)
-                                    .arg(sedsArgument.nameStr())
-                                    .arg(interfaceName);
-        throw TranslationException(std::move(errorMessage));
-    }
-
-    const auto &argumentConcreteTypeRef = concreteTypes.front().typeRef;
-
-    if (sedsArgument.arrayDimensions().empty()) {
-        const auto &argumentConcreteTypeName = argumentConcreteTypeRef.nameStr();
-        return Escaper::escapeAsn1TypeName(argumentConcreteTypeName);
-    } else {
-        return InterfaceTranslatorHelper::createArrayType(argumentConcreteTypeRef, sedsArgument.arrayDimensions(),
-                m_asn1Definitions, m_sedsPackage, m_asn1Files, m_sedsPackages, m_sequenceSizeThreshold);
-    }
+    return "STUB_SYNC";
 }
 
 } // namespace conversion::iv::translator

@@ -1,0 +1,23 @@
+ALTERNATESET-MEGACOMPONENT DEFINITIONS ::= BEGIN
+MegaComponent-ProvidedInterface-GenericType1 [size 8, encoding pos-int, endianness big]
+MegaComponent-ProvidedInterface-GenericType2 [size 8, encoding pos-int, endianness big]
+MegaComponent-ProvidedInterface-GenericType3 <DeterminantType:determinant> []
+{
+    concrete0 [present-when determinant==0],
+    concrete1 [present-when determinant==1],
+    concrete2 [present-when determinant==2]
+}
+MegaComponent-ProvidedInterface-GenericType4 <DeterminantType:determinant> []
+{
+    concrete0 [present-when determinant==0],
+    concrete1 [present-when determinant==1],
+    concrete2 [present-when determinant==2]
+}
+MegaComponent-ProvidedInterface-AsyncWithGenericTypes-Type []
+{
+    genericArgument1 [],
+    genericArgument2 MegaComponent-ProvidedInterface-GenericType2 [],
+    genericArgument3 <genericArgument2>[],
+    genericArgument4 <genericArgument2>[]
+}
+END

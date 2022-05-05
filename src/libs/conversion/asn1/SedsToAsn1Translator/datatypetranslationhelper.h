@@ -55,7 +55,7 @@ public:
 private:
     inline static const QString m_arrayTypeNameTemplate = "%1Array-%2";
     inline static const QString m_bundledTypeNameTemplate = "%1-%2-Type%3";
-    inline static const QString m_genericBundledTypeNameTemplate = "%1-%2-%3Type";
+    inline static const QString m_genericBundledTypeNameTemplate = "%1-%2-%3-Type";
     inline static const QString m_concreteTypeNameTemplate = "%1-%2-%3";
 };
 

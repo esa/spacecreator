@@ -129,14 +129,12 @@ private:
             const QString &sedsInterfaceName, const std::optional<seds::model::GenericTypeMapSet> &typeMapSet,
             const seds::model::Component &sedsComponent, const ivm::IVInterface::InterfaceType interfaceType,
             ivm::IVFunction *ivFunction, const QString &currentPackageName) const -> void;
-    auto translateParameters(const QString &sedsInterfaceName,
+    auto translateParameters(const QString &sedsComponentName, const QString &sedsInterfaceName,
             const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
-            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
-            const GenericTypeMapper *typeMapper) const -> void;
-    auto translateCommands(const QString &sedsInterfaceName,
+            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
+    auto translateCommands(const QString &sedsComponentName, const QString &sedsInterfaceName,
             const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
-            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
-            const QString &currentPackageName, const GenericTypeMapper *typeMapper) const -> void;
+            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
 
 private:
     /// @brief  Parent package

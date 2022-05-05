@@ -117,37 +117,30 @@ void ComponentsTranslator::translateInterfaceDeclaration(
                 baseInterfacePackageName);
     }
 
-    GenericTypeMapper typeMapper(sedsInterfaceName, genericTypeMapSet);
-    translateParameters(sedsInterfaceName, sedsInterfaceDeclaration, interfaceType, ivFunction, &typeMapper);
-    translateCommands(
-            sedsInterfaceName, sedsInterfaceDeclaration, interfaceType, ivFunction, currentPackageName, &typeMapper);
+    const auto &sedsComponentName = sedsComponent.nameStr();
+
+    translateParameters(sedsComponentName, sedsInterfaceName, sedsInterfaceDeclaration, interfaceType, ivFunction);
+    translateCommands(sedsComponentName, sedsInterfaceName, sedsInterfaceDeclaration, interfaceType, ivFunction);
 }
 
-void ComponentsTranslator::translateParameters(const QString &sedsInterfaceName,
+void ComponentsTranslator::translateParameters(const QString &sedsComponentName, const QString &sedsInterfaceName,
         const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
-        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
-        const GenericTypeMapper *typeMapper) const
+        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const
 {
-    InterfaceParameterTranslator parameterTranslator(ivFunction, sedsInterfaceName, typeMapper);
+    InterfaceParameterTranslator parameterTranslator(ivFunction, sedsInterfaceName);
 
     for (const auto &sedsParameter : sedsInterfaceDeclaration.parameters()) {
         parameterTranslator.translateParameter(sedsParameter, interfaceType);
     }
 }
 
-void ComponentsTranslator::translateCommands(const QString &sedsInterfaceName,
+void ComponentsTranslator::translateCommands(const QString &sedsComponentName, const QString &sedsInterfaceName,
         const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
-        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
-        const QString &currentPackageName, const GenericTypeMapper *typeMapper) const
+        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const
 {
-    // TODO
-    Asn1Acn::Definitions *asn1Definitions = nullptr;
-    /* const auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(currentPackageName, m_asn1Files); */
-
-    AsyncInterfaceCommandTranslator asyncCommandTranslator(ivFunction, sedsInterfaceName, m_sedsPackage, m_sedsPackages,
-            asn1Definitions, m_asn1Files, typeMapper, m_sequenceSizeThreshold);
-    SyncInterfaceCommandTranslator syncCommandTranslator(ivFunction, sedsInterfaceName, m_sedsPackage, m_sedsPackages,
-            asn1Definitions, m_asn1Files, typeMapper, m_sequenceSizeThreshold);
+    AsyncInterfaceCommandTranslator asyncCommandTranslator(
+            ivFunction, sedsInterfaceDeclaration, sedsComponentName, sedsInterfaceName);
+    SyncInterfaceCommandTranslator syncCommandTranslator(ivFunction, sedsInterfaceName);
 
     for (const auto &sedsCommand : sedsInterfaceDeclaration.commands()) {
         switch (sedsCommand.mode()) {

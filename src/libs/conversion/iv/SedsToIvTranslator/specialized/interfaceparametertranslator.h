@@ -48,10 +48,8 @@ public:
      *
      * @param   ivFunction          Output interface view function
      * @param   sedsInterfaceName   Parent interface name
-     * @param   genericTypeMapper   Generic type mapper
      */
-    InterfaceParameterTranslator(
-            ivm::IVFunction *ivFunction, const QString &sedsInterfaceName, const GenericTypeMapper *typeMapper);
+    InterfaceParameterTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName);
     /**
      * @brief   Deleted copy constructor
      */
@@ -99,11 +97,8 @@ private:
     /// @brief  Parent SEDS interface name
     const QString &m_sedsInterfaceName;
 
-    /// @brief  Generic type mapper
-    const GenericTypeMapper *m_typeMapper;
-
     /// @brief  Name for the argument in the IV interface
-    static const QString m_ivInterfaceParameterName;
+    inline static const QString m_ivInterfaceParameterName = "Param";
 };
 
 } // namespace conversion::iv::translator

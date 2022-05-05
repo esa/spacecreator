@@ -62,12 +62,6 @@ GenericInterfaceTypeCreator::GenericInterfaceTypeCreator(
     , m_component(component)
     , m_typeMapper(context, interface.nameStr())
 {
-    if (!interface.genericTypeMapSet()) {
-        auto message = QString("Failed to create concrete types for interface '%1' because it has no type maps")
-                               .arg(interface.nameStr());
-        throw TranslationException(std::move(message));
-    }
-
     m_typeMapper.addMappings(*interface.genericTypeMapSet());
 
     m_interfaceDeclaration = findInterfaceDeclaration(m_interface.type());
@@ -175,9 +169,13 @@ void GenericInterfaceTypeCreator::createConcreteChoiceAlternative(
 
     const auto presentWhen = QString("determinant==%1").arg(*concreteMapping.determinantValue);
 
+    auto choiceAlternativeUserType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
+            choiceAlternativeType->identifier(), m_context.definitionsName());
+    choiceAlternativeUserType->setType(std::move(choiceAlternativeType));
+
     auto choiceAlternative = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(choiceAlternativeName,
             choiceAlternativeName, choiceAlternativeName, choiceAlternativeName, presentWhen, Asn1Acn::SourceLocation(),
-            std::move(choiceAlternativeType));
+            std::move(choiceAlternativeUserType));
 
     choice->addComponent(std::move(choiceAlternative));
 }
@@ -335,7 +333,7 @@ void GenericInterfaceTypeCreator::createAsyncCommandBundledType(const seds::mode
 }
 
 void GenericInterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const seds::model::CommandArgument &argument,
-        Asn1Acn::Types::Sequence *bundledType, const QString &determinantArgumentName)
+        Asn1Acn::Types::Sequence *bundledType, const std::optional<QString> &determinantArgumentName)
 {
     const auto argumentName = Escaper::escapeAsn1FieldName(argument.nameStr());
     const auto argumentTypeRef = argument.type();
@@ -370,8 +368,9 @@ void GenericInterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const s
                     std::nullopt, "", Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
                     std::move(sequenceComponentType));
 
-            if (argumentType->typeEnum() == Asn1Acn::Types::Type::ASN1Type::CHOICE) {
-                sequenceComponent->addAcnParameter(determinantArgumentName);
+            if (determinantArgumentName.has_value()
+                    && argumentType->typeEnum() == Asn1Acn::Types::Type::ASN1Type::CHOICE) {
+                sequenceComponent->addAcnParameter(*determinantArgumentName);
             }
 
             bundledType->addComponent(std::move(sequenceComponent));
@@ -428,9 +427,15 @@ const seds::model::InterfaceDeclaration *GenericInterfaceTypeCreator::findInterf
     throw UndeclaredInterfaceException(interfaceRef.value().pathStr());
 }
 
-QString GenericInterfaceTypeCreator::findDeterminantArgument(const std::vector<seds::model::CommandArgument> &arguments)
+std::optional<QString> GenericInterfaceTypeCreator::findDeterminantArgument(
+        const std::vector<seds::model::CommandArgument> &arguments)
 {
     const auto &determinantName = m_typeMapper.determinantName();
+
+    if (!determinantName.has_value()) {
+        return std::nullopt;
+    }
+
     const auto foundArgument = std::find_if(arguments.begin(), arguments.end(),
             [&](const seds::model::CommandArgument &argument) { return argument.type().nameStr() == determinantName; });
 

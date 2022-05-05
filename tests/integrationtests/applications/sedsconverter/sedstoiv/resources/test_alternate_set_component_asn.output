@@ -1,0 +1,28 @@
+ALTERNATESET-MEGACOMPONENT DEFINITIONS ::= BEGIN
+IMPORTS
+DeterminantType FROM ALTERNATESET
+Integer16 FROM ALTERNATESET
+Integer32 FROM ALTERNATESET
+Integer8 FROM ALTERNATESET
+;
+MegaComponent-ProvidedInterface-GenericType1 ::= INTEGER(0 .. 255)
+MegaComponent-ProvidedInterface-GenericType2 ::= INTEGER(0 .. 2)
+MegaComponent-ProvidedInterface-GenericType3 ::= CHOICE
+{
+    concrete0 Integer8(0 .. 255),
+    concrete1 Integer16(0 .. 65535),
+    concrete2 Integer32(0 .. 4294967295)
+}
+MegaComponent-ProvidedInterface-GenericType4 ::= CHOICE
+{
+    concrete0 Integer8(0 .. 255) (10),
+    concrete1 Integer16(0 .. 65535) (20),
+    concrete2 Integer32(0 .. 4294967295) (30)
+}
+MegaComponent-ProvidedInterface-AsyncWithGenericTypes-Type ::= SEQUENCE
+{
+    genericArgument1 MegaComponent-ProvidedInterface-GenericType1(0 .. 255),
+    genericArgument3 MegaComponent-ProvidedInterface-GenericType3,
+    genericArgument4 MegaComponent-ProvidedInterface-GenericType4
+}
+END

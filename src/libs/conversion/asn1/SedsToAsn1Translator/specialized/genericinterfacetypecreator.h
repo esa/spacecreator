@@ -78,11 +78,11 @@ private:
     auto createAsyncCommandBundledType(const seds::model::InterfaceCommand &command, const QString &bundledTypeName,
             const seds::model::CommandArgumentMode requestedArgumentMode) -> void;
     auto createAsyncCommandBundledTypeComponent(const seds::model::CommandArgument &argument,
-            Asn1Acn::Types::Sequence *bundledType, const QString &determinantArgumentName) -> void;
+            Asn1Acn::Types::Sequence *bundledType, const std::optional<QString> &determinantArgumentName) -> void;
 
     auto findInterfaceDeclaration(const seds::model::InterfaceDeclarationRef &interfaceRef)
             -> const seds::model::InterfaceDeclaration *;
-    auto findDeterminantArgument(const std::vector<seds::model::CommandArgument> &arguments) -> QString;
+    auto findDeterminantArgument(const std::vector<seds::model::CommandArgument> &arguments) -> std::optional<QString>;
     auto isTypeGeneric(const seds::model::DataTypeRef &typeRef) -> bool;
 
 private:

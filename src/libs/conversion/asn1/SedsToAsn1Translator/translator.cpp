@@ -185,8 +185,10 @@ void SedsToAsn1Translator::translateInterfaceImplementations(const std::vector<s
         const seds::model::Component &component, Context &context) const
 {
     for (const auto &interface : interfaces) {
-        GenericInterfaceTypeCreator typeCreator(context, interface, component);
-        typeCreator.createTypes();
+        if (interface.genericTypeMapSet()) {
+            GenericInterfaceTypeCreator typeCreator(context, interface, component);
+            typeCreator.createTypes();
+        }
     }
 }
 

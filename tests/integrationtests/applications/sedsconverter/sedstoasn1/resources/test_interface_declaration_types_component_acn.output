@@ -28,16 +28,16 @@ Component-GenericInterfaceImpl-GenericDeterminant [size 8, encoding pos-int]
 Component-GenericInterfaceImpl-Generic1 [size 8, encoding pos-int]
 Component-GenericInterfaceImpl-Generic2 <DeterminantType:determinant> []
 {
-    concrete0 [size 8, encoding pos-int, present-when determinant==0],
-    concrete1 [size 8, encoding pos-int, present-when determinant==1]
+    concrete0 [present-when determinant==0],
+    concrete1 [present-when determinant==1]
 }
 Component-GenericInterfaceImpl-Generic3 <DeterminantType:determinant> []
 {
-    concrete0 [size 8, encoding pos-int, present-when determinant==0],
-    concrete1 [size 8, encoding pos-int, present-when determinant==1]
+    concrete0 [present-when determinant==0],
+    concrete1 [present-when determinant==1]
 }
 PackageIntegerArray-2 []
-Component-GenericInterfaceImpl-InArgsOnlyType []
+Component-GenericInterfaceImpl-InArgsOnly-Type []
 {
     argX [],
     argA [],
@@ -45,7 +45,7 @@ Component-GenericInterfaceImpl-InArgsOnlyType []
     argB <determinantArg>[],
     argC <determinantArg>[]
 }
-Component-GenericInterfaceImpl-OutArgsOnlyType []
+Component-GenericInterfaceImpl-OutArgsOnly-Type []
 {
     argX [],
     argA [],
