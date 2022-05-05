@@ -62,6 +62,12 @@
           <GenericType name="Generic2" />
           <GenericType name="Generic3" />
         </GenericTypeSet>
+        <ParameterSet>
+          <Parameter name="ReadOnlyAsync" type="Generic1" mode="async" readOnly="true"/>
+          <Parameter name="ReadOnlySync" type="Generic1" mode="sync" readOnly="true"/>
+          <Parameter name="ReadWriteAsync" type="Generic1" mode="async" readOnly="false"/>
+          <Parameter name="ReadWriteSync" type="Generic1" mode="sync" readOnly="false"/>
+        </ParameterSet>
         <CommandSet>
           <Command name="SyncCommand" mode="sync">
             <Argument name="ArgX" type="PackageInteger" mode="in">

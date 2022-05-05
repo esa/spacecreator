@@ -126,7 +126,8 @@ void ComponentsTranslator::translateParameters(const QString &sedsComponentName,
         const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
         const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const
 {
-    InterfaceParameterTranslator parameterTranslator(ivFunction, sedsInterfaceName);
+    InterfaceParameterTranslator parameterTranslator(
+            ivFunction, sedsInterfaceDeclaration, sedsComponentName, sedsInterfaceName);
 
     for (const auto &sedsParameter : sedsInterfaceDeclaration.parameters()) {
         parameterTranslator.translateParameter(sedsParameter, interfaceType);
@@ -139,7 +140,8 @@ void ComponentsTranslator::translateCommands(const QString &sedsComponentName, c
 {
     AsyncInterfaceCommandTranslator asyncCommandTranslator(
             ivFunction, sedsInterfaceDeclaration, sedsComponentName, sedsInterfaceName);
-    SyncInterfaceCommandTranslator syncCommandTranslator(ivFunction, sedsInterfaceName);
+    SyncInterfaceCommandTranslator syncCommandTranslator(
+            ivFunction, sedsInterfaceDeclaration, sedsComponentName, sedsInterfaceName);
 
     for (const auto &sedsCommand : sedsInterfaceDeclaration.commands()) {
         switch (sedsCommand.mode()) {

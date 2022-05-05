@@ -19,16 +19,21 @@
 
 #include "specialized/interfaceparametertranslator.h"
 
+#include <conversion/asn1/SedsToAsn1Translator/datatypetranslationhelper.h>
 #include <conversion/common/translation/exceptions.h>
 
 using conversion::UnhandledValueException;
+using conversion::asn1::translator::DataTypeTranslationHelper;
 using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator {
 
-InterfaceParameterTranslator::InterfaceParameterTranslator(
-        ivm::IVFunction *ivFunction, const QString &sedsInterfaceName)
+InterfaceParameterTranslator::InterfaceParameterTranslator(ivm::IVFunction *ivFunction,
+        const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration, const QString &sedsComponentName,
+        const QString &sedsInterfaceName)
     : m_ivFunction(ivFunction)
+    , m_sedsInterfaceDeclaration(sedsInterfaceDeclaration)
+    , m_sedsComponentName(sedsComponentName)
     , m_sedsInterfaceName(sedsInterfaceName)
 {
 }
@@ -102,7 +107,42 @@ void InterfaceParameterTranslator::buildParameter(const seds::model::InterfacePa
 QString InterfaceParameterTranslator::handleParameterTypeName(
         const seds::model::InterfaceParameter &sedsParameter) const
 {
-    return "STUB_PARAMETER";
+    const auto &parameterTypeRef = sedsParameter.type();
+    const auto &parameterTypeName = parameterTypeRef.nameStr();
+
+    const auto &genericTypes = m_sedsInterfaceDeclaration.genericTypes();
+    const auto &dimensions = sedsParameter.arrayDimensions();
+
+    if (genericTypes.empty()) {
+        if (dimensions.empty()) {
+            return parameterTypeName;
+        } else {
+            return DataTypeTranslationHelper::buildArrayTypeName(parameterTypeName, dimensions);
+        }
+    } else {
+        if (!dimensions.empty()) {
+            auto errorMessage = QString("Parameter '%1' could not be translated, array parameters with generic "
+                                        "types are not supported because of the ACN limitations")
+                                        .arg(sedsParameter.nameStr());
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        if (parameterTypeRef.packageStr()) {
+            return parameterTypeName;
+        }
+
+        const auto found = std::find_if(
+                genericTypes.begin(), genericTypes.end(), [&](const seds::model::GenericType &genericType) {
+                    return genericType.nameStr() == parameterTypeName;
+                });
+
+        if (found == genericTypes.end()) {
+            return parameterTypeName;
+        } else {
+            return DataTypeTranslationHelper::buildConcreteTypeName(
+                    m_sedsComponentName, m_sedsInterfaceName, sedsParameter.type().nameStr());
+        }
+    }
 }
 
 } // namespace conversion::iv::translator

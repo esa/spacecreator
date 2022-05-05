@@ -39,10 +39,14 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   ivFunction          Output interface view function
-     * @param   sedsInterfaceName   Parent interface name
+     * @param   ivFunction                  Output interface view function
+     * @param   sedsInterfaceDeclaration    Declaration of the parent interface
+     * @param   sedsComponentName           Parent component name
+     * @param   sedsInterfaceName           Parent interface name
      */
-    SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName);
+    SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction,
+            const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration, const QString &sedsComponentName,
+            const QString &sedsInterfaceName);
     /**
      * @brief   Deleted copy constructor
      */
@@ -80,6 +84,10 @@ private:
 private:
     /// @brief  Output interface view function
     ivm::IVFunction *m_ivFunction;
+    /// @brief  Parent interface declaration
+    const seds::model::InterfaceDeclaration &m_sedsInterfaceDeclaration;
+    /// @brief  Parent SEDS component name
+    const QString &m_sedsComponentName;
     /// @brief  Parent SEDS interface name
     const QString &m_sedsInterfaceName;
 };

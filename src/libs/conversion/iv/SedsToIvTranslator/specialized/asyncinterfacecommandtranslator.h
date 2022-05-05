@@ -41,8 +41,10 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   ivFunction          Output interface view function
-     * @param   sedsInterfaceName   Parent interface name
+     * @param   ivFunction                  Output interface view function
+     * @param   sedsInterfaceDeclaration    Declaration of the parent interface
+     * @param   sedsComponentName           Parent component name
+     * @param   sedsInterfaceName           Parent interface name
      */
     AsyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction,
             const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration, const QString &sedsComponentName,

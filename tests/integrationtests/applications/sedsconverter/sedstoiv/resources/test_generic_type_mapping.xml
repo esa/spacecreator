@@ -25,25 +25,11 @@
         <Command name="SyncCommandSimpleMapping" mode="sync">
           <Argument name="ArgumentSimpleMapping" type="GenericType" mode="in" />
         </Command>
-        <Command name="SyncCommandSimpleMappingArray" mode="sync">
-          <Argument name="ArrayArgumentSimpleMapping" type="GenericType" mode="in">
-            <ArrayDimensions>
-              <Dimension size="10" />
-            </ArrayDimensions>
-          </Argument>
-        </Command>
         <Command name="AsyncCommandNoMapping" mode="async">
           <Argument name="ArgumentNoMapping" type="MyInteger" mode="in" />
         </Command>
         <Command name="AsyncCommandSimpleMapping" mode="async">
           <Argument name="ArgumentSimpleMapping" type="GenericType" mode="in" />
-        </Command>
-        <Command name="AsyncCommandSimpleMappingArray" mode="async">
-          <Argument name="ArrayArgumentSimpleMapping" type="GenericType" mode="in">
-            <ArrayDimensions>
-              <Dimension size="10" />
-            </ArrayDimensions>
-          </Argument>
         </Command>
     </CommandSet>
     </Interface>

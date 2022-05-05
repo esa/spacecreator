@@ -31,9 +31,12 @@ using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator {
 
-SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(
-        ivm::IVFunction *ivFunction, const QString &sedsInterfaceName)
+SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction,
+        const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration, const QString &sedsComponentName,
+        const QString &sedsInterfaceName)
     : m_ivFunction(ivFunction)
+    , m_sedsInterfaceDeclaration(sedsInterfaceDeclaration)
+    , m_sedsComponentName(sedsComponentName)
     , m_sedsInterfaceName(sedsInterfaceName)
 {
 }
@@ -105,13 +108,41 @@ void SyncInterfaceCommandTranslator::translateArguments(
 
 QString SyncInterfaceCommandTranslator::handleArgumentTypeName(const seds::model::CommandArgument &sedsArgument) const
 {
-    const auto &typeName = sedsArgument.type().nameStr();
+    const auto &genericTypes = m_sedsInterfaceDeclaration.genericTypes();
     const auto &dimensions = sedsArgument.arrayDimensions();
 
-    if (dimensions.empty()) {
-        return typeName;
+    if (genericTypes.empty()) {
+        const auto &typeName = sedsArgument.type().nameStr();
+
+        if (dimensions.empty()) {
+            return typeName;
+        } else {
+            return DataTypeTranslationHelper::buildArrayTypeName(typeName, dimensions);
+        }
     } else {
-        return DataTypeTranslationHelper::buildArrayTypeName(typeName, dimensions);
+        if (!dimensions.empty()) {
+            auto errorMessage = QString("Command argument '%1' could not be translated, array arguments with generic "
+                                        "types are not supported because of the ACN limitations")
+                                        .arg(sedsArgument.nameStr());
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        const auto &argumentTypeRef = sedsArgument.type();
+        const auto &argumentTypeName = argumentTypeRef.nameStr();
+
+        if (argumentTypeRef.packageStr()) {
+            return argumentTypeName;
+        }
+
+        const auto found = std::find_if(genericTypes.begin(), genericTypes.end(),
+                [&](const seds::model::GenericType &genericType) { return genericType.nameStr() == argumentTypeName; });
+
+        if (found == genericTypes.end()) {
+            return argumentTypeName;
+        } else {
+            return DataTypeTranslationHelper::buildConcreteTypeName(
+                    m_sedsComponentName, m_sedsInterfaceName, sedsArgument.type().nameStr());
+        }
     }
 }
 

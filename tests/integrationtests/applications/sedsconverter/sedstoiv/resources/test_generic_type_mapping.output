@@ -4,25 +4,19 @@
     <Output_Parameter name="Param" type="MyInteger" encoding="ACN"/>
 </Provided_Interface>
 <Provided_Interface name="Get_ProvidedInterface_ParameterSimpleMapping_Pi" kind="Protected" layer="default">
-    <Output_Parameter name="Param" type="MyInteger" encoding="ACN"/>
+    <Output_Parameter name="Param" type="MegaComponent-ProvidedInterface-GenericType" encoding="ACN"/>
 </Provided_Interface>
 <Provided_Interface name="ProvidedInterface_SyncCommandNoMapping_Pi" kind="Protected" layer="default">
     <Input_Parameter name="ArgumentNoMapping" type="MyInteger" encoding="ACN"/>
 </Provided_Interface>
 <Provided_Interface name="ProvidedInterface_SyncCommandSimpleMapping_Pi" kind="Protected" layer="default">
-    <Input_Parameter name="ArgumentSimpleMapping" type="MyInteger" encoding="ACN"/>
-</Provided_Interface>
-<Provided_Interface name="ProvidedInterface_SyncCommandSimpleMappingArray_Pi" kind="Protected" layer="default">
-    <Input_Parameter name="ArrayArgumentSimpleMapping" type="MyIntegerArray-10" encoding="ACN"/>
+    <Input_Parameter name="ArgumentSimpleMapping" type="MegaComponent-ProvidedInterface-GenericType" encoding="ACN"/>
 </Provided_Interface>
 <Provided_Interface name="ProvidedInterface_AsyncCommandNoMapping_Pi" layer="default">
-    <Input_Parameter name="InputParam" type="AsyncCommandNoMapping-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="MegaComponent-ProvidedInterface-AsyncCommandNoMapping-Type" encoding="ACN"/>
 </Provided_Interface>
 <Provided_Interface name="ProvidedInterface_AsyncCommandSimpleMapping_Pi" layer="default">
-    <Input_Parameter name="InputParam" type="AsyncCommandSimpleMapping-Type" encoding="ACN"/>
-</Provided_Interface>
-<Provided_Interface name="ProvidedInterface_AsyncCommandSimpleMappingArray_Pi" layer="default">
-    <Input_Parameter name="InputParam" type="AsyncCommandSimpleMappingArray-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="MegaComponent-ProvidedInterface-AsyncCommandSimpleMapping-Type" encoding="ACN"/>
 </Provided_Interface>
 
     <Implementations>

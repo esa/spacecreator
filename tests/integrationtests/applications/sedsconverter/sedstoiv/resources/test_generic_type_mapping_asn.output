@@ -1,16 +1,3 @@
 TYPEMAPPING DEFINITIONS ::= BEGIN
 MyInteger ::= INTEGER(0 .. 255)
-MyIntegerArray-10 ::= SEQUENCE (SIZE(10)) OF MyInteger(0 .. 255)
-AsyncCommandNoMapping-Type ::= SEQUENCE
-{
-    argumentNoMapping MyInteger(0 .. 255)
-}
-AsyncCommandSimpleMapping-Type ::= SEQUENCE
-{
-    argumentSimpleMapping MyInteger(0 .. 255)
-}
-AsyncCommandSimpleMappingArray-Type ::= SEQUENCE
-{
-    arrayArgumentSimpleMapping MyIntegerArray-10(SIZE(10))
-}
 END
