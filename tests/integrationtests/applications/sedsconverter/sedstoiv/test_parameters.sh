@@ -29,6 +29,10 @@ cd $TEST_OUTPUT_DIR
 # Execute commands in chain to make sure that the generated interface view matches
 # the reference and allows to succesfully generate derived artefacts
 $DIFF interfaceview.xml ../resources/test_parameters.output \
+  && $DIFF PARAMETERS.asn ../resources/test_parameters_asn.output \
+  && $DIFF PARAMETERS.acn ../resources/test_parameters_acn.output \
+  && $DIFF PARAMETERS-MEGACOMPONENT.asn ../resources/test_parameters_component_asn.output \
+  && $DIFF PARAMETERS-MEGACOMPONENT.acn ../resources/test_parameters_component_acn.output \
   && $UPDATE_DATAVIEW \
   && $AADL_CONVERTER -o interfaceview.xml \
   -t ../resources/xml2dv/interfaceview.tmplt \

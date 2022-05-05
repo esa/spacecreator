@@ -49,7 +49,7 @@ public:
     static auto buildConcreteTypeName(
             const QString &componentName, const QString &interfaceName, const QString &genericName) -> QString;
 
-    static auto handleArrayArgumentType(Context &context, const seds::model::DataTypeRef &argumentTypeRef,
+    static auto handleArrayType(Context &context, const seds::model::DataTypeRef &argumentTypeRef,
             const std::vector<seds::model::DimensionSize> &dimensions) -> Asn1Acn::Types::Type *;
 
 private:

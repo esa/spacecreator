@@ -22,6 +22,7 @@
 #include "context.h"
 
 #include <seds/SedsModel/interfaces/interfacedeclaration.h>
+#include <seds/SedsModel/interfaces/interfaceparameter.h>
 
 namespace conversion::asn1::translator {
 
@@ -56,6 +57,8 @@ public:
     auto createTypes(const seds::model::InterfaceDeclaration &interfaceDeclaration) -> void;
 
 private:
+    auto createTypesForParameter(const seds::model::InterfaceParameter &parameter) -> void;
+
     auto createTypesForSyncCommand(const seds::model::InterfaceCommand &command) -> void;
 
     auto createTypesForAsyncCommand(const seds::model::InterfaceCommand &command, const QString &interfaceName) -> void;

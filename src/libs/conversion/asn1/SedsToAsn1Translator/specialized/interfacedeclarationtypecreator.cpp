@@ -48,9 +48,11 @@ void InterfaceDeclarationTypeCreator::createTypes(const seds::model::InterfaceDe
         return;
     }
 
-    const auto &commands = interfaceDeclaration.commands();
+    for (const auto &parameter : interfaceDeclaration.parameters()) {
+        createTypesForParameter(parameter);
+    }
 
-    for (const auto &command : commands) {
+    for (const auto &command : interfaceDeclaration.commands()) {
         switch (command.mode()) {
         case InterfaceCommandMode::Sync:
             createTypesForSyncCommand(command);
@@ -64,12 +66,20 @@ void InterfaceDeclarationTypeCreator::createTypes(const seds::model::InterfaceDe
     }
 }
 
+void InterfaceDeclarationTypeCreator::createTypesForParameter(const seds::model::InterfaceParameter &parameter)
+{
+    const auto &arrayDimensions = parameter.arrayDimensions();
+    if (!arrayDimensions.empty()) {
+        DataTypeTranslationHelper::handleArrayType(m_context, parameter.type(), arrayDimensions);
+    }
+}
+
 void InterfaceDeclarationTypeCreator::createTypesForSyncCommand(const seds::model::InterfaceCommand &command)
 {
     for (const auto &argument : command.arguments()) {
         const auto &arrayDimensions = argument.arrayDimensions();
         if (!arrayDimensions.empty()) {
-            DataTypeTranslationHelper::handleArrayArgumentType(m_context, argument.type(), arrayDimensions);
+            DataTypeTranslationHelper::handleArrayType(m_context, argument.type(), arrayDimensions);
         }
     }
 }
@@ -143,7 +153,7 @@ void InterfaceDeclarationTypeCreator::createAsyncCommandBundledTypeComponent(
 {
     const auto argumentName = Escaper::escapeAsn1FieldName(argument.nameStr());
     const auto argumentType =
-            DataTypeTranslationHelper::handleArrayArgumentType(m_context, argument.type(), argument.arrayDimensions());
+            DataTypeTranslationHelper::handleArrayType(m_context, argument.type(), argument.arrayDimensions());
 
     auto sequenceComponentType =
             std::make_unique<Asn1Acn::Types::UserdefinedType>(argumentType->identifier(), m_context.definitionsName());

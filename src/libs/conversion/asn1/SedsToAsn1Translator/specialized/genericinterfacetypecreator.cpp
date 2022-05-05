@@ -74,6 +74,10 @@ void GenericInterfaceTypeCreator::createTypes()
         createTypeForGeneric(genericType);
     }
 
+    for (const auto &parameter : m_interfaceDeclaration->parameters()) {
+        createTypesForParameter(parameter);
+    }
+
     for (const auto &command : m_interfaceDeclaration->commands()) {
         switch (command.mode()) {
         case InterfaceCommandMode::Sync:
@@ -254,6 +258,25 @@ void GenericInterfaceTypeCreator::handleFixedValue(Asn1Acn::Types::Type *type, c
     }
 }
 
+void GenericInterfaceTypeCreator::createTypesForParameter(const seds::model::InterfaceParameter &parameter)
+{
+    const auto parameterTypeRef = parameter.type();
+
+    const auto isGeneric = isTypeGeneric(parameterTypeRef);
+
+    if (isGeneric) {
+        if (!parameter.arrayDimensions().empty()) {
+            auto errorMessage =
+                    QString("Interface parameter '%1' could not be translated, array parameters with generic "
+                            "types are not supported because of the ACN limitations")
+                            .arg(parameter.nameStr());
+            throw TranslationException(std::move(errorMessage));
+        }
+    } else {
+        DataTypeTranslationHelper::handleArrayType(m_context, parameterTypeRef, parameter.arrayDimensions());
+    }
+}
+
 void GenericInterfaceTypeCreator::createTypesForSyncCommand(const seds::model::InterfaceCommand &command)
 {
     for (const auto &argument : command.arguments()) {
@@ -275,7 +298,7 @@ void GenericInterfaceTypeCreator::createSyncArgumentType(const seds::model::Comm
             throw TranslationException(std::move(errorMessage));
         }
     } else {
-        DataTypeTranslationHelper::handleArrayArgumentType(m_context, argumentTypeRef, argument.arrayDimensions());
+        DataTypeTranslationHelper::handleArrayType(m_context, argumentTypeRef, argument.arrayDimensions());
     }
 }
 
@@ -380,8 +403,8 @@ void GenericInterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const s
             bundledType->addComponent(std::move(sequenceComponent));
         }
     } else {
-        argumentType = DataTypeTranslationHelper::handleArrayArgumentType(
-                m_context, argumentTypeRef, argument.arrayDimensions());
+        argumentType =
+                DataTypeTranslationHelper::handleArrayType(m_context, argumentTypeRef, argument.arrayDimensions());
 
         auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
                 argumentType->identifier(), m_context.definitionsName());

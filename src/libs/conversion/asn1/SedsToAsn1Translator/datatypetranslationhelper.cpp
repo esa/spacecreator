@@ -67,7 +67,7 @@ QString DataTypeTranslationHelper::buildConcreteTypeName(
     return m_concreteTypeNameTemplate.arg(componentName).arg(interfaceName).arg(genericName);
 }
 
-Asn1Acn::Types::Type *DataTypeTranslationHelper::handleArrayArgumentType(Context &context,
+Asn1Acn::Types::Type *DataTypeTranslationHelper::handleArrayType(Context &context,
         const seds::model::DataTypeRef &argumentTypeRef, const std::vector<seds::model::DimensionSize> &dimensions)
 {
     if (dimensions.empty()) {

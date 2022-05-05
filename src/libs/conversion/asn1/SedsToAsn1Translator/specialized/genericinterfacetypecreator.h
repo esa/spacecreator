@@ -27,6 +27,7 @@
 #include <seds/SedsModel/interfaces/interfacecommand.h>
 #include <seds/SedsModel/interfaces/interfacedeclaration.h>
 #include <seds/SedsModel/interfaces/interfacedeclarationref.h>
+#include <seds/SedsModel/interfaces/interfaceparameter.h>
 
 namespace conversion::asn1::translator {
 
@@ -70,6 +71,8 @@ private:
     auto createConcreteChoiceAlternative(
             const TypeMapping::Concrete &concreteType, Asn1Acn::Types::Choice *choice, const std::size_t count) -> void;
     auto handleFixedValue(Asn1Acn::Types::Type *type, const QString &fixedValue) -> void;
+
+    auto createTypesForParameter(const seds::model::InterfaceParameter &parameter) -> void;
 
     auto createTypesForSyncCommand(const seds::model::InterfaceCommand &command) -> void;
     auto createSyncArgumentType(const seds::model::CommandArgument &argument) -> void;

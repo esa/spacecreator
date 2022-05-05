@@ -16,6 +16,11 @@
         <Parameter name="ReadOnlySync" type="MyInteger" mode="sync" readOnly="true"/>
         <Parameter name="ReadWriteAsync" type="MyInteger" mode="async" readOnly="false"/>
         <Parameter name="ReadWriteSync" type="MyInteger" mode="sync" readOnly="false"/>
+        <Parameter name="ArrayParameter" type="MyInteger" mode="sync" readOnly="false">
+          <ArrayDimensions>
+            <Dimension size="3"/>
+          </ArrayDimensions>
+        </Parameter>
       </ParameterSet>
     </Interface>
   </DeclaredInterfaceSet>
