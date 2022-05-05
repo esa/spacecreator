@@ -1,0 +1,29 @@
+DEKKER1-DATAVIEW DEFINITIONS ::=
+BEGIN
+IMPORTS T-UInt8, T-Boolean FROM TASTE-BasicTypes;
+
+
+--T-UInt8 ::= INTEGER (0 .. 255)
+
+T-UInt16 ::= INTEGER (0 .. 65535)
+
+--T-Boolean ::= BOOLEAN
+
+T-WriteAccess ::= SEQUENCE {
+    write-address T-UInt16,
+    write-value   T-UInt8
+}
+
+T-ByteArray ::= SEQUENCE (SIZE(1 .. 64)) OF T-UInt8
+
+T-MemBuffer ::= T-ByteArray(SIZE (64))
+
+T-WriteRequest ::= SEQUENCE {
+    start-address T-UInt16,
+    values        T-ByteArray
+}
+
+T-ProcID ::= T-UInt8 (0 .. 1)
+
+END
+
