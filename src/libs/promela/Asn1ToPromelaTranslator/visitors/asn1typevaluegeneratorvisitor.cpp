@@ -190,16 +190,17 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 {
     const QString argumentName = "value";
 
-    const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(type.identifier());
+    const QString inlineSeqGeneratorName = getInlineGeneratorName(type.identifier());
     const QStringList inlineArguments = { argumentName };
     promela::model::Sequence sequence(promela::model::Sequence::Type::NORMAL);
     for (auto &sequenceComponent : type.components()) {
         auto *const asnSequenceComponent = static_cast<Asn1Acn::AsnSequenceComponent *>(sequenceComponent.get());
         if (asnSequenceComponent != nullptr) {
-            auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
-            if (!modelContainsInlineGenerator(*asnSequenceComponentType)) {
-                const QString typeToGenerateName = getSequenceComponentTypeName(*asnSequenceComponent, m_name);
-                Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, typeToGenerateName);
+            const QString componentTypeName = getSequenceComponentTypeName(*asnSequenceComponent, m_name);
+            const QString inlineTypeGeneratorName = getInlineGeneratorName(componentTypeName);
+            if (!modelContainsInlineGenerator(inlineTypeGeneratorName)) {
+                auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
+                Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName);
                 asnSequenceComponentType->accept(visitor);
             }
 
@@ -286,7 +287,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const UserdefinedType &type)
 
 void Asn1TypeValueGeneratorVisitor::createValueGenerationInline(::promela::model::Sequence sequence)
 {
-    const QString inlineName = QString("%1_generate_value").arg(m_name);
+    const QString inlineName = getInlineGeneratorName(m_name);
     const QList<QString> inlineArguments = { QString("value") };
     std::unique_ptr<InlineDef> inlineDef =
             std::make_unique<InlineDef>(inlineName, inlineArguments, std::move(sequence));
@@ -300,7 +301,9 @@ Asn1Acn::Types::Type *Asn1TypeValueGeneratorVisitor::getAsnSequenceComponentType
     if (component == nullptr) {
         throw std::runtime_error("Component cannot be null");
     }
+
     Asn1Acn::Types::Type *const componentType = component->type();
+
     if (componentType == nullptr) {
         throw std::runtime_error("Type not specified in Component");
     }
@@ -314,19 +317,24 @@ QString Asn1TypeValueGeneratorVisitor::getSequenceComponentTypeName(
     const auto &type = *asnComponent.type();
 
     if (isEmbeddedType(type)) {
-        return type.typeName();
-    } else {
         return QString("%1_%2").arg(sequenceName).arg(asnComponent.name());
+    } else {
+        return type.typeName();
     }
+}
+
+QString Asn1TypeValueGeneratorVisitor::getInlineGeneratorName(const QString &typeName)
+{
+    return QString("%1_generate_value").arg(typeName);
 }
 
 std::unique_ptr<ProctypeElement> Asn1TypeValueGeneratorVisitor::generateAsnSequenceComponentInlineCall(
         Asn1Acn::AsnSequenceComponent *const asnSequenceComponent, const QString &argumentName)
 {
     const QString typeToGenerateName = getSequenceComponentTypeName(*asnSequenceComponent, m_name);
-
-    const QString typeGeneratorToCallName = QString("%1_generate_value").arg(typeToGenerateName);
+    const QString typeGeneratorToCallName = getInlineGeneratorName(typeToGenerateName);
     const QString &componentName = asnSequenceComponent->name();
+
     if (asnSequenceComponent->isOptional()) {
         const QString valueExistAssignmentName = QString("%1.exist.%2").arg(argumentName).arg(componentName);
 
@@ -350,10 +358,10 @@ std::unique_ptr<ProctypeElement> Asn1TypeValueGeneratorVisitor::generateAsnSeque
     }
 }
 
-bool Asn1TypeValueGeneratorVisitor::modelContainsInlineGenerator(const Asn1Acn::Types::Type &type)
+bool Asn1TypeValueGeneratorVisitor::modelContainsInlineGenerator(const QString &inlineGeneratorName)
 {
     for (const auto &inlineDef : m_promelaModel.getInlineDefs()) {
-        if (inlineDef->getName().contains(type.typeName(), Qt::CaseInsensitive)) {
+        if (inlineDef->getName().compare(inlineGeneratorName) == 0) {
             return true;
         }
     }
@@ -362,7 +370,7 @@ bool Asn1TypeValueGeneratorVisitor::modelContainsInlineGenerator(const Asn1Acn::
 
 auto Asn1TypeValueGeneratorVisitor::isEmbeddedType(const Asn1Acn::Types::Type &type) -> bool
 {
-    return type.label().contains(".");
+    return !type.label().contains(".");
 }
 
 } // namespace promela::translator
