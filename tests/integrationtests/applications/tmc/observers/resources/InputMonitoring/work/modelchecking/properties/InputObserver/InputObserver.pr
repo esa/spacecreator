@@ -1,5 +1,5 @@
 /* CIF PROCESS (248, 150), (150, 75) */
-process InputObserver;
+process Inputobserver;
     /* CIF TEXT (609, 97), (267, 140) */
     monitor st System_State;
     monitor event Observable_Event;

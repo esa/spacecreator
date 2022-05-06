@@ -1,21 +1,21 @@
 /* CIF Keep Specific Geode ASNFilename 'dataview-uniq.asn' */
 use Datamodel;
 
-system InputObserver;
+system Inputobserver;
     /* CIF TEXT (783, 105), (388, 140) */
     signal trigger_in (MyInteger) renames input trigger to MODEL;
     signal action_in (MyInteger) renames input action to MMI;
     /* CIF ENDTEXT */
     channel c
-        from env to InputObserver with trigger_in;
-        from env to InputObserver with action_in;
+        from env to Inputobserver with trigger_in;
+        from env to Inputobserver with action_in;
     endchannel;
-    block InputObserver;
+    block Inputobserver;
         signalroute r
-        from env to InputObserver with trigger_in;
-        from env to InputObserver with action_in;
+        from env to Inputobserver with trigger_in;
+        from env to Inputobserver with action_in;
         connect c and r;
         /* CIF PROCESS (557, 255), (150, 75) */
-        process InputObserver referenced;
+        process Inputobserver referenced;
     endblock;
 endsystem;

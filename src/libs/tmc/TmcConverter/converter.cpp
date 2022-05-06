@@ -176,9 +176,9 @@ auto TmcConverter::integrateObserver(const ObserverInfo &info, QStringList &obse
     ProcessMetadata meta(Escaper::escapePromelaName(processName), structure, process, datamodel, QList<QFileInfo>());
     SdlToPromelaConverter sdl2Promela;
 
-    const auto promelaFilename = Escaper::escapePromelaName(processName) + ".pml";
-    const auto infoPath = outputFilepath(Escaper::escapePromelaName(processName) + ".info");
-    observerNames.append(Escaper::escapePromelaName(processName));
+    const auto promelaFilename = Escaper::escapePromelaIV(processName) + ".pml";
+    const auto infoPath = outputFilepath(Escaper::escapePromelaIV(processName) + ".info");
+    observerNames.append(Escaper::escapePromelaIV(processName));
     sdl2Promela.convertObserverSdl(meta, outputFilepath(promelaFilename), infoPath);
     QFile infoFile(infoPath.absoluteFilePath());
     if (infoFile.open(QIODevice::ReadOnly)) {

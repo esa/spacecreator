@@ -1,0 +1,100 @@
+[
+{
+    "arguments": [
+        "clang",
+        "-c",
+        "-m64",
+        "-target",
+        "x86_64-linux-gnu",
+        "-std=gnu++14",
+        "-fcxx-exceptions",
+        "-fexceptions",
+        "-DBOOST_TYPE_INDEX_CTTI_USER_DEFINED_PARSING=(39, 1, true, \"T = \")",
+        "-fPIC",
+        "-I",
+        "/home/taste/dekker1",
+        "-I",
+        "/home/taste/dekker1/work/dataview/C",
+        "-I",
+        "/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++",
+        "-x",
+        "c++-header",
+        "/home/taste/dekker1/work/dataview/C/dataview-uniq.h"
+    ],
+    "directory": "/home/taste/dekker1",
+    "file": "/home/taste/dekker1/work/dataview/C/dataview-uniq.h"
+},
+{
+    "arguments": [
+        "clang",
+        "-c",
+        "-m64",
+        "-target",
+        "x86_64-linux-gnu",
+        "-std=gnu++14",
+        "-fcxx-exceptions",
+        "-fexceptions",
+        "-DBOOST_TYPE_INDEX_CTTI_USER_DEFINED_PARSING=(39, 1, true, \"T = \")",
+        "-fPIC",
+        "-I",
+        "/home/taste/dekker1",
+        "-I",
+        "/home/taste/dekker1/work/dataview/C",
+        "-I",
+        "/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++",
+        "-x",
+        "objective-c++-header",
+        "/home/taste/dekker1/work/dataview/C/dataview-uniq.h"
+    ],
+    "directory": "/home/taste/dekker1",
+    "file": "/home/taste/dekker1/work/dataview/C/dataview-uniq.h"
+},
+{
+    "arguments": [
+        "clang",
+        "-c",
+        "-m64",
+        "-target",
+        "x86_64-linux-gnu",
+        "-std=gnu17",
+        "-fexceptions",
+        "-DBOOST_TYPE_INDEX_CTTI_USER_DEFINED_PARSING=(39, 1, true, \"T = \")",
+        "-fPIC",
+        "-I",
+        "/home/taste/dekker1",
+        "-I",
+        "/home/taste/dekker1/work/dataview/C",
+        "-I",
+        "/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++",
+        "-x",
+        "c++-header",
+        "/home/taste/dekker1/work/dataview/C/dataview-uniq.h"
+    ],
+    "directory": "/home/taste/dekker1",
+    "file": "/home/taste/dekker1/work/dataview/C/dataview-uniq.h"
+},
+{
+    "arguments": [
+        "clang",
+        "-c",
+        "-m64",
+        "-target",
+        "x86_64-linux-gnu",
+        "-std=gnu17",
+        "-fexceptions",
+        "-DBOOST_TYPE_INDEX_CTTI_USER_DEFINED_PARSING=(39, 1, true, \"T = \")",
+        "-fPIC",
+        "-I",
+        "/home/taste/dekker1",
+        "-I",
+        "/home/taste/dekker1/work/dataview/C",
+        "-I",
+        "/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++",
+        "-x",
+        "objective-c++-header",
+        "/home/taste/dekker1/work/dataview/C/dataview-uniq.h"
+    ],
+    "directory": "/home/taste/dekker1",
+    "file": "/home/taste/dekker1/work/dataview/C/dataview-uniq.h"
+}
+]
