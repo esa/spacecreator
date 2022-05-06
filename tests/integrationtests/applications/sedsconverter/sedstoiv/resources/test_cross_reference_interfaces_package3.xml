@@ -14,6 +14,12 @@
           <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
         </Range>
       </IntegerDataType>
+      <IntegerDataType name="Package3Item">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
     </DataTypeSet>
     <DeclaredInterfaceSet>
       <Interface name="ParentInterface">
@@ -21,8 +27,9 @@
           <GenericType name="GenericType" />
         </GenericTypeSet>
         <CommandSet>
-          <Command name="SyncCommandSimpleMapping" mode="sync">
+          <Command name="AsyncCommandSimpleMapping" mode="async">
             <Argument name="ArgumentSimpleMapping" type="GenericType" mode="in" />
+            <Argument name="ArgumentLocal" type="Package3Item" mode="in" />
           </Command>
         </CommandSet>
       </Interface>

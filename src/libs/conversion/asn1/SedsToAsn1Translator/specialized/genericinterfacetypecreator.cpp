@@ -50,21 +50,26 @@ using conversion::UnhandledValueException;
 using conversion::UnsupportedValueException;
 using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::TranslationException;
-using conversion::translator::UndeclaredInterfaceException;
 using seds::model::InterfaceCommandMode;
 
 namespace conversion::asn1::translator {
 
-GenericInterfaceTypeCreator::GenericInterfaceTypeCreator(
-        Context &context, const seds::model::Interface &interface, const seds::model::Component &component)
+GenericInterfaceTypeCreator::GenericInterfaceTypeCreator(Context &context, Context &interfaceContext,
+        const seds::model::Interface &interface, const seds::model::InterfaceDeclaration *interfaceDeclaration,
+        const seds::model::Component &component)
     : m_context(context)
-    , m_interface(interface)
+    , m_interfaceContext(interfaceContext)
+    , m_interfaceName(interface.nameStr())
+    , m_interfaceDeclaration(interfaceDeclaration)
     , m_component(component)
-    , m_typeMapper(context, interface.nameStr())
+    , m_typeMapper(m_context, m_interfaceName)
 {
-    m_typeMapper.addMappings(*interface.genericTypeMapSet());
+    if (!interface.genericTypeMapSet()) {
+        auto errorMessage = QString("Generic interface '%1' is missing mappings").arg(m_interfaceName);
+        throw TranslationException(std::move(errorMessage));
+    }
 
-    m_interfaceDeclaration = findInterfaceDeclaration(m_interface.type());
+    m_typeMapper.addMappings(*interface.genericTypeMapSet());
 }
 
 void GenericInterfaceTypeCreator::createTypes()
@@ -100,7 +105,7 @@ void GenericInterfaceTypeCreator::createTypeForGeneric(const seds::model::Generi
     if (mapping == nullptr || mapping->concreteMappings.empty()) {
         auto errorMessage = QString("Missing mapping for generic type '%1' in interface '%2'")
                                     .arg(genericName)
-                                    .arg(m_interface.nameStr());
+                                    .arg(m_interfaceName);
         throw TranslationException(std::move(errorMessage));
     }
 
@@ -126,7 +131,7 @@ void GenericInterfaceTypeCreator::createConcreteTypeAlias(
 {
     const auto &genericName = genericType.nameStr();
     const auto concreteTypeName =
-            DataTypeTranslationHelper::buildConcreteTypeName(m_component.nameStr(), m_interface.nameStr(), genericName);
+            DataTypeTranslationHelper::buildConcreteTypeName(m_component.nameStr(), m_interfaceName, genericName);
     const auto concreteType = concreteMapping.type;
 
     auto aliasType =
@@ -144,7 +149,7 @@ void GenericInterfaceTypeCreator::createConcreteChoice(
 {
     const auto &genericName = genericType.nameStr();
     const auto concreteTypeName =
-            DataTypeTranslationHelper::buildConcreteTypeName(m_component.nameStr(), m_interface.nameStr(), genericName);
+            DataTypeTranslationHelper::buildConcreteTypeName(m_component.nameStr(), m_interfaceName, genericName);
 
     const auto &concreteMappings = mapping->concreteMappings;
 
@@ -274,7 +279,11 @@ void GenericInterfaceTypeCreator::createTypesForParameter(const seds::model::Int
             throw TranslationException(std::move(errorMessage));
         }
     } else {
-        DataTypeTranslationHelper::handleArrayType(m_context, parameterTypeRef, parameter.arrayDimensions());
+        const auto typePackage =
+                parameterTypeRef.packageStr() ? *parameterTypeRef.packageStr() : m_interfaceContext.packageName();
+        m_context.importType(typePackage, parameterTypeRef.nameStr());
+
+        DataTypeTranslationHelper::handleArrayType(m_interfaceContext, parameterTypeRef, parameter.arrayDimensions());
     }
 }
 
@@ -300,7 +309,12 @@ void GenericInterfaceTypeCreator::createSyncArgumentType(const seds::model::Comm
             throw TranslationException(std::move(errorMessage));
         }
     } else {
-        DataTypeTranslationHelper::handleArrayType(m_context, argumentTypeRef, argument.arrayDimensions());
+        const auto typePackage =
+                argumentTypeRef.packageStr() ? *argumentTypeRef.packageStr() : m_interfaceContext.packageName();
+        m_context.importType(typePackage, argumentTypeRef.nameStr());
+
+        auto argumentType = DataTypeTranslationHelper::handleArrayType(
+                m_interfaceContext, argumentTypeRef, argument.arrayDimensions());
     }
 }
 
@@ -313,14 +327,14 @@ void GenericInterfaceTypeCreator::createTypesForAsyncCommand(const seds::model::
     case seds::model::ArgumentsCombination::InOnly: {
         // In arguments are 'native', so they are handles as-is
         const auto bundledTypeName = DataTypeTranslationHelper::buildGenericBundledTypeName(
-                m_component.nameStr(), m_interface.nameStr(), commandName);
+                m_component.nameStr(), m_interfaceName, commandName);
         createAsyncCommandBundledType(command, bundledTypeName, seds::model::CommandArgumentMode::In);
     } break;
     case seds::model::ArgumentsCombination::OutOnly: {
         // Out arguments aren't supported by TASTE sporadic interface.
         // We cannot change the argument direction, so we switch interface type (provided <-> required)
         const auto bundledTypeName = DataTypeTranslationHelper::buildGenericBundledTypeName(
-                m_component.nameStr(), m_interface.nameStr(), commandName);
+                m_component.nameStr(), m_interfaceName, commandName);
         createAsyncCommandBundledType(command, bundledTypeName, seds::model::CommandArgumentMode::Out);
     } break;
     case seds::model::ArgumentsCombination::NoArgs: {
@@ -367,8 +381,6 @@ void GenericInterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const s
     const auto argumentName = Escaper::escapeAsn1FieldName(argument.nameStr());
     const auto argumentTypeRef = argument.type();
 
-    Asn1Acn::Types::Type *argumentType = nullptr;
-
     const auto isGeneric =
             DataTypeTranslationHelper::isTypeGeneric(argumentTypeRef, m_interfaceDeclaration->genericTypes());
 
@@ -381,8 +393,8 @@ void GenericInterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const s
         }
 
         const auto argumentConcreteTypeName = DataTypeTranslationHelper::buildConcreteTypeName(
-                m_component.nameStr(), m_interface.nameStr(), argumentTypeRef.nameStr());
-        argumentType = m_context.findAsn1Type(argumentConcreteTypeName);
+                m_component.nameStr(), m_interfaceName, argumentTypeRef.nameStr());
+        auto argumentType = m_context.findAsn1Type(argumentConcreteTypeName);
 
         auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
                 argumentType->identifier(), m_context.definitionsName());
@@ -406,8 +418,12 @@ void GenericInterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const s
             bundledType->addComponent(std::move(sequenceComponent));
         }
     } else {
-        argumentType =
-                DataTypeTranslationHelper::handleArrayType(m_context, argumentTypeRef, argument.arrayDimensions());
+        const auto typePackage =
+                argumentTypeRef.packageStr() ? *argumentTypeRef.packageStr() : m_interfaceContext.packageName();
+        m_context.importType(typePackage, argumentTypeRef.nameStr());
+
+        auto argumentType = DataTypeTranslationHelper::handleArrayType(
+                m_interfaceContext, argumentTypeRef, argument.arrayDimensions());
 
         auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
                 argumentType->identifier(), m_context.definitionsName());
@@ -419,42 +435,6 @@ void GenericInterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const s
 
         bundledType->addComponent(std::move(sequenceComponent));
     }
-}
-
-const seds::model::InterfaceDeclaration *GenericInterfaceTypeCreator::findInterfaceDeclaration(
-        const seds::model::InterfaceDeclarationRef &interfaceRef)
-{
-    const auto &name = interfaceRef.nameStr();
-
-    const auto namesEqual = [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
-        return interfaceDeclaration.nameStr() == name;
-    };
-
-    if (interfaceRef.packageStr()) {
-        const auto package = m_context.getSedsPackage(*interfaceRef.packageStr());
-        const auto &interfaceDeclarations = package->declaredInterfaces();
-
-        const auto found = std::find_if(interfaceDeclarations.begin(), interfaceDeclarations.end(), namesEqual);
-        if (found != interfaceDeclarations.end()) {
-            return &(*found);
-        }
-    } else {
-        const auto &componentInterfaceDeclarations = m_component.declaredInterfaces();
-        auto found =
-                std::find_if(componentInterfaceDeclarations.begin(), componentInterfaceDeclarations.end(), namesEqual);
-        if (found != componentInterfaceDeclarations.end()) {
-            return &(*found);
-        }
-
-        const auto package = m_context.getSedsPackage();
-        const auto &packageInterfaceDeclarations = package->declaredInterfaces();
-        found = std::find_if(packageInterfaceDeclarations.begin(), packageInterfaceDeclarations.end(), namesEqual);
-        if (found != packageInterfaceDeclarations.end()) {
-            return &(*found);
-        }
-    }
-
-    throw UndeclaredInterfaceException(interfaceRef.value().pathStr());
 }
 
 std::optional<QString> GenericInterfaceTypeCreator::findDeterminantArgument(

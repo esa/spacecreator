@@ -96,10 +96,16 @@ private:
             Context &context) const -> void;
     auto translateInterfaceImplementations(const std::vector<seds::model::Interface> &providedInterfaces,
             const seds::model::Component &component, Context &context) const -> void;
+    auto translateGenericTypes(const seds::model::Interface &interface,
+            const seds::model::InterfaceDeclaration *interfaceDeclaration, const seds::model::Component &component,
+            Context &context, Context &interfaceContext) const -> void;
 
 private:
     auto collectDataTypes(const seds::model::Package *package) const -> std::vector<const seds::model::DataType *>;
     auto collectDataTypes(const seds::model::Component &component) const -> std::vector<const seds::model::DataType *>;
+
+    auto isInterfaceGeneric(const seds::model::InterfaceDeclaration *interfaceDeclaration, Context &context) const
+            -> bool;
 };
 
 } // namespace conversion::asn1::translator

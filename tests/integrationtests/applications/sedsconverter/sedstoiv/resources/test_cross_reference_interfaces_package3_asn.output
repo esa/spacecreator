@@ -1,4 +1,5 @@
 COM-N7SPACE-PACKAGE3 DEFINITIONS ::= BEGIN
 MappedItem ::= INTEGER(0 .. 255)
 ParamItem ::= INTEGER(0 .. 255)
+Package3Item ::= INTEGER(0 .. 255)
 END

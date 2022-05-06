@@ -29,15 +29,18 @@
 using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredDataTypeException;
+using conversion::translator::UndeclaredInterfaceException;
 
 namespace conversion::asn1::translator {
 
 Context::Context(const seds::model::Package *sedsPackage, Asn1Acn::Definitions *definitions,
-        Asn1Acn::Definitions *parentDefinitions, const std::list<const seds::model::Package *> &sedsPackages,
+        Asn1Acn::Definitions *parentDefinitions, const seds::model::Component *component,
+        const std::list<const seds::model::Package *> &sedsPackages,
         const std::vector<std::unique_ptr<Asn1Acn::File>> &asn1Files, const Options &options)
     : m_sedsPackage(sedsPackage)
     , m_definitions(definitions)
     , m_parentDefinitions(parentDefinitions)
+    , m_component(component)
     , m_sedsPackages(sedsPackages)
     , m_asn1Files(asn1Files)
     , m_options(options)
@@ -133,6 +136,45 @@ Asn1Acn::Definitions *Context::findAsn1TypeDefinitions(const seds::model::DataTy
     throw MissingAsn1TypeDefinitionException(typeRef.value().pathStr());
 }
 
+const seds::model::InterfaceDeclaration *Context::findInterfaceDeclaration(
+        const seds::model::InterfaceDeclarationRef &interfaceRef)
+{
+    const auto &name = interfaceRef.nameStr();
+
+    const auto namesEqual = [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
+        return interfaceDeclaration.nameStr() == name;
+    };
+
+    if (interfaceRef.packageStr()) {
+        const auto package = getSedsPackage(*interfaceRef.packageStr());
+        const auto &interfaceDeclarations = package->declaredInterfaces();
+
+        const auto found = std::find_if(interfaceDeclarations.begin(), interfaceDeclarations.end(), namesEqual);
+        if (found != interfaceDeclarations.end()) {
+            return &(*found);
+        }
+    } else {
+        if (m_component != nullptr) {
+            const auto &componentInterfaceDeclarations = m_component->declaredInterfaces();
+
+            const auto found = std::find_if(
+                    componentInterfaceDeclarations.begin(), componentInterfaceDeclarations.end(), namesEqual);
+            if (found != componentInterfaceDeclarations.end()) {
+                return &(*found);
+            }
+        }
+
+        const auto &packageInterfaceDeclarations = m_sedsPackage->declaredInterfaces();
+        const auto found =
+                std::find_if(packageInterfaceDeclarations.begin(), packageInterfaceDeclarations.end(), namesEqual);
+        if (found != packageInterfaceDeclarations.end()) {
+            return &(*found);
+        }
+    }
+
+    throw UndeclaredInterfaceException(interfaceRef.value().pathStr());
+}
+
 const seds::model::Package *Context::getSedsPackage() const
 {
     return m_sedsPackage;
@@ -174,6 +216,25 @@ Asn1Acn::Definitions *Context::getAsn1Definitions(const QString &asn1FileName) c
     return asn1Definitions;
 }
 
+void Context::importType(const QString &packageName, const QString &typeName)
+{
+    const auto definitionsName = Escaper::escapeAsn1PackageName(packageName);
+
+    if (definitionsName == m_definitions->name()) {
+        return;
+    }
+
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(typeName);
+
+    Asn1Acn::ImportedType importedType(definitionsName, asn1TypeName);
+    m_definitions->addImportedType(importedType);
+}
+
+const QString &Context::packageName() const
+{
+    return m_sedsPackage->nameStr();
+}
+
 const QString &Context::definitionsName() const
 {
     return m_definitions->name();
@@ -186,6 +247,16 @@ std::optional<uint64_t> Context::arraySizeThreshold() const
     } else {
         return std::nullopt;
     }
+}
+
+Context Context::cloneForPackage(const QString &packageName)
+{
+    auto package = getSedsPackage(packageName);
+
+    const auto definitionsName = Escaper::escapeAsn1PackageName(packageName);
+    auto definitions = getAsn1Definitions(definitionsName);
+
+    return Context(package, definitions, nullptr, nullptr, m_sedsPackages, m_asn1Files, m_options);
 }
 
 } // namespace conversion::asn1::translator

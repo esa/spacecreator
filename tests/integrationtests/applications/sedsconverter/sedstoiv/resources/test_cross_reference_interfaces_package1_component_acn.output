@@ -1,0 +1,8 @@
+COM-N7SPACE-PACKAGE1-COMPONENT DEFINITIONS ::= BEGIN
+Component-ProvidedInterface-GenericType []
+Component-ProvidedInterface-AsyncCommandSimpleMapping-Type []
+{
+    argumentSimpleMapping [],
+    argumentLocal []
+}
+END

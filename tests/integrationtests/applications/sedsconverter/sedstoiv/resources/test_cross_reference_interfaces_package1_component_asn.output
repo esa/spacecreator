@@ -1,0 +1,12 @@
+COM-N7SPACE-PACKAGE1-COMPONENT DEFINITIONS ::= BEGIN
+IMPORTS
+Package1Item FROM COM-N7SPACE-PACKAGE1
+Package3Item FROM COM-N7SPACE-PACKAGE3
+;
+Component-ProvidedInterface-GenericType ::= Package1Item(0 .. 255)
+Component-ProvidedInterface-AsyncCommandSimpleMapping-Type ::= SEQUENCE
+{
+    argumentSimpleMapping Component-ProvidedInterface-GenericType(0 .. 255),
+    argumentLocal Package3Item(0 .. 255)
+}
+END

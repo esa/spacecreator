@@ -40,8 +40,8 @@ public:
      * @param   context     Current translation context
      * @param   component   Parent SEDS component
      */
-    GenericInterfaceTypeCreator(
-            Context &context, const seds::model::Interface &interface, const seds::model::Component &component);
+    GenericInterfaceTypeCreator(Context &context, Context &interfaceContext, const seds::model::Interface &interface,
+            const seds::model::InterfaceDeclaration *interfaceDeclaration, const seds::model::Component &component);
     /**
      * @brief   Deleted copy constructor
      */
@@ -83,14 +83,13 @@ private:
     auto createAsyncCommandBundledTypeComponent(const seds::model::CommandArgument &argument,
             Asn1Acn::Types::Sequence *bundledType, const std::optional<QString> &determinantArgumentName) -> void;
 
-    auto findInterfaceDeclaration(const seds::model::InterfaceDeclarationRef &interfaceRef)
-            -> const seds::model::InterfaceDeclaration *;
     auto findDeterminantArgument(const std::vector<seds::model::CommandArgument> &arguments) -> std::optional<QString>;
 
 private:
     Context &m_context;
+    Context &m_interfaceContext;
 
-    const seds::model::Interface &m_interface;
+    const QString &m_interfaceName;
     const seds::model::InterfaceDeclaration *m_interfaceDeclaration;
     const seds::model::Component &m_component;
 

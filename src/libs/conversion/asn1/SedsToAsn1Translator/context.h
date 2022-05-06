@@ -28,6 +28,7 @@
 #include <memory>
 #include <optional>
 #include <seds/SedsModel/base/description.h>
+#include <seds/SedsModel/components/component.h>
 #include <seds/SedsModel/types/datatype.h>
 #include <seds/SedsModel/types/datatyperef.h>
 #include <vector>
@@ -42,7 +43,8 @@ class Context final
 {
 public:
     Context(const seds::model::Package *sedsPackage, Asn1Acn::Definitions *definitions,
-            Asn1Acn::Definitions *parentDefinitions, const std::list<const seds::model::Package *> &sedsPackages,
+            Asn1Acn::Definitions *parentDefinitions, const seds::model::Component *component,
+            const std::list<const seds::model::Package *> &sedsPackages,
             const std::vector<std::unique_ptr<Asn1Acn::File>> &asn1Files, const Options &options);
     Context(const Context &) = delete;
     Context(Context &&) = delete;
@@ -57,19 +59,28 @@ public:
     auto findSedsType(const seds::model::DataTypeRef &typeRef) -> const seds::model::DataType *;
     auto findAsn1Type(const seds::model::DataTypeRef &typeRef) -> Asn1Acn::Types::Type *;
     auto findAsn1TypeDefinitions(const seds::model::DataTypeRef &typeRef) -> Asn1Acn::Definitions *;
+    auto findInterfaceDeclaration(const seds::model::InterfaceDeclarationRef &interfaceRef)
+            -> const seds::model::InterfaceDeclaration *;
 
     auto getSedsPackage() const -> const seds::model::Package *;
     auto getSedsPackage(const QString &packageName) const -> const seds::model::Package *;
     auto getAsn1Definitions() const -> Asn1Acn::Definitions *;
     auto getAsn1Definitions(const QString &asn1FileName) const -> Asn1Acn::Definitions *;
 
+    auto importType(const QString &packageName, const QString &typeName) -> void;
+
+    auto packageName() const -> const QString &;
     auto definitionsName() const -> const QString &;
     auto arraySizeThreshold() const -> std::optional<uint64_t>;
+
+public:
+    auto cloneForPackage(const QString &packageName) -> Context;
 
 private:
     const seds::model::Package *m_sedsPackage;
     Asn1Acn::Definitions *m_definitions;
     Asn1Acn::Definitions *m_parentDefinitions;
+    const seds::model::Component *m_component;
 
     const std::list<const seds::model::Package *> &m_sedsPackages;
     const std::vector<std::unique_ptr<Asn1Acn::File>> &m_asn1Files;

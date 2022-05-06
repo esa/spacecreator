@@ -49,7 +49,6 @@ $DIFF interfaceview.xml ../resources/test_cross_reference_complex.output \
   && $DIFF package3.acn ../resources/test_cross_reference_complex_package3_acn.output \
   && $DIFF package4.asn ../resources/test_cross_reference_complex_package4_asn.output \
   && $DIFF package4.acn ../resources/test_cross_reference_complex_package4_acn.output \
-  && 
   && $UPDATE_DATAVIEW \
   && $AADL_CONVERTER -o interfaceview.xml \
   -t ../resources/xml2dv/interfaceview.tmplt \

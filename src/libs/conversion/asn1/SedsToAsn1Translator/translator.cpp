@@ -108,7 +108,8 @@ void SedsToAsn1Translator::translatePackage(const seds::model::Package *sedsPack
     DescriptionTranslator::translate(sedsPackage, packageAsn1Definitions.get());
 
     // Create package context
-    Context packageContext(sedsPackage, packageAsn1DefinitionsPtr, nullptr, sedsPackages, asn1Model->data(), options);
+    Context packageContext(
+            sedsPackage, packageAsn1DefinitionsPtr, nullptr, nullptr, sedsPackages, asn1Model->data(), options);
 
     // Translate package data types
     const auto packageSedsTypes = collectDataTypes(sedsPackage);
@@ -135,8 +136,8 @@ void SedsToAsn1Translator::translatePackage(const seds::model::Package *sedsPack
         DescriptionTranslator::translate(&sedsComponent, componentAsn1Definitions.get());
 
         // Create component context
-        Context componentContext(sedsPackage, componentAsn1Definitions.get(), packageAsn1DefinitionsPtr, sedsPackages,
-                asn1Model->data(), options);
+        Context componentContext(sedsPackage, componentAsn1Definitions.get(), packageAsn1DefinitionsPtr, &sedsComponent,
+                sedsPackages, asn1Model->data(), options);
 
         // Translate component data types
         const auto componentSedsTypes = collectDataTypes(sedsComponent);
@@ -185,9 +186,40 @@ void SedsToAsn1Translator::translateInterfaceImplementations(const std::vector<s
         const seds::model::Component &component, Context &context) const
 {
     for (const auto &interface : interfaces) {
-        if (interface.genericTypeMapSet()) {
-            GenericInterfaceTypeCreator typeCreator(context, interface, component);
-            typeCreator.createTypes();
+        const auto &interfaceType = interface.type();
+        const auto interfaceDeclaration = context.findInterfaceDeclaration(interfaceType);
+
+        if (interfaceType.packageStr()) {
+            const auto interfacePackageName = *interfaceType.packageStr();
+            auto interfaceContext = context.cloneForPackage(interfacePackageName);
+
+            translateGenericTypes(interface, interfaceDeclaration, component, context, interfaceContext);
+        } else {
+            translateGenericTypes(interface, interfaceDeclaration, component, context, context);
+        }
+    }
+}
+
+void SedsToAsn1Translator::translateGenericTypes(const seds::model::Interface &interface,
+        const seds::model::InterfaceDeclaration *interfaceDeclaration, const seds::model::Component &component,
+        Context &context, Context &interfaceContext) const
+{
+    if (isInterfaceGeneric(interfaceDeclaration, context)) {
+        GenericInterfaceTypeCreator typeCreator(context, interfaceContext, interface, interfaceDeclaration, component);
+        typeCreator.createTypes();
+    }
+
+    for (const auto &baseInterface : interfaceDeclaration->baseInterfaces()) {
+        const auto &baseInterfaceType = baseInterface.type();
+        const auto baseInterfaceDeclaration = context.findInterfaceDeclaration(baseInterfaceType);
+
+        if (baseInterfaceType.packageStr()) {
+            const auto baseInterfacePackageName = *baseInterfaceType.packageStr();
+            auto baseInterfaceContext = context.cloneForPackage(baseInterfacePackageName);
+
+            translateGenericTypes(interface, baseInterfaceDeclaration, component, context, baseInterfaceContext);
+        } else {
+            translateGenericTypes(interface, baseInterfaceDeclaration, component, context, context);
         }
     }
 }
@@ -216,6 +248,12 @@ std::vector<const seds::model::DataType *> SedsToAsn1Translator::collectDataType
             extractPointer);
 
     return sedsDataTypes;
+}
+
+bool SedsToAsn1Translator::isInterfaceGeneric(
+        const seds::model::InterfaceDeclaration *interfaceDeclaration, Context &context) const
+{
+    return !interfaceDeclaration->genericTypes().empty();
 }
 
 } // namespace conversion::asn1::translator
