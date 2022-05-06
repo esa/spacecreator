@@ -64,6 +64,22 @@ using shared::InterfaceParameter;
 using tmc::converter::TmcConverter;
 
 namespace tmc::converter {
+
+TmcConverter::ObserverInfo::ObserverInfo(const QString path, const uint32_t priority)
+{
+    m_path = path;
+    m_priority = priority;
+}
+
+const QString &TmcConverter::ObserverInfo::path() const
+{
+    return m_path;
+}
+uint32_t TmcConverter::ObserverInfo::priority() const
+{
+    return m_priority;
+}
+
 TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &outputDirectory)
     : m_inputIvFilepath(inputIvFilepath)
     , m_outputDirectoryFilepath(outputDirectory)
@@ -115,9 +131,9 @@ bool TmcConverter::addStopConditionFiles(const QStringList &files)
     return true;
 }
 
-bool TmcConverter::attachObserver(const QString &observerPath)
+bool TmcConverter::attachObserver(const QString &observerPath, const uint32_t priority)
 {
-    m_observerFiles.append(observerPath);
+    m_observerInfos.emplace_back(ObserverInfo(observerPath, priority));
     return true;
 }
 
@@ -145,21 +161,10 @@ bool TmcConverter::convertModel(const std::set<conversion::ModelType> &sourceMod
     return false;
 }
 
-auto TmcConverter::integrateObserver(QString observerPath, QStringList &observerNames, QStringList &asn1Files,
+auto TmcConverter::integrateObserver(const ObserverInfo &info, QStringList &observerNames, QStringList &asn1Files,
         std::map<QString, ProcessMetadata> &allSdlFiles, QStringList &attachmentInfos)
 {
-    const auto separator = ":";
-    // Path can contain additional priority information
-    const auto elements = observerPath.split(separator, QString::KeepEmptyParts);
-    const auto processPath = elements[0];
-    bool ok = true;
-    const auto priority = elements.size() > 1 ? elements[1].toInt(&ok) : 1;
-    if (!ok) {
-        const auto message = QString("Priority %1 could not be parsed as an integer").arg(elements[1]);
-        throw TranslationException(message);
-    }
-
-    const auto process = QFileInfo(processPath);
+    const auto process = QFileInfo(info.path());
     const auto processName = process.baseName();
     const auto directory = process.absoluteDir();
     // Observers require separate system_stucture, because OpenGEODE does not save
@@ -179,7 +184,7 @@ auto TmcConverter::integrateObserver(QString observerPath, QStringList &observer
     if (infoFile.open(QIODevice::ReadOnly)) {
         QTextStream in(&infoFile);
         while (!in.atEnd()) {
-            attachmentInfos.append(in.readLine() + ":" + QString::number(priority));
+            attachmentInfos.append(in.readLine() + ":" + QString::number(info.priority()));
             qDebug() << "Appended observer specification " << attachmentInfos.last();
         }
         infoFile.close();
@@ -248,8 +253,8 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
 
     QStringList asn1Files;
 
-    for (auto &path : m_observerFiles) {
-        integrateObserver(path, m_observerNames, asn1Files, allSdlFiles, m_observerAttachmentInfos);
+    for (auto &info : m_observerInfos) {
+        integrateObserver(info, m_observerNames, asn1Files, allSdlFiles, m_observerAttachmentInfos);
     }
 
     const QFileInfo simuDataView = simuDataViewLocation();
@@ -493,12 +498,6 @@ bool TmcConverter::createEnvGenerationInlines(
 QFileInfo TmcConverter::workDirectory() const
 {
     return m_ivBaseDirectory.absolutePath() + QDir::separator() + "work";
-}
-
-QFileInfo TmcConverter::dataViewUniqLocation() const
-{
-    return workDirectory().absoluteFilePath() + QDir::separator() + "dataview" + QDir::separator()
-            + "dataview-uniq.asn";
 }
 
 QFileInfo TmcConverter::simuDataViewLocation() const

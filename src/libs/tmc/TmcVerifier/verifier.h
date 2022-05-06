@@ -49,13 +49,11 @@ public:
     /**
      * @brief Attach an Observer
      *
-     * It shall point to the main SDL process file, followed by an optional priority, separated from the file by ":"
-     * (lower number is higher priority).
-     *
      * @param observerPath Path to the observer process file
+     * @param priority Observer priority
      * @return true if the operation succeeded, false otherwise.
      */
-    bool attachObserver(const QString &observerPath);
+    bool attachObserver(const QString &observerPath, const uint32_t priority);
 
     /**
      * @brief Prepare the system and process formal model verification.
