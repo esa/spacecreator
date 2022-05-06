@@ -110,16 +110,11 @@ QString InterfaceParameterTranslator::handleParameterTypeName(
     const auto &parameterTypeRef = sedsParameter.type();
     const auto &parameterTypeName = parameterTypeRef.nameStr();
 
-    const auto &genericTypes = m_sedsInterfaceDeclaration.genericTypes();
     const auto &dimensions = sedsParameter.arrayDimensions();
+    const auto &genericTypes = m_sedsInterfaceDeclaration.genericTypes();
+    const auto isTypeGeneric = DataTypeTranslationHelper::isTypeGeneric(parameterTypeRef, genericTypes);
 
-    if (genericTypes.empty()) {
-        if (dimensions.empty()) {
-            return parameterTypeName;
-        } else {
-            return DataTypeTranslationHelper::buildArrayTypeName(parameterTypeName, dimensions);
-        }
-    } else {
+    if (isTypeGeneric) {
         if (!dimensions.empty()) {
             auto errorMessage = QString("Parameter '%1' could not be translated, array parameters with generic "
                                         "types are not supported because of the ACN limitations")
@@ -140,7 +135,13 @@ QString InterfaceParameterTranslator::handleParameterTypeName(
             return parameterTypeName;
         } else {
             return DataTypeTranslationHelper::buildConcreteTypeName(
-                    m_sedsComponentName, m_sedsInterfaceName, sedsParameter.type().nameStr());
+                    m_sedsComponentName, m_sedsInterfaceName, parameterTypeName);
+        }
+    } else {
+        if (dimensions.empty()) {
+            return parameterTypeName;
+        } else {
+            return DataTypeTranslationHelper::buildArrayTypeName(parameterTypeName, dimensions);
         }
     }
 }

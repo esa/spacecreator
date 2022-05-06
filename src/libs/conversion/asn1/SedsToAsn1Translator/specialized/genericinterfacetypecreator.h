@@ -86,7 +86,6 @@ private:
     auto findInterfaceDeclaration(const seds::model::InterfaceDeclarationRef &interfaceRef)
             -> const seds::model::InterfaceDeclaration *;
     auto findDeterminantArgument(const std::vector<seds::model::CommandArgument> &arguments) -> std::optional<QString>;
-    auto isTypeGeneric(const seds::model::DataTypeRef &typeRef) -> bool;
 
 private:
     Context &m_context;

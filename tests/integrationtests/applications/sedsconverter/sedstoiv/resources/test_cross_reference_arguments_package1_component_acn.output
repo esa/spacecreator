@@ -1,0 +1,29 @@
+COM-N7SPACE-PACKAGE1-MEGACOMPONENT DEFINITIONS ::= BEGIN
+MegaComponent-ProvidedInterface-SyncGenericType []
+MegaComponent-ProvidedInterface-AsyncGenericType []
+MegaComponent-ProvidedInterface-AlternateGenericType <COM-N7SPACE-PACKAGE2.DeterminantItem:determinant> []
+{
+    concrete0 [present-when determinant==0],
+    concrete1 [present-when determinant==1]
+}
+MegaComponent-ProvidedInterface-DeterminantGenericType []
+SyncItemArrayArray-10 []
+MegaComponent-ProvidedInterface-AsyncCommandNoMapping-Type []
+{
+    argumentNoMapping []
+}
+AsyncItemArrayArray-10 []
+MegaComponent-ProvidedInterface-AsyncCommandNoMappingArray-Type []
+{
+    arrayArgumentNoMapping []
+}
+MegaComponent-ProvidedInterface-AsyncCommandSimpleMapping-Type []
+{
+    argumentSimpleMapping []
+}
+MegaComponent-ProvidedInterface-AsyncCommandAlternateMapping-Type []
+{
+    genericArgument1 MegaComponent-ProvidedInterface-DeterminantGenericType [],
+    genericArgument2 <genericArgument1>[]
+}
+END

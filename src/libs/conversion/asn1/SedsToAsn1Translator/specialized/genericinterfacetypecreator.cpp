@@ -262,7 +262,8 @@ void GenericInterfaceTypeCreator::createTypesForParameter(const seds::model::Int
 {
     const auto parameterTypeRef = parameter.type();
 
-    const auto isGeneric = isTypeGeneric(parameterTypeRef);
+    const auto isGeneric =
+            DataTypeTranslationHelper::isTypeGeneric(parameterTypeRef, m_interfaceDeclaration->genericTypes());
 
     if (isGeneric) {
         if (!parameter.arrayDimensions().empty()) {
@@ -288,7 +289,8 @@ void GenericInterfaceTypeCreator::createSyncArgumentType(const seds::model::Comm
 {
     const auto argumentTypeRef = argument.type();
 
-    const auto isGeneric = isTypeGeneric(argumentTypeRef);
+    const auto isGeneric =
+            DataTypeTranslationHelper::isTypeGeneric(argumentTypeRef, m_interfaceDeclaration->genericTypes());
 
     if (isGeneric) {
         if (!argument.arrayDimensions().empty()) {
@@ -367,7 +369,8 @@ void GenericInterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const s
 
     Asn1Acn::Types::Type *argumentType = nullptr;
 
-    const auto isGeneric = isTypeGeneric(argumentTypeRef);
+    const auto isGeneric =
+            DataTypeTranslationHelper::isTypeGeneric(argumentTypeRef, m_interfaceDeclaration->genericTypes());
 
     if (isGeneric) {
         if (!argument.arrayDimensions().empty()) {
@@ -466,22 +469,11 @@ std::optional<QString> GenericInterfaceTypeCreator::findDeterminantArgument(
     const auto foundArgument = std::find_if(arguments.begin(), arguments.end(),
             [&](const seds::model::CommandArgument &argument) { return argument.type().nameStr() == determinantName; });
 
-    return Escaper::escapeAsn1FieldName(foundArgument->nameStr());
-}
-
-bool GenericInterfaceTypeCreator::isTypeGeneric(const seds::model::DataTypeRef &typeRef)
-{
-    if (typeRef.packageStr()) {
-        return false;
+    if (foundArgument == arguments.end()) {
+        return std::nullopt;
+    } else {
+        return Escaper::escapeAsn1FieldName(foundArgument->nameStr());
     }
-
-    const auto &typeName = typeRef.nameStr();
-    const auto &genericTypes = m_interfaceDeclaration->genericTypes();
-
-    const auto found = std::find_if(genericTypes.begin(), genericTypes.end(),
-            [&](const seds::model::GenericType &genericType) { return genericType.nameStr() == typeName; });
-
-    return found != genericTypes.end();
 }
 
 } // namespace conversion::asn1::translator

@@ -22,7 +22,9 @@
 #include "context.h"
 
 #include <QString>
+#include <seds/SedsModel/generics/generictype.h>
 #include <seds/SedsModel/interfaces/commandargument.h>
+#include <seds/SedsModel/types/datatyperef.h>
 #include <seds/SedsModel/types/dimensionsize.h>
 #include <vector>
 
@@ -51,6 +53,9 @@ public:
 
     static auto handleArrayType(Context &context, const seds::model::DataTypeRef &argumentTypeRef,
             const std::vector<seds::model::DimensionSize> &dimensions) -> Asn1Acn::Types::Type *;
+
+    static auto isTypeGeneric(
+            const seds::model::DataTypeRef &typeRef, const std::vector<seds::model::GenericType> &genericTypes) -> bool;
 
 private:
     inline static const QString m_arrayTypeNameTemplate = "%1Array-%2";

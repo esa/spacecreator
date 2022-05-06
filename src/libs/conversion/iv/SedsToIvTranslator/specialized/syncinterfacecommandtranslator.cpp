@@ -108,27 +108,20 @@ void SyncInterfaceCommandTranslator::translateArguments(
 
 QString SyncInterfaceCommandTranslator::handleArgumentTypeName(const seds::model::CommandArgument &sedsArgument) const
 {
-    const auto &genericTypes = m_sedsInterfaceDeclaration.genericTypes();
+    const auto &argumentTypeRef = sedsArgument.type();
+    const auto &argumentTypeName = argumentTypeRef.nameStr();
+
     const auto &dimensions = sedsArgument.arrayDimensions();
+    const auto &genericTypes = m_sedsInterfaceDeclaration.genericTypes();
+    const auto isTypeGeneric = DataTypeTranslationHelper::isTypeGeneric(argumentTypeRef, genericTypes);
 
-    if (genericTypes.empty()) {
-        const auto &typeName = sedsArgument.type().nameStr();
-
-        if (dimensions.empty()) {
-            return typeName;
-        } else {
-            return DataTypeTranslationHelper::buildArrayTypeName(typeName, dimensions);
-        }
-    } else {
+    if (isTypeGeneric) {
         if (!dimensions.empty()) {
             auto errorMessage = QString("Command argument '%1' could not be translated, array arguments with generic "
                                         "types are not supported because of the ACN limitations")
                                         .arg(sedsArgument.nameStr());
             throw TranslationException(std::move(errorMessage));
         }
-
-        const auto &argumentTypeRef = sedsArgument.type();
-        const auto &argumentTypeName = argumentTypeRef.nameStr();
 
         if (argumentTypeRef.packageStr()) {
             return argumentTypeName;
@@ -141,7 +134,13 @@ QString SyncInterfaceCommandTranslator::handleArgumentTypeName(const seds::model
             return argumentTypeName;
         } else {
             return DataTypeTranslationHelper::buildConcreteTypeName(
-                    m_sedsComponentName, m_sedsInterfaceName, sedsArgument.type().nameStr());
+                    m_sedsComponentName, m_sedsInterfaceName, argumentTypeName);
+        }
+    } else {
+        if (dimensions.empty()) {
+            return argumentTypeName;
+        } else {
+            return DataTypeTranslationHelper::buildArrayTypeName(argumentTypeName, dimensions);
         }
     }
 }

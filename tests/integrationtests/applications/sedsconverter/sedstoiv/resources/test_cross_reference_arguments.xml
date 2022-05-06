@@ -14,7 +14,7 @@
         <GenericTypeSet>
           <GenericType name="SyncGenericType" />
           <GenericType name="AsyncGenericType" />
-          <GenericType name="AlternateGenericType1" />
+          <GenericType name="AlternateGenericType" />
           <GenericType name="DeterminantGenericType" />
         </GenericTypeSet>
         <ParameterSet>
@@ -34,13 +34,6 @@
           <Command name="SyncCommandSimpleMapping" mode="sync">
             <Argument name="ArgumentSimpleMapping" type="SyncGenericType" mode="in" />
           </Command>
-          <Command name="SyncCommandSimpleMappingArray" mode="sync">
-            <Argument name="ArrayArgumentSimpleMapping" type="SyncGenericType" mode="in">
-              <ArrayDimensions>
-                <Dimension size="10" />
-              </ArrayDimensions>
-            </Argument>
-          </Command>
           <Command name="AsyncCommandNoMapping" mode="async">
             <Argument name="ArgumentNoMapping" type="com/n7space/Package2/AsyncItem" mode="in" />
           </Command>
@@ -54,24 +47,9 @@
           <Command name="AsyncCommandSimpleMapping" mode="async">
             <Argument name="ArgumentSimpleMapping" type="AsyncGenericType" mode="in" />
           </Command>
-          <Command name="AsyncCommandSimpleMappingArray" mode="async">
-            <Argument name="ArrayArgumentSimpleMapping" type="AsyncGenericType" mode="in">
-              <ArrayDimensions>
-                <Dimension size="10" />
-              </ArrayDimensions>
-            </Argument>
-          </Command>
           <Command name="AsyncCommandAlternateMapping" mode="async">
             <Argument name="GenericArgument1" type="DeterminantGenericType" mode="in" />
             <Argument name="GenericArgument2" type="AlternateGenericType" mode="in" />
-          </Command>
-          <Command name="AsyncCommandAlternateMappingArray" mode="async">
-            <Argument name="GenericArgument1" type="DeterminantGenericType" mode="in" />
-            <Argument name="GenericArgument2" type="AlternateGenericType" mode="in">
-              <ArrayDimensions>
-                <Dimension size="10" />
-              </ArrayDimensions>
-            </Argument>
           </Command>
         </CommandSet>
       </Interface>

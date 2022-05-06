@@ -98,4 +98,19 @@ Asn1Acn::Types::Type *DataTypeTranslationHelper::handleArrayType(Context &contex
     }
 }
 
+bool DataTypeTranslationHelper::isTypeGeneric(
+        const seds::model::DataTypeRef &typeRef, const std::vector<seds::model::GenericType> &genericTypes)
+{
+    if (typeRef.packageStr()) {
+        return false;
+    }
+
+    const auto &typeName = typeRef.nameStr();
+
+    const auto found = std::find_if(genericTypes.begin(), genericTypes.end(),
+            [&](const seds::model::GenericType &genericType) { return genericType.nameStr() == typeName; });
+
+    return found != genericTypes.end();
+}
+
 } // namespace conversion::asn1::translator
