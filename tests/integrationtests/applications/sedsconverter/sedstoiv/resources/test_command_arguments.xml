@@ -30,6 +30,7 @@
     </Interface>
     <Interface name="SyncInterface">
       <CommandSet>
+        <Command name="SyncNoArgsCommand" mode="sync" />
         <Command name="SyncInCommand" mode="sync">
           <Argument name="SyncInArgument1" type="MyInteger" mode="in" />
           <Argument name="SyncInArgument2" type="MyInteger" mode="in" />
