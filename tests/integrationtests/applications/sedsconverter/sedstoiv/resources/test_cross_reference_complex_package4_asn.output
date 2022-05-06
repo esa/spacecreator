@@ -1,6 +1,6 @@
 PACKAGE4 DEFINITIONS ::= BEGIN
 Integer4 ::= INTEGER(0 .. 255)
-ParentInterface2Command-Type ::= SEQUENCE
+ParentInterface2-ParentInterface2Command-Type ::= SEQUENCE
 {
     arg1 Integer4(0 .. 255)
 }

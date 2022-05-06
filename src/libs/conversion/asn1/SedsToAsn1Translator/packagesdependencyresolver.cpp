@@ -60,6 +60,7 @@ void PackagesDependencyResolver::visit(const seds::model::Package *package)
     markTemporary(package);
 
     handleDataTypes(package->dataTypes());
+    handleInterfaceDeclarations(package->declaredInterfaces());
     handleComponents(package->components(), package);
 
     markPermanent(package);
@@ -133,32 +134,11 @@ void PackagesDependencyResolver::handleSubRangeDataType(const seds::model::SubRa
     handleDataTypeRef(subRangeDataType.type());
 }
 
-void PackagesDependencyResolver::handleComponents(
-        const std::vector<seds::model::Component> &components, const seds::model::Package *package)
+void PackagesDependencyResolver::handleInterfaceDeclarations(
+        const std::vector<seds::model::InterfaceDeclaration> &interfaceDeclarations)
 {
-    for (const auto &component : components) {
-        handleDataTypes(component.dataTypes());
-        handleInterfaces(component.providedInterfaces(), component, package);
-        handleInterfaces(component.requiredInterfaces(), component, package);
-    }
-}
-
-void PackagesDependencyResolver::handleInterfaces(const std::vector<seds::model::Interface> &interfaces,
-        const seds::model::Component &component, const seds::model::Package *package)
-{
-    for (const auto &interface : interfaces) {
-        const auto &interfaceDeclarationRef = interface.type();
-        if (interfaceDeclarationRef.packageStr()) {
-            const auto otherPackage = findPackage(*interfaceDeclarationRef.packageStr());
-            visit(otherPackage);
-            continue;
-        }
-
-        const auto &interfaceDeclaration =
-                findInterfaceDeclaration(interfaceDeclarationRef.nameStr(), component, package);
+    for (const auto &interfaceDeclaration : interfaceDeclarations) {
         handleInterfaceDeclaration(interfaceDeclaration);
-
-        handleTypeMapSet(interface.genericTypeMapSet());
     }
 }
 
@@ -191,6 +171,36 @@ void PackagesDependencyResolver::handleCommands(const std::vector<seds::model::I
         for (const auto &argument : command.arguments()) {
             handleDataTypeRef(argument.type());
         }
+    }
+}
+
+void PackagesDependencyResolver::handleComponents(
+        const std::vector<seds::model::Component> &components, const seds::model::Package *package)
+{
+    for (const auto &component : components) {
+        handleDataTypes(component.dataTypes());
+        handleInterfaceDeclarations(component.declaredInterfaces());
+        handleInterfaces(component.providedInterfaces(), component, package);
+        handleInterfaces(component.requiredInterfaces(), component, package);
+    }
+}
+
+void PackagesDependencyResolver::handleInterfaces(const std::vector<seds::model::Interface> &interfaces,
+        const seds::model::Component &component, const seds::model::Package *package)
+{
+    for (const auto &interface : interfaces) {
+        const auto &interfaceDeclarationRef = interface.type();
+        if (interfaceDeclarationRef.packageStr()) {
+            const auto otherPackage = findPackage(*interfaceDeclarationRef.packageStr());
+            visit(otherPackage);
+            continue;
+        }
+
+        const auto &interfaceDeclaration =
+                findInterfaceDeclaration(interfaceDeclarationRef.nameStr(), component, package);
+        handleInterfaceDeclaration(interfaceDeclaration);
+
+        handleTypeMapSet(interface.genericTypeMapSet());
     }
 }
 

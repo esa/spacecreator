@@ -65,14 +65,16 @@ private:
     auto handleContainer(const seds::model::ContainerDataType &containerDataType) -> void;
     auto handleSubRangeDataType(const seds::model::SubRangeDataType &subRangeDataType) -> void;
 
+    auto handleInterfaceDeclarations(const std::vector<seds::model::InterfaceDeclaration> &interfaceDeclarations)
+            -> void;
+    auto handleInterfaceDeclaration(const seds::model::InterfaceDeclaration &interfaceDeclaration) -> void;
+    auto handleParameters(const std::vector<seds::model::InterfaceParameter> &parameters) -> void;
+    auto handleCommands(const std::vector<seds::model::InterfaceCommand> &commands) -> void;
+
     auto handleComponents(const std::vector<seds::model::Component> &components, const seds::model::Package *package)
             -> void;
     auto handleInterfaces(const std::vector<seds::model::Interface> &interfaces,
             const seds::model::Component &component, const seds::model::Package *package) -> void;
-
-    auto handleInterfaceDeclaration(const seds::model::InterfaceDeclaration &interfaceDeclaration) -> void;
-    auto handleParameters(const std::vector<seds::model::InterfaceParameter> &parameters) -> void;
-    auto handleCommands(const std::vector<seds::model::InterfaceCommand> &commands) -> void;
 
     auto handleTypeMapSet(const std::optional<seds::model::GenericTypeMapSet> &typeMapSet) -> void;
     auto handleAlternateSet(const std::optional<seds::model::GenericAlternateSet> &alternateSet) -> void;
