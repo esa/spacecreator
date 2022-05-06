@@ -136,8 +136,11 @@ private:
     auto getAsnSequenceComponentType(Asn1Acn::AsnSequenceComponent *component) -> Asn1Acn::Types::Type *;
     auto getSequenceComponentTypeName(const Asn1Acn::AsnSequenceComponent &asnComponent, const QString &sequenceName)
             -> QString;
-    auto generateAsnSequenceComponentInline(Asn1Acn::AsnSequenceComponent *asnSequenceComponent,
+    auto generateAsnSequenceComponentInlineCall(Asn1Acn::AsnSequenceComponent *asnSequenceComponent,
             const QString &argumentName) -> std::unique_ptr<model::ProctypeElement>;
+    auto modelContainsInlineGenerator(const QString &inlineGeneratorName) -> bool;
+    auto isEmbeddedType(const Asn1Acn::Types::Type &type) -> bool;
+    auto getInlineGeneratorName(const QString &typeName) -> QString;
 
 private:
     ::promela::model::PromelaModel &m_promelaModel;

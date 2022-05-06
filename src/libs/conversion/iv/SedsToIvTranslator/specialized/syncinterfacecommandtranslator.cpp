@@ -52,6 +52,7 @@ void SyncInterfaceCommandTranslator::translateCommand(
             m_sedsInterfaceName, sedsCommand.nameStr(), interfaceType);
 
     switch (sedsCommand.argumentsCombination()) {
+    case seds::model::ArgumentsCombination::NoArgs:
     case seds::model::ArgumentsCombination::InOnly:
     case seds::model::ArgumentsCombination::OutOnly:
     case seds::model::ArgumentsCombination::InAndOut: {
@@ -60,7 +61,6 @@ void SyncInterfaceCommandTranslator::translateCommand(
         translateArguments(sedsCommand.arguments(), ivInterface);
         m_ivFunction->addChild(ivInterface);
     } break;
-    case seds::model::ArgumentsCombination::NoArgs:
     case seds::model::ArgumentsCombination::NotifyOnly:
     case seds::model::ArgumentsCombination::InAndNotify:
     case seds::model::ArgumentsCombination::OutAndNotify:
