@@ -701,13 +701,13 @@ void ModelCheckingWindow::addProperty()
 {
     bool ok1;
     QString propertyType = "";
-    QStringList propertyTypes = { "Boolean Stop Condition - LTL", "Boolean Stop Condition - Observer", "Message Sequence Chart", "Observer" };
+    QStringList propertyTypes = { "Boolean Stop Condition - LTL", "Boolean Stop Condition - Observer", "Message Sequence Chart Search/Verify", "Observer" };
     propertyType = QInputDialog::getItem(this, tr("New Property"), tr("Property type:"), propertyTypes, 0, false, &ok1);
 
     if (ok1 && !propertyType.isEmpty()){
         QString makeRule = "";
         if(propertyType == "Observer") {makeRule = "create-obs";}
-        if(propertyType == "Message Sequence Chart") {makeRule = "create-msc";}
+        if(propertyType == "Message Sequence Chart Search/Verify") {makeRule = "create-msc";}
         if(propertyType == "Boolean Stop Condition - Observer") {makeRule = "create-bsc";}
         if(propertyType == "Boolean Stop Condition - LTL") {
             QMessageBox::warning(this, tr("Add property"),
