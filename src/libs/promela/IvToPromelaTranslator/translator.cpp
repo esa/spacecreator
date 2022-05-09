@@ -171,7 +171,7 @@ auto IvToPromelaTranslator::Context::getObserverAttachments(const QString &funct
     ObserverAttachments result;
     // [] may create new keys, but performance penalty is negligible and code is more terse
     // The best way to implement this would be to use LINQ-like C++20 ranges
-    for (const auto attachment : m_observerAttachments[function][interface]) {
+    for (const auto &attachment : m_observerAttachments[function][interface]) {
         if (attachment.kind() == kind) {
             result.push_back(attachment);
         }
