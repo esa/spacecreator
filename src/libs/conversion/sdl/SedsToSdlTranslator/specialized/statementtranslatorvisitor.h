@@ -151,9 +151,9 @@ public:
          * @param interface     Name of the interface hosting the command
          * @param name          Name of the command
          *
-         * @return InterfaceCommand
+         * @return Command info
          */
-        auto getCommand(const QString &interface, const QString &name) -> const seds::model::InterfaceCommand *;
+        auto getCommand(const QString &interface, const QString &name) -> const CommandInfo *;
 
     private:
         int m_labelCount;

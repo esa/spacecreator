@@ -105,6 +105,26 @@ private:
     std::vector<AssignmentInfo> m_returnAssignments;
 };
 
+class CommandInfo
+{
+public:
+    CommandInfo() = default;
+
+    CommandInfo(const bool isProvided, const QString &interface, const QString &name,
+            const seds::model::InterfaceCommand *definition);
+
+    auto isProvided() const -> bool;
+    auto interface() const -> QString;
+    auto name() const -> QString;
+    auto definition() const -> const seds::model::InterfaceCommand *;
+
+private:
+    bool m_isProvided;
+    QString m_interface;
+    QString m_name;
+    const seds::model::InterfaceCommand *m_definition;
+};
+
 /**
  *  @brief  Translation context
  */
@@ -182,14 +202,23 @@ public:
     auto handleSplinePointCount(const std::size_t count) -> void;
 
     /**
-     * @brief Add Command definition
+     * @brief Add provided Command definition
      *
      * @brief interface     Name of the hosting Interface
      * @brief name          Name of the Command
      * @brief definition    Command definition
      */
-    auto addCommand(const QString &interface, const QString &name, const seds::model::InterfaceCommand *definition)
-            -> void;
+    auto addProvidedCommand(
+            const QString &interface, const QString &name, const seds::model::InterfaceCommand *definition) -> void;
+    /**
+     * @brief Add required Command definition
+     *
+     * @brief interface     Name of the hosting Interface
+     * @brief name          Name of the Command
+     * @brief definition    Command definition
+     */
+    auto addRequiredCommand(
+            const QString &interface, const QString &name, const seds::model::InterfaceCommand *definition) -> void;
     /**
      * @brief Get Command definition
      *
@@ -198,13 +227,13 @@ public:
      *
      * @returns Command definition
      */
-    auto getCommand(const QString &interface, const QString &name) -> const seds::model::InterfaceCommand *;
+    auto getCommand(const QString &interface, const QString &name) -> const CommandInfo *;
     /**
      * @brief Return a map of Command names to Command definitions
      *
      * @return Returns map of Commands
      */
-    auto commands() -> std::vector<std::pair<QString, const seds::model::InterfaceCommand *>>;
+    auto commands() -> std::vector<std::pair<QString, const CommandInfo *>>;
 
     /**
      * @brief Add Activity information
@@ -231,7 +260,7 @@ private:
     ::sdl::Process *m_sdlProcess;
     ::sdl::StateMachine *m_sdlStateMachine;
     std::size_t m_maxSplinePointCount;
-    std::map<std::pair<QString, QString>, const seds::model::InterfaceCommand *> m_commands;
+    std::map<std::pair<QString, QString>, CommandInfo> m_commands;
     std::map<QString, ActivityInfo> m_activityInfos;
 };
 
