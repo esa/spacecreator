@@ -62,7 +62,6 @@ private:
 
 /**
  * @brief A helper class to store additional extracted Activity information
- *
  */
 class ActivityInfo
 {
@@ -105,17 +104,54 @@ private:
     std::vector<AssignmentInfo> m_returnAssignments;
 };
 
+/**
+ * @brief
+ */
 class CommandInfo
 {
 public:
+    /**
+     * @brief Default parameterless constructor
+     */
     CommandInfo() = default;
 
+    /**
+     * @brief Constructor
+     *
+     * @param isProvided Is the command in a provided interface
+     * @param interface Interface name
+     * @param name Command name
+     * @param definition Command definition
+     */
     CommandInfo(const bool isProvided, const QString &interface, const QString &name,
             const seds::model::InterfaceCommand *definition);
 
+    /**
+     * @brief Getter for the isProvided property
+     *
+     * @returns Whether the command is in a provided interface
+     */
     auto isProvided() const -> bool;
+
+    /**
+     * @brief Getter for the command's interface name
+     *
+     * @return Command's interface name
+     */
     auto interface() const -> QString;
+
+    /**
+     * @brief Getter for the command's name
+     *
+     * @return Command's name
+     */
     auto name() const -> QString;
+
+    /**
+     * @brief Getter for the command's definition
+     *
+     * @return Command's definition
+     */
     auto definition() const -> const seds::model::InterfaceCommand *;
 
 private:
