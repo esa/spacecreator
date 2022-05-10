@@ -24,6 +24,7 @@
 #include <conversion/asn1/Asn1Options/options.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
+#include <iostream>
 #include <seds/SedsModel/package/package.h>
 
 using conversion::translator::MissingAsn1TypeDefinitionException;
@@ -175,6 +176,36 @@ const seds::model::InterfaceDeclaration *Context::findInterfaceDeclaration(
     throw UndeclaredInterfaceException(interfaceRef.value().pathStr());
 }
 
+bool Context::hasAsn1Type(const seds::model::DataTypeRef &typeRef) const
+{
+    const auto &typeName = typeRef.nameStr();
+
+    if (typeRef.packageStr()) {
+        const auto asn1DefinitionsName = Escaper::escapeAsn1PackageName(*typeRef.packageStr());
+        auto definitions = getAsn1Definitions(asn1DefinitionsName);
+        auto typeAssignment = definitions->type(typeName);
+
+        if (typeAssignment != nullptr) {
+            return true;
+        }
+    } else {
+        auto *typeAssignment = m_definitions->type(typeName);
+        if (typeAssignment != nullptr) {
+            return true;
+        }
+
+        if (m_parentDefinitions != nullptr) {
+            typeAssignment = m_parentDefinitions->type(typeName);
+
+            if (typeAssignment != nullptr) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 const seds::model::Package *Context::getSedsPackage() const
 {
     return m_sedsPackage;
@@ -238,6 +269,11 @@ const QString &Context::packageName() const
 const QString &Context::definitionsName() const
 {
     return m_definitions->name();
+}
+
+const QString &Context::componentName() const
+{
+    return m_component->nameStr();
 }
 
 std::optional<uint64_t> Context::arraySizeThreshold() const

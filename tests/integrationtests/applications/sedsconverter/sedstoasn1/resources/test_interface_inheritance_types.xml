@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DataSheet xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Device name="CoolDevice" />
+  <Package name="com/n7space/InterfaceInheritance1">
+    <DataTypeSet>
+      <IntegerDataType name="PackageInteger">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <FloatDataType name="PackageFloat">
+        <FloatDataEncoding encodingAndPrecision="IEEE754_2008_single" sizeInBits="32" />
+        <Range>
+          <PrecisionRange>single</PrecisionRange>
+        </Range>
+      </FloatDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="InterfaceDecl1">
+        <ParameterSet>
+          <Parameter name="Param1" type="PackageFloat" mode="async" readOnly="true">
+            <ArrayDimensions>
+              <Dimension size="1" />
+            </ArrayDimensions>
+          </Parameter>
+        </ParameterSet>
+        <CommandSet>
+          <Command name="Sync1" mode="sync">
+            <Argument name="Arg1" type="PackageInteger" mode="in"/>
+            <Argument name="Arg2" type="PackageInteger" mode="in">
+              <ArrayDimensions>
+                <Dimension size="1" />
+              </ArrayDimensions>
+            </Argument>
+          </Command>
+          <Command name="Async1" mode="async">
+            <Argument name="Arg1" type="PackageInteger" mode="in" />
+            <Argument name="Arg2" type="PackageInteger" mode="in" />
+          </Command>
+        </CommandSet>
+      </Interface>
+      <Interface name="InterfaceDecl2">
+        <BaseInterfaceSet>
+          <Interface type="InterfaceDecl1" />
+        </BaseInterfaceSet>
+        <GenericTypeSet>
+          <GenericType name="Generic2" />
+        </GenericTypeSet>
+        <ParameterSet>
+          <Parameter name="Param2" type="Generic2" mode="async" readOnly="true">
+            <ArrayDimensions>
+              <Dimension size="2" />
+            </ArrayDimensions>
+          </Parameter>
+        </ParameterSet>
+        <CommandSet>
+          <Command name="Sync2" mode="sync">
+            <Argument name="Arg1" type="PackageInteger" mode="in"/>
+            <Argument name="Arg2" type="Generic2" mode="in">
+              <ArrayDimensions>
+                <Dimension size="2" />
+              </ArrayDimensions>
+            </Argument>
+          </Command>
+          <Command name="Async2" mode="async">
+            <Argument name="Arg1" type="PackageInteger" mode="in" />
+            <Argument name="Arg2" type="Generic2" mode="in" />
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+  </Package>
+  <Package name="com/n7space/InterfaceInheritance2">
+    <DataTypeSet>
+      <IntegerDataType name="OtherInteger">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <FloatDataType name="OtherFloat">
+        <FloatDataEncoding encodingAndPrecision="IEEE754_2008_single" sizeInBits="32" />
+        <Range>
+          <PrecisionRange>single</PrecisionRange>
+        </Range>
+      </FloatDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="InterfaceDecl3">
+        <BaseInterfaceSet>
+          <Interface type="com/n7space/InterfaceInheritance1/InterfaceDecl2">
+        </BaseInterfaceSet>
+        <GenericTypeSet>
+          <GenericType name="Generic3" />
+        </GenericTypeSet>
+        <CommandSet>
+          <Command name="Async3" mode="async">
+            <Argument name="Arg1" type="Generic2" mode="in" />
+            <Argument name="Arg2" type="Generic3" mode="in" />
+          </Command>
+        </CommandSet>
+      </Interface>
+      <Interface name="InterfaceDecl4">
+        <BaseInterfaceSet>
+          <Interface type="InterfaceDecl3">
+            <GenericTypeMapSet>
+              <GenericTypeMap name="Generic2" type="OtherInteger" />
+              <GenericTypeMap name="Generic3" type="OtherFloat" />
+            </GenericTypeMapSet>
+          </Interface>
+        </BaseInterfaceSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="Component">
+        <DataTypeSet>
+          <IntegerDataType name="ComponentInteger">
+            <IntegerDataEncoding encoding="unsigned" sizeInBits="8" byteOrder="littleEndian" />
+            <Range>
+              <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+            </Range>
+          </IntegerDataType>
+        </DataTypeSet>
+        <DeclaredInterfaceSet>
+          <Interface name="InterfaceDecl5">
+            <BaseInterfaceSet>
+              <Interface type="InterfaceDecl4" />
+            </BaseInterfaceSet>
+            <ParameterSet>
+              <Parameter name="Param5" type="Generic2" mode="async" readOnly="true">
+                <ArrayDimensions>
+                  <Dimension size="5" />
+                </ArrayDimensions>
+              </Parameter>
+            </ParameterSet>
+            <CommandSet>
+              <Command name="Sync4" mode="sync">
+                <Argument name="Arg1" type="Generic2" mode="in">
+                  <ArrayDimensions>
+                    <Dimension size="4" />
+                  </ArrayDimensions>
+                </Argument>
+                <Argument name="Arg2" type="Generic3" mode="in">
+                  <ArrayDimensions>
+                    <Dimension size="4" />
+                  </ArrayDimensions>
+                </Argument>
+              </Command>
+              <Command name="Async4" mode="async">
+                <Argument name="Arg1" type="Generic2" mode="in" />
+                <Argument name="Arg2" type="Generic3" mode="in" />
+              </Command>
+            </CommandSet>
+          </Interface>
+        </DeclaredInterfaceSet>
+        <ProvidedInterfaceSet>
+          <Interface name="InterfaceImplementation" type="InterfaceDecl5">
+            <GenericTypeMapSet>
+              <GenericTypeMap name="Generic2" type="OtherInteger">
+              <GenericTypeMap name="Generic3" type="ComponentInteger">
+            </GenericTypeMapSet>
+          </Interface>
+        </ProvidedInterfaceSet>
+      </Component>
+    </ComponentSet>
+  </Package>
+</DataSheet>

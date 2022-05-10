@@ -1,0 +1,3 @@
+COM-N7SPACE-INTERFACEINHERITANCE-COMPONENT DEFINITIONS ::= BEGIN
+ComponentInteger [size 8, encoding pos-int]
+END

@@ -62,6 +62,8 @@ public:
     auto findInterfaceDeclaration(const seds::model::InterfaceDeclarationRef &interfaceRef)
             -> const seds::model::InterfaceDeclaration *;
 
+    auto hasAsn1Type(const seds::model::DataTypeRef &typeRef) const -> bool;
+
     auto getSedsPackage() const -> const seds::model::Package *;
     auto getSedsPackage(const QString &packageName) const -> const seds::model::Package *;
     auto getAsn1Definitions() const -> Asn1Acn::Definitions *;
@@ -71,6 +73,7 @@ public:
 
     auto packageName() const -> const QString &;
     auto definitionsName() const -> const QString &;
+    auto componentName() const -> const QString &;
     auto arraySizeThreshold() const -> std::optional<uint64_t>;
 
 public:

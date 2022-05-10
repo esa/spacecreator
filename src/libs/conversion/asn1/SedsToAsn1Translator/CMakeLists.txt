@@ -3,7 +3,9 @@ project(SedsToAsn1Translator VERSION 1.0.0 LANGUAGES CXX)
 set(SOURCES     context.cpp
                 datatypetranslationhelper.cpp
                 datatypesdependencyresolver.cpp
+                generictypecreator.cpp
                 generictypemapper.cpp
+                interfacetypecreator.cpp
                 packagesdependencyresolver.cpp
                 patchersnippetsgenerator.cpp
                 translator.cpp
@@ -20,7 +22,9 @@ set(SOURCES     context.cpp
 set(INCLUDES    context.h
                 datatypetranslationhelper.h
                 datatypesdependencyresolver.h
+                generictypecreator.cpp
                 generictypemapper.h
+                interfacetypecreator.h
                 packagesdependencyresolver.h
                 patchersnippetsgenerator.h
                 translator.h

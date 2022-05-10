@@ -41,7 +41,7 @@ public:
      * @param   component   Parent SEDS component
      */
     GenericInterfaceTypeCreator(Context &context, Context &interfaceContext, const seds::model::Interface &interface,
-            const seds::model::InterfaceDeclaration *interfaceDeclaration, const seds::model::Component &component);
+            const seds::model::InterfaceDeclaration *interfaceDeclaration);
     /**
      * @brief   Deleted copy constructor
      */
@@ -91,7 +91,6 @@ private:
 
     const QString &m_interfaceName;
     const seds::model::InterfaceDeclaration *m_interfaceDeclaration;
-    const seds::model::Component &m_component;
 
     GenericTypeMapper m_typeMapper;
 };

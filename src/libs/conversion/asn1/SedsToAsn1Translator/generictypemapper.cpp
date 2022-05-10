@@ -56,7 +56,7 @@ void GenericTypeMapper::addMappings(const seds::model::GenericTypeMapSet &typeMa
     }
 }
 
-const TypeMapping *GenericTypeMapper::getMapping(const QString &genericTypeName)
+const TypeMapping *GenericTypeMapper::getMapping(const QString &genericTypeName) const
 {
     if (m_mappings.count(genericTypeName) != 0) {
         return &(m_mappings.at(genericTypeName));

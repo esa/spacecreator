@@ -62,9 +62,15 @@ QString DataTypeTranslationHelper::buildGenericBundledTypeName(
 }
 
 QString DataTypeTranslationHelper::buildConcreteTypeName(
+        const QString &interfaceDeclarationName, const QString &genericName)
+{
+    return m_concreteTypeNameDeclarationTemplate.arg(interfaceDeclarationName).arg(genericName);
+}
+
+QString DataTypeTranslationHelper::buildConcreteTypeName(
         const QString &componentName, const QString &interfaceName, const QString &genericName)
 {
-    return m_concreteTypeNameTemplate.arg(componentName).arg(interfaceName).arg(genericName);
+    return m_concreteTypeNameImplementationTemplate.arg(componentName).arg(interfaceName).arg(genericName);
 }
 
 Asn1Acn::Types::Type *DataTypeTranslationHelper::handleArrayType(Context &context,
@@ -73,13 +79,9 @@ Asn1Acn::Types::Type *DataTypeTranslationHelper::handleArrayType(Context &contex
     if (dimensions.empty()) {
         return context.findAsn1Type(argumentTypeRef);
     } else {
-        Asn1Acn::Types::Type *arrayType = nullptr;
-
         const auto name = buildArrayTypeName(argumentTypeRef.nameStr(), dimensions);
 
-        try {
-            arrayType = context.findAsn1Type(name);
-        } catch (const MissingAsn1TypeDefinitionException &) {
+        if (!context.hasAsn1Type(name)) {
             seds::model::ArrayDataType sedsArray;
             sedsArray.setName(name);
             sedsArray.setType(argumentTypeRef);
@@ -90,11 +92,9 @@ Asn1Acn::Types::Type *DataTypeTranslationHelper::handleArrayType(Context &contex
 
             DataTypeTranslatorVisitor dataTypeTranslator(context);
             dataTypeTranslator(sedsArray);
-
-            arrayType = context.findAsn1Type(name);
         }
 
-        return arrayType;
+        return context.findAsn1Type(name);
     }
 }
 

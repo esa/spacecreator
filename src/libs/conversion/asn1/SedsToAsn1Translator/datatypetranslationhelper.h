@@ -48,6 +48,7 @@ public:
             const QString &interfaceDeclarationName, const QString &commandName, QString postfix = "") -> QString;
     static auto buildGenericBundledTypeName(
             const QString &componentName, const QString &interfaceName, const QString &commandName) -> QString;
+    static auto buildConcreteTypeName(const QString &interfaceDeclarationName, const QString &genericName) -> QString;
     static auto buildConcreteTypeName(
             const QString &componentName, const QString &interfaceName, const QString &genericName) -> QString;
 
@@ -61,7 +62,8 @@ private:
     inline static const QString m_arrayTypeNameTemplate = "%1Array-%2";
     inline static const QString m_bundledTypeNameTemplate = "%1-%2-Type%3";
     inline static const QString m_genericBundledTypeNameTemplate = "%1-%2-%3-Type";
-    inline static const QString m_concreteTypeNameTemplate = "%1-%2-%3";
+    inline static const QString m_concreteTypeNameDeclarationTemplate = "%1-%2";
+    inline static const QString m_concreteTypeNameImplementationTemplate = "%1-%2-%3";
 };
 
 } // namespace conversion::asn1::translator

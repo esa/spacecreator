@@ -55,13 +55,11 @@ using seds::model::InterfaceCommandMode;
 namespace conversion::asn1::translator {
 
 GenericInterfaceTypeCreator::GenericInterfaceTypeCreator(Context &context, Context &interfaceContext,
-        const seds::model::Interface &interface, const seds::model::InterfaceDeclaration *interfaceDeclaration,
-        const seds::model::Component &component)
+        const seds::model::Interface &interface, const seds::model::InterfaceDeclaration *interfaceDeclaration)
     : m_context(context)
     , m_interfaceContext(interfaceContext)
     , m_interfaceName(interface.nameStr())
     , m_interfaceDeclaration(interfaceDeclaration)
-    , m_component(component)
     , m_typeMapper(m_context, m_interfaceName)
 {
     if (!interface.genericTypeMapSet()) {
@@ -131,7 +129,7 @@ void GenericInterfaceTypeCreator::createConcreteTypeAlias(
 {
     const auto &genericName = genericType.nameStr();
     const auto concreteTypeName =
-            DataTypeTranslationHelper::buildConcreteTypeName(m_component.nameStr(), m_interfaceName, genericName);
+            DataTypeTranslationHelper::buildConcreteTypeName(m_context.componentName(), m_interfaceName, genericName);
     const auto concreteType = concreteMapping.type;
 
     auto aliasType =
@@ -149,7 +147,7 @@ void GenericInterfaceTypeCreator::createConcreteChoice(
 {
     const auto &genericName = genericType.nameStr();
     const auto concreteTypeName =
-            DataTypeTranslationHelper::buildConcreteTypeName(m_component.nameStr(), m_interfaceName, genericName);
+            DataTypeTranslationHelper::buildConcreteTypeName(m_context.componentName(), m_interfaceName, genericName);
 
     const auto &concreteMappings = mapping->concreteMappings;
 
@@ -327,14 +325,14 @@ void GenericInterfaceTypeCreator::createTypesForAsyncCommand(const seds::model::
     case seds::model::ArgumentsCombination::InOnly: {
         // In arguments are 'native', so they are handles as-is
         const auto bundledTypeName = DataTypeTranslationHelper::buildGenericBundledTypeName(
-                m_component.nameStr(), m_interfaceName, commandName);
+                m_context.componentName(), m_interfaceName, commandName);
         createAsyncCommandBundledType(command, bundledTypeName, seds::model::CommandArgumentMode::In);
     } break;
     case seds::model::ArgumentsCombination::OutOnly: {
         // Out arguments aren't supported by TASTE sporadic interface.
         // We cannot change the argument direction, so we switch interface type (provided <-> required)
         const auto bundledTypeName = DataTypeTranslationHelper::buildGenericBundledTypeName(
-                m_component.nameStr(), m_interfaceName, commandName);
+                m_context.componentName(), m_interfaceName, commandName);
         createAsyncCommandBundledType(command, bundledTypeName, seds::model::CommandArgumentMode::Out);
     } break;
     case seds::model::ArgumentsCombination::NoArgs: {
@@ -393,7 +391,7 @@ void GenericInterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const s
         }
 
         const auto argumentConcreteTypeName = DataTypeTranslationHelper::buildConcreteTypeName(
-                m_component.nameStr(), m_interfaceName, argumentTypeRef.nameStr());
+                m_context.componentName(), m_interfaceName, argumentTypeRef.nameStr());
         auto argumentType = m_context.findAsn1Type(argumentConcreteTypeName);
 
         auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(

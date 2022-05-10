@@ -78,7 +78,7 @@ public:
 
 public:
     auto addMappings(const seds::model::GenericTypeMapSet &typeMapSet) -> void;
-    auto getMapping(const QString &genericTypeName) -> const TypeMapping *;
+    auto getMapping(const QString &genericTypeName) const -> const TypeMapping *;
 
     auto determinantName() const -> const std::optional<QString> &;
     auto determinantTypePath() const -> const std::optional<QString> &;
