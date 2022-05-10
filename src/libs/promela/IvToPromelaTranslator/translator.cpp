@@ -190,7 +190,8 @@ auto IvToPromelaTranslator::Context::model() -> ::promela::model::PromelaModel *
     return m_promelaModel;
 }
 
-static auto addChannelAndLock(IvToPromelaTranslator::Context &context, const QString &functionName)
+void IvToPromelaTranslator::addChannelAndLock(
+        IvToPromelaTranslator::Context &context, const QString &functionName) const
 {
     QList<ChannelInit::Type> channelType;
     channelType.append(BasicType::INT);
@@ -340,7 +341,8 @@ InitProctype IvToPromelaTranslator::generateInitProctype(
     return InitProctype(std::move(sequence));
 }
 
-static QString observerInputSignalName(const IvToPromelaTranslator::ObserverAttachment &attachment)
+QString IvToPromelaTranslator::observerInputSignalName(
+        const IvToPromelaTranslator::ObserverAttachment &attachment) const
 {
     return QString("%1_0_PI_0_%2")
             .arg(Escaper::escapePromelaName(attachment.observer()))
