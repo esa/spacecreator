@@ -21,75 +21,40 @@
 #include "context.h"
 #include "generictypecreator.h"
 #include "generictypemapper.h"
+#include "interfacetypecreatorcontext.h"
 
 #include <optional>
 #include <seds/SedsModel/components/interface.h>
 #include <seds/SedsModel/generics/generictypemapset.h>
 #include <seds/SedsModel/interfaces/interfacedeclaration.h>
+#include <seds/SedsModel/interfaces/interfaceparameter.h>
 
 namespace conversion::asn1::translator {
-
-class InterfaceTypeCreatorContext final
-{
-public:
-    InterfaceTypeCreatorContext(Context &context, Context &interfaceContext, bool isGeneric,
-            const QString &interfaceName, const QString &parentInterfaceName,
-            const std::vector<const seds::model::GenericType *> &genericTypes,
-            const std::optional<seds::model::GenericTypeMapSet> &mappings);
-
-public:
-    auto handleType(const seds::model::DataTypeRef &typeRef, const std::vector<seds::model::DimensionSize> &dimensions)
-            -> Asn1Acn::Types::Type *;
-
-    auto context() const -> Context &;
-    auto interfaceContext() const -> Context &;
-    auto interfaceName() const -> const QString &;
-    auto isTypeGeneric(const seds::model::DataTypeRef &argumentType) const -> bool;
-
-private:
-    Context &m_context;
-    Context &m_interfaceContext;
-    bool m_isGeneric;
-    QString m_interfaceName;
-    QString m_parentInterfaceName;
-    const std::vector<const seds::model::GenericType *> &m_genericTypes;
-    GenericTypeMapper m_typeMapper;
-    GenericTypeCreator m_genericTypeCreator;
-};
 
 class InterfaceTypeCreator final
 {
 public:
-    InterfaceTypeCreator(Context &context);
+    InterfaceTypeCreator() = default;
 
 public:
-    auto createTypes(const seds::model::InterfaceDeclaration &interfaceDeclaration) -> void;
+    auto createTypes(const seds::model::InterfaceDeclaration &interfaceDeclaration, Context &context) -> void;
+    auto createTypes(const seds::model::Interface &interface, Context &context) -> void;
 
 private:
-    auto doCreateTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration, Context &context,
-            Context &interfaceContext, const QString &parentInterfaceName,
-            const std::optional<seds::model::GenericTypeMapSet> &mappings) -> void;
+    auto doCreateTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration, QString parentName,
+            const std::optional<seds::model::GenericTypeMapSet> &mappings, Context &mainContext,
+            Context &interfaceContext) -> void;
 
-    auto createTypesForParameter(const seds::model::InterfaceParameter &parameter, InterfaceTypeCreatorContext &context)
-            -> void;
+    auto createTypesForParameter(
+            const seds::model::InterfaceParameter &parameter, InterfaceTypeCreatorContext &typeCreatorContext) -> void;
 
-    auto createTypesForSyncCommand(const seds::model::InterfaceCommand &command, InterfaceTypeCreatorContext &context)
-            -> void;
-
-    auto createTypesForAsyncCommand(const seds::model::InterfaceCommand &command, InterfaceTypeCreatorContext &context)
-            -> void;
-    auto createAsyncCommandBundledType(const seds::model::InterfaceCommand &command, const QString &bundledTypeName,
-            const seds::model::CommandArgumentMode requestedArgumentMode, InterfaceTypeCreatorContext &context) -> void;
-    auto createAsyncCommandBundledTypeComponent(const seds::model::CommandArgument &argument,
-            Asn1Acn::Types::Sequence *bundledType, InterfaceTypeCreatorContext &context) -> void;
-
-    auto collectGenericTypes(
-            Context &interfaceContext, const seds::model::InterfaceDeclaration *interfaceDeclaration) const
-            -> std::vector<const seds::model::GenericType *>;
-    auto doCollectGenericTypes(Context &interfaceContext, const seds::model::InterfaceDeclaration *interfaceDeclaration,
+private:
+    auto collectGenericTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration,
+            Context &interfaceContext) const -> std::vector<const seds::model::GenericType *>;
+    auto doCollectGenericTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration, Context &interfaceContext,
             std::vector<const seds::model::GenericType *> &genericTypes) const -> void;
 
-    auto isInterfaceGeneric(const seds::model::InterfaceDeclaration *interfaceDeclaration,
+    auto isInterfaceDeclarationGeneric(const seds::model::InterfaceDeclaration *interfaceDeclaration,
             const std::vector<const seds::model::GenericType *> &genericTypes) -> bool;
     auto isParameterGeneric(const seds::model::InterfaceParameter &parameter,
             const std::vector<const seds::model::GenericType *> &genericTypes) -> bool;
@@ -97,9 +62,6 @@ private:
             const std::vector<const seds::model::GenericType *> &genericTypes) -> bool;
     auto isTypeGeneric(const seds::model::DataTypeRef &argumentType,
             const std::vector<const seds::model::GenericType *> &genericTypes) -> bool;
-
-private:
-    Context &m_context;
 };
 
 } // namespace conversion::asn1::translator

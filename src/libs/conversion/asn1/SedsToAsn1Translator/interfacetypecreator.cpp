@@ -38,141 +38,71 @@ using seds::model::InterfaceCommandMode;
 
 namespace conversion::asn1::translator {
 
-InterfaceTypeCreatorContext::InterfaceTypeCreatorContext(Context &context, Context &interfaceContext, bool isGeneric,
-        const QString &interfaceName, const QString &parentInterfaceName,
-        const std::vector<const GenericType *> &genericTypes,
-        const std::optional<seds::model::GenericTypeMapSet> &mappings)
-    : m_context(context)
-    , m_interfaceContext(interfaceContext)
-    , m_isGeneric(isGeneric)
-    , m_interfaceName(interfaceName)
-    , m_parentInterfaceName(parentInterfaceName)
-    , m_genericTypes(genericTypes)
-    , m_typeMapper(m_context, m_parentInterfaceName)
-    , m_genericTypeCreator(m_context, m_parentInterfaceName, m_typeMapper)
+void InterfaceTypeCreator::createTypes(const seds::model::InterfaceDeclaration &interfaceDeclaration, Context &context)
 {
-    if (mappings.has_value()) {
-        m_typeMapper.addMappings(*mappings);
-    }
-}
+    std::cerr << "Handling interface declaration: " << interfaceDeclaration.nameStr().toStdString() << '\n';
 
-Asn1Acn::Types::Type *InterfaceTypeCreatorContext::handleType(
-        const seds::model::DataTypeRef &typeRef, const std::vector<seds::model::DimensionSize> &dimensions)
-{
-    if (m_isGeneric && isTypeGeneric(typeRef)) {
-        const auto &genericName = typeRef.nameStr();
-        const auto mapping = m_typeMapper.getMapping(genericName);
+    doCreateTypes(&interfaceDeclaration, "", std::nullopt, context, context);
 
-        auto genericTypeRef = m_genericTypeCreator.createTypeForGeneric(mapping, genericName);
-
-        if (!dimensions.empty()) {
-            if (mapping->concreteMappings.size() > 1) {
-                auto errorMessage = QString("Array dimensions for alternate generic type '%1' for interface '%2' are "
-                                            "not supported because of the ACN limitations")
-                                            .arg(genericName)
-                                            .arg(m_parentInterfaceName);
-                throw TranslationException(std::move(errorMessage));
-            }
-
-            return DataTypeTranslationHelper::handleArrayType(m_context, genericTypeRef, dimensions);
-        } else {
-            return m_context.findAsn1Type(genericTypeRef);
-        }
-    } else {
-        return DataTypeTranslationHelper::handleArrayType(m_interfaceContext, typeRef, dimensions);
-    }
-}
-
-Context &InterfaceTypeCreatorContext::context() const
-{
-    return m_context;
-}
-
-Context &InterfaceTypeCreatorContext::interfaceContext() const
-{
-    return m_interfaceContext;
-}
-
-const QString &InterfaceTypeCreatorContext::interfaceName() const
-{
-    if (m_isGeneric) {
-        return m_parentInterfaceName;
-    } else {
-        return m_interfaceName;
-    }
-}
-
-bool InterfaceTypeCreatorContext::isTypeGeneric(const seds::model::DataTypeRef &typeRef) const
-{
-    if (typeRef.packageStr()) {
-        return false;
-    }
-
-    const auto found = std::find_if(m_genericTypes.begin(), m_genericTypes.end(),
-            [&](const auto genericType) { return genericType->nameStr() == typeRef.nameStr(); });
-
-    return (found != m_genericTypes.end());
-}
-
-InterfaceTypeCreator::InterfaceTypeCreator(Context &context)
-    : m_context(context)
-{
-}
-
-void InterfaceTypeCreator::createTypes(const seds::model::InterfaceDeclaration &interfaceDeclaration)
-{
-    doCreateTypes(&interfaceDeclaration, m_context, m_context, "", std::nullopt);
     std::cerr << '\n';
 }
 
-void InterfaceTypeCreator::doCreateTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration,
-        Context &context, Context &interfaceContext, const QString &parentInterfaceName,
-        const std::optional<GenericTypeMapSet> &mappings)
+void InterfaceTypeCreator::createTypes(const seds::model::Interface &interface, Context &context)
 {
-    const auto genericTypes = collectGenericTypes(interfaceContext, interfaceDeclaration);
-    std::cerr << "Number of generic types: " << genericTypes.size() << '\n';
+    std::cerr << "Handling interface implementation: " << interface.nameStr().toStdString() << " of type "
+              << interface.type().value().pathStr().toStdString() << '\n';
 
-    bool isGeneric = isInterfaceGeneric(interfaceDeclaration, genericTypes);
+    const auto &interfaceTypeRef = interface.type();
+    const auto &interfaceDeclaration = context.findInterfaceDeclaration(interfaceTypeRef);
+    const auto parentName = QString("%1-%2").arg(context.componentName()).arg(interface.nameStr());
+    const auto &mappings = interface.genericTypeMapSet();
 
-    if (!isGeneric || mappings.has_value()) {
-        InterfaceTypeCreatorContext typeCreatorContext(context, interfaceContext, isGeneric,
-                interfaceDeclaration->nameStr(), parentInterfaceName, genericTypes, mappings);
+    if (interfaceTypeRef.packageStr()) {
+        auto interfaceContext = context.cloneForPackage(*interfaceTypeRef.packageStr());
+        doCreateTypes(interfaceDeclaration, parentName, mappings, context, interfaceContext);
+    } else {
+        doCreateTypes(interfaceDeclaration, parentName, mappings, context, context);
+    }
+}
 
-        for (const auto &parameter : interfaceDeclaration->parameters()) {
-            createTypesForParameter(parameter, typeCreatorContext);
-        }
+void InterfaceTypeCreator::doCreateTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration,
+        QString parentName, const std::optional<seds::model::GenericTypeMapSet> &mappings, Context &mainContext,
+        Context &interfaceContext)
+{
+    std::cerr << "\tTranslating interface declaration: " << interfaceDeclaration->nameStr().toStdString() << '\n';
 
-        for (const auto &command : interfaceDeclaration->commands()) {
-            switch (command.mode()) {
-            case InterfaceCommandMode::Sync:
-                createTypesForSyncCommand(command, typeCreatorContext);
-                break;
-            case InterfaceCommandMode::Async:
-                createTypesForAsyncCommand(command, typeCreatorContext);
-                break;
-            default:
-                throw UnhandledValueException("InterfaceCommandMode");
-            }
-        }
+    const auto genericTypes = collectGenericTypes(interfaceDeclaration, interfaceContext);
+
+    InterfaceTypeCreatorContext typeCreatorContext(mainContext, interfaceContext, parentName, genericTypes, mappings);
+    typeCreatorContext.debugPrint();
+
+    const auto &parameters = interfaceDeclaration->parameters();
+    for (const auto &parameter : parameters) {
+        createTypesForParameter(parameter, typeCreatorContext);
     }
 
+    const auto &commands = interfaceDeclaration->commands();
+    for (const auto &command : commands) {
+    }
+
+    std::cerr << '\n';
+
     for (const auto &baseInterface : interfaceDeclaration->baseInterfaces()) {
-        const auto &baseInterfaceType = baseInterface.type();
-        const auto baseInterfaceDeclaration = interfaceContext.findInterfaceDeclaration(baseInterfaceType);
+        const auto &baseInterfaceTypeRef = baseInterface.type();
+        const auto &baseInterfaceDeclaration = interfaceContext.findInterfaceDeclaration(baseInterfaceTypeRef);
 
-        auto &mainContext = baseInterface.genericTypeMapSet() ? interfaceContext : context;
-        const auto &baseInterfaceMappings =
-                baseInterface.genericTypeMapSet() ? baseInterface.genericTypeMapSet() : mappings;
+        auto &baseInterfaceParentName =
+                baseInterface.genericTypeMapSet() ? interfaceDeclaration->nameStr() : parentName;
+        auto &baseInterfaceMainContext = baseInterface.genericTypeMapSet() ? interfaceContext : mainContext;
+        auto &baseInterfaceMappings = baseInterface.genericTypeMapSet() ? baseInterface.genericTypeMapSet() : mappings;
 
-        if (baseInterfaceType.packageStr()) {
-            const auto baseInterfacePackageName = *baseInterfaceType.packageStr();
-            auto baseInterfaceContext = interfaceContext.cloneForPackage(baseInterfacePackageName);
-
-            doCreateTypes(baseInterfaceDeclaration, mainContext, baseInterfaceContext, interfaceDeclaration->nameStr(),
-                    baseInterfaceMappings);
+        if (baseInterfaceTypeRef.packageStr()) {
+            auto baseInterfaceContext = interfaceContext.cloneForPackage(*baseInterfaceTypeRef.packageStr());
+            doCreateTypes(baseInterfaceDeclaration, baseInterfaceParentName, baseInterfaceMappings,
+                    baseInterfaceMainContext, baseInterfaceContext);
         } else {
-            doCreateTypes(baseInterfaceDeclaration, mainContext, interfaceContext, interfaceDeclaration->nameStr(),
-                    baseInterfaceMappings);
+            doCreateTypes(baseInterfaceDeclaration, baseInterfaceParentName, baseInterfaceMappings,
+                    baseInterfaceMainContext, interfaceContext);
         }
     }
 }
@@ -180,116 +110,19 @@ void InterfaceTypeCreator::doCreateTypes(const seds::model::InterfaceDeclaration
 void InterfaceTypeCreator::createTypesForParameter(
         const seds::model::InterfaceParameter &parameter, InterfaceTypeCreatorContext &typeCreatorContext)
 {
-    typeCreatorContext.handleType(parameter.type(), parameter.arrayDimensions());
-}
+    const auto parameterTypeRef = parameter.type();
+    std::cerr << "\tParameter '" << parameter.nameStr().toStdString() << "' type "
+              << parameterTypeRef.value().pathStr().toStdString() << '\n';
 
-void InterfaceTypeCreator::createTypesForSyncCommand(
-        const seds::model::InterfaceCommand &command, InterfaceTypeCreatorContext &typeCreatorContext)
-{
-    for (const auto &argument : command.arguments()) {
-        typeCreatorContext.handleType(argument.type(), argument.arrayDimensions());
-    }
-}
-
-void InterfaceTypeCreator::createTypesForAsyncCommand(
-        const seds::model::InterfaceCommand &command, InterfaceTypeCreatorContext &typeCreatorContext)
-{
-    const auto &interfaceName = typeCreatorContext.interfaceName();
-    const auto commandName = Escaper::escapeAsn1TypeName(command.nameStr());
-
-    // Process command based on its commands
-    switch (command.argumentsCombination()) {
-    case seds::model::ArgumentsCombination::InOnly: {
-        // In arguments are 'native', so they are handles as-is
-        const auto bundledTypeName = DataTypeTranslationHelper::buildBundledTypeName(interfaceName, commandName);
-        createAsyncCommandBundledType(
-                command, bundledTypeName, seds::model::CommandArgumentMode::In, typeCreatorContext);
-    } break;
-    case seds::model::ArgumentsCombination::OutOnly: {
-        // Out arguments aren't supported by TASTE sporadic interface.
-        // We cannot change the argument direction, so we switch interface type (provided <-> required)
-        const auto bundledTypeName = DataTypeTranslationHelper::buildBundledTypeName(interfaceName, commandName);
-        createAsyncCommandBundledType(
-                command, bundledTypeName, seds::model::CommandArgumentMode::Out, typeCreatorContext);
-    } break;
-    case seds::model::ArgumentsCombination::InAndNotify: {
-        // InAndNotify arguments are separated onto two interfaces
-        // In arguments - as-is
-        const auto inBundledTypeName =
-                DataTypeTranslationHelper::buildBundledTypeName(interfaceName, commandName, "In");
-        createAsyncCommandBundledType(
-                command, inBundledTypeName, seds::model::CommandArgumentMode::In, typeCreatorContext);
-        // Notify arguments - switched interface type (provided <-> required)
-        const auto notifyBundledTypeName =
-                DataTypeTranslationHelper::buildBundledTypeName(interfaceName, commandName, "Notify");
-        createAsyncCommandBundledType(
-                command, notifyBundledTypeName, seds::model::CommandArgumentMode::Notify, typeCreatorContext);
-    } break;
-    case seds::model::ArgumentsCombination::NoArgs: {
-        // No arguments, no problems
-        break;
-    }
-    case seds::model::ArgumentsCombination::NotifyOnly:
-    case seds::model::ArgumentsCombination::InAndOut:
-    case seds::model::ArgumentsCombination::OutAndNotify:
-    case seds::model::ArgumentsCombination::All: {
-        const auto message = QString(
-                "Interface command arguments combination '%1' is not supported for TASTE InterfaceView async interface")
-                                     .arg(argumentsCombinationToString(command.argumentsCombination()));
-        throw TranslationException(message);
-    } break;
-    default:
-        throw UnhandledValueException("ArgumentsCombination");
-        break;
-    }
-}
-
-void InterfaceTypeCreator::createAsyncCommandBundledType(const seds::model::InterfaceCommand &command,
-        const QString &bundledTypeName, const seds::model::CommandArgumentMode requestedArgumentMode,
-        InterfaceTypeCreatorContext &typeCreatorContext)
-{
-    auto &context = typeCreatorContext.interfaceContext();
-
-    if (context.hasAsn1Type(bundledTypeName)) {
-        return;
-    }
-
-    auto bundledType = std::make_unique<Asn1Acn::Types::Sequence>(bundledTypeName);
-
-    for (const auto &argument : command.arguments()) {
-        if (argument.mode() != requestedArgumentMode) {
-            continue;
-        }
-
-        createAsyncCommandBundledTypeComponent(argument, bundledType.get(), typeCreatorContext);
-    }
-
-    context.addAsn1Type(std::move(bundledType), nullptr);
-}
-
-void InterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const seds::model::CommandArgument &argument,
-        Asn1Acn::Types::Sequence *bundledType, InterfaceTypeCreatorContext &typeCreatorContext)
-{
-    const auto argumentName = Escaper::escapeAsn1FieldName(argument.nameStr());
-    const auto argumentType = typeCreatorContext.handleType(argument.type(), argument.arrayDimensions());
-
-    auto sequenceComponentType =
-            std::make_unique<Asn1Acn::Types::UserdefinedType>(argumentType->identifier(), m_context.definitionsName());
-    sequenceComponentType->setType(argumentType->clone());
-
-    std::unique_ptr<Asn1Acn::SequenceComponent> sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            argumentName, argumentName, false, std::nullopt, "", Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
-            Asn1Acn::SourceLocation(), std::move(sequenceComponentType));
-
-    bundledType->addComponent(std::move(sequenceComponent));
+    typeCreatorContext.handleType(parameterTypeRef, parameter.arrayDimensions());
 }
 
 std::vector<const GenericType *> InterfaceTypeCreator::collectGenericTypes(
-        Context &interfaceContext, const seds::model::InterfaceDeclaration *interfaceDeclaration) const
+        const seds::model::InterfaceDeclaration *interfaceDeclaration, Context &interfaceContext) const
 {
     std::vector<const GenericType *> genericTypes;
 
-    doCollectGenericTypes(interfaceContext, interfaceDeclaration, genericTypes);
+    doCollectGenericTypes(interfaceDeclaration, interfaceContext, genericTypes);
 
     const auto it = std::unique(genericTypes.begin(), genericTypes.end(),
             [](const auto lhs, const auto rhs) { return lhs->nameStr() == rhs->nameStr(); });
@@ -302,9 +135,8 @@ std::vector<const GenericType *> InterfaceTypeCreator::collectGenericTypes(
     return genericTypes;
 }
 
-void InterfaceTypeCreator::doCollectGenericTypes(Context &interfaceContext,
-        const seds::model::InterfaceDeclaration *interfaceDeclaration,
-        std::vector<const GenericType *> &genericTypes) const
+void InterfaceTypeCreator::doCollectGenericTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration,
+        Context &interfaceContext, std::vector<const GenericType *> &genericTypes) const
 {
     const auto &interfaceGenericTypes = interfaceDeclaration->genericTypes();
 
@@ -313,21 +145,19 @@ void InterfaceTypeCreator::doCollectGenericTypes(Context &interfaceContext,
     }
 
     for (const auto &baseInterface : interfaceDeclaration->baseInterfaces()) {
-        const auto &baseInterfaceType = baseInterface.type();
-        const auto &baseInterfaceDeclaration = interfaceContext.findInterfaceDeclaration(baseInterfaceType);
+        const auto &baseInterfaceTypeRef = baseInterface.type();
+        const auto &baseInterfaceDeclaration = interfaceContext.findInterfaceDeclaration(baseInterfaceTypeRef);
 
-        if (baseInterfaceType.packageStr()) {
-            const auto baseInterfacePackageName = *baseInterfaceType.packageStr();
-            auto baseInterfaceContext = interfaceContext.cloneForPackage(baseInterfacePackageName);
-
-            doCollectGenericTypes(baseInterfaceContext, baseInterfaceDeclaration, genericTypes);
+        if (baseInterfaceTypeRef.packageStr()) {
+            auto baseInterfaceContext = interfaceContext.cloneForPackage(*baseInterfaceTypeRef.packageStr());
+            doCollectGenericTypes(baseInterfaceDeclaration, baseInterfaceContext, genericTypes);
         } else {
-            doCollectGenericTypes(interfaceContext, baseInterfaceDeclaration, genericTypes);
+            doCollectGenericTypes(baseInterfaceDeclaration, interfaceContext, genericTypes);
         }
     }
 }
 
-bool InterfaceTypeCreator::isInterfaceGeneric(const seds::model::InterfaceDeclaration *interfaceDeclaration,
+bool InterfaceTypeCreator::isInterfaceDeclarationGeneric(const seds::model::InterfaceDeclaration *interfaceDeclaration,
         const std::vector<const GenericType *> &genericTypes)
 {
     if (genericTypes.empty()) {

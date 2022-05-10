@@ -6,6 +6,7 @@ set(SOURCES     context.cpp
                 generictypecreator.cpp
                 generictypemapper.cpp
                 interfacetypecreator.cpp
+                interfacetypecreatorcontext.cpp
                 packagesdependencyresolver.cpp
                 patchersnippetsgenerator.cpp
                 translator.cpp
@@ -25,6 +26,7 @@ set(INCLUDES    context.h
                 generictypecreator.cpp
                 generictypemapper.h
                 interfacetypecreator.h
+                interfacetypecreatorcontext.h
                 packagesdependencyresolver.h
                 patchersnippetsgenerator.h
                 translator.h

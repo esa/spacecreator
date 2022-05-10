@@ -89,14 +89,21 @@
     <DeclaredInterfaceSet>
       <Interface name="InterfaceDecl3">
         <BaseInterfaceSet>
-          <Interface type="com/n7space/InterfaceInheritance1/InterfaceDecl2">
+          <Interface type="com/n7space/InterfaceInheritance1/InterfaceDecl2"/>
         </BaseInterfaceSet>
         <GenericTypeSet>
           <GenericType name="Generic3" />
         </GenericTypeSet>
+        <ParameterSet>
+          <Parameter name="Param3" type="Generic2" mode="async" readOnly="true">
+            <ArrayDimensions>
+              <Dimension size="3" />
+            </ArrayDimensions>
+          </Parameter>
+        </ParameterSet>
         <CommandSet>
           <Command name="Async3" mode="async">
-            <Argument name="Arg1" type="Generic2" mode="in" />
+            <Argument name="Arg1" type="Generic3" mode="in" />
             <Argument name="Arg2" type="Generic3" mode="in" />
           </Command>
         </CommandSet>
@@ -135,19 +142,19 @@
               </Parameter>
             </ParameterSet>
             <CommandSet>
-              <Command name="Sync4" mode="sync">
+              <Command name="Sync5" mode="sync">
                 <Argument name="Arg1" type="Generic2" mode="in">
                   <ArrayDimensions>
-                    <Dimension size="4" />
+                    <Dimension size="5" />
                   </ArrayDimensions>
                 </Argument>
                 <Argument name="Arg2" type="Generic3" mode="in">
                   <ArrayDimensions>
-                    <Dimension size="4" />
+                    <Dimension size="5" />
                   </ArrayDimensions>
                 </Argument>
               </Command>
-              <Command name="Async4" mode="async">
+              <Command name="Async5" mode="async">
                 <Argument name="Arg1" type="Generic2" mode="in" />
                 <Argument name="Arg2" type="Generic3" mode="in" />
               </Command>
@@ -157,8 +164,8 @@
         <ProvidedInterfaceSet>
           <Interface name="InterfaceImplementation" type="InterfaceDecl5">
             <GenericTypeMapSet>
-              <GenericTypeMap name="Generic2" type="OtherInteger">
-              <GenericTypeMap name="Generic3" type="ComponentInteger">
+              <GenericTypeMap name="Generic2" type="OtherInteger"/>
+              <GenericTypeMap name="Generic3" type="ComponentInteger"/>
             </GenericTypeMapSet>
           </Interface>
         </ProvidedInterfaceSet>

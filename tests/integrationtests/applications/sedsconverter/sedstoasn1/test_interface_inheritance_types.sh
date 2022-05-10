@@ -23,6 +23,12 @@ cd $TEST_OUTPUT_DIR
 
 $DIFF COM-N7SPACE-INTERFACEINHERITANCE1.asn ../resources/test_interface_inheritance_types1_asn.output \
     && $DIFF COM-N7SPACE-INTERFACEINHERITANCE1.acn ../resources/test_interface_inheritance_types1_acn.output \
-    && asn1scc -c COM-N7SPACE-INTERFACEINHERITANCE1.asn COM-N7SPACE-INTERFACEINHERITANCE1.acn  \
+    && $DIFF COM-N7SPACE-INTERFACEINHERITANCE2.asn ../resources/test_interface_inheritance_types2_asn.output \
+    && $DIFF COM-N7SPACE-INTERFACEINHERITANCE2.acn ../resources/test_interface_inheritance_types2_acn.output \
+    && $DIFF COM-N7SPACE-INTERFACEINHERITANCE2-COMPONENT.asn ../resources/test_interface_inheritance_types2_component_asn.output \
+    && $DIFF COM-N7SPACE-INTERFACEINHERITANCE2-COMPONENT.acn ../resources/test_interface_inheritance_types2_component_acn.output \
+    && asn1scc -c COM-N7SPACE-INTERFACEINHERITANCE1.asn COM-N7SPACE-INTERFACEINHERITANCE1.acn \
+                  COM-N7SPACE-INTERFACEINHERITANCE2.asn COM-N7SPACE-INTERFACEINHERITANCE2.acn \
+                  COM-N7SPACE-INTERFACEINHERITANCE2-COMPONENT.asn COM-N7SPACE-INTERFACEINHERITANCE2-COMPONENT.acn \
     && cd .. \
     && rm -r -f $TEST_OUTPUT_DIR

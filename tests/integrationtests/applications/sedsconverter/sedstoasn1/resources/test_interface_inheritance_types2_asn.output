@@ -1,0 +1,7 @@
+COM-N7SPACE-INTERFACEINHERITANCE2 DEFINITIONS ::= BEGIN
+OtherInteger ::= INTEGER(0 .. 255)
+OtherFloat ::= REAL(-3.40282e+38 .. 3.40282e+38)
+InterfaceDecl4-Generic2 ::= OtherInteger(0 .. 255)
+InterfaceDecl4-Generic2Array-3 ::= SEQUENCE (SIZE(3)) OF InterfaceDecl4-Generic2(0 .. 255)
+InterfaceDecl4-Generic2Array-2 ::= SEQUENCE (SIZE(2)) OF InterfaceDecl4-Generic2(0 .. 255)
+END

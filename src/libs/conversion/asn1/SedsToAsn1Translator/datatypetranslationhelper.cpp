@@ -73,6 +73,27 @@ QString DataTypeTranslationHelper::buildConcreteTypeName(
     return m_concreteTypeNameImplementationTemplate.arg(componentName).arg(interfaceName).arg(genericName);
 }
 
+seds::model::DataTypeRef DataTypeTranslationHelper::createArrayType(Context &context,
+        const seds::model::DataTypeRef &baseTypeRef, const std::vector<seds::model::DimensionSize> &dimensions)
+{
+    const auto name = buildArrayTypeName(baseTypeRef.nameStr(), dimensions);
+
+    if (!context.hasAsn1Type(name)) {
+        seds::model::ArrayDataType sedsArray;
+        sedsArray.setName(name);
+        sedsArray.setType(baseTypeRef);
+
+        for (auto dimension : dimensions) {
+            sedsArray.addDimension(std::move(dimension));
+        }
+
+        DataTypeTranslatorVisitor dataTypeTranslator(context);
+        dataTypeTranslator(sedsArray);
+    }
+
+    return name;
+}
+
 Asn1Acn::Types::Type *DataTypeTranslationHelper::handleArrayType(Context &context,
         const seds::model::DataTypeRef &argumentTypeRef, const std::vector<seds::model::DimensionSize> &dimensions)
 {

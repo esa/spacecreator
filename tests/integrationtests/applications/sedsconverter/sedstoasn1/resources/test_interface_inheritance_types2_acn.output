@@ -1,0 +1,7 @@
+COM-N7SPACE-INTERFACEINHERITANCE2 DEFINITIONS ::= BEGIN
+OtherInteger [size 8, encoding pos-int]
+OtherFloat [encoding IEEE754-1985-32, endianness big]
+InterfaceDecl4-Generic2 []
+InterfaceDecl4-Generic2Array-3 []
+InterfaceDecl4-Generic2Array-2 []
+END
