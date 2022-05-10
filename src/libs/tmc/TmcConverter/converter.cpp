@@ -253,7 +253,7 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
 
     QStringList asn1Files;
 
-    for (auto &info : m_observerInfos) {
+    for (const auto &info : m_observerInfos) {
         integrateObserver(info, m_observerNames, asn1Files, allSdlFiles, m_observerAttachmentInfos);
     }
 
@@ -330,7 +330,7 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
         options.add(PromelaOptions::observerFunctionName, observer);
     }
 
-    for (auto &info : m_observerAttachmentInfos) {
+    for (const auto &info : m_observerAttachmentInfos) {
         options.add(PromelaOptions::observerAttachment, info);
     }
 

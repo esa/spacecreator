@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
     if (!verifier.addStopConditionFiles(stopConditionFiles)) {
         return EXIT_FAILURE;
     }
-    for (auto &info : observerInfos) {
+    for (const auto &info : observerInfos) {
 
         if (!verifier.attachObserver(extractObserverPath(info), extractObserverPriority(info))) {
             return EXIT_FAILURE;

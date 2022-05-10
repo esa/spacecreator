@@ -169,9 +169,14 @@ auto IvToPromelaTranslator::Context::getObserverAttachments(const QString &funct
         const ObserverAttachment::Kind kind) -> const IvToPromelaTranslator::ObserverAttachments
 {
     ObserverAttachments result;
-    // [] may create new keys, but performance penalty is negligible and code is more terse
-    // The best way to implement this would be to use LINQ-like C++20 ranges
-    for (const auto attachment : m_observerAttachments[function][interface]) {
+    if (m_observerAttachments.find(function) == m_observerAttachments.end()) {
+        return result;
+    }
+    const auto &attachments = m_observerAttachments.at(function);
+    if (attachments.find(interface) == attachments.end()) {
+        return result;
+    }
+    for (const auto &attachment : attachments.at(interface)) {
         if (attachment.kind() == kind) {
             result.push_back(attachment);
         }
@@ -190,7 +195,8 @@ auto IvToPromelaTranslator::Context::model() -> ::promela::model::PromelaModel *
     return m_promelaModel;
 }
 
-static auto addChannelAndLock(IvToPromelaTranslator::Context &context, const QString &functionName)
+void IvToPromelaTranslator::addChannelAndLock(
+        IvToPromelaTranslator::Context &context, const QString &functionName) const
 {
     QList<ChannelInit::Type> channelType;
     channelType.append(BasicType::INT);
@@ -340,7 +346,8 @@ InitProctype IvToPromelaTranslator::generateInitProctype(
     return InitProctype(std::move(sequence));
 }
 
-static QString observerInputSignalName(const IvToPromelaTranslator::ObserverAttachment &attachment)
+QString IvToPromelaTranslator::observerInputSignalName(
+        const IvToPromelaTranslator::ObserverAttachment &attachment) const
 {
     return QString("%1_0_PI_0_%2")
             .arg(Escaper::escapePromelaName(attachment.observer()))

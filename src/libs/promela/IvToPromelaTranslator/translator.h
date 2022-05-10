@@ -30,7 +30,7 @@ namespace promela::translator {
  */
 class IvToPromelaTranslator final : public ::conversion::translator::Translator
 {
-public:
+private:
     /**
      * @brief Parsed Observer Attachment specification
      */
@@ -177,6 +177,7 @@ public:
         std::map<QString, std::map<QString, ObserverAttachments>> m_observerAttachments;
     };
 
+public:
     /**
      * @brief   Translate given InterfaceView model into an Promela model
      *
@@ -208,6 +209,8 @@ public:
     auto getDependencies() const -> std::set<conversion::ModelType> override;
 
 private:
+    auto addChannelAndLock(IvToPromelaTranslator::Context &context, const QString &functionName) const -> void;
+    auto observerInputSignalName(const IvToPromelaTranslator::ObserverAttachment &attachment) const -> QString;
     auto attachInputObservers(IvToPromelaTranslator::Context &context, const QString &functionName,
             const QString &interfaceName, const QString &parameterName, const QString &parameterType,
             promela::model::Sequence *sequence) const -> void;
