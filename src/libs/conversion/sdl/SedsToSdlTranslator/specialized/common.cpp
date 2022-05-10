@@ -20,7 +20,6 @@
 #include "common.h"
 
 #include <algorithm>
-#include <iostream>
 #include <ivcore/ivfunction.h>
 
 namespace conversion::sdl::translator {
@@ -151,7 +150,6 @@ auto Context::addProvidedCommand(
         const QString &interface, const QString &name, const seds::model::InterfaceCommand *definition) -> void
 {
     CommandInfo info(true, interface, name, definition);
-    std::cout << "Adding provided command " << name.toStdString() << std::endl;
     m_commands[std::make_pair(interface, name)] = info;
 }
 
@@ -159,7 +157,6 @@ auto Context::addRequiredCommand(
         const QString &interface, const QString &name, const seds::model::InterfaceCommand *definition) -> void
 {
     CommandInfo info(false, interface, name, definition);
-    std::cout << "Adding required command " << name.toStdString() << std::endl;
     m_commands.emplace(std::make_pair(interface, name), std::move(info));
 }
 
