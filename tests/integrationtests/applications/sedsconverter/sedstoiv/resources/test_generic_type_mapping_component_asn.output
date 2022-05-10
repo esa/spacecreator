@@ -3,10 +3,6 @@ IMPORTS
 MyInteger FROM TYPEMAPPING
 ;
 MegaComponent-ProvidedInterface-GenericType ::= MyInteger(0 .. 255)
-MegaComponent-ProvidedInterface-AsyncCommandNoMapping-Type ::= SEQUENCE
-{
-    argumentNoMapping MyInteger(0 .. 255)
-}
 MegaComponent-ProvidedInterface-AsyncCommandSimpleMapping-Type ::= SEQUENCE
 {
     argumentSimpleMapping MegaComponent-ProvidedInterface-GenericType(0 .. 255)

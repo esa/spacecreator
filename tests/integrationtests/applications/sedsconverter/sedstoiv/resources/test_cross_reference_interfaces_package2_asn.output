@@ -1,2 +1,12 @@
 COM-N7SPACE-PACKAGE2 DEFINITIONS ::= BEGIN
+IMPORTS
+MappedItem FROM COM-N7SPACE-PACKAGE3
+Package3Item FROM COM-N7SPACE-PACKAGE3
+;
+ChildInterface-GenericType ::= MappedItem(0 .. 255)
+ChildInterface-AsyncCommandSimpleMapping-Type ::= SEQUENCE
+{
+    argumentSimpleMapping ChildInterface-GenericType(0 .. 255),
+    argumentLocal Package3Item(0 .. 255)
+}
 END

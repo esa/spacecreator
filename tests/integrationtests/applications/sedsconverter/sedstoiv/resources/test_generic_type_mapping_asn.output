@@ -1,3 +1,7 @@
 TYPEMAPPING DEFINITIONS ::= BEGIN
 MyInteger ::= INTEGER(0 .. 255)
+MegaInterface-AsyncCommandNoMapping-Type ::= SEQUENCE
+{
+    argumentNoMapping MyInteger(0 .. 255)
+}
 END

@@ -1,3 +1,7 @@
 TYPEMAPPING DEFINITIONS ::= BEGIN
 MyInteger [size 8, encoding pos-int, endianness big]
+MegaInterface-AsyncCommandNoMapping-Type []
+{
+    argumentNoMapping []
+}
 END

@@ -2,36 +2,21 @@ COM-N7SPACE-PACKAGE1-MEGACOMPONENT DEFINITIONS ::= BEGIN
 IMPORTS
 AlternateItem1 FROM COM-N7SPACE-PACKAGE2
 AlternateItem2 FROM COM-N7SPACE-PACKAGE2
-AsyncItem FROM COM-N7SPACE-PACKAGE2
-AsyncItemArray FROM COM-N7SPACE-PACKAGE2
 DeterminantItem FROM COM-N7SPACE-PACKAGE2
 MappedAsyncItem FROM COM-N7SPACE-PACKAGE2
 MappedSyncItem FROM COM-N7SPACE-PACKAGE2
-ParameterItem FROM COM-N7SPACE-PACKAGE2
-SyncItem FROM COM-N7SPACE-PACKAGE2
-SyncItemArray FROM COM-N7SPACE-PACKAGE2
 ;
 MegaComponent-ProvidedInterface-SyncGenericType ::= MappedSyncItem(0 .. 255)
 MegaComponent-ProvidedInterface-AsyncGenericType ::= MappedAsyncItem(0 .. 255)
+MegaComponent-ProvidedInterface-AsyncCommandSimpleMapping-Type ::= SEQUENCE
+{
+    argumentSimpleMapping MegaComponent-ProvidedInterface-AsyncGenericType(0 ..  255)
+}
+MegaComponent-ProvidedInterface-DeterminantGenericType ::= DeterminantItem(0 ..  1)
 MegaComponent-ProvidedInterface-AlternateGenericType ::= CHOICE
 {
     concrete0 AlternateItem1(0 .. 255),
     concrete1 AlternateItem2(0 .. 255)
-}
-MegaComponent-ProvidedInterface-DeterminantGenericType ::= DeterminantItem(0 ..  1)
-SyncItemArrayArray-10 ::= SEQUENCE (SIZE(10)) OF SyncItemArray(0 .. 255)
-MegaComponent-ProvidedInterface-AsyncCommandNoMapping-Type ::= SEQUENCE
-{
-    argumentNoMapping AsyncItem(0 .. 255)
-}
-AsyncItemArrayArray-10 ::= SEQUENCE (SIZE(10)) OF AsyncItemArray(0 .. 255)
-MegaComponent-ProvidedInterface-AsyncCommandNoMappingArray-Type ::= SEQUENCE
-{
-    arrayArgumentNoMapping AsyncItemArrayArray-10(SIZE(10))
-}
-MegaComponent-ProvidedInterface-AsyncCommandSimpleMapping-Type ::= SEQUENCE
-{
-    argumentSimpleMapping MegaComponent-ProvidedInterface-AsyncGenericType(0 ..  255)
 }
 MegaComponent-ProvidedInterface-AsyncCommandAlternateMapping-Type ::= SEQUENCE
 {

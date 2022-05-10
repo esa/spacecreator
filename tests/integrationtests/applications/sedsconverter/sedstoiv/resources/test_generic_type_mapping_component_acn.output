@@ -1,9 +1,5 @@
 TYPEMAPPING-MEGACOMPONENT DEFINITIONS ::= BEGIN
 MegaComponent-ProvidedInterface-GenericType []
-MegaComponent-ProvidedInterface-AsyncCommandNoMapping-Type []
-{
-    argumentNoMapping []
-}
 MegaComponent-ProvidedInterface-AsyncCommandSimpleMapping-Type []
 {
     argumentSimpleMapping []
