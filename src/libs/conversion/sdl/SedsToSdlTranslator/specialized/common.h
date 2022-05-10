@@ -111,6 +111,15 @@ class CommandInfo
 {
 public:
     /**
+     * Type of the host interface
+     */
+    enum class HostInterfaceType
+    {
+        Provided, //< Command is hosted by a provided interface
+        Required //< Command is hosted by a required interface
+    };
+
+    /**
      * @brief Default parameterless constructor
      */
     CommandInfo() = default;
@@ -118,20 +127,20 @@ public:
     /**
      * @brief Constructor
      *
-     * @param isProvided Is the command in a provided interface
+     * @param interfaceType Host interface type
      * @param interface Interface name
      * @param name Command name
      * @param definition Command definition
      */
-    CommandInfo(const bool isProvided, const QString &interface, const QString &name,
+    CommandInfo(const HostInterfaceType interfaceType, const QString &interface, const QString &name,
             const seds::model::InterfaceCommand *definition);
 
     /**
-     * @brief Getter for the isProvided property
+     * @brief Getter for the command's interface type
      *
-     * @returns Whether the command is in a provided interface
+     * @returns Command's interface type
      */
-    auto isProvided() const -> bool;
+    auto interfaceType() const -> HostInterfaceType;
 
     /**
      * @brief Getter for the command's interface name
@@ -155,7 +164,7 @@ public:
     auto definition() const -> const seds::model::InterfaceCommand *;
 
 private:
-    bool m_isProvided;
+    HostInterfaceType m_interfaceType;
     QString m_interface;
     QString m_name;
     const seds::model::InterfaceCommand *m_definition;

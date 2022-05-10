@@ -278,7 +278,7 @@ auto StatementTranslatorVisitor::operator()(const seds::model::SendCommandPrimit
 
     // Check, if this is a sync return call
     const auto &command = m_context.getCommand(interfaceName, commandName);
-    if (command != nullptr && command->isProvided()
+    if (command != nullptr && command->interfaceType() == CommandInfo::HostInterfaceType::Provided
             && command->definition()->mode() == seds::model::InterfaceCommandMode::Sync) {
         // Registered and provided sync command
         // SendCommandPrimitive is basically a return statement

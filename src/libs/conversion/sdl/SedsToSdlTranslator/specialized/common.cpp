@@ -59,18 +59,18 @@ auto ActivityInfo::addAssignment(AssignmentInfo assignment) -> void
     m_returnAssignments.push_back(std::move(assignment));
 }
 
-CommandInfo::CommandInfo(const bool isProvided, const QString &interface, const QString &name,
-        const seds::model::InterfaceCommand *definition)
+CommandInfo::CommandInfo(const CommandInfo::HostInterfaceType interfaceType, const QString &interface,
+        const QString &name, const seds::model::InterfaceCommand *definition)
 {
-    m_isProvided = isProvided;
+    m_interfaceType = interfaceType;
     m_interface = interface;
     m_name = name;
     m_definition = definition;
 }
 
-bool CommandInfo::isProvided() const
+CommandInfo::HostInterfaceType CommandInfo::interfaceType() const
 {
-    return m_isProvided;
+    return m_interfaceType;
 }
 QString CommandInfo::interface() const
 {
@@ -149,14 +149,14 @@ auto Context::handleSplinePointCount(const std::size_t count) -> void
 auto Context::addProvidedCommand(
         const QString &interface, const QString &name, const seds::model::InterfaceCommand *definition) -> void
 {
-    CommandInfo info(true, interface, name, definition);
+    CommandInfo info(CommandInfo::HostInterfaceType::Provided, interface, name, definition);
     m_commands[std::make_pair(interface, name)] = info;
 }
 
 auto Context::addRequiredCommand(
         const QString &interface, const QString &name, const seds::model::InterfaceCommand *definition) -> void
 {
-    CommandInfo info(false, interface, name, definition);
+    CommandInfo info(CommandInfo::HostInterfaceType::Required, interface, name, definition);
     m_commands.emplace(std::make_pair(interface, name), std::move(info));
 }
 

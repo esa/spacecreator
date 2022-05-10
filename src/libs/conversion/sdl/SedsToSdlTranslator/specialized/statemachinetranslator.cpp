@@ -287,7 +287,7 @@ static inline auto generateProceduresForSyncCommands(
         Context &context, const seds::model::StateMachine &sedsStateMachine) -> void
 {
     for (const auto &command : context.commands()) {
-        if (command.second->isProvided()
+        if (command.second->interfaceType() == CommandInfo::HostInterfaceType::Provided
                 && command.second->definition()->mode() == seds::model::InterfaceCommandMode::Sync) {
             // Procedures are generated only for sync commands in provided interfaces
             generateProcedureForSyncCommand(context, sedsStateMachine, command.first, *command.second->definition());
