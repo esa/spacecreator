@@ -3,5 +3,16 @@ OtherInteger [size 8, encoding pos-int]
 OtherFloat [encoding IEEE754-1985-32, endianness big]
 InterfaceDecl4-Generic2 []
 InterfaceDecl4-Generic2Array-3 []
+InterfaceDecl4-Generic3 []
+InterfaceDecl4-Async3-Type []
+{
+    arg1 [],
+    arg2 []
+}
 InterfaceDecl4-Generic2Array-2 []
+InterfaceDecl4-Async2-Type []
+{
+    arg1 [],
+    arg2 []
+}
 END

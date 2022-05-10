@@ -93,24 +93,26 @@ void InterfaceDeclarationTypeCreator::createTypesForAsyncCommand(
     switch (command.argumentsCombination()) {
     case seds::model::ArgumentsCombination::InOnly: {
         // In arguments are 'native', so they are handles as-is
-        const auto bundledTypeName = DataTypeTranslationHelper::buildBundledTypeName(interfaceName, commandName);
+        const auto bundledTypeName = DataTypeTranslationHelper::buildBundledTypeName(
+                interfaceName, commandName, seds::model::CommandArgumentMode::In);
         createAsyncCommandBundledType(command, bundledTypeName, seds::model::CommandArgumentMode::In);
     } break;
     case seds::model::ArgumentsCombination::OutOnly: {
         // Out arguments aren't supported by TASTE sporadic interface.
         // We cannot change the argument direction, so we switch interface type (provided <-> required)
-        const auto bundledTypeName = DataTypeTranslationHelper::buildBundledTypeName(interfaceName, commandName);
+        const auto bundledTypeName = DataTypeTranslationHelper::buildBundledTypeName(
+                interfaceName, commandName, seds::model::CommandArgumentMode::Out);
         createAsyncCommandBundledType(command, bundledTypeName, seds::model::CommandArgumentMode::Out);
     } break;
     case seds::model::ArgumentsCombination::InAndNotify: {
         // InAndNotify arguments are separated onto two interfaces
         // In arguments - as-is
-        const auto inBundledTypeName =
-                DataTypeTranslationHelper::buildBundledTypeName(interfaceName, commandName, "In");
+        const auto inBundledTypeName = DataTypeTranslationHelper::buildBundledTypeName(
+                interfaceName, commandName, seds::model::CommandArgumentMode::In);
         createAsyncCommandBundledType(command, inBundledTypeName, seds::model::CommandArgumentMode::In);
         // Notify arguments - switched interface type (provided <-> required)
-        const auto notifyBundledTypeName =
-                DataTypeTranslationHelper::buildBundledTypeName(interfaceName, commandName, "Notify");
+        const auto notifyBundledTypeName = DataTypeTranslationHelper::buildBundledTypeName(
+                interfaceName, commandName, seds::model::CommandArgumentMode::Notify);
         createAsyncCommandBundledType(command, notifyBundledTypeName, seds::model::CommandArgumentMode::Notify);
     } break;
     case seds::model::ArgumentsCombination::NoArgs: {

@@ -21,6 +21,7 @@
 
 #include "datatypetranslationhelper.h"
 
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <iostream>
 
@@ -49,13 +50,11 @@ std::optional<seds::model::DataTypeRef> InterfaceTypeCreatorContext::handleType(
 {
     const auto isGeneric = isTypeGeneric(typeRef);
 
-    auto concreteTypeRef = typeRef;
-
     if (isGeneric) {
-        std::cerr << "\t\tGeneric type\n";
+        /* std::cerr << "\t\tGeneric type\n"; */
 
         if (!m_mappings.has_value()) {
-            std::cerr << "\t\tNo mappings provided\n";
+            /* std::cerr << "\t\tNo mappings provided\n"; */
             return std::nullopt;
         }
 
@@ -69,21 +68,48 @@ std::optional<seds::model::DataTypeRef> InterfaceTypeCreatorContext::handleType(
             return std::nullopt;
         }
 
-        concreteTypeRef = m_genericTypeCreator.createTypeForGeneric(mapping, genericName);
-        std::cerr << "\t\tCreating concrete type " << concreteTypeRef.nameStr().toStdString() << '\n';
+        auto concreteTypeRef = m_genericTypeCreator.createTypeForGeneric(mapping, genericName);
+        /* std::cerr << "\t\tCreating concrete type " << concreteTypeRef.toStdString() << '\n'; */
 
-        if (!dimensions.empty()) {
-            concreteTypeRef = DataTypeTranslationHelper::createArrayType(m_mainContext, concreteTypeRef, dimensions);
-        }
+        return DataTypeTranslationHelper::createArrayType(m_mainContext, concreteTypeRef, dimensions);
     } else {
-        std::cerr << "\t\tInterface local type\n";
-        if (!dimensions.empty()) {
-            concreteTypeRef =
-                    DataTypeTranslationHelper::createArrayType(m_interfaceContext, concreteTypeRef, dimensions);
-        }
+        /* std::cerr << "\t\tInterface local type\n"; */
+        return DataTypeTranslationHelper::createArrayType(m_interfaceContext, typeRef, dimensions);
+    }
+}
+
+Context &InterfaceTypeCreatorContext::mainContext() const
+{
+    return m_mainContext;
+}
+
+Context &InterfaceTypeCreatorContext::interfaceContext() const
+{
+    return m_interfaceContext;
+}
+
+const QString &InterfaceTypeCreatorContext::parentName() const
+{
+    return m_parentName;
+}
+
+std::optional<QString> InterfaceTypeCreatorContext::findDeterminantArgument(
+        const std::vector<seds::model::CommandArgument> &arguments)
+{
+    const auto &determinantName = m_typeMapper.determinantName();
+
+    if (!determinantName.has_value()) {
+        return std::nullopt;
     }
 
-    return concreteTypeRef;
+    const auto foundArgument = std::find_if(arguments.begin(), arguments.end(),
+            [&](const seds::model::CommandArgument &argument) { return argument.type().nameStr() == determinantName; });
+
+    if (foundArgument == arguments.end()) {
+        return std::nullopt;
+    } else {
+        return Escaper::escapeAsn1FieldName(foundArgument->nameStr());
+    }
 }
 
 bool InterfaceTypeCreatorContext::isTypeGeneric(const seds::model::DataTypeRef &typeRef)
@@ -96,6 +122,19 @@ bool InterfaceTypeCreatorContext::isTypeGeneric(const seds::model::DataTypeRef &
             [&](const auto genericType) { return genericType->nameStr() == typeRef.nameStr(); });
 
     return (found != m_genericTypes.end());
+}
+
+bool InterfaceTypeCreatorContext::isCommandGeneric(const seds::model::InterfaceCommand &command)
+{
+    const auto &arguments = command.arguments();
+    for (const auto &argument : arguments) {
+        const auto &argumentTypeRef = argument.type();
+        if (isTypeGeneric(argumentTypeRef)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void InterfaceTypeCreatorContext::debugPrint() const

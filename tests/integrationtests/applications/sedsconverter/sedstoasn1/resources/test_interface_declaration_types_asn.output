@@ -15,7 +15,7 @@ PackageInterfaceDecl-OutArgsOnly-Type ::= SEQUENCE
     argB PackageInteger(0 .. 255),
     arrayArg PackageIntegerArray-3x3x3(SIZE(3))
 }
-PackageInterfaceDecl-InAndNotify-TypeIn ::= SEQUENCE
+PackageInterfaceDecl-InAndNotify-Type ::= SEQUENCE
 {
     inputArg PackageInteger(0 .. 255)
 }
@@ -23,4 +23,5 @@ PackageInterfaceDecl-InAndNotify-TypeNotify ::= SEQUENCE
 {
     notifyArg PackageInteger(0 .. 255)
 }
+PackageIntegerArray-2 ::= SEQUENCE (SIZE(2)) OF PackageInteger(0 .. 255)
 END

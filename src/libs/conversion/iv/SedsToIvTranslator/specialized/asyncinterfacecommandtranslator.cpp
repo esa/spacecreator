@@ -132,45 +132,7 @@ void AsyncInterfaceCommandTranslator::translateArguments(const seds::model::Inte
 QString AsyncInterfaceCommandTranslator::handleArgumentTypeName(
         const seds::model::InterfaceCommand &sedsCommand, const CommandArgumentMode requestedArgumentMode)
 {
-    const auto &genericTypes = m_sedsInterfaceDeclaration.genericTypes();
-
-    if (genericTypes.empty()) {
-        const auto &sedsCommandName = sedsCommand.nameStr();
-
-        switch (sedsCommand.argumentsCombination()) {
-        case ArgumentsCombination::InOnly:
-        case ArgumentsCombination::OutOnly:
-            return DataTypeTranslationHelper::buildBundledTypeName(
-                    m_sedsInterfaceDeclaration.nameStr(), sedsCommandName);
-        case seds::model::ArgumentsCombination::InAndNotify:
-            if (requestedArgumentMode == CommandArgumentMode::In) {
-                return DataTypeTranslationHelper::buildBundledTypeName(
-                        m_sedsInterfaceDeclaration.nameStr(), sedsCommandName, "In");
-            } else {
-                return DataTypeTranslationHelper::buildBundledTypeName(
-                        m_sedsInterfaceDeclaration.nameStr(), sedsCommandName, "Notify");
-            }
-        case ArgumentsCombination::NoArgs:
-            break;
-        case ArgumentsCombination::NotifyOnly:
-        case ArgumentsCombination::InAndOut:
-        case ArgumentsCombination::OutAndNotify:
-        case ArgumentsCombination::All: {
-            const auto message = QString("Interface command arguments combination '%1' is not supported for TASTE "
-                                         "InterfaceView async interface")
-                                         .arg(argumentsCombinationToString(sedsCommand.argumentsCombination()));
-            throw TranslationException(message);
-        } break;
-        default:
-            throw UnhandledValueException("ArgumentsCombination");
-            break;
-        }
-
-        return "";
-    } else {
-        return DataTypeTranslationHelper::buildGenericBundledTypeName(
-                m_sedsComponentName, m_sedsInterfaceName, sedsCommand.nameStr());
-    }
+    return "ASYNC_STUB";
 }
 
 } // namespace conversion::iv::translator

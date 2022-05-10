@@ -50,15 +50,14 @@ QString DataTypeTranslationHelper::buildArrayTypeName(
 }
 
 QString DataTypeTranslationHelper::buildBundledTypeName(
-        const QString &interfaceDeclarationName, const QString &commandName, QString postfix)
+        const QString &parentName, const QString &commandName, const seds::model::CommandArgumentMode mode)
 {
-    return m_bundledTypeNameTemplate.arg(interfaceDeclarationName).arg(commandName).arg(postfix);
-}
+    QString postfix;
+    if (mode == seds::model::CommandArgumentMode::Notify) {
+        postfix = "Notify";
+    }
 
-QString DataTypeTranslationHelper::buildGenericBundledTypeName(
-        const QString &componentName, const QString &interfaceName, const QString &commandName)
-{
-    return m_genericBundledTypeNameTemplate.arg(componentName).arg(interfaceName).arg(commandName);
+    return m_bundledTypeNameTemplate.arg(parentName).arg(commandName).arg(postfix);
 }
 
 QString DataTypeTranslationHelper::buildConcreteTypeName(
@@ -74,14 +73,18 @@ QString DataTypeTranslationHelper::buildConcreteTypeName(
 }
 
 seds::model::DataTypeRef DataTypeTranslationHelper::createArrayType(Context &context,
-        const seds::model::DataTypeRef &baseTypeRef, const std::vector<seds::model::DimensionSize> &dimensions)
+        const seds::model::DataTypeRef &typeRef, const std::vector<seds::model::DimensionSize> &dimensions)
 {
-    const auto name = buildArrayTypeName(baseTypeRef.nameStr(), dimensions);
+    if (dimensions.empty()) {
+        return typeRef;
+    }
+
+    const auto name = buildArrayTypeName(typeRef.nameStr(), dimensions);
 
     if (!context.hasAsn1Type(name)) {
         seds::model::ArrayDataType sedsArray;
         sedsArray.setName(name);
-        sedsArray.setType(baseTypeRef);
+        sedsArray.setType(typeRef);
 
         for (auto dimension : dimensions) {
             sedsArray.addDimension(std::move(dimension));
@@ -95,26 +98,12 @@ seds::model::DataTypeRef DataTypeTranslationHelper::createArrayType(Context &con
 }
 
 Asn1Acn::Types::Type *DataTypeTranslationHelper::handleArrayType(Context &context,
-        const seds::model::DataTypeRef &argumentTypeRef, const std::vector<seds::model::DimensionSize> &dimensions)
+        const seds::model::DataTypeRef &typeRef, const std::vector<seds::model::DimensionSize> &dimensions)
 {
     if (dimensions.empty()) {
-        return context.findAsn1Type(argumentTypeRef);
+        return context.findAsn1Type(typeRef);
     } else {
-        const auto name = buildArrayTypeName(argumentTypeRef.nameStr(), dimensions);
-
-        if (!context.hasAsn1Type(name)) {
-            seds::model::ArrayDataType sedsArray;
-            sedsArray.setName(name);
-            sedsArray.setType(argumentTypeRef);
-
-            for (auto dimension : dimensions) {
-                sedsArray.addDimension(std::move(dimension));
-            }
-
-            DataTypeTranslatorVisitor dataTypeTranslator(context);
-            dataTypeTranslator(sedsArray);
-        }
-
+        const auto name = createArrayType(context, typeRef, dimensions);
         return context.findAsn1Type(name);
     }
 }

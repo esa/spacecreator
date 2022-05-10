@@ -15,7 +15,7 @@ PackageInterfaceDecl-OutArgsOnly-Type []
     argB [],
     arrayArg []
 }
-PackageInterfaceDecl-InAndNotify-TypeIn []
+PackageInterfaceDecl-InAndNotify-Type []
 {
     inputArg []
 }
@@ -23,4 +23,5 @@ PackageInterfaceDecl-InAndNotify-TypeNotify []
 {
     notifyArg []
 }
+PackageIntegerArray-2 []
 END

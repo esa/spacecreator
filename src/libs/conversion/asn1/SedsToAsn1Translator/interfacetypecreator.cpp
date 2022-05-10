@@ -22,14 +22,17 @@
 #include "datatypetranslationhelper.h"
 #include "generictypecreator.h"
 
+#include <asn1library/asn1/acnsequencecomponent.h>
 #include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/typeassignment.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <conversion/common/escaper/escaper.h>
+#include <conversion/common/exceptions.h>
 #include <conversion/common/translation/exceptions.h>
 #include <iostream>
 
+using conversion::UnhandledValueException;
 using conversion::translator::TranslationException;
 using seds::model::GenericType;
 using seds::model::GenericTypeMap;
@@ -40,17 +43,17 @@ namespace conversion::asn1::translator {
 
 void InterfaceTypeCreator::createTypes(const seds::model::InterfaceDeclaration &interfaceDeclaration, Context &context)
 {
-    std::cerr << "Handling interface declaration: " << interfaceDeclaration.nameStr().toStdString() << '\n';
+    /* std::cerr << "Handling interface declaration: " << interfaceDeclaration.nameStr().toStdString() << '\n'; */
 
     doCreateTypes(&interfaceDeclaration, "", std::nullopt, context, context);
 
-    std::cerr << '\n';
+    /* std::cerr << '\n'; */
 }
 
 void InterfaceTypeCreator::createTypes(const seds::model::Interface &interface, Context &context)
 {
-    std::cerr << "Handling interface implementation: " << interface.nameStr().toStdString() << " of type "
-              << interface.type().value().pathStr().toStdString() << '\n';
+    /* std::cerr << "Handling interface implementation: " << interface.nameStr().toStdString() << " of type " */
+    /* << interface.type().value().pathStr().toStdString() << '\n'; */
 
     const auto &interfaceTypeRef = interface.type();
     const auto &interfaceDeclaration = context.findInterfaceDeclaration(interfaceTypeRef);
@@ -69,12 +72,12 @@ void InterfaceTypeCreator::doCreateTypes(const seds::model::InterfaceDeclaration
         QString parentName, const std::optional<seds::model::GenericTypeMapSet> &mappings, Context &mainContext,
         Context &interfaceContext)
 {
-    std::cerr << "\tTranslating interface declaration: " << interfaceDeclaration->nameStr().toStdString() << '\n';
+    /* std::cerr << "\tTranslating interface declaration: " << interfaceDeclaration->nameStr().toStdString() << '\n'; */
 
     const auto genericTypes = collectGenericTypes(interfaceDeclaration, interfaceContext);
 
     InterfaceTypeCreatorContext typeCreatorContext(mainContext, interfaceContext, parentName, genericTypes, mappings);
-    typeCreatorContext.debugPrint();
+    /* typeCreatorContext.debugPrint(); */
 
     const auto &parameters = interfaceDeclaration->parameters();
     for (const auto &parameter : parameters) {
@@ -83,9 +86,10 @@ void InterfaceTypeCreator::doCreateTypes(const seds::model::InterfaceDeclaration
 
     const auto &commands = interfaceDeclaration->commands();
     for (const auto &command : commands) {
+        createTypesForCommand(command, interfaceDeclaration->nameStr(), typeCreatorContext);
     }
 
-    std::cerr << '\n';
+    /* std::cerr << '\n'; */
 
     for (const auto &baseInterface : interfaceDeclaration->baseInterfaces()) {
         const auto &baseInterfaceTypeRef = baseInterface.type();
@@ -111,10 +115,198 @@ void InterfaceTypeCreator::createTypesForParameter(
         const seds::model::InterfaceParameter &parameter, InterfaceTypeCreatorContext &typeCreatorContext)
 {
     const auto parameterTypeRef = parameter.type();
-    std::cerr << "\tParameter '" << parameter.nameStr().toStdString() << "' type "
-              << parameterTypeRef.value().pathStr().toStdString() << '\n';
+    const auto &parameterDimensions = parameter.arrayDimensions();
 
-    typeCreatorContext.handleType(parameterTypeRef, parameter.arrayDimensions());
+    /* std::cerr << "\tParameter '" << parameter.nameStr().toStdString() << "' type " */
+    /*           << parameterTypeRef.value().pathStr().toStdString() << '\n'; */
+
+    typeCreatorContext.handleType(parameterTypeRef, parameterDimensions);
+}
+
+void InterfaceTypeCreator::createTypesForCommand(const seds::model::InterfaceCommand &command,
+        const QString &interfaceDeclarationName, InterfaceTypeCreatorContext &typeCreatorContext)
+{
+    switch (command.mode()) {
+    case InterfaceCommandMode::Sync:
+        createTypesForSyncCommand(command, typeCreatorContext);
+        break;
+    case InterfaceCommandMode::Async:
+        createTypesForAsyncCommand(command, interfaceDeclarationName, typeCreatorContext);
+        break;
+    default:
+        throw UnhandledValueException("InterfaceCommandMode");
+    }
+}
+
+void InterfaceTypeCreator::createTypesForSyncCommand(
+        const seds::model::InterfaceCommand &command, InterfaceTypeCreatorContext &typeCreatorContext)
+{
+    /* std::cerr << "\tSync command '" << command.nameStr().toStdString() << "'\n"; */
+
+    const auto &arguments = command.arguments();
+    for (const auto &argument : arguments) {
+        const auto argumentTypeRef = argument.type();
+        const auto &argumentDimensions = argument.arrayDimensions();
+
+        /* std::cerr << "\t\tArgument '" << argument.nameStr().toStdString() << "' type " */
+        /*           << argumentTypeRef.value().pathStr().toStdString() << '\n'; */
+
+        typeCreatorContext.handleType(argumentTypeRef, argumentDimensions);
+    }
+}
+
+void InterfaceTypeCreator::createTypesForAsyncCommand(const seds::model::InterfaceCommand &command,
+        const QString &interfaceDeclarationName, InterfaceTypeCreatorContext &typeCreatorContext)
+{
+    /* std::cerr << "\tAsync command '" << command.nameStr().toStdString() << "'\n"; */
+
+    // Process command based on its commands
+    switch (command.argumentsCombination()) {
+    case seds::model::ArgumentsCombination::InOnly: {
+        // In arguments are 'native', so they are handles as-is
+        createAsyncCommandBundledType(
+                command, interfaceDeclarationName, seds::model::CommandArgumentMode::In, typeCreatorContext);
+    } break;
+    case seds::model::ArgumentsCombination::OutOnly: {
+        // Out arguments aren't supported by TASTE sporadic interface.
+        // We cannot change the argument direction, so we switch interface type (provided <-> required)
+        createAsyncCommandBundledType(
+                command, interfaceDeclarationName, seds::model::CommandArgumentMode::Out, typeCreatorContext);
+    } break;
+    case seds::model::ArgumentsCombination::InAndNotify: {
+        // InAndNotify arguments are separated onto two interfaces
+        // In arguments - as-is
+        createAsyncCommandBundledType(
+                command, interfaceDeclarationName, seds::model::CommandArgumentMode::In, typeCreatorContext);
+        // Notify arguments - switched interface type (provided <-> required)
+        createAsyncCommandBundledType(
+                command, interfaceDeclarationName, seds::model::CommandArgumentMode::Notify, typeCreatorContext);
+    } break;
+    case seds::model::ArgumentsCombination::NoArgs: {
+        // No arguments, no problems
+        break;
+    }
+    case seds::model::ArgumentsCombination::NotifyOnly:
+    case seds::model::ArgumentsCombination::InAndOut:
+    case seds::model::ArgumentsCombination::OutAndNotify:
+    case seds::model::ArgumentsCombination::All: {
+        const auto message = QString(
+                "Interface command arguments combination '%1' is not supported for TASTE InterfaceView async interface")
+                                     .arg(argumentsCombinationToString(command.argumentsCombination()));
+        throw TranslationException(message);
+    } break;
+    default:
+        throw UnhandledValueException("ArgumentsCombination");
+        break;
+    }
+}
+
+void InterfaceTypeCreator::createAsyncCommandBundledType(const seds::model::InterfaceCommand &command,
+        const QString &interfaceDeclarationName, const seds::model::CommandArgumentMode requestedArgumentMode,
+        InterfaceTypeCreatorContext &typeCreatorContext)
+{
+    const auto commandName = Escaper::escapeAsn1TypeName(command.nameStr());
+    const auto isGeneric = typeCreatorContext.isCommandGeneric(command);
+
+    const auto bundledTypeName = isGeneric
+            ? DataTypeTranslationHelper::buildBundledTypeName(
+                      typeCreatorContext.parentName(), commandName, requestedArgumentMode)
+            : DataTypeTranslationHelper::buildBundledTypeName(
+                      interfaceDeclarationName, commandName, requestedArgumentMode);
+
+    /* std::cerr << "\t\tCreating bundled type " << bundledTypeName.toStdString() << '\n'; */
+
+    auto &context = isGeneric ? typeCreatorContext.mainContext() : typeCreatorContext.interfaceContext();
+
+    if (context.hasAsn1Type(bundledTypeName)) {
+        return;
+    }
+
+    auto bundledType = std::make_unique<Asn1Acn::Types::Sequence>(bundledTypeName);
+    const auto determinantArgumentName = typeCreatorContext.findDeterminantArgument(command.arguments());
+
+    auto isConcrete = true;
+
+    for (const auto &argument : command.arguments()) {
+        if (argument.mode() != requestedArgumentMode) {
+            continue;
+        }
+
+        isConcrete = createAsyncCommandBundledTypeComponent(
+                argument, bundledType.get(), determinantArgumentName, context, typeCreatorContext);
+
+        if (!isConcrete) {
+            break;
+        }
+    }
+
+    if (isConcrete) {
+        context.addAsn1Type(std::move(bundledType), nullptr);
+    }
+}
+
+bool InterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const seds::model::CommandArgument &argument,
+        Asn1Acn::Types::Sequence *bundledType, const std::optional<QString> &determinantArgumentName,
+        Context &bundledTypeContext, InterfaceTypeCreatorContext &typeCreatorContext)
+{
+    const auto argumentTypeRef = argument.type();
+    const auto &argumentDimensions = argument.arrayDimensions();
+
+    /* std::cerr << "\t\tArgument '" << argument.nameStr().toStdString() << "' type " */
+    /*           << argumentTypeRef.value().pathStr().toStdString() << '\n'; */
+
+    const auto argumentName = Escaper::escapeAsn1FieldName(argument.nameStr());
+    const auto argumentConcreteTypeRef = typeCreatorContext.handleType(argumentTypeRef, argumentDimensions);
+
+    if (!argumentConcreteTypeRef.has_value()) {
+        return false;
+    }
+
+    const auto isTypeGeneric = typeCreatorContext.isTypeGeneric(argumentTypeRef);
+
+    if (isTypeGeneric) {
+        auto &typeContext = typeCreatorContext.mainContext();
+
+        const auto argumentType = typeContext.findAsn1Type(*argumentConcreteTypeRef);
+
+        auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(argumentType->identifier(), "");
+        sequenceComponentType->setType(argumentType->clone());
+
+        if (argumentName == determinantArgumentName) {
+            auto sequenceComponent = std::make_unique<Asn1Acn::AcnSequenceComponent>(
+                    argumentName, argumentName, std::move(sequenceComponentType));
+
+            bundledType->addComponent(std::move(sequenceComponent));
+        } else {
+            auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(argumentName, argumentName, false,
+                    std::nullopt, "", Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
+                    std::move(sequenceComponentType));
+
+            if (determinantArgumentName.has_value()
+                    && argumentType->typeEnum() == Asn1Acn::Types::Type::ASN1Type::CHOICE) {
+                sequenceComponent->addAcnParameter(*determinantArgumentName);
+            }
+
+            bundledType->addComponent(std::move(sequenceComponent));
+        }
+    } else {
+        auto &typeContext = typeCreatorContext.interfaceContext();
+
+        const auto argumentType = typeContext.findAsn1Type(*argumentConcreteTypeRef);
+        bundledTypeContext.importType(typeContext.definitionsName(), argumentType->identifier());
+
+        auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(argumentType->identifier(), "");
+        sequenceComponentType->setType(argumentType->clone());
+
+        std::unique_ptr<Asn1Acn::SequenceComponent> sequenceComponent =
+                std::make_unique<Asn1Acn::AsnSequenceComponent>(argumentName, argumentName, false, std::nullopt, "",
+                        Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
+                        std::move(sequenceComponentType));
+
+        bundledType->addComponent(std::move(sequenceComponent));
+    }
+
+    return true;
 }
 
 std::vector<const GenericType *> InterfaceTypeCreator::collectGenericTypes(

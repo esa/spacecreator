@@ -43,7 +43,12 @@ public:
     auto handleType(const seds::model::DataTypeRef &typeRef, const std::vector<seds::model::DimensionSize> &dimensions)
             -> std::optional<seds::model::DataTypeRef>;
 
+    auto mainContext() const -> Context &;
+    auto interfaceContext() const -> Context &;
+    auto parentName() const -> const QString &;
+    auto findDeterminantArgument(const std::vector<seds::model::CommandArgument> &arguments) -> std::optional<QString>;
     auto isTypeGeneric(const seds::model::DataTypeRef &typeRef) -> bool;
+    auto isCommandGeneric(const seds::model::InterfaceCommand &command) -> bool;
 
 public:
     auto debugPrint() const -> void;

@@ -20,7 +20,7 @@ ComponentInterfaceDecl-OutArgsOnly-Type ::= SEQUENCE
     argB ComponentInteger(0 .. 255),
     arrayArg PackageIntegerArray-10(SIZE(10))
 }
-ComponentInterfaceDecl-InAndNotify-TypeIn ::= SEQUENCE
+ComponentInterfaceDecl-InAndNotify-Type ::= SEQUENCE
 {
     inputArg PackageInteger(0 .. 255)
 }
@@ -28,19 +28,18 @@ ComponentInterfaceDecl-InAndNotify-TypeNotify ::= SEQUENCE
 {
     notifyArg ComponentInteger(0 .. 255)
 }
-Component-GenericInterfaceImpl-GenericDeterminant ::= DeterminantType(0 .. 1)
 Component-GenericInterfaceImpl-Generic1 ::= PackageInteger(0 .. 255)
 Component-GenericInterfaceImpl-Generic2 ::= CHOICE
 {
     concrete0 ComponentInteger(0 .. 255) (12),
     concrete1 PackageInteger(0 .. 255) (42)
 }
+Component-GenericInterfaceImpl-GenericDeterminant ::= DeterminantType(0 .. 1)
 Component-GenericInterfaceImpl-Generic3::= CHOICE
 {
     concrete0 PackageInteger(0 .. 255),
     concrete1 ComponentInteger(0 .. 255)
 }
-PackageIntegerArray-2 ::= SEQUENCE (SIZE(2)) OF PackageInteger(0 .. 255)
 Component-GenericInterfaceImpl-InArgsOnly-Type ::= SEQUENCE
 {
     argX PackageInteger(0 .. 255),

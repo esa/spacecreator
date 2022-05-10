@@ -15,7 +15,7 @@ ComponentInterfaceDecl-OutArgsOnly-Type []
     argB [],
     arrayArg []
 }
-ComponentInterfaceDecl-InAndNotify-TypeIn []
+ComponentInterfaceDecl-InAndNotify-Type []
 {
     inputArg []
 }
@@ -23,19 +23,18 @@ ComponentInterfaceDecl-InAndNotify-TypeNotify []
 {
     notifyArg []
 }
-Component-GenericInterfaceImpl-GenericDeterminant []
 Component-GenericInterfaceImpl-Generic1 []
 Component-GenericInterfaceImpl-Generic2 <COM-N7SPACE-INTERFACEDECLARATIONS.DeterminantType:determinant> []
 {
     concrete0 [present-when determinant==0],
     concrete1 [present-when determinant==1]
 }
+Component-GenericInterfaceImpl-GenericDeterminant []
 Component-GenericInterfaceImpl-Generic3 <COM-N7SPACE-INTERFACEDECLARATIONS.DeterminantType:determinant> []
 {
     concrete0 [present-when determinant==0],
     concrete1 [present-when determinant==1]
 }
-PackageIntegerArray-2 []
 Component-GenericInterfaceImpl-InArgsOnly-Type []
 {
     argX [],

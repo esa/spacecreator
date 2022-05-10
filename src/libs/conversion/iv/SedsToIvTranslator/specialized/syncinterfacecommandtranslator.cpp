@@ -108,41 +108,7 @@ void SyncInterfaceCommandTranslator::translateArguments(
 
 QString SyncInterfaceCommandTranslator::handleArgumentTypeName(const seds::model::CommandArgument &sedsArgument) const
 {
-    const auto &argumentTypeRef = sedsArgument.type();
-    const auto &argumentTypeName = argumentTypeRef.nameStr();
-
-    const auto &dimensions = sedsArgument.arrayDimensions();
-    const auto &genericTypes = m_sedsInterfaceDeclaration.genericTypes();
-    const auto isTypeGeneric = DataTypeTranslationHelper::isTypeGeneric(argumentTypeRef, genericTypes);
-
-    if (isTypeGeneric) {
-        if (!dimensions.empty()) {
-            auto errorMessage = QString("Command argument '%1' could not be translated, array arguments with generic "
-                                        "types are not supported because of the ACN limitations")
-                                        .arg(sedsArgument.nameStr());
-            throw TranslationException(std::move(errorMessage));
-        }
-
-        if (argumentTypeRef.packageStr()) {
-            return argumentTypeName;
-        }
-
-        const auto found = std::find_if(genericTypes.begin(), genericTypes.end(),
-                [&](const seds::model::GenericType &genericType) { return genericType.nameStr() == argumentTypeName; });
-
-        if (found == genericTypes.end()) {
-            return argumentTypeName;
-        } else {
-            return DataTypeTranslationHelper::buildConcreteTypeName(
-                    m_sedsComponentName, m_sedsInterfaceName, argumentTypeName);
-        }
-    } else {
-        if (dimensions.empty()) {
-            return argumentTypeName;
-        } else {
-            return DataTypeTranslationHelper::buildArrayTypeName(argumentTypeName, dimensions);
-        }
-    }
+    return "SYNC_STUB";
 }
 
 } // namespace conversion::iv::translator

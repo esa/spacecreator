@@ -107,43 +107,7 @@ void InterfaceParameterTranslator::buildParameter(const seds::model::InterfacePa
 QString InterfaceParameterTranslator::handleParameterTypeName(
         const seds::model::InterfaceParameter &sedsParameter) const
 {
-    const auto &parameterTypeRef = sedsParameter.type();
-    const auto &parameterTypeName = parameterTypeRef.nameStr();
-
-    const auto &dimensions = sedsParameter.arrayDimensions();
-    const auto &genericTypes = m_sedsInterfaceDeclaration.genericTypes();
-    const auto isTypeGeneric = DataTypeTranslationHelper::isTypeGeneric(parameterTypeRef, genericTypes);
-
-    if (isTypeGeneric) {
-        if (!dimensions.empty()) {
-            auto errorMessage = QString("Parameter '%1' could not be translated, array parameters with generic "
-                                        "types are not supported because of the ACN limitations")
-                                        .arg(sedsParameter.nameStr());
-            throw TranslationException(std::move(errorMessage));
-        }
-
-        if (parameterTypeRef.packageStr()) {
-            return parameterTypeName;
-        }
-
-        const auto found = std::find_if(
-                genericTypes.begin(), genericTypes.end(), [&](const seds::model::GenericType &genericType) {
-                    return genericType.nameStr() == parameterTypeName;
-                });
-
-        if (found == genericTypes.end()) {
-            return parameterTypeName;
-        } else {
-            return DataTypeTranslationHelper::buildConcreteTypeName(
-                    m_sedsComponentName, m_sedsInterfaceName, parameterTypeName);
-        }
-    } else {
-        if (dimensions.empty()) {
-            return parameterTypeName;
-        } else {
-            return DataTypeTranslationHelper::buildArrayTypeName(parameterTypeName, dimensions);
-        }
-    }
+    return "PARAM_STUB";
 }
 
 } // namespace conversion::iv::translator

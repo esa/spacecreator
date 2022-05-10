@@ -47,6 +47,19 @@ private:
 
     auto createTypesForParameter(
             const seds::model::InterfaceParameter &parameter, InterfaceTypeCreatorContext &typeCreatorContext) -> void;
+    auto createTypesForCommand(const seds::model::InterfaceCommand &command, const QString &interfaceDeclarationName,
+            InterfaceTypeCreatorContext &typeCreatorContext) -> void;
+
+    auto createTypesForSyncCommand(
+            const seds::model::InterfaceCommand &command, InterfaceTypeCreatorContext &typeCreatorContext) -> void;
+    auto createTypesForAsyncCommand(const seds::model::InterfaceCommand &command,
+            const QString &interfaceDeclarationName, InterfaceTypeCreatorContext &typeCreatorContext) -> void;
+    auto createAsyncCommandBundledType(const seds::model::InterfaceCommand &command,
+            const QString &interfaceDeclarationName, const seds::model::CommandArgumentMode requestedArgumentMode,
+            InterfaceTypeCreatorContext &typeCreatorContext) -> void;
+    auto createAsyncCommandBundledTypeComponent(const seds::model::CommandArgument &argument,
+            Asn1Acn::Types::Sequence *bundledType, const std::optional<QString> &determinantArgumentName,
+            Context &bundledTypeContext, InterfaceTypeCreatorContext &typeCreatorContext) -> bool;
 
 private:
     auto collectGenericTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration,

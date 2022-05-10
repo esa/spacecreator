@@ -324,15 +324,17 @@ void GenericInterfaceTypeCreator::createTypesForAsyncCommand(const seds::model::
     switch (command.argumentsCombination()) {
     case seds::model::ArgumentsCombination::InOnly: {
         // In arguments are 'native', so they are handles as-is
-        const auto bundledTypeName = DataTypeTranslationHelper::buildGenericBundledTypeName(
-                m_context.componentName(), m_interfaceName, commandName);
+        const auto bundledTypeName = DataTypeTranslationHelper::buildBundledTypeName(
+                QString("%1-%2").arg(m_context.componentName()).arg(m_interfaceName), commandName,
+                seds::model::CommandArgumentMode::In);
         createAsyncCommandBundledType(command, bundledTypeName, seds::model::CommandArgumentMode::In);
     } break;
     case seds::model::ArgumentsCombination::OutOnly: {
         // Out arguments aren't supported by TASTE sporadic interface.
         // We cannot change the argument direction, so we switch interface type (provided <-> required)
-        const auto bundledTypeName = DataTypeTranslationHelper::buildGenericBundledTypeName(
-                m_context.componentName(), m_interfaceName, commandName);
+        const auto bundledTypeName = DataTypeTranslationHelper::buildBundledTypeName(
+                QString("%1-%2").arg(m_context.componentName()).arg(m_interfaceName), commandName,
+                seds::model::CommandArgumentMode::Out);
         createAsyncCommandBundledType(command, bundledTypeName, seds::model::CommandArgumentMode::Out);
     } break;
     case seds::model::ArgumentsCombination::NoArgs: {
