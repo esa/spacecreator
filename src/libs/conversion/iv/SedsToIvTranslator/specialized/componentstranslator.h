@@ -35,7 +35,6 @@ class IVFunction;
 
 namespace seds::model {
 class Component;
-class GenericTypeMapSet;
 class Interface;
 class InterfaceDeclaration;
 class Package;
@@ -54,10 +53,9 @@ public:
      *
      * @param   sedsPackage         Package with components to translate
      * @param   sedsPackages        List of SEDS packages
-     * @param   asn1Files           List of all ASN.1 files
      */
-    ComponentsTranslator(const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages,
-            const Asn1Acn::Asn1Model::Data &asn1Files, const std::optional<uint64_t> &sequenceSizeThreshold);
+    ComponentsTranslator(
+            const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages);
     /**
      * @brief   Deleted copy constructor
      */
@@ -124,13 +122,12 @@ private:
     auto translateInterface(const seds::model::Interface &sedsInterface, const seds::model::Component &sedsComponent,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) -> void;
     auto translateInterfaceDeclaration(const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
-            const QString &sedsInterfaceName, const std::optional<seds::model::GenericTypeMapSet> &typeMapSet,
-            const seds::model::Component &sedsComponent, const ivm::IVInterface::InterfaceType interfaceType,
-            ivm::IVFunction *ivFunction, const QString &currentPackageName) const -> void;
-    auto translateParameters(const QString &sedsComponentName, const QString &sedsInterfaceName,
+            const QString &sedsInterfaceName, const seds::model::Component &sedsComponent,
+            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
+    auto translateParameters(const QString &sedsInterfaceName,
             const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
-    auto translateCommands(const QString &sedsComponentName, const QString &sedsInterfaceName,
+    auto translateCommands(const QString &sedsInterfaceName,
             const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
 
@@ -139,11 +136,6 @@ private:
     const seds::model::Package *m_sedsPackage;
     /// @brief  List of SEDS packages
     const std::vector<seds::model::Package> &m_sedsPackages;
-    /// @brief  List of all ASN.1 files
-    const Asn1Acn::Asn1Model::Data &m_asn1Files;
-
-    /// @brief  ASN.1 sequence size threshold
-    const std::optional<uint64_t> &m_sequenceSizeThreshold;
 };
 
 } // namespace conversion::iv::translator

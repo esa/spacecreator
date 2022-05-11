@@ -24,8 +24,6 @@
 #include "packagesdependencyresolver.h"
 #include "specialized/datatypetranslatorvisitor.h"
 #include "specialized/descriptiontranslator.h"
-#include "specialized/genericinterfacetypecreator.h"
-#include "specialized/interfacedeclarationtypecreator.h"
 
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/file.h>
@@ -217,12 +215,6 @@ std::vector<const seds::model::DataType *> SedsToAsn1Translator::collectDataType
             extractPointer);
 
     return sedsDataTypes;
-}
-
-bool SedsToAsn1Translator::isInterfaceGeneric(
-        const seds::model::InterfaceDeclaration *interfaceDeclaration, Context &context) const
-{
-    return !interfaceDeclaration->genericTypes().empty();
 }
 
 } // namespace conversion::asn1::translator

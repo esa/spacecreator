@@ -31,12 +31,9 @@ using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator {
 
-SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction,
-        const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration, const QString &sedsComponentName,
-        const QString &sedsInterfaceName)
+SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(
+        ivm::IVFunction *ivFunction, const QString &sedsInterfaceName)
     : m_ivFunction(ivFunction)
-    , m_sedsInterfaceDeclaration(sedsInterfaceDeclaration)
-    , m_sedsComponentName(sedsComponentName)
     , m_sedsInterfaceName(sedsInterfaceName)
 {
 }
@@ -108,6 +105,7 @@ void SyncInterfaceCommandTranslator::translateArguments(
 
 QString SyncInterfaceCommandTranslator::handleArgumentTypeName(const seds::model::CommandArgument &sedsArgument) const
 {
+    Q_UNUSED(sedsArgument)
     return "SYNC_STUB";
 }
 

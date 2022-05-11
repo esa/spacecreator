@@ -27,6 +27,7 @@
 #include <optional>
 #include <seds/SedsModel/generics/generictype.h>
 #include <seds/SedsModel/generics/generictypemapset.h>
+#include <seds/SedsModel/interfaces/interfacedeclaration.h>
 #include <seds/SedsModel/types/dimensionsize.h>
 #include <vector>
 
@@ -35,8 +36,8 @@ namespace conversion::asn1::translator {
 class InterfaceTypeCreatorContext final
 {
 public:
-    InterfaceTypeCreatorContext(Context &mainContext, Context &interfaceContext, QString parentName,
-            const std::vector<const seds::model::GenericType *> &genericTypes,
+    InterfaceTypeCreatorContext(Context &mainContext, Context &interfaceContext,
+            const seds::model::InterfaceDeclaration *interfaceDeclaration, QString parentName,
             const std::optional<seds::model::GenericTypeMapSet> &mappings);
 
 public:
@@ -50,14 +51,16 @@ public:
     auto isTypeGeneric(const seds::model::DataTypeRef &typeRef) -> bool;
     auto isCommandGeneric(const seds::model::InterfaceCommand &command) -> bool;
 
-public:
-    auto debugPrint() const -> void;
+private:
+    auto collectGenericTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration) -> void;
+    auto doCollectGenericTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration, Context &interfaceContext)
+            -> void;
 
 private:
     Context &m_mainContext;
     Context &m_interfaceContext;
     QString m_parentName;
-    const std::vector<const seds::model::GenericType *> &m_genericTypes;
+    std::vector<const seds::model::GenericType *> m_genericTypes;
     const std::optional<seds::model::GenericTypeMapSet> &m_mappings;
     GenericTypeMapper m_typeMapper;
     GenericTypeCreator m_genericTypeCreator;

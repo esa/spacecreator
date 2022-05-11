@@ -39,12 +39,9 @@ using seds::model::CommandArgumentMode;
 
 namespace conversion::iv::translator {
 
-AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction,
-        const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration, const QString &sedsComponentName,
-        const QString &sedsInterfaceName)
+AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(
+        ivm::IVFunction *ivFunction, const QString &sedsInterfaceName)
     : m_ivFunction(ivFunction)
-    , m_sedsInterfaceDeclaration(sedsInterfaceDeclaration)
-    , m_sedsComponentName(sedsComponentName)
     , m_sedsInterfaceName(sedsInterfaceName)
 {
 }
@@ -132,6 +129,8 @@ void AsyncInterfaceCommandTranslator::translateArguments(const seds::model::Inte
 QString AsyncInterfaceCommandTranslator::handleArgumentTypeName(
         const seds::model::InterfaceCommand &sedsCommand, const CommandArgumentMode requestedArgumentMode)
 {
+    Q_UNUSED(sedsCommand);
+    Q_UNUSED(requestedArgumentMode);
     return "ASYNC_STUB";
 }
 

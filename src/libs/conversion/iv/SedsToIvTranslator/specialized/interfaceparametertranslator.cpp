@@ -28,12 +28,9 @@ using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator {
 
-InterfaceParameterTranslator::InterfaceParameterTranslator(ivm::IVFunction *ivFunction,
-        const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration, const QString &sedsComponentName,
-        const QString &sedsInterfaceName)
+InterfaceParameterTranslator::InterfaceParameterTranslator(
+        ivm::IVFunction *ivFunction, const QString &sedsInterfaceName)
     : m_ivFunction(ivFunction)
-    , m_sedsInterfaceDeclaration(sedsInterfaceDeclaration)
-    , m_sedsComponentName(sedsComponentName)
     , m_sedsInterfaceName(sedsInterfaceName)
 {
 }
@@ -107,6 +104,7 @@ void InterfaceParameterTranslator::buildParameter(const seds::model::InterfacePa
 QString InterfaceParameterTranslator::handleParameterTypeName(
         const seds::model::InterfaceParameter &sedsParameter) const
 {
+    Q_UNUSED(sedsParameter);
     return "PARAM_STUB";
 }
 

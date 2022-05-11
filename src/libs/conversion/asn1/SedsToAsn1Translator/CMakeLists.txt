@@ -17,8 +17,6 @@ set(SOURCES     context.cpp
                 specialized/descriptiontranslator.cpp
                 specialized/dimensiontranslator.cpp
                 specialized/entrytranslatorvisitor.cpp
-                specialized/genericinterfacetypecreator.cpp
-                specialized/interfacedeclarationtypecreator.cpp
                 specialized/rangetranslatorvisitor.cpp)
 set(INCLUDES    context.h
                 datatypetranslationhelper.h
@@ -37,8 +35,6 @@ set(INCLUDES    context.h
                 specialized/descriptiontranslator.h
                 specialized/dimensiontranslator.h
                 specialized/entrytranslatorvisitor.h
-                specialized/genericinterfacetypecreator.h
-                specialized/interfacedeclarationtypecreator.h
                 specialized/rangetranslatorvisitor.h
                 specialized/sizetranslatorvisitor.h)
 

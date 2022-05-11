@@ -23,23 +23,23 @@
 
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
-#include <iostream>
 
 using conversion::translator::TranslationException;
 
 namespace conversion::asn1::translator {
 
 InterfaceTypeCreatorContext::InterfaceTypeCreatorContext(Context &mainContext, Context &interfaceContext,
-        QString parentName, const std::vector<const seds::model::GenericType *> &genericTypes,
+        const seds::model::InterfaceDeclaration *interfaceDeclaration, QString parentName,
         const std::optional<seds::model::GenericTypeMapSet> &mappings)
     : m_mainContext(mainContext)
     , m_interfaceContext(interfaceContext)
     , m_parentName(std::move(parentName))
-    , m_genericTypes(genericTypes)
     , m_mappings(mappings)
     , m_typeMapper(m_mainContext, m_parentName)
     , m_genericTypeCreator(m_mainContext, m_parentName, m_typeMapper)
 {
+    collectGenericTypes(interfaceDeclaration);
+
     if (m_mappings.has_value()) {
         m_typeMapper.addMappings(*m_mappings);
     }
@@ -51,10 +51,7 @@ std::optional<seds::model::DataTypeRef> InterfaceTypeCreatorContext::handleType(
     const auto isGeneric = isTypeGeneric(typeRef);
 
     if (isGeneric) {
-        /* std::cerr << "\t\tGeneric type\n"; */
-
         if (!m_mappings.has_value()) {
-            /* std::cerr << "\t\tNo mappings provided\n"; */
             return std::nullopt;
         }
 
@@ -69,11 +66,9 @@ std::optional<seds::model::DataTypeRef> InterfaceTypeCreatorContext::handleType(
         }
 
         auto concreteTypeRef = m_genericTypeCreator.createTypeForGeneric(mapping, genericName);
-        /* std::cerr << "\t\tCreating concrete type " << concreteTypeRef.toStdString() << '\n'; */
 
         return DataTypeTranslationHelper::createArrayType(m_mainContext, concreteTypeRef, dimensions);
     } else {
-        /* std::cerr << "\t\tInterface local type\n"; */
         return DataTypeTranslationHelper::createArrayType(m_interfaceContext, typeRef, dimensions);
     }
 }
@@ -137,13 +132,39 @@ bool InterfaceTypeCreatorContext::isCommandGeneric(const seds::model::InterfaceC
     return false;
 }
 
-void InterfaceTypeCreatorContext::debugPrint() const
+void InterfaceTypeCreatorContext::collectGenericTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration)
 {
-    std::cerr << "\tMain location: " << m_mainContext.packageName().toStdString() << '\n';
-    std::cerr << "\tInterface location: " << m_interfaceContext.packageName().toStdString() << '\n';
-    std::cerr << "\tGeneric type count: " << m_genericTypes.size() << '\n';
-    std::cerr << "\tParent name: " << m_parentName.toStdString() << '\n';
-    std::cerr << "\t==========\n";
+    doCollectGenericTypes(interfaceDeclaration, m_interfaceContext);
+
+    const auto it = std::unique(m_genericTypes.begin(), m_genericTypes.end(),
+            [](const auto lhs, const auto rhs) { return lhs->nameStr() == rhs->nameStr(); });
+    if (it != m_genericTypes.end()) {
+        auto errorMessage = QString("Interface declaration '%1' has a non-unique generic types.")
+                                    .arg(interfaceDeclaration->nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+}
+
+void InterfaceTypeCreatorContext::doCollectGenericTypes(
+        const seds::model::InterfaceDeclaration *interfaceDeclaration, Context &interfaceContext)
+{
+    const auto &interfaceGenericTypes = interfaceDeclaration->genericTypes();
+
+    for (const auto &genericType : interfaceGenericTypes) {
+        m_genericTypes.push_back(&genericType);
+    }
+
+    for (const auto &baseInterface : interfaceDeclaration->baseInterfaces()) {
+        const auto &baseInterfaceTypeRef = baseInterface.type();
+        const auto &baseInterfaceDeclaration = interfaceContext.findInterfaceDeclaration(baseInterfaceTypeRef);
+
+        if (baseInterfaceTypeRef.packageStr()) {
+            auto baseInterfaceContext = interfaceContext.cloneForPackage(*baseInterfaceTypeRef.packageStr());
+            doCollectGenericTypes(baseInterfaceDeclaration, baseInterfaceContext);
+        } else {
+            doCollectGenericTypes(baseInterfaceDeclaration, interfaceContext);
+        }
+    }
 }
 
 } // namespace conversion::asn1::translator

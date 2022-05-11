@@ -170,6 +170,7 @@ auto SplineCalibratorTranslator::buildSplinePointsVariable(
 auto SplineCalibratorTranslator::createAsn1Types(Context &context) -> void
 {
     // TODO
+    Q_UNUSED(context);
     /* auto asn1Definitions = */
     /*         SedsToAsn1Translator::getAsn1Definitions(context.sedsPackage().nameStr(), context.asn1Model()->data());
      */
