@@ -39,6 +39,11 @@ public:
     InterfaceTypeCreatorContext(Context &mainContext, Context &interfaceContext,
             const seds::model::InterfaceDeclaration *interfaceDeclaration, QString parentName,
             const std::optional<seds::model::GenericTypeMapSet> &mappings);
+    InterfaceTypeCreatorContext(const InterfaceTypeCreatorContext &) = delete;
+    InterfaceTypeCreatorContext(InterfaceTypeCreatorContext &&) = delete;
+
+    InterfaceTypeCreatorContext operator=(const InterfaceTypeCreatorContext &) = delete;
+    InterfaceTypeCreatorContext operator=(InterfaceTypeCreatorContext &&) = delete;
 
 public:
     auto handleType(const seds::model::DataTypeRef &typeRef, const std::vector<seds::model::DimensionSize> &dimensions)

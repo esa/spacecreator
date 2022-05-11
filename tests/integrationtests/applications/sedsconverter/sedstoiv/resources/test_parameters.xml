@@ -19,7 +19,7 @@
         <Parameter name="ReadOnlySync" type="MyInteger" mode="sync" readOnly="true"/>
         <Parameter name="ReadWriteAsync" type="MyInteger" mode="async" readOnly="false"/>
         <Parameter name="ReadWriteSync" type="MyInteger" mode="sync" readOnly="false"/>
-        <Parameter name="ArrayParameter" type="GenericType" mode="sync" readOnly="false">
+        <Parameter name="ArrayParameter" type="GenericType" mode="sync" readOnly="true">
           <ArrayDimensions>
             <Dimension size="3"/>
           </ArrayDimensions>

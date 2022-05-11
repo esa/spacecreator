@@ -25,18 +25,16 @@
 #include "specialized/syncinterfacecommandtranslator.h"
 #include "translator.h"
 
-#include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
+#include <iostream>
 #include <ivcore/ivcommonprops.h>
 #include <ivcore/ivfunction.h>
 #include <seds/SedsModel/package/package.h>
 
 using conversion::Escaper;
 using conversion::UnhandledValueException;
-using conversion::asn1::translator::SedsToAsn1Translator;
 using conversion::translator::TranslationException;
-using conversion::translator::UndeclaredInterfaceException;
 
 namespace conversion::iv::translator {
 
@@ -83,53 +81,72 @@ void ComponentsTranslator::translateInterface(const seds::model::Interface &seds
         ivm::IVFunction *ivFunction)
 {
     const auto &sedsInterfaceName = sedsInterface.nameStr();
-    const auto &sedsInterfaceType = sedsInterface.type();
+    const auto &sedsInterfaceTypeRef = sedsInterface.type();
 
-    const auto &sedsInterfaceDeclaration =
-            findInterfaceDeclaration(sedsInterfaceType, sedsComponent, m_sedsPackage, m_sedsPackages);
+    Context context { m_sedsPackage, &sedsComponent };
+
+    if (sedsInterfaceTypeRef.packageStr()) {
+        const auto sedsBaseInterfacePackage =
+                SedsToIvTranslator::getSedsPackage(*sedsInterfaceTypeRef.packageStr(), m_sedsPackages);
+        context = { sedsBaseInterfacePackage, nullptr };
+    }
+
+    auto parentName = QString("%1-%2").arg(sedsComponent.nameStr()).arg(sedsInterface.nameStr());
+    const auto sedsInterfaceDeclaration = context.findInterfaceDeclaration(sedsInterfaceTypeRef.nameStr());
 
     translateInterfaceDeclaration(
-            sedsInterfaceDeclaration, sedsInterfaceName, sedsComponent, interfaceType, ivFunction);
+            sedsInterfaceDeclaration, sedsInterfaceName, sedsComponent, parentName, interfaceType, ivFunction, context);
 }
 
 void ComponentsTranslator::translateInterfaceDeclaration(
-        const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration, const QString &sedsInterfaceName,
-        const seds::model::Component &sedsComponent, const ivm::IVInterface::InterfaceType interfaceType,
-        ivm::IVFunction *ivFunction) const
+        const seds::model::InterfaceDeclaration *sedsInterfaceDeclaration, const QString &sedsInterfaceName,
+        const seds::model::Component &sedsComponent, const QString &parentName,
+        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction, Context context) const
 {
-    for (const auto &sedsBaseInterface : sedsInterfaceDeclaration.baseInterfaces()) {
-        const auto &sedsBaseInterfaceType = sedsBaseInterface.type();
+    for (const auto &sedsBaseInterface : sedsInterfaceDeclaration->baseInterfaces()) {
+        const auto &sedsBaseInterfaceTypeRef = sedsBaseInterface.type();
+
+        auto sedsBaseInterfaceContext = context;
+        if (sedsBaseInterfaceTypeRef.packageStr()) {
+            const auto sedsBaseInterfacePackage =
+                    SedsToIvTranslator::getSedsPackage(*sedsBaseInterfaceTypeRef.packageStr(), m_sedsPackages);
+            sedsBaseInterfaceContext = { sedsBaseInterfacePackage, nullptr };
+        }
 
         const auto &sedsBaseInterfaceDeclaration =
-                findInterfaceDeclaration(sedsBaseInterfaceType, sedsComponent, m_sedsPackage, m_sedsPackages);
+                sedsBaseInterfaceContext.findInterfaceDeclaration(sedsBaseInterfaceTypeRef.nameStr());
 
-        translateInterfaceDeclaration(
-                sedsBaseInterfaceDeclaration, sedsInterfaceName, sedsComponent, interfaceType, ivFunction);
+        translateInterfaceDeclaration(sedsBaseInterfaceDeclaration, sedsInterfaceName, sedsComponent, parentName,
+                interfaceType, ivFunction, sedsBaseInterfaceContext);
     }
 
-    translateParameters(sedsInterfaceName, sedsInterfaceDeclaration, interfaceType, ivFunction);
-    translateCommands(sedsInterfaceName, sedsInterfaceDeclaration, interfaceType, ivFunction);
+    InterfaceTypeNameHelper typeNameHelper(context, parentName, sedsInterfaceDeclaration, m_sedsPackages);
+
+    translateParameters(sedsInterfaceName, sedsInterfaceDeclaration, interfaceType, ivFunction, typeNameHelper);
+    translateCommands(sedsInterfaceName, sedsInterfaceDeclaration, interfaceType, ivFunction, typeNameHelper);
 }
 
 void ComponentsTranslator::translateParameters(const QString &sedsInterfaceName,
-        const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
-        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const
+        const seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
+        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
+        const InterfaceTypeNameHelper &typeNameHelper) const
 {
-    InterfaceParameterTranslator parameterTranslator(ivFunction, sedsInterfaceName);
+    InterfaceParameterTranslator parameterTranslator(ivFunction, sedsInterfaceName, typeNameHelper);
 
-    for (const auto &sedsParameter : sedsInterfaceDeclaration.parameters()) {
+    for (const auto &sedsParameter : sedsInterfaceDeclaration->parameters()) {
         parameterTranslator.translateParameter(sedsParameter, interfaceType);
     }
 }
 
 void ComponentsTranslator::translateCommands(const QString &sedsInterfaceName,
-        const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
-        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const
+        const seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
+        const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
+        const InterfaceTypeNameHelper &typeNameHelper) const
 {
-    AsyncInterfaceCommandTranslator asyncCommandTranslator(ivFunction, sedsInterfaceName);
-    SyncInterfaceCommandTranslator syncCommandTranslator(ivFunction, sedsInterfaceName);
+    AsyncInterfaceCommandTranslator asyncCommandTranslator(ivFunction, sedsInterfaceName, typeNameHelper);
+    SyncInterfaceCommandTranslator syncCommandTranslator(ivFunction, sedsInterfaceName, typeNameHelper);
 
-    for (const auto &sedsCommand : sedsInterfaceDeclaration.commands()) {
+    for (const auto &sedsCommand : sedsInterfaceDeclaration->commands()) {
         switch (sedsCommand.mode()) {
         case seds::model::InterfaceCommandMode::Sync:
             syncCommandTranslator.translateCommand(sedsCommand, interfaceType);
@@ -142,49 +159,6 @@ void ComponentsTranslator::translateCommands(const QString &sedsInterfaceName,
             break;
         }
     }
-}
-
-const seds::model::InterfaceDeclaration &ComponentsTranslator::findInterfaceDeclaration(
-        const seds::model::InterfaceDeclarationRef &interfaceDeclarationRef,
-        const seds::model::Component &sedsComponent, const seds::model::Package *sedsPackage,
-        const std::vector<seds::model::Package> &sedsPackages)
-{
-    const auto &name = interfaceDeclarationRef.nameStr();
-
-    if (interfaceDeclarationRef.packageStr()) {
-        const auto otherSedsPackage =
-                SedsToIvTranslator::getSedsPackage(*interfaceDeclarationRef.packageStr(), sedsPackages);
-
-        const auto &sedsPackageInterfaceDeclarations = otherSedsPackage->declaredInterfaces();
-        const auto found =
-                std::find_if(sedsPackageInterfaceDeclarations.begin(), sedsPackageInterfaceDeclarations.end(),
-                        [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
-                            return interfaceDeclaration.nameStr() == name;
-                        });
-        if (found != sedsPackageInterfaceDeclarations.end()) {
-            return *found;
-        }
-    } else {
-        const auto &sedsComponentInterfaceDeclarations = sedsComponent.declaredInterfaces();
-        auto found = std::find_if(sedsComponentInterfaceDeclarations.begin(), sedsComponentInterfaceDeclarations.end(),
-                [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
-                    return interfaceDeclaration.nameStr() == name;
-                });
-        if (found != sedsComponentInterfaceDeclarations.end()) {
-            return *found;
-        }
-
-        const auto &sedsPackageInterfaceDeclarations = sedsPackage->declaredInterfaces();
-        found = std::find_if(sedsPackageInterfaceDeclarations.begin(), sedsPackageInterfaceDeclarations.end(),
-                [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
-                    return interfaceDeclaration.nameStr() == name;
-                });
-        if (found != sedsPackageInterfaceDeclarations.end()) {
-            return *found;
-        }
-    }
-
-    throw UndeclaredInterfaceException(interfaceDeclarationRef.value().pathStr());
 }
 
 } // namespace conversion::iv::translator

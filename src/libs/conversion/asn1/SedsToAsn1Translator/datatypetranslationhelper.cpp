@@ -66,12 +66,6 @@ QString DataTypeTranslationHelper::buildConcreteTypeName(
     return m_concreteTypeNameDeclarationTemplate.arg(interfaceDeclarationName).arg(genericName);
 }
 
-QString DataTypeTranslationHelper::buildConcreteTypeName(
-        const QString &componentName, const QString &interfaceName, const QString &genericName)
-{
-    return m_concreteTypeNameImplementationTemplate.arg(componentName).arg(interfaceName).arg(genericName);
-}
-
 seds::model::DataTypeRef DataTypeTranslationHelper::createArrayType(Context &context,
         const seds::model::DataTypeRef &typeRef, const std::vector<seds::model::DimensionSize> &dimensions)
 {

@@ -29,9 +29,10 @@ using conversion::translator::TranslationException;
 namespace conversion::iv::translator {
 
 InterfaceParameterTranslator::InterfaceParameterTranslator(
-        ivm::IVFunction *ivFunction, const QString &sedsInterfaceName)
+        ivm::IVFunction *ivFunction, const QString &sedsInterfaceName, const InterfaceTypeNameHelper &typeNameHelper)
     : m_ivFunction(ivFunction)
     , m_sedsInterfaceName(sedsInterfaceName)
+    , m_typeNameHelper(typeNameHelper)
 {
 }
 
@@ -104,8 +105,10 @@ void InterfaceParameterTranslator::buildParameter(const seds::model::InterfacePa
 QString InterfaceParameterTranslator::handleParameterTypeName(
         const seds::model::InterfaceParameter &sedsParameter) const
 {
-    Q_UNUSED(sedsParameter);
-    return "PARAM_STUB";
+    const auto &parameterTypeRef = sedsParameter.type();
+    const auto &parameterDimensions = sedsParameter.arrayDimensions();
+
+    return m_typeNameHelper.handleTypeName(parameterTypeRef, parameterDimensions);
 }
 
 } // namespace conversion::iv::translator

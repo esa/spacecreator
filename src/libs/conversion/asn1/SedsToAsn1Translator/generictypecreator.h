@@ -29,7 +29,7 @@ namespace conversion::asn1::translator {
 class GenericTypeCreator final
 {
 public:
-    GenericTypeCreator(Context &context, const QString &interfaceName, const GenericTypeMapper &typeMapper);
+    GenericTypeCreator(Context &context, QString parentName, const GenericTypeMapper &typeMapper);
 
 public:
     auto createTypeForGeneric(const TypeMapping *mapping, const QString &genericName) -> QString;
@@ -47,7 +47,7 @@ private:
 
 private:
     Context &m_context;
-    QString m_interfaceName;
+    QString m_parentName;
     const GenericTypeMapper &m_typeMapper;
 };
 

@@ -1,4 +1,3 @@
 PARAMETERS DEFINITIONS ::= BEGIN
 MyInteger ::= INTEGER(0 .. 255)
-MyIntegerArray-3 ::= SEQUENCE (SIZE(3)) OF MyInteger(0 .. 255)
 END

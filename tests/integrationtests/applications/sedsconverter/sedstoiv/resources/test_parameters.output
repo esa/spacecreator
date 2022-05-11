@@ -17,11 +17,7 @@
 </Provided_Interface>
 
 <Provided_Interface name="Get_ProvidedInterface_ArrayParameter_Pi" kind="Protected" layer="default">
-    <Output_Parameter name="Param" type="MyIntegerArray-3" encoding="ACN"/>
-</Provided_Interface>
-
-<Provided_Interface name="Set_ProvidedInterface_ArrayParameter_Pi" kind="Protected" layer="default">
-    <Input_Parameter name="Param" type="MyIntegerArray-3" encoding="ACN"/>
+    <Output_Parameter name="Param" type="MegaComponent-ProvidedInterface-GenericTypeArray-3" encoding="ACN"/>
 </Provided_Interface>
 
 <Required_Interface name="Get_ProvidedInterface_ReadOnlyAsync_Ri" kind="Sporadic" layer="default">

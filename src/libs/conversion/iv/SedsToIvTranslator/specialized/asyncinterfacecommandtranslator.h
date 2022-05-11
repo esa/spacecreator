@@ -20,6 +20,7 @@
 #pragma once
 
 #include "generictypemapper.h"
+#include "interfacetypenamehelper.h"
 
 #include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/definitions.h>
@@ -41,10 +42,12 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   ivFunction                  Output interface view function
-     * @param   sedsInterfaceName           Parent interface name
+     * @param   ivFunction          Output interface view function
+     * @param   sedsInterfaceName   Parent interface name
+     * @param   typeNameHelper      Helper for ASN.1 type names
      */
-    AsyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName);
+    AsyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
+            const InterfaceTypeNameHelper &typeNameHelper);
     /**
      * @brief   Deleted copy constructor
      */
@@ -78,14 +81,13 @@ private:
     auto translateArguments(const seds::model::InterfaceCommand &sedsCommand,
             const seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface) -> void;
 
-    auto handleArgumentTypeName(const seds::model::InterfaceCommand &sedsCommand,
-            const seds::model::CommandArgumentMode requestedArgumentMode) -> QString;
-
 private:
     /// @brief  Output interface view function
     ivm::IVFunction *m_ivFunction;
     /// @brief  Parent SEDS interface name
     const QString &m_sedsInterfaceName;
+    /// @brief  Helper for ASN.1 names
+    const InterfaceTypeNameHelper &m_typeNameHelper;
 
     /// @brief  Name for the argument in the IV interface
     inline static const QString m_ivInterfaceParameterName = "InputParam";

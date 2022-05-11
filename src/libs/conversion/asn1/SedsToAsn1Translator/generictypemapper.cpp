@@ -29,9 +29,9 @@ using seds::model::GenericTypeMapSet;
 
 namespace conversion::asn1::translator {
 
-GenericTypeMapper::GenericTypeMapper(Context &context, QString interfaceName)
+GenericTypeMapper::GenericTypeMapper(Context &context, QString parentName)
     : m_context(context)
-    , m_interfaceName(std::move(interfaceName))
+    , m_parentName(std::move(parentName))
 {
 }
 
@@ -96,9 +96,8 @@ void GenericTypeMapper::addAlternateMapping(const GenericAlternate &alternate)
             [&](const auto &typeMap) { return typeMap.nameStr() == *m_determinantName; });
 
     if (foundDeterminant == typeMaps.end()) {
-        auto errorMessage = QString("Unable to find determinant \"%1\" for interface \"%2\"")
-                                    .arg(*m_determinantName)
-                                    .arg(m_interfaceName);
+        auto errorMessage =
+                QString("Unable to find determinant \"%1\" for \"%2\"").arg(*m_determinantName).arg(m_parentName);
         throw TranslationException(std::move(errorMessage));
     }
 
@@ -138,12 +137,11 @@ std::pair<QString, seds::model::DataTypeRef> GenericTypeMapper::findDeterminant(
             });
 
     if (determinants.empty()) {
-        auto errorMessage =
-                QString("No alternate determinant could be found in the interface \"%1\"").arg(m_interfaceName);
+        auto errorMessage = QString("No alternate determinant could be found in \"%1\"").arg(m_parentName);
         throw TranslationException(std::move(errorMessage));
     } else if (determinants.size() > 1) {
-        auto errorMessage = QString("More than one possible alternate determinant was found in the interface \"%1\"")
-                                    .arg(m_interfaceName);
+        auto errorMessage =
+                QString("More than one possible alternate determinant was found in \"%1\"").arg(m_parentName);
         throw TranslationException(std::move(errorMessage));
     }
 

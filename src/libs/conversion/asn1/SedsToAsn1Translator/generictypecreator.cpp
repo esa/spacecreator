@@ -51,10 +51,9 @@ using seds::model::GenericType;
 
 namespace conversion::asn1::translator {
 
-GenericTypeCreator::GenericTypeCreator(
-        Context &context, const QString &interfaceName, const GenericTypeMapper &typeMapper)
+GenericTypeCreator::GenericTypeCreator(Context &context, QString parentName, const GenericTypeMapper &typeMapper)
     : m_context(context)
-    , m_interfaceName(interfaceName)
+    , m_parentName(std::move(parentName))
     , m_typeMapper(typeMapper)
 {
 }
@@ -62,9 +61,8 @@ GenericTypeCreator::GenericTypeCreator(
 QString GenericTypeCreator::createTypeForGeneric(const TypeMapping *mapping, const QString &genericName)
 {
     if (mapping == nullptr || mapping->concreteMappings.empty()) {
-        auto errorMessage = QString("Missing mapping for generic type '%1' in interface '%2'")
-                                    .arg(genericName)
-                                    .arg(m_interfaceName);
+        auto errorMessage =
+                QString("Missing mapping for generic type '%1' in interface '%2'").arg(genericName).arg(m_parentName);
         throw TranslationException(std::move(errorMessage));
     }
 
@@ -88,7 +86,7 @@ QString GenericTypeCreator::createTypeForGeneric(const TypeMapping *mapping, con
 QString GenericTypeCreator::createConcreteTypeAlias(
         const QString &genericName, const TypeMapping::Concrete &concreteMapping)
 {
-    const auto concreteTypeName = DataTypeTranslationHelper::buildConcreteTypeName(m_interfaceName, genericName);
+    const auto concreteTypeName = DataTypeTranslationHelper::buildConcreteTypeName(m_parentName, genericName);
 
     if (m_context.hasAsn1Type(concreteTypeName)) {
         return concreteTypeName;
@@ -110,7 +108,7 @@ QString GenericTypeCreator::createConcreteTypeAlias(
 
 QString GenericTypeCreator::createConcreteChoice(const QString &genericName, const TypeMapping *mapping)
 {
-    const auto concreteTypeName = DataTypeTranslationHelper::buildConcreteTypeName(m_interfaceName, genericName);
+    const auto concreteTypeName = DataTypeTranslationHelper::buildConcreteTypeName(m_parentName, genericName);
 
     if (m_context.hasAsn1Type(concreteTypeName)) {
         return concreteTypeName;

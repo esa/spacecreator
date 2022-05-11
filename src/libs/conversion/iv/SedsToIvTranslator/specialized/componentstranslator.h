@@ -19,6 +19,9 @@
 
 #pragma once
 
+#include "context.h"
+#include "interfacetypenamehelper.h"
+
 #include <QVector>
 #include <asn1library/asn1/asn1model.h>
 #include <ivcore/ivinterface.h>
@@ -81,26 +84,6 @@ public:
      */
     auto translateComponents() -> QVector<ivm::IVFunction *>;
 
-public:
-    /**
-     * @brief   Searches for interface declaration
-     *
-     * It first searches in the component interface declarations. If no declaration was found
-     * then it searches in the package interface declarations.
-     *
-     * @param   interfaceDeclarationRef     Interface declaration to find
-     * @param   sedsComponent               Component to search in
-     * @param   sedsPackage                 Package to search in, if the search in the component fails
-     * @param   sedsPackages                List of SEDS packages
-     *
-     * @throw UndeclaredInterfaceException  If interface declaration was not found
-     *
-     * @return  Found interface declarartion
-     */
-    static auto findInterfaceDeclaration(const seds::model::InterfaceDeclarationRef &interfaceDeclarationRef,
-            const seds::model::Component &sedsComponent, const seds::model::Package *sedsPackage,
-            const std::vector<seds::model::Package> &sedsPackages) -> const seds::model::InterfaceDeclaration &;
-
 private:
     /**
      * @brief   Translates SEDS component to InterfaceView function
@@ -121,15 +104,18 @@ private:
      */
     auto translateInterface(const seds::model::Interface &sedsInterface, const seds::model::Component &sedsComponent,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) -> void;
-    auto translateInterfaceDeclaration(const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
-            const QString &sedsInterfaceName, const seds::model::Component &sedsComponent,
-            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
+    auto translateInterfaceDeclaration(const seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
+            const QString &sedsInterfaceName, const seds::model::Component &sedsComponent, const QString &parentName,
+            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction, Context context) const
+            -> void;
     auto translateParameters(const QString &sedsInterfaceName,
-            const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
-            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
+            const seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
+            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
+            const InterfaceTypeNameHelper &typeNameHelper) const -> void;
     auto translateCommands(const QString &sedsInterfaceName,
-            const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
-            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
+            const seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
+            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
+            const InterfaceTypeNameHelper &typeNameHelper) const -> void;
 
 private:
     /// @brief  Parent package

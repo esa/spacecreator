@@ -40,9 +40,10 @@ using seds::model::CommandArgumentMode;
 namespace conversion::iv::translator {
 
 AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(
-        ivm::IVFunction *ivFunction, const QString &sedsInterfaceName)
+        ivm::IVFunction *ivFunction, const QString &sedsInterfaceName, const InterfaceTypeNameHelper &typeNameHelper)
     : m_ivFunction(ivFunction)
     , m_sedsInterfaceName(sedsInterfaceName)
+    , m_typeNameHelper(typeNameHelper)
 {
 }
 
@@ -119,19 +120,11 @@ void AsyncInterfaceCommandTranslator::translateArguments(const seds::model::Inte
 {
     // Async commands are translated to sporadic interfaces, which can accept only one argument
     // To satisfy this we need to pack all command arguments into one
-    const auto bundledTypeName = handleArgumentTypeName(sedsCommand, requestedArgumentMode);
+    const auto bundledTypeName = m_typeNameHelper.handleAsyncCommandTypeName(sedsCommand, requestedArgumentMode);
 
     const auto ivParameter = InterfaceTranslatorHelper::createInterfaceParameter(
             m_ivInterfaceParameterName, bundledTypeName, shared::InterfaceParameter::Direction::IN);
     ivInterface->addParam(ivParameter);
-}
-
-QString AsyncInterfaceCommandTranslator::handleArgumentTypeName(
-        const seds::model::InterfaceCommand &sedsCommand, const CommandArgumentMode requestedArgumentMode)
-{
-    Q_UNUSED(sedsCommand);
-    Q_UNUSED(requestedArgumentMode);
-    return "ASYNC_STUB";
 }
 
 } // namespace conversion::iv::translator

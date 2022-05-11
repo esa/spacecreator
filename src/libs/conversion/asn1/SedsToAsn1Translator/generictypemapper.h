@@ -54,10 +54,10 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   context         Current translation context
-     * @param   interfaceName   Parent SEDS interface name
+     * @param   context     Current translation context
+     * @param   parentName  Name of the parent
      */
-    explicit GenericTypeMapper(Context &context, QString interfaceName);
+    GenericTypeMapper(Context &context, QString parentName);
     /**
      * @brief   Deleted copy constructor
      */
@@ -95,7 +95,7 @@ private:
 
 private:
     Context &m_context;
-    QString m_interfaceName;
+    QString m_parentName;
     std::optional<QString> m_determinantName;
     std::optional<QString> m_determinantTypePath;
 

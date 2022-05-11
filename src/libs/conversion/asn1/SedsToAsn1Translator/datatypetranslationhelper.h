@@ -47,8 +47,6 @@ public:
     static auto buildBundledTypeName(const QString &parentName, const QString &commandName,
             const seds::model::CommandArgumentMode mode) -> QString;
     static auto buildConcreteTypeName(const QString &interfaceDeclarationName, const QString &genericName) -> QString;
-    static auto buildConcreteTypeName(
-            const QString &componentName, const QString &interfaceName, const QString &genericName) -> QString;
 
     static auto createArrayType(Context &context, const seds::model::DataTypeRef &typeRef,
             const std::vector<seds::model::DimensionSize> &dimensions) -> seds::model::DataTypeRef;

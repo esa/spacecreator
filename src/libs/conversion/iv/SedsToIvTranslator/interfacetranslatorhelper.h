@@ -95,6 +95,25 @@ public:
             const ivm::IVInterface::InterfaceType type) -> QString;
 
     /**
+     * @brief   Searches for interface declaration
+     *
+     * It first searches in the component interface declarations. If no declaration was found
+     * then it searches in the package interface declarations.
+     *
+     * @param   interfaceDeclarationRef     Interface declaration to find
+     * @param   sedsComponent               Component to search in
+     * @param   sedsPackage                 Package to search in, if the search in the component fails
+     * @param   sedsPackages                List of SEDS packages
+     *
+     * @throw UndeclaredInterfaceException  If interface declaration was not found
+     *
+     * @return  Found interface declarartion
+     */
+    static auto findInterfaceDeclaration(const seds::model::InterfaceDeclarationRef &interfaceDeclarationRef,
+            const seds::model::Component &sedsComponent, const seds::model::Package *sedsPackage,
+            const std::vector<seds::model::Package> &sedsPackages) -> const seds::model::InterfaceDeclaration &;
+
+    /**
      * @brief   Switch interface type
      *
      * @param   interfaceType       Type to switch

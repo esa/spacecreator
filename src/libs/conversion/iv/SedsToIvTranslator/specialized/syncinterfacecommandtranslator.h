@@ -20,6 +20,7 @@
 #pragma once
 
 #include "generictypemapper.h"
+#include "interfacetypenamehelper.h"
 
 #include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/definitions.h>
@@ -39,10 +40,12 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   ivFunction                  Output interface view function
-     * @param   sedsInterfaceName           Parent interface name
+     * @param   ivFunction          Output interface view function
+     * @param   sedsInterfaceName   Parent interface name
+     * @param   typeNameHelper      Helper for ASN.1 type names
      */
-    SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName);
+    SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
+            const InterfaceTypeNameHelper &typeNameHelper);
     /**
      * @brief   Deleted copy constructor
      */
@@ -82,6 +85,8 @@ private:
     ivm::IVFunction *m_ivFunction;
     /// @brief  Parent SEDS interface name
     const QString &m_sedsInterfaceName;
+    /// @brief  Helper for ASN.1 names
+    const InterfaceTypeNameHelper &m_typeNameHelper;
 };
 
 } // namespace conversion::iv::translator
