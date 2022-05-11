@@ -38,3 +38,6 @@ configure_file(resources/sequence-embedded.pml.out resources/sequence-embedded.p
 
 configure_file(resources/sequenceof.asn resources/sequenceof.asn COPYONLY)
 configure_file(resources/sequenceof.pml.out resources/sequenceof.pml.out COPYONLY)
+
+configure_file(resources/sequenceof-variable-size.asn resources/sequenceof-variable-size.asn COPYONLY)
+configure_file(resources/sequenceof-variable-size.pml.out resources/sequenceof-variable-size.pml.out COPYONLY)

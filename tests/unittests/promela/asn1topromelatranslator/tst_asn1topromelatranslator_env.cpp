@@ -308,6 +308,17 @@ void tst_Asn1ToPromelaTranslator_Env::testSequenceOf() const
     compareTextFiles(actualOutputFilename, expectedOutputFilename);
 }
 
+void tst_Asn1ToPromelaTranslator_Env::testSequenceOfVariableSize() const
+{
+    const QString inputAsnFilename = "sequenceof-variable-size.asn";
+    const QStringList asnTypesToTranslate = { "SimpleVariableSizeSequenceOf" };
+    const QString actualOutputFilename = "sequenceof-variable-size.pml";
+    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
+
+    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
+    compareTextFiles(actualOutputFilename, expectedOutputFilename);
+}
+
 std::unique_ptr<Definitions> tst_Asn1ToPromelaTranslator_Env::createModel() const
 {
     return std::make_unique<Definitions>("myModule", SourceLocation());
