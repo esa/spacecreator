@@ -19,6 +19,7 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
+#include <QDebug>
 #include <QList>
 #include <algorithm>
 #include <asn1library/asn1/asnsequencecomponent.h>
@@ -48,6 +49,8 @@
 #include <promela/PromelaModel/basictypes.h>
 #include <promela/PromelaModel/inlinecall.h>
 #include <promela/PromelaModel/inlinedef.h>
+#include <promela/PromelaModel/proctypeelement.h>
+#include <promela/PromelaModel/sequence.h>
 #include <promela/PromelaModel/variableref.h>
 #include <qglobal.h>
 #include <stdexcept>
@@ -219,6 +222,18 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
     m_promelaModel.addInlineDef(std::move(inlineDef));
 }
 
+std::unique_ptr<ProctypeElement> makeForLoopWithCall(
+        const QString &functionToCallName, const int itEndValue, const QString &iteratorVariableName = "i")
+{
+    auto sequence = ProctypeMaker::makeNormalSequence();
+
+    auto innerSequence = ProctypeMaker::makeNormalSequence();
+    innerSequence->appendElement(ProctypeMaker::makeInlineCall(functionToCallName, "value", "data[i]"));
+
+    VariableRef iteratorReference(iteratorVariableName);
+    return ProctypeMaker::makeForLoop(iteratorReference, 0, itEndValue, std::move(innerSequence));
+}
+
 void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
 {
     const QString componentTypeName = type.itemsType()->typeName();
@@ -233,16 +248,24 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
     type.constraints().accept(constraintVisitor);
     constraintVisitor.isSizeConstraintVisited();
 
-    const size_t minSize = 0;
-    const size_t maxSize = constraintVisitor.getMaxSize();
-
-    auto innerSequence = ProctypeMaker::makeNormalSequence();
-    const QString seqOfGeneratorInline = QString("%1%2").arg(type.itemsType()->typeName()).arg("_generate_value");
-    innerSequence->appendElement(ProctypeMaker::makeInlineCall(seqOfGeneratorInline, "value", "data[i]"));
-
     auto sequence = ProctypeMaker::makeNormalSequence();
     sequence->appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, "i"));
-    sequence->appendElement(ProctypeMaker::makeForLoop(VariableRef("i"), minSize, maxSize, std::move(innerSequence)));
+    const size_t minSize = constraintVisitor.getMinSize();
+    const size_t maxSize = constraintVisitor.getMaxSize();
+    const QString seqOfGeneratorInline = QString("%1%2").arg(type.itemsType()->typeName()).arg("_generate_value");
+    if (minSize == maxSize) {
+        sequence->appendElement(makeForLoopWithCall(seqOfGeneratorInline, maxSize));
+    } else { // sequenceOf has variable length
+        Conditional conditional;
+        for (unsigned int i = minSize; i <= maxSize; i++) {
+            auto alternativeSequence = ProctypeMaker::makeNormalSequence();
+            alternativeSequence->appendElement(ProctypeMaker::makeTrueExpressionProctypeElement());
+            alternativeSequence->appendElement(makeForLoopWithCall(seqOfGeneratorInline, static_cast<int>(i)));
+            conditional.appendAlternative(std::move(alternativeSequence));
+        }
+
+        sequence->appendElement(std::make_unique<ProctypeElement>(std::move(conditional)));
+    }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(type.identifier());
     const QString argumentName = "value";
