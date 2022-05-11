@@ -1,0 +1,37 @@
+inline Type1_generate_value(value)
+{
+    if
+    ::  true;
+        value = 0;
+    ::  true;
+        value = 1;
+    ::  true;
+        value = 2;
+    ::  true;
+        value = 3;
+    fi;
+}
+inline Type2_generate_value(value)
+{
+    if
+    ::  true;
+        value = 9;
+    ::  true;
+        value = 10;
+    ::  true;
+        value = 11;
+    ::  true;
+        value = 12;
+    ::  true;
+        value = 13;
+    fi;
+}
+inline SimpleFixedSizeSequenceOf_generate_value(value)
+{
+    if
+    :: true;
+       Type1_generate_value(value);
+    :: true;
+       Type2_generate_value(value);
+    fi;
+}

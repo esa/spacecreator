@@ -19,6 +19,7 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
+#include <QDebug>
 #include <QList>
 #include <algorithm>
 #include <asn1library/asn1/asnsequencecomponent.h>
@@ -188,6 +189,9 @@ void Asn1TypeValueGeneratorVisitor::visit(const Enumerated &type)
 void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
 {
     Q_UNUSED(type);
+
+    qDebug() << "im choice visitor";
+
     const QString message = QString("Choice ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
                                     .arg(__FILE__)
                                     .arg(__LINE__);
