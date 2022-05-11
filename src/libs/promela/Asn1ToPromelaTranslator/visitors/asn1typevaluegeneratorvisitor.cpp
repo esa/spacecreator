@@ -221,6 +221,14 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 
 void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
 {
+    const QString componentTypeName = type.itemsType()->typeName();
+    const QString inlineTypeGeneratorName = getInlineGeneratorName(componentTypeName);
+    if (!modelContainsInlineGenerator(inlineTypeGeneratorName)) {
+        auto *const asnSequenceComponentType = type.itemsType();
+        Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName);
+        asnSequenceComponentType->accept(visitor);
+    }
+
     Asn1ConstraintVisitor<Asn1Acn::IntegerValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
     constraintVisitor.isSizeConstraintVisited();

@@ -300,7 +300,7 @@ void tst_Asn1ToPromelaTranslator_Env::testSequenceEmbeddedType() const
 void tst_Asn1ToPromelaTranslator_Env::testSequenceOf() const
 {
     const QString inputAsnFilename = "sequenceof.asn";
-    const QStringList asnTypesToTranslate = { "Type1", "SimpleFixedSizeSequenceOf" };
+    const QStringList asnTypesToTranslate = { "SimpleFixedSizeSequenceOf" };
     const QString actualOutputFilename = "sequenceof.pml";
     const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
 
