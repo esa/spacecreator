@@ -1,0 +1,58 @@
+<InterfaceView>
+<Function name="Component" is_type="NO" language="SDL" default_implementation="default">
+<Provided_Interface name="InterfaceImplementation_Sync1_Pi" kind="Protected" layer="default">
+    <Input_Parameter name="Arg1" type="PackageInteger" encoding="ACN"/>
+    <Input_Parameter name="Arg2" type="PackageIntegerArray-1" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="InterfaceImplementation_Async1_Pi" layer="default">
+    <Input_Parameter name="InputParam" type="InterfaceDecl1-Async1-Type" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="InterfaceImplementation_Sync2_Pi" kind="Protected" layer="default">
+    <Input_Parameter name="Arg1" type="PackageInteger" encoding="ACN"/>
+    <Input_Parameter name="Arg2" type="InterfaceDecl4-Generic2Array-2" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="InterfaceImplementation_Async2_Pi" layer="default">
+    <Input_Parameter name="InputParam" type="InterfaceDecl4-Async2-Type" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="InterfaceImplementation_Async3_Pi" layer="default">
+    <Input_Parameter name="InputParam" type="InterfaceDecl4-Async3-Type" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="InterfaceImplementation_Sync5_Pi" kind="Protected" layer="default">
+    <Input_Parameter name="Arg1" type="Component-InterfaceImplementation-Generic2Array-5" encoding="ACN"/>
+    <Input_Parameter name="Arg2" type="Component-InterfaceImplementation-Generic3Array-5" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface name="InterfaceImplementation_Async5_Pi" layer="default">
+    <Input_Parameter name="InputParam" type="Component-InterfaceImplementation-Async5-Type" encoding="ACN"/>
+</Provided_Interface>
+
+<Required_Interface name="Get_InterfaceImplementation_Param1_Ri" kind="Sporadic" layer="default">
+    <Input_Parameter name="Param" type="PackageFloatArray-1" encoding="ACN"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="Get_InterfaceImplementation_Param2_Ri" kind="Sporadic" layer="default">
+    <Input_Parameter name="Param" type="InterfaceDecl4-Generic2Array-2" encoding="ACN"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="Get_InterfaceImplementation_Param3_Ri" kind="Sporadic" layer="default">
+    <Input_Parameter name="Param" type="InterfaceDecl4-Generic2Array-3" encoding="ACN"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="Get_InterfaceImplementation_Param5_Ri" kind="Sporadic" layer="default">
+    <Input_Parameter name="Param" type="Component-InterfaceImplementation-Generic2Array-5" encoding="ACN"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+</InterfaceView>

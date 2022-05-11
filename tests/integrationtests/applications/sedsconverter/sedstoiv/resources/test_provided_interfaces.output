@@ -11,20 +11,20 @@
 </Provided_Interface>
 
 <Provided_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousAction_Pi" comment="Execute an asynchronous action with input arguments" layer="default">
-    <Input_Parameter name="InputParam" type="ExecuteAsynchronousAction-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="InterfaceWithAsynchronousCommands-ExecuteAsynchronousAction-Type" encoding="ACN"/>
 </Provided_Interface>
 
 <Provided_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithNotification_Pi" comment="Execute an asynchronous action with output arguments" layer="default">
-    <Input_Parameter name="InputParam" type="ExecuteAsynchronousActionWithNotification-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="InterfaceWithAsynchronousCommands-ExecuteAsynchronousActionWithNotification-Type" encoding="ACN"/>
 </Provided_Interface>
 
 <Required_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithOutArgs_Ri" comment="Execute an asynchronous action with output arguments" kind="Sporadic" layer="default">
-    <Input_Parameter name="InputParam" type="ExecuteAsynchronousActionWithOutArgs-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="InterfaceWithAsynchronousCommands-ExecuteAsynchronousActionWithOutArgs-Type" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
 <Required_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithNotification_Ri" comment="Execute an asynchronous action with output arguments" kind="Sporadic" layer="default">
-    <Input_Parameter name="InputParam" type="ExecuteAsynchronousActionWithNotification-Type1" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="InterfaceWithAsynchronousCommands-ExecuteAsynchronousActionWithNotification-TypeNotify" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 

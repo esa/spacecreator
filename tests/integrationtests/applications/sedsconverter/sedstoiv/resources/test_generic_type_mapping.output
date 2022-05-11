@@ -13,7 +13,7 @@
     <Input_Parameter name="ArgumentSimpleMapping" type="MegaComponent-ProvidedInterface-GenericType" encoding="ACN"/>
 </Provided_Interface>
 <Provided_Interface name="ProvidedInterface_AsyncCommandNoMapping_Pi" layer="default">
-    <Input_Parameter name="InputParam" type="MegaComponent-ProvidedInterface-AsyncCommandNoMapping-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="MegaInterface-AsyncCommandNoMapping-Type" encoding="ACN"/>
 </Provided_Interface>
 <Provided_Interface name="ProvidedInterface_AsyncCommandSimpleMapping_Pi" layer="default">
     <Input_Parameter name="InputParam" type="MegaComponent-ProvidedInterface-AsyncCommandSimpleMapping-Type" encoding="ACN"/>

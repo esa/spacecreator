@@ -113,11 +113,16 @@ void ComponentsTranslator::translateInterfaceDeclaration(
             sedsBaseInterfaceContext = { sedsBaseInterfacePackage, nullptr };
         }
 
+        auto sedsBaseInterfaceParentName = parentName;
+        if (sedsBaseInterface.genericTypeMapSet()) {
+            sedsBaseInterfaceParentName = sedsInterfaceDeclaration->nameStr();
+        }
+
         const auto &sedsBaseInterfaceDeclaration =
                 sedsBaseInterfaceContext.findInterfaceDeclaration(sedsBaseInterfaceTypeRef.nameStr());
 
-        translateInterfaceDeclaration(sedsBaseInterfaceDeclaration, sedsInterfaceName, sedsComponent, parentName,
-                interfaceType, ivFunction, sedsBaseInterfaceContext);
+        translateInterfaceDeclaration(sedsBaseInterfaceDeclaration, sedsInterfaceName, sedsComponent,
+                sedsBaseInterfaceParentName, interfaceType, ivFunction, sedsBaseInterfaceContext);
     }
 
     InterfaceTypeNameHelper typeNameHelper(context, parentName, sedsInterfaceDeclaration, m_sedsPackages);
