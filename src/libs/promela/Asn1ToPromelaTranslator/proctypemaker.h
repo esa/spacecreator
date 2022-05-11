@@ -46,19 +46,7 @@ public:
      *
      * @return  ProctypeElement with specified InlineCall
      */
-    static auto makeMonadicInlineCall(const QString &inlineName, const QString &argumentName,
-            const QString &memberName = "") -> std::unique_ptr<ProctypeElement>;
-
-    /**
-     * @brief make ProctypeElement with InlineCall with two arguments
-     *
-     * @param inlineName name of required inline
-     * @param arg1       name of a first argument
-     * @param arg2       name of a second argument
-     *
-     * @return  ProctypeElement with specified InlineCall
-     */
-    static auto makeDyadicInlineCall(const QString &inlineName, const QString &arg1, const QString &arg2)
+    static auto makeInlineCall(const QString &inlineName, const QString &argumentName, const QString &memberName = "")
             -> std::unique_ptr<ProctypeElement>;
 
     /**
@@ -100,14 +88,14 @@ public:
     /**
      * @brief make ProctypeElement with a for loop
      *
-     * @param var      reference to iterator variable
+     * @param variable reference to iterator variable
      * @param first    start value of iterator value
      * @param last     end value of iterator value (inclusive)
      * @param sequence loop's body
      *
      * @return ProctypeElement with specified specified variable declaration
      */
-    static auto makeForLoop(const VariableRef &var, int first, int last, std::unique_ptr<model::Sequence> sequence)
+    static auto makeForLoop(const VariableRef &variable, int first, int last, std::unique_ptr<model::Sequence> sequence)
             -> std::unique_ptr<ProctypeElement>;
 };
 

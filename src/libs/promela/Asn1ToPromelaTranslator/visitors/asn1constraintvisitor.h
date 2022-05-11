@@ -83,7 +83,7 @@ public:
      *
      * @return true if size constraint was visited, otherwise false
      */
-    bool isSizeConstraintVisited() const noexcept { return m_sizeVisitor.isRangeConstraintVisited(); }
+    bool isSizeConstraintVisited() const noexcept { return m_sizeVisitor.isSizeConstraintVisited(); }
 
     /**
      * @brief Getter for found minimal size constraint

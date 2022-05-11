@@ -75,7 +75,7 @@ public:
      *
      * @return true if constraint was visited, otherwise false
      */
-    bool isRangeConstraintVisited() const noexcept;
+    bool isSizeConstraintVisited() const noexcept;
 
     /**
      * @brief Getter for found minimal value constraint

@@ -39,21 +39,12 @@ using promela::model::Sequence;
 
 namespace promela::translator {
 
-std::unique_ptr<ProctypeElement> ProctypeMaker::makeMonadicInlineCall(
+std::unique_ptr<ProctypeElement> ProctypeMaker::makeInlineCall(
         const QString &inlineName, const QString &argumentName, const QString &memberName)
 {
     const QString inlineCallArgument =
             memberName.isEmpty() ? argumentName : QString("%1.%2").arg(argumentName).arg(memberName);
     const QList<InlineCall::Argument> args({ inlineCallArgument });
-
-    auto inlineCall = InlineCall(inlineName, args);
-    return std::make_unique<ProctypeElement>(std::move(inlineCall));
-}
-
-std::unique_ptr<ProctypeElement> ProctypeMaker::makeDyadicInlineCall(
-        const QString &inlineName, const QString &arg1, const QString &arg2)
-{
-    const QList<InlineCall::Argument> args({ arg1, arg2 });
 
     auto inlineCall = InlineCall(inlineName, args);
     return std::make_unique<ProctypeElement>(std::move(inlineCall));
@@ -84,9 +75,9 @@ std::unique_ptr<ProctypeElement> ProctypeMaker::makeVariableDeclaration(
 }
 
 std::unique_ptr<ProctypeElement> ProctypeMaker::makeForLoop(
-        const VariableRef &var, int first, int last, std::unique_ptr<Sequence> sequence)
+        const VariableRef &variable, const int first, const int last, std::unique_ptr<Sequence> sequence)
 {
-    ForLoop loop(var, first, last, std::move(sequence));
+    ForLoop loop(variable, first, last, std::move(sequence));
     return std::make_unique<ProctypeElement>(std::move(loop));
 }
 

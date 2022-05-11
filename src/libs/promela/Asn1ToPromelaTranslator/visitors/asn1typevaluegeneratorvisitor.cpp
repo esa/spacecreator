@@ -238,7 +238,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
 
     auto innerSequence = ProctypeMaker::makeNormalSequence();
     const QString seqOfGeneratorInline = QString("%1%2").arg(type.itemsType()->typeName()).arg("_generate_value");
-    innerSequence->appendElement(ProctypeMaker::makeMonadicInlineCall(seqOfGeneratorInline, "value", "data[i]"));
+    innerSequence->appendElement(ProctypeMaker::makeInlineCall(seqOfGeneratorInline, "value", "data[i]"));
 
     auto sequence = ProctypeMaker::makeNormalSequence();
     sequence->appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, "i"));
@@ -368,8 +368,8 @@ std::unique_ptr<ProctypeElement> Asn1TypeValueGeneratorVisitor::generateAsnSeque
 
         auto valueExistsSequence = ProctypeMaker::makeNormalSequence();
         valueExistsSequence->appendElement(ProctypeMaker::makeTrueExpressionProctypeElement());
-        valueExistsSequence->appendElement(
-                ProctypeMaker::makeMonadicInlineCall(typeGeneratorToCallName, argumentName, componentName));
+        valueExistsSequence->appendElement(ProctypeMaker::makeInlineCall(typeGeneratorToCallName,
+                Escaper::escapePromelaName(argumentName), Escaper::escapePromelaName(componentName)));
         valueExistsSequence->appendElement(ProctypeMaker::makeAssignmentProctypeElement(valueExistAssignmentName, 1));
 
         auto valueNotExistSequence = ProctypeMaker::makeNormalSequence();
@@ -382,7 +382,7 @@ std::unique_ptr<ProctypeElement> Asn1TypeValueGeneratorVisitor::generateAsnSeque
 
         return std::make_unique<ProctypeElement>(std::move(conditional));
     } else {
-        return ProctypeMaker::makeMonadicInlineCall(typeGeneratorToCallName, argumentName, componentName);
+        return ProctypeMaker::makeInlineCall(typeGeneratorToCallName, argumentName, componentName);
     }
 }
 

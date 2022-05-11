@@ -97,7 +97,7 @@ void IntegerConstraintVisitor::visit(const ::Asn1Acn::Constraints::ConstraintLis
     m_subset = tmp;
 }
 
-bool IntegerConstraintVisitor::isRangeConstraintVisited() const noexcept
+bool IntegerConstraintVisitor::isSizeConstraintVisited() const noexcept
 {
     return m_subset.has_value();
 }
@@ -124,5 +124,4 @@ const std::optional<IntegerSubset> &IntegerConstraintVisitor::getResultSubset() 
 {
     return m_subset;
 }
-
 } // namespace promela::translator
