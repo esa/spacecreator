@@ -246,26 +246,32 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
     Asn1ConstraintVisitor<Asn1Acn::IntegerValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
 
+    const QString &typeIdentifier = type.identifier();
+
     auto sequence = ProctypeMaker::makeNormalSequence();
     sequence->appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, "i"));
     const size_t minSize = constraintVisitor.getMinSize();
     const size_t maxSize = constraintVisitor.getMaxSize();
-    const QString seqOfGeneratorInline = QString("%1%2").arg(type.itemsType()->typeName()).arg("_generate_value");
+    const QString typeGeneratorInline = QString("%1%2").arg(componentTypeName).arg("_generate_value");
     if (minSize == maxSize) {
-        sequence->appendElement(makeForLoopWithCall(seqOfGeneratorInline, maxSize));
+        sequence->appendElement(makeForLoopWithCall(typeGeneratorInline, maxSize));
     } else { // sequenceOf has variable length
-        Conditional conditional;
-        for (unsigned int i = minSize; i <= maxSize; i++) {
-            auto alternativeSequence = ProctypeMaker::makeNormalSequence();
-            alternativeSequence->appendElement(ProctypeMaker::makeTrueExpressionProctypeElement());
-            alternativeSequence->appendElement(makeForLoopWithCall(seqOfGeneratorInline, static_cast<int>(i)));
-            conditional.appendAlternative(std::move(alternativeSequence));
-        }
+        Asn1Acn::Types::Integer length("length");
+        const Asn1Acn::Range<Asn1Acn::IntegerValue::Type> range(static_cast<long>(minSize), static_cast<long>(maxSize));
+        length.constraints().append(range);
 
-        sequence->appendElement(std::make_unique<ProctypeElement>(std::move(conditional)));
+        const QString lengthGeneratorTypeName = QString("%1_length").arg(typeIdentifier);
+        Asn1TypeValueGeneratorVisitor lenVisitor(m_promelaModel, lengthGeneratorTypeName);
+        length.accept(lenVisitor);
+
+        sequence->appendElement(ProctypeMaker::makeInlineCall(
+                QString("%1_generate_value").arg(lengthGeneratorTypeName), "value.length"));
+
+        // for(i : 0 .. value.length - 1)
+        sequence->appendElement(makeForLoopWithCall(typeGeneratorInline, 4));
     }
 
-    const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(type.identifier());
+    const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);
     const QString argumentName = "value";
     const QStringList inlineArguments = { argumentName };
     auto inlineDef = std::make_unique<InlineDef>(inlineSeqGeneratorName, inlineArguments, std::move(*sequence));
