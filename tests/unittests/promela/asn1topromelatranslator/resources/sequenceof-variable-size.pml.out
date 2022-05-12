@@ -11,24 +11,24 @@ inline Type1_generate_value(value)
         value = 3;
     fi;
 }
-inline SimpleVariableSizeSequenceOf_generate_value(value)
+inline SimpleVariableSizeSequenceOf_length_generate_value(value)
 {
-    int i;
     if
     ::  true;
-        for(i : 0 .. 3)
-        {
-            Type1_generate_value(value.data[i]);
-        }
+        value = 3;
     ::  true;
-        for(i : 0 .. 4)
-        {
-            Type1_generate_value(value.data[i]);
-        }
+        value = 4;
     ::  true;
-        for(i : 0 .. 5)
-        {
-            Type1_generate_value(value.data[i]);
-        }
+        value = 5;
     fi;
+}
+inline SimpleVariableSizeSequenceOf_generate_value(value)
+{
+    SimpleVariableSizeSequenceOf_length_generate_value(value.length);
+    
+    int i;
+    for(i : 0 .. value.length - 1)
+    {
+        Type1_generate_value(value.data[i]);
+    }
 }

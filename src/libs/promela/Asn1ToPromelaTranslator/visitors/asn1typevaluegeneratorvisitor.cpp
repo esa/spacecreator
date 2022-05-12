@@ -230,7 +230,7 @@ std::unique_ptr<ProctypeElement> makeForLoopWithCall(
     innerSequence->appendElement(ProctypeMaker::makeInlineCall(functionToCallName, "value", "data[i]"));
 
     VariableRef iteratorReference(iteratorVariableName);
-    return ProctypeMaker::makeForLoop(iteratorReference, 0, itEndValue, std::move(innerSequence));
+    return ProctypeMaker::makeForLoop(iteratorReference, 0, itEndValue - 1, std::move(innerSequence));
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
@@ -245,7 +245,6 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
 
     Asn1ConstraintVisitor<Asn1Acn::IntegerValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
-    constraintVisitor.isSizeConstraintVisited();
 
     auto sequence = ProctypeMaker::makeNormalSequence();
     sequence->appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, "i"));
