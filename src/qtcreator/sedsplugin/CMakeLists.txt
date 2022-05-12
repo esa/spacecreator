@@ -36,7 +36,7 @@ add_qtc_plugin(${PLUGIN_NAME}
             libmsceditor
             libiveditor
             libdveditor
-            PluginCommon
+            CommonTools
             ${QT_CORE}
             ${QT_GUI}
             ${QT_WIDGETS}
