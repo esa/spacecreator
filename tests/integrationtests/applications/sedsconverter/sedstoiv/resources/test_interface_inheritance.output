@@ -1,5 +1,5 @@
 <InterfaceView>
-<Function name="Component" is_type="NO" language="C" default_implementation="default">
+<Function name="Component" is_type="NO" language="SDL" default_implementation="default">
 <Provided_Interface name="Get_ComponentInterface_MegaParam_Pi" kind="Protected" layer="default">
     <Output_Parameter name="Param" type="BaseInterface-GenericInteger" encoding="ACN"/>
 </Provided_Interface>
@@ -28,7 +28,7 @@
 </Provided_Interface>
 
     <Implementations>
-        <Implementation name="default" language="C"/>
+        <Implementation name="default" language="SDL"/>
     </Implementations>
 </Function>
 
