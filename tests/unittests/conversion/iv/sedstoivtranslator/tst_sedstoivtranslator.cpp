@@ -186,7 +186,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
 
     const auto param = params[0];
     QCOMPARE(param.name(), "InputParam");
-    QCOMPARE(param.paramTypeName(), "ICommand-Type");
+    QCOMPARE(param.paramTypeName(), "Component-Interface-ICommand-Type");
     QCOMPARE(param.direction(), shared::InterfaceParameter::Direction::IN);
 }
 
@@ -255,7 +255,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
 
     const auto param = params[0];
     QCOMPARE(param.name(), "InputParam");
-    QCOMPARE(param.paramTypeName(), "ICommand-Type");
+    QCOMPARE(param.paramTypeName(), "Component-Interface-ICommand-Type");
     QCOMPARE(param.direction(), shared::InterfaceParameter::Direction::IN);
 }
 
