@@ -111,6 +111,7 @@ void tst_SedsToIvTranslator::testTooManyModels()
 void tst_SedsToIvTranslator::testWrongModel()
 {
     Options options;
+    options.add(IvOptions::configFilepath, "config.xml");
     SedsToIvTranslator translator;
 
     const auto sedsModel = SedsModelBuilder("Package").build();
