@@ -128,3 +128,7 @@ configure_file(resources/test_cross_reference_interfaces_package3_acn.output res
 configure_file(test_descriptions.sh test_descriptions.sh COPYONLY)
 configure_file(resources/test_descriptions.xml resources/test_descriptions.xml COPYONLY)
 configure_file(resources/test_descriptions.output resources/test_descriptions.output COPYONLY)
+
+configure_file(test_interface_inheritance_types.sh test_interface_inheritance_types.sh COPYONLY)
+configure_file(resources/test_interface_inheritance_types.xml resources/test_interface_inheritance_types.xml COPYONLY)
+configure_file(resources/test_interface_inheritance_types.output resources/test_interface_inheritance_types.output COPYONLY)

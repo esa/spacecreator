@@ -41,6 +41,8 @@ private Q_SLOTS:
     void testMinMaxRange();
     void testCrossReferenceDataTypes();
     void testDescriptions();
+    void testInterfaceDeclarationTypes();
+    void testInterfaceInheritanceTypes();
 };
 
 /// \SRS  ETB-FUN-10
@@ -202,6 +204,28 @@ void tst_SedsConverter_SedsToAsn1::testCrossReferenceDataTypes()
 void tst_SedsConverter_SedsToAsn1::testDescriptions()
 {
     const int result = system("./test_descriptions.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-110
+/// \SRS  ETB-FUN-1080
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-120
+void tst_SedsConverter_SedsToAsn1::testInterfaceDeclarationTypes()
+{
+    const int result = system("./test_interface_declaration_types.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-110
+/// \SRS  ETB-FUN-1080
+/// \SRS  ETB-IF-10
+/// \SRS  ETB-IF-120
+void tst_SedsConverter_SedsToAsn1::testInterfaceInheritanceTypes()
+{
+    const int result = system("./test_interface_inheritance_types.sh");
     QCOMPARE(result, 0);
 }
 

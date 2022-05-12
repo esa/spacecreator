@@ -21,7 +21,6 @@ $SEDS_CONVERTER --from SEDS --to InterfaceView --aux-models ASN.1 --skip-validat
 
 cd $TEST_OUTPUT_DIR
 
-
 # Merge ASN files
 sed -e '$s/$/\n/' -s INTERFACEINHERITANCE.asn INTERFACEINHERITANCE-COMPONENT.asn > dataview-uniq.asn
 sed -e '$s/$/\n/' -s INTERFACEINHERITANCE.acn INTERFACEINHERITANCE-COMPONENT.acn > dataview-uniq.acn
