@@ -14,8 +14,8 @@ use Datamodel;
 
 system Comparator;
 
-   signal AsyncComparator_Less_Ri(Less_Type1);
-   signal AsyncComparator_Less_Pi(Less_Type);
+   signal AsyncComparator_Less_Ri(AsyncComparatorType_Less_TypeNotify);
+   signal AsyncComparator_Less_Pi(AsyncComparatorType_Less_Type);
    signal AsyncComparator_Init_Pi;
   
 
