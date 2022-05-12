@@ -22,6 +22,7 @@
 #include "specialized/componentstranslator.h"
 
 #include <QFileInfo>
+#include <asn1library/asn1/asn1model.h>
 #include <conversion/asn1/Asn1Options/options.h>
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/escaper/escaper.h>
@@ -33,6 +34,7 @@
 #include <ivcore/ivpropertytemplateconfig.h>
 #include <seds/SedsModel/sedsmodel.h>
 
+using Asn1Acn::Asn1Model;
 using conversion::Escaper;
 using conversion::asn1::translator::SedsToAsn1Translator;
 using conversion::iv::IvOptions;
@@ -48,6 +50,8 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateModels(
     checkSourceModelCount(sourceModels);
 
     const auto *sedsModel = getModel<SedsModel>(sourceModels);
+    const auto *asn1Model = getModel<Asn1Model>(sourceModels);
+    Q_UNUSED(asn1Model);
 
     const auto ivConfigFilepath = options.value(IvOptions::configFilepath);
     if (!ivConfigFilepath) {
