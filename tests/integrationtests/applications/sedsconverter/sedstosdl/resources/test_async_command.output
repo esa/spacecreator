@@ -2,8 +2,8 @@
 process Component;
     /* CIF Text (0, 150), (400, 500) */
     dcl Mvar DataItemType;
-    dcl Io_if_asynccmd_pi AsyncCmd_Type1;
-    dcl Io_if_asynccmd_ri AsyncCmd_Type;
+    dcl Io_if_asynccmd_pi IfType_AsyncCmd_TypeNotify;
+    dcl Io_if_asynccmd_ri IfType_AsyncCmd_Type;
     /* CIF ENDTEXT */
     /* CIF Procedure (0, 900), (800, 50) */
     procedure Activity;

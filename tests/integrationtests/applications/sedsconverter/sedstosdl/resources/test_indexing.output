@@ -4,7 +4,7 @@ process Component;
     dcl Var1 Container;
     dcl Var2 Container;
     dcl Var3 Scalar;
-    dcl Io_i_c_pi C_Type;
+    dcl Io_i_c_pi TI_C_Type;
     /* CIF ENDTEXT */
     /* CIF Procedure (0, 900), (800, 50) */
     procedure Activity;
