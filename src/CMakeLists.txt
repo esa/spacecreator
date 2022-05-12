@@ -1,7 +1,4 @@
-if (${QTC_FOUND})
-    add_subdirectory(qtcreator)
-endif()
-
+add_subdirectory(qtcreator)
 add_definitions(-DQT_NO_KEYWORDS)
 add_subdirectory(3rdparty)
 add_subdirectory(libs)
