@@ -23,7 +23,6 @@
 
 #include <asn1library/asn1/typeassignment.h>
 #include <asn1library/asn1/types/sequence.h>
-#include <conversion/asn1/SedsToAsn1Translator/specialized/datatypetranslatorvisitor.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/iv/SedsToIvTranslator/translator.h>

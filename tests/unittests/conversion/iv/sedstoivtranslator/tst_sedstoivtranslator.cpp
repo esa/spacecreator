@@ -22,7 +22,6 @@
 #include <asn1modelbuilder/asn1modelbuilder.h>
 #include <conversion/common/options.h>
 #include <conversion/iv/IvOptions/options.h>
-#include <conversion/iv/SedsToIvTranslator/generictypemapper.h>
 #include <conversion/iv/SedsToIvTranslator/translator.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
@@ -41,7 +40,6 @@ using namespace seds::model;
 
 using conversion::Options;
 using conversion::iv::IvOptions;
-using conversion::iv::translator::GenericTypeMapper;
 using conversion::iv::translator::SedsToIvTranslator;
 using conversion::translator::TranslationException;
 
@@ -74,9 +72,6 @@ private Q_SLOTS:
 
     void testTranslateComponentWithProvidedInterface();
     void testTranslateComponentWithRequiredInterface();
-
-    void testGenericTypeMapping();
-    void testGenericTypeMappingAmbiguousDeterminant();
 };
 
 void tst_SedsToIvTranslator::testMissingModel()
@@ -262,88 +257,6 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
     QCOMPARE(param.name(), "InputParam");
     QCOMPARE(param.paramTypeName(), "ICommand-Type");
     QCOMPARE(param.direction(), shared::InterfaceParameter::Direction::IN);
-}
-
-void tst_SedsToIvTranslator::testGenericTypeMapping()
-{
-    // clang-format off
-    const auto typeMapSet = std::make_optional(
-        SedsTypeMapSetBuilder()
-            .withMapping("GenericType1", "ConcreteType1")
-            .withAlternateSet(
-                SedsAlternateSetBuilder()
-                    .withAlternate(
-                        SedsAlternateBuilder()
-                            .withMapping("GenericType2", "DeterminantType", "1")
-                            .withMapping("GenericType3", "DeterminantType", "2")
-                        .build())
-                    .withAlternate(
-                        SedsAlternateBuilder()
-                            .withMapping("GenericType2", "DeterminantType", "2")
-                            .withMapping("GenericType3", "DeterminantType", "3")
-                        .build())
-                    .withAlternate(
-                        SedsAlternateBuilder()
-                            .withMapping("GenericType2", "DeterminantType", "3")
-                            .withMapping("GenericType3", "ConcreteType3", std::nullopt)
-                        .build())
-                    .build())
-            .build());
-    // clang-format on
-
-    GenericTypeMapper typeMapper("SedsInterfaceName", typeMapSet);
-
-    const auto typeMapping = typeMapper.getMapping("GenericType3");
-    QCOMPARE(typeMapping->genericTypeName, "GenericType3");
-
-    QVERIFY(typeMapping->determinantTypeRef.has_value());
-    QCOMPARE(typeMapping->determinantTypeRef->nameStr(), "DeterminantType");
-
-    QCOMPARE(typeMapping->concreteTypes.size(), 3);
-
-    const auto concreteType1 = typeMapping->concreteTypes.at(0);
-    QCOMPARE(concreteType1.typeRef.nameStr(), "DeterminantType");
-    QVERIFY(concreteType1.determinantValue.has_value());
-    QCOMPARE(concreteType1.determinantValue.value(), "1");
-
-    const auto concreteType2 = typeMapping->concreteTypes.at(1);
-    QCOMPARE(concreteType2.typeRef.nameStr(), "DeterminantType");
-    QVERIFY(concreteType2.determinantValue.has_value());
-    QCOMPARE(concreteType2.determinantValue.value(), "2");
-
-    const auto concreteType3 = typeMapping->concreteTypes.at(2);
-    QCOMPARE(concreteType3.typeRef.nameStr(), "ConcreteType3");
-    QVERIFY(concreteType3.determinantValue.has_value());
-    QCOMPARE(concreteType3.determinantValue.value(), "3");
-}
-
-void tst_SedsToIvTranslator::testGenericTypeMappingAmbiguousDeterminant()
-{
-    // clang-format off
-    const auto typeMapSet = std::make_optional(
-        SedsTypeMapSetBuilder()
-            .withMapping("GenericType1", "ConcreteType1")
-            .withAlternateSet(
-                SedsAlternateSetBuilder()
-                    .withAlternate(
-                        SedsAlternateBuilder()
-                            .withMapping("GenericType2", "DeterminantType", "1")
-                            .withMapping("GenericType3", "DeterminantType", "2")
-                        .build())
-                    .withAlternate(
-                        SedsAlternateBuilder()
-                            .withMapping("GenericType2", "DeterminantType", "2")
-                            .withMapping("GenericType3", "DeterminantType", "3")
-                        .build())
-                    .build())
-            .build());
-    // clang-format on
-
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(GenericTypeMapper typeMapper("SedsInterfaceName", typeMapSet),
-            TranslationException,
-            "More than one possible alternate determinant was found in the interface \"SedsInterfaceName\"");
-
-    ;
 }
 
 } // namespace conversion::iv::test
