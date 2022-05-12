@@ -90,16 +90,14 @@ public:
      *
      * @return minimal size constraint
      */
-    size_t getMinSize() const noexcept { return m_sizeVisitor.getMinValue(); }
+    size_t getMinSize() const noexcept { return m_sizeVisitor.getMinSize(); }
 
     /**
      * @brief Getter for found maximal size constraint
      *
      * @return maximal size constraint
      */
-    size_t getMaxSize() const noexcept { return m_sizeVisitor.getMaxValue(); }
-
-    IntegerConstraintVisitor *getSizeVisitor() { return &m_sizeVisitor; }
+    size_t getMaxSize() const noexcept { return m_sizeVisitor.getMaxSize(); }
 
 private:
     IntegerConstraintVisitor m_sizeVisitor;

@@ -82,14 +82,14 @@ public:
      *
      * @return minimal allowed value
      */
-    size_t getMinValue() const noexcept;
+    size_t getMinSize() const noexcept;
 
     /**
      * @brief Getter for found maximal value constraint
      *
      * @return maximal allowed value
      */
-    size_t getMaxValue() const noexcept;
+    size_t getMaxSize() const noexcept;
 
     /**
      * @brief Getter for result IntegerSubset which describes allowed size values
@@ -101,4 +101,4 @@ public:
 private:
     std::optional<IntegerSubset> m_subset;
 };
-} // promela::translator
+}

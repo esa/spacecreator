@@ -19,7 +19,6 @@
 
 #include "proctypemaker.h"
 
-#include <memory>
 #include <promela/PromelaModel/assignment.h>
 #include <promela/PromelaModel/basictypes.h>
 #include <promela/PromelaModel/constant.h>

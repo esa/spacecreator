@@ -19,7 +19,6 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
-#include <QDebug>
 #include <QList>
 #include <algorithm>
 #include <asn1library/asn1/asnsequencecomponent.h>
@@ -405,7 +404,8 @@ std::unique_ptr<ProctypeElement> Asn1TypeValueGeneratorVisitor::generateAsnSeque
 
         return std::make_unique<ProctypeElement>(std::move(conditional));
     } else {
-        return ProctypeMaker::makeInlineCall(typeGeneratorToCallName, argumentName, componentName);
+        return ProctypeMaker::makeInlineCall(
+                typeGeneratorToCallName, argumentName, Escaper::escapePromelaName(componentName));
     }
 }
 
