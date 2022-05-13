@@ -2,6 +2,9 @@
 add_subdirectory(shared)
 add_subdirectory(templating)
 
+# Common tools
+add_subdirectory(common)
+
 # Asn.1 editor
 add_subdirectory(asn1library)
 add_subdirectory(asn1editor)

@@ -11,8 +11,8 @@ target_sources(CommonTools
 
 target_include_directories(CommonTools
     PUBLIC      .
-                ${CMAKE_SOURCE_DIR}/src/qtcreator/common/modelloader
-                ${CMAKE_SOURCE_DIR}/src/qtcreator/common/ivtools
+                ${CMAKE_SOURCE_DIR}/src/libs/common/modelloader
+                ${CMAKE_SOURCE_DIR}/src/libs/common/ivtools
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs
 )
 
