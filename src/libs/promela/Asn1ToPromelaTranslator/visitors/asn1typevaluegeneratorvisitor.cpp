@@ -19,6 +19,9 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
+#include "binaryexpression.h"
+#include "constant.h"
+
 #include <QList>
 #include <algorithm>
 #include <asn1library/asn1/asnsequencecomponent.h>
@@ -222,7 +225,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 }
 
 std::unique_ptr<ProctypeElement> makeForLoopWithCall(
-        const QString &functionToCallName, const int itEndValue, const QString &iteratorVariableName = "i")
+        const QString &functionToCallName, const Expression &itEndValue, const QString &iteratorVariableName = "i")
 {
     auto sequence = ProctypeMaker::makeNormalSequence();
 
@@ -230,7 +233,7 @@ std::unique_ptr<ProctypeElement> makeForLoopWithCall(
     innerSequence->appendElement(ProctypeMaker::makeInlineCall(functionToCallName, "value", "data[i]"));
 
     VariableRef iteratorReference(iteratorVariableName);
-    return ProctypeMaker::makeForLoop(iteratorReference, 0, itEndValue - 1, std::move(innerSequence));
+    return ProctypeMaker::makeForLoop(iteratorReference, 0, itEndValue, std::move(innerSequence));
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
@@ -268,7 +271,9 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
                 QString("%1_generate_value").arg(lengthGeneratorTypeName), "value.length"));
 
         // for(i : 0 .. value.length - 1)
-        sequence->appendElement(makeForLoopWithCall(typeGeneratorInline, 4));
+        Expression end(model::BinaryExpression(model::BinaryExpression::Operator::SUBTRACT,
+                std::make_unique<Expression>(model::Constant(3)), std::make_unique<Expression>(model::Constant(1))));
+        sequence->appendElement(makeForLoopWithCall(typeGeneratorInline, end));
     }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);

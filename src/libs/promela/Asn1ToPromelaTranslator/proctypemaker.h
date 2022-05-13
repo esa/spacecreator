@@ -22,11 +22,13 @@
 #include <QString>
 #include <memory>
 #include <promela/PromelaModel/basictypes.h>
+#include <promela/PromelaModel/expression.h>
 #include <promela/PromelaModel/proctypeelement.h>
 #include <promela/PromelaModel/sequence.h>
 #include <promela/PromelaModel/variableref.h>
 
 using promela::model::BasicType;
+using promela::model::Expression;
 using promela::model::ProctypeElement;
 using promela::model::VariableRef;
 
@@ -95,8 +97,8 @@ public:
      *
      * @return ProctypeElement with specified specified variable declaration
      */
-    static auto makeForLoop(const VariableRef &variable, int first, int last, std::unique_ptr<model::Sequence> sequence)
-            -> std::unique_ptr<ProctypeElement>;
+    static auto makeForLoop(const VariableRef &variable, const Expression &first, const Expression &last,
+            std::unique_ptr<model::Sequence> sequence) -> std::unique_ptr<ProctypeElement>;
 };
 
 } // namespace promela::translator

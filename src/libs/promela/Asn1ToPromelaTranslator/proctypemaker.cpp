@@ -24,14 +24,12 @@
 #include <promela/PromelaModel/constant.h>
 #include <promela/PromelaModel/datatype.h>
 #include <promela/PromelaModel/declaration.h>
-#include <promela/PromelaModel/expression.h>
 #include <promela/PromelaModel/forloop.h>
 #include <promela/PromelaModel/inlinecall.h>
 
 using promela::model::Assignment;
 using promela::model::Constant;
 using promela::model::Declaration;
-using promela::model::Expression;
 using promela::model::ForLoop;
 using promela::model::InlineCall;
 using promela::model::Sequence;
@@ -73,10 +71,10 @@ std::unique_ptr<ProctypeElement> ProctypeMaker::makeVariableDeclaration(
     return std::make_unique<ProctypeElement>(std::move(declaration));
 }
 
-std::unique_ptr<ProctypeElement> ProctypeMaker::makeForLoop(
-        const VariableRef &variable, const int first, const int last, std::unique_ptr<Sequence> sequence)
+std::unique_ptr<ProctypeElement> ProctypeMaker::makeForLoop(const VariableRef &variable, const Expression &first,
+        const Expression &last, std::unique_ptr<Sequence> sequence)
 {
-    ForLoop loop(variable, Expression(Constant(first)), Expression(Constant(last)), std::move(sequence));
+    ForLoop loop(variable, first, last, std::move(sequence));
     return std::make_unique<ProctypeElement>(std::move(loop));
 }
 
