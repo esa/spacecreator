@@ -19,11 +19,13 @@
 
 #include "forloop.h"
 
+#include "constant.h"
+#include "expression.h"
 #include "proctypeelement.h"
 
 namespace promela::model {
 
-ForLoop::ForLoop(VariableRef var, int first, int last, std::unique_ptr<Sequence> sequence)
+ForLoop::ForLoop(VariableRef var, const Expression &first, const Expression &last, std::unique_ptr<Sequence> sequence)
     : m_variable(std::move(var))
     , m_data(std::make_pair(first, last))
     , m_sequence(std::move(sequence))
@@ -49,12 +51,14 @@ const VariableRef &ForLoop::getForVariable() const noexcept
 
 int ForLoop::getFirstValue() const
 {
-    return std::get<Range>(m_data).first;
+    const Expression &value = std::get<Range>(m_data).first;
+    return std::get<Constant>(value.getContent()).getValue();
 }
 
 int ForLoop::getLastValue() const
 {
-    return std::get<Range>(m_data).second;
+    const Expression &value = std::get<Range>(m_data).second;
+    return std::get<Constant>(value.getContent()).getValue();
 }
 
 const VariableRef &ForLoop::getArrayRef() const

@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "expression.h"
 #include "sequence.h"
 #include "variableref.h"
 
@@ -49,12 +50,12 @@ public:
     /**
      * @brief Constructor for range based for loop.
      *
-     * @param var loop variable.
-     * @param first First element or range.
-     * @param last Last element of range.
+     * @param var      loop variable.
+     * @param first    First element or range.
+     * @param last     Last element of range.
      * @param sequence body.
      */
-    ForLoop(VariableRef var, int first, int last, std::unique_ptr<Sequence> sequence);
+    ForLoop(VariableRef var, const Expression &first, const Expression &last, std::unique_ptr<Sequence> sequence);
 
     /**
      * @brief Constructor for array based for loop.
@@ -112,7 +113,7 @@ public:
 
 private:
     VariableRef m_variable;
-    using Range = std::pair<int, int>;
+    using Range = std::pair<Expression, Expression>;
     std::variant<Range, VariableRef> m_data;
     std::unique_ptr<Sequence> m_sequence;
 };

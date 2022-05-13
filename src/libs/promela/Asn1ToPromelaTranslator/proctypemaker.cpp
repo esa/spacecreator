@@ -76,7 +76,7 @@ std::unique_ptr<ProctypeElement> ProctypeMaker::makeVariableDeclaration(
 std::unique_ptr<ProctypeElement> ProctypeMaker::makeForLoop(
         const VariableRef &variable, const int first, const int last, std::unique_ptr<Sequence> sequence)
 {
-    ForLoop loop(variable, first, last, std::move(sequence));
+    ForLoop loop(variable, Expression(Constant(first)), Expression(Constant(last)), std::move(sequence));
     return std::make_unique<ProctypeElement>(std::move(loop));
 }
 
