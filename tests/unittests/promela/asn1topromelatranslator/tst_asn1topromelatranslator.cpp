@@ -287,8 +287,8 @@ void tst_Asn1ToPromelaTranslator::testVariableBitString()
         const ForLoop *loop = findProctypeElement<ForLoop>(inlineDef->getSequence(), 1);
         QVERIFY(loop != nullptr);
         QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstValue(), 0);
-        QCOMPARE(loop->getLastValue(), EXPECTED_SIZE - 1);
+        QCOMPARE(loop->getFirstIntValue(), 0);
+        QCOMPARE(loop->getLastIntValue(), EXPECTED_SIZE - 1);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 2);
         QVERIFY(assignment != nullptr);
     }
@@ -342,8 +342,8 @@ void tst_Asn1ToPromelaTranslator::testFixedBitString()
         const ForLoop *loop = findProctypeElement<ForLoop>(inlineDef->getSequence(), 1);
         QVERIFY(loop != nullptr);
         QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstValue(), 0);
-        QCOMPARE(loop->getLastValue(), EXPECTED_SIZE - 1);
+        QCOMPARE(loop->getFirstIntValue(), 0);
+        QCOMPARE(loop->getLastIntValue(), EXPECTED_SIZE - 1);
     }
 }
 
@@ -399,8 +399,8 @@ void tst_Asn1ToPromelaTranslator::testVariableOctetString()
         const ForLoop *loop = findProctypeElement<ForLoop>(inlineDef->getSequence(), 1);
         QVERIFY(loop != nullptr);
         QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstValue(), 0);
-        QCOMPARE(loop->getLastValue(), EXPECTED_SIZE - 1);
+        QCOMPARE(loop->getFirstIntValue(), 0);
+        QCOMPARE(loop->getLastIntValue(), EXPECTED_SIZE - 1);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 2);
         QVERIFY(assignment != nullptr);
     }
@@ -454,8 +454,8 @@ void tst_Asn1ToPromelaTranslator::testFixedOctetString()
         const ForLoop *loop = findProctypeElement<ForLoop>(inlineDef->getSequence(), 1);
         QVERIFY(loop != nullptr);
         QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstValue(), 0);
-        QCOMPARE(loop->getLastValue(), EXPECTED_SIZE - 1);
+        QCOMPARE(loop->getFirstIntValue(), 0);
+        QCOMPARE(loop->getLastIntValue(), EXPECTED_SIZE - 1);
     }
 }
 
@@ -512,8 +512,8 @@ void tst_Asn1ToPromelaTranslator::testVariableIA5String()
         const ForLoop *loop = findProctypeElement<ForLoop>(inlineDef->getSequence(), 1);
         QVERIFY(loop != nullptr);
         QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstValue(), 0);
-        QCOMPARE(loop->getLastValue(), EXPECTED_SIZE - 1);
+        QCOMPARE(loop->getFirstIntValue(), 0);
+        QCOMPARE(loop->getLastIntValue(), EXPECTED_SIZE - 1);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 2);
         QVERIFY(assignment != nullptr);
     }
@@ -567,8 +567,8 @@ void tst_Asn1ToPromelaTranslator::testFixedIA5String()
         const ForLoop *loop = findProctypeElement<ForLoop>(inlineDef->getSequence(), 1);
         QVERIFY(loop != nullptr);
         QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstValue(), 0);
-        QCOMPARE(loop->getLastValue(), EXPECTED_SIZE - 1);
+        QCOMPARE(loop->getFirstIntValue(), 0);
+        QCOMPARE(loop->getLastIntValue(), EXPECTED_SIZE - 1);
     }
 }
 
@@ -1083,8 +1083,8 @@ void tst_Asn1ToPromelaTranslator::testVariableSequenceOf()
         const ForLoop *loop = findProctypeElement<ForLoop>(inlineDef->getSequence(), 1);
         QVERIFY(loop != nullptr);
         QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstValue(), 0);
-        QCOMPARE(loop->getLastValue(), EXPECTED_SIZE - 1);
+        QCOMPARE(loop->getFirstIntValue(), 0);
+        QCOMPARE(loop->getLastIntValue(), EXPECTED_SIZE - 1);
         const InlineCall *inlineCall = findProctypeElement<InlineCall>(*loop->getSequence(), 0);
         QVERIFY(inlineCall != nullptr);
         QCOMPARE(inlineCall->getName(), "MyType_elem_assign_value");
@@ -1155,8 +1155,8 @@ void tst_Asn1ToPromelaTranslator::testFixedSequenceOf()
         const ForLoop *loop = findProctypeElement<ForLoop>(inlineDef->getSequence(), 1);
         QVERIFY(loop != nullptr);
         QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstValue(), 0);
-        QCOMPARE(loop->getLastValue(), EXPECTED_SIZE - 1);
+        QCOMPARE(loop->getFirstIntValue(), 0);
+        QCOMPARE(loop->getLastIntValue(), EXPECTED_SIZE - 1);
     }
 
     QCOMPARE(promelaModel.getInlineDefs().size(), 2);

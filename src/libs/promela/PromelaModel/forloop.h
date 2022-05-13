@@ -81,20 +81,20 @@ public:
     const VariableRef &getForVariable() const noexcept;
 
     /**
-     * @brief Getter for first value of range based loop.
+     * @brief Getter for first value of range based loop if it is a constant.
      *
      * @return First value in range.
      * @throws std::bad_optional_access if loop is not range based.
      */
-    int getFirstValue() const;
+    int getFirstIntValue() const;
 
     /**
-     * @brief Getter for last value of range based loop.
+     * @brief Getter for last value of range based loop if it is a constant.
      *
      * @return Last value in range.
      * @throws std::bad_optional_access if loop is not range based.
      */
-    int getLastValue() const;
+    int getLastIntValue() const;
 
     /**
      * @brief Getter for array of array based loop.

@@ -181,7 +181,7 @@ void ProctypeElementVisitor::operator()(const ForLoop &loop)
     if (loop.getType() == ForLoop::Type::RANGE) {
         m_stream << m_indent << "for(";
         variableRefVisitor.visit(loop.getForVariable());
-        m_stream << " : " << loop.getFirstValue() << " .. " << loop.getLastValue() << ")\n";
+        m_stream << " : " << loop.getFirstIntValue() << " .. " << loop.getLastIntValue() << ")\n";
     } else {
         m_stream << m_indent << "for(";
         variableRefVisitor.visit(loop.getForVariable());

@@ -23,6 +23,9 @@
 #include "expression.h"
 #include "proctypeelement.h"
 
+#include <stdexcept>
+#include <variant>
+
 namespace promela::model {
 
 ForLoop::ForLoop(VariableRef var, const Expression &first, const Expression &last, std::unique_ptr<Sequence> sequence)
@@ -49,16 +52,26 @@ const VariableRef &ForLoop::getForVariable() const noexcept
     return m_variable;
 }
 
-int ForLoop::getFirstValue() const
+int ForLoop::getFirstIntValue() const
 {
     const Expression &value = std::get<Range>(m_data).first;
-    return std::get<Constant>(value.getContent()).getValue();
+    const auto &content = value.getContent();
+    if (std::holds_alternative<Constant>(content)) {
+        return std::get<Constant>(content).getValue();
+    } else {
+        throw std::logic_error("Expression does not contain a constant");
+    }
 }
 
-int ForLoop::getLastValue() const
+int ForLoop::getLastIntValue() const
 {
     const Expression &value = std::get<Range>(m_data).second;
-    return std::get<Constant>(value.getContent()).getValue();
+    const auto &content = value.getContent();
+    if (std::holds_alternative<Constant>(content)) {
+        return std::get<Constant>(content).getValue();
+    } else {
+        throw std::logic_error("Expression does not contain a constant");
+    }
 }
 
 const VariableRef &ForLoop::getArrayRef() const
