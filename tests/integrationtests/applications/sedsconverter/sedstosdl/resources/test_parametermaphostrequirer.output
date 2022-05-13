@@ -19,6 +19,7 @@ process ParameterMapHostRequirer;
             task Io_set_if_asyncparam_ri := 10;
             /* CIF Output (0, 412), (200, 50) */
             output Set_IF_AsyncParam_Ri(Io_set_if_asyncparam_ri);
+        return;
     endprocedure;
     /* CIF Start (0, 975), (200, 75) */
     START;

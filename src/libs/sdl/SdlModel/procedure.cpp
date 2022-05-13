@@ -58,7 +58,7 @@ void Procedure::addParameter(std::unique_ptr<ProcedureParameter> parameter)
     m_parameters.push_back(std::move(parameter));
 }
 
-const QString &Procedure::returnType() const
+const std::optional<QString> &Procedure::returnType() const
 {
     return m_returnType;
 }

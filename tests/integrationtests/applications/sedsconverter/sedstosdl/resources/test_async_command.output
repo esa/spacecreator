@@ -13,6 +13,7 @@ process Component;
             task Io_if_asynccmd_ri.Inarg := Mvar;
             /* CIF Output (0, 262), (200, 50) */
             output If_AsyncCmd_Ri(Io_if_asynccmd_ri);
+        return;
     endprocedure;
     /* CIF Start (0, 975), (200, 75) */
     START;

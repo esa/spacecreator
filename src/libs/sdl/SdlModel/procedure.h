@@ -104,7 +104,7 @@ public:
      *
      * @return  return type
      */
-    auto returnType() const -> const QString &;
+    auto returnType() const -> const std::optional<QString> &;
     /**
      * @brief   Setter for the return type
      *
@@ -121,7 +121,7 @@ private:
     std::unique_ptr<Transition> m_implementation; // Null if external
     std::vector<std::unique_ptr<VariableDeclaration>> m_variables;
     std::vector<std::unique_ptr<ProcedureParameter>> m_parameters;
-    QString m_returnType;
+    std::optional<QString> m_returnType;
 };
 
 } // namespace sdl
