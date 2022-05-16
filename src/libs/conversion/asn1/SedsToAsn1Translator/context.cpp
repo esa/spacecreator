@@ -73,7 +73,7 @@ const seds::model::DataType *Context::findSedsType(const seds::model::DataTypeRe
 
 Asn1Acn::Types::Type *Context::findAsn1Type(const seds::model::DataTypeRef &typeRef)
 {
-    const auto &typeName = typeRef.nameStr();
+    const auto &typeName = Escaper::escapeAsn1TypeName(typeRef.nameStr());
 
     if (typeRef.packageStr()) {
         const auto asn1DefinitionsName = Escaper::escapeAsn1PackageName(*typeRef.packageStr());
@@ -109,7 +109,7 @@ Asn1Acn::Types::Type *Context::findAsn1Type(const seds::model::DataTypeRef &type
 
 Asn1Acn::Definitions *Context::findAsn1TypeDefinitions(const seds::model::DataTypeRef &typeRef)
 {
-    const auto &typeName = typeRef.nameStr();
+    const auto &typeName = Escaper::escapeAsn1TypeName(typeRef.nameStr());
 
     if (typeRef.packageStr()) {
         const auto asn1DefinitionsName = Escaper::escapeAsn1PackageName(*typeRef.packageStr());
@@ -178,7 +178,7 @@ const seds::model::InterfaceDeclaration *Context::findInterfaceDeclaration(
 
 bool Context::hasAsn1Type(const seds::model::DataTypeRef &typeRef) const
 {
-    const auto &typeName = typeRef.nameStr();
+    const auto &typeName = Escaper::escapeAsn1TypeName(typeRef.nameStr());
 
     if (typeRef.packageStr()) {
         const auto asn1DefinitionsName = Escaper::escapeAsn1PackageName(*typeRef.packageStr());
