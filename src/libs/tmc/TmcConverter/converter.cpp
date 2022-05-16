@@ -38,6 +38,7 @@
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivxmlreader.h>
 #include <promela/PromelaOptions/options.h>
+#include <tmc/TmcInterfaceViewOptimizer/interfaceviewoptimizer.h>
 #include <tmc/SdlToPromelaConverter/converter.h>
 
 using conversion::ConversionException;
@@ -222,6 +223,8 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
         qCritical() << "Unable to read InterfaceView.";
         return false;
     }
+
+    InterfaceViewOptimizer::optimizeModel(inputIv.get());
 
     QStringList modelFunctions;
     QStringList environmentFunctions;
