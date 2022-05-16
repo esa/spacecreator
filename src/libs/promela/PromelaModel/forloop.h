@@ -81,6 +81,22 @@ public:
     const VariableRef &getForVariable() const noexcept;
 
     /**
+     * @brief Getter for first Expression of range based loop.
+     *
+     * @return First Expression in range.
+     * @throws std::bad_optional_access if loop is not range based.
+     */
+    Expression getFirstExpression() const;
+
+    /**
+     * @brief Getter for last Expression of range based loop.
+     *
+     * @return Last Expression in range.
+     * @throws std::bad_optional_access if loop is not range based.
+     */
+    Expression getLastExpression() const;
+
+    /**
      * @brief Getter for first value of range based loop if it is a constant.
      *
      * @return First value in range.
@@ -112,6 +128,8 @@ public:
     const std::unique_ptr<Sequence> &getSequence() const noexcept;
 
 private:
+    Expression getExpression(const Expression &expression) const;
+
     VariableRef m_variable;
     using Range = std::pair<Expression, Expression>;
     std::variant<Range, VariableRef> m_data;

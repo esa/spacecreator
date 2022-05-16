@@ -113,6 +113,8 @@ public:
     void operator()(const ::promela::model::ForLoop &loop);
 
 private:
+    QString expressionContentToString(const ::promela::model::Expression &expression);
+
     QTextStream &m_stream;
     const QString m_baseIndent;
     const QString m_sequenceIndent;

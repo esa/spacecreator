@@ -95,10 +95,22 @@ public:
      * @param last     end value of iterator value (inclusive)
      * @param sequence loop's body
      *
-     * @return ProctypeElement with specified specified variable declaration
+     * @return ProctypeElement with specified for loop
      */
     static auto makeForLoop(const VariableRef &variable, const Expression &first, const Expression &last,
             std::unique_ptr<model::Sequence> sequence) -> std::unique_ptr<ProctypeElement>;
+
+    /**
+     * @brief make ProctypeElement with a for loop with specified characteristics
+     *
+     * @param functionToCallName    function to be called in loop's body
+     * @param iteratorEndValue      last value of iterator (inclusive)
+     * @param iteratorVariableName  name of iterator variable
+     *
+     * @return ProctypeElement with specified for loop
+     */
+    static auto makeForLoopWithCall(const QString &functionToCallName, const Expression &iteratorEndValue,
+            const QString &iteratorVariableName = "i") -> std::unique_ptr<ProctypeElement>;
 };
 
 } // namespace promela::translator

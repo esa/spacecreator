@@ -19,9 +19,6 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
-#include "binaryexpression.h"
-#include "constant.h"
-
 #include <QList>
 #include <algorithm>
 #include <asn1library/asn1/asnsequencecomponent.h>
@@ -49,6 +46,8 @@
 #include <promela/Asn1ToPromelaTranslator/visitors/asn1itemtypevisitor.h>
 #include <promela/Asn1ToPromelaTranslator/visitors/asn1sequencecomponentvisitor.h>
 #include <promela/PromelaModel/basictypes.h>
+#include <promela/PromelaModel/binaryexpression.h>
+#include <promela/PromelaModel/constant.h>
 #include <promela/PromelaModel/inlinecall.h>
 #include <promela/PromelaModel/inlinedef.h>
 #include <promela/PromelaModel/proctypeelement.h>
@@ -224,18 +223,6 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
     m_promelaModel.addInlineDef(std::move(inlineDef));
 }
 
-std::unique_ptr<ProctypeElement> makeForLoopWithCall(
-        const QString &functionToCallName, const Expression &itEndValue, const QString &iteratorVariableName = "i")
-{
-    auto sequence = ProctypeMaker::makeNormalSequence();
-
-    auto innerSequence = ProctypeMaker::makeNormalSequence();
-    innerSequence->appendElement(ProctypeMaker::makeInlineCall(functionToCallName, "value", "data[i]"));
-
-    VariableRef iteratorReference(iteratorVariableName);
-    return ProctypeMaker::makeForLoop(iteratorReference, 0, itEndValue, std::move(innerSequence));
-}
-
 void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
 {
     const QString componentTypeName = type.itemsType()->typeName();
@@ -257,7 +244,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
     const size_t maxSize = constraintVisitor.getMaxSize();
     const QString typeGeneratorInline = QString("%1%2").arg(componentTypeName).arg("_generate_value");
     if (minSize == maxSize) {
-        sequence->appendElement(makeForLoopWithCall(typeGeneratorInline, maxSize));
+        sequence->appendElement(ProctypeMaker::makeForLoopWithCall(typeGeneratorInline, Expression(maxSize - 1)));
     } else { // sequenceOf has variable length
         Asn1Acn::Types::Integer length("length");
         const Asn1Acn::Range<Asn1Acn::IntegerValue::Type> range(static_cast<long>(minSize), static_cast<long>(maxSize));
@@ -270,10 +257,10 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
         sequence->appendElement(ProctypeMaker::makeInlineCall(
                 QString("%1_generate_value").arg(lengthGeneratorTypeName), "value.length"));
 
-        // for(i : 0 .. value.length - 1)
+        VariableRef endVarRef("value.length");
         Expression end(model::BinaryExpression(model::BinaryExpression::Operator::SUBTRACT,
-                std::make_unique<Expression>(model::Constant(3)), std::make_unique<Expression>(model::Constant(1))));
-        sequence->appendElement(makeForLoopWithCall(typeGeneratorInline, end));
+                std::make_unique<Expression>(endVarRef), std::make_unique<Expression>(model::Constant(1))));
+        sequence->appendElement(ProctypeMaker::makeForLoopWithCall(typeGeneratorInline, end));
     }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);

@@ -78,4 +78,13 @@ std::unique_ptr<ProctypeElement> ProctypeMaker::makeForLoop(const VariableRef &v
     return std::make_unique<ProctypeElement>(std::move(loop));
 }
 
+std::unique_ptr<ProctypeElement> ProctypeMaker::makeForLoopWithCall(
+        const QString &functionToCallName, const Expression &iteratorEndValue, const QString &iteratorVariableName)
+{
+    auto innerSequence = ProctypeMaker::makeNormalSequence();
+    innerSequence->appendElement(ProctypeMaker::makeInlineCall(functionToCallName, "value", "data[i]"));
+
+    return makeForLoop(VariableRef(iteratorVariableName), Expression(0), iteratorEndValue, std::move(innerSequence));
+}
+
 } // namespace promela::translator

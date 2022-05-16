@@ -19,6 +19,7 @@
 
 #include "forloop.h"
 
+#include "binaryexpression.h"
 #include "constant.h"
 #include "expression.h"
 #include "proctypeelement.h"
@@ -52,6 +53,18 @@ const VariableRef &ForLoop::getForVariable() const noexcept
     return m_variable;
 }
 
+Expression ForLoop::getFirstExpression() const
+{
+    const Expression value = std::get<Range>(m_data).first;
+    return getExpression(value);
+}
+
+Expression ForLoop::getLastExpression() const
+{
+    const Expression value = std::get<Range>(m_data).second;
+    return getExpression(value);
+}
+
 int ForLoop::getFirstIntValue() const
 {
     const Expression &value = std::get<Range>(m_data).first;
@@ -82,6 +95,23 @@ const VariableRef &ForLoop::getArrayRef() const
 const std::unique_ptr<Sequence> &ForLoop::getSequence() const noexcept
 {
     return m_sequence;
+}
+
+Expression ForLoop::getExpression(const Expression &expression) const
+{
+    const auto &content = expression.getContent();
+    if (std::holds_alternative<Constant>(content)) {
+        const auto val = std::get<Constant>(content).getValue();
+        return Expression(val);
+    } else if (std::holds_alternative<BinaryExpression>(content)) {
+        const auto &binaryExpr = std::get<BinaryExpression>(content);
+        return Expression(binaryExpr);
+    } else {
+        throw std::logic_error(QString("Serialization of type with index %1 not implemented")
+                                       .arg(content.index())
+                                       .toStdString()
+                                       .c_str());
+    }
 }
 
 }
