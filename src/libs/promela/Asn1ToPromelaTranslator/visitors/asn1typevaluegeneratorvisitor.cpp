@@ -19,6 +19,7 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
+#include <QDebug>
 #include <QList>
 #include <algorithm>
 #include <asn1library/asn1/asnsequencecomponent.h>
@@ -198,6 +199,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 {
     const QString argumentName = "value";
 
+    qDebug() << "id: " << type.identifier() << type.label() << type.typeName();
     const QString inlineSeqGeneratorName = getInlineGeneratorName(type.identifier());
     const QStringList inlineArguments = { argumentName };
     promela::model::Sequence sequence(promela::model::Sequence::Type::NORMAL);

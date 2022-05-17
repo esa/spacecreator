@@ -1,0 +1,263 @@
+Lock-Datamodel DEFINITIONS ::=
+BEGIN
+IMPORTS
+   T-UInt16, T-WriteAccess, T-ByteArray, T-MemBuffer, T-WriteRequest, T-ProcID FROM DEKKER1-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
+
+Lock-States ::= ENUMERATED {wait-nocontention, writing, idle, wait-turn}
+
+Lock-Context ::= SEQUENCE {
+   state Lock-States,
+   init-done BOOLEAN,
+   remotewantstoenter T-Boolean,
+   writesize T-UInt8,
+   myprocid T-ProcID,
+   remoteprocid T-ProcID,
+   turn T-ProcID,
+   mywritevalue T-WriteAccess,
+   writecount T-UInt8,
+   turnerror T-Boolean,
+   contentionerror T-Boolean,
+   writerequest T-WriteRequest,
+   startaddress T-UInt16
+}
+
+END
+
+Sharedmemory-Datamodel DEFINITIONS ::=
+BEGIN
+IMPORTS
+   T-UInt16, T-WriteAccess, T-ByteArray, T-MemBuffer, T-WriteRequest, T-ProcID FROM DEKKER1-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
+
+Sharedmemory-States ::= ENUMERATED {idle}
+
+Sharedmemory-Context ::= SEQUENCE {
+   state Sharedmemory-States,
+   init-done BOOLEAN,
+   membuffer T-MemBuffer,
+   writeaccess T-WriteAccess
+}
+
+END
+
+DEKKER1-DATAVIEW DEFINITIONS ::=
+BEGIN
+IMPORTS T-UInt8, T-Boolean FROM TASTE-BasicTypes;
+
+
+--T-UInt8 ::= INTEGER (0 .. 255)
+
+T-UInt16 ::= INTEGER (0 .. 65535)
+
+--T-Boolean ::= BOOLEAN
+
+T-WriteAccess ::= SEQUENCE {
+    write-address T-UInt16,
+    write-value   T-UInt8
+}
+
+T-ByteArray ::= SEQUENCE (SIZE(1 .. 64)) OF T-UInt8
+
+T-MemBuffer ::= T-ByteArray(SIZE (64))
+
+T-WriteRequest ::= SEQUENCE {
+    start-address T-UInt16,
+    values        T-ByteArray
+}
+
+T-ProcID ::= T-UInt8 (0 .. 1)
+
+END
+
+
+TASTE-BasicTypes DEFINITIONS ::=
+BEGIN
+
+-- Set of TASTE predefined basic types
+
+T-Int32 ::=  INTEGER (-2147483648 .. 2147483647)
+
+T-UInt32 ::= INTEGER (0 .. 4294967295)
+
+T-Int8 ::= INTEGER (-128 .. 127)
+
+T-UInt8 ::= INTEGER (0 .. 255)
+
+T-Boolean ::= BOOLEAN
+
+T-Null-Record ::= SEQUENCE {}
+
+END
+
+
+
+Simulation-DataView DEFINITIONS ::=
+BEGIN
+   IMPORTS
+      
+      --  ASN.1 modules used by thread locka_RemoteSetsTurn
+      T-ProcID FROM DEKKER1-DATAVIEW
+      
+      --  ASN.1 modules used by thread locka_RemoteWantsToEnter
+      T-Boolean FROM TASTE-BasicTypes
+      
+      --  ASN.1 modules used by thread locka_WriteRequest
+      T-WriteRequest FROM DEKKER1-DATAVIEW
+      
+      --  ASN.1 modules used by thread lockb_RemoteSetsTurn
+      T-ProcID FROM DEKKER1-DATAVIEW
+      
+      --  ASN.1 modules used by thread lockb_RemoteWantsToEnter
+      T-Boolean FROM TASTE-BasicTypes
+      
+      --  ASN.1 modules used by thread lockb_WriteRequest
+      T-WriteRequest FROM DEKKER1-DATAVIEW
+      
+      --  ASN.1 modules used by thread sharedmemory_MemWriteA
+      T-WriteAccess FROM DEKKER1-DATAVIEW
+      
+      --  ASN.1 modules used by thread sharedmemory_MemWriteB
+      T-WriteAccess FROM DEKKER1-DATAVIEW
+      
+      
+      
+      
+      -- Import generic integer type (used for timers)
+      T-UInt32 FROM TASTE-BasicTypes
+      --  Import the SDL function states needed for the global system state
+      Lock-Context         FROM Lock-Datamodel
+      Lock-Context         FROM Lock-Datamodel
+      Sharedmemory-Context FROM Sharedmemory-Datamodel
+   ;
+
+   --  List all the TASTE functions present in the system
+   PID ::= ENUMERATED {
+        env, locka, lockb, sharedmemory, testgui
+   }
+
+   --  Simulator needs to knows about cyclic interfaces
+   Periodic-Event {Event-Ty} ::= SEQUENCE {
+      period INTEGER (0 .. 500000),  -- Upper limit is arbitrary
+      event  Event-Ty
+   }
+
+   --  To keep a constant list of events.
+   Periodic-Events {Event-Ty, INTEGER:max} ::=
+      SEQUENCE (SIZE (0 .. max)) OF Periodic-Event {Event-Ty}
+
+   
+   
+   
+   Locka-Event ::= CHOICE {
+      msg-in CHOICE {
+         input-none SEQUENCE {},
+         remotesetsturn     SEQUENCE { p1 T-ProcID},
+         remotewantstoenter SEQUENCE { p1 T-Boolean},
+         writerequest       SEQUENCE { p1 T-WriteRequest}
+      },
+      msg-out CHOICE {
+         memwrite    SEQUENCE { p1 T-WriteAccess },
+         setturn     SEQUENCE { p1 T-ProcID },
+         wanttoenter SEQUENCE { p1 T-Boolean },
+         writeack    SEQUENCE {   }
+      }
+   }
+   
+   Lockb-Event ::= CHOICE {
+      msg-in CHOICE {
+         input-none SEQUENCE {},
+         remotesetsturn     SEQUENCE { p1 T-ProcID},
+         remotewantstoenter SEQUENCE { p1 T-Boolean},
+         writerequest       SEQUENCE { p1 T-WriteRequest}
+      },
+      msg-out CHOICE {
+         memwrite    SEQUENCE { p1 T-WriteAccess },
+         setturn     SEQUENCE { p1 T-ProcID },
+         wanttoenter SEQUENCE { p1 T-Boolean },
+         writeack    SEQUENCE {   }
+      }
+   }
+   
+   Sharedmemory-Event ::= CHOICE {
+      msg-in CHOICE {
+         input-none SEQUENCE {},
+         memwritea SEQUENCE { p1 T-WriteAccess},
+         memwriteb SEQUENCE { p1 T-WriteAccess}
+      }
+   }
+   
+   Testgui-Event ::= CHOICE {
+      msg-in CHOICE {
+         writeacka SEQUENCE {  },
+         writeackb SEQUENCE {  }
+      },
+      msg-out CHOICE {
+         writerequesta SEQUENCE { p1 T-WriteRequest },
+         writerequestb SEQUENCE { p1 T-WriteRequest }
+      }
+   }
+   
+
+   --  Current observer state flag (used by model checkers)
+   Observer-State-Kind ::= ENUMERATED {
+      regular-state,
+      error-state,
+      ignore-state,
+      success-state
+   }
+
+   --  Event related to the execution of a PI or call of a RI in the functional code
+   Function-Event ::= CHOICE {
+      locka        Locka-Event,
+      lockb        Lockb-Event,
+      sharedmemory Sharedmemory-Event,
+      testgui      Testgui-Event
+   }
+
+   --  Type used to store events in a database: associate a name to the event
+   Named-Function-Event ::= SEQUENCE {
+      id    IA5String (SIZE (1..80)),
+      event Function-Event
+   }
+
+   --  Event at interface level (PI or RI), including source and destination ID
+   Interface-Event ::= SEQUENCE {
+      source PID,
+      dest   PID,
+      event  Function-Event
+   }
+
+   --  Event sent to the observers
+   Observable-Event ::= CHOICE {
+      no-event        SEQUENCE {},
+      system-startup  SEQUENCE {},
+      input-event     Interface-Event,   --  input event is evaluated after the transition
+      output-event    Interface-Event,   --  output event is evaluated before the message is sent
+      unhandled-input Interface-Event    --  message received in a state where it is not expected
+   }
+
+   --  constant that can be used to refer to the absence of an input/output event
+   nothing Observable-Event ::= no-event : {}
+
+   --  Define a queue of events, corresponding to the input queue for each function
+   max-events INTEGER ::= 10
+   Events-Ty ::= SEQUENCE (SIZE (0 .. max-events)) OF Observable-Event
+
+   --  Global system state (excluding observers, which are defined later)
+   locka-queue-size INTEGER ::= 2
+   lockb-queue-size INTEGER ::= 2
+   sharedmemory-queue-size INTEGER ::= 2
+   System-State ::= SEQUENCE {
+      --  Message queues
+      locka-queue        Events-Ty (SIZE (0 .. locka-queue-size)),
+      lockb-queue        Events-Ty (SIZE (0 .. lockb-queue-size)),
+      sharedmemory-queue Events-Ty (SIZE (0 .. sharedmemory-queue-size)),
+
+      locka         Lock-Context,
+      lockb         Lock-Context,
+      sharedmemory  Sharedmemory-Context
+   }
+
+END
+
