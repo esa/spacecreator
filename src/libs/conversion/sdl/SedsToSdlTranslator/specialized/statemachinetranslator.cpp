@@ -238,17 +238,21 @@ static inline auto generateProcedureForSyncCommand(Context &context, const seds:
     context.sdlProcess()->addProcedure(std::move(procedure));
 }
 
-static inline auto buildCommandMapInternal(Context &context, const QString &interfaceName,
+static inline auto buildCommandMapInternal(Context &context, const bool isProvided, const QString &interfaceName,
         const seds::model::InterfaceDeclaration &intefaceDeclaration) -> void
 {
     for (const auto &command : intefaceDeclaration.commands()) {
-        context.addCommand(interfaceName, command.nameStr(), &command);
+        if (isProvided) {
+            context.addProvidedCommand(interfaceName, command.nameStr(), &command);
+        } else {
+            context.addRequiredCommand(interfaceName, command.nameStr(), &command);
+        }
     }
 
     for (const auto &baseInterface : intefaceDeclaration.baseInterfaces()) {
         const auto &baseIntefaceDeclaration = ComponentsTranslator::findInterfaceDeclaration(
                 baseInterface.type(), context.sedsComponent(), &context.sedsPackage(), context.sedsPackages());
-        buildCommandMapInternal(context, interfaceName, baseIntefaceDeclaration);
+        buildCommandMapInternal(context, isProvided, interfaceName, baseIntefaceDeclaration);
     }
 }
 
@@ -270,7 +274,12 @@ auto StateMachineTranslator::buildCommandMap(Context &context) -> void
     for (const auto &interface : context.sedsComponent().providedInterfaces()) {
         const auto &intefaceDeclaration = ComponentsTranslator::findInterfaceDeclaration(
                 interface.type(), context.sedsComponent(), &context.sedsPackage(), context.sedsPackages());
-        buildCommandMapInternal(context, interface.nameStr(), intefaceDeclaration);
+        buildCommandMapInternal(context, true, interface.nameStr(), intefaceDeclaration);
+    }
+    for (const auto &interface : context.sedsComponent().requiredInterfaces()) {
+        const auto &intefaceDeclaration = ComponentsTranslator::findInterfaceDeclaration(
+                interface.type(), context.sedsComponent(), &context.sedsPackage(), context.sedsPackages());
+        buildCommandMapInternal(context, false, interface.nameStr(), intefaceDeclaration);
     }
 }
 
@@ -278,8 +287,10 @@ static inline auto generateProceduresForSyncCommands(
         Context &context, const seds::model::StateMachine &sedsStateMachine) -> void
 {
     for (const auto &command : context.commands()) {
-        if (command.second->mode() == seds::model::InterfaceCommandMode::Sync) {
-            generateProcedureForSyncCommand(context, sedsStateMachine, command.first, *command.second);
+        if (command.second->interfaceType() == CommandInfo::HostInterfaceType::Provided
+                && command.second->definition()->mode() == seds::model::InterfaceCommandMode::Sync) {
+            // Procedures are generated only for sync commands in provided interfaces
+            generateProcedureForSyncCommand(context, sedsStateMachine, command.first, *command.second->definition());
         }
     }
 }
@@ -770,7 +781,7 @@ auto StateMachineTranslator::translateTransition(Context &context, const seds::m
             throw TranslationException(
                     QString("Transition on undefined command %1").arg(onCommandPrimitive.command().value()));
         }
-        if (command->mode() == seds::model::InterfaceCommandMode::Sync) {
+        if (command->definition()->mode() == seds::model::InterfaceCommandMode::Sync) {
             invokeDoActivity = false;
         }
     }

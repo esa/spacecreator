@@ -59,6 +59,32 @@ auto ActivityInfo::addAssignment(AssignmentInfo assignment) -> void
     m_returnAssignments.push_back(std::move(assignment));
 }
 
+CommandInfo::CommandInfo(const CommandInfo::HostInterfaceType interfaceType, const QString &interface,
+        const QString &name, const seds::model::InterfaceCommand *definition)
+{
+    m_interfaceType = interfaceType;
+    m_interface = interface;
+    m_name = name;
+    m_definition = definition;
+}
+
+CommandInfo::HostInterfaceType CommandInfo::interfaceType() const
+{
+    return m_interfaceType;
+}
+QString CommandInfo::interface() const
+{
+    return m_interface;
+}
+QString CommandInfo::name() const
+{
+    return m_name;
+}
+const seds::model::InterfaceCommand *CommandInfo::definition() const
+{
+    return m_definition;
+}
+
 Context::Context(const seds::model::Package &sedsPackage, const std::vector<seds::model::Package> &sedsPackages,
         const seds::model::Component &sedsComponent, Asn1Acn::Asn1Model *asn1Model, ivm::IVFunction *ivFunction,
         ::sdl::Process *sdlProcess, ::sdl::StateMachine *sdlStateMachine)
@@ -120,26 +146,34 @@ auto Context::handleSplinePointCount(const std::size_t count) -> void
     }
 }
 
-auto Context::addCommand(const QString &interface, const QString &name, const seds::model::InterfaceCommand *definition)
-        -> void
+auto Context::addProvidedCommand(
+        const QString &interface, const QString &name, const seds::model::InterfaceCommand *definition) -> void
 {
-    m_commands[std::make_pair(interface, name)] = definition;
+    CommandInfo info(CommandInfo::HostInterfaceType::Provided, interface, name, definition);
+    m_commands[std::make_pair(interface, name)] = info;
 }
 
-auto Context::getCommand(const QString &interface, const QString &name) -> const seds::model::InterfaceCommand *
+auto Context::addRequiredCommand(
+        const QString &interface, const QString &name, const seds::model::InterfaceCommand *definition) -> void
+{
+    CommandInfo info(CommandInfo::HostInterfaceType::Required, interface, name, definition);
+    m_commands.emplace(std::make_pair(interface, name), std::move(info));
+}
+
+auto Context::getCommand(const QString &interface, const QString &name) -> const CommandInfo *
 {
     const auto i = m_commands.find(std::make_pair(interface, name));
     if (i == m_commands.end()) {
         return nullptr;
     }
-    return i->second;
+    return &(i->second);
 }
 
-auto Context::commands() -> std::vector<std::pair<QString, const seds::model::InterfaceCommand *>>
+auto Context::commands() -> std::vector<std::pair<QString, const CommandInfo *>>
 {
-    std::vector<std::pair<QString, const seds::model::InterfaceCommand *>> result;
+    std::vector<std::pair<QString, const CommandInfo *>> result;
     for (const auto &i : m_commands) {
-        result.push_back(std::make_pair(i.first.first, i.second));
+        result.push_back(std::make_pair(i.first.first, &(i.second)));
     }
     return result;
 }

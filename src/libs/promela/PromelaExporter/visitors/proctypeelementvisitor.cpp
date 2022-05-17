@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021 - 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,6 +19,8 @@
 
 #include "proctypeelementvisitor.h"
 
+#include "binaryexpression.h"
+#include "constant.h"
 #include "declarationvisitor.h"
 #include "expressionvisitor.h"
 #include "inlinecallvisitor.h"
@@ -181,7 +183,10 @@ void ProctypeElementVisitor::operator()(const ForLoop &loop)
     if (loop.getType() == ForLoop::Type::RANGE) {
         m_stream << m_indent << "for(";
         variableRefVisitor.visit(loop.getForVariable());
-        m_stream << " : " << loop.getFirstValue() << " .. " << loop.getLastValue() << ")\n";
+
+        const QString beginExpr = expressionContentToString(loop.getFirstExpression());
+        const QString endExpr = expressionContentToString(loop.getLastExpression());
+        m_stream << " : " << beginExpr << " .. " << endExpr << ")\n";
     } else {
         m_stream << m_indent << "for(";
         variableRefVisitor.visit(loop.getForVariable());
@@ -194,4 +199,21 @@ void ProctypeElementVisitor::operator()(const ForLoop &loop)
     visitor.visit(*loop.getSequence(), false);
     m_stream << m_indent << "}\n";
 }
+
+QString ProctypeElementVisitor::expressionContentToString(const ::promela::model::Expression &expression)
+{
+    const Expression::Value &content = expression.getContent();
+
+    QString str;
+    QTextStream stream(&str);
+
+    ProctypeElementVisitor visitor(stream, "", "", ""); // none indent shall be used
+    visitor(Expression(content));
+
+    const int lineEndingLen = 2;
+    str.truncate(str.length() - lineEndingLen);
+
+    return str;
+}
+
 }

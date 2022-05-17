@@ -23,7 +23,7 @@
 #include <asn1model.h>
 #include <conversion/common/model.h>
 #include <csv/CsvModel/csvmodel.h>
-#include <ivmodel.h>
+#include <ivcore/ivmodel.h>
 #include <memory>
 
 namespace plugincommon {

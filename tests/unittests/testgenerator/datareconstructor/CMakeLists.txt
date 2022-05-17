@@ -19,7 +19,7 @@ target_link_libraries(${TEST_NAME}
     PRIVATE     Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test
                 TestGenerator
-                PluginCommon
+                CommonTools
                 CommonProjectWarnings
 )
 

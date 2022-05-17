@@ -23,7 +23,7 @@ target_link_libraries(${TEST_NAME}
     PRIVATE     Conversion::Common
                 Conversion::Asn1ToPromelaTranslator
                 PromelaExporter
-                PluginCommon
+                CommonTools
                 TextCheckerAndConsumer
                 Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test)
@@ -35,3 +35,9 @@ configure_file(resources/sequence-embedded.asn resources/sequence-embedded.asn C
 
 configure_file(resources/sequence.pml.out resources/sequence.pml.out COPYONLY)
 configure_file(resources/sequence-embedded.pml.out resources/sequence-embedded.pml.out COPYONLY)
+
+configure_file(resources/sequenceof.asn resources/sequenceof.asn COPYONLY)
+configure_file(resources/sequenceof.pml.out resources/sequenceof.pml.out COPYONLY)
+
+configure_file(resources/sequenceof-variable-size.asn resources/sequenceof-variable-size.asn COPYONLY)
+configure_file(resources/sequenceof-variable-size.pml.out resources/sequenceof-variable-size.pml.out COPYONLY)

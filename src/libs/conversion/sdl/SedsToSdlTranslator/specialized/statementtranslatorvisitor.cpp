@@ -121,7 +121,7 @@ auto StatementTranslatorVisitor::StatementContext::addActivityInfo(const QString
 }
 
 auto StatementTranslatorVisitor::StatementContext::getCommand(const QString &interface, const QString &name)
-        -> const seds::model::InterfaceCommand *
+        -> const CommandInfo *
 {
     return m_masterContext.getCommand(interface, name);
 }
@@ -278,8 +278,9 @@ auto StatementTranslatorVisitor::operator()(const seds::model::SendCommandPrimit
 
     // Check, if this is a sync return call
     const auto &command = m_context.getCommand(interfaceName, commandName);
-    if (command != nullptr && command->mode() == seds::model::InterfaceCommandMode::Sync) {
-        // Registered (and so provided) sync command
+    if (command != nullptr && command->interfaceType() == CommandInfo::HostInterfaceType::Provided
+            && command->definition()->mode() == seds::model::InterfaceCommandMode::Sync) {
+        // Registered and provided sync command
         // SendCommandPrimitive is basically a return statement
         ActivityInfo info(m_context.sdlProcedure()->name());
 

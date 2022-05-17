@@ -30,7 +30,7 @@ namespace promela::translator {
  */
 class IvToPromelaTranslator final : public ::conversion::translator::Translator
 {
-public:
+private:
     /**
      * @brief Parsed Observer Attachment specification
      */
@@ -40,11 +40,11 @@ public:
         /**
          * @brief Kind of the attachment
          */
-        typedef enum
+        enum class Kind
         {
             Kind_Input, //< Input signal interception, after processing by the recipient
             Kind_Output, //< Ouput signal interception, before processing by the recipient
-        } Kind;
+        };
 
         /**
          * @brief Observer priority
@@ -56,7 +56,7 @@ public:
          *
          * @param specification Textual Observer Attachment specification to be parsed
          */
-        ObserverAttachment(QString specification);
+        ObserverAttachment(const QString &specification);
 
         /**
          * @brief Getter for the signal recipient function
@@ -75,19 +75,19 @@ public:
          *
          * @return Interface (signal) name
          */
-        auto interface() const -> QString;
+        auto interface() const -> const QString &;
         /**
          * @brief Getter for the observer name
          *
          * @return Observer name
          */
-        auto observer() const -> QString;
+        auto observer() const -> const QString &;
         /**
          * @brief Getter for the observer's interface name
          *
          * @return Observer inteface (signal) name
          */
-        auto observerInterface() const -> QString;
+        auto observerInterface() const -> const QString &;
 
         /**
          * @brief Getter for the observer's kind (input or output)
@@ -112,7 +112,7 @@ public:
         Priority m_priority;
         Kind m_kind;
 
-        static auto stringToKind(const QString kind) -> Kind;
+        static auto stringToKind(const QString &kind) -> Kind;
     };
 
     /**
@@ -153,6 +153,19 @@ public:
                 const ObserverAttachment::Kind kind) -> const ObserverAttachments;
 
         /**
+         * @brief Return whether there are attachment of the given kind applicable to the given interface of the given
+         * function
+         *
+         * @param function Name of the function
+         * @param interface Name of the function's interface
+         * @param kind Kind of the attachments to be retrieved
+         *
+         * @return Whether the specified attachments exist
+         */
+        auto hasObserverAttachments(
+                const QString &function, const QString &interface, const ObserverAttachment::Kind kind) -> bool;
+
+        /**
          * Getter for the Promela model that is being created
          *
          * @return Promela model
@@ -164,6 +177,7 @@ public:
         std::map<QString, std::map<QString, ObserverAttachments>> m_observerAttachments;
     };
 
+public:
     /**
      * @brief   Translate given InterfaceView model into an Promela model
      *
@@ -195,6 +209,8 @@ public:
     auto getDependencies() const -> std::set<conversion::ModelType> override;
 
 private:
+    auto addChannelAndLock(IvToPromelaTranslator::Context &context, const QString &functionName) const -> void;
+    auto observerInputSignalName(const IvToPromelaTranslator::ObserverAttachment &attachment) const -> QString;
     auto attachInputObservers(IvToPromelaTranslator::Context &context, const QString &functionName,
             const QString &interfaceName, const QString &parameterName, const QString &parameterType,
             promela::model::Sequence *sequence) const -> void;

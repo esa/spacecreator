@@ -41,6 +41,37 @@ class TmcConverter
 {
 public:
     /**
+     * @brief Attached observer information
+     */
+    class ObserverInfo
+    {
+    public:
+        /**
+         * @brief Constructor
+         *
+         * @param path Path to the observer process file
+         * @param priority Observer priority
+         */
+        ObserverInfo(const QString path, const uint32_t priority);
+        /**
+         * @brief Getter for the observer path
+         *
+         * @returns Path to the obsever process file
+         */
+        auto path() const -> const QString &;
+        /**
+         * @brief Getter for the observer priority
+         *
+         * @returns Observer priority
+         */
+        auto priority() const -> uint32_t;
+
+    private:
+        QString m_path;
+        uint32_t m_priority;
+    };
+
+    /**
      * @brief Constructor.
      *
      * @param inputIvFilepath Path to XML interface view.
@@ -69,19 +100,17 @@ public:
     /**
      * @brief Attach an Observer
      *
-     * It shall point to the main SDL process file, followed by an optional priority, separated from the file by ":"
-     * (lower number is higher priority).
-     *
      * @param observerPath Path to the observer process file
+     * @param priority Observer priority
      * @return true if the operation succeeded, false otherwise.
      */
-    bool attachObserver(const QString &observerPath);
+    auto attachObserver(const QString &observerPath, const uint32_t priority) -> bool;
 
 private:
     bool convertModel(const std::set<conversion::ModelType> &sourceModelTypes, conversion::ModelType targetModelType,
             const std::set<conversion::ModelType> &auxilaryModelTypes, conversion::Options options) const;
 
-    auto integrateObserver(QString observerSpecification, QStringList &observerNames, QStringList &asn1Files,
+    auto integrateObserver(const ObserverInfo &info, QStringList &observerNames, QStringList &asn1Files,
             std::map<QString, ProcessMetadata> &allSdlFiles, QStringList &attachmentInfos);
     bool convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles);
 
@@ -101,7 +130,6 @@ private:
 
     QFileInfo workDirectory() const;
     QFileInfo simuDataViewLocation() const;
-    QFileInfo dataViewUniqLocation() const;
     QFileInfo sdlImplementationBaseDirectory(const QString &functionName) const;
     QFileInfo sdlImplementationLocation(const QString &functionName) const;
     QFileInfo sdlSystemStructureLocation(const QString &functionName) const;
@@ -118,7 +146,7 @@ private:
     ivm::IVPropertyTemplateConfig *m_dynPropConfig;
 
     QStringList m_stopConditionsFiles;
-    QStringList m_observerFiles;
+    std::vector<ObserverInfo> m_observerInfos;
     QStringList m_observerAttachmentInfos;
     QStringList m_observerNames;
 

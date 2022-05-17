@@ -54,7 +54,8 @@ public:
      *
      * Creates a IntegerSubset which contains a continuous range of numbers.
      *
-     * @param minValue - minimumValue of Range
+     * @param minValue - minimum value of Range
+     * @param maxValue - maximum value of Range
      */
     explicit IntegerSubset(int minValue, int maxValue);
 

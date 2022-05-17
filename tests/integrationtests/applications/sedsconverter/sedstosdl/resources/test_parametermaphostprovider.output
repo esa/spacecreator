@@ -14,6 +14,7 @@ process ParameterMapHostProvider;
             task Io_get_if_asyncparam_ri := X;
             /* CIF Output (0, 262), (200, 50) */
             output Get_IF_AsyncParam_Ri(Io_get_if_asyncparam_ri);
+        return;
     endprocedure;
     /* CIF Procedure (0, 975), (800, 50) */
     procedure Get_IF_SyncParam_Pi;
@@ -25,6 +26,7 @@ process ParameterMapHostProvider;
         START;
             /* CIF Task (0, 937), (100, 50) */
             task Param := X;
+        return;
     endprocedure;
     /* CIF Procedure (0, 1050), (800, 50) */
     procedure Set_IF_SyncParam_Pi;
@@ -36,6 +38,7 @@ process ParameterMapHostProvider;
         START;
             /* CIF Task (0, 937), (100, 50) */
             task X := Param;
+        return;
     endprocedure;
     /* CIF Procedure (0, 1125), (800, 50) */
     procedure Get_IF_SyncRoParam_Pi;
@@ -47,6 +50,7 @@ process ParameterMapHostProvider;
         START;
             /* CIF Task (0, 937), (100, 50) */
             task Param := X;
+        return;
     endprocedure;
     /* CIF Start (0, 1200), (200, 75) */
     START;

@@ -26,6 +26,7 @@ process Component;
             enddecision;
             /* CIF Label (1200, 412), (100, 50) */
             condition_1:
+        return;
     endprocedure;
     /* CIF Start (0, 975), (200, 75) */
     START;

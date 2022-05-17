@@ -65,11 +65,11 @@ using shared::VEObject;
 
 namespace promela::translator {
 
-auto IvToPromelaTranslator::ObserverAttachment::stringToKind(const QString kind)
-        -> IvToPromelaTranslator::ObserverAttachment::Kind
+IvToPromelaTranslator::ObserverAttachment::Kind IvToPromelaTranslator::ObserverAttachment::stringToKind(
+        const QString &kind)
 {
-    const auto kindIn = "ObservedSignalKind.INPUT";
-    const auto kindOut = "ObservedSignalKind.OUTPUT";
+    const auto kindIn = QString("ObservedSignalKind.INPUT");
+    const auto kindOut = QString("ObservedSignalKind.OUTPUT");
     if (kind == kindIn) {
         return ObserverAttachment::Kind::Kind_Input;
     } else if (kind == kindOut) {
@@ -80,9 +80,12 @@ auto IvToPromelaTranslator::ObserverAttachment::stringToKind(const QString kind)
     }
 }
 
-IvToPromelaTranslator::ObserverAttachment::ObserverAttachment(QString specification)
+IvToPromelaTranslator::ObserverAttachment::ObserverAttachment(const QString &specification)
 {
-    const auto separator = ":";
+    const auto separator = QString(":");
+    const auto recipientPrefix = QString(">");
+    const auto senderPrefix = QString("<");
+    const auto priorityPrefix = QString("p");
     const auto elements = specification.split(separator, QString::KeepEmptyParts);
     if (elements.size() < 4) {
         const auto message =
@@ -96,14 +99,14 @@ IvToPromelaTranslator::ObserverAttachment::ObserverAttachment(QString specificat
     m_priority = 1;
 
     for (auto i = 4; i < elements.size(); i++) {
-        if (elements[i].startsWith(">")) {
+        if (elements[i].startsWith(recipientPrefix)) {
             m_toFunctionName = elements[i].right(elements[i].length() - 1);
-        } else if (elements[i].startsWith("<")) {
+        } else if (elements[i].startsWith(senderPrefix)) {
             m_fromFunctionName = elements[i].right(elements[i].length() - 1);
-        } else if (elements[i].startsWith("p")) {
+        } else if (elements[i].startsWith(priorityPrefix)) {
             bool ok = false;
             const auto priorityString = elements[i].right(elements[i].length() - 1);
-            m_priority = static_cast<IvToPromelaTranslator::ObserverAttachment::Priority>(priorityString.toInt(&ok));
+            m_priority = priorityString.toUInt(&ok);
             if (!ok) {
                 const auto message = QString("Priority %1 could not be parsed as an integer").arg(priorityString);
                 throw TranslationException(message);
@@ -112,34 +115,37 @@ IvToPromelaTranslator::ObserverAttachment::ObserverAttachment(QString specificat
     }
 }
 
-auto IvToPromelaTranslator::ObserverAttachment::toFunction() const -> std::optional<QString>
+std::optional<QString> IvToPromelaTranslator::ObserverAttachment::toFunction() const
 {
     return m_toFunctionName;
 }
 
-auto IvToPromelaTranslator::ObserverAttachment::fromFunction() const -> std::optional<QString>
+std::optional<QString> IvToPromelaTranslator::ObserverAttachment::fromFunction() const
 {
     return m_fromFunctionName;
 }
 
-auto IvToPromelaTranslator::ObserverAttachment::observerInterface() const -> QString
+const QString &IvToPromelaTranslator::ObserverAttachment::observerInterface() const
 {
     return m_observerInterfaceName;
 }
 
-auto IvToPromelaTranslator::ObserverAttachment::interface() const -> QString
+const QString &IvToPromelaTranslator::ObserverAttachment::interface() const
 {
     return m_interfaceName;
 }
-auto IvToPromelaTranslator::ObserverAttachment::observer() const -> QString
+
+const QString &IvToPromelaTranslator::ObserverAttachment::observer() const
 {
     return m_observerName;
 }
-auto IvToPromelaTranslator::ObserverAttachment::kind() const -> Kind
+
+IvToPromelaTranslator::ObserverAttachment::Kind IvToPromelaTranslator::ObserverAttachment::kind() const
 {
     return m_kind;
 }
-auto IvToPromelaTranslator::ObserverAttachment::priority() const -> IvToPromelaTranslator::ObserverAttachment::Priority
+
+IvToPromelaTranslator::ObserverAttachment::Priority IvToPromelaTranslator::ObserverAttachment::priority() const
 {
     return m_priority;
 }
@@ -149,8 +155,7 @@ IvToPromelaTranslator::Context::Context(::promela::model::PromelaModel *promelaM
     m_promelaModel = promelaModel;
 }
 
-auto IvToPromelaTranslator::Context::addObserverAttachment(const IvToPromelaTranslator::ObserverAttachment &attachment)
-        -> void
+void IvToPromelaTranslator::Context::addObserverAttachment(const IvToPromelaTranslator::ObserverAttachment &attachment)
 {
     if (attachment.fromFunction().has_value()) {
         m_observerAttachments[*attachment.fromFunction()][attachment.interface()].push_back(attachment);
@@ -164,9 +169,14 @@ auto IvToPromelaTranslator::Context::getObserverAttachments(const QString &funct
         const ObserverAttachment::Kind kind) -> const IvToPromelaTranslator::ObserverAttachments
 {
     ObserverAttachments result;
-    // [] may create new keys, but performance penalty is negligible and code is more terse
-    // The best way to implement this would be to use LINQ-like C++20 ranges
-    for (const auto attachment : m_observerAttachments[function][interface]) {
+    if (m_observerAttachments.find(function) == m_observerAttachments.end()) {
+        return result;
+    }
+    const auto &attachments = m_observerAttachments.at(function);
+    if (attachments.find(interface) == attachments.end()) {
+        return result;
+    }
+    for (const auto &attachment : attachments.at(interface)) {
         if (attachment.kind() == kind) {
             result.push_back(attachment);
         }
@@ -174,9 +184,27 @@ auto IvToPromelaTranslator::Context::getObserverAttachments(const QString &funct
     return result;
 }
 
+auto IvToPromelaTranslator::Context::hasObserverAttachments(
+        const QString &function, const QString &interface, const ObserverAttachment::Kind kind) -> bool
+{
+    return getObserverAttachments(function, interface, kind).size() > 0;
+}
+
 auto IvToPromelaTranslator::Context::model() -> ::promela::model::PromelaModel *
 {
     return m_promelaModel;
+}
+
+void IvToPromelaTranslator::addChannelAndLock(
+        IvToPromelaTranslator::Context &context, const QString &functionName) const
+{
+    QList<ChannelInit::Type> channelType;
+    channelType.append(BasicType::INT);
+    ChannelInit channelInit(1, std::move(channelType));
+    Declaration channelDeclaration(
+            DataType(BasicType::CHAN), QString("%1_lock").arg(Escaper::escapePromelaIV(functionName)));
+    channelDeclaration.setInit(channelInit);
+    context.model()->addDeclaration(channelDeclaration);
 }
 
 std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
@@ -225,23 +253,11 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     createSystemState(promelaModel.get(), ivModel, modelFunctions, observerNames);
 
     for (const QString &function : modelFunctions) {
-        QList<ChannelInit::Type> channelType;
-        channelType.append(BasicType::INT);
-        ChannelInit channelInit(1, std::move(channelType));
-        Declaration channelDeclaration(
-                DataType(BasicType::CHAN), QString("%1_lock").arg(Escaper::escapePromelaIV(function)));
-        channelDeclaration.setInit(channelInit);
-        promelaModel->addDeclaration(channelDeclaration);
+        addChannelAndLock(context, function);
     }
 
     for (const auto &observer : observerNames) {
-        QList<ChannelInit::Type> channelType;
-        channelType.append(BasicType::INT);
-        ChannelInit channelInit(1, std::move(channelType));
-        Declaration channelDeclaration(
-                DataType(BasicType::CHAN), QString("%1_lock").arg(Escaper::escapePromelaIV(observer)));
-        channelDeclaration.setInit(channelInit);
-        promelaModel->addDeclaration(channelDeclaration);
+        addChannelAndLock(context, observer);
     }
 
     promelaModel->setInit(generateInitProctype(modelFunctions, observerNames, ivModel));
@@ -268,6 +284,20 @@ ModelType IvToPromelaTranslator::getTargetModelType() const
 std::set<ModelType> IvToPromelaTranslator::getDependencies() const
 {
     return std::set<ModelType> { ModelType::InterfaceView };
+}
+
+static void initializeFunction(Sequence &sequence, const QString &functionName)
+{
+    QString initFn = QString("%1_0_init").arg(Escaper::escapePromelaIV(functionName));
+    std::unique_ptr<ProctypeElement> initCall = std::make_unique<ProctypeElement>(InlineCall(initFn, {}));
+    sequence.appendElement(std::move(initCall));
+
+    const VariableRef lockChannelName = VariableRef(QString("%1_lock").arg(Escaper::escapePromelaIV(functionName)));
+    QList<VariableRef> lockChannelArguments;
+    lockChannelArguments.append(VariableRef("init_token"));
+
+    sequence.appendElement(
+            std::make_unique<ProctypeElement>(ChannelSend(VariableRef(lockChannelName), lockChannelArguments)));
 }
 
 InitProctype IvToPromelaTranslator::generateInitProctype(
@@ -303,29 +333,11 @@ InitProctype IvToPromelaTranslator::generateInitProctype(
     }
 
     for (const QString &functionName : modelFunctions) {
-        QString initFn = QString("%1_0_init").arg(Escaper::escapePromelaIV(functionName));
-        std::unique_ptr<ProctypeElement> initCall = std::make_unique<ProctypeElement>(InlineCall(initFn, {}));
-        sequence.appendElement(std::move(initCall));
-
-        const VariableRef lockChannelName = VariableRef(QString("%1_lock").arg(Escaper::escapePromelaIV(functionName)));
-        QList<VariableRef> lockChannelArguments;
-        lockChannelArguments.append(VariableRef("init_token"));
-
-        sequence.appendElement(
-                std::make_unique<ProctypeElement>(ChannelSend(VariableRef(lockChannelName), lockChannelArguments)));
+        initializeFunction(sequence, functionName);
     }
 
     for (const QString &observer : observers) {
-        QString initFn = QString("%1_0_init").arg(Escaper::escapePromelaName(observer));
-        std::unique_ptr<ProctypeElement> initCall = std::make_unique<ProctypeElement>(InlineCall(initFn, {}));
-        sequence.appendElement(std::move(initCall));
-
-        const VariableRef lockChannelName = VariableRef(QString("%1_lock").arg(Escaper::escapePromelaIV(observer)));
-        QList<VariableRef> lockChannelArguments;
-        lockChannelArguments.append(VariableRef("init_token"));
-
-        sequence.appendElement(
-                std::make_unique<ProctypeElement>(ChannelSend(VariableRef(lockChannelName), lockChannelArguments)));
+        initializeFunction(sequence, observer);
     }
 
     std::unique_ptr<ProctypeElement> setInited =
@@ -334,23 +346,23 @@ InitProctype IvToPromelaTranslator::generateInitProctype(
     return InitProctype(std::move(sequence));
 }
 
-static auto observerInputSignalName(const IvToPromelaTranslator::ObserverAttachment &attachment) -> QString
+QString IvToPromelaTranslator::observerInputSignalName(
+        const IvToPromelaTranslator::ObserverAttachment &attachment) const
 {
     return QString("%1_0_PI_0_%2")
             .arg(Escaper::escapePromelaName(attachment.observer()))
             .arg(Escaper::escapePromelaName(attachment.observerInterface()));
 }
 
-auto IvToPromelaTranslator::attachInputObservers(IvToPromelaTranslator::Context &context, const QString &functionName,
+void IvToPromelaTranslator::attachInputObservers(IvToPromelaTranslator::Context &context, const QString &functionName,
         const QString &interfaceName, const QString &parameterName, const QString &parameterType,
-        Sequence *sequence) const -> void
+        Sequence *sequence) const
 {
     auto attachments = context.getObserverAttachments(
             functionName, interfaceName, IvToPromelaTranslator::ObserverAttachment::Kind::Kind_Input);
     std::sort(attachments.begin(), attachments.end(),
             [](const auto &a, const auto &b) -> bool { return a.priority() > b.priority(); });
     for (const auto &attachment : attachments) {
-
         const VariableRef lockChannelName =
                 VariableRef(QString("%1_lock").arg(Escaper::escapePromelaIV(attachment.observer())));
         QList<VariableRef> lockChannelArguments;
@@ -387,10 +399,8 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(Context &conte
     std::unique_ptr<ProctypeElement> waitForInit = std::make_unique<ProctypeElement>(Expression(VariableRef("inited")));
     sequence.appendElement(std::move(waitForInit));
 
-    const auto hasInputObservers = context.getObserverAttachments(functionName, interfaceName,
-                                                  IvToPromelaTranslator::ObserverAttachment::Kind::Kind_Input)
-                                           .size()
-            > 0;
+    const auto hasInputObservers = context.hasObserverAttachments(
+            functionName, interfaceName, IvToPromelaTranslator::ObserverAttachment::Kind::Kind_Input);
 
     if (hasInputObservers || !environment) {
         std::unique_ptr<ProctypeElement> tokenDeclaration =

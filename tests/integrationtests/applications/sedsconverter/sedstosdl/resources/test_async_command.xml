@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="AsyncCommandDemo">
+    <DataTypeSet>
+      <IntegerDataType name="DataItemType">
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="64" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface level="subnetwork" name="IfType">
+        <CommandSet>
+          <Command name="AsyncCmd" mode="async">
+            <Argument name="inArg" type="DataItemType" mode="in" />
+            <Argument name="notifyArg" type="DataItemType" mode="notify" />
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="Component">
+        <RequiredInterfaceSet>
+          <Interface name="If" type="IfType" />
+        </RequiredInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="mVar" type="DataItemType" />
+          </VariableSet>
+          <ActivitySet>
+            <Activity name="Activity">
+              <Body>
+                <SendCommandPrimitive command="AsyncCmd" interface="If">
+                  <ArgumentValue name="inArg">
+                    <VariableRef variableRef="mVar"></VariableRef>
+                  </ArgumentValue>
+                </SendCommandPrimitive>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="StateMachine">
+              <State name="s2" />
+              <EntryState name="s1" />
+              <Transition fromState="s1" toState="s2" name="dummy">
+                <OnCommandPrimitive command="AsyncCmd" interface="If">
+                  <ArgumentValue name="notifyArg" outputVariableRef="mVar" />
+                </OnCommandPrimitive>
+                <Do activity="Activity" />
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

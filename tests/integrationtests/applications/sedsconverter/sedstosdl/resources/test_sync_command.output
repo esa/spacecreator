@@ -16,6 +16,7 @@ process Component;
         START;
             /* CIF Task (0, 937), (100, 50) */
             task R := (X * Y) + 1;
+        return;
     endprocedure;
     /* CIF Procedure (0, 975), (800, 50) */
     procedure IF_SyncCommand_Pi;
@@ -35,6 +36,7 @@ process Component;
             call AddActivity(X, Y);
             /* CIF Task (0, 1162), (100, 50) */
             task Argument3 := R;
+        return;
     endprocedure;
     /* CIF Start (0, 1050), (200, 75) */
     START;

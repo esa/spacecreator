@@ -25,6 +25,28 @@
 #include <shared/sharedlibrary.h>
 #include <tmc/TmcVerifier/verifier.h>
 
+const auto separator = QString(":");
+
+static QString extractObserverPath(const QString &info)
+{
+    const auto elements = info.split(separator, QString::KeepEmptyParts);
+    if (elements.size() == 0) {
+        qCritical("Malformed observer info: missing path");
+    }
+    return elements[0];
+}
+
+static uint32_t extractObserverPriority(const QString &info)
+{
+    const auto elements = info.split(separator, QString::KeepEmptyParts);
+    bool ok = true;
+    const auto priority = elements.size() > 1 ? elements[1].toUInt(&ok) : 1;
+    if (!ok) {
+        qCritical("Malformed observer info: priority could not be parsed as an integer");
+    }
+    return priority;
+}
+
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(asn1_resources);
@@ -42,7 +64,7 @@ int main(int argc, char *argv[])
     std::optional<QString> inputIvFilepath;
     std::optional<QString> outputDirectory;
     QStringList stopConditionFiles;
-    QStringList observers;
+    QStringList observerInfos;
 
     const QStringList args = app.arguments();
 
@@ -75,7 +97,7 @@ int main(int argc, char *argv[])
             stopConditionFiles.append(args[i]);
         } else if (arg == "-os") {
             ++i;
-            observers.append(args[i]);
+            observerInfos.append(args[i]);
         } else if (arg == "-h" || arg == "--help") {
             qInfo("tmc: TASTE Model Chcecker");
             qInfo("Usage: tmc [OPTIONS]");
@@ -107,8 +129,9 @@ int main(int argc, char *argv[])
     if (!verifier.addStopConditionFiles(stopConditionFiles)) {
         return EXIT_FAILURE;
     }
-    for (auto &observer : observers) {
-        if (!verifier.attachObserver(observer)) {
+    for (const auto &info : observerInfos) {
+
+        if (!verifier.attachObserver(extractObserverPath(info), extractObserverPriority(info))) {
             return EXIT_FAILURE;
         }
     }
