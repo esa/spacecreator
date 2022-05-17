@@ -1,22 +1,22 @@
-project(PluginCommon VERSION 1.0.0 LANGUAGES CXX)
+project(CommonTools VERSION 1.0.0 LANGUAGES CXX)
 
-add_library(PluginCommon STATIC)
+add_library(CommonTools STATIC)
 
-target_sources(PluginCommon
+target_sources(CommonTools
     PRIVATE     modelloader/modelloader.cpp
                 modelloader/modelloader.h
                 ivtools/ivtools.cpp
                 ivtools/ivtools.h
 )
 
-target_include_directories(PluginCommon
+target_include_directories(CommonTools
     PUBLIC      .
-                ${CMAKE_SOURCE_DIR}/src/qtcreator/common/modelloader
-                ${CMAKE_SOURCE_DIR}/src/qtcreator/common/ivtools
+                ${CMAKE_SOURCE_DIR}/src/libs/common/modelloader
+                ${CMAKE_SOURCE_DIR}/src/libs/common/ivtools
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs
 )
 
-target_link_libraries(PluginCommon
+target_link_libraries(CommonTools
     PUBLIC      ivcore
     PRIVATE     Asn1Importer
                 CommonProjectWarnings
@@ -27,5 +27,5 @@ target_link_libraries(PluginCommon
                 SedsModel
 )
 
-add_format_target(PluginCommon)
-add_tidy_target(PluginCommon)
+add_format_target(CommonTools)
+add_tidy_target(CommonTools)

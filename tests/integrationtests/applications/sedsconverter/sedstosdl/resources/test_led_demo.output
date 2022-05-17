@@ -18,6 +18,7 @@ process LedDemo;
             task Enablevalue := 4;
             /* CIF Task (0, 412), (100, 50) */
             task Disablevalue := 0;
+        return;
     endprocedure;
     /* CIF Procedure (0, 975), (800, 50) */
     procedure IssueCommand;
@@ -29,6 +30,7 @@ process LedDemo;
         START;
             /* CIF ProcedureCall (0, 937), (100, 50) */
             call RawMemoryAccessInterface_WriteWord_Ri(Registeraddress, Registermask, Value);
+        return;
     endprocedure;
     /* CIF Start (0, 1050), (200, 75) */
     START;

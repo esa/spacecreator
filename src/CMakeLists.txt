@@ -1,4 +1,4 @@
-if (${QTC_FOUND})
+if(${QTC_FOUND})
     add_subdirectory(qtcreator)
 endif()
 

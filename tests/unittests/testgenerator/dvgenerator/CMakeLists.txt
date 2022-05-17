@@ -16,7 +16,7 @@ target_include_directories(${TEST_NAME}
 )
 
 target_link_libraries(${TEST_NAME}
-    PRIVATE     PluginCommon
+    PRIVATE     CommonTools
                 ivcore
                 dvcore
                 libiveditor

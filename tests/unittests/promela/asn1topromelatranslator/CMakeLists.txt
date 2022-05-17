@@ -23,7 +23,7 @@ target_link_libraries(${TEST_NAME}
     PRIVATE     Conversion::Common
                 Conversion::Asn1ToPromelaTranslator
                 PromelaExporter
-                PluginCommon
+                CommonTools
                 TextCheckerAndConsumer
                 Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test)
