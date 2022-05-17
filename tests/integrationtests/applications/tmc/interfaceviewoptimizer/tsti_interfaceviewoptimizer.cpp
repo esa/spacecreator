@@ -23,7 +23,7 @@
 
 namespace tmc {
 
-class tst_Tmc_InterfaceViewOptimizer : public QObject
+class tsti_InterfaceViewOptimizer : public QObject
 {
     Q_OBJECT
 
@@ -31,7 +31,7 @@ private Q_SLOTS:
     void test_interfaceViewOptimizer();
 };
 
-void tst_Tmc_InterfaceViewOptimizer::test_interfaceViewOptimizer()
+void tsti_InterfaceViewOptimizer::test_interfaceViewOptimizer()
 {
     const int result = system("./test_interface_view_optimizer.sh");
     QCOMPARE(result, 0);
@@ -39,6 +39,6 @@ void tst_Tmc_InterfaceViewOptimizer::test_interfaceViewOptimizer()
 
 } // namespace sedsconverter
 
-QTEST_MAIN(tmc::tst_Tmc_InterfaceViewOptimizer)
+QTEST_MAIN(tmc::tsti_InterfaceViewOptimizer)
 
-#include "tst_tmc_interface_view_optimizer.moc"
+#include "tsti_interfaceviewoptimizer.moc"

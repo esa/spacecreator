@@ -1,4 +1,4 @@
-set(TEST_NAME tst_tmc_interface_view_optimizer)
+set(TEST_NAME tsti_interfaceviewoptimizer)
 project(${TEST_NAME})
 
 add_executable(${TEST_NAME})
@@ -11,6 +11,7 @@ target_include_directories(${TEST_NAME}
 target_link_libraries(${TEST_NAME}
     PRIVATE     Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test)
+add_dependencies(${TEST_NAME} tmc)
 
 add_format_target(${TEST_NAME})
 
