@@ -35,7 +35,7 @@ public:
     InterfaceViewOptimizer operator=(InterfaceViewOptimizer &&) = delete;
 
 public:
-    static auto optimizeModel(ivm::IVModel *ivModel, const std::vector<QString>& environmentFunctions) -> void;
+    static auto optimizeModel(ivm::IVModel *ivModel, const std::vector<QString> &environmentFunctions) -> void;
 
 private:
     static auto makeEnvironment(const QString &functionName, ivm::IVModel *ivModel) -> void;

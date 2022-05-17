@@ -74,10 +74,12 @@ public:
     /**
      * @brief Constructor.
      *
-     * @param inputIvFilepath Path to XML interface view.
-     * @param outputDirectory Pat to output directory for conversion results.
+     * @param   inputIvFilepath         Path to XML interface view.
+     * @param   outputDirectory         Path to output directory for conversion results.
+     * @param   environmentFunctions    List of the IV functions that should be marked as an environment.
      */
-    TmcConverter(const QString &inputIvFilepath, const QString &outputDirectory);
+    TmcConverter(
+            const QString &inputIvFilepath, const QString &outputDirectory, std::vector<QString> environmentFunctions);
 
     /**
      * @brief Process system conversion.
@@ -145,6 +147,7 @@ private:
     const QDir m_outputDirectory;
     ivm::IVPropertyTemplateConfig *m_dynPropConfig;
 
+    std::vector<QString> m_environmentFunctions;
     QStringList m_stopConditionsFiles;
     std::vector<ObserverInfo> m_observerInfos;
     QStringList m_observerAttachmentInfos;

@@ -38,8 +38,8 @@
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivxmlreader.h>
 #include <promela/PromelaOptions/options.h>
-#include <tmc/TmcInterfaceViewOptimizer/interfaceviewoptimizer.h>
 #include <tmc/SdlToPromelaConverter/converter.h>
+#include <tmc/TmcInterfaceViewOptimizer/interfaceviewoptimizer.h>
 
 using conversion::ConversionException;
 using conversion::Converter;
@@ -81,11 +81,13 @@ uint32_t TmcConverter::ObserverInfo::priority() const
     return m_priority;
 }
 
-TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &outputDirectory)
+TmcConverter::TmcConverter(
+        const QString &inputIvFilepath, const QString &outputDirectory, std::vector<QString> environmentFunctions)
     : m_inputIvFilepath(inputIvFilepath)
     , m_outputDirectoryFilepath(outputDirectory)
     , m_ivBaseDirectory(QFileInfo(m_inputIvFilepath).dir())
     , m_outputDirectory(outputDirectory)
+    , m_environmentFunctions(std::move(environmentFunctions))
 {
     Asn1Registrar asn1Registrar;
     bool result = asn1Registrar.registerCapabilities(m_registry);
@@ -224,7 +226,7 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
         return false;
     }
 
-    InterfaceViewOptimizer::optimizeModel(inputIv.get(), { "Pinger" });
+    InterfaceViewOptimizer::optimizeModel(inputIv.get(), m_environmentFunctions);
 
     QStringList modelFunctions;
     QStringList environmentFunctions;

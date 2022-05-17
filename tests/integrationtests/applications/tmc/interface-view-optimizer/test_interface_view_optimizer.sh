@@ -17,7 +17,8 @@ mkdir $TEST_OUTPUT_DIR
 
 # Translate
 $TMC -iv $RESOURCE_DIR/interfaceview.xml \
-    -o $TEST_OUTPUT_DIR
+    -o $TEST_OUTPUT_DIR \
+    -e Pinger
 
 cd $TEST_OUTPUT_DIR \
     && $SPIN -a system.pml \

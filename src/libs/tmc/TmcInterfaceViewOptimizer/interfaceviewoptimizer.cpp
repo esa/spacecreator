@@ -21,18 +21,18 @@
 
 #include <QBuffer>
 #include <QSaveFile>
-#include <iostream>
-#include <ivcore/ivfunction.h>
-#include <ivcore/ivconnection.h>
-#include <libiveditor/ivexporter.h>
 #include <conversion/common/translation/exceptions.h>
+#include <iostream>
+#include <ivcore/ivconnection.h>
+#include <ivcore/ivfunction.h>
+#include <libiveditor/ivexporter.h>
 
-using ivm::meta::Props;
 using ivm::IVConnection;
 using ivm::IVFunction;
 using ivm::IVFunctionType;
 using ivm::IVModel;
 using ivm::IVObject;
+using ivm::meta::Props;
 
 using conversion::translator::TranslationException;
 
@@ -40,7 +40,7 @@ namespace tmc {
 
 void InterfaceViewOptimizer::optimizeModel(IVModel *ivModel, const std::vector<QString> &environmentFunctions)
 {
-    for(const auto &functionName : environmentFunctions) {
+    for (const auto &functionName : environmentFunctions) {
         makeEnvironment(functionName, ivModel);
     }
 
@@ -115,8 +115,7 @@ bool InterfaceViewOptimizer::isConnectionDead(const IVConnection *connection)
     const auto source = connection->source();
     const auto target = connection->target();
 
-    if(source->type() != IVObject::Type::Function || target->type() != IVObject::Type::Function)
-    {
+    if (source->type() != IVObject::Type::Function || target->type() != IVObject::Type::Function) {
         return false;
     }
 
