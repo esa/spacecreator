@@ -22,7 +22,7 @@ target_link_libraries(TmcConverter
                Conversion::PromelaRegistrar
                Tmc::SdlToPromelaConverter
     PRIVATE    CommonProjectWarnings
-               Tmc::EnvironmentSelector)
+               Tmc::InterfaceViewOptimizer)
 
 add_format_target(TmcConverter)
 add_tidy_target(TmcConverter)

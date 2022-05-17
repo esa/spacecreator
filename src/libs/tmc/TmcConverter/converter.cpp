@@ -224,7 +224,7 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
         return false;
     }
 
-    InterfaceViewOptimizer::optimizeModel(inputIv.get());
+    InterfaceViewOptimizer::optimizeModel(inputIv.get(), { "Pinger" });
 
     QStringList modelFunctions;
     QStringList environmentFunctions;
