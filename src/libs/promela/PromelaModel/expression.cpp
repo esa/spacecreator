@@ -34,5 +34,4 @@ const Expression::Value &Expression::getContent() const noexcept
 {
     return m_content;
 }
-
 }
