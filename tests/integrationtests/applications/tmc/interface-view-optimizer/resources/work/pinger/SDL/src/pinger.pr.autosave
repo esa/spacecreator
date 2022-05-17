@@ -1,0 +1,35 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Pinger;
+    /* CIF TEXT (1074, 65), (267, 128) */
+    -- Text area for declarations and comments
+    
+    dcl value MyInteger;
+    dcl result MyInteger;
+    /* CIF ENDTEXT */
+    /* CIF START (320, 9), (70, 35) */
+    START;
+        /* CIF task (315, 64), (78, 35) */
+        task value := 1;
+        /* CIF NEXTSTATE (320, 114), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (450, 10), (70, 35) */
+    state Wait;
+        /* CIF input (423, 65), (123, 41) */
+        input ClockInterface;
+            /* CIF output (413, 126), (142, 35) */
+            output PingInterface(value);
+            /* CIF NEXTSTATE (449, 181), (70, 35) */
+            NEXTSTATE Wait;
+    endstate;
+    /* CIF state (657, 22), (70, 35) */
+    state Wait;
+        /* CIF input (616, 77), (149, 35) */
+        input PongInterface(result);
+            /* CIF task (638, 132), (105, 35) */
+            task value := result;
+            /* CIF PROCEDURECALL (625, 182), (132, 35) */
+            call writeln(value);
+            /* CIF NEXTSTATE (656, 237), (70, 35) */
+            NEXTSTATE Wait;
+    endstate;
+endprocess Pinger;
