@@ -30,58 +30,44 @@
 using namespace Asn1Acn;
 
 Project::Project(const QString &projectName)
-    : Node(projectName, {})
-    , m_buildersCount(0)
-{
-}
+    : Node(projectName, {}), m_buildersCount(0) {}
 
-Project::Project(const Project &other)
-    : Project(other.name())
-{
-    for (const auto &file : other.files())
-        add(std::make_unique<File>(*file));
+Project::Project(const Project &other) : Project(other.name()) {
+  for (const auto &file : other.files())
+    add(std::make_unique<File>(*file));
 }
 
 Project::~Project() {}
 
-void Project::accept(Visitor &visitor) const
-{
-    visitor.visit(*this);
+void Project::accept(Visitor &visitor) const { visitor.visit(*this); }
+
+void Project::accept(MutatingVisitor &visitor) { visitor.visit(*this); }
+
+void Project::add(std::unique_ptr<File> file) {
+  const QString path = file->name();
+
+  remove(path);
+
+  file->setParent(this);
+  m_filesByPathMap[path] = file.get();
+  m_files.push_back(std::move(file));
 }
 
-void Project::accept(MutatingVisitor &visitor)
-{
-    visitor.visit(*this);
-}
+void Project::remove(const QString &path) {
+  const auto mapIt = m_filesByPathMap.find(path);
+  if (mapIt != m_filesByPathMap.end())
+    m_filesByPathMap.erase(mapIt);
 
-void Project::add(std::unique_ptr<File> file)
-{
-    const QString path = file->name();
-
-    remove(path);
-
-    file->setParent(this);
-    m_filesByPathMap[path] = file.get();
-    m_files.push_back(std::move(file));
-}
-
-void Project::remove(const QString &path)
-{
-    const auto mapIt = m_filesByPathMap.find(path);
-    if (mapIt != m_filesByPathMap.end())
-        m_filesByPathMap.erase(mapIt);
-
-    for (auto vecIt = m_files.begin(); vecIt != m_files.end(); vecIt++) {
-        if ((*vecIt)->name() == path) {
-            m_files.erase(vecIt);
-            break;
-        }
+  for (auto vecIt = m_files.begin(); vecIt != m_files.end(); vecIt++) {
+    if ((*vecIt)->name() == path) {
+      m_files.erase(vecIt);
+      break;
     }
+  }
 }
 
-File *Project::file(const QString &path) const
-{
-    const auto it = m_filesByPathMap.find(path);
+File *Project::file(const QString &path) const {
+  const auto it = m_filesByPathMap.find(path);
 
-    return it != m_filesByPathMap.end() ? it->second : nullptr;
+  return it != m_filesByPathMap.end() ? it->second : nullptr;
 }
