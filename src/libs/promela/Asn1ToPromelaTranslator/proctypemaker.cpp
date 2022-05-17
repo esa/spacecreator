@@ -78,7 +78,7 @@ std::unique_ptr<ProctypeElement> ProctypeMaker::makeForLoop(const VariableRef &v
     return std::make_unique<ProctypeElement>(std::move(loop));
 }
 
-std::unique_ptr<ProctypeElement> ProctypeMaker::makeForLoopWithCall(
+std::unique_ptr<ProctypeElement> ProctypeMaker::makeCallForEachValue(
         const QString &functionToCallName, const Expression &iteratorEndValue, const QString &iteratorVariableName)
 {
     auto innerSequence = ProctypeMaker::makeNormalSequence();

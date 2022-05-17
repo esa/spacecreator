@@ -225,8 +225,8 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 
 void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
 {
-    const QString componentTypeName = type.itemsType()->typeName();
-    const QString inlineTypeGeneratorName = getInlineGeneratorName(componentTypeName);
+    const QString componentTypeName = Escaper::escapePromelaName(type.itemsType()->typeName());
+    const QString inlineTypeGeneratorName = Escaper::escapePromelaName(getInlineGeneratorName(componentTypeName));
     if (!modelContainsInlineGenerator(inlineTypeGeneratorName)) {
         auto *const asnSequenceComponentType = type.itemsType();
         Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName);
@@ -236,7 +236,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
     Asn1ConstraintVisitor<Asn1Acn::IntegerValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
 
-    const QString &typeIdentifier = type.identifier();
+    const QString typeIdentifier = Escaper::escapePromelaName(type.identifier());
 
     auto sequence = ProctypeMaker::makeNormalSequence();
     sequence->appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, "i"));
@@ -244,7 +244,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
     const size_t maxSize = constraintVisitor.getMaxSize();
     const QString typeGeneratorInline = QString("%1%2").arg(componentTypeName).arg("_generate_value");
     if (minSize == maxSize) {
-        sequence->appendElement(ProctypeMaker::makeForLoopWithCall(typeGeneratorInline, Expression(maxSize - 1)));
+        sequence->appendElement(ProctypeMaker::makeCallForEachValue(typeGeneratorInline, Expression(maxSize - 1)));
     } else { // sequenceOf has variable length
         Asn1Acn::Types::Integer length("length");
         const Asn1Acn::Range<Asn1Acn::IntegerValue::Type> range(static_cast<long>(minSize), static_cast<long>(maxSize));
@@ -260,7 +260,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
         VariableRef endVarRef("value.length");
         Expression end(model::BinaryExpression(model::BinaryExpression::Operator::SUBTRACT,
                 std::make_unique<Expression>(endVarRef), std::make_unique<Expression>(model::Constant(1))));
-        sequence->appendElement(ProctypeMaker::makeForLoopWithCall(typeGeneratorInline, end));
+        sequence->appendElement(ProctypeMaker::makeCallForEachValue(typeGeneratorInline, end));
     }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);

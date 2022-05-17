@@ -128,8 +128,6 @@ public:
     const std::unique_ptr<Sequence> &getSequence() const noexcept;
 
 private:
-    Expression getExpression(const Expression &expression) const;
-
     VariableRef m_variable;
     using Range = std::pair<Expression, Expression>;
     std::variant<Range, VariableRef> m_data;

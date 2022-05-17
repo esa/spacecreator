@@ -207,10 +207,11 @@ QString ProctypeElementVisitor::expressionContentToString(const ::promela::model
     QString str;
     QTextStream stream(&str);
 
-    ProctypeElementVisitor visitor(stream, "", "", "");
+    ProctypeElementVisitor visitor(stream, "", "", ""); // none indent shall be used
     visitor(Expression(content));
 
-    str.truncate(str.length() - 2);
+    const int lineEndingLen = 2;
+    str.truncate(str.length() - lineEndingLen);
 
     return str;
 }

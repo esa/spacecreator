@@ -109,7 +109,7 @@ public:
      *
      * @return ProctypeElement with specified for loop
      */
-    static auto makeForLoopWithCall(const QString &functionToCallName, const Expression &iteratorEndValue,
+    static auto makeCallForEachValue(const QString &functionToCallName, const Expression &iteratorEndValue,
             const QString &iteratorVariableName = "i") -> std::unique_ptr<ProctypeElement>;
 };
 
