@@ -45,8 +45,6 @@ void InterfaceViewOptimizer::optimizeModel(IVModel *ivModel, const std::vector<Q
     }
 
     removeDeadFunctions(ivModel);
-
-    debugExportIv(ivModel);
 }
 
 void InterfaceViewOptimizer::makeEnvironment(const QString &functionName, IVModel *ivModel)
@@ -140,21 +138,6 @@ bool InterfaceViewOptimizer::isSdlFunction(const ivm::IVFunction *function)
 bool InterfaceViewOptimizer::isFunctionDead(const IVFunctionType *function)
 {
     return function->interfaces().empty();
-}
-
-void InterfaceViewOptimizer::debugExportIv(IVModel *ivModel)
-{
-    QByteArray modelData;
-    QBuffer modelDataBuffer(&modelData);
-    modelDataBuffer.open(QIODevice::WriteOnly);
-
-    ive::IVExporter exporter;
-    exporter.exportObjects(ivModel->objects().values(), &modelDataBuffer);
-
-    QSaveFile outputFile("modified.xml");
-    outputFile.open(QIODevice::WriteOnly);
-    outputFile.write(modelData);
-    outputFile.commit();
 }
 
 } // namespace tmc

@@ -47,9 +47,6 @@ private:
     static auto isConnectionDead(const ivm::IVConnection *connection) -> bool;
     static auto isFunctionDead(const ivm::IVFunctionType *function) -> bool;
     static auto isSdlFunction(const ivm::IVFunction *function) -> bool;
-
-private:
-    static auto debugExportIv(ivm::IVModel *ivModel) -> void;
 };
 
 } // namespace tmc
