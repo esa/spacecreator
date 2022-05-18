@@ -19,7 +19,6 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
-#include <QDebug>
 #include <QList>
 #include <algorithm>
 #include <asn1library/asn1/asnsequencecomponent.h>
@@ -199,12 +198,11 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 {
     const QString argumentName = "value";
 
-    qDebug() << "id: " << type.identifier() << type.label() << type.typeName();
-    const QString inlineSeqGeneratorName = getInlineGeneratorName(type.identifier());
+    const QString inlineSeqGeneratorName = getInlineGeneratorName(m_name);
     const QStringList inlineArguments = { argumentName };
     promela::model::Sequence sequence(promela::model::Sequence::Type::NORMAL);
     for (auto &sequenceComponent : type.components()) {
-        auto *const asnSequenceComponent = static_cast<Asn1Acn::AsnSequenceComponent *>(sequenceComponent.get());
+        auto *const asnSequenceComponent = dynamic_cast<Asn1Acn::AsnSequenceComponent *>(sequenceComponent.get());
         if (asnSequenceComponent != nullptr) {
             const QString componentTypeName = getSequenceComponentTypeName(*asnSequenceComponent, m_name);
             const QString inlineTypeGeneratorName = getInlineGeneratorName(componentTypeName);
@@ -238,7 +236,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
     Asn1ConstraintVisitor<Asn1Acn::IntegerValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
 
-    const QString typeIdentifier = Escaper::escapePromelaName(type.identifier());
+    const QString typeIdentifier = Escaper::escapePromelaName(m_name);
 
     auto sequence = ProctypeMaker::makeNormalSequence();
     sequence->appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, "i"));
@@ -328,9 +326,10 @@ void Asn1TypeValueGeneratorVisitor::visit(const Integer &type)
 
 void Asn1TypeValueGeneratorVisitor::visit(const UserdefinedType &type)
 {
-    const auto &typeType = type.type();
+    auto *const typeType = type.type();
     if (typeType != nullptr) {
-        typeType->accept(*this);
+        Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, type.typeName());
+        typeType->accept(visitor);
     }
 }
 

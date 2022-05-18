@@ -22,7 +22,6 @@
 #include "exceptions.h"
 
 #include <QChar>
-#include <QDebug>
 #include <QRegularExpression>
 #include <algorithm>
 #include <utility>
@@ -139,7 +138,6 @@ QString Escaper::escapeCFieldName(QString name)
 
 void Escaper::escapeName(QString &name, const QChar &delimeter)
 {
-    qDebug() << "escaping: " << name;
     name = name.trimmed();
     removeLeadingNonletters(name);
     replaceDelimeters(name, { '_', '-', ' ' }, delimeter);
