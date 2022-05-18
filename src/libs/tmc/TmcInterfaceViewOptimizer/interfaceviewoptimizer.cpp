@@ -41,16 +41,16 @@ namespace tmc {
 void InterfaceViewOptimizer::optimizeModel(IVModel *ivModel, const std::vector<QString> &environmentFunctions)
 {
     for (const auto &functionName : environmentFunctions) {
-        makeEnvironment(functionName, ivModel);
+        markAsEnvironment(functionName, ivModel);
     }
 
     removeDeadFunctions(ivModel);
 }
 
-void InterfaceViewOptimizer::makeEnvironment(const QString &functionName, IVModel *ivModel)
+void InterfaceViewOptimizer::markAsEnvironment(const QString &functionName, IVModel *ivModel)
 {
     auto function = findFunction(functionName, ivModel);
-    setGUIImplementation(function);
+    setGuiAsDefaultImplementation(function);
 }
 
 void InterfaceViewOptimizer::removeDeadFunctions(IVModel *ivModel)
@@ -102,7 +102,7 @@ IVFunction *InterfaceViewOptimizer::findFunction(const QString &functionName, IV
     return function;
 }
 
-void InterfaceViewOptimizer::setGUIImplementation(IVFunction *function)
+void InterfaceViewOptimizer::setGuiAsDefaultImplementation(IVFunction *function)
 {
     function->addImplementation("environment", "GUI");
     function->setDefaultImplementation("environment");

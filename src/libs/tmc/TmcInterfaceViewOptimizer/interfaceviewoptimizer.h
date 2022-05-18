@@ -24,25 +24,53 @@
 
 namespace tmc {
 
+/**
+ * @brief   InterfaceView optimizer for model checking
+ *
+ * This optimizes given IV by marking listed functions as an environment and then
+ * removes all 'dead' functions - environment functions that are connected only
+ * to other environment functions
+ */
 class InterfaceViewOptimizer final
 {
 public:
+    /**
+     * @brief   Deleted constructor
+     */
     InterfaceViewOptimizer() = delete;
+    /**
+     * @brief   Deleted copy constructor
+     */
     InterfaceViewOptimizer(const InterfaceViewOptimizer &) = delete;
+    /**
+     * @brief   Deleted move constructor
+     */
     InterfaceViewOptimizer(InterfaceViewOptimizer &&) = delete;
 
+    /**
+     * @brief   Deleted copy assignment operator
+     */
     InterfaceViewOptimizer operator=(const InterfaceViewOptimizer &) = delete;
+    /**
+     * @brief   Deleted move assignment operator
+     */
     InterfaceViewOptimizer operator=(InterfaceViewOptimizer &&) = delete;
 
 public:
+    /**
+     * @brief   Optimize passed model
+     *
+     * @param   ivModel                 Model to modify
+     * @param   environmentFunctions    Names of functions that should be marked as environment
+     */
     static auto optimizeModel(ivm::IVModel *ivModel, const std::vector<QString> &environmentFunctions) -> void;
 
 private:
-    static auto makeEnvironment(const QString &functionName, ivm::IVModel *ivModel) -> void;
+    static auto markAsEnvironment(const QString &functionName, ivm::IVModel *ivModel) -> void;
     static auto removeDeadFunctions(ivm::IVModel *ivModel) -> void;
 
     static auto findFunction(const QString &functionName, ivm::IVModel *ivModel) -> ivm::IVFunction *;
-    static auto setGUIImplementation(ivm::IVFunction *function) -> void;
+    static auto setGuiAsDefaultImplementation(ivm::IVFunction *function) -> void;
 
     static auto isConnectionDead(const ivm::IVConnection *connection) -> bool;
     static auto isFunctionDead(const ivm::IVFunctionType *function) -> bool;
