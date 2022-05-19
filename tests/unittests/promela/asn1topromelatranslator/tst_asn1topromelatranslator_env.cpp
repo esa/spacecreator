@@ -275,19 +275,6 @@ void tst_Asn1ToPromelaTranslator_Env::testEnumerated() const
     }
 }
 
-void tst_Asn1ToPromelaTranslator_Env::testObserver() const
-{
-    const QString inputAsnFilename = "observer.asn";
-    const QStringList asnTypesToTranslate = {
-        "Lock-Context",
-    };
-    const QString actualOutputFilename = "observer.pml";
-    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
-
-    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
-    compareTextFiles(actualOutputFilename, expectedOutputFilename);
-}
-
 void tst_Asn1ToPromelaTranslator_Env::testSequence() const
 {
     const QString inputAsnFilename = "sequence.asn";
@@ -309,6 +296,19 @@ void tst_Asn1ToPromelaTranslator_Env::testSequenceEmbeddedType() const
         "EnvParamSeq",
     };
     const QString actualOutputFilename = "sequence-embedded.pml";
+    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
+
+    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
+    compareTextFiles(actualOutputFilename, expectedOutputFilename);
+}
+
+void tst_Asn1ToPromelaTranslator_Env::testSequenceNested() const
+{
+    const QString inputAsnFilename = "sequence-nested.asn";
+    const QStringList asnTypesToTranslate = {
+        "Outer-sequence",
+    };
+    const QString actualOutputFilename = "sequence-nested.pml";
     const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
 
     translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
