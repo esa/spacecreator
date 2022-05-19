@@ -41,6 +41,7 @@ private Q_SLOTS:
     void testSequence() const;
     void testSequenceEmbeddedType() const;
     void testSequenceNested() const;
+    void testSequenceNestedAnonymous() const;
     void testSequenceOf() const;
     void testSequenceOfVariableSize() const;
     void testEnumerated() const;

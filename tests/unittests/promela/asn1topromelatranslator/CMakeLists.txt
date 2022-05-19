@@ -39,6 +39,9 @@ configure_file(resources/sequence-embedded.pml.out resources/sequence-embedded.p
 configure_file(resources/sequence-nested.asn resources/sequence-nested.asn COPYONLY)
 configure_file(resources/sequence-nested.pml.out resources/sequence-nested.pml.out COPYONLY)
 
+configure_file(resources/sequence-nested-anonymous.asn resources/sequence-nested-anonymous.asn COPYONLY)
+configure_file(resources/sequence-nested-anonymous.pml.out resources/sequence-nested-anonymous.pml.out COPYONLY)
+
 configure_file(resources/sequenceof.asn resources/sequenceof.asn COPYONLY)
 configure_file(resources/sequenceof.pml.out resources/sequenceof.pml.out COPYONLY)
 

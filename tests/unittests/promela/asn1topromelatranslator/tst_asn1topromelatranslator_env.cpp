@@ -315,6 +315,19 @@ void tst_Asn1ToPromelaTranslator_Env::testSequenceNested() const
     compareTextFiles(actualOutputFilename, expectedOutputFilename);
 }
 
+void tst_Asn1ToPromelaTranslator_Env::testSequenceNestedAnonymous() const
+{
+    const QString inputAsnFilename = "sequence-nested-anonymous.asn";
+    const QStringList asnTypesToTranslate = {
+        "Outer-sequence",
+    };
+    const QString actualOutputFilename = "sequence-nested-anonymous.pml";
+    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
+
+    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
+    compareTextFiles(actualOutputFilename, expectedOutputFilename);
+}
+
 void tst_Asn1ToPromelaTranslator_Env::testSequenceOf() const
 {
     const QString inputAsnFilename = "sequenceof.asn";
