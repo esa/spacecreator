@@ -40,6 +40,7 @@
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <asn1library/asn1/values.h>
 #include <conversion/common/escaper/escaper.h>
+#include <iostream>
 #include <promela/PromelaModel/proctypeelement.h>
 
 using Asn1Acn::BitStringValue;
@@ -66,6 +67,7 @@ using promela::model::ArrayType;
 using promela::model::AssertCall;
 using promela::model::Assignment;
 using promela::model::BasicType;
+using promela::model::BinaryExpression;
 using promela::model::Constant;
 using promela::model::DataType;
 using promela::model::Declaration;
@@ -504,22 +506,55 @@ void Asn1ItemTypeVisitor::addAssignValueInline(const QString &typeName, ::promel
 
 void Asn1ItemTypeVisitor::addRangeCheckInline(const Integer &type, const QString &typeName)
 {
-    const auto inlineName = QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(rangeCheckInlineSuffix);
-    QList<QString> inlineArguments;
-    inlineArguments.append("dst");
-    inlineArguments.append("src");
-
+    // Get type range subset
     IntegerConstraintVisitor visitor;
     type.constraints().accept(visitor);
 
+    const auto &rangeSubsets = visitor.getResultSubset();
+
+    if (!rangeSubsets.has_value()) {
+        return;
+    }
+
+    std::vector<BinaryExpression> rangeCheckingExpressions;
+    for (const auto &range : rangeSubsets->getRanges()) {
+        std::cerr << type.identifier().toStdString() << ": " << range.first << " -> " << range.second << '\n';
+
+        auto minValueConst = std::make_unique<Expression>(Constant(range.first));
+        auto minValueVar = std::make_unique<Expression>(VariableRef("value"));
+        auto greaterThanExpr = std::make_unique<Expression>(
+                BinaryExpression(BinaryExpression::Operator::GEQUAL, std::move(minValueVar), std::move(minValueConst)));
+
+        auto maxValueConst = std::make_unique<Expression>(Constant(range.second));
+        auto maxValueVar = std::make_unique<Expression>(VariableRef("value"));
+        auto lessThanExpr = std::make_unique<Expression>(
+                BinaryExpression(BinaryExpression::Operator::LEQUAL, std::move(maxValueVar), std::move(maxValueConst)));
+
+        BinaryExpression combinedExpr(
+                BinaryExpression::Operator::AND, std::move(greaterThanExpr), std::move(lessThanExpr));
+        rangeCheckingExpressions.push_back(std::move(combinedExpr));
+    }
+
     ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
 
-    Expression testExpression(Constant(42));
-    AssertCall assertCall(std::move(testExpression));
+    auto rangeCheckingExpression =
+            std::accumulate(std::next(rangeCheckingExpressions.begin()), rangeCheckingExpressions.end(),
+                    std::make_unique<Expression>(rangeCheckingExpressions[0]), [&](auto &&acc, const auto &expr) {
+                        return std::make_unique<Expression>(BinaryExpression(
+                                BinaryExpression::Operator::OR, std::move(acc), std::make_unique<Expression>(expr)));
+                    });
+
+    AssertCall assertCall(*rangeCheckingExpression);
     sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assertCall)));
 
-    auto rangeCheckInline = std::make_unique<InlineDef>(inlineName, inlineArguments, std::move(sequence));
+    // Create range check inline
+    const auto rangeCheckInlineName =
+            QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(rangeCheckInlineSuffix);
+    QList<QString> rangeCheckInlineArguments;
+    rangeCheckInlineArguments.append("value");
 
+    auto rangeCheckInline =
+            std::make_unique<InlineDef>(rangeCheckInlineName, rangeCheckInlineArguments, std::move(sequence));
     m_promelaModel.addInlineDef(std::move(rangeCheckInline));
 }
 

@@ -52,6 +52,8 @@ void ExpressionVisitor::operator()(const Constant &constant)
 
 void ExpressionVisitor::operator()(const BinaryExpression &expression)
 {
+    m_stream << "(";
+
     ExpressionVisitor leftVisitor(m_stream);
     leftVisitor.visit(*expression.getLeft());
 
@@ -102,6 +104,8 @@ void ExpressionVisitor::operator()(const BinaryExpression &expression)
 
     ExpressionVisitor rightVisitor(m_stream);
     rightVisitor.visit(*expression.getRight());
+
+    m_stream << ")";
 }
 
 void ExpressionVisitor::operator()(const InlineCall &inlineCall)
