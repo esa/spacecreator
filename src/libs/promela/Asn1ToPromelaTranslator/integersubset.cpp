@@ -23,12 +23,12 @@
 
 namespace promela::translator {
 
-IntegerSubset::IntegerSubset(int singleValue)
+IntegerSubset::IntegerSubset(IntegerSubset::IntegerType singleValue)
 {
     m_allowedValues.emplace_back(singleValue, singleValue);
 }
 
-IntegerSubset::IntegerSubset(int minValue, int maxValue)
+IntegerSubset::IntegerSubset(IntegerSubset::IntegerType minValue, IntegerSubset::IntegerType maxValue)
 {
     m_allowedValues.emplace_back(minValue, maxValue);
 }
@@ -52,8 +52,8 @@ IntegerSubset IntegerSubset::operator&(const IntegerSubset &rhs) const
 
     for (const auto &p : m_allowedValues) {
         for (const auto &q : rhs.m_allowedValues) {
-            int left = std::max(p.first, q.first);
-            int right = std::min(p.second, q.second);
+            auto left = std::max(p.first, q.first);
+            auto right = std::min(p.second, q.second);
 
             if (left <= right) {
                 result.m_allowedValues.emplace_back(left, right);
@@ -77,7 +77,7 @@ bool IntegerSubset::isEmpty() const noexcept
     return m_allowedValues.empty();
 }
 
-std::optional<int> IntegerSubset::getMin() const noexcept
+std::optional<IntegerSubset::IntegerType> IntegerSubset::getMin() const noexcept
 {
     if (m_allowedValues.empty()) {
         return std::nullopt;
@@ -85,7 +85,7 @@ std::optional<int> IntegerSubset::getMin() const noexcept
     return m_allowedValues.front().first;
 }
 
-std::optional<int> IntegerSubset::getMax() const noexcept
+std::optional<IntegerSubset::IntegerType> IntegerSubset::getMax() const noexcept
 {
     if (m_allowedValues.empty()) {
         return std::nullopt;
@@ -93,7 +93,7 @@ std::optional<int> IntegerSubset::getMax() const noexcept
     return m_allowedValues.back().second;
 }
 
-const std::list<std::pair<int, int>> &IntegerSubset::getRanges() const noexcept
+const IntegerSubset::RangeList &IntegerSubset::getRanges() const noexcept
 {
     return m_allowedValues;
 }
