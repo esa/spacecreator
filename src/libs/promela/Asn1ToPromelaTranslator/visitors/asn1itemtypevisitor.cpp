@@ -421,7 +421,7 @@ void Asn1ItemTypeVisitor::visit(const Integer &type)
     m_promelaModel.addTypeAlias(TypeAlias(typeName, BasicType::INT));
 
     addSimpleValueAssignmentInline(typeName);
-    addRangeCheckInline(type, typeName);
+    addIntegerRangeCheckInline(type, typeName);
 
     m_resultDataType = DataType(UtypeRef(typeName));
 }
@@ -504,7 +504,7 @@ void Asn1ItemTypeVisitor::addAssignValueInline(const QString &typeName, ::promel
     m_promelaModel.addInlineDef(std::make_unique<InlineDef>(assignValueInline, arguments, std::move(sequence)));
 }
 
-void Asn1ItemTypeVisitor::addRangeCheckInline(const Integer &type, const QString &typeName)
+void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const Integer &type, const QString &typeName)
 {
     // Get type range subset
     IntegerConstraintVisitor visitor;
@@ -516,6 +516,7 @@ void Asn1ItemTypeVisitor::addRangeCheckInline(const Integer &type, const QString
         return;
     }
 
+    // Build one big expression for range check
     std::vector<BinaryExpression> rangeCheckingExpressions;
     for (const auto &range : rangeSubsets->getRanges()) {
         std::cerr << type.identifier().toStdString() << ": " << range.first << " -> " << range.second << '\n';
@@ -535,8 +536,6 @@ void Asn1ItemTypeVisitor::addRangeCheckInline(const Integer &type, const QString
         rangeCheckingExpressions.push_back(std::move(combinedExpr));
     }
 
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
-
     auto rangeCheckingExpression =
             std::accumulate(std::next(rangeCheckingExpressions.begin()), rangeCheckingExpressions.end(),
                     std::make_unique<Expression>(rangeCheckingExpressions[0]), [&](auto &&acc, const auto &expr) {
@@ -544,14 +543,20 @@ void Asn1ItemTypeVisitor::addRangeCheckInline(const Integer &type, const QString
                                 BinaryExpression::Operator::OR, std::move(acc), std::make_unique<Expression>(expr)));
                     });
 
-    AssertCall assertCall(*rangeCheckingExpression);
-    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assertCall)));
+    addRangeCheckInline(*rangeCheckingExpression, typeName);
+}
 
-    // Create range check inline
+void Asn1ItemTypeVisitor::addRangeCheckInline(const Expression &expression, const QString &typeName)
+{
     const auto rangeCheckInlineName =
             QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(rangeCheckInlineSuffix);
     QList<QString> rangeCheckInlineArguments;
     rangeCheckInlineArguments.append("value");
+
+    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+
+    AssertCall assertCall(expression);
+    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assertCall)));
 
     auto rangeCheckInline =
             std::make_unique<InlineDef>(rangeCheckInlineName, rangeCheckInlineArguments, std::move(sequence));
