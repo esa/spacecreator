@@ -44,3 +44,6 @@ configure_file(resources/sequenceof-variable-size.pml.out resources/sequenceof-v
 
 configure_file(resources/choice.asn resources/choice.asn COPYONLY)
 configure_file(resources/choice.pml.out resources/choice.pml.out COPYONLY)
+
+configure_file(resources/choice-anonymous.asn resources/choice-anonymous.asn COPYONLY)
+configure_file(resources/choice-anonymous.pml.out resources/choice-anonymous.pml.out COPYONLY)

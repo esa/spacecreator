@@ -1,3 +1,6 @@
+#define SimpleChoice_NOT_SELECTED 0
+#define SimpleChoice_alt1_PRESENT 1
+#define SimpleChoice_alt2_PRESENT 2
 inline Type1_generate_value(value)
 {
     if
@@ -26,12 +29,14 @@ inline Type2_generate_value(value)
         value = 13;
     fi;
 }
-inline SimpleFixedSizeSequenceOf_generate_value(value)
+inline SimpleChoice_generate_value(value)
 {
     if
-    :: true;
-       Type1_generate_value(value);
-    :: true;
-       Type2_generate_value(value);
+    ::  true;
+        Type1_generate_value(value);
+        value.selection = SimpleChoice_alt1_PRESENT;
+    ::  true;
+        Type2_generate_value(value);
+        value.selection = SimpleChoice_alt2_PRESENT;
     fi;
 }

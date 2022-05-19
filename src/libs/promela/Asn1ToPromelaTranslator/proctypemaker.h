@@ -73,7 +73,7 @@ public:
      *
      * @return ProctypeElement with specified Assignment
      */
-    static auto makeAssignmentProctypeElement(const QString &variableName, int32_t value)
+    static auto makeAssignmentProctypeElement(const QString &variableName, const Expression::Value &value)
             -> std::unique_ptr<ProctypeElement>;
 
     /**

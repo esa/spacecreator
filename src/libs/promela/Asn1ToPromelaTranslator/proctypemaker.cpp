@@ -58,9 +58,9 @@ std::unique_ptr<ProctypeElement> ProctypeMaker::makeTrueExpressionProctypeElemen
 }
 
 std::unique_ptr<ProctypeElement> ProctypeMaker::makeAssignmentProctypeElement(
-        const QString &variableName, const int32_t value)
+        const QString &variableName, const Expression::Value &value)
 {
-    Assignment valueExistAssignment((VariableRef(variableName)), Expression(Constant(value)));
+    Assignment valueExistAssignment((VariableRef(variableName)), Expression(value));
     return std::make_unique<ProctypeElement>(std::move(valueExistAssignment));
 }
 

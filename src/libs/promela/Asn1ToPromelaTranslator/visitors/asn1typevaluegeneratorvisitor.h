@@ -142,8 +142,6 @@ private:
             -> QString;
     auto generateAsnSequenceComponentInlineCall(Asn1Acn::AsnSequenceComponent *asnSequenceComponent,
             const QString &argumentName) -> std::unique_ptr<model::ProctypeElement>;
-    auto generateChoiceComponentInlineCall(Asn1Acn::Types::ChoiceAlternative *choiceComponent,
-            const QString &argumentName) -> std::unique_ptr<model::ProctypeElement>;
     auto modelContainsInlineGenerator(const QString &inlineGeneratorName) -> bool;
     auto isEmbeddedType(const Asn1Acn::Types::Type &type) -> bool;
     auto getInlineGeneratorName(const QString &typeName) -> QString;
