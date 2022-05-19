@@ -40,7 +40,7 @@ namespace promela::translator {
  *
  * Visitor finds a subset of allowed values for integer or for size constraints
  */
-class IntegerRangeConstraintVisitor : public ::Asn1Acn::Constraints::ConstraintVisitor<::Asn1Acn::IntegerValue>
+class IntegerRangeConstraintVisitor : public Asn1Acn::Constraints::ConstraintVisitor<Asn1Acn::IntegerValue>
 {
 public:
     /**
@@ -58,17 +58,17 @@ public:
      *
      * @param constraint element to visit
      */
-    void visit(const ::Asn1Acn::Constraints::RangeConstraint<::Asn1Acn::IntegerValue> &constraint) override;
+    void visit(const Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue> &constraint) override;
     /// @brief Visit Asn1Acn::Constraints::AndConstraint
-    void visit(const ::Asn1Acn::Constraints::AndConstraint<::Asn1Acn::IntegerValue> &constraint) override;
+    void visit(const Asn1Acn::Constraints::AndConstraint<Asn1Acn::IntegerValue> &constraint) override;
     /// @brief Visit Asn1Acn::Constraints::OrConstraint
-    void visit(const ::Asn1Acn::Constraints::OrConstraint<::Asn1Acn::IntegerValue> &constraint) override;
+    void visit(const Asn1Acn::Constraints::OrConstraint<Asn1Acn::IntegerValue> &constraint) override;
     /// @brief Visit Asn1Acn::Constraints::FromConstraint
-    void visit(const ::Asn1Acn::Constraints::FromConstraint<::Asn1Acn::IntegerValue> &constraint) override;
+    void visit(const Asn1Acn::Constraints::FromConstraint<Asn1Acn::IntegerValue> &constraint) override;
     /// @brief Visit Asn1Acn::Constraints::SizeConstraint
-    void visit(const ::Asn1Acn::Constraints::SizeConstraint<::Asn1Acn::IntegerValue> &constraint) override;
+    void visit(const Asn1Acn::Constraints::SizeConstraint<Asn1Acn::IntegerValue> &constraint) override;
     /// @brief Visit Asn1Acn::Constraints::ConstraintList
-    void visit(const ::Asn1Acn::Constraints::ConstraintList<::Asn1Acn::IntegerValue> &constraint) override;
+    void visit(const Asn1Acn::Constraints::ConstraintList<Asn1Acn::IntegerValue> &constraint) override;
 
     /**
      * @brief Check if constraint was calculated.

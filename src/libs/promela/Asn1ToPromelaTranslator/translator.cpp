@@ -90,7 +90,7 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
 }
 
 std::vector<std::unique_ptr<conversion::Model>> Asn1ToPromelaTranslator::generateValueGenerationInlines(
-        const ::Asn1Acn::Asn1Model *model, const QStringList &typeNames) const
+        const Asn1Acn::Asn1Model *model, const QStringList &typeNames) const
 {
     std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
     for (const std::unique_ptr<File> &file : model->data()) {

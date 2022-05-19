@@ -69,7 +69,7 @@ using promela::model::VariableRef;
 
 namespace promela::translator {
 ValueAssignmentVisitor::ValueAssignmentVisitor(
-        Value *value, ::promela::model::Sequence &sequence, const VariableRef &target, QString typeName)
+        Value *value, model::Sequence &sequence, const VariableRef &target, QString typeName)
     : m_value(value)
     , m_sequence(sequence)
     , m_target(target)

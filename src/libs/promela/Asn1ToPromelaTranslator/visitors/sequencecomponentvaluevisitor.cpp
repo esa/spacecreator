@@ -44,7 +44,7 @@ using promela::model::VariableRef;
 
 namespace promela::translator {
 SequenceComponentValueVisitor::SequenceComponentValueVisitor(const NamedValue *value,
-        ::promela::model::Sequence &sequence, const VariableRef &target, QString sequenceTypeName)
+        model::Sequence &sequence, const VariableRef &target, QString sequenceTypeName)
     : m_value(value)
     , m_sequence(sequence)
     , m_target(target)

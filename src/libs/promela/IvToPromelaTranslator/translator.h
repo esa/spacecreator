@@ -131,7 +131,7 @@ private:
          *
          * @param promelaModel The model that is being created
          */
-        Context(::promela::model::PromelaModel *promelaModel);
+        Context(model::PromelaModel *promelaModel);
 
         /**
          * @brief Add observer attachment
@@ -170,10 +170,10 @@ private:
          *
          * @return Promela model
          */
-        auto model() -> ::promela::model::PromelaModel *;
+        auto model() -> model::PromelaModel *;
 
     private:
-        ::promela::model::PromelaModel *m_promelaModel;
+        model::PromelaModel *m_promelaModel;
         std::map<QString, std::map<QString, ObserverAttachments>> m_observerAttachments;
     };
 
@@ -215,23 +215,23 @@ private:
             const QString &interfaceName, const QString &parameterName, const QString &parameterType,
             promela::model::Sequence *sequence) const -> void;
     auto generateInitProctype(const std::vector<QString> &modelFunctions, const std::vector<QString> &observers,
-            const ::ivm::IVModel *ivModel) const -> ::promela::model::InitProctype;
+            const ::ivm::IVModel *ivModel) const -> model::InitProctype;
     auto generateProctype(Context &context, const QString &functionName, const QString &interfaceName,
             const QString &parameterType, size_t queueSize, size_t priority, bool environment) const
-            -> std::unique_ptr<::promela::model::Proctype>;
+            -> std::unique_ptr<model::Proctype>;
     auto generateEnvironmentProctype(const QString &functionName, const QString &interfaceName,
             const QString &parameterType, const QString &sendInline) const
-            -> std::unique_ptr<::promela::model::Proctype>;
+            -> std::unique_ptr<model::Proctype>;
     auto generateSendInline(const QString &functionName, const QString &interfaceName, const QString &parameterName,
             const QString &parameterType, const QString &sourceFunctionName, const QString &sourceInterfaceName) const
-            -> std::unique_ptr<::promela::model::InlineDef>;
+            -> std::unique_ptr<model::InlineDef>;
     auto createPromelaObjectsForFunction(Context &context, const ::ivm::IVModel *ivModel, ::ivm::IVFunction *ivFunction,
             const QString &functionName) const -> void;
     auto createPromelaObjectsForEnvironment(Context &context, const ::ivm::IVModel *ivModel,
             ::ivm::IVFunction *ivFunction, const QString &functionName) const -> void;
-    auto createCheckQueueInline(::promela::model::PromelaModel *promelaModel, const QString &functionName,
+    auto createCheckQueueInline(model::PromelaModel *promelaModel, const QString &functionName,
             QList<QString> &channelNames) const -> void;
-    auto createSystemState(::promela::model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,
+    auto createSystemState(model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,
             const std::vector<QString> &modelFunctions, const std::vector<QString> &observers) const -> void;
 
     auto containsContextVariables(const QVector<shared::ContextParameter> &parameters) const -> bool;

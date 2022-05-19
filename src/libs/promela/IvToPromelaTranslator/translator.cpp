@@ -150,7 +150,7 @@ IvToPromelaTranslator::ObserverAttachment::Priority IvToPromelaTranslator::Obser
     return m_priority;
 }
 
-IvToPromelaTranslator::Context::Context(::promela::model::PromelaModel *promelaModel)
+IvToPromelaTranslator::Context::Context(model::PromelaModel *promelaModel)
 {
     m_promelaModel = promelaModel;
 }
@@ -190,7 +190,7 @@ auto IvToPromelaTranslator::Context::hasObserverAttachments(
     return getObserverAttachments(function, interface, kind).size() > 0;
 }
 
-auto IvToPromelaTranslator::Context::model() -> ::promela::model::PromelaModel *
+auto IvToPromelaTranslator::Context::model() -> model::PromelaModel *
 {
     return m_promelaModel;
 }
@@ -517,7 +517,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(con
     return proctype;
 }
 
-std::unique_ptr<::promela::model::InlineDef> IvToPromelaTranslator::generateSendInline(const QString &functionName,
+std::unique_ptr<model::InlineDef> IvToPromelaTranslator::generateSendInline(const QString &functionName,
         const QString &interfaceName, const QString &parameterName, const QString &parameterType,
         const QString &sourceFunctionName, const QString &sourceInterfaceName) const
 {

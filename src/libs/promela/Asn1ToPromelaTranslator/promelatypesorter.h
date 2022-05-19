@@ -36,11 +36,11 @@ public:
      *
      * @param promelaModel Promela Model to sort utypes
      */
-    auto sortTypeDefinitions(::promela::model::PromelaModel &promelaModel) const -> void;
+    auto sortTypeDefinitions(model::PromelaModel &promelaModel) const -> void;
 
 private:
-    auto getTypeAliasMap(const ::promela::model::PromelaModel &promelaModel) const -> std::map<QString, QString>;
-    auto populateTypeDependencies(const ::promela::model::PromelaModel &promelaModel,
+    auto getTypeAliasMap(const model::PromelaModel &promelaModel) const -> std::map<QString, QString>;
+    auto populateTypeDependencies(const model::PromelaModel &promelaModel,
             const std::map<QString, QString> &typeAliasMap, std::map<QString, std::set<QString>> &dependencies) const
             -> void;
 };

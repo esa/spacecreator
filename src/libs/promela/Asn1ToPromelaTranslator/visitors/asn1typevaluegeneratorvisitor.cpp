@@ -116,7 +116,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Boolean &type)
     const auto valueVariableName = getInlineArgumentName();
 
     std::for_each(possibleValues.begin(), possibleValues.end(), [&conditional, &valueVariableName](const bool &value) {
-        auto nestedSequence = std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
+        auto nestedSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
 
         nestedSequence->appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("true"))));
         nestedSequence->appendElement(std::make_unique<ProctypeElement>(
@@ -125,7 +125,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Boolean &type)
         conditional.appendAlternative(std::move(nestedSequence));
     });
 
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
     sequence.appendElement(std::make_unique<ProctypeElement>(std::move(conditional)));
 
     createValueGenerationInline(std::move(sequence));
@@ -229,8 +229,8 @@ void Asn1TypeValueGeneratorVisitor::visit(const Enumerated &type)
     while (generator.has_next()) {
         auto element = generator.next();
 
-        std::unique_ptr<::promela::model::Sequence> nestedSequence =
-                std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
+        std::unique_ptr<model::Sequence> nestedSequence =
+                std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
 
         nestedSequence->appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("true"))));
         nestedSequence->appendElement(std::make_unique<ProctypeElement>(
@@ -239,7 +239,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Enumerated &type)
         conditional.appendAlternative(std::move(nestedSequence));
     }
 
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
     sequence.appendElement(std::make_unique<ProctypeElement>(std::move(conditional)));
 
     createValueGenerationInline(std::move(sequence));
@@ -400,14 +400,14 @@ void Asn1TypeValueGeneratorVisitor::visit(const Integer &type)
         const auto rangeMin = range.first;
         const auto rangeMax = range.second;
 
-        std::unique_ptr<::promela::model::Sequence> nestedSequence =
-                std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::ATOMIC);
+        std::unique_ptr<model::Sequence> nestedSequence =
+                std::make_unique<model::Sequence>(model::Sequence::Type::ATOMIC);
         nestedSequence->appendElement(std::make_unique<ProctypeElement>(
                 Select(VariableRef(tempName), Expression(Constant(rangeMin)), Expression(Constant(rangeMax)))));
         conditional.appendAlternative(std::move(nestedSequence));
     }
 
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
     sequence.appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, tempName));
     sequence.appendElement(std::make_unique<ProctypeElement>(std::move(conditional)));
     sequence.appendElement(std::make_unique<ProctypeElement>(
@@ -425,7 +425,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const UserdefinedType &type)
     }
 }
 
-void Asn1TypeValueGeneratorVisitor::createValueGenerationInline(::promela::model::Sequence sequence)
+void Asn1TypeValueGeneratorVisitor::createValueGenerationInline(model::Sequence sequence)
 {
     const auto valueVariableName = getInlineArgumentName();
     const QString inlineName = getInlineGeneratorName(m_name);

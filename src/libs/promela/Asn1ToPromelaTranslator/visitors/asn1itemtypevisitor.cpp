@@ -94,7 +94,7 @@ Asn1ItemTypeVisitor::Asn1ItemTypeVisitor(
 {
 }
 
-const std::optional<::promela::model::DataType> &Asn1ItemTypeVisitor::getResultDataType() const noexcept
+const std::optional<model::DataType> &Asn1ItemTypeVisitor::getResultDataType() const noexcept
 {
     return m_resultDataType;
 }
@@ -116,7 +116,7 @@ void Asn1ItemTypeVisitor::visit(const Null &type)
     const QString typeName = constructTypeName(m_name);
     m_promelaModel.addTypeAlias(TypeAlias(typeName, BasicType::BIT));
 
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     sequence.appendElement(std::make_unique<ProctypeElement>(Skip()));
 
@@ -220,7 +220,7 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
     const QString none = QString("%1_NONE").arg(utypeName);
     m_promelaModel.addValueDefinition(ValueDefinition(none, 0));
     int32_t index = 1;
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
     for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type.components()) {
         Asn1ItemTypeVisitor nestedVisitor(m_promelaModel, utypeName, component->name(), m_enhancedSpinSupport);
         component->type()->accept(nestedVisitor);
@@ -271,7 +271,7 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
     Utype nestedUtype(nestedUtypeName);
 
     QList<QString> optionalFields;
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : type.components()) {
         Asn1SequenceComponentVisitor componentVisitor(m_promelaModel, nestedUtypeName, m_enhancedSpinSupport);
@@ -358,12 +358,12 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
     type.itemsType();
     m_promelaModel.addUtype(utype);
 
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     sequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "i")));
 
-    std::unique_ptr<::promela::model::Sequence> loopSequence =
-            std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
+    std::unique_ptr<model::Sequence> loopSequence =
+            std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
 
     VariableRef dst("dst");
     dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
@@ -433,7 +433,7 @@ void Asn1ItemTypeVisitor::visit(const UserdefinedType &type)
     m_promelaModel.addTypeAlias(TypeAlias(typeName, UtypeRef(escapedTypeName)));
     m_resultDataType = DataType(UtypeRef(typeName));
 
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     const QString inlineName = escapedTypeName + assignValueInlineSuffix;
     QList<InlineCall::Argument> inlineArguments;
@@ -455,7 +455,7 @@ QString Asn1ItemTypeVisitor::constructTypeName(QString name)
 
 void Asn1ItemTypeVisitor::addSimpleValueAssignmentInline(const QString &typeName)
 {
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     sequence.appendElement(
             std::make_unique<ProctypeElement>(Assignment(VariableRef("dst"), Expression(VariableRef("src")))));
@@ -465,12 +465,12 @@ void Asn1ItemTypeVisitor::addSimpleValueAssignmentInline(const QString &typeName
 
 void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeName, int length, bool lengthFieldPresent)
 {
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     sequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "i")));
 
-    std::unique_ptr<::promela::model::Sequence> loopSequence =
-            std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
+    std::unique_ptr<model::Sequence> loopSequence =
+            std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
 
     VariableRef dst("dst");
     dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
@@ -493,7 +493,7 @@ void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeNam
     addAssignValueInline(typeName, std::move(sequence));
 }
 
-void Asn1ItemTypeVisitor::addAssignValueInline(const QString &typeName, ::promela::model::Sequence sequence)
+void Asn1ItemTypeVisitor::addAssignValueInline(const QString &typeName, model::Sequence sequence)
 {
     const QString assignValueInline =
             QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(assignValueInlineSuffix);
@@ -553,7 +553,7 @@ void Asn1ItemTypeVisitor::addRangeCheckInline(const Expression &expression, cons
     QList<QString> rangeCheckInlineArguments;
     rangeCheckInlineArguments.append("value");
 
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     AssertCall assertCall(expression);
     sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assertCall)));

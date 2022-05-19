@@ -23,7 +23,7 @@
 
 namespace promela::exporter {
 /**
- * @brief Visitor for @link{::promela::model::Sequence}
+ * @brief Visitor for @link{model::Sequence}
  */
 class SequenceVisitor final
 {
@@ -44,7 +44,7 @@ public:
      * @param sequence sequence to visit
      * @param useSequenceIndent if true the indent for first element will be sequenceIndent
      */
-    void visit(const ::promela::model::Sequence &sequence, bool useSequenceIndent = false);
+    void visit(const model::Sequence &sequence, bool useSequenceIndent = false);
 
     /**
      * @brief Get string prefix for sequence based on sequence type
@@ -52,7 +52,7 @@ public:
      * @param sequence sequence
      * @return prefix of sequence e.g. atomic or d_step
      */
-    QString getSequencePrefix(const ::promela::model::Sequence &sequence);
+    QString getSequencePrefix(const model::Sequence &sequence);
 
 private:
     QTextStream &m_stream;

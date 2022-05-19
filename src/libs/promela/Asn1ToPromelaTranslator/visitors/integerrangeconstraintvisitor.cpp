@@ -25,7 +25,7 @@ using Asn1Acn::Range;
 namespace promela::translator {
 IntegerRangeConstraintVisitor::IntegerRangeConstraintVisitor() {}
 
-void IntegerRangeConstraintVisitor::visit(const ::Asn1Acn::Constraints::RangeConstraint<IntegerValue> &constraint)
+void IntegerRangeConstraintVisitor::visit(const Asn1Acn::Constraints::RangeConstraint<IntegerValue> &constraint)
 {
     const Range<IntegerValue::Type> &range = constraint.range();
     if (range.isSingleItem()) {
@@ -35,7 +35,7 @@ void IntegerRangeConstraintVisitor::visit(const ::Asn1Acn::Constraints::RangeCon
     }
 }
 
-void IntegerRangeConstraintVisitor::visit(const ::Asn1Acn::Constraints::AndConstraint<IntegerValue> &constraint)
+void IntegerRangeConstraintVisitor::visit(const Asn1Acn::Constraints::AndConstraint<IntegerValue> &constraint)
 {
     IntegerRangeConstraintVisitor lhsVisitor;
     constraint.leftChild()->accept(lhsVisitor);
@@ -52,7 +52,7 @@ void IntegerRangeConstraintVisitor::visit(const ::Asn1Acn::Constraints::AndConst
     m_subset = lhs.value() & rhs.value();
 }
 
-void IntegerRangeConstraintVisitor::visit(const ::Asn1Acn::Constraints::OrConstraint<IntegerValue> &constraint)
+void IntegerRangeConstraintVisitor::visit(const Asn1Acn::Constraints::OrConstraint<IntegerValue> &constraint)
 {
     IntegerRangeConstraintVisitor lhsVisitor;
     constraint.leftChild()->accept(lhsVisitor);
@@ -69,17 +69,17 @@ void IntegerRangeConstraintVisitor::visit(const ::Asn1Acn::Constraints::OrConstr
     m_subset = lhs.value() | rhs.value();
 }
 
-void IntegerRangeConstraintVisitor::visit(const ::Asn1Acn::Constraints::FromConstraint<IntegerValue> &constraint)
+void IntegerRangeConstraintVisitor::visit(const Asn1Acn::Constraints::FromConstraint<IntegerValue> &constraint)
 {
     Q_UNUSED(constraint);
 }
 
-void IntegerRangeConstraintVisitor::visit(const ::Asn1Acn::Constraints::SizeConstraint<IntegerValue> &constraint)
+void IntegerRangeConstraintVisitor::visit(const Asn1Acn::Constraints::SizeConstraint<IntegerValue> &constraint)
 {
     Q_UNUSED(constraint);
 }
 
-void IntegerRangeConstraintVisitor::visit(const ::Asn1Acn::Constraints::ConstraintList<IntegerValue> &constraint)
+void IntegerRangeConstraintVisitor::visit(const Asn1Acn::Constraints::ConstraintList<IntegerValue> &constraint)
 {
     std::optional<IntegerSubset> tmp;
     for (const auto &c : constraint.constraints()) {
