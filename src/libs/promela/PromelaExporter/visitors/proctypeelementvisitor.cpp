@@ -27,6 +27,7 @@
 #include "sequencevisitor.h"
 #include "variablerefvisitor.h"
 
+using promela::model::AssertCall;
 using promela::model::Assignment;
 using promela::model::ChannelRecv;
 using promela::model::ChannelSend;
@@ -219,6 +220,18 @@ void ProctypeElementVisitor::operator()(const Select &select)
     const QString beginExpr = expressionContentToString(select.getFirstExpression());
     const QString endExpr = expressionContentToString(select.getLastExpression());
     m_stream << " : " << beginExpr << " .. " << endExpr << ");\n";
+}
+
+void ProctypeElementVisitor::operator()(const AssertCall &call)
+{
+    m_stream << m_indent;
+
+    m_stream << "assert(";
+
+    ExpressionVisitor visitor(m_stream);
+    visitor.visit(call.expression());
+
+    m_stream << ");\n";
 }
 
 QString ProctypeElementVisitor::expressionContentToString(const ::promela::model::Expression &expression)

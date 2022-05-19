@@ -123,6 +123,12 @@ public:
      * @param select Select to export
      */
     void operator()(const ::promela::model::Select &select);
+    /**
+     * @brief Handle Assert Call
+     *
+     * @param call AssertCall to export
+     */
+    void operator()(const ::promela::model::AssertCall &call);
 
 private:
     QString expressionContentToString(const ::promela::model::Expression &expression);

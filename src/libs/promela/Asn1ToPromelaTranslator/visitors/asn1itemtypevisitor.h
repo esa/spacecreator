@@ -137,13 +137,15 @@ public:
     void visit(const ::Asn1Acn::Types::UserdefinedType &type) override;
 
 private:
-    const QString assignValueInlineSuffix = "_assign_value";
+    inline static const QString assignValueInlineSuffix = "_assign_value";
+    inline static const QString rangeCheckInlineSuffix = "_range_check";
 
 private:
     QString constructTypeName(QString name);
     void addSimpleValueAssignmentInline(const QString &typeName);
-    void addAssignValueInline(const QString &typeName, ::promela::model::Sequence sequence);
     void addSimpleArrayAssignInlineValue(const QString &typeName, int length, bool lengthFieldPresent);
+    void addAssignValueInline(const QString &typeName, ::promela::model::Sequence sequence);
+    void addRangeCheckInline(const ::Asn1Acn::Types::Integer &type, const QString &typeName);
     QString getAssignValueInlineNameForNestedType(const QString &utype, const QString &field) const;
 
 private:

@@ -22,6 +22,7 @@
 #include "asn1constraintvisitor.h"
 #include "asn1sequencecomponentvisitor.h"
 #include "enumeratedgenerator.h"
+#include "integerconstraintvisitor.h"
 
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
@@ -62,8 +63,10 @@ using Asn1Acn::Types::SequenceOf;
 using Asn1Acn::Types::UserdefinedType;
 using conversion::Escaper;
 using promela::model::ArrayType;
+using promela::model::AssertCall;
 using promela::model::Assignment;
 using promela::model::BasicType;
+using promela::model::Constant;
 using promela::model::DataType;
 using promela::model::Declaration;
 using promela::model::Expression;
@@ -416,6 +419,7 @@ void Asn1ItemTypeVisitor::visit(const Integer &type)
     m_promelaModel.addTypeAlias(TypeAlias(typeName, BasicType::INT));
 
     addSimpleValueAssignmentInline(typeName);
+    addRangeCheckInline(type, typeName);
 
     m_resultDataType = DataType(UtypeRef(typeName));
 }
@@ -457,17 +461,6 @@ void Asn1ItemTypeVisitor::addSimpleValueAssignmentInline(const QString &typeName
     addAssignValueInline(typeName, std::move(sequence));
 }
 
-void Asn1ItemTypeVisitor::addAssignValueInline(const QString &typeName, ::promela::model::Sequence sequence)
-{
-    const QString assignValueInline =
-            QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(assignValueInlineSuffix);
-    QList<QString> arguments;
-    arguments.append("dst");
-    arguments.append("src");
-
-    m_promelaModel.addInlineDef(std::make_unique<InlineDef>(assignValueInline, arguments, std::move(sequence)));
-}
-
 void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeName, int length, bool lengthFieldPresent)
 {
     ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
@@ -496,6 +489,38 @@ void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeNam
     }
 
     addAssignValueInline(typeName, std::move(sequence));
+}
+
+void Asn1ItemTypeVisitor::addAssignValueInline(const QString &typeName, ::promela::model::Sequence sequence)
+{
+    const QString assignValueInline =
+            QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(assignValueInlineSuffix);
+    QList<QString> arguments;
+    arguments.append("dst");
+    arguments.append("src");
+
+    m_promelaModel.addInlineDef(std::make_unique<InlineDef>(assignValueInline, arguments, std::move(sequence)));
+}
+
+void Asn1ItemTypeVisitor::addRangeCheckInline(const Integer &type, const QString &typeName)
+{
+    const auto inlineName = QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(rangeCheckInlineSuffix);
+    QList<QString> inlineArguments;
+    inlineArguments.append("dst");
+    inlineArguments.append("src");
+
+    IntegerConstraintVisitor visitor;
+    type.constraints().accept(visitor);
+
+    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+
+    Expression testExpression(Constant(42));
+    AssertCall assertCall(std::move(testExpression));
+    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assertCall)));
+
+    auto rangeCheckInline = std::make_unique<InlineDef>(inlineName, inlineArguments, std::move(sequence));
+
+    m_promelaModel.addInlineDef(std::move(rangeCheckInline));
 }
 
 QString Asn1ItemTypeVisitor::getAssignValueInlineNameForNestedType(const QString &utype, const QString &field) const

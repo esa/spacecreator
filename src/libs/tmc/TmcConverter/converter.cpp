@@ -300,15 +300,12 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
     }
 
     const QFileInfo outputDataview = outputFilepath("dataview.pml");
-
     convertDataview(asn1Files, outputDataview.absoluteFilePath());
 
     const QFileInfo outputEnv = outputFilepath("env_inlines.pml");
-
     createEnvGenerationInlines(simuDataView, outputEnv, environmentDatatypes);
 
     const QFileInfo outputSystemFile = outputFilepath("system.pml");
-
     convertInterfaceview(
             outputOptimizedIvFileName, outputSystemFile.absoluteFilePath(), modelFunctions, environmentFunctions);
 
@@ -366,9 +363,7 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
         options.add(PromelaOptions::additionalIncludes, base.toLower() + ".pml");
     }
 
-    ModelType sourceModelType = ModelType::InterfaceView;
-
-    return convertModel({ sourceModelType }, ModelType::Promela, {}, std::move(options));
+    return convertModel({ ModelType::InterfaceView }, ModelType::Promela, {}, std::move(options));
 }
 
 bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath)
@@ -379,6 +374,7 @@ bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, cons
     }
     qDebug() << "  to:";
     qDebug() << "    " << outputFilepath;
+
     Options options;
 
     for (const QString &inputFileName : inputFilepathList) {
@@ -387,9 +383,7 @@ bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, cons
 
     options.add(PromelaOptions::outputFilepath, outputFilepath);
 
-    ModelType sourceModelType = ModelType::Asn1;
-
-    return convertModel({ sourceModelType }, ModelType::Promela, {}, std::move(options));
+    return convertModel({ ModelType::Asn1 }, ModelType::Promela, {}, std::move(options));
 }
 
 std::unique_ptr<IVModel> TmcConverter::readInterfaceView(const QString &filepath)
