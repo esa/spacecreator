@@ -19,6 +19,9 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
+#include "integerrangeconstraintvisitor.h"
+#include "proctypemaker.h"
+
 #include <QList>
 #include <algorithm>
 #include <asn1library/asn1/asnsequencecomponent.h>
@@ -378,7 +381,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const LabelType &type)
 
 void Asn1TypeValueGeneratorVisitor::visit(const Integer &type)
 {
-    IntegerConstraintVisitor constraintVisitor;
+    IntegerRangeConstraintVisitor constraintVisitor;
     type.constraints().accept(constraintVisitor);
 
     const auto valueVariableName = getInlineArgumentName();

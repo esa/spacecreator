@@ -17,15 +17,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "integerconstraintvisitor.h"
+#include "integerrangeconstraintvisitor.h"
 
 using Asn1Acn::IntegerValue;
 using Asn1Acn::Range;
 
 namespace promela::translator {
-IntegerConstraintVisitor::IntegerConstraintVisitor() {}
+IntegerRangeConstraintVisitor::IntegerRangeConstraintVisitor() {}
 
-void IntegerConstraintVisitor::visit(const ::Asn1Acn::Constraints::RangeConstraint<IntegerValue> &constraint)
+void IntegerRangeConstraintVisitor::visit(const ::Asn1Acn::Constraints::RangeConstraint<IntegerValue> &constraint)
 {
     const Range<IntegerValue::Type> &range = constraint.range();
     if (range.isSingleItem()) {
@@ -35,13 +35,13 @@ void IntegerConstraintVisitor::visit(const ::Asn1Acn::Constraints::RangeConstrai
     }
 }
 
-void IntegerConstraintVisitor::visit(const ::Asn1Acn::Constraints::AndConstraint<IntegerValue> &constraint)
+void IntegerRangeConstraintVisitor::visit(const ::Asn1Acn::Constraints::AndConstraint<IntegerValue> &constraint)
 {
-    IntegerConstraintVisitor lhsVisitor;
+    IntegerRangeConstraintVisitor lhsVisitor;
     constraint.leftChild()->accept(lhsVisitor);
     std::optional<IntegerSubset> lhs = lhsVisitor.getResultSubset();
 
-    IntegerConstraintVisitor rhsVisitor;
+    IntegerRangeConstraintVisitor rhsVisitor;
     constraint.rightChild()->accept(rhsVisitor);
     std::optional<IntegerSubset> rhs = rhsVisitor.getResultSubset();
 
@@ -52,13 +52,13 @@ void IntegerConstraintVisitor::visit(const ::Asn1Acn::Constraints::AndConstraint
     m_subset = lhs.value() & rhs.value();
 }
 
-void IntegerConstraintVisitor::visit(const ::Asn1Acn::Constraints::OrConstraint<IntegerValue> &constraint)
+void IntegerRangeConstraintVisitor::visit(const ::Asn1Acn::Constraints::OrConstraint<IntegerValue> &constraint)
 {
-    IntegerConstraintVisitor lhsVisitor;
+    IntegerRangeConstraintVisitor lhsVisitor;
     constraint.leftChild()->accept(lhsVisitor);
     std::optional<IntegerSubset> lhs = lhsVisitor.getResultSubset();
 
-    IntegerConstraintVisitor rhsVisitor;
+    IntegerRangeConstraintVisitor rhsVisitor;
     constraint.rightChild()->accept(rhsVisitor);
     std::optional<IntegerSubset> rhs = rhsVisitor.getResultSubset();
 
@@ -69,21 +69,21 @@ void IntegerConstraintVisitor::visit(const ::Asn1Acn::Constraints::OrConstraint<
     m_subset = lhs.value() | rhs.value();
 }
 
-void IntegerConstraintVisitor::visit(const ::Asn1Acn::Constraints::FromConstraint<IntegerValue> &constraint)
+void IntegerRangeConstraintVisitor::visit(const ::Asn1Acn::Constraints::FromConstraint<IntegerValue> &constraint)
 {
     Q_UNUSED(constraint);
 }
 
-void IntegerConstraintVisitor::visit(const ::Asn1Acn::Constraints::SizeConstraint<IntegerValue> &constraint)
+void IntegerRangeConstraintVisitor::visit(const ::Asn1Acn::Constraints::SizeConstraint<IntegerValue> &constraint)
 {
     Q_UNUSED(constraint);
 }
 
-void IntegerConstraintVisitor::visit(const ::Asn1Acn::Constraints::ConstraintList<IntegerValue> &constraint)
+void IntegerRangeConstraintVisitor::visit(const ::Asn1Acn::Constraints::ConstraintList<IntegerValue> &constraint)
 {
     std::optional<IntegerSubset> tmp;
     for (const auto &c : constraint.constraints()) {
-        IntegerConstraintVisitor nestedVisitor;
+        IntegerRangeConstraintVisitor nestedVisitor;
         c->accept(nestedVisitor);
         std::optional<IntegerSubset> rhs = nestedVisitor.getResultSubset();
 
@@ -97,12 +97,12 @@ void IntegerConstraintVisitor::visit(const ::Asn1Acn::Constraints::ConstraintLis
     m_subset = tmp;
 }
 
-bool IntegerConstraintVisitor::isSizeConstraintVisited() const noexcept
+bool IntegerRangeConstraintVisitor::isSizeConstraintVisited() const noexcept
 {
     return m_subset.has_value();
 }
 
-size_t IntegerConstraintVisitor::getMinSize() const noexcept
+size_t IntegerRangeConstraintVisitor::getMinSize() const noexcept
 {
     int min = m_subset.value().getMin().value();
     if (min < 0) {
@@ -111,7 +111,7 @@ size_t IntegerConstraintVisitor::getMinSize() const noexcept
     return static_cast<size_t>(min);
 }
 
-size_t IntegerConstraintVisitor::getMaxSize() const noexcept
+size_t IntegerRangeConstraintVisitor::getMaxSize() const noexcept
 {
     int max = m_subset.value().getMax().value();
     if (max < 0) {
@@ -120,7 +120,7 @@ size_t IntegerConstraintVisitor::getMaxSize() const noexcept
     return static_cast<size_t>(max);
 }
 
-const std::optional<IntegerSubset> &IntegerConstraintVisitor::getResultSubset() const
+const std::optional<IntegerSubset> &IntegerRangeConstraintVisitor::getResultSubset() const
 {
     return m_subset;
 }

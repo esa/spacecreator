@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "integerconstraintvisitor.h"
+#include "integerrangeconstraintvisitor.h"
 
 #include <QtGlobal>
 #include <algorithm>
@@ -41,7 +41,7 @@ namespace promela::translator {
  * @tparam ValueType constrained value type
  */
 template<typename ValueType>
-class Asn1ConstraintVisitor : public ::Asn1Acn::Constraints::ConstraintVisitor<ValueType>
+class SizeConstraintVisitor : public ::Asn1Acn::Constraints::ConstraintVisitor<ValueType>
 {
 public:
     /// @brief Visit Asn1Acn::Constraints::RangeConstraint
@@ -100,6 +100,6 @@ public:
     size_t getMaxSize() const noexcept { return m_sizeVisitor.getMaxSize(); }
 
 private:
-    IntegerConstraintVisitor m_sizeVisitor;
+    IntegerRangeConstraintVisitor m_sizeVisitor;
 };
 }

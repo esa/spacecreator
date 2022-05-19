@@ -40,7 +40,7 @@ namespace promela::translator {
  *
  * Visitor finds a subset of allowed values for integer or for size constraints
  */
-class IntegerConstraintVisitor : public ::Asn1Acn::Constraints::ConstraintVisitor<::Asn1Acn::IntegerValue>
+class IntegerRangeConstraintVisitor : public ::Asn1Acn::Constraints::ConstraintVisitor<::Asn1Acn::IntegerValue>
 {
 public:
     /**
@@ -48,7 +48,7 @@ public:
      *
      * Initializes empty visitor
      */
-    IntegerConstraintVisitor();
+    IntegerRangeConstraintVisitor();
 
     /**
      * @brief Visit Asn1Acn::Constraints::RangeConstraint

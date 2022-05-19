@@ -19,10 +19,10 @@
 
 #include "asn1itemtypevisitor.h"
 
-#include "asn1constraintvisitor.h"
+#include "sizeconstraintvisitor.h"
 #include "asn1sequencecomponentvisitor.h"
 #include "enumeratedgenerator.h"
-#include "integerconstraintvisitor.h"
+#include "integerrangeconstraintvisitor.h"
 
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
@@ -127,7 +127,7 @@ void Asn1ItemTypeVisitor::visit(const Null &type)
 
 void Asn1ItemTypeVisitor::visit(const BitString &type)
 {
-    Asn1ConstraintVisitor<BitStringValue> constraintVisitor;
+    SizeConstraintVisitor<BitStringValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
@@ -148,7 +148,7 @@ void Asn1ItemTypeVisitor::visit(const BitString &type)
 
 void Asn1ItemTypeVisitor::visit(const OctetString &type)
 {
-    Asn1ConstraintVisitor<OctetStringValue> constraintVisitor;
+    SizeConstraintVisitor<OctetStringValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
@@ -169,7 +169,7 @@ void Asn1ItemTypeVisitor::visit(const OctetString &type)
 
 void Asn1ItemTypeVisitor::visit(const IA5String &type)
 {
-    Asn1ConstraintVisitor<StringValue> constraintVisitor;
+    SizeConstraintVisitor<StringValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
@@ -333,7 +333,7 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
 
 void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
 {
-    Asn1ConstraintVisitor<IntegerValue> constraintVisitor;
+    SizeConstraintVisitor<IntegerValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
 
     const QString utypeName = constructTypeName(m_name);
@@ -507,7 +507,7 @@ void Asn1ItemTypeVisitor::addAssignValueInline(const QString &typeName, ::promel
 void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const Integer &type, const QString &typeName)
 {
     // Get type range subset
-    IntegerConstraintVisitor visitor;
+    IntegerRangeConstraintVisitor visitor;
     type.constraints().accept(visitor);
 
     const auto &rangeSubsets = visitor.getResultSubset();

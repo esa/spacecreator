@@ -40,7 +40,6 @@
 #include "types/typereadingvisitor.h"
 #include "types/userdefinedtype.h"
 #include "variableref.h"
-#include "visitors/asn1constraintvisitor.h"
 
 #include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
