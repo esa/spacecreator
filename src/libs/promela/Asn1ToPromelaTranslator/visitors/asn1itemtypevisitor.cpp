@@ -130,12 +130,14 @@ void Asn1ItemTypeVisitor::visit(const BitString &type)
 {
     SizeConstraintVisitor<BitStringValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
+    const auto constSize = constraintVisitor.getMinSize() == constraintVisitor.getMaxSize();
+
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
 
     utype.addField(Declaration(DataType(ArrayType(constraintVisitor.getMaxSize(), BasicType::BIT)), "data"));
 
-    if (constraintVisitor.getMaxSize() != constraintVisitor.getMinSize()) {
+    if (!constSize) {
         utype.addField(Declaration(DataType(BasicType::INT), "length"));
     }
 
@@ -143,6 +145,10 @@ void Asn1ItemTypeVisitor::visit(const BitString &type)
 
     addSimpleArrayAssignInlineValue(utypeName, constraintVisitor.getMaxSize(),
             constraintVisitor.getMinSize() != constraintVisitor.getMaxSize());
+
+    if (!constSize) {
+        addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
+    }
 
     m_resultDataType = DataType(UtypeRef(utypeName));
 }
@@ -151,12 +157,14 @@ void Asn1ItemTypeVisitor::visit(const OctetString &type)
 {
     SizeConstraintVisitor<OctetStringValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
+    const auto constSize = constraintVisitor.getMinSize() == constraintVisitor.getMaxSize();
+
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
 
     utype.addField(Declaration(DataType(ArrayType(constraintVisitor.getMaxSize(), BasicType::BYTE)), "data"));
 
-    if (constraintVisitor.getMaxSize() != constraintVisitor.getMinSize()) {
+    if (!constSize) {
         utype.addField(Declaration(DataType(BasicType::INT), "length"));
     }
 
@@ -164,6 +172,10 @@ void Asn1ItemTypeVisitor::visit(const OctetString &type)
 
     addSimpleArrayAssignInlineValue(utypeName, constraintVisitor.getMaxSize(),
             constraintVisitor.getMinSize() != constraintVisitor.getMaxSize());
+
+    if (!constSize) {
+        addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
+    }
 
     m_resultDataType = DataType(UtypeRef(utypeName));
 }
@@ -172,12 +184,14 @@ void Asn1ItemTypeVisitor::visit(const IA5String &type)
 {
     SizeConstraintVisitor<StringValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
+    const auto constSize = constraintVisitor.getMinSize() == constraintVisitor.getMaxSize();
+
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
 
     utype.addField(Declaration(DataType(ArrayType(constraintVisitor.getMaxSize(), BasicType::BYTE)), "data"));
 
-    if (constraintVisitor.getMaxSize() != constraintVisitor.getMinSize()) {
+    if (!constSize) {
         utype.addField(Declaration(DataType(BasicType::INT), "length"));
     }
 
@@ -185,6 +199,10 @@ void Asn1ItemTypeVisitor::visit(const IA5String &type)
 
     addSimpleArrayAssignInlineValue(utypeName, constraintVisitor.getMaxSize(),
             constraintVisitor.getMinSize() != constraintVisitor.getMaxSize());
+
+    if (!constSize) {
+        addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
+    }
 
     m_resultDataType = DataType(UtypeRef(utypeName));
 }
@@ -337,6 +355,7 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
 {
     SizeConstraintVisitor<IntegerValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
+    const auto constSize = constraintVisitor.getMinSize() == constraintVisitor.getMaxSize();
 
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
@@ -353,7 +372,7 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
                 Declaration(DataType(ArrayType(constraintVisitor.getMaxSize(), dataType.getUtypeReference())), "data"));
     }
 
-    if (constraintVisitor.getMaxSize() != constraintVisitor.getMinSize()) {
+    if (!constSize) {
         utype.addField(Declaration(DataType(BasicType::INT), "length"));
     }
 
@@ -383,7 +402,7 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
     sequence.appendElement(std::make_unique<ProctypeElement>(
             ForLoop(VariableRef("i"), 0, constraintVisitor.getMaxSize() - 1, std::move(loopSequence))));
 
-    if (constraintVisitor.getMaxSize() != constraintVisitor.getMinSize()) {
+    if (!constSize) {
         VariableRef dst_length = VariableRef("dst");
         dst_length.appendElement("length");
         VariableRef src_length = VariableRef("src");
@@ -392,6 +411,10 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
     }
 
     addAssignValueInline(utypeName, std::move(sequence));
+
+    if (!constSize) {
+        addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
+    }
 
     m_resultDataType = DataType(UtypeRef(utypeName));
 }
@@ -590,6 +613,36 @@ void Asn1ItemTypeVisitor::addRangeCheckInline(const Expression &expression, cons
     model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     AssertCall assertCall(expression);
+    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assertCall)));
+
+    auto rangeCheckInline =
+            std::make_unique<InlineDef>(rangeCheckInlineName, rangeCheckInlineArguments, std::move(sequence));
+    m_promelaModel.addInlineDef(std::move(rangeCheckInline));
+}
+
+void Asn1ItemTypeVisitor::addSizeCheckInline(const std::size_t minValue, const std::size_t maxValue, const QString &typeName)
+{
+    const auto rangeCheckInlineName =
+            QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(rangeCheckInlineSuffix);
+    QList<QString> rangeCheckInlineArguments;
+    rangeCheckInlineArguments.append("size");
+
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
+
+    auto minValueConst = std::make_unique<Expression>(Constant(minValue));
+    auto minValueVar = std::make_unique<Expression>(VariableRef("size"));
+    auto greaterThanExpr = std::make_unique<Expression>(
+            BinaryExpression(BinaryExpression::Operator::GEQUAL, std::move(minValueVar), std::move(minValueConst)));
+
+    auto maxValueConst = std::make_unique<Expression>(Constant(maxValue));
+    auto maxValueVar = std::make_unique<Expression>(VariableRef("size"));
+    auto lessThanExpr = std::make_unique<Expression>(
+            BinaryExpression(BinaryExpression::Operator::LEQUAL, std::move(maxValueVar), std::move(maxValueConst)));
+
+    BinaryExpression sizeCheckingExpression(
+            BinaryExpression::Operator::AND, std::move(greaterThanExpr), std::move(lessThanExpr));
+
+    AssertCall assertCall(Expression(std::move(sizeCheckingExpression)));
     sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assertCall)));
 
     auto rangeCheckInline =

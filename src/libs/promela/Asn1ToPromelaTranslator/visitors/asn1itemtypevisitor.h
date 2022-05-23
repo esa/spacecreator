@@ -148,6 +148,7 @@ private:
     void addEnumRangeCheckInline(const Asn1Acn::Types::Enumerated &type, const QString &typeName);
     void addIntegerRangeCheckInline(const Asn1Acn::Types::Integer &type, const QString &typeName);
     void addRangeCheckInline(const model::Expression &type, const QString &typeName);
+    void addSizeCheckInline(const std::size_t minValue, const std::size_t maxValue, const QString &typeName);
     QString getAssignValueInlineNameForNestedType(const QString &utype, const QString &field) const;
 
 private:
