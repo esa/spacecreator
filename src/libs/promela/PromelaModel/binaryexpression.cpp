@@ -67,13 +67,13 @@ BinaryExpression::Operator BinaryExpression::getOperator() const noexcept
     return m_operator;
 }
 
-const std::unique_ptr<Expression> &BinaryExpression::getLeft() const
+const Expression *BinaryExpression::getLeft() const
 {
-    return m_left;
+    return m_left.get();
 }
-const std::unique_ptr<Expression> &BinaryExpression::getRight() const
+const Expression *BinaryExpression::getRight() const
 {
-    return m_right;
+    return m_right.get();
 }
 
 }

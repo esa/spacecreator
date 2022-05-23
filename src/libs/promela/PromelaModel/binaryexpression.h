@@ -97,13 +97,13 @@ public:
      *
      * @return left hand side of binary expression.
      */
-    const std::unique_ptr<Expression> &getLeft() const;
+    const Expression *getLeft() const;
     /**
      * @brief Getter for right hand side of binary expression.
      *
      * @return right hand side of binary expression.
      */
-    const std::unique_ptr<Expression> &getRight() const;
+    const Expression *getRight() const;
 
 private:
     Operator m_operator;

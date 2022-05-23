@@ -19,6 +19,7 @@
 
 #include "tst_asn1topromelatranslator.h"
 #include "tst_asn1topromelatranslator_env.h"
+#include "tst_asn1topromelatranslator_rangechecks.h"
 #include "tst_asn1topromelatranslator_values.h"
 #include "tst_integergenerator.h"
 #include "tst_integersubset.h"
@@ -42,6 +43,10 @@ int main(int argc, char *argv[])
     }
     {
         tmc::test::tst_Asn1ToPromelaTranslator_Env test;
+        status |= QTest::qExec(&test, argc, argv);
+    }
+    {
+        tmc::test::tst_Asn1ToPromelaTranslator_RangeChecks test;
         status |= QTest::qExec(&test, argc, argv);
     }
     {

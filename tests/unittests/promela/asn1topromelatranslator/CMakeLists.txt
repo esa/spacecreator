@@ -9,12 +9,14 @@ target_sources(${TEST_NAME}
                 tst_integersubset.cpp
                 tst_integergenerator.cpp
                 tst_asn1topromelatranslator_env.cpp
+                tst_asn1topromelatranslator_rangechecks.cpp
                 tst_asn1topromelatranslator_values.cpp
                 main.cpp
                 tst_asn1topromelatranslator.h
                 tst_integersubset.h
                 tst_integergenerator.h
                 tst_asn1topromelatranslator_env.h
+                tst_asn1topromelatranslator_rangechecks.h
                 tst_asn1topromelatranslator_values.h)
 target_include_directories(${TEST_NAME}
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs
