@@ -19,11 +19,12 @@
 
 #include "integerrangeconstraintvisitor.h"
 
+#include <algorithm>
+
 using Asn1Acn::IntegerValue;
 using Asn1Acn::Range;
 
 namespace promela::translator {
-IntegerRangeConstraintVisitor::IntegerRangeConstraintVisitor() {}
 
 void IntegerRangeConstraintVisitor::visit(const Asn1Acn::Constraints::RangeConstraint<IntegerValue> &constraint)
 {

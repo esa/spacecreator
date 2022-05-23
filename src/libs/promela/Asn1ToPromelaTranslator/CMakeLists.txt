@@ -12,6 +12,7 @@ set(SOURCES
   visitors/asn1nodevisitor.cpp
   visitors/asn1sequencecomponentvisitor.cpp
   visitors/asn1typevaluegeneratorvisitor.cpp
+  visitors/enumvalueconstraintvisitor.cpp
   visitors/integerrangeconstraintvisitor.cpp
   visitors/sequencecomponentvaluevisitor.cpp
   visitors/valueassignmentvisitor.cpp
@@ -28,6 +29,7 @@ set(INCLUDES
   visitors/asn1nodevisitor.h
   visitors/asn1sequencecomponentvisitor.h
   visitors/asn1typevaluegeneratorvisitor.h
+  visitors/enumvalueconstraintvisitor.h
   visitors/integerrangeconstraintvisitor.h
   visitors/sequencecomponentvaluevisitor.h
   visitors/sizeconstraintvisitor.h

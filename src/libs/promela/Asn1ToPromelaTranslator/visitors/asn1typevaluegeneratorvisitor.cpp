@@ -19,8 +19,8 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
-#include "integerrangeconstraintvisitor.h"
 #include "proctypemaker.h"
+#include "visitors/sizeconstraintvisitor.h"
 
 #include <QList>
 #include <algorithm>
@@ -46,9 +46,6 @@
 #include <promela/Asn1ToPromelaTranslator/integergenerator.h>
 #include <promela/Asn1ToPromelaTranslator/integersubset.h>
 #include <promela/Asn1ToPromelaTranslator/proctypemaker.h>
-#include <promela/Asn1ToPromelaTranslator/visitors/asn1constraintvisitor.h>
-#include <promela/Asn1ToPromelaTranslator/visitors/asn1itemtypevisitor.h>
-#include <promela/Asn1ToPromelaTranslator/visitors/asn1sequencecomponentvisitor.h>
 #include <promela/PromelaModel/basictypes.h>
 #include <promela/PromelaModel/binaryexpression.h>
 #include <promela/PromelaModel/conditional.h>
@@ -328,7 +325,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
         asnSequenceComponentType->accept(visitor);
     }
 
-    Asn1ConstraintVisitor<Asn1Acn::IntegerValue> constraintVisitor;
+    SizeConstraintVisitor<Asn1Acn::IntegerValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
 
     const QString typeIdentifier = Escaper::escapePromelaName(m_name);

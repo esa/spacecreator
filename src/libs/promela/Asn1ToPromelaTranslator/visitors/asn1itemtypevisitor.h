@@ -145,6 +145,7 @@ private:
     void addSimpleValueAssignmentInline(const QString &typeName);
     void addSimpleArrayAssignInlineValue(const QString &typeName, int length, bool lengthFieldPresent);
     void addAssignValueInline(const QString &typeName, model::Sequence sequence);
+    void addEnumRangeCheckInline(const Asn1Acn::Types::Enumerated &type, const QString &typeName);
     void addIntegerRangeCheckInline(const Asn1Acn::Types::Integer &type, const QString &typeName);
     void addRangeCheckInline(const model::Expression &type, const QString &typeName);
     QString getAssignValueInlineNameForNestedType(const QString &utype, const QString &field) const;

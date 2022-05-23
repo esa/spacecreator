@@ -22,6 +22,7 @@
 #include "sizeconstraintvisitor.h"
 #include "asn1sequencecomponentvisitor.h"
 #include "enumeratedgenerator.h"
+#include "enumvalueconstraintvisitor.h"
 #include "integerrangeconstraintvisitor.h"
 
 #include <asn1library/asn1/types/bitstring.h>
@@ -207,6 +208,7 @@ void Asn1ItemTypeVisitor::visit(const Enumerated &type)
     m_promelaModel.addTypeAlias(TypeAlias(typeName, BasicType::INT));
 
     addSimpleValueAssignmentInline(typeName);
+    addEnumRangeCheckInline(type, typeName);
 
     m_resultDataType = DataType(UtypeRef(typeName));
 }
@@ -504,6 +506,40 @@ void Asn1ItemTypeVisitor::addAssignValueInline(const QString &typeName, model::S
     m_promelaModel.addInlineDef(std::make_unique<InlineDef>(assignValueInline, arguments, std::move(sequence)));
 }
 
+void Asn1ItemTypeVisitor::addEnumRangeCheckInline(const Enumerated &type, const QString &typeName)
+{
+    // Get allowed values
+    EnumValueConstraintVisitor visitor;
+    type.constraints().accept(visitor);
+
+    const auto &allowedValues = visitor.allowedValues();
+
+    if (allowedValues.empty()) {
+        return;
+    }
+
+    // Build one big expression for range check
+    std::vector<BinaryExpression> valueCheckingExpressions;
+    for (const auto &enumValue : allowedValues) {
+        auto valueVar = std::make_unique<Expression>(VariableRef("value"));
+
+        const auto enumValueName = QString("%1_%2").arg(typeName).arg(Escaper::escapePromelaName(enumValue));
+        auto enumValueVar = std::make_unique<Expression>(VariableRef(enumValueName));
+
+        auto equalExpr = BinaryExpression(BinaryExpression::Operator::EQUAL, std::move(valueVar), std::move(enumValueVar));
+        valueCheckingExpressions.push_back(std::move(equalExpr));
+    }
+
+    auto valueCheckingExpression =
+            std::accumulate(std::next(valueCheckingExpressions.begin()), valueCheckingExpressions.end(),
+                    std::make_unique<Expression>(valueCheckingExpressions.front()), [&](auto &&acc, const auto &expr) {
+                        return std::make_unique<Expression>(BinaryExpression(
+                                BinaryExpression::Operator::OR, std::move(acc), std::make_unique<Expression>(expr)));
+                    });
+
+    addRangeCheckInline(*valueCheckingExpression, typeName);
+}
+
 void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const Integer &type, const QString &typeName)
 {
     // Get type range subset
@@ -519,8 +555,6 @@ void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const Integer &type, const 
     // Build one big expression for range check
     std::vector<BinaryExpression> rangeCheckingExpressions;
     for (const auto &range : rangeSubsets->getRanges()) {
-        std::cerr << type.identifier().toStdString() << ": " << range.first << " -> " << range.second << '\n';
-
         auto minValueConst = std::make_unique<Expression>(Constant(range.first));
         auto minValueVar = std::make_unique<Expression>(VariableRef("value"));
         auto greaterThanExpr = std::make_unique<Expression>(
@@ -538,7 +572,7 @@ void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const Integer &type, const 
 
     auto rangeCheckingExpression =
             std::accumulate(std::next(rangeCheckingExpressions.begin()), rangeCheckingExpressions.end(),
-                    std::make_unique<Expression>(rangeCheckingExpressions[0]), [&](auto &&acc, const auto &expr) {
+                    std::make_unique<Expression>(rangeCheckingExpressions.front()), [&](auto &&acc, const auto &expr) {
                         return std::make_unique<Expression>(BinaryExpression(
                                 BinaryExpression::Operator::OR, std::move(acc), std::make_unique<Expression>(expr)));
                     });

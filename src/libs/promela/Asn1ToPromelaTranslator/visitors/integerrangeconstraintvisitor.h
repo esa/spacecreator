@@ -21,8 +21,6 @@
 
 #include "integersubset.h"
 
-#include <QtGlobal>
-#include <algorithm>
 #include <asn1library/asn1/constraints/constraintlist.h>
 #include <asn1library/asn1/constraints/constraintvisitor.h>
 #include <asn1library/asn1/constraints/fromconstraint.h>
@@ -43,13 +41,6 @@ namespace promela::translator {
 class IntegerRangeConstraintVisitor : public Asn1Acn::Constraints::ConstraintVisitor<Asn1Acn::IntegerValue>
 {
 public:
-    /**
-     * @brief Constructor.
-     *
-     * Initializes empty visitor
-     */
-    IntegerRangeConstraintVisitor();
-
     /**
      * @brief Visit Asn1Acn::Constraints::RangeConstraint
      *
@@ -83,14 +74,12 @@ public:
      * @return minimal allowed value
      */
     size_t getMinSize() const noexcept;
-
     /**
      * @brief Getter for found maximal value constraint
      *
      * @return maximal allowed value
      */
     size_t getMaxSize() const noexcept;
-
     /**
      * @brief Getter for result IntegerSubset which describes allowed size values
      *
