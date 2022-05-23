@@ -357,7 +357,9 @@ void tst_Asn1ToPromelaTranslator_Env::testSequenceOfVariableSize() const
 void tst_Asn1ToPromelaTranslator_Env::testChoice() const
 {
     const QString inputAsnFilename = "choice.asn";
-    const QStringList asnTypesToTranslate = { "SimpleChoice" };
+    const QStringList asnTypesToTranslate = {
+        "SimpleChoice",
+    };
     const QString actualOutputFilename = "choice.pml";
     const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
 
@@ -372,6 +374,32 @@ void tst_Asn1ToPromelaTranslator_Env::testChoiceAnonymous() const
         "SimpleChoiceWithAnonymousTypes",
     };
     const QString actualOutputFilename = "choice-anonymous.pml";
+    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
+
+    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
+    compareTextFiles(actualOutputFilename, expectedOutputFilename);
+}
+
+void tst_Asn1ToPromelaTranslator_Env::testOctetString() const
+{
+    const QString inputAsnFilename = "octetstring.asn";
+    const QStringList asnTypesToTranslate = {
+        "MyOctetString",
+    };
+    const QString actualOutputFilename = "octetstring.pml";
+    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
+
+    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
+    compareTextFiles(actualOutputFilename, expectedOutputFilename);
+}
+
+void tst_Asn1ToPromelaTranslator_Env::testOctetStringVariableSize() const
+{
+    const QString inputAsnFilename = "octetstring-variable-size.asn";
+    const QStringList asnTypesToTranslate = {
+        "MyOctetString",
+    };
+    const QString actualOutputFilename = "octetstring-variable-size.pml";
     const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
 
     translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);

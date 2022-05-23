@@ -1,0 +1,5 @@
+MYMODULE DEFINITIONS ::= BEGIN
+
+MyOctetString ::= OCTET STRING (SIZE (6))
+
+END

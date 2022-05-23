@@ -19,6 +19,9 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
+#include "conditional.h"
+
+#include <QDebug>
 #include <QList>
 #include <algorithm>
 #include <asn1library/asn1/asnsequencecomponent.h>
@@ -140,11 +143,81 @@ void Asn1TypeValueGeneratorVisitor::visit(const BitString &type)
 
 void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
 {
-    Q_UNUSED(type);
-    const QString message = QString("OctetString ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
-                                    .arg(__FILE__)
-                                    .arg(__LINE__);
-    throw std::logic_error(message.toStdString().c_str());
+    Asn1ConstraintVisitor<Asn1Acn::OctetStringValue> osVisitor;
+    const auto &typeConstraints = type.constraints().constraints();
+    if (typeConstraints.size() != 1) {
+        const QString msg("OctetString shall have only one constraint");
+        throw std::logic_error(msg.toStdString().c_str());
+    }
+    for (const auto &constraint : typeConstraints) {
+        constraint->accept(osVisitor);
+    }
+    if (!osVisitor.isSizeConstraintVisited()) {
+        const QString msg("Specified OctetString has no size constraint");
+        throw std::logic_error(msg.toStdString().c_str());
+    }
+
+    const QString componentTypeName = m_name;
+    const QString octetGeneratorName = "OctetStringElement_generate_value";
+    const QString octetGeneratorArg = "OctetStringElement_gv";
+    if (!modelContainsInlineGenerator(octetGeneratorName)) {
+        auto sequence = ProctypeMaker::makeNormalSequence();
+        auto conditional = std::make_unique<promela::model::Conditional>();
+        const int maxOctetValue = 255;
+        for (int i = 0; i <= maxOctetValue; i++) {
+            auto altSequence = ProctypeMaker::makeNormalSequence();
+            auto alternative = ProctypeMaker::makeTrueExpressionProctypeElement();
+            auto assignment = ProctypeMaker::makeAssignmentProctypeElement(octetGeneratorArg, i);
+
+            altSequence->appendElement(std::move(alternative));
+            altSequence->appendElement(std::move(assignment));
+
+            conditional->appendAlternative(std::move(altSequence));
+        }
+        auto conditionalProctype = std::make_unique<ProctypeElement>(std::move(*conditional));
+
+        sequence->appendElement(std::move(conditionalProctype));
+
+        auto inlineDef = std::make_unique<InlineDef>(
+                octetGeneratorName, QStringList({ octetGeneratorArg }), std::move(*sequence));
+
+        m_promelaModel.addInlineDef(std::move(inlineDef));
+    }
+
+    const QString typeIdentifier = Escaper::escapePromelaName(type.identifier());
+    const QString argumentName = QString("%1_gv").arg(typeIdentifier);
+
+    auto sequence = ProctypeMaker::makeNormalSequence();
+    sequence->appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, "i"));
+    const size_t minSize = osVisitor.getMinSize();
+    const size_t maxSize = osVisitor.getMaxSize();
+    if (minSize == maxSize) {
+        sequence->appendElement(
+                ProctypeMaker::makeCallForEachValue(octetGeneratorName, argumentName, Expression(maxSize - 1)));
+    } else { // sequenceOf has variable length
+        Asn1Acn::Types::Integer length("length");
+        const Asn1Acn::Range<Asn1Acn::IntegerValue::Type> range(static_cast<long>(minSize), static_cast<long>(maxSize));
+        length.constraints().append(range);
+
+        const QString lengthGeneratorTypeName = QString("%1_length").arg(typeIdentifier);
+        Asn1TypeValueGeneratorVisitor lenVisitor(m_promelaModel, lengthGeneratorTypeName);
+        length.accept(lenVisitor);
+
+        const QString valueLength = QString("%1.%2").arg(argumentName).arg("length");
+        sequence->appendElement(
+                ProctypeMaker::makeInlineCall(QString("%1_generate_value").arg(lengthGeneratorTypeName), valueLength));
+
+        VariableRef endVarRef(valueLength);
+        Expression end(model::BinaryExpression(model::BinaryExpression::Operator::SUBTRACT,
+                std::make_unique<Expression>(endVarRef), std::make_unique<Expression>(model::Constant(1))));
+        sequence->appendElement(ProctypeMaker::makeCallForEachValue(octetGeneratorName, argumentName, end));
+    }
+
+    const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);
+    const QStringList inlineArguments = { argumentName };
+    auto inlineDef = std::make_unique<InlineDef>(inlineSeqGeneratorName, inlineArguments, std::move(*sequence));
+
+    m_promelaModel.addInlineDef(std::move(inlineDef));
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const IA5String &type)

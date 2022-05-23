@@ -30,7 +30,7 @@
 namespace promela::translator {
 
 /**
- * @brief Visitor for ASN.1 toplevel types
+ * @brief Visitor for ASN.1 top-level types
  *
  * Visitor generates Promela inlines responsible for value generation for inlines
  *
