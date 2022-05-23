@@ -23,6 +23,7 @@
 #include <asn1library/asn1/sourcelocation.h>
 #include <asn1library/asn1/typeassignment.h>
 #include <asn1library/asn1/values.h>
+#include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <promela/Asn1ToPromelaTranslator/visitors/asn1nodevisitor.h>
@@ -34,6 +35,7 @@ using Asn1Acn::IntegerValue;
 using Asn1Acn::TypeAssignment;
 using Asn1Acn::SourceLocation;
 using Asn1Acn::Constraints::RangeConstraint;
+using Asn1Acn::Types::Enumerated;
 using Asn1Acn::Types::Integer;
 using promela::model::AssertCall;
 using promela::model::BinaryExpression;
@@ -57,7 +59,7 @@ void tst_Asn1ToPromelaTranslator_RangeChecks::testInteger() const
         auto integerType = std::make_unique<Integer>();
         integerType->constraints().append({ 1, 10 });
         auto myIntegerAssignment = std::make_unique<TypeAssignment>(
-                QStringLiteral("MyInteger"), QStringLiteral("MyInteger"), SourceLocation(), integerType->clone());
+                QStringLiteral("MyInteger"), QStringLiteral("MyInteger"), SourceLocation(), std::move(integerType));
 
         asn1Model->addType(std::move(myIntegerAssignment));
     }
@@ -86,6 +88,7 @@ void tst_Asn1ToPromelaTranslator_RangeChecks::testInteger() const
         QVERIFY(minValueExpr->getOperator() == BinaryExpression::Operator::GEQUAL);
         const auto minValueVar = std::get_if<VariableRef>(&minValueExpr->getLeft()->getContent());
         QVERIFY(minValueVar != nullptr);
+        QCOMPARE(minValueVar->getElements().begin()->m_name, "value");
         const auto minValueConst = std::get_if<Constant>(&minValueExpr->getRight()->getContent());
         QVERIFY(minValueConst != nullptr);
         QCOMPARE(minValueConst->getValue(), 1);
@@ -96,9 +99,52 @@ void tst_Asn1ToPromelaTranslator_RangeChecks::testInteger() const
         QVERIFY(maxValueExpr->getOperator() == BinaryExpression::Operator::LEQUAL);
         const auto maxValueVar = std::get_if<VariableRef>(&maxValueExpr->getLeft()->getContent());
         QVERIFY(maxValueVar != nullptr);
+        QCOMPARE(maxValueVar->getElements().begin()->m_name, "value");
         const auto maxValueConst = std::get_if<Constant>(&maxValueExpr->getRight()->getContent());
         QVERIFY(maxValueConst != nullptr);
         QCOMPARE(maxValueConst->getValue(), 10);
+    }
+}
+
+void tst_Asn1ToPromelaTranslator_RangeChecks::testEnum() const
+{
+    auto asn1Model = std::make_unique<Definitions>("TmcTestModule", SourceLocation());
+
+    {
+        auto enumType = std::make_unique<Enumerated>();
+        enumType->addItem({1, "value1", 1});
+        enumType->addItem({2, "value2", 2});
+        enumType->addItem({3, "value3", 3});
+        enumType->constraints().append({ "value2" });
+        auto myEnumAssignment = std::make_unique<TypeAssignment>(
+                QStringLiteral("MyEnum"), QStringLiteral("MyEnum"), SourceLocation(), std::move(enumType));
+
+        asn1Model->addType(std::move(myEnumAssignment));
+    }
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel, true);
+    visitor.visit(*asn1Model);
+
+    QCOMPARE(promelaModel.getInlineDefs().size(), 2);
+    {
+        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyEnum_range_check");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
+
+        const auto assertCall = findAssertCall(inlineDef->getSequence());
+        QVERIFY(assertCall != nullptr);
+
+        const auto assertExpr = std::get_if<BinaryExpression>(&assertCall->expression().getContent());
+        QVERIFY(assertExpr != nullptr);
+
+        QVERIFY(assertExpr->getOperator() == BinaryExpression::Operator::EQUAL);
+        const auto valueVar = std::get_if<VariableRef>(&assertExpr->getLeft()->getContent());
+        QVERIFY(valueVar != nullptr);
+        const auto enumValueVar = std::get_if<VariableRef>(&assertExpr->getRight()->getContent());
+        QVERIFY(enumValueVar != nullptr);
+        QCOMPARE(enumValueVar->getElements().begin()->m_name, "MyEnum_value2");
     }
 }
 
