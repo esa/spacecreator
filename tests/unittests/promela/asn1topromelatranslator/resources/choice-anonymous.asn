@@ -2,7 +2,7 @@ CHOICES DEFINITIONS ::= BEGIN
 
 SimpleChoiceWithAnonymousTypes ::= CHOICE 
 {
-    alt1 INTEGER(0..50),
+    alt1 INTEGER(0..5),
     alt2 INTEGER(-1..1)
 }
 

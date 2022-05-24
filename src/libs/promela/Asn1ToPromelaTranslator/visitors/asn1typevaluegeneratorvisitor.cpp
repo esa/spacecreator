@@ -194,14 +194,13 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
     const QString argumentName = "value";
     const QStringList inlineArguments = { argumentName };
 
-    m_promelaModel.addValueDefinition(ValueDefinition(QString("%1_NOT_SELECTED").arg(m_name), 0));
-
     auto sequence = ProctypeMaker::makeNormalSequence();
 
     auto conditional = std::make_unique<Conditional>();
     int selectorVal = 1;
     for (auto &component : type.components()) {
-        const QString thisComponentSelected = QString("%1_%2_PRESENT").arg(m_name).arg(component->name());
+        const QString &componentName = component->name();
+        const QString thisComponentSelected = QString("%1_%2_PRESENT").arg(m_name).arg(componentName);
         m_promelaModel.addValueDefinition(ValueDefinition(thisComponentSelected, selectorVal++));
 
         auto *const choiceComponent = component.get();
@@ -216,7 +215,8 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
 
         auto alternative = ProctypeMaker::makeNormalSequence();
         alternative->appendElement(ProctypeMaker::makeTrueExpressionProctypeElement());
-        alternative->appendElement(ProctypeMaker::makeInlineCall(inlineTypeGeneratorName, argumentName));
+        alternative->appendElement(ProctypeMaker::makeInlineCall(
+                inlineTypeGeneratorName, QString("%1.%2").arg(argumentName).arg(componentName)));
         alternative->appendElement(
                 ProctypeMaker::makeAssignmentProctypeElement(QString("value.selection"), thisComponentSelected));
 

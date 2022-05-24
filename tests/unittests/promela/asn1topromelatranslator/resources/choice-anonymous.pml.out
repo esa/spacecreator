@@ -1,4 +1,3 @@
-#define SimpleChoiceWithAnonymousTypes_NOT_SELECTED 0
 #define SimpleChoiceWithAnonymousTypes_alt1_PRESENT 1
 #define SimpleChoiceWithAnonymousTypes_alt2_PRESENT 2
 inline SimpleChoiceWithAnonymousTypes_alt1_generate_value(value)
@@ -16,97 +15,7 @@ inline SimpleChoiceWithAnonymousTypes_alt1_generate_value(value)
         value = 4;
     ::  true;
         value = 5;
-    ::  true;
-        value = 6;
-    ::  true;
-        value = 7;
-    ::  true;
-        value = 8;
-    ::  true;
-        value = 9;
-    ::  true;
-        value = 10;
-    ::  true;
-        value = 11;
-    ::  true;
-        value = 12;
-    ::  true;
-        value = 13;
-    ::  true;
-        value = 14;
-    ::  true;
-        value = 15;
-    ::  true;
-        value = 16;
-    ::  true;
-        value = 17;
-    ::  true;
-        value = 18;
-    ::  true;
-        value = 19;
-    ::  true;
-        value = 20;
-    ::  true;
-        value = 21;
-    ::  true;
-        value = 22;
-    ::  true;
-        value = 23;
-    ::  true;
-        value = 24;
-    ::  true;
-        value = 25;
-    ::  true;
-        value = 26;
-    ::  true;
-        value = 27;
-    ::  true;
-        value = 28;
-    ::  true;
-        value = 29;
-    ::  true;
-        value = 30;
-    ::  true;
-        value = 31;
-    ::  true;
-        value = 32;
-    ::  true;
-        value = 33;
-    ::  true;
-        value = 34;
-    ::  true;
-        value = 35;
-    ::  true;
-        value = 36;
-    ::  true;
-        value = 37;
-    ::  true;
-        value = 38;
-    ::  true;
-        value = 39;
-    ::  true;
-        value = 40;
-    ::  true;
-        value = 41;
-    ::  true;
-        value = 42;
-    ::  true;
-        value = 43;
-    ::  true;
-        value = 44;
-    ::  true;
-        value = 45;
-    ::  true;
-        value = 46;
-    ::  true;
-        value = 47;
-    ::  true;
-        value = 48;
-    ::  true;
-        value = 49;
-    ::  true;
-        value = 50;
-    fi;
+   fi;
 }
 inline SimpleChoiceWithAnonymousTypes_alt2_generate_value(value)
 {
@@ -123,10 +32,10 @@ inline SimpleChoiceWithAnonymousTypes_generate_value(value)
 {
     if
     ::  true;
-        SimpleChoiceWithAnonymousTypes_alt1_generate_value(value);
+        SimpleChoiceWithAnonymousTypes_alt1_generate_value(value.alt1);
         value.selection = SimpleChoiceWithAnonymousTypes_alt1_PRESENT;
     ::  true;
-        SimpleChoiceWithAnonymousTypes_alt2_generate_value(value);
+        SimpleChoiceWithAnonymousTypes_alt2_generate_value(value.alt2);
         value.selection = SimpleChoiceWithAnonymousTypes_alt2_PRESENT;
     fi;
 }
