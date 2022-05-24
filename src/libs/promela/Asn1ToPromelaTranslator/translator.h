@@ -71,9 +71,8 @@ private:
             -> std::vector<std::unique_ptr<conversion::Model>>;
     auto generateValueGenerationInlines(const Asn1Acn::Asn1Model *model, const QStringList &typeNames) const
             -> std::vector<std::unique_ptr<conversion::Model>>;
-    auto visitAsn1File(Asn1Acn::File *file, model::PromelaModel &promelaModel,
-            bool enhancedSpinSupport) const -> void;
-    auto visitAsn1FileGenerate(Asn1Acn::File *file, model::PromelaModel &promelaModel,
-            const QStringList &typeNames) const -> void;
+    auto visitAsn1File(Asn1Acn::File *file, model::PromelaModel &promelaModel, bool enhancedSpinSupport) const -> void;
+    auto visitAsn1FileGenerate(
+            Asn1Acn::File *file, model::PromelaModel &promelaModel, const QStringList &typeNames) const -> void;
 };
 }

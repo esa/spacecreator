@@ -19,23 +19,23 @@
 
 #include "tst_asn1topromelatranslator_rangechecks.h"
 
+#include <asn1library/asn1/constraints/rangeconstraint.h>
+#include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/sourcelocation.h>
 #include <asn1library/asn1/typeassignment.h>
-#include <asn1library/asn1/values.h>
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/sequenceof.h>
-#include <asn1library/asn1/constraints/rangeconstraint.h>
-#include <asn1library/asn1/constraints/sizeconstraint.h>
+#include <asn1library/asn1/values.h>
+#include <memory>
 #include <promela/Asn1ToPromelaTranslator/visitors/asn1nodevisitor.h>
 #include <promela/PromelaModel/promelamodel.h>
-#include <memory>
 
 using Asn1Acn::Definitions;
 using Asn1Acn::IntegerValue;
-using Asn1Acn::TypeAssignment;
 using Asn1Acn::SourceLocation;
+using Asn1Acn::TypeAssignment;
 using Asn1Acn::Constraints::RangeConstraint;
 using Asn1Acn::Constraints::SizeConstraint;
 using Asn1Acn::Types::Enumerated;
@@ -117,9 +117,9 @@ void tst_Asn1ToPromelaTranslator_RangeChecks::testEnum() const
 
     {
         auto enumType = std::make_unique<Enumerated>();
-        enumType->addItem({1, "value1", 1});
-        enumType->addItem({2, "value2", 2});
-        enumType->addItem({3, "value3", 3});
+        enumType->addItem({ 1, "value1", 1 });
+        enumType->addItem({ 2, "value2", 2 });
+        enumType->addItem({ 3, "value3", 3 });
         enumType->constraints().append({ "value2" });
         auto myEnumAssignment = std::make_unique<TypeAssignment>(
                 QStringLiteral("MyEnum"), QStringLiteral("MyEnum"), SourceLocation(), std::move(enumType));
@@ -164,15 +164,15 @@ void tst_Asn1ToPromelaTranslator_RangeChecks::testSequenceOf() const
 
         auto sequenceOfType = std::make_unique<SequenceOf>();
         sequenceOfType->setItemsType(integerType->clone());
-        auto sizeRangeConstraint = RangeConstraint<IntegerValue>::create({2, 5});
+        auto sizeRangeConstraint = RangeConstraint<IntegerValue>::create({ 2, 5 });
         auto sizeConstraint = std::make_unique<SizeConstraint<IntegerValue>>(std::move(sizeRangeConstraint));
         sequenceOfType->constraints().append(std::move(sizeConstraint));
 
         auto myIntegerAssignment = std::make_unique<TypeAssignment>(
                 QStringLiteral("MyInteger"), QStringLiteral("MyInteger"), SourceLocation(), std::move(integerType));
         asn1Model->addType(std::move(myIntegerAssignment));
-        auto mySequenceOfAssignment = std::make_unique<TypeAssignment>(
-                QStringLiteral("MySequenceOf"), QStringLiteral("MySequenceOf"), SourceLocation(), std::move(sequenceOfType));
+        auto mySequenceOfAssignment = std::make_unique<TypeAssignment>(QStringLiteral("MySequenceOf"),
+                QStringLiteral("MySequenceOf"), SourceLocation(), std::move(sequenceOfType));
         asn1Model->addType(std::move(mySequenceOfAssignment));
     }
 

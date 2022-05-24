@@ -19,11 +19,11 @@
 
 #include "asn1itemtypevisitor.h"
 
-#include "sizeconstraintvisitor.h"
 #include "asn1sequencecomponentvisitor.h"
 #include "enumeratedgenerator.h"
 #include "enumvalueconstraintvisitor.h"
 #include "integerrangeconstraintvisitor.h"
+#include "sizeconstraintvisitor.h"
 
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
@@ -383,8 +383,7 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
 
     sequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "i")));
 
-    std::unique_ptr<model::Sequence> loopSequence =
-            std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
+    std::unique_ptr<model::Sequence> loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
 
     VariableRef dst("dst");
     dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
@@ -494,8 +493,7 @@ void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeNam
 
     sequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "i")));
 
-    std::unique_ptr<model::Sequence> loopSequence =
-            std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
+    std::unique_ptr<model::Sequence> loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
 
     VariableRef dst("dst");
     dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
@@ -551,7 +549,8 @@ void Asn1ItemTypeVisitor::addEnumRangeCheckInline(const Enumerated &type, const 
         const auto enumValueName = QString("%1_%2").arg(typeName).arg(Escaper::escapePromelaName(enumValue));
         auto enumValueVar = std::make_unique<Expression>(VariableRef(enumValueName));
 
-        auto equalExpr = BinaryExpression(BinaryExpression::Operator::EQUAL, std::move(valueVar), std::move(enumValueVar));
+        auto equalExpr =
+                BinaryExpression(BinaryExpression::Operator::EQUAL, std::move(valueVar), std::move(enumValueVar));
         valueCheckingExpressions.push_back(std::move(equalExpr));
     }
 
@@ -609,8 +608,7 @@ void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const Integer &type, const 
 
 void Asn1ItemTypeVisitor::addRangeCheckInline(const Expression &expression, const QString &typeName)
 {
-    const auto inlineName =
-            QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(rangeCheckInlineSuffix);
+    const auto inlineName = QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(rangeCheckInlineSuffix);
     QList<QString> arguments;
     const auto argumentName = buildCheckArgumentName(typeName, "value");
     arguments.append(argumentName);
@@ -620,15 +618,14 @@ void Asn1ItemTypeVisitor::addRangeCheckInline(const Expression &expression, cons
     AssertCall assertCall(expression);
     sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assertCall)));
 
-    auto rangeCheckInline =
-            std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
+    auto rangeCheckInline = std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
     m_promelaModel.addInlineDef(std::move(rangeCheckInline));
 }
 
-void Asn1ItemTypeVisitor::addSizeCheckInline(const std::size_t minValue, const std::size_t maxValue, const QString &typeName)
+void Asn1ItemTypeVisitor::addSizeCheckInline(
+        const std::size_t minValue, const std::size_t maxValue, const QString &typeName)
 {
-    const auto inlineName =
-            QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(rangeCheckInlineSuffix);
+    const auto inlineName = QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(rangeCheckInlineSuffix);
     QList<QString> arguments;
     const auto argumentName = buildCheckArgumentName(typeName, "size");
     arguments.append(argumentName);
@@ -651,8 +648,7 @@ void Asn1ItemTypeVisitor::addSizeCheckInline(const std::size_t minValue, const s
     AssertCall assertCall(Expression(std::move(sizeCheckingExpression)));
     sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assertCall)));
 
-    auto rangeCheckInline =
-            std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
+    auto rangeCheckInline = std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
     m_promelaModel.addInlineDef(std::move(rangeCheckInline));
 }
 

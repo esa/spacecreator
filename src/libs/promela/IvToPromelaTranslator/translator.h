@@ -220,8 +220,7 @@ private:
             const QString &parameterType, size_t queueSize, size_t priority, bool environment) const
             -> std::unique_ptr<model::Proctype>;
     auto generateEnvironmentProctype(const QString &functionName, const QString &interfaceName,
-            const QString &parameterType, const QString &sendInline) const
-            -> std::unique_ptr<model::Proctype>;
+            const QString &parameterType, const QString &sendInline) const -> std::unique_ptr<model::Proctype>;
     auto generateSendInline(const QString &functionName, const QString &interfaceName, const QString &parameterName,
             const QString &parameterType, const QString &sourceFunctionName, const QString &sourceInterfaceName) const
             -> std::unique_ptr<model::InlineDef>;
@@ -229,8 +228,8 @@ private:
             const QString &functionName) const -> void;
     auto createPromelaObjectsForEnvironment(Context &context, const ::ivm::IVModel *ivModel,
             ::ivm::IVFunction *ivFunction, const QString &functionName) const -> void;
-    auto createCheckQueueInline(model::PromelaModel *promelaModel, const QString &functionName,
-            QList<QString> &channelNames) const -> void;
+    auto createCheckQueueInline(
+            model::PromelaModel *promelaModel, const QString &functionName, QList<QString> &channelNames) const -> void;
     auto createSystemState(model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,
             const std::vector<QString> &modelFunctions, const std::vector<QString> &observers) const -> void;
 

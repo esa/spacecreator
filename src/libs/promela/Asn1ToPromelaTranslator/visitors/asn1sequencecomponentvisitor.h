@@ -40,8 +40,7 @@ public:
      * @param baseTypeName base name for nested types
      * @param enhancedSpinSupport  if true, then generate model for enhanced spin
      */
-    Asn1SequenceComponentVisitor(
-            model::PromelaModel &promelaModel, QString baseTypeName, bool enhancedSpinSupport);
+    Asn1SequenceComponentVisitor(model::PromelaModel &promelaModel, QString baseTypeName, bool enhancedSpinSupport);
 
     /**
      * @brief Visit Asn1Acn::AsnSequenceComponent

@@ -41,8 +41,8 @@ public:
      * @param target target variable to assign the value
      * @param typeName name of the type of variable
      */
-    ValueAssignmentVisitor(Asn1Acn::Value *value, model::Sequence &sequence,
-            const model::VariableRef &target, QString typeName);
+    ValueAssignmentVisitor(
+            Asn1Acn::Value *value, model::Sequence &sequence, const model::VariableRef &target, QString typeName);
     /**
      * @brief Visit Asn1Acn::Types::Boolean
      *

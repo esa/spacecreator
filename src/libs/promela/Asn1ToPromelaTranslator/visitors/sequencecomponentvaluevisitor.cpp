@@ -43,8 +43,8 @@ using promela::model::ProctypeElement;
 using promela::model::VariableRef;
 
 namespace promela::translator {
-SequenceComponentValueVisitor::SequenceComponentValueVisitor(const NamedValue *value,
-        model::Sequence &sequence, const VariableRef &target, QString sequenceTypeName)
+SequenceComponentValueVisitor::SequenceComponentValueVisitor(
+        const NamedValue *value, model::Sequence &sequence, const VariableRef &target, QString sequenceTypeName)
     : m_value(value)
     , m_sequence(sequence)
     , m_target(target)
