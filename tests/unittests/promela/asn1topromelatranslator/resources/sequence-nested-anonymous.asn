@@ -1,0 +1,10 @@
+Sequence-nested DEFINITIONS ::=
+BEGIN
+
+Outer-sequence ::= SEQUENCE {
+   memberSequence SEQUENCE {
+       memberInt INTEGER (0 .. 10)
+   }
+}
+
+END
