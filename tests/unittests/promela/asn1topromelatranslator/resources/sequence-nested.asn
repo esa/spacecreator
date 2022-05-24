@@ -1,0 +1,12 @@
+Sequence-nested DEFINITIONS ::=
+BEGIN
+
+Inner-sequence ::= SEQUENCE {
+    write-address INTEGER (0 .. 10)
+}
+
+Outer-sequence ::= SEQUENCE {
+   mywritevalue Inner-sequence
+}
+
+END

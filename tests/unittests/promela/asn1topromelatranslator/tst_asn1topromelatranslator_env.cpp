@@ -278,7 +278,10 @@ void tst_Asn1ToPromelaTranslator_Env::testEnumerated() const
 void tst_Asn1ToPromelaTranslator_Env::testSequence() const
 {
     const QString inputAsnFilename = "sequence.asn";
-    const QStringList asnTypesToTranslate = { "EnvIntParam", "EnvParamSeq" };
+    const QStringList asnTypesToTranslate = {
+        "EnvIntParam",
+        "EnvParamSeq",
+    };
     const QString actualOutputFilename = "sequence.pml";
     const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
 
@@ -289,8 +292,36 @@ void tst_Asn1ToPromelaTranslator_Env::testSequence() const
 void tst_Asn1ToPromelaTranslator_Env::testSequenceEmbeddedType() const
 {
     const QString inputAsnFilename = "sequence-embedded.asn";
-    const QStringList asnTypesToTranslate = { "EnvParamSeq" };
+    const QStringList asnTypesToTranslate = {
+        "EnvParamSeq",
+    };
     const QString actualOutputFilename = "sequence-embedded.pml";
+    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
+
+    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
+    compareTextFiles(actualOutputFilename, expectedOutputFilename);
+}
+
+void tst_Asn1ToPromelaTranslator_Env::testSequenceNested() const
+{
+    const QString inputAsnFilename = "sequence-nested.asn";
+    const QStringList asnTypesToTranslate = {
+        "Outer-sequence",
+    };
+    const QString actualOutputFilename = "sequence-nested.pml";
+    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
+
+    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
+    compareTextFiles(actualOutputFilename, expectedOutputFilename);
+}
+
+void tst_Asn1ToPromelaTranslator_Env::testSequenceNestedAnonymous() const
+{
+    const QString inputAsnFilename = "sequence-nested-anonymous.asn";
+    const QStringList asnTypesToTranslate = {
+        "Outer-sequence",
+    };
+    const QString actualOutputFilename = "sequence-nested-anonymous.pml";
     const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
 
     translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
@@ -300,7 +331,9 @@ void tst_Asn1ToPromelaTranslator_Env::testSequenceEmbeddedType() const
 void tst_Asn1ToPromelaTranslator_Env::testSequenceOf() const
 {
     const QString inputAsnFilename = "sequenceof.asn";
-    const QStringList asnTypesToTranslate = { "SimpleFixedSizeSequenceOf" };
+    const QStringList asnTypesToTranslate = {
+        "SimpleFixedSizeSequenceOf",
+    };
     const QString actualOutputFilename = "sequenceof.pml";
     const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
 
@@ -311,7 +344,9 @@ void tst_Asn1ToPromelaTranslator_Env::testSequenceOf() const
 void tst_Asn1ToPromelaTranslator_Env::testSequenceOfVariableSize() const
 {
     const QString inputAsnFilename = "sequenceof-variable-size.asn";
-    const QStringList asnTypesToTranslate = { "SimpleVariableSizeSequenceOf" };
+    const QStringList asnTypesToTranslate = {
+        "SimpleVariableSizeSequenceOf",
+    };
     const QString actualOutputFilename = "sequenceof-variable-size.pml";
     const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
 
