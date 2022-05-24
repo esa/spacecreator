@@ -4,7 +4,7 @@ IMPORTS
    T-UInt16, T-WriteAccess, T-ByteArray, T-MemBuffer, T-WriteRequest, T-ProcID FROM DEKKER1-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
 
-Lock-States ::= ENUMERATED {wait-nocontention, writing, idle, wait-turn}
+Lock-States ::= ENUMERATED {idle, wait-nocontention, wait-turn, writing}
 
 Lock-Context ::= SEQUENCE {
    state Lock-States,
@@ -48,7 +48,7 @@ IMPORTS T-UInt8, T-Boolean FROM TASTE-BasicTypes;
 
 --T-UInt8 ::= INTEGER (0 .. 255)
 
-T-UInt16 ::= INTEGER (0 .. 65535)
+T-UInt16 ::= INTEGER (0 .. 10)
 
 --T-Boolean ::= BOOLEAN
 

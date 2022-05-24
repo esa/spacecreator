@@ -5,7 +5,7 @@ IMPORTS T-UInt8, T-Boolean FROM TASTE-BasicTypes;
 
 --T-UInt8 ::= INTEGER (0 .. 255)
 
-T-UInt16 ::= INTEGER (0 .. 65535)
+T-UInt16 ::= INTEGER (0 .. 10)
 
 --T-Boolean ::= BOOLEAN
 
