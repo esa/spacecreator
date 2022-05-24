@@ -191,7 +191,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Enumerated &type)
 
 void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
 {
-    const QString argumentName = "value";
+    const QString argumentName = Escaper::escapePromelaName("value");
     const QStringList inlineArguments = { argumentName };
 
     auto sequence = ProctypeMaker::makeNormalSequence();
@@ -200,12 +200,14 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
     int selectorVal = 1;
     for (auto &component : type.components()) {
         const QString &componentName = component->name();
-        const QString thisComponentSelected = QString("%1_%2_PRESENT").arg(m_name).arg(componentName);
+        const QString thisComponentSelected =
+                Escaper::escapePromelaName(QString("%1_%2_PRESENT").arg(m_name).arg(componentName));
         m_promelaModel.addValueDefinition(ValueDefinition(thisComponentSelected, selectorVal++));
 
         auto *const choiceComponent = component.get();
-        const QString componentTypeName = getChoiceComponentTypeName(*choiceComponent, m_name);
-        const QString inlineTypeGeneratorName = getInlineGeneratorName(componentTypeName);
+        const QString componentTypeName =
+                Escaper::escapePromelaName(getChoiceComponentTypeName(*choiceComponent, m_name));
+        const QString inlineTypeGeneratorName = Escaper::escapePromelaName(getInlineGeneratorName(componentTypeName));
 
         if (!modelContainsInlineGenerator(inlineTypeGeneratorName)) {
             auto *const choiceComponentType = getChoiceComponentType(choiceComponent);
@@ -215,8 +217,8 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
 
         auto alternative = ProctypeMaker::makeNormalSequence();
         alternative->appendElement(ProctypeMaker::makeTrueExpressionProctypeElement());
-        alternative->appendElement(ProctypeMaker::makeInlineCall(
-                inlineTypeGeneratorName, QString("%1.%2").arg(argumentName).arg(componentName)));
+        alternative->appendElement(ProctypeMaker::makeInlineCall(inlineTypeGeneratorName,
+                QString("%1.%2").arg(argumentName).arg(Escaper::escapePromelaName(componentName))));
         alternative->appendElement(
                 ProctypeMaker::makeAssignmentProctypeElement(QString("value.selection"), thisComponentSelected));
 
@@ -224,7 +226,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
     }
     sequence->appendElement(std::make_unique<ProctypeElement>(std::move(*conditional)));
 
-    const QString choiceGeneratorInlineName = QString("%1_generate_value").arg(m_name);
+    const QString choiceGeneratorInlineName = Escaper::escapePromelaName(QString("%1_generate_value").arg(m_name));
     auto inlineDef = std::make_unique<InlineDef>(choiceGeneratorInlineName, inlineArguments, std::move(*sequence));
 
     m_promelaModel.addInlineDef(std::move(inlineDef));
