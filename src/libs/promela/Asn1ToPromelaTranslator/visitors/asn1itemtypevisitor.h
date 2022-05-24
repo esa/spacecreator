@@ -150,6 +150,7 @@ private:
     void addRangeCheckInline(const model::Expression &type, const QString &typeName);
     void addSizeCheckInline(const std::size_t minValue, const std::size_t maxValue, const QString &typeName);
     QString getAssignValueInlineNameForNestedType(const QString &utype, const QString &field) const;
+    QString buildCheckArgumentName(const QString &typeName, const QString &postfix) const;
 
 private:
     model::PromelaModel &m_promelaModel;

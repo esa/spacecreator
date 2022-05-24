@@ -541,10 +541,12 @@ void Asn1ItemTypeVisitor::addEnumRangeCheckInline(const Enumerated &type, const 
         return;
     }
 
+    const auto argumentName = buildCheckArgumentName(typeName, "value");
+
     // Build one big expression for range check
     std::vector<BinaryExpression> valueCheckingExpressions;
     for (const auto &enumValue : allowedValues) {
-        auto valueVar = std::make_unique<Expression>(VariableRef("value"));
+        auto valueVar = std::make_unique<Expression>(VariableRef(argumentName));
 
         const auto enumValueName = QString("%1_%2").arg(typeName).arg(Escaper::escapePromelaName(enumValue));
         auto enumValueVar = std::make_unique<Expression>(VariableRef(enumValueName));
@@ -575,16 +577,18 @@ void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const Integer &type, const 
         return;
     }
 
+    const auto argumentName = buildCheckArgumentName(typeName, "value");
+
     // Build one big expression for range check
     std::vector<BinaryExpression> rangeCheckingExpressions;
     for (const auto &range : rangeSubsets->getRanges()) {
         auto minValueConst = std::make_unique<Expression>(Constant(range.first));
-        auto minValueVar = std::make_unique<Expression>(VariableRef("value"));
+        auto minValueVar = std::make_unique<Expression>(VariableRef(argumentName));
         auto greaterThanExpr = std::make_unique<Expression>(
                 BinaryExpression(BinaryExpression::Operator::GEQUAL, std::move(minValueVar), std::move(minValueConst)));
 
         auto maxValueConst = std::make_unique<Expression>(Constant(range.second));
-        auto maxValueVar = std::make_unique<Expression>(VariableRef("value"));
+        auto maxValueVar = std::make_unique<Expression>(VariableRef(argumentName));
         auto lessThanExpr = std::make_unique<Expression>(
                 BinaryExpression(BinaryExpression::Operator::LEQUAL, std::move(maxValueVar), std::move(maxValueConst)));
 
@@ -605,10 +609,11 @@ void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const Integer &type, const 
 
 void Asn1ItemTypeVisitor::addRangeCheckInline(const Expression &expression, const QString &typeName)
 {
-    const auto rangeCheckInlineName =
+    const auto inlineName =
             QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(rangeCheckInlineSuffix);
-    QList<QString> rangeCheckInlineArguments;
-    rangeCheckInlineArguments.append("value");
+    QList<QString> arguments;
+    const auto argumentName = buildCheckArgumentName(typeName, "value");
+    arguments.append(argumentName);
 
     model::Sequence sequence(model::Sequence::Type::NORMAL);
 
@@ -616,26 +621,27 @@ void Asn1ItemTypeVisitor::addRangeCheckInline(const Expression &expression, cons
     sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assertCall)));
 
     auto rangeCheckInline =
-            std::make_unique<InlineDef>(rangeCheckInlineName, rangeCheckInlineArguments, std::move(sequence));
+            std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
     m_promelaModel.addInlineDef(std::move(rangeCheckInline));
 }
 
 void Asn1ItemTypeVisitor::addSizeCheckInline(const std::size_t minValue, const std::size_t maxValue, const QString &typeName)
 {
-    const auto rangeCheckInlineName =
+    const auto inlineName =
             QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(rangeCheckInlineSuffix);
-    QList<QString> rangeCheckInlineArguments;
-    rangeCheckInlineArguments.append("size");
+    QList<QString> arguments;
+    const auto argumentName = buildCheckArgumentName(typeName, "size");
+    arguments.append(argumentName);
 
     model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     auto minValueConst = std::make_unique<Expression>(Constant(minValue));
-    auto minValueVar = std::make_unique<Expression>(VariableRef("size"));
+    auto minValueVar = std::make_unique<Expression>(VariableRef(argumentName));
     auto greaterThanExpr = std::make_unique<Expression>(
             BinaryExpression(BinaryExpression::Operator::GEQUAL, std::move(minValueVar), std::move(minValueConst)));
 
     auto maxValueConst = std::make_unique<Expression>(Constant(maxValue));
-    auto maxValueVar = std::make_unique<Expression>(VariableRef("size"));
+    auto maxValueVar = std::make_unique<Expression>(VariableRef(argumentName));
     auto lessThanExpr = std::make_unique<Expression>(
             BinaryExpression(BinaryExpression::Operator::LEQUAL, std::move(maxValueVar), std::move(maxValueConst)));
 
@@ -646,7 +652,7 @@ void Asn1ItemTypeVisitor::addSizeCheckInline(const std::size_t minValue, const s
     sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assertCall)));
 
     auto rangeCheckInline =
-            std::make_unique<InlineDef>(rangeCheckInlineName, rangeCheckInlineArguments, std::move(sequence));
+            std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
     m_promelaModel.addInlineDef(std::move(rangeCheckInline));
 }
 
@@ -654,4 +660,10 @@ QString Asn1ItemTypeVisitor::getAssignValueInlineNameForNestedType(const QString
 {
     return Escaper::escapePromelaName(utype) + "_" + Escaper::escapePromelaName(field) + assignValueInlineSuffix;
 }
+
+QString Asn1ItemTypeVisitor::buildCheckArgumentName(const QString &typeName, const QString &postfix) const
+{
+    return QString("%1_%2_check").arg(typeName).arg(postfix);
+}
+
 }
