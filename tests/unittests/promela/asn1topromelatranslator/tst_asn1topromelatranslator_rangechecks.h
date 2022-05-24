@@ -37,6 +37,7 @@ private Q_SLOTS:
 
     void testInteger() const;
     void testEnum() const;
+    void testSequenceOf() const;
 
 private:
     const ::promela::model::InlineDef *findInline(

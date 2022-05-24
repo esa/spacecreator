@@ -25,7 +25,9 @@
 #include <asn1library/asn1/values.h>
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
+#include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <promela/Asn1ToPromelaTranslator/visitors/asn1nodevisitor.h>
 #include <promela/PromelaModel/promelamodel.h>
 #include <memory>
@@ -35,8 +37,10 @@ using Asn1Acn::IntegerValue;
 using Asn1Acn::TypeAssignment;
 using Asn1Acn::SourceLocation;
 using Asn1Acn::Constraints::RangeConstraint;
+using Asn1Acn::Constraints::SizeConstraint;
 using Asn1Acn::Types::Enumerated;
 using Asn1Acn::Types::Integer;
+using Asn1Acn::Types::SequenceOf;
 using promela::model::AssertCall;
 using promela::model::BinaryExpression;
 using promela::model::Constant;
@@ -82,6 +86,7 @@ void tst_Asn1ToPromelaTranslator_RangeChecks::testInteger() const
         QVERIFY(assertExpr != nullptr);
 
         QVERIFY(assertExpr->getOperator() == BinaryExpression::Operator::AND);
+
         const auto minValueExpr = std::get_if<BinaryExpression>(&assertExpr->getLeft()->getContent());
         QVERIFY(minValueExpr != nullptr);
 
@@ -145,6 +150,71 @@ void tst_Asn1ToPromelaTranslator_RangeChecks::testEnum() const
         const auto enumValueVar = std::get_if<VariableRef>(&assertExpr->getRight()->getContent());
         QVERIFY(enumValueVar != nullptr);
         QCOMPARE(enumValueVar->getElements().begin()->m_name, "MyEnum_value2");
+    }
+}
+
+void tst_Asn1ToPromelaTranslator_RangeChecks::testSequenceOf() const
+{
+    auto asn1Model = std::make_unique<Definitions>("TmcTestModule", SourceLocation());
+
+    {
+        auto integerType = std::make_unique<Integer>();
+        integerType->constraints().append({ 1, 10 });
+
+        auto sequenceOfType = std::make_unique<SequenceOf>();
+        sequenceOfType->setItemsType(integerType->clone());
+        auto sizeRangeConstraint = RangeConstraint<IntegerValue>::create({2, 5});
+        auto sizeConstraint = std::make_unique<SizeConstraint<IntegerValue>>(std::move(sizeRangeConstraint));
+        sequenceOfType->constraints().append(std::move(sizeConstraint));
+
+        auto myIntegerAssignment = std::make_unique<TypeAssignment>(
+                QStringLiteral("MyInteger"), QStringLiteral("MyInteger"), SourceLocation(), std::move(integerType));
+        asn1Model->addType(std::move(myIntegerAssignment));
+        auto mySequenceOfAssignment = std::make_unique<TypeAssignment>(
+                QStringLiteral("MySequenceOf"), QStringLiteral("MySequenceOf"), SourceLocation(), std::move(sequenceOfType));
+        asn1Model->addType(std::move(mySequenceOfAssignment));
+    }
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel, true);
+    visitor.visit(*asn1Model);
+
+    QCOMPARE(promelaModel.getInlineDefs().size(), 6);
+    {
+        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MySequenceOf_range_check");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
+
+        const auto assertCall = findAssertCall(inlineDef->getSequence());
+        QVERIFY(assertCall != nullptr);
+
+        const auto assertExpr = std::get_if<BinaryExpression>(&assertCall->expression().getContent());
+        QVERIFY(assertExpr != nullptr);
+
+        QVERIFY(assertExpr->getOperator() == BinaryExpression::Operator::AND);
+
+        const auto minSizeExpr = std::get_if<BinaryExpression>(&assertExpr->getLeft()->getContent());
+        QVERIFY(minSizeExpr != nullptr);
+
+        QVERIFY(minSizeExpr->getOperator() == BinaryExpression::Operator::GEQUAL);
+        const auto minSizeVar = std::get_if<VariableRef>(&minSizeExpr->getLeft()->getContent());
+        QVERIFY(minSizeVar != nullptr);
+        QCOMPARE(minSizeVar->getElements().begin()->m_name, "size");
+        const auto minSizeConst = std::get_if<Constant>(&minSizeExpr->getRight()->getContent());
+        QVERIFY(minSizeConst != nullptr);
+        QCOMPARE(minSizeConst->getValue(), 2);
+
+        const auto maxSizeExpr = std::get_if<BinaryExpression>(&assertExpr->getRight()->getContent());
+        QVERIFY(maxSizeExpr != nullptr);
+
+        QVERIFY(maxSizeExpr->getOperator() == BinaryExpression::Operator::LEQUAL);
+        const auto maxSizeVar = std::get_if<VariableRef>(&maxSizeExpr->getLeft()->getContent());
+        QVERIFY(maxSizeVar != nullptr);
+        QCOMPARE(maxSizeVar->getElements().begin()->m_name, "size");
+        const auto maxSizeConst = std::get_if<Constant>(&maxSizeExpr->getRight()->getContent());
+        QVERIFY(maxSizeConst != nullptr);
+        QCOMPARE(maxSizeConst->getValue(), 5);
     }
 }
 
