@@ -1,0 +1,12 @@
+CHOICES DEFINITIONS ::= BEGIN
+
+Type1 ::= INTEGER(0..3)
+Type2 ::= INTEGER(9..13)
+
+SimpleChoice ::= CHOICE 
+{
+    alt1 Type1,
+    alt2 Type2
+}
+
+END

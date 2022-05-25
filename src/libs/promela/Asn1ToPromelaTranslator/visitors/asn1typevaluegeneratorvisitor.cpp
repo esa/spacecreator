@@ -24,6 +24,7 @@
 #include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/sequencecomponent.h>
 #include <asn1library/asn1/sequencecomponentvisitor.h>
+#include <asn1library/asn1/types/choice.h>
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/sequence.h>
@@ -52,9 +53,11 @@
 #include <promela/PromelaModel/inlinedef.h>
 #include <promela/PromelaModel/proctypeelement.h>
 #include <promela/PromelaModel/sequence.h>
+#include <promela/PromelaModel/valuedefinition.h>
 #include <promela/PromelaModel/variableref.h>
 #include <qglobal.h>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 
 using Asn1Acn::Types::BitString;
@@ -82,6 +85,7 @@ using promela::model::InlineDef;
 using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
 using promela::model::UtypeRef;
+using promela::model::ValueDefinition;
 using promela::model::VariableRef;
 
 namespace promela::translator {
@@ -98,13 +102,14 @@ void Asn1TypeValueGeneratorVisitor::visit(const Boolean &type)
 
     Conditional conditional;
     const std::list<bool> possibleValues = { true, false };
+    const auto valueVariableName = getInlineArgumentName();
 
-    std::for_each(possibleValues.begin(), possibleValues.end(), [&conditional](const bool &value) {
+    std::for_each(possibleValues.begin(), possibleValues.end(), [&conditional, &valueVariableName](const bool &value) {
         auto nestedSequence = std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
 
         nestedSequence->appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("true"))));
-        nestedSequence->appendElement(
-                std::make_unique<ProctypeElement>(Assignment(VariableRef("value"), Expression(Constant(value)))));
+        nestedSequence->appendElement(std::make_unique<ProctypeElement>(
+                Assignment(VariableRef(valueVariableName), Expression(Constant(value)))));
 
         conditional.appendAlternative(std::move(nestedSequence));
     });
@@ -164,6 +169,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Enumerated &type)
 {
     Conditional conditional;
 
+    const auto valueVariableName = getInlineArgumentName();
     EnumeratedGenerator generator(Escaper::escapePromelaName(m_name), type);
 
     while (generator.has_next()) {
@@ -174,7 +180,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Enumerated &type)
 
         nestedSequence->appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("true"))));
         nestedSequence->appendElement(std::make_unique<ProctypeElement>(
-                Assignment(VariableRef("value"), Expression(VariableRef(element.first)))));
+                Assignment(VariableRef(valueVariableName), Expression(VariableRef(element.first)))));
 
         conditional.appendAlternative(std::move(nestedSequence));
     }
@@ -187,19 +193,53 @@ void Asn1TypeValueGeneratorVisitor::visit(const Enumerated &type)
 
 void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
 {
-    Q_UNUSED(type);
-    const QString message = QString("Choice ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
-                                    .arg(__FILE__)
-                                    .arg(__LINE__);
-    throw std::logic_error(message.toStdString().c_str());
+    const auto valueVariableName = getInlineArgumentName();
+    const QStringList inlineArguments = { valueVariableName };
+
+    auto sequence = ProctypeMaker::makeNormalSequence();
+
+    auto conditional = std::make_unique<Conditional>();
+    int selectorVal = 1;
+    for (auto &component : type.components()) {
+        const QString &componentName = component->name();
+        const QString thisComponentSelected =
+                Escaper::escapePromelaName(QString("%1_%2_PRESENT").arg(m_name).arg(componentName));
+        m_promelaModel.addValueDefinition(ValueDefinition(thisComponentSelected, selectorVal++));
+
+        auto *const choiceComponent = component.get();
+        const QString componentTypeName =
+                Escaper::escapePromelaName(getChoiceComponentTypeName(*choiceComponent, m_name));
+        const QString inlineTypeGeneratorName = Escaper::escapePromelaName(getInlineGeneratorName(componentTypeName));
+
+        if (!modelContainsInlineGenerator(inlineTypeGeneratorName)) {
+            auto *const choiceComponentType = getChoiceComponentType(choiceComponent);
+            Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName);
+            choiceComponentType->accept(visitor);
+        }
+
+        auto alternative = ProctypeMaker::makeNormalSequence();
+        alternative->appendElement(ProctypeMaker::makeTrueExpressionProctypeElement());
+        alternative->appendElement(ProctypeMaker::makeInlineCall(inlineTypeGeneratorName,
+                QString("%1.%2").arg(valueVariableName).arg(Escaper::escapePromelaName(componentName))));
+        alternative->appendElement(ProctypeMaker::makeAssignmentProctypeElement(
+                QString("%1.selection").arg(valueVariableName), thisComponentSelected));
+
+        conditional->appendAlternative(std::move(alternative));
+    }
+    sequence->appendElement(std::make_unique<ProctypeElement>(std::move(*conditional)));
+
+    const QString choiceGeneratorInlineName = Escaper::escapePromelaName(QString("%1_generate_value").arg(m_name));
+    auto inlineDef = std::make_unique<InlineDef>(choiceGeneratorInlineName, inlineArguments, std::move(*sequence));
+
+    m_promelaModel.addInlineDef(std::move(inlineDef));
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 {
-    const QString argumentName = "value";
+    const auto valueVariableName = getInlineArgumentName();
 
     const QString inlineSeqGeneratorName = getInlineGeneratorName(m_name);
-    const QStringList inlineArguments = { argumentName };
+    const QStringList inlineArguments = { valueVariableName };
     promela::model::Sequence sequence(promela::model::Sequence::Type::NORMAL);
     for (auto &sequenceComponent : type.components()) {
         auto *const asnSequenceComponent = dynamic_cast<Asn1Acn::AsnSequenceComponent *>(sequenceComponent.get());
@@ -213,7 +253,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
             }
 
             auto asnSequenceComponentInlineCall =
-                    generateAsnSequenceComponentInlineCall(asnSequenceComponent, argumentName);
+                    generateAsnSequenceComponentInlineCall(asnSequenceComponent, valueVariableName);
             sequence.appendElement(std::move(asnSequenceComponentInlineCall));
         }
     }
@@ -225,6 +265,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 
 void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
 {
+    const auto valueVariableName = getInlineArgumentName();
     const QString componentTypeName = Escaper::escapePromelaName(type.itemsType()->typeName());
     const QString inlineTypeGeneratorName = Escaper::escapePromelaName(getInlineGeneratorName(componentTypeName));
     if (!modelContainsInlineGenerator(inlineTypeGeneratorName)) {
@@ -244,7 +285,8 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
     const size_t maxSize = constraintVisitor.getMaxSize();
     const QString typeGeneratorInline = QString("%1%2").arg(componentTypeName).arg("_generate_value");
     if (minSize == maxSize) {
-        sequence->appendElement(ProctypeMaker::makeCallForEachValue(typeGeneratorInline, Expression(maxSize - 1)));
+        sequence->appendElement(
+                ProctypeMaker::makeCallForEachValue(typeGeneratorInline, valueVariableName, Expression(maxSize - 1)));
     } else { // sequenceOf has variable length
         Asn1Acn::Types::Integer length("length");
         const Asn1Acn::Range<Asn1Acn::IntegerValue::Type> range(static_cast<long>(minSize), static_cast<long>(maxSize));
@@ -254,18 +296,17 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
         Asn1TypeValueGeneratorVisitor lenVisitor(m_promelaModel, lengthGeneratorTypeName);
         length.accept(lenVisitor);
 
-        sequence->appendElement(ProctypeMaker::makeInlineCall(
-                QString("%1_generate_value").arg(lengthGeneratorTypeName), "value.length"));
+        sequence->appendElement(ProctypeMaker::makeInlineCall(QString("%1_generate_value").arg(lengthGeneratorTypeName),
+                QString("%1.length").arg(valueVariableName)));
 
-        VariableRef endVarRef("value.length");
+        VariableRef endVarRef(QString("%1.length").arg(valueVariableName));
         Expression end(model::BinaryExpression(model::BinaryExpression::Operator::SUBTRACT,
                 std::make_unique<Expression>(endVarRef), std::make_unique<Expression>(model::Constant(1))));
-        sequence->appendElement(ProctypeMaker::makeCallForEachValue(typeGeneratorInline, end));
+        sequence->appendElement(ProctypeMaker::makeCallForEachValue(typeGeneratorInline, valueVariableName, end));
     }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);
-    const QString argumentName = "value";
-    const QStringList inlineArguments = { argumentName };
+    const QStringList inlineArguments = { valueVariableName };
     auto inlineDef = std::make_unique<InlineDef>(inlineSeqGeneratorName, inlineArguments, std::move(*sequence));
 
     m_promelaModel.addInlineDef(std::move(inlineDef));
@@ -294,6 +335,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Integer &type)
     IntegerConstraintVisitor constraintVisitor;
     type.constraints().accept(constraintVisitor);
 
+    const auto valueVariableName = getInlineArgumentName();
     std::optional<IntegerSubset> integerSubset = constraintVisitor.getResultSubset();
 
     if (!integerSubset.has_value()) {
@@ -312,8 +354,8 @@ void Asn1TypeValueGeneratorVisitor::visit(const Integer &type)
                 std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
 
         nestedSequence->appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("true"))));
-        nestedSequence->appendElement(
-                std::make_unique<ProctypeElement>(Assignment(VariableRef("value"), Expression(Constant(value)))));
+        nestedSequence->appendElement(std::make_unique<ProctypeElement>(
+                Assignment(VariableRef(valueVariableName), Expression(Constant(value)))));
 
         conditional.appendAlternative(std::move(nestedSequence));
     }
@@ -335,8 +377,9 @@ void Asn1TypeValueGeneratorVisitor::visit(const UserdefinedType &type)
 
 void Asn1TypeValueGeneratorVisitor::createValueGenerationInline(::promela::model::Sequence sequence)
 {
+    const auto valueVariableName = getInlineArgumentName();
     const QString inlineName = getInlineGeneratorName(m_name);
-    const QList<QString> inlineArguments = { QString("value") };
+    const QList<QString> inlineArguments = { valueVariableName };
     std::unique_ptr<InlineDef> inlineDef =
             std::make_unique<InlineDef>(inlineName, inlineArguments, std::move(sequence));
 
@@ -359,6 +402,22 @@ Asn1Acn::Types::Type *Asn1TypeValueGeneratorVisitor::getAsnSequenceComponentType
     return componentType;
 }
 
+Asn1Acn::Types::Type *Asn1TypeValueGeneratorVisitor::getChoiceComponentType(
+        Asn1Acn::Types::ChoiceAlternative *const component)
+{
+    if (component == nullptr) {
+        throw std::runtime_error("Component cannot be null");
+    }
+
+    Asn1Acn::Types::Type *const componentType = component->type();
+
+    if (componentType == nullptr) {
+        throw std::runtime_error("Type not specified in Component");
+    }
+
+    return componentType;
+}
+
 QString Asn1TypeValueGeneratorVisitor::getSequenceComponentTypeName(
         const Asn1Acn::AsnSequenceComponent &asnComponent, const QString &sequenceName)
 {
@@ -366,6 +425,18 @@ QString Asn1TypeValueGeneratorVisitor::getSequenceComponentTypeName(
 
     if (isEmbeddedType(type)) {
         return QString("%1_%2").arg(sequenceName).arg(asnComponent.name());
+    } else {
+        return type.typeName();
+    }
+}
+
+QString Asn1TypeValueGeneratorVisitor::getChoiceComponentTypeName(
+        const Asn1Acn::Types::ChoiceAlternative &choiceComponent, const QString &choiceName)
+{
+    const auto &type = *choiceComponent.type();
+
+    if (isEmbeddedType(type)) {
+        return QString("%1_%2").arg(choiceName).arg(choiceComponent.name());
     } else {
         return type.typeName();
     }
@@ -420,6 +491,12 @@ bool Asn1TypeValueGeneratorVisitor::modelContainsInlineGenerator(const QString &
 auto Asn1TypeValueGeneratorVisitor::isEmbeddedType(const Asn1Acn::Types::Type &type) -> bool
 {
     return !type.label().contains(".");
+}
+
+QString Asn1TypeValueGeneratorVisitor::getInlineArgumentName()
+{
+    // gv is generated value; it is short to reduce the chance of generating a too long identifier
+    return Escaper::escapePromelaName(QString("%1_gv").arg(m_name));
 }
 
 } // namespace promela::translator

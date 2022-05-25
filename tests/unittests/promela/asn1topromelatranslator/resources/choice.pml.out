@@ -1,0 +1,41 @@
+#define SimpleChoice_alt1_PRESENT 1
+#define SimpleChoice_alt2_PRESENT 2
+inline Type1_generate_value(Type1_gv)
+{
+    if
+    ::  true;
+        Type1_gv = 0;
+    ::  true;
+        Type1_gv = 1;
+    ::  true;
+        Type1_gv = 2;
+    ::  true;
+        Type1_gv = 3;
+    fi;
+}
+inline Type2_generate_value(Type2_gv)
+{
+    if
+    ::  true;
+        Type2_gv = 9;
+    ::  true;
+        Type2_gv = 10;
+    ::  true;
+        Type2_gv = 11;
+    ::  true;
+        Type2_gv = 12;
+    ::  true;
+        Type2_gv = 13;
+    fi;
+}
+inline SimpleChoice_generate_value(SimpleChoice_gv)
+{
+    if
+    ::  true;
+        Type1_generate_value(SimpleChoice_gv.alt1);
+        SimpleChoice_gv.selection = SimpleChoice_alt1_PRESENT;
+    ::  true;
+        Type2_generate_value(SimpleChoice_gv.alt2);
+        SimpleChoice_gv.selection = SimpleChoice_alt2_PRESENT;
+    fi;
+}

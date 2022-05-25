@@ -354,6 +354,30 @@ void tst_Asn1ToPromelaTranslator_Env::testSequenceOfVariableSize() const
     compareTextFiles(actualOutputFilename, expectedOutputFilename);
 }
 
+void tst_Asn1ToPromelaTranslator_Env::testChoice() const
+{
+    const QString inputAsnFilename = "choice.asn";
+    const QStringList asnTypesToTranslate = { "SimpleChoice" };
+    const QString actualOutputFilename = "choice.pml";
+    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
+
+    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
+    compareTextFiles(actualOutputFilename, expectedOutputFilename);
+}
+
+void tst_Asn1ToPromelaTranslator_Env::testChoiceAnonymous() const
+{
+    const QString inputAsnFilename = "choice-anonymous.asn";
+    const QStringList asnTypesToTranslate = {
+        "SimpleChoiceWithAnonymousTypes",
+    };
+    const QString actualOutputFilename = "choice-anonymous.pml";
+    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
+
+    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
+    compareTextFiles(actualOutputFilename, expectedOutputFilename);
+}
+
 std::unique_ptr<Definitions> tst_Asn1ToPromelaTranslator_Env::createModel() const
 {
     return std::make_unique<Definitions>("myModule", SourceLocation());

@@ -1,35 +1,35 @@
-inline Outer_sequence_memberSequence_memberInt_generate_value(value)
+inline Outer_sequence_memberSequence_memberInt_generate_value(Outer_sequence_memberSequence_memberInt_gv)
 {
     if
     ::  true;
-        value = 0;
+        Outer_sequence_memberSequence_memberInt_gv = 0;
     ::  true;
-        value = 1;
+        Outer_sequence_memberSequence_memberInt_gv = 1;
     ::  true;
-        value = 2;
+        Outer_sequence_memberSequence_memberInt_gv = 2;
     ::  true;
-        value = 3;
+        Outer_sequence_memberSequence_memberInt_gv = 3;
     ::  true;
-        value = 4;
+        Outer_sequence_memberSequence_memberInt_gv = 4;
     ::  true;
-        value = 5;
+        Outer_sequence_memberSequence_memberInt_gv = 5;
     ::  true;
-        value = 6;
+        Outer_sequence_memberSequence_memberInt_gv = 6;
     ::  true;
-        value = 7;
+        Outer_sequence_memberSequence_memberInt_gv = 7;
     ::  true;
-        value = 8;
+        Outer_sequence_memberSequence_memberInt_gv = 8;
     ::  true;
-        value = 9;
+        Outer_sequence_memberSequence_memberInt_gv = 9;
     ::  true;
-        value = 10;
+        Outer_sequence_memberSequence_memberInt_gv = 10;
     fi;
 }
-inline Outer_sequence_memberSequence_generate_value(value)
+inline Outer_sequence_memberSequence_generate_value(Outer_sequence_memberSequence_gv)
 {
-    Outer_sequence_memberSequence_memberInt_generate_value(value.memberInt);
+    Outer_sequence_memberSequence_memberInt_generate_value(Outer_sequence_memberSequence_gv.memberInt);
 }
-inline Outer_sequence_generate_value(value)
+inline Outer_sequence_generate_value(Outer_sequence_gv)
 {
-    Outer_sequence_memberSequence_generate_value(value.memberSequence);
+    Outer_sequence_memberSequence_generate_value(Outer_sequence_gv.memberSequence);
 }
