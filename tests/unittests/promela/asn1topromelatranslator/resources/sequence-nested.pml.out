@@ -1,35 +1,35 @@
-inline Inner_sequence_write_address_generate_value(value)
+inline Inner_sequence_write_address_generate_value(Inner_sequence_write_address_gv)
 {
     if
     ::  true;
-        value = 0;
+        Inner_sequence_write_address_gv = 0;
     ::  true;
-        value = 1;
+        Inner_sequence_write_address_gv = 1;
     ::  true;
-        value = 2;
+        Inner_sequence_write_address_gv = 2;
     ::  true;
-        value = 3;
+        Inner_sequence_write_address_gv = 3;
     ::  true;
-        value = 4;
+        Inner_sequence_write_address_gv = 4;
     ::  true;
-        value = 5;
+        Inner_sequence_write_address_gv = 5;
     ::  true;
-        value = 6;
+        Inner_sequence_write_address_gv = 6;
     ::  true;
-        value = 7;
+        Inner_sequence_write_address_gv = 7;
     ::  true;
-        value = 8;
+        Inner_sequence_write_address_gv = 8;
     ::  true;
-        value = 9;
+        Inner_sequence_write_address_gv = 9;
     ::  true;
-        value = 10;
+        Inner_sequence_write_address_gv = 10;
     fi;
 }
-inline Inner_sequence_generate_value(value)
+inline Inner_sequence_generate_value(Inner_sequence_gv)
 {
-    Inner_sequence_write_address_generate_value(value.write_address);
+    Inner_sequence_write_address_generate_value(Inner_sequence_gv.write_address);
 }
-inline Outer_sequence_generate_value(value)
+inline Outer_sequence_generate_value(Outer_sequence_gv)
 {
-    Inner_sequence_generate_value(value.mywritevalue);
+    Inner_sequence_generate_value(Outer_sequence_gv.mywritevalue);
 }
