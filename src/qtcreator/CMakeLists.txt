@@ -4,3 +4,4 @@ endif()
 
 add_subdirectory(spacecreatorplugin)
 add_subdirectory(sedsplugin)
+add_subdirectory(functiontesterplugin)
