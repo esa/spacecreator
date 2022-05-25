@@ -94,6 +94,12 @@ public:
      */
     void operator()(const ::promela::model::Skip &skip);
     /**
+     * @brief Handle ExitLoop (break)
+     *
+     * @param skip ExitLoop to export
+     */
+    void operator()(const ::promela::model::ExitLoop &exitLoop);
+    /**
      * @brief Handle Conditional
      *
      * @param ifStatement Conditional to export

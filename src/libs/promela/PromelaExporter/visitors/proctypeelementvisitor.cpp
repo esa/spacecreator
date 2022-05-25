@@ -33,6 +33,7 @@ using promela::model::ChannelSend;
 using promela::model::Conditional;
 using promela::model::Declaration;
 using promela::model::DoLoop;
+using promela::model::ExitLoop;
 using promela::model::Expression;
 using promela::model::ForLoop;
 using promela::model::InlineCall;
@@ -150,6 +151,13 @@ void ProctypeElementVisitor::operator()(const Skip &skip)
     Q_UNUSED(skip);
     m_stream << m_indent;
     m_stream << "skip;\n";
+}
+
+void ProctypeElementVisitor::operator()(const ExitLoop &exitLoop)
+{
+    Q_UNUSED(exitLoop);
+    m_stream << m_indent;
+    m_stream << "break;\n";
 }
 
 void ProctypeElementVisitor::operator()(const Conditional &conditional)

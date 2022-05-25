@@ -54,6 +54,7 @@ set(INCLUDES
   promelamodel.h
   sequence.h
   skip.h
+  exitloop.h
   typealias.h
   unsigneddatatype.h
   utype.h

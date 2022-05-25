@@ -80,7 +80,10 @@ using conversion::translator::TranslationException;
 using promela::model::Assignment;
 using promela::model::Conditional;
 using promela::model::Constant;
+using promela::model::DoLoop;
+using promela::model::ExitLoop;
 using promela::model::Expression;
+using promela::model::InlineCall;
 using promela::model::InlineDef;
 using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
@@ -341,17 +344,20 @@ void Asn1TypeValueGeneratorVisitor::visit(const Integer &type)
     }
 
     Conditional conditional;
-    IntegerGenerator generator(integerSubset.value());
 
-    while (generator.has_next()) {
-        int value = generator.next();
+    for (const auto &range : integerSubset.value().getRanges()) {
+        const auto rangeMin = range.first;
+        const auto rangeMax = range.second;
 
         std::unique_ptr<::promela::model::Sequence> nestedSequence =
                 std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
 
         nestedSequence->appendElement(std::make_unique<ProctypeElement>(Expression(VariableRef("true"))));
+
+        const QList<InlineCall::Argument> args({ VariableRef("value"), Constant(rangeMin), Constant(rangeMax) });
+
         nestedSequence->appendElement(
-                std::make_unique<ProctypeElement>(Assignment(VariableRef("value"), Expression(Constant(value)))));
+                std::make_unique<ProctypeElement>(InlineCall(getIntegerRangeGeneratorName(), args)));
 
         conditional.appendAlternative(std::move(nestedSequence));
     }
@@ -483,9 +489,59 @@ bool Asn1TypeValueGeneratorVisitor::modelContainsInlineGenerator(const QString &
     return false;
 }
 
-auto Asn1TypeValueGeneratorVisitor::isEmbeddedType(const Asn1Acn::Types::Type &type) -> bool
+bool Asn1TypeValueGeneratorVisitor::isEmbeddedType(const Asn1Acn::Types::Type &type)
 {
     return !type.label().contains(".");
+}
+
+QString Asn1TypeValueGeneratorVisitor::getIntegerRangeGeneratorName()
+{
+    return "generateIntegerFromRange";
+}
+
+void Asn1TypeValueGeneratorVisitor::ensureIntegerRangeGeneratorPresence()
+{
+    const auto name = getIntegerRangeGeneratorName();
+
+    if (!modelContainsInlineGenerator(name)) {
+        const QString valueArgumentName = "generated_value";
+        const QString minArgumentValue = "min_value";
+        const QString maxArgumentValue = "max_value";
+
+        const QStringList inlineArguments = { valueArgumentName, minArgumentValue, maxArgumentValue };
+        promela::model::Sequence sequence(promela::model::Sequence::Type::NORMAL);
+
+        sequence.appendElement(std::make_unique<ProctypeElement>(
+                Assignment(VariableRef(valueArgumentName), Expression(VariableRef(minArgumentValue)))));
+
+        DoLoop loop;
+        std::unique_ptr<::promela::model::Sequence> incSequence =
+                std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
+
+        Expression condition(model::BinaryExpression(model::BinaryExpression::Operator::LESS,
+                std::make_unique<Expression>(VariableRef(valueArgumentName)),
+                std::make_unique<Expression>(VariableRef(maxArgumentValue))));
+
+        sequence.appendElement(std::make_unique<ProctypeElement>(std::move(condition)));
+
+        Assignment assignment(VariableRef(valueArgumentName),
+                model::BinaryExpression(model::BinaryExpression::Operator::ADD,
+                        std::make_unique<Expression>(VariableRef(valueArgumentName)),
+                        std::make_unique<Expression>(Constant(1))));
+        sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assignment)));
+
+        loop.appendSequence(std::move(incSequence));
+        std::unique_ptr<::promela::model::Sequence> breakSequence =
+                std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
+        breakSequence->appendElement(std::make_unique<ProctypeElement>(::promela::model::ExitLoop()));
+        loop.appendSequence(std::move(breakSequence));
+
+        sequence.appendElement(std::make_unique<ProctypeElement>(std::move(loop)));
+
+        auto inlineDef = std::make_unique<InlineDef>(name, inlineArguments, std::move(sequence));
+
+        m_promelaModel.addInlineDef(std::move(inlineDef));
+    }
 }
 
 } // namespace promela::translator
