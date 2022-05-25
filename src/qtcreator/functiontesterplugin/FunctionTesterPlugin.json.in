@@ -1,0 +1,23 @@
+{
+    \"Name\" : \"FunctionTesterPlugin\",
+    \"Version\" : \"$$PLUGIN_VERSION\",
+    \"CompatVersion\" : \"$$QTCREATOR_COMPAT_VERSION\",
+    \"Vendor\" : \"N7 Space\",
+    \"Copyright\" : \"(C) 2021-2022 N7 Space sp. z o.o.\",
+    \"License\" : \"LGPL 2 or later\",
+    \"Category\" : \"Modeling\",
+    \"Description\" : \"Function Test Vector Importer for TASTE\",
+    \"Url\" : \"www.n7space.com",
+    $$dependencyList,
+
+    \"Mimetypes\" : \"
+        <?xml version='1.0' encoding='UTF-8'?>
+        <mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
+            <mime-type type='application/xml'>
+                <sub-class-of type='text/plain'/>
+                <comment>IV Model File</comment>
+                <glob pattern='*interfaceview.xml'/>
+            </mime-type>
+        </mime-info>
+        \"
+}
