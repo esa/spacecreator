@@ -59,6 +59,9 @@ configure_file(resources/choice.pml.out resources/choice.pml.out COPYONLY)
 configure_file(resources/choice-anonymous.asn resources/choice-anonymous.asn COPYONLY)
 configure_file(resources/choice-anonymous.pml.out resources/choice-anonymous.pml.out COPYONLY)
 
+configure_file(resources/choice-sub.asn resources/choice-sub.asn COPYONLY)
+configure_file(resources/choice-sub.pml.out resources/choice-sub.pml.out COPYONLY)
+
 configure_file(resources/octetstring.asn resources/octetstring.asn COPYONLY)
 configure_file(resources/octetstring.pml.out resources/octetstring.pml.out COPYONLY)
 

@@ -1,0 +1,39 @@
+#define ConcreteChoice_firstOption_PRESENT 1
+#define ConcreteChoice_thirdOption_PRESENT 3
+inline ConcreteChoice_firstOption_generate_value(value)
+{
+    if
+    ::  true;
+        value = 0;
+    ::  true;
+        value = 1;
+    ::  true;
+        value = 2;
+    fi;
+}
+inline ConcreteChoice_thirdOption_generate_value(value)
+{
+    if
+    ::  true;
+        value = 0;
+    ::  true;
+        value = 1;
+    ::  true;
+        value = 2;
+    ::  true;
+        value = 3;
+    ::  true;
+        value = 4;
+    fi;
+}
+inline ConcreteChoice_generate_value(value)
+{
+    if
+    ::  true;
+        ConcreteChoice_firstOption_generate_value(value.firstOption);
+        value.selection = ConcreteChoice_firstOption_PRESENT;
+    ::  true;
+        ConcreteChoice_thirdOption_generate_value(value.thirdOption);
+        value.selection = ConcreteChoice_thirdOption_PRESENT;
+    fi;
+}

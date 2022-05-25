@@ -47,6 +47,7 @@ private Q_SLOTS:
     void testSequenceOfNested() const;
     void testChoice() const;
     void testChoiceAnonymous() const;
+    void testChoiceSub() const;
     void testOctetString() const;
     void testOctetStringVariableSize() const;
     void testEnumerated() const;
