@@ -3,29 +3,17 @@
 inline SimpleChoiceWithAnonymousTypes_alt1_generate_value(value)
 {
     if
-    ::  true;
-        value = 0;
-    ::  true;
-        value = 1;
-    ::  true;
-        value = 2;
-    ::  true;
-        value = 3;
-    ::  true;
-        value = 4;
-    ::  true;
-        value = 5;
+    ::  atomic {
+        select (value : 0 .. 5);
+    }
    fi;
 }
 inline SimpleChoiceWithAnonymousTypes_alt2_generate_value(value)
 {
     if
-    ::  true;
-        value = -1;
-    ::  true;
-        value = 0;
-    ::  true;
-        value = 1;
+    ::  atomic {
+        select (value : -1 .. 1);
+    }
     fi;
 }
 inline SimpleChoiceWithAnonymousTypes_generate_value(value)

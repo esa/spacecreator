@@ -3,29 +3,17 @@
 inline Type1_generate_value(value)
 {
     if
-    ::  true;
-        value = 0;
-    ::  true;
-        value = 1;
-    ::  true;
-        value = 2;
-    ::  true;
-        value = 3;
+    ::  atomic {
+        select (value : 0 .. 3);
+    }
     fi;
 }
 inline Type2_generate_value(value)
 {
     if
-    ::  true;
-        value = 9;
-    ::  true;
-        value = 10;
-    ::  true;
-        value = 11;
-    ::  true;
-        value = 12;
-    ::  true;
-        value = 13;
+    ::  atomic {
+        select (value : 9 .. 13);
+    }
     fi;
 }
 inline SimpleChoice_generate_value(value)

@@ -1,25 +1,17 @@
 inline Type1_generate_value(value)
 {
     if
-    ::  true;
-        value = 0;
-    ::  true;
-        value = 1;
-    ::  true;
-        value = 2;
-    ::  true;
-        value = 3;
+    ::  atomic {
+        select (value : 0 .. 3);
+    }
     fi;
 }
 inline SimpleVariableSizeSequenceOf_length_generate_value(value)
 {
     if
-    ::  true;
-        value = 3;
-    ::  true;
-        value = 4;
-    ::  true;
-        value = 5;
+    ::  atomic {
+        select (value : 3 .. 5);
+    }
     fi;
 }
 inline SimpleVariableSizeSequenceOf_generate_value(value)
