@@ -1,29 +1,42 @@
 #define SimpleChoice_alt1_PRESENT 1
 #define SimpleChoice_alt2_PRESENT 2
-inline Type1_generate_value(value)
+inline Type1_generate_value(Type1_gv)
 {
     if
     ::  atomic {
-        select (value : 0 .. 3);
+        select (Type1_gv : 0 .. 3);
     }
     fi;
 }
-inline Type2_generate_value(value)
+inline Type2_generate_value(Type2_gv)
 {
     if
+<<<<<<< HEAD
     ::  atomic {
         select (value : 9 .. 13);
     }
+=======
+    ::  true;
+        Type2_gv = 9;
+    ::  true;
+        Type2_gv = 10;
+    ::  true;
+        Type2_gv = 11;
+    ::  true;
+        Type2_gv = 12;
+    ::  true;
+        Type2_gv = 13;
+>>>>>>> origin/master
     fi;
 }
-inline SimpleChoice_generate_value(value)
+inline SimpleChoice_generate_value(SimpleChoice_gv)
 {
     if
     ::  true;
-        Type1_generate_value(value.alt1);
-        value.selection = SimpleChoice_alt1_PRESENT;
+        Type1_generate_value(SimpleChoice_gv.alt1);
+        SimpleChoice_gv.selection = SimpleChoice_alt1_PRESENT;
     ::  true;
-        Type2_generate_value(value.alt2);
-        value.selection = SimpleChoice_alt2_PRESENT;
+        Type2_generate_value(SimpleChoice_gv.alt2);
+        SimpleChoice_gv.selection = SimpleChoice_alt2_PRESENT;
     fi;
 }

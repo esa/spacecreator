@@ -104,13 +104,15 @@ public:
      * @brief make ProctypeElement with a for loop with specified characteristics
      *
      * @param functionToCallName    function to be called in loop's body
+     * @param valueName             name of the accessed value
      * @param iteratorEndValue      last value of iterator (inclusive)
      * @param iteratorVariableName  name of iterator variable
      *
      * @return ProctypeElement with specified for loop
      */
-    static auto makeCallForEachValue(const QString &functionToCallName, const Expression &iteratorEndValue,
-            const QString &iteratorVariableName = "i") -> std::unique_ptr<ProctypeElement>;
+    static auto makeCallForEachValue(const QString &functionToCallName, const QString &valueName,
+            const Expression &iteratorEndValue, const QString &iteratorVariableName = "i")
+            -> std::unique_ptr<ProctypeElement>;
 };
 
 } // namespace promela::translator

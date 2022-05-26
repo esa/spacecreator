@@ -1,25 +1,25 @@
-inline Type1_generate_value(value)
+inline Type1_generate_value(Type1_gv)
 {
     if
     ::  atomic {
-        select (value : 0 .. 3);
+        select (Type1_gv : 0 .. 3);
     }
     fi;
 }
-inline SimpleVariableSizeSequenceOf_length_generate_value(value)
+inline SimpleVariableSizeSequenceOf_length_generate_value(SimpleVariableSizeSequenceOf_length_gv)
 {
     if
     ::  atomic {
-        select (value : 3 .. 5);
+        select (SimpleVariableSizeSequenceOf_length_gv : 3 .. 5);
     }
     fi;
 }
-inline SimpleVariableSizeSequenceOf_generate_value(value)
+inline SimpleVariableSizeSequenceOf_generate_value(SimpleVariableSizeSequenceOf_gv)
 {
     int i;
-    SimpleVariableSizeSequenceOf_length_generate_value(value.length);
-    for(i : 0 .. value.length - 1)
+    SimpleVariableSizeSequenceOf_length_generate_value(SimpleVariableSizeSequenceOf_gv.length);
+    for(i : 0 .. SimpleVariableSizeSequenceOf_gv.length - 1)
     {
-        Type1_generate_value(value.data[i]);
+        Type1_generate_value(SimpleVariableSizeSequenceOf_gv.data[i]);
     }
 }

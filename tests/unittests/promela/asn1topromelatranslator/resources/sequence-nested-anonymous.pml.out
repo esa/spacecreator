@@ -1,16 +1,16 @@
-inline Outer_sequence_memberSequence_memberInt_generate_value(value)
+inline Outer_sequence_memberSequence_memberInt_generate_value(Outer_sequence_memberSequence_memberInt_gv)
 {
     if
     ::  atomic {
-        select (value : 0 .. 10);
+        select (Outer_sequence_memberSequence_memberInt_gv : 0 .. 10);
     }
     fi;
 }
-inline Outer_sequence_memberSequence_generate_value(value)
+inline Outer_sequence_memberSequence_generate_value(Outer_sequence_memberSequence_gv)
 {
-    Outer_sequence_memberSequence_memberInt_generate_value(value.memberInt);
+    Outer_sequence_memberSequence_memberInt_generate_value(Outer_sequence_memberSequence_gv.memberInt);
 }
-inline Outer_sequence_generate_value(value)
+inline Outer_sequence_generate_value(Outer_sequence_gv)
 {
-    Outer_sequence_memberSequence_generate_value(value.memberSequence);
+    Outer_sequence_memberSequence_generate_value(Outer_sequence_gv.memberSequence);
 }

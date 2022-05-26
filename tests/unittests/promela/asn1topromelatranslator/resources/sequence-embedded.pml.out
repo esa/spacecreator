@@ -1,37 +1,56 @@
-inline EnvParamSeq_x_generate_value(value)
+inline EnvParamSeq_x_generate_value(EnvParamSeq_x_gv)
 {
     if
     ::  atomic {
-        select (value : 0 .. 9);
+        select (EnvParamSeq_x_gv : 0 .. 9);
     }
     fi;
 }
-inline EnvParamSeq_y_generate_value(value)
+inline EnvParamSeq_y_generate_value(EnvParamSeq_y_gv)
 {
     if
+<<<<<<< HEAD
     ::  atomic {
         select (value : 0 .. 7);
     }
+=======
+    ::  true;
+        EnvParamSeq_y_gv = 0;
+    ::  true;
+        EnvParamSeq_y_gv = 1;
+    ::  true;
+        EnvParamSeq_y_gv = 2;
+    ::  true;
+        EnvParamSeq_y_gv = 3;
+    ::  true;
+        EnvParamSeq_y_gv = 4;
+    ::  true;
+        EnvParamSeq_y_gv = 5;
+    ::  true;
+        EnvParamSeq_y_gv = 6;
+    ::  true;
+        EnvParamSeq_y_gv = 7;
+>>>>>>> origin/master
     fi;
 }
-inline EnvParamSeq_z_generate_value(value)
+inline EnvParamSeq_z_generate_value(EnvParamSeq_z_gv)
 {
     if
     ::  true;
-        value = 1;
+        EnvParamSeq_z_gv = 1;
     ::  true;
-        value = 0;
+        EnvParamSeq_z_gv = 0;
     fi;
 }
-inline EnvParamSeq_generate_value(value)
+inline EnvParamSeq_generate_value(EnvParamSeq_gv)
 {
-    EnvParamSeq_x_generate_value(value.x);
+    EnvParamSeq_x_generate_value(EnvParamSeq_gv.x);
     if
     ::  true;
-        EnvParamSeq_y_generate_value(value.y);
-        value.exist.y = 1;
+        EnvParamSeq_y_generate_value(EnvParamSeq_gv.y);
+        EnvParamSeq_gv.exist.y = 1;
     ::  true;
-        value.exist.y = 0;
+        EnvParamSeq_gv.exist.y = 0;
     fi;
-    EnvParamSeq_z_generate_value(value.z);
+    EnvParamSeq_z_generate_value(EnvParamSeq_gv.z);
 }

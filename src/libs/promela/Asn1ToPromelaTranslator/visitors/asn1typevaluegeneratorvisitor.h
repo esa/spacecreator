@@ -145,8 +145,7 @@ private:
     auto modelContainsInlineGenerator(const QString &inlineGeneratorName) -> bool;
     auto isEmbeddedType(const Asn1Acn::Types::Type &type) -> bool;
     auto getInlineGeneratorName(const QString &typeName) -> QString;
-    auto getIntegerRangeGeneratorName() -> QString;
-    auto ensureIntegerRangeGeneratorPresence() -> void;
+    auto getInlineArgumentName() -> QString;
 
 private:
     ::promela::model::PromelaModel &m_promelaModel;
