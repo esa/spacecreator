@@ -1,27 +1,27 @@
-inline INTEGER_generate_value(value)
+inline INTEGER_generate_value(INTEGER_gv)
 {
     if
     ::  true;
-        value = 0;
+        INTEGER_gv = 0;
     ::  true;
-        value = 1;
+        INTEGER_gv = 1;
     ::  true;
-        value = 2;
+        INTEGER_gv = 2;
     fi;
 }
-inline Type1_generate_value(value)
+inline Type1_generate_value(Type1_gv)
 {
     int i;
     for(i : 0 .. 2)
     {
-        INTEGER_generate_value(value.data[i]);
+        INTEGER_generate_value(Type1_gv.data[i]);
     }
 }
-inline SimpleFixedSizeSequenceOf_generate_value(value)
+inline SimpleFixedSizeSequenceOf_generate_value(SimpleFixedSizeSequenceOf_gv)
 {
     int i;
     for(i : 0 .. 3)
     {
-        Type1_generate_value(value.data[i]);
+        Type1_generate_value(SimpleFixedSizeSequenceOf_gv.data[i]);
     }
 }
