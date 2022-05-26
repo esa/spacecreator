@@ -130,12 +130,12 @@ auto FunctionTesterPlugin::addTestInterfaceOption() -> void
 {
     Context allContexts(Core::Constants::C_WELCOME_MODE, Core::Constants::C_EDIT_MODE, Core::Constants::C_DESIGN_MODE);
 
-    ActionContainer *const acToolsSeds = createActionContainerInTools(tr("&Test Interface"));
+    ActionContainer *const acToolsFunctionTester = createActionContainerInTools(tr("&Test Interface"));
 
     const auto csvImportAction = new QAction(tr("Import test vectors from CSV"), this);
     connect(csvImportAction, &QAction::triggered, [=]() { this->loadCsv(); });
     Command *const csvImport = ActionManager::registerAction(csvImportAction, Constants::CSV_IMPORT_ID, allContexts);
-    acToolsSeds->addAction(csvImport);
+    acToolsFunctionTester->addAction(csvImport);
 }
 
 auto FunctionTesterPlugin::createActionContainerInTools(const QString &title) -> ActionContainer *
@@ -154,16 +154,19 @@ auto FunctionTesterPlugin::createActionContainerInTools(const QString &title) ->
 auto FunctionTesterPlugin::loadCsv() -> void
 {
     const QString inputFilePath = QFileDialog::getOpenFileName(
-            nullptr, "Select CSV file to import test vectors from...", QString(), tr("*.csv"));
+            nullptr, tr("Select CSV file to import test vectors from..."), QString(), tr("*.csv"));
     if (inputFilePath.isEmpty()) {
         MessageManager::write(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
         return;
     }
 
-    conversion::Options options;
-    options.add(conversion::seds::SedsOptions::inputFilepath, inputFilePath);
-
-    // TODO: parse csv to a model
+    std::unique_ptr<csv::CsvModel> model;
+    try {
+        model = ModelLoader::loadCsvModel(inputFilePath);
+    } catch (std::exception &ex) {
+        MessageManager::write(GenMsg::msgError.arg(ex.what()));
+        return;
+    }
 
     MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesImported));
 }
