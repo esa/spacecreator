@@ -197,9 +197,8 @@ void tst_Asn1ToPromelaTranslator_Env::testInteger() const
     const Conditional &ifStatement = std::get<Conditional>(mainSequence.getContent().front()->getValue());
 
     QVERIFY(ifStatement.getAlternatives().size() == 1);
-    auto alternative = ifStatement.getAlternatives().begin();
 
-    const std::unique_ptr<Sequence> &nestedSequence = *alternative;
+    const std::unique_ptr<Sequence> &nestedSequence = ifStatement.getAlternatives().front();
     QCOMPARE(nestedSequence->getContent().size(), 1);
 
     QVERIFY(std::holds_alternative<Select>(nestedSequence->getContent().back()->getValue()));
