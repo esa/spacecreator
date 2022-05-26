@@ -19,21 +19,27 @@
 
 #include "valueassignmentvisitor.h"
 
+#include "asn1constraintvisitor.h"
 #include "sequencecomponentvaluevisitor.h"
 
 #include <asn1library/asn1/choicevalue.h>
+#include <asn1library/asn1/multiplevalue.h>
 #include <asn1library/asn1/namedvalue.h>
 #include <asn1library/asn1/singlevalue.h>
 #include <asn1library/asn1/types/choice.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/sequence.h>
+#include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
+#include <asn1library/asn1/values.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/converter/exceptions.h>
 #include <iostream>
 #include <promela/PromelaModel/proctypeelement.h>
 
 using Asn1Acn::ChoiceValue;
+using Asn1Acn::IntegerValue;
+using Asn1Acn::MultipleValue;
 using Asn1Acn::NamedValue;
 using Asn1Acn::SingleValue;
 using Asn1Acn::Value;
@@ -179,8 +185,33 @@ void ValueAssignmentVisitor::visit(const Sequence &type)
 
 void ValueAssignmentVisitor::visit(const SequenceOf &type)
 {
-    Q_UNUSED(type);
-    throw ConverterException("Value generation is not implemented for SEQUENCE OF datatype");
+    if (m_value->typeEnum() != Value::MULTIPLE_VALUE) {
+        throw ConverterException("Invalid value for SEQUENCEOF datatype");
+    }
+
+    Asn1ConstraintVisitor<IntegerValue> constraintVisitor;
+    type.constraints().accept(constraintVisitor);
+
+    const auto multipleValue = dynamic_cast<const MultipleValue *>(m_value);
+    const auto &values = multipleValue->values();
+    const auto valuesCount = values.size();
+
+    for (std::size_t i = 0; i < valuesCount; ++i) {
+        const auto &value = values[i];
+        auto target = m_target;
+        target.appendElement("data", std::make_unique<Expression>(Constant(i)));
+
+        ValueAssignmentVisitor visitor(value.get(), m_sequence, target, type.itemsType()->identifier());
+        type.itemsType()->accept(visitor);
+    }
+
+    if (constraintVisitor.getMaxSize() != constraintVisitor.getMinSize()) {
+        auto target = m_target;
+        target.appendElement("length");
+
+        auto assignment = Assignment(target, Expression(Constant(valuesCount)));
+        m_sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assignment)));
+    }
 }
 
 void ValueAssignmentVisitor::visit(const Real &type)
