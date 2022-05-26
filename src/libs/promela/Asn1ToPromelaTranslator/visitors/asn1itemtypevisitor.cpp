@@ -452,21 +452,7 @@ void Asn1ItemTypeVisitor::visit(const Integer &type)
 
 void Asn1ItemTypeVisitor::visit(const UserdefinedType &type)
 {
-    const QString typeName = constructTypeName(m_name);
-    const auto escapedTypeName = Escaper::escapePromelaName(type.typeName());
-    m_promelaModel.addTypeAlias(TypeAlias(typeName, UtypeRef(escapedTypeName)));
-    m_resultDataType = DataType(UtypeRef(typeName));
-
-    model::Sequence sequence(model::Sequence::Type::NORMAL);
-
-    const QString inlineName = escapedTypeName + assignValueInlineSuffix;
-    QList<InlineCall::Argument> inlineArguments;
-    inlineArguments.append(VariableRef("dst"));
-    inlineArguments.append(VariableRef("src"));
-
-    sequence.appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineName, inlineArguments)));
-
-    addAssignValueInline(typeName, std::move(sequence));
+    type.type()->accept(*this);
 }
 
 QString Asn1ItemTypeVisitor::constructTypeName(QString name)
