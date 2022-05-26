@@ -1,10 +1,12 @@
 inline EnvIntParam_generate_value(EnvIntParam_gv)
 {
+    int EnvIntParam_tmp;
     if
     ::  atomic {
-        select (EnvIntParam_gv : 0 .. 9);
+        select (EnvIntParam_tmp : 0 .. 9);
     }
     fi;
+    EnvIntParam_gv = EnvIntParam_tmp;
 }
 inline EnvBoolParam_generate_value(EnvBoolParam_gv)
 {
