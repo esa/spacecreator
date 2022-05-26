@@ -2,7 +2,7 @@ inline INTEGER_generate_value(INTEGER_gv)
 {
     if
     ::  atomic {
-        select (INTEGER_gv : 0 .. 3);
+        select (INTEGER_gv : 0 .. 2);
     }
     fi;
 }
