@@ -63,8 +63,8 @@ using promela::model::VariableRef;
 
 namespace promela::translator {
 ValueAssignmentVisitor::ValueAssignmentVisitor(
-        ValuePtr value, ::promela::model::Sequence &sequence, const VariableRef &target, QString typeName)
-    : m_value(std::move(value))
+        Value *value, ::promela::model::Sequence &sequence, const VariableRef &target, QString typeName)
+    : m_value(value)
     , m_sequence(sequence)
     , m_target(target)
     , m_typeName(std::move(typeName))
@@ -77,7 +77,7 @@ void ValueAssignmentVisitor::visit(const Boolean &type)
     if (m_value->typeEnum() != Value::SINGLE_VALUE) {
         throw ConverterException("Invalid value for BOOLEAN datatype");
     }
-    const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value.get());
+    const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value);
 
     int value = singleValue->value().compare("true", Qt::CaseInsensitive) == 0 ? 1 : 0;
 
@@ -124,7 +124,7 @@ void ValueAssignmentVisitor::visit(const Enumerated &type)
     if (m_value->typeEnum() != Value::SINGLE_VALUE) {
         throw ConverterException("Invalid value for ENUMERATED datatype");
     }
-    const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value.get());
+    const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value);
     Q_UNUSED(type);
 
     const QString value = QString("%1_%2")
@@ -144,7 +144,7 @@ void ValueAssignmentVisitor::visit(const Choice &type)
     if (m_value->typeEnum() != Value::CHOICE_VALUE) {
         throw ConverterException("Invalid value for Choice datatype");
     }
-    const ChoiceValue *choiceValue = dynamic_cast<const ChoiceValue *>(m_value.get());
+    const ChoiceValue *choiceValue = dynamic_cast<const ChoiceValue *>(m_value);
 
     const auto escapedTypeName = Escaper::escapePromelaName(m_typeName);
     const auto escapedSelectionName = Escaper::escapePromelaName(choiceValue->name());
@@ -160,7 +160,7 @@ void ValueAssignmentVisitor::visit(const Choice &type)
     m_sequence.appendElement(std::make_unique<ProctypeElement>(Assignment(selectionMember, selectionValue)));
 
     auto component = type.component(choiceValue->name());
-    ValueAssignmentVisitor visitor(choiceValue->value()->clone(), m_sequence, dataMember,
+    ValueAssignmentVisitor visitor(choiceValue->value().get(), m_sequence, dataMember,
             QString("%1_%2").arg(escapedTypeName).arg(escapedSelectionName));
     component->type()->accept(visitor);
 }
@@ -170,7 +170,7 @@ void ValueAssignmentVisitor::visit(const Sequence &type)
     if (m_value->typeEnum() != Value::NAMED_VALUE) {
         throw ConverterException("Invalid value for SEQUENCE datatype");
     }
-    const NamedValue *namedValue = dynamic_cast<const NamedValue *>(m_value.get());
+    const NamedValue *namedValue = dynamic_cast<const NamedValue *>(m_value);
     for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : type.components()) {
         SequenceComponentValueVisitor visitor(namedValue, m_sequence, m_target, m_typeName);
         component->accept(visitor);
@@ -199,9 +199,9 @@ void ValueAssignmentVisitor::visit(const Integer &type)
 {
     Q_UNUSED(type);
     if (m_value->typeEnum() != Value::SINGLE_VALUE) {
-        throw ConverterException("Invalid value for SEQUENCE datatype");
+        throw ConverterException("Invalid value for INTEGER datatype");
     }
-    const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value.get());
+    const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value);
     int value = singleValue->value().toInt();
 
     const QString inlineCallName = QString("%1_assign_value").arg(Escaper::escapePromelaName(m_typeName));
@@ -214,7 +214,7 @@ void ValueAssignmentVisitor::visit(const Integer &type)
 
 void ValueAssignmentVisitor::visit(const UserdefinedType &type)
 {
-    ValueAssignmentVisitor visitor(m_value->clone(), m_sequence, m_target, type.typeName());
+    ValueAssignmentVisitor visitor(m_value, m_sequence, m_target, type.typeName());
 
     type.type()->accept(visitor);
 }

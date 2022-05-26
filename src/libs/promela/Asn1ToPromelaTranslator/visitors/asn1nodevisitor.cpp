@@ -89,7 +89,7 @@ void Asn1NodeVisitor::visit(const ValueAssignment &value)
         Sequence initInlineSequence(Sequence::Type::D_STEP);
 
         VariableRef target(valueName);
-        ValueAssignmentVisitor visitor(value.value()->clone(), initInlineSequence, target, typeName);
+        ValueAssignmentVisitor visitor(value.value().get(), initInlineSequence, target, typeName);
 
         value.type()->accept(visitor);
 

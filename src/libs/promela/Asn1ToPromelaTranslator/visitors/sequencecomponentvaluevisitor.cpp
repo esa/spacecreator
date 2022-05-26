@@ -82,7 +82,7 @@ void SequenceComponentValueVisitor::visit(const AsnSequenceComponent &component)
     m_target.appendElement(Escaper::escapePromelaName(componentName));
 
     ValueAssignmentVisitor visitor(
-            iter->second->clone(), m_sequence, m_target, QString("%1_%2").arg(m_sequenceTypeName).arg(componentName));
+            iter->second.get(), m_sequence, m_target, QString("%1_%2").arg(m_sequenceTypeName).arg(componentName));
 
     component.type()->accept(visitor);
 }
