@@ -55,14 +55,14 @@ public:
      *
      * @return First Expression in range.
      */
-    Expression getFirstExpression() const;
+    const Expression &getFirstExpression() const;
 
     /**
      * @brief Getter for last Expression of range.
      *
      * @return Last Expression in range.
      */
-    Expression getLastExpression() const;
+    const Expression &getLastExpression() const;
 
     /**
      * @brief Getter for first value of range if it is a constant.

@@ -39,12 +39,12 @@ const VariableRef &Select::getRecipientVariable() const noexcept
     return m_variable;
 }
 
-Expression Select::getFirstExpression() const
+const Expression &Select::getFirstExpression() const
 {
     return m_range.first;
 }
 
-Expression Select::getLastExpression() const
+const Expression &Select::getLastExpression() const
 {
     return m_range.second;
 }
