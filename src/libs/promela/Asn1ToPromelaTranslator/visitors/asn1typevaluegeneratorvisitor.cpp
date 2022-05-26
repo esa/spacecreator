@@ -340,6 +340,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Integer &type)
     type.constraints().accept(constraintVisitor);
 
     const auto valueVariableName = getInlineArgumentName();
+    const auto tempName = Escaper::escapePromelaName(QString("%1_tmp").arg(m_name));
     std::optional<IntegerSubset> integerSubset = constraintVisitor.getResultSubset();
 
     if (!integerSubset.has_value()) {
@@ -356,13 +357,16 @@ void Asn1TypeValueGeneratorVisitor::visit(const Integer &type)
 
         std::unique_ptr<::promela::model::Sequence> nestedSequence =
                 std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::ATOMIC);
-        nestedSequence->appendElement(std::make_unique<ProctypeElement>(Select(
-                VariableRef(valueVariableName), Expression(Constant(rangeMin)), Expression(Constant(rangeMax)))));
+        nestedSequence->appendElement(std::make_unique<ProctypeElement>(
+                Select(VariableRef(tempName), Expression(Constant(rangeMin)), Expression(Constant(rangeMax)))));
         conditional.appendAlternative(std::move(nestedSequence));
     }
 
     ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    sequence.appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, tempName));
     sequence.appendElement(std::make_unique<ProctypeElement>(std::move(conditional)));
+    sequence.appendElement(std::make_unique<ProctypeElement>(
+            Assignment(VariableRef(valueVariableName), Expression(VariableRef(tempName)))));
 
     createValueGenerationInline(std::move(sequence));
 }

@@ -22,16 +22,16 @@ package body Lock is
    procedure RemoteWantsToEnter(p1: in out asn1SccT_Boolean) is
       begin
          case ctxt.state is
-            when asn1Sccwriting =>
+            when asn1Sccwait_nocontention =>
+               ctxt.remotewantstoenter := p1;
+               Execute_Transition (4);
+            when asn1Sccidle =>
                ctxt.remotewantstoenter := p1;
                Execute_Transition (4);
             when asn1Sccwait_turn =>
                ctxt.remotewantstoenter := p1;
                Execute_Transition (4);
-            when asn1Sccwait_nocontention =>
-               ctxt.remotewantstoenter := p1;
-               Execute_Transition (4);
-            when asn1Sccidle =>
+            when asn1Sccwriting =>
                ctxt.remotewantstoenter := p1;
                Execute_Transition (4);
             when others =>
@@ -56,11 +56,11 @@ package body Lock is
       trId : Integer := Id;
       Message_Pending : Asn1Boolean := True;
       tmp39 : asn1SccT_Boolean;
-      tmp67 : asn1SccT_Boolean;
-      tmp72 : asn1SccT_Boolean;
-      --  !! stack: _call_external_function line 1440
-      tmp79 : asn1SccT_Boolean;
       tmp53 : asn1SccT_Boolean;
+      --  !! stack: _call_external_function line 1440
+      tmp72 : asn1SccT_Boolean;
+      tmp79 : asn1SccT_Boolean;
+      tmp67 : asn1SccT_Boolean;
       begin
          while (trId /= -1) loop
             case trId is
@@ -197,6 +197,14 @@ package body Lock is
             if Message_Pending or trId /= -1 then
                goto Next_Transition;
             end if;
+            if ctxt.State = asn1Sccwait_nocontention then
+               --  Priority: 1
+               --  DECISION remoteWantsToEnter = false (90,36)
+               --  ANSWER true (None,None)
+               if ((ctxt.remoteWantsToEnter = false)) then
+                  trId := 5;
+               end if;
+            end if;
             if ctxt.State = asn1Sccwriting then
                --  Priority: 1
                --  DECISION writeCount < writeSize (31,28)
@@ -208,14 +216,6 @@ package body Lock is
                   --  ANSWER true (None,None)
                elsif ((ctxt.writeCount >= ctxt.writeSize)) then
                   trId := 2;
-               end if;
-            end if;
-            if ctxt.State = asn1Sccwait_nocontention then
-               --  Priority: 1
-               --  DECISION remoteWantsToEnter = false (90,36)
-               --  ANSWER true (None,None)
-               if ((ctxt.remoteWantsToEnter = false)) then
-                  trId := 5;
                end if;
             end if;
             <<Next_Transition>>

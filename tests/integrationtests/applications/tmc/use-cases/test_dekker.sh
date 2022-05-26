@@ -10,7 +10,6 @@ CC=gcc
 DIFF="diff -w -B"
 TEST_OUTPUT_DIR=output
 RESOURCE_DIR=resources/dekker1
-PROPERTIES_DIR=$RESOURCE_DIR/work/modelchecking/properties
 
 echo "Running TMC test: ${0##*/}'"
 
@@ -22,10 +21,13 @@ mkdir $TEST_OUTPUT_DIR
 $TMC -iv $RESOURCE_DIR/interfaceview.xml \
     -o $TEST_OUTPUT_DIR
 
+# Compile the actual Spin model checker. This tests
+# whether all the features are supported, and that 
+# one feature does not interfere with another.
+# The model is not checked, as it would take a huge amounth of time,
+# potentially infinite given no signal generation optimizations.
+# Checking could be added in the future, once the optimizations
+# are implemented.
 cd $TEST_OUTPUT_DIR \
     && $SPIN -a system.pml \
-    && $CC -DVECTORSZ=65536 -o system.out pan.c \
-    && ./system.out -m1000000 -a -n > system.output
-#    && grep -q "errors: 0" system.output \
-#    && cd .. \
-#    && rm -r $TEST_OUTPUT_DIR
+    && $CC -DVECTORSZ=65536 -o system.out pan.c
