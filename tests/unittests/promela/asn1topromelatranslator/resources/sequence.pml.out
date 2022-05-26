@@ -1,46 +1,46 @@
-inline EnvIntParam_generate_value(value)
+inline EnvIntParam_generate_value(EnvIntParam_gv)
 {
     if
     ::  true;
-        value = 0;
+        EnvIntParam_gv = 0;
     ::  true;
-        value = 1;
+        EnvIntParam_gv = 1;
     ::  true;
-        value = 2;
+        EnvIntParam_gv = 2;
     ::  true;
-        value = 3;
+        EnvIntParam_gv = 3;
     ::  true;
-        value = 4;
+        EnvIntParam_gv = 4;
     ::  true;
-        value = 5;
+        EnvIntParam_gv = 5;
     ::  true;
-        value = 6;
+        EnvIntParam_gv = 6;
     ::  true;
-        value = 7;
+        EnvIntParam_gv = 7;
     ::  true;
-        value = 8;
+        EnvIntParam_gv = 8;
     ::  true;
-        value = 9;
+        EnvIntParam_gv = 9;
     fi;
 }
-inline EnvBoolParam_generate_value(value)
+inline EnvBoolParam_generate_value(EnvBoolParam_gv)
 {
     if
     ::  true;
-        value = 1;
+        EnvBoolParam_gv = 1;
     ::  true;
-        value = 0;
+        EnvBoolParam_gv = 0;
     fi;
 }
-inline EnvParamSeq_generate_value(value)
+inline EnvParamSeq_generate_value(EnvParamSeq_gv)
 {
-    EnvIntParam_generate_value(value.x);
+    EnvIntParam_generate_value(EnvParamSeq_gv.x);
     if
     ::  true;
-        EnvIntParam_generate_value(value.y);
-        value.exist.y = 1;
+        EnvIntParam_generate_value(EnvParamSeq_gv.y);
+        EnvParamSeq_gv.exist.y = 1;
     ::  true;
-        value.exist.y = 0;
+        EnvParamSeq_gv.exist.y = 0;
     fi;
-    EnvBoolParam_generate_value(value.z);
+    EnvBoolParam_generate_value(EnvParamSeq_gv.z);
 }

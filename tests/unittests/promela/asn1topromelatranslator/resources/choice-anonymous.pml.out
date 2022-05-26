@@ -1,41 +1,41 @@
 #define SimpleChoiceWithAnonymousTypes_alt1_PRESENT 1
 #define SimpleChoiceWithAnonymousTypes_alt2_PRESENT 2
-inline SimpleChoiceWithAnonymousTypes_alt1_generate_value(value)
+inline SimpleChoiceWithAnonymousTypes_alt1_generate_value(SimpleChoiceWithAnonymousTypes_alt1_gv)
 {
     if
     ::  true;
-        value = 0;
+        SimpleChoiceWithAnonymousTypes_alt1_gv = 0;
     ::  true;
-        value = 1;
+        SimpleChoiceWithAnonymousTypes_alt1_gv = 1;
     ::  true;
-        value = 2;
+        SimpleChoiceWithAnonymousTypes_alt1_gv = 2;
     ::  true;
-        value = 3;
+        SimpleChoiceWithAnonymousTypes_alt1_gv = 3;
     ::  true;
-        value = 4;
+        SimpleChoiceWithAnonymousTypes_alt1_gv = 4;
     ::  true;
-        value = 5;
+        SimpleChoiceWithAnonymousTypes_alt1_gv = 5;
    fi;
 }
-inline SimpleChoiceWithAnonymousTypes_alt2_generate_value(value)
+inline SimpleChoiceWithAnonymousTypes_alt2_generate_value(SimpleChoiceWithAnonymousTypes_alt2_gv)
 {
     if
     ::  true;
-        value = -1;
+        SimpleChoiceWithAnonymousTypes_alt2_gv = -1;
     ::  true;
-        value = 0;
+        SimpleChoiceWithAnonymousTypes_alt2_gv = 0;
     ::  true;
-        value = 1;
+        SimpleChoiceWithAnonymousTypes_alt2_gv = 1;
     fi;
 }
-inline SimpleChoiceWithAnonymousTypes_generate_value(value)
+inline SimpleChoiceWithAnonymousTypes_generate_value(SimpleChoiceWithAnonymousTypes_gv)
 {
     if
     ::  true;
-        SimpleChoiceWithAnonymousTypes_alt1_generate_value(value.alt1);
-        value.selection = SimpleChoiceWithAnonymousTypes_alt1_PRESENT;
+        SimpleChoiceWithAnonymousTypes_alt1_generate_value(SimpleChoiceWithAnonymousTypes_gv.alt1);
+        SimpleChoiceWithAnonymousTypes_gv.selection = SimpleChoiceWithAnonymousTypes_alt1_PRESENT;
     ::  true;
-        SimpleChoiceWithAnonymousTypes_alt2_generate_value(value.alt2);
-        value.selection = SimpleChoiceWithAnonymousTypes_alt2_PRESENT;
+        SimpleChoiceWithAnonymousTypes_alt2_generate_value(SimpleChoiceWithAnonymousTypes_gv.alt2);
+        SimpleChoiceWithAnonymousTypes_gv.selection = SimpleChoiceWithAnonymousTypes_alt2_PRESENT;
     fi;
 }
