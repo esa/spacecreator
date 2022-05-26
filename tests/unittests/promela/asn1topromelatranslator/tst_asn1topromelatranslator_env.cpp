@@ -190,11 +190,16 @@ void tst_Asn1ToPromelaTranslator_Env::testInteger() const
     const QString &argName = inlineDef->getArguments().front();
 
     const Sequence &mainSequence = inlineDef->getSequence();
-    QCOMPARE(mainSequence.getContent().size(), 1);
+    QCOMPARE(mainSequence.getContent().size(), 3);
 
-    QVERIFY(std::holds_alternative<Conditional>(mainSequence.getContent().front()->getValue()));
+    auto statement = mainSequence.getContent().begin();
 
-    const Conditional &ifStatement = std::get<Conditional>(mainSequence.getContent().front()->getValue());
+    QVERIFY(std::holds_alternative<Declaration>((*statement)->getValue()));
+    // We are checking in detail just the second statement, which holds the actual logic
+    statement++;
+    QVERIFY(std::holds_alternative<Conditional>((*statement)->getValue()));
+
+    const Conditional &ifStatement = std::get<Conditional>((*statement)->getValue());
 
     QCOMPARE(ifStatement.getAlternatives().size(), 1);
 
@@ -212,6 +217,8 @@ void tst_Asn1ToPromelaTranslator_Env::testInteger() const
 
     QVERIFY(selection.getFirstIntValue() == 0);
     QVERIFY(selection.getLastIntValue() == 3);
+    statement++;
+    QVERIFY(std::holds_alternative<Assignment>((*statement)->getValue()));
 }
 
 void tst_Asn1ToPromelaTranslator_Env::testEnumerated() const
