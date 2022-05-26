@@ -19,37 +19,11 @@
 
 #pragma once
 
-#include <QObject>
-#include <QtTest>
-#include <asn1library/asn1/asn1model.h>
-#include <memory>
-
-using Asn1Acn::Definitions;
-
-namespace tmc::test {
-
-class tst_Asn1ToPromelaTranslator_Env : public QObject
+namespace promela::model {
+/**
+ * @brief Representation of break statement in promela; ExitLoop name was chosen to avoid conflicts
+ */
+class ExitLoop
 {
-    Q_OBJECT
-
-private Q_SLOTS:
-    void initTestCase();
-    void cleanupTestCase();
-
-    void testBoolean() const;
-    void testInteger() const;
-    void testSequence() const;
-    void testSequenceEmbeddedType() const;
-    void testSequenceNested() const;
-    void testSequenceNestedAnonymous() const;
-    void testSequenceOf() const;
-    void testSequenceOfVariableSize() const;
-    void testSequenceOfNested() const;
-    void testChoice() const;
-    void testChoiceAnonymous() const;
-    void testEnumerated() const;
-
-private:
-    std::unique_ptr<Definitions> createModel() const;
 };
 }

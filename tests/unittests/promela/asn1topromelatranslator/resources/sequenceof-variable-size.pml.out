@@ -1,25 +1,17 @@
 inline Type1_generate_value(Type1_gv)
 {
     if
-    ::  true;
-        Type1_gv = 0;
-    ::  true;
-        Type1_gv = 1;
-    ::  true;
-        Type1_gv = 2;
-    ::  true;
-        Type1_gv = 3;
+    ::  atomic {
+        select (Type1_gv : 0 .. 3);
+    }
     fi;
 }
 inline SimpleVariableSizeSequenceOf_length_generate_value(SimpleVariableSizeSequenceOf_length_gv)
 {
     if
-    ::  true;
-        SimpleVariableSizeSequenceOf_length_gv = 3;
-    ::  true;
-        SimpleVariableSizeSequenceOf_length_gv = 4;
-    ::  true;
-        SimpleVariableSizeSequenceOf_length_gv = 5;
+    ::  atomic {
+        select (SimpleVariableSizeSequenceOf_length_gv : 3 .. 5);
+    }
     fi;
 }
 inline SimpleVariableSizeSequenceOf_generate_value(SimpleVariableSizeSequenceOf_gv)

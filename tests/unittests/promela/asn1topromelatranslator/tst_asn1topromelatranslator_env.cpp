@@ -82,6 +82,7 @@ using promela::model::Expression;
 using promela::model::InlineCall;
 using promela::model::InlineDef;
 using promela::model::PromelaModel;
+using promela::model::Select;
 using promela::model::Sequence;
 using promela::model::VariableRef;
 using promela::translator::Asn1NodeValueGeneratorVisitor;
@@ -195,26 +196,22 @@ void tst_Asn1ToPromelaTranslator_Env::testInteger() const
 
     const Conditional &ifStatement = std::get<Conditional>(mainSequence.getContent().front()->getValue());
 
-    auto iter = ifStatement.getAlternatives().begin();
-    for (int i = 0; i < 4; ++i) {
-        QVERIFY(iter != ifStatement.getAlternatives().end());
-        const std::unique_ptr<Sequence> &nestedSequence = *iter;
-        ++iter;
-        QCOMPARE(nestedSequence->getContent().size(), 2);
+    QCOMPARE(ifStatement.getAlternatives().size(), 1);
 
-        QVERIFY(std::holds_alternative<Assignment>(nestedSequence->getContent().back()->getValue()));
-        const Assignment &assignment = std::get<Assignment>(nestedSequence->getContent().back()->getValue());
-        const VariableRef &variableRef = assignment.getVariableRef();
+    const std::unique_ptr<Sequence> &nestedSequence = ifStatement.getAlternatives().front();
+    QCOMPARE(nestedSequence->getContent().size(), 1);
 
-        const std::list<VariableRef::Element> &variableRefElements = variableRef.getElements();
-        QCOMPARE(variableRefElements.size(), 1);
-        QCOMPARE(variableRefElements.front().m_name, argName);
-        QVERIFY(variableRefElements.front().m_index.get() == nullptr);
+    QVERIFY(std::holds_alternative<Select>(nestedSequence->getContent().back()->getValue()));
+    const Select &selection = std::get<Select>(nestedSequence->getContent().back()->getValue());
+    const VariableRef &variableRef = selection.getRecipientVariable();
 
-        QVERIFY(std::holds_alternative<Constant>(assignment.getExpression().getContent()));
-        const Constant &constant = std::get<Constant>(assignment.getExpression().getContent());
-        QCOMPARE(constant.getValue(), i);
-    }
+    const std::list<VariableRef::Element> &variableRefElements = variableRef.getElements();
+    QCOMPARE(variableRefElements.size(), 1);
+    QCOMPARE(variableRefElements.front().m_name, argName);
+    QVERIFY(variableRefElements.front().m_index.get() == nullptr);
+
+    QVERIFY(selection.getFirstIntValue() == 0);
+    QVERIFY(selection.getLastIntValue() == 3);
 }
 
 void tst_Asn1ToPromelaTranslator_Env::testEnumerated() const
@@ -348,6 +345,19 @@ void tst_Asn1ToPromelaTranslator_Env::testSequenceOfVariableSize() const
         "SimpleVariableSizeSequenceOf",
     };
     const QString actualOutputFilename = "sequenceof-variable-size.pml";
+    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
+
+    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
+    compareTextFiles(actualOutputFilename, expectedOutputFilename);
+}
+
+void tst_Asn1ToPromelaTranslator_Env::testSequenceOfNested() const
+{
+    const QString inputAsnFilename = "sequenceof-nested.asn";
+    const QStringList asnTypesToTranslate = {
+        "SimpleFixedSizeSequenceOf",
+    };
+    const QString actualOutputFilename = "sequenceof-nested.pml";
     const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
 
     translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);

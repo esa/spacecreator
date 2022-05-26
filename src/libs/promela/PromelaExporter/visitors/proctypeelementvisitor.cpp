@@ -33,10 +33,12 @@ using promela::model::ChannelSend;
 using promela::model::Conditional;
 using promela::model::Declaration;
 using promela::model::DoLoop;
+using promela::model::ExitLoop;
 using promela::model::Expression;
 using promela::model::ForLoop;
 using promela::model::InlineCall;
 using promela::model::ProctypeElement;
+using promela::model::Select;
 using promela::model::Sequence;
 using promela::model::Skip;
 using promela::model::VariableRef;
@@ -152,6 +154,13 @@ void ProctypeElementVisitor::operator()(const Skip &skip)
     m_stream << "skip;\n";
 }
 
+void ProctypeElementVisitor::operator()(const ExitLoop &exitLoop)
+{
+    Q_UNUSED(exitLoop);
+    m_stream << m_indent;
+    m_stream << "break;\n";
+}
+
 void ProctypeElementVisitor::operator()(const Conditional &conditional)
 {
     m_stream << m_indent << "if\n";
@@ -198,6 +207,18 @@ void ProctypeElementVisitor::operator()(const ForLoop &loop)
     m_stream << m_indent << visitor.getSequencePrefix(*loop.getSequence()) << "{\n";
     visitor.visit(*loop.getSequence(), false);
     m_stream << m_indent << "}\n";
+}
+
+void ProctypeElementVisitor::operator()(const Select &select)
+{
+    VariableRefVisitor variableRefVisitor(m_stream);
+
+    m_stream << m_indent << "select (";
+    variableRefVisitor.visit(select.getRecipientVariable());
+
+    const QString beginExpr = expressionContentToString(select.getFirstExpression());
+    const QString endExpr = expressionContentToString(select.getLastExpression());
+    m_stream << " : " << beginExpr << " .. " << endExpr << ");\n";
 }
 
 QString ProctypeElementVisitor::expressionContentToString(const ::promela::model::Expression &expression)
