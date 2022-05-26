@@ -27,6 +27,8 @@
 #include <promela/PromelaModel/proctypeelement.h>
 #include <promela/PromelaModel/promelamodel.h>
 
+using promela::model::Expression;
+
 namespace promela::translator {
 
 /**
@@ -133,6 +135,20 @@ public:
     void visit(const ::Asn1Acn::Types::UserdefinedType &type) override;
 
 private:
+    class InlineDefAdder final
+    {
+    public:
+        static const QString lengthMemberName;
+        static const QString octetGeneratorName;
+
+        static void addOctetGeneratorToModel(model::PromelaModel &model);
+
+        static QString addTypeLengthGeneratorToModel(
+                const QString &typeName, model::PromelaModel &model, long minSize, long maxSize);
+
+        static Expression getValueLenghtMinusConstAsExpression(const QString &valueVariableName, int x);
+    };
+
     auto createValueGenerationInline(::promela::model::Sequence sequence) -> void;
     auto getAsnSequenceComponentType(Asn1Acn::AsnSequenceComponent *component) -> Asn1Acn::Types::Type *;
     auto getChoiceComponentType(Asn1Acn::Types::ChoiceAlternative *component) -> Asn1Acn::Types::Type *;
