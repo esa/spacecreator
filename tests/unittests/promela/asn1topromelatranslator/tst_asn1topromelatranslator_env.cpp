@@ -212,7 +212,8 @@ void tst_Asn1ToPromelaTranslator_Env::testInteger() const
 
     const std::list<VariableRef::Element> &variableRefElements = variableRef.getElements();
     QCOMPARE(variableRefElements.size(), 1);
-    QCOMPARE(variableRefElements.front().m_name, argName);
+    QString variableName = variableRefElements.front().m_name;
+    QCOMPARE(variableName.replace("tmp", "gv"), argName);
     QVERIFY(variableRefElements.front().m_index.get() == nullptr);
 
     QVERIFY(selection.getFirstIntValue() == 0);
