@@ -117,6 +117,12 @@ public:
      * @param loop ForLoop to export
      */
     void operator()(const ::promela::model::ForLoop &loop);
+    /**
+     * @brief Handle select
+     *
+     * @param select Select to export
+     */
+    void operator()(const ::promela::model::Select &select);
 
 private:
     QString expressionContentToString(const ::promela::model::Expression &expression);
