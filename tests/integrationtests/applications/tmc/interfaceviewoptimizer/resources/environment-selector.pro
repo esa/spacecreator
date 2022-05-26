@@ -2,8 +2,7 @@ TEMPLATE = lib
 CONFIG -= qt
 CONFIG += generateC
 
-DISTFILES +=  $(HOME)/tool-inst/share/taste-types/taste-types.asn \
-    deploymentview.dv.xml
+DISTFILES +=  $(HOME)/tool-inst/share/taste-types/taste-types.asn
 DISTFILES += environment-selector.asn
 DISTFILES += environment-selector.acn
 DISTFILES += environment-selector.msc

@@ -117,17 +117,17 @@ std::unique_ptr<ivm::IVModel> tst_InterfaceViewOptimizer::importIvModel(const QS
     ivm::IVXMLReader reader;
 
     const bool ok = reader.readFile(filepath);
-    if (ok) {
-        auto model = std::make_unique<ivm::IVModel>(m_dynPropConfig);
-        model->initFromObjects(reader.parsedObjects());
-        return model;
-    } else {
-        qWarning() << "Cannot read file " << filepath;
+    if (!ok) {
+        return nullptr;
     }
 
-    return {};
+    auto model = std::make_unique<ivm::IVModel>(m_dynPropConfig);
+    model->initFromObjects(reader.parsedObjects());
+    return model;
 }
-}
+
+} // namespace tmc::test
+
 QTEST_MAIN(tmc::test::tst_InterfaceViewOptimizer)
 
 #include "tst_interfaceviewoptimizer.moc"

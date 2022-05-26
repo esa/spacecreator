@@ -69,12 +69,19 @@ private:
     static auto markAsEnvironment(const QString &functionName, ivm::IVModel *ivModel) -> void;
     static auto removeDeadFunctions(ivm::IVModel *ivModel) -> void;
 
-    static auto findFunction(const QString &functionName, ivm::IVModel *ivModel) -> ivm::IVFunction *;
     static auto setGuiAsDefaultImplementation(ivm::IVFunction *function) -> void;
+
+    static auto findFunction(const QString &functionName, ivm::IVModel *ivModel) -> ivm::IVFunction *;
+    static auto findImplementationType(const QString &implementationName, const ivm::IVFunction *function) -> QString;
+
+    static auto removeCyclicInterfaces(ivm::IVFunction *function) -> void;
 
     static auto isConnectionDead(const ivm::IVConnection *connection) -> bool;
     static auto isFunctionDead(const ivm::IVFunctionType *function) -> bool;
     static auto isSdlFunction(const ivm::IVFunction *function) -> bool;
+
+    static inline const QString m_environmentImplementationName = "environment";
+    static inline const QString m_environmentImplementationType = "GUI";
 };
 
 } // namespace tmc

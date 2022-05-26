@@ -67,6 +67,7 @@ BEGIN
       
       
       
+      
       --  ASN.1 modules used by thread ponger_PingInterface
       MyInteger FROM ENVIRONMENT-SELECTOR-DATAVIEW
       
@@ -104,11 +105,18 @@ BEGIN
    Pinger-Event ::= CHOICE {
       msg-in CHOICE {
          input-none SEQUENCE {},
-         clockinterface SEQUENCE {  }
+         clockinterface        SEQUENCE {  },
+         pingercyclicinterface SEQUENCE {  }
       },
       msg-out CHOICE {
          pinginterface SEQUENCE { arg MyInteger }
       }
+   }
+   Pinger-Periodic-Events ::=
+      Periodic-Events {Pinger-Event, 1}
+   
+   pinger-periodic-events Pinger-Periodic-Events ::= {
+      { period 1000, event msg-in: pingercyclicinterface : {} }
    }
    
    Ponger-Event ::= CHOICE {

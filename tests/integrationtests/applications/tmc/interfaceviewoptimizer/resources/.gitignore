@@ -21,8 +21,10 @@ Makefile.*
 
 work/binaries
 work/build
+work/clock/
 work/dataview
 work/Debug
+work/Dump
 work/sql_db
 work/glue_simu
 work/glue_debug
