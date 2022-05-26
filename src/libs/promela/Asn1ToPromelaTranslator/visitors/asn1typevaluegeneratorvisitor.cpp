@@ -343,6 +343,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Integer &type)
         throw TranslationException(message);
     }
 
+    ensureIntegerRangeGeneratorPresence();
     Conditional conditional;
 
     for (const auto &range : integerSubset.value().getRanges()) {
@@ -521,14 +522,13 @@ void Asn1TypeValueGeneratorVisitor::ensureIntegerRangeGeneratorPresence()
         Expression condition(model::BinaryExpression(model::BinaryExpression::Operator::LESS,
                 std::make_unique<Expression>(VariableRef(valueArgumentName)),
                 std::make_unique<Expression>(VariableRef(maxArgumentValue))));
-
-        sequence.appendElement(std::make_unique<ProctypeElement>(std::move(condition)));
+        incSequence->appendElement(std::make_unique<ProctypeElement>(std::move(condition)));
 
         Assignment assignment(VariableRef(valueArgumentName),
-                model::BinaryExpression(model::BinaryExpression::Operator::ADD,
+                Expression(model::BinaryExpression(model::BinaryExpression::Operator::ADD,
                         std::make_unique<Expression>(VariableRef(valueArgumentName)),
-                        std::make_unique<Expression>(Constant(1))));
-        sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assignment)));
+                        std::make_unique<Expression>(Constant(1)))));
+        incSequence->appendElement(std::make_unique<ProctypeElement>(std::move(assignment)));
 
         loop.appendSequence(std::move(incSequence));
         std::unique_ptr<::promela::model::Sequence> breakSequence =
@@ -537,9 +537,7 @@ void Asn1TypeValueGeneratorVisitor::ensureIntegerRangeGeneratorPresence()
         loop.appendSequence(std::move(breakSequence));
 
         sequence.appendElement(std::make_unique<ProctypeElement>(std::move(loop)));
-
         auto inlineDef = std::make_unique<InlineDef>(name, inlineArguments, std::move(sequence));
-
         m_promelaModel.addInlineDef(std::move(inlineDef));
     }
 }
