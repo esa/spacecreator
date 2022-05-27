@@ -81,13 +81,10 @@ using conversion::translator::TranslationException;
 using promela::model::Assignment;
 using promela::model::Conditional;
 using promela::model::Constant;
-<<<<<<< HEAD
-=======
 using promela::model::DoLoop;
 using promela::model::ExitLoop;
 using promela::model::Expression;
 using promela::model::InlineCall;
->>>>>>> master
 using promela::model::InlineDef;
 using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
@@ -97,6 +94,9 @@ using promela::model::ValueDefinition;
 using promela::model::VariableRef;
 
 namespace promela::translator {
+
+const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::lengthMemberName = "length";
+const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::octetGeneratorName = "OctetStringElement_generate_value";
 
 Asn1TypeValueGeneratorVisitor::Asn1TypeValueGeneratorVisitor(PromelaModel &promelaModel, QString name)
     : m_promelaModel(promelaModel)
@@ -160,10 +160,10 @@ void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
         throw std::logic_error(msg.toStdString().c_str());
     }
 
-    const QString componentTypeName = m_name;
-    const QString octetGeneratorName = InlineDefAdder::octetGeneratorName;
+    const QString &octetGeneratorName = InlineDefAdder::octetGeneratorName;
     if (!modelContainsInlineGenerator(octetGeneratorName)) {
-        InlineDefAdder::addOctetGeneratorToModel(m_promelaModel);
+        const long maxOctetValue = 255;
+        InlineDefAdder::addRangedIntegerGeneratorToModel("OctetStringElement", m_promelaModel, 0, maxOctetValue);
     }
 
     const QString typeIdentifier = Escaper::escapePromelaName(type.identifier());
@@ -177,8 +177,10 @@ void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
         sequence->appendElement(
                 ProctypeMaker::makeCallForEachValue(octetGeneratorName, argumentName, Expression(maxSize - 1)));
     } else { // OctetString has variable length
-        const QString lengthGeneratorTypeName = InlineDefAdder::addTypeLengthGeneratorToModel(
-                typeIdentifier, m_promelaModel, static_cast<long>(minSize), static_cast<long>(maxSize));
+        const QString lengthGeneratorTypeName =
+                QString("%1_%2").arg(typeIdentifier).arg(InlineDefAdder::lengthMemberName);
+        InlineDefAdder::addRangedIntegerGeneratorToModel(
+                lengthGeneratorTypeName, m_promelaModel, static_cast<long>(minSize), static_cast<long>(maxSize));
 
         const QString valueLengthVariableName =
                 QString("%1.%2").arg(argumentName).arg(InlineDefAdder::lengthMemberName);
@@ -337,8 +339,10 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
         sequence->appendElement(
                 ProctypeMaker::makeCallForEachValue(typeGeneratorInline, valueVariableName, Expression(maxSize - 1)));
     } else { // sequenceOf has variable length
-        const QString lengthGeneratorTypeName = InlineDefAdder::addTypeLengthGeneratorToModel(
-                typeIdentifier, m_promelaModel, static_cast<long>(minSize), static_cast<long>(maxSize));
+        const QString lengthGeneratorTypeName =
+                QString("%1_%2").arg(typeIdentifier).arg(InlineDefAdder::lengthMemberName);
+        InlineDefAdder::addRangedIntegerGeneratorToModel(
+                lengthGeneratorTypeName, m_promelaModel, static_cast<long>(minSize), static_cast<long>(maxSize));
 
         sequence->appendElement(ProctypeMaker::makeInlineCall(QString("%1_generate_value").arg(lengthGeneratorTypeName),
                 QString("%1.%2").arg(valueVariableName).arg(InlineDefAdder::lengthMemberName)));
@@ -538,44 +542,15 @@ QString Asn1TypeValueGeneratorVisitor::getInlineArgumentName()
     return Escaper::escapePromelaName(QString("%1_gv").arg(m_name));
 }
 
-const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::lengthMemberName = "length";
-const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::octetGeneratorName = "OctetStringElement_generate_value";
-
-void Asn1TypeValueGeneratorVisitor::InlineDefAdder::addOctetGeneratorToModel(model::PromelaModel &model)
+void Asn1TypeValueGeneratorVisitor::InlineDefAdder::addRangedIntegerGeneratorToModel(
+        const QString &inlineName, model::PromelaModel &model, const long minSize, const long maxSize)
 {
-    const QString octetGeneratorArg = "OctetStringElement_gv";
-
-    auto body = ProctypeMaker::makeNormalSequence();
-    auto conditional = std::make_unique<promela::model::Conditional>();
-    const int maxOctetValue = 255;
-    for (int i = 0; i <= maxOctetValue; i++) {
-        auto alternativeBody = ProctypeMaker::makeNormalSequence();
-        alternativeBody->appendElement(ProctypeMaker::makeTrueExpressionProctypeElement());
-        alternativeBody->appendElement(ProctypeMaker::makeAssignmentProctypeElement(octetGeneratorArg, i));
-
-        conditional->appendAlternative(std::move(alternativeBody));
-    }
-    body->appendElement(std::make_unique<ProctypeElement>(std::move(*conditional)));
-
-    auto inlineDef =
-            std::make_unique<InlineDef>(octetGeneratorName, QStringList({ octetGeneratorArg }), std::move(*body));
-
-    model.addInlineDef(std::move(inlineDef));
-}
-
-QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::addTypeLengthGeneratorToModel(
-        const QString &typeName, model::PromelaModel &model, const long minSize, const long maxSize)
-{
-    QString inlineName = QString("%1_%2").arg(typeName).arg(lengthMemberName);
-
     Asn1Acn::Types::Integer lengthType(lengthMemberName);
     const Asn1Acn::Range<Asn1Acn::IntegerValue::Type> range(minSize, maxSize);
     lengthType.constraints().append(range);
 
     Asn1TypeValueGeneratorVisitor lenVisitor(model, inlineName);
     lengthType.accept(lenVisitor);
-
-    return inlineName;
 }
 
 Expression Asn1TypeValueGeneratorVisitor::InlineDefAdder::getValueLenghtMinusConstAsExpression(
