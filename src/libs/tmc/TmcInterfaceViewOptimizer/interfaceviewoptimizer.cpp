@@ -55,7 +55,7 @@ void InterfaceViewOptimizer::markAsEnvironment(const QString &functionName, IVMo
     const auto &currentDefaultImplementationName = function->defaultImplementation();
     const auto &currentDefaultImplementationType = findImplementationType(currentDefaultImplementationName, function);
 
-    if(currentDefaultImplementationType.toLower() == "sdl") {
+    if (currentDefaultImplementationType.toLower() == "sdl") {
         setGuiAsDefaultImplementation(function);
     }
 }
@@ -102,9 +102,11 @@ void InterfaceViewOptimizer::setGuiAsDefaultImplementation(IVFunction *function)
     if (function->hasImplementationName(m_environmentImplementationName)) {
         const auto environmentImplementationType = findImplementationType(m_environmentImplementationName, function);
 
-        if(environmentImplementationType.toUpper() != m_environmentImplementationType) {
+        if (environmentImplementationType.toUpper() != m_environmentImplementationType) {
             auto errorMessage = QString("Function '%1' already has implementation named '%2' but it's not of type '%3'")
-                .arg(function->title()).arg(m_environmentImplementationName).arg(m_environmentImplementationType);
+                                        .arg(function->title())
+                                        .arg(m_environmentImplementationName)
+                                        .arg(m_environmentImplementationType);
             throw TranslationException(std::move(errorMessage));
         }
     } else {
@@ -114,7 +116,7 @@ void InterfaceViewOptimizer::setGuiAsDefaultImplementation(IVFunction *function)
     function->setDefaultImplementation(m_environmentImplementationName);
 
     // GUI interfaces cannot have any cyclic interfaces
-    removeCyclicInterfaces(function);
+    removeUnallowedInterfaces(function);
 }
 
 IVFunction *InterfaceViewOptimizer::findFunction(const QString &functionName, IVModel *ivModel)
@@ -140,17 +142,17 @@ QString InterfaceViewOptimizer::findImplementationType(const QString &implementa
     return "";
 }
 
-void InterfaceViewOptimizer::removeCyclicInterfaces(IVFunction *function)
+void InterfaceViewOptimizer::removeUnallowedInterfaces(IVFunction *function)
 {
-    std::vector<IVInterface*> interfacesToRemove;
+    std::vector<IVInterface *> interfacesToRemove;
 
-    for(const auto interface : function->interfaces()) {
-        if (interface->kind() == IVInterface::OperationKind::Cyclic) {
+    for (const auto interface : function->interfaces()) {
+        if (interface->kind() != IVInterface::OperationKind::Sporadic) {
             interfacesToRemove.push_back(interface);
         }
     }
 
-    for(const auto interface : interfacesToRemove) {
+    for (const auto interface : interfacesToRemove) {
         function->removeChild(interface);
     }
 }
@@ -185,8 +187,8 @@ bool InterfaceViewOptimizer::isSdlFunction(const ivm::IVFunction *function)
 bool InterfaceViewOptimizer::isFunctionDead(const IVFunctionType *function)
 {
     // Function in considered 'dead' if it has no non-cyclic interfaces
-    for(const auto interface : function->interfaces()) {
-        if(interface->kind() != IVInterface::OperationKind::Cyclic) {
+    for (const auto interface : function->interfaces()) {
+        if (interface->kind() != IVInterface::OperationKind::Cyclic) {
             return false;
         }
     }

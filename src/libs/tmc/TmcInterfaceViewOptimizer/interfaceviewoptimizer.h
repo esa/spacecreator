@@ -74,7 +74,7 @@ private:
     static auto findFunction(const QString &functionName, ivm::IVModel *ivModel) -> ivm::IVFunction *;
     static auto findImplementationType(const QString &implementationName, const ivm::IVFunction *function) -> QString;
 
-    static auto removeCyclicInterfaces(ivm::IVFunction *function) -> void;
+    static auto removeUnallowedInterfaces(ivm::IVFunction *function) -> void;
 
     static auto isConnectionDead(const ivm::IVConnection *connection) -> bool;
     static auto isFunctionDead(const ivm::IVFunctionType *function) -> bool;

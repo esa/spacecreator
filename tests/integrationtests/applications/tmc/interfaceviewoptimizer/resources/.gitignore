@@ -4,7 +4,6 @@
 *.ini
 *.gpr
 *.md5
-Makefile.*
 
 **/wrappers/*
 **/cache/*
