@@ -101,7 +101,7 @@ public:
             std::unique_ptr<model::Sequence> sequence) -> std::unique_ptr<ProctypeElement>;
 
     /**
-     * @brief make ProctypeElement with a for loop with specified characteristics:
+     * @brief make ProctypeElement with a for loop with specified characteristics
      *
      * @param functionToCallName    function to be called in loop's body
      * @param valueName             name of the accessed value
