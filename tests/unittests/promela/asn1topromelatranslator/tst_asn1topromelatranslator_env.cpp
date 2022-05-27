@@ -213,6 +213,11 @@ void tst_Asn1ToPromelaTranslator_Env::testInteger() const
     const std::list<VariableRef::Element> &variableRefElements = variableRef.getElements();
     QCOMPARE(variableRefElements.size(), 1);
     QString variableName = variableRefElements.front().m_name;
+    // In order to resolve Spin issue with using struct members in select statement, a temporary
+    // variable is used. Both the temporary variable and argument share the same prefix,
+    // but the argument has "_gv" postfix, while the variable has "_tmp" postfix.
+    // In order to compare the temporary variable to the argument name, the "tmp" postfix must be
+    // changed to "gv" ("_" is the same).
     QCOMPARE(variableName.replace("tmp", "gv"), argName);
     QVERIFY(variableRefElements.front().m_index.get() == nullptr);
 
