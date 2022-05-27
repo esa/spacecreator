@@ -122,6 +122,7 @@ private:
             const QStringList &modelFunctions, const QStringList &environmentFunctions);
     bool convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath);
     std::unique_ptr<ivm::IVModel> readInterfaceView(const QString &filepath);
+    void saveOptimizedInterfaceView(const ivm::IVModel *ivModel, const QString outputFilePath);
     void findFunctionsToConvert(const ivm::IVModel &model, QStringList &sdlFunctions,
             std::map<QString, ProcessMetadata> &sdlProcesses, QStringList &envFunctions);
     bool isSdlFunction(const ivm::IVFunction *function);

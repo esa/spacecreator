@@ -19,8 +19,10 @@
 
 #include "converter.h"
 
+#include <QBuffer>
 #include <QDebug>
 #include <QProcess>
+#include <QTemporaryFile>
 #include <QtDebug>
 #include <QtGlobal>
 #include <conversion/asn1/Asn1Options/options.h>
@@ -35,8 +37,10 @@
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/IvRegistrar/registrar.h>
 #include <conversion/promela/PromelaRegistrar/registrar.h>
+#include <iostream>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivxmlreader.h>
+#include <libiveditor/ivexporter.h>
 #include <promela/PromelaOptions/options.h>
 #include <tmc/SdlToPromelaConverter/converter.h>
 #include <tmc/TmcInterfaceViewOptimizer/interfaceviewoptimizer.h>
@@ -56,6 +60,7 @@ using conversion::iv::IvRegistrar;
 using conversion::promela::PromelaOptions;
 using conversion::promela::PromelaRegistrar;
 using conversion::translator::TranslationException;
+using ive::IVExporter;
 using ivm::IVFunction;
 using ivm::IVFunctionType;
 using ivm::IVInterface;
@@ -228,6 +233,16 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
 
     InterfaceViewOptimizer::optimizeModel(inputIv.get(), m_environmentFunctions);
 
+    QTemporaryFile outputOptimizedIvFile;
+    if (!outputOptimizedIvFile.open()) {
+        qCritical() << "Unable to create temp file for optimized IV model";
+        return false;
+    }
+    outputOptimizedIvFile.close();
+    const auto &outputOptimizedIvFileName = outputOptimizedIvFile.fileName();
+
+    saveOptimizedInterfaceView(inputIv.get(), outputOptimizedIvFileName);
+
     QStringList modelFunctions;
     QStringList environmentFunctions;
 
@@ -290,7 +305,7 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
     const QFileInfo outputSystemFile = outputFilepath("system.pml");
 
     convertInterfaceview(
-            ivFileInfo.absoluteFilePath(), outputSystemFile.absoluteFilePath(), modelFunctions, environmentFunctions);
+            outputOptimizedIvFileName, outputSystemFile.absoluteFilePath(), modelFunctions, environmentFunctions);
 
     return true;
 }
@@ -386,6 +401,21 @@ std::unique_ptr<IVModel> TmcConverter::readInterfaceView(const QString &filepath
     }
 
     return {};
+}
+
+void TmcConverter::saveOptimizedInterfaceView(const IVModel *ivModel, const QString outputFilePath)
+{
+    QByteArray modelData;
+    QBuffer modelDataBuffer(&modelData);
+    modelDataBuffer.open(QIODevice::WriteOnly);
+
+    IVExporter exporter;
+    exporter.exportObjects(ivModel->objects().values(), &modelDataBuffer);
+
+    QSaveFile outputFile(outputFilePath);
+    outputFile.open(QIODevice::WriteOnly);
+    outputFile.write(modelData);
+    outputFile.commit();
 }
 
 void TmcConverter::findFunctionsToConvert(const IVModel &model, QStringList &sdlFunctions,
