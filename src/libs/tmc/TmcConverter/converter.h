@@ -76,10 +76,8 @@ public:
      *
      * @param   inputIvFilepath         Path to XML interface view.
      * @param   outputDirectory         Path to output directory for conversion results.
-     * @param   environmentFunctions    List of the IV functions that should be marked as an environment.
      */
-    TmcConverter(
-            const QString &inputIvFilepath, const QString &outputDirectory, std::vector<QString> environmentFunctions);
+    TmcConverter(const QString &inputIvFilepath, const QString &outputDirectory);
 
     /**
      * @brief Process system conversion.
@@ -89,6 +87,13 @@ public:
      * @return true if conversion succeed, otherwise false.
      */
     bool convert();
+    /**
+     * @brief   Specify which IV functions should be treated as an environment
+     *          during model checking
+     *
+     * @param   environmentFunctions    Functions to treat as an evironment
+     */
+    void addEnvironmentFunctions(const std::vector<QString> &environmentFunctions);
     /**
      * @brief Add Stop Condition files to convert.
      *

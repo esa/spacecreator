@@ -128,8 +128,9 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    tmc::verifier::TmcVerifier verifier(
-            inputIvFilepath.value(), outputDirectory.value(), std::move(environmentFunctions));
+    tmc::verifier::TmcVerifier verifier(inputIvFilepath.value(), outputDirectory.value());
+
+    verifier.addEnvironmentFunctions(environmentFunctions);
 
     if (!verifier.addStopConditionFiles(stopConditionFiles)) {
         return EXIT_FAILURE;

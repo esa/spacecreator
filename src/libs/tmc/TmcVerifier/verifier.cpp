@@ -22,12 +22,16 @@
 using tmc::converter::TmcConverter;
 
 namespace tmc::verifier {
-TmcVerifier::TmcVerifier(
-        const QString &inputIvFilepath, const QString &outputDirectory, std::vector<QString> environmentFunctions)
+TmcVerifier::TmcVerifier(const QString &inputIvFilepath, const QString &outputDirectory)
     : m_inputIvFilepath(inputIvFilepath)
     , m_outputDirectory(outputDirectory)
 {
-    m_converter = std::make_unique<TmcConverter>(m_inputIvFilepath, m_outputDirectory, std::move(environmentFunctions));
+    m_converter = std::make_unique<TmcConverter>(m_inputIvFilepath, m_outputDirectory);
+}
+
+void TmcVerifier::addEnvironmentFunctions(const std::vector<QString> &environmentFunctions)
+{
+    m_converter->addEnvironmentFunctions(environmentFunctions);
 }
 
 bool TmcVerifier::addStopConditionFiles(const QStringList &files)

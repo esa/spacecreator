@@ -35,11 +35,16 @@ public:
      *
      * @param   inputIvFilepath         Path to XML interface view.
      * @param   outputDirectory         Path to output directory.
-     * @param   environmentFunctions    List of the IV functions that should be marked as an environment.
      */
-    TmcVerifier(
-            const QString &inputIvFilepath, const QString &outputDirectory, std::vector<QString> environmentFunctions);
+    TmcVerifier(const QString &inputIvFilepath, const QString &outputDirectory);
 
+    /**
+     * @brief   Specify which IV functions should be treated as an environment
+     *          during model checking
+     *
+     * @param   environmentFunctions    Functions to treat as an evironment
+     */
+    void addEnvironmentFunctions(const std::vector<QString> &environmentFunctions);
     /**
      * @brief Add Stop Condition files to verifier.
      *

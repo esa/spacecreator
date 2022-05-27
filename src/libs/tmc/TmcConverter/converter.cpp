@@ -86,13 +86,11 @@ uint32_t TmcConverter::ObserverInfo::priority() const
     return m_priority;
 }
 
-TmcConverter::TmcConverter(
-        const QString &inputIvFilepath, const QString &outputDirectory, std::vector<QString> environmentFunctions)
+TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &outputDirectory)
     : m_inputIvFilepath(inputIvFilepath)
     , m_outputDirectoryFilepath(outputDirectory)
     , m_ivBaseDirectory(QFileInfo(m_inputIvFilepath).dir())
     , m_outputDirectory(outputDirectory)
-    , m_environmentFunctions(std::move(environmentFunctions))
 {
     Asn1Registrar asn1Registrar;
     bool result = asn1Registrar.registerCapabilities(m_registry);
@@ -124,6 +122,13 @@ bool TmcConverter::convert()
         return false;
     }
     return true;
+}
+
+void TmcConverter::addEnvironmentFunctions(const std::vector<QString> &environmentFunctions)
+{
+    for (const auto &function : environmentFunctions) {
+        m_environmentFunctions.push_back(function);
+    }
 }
 
 bool TmcConverter::addStopConditionFiles(const QStringList &files)
