@@ -48,6 +48,9 @@ configure_file(resources/sequenceof.pml.out resources/sequenceof.pml.out COPYONL
 configure_file(resources/sequenceof-variable-size.asn resources/sequenceof-variable-size.asn COPYONLY)
 configure_file(resources/sequenceof-variable-size.pml.out resources/sequenceof-variable-size.pml.out COPYONLY)
 
+configure_file(resources/sequenceof-nested.asn resources/sequenceof-nested.asn COPYONLY)
+configure_file(resources/sequenceof-nested.pml.out resources/sequenceof-nested.pml.out COPYONLY)
+
 configure_file(resources/choice.asn resources/choice.asn COPYONLY)
 configure_file(resources/choice.pml.out resources/choice.pml.out COPYONLY)
 

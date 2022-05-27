@@ -1,10 +1,18 @@
-inline Type1_generate_value(Type1_gv)
+inline INTEGER_generate_value(INTEGER_gv)
 {
     if
     ::  atomic {
-        select (Type1_gv : 0 .. 2);
+        select (INTEGER_gv : 0 .. 2);
     }
     fi;
+}
+inline Type1_generate_value(Type1_gv)
+{
+    int i;
+    for(i : 0 .. 2)
+    {
+        INTEGER_generate_value(Type1_gv.data[i]);
+    }
 }
 inline SimpleFixedSizeSequenceOf_generate_value(SimpleFixedSizeSequenceOf_gv)
 {

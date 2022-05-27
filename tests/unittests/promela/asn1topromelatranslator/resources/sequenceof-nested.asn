@@ -1,0 +1,7 @@
+SequencesOf DEFINITIONS ::= BEGIN
+
+Type1 ::= SEQUENCE (SIZE(3)) OF INTEGER(0..2)
+
+SimpleFixedSizeSequenceOf ::= SEQUENCE (SIZE(4)) OF Type1
+
+END

@@ -1,47 +1,17 @@
 inline EnvParamSeq_x_generate_value(EnvParamSeq_x_gv)
 {
     if
-    ::  true;
-        EnvParamSeq_x_gv = 0;
-    ::  true;
-        EnvParamSeq_x_gv = 1;
-    ::  true;
-        EnvParamSeq_x_gv = 2;
-    ::  true;
-        EnvParamSeq_x_gv = 3;
-    ::  true;
-        EnvParamSeq_x_gv = 4;
-    ::  true;
-        EnvParamSeq_x_gv = 5;
-    ::  true;
-        EnvParamSeq_x_gv = 6;
-    ::  true;
-        EnvParamSeq_x_gv = 7;
-    ::  true;
-        EnvParamSeq_x_gv = 8;
-    ::  true;
-        EnvParamSeq_x_gv = 9;
+    ::  atomic {
+        select (EnvParamSeq_x_gv : 0 .. 9);
+    }
     fi;
 }
 inline EnvParamSeq_y_generate_value(EnvParamSeq_y_gv)
 {
     if
-    ::  true;
-        EnvParamSeq_y_gv = 0;
-    ::  true;
-        EnvParamSeq_y_gv = 1;
-    ::  true;
-        EnvParamSeq_y_gv = 2;
-    ::  true;
-        EnvParamSeq_y_gv = 3;
-    ::  true;
-        EnvParamSeq_y_gv = 4;
-    ::  true;
-        EnvParamSeq_y_gv = 5;
-    ::  true;
-        EnvParamSeq_y_gv = 6;
-    ::  true;
-        EnvParamSeq_y_gv = 7;
+    ::  atomic {
+        select (EnvParamSeq_y_gv : 0 .. 7);
+    }
     fi;
 }
 inline EnvParamSeq_z_generate_value(EnvParamSeq_z_gv)

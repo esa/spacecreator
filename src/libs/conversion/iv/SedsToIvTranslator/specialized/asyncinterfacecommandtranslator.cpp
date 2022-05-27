@@ -198,7 +198,7 @@ void AsyncInterfaceCommandTranslator::createBundledTypeComponent(
             ? SedsToAsn1Translator::getAsn1Definitions(*typeRef.packageStr(), m_asn1Files)
             : m_asn1Definitions;
 
-    const auto &typeName = typeRef.nameStr();
+    const auto &typeName = Escaper::escapeAsn1TypeName(typeRef.nameStr());
     const auto *referencedTypeAssignment = asn1Definitions->type(typeName);
 
     if (!referencedTypeAssignment) {

@@ -94,6 +94,12 @@ public:
      */
     void operator()(const ::promela::model::Skip &skip);
     /**
+     * @brief Handle ExitLoop (break)
+     *
+     * @param skip ExitLoop to export
+     */
+    void operator()(const ::promela::model::ExitLoop &exitLoop);
+    /**
      * @brief Handle Conditional
      *
      * @param ifStatement Conditional to export
@@ -111,6 +117,12 @@ public:
      * @param loop ForLoop to export
      */
     void operator()(const ::promela::model::ForLoop &loop);
+    /**
+     * @brief Handle select
+     *
+     * @param select Select to export
+     */
+    void operator()(const ::promela::model::Select &select);
 
 private:
     QString expressionContentToString(const ::promela::model::Expression &expression);

@@ -1,28 +1,9 @@
 inline Outer_sequence_memberSequence_memberInt_generate_value(Outer_sequence_memberSequence_memberInt_gv)
 {
     if
-    ::  true;
-        Outer_sequence_memberSequence_memberInt_gv = 0;
-    ::  true;
-        Outer_sequence_memberSequence_memberInt_gv = 1;
-    ::  true;
-        Outer_sequence_memberSequence_memberInt_gv = 2;
-    ::  true;
-        Outer_sequence_memberSequence_memberInt_gv = 3;
-    ::  true;
-        Outer_sequence_memberSequence_memberInt_gv = 4;
-    ::  true;
-        Outer_sequence_memberSequence_memberInt_gv = 5;
-    ::  true;
-        Outer_sequence_memberSequence_memberInt_gv = 6;
-    ::  true;
-        Outer_sequence_memberSequence_memberInt_gv = 7;
-    ::  true;
-        Outer_sequence_memberSequence_memberInt_gv = 8;
-    ::  true;
-        Outer_sequence_memberSequence_memberInt_gv = 9;
-    ::  true;
-        Outer_sequence_memberSequence_memberInt_gv = 10;
+    ::  atomic {
+        select (Outer_sequence_memberSequence_memberInt_gv : 0 .. 10);
+    }
     fi;
 }
 inline Outer_sequence_memberSequence_generate_value(Outer_sequence_memberSequence_gv)

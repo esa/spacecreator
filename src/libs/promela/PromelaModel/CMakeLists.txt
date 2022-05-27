@@ -23,6 +23,7 @@ set(SOURCES
   proctypeelement.cpp
   promelamodel.cpp
   sequence.cpp
+  select.cpp
   typealias.cpp
   utype.cpp
   utyperef.cpp
@@ -54,6 +55,8 @@ set(INCLUDES
   promelamodel.h
   sequence.h
   skip.h
+  exitloop.h
+  select.h
   typealias.h
   unsigneddatatype.h
   utype.h

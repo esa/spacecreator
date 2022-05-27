@@ -1,26 +1,9 @@
 inline EnvIntParam_generate_value(EnvIntParam_gv)
 {
     if
-    ::  true;
-        EnvIntParam_gv = 0;
-    ::  true;
-        EnvIntParam_gv = 1;
-    ::  true;
-        EnvIntParam_gv = 2;
-    ::  true;
-        EnvIntParam_gv = 3;
-    ::  true;
-        EnvIntParam_gv = 4;
-    ::  true;
-        EnvIntParam_gv = 5;
-    ::  true;
-        EnvIntParam_gv = 6;
-    ::  true;
-        EnvIntParam_gv = 7;
-    ::  true;
-        EnvIntParam_gv = 8;
-    ::  true;
-        EnvIntParam_gv = 9;
+    ::  atomic {
+        select (EnvIntParam_gv : 0 .. 9);
+    }
     fi;
 }
 inline EnvBoolParam_generate_value(EnvBoolParam_gv)
