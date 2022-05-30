@@ -382,71 +382,29 @@ void tst_Asn1ToPromelaTranslator_Values::testSequenceOf() const
 
         const auto &sequence = inlineDef->getSequence();
 
-        const auto assignIndex0 = findProctypeElement<InlineCall>(sequence, 0);
-        QVERIFY(assignIndex0);
-        QCOMPARE(assignIndex0->getName(), "MyInteger_assign_value");
-        QCOMPARE(assignIndex0->getArguments().size(), 2);
+        for (std::size_t i = 0; i < 3; ++i) {
+            const auto assignIndex = findProctypeElement<InlineCall>(sequence, i);
+            QVERIFY(assignIndex);
+            QCOMPARE(assignIndex->getName(), "MyInteger_assign_value");
+            QCOMPARE(assignIndex->getArguments().size(), 2);
 
-        const auto &assignIndex0Args = assignIndex0->getArguments();
+            const auto &assignIndexArgs = assignIndex->getArguments();
 
-        const auto assignIndex0Arg0 = std::get_if<VariableRef>(&assignIndex0Args.at(0));
-        QVERIFY(assignIndex0Arg0);
-        const auto &assignIndex0Arg0Elements = assignIndex0Arg0->getElements();
-        QCOMPARE(assignIndex0Arg0Elements.size(), 2);
-        QCOMPARE(assignIndex0Arg0Elements.front().m_name, "myValue");
-        QCOMPARE(assignIndex0Arg0Elements.back().m_name, "data");
-        const auto &assignIndex0Arg0Index =
-                std::get_if<Constant>(&assignIndex0Arg0Elements.back().m_index->getContent());
-        QVERIFY(assignIndex0Arg0Index);
-        QCOMPARE(assignIndex0Arg0Index->getValue(), 0);
+            const auto assignIndexArg0 = std::get_if<VariableRef>(&assignIndexArgs.at(0));
+            QVERIFY(assignIndexArg0);
+            const auto &assignIndexArg0Elements = assignIndexArg0->getElements();
+            QCOMPARE(assignIndexArg0Elements.size(), 2);
+            QCOMPARE(assignIndexArg0Elements.front().m_name, "myValue");
+            QCOMPARE(assignIndexArg0Elements.back().m_name, "data");
+            const auto &assignIndexArg0Index =
+                    std::get_if<Constant>(&assignIndexArg0Elements.back().m_index->getContent());
+            QVERIFY(assignIndexArg0Index);
+            QCOMPARE(assignIndexArg0Index->getValue(), i);
 
-        const auto assignIndex0Arg1 = std::get_if<Constant>(&assignIndex0Args.at(1));
-        QVERIFY(assignIndex0Arg1);
-        QCOMPARE(assignIndex0Arg1->getValue(), 1);
-
-        const auto assignIndex1 = findProctypeElement<InlineCall>(sequence, 1);
-        QVERIFY(assignIndex1);
-        QCOMPARE(assignIndex1->getName(), "MyInteger_assign_value");
-        QCOMPARE(assignIndex1->getArguments().size(), 2);
-
-        const auto &assignIndex1Args = assignIndex1->getArguments();
-
-        const auto assignIndex1Arg0 = std::get_if<VariableRef>(&assignIndex1Args.at(0));
-        QVERIFY(assignIndex1Arg0);
-        const auto &assignIndex1Arg0Elements = assignIndex1Arg0->getElements();
-        QCOMPARE(assignIndex1Arg0Elements.size(), 2);
-        QCOMPARE(assignIndex1Arg0Elements.front().m_name, "myValue");
-        QCOMPARE(assignIndex1Arg0Elements.back().m_name, "data");
-        const auto &assignIndex1Arg0Index =
-                std::get_if<Constant>(&assignIndex1Arg0Elements.back().m_index->getContent());
-        QVERIFY(assignIndex1Arg0Index);
-        QCOMPARE(assignIndex1Arg0Index->getValue(), 1);
-
-        const auto assignIndex1Arg1 = std::get_if<Constant>(&assignIndex1Args.at(1));
-        QVERIFY(assignIndex1Arg1);
-        QCOMPARE(assignIndex1Arg1->getValue(), 2);
-
-        const auto assignIndex2 = findProctypeElement<InlineCall>(sequence, 2);
-        QVERIFY(assignIndex2);
-        QCOMPARE(assignIndex2->getName(), "MyInteger_assign_value");
-        QCOMPARE(assignIndex2->getArguments().size(), 2);
-
-        const auto &assignIndex2Args = assignIndex2->getArguments();
-
-        const auto assignIndex2Arg0 = std::get_if<VariableRef>(&assignIndex2Args.at(0));
-        QVERIFY(assignIndex2Arg0);
-        const auto &assignIndex2Arg0Elements = assignIndex2Arg0->getElements();
-        QCOMPARE(assignIndex2Arg0Elements.size(), 2);
-        QCOMPARE(assignIndex2Arg0Elements.front().m_name, "myValue");
-        QCOMPARE(assignIndex2Arg0Elements.back().m_name, "data");
-        const auto &assignIndex2Arg0Index =
-                std::get_if<Constant>(&assignIndex2Arg0Elements.back().m_index->getContent());
-        QVERIFY(assignIndex2Arg0Index);
-        QCOMPARE(assignIndex2Arg0Index->getValue(), 2);
-
-        const auto assignIndex2Arg1 = std::get_if<Constant>(&assignIndex2Args.at(1));
-        QVERIFY(assignIndex2Arg1);
-        QCOMPARE(assignIndex2Arg1->getValue(), 3);
+            const auto assignIndexArg1 = std::get_if<Constant>(&assignIndexArgs.at(1));
+            QVERIFY(assignIndexArg1);
+            QCOMPARE(assignIndexArg1->getValue(), i + 1);
+        }
 
         const auto assignLength = findProctypeElement<Assignment>(sequence, 3);
         QVERIFY(assignLength);
