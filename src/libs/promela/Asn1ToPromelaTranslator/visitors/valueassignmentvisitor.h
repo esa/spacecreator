@@ -41,7 +41,7 @@ public:
      * @param target target variable to assign the value
      * @param typeName name of the type of variable
      */
-    ValueAssignmentVisitor(::Asn1Acn::ValuePtr value, ::promela::model::Sequence &sequence,
+    ValueAssignmentVisitor(::Asn1Acn::Value *value, ::promela::model::Sequence &sequence,
             const ::promela::model::VariableRef &target, QString typeName);
     /**
      * @brief Visit ::Asn1Acn::Types::Boolean
@@ -129,7 +129,7 @@ public:
     void visit(const ::Asn1Acn::Types::UserdefinedType &type) override;
 
 private:
-    ::Asn1Acn::ValuePtr m_value;
+    ::Asn1Acn::Value *m_value;
     ::promela::model::Sequence &m_sequence;
     ::promela::model::VariableRef m_target;
     QString m_typeName;

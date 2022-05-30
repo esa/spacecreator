@@ -20,12 +20,17 @@
 #include "tst_asn1topromelatranslator_values.h"
 
 #include <asn1library/asn1/asnsequencecomponent.h>
+#include <asn1library/asn1/constraints/constraintlist.h>
+#include <asn1library/asn1/constraints/rangeconstraint.h>
+#include <asn1library/asn1/constraints/sizeconstraint.h>
+#include <asn1library/asn1/multiplevalue.h>
 #include <asn1library/asn1/namedvalue.h>
 #include <asn1library/asn1/singlevalue.h>
 #include <asn1library/asn1/types/boolean.h>
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/sequence.h>
+#include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/typefactory.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <asn1library/asn1/valueassignment.h>
@@ -33,16 +38,21 @@
 #include <promela/PromelaModel/promelamodel.h>
 
 using Asn1Acn::AsnSequenceComponent;
+using Asn1Acn::IntegerValue;
+using Asn1Acn::MultipleValue;
 using Asn1Acn::NamedValue;
 using Asn1Acn::SingleValue;
 using Asn1Acn::SourceLocation;
 using Asn1Acn::TypeAssignment;
 using Asn1Acn::ValueAssignment;
+using Asn1Acn::Constraints::RangeConstraint;
+using Asn1Acn::Constraints::SizeConstraint;
 using Asn1Acn::Types::Boolean;
 using Asn1Acn::Types::Enumerated;
 using Asn1Acn::Types::EnumeratedItem;
 using Asn1Acn::Types::Integer;
 using Asn1Acn::Types::Sequence;
+using Asn1Acn::Types::SequenceOf;
 using Asn1Acn::Types::TypeFactory;
 using Asn1Acn::Types::UserdefinedType;
 using promela::model::Assignment;
@@ -313,6 +323,101 @@ void tst_Asn1ToPromelaTranslator_Values::testBoolean() const
         QCOMPARE(std::get<VariableRef>(call->getArguments().at(0)).getElements().front().m_name, "myValue");
         QVERIFY(std::holds_alternative<Constant>(call->getArguments().at(1)));
         QCOMPARE(std::get<Constant>(call->getArguments().at(1)).getValue(), 1);
+    }
+}
+
+void tst_Asn1ToPromelaTranslator_Values::testSequenceOf() const
+{
+    auto asn1Model = createModel();
+
+    {
+        auto integerType = std::make_unique<Integer>("MyInteger");
+        auto myIntegerAssignment =
+                std::make_unique<TypeAssignment>("MyInteger", "MyInteger", SourceLocation(), integerType->clone());
+
+        asn1Model->addType(std::move(myIntegerAssignment));
+
+        auto sequenceType = std::make_unique<SequenceOf>("MySequenceOf");
+        sequenceType->setItemsType(integerType->clone());
+
+        auto sizeConstraint =
+                std::make_unique<SizeConstraint<IntegerValue>>(RangeConstraint<IntegerValue>::create({ 2, 5 }));
+        sequenceType->constraints().append(std::move(sizeConstraint));
+
+        auto mySequenceAssignment = std::make_unique<TypeAssignment>(
+                "MySequenceOf", "MySequenceOf", SourceLocation(), sequenceType->clone());
+
+        asn1Model->addType(std::move(mySequenceAssignment));
+
+        auto sequenceReference = std::make_unique<UserdefinedType>("MySequenceOf", "myModule");
+        sequenceReference->setType(sequenceType->clone());
+
+        auto multipleValue = std::make_unique<MultipleValue>();
+        multipleValue->addValue(std::make_unique<SingleValue>("1"));
+        multipleValue->addValue(std::make_unique<SingleValue>("2"));
+        multipleValue->addValue(std::make_unique<SingleValue>("3"));
+        auto valueAssignment = std::make_unique<ValueAssignment>(
+                "myValue", SourceLocation(), std::move(sequenceReference), std::move(multipleValue));
+        asn1Model->addValue(std::move(valueAssignment));
+    }
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel, true);
+    visitor.visit(*asn1Model);
+
+    const auto &valueDeclarations = promelaModel.getDeclarations();
+    QCOMPARE(valueDeclarations.size(), 1);
+
+    const auto &valueDeclaration = valueDeclarations.at(0);
+    QCOMPARE(valueDeclaration.getName(), "myValue");
+    QVERIFY(valueDeclaration.getType().isUtypeReference());
+    QCOMPARE(valueDeclaration.getType().getUtypeReference().getName(), "MySequenceOf");
+
+    QCOMPARE(promelaModel.getInlineDefs().size(), 4);
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "myValue_init");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 0);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 4);
+
+        const auto &sequence = inlineDef->getSequence();
+
+        for (std::size_t i = 0; i < 3; ++i) {
+            const auto assignIndex = findProctypeElement<InlineCall>(sequence, i);
+            QVERIFY(assignIndex);
+            QCOMPARE(assignIndex->getName(), "MyInteger_assign_value");
+            QCOMPARE(assignIndex->getArguments().size(), 2);
+
+            const auto &assignIndexArgs = assignIndex->getArguments();
+
+            const auto assignIndexArg0 = std::get_if<VariableRef>(&assignIndexArgs.at(0));
+            QVERIFY(assignIndexArg0);
+            const auto &assignIndexArg0Elements = assignIndexArg0->getElements();
+            QCOMPARE(assignIndexArg0Elements.size(), 2);
+            QCOMPARE(assignIndexArg0Elements.front().m_name, "myValue");
+            QCOMPARE(assignIndexArg0Elements.back().m_name, "data");
+            const auto &assignIndexArg0Index =
+                    std::get_if<Constant>(&assignIndexArg0Elements.back().m_index->getContent());
+            QVERIFY(assignIndexArg0Index);
+            QCOMPARE(assignIndexArg0Index->getValue(), i);
+
+            const auto assignIndexArg1 = std::get_if<Constant>(&assignIndexArgs.at(1));
+            QVERIFY(assignIndexArg1);
+            QCOMPARE(assignIndexArg1->getValue(), i + 1);
+        }
+
+        const auto assignLength = findProctypeElement<Assignment>(sequence, 3);
+        QVERIFY(assignLength);
+
+        const auto assignLengthVar = assignLength->getVariableRef();
+        const auto &assignLengthVarElements = assignLengthVar.getElements();
+        QCOMPARE(assignLengthVarElements.size(), 2);
+        QCOMPARE(assignLengthVarElements.front().m_name, "myValue");
+        QCOMPARE(assignLengthVarElements.back().m_name, "length");
+
+        const auto assignLengthConst = std::get_if<Constant>(&assignLength->getExpression().getContent());
+        QVERIFY(assignLengthConst);
+        QCOMPARE(assignLengthConst->getValue(), 3);
     }
 }
 
