@@ -190,11 +190,16 @@ void tst_Asn1ToPromelaTranslator_Env::testInteger() const
     const QString &argName = inlineDef->getArguments().front();
 
     const Sequence &mainSequence = inlineDef->getSequence();
-    QCOMPARE(mainSequence.getContent().size(), 1);
+    QCOMPARE(mainSequence.getContent().size(), 3);
 
-    QVERIFY(std::holds_alternative<Conditional>(mainSequence.getContent().front()->getValue()));
+    auto statement = mainSequence.getContent().begin();
 
-    const Conditional &ifStatement = std::get<Conditional>(mainSequence.getContent().front()->getValue());
+    QVERIFY(std::holds_alternative<Declaration>((*statement)->getValue()));
+    // We are checking in detail just the second statement, which holds the actual logic
+    statement++;
+    QVERIFY(std::holds_alternative<Conditional>((*statement)->getValue()));
+
+    const Conditional &ifStatement = std::get<Conditional>((*statement)->getValue());
 
     QCOMPARE(ifStatement.getAlternatives().size(), 1);
 
@@ -207,11 +212,19 @@ void tst_Asn1ToPromelaTranslator_Env::testInteger() const
 
     const std::list<VariableRef::Element> &variableRefElements = variableRef.getElements();
     QCOMPARE(variableRefElements.size(), 1);
-    QCOMPARE(variableRefElements.front().m_name, argName);
+    QString variableName = variableRefElements.front().m_name;
+    // In order to resolve Spin issue with using struct members in select statement, a temporary
+    // variable is used. Both the temporary variable and argument share the same prefix,
+    // but the argument has "_gv" postfix, while the variable has "_tmp" postfix.
+    // In order to compare the temporary variable to the argument name, the "tmp" postfix must be
+    // changed to "gv" ("_" is the same).
+    QCOMPARE(variableName.replace("tmp", "gv"), argName);
     QVERIFY(variableRefElements.front().m_index.get() == nullptr);
 
     QVERIFY(selection.getFirstIntValue() == 0);
     QVERIFY(selection.getLastIntValue() == 3);
+    statement++;
+    QVERIFY(std::holds_alternative<Assignment>((*statement)->getValue()));
 }
 
 void tst_Asn1ToPromelaTranslator_Env::testEnumerated() const

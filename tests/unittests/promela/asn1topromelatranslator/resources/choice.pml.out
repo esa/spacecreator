@@ -2,19 +2,23 @@
 #define SimpleChoice_alt2_PRESENT 2
 inline Type1_generate_value(Type1_gv)
 {
+    int Type1_tmp;
     if
     ::  atomic {
-        select (Type1_gv : 0 .. 3);
+        select (Type1_tmp : 0 .. 3);
     }
     fi;
+    Type1_gv = Type1_tmp;
 }
 inline Type2_generate_value(Type2_gv)
 {
+    int Type2_tmp;
     if
     ::  atomic {
-        select (Type2_gv : 9 .. 13);
+        select (Type2_tmp : 9 .. 13);
     }
     fi;
+    Type2_gv = Type2_tmp;
 }
 inline SimpleChoice_generate_value(SimpleChoice_gv)
 {

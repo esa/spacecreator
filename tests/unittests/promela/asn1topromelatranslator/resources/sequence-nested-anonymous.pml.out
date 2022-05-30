@@ -1,10 +1,12 @@
 inline Outer_sequence_memberSequence_memberInt_generate_value(Outer_sequence_memberSequence_memberInt_gv)
 {
+    int Outer_sequence_memberSequence_memberInt_tmp;
     if
     ::  atomic {
-        select (Outer_sequence_memberSequence_memberInt_gv : 0 .. 10);
+        select (Outer_sequence_memberSequence_memberInt_tmp : 0 .. 10);
     }
     fi;
+    Outer_sequence_memberSequence_memberInt_gv = Outer_sequence_memberSequence_memberInt_tmp;
 }
 inline Outer_sequence_memberSequence_generate_value(Outer_sequence_memberSequence_gv)
 {

@@ -1,18 +1,22 @@
 inline EnvParamSeq_x_generate_value(EnvParamSeq_x_gv)
 {
+    int EnvParamSeq_x_tmp;
     if
     ::  atomic {
-        select (EnvParamSeq_x_gv : 0 .. 9);
+        select (EnvParamSeq_x_tmp : 0 .. 9);
     }
     fi;
+    EnvParamSeq_x_gv = EnvParamSeq_x_tmp;
 }
 inline EnvParamSeq_y_generate_value(EnvParamSeq_y_gv)
 {
+    int EnvParamSeq_y_tmp;
     if
     ::  atomic {
-        select (EnvParamSeq_y_gv : 0 .. 7);
+        select (EnvParamSeq_y_tmp : 0 .. 7);
     }
     fi;
+    EnvParamSeq_y_gv = EnvParamSeq_y_tmp;
 }
 inline EnvParamSeq_z_generate_value(EnvParamSeq_z_gv)
 {

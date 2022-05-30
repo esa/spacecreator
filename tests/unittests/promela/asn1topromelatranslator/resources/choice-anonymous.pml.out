@@ -2,19 +2,23 @@
 #define SimpleChoiceWithAnonymousTypes_alt2_PRESENT 2
 inline SimpleChoiceWithAnonymousTypes_alt1_generate_value(SimpleChoiceWithAnonymousTypes_alt1_gv)
 {
+    int SimpleChoiceWithAnonymousTypes_alt1_tmp;
     if
     ::  atomic {
-        select (SimpleChoiceWithAnonymousTypes_alt1_gv : 0 .. 5);
+        select (SimpleChoiceWithAnonymousTypes_alt1_tmp : 0 .. 5);
     }
-   fi;
+    fi;
+    SimpleChoiceWithAnonymousTypes_alt1_gv = SimpleChoiceWithAnonymousTypes_alt1_tmp;
 }
 inline SimpleChoiceWithAnonymousTypes_alt2_generate_value(SimpleChoiceWithAnonymousTypes_alt2_gv)
 {
+    int SimpleChoiceWithAnonymousTypes_alt2_tmp;
     if
     ::  atomic {
-        select (SimpleChoiceWithAnonymousTypes_alt2_gv : -1 .. 1);
+        select (SimpleChoiceWithAnonymousTypes_alt2_tmp : -1 .. 1);
     }
     fi;
+    SimpleChoiceWithAnonymousTypes_alt2_gv = SimpleChoiceWithAnonymousTypes_alt2_tmp;
 }
 inline SimpleChoiceWithAnonymousTypes_generate_value(SimpleChoiceWithAnonymousTypes_gv)
 {

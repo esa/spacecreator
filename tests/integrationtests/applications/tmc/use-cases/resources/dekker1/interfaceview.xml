@@ -1,0 +1,252 @@
+<InterfaceView asn1file="dekker1.asn">
+<Function name="LockA" is_type="NO" instance_of="Lock" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="5600 20100 26900 37300"/>
+<Provided_Interface name="WriteRequest" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="1">
+    <Input_Parameter name="p1" type="T-WriteRequest" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="8100 20100"/>
+</Provided_Interface>
+
+<Provided_Interface name="RemoteWantsToEnter" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="3">
+    <Input_Parameter name="p1" type="T-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26900 30400"/>
+</Provided_Interface>
+
+<Provided_Interface name="RemoteSetsTurn" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="1">
+    <Input_Parameter name="p1" type="T-ProcID" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26900 33200"/>
+</Provided_Interface>
+
+<Required_Interface name="WantToEnter" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="3">
+    <Input_Parameter name="p1" type="T-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26900 22400"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="SetTurn" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="1">
+    <Input_Parameter name="p1" type="T-ProcID" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26900 25300"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="MemWrite" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="64">
+    <Input_Parameter name="p1" type="T-WriteAccess" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="16200 37300"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="WriteAck" kind="Sporadic" layer="default">
+    <Property name="Taste::coordinates" value="22500 20100"/>
+    <Property name="Taste::InheritPI" value="false"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="TestGUI" is_type="NO" language="GUI" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="2100 3900 78800 13700"/>
+<Provided_Interface name="WriteAckA" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="1">
+    <Property name="Taste::coordinates" value="22600 13700"/>
+</Provided_Interface>
+
+<Provided_Interface name="WriteAckB" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="1">
+    <Property name="Taste::coordinates" value="73000 13700"/>
+</Provided_Interface>
+
+<Required_Interface name="WriteRequestA" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="1">
+    <Input_Parameter name="p1" type="T-WriteRequest" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="7900 13700"/>
+    <Property name="Taste::InheritPI" value="false"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="WriteRequestB" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="1">
+    <Input_Parameter name="p1" type="T-WriteRequest" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="59200 13700"/>
+    <Property name="Taste::InheritPI" value="false"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Function name="LockB" is_type="NO" instance_of="Lock" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="55400 20900 76600 36300"/>
+<Provided_Interface name="WriteRequest" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="1">
+    <Input_Parameter name="p1" type="T-WriteRequest" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="59300 20900"/>
+</Provided_Interface>
+
+<Provided_Interface name="RemoteWantsToEnter" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="3">
+    <Input_Parameter name="p1" type="T-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="55400 22600"/>
+</Provided_Interface>
+
+<Provided_Interface name="RemoteSetsTurn" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="1">
+    <Input_Parameter name="p1" type="T-ProcID" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="55400 25500"/>
+</Provided_Interface>
+
+<Required_Interface name="WantToEnter" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="3">
+    <Input_Parameter name="p1" type="T-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="55400 30500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="SetTurn" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="1">
+    <Input_Parameter name="p1" type="T-ProcID" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="55400 33200"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="MemWrite" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="64">
+    <Input_Parameter name="p1" type="T-WriteAccess" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="65700 36300"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="WriteAck" kind="Sporadic" layer="default">
+    <Property name="Taste::coordinates" value="73000 20900"/>
+    <Property name="Taste::InheritPI" value="false"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="Lock" is_type="YES" type_language="SDL" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="97700 21900 119300 38500"/>
+<Provided_Interface name="WriteRequest" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="1">
+    <Input_Parameter name="p1" type="T-WriteRequest" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="101700 21900"/>
+</Provided_Interface>
+
+<Provided_Interface name="RemoteWantsToEnter" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="3">
+    <Input_Parameter name="p1" type="T-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="119300 24600"/>
+</Provided_Interface>
+
+<Provided_Interface name="RemoteSetsTurn" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="1">
+    <Input_Parameter name="p1" type="T-ProcID" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="119300 27300"/>
+</Provided_Interface>
+
+<Required_Interface name="WantToEnter" kind="Sporadic" layer="default">
+    <Input_Parameter name="p1" type="T-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="119300 32400"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="SetTurn" kind="Sporadic" layer="default">
+    <Input_Parameter name="p1" type="T-ProcID" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="119300 35200"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="MemWrite" kind="Sporadic" layer="default">
+    <Input_Parameter name="p1" type="T-WriteAccess" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="109600 38500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="WriteAck" kind="Sporadic" layer="default">
+    <Property name="Taste::coordinates" value="114900 23100"/>
+    <Property name="Taste::InheritPI" value="false"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+</Function>
+
+<Function name="SharedMemory" is_type="NO" language="SDL" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="3600 44500 78400 54600"/>
+<Provided_Interface name="MemWriteA" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="64">
+    <Input_Parameter name="p1" type="T-WriteAccess" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="16300 44500"/>
+</Provided_Interface>
+
+<Provided_Interface name="MemWriteB" kind="Sporadic" layer="default" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="64">
+    <Input_Parameter name="p1" type="T-WriteAccess" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="65600 44500"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Connection >
+    <Source func_name="TestGUI" ri_name="WriteRequestB"/>
+    <Target func_name="LockB" pi_name="WriteRequest"/>
+    <Property name="Taste::coordinates" value="59200 14300 59200 17400 59300 20600"/>
+</Connection>
+
+<Connection >
+    <Source func_name="LockB" ri_name="MemWrite"/>
+    <Target func_name="SharedMemory" pi_name="MemWriteB"/>
+    <Property name="Taste::coordinates" value="65700 36900 65700 40500 65600 44200"/>
+</Connection>
+
+<Connection >
+    <Source func_name="LockA" ri_name="WantToEnter"/>
+    <Target func_name="LockB" pi_name="RemoteWantsToEnter"/>
+    <Property name="Taste::coordinates" value="27500 22400 41300 22400 55100 22600"/>
+</Connection>
+
+<Connection >
+    <Source func_name="LockA" ri_name="SetTurn"/>
+    <Target func_name="LockB" pi_name="RemoteSetsTurn"/>
+    <Property name="Taste::coordinates" value="27500 25300 41300 25300 55100 25500"/>
+</Connection>
+
+<Connection >
+    <Source func_name="LockB" ri_name="SetTurn"/>
+    <Target func_name="LockA" pi_name="RemoteSetsTurn"/>
+    <Property name="Taste::coordinates" value="54800 33200 27200 33200"/>
+</Connection>
+
+<Connection >
+    <Source func_name="TestGUI" ri_name="WriteRequestA"/>
+    <Target func_name="LockA" pi_name="WriteRequest"/>
+    <Property name="Taste::coordinates" value="7900 14300 7900 17000 8100 18200 8100 19800"/>
+</Connection>
+
+<Connection >
+    <Source func_name="LockA" ri_name="WriteAck"/>
+    <Target func_name="TestGUI" pi_name="WriteAckA"/>
+    <Property name="Taste::coordinates" value="22500 19500 22500 16800 22600 15600 22600 14000"/>
+</Connection>
+
+<Connection >
+    <Source func_name="LockB" ri_name="WantToEnter"/>
+    <Target func_name="LockA" pi_name="RemoteWantsToEnter"/>
+    <Property name="Taste::coordinates" value="54800 30500 41000 30500 27200 30400"/>
+</Connection>
+
+<Connection >
+    <Source func_name="LockA" ri_name="MemWrite"/>
+    <Target func_name="SharedMemory" pi_name="MemWriteA"/>
+    <Property name="Taste::coordinates" value="16200 37900 16200 41000 16300 44200"/>
+</Connection>
+
+<Connection >
+    <Source func_name="LockB" ri_name="WriteAck"/>
+    <Target func_name="TestGUI" pi_name="WriteAckB"/>
+    <Property name="Taste::coordinates" value="73000 20300 73000 14000"/>
+</Connection>
+
+</InterfaceView>
