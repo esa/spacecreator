@@ -373,7 +373,7 @@ void tst_Asn1ToPromelaTranslator_Values::testSequenceOf() const
     QVERIFY(valueDeclaration.getType().isUtypeReference());
     QCOMPARE(valueDeclaration.getType().getUtypeReference().getName(), "MySequenceOf");
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 4);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 5);
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "myValue_init");
         QVERIFY(inlineDef != nullptr);
