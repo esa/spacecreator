@@ -466,13 +466,12 @@ void compareTextFiles(const QString &actualOutputFilename, const QString &expect
     }
     QTextStream consumableOutput(&outputFile);
 
-    const QString expectedFilepath = QString("resources%1%2").arg(QDir::separator()).arg(expectedOutputFilename);
-    try {
-        const std::vector<QString> expectedOutput = TextCheckerAndConsumer::readLinesFromFile(expectedFilepath);
-        TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
-    } catch (const std::exception &e) {
-        QFAIL(e.what());
-    }
+    const QString diffCommand = QString("diff --ignore-all-space --suppress-common-lines --side-by-side "
+                                        "resources/%1 "
+                                        "%2")
+                                        .arg(expectedOutputFilename)
+                                        .arg(actualOutputFilename);
+    QCOMPARE(QProcess::execute(diffCommand), 0);
 }
 
 } // namespace tmc::test
