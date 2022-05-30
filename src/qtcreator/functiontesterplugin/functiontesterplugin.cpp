@@ -188,18 +188,16 @@ auto FunctionTesterPlugin::getCurrentIvEditorCore() -> IVEditorCorePtr
 
 auto FunctionTesterPlugin::getSelectedInterface() -> ivm::IVObject *
 {
-    ivm::IVObject *entity = nullptr;
     IVEditorCorePtr ivEditorCorePtr = getCurrentIvEditorCore();
-
     auto view = ivEditorCorePtr->chartView();
     if (!view) {
-        return entity;
+        return nullptr;
     }
 
     if (auto scene = view->scene()) {
         for (const auto& item : scene->selectedItems()) {
             if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
-                if (entity = iObj->entity() ? iObj->entity()->as<ivm::IVObject *>() : nullptr) {
+                if (auto entity = iObj->entity() ? iObj->entity()->as<ivm::IVObject *>() : nullptr) {
                     if (entity->isInterface()) {
                         MessageManager::write(GenMsg::msgInfo.arg(entity->title()));
                         return entity;
@@ -209,7 +207,7 @@ auto FunctionTesterPlugin::getSelectedInterface() -> ivm::IVObject *
         }
     }
 
-    return entity;
+    return nullptr;
 }
 
 } // namespace spctr
