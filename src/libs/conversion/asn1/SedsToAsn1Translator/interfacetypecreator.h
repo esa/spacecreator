@@ -44,20 +44,20 @@ public:
     /**
      * @brief   Deleted copy constructor
      */
-    InterfaceTypeCreator(const InterfaceTypeCreator&) = delete;
+    InterfaceTypeCreator(const InterfaceTypeCreator &) = delete;
     /**
      * @brief   Deleted move constructor
      */
-    InterfaceTypeCreator(InterfaceTypeCreator&) = delete;
+    InterfaceTypeCreator(InterfaceTypeCreator &) = delete;
 
     /**
      * @brief   Deleted copy assignment operator
      */
-    auto operator=(const InterfaceTypeCreator&) -> InterfaceTypeCreator& = delete;
+    auto operator=(const InterfaceTypeCreator &) -> InterfaceTypeCreator & = delete;
     /**
      * @brief   Deleted move assignment operator
      */
-    auto operator=(InterfaceTypeCreator&) -> InterfaceTypeCreator& = delete;
+    auto operator=(InterfaceTypeCreator &) -> InterfaceTypeCreator & = delete;
 
 public:
     /**

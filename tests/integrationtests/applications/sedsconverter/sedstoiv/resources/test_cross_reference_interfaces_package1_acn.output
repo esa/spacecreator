@@ -1,3 +1,2 @@
 COM-N7SPACE-PACKAGE1 DEFINITIONS ::= BEGIN
-Package1Item [size 8, encoding pos-int, endianness big]
 END

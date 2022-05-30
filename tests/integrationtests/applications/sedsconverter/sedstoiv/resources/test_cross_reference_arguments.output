@@ -12,6 +12,9 @@
 <Provided_Interface name="ProvidedInterface_SyncCommandSimpleMapping_Pi" kind="Protected" layer="default">
     <Input_Parameter name="ArgumentSimpleMapping" type="MegaComponent-ProvidedInterface-SyncGenericType" encoding="ACN"/>
 </Provided_Interface>
+<Provided_Interface name="ProvidedInterface_SyncCommandSimpleMappingArray_Pi" kind="Protected" layer="default">
+    <Input_Parameter name="ArrayArgumentSimpleMapping" type="MegaComponent-ProvidedInterface-SyncGenericTypeArray-10" encoding="ACN"/>
+</Provided_Interface>
 <Provided_Interface name="ProvidedInterface_AsyncCommandNoMapping_Pi" layer="default">
     <Input_Parameter name="InputParam" type="MegaInterface-AsyncCommandNoMapping-Type" encoding="ACN"/>
 </Provided_Interface>
@@ -21,8 +24,14 @@
 <Provided_Interface name="ProvidedInterface_AsyncCommandSimpleMapping_Pi" layer="default">
     <Input_Parameter name="InputParam" type="MegaComponent-ProvidedInterface-AsyncCommandSimpleMapping-Type" encoding="ACN"/>
 </Provided_Interface>
+<Provided_Interface name="ProvidedInterface_AsyncCommandSimpleMappingArray_Pi" layer="default">
+    <Input_Parameter name="InputParam" type="MegaComponent-ProvidedInterface-AsyncCommandSimpleMappingArray-Type" encoding="ACN"/>
+</Provided_Interface>
 <Provided_Interface name="ProvidedInterface_AsyncCommandAlternateMapping_Pi" layer="default">
     <Input_Parameter name="InputParam" type="MegaComponent-ProvidedInterface-AsyncCommandAlternateMapping-Type" encoding="ACN"/>
+</Provided_Interface>
+<Provided_Interface name="ProvidedInterface_AsyncCommandAlternateMappingArray_Pi" layer="default">
+    <Input_Parameter name="InputParam" type="MegaComponent-ProvidedInterface-AsyncCommandAlternateMappingArray-Type" encoding="ACN"/>
 </Provided_Interface>
 
     <Implementations>

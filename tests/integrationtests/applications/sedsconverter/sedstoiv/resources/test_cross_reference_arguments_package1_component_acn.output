@@ -1,9 +1,15 @@
 COM-N7SPACE-PACKAGE1-MEGACOMPONENT DEFINITIONS ::= BEGIN
 MegaComponent-ProvidedInterface-SyncGenericType []
+MegaComponent-ProvidedInterface-SyncGenericTypeArray-10 []
 MegaComponent-ProvidedInterface-AsyncGenericType []
 MegaComponent-ProvidedInterface-AsyncCommandSimpleMapping-Type []
 {
     argumentSimpleMapping []
+}
+MegaComponent-ProvidedInterface-AsyncGenericTypeArray-10 []
+MegaComponent-ProvidedInterface-AsyncCommandSimpleMappingArray-Type []
+{
+    arrayArgumentSimpleMapping []
 }
 MegaComponent-ProvidedInterface-DeterminantGenericType []
 MegaComponent-ProvidedInterface-AlternateGenericType <COM-N7SPACE-PACKAGE2.DeterminantItem:determinant> []
@@ -15,5 +21,11 @@ MegaComponent-ProvidedInterface-AsyncCommandAlternateMapping-Type []
 {
     genericArgument1 MegaComponent-ProvidedInterface-DeterminantGenericType [],
     genericArgument2 <genericArgument1>[]
+}
+MegaComponent-ProvidedInterface-AlternateGenericTypeArray-10 []
+MegaComponent-ProvidedInterface-AsyncCommandAlternateMappingArray-Type []
+{
+    genericArgument1 MegaComponent-ProvidedInterface-DeterminantGenericType [],
+    genericArgument2 []
 }
 END

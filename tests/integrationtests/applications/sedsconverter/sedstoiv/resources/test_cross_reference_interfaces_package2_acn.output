@@ -1,8 +1,3 @@
 COM-N7SPACE-PACKAGE2 DEFINITIONS ::= BEGIN
 ChildInterface-GenericType []
-ChildInterface-AsyncCommandSimpleMapping-Type []
-{
-    argumentSimpleMapping [],
-    argumentLocal []
-}
 END
