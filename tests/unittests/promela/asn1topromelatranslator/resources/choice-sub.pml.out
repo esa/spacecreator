@@ -1,39 +1,33 @@
 #define ConcreteChoice_firstOption_PRESENT 1
-#define ConcreteChoice_thirdOption_PRESENT 3
-inline ConcreteChoice_firstOption_generate_value(value)
+#define ConcreteChoice_thirdOption_PRESENT 2
+inline ConcreteChoice_firstOption_generate_value(ConcreteChoice_firstOption_gv)
 {
+    int ConcreteChoice_firstOption_tmp;
     if
-    ::  true;
-        value = 0;
-    ::  true;
-        value = 1;
-    ::  true;
-        value = 2;
+    ::  atomic {
+        select (ConcreteChoice_firstOption_tmp : 0 .. 2);
+    }
     fi;
+    ConcreteChoice_firstOption_gv = ConcreteChoice_firstOption_tmp;
 }
-inline ConcreteChoice_thirdOption_generate_value(value)
+inline ConcreteChoice_thirdOption_generate_value(ConcreteChoice_thirdOption_gv)
 {
+    int ConcreteChoice_thirdOption_tmp;
     if
-    ::  true;
-        value = 0;
-    ::  true;
-        value = 1;
-    ::  true;
-        value = 2;
-    ::  true;
-        value = 3;
-    ::  true;
-        value = 4;
+    ::  atomic {
+        select (ConcreteChoice_thirdOption_tmp : 0 .. 4);
+    }
     fi;
+    ConcreteChoice_thirdOption_gv = ConcreteChoice_thirdOption_tmp;
 }
-inline ConcreteChoice_generate_value(value)
+inline ConcreteChoice_generate_value(ConcreteChoice_gv)
 {
     if
     ::  true;
-        ConcreteChoice_firstOption_generate_value(value.firstOption);
-        value.selection = ConcreteChoice_firstOption_PRESENT;
+        ConcreteChoice_firstOption_generate_value(ConcreteChoice_gv.firstOption);
+        ConcreteChoice_gv.selection = ConcreteChoice_firstOption_PRESENT;
     ::  true;
-        ConcreteChoice_thirdOption_generate_value(value.thirdOption);
-        value.selection = ConcreteChoice_thirdOption_PRESENT;
+        ConcreteChoice_thirdOption_generate_value(ConcreteChoice_gv.thirdOption);
+        ConcreteChoice_gv.selection = ConcreteChoice_thirdOption_PRESENT;
     fi;
 }
