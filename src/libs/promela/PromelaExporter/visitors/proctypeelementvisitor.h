@@ -98,7 +98,7 @@ public:
      *
      * @param skip ExitLoop to export
      */
-    void operator()(const ::promela::model::ExitLoop &exitLoop);
+    void operator()(const model::ExitLoop &exitLoop);
     /**
      * @brief Handle Conditional
      *
@@ -122,7 +122,7 @@ public:
      *
      * @param select Select to export
      */
-    void operator()(const ::promela::model::Select &select);
+    void operator()(const model::Select &select);
     /**
      * @brief Handle Assert Call
      *
@@ -131,7 +131,7 @@ public:
     void operator()(const model::AssertCall &call);
 
 private:
-    QString expressionContentToString(const ::promela::model::Expression &expression);
+    QString expressionContentToString(const model::Expression &expression);
 
     QTextStream &m_stream;
     const QString m_baseIndent;

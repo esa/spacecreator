@@ -234,7 +234,7 @@ void ProctypeElementVisitor::operator()(const AssertCall &call)
     m_stream << ");\n";
 }
 
-QString ProctypeElementVisitor::expressionContentToString(const ::promela::model::Expression &expression)
+QString ProctypeElementVisitor::expressionContentToString(const model::Expression &expression)
 {
     const Expression::Value &content = expression.getContent();
 

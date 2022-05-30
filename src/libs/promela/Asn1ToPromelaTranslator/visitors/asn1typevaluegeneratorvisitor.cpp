@@ -148,7 +148,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const BitString &type)
 
 void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
 {
-    Asn1ConstraintVisitor<Asn1Acn::OctetStringValue> osVisitor;
+    SizeConstraintVisitor<Asn1Acn::OctetStringValue> osVisitor;
     const auto &typeConstraints = type.constraints().constraints();
     if (typeConstraints.size() != 1) {
         const QString msg("OctetString shall have only one constraint");
