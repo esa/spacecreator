@@ -83,6 +83,8 @@
 #include <spacecreatorplugin/iv/ivqtceditor.h>
 #include <utils/fileutils.h>
 
+#include <shared/ui/veinteractiveobject.h>
+
 using namespace Core;
 using conversion::Converter;
 using conversion::ModelType;
@@ -153,6 +155,8 @@ auto FunctionTesterPlugin::createActionContainerInTools(const QString &title) ->
 
 auto FunctionTesterPlugin::loadCsv() -> void
 {
+    getSelectedInterface(); // TODO: delete from here and use in a more suitable place
+
     const QString inputFilePath = QFileDialog::getOpenFileName(
             nullptr, tr("Select CSV file to import test vectors from..."), QString(), tr("*.csv"));
     if (inputFilePath.isEmpty()) {
@@ -169,6 +173,43 @@ auto FunctionTesterPlugin::loadCsv() -> void
     }
 
     MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesImported));
+}
+
+auto FunctionTesterPlugin::getCurrentIvEditorCore() -> IVEditorCorePtr
+{
+    auto *const currentDocument = EditorManager::currentDocument();
+    auto *const currentIvDocument = static_cast<IVEditorDocument *>(currentDocument);
+    if (currentIvDocument == nullptr) {
+        MessageManager::write(GenMsg::msgError.arg(GenMsg::ivFileNotSelected));
+        return nullptr;
+    }
+    return currentIvDocument->ivEditorCore();
+}
+
+auto FunctionTesterPlugin::getSelectedInterface() -> ivm::IVObject *
+{
+    ivm::IVObject *entity = nullptr;
+    IVEditorCorePtr ivEditorCorePtr = getCurrentIvEditorCore();
+
+    auto view = ivEditorCorePtr->chartView();
+    if (!view) {
+        return entity;
+    }
+
+    if (auto scene = view->scene()) {
+        for (const auto& item : scene->selectedItems()) {
+            if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
+                if (entity = iObj->entity() ? iObj->entity()->as<ivm::IVObject *>() : nullptr) {
+                    if (entity->isInterface()) {
+                        MessageManager::write(GenMsg::msgInfo.arg(entity->title()));
+                        return entity;
+                    }
+                }
+            }
+        }
+    }
+
+    return entity;
 }
 
 } // namespace spctr
