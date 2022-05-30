@@ -32,6 +32,7 @@
 #include <extensionsystem/iplugin.h>
 #include <memory>
 #include <shared/ui/listtreedialog.h>
+#include <csv/CsvModel/csvmodel.h>
 
 namespace spctr {
 
@@ -47,13 +48,14 @@ public:
     auto initialize(const QStringList &arguments, QString *errorString) -> bool override;
     auto extensionsInitialized() -> void override;
     auto aboutToShutdown() -> ShutdownFlag override;
-
+    auto functionTesterPluginMain() -> void;
 private:
     auto addTestInterfaceOption() -> void;
     auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
-    auto loadCsv() -> void;
+    auto loadCsv() -> std::unique_ptr<csv::CsvModel>;
     auto getCurrentIvEditorCore() -> IVEditorCorePtr;
     auto getSelectedInterface() -> ivm::IVObject *;
+    auto setDeltaDialog() -> float;
 
     // auto initializeRegistry() -> void;
 

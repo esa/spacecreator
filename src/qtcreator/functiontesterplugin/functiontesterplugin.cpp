@@ -18,12 +18,15 @@
  */
 
 #include "functiontesterplugin.h"
+
 #include "ftpluginconstants.h"
 
 #include <QAction>
 #include <QDir>
 #include <QFileDialog>
+#include <QInputDialog>
 #include <QMenu>
+#include <QMessageBox>
 #include <algorithm>
 #include <asn1library/asn1/asn1model.h>
 #include <context/action/actionsmanager.h>
@@ -77,13 +80,12 @@
 #include <shared/entityattribute.h>
 #include <shared/graphicsviewutils.h>
 #include <shared/sharedlibrary.h>
+#include <shared/ui/veinteractiveobject.h>
 #include <spacecreatorplugin/iv/iveditordata.h>
 #include <spacecreatorplugin/iv/iveditordocument.h>
 #include <spacecreatorplugin/iv/iveditorfactory.h>
 #include <spacecreatorplugin/iv/ivqtceditor.h>
 #include <utils/fileutils.h>
-
-#include <shared/ui/veinteractiveobject.h>
 
 using namespace Core;
 using conversion::Converter;
@@ -128,6 +130,22 @@ auto FunctionTesterPlugin::aboutToShutdown() -> ExtensionSystem::IPlugin::Shutdo
     return SynchronousShutdown;
 }
 
+auto FunctionTesterPlugin::functionTesterPluginMain() -> void
+{
+    ivm::IVObject *interface = getSelectedInterface();
+    if (!interface) {
+        QMessageBox msgBox;
+        msgBox.setText(tr("No interface selected!"));
+        msgBox.exec();
+        return;
+    }
+    auto csvModel = loadCsv();
+    if (!csvModel) {
+        return;
+    }
+    float delta = setDeltaDialog();
+}
+
 auto FunctionTesterPlugin::addTestInterfaceOption() -> void
 {
     Context allContexts(Core::Constants::C_WELCOME_MODE, Core::Constants::C_EDIT_MODE, Core::Constants::C_DESIGN_MODE);
@@ -135,7 +153,7 @@ auto FunctionTesterPlugin::addTestInterfaceOption() -> void
     ActionContainer *const acToolsFunctionTester = createActionContainerInTools(tr("&Test Interface"));
 
     const auto csvImportAction = new QAction(tr("Import test vectors from CSV"), this);
-    connect(csvImportAction, &QAction::triggered, [=]() { this->loadCsv(); });
+    connect(csvImportAction, &QAction::triggered, [=]() { this->functionTesterPluginMain(); });
     Command *const csvImport = ActionManager::registerAction(csvImportAction, Constants::CSV_IMPORT_ID, allContexts);
     acToolsFunctionTester->addAction(csvImport);
 }
@@ -153,15 +171,25 @@ auto FunctionTesterPlugin::createActionContainerInTools(const QString &title) ->
     return container;
 }
 
-auto FunctionTesterPlugin::loadCsv() -> void
+auto FunctionTesterPlugin::setDeltaDialog() -> float
 {
-    getSelectedInterface(); // TODO: delete from here and use in a more suitable place
+    float delta = 0.0;
+    bool isOk;
+    QString text = QInputDialog::getText(nullptr, tr("Set delta"), tr("Max error:"), QLineEdit::Normal,
+            "0.0", &isOk, { 0U }, Qt::ImhFormattedNumbersOnly);
+    if (isOk && !text.isEmpty()) {
+        delta = text.toFloat();
+    }
+    return delta;
+}
 
+auto FunctionTesterPlugin::loadCsv() -> std::unique_ptr<csv::CsvModel>
+{
     const QString inputFilePath = QFileDialog::getOpenFileName(
             nullptr, tr("Select CSV file to import test vectors from..."), QString(), tr("*.csv"));
     if (inputFilePath.isEmpty()) {
         MessageManager::write(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
-        return;
+        return std::unique_ptr<csv::CsvModel> {};
     }
 
     std::unique_ptr<csv::CsvModel> model;
@@ -169,10 +197,11 @@ auto FunctionTesterPlugin::loadCsv() -> void
         model = ModelLoader::loadCsvModel(inputFilePath);
     } catch (std::exception &ex) {
         MessageManager::write(GenMsg::msgError.arg(ex.what()));
-        return;
+        return model;
     }
 
     MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesImported));
+    return model;
 }
 
 auto FunctionTesterPlugin::getCurrentIvEditorCore() -> IVEditorCorePtr
@@ -195,7 +224,7 @@ auto FunctionTesterPlugin::getSelectedInterface() -> ivm::IVObject *
     }
 
     if (auto scene = view->scene()) {
-        for (const auto& item : scene->selectedItems()) {
+        for (const auto &item : scene->selectedItems()) {
             if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
                 if (auto entity = iObj->entity() ? iObj->entity()->as<ivm::IVObject *>() : nullptr) {
                     if (entity->isInterface()) {
