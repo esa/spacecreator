@@ -27,6 +27,9 @@
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Translator for SEDS array data type
+ */
 class ArrayDataTypeTranslator final
 {
 public:
@@ -55,6 +58,11 @@ public:
     ArrayDataTypeTranslator &operator=(ArrayDataTypeTranslator &&) = delete;
 
 public:
+    /**
+     * @brief   Translate passed data type
+     *
+     * @param   sedsType    Type to translation
+     */
     auto translate(const seds::model::ArrayDataType &sedsType) -> void;
 
 private:

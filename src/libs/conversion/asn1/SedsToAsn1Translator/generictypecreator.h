@@ -26,12 +26,41 @@
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Helper for creating generic types
+ */
 class GenericTypeCreator final
 {
 public:
+    /**
+     * @brief   Constructor
+     */
     GenericTypeCreator(Context &context, QString parentName, const GenericTypeMapper &typeMapper);
+    /**
+     * @brief   Deleted copy constructor
+     */
+    GenericTypeCreator(const GenericTypeCreator&) = delete;
+    /**
+     * @brief   Deleted move constructor
+     */
+    GenericTypeCreator(GenericTypeCreator&&) = delete;
+
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    auto operator=(const GenericTypeCreator&) -> GenericTypeCreator& = delete;
+    /**
+     * @brief   Deleted move assignment operator
+     */
+    auto operator=(GenericTypeCreator&&) -> GenericTypeCreator& = delete ;
 
 public:
+    /**
+     * @brief   Create ASN.1 for generic SEDS type
+     *
+     * @param   mapping         SEDS generic type mappings
+     * @param   genericName     Name of the generic type
+     */
     auto createTypeForGeneric(const TypeMapping *mapping, const QString &genericName) -> QString;
 
 private:

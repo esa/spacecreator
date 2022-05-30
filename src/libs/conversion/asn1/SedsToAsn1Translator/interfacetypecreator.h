@@ -31,13 +31,48 @@
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Helper for creating types for interface commands
+ */
 class InterfaceTypeCreator final
 {
 public:
+    /**
+     * @brief   Default constructor
+     */
     InterfaceTypeCreator() = default;
+    /**
+     * @brief   Deleted copy constructor
+     */
+    InterfaceTypeCreator(const InterfaceTypeCreator&) = delete;
+    /**
+     * @brief   Deleted move constructor
+     */
+    InterfaceTypeCreator(InterfaceTypeCreator&) = delete;
+
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    auto operator=(const InterfaceTypeCreator&) -> InterfaceTypeCreator& = delete;
+    /**
+     * @brief   Deleted move assignment operator
+     */
+    auto operator=(InterfaceTypeCreator&) -> InterfaceTypeCreator& = delete;
 
 public:
+    /**
+     * @brief   Create types for interface delcaration
+     *
+     * @param   interfaceDeclaration    Interface delcaration to handle
+     * @param   context                 Current translation context
+     */
     auto createTypes(const seds::model::InterfaceDeclaration &interfaceDeclaration, Context &context) -> void;
+    /**
+     * @brief   Create types for interface
+     *
+     * @param   interfaceDeclaration    Interface to handle
+     * @param   context                 Current translation context
+     */
     auto createTypes(const seds::model::Interface &interface, Context &context) -> void;
 
 private:

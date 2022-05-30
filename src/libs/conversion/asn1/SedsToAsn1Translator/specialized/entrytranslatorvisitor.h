@@ -36,15 +36,20 @@
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Translator visitor for SEDS entry type
+ *
+ * Translated entry will be added to the passed ASN.1 sequence
+ */
 class EntryTranslatorVisitor final
 {
 public:
     /**
      * @brief   Constructor
      *
-     * @param   context     Current translation context
-     * @param   container   Parent SEDS container
-     * @param   sequence    ASN.1 sequence where translated entries will be added
+     * @param   context         Current translation context
+     * @param   sedsContainer   Parent SEDS container
+     * @param   sequence        ASN.1 sequence where translated entries will be added
      */
     EntryTranslatorVisitor(
             Context &context, const seds::model::ContainerDataType &sedsContainer, Asn1Acn::Types::Sequence *sequence);

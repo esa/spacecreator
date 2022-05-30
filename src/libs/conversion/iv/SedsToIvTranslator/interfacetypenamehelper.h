@@ -27,21 +27,60 @@
 
 namespace conversion::iv::translator {
 
+/**
+ * @brief   Helper for building names for interface command argument types
+ */
 class InterfaceTypeNameHelper final
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   context                 Translation context
+     * @param   parentName              Parent entity name
+     * @param   interfaceDeclaration    Parent interface declaration
+     * @param   sedsPackages            List of all SEDS packages
+     */
     InterfaceTypeNameHelper(Context context, QString parentName,
             const seds::model::InterfaceDeclaration *interfaceDeclaration,
             const std::vector<seds::model::Package> &sedsPackages);
+    /**
+     * @brief   Deleted copy constructor
+     */
     InterfaceTypeNameHelper(const InterfaceTypeNameHelper &) = delete;
+    /**
+     * @brief   Deleted move constructor
+     */
     InterfaceTypeNameHelper(InterfaceTypeNameHelper &&) = delete;
 
+    /**
+     * @brief   Deleted copy assignment operator
+     */
     InterfaceTypeNameHelper operator=(const InterfaceTypeNameHelper &) = delete;
+    /**
+     * @brief   Deleted move assignment operator
+     */
     InterfaceTypeNameHelper operator=(InterfaceTypeNameHelper &&) = delete;
 
 public:
+    /**
+     * @brief   Handle name of given type
+     *
+     * @param   typeRef     Type reference
+     * @param   dimensions  Array dimensions
+     *
+     * @return  Type name
+     */
     auto handleTypeName(const seds::model::DataTypeRef &typeRef,
             const std::vector<seds::model::DimensionSize> &dimensions) const -> QString;
+    /**
+     * @brief   Handle bundled name of the async command type
+     *
+     * @param   command                 Command to handle
+     * @param   requestedArgumentMode   Mode for command arguments that should be handled
+     *
+     * @return  Command bundled type name
+     */
     auto handleAsyncCommandTypeName(const seds::model::InterfaceCommand &command,
             const seds::model::CommandArgumentMode requestedArgumentMode) const -> QString;
 

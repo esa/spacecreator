@@ -29,6 +29,11 @@
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Translator visitor for SEDS container constraints
+ *
+ * Translated constraints will be applied to the passed ASN.1 sequence
+ */
 class ContainerConstraintTranslatorVisitor final
 {
 public:

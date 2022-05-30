@@ -42,17 +42,68 @@ public:
     DataTypeTranslationHelper() = delete;
 
 public:
+    /**
+     * @brief   Build name for the array type
+     *
+     * @param   baseTypeName    Name of the type that is a base of the array
+     * @param   dimensions      Array dimensions
+     *
+     * @return  Array type name
+     */
     static auto buildArrayTypeName(
             const QString &baseTypeName, const std::vector<seds::model::DimensionSize> &dimensions) -> QString;
+    /**
+     * @brief   Build name for the bundled type
+     *
+     * @param   parentName      Name of the entity that is a parent of the bundled type
+     * @param   commandName     Name of the command for which the bundled type is created
+     * @param   mode            Mode of the parent command
+     *
+     * @return  Bundled type name
+     */
     static auto buildBundledTypeName(const QString &parentName, const QString &commandName,
             const seds::model::CommandArgumentMode mode) -> QString;
+    /**
+     * @brief   Build name for the concrete type name
+     *
+     * @param   interfaceDeclarationName    Name of the parent interface declaration
+     * @param   genericName                 Name of the generic type
+     *
+     * @return  Concrete type name
+     */
     static auto buildConcreteTypeName(const QString &interfaceDeclarationName, const QString &genericName) -> QString;
 
+    /**
+     * @brief   Create array type
+     *
+     * @param   context     Current translation context
+     * @param   typeRef     Type that is a base of the array
+     * @param   dimensions  Array dimensions
+     *
+     * @return  Type reference for the created type
+     */
     static auto createArrayType(Context &context, const seds::model::DataTypeRef &typeRef,
             const std::vector<seds::model::DimensionSize> &dimensions) -> seds::model::DataTypeRef;
+    /**
+     * @brief   Create array type if it doesn't exists, return reference to it otherwise
+     *
+     * @param   context     Current translation context
+     * @param   typeRef     Type that is a base of the array
+     * @param   dimensions  Array dimensions
+     *
+     * @return  ASN.1 type
+     */
     static auto handleArrayType(Context &context, const seds::model::DataTypeRef &argumentTypeRef,
             const std::vector<seds::model::DimensionSize> &dimensions) -> Asn1Acn::Types::Type *;
 
+    /**
+     * @brief   Check if given type is a generic type
+     *
+     * @param   typeRef         Type to check
+     * @param   genericTypes    List of generic types
+     *
+     * @return  True of type is generic, false otherwise
+     */
     static auto isTypeGeneric(
             const seds::model::DataTypeRef &typeRef, const std::vector<seds::model::GenericType> &genericTypes) -> bool;
 

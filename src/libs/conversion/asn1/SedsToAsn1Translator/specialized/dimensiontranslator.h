@@ -26,6 +26,9 @@
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Translator for SEDS dimensions
+ */
 class DimensionTranslator final
 {
 public:

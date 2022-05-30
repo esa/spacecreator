@@ -33,27 +33,93 @@
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Context for creating types for interface commands
+ */
 class InterfaceTypeCreatorContext final
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   mainContext             Current translation context
+     * @param   interfaceContext        Translation context for parent interface
+     * @param   interfaceDeclaration    Parent interface declaration
+     * @param   parentName              Name of the entity that should be a parent for the created type
+     * @param   mappings                Mappings for generic types
+     */
     InterfaceTypeCreatorContext(Context &mainContext, Context &interfaceContext,
             const seds::model::InterfaceDeclaration *interfaceDeclaration, QString parentName,
             const std::optional<seds::model::GenericTypeMapSet> &mappings);
+    /**
+     * @brief   Deleted copy constructor
+     */
     InterfaceTypeCreatorContext(const InterfaceTypeCreatorContext &) = delete;
+    /**
+     * @brief   Deleted move constructor
+     */
     InterfaceTypeCreatorContext(InterfaceTypeCreatorContext &&) = delete;
 
+    /**
+     * @brief   Deleted copy assignment operator
+     */
     InterfaceTypeCreatorContext operator=(const InterfaceTypeCreatorContext &) = delete;
+    /**
+     * @brief   Deleted move assignment operator
+     */
     InterfaceTypeCreatorContext operator=(InterfaceTypeCreatorContext &&) = delete;
 
 public:
+    /**
+     * @brief   Handle type of the command argument
+     *
+     * @param   typeRef         Type reference
+     * @param   dimensions      Type array dimensions
+     */
     auto handleType(const seds::model::DataTypeRef &typeRef, const std::vector<seds::model::DimensionSize> &dimensions)
             -> std::optional<seds::model::DataTypeRef>;
 
+    /**
+     * @brief   Getter for main context
+     *
+     * @return  Main context
+     */
     auto mainContext() const -> Context &;
+    /**
+     * @brief   Getter for interface context
+     *
+     * @return  Interface context
+     */
     auto interfaceContext() const -> Context &;
+    /**
+     * @brief   Getter for parent entity name
+     *
+     * @return  Parent entity name
+     */
     auto parentName() const -> const QString &;
+    /**
+     * @brief   Find determinant argument from given vector
+     *
+     * @param   arguments   Arguments to check in
+     *
+     * @return  Name of the determinant argument if found, nullopt otherwise
+     */
     auto findDeterminantArgument(const std::vector<seds::model::CommandArgument> &arguments) -> std::optional<QString>;
+    /**
+     * @brief   Check if given type is a generic type
+     *
+     * @param   typeRef     Type reference to check
+     *
+     * @return  True if type is generic, false otherwise
+     */
     auto isTypeGeneric(const seds::model::DataTypeRef &typeRef) -> bool;
+    /**
+     * @brief   Check if given command has any argument with generic type
+     *
+     * @param   command     Commend to check
+     *
+     * @true    True if command is generic, false otherwise
+     */
     auto isCommandGeneric(const seds::model::InterfaceCommand &command) -> bool;
 
 private:

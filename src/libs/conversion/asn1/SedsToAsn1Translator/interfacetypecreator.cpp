@@ -136,10 +136,10 @@ void InterfaceTypeCreator::createTypesForSyncCommand(
 void InterfaceTypeCreator::createTypesForAsyncCommand(const seds::model::InterfaceCommand &command,
         const QString &interfaceDeclarationName, InterfaceTypeCreatorContext &typeCreatorContext)
 {
-    // Process command based on its commands
+    // Process command based on its arguments
     switch (command.argumentsCombination()) {
     case seds::model::ArgumentsCombination::InOnly: {
-        // In arguments are 'native', so they are handles as-is
+        // In arguments are 'native', so they are handled as-is
         createAsyncCommandBundledType(
                 command, interfaceDeclarationName, seds::model::CommandArgumentMode::In, typeCreatorContext);
     } break;

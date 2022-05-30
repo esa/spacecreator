@@ -31,7 +31,13 @@
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Data structure for SEDS generic type mapping
+ */
 struct TypeMapping final {
+    /**
+     * @brief   Information about concrete type
+     */
     struct Concrete {
         Asn1Acn::Types::Type *type;
         std::optional<QString> fixedValue;
@@ -48,6 +54,9 @@ struct TypeMapping final {
     std::vector<Concrete> concreteMappings;
 };
 
+/**
+ * @brief   Helper for mapping SEDS generic types
+ */
 class GenericTypeMapper final
 {
 public:

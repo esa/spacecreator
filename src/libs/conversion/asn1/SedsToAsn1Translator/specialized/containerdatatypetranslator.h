@@ -28,6 +28,9 @@
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Translator for SEDS container data type
+ */
 class ContainerDataTypeTranslator final
 {
 public:
@@ -56,6 +59,11 @@ public:
     ContainerDataTypeTranslator &operator=(ContainerDataTypeTranslator &&) = delete;
 
 public:
+    /**
+     * @brief   Translate passed data type
+     *
+     * @param   sedsType    Type to translation
+     */
     auto translate(const seds::model::ContainerDataType &sedsType) -> void;
 
 private:

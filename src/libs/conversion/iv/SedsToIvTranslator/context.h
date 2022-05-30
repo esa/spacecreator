@@ -28,12 +28,28 @@ class Component;
 
 namespace conversion::iv::translator {
 
+/**
+ * @brief   Context with current SEDS to IV translation state
+ */
 class Context final
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   package     Current package
+     * @param   component   Current componen
+     */
     Context(const seds::model::Package *package, const seds::model::Component *component);
 
 public:
+    /**
+     * @brief   Find interface declaration with given name
+     *
+     * @param   interfaceDeclarationName    Name to search
+     *
+     * @return  Pointer to the interface declaration if found, nullptr otherwise
+     */
     auto findInterfaceDeclaration(const QString &interfaceDeclarationName) const
             -> const seds::model::InterfaceDeclaration *;
 
