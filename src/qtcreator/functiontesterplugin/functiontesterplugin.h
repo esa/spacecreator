@@ -52,6 +52,8 @@ private:
     auto addTestInterfaceOption() -> void;
     auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
     auto loadCsv() -> void;
+    auto getCurrentIvEditorCore() -> IVEditorCorePtr;
+    auto getSelectedInterface() -> ivm::IVObject *;
 
     // auto initializeRegistry() -> void;
 
