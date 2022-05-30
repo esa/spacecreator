@@ -16,7 +16,6 @@ rm -r -f $TEST_OUTPUT_DIR
 mkdir $TEST_OUTPUT_DIR
 
 # Translate
-# gdb --args \
 $SEDS_CONVERTER --from SEDS --to InterfaceView --aux-models ASN.1 --skip-validation -i resources/test_command_arguments.xml \
   --out $TEST_OUTPUT_DIR/interfaceview.xml --iv-config resources/config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/
 
