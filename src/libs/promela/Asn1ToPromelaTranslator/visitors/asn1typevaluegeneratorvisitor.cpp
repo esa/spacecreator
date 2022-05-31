@@ -417,7 +417,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const UserdefinedType &type)
 {
     auto *const typeType = type.type();
     if (typeType != nullptr) {
-        Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, type.typeName());
+        Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, type.identifier());
         typeType->accept(visitor);
     }
 }
