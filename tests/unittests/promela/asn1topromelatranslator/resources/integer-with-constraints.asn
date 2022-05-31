@@ -1,0 +1,7 @@
+Ints DEFINITIONS ::= BEGIN
+
+ConstraintedInt ::= INTEGER(0 .. 10)
+
+MyInt ::= ConstraintedInt(2 .. 5)
+
+END

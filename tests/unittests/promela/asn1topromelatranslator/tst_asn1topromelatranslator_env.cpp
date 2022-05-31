@@ -226,6 +226,19 @@ void tst_Asn1ToPromelaTranslator_Env::testInteger() const
     QVERIFY(std::holds_alternative<Assignment>((*statement)->getValue()));
 }
 
+void tst_Asn1ToPromelaTranslator_Env::testIntegerWithConstraints() const
+{
+    const QString inputAsnFilename = "integer-with-constraints.asn";
+    const QStringList asnTypesToTranslate = {
+        "MyInt",
+    };
+    const QString actualOutputFilename = "integer-with-constraints.pml";
+    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
+
+    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
+    compareTextFiles(actualOutputFilename, expectedOutputFilename);
+}
+
 void tst_Asn1ToPromelaTranslator_Env::testEnumerated() const
 {
     auto model = createModel();

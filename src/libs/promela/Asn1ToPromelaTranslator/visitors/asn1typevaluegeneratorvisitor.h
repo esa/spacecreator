@@ -42,12 +42,14 @@ class Asn1TypeValueGeneratorVisitor : public Asn1Acn::Types::TypeReadingVisitor
 {
 public:
     /**
+
      * @brief Constructor
      *
      * @param promelaModel target promela model
      * @param name name of ASN.1 type
+     * @param isTypeAssignment is type being visited used in type assignment or used as a reference to type definition
      */
-    Asn1TypeValueGeneratorVisitor(model::PromelaModel &promelaModel, QString name);
+    Asn1TypeValueGeneratorVisitor(model::PromelaModel &promelaModel, QString name, bool isTypeAssignment);
 
     /**
      * @brief Visit Asn1Acn::Types::Boolean
@@ -141,8 +143,8 @@ private:
         static const QString lengthMemberName;
         static const QString octetGeneratorName;
 
-        static void addRangedIntegerGeneratorToModel(
-                const QString &inlineName, model::PromelaModel &model, long minSize, long maxSize);
+        static void addRangedIntegerGeneratorToModel(const QString &inlineName, model::PromelaModel &model,
+                long minSize, long maxSize, bool isTypeAssignment);
 
         static Expression getValueLenghtMinusConstAsExpression(const QString &valueVariableName, int x);
     };
@@ -164,6 +166,7 @@ private:
 private:
     model::PromelaModel &m_promelaModel;
     QString m_name;
+    bool m_isTypeAssignment;
 };
 
 } // namespace promela::translator

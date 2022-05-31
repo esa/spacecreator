@@ -67,3 +67,6 @@ configure_file(resources/octetstring.pml.out resources/octetstring.pml.out COPYO
 
 configure_file(resources/octetstring-variable-size.asn resources/octetstring-variable-size.asn COPYONLY)
 configure_file(resources/octetstring-variable-size.pml.out resources/octetstring-variable-size.pml.out COPYONLY)
+
+configure_file(resources/integer-with-constraints.asn resources/integer-with-constraints.asn COPYONLY)
+configure_file(resources/integer-with-constraints.pml.out resources/integer-with-constraints.pml.out COPYONLY)

@@ -38,6 +38,7 @@ private Q_SLOTS:
 
     void testBoolean() const;
     void testInteger() const;
+    void testIntegerWithConstraints() const;
     void testSequence() const;
     void testSequenceEmbeddedType() const;
     void testSequenceNested() const;
