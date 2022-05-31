@@ -4,14 +4,17 @@
 *.ini
 *.gpr
 *.md5
-Makefile.*
 
 **/wrappers/*
 **/cache/*
-**/model/**/*.ad*
-**/model/**/*.md5
-**/model/**/Makefile
-**/model/**/*.pro
+**/pinger/**/*.ad*
+**/pinger/**/*.md5
+**/pinger/**/Makefile
+**/pinger/**/*.pro
+**/receiver/**/*.ad*
+**/receiver/**/*.md5
+**/receiver/**/Makefile
+**/receiver/**/*.pro
 **/modelchecking/**/*.adb
 **/modelchecking/**/*.ads
 
