@@ -33,6 +33,8 @@ class ExportableIVConnection : public ExportableIVObject
     Q_GADGET
     Q_PROPERTY(QString source READ sourceName)
     Q_PROPERTY(QString target READ targetName)
+    Q_PROPERTY(QString sourcePath READ sourcePath)
+    Q_PROPERTY(QString targetPath READ targetPath)
     Q_PROPERTY(QString siName READ sourceInterfaceName)
     Q_PROPERTY(QString tiName READ targetInterfaceName)
     Q_PROPERTY(bool siIsRequired READ sourceInterfaceIsRequired)
@@ -45,6 +47,8 @@ public:
 
     QString sourceName() const;
     QString targetName() const;
+    QString sourcePath() const;
+    QString targetPath() const;
     QString sourceInterfaceName() const;
     QString targetInterfaceName() const;
     bool sourceInterfaceIsRequired() const;
