@@ -87,6 +87,9 @@
 #include <spacecreatorplugin/iv/ivqtceditor.h>
 #include <utils/fileutils.h>
 
+#include <testgenerator/testgenerator.h>
+#include <fstream>
+
 using namespace Core;
 using conversion::Converter;
 using conversion::ModelType;
@@ -96,6 +99,7 @@ using conversion::iv::IvRegistrar;
 using conversion::sdl::SdlRegistrar;
 using conversion::seds::SedsRegistrar;
 using plugincommon::ModelLoader;
+using namespace testgenerator;
 
 namespace spctr {
 
@@ -132,7 +136,7 @@ auto FunctionTesterPlugin::aboutToShutdown() -> ExtensionSystem::IPlugin::Shutdo
 
 auto FunctionTesterPlugin::functionTesterPluginMain() -> void
 {
-    ivm::IVObject *interface = getSelectedInterface();
+    ivm::IVInterface *interface = getSelectedInterface();
     if (!interface) {
         QMessageBox msgBox;
         msgBox.setText(tr("No interface selected!"));
@@ -144,6 +148,22 @@ auto FunctionTesterPlugin::functionTesterPluginMain() -> void
         return;
     }
     float delta = setDeltaDialog();
+    auto asn1Model = loadAsn1Model();
+    if (!asn1Model) {
+        return;
+    }
+
+    std::stringstream outStream;
+    try {
+        outStream = TestDriverGenerator::generateTestDriver(*csvModel, *interface, *asn1Model);
+        std::ofstream outFile("output.cpp", std::ofstream::out);
+        outFile << outStream.rdbuf();
+        outFile.close();
+    }
+    catch (TestDriverGeneratorException& e) {
+        MessageManager::write(GenMsg::msgInfo.arg("TestDriverGeneratorException: " + QString(e.what())));
+        return;
+    }
 }
 
 auto FunctionTesterPlugin::addTestInterfaceOption() -> void
@@ -189,7 +209,7 @@ auto FunctionTesterPlugin::loadCsv() -> std::unique_ptr<csv::CsvModel>
             nullptr, tr("Select CSV file to import test vectors from..."), QString(), tr("*.csv"));
     if (inputFilePath.isEmpty()) {
         MessageManager::write(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
-        return std::unique_ptr<csv::CsvModel> {};
+        return std::unique_ptr<csv::CsvModel>{};
     }
 
     std::unique_ptr<csv::CsvModel> model;
@@ -201,7 +221,7 @@ auto FunctionTesterPlugin::loadCsv() -> std::unique_ptr<csv::CsvModel>
     }
 
     MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesImported));
-    return model;
+    return ModelLoader::loadCsvModel(inputFilePath);
 }
 
 auto FunctionTesterPlugin::getCurrentIvEditorCore() -> IVEditorCorePtr
@@ -215,7 +235,7 @@ auto FunctionTesterPlugin::getCurrentIvEditorCore() -> IVEditorCorePtr
     return currentIvDocument->ivEditorCore();
 }
 
-auto FunctionTesterPlugin::getSelectedInterface() -> ivm::IVObject *
+auto FunctionTesterPlugin::getSelectedInterface() -> ivm::IVInterface *
 {
     IVEditorCorePtr ivEditorCorePtr = getCurrentIvEditorCore();
     auto view = ivEditorCorePtr->chartView();
@@ -229,7 +249,7 @@ auto FunctionTesterPlugin::getSelectedInterface() -> ivm::IVObject *
                 if (auto entity = iObj->entity() ? iObj->entity()->as<ivm::IVObject *>() : nullptr) {
                     if (entity->isInterface()) {
                         MessageManager::write(GenMsg::msgInfo.arg(entity->title()));
-                        return entity;
+                        return dynamic_cast<ivm::IVInterface *>(entity);
                     }
                 }
             }
@@ -237,6 +257,24 @@ auto FunctionTesterPlugin::getSelectedInterface() -> ivm::IVObject *
     }
 
     return nullptr;
+}
+
+auto FunctionTesterPlugin::loadAsn1Model() -> std::unique_ptr<Asn1Acn::Asn1Model>
+{
+    QString ivDocumentPath = getCurrentIvEditorCore()->document()->path();
+    QDir ivBaseDirectory = QFileInfo(ivDocumentPath).absoluteDir();
+    QFileInfo workDirectory = ivBaseDirectory.absolutePath() + QDir::separator() + "work";
+    QString asn1Path = workDirectory.absoluteFilePath() + QDir::separator() + "dataview"
+        + QDir::separator() + "dataview-uniq.asn";
+
+    auto modelPtr = std::unique_ptr<Asn1Acn::Asn1Model>{};
+    try {
+        modelPtr = ModelLoader::loadAsn1Model(asn1Path);
+    }
+    catch (...) {
+        MessageManager::write(GenMsg::msgInfo.arg(tr("No ASN1 file found. Try to build the project first.")));
+    }
+    return modelPtr;
 }
 
 } // namespace spctr

@@ -33,6 +33,7 @@
 #include <memory>
 #include <shared/ui/listtreedialog.h>
 #include <csv/CsvModel/csvmodel.h>
+#include <asn1library/asn1/asn1model.h>
 
 namespace spctr {
 
@@ -54,8 +55,9 @@ private:
     auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
     auto loadCsv() -> std::unique_ptr<csv::CsvModel>;
     auto getCurrentIvEditorCore() -> IVEditorCorePtr;
-    auto getSelectedInterface() -> ivm::IVObject *;
+    auto getSelectedInterface() -> ivm::IVInterface *;
     auto setDeltaDialog() -> float;
+    auto loadAsn1Model() -> std::unique_ptr<Asn1Acn::Asn1Model>; 
 
     // auto initializeRegistry() -> void;
 

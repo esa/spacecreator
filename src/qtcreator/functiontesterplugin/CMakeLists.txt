@@ -37,6 +37,7 @@ add_qtc_plugin(${PLUGIN_NAME}
             libiveditor
             libdveditor
             CommonTools
+            TestGenerator
             ${QT_CORE}
             ${QT_GUI}
             ${QT_WIDGETS}
