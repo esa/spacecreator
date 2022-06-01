@@ -20,6 +20,8 @@
 #include <QObject>
 #include <QtTest>
 #include <asn1modelbuilder/asn1modelbuilder.h>
+#include <conversion/asn1/SedsToAsn1Translator/context.h>
+#include <conversion/asn1/SedsToAsn1Translator/generictypemapper.h>
 #include <conversion/common/options.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/SedsToIvTranslator/translator.h>
@@ -39,6 +41,8 @@ using namespace ivm;
 using namespace seds::model;
 
 using conversion::Options;
+using conversion::asn1::translator::Context;
+using conversion::asn1::translator::GenericTypeMapper;
 using conversion::iv::IvOptions;
 using conversion::iv::translator::SedsToIvTranslator;
 using conversion::translator::TranslationException;
@@ -72,6 +76,8 @@ private Q_SLOTS:
 
     void testTranslateComponentWithProvidedInterface();
     void testTranslateComponentWithRequiredInterface();
+
+    void testGenericTypeMappingAmbiguousDeterminant();
 };
 
 void tst_SedsToIvTranslator::testMissingModel()
@@ -258,6 +264,55 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
     QCOMPARE(param.name(), "InputParam");
     QCOMPARE(param.paramTypeName(), "Component-Interface-ICommand-Type");
     QCOMPARE(param.direction(), shared::InterfaceParameter::Direction::IN);
+}
+
+void tst_SedsToIvTranslator::testGenericTypeMappingAmbiguousDeterminant()
+{
+    // clang-format off
+    const auto sedsModel =
+        SedsModelBuilder("MyPackage")
+            .withIntegerDataType("DeterminantType")
+            .build();
+    // clang-format on
+
+    const auto &sedsPackage = std::get<seds::model::PackageFile>(sedsModel->data()).package();
+
+    // clang-format off
+    const auto asn1Model =
+        Asn1ModelBuilder("MYPACKAGE")
+            .withIntegerDataType("ConcreteType")
+            .withIntegerDataType("DeterminantType")
+        .build();
+    // clang-format on
+
+    const auto asn1Definitions = asn1Model->data().front()->definitions("MYPACKAGE");
+
+    Context context(&sedsPackage, asn1Definitions, nullptr, nullptr, {}, {}, Options());
+
+    // clang-format off
+    const auto typeMapSet =
+        SedsTypeMapSetBuilder()
+            .withMapping("GenericType1", "ConcreteType")
+            .withAlternateSet(
+                SedsAlternateSetBuilder()
+                    .withAlternate(
+                        SedsAlternateBuilder()
+                            .withMapping("GenericType2", "DeterminantType", "1")
+                            .withMapping("GenericType3", "DeterminantType", "2")
+                        .build())
+                    .withAlternate(
+                        SedsAlternateBuilder()
+                            .withMapping("GenericType2", "DeterminantType", "2")
+                            .withMapping("GenericType3", "DeterminantType", "3")
+                        .build())
+                    .build())
+            .build();
+    // clang-format on
+
+    GenericTypeMapper typeMapper(context, "CoolInterface");
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(typeMapper.addMappings(typeMapSet), TranslationException,
+            "More than one possible alternate determinant was found in \"CoolInterface\"");
 }
 
 } // namespace conversion::iv::test
