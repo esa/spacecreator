@@ -1177,12 +1177,11 @@ void tst_Asn1ToPromelaTranslator::testUserDefinedType()
     {
         auto integerType = TypeFactory::createBuiltinType("INTEGER");
         auto myIntegerAssignment = std::make_unique<TypeAssignment>(
-                QStringLiteral("MyInteger"), QStringLiteral("MyIntegerT"), SourceLocation(), std::move(integerType));
+                QStringLiteral("MyInteger"), QStringLiteral("MyIntegerT"), SourceLocation(), integerType->clone());
         model->addType(std::move(myIntegerAssignment));
-    }
 
-    {
-        auto typeAlias = std::make_unique<UserdefinedType>("MyInteger", "");
+        auto typeAlias = std::make_unique<UserdefinedType>("MyIntegerAlias", "");
+        typeAlias->setType(integerType->clone());
         auto typeAliasAssignment = std::make_unique<TypeAssignment>(QStringLiteral("MyIntegerAlias"),
                 QStringLiteral("MyIntegerAliasT"), SourceLocation(), std::move(typeAlias));
         model->addType(std::move(typeAliasAssignment));
@@ -1207,8 +1206,8 @@ void tst_Asn1ToPromelaTranslator::testUserDefinedType()
 
     const TypeAlias &expectedAlias = aliases.at(1);
     QCOMPARE(expectedAlias.getName(), "MyIntegerAlias");
-    QVERIFY(std::holds_alternative<UtypeRef>(expectedAlias.getType()));
-    QCOMPARE(std::get<UtypeRef>(expectedAlias.getType()).getName(), "MyInteger");
+    QVERIFY(std::holds_alternative<BasicType>(expectedAlias.getType()));
+    QCOMPARE(std::get<BasicType>(expectedAlias.getType()), BasicType::INT);
 
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyInteger_assign_value");
@@ -1223,9 +1222,7 @@ void tst_Asn1ToPromelaTranslator::testUserDefinedType()
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
-        QVERIFY(std::holds_alternative<InlineCall>(inlineDef->getSequence().getContent().front()->getValue()));
-        QCOMPARE(std::get<InlineCall>(inlineDef->getSequence().getContent().front()->getValue()).getName(),
-                "MyInteger_assign_value");
+        QVERIFY(std::holds_alternative<Assignment>(inlineDef->getSequence().getContent().front()->getValue()));
     }
 }
 
@@ -1233,23 +1230,30 @@ void tst_Asn1ToPromelaTranslator::testTypeSorting()
 {
     auto model = createModel();
 
-    auto secondType = std::make_unique<Sequence>();
-    auto secondTypeComponent =
-            std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"), false,
-                    std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
-                    std::make_unique<UserdefinedType>(QStringLiteral("MyTypeFirst"), QStringLiteral("myModule")));
+    auto secondType = std::make_unique<Sequence>("MyTypeSecond");
+
+    auto secondTypeComponentType = TypeFactory::createBuiltinType("INTEGER");
+    auto secondTypeComponentTypeAssignment = std::make_unique<TypeAssignment>(
+                QStringLiteral("MyInteger"), QStringLiteral("MyIntegerT"), SourceLocation(), secondTypeComponentType->clone());
+    model->addType(std::move(secondTypeComponentTypeAssignment));
+
+    auto secondTypeComponentTypeReference = std::make_unique<UserdefinedType>("MyIntegerAlias", "");
+    secondTypeComponentTypeReference->setType(secondTypeComponentType->clone());
+    auto secondTypeComponentTypeReferenceAssignment = std::make_unique<TypeAssignment>("MyIntegerAlias", "MyIntegerAliasT", SourceLocation(), secondTypeComponentTypeReference->clone());
+    model->addType(std::move(secondTypeComponentTypeReferenceAssignment));
+
+    auto secondTypeComponent = std::make_unique<AsnSequenceComponent>("field2", "field2", false, std::nullopt, "", AsnSequenceComponent::Presence::NotSpecified, SourceLocation(), secondTypeComponentTypeReference->clone());
     secondType->addComponent(std::move(secondTypeComponent));
-    auto secondTypeAssignment = std::make_unique<TypeAssignment>(
-            QStringLiteral("MyTypeSecond"), QStringLiteral("MyTypeSecondT"), SourceLocation(), std::move(secondType));
+
+    auto secondTypeAssignment = std::make_unique<TypeAssignment>("MyTypeSecond", "MyTypeSecondT", SourceLocation(), std::move(secondType));
     model->addType(std::move(secondTypeAssignment));
 
-    auto firstType = std::make_unique<Sequence>();
-    auto firstTypeComponent = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"),
-            false, std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
-            TypeFactory::createBuiltinType(QStringLiteral("INTEGER")));
+    auto firstType = std::make_unique<Sequence>("MyTypeFirst");
+
+    auto firstTypeComponent = std::make_unique<AsnSequenceComponent>("field1", "field1", false, std::nullopt, "", AsnSequenceComponent::Presence::NotSpecified, SourceLocation(), TypeFactory::createBuiltinType("INTEGER"));
     firstType->addComponent(std::move(firstTypeComponent));
-    auto firstTypeAssignment = std::make_unique<TypeAssignment>(
-            QStringLiteral("MyTypeFirst"), QStringLiteral("MyTypeSecondT"), SourceLocation(), std::move(firstType));
+
+    auto firstTypeAssignment = std::make_unique<TypeAssignment>("MyTypeFirst", "MyTypeSecondT", SourceLocation(), std::move(firstType));
     model->addType(std::move(firstTypeAssignment));
 
     PromelaModel promelaModel;
@@ -1261,7 +1265,7 @@ void tst_Asn1ToPromelaTranslator::testTypeSorting()
 
     QCOMPARE(promelaModel.getMtypeValues().size(), 0);
     QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
-    QCOMPARE(promelaModel.getTypeAliases().size(), 2);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 4);
     QCOMPARE(promelaModel.getValueDefinitions().size(), 0);
     QCOMPARE(promelaModel.getUtypes().size(), 2);
 
