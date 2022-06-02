@@ -595,6 +595,10 @@ auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel 
         dstIf->removeEntityAttribute("miat");
         dstIf->removeEntityAttribute("period");
     }
+
+    for (const auto &srcContextParam : srcFun->contextParams()) {
+        dstFun->addContextParam(srcContextParam);
+    }
 }
 
 auto SedsPlugin::addFilesToCurrentProject(QStringList filenames, const QString &path) -> void
