@@ -1,1 +1,1 @@
-never receiver.integerhandled;
+eventually receiver.integerhandled and receiver.boolhandled;

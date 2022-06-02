@@ -2,7 +2,7 @@ Receiver-Datamodel DEFINITIONS ::=
 BEGIN
 IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   MyInteger, MyBetterInteger FROM USERDEFINED-TYPES-DATAVIEW;
+   MyInteger, MyBetterInteger, MyBool, MyBetterBoolean FROM USERDEFINED-TYPES-DATAVIEW;
 
 Receiver-States ::= ENUMERATED {wait}
 
@@ -11,7 +11,10 @@ Receiver-Context ::= SEQUENCE {
    init-done BOOLEAN,
    integerarg MyBetterInteger,
    integervalue MyBetterInteger,
-   integerhandled T-Boolean
+   integerhandled T-Boolean,
+   boolarg MyBetterBoolean,
+   boolvalue MyBetterBoolean,
+   boolhandled T-Boolean
 }
 
 END

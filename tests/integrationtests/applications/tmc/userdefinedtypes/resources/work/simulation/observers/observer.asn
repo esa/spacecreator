@@ -2,7 +2,7 @@ Receiver-Datamodel DEFINITIONS ::=
 BEGIN
 IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   MyInteger, MyBetterInteger FROM USERDEFINED-TYPES-DATAVIEW;
+   MyInteger, MyBetterInteger, MyBool, MyBetterBoolean FROM USERDEFINED-TYPES-DATAVIEW;
 
 Receiver-States ::= ENUMERATED {wait}
 
@@ -11,7 +11,10 @@ Receiver-Context ::= SEQUENCE {
    init-done BOOLEAN,
    integerarg MyBetterInteger,
    integervalue MyBetterInteger,
-   integerhandled T-Boolean
+   integerhandled T-Boolean,
+   boolarg MyBetterBoolean,
+   boolvalue MyBetterBoolean,
+   boolhandled T-Boolean
 }
 
 END
@@ -42,6 +45,8 @@ BEGIN
     MyInteger ::= INTEGER (0 .. 10)
     MyBetterInteger ::= MyInteger (2 .. 5)
 
+    MyBool ::= BOOLEAN
+    MyBetterBoolean ::= MyBool
 END
 
 
@@ -50,6 +55,9 @@ Simulation-DataView DEFINITIONS ::=
 BEGIN
    IMPORTS
       
+      
+      --  ASN.1 modules used by thread receiver_BoolInterface
+      MyBetterBoolean FROM USERDEFINED-TYPES-DATAVIEW
       
       --  ASN.1 modules used by thread receiver_IntegerInterface
       MyBetterInteger FROM USERDEFINED-TYPES-DATAVIEW
@@ -80,6 +88,7 @@ BEGIN
    
    Pinger-Event ::= CHOICE {
       msg-out CHOICE {
+         boolinterface    SEQUENCE { boolarg MyBetterBoolean },
          integerinterface SEQUENCE { integerarg MyBetterInteger }
       }
    }
@@ -87,6 +96,7 @@ BEGIN
    Receiver-Event ::= CHOICE {
       msg-in CHOICE {
          input-none SEQUENCE {},
+         boolinterface    SEQUENCE { boolarg MyBetterBoolean},
          integerinterface SEQUENCE { integerarg MyBetterInteger}
       }
    }

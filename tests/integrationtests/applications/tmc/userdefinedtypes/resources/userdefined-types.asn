@@ -4,5 +4,7 @@ BEGIN
     MyInteger ::= INTEGER (0 .. 10)
     MyBetterInteger ::= MyInteger (2 .. 5)
 
+    MyBool ::= BOOLEAN
+    MyBetterBoolean ::= MyBool
 END
 
