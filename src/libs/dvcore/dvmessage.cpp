@@ -46,7 +46,7 @@ void DVMessage::setFromFunction(const QString &from)
     setEntityAttribute(meta::Props::token(meta::Props::Token::from_function), from);
 }
 
-QString DVMessage::fromFunctionPath() const
+QStringList DVMessage::fromFunctionPath() const
 {
     return pathOfFunction(fromFunction());
 }
@@ -80,7 +80,7 @@ void DVMessage::setToFunction(const QString &to)
     setEntityAttribute(meta::Props::token(meta::Props::Token::to_function), to);
 }
 
-QString DVMessage::toFunctionPath() const
+QStringList DVMessage::toFunctionPath() const
 {
     return pathOfFunction(toFunction());
 }
@@ -104,16 +104,14 @@ DVNode *DVMessage::toNode() const
     return connection->targetNode();
 }
 
-QString DVMessage::pathOfFunction(const QString &functionName) const
+QStringList DVMessage::pathOfFunction(const QString &functionName) const
 {
     if (model()) {
         AbstractSystemChecks *queries = model()->ivQueries();
         if (queries) {
-            qDebug() << Q_FUNC_INFO << functionName << queries->functionPath(functionName).join("::");
-            return queries->functionPath(functionName).join("::");
+            return queries->functionPath(functionName);
         }
     }
-    qDebug() << Q_FUNC_INFO << functionName << ":(((";
     return {};
 }
 

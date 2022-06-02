@@ -60,11 +60,11 @@ connection.messages        :    |_ List of message binding of that connection
 message                    :       |_ Instance of message/binding (see "for message in connection.messages")
 message.fromFunction       :          |_ Name of the connected source function
 message.fromInterface      :          |_ Name of the connected source interface
-message.fromFunctionPath   :          |_ Path of the connected source function (function, including all parents. Joined by "::")
+message.fromFunctionPath   :          |_ List of all parent function names of and including the from function one as last element (use for example {{ function.path|join:"::" }})
 message.fromInterface      :          |_ Name of the connected source interface
 message.toFunction         :          |_ Name of the connected target function
 message.toInterface        :          |_ Name of the connected target interface
-message.toFunctionPath     :          |_ Path of the connected target function (function, including all parents. Joined by "::")
+message.toFunctionPath     :          |_ List of all parent function names of and including the to function one as last element (use for example {{ function.path|join:"::" }})
 
 Buses                      : List of all used Buses
 bus                        : |_ Instance of one bus

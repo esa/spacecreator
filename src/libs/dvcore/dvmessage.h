@@ -27,11 +27,11 @@ class DVMessage : public DVObject
     Q_OBJECT
     Q_PROPERTY(QString titleUI READ titleUI)
     Q_PROPERTY(QString fromFunction READ fromFunction WRITE setFromFunction)
-    Q_PROPERTY(QString fromFunctionPath READ fromFunctionPath)
+    Q_PROPERTY(QStringList fromFunctionPath READ fromFunctionPath)
     Q_PROPERTY(QString fromInterface READ fromInterface WRITE setFromInterface)
     Q_PROPERTY(dvm::DVNode *fromNode READ fromNode)
     Q_PROPERTY(QString toFunction READ toFunction WRITE setToFunction)
-    Q_PROPERTY(QString toFunctionPath READ toFunctionPath)
+    Q_PROPERTY(QStringList toFunctionPath READ toFunctionPath)
     Q_PROPERTY(QString toInterface READ toInterface WRITE setToInterface)
     Q_PROPERTY(dvm::DVNode *toNode READ toNode)
 
@@ -42,7 +42,7 @@ public:
 
     QString fromFunction() const;
     void setFromFunction(const QString &from);
-    QString fromFunctionPath() const;
+    QStringList fromFunctionPath() const;
 
     QString fromInterface() const;
     void setFromInterface(const QString &from);
@@ -51,7 +51,7 @@ public:
 
     QString toFunction() const;
     void setToFunction(const QString &to);
-    QString toFunctionPath() const;
+    QStringList toFunctionPath() const;
 
     QString toInterface() const;
     void setToInterface(const QString &to);
@@ -59,7 +59,7 @@ public:
     DVNode *toNode() const;
 
 private:
-    QString pathOfFunction(const QString &functionName) const;
+    QStringList pathOfFunction(const QString &functionName) const;
 };
 
 } // namespace dvm
