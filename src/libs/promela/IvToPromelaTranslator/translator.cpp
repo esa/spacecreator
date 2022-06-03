@@ -408,12 +408,17 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(Context &conte
         sequence.appendElement(std::move(tokenDeclaration));
     }
 
-    const QString &signalParameterName = "signal_parameter";
+    const QString &signalParameterName =
+            QString("%1_%2_signal_parameter").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName.toLower());
+    const QString channelUsedName =
+            QString("%1_%2_channel_used").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName.toLower());
 
     if (!parameterType.isEmpty()) {
-        std::unique_ptr<ProctypeElement> variableDecl = std::make_unique<ProctypeElement>(
+        context.model()->addDeclaration(
                 Declaration(DataType(UtypeRef(Escaper::escapePromelaName(parameterType))), signalParameterName));
-        sequence.appendElement(std::move(variableDecl));
+        Declaration channelUsedDeclaration = Declaration(DataType(BasicType::BOOLEAN), channelUsedName);
+        channelUsedDeclaration.setInit(Expression(Constant(0)));
+        context.model()->addDeclaration(channelUsedDeclaration);
     }
 
     std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>(Sequence::Type::ATOMIC);
@@ -424,6 +429,11 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(Context &conte
             std::make_unique<ProctypeElement>(ChannelRecv(VariableRef(channelName), params));
 
     loopSequence->appendElement(std::move(channelReceive));
+
+    if (!parameterType.isEmpty()) {
+        loopSequence->appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef(channelUsedName), Expression(Constant(1)))));
+    }
 
     if (!environment) {
         const QString piName = QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
