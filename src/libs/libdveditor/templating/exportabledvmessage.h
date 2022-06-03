@@ -25,16 +25,20 @@ class ExportableDVMessage : public ExportableDVObject
 {
     Q_GADGET
     Q_PROPERTY(QString fromFunction READ fromFunction)
+    Q_PROPERTY(QStringList fromFunctionPath READ fromFunctionPath)
     Q_PROPERTY(QString fromInterface READ fromInterface)
     Q_PROPERTY(QString toFunction READ toFunction)
+    Q_PROPERTY(QStringList toFunctionPath READ toFunctionPath)
     Q_PROPERTY(QString toInterface READ toInterface)
 public:
     ExportableDVMessage(const dvm::DVObject *dvObject = nullptr);
 
     QString fromFunction() const;
+    QStringList fromFunctionPath() const;
     QString fromInterface() const;
 
     QString toFunction() const;
+    QStringList toFunctionPath() const;
     QString toInterface() const;
 };
 
