@@ -121,6 +121,7 @@ MainWindow::MainWindow(ive::IVEditorCore *core, QWidget *parent)
     auto modelCheckingWindow = new ModelCheckingWindow(m_core->document(), "", this);
     modelCheckingWindow->hide();
     connect(core->actionLaunchModelCheckingWindow(), &QAction::toggled, modelCheckingWindow, &QWidget::setVisible);
+    connect(core->actionLaunchModelCheckingWindow(), &QAction::toggled, modelCheckingWindow, &ModelCheckingWindow::callTasteGens);
     connect(modelCheckingWindow, &ModelCheckingWindow::visibleChanged, core->actionLaunchModelCheckingWindow(), &QAction::setChecked);
     modelCheckingWindow->setVisible(core->actionLaunchModelCheckingWindow()->isChecked());
 
