@@ -4,6 +4,7 @@ process Component;
     Timer timer_StateA;
     Timer timer_StateB;
     Timer timer_StateC;
+    Timer timer_Idle;
     /* CIF ENDTEXT */
     /* CIF Start (0, 900), (200, 75) */
     START;
@@ -12,30 +13,39 @@ process Component;
         /* CIF NextState (0, 1162), (200, 50) */
         NEXTSTATE StateA;
     /* CIF State (0, 1237), (200, 50) */
-    state StateA;
+    state Idle;
         /* CIF Input (0, 1237), (200, 50) */
-        input timer_StateA;
+        input timer_Idle;
             /* CIF ProcedureCall (0, 1312), (100, 50) */
-            call set_timer(2000, timer_StateB);
+            call set_timer(4000, timer_Idle);
             /* CIF NextState (0, 1387), (200, 50) */
-            NEXTSTATE StateB;
+            NEXTSTATE Idle;
     endstate;
     /* CIF State (600, 1237), (200, 50) */
-    state StateB;
+    state StateA;
         /* CIF Input (600, 1237), (200, 50) */
-        input timer_StateB;
+        input timer_StateA;
             /* CIF ProcedureCall (600, 1312), (100, 50) */
-            call set_timer(3000, timer_StateC);
+            call set_timer(2000, timer_StateB);
             /* CIF NextState (600, 1387), (200, 50) */
-            NEXTSTATE StateC;
+            NEXTSTATE StateB;
     endstate;
     /* CIF State (1200, 1237), (200, 50) */
-    state StateC;
+    state StateB;
         /* CIF Input (1200, 1237), (200, 50) */
-        input timer_StateC;
+        input timer_StateB;
             /* CIF ProcedureCall (1200, 1312), (100, 50) */
-            call set_timer(2000, timer_StateB);
+            call set_timer(3000, timer_StateC);
             /* CIF NextState (1200, 1387), (200, 50) */
-            NEXTSTATE StateB;
+            NEXTSTATE StateC;
+    endstate;
+    /* CIF State (1800, 1237), (200, 50) */
+    state StateC;
+        /* CIF Input (1800, 1237), (200, 50) */
+        input timer_StateC;
+            /* CIF ProcedureCall (1800, 1312), (100, 50) */
+            call set_timer(4000, timer_Idle);
+            /* CIF NextState (1800, 1387), (200, 50) */
+            NEXTSTATE Idle;
     endstate;
 endprocess Component;

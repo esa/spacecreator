@@ -784,12 +784,13 @@ auto StateMachineTranslator::translateTransition(Context &context, const seds::m
             currentTransitionPtr->addAction(
                     StatementTranslatorVisitor::translateActivityCall(context.sdlProcess(), **onEntry));
         }
-        const auto timerTime = getTimerInvocationTime(sedsStateMachine, sedsTransition.toState().nameStr());
-        if (timerTime.has_value()) {
-            currentTransitionPtr->addAction(
-                    createTimerSetCall(timerName(sedsTransition.toState().nameStr()), *timerTime));
-        }
     }
+
+    const auto timerTime = getTimerInvocationTime(sedsStateMachine, sedsTransition.toState().nameStr());
+    if (timerTime.has_value()) {
+        currentTransitionPtr->addAction(createTimerSetCall(timerName(sedsTransition.toState().nameStr()), *timerTime));
+    }
+
     // State switch
     currentTransitionPtr->addAction(std::make_unique<::sdl::NextState>("", sdlToState));
 
