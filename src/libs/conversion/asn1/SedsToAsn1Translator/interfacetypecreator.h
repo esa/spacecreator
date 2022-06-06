@@ -70,8 +70,8 @@ public:
     /**
      * @brief   Create types for interface
      *
-     * @param   interfaceDeclaration    Interface to handle
-     * @param   context                 Current translation context
+     * @param   interface   Interface to handle
+     * @param   context     Current translation context
      */
     auto createTypes(const seds::model::Interface &interface, Context &context) -> void;
 

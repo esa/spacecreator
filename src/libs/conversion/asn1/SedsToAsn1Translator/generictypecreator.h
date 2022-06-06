@@ -34,6 +34,10 @@ class GenericTypeCreator final
 public:
     /**
      * @brief   Constructor
+     *
+     * @param   context     Current translation context
+     * @param   parentName  Name of the entity that contains mappings
+     * @param   typeMapper  Mapper for generic types
      */
     GenericTypeCreator(Context &context, QString parentName, const GenericTypeMapper &typeMapper);
     /**

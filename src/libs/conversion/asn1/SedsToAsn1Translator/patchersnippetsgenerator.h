@@ -61,6 +61,9 @@ public:
     PatcherSnippetsGenerator &operator=(PatcherSnippetsGenerator &&) = delete;
 
 public:
+    /**
+     * @brief   Generiate patcher snippets for the sequence
+     */
     auto generate() -> void;
 
 private:

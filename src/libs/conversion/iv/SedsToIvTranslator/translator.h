@@ -96,10 +96,10 @@ private:
     /**
      * @brief   Translate SEDS package
      *
-     * @param   package                 Package to translate
-     * @param   model                   InterfaceView model to which should translated IV functions will be added
-     * @param   sedsPackages            List of SEDS packages
-     * @param   generateFunction        Generate parent function for the translated components
+     * @param   sedsPackage         Package to translate
+     * @param   ivModel             InterfaceView model to which should translated IV functions will be added
+     * @param   sedsPackages        List of SEDS packages
+     * @param   generateFunction    Generate parent function for the translated components
      */
     auto translatePackage(const seds::model::Package &sedsPackage, ivm::IVModel *ivModel,
             const std::vector<seds::model::Package> &sedsPackages, bool generateFunction) const -> void;

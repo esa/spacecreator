@@ -87,9 +87,9 @@ public:
     /**
      * @brief   Create array type if it doesn't exists, return reference to it otherwise
      *
-     * @param   context     Current translation context
-     * @param   typeRef     Type that is a base of the array
-     * @param   dimensions  Array dimensions
+     * @param   context             Current translation context
+     * @param   argumentTypeRef     Type that is a base of the array
+     * @param   dimensions          Array dimensions
      *
      * @return  ASN.1 type
      */

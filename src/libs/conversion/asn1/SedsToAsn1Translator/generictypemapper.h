@@ -39,18 +39,38 @@ struct TypeMapping final {
      * @brief   Information about concrete type
      */
     struct Concrete {
+        /** @brief  Concrete ASN.1 type */
         Asn1Acn::Types::Type *type;
+        /** @brief  Optional fixed value */
         std::optional<QString> fixedValue;
+        /** @brief  Determinent value if present */
         std::optional<QString> determinantValue;
 
+        /**
+         * @brief   Equal operator
+         *
+         * @param   lhs     Left element
+         * @param   rhs     Right element
+         *
+         * @return  True if equal, false otherwise
+         */
         friend auto operator==(const Concrete &lhs, const Concrete &rhs) -> bool
         {
             return lhs.type->identifier() == rhs.type->identifier() && lhs.fixedValue == rhs.fixedValue;
         }
 
+        /**
+         * @brief   Not equal operator
+         *
+         * @param   lhs     Left element
+         * @param   rhs     Right element
+         *
+         * @return  True if not equal, false otherwise
+         */
         friend auto operator!=(const Concrete &lhs, const Concrete &rhs) -> bool { return !(lhs == rhs); }
     };
 
+    /** @brief   List of types that given generic type can be mapped to */
     std::vector<Concrete> concreteMappings;
 };
 
@@ -86,10 +106,32 @@ public:
     GenericTypeMapper &operator=(GenericTypeMapper &&) = delete;
 
 public:
+    /**
+     * @brief   Add mappings from type map set
+     *
+     * @param   typeMapSet      Generic type mappings
+     */
     auto addMappings(const seds::model::GenericTypeMapSet &typeMapSet) -> void;
+    /**
+     * @brief   Get mapping for given generic type
+     *
+     * @param   genericTypeName     Name of the generic type
+     *
+     * @return  Mapping for given generic type if any, nullptr otherwise
+     */
     auto getMapping(const QString &genericTypeName) const -> const TypeMapping *;
 
+    /**
+     * @brief   Getter for name of the determinant entry
+     *
+     * @return  Name of the deterinant entry if present, nullopt otherwise
+     */
     auto determinantName() const -> const std::optional<QString> &;
+    /**
+     * @brief   Getter for type of the determinant entry
+     *
+     * @return  Type of the deterinant entry if present, nullopt otherwise
+     */
     auto determinantTypePath() const -> const std::optional<QString> &;
 
 private:
