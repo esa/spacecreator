@@ -89,6 +89,11 @@
 
 #include <testgenerator/testgenerator.h>
 #include <fstream>
+#include <libdveditor/dvexporter.h>
+#include <QBuffer>
+#include <conversion/iv/IvXmlExporter/exporter.h>
+#include <conversion/common/model.h>
+#include <libiveditor/ivexporter.h>
 
 using namespace Core;
 using conversion::Converter;
@@ -98,6 +103,7 @@ using conversion::asn1::Asn1Registrar;
 using conversion::iv::IvRegistrar;
 using conversion::sdl::SdlRegistrar;
 using conversion::seds::SedsRegistrar;
+using ive::IVExporter;
 using plugincommon::ModelLoader;
 using namespace testgenerator;
 
@@ -153,17 +159,105 @@ auto FunctionTesterPlugin::functionTesterPluginMain() -> void
         return;
     }
 
+    QString generatedPath = getBaseDirectory() + QDir::separator() + "generated";
+    QString generatedCodePath = generatedPath + QDir::separator() + "generatedtest.c";
+    QString generatedIvPath = generatedPath + QDir::separator() + "generatediv.xml";
+    QString generatedDvPath = generatedPath + QDir::separator() + "generateddv.dv.xml";
+
+    QDir dir(generatedPath);
+    if (!dir.exists()) {
+        dir.mkpath(".");
+    }
+
     std::stringstream outStream;
     try {
         outStream = TestDriverGenerator::generateTestDriver(*csvModel, *interface, *asn1Model);
-        std::ofstream outFile("output.cpp", std::ofstream::out);
-        outFile << outStream.rdbuf();
-        outFile.close();
+        std::ofstream outFile;
+        outFile.open(generatedCodePath.toStdString());
+        outFile << outStream.str();
     }
     catch (TestDriverGeneratorException& e) {
         MessageManager::write(GenMsg::msgInfo.arg("TestDriverGeneratorException: " + QString(e.what())));
         return;
     }
+
+    const auto ivModelGenerated = IvGenerator::generate(interface);
+    if (ivModelGenerated == nullptr) {
+        MessageManager::write(GenMsg::msgInfo.arg("IV model was not generated"));
+        return;
+    }
+
+    QList<ivm::IVObject *> ivObjects = ivModelGenerated->visibleObjects();
+    std::vector<ivm::IVFunction *> ivFunctions = {};
+
+    for (const auto& ivObject : ivObjects) {
+        if (ivObject->isFunction()) {
+            ivFunctions.push_back(dynamic_cast<ivm::IVFunction *>(ivObject));
+        }
+    }
+
+    for (const auto& ivFunction : ivFunctions) {
+        MessageManager::write(GenMsg::msgInfo.arg("Znaleziono funkcje"));
+    }
+
+    exportIvModel(ivModelGenerated, generatedIvPath);
+
+    const std::unique_ptr<dvm::DVModel> dvModelGenerated =
+        DvGenerator::generate(ivFunctions, "x86 Linux CPP", "x86_Linux_TestRunner", "Node_1", "hostPartition");
+
+    if (dvModelGenerated == nullptr) {
+        MessageManager::write(GenMsg::msgInfo.arg("DV model was not generated"));
+        return;
+    }
+
+    exportDvModel(dvModelGenerated, generatedDvPath);
+}
+auto FunctionTesterPlugin::exportIvModel(const std::unique_ptr<ivm::IVModel> &ivModel, QString outputFilepath) -> void
+{
+    QByteArray modelData;
+    QBuffer modelDataBuffer(&modelData);
+    modelDataBuffer.open(QIODevice::WriteOnly);
+
+    IVExporter exporter;
+    exporter.exportObjects(ivModel->objects().values(), &modelDataBuffer);
+
+    QSaveFile outputFile(outputFilepath);
+    outputFile.open(QIODevice::WriteOnly);
+    outputFile.write(modelData);
+    outputFile.commit();
+}
+
+
+auto FunctionTesterPlugin::exportDvModel(const std::unique_ptr<dvm::DVModel> &dvModel, const QString &outputFilename) -> void
+{
+    const auto dvObjects = getDvObjectsFromModel(dvModel.get());
+
+    dve::DVExporter exporter;
+    QList<shared::VEObject *> objects;
+    std::for_each(dvObjects->begin(), dvObjects->end(), //
+            [&objects](const auto &obj) { objects.push_back(obj); });
+
+    const int objectMaxSize = 1'000;
+    QByteArray qba(objects.size() * objectMaxSize, '\00');
+    QBuffer buf = QBuffer(&qba);
+
+    exporter.exportObjects(objects, &buf);
+
+    QFile file(outputFilename);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        return;
+    }
+    file.write(qba);
+}
+
+auto FunctionTesterPlugin::getDvObjectsFromModel(dvm::DVModel *const model) -> std::unique_ptr<QVector<dvm::DVObject *>>
+{
+    auto generatedDvObjects = std::make_unique<QVector<dvm::DVObject *>>();
+    for (const auto &obj : model->objects()) {
+        generatedDvObjects->append(static_cast<dvm::DVObject *>(obj));
+    }
+
+    return generatedDvObjects;
 }
 
 auto FunctionTesterPlugin::addTestInterfaceOption() -> void
@@ -259,12 +353,17 @@ auto FunctionTesterPlugin::getSelectedInterface() -> ivm::IVInterface *
     return nullptr;
 }
 
-auto FunctionTesterPlugin::loadAsn1Model() -> std::unique_ptr<Asn1Acn::Asn1Model>
+auto FunctionTesterPlugin::getBaseDirectory() -> QString
 {
     QString ivDocumentPath = getCurrentIvEditorCore()->document()->path();
-    QDir ivBaseDirectory = QFileInfo(ivDocumentPath).absoluteDir();
-    QFileInfo workDirectory = ivBaseDirectory.absolutePath() + QDir::separator() + "work";
-    QString asn1Path = workDirectory.absoluteFilePath() + QDir::separator() + "dataview"
+    return QFileInfo(ivDocumentPath).absoluteDir().absolutePath();
+}
+
+auto FunctionTesterPlugin::loadAsn1Model() -> std::unique_ptr<Asn1Acn::Asn1Model>
+{
+    QString baseDirectory = getBaseDirectory();
+    QString workDirectory = baseDirectory + QDir::separator() + "work";
+    QString asn1Path = workDirectory + QDir::separator() + "dataview"
         + QDir::separator() + "dataview-uniq.asn";
 
     auto modelPtr = std::unique_ptr<Asn1Acn::Asn1Model>{};

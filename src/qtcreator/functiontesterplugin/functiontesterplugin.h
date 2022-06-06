@@ -24,6 +24,7 @@
 #include "ivmodel.h"
 #include "model.h"
 #include "options.h"
+#include "dveditor.h"
 
 #include <QStandardItemModel>
 #include <QStringList>
@@ -34,6 +35,8 @@
 #include <shared/ui/listtreedialog.h>
 #include <csv/CsvModel/csvmodel.h>
 #include <asn1library/asn1/asn1model.h>
+
+#include <dvcore/dvobject.h>
 
 namespace spctr {
 
@@ -57,7 +60,11 @@ private:
     auto getCurrentIvEditorCore() -> IVEditorCorePtr;
     auto getSelectedInterface() -> ivm::IVInterface *;
     auto setDeltaDialog() -> float;
-    auto loadAsn1Model() -> std::unique_ptr<Asn1Acn::Asn1Model>; 
+    auto loadAsn1Model() -> std::unique_ptr<Asn1Acn::Asn1Model>;
+    auto exportDvModel(const std::unique_ptr<dvm::DVModel> &dvModel, const QString &outputFilename) -> void;
+    auto exportIvModel(const std::unique_ptr<ivm::IVModel> &ivModel, QString outputFilepath) -> void;
+    auto getDvObjectsFromModel(dvm::DVModel *const model) -> std::unique_ptr<QVector<dvm::DVObject *>>;
+    auto getBaseDirectory() -> QString;
 
     // auto initializeRegistry() -> void;
 
