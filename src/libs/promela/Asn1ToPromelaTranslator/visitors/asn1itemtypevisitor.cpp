@@ -130,14 +130,14 @@ void Asn1ItemTypeVisitor::visit(const BitString &type)
 {
     SizeConstraintVisitor<BitStringValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
-    const auto constSize = constraintVisitor.getMinSize() == constraintVisitor.getMaxSize();
+    const auto isConstSize = constraintVisitor.getMinSize() == constraintVisitor.getMaxSize();
 
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
 
     utype.addField(Declaration(DataType(ArrayType(constraintVisitor.getMaxSize(), BasicType::BIT)), "data"));
 
-    if (!constSize) {
+    if (!isConstSize) {
         utype.addField(Declaration(DataType(BasicType::INT), "length"));
     }
 
@@ -146,7 +146,7 @@ void Asn1ItemTypeVisitor::visit(const BitString &type)
     addSimpleArrayAssignInlineValue(utypeName, constraintVisitor.getMaxSize(),
             constraintVisitor.getMinSize() != constraintVisitor.getMaxSize());
 
-    if (!constSize) {
+    if (!isConstSize) {
         addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
     }
 
@@ -157,14 +157,14 @@ void Asn1ItemTypeVisitor::visit(const OctetString &type)
 {
     SizeConstraintVisitor<OctetStringValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
-    const auto constSize = constraintVisitor.getMinSize() == constraintVisitor.getMaxSize();
+    const auto isConstSize = constraintVisitor.getMinSize() == constraintVisitor.getMaxSize();
 
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
 
     utype.addField(Declaration(DataType(ArrayType(constraintVisitor.getMaxSize(), BasicType::BYTE)), "data"));
 
-    if (!constSize) {
+    if (!isConstSize) {
         utype.addField(Declaration(DataType(BasicType::INT), "length"));
     }
 
@@ -173,7 +173,7 @@ void Asn1ItemTypeVisitor::visit(const OctetString &type)
     addSimpleArrayAssignInlineValue(utypeName, constraintVisitor.getMaxSize(),
             constraintVisitor.getMinSize() != constraintVisitor.getMaxSize());
 
-    if (!constSize) {
+    if (!isConstSize) {
         addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
     }
 
@@ -184,14 +184,14 @@ void Asn1ItemTypeVisitor::visit(const IA5String &type)
 {
     SizeConstraintVisitor<StringValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
-    const auto constSize = constraintVisitor.getMinSize() == constraintVisitor.getMaxSize();
+    const auto isConstSize = constraintVisitor.getMinSize() == constraintVisitor.getMaxSize();
 
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
 
     utype.addField(Declaration(DataType(ArrayType(constraintVisitor.getMaxSize(), BasicType::BYTE)), "data"));
 
-    if (!constSize) {
+    if (!isConstSize) {
         utype.addField(Declaration(DataType(BasicType::INT), "length"));
     }
 
@@ -200,7 +200,7 @@ void Asn1ItemTypeVisitor::visit(const IA5String &type)
     addSimpleArrayAssignInlineValue(utypeName, constraintVisitor.getMaxSize(),
             constraintVisitor.getMinSize() != constraintVisitor.getMaxSize());
 
-    if (!constSize) {
+    if (!isConstSize) {
         addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
     }
 
@@ -355,7 +355,7 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
 {
     SizeConstraintVisitor<IntegerValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
-    const auto constSize = constraintVisitor.getMinSize() == constraintVisitor.getMaxSize();
+    const auto isConstSize = constraintVisitor.getMinSize() == constraintVisitor.getMaxSize();
 
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
@@ -372,7 +372,7 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
                 Declaration(DataType(ArrayType(constraintVisitor.getMaxSize(), dataType.getUtypeReference())), "data"));
     }
 
-    if (!constSize) {
+    if (!isConstSize) {
         utype.addField(Declaration(DataType(BasicType::INT), "length"));
     }
 
@@ -401,7 +401,7 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
     sequence.appendElement(std::make_unique<ProctypeElement>(
             ForLoop(VariableRef("i"), 0, constraintVisitor.getMaxSize() - 1, std::move(loopSequence))));
 
-    if (!constSize) {
+    if (!isConstSize) {
         VariableRef dst_length = VariableRef("dst");
         dst_length.appendElement("length");
         VariableRef src_length = VariableRef("src");
@@ -411,7 +411,7 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
 
     addAssignValueInline(utypeName, std::move(sequence));
 
-    if (!constSize) {
+    if (!isConstSize) {
         addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
     }
 
