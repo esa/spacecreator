@@ -30,13 +30,22 @@ void EnumValueConstraintVisitor::visit(const Asn1Acn::Constraints::RangeConstrai
     if (range.isSingleItem()) {
         m_allowedValues.push_back(range.begin());
     }
-
-    Q_UNUSED(constraint);
 }
 
 void EnumValueConstraintVisitor::visit(const Asn1Acn::Constraints::AndConstraint<EnumValue> &constraint)
 {
-    Q_UNUSED(constraint);
+    EnumValueConstraintVisitor leftVisitor;
+    constraint.leftChild()->accept(leftVisitor);
+    auto leftValues = leftVisitor.allowedValues();
+    std::sort(leftValues.begin(), leftValues.end());
+
+    EnumValueConstraintVisitor rightVisitor;
+    constraint.rightChild()->accept(rightVisitor);
+    auto rightValues = rightVisitor.allowedValues();
+    std::sort(rightValues.begin(), rightValues.end());
+
+    std::set_intersection(leftValues.begin(), leftValues.end(), rightValues.begin(), rightValues.end(),
+            std::back_inserter(m_allowedValues));
 }
 
 void EnumValueConstraintVisitor::visit(const Asn1Acn::Constraints::OrConstraint<EnumValue> &constraint)
