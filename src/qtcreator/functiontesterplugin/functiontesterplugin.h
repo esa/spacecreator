@@ -54,6 +54,9 @@ public:
     auto aboutToShutdown() -> ShutdownFlag override;
     auto functionTesterPluginMain() -> void;
 private:
+    auto functionTesterPluginCore(ivm::IVInterface *interface,
+        const std::unique_ptr<csv::CsvModel> &csvModel,
+        const std::unique_ptr<Asn1Acn::Asn1Model> &asn1Model, float delta) -> void;
     auto addTestInterfaceOption() -> void;
     auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
     auto loadCsv() -> std::unique_ptr<csv::CsvModel>;
