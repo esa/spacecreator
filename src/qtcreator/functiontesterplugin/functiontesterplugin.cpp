@@ -153,16 +153,22 @@ auto FunctionTesterPlugin::functionTesterPluginMain() -> void
     if (!csvModel) {
         return;
     }
-    float delta = setDeltaDialog();
     auto asn1Model = loadAsn1Model();
     if (!asn1Model) {
         return;
     }
+    float delta = setDeltaDialog();
+    functionTesterPluginCore(interface, csvModel, asn1Model, delta);
+}
 
+auto FunctionTesterPlugin::functionTesterPluginCore(ivm::IVInterface *interface,
+    const std::unique_ptr<csv::CsvModel> &csvModel,
+    const std::unique_ptr<Asn1Acn::Asn1Model> &asn1Model, float delta) -> void
+{
     QString generatedPath = getBaseDirectory() + QDir::separator() + "generated";
     QString generatedCodePath = generatedPath + QDir::separator() + "generatedtest.c";
-    QString generatedIvPath = generatedPath + QDir::separator() + "generatediv.xml";
-    QString generatedDvPath = generatedPath + QDir::separator() + "generateddv.dv.xml";
+    QString generatedIvPath = generatedPath + QDir::separator() + "interfaceview.xml";
+    QString generatedDvPath = generatedPath + QDir::separator() + "deploymentview.dv.xml";
 
     QDir dir(generatedPath);
     if (!dir.exists()) {
@@ -172,9 +178,9 @@ auto FunctionTesterPlugin::functionTesterPluginMain() -> void
     std::stringstream outStream;
     try {
         outStream = TestDriverGenerator::generateTestDriver(*csvModel, *interface, *asn1Model);
-        std::ofstream outFile;
-        outFile.open(generatedCodePath.toStdString());
+        std::ofstream outFile(generatedCodePath.toStdString(), std::ofstream::out);
         outFile << outStream.str();
+        outFile.close();
     }
     catch (TestDriverGeneratorException& e) {
         MessageManager::write(GenMsg::msgInfo.arg("TestDriverGeneratorException: " + QString(e.what())));
@@ -196,10 +202,6 @@ auto FunctionTesterPlugin::functionTesterPluginMain() -> void
         }
     }
 
-    for (const auto& ivFunction : ivFunctions) {
-        MessageManager::write(GenMsg::msgInfo.arg("Znaleziono funkcje"));
-    }
-
     exportIvModel(ivModelGenerated, generatedIvPath);
 
     const std::unique_ptr<dvm::DVModel> dvModelGenerated =
@@ -212,6 +214,7 @@ auto FunctionTesterPlugin::functionTesterPluginMain() -> void
 
     exportDvModel(dvModelGenerated, generatedDvPath);
 }
+
 auto FunctionTesterPlugin::exportIvModel(const std::unique_ptr<ivm::IVModel> &ivModel, QString outputFilepath) -> void
 {
     QByteArray modelData;
