@@ -148,14 +148,10 @@ void Asn1TypeValueGeneratorVisitor::visit(const BitString &type)
 
 void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
 {
-    SizeConstraintVisitor<Asn1Acn::OctetStringValue> osVisitor;
-    const auto &typeConstraints = type.constraints().constraints();
-    if (typeConstraints.size() != 1) {
-        const QString msg("OctetString shall have only one constraint");
-        throw std::logic_error(msg.toStdString().c_str());
-    }
-    typeConstraints.front()->accept(osVisitor);
-    if (!osVisitor.isSizeConstraintVisited()) {
+    SizeConstraintVisitor<Asn1Acn::OctetStringValue> constraintVisitor;
+    type.constraints().accept(constraintVisitor);
+
+    if (!constraintVisitor.isSizeConstraintVisited()) {
         const QString msg("Specified OctetString has no size constraint");
         throw std::logic_error(msg.toStdString().c_str());
     }
@@ -166,13 +162,13 @@ void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
         InlineDefAdder::addRangedIntegerGeneratorToModel("OctetStringElement", m_promelaModel, 0, maxOctetValue);
     }
 
-    const QString typeIdentifier = Escaper::escapePromelaName(type.identifier());
+    const QString typeIdentifier = Escaper::escapePromelaName(m_name);
     const QString argumentName = QString("%1_gv").arg(typeIdentifier);
 
     auto sequence = ProctypeMaker::makeNormalSequence();
     sequence->appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, "i"));
-    const size_t minSize = osVisitor.getMinSize();
-    const size_t maxSize = osVisitor.getMaxSize();
+    const size_t minSize = constraintVisitor.getMinSize();
+    const size_t maxSize = constraintVisitor.getMaxSize();
     if (minSize == maxSize) {
         sequence->appendElement(
                 ProctypeMaker::makeCallForEachValue(octetGeneratorName, argumentName, Expression(maxSize - 1)));
