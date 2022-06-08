@@ -1233,27 +1233,32 @@ void tst_Asn1ToPromelaTranslator::testTypeSorting()
     auto secondType = std::make_unique<Sequence>("MyTypeSecond");
 
     auto secondTypeComponentType = TypeFactory::createBuiltinType("INTEGER");
-    auto secondTypeComponentTypeAssignment = std::make_unique<TypeAssignment>(
-                QStringLiteral("MyInteger"), QStringLiteral("MyIntegerT"), SourceLocation(), secondTypeComponentType->clone());
+    auto secondTypeComponentTypeAssignment = std::make_unique<TypeAssignment>(QStringLiteral("MyInteger"),
+            QStringLiteral("MyIntegerT"), SourceLocation(), secondTypeComponentType->clone());
     model->addType(std::move(secondTypeComponentTypeAssignment));
 
     auto secondTypeComponentTypeReference = std::make_unique<UserdefinedType>("MyIntegerAlias", "");
     secondTypeComponentTypeReference->setType(secondTypeComponentType->clone());
-    auto secondTypeComponentTypeReferenceAssignment = std::make_unique<TypeAssignment>("MyIntegerAlias", "MyIntegerAliasT", SourceLocation(), secondTypeComponentTypeReference->clone());
+    auto secondTypeComponentTypeReferenceAssignment = std::make_unique<TypeAssignment>(
+            "MyIntegerAlias", "MyIntegerAliasT", SourceLocation(), secondTypeComponentTypeReference->clone());
     model->addType(std::move(secondTypeComponentTypeReferenceAssignment));
 
-    auto secondTypeComponent = std::make_unique<AsnSequenceComponent>("field2", "field2", false, std::nullopt, "", AsnSequenceComponent::Presence::NotSpecified, SourceLocation(), secondTypeComponentTypeReference->clone());
+    auto secondTypeComponent = std::make_unique<AsnSequenceComponent>("field2", "field2", false, std::nullopt, "",
+            AsnSequenceComponent::Presence::NotSpecified, SourceLocation(), secondTypeComponentTypeReference->clone());
     secondType->addComponent(std::move(secondTypeComponent));
 
-    auto secondTypeAssignment = std::make_unique<TypeAssignment>("MyTypeSecond", "MyTypeSecondT", SourceLocation(), std::move(secondType));
+    auto secondTypeAssignment =
+            std::make_unique<TypeAssignment>("MyTypeSecond", "MyTypeSecondT", SourceLocation(), std::move(secondType));
     model->addType(std::move(secondTypeAssignment));
 
     auto firstType = std::make_unique<Sequence>("MyTypeFirst");
 
-    auto firstTypeComponent = std::make_unique<AsnSequenceComponent>("field1", "field1", false, std::nullopt, "", AsnSequenceComponent::Presence::NotSpecified, SourceLocation(), TypeFactory::createBuiltinType("INTEGER"));
+    auto firstTypeComponent = std::make_unique<AsnSequenceComponent>("field1", "field1", false, std::nullopt, "",
+            AsnSequenceComponent::Presence::NotSpecified, SourceLocation(), TypeFactory::createBuiltinType("INTEGER"));
     firstType->addComponent(std::move(firstTypeComponent));
 
-    auto firstTypeAssignment = std::make_unique<TypeAssignment>("MyTypeFirst", "MyTypeSecondT", SourceLocation(), std::move(firstType));
+    auto firstTypeAssignment =
+            std::make_unique<TypeAssignment>("MyTypeFirst", "MyTypeSecondT", SourceLocation(), std::move(firstType));
     model->addType(std::move(firstTypeAssignment));
 
     PromelaModel promelaModel;

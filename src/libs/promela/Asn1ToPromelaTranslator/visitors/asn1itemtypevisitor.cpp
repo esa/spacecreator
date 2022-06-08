@@ -452,7 +452,7 @@ void Asn1ItemTypeVisitor::visit(const Integer &type)
 
 void Asn1ItemTypeVisitor::visit(const UserdefinedType &type)
 {
-    if(type.type()) {
+    if (type.type()) {
         const auto name = m_name.isEmpty() ? type.typeName() : m_name;
         Asn1ItemTypeVisitor visitor(m_promelaModel, m_baseTypeName, name, m_enhancedSpinSupport);
         type.type()->accept(visitor);
