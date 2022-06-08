@@ -536,7 +536,8 @@ QFileInfo TmcConverter::workDirectory() const
 
 QFileInfo TmcConverter::simuDataViewLocation() const
 {
-    return workDirectory().absoluteFilePath() + QDir::separator() + "simulation" + QDir::separator() + "observer.asn";
+    return workDirectory().absoluteFilePath() + QDir::separator() + "simulation" + QDir::separator() + "observers"
+            + QDir::separator() + "observer.asn";
 }
 
 QFileInfo TmcConverter::sdlImplementationBaseDirectory(const QString &functionName) const
