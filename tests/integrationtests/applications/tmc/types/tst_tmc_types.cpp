@@ -31,6 +31,7 @@ private Q_SLOTS:
     void test_bool();
     void test_integer();
     void test_octet();
+    void test_enum();
 };
 
 void tst_Tmc_Types::test_bool()
@@ -48,6 +49,12 @@ void tst_Tmc_Types::test_integer()
 void tst_Tmc_Types::test_octet()
 {
     const int result = system("./test_octet.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Types::test_enum()
+{
+    const int result = system("./test_enum.sh");
     QCOMPARE(result, 0);
 }
 
