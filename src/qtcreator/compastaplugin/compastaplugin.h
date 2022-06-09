@@ -42,6 +42,7 @@ public:
 private:
     auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
     auto addCompastaMenu() -> void;
+    auto projectDir() -> QString;
     auto verificationGUI() -> void;
     auto editFaults() -> void;
     auto editContracts() -> void;

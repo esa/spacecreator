@@ -138,16 +138,25 @@ auto CompastaPlugin::createActionContainerInTools(const QString &title) -> Actio
     return container;
 }
 
+auto CompastaPlugin::projectDir() -> QString
+{
+    QString prjdir = ProjectExplorer::ProjectTree::currentProject()->projectDirectory().toString();
+    return prjdir;
+}
+
 auto CompastaPlugin::verificationGUI() -> void
 {
     MessageManager::write(GenMsg::msgInfo.arg(EvtMsg::openVerificationGUIClicked));
-    system("compasta-verification-gui");
+    const QString prog = "compasta-verification-gui";
+    QString prjdir = this->projectDir();
+    QString command = prog + " " + prjdir;
+    system(command.toStdString().c_str());
 }
 
 auto CompastaPlugin::editFaults() -> void
 {
     MessageManager::write(GenMsg::msgInfo.arg(EvtMsg::editFaultsClicked));
-    QString prjdir = ProjectExplorer::ProjectTree::currentProject()->projectDirectory().toString();
+    QString prjdir = this->projectDir();
     QString filename = QString("faults.slim");
     this->openSlimFile(prjdir, filename);
 }
@@ -155,7 +164,7 @@ auto CompastaPlugin::editFaults() -> void
 auto CompastaPlugin::editContracts() -> void
 {
     MessageManager::write(GenMsg::msgInfo.arg(EvtMsg::editContractsClicked));
-    QString prjdir = ProjectExplorer::ProjectTree::currentProject()->projectDirectory().toString();
+    QString prjdir = this->projectDir();
     QString filename = QString("contracts.slim");
     this->openSlimFile(prjdir, filename);
 }
@@ -163,7 +172,7 @@ auto CompastaPlugin::editContracts() -> void
 auto CompastaPlugin::editRequirements() -> void
 {
     MessageManager::write(GenMsg::msgInfo.arg(EvtMsg::editRequirementsClicked));
-    QString prjdir = ProjectExplorer::ProjectTree::currentProject()->projectDirectory().toString();
+    QString prjdir = this->projectDir();
     QString filename = QString("requirements.slim");
     this->openSlimFile(prjdir, filename);
 }
@@ -171,7 +180,7 @@ auto CompastaPlugin::editRequirements() -> void
 auto CompastaPlugin::editProperties() -> void
 {
     MessageManager::write(GenMsg::msgInfo.arg(EvtMsg::editPropertiesClicked));
-    QString prjdir = ProjectExplorer::ProjectTree::currentProject()->projectDirectory().toString();
+    QString prjdir = this->projectDir();
     QString filename = QString("properties.slim");
     this->openSlimFile(prjdir, filename);
 }
