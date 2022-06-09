@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>880</width>
-    <height>720</height>
+    <height>756</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>10</x>
       <y>30</y>
       <width>711</width>
-      <height>651</height>
+      <height>681</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -34,7 +34,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>30</y>
+        <y>50</y>
         <width>371</width>
         <height>351</height>
        </rect>
@@ -83,7 +83,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>380</y>
+        <y>400</y>
         <width>231</width>
         <height>21</height>
        </rect>
@@ -102,7 +102,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>400</y>
+        <y>440</y>
         <width>321</width>
         <height>211</height>
        </rect>
@@ -172,6 +172,44 @@
       </property>
       <property name="text">
        <string>Select Functions (submodel)</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_17">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>381</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>(right-click entries to add/delete/convert, double-click to open)</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_18">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>420</y>
+        <width>331</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>(right-click entries to add/delete, double-click to open)</string>
       </property>
      </widget>
     </widget>
@@ -373,7 +411,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>280</y>
+        <y>300</y>
         <width>401</width>
         <height>241</height>
        </rect>
@@ -527,6 +565,25 @@
       </property>
       <property name="text">
        <string>(optional field)</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_19">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>280</y>
+        <width>181</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>(double-click entries to open)</string>
       </property>
      </widget>
     </widget>
