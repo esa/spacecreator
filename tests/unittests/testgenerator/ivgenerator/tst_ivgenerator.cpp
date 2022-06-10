@@ -51,6 +51,7 @@ class tst_ivgenerator final : public QObject
 private Q_SLOTS:
     void initTestCase();
     void testNominal();
+    void testDefaultInterfaceName();
 
 private:
     const QString ivDir = "resources";
@@ -100,6 +101,29 @@ void tst_ivgenerator::testNominal()
     }
 
     const auto ivModelLoaded = ModelLoader::loadIvModel(ivConfig, ivPath.arg("interfaceview"));
+    if (ivModelLoaded == nullptr) {
+        throw std::runtime_error(QString("%1 file could not be read as IV").arg(ivDir).toStdString());
+    }
+
+    compareModels(ivModelLoaded.get(), ivModelGenerated.get());
+}
+
+void tst_ivgenerator::testDefaultInterfaceName()
+{
+    const auto functionUnderTest = makeFunctionUnderTest("FunctionUnderTest");
+
+    ivm::IVInterface *const interfaceUnderTest =
+            makeInterfaceUnderTest("PI_0", functionUnderTest.get(), ivm::IVInterface::OperationKind::Protected);
+
+    functionUnderTest->addChild(interfaceUnderTest);
+
+    const auto ivModelGenerated = IvGenerator::generate(interfaceUnderTest);
+
+    if (ivModelGenerated == nullptr) {
+        QFAIL("IV model was not generated");
+    }
+
+    const auto ivModelLoaded = ModelLoader::loadIvModel(ivConfig, ivPath.arg("interfaceview_default_iface_name"));
     if (ivModelLoaded == nullptr) {
         throw std::runtime_error(QString("%1 file could not be read as IV").arg(ivDir).toStdString());
     }
