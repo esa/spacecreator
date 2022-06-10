@@ -106,6 +106,7 @@ void IVQtCEditor::showModelCheckingWindow(const QString projectDir)
     IVEditorCorePtr plugin = ivPlugin();
     if (m_modelCheckingWindow.isNull()) {
         m_modelCheckingWindow = new ive::ModelCheckingWindow(plugin->document(), projectDir, nullptr);
+        m_modelCheckingWindow->callTasteGens(true);
         m_modelCheckingWindow->setAttribute(Qt::WA_DeleteOnClose);
         connect(plugin->document(), &QObject::destroyed, m_modelCheckingWindow.data(), &QObject::deleteLater);
     }
