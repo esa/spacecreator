@@ -23,6 +23,8 @@ cd $TEST_OUTPUT_DIR
 $DIFF interfaceview.xml ../resources/test_alternate_set.output \
   && $DIFF ALTERNATESET.asn ../resources/test_alternate_set_asn.output \
   && $DIFF ALTERNATESET.acn ../resources/test_alternate_set_acn.output \
-  && asn1scc -c ALTERNATESET.asn ALTERNATESET.acn \
+  && $DIFF ALTERNATESET-MEGACOMPONENT.asn ../resources/test_alternate_set_component_asn.output \
+  && $DIFF ALTERNATESET-MEGACOMPONENT.acn ../resources/test_alternate_set_component_acn.output \
+  && asn1scc -c ALTERNATESET.asn ALTERNATESET.acn ALTERNATESET-MEGACOMPONENT.asn ALTERNATESET-MEGACOMPONENT.acn\
   && cd .. \
   && rm -r -f $TEST_OUTPUT_DIR

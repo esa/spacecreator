@@ -19,9 +19,11 @@
 
 #include "asn1itemtypevisitor.h"
 
-#include "asn1constraintvisitor.h"
 #include "asn1sequencecomponentvisitor.h"
 #include "enumeratedgenerator.h"
+#include "enumvalueconstraintvisitor.h"
+#include "integerrangeconstraintvisitor.h"
+#include "sizeconstraintvisitor.h"
 
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
@@ -39,6 +41,7 @@
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <asn1library/asn1/values.h>
 #include <conversion/common/escaper/escaper.h>
+#include <iostream>
 #include <promela/PromelaModel/proctypeelement.h>
 
 using Asn1Acn::BitStringValue;
@@ -62,8 +65,11 @@ using Asn1Acn::Types::SequenceOf;
 using Asn1Acn::Types::UserdefinedType;
 using conversion::Escaper;
 using promela::model::ArrayType;
+using promela::model::AssertCall;
 using promela::model::Assignment;
 using promela::model::BasicType;
+using promela::model::BinaryExpression;
+using promela::model::Constant;
 using promela::model::DataType;
 using promela::model::Declaration;
 using promela::model::Expression;
@@ -89,7 +95,7 @@ Asn1ItemTypeVisitor::Asn1ItemTypeVisitor(
 {
 }
 
-const std::optional<::promela::model::DataType> &Asn1ItemTypeVisitor::getResultDataType() const noexcept
+const std::optional<model::DataType> &Asn1ItemTypeVisitor::getResultDataType() const noexcept
 {
     return m_resultDataType;
 }
@@ -111,7 +117,7 @@ void Asn1ItemTypeVisitor::visit(const Null &type)
     const QString typeName = constructTypeName(m_name);
     m_promelaModel.addTypeAlias(TypeAlias(typeName, BasicType::BIT));
 
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     sequence.appendElement(std::make_unique<ProctypeElement>(Skip()));
 
@@ -122,14 +128,16 @@ void Asn1ItemTypeVisitor::visit(const Null &type)
 
 void Asn1ItemTypeVisitor::visit(const BitString &type)
 {
-    Asn1ConstraintVisitor<BitStringValue> constraintVisitor;
+    SizeConstraintVisitor<BitStringValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
+    const auto isConstSize = constraintVisitor.getMinSize() == constraintVisitor.getMaxSize();
+
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
 
     utype.addField(Declaration(DataType(ArrayType(constraintVisitor.getMaxSize(), BasicType::BIT)), "data"));
 
-    if (constraintVisitor.getMaxSize() != constraintVisitor.getMinSize()) {
+    if (!isConstSize) {
         utype.addField(Declaration(DataType(BasicType::INT), "length"));
     }
 
@@ -137,20 +145,26 @@ void Asn1ItemTypeVisitor::visit(const BitString &type)
 
     addSimpleArrayAssignInlineValue(utypeName, constraintVisitor.getMaxSize(),
             constraintVisitor.getMinSize() != constraintVisitor.getMaxSize());
+
+    if (!isConstSize) {
+        addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
+    }
 
     m_resultDataType = DataType(UtypeRef(utypeName));
 }
 
 void Asn1ItemTypeVisitor::visit(const OctetString &type)
 {
-    Asn1ConstraintVisitor<OctetStringValue> constraintVisitor;
+    SizeConstraintVisitor<OctetStringValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
+    const auto isConstSize = constraintVisitor.getMinSize() == constraintVisitor.getMaxSize();
+
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
 
     utype.addField(Declaration(DataType(ArrayType(constraintVisitor.getMaxSize(), BasicType::BYTE)), "data"));
 
-    if (constraintVisitor.getMaxSize() != constraintVisitor.getMinSize()) {
+    if (!isConstSize) {
         utype.addField(Declaration(DataType(BasicType::INT), "length"));
     }
 
@@ -158,20 +172,26 @@ void Asn1ItemTypeVisitor::visit(const OctetString &type)
 
     addSimpleArrayAssignInlineValue(utypeName, constraintVisitor.getMaxSize(),
             constraintVisitor.getMinSize() != constraintVisitor.getMaxSize());
+
+    if (!isConstSize) {
+        addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
+    }
 
     m_resultDataType = DataType(UtypeRef(utypeName));
 }
 
 void Asn1ItemTypeVisitor::visit(const IA5String &type)
 {
-    Asn1ConstraintVisitor<StringValue> constraintVisitor;
+    SizeConstraintVisitor<StringValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
+    const auto isConstSize = constraintVisitor.getMinSize() == constraintVisitor.getMaxSize();
+
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
 
     utype.addField(Declaration(DataType(ArrayType(constraintVisitor.getMaxSize(), BasicType::BYTE)), "data"));
 
-    if (constraintVisitor.getMaxSize() != constraintVisitor.getMinSize()) {
+    if (!isConstSize) {
         utype.addField(Declaration(DataType(BasicType::INT), "length"));
     }
 
@@ -179,6 +199,10 @@ void Asn1ItemTypeVisitor::visit(const IA5String &type)
 
     addSimpleArrayAssignInlineValue(utypeName, constraintVisitor.getMaxSize(),
             constraintVisitor.getMinSize() != constraintVisitor.getMaxSize());
+
+    if (!isConstSize) {
+        addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
+    }
 
     m_resultDataType = DataType(UtypeRef(utypeName));
 }
@@ -202,6 +226,7 @@ void Asn1ItemTypeVisitor::visit(const Enumerated &type)
     m_promelaModel.addTypeAlias(TypeAlias(typeName, BasicType::INT));
 
     addSimpleValueAssignmentInline(typeName);
+    addEnumRangeCheckInline(type, typeName);
 
     m_resultDataType = DataType(UtypeRef(typeName));
 }
@@ -215,7 +240,7 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
     const QString none = QString("%1_NONE").arg(utypeName);
     m_promelaModel.addValueDefinition(ValueDefinition(none, 0));
     int32_t index = 1;
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
     for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type.components()) {
         Asn1ItemTypeVisitor nestedVisitor(m_promelaModel, utypeName, component->name(), m_enhancedSpinSupport);
         component->type()->accept(nestedVisitor);
@@ -266,7 +291,7 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
     Utype nestedUtype(nestedUtypeName);
 
     QList<QString> optionalFields;
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : type.components()) {
         Asn1SequenceComponentVisitor componentVisitor(m_promelaModel, nestedUtypeName, m_enhancedSpinSupport);
@@ -328,8 +353,9 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
 
 void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
 {
-    Asn1ConstraintVisitor<IntegerValue> constraintVisitor;
+    SizeConstraintVisitor<IntegerValue> constraintVisitor;
     type.constraints().accept(constraintVisitor);
+    const auto isConstSize = constraintVisitor.getMinSize() == constraintVisitor.getMaxSize();
 
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
@@ -346,19 +372,18 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
                 Declaration(DataType(ArrayType(constraintVisitor.getMaxSize(), dataType.getUtypeReference())), "data"));
     }
 
-    if (constraintVisitor.getMaxSize() != constraintVisitor.getMinSize()) {
+    if (!isConstSize) {
         utype.addField(Declaration(DataType(BasicType::INT), "length"));
     }
 
     type.itemsType();
     m_promelaModel.addUtype(utype);
 
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     sequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "i")));
 
-    std::unique_ptr<::promela::model::Sequence> loopSequence =
-            std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
+    std::unique_ptr<model::Sequence> loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
 
     VariableRef dst("dst");
     dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
@@ -376,7 +401,7 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
     sequence.appendElement(std::make_unique<ProctypeElement>(
             ForLoop(VariableRef("i"), 0, constraintVisitor.getMaxSize() - 1, std::move(loopSequence))));
 
-    if (constraintVisitor.getMaxSize() != constraintVisitor.getMinSize()) {
+    if (!isConstSize) {
         VariableRef dst_length = VariableRef("dst");
         dst_length.appendElement("length");
         VariableRef src_length = VariableRef("src");
@@ -385,6 +410,10 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
     }
 
     addAssignValueInline(utypeName, std::move(sequence));
+
+    if (!isConstSize) {
+        addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
+    }
 
     m_resultDataType = DataType(UtypeRef(utypeName));
 }
@@ -416,6 +445,7 @@ void Asn1ItemTypeVisitor::visit(const Integer &type)
     m_promelaModel.addTypeAlias(TypeAlias(typeName, BasicType::INT));
 
     addSimpleValueAssignmentInline(typeName);
+    addIntegerRangeCheckInline(type, typeName);
 
     m_resultDataType = DataType(UtypeRef(typeName));
 }
@@ -427,7 +457,7 @@ void Asn1ItemTypeVisitor::visit(const UserdefinedType &type)
     m_promelaModel.addTypeAlias(TypeAlias(typeName, UtypeRef(escapedTypeName)));
     m_resultDataType = DataType(UtypeRef(typeName));
 
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     const QString inlineName = escapedTypeName + assignValueInlineSuffix;
     QList<InlineCall::Argument> inlineArguments;
@@ -449,7 +479,7 @@ QString Asn1ItemTypeVisitor::constructTypeName(QString name)
 
 void Asn1ItemTypeVisitor::addSimpleValueAssignmentInline(const QString &typeName)
 {
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     sequence.appendElement(
             std::make_unique<ProctypeElement>(Assignment(VariableRef("dst"), Expression(VariableRef("src")))));
@@ -457,25 +487,13 @@ void Asn1ItemTypeVisitor::addSimpleValueAssignmentInline(const QString &typeName
     addAssignValueInline(typeName, std::move(sequence));
 }
 
-void Asn1ItemTypeVisitor::addAssignValueInline(const QString &typeName, ::promela::model::Sequence sequence)
-{
-    const QString assignValueInline =
-            QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(assignValueInlineSuffix);
-    QList<QString> arguments;
-    arguments.append("dst");
-    arguments.append("src");
-
-    m_promelaModel.addInlineDef(std::make_unique<InlineDef>(assignValueInline, arguments, std::move(sequence)));
-}
-
 void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeName, int length, bool lengthFieldPresent)
 {
-    ::promela::model::Sequence sequence(::promela::model::Sequence::Type::NORMAL);
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     sequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "i")));
 
-    std::unique_ptr<::promela::model::Sequence> loopSequence =
-            std::make_unique<::promela::model::Sequence>(::promela::model::Sequence::Type::NORMAL);
+    std::unique_ptr<model::Sequence> loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
 
     VariableRef dst("dst");
     dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
@@ -498,8 +516,150 @@ void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeNam
     addAssignValueInline(typeName, std::move(sequence));
 }
 
+void Asn1ItemTypeVisitor::addAssignValueInline(const QString &typeName, model::Sequence sequence)
+{
+    const QString assignValueInline =
+            QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(assignValueInlineSuffix);
+    QList<QString> arguments;
+    arguments.append("dst");
+    arguments.append("src");
+
+    m_promelaModel.addInlineDef(std::make_unique<InlineDef>(assignValueInline, arguments, std::move(sequence)));
+}
+
+void Asn1ItemTypeVisitor::addEnumRangeCheckInline(const Enumerated &type, const QString &typeName)
+{
+    // Get allowed values
+    EnumValueConstraintVisitor visitor;
+    type.constraints().accept(visitor);
+
+    const auto &allowedValues = visitor.allowedValues();
+
+    if (allowedValues.empty()) {
+        return;
+    }
+
+    const auto argumentName = buildCheckArgumentName(typeName, "value");
+
+    // Build one big expression for range check
+    std::vector<BinaryExpression> valueCheckingExpressions;
+    for (const auto &enumValue : allowedValues) {
+        auto valueVar = std::make_unique<Expression>(VariableRef(argumentName));
+
+        const auto enumValueName = QString("%1_%2").arg(typeName).arg(Escaper::escapePromelaName(enumValue));
+        auto enumValueVar = std::make_unique<Expression>(VariableRef(enumValueName));
+
+        auto equalExpr =
+                BinaryExpression(BinaryExpression::Operator::EQUAL, std::move(valueVar), std::move(enumValueVar));
+        valueCheckingExpressions.push_back(std::move(equalExpr));
+    }
+
+    auto valueCheckingExpression =
+            std::accumulate(std::next(valueCheckingExpressions.begin()), valueCheckingExpressions.end(),
+                    std::make_unique<Expression>(valueCheckingExpressions.front()), [&](auto &&acc, const auto &expr) {
+                        return std::make_unique<Expression>(BinaryExpression(
+                                BinaryExpression::Operator::OR, std::move(acc), std::make_unique<Expression>(expr)));
+                    });
+
+    addRangeCheckInline(*valueCheckingExpression, typeName);
+}
+
+void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const Integer &type, const QString &typeName)
+{
+    // Get type range subset
+    IntegerRangeConstraintVisitor visitor;
+    type.constraints().accept(visitor);
+
+    const auto &rangeSubsets = visitor.getResultSubset();
+
+    if (!rangeSubsets.has_value()) {
+        return;
+    }
+
+    const auto argumentName = buildCheckArgumentName(typeName, "value");
+
+    // Build one big expression for range check
+    std::vector<BinaryExpression> rangeCheckingExpressions;
+    for (const auto &range : rangeSubsets->getRanges()) {
+        auto minValueConst = std::make_unique<Expression>(Constant(range.first));
+        auto minValueVar = std::make_unique<Expression>(VariableRef(argumentName));
+        auto greaterThanExpr = std::make_unique<Expression>(
+                BinaryExpression(BinaryExpression::Operator::GEQUAL, std::move(minValueVar), std::move(minValueConst)));
+
+        auto maxValueConst = std::make_unique<Expression>(Constant(range.second));
+        auto maxValueVar = std::make_unique<Expression>(VariableRef(argumentName));
+        auto lessThanExpr = std::make_unique<Expression>(
+                BinaryExpression(BinaryExpression::Operator::LEQUAL, std::move(maxValueVar), std::move(maxValueConst)));
+
+        BinaryExpression combinedExpr(
+                BinaryExpression::Operator::AND, std::move(greaterThanExpr), std::move(lessThanExpr));
+        rangeCheckingExpressions.push_back(std::move(combinedExpr));
+    }
+
+    auto rangeCheckingExpression =
+            std::accumulate(std::next(rangeCheckingExpressions.begin()), rangeCheckingExpressions.end(),
+                    std::make_unique<Expression>(rangeCheckingExpressions.front()), [&](auto &&acc, const auto &expr) {
+                        return std::make_unique<Expression>(BinaryExpression(
+                                BinaryExpression::Operator::OR, std::move(acc), std::make_unique<Expression>(expr)));
+                    });
+
+    addRangeCheckInline(*rangeCheckingExpression, typeName);
+}
+
+void Asn1ItemTypeVisitor::addRangeCheckInline(const Expression &expression, const QString &typeName)
+{
+    const auto inlineName = QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(rangeCheckInlineSuffix);
+    QList<QString> arguments;
+    const auto argumentName = buildCheckArgumentName(typeName, "value");
+    arguments.append(argumentName);
+
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
+
+    AssertCall assertCall(expression);
+    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assertCall)));
+
+    auto rangeCheckInline = std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
+    m_promelaModel.addInlineDef(std::move(rangeCheckInline));
+}
+
+void Asn1ItemTypeVisitor::addSizeCheckInline(
+        const std::size_t minValue, const std::size_t maxValue, const QString &typeName)
+{
+    const auto inlineName = QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(rangeCheckInlineSuffix);
+    QList<QString> arguments;
+    const auto argumentName = buildCheckArgumentName(typeName, "size");
+    arguments.append(argumentName);
+
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
+
+    auto minValueConst = std::make_unique<Expression>(Constant(minValue));
+    auto minValueVar = std::make_unique<Expression>(VariableRef(argumentName));
+    auto greaterThanExpr = std::make_unique<Expression>(
+            BinaryExpression(BinaryExpression::Operator::GEQUAL, std::move(minValueVar), std::move(minValueConst)));
+
+    auto maxValueConst = std::make_unique<Expression>(Constant(maxValue));
+    auto maxValueVar = std::make_unique<Expression>(VariableRef(argumentName));
+    auto lessThanExpr = std::make_unique<Expression>(
+            BinaryExpression(BinaryExpression::Operator::LEQUAL, std::move(maxValueVar), std::move(maxValueConst)));
+
+    BinaryExpression sizeCheckingExpression(
+            BinaryExpression::Operator::AND, std::move(greaterThanExpr), std::move(lessThanExpr));
+
+    AssertCall assertCall(Expression(std::move(sizeCheckingExpression)));
+    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assertCall)));
+
+    auto rangeCheckInline = std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
+    m_promelaModel.addInlineDef(std::move(rangeCheckInline));
+}
+
 QString Asn1ItemTypeVisitor::getAssignValueInlineNameForNestedType(const QString &utype, const QString &field) const
 {
     return Escaper::escapePromelaName(utype) + "_" + Escaper::escapePromelaName(field) + assignValueInlineSuffix;
 }
+
+QString Asn1ItemTypeVisitor::buildCheckArgumentName(const QString &typeName, const QString &postfix) const
+{
+    return QString("%1_%2_check").arg(typeName).arg(postfix);
+}
+
 }

@@ -1,0 +1,19 @@
+COM-N7SPACE-CONTAINERS-COMPONENT DEFINITIONS ::= BEGIN
+PackageContainer []
+{
+    realization []
+    {
+        realizationPackageContainer []
+        {
+            fieldA [],
+            fieldB []
+        },
+        realizationPackageChildContainer []
+    }
+}
+PackageChildContainer []
+{
+    fieldA [],
+    fieldB []
+}
+END

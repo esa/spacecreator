@@ -1,5 +1,5 @@
 <InterfaceView>
-<Function name="HWAS" comment="Facade for the underlying microprocessor/microcontroller system." is_type="NO" language="C" default_implementation="default">
+<Function name="HWAS" comment="Facade for the underlying microprocessor/microcontroller system." is_type="NO" language="SDL" default_implementation="default">
 <Provided_Interface name="InterruptSubscriptionManagement_SubscribeToInterrupt_Pi" comment="Subscribe to a hardware interrupt" kind="Protected" layer="default">
     <Input_Parameter name="interrupt" type="InterruptNumber" encoding="ACN"/>
 </Provided_Interface>
@@ -35,12 +35,12 @@
 </Provided_Interface>
 
 <Required_Interface name="InterruptSubscription_Interrupt_Ri" comment="Receive a hardware interrupt notification. The notification is asynchronous, as it may not be executed in the interrupt context" kind="Sporadic" layer="default">
-    <Input_Parameter name="InputParam" type="Interrupt-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="InterruptSubscriptionInterfaceType-Interrupt-Type" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
     <Implementations>
-        <Implementation name="default" language="C"/>
+        <Implementation name="default" language="SDL"/>
     </Implementations>
 </Function>
 

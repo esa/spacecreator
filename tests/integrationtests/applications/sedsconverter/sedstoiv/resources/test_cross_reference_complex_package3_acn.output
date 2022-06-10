@@ -1,6 +1,6 @@
 PACKAGE3 DEFINITIONS ::= BEGIN
 Integer3 [size 8, encoding pos-int, endianness big]
-ParentInterface1Command-Type []
+ParentInterface1-ParentInterface1Command-Type []
 {
     arg1 [],
     arg2 []

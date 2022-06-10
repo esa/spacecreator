@@ -1,0 +1,29 @@
+inline OctetStringElement_generate_value(OctetStringElement_gv)
+{
+    int OctetStringElement_tmp;
+    if
+    ::  atomic {
+        select (OctetStringElement_tmp : 0 .. 255);
+    }
+    fi;
+    OctetStringElement_gv = OctetStringElement_tmp;
+}
+inline MyOctetString_length_generate_value(MyOctetString_length_gv)
+{
+    int MyOctetString_length_tmp;
+    if
+    ::  atomic {
+        select (MyOctetString_length_tmp : 9 .. 13);
+    }
+    fi;
+    MyOctetString_length_gv = MyOctetString_length_tmp;
+}
+inline MyOctetString_generate_value(MyOctetString_gv)
+{
+    int i;
+    MyOctetString_length_generate_value(MyOctetString_gv.length);
+    for(i : 0 .. (MyOctetString_gv.length - 1))
+    {
+        OctetStringElement_generate_value(MyOctetString_gv.data[i]);
+    }
+}

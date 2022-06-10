@@ -1,0 +1,24 @@
+COM-N7SPACE-COMMANDARGUMENTS-COMPONENT DEFINITIONS ::= BEGIN
+IMPORTS
+MyFloat FROM COM-N7SPACE-COMMANDARGUMENTS
+MyInteger FROM COM-N7SPACE-COMMANDARGUMENTS
+;
+Component-GenericInterfaceIntegerPI-GenericType ::= MyInteger(0 .. 255)
+Component-GenericInterfaceIntegerPI-GenericCommand-Type ::= SEQUENCE
+{
+    genericArgument1 Component-GenericInterfaceIntegerPI-GenericType(0 .. 255),
+    genericArgument2 Component-GenericInterfaceIntegerPI-GenericType(0 .. 255)
+}
+Component-GenericInterfaceIntegerReusePI-GenericType ::= MyInteger(0 .. 255)
+Component-GenericInterfaceIntegerReusePI-GenericCommand-Type ::= SEQUENCE
+{
+    genericArgument1 Component-GenericInterfaceIntegerReusePI-GenericType(0 .. 255),
+    genericArgument2 Component-GenericInterfaceIntegerReusePI-GenericType(0 .. 255)
+}
+Component-GenericInterfaceFloatPI-GenericType ::= MyFloat(-3.40282e+38 .. 3.40282e+38)
+Component-GenericInterfaceFloatPI-GenericCommand-Type ::= SEQUENCE
+{
+    genericArgument1 Component-GenericInterfaceFloatPI-GenericType(-3.40282e+38 .. 3.40282e+38),
+    genericArgument2 Component-GenericInterfaceFloatPI-GenericType(-3.40282e+38 .. 3.40282e+38)
+}
+END

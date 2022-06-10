@@ -51,18 +51,17 @@ const QString &QualifiedName::pathStr() const
 
 bool operator==(const QualifiedName &lhs, const QualifiedName &rhs)
 {
-    if (lhs.namespaceName() != rhs.namespaceName()) {
-        return false;
-    } else if (lhs.name() != rhs.name()) {
-        return false;
-    } else {
-        return true;
-    }
+    return lhs.m_path == rhs.m_path;
 }
 
 bool operator!=(const QualifiedName &lhs, const QualifiedName &rhs)
 {
     return !(lhs == rhs);
+}
+
+bool operator<(const QualifiedName &lhs, const QualifiedName &rhs)
+{
+    return lhs.m_path < rhs.m_path;
 }
 
 } // namespace seds::model

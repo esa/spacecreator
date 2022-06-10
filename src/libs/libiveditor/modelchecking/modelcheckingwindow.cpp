@@ -147,6 +147,20 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     // set status bar text color
     statusBar()->setStyleSheet("color: white");
 
+    statusBar()->showMessage("Window started.", 6000);
+}
+
+ModelCheckingWindow::~ModelCheckingWindow()
+{
+    delete d;
+    d = nullptr;
+}
+
+/*!
+ * \brief ModelCheckingWindow::callTasteGens Calls any needed TASTE generators.
+ */
+void ModelCheckingWindow::callTasteGens(bool toggled){
+    if (!toggled) {return;}
     // CALL MAKE SKELETONS
     QString makeSkeletonsCall = "make skeletons";
     QProcess *makeSleletonsCallerProcess = new QProcess(this);
@@ -172,14 +186,6 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     }
     // reset path
     QDir::setCurrent(qDirAppPath);
-
-    statusBar()->showMessage("Window started.", 6000);
-}
-
-ModelCheckingWindow::~ModelCheckingWindow()
-{
-    delete d;
-    d = nullptr;
 }
 
 /*!

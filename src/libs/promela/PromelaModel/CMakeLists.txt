@@ -2,6 +2,7 @@ project(PromelaModel VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES
   arraytype.cpp
+  assertcall.cpp
   assignment.cpp
   binaryexpression.cpp
   channelinit.cpp
@@ -23,6 +24,7 @@ set(SOURCES
   proctypeelement.cpp
   promelamodel.cpp
   sequence.cpp
+  select.cpp
   typealias.cpp
   utype.cpp
   utyperef.cpp
@@ -31,6 +33,7 @@ set(SOURCES
   )
 set(INCLUDES
   arraytype.h
+  assertcall.h
   assignment.h
   basictypes.h
   binaryexpression.h
@@ -54,6 +57,8 @@ set(INCLUDES
   promelamodel.h
   sequence.h
   skip.h
+  exitloop.h
+  select.h
   typealias.h
   unsigneddatatype.h
   utype.h

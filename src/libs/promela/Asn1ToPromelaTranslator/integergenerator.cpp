@@ -37,7 +37,7 @@ void IntegerGenerator::reset()
 
 int IntegerGenerator::next()
 {
-    int result = m_next.value();
+    auto result = m_next.value();
 
     if (result == m_iter->second) {
         ++m_iter;

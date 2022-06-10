@@ -20,20 +20,26 @@
 #include "valueassignmentvisitor.h"
 
 #include "sequencecomponentvaluevisitor.h"
+#include "sizeconstraintvisitor.h"
 
 #include <asn1library/asn1/choicevalue.h>
+#include <asn1library/asn1/multiplevalue.h>
 #include <asn1library/asn1/namedvalue.h>
 #include <asn1library/asn1/singlevalue.h>
 #include <asn1library/asn1/types/choice.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/sequence.h>
+#include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
+#include <asn1library/asn1/values.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/converter/exceptions.h>
 #include <iostream>
 #include <promela/PromelaModel/proctypeelement.h>
 
 using Asn1Acn::ChoiceValue;
+using Asn1Acn::IntegerValue;
+using Asn1Acn::MultipleValue;
 using Asn1Acn::NamedValue;
 using Asn1Acn::SingleValue;
 using Asn1Acn::Value;
@@ -63,8 +69,8 @@ using promela::model::VariableRef;
 
 namespace promela::translator {
 ValueAssignmentVisitor::ValueAssignmentVisitor(
-        ValuePtr value, ::promela::model::Sequence &sequence, const VariableRef &target, QString typeName)
-    : m_value(std::move(value))
+        Value *value, model::Sequence &sequence, const VariableRef &target, QString typeName)
+    : m_value(value)
     , m_sequence(sequence)
     , m_target(target)
     , m_typeName(std::move(typeName))
@@ -77,7 +83,7 @@ void ValueAssignmentVisitor::visit(const Boolean &type)
     if (m_value->typeEnum() != Value::SINGLE_VALUE) {
         throw ConverterException("Invalid value for BOOLEAN datatype");
     }
-    const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value.get());
+    const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value);
 
     int value = singleValue->value().compare("true", Qt::CaseInsensitive) == 0 ? 1 : 0;
 
@@ -124,7 +130,7 @@ void ValueAssignmentVisitor::visit(const Enumerated &type)
     if (m_value->typeEnum() != Value::SINGLE_VALUE) {
         throw ConverterException("Invalid value for ENUMERATED datatype");
     }
-    const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value.get());
+    const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value);
     Q_UNUSED(type);
 
     const QString value = QString("%1_%2")
@@ -144,7 +150,7 @@ void ValueAssignmentVisitor::visit(const Choice &type)
     if (m_value->typeEnum() != Value::CHOICE_VALUE) {
         throw ConverterException("Invalid value for Choice datatype");
     }
-    const ChoiceValue *choiceValue = dynamic_cast<const ChoiceValue *>(m_value.get());
+    const ChoiceValue *choiceValue = dynamic_cast<const ChoiceValue *>(m_value);
 
     const auto escapedTypeName = Escaper::escapePromelaName(m_typeName);
     const auto escapedSelectionName = Escaper::escapePromelaName(choiceValue->name());
@@ -160,7 +166,7 @@ void ValueAssignmentVisitor::visit(const Choice &type)
     m_sequence.appendElement(std::make_unique<ProctypeElement>(Assignment(selectionMember, selectionValue)));
 
     auto component = type.component(choiceValue->name());
-    ValueAssignmentVisitor visitor(choiceValue->value()->clone(), m_sequence, dataMember,
+    ValueAssignmentVisitor visitor(choiceValue->value().get(), m_sequence, dataMember,
             QString("%1_%2").arg(escapedTypeName).arg(escapedSelectionName));
     component->type()->accept(visitor);
 }
@@ -170,7 +176,7 @@ void ValueAssignmentVisitor::visit(const Sequence &type)
     if (m_value->typeEnum() != Value::NAMED_VALUE) {
         throw ConverterException("Invalid value for SEQUENCE datatype");
     }
-    const NamedValue *namedValue = dynamic_cast<const NamedValue *>(m_value.get());
+    const NamedValue *namedValue = dynamic_cast<const NamedValue *>(m_value);
     for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : type.components()) {
         SequenceComponentValueVisitor visitor(namedValue, m_sequence, m_target, m_typeName);
         component->accept(visitor);
@@ -179,8 +185,33 @@ void ValueAssignmentVisitor::visit(const Sequence &type)
 
 void ValueAssignmentVisitor::visit(const SequenceOf &type)
 {
-    Q_UNUSED(type);
-    throw ConverterException("Value generation is not implemented for SEQUENCE OF datatype");
+    if (m_value->typeEnum() != Value::MULTIPLE_VALUE) {
+        throw ConverterException("Invalid value for SEQUENCEOF datatype");
+    }
+
+    SizeConstraintVisitor<IntegerValue> sizeConstraintVisitor;
+    type.constraints().accept(sizeConstraintVisitor);
+
+    const auto multipleValue = dynamic_cast<const MultipleValue *>(m_value);
+    const auto &values = multipleValue->values();
+    const auto valuesCount = values.size();
+
+    for (std::size_t i = 0; i < valuesCount; ++i) {
+        const auto &value = values[i];
+        auto target = m_target;
+        target.appendElement("data", std::make_unique<Expression>(Constant(i)));
+
+        ValueAssignmentVisitor visitor(value.get(), m_sequence, target, type.itemsType()->identifier());
+        type.itemsType()->accept(visitor);
+    }
+
+    if (sizeConstraintVisitor.getMaxSize() != sizeConstraintVisitor.getMinSize()) {
+        auto target = m_target;
+        target.appendElement("length");
+
+        auto assignment = Assignment(target, Expression(Constant(valuesCount)));
+        m_sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assignment)));
+    }
 }
 
 void ValueAssignmentVisitor::visit(const Real &type)
@@ -199,9 +230,9 @@ void ValueAssignmentVisitor::visit(const Integer &type)
 {
     Q_UNUSED(type);
     if (m_value->typeEnum() != Value::SINGLE_VALUE) {
-        throw ConverterException("Invalid value for SEQUENCE datatype");
+        throw ConverterException("Invalid value for INTEGER datatype");
     }
-    const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value.get());
+    const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value);
     int value = singleValue->value().toInt();
 
     const QString inlineCallName = QString("%1_assign_value").arg(Escaper::escapePromelaName(m_typeName));
@@ -214,7 +245,7 @@ void ValueAssignmentVisitor::visit(const Integer &type)
 
 void ValueAssignmentVisitor::visit(const UserdefinedType &type)
 {
-    ValueAssignmentVisitor visitor(m_value->clone(), m_sequence, m_target, type.typeName());
+    ValueAssignmentVisitor visitor(m_value, m_sequence, m_target, type.typeName());
 
     type.type()->accept(visitor);
 }

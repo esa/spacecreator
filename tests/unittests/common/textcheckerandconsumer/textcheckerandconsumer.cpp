@@ -30,11 +30,13 @@ namespace tests::common {
 void TextCheckerAndConsumer::checkSequenceAndConsume(
         const std::vector<QString> &expectedOutput, QTextStream &actualConsumableOutput)
 {
-    for (const auto &expectedLine : expectedOutput) {
+    for (unsigned int i = 0; i < expectedOutput.size(); i++) {
+        const auto &expectedLine = expectedOutput.at(i);
         if (doesStreamContainRequested(actualConsumableOutput, expectedLine)) {
             continue;
         } else {
-            const QString message = QString("the generated file does not contain '%1' substring").arg(expectedLine);
+            const QString message =
+                    QString("the generated file does not contain '%1' substring (line %2)").arg(expectedLine).arg(i);
             throw std::logic_error(message.toStdString().c_str());
         }
     }

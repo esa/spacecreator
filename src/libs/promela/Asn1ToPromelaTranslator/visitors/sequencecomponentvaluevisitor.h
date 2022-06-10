@@ -29,7 +29,7 @@ namespace promela::translator {
 /**
  * @brief Visitor for ASN.1 SequenceComponent, for generation of value assignments
  */
-class SequenceComponentValueVisitor final : public ::Asn1Acn::SequenceComponentVisitor
+class SequenceComponentValueVisitor final : public Asn1Acn::SequenceComponentVisitor
 {
 public:
     /**
@@ -40,25 +40,25 @@ public:
      * @param target target variable to assign value
      * @param sequenceTypeName name of SEQUENCE datatype
      */
-    SequenceComponentValueVisitor(const ::Asn1Acn::NamedValue *value, ::promela::model::Sequence &sequence,
-            const ::promela::model::VariableRef &target, QString sequenceTypeName);
+    SequenceComponentValueVisitor(const Asn1Acn::NamedValue *value, model::Sequence &sequence,
+            const model::VariableRef &target, QString sequenceTypeName);
     /**
-     * @brief Visit ::Asn1Acn::AsnSequenceComponent
+     * @brief Visit Asn1Acn::AsnSequenceComponent
      *
      * @param component component to visit
      */
-    void visit(const ::Asn1Acn::AsnSequenceComponent &component) override;
+    void visit(const Asn1Acn::AsnSequenceComponent &component) override;
     /**
-     * @brief Visit ::Asn1Acn::AcnSequenceComponent
+     * @brief Visit Asn1Acn::AcnSequenceComponent
      *
      * @param component component to visit
      */
-    void visit(const ::Asn1Acn::AcnSequenceComponent &component) override;
+    void visit(const Asn1Acn::AcnSequenceComponent &component) override;
 
 private:
-    const ::Asn1Acn::NamedValue *m_value;
-    ::promela::model::Sequence &m_sequence;
-    ::promela::model::VariableRef m_target;
+    const Asn1Acn::NamedValue *m_value;
+    model::Sequence &m_sequence;
+    model::VariableRef m_target;
     QString m_sequenceTypeName;
 };
 }

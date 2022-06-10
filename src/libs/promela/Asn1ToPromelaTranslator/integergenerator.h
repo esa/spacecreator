@@ -57,7 +57,7 @@ public:
 
 private:
     const IntegerSubset &m_subset;
-    std::list<std::pair<int, int>>::const_iterator m_iter;
-    std::optional<int> m_next;
+    IntegerSubset::RangeList::const_iterator m_iter;
+    std::optional<IntegerSubset::IntegerType> m_next;
 };
 }

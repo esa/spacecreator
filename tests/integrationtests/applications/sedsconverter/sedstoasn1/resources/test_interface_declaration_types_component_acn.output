@@ -1,0 +1,54 @@
+COM-N7SPACE-INTERFACEDECLARATIONS-COMPONENT DEFINITIONS ::= BEGIN
+ComponentInteger [size 8, encoding pos-int]
+PackageIntegerArray-13 []
+PackageIntegerArray-3 []
+ComponentInterfaceDecl-InArgsOnly-Type []
+{
+    argA [],
+    argB [],
+    arrayArg []
+}
+PackageIntegerArray-10 []
+ComponentInterfaceDecl-OutArgsOnly-Type []
+{
+    argA [],
+    argB [],
+    arrayArg []
+}
+ComponentInterfaceDecl-InAndNotify-Type []
+{
+    inputArg []
+}
+ComponentInterfaceDecl-InAndNotify-TypeNotify []
+{
+    notifyArg []
+}
+Component-GenericInterfaceImpl-Generic1 []
+Component-GenericInterfaceImpl-Generic2 <COM-N7SPACE-INTERFACEDECLARATIONS.DeterminantType:determinant> []
+{
+    concrete0 [present-when determinant==0],
+    concrete1 [present-when determinant==1]
+}
+Component-GenericInterfaceImpl-GenericDeterminant []
+Component-GenericInterfaceImpl-Generic3 <COM-N7SPACE-INTERFACEDECLARATIONS.DeterminantType:determinant> []
+{
+    concrete0 [present-when determinant==0],
+    concrete1 [present-when determinant==1]
+}
+Component-GenericInterfaceImpl-InArgsOnly-Type []
+{
+    argX [],
+    argA [],
+    determinantArg Component-GenericInterfaceImpl-GenericDeterminant [],
+    argB <determinantArg>[],
+    argC <determinantArg>[]
+}
+Component-GenericInterfaceImpl-OutArgsOnly-Type []
+{
+    argX [],
+    argA [],
+    determinantArg Component-GenericInterfaceImpl-GenericDeterminant [],
+    argB <determinantArg>[],
+    argC <determinantArg>[]
+}
+END

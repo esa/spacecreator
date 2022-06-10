@@ -3,8 +3,8 @@ use Datamodel;
 
 system Component;
 
-   signal If_AsyncCmd_Ri(AsyncCmd_Type);
-   signal If_AsyncCmd_Pi(AsyncCmd_Type1);
+   signal If_AsyncCmd_Ri(IfType_AsyncCmd_Type);
+   signal If_AsyncCmd_Pi(IfType_AsyncCmd_TypeNotify);
   
 
    channel c

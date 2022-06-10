@@ -31,6 +31,11 @@ QString ExportableDVMessage::fromFunction() const
     return exportedObject<dvm::DVMessage>()->fromFunction();
 }
 
+QStringList ExportableDVMessage::fromFunctionPath() const
+{
+    return exportedObject<dvm::DVMessage>()->fromFunctionPath();
+}
+
 QString ExportableDVMessage::fromInterface() const
 {
     return exportedObject<dvm::DVMessage>()->fromInterface();
@@ -39,6 +44,11 @@ QString ExportableDVMessage::fromInterface() const
 QString ExportableDVMessage::toFunction() const
 {
     return exportedObject<dvm::DVMessage>()->toFunction();
+}
+
+QStringList ExportableDVMessage::toFunctionPath() const
+{
+    return exportedObject<dvm::DVMessage>()->toFunctionPath();
 }
 
 QString ExportableDVMessage::toInterface() const

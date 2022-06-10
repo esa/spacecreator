@@ -28,7 +28,7 @@ namespace promela::translator {
  * @brief Main visitor responsible for generation of promela inlines
  * for environment values generation.
  */
-class Asn1NodeValueGeneratorVisitor : public ::Asn1Acn::Visitor
+class Asn1NodeValueGeneratorVisitor : public Asn1Acn::Visitor
 {
 public:
     /**
@@ -37,23 +37,23 @@ public:
      * @param promelaModel         target promela model
      * @param typeNames            list of top-level type names to generate value generation inlines
      */
-    Asn1NodeValueGeneratorVisitor(::promela::model::PromelaModel &promelaModel, const QStringList &typeNames);
+    Asn1NodeValueGeneratorVisitor(model::PromelaModel &promelaModel, const QStringList &typeNames);
 
     /// @brief Visit Asn1Acn::Definitions
-    void visit(const ::Asn1Acn::Definitions &defs) override;
+    void visit(const Asn1Acn::Definitions &defs) override;
     /// @brief Visit Asn1Acn::File
-    void visit(const ::Asn1Acn::File &file) override;
+    void visit(const Asn1Acn::File &file) override;
     /// @brief Visit Asn1Acn::TypeAssignment
-    void visit(const ::Asn1Acn::TypeAssignment &type) override;
+    void visit(const Asn1Acn::TypeAssignment &type) override;
     /// @brief Visit Asn1Acn::ValueAssignment
-    void visit(const ::Asn1Acn::ValueAssignment &value) override;
+    void visit(const Asn1Acn::ValueAssignment &value) override;
     /// @brief Visit Asn1Acn::Project
-    void visit(const ::Asn1Acn::Project &project) override;
+    void visit(const Asn1Acn::Project &project) override;
     /// @brief Visit Asn1Acn::Root
-    void visit(const ::Asn1Acn::Root &root) override;
+    void visit(const Asn1Acn::Root &root) override;
 
 private:
-    ::promela::model::PromelaModel &m_promelaModel;
+    model::PromelaModel &m_promelaModel;
     const QStringList &m_typeNames;
 };
 }

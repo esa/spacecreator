@@ -29,6 +29,11 @@ TmcVerifier::TmcVerifier(const QString &inputIvFilepath, const QString &outputDi
     m_converter = std::make_unique<TmcConverter>(m_inputIvFilepath, m_outputDirectory);
 }
 
+void TmcVerifier::addEnvironmentFunctions(const std::vector<QString> &environmentFunctions)
+{
+    m_converter->addEnvironmentFunctions(environmentFunctions);
+}
+
 bool TmcVerifier::addStopConditionFiles(const QStringList &files)
 {
     return m_converter->addStopConditionFiles(files);

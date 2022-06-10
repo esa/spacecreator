@@ -30,7 +30,7 @@ namespace promela::translator {
 /**
  * @brief Visitor to generate value assignments.
  */
-class ValueAssignmentVisitor : public ::Asn1Acn::Types::TypeReadingVisitor
+class ValueAssignmentVisitor : public Asn1Acn::Types::TypeReadingVisitor
 {
 public:
     /**
@@ -41,97 +41,97 @@ public:
      * @param target target variable to assign the value
      * @param typeName name of the type of variable
      */
-    ValueAssignmentVisitor(::Asn1Acn::ValuePtr value, ::promela::model::Sequence &sequence,
-            const ::promela::model::VariableRef &target, QString typeName);
+    ValueAssignmentVisitor(
+            Asn1Acn::Value *value, model::Sequence &sequence, const model::VariableRef &target, QString typeName);
     /**
-     * @brief Visit ::Asn1Acn::Types::Boolean
+     * @brief Visit Asn1Acn::Types::Boolean
      *
      * @param type boolean value
      */
-    void visit(const ::Asn1Acn::Types::Boolean &type) override;
+    void visit(const Asn1Acn::Types::Boolean &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::Null
+     * @brief Visit Asn1Acn::Types::Null
      *
      * @param type null value
      */
-    void visit(const ::Asn1Acn::Types::Null &type) override;
+    void visit(const Asn1Acn::Types::Null &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::BitString
+     * @brief Visit Asn1Acn::Types::BitString
      *
      * @param type bit string value
      */
-    void visit(const ::Asn1Acn::Types::BitString &type) override;
+    void visit(const Asn1Acn::Types::BitString &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::OctetString
+     * @brief Visit Asn1Acn::Types::OctetString
      *
      * @param type octet string value
      */
-    void visit(const ::Asn1Acn::Types::OctetString &type) override;
+    void visit(const Asn1Acn::Types::OctetString &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::IA5String
+     * @brief Visit Asn1Acn::Types::IA5String
      *
      * @param type IA5String value
      */
-    void visit(const ::Asn1Acn::Types::IA5String &type) override;
+    void visit(const Asn1Acn::Types::IA5String &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::NumericString
+     * @brief Visit Asn1Acn::Types::NumericString
      *
      * @param type numeric string value
      */
-    void visit(const ::Asn1Acn::Types::NumericString &type) override;
+    void visit(const Asn1Acn::Types::NumericString &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::Enumerated
+     * @brief Visit Asn1Acn::Types::Enumerated
      *
      * @param type enumerated value
      */
-    void visit(const ::Asn1Acn::Types::Enumerated &type) override;
+    void visit(const Asn1Acn::Types::Enumerated &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::Choice
+     * @brief Visit Asn1Acn::Types::Choice
      *
      * @param type choice value
      */
-    void visit(const ::Asn1Acn::Types::Choice &type) override;
+    void visit(const Asn1Acn::Types::Choice &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::Sequence
+     * @brief Visit Asn1Acn::Types::Sequence
      *
      * @param type sequence value
      */
-    void visit(const ::Asn1Acn::Types::Sequence &type) override;
+    void visit(const Asn1Acn::Types::Sequence &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::SequenceOf
+     * @brief Visit Asn1Acn::Types::SequenceOf
      *
      * @param type 'sequence of' value
      */
-    void visit(const ::Asn1Acn::Types::SequenceOf &type) override;
+    void visit(const Asn1Acn::Types::SequenceOf &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::Real
+     * @brief Visit Asn1Acn::Types::Real
      *
      * @param type real value
      */
-    void visit(const ::Asn1Acn::Types::Real &type) override;
+    void visit(const Asn1Acn::Types::Real &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::LabelType
+     * @brief Visit Asn1Acn::Types::LabelType
      *
      * @param type label type value
      */
-    void visit(const ::Asn1Acn::Types::LabelType &type) override;
+    void visit(const Asn1Acn::Types::LabelType &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::Integer
+     * @brief Visit Asn1Acn::Types::Integer
      *
      * @param type integer value
      */
-    void visit(const ::Asn1Acn::Types::Integer &type) override;
+    void visit(const Asn1Acn::Types::Integer &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::UserdefinedType
+     * @brief Visit Asn1Acn::Types::UserdefinedType
      *
      * @param type user defined type value
      */
-    void visit(const ::Asn1Acn::Types::UserdefinedType &type) override;
+    void visit(const Asn1Acn::Types::UserdefinedType &type) override;
 
 private:
-    ::Asn1Acn::ValuePtr m_value;
-    ::promela::model::Sequence &m_sequence;
-    ::promela::model::VariableRef m_target;
+    Asn1Acn::Value *m_value;
+    model::Sequence &m_sequence;
+    model::VariableRef m_target;
     QString m_typeName;
 };
 }

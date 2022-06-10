@@ -1,0 +1,18 @@
+inline OctetStringElement_generate_value(OctetStringElement_gv)
+{
+    int OctetStringElement_tmp;
+    if
+    ::  atomic {
+        select (OctetStringElement_tmp : 0 .. 255);
+    }
+    fi;
+    OctetStringElement_gv = OctetStringElement_tmp;
+}
+inline MyOctetString_generate_value(MyOctetString_gv)
+{
+    int i;
+    for(i : 0 .. 5)
+    {
+        OctetStringElement_generate_value(MyOctetString_gv.data[i]);
+    }
+}

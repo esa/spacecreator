@@ -65,6 +65,7 @@ int main(int argc, char *argv[])
     std::optional<QString> outputDirectory;
     QStringList stopConditionFiles;
     QStringList observerInfos;
+    std::vector<QString> environmentFunctions;
 
     const QStringList args = app.arguments();
 
@@ -98,6 +99,9 @@ int main(int argc, char *argv[])
         } else if (arg == "-os") {
             ++i;
             observerInfos.append(args[i]);
+        } else if (arg == "-e" || arg == "--envfunc") {
+            ++i;
+            environmentFunctions.emplace_back(args[i]);
         } else if (arg == "-h" || arg == "--help") {
             qInfo("tmc: TASTE Model Chcecker");
             qInfo("Usage: tmc [OPTIONS]");
@@ -125,6 +129,8 @@ int main(int argc, char *argv[])
     }
 
     tmc::verifier::TmcVerifier verifier(inputIvFilepath.value(), outputDirectory.value());
+
+    verifier.addEnvironmentFunctions(environmentFunctions);
 
     if (!verifier.addStopConditionFiles(stopConditionFiles)) {
         return EXIT_FAILURE;

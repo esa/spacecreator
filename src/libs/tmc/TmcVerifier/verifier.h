@@ -33,11 +33,18 @@ public:
     /**
      * @brief Constructor.
      *
-     * @param inputIvFilepath Path to XML interface view.
-     * @param outputDirectory Pat to output directory.
+     * @param   inputIvFilepath         Path to XML interface view.
+     * @param   outputDirectory         Path to output directory.
      */
     TmcVerifier(const QString &inputIvFilepath, const QString &outputDirectory);
 
+    /**
+     * @brief   Specify which IV functions should be treated as an environment
+     *          during model checking
+     *
+     * @param   environmentFunctions    Functions to treat as an evironment
+     */
+    void addEnvironmentFunctions(const std::vector<QString> &environmentFunctions);
     /**
      * @brief Add Stop Condition files to verifier.
      *

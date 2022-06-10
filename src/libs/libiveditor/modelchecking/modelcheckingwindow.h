@@ -38,6 +38,9 @@ public:
     ~ModelCheckingWindow() override;
     void setVisible(bool visible) override;
 
+public Q_SLOTS:
+    void callTasteGens(bool toggled);
+
 Q_SIGNALS:
     void visibleChanged(bool visible);
 

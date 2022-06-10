@@ -34,5 +34,21 @@
         </DimensionList>
       </ArrayDataType>
     </DataTypeSet>
+    <ComponentSet>
+      <Component name="Component">
+        <DataTypeSet>
+          <ArrayDataType name="ComponentBasicArray1D" dataTypeRef="DataItem">
+            <DimensionList>
+              <Dimension size="15" />
+            </DimensionList>
+          </ArrayDataType>
+          <ArrayDataType name="ComponentArrayWithIndexDataRef" dataTypeRef="DataItem">
+            <DimensionList>
+              <Dimension indexTypeRef="IndexItem" />
+            </DimensionList>
+          </ArrayDataType>
+        </DataTypeSet>
+      </Component>
+    </ComponentSet>
   </Package>
 </PackageFile>

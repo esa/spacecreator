@@ -74,8 +74,8 @@ public:
     /**
      * @brief Constructor.
      *
-     * @param inputIvFilepath Path to XML interface view.
-     * @param outputDirectory Pat to output directory for conversion results.
+     * @param   inputIvFilepath         Path to XML interface view.
+     * @param   outputDirectory         Path to output directory for conversion results.
      */
     TmcConverter(const QString &inputIvFilepath, const QString &outputDirectory);
 
@@ -87,6 +87,13 @@ public:
      * @return true if conversion succeed, otherwise false.
      */
     bool convert();
+    /**
+     * @brief   Specify which IV functions should be treated as an environment
+     *          during model checking
+     *
+     * @param   environmentFunctions    Functions to treat as an evironment
+     */
+    void addEnvironmentFunctions(const std::vector<QString> &environmentFunctions);
     /**
      * @brief Add Stop Condition files to convert.
      *
@@ -120,6 +127,7 @@ private:
             const QStringList &modelFunctions, const QStringList &environmentFunctions);
     bool convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath);
     std::unique_ptr<ivm::IVModel> readInterfaceView(const QString &filepath);
+    void saveOptimizedInterfaceView(const ivm::IVModel *ivModel, const QString outputFilePath);
     void findFunctionsToConvert(const ivm::IVModel &model, QStringList &sdlFunctions,
             std::map<QString, ProcessMetadata> &sdlProcesses, QStringList &envFunctions);
     bool isSdlFunction(const ivm::IVFunction *function);
@@ -145,6 +153,7 @@ private:
     const QDir m_outputDirectory;
     ivm::IVPropertyTemplateConfig *m_dynPropConfig;
 
+    std::vector<QString> m_environmentFunctions;
     QStringList m_stopConditionsFiles;
     std::vector<ObserverInfo> m_observerInfos;
     QStringList m_observerAttachmentInfos;

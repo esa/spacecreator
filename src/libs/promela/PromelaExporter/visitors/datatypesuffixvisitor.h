@@ -24,7 +24,7 @@
 
 namespace promela::exporter {
 /**
- * @brief  Visitor for exporting @link{::promela::model::DataType}
+ * @brief  Visitor for exporting @link{model::DataType}
  *
  * This translator creates suffix for data type.
  * This should be used together with DataTypePrefixVisitor.
@@ -44,20 +44,20 @@ public:
      *
      * @param dataType DataType to visit
      */
-    void visit(const ::promela::model::DataType &dataType);
+    void visit(const model::DataType &dataType);
 
     /**
      * @brief Visit value of DataType, which is std::variant
      *
      * @param type std::variant to visit
      */
-    void visit(const ::promela::model::DataType::Type &type);
+    void visit(const model::DataType::Type &type);
     /**
      * @brief Visit value of ArrayType, which is std::variant
      *
      * @param type std::variant to visit
      */
-    void visit(const ::promela::model::ArrayType::Type &type);
+    void visit(const model::ArrayType::Type &type);
 
     /**
      * @brief Handle UnsignedDatatype
@@ -66,7 +66,7 @@ public:
      *
      * @param type type to translate.
      */
-    void operator()(const ::promela::model::UnsignedDataType &type);
+    void operator()(const model::UnsignedDataType &type);
     /**
      * @brief Handle BasicType
      *
@@ -74,7 +74,7 @@ public:
      *
      * @param type type to translate.
      */
-    void operator()(const ::promela::model::BasicType &type);
+    void operator()(const model::BasicType &type);
     /**
      * @brief Handle UtypeRef
      *
@@ -82,7 +82,7 @@ public:
      *
      * @param type type to translate.
      */
-    void operator()(const ::promela::model::UtypeRef &type);
+    void operator()(const model::UtypeRef &type);
     /**
      * @brief Handle MtypeRef
      *
@@ -90,7 +90,7 @@ public:
      *
      * @param type type to translate.
      */
-    void operator()(const ::promela::model::MtypeRef &type);
+    void operator()(const model::MtypeRef &type);
     /**
      * @brief Handle ArrayType
      *
@@ -98,7 +98,7 @@ public:
      *
      * @param type type to translate.
      */
-    void operator()(const ::promela::model::ArrayType &type);
+    void operator()(const model::ArrayType &type);
 
 private:
     QTextStream &m_stream;

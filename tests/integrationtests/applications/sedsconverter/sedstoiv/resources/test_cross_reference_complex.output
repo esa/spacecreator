@@ -6,17 +6,17 @@
 </Provided_Interface>
 
 <Required_Interface name="Component2Ri_ParentInterface1Command_Ri" kind="Sporadic" layer="default">
-    <Input_Parameter name="InputParam" type="ParentInterface1Command-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="ParentInterface1-ParentInterface1Command-Type" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
 <Required_Interface name="Component2Ri_ParentInterface2Command_Ri" kind="Sporadic" layer="default">
-    <Input_Parameter name="InputParam" type="ParentInterface2Command-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="ParentInterface2-ParentInterface2Command-Type" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
 <Required_Interface name="Component2Ri_Interface2Command_Ri" kind="Sporadic" layer="default">
-    <Input_Parameter name="InputParam" type="Interface2Command-Type" encoding="ACN"/>
+    <Input_Parameter name="InputParam" type="Interface2-Interface2Command-Type" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 

@@ -28,7 +28,7 @@ namespace promela::translator {
  *
  * This is a part of Asn1ToPromelaTranslator.
  */
-class Asn1NodeVisitor : public ::Asn1Acn::Visitor
+class Asn1NodeVisitor : public Asn1Acn::Visitor
 {
 public:
     /**
@@ -37,23 +37,23 @@ public:
      * @param promelaModel         target promela model
      * @param enhancedSpinSupport  if true, then generate model for enhanced spin
      */
-    Asn1NodeVisitor(::promela::model::PromelaModel &promelaModel, bool enhancedSpinSupport);
+    Asn1NodeVisitor(model::PromelaModel &promelaModel, bool enhancedSpinSupport);
 
     /// @brief Visit Asn1Acn::Definitions
-    void visit(const ::Asn1Acn::Definitions &defs) override;
+    void visit(const Asn1Acn::Definitions &defs) override;
     /// @brief Visit Asn1Acn::File
-    void visit(const ::Asn1Acn::File &file) override;
+    void visit(const Asn1Acn::File &file) override;
     /// @brief Visit Asn1Acn::TypeAssignment
-    void visit(const ::Asn1Acn::TypeAssignment &type) override;
+    void visit(const Asn1Acn::TypeAssignment &type) override;
     /// @brief Visit Asn1Acn::ValueAssignment
-    void visit(const ::Asn1Acn::ValueAssignment &value) override;
+    void visit(const Asn1Acn::ValueAssignment &value) override;
     /// @brief Visit Asn1Acn::Project
-    void visit(const ::Asn1Acn::Project &project) override;
+    void visit(const Asn1Acn::Project &project) override;
     /// @brief Visit Asn1Acn::Root
-    void visit(const ::Asn1Acn::Root &root) override;
+    void visit(const Asn1Acn::Root &root) override;
 
 private:
-    ::promela::model::PromelaModel &m_promelaModel;
+    model::PromelaModel &m_promelaModel;
     const bool m_enhancedSpinSupport;
 };
 }

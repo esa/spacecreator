@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,12 +19,8 @@
 
 #include "specialized/datatypetranslatorvisitor.h"
 
-#include "specialized/containerconstrainttranslatorvisitor.h"
-#include "specialized/dimensiontranslator.h"
 #include "specialized/rangetranslatorvisitor.h"
-#include "translator.h"
 
-#include <QDebug>
 #include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <asn1library/asn1/constraints/sizeconstraint.h>
@@ -64,191 +60,163 @@ using seds::model::SubRangeDataType;
 
 namespace conversion::asn1::translator {
 
-DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(Asn1Acn::Definitions *asn1Definitions,
-        const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
-        const std::vector<seds::model::Package> &sedsPackages, const std::optional<uint64_t> &sequenceSizeThreshold)
-    : m_asn1Definitions(asn1Definitions)
-    , m_sedsPackage(sedsPackage)
-    , m_asn1Files(asn1Files)
-    , m_sedsPackages(sedsPackages)
-    , m_containersScope(asn1Definitions, sedsPackage, asn1Files, sedsPackages, sequenceSizeThreshold)
-    , m_sequenceSizeThreshold(sequenceSizeThreshold)
+DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(Context &context)
+    : m_context(context)
+    , m_arrayTranslator(m_context)
+    , m_containerTranslator(m_context)
 {
 }
 
-void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
+void DataTypeTranslatorVisitor::operator()(const seds::model::ArrayDataType &sedsType)
 {
-    const auto &dimensions = sedsType.dimensions();
-    if (dimensions.empty()) {
-        throw TranslationException("Encountered ArrayDataType without dimensions");
-    }
-
-    DimensionTranslator dimensionTranslator(m_sedsPackage, m_sedsPackages, m_sequenceSizeThreshold);
-
-    if (dimensions.size() == 1) { // Sequence of type with one dimension
-        auto type = std::make_unique<Asn1Acn::Types::SequenceOf>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
-        translateArrayType(sedsType.type(), type.get());
-        dimensionTranslator.translateDimension(dimensions[0], type.get());
-
-        m_asn1Type = std::move(type);
-    } else { // Sequence of with many dimensions
-        // The outermost 'sequence of' element
-        auto rootType = std::make_unique<Asn1Acn::Types::SequenceOf>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
-        dimensionTranslator.translateDimension(dimensions[0], rootType.get());
-
-        // Create 'sequence of' chain
-        auto *lastType = rootType.get();
-        std::for_each(std::next(dimensions.begin()), dimensions.end(), [&](const auto &dimension) {
-            auto subType = std::make_unique<Asn1Acn::Types::SequenceOf>();
-            dimensionTranslator.translateDimension(dimension, subType.get());
-            lastType->setItemsType(std::move(subType));
-
-            lastType = dynamic_cast<Asn1Acn::Types::SequenceOf *>(lastType->itemsType());
-        });
-
-        // Add item type to the last element
-        translateArrayType(sedsType.type(), lastType);
-
-        m_asn1Type = std::move(rootType);
-    }
+    m_arrayTranslator.translate(sedsType);
 }
 
-void DataTypeTranslatorVisitor::operator()(const BinaryDataType &sedsType)
+void DataTypeTranslatorVisitor::operator()(const seds::model::BinaryDataType &sedsType)
 {
-    auto type = std::make_unique<Asn1Acn::Types::BitString>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
-    translateBitStringLength(sedsType, type.get());
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto asn1Type = std::make_unique<Asn1Acn::Types::BitString>(asn1TypeName);
 
-    m_asn1Type = std::move(type);
+    translateBitStringLength(sedsType, asn1Type.get());
+
+    m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
-void DataTypeTranslatorVisitor::operator()(const BooleanDataType &sedsType)
+void DataTypeTranslatorVisitor::operator()(const seds::model::BooleanDataType &sedsType)
 {
-    auto type = std::make_unique<Asn1Acn::Types::Boolean>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
-    translateBooleanEncoding(sedsType.encoding(), type.get());
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto asn1Type = std::make_unique<Asn1Acn::Types::Boolean>(asn1TypeName);
 
-    m_asn1Type = std::move(type);
+    translateBooleanEncoding(sedsType, asn1Type.get());
+
+    m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
-void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
+void DataTypeTranslatorVisitor::operator()(const seds::model::ContainerDataType &sedsType)
 {
-    const auto sequenceName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
-    auto type = std::make_unique<Asn1Acn::Types::Sequence>(sequenceName);
-
-    // Add this type to the scope
-    m_containersScope.addContainer(sedsType);
-
-    // If type is not abstract, then we want it's entries in the ASN.1 type
-    if (!sedsType.isAbstract()) {
-        const QString &sedsTypeName = sedsType.nameStr();
-
-        const auto &asn1Components = m_containersScope.fetchComponents(sedsTypeName);
-        for (const auto &asn1Component : asn1Components) {
-            type->addComponent(asn1Component->clone());
-        }
-
-        const auto &asn1TrailerComponents = m_containersScope.fetchTrailerComponents(sedsTypeName);
-        for (const auto &asn1TrailerComponent : asn1TrailerComponents) {
-            type->addComponent(asn1TrailerComponent->clone());
-        }
-
-        const auto &patcherSnippets = m_containersScope.fetchPatcherSnippets(sedsTypeName);
-        for (const auto &patcherSnippet : patcherSnippets) {
-            type->addPatcherSnippet(patcherSnippet);
-        }
-
-        if (!patcherSnippets.empty()) {
-            type->setPostEncodingFunction(QString("%1-encoding-function").arg(sequenceName.toLower()));
-            type->setPostDecodingValidator(QString("%1-decoding-validator").arg(sequenceName).toLower());
-        }
-    }
-
-    // Add realization to the parent component
-    if (sedsType.baseType()) {
-        applyContainerConstraints(sedsType, type.get());
-        updateParentContainer(Escaper::escapeAsn1TypeName(sedsType.baseType()->nameStr()), type.get());
-    }
-
-    m_asn1Type = std::move(type);
+    m_containerTranslator.translate(sedsType);
 }
 
-void DataTypeTranslatorVisitor::operator()(const EnumeratedDataType &sedsType)
+void DataTypeTranslatorVisitor::operator()(const seds::model::EnumeratedDataType &sedsType)
 {
-    auto type = std::make_unique<Asn1Acn::Types::Enumerated>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
-    translateIntegerEncoding(sedsType.encoding(), type.get());
-    translateEnumerationList(sedsType.enumerationList(), type.get());
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto asn1Type = std::make_unique<Asn1Acn::Types::Enumerated>(asn1TypeName);
 
-    m_asn1Type = std::move(type);
+    translateIntegerEncoding(sedsType.encoding(), asn1Type.get());
+    translateEnumerationList(sedsType, asn1Type.get());
+
+    m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
-void DataTypeTranslatorVisitor::operator()(const FloatDataType &sedsType)
+void DataTypeTranslatorVisitor::operator()(const seds::model::FloatDataType &sedsType)
 {
-    auto type = std::make_unique<Asn1Acn::Types::Real>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto asn1Type = std::make_unique<Asn1Acn::Types::Real>(asn1TypeName);
 
-    translateFloatEncoding(sedsType.encoding(), type.get());
+    translateFloatEncoding(sedsType, asn1Type.get());
 
-    RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue> rangeTranslator(type.get());
+    RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue> rangeTranslator(asn1Type.get());
     std::visit(rangeTranslator, sedsType.range());
 
-    m_asn1Type = std::move(type);
+    m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
-void DataTypeTranslatorVisitor::operator()(const IntegerDataType &sedsType)
+void DataTypeTranslatorVisitor::operator()(const seds::model::IntegerDataType &sedsType)
 {
-    auto type = std::make_unique<Asn1Acn::Types::Integer>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto asn1Type = std::make_unique<Asn1Acn::Types::Integer>(asn1TypeName);
 
-    translateIntegerEncoding(sedsType.encoding(), type.get());
+    translateIntegerEncoding(sedsType.encoding(), asn1Type.get());
 
-    RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue> rangeTranslator(type.get());
+    RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue> rangeTranslator(asn1Type.get());
     std::visit(rangeTranslator, sedsType.range());
 
-    m_asn1Type = std::move(type);
+    m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
-void DataTypeTranslatorVisitor::operator()(const StringDataType &sedsType)
+void DataTypeTranslatorVisitor::operator()(const seds::model::StringDataType &sedsType)
 {
-    auto type = std::make_unique<Asn1Acn::Types::IA5String>(Escaper::escapeAsn1TypeName(sedsType.nameStr()));
-    translateStringLength(sedsType, type.get());
-    translateStringEncoding(sedsType.encoding(), type.get());
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto asn1Type = std::make_unique<Asn1Acn::Types::IA5String>(asn1TypeName);
 
-    m_asn1Type = std::move(type);
+    translateStringLength(sedsType, asn1Type.get());
+    translateStringEncoding(sedsType, asn1Type.get());
+
+    m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
-void DataTypeTranslatorVisitor::operator()(const SubRangeDataType &sedsType)
+void DataTypeTranslatorVisitor::operator()(const seds::model::SubRangeDataType &sedsType)
 {
-    const auto &baseTypeRef = sedsType.type();
-    const auto &baseTypeName = baseTypeRef.nameStr();
+    const auto baseType = m_context.findSedsType(sedsType.type());
 
-    const auto sedsPackage = baseTypeRef.packageStr()
-            ? SedsToAsn1Translator::getSedsPackage(*baseTypeRef.packageStr(), m_sedsPackages)
-            : m_sedsPackage;
-
-    const auto sedsBaseType = sedsPackage->dataType(baseTypeName);
-
-    if (sedsBaseType == nullptr) {
-        auto errorMessage = QString("SubRangeDataType \"%1\" references unknown type \"%2\"")
-                                    .arg(sedsType.nameStr())
-                                    .arg(baseTypeName);
-        throw TranslationException(std::move(errorMessage));
-    }
-
-    if (std::holds_alternative<IntegerDataType>(*sedsBaseType)) {
-        translateIntegerSubRangeDataType(sedsType, sedsBaseType);
-    } else if (std::holds_alternative<FloatDataType>(*sedsBaseType)) {
-        translateFloatSubRangeDataType(sedsType, sedsBaseType);
-    } else if (std::holds_alternative<EnumeratedDataType>(*sedsBaseType)) {
-        translateEnumSubRangeDataType(sedsType, sedsBaseType);
+    if (std::holds_alternative<IntegerDataType>(*baseType)) {
+        translateIntegerSubRangeDataType(sedsType, std::get<seds::model::IntegerDataType>(*baseType));
+    } else if (std::holds_alternative<FloatDataType>(*baseType)) {
+        translateFloatSubRangeDataType(sedsType, std::get<seds::model::FloatDataType>(*baseType));
+    } else if (std::holds_alternative<EnumeratedDataType>(*baseType)) {
+        translateEnumSubRangeDataType(sedsType, std::get<seds::model::EnumeratedDataType>(*baseType));
     } else {
         auto errorMessage =
                 QString("SubRangeDataType \"%1\" references type \"%2\" that is neither numeric nor enumerated")
                         .arg(sedsType.nameStr())
-                        .arg(baseTypeName);
+                        .arg(sedsType.type().value().pathStr());
         throw TranslationException(std::move(errorMessage));
     }
 }
 
-std::unique_ptr<Asn1Acn::Types::Type> DataTypeTranslatorVisitor::consumeResultType()
+void DataTypeTranslatorVisitor::translateBitStringLength(
+        const BinaryDataType &sedsType, Asn1Acn::Types::BitString *asn1Type) const
 {
-    return std::move(m_asn1Type);
+    if (sedsType.bits() > std::numeric_limits<Asn1Acn::IntegerValue::Type>::max()) {
+        throw TranslationException("Bit string length size overflows ASN.1 range");
+    }
+
+    auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::BitStringValue>>();
+
+    if (sedsType.hasFixedSize()) {
+        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
+                { static_cast<Asn1Acn::IntegerValue::Type>(sedsType.bits()) });
+        sizeConstraint->setInnerConstraints(std::move(constraint));
+    } else {
+        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
+                { 0, static_cast<Asn1Acn::IntegerValue::Type>(sedsType.bits()) });
+        sizeConstraint->setInnerConstraints(std::move(constraint));
+    }
+
+    asn1Type->constraints().append(std::move(sizeConstraint));
+}
+
+void DataTypeTranslatorVisitor::translateStringLength(
+        const StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
+{
+    if (sedsType.length() > std::numeric_limits<Asn1Acn::IntegerValue::Type>::max()) {
+        throw TranslationException("String length size overflows ASN.1 range");
+    }
+
+    auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::StringValue>>();
+
+    if (sedsType.hasFixedLength()) {
+        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
+                { static_cast<Asn1Acn::IntegerValue::Type>(sedsType.length()) });
+        sizeConstraint->setInnerConstraints(std::move(constraint));
+    } else {
+        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
+                { 0, static_cast<Asn1Acn::IntegerValue::Type>(sedsType.length()) });
+        sizeConstraint->setInnerConstraints(std::move(constraint));
+    }
+
+    asn1Type->constraints().append(std::move(sizeConstraint));
+}
+
+void DataTypeTranslatorVisitor::translateBooleanEncoding(
+        const seds::model::BooleanDataType &sedsType, Asn1Acn::Types::Boolean *asn1Type) const
+{
+    if (const auto &encoding = sedsType.encoding(); encoding.has_value()) {
+        asn1Type->setAcnSize(encoding->bits());
+        translateFalseValue(encoding->falseValue(), asn1Type);
+    } else {
+        asn1Type->setFalseValue("0");
+    }
 }
 
 void DataTypeTranslatorVisitor::translateIntegerEncoding(
@@ -273,9 +241,9 @@ void DataTypeTranslatorVisitor::translateIntegerEncoding(
 }
 
 void DataTypeTranslatorVisitor::translateFloatEncoding(
-        const std::optional<seds::model::FloatDataEncoding> &encoding, Asn1Acn::Types::Real *asn1Type) const
+        const seds::model::FloatDataType &sedsType, Asn1Acn::Types::Real *asn1Type) const
 {
-    if (encoding) {
+    if (const auto &encoding = sedsType.encoding(); encoding.has_value()) {
         // clang-format off
         std::visit(overloaded {
             [&](seds::model::CoreEncodingAndPrecision coreEncoding) {
@@ -290,21 +258,10 @@ void DataTypeTranslatorVisitor::translateFloatEncoding(
     }
 }
 
-void DataTypeTranslatorVisitor::translateBooleanEncoding(
-        const std::optional<seds::model::BooleanDataEncoding> &encoding, Asn1Acn::Types::Boolean *asn1Type) const
-{
-    if (encoding) {
-        asn1Type->setAcnSize(encoding->bits());
-        translateFalseValue(encoding->falseValue(), asn1Type);
-    } else {
-        asn1Type->setFalseValue("0");
-    }
-}
-
 void DataTypeTranslatorVisitor::translateStringEncoding(
-        const std::optional<seds::model::StringDataEncoding> &encoding, Asn1Acn::Types::IA5String *asn1Type) const
+        const seds::model::StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
 {
-    if (encoding) {
+    if (const auto &encoding = sedsType.encoding(); encoding.has_value()) {
         // clang-format off
         std::visit(overloaded {
             [&](seds::model::CoreStringEncoding coreEncoding) {
@@ -321,8 +278,23 @@ void DataTypeTranslatorVisitor::translateStringEncoding(
     }
 }
 
+void DataTypeTranslatorVisitor::translateEnumerationList(
+        const seds::model::EnumeratedDataType &sedsType, Asn1Acn::Types::Enumerated *asn1Type) const
+{
+    const auto &items = sedsType.enumerationList();
+
+    for (std::size_t index = 0; index < items.size(); ++index) {
+        const auto &item = items[index];
+        const auto name = Escaper::escapeAsn1FieldName(item.label().value());
+        const auto enumeratedItem =
+                Asn1Acn::Types::EnumeratedItem(index, name, item.value(), Asn1Acn::SourceLocation());
+
+        asn1Type->addItem(enumeratedItem);
+    }
+}
+
 void DataTypeTranslatorVisitor::translateIntegerSubRangeDataType(
-        const SubRangeDataType &sedsType, const DataType *sedsBaseType)
+        const seds::model::SubRangeDataType &sedsType, const seds::model::IntegerDataType &sedsBaseType)
 {
     if (!std::holds_alternative<seds::model::MinMaxRange>(sedsType.range())) {
         auto errorMessage = QString("Only MinMaxRange can be used as a range in SubRangeDataType \"%1\" because it's "
@@ -331,18 +303,19 @@ void DataTypeTranslatorVisitor::translateIntegerSubRangeDataType(
         throw TranslationException(std::move(errorMessage));
     }
 
-    std::visit(*this, *sedsBaseType);
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto asn1Type = std::make_unique<Asn1Acn::Types::Integer>(asn1TypeName);
 
-    auto asn1IntegerType = dynamic_cast<Asn1Acn::Types::Integer *>(m_asn1Type.get());
-    asn1IntegerType->setIdentifier(sedsType.nameStr());
-    asn1IntegerType->constraints().clear();
+    translateIntegerEncoding(sedsBaseType.encoding(), asn1Type.get());
 
-    auto rangeTranslator = RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>(m_asn1Type.get());
+    auto rangeTranslator = RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>(asn1Type.get());
     std::visit(rangeTranslator, sedsType.range());
+
+    m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
 void DataTypeTranslatorVisitor::translateFloatSubRangeDataType(
-        const SubRangeDataType &sedsType, const DataType *sedsBaseType)
+        const seds::model::SubRangeDataType &sedsType, const seds::model::FloatDataType &sedsBaseType)
 {
     if (std::holds_alternative<EnumeratedDataTypeRange>(sedsType.range())) {
         auto errorMessage = QString("EnumeratedDataTypeRange can't be used as a range in SubRangeDataType \"%1\" "
@@ -351,18 +324,19 @@ void DataTypeTranslatorVisitor::translateFloatSubRangeDataType(
         throw TranslationException(std::move(errorMessage));
     }
 
-    std::visit(*this, *sedsBaseType);
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto asn1Type = std::make_unique<Asn1Acn::Types::Real>(asn1TypeName);
 
-    auto asn1RealType = dynamic_cast<Asn1Acn::Types::Real *>(m_asn1Type.get());
-    asn1RealType->setIdentifier(sedsType.nameStr());
-    asn1RealType->constraints().clear();
+    translateFloatEncoding(sedsBaseType, asn1Type.get());
 
-    auto rangeTranslator = RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>(m_asn1Type.get());
+    auto rangeTranslator = RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>(asn1Type.get());
     std::visit(rangeTranslator, sedsType.range());
+
+    m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
 void DataTypeTranslatorVisitor::translateEnumSubRangeDataType(
-        const SubRangeDataType &sedsType, const DataType *sedsBaseType)
+        const seds::model::SubRangeDataType &sedsType, const seds::model::EnumeratedDataType &sedsBaseType)
 {
     if (!std::holds_alternative<EnumeratedDataTypeRange>(sedsType.range())) {
         auto errorMessage = QString("Only EnumeratedDataTypeRange can be used as a range in SubRangeDataType "
@@ -371,26 +345,34 @@ void DataTypeTranslatorVisitor::translateEnumSubRangeDataType(
         throw TranslationException(std::move(errorMessage));
     }
 
-    std::visit(*this, *sedsBaseType);
+    const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
+    auto asn1Type = std::make_unique<Asn1Acn::Types::Enumerated>(asn1TypeName);
 
-    auto asn1EnumType = dynamic_cast<Asn1Acn::Types::Enumerated *>(m_asn1Type.get());
-    asn1EnumType->setIdentifier(sedsType.nameStr());
+    translateIntegerEncoding(sedsBaseType.encoding(), asn1Type.get());
 
-    const auto &sedsEnumType = std::get<EnumeratedDataType>(*sedsBaseType);
-    const auto &sedsEnumRange = std::get<EnumeratedDataTypeRange>(sedsType.range());
-    for (const auto &sedsEnumItem : sedsEnumType.enumerationList()) {
-        const auto &sedsEnumItemName = sedsEnumItem.nameStr();
+    const auto &enumRange = std::get<EnumeratedDataTypeRange>(sedsType.range());
+    const auto &items = sedsBaseType.enumerationList();
 
-        if (!sedsEnumRange.contains(sedsEnumItemName)) {
-            asn1EnumType->items().remove(Escaper::escapeAsn1FieldName(sedsEnumItemName));
+    for (std::size_t index = 0; index < items.size(); ++index) {
+        const auto &item = items[index];
+        const auto itemName = item.label().value();
+
+        if (!enumRange.contains(itemName)) {
+            continue;
         }
+
+        const auto enumeratedItem = Asn1Acn::Types::EnumeratedItem(
+                index, Escaper::escapeAsn1FieldName(itemName), item.value(), Asn1Acn::SourceLocation());
+        asn1Type->addItem(enumeratedItem);
     }
 
-    if (asn1EnumType->items().empty()) {
+    if (asn1Type->items().empty()) {
         auto errorMessage = QString("EnumeratedDataTypeRange on SubRangeDataType \"%1\" doesn't allow for any items")
-                                    .arg(sedsEnumType.nameStr());
+                                    .arg(sedsBaseType.nameStr());
         throw TranslationException(std::move(errorMessage));
     }
+
+    m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
 void DataTypeTranslatorVisitor::translateCoreIntegerEncoding(
@@ -470,86 +452,6 @@ void DataTypeTranslatorVisitor::translateCoreStringEncoding(
     }
 }
 
-void DataTypeTranslatorVisitor::translateBitStringLength(
-        const BinaryDataType &sedsType, Asn1Acn::Types::BitString *asn1Type) const
-{
-    if (sedsType.bits() > std::numeric_limits<Asn1Acn::IntegerValue::Type>::max()) {
-        throw TranslationException("Bit string length size overflows ASN.1 range");
-    }
-
-    auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::BitStringValue>>();
-
-    if (sedsType.hasFixedSize()) {
-        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
-                { static_cast<Asn1Acn::IntegerValue::Type>(sedsType.bits()) });
-        sizeConstraint->setInnerConstraints(std::move(constraint));
-    } else {
-        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
-                { 0, static_cast<Asn1Acn::IntegerValue::Type>(sedsType.bits()) });
-        sizeConstraint->setInnerConstraints(std::move(constraint));
-    }
-
-    asn1Type->constraints().append(std::move(sizeConstraint));
-}
-
-void DataTypeTranslatorVisitor::translateStringLength(
-        const StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
-{
-    if (sedsType.length() > std::numeric_limits<Asn1Acn::IntegerValue::Type>::max()) {
-        throw TranslationException("String length size overflows ASN.1 range");
-    }
-
-    auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::StringValue>>();
-
-    if (sedsType.hasFixedLength()) {
-        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
-                { static_cast<Asn1Acn::IntegerValue::Type>(sedsType.length()) });
-        sizeConstraint->setInnerConstraints(std::move(constraint));
-    } else {
-        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
-                { 0, static_cast<Asn1Acn::IntegerValue::Type>(sedsType.length()) });
-        sizeConstraint->setInnerConstraints(std::move(constraint));
-    }
-
-    asn1Type->constraints().append(std::move(sizeConstraint));
-}
-
-void DataTypeTranslatorVisitor::translateArrayType(
-        const seds::model::DataTypeRef &sedsTypeRef, Asn1Acn::Types::SequenceOf *asn1Type) const
-{
-    const auto sedsTypeName = Escaper::escapeAsn1TypeName(sedsTypeRef.nameStr());
-
-    const auto asn1Definitions = sedsTypeRef.packageStr()
-            ? SedsToAsn1Translator::getAsn1Definitions(*sedsTypeRef.packageStr(), m_asn1Files)
-            : m_asn1Definitions;
-
-    const auto *asn1ReferencedTypeAssignment = asn1Definitions->type(sedsTypeName);
-    if (!asn1ReferencedTypeAssignment) {
-        throw MissingAsn1TypeDefinitionException(sedsTypeName);
-    }
-
-    const auto *asn1ReferencedType = asn1ReferencedTypeAssignment->type();
-
-    auto asn1ItemType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
-            asn1ReferencedType->identifier(), m_asn1Definitions->name());
-    asn1ItemType->setType(asn1ReferencedType->clone());
-
-    asn1Type->setItemsType(std::move(asn1ItemType));
-}
-
-void DataTypeTranslatorVisitor::translateEnumerationList(
-        const std::vector<seds::model::ValueEnumeration> &items, Asn1Acn::Types::Enumerated *asn1Type) const
-{
-    for (std::size_t index = 0; index < items.size(); ++index) {
-        const auto &item = items[index];
-        const auto name = Escaper::escapeAsn1FieldName(item.label().value());
-        const auto enumeratedItem =
-                Asn1Acn::Types::EnumeratedItem(index, name, item.value(), Asn1Acn::SourceLocation());
-
-        asn1Type->addItem(enumeratedItem);
-    }
-}
-
 void DataTypeTranslatorVisitor::translateFalseValue(
         seds::model::FalseValue falseValue, Asn1Acn::Types::Boolean *asn1Type) const
 {
@@ -564,79 +466,6 @@ void DataTypeTranslatorVisitor::translateFalseValue(
         throw UnhandledValueException("FalseValue");
         break;
     }
-}
-
-void DataTypeTranslatorVisitor::createRealizationContainerField(Asn1Acn::Types::Sequence *asn1Sequence)
-{
-    auto realizationChoice = std::make_unique<Asn1Acn::Types::Choice>();
-
-    if (!asn1Sequence->components().empty()) {
-        auto ownRealizationSequence = std::make_unique<Asn1Acn::Types::Sequence>();
-        for (const auto &asn1SequenceComponent : asn1Sequence->components()) {
-            ownRealizationSequence->addComponent(asn1SequenceComponent->clone());
-        }
-        asn1Sequence->components().clear();
-
-        const auto ownRealizationChoiceAlternativeName =
-                m_realizationComponentsAlternativeNameTemplate.arg(asn1Sequence->identifier());
-        auto ownRealizationChoiceAlternative = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(
-                ownRealizationChoiceAlternativeName, ownRealizationChoiceAlternativeName,
-                ownRealizationChoiceAlternativeName, ownRealizationChoiceAlternativeName, "", Asn1Acn::SourceLocation(),
-                std::move(ownRealizationSequence));
-        realizationChoice->addComponent(std::move(ownRealizationChoiceAlternative));
-    }
-
-    auto realizationComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(m_realizationComponentsName,
-            m_realizationComponentsName, false, std::nullopt, "", Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
-            Asn1Acn::SourceLocation(), std::move(realizationChoice));
-    asn1Sequence->addComponent(std::move(realizationComponent));
-}
-
-void DataTypeTranslatorVisitor::applyContainerConstraints(
-        const ContainerDataType &sedsType, Asn1Acn::Types::Sequence *asn1Type) const
-{
-    ContainerConstraintTranslatorVisitor translatorVisitor(asn1Type, m_sedsPackage, m_sedsPackages);
-
-    for (const auto &constraint : sedsType.constraints()) {
-        std::visit(translatorVisitor, constraint);
-    }
-}
-
-void DataTypeTranslatorVisitor::updateParentContainer(
-        const QString &sedsBaseTypeName, Asn1Acn::Types::Sequence *asn1RealizationSequence)
-{
-    auto *asn1BaseSequence =
-            dynamic_cast<Asn1Acn::Types::Sequence *>(m_asn1Definitions->type(sedsBaseTypeName)->type());
-    if (!asn1BaseSequence) {
-        throw MissingAsn1TypeDefinitionException(sedsBaseTypeName);
-    }
-
-    auto *asn1RealizationComponent = asn1BaseSequence->component(m_realizationComponentsName);
-    if (!asn1RealizationComponent) {
-        createRealizationContainerField(asn1BaseSequence);
-        asn1RealizationComponent = asn1BaseSequence->component(m_realizationComponentsName);
-    }
-
-    auto *asn1RealizationChoice = dynamic_cast<Asn1Acn::Types::Choice *>(asn1RealizationComponent->type());
-    const auto asn1RealizationChoiceAlternativeName =
-            m_realizationComponentsAlternativeNameTemplate.arg(asn1RealizationSequence->identifier());
-
-    auto asn1SequenceReference = std::make_unique<Asn1Acn::Types::UserdefinedType>(
-            asn1RealizationSequence->identifier(), m_asn1Definitions->name());
-    auto asn1RealizationChoiceAlternative = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(
-            asn1RealizationChoiceAlternativeName, asn1RealizationChoiceAlternativeName,
-            asn1RealizationChoiceAlternativeName, asn1RealizationChoiceAlternativeName, "", Asn1Acn::SourceLocation(),
-            std::move(asn1SequenceReference));
-    asn1RealizationChoice->addComponent(std::move(asn1RealizationChoiceAlternative));
-}
-
-void DataTypeTranslatorVisitor::addPatcherFunctions(Asn1Acn::Types::Sequence *asn1Type)
-{
-    auto postEncodingFunction = QString("%1-encoding-function").arg(asn1Type->identifier().toLower());
-    asn1Type->setPostEncodingFunction(std::move(postEncodingFunction));
-
-    auto postDecodingValidator = QString("%1-decoding-validator").arg(asn1Type->identifier().toLower());
-    asn1Type->setPostDecodingValidator(std::move(postDecodingValidator));
 }
 
 Asn1Acn::Types::Endianness DataTypeTranslatorVisitor::convertByteOrder(seds::model::ByteOrder sedsByteOrder) const

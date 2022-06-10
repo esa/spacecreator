@@ -36,6 +36,16 @@ QString ExportableIVConnection::targetName() const
     return exportedObject<ivm::IVConnection>()->targetName();
 }
 
+QString ExportableIVConnection::sourcePath() const {
+    return exportedObject<ivm::IVConnection>()->source()->path().join("::");
+
+}
+
+QString ExportableIVConnection::targetPath() const
+{
+    return exportedObject<ivm::IVConnection>()->source()->path().join("::");
+}
+
 QString ExportableIVConnection::sourceInterfaceName() const
 {
     return exportedObject<ivm::IVConnection>()->sourceInterfaceName();

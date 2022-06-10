@@ -1,0 +1,13 @@
+Locka-Datamodel DEFINITIONS ::=
+BEGIN
+IMPORTS
+   T-UInt8, T-UInt16, T-Boolean, T-WriteAccess, T-ByteArray, T-MemBuffer, T-WriteRequest, T-ProcID FROM DEKKER1-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, TASTE-BasicTypes-T-UInt8, TASTE-BasicTypes-T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
+
+Locka-States ::= ENUMERATED {locka-has-no-state}
+
+Locka-Context ::= SEQUENCE {
+init-done BOOLEAN
+}
+
+END

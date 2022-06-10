@@ -24,7 +24,7 @@
 
 namespace promela::exporter {
 /**
- * @brief Visitor for @link{::promela::model::VariableRef}
+ * @brief Visitor for @link{model::VariableRef}
  */
 class VariableRefVisitor
 {
@@ -40,7 +40,7 @@ public:
      * @brief Visit VariableRef
      *
      * @param element VariableRef to visit*/
-    void visit(const ::promela::model::VariableRef &variableRef);
+    void visit(const model::VariableRef &variableRef);
 
 private:
     QTextStream &m_stream;

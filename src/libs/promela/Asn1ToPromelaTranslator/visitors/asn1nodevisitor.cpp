@@ -78,7 +78,7 @@ void Asn1NodeVisitor::visit(const ValueAssignment &value)
 {
     const Asn1Acn::Types::Type *type = value.type();
 
-    if (type->typeEnum() == ::Asn1Acn::Types::Type::USERDEFINED) {
+    if (type->typeEnum() == Asn1Acn::Types::Type::USERDEFINED) {
         const Asn1Acn::Types::UserdefinedType *t = dynamic_cast<const Asn1Acn::Types::UserdefinedType *>(type);
         const QString valueName = Escaper::escapePromelaName(value.name());
         const QString typeName = Escaper::escapePromelaName(t->typeName());
@@ -89,7 +89,7 @@ void Asn1NodeVisitor::visit(const ValueAssignment &value)
         Sequence initInlineSequence(Sequence::Type::D_STEP);
 
         VariableRef target(valueName);
-        ValueAssignmentVisitor visitor(value.value()->clone(), initInlineSequence, target, typeName);
+        ValueAssignmentVisitor visitor(value.value().get(), initInlineSequence, target, typeName);
 
         value.type()->accept(visitor);
 

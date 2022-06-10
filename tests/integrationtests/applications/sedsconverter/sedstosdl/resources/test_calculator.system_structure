@@ -14,8 +14,8 @@ use Datamodel;
 
 system Calculator;
 
-   signal AsyncCalculator_Add_Ri(Add_Type1);
-   signal AsyncCalculator_Add_Pi(Add_Type);
+   signal AsyncCalculator_Add_Ri(AsyncCalculatorType_Add_TypeNotify);
+   signal AsyncCalculator_Add_Pi(AsyncCalculatorType_Add_Type);
    signal AsyncCalculator_Init_Pi;
   
 

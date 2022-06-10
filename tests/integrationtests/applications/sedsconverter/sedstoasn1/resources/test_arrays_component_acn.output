@@ -1,0 +1,4 @@
+COM-N7SPACE-ARRAYS-COMPONENT DEFINITIONS ::= BEGIN
+ComponentBasicArray1D []
+ComponentArrayWithIndexDataRef []
+END

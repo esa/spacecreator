@@ -1,0 +1,12 @@
+TYPEMAPPING-MEGACOMPONENT DEFINITIONS ::= BEGIN
+MegaComponent-ProvidedInterface-GenericType []
+MegaComponent-ProvidedInterface-GenericTypeArray-10 []
+MegaComponent-ProvidedInterface-AsyncCommandSimpleMapping-Type []
+{
+    argumentSimpleMapping []
+}
+MegaComponent-ProvidedInterface-AsyncCommandSimpleMappingArray-Type []
+{
+    arrayArgumentSimpleMapping []
+}
+END

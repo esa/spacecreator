@@ -43,7 +43,7 @@ public:
      *
      * @param type value of BasicType, which will be converted to string
      */
-    void generate(::promela::model::BasicType type);
+    void generate(model::BasicType type);
 
 private:
     QTextStream &m_stream;

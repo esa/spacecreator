@@ -47,21 +47,21 @@ public:
      *
      * @param promelaModel PromelaModel to visit.
      */
-    void visit(const ::promela::model::PromelaModel &promelaModel);
+    void visit(const model::PromelaModel &promelaModel);
 
 private:
     void generateIncludes(const QList<QString> &includes);
     void generateMtypes(const QSet<QString> &values);
-    void generateNamedMtypes(const std::map<QString, ::promela::model::NamedMtype> &values);
+    void generateNamedMtypes(const std::map<QString, model::NamedMtype> &values);
     void generateMtypeNames(const QVector<QString> &names);
-    void generateTypeAliases(const QList<::promela::model::TypeAlias> &aliases);
-    void generateValueDefinitions(const QList<::promela::model::ValueDefinition> &values);
-    void generateUtypes(const QList<::promela::model::Utype> &utypes);
-    void generateDeclarations(const QList<::promela::model::Declaration> &values);
-    void generateInlineDefs(const std::list<std::unique_ptr<::promela::model::InlineDef>> &inlines);
-    void generateProctypes(const std::list<std::unique_ptr<::promela::model::Proctype>> &proctypes);
-    void generateInitProctype(const ::promela::model::InitProctype &init);
-    void generateSequence(const ::promela::model::Sequence &sequence);
+    void generateTypeAliases(const QList<model::TypeAlias> &aliases);
+    void generateValueDefinitions(const QList<model::ValueDefinition> &values);
+    void generateUtypes(const QList<model::Utype> &utypes);
+    void generateDeclarations(const QList<model::Declaration> &values);
+    void generateInlineDefs(const std::list<std::unique_ptr<model::InlineDef>> &inlines);
+    void generateProctypes(const std::list<std::unique_ptr<model::Proctype>> &proctypes);
+    void generateInitProctype(const model::InitProctype &init);
+    void generateSequence(const model::Sequence &sequence);
 
 private:
     QTextStream &m_stream;

@@ -4,8 +4,8 @@ process Factorial;
     dcl X Number;
     dcl Tmp Number;
     dcl Iterator Number;
-    dcl Io_asyncfactorial_calculatefactorial_pi CalculateFactorial_Type;
-    dcl Io_asyncfactorial_calculatefactorial_ri CalculateFactorial_Type1;
+    dcl Io_asyncfactorial_calculatefactorial_pi AsyncFactorialType_CalculateFactorial_Type;
+    dcl Io_asyncfactorial_calculatefactorial_ri AsyncFactorialType_CalculateFactorial_TypeNotify;
     /* CIF ENDTEXT */
     /* CIF Procedure (0, 900), (800, 50) */
     procedure CalculateFactorial;

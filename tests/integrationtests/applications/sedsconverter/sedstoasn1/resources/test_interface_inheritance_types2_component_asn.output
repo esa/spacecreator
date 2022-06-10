@@ -1,0 +1,16 @@
+COM-N7SPACE-INTERFACEINHERITANCE2-COMPONENT DEFINITIONS ::= BEGIN
+IMPORTS
+OtherFloat FROM COM-N7SPACE-INTERFACEINHERITANCE2
+OtherInteger FROM COM-N7SPACE-INTERFACEINHERITANCE2
+;
+ComponentInteger ::= INTEGER(0 .. 255)
+Component-InterfaceImplementation-Generic2 ::= OtherInteger(0 .. 255)
+Component-InterfaceImplementation-Generic2Array-5 ::= SEQUENCE (SIZE(5)) OF Component-InterfaceImplementation-Generic2(0 .. 255)
+Component-InterfaceImplementation-Generic3 ::= ComponentInteger(0 .. 255)
+Component-InterfaceImplementation-Generic3Array-5 ::= SEQUENCE (SIZE(5)) OF Component-InterfaceImplementation-Generic3(0 .. 255)
+Component-InterfaceImplementation-Async5-Type ::= SEQUENCE
+{
+    arg1 Component-InterfaceImplementation-Generic2(0 .. 255),
+    arg2 Component-InterfaceImplementation-Generic3(0 .. 255)
+}
+END

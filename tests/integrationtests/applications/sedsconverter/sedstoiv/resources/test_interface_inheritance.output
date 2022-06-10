@@ -1,34 +1,34 @@
 <InterfaceView>
-<Function name="Component" is_type="NO" language="C" default_implementation="default">
+<Function name="Component" is_type="NO" language="SDL" default_implementation="default">
 <Provided_Interface name="Get_ComponentInterface_MegaParam_Pi" kind="Protected" layer="default">
-    <Output_Parameter name="Param" type="MegaInteger" encoding="ACN"/>
+    <Output_Parameter name="Param" type="BaseInterface-GenericInteger" encoding="ACN"/>
 </Provided_Interface>
 
 <Provided_Interface name="ComponentInterface_MegaCommand_Pi" kind="Protected" layer="default">
-    <Input_Parameter name="InputArg" type="MegaInteger" encoding="ACN"/>
-    <Output_Parameter name="OutputArg" type="MegaInteger" encoding="ACN"/>
+    <Input_Parameter name="InputArg" type="BaseInterface-GenericInteger" encoding="ACN"/>
+    <Output_Parameter name="OutputArg" type="BaseInterface-GenericInteger" encoding="ACN"/>
 </Provided_Interface>
 
 <Provided_Interface name="Get_ComponentInterface_BaseParam_Pi" kind="Protected" layer="default">
-    <Output_Parameter name="Param" type="BaseInteger" encoding="ACN"/>
+    <Output_Parameter name="Param" type="ChildInterface-GenericInteger" encoding="ACN"/>
 </Provided_Interface>
 
 <Provided_Interface name="ComponentInterface_BaseCommand_Pi" kind="Protected" layer="default">
-    <Input_Parameter name="InputArg" type="BaseInteger" encoding="ACN"/>
-    <Output_Parameter name="OutputArg" type="BaseInteger" encoding="ACN"/>
+    <Input_Parameter name="InputArg" type="ChildInterface-GenericInteger" encoding="ACN"/>
+    <Output_Parameter name="OutputArg" type="ChildInterface-GenericInteger" encoding="ACN"/>
 </Provided_Interface>
 
 <Provided_Interface name="Get_ComponentInterface_ChildParam_Pi" kind="Protected" layer="default">
-    <Output_Parameter name="Param" type="ChildInteger" encoding="ACN"/>
+    <Output_Parameter name="Param" type="Component-ComponentInterface-GenericInteger" encoding="ACN"/>
 </Provided_Interface>
 
 <Provided_Interface name="ComponentInterface_ChildCommand_Pi" kind="Protected" layer="default">
-    <Input_Parameter name="InputArg" type="ChildInteger" encoding="ACN"/>
-    <Output_Parameter name="OutputArg" type="ChildInteger" encoding="ACN"/>
+    <Input_Parameter name="InputArg" type="Component-ComponentInterface-GenericInteger" encoding="ACN"/>
+    <Output_Parameter name="OutputArg" type="Component-ComponentInterface-GenericInteger" encoding="ACN"/>
 </Provided_Interface>
 
     <Implementations>
-        <Implementation name="default" language="C"/>
+        <Implementation name="default" language="SDL"/>
     </Implementations>
 </Function>
 

@@ -43,8 +43,8 @@ using promela::model::ProctypeElement;
 using promela::model::VariableRef;
 
 namespace promela::translator {
-SequenceComponentValueVisitor::SequenceComponentValueVisitor(const NamedValue *value,
-        ::promela::model::Sequence &sequence, const VariableRef &target, QString sequenceTypeName)
+SequenceComponentValueVisitor::SequenceComponentValueVisitor(
+        const NamedValue *value, model::Sequence &sequence, const VariableRef &target, QString sequenceTypeName)
     : m_value(value)
     , m_sequence(sequence)
     , m_target(target)
@@ -82,7 +82,7 @@ void SequenceComponentValueVisitor::visit(const AsnSequenceComponent &component)
     m_target.appendElement(Escaper::escapePromelaName(componentName));
 
     ValueAssignmentVisitor visitor(
-            iter->second->clone(), m_sequence, m_target, QString("%1_%2").arg(m_sequenceTypeName).arg(componentName));
+            iter->second.get(), m_sequence, m_target, QString("%1_%2").arg(m_sequenceTypeName).arg(componentName));
 
     component.type()->accept(visitor);
 }

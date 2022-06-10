@@ -276,7 +276,7 @@ void tst_Asn1ToPromelaTranslator::testVariableBitString()
     QVERIFY(expectedLength.getType().isBasicType());
     QCOMPARE(expectedLength.getType().getBasicType(), BasicType::INT);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 1);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 2);
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
@@ -388,7 +388,7 @@ void tst_Asn1ToPromelaTranslator::testVariableOctetString()
     QCOMPARE(expectedLength.getName(), "length");
     QVERIFY(expectedLength.getType().isBasicType());
     QCOMPARE(expectedLength.getType().getBasicType(), BasicType::INT);
-    QCOMPARE(promelaModel.getInlineDefs().size(), 1);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 2);
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
@@ -501,7 +501,7 @@ void tst_Asn1ToPromelaTranslator::testVariableIA5String()
     QVERIFY(expectedLength.getType().isBasicType());
     QCOMPARE(expectedLength.getType().getBasicType(), BasicType::INT);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 1);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 2);
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
@@ -1072,7 +1072,7 @@ void tst_Asn1ToPromelaTranslator::testVariableSequenceOf()
     QVERIFY(std::holds_alternative<BasicType>(promelaModel.getTypeAliases().at(0).getType()));
     QCOMPARE(std::get<BasicType>(promelaModel.getTypeAliases().at(0).getType()), BasicType::INT);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 2);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 3);
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
@@ -1092,7 +1092,7 @@ void tst_Asn1ToPromelaTranslator::testVariableSequenceOf()
         QVERIFY(assignment != nullptr);
     }
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 2);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 3);
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_elem_assign_value");
         QVERIFY(inlineDef != nullptr);

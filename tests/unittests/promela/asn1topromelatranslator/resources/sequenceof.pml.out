@@ -1,19 +1,18 @@
-inline Type1_generate_value(value)
+inline Type1_generate_value(Type1_gv)
 {
+    int Type1_tmp;
     if
-    ::  true;
-        value = 0;
-    ::  true;
-        value = 1;
-    ::  true;
-        value = 2;
+    ::  atomic {
+        select (Type1_tmp : 0 .. 2);
+    }
     fi;
+    Type1_gv = Type1_tmp;
 }
-inline SimpleFixedSizeSequenceOf_generate_value(value)
+inline SimpleFixedSizeSequenceOf_generate_value(SimpleFixedSizeSequenceOf_gv)
 {
     int i;
     for(i : 0 .. 3)
     {
-        Type1_generate_value(value.data[i]);
+        Type1_generate_value(SimpleFixedSizeSequenceOf_gv.data[i]);
     }
 }

@@ -17,8 +17,12 @@
 
 #include "dvmessage.h"
 
+#include "abstractsystemchecks.h"
 #include "dvconnection.h"
+#include "dvmodel.h"
 #include "dvnode.h"
+
+#include <QDebug>
 
 namespace dvm {
 
@@ -40,6 +44,11 @@ QString DVMessage::fromFunction() const
 void DVMessage::setFromFunction(const QString &from)
 {
     setEntityAttribute(meta::Props::token(meta::Props::Token::from_function), from);
+}
+
+QStringList DVMessage::fromFunctionPath() const
+{
+    return pathOfFunction(fromFunction());
 }
 
 QString DVMessage::fromInterface() const
@@ -71,6 +80,11 @@ void DVMessage::setToFunction(const QString &to)
     setEntityAttribute(meta::Props::token(meta::Props::Token::to_function), to);
 }
 
+QStringList DVMessage::toFunctionPath() const
+{
+    return pathOfFunction(toFunction());
+}
+
 QString DVMessage::toInterface() const
 {
     return entityAttributeValue(meta::Props::token(meta::Props::Token::to_interface)).toString();
@@ -88,6 +102,17 @@ DVNode *DVMessage::toNode() const
         return nullptr;
     }
     return connection->targetNode();
+}
+
+QStringList DVMessage::pathOfFunction(const QString &functionName) const
+{
+    if (model()) {
+        AbstractSystemChecks *queries = model()->ivQueries();
+        if (queries) {
+            return queries->functionPath(functionName);
+        }
+    }
+    return {};
 }
 
 } // namespace dvm
