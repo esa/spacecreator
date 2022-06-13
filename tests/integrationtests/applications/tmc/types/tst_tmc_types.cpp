@@ -33,6 +33,7 @@ private Q_SLOTS:
     void test_octet();
     void test_enum();
     void test_choice();
+    void test_sequence();
 };
 
 void tst_Tmc_Types::test_bool()
@@ -62,6 +63,12 @@ void tst_Tmc_Types::test_enum()
 void tst_Tmc_Types::test_choice()
 {
     const int result = system("./test_choice.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Types::test_sequence()
+{
+    const int result = system("./test_sequence.sh");
     QCOMPARE(result, 0);
 }
 

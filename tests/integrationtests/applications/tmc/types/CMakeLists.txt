@@ -20,6 +20,7 @@ configure_file(test_choice.sh test_choice.sh COPYONLY)
 configure_file(test_enum.sh test_enum.sh COPYONLY)
 configure_file(test_integer.sh test_integer.sh COPYONLY)
 configure_file(test_octet.sh test_octet.sh COPYONLY)
+configure_file(test_sequence.sh test_sequence.sh COPYONLY)
 add_custom_target(${TEST_NAME}_copy_files ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/resources $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources
     DEPENDS ${TEST_NAME})
