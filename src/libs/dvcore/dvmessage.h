@@ -59,7 +59,7 @@ public:
     DVNode *toNode() const;
 
 private:
-    QStringList pathOfFunction(const QString &functionName) const;
+    QStringList pathOfFunction(const QString &functionName, DVNode* node) const;
 };
 
 } // namespace dvm
