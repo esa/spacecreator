@@ -142,8 +142,8 @@ private:
         static const QString lengthMemberName;
         static const QString octetGeneratorName;
 
-        static void addRangedIntegerGeneratorToModel(const QString &inlineName, model::PromelaModel &model,
-                long minSize, long maxSize);
+        static void addRangedIntegerGeneratorToModel(
+                const QString &inlineName, model::PromelaModel &model, long minSize, long maxSize);
 
         static Expression getValueLenghtMinusConstAsExpression(const QString &valueVariableName, int x);
     };

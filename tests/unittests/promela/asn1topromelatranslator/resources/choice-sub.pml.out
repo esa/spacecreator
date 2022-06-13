@@ -24,10 +24,10 @@ inline ConcreteChoice_generate_value(ConcreteChoice_gv)
 {
     if
     ::  true;
-        ConcreteChoice_firstOption_generate_value(ConcreteChoice_gv.firstOption);
+        ConcreteChoice_firstOption_generate_value(ConcreteChoice_gv.data.firstOption);
         ConcreteChoice_gv.selection = ConcreteChoice_firstOption_PRESENT;
     ::  true;
-        ConcreteChoice_thirdOption_generate_value(ConcreteChoice_gv.thirdOption);
+        ConcreteChoice_thirdOption_generate_value(ConcreteChoice_gv.data.thirdOption);
         ConcreteChoice_gv.selection = ConcreteChoice_thirdOption_PRESENT;
     fi;
 }

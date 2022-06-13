@@ -1,1 +1,10 @@
-TODO
+inline MyInt_generate_value(MyInt_gv)
+{
+    int MyInt_tmp;
+    if
+    ::  atomic {
+        select (MyInt_tmp : 2 .. 5);
+    }
+    fi;
+    MyInt_gv = MyInt_tmp;
+}
