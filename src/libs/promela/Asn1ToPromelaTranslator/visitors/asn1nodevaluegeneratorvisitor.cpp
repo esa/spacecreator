@@ -56,7 +56,7 @@ void Asn1NodeValueGeneratorVisitor::visit(const File &file)
 void Asn1NodeValueGeneratorVisitor::visit(const TypeAssignment &type)
 {
     if (m_typeNames.contains(type.name())) {
-        Asn1TypeValueGeneratorVisitor typeVisitor(m_promelaModel, type.name(), true);
+        Asn1TypeValueGeneratorVisitor typeVisitor(m_promelaModel, type.name());
         type.type()->accept(typeVisitor);
     }
 }
