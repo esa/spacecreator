@@ -16,6 +16,7 @@ target_link_libraries(${TEST_NAME}
 add_format_target(${TEST_NAME})
 
 configure_file(test_bool.sh test_bool.sh COPYONLY)
+configure_file(test_choice.sh test_choice.sh COPYONLY)
 configure_file(test_enum.sh test_enum.sh COPYONLY)
 configure_file(test_integer.sh test_integer.sh COPYONLY)
 configure_file(test_octet.sh test_octet.sh COPYONLY)

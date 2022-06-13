@@ -267,7 +267,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
         auto alternative = ProctypeMaker::makeNormalSequence();
         alternative->appendElement(ProctypeMaker::makeTrueExpressionProctypeElement());
         alternative->appendElement(ProctypeMaker::makeInlineCall(inlineTypeGeneratorName,
-                QString("%1.%2").arg(valueVariableName).arg(Escaper::escapePromelaName(componentName))));
+                QString("%1.data.%2").arg(valueVariableName).arg(Escaper::escapePromelaName(componentName))));
         alternative->appendElement(ProctypeMaker::makeAssignmentProctypeElement(
                 QString("%1.selection").arg(valueVariableName), thisComponentSelected));
 

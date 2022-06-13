@@ -1,0 +1,9 @@
+USERDEFINED-TYPES-DATAVIEW DEFINITIONS ::=
+BEGIN
+    MyChoice ::= CHOICE {
+        option1 INTEGER(0 .. 2),
+        option2 INTEGER(3 .. 5)
+    }
+    MyBetterChoice ::= MyChoice
+END
+
