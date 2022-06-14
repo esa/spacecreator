@@ -137,8 +137,9 @@ public:
     void visit(const Asn1Acn::Types::UserdefinedType &type) override;
 
 private:
-    inline static const QString assignValueInlineSuffix = "_assign_value";
-    inline static const QString rangeCheckInlineSuffix = "_range_check";
+    inline static const QString m_assignValueInlineSuffix = "_assign_value";
+    inline static const QString m_rangeCheckInlineSuffix = "_range_check";
+    inline static const QString m_sizeCheckInlineSuffix = "_size_check";
 
 private:
     QString constructTypeName(QString name);

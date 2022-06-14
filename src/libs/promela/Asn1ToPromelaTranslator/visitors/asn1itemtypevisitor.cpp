@@ -394,7 +394,7 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
     inlineArguments.append(dst);
     inlineArguments.append(src);
 
-    const QString inlineName = utypeName + "_elem" + assignValueInlineSuffix;
+    const QString inlineName = utypeName + "_elem" + m_assignValueInlineSuffix;
 
     loopSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineName, inlineArguments)));
 
@@ -511,7 +511,7 @@ void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeNam
 void Asn1ItemTypeVisitor::addAssignValueInline(const QString &typeName, model::Sequence sequence)
 {
     const QString assignValueInline =
-            QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(assignValueInlineSuffix);
+            QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(m_assignValueInlineSuffix);
     QList<QString> arguments;
     arguments.append("dst");
     arguments.append("src");
@@ -531,7 +531,7 @@ void Asn1ItemTypeVisitor::addEnumRangeCheckInline(const Enumerated &type, const 
         return;
     }
 
-    const auto argumentName = buildCheckArgumentName(typeName, "value");
+    const auto argumentName = buildCheckArgumentName(typeName, "v");
 
     // Build one big expression for range check
     std::vector<BinaryExpression> valueCheckingExpressions;
@@ -568,7 +568,7 @@ void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const Integer &type, const 
         return;
     }
 
-    const auto argumentName = buildCheckArgumentName(typeName, "value");
+    const auto argumentName = buildCheckArgumentName(typeName, "v");
 
     // Build one big expression for range check
     std::vector<BinaryExpression> rangeCheckingExpressions;
@@ -600,9 +600,9 @@ void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const Integer &type, const 
 
 void Asn1ItemTypeVisitor::addRangeCheckInline(const Expression &expression, const QString &typeName)
 {
-    const auto inlineName = QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(rangeCheckInlineSuffix);
+    const auto inlineName = QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(m_rangeCheckInlineSuffix);
     QList<QString> arguments;
-    const auto argumentName = buildCheckArgumentName(typeName, "value");
+    const auto argumentName = buildCheckArgumentName(typeName, "v");
     arguments.append(argumentName);
 
     model::Sequence sequence(model::Sequence::Type::NORMAL);
@@ -617,9 +617,9 @@ void Asn1ItemTypeVisitor::addRangeCheckInline(const Expression &expression, cons
 void Asn1ItemTypeVisitor::addSizeCheckInline(
         const std::size_t minValue, const std::size_t maxValue, const QString &typeName)
 {
-    const auto inlineName = QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(rangeCheckInlineSuffix);
+    const auto inlineName = QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(m_sizeCheckInlineSuffix);
     QList<QString> arguments;
-    const auto argumentName = buildCheckArgumentName(typeName, "size");
+    const auto argumentName = buildCheckArgumentName(typeName, "s");
     arguments.append(argumentName);
 
     model::Sequence sequence(model::Sequence::Type::NORMAL);
@@ -646,12 +646,12 @@ void Asn1ItemTypeVisitor::addSizeCheckInline(
 
 QString Asn1ItemTypeVisitor::getAssignValueInlineNameForNestedType(const QString &utype, const QString &field) const
 {
-    return Escaper::escapePromelaName(utype) + "_" + Escaper::escapePromelaName(field) + assignValueInlineSuffix;
+    return Escaper::escapePromelaName(utype) + "_" + Escaper::escapePromelaName(field) + m_assignValueInlineSuffix;
 }
 
 QString Asn1ItemTypeVisitor::buildCheckArgumentName(const QString &typeName, const QString &postfix) const
 {
-    return QString("%1_%2_check").arg(typeName).arg(postfix);
+    return QString("%1_%2c").arg(typeName).arg(postfix);
 }
 
 }
