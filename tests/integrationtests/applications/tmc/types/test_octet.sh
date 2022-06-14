@@ -27,9 +27,3 @@ cd $TEST_OUTPUT_DIR \
     && grep -q "errors: 0" system.output \
     && cd .. \
     && rm -r $TEST_OUTPUT_DIR
-
-if [[ $? -eq 0 ]] ; then
-    echo "Test ${0##*/} successful"
-else
-    echo "Test ${0##*/} failed"
-fi
