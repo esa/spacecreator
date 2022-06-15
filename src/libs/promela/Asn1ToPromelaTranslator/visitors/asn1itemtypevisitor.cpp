@@ -234,39 +234,15 @@ void Asn1ItemTypeVisitor::visit(const Enumerated &type)
 void Asn1ItemTypeVisitor::visit(const Choice &type)
 {
     const QString utypeName = constructTypeName(m_name);
-    const QString nestedUtypeName = constructTypeName(QString("%1_data").arg(m_name));
     Utype utype(utypeName);
+
+    const QString nestedUtypeName = constructTypeName(QString("%1_data").arg(m_name));
     Utype nestedUtype(nestedUtypeName, m_enhancedSpinSupport);
+
     const QString none = QString("%1_NONE").arg(utypeName);
     m_promelaModel.addValueDefinition(ValueDefinition(none, 0));
-    int32_t index = 1;
+
     model::Sequence sequence(model::Sequence::Type::NORMAL);
-    for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type.components()) {
-        Asn1ItemTypeVisitor nestedVisitor(m_promelaModel, utypeName, component->name(), m_enhancedSpinSupport);
-        component->type()->accept(nestedVisitor);
-        std::optional<DataType> nestedDataType = nestedVisitor.getResultDataType();
-
-        const QString componentName = Escaper::escapePromelaName(component->name());
-
-        const QString fieldPresent = QString("%1_%2_PRESENT").arg(utypeName).arg(componentName);
-        m_promelaModel.addValueDefinition(ValueDefinition(fieldPresent, index));
-        ++index;
-        nestedUtype.addField(Declaration(nestedDataType.value(), componentName));
-
-        VariableRef dst("dst");
-        dst.appendElement("data");
-        dst.appendElement(componentName);
-        VariableRef src("src");
-        src.appendElement("data");
-        src.appendElement(componentName);
-        const QString inlineName = getAssignValueInlineNameForNestedType(utypeName, componentName);
-        QList<InlineCall::Argument> inlineArguments;
-        inlineArguments.append(dst);
-        inlineArguments.append(src);
-        sequence.appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineName, inlineArguments)));
-    }
-
-    m_promelaModel.addUtype(nestedUtype);
 
     utype.addField(Declaration(DataType(UtypeRef(nestedUtypeName)), "data"));
     utype.addField(Declaration(DataType(BasicType::INT), "selection"));
@@ -279,6 +255,55 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
         src.appendElement("selection");
         sequence.appendElement(std::make_unique<ProctypeElement>(Assignment(dst, Expression(src))));
     }
+
+    model::Conditional assignConditional;
+    int32_t index = 1;
+    for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type.components()) {
+        Asn1ItemTypeVisitor nestedVisitor(m_promelaModel, utypeName, component->name(), m_enhancedSpinSupport);
+        component->type()->accept(nestedVisitor);
+        std::optional<DataType> nestedDataType = nestedVisitor.getResultDataType();
+
+        const QString componentName = Escaper::escapePromelaName(component->name());
+
+        const QString fieldPresent = QString("%1_%2_PRESENT").arg(utypeName).arg(componentName);
+        m_promelaModel.addValueDefinition(ValueDefinition(fieldPresent, index));
+        ++index;
+        nestedUtype.addField(Declaration(nestedDataType.value(), componentName));
+
+        auto assignSequence = std::make_unique<model::Sequence> (model::Sequence::Type::NORMAL);
+
+        VariableRef currentSelection("dst");
+        currentSelection.appendElement("selection");
+        VariableRef componentSelection(fieldPresent);
+        model::BinaryExpression assignCheckSelection(model::BinaryExpression::Operator::EQUAL, std::make_unique<Expression>(std::move(currentSelection)), std::make_unique<Expression>(std::move(componentSelection)));
+        model::Expression assignCheckSelectionExpr(std::move(assignCheckSelection));
+
+        assignSequence->appendElement(std::make_unique<ProctypeElement>(std::move(assignCheckSelectionExpr)));
+
+        VariableRef dst("dst");
+        dst.appendElement("data");
+        dst.appendElement(componentName);
+        VariableRef src("src");
+        src.appendElement("data");
+        src.appendElement(componentName);
+        const QString inlineName = getAssignValueInlineNameForNestedType(utypeName, componentName);
+        QList<InlineCall::Argument> inlineArguments;
+        inlineArguments.append(dst);
+        inlineArguments.append(src);
+        assignSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineName, inlineArguments)));
+
+        assignConditional.appendAlternative(std::move(assignSequence));
+    }
+
+    auto assignSequenceElse = std::make_unique<model::Sequence> (model::Sequence::Type::NORMAL);
+    model::Expression assignCheckElseExpr(VariableRef("else"));
+    assignSequenceElse->appendElement(std::make_unique<ProctypeElement>(std::move(assignCheckElseExpr)));
+    assignSequenceElse->appendElement(std::make_unique<ProctypeElement>(Skip()));
+    assignConditional.appendAlternative(std::move(assignSequenceElse));
+
+    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assignConditional)));
+
+    m_promelaModel.addUtype(nestedUtype);
 
     addAssignValueInline(utypeName, std::move(sequence));
 
