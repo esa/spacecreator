@@ -273,12 +273,14 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
         ++index;
         nestedUtype.addField(Declaration(nestedDataType.value(), componentName));
 
-        auto assignSequence = std::make_unique<model::Sequence> (model::Sequence::Type::NORMAL);
+        auto assignSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
 
         VariableRef currentSelection("dst");
         currentSelection.appendElement("selection");
         VariableRef componentSelection(fieldPresent);
-        model::BinaryExpression assignCheckSelection(model::BinaryExpression::Operator::EQUAL, std::make_unique<Expression>(std::move(currentSelection)), std::make_unique<Expression>(std::move(componentSelection)));
+        model::BinaryExpression assignCheckSelection(model::BinaryExpression::Operator::EQUAL,
+                std::make_unique<Expression>(std::move(currentSelection)),
+                std::make_unique<Expression>(std::move(componentSelection)));
         model::Expression assignCheckSelectionExpr(std::move(assignCheckSelection));
 
         assignSequence->appendElement(std::make_unique<ProctypeElement>(std::move(assignCheckSelectionExpr)));
@@ -298,7 +300,7 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
         assignConditional.appendAlternative(std::move(assignSequence));
     }
 
-    auto assignSequenceElse = std::make_unique<model::Sequence> (model::Sequence::Type::NORMAL);
+    auto assignSequenceElse = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
     model::Expression assignCheckElseExpr(VariableRef("else"));
     assignSequenceElse->appendElement(std::make_unique<ProctypeElement>(std::move(assignCheckElseExpr)));
     assignSequenceElse->appendElement(std::make_unique<ProctypeElement>(Skip()));
@@ -525,7 +527,8 @@ void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeNam
         src_length.appendElement("length");
         sizeCheckCallArguments.append(src_length);
 
-        const auto sizeCheckInlineName = QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(m_sizeCheckInlineSuffix);
+        const auto sizeCheckInlineName =
+                QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(m_sizeCheckInlineSuffix);
         InlineCall sizeCheckCall(sizeCheckInlineName, std::move(sizeCheckCallArguments));
         sequence.appendElement(std::make_unique<ProctypeElement>(std::move(sizeCheckCall)));
     }
@@ -621,7 +624,8 @@ void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const Integer &type, const 
 
     if (!rangeSubsets.has_value()) {
         auto errorMessage =
-                QString("Unable to generate integer range check for type %1, unable to determine available subset").arg(m_name);
+                QString("Unable to generate integer range check for type %1, unable to determine available subset")
+                        .arg(m_name);
         throw TranslationException(std::move(errorMessage));
     }
 

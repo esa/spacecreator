@@ -77,19 +77,25 @@ void tst_Asn1ToPromelaTranslator_Values::testSequence() const
         auto mySeq = std::make_unique<Sequence>();
 
         auto component1Type = TypeFactory::createBuiltinType(QStringLiteral("INTEGER"));
-        dynamic_cast<Integer*>(component1Type.get())->constraints().append(RangeConstraint<IntegerValue>::create({1, 5}));
+        dynamic_cast<Integer *>(component1Type.get())
+                ->constraints()
+                .append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
         auto component1 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"),
                 false, std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
                 std::move(component1Type));
         mySeq->addComponent(std::move(component1));
         auto component2Type = TypeFactory::createBuiltinType(QStringLiteral("INTEGER"));
-        dynamic_cast<Integer*>(component2Type.get())->constraints().append(RangeConstraint<IntegerValue>::create({1, 5}));
+        dynamic_cast<Integer *>(component2Type.get())
+                ->constraints()
+                .append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
         auto component2 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field2"), QStringLiteral("field2"),
                 true, std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
                 std::move(component2Type));
         mySeq->addComponent(std::move(component2));
         auto component3Type = TypeFactory::createBuiltinType(QStringLiteral("INTEGER"));
-        dynamic_cast<Integer*>(component3Type.get())->constraints().append(RangeConstraint<IntegerValue>::create({1, 5}));
+        dynamic_cast<Integer *>(component3Type.get())
+                ->constraints()
+                .append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
         auto component3 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field3"), QStringLiteral("field3"),
                 true, std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
                 std::move(component3Type));
@@ -193,7 +199,9 @@ void tst_Asn1ToPromelaTranslator_Values::testInteger() const
 
     {
         auto integerType = std::make_unique<Integer>();
-        dynamic_cast<Integer*>(integerType.get())->constraints().append(RangeConstraint<IntegerValue>::create({1, 5}));
+        dynamic_cast<Integer *>(integerType.get())
+                ->constraints()
+                .append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
         auto myIntegerAssignment = std::make_unique<TypeAssignment>(
                 QStringLiteral("MyInteger"), QStringLiteral("MyInteger"), SourceLocation(), integerType->clone());
 
@@ -342,7 +350,9 @@ void tst_Asn1ToPromelaTranslator_Values::testSequenceOf() const
 
     {
         auto integerType = std::make_unique<Integer>("MyInteger");
-        dynamic_cast<Integer*>(integerType.get())->constraints().append(RangeConstraint<IntegerValue>::create({1, 5}));
+        dynamic_cast<Integer *>(integerType.get())
+                ->constraints()
+                .append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
         auto myIntegerAssignment =
                 std::make_unique<TypeAssignment>("MyInteger", "MyInteger", SourceLocation(), integerType->clone());
 

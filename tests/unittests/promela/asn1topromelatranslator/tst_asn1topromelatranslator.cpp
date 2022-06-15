@@ -96,7 +96,9 @@ void tst_Asn1ToPromelaTranslator::testBasicTypes()
 
     {
         auto integerType = TypeFactory::createBuiltinType("INTEGER");
-        dynamic_cast<Integer*>(integerType.get())->constraints().append(RangeConstraint<IntegerValue>::create({1, 5}));
+        dynamic_cast<Integer *>(integerType.get())
+                ->constraints()
+                .append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
         auto myIntegerAssignment = std::make_unique<TypeAssignment>(
                 QStringLiteral("MyInteger"), QStringLiteral("MyIntegerT"), SourceLocation(), std::move(integerType));
         model->addType(std::move(myIntegerAssignment));
@@ -641,10 +643,9 @@ void tst_Asn1ToPromelaTranslator::testChoice()
     auto type = std::make_unique<Choice>();
 
     auto ch1Type = TypeFactory::createBuiltinType(QStringLiteral("INTEGER"));
-    dynamic_cast<Integer*>(ch1Type.get())->constraints().append(RangeConstraint<IntegerValue>::create({1, 5}));
+    dynamic_cast<Integer *>(ch1Type.get())->constraints().append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
     type->addComponent(std::make_unique<ChoiceAlternative>(QStringLiteral("ch1"), QStringLiteral(""),
-            QStringLiteral(""), QStringLiteral(""), QStringLiteral(""), SourceLocation(),
-            std::move(ch1Type)));
+            QStringLiteral(""), QStringLiteral(""), QStringLiteral(""), SourceLocation(), std::move(ch1Type)));
 
     type->addComponent(std::make_unique<ChoiceAlternative>(QStringLiteral("ch2"), QStringLiteral(""),
             QStringLiteral(""), QStringLiteral(""), QStringLiteral(""), SourceLocation(),
@@ -736,7 +737,7 @@ void tst_Asn1ToPromelaTranslator::testSequence()
     auto model = createModel();
     auto type = std::make_unique<Sequence>();
     auto field1Type = TypeFactory::createBuiltinType(QStringLiteral("INTEGER"));
-    dynamic_cast<Integer*>(field1Type.get())->constraints().append(RangeConstraint<IntegerValue>::create({1, 5}));
+    dynamic_cast<Integer *>(field1Type.get())->constraints().append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
     auto component1 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"), false,
             std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
             std::move(field1Type));
@@ -818,7 +819,7 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
     auto model = createModel();
     auto type = std::make_unique<Sequence>();
     auto field1Type = TypeFactory::createBuiltinType(QStringLiteral("INTEGER"));
-    dynamic_cast<Integer*>(field1Type.get())->constraints().append(RangeConstraint<IntegerValue>::create({1, 5}));
+    dynamic_cast<Integer *>(field1Type.get())->constraints().append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
     auto component1 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"), true,
             std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
             std::move(field1Type));
@@ -982,7 +983,7 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
     auto level2 = std::make_unique<Sequence>();
 
     auto fieldType = TypeFactory::createBuiltinType(QStringLiteral("INTEGER"));
-    dynamic_cast<Integer*>(fieldType.get())->constraints().append(RangeConstraint<IntegerValue>::create({1, 5}));
+    dynamic_cast<Integer *>(fieldType.get())->constraints().append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
     auto level2Component = std::make_unique<AsnSequenceComponent>(QStringLiteral("field"), QStringLiteral("field"),
             false, std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
             std::move(fieldType));
@@ -1098,7 +1099,7 @@ void tst_Asn1ToPromelaTranslator::testVariableSequenceOf()
     auto model = createModel();
     auto type = std::make_unique<SequenceOf>();
     auto itemsType = TypeFactory::createBuiltinType(QStringLiteral("INTEGER"));
-    dynamic_cast<Integer*>(itemsType.get())->constraints().append(RangeConstraint<IntegerValue>::create({1, 5}));
+    dynamic_cast<Integer *>(itemsType.get())->constraints().append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
     type->setItemsType(std::move(itemsType));
     auto sizeConstraint = std::make_unique<SizeConstraint<IntegerValue>>(
             RangeConstraint<IntegerValue>::create(Range<int64_t>({ 1, EXPECTED_SIZE })));
@@ -1177,7 +1178,7 @@ void tst_Asn1ToPromelaTranslator::testFixedSequenceOf()
     auto model = createModel();
     auto type = std::make_unique<SequenceOf>();
     auto itemsType = TypeFactory::createBuiltinType(QStringLiteral("INTEGER"));
-    dynamic_cast<Integer*>(itemsType.get())->constraints().append(RangeConstraint<IntegerValue>::create({1, 5}));
+    dynamic_cast<Integer *>(itemsType.get())->constraints().append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
     type->setItemsType(std::move(itemsType));
     auto sizeConstraint = std::make_unique<SizeConstraint<IntegerValue>>(
             RangeConstraint<IntegerValue>::create(Range<int64_t>(EXPECTED_SIZE)));
@@ -1245,7 +1246,9 @@ void tst_Asn1ToPromelaTranslator::testUserDefinedType()
 
     {
         auto integerType = TypeFactory::createBuiltinType("INTEGER");
-        dynamic_cast<Integer*>(integerType.get())->constraints().append(RangeConstraint<IntegerValue>::create({1, 5}));
+        dynamic_cast<Integer *>(integerType.get())
+                ->constraints()
+                .append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
         auto myIntegerAssignment = std::make_unique<TypeAssignment>(
                 QStringLiteral("MyInteger"), QStringLiteral("MyIntegerT"), SourceLocation(), integerType->clone());
         model->addType(std::move(myIntegerAssignment));
@@ -1317,7 +1320,9 @@ void tst_Asn1ToPromelaTranslator::testTypeSorting()
     auto secondType = std::make_unique<Sequence>("MyTypeSecond");
 
     auto secondTypeComponentType = TypeFactory::createBuiltinType("INTEGER");
-    dynamic_cast<Integer*>(secondTypeComponentType.get())->constraints().append(RangeConstraint<IntegerValue>::create({1, 5}));
+    dynamic_cast<Integer *>(secondTypeComponentType.get())
+            ->constraints()
+            .append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
     auto secondTypeComponentTypeAssignment = std::make_unique<TypeAssignment>(QStringLiteral("MyInteger"),
             QStringLiteral("MyIntegerT"), SourceLocation(), secondTypeComponentType->clone());
     model->addType(std::move(secondTypeComponentTypeAssignment));
@@ -1339,7 +1344,9 @@ void tst_Asn1ToPromelaTranslator::testTypeSorting()
     auto firstType = std::make_unique<Sequence>("MyTypeFirst");
 
     auto firstTypeComponentType = TypeFactory::createBuiltinType("INTEGER");
-    dynamic_cast<Integer*>(firstTypeComponentType.get())->constraints().append(RangeConstraint<IntegerValue>::create({1, 5}));
+    dynamic_cast<Integer *>(firstTypeComponentType.get())
+            ->constraints()
+            .append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
     auto firstTypeComponent = std::make_unique<AsnSequenceComponent>("field1", "field1", false, std::nullopt, "",
             AsnSequenceComponent::Presence::NotSpecified, SourceLocation(), std::move(firstTypeComponentType));
     firstType->addComponent(std::move(firstTypeComponent));
