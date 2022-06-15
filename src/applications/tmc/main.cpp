@@ -111,6 +111,7 @@ int main(int argc, char *argv[])
             qInfo("  -os <filepath>[:priority]");
             qInfo("                       Use <filepath> as an Observer source file.");
             qInfo("                       Integer <priority> of the Observer is optional");
+            qInfo("  -e, --envfunc <name> Use <name> to specify a SDL function that  should be treated as environment");
             qInfo("  -h, --help           Print this message and exit.");
             exit(EXIT_SUCCESS);
         } else {
