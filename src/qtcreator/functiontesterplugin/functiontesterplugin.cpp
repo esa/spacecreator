@@ -94,6 +94,7 @@
 #include <conversion/iv/IvXmlExporter/exporter.h>
 #include <conversion/common/model.h>
 #include <libiveditor/ivexporter.h>
+#include <QProcess>
 
 using namespace Core;
 using conversion::Converter;
@@ -165,15 +166,15 @@ auto FunctionTesterPlugin::functionTesterPluginCore(ivm::IVInterface *interface,
     const std::unique_ptr<csv::CsvModel> &csvModel,
     const std::unique_ptr<Asn1Acn::Asn1Model> &asn1Model, float delta) -> void
 {
-    QString generatedPath = getBaseDirectory() + QDir::separator() + "generated";
-    QString generatedCodePath = generatedPath + QDir::separator() + "generatedtest.c";
-    QString generatedIvPath = generatedPath + QDir::separator() + "interfaceview.xml";
-    QString generatedDvPath = generatedPath + QDir::separator() + "deploymentview.dv.xml";
+    projectDirectory = getBaseDirectory();
+    generatedPath = projectDirectory + QDir::separator() + "generated";
+    generatedCodePath = generatedPath + QDir::separator() + "testdriver.c";
+    generatedIvPath = generatedPath + QDir::separator() + "interfaceview.xml";
+    generatedDvPath = generatedPath + QDir::separator() + "deploymentview.dv.xml";
 
     QDir dir(generatedPath);
-    if (!dir.exists()) {
-        dir.mkpath(".");
-    }
+    dir.removeRecursively();
+    dir.mkpath(".");
 
     std::stringstream outStream;
     try {
@@ -213,6 +214,82 @@ auto FunctionTesterPlugin::functionTesterPluginCore(ivm::IVInterface *interface,
     }
 
     exportDvModel(dvModelGenerated, generatedDvPath);
+    prepareCompilation(ivFunctions[1]->title());
+}
+
+auto FunctionTesterPlugin::copyRecursively(const QString &srcPath, const QString &dstPath) -> bool
+{
+    QDir parentDstDir(QFileInfo(dstPath).path());
+    if (!parentDstDir.mkdir(QFileInfo(dstPath).fileName()))
+        return false;
+
+    QDir srcDir(srcPath);
+    foreach(const QFileInfo &info, srcDir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot)) {
+        QString srcItemPath = srcPath + "/" + info.fileName();
+        QString dstItemPath = dstPath + "/" + info.fileName();
+        if (info.isDir()) {
+            if (!copyRecursively(srcItemPath, dstItemPath)) {
+                return false;
+            }
+        } else if (info.isFile()) {
+            if (!QFile::copy(srcItemPath, dstItemPath)) {
+                return false;
+            }
+        } else {
+            qDebug() << "Unhandled item" << info.filePath() << "in copyRecursively";
+        }
+    }
+    return true;
+}
+
+auto FunctionTesterPlugin::runProcess(QString cmd, QStringList args, QString workingPath) -> void
+{
+    QProcess process;
+    process.setWorkingDirectory(workingPath);
+    process.start(cmd, args);
+    process.waitForFinished(-1);
+    if (process.exitCode() != 0)
+    {
+        qDebug() << "Error: " << process.exitCode() << process.readAllStandardError();
+        MessageManager::write(GenMsg::msgInfo.arg("Error: " + process.exitCode()));
+    }
+    else
+    {
+        MessageManager::write(GenMsg::msgInfo.arg("Command: " + cmd + " finished"));
+    }
+}
+
+auto FunctionTesterPlugin::prepareCompilation(const QString &functionName) -> void
+{
+    std::string baseDir = projectDirectory.toStdString();
+    QString projectName = QString::fromStdString(baseDir.substr(baseDir.find_last_of("/") + 1));
+    MessageManager::write(GenMsg::msgInfo.arg(projectName + ".asn"));
+
+    QString sourceFilePath = projectDirectory + QDir::separator() + projectName + ".asn";
+    QString destFilePath = generatedPath + QDir::separator() + projectName + ".asn";
+    QFile::copy(sourceFilePath, destFilePath);
+
+    sourceFilePath = projectDirectory + QDir::separator() + projectName + ".acn";
+    destFilePath = generatedPath + QDir::separator() + projectName + ".acn";
+    QFile::copy(sourceFilePath, destFilePath);
+
+    sourceFilePath = projectDirectory + QDir::separator() + "Makefile";
+    destFilePath = generatedPath + QDir::separator() + "Makefile";
+    QFile::copy(sourceFilePath, destFilePath);
+
+    runProcess("taste-update-data-view", QStringList() << "*.asn", generatedPath);
+    runProcess("make", QStringList() << "skeletons", generatedPath);
+
+    sourceFilePath = projectDirectory + QDir::separator() + "work" + QDir::separator() + functionName;
+    destFilePath = generatedPath + QDir::separator() + "work" + QDir::separator() + functionName;
+    copyRecursively(sourceFilePath, destFilePath);
+
+    sourceFilePath = generatedPath + QDir::separator() + "testdriver.c";
+    destFilePath = generatedPath + QDir::separator() + "work/testdriver/C/src/testdriver.c";
+    QFile::copy(sourceFilePath, destFilePath);
+
+    runProcess("make", QStringList() << "deploymentview" << "debug", generatedPath);
+    MessageManager::write(GenMsg::msgInfo.arg("Tests compilation finished"));
 }
 
 auto FunctionTesterPlugin::exportIvModel(const std::unique_ptr<ivm::IVModel> &ivModel, QString outputFilepath) -> void
@@ -269,7 +346,7 @@ auto FunctionTesterPlugin::addTestInterfaceOption() -> void
 
     ActionContainer *const acToolsFunctionTester = createActionContainerInTools(tr("&Test Interface"));
 
-    const auto csvImportAction = new QAction(tr("Import test vectors from CSV"), this);
+    const auto csvImportAction = new QAction(tr("Test using data from CSV"), this);
     connect(csvImportAction, &QAction::triggered, [=]() { this->functionTesterPluginMain(); });
     Command *const csvImport = ActionManager::registerAction(csvImportAction, Constants::CSV_IMPORT_ID, allContexts);
     acToolsFunctionTester->addAction(csvImport);

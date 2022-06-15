@@ -68,10 +68,14 @@ private:
     auto exportIvModel(const std::unique_ptr<ivm::IVModel> &ivModel, QString outputFilepath) -> void;
     auto getDvObjectsFromModel(dvm::DVModel *const model) -> std::unique_ptr<QVector<dvm::DVObject *>>;
     auto getBaseDirectory() -> QString;
+    auto prepareCompilation(const QString &functionName) -> void;
+    auto copyRecursively(const QString &srcPath, const QString &dstPath) -> bool;
+    auto runProcess(QString cmd, QStringList args, QString workingPath) -> void;
 
-    // auto initializeRegistry() -> void;
-
-    /** @brief  Internal registry */
-    conversion::Registry m_registry;
+    QString projectDirectory;
+    QString generatedPath;
+    QString generatedCodePath;
+    QString generatedIvPath;
+    QString generatedDvPath;
 };
 }
