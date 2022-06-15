@@ -146,6 +146,8 @@ private:
     void addSimpleValueAssignmentInline(const QString &typeName);
     void addSimpleArrayAssignInlineValue(const QString &typeName, int length, bool lengthFieldPresent);
     void addAssignValueInline(const QString &typeName, model::Sequence sequence);
+
+    void addBoolRangeCheckInline(const Asn1Acn::Types::Boolean &type, const QString &typeName);
     void addEnumRangeCheckInline(const Asn1Acn::Types::Enumerated &type, const QString &typeName);
     void addIntegerRangeCheckInline(const Asn1Acn::Types::Integer &type, const QString &typeName);
     void addRangeCheckInline(const model::Expression &type, const QString &typeName);

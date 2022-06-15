@@ -10,13 +10,13 @@ process Model;
         NEXTSTATE S1;
     /* CIF state (450, 10), (70, 35) */
     state S1;
-        /* CIF input (444, 65), (78, 35) */
+        /* CIF input (443, 65), (78, 35) */
         input trigger(x);
-            /* CIF task (447, 120), (72, 35) */
-            task y := x * 2;
-            /* CIF output (446, 170), (74, 35) */
+            /* CIF task (446, 120), (72, 35) */
+            task y := x;
+            /* CIF output (445, 170), (74, 35) */
             output action(y);
-            /* CIF NEXTSTATE (449, 225), (70, 35) */
+            /* CIF NEXTSTATE (448, 225), (70, 35) */
             NEXTSTATE S1;
     endstate;
 endprocess Model;

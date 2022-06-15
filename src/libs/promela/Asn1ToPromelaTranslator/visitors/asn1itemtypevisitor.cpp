@@ -41,6 +41,7 @@
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <asn1library/asn1/values.h>
 #include <conversion/common/escaper/escaper.h>
+#include <conversion/common/translation/exceptions.h>
 #include <iostream>
 #include <promela/PromelaModel/proctypeelement.h>
 
@@ -64,6 +65,7 @@ using Asn1Acn::Types::Sequence;
 using Asn1Acn::Types::SequenceOf;
 using Asn1Acn::Types::UserdefinedType;
 using conversion::Escaper;
+using conversion::translator::TranslationException;
 using promela::model::ArrayType;
 using promela::model::AssertCall;
 using promela::model::Assignment;
@@ -107,6 +109,7 @@ void Asn1ItemTypeVisitor::visit(const Boolean &type)
     m_promelaModel.addTypeAlias(TypeAlias(typeName, BasicType::BOOLEAN));
 
     addSimpleValueAssignmentInline(typeName);
+    addBoolRangeCheckInline(type, typeName);
 
     m_resultDataType = DataType(UtypeRef(typeName));
 }
@@ -498,8 +501,15 @@ void Asn1ItemTypeVisitor::addSimpleValueAssignmentInline(const QString &typeName
 {
     model::Sequence sequence(model::Sequence::Type::NORMAL);
 
-    sequence.appendElement(
-            std::make_unique<ProctypeElement>(Assignment(VariableRef("dst"), Expression(VariableRef("src")))));
+    QList<InlineCall::Argument> rangeCheckCallArguments;
+    rangeCheckCallArguments.append(VariableRef("src"));
+    const auto rangeCheckInlineName =
+            QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(m_rangeCheckInlineSuffix);
+    InlineCall rangeCheckCall(rangeCheckInlineName, std::move(rangeCheckCallArguments));
+    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(rangeCheckCall)));
+
+    Assignment assignment(VariableRef("dst"), Expression(VariableRef("src")));
+    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assignment)));
 
     addAssignValueInline(typeName, std::move(sequence));
 }
@@ -507,6 +517,18 @@ void Asn1ItemTypeVisitor::addSimpleValueAssignmentInline(const QString &typeName
 void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeName, int length, bool lengthFieldPresent)
 {
     model::Sequence sequence(model::Sequence::Type::NORMAL);
+
+    if (lengthFieldPresent) {
+        QList<InlineCall::Argument> sizeCheckCallArguments;
+
+        VariableRef src_length = VariableRef("src");
+        src_length.appendElement("length");
+        sizeCheckCallArguments.append(src_length);
+
+        const auto sizeCheckInlineName = QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(m_sizeCheckInlineSuffix);
+        InlineCall sizeCheckCall(sizeCheckInlineName, std::move(sizeCheckCallArguments));
+        sequence.appendElement(std::make_unique<ProctypeElement>(std::move(sizeCheckCall)));
+    }
 
     sequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "i")));
 
@@ -544,6 +566,13 @@ void Asn1ItemTypeVisitor::addAssignValueInline(const QString &typeName, model::S
     m_promelaModel.addInlineDef(std::make_unique<InlineDef>(assignValueInline, arguments, std::move(sequence)));
 }
 
+void Asn1ItemTypeVisitor::addBoolRangeCheckInline(const Boolean &type, const QString &typeName)
+{
+    // TODO: Generating empty inline for now
+    Q_UNUSED(type);
+    addRangeCheckInline(Expression(VariableRef("true")), typeName);
+}
+
 void Asn1ItemTypeVisitor::addEnumRangeCheckInline(const Enumerated &type, const QString &typeName)
 {
     // Get allowed values
@@ -553,7 +582,8 @@ void Asn1ItemTypeVisitor::addEnumRangeCheckInline(const Enumerated &type, const 
     const auto &allowedValues = visitor.allowedValues();
 
     if (allowedValues.empty()) {
-        return;
+        auto errorMessage = QString("Unable to create enum range check for type %1, no value is allowed").arg(typeName);
+        throw TranslationException(std::move(errorMessage));
     }
 
     const auto argumentName = buildCheckArgumentName(typeName, "v");
@@ -590,7 +620,9 @@ void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const Integer &type, const 
     const auto &rangeSubsets = visitor.getResultSubset();
 
     if (!rangeSubsets.has_value()) {
-        return;
+        auto errorMessage =
+                QString("Unable to generate integer range check for type %1, unable to determine available subset").arg(m_name);
+        throw TranslationException(std::move(errorMessage));
     }
 
     const auto argumentName = buildCheckArgumentName(typeName, "v");
