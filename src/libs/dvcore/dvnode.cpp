@@ -135,6 +135,21 @@ bool DVNode::hasSystemFunction(const QString &name) const
     return systemFunction(name) != nullptr;
 }
 
+bool DVNode::containsFunction(const QString &name) const
+{
+    if (hasSystemFunction(name)) {
+        return true;
+    }
+
+    for (const DVPartition *partition : d->partitions) {
+        if (partition->functionsNames().contains(name)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 /*!
    A Unique label for for this node within it's model
  */

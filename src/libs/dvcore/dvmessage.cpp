@@ -22,6 +22,7 @@
 #include "dvfunction.h"
 #include "dvmodel.h"
 #include "dvnode.h"
+#include "errorhub.h"
 
 #include <QDebug>
 
@@ -30,6 +31,24 @@ namespace dvm {
 DVMessage::DVMessage(QObject *parent)
     : DVObject(DVObject::Type::Message, {}, parent)
 {
+}
+
+bool DVMessage::postInit()
+{
+    auto nodeHasFunction = [&](DVNode *node, const QString &func) -> bool {
+        if (!node) {
+            shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Message %1 has invalid node").arg(title()));
+            return false;
+        }
+        if (!node->containsFunction(func)) {
+            shared::ErrorHub::addError(shared::ErrorItem::Error,
+                    tr("Message %1 has invalid source function '%2.%3'").arg(title(), node->title(), func));
+            return false;
+        }
+        return true;
+    };
+
+    return nodeHasFunction(fromNode(), fromFunction()) && nodeHasFunction(toNode(), toFunction());
 }
 
 QString DVMessage::titleUI() const
