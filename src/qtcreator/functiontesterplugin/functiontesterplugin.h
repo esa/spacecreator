@@ -54,9 +54,8 @@ public:
     auto aboutToShutdown() -> ShutdownFlag override;
     auto functionTesterPluginMain() -> void;
 private:
-    auto functionTesterPluginCore(ivm::IVInterface *interface,
-        const std::unique_ptr<csv::CsvModel> &csvModel,
-        const std::unique_ptr<Asn1Acn::Asn1Model> &asn1Model, float delta) -> void;
+    auto functionTesterPluginCore(ivm::IVInterface &interface, const csv::CsvModel &csvModel,
+            const Asn1Acn::Asn1Model &asn1Model, float delta) -> void;
     auto addTestInterfaceOption() -> void;
     auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
     auto loadCsv() -> std::unique_ptr<csv::CsvModel>;
@@ -64,8 +63,8 @@ private:
     auto getSelectedInterface() -> ivm::IVInterface *;
     auto setDeltaDialog() -> float;
     auto loadAsn1Model() -> std::unique_ptr<Asn1Acn::Asn1Model>;
-    auto exportDvModel(const std::unique_ptr<dvm::DVModel> &dvModel, const QString &outputFilename) -> void;
-    auto exportIvModel(const std::unique_ptr<ivm::IVModel> &ivModel, QString outputFilepath) -> void;
+    auto exportDvModel(dvm::DVModel *dvModel, const QString &outputFilename) -> void;
+    auto exportIvModel(ivm::IVModel *ivModel, const QString &outputFilename) -> void;
     auto getDvObjectsFromModel(dvm::DVModel *const model) -> std::unique_ptr<QVector<dvm::DVObject *>>;
     auto getBaseDirectory() -> QString;
     auto compileTest(const QString &functionName) -> void;
