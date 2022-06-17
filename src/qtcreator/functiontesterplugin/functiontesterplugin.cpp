@@ -18,114 +18,52 @@
  */
 
 #include "functiontesterplugin.h"
-
 #include "ftpluginconstants.h"
 
-#include <QAction>
-#include <QDir>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMenu>
 #include <QMessageBox>
-#include <algorithm>
-#include <asn1library/asn1/asn1model.h>
-#include <context/action/actionsmanager.h>
-#include <conversion/asn1/Asn1Exporter/exporter.h>
-#include <conversion/asn1/Asn1Importer/importer.h>
-#include <conversion/asn1/Asn1Options/options.h>
-#include <conversion/asn1/Asn1Registrar/registrar.h>
-#include <conversion/common/exceptions.h>
-#include <conversion/common/export/exceptions.h>
-#include <conversion/common/import/exceptions.h>
-#include <conversion/common/model.h>
-#include <conversion/common/options.h>
-#include <conversion/common/translation/translator.h>
-#include <conversion/converter/converter.h>
-#include <conversion/converter/exceptions.h>
-#include <conversion/iv/IvOptions/options.h>
-#include <conversion/iv/IvRegistrar/registrar.h>
-#include <conversion/iv/IvXmlImporter/importer.h>
-#include <conversion/sdl/SdlRegistrar/registrar.h>
-#include <conversion/seds/SedsRegistrar/registrar.h>
-#include <coreplugin/actionmanager/actioncontainer.h>
-#include <coreplugin/actionmanager/actionmanager.h>
-#include <coreplugin/icore.h>
-#include <editormanager/editormanager.h>
-#include <editormanager/ieditor.h>
-#include <exception>
-#include <ivcore/ivfunction.h>
-#include <ivcore/ivlibrary.h>
-#include <ivcore/ivmodel.h>
-#include <ivcore/ivobject.h>
-#include <libiveditor/interfacedocument.h>
-#include <libiveditor/iveditor.h>
-#include <libiveditor/iveditorcore.h>
-#include <memory>
+#include <QProcess>
+#include <QBuffer>
+#include <fstream>
+
 #include <messagemanager.h>
 #include <messagestrings.h>
 #include <modelloader.h>
-#include <modeltype.h>
-#include <projectexplorer.h>
-#include <projectexplorer/project.h>
-#include <projectexplorer/projecttree.h>
-#include <projectnodes.h>
-#include <sdl/SdlExporter/exporter.h>
-#include <sdl/SdlModel/sdlmodel.h>
-#include <sdl/SdlOptions/options.h>
-#include <seds/SedsModel/sedsmodel.h>
-#include <seds/SedsOptions/options.h>
-#include <seds/SedsXmlExporter/exporter.h>
-#include <seds/SedsXmlImporter/importer.h>
-#include <shared/common.h>
-#include <shared/entityattribute.h>
-#include <shared/graphicsviewutils.h>
-#include <shared/sharedlibrary.h>
+#include <ivtools.h>
+#include <coreplugin/actionmanager/actioncontainer.h>
+#include <coreplugin/actionmanager/actionmanager.h>
+#include <editormanager/editormanager.h>
 #include <shared/ui/veinteractiveobject.h>
-#include <spacecreatorplugin/iv/iveditordata.h>
 #include <spacecreatorplugin/iv/iveditordocument.h>
-#include <spacecreatorplugin/iv/iveditorfactory.h>
-#include <spacecreatorplugin/iv/ivqtceditor.h>
-#include <utils/fileutils.h>
-
-#include <testgenerator/testgenerator.h>
-#include <fstream>
 #include <libdveditor/dvexporter.h>
-#include <QBuffer>
+#include <libiveditor/ivexporter.h>
+#include <libiveditor/interfacedocument.h>
 #include <conversion/iv/IvXmlExporter/exporter.h>
 #include <conversion/common/model.h>
-#include <libiveditor/ivexporter.h>
-#include <QProcess>
+#include <testgenerator/testgenerator.h>
 #include <testgenerator/datareconstructor/datareconstructor.h>
-#include <ivtools.h>
 #include <testgenerator/gdbconnector/gdbconnector.h>
 
-using plugincommon::IvTools;
+using namespace Core;
+using namespace testgenerator;
+
 using plugincommon::ModelLoader;
 using testgenerator::DataReconstructor;
 using testgenerator::GdbConnector;
-
-using namespace Core;
-using conversion::Converter;
-using conversion::ModelType;
-using conversion::RegistrationFailedException;
-using conversion::asn1::Asn1Registrar;
-using conversion::iv::IvRegistrar;
-using conversion::sdl::SdlRegistrar;
-using conversion::seds::SedsRegistrar;
 using ive::IVExporter;
-using plugincommon::ModelLoader;
-using namespace testgenerator;
 
 namespace spctr {
 
 FunctionTesterPlugin::FunctionTesterPlugin()
 {
-    // Do not remove
+
 }
 
 FunctionTesterPlugin::~FunctionTesterPlugin()
 {
-    // Do not remove
+
 }
 
 auto FunctionTesterPlugin::initialize(const QStringList &arguments, QString *errorString) -> bool
@@ -133,7 +71,6 @@ auto FunctionTesterPlugin::initialize(const QStringList &arguments, QString *err
     Q_UNUSED(arguments)
     Q_UNUSED(errorString)
 
-    // initializeRegistry();
     addTestInterfaceOption();
 
     return true;
@@ -141,7 +78,7 @@ auto FunctionTesterPlugin::initialize(const QStringList &arguments, QString *err
 
 auto FunctionTesterPlugin::extensionsInitialized() -> void
 {
-    // Do not remove
+
 }
 
 auto FunctionTesterPlugin::aboutToShutdown() -> ExtensionSystem::IPlugin::ShutdownFlag
@@ -316,7 +253,6 @@ auto FunctionTesterPlugin::exportIvModel(ivm::IVModel *ivModel, const QString &o
     outputFile.write(modelData);
     outputFile.commit();
 }
-
 
 auto FunctionTesterPlugin::exportDvModel(dvm::DVModel *dvModel, const QString &outputFilename) -> void
 {

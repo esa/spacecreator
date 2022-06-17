@@ -21,21 +21,11 @@
 
 #include "iveditorcore.h"
 #include "ivfunction.h"
-#include "ivmodel.h"
-#include "model.h"
-#include "options.h"
-#include "dveditor.h"
 
-#include <QStandardItemModel>
-#include <QStringList>
-#include <conversion/registry/registry.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <extensionsystem/iplugin.h>
-#include <memory>
-#include <shared/ui/listtreedialog.h>
 #include <csv/CsvModel/csvmodel.h>
 #include <asn1library/asn1/asn1model.h>
-
 #include <dvcore/dvobject.h>
 
 namespace spctr {
