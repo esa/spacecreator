@@ -95,6 +95,14 @@
 #include <conversion/common/model.h>
 #include <libiveditor/ivexporter.h>
 #include <QProcess>
+#include <testgenerator/datareconstructor/datareconstructor.h>
+#include <ivtools.h>
+#include <testgenerator/gdbconnector/gdbconnector.h>
+
+using plugincommon::IvTools;
+using plugincommon::ModelLoader;
+using testgenerator::DataReconstructor;
+using testgenerator::GdbConnector;
 
 using namespace Core;
 using conversion::Converter;
@@ -162,6 +170,60 @@ auto FunctionTesterPlugin::functionTesterPluginMain() -> void
     functionTesterPluginCore(interface, csvModel, asn1Model, delta);
 }
 
+QString byteToHexStr(const char byte)
+{
+    const int hexBase = 16;
+
+    const auto number = static_cast<uint_least8_t>(byte);
+    if (number < hexBase) {
+        return QString("0%1").arg(number, 1, hexBase);
+    } else {
+        return QString("%1").arg(number, 2, hexBase);
+    }
+}
+
+void printQByteArrayInHex(const QByteArray &array)
+{
+    QString arrayInHex = QString("QByteArray size: %1\n").arg(array.size());
+    for (int i = 0; i < array.size(); i++) {
+        arrayInHex += byteToHexStr(array.at(i));
+        arrayInHex += " ";
+
+        if ((i + 1) % 8 == 0) {
+            arrayInHex += "| ";
+        }
+
+        if ((i + 1) % 16 == 0) {
+            arrayInHex += "\n";
+        }
+    }
+
+    qDebug().noquote() << arrayInHex;
+}
+
+// TODO: fix and finish (doesnt work)
+auto FunctionTesterPlugin::extractResult(ivm::IVInterface *const interface, Asn1Acn::Asn1Model *const asn1Model) -> void
+{
+    const QString binLocalization = generatedPath + QDir::separator()
+            + "work" + QDir::separator() + "binaries" + QDir::separator();
+    // TODO: it is now absolute but later will be changed
+    const QString script = "/home/taste/SpaceCreator/spacecreator/src/libs/testgenerator/gdbconnector/scripts/x86-linux-cpp.gdb";
+    const QString binToRun = "hostpartition";
+    const QByteArray rawTestData =
+            GdbConnector::getRawTestResults(binLocalization, { "-batch", "-x", script }, { "host:1234", binToRun });
+
+    const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
+        { "INTEGER", 4, 4 },
+        { "BOOLEAN", 1, 7 },
+        { "REAL", 8, 0 },
+    };
+    const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
+            rawTestData, interface, asn1Model, QDataStream::LittleEndian, typeLayoutInfos);
+
+    const int dataSize = readTestData.size();
+    printQByteArrayInHex(rawTestData);
+}
+
 auto FunctionTesterPlugin::functionTesterPluginCore(ivm::IVInterface *interface,
     const std::unique_ptr<csv::CsvModel> &csvModel,
     const std::unique_ptr<Asn1Acn::Asn1Model> &asn1Model, float delta) -> void
@@ -214,7 +276,8 @@ auto FunctionTesterPlugin::functionTesterPluginCore(ivm::IVInterface *interface,
     }
 
     exportDvModel(dvModelGenerated, generatedDvPath);
-    prepareCompilation(ivFunctions[1]->title());
+    compileTest(ivFunctions[1]->title());
+    //extractResult(interface, asn1Model.get());
 }
 
 auto FunctionTesterPlugin::copyRecursively(const QString &srcPath, const QString &dstPath) -> bool
@@ -259,11 +322,13 @@ auto FunctionTesterPlugin::runProcess(QString cmd, QStringList args, QString wor
     }
 }
 
-auto FunctionTesterPlugin::prepareCompilation(const QString &functionName) -> void
+auto FunctionTesterPlugin::compileTest(const QString &functionName) -> void
 {
+    MessageManager::write(GenMsg::msgInfo.arg("Wait for compilation of the test..."));
+
     std::string baseDir = projectDirectory.toStdString();
-    QString projectName = QString::fromStdString(baseDir.substr(baseDir.find_last_of("/") + 1));
-    MessageManager::write(GenMsg::msgInfo.arg(projectName + ".asn"));
+    auto separator = QString(QDir::separator()).toStdString();
+    QString projectName = QString::fromStdString(baseDir.substr(baseDir.find_last_of(separator) + 1));
 
     QString sourceFilePath = projectDirectory + QDir::separator() + projectName + ".asn";
     QString destFilePath = generatedPath + QDir::separator() + projectName + ".asn";
