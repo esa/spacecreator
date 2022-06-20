@@ -95,6 +95,12 @@ public:
      */
     void addEnvironmentFunctions(const std::vector<QString> &environmentFunctions);
     /**
+     * @brief   Set global input vector length limit
+     *
+     * @param   limit   Limit to set
+     */
+    void setGlobalInputVectorLengthLimit(const std::optional<QString> &limit);
+    /**
      * @brief Add Stop Condition files to convert.
      *
      * This shall be called before @link{convert}
@@ -154,6 +160,7 @@ private:
     ivm::IVPropertyTemplateConfig *m_dynPropConfig;
 
     std::vector<QString> m_environmentFunctions;
+    std::optional<QString> m_globalInputVectorLengthLimit;
     QStringList m_stopConditionsFiles;
     std::vector<ObserverInfo> m_observerInfos;
     QStringList m_observerAttachmentInfos;

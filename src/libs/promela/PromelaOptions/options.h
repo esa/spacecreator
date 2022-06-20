@@ -47,8 +47,11 @@ public:
     /** @brief Use function name as part of model under verification */
     inline static const QString modelFunctionName = "Promela_Convert_ModelFunction";
 
-    /** @brief Use function name as part of environment  */
+    /** @brief Use function name as part of environment */
     inline static const QString environmentFunctionName = "Promela_Convert_EnvironmentFunction";
+
+    /** @brief Global input vector length limit */
+    inline static const QString globalInputVectorLengthLimit = "Promela_Convert_GlobalInputVectorLengthLimit";
 
     /**
      *  @brief Specification of an observer attachment

@@ -34,6 +34,11 @@ void TmcVerifier::addEnvironmentFunctions(const std::vector<QString> &environmen
     m_converter->addEnvironmentFunctions(environmentFunctions);
 }
 
+void TmcVerifier::setGlobalInputVectorLengthLimit(const std::optional<QString> &limit)
+{
+    m_converter->setGlobalInputVectorLengthLimit(limit);
+}
+
 bool TmcVerifier::addStopConditionFiles(const QStringList &files)
 {
     return m_converter->addStopConditionFiles(files);

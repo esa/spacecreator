@@ -131,6 +131,11 @@ void TmcConverter::addEnvironmentFunctions(const std::vector<QString> &environme
     }
 }
 
+void TmcConverter::setGlobalInputVectorLengthLimit(const std::optional<QString> &limit)
+{
+    m_globalInputVectorLengthLimit = limit;
+}
+
 bool TmcConverter::addStopConditionFiles(const QStringList &files)
 {
     for (const QString &filepath : files) { // NOLINT(readability-use-anyofallof)
@@ -346,6 +351,10 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
 
     for (const QString &function : environmentFunctions) {
         options.add(PromelaOptions::environmentFunctionName, function);
+    }
+
+    if (m_globalInputVectorLengthLimit) {
+        options.add(PromelaOptions::globalInputVectorLengthLimit, *m_globalInputVectorLengthLimit);
     }
 
     for (const QString &observer : m_observerNames) {

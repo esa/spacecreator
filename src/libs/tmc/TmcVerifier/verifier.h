@@ -46,6 +46,12 @@ public:
      */
     void addEnvironmentFunctions(const std::vector<QString> &environmentFunctions);
     /**
+     * @brief   Set global input vector length limit
+     *
+     * @param   limit   Limit to set
+     */
+    void setGlobalInputVectorLengthLimit(const std::optional<QString> &limit);
+    /**
      * @brief Add Stop Condition files to verifier.
      *
      * @param files A list of paths with Stop Condition files.
