@@ -49,6 +49,7 @@ using promela::model::DataType;
 using promela::model::Declaration;
 using promela::model::DoLoop;
 using promela::model::Expression;
+using promela::model::ForLoop;
 using promela::model::InitProctype;
 using promela::model::InlineCall;
 using promela::model::InlineDef;
@@ -210,12 +211,12 @@ void IvToPromelaTranslator::addChannelAndLock(
 std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
         std::vector<Model *> sourceModels, const Options &options) const
 {
-    const std::vector<QString> additionalIncludes = options.values(PromelaOptions::additionalIncludes);
-    const std::vector<QString> modelFunctions = options.values(PromelaOptions::modelFunctionName);
-    const std::vector<QString> environmentFunctions = options.values(PromelaOptions::environmentFunctionName);
-    const std::vector<QString> observerAttachmentInfos = options.values(PromelaOptions::observerAttachment);
-    const std::vector<QString> observerNames = options.values(PromelaOptions::observerFunctionName);
-    std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
+    const auto &additionalIncludes = options.values(PromelaOptions::additionalIncludes);
+    const auto &modelFunctions = options.values(PromelaOptions::modelFunctionName);
+    const auto &environmentFunctions = options.values(PromelaOptions::environmentFunctionName);
+    const auto &observerAttachmentInfos = options.values(PromelaOptions::observerAttachment);
+    const auto &observerNames = options.values(PromelaOptions::observerFunctionName);
+    auto promelaModel = std::make_unique<PromelaModel>();
 
     Context context(promelaModel.get());
 
@@ -240,7 +241,7 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
             createPromelaObjectsForFunction(context, ivModel, ivFunction, functionName);
         } else if (std::find(environmentFunctions.begin(), environmentFunctions.end(), functionName)
                 != environmentFunctions.end()) {
-            createPromelaObjectsForEnvironment(context, ivModel, ivFunction, functionName);
+            createPromelaObjectsForEnvironment(context, ivModel, ivFunction, functionName, options);
         }
     }
 
@@ -478,7 +479,8 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(Context &conte
 }
 
 std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(const QString &functionName,
-        const QString &interfaceName, const QString &parameterType, const QString &sendInline) const
+        const QString &interfaceName, const QString &parameterType, const QString &sendInline,
+        const conversion::Options &options) const
 {
     Sequence sequence(Sequence::Type::NORMAL);
     std::unique_ptr<ProctypeElement> waitForInit = std::make_unique<ProctypeElement>(Expression(VariableRef("inited")));
@@ -489,7 +491,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(con
                 Declaration(DataType(UtypeRef(Escaper::escapePromelaName(parameterType))), "value")));
     }
 
-    DoLoop loop;
+    const auto &globalInputVectorLength = options.value(PromelaOptions::globalInputVectorLengthLimit);
 
     std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>(Sequence::Type::ATOMIC);
 
@@ -511,11 +513,26 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(con
         loopSequence->appendElement(std::move(inlineCall));
     }
 
-    loop.appendSequence(std::move(loopSequence));
+    if (globalInputVectorLength.has_value()) {
+        Declaration iteratorVariable(DataType(UtypeRef("int")), "inputVectorCounter");
+        auto iteratorVariableElement = std::make_unique<ProctypeElement>(std::move(iteratorVariable));
+        sequence.appendElement(std::move(iteratorVariableElement));
 
-    std::unique_ptr<ProctypeElement> loopElement = std::make_unique<ProctypeElement>(std::move(loop));
+        VariableRef iteratorVariableRef("inputVectorCounter");
+        Expression firstExpression(Constant(0));
+        Expression lastExpression(Constant(globalInputVectorLength->toInt()));
 
-    sequence.appendElement(std::move(loopElement));
+        ForLoop loop(std::move(iteratorVariableRef), firstExpression, lastExpression, std::move(loopSequence));
+
+        std::unique_ptr<ProctypeElement> loopElement = std::make_unique<ProctypeElement>(std::move(loop));
+        sequence.appendElement(std::move(loopElement));
+    } else {
+        DoLoop loop;
+        loop.appendSequence(std::move(loopSequence));
+
+        std::unique_ptr<ProctypeElement> loopElement = std::make_unique<ProctypeElement>(std::move(loop));
+        sequence.appendElement(std::move(loopElement));
+    }
 
     const QString proctypeName = QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
 
@@ -603,7 +620,8 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslato
 }
 
 void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTranslator::Context &context,
-        const IVModel *ivModel, IVFunction *ivFunction, const QString &functionName) const
+        const IVModel *ivModel, IVFunction *ivFunction, const QString &functionName,
+        const conversion::Options &options) const
 {
     QVector<IVInterface *> providedInterfaceList = ivFunction->pis();
     for (IVInterface *providedInterface : providedInterfaceList) {
@@ -655,7 +673,7 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTransl
                 QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
 
         context.model()->addProctype(
-                generateEnvironmentProctype(functionName, interfaceName, parameterType, sendInline));
+                generateEnvironmentProctype(functionName, interfaceName, parameterType, sendInline, options));
     }
 }
 
