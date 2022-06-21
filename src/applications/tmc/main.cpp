@@ -71,6 +71,7 @@ int main(int argc, char *argv[])
     std::vector<QString> keepFunctions;
     std::optional<QString> globalInputVectorLengthLimit;
     std::unordered_map<QString, QString> interfaceInputVectorLengthLimits;
+    std::optional<QString> subtypingFileName;
 
     const QStringList args = app.arguments();
 
@@ -154,6 +155,17 @@ int main(int argc, char *argv[])
                 qCritical("Incorrect input vector length limit argument value");
                 exit(EXIT_FAILURE);
             }
+        } else if (arg == "-sub") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing filename after -sub");
+                exit(EXIT_FAILURE);
+            }
+            if (subtypingFileName.has_value()) {
+                qCritical("Duplicated -sub argument");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
+            subtypingFileName = args[i];
         } else if (arg == "-h" || arg == "--help") {
             qInfo("tmc: TASTE Model Chcecker");
             qInfo("Usage: tmc [OPTIONS]");
@@ -172,6 +184,7 @@ int main(int argc, char *argv[])
             qInfo("                         Provide number only to set the global limit");
             qInfo("                         Use <interface_name>:<number> to set limit for a single interface");
             qInfo("                         Interface limit overrides the global limit");
+            qInfo("  -sub <filepath>        Use <filepath> as an ASN.1 file used for subtyping");
             qInfo("  -h, --help             Print this message and exit.");
             exit(EXIT_SUCCESS);
         } else {
