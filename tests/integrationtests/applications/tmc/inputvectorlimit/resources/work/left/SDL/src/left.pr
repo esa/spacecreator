@@ -1,0 +1,22 @@
+/* CIF PROCESS (251, 150), (150, 75) */
+process Left;
+    /* CIF TEXT (778, 96), (267, 140) */
+    -- Text area for declarations and comments
+    
+    dcl leftArg MyInteger;
+    dcl leftVal MyInteger;
+    /* CIF ENDTEXT */
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (320, 60), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (570, 45), (70, 35) */
+    state Wait;
+        /* CIF input (510, 100), (190, 38) */
+        input LeftInterface(leftArg);
+            /* CIF task (542, 158), (124, 35) */
+            task leftVal := leftArg;
+            /* CIF NEXTSTATE (570, 213), (70, 35) */
+            NEXTSTATE Wait;
+    endstate;
+endprocess Left;

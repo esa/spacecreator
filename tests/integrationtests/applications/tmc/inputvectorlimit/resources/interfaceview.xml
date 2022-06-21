@@ -1,0 +1,59 @@
+<InterfaceView asn1file="inputvectorlimit.acn">
+<Function name="GUI" is_type="NO" language="GUI" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="55400 21000 75400 29000"/>
+<Required_Interface name="LeftInterface" kind="Sporadic" layer="default" stack_size="1024" priority="1" miat="0" queue_size="1" wcet="0">
+    <Input_Parameter name="leftArg" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="59700 29000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="RightInterface" kind="Sporadic" layer="default" stack_size="1024" priority="1" miat="0" queue_size="1" wcet="0">
+    <Input_Parameter name="rightArg" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="72400 29000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Function name="Right" is_type="NO" language="SDL" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="70200 37800 90200 45800"/>
+<Provided_Interface name="RightInterface" kind="Sporadic" layer="default" stack_size="1024" priority="1" miat="0" queue_size="1" wcet="0">
+    <Input_Parameter name="rightArg" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="76500 37800"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="Left" is_type="NO" language="SDL" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="39700 38000 59700 46000"/>
+<Provided_Interface name="LeftInterface" kind="Sporadic" layer="default" stack_size="1024" priority="1" miat="0" queue_size="1" wcet="0">
+    <Input_Parameter name="leftArg" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="55400 38000"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Connection >
+    <Source func_name="GUI" ri_name="RightInterface"/>
+    <Target func_name="Right" pi_name="RightInterface"/>
+    <Property name="Taste::coordinates" value="72400 29600 72400 33500 76500 33500 76500 37500"/>
+</Connection>
+
+<Connection >
+    <Source func_name="GUI" ri_name="LeftInterface"/>
+    <Target func_name="Left" pi_name="LeftInterface"/>
+    <Property name="Taste::coordinates" value="59700 29600 59700 33600 55400 33600 55400 37700"/>
+</Connection>
+
+</InterfaceView>
