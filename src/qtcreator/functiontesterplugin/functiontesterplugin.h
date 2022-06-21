@@ -57,10 +57,13 @@ private:
     auto exportIvModel(ivm::IVModel *ivModel, const QString &outputFilename) -> void;
     auto getDvObjectsFromModel(dvm::DVModel *const model) -> std::unique_ptr<QVector<dvm::DVObject *>>;
     auto getBaseDirectory() -> QString;
-    auto compileTest(const QString &functionName) -> void;
     auto copyRecursively(const QString &srcPath, const QString &dstPath) -> bool;
     auto runProcess(QString cmd, QStringList args, QString workingPath) -> void;
     auto extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Model &asn1Model) -> void;
+    auto prepareTasteProjectSkeleton() -> void;
+    auto copyFunctionImplementations(const QString &functionName) -> void;
+    auto compileSystemUnderTest() -> void;
+    auto initializePaths() -> void;
 
     QString projectDirectory;
     QString generatedPath;

@@ -97,14 +97,19 @@ auto FunctionTesterPlugin::testUsingDataFromCsv() -> void
     functionTesterPluginCore(*interface, *csvModel, *asn1Model, delta);
 }
 
-auto FunctionTesterPlugin::functionTesterPluginCore(ivm::IVInterface &interface, const csv::CsvModel &csvModel,
-        Asn1Acn::Asn1Model &asn1Model, float delta) -> void
+auto FunctionTesterPlugin::initializePaths() -> void
 {
     projectDirectory = getBaseDirectory();
     generatedPath = projectDirectory + QDir::separator() + "generated";
     generatedCodePath = generatedPath + QDir::separator() + "testdriver.c";
     generatedIvPath = generatedPath + QDir::separator() + "interfaceview.xml";
     generatedDvPath = generatedPath + QDir::separator() + "deploymentview.dv.xml";
+}
+
+auto FunctionTesterPlugin::functionTesterPluginCore(ivm::IVInterface &interface, const csv::CsvModel &csvModel,
+        Asn1Acn::Asn1Model &asn1Model, float delta) -> void
+{
+    initializePaths();
 
     QDir dir(generatedPath);
     dir.removeRecursively();
@@ -147,7 +152,11 @@ auto FunctionTesterPlugin::functionTesterPluginCore(ivm::IVInterface &interface,
     }
 
     exportDvModel(dvModelGenerated.get(), generatedDvPath);
-    compileTest(ivFunctions[1]->title());
+
+    prepareTasteProjectSkeleton();
+    constexpr int TESTED_FUNCTION_INDEX = 1;
+    copyFunctionImplementations(ivFunctions[TESTED_FUNCTION_INDEX]->title());
+    compileSystemUnderTest();
     // extractResult(interface, asn1Model);
 }
 
@@ -190,37 +199,36 @@ auto FunctionTesterPlugin::runProcess(QString cmd, QStringList args, QString wor
     }
 }
 
-auto FunctionTesterPlugin::compileTest(const QString &functionName) -> void
+auto FunctionTesterPlugin::prepareTasteProjectSkeleton() -> void
 {
-    MessageManager::write(GenMsg::msgInfo.arg("Wait for compilation of the test..."));
+    MessageManager::write(GenMsg::msgInfo.arg("Preparing project skeleton..."));
 
-    std::string baseDir = projectDirectory.toStdString();
-    auto separator = QString(QDir::separator()).toStdString();
-    QString projectName = QString::fromStdString(baseDir.substr(baseDir.find_last_of(separator) + 1));
+    auto copy = [this](const QFileInfo &file) {
+        if (file.suffix() == "asn" || file.suffix() == "acn" || file.fileName() == "Makefile") {
+            QFile::copy(file.absoluteFilePath(), generatedPath + QDir::separator() + file.fileName());
+        }
+    };
 
-    QString sourceFilePath = projectDirectory + QDir::separator() + projectName + ".asn";
-    QString destFilePath = generatedPath + QDir::separator() + projectName + ".asn";
-    QFile::copy(sourceFilePath, destFilePath);
-
-    sourceFilePath = projectDirectory + QDir::separator() + projectName + ".acn";
-    destFilePath = generatedPath + QDir::separator() + projectName + ".acn";
-    QFile::copy(sourceFilePath, destFilePath);
-
-    sourceFilePath = projectDirectory + QDir::separator() + "Makefile";
-    destFilePath = generatedPath + QDir::separator() + "Makefile";
-    QFile::copy(sourceFilePath, destFilePath);
+    QFileInfoList qFileInfoList = QDir(projectDirectory).entryInfoList(QDir::Files);
+    std::for_each(qFileInfoList.cbegin(), qFileInfoList.cend(), copy);
 
     runProcess("taste-update-data-view", QStringList() << "*.asn", generatedPath);
     runProcess("make", QStringList() << "skeletons", generatedPath);
+}
 
-    sourceFilePath = projectDirectory + QDir::separator() + "work" + QDir::separator() + functionName;
-    destFilePath = generatedPath + QDir::separator() + "work" + QDir::separator() + functionName;
+auto FunctionTesterPlugin::copyFunctionImplementations(const QString &functionName) -> void
+{
+    QString sourceFilePath = projectDirectory + QDir::separator() + "work" + QDir::separator() + functionName;
+    QString destFilePath = generatedPath + QDir::separator() + "work" + QDir::separator() + functionName;
     copyRecursively(sourceFilePath, destFilePath);
 
     sourceFilePath = generatedPath + QDir::separator() + "testdriver.c";
     destFilePath = generatedPath + QDir::separator() + "work/testdriver/C/src/testdriver.c";
     QFile::copy(sourceFilePath, destFilePath);
+}
 
+auto FunctionTesterPlugin::compileSystemUnderTest() -> void
+{
     runProcess("make", QStringList() << "deploymentview" << "debug", generatedPath);
     MessageManager::write(GenMsg::msgInfo.arg("Tests compilation finished"));
 }
