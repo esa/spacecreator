@@ -20,51 +20,44 @@
 #include "functiontesterplugin.h"
 #include "ftpluginconstants.h"
 
+#include <QBuffer>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMenu>
 #include <QMessageBox>
 #include <QProcess>
-#include <QBuffer>
-#include <fstream>
-
-#include <messagemanager.h>
-#include <messagestrings.h>
-#include <modelloader.h>
-#include <ivtools.h>
+#include <conversion/common/model.h>
+#include <conversion/iv/IvXmlExporter/exporter.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <editormanager/editormanager.h>
+#include <fstream>
+#include <ivtools.h>
+#include <libdveditor/dvexporter.h>
+#include <libiveditor/interfacedocument.h>
+#include <libiveditor/ivexporter.h>
+#include <messagemanager.h>
+#include <messagestrings.h>
+#include <modelloader.h>
 #include <shared/ui/veinteractiveobject.h>
 #include <spacecreatorplugin/iv/iveditordocument.h>
-#include <libdveditor/dvexporter.h>
-#include <libiveditor/ivexporter.h>
-#include <libiveditor/interfacedocument.h>
-#include <conversion/iv/IvXmlExporter/exporter.h>
-#include <conversion/common/model.h>
-#include <testgenerator/testgenerator.h>
 #include <testgenerator/datareconstructor/datareconstructor.h>
 #include <testgenerator/gdbconnector/gdbconnector.h>
+#include <testgenerator/testgenerator.h>
 
 using namespace Core;
 using namespace testgenerator;
 
+using ive::IVExporter;
 using plugincommon::ModelLoader;
 using testgenerator::DataReconstructor;
 using testgenerator::GdbConnector;
-using ive::IVExporter;
 
 namespace spctr {
 
-FunctionTesterPlugin::FunctionTesterPlugin()
-{
+FunctionTesterPlugin::FunctionTesterPlugin() { }
 
-}
-
-FunctionTesterPlugin::~FunctionTesterPlugin()
-{
-
-}
+FunctionTesterPlugin::~FunctionTesterPlugin() { }
 
 auto FunctionTesterPlugin::initialize(const QStringList &arguments, QString *errorString) -> bool
 {
@@ -76,10 +69,7 @@ auto FunctionTesterPlugin::initialize(const QStringList &arguments, QString *err
     return true;
 }
 
-auto FunctionTesterPlugin::extensionsInitialized() -> void
-{
-
-}
+auto FunctionTesterPlugin::extensionsInitialized() -> void { }
 
 auto FunctionTesterPlugin::aboutToShutdown() -> ExtensionSystem::IPlugin::ShutdownFlag
 {
@@ -107,8 +97,8 @@ auto FunctionTesterPlugin::functionTesterPluginMain() -> void
     functionTesterPluginCore(*interface, *csvModel, *asn1Model, delta);
 }
 
-auto FunctionTesterPlugin::functionTesterPluginCore(ivm::IVInterface &interface,
-    const csv::CsvModel &csvModel, const Asn1Acn::Asn1Model &asn1Model, float delta) -> void
+auto FunctionTesterPlugin::functionTesterPluginCore(ivm::IVInterface &interface, const csv::CsvModel &csvModel,
+        const Asn1Acn::Asn1Model &asn1Model, float delta) -> void
 {
     projectDirectory = getBaseDirectory();
     generatedPath = projectDirectory + QDir::separator() + "generated";
@@ -126,8 +116,7 @@ auto FunctionTesterPlugin::functionTesterPluginCore(ivm::IVInterface &interface,
         std::ofstream outFile(generatedCodePath.toStdString(), std::ofstream::out);
         outFile << outStream.str();
         outFile.close();
-    }
-    catch (TestDriverGeneratorException& e) {
+    } catch (TestDriverGeneratorException &e) {
         MessageManager::write(GenMsg::msgInfo.arg("TestDriverGeneratorException: " + QString(e.what())));
         return;
     }
@@ -141,7 +130,7 @@ auto FunctionTesterPlugin::functionTesterPluginCore(ivm::IVInterface &interface,
     QList<ivm::IVObject *> ivObjects = ivModelGenerated->visibleObjects();
     std::vector<ivm::IVFunction *> ivFunctions = {};
 
-    for (const auto& ivObject : ivObjects) {
+    for (const auto &ivObject : ivObjects) {
         if (ivObject->isFunction()) {
             ivFunctions.push_back(dynamic_cast<ivm::IVFunction *>(ivObject));
         }
@@ -150,7 +139,7 @@ auto FunctionTesterPlugin::functionTesterPluginCore(ivm::IVInterface &interface,
     exportIvModel(ivModelGenerated.get(), generatedIvPath);
 
     const std::unique_ptr<dvm::DVModel> dvModelGenerated =
-        DvGenerator::generate(ivFunctions, "x86 Linux CPP", "x86_Linux_TestRunner", "Node_1", "hostPartition");
+            DvGenerator::generate(ivFunctions, "x86 Linux CPP", "x86_Linux_TestRunner", "Node_1", "hostPartition");
 
     if (dvModelGenerated == nullptr) {
         MessageManager::write(GenMsg::msgInfo.arg("DV model was not generated"));
@@ -159,7 +148,7 @@ auto FunctionTesterPlugin::functionTesterPluginCore(ivm::IVInterface &interface,
 
     exportDvModel(dvModelGenerated.get(), generatedDvPath);
     compileTest(ivFunctions[1]->title());
-    //extractResult(interface, asn1Model.get());
+    // extractResult(interface, asn1Model.get());
 }
 
 auto FunctionTesterPlugin::copyRecursively(const QString &srcPath, const QString &dstPath) -> bool
@@ -169,7 +158,7 @@ auto FunctionTesterPlugin::copyRecursively(const QString &srcPath, const QString
         return false;
 
     QDir srcDir(srcPath);
-    foreach(const QFileInfo &info, srcDir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot)) {
+    foreach (const QFileInfo &info, srcDir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot)) {
         QString srcItemPath = srcPath + "/" + info.fileName();
         QString dstItemPath = dstPath + "/" + info.fileName();
         if (info.isDir()) {
@@ -193,13 +182,10 @@ auto FunctionTesterPlugin::runProcess(QString cmd, QStringList args, QString wor
     process.setWorkingDirectory(workingPath);
     process.start(cmd, args);
     process.waitForFinished(-1);
-    if (process.exitCode() != 0)
-    {
+    if (process.exitCode() != 0) {
         qDebug() << "Error: " << process.exitCode() << process.readAllStandardError();
         MessageManager::write(GenMsg::msgInfo.arg("Error: " + process.exitCode()));
-    }
-    else
-    {
+    } else {
         MessageManager::write(GenMsg::msgInfo.arg("Command: " + cmd + " finished"));
     }
 }
@@ -315,8 +301,8 @@ auto FunctionTesterPlugin::setDeltaDialog() -> float
 {
     float delta = 0.0;
     bool isOk;
-    QString text = QInputDialog::getText(nullptr, tr("Set delta"), tr("Max error:"), QLineEdit::Normal,
-            "0.0", &isOk, { 0U }, Qt::ImhFormattedNumbersOnly);
+    QString text = QInputDialog::getText(nullptr, tr("Set delta"), tr("Max error:"), QLineEdit::Normal, "0.0", &isOk,
+            { 0U }, Qt::ImhFormattedNumbersOnly);
     if (isOk && !text.isEmpty()) {
         delta = text.toFloat();
     }
@@ -329,7 +315,7 @@ auto FunctionTesterPlugin::loadCsv() -> std::unique_ptr<csv::CsvModel>
             nullptr, tr("Select CSV file to import test vectors from..."), QString(), tr("*.csv"));
     if (inputFilePath.isEmpty()) {
         MessageManager::write(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
-        return std::unique_ptr<csv::CsvModel>{};
+        return std::unique_ptr<csv::CsvModel> {};
     }
 
     std::unique_ptr<csv::CsvModel> model;
@@ -389,14 +375,12 @@ auto FunctionTesterPlugin::loadAsn1Model() -> std::unique_ptr<Asn1Acn::Asn1Model
 {
     QString baseDirectory = getBaseDirectory();
     QString workDirectory = baseDirectory + QDir::separator() + "work";
-    QString asn1Path = workDirectory + QDir::separator() + "dataview"
-        + QDir::separator() + "dataview-uniq.asn";
+    QString asn1Path = workDirectory + QDir::separator() + "dataview" + QDir::separator() + "dataview-uniq.asn";
 
-    auto modelPtr = std::unique_ptr<Asn1Acn::Asn1Model>{};
+    auto modelPtr = std::unique_ptr<Asn1Acn::Asn1Model> {};
     try {
         modelPtr = ModelLoader::loadAsn1Model(asn1Path);
-    }
-    catch (...) {
+    } catch (...) {
         MessageManager::write(GenMsg::msgInfo.arg(tr("No ASN1 file found. Try to build the project first.")));
     }
     return modelPtr;
@@ -437,10 +421,11 @@ void printQByteArrayInHex(const QByteArray &array)
 // TODO: fix and finish (doesnt work)
 auto FunctionTesterPlugin::extractResult(ivm::IVInterface *const interface, Asn1Acn::Asn1Model *const asn1Model) -> void
 {
-    const QString binLocalization = generatedPath + QDir::separator()
-            + "work" + QDir::separator() + "binaries" + QDir::separator();
+    const QString binLocalization =
+            generatedPath + QDir::separator() + "work" + QDir::separator() + "binaries" + QDir::separator();
     // TODO: it is now absolute but later will be changed
-    const QString script = "/home/taste/SpaceCreator/spacecreator/src/libs/testgenerator/gdbconnector/scripts/x86-linux-cpp.gdb";
+    const QString script =
+            "/home/taste/SpaceCreator/spacecreator/src/libs/testgenerator/gdbconnector/scripts/x86-linux-cpp.gdb";
     const QString binToRun = "hostpartition";
     const QByteArray rawTestData =
             GdbConnector::getRawTestResults(binLocalization, { "-batch", "-x", script }, { "host:1234", binToRun });

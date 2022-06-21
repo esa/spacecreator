@@ -11,15 +11,6 @@ set(FT_PLUGIN_SOURCES
 set(FT_QTC_LIBRARIES
     -L"${QTC_LIB_DIR}"
     -L"${QTC_PLUGINS_DIR}"
-    Aggregation
-    ExtensionSystem
-    Conversion::Converter
-    Conversion::Registry
-    Conversion::SedsRegistrar
-    Conversion::SdlRegistrar
-    Conversion::IvRegistrar
-    Conversion::Asn1Registrar
-    Utils
 )
 
 set(FT_QTC_PLUGINS
@@ -51,12 +42,7 @@ target_include_directories(${PLUGIN_NAME}
     PRIVATE src
     PRIVATE ${QTC_SOURCE_DIR}/src
     PRIVATE ${QTC_SOURCE_DIR}/src/libs
-    PRIVATE ${QTC_SOURCE_DIR}/src/libs/aggregation
     PRIVATE ${QTC_SOURCE_DIR}/src/libs/extensionsystem
-    PRIVATE ${QTC_SOURCE_DIR}/src/libs/utils
     PRIVATE ${QTC_SOURCE_DIR}/src/plugins
     PRIVATE ${QTC_SOURCE_DIR}/src/plugins/coreplugin
-    PRIVATE ${QTC_SOURCE_DIR}/src/plugins/projectexplorer
-    PRIVATE ${QTC_SOURCE_DIR}/src/plugins/qtsupport
-    PRIVATE ${QTC_SOURCE_DIR}/src/plugins/texteditor
 )
