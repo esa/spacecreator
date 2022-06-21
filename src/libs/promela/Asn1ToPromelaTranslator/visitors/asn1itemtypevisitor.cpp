@@ -503,15 +503,15 @@ void Asn1ItemTypeVisitor::addSimpleValueAssignmentInline(const QString &typeName
 {
     model::Sequence sequence(model::Sequence::Type::NORMAL);
 
+    Assignment assignment(VariableRef("dst"), Expression(VariableRef("src")));
+    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assignment)));
+
     QList<InlineCall::Argument> rangeCheckCallArguments;
-    rangeCheckCallArguments.append(VariableRef("src"));
+    rangeCheckCallArguments.append(VariableRef("dst"));
     const auto rangeCheckInlineName =
             QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(m_rangeCheckInlineSuffix);
     InlineCall rangeCheckCall(rangeCheckInlineName, std::move(rangeCheckCallArguments));
     sequence.appendElement(std::make_unique<ProctypeElement>(std::move(rangeCheckCall)));
-
-    Assignment assignment(VariableRef("dst"), Expression(VariableRef("src")));
-    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assignment)));
 
     addAssignValueInline(typeName, std::move(sequence));
 }

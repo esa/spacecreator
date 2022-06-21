@@ -167,11 +167,11 @@ void tst_Asn1ToPromelaTranslator::testBasicTypes()
         const auto &sequence = inlineDef->getSequence();
         QCOMPARE(sequence.getContent().size(), 2);
 
-        const auto rangeCheckCall = findProctypeElement<InlineCall>(sequence, 0);
-        QVERIFY(rangeCheckCall != nullptr);
-
-        const auto assignment = findProctypeElement<Assignment>(sequence, 1);
+        const auto assignment = findProctypeElement<Assignment>(sequence, 0);
         QVERIFY(assignment != nullptr);
+
+        const auto rangeCheckCall = findProctypeElement<InlineCall>(sequence, 1);
+        QVERIFY(rangeCheckCall != nullptr);
     }
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyReal_assign_value");
@@ -181,11 +181,11 @@ void tst_Asn1ToPromelaTranslator::testBasicTypes()
         const auto &sequence = inlineDef->getSequence();
         QCOMPARE(sequence.getContent().size(), 2);
 
-        const auto rangeCheckCall = findProctypeElement<InlineCall>(sequence, 0);
-        QVERIFY(rangeCheckCall != nullptr);
-
-        const auto assignment = findProctypeElement<Assignment>(sequence, 1);
+        const auto assignment = findProctypeElement<Assignment>(sequence, 0);
         QVERIFY(assignment != nullptr);
+
+        const auto rangeCheckCall = findProctypeElement<InlineCall>(sequence, 1);
+        QVERIFY(rangeCheckCall != nullptr);
     }
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyBoolean_assign_value");
@@ -195,11 +195,11 @@ void tst_Asn1ToPromelaTranslator::testBasicTypes()
         const auto &sequence = inlineDef->getSequence();
         QCOMPARE(sequence.getContent().size(), 2);
 
-        const auto rangeCheckCall = findProctypeElement<InlineCall>(sequence, 0);
-        QVERIFY(rangeCheckCall != nullptr);
-
-        const auto assignment = findProctypeElement<Assignment>(sequence, 1);
+        const auto assignment = findProctypeElement<Assignment>(sequence, 0);
         QVERIFY(assignment != nullptr);
+
+        const auto rangeCheckCall = findProctypeElement<InlineCall>(sequence, 1);
+        QVERIFY(rangeCheckCall != nullptr);
     }
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyNull_assign_value");
@@ -267,11 +267,11 @@ void tst_Asn1ToPromelaTranslator::testEnumerated()
         const auto &sequence = inlineDef->getSequence();
         QCOMPARE(sequence.getContent().size(), 2);
 
-        const auto rangeCheckCall = findProctypeElement<InlineCall>(sequence, 0);
-        QVERIFY(rangeCheckCall != nullptr);
-
-        const auto assignment = findProctypeElement<Assignment>(sequence, 1);
+        const auto assignment = findProctypeElement<Assignment>(sequence, 0);
         QVERIFY(assignment != nullptr);
+
+        const auto rangeCheckCall = findProctypeElement<InlineCall>(sequence, 1);
+        QVERIFY(rangeCheckCall != nullptr);
     }
 }
 
@@ -719,7 +719,7 @@ void tst_Asn1ToPromelaTranslator::testChoice()
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
-        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 1);
+        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
     }
     {
@@ -727,7 +727,7 @@ void tst_Asn1ToPromelaTranslator::testChoice()
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
-        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 1);
+        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
     }
 }
@@ -801,7 +801,7 @@ void tst_Asn1ToPromelaTranslator::testSequence()
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
-        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 1);
+        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
     }
     {
@@ -809,7 +809,7 @@ void tst_Asn1ToPromelaTranslator::testSequence()
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
-        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 1);
+        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
     }
 }
@@ -962,7 +962,7 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
-        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 1);
+        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
     }
     {
@@ -970,7 +970,7 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
-        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 1);
+        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
     }
 }
@@ -1087,7 +1087,7 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
-        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 1);
+        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
     }
 }
@@ -1166,7 +1166,7 @@ void tst_Asn1ToPromelaTranslator::testVariableSequenceOf()
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
-        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 1);
+        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
     }
 }
@@ -1235,7 +1235,7 @@ void tst_Asn1ToPromelaTranslator::testFixedSequenceOf()
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
-        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 1);
+        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
     }
 }
@@ -1290,11 +1290,11 @@ void tst_Asn1ToPromelaTranslator::testUserDefinedType()
         const auto &sequence = inlineDef->getSequence();
         QCOMPARE(sequence.getContent().size(), 2);
 
-        const auto rangeCheckCall = findProctypeElement<InlineCall>(sequence, 0);
-        QVERIFY(rangeCheckCall != nullptr);
-
-        const auto assignment = findProctypeElement<Assignment>(sequence, 1);
+        const auto assignment = findProctypeElement<Assignment>(sequence, 0);
         QVERIFY(assignment != nullptr);
+
+        const auto rangeCheckCall = findProctypeElement<InlineCall>(sequence, 1);
+        QVERIFY(rangeCheckCall != nullptr);
     }
 
     {
@@ -1305,11 +1305,11 @@ void tst_Asn1ToPromelaTranslator::testUserDefinedType()
         const auto &sequence = inlineDef->getSequence();
         QCOMPARE(sequence.getContent().size(), 2);
 
-        const auto rangeCheckCall = findProctypeElement<InlineCall>(sequence, 0);
-        QVERIFY(rangeCheckCall != nullptr);
-
-        const auto assignment = findProctypeElement<Assignment>(sequence, 1);
+        const auto assignment = findProctypeElement<Assignment>(sequence, 0);
         QVERIFY(assignment != nullptr);
+
+        const auto rangeCheckCall = findProctypeElement<InlineCall>(sequence, 1);
+        QVERIFY(rangeCheckCall != nullptr);
     }
 }
 
