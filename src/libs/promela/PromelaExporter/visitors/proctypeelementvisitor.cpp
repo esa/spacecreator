@@ -209,8 +209,7 @@ void ProctypeElementVisitor::operator()(const ForLoop &loop)
 
     if (sequence->getType() != Sequence::Type::NORMAL) {
         SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent + m_baseIndent);
-        m_stream << m_indent << "{\n"
-                 << m_baseIndent << m_indent << visitor.getSequencePrefix(*sequence) << "{\n";
+        m_stream << m_indent << "{\n" << m_baseIndent << m_indent << visitor.getSequencePrefix(*sequence) << "{\n";
         visitor.visit(*sequence, false);
         m_stream << m_baseIndent << m_indent << "}\n" << m_indent << "}\n";
     } else {

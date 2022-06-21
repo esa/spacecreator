@@ -491,7 +491,9 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(con
                 Declaration(DataType(UtypeRef(Escaper::escapePromelaName(parameterType))), "value")));
     }
 
-    const auto &globalInputVectorLength = options.value(PromelaOptions::globalInputVectorLengthLimit);
+    const auto &globalInputVectorLengthLimit = options.value(PromelaOptions::globalInputVectorLengthLimit);
+    const auto &interfaceInputVectorLenghtLimit =
+            options.value(PromelaOptions::interfaceInputVectorLengthLimit.arg(interfaceName.toLower()));
 
     std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>(Sequence::Type::ATOMIC);
 
@@ -513,22 +515,29 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(con
         loopSequence->appendElement(std::move(inlineCall));
     }
 
-    if (globalInputVectorLength.has_value()) {
+    int limit = 0;
+    if (interfaceInputVectorLenghtLimit.has_value()) {
+        limit = interfaceInputVectorLenghtLimit->toInt();
+    } else if (globalInputVectorLengthLimit.has_value()) {
+        limit = globalInputVectorLengthLimit->toInt();
+    }
+
+    if (limit == 0) {
+        DoLoop loop;
+        loop.appendSequence(std::move(loopSequence));
+
+        std::unique_ptr<ProctypeElement> loopElement = std::make_unique<ProctypeElement>(std::move(loop));
+        sequence.appendElement(std::move(loopElement));
+    } else {
         Declaration iteratorVariable(DataType(UtypeRef("int")), "inputVectorCounter");
         auto iteratorVariableElement = std::make_unique<ProctypeElement>(std::move(iteratorVariable));
         sequence.appendElement(std::move(iteratorVariableElement));
 
         VariableRef iteratorVariableRef("inputVectorCounter");
-        Expression firstExpression(Constant(0));
-        Expression lastExpression(Constant(globalInputVectorLength->toInt()));
+        Expression firstExpression(0);
+        Expression lastExpression(limit);
 
         ForLoop loop(std::move(iteratorVariableRef), firstExpression, lastExpression, std::move(loopSequence));
-
-        std::unique_ptr<ProctypeElement> loopElement = std::make_unique<ProctypeElement>(std::move(loop));
-        sequence.appendElement(std::move(loopElement));
-    } else {
-        DoLoop loop;
-        loop.appendSequence(std::move(loopSequence));
 
         std::unique_ptr<ProctypeElement> loopElement = std::make_unique<ProctypeElement>(std::move(loop));
         sequence.appendElement(std::move(loopElement));

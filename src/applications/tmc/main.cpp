@@ -22,8 +22,10 @@
 #include <QCoreApplication>
 #include <QString>
 #include <ivcore/ivlibrary.h>
+#include <shared/qstringhash.h>
 #include <shared/sharedlibrary.h>
 #include <tmc/TmcVerifier/verifier.h>
+#include <unordered_map>
 
 const auto separator = QString(":");
 
@@ -67,6 +69,7 @@ int main(int argc, char *argv[])
     QStringList observerInfos;
     std::vector<QString> environmentFunctions;
     std::optional<QString> globalInputVectorLengthLimit;
+    std::unordered_map<QString, QString> interfaceInputVectorLengthLimits;
 
     const QStringList args = app.arguments();
 
@@ -105,7 +108,48 @@ int main(int argc, char *argv[])
             environmentFunctions.emplace_back(args[i]);
         } else if (arg == "-ivl") {
             ++i;
-            globalInputVectorLengthLimit = args[i];
+
+            auto limit = args[i];
+            auto limitSemicolonCount = limit.count(':');
+
+            if (limitSemicolonCount == 0) {
+                if (globalInputVectorLengthLimit.has_value()) {
+                    qCritical("Duplicated global input vector length limit argument");
+                    exit(EXIT_FAILURE);
+                }
+
+                bool valueOk;
+                limit.toInt(&valueOk);
+
+                if (!valueOk) {
+                    qCritical("Global input vector length limit argument value is not an integer");
+                    exit(EXIT_FAILURE);
+                }
+
+                globalInputVectorLengthLimit = limit;
+            } else if (limitSemicolonCount == 1) {
+                auto interfaceLimit = limit.split(':');
+
+                if (interfaceInputVectorLengthLimits.count(interfaceLimit[0]) != 0) {
+                    qCritical("Duplicated input vector length limit argument for interface %s",
+                            interfaceLimit[0].toStdString().c_str());
+                    exit(EXIT_FAILURE);
+                }
+
+                bool valueOk;
+                interfaceLimit[1].toInt(&valueOk);
+
+                if (!valueOk) {
+                    qCritical("Input vector length limit argument for interface %s is not an integer",
+                            interfaceLimit[0].toStdString().c_str());
+                    exit(EXIT_FAILURE);
+                }
+
+                interfaceInputVectorLengthLimits.insert({ interfaceLimit[0], interfaceLimit[1] });
+            } else {
+                qCritical("Incorrect input vector length limit argument value");
+                exit(EXIT_FAILURE);
+            }
         } else if (arg == "-h" || arg == "--help") {
             qInfo("tmc: TASTE Model Chcecker");
             qInfo("Usage: tmc [OPTIONS]");
@@ -116,6 +160,10 @@ int main(int argc, char *argv[])
             qInfo("                       Use <filepath> as an Observer source file.");
             qInfo("                       Integer <priority> of the Observer is optional");
             qInfo("  -e, --envfunc <name> Use <name> to specify a SDL function that  should be treated as environment");
+            qInfo("  -ivl <limit>         Use <name> to specify input vector length limit.");
+            qInfo("                       Provide number only to set global limit");
+            qInfo("                       Use <interface_name>:<number> to set limit for single interface");
+            qInfo("                       Interface limit overrides global limit");
             qInfo("  -h, --help           Print this message and exit.");
             exit(EXIT_SUCCESS);
         } else {
@@ -136,7 +184,8 @@ int main(int argc, char *argv[])
     tmc::verifier::TmcVerifier verifier(inputIvFilepath.value(), outputDirectory.value());
 
     verifier.addEnvironmentFunctions(environmentFunctions);
-    verifier.setGlobalInputVectorLengthLimit(globalInputVectorLengthLimit);
+    verifier.setGlobalInputVectorLengthLimit(std::move(globalInputVectorLengthLimit));
+    verifier.setInterfaceInputVectorLengthLimits(std::move(interfaceInputVectorLengthLimits));
 
     if (!verifier.addStopConditionFiles(stopConditionFiles)) {
         return EXIT_FAILURE;

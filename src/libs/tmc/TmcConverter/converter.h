@@ -32,6 +32,7 @@
 #include <map>
 #include <memory>
 #include <tmc/SdlToPromelaConverter/processmetadata.h>
+#include <unordered_map>
 
 namespace tmc::converter {
 /**
@@ -99,7 +100,13 @@ public:
      *
      * @param   limit   Limit to set
      */
-    void setGlobalInputVectorLengthLimit(const std::optional<QString> &limit);
+    void setGlobalInputVectorLengthLimit(std::optional<QString> limit);
+    /**
+     * @brief   Set per interface input vector length limits
+     *
+     * @param   limits  Limits to set
+     */
+    void setInterfaceInputVectorLengthLimits(std::unordered_map<QString, QString> limits);
     /**
      * @brief Add Stop Condition files to convert.
      *
@@ -161,6 +168,7 @@ private:
 
     std::vector<QString> m_environmentFunctions;
     std::optional<QString> m_globalInputVectorLengthLimit;
+    std::unordered_map<QString, QString> m_interfaceInputVectorLengthLimits;
     QStringList m_stopConditionsFiles;
     std::vector<ObserverInfo> m_observerInfos;
     QStringList m_observerAttachmentInfos;

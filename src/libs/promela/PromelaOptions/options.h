@@ -53,6 +53,9 @@ public:
     /** @brief Global input vector length limit */
     inline static const QString globalInputVectorLengthLimit = "Promela_Convert_GlobalInputVectorLengthLimit";
 
+    /** @brief Interface input vector length limit template*/
+    inline static const QString interfaceInputVectorLengthLimit = "Promela_Convert_InterfaceInputVectorLengthLimit_%1";
+
     /**
      *  @brief Specification of an observer attachment
      *  Contains information regarding the name of the observer, as well as the location

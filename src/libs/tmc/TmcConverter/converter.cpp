@@ -131,9 +131,14 @@ void TmcConverter::addEnvironmentFunctions(const std::vector<QString> &environme
     }
 }
 
-void TmcConverter::setGlobalInputVectorLengthLimit(const std::optional<QString> &limit)
+void TmcConverter::setGlobalInputVectorLengthLimit(std::optional<QString> limit)
 {
-    m_globalInputVectorLengthLimit = limit;
+    m_globalInputVectorLengthLimit = std::move(limit);
+}
+
+void TmcConverter::setInterfaceInputVectorLengthLimits(std::unordered_map<QString, QString> limits)
+{
+    m_interfaceInputVectorLengthLimits = std::move(limits);
 }
 
 bool TmcConverter::addStopConditionFiles(const QStringList &files)
@@ -355,6 +360,10 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
 
     if (m_globalInputVectorLengthLimit) {
         options.add(PromelaOptions::globalInputVectorLengthLimit, *m_globalInputVectorLengthLimit);
+    }
+
+    for (const auto &[interfaceName, value] : m_interfaceInputVectorLengthLimits) {
+        options.add(PromelaOptions::interfaceInputVectorLengthLimit.arg(interfaceName.toLower()), value);
     }
 
     for (const QString &observer : m_observerNames) {

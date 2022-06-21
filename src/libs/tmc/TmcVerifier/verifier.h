@@ -50,7 +50,13 @@ public:
      *
      * @param   limit   Limit to set
      */
-    void setGlobalInputVectorLengthLimit(const std::optional<QString> &limit);
+    void setGlobalInputVectorLengthLimit(std::optional<QString> limit);
+    /**
+     * @brief   Set per interface input vector length limits
+     *
+     * @param   limits  Limits to set
+     */
+    void setInterfaceInputVectorLengthLimits(std::unordered_map<QString, QString> limits);
     /**
      * @brief Add Stop Condition files to verifier.
      *
