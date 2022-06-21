@@ -4,8 +4,6 @@ set(FT_PLUGIN_SOURCES
     FunctionTesterPlugin.json.in
     functiontesterplugin.cpp
     functiontesterplugin.h
-    messagemanager.cpp
-    messagemanager.h
 )
 
 set(FT_QTC_LIBRARIES

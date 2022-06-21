@@ -2,6 +2,8 @@ set(PLUGIN_NAME SpaceCreatorPlugin)
 
 set(SC_PLUGIN_SOURCES
     SpaceCreatorPlugin.json.in
+    common/messagemanager.cpp
+    common/messagemanager.h
     dv/dveditordata.cpp
     dv/dveditordata.h
     dv/dveditordocument.cpp
