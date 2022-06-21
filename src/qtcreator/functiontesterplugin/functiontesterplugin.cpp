@@ -18,7 +18,7 @@
  */
 
 #include "functiontesterplugin.h"
-#include "ftpluginconstants.h"
+#include "pluginconstants.h"
 
 #include <QBuffer>
 #include <QFileDialog>
@@ -76,7 +76,7 @@ auto FunctionTesterPlugin::aboutToShutdown() -> ExtensionSystem::IPlugin::Shutdo
     return SynchronousShutdown;
 }
 
-auto FunctionTesterPlugin::functionTesterPluginMain() -> void
+auto FunctionTesterPlugin::testUsingDataFromCsv() -> void
 {
     ivm::IVInterface *interface = getSelectedInterface();
     if (!interface) {
@@ -98,7 +98,7 @@ auto FunctionTesterPlugin::functionTesterPluginMain() -> void
 }
 
 auto FunctionTesterPlugin::functionTesterPluginCore(ivm::IVInterface &interface, const csv::CsvModel &csvModel,
-        const Asn1Acn::Asn1Model &asn1Model, float delta) -> void
+        Asn1Acn::Asn1Model &asn1Model, float delta) -> void
 {
     projectDirectory = getBaseDirectory();
     generatedPath = projectDirectory + QDir::separator() + "generated";
@@ -148,7 +148,7 @@ auto FunctionTesterPlugin::functionTesterPluginCore(ivm::IVInterface &interface,
 
     exportDvModel(dvModelGenerated.get(), generatedDvPath);
     compileTest(ivFunctions[1]->title());
-    // extractResult(interface, asn1Model.get());
+    // extractResult(interface, asn1Model);
 }
 
 auto FunctionTesterPlugin::copyRecursively(const QString &srcPath, const QString &dstPath) -> bool
@@ -279,7 +279,7 @@ auto FunctionTesterPlugin::addTestInterfaceOption() -> void
     ActionContainer *const acToolsFunctionTester = createActionContainerInTools(tr("&Test Interface"));
 
     const auto csvImportAction = new QAction(tr("Test using data from CSV"), this);
-    connect(csvImportAction, &QAction::triggered, [=]() { this->functionTesterPluginMain(); });
+    connect(csvImportAction, &QAction::triggered, [=]() { this->testUsingDataFromCsv(); });
     Command *const csvImport = ActionManager::registerAction(csvImportAction, Constants::CSV_IMPORT_ID, allContexts);
     acToolsFunctionTester->addAction(csvImport);
 }
@@ -419,7 +419,7 @@ void printQByteArrayInHex(const QByteArray &array)
 }
 
 // TODO: fix and finish (doesnt work)
-auto FunctionTesterPlugin::extractResult(ivm::IVInterface *const interface, Asn1Acn::Asn1Model *const asn1Model) -> void
+auto FunctionTesterPlugin::extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Model &asn1Model) -> void
 {
     const QString binLocalization =
             generatedPath + QDir::separator() + "work" + QDir::separator() + "binaries" + QDir::separator();
@@ -436,7 +436,7 @@ auto FunctionTesterPlugin::extractResult(ivm::IVInterface *const interface, Asn1
         { "REAL", 8, 0 },
     };
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
-            rawTestData, interface, asn1Model, QDataStream::LittleEndian, typeLayoutInfos);
+            rawTestData, &interface, &asn1Model, QDataStream::LittleEndian, typeLayoutInfos);
 
     const int dataSize = readTestData.size();
     printQByteArrayInHex(rawTestData);

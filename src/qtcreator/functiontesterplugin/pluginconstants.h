@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2022 N7 Space Sp. z o.o.
+ * @copyright (C) 2021 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,22 +19,11 @@
 
 #pragma once
 
-#include <QString>
-
 namespace spctr {
+namespace Constants {
 
-/**
- * @brief   This class provides API compatibility for the Qt::Core::MessageManager
- */
-class MessageManager final
-{
-public:
-    /**
-     * @brief   Writes the message to the General Messages pane 
-     *
-     * @param message   Message to write
-     */
-    static void write(const QString &message);
-};
+const char CSV_IMPORT_ID[] = "Csv.Import";
+const char M_TOOLS_FUNCTION_TESTER[] = "QtCreator.Menu.Tools.FunctionTester";
 
-} // namespace spctr
+}
+}

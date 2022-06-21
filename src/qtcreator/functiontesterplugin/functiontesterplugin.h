@@ -42,10 +42,10 @@ public:
     auto initialize(const QStringList &arguments, QString *errorString) -> bool override;
     auto extensionsInitialized() -> void override;
     auto aboutToShutdown() -> ShutdownFlag override;
-    auto functionTesterPluginMain() -> void;
+    auto testUsingDataFromCsv() -> void;
 private:
     auto functionTesterPluginCore(ivm::IVInterface &interface, const csv::CsvModel &csvModel,
-            const Asn1Acn::Asn1Model &asn1Model, float delta) -> void;
+            Asn1Acn::Asn1Model &asn1Model, float delta) -> void;
     auto addTestInterfaceOption() -> void;
     auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
     auto loadCsv() -> std::unique_ptr<csv::CsvModel>;
@@ -60,7 +60,7 @@ private:
     auto compileTest(const QString &functionName) -> void;
     auto copyRecursively(const QString &srcPath, const QString &dstPath) -> bool;
     auto runProcess(QString cmd, QStringList args, QString workingPath) -> void;
-    auto extractResult(ivm::IVInterface *const interface, Asn1Acn::Asn1Model *const asn1Model) -> void;
+    auto extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Model &asn1Model) -> void;
 
     QString projectDirectory;
     QString generatedPath;
