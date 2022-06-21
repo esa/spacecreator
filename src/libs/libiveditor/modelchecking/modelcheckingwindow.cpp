@@ -161,6 +161,7 @@ ModelCheckingWindow::~ModelCheckingWindow()
  */
 void ModelCheckingWindow::callTasteGens(bool toggled){
     if (!toggled) {return;}
+
     // CALL MAKE SKELETONS
     QString makeSkeletonsCall = "make skeletons";
     QProcess *makeSleletonsCallerProcess = new QProcess(this);
@@ -170,6 +171,19 @@ void ModelCheckingWindow::callTasteGens(bool toggled){
     if (makeSleletonsCallerProcess->execute(makeSkeletonsCall) != 0) {
         QMessageBox::warning(this, tr("Make skeletons call"),
                              "Error when making skeletons!");
+    }
+    // reset path
+    QDir::setCurrent(qDirAppPath);
+
+    // CALL MAKE DEPLOYMENT
+    QString makeDeploymentCall = "make DeploymentView.aadl";
+    QProcess *makeDeploymentCallerProcess = new QProcess(this);
+    // set path to project dir
+    qDirAppPath = QDir::currentPath();
+    QDir::setCurrent(this->projectDir+"/");
+    if (makeDeploymentCallerProcess->execute(makeDeploymentCall) != 0) {
+        QMessageBox::warning(this, tr("Make deployment call"),
+                             "Error when making deployment view!");
     }
     // reset path
     QDir::setCurrent(qDirAppPath);
