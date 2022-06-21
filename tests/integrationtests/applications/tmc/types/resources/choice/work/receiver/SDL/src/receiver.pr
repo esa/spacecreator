@@ -4,24 +4,22 @@ process Receiver;
     -- Text area for declarations and comments
     
     dcl choiceArg MyBetterChoice;
-    dcl choiceValue MyBetterChoice;
+    dcl choiceValue MyBetterChoice := option1 : 2;
     dcl choiceHandled T_Boolean := false;
     /* CIF ENDTEXT */
-    /* CIF START (543, 34), (70, 35) */
+    /* CIF START (437, 12), (70, 35) */
     START;
-        /* CIF task (491, 89), (173, 35) */
-        task choiceValue := option1 : 2;
-        /* CIF NEXTSTATE (543, 139), (70, 35) */
+        /* CIF NEXTSTATE (437, 67), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (849, 25), (70, 35) */
+    /* CIF state (600, 20), (70, 35) */
     state Wait;
-        /* CIF input (777, 80), (213, 43) */
-        input ChoiceInterface(choiceArg);
-            /* CIF task (799, 143), (169, 35) */
+        /* CIF input (528, 75), (213, 43) */
+        input ChoiceInterface(choiceArg) ;
+            /* CIF task (550, 138), (169, 35) */
             task choiceValue := choiceArg;
-            /* CIF task (807, 198), (153, 35) */
+            /* CIF task (558, 193), (153, 35) */
             task choiceHandled := true;
-            /* CIF NEXTSTATE (849, 253), (70, 35) */
+            /* CIF NEXTSTATE (600, 248), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Receiver;
