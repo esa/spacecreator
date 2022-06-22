@@ -22,8 +22,8 @@ $TMC -iv $RESOURCE_DIR/interfaceview.xml \
     -ivl rightinterface:4
 
 cd $TEST_OUTPUT_DIR \
-    && grep -q "for(inputVectorCounter : 0 \.\. 10)" system.pml \
-    && grep -q "for(inputVectorCounter : 0 \.\. 4)" system.pml \
+    && grep -q "for(inputVectorCounter : 0 \.\. 9)" system.pml \
+    && grep -q "for(inputVectorCounter : 0 \.\. 3)" system.pml \
     && $SPIN -a system.pml \
     && $CC -o system.out pan.c \
     && cd .. \
