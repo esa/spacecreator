@@ -97,6 +97,7 @@ namespace promela::translator {
 
 const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::lengthMemberName = "length";
 const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::octetGeneratorName = "OctetStringElement_generate_value";
+const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::ia5StringGeneratorName = "IA5StringElement_generate_value";
 
 Asn1TypeValueGeneratorVisitor::Asn1TypeValueGeneratorVisitor(PromelaModel &promelaModel, QString name)
     : m_promelaModel(promelaModel)
@@ -196,11 +197,50 @@ void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
 
 void Asn1TypeValueGeneratorVisitor::visit(const IA5String &type)
 {
-    Q_UNUSED(type);
-    const QString message = QString("IA5String ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
-                                    .arg(__FILE__)
-                                    .arg(__LINE__);
-    throw std::logic_error(message.toStdString().c_str());
+    SizeConstraintVisitor<Asn1Acn::StringValue> constraintVisitor;
+    type.constraints().accept(constraintVisitor);
+
+    if (!constraintVisitor.isSizeConstraintVisited()) {
+        const QString msg("Specified IA5String has no size constraint");
+        throw std::logic_error(msg.toStdString().c_str());
+    }
+
+    const QString &ia5StringGeneratorName = InlineDefAdder::ia5StringGeneratorName;
+    if (!modelContainsInlineGenerator(ia5StringGeneratorName)) {
+        const long maxStringValue = 127;
+        InlineDefAdder::addRangedIntegerGeneratorToModel("IA5StringElement", m_promelaModel, 0, maxStringValue);
+    }
+
+    const QString typeIdentifier = Escaper::escapePromelaName(m_name);
+    const QString argumentName = QString("%1_gv").arg(typeIdentifier);
+
+    auto sequence = ProctypeMaker::makeNormalSequence();
+    sequence->appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, "i"));
+    const size_t minSize = constraintVisitor.getMinSize();
+    const size_t maxSize = constraintVisitor.getMaxSize();
+    if (minSize == maxSize) {
+        sequence->appendElement(
+                ProctypeMaker::makeCallForEachValue(ia5StringGeneratorName, argumentName, Expression(maxSize - 1)));
+    } else { // IA5String has variable length
+        const QString lengthGeneratorTypeName =
+                QString("%1_%2").arg(typeIdentifier).arg(InlineDefAdder::lengthMemberName);
+        InlineDefAdder::addRangedIntegerGeneratorToModel(
+                lengthGeneratorTypeName, m_promelaModel, static_cast<long>(minSize), static_cast<long>(maxSize));
+
+        const QString valueLengthVariableName =
+                QString("%1.%2").arg(argumentName).arg(InlineDefAdder::lengthMemberName);
+        sequence->appendElement(ProctypeMaker::makeInlineCall(
+                QString("%1_generate_value").arg(lengthGeneratorTypeName), valueLengthVariableName));
+
+        Expression end = InlineDefAdder::getValueLenghtMinusConstAsExpression(argumentName, 1);
+        sequence->appendElement(ProctypeMaker::makeCallForEachValue(ia5StringGeneratorName, argumentName, end));
+    }
+
+    const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);
+    const QStringList inlineArguments = { argumentName };
+    auto inlineDef = std::make_unique<InlineDef>(inlineSeqGeneratorName, inlineArguments, std::move(*sequence));
+
+    m_promelaModel.addInlineDef(std::move(inlineDef));
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const NumericString &type)

@@ -27,4 +27,3 @@ cd $TEST_OUTPUT_DIR \
     && grep -q "errors: 0" system.output \
     && cd .. \
     && rm -r $TEST_OUTPUT_DIR \
-    && echo "WORKED ${0##*/}"
