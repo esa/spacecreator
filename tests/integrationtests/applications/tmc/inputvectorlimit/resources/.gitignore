@@ -4,21 +4,23 @@
 *.ini
 *.gpr
 *.md5
+*.msc
 
 **/wrappers/*
 **/cache/*
 
-**/left/**/*.ad*
-**/left/**/*.md5
-**/left/**/Makefile
-**/left/**/*.pro
+work/left/**/*.ad*
+work/left/**/*.md5
+work/left/**/Makefile
+work/left/**/*.pro
 
-**/right/**/*.ad*
-**/right/**/*.md5
-**/right/**/Makefile
-**/right/**/*.pro
+work/right/**/*.ad*
+work/right/**/*.md5
+work/right/**/Makefile
+work/right/**/*.pro
 
-work/**/GUI/src
+work/gui
+
 work/**/SDL/**/Makefile.*
 
 **/modelchecking/**/*.adb
