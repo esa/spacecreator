@@ -31,6 +31,7 @@ private Q_SLOTS:
     void test_bool();
     void test_integer();
     void test_octet();
+    void test_ia5string();
     void test_enum();
     void test_choice();
     void test_sequence();
@@ -52,6 +53,12 @@ void tst_Tmc_Types::test_integer()
 void tst_Tmc_Types::test_octet()
 {
     const int result = system("./test_octet.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Types::test_ia5string()
+{
+    const int result = system("./test_ia5string.sh");
     QCOMPARE(result, 0);
 }
 
