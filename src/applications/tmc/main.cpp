@@ -160,10 +160,10 @@ int main(int argc, char *argv[])
             qInfo("                       Use <filepath> as an Observer source file.");
             qInfo("                       Integer <priority> of the Observer is optional");
             qInfo("  -e, --envfunc <name> Use <name> to specify a SDL function that  should be treated as environment");
-            qInfo("  -ivl <limit>         Use <name> to specify input vector length limit.");
-            qInfo("                       Provide number only to set global limit");
-            qInfo("                       Use <interface_name>:<number> to set limit for single interface");
-            qInfo("                       Interface limit overrides global limit");
+            qInfo("  -ivl <limit>         Use <limit> to specify input vector length limit.");
+            qInfo("                       Provide number only to set the global limit");
+            qInfo("                       Use <interface_name>:<number> to set limit for a single interface");
+            qInfo("                       Interface limit overrides the global limit");
             qInfo("  -h, --help           Print this message and exit.");
             exit(EXIT_SUCCESS);
         } else {
