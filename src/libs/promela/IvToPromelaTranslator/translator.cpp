@@ -535,7 +535,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(con
 
         VariableRef iteratorVariableRef("inputVectorCounter");
         Expression firstExpression(0);
-        Expression lastExpression(limit-1);
+        Expression lastExpression(limit - 1);
 
         ForLoop loop(std::move(iteratorVariableRef), firstExpression, lastExpression, std::move(loopSequence));
 
