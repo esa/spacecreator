@@ -1,0 +1,257 @@
+<InterfaceView asn1file="Stats.asn" mscfile="/home/taste/work/pizza/pizza.msc">
+<Function name="Customer" is_type="NO" language="SDL" default_implementation="prototype" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="3200 29300 25600 56900"/>
+    <ContextParameter name="impatient" type="Timer" value=""/>
+<Provided_Interface name="Pizza" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="25600 51800"/>
+</Provided_Interface>
+
+<Provided_Interface name="Pizza_on_its_way" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="25600 40800"/>
+</Provided_Interface>
+
+<Provided_Interface name="Hungry" kind="Sporadic" queue_size="1" stack_size="50" priority="2" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="7900 29300"/>
+</Provided_Interface>
+
+<Required_Interface name="Order_a_pizza" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="25600 32200"/>
+    <Property name="Taste::RootCoordinates" value="-200 8700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="Money" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="25600 45500"/>
+    <Property name="Taste::RootCoordinates" value="-200 22600"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="Complain" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="25600 36300"/>
+    <Property name="Taste::RootCoordinates" value="-200 17500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="Satisfied" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="20800 29300"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="prototype" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="Vendor" is_type="NO" language="SDL" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="47900 29100 80700 54200"/>
+    <Property name="Taste::RootCoordinates" value="-200 0 52500 53500"/>
+<Provided_Interface name="Order_a_pizza" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="47900 33200"/>
+    <Property name="Taste::RootCoordinates" value="-200 11100"/>
+</Provided_Interface>
+
+<Provided_Interface name="Money" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="47900 46400"/>
+    <Property name="Taste::RootCoordinates" value="-200 39700"/>
+</Provided_Interface>
+
+<Provided_Interface name="Complain" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="47900 37500"/>
+    <Property name="Taste::RootCoordinates" value="-200 17500"/>
+</Provided_Interface>
+
+<Required_Interface name="Pizza" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="47900 51300"/>
+    <Property name="Taste::RootCoordinates" value="-200 47700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="Pizza_on_its_way" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="47900 40600"/>
+    <Property name="Taste::RootCoordinates" value="-200 24500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Function name="Clerk" is_type="NO" language="SDL" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="23100 8000 49400 16000"/>
+<Provided_Interface name="Order_a_pizza" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="23100 11400"/>
+</Provided_Interface>
+
+<Provided_Interface name="Complain" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="23100 13900"/>
+</Provided_Interface>
+
+<Required_Interface name="Prepare_the_pizza" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="6000" wcet="0">
+    <Property name="Taste::coordinates" value="31200 16000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="Pizza_on_its_way" kind="Sporadic">
+    <Property name="Taste::coordinates" value="24200 16000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+        <Implementation name="OtherImpl" language="Ada"/>
+    </Implementations>
+</Function>
+
+<Function name="Chef" is_type="NO" language="SDL" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="23500 24900 49200 32900"/>
+<Provided_Interface name="Prepare_the_pizza" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="6000" wcet="0">
+    <Property name="Taste::coordinates" value="31700 24900"/>
+</Provided_Interface>
+
+<Required_Interface name="Pizza" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="38000 32900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="Delivery_Boy" is_type="NO" language="SDL" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="24100 41900 49400 49900"/>
+<Provided_Interface name="Money" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="29900 41900"/>
+</Provided_Interface>
+
+<Provided_Interface name="Pizza" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="38100 41900"/>
+</Provided_Interface>
+
+<Required_Interface name="Pizza" kind="Sporadic">
+    <Property name="Taste::coordinates" value="24100 47300"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Connection >
+    <Source func_name="Vendor" pi_name="Order_a_pizza"/>
+    <Target func_name="Clerk" pi_name="Order_a_pizza"/>
+    <Property name="Taste::coordinates" value="400 11100 11600 11100 22800 11400"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Delivery_Boy" ri_name="Pizza"/>
+    <Target func_name="Vendor" ri_name="Pizza"/>
+    <Property name="Taste::coordinates" value="23500 47300 11800 47300 100 47700"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Vendor" pi_name="Money"/>
+    <Target func_name="Delivery_Boy" pi_name="Money"/>
+    <Property name="Taste::coordinates" value="400 39700 29900 39700 29900 41600"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Chef" ri_name="Pizza"/>
+    <Target func_name="Delivery_Boy" pi_name="Pizza"/>
+    <Property name="Taste::coordinates" value="38000 33500 38000 37500 38100 41600"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Clerk" ri_name="Prepare_the_pizza"/>
+    <Target func_name="Chef" pi_name="Prepare_the_pizza"/>
+    <Property name="Taste::coordinates" value="31200 16600 31200 20800 31700 23000 31700 24600"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Clerk" ri_name="Pizza_on_its_way"/>
+    <Target func_name="Vendor" ri_name="Pizza_on_its_way"/>
+    <Property name="Taste::coordinates" value="24200 16600 24200 24500 100 24500"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Vendor" pi_name="Complain"/>
+    <Target func_name="Clerk" pi_name="Complain"/>
+    <Property name="Taste::coordinates" value="400 17500 11600 17500 11600 13900 22800 13900"/>
+</Connection>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="Belly" is_type="NO" language="GUI" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="4100 6900 24500 16600"/>
+<Provided_Interface name="Satisfied" kind="Sporadic" queue_size="1" stack_size="50" priority="1" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="20800 16600"/>
+</Provided_Interface>
+
+<Required_Interface name="Hungry" kind="Sporadic" queue_size="1" stack_size="50" priority="2" miat="0" wcet="0">
+    <Property name="Taste::coordinates" value="7700 16600"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Connection >
+    <Source func_name="Belly" ri_name="Hungry"/>
+    <Target func_name="Customer" pi_name="Hungry"/>
+    <Property name="Taste::coordinates" value="7700 17200 7900 29000"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Customer" ri_name="Money"/>
+    <Target func_name="Vendor" pi_name="Money"/>
+    <Property name="Taste::coordinates" value="26200 45500 36800 45500 46000 46400 47600 46400"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Customer" ri_name="Satisfied"/>
+    <Target func_name="Belly" pi_name="Satisfied"/>
+    <Property name="Taste::coordinates" value="20800 28700 20800 16900"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Customer" ri_name="Complain"/>
+    <Target func_name="Vendor" pi_name="Complain"/>
+    <Property name="Taste::coordinates" value="26200 36300 36800 36300 36800 37500 47600 37500"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Vendor" ri_name="Pizza"/>
+    <Target func_name="Customer" pi_name="Pizza"/>
+    <Property name="Taste::coordinates" value="47300 51300 25900 51800"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Customer" ri_name="Order_a_pizza"/>
+    <Target func_name="Vendor" pi_name="Order_a_pizza"/>
+    <Property name="Taste::coordinates" value="26200 32200 36800 32200 46000 33200 47600 33200"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Vendor" ri_name="Pizza_on_its_way"/>
+    <Target func_name="Customer" pi_name="Pizza_on_its_way"/>
+    <Property name="Taste::coordinates" value="47300 40600 25900 40800"/>
+</Connection>
+
+<Comment name="Pizza model inspired from Pragmadev&#39;s BPMN example">
+    <Property name="Taste::coordinates" value="40500 1900 81800 17500"/>
+</Comment>
+
+</InterfaceView>

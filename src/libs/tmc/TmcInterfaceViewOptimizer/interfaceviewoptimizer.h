@@ -34,6 +34,14 @@ namespace tmc {
 class InterfaceViewOptimizer final
 {
 public:
+    enum class Mode
+    {
+        Environment,
+        Keep,
+        None
+    };
+
+public:
     /**
      * @brief   Deleted constructor
      */
@@ -60,24 +68,26 @@ public:
     /**
      * @brief   Optimize passed model
      *
-     * @param   ivModel                 Model to modify
-     * @param   environmentFunctions    Names of functions that should be marked as environment
+     * @param   ivModel         Model to modify
+     * @param   functionNames   Names of functions
+     * @param   mode            Mode in which optimizer should work
      */
-    static auto optimizeModel(ivm::IVModel *ivModel, const std::vector<QString> &environmentFunctions) -> void;
+    static auto optimizeModel(ivm::IVModel *ivModel, const std::vector<QString> &functionNames, Mode mode) -> void;
 
 private:
-    static auto markAsEnvironment(const QString &functionName, ivm::IVModel *ivModel) -> void;
-    static auto removeDeadFunctions(ivm::IVModel *ivModel) -> void;
+    static auto markAsEnvironment(ivm::IVFunction *function) -> void;
 
     static auto setGuiAsDefaultImplementation(ivm::IVFunction *function) -> void;
-
-    static auto findFunction(const QString &functionName, ivm::IVModel *ivModel) -> ivm::IVFunction *;
     static auto findImplementationType(const QString &implementationName, const ivm::IVFunction *function) -> QString;
 
+    static auto removeDeadConnections(ivm::IVModel *ivModel) -> void;
+    static auto removeDeadInterfaces(ivm::IVModel *ivModel) -> void;
+    static auto removeDeadFunctions(ivm::IVModel *ivModel) -> void;
     static auto removeUnallowedInterfaces(ivm::IVFunction *function) -> void;
 
     static auto isConnectionDead(const ivm::IVConnection *connection) -> bool;
-    static auto isFunctionDead(const ivm::IVFunctionType *function) -> bool;
+    static auto isInterfaceDead(const ivm::IVInterface *interface, const ivm::IVModel *ivModel) -> bool;
+    static auto isFunctionDead(const ivm::IVFunction *function) -> bool;
     static auto isSdlFunction(const ivm::IVFunction *function) -> bool;
 
     static inline const QString m_environmentImplementationName = "environment";

@@ -33,6 +33,8 @@
 #include <shared/sharedlibrary.h>
 #include <tmc/TmcInterfaceViewOptimizer/interfaceviewoptimizer.h>
 
+using tmc::InterfaceViewOptimizer;
+
 std::unique_ptr<ivm::IVModel> importIvModel(const QString &filepath)
 {
     ivm::IVXMLReader reader;
@@ -81,6 +83,7 @@ int main(int argc, char *argv[])
     std::optional<QString> inputIvFilepath;
     std::optional<QString> outputIvFilepath;
     std::vector<QString> environmentFunctions;
+    std::vector<QString> keepFunctions;
 
     const QStringList args = app.arguments();
 
@@ -111,6 +114,9 @@ int main(int argc, char *argv[])
         } else if (arg == "-e" || arg == "--envfunc") {
             ++i;
             environmentFunctions.emplace_back(args[i]);
+        } else if (arg == "-k" || arg == "--keep") {
+            ++i;
+            keepFunctions.emplace_back(args[i]);
         } else if (arg == "-h" || arg == "--help") {
             qInfo("TASTE Model Chcecker InterfaceView optimizer");
             qInfo("Usage: tmcivoptimizer [OPTIONS]");
@@ -135,8 +141,22 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+    if (!environmentFunctions.empty() && !keepFunctions.empty()) {
+        qCritical("-e and -k arguments cannot be combined");
+        exit(EXIT_FAILURE);
+    }
+
     auto ivModel = importIvModel(*inputIvFilepath);
-    tmc::InterfaceViewOptimizer::optimizeModel(ivModel.get(), environmentFunctions);
+
+    if (!environmentFunctions.empty()) {
+        InterfaceViewOptimizer::optimizeModel(
+                ivModel.get(), environmentFunctions, InterfaceViewOptimizer::Mode::Environment);
+    } else if (!keepFunctions.empty()) {
+        InterfaceViewOptimizer::optimizeModel(ivModel.get(), keepFunctions, InterfaceViewOptimizer::Mode::Keep);
+    } else {
+        InterfaceViewOptimizer::optimizeModel(ivModel.get(), {}, InterfaceViewOptimizer::Mode::None);
+    }
+
     saveOptimizedInterfaceView(ivModel.get(), *outputIvFilepath);
 
     return EXIT_SUCCESS;
