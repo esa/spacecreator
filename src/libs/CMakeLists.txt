@@ -33,6 +33,7 @@ add_subdirectory(testgenerator)
 # conversion
 add_subdirectory(conversion)
 add_subdirectory(seds)
+add_subdirectory(simulink)
 add_subdirectory(promela)
 add_subdirectory(tmc)
 

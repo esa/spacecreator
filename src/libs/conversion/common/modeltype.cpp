@@ -41,6 +41,8 @@ const QString &modelTypeToString(ModelType modelType)
         return ModelTypeProperties<ModelType::Sdl>::name;
     case ModelType::Seds:
         return ModelTypeProperties<ModelType::Seds>::name;
+    case ModelType::Simulink:
+        return ModelTypeProperties<ModelType::Simulink>::name;
     default:
         static const auto unhandled = QStringLiteral("unhandled model type name");
         return unhandled;
@@ -68,6 +70,8 @@ const QStringList &modelTypeExtensions(ModelType modelType)
         return ModelTypeProperties<ModelType::Sdl>::extensions;
     case ModelType::Seds:
         return ModelTypeProperties<ModelType::Seds>::extensions;
+    case ModelType::Simulink:
+        return ModelTypeProperties<ModelType::Simulink>::extensions;
     default:
         static const QStringList unhandled = { QStringLiteral("unhandled model type extension") };
         return unhandled;
@@ -81,6 +85,9 @@ ModelType stringToModelType(const QString &s)
     }
     if (!s.compare(ModelTypeProperties<ModelType::Seds>::name, Qt::CaseInsensitive)) {
         return conversion::ModelType::Seds;
+    }
+    if (!s.compare(ModelTypeProperties<ModelType::Simulink>::name, Qt::CaseInsensitive)) {
+        return conversion::ModelType::Simulink;
     }
     if (!s.compare(ModelTypeProperties<ModelType::InterfaceView>::name, Qt::CaseInsensitive)) {
         return conversion::ModelType::InterfaceView;
