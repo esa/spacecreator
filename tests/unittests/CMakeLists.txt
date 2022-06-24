@@ -15,7 +15,6 @@ add_subdirectory(sdl)
 add_subdirectory(seds)
 add_subdirectory(shared)
 add_subdirectory(spacecreatorsystem)
-add_subdirectory(functiontesterplugin)
 
 if(${QTC_FOUND})
     add_subdirectory(testgenerator)
