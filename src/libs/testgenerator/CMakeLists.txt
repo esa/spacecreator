@@ -3,7 +3,8 @@ project(TestGenerator VERSION 1.0.0 LANGUAGES CXX)
 add_library(TestGenerator STATIC)
 
 target_sources(TestGenerator
-    PRIVATE     datareconstructor/datareconstructor.cpp
+    PRIVATE     testgenerator.cpp
+                datareconstructor/datareconstructor.cpp
                 datareconstructor/datareconstructor.h
                 gdbconnector/gdbconnector.cpp
                 gdbconnector/gdbconnector.h
@@ -29,9 +30,12 @@ target_include_directories(TestGenerator
 target_link_libraries(TestGenerator
     PRIVATE     ivcore
                 dvcore
+                libiveditor
+                libdveditor
                 qobjectlistmodel
                 CsvImporter
                 CommonProjectWarnings
+                CommonTools
 )
 
 add_format_target(TestGenerator)

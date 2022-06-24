@@ -23,3 +23,34 @@
 #include "harness/ivgenerator/ivgenerator.h"
 #include "testdrivergenerator/testdrivergenerator.h"
 #include "testdrivergenerator/testdrivergeneratorexception.h"
+
+namespace testgenerator {
+
+class TestGenerator final
+{
+public:
+    TestGenerator(const QString &baseDirectory);
+    auto testUsingDataFromCsv(ivm::IVInterface &interface, const csv::CsvModel &csvModel,
+            Asn1Acn::Asn1Model &asn1Model, float delta) -> void;
+private:
+    auto initializePaths(const QString &baseDirectory) -> void;
+    auto exportDvModel(dvm::DVModel *dvModel, const QString &outputFilename) -> void;
+    auto exportIvModel(ivm::IVModel *ivModel, const QString &outputFilename) -> void;
+    auto getDvObjectsFromModel(dvm::DVModel *const model) -> std::unique_ptr<QVector<dvm::DVObject *>>;
+    auto copyRecursively(const QString &srcPath, const QString &dstPath) -> bool;
+    auto runProcess(QString cmd, QStringList args, QString workingPath) -> void;
+    auto prepareTasteProjectSkeleton() -> void;
+    auto copyFunctionImplementations(const QString &functionName) -> void;
+    auto compileSystemUnderTest() -> void;
+    auto getAllFunctionsFromModel(const ivm::IVModel &ivModel) -> std::vector<ivm::IVFunction *>;
+    auto prepareTestHarnessFiles(ivm::IVInterface &interface,
+            const csv::CsvModel &csvModel, Asn1Acn::Asn1Model &asn1Model) -> QString;
+    
+    QString projectDirectory;
+    QString generatedPath;
+    QString generatedCodePath;
+    QString generatedIvPath;
+    QString generatedDvPath;
+};
+
+}

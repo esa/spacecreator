@@ -44,34 +44,14 @@ public:
     auto aboutToShutdown() -> ShutdownFlag override;
     auto testUsingDataFromCsvGui() -> void;
 private:
-    auto testUsingDataFromCsv(ivm::IVInterface &interface, const csv::CsvModel &csvModel,
-            Asn1Acn::Asn1Model &asn1Model, float delta) -> void;
     auto addTestInterfaceOption() -> void;
     auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
     auto loadCsv() -> std::unique_ptr<csv::CsvModel>;
-    auto getCurrentIvEditorCore() -> IVEditorCorePtr;
-    auto getSelectedInterface() -> ivm::IVInterface *;
     auto setDeltaDialog() -> float;
+    auto getSelectedInterface() -> ivm::IVInterface *;
     auto loadAsn1Model() -> std::unique_ptr<Asn1Acn::Asn1Model>;
-    auto exportDvModel(dvm::DVModel *dvModel, const QString &outputFilename) -> void;
-    auto exportIvModel(ivm::IVModel *ivModel, const QString &outputFilename) -> void;
-    auto getDvObjectsFromModel(dvm::DVModel *const model) -> std::unique_ptr<QVector<dvm::DVObject *>>;
     auto getBaseDirectory() -> QString;
-    auto copyRecursively(const QString &srcPath, const QString &dstPath) -> bool;
-    auto runProcess(QString cmd, QStringList args, QString workingPath) -> void;
-    auto extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Model &asn1Model) -> void;
-    auto prepareTasteProjectSkeleton() -> void;
-    auto copyFunctionImplementations(const QString &functionName) -> void;
-    auto compileSystemUnderTest() -> void;
-    auto initializePaths() -> void;
-    auto getAllFunctionsFromModel(const ivm::IVModel &ivModel) -> std::vector<ivm::IVFunction *>;
-    auto prepareTestHarnessFiles(ivm::IVInterface &interface,
-            const csv::CsvModel &csvModel, Asn1Acn::Asn1Model &asn1Model) -> QString;
-
-    QString projectDirectory;
-    QString generatedPath;
-    QString generatedCodePath;
-    QString generatedIvPath;
-    QString generatedDvPath;
+    auto getCurrentIvEditorCore() -> IVEditorCorePtr;
 };
+
 }
