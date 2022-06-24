@@ -25,7 +25,6 @@
 #include <QInputDialog>
 #include <QMenu>
 #include <QMessageBox>
-#include <QProcess>
 #include <conversion/common/model.h>
 #include <conversion/iv/IvXmlExporter/exporter.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
@@ -44,6 +43,7 @@
 #include <testgenerator/datareconstructor/datareconstructor.h>
 #include <testgenerator/gdbconnector/gdbconnector.h>
 #include <testgenerator/testgenerator.h>
+#include <testgenerator/gdbconnector/process.h>
 
 using namespace Core;
 using namespace testgenerator;
@@ -76,7 +76,7 @@ auto FunctionTesterPlugin::aboutToShutdown() -> ExtensionSystem::IPlugin::Shutdo
     return SynchronousShutdown;
 }
 
-auto FunctionTesterPlugin::testUsingDataFromCsv() -> void
+auto FunctionTesterPlugin::testUsingDataFromCsvGui() -> void
 {
     ivm::IVInterface *interface = getSelectedInterface();
     if (!interface) {
@@ -94,7 +94,7 @@ auto FunctionTesterPlugin::testUsingDataFromCsv() -> void
         return;
     }
     float delta = setDeltaDialog();
-    functionTesterPluginCore(*interface, *csvModel, *asn1Model, delta);
+    testUsingDataFromCsv(*interface, *csvModel, *asn1Model, delta);
 }
 
 auto FunctionTesterPlugin::initializePaths() -> void
@@ -106,11 +106,21 @@ auto FunctionTesterPlugin::initializePaths() -> void
     generatedDvPath = generatedPath + QDir::separator() + "deploymentview.dv.xml";
 }
 
-auto FunctionTesterPlugin::functionTesterPluginCore(ivm::IVInterface &interface, const csv::CsvModel &csvModel,
-        Asn1Acn::Asn1Model &asn1Model, float delta) -> void
+auto FunctionTesterPlugin::getAllFunctionsFromModel(const ivm::IVModel &ivModel) -> std::vector<ivm::IVFunction *>
 {
-    initializePaths();
+    QList<ivm::IVObject *> ivObjects = ivModel.visibleObjects();
+    std::vector<ivm::IVFunction *> ivFunctions = {};
+    for (const auto &ivObject : ivObjects) {
+        if (ivObject->isFunction()) {
+            ivFunctions.push_back(dynamic_cast<ivm::IVFunction *>(ivObject));
+        }
+    }
+    return ivFunctions;
+}
 
+auto FunctionTesterPlugin::prepareTestHarnessFiles(ivm::IVInterface &interface,
+        const csv::CsvModel &csvModel, Asn1Acn::Asn1Model &asn1Model) -> QString
+{
     QDir dir(generatedPath);
     dir.removeRecursively();
     dir.mkpath(".");
@@ -123,41 +133,40 @@ auto FunctionTesterPlugin::functionTesterPluginCore(ivm::IVInterface &interface,
         outFile.close();
     } catch (TestDriverGeneratorException &e) {
         MessageManager::write(GenMsg::msgInfo.arg("TestDriverGeneratorException: " + QString(e.what())));
-        return;
+        return {};
     }
 
     const auto ivModelGenerated = IvGenerator::generate(&interface);
     if (ivModelGenerated == nullptr) {
         MessageManager::write(GenMsg::msgInfo.arg("IV model was not generated"));
-        return;
+        return {};
     }
 
-    QList<ivm::IVObject *> ivObjects = ivModelGenerated->visibleObjects();
-    std::vector<ivm::IVFunction *> ivFunctions = {};
-
-    for (const auto &ivObject : ivObjects) {
-        if (ivObject->isFunction()) {
-            ivFunctions.push_back(dynamic_cast<ivm::IVFunction *>(ivObject));
-        }
-    }
-
+    std::vector<ivm::IVFunction *> ivFunctions = getAllFunctionsFromModel(*ivModelGenerated);
     exportIvModel(ivModelGenerated.get(), generatedIvPath);
 
     const std::unique_ptr<dvm::DVModel> dvModelGenerated =
             DvGenerator::generate(ivFunctions, "x86 Linux CPP", "x86_Linux_TestRunner", "Node_1", "hostPartition");
-
     if (dvModelGenerated == nullptr) {
         MessageManager::write(GenMsg::msgInfo.arg("DV model was not generated"));
+        return {};
+    }
+    exportDvModel(dvModelGenerated.get(), generatedDvPath);
+    constexpr int TESTED_FUNCTION_INDEX = 1;
+    return ivFunctions[TESTED_FUNCTION_INDEX]->title();
+}
+
+auto FunctionTesterPlugin::testUsingDataFromCsv(ivm::IVInterface &interface, const csv::CsvModel &csvModel,
+        Asn1Acn::Asn1Model &asn1Model, float delta) -> void
+{
+    initializePaths();
+    QString testedFunctionName = prepareTestHarnessFiles(interface, csvModel, asn1Model);
+    if (testedFunctionName.isEmpty()) {
         return;
     }
-
-    exportDvModel(dvModelGenerated.get(), generatedDvPath);
-
     prepareTasteProjectSkeleton();
-    constexpr int TESTED_FUNCTION_INDEX = 1;
-    copyFunctionImplementations(ivFunctions[TESTED_FUNCTION_INDEX]->title());
+    copyFunctionImplementations(testedFunctionName);
     compileSystemUnderTest();
-    // extractResult(interface, asn1Model);
 }
 
 auto FunctionTesterPlugin::copyRecursively(const QString &srcPath, const QString &dstPath) -> bool
@@ -187,13 +196,12 @@ auto FunctionTesterPlugin::copyRecursively(const QString &srcPath, const QString
 
 auto FunctionTesterPlugin::runProcess(QString cmd, QStringList args, QString workingPath) -> void
 {
-    QProcess process;
-    process.setWorkingDirectory(workingPath);
-    process.start(cmd, args);
-    process.waitForFinished(-1);
-    if (process.exitCode() != 0) {
-        qDebug() << "Error: " << process.exitCode() << process.readAllStandardError();
-        MessageManager::write(GenMsg::msgInfo.arg("Error: " + process.exitCode()));
+    Process process(cmd, args, workingPath);
+    auto p = process.get();
+    p->waitForFinished(-1);
+    if (p->exitCode() != 0) {
+        qDebug() << "Error: " << p->exitCode() << p->readAllStandardError();
+        MessageManager::write(GenMsg::msgInfo.arg("Error: " + p->exitCode()));
     } else {
         MessageManager::write(GenMsg::msgInfo.arg("Command: " + cmd + " finished"));
     }
@@ -287,7 +295,7 @@ auto FunctionTesterPlugin::addTestInterfaceOption() -> void
     ActionContainer *const acToolsFunctionTester = createActionContainerInTools(tr("&Test Interface"));
 
     const auto csvImportAction = new QAction(tr("Test using data from CSV"), this);
-    connect(csvImportAction, &QAction::triggered, [=]() { this->testUsingDataFromCsv(); });
+    connect(csvImportAction, &QAction::triggered, [=]() { this->testUsingDataFromCsvGui(); });
     Command *const csvImport = ActionManager::registerAction(csvImportAction, Constants::CSV_IMPORT_ID, allContexts);
     acToolsFunctionTester->addAction(csvImport);
 }
@@ -392,62 +400,6 @@ auto FunctionTesterPlugin::loadAsn1Model() -> std::unique_ptr<Asn1Acn::Asn1Model
         MessageManager::write(GenMsg::msgInfo.arg(tr("No ASN1 file found. Try to build the project first.")));
     }
     return modelPtr;
-}
-
-// TODO: this is draft
-QString byteToHexStr(const char byte)
-{
-    const int hexBase = 16;
-
-    const auto number = static_cast<uint_least8_t>(byte);
-    if (number < hexBase) {
-        return QString("0%1").arg(number, 1, hexBase);
-    } else {
-        return QString("%1").arg(number, 2, hexBase);
-    }
-}
-
-void printQByteArrayInHex(const QByteArray &array)
-{
-    QString arrayInHex = QString("QByteArray size: %1\n").arg(array.size());
-    for (int i = 0; i < array.size(); i++) {
-        arrayInHex += byteToHexStr(array.at(i));
-        arrayInHex += " ";
-
-        if ((i + 1) % 8 == 0) {
-            arrayInHex += "| ";
-        }
-
-        if ((i + 1) % 16 == 0) {
-            arrayInHex += "\n";
-        }
-    }
-
-    qDebug().noquote() << arrayInHex;
-}
-
-// TODO: fix and finish (doesnt work)
-auto FunctionTesterPlugin::extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Model &asn1Model) -> void
-{
-    const QString binLocalization =
-            generatedPath + QDir::separator() + "work" + QDir::separator() + "binaries" + QDir::separator();
-    // TODO: it is now absolute but later will be changed
-    const QString script =
-            "/home/taste/SpaceCreator/spacecreator/src/libs/testgenerator/gdbconnector/scripts/x86-linux-cpp.gdb";
-    const QString binToRun = "hostpartition";
-    const QByteArray rawTestData =
-            GdbConnector::getRawTestResults(binLocalization, { "-batch", "-x", script }, { "host:1234", binToRun });
-
-    const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
-        { "INTEGER", 4, 4 },
-        { "BOOLEAN", 1, 7 },
-        { "REAL", 8, 0 },
-    };
-    const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
-            rawTestData, &interface, &asn1Model, QDataStream::LittleEndian, typeLayoutInfos);
-
-    const int dataSize = readTestData.size();
-    printQByteArrayInHex(rawTestData);
 }
 
 } // namespace spctr
