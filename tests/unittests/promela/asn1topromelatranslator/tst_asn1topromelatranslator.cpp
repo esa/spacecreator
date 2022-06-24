@@ -700,7 +700,7 @@ void tst_Asn1ToPromelaTranslator::testChoice()
     QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "MyType_ch1");
     QCOMPARE(promelaModel.getTypeAliases().at(1).getName(), "MyType_ch2");
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 4);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 5);
     {
         const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
@@ -727,6 +727,18 @@ void tst_Asn1ToPromelaTranslator::testChoice()
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
+        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
+        QVERIFY(assignment != nullptr);
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_ch1_range_check");
+        QVERIFY(inlineDef != nullptr);
+    }
+    {
+        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "Mytype_selection_assign_value");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 2);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
     }

@@ -312,6 +312,17 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
 
     addAssignValueInline(utypeName, std::move(sequence));
 
+    {
+        model::Sequence seq(model::Sequence::Type::NORMAL);
+
+        Assignment assignment(VariableRef("dst"), Expression(VariableRef("src")));
+        seq.appendElement(std::make_unique<ProctypeElement>(std::move(assignment)));
+
+        QString selectionTypeName = utypeName.toLower();
+        selectionTypeName[0] = selectionTypeName[0].toUpper();
+        addAssignValueInline(QString("%1_selection").arg(selectionTypeName), std::move(seq));
+    }
+
     m_resultDataType = DataType(UtypeRef(utypeName));
 }
 
