@@ -75,6 +75,11 @@ public:
     static auto optimizeModel(ivm::IVModel *ivModel, const std::vector<QString> &functionNames, Mode mode) -> void;
 
 private:
+    static auto flattenModel(ivm::IVModel *ivModel) -> void;
+    static auto flattenConnections(ivm::IVFunctionType *function, ivm::IVModel *ivModel) -> void;
+    static auto shouldFlattenConnection(ivm::IVConnection *connection, ivm::IVFunctionType *function) -> bool;
+    static auto findLastConnection(ivm::IVConnection *connection, ivm::IVModel *ivModel) -> ivm::IVConnection *;
+
     static auto markAsEnvironment(ivm::IVFunction *function) -> void;
 
     static auto setGuiAsDefaultImplementation(ivm::IVFunction *function) -> void;
@@ -85,10 +90,13 @@ private:
     static auto removeDeadFunctions(ivm::IVModel *ivModel) -> void;
     static auto removeUnallowedInterfaces(ivm::IVFunction *function) -> void;
 
+    static auto isFunction(const shared::VEObject *object) -> bool;
+    static auto isFunctionType(const shared::VEObject *object) -> bool;
     static auto isConnectionDead(const ivm::IVConnection *connection) -> bool;
     static auto isInterfaceDead(const ivm::IVInterface *interface, const ivm::IVModel *ivModel) -> bool;
-    static auto isFunctionDead(const ivm::IVFunction *function) -> bool;
-    static auto isSdlFunction(const ivm::IVFunction *function) -> bool;
+    static auto isFunctionDead(const ivm::IVFunctionType *function) -> bool;
+    static auto isFunctionParent(const ivm::IVFunctionType *function) -> bool;
+    static auto isSdlFunction(const ivm::IVFunctionType *functionType) -> bool;
 
     static inline const QString m_environmentImplementationName = "environment";
     static inline const QString m_environmentImplementationType = "GUI";
