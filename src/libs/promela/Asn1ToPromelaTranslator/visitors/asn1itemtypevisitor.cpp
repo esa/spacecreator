@@ -245,6 +245,9 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
     const QString none = QString("%1_NONE").arg(utypeName);
     m_promelaModel.addValueDefinition(ValueDefinition(none, 0));
 
+    QString selectionTypeName = utypeName.toLower();
+    selectionTypeName[0] = selectionTypeName[0].toUpper();
+
     model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     utype.addField(Declaration(DataType(UtypeRef(nestedUtypeName)), "data"));
@@ -270,6 +273,8 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
 
         const QString fieldPresent = QString("%1_%2_PRESENT").arg(utypeName).arg(componentName);
         m_promelaModel.addValueDefinition(ValueDefinition(fieldPresent, index));
+        const QString selectionPresent = QString("%1_selection_%2_PRESENT").arg(selectionTypeName).arg(componentName);
+        m_promelaModel.addValueDefinition(ValueDefinition(selectionPresent, index));
         ++index;
         nestedUtype.addField(Declaration(nestedDataType.value(), componentName));
 
@@ -318,8 +323,6 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
         Assignment assignment(VariableRef("dst"), Expression(VariableRef("src")));
         seq.appendElement(std::make_unique<ProctypeElement>(std::move(assignment)));
 
-        QString selectionTypeName = utypeName.toLower();
-        selectionTypeName[0] = selectionTypeName[0].toUpper();
         addAssignValueInline(QString("%1_selection").arg(selectionTypeName), std::move(seq));
     }
 
