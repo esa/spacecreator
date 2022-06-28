@@ -24,7 +24,7 @@
 
 namespace promela::exporter {
 /**
- * @brief Visitor for exporting @link{::promela::model::ProctypeElement}
+ * @brief Visitor for exporting @link{model::ProctypeElement}
  */
 class ProctypeElementVisitor
 {
@@ -43,89 +43,95 @@ public:
      * @brief Visit ProctypeElement
      *
      * @param element ProctypeElement to visit*/
-    void visit(const ::promela::model::ProctypeElement &element);
+    void visit(const model::ProctypeElement &element);
 
     /**
      * @brief Handle Declaration
      *
      * @param declaration declaration to export
      */
-    void operator()(const ::promela::model::Declaration &declaration);
+    void operator()(const model::Declaration &declaration);
     /**
      * @brief Handle ChannelRecv
      *
      * @param channelRecv ChannelRecv to export
      */
-    void operator()(const ::promela::model::ChannelRecv &channelRecv);
+    void operator()(const model::ChannelRecv &channelRecv);
     /**
      * @brief Handle ChannelSend
      *
      * @param channelSend ChannelSend to export
      */
-    void operator()(const ::promela::model::ChannelSend &channelSend);
+    void operator()(const model::ChannelSend &channelSend);
     /**
      * @brief Handle Expression
      *
      * @param expression Expression to export
      */
-    void operator()(const ::promela::model::Expression &expression);
+    void operator()(const model::Expression &expression);
     /**
      * @brief Handle DoLoop
      *
      * @param doLoop DoLoop to export
      */
-    void operator()(const ::promela::model::DoLoop &doLoop);
+    void operator()(const model::DoLoop &doLoop);
     /**
      * @brief Handle Assignment
      *
      * @param assignment Assignment to export
      */
-    void operator()(const ::promela::model::Assignment &assignment);
+    void operator()(const model::Assignment &assignment);
     /**
      * @brief Handle InlineCall
      *
      * @param inlineCall InlineCall to export
      */
-    void operator()(const ::promela::model::InlineCall &inlineCall);
+    void operator()(const model::InlineCall &inlineCall);
     /**
      * @brief Handle Skip
      *
      * @param skip Skip to export
      */
-    void operator()(const ::promela::model::Skip &skip);
+    void operator()(const model::Skip &skip);
     /**
      * @brief Handle ExitLoop (break)
      *
      * @param skip ExitLoop to export
      */
-    void operator()(const ::promela::model::ExitLoop &exitLoop);
+    void operator()(const model::ExitLoop &exitLoop);
     /**
      * @brief Handle Conditional
      *
      * @param ifStatement Conditional to export
      */
-    void operator()(const ::promela::model::Conditional &conditional);
+    void operator()(const model::Conditional &conditional);
     /**
      * @brief Handle Sequence
      *
      * @param sequence Sequence to export
      */
-    void operator()(const ::promela::model::Sequence &sequence);
+    void operator()(const model::Sequence &sequence);
     /**
      * @brief Handle For Loop
      *
      * @param loop ForLoop to export
      */
-    void operator()(const ::promela::model::ForLoop &loop);
+    void operator()(const model::ForLoop &loop);
     /**
      * @brief Handle select
      *
      * @param select Select to export
      */
-    void operator()(const ::promela::model::Select &select);
+    void operator()(const model::Select &select);
+    /**
+     * @brief Handle Assert Call
+     *
+     * @param call AssertCall to export
+     */
+    void operator()(const model::AssertCall &call);
 
 private:
-    QString expressionContentToString(const ::promela::model::Expression &expression);
+    QString expressionContentToString(const model::Expression &expression);
 
     QTextStream &m_stream;
     const QString m_baseIndent;

@@ -44,9 +44,7 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
     checkSourceModelCount(sourceModels);
 
     const bool enhancedSpinSupport = options.isSet(PromelaOptions::enhancedSpinSupport);
-
     const bool asn1ValueGeneration = options.isSet(PromelaOptions::asn1ValueGeneration);
-
     const std::vector<QString> valueGeneration = options.values(PromelaOptions::asn1ValueGenerationForType);
 
     const auto *asn1Model = getModel<Asn1Model>(sourceModels);
@@ -92,7 +90,7 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
 }
 
 std::vector<std::unique_ptr<conversion::Model>> Asn1ToPromelaTranslator::generateValueGenerationInlines(
-        const ::Asn1Acn::Asn1Model *model, const QStringList &typeNames) const
+        const Asn1Acn::Asn1Model *model, const QStringList &typeNames) const
 {
     std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
     for (const std::unique_ptr<File> &file : model->data()) {

@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/InterfaceDeclarations">
+    <DataTypeSet>
+      <IntegerDataType name="PackageInteger">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="DeterminantType">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="1" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="PackageInterfaceDecl">
+        <CommandSet>
+          <Command name="SyncCommand" mode="sync">
+            <Argument name="ArgA" type="PackageInteger" mode="in" />
+            <Argument name="ArgB" type="PackageInteger" mode="in" />
+            <Argument name="ArrayArg" type="PackageInteger" mode="out">
+              <ArrayDimensions>
+                <Dimension size="12" />
+              </ArrayDimensions>
+            </Argument>
+          </Command>
+          <Command name="InArgsOnly" mode="async">
+            <Argument name="ArgA" type="PackageInteger" mode="in" />
+            <Argument name="ArgB" type="PackageInteger" mode="in" />
+            <Argument name="ArrayArg" type="PackageInteger" mode="in">
+              <ArrayDimensions>
+                <Dimension size="3" />
+                <Dimension size="3" />
+                <Dimension size="3" />
+              </ArrayDimensions>
+            </Argument>
+          </Command>
+          <Command name="OutArgsOnly" mode="async">
+            <Argument name="ArgA" type="PackageInteger" mode="out" />
+            <Argument name="ArgB" type="PackageInteger" mode="out" />
+            <Argument name="ArrayArg" type="PackageInteger" mode="out">
+              <ArrayDimensions>
+                <Dimension size="3" />
+                <Dimension size="3" />
+                <Dimension size="3" />
+              </ArrayDimensions>
+            </Argument>
+          </Command>
+          <Command name="InAndNotify" mode="async">
+            <Argument name="InputArg" type="PackageInteger" mode="in" />
+            <Argument name="NotifyArg" type="PackageInteger" mode="notify" />
+          </Command>
+        </CommandSet>
+      </Interface>
+      <Interface name="PackageGenericInterfaceDecl">
+        <GenericTypeSet>
+          <GenericType name="GenericDeterminant" />
+          <GenericType name="Generic1" />
+          <GenericType name="Generic2" />
+          <GenericType name="Generic3" />
+        </GenericTypeSet>
+        <ParameterSet>
+          <Parameter name="ReadOnlyAsync" type="Generic1" mode="async" readOnly="true"/>
+          <Parameter name="ReadOnlySync" type="Generic1" mode="sync" readOnly="true"/>
+          <Parameter name="ReadWriteAsync" type="Generic1" mode="async" readOnly="false"/>
+          <Parameter name="ReadWriteSync" type="Generic1" mode="sync" readOnly="false"/>
+        </ParameterSet>
+        <CommandSet>
+          <Command name="SyncCommand" mode="sync">
+            <Argument name="ArgX" type="PackageInteger" mode="in">
+              <ArrayDimensions>
+                <Dimension size="2" />
+              </ArrayDimensions>
+            </Argument>
+            <Argument name="ArgA" type="Generic1" mode="in" />
+            <Argument name="ArgB" type="Generic2" mode="in" />
+          </Command>
+          <Command name="InArgsOnly" mode="async">
+            <Argument name="ArgX" type="PackageInteger" mode="in" />
+            <Argument name="ArgA" type="Generic1" mode="in" />
+            <Argument name="DeterminantArg" type="GenericDeterminant" mode="in" />
+            <Argument name="ArgB" type="Generic2" mode="in" />
+            <Argument name="ArgC" type="Generic3" mode="in" />
+          </Command>
+          <Command name="OutArgsOnly" mode="async">
+            <Argument name="ArgX" type="PackageInteger" mode="out" />
+            <Argument name="ArgA" type="Generic1" mode="out" />
+            <Argument name="DeterminantArg" type="GenericDeterminant" mode="out" />
+            <Argument name="ArgB" type="Generic2" mode="out" />
+            <Argument name="ArgC" type="Generic3" mode="out" />
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="Component">
+        <DataTypeSet>
+          <IntegerDataType name="ComponentInteger">
+            <IntegerDataEncoding encoding="unsigned" sizeInBits="8" byteOrder="littleEndian" />
+            <Range>
+              <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+            </Range>
+          </IntegerDataType>
+        </DataTypeSet>
+        <DeclaredInterfaceSet>
+          <Interface name="ComponentInterfaceDecl">
+            <CommandSet>
+              <Command name="SyncCommand" mode="sync">
+                <Argument name="ArgA" type="PackageInteger" mode="in" />
+                <Argument name="ArgB" type="PackageInteger" mode="in" />
+                <Argument name="ArrayArg" type="PackageInteger" mode="out">
+                  <ArrayDimensions>
+                    <Dimension size="13" />
+                  </ArrayDimensions>
+                </Argument>
+              </Command>
+              <Command name="InArgsOnly" mode="async">
+                <Argument name="ArgA" type="PackageInteger" mode="in">
+                  <ArrayDimensions>
+                    <Dimension size="3" />
+                  </ArrayDimensions>
+                </Argument>
+                <Argument name="ArgB" type="ComponentInteger" mode="in" />
+                <Argument name="ArrayArg" type="PackageInteger" mode="in">
+                  <ArrayDimensions>
+                    <Dimension size="3" />
+                    <Dimension size="3" />
+                    <Dimension size="3" />
+                  </ArrayDimensions>
+                </Argument>
+              </Command>
+              <Command name="OutArgsOnly" mode="async">
+                <Argument name="ArgA" type="PackageInteger" mode="out" />
+                <Argument name="ArgB" type="ComponentInteger" mode="out" />
+                <Argument name="ArrayArg" type="PackageInteger" mode="out">
+                  <ArrayDimensions>
+                    <Dimension size="10" />
+                  </ArrayDimensions>
+                </Argument>
+              </Command>
+              <Command name="InAndNotify" mode="async">
+                <Argument name="InputArg" type="PackageInteger" mode="in" />
+                <Argument name="NotifyArg" type="ComponentInteger" mode="notify" />
+              </Command>
+            </CommandSet>
+          </Interface>
+        </DeclaredInterfaceSet>
+        <ProvidedInterfaceSet>
+          <Interface name="GenericInterfaceImpl" type="PackageGenericInterfaceDecl">
+            <GenericTypeMapSet>
+              <GenericTypeMap name="Generic1" type="PackageInteger"/>
+              <AlternateSet>
+                <Alternate>
+                  <GenericTypeMap name="Generic2" type="ComponentInteger" fixedValue="12"/>
+                  <GenericTypeMap name="GenericDeterminant" type="DeterminantType" fixedValue="0"/>
+                  <GenericTypeMap name="Generic3" type="PackageInteger"/>
+                </Alternate>
+                <Alternate>
+                  <GenericTypeMap name="Generic2" type="PackageInteger" fixedValue="42"/>
+                  <GenericTypeMap name="GenericDeterminant" type="DeterminantType" fixedValue="1"/>
+                  <GenericTypeMap name="Generic3" type="ComponentInteger"/>
+                </Alternate>
+              </AlternateSet>
+            </GenericTypeMapSet>
+          </Interface>
+        </ProvidedInterfaceSet>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

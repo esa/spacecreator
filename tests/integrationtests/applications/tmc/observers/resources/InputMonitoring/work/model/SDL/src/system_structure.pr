@@ -17,7 +17,7 @@ system Model;
    signal trigger (MyInteger);
 
    /* CIF Keep Specific Geode PARAMNAMES y */
-   signal action (MyInteger);
+   signal action (MyIntegerBigger);
 
    channel c
       from env to Model with trigger;

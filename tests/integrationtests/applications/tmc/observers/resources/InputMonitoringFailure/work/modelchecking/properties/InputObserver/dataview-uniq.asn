@@ -1,7 +1,7 @@
 Model-Datamodel DEFINITIONS ::=
 BEGIN
 IMPORTS
-   MyInteger FROM INPUTMONITORING-DATAVIEW
+   MyInteger, MyIntegerBigger FROM INPUTMONITORING-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
 
 Model-States ::= ENUMERATED {s1}
@@ -10,7 +10,7 @@ Model-Context ::= SEQUENCE {
    state Model-States,
    init-done BOOLEAN,
    x MyInteger,
-   y MyInteger
+   y MyIntegerBigger
 }
 
 END
@@ -18,7 +18,8 @@ END
 INPUTMONITORING-DATAVIEW DEFINITIONS ::=
 BEGIN
 
-   MyInteger ::= INTEGER (0 .. 10)
+   MyInteger ::= INTEGER (0 .. 5)
+   MyIntegerBigger ::= INTEGER (0 .. 10)
 
 END
 
@@ -53,7 +54,7 @@ BEGIN
       
       
       --  ASN.1 modules used by thread model_trigger
-      MyInteger FROM INPUTMONITORING-DATAVIEW
+      MyIntegerBigger FROM INPUTMONITORING-DATAVIEW
       
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
@@ -84,14 +85,14 @@ BEGIN
          action SEQUENCE { y MyInteger}
       },
       msg-out CHOICE {
-         trigger SEQUENCE { z MyInteger }
+         trigger SEQUENCE { z MyIntegerBigger }
       }
    }
    
    Model-Event ::= CHOICE {
       msg-in CHOICE {
          input-none SEQUENCE {},
-         trigger SEQUENCE { z MyInteger}
+         trigger SEQUENCE { z MyIntegerBigger }
       },
       msg-out CHOICE {
          action SEQUENCE { y MyInteger }

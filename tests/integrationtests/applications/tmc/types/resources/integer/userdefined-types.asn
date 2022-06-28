@@ -1,0 +1,7 @@
+USERDEFINED-TYPES-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+    MyInteger ::= INTEGER (0 .. 10)
+    MyBetterInteger ::= MyInteger (2 .. 5)
+END
+

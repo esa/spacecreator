@@ -45,7 +45,7 @@ public:
      *
      * @param typeAlias value of TypeAlias
      */
-    void operator()(const ::promela::model::TypeAlias &typeAlias);
+    void operator()(const model::TypeAlias &typeAlias);
 
     /**
      * @brief operator for BasicType
@@ -54,7 +54,7 @@ public:
      *
      * @param basicType value of BasicType
      */
-    void operator()(const ::promela::model::BasicType &basicType);
+    void operator()(const model::BasicType &basicType);
     /**
      * @brief operator for UtypeRef
      *
@@ -62,7 +62,7 @@ public:
      *
      * @param utypeRef value of UtypeRef
      */
-    void operator()(const ::promela::model::UtypeRef &utypeRef);
+    void operator()(const model::UtypeRef &utypeRef);
 
 private:
     QTextStream &m_stream;

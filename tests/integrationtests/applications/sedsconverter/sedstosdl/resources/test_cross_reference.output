@@ -3,7 +3,7 @@ process FunComponent;
     /* CIF Text (0, 150), (400, 500) */
     dcl X IntegerType;
     dcl Y IntegerType;
-    dcl Io_funcomponentinterface_funcommand_pi FunCommand_Type;
+    dcl Io_funcomponentinterface_funcommand_pi FunInterface_FunCommand_Type;
     /* CIF ENDTEXT */
     /* CIF Start (0, 900), (200, 75) */
     START;

@@ -22,7 +22,7 @@ inline MyOctetString_generate_value(MyOctetString_gv)
 {
     int i;
     MyOctetString_length_generate_value(MyOctetString_gv.length);
-    for(i : 0 .. MyOctetString_gv.length - 1)
+    for(i : 0 .. (MyOctetString_gv.length - 1))
     {
         OctetStringElement_generate_value(MyOctetString_gv.data[i]);
     }

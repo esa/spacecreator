@@ -43,7 +43,7 @@ public:
      *
      * @param utype Utype to visit
      */
-    void visit(const ::promela::model::Utype &utype);
+    void visit(const model::Utype &utype);
 
 private:
     QTextStream &m_stream;

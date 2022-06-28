@@ -82,8 +82,9 @@ bool XmlReader::readFile(const QString &file)
 {
     d->m_file = file;
     QFile in(file);
-    if (in.exists(file) && in.open(QFile::ReadOnly | QFile::Text))
+    if (in.exists(file) && in.open(QFile::ReadOnly | QFile::Text)) {
         return read(&in);
+    }
 
     setErrorString(QString("Can't open file %1: %2").arg(file, in.errorString()));
     return false;

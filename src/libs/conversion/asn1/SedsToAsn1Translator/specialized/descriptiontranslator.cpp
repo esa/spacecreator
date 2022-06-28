@@ -31,31 +31,26 @@
 
 namespace conversion::asn1::translator {
 
-void DescriptionTranslator::translate(const seds::model::Description &sedsDescription, Asn1Acn::Node *asn1Node)
+void DescriptionTranslator::translate(const seds::model::Description *sedsDescription, Asn1Acn::Node *asn1Node)
 {
+    if (sedsDescription == nullptr) {
+        return;
+    }
+
     auto description = combineDescriptions(sedsDescription);
     asn1Node->setComment(std::move(description));
 }
 
-void DescriptionTranslator::translate(const seds::model::DataType &sedsDataType, Asn1Acn::Node *asn1Node)
+QString DescriptionTranslator::combineDescriptions(const seds::model::Description *sedsDescription)
 {
-    const seds::model::Description *sedsDescription = nullptr;
-    std::visit([&](const auto &type) { sedsDescription = &type; }, sedsDataType);
+    auto description = sedsDescription->shortDescription().value_or("");
 
-    auto description = combineDescriptions(*sedsDescription);
-    asn1Node->setComment(std::move(description));
-}
-
-QString DescriptionTranslator::combineDescriptions(const seds::model::Description &sedsDescription)
-{
-    auto description = sedsDescription.shortDescription().value_or("");
-
-    if (sedsDescription.longDescription()) {
+    if (sedsDescription->longDescription()) {
         if (!description.isEmpty()) {
             description += "\n";
         }
 
-        description += sedsDescription.longDescription().value();
+        description += sedsDescription->longDescription().value();
     }
 
     return description;

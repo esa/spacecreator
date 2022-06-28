@@ -3,8 +3,8 @@ process Comparator;
     /* CIF Text (0, 150), (400, 500) */
     dcl X Number;
     dcl Y Number;
-    dcl Io_asynccomparator_less_pi Less_Type;
-    dcl Io_asynccomparator_less_ri Less_Type1;
+    dcl Io_asynccomparator_less_pi AsyncComparatorType_Less_Type;
+    dcl Io_asynccomparator_less_ri AsyncComparatorType_Less_TypeNotify;
     /* CIF ENDTEXT */
     /* CIF Procedure (0, 900), (800, 50) */
     procedure NotifyLess;

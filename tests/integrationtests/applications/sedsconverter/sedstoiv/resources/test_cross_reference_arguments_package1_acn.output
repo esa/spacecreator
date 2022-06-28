@@ -1,40 +1,14 @@
 COM-N7SPACE-PACKAGE1 DEFINITIONS ::= BEGIN
 NiceItem [size 8, encoding pos-int, endianness big]
 SyncItemArrayArray-10 []
-MappedSyncItemArray-10 []
-AsyncCommandNoMapping-Type []
+MegaInterface-AsyncCommandNoMapping-Type []
 {
     argumentNoMapping []
 }
 AsyncItemArrayArray-10 []
-AsyncCommandNoMappingArray-Type []
+MegaInterface-AsyncCommandNoMappingArray-Type []
 {
     arrayArgumentNoMapping []
-}
-AsyncCommandSimpleMapping-Type []
-{
-    argumentSimpleMapping []
-}
-MappedAsyncItemArray-10 []
-AsyncCommandSimpleMappingArray-Type []
-{
-    arrayArgumentSimpleMapping []
-}
-ProvidedInterface-AlternateGenericType <DeterminantItem:determinant> []
-{
-    concrete-AlternateItem1 [size 8, encoding pos-int, endianness big, present-when determinant==0],
-    concrete-AlternateItem2 [size 8, encoding pos-int, endianness big, present-when determinant==1]
-}
-AsyncCommandAlternateMapping-Type []
-{
-    genericArgument1 COM-N7SPACE-PACKAGE2.DeterminantItem [],
-    genericArgument2 <genericArgument1>[]
-}
-ProvidedInterface-AlternateGenericTypeArray-10 []
-AsyncCommandAlternateMappingArray-Type []
-{
-    genericArgument1 COM-N7SPACE-PACKAGE2.DeterminantItem [],
-    genericArgument2 <genericArgument1>[]
 }
 END
 

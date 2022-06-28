@@ -28,7 +28,6 @@
 #include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/iv/SedsToIvTranslator/interfacetranslatorhelper.h>
-#include <conversion/iv/SedsToIvTranslator/specialized/componentstranslator.h>
 #include <conversion/iv/SedsToIvTranslator/translator.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
@@ -37,7 +36,6 @@
 
 using conversion::Escaper;
 using conversion::asn1::translator::SedsToAsn1Translator;
-using conversion::iv::translator::ComponentsTranslator;
 using conversion::iv::translator::InterfaceTranslatorHelper;
 using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::MissingInterfaceViewFunctionException;
@@ -250,7 +248,7 @@ static inline auto buildCommandMapInternal(Context &context, const bool isProvid
     }
 
     for (const auto &baseInterface : intefaceDeclaration.baseInterfaces()) {
-        const auto &baseIntefaceDeclaration = ComponentsTranslator::findInterfaceDeclaration(
+        const auto &baseIntefaceDeclaration = InterfaceTranslatorHelper::findInterfaceDeclaration(
                 baseInterface.type(), context.sedsComponent(), &context.sedsPackage(), context.sedsPackages());
         buildCommandMapInternal(context, isProvided, interfaceName, baseIntefaceDeclaration);
     }
@@ -272,12 +270,12 @@ auto StateMachineTranslator::setInitialVariableValues(
 auto StateMachineTranslator::buildCommandMap(Context &context) -> void
 {
     for (const auto &interface : context.sedsComponent().providedInterfaces()) {
-        const auto &intefaceDeclaration = ComponentsTranslator::findInterfaceDeclaration(
+        const auto &intefaceDeclaration = InterfaceTranslatorHelper::findInterfaceDeclaration(
                 interface.type(), context.sedsComponent(), &context.sedsPackage(), context.sedsPackages());
         buildCommandMapInternal(context, true, interface.nameStr(), intefaceDeclaration);
     }
     for (const auto &interface : context.sedsComponent().requiredInterfaces()) {
-        const auto &intefaceDeclaration = ComponentsTranslator::findInterfaceDeclaration(
+        const auto &intefaceDeclaration = InterfaceTranslatorHelper::findInterfaceDeclaration(
                 interface.type(), context.sedsComponent(), &context.sedsPackage(), context.sedsPackages());
         buildCommandMapInternal(context, false, interface.nameStr(), intefaceDeclaration);
     }
@@ -340,16 +338,6 @@ auto StateMachineTranslator::translateVariables(
         const auto variableName = Escaper::escapeSdlVariableName(variable.nameStr());
         const auto variableType = variable.type();
         const auto variableTypeName = Escaper::escapeAsn1TypeName(variableType.nameStr());
-
-        const auto asn1Definitions = variableType.packageStr()
-                ? SedsToAsn1Translator::getAsn1Definitions(*variableType.packageStr(), context.asn1Model()->data())
-                : SedsToAsn1Translator::getAsn1Definitions(
-                          context.sedsPackage().nameStr(), context.asn1Model()->data());
-
-        const auto *referencedType = asn1Definitions->type(variableTypeName);
-        if (referencedType == nullptr) {
-            throw MissingAsn1TypeDefinitionException(variableTypeName);
-        }
 
         auto sdlVariable =
                 std::make_unique<::sdl::VariableDeclaration>(variableName, Escaper::escapeSdlName(variableTypeName));
@@ -796,12 +784,13 @@ auto StateMachineTranslator::translateTransition(Context &context, const seds::m
             currentTransitionPtr->addAction(
                     StatementTranslatorVisitor::translateActivityCall(context.sdlProcess(), **onEntry));
         }
-        const auto timerTime = getTimerInvocationTime(sedsStateMachine, sedsTransition.toState().nameStr());
-        if (timerTime.has_value()) {
-            currentTransitionPtr->addAction(
-                    createTimerSetCall(timerName(sedsTransition.toState().nameStr()), *timerTime));
-        }
     }
+
+    const auto timerTime = getTimerInvocationTime(sedsStateMachine, sedsTransition.toState().nameStr());
+    if (timerTime.has_value()) {
+        currentTransitionPtr->addAction(createTimerSetCall(timerName(sedsTransition.toState().nameStr()), *timerTime));
+    }
+
     // State switch
     currentTransitionPtr->addAction(std::make_unique<::sdl::NextState>("", sdlToState));
 

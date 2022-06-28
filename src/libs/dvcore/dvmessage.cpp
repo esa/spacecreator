@@ -19,8 +19,10 @@
 
 #include "abstractsystemchecks.h"
 #include "dvconnection.h"
+#include "dvfunction.h"
 #include "dvmodel.h"
 #include "dvnode.h"
+#include "errorhub.h"
 
 #include <QDebug>
 
@@ -29,6 +31,24 @@ namespace dvm {
 DVMessage::DVMessage(QObject *parent)
     : DVObject(DVObject::Type::Message, {}, parent)
 {
+}
+
+bool DVMessage::postInit()
+{
+    auto nodeHasFunction = [&](DVNode *node, const QString &func) -> bool {
+        if (!node) {
+            shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Message %1 has invalid node").arg(title()));
+            return false;
+        }
+        if (!node->containsFunction(func)) {
+            shared::ErrorHub::addError(shared::ErrorItem::Error,
+                    tr("Message %1 has invalid source function '%2.%3'").arg(title(), node->title(), func));
+            return false;
+        }
+        return true;
+    };
+
+    return nodeHasFunction(fromNode(), fromFunction()) && nodeHasFunction(toNode(), toFunction());
 }
 
 QString DVMessage::titleUI() const
@@ -48,7 +68,7 @@ void DVMessage::setFromFunction(const QString &from)
 
 QStringList DVMessage::fromFunctionPath() const
 {
-    return pathOfFunction(fromFunction());
+    return pathOfFunction(fromFunction(), fromNode());
 }
 
 QString DVMessage::fromInterface() const
@@ -63,7 +83,7 @@ void DVMessage::setFromInterface(const QString &from)
 
 DVNode *DVMessage::fromNode() const
 {
-    auto connection = qobject_cast<const DVConnection *>(this);
+    auto connection = qobject_cast<const DVConnection *>(parent());
     if (!connection) {
         return nullptr;
     }
@@ -82,7 +102,7 @@ void DVMessage::setToFunction(const QString &to)
 
 QStringList DVMessage::toFunctionPath() const
 {
-    return pathOfFunction(toFunction());
+    return pathOfFunction(toFunction(), toNode());
 }
 
 QString DVMessage::toInterface() const
@@ -97,22 +117,26 @@ void DVMessage::setToInterface(const QString &to)
 
 DVNode *DVMessage::toNode() const
 {
-    auto connection = qobject_cast<const DVConnection *>(this);
+    auto connection = qobject_cast<const DVConnection *>(parent());
     if (!connection) {
         return nullptr;
     }
     return connection->targetNode();
 }
 
-QStringList DVMessage::pathOfFunction(const QString &functionName) const
+QStringList DVMessage::pathOfFunction(const QString &functionName, DVNode *node) const
 {
-    if (model()) {
-        AbstractSystemChecks *queries = model()->ivQueries();
-        if (queries) {
-            return queries->functionPath(functionName);
+    Q_ASSERT(node != nullptr);
+
+    for (const DVPartition *partition : node->partitions()) {
+        for (const DVFunction *func : partition->functions()) {
+            if (func->title() == functionName) {
+                return func->path();
+            }
         }
     }
-    return {};
+
+    return { functionName };
 }
 
 } // namespace dvm

@@ -40,7 +40,6 @@
 #include "types/typereadingvisitor.h"
 #include "types/userdefinedtype.h"
 #include "variableref.h"
-#include "visitors/asn1constraintvisitor.h"
 
 #include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
@@ -227,6 +226,19 @@ void tst_Asn1ToPromelaTranslator_Env::testInteger() const
     QVERIFY(std::holds_alternative<Assignment>((*statement)->getValue()));
 }
 
+void tst_Asn1ToPromelaTranslator_Env::testIntegerWithConstraints() const
+{
+    const QString inputAsnFilename = "integer-with-constraints.asn";
+    const QStringList asnTypesToTranslate = {
+        "MyInt",
+    };
+    const QString actualOutputFilename = "integer-with-constraints.pml";
+    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
+
+    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
+    compareTextFiles(actualOutputFilename, expectedOutputFilename);
+}
+
 void tst_Asn1ToPromelaTranslator_Env::testEnumerated() const
 {
     auto model = createModel();
@@ -397,6 +409,19 @@ void tst_Asn1ToPromelaTranslator_Env::testChoiceAnonymous() const
         "SimpleChoiceWithAnonymousTypes",
     };
     const QString actualOutputFilename = "choice-anonymous.pml";
+    const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
+
+    translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);
+    compareTextFiles(actualOutputFilename, expectedOutputFilename);
+}
+
+void tst_Asn1ToPromelaTranslator_Env::testChoiceSub() const
+{
+    const QString inputAsnFilename = "choice-sub.asn";
+    const QStringList asnTypesToTranslate = {
+        "ConcreteChoice",
+    };
+    const QString actualOutputFilename = "choice-sub.pml";
     const QString expectedOutputFilename = QString("%1.out").arg(actualOutputFilename);
 
     translateAsnToPromela(inputAsnFilename, asnTypesToTranslate, actualOutputFilename);

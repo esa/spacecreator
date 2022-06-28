@@ -26,4 +26,5 @@ target_link_libraries(${TEST_NAME}
 add_format_target(${TEST_NAME})
 
 configure_file(resources/interfaceview.xml resources/interfaceview.xml COPYONLY)
+configure_file(resources/interfaceview_default_iface_name.xml resources/interfaceview_default_iface_name.xml COPYONLY)
 configure_file(resources/config.xml resources/config.xml COPYONLY)

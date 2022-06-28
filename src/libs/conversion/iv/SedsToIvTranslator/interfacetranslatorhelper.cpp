@@ -23,26 +23,18 @@
 
 #include <asn1library/asn1/typeassignment.h>
 #include <asn1library/asn1/types/sequence.h>
-#include <conversion/asn1/SedsToAsn1Translator/specialized/datatypetranslatorvisitor.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
+#include <conversion/iv/SedsToIvTranslator/translator.h>
 #include <seds/SedsModel/types/arraydatatype.h>
 #include <seds/SedsModel/types/dimensionsize.h>
 #include <shared/parameter.h>
 
 using conversion::UnhandledValueException;
 using conversion::translator::TranslationException;
+using conversion::translator::UndeclaredInterfaceException;
 
 namespace conversion::iv::translator {
-
-const QString InterfaceTranslatorHelper::m_interfaceParameterEncoding = "ACN";
-const QString InterfaceTranslatorHelper::m_ivParameterInterfaceNameTemplate = "%1_%2_%3_%4";
-const QString InterfaceTranslatorHelper::m_ivCommandInterfaceNameTemplate = "%1_%2_%3";
-const QString InterfaceTranslatorHelper::m_asn1ArrayNameTemplate = "%1Array-%2";
-const QString InterfaceTranslatorHelper::m_bundledTypeNameTemplate = "%1-Type%2";
-const QString InterfaceTranslatorHelper::m_alternateTypeNameTemplate = "%1-%2";
-const QString InterfaceTranslatorHelper::m_getterInterfacePrefix = "Get";
-const QString InterfaceTranslatorHelper::m_setterInterfacePrefix = "Set";
 
 ivm::IVInterface *InterfaceTranslatorHelper::createIvInterface(const QString &name,
         ivm::IVInterface::InterfaceType type, ivm::IVInterface::OperationKind kind,
@@ -65,38 +57,6 @@ shared::InterfaceParameter InterfaceTranslatorHelper::createInterfaceParameter(
 {
     return shared::InterfaceParameter(
             name, shared::BasicParameter::Type::Other, typeName, m_interfaceParameterEncoding, direction);
-}
-
-QString InterfaceTranslatorHelper::createArrayType(const seds::model::DataTypeRef &baseTypeRef,
-        const std::vector<seds::model::DimensionSize> &dimensions, Asn1Acn::Definitions *asn1Definitions,
-        const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
-        const std::vector<seds::model::Package> &sedsPackages, const std::optional<uint64_t> &sequenceSizeThreshold)
-{
-    const auto &baseTypeName = baseTypeRef.nameStr();
-    const auto name = buildArrayTypeName(baseTypeName, dimensions);
-
-    const auto foundAsn1Array = asn1Definitions->type(name);
-    if (foundAsn1Array != nullptr) {
-        return name;
-    }
-
-    seds::model::ArrayDataType sedsArray;
-    sedsArray.setName(name);
-    sedsArray.setType(baseTypeRef);
-
-    for (auto dimension : dimensions) {
-        sedsArray.addDimension(std::move(dimension));
-    }
-
-    asn1::translator::DataTypeTranslatorVisitor dataTypeVisitor(
-            asn1Definitions, sedsPackage, asn1Files, sedsPackages, sequenceSizeThreshold);
-    dataTypeVisitor(sedsArray);
-
-    auto asn1ArrayAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
-            name, name, Asn1Acn::SourceLocation(), dataTypeVisitor.consumeResultType());
-    asn1Definitions->addType(std::move(asn1ArrayAssignment));
-
-    return name;
 }
 
 QString InterfaceTranslatorHelper::buildParameterInterfaceName(const QString &sedsInterfaceName,
@@ -128,43 +88,47 @@ QString InterfaceTranslatorHelper::buildCommandInterfaceName(
             m_ivCommandInterfaceNameTemplate.arg(sedsInterfaceName).arg(commandName).arg(interfaceTypeToString(type)));
 }
 
-QString InterfaceTranslatorHelper::buildArrayTypeName(
-        const QString &baseTypeName, const std::vector<seds::model::DimensionSize> &dimensions)
+const seds::model::InterfaceDeclaration &InterfaceTranslatorHelper::findInterfaceDeclaration(
+        const seds::model::InterfaceDeclarationRef &interfaceDeclarationRef,
+        const seds::model::Component &sedsComponent, const seds::model::Package *sedsPackage,
+        const std::vector<seds::model::Package> &sedsPackages)
 {
-    const auto dimensionSizeFunc = [&](const seds::model::DimensionSize &dimension) {
-        if (dimension.size()) {
-            return QString::number(dimension.size()->value());
-        } else if (dimension.indexTypeRef()) {
-            return dimension.indexTypeRef()->nameStr();
-        } else {
-            return QString();
+    const auto &name = interfaceDeclarationRef.nameStr();
+
+    if (interfaceDeclarationRef.packageStr()) {
+        const auto otherSedsPackage =
+                SedsToIvTranslator::getSedsPackage(*interfaceDeclarationRef.packageStr(), sedsPackages);
+
+        const auto &sedsPackageInterfaceDeclarations = otherSedsPackage->declaredInterfaces();
+        const auto found =
+                std::find_if(sedsPackageInterfaceDeclarations.begin(), sedsPackageInterfaceDeclarations.end(),
+                        [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
+                            return interfaceDeclaration.nameStr() == name;
+                        });
+        if (found != sedsPackageInterfaceDeclarations.end()) {
+            return *found;
         }
-    };
-
-    const auto dimensionSuffix = std::accumulate(std::next(dimensions.begin()), dimensions.end(),
-            dimensionSizeFunc(dimensions.front()), [&](const auto &acc, const seds::model::DimensionSize &dimension) {
-                return acc + "x" + dimensionSizeFunc(dimension);
-            });
-
-    return Escaper::escapeAsn1TypeName(m_asn1ArrayNameTemplate.arg(baseTypeName).arg(dimensionSuffix));
-}
-
-QString InterfaceTranslatorHelper::buildBundledTypeName(
-        const QString &sedsCommandName, const std::size_t cachedTypesCount)
-{
-    const auto sedsCommandNameEscaped = Escaper::escapeAsn1TypeName(sedsCommandName);
-
-    if (cachedTypesCount == 0) {
-        return m_bundledTypeNameTemplate.arg(sedsCommandNameEscaped).arg("");
     } else {
-        return m_bundledTypeNameTemplate.arg(sedsCommandNameEscaped).arg(cachedTypesCount);
-    }
-}
+        const auto &sedsComponentInterfaceDeclarations = sedsComponent.declaredInterfaces();
+        auto found = std::find_if(sedsComponentInterfaceDeclarations.begin(), sedsComponentInterfaceDeclarations.end(),
+                [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
+                    return interfaceDeclaration.nameStr() == name;
+                });
+        if (found != sedsComponentInterfaceDeclarations.end()) {
+            return *found;
+        }
 
-QString InterfaceTranslatorHelper::buildAlternateTypeName(
-        const QString &sedsInterfaceName, const QString &genericTypeName)
-{
-    return m_alternateTypeNameTemplate.arg(sedsInterfaceName).arg(genericTypeName);
+        const auto &sedsPackageInterfaceDeclarations = sedsPackage->declaredInterfaces();
+        found = std::find_if(sedsPackageInterfaceDeclarations.begin(), sedsPackageInterfaceDeclarations.end(),
+                [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
+                    return interfaceDeclaration.nameStr() == name;
+                });
+        if (found != sedsPackageInterfaceDeclarations.end()) {
+            return *found;
+        }
+    }
+
+    throw UndeclaredInterfaceException(interfaceDeclarationRef.value().pathStr());
 }
 
 ivm::IVInterface::InterfaceType InterfaceTranslatorHelper::switchInterfaceType(

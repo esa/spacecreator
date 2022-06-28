@@ -1,0 +1,3 @@
+PARAMETERS DEFINITIONS ::= BEGIN
+MyInteger [size 8, encoding pos-int, endianness big]
+END

@@ -14,7 +14,7 @@
         <GenericTypeSet>
           <GenericType name="SyncGenericType" />
           <GenericType name="AsyncGenericType" />
-          <GenericType name="AlternateGenericType1" />
+          <GenericType name="AlternateGenericType" />
           <GenericType name="DeterminantGenericType" />
         </GenericTypeSet>
         <ParameterSet>

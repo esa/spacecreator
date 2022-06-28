@@ -19,8 +19,6 @@
 
 #pragma once
 
-class QString;
-
 #include <QString>
 #include <QStringList>
 #include <set>

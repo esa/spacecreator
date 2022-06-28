@@ -1,7 +1,7 @@
 <InterfaceView>
 <Function name="Component" is_type="NO" language="SDL" default_implementation="default">
 <Provided_Interface name="ProvidedInterface_SyncCommandSimpleMapping_Pi" kind="Protected" layer="default">
-    <Input_Parameter name="ArgumentSimpleMapping" type="MappedItem" encoding="ACN"/>
+    <Input_Parameter name="ArgumentSimpleMapping" type="ChildInterface-GenericType" encoding="ACN"/>
 </Provided_Interface>
 <Provided_Interface name="Get_ProvidedInterface_BaseParam_Pi" kind="Protected" layer="default">
     <Output_Parameter name="Param" type="ParamItem" encoding="ACN"/>

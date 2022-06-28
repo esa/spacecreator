@@ -20,6 +20,7 @@
 #include "common.h"
 
 #include <algorithm>
+#include <conversion/common/escaper/escaper.h>
 #include <ivcore/ivfunction.h>
 
 namespace conversion::sdl::translator {
@@ -189,6 +190,25 @@ auto Context::getActivityInfo(const QString &name) -> const ActivityInfo *
         return &m_activityInfos[name];
     }
     return nullptr;
+}
+
+Asn1Acn::Definitions *Context::getAsn1Definitions(const QString &definitionsName) const
+{
+    const auto asn1FileName = Escaper::escapeAsn1PackageName(definitionsName);
+    const auto &asn1Files = m_asn1Model->data();
+
+    auto asn1File = std::find_if(
+            std::begin(asn1Files), std::end(asn1Files), [&](const auto &file) { return file->name() == asn1FileName; });
+    if (asn1File == asn1Files.end()) {
+        return nullptr;
+    }
+
+    auto *asn1Definitions = (*asn1File)->definitions(asn1FileName);
+    if (!asn1Definitions) {
+        return nullptr;
+    }
+
+    return asn1Definitions;
 }
 
 }

@@ -4,8 +4,8 @@ process Calculator;
     dcl X Number;
     dcl Y Number;
     dcl Tmp Number;
-    dcl Io_asynccalculator_add_pi Add_Type;
-    dcl Io_asynccalculator_add_ri Add_Type1;
+    dcl Io_asynccalculator_add_pi AsyncCalculatorType_Add_Type;
+    dcl Io_asynccalculator_add_ri AsyncCalculatorType_Add_TypeNotify;
     /* CIF ENDTEXT */
     /* CIF Procedure (0, 900), (800, 50) */
     procedure AddAndNotify;

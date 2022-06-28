@@ -19,8 +19,8 @@
 
 #include "valueassignmentvisitor.h"
 
-#include "asn1constraintvisitor.h"
 #include "sequencecomponentvaluevisitor.h"
+#include "sizeconstraintvisitor.h"
 
 #include <asn1library/asn1/choicevalue.h>
 #include <asn1library/asn1/multiplevalue.h>
@@ -69,7 +69,7 @@ using promela::model::VariableRef;
 
 namespace promela::translator {
 ValueAssignmentVisitor::ValueAssignmentVisitor(
-        Value *value, ::promela::model::Sequence &sequence, const VariableRef &target, QString typeName)
+        Value *value, model::Sequence &sequence, const VariableRef &target, QString typeName)
     : m_value(value)
     , m_sequence(sequence)
     , m_target(target)
@@ -189,8 +189,8 @@ void ValueAssignmentVisitor::visit(const SequenceOf &type)
         throw ConverterException("Invalid value for SEQUENCEOF datatype");
     }
 
-    Asn1ConstraintVisitor<IntegerValue> constraintVisitor;
-    type.constraints().accept(constraintVisitor);
+    SizeConstraintVisitor<IntegerValue> sizeConstraintVisitor;
+    type.constraints().accept(sizeConstraintVisitor);
 
     const auto multipleValue = dynamic_cast<const MultipleValue *>(m_value);
     const auto &values = multipleValue->values();
@@ -205,7 +205,7 @@ void ValueAssignmentVisitor::visit(const SequenceOf &type)
         type.itemsType()->accept(visitor);
     }
 
-    if (constraintVisitor.getMaxSize() != constraintVisitor.getMinSize()) {
+    if (sizeConstraintVisitor.getMaxSize() != sizeConstraintVisitor.getMinSize()) {
         auto target = m_target;
         target.appendElement("length");
 

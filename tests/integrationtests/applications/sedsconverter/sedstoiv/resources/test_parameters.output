@@ -16,6 +16,10 @@
     <Input_Parameter name="Param" type="MyInteger" encoding="ACN"/>
 </Provided_Interface>
 
+<Provided_Interface name="Get_ProvidedInterface_ArrayParameter_Pi" kind="Protected" layer="default">
+    <Output_Parameter name="Param" type="MegaComponent-ProvidedInterface-GenericTypeArray-3" encoding="ACN"/>
+</Provided_Interface>
+
 <Required_Interface name="Get_ProvidedInterface_ReadOnlyAsync_Ri" kind="Sporadic" layer="default">
     <Input_Parameter name="Param" type="MyInteger" encoding="ACN"/>
     <Property name="Taste::Autonamed" value="false"/>

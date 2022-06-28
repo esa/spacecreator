@@ -1,0 +1,21 @@
+COM-N7SPACE-INTERFACEINHERITANCE2 DEFINITIONS ::= BEGIN
+IMPORTS
+PackageInteger FROM COM-N7SPACE-INTERFACEINHERITANCE1
+;
+OtherInteger ::= INTEGER(0 .. 255)
+OtherFloat ::= REAL(-3.40282e+38 .. 3.40282e+38)
+InterfaceDecl4-Generic2 ::= OtherInteger(0 .. 255)
+InterfaceDecl4-Generic2Array-3 ::= SEQUENCE (SIZE(3)) OF InterfaceDecl4-Generic2(0 .. 255)
+InterfaceDecl4-Generic3 ::= OtherFloat(-3.40282e+38 .. 3.40282e+38)
+InterfaceDecl4-Async3-Type ::= SEQUENCE
+{
+    arg1 InterfaceDecl4-Generic3(-3.40282e+38 .. 3.40282e+38),
+    arg2 InterfaceDecl4-Generic3(-3.40282e+38 .. 3.40282e+38)
+}
+InterfaceDecl4-Generic2Array-2 ::= SEQUENCE (SIZE(2)) OF InterfaceDecl4-Generic2(0 .. 255)
+InterfaceDecl4-Async2-Type ::= SEQUENCE
+{
+    arg1 PackageInteger(0 .. 255),
+    arg2 InterfaceDecl4-Generic2(0 .. 255)
+}
+END

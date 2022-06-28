@@ -16,7 +16,6 @@ rm -r -f $TEST_OUTPUT_DIR
 mkdir $TEST_OUTPUT_DIR
 
 # Translate
-# gdb --args \
 $SEDS_CONVERTER --from SEDS --to InterfaceView --aux-models ASN.1 --skip-validation -i resources/test_command_arguments.xml \
   --out $TEST_OUTPUT_DIR/interfaceview.xml --iv-config resources/config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/
 
@@ -26,5 +25,7 @@ cd $TEST_OUTPUT_DIR
 # the reference and allows to succesfully generate derived artefacts
 $DIFF interfaceview.xml ../resources/test_command_arguments.output \
   && $DIFF COM-N7SPACE-COMMANDARGUMENTS.asn ../resources/test_command_arguments.asn \
+  && $DIFF COM-N7SPACE-COMMANDARGUMENTS-COMPONENT.asn ../resources/test_command_arguments_component.asn \
+  && asn1scc -c COM-N7SPACE-COMMANDARGUMENTS.asn COM-N7SPACE-COMMANDARGUMENTS.acn COM-N7SPACE-COMMANDARGUMENTS-COMPONENT.asn COM-N7SPACE-COMMANDARGUMENTS-COMPONENT.acn\
   && cd .. \
   && rm -r -f $TEST_OUTPUT_DIR

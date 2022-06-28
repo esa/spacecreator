@@ -21,6 +21,7 @@
 
 #include "generictypemapper.h"
 #include "interfacetranslatorhelper.h"
+#include "interfacetypenamehelper.h"
 
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivinterface.h>
@@ -48,10 +49,10 @@ public:
      *
      * @param   ivFunction          Output interface view function
      * @param   sedsInterfaceName   Parent interface name
-     * @param   genericTypeMapper   Generic type mapper
+     * @param   typeNameHelper      Helper for ASN.1 type names
      */
-    InterfaceParameterTranslator(
-            ivm::IVFunction *ivFunction, const QString &sedsInterfaceName, const GenericTypeMapper *typeMapper);
+    InterfaceParameterTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
+            const InterfaceTypeNameHelper &typeNameHelper);
     /**
      * @brief   Deleted copy constructor
      */
@@ -98,12 +99,11 @@ private:
     ivm::IVFunction *m_ivFunction;
     /// @brief  Parent SEDS interface name
     const QString &m_sedsInterfaceName;
-
-    /// @brief  Generic type mapper
-    const GenericTypeMapper *m_typeMapper;
+    /// @brief  Helper for ASN.1 names
+    const InterfaceTypeNameHelper &m_typeNameHelper;
 
     /// @brief  Name for the argument in the IV interface
-    static const QString m_ivInterfaceParameterName;
+    inline static const QString m_ivInterfaceParameterName = "Param";
 };
 
 } // namespace conversion::iv::translator

@@ -1,0 +1,34 @@
+<InterfaceView asn1file="userdefined-types.asn">
+<Function name="Pinger" is_type="NO" language="GUI" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="21500 18100 50200 26400"/>
+<Required_Interface name="BoolInterface" kind="Sporadic" layer="default" priority="1" wcet="0" queue_size="1" miat="0" stack_size="1024">
+    <Input_Parameter name="boolArg" type="MyBetterBoolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="36100 26400"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Function name="Receiver" is_type="NO" language="SDL" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="21100 35700 50300 45500"/>
+<Provided_Interface name="BoolInterface" kind="Sporadic" layer="default" priority="1" wcet="0" queue_size="1" miat="0" stack_size="1024">
+    <Input_Parameter name="boolArg" type="MyBetterBoolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="36100 35700"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Connection >
+    <Source func_name="Pinger" ri_name="BoolInterface"/>
+    <Target func_name="Receiver" pi_name="BoolInterface"/>
+    <Property name="Taste::coordinates" value="36100 27000 36100 35400"/>
+</Connection>
+
+</InterfaceView>

@@ -46,6 +46,18 @@ public:
      */
     void addEnvironmentFunctions(const std::vector<QString> &environmentFunctions);
     /**
+     * @brief   Set global input vector length limit
+     *
+     * @param   limit   Limit to set
+     */
+    void setGlobalInputVectorLengthLimit(std::optional<QString> limit);
+    /**
+     * @brief   Set per interface input vector length limits
+     *
+     * @param   limits  Limits to set
+     */
+    void setInterfaceInputVectorLengthLimits(std::unordered_map<QString, QString> limits);
+    /**
      * @brief Add Stop Condition files to verifier.
      *
      * @param files A list of paths with Stop Condition files.

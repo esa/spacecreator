@@ -1,0 +1,25 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Receiver;
+    /* CIF TEXT (1334, 60), (354, 143) */
+    -- Text area for declarations and comments
+    
+    dcl seqOfArg MyBetterSequenceOf;
+    dcl seqOfValue MyBetterSequenceOf := { 1 };
+    dcl  seqOfHandled T_Boolean := false;
+    /* CIF ENDTEXT */
+    /* CIF START (402, 12), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (402, 67), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (866, 36), (70, 35) */
+    state Wait;
+        /* CIF input (793, 93), (216, 40) */
+        input SequenceOfInterface(seqOfArg);
+            /* CIF task (818, 153), (165, 35) */
+            task seqOfValue := seqOfArg;
+            /* CIF task (825, 208), (151, 35) */
+            task seqOfHandled := true;
+            /* CIF NEXTSTATE (866, 263), (70, 35) */
+            NEXTSTATE Wait;
+    endstate;
+endprocess Receiver;

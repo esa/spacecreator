@@ -15,6 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "dvfunction.h"
 #include "dvnode.h"
 #include "dvpartition.h"
 
@@ -28,6 +29,7 @@ class tst_DVNode : public QObject
 private Q_SLOTS:
     void init();
     void testnewPartitionNameName();
+    void testContainsFunction();
 
 private:
     QScopedPointer<dvm::DVNode> m_node;
@@ -57,6 +59,19 @@ void tst_DVNode::testnewPartitionNameName()
     m_node->removePartition(partition1);
     delete partition1;
     QCOMPARE(m_node->newPartitionName(), "Partition_3");
+}
+
+void tst_DVNode::testContainsFunction()
+{
+    auto partition = new dvm::DVPartition(m_node.data());
+    m_node->addPartition(partition);
+
+    auto dvfunc = new dvm::DVFunction();
+    dvfunc->setTitle("MyFunc");
+    partition->addFunction(dvfunc);
+
+    QCOMPARE(m_node->containsFunction("MyFunc"), true);
+    QCOMPARE(m_node->containsFunction("dummy"), false);
 }
 
 QTEST_APPLESS_MAIN(tst_DVNode)

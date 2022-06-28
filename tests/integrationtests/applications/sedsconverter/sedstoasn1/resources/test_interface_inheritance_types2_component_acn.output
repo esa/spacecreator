@@ -1,0 +1,12 @@
+COM-N7SPACE-INTERFACEINHERITANCE2-COMPONENT DEFINITIONS ::= BEGIN
+ComponentInteger [size 8, encoding pos-int]
+Component-InterfaceImplementation-Generic2 []
+Component-InterfaceImplementation-Generic2Array-5 []
+Component-InterfaceImplementation-Generic3 []
+Component-InterfaceImplementation-Generic3Array-5 []
+Component-InterfaceImplementation-Async5-Type []
+{
+    arg1 [],
+    arg2 []
+}
+END

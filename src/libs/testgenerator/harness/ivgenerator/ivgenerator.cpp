@@ -159,7 +159,9 @@ auto IvGenerator::makeTestDriverRequiredIface(
     throwOnNullpointer(ifaceUnderTest);
     throwOnNullpointer(testDriverFunction);
 
-    ivm::IVInterface::CreationInfo ci = ivm::IVInterface::CreationInfo::fromIface(ifaceUnderTest);
+    ivm::IVInterface::CreationInfo ci =
+            ivm::IVInterface::CreationInfo::initFromIface(ifaceUnderTest, ivm::IVInterface::CreationInfo::Policy::Init);
+
     ci.model = testDriverFunction->model();
     ci.function = testDriverFunction;
     ci.type = ivm::IVInterface::InterfaceType::Required;
@@ -176,7 +178,9 @@ auto IvGenerator::makeTestDriverRequiredIface(
 auto IvGenerator::makeFunctionUnderTestProvidedInterface(
         ivm::IVInterface *const ifaceUnderTest, ivm::IVFunction *const functionUnderTest) -> ivm::IVInterface *
 {
-    ivm::IVInterface::CreationInfo ci = ivm::IVInterface::CreationInfo::fromIface(ifaceUnderTest);
+    ivm::IVInterface::CreationInfo ci =
+            ivm::IVInterface::CreationInfo::initFromIface(ifaceUnderTest, ivm::IVInterface::CreationInfo::Policy::Init);
+
     ci.function = functionUnderTest;
 
     auto *const iface = ivm::IVInterface::createIface(ci);

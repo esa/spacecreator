@@ -23,15 +23,12 @@
   </DataTypeSet>
   <DeclaredInterfaceSet>
     <Interface name="ChildInterface">
-      <GenericTypeSet>
-        <GenericType name="GenericInteger" />
-      </GenericTypeSet>
       <BaseInterfaceSet>
-          <Interface type="BaseInterface">
-            <GenericTypeMapSet>
-              <GenericTypeMap name="GenericInteger" type="BaseInteger"/>
-            </GenericTypeMapSet>
-          </Interface>
+        <Interface type="BaseInterface">
+          <GenericTypeMapSet>
+            <GenericTypeMap name="GenericInteger" type="BaseInteger"/>
+          </GenericTypeMapSet>
+        </Interface>
       </BaseInterfaceSet>
       <ParameterSet>
         <Parameter name="ChildParam" type="GenericInteger" mode="sync" readOnly="true"/>
@@ -44,15 +41,12 @@
       </CommandSet>
     </Interface>
     <Interface name="BaseInterface">
-      <GenericTypeSet>
-        <GenericType name="GenericInteger" />
-      </GenericTypeSet>
       <BaseInterfaceSet>
-          <Interface type="MegaInterface">
-            <GenericTypeMapSet>
-              <GenericTypeMap name="GenericInteger" type="MegaInteger"/>
-            </GenericTypeMapSet>
-          </Interface>
+        <Interface type="MegaInterface">
+          <GenericTypeMapSet>
+            <GenericTypeMap name="GenericInteger" type="MegaInteger"/>
+          </GenericTypeMapSet>
+        </Interface>
       </BaseInterfaceSet>
       <ParameterSet>
         <Parameter name="BaseParam" type="GenericInteger" mode="sync" readOnly="true"/>

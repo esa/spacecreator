@@ -51,4 +51,9 @@ bool operator!=(const DataTypeRef &lhs, const DataTypeRef &rhs)
     return !(lhs == rhs);
 }
 
+bool operator<(const DataTypeRef &lhs, const DataTypeRef &rhs)
+{
+    return lhs.m_value < rhs.m_value;
+}
+
 } // namespace seds::model

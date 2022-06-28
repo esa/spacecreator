@@ -35,4 +35,5 @@ $DIFF COM-N7SPACE-PATCHED.asn ../resources/test_patched_entries_asn.output \
         asn1crt_encoding.c \
         asn1crt_encoding_uper.c \
     && ./patchedentries \
-    && rm -r -f $TEST_OUTPUT_DIR
+    && cd .. \
+    && rm -rf $TEST_OUTPUT_DIR

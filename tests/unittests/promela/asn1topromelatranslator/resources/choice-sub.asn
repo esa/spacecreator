@@ -1,0 +1,12 @@
+WithComponents DEFINITIONS ::= BEGIN
+
+MyChoice ::= CHOICE
+{
+    firstOption INTEGER (0..2),
+    secondOption INTEGER(0..3),
+    thirdOption INTEGER(0..4)
+}
+
+ConcreteChoice ::= MyChoice (WITH COMPONENTS { firstOption, thirdOption })
+
+END

@@ -1,0 +1,7 @@
+COM-N7SPACE-ARRAYS-COMPONENT DEFINITIONS ::= BEGIN
+IMPORTS
+DataItem FROM COM-N7SPACE-ARRAYS
+;
+ComponentBasicArray1D ::= SEQUENCE (SIZE(15)) OF DataItem(0 .. 255)
+ComponentArrayWithIndexDataRef ::= SEQUENCE (SIZE(16)) OF DataItem(0 .. 255)
+END

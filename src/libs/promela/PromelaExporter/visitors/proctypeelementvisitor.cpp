@@ -27,6 +27,7 @@
 #include "sequencevisitor.h"
 #include "variablerefvisitor.h"
 
+using promela::model::AssertCall;
 using promela::model::Assignment;
 using promela::model::ChannelRecv;
 using promela::model::ChannelSend;
@@ -203,10 +204,20 @@ void ProctypeElementVisitor::operator()(const ForLoop &loop)
         variableRefVisitor.visit(loop.getArrayRef());
         m_stream << ")\n";
     }
-    SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
-    m_stream << m_indent << visitor.getSequencePrefix(*loop.getSequence()) << "{\n";
-    visitor.visit(*loop.getSequence(), false);
-    m_stream << m_indent << "}\n";
+
+    auto &sequence = loop.getSequence();
+
+    if (sequence->getType() != Sequence::Type::NORMAL) {
+        SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent + m_baseIndent);
+        m_stream << m_indent << "{\n" << m_baseIndent << m_indent << visitor.getSequencePrefix(*sequence) << "{\n";
+        visitor.visit(*sequence, false);
+        m_stream << m_baseIndent << m_indent << "}\n" << m_indent << "}\n";
+    } else {
+        SequenceVisitor visitor(m_stream, m_baseIndent, m_sequenceIndent, m_indent);
+        m_stream << m_indent << "{\n";
+        visitor.visit(*sequence, false);
+        m_stream << m_indent << "}\n";
+    }
 }
 
 void ProctypeElementVisitor::operator()(const Select &select)
@@ -221,7 +232,19 @@ void ProctypeElementVisitor::operator()(const Select &select)
     m_stream << " : " << beginExpr << " .. " << endExpr << ");\n";
 }
 
-QString ProctypeElementVisitor::expressionContentToString(const ::promela::model::Expression &expression)
+void ProctypeElementVisitor::operator()(const AssertCall &call)
+{
+    m_stream << m_indent;
+
+    m_stream << "assert(";
+
+    ExpressionVisitor visitor(m_stream);
+    visitor.visit(call.expression());
+
+    m_stream << ");\n";
+}
+
+QString ProctypeElementVisitor::expressionContentToString(const model::Expression &expression)
 {
     const Expression::Value &content = expression.getContent();
 

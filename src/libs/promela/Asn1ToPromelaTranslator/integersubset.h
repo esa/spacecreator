@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <list>
 #include <optional>
 #include <utility>
@@ -41,6 +42,13 @@ namespace promela::translator {
 class IntegerSubset
 {
 public:
+    /** @brief  Typedef for underlying integer type */
+    using IntegerType = int64_t;
+    /** @brief  Typedef for integer range */
+    using Range = std::pair<IntegerType, IntegerType>;
+    /** @brief  Typedef for integer range list */
+    using RangeList = std::list<Range>;
+
     /**
      * @brief Constructor.
      *
@@ -48,7 +56,7 @@ public:
      *
      * @param singleValue - number which will be included in subset.
      */
-    explicit IntegerSubset(int singleValue);
+    explicit IntegerSubset(IntegerType singleValue);
     /**
      * @brief Constructor.
      *
@@ -57,7 +65,7 @@ public:
      * @param minValue - minimum value of Range
      * @param maxValue - maximum value of Range
      */
-    explicit IntegerSubset(int minValue, int maxValue);
+    explicit IntegerSubset(IntegerType minValue, IntegerType maxValue);
 
     /**
      * @brief Calculate sum of two integer subsets.
@@ -92,27 +100,27 @@ public:
      *
      * @return Minimum number of subset or nullopt if subset is empty
      */
-    std::optional<int> getMin() const noexcept;
+    std::optional<IntegerType> getMin() const noexcept;
     /**
      * @brief Get maximum number of subset.
      *
      * @return Maximum number of subset or nullopt if subset is empty
      */
-    std::optional<int> getMax() const noexcept;
+    std::optional<IntegerType> getMax() const noexcept;
 
     /**
      * @brief Get sorted list of continuous ranges included into subset
      *
      * @return List of ranges.
      */
-    const std::list<std::pair<int, int>> &getRanges() const noexcept;
+    const RangeList &getRanges() const noexcept;
 
 private:
     IntegerSubset();
     void mergeOverlappingNeighbours();
 
 private:
-    std::list<std::pair<int, int>> m_allowedValues;
+    RangeList m_allowedValues;
 };
 
 }

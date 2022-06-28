@@ -296,6 +296,15 @@ public:
      */
     auto getActivityInfo(const QString &name) -> const ActivityInfo *;
 
+    /**
+     * @brief   Gets ASN.1 definitions from the ASN.1 model
+     *
+     * @param   definitionsName     Definitions name
+     *
+     * @return  ASN.1 definitions
+     */
+    auto getAsn1Definitions(const QString &definitionsName) const -> Asn1Acn::Definitions *;
+
 private:
     const seds::model::Package &m_sedsPackage;
     const std::vector<seds::model::Package> &m_sedsPackages;

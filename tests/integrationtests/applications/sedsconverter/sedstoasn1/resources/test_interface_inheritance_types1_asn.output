@@ -1,0 +1,11 @@
+COM-N7SPACE-INTERFACEINHERITANCE1 DEFINITIONS ::= BEGIN
+PackageInteger ::= INTEGER(0 .. 255)
+PackageFloat ::= REAL(-3.40282e+38 .. 3.40282e+38)
+PackageFloatArray-1 ::= SEQUENCE (SIZE(1)) OF PackageFloat(-3.40282e+38 .. 3.40282e+38)
+PackageIntegerArray-1 ::= SEQUENCE (SIZE(1)) OF PackageInteger(0 .. 255)
+InterfaceDecl1-Async1-Type ::= SEQUENCE
+{
+    arg1 PackageInteger(0 .. 255),
+    arg2 PackageInteger(0 .. 255)
+}
+END

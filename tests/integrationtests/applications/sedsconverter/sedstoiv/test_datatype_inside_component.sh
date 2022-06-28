@@ -19,8 +19,8 @@ $SEDS_CONVERTER --from SEDS --to InterfaceView --aux-models ASN.1 --skip-validat
 # Compare and clean-up on success
 $DIFF $TEST_OUTPUT_DIR/PKG.asn resources/test_datatype_inside_component_asn1.output && \
     $DIFF $TEST_OUTPUT_DIR/PKG.acn resources/test_datatype_inside_component_acn1.output && \
-    asn1scc -c -o $TEST_OUTPUT_DIR $TEST_OUTPUT_DIR/PKG.asn $TEST_OUTPUT_DIR/PKG.acn && \
     $DIFF $TEST_OUTPUT_DIR/PKG-CONTAINER.asn resources/test_datatype_inside_component_asn2.output && \
     $DIFF $TEST_OUTPUT_DIR/PKG-CONTAINER.acn resources/test_datatype_inside_component_acn2.output && \
-    asn1scc -c -o $TEST_OUTPUT_DIR $TEST_OUTPUT_DIR/PKG-CONTAINER.asn $TEST_OUTPUT_DIR/PKG-CONTAINER.acn && \
+    asn1scc -c -o $TEST_OUTPUT_DIR $TEST_OUTPUT_DIR/PKG.asn $TEST_OUTPUT_DIR/PKG.acn \
+                                   $TEST_OUTPUT_DIR/PKG-CONTAINER.asn $TEST_OUTPUT_DIR/PKG-CONTAINER.acn && \
     rm -r -f $TEST_OUTPUT_DIR

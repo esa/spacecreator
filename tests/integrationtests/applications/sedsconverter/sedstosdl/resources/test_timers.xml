@@ -25,6 +25,7 @@
             <StateMachine name="StateMachine">
               <State name="StateB" />
               <State name="StateC" />
+              <State name="Idle" />
               <EntryState name="StateA" />
               <Transition fromState="StateA" toState="StateB" name="dummy">
                 <OnTimer nanosecondsAfterEntry="1000000" />
@@ -32,8 +33,11 @@
               <Transition fromState="StateB" toState="StateC" name="dummy">
                 <OnTimer nanosecondsAfterEntry="2000000" />
               </Transition>
-              <Transition fromState="StateC" toState="StateB" name="dummy">
+              <Transition fromState="StateC" toState="Idle" name="dummy">
                 <OnTimer nanosecondsAfterEntry="3000000" />
+              </Transition>
+              <Transition fromState="Idle" toState="Idle" name="dummy">
+                <OnTimer nanosecondsAfterEntry="4000000" />
               </Transition>
             </StateMachine>
           </StateMachineSet>

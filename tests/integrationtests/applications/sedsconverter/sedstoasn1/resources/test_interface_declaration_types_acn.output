@@ -1,0 +1,27 @@
+COM-N7SPACE-INTERFACEDECLARATIONS DEFINITIONS ::= BEGIN
+PackageInteger [size 8, encoding pos-int]
+DeterminantType [size 8, encoding pos-int]
+PackageIntegerArray-12 []
+PackageIntegerArray-3x3x3 []
+PackageInterfaceDecl-InArgsOnly-Type []
+{
+    argA [],
+    argB [],
+    arrayArg []
+}
+PackageInterfaceDecl-OutArgsOnly-Type []
+{
+    argA [],
+    argB [],
+    arrayArg []
+}
+PackageInterfaceDecl-InAndNotify-Type []
+{
+    inputArg []
+}
+PackageInterfaceDecl-InAndNotify-TypeNotify []
+{
+    notifyArg []
+}
+PackageIntegerArray-2 []
+END

@@ -1,0 +1,5 @@
+PARAMETERS-MEGACOMPONENT DEFINITIONS ::= BEGIN
+ComponentInteger [size 8, encoding pos-int, endianness big]
+MegaComponent-ProvidedInterface-GenericType []
+MegaComponent-ProvidedInterface-GenericTypeArray-3 []
+END

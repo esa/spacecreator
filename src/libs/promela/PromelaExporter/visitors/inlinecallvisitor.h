@@ -24,7 +24,7 @@
 
 namespace promela::exporter {
 /**
- * @brief Visitor for exporting @link{::promela::model::InlineCall}
+ * @brief Visitor for exporting @link{model::InlineCall}
  */
 class InlineCallVisitor final
 {
@@ -41,7 +41,7 @@ public:
      *
      * @param inlineCall InlineCall to visit
      */
-    void visit(const ::promela::model::InlineCall &inlineCall);
+    void visit(const model::InlineCall &inlineCall);
 
 private:
     QTextStream &m_stream;

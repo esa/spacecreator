@@ -23,5 +23,8 @@ cd $TEST_OUTPUT_DIR
 $DIFF interfaceview.xml ../resources/test_generic_type_mapping.output \
   && $DIFF TYPEMAPPING.asn ../resources/test_generic_type_mapping_asn.output \
   && $DIFF TYPEMAPPING.acn ../resources/test_generic_type_mapping_acn.output \
+  && $DIFF TYPEMAPPING-MEGACOMPONENT.asn ../resources/test_generic_type_mapping_component_asn.output \
+  && $DIFF TYPEMAPPING-MEGACOMPONENT.acn ../resources/test_generic_type_mapping_component_acn.output \
+  && asn1scc -c TYPEMAPPING.asn TYPEMAPPING.acn TYPEMAPPING-MEGACOMPONENT.asn TYPEMAPPING-MEGACOMPONENT.acn\
   && cd .. \
   && rm -r -f $TEST_OUTPUT_DIR

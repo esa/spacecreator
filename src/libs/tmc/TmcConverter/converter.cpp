@@ -131,6 +131,16 @@ void TmcConverter::addEnvironmentFunctions(const std::vector<QString> &environme
     }
 }
 
+void TmcConverter::setGlobalInputVectorLengthLimit(std::optional<QString> limit)
+{
+    m_globalInputVectorLengthLimit = std::move(limit);
+}
+
+void TmcConverter::setInterfaceInputVectorLengthLimits(std::unordered_map<QString, QString> limits)
+{
+    m_interfaceInputVectorLengthLimits = std::move(limits);
+}
+
 bool TmcConverter::addStopConditionFiles(const QStringList &files)
 {
     for (const QString &filepath : files) { // NOLINT(readability-use-anyofallof)
@@ -300,15 +310,12 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
     }
 
     const QFileInfo outputDataview = outputFilepath("dataview.pml");
-
     convertDataview(asn1Files, outputDataview.absoluteFilePath());
 
     const QFileInfo outputEnv = outputFilepath("env_inlines.pml");
-
     createEnvGenerationInlines(simuDataView, outputEnv, environmentDatatypes);
 
     const QFileInfo outputSystemFile = outputFilepath("system.pml");
-
     convertInterfaceview(
             outputOptimizedIvFileName, outputSystemFile.absoluteFilePath(), modelFunctions, environmentFunctions);
 
@@ -351,6 +358,14 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
         options.add(PromelaOptions::environmentFunctionName, function);
     }
 
+    if (m_globalInputVectorLengthLimit) {
+        options.add(PromelaOptions::globalInputVectorLengthLimit, *m_globalInputVectorLengthLimit);
+    }
+
+    for (const auto &[interfaceName, value] : m_interfaceInputVectorLengthLimits) {
+        options.add(PromelaOptions::interfaceInputVectorLengthLimit.arg(interfaceName.toLower()), value);
+    }
+
     for (const QString &observer : m_observerNames) {
         options.add(PromelaOptions::observerFunctionName, observer);
     }
@@ -366,9 +381,7 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
         options.add(PromelaOptions::additionalIncludes, base.toLower() + ".pml");
     }
 
-    ModelType sourceModelType = ModelType::InterfaceView;
-
-    return convertModel({ sourceModelType }, ModelType::Promela, {}, std::move(options));
+    return convertModel({ ModelType::InterfaceView }, ModelType::Promela, {}, std::move(options));
 }
 
 bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath)
@@ -379,6 +392,7 @@ bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, cons
     }
     qDebug() << "  to:";
     qDebug() << "    " << outputFilepath;
+
     Options options;
 
     for (const QString &inputFileName : inputFilepathList) {
@@ -387,9 +401,7 @@ bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, cons
 
     options.add(PromelaOptions::outputFilepath, outputFilepath);
 
-    ModelType sourceModelType = ModelType::Asn1;
-
-    return convertModel({ sourceModelType }, ModelType::Promela, {}, std::move(options));
+    return convertModel({ ModelType::Asn1 }, ModelType::Promela, {}, std::move(options));
 }
 
 std::unique_ptr<IVModel> TmcConverter::readInterfaceView(const QString &filepath)
@@ -542,7 +554,8 @@ QFileInfo TmcConverter::workDirectory() const
 
 QFileInfo TmcConverter::simuDataViewLocation() const
 {
-    return workDirectory().absoluteFilePath() + QDir::separator() + "simulation" + QDir::separator() + "observer.asn";
+    return workDirectory().absoluteFilePath() + QDir::separator() + "simulation" + QDir::separator() + "observers"
+            + QDir::separator() + "observer.asn";
 }
 
 QFileInfo TmcConverter::sdlImplementationBaseDirectory(const QString &functionName) const

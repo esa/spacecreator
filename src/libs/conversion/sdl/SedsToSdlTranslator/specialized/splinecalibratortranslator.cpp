@@ -29,13 +29,11 @@
 #include <asn1library/asn1/types/real.h>
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/values.h>
-#include <conversion/asn1/SedsToAsn1Translator/specialized/rangetranslatorvisitor.h>
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/translation/exceptions.h>
 #include <sdl/SdlModel/return.h>
 #include <seds/SedsModel/types/ranges/floatprecisionrange.h>
 
-using conversion::asn1::translator::RangeTranslatorVisitor;
 using conversion::asn1::translator::SedsToAsn1Translator;
 using conversion::translator::TranslationException;
 
@@ -171,9 +169,13 @@ auto SplineCalibratorTranslator::buildSplinePointsVariable(
 
 auto SplineCalibratorTranslator::createAsn1Types(Context &context) -> void
 {
-    auto asn1Definitions =
-            SedsToAsn1Translator::getAsn1Definitions(context.sedsPackage().nameStr(), context.asn1Model()->data());
-    Q_UNUSED(asn1Definitions);
+    const auto &packageName = context.sedsPackage().nameStr();
+    auto asn1Definitions = context.getAsn1Definitions(packageName);
+
+    if (asn1Definitions == nullptr) {
+        auto message = QString("Unable to find definitions %1 in the ASN.1 model").arg(packageName);
+        throw TranslationException(std::move(message));
+    }
 
     // Create type for spline points values
     auto splinePointType = std::make_unique<Asn1Acn::Types::Real>(m_splinePointValueTypeName);

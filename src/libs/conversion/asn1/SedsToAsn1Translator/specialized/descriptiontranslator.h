@@ -43,17 +43,10 @@ public:
      * @param   sedsDescription     Description to translate
      * @param   asn1Node            Node that should contain the comment
      */
-    static auto translate(const seds::model::Description &sedsDescription, Asn1Acn::Node *asn1Node) -> void;
-    /**
-     * @brief   Translate description of SEDS data type to ASN.1 comment
-     *
-     * @param   sedsDataType        Data type containing description
-     * @param   asn1Node            Node that should contain the comment
-     */
-    static auto translate(const seds::model::DataType &sedsDataType, Asn1Acn::Node *asn1Node) -> void;
+    static auto translate(const seds::model::Description *sedsDescription, Asn1Acn::Node *asn1Node) -> void;
 
 private:
-    static auto combineDescriptions(const seds::model::Description &sedsDescription) -> QString;
+    static auto combineDescriptions(const seds::model::Description *sedsDescription) -> QString;
 };
 
 } // namespace conversion::asn1::translator

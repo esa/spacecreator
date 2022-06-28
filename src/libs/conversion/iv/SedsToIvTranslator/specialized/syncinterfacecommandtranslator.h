@@ -20,6 +20,7 @@
 #pragma once
 
 #include "generictypemapper.h"
+#include "interfacetypenamehelper.h"
 
 #include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/definitions.h>
@@ -41,16 +42,10 @@ public:
      *
      * @param   ivFunction          Output interface view function
      * @param   sedsInterfaceName   Parent interface name
-     * @param   sedsPackage         Parent SEDS package
-     * @param   sedsPackages        List of SEDS packages
-     * @param   asn1Definitions     Parent ASN.1 definitions
-     * @param   asn1Files           List of all ASN.1 files
-     * @param   typeMapper          Generic type mapper
+     * @param   typeNameHelper      Helper for ASN.1 type names
      */
     SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
-            const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages,
-            Asn1Acn::Definitions *asn1Definitions, const Asn1Acn::Asn1Model::Data &m_asn1Files,
-            const GenericTypeMapper *typeMapper, const std::optional<uint64_t> &sequenceSizeThreshold);
+            const InterfaceTypeNameHelper &typeNameHelper);
     /**
      * @brief   Deleted copy constructor
      */
@@ -83,30 +78,15 @@ public:
 private:
     auto translateArguments(
             const std::vector<seds::model::CommandArgument> &sedsArguments, ivm::IVInterface *ivInterface) -> void;
-    auto handleArgumentType(const seds::model::CommandArgument &sedsArgument, const QString &interfaceName) const
-            -> QString;
+    auto handleArgumentTypeName(const seds::model::CommandArgument &sedsArgument) const -> QString;
 
 private:
     /// @brief  Output interface view function
     ivm::IVFunction *m_ivFunction;
-
     /// @brief  Parent SEDS interface name
     const QString &m_sedsInterfaceName;
-
-    /// @brief  Parent SEDS package
-    const seds::model::Package *m_sedsPackage;
-    /// @brief  List of SEDS packages
-    const std::vector<seds::model::Package> &m_sedsPackages;
-    /// @brief  Parent ASN.1 type definitions
-    Asn1Acn::Definitions *m_asn1Definitions;
-    /// @brief  List of all ASN.1 files
-    const Asn1Acn::Asn1Model::Data &m_asn1Files;
-
-    /// @brief  Generic type mapper
-    const GenericTypeMapper *m_typeMapper;
-
-    /// @brief  ASN.1 sequence size threshold
-    const std::optional<uint64_t> &m_sequenceSizeThreshold;
+    /// @brief  Helper for ASN.1 names
+    const InterfaceTypeNameHelper &m_typeNameHelper;
 };
 
 } // namespace conversion::iv::translator

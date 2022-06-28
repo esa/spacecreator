@@ -19,7 +19,8 @@
 
 #pragma once
 
-#include "generictypemapper.h"
+#include "context.h"
+#include "interfacetypenamehelper.h"
 
 #include <QVector>
 #include <asn1library/asn1/asn1model.h>
@@ -37,7 +38,6 @@ class IVFunction;
 
 namespace seds::model {
 class Component;
-class GenericTypeMapSet;
 class Interface;
 class InterfaceDeclaration;
 class Package;
@@ -56,10 +56,9 @@ public:
      *
      * @param   sedsPackage         Package with components to translate
      * @param   sedsPackages        List of SEDS packages
-     * @param   asn1Files           List of all ASN.1 files
      */
-    ComponentsTranslator(const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages,
-            const Asn1Acn::Asn1Model::Data &asn1Files, const std::optional<uint64_t> &sequenceSizeThreshold);
+    ComponentsTranslator(
+            const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages);
     /**
      * @brief   Deleted copy constructor
      */
@@ -85,26 +84,6 @@ public:
      */
     auto translateComponents() -> QVector<ivm::IVFunction *>;
 
-public:
-    /**
-     * @brief   Searches for interface declaration
-     *
-     * It first searches in the component interface declarations. If no declaration was found
-     * then it searches in the package interface declarations.
-     *
-     * @param   interfaceDeclarationRef     Interface declaration to find
-     * @param   sedsComponent               Component to search in
-     * @param   sedsPackage                 Package to search in, if the search in the component fails
-     * @param   sedsPackages                List of SEDS packages
-     *
-     * @throw UndeclaredInterfaceException  If interface declaration was not found
-     *
-     * @return  Found interface declarartion
-     */
-    static auto findInterfaceDeclaration(const seds::model::InterfaceDeclarationRef &interfaceDeclarationRef,
-            const seds::model::Component &sedsComponent, const seds::model::Package *sedsPackage,
-            const std::vector<seds::model::Package> &sedsPackages) -> const seds::model::InterfaceDeclaration &;
-
 private:
     /**
      * @brief   Translates SEDS component to InterfaceView function
@@ -125,29 +104,24 @@ private:
      */
     auto translateInterface(const seds::model::Interface &sedsInterface, const seds::model::Component &sedsComponent,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) -> void;
-    auto translateInterfaceDeclaration(const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
-            const QString &sedsInterfaceName, const std::optional<seds::model::GenericTypeMapSet> &typeMapSet,
-            const seds::model::Component &sedsComponent, const ivm::IVInterface::InterfaceType interfaceType,
-            ivm::IVFunction *ivFunction, const QString &currentPackageName) const -> void;
+    auto translateInterfaceDeclaration(const seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
+            const QString &sedsInterfaceName, const seds::model::Component &sedsComponent, const QString &parentName,
+            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction, Context context) const
+            -> void;
     auto translateParameters(const QString &sedsInterfaceName,
-            const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
+            const seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
-            const GenericTypeMapper *typeMapper) const -> void;
+            const InterfaceTypeNameHelper &typeNameHelper) const -> void;
     auto translateCommands(const QString &sedsInterfaceName,
-            const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
+            const seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
-            const QString &currentPackageName, const GenericTypeMapper *typeMapper) const -> void;
+            const InterfaceTypeNameHelper &typeNameHelper) const -> void;
 
 private:
     /// @brief  Parent package
     const seds::model::Package *m_sedsPackage;
     /// @brief  List of SEDS packages
     const std::vector<seds::model::Package> &m_sedsPackages;
-    /// @brief  List of all ASN.1 files
-    const Asn1Acn::Asn1Model::Data &m_asn1Files;
-
-    /// @brief  ASN.1 sequence size threshold
-    const std::optional<uint64_t> &m_sequenceSizeThreshold;
 };
 
 } // namespace conversion::iv::translator

@@ -1,0 +1,5 @@
+PARAMETERS-MEGACOMPONENT DEFINITIONS ::= BEGIN
+ComponentInteger ::= INTEGER(0 .. 255)
+MegaComponent-ProvidedInterface-GenericType ::= ComponentInteger(0 .. 255)
+MegaComponent-ProvidedInterface-GenericTypeArray-3 ::= SEQUENCE (SIZE(3)) OF MegaComponent-ProvidedInterface-GenericType(0 .. 255)
+END

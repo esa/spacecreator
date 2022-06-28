@@ -68,23 +68,6 @@ public:
      */
     static auto createInterfaceParameter(const QString &name, const QString &typeName,
             shared::InterfaceParameter::Direction direction) -> shared::InterfaceParameter;
-    /**
-     * @brief   Create ASN.1 SEQUENCE OF with given dimensions
-     *
-     * @param   baseTypeRef         Type that is the base of the array
-     * @param   dimensions          Array dimensions
-     * @param   asn1Definitions     Where the created type will be added
-     * @param   sedsPackage         Parent SEDS package
-     * @param   asn1Files           List of all ASN.1 files
-     * @param   sedsPackages        List of SEDS packages
-     *
-     * @return  Create type name
-     */
-    static auto createArrayType(const seds::model::DataTypeRef &baseTypeRef,
-            const std::vector<seds::model::DimensionSize> &dimensions, Asn1Acn::Definitions *asn1Definitions,
-            const seds::model::Package *sedsPackage, const Asn1Acn::Asn1Model::Data &asn1Files,
-            const std::vector<seds::model::Package> &sedsPackages, const std::optional<uint64_t> &sequenceSizeThreshold)
-            -> QString;
 
     /**
      * @brief   Assemble name for the parameter
@@ -110,34 +93,25 @@ public:
      */
     static auto buildCommandInterfaceName(const QString &sedsInterfaceName, const QString &commandName,
             const ivm::IVInterface::InterfaceType type) -> QString;
+
     /**
-     * @brief   Assemble name for the array type
+     * @brief   Searches for interface declaration
      *
-     * @param   baseTypeName    Name of the type that is a base of the array
-     * @param   dimensions      Array dimensions
+     * It first searches in the component interface declarations. If no declaration was found
+     * then it searches in the package interface declarations.
      *
-     * @return  Assembled name
+     * @param   interfaceDeclarationRef     Interface declaration to find
+     * @param   sedsComponent               Component to search in
+     * @param   sedsPackage                 Package to search in, if the search in the component fails
+     * @param   sedsPackages                List of SEDS packages
+     *
+     * @throw UndeclaredInterfaceException  If interface declaration was not found
+     *
+     * @return  Found interface declarartion
      */
-    static auto buildArrayTypeName(
-            const QString &baseTypeName, const std::vector<seds::model::DimensionSize> &dimensions) -> QString;
-    /**
-     * @brief   Assemble name for the bundled type
-     *
-     * @param   sedsCommandName     Parent command name
-     * @param   cachedTypesCound    Number of already created types for that command
-     *
-     * @return Assembled name
-     */
-    static auto buildBundledTypeName(const QString &sedsCommandName, const std::size_t cachedTypesCount) -> QString;
-    /**
-     * @brief   Assemble name for the alternate type
-     *
-     * @param   sedsInterfaceName   Parent interface name
-     * @param   genericTypeName     Name of the generic type
-     *
-     * @return Assembled name
-     */
-    static auto buildAlternateTypeName(const QString &sedsInterfaceName, const QString &genericTypeName) -> QString;
+    static auto findInterfaceDeclaration(const seds::model::InterfaceDeclarationRef &interfaceDeclarationRef,
+            const seds::model::Component &sedsComponent, const seds::model::Package *sedsPackage,
+            const std::vector<seds::model::Package> &sedsPackages) -> const seds::model::InterfaceDeclaration &;
 
     /**
      * @brief   Switch interface type
@@ -153,21 +127,15 @@ private:
 
 private:
     /// @brief  Interface parameter encoding name
-    static const QString m_interfaceParameterEncoding;
+    inline static const QString m_interfaceParameterEncoding = "ACN";
     /// @brief  Template for parameter interface view interfaces
-    static const QString m_ivParameterInterfaceNameTemplate;
+    inline static const QString m_ivParameterInterfaceNameTemplate = "%1_%2_%3_%4";
     /// @brief  Template for command interface view interfaces
-    static const QString m_ivCommandInterfaceNameTemplate;
-    /// @brief  Template for array ASN.1 type name
-    static const QString m_asn1ArrayNameTemplate;
-    /// @brief  Template for ASN.1 bundled type name
-    static const QString m_bundledTypeNameTemplate;
-    /// @brief  Template for ASN.1 alternate type name
-    static const QString m_alternateTypeNameTemplate;
+    inline static const QString m_ivCommandInterfaceNameTemplate = "%1_%2_%3";
     /// @brief  Prefix for getter interfaces
-    static const QString m_getterInterfacePrefix;
+    inline static const QString m_getterInterfacePrefix = "Get";
     /// @brief  Prefix for setter interfaces
-    static const QString m_setterInterfacePrefix;
+    inline static const QString m_setterInterfacePrefix = "Set";
 };
 
 } // namespace conversion::iv::translator

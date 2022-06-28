@@ -11,18 +11,38 @@
   </DataTypeSet>
   <DeclaredInterfaceSet>
     <Interface name="MegaInterface">
+      <GenericTypeSet>
+        <GenericType name="GenericType"/>
+      </GenericTypeSet>
       <ParameterSet>
         <Parameter name="ReadOnlyAsync" type="MyInteger" mode="async" readOnly="true"/>
         <Parameter name="ReadOnlySync" type="MyInteger" mode="sync" readOnly="true"/>
         <Parameter name="ReadWriteAsync" type="MyInteger" mode="async" readOnly="false"/>
         <Parameter name="ReadWriteSync" type="MyInteger" mode="sync" readOnly="false"/>
+        <Parameter name="ArrayParameter" type="GenericType" mode="sync" readOnly="true">
+          <ArrayDimensions>
+            <Dimension size="3"/>
+          </ArrayDimensions>
+        </Parameter>
       </ParameterSet>
     </Interface>
   </DeclaredInterfaceSet>
   <ComponentSet>
     <Component name="MegaComponent">
+      <DataTypeSet>
+        <IntegerDataType name="ComponentInteger">
+          <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+          <Range>
+            <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+          </Range>
+        </IntegerDataType>
+      </DataTypeSet>
       <ProvidedInterfaceSet>
-        <Interface name="ProvidedInterface" type="MegaInterface"/>
+        <Interface name="ProvidedInterface" type="MegaInterface">
+          <GenericTypeMapSet>
+            <GenericTypeMap name="GenericType" type="ComponentInteger" />
+          </GenericTypeMapSet>
+        </Interface>
       </ProvidedInterfaceSet>
     </Component>
   </ComponentSet>
