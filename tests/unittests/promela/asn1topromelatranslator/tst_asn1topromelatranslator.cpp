@@ -663,7 +663,7 @@ void tst_Asn1ToPromelaTranslator::testChoice()
     QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
     QCOMPARE(promelaModel.getUtypes().size(), 2);
     QCOMPARE(promelaModel.getTypeAliases().size(), 2);
-    QCOMPARE(promelaModel.getValueDefinitions().size(), 3);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 5);
 
     const Utype &expectedUtype = promelaModel.getUtypes().at(0);
     QCOMPARE(expectedUtype.getName(), "MyType");
@@ -694,8 +694,12 @@ void tst_Asn1ToPromelaTranslator::testChoice()
     QCOMPARE(promelaModel.getValueDefinitions().at(0).getValue(), 0);
     QCOMPARE(promelaModel.getValueDefinitions().at(1).getName(), "MyType_ch1_PRESENT");
     QCOMPARE(promelaModel.getValueDefinitions().at(1).getValue(), 1);
-    QCOMPARE(promelaModel.getValueDefinitions().at(2).getName(), "MyType_ch2_PRESENT");
-    QCOMPARE(promelaModel.getValueDefinitions().at(2).getValue(), 2);
+    QCOMPARE(promelaModel.getValueDefinitions().at(2).getName(), "Mytype_selection_ch1_PRESENT");
+    QCOMPARE(promelaModel.getValueDefinitions().at(2).getValue(), 1);
+    QCOMPARE(promelaModel.getValueDefinitions().at(3).getName(), "MyType_ch2_PRESENT");
+    QCOMPARE(promelaModel.getValueDefinitions().at(3).getValue(), 2);
+    QCOMPARE(promelaModel.getValueDefinitions().at(4).getName(), "Mytype_selection_ch2_PRESENT");
+    QCOMPARE(promelaModel.getValueDefinitions().at(4).getValue(), 2);
 
     QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "MyType_ch1");
     QCOMPARE(promelaModel.getTypeAliases().at(1).getName(), "MyType_ch2");
