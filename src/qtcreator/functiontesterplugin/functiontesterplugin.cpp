@@ -20,38 +20,25 @@
 #include "functiontesterplugin.h"
 #include "pluginconstants.h"
 
-#include <QBuffer>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMenu>
 #include <QMessageBox>
-#include <conversion/common/model.h>
-#include <conversion/iv/IvXmlExporter/exporter.h>
-#include <coreplugin/actionmanager/actioncontainer.h>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <editormanager/editormanager.h>
-#include <fstream>
-#include <ivtools.h>
-#include <libdveditor/dvexporter.h>
 #include <libiveditor/interfacedocument.h>
-#include <libiveditor/ivexporter.h>
 #include <messagemanager.h>
 #include <messagestrings.h>
 #include <modelloader.h>
 #include <shared/ui/veinteractiveobject.h>
 #include <spacecreatorplugin/iv/iveditordocument.h>
-#include <testgenerator/datareconstructor/datareconstructor.h>
-#include <testgenerator/gdbconnector/gdbconnector.h>
 #include <testgenerator/testgenerator.h>
-#include <testgenerator/gdbconnector/process.h>
 
 using namespace Core;
 using namespace testgenerator;
 
 using ive::IVExporter;
 using plugincommon::ModelLoader;
-using testgenerator::DataReconstructor;
-using testgenerator::GdbConnector;
 
 namespace spctr {
 

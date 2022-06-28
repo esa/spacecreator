@@ -20,13 +20,11 @@
 #pragma once
 
 #include "iveditorcore.h"
-#include "ivfunction.h"
 
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <extensionsystem/iplugin.h>
 #include <csv/CsvModel/csvmodel.h>
 #include <asn1library/asn1/asn1model.h>
-#include <dvcore/dvobject.h>
 
 namespace spctr {
 

@@ -28,12 +28,8 @@ target_include_directories(TestGenerator
 )
 
 target_link_libraries(TestGenerator
-    PRIVATE     ivcore
-                dvcore
-                libiveditor
-                libdveditor
+    PRIVATE     libdveditor
                 qobjectlistmodel
-                CsvImporter
                 CommonProjectWarnings
                 CommonTools
 )

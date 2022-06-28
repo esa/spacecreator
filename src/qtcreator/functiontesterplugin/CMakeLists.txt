@@ -22,9 +22,6 @@ add_qtc_plugin(${PLUGIN_NAME}
     DEFINES FunctionTesterPlugin_LIBRARY
     DEPENDS SpaceCreatorPlugin
             spacecreatorsystem
-            libmsceditor
-            libiveditor
-            libdveditor
             CommonTools
             TestGenerator
             ${QT_CORE}
