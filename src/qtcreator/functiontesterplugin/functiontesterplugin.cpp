@@ -131,16 +131,6 @@ auto FunctionTesterPlugin::loadCsv() -> std::unique_ptr<csv::CsvModel>
         MessageManager::write(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
         return std::unique_ptr<csv::CsvModel> {};
     }
-
-    std::unique_ptr<csv::CsvModel> model;
-    try {
-        model = ModelLoader::loadCsvModel(inputFilePath);
-    } catch (std::exception &ex) {
-        MessageManager::write(GenMsg::msgError.arg(ex.what()));
-        return model;
-    }
-
-    MessageManager::write(GenMsg::msgInfo.arg(GenMsg::filesImported));
     return ModelLoader::loadCsvModel(inputFilePath);
 }
 
