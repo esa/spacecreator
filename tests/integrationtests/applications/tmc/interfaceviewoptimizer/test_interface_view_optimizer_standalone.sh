@@ -20,5 +20,6 @@ $OPTIMIZER -i $RESOURCE_DIR/interfaceview.xml -o $TEST_OUTPUT_DIR/optimized.xml 
 
 cd $TEST_OUTPUT_DIR \
     && grep -q "^<Function name=\"Pinger\".*language=\"GUI\" default_implementation=\"environment\"" optimized.xml \
+    && grep -q "^<Function name=\"Ponger\".*language=\"SDL\" default_implementation=\"default\"" optimized.xml \
     && cd .. \
     && rm -r $TEST_OUTPUT_DIR

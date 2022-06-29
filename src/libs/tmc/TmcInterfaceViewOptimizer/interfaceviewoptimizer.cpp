@@ -42,31 +42,19 @@ namespace tmc {
 void InterfaceViewOptimizer::optimizeModel(
         IVModel *ivModel, const std::vector<QString> &functionNames, InterfaceViewOptimizer::Mode mode)
 {
-    flattenModel(ivModel);
+    auto parentFunctionsInfo = flattenModel(ivModel);
 
-    for (auto obj : ivModel->objects()) {
-        if (!isFunction(obj)) {
-            continue;
-        }
+    auto allFunctionNames = resolveFunctionNames(functionNames, parentFunctionsInfo);
 
-        auto function = obj->as<IVFunction *>();
-
-        const auto &functionFound = std::find(functionNames.begin(), functionNames.end(), function->title());
-
-        switch (mode) {
-        case Mode::Environment:
-            if (functionFound != functionNames.end()) {
-                markAsEnvironment(function);
-            }
-            break;
-        case Mode::Keep:
-            if (functionFound == functionNames.end()) {
-                markAsEnvironment(function);
-            }
-            break;
-        case Mode::None:
-            break;
-        }
+    switch (mode) {
+    case Mode::Environment:
+        discardFunctions(ivModel, allFunctionNames);
+        break;
+    case Mode::Keep:
+        keepFunctions(ivModel, allFunctionNames);
+        break;
+    case Mode::None:
+        break;
     }
 
     removeDeadConnections(ivModel);
@@ -74,9 +62,40 @@ void InterfaceViewOptimizer::optimizeModel(
     removeDeadFunctions(ivModel);
 }
 
-void InterfaceViewOptimizer::flattenModel(IVModel *ivModel)
+void InterfaceViewOptimizer::discardFunctions(IVModel *ivModel, const std::vector<QString> &functionNames)
+{
+    for (const auto &functionName : functionNames) {
+        auto function = ivModel->getFunction(functionName, Qt::CaseInsensitive);
+
+        if (function == nullptr) {
+            auto errorMessage = QString("InterfaceView optimizer cannot find function '%1'").arg(functionName);
+            throw TranslationException(errorMessage);
+        }
+
+        markAsEnvironment(function);
+    }
+}
+
+void InterfaceViewOptimizer::keepFunctions(IVModel *ivModel, const std::vector<QString> &functionNames)
+{
+    for (auto obj : ivModel->objects()) {
+        if (!isFunction(obj)) {
+            continue;
+        }
+
+        auto function = obj->as<IVFunction *>();
+
+        const auto functionFound = std::find(functionNames.begin(), functionNames.end(), function->title());
+        if (functionFound == functionNames.end()) {
+            markAsEnvironment(function);
+        }
+    }
+}
+
+InterfaceViewOptimizer::ParentFunctionsInfo InterfaceViewOptimizer::flattenModel(IVModel *ivModel)
 {
     auto objects = ivModel->objects();
+    ParentFunctionsInfo parentFunctionsInfo;
     std::vector<IVFunctionType *> functionsToRemove;
 
     for (auto obj : objects) {
@@ -87,6 +106,12 @@ void InterfaceViewOptimizer::flattenModel(IVModel *ivModel)
         auto function = obj->as<IVFunctionType *>();
 
         if (isFunctionParent(function)) {
+            std::vector<QString> children;
+            for (auto childFunction : function->functions()) {
+                children.push_back(childFunction->title());
+            }
+            parentFunctionsInfo.insert({ function->title(), std::move(children) });
+
             functionsToRemove.push_back(function);
         } else {
             flattenConnections(function, ivModel);
@@ -101,6 +126,8 @@ void InterfaceViewOptimizer::flattenModel(IVModel *ivModel)
 
         ivModel->removeObject(function);
     }
+
+    return parentFunctionsInfo;
 }
 
 void InterfaceViewOptimizer::flattenConnections(IVFunctionType *function, IVModel *ivModel)
@@ -169,6 +196,39 @@ void InterfaceViewOptimizer::markAsEnvironment(IVFunction *function)
 
     if (currentDefaultImplementationType.toLower() == "sdl") {
         setGuiAsDefaultImplementation(function);
+    }
+}
+
+std::vector<QString> InterfaceViewOptimizer::resolveFunctionNames(
+        const std::vector<QString> &functionNames, InterfaceViewOptimizer::ParentFunctionsInfo parentFunctionsInfo)
+{
+    std::vector<QString> allFunctionNames;
+
+    for (const auto &functionName : functionNames) {
+        auto resolvedFunctionNames = resolveFunctionName(functionName, parentFunctionsInfo);
+        allFunctionNames.insert(allFunctionNames.end(), resolvedFunctionNames.begin(), resolvedFunctionNames.end());
+    }
+
+    return allFunctionNames;
+}
+
+std::vector<QString> InterfaceViewOptimizer::resolveFunctionName(
+        const QString &functionName, InterfaceViewOptimizer::ParentFunctionsInfo parentFunctionsInfo)
+{
+    if (parentFunctionsInfo.count(functionName) == 0) {
+        return { functionName };
+    } else {
+        const auto childrenFunctionsNames = parentFunctionsInfo.at(functionName);
+
+        std::vector<QString> allFunctionNames;
+
+        for (const auto &childrenFunctionName : childrenFunctionsNames) {
+            auto resolvedChildrenFunctionNames = resolveFunctionName(childrenFunctionName, parentFunctionsInfo);
+            allFunctionNames.insert(allFunctionNames.begin(), resolvedChildrenFunctionNames.begin(),
+                    resolvedChildrenFunctionNames.end());
+        }
+
+        return allFunctionNames;
     }
 }
 
@@ -347,7 +407,7 @@ bool InterfaceViewOptimizer::isFunctionDead(const IVFunctionType *function)
 
 bool InterfaceViewOptimizer::isFunctionParent(const IVFunctionType *function)
 {
-    return !function->functions().empty();
+    return !function->functions().empty() || !function->functionTypes().empty();
 }
 
 bool InterfaceViewOptimizer::isSdlFunction(const IVFunctionType *functionType)
