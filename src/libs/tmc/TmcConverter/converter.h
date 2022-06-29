@@ -96,6 +96,13 @@ public:
      */
     void addEnvironmentFunctions(const std::vector<QString> &environmentFunctions);
     /**
+     * @brief   Specify which IV functions shouldn't be treated as an environment
+     *          during model checking
+     *
+     * @param   keepFunctions   Functions to treat as an evironment
+     */
+    void addKeepFunctions(const std::vector<QString> &keepFunctions);
+    /**
      * @brief   Set global input vector length limit
      *
      * @param   limit   Limit to set
@@ -167,6 +174,7 @@ private:
     ivm::IVPropertyTemplateConfig *m_dynPropConfig;
 
     std::vector<QString> m_environmentFunctions;
+    std::vector<QString> m_keepFunctions;
     std::optional<QString> m_globalInputVectorLengthLimit;
     std::unordered_map<QString, QString> m_interfaceInputVectorLengthLimits;
     QStringList m_stopConditionsFiles;

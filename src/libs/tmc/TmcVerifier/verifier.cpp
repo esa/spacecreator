@@ -34,6 +34,11 @@ void TmcVerifier::addEnvironmentFunctions(const std::vector<QString> &environmen
     m_converter->addEnvironmentFunctions(environmentFunctions);
 }
 
+void TmcVerifier::addKeepFunctions(const std::vector<QString> &keepFunctions)
+{
+    m_converter->addKeepFunctions(keepFunctions);
+}
+
 void TmcVerifier::setGlobalInputVectorLengthLimit(std::optional<QString> limit)
 {
     m_converter->setGlobalInputVectorLengthLimit(std::move(limit));

@@ -126,9 +126,12 @@ bool TmcConverter::convert()
 
 void TmcConverter::addEnvironmentFunctions(const std::vector<QString> &environmentFunctions)
 {
-    for (const auto &function : environmentFunctions) {
-        m_environmentFunctions.push_back(function);
-    }
+    m_environmentFunctions = environmentFunctions;
+}
+
+void TmcConverter::addKeepFunctions(const std::vector<QString> &keepFunctions)
+{
+    m_keepFunctions = keepFunctions;
 }
 
 void TmcConverter::setGlobalInputVectorLengthLimit(std::optional<QString> limit)
@@ -246,7 +249,19 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
         return false;
     }
 
-    InterfaceViewOptimizer::optimizeModel(inputIv.get(), m_environmentFunctions);
+    if (!m_environmentFunctions.empty() && !m_keepFunctions.empty()) {
+        qCritical() << "Environment and keep functions shouldn't be specified at once";
+        return false;
+    }
+
+    if (!m_environmentFunctions.empty()) {
+        InterfaceViewOptimizer::optimizeModel(
+                inputIv.get(), m_environmentFunctions, InterfaceViewOptimizer::Mode::Environment);
+    } else if (!m_keepFunctions.empty()) {
+        InterfaceViewOptimizer::optimizeModel(inputIv.get(), m_keepFunctions, InterfaceViewOptimizer::Mode::Keep);
+    } else {
+        InterfaceViewOptimizer::optimizeModel(inputIv.get(), {}, InterfaceViewOptimizer::Mode::None);
+    }
 
     QTemporaryFile outputOptimizedIvFile;
     if (!outputOptimizedIvFile.open()) {

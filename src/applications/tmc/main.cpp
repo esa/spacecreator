@@ -68,6 +68,7 @@ int main(int argc, char *argv[])
     QStringList stopConditionFiles;
     QStringList observerInfos;
     std::vector<QString> environmentFunctions;
+    std::vector<QString> keepFunctions;
     std::optional<QString> globalInputVectorLengthLimit;
     std::unordered_map<QString, QString> interfaceInputVectorLengthLimits;
 
@@ -106,6 +107,9 @@ int main(int argc, char *argv[])
         } else if (arg == "-e" || arg == "--envfunc") {
             ++i;
             environmentFunctions.emplace_back(args[i]);
+        } else if (arg == "-k" || arg == "--keep") {
+            ++i;
+            keepFunctions.emplace_back(args[i]);
         } else if (arg == "-ivl") {
             ++i;
 
@@ -153,18 +157,22 @@ int main(int argc, char *argv[])
         } else if (arg == "-h" || arg == "--help") {
             qInfo("tmc: TASTE Model Chcecker");
             qInfo("Usage: tmc [OPTIONS]");
-            qInfo("  -iv <filepath>       Use <filepath> as input InterfaceView");
-            qInfo("  -o <dir>             Use <dir> as output directory.");
-            qInfo("  -scl <filepath>      Use <filepath> as input Stop Condition source file.");
+            qInfo("  -iv <filepath>         Use <filepath> as input InterfaceView");
+            qInfo("  -o <dir>               Use <dir> as output directory.");
+            qInfo("  -scl <filepath>        Use <filepath> as input Stop Condition source file.");
             qInfo("  -os <filepath>[:priority]");
-            qInfo("                       Use <filepath> as an Observer source file.");
-            qInfo("                       Integer <priority> of the Observer is optional");
-            qInfo("  -e, --envfunc <name> Use <name> to specify a SDL function that  should be treated as environment");
-            qInfo("  -ivl <limit>         Use <limit> to specify input vector length limit.");
-            qInfo("                       Provide number only to set the global limit");
-            qInfo("                       Use <interface_name>:<number> to set limit for a single interface");
-            qInfo("                       Interface limit overrides the global limit");
-            qInfo("  -h, --help           Print this message and exit.");
+            qInfo("                         Use <filepath> as an Observer source file.");
+            qInfo("                         Integer <priority> of the Observer is optional");
+            qInfo("  -e, --envfunc <name>   Use <name> to specify a SDL function that should be treated as "
+                  "environment");
+            qInfo("  -k, --keepfunc <name>  Use <name> to specify a SDL function that shouldn't be treates as "
+                  "environment.");
+            qInfo("                         All other functions will be treated as environment");
+            qInfo("  -ivl <limit>           Use <limit> to specify input vector length limit.");
+            qInfo("                         Provide number only to set the global limit");
+            qInfo("                         Use <interface_name>:<number> to set limit for a single interface");
+            qInfo("                         Interface limit overrides the global limit");
+            qInfo("  -h, --help             Print this message and exit.");
             exit(EXIT_SUCCESS);
         } else {
             qCritical("Unrecognized command line option");
@@ -180,10 +188,15 @@ int main(int argc, char *argv[])
         qCritical("Missing mandatory argument: output directory");
         exit(EXIT_FAILURE);
     }
+    if (!environmentFunctions.empty() && !keepFunctions.empty()) {
+        qCritical("-e and -k arguments cannot be combined");
+        exit(EXIT_FAILURE);
+    }
 
     tmc::verifier::TmcVerifier verifier(inputIvFilepath.value(), outputDirectory.value());
 
     verifier.addEnvironmentFunctions(environmentFunctions);
+    verifier.addKeepFunctions(keepFunctions);
     verifier.setGlobalInputVectorLengthLimit(std::move(globalInputVectorLengthLimit));
     verifier.setInterfaceInputVectorLengthLimits(std::move(interfaceInputVectorLengthLimits));
 
