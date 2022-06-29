@@ -315,11 +315,11 @@ void InterfaceViewOptimizer::removeDeadFunctions(IVModel *ivModel)
     std::vector<IVFunctionType *> functionsToRemove;
 
     for (auto obj : ivModel->objects()) {
-        if (!isFunctionType(obj)) {
+        if (!isFunction(obj)) {
             continue;
         }
 
-        auto function = obj->as<IVFunctionType *>();
+        auto function = obj->as<IVFunction *>();
 
         if (isFunctionDead(function)) {
             functionsToRemove.push_back(function);
@@ -393,7 +393,7 @@ bool InterfaceViewOptimizer::isInterfaceDead(const IVInterface *interface, const
     }
 }
 
-bool InterfaceViewOptimizer::isFunctionDead(const IVFunctionType *function)
+bool InterfaceViewOptimizer::isFunctionDead(const IVFunction *function)
 {
     // Function in considered 'dead' if it has no non-cyclic interfaces
     for (const auto interface : function->interfaces()) {

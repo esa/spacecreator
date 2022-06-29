@@ -106,7 +106,7 @@ private:
     static auto isFunctionType(const shared::VEObject *object) -> bool;
     static auto isConnectionDead(const ivm::IVConnection *connection) -> bool;
     static auto isInterfaceDead(const ivm::IVInterface *interface, const ivm::IVModel *ivModel) -> bool;
-    static auto isFunctionDead(const ivm::IVFunctionType *function) -> bool;
+    static auto isFunctionDead(const ivm::IVFunction *function) -> bool;
     static auto isFunctionParent(const ivm::IVFunctionType *function) -> bool;
     static auto isSdlFunction(const ivm::IVFunctionType *functionType) -> bool;
 
