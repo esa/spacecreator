@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include <conversion/common/model.h>
-
 #include "modelinterface.h"
+
+#include <conversion/common/model.h>
 
 namespace simulink::model {
 

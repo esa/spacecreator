@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <simulink/SimulinkModel/base/namedentity.h>
 #include <simulink/SimulinkCommon/basetypesmappings.h>
+#include <simulink/SimulinkModel/base/namedentity.h>
 
 namespace simulink::model {
 
@@ -37,9 +37,10 @@ public:
 
     auto description() const -> const common::String &;
     auto setDescription(common::String description) -> void;
-    
+
     auto detailedDescription() const -> const common::String &;
     auto setDetailedDescription(common::String detailedDescription) -> void;
+
 private:
     common::String m_value;
     common::String m_description;

@@ -19,9 +19,10 @@
 
 #pragma once
 
-#include <simulink/SimulinkModel/base/namedentity.h>
-#include <simulink/SimulinkCommon/basetypesmappings.h>
 #include "rootdatatype.h"
+
+#include <simulink/SimulinkCommon/basetypesmappings.h>
+#include <simulink/SimulinkModel/base/namedentity.h>
 
 namespace simulink::model {
 

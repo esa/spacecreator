@@ -19,13 +19,12 @@
 
 #include <QObject>
 #include <QtTest>
-
-#include <simulink/SimulinkXMLImporter/importer.h>
-#include <simulink/SimulinkOptions/options.h>
 #include <simulink/SimulinkModel/simulinkmodel.h>
+#include <simulink/SimulinkOptions/options.h>
+#include <simulink/SimulinkXMLImporter/importer.h>
 
-using simulink::importer::SimulinkXmlImporter;
 using conversion::simulink::SimulinkOptions;
+using simulink::importer::SimulinkXmlImporter;
 using simulink::model::SimulinkModel;
 
 namespace simulink::test {

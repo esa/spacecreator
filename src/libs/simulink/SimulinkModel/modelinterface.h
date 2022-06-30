@@ -19,10 +19,10 @@
 
 #pragma once
 
-#include "datatypes/datatype.h"
-#include "datatypes/enumdatatype.h"
 #include "datatypes/aliasdatatype.h"
 #include "datatypes/busdatatype.h"
+#include "datatypes/datatype.h"
+#include "datatypes/enumdatatype.h"
 #include "inport/inport.h"
 #include "outport/outport.h"
 

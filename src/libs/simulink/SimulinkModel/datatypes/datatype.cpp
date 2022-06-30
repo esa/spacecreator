@@ -17,12 +17,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include <QString>
-
 #include "datatype.h"
-#include "enumdatatype.h"
+
 #include "aliasdatatype.h"
 #include "busdatatype.h"
+#include "enumdatatype.h"
+
+#include <QString>
 
 namespace simulink::model {
 

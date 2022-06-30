@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include <vector>
-
-#include <simulink/SimulinkCommon/basetypesmappings.h>
 #include "enumvalue.h"
 #include "rootdatatype.h"
+
+#include <simulink/SimulinkCommon/basetypesmappings.h>
+#include <vector>
 
 namespace simulink::model {
 
@@ -55,7 +55,7 @@ public:
 
     auto enumValues() const -> const EnumValues &;
     auto addEnumValue(EnumValue enumValue) -> void;
-    
+
 private:
     common::String m_headerFile;
     common::String m_description;

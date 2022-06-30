@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <simulink/SimulinkCommon/basetypesmappings.h>
 #include <conversion/common/import/exceptions.h>
+#include <simulink/SimulinkCommon/basetypesmappings.h>
 
 namespace simulink::importer {
 

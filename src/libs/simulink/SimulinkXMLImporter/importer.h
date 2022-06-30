@@ -19,10 +19,9 @@
 
 #pragma once
 
+#include <conversion/common/import/modelimporter.h>
 #include <functional>
 #include <memory>
-
-#include <conversion/common/import/modelimporter.h>
 #include <simulink/SimulinkCommon/basetypesmappings.h>
 
 class QXmlStreamReader;
@@ -64,7 +63,7 @@ public:
      * @throws  simulink::importer::ParserException
      * @throws  simulink::importer::UnhandledElement
      * @throws  simulink::importer::UnhandledAttribute
-     * 
+     *
      * @return  Imported SIMULINK model
      */
     virtual auto importModel(const conversion::Options &options) const -> std::unique_ptr<conversion::Model> override;

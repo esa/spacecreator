@@ -18,24 +18,23 @@
  */
 
 #include "importer.h"
+
 #include "exceptions.h"
-
-#include <simulink/SimulinkModel/simulinkmodel.h>
-#include <simulink/SimulinkOptions/options.h>
-#include <conversion/common/import/exceptions.h>
-#include <conversion/common/exceptions.h>
-
-#include <datatypes/rootdatatype.h>
-#include <datatypes/enumdatatype.h>
-#include <datatypes/enumvalue.h>
-#include <datatypes/aliasdatatype.h>
-#include <datatypes/busdatatype.h>
 
 #include <QFileInfo>
 #include <QXmlStreamReader>
+#include <conversion/common/exceptions.h>
+#include <conversion/common/import/exceptions.h>
+#include <datatypes/aliasdatatype.h>
+#include <datatypes/busdatatype.h>
+#include <datatypes/enumdatatype.h>
+#include <datatypes/enumvalue.h>
+#include <datatypes/rootdatatype.h>
+#include <simulink/SimulinkModel/simulinkmodel.h>
+#include <simulink/SimulinkOptions/options.h>
 
-using conversion::Options;
 using conversion::FileNotFoundException;
+using conversion::Options;
 using conversion::importer::ImportException;
 using conversion::simulink::SimulinkOptions;
 
@@ -81,7 +80,7 @@ std::unique_ptr<conversion::Model> SimulinkXmlImporter::parse(const common::Stri
     xmlReader.readNextStartElement();
 
     if (xmlReader.name() == QLatin1String("ModelInterface")) {
-        return std::make_unique<model::SimulinkModel>(readModelInterface(xmlReader)); 
+        return std::make_unique<model::SimulinkModel>(readModelInterface(xmlReader));
     } else {
         throw UnhandledElement(xmlReader.name(), "Root");
     }
@@ -142,7 +141,7 @@ model::EnumDataType SimulinkXmlImporter::readEnumDataType(QXmlStreamReader &xmlR
             throw UnhandledAttribute(attribute.name(), xmlReader.name());
         }
     }
-    
+
     while (xmlReader.readNextStartElement()) {
         if (xmlReader.name() == QStringLiteral("EnumValues")) {
             readEnumValues(xmlReader, enumDataType);
@@ -232,10 +231,10 @@ model::BusDataType SimulinkXmlImporter::readBusDataType(QXmlStreamReader &xmlRea
             throw UnhandledAttribute(attribute.name(), xmlReader.name());
         }
     }
-    
-    while(xmlReader.readNextStartElement()) {
+
+    while (xmlReader.readNextStartElement()) {
         if (xmlReader.name() == QStringLiteral("BusMembers")) {
-        readBusMembers(xmlReader, busDataType);
+            readBusMembers(xmlReader, busDataType);
         } else {
             throw UnhandledElement(xmlReader.name(), "BusDataType");
         }

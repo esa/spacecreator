@@ -85,7 +85,7 @@ public:
 
     auto useBusObject() const -> const common::String &;
     auto setUseBusObject(common::String useBusObject) -> void;
-    
+
 private:
     common::String m_busObject;
     common::String m_busOutputAsStruct;

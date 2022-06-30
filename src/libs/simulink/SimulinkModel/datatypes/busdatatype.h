@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include <vector>
+#include "busmember.h"
+#include "rootdatatype.h"
 
 #include <simulink/SimulinkCommon/basetypesmappings.h>
-#include "rootdatatype.h"
-#include "busmember.h"
+#include <vector>
 
 namespace simulink::model {
 

@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include <simulink/SimulinkCommon/basetypesmappings.h>
-
 #include "rootdatatype.h"
+
+#include <simulink/SimulinkCommon/basetypesmappings.h>
 
 namespace simulink::model {
 
