@@ -21,232 +21,222 @@
 
 namespace simulink::model {
 
-const QString &Outport::name() const
-{
-    return m_name;
-}
-
-void Outport::setName(QString name)
-{
-    m_name = std::move(name);
-}
-
-const QString &Outport::outDataTypeStr() const
+const common::String &Outport::outDataTypeStr() const
 {
     return m_outDataTypeStr;
 }
 
-void Outport::setOutDataTypeStr(QString outDataTypeStr)
+void Outport::setOutDataTypeStr(common::String outDataTypeStr)
 {
     m_outDataTypeStr = std::move(outDataTypeStr);
 }
 
-const QString &Outport::busObject() const
+const common::String &Outport::busObject() const
 {
     return m_busObject;
 }
 
-void Outport::setBusObject(QString busObject)
+void Outport::setBusObject(common::String busObject)
 {
     m_busObject = std::move(busObject);
 }
 
-const QString &Outport::busOutputAsStruct() const
+const common::String &Outport::busOutputAsStruct() const
 {
     return m_busOutputAsStruct;
 }
 
-void Outport::setBusOutputAsStruct(QString busOutputAsStruct)
+void Outport::setBusOutputAsStruct(common::String busOutputAsStruct)
 {
     m_busOutputAsStruct = std::move(busOutputAsStruct);
 }
 
-const QString &Outport::iconDisplay() const
+const common::String &Outport::iconDisplay() const
 {
     return m_iconDisplay;
 }
 
-void Outport::setIconDisplay(QString iconDisplay)
+void Outport::setIconDisplay(common::String iconDisplay)
 {
     m_iconDisplay = std::move(iconDisplay);
 }
 
-const QString &Outport::initialOutput() const
+const common::String &Outport::initialOutput() const
 {
     return m_initialOutput;
 }
 
-void Outport::setInitialOutput(QString initialOutput)
+void Outport::setInitialOutput(common::String initialOutput)
 {
     m_initialOutput = std::move(initialOutput);
 }
 
-const QString &Outport::inputSignalNames() const
+const common::String &Outport::inputSignalNames() const
 {
     return m_inputSignalNames;
 }
 
-void Outport::setInputSignalNames(QString inputSignalNames)
+void Outport::setInputSignalNames(common::String inputSignalNames)
 {
     m_inputSignalNames = std::move(inputSignalNames);
 }
 
-const QString &Outport::lockScale() const
+const common::String &Outport::lockScale() const
 {
     return m_lockScale;
 }
 
-void Outport::setLockScale(QString lockScale)
+void Outport::setLockScale(common::String lockScale)
 {
     m_lockScale = std::move(lockScale);
 }
 
-const QString &Outport::mustResolveToSignalObject() const
+const common::String &Outport::mustResolveToSignalObject() const
 {
     return m_mustResolveToSignalObject;
 }
 
-void Outport::setMustResolveToSignalObject(QString mustResolveToSignalObject)
+void Outport::setMustResolveToSignalObject(common::String mustResolveToSignalObject)
 {
     m_mustResolveToSignalObject = std::move(mustResolveToSignalObject);
 }
 
-const QString &Outport::outMax() const
+const common::String &Outport::outMax() const
 {
     return m_outMax;
 }
 
-void Outport::setOutMax(QString outMax)
+void Outport::setOutMax(common::String outMax)
 {
     m_outMax = std::move(outMax);
 }
 
-const QString &Outport::outMin() const
+const common::String &Outport::outMin() const
 {
     return m_outMin;
 }
 
-void Outport::setOutMin(QString outMin)
+void Outport::setOutMin(common::String outMin)
 {
     m_outMin = std::move(outMin);
 }
 
-const QString &Outport::outputWhenDisabled() const
+const common::String &Outport::outputWhenDisabled() const
 {
     return m_outputWhenDisabled;
 }
 
-void Outport::setOutputWhenDisabled(QString outputWhenDisabled)
+void Outport::setOutputWhenDisabled(common::String outputWhenDisabled)
 {
     m_outputWhenDisabled = std::move(outputWhenDisabled);
 }
 
-const QString &Outport::port() const
+const common::String &Outport::port() const
 {
     return m_port;
 }
 
-void Outport::setPort(QString port)
+void Outport::setPort(common::String port)
 {
     m_port = std::move(port);
 }
 
-const QString &Outport::portDimensions() const
+const common::String &Outport::portDimensions() const
 {
     return m_portDimensions;
 }
 
-void Outport::setPortDimensions(QString portDimensions)
+void Outport::setPortDimensions(common::String portDimensions)
 {
     m_portDimensions = std::move(portDimensions);
 }
 
-const QString &Outport::sampleTime() const
+const common::String &Outport::sampleTime() const
 {
     return m_sampleTime;
 }
 
-void Outport::setSampleTime(QString sampleTime)
+void Outport::setSampleTime(common::String sampleTime)
 {
     m_sampleTime = std::move(sampleTime);
 }
 
-const QString &Outport::signalName() const
+const common::String &Outport::signalName() const
 {
     return m_signalName;
 }
 
-void Outport::setSignalName(QString signalName)
+void Outport::setSignalName(common::String signalName)
 {
     m_signalName = std::move(signalName);
 }
 
-const QString &Outport::signalObject() const
+const common::String &Outport::signalObject() const
 {
     return m_signalObject;
 }
 
-void Outport::setSignalObject(QString signalObject)
+void Outport::setSignalObject(common::String signalObject)
 {
     m_signalObject = std::move(signalObject);
 }
 
-const QString &Outport::signalType() const
+const common::String &Outport::signalType() const
 {
     return m_signalType;
 }
 
-void Outport::setSignalType(QString signalType)
+void Outport::setSignalType(common::String signalType)
 {
     m_signalType = std::move(signalType);
 }
 
-const QString &Outport::storageClass() const
+const common::String &Outport::storageClass() const
 {
     return m_storageClass;
 }
 
-void Outport::setStorageClass(QString storageClass)
+void Outport::setStorageClass(common::String storageClass)
 {
     m_storageClass = std::move(storageClass);
 }
 
-const QString &Outport::unit() const
+const common::String &Outport::unit() const
 {
     return m_unit;
 }
 
-void Outport::setUnit(QString unit)
+void Outport::setUnit(common::String unit)
 {
     m_unit = std::move(unit);
 }
 
-const QString &Outport::unitNoProp() const
+const common::String &Outport::unitNoProp() const
 {
     return m_unitNoProp;
 }
 
-void Outport::setUnitNoProp(QString unitNoProp)
+void Outport::setUnitNoProp(common::String unitNoProp)
 {
     m_unitNoProp = std::move(unitNoProp);
 }
 
-const QString &Outport::useBusObject() const
+const common::String &Outport::useBusObject() const
 {
     return m_useBusObject;
 }
 
-void Outport::setUseBusObject(QString useBusObject)
+void Outport::setUseBusObject(common::String useBusObject)
 {
     m_useBusObject = std::move(useBusObject);
 }
 
-const QString &Outport::varSizeSig() const
+const common::String &Outport::varSizeSig() const
 {
     return m_varSizeSig;
 }
 
-void Outport::setVarSizeSig(QString varSizeSig)
+void Outport::setVarSizeSig(common::String varSizeSig)
 {
     m_varSizeSig = std::move(varSizeSig);
 }

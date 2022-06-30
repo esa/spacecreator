@@ -19,11 +19,14 @@
 
 #pragma once
 
-#include <conversion/common/import/modelimporter.h>
-
+#include <functional>
 #include <memory>
 
+#include <conversion/common/import/modelimporter.h>
+#include <simulink/SimulinkCommon/basetypesmappings.h>
+
 class QXmlStreamReader;
+class QXmlStreamAttribute;
 
 namespace conversion {
 class Model;
@@ -33,12 +36,13 @@ class Options;
 namespace simulink::model {
 class ModelInterface;
 class Workspace;
-class WorkspaceElement;
-class MemberSet;
-class Member;
-class Inports;
+class RootDataType;
+class EnumDataType;
+class EnumValue;
+class AliasDataType;
+class BusDataType;
+class BusMember;
 class Inport;
-class Outports;
 class Outport;
 } // namespace simulink::model
 
@@ -53,38 +57,34 @@ public:
     /**
      * @brief   Read given SIMULINK file and produce SIMULINK model
      *
-     * @param   options     List of options
+     * @param   options  List of options
      *
      * @throws  conversion::importer::ImportException
      * @throws  msc::FileNotFoundException
+     * @throws  simulink::importer::ParserException
+     * @throws  simulink::importer::UnhandledElement
+     * @throws  simulink::importer::UnhandledAttribute
      * 
      * @return  Imported SIMULINK model
      */
     virtual auto importModel(const conversion::Options &options) const -> std::unique_ptr<conversion::Model> override;
 
 private:
-    /**
-     * @brief   Validate given preprocessed SEDS file
-     *
-     * Uses XmlValidator
-     *
-     * @param   preprocessedFilename    File to validate
-     * @param   options                 Importer options
-     *
-     * @throws  conversion::importer::FileNotFound
-     * @throws  seds::validator::ValidatorException
-     */
-    //auto validate(const QString &preprocessedFilepath, const conversion::Options &options) const -> void;
+    static auto processForNamedEntity(model::NamedEntity &namedEntity, const QXmlStreamAttribute &attribute) -> bool;
 
-    static auto parse(const QString &inputSimulinkFilename) -> std::unique_ptr<conversion::Model>;
+    static auto parse(const common::String &inputSimulinkFilename) -> std::unique_ptr<conversion::Model>;
     static auto readModelInterface(QXmlStreamReader &xmlReader) -> model::ModelInterface;
-    static auto readWorkspace(QXmlStreamReader &xmlReader) -> model::Workspace;
-    static auto readWorkspaceElement(QXmlStreamReader &xmlReader) -> model::WorkspaceElement;
-    static auto readWorkspaceElementMembers(QXmlStreamReader &xmlReader) -> model::MemberSet;
-    static auto readMember(QXmlStreamReader &xmlReader) -> model::Member;
-    static auto readInports(QXmlStreamReader &xmlReader) -> model::Inports;
+    static auto readDataTypes(QXmlStreamReader &xmlReader, model::ModelInterface &modelInterface) -> void;
+    static auto readEnumDataType(QXmlStreamReader &xmlReader) -> model::EnumDataType;
+    static auto readEnumValues(QXmlStreamReader &xmlReader, model::EnumDataType &enumDataType) -> void;
+    static auto readEnumValue(QXmlStreamReader &xmlReader) -> model::EnumValue;
+    static auto readAliasDataType(QXmlStreamReader &xmlReader) -> model::AliasDataType;
+    static auto readBusDataType(QXmlStreamReader &xmlReader) -> model::BusDataType;
+    static auto readBusMembers(QXmlStreamReader &xmlReader, model::BusDataType &busDataType) -> void;
+    static auto readBusMember(QXmlStreamReader &xmlReader) -> model::BusMember;
+    static auto readInports(QXmlStreamReader &xmlReader, model::ModelInterface &modelInterface) -> void;
     static auto readInport(QXmlStreamReader &xmlReader) -> model::Inport;
-    static auto readOutports(QXmlStreamReader &xmlReader) -> model::Outports;
+    static auto readOutports(QXmlStreamReader &xmlReader, model::ModelInterface &modelInterface) -> void;
     static auto readOutport(QXmlStreamReader &xmlReader) -> model::Outport;
 };
 

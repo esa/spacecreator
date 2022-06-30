@@ -17,30 +17,38 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
-
-#include "outport.h"
-
-#include <vector>
+#include "enumvalue.h"
 
 namespace simulink::model {
 
-class Outports final
+const common::String &EnumValue::value() const
 {
-public:
-    using OutportSet = std::vector<Outport>;
+    return m_value;
+}
 
-public:
-    Outports() = default;
-    Outports(Outports &&) = default;
-    Outports &operator=(Outports &&) = default;
+void EnumValue::setValue(common::String value)
+{
+    m_value = std::move(value);
+}
 
-public:
-    auto outports() const -> const OutportSet &;
-    auto addOutport(Outport outport) -> void;
+const common::String &EnumValue::description() const
+{
+    return m_description;
+}
 
-private:
-    OutportSet m_outports;
-};
+void EnumValue::setDescription(common::String description)
+{
+    m_description = std::move(description);
+}
+
+const common::String &EnumValue::detailedDescription() const
+{
+    return m_detailedDescription;
+}
+
+void EnumValue::setDetailedDescription(common::String detailedDescription)
+{
+    m_detailedDescription = std::move(detailedDescription);
+}
 
 } // namespace simulink::model

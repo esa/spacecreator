@@ -21,34 +21,46 @@
 
 namespace simulink::model {
 
-const Workspace &ModelInterface::workspace() const
+const DataType *ModelInterface::dataType(const QString &name) const
 {
-    return m_workspace;
+    auto result = std::find_if(m_dataTypes.begin(), m_dataTypes.end(),
+            [&name](const auto &dataType) { return dataTypeNameStr(dataType) == name; });
+
+    if (result != m_dataTypes.end()) {
+        return &(*result);
+    }
+
+    return nullptr;
 }
 
-void ModelInterface::setWorkspace(Workspace workspace)
+const ModelInterface::DataTypes &ModelInterface::dataTypes() const
 {
-    m_workspace = std::move(workspace);
+    return m_dataTypes;
 }
 
-const Inports &ModelInterface::inports() const
+void ModelInterface::addDataType(DataType dataType)
+{
+    m_dataTypes.push_back(std::move(dataType));
+}
+
+const ModelInterface::Inports &ModelInterface::inports() const
 {
     return m_inports;
 }
 
-void ModelInterface::setInports(Inports inports)
+void ModelInterface::addInport(Inport inport)
 {
-    m_inports = std::move(inports);
+    m_inports.push_back(std::move(inport));
 }
 
-const Outports &ModelInterface::outports() const
+const ModelInterface::Outports &ModelInterface::outports() const
 {
     return m_outports;
 }
 
-void ModelInterface::setOutports(Outports outports)
+void ModelInterface::addOutport(Outport outport)
 {
-    m_outports = std::move(outports);
+    m_outports.push_back(std::move(outport));
 }
 
 } // namespace simulink::model

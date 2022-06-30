@@ -17,18 +17,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "outports.h"
+#include "namedentity.h"
 
 namespace simulink::model {
 
-const Outports::OutportSet &Outports::outports() const
+NamedEntity::~NamedEntity() = default;
+
+const common::String &NamedEntity::name() const
 {
-    return m_outports;
+    return m_name;
 }
 
-void Outports::addOutport(Outport outport)
+void NamedEntity::setName(common::String name)
 {
-    m_outports.push_back(std::move(outport));
+    m_name = std::move(name);
 }
 
 } // namespace simulink::model

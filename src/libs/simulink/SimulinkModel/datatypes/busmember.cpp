@@ -17,106 +17,96 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "member.h"
+#include "busmember.h"
 
 namespace simulink::model {
 
-const QString &Member::name() const
-{
-    return m_name;
-}
-
-void Member::setName(QString name)
-{
-    m_name = std::move(name);
-}
-
-const QString &Member::dataType() const
+const common::String &BusMember::dataType() const
 {
     return m_dataType;
 }
 
-void Member::setDataType(QString dataType)
+void BusMember::setDataType(common::String dataType)
 {
     m_dataType = std::move(dataType);
 }
 
-const QString &Member::complexity() const
+const common::String &BusMember::complexity() const
 {
     return m_complexity;
 }
 
-void Member::setComplexity(QString complexity)
+void BusMember::setComplexity(common::String complexity)
 {
     m_complexity = std::move(complexity);
 }
 
-const QString &Member::description() const
+const common::String &BusMember::description() const
 {
     return m_description;
 }
 
-void Member::setDescription(QString description)
+void BusMember::setDescription(common::String description)
 {
     m_description = std::move(description);
 }
 
-const QString &Member::dimensions() const
+const common::String &BusMember::dimensions() const
 {
     return m_dimensions;
 }
 
-void Member::setDimensions(QString dimensions)
+void BusMember::setDimensions(common::String dimensions)
 {
     m_dimensions = std::move(dimensions);
 }
 
-const QString &Member::dimensionsMode() const
+const common::String &BusMember::dimensionsMode() const
 {
     return m_dimensionsMode;
 }
 
-void Member::setDimensionsMode(QString dimensionsMode)
+void BusMember::setDimensionsMode(common::String dimensionsMode)
 {
     m_dimensionsMode = std::move(dimensionsMode);
 }
 
-const QString &Member::max() const
+const common::String &BusMember::max() const
 {
     return m_max;
 }
 
-void Member::setMax(QString max)
+void BusMember::setMax(common::String max)
 {
     m_max = std::move(max);
 }
 
-const QString &Member::min() const
+const common::String &BusMember::min() const
 {
     return m_min;
 }
 
-void Member::setMin(QString min)
+void BusMember::setMin(common::String min)
 {
     m_min = std::move(min);
 }
 
-const QString &Member::sampleTime() const
+const common::String &BusMember::sampleTime() const
 {
     return m_sampleTime;
 }
 
-void Member::setSampleTime(QString sampleTime)
+void BusMember::setSampleTime(common::String sampleTime)
 {
     m_sampleTime = std::move(sampleTime);
 }
 
-const QString &Member::unit() const
+const common::String &BusMember::unit() const
 {
     return m_unit;
 }
 
-void Member::setUnit(QString unit)
+void BusMember::setUnit(common::String unit)
 {
     m_unit = std::move(unit);
 }

@@ -19,11 +19,12 @@
 
 #pragma once
 
-#include <QString>
+#include <simulink/SimulinkCommon/basetypesmappings.h>
+#include <simulink/SimulinkModel/base/namedentity.h>
 
 namespace simulink::model {
 
-class Inport final
+class Inport final : public NamedEntity
 {
 public:
     Inport() = default;
@@ -31,82 +32,80 @@ public:
     Inport &operator=(Inport &&) = default;
 
 public:
-    auto name() const -> const QString &;
-    auto setName(QString name) -> void;
+    auto outDataTypeStr() const -> const common::String &;
+    auto setOutDataTypeStr(common::String outDataTypeStr) -> void;
 
-    auto outDataTypeStr() const -> const QString &;
-    auto setOutDataTypeStr(QString outDataTypeStr) -> void;
+    auto busObject() const -> const common::String &;
+    auto setBusObject(common::String busObject) -> void;
 
-    auto busObject() const -> const QString &;
-    auto setBusObject(QString busObject) -> void;
+    auto busOutputAsStruct() const -> const common::String &;
+    auto setBusOutputAsStruct(common::String busOutputAsStruct) -> void;
 
-    auto busOutputAsStruct() const -> const QString &;
-    auto setBusOutputAsStruct(QString busOutputAsStruct) -> void;
+    auto iconDisplay() const -> const common::String &;
+    auto setIconDisplay(common::String iconDisplay) -> void;
 
-    auto iconDisplay() const -> const QString &;
-    auto setIconDisplay(QString iconDisplay) -> void;
+    auto interpolate() const -> const common::String &;
+    auto setInterpolate(common::String interpolate) -> void;
 
-    auto interpolate() const -> const QString &;
-    auto setInterpolate(QString interpolate) -> void;
+    auto latchByDelayingOutsideSignal() const -> const common::String &;
+    auto setLatchByDelayingOutsideSignal(common::String latchByDelayingOutsideSignal) -> void;
 
-    auto latchByDelayingOutsideSignal() const -> const QString &;
-    auto setLatchByDelayingOutsideSignal(QString latchByDelayingOutsideSignal) -> void;
+    auto latchInputForFeedbackSignals() const -> const common::String &;
+    auto setLatchInputForFeedbackSignals(common::String latchInputForFeedbackSignals) -> void;
 
-    auto latchInputForFeedbackSignals() const -> const QString &;
-    auto setLatchInputForFeedbackSignals(QString latchInputForFeedbackSignals) -> void;
+    auto lockScale() const -> const common::String &;
+    auto setLockScale(common::String lockScale) -> void;
 
-    auto lockScale() const -> const QString &;
-    auto setLockScale(QString lockScale) -> void;
+    auto outMax() const -> const common::String &;
+    auto setOutMax(common::String outMax) -> void;
 
-    auto outMax() const -> const QString &;
-    auto setOutMax(QString outMax) -> void;
+    auto outMin() const -> const common::String &;
+    auto setOutMin(common::String outMin) -> void;
 
-    auto outMin() const -> const QString &;
-    auto setOutMin(QString outMin) -> void;
+    auto outputSignalNames() const -> const common::String &;
+    auto setOutputSignalNames(common::String outputSignalNames) -> void;
 
-    auto outputSignalNames() const -> const QString &;
-    auto setOutputSignalNames(QString outputSignalNames) -> void;
+    auto port() const -> const common::String &;
+    auto setPort(common::String port) -> void;
 
-    auto port() const -> const QString &;
-    auto setPort(QString port) -> void;
+    auto portDimensions() const -> const common::String &;
+    auto setPortDimensions(common::String portDimensions) -> void;
 
-    auto portDimensions() const -> const QString &;
-    auto setPortDimensions(QString portDimensions) -> void;
+    auto sampleTime() const -> const common::String &;
+    auto setSampleTime(common::String sampleTime) -> void;
 
-    auto sampleTime() const -> const QString &;
-    auto setSampleTime(QString sampleTime) -> void;
+    auto signalType() const -> const common::String &;
+    auto setSignalType(common::String signalType) -> void;
 
-    auto signalType() const -> const QString &;
-    auto setSignalType(QString signalType) -> void;
+    auto unit() const -> const common::String &;
+    auto setUnit(common::String unit) -> void;
 
-    auto unit() const -> const QString &;
-    auto setUnit(QString unit) -> void;
+    auto unitNoProp() const -> const common::String &;
+    auto setUnitNoProp(common::String unitNoProp) -> void;
 
-    auto unitNoProp() const -> const QString &;
-    auto setUnitNoProp(QString unitNoProp) -> void;
-
-    auto useBusObject() const -> const QString &;
-    auto setUseBusObject(QString useBusObject) -> void;
+    auto useBusObject() const -> const common::String &;
+    auto setUseBusObject(common::String useBusObject) -> void;
+    
 private:
-    QString m_busObject;
-    QString m_busOutputAsStruct;
-    QString m_iconDisplay;
-    QString m_interpolate;
-    QString m_latchByDelayingOutsideSignal;
-    QString m_latchInputForFeedbackSignals;
-    QString m_lockScale;
-    QString m_name;
-    QString m_outDataTypeStr;
-    QString m_outMax;
-    QString m_outMin;
-    QString m_outputSignalNames;
-    QString m_port;
-    QString m_portDimensions;
-    QString m_sampleTime;
-    QString m_signalType;
-    QString m_unit;
-    QString m_unitNoProp;
-    QString m_useBusObject;
+    common::String m_busObject;
+    common::String m_busOutputAsStruct;
+    common::String m_iconDisplay;
+    common::String m_interpolate;
+    common::String m_latchByDelayingOutsideSignal;
+    common::String m_latchInputForFeedbackSignals;
+    common::String m_lockScale;
+    common::String m_name;
+    common::String m_outDataTypeStr;
+    common::String m_outMax;
+    common::String m_outMin;
+    common::String m_outputSignalNames;
+    common::String m_port;
+    common::String m_portDimensions;
+    common::String m_sampleTime;
+    common::String m_signalType;
+    common::String m_unit;
+    common::String m_unitNoProp;
+    common::String m_useBusObject;
 };
 
 } // namespace simulink::model

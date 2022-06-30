@@ -19,28 +19,31 @@
 
 #pragma once
 
-#include "workspaceelement.h"
-
-#include <vector>
+#include <simulink/SimulinkModel/base/namedentity.h>
+#include <simulink/SimulinkCommon/basetypesmappings.h>
 
 namespace simulink::model {
 
-class Workspace final
+class EnumValue final : public NamedEntity
 {
 public:
-    using WorkspaceElementSet = std::vector<WorkspaceElement>;
+    EnumValue() = default;
+    EnumValue(EnumValue &&) = default;
+    EnumValue &operator=(EnumValue &&) = default;
 
 public:
-    Workspace() = default;
-    Workspace(Workspace &&) = default;
-    Workspace &operator=(Workspace &&) = default;
+    auto value() const -> const common::String &;
+    auto setValue(common::String value) -> void;
 
-public:
-    auto workspaceElements() const -> const WorkspaceElementSet &;
-    auto addWorkspaceElement(WorkspaceElement workspaceElement) -> void;
-
+    auto description() const -> const common::String &;
+    auto setDescription(common::String description) -> void;
+    
+    auto detailedDescription() const -> const common::String &;
+    auto setDetailedDescription(common::String detailedDescription) -> void;
 private:
-    WorkspaceElementSet m_workspaceElements;
+    common::String m_value;
+    common::String m_description;
+    common::String m_detailedDescription;
 };
 
 } // namespace simulink::model

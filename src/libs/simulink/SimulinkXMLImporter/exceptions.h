@@ -19,9 +19,8 @@
 
 #pragma once
 
-#include <QString>
+#include <simulink/SimulinkCommon/basetypesmappings.h>
 #include <conversion/common/import/exceptions.h>
-#include <shared/stringref.h>
 
 namespace simulink::importer {
 
@@ -36,7 +35,7 @@ public:
      *
      * @param   message     Error message
      */
-    ParserException(QString message);
+    ParserException(common::String message);
 };
 
 /**
@@ -51,7 +50,7 @@ public:
      * @param   encounteredType     Type of the encountered element
      * @param   elementType         Type of the element in which unhandled element was encountered in
      */
-    UnhandledElement(const StringRef &encounteredType, const QString &elementType);
+    UnhandledElement(const StringRef &encounteredType, const common::String &elementType);
 };
 
 /**

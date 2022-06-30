@@ -17,18 +17,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "inports.h"
+#pragma once
+
+#include <simulink/SimulinkModel/base/namedentity.h>
 
 namespace simulink::model {
 
-const Inports::InportSet &Inports::inports() const
+class RootDataType : public NamedEntity
 {
-    return m_inports;
-}
-
-void Inports::addInport(Inport inport)
-{
-    m_inports.push_back(std::move(inport));
-}
+public:
+    RootDataType() = default;
+    virtual ~RootDataType() = 0;
+    RootDataType(RootDataType &&) = default;
+    RootDataType &operator=(RootDataType &&) = default;
+};
 
 } // namespace simulink::model

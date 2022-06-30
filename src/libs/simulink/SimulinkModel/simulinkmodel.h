@@ -20,7 +20,8 @@
 #pragma once
 
 #include <conversion/common/model.h>
-#include <simulink/SimulinkModel/modelinterface.h>
+
+#include "modelinterface.h"
 
 namespace simulink::model {
 

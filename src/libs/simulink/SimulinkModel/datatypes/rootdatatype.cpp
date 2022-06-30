@@ -17,18 +17,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "workspace.h"
+#include "rootdatatype.h"
 
 namespace simulink::model {
 
-const Workspace::WorkspaceElementSet &Workspace::workspaceElements() const
-{
-    return m_workspaceElements;
-}
-
-void Workspace::addWorkspaceElement(WorkspaceElement workspaceElement)
-{
-    m_workspaceElements.push_back(std::move(workspaceElement));
-}
+RootDataType::~RootDataType() = default;
 
 } // namespace simulink::model

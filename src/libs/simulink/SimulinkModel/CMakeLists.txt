@@ -1,28 +1,32 @@
 project(SimulinkModel VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES
+    base/namedentity.cpp
     simulinkmodel.cpp
     modelinterface.cpp
-    inport/inports.cpp
     inport/inport.cpp
-    outport/outports.cpp
     outport/outport.cpp
-    workspace/member.cpp
-    workspace/memberset.cpp
-    workspace/workspace.cpp
-    workspace/workspaceelement.cpp
+    datatypes/aliasdatatype.cpp
+    datatypes/busdatatype.cpp
+    datatypes/enumdatatype.cpp
+    datatypes/busmember.cpp
+    datatypes/enumvalue.cpp
+    datatypes/datatype.cpp
+    datatypes/rootdatatype.cpp
     )
 set(INCLUDES
+    base/namedentity.h
     simulinkmodel.h
     modelinterface.h
-    inport/inports.h
     inport/inport.h
-    outport/outports.h
     outport/outport.h
-    workspace/member.h
-    workspace/memberset.h
-    workspace/workspace.h
-    workspace/workspaceelement.h
+    datatypes/aliasdatatype.h
+    datatypes/busdatatype.h
+    datatypes/enumdatatype.h
+    datatypes/busmember.h
+    datatypes/enumvalue.h
+    datatypes/datatype.h
+    datatypes/rootdatatype.h
     )
 
 add_library(SimulinkModel STATIC)

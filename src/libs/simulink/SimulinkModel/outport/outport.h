@@ -19,11 +19,12 @@
 
 #pragma once
 
-#include <QString>
+#include <simulink/SimulinkCommon/basetypesmappings.h>
+#include <simulink/SimulinkModel/base/namedentity.h>
 
 namespace simulink::model {
 
-class Outport final
+class Outport final : public NamedEntity
 {
 public:
     Outport() = default;
@@ -31,98 +32,95 @@ public:
     Outport &operator=(Outport &&) = default;
 
 public:
-	auto name() const -> const QString &;
-	auto setName(QString name) -> void;
+	auto outDataTypeStr() const -> const common::String &;
+	auto setOutDataTypeStr(common::String outDataTypeStr) -> void;
 
-	auto outDataTypeStr() const -> const QString &;
-	auto setOutDataTypeStr(QString outDataTypeStr) -> void;
+	auto busObject() const -> const common::String &;
+	auto setBusObject(common::String busObject) -> void;
 
-	auto busObject() const -> const QString &;
-	auto setBusObject(QString busObject) -> void;
+	auto busOutputAsStruct() const -> const common::String &;
+	auto setBusOutputAsStruct(common::String busOutputAsStruct) -> void;
 
-	auto busOutputAsStruct() const -> const QString &;
-	auto setBusOutputAsStruct(QString busOutputAsStruct) -> void;
+	auto iconDisplay() const -> const common::String &;
+	auto setIconDisplay(common::String iconDisplay) -> void;
 
-	auto iconDisplay() const -> const QString &;
-	auto setIconDisplay(QString iconDisplay) -> void;
+	auto initialOutput() const -> const common::String &;
+	auto setInitialOutput(common::String initialOutput) -> void;
 
-	auto initialOutput() const -> const QString &;
-	auto setInitialOutput(QString initialOutput) -> void;
+	auto inputSignalNames() const -> const common::String &;
+	auto setInputSignalNames(common::String inputSignalNames) -> void;
 
-	auto inputSignalNames() const -> const QString &;
-	auto setInputSignalNames(QString inputSignalNames) -> void;
+	auto lockScale() const -> const common::String &;
+	auto setLockScale(common::String lockScale) -> void;
 
-	auto lockScale() const -> const QString &;
-	auto setLockScale(QString lockScale) -> void;
+	auto mustResolveToSignalObject() const -> const common::String &;
+	auto setMustResolveToSignalObject(common::String mustResolveToSignalObject) -> void;
 
-	auto mustResolveToSignalObject() const -> const QString &;
-	auto setMustResolveToSignalObject(QString mustResolveToSignalObject) -> void;
+	auto outMax() const -> const common::String &;
+	auto setOutMax(common::String outMax) -> void;
 
-	auto outMax() const -> const QString &;
-	auto setOutMax(QString outMax) -> void;
+	auto outMin() const -> const common::String &;
+	auto setOutMin(common::String outMin) -> void;
 
-	auto outMin() const -> const QString &;
-	auto setOutMin(QString outMin) -> void;
+	auto outputWhenDisabled() const -> const common::String &;
+	auto setOutputWhenDisabled(common::String outputWhenDisabled) -> void;
 
-	auto outputWhenDisabled() const -> const QString &;
-	auto setOutputWhenDisabled(QString outputWhenDisabled) -> void;
+	auto port() const -> const common::String &;
+	auto setPort(common::String port) -> void;
 
-	auto port() const -> const QString &;
-	auto setPort(QString port) -> void;
+	auto portDimensions() const -> const common::String &;
+	auto setPortDimensions(common::String portDimensions) -> void;
 
-	auto portDimensions() const -> const QString &;
-	auto setPortDimensions(QString portDimensions) -> void;
+	auto sampleTime() const -> const common::String &;
+	auto setSampleTime(common::String sampleTime) -> void;
 
-	auto sampleTime() const -> const QString &;
-	auto setSampleTime(QString sampleTime) -> void;
+	auto signalName() const -> const common::String &;
+	auto setSignalName(common::String signalName) -> void;
 
-	auto signalName() const -> const QString &;
-	auto setSignalName(QString signalName) -> void;
+	auto signalObject() const -> const common::String &;
+	auto setSignalObject(common::String signalObject) -> void;
 
-	auto signalObject() const -> const QString &;
-	auto setSignalObject(QString signalObject) -> void;
+	auto signalType() const -> const common::String &;
+	auto setSignalType(common::String signalType) -> void;
 
-	auto signalType() const -> const QString &;
-	auto setSignalType(QString signalType) -> void;
+	auto storageClass() const -> const common::String &;
+	auto setStorageClass(common::String storageClass) -> void;
 
-	auto storageClass() const -> const QString &;
-	auto setStorageClass(QString storageClass) -> void;
+	auto unit() const -> const common::String &;
+	auto setUnit(common::String unit) -> void;
 
-	auto unit() const -> const QString &;
-	auto setUnit(QString unit) -> void;
+	auto unitNoProp() const -> const common::String &;
+	auto setUnitNoProp(common::String unitNoProp) -> void;
 
-	auto unitNoProp() const -> const QString &;
-	auto setUnitNoProp(QString unitNoProp) -> void;
+	auto useBusObject() const -> const common::String &;
+	auto setUseBusObject(common::String useBusObject) -> void;
 
-	auto useBusObject() const -> const QString &;
-	auto setUseBusObject(QString useBusObject) -> void;
-
-	auto varSizeSig() const -> const QString &;
-	auto setVarSizeSig(QString varSizeSig) -> void;
+	auto varSizeSig() const -> const common::String &;
+	auto setVarSizeSig(common::String varSizeSig) -> void;
+	
 private:
-	QString m_name;
-	QString m_outDataTypeStr;
-	QString m_busObject;
-	QString m_busOutputAsStruct;
-	QString m_iconDisplay;
-	QString m_initialOutput;
-	QString m_inputSignalNames;
-	QString m_lockScale;
-	QString m_mustResolveToSignalObject;
-	QString m_outMax;
-	QString m_outMin;
-	QString m_outputWhenDisabled;
-	QString m_port;
-	QString m_portDimensions;
-	QString m_sampleTime;
-	QString m_signalName;
-	QString m_signalObject;
-	QString m_signalType;
-	QString m_storageClass;
-	QString m_unit;
-	QString m_unitNoProp;
-	QString m_useBusObject;
-	QString m_varSizeSig;
+	common::String m_outDataTypeStr;
+	common::String m_busObject;
+	common::String m_busOutputAsStruct;
+	common::String m_iconDisplay;
+	common::String m_initialOutput;
+	common::String m_inputSignalNames;
+	common::String m_lockScale;
+	common::String m_mustResolveToSignalObject;
+	common::String m_outMax;
+	common::String m_outMin;
+	common::String m_outputWhenDisabled;
+	common::String m_port;
+	common::String m_portDimensions;
+	common::String m_sampleTime;
+	common::String m_signalName;
+	common::String m_signalObject;
+	common::String m_signalType;
+	common::String m_storageClass;
+	common::String m_unit;
+	common::String m_unitNoProp;
+	common::String m_useBusObject;
+	common::String m_varSizeSig;
 };
 
 } // namespace simulink::model

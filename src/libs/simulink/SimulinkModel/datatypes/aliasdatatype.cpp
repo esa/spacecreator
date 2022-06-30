@@ -17,30 +17,48 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
-
-#include "inport.h"
-
-#include <vector>
+#include "aliasdatatype.h"
 
 namespace simulink::model {
 
-class Inports final
+const common::String &AliasDataType::baseType() const
 {
-public:
-    using InportSet = std::vector<Inport>;
+    return m_baseType;
+}
 
-public:
-    Inports() = default;
-    Inports(Inports &&) = default;
-    Inports &operator=(Inports &&) = default;
+void AliasDataType::setBaseType(common::String baseType)
+{
+    m_baseType = std::move(baseType);
+}
 
-public:
-    auto inports() const -> const InportSet &;
-    auto addInport(Inport inport) -> void;
+const common::String &AliasDataType::dataScope() const
+{
+    return m_dataScope;
+}
 
-private:
-    InportSet m_inports;
-};
+void AliasDataType::setDataScope(common::String dataScope)
+{
+    m_dataScope = std::move(dataScope);
+}
+
+const common::String &AliasDataType::description() const
+{
+    return m_description;
+}
+
+void AliasDataType::setDescription(common::String description)
+{
+    m_description = std::move(description);
+}
+
+const common::String &AliasDataType::headerFile() const
+{
+    return m_headerFile;
+}
+
+void AliasDataType::setHeaderFile(common::String headerFile)
+{
+    m_headerFile = std::move(headerFile);
+}
 
 } // namespace simulink::model

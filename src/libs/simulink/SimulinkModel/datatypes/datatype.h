@@ -17,28 +17,27 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "exceptions.h"
+#pragma once
 
-namespace simulink::importer {
+#include <variant>
 
-ParserException::ParserException(common::String message)
-    : ImportException(std::move(message))
-{
-}
+class QString;
 
-UnhandledElement::UnhandledElement(const StringRef &encounteredType, const common::String &elementType)
-    : ParserException(QString("Unhandled element <%1> in <%2>").arg(encounteredType).arg(elementType))
-{
-}
+namespace simulink::model {
 
-UnhandledAttribute::UnhandledAttribute(const StringRef &attributeName, const StringRef &elementType)
-    : ParserException(QString("Unhandled attribute [%1] in element <%2>").arg(attributeName).arg(elementType))
-{
-}
+class EnumDataType;
+class AliasDataType;
+class BusDataType;
 
-UnexpectedEOF::UnexpectedEOF(const StringRef &elementType)
-    : ParserException(QString("Unexpected EOF in <%1>").arg(elementType))
-{
-}
+using DataType = std::variant<EnumDataType, AliasDataType, BusDataType>;
 
-} // namespace simulink::importer
+/**
+ * @brief   Gets name from data type
+ *
+ * @param   dataType    Data type
+ *
+ * @return  Name
+ */
+const QString &dataTypeNameStr(const DataType &dataType);
+
+} // namespace simulink::model

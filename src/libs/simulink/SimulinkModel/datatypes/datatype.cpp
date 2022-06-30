@@ -17,30 +17,27 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include <QString>
 
-#include "member.h"
-
-#include <vector>
+#include "datatype.h"
+#include "enumdatatype.h"
+#include "aliasdatatype.h"
+#include "busdatatype.h"
 
 namespace simulink::model {
 
-class MemberSet final
+const QString &dataTypeNameStr(const DataType &dataType)
 {
-public:
-    using Members = std::vector<Member>;
+    const QString *dataTypeName = nullptr;
 
-public:
-    MemberSet() = default;
-    MemberSet(MemberSet &&) = default;
-    MemberSet &operator=(MemberSet &&) = default;
+    std::visit([&dataTypeName](auto &&type) { dataTypeName = &type.name(); }, dataType);
 
-public:
-    auto members() const -> const Members &;
-    auto addMember(Member member) -> void;
-
-private:
-    Members m_members;
-};
+    if (dataTypeName) {
+        return *dataTypeName;
+    } else {
+        static const QString emptyStr = "";
+        return emptyStr;
+    }
+}
 
 } // namespace simulink::model

@@ -17,18 +17,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "memberset.h"
+#pragma once
+
+#include <simulink/SimulinkCommon/basetypesmappings.h>
 
 namespace simulink::model {
 
-const MemberSet::Members &MemberSet::members() const
+class NamedEntity
 {
-    return m_members;
-}
+public:
+    NamedEntity() = default;
+    virtual ~NamedEntity() = 0;
+    NamedEntity(NamedEntity &&) = default;
+    NamedEntity &operator=(NamedEntity &&) = default;
 
-void MemberSet::addMember(Member member)
-{
-    m_members.push_back(std::move(member));
-}
+public:
+    auto name() const -> const common::String &;
+    auto setName(common::String name) -> void;
 
-} // namespace simulink::model
+protected:
+    common::String m_name;
+};
+
+} // namespace seds::model

@@ -19,31 +19,40 @@
 
 #pragma once
 
-#include "workspace/workspace.h"
-#include "inport/inports.h"
-#include "outport/outports.h"
+#include "datatypes/datatype.h"
+#include "datatypes/enumdatatype.h"
+#include "datatypes/aliasdatatype.h"
+#include "datatypes/busdatatype.h"
+#include "inport/inport.h"
+#include "outport/outport.h"
 
 namespace simulink::model {
 
 class ModelInterface final
 {
 public:
+    using DataTypes = std::vector<DataType>;
+    using Inports = std::vector<Inport>;
+    using Outports = std::vector<Outport>;
+
+public:
     ModelInterface() = default;
     ModelInterface(ModelInterface &&) = default;
     ModelInterface &operator=(ModelInterface &&) = default;
 
 public:
-    auto workspace() const -> const Workspace &;
-    auto setWorkspace(Workspace workspace) -> void;
+    auto dataType(const QString &name) const -> const DataType *;
+    auto dataTypes() const -> const DataTypes &;
+    auto addDataType(DataType dataType) -> void;
 
     auto inports() const -> const Inports &;
-    auto setInports(Inports inports) -> void;
+    auto addInport(Inport inport) -> void;
 
     auto outports() const -> const Outports &;
-    auto setOutports(Outports outports) -> void;
+    auto addOutport(Outport outport) -> void;
 
 private:
-    Workspace m_workspace;
+    DataTypes m_dataTypes;
     Inports m_inports;
     Outports m_outports;
 };
