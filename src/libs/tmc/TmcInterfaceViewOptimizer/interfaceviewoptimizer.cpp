@@ -78,13 +78,7 @@ void InterfaceViewOptimizer::discardFunctions(IVModel *ivModel, const std::vecto
 
 void InterfaceViewOptimizer::keepFunctions(IVModel *ivModel, const std::vector<QString> &functionNames)
 {
-    for (auto obj : ivModel->objects()) {
-        if (!isFunction(obj)) {
-            continue;
-        }
-
-        auto function = obj->as<IVFunction *>();
-
+    for (auto function : ivModel->allObjectsByType<IVFunction>()) {
         const auto functionFound = std::find(functionNames.begin(), functionNames.end(), function->title());
         if (functionFound == functionNames.end()) {
             markAsEnvironment(function);
@@ -94,16 +88,10 @@ void InterfaceViewOptimizer::keepFunctions(IVModel *ivModel, const std::vector<Q
 
 InterfaceViewOptimizer::ParentFunctionsInfo InterfaceViewOptimizer::flattenModel(IVModel *ivModel)
 {
-    auto objects = ivModel->objects();
     ParentFunctionsInfo parentFunctionsInfo;
     std::vector<IVFunctionType *> functionsToRemove;
 
-    for (auto obj : objects) {
-        if (!isFunctionType(obj)) {
-            continue;
-        }
-
-        auto function = obj->as<IVFunctionType *>();
+    for (auto function : ivModel->allObjectsByType<IVFunctionType>()) {
 
         if (isFunctionParent(function)) {
             std::vector<QString> children;
@@ -269,13 +257,7 @@ void InterfaceViewOptimizer::removeDeadConnections(IVModel *ivModel)
 {
     std::vector<IVObject *> objectsToRemove;
 
-    for (auto obj : ivModel->objects()) {
-        if (obj->as<IVObject *>()->type() != IVObject::Type::Connection) {
-            continue;
-        }
-
-        auto connection = obj->as<IVConnection *>();
-
+    for (auto connection : ivModel->allObjectsByType<IVConnection>()) {
         if (isConnectionDead(connection)) {
             objectsToRemove.push_back(connection);
             objectsToRemove.push_back(connection->sourceInterface());
@@ -292,14 +274,7 @@ void InterfaceViewOptimizer::removeDeadInterfaces(IVModel *ivModel)
 {
     std::vector<IVInterface *> interfacesToRemove;
 
-    for (auto obj : ivModel->objects()) {
-        if (obj->as<IVObject *>()->type() != IVObject::Type::ProvidedInterface
-                && obj->as<IVObject *>()->type() != IVObject::Type::RequiredInterface) {
-            continue;
-        }
-
-        auto interface = obj->as<IVInterface *>();
-
+    for (auto interface : ivModel->allObjectsByType<IVInterface>()) {
         if (isInterfaceDead(interface, ivModel)) {
             interfacesToRemove.push_back(interface);
         }
@@ -314,13 +289,7 @@ void InterfaceViewOptimizer::removeDeadFunctions(IVModel *ivModel)
 {
     std::vector<IVFunctionType *> functionsToRemove;
 
-    for (auto obj : ivModel->objects()) {
-        if (!isFunction(obj)) {
-            continue;
-        }
-
-        auto function = obj->as<IVFunction *>();
-
+    for (auto function : ivModel->allObjectsByType<IVFunction>()) {
         if (isFunctionDead(function)) {
             functionsToRemove.push_back(function);
         }
