@@ -36,7 +36,6 @@ class Options;
 namespace simulink::model {
 class ModelInterface;
 class Workspace;
-class RootDataType;
 class EnumDataType;
 class EnumValue;
 class AliasDataType;
@@ -44,6 +43,7 @@ class BusDataType;
 class BusMember;
 class Inport;
 class Outport;
+class NamedEntity;
 } // namespace simulink::model
 
 namespace simulink::importer {
