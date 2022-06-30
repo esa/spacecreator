@@ -23,4 +23,6 @@ init
     m = (m && n);
     m = (m || n);
     m = empty(channel1);
+    m = false;
+    m = true;
 }

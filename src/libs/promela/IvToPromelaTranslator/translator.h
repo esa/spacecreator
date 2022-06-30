@@ -234,6 +234,9 @@ private:
             model::PromelaModel *promelaModel, const QString &functionName, QList<QString> &channelNames) const -> void;
     auto createSystemState(model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,
             const std::vector<QString> &modelFunctions, const std::vector<QString> &observers) const -> void;
+    auto createPromelaObjectsForTimers(
+            Context &context, const ::ivm::IVModel *ivModel, const std::vector<QString> &modelFunctions) const -> void;
+    auto createWaitForInitStatement() const -> std::unique_ptr<model::ProctypeElement>;
 
     auto containsContextVariables(const QVector<shared::ContextParameter> &parameters) const -> bool;
     auto constructChannelName(const QString &functionName, const QString &interfaceName) const -> QString;

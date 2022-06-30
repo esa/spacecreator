@@ -553,11 +553,13 @@ std::unique_ptr<ProctypeElement> Asn1TypeValueGeneratorVisitor::generateAsnSeque
         valueExistsSequence->appendElement(ProctypeMaker::makeTrueExpressionProctypeElement());
         valueExistsSequence->appendElement(ProctypeMaker::makeInlineCall(typeGeneratorToCallName,
                 Escaper::escapePromelaName(argumentName), Escaper::escapePromelaName(componentName)));
-        valueExistsSequence->appendElement(ProctypeMaker::makeAssignmentProctypeElement(valueExistAssignmentName, 1));
+        valueExistsSequence->appendElement(
+                ProctypeMaker::makeAssignmentProctypeElement(valueExistAssignmentName, Constant(1)));
 
         auto valueNotExistSequence = ProctypeMaker::makeNormalSequence();
         valueNotExistSequence->appendElement(ProctypeMaker::makeTrueExpressionProctypeElement());
-        valueNotExistSequence->appendElement(ProctypeMaker::makeAssignmentProctypeElement(valueExistAssignmentName, 0));
+        valueNotExistSequence->appendElement(
+                ProctypeMaker::makeAssignmentProctypeElement(valueExistAssignmentName, Constant(0)));
 
         Conditional conditional;
         conditional.appendAlternative(std::move(valueExistsSequence));

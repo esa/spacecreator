@@ -34,6 +34,7 @@ using promela::model::ChannelSend;
 using promela::model::Conditional;
 using promela::model::Declaration;
 using promela::model::DoLoop;
+using promela::model::ElseStatement;
 using promela::model::ExitLoop;
 using promela::model::Expression;
 using promela::model::ForLoop;
@@ -93,11 +94,12 @@ void ProctypeElementVisitor::operator()(const ChannelSend &channelSend)
     m_stream << "!";
 
     bool afterFirst = false;
-    for (const VariableRef &arg : channelSend.getArgs()) {
+    for (const Expression &arg : channelSend.getArgs()) {
         if (afterFirst) {
-            m_stream << ",";
+            m_stream << ", ";
         }
-        visitor.visit(arg);
+        ExpressionVisitor expressionVisitor(m_stream);
+        expressionVisitor.visit(arg);
         afterFirst = true;
     }
 
@@ -242,6 +244,14 @@ void ProctypeElementVisitor::operator()(const AssertCall &call)
     visitor.visit(call.expression());
 
     m_stream << ");\n";
+}
+
+void ProctypeElementVisitor::operator()(const ElseStatement &statement)
+{
+    Q_UNUSED(statement);
+
+    m_stream << m_indent;
+    m_stream << "else;\n";
 }
 
 QString ProctypeElementVisitor::expressionContentToString(const model::Expression &expression)

@@ -32,6 +32,7 @@ using promela::model::ArrayType;
 using promela::model::Assignment;
 using promela::model::BasicType;
 using promela::model::BinaryExpression;
+using promela::model::BooleanConstant;
 using promela::model::ChannelInit;
 using promela::model::ChannelRecv;
 using promela::model::ChannelSend;
@@ -465,12 +466,14 @@ void tst_PromelaExporter::testProctypeElements()
     Declaration paramDecl(DataType(BasicType::INT), "param");
     paramDecl.setInit(Expression(Constant(4)));
     std::unique_ptr<ProctypeElement> declaration = std::make_unique<ProctypeElement>(paramDecl);
-    QList<VariableRef> params;
-    params.append(VariableRef("param"));
+    QList<Expression> sendParams;
+    sendParams.append(Expression(VariableRef("param")));
     std::unique_ptr<ProctypeElement> channelSend =
-            std::make_unique<ProctypeElement>(ChannelSend(VariableRef("channel1"), params));
+            std::make_unique<ProctypeElement>(ChannelSend(VariableRef("channel1"), sendParams));
+    QList<VariableRef> recvParams;
+    recvParams.append(VariableRef("param"));
     std::unique_ptr<ProctypeElement> channelRecv =
-            std::make_unique<ProctypeElement>(ChannelRecv(VariableRef("channel1"), params));
+            std::make_unique<ProctypeElement>(ChannelRecv(VariableRef("channel1"), recvParams));
     std::unique_ptr<ProctypeElement> inlineCall = std::make_unique<ProctypeElement>(InlineCall("fn", {}));
     QList<InlineCall::Argument> inlineParams;
     inlineParams.append(VariableRef("param"));
@@ -1016,6 +1019,13 @@ void tst_PromelaExporter::testExpressions()
         InlineCall emptyCall = InlineCall("empty", args);
         initSequence.appendElement(
                 std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(emptyCall))));
+    }
+
+    {
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(BooleanConstant(false)))));
+        initSequence.appendElement(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef("m"), Expression(BooleanConstant(true)))));
     }
 
     InitProctype init(std::move(initSequence));

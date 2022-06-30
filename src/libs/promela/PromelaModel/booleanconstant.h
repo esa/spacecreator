@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 - 2022 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,49 +19,29 @@
 
 #pragma once
 
-#include "binaryexpression.h"
-#include "booleanconstant.h"
-#include "constant.h"
-#include "inlinecall.h"
-#include "variableref.h"
-
-#include <QString>
-#include <variant>
-
 namespace promela::model {
 /**
- * @brief Representation of expression in promela.
+ * @brief Representation of boolean constant in promela
+ *
  */
-class Expression final
+class BooleanConstant final
 {
 public:
     /**
-     * @brief Variant to represent alternatives of expression
-     */
-    using Value = std::variant<VariableRef, Constant, BinaryExpression, InlineCall, BooleanConstant>;
-
-    /**
      * @brief Constructor.
      *
-     * @param content expression content
+     * @param value boolean constant value
      */
-    Expression(Value content);
+    BooleanConstant(bool value);
 
     /**
-     * @brief Constructor.
+     * @brief Getter for boolean constant value
      *
-     * @param constant expression content
+     * @return bool constant value
      */
-    Expression(int constant);
-
-    /**
-     * @brief Getter for expression content
-     *
-     * @return content of expression
-     */
-    const Value &getContent() const noexcept;
+    bool getValue() const noexcept;
 
 private:
-    Value m_content;
+    bool m_value;
 };
 }

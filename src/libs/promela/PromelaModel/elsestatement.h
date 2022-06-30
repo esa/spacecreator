@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,22 +17,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "channelsend.h"
+#pragma once
 
 namespace promela::model {
-ChannelSend::ChannelSend(VariableRef channelRef, const QList<Expression> &args)
-    : m_channelRef(std::move(channelRef))
-    , m_args(args)
+/**
+ * @brief Representation of proctype element else
+ */
+class ElseStatement
 {
-}
-
-const VariableRef &ChannelSend::getChannelRef() const noexcept
-{
-    return m_channelRef;
-}
-
-const QList<Expression> &ChannelSend::getArgs() const noexcept
-{
-    return m_args;
-}
+};
 }

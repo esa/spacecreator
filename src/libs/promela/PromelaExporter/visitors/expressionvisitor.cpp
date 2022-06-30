@@ -23,6 +23,7 @@
 #include "variablerefvisitor.h"
 
 using promela::model::BinaryExpression;
+using promela::model::BooleanConstant;
 using promela::model::Constant;
 using promela::model::Expression;
 using promela::model::InlineCall;
@@ -112,5 +113,14 @@ void ExpressionVisitor::operator()(const InlineCall &inlineCall)
 {
     InlineCallVisitor visitor(m_stream);
     visitor.visit(inlineCall);
+}
+
+void ExpressionVisitor::operator()(const BooleanConstant &constant)
+{
+    if (constant.getValue()) {
+        m_stream << "true";
+    } else {
+        m_stream << "false";
+    }
 }
 }

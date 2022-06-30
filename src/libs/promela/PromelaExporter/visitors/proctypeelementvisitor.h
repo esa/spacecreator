@@ -129,6 +129,12 @@ public:
      * @param call AssertCall to export
      */
     void operator()(const model::AssertCall &call);
+    /**
+     * @brief Handle Else Statement
+     *
+     * @param statement ElseStatement to export
+     */
+    void operator()(const model::ElseStatement &statement);
 
 private:
     QString expressionContentToString(const model::Expression &expression);

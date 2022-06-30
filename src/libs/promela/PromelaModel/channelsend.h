@@ -37,9 +37,9 @@ public:
      * TODO in future, it shall be possible to send an expression
      *
      * @param channelRef variableRef, which shall be a reference to channel
-     * @param args list of variable references, which are parameters of the signal
+     * @param args list of expression, which are parameters of the signal
      */
-    ChannelSend(VariableRef channelRef, const QList<VariableRef> &args);
+    ChannelSend(VariableRef channelRef, const QList<Expression> &args);
 
     /**
      * @brief Getter for channel reference.
@@ -53,10 +53,10 @@ public:
      *
      * @return list of arguments for send operation
      */
-    const QList<VariableRef> &getArgs() const noexcept;
+    const QList<Expression> &getArgs() const noexcept;
 
 private:
     VariableRef m_channelRef;
-    QList<VariableRef> m_args;
+    QList<Expression> m_args;
 };
 }
