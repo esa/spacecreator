@@ -1,0 +1,9 @@
+SUBTYPES DEFINITIONS ::=
+BEGIN
+
+IMPORTS MyInteger FROM USERDEFINED-TYPES-DATAVIEW;
+
+Pinger-ping-pingarg ::= MyInteger (3 .. 6)
+Pinger-pong-pongarg ::= MyInteger (3 .. 6)
+
+END
