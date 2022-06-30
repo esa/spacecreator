@@ -19,6 +19,8 @@
 
 #include "testgenerator.h"
 
+#include "datareconstructor/datareconstructor.h"
+#include "gdbconnector/gdbconnector.h"
 #include "gdbconnector/process.h"
 
 #include <QBuffer>
@@ -58,6 +60,7 @@ auto TestGenerator::testUsingDataFromCsv(
     prepareTasteProjectSkeleton();
     copyFunctionImplementations(testedFunctionName);
     compileSystemUnderTest();
+    extractResult(interface, asn1Model);
 }
 
 auto TestGenerator::initializePaths(const QString &baseDirectory) -> void
@@ -181,6 +184,7 @@ auto TestGenerator::copyFunctionImplementations(const QString &functionName) -> 
 
     sourceFilePath = generatedPath + QDir::separator() + "testdriver.c";
     destFilePath = generatedPath + QDir::separator() + "work/testdriver/C/src/testdriver.c";
+    QFile::remove(destFilePath);
     QFile::copy(sourceFilePath, destFilePath);
 }
 
@@ -238,6 +242,59 @@ auto TestGenerator::getDvObjectsFromModel(dvm::DVModel *const model) -> std::uni
     }
 
     return generatedDvObjects;
+}
+
+QString byteToHexStr(const char byte)
+{
+    const int hexBase = 16;
+
+    const auto number = static_cast<uint_least8_t>(byte);
+    if (number < hexBase) {
+        return QString("0%1").arg(number, 1, hexBase);
+    } else {
+        return QString("%1").arg(number, 2, hexBase);
+    }
+}
+
+void printQByteArrayInHex(const QByteArray &array)
+{
+    QString arrayInHex = QString("QByteArray size: %1\n").arg(array.size());
+    for (int i = 0; i < array.size(); i++) {
+        arrayInHex += byteToHexStr(array.at(i));
+        arrayInHex += " ";
+
+        if ((i + 1) % 8 == 0) {
+            arrayInHex += "| ";
+        }
+
+        if ((i + 1) % 16 == 0) {
+            arrayInHex += "\n";
+        }
+    }
+
+    qDebug().noquote() << arrayInHex;
+}
+
+auto TestGenerator::extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Model &asn1Model) -> void
+{
+    const QString binLocalization =
+            generatedPath + QDir::separator() + "work" + QDir::separator() + "binaries" + QDir::separator();
+    // TODO: it is now absolute but later will be changed
+    const QString script =
+            "/home/taste/SpaceCreator/spacecreator/src/libs/testgenerator/gdbconnector/scripts/x86-linux-cpp.gdb";
+    const QString binToRun = "/home/taste/SpaceCreator/TestProj3/generated/work/binaries/hostpartition";
+    const QByteArray rawTestData =
+            GdbConnector::getRawTestResults(binLocalization, { "-batch", "-x", script }, { "host:1234", binToRun });
+
+    const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
+        { "INTEGER", 4, 4 },
+        { "BOOLEAN", 1, 7 },
+        { "REAL", 8, 0 },
+    };
+    const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
+            rawTestData, &interface, &asn1Model, QDataStream::LittleEndian, typeLayoutInfos);
+
+    printQByteArrayInHex(rawTestData);
 }
 
 } // namespace spctr
