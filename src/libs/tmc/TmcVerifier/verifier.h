@@ -65,6 +65,12 @@ public:
      */
     void setInterfaceInputVectorLengthLimits(std::unordered_map<QString, QString> limits);
     /**
+     * @brief   Set path to the ASN.1 containing subtypes
+     *
+     * @param   filepath    Path to the file
+     */
+    void setSubtypesFilepath(std::optional<QString> filepath);
+    /**
      * @brief Add Stop Condition files to verifier.
      *
      * @param files A list of paths with Stop Condition files.

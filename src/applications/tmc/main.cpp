@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
     std::vector<QString> keepFunctions;
     std::optional<QString> globalInputVectorLengthLimit;
     std::unordered_map<QString, QString> interfaceInputVectorLengthLimits;
-    std::optional<QString> subtypingFileName;
+    std::optional<QString> subtypesFilepath;
 
     const QStringList args = app.arguments();
 
@@ -160,12 +160,12 @@ int main(int argc, char *argv[])
                 qCritical("Missing filename after -sub");
                 exit(EXIT_FAILURE);
             }
-            if (subtypingFileName.has_value()) {
+            if (subtypesFilepath.has_value()) {
                 qCritical("Duplicated -sub argument");
                 exit(EXIT_FAILURE);
             }
             ++i;
-            subtypingFileName = args[i];
+            subtypesFilepath = args[i];
         } else if (arg == "-h" || arg == "--help") {
             qInfo("tmc: TASTE Model Chcecker");
             qInfo("Usage: tmc [OPTIONS]");
@@ -212,6 +212,7 @@ int main(int argc, char *argv[])
     verifier.setKeepFunctions(keepFunctions);
     verifier.setGlobalInputVectorLengthLimit(std::move(globalInputVectorLengthLimit));
     verifier.setInterfaceInputVectorLengthLimits(std::move(interfaceInputVectorLengthLimits));
+    verifier.setSubtypesFilepath(subtypesFilepath);
 
     if (!verifier.addStopConditionFiles(stopConditionFiles)) {
         return EXIT_FAILURE;

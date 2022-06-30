@@ -115,6 +115,12 @@ public:
      */
     void setInterfaceInputVectorLengthLimits(std::unordered_map<QString, QString> limits);
     /**
+     * @brief   Set path to the ASN.1 containing subtypes
+     *
+     * @param   filepath    Path to the file
+     */
+    void setSubtypesFilepath(std::optional<QString> filepath);
+    /**
      * @brief Add Stop Condition files to convert.
      *
      * This shall be called before @link{convert}
@@ -177,6 +183,7 @@ private:
     std::vector<QString> m_keepFunctions;
     std::optional<QString> m_globalInputVectorLengthLimit;
     std::unordered_map<QString, QString> m_interfaceInputVectorLengthLimits;
+    std::optional<QString> m_subtypesFilepath;
     QStringList m_stopConditionsFiles;
     std::vector<ObserverInfo> m_observerInfos;
     QStringList m_observerAttachmentInfos;

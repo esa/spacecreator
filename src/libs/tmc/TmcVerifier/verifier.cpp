@@ -49,6 +49,11 @@ void TmcVerifier::setInterfaceInputVectorLengthLimits(std::unordered_map<QString
     m_converter->setInterfaceInputVectorLengthLimits(std::move(limits));
 }
 
+void TmcVerifier::setSubtypesFilepath(std::optional<QString> filepath)
+{
+    m_converter->setSubtypesFilepath(std::move(filepath));
+}
+
 bool TmcVerifier::addStopConditionFiles(const QStringList &files)
 {
     return m_converter->addStopConditionFiles(files);

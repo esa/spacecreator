@@ -144,6 +144,11 @@ void TmcConverter::setInterfaceInputVectorLengthLimits(std::unordered_map<QStrin
     m_interfaceInputVectorLengthLimits = std::move(limits);
 }
 
+void TmcConverter::setSubtypesFilepath(std::optional<QString> filepath)
+{
+    m_subtypesFilepath = std::move(filepath);
+}
+
 bool TmcConverter::addStopConditionFiles(const QStringList &files)
 {
     for (const QString &filepath : files) { // NOLINT(readability-use-anyofallof)
@@ -322,6 +327,17 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
         }
 
         asn1Files.append(datamodel);
+    }
+
+    if (m_subtypesFilepath.has_value()) {
+        QFileInfo subtypesFileInfo(*m_subtypesFilepath);
+
+        if (!subtypesFileInfo.exists()) {
+            qCritical() << "File " << subtypesFileInfo.absoluteFilePath() << " with subtypes does not exist.";
+            return false;
+        }
+
+        asn1Files.append(subtypesFileInfo.absoluteFilePath());
     }
 
     const QFileInfo outputDataview = outputFilepath("dataview.pml");
