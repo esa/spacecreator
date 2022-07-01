@@ -32,7 +32,8 @@ public:
     TestResultData(const CsvModel &csvModel, const QVector<QVariant> &results, float delta);
     QVector<QVariant> orygValues;
     QVector<QVariant> resultValues;
-    Fields expectedResults;
+    QVector<QVariant> expectedResults;
+    QVector<bool> isCorrectVector;
     float resultDelta;
 };
 
@@ -58,6 +59,7 @@ private:
     auto extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Model &asn1Model) -> QVector<QVariant>;
     auto generateResultHtmlFile(const TestResultData &resultData) -> void;
     auto generateResultHtmlStream(QTextStream &stream, const TestResultData &resultData) -> void;
+    auto generateTableRow(QTextStream &stream, QVector<QVariant> values, QVector<bool> isCorrectVector) -> void;
 
     QString projectDirectory;
     QString generatedPath;

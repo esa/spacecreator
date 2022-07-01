@@ -52,10 +52,13 @@ TestResultData::TestResultData(const CsvModel &csvModel, const QVector<QVariant>
         resultValues.push_back(results[i + 1]);
     }
     for (const auto &row : csvModel.records()) {
-        csv::Row csvRow = (*row);
+        csv::Row csvRow = *row;
         auto fields = csvRow.fields();
         constexpr int EXPECTED_RESULT_INDEX = 1;
         expectedResults.push_back(fields[EXPECTED_RESULT_INDEX]);
+    }
+    for (int i = 0; i < resultValues.size(); i++) {
+        isCorrectVector.push_back(abs(resultValues[i].toFloat() - expectedResults[i].toFloat()) <= resultDelta);
     }
 }
 
@@ -260,46 +263,26 @@ auto TestGenerator::getDvObjectsFromModel(dvm::DVModel *const model) -> std::uni
     return generatedDvObjects;
 }
 
-// auto TestGenerator::generateResultHtmlStream(QTextStream &stream, const QVector<QVariant> &readTestData) -> void
-// {
-//     stream << "<!DOCTYPE html>" << endl;
-//     stream << "<html lang='en'>" << endl;
-//     stream << " <head>" << endl;
-//     stream << "  <title>Test results for interface</title>" << endl;
-//     stream << "  <meta charset='utf-8'>" << endl;
-//     stream << " </head>" << endl;
-//     stream << " <style> table, th, td { border: 1px solid black; border-collapse: collapse; } </style>" << endl;
-//     stream << "<body>" << endl;
-//     stream << "    <table>" << endl;
-//     stream << "        <tr>" << endl;
-//     stream << "            ";
-
-//     for (const auto &value : readTestData) {
-//         stream << "<td>" << value.toInt() << "</td>";
-//     }
-
-//     stream << endl;
-//     stream << "        </tr>" << endl;
-//     stream << "        <tr>" << endl;
-//     stream << "            ";
-
-//     for (const auto &value : readTestData) {
-//         stream << "<td>" << value.toInt() << "</td>";
-//     }
-
-//     stream << endl;
-//     stream << "        </tr>" << endl;
-//     stream << "     </table>" << endl;
-//     stream << " </body>" << endl;
-//     stream << "</html>" << endl;
-// }
+auto TestGenerator::generateTableRow(QTextStream &stream, QVector<QVariant> values, QVector<bool> isCorrectVector = {})
+        -> void
+{
+    stream << "        <tr>" << endl;
+    stream << "            ";
+    for (int i = 0; i < values.size(); i++) {
+        if (!isCorrectVector.empty() && isCorrectVector[i] == false) {
+            stream << "<td style='color:red'>";
+        } else {
+            stream << "<td>";
+        }
+        stream << values[i].toFloat();
+        stream << "</td>";
+    }
+    stream << endl;
+    stream << "        </tr>" << endl;
+}
 
 auto TestGenerator::generateResultHtmlStream(QTextStream &stream, const TestResultData &resultData) -> void
 {
-    auto orygValues = resultData.orygValues;
-    auto expectedResults = resultData.expectedResults;
-    auto resultValues = resultData.resultValues;
-
     stream << "<!DOCTYPE html>" << endl;
     stream << "<html lang='en'>" << endl;
     stream << " <head>" << endl;
@@ -310,29 +293,9 @@ auto TestGenerator::generateResultHtmlStream(QTextStream &stream, const TestResu
     stream << "<body>" << endl;
     stream << "    <table>" << endl;
 
-    stream << "        <tr>" << endl;
-    stream << "            ";
-    for (const auto &value : orygValues) {
-        stream << "<td>" << value.toInt() << "</td>";
-    }
-    stream << endl;
-    stream << "        </tr>" << endl;
-
-    stream << "        <tr>" << endl;
-    stream << "            ";
-    for (const auto &value : expectedResults) {
-        stream << "<td>" << value.toInt() << "</td>";
-    }
-    stream << endl;
-    stream << "        </tr>" << endl;
-
-    stream << "        <tr>" << endl;
-    stream << "            ";
-    for (const auto &value : resultValues) {
-        stream << "<td>" << value.toInt() << "</td>";
-    }
-    stream << endl;
-    stream << "        </tr>" << endl;
+    generateTableRow(stream, resultData.orygValues);
+    generateTableRow(stream, resultData.expectedResults);
+    generateTableRow(stream, resultData.resultValues, resultData.isCorrectVector);
 
     stream << "     </table>" << endl;
     stream << " </body>" << endl;
