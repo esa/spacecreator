@@ -26,15 +26,15 @@
 
 namespace testgenerator {
 
-class TestResultData
+struct TestResultData
 {
-public:
-    TestResultData(const CsvModel &csvModel, const QVector<QVariant> &results, float delta);
+    TestResultData(const QString &ifaceName, const CsvModel &csvModel, const QVector<QVariant> &results, float delta);
+    QString interfaceName;
     QVector<QVariant> orygValues;
     QVector<QVariant> resultValues;
     QVector<QVariant> expectedResults;
     QVector<bool> isCorrectVector;
-    float resultDelta;
+    float maxDelta;
 };
 
 class TestGenerator final
@@ -59,7 +59,7 @@ private:
     auto extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Model &asn1Model) -> QVector<QVariant>;
     auto generateResultHtmlFile(const TestResultData &resultData) -> void;
     auto generateResultHtmlStream(QTextStream &stream, const TestResultData &resultData) -> void;
-    auto generateTableRow(QTextStream &stream, QVector<QVariant> values, QVector<bool> isCorrectVector) -> void;
+    auto generateTableRow(QTextStream &stream, const QString &columnName, QVector<QVariant> values, QVector<bool> isCorrectVector) -> void;
 
     QString projectDirectory;
     QString generatedPath;
