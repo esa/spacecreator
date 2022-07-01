@@ -27,6 +27,7 @@
 #include <promela/PromelaOptions/options.h>
 #include <shared/exportableproperty.h>
 
+using Asn1Acn::Asn1Model;
 using conversion::Escaper;
 using conversion::Model;
 using conversion::ModelType;
@@ -231,8 +232,10 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     }
 
     const auto *ivModel = getModel<IVModel>(sourceModels);
+    auto ivFunctionList = ivModel->allObjectsByType<IVFunction>();
 
-    QVector<IVFunction *> ivFunctionList = ivModel->allObjectsByType<IVFunction>();
+    const auto *asn1Model = getModel<Asn1Model>(sourceModels);
+    const auto asn1SubtypesDefinitions = getSubtypesDefinitions(asn1Model, options);
 
     promelaModel->addInclude("dataview.pml");
 
@@ -291,7 +294,7 @@ ModelType IvToPromelaTranslator::getTargetModelType() const
 
 std::set<ModelType> IvToPromelaTranslator::getDependencies() const
 {
-    return std::set<ModelType> { ModelType::InterfaceView };
+    return std::set<ModelType> { ModelType::InterfaceView, ModelType::Asn1 };
 }
 
 static void initializeFunction(Sequence &sequence, const QString &functionName)
@@ -894,6 +897,38 @@ QString IvToPromelaTranslator::constructChannelName(const QString &functionName,
     return QString("%1_%2_channel").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
 }
 
+const Asn1Acn::Definitions *IvToPromelaTranslator::getSubtypesDefinitions(
+        const Asn1Model *asn1Model, const Options &options) const
+{
+    const auto subtypesFilepath = options.value(PromelaOptions::subtypesFilepath);
+
+    if (subtypesFilepath.has_value()) {
+        const auto &asn1ModelData = asn1Model->data();
+
+        const auto foundAsn1File = std::find_if(asn1ModelData.begin(), asn1ModelData.end(),
+                [&](const auto &file) { return file->name() == *subtypesFilepath; });
+
+        if (foundAsn1File == asn1ModelData.end()) {
+            auto errorMessage = QString("Unable to find subtypes file '%1' in the ASN.1 model").arg(*subtypesFilepath);
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        const auto &definitionsList = (*foundAsn1File)->definitionsList();
+
+        if (definitionsList.empty()) {
+            auto errorMessage = QString("Subtypes file '%1' doesn't contain any definitions").arg(*subtypesFilepath);
+            throw TranslationException(std::move(errorMessage));
+        } else if (definitionsList.size() > 1) {
+            auto errorMessage = QString("Subtypes file '%1' contains more than one definitions").arg(*subtypesFilepath);
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        return definitionsList.at(0).get();
+    } else {
+        return nullptr;
+    }
+}
+
 QString IvToPromelaTranslator::getInterfaceName(const ivm::IVInterface *interface) const
 {
     return interface->property("name").toString();
@@ -953,5 +988,27 @@ size_t IvToPromelaTranslator::getInterfacePriority(IVInterface *interface) const
         return property.toULongLong();
     }
     return 1;
+}
+
+QString IvToPromelaTranslator::handleParameterType(const QString &parameterTypeName, const QString &parameterName,
+        const QString &interfaceName, const QString &functionName,
+        const Asn1Acn::Definitions *asn1SubtypesDefinitions) const
+{
+    if (asn1SubtypesDefinitions == nullptr) {
+        return parameterTypeName;
+    }
+
+    auto parameterSubtypeName = QString("%1-%2-%3").arg(functionName).arg(interfaceName).arg(parameterName);
+    parameterSubtypeName.replace('_', '-');
+    parameterSubtypeName = parameterSubtypeName.toLower();
+    parameterSubtypeName[0] = parameterSubtypeName[0].toUpper();
+
+    const auto parameterSubtype = asn1SubtypesDefinitions->type(parameterSubtypeName);
+
+    if (parameterSubtype == nullptr) {
+        return parameterTypeName;
+    } else {
+        return parameterSubtypeName;
+    }
 }
 }

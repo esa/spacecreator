@@ -347,8 +347,8 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
     createEnvGenerationInlines(simuDataView, outputEnv, environmentDatatypes);
 
     const QFileInfo outputSystemFile = outputFilepath("system.pml");
-    convertInterfaceview(
-            outputOptimizedIvFileName, outputSystemFile.absoluteFilePath(), modelFunctions, environmentFunctions);
+    convertInterfaceview(outputOptimizedIvFileName, outputSystemFile.absoluteFilePath(), asn1Files, modelFunctions,
+            environmentFunctions);
 
     return true;
 }
@@ -371,7 +371,8 @@ bool TmcConverter::convertStopConditions(const std::map<QString, ProcessMetadata
 }
 
 bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QString &outputFilepath,
-        const QStringList &modelFunctions, const QStringList &environmentFunctions)
+        const QList<QString> &asn1FilepathList, const QStringList &modelFunctions,
+        const QStringList &environmentFunctions)
 {
     qDebug() << "Converting InterfaceView " << inputFilepath << " to " << outputFilepath;
 
@@ -397,6 +398,11 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
         options.add(PromelaOptions::interfaceInputVectorLengthLimit.arg(interfaceName.toLower()), value);
     }
 
+    if (m_subtypesFilepath.has_value()) {
+        QFileInfo subtypesFileInfo(*m_subtypesFilepath);
+        options.add(PromelaOptions::subtypesFilepath, subtypesFileInfo.absoluteFilePath());
+    }
+
     for (const QString &observer : m_observerNames) {
         options.add(PromelaOptions::observerFunctionName, observer);
     }
@@ -412,7 +418,11 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
         options.add(PromelaOptions::additionalIncludes, base.toLower() + ".pml");
     }
 
-    return convertModel({ ModelType::InterfaceView }, ModelType::Promela, {}, std::move(options));
+    for (const QString &inputFileName : asn1FilepathList) {
+        options.add(Asn1Options::inputFilepath, inputFileName);
+    }
+
+    return convertModel({ ModelType::InterfaceView, ModelType::Asn1 }, ModelType::Promela, {}, std::move(options));
 }
 
 bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath)

@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <asn1library/asn1/asn1model.h>
+#include <asn1library/asn1/definitions.h>
 #include <conversion/common/translation/translator.h>
 #include <ivcore/ivinterface.h>
 #include <promela/PromelaModel/promelamodel.h>
@@ -249,11 +251,17 @@ private:
     auto containsContextVariables(const QVector<shared::ContextParameter> &parameters) const -> bool;
     auto constructChannelName(const QString &functionName, const QString &interfaceName) const -> QString;
 
+    auto getSubtypesDefinitions(const Asn1Acn::Asn1Model *asn1Model, const conversion::Options &options) const
+            -> const Asn1Acn::Definitions *;
     auto getInterfaceName(const ivm::IVInterface *interface) const -> QString;
     auto getInterfaceFunctionName(const ivm::IVInterface *interface) const -> QString;
     auto getInterfaceProperty(ivm::IVInterface *interface, const QString &name) const -> QVariant;
     auto getInterfaceParameter(const ivm::IVInterface *interface) const -> std::pair<QString, QString>;
     auto getInterfaceQueueSize(ivm::IVInterface *interface) const -> size_t;
     auto getInterfacePriority(ivm::IVInterface *interface) const -> size_t;
+
+    auto handleParameterType(const QString &parameterTypeName, const QString &parameterName,
+            const QString &interfaceName, const QString &functionName,
+            const Asn1Acn::Definitions *asn1SubtypesDefinitions) const -> QString;
 };
 }

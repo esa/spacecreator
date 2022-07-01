@@ -56,6 +56,9 @@ public:
     /** @brief Interface input vector length limit template*/
     inline static const QString interfaceInputVectorLengthLimit = "Promela_Convert_InterfaceInputVectorLengthLimit_%1";
 
+    /** @brief  Filepath of the ASN.1 file containing subtypes */
+    inline static const QString subtypesFilepath = "Promela_Convert_SubtypesFilepath";
+
     /**
      *  @brief Specification of an observer attachment
      *  Contains information regarding the name of the observer, as well as the location

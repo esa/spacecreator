@@ -46,6 +46,6 @@ bool PromelaRegistrar::registerCapabilities(conversion::Registry &registry)
 
     auto ivToPromelaTranslator = std::make_unique<IvToPromelaTranslator>();
     return registry.registerTranslator(
-            { ModelType::InterfaceView }, ModelType::Promela, std::move(ivToPromelaTranslator));
+            { ModelType::InterfaceView, ModelType::Asn1 }, ModelType::Promela, std::move(ivToPromelaTranslator));
 }
 }

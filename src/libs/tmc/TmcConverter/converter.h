@@ -150,7 +150,8 @@ private:
     bool convertStopConditions(const std::map<QString, ProcessMetadata> &allSdlFiles);
 
     bool convertInterfaceview(const QString &inputFilepath, const QString &outputFilepath,
-            const QStringList &modelFunctions, const QStringList &environmentFunctions);
+            const QList<QString> &asn1FilepathList, const QStringList &modelFunctions,
+            const QStringList &environmentFunctions);
     bool convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath);
     std::unique_ptr<ivm::IVModel> readInterfaceView(const QString &filepath);
     void saveOptimizedInterfaceView(const ivm::IVModel *ivModel, const QString outputFilePath);
