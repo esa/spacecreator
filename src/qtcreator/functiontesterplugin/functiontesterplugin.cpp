@@ -20,10 +20,12 @@
 #include "functiontesterplugin.h"
 #include "pluginconstants.h"
 
+#include <QDesktopServices>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMenu>
 #include <QMessageBox>
+#include <QTextBrowser>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <editormanager/editormanager.h>
 #include <libiveditor/interfacedocument.h>
@@ -84,6 +86,7 @@ auto FunctionTesterPlugin::testUsingDataFromCsvGui() -> void
 
     TestGenerator testGenerator(getBaseDirectory());
     testGenerator.testUsingDataFromCsv(*interface, *csvModel, *asn1Model, delta);
+    displayResultHtml();
 }
 
 auto FunctionTesterPlugin::addTestInterfaceOption() -> void
@@ -198,6 +201,20 @@ auto FunctionTesterPlugin::getCurrentIvEditorCore() -> IVEditorCorePtr
         return nullptr;
     }
     return currentIvDocument->ivEditorCore();
+}
+
+auto FunctionTesterPlugin::displayResultHtml() -> void
+{
+    qDebug() << "Displaying html";
+    QString filepath = getBaseDirectory() + QDir::separator() + "work" + QDir::separator() + "Results.html";
+    // QTextBrowser *textBrowser = new QTextBrowser();
+    // textBrowser->setSource(QUrl::fromLocalFile(filepath));
+    // textBrowser->show();
+
+    // QWebEngineView *view = new QWebEngineView(parent);
+    // view->load(QUrl(QUrl::fromLocalFile(filepath)));
+    // view->show();
+    QDesktopServices::openUrl(QUrl::fromLocalFile(filepath));
 }
 
 } // namespace spctr

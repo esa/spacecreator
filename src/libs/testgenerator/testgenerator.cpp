@@ -44,6 +44,21 @@ using plugincommon::ModelLoader;
 
 namespace testgenerator {
 
+TestResultData::TestResultData(const CsvModel &csvModel, const QVector<QVariant> &results, float delta)
+    : resultDelta(delta)
+{
+    for (int i = 0; i < results.size(); i += 2) {
+        orygValues.push_back(results[i]);
+        resultValues.push_back(results[i + 1]);
+    }
+    for (const auto &row : csvModel.records()) {
+        csv::Row csvRow = (*row);
+        auto fields = csvRow.fields();
+        constexpr int EXPECTED_RESULT_INDEX = 1;
+        expectedResults.push_back(fields[EXPECTED_RESULT_INDEX]);
+    }
+}
+
 TestGenerator::TestGenerator(const QString &baseDirectory)
 {
     initializePaths(baseDirectory);
@@ -60,7 +75,8 @@ auto TestGenerator::testUsingDataFromCsv(
     prepareTasteProjectSkeleton();
     copyFunctionImplementations(testedFunctionName);
     compileSystemUnderTest();
-    extractResult(interface, asn1Model);
+    QVector<QVariant> testResults = extractResult(interface, asn1Model);
+    generateResultHtmlFile(TestResultData(csvModel, testResults, delta));
 }
 
 auto TestGenerator::initializePaths(const QString &baseDirectory) -> void
@@ -244,38 +260,96 @@ auto TestGenerator::getDvObjectsFromModel(dvm::DVModel *const model) -> std::uni
     return generatedDvObjects;
 }
 
-QString byteToHexStr(const char byte)
-{
-    const int hexBase = 16;
+// auto TestGenerator::generateResultHtmlStream(QTextStream &stream, const QVector<QVariant> &readTestData) -> void
+// {
+//     stream << "<!DOCTYPE html>" << endl;
+//     stream << "<html lang='en'>" << endl;
+//     stream << " <head>" << endl;
+//     stream << "  <title>Test results for interface</title>" << endl;
+//     stream << "  <meta charset='utf-8'>" << endl;
+//     stream << " </head>" << endl;
+//     stream << " <style> table, th, td { border: 1px solid black; border-collapse: collapse; } </style>" << endl;
+//     stream << "<body>" << endl;
+//     stream << "    <table>" << endl;
+//     stream << "        <tr>" << endl;
+//     stream << "            ";
 
-    const auto number = static_cast<uint_least8_t>(byte);
-    if (number < hexBase) {
-        return QString("0%1").arg(number, 1, hexBase);
-    } else {
-        return QString("%1").arg(number, 2, hexBase);
+//     for (const auto &value : readTestData) {
+//         stream << "<td>" << value.toInt() << "</td>";
+//     }
+
+//     stream << endl;
+//     stream << "        </tr>" << endl;
+//     stream << "        <tr>" << endl;
+//     stream << "            ";
+
+//     for (const auto &value : readTestData) {
+//         stream << "<td>" << value.toInt() << "</td>";
+//     }
+
+//     stream << endl;
+//     stream << "        </tr>" << endl;
+//     stream << "     </table>" << endl;
+//     stream << " </body>" << endl;
+//     stream << "</html>" << endl;
+// }
+
+auto TestGenerator::generateResultHtmlStream(QTextStream &stream, const TestResultData &resultData) -> void
+{
+    auto orygValues = resultData.orygValues;
+    auto expectedResults = resultData.expectedResults;
+    auto resultValues = resultData.resultValues;
+
+    stream << "<!DOCTYPE html>" << endl;
+    stream << "<html lang='en'>" << endl;
+    stream << " <head>" << endl;
+    stream << "  <title>Test results for interface</title>" << endl;
+    stream << "  <meta charset='utf-8'>" << endl;
+    stream << " </head>" << endl;
+    stream << " <style> table, th, td { border: 1px solid black; border-collapse: collapse; } </style>" << endl;
+    stream << "<body>" << endl;
+    stream << "    <table>" << endl;
+
+    stream << "        <tr>" << endl;
+    stream << "            ";
+    for (const auto &value : orygValues) {
+        stream << "<td>" << value.toInt() << "</td>";
+    }
+    stream << endl;
+    stream << "        </tr>" << endl;
+
+    stream << "        <tr>" << endl;
+    stream << "            ";
+    for (const auto &value : expectedResults) {
+        stream << "<td>" << value.toInt() << "</td>";
+    }
+    stream << endl;
+    stream << "        </tr>" << endl;
+
+    stream << "        <tr>" << endl;
+    stream << "            ";
+    for (const auto &value : resultValues) {
+        stream << "<td>" << value.toInt() << "</td>";
+    }
+    stream << endl;
+    stream << "        </tr>" << endl;
+
+    stream << "     </table>" << endl;
+    stream << " </body>" << endl;
+    stream << "</html>" << endl;
+}
+
+auto TestGenerator::generateResultHtmlFile(const TestResultData &resultData) -> void
+{
+    QString filename = this->projectDirectory + QDir::separator() + "work" + QDir::separator() + "Results.html";
+    QFile file(filename);
+    if (file.open(QIODevice::WriteOnly)) {
+        QTextStream stream(&file);
+        generateResultHtmlStream(stream, resultData);
     }
 }
 
-void printQByteArrayInHex(const QByteArray &array)
-{
-    QString arrayInHex = QString("QByteArray size: %1\n").arg(array.size());
-    for (int i = 0; i < array.size(); i++) {
-        arrayInHex += byteToHexStr(array.at(i));
-        arrayInHex += " ";
-
-        if ((i + 1) % 8 == 0) {
-            arrayInHex += "| ";
-        }
-
-        if ((i + 1) % 16 == 0) {
-            arrayInHex += "\n";
-        }
-    }
-
-    qDebug().noquote() << arrayInHex;
-}
-
-auto TestGenerator::extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Model &asn1Model) -> void
+auto TestGenerator::extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Model &asn1Model) -> QVector<QVariant>
 {
     const QString binLocalization =
             generatedPath + QDir::separator() + "work" + QDir::separator() + "binaries" + QDir::separator();
@@ -294,7 +368,7 @@ auto TestGenerator::extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Mode
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
             rawTestData, &interface, &asn1Model, QDataStream::LittleEndian, typeLayoutInfos);
 
-    printQByteArrayInHex(rawTestData);
+    return readTestData;
 }
 
 } // namespace spctr

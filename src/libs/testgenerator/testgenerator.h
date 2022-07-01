@@ -26,6 +26,16 @@
 
 namespace testgenerator {
 
+class TestResultData
+{
+public:
+    TestResultData(const CsvModel &csvModel, const QVector<QVariant> &results, float delta);
+    QVector<QVariant> orygValues;
+    QVector<QVariant> resultValues;
+    Fields expectedResults;
+    float resultDelta;
+};
+
 class TestGenerator final
 {
 public:
@@ -45,8 +55,10 @@ private:
     auto getAllFunctionsFromModel(const ivm::IVModel &ivModel) -> std::vector<ivm::IVFunction *>;
     auto prepareTestHarnessFiles(ivm::IVInterface &interface,
             const csv::CsvModel &csvModel, Asn1Acn::Asn1Model &asn1Model) -> QString;
-    auto extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Model &asn1Model) -> void;
-    
+    auto extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Model &asn1Model) -> QVector<QVariant>;
+    auto generateResultHtmlFile(const TestResultData &resultData) -> void;
+    auto generateResultHtmlStream(QTextStream &stream, const TestResultData &resultData) -> void;
+
     QString projectDirectory;
     QString generatedPath;
     QString generatedCodePath;
