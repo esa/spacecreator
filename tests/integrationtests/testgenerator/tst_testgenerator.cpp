@@ -35,10 +35,36 @@ class tst_testgenerator : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
-    void testGenerateAndBuildTests();
+    void testGeneratingAndBuildingTests();
+    void testCompilation();
 };
 
-void tst_testgenerator::testGenerateAndBuildTests()
+void tst_testgenerator::testGeneratingAndBuildingTests()
+{
+    const auto ivModel =
+            ModelLoader::loadIvModel("resources/project/config.xml", "resources/project/interfaceview.xml");
+    ivm::IVInterface *const interface = IvTools::getIfaceFromModel("CustomIface", ivModel.get());
+    if (!interface) {
+        return;
+    }
+    auto csvModel = ModelLoader::loadCsvModel("resources/project/test.csv");
+    if (!csvModel) {
+        return;
+    }
+    auto asn1Model = ModelLoader::loadAsn1Model("resources/project/dataview-uniq.asn");
+    if (!asn1Model) {
+        return;
+    }
+    float delta = 0.0;
+
+    TestGenerator testGenerator(QDir::currentPath());
+    testGenerator.testUsingDataFromCsv(*interface, *csvModel, *asn1Model, delta);
+
+    // auto generatedBinary = "generated/work/binaries";
+    // QCOMPARE(QFileInfo::exists(generatedBinary), true);
+}
+
+void tst_testgenerator::testCompilation()
 {
     const auto ivModel =
             ModelLoader::loadIvModel("resources/project/config.xml", "resources/project/interfaceview.xml");
