@@ -324,14 +324,15 @@ auto TestGenerator::generateResultHtmlFile(const TestResultData &resultData) -> 
 
 auto TestGenerator::extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Model &asn1Model) -> QVector<QVariant>
 {
+
     const QString binLocalization =
             generatedPath + QDir::separator() + "work" + QDir::separator() + "binaries" + QDir::separator();
     // TODO: it is now absolute but later will be changed
     const QString script =
             "/home/taste/SpaceCreator/spacecreator/src/libs/testgenerator/gdbconnector/scripts/x86-linux-cpp.gdb";
     const QString binToRun = "/home/taste/SpaceCreator/TestProj3/generated/work/binaries/hostpartition";
-    const QByteArray rawTestData =
-            GdbConnector::getRawTestResults(binLocalization, { "-batch", "-x", script }, { "host:1234", binToRun });
+    const QByteArray rawTestData = GdbConnector::getRawTestResults(
+            binLocalization, { "-batch", "-x", script }, { "localhost:1234", binToRun });
 
     const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
         { "INTEGER", 4, 4 },

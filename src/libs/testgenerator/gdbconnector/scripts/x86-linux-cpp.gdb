@@ -1,9 +1,9 @@
-#target extended-remote host:1234
-file /home/taste/SpaceCreator/TestProj3/generated/work/binaries/hostpartition
+target extended-remote :1234
+
 break notifyTestFinished
-#commands
-#end
+commands
+dump srec memory /dev/stdout testData testData+testDataSize
+end
 
 run
-dump srec memory /dev/stdout testData testData+testDataSize
-#monitor exit
+monitor exit
