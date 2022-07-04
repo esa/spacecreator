@@ -251,7 +251,8 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
             createPromelaObjectsForFunction(context, ivModel, ivFunction, functionName);
         } else if (std::find(environmentFunctions.begin(), environmentFunctions.end(), functionName)
                 != environmentFunctions.end()) {
-            createPromelaObjectsForEnvironment(context, ivModel, ivFunction, functionName, options);
+            createPromelaObjectsForEnvironment(
+                    context, ivModel, ivFunction, functionName, asn1SubtypesDefinitions, options);
         }
     }
 
@@ -649,7 +650,7 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslato
 
 void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTranslator::Context &context,
         const IVModel *ivModel, IVFunction *ivFunction, const QString &functionName,
-        const conversion::Options &options) const
+        const Asn1Acn::Definitions *asn1SubtypesDefinitions, const conversion::Options &options) const
 {
     QVector<IVInterface *> providedInterfaceList = ivFunction->pis();
     for (IVInterface *providedInterface : providedInterfaceList) {
@@ -670,7 +671,8 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTransl
         const std::pair<QString, QString> parameter = getInterfaceParameter(providedInterface);
 
         const QString parameterName = parameter.first;
-        const QString parameterType = parameter.second;
+        const QString parameterType = handleParameterType(
+                parameter.second, parameterName, interfaceName, functionName, asn1SubtypesDefinitions);
 
         context.model()->addInlineDef(generateSendInline(
                 functionName, interfaceName, parameterName, parameterType, sourceFunctionName, sourceInterfaceName));
@@ -695,7 +697,8 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTransl
         const std::pair<QString, QString> parameter = getInterfaceParameter(requiredInterface);
 
         const QString parameterName = parameter.first;
-        const QString parameterType = parameter.second;
+        const QString parameterType = handleParameterType(
+                parameter.second, parameterName, interfaceName, functionName, asn1SubtypesDefinitions);
 
         const QString sendInline =
                 QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);

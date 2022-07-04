@@ -234,8 +234,8 @@ private:
     auto createPromelaObjectsForFunction(Context &context, const ::ivm::IVModel *ivModel, ::ivm::IVFunction *ivFunction,
             const QString &functionName) const -> void;
     auto createPromelaObjectsForEnvironment(Context &context, const ::ivm::IVModel *ivModel,
-            ::ivm::IVFunction *ivFunction, const QString &functionName, const conversion::Options &options) const
-            -> void;
+            ::ivm::IVFunction *ivFunction, const QString &functionName,
+            const Asn1Acn::Definitions *asn1SubtypesDefinitions, const conversion::Options &options) const -> void;
     auto createCheckQueueInline(
             model::PromelaModel *promelaModel, const QString &functionName, QList<QString> &channelNames) const -> void;
     auto createSystemState(model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,

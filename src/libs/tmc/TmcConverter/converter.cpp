@@ -440,6 +440,11 @@ bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, cons
         options.add(Asn1Options::inputFilepath, inputFileName);
     }
 
+    if (m_subtypesFilepath.has_value()) {
+        QFileInfo subtypesFileInfo(*m_subtypesFilepath);
+        options.add(PromelaOptions::subtypesFilepath, subtypesFileInfo.absoluteFilePath());
+    }
+
     options.add(PromelaOptions::outputFilepath, outputFilepath);
 
     return convertModel({ ModelType::Asn1 }, ModelType::Promela, {}, std::move(options));
@@ -559,6 +564,15 @@ bool TmcConverter::createEnvGenerationInlines(
     Options options;
 
     options.add(Asn1Options::inputFilepath, inputDataView.absoluteFilePath());
+
+    if (m_subtypesFilepath.has_value()) {
+        QFileInfo subtypesFileInfo(*m_subtypesFilepath);
+
+        qDebug() << "Converting ASN.1 subtypes value generators using " << subtypesFileInfo.absoluteFilePath();
+        options.add(Asn1Options::inputFilepath, subtypesFileInfo.absoluteFilePath());
+        options.add(PromelaOptions::subtypesFilepath, subtypesFileInfo.absoluteFilePath());
+    }
+
     options.add(PromelaOptions::outputFilepath, outputFilepath.absoluteFilePath());
 
     options.add(PromelaOptions::asn1ValueGeneration);
