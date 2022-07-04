@@ -56,12 +56,12 @@ auto TestGenerator::testUsingDataFromCsv(
     Q_UNUSED(delta);
 
     QString testedFunctionName = prepareTestHarnessFiles(interface, csvModel, asn1Model);
-    // if (testedFunctionName.isEmpty()) {
-    //     return;
-    // }
-    // prepareTasteProjectSkeleton();
-    // copyFunctionImplementations(testedFunctionName);
-    // compileSystemUnderTest();
+    if (testedFunctionName.isEmpty()) {
+        return;
+    }
+    prepareTasteProjectSkeleton();
+    copyFunctionImplementations(testedFunctionName);
+    compileSystemUnderTest();
 }
 
 auto TestGenerator::initializePaths(const QString &baseDirectory) -> void
@@ -114,13 +114,13 @@ auto TestGenerator::prepareTestHarnessFiles(
 
     const std::unique_ptr<dvm::DVModel> dvModelGenerated =
             DvGenerator::generate(ivFunctions, "x86 Linux CPP", "x86_Linux_TestRunner", "Node_1", "hostPartition");
-    // if (dvModelGenerated == nullptr) {
-    //     qDebug() << "DV model was not generated";
-    //     return {};
-    // }
-    // exportDvModel(dvModelGenerated.get(), generatedDvPath);
-    // constexpr int TESTED_FUNCTION_INDEX = 1;
-    // return ivFunctions[TESTED_FUNCTION_INDEX]->title();
+    if (dvModelGenerated == nullptr) {
+        qDebug() << "DV model was not generated";
+        return {};
+    }
+    exportDvModel(dvModelGenerated.get(), generatedDvPath);
+    constexpr int TESTED_FUNCTION_INDEX = 1;
+    return ivFunctions[TESTED_FUNCTION_INDEX]->title();
     return {};
 }
 
