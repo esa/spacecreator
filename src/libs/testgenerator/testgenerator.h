@@ -39,7 +39,6 @@ private:
     auto exportDvModel(dvm::DVModel *dvModel, const QString &outputFilename) -> void;
     auto exportIvModel(ivm::IVModel *ivModel, const QString &outputFilename) -> void;
     auto getDvObjectsFromModel(dvm::DVModel *const model) -> std::unique_ptr<QVector<dvm::DVObject *>>;
-    auto copyRecursively(const QString &srcPath, const QString &dstPath) -> bool;
     auto runProcess(QString cmd, QStringList args, QString workingPath) -> void;
     auto prepareTasteProjectSkeleton() -> void;
     auto copyFunctionImplementations(const QString &functionName) -> void;
