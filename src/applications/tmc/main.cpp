@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
             qInfo("                         Integer <priority> of the Observer is optional");
             qInfo("  -e, --envfunc <name>   Use <name> to specify a SDL function that should be treated as "
                   "environment");
-            qInfo("  -k, --keepfunc <name>  Use <name> to specify a SDL function that shouldn't be treates as "
+            qInfo("  -k, --keepfunc <name>  Use <name> to specify a SDL function that shouldn't be treated as "
                   "environment.");
             qInfo("                         All other functions will be treated as environment");
             qInfo("  -ivl <limit>           Use <limit> to specify input vector length limit.");

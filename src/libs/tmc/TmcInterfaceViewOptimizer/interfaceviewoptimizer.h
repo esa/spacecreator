@@ -36,6 +36,7 @@ namespace tmc {
 class InterfaceViewOptimizer final
 {
 public:
+    /// @brief   Mode in which optimizer should work
     enum class Mode
     {
         Environment,

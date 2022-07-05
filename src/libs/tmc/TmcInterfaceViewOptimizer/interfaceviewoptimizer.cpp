@@ -355,11 +355,7 @@ bool InterfaceViewOptimizer::isInterfaceDead(const IVInterface *interface, const
 {
     const auto connection = ivModel->getConnectionForIface(interface->id());
 
-    if (connection == nullptr) {
-        return true;
-    } else {
-        return false;
-    }
+    return connection == nullptr;
 }
 
 bool InterfaceViewOptimizer::isFunctionDead(const IVFunction *function)

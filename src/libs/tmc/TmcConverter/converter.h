@@ -99,7 +99,7 @@ public:
      * @brief   Specify which IV functions shouldn't be treated as an environment
      *          during model checking
      *
-     * @param   keepFunctions   Functions to treat as an evironment
+     * @param   keepFunctions   Functions to be treated as an evironment
      */
     void setKeepFunctions(const std::vector<QString> &keepFunctions);
     /**
