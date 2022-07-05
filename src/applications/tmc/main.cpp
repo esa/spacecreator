@@ -195,8 +195,8 @@ int main(int argc, char *argv[])
 
     tmc::verifier::TmcVerifier verifier(inputIvFilepath.value(), outputDirectory.value());
 
-    verifier.addEnvironmentFunctions(environmentFunctions);
-    verifier.addKeepFunctions(keepFunctions);
+    verifier.setEnvironmentFunctions(environmentFunctions);
+    verifier.setKeepFunctions(keepFunctions);
     verifier.setGlobalInputVectorLengthLimit(std::move(globalInputVectorLengthLimit));
     verifier.setInterfaceInputVectorLengthLimits(std::move(interfaceInputVectorLengthLimits));
 

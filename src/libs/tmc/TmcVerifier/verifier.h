@@ -44,14 +44,14 @@ public:
      *
      * @param   environmentFunctions    Functions to treat as an evironment
      */
-    void addEnvironmentFunctions(const std::vector<QString> &environmentFunctions);
+    void setEnvironmentFunctions(const std::vector<QString> &environmentFunctions);
     /**
      * @brief   Specify which IV functions shouldn't be treated as an environment
      *          during model checking
      *
      * @param   keepFunctions   Functions to treat as an evironment
      */
-    void addKeepFunctions(const std::vector<QString> &keepFunctions);
+    void setKeepFunctions(const std::vector<QString> &keepFunctions);
     /**
      * @brief   Set global input vector length limit
      *

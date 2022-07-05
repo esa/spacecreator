@@ -124,12 +124,12 @@ bool TmcConverter::convert()
     return true;
 }
 
-void TmcConverter::addEnvironmentFunctions(const std::vector<QString> &environmentFunctions)
+void TmcConverter::setEnvironmentFunctions(const std::vector<QString> &environmentFunctions)
 {
     m_environmentFunctions = environmentFunctions;
 }
 
-void TmcConverter::addKeepFunctions(const std::vector<QString> &keepFunctions)
+void TmcConverter::setKeepFunctions(const std::vector<QString> &keepFunctions)
 {
     m_keepFunctions = keepFunctions;
 }
