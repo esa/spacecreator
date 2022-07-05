@@ -43,12 +43,10 @@ set_tests_properties(${TEST_NAME} PROPERTIES
     ENVIRONMENT "LD_LIBRARY_PATH=$<TARGET_FILE_DIR:TestGenerator>:${QTC_LIB_DIR}:${QTC_PLUGINS_DIR}:$LD_LIBRARY_PATH"
 )
 
-configure_file(resources/project/test.csv resources/project/test.csv COPYONLY)
-configure_file(resources/project/interfaceview.xml resources/project/interfaceview.xml COPYONLY)
-configure_file(resources/project/dataview-uniq.asn resources/project/dataview-uniq.asn COPYONLY)
-configure_file(resources/project/config.xml resources/project/config.xml COPYONLY)
-configure_file(resources/generated/testdriver.c resources/generated/testdriver.c COPYONLY)
-configure_file(resources/generated/interfaceview.xml resources/generated/interfaceview.xml COPYONLY)
-configure_file(resources/generated/deploymentview.dv.xml resources/generated/deploymentview.dv.xml COPYONLY)
+configure_file(resources/test.csv resources/test.csv COPYONLY)
+configure_file(resources/interfaceview.xml resources/interfaceview.xml COPYONLY)
+configure_file(resources/dataview-uniq.asn resources/dataview-uniq.asn COPYONLY)
+configure_file(resources/config.xml resources/config.xml COPYONLY)
+configure_file(resources/Board1.xml "$ENV{HOME}/.local/share/${TEST_NAME}/HWlibrary/Board1.xml" COPYONLY)
 
 add_format_target(${TEST_NAME})
