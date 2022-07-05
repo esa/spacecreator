@@ -50,12 +50,9 @@ TestGenerator::TestGenerator(const QString &baseDirectory)
 auto TestGenerator::testUsingDataFromCsv(
         ivm::IVInterface &interface, const csv::CsvModel &csvModel, Asn1Acn::Asn1Model &asn1Model, float delta) -> void
 {
-    Q_UNUSED(interface);
-    Q_UNUSED(csvModel);
-    Q_UNUSED(asn1Model);
     Q_UNUSED(delta);
 
-    QString testedFunctionName = prepareTestHarnessFiles(interface, csvModel, asn1Model);
+    QString testedFunctionName = prepareTestHarness(interface, csvModel, asn1Model);
     if (testedFunctionName.isEmpty()) {
         return;
     }
@@ -85,7 +82,7 @@ auto TestGenerator::getAllFunctionsFromModel(const ivm::IVModel &ivModel) -> std
     return ivFunctions;
 }
 
-auto TestGenerator::prepareTestHarnessFiles(
+auto TestGenerator::prepareTestHarness(
         ivm::IVInterface &interface, const csv::CsvModel &csvModel, Asn1Acn::Asn1Model &asn1Model) -> QString
 {
     QDir dir(generatedPath);
@@ -121,7 +118,6 @@ auto TestGenerator::prepareTestHarnessFiles(
     exportDvModel(dvModelGenerated.get(), generatedDvPath);
     constexpr int TESTED_FUNCTION_INDEX = 1;
     return ivFunctions[TESTED_FUNCTION_INDEX]->title();
-    return {};
 }
 
 auto TestGenerator::copyRecursively(const QString &srcPath, const QString &dstPath) -> bool

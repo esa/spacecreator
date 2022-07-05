@@ -35,58 +35,38 @@ class tst_testgenerator : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
-    void testGeneratingAndBuildingTests();
-    void testCompilation();
+    void testPrepareTestHarness();
 };
 
-void tst_testgenerator::testGeneratingAndBuildingTests()
+void tst_testgenerator::testPrepareTestHarness()
 {
-    const auto ivModel =
-            ModelLoader::loadIvModel("resources/project/config.xml", "resources/project/interfaceview.xml");
+    const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview.xml");
     ivm::IVInterface *const interface = IvTools::getIfaceFromModel("CustomIface", ivModel.get());
     if (!interface) {
         return;
     }
-    auto csvModel = ModelLoader::loadCsvModel("resources/project/test.csv");
+    auto csvModel = ModelLoader::loadCsvModel("resources/test.csv");
     if (!csvModel) {
         return;
     }
-    auto asn1Model = ModelLoader::loadAsn1Model("resources/project/dataview-uniq.asn");
+    auto asn1Model = ModelLoader::loadAsn1Model("resources/dataview-uniq.asn");
     if (!asn1Model) {
         return;
     }
-    float delta = 0.0;
 
     TestGenerator testGenerator(QDir::currentPath());
-    testGenerator.testUsingDataFromCsv(*interface, *csvModel, *asn1Model, delta);
+    QString testedFunctionName = testGenerator.prepareTestHarness(*interface, *csvModel, *asn1Model);
 
-    // auto generatedBinary = "generated/work/binaries";
-    // QCOMPARE(QFileInfo::exists(generatedBinary), true);
-}
+    QString generatedHarnessDirectory = "generated";
+    auto generatedTestDriver = generatedHarnessDirectory + QDir::separator() + "testdriver.c";
+    auto generatedIvFile = generatedHarnessDirectory + QDir::separator() + "interfaceview.xml";
+    auto generatedDvFile = generatedHarnessDirectory + QDir::separator() + "deploymentview.dv.xml";
 
-void tst_testgenerator::testCompilation()
-{
-    const auto ivModel =
-            ModelLoader::loadIvModel("resources/project/config.xml", "resources/project/interfaceview.xml");
-    ivm::IVInterface *const interface = IvTools::getIfaceFromModel("CustomIface", ivModel.get());
-    if (!interface) {
-        return;
-    }
-    auto csvModel = ModelLoader::loadCsvModel("resources/project/test.csv");
-    if (!csvModel) {
-        return;
-    }
-    auto asn1Model = ModelLoader::loadAsn1Model("resources/project/dataview-uniq.asn");
-    if (!asn1Model) {
-        return;
-    }
-    float delta = 0.0;
+    QVERIFY(QFileInfo::exists(generatedTestDriver));
+    QVERIFY(QFileInfo::exists(generatedIvFile));
+    QVERIFY(QFileInfo::exists(generatedDvFile));
 
-    TestGenerator testGenerator(QDir::currentPath());
-    testGenerator.testUsingDataFromCsv(*interface, *csvModel, *asn1Model, delta);
-
-    // auto generatedBinary = "generated/work/binaries";
-    // QCOMPARE(QFileInfo::exists(generatedBinary), true);
+    QDir(generatedHarnessDirectory).removeRecursively();
 }
 
 }
