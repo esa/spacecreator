@@ -26,14 +26,27 @@
 
 namespace testgenerator {
 
+// struct TestResultRow
+// {
+//     TestResultRow(const QVector<QVariant> &resultsInRow)
+//         : results(resultsInRow) {
+//                 for (int i = 0; i < params.size(); i++)
+//     {
+//         if (params[i].isInDirection()) {
+            
+//         }
+//     }
+//         }
+//     QVector<QVariant> results;
+// };
+
 struct TestResultData
 {
-    TestResultData(const QString &ifaceName, const CsvModel &csvModel, const QVector<QVariant> &results, float delta);
+    TestResultData(const QString &ifaceName, const QVector<shared::InterfaceParameter> &params, const CsvModel &csvModel, const QVector<QVariant> &results, float delta);
     QString interfaceName;
-    QVector<QVariant> orygValues;
-    QVector<QVariant> resultValues;
-    QVector<QVariant> expectedResults;
-    QVector<bool> isCorrectVector;
+    QVector<shared::InterfaceParameter> ifaceParams;
+    QVector<QVector<QVariant>> cells;
+    int rows;
     float maxDelta;
 };
 

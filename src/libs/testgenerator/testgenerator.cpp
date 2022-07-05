@@ -44,23 +44,26 @@ using plugincommon::ModelLoader;
 
 namespace testgenerator {
 
-TestResultData::TestResultData(
-        const QString &ifaceName, const CsvModel &csvModel, const QVector<QVariant> &results, float delta)
+TestResultData::TestResultData(const QString &ifaceName, const QVector<shared::InterfaceParameter> &params,
+        const CsvModel &csvModel, const QVector<QVariant> &results, float delta)
     : interfaceName(ifaceName)
+    , ifaceParams(params)
+    , rows(results.size() / params.size())
     , maxDelta(delta)
 {
-    for (int i = 0; i < results.size(); i += 2) {
-        orygValues.push_back(results[i]);
-        resultValues.push_back(results[i + 1]);
-    }
-    for (const auto &row : csvModel.records()) {
-        csv::Row csvRow = *row;
-        auto fields = csvRow.fields();
-        constexpr int EXPECTED_RESULT_INDEX = 1;
-        expectedResults.push_back(fields[EXPECTED_RESULT_INDEX]);
-    }
-    for (int i = 0; i < resultValues.size(); i++) {
-        isCorrectVector.push_back(abs(resultValues[i].toFloat() - expectedResults[i].toFloat()) <= maxDelta);
+    Q_UNUSED(csvModel);
+    for (int i = 0; i < rows; i++) {
+        cells.push_back({});
+        for (int j = i * params.size(); j < (i + 1) * params.size(); j++) {
+            cells[i].push_back(results[j]); // TODO: replace this line with the following conditional statement
+            // if (params[j].isInDirection()) {
+            //     cells[i].push_back(results[j]);
+            // } else {
+            //     // cells[i].push_back(results[j]); // csvmodel
+            //     cells[i].push_back(results[j]);
+            //     // cells[i].push_back(); // diff
+            // }
+        }
     }
 }
 
@@ -82,7 +85,7 @@ auto TestGenerator::testUsingDataFromCsv(
     copyFunctionImplementations(testedFunctionName);
     compileSystemUnderTest();
     QVector<QVariant> testResults = extractResult(interface, asn1Model);
-    generateResultHtmlFile(TestResultData(interface.title(), csvModel, testResults, delta));
+    generateResultHtmlFile(TestResultData(interface.title(), interface.params(), csvModel, testResults, delta));
 }
 
 auto TestGenerator::initializePaths(const QString &baseDirectory) -> void
@@ -279,9 +282,29 @@ auto TestGenerator::generateResultHtmlStream(QTextStream &stream, const TestResu
     stream << "<h2>Test results for interface " << resultData.interfaceName << "</h2>" << endl;
     stream << "    <table>" << endl;
 
-    generateTableRow(stream, "Input", resultData.orygValues);
-    generateTableRow(stream, "Expected", resultData.expectedResults);
-    generateTableRow(stream, "Results", resultData.resultValues, resultData.isCorrectVector);
+    auto values = resultData.cells;
+
+    for (int i = 0; i < resultData.rows; i++) {
+        stream << "        <tr>" << endl;
+        stream << "            ";
+        // stream << "<th>" << columnName << "</th>";
+        for (int j = 0; j < values[i].size(); j++) {
+            // if (!isCorrectVector.empty() && isCorrectVector[i] == false) {
+            //     stream << "<td style='color:red'>";
+            // } else {
+            //     stream << "<td>";
+            // }
+            stream << "<td>";
+            stream << values[i][j].toFloat();
+            stream << "</td>";
+        }
+        stream << endl;
+        stream << "        </tr>" << endl;
+    }
+
+    // generateTableRow(stream, "Input", resultData.orygValues);
+    // generateTableRow(stream, "Expected", resultData.expectedResults);
+    // generateTableRow(stream, "Results", resultData.resultValues, resultData.isCorrectVector);
 
     stream << "    </table>" << endl;
     stream << "    <p style='font-size: 22px'>Maximum acceptable error: " << resultData.maxDelta << "</p>" << endl;

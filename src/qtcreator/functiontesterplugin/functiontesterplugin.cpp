@@ -197,13 +197,6 @@ auto FunctionTesterPlugin::displayResultHtml() -> void
 {
     qDebug() << "Displaying html";
     QString filepath = getBaseDirectory() + QDir::separator() + "work" + QDir::separator() + "Results.html";
-    // QTextBrowser *textBrowser = new QTextBrowser();
-    // textBrowser->setSource(QUrl::fromLocalFile(filepath));
-    // textBrowser->show();
-
-    // QWebEngineView *view = new QWebEngineView(parent);
-    // view->load(QUrl(QUrl::fromLocalFile(filepath)));
-    // view->show();
     QDesktopServices::openUrl(QUrl::fromLocalFile(filepath));
 }
 
