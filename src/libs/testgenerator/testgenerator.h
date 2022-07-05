@@ -43,24 +43,23 @@ public:
     TestGenerator(const QString &baseDirectory);
     auto testUsingDataFromCsv(ivm::IVInterface &interface, const csv::CsvModel &csvModel,
             Asn1Acn::Asn1Model &asn1Model, float delta) -> void;
+    auto prepareTestHarness(ivm::IVInterface &interface,
+            const csv::CsvModel &csvModel, Asn1Acn::Asn1Model &asn1Model) -> QString;
 private:
     auto initializePaths(const QString &baseDirectory) -> void;
     auto exportDvModel(dvm::DVModel *dvModel, const QString &outputFilename) -> void;
     auto exportIvModel(ivm::IVModel *ivModel, const QString &outputFilename) -> void;
     auto getDvObjectsFromModel(dvm::DVModel *const model) -> std::unique_ptr<QVector<dvm::DVObject *>>;
-    auto copyRecursively(const QString &srcPath, const QString &dstPath) -> bool;
     auto runProcess(QString cmd, QStringList args, QString workingPath) -> void;
     auto prepareTasteProjectSkeleton() -> void;
     auto copyFunctionImplementations(const QString &functionName) -> void;
     auto compileSystemUnderTest() -> void;
     auto getAllFunctionsFromModel(const ivm::IVModel &ivModel) -> std::vector<ivm::IVFunction *>;
-    auto prepareTestHarnessFiles(ivm::IVInterface &interface,
-            const csv::CsvModel &csvModel, Asn1Acn::Asn1Model &asn1Model) -> QString;
     auto extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Model &asn1Model) -> QVector<QVariant>;
     auto generateResultHtmlFile(const TestResultData &resultData) -> void;
     auto generateResultHtmlStream(QTextStream &stream, const TestResultData &resultData) -> void;
     auto generateTableRow(QTextStream &stream, const QString &columnName, QVector<QVariant> values, QVector<bool> isCorrectVector) -> void;
-
+    
     QString projectDirectory;
     QString generatedPath;
     QString generatedCodePath;

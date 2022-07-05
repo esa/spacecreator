@@ -72,8 +72,9 @@ TestGenerator::TestGenerator(const QString &baseDirectory)
 auto TestGenerator::testUsingDataFromCsv(
         ivm::IVInterface &interface, const csv::CsvModel &csvModel, Asn1Acn::Asn1Model &asn1Model, float delta) -> void
 {
-    qDebug() << "Delta: " << delta;
-    QString testedFunctionName = prepareTestHarnessFiles(interface, csvModel, asn1Model);
+    Q_UNUSED(delta);
+
+    QString testedFunctionName = prepareTestHarness(interface, csvModel, asn1Model);
     if (testedFunctionName.isEmpty()) {
         return;
     }
@@ -105,7 +106,7 @@ auto TestGenerator::getAllFunctionsFromModel(const ivm::IVModel &ivModel) -> std
     return ivFunctions;
 }
 
-auto TestGenerator::prepareTestHarnessFiles(
+auto TestGenerator::prepareTestHarness(
         ivm::IVInterface &interface, const csv::CsvModel &csvModel, Asn1Acn::Asn1Model &asn1Model) -> QString
 {
     QDir dir(generatedPath);
@@ -143,31 +144,6 @@ auto TestGenerator::prepareTestHarnessFiles(
     return ivFunctions[TESTED_FUNCTION_INDEX]->title();
 }
 
-auto TestGenerator::copyRecursively(const QString &srcPath, const QString &dstPath) -> bool
-{
-    QDir parentDstDir(QFileInfo(dstPath).path());
-    if (!parentDstDir.mkdir(QFileInfo(dstPath).fileName()))
-        return false;
-
-    QDir srcDir(srcPath);
-    for (const QFileInfo &info : srcDir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot)) {
-        QString srcItemPath = srcPath + "/" + info.fileName();
-        QString dstItemPath = dstPath + "/" + info.fileName();
-        if (info.isDir()) {
-            if (!copyRecursively(srcItemPath, dstItemPath)) {
-                return false;
-            }
-        } else if (info.isFile()) {
-            if (!QFile::copy(srcItemPath, dstItemPath)) {
-                return false;
-            }
-        } else {
-            qDebug() << "Unhandled item" << info.filePath() << "in copyRecursively";
-        }
-    }
-    return true;
-}
-
 auto TestGenerator::runProcess(QString cmd, QStringList args, QString workingPath) -> void
 {
     Process process(cmd, args, workingPath);
@@ -199,12 +175,13 @@ auto TestGenerator::prepareTasteProjectSkeleton() -> void
 
 auto TestGenerator::copyFunctionImplementations(const QString &functionName) -> void
 {
-    QString sourceFilePath = projectDirectory + QDir::separator() + "work" + QDir::separator() + functionName;
-    QString destFilePath = generatedPath + QDir::separator() + "work" + QDir::separator() + functionName;
-    copyRecursively(sourceFilePath, destFilePath);
+    QString sourceFilePath = projectDirectory + QDir::separator() + "work" + QDir::separator() + functionName.toLower();
+    QString destFilePath = generatedPath + QDir::separator() + "work" + QDir::separator() + functionName.toLower();
+    runProcess("cp", QStringList() << "-r" << sourceFilePath << destFilePath, generatedPath);
 
     sourceFilePath = generatedPath + QDir::separator() + "testdriver.c";
     destFilePath = generatedPath + QDir::separator() + "work/testdriver/C/src/testdriver.c";
+
     QFile::remove(destFilePath);
     QFile::copy(sourceFilePath, destFilePath);
 }
@@ -239,8 +216,7 @@ auto TestGenerator::exportDvModel(dvm::DVModel *dvModel, const QString &outputFi
 
     dve::DVExporter exporter;
     QList<shared::VEObject *> objects;
-    std::for_each(dvObjects->begin(), dvObjects->end(), //
-            [&objects](const auto &obj) { objects.push_back(obj); });
+    std::for_each(dvObjects->begin(), dvObjects->end(), [&objects](const auto &obj) { objects.push_back(obj); });
 
     const int objectMaxSize = 1'000;
     QByteArray qba(objects.size() * objectMaxSize, '\00');
