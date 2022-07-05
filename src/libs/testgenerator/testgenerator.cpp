@@ -175,15 +175,16 @@ auto TestGenerator::prepareTasteProjectSkeleton() -> void
 
 auto TestGenerator::copyFunctionImplementations(const QString &functionName) -> void
 {
-    QString sourceFilePath = projectDirectory + QDir::separator() + "work" + QDir::separator() + functionName.toLower();
-    QString destFilePath = generatedPath + QDir::separator() + "work" + QDir::separator() + functionName.toLower();
-    runProcess("cp", QStringList() << "-r" << sourceFilePath << destFilePath, generatedPath);
+    QString sourcePath = projectDirectory + QDir::separator() + "work" + QDir::separator() + functionName.toLower();
+    QString destPath = generatedPath + QDir::separator() + "work" + QDir::separator();
+    QDir(destPath + QDir::separator() + functionName.toLower()).removeRecursively();
+    runProcess("cp", QStringList() << "-r" << sourcePath << destPath, generatedPath);
 
-    sourceFilePath = generatedPath + QDir::separator() + "testdriver.c";
-    destFilePath = generatedPath + QDir::separator() + "work/testdriver/C/src/testdriver.c";
+    sourcePath = generatedPath + QDir::separator() + "testdriver.c";
+    destPath = generatedPath + QDir::separator() + "work/testdriver/C/src/testdriver.c";
 
-    QFile::remove(destFilePath);
-    QFile::copy(sourceFilePath, destFilePath);
+    QFile::remove(destPath);
+    QFile::copy(sourcePath, destPath);
 }
 
 auto TestGenerator::compileSystemUnderTest() -> void
