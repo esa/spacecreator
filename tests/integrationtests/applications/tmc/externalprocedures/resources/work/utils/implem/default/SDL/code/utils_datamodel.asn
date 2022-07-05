@@ -1,0 +1,15 @@
+Utils-Datamodel DEFINITIONS ::=
+BEGIN
+--  This file was generated automatically by OpenGEODE
+IMPORTS
+   MyInteger FROM EXTERNAL-PROCEDURES-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
+
+Utils-States ::= ENUMERATED {wait}
+
+Utils-Context ::= SEQUENCE {
+   state Utils-States,
+   init-done BOOLEAN
+}
+
+END
