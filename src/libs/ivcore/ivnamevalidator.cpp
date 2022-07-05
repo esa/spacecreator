@@ -44,6 +44,7 @@ IVNameValidator::IVNameValidator()
         { IVObject::Type::Comment, QObject::tr("Comment_") },
         { IVObject::Type::Connection, QObject::tr("Connection_") },
         { IVObject::Type::ConnectionGroup, QObject::tr("Connection_Group_") },
+        { IVObject::Type::ConnectionLayer, QObject::tr("Layer_") },
     }
 {
 }
@@ -286,8 +287,9 @@ QString IVNameValidator::nextName(const IVObject *object) const
     case IVObject::Type::ConnectionGroup:
     case IVObject::Type::Connection:
         return nameConnection(object);
-    case IVObject::Type::InterfaceGroup:
     case IVObject::Type::ConnectionLayer:
+        return nameConnectionLayer(object);
+    case IVObject::Type::InterfaceGroup:
     case IVObject::Type::Unknown:
         return QString();
     default:
@@ -422,6 +424,25 @@ QString IVNameValidator::nameConnection(const IVObject *connection) const
                         targetNames.join(QLatin1Char('|')));
     }
     return {};
+}
+
+QString IVNameValidator::nameConnectionLayer(const IVObject *layer) const
+{
+    Q_ASSERT(layer);
+    const QString nameTemplate = m_typePrefixes[layer->type()];
+
+    int counter = 1;
+    if (layer->model()) {
+        for (const auto ly : layer->model()->objects()) {
+            if (auto obj = qobject_cast<ivm::IVConnectionLayerType *>(ly)) {
+                if (obj->type() == IVObject::Type::ConnectionLayer && ly != layer) {
+                    ++counter;
+                }
+            }
+        }
+    }
+
+    return makeCountedName(layer, nameTemplate, counter);
 }
 
 bool IVNameValidator::isFunctionTypeNameUsed(const QString &name, const IVObject *fnType) const
