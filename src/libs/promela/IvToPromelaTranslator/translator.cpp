@@ -791,9 +791,11 @@ void IvToPromelaTranslator::createPromelaObjectsForTimers(
             for (const shared::ContextParameter &parameter : parameters) {
                 if (parameter.paramType() == shared::BasicParameter::Type::Timer) {
                     const QString timerName = parameter.name().toLower();
+                    const QString signalName =
+                            QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(timerName);
                     const int timerId = timerCount;
                     ++timerCount;
-                    const QString signalName = createTimerObjectsForFunction(context, functionName, timerName, timerId);
+                    createTimerInlinesForFunction(context, functionName, timerName, timerId);
                     timerSignals.emplace(timerId, signalName);
                 }
             }
@@ -805,14 +807,13 @@ void IvToPromelaTranslator::createPromelaObjectsForTimers(
     }
 }
 
-QString IvToPromelaTranslator::createTimerObjectsForFunction(
+void IvToPromelaTranslator::createTimerInlinesForFunction(
         Context &context, const QString &functionName, const QString &timerName, int timerId) const
 {
     const QList<InlineCall::Argument> arguments;
 
     const QString setTimerName = QString("%1_0_%2_set").arg(Escaper::escapePromelaIV(functionName)).arg(timerName);
     const QString resetTimerName = QString("%1_0_%2_reset").arg(Escaper::escapePromelaIV(functionName)).arg(timerName);
-    const QString signalName = QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(timerName);
 
     Sequence setTimerSequence(Sequence::Type::NORMAL);
     VariableRef element(QString(TIMER_MANAGER_DATA_NAME), std::make_unique<Expression>((Constant(timerId))));
@@ -828,8 +829,6 @@ QString IvToPromelaTranslator::createTimerObjectsForFunction(
             std::make_unique<InlineDef>(setTimerName, QList<QString>(), std::move(setTimerSequence)));
     context.model()->addInlineDef(
             std::make_unique<InlineDef>(resetTimerName, QList<QString>(), std::move(resetTimerSequence)));
-
-    return signalName;
 }
 
 void IvToPromelaTranslator::createGlobalTimerObjects(

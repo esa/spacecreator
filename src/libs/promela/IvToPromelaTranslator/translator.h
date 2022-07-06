@@ -240,8 +240,8 @@ private:
             const std::vector<QString> &modelFunctions, const std::vector<QString> &observers) const -> void;
     auto createPromelaObjectsForTimers(
             Context &context, const ::ivm::IVModel *ivModel, const std::vector<QString> &modelFunctions) const -> void;
-    auto createTimerObjectsForFunction(
-            Context &context, const QString &functionName, const QString &timerName, int timerId) const -> QString;
+    auto createTimerInlinesForFunction(
+            Context &context, const QString &functionName, const QString &timerName, int timerId) const -> void;
     auto createGlobalTimerObjects(Context &context, int timerCount, const std::map<int, QString> &timerSignals) const
             -> void;
     auto createWaitForInitStatement() const -> std::unique_ptr<model::ProctypeElement>;
