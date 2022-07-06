@@ -67,6 +67,7 @@ private:
     bool isFunctionNameUsed(const QString &name, const IVObject *fn) const;
     bool isRequiredInterfaceNameUsed(const QString &name, const IVObject *reqIface) const;
     bool isProvidedInterfaceNameUsed(const QString &name, const IVObject *parent) const;
+    bool isConnectionLayerNameUsed(const QString &name, const IVObject *layer) const;
 };
 
 }

@@ -250,13 +250,12 @@ void InterfaceDocument::updateLayersModel() const
         auto layers = layersModel()->allObjectsByType<ivm::IVConnectionLayerType>();
         bool isDefaultPresent = false;
         for (auto * const layer : layers) {
-            if (layer->name() == ivm::IVConnectionLayerType::DefaultLayerName) {
+            if (layer->title() == ivm::IVConnectionLayerType::DefaultLayerName) {
                 isDefaultPresent = true;
             }
         }
         if (!isDefaultPresent) {
-            auto *cmd = new cmd::CmdConnectionLayerCreate(
-                    ivm::IVConnectionLayerType::DefaultLayerName, layersModel(), objectsModel());
+            auto *cmd = new cmd::CmdConnectionLayerCreate(layersModel(), objectsModel(), true);
             commandsStack()->push(cmd);
         }
         if (objectsModel() != nullptr) {

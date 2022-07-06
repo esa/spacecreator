@@ -28,17 +28,15 @@ namespace ivm {
 
 const QString IVConnectionLayerType::DefaultLayerName = "default";
 
-IVConnectionLayerType::IVConnectionLayerType(const QString &name, QObject *parent, const shared::Id &id)
+IVConnectionLayerType::IVConnectionLayerType(QObject *parent, const shared::Id &id)
     : IVObject(IVObject::Type::ConnectionLayer, parent, id)
-    , m_name(name)
 {
 }
 
 void IVConnectionLayerType::rename(const QString &name)
 {
-    m_name = name;
-    //setEntityAttribute(meta::Props::Token::name, name);
-    Q_EMIT titleChanged(m_name);
+    setTitle(name);
+    Q_EMIT titleChanged(name);
 }
 
 IVConnectionLayerType::~IVConnectionLayerType() {}

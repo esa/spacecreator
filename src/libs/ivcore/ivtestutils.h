@@ -29,7 +29,7 @@ IVFunctionType *createFunctionType(const QString &name = QString(), QObject *par
 
 IVComment *createComment(const QString &name = QString(), QObject *parent = nullptr);
 
-IVConnectionLayerType *createConnectionLayer(const QString &name = "default", QObject *parent = nullptr);
+IVConnectionLayerType *createConnectionLayer(QObject *parent = nullptr);
 
 }
 }
