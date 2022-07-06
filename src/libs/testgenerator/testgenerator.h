@@ -26,7 +26,7 @@
 
 namespace testgenerator {
 
-struct TestResultTableModel
+struct TestResultModel
 {
     enum class CellColor
     {
@@ -34,12 +34,17 @@ struct TestResultTableModel
         Green,
         Black
     };
-    TestResultTableModel(const QString &ifaceName, const QVector<shared::InterfaceParameter> &params,
-            const CsvModel &csvModel, const QVector<QVariant> &results, float delta);
+    struct Cell
+    {
+        QVariant value;
+        CellColor color;
+    };
+    typedef QVector<QVector<Cell>> CellTable;
+    TestResultModel(const ivm::IVInterface &interface, const CsvModel &csvModel, const QVector<QVariant> &results, float delta);
     QString interfaceName;
+    QString functionName;
     QVector<shared::InterfaceParameter> ifaceParams;
-    QVector<QVector<QVariant>> cells;
-    QVector<QVector<CellColor>> cellColors;
+    CellTable cells;
     int rows;
     float maxDelta;
 };
@@ -63,9 +68,9 @@ private:
     auto compileSystemUnderTest() -> void;
     auto getAllFunctionsFromModel(const ivm::IVModel &ivModel) -> std::vector<ivm::IVFunction *>;
     auto extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Model &asn1Model) -> QVector<QVariant>;
-    auto generateResultHtmlFile(const TestResultTableModel &resultData) -> void;
-    auto generateResultHtmlStream(QTextStream &stream, const TestResultTableModel &resultData) -> void;
-    auto generateTableRow(QTextStream &stream, const QString &columnName, QVector<QVariant> values, QVector<bool> isCorrectVector) -> void;
+    auto generateResultHtmlFile(const TestResultModel &resultData) -> void;
+    auto generateResultHtmlStream(QTextStream &stream, const TestResultModel &resultData) -> void;
+    auto generateTableRow(QTextStream &stream, const TestResultModel::CellTable &cells, int row) -> void;
     
     QString projectDirectory;
     QString generatedPath;

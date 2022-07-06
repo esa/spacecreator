@@ -44,11 +44,12 @@ using plugincommon::ModelLoader;
 
 namespace testgenerator {
 
-TestResultTableModel::TestResultTableModel(const QString &ifaceName, const QVector<shared::InterfaceParameter> &params,
-        const CsvModel &csvModel, const QVector<QVariant> &results, float delta)
-    : interfaceName(ifaceName)
-    , ifaceParams(params)
-    , rows(results.size() / params.size())
+TestResultModel::TestResultModel(
+        const ivm::IVInterface &interface, const CsvModel &csvModel, const QVector<QVariant> &results, float delta)
+    : interfaceName(interface.title())
+    , functionName(interface.function()->title())
+    , ifaceParams(interface.params())
+    , rows(results.size() / ifaceParams.size())
     , maxDelta(delta)
 {
     std::vector<QString>::size_type i = 0;
@@ -57,27 +58,16 @@ TestResultTableModel::TestResultTableModel(const QString &ifaceName, const QVect
         csv::Row csvRow = *row;
         auto csvFields = csvRow.fields();
         cells.push_back({});
-        cellColors.push_back({});
         std::vector<QString>::size_type j = 0;
         for (const auto &csvField : csvFields) {
-            if (params[j].isInDirection()) {
-                cells[i].push_back(results[k]);
-                cellColors[i].push_back(CellColor::Black);
+            if (ifaceParams[j].isInDirection()) {
+                cells[i].push_back({ results[k], CellColor::Black });
             } else {
-                cells[i].push_back(csvField);
-                cellColors[i].push_back(CellColor::Black);
-
-                cells[i].push_back(results[k]);
                 auto currDelta = results[k].toFloat() - csvField.toFloat();
-                cells[i].push_back(currDelta);
-
-                if (abs(currDelta) == 0) {
-                    cellColors[i].push_back(CellColor::Green);
-                    cellColors[i].push_back(CellColor::Green);
-                } else {
-                    cellColors[i].push_back(CellColor::Red);
-                    cellColors[i].push_back(CellColor::Red);
-                }
+                auto color = abs(currDelta) > maxDelta ? CellColor::Red : CellColor::Green;
+                cells[i].push_back({ csvField, CellColor::Black });
+                cells[i].push_back({ results[k], color });
+                cells[i].push_back({ currDelta, color });
             }
             j++;
             k++;
@@ -104,7 +94,7 @@ auto TestGenerator::testUsingDataFromCsv(
     copyFunctionImplementations(testedFunctionName);
     compileSystemUnderTest();
     QVector<QVariant> testResults = extractResult(interface, asn1Model);
-    generateResultHtmlFile(TestResultTableModel(interface.title(), interface.params(), csvModel, testResults, delta));
+    generateResultHtmlFile(TestResultModel(interface, csvModel, testResults, delta));
 }
 
 auto TestGenerator::initializePaths(const QString &baseDirectory) -> void
@@ -264,76 +254,55 @@ auto TestGenerator::getDvObjectsFromModel(dvm::DVModel *const model) -> std::uni
     return generatedDvObjects;
 }
 
-auto TestGenerator::generateTableRow(QTextStream &stream, const QString &columnName, QVector<QVariant> values,
-        QVector<bool> isCorrectVector = {}) -> void
+auto TestGenerator::generateTableRow(QTextStream &stream, const TestResultModel::CellTable &cells, int row) -> void
 {
-    stream << "        <tr>" << endl;
-    stream << "            ";
-    stream << "<th>" << columnName << "</th>";
-    for (int i = 0; i < values.size(); i++) {
-        if (!isCorrectVector.empty() && isCorrectVector[i] == false) {
+    stream << "\t\t\t<tr>\n";
+    stream << "\t\t\t\t";
+    for (int j = 0; j < cells[row].size(); j++) {
+        if (cells[row][j].color == TestResultModel::CellColor::Green) {
+            stream << "<td style='color:green'>";
+        } else if (cells[row][j].color == TestResultModel::CellColor::Red) {
             stream << "<td style='color:red'>";
         } else {
             stream << "<td>";
         }
-        stream << values[i].toFloat();
+        stream << cells[row][j].value.toString();
         stream << "</td>";
     }
-    stream << endl;
-    stream << "        </tr>" << endl;
+    stream << "\n";
+    stream << "\t\t\t</tr>\n";
 }
 
-auto TestGenerator::generateResultHtmlStream(QTextStream &stream, const TestResultTableModel &resultData) -> void
+auto TestGenerator::generateResultHtmlStream(QTextStream &stream, const TestResultModel &resultData) -> void
 {
-    stream << "<!DOCTYPE html>" << endl;
-    stream << "<html lang='en'>" << endl;
-    stream << " <head>" << endl;
-    stream << "  <title>Test results for interface " << resultData.interfaceName << "</title>" << endl;
-    stream << "  <meta charset='utf-8'>" << endl;
-    stream << " </head>" << endl;
-    stream << " <style> ";
+    stream << "<!DOCTYPE html>\n";
+    stream << "<html lang='en'>\n";
+    stream << "\t<head>\n";
+    stream << "\t\t<title>Test results for interface " << resultData.interfaceName << "</title>\n";
+    stream << "\t\t<meta charset='utf-8'>\n";
+    stream << "\t</head>\n";
+    stream << "\t<style> ";
     stream << "table, th, td { ";
     stream << "border: 1px solid black; border-collapse: collapse; font-size: 30px; } ";
     stream << "th { ";
     stream << "font-size: 18px; } ";
-    stream << "</style>" << endl;
-    stream << "<body>" << endl;
-    stream << "<h2>Test results for interface " << resultData.interfaceName << "</h2>" << endl;
-    stream << "    <table>" << endl;
-
-    auto values = resultData.cells;
-    auto colors = resultData.cellColors;
+    stream << "\t</style>\n";
+    stream << "\t<body>\n";
+    stream << "\t\t<h2>Test results for interface " << resultData.interfaceName << " of function "
+           << resultData.functionName << "</h2>\n";
+    stream << "\t\t<p style='font-size: 22px'>Maximum allowed absolute error: " << resultData.maxDelta << "</p>\n";
+    stream << "\t\t<table>\n";
 
     for (int i = 0; i < resultData.rows; i++) {
-        stream << "        <tr>" << endl;
-        stream << "            ";
-        // stream << "<th>" << columnName << "</th>";
-        for (int j = 0; j < values[i].size(); j++) {
-            if (colors[i][j] == TestResultTableModel::CellColor::Green) {
-                stream << "<td style='color:green'>";
-            } else if (colors[i][j] == TestResultTableModel::CellColor::Red) {
-                stream << "<td style='color:red'>";
-            } else {
-                stream << "<td>";
-            }
-            stream << values[i][j].toFloat();
-            stream << "</td>";
-        }
-        stream << endl;
-        stream << "        </tr>" << endl;
+        generateTableRow(stream, resultData.cells, i);
     }
 
-    // generateTableRow(stream, "Input", resultData.orygValues);
-    // generateTableRow(stream, "Expected", resultData.expectedResults);
-    // generateTableRow(stream, "Results", resultData.resultValues, resultData.isCorrectVector);
-
-    stream << "    </table>" << endl;
-    stream << "    <p style='font-size: 22px'>Maximum acceptable error: " << resultData.maxDelta << "</p>" << endl;
-    stream << " </body>" << endl;
-    stream << "</html>" << endl;
+    stream << "\t\t</table>\n";
+    stream << "\t</body>\n";
+    stream << "</html>\n";
 }
 
-auto TestGenerator::generateResultHtmlFile(const TestResultTableModel &resultData) -> void
+auto TestGenerator::generateResultHtmlFile(const TestResultModel &resultData) -> void
 {
     QString filename = this->projectDirectory + QDir::separator() + "work" + QDir::separator() + "Results.html";
     QFile file(filename);
