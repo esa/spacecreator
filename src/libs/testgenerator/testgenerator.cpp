@@ -44,26 +44,45 @@ using plugincommon::ModelLoader;
 
 namespace testgenerator {
 
-TestResultData::TestResultData(const QString &ifaceName, const QVector<shared::InterfaceParameter> &params,
+TestResultTableModel::TestResultTableModel(const QString &ifaceName, const QVector<shared::InterfaceParameter> &params,
         const CsvModel &csvModel, const QVector<QVariant> &results, float delta)
     : interfaceName(ifaceName)
     , ifaceParams(params)
     , rows(results.size() / params.size())
     , maxDelta(delta)
 {
-    Q_UNUSED(csvModel);
-    for (int i = 0; i < rows; i++) {
+    std::vector<QString>::size_type i = 0;
+    std::vector<QString>::size_type k = 0;
+    for (const auto &row : csvModel.records()) {
+        csv::Row csvRow = *row;
+        auto csvFields = csvRow.fields();
         cells.push_back({});
-        for (int j = i * params.size(); j < (i + 1) * params.size(); j++) {
-            cells[i].push_back(results[j]); // TODO: replace this line with the following conditional statement
-            // if (params[j].isInDirection()) {
-            //     cells[i].push_back(results[j]);
-            // } else {
-            //     // cells[i].push_back(results[j]); // csvmodel
-            //     cells[i].push_back(results[j]);
-            //     // cells[i].push_back(); // diff
-            // }
+        cellColors.push_back({});
+        std::vector<QString>::size_type j = 0;
+        for (const auto &csvField : csvFields) {
+            if (params[j].isInDirection()) {
+                cells[i].push_back(results[k]);
+                cellColors[i].push_back(CellColor::Black);
+            } else {
+                cells[i].push_back(csvField);
+                cellColors[i].push_back(CellColor::Black);
+
+                cells[i].push_back(results[k]);
+                auto currDelta = results[k].toFloat() - csvField.toFloat();
+                cells[i].push_back(currDelta);
+
+                if (abs(currDelta) == 0) {
+                    cellColors[i].push_back(CellColor::Green);
+                    cellColors[i].push_back(CellColor::Green);
+                } else {
+                    cellColors[i].push_back(CellColor::Red);
+                    cellColors[i].push_back(CellColor::Red);
+                }
+            }
+            j++;
+            k++;
         }
+        i++;
     }
 }
 
@@ -85,7 +104,7 @@ auto TestGenerator::testUsingDataFromCsv(
     copyFunctionImplementations(testedFunctionName);
     compileSystemUnderTest();
     QVector<QVariant> testResults = extractResult(interface, asn1Model);
-    generateResultHtmlFile(TestResultData(interface.title(), interface.params(), csvModel, testResults, delta));
+    generateResultHtmlFile(TestResultTableModel(interface.title(), interface.params(), csvModel, testResults, delta));
 }
 
 auto TestGenerator::initializePaths(const QString &baseDirectory) -> void
@@ -264,7 +283,7 @@ auto TestGenerator::generateTableRow(QTextStream &stream, const QString &columnN
     stream << "        </tr>" << endl;
 }
 
-auto TestGenerator::generateResultHtmlStream(QTextStream &stream, const TestResultData &resultData) -> void
+auto TestGenerator::generateResultHtmlStream(QTextStream &stream, const TestResultTableModel &resultData) -> void
 {
     stream << "<!DOCTYPE html>" << endl;
     stream << "<html lang='en'>" << endl;
@@ -283,18 +302,20 @@ auto TestGenerator::generateResultHtmlStream(QTextStream &stream, const TestResu
     stream << "    <table>" << endl;
 
     auto values = resultData.cells;
+    auto colors = resultData.cellColors;
 
     for (int i = 0; i < resultData.rows; i++) {
         stream << "        <tr>" << endl;
         stream << "            ";
         // stream << "<th>" << columnName << "</th>";
         for (int j = 0; j < values[i].size(); j++) {
-            // if (!isCorrectVector.empty() && isCorrectVector[i] == false) {
-            //     stream << "<td style='color:red'>";
-            // } else {
-            //     stream << "<td>";
-            // }
-            stream << "<td>";
+            if (colors[i][j] == TestResultTableModel::CellColor::Green) {
+                stream << "<td style='color:green'>";
+            } else if (colors[i][j] == TestResultTableModel::CellColor::Red) {
+                stream << "<td style='color:red'>";
+            } else {
+                stream << "<td>";
+            }
             stream << values[i][j].toFloat();
             stream << "</td>";
         }
@@ -312,7 +333,7 @@ auto TestGenerator::generateResultHtmlStream(QTextStream &stream, const TestResu
     stream << "</html>" << endl;
 }
 
-auto TestGenerator::generateResultHtmlFile(const TestResultData &resultData) -> void
+auto TestGenerator::generateResultHtmlFile(const TestResultTableModel &resultData) -> void
 {
     QString filename = this->projectDirectory + QDir::separator() + "work" + QDir::separator() + "Results.html";
     QFile file(filename);
