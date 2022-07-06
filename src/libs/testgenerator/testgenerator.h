@@ -45,6 +45,7 @@ struct TestResultModel
     QString functionName;
     QVector<shared::InterfaceParameter> ifaceParams;
     CellTable cells;
+    QVector<QString> columnNames;
     int rows;
     float maxDelta;
 };
@@ -71,7 +72,8 @@ private:
     auto generateResultHtmlFile(const TestResultModel &resultData) -> void;
     auto generateResultHtmlStream(QTextStream &stream, const TestResultModel &resultData) -> void;
     auto generateTableRow(QTextStream &stream, const TestResultModel::CellTable &cells, int row) -> void;
-    
+    auto generateTableHeader(QTextStream &stream, const QVector<QString> &columnNames) -> void;
+
     QString projectDirectory;
     QString generatedPath;
     QString generatedCodePath;

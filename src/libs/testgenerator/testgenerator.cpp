@@ -74,6 +74,15 @@ TestResultModel::TestResultModel(
         }
         i++;
     }
+    for (int l = 0; l < ifaceParams.size(); l++) {
+        if (ifaceParams[l].isInDirection()) {
+            columnNames.append(ifaceParams[l].name());
+        } else {
+            columnNames.append(ifaceParams[l].name() + " (expected)");
+            columnNames.append(ifaceParams[l].name() + " (actual)");
+            columnNames.append(ifaceParams[l].name() + " (delta)");
+        }
+    }
 }
 
 TestGenerator::TestGenerator(const QString &baseDirectory)
@@ -273,6 +282,19 @@ auto TestGenerator::generateTableRow(QTextStream &stream, const TestResultModel:
     stream << "\t\t\t</tr>\n";
 }
 
+auto TestGenerator::generateTableHeader(QTextStream &stream, const QVector<QString> &columnNames) -> void
+{
+    stream << "\t\t\t<tr>\n";
+    stream << "\t\t\t\t";
+    for (const auto &name : columnNames) {
+        stream << "<th>";
+        stream << name;
+        stream << "</th>";
+    }
+    stream << "\n";
+    stream << "\t\t\t</tr>\n";
+}
+
 auto TestGenerator::generateResultHtmlStream(QTextStream &stream, const TestResultModel &resultData) -> void
 {
     stream << "<!DOCTYPE html>\n";
@@ -292,7 +314,7 @@ auto TestGenerator::generateResultHtmlStream(QTextStream &stream, const TestResu
            << resultData.functionName << "</h2>\n";
     stream << "\t\t<p style='font-size: 22px'>Maximum allowed absolute error: " << resultData.maxDelta << "</p>\n";
     stream << "\t\t<table>\n";
-
+    generateTableHeader(stream, resultData.columnNames);
     for (int i = 0; i < resultData.rows; i++) {
         generateTableRow(stream, resultData.cells, i);
     }
