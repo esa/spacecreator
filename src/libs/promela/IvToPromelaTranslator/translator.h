@@ -209,6 +209,10 @@ public:
     auto getDependencies() const -> std::set<conversion::ModelType> override;
 
 private:
+    static const char *TIMER_MANAGER_DATA_NAME;
+    static const char *TIMER_MANAGER_PROCTYPE_NAME;
+
+private:
     auto addChannelAndLock(IvToPromelaTranslator::Context &context, const QString &functionName) const -> void;
     auto observerInputSignalName(const IvToPromelaTranslator::ObserverAttachment &attachment) const -> QString;
     auto attachInputObservers(IvToPromelaTranslator::Context &context, const QString &functionName,
@@ -236,6 +240,10 @@ private:
             const std::vector<QString> &modelFunctions, const std::vector<QString> &observers) const -> void;
     auto createPromelaObjectsForTimers(
             Context &context, const ::ivm::IVModel *ivModel, const std::vector<QString> &modelFunctions) const -> void;
+    auto createTimerObjectsForFunction(
+            Context &context, const QString &functionName, const QString &timerName, int timerId) const -> QString;
+    auto createGlobalTimerObjects(Context &context, int timerCount, const std::map<int, QString> &timerSignals) const
+            -> void;
     auto createWaitForInitStatement() const -> std::unique_ptr<model::ProctypeElement>;
 
     auto containsContextVariables(const QVector<shared::ContextParameter> &parameters) const -> bool;

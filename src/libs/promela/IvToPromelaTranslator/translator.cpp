@@ -308,6 +308,9 @@ static void initializeFunction(Sequence &sequence, const QString &functionName)
             std::make_unique<ProctypeElement>(ChannelSend(VariableRef(lockChannelName), lockChannelArguments)));
 }
 
+const char *IvToPromelaTranslator::TIMER_MANAGER_DATA_NAME = "timer_manager_data";
+const char *IvToPromelaTranslator::TIMER_MANAGER_PROCTYPE_NAME = "timer_manager_proc";
+
 InitProctype IvToPromelaTranslator::generateInitProctype(
         const std::vector<QString> &modelFunctions, const std::vector<QString> &observers, const IVModel *ivModel) const
 {
@@ -776,9 +779,6 @@ void IvToPromelaTranslator::createSystemState(PromelaModel *promelaModel, const 
 void IvToPromelaTranslator::createPromelaObjectsForTimers(
         Context &context, const ::ivm::IVModel *ivModel, const std::vector<QString> &modelFunctions) const
 {
-    const QString timerManagerChannelName = "timer_manager_channel";
-    const QString timerManagerProctypeName = "timer_manager_proc";
-
     std::map<int, QString> timerSignals;
     int timerCount = 0;
 
@@ -790,36 +790,10 @@ void IvToPromelaTranslator::createPromelaObjectsForTimers(
             const QVector<shared::ContextParameter> parameters = ivFunction->contextParams();
             for (const shared::ContextParameter &parameter : parameters) {
                 if (parameter.paramType() == shared::BasicParameter::Type::Timer) {
+                    const QString timerName = parameter.name().toLower();
                     const int timerId = timerCount;
                     ++timerCount;
-                    const QList<InlineCall::Argument> arguments;
-                    const QString timerName = parameter.name().toLower();
-
-                    const QString setTimerName =
-                            QString("%1_0_%2_set").arg(Escaper::escapePromelaIV(functionName)).arg(timerName);
-                    const QString resetTimerName =
-                            QString("%1_0_%2_reset").arg(Escaper::escapePromelaIV(functionName)).arg(timerName);
-                    const QString signalName =
-                            QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(timerName);
-
-                    Sequence setTimerSequence(Sequence::Type::NORMAL);
-                    QList<Expression> setTimerArguments;
-                    setTimerArguments.append(Expression(Constant(timerId)));
-                    setTimerArguments.append(Expression(BooleanConstant(true)));
-                    setTimerSequence.appendElement(std::make_unique<ProctypeElement>(
-                            ChannelSend(VariableRef(timerManagerChannelName), setTimerArguments)));
-                    Sequence resetTimerSequence(Sequence::Type::NORMAL);
-                    QList<Expression> resetTimerArguments;
-                    resetTimerArguments.append(Expression(Constant(timerId)));
-                    resetTimerArguments.append(Expression(BooleanConstant(false)));
-                    resetTimerSequence.appendElement(std::make_unique<ProctypeElement>(
-                            ChannelSend(VariableRef(timerManagerChannelName), resetTimerArguments)));
-
-                    context.model()->addInlineDef(
-                            std::make_unique<InlineDef>(setTimerName, QList<QString>(), std::move(setTimerSequence)));
-                    context.model()->addInlineDef(std::make_unique<InlineDef>(
-                            resetTimerName, QList<QString>(), std::move(resetTimerSequence)));
-
+                    const QString signalName = createTimerObjectsForFunction(context, functionName, timerName, timerId);
                     timerSignals.emplace(timerId, signalName);
                 }
             }
@@ -827,85 +801,86 @@ void IvToPromelaTranslator::createPromelaObjectsForTimers(
     }
 
     if (timerCount > 0) {
-        Declaration timerManagerChannelDeclaration(DataType(BasicType::CHAN), timerManagerChannelName);
-        QList<ChannelInit::Type> timerManagerChannelType;
-        timerManagerChannelType.append(ChannelInit::Type(BasicType::INT));
-        timerManagerChannelType.append(ChannelInit::Type(BasicType::BOOLEAN));
-        timerManagerChannelDeclaration.setInit(ChannelInit(1, std::move(timerManagerChannelType)));
-        context.model()->addDeclaration(std::move(timerManagerChannelDeclaration));
-
-        Declaration timerManagerDataDeclaration(
-                DataType(ArrayType(static_cast<size_t>(timerCount), BasicType::BOOLEAN)), "timer_manager_data");
-        context.model()->addDeclaration(std::move(timerManagerDataDeclaration));
-
-        Sequence timerProctypeBody(Sequence::Type::NORMAL);
-        timerProctypeBody.appendElement(createWaitForInitStatement());
-        timerProctypeBody.appendElement(
-                std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "timer_id")));
-        timerProctypeBody.appendElement(
-                std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::BOOLEAN), "timer_enabled")));
-
-        DoLoop mainLoop;
-
-        std::unique_ptr<Sequence> receiveMessageSequence = std::make_unique<Sequence>(Sequence::Type::ATOMIC);
-
-        {
-            QList<InlineCall::Argument> arguments;
-            arguments.append(VariableRef(timerManagerChannelName));
-            receiveMessageSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall("nempty", arguments)));
-        }
-        {
-            QList<VariableRef> arguments;
-            arguments.append(VariableRef("timer_id"));
-            arguments.append(VariableRef("timer_enabled"));
-            receiveMessageSequence->appendElement(
-                    std::make_unique<ProctypeElement>(ChannelRecv(VariableRef(timerManagerChannelName), arguments)));
-        }
-        {
-            VariableRef element("timer_manager_data", std::make_unique<Expression>((VariableRef("timer_id"))));
-            receiveMessageSequence->appendElement(
-                    std::make_unique<ProctypeElement>(Assignment(element, Expression(VariableRef("timer_enabled")))));
-        }
-
-        mainLoop.appendSequence(std::move(receiveMessageSequence));
-
-        std::unique_ptr<Sequence> checkTimersSequence = std::make_unique<Sequence>(Sequence::Type::ATOMIC);
-
-        {
-            QList<InlineCall::Argument> arguments;
-            arguments.append(VariableRef(timerManagerChannelName));
-            checkTimersSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall("empty", arguments)));
-        }
-        {
-            for (auto iter = timerSignals.begin(); iter != timerSignals.end(); ++iter) {
-                Conditional cond;
-
-                std::unique_ptr<Sequence> timerCall = std::make_unique<Sequence>(Sequence::Type::NORMAL);
-                timerCall->appendElement(std::make_unique<ProctypeElement>(Expression(
-                        VariableRef("timer_manager_data", std::make_unique<Expression>(Constant(iter->first))))));
-                QList<InlineCall::Argument> arguments;
-                timerCall->appendElement(std::make_unique<ProctypeElement>(InlineCall(iter->second, arguments)));
-                cond.appendAlternative(std::move(timerCall));
-
-                std::unique_ptr<Sequence> emptySeq = std::make_unique<Sequence>(Sequence::Type::NORMAL);
-                emptySeq->appendElement(std::make_unique<ProctypeElement>(ElseStatement()));
-                emptySeq->appendElement(std::make_unique<ProctypeElement>(Skip()));
-                cond.appendAlternative(std::move(emptySeq));
-
-                checkTimersSequence->appendElement(std::make_unique<ProctypeElement>(std::move(cond)));
-            }
-        }
-
-        mainLoop.appendSequence(std::move(checkTimersSequence));
-
-        timerProctypeBody.appendElement(std::make_unique<ProctypeElement>(std::move(mainLoop)));
-
-        std::unique_ptr<Proctype> timerManagerProctype =
-                std::make_unique<Proctype>(timerManagerProctypeName, std::move(timerProctypeBody));
-        timerManagerProctype->setActive(true);
-        timerManagerProctype->setPriority(1);
-        context.model()->addProctype(std::move(timerManagerProctype));
+        createGlobalTimerObjects(context, timerCount, timerSignals);
     }
+}
+
+QString IvToPromelaTranslator::createTimerObjectsForFunction(
+        Context &context, const QString &functionName, const QString &timerName, int timerId) const
+{
+    const QList<InlineCall::Argument> arguments;
+
+    const QString setTimerName = QString("%1_0_%2_set").arg(Escaper::escapePromelaIV(functionName)).arg(timerName);
+    const QString resetTimerName = QString("%1_0_%2_reset").arg(Escaper::escapePromelaIV(functionName)).arg(timerName);
+    const QString signalName = QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(timerName);
+
+    Sequence setTimerSequence(Sequence::Type::NORMAL);
+    VariableRef element(QString(TIMER_MANAGER_DATA_NAME), std::make_unique<Expression>((Constant(timerId))));
+    setTimerSequence.appendElement(
+            std::make_unique<ProctypeElement>(Assignment(element, Expression(BooleanConstant(true)))));
+
+    Sequence resetTimerSequence(Sequence::Type::NORMAL);
+
+    resetTimerSequence.appendElement(
+            std::make_unique<ProctypeElement>(Assignment(element, Expression(BooleanConstant(false)))));
+
+    context.model()->addInlineDef(
+            std::make_unique<InlineDef>(setTimerName, QList<QString>(), std::move(setTimerSequence)));
+    context.model()->addInlineDef(
+            std::make_unique<InlineDef>(resetTimerName, QList<QString>(), std::move(resetTimerSequence)));
+
+    return signalName;
+}
+
+void IvToPromelaTranslator::createGlobalTimerObjects(
+        Context &context, int timerCount, const std::map<int, QString> &timerSignals) const
+{
+    Declaration timerManagerDataDeclaration(
+            DataType(ArrayType(static_cast<size_t>(timerCount), BasicType::BOOLEAN)), QString(TIMER_MANAGER_DATA_NAME));
+    context.model()->addDeclaration(std::move(timerManagerDataDeclaration));
+
+    Sequence timerProctypeBody(Sequence::Type::NORMAL);
+    timerProctypeBody.appendElement(createWaitForInitStatement());
+
+    DoLoop mainLoop;
+
+    std::unique_ptr<Sequence> checkTimersSequence = std::make_unique<Sequence>(Sequence::Type::ATOMIC);
+
+    {
+        checkTimersSequence->appendElement(std::make_unique<ProctypeElement>(Expression(BooleanConstant(true))));
+    }
+    {
+        for (auto iter = timerSignals.begin(); iter != timerSignals.end(); ++iter) {
+            Conditional cond;
+
+            VariableRef fpt(QString(TIMER_MANAGER_DATA_NAME), std::make_unique<Expression>(Constant(iter->first)));
+
+            std::unique_ptr<Sequence> timerCall = std::make_unique<Sequence>(Sequence::Type::NORMAL);
+            timerCall->appendElement(std::make_unique<ProctypeElement>(Expression(fpt)));
+            QList<InlineCall::Argument> arguments;
+            timerCall->appendElement(std::make_unique<ProctypeElement>(InlineCall(iter->second, arguments)));
+            timerCall->appendElement(
+                    std::make_unique<ProctypeElement>(Assignment(fpt, Expression(BooleanConstant(false)))));
+            cond.appendAlternative(std::move(timerCall));
+
+            std::unique_ptr<Sequence> emptySeq = std::make_unique<Sequence>(Sequence::Type::NORMAL);
+            emptySeq->appendElement(std::make_unique<ProctypeElement>(ElseStatement()));
+            emptySeq->appendElement(std::make_unique<ProctypeElement>(Skip()));
+            cond.appendAlternative(std::move(emptySeq));
+
+            checkTimersSequence->appendElement(std::make_unique<ProctypeElement>(std::move(cond)));
+        }
+    }
+
+    mainLoop.appendSequence(std::move(checkTimersSequence));
+
+    timerProctypeBody.appendElement(std::make_unique<ProctypeElement>(std::move(mainLoop)));
+
+    std::unique_ptr<Proctype> timerManagerProctype =
+            std::make_unique<Proctype>(QString(TIMER_MANAGER_PROCTYPE_NAME), std::move(timerProctypeBody));
+    timerManagerProctype->setActive(true);
+    timerManagerProctype->setPriority(1);
+    context.model()->addProctype(std::move(timerManagerProctype));
 }
 
 bool IvToPromelaTranslator::containsContextVariables(const QVector<shared::ContextParameter> &parameters) const
