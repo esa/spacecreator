@@ -35,20 +35,25 @@ DVMessage::DVMessage(QObject *parent)
 
 bool DVMessage::postInit()
 {
-    auto nodeHasFunction = [&](DVNode *node, const QString &func) -> bool {
-        if (!node) {
-            shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Message %1 has invalid node").arg(title()));
-            return false;
-        }
-        if (!node->containsFunction(func)) {
-            shared::ErrorHub::addError(shared::ErrorItem::Error,
-                    tr("Message %1 has invalid source function '%2.%3'").arg(title(), node->title(), func));
-            return false;
-        }
-        return true;
-    };
+    DVNode *node1 = fromNode();
+    if (!node1) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Message %1 has invalid node").arg(title()));
+        return false;
+    }
+    DVNode *node2 = toNode();
+    if (!node2) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Message %1 has invalid node").arg(title()));
+        return false;
+    }
 
-    return nodeHasFunction(fromNode(), fromFunction()) && nodeHasFunction(toNode(), toFunction());
+    bool direction1Ok = node1->containsFunction(fromFunction()) && node2->containsFunction(toFunction());
+    bool direction2Ok = node2->containsFunction(fromFunction()) && node1->containsFunction(toFunction());
+
+    if (!direction1Ok && !direction2Ok) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Message %1 has invalid function").arg(title()));
+        return false;
+    }
+    return true;
 }
 
 QString DVMessage::titleUI() const

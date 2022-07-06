@@ -22,6 +22,10 @@
 
 namespace dvm {
 
+/**
+ * Represents a message between two node
+ * @note the message can go both ways. So fromNode/toNodes can be swapped (names kept for backwards compatibility)
+ */
 class DVMessage : public DVObject
 {
     Q_OBJECT
