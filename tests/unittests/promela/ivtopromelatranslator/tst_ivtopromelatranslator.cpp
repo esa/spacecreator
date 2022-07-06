@@ -19,6 +19,7 @@
 
 #include <QObject>
 #include <QtTest>
+#include <asn1library/asn1/asn1model.h>
 #include <conversion/common/modeltype.h>
 #include <ivcore/ivlibrary.h>
 #include <ivcore/ivmodel.h>
@@ -813,8 +814,10 @@ std::unique_ptr<PromelaModel> tst_IvToPromelaTranslator::translateIvToPromela(
     for (const QString &function : functions) {
         options.add(PromelaOptions::modelFunctionName, function);
     }
+    auto asn1Model = std::make_unique<Asn1Acn::Asn1Model>();
     std::vector<conversion::Model *> inputs;
     inputs.push_back(ivModel.get());
+    inputs.push_back(asn1Model.get());
     auto result = translator.translateModels(std::move(inputs), options);
 
     if (result.empty()) {
