@@ -40,6 +40,10 @@ public:
     auto initialize(const QStringList &arguments, QString *errorString) -> bool override;
     auto extensionsInitialized() -> void override;
     auto aboutToShutdown() -> ShutdownFlag override;
+    /**
+     * @brief Test the selected interface using user provided data
+     *
+     */
     auto testUsingDataFromCsvGui() -> void;
 private:
     auto addTestInterfaceOption() -> void;

@@ -115,8 +115,8 @@ auto FunctionTesterPlugin::setDeltaDialog() -> float
 {
     float delta = 0.0;
     bool isOk;
-    QString text = QInputDialog::getText(nullptr, tr("Set delta"), tr("Max error:"), QLineEdit::Normal, "0.0", &isOk,
-            { 0U }, Qt::ImhFormattedNumbersOnly);
+    QString text = QInputDialog::getText(nullptr, tr("Set delta"), tr("Maximum allowed absolute error:"),
+            QLineEdit::Normal, "0.0", &isOk, { 0U }, Qt::ImhFormattedNumbersOnly);
     if (isOk && !text.isEmpty()) {
         delta = text.toFloat();
     }
@@ -168,7 +168,7 @@ auto FunctionTesterPlugin::loadAsn1Model() -> std::unique_ptr<Asn1Acn::Asn1Model
     try {
         modelPtr = ModelLoader::loadAsn1Model(asn1Path);
     } catch (...) {
-        MessageManager::write(GenMsg::msgInfo.arg(tr("No ASN1 file found. Try to build the project first.")));
+        MessageManager::write(GenMsg::msgInfo.arg(tr("No ASN.1 file found. Try to build the project first.")));
     }
     return modelPtr;
 }

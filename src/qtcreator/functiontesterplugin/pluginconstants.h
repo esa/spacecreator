@@ -21,8 +21,15 @@
 
 namespace spctr {
 namespace Constants {
-
+/**
+ * @brief ID of the action to register for importing a CSV file
+ *
+ */
 const char CSV_IMPORT_ID[] = "Csv.Import";
+/**
+ * @brief ID of the plugin's entry in the tools menu
+ *
+ */
 const char M_TOOLS_FUNCTION_TESTER[] = "QtCreator.Menu.Tools.FunctionTester";
 
 }

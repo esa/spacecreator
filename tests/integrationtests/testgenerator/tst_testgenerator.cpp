@@ -41,18 +41,16 @@ private Q_SLOTS:
 void tst_testgenerator::testPrepareTestHarness()
 {
     const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview.xml");
+    QVERIFY(ivModel);
+
     ivm::IVInterface *const interface = IvTools::getIfaceFromModel("CustomIface", ivModel.get());
-    if (!interface) {
-        return;
-    }
+    QVERIFY(interface);
+
     auto csvModel = ModelLoader::loadCsvModel("resources/test.csv");
-    if (!csvModel) {
-        return;
-    }
+    QVERIFY(csvModel);
+
     auto asn1Model = ModelLoader::loadAsn1Model("resources/dataview-uniq.asn");
-    if (!asn1Model) {
-        return;
-    }
+    QVERIFY(asn1Model);
 
     TestGenerator testGenerator(QDir::currentPath());
     QString testedFunctionName = testGenerator.prepareTestHarness(*interface, *csvModel, *asn1Model);
