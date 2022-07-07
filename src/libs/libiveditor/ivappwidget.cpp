@@ -35,6 +35,7 @@
 #include "ivvisualizationmodelbase.h"
 #include "properties/ivpropertiesdialog.h"
 #include "ui_ivappwidget.h"
+#include "ivnamevalidator.h"
 
 #include <QAction>
 #include <QActionGroup>
@@ -195,11 +196,12 @@ void IVAppWidget::renameSelectedLayer(QStandardItem *item)
 
     if (obj->type() == ivm::IVObject::Type::ConnectionLayer) {
         const auto *layer = qobject_cast<const ivm::IVConnectionLayerType *>(obj);
+        const auto itemText = ivm::IVNameValidator::encodeName(layer->type(), item->text());
         if (layer != nullptr && layer->title().compare(ivm::IVConnectionLayerType::DefaultLayerName) != 0) {
             disconnect(m_document->layerVisualisationModel(), &IVVisualizationModelBase::itemChanged, this,
                     &IVAppWidget::renameSelectedLayer);
             auto *cmd = new cmd::CmdConnectionLayerRename(
-                    layer->title(), item->text(), m_document->layersModel(), m_document->objectsModel());
+                    layer->title(), itemText, m_document->layersModel(), m_document->objectsModel());
             if (cmd->layer() != nullptr) {
                 m_document->commandsStack()->push(cmd);
             } else {
@@ -210,7 +212,7 @@ void IVAppWidget::renameSelectedLayer(QStandardItem *item)
         }
     }
 
-    item->setText(obj->title());
+    item->setText(obj->titleUI());
 }
 
 void IVAppWidget::copyItems()

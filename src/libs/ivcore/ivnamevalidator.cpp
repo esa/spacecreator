@@ -44,7 +44,7 @@ IVNameValidator::IVNameValidator()
         { IVObject::Type::Comment, QObject::tr("Comment_") },
         { IVObject::Type::Connection, QObject::tr("Connection_") },
         { IVObject::Type::ConnectionGroup, QObject::tr("Connection_Group_") },
-        { IVObject::Type::ConnectionLayer, QObject::tr("Layer ") },
+        { IVObject::Type::ConnectionLayer, QObject::tr("Layer_") },
     }
 {
 }
