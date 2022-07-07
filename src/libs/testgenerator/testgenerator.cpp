@@ -39,6 +39,7 @@
 #include <modelloader.h>
 #include <shared/ui/veinteractiveobject.h>
 
+using dve::DVExporter;
 using ive::IVExporter;
 using plugincommon::ModelLoader;
 
@@ -91,19 +92,23 @@ TestGenerator::TestGenerator(const QString &baseDirectory)
 }
 
 auto TestGenerator::testUsingDataFromCsv(
-        ivm::IVInterface &interface, const csv::CsvModel &csvModel, Asn1Acn::Asn1Model &asn1Model, float delta) -> void
+        ivm::IVInterface &interface, const csv::CsvModel &csvModel, Asn1Acn::Asn1Model &asn1Model, float delta) -> bool
 {
     Q_UNUSED(delta);
 
     QString testedFunctionName = prepareTestHarness(interface, csvModel, asn1Model);
     if (testedFunctionName.isEmpty()) {
-        return;
+        return false;
     }
-    prepareTasteProjectSkeleton();
+    if (!prepareTasteProjectSkeleton()) {
+        qDebug() << "Error preparing taste project skeleton";
+        return false;
+    }
     copyFunctionImplementations(testedFunctionName);
     compileSystemUnderTest();
     QVector<QVariant> testResults = extractResult(interface, asn1Model);
     generateResultHtmlFile(TestResultModel(interface, csvModel, testResults, delta));
+    return true;
 }
 
 auto TestGenerator::initializePaths(const QString &baseDirectory) -> void
@@ -152,7 +157,9 @@ auto TestGenerator::prepareTestHarness(
     }
 
     std::vector<ivm::IVFunction *> ivFunctions = getAllFunctionsFromModel(*ivModelGenerated);
-    exportIvModel(ivModelGenerated.get(), generatedIvPath);
+    if (!exportIvModel(ivModelGenerated.get(), generatedIvPath)) {
+        return {};
+    }
 
     const std::unique_ptr<dvm::DVModel> dvModelGenerated =
             DvGenerator::generate(ivFunctions, "x86 Linux CPP", "x86_Linux_TestRunner", "Node_1", "hostPartition");
@@ -160,38 +167,52 @@ auto TestGenerator::prepareTestHarness(
         qDebug() << "DV model was not generated";
         return {};
     }
-    exportDvModel(dvModelGenerated.get(), generatedDvPath);
+    if (!exportDvModel(dvModelGenerated.get(), generatedDvPath)) {
+        return {};
+    }
     constexpr int TESTED_FUNCTION_INDEX = 1;
     return ivFunctions[TESTED_FUNCTION_INDEX]->title();
 }
 
-auto TestGenerator::runProcess(QString cmd, QStringList args, QString workingPath) -> void
+auto TestGenerator::runProcess(QString cmd, QStringList args, QString workingPath) -> bool
 {
     Process process(cmd, args, workingPath);
     auto p = process.get();
     p->waitForFinished(-1);
     if (p->exitCode() != 0) {
         qDebug() << "Error: " << p->exitCode() << p->readAllStandardError();
+        return false;
     } else {
         qDebug() << "Command: " + cmd + " finished";
+        return true;
     }
 }
 
-auto TestGenerator::prepareTasteProjectSkeleton() -> void
+auto TestGenerator::prepareTasteProjectSkeleton() -> bool
 {
     qDebug() << "Preparing project skeleton...";
 
-    auto copy = [this](const QFileInfo &file) {
-        if (file.suffix() == "asn" || file.suffix() == "acn" || file.fileName() == "Makefile") {
-            QFile::copy(file.absoluteFilePath(), generatedPath + QDir::separator() + file.fileName());
-        }
-    };
-
     QFileInfoList qFileInfoList = QDir(projectDirectory).entryInfoList(QDir::Files);
-    std::for_each(qFileInfoList.cbegin(), qFileInfoList.cend(), copy);
+    if (qFileInfoList.empty()) {
+        qDebug() << "No files found in project directory: " + projectDirectory;
+        return false;
+    }
+    for (const auto &file : qFileInfoList) {
+        if (file.suffix() == "asn" || file.suffix() == "acn" || file.fileName() == "Makefile") {
+            if (!QFile::copy(file.absoluteFilePath(), generatedPath + QDir::separator() + file.fileName())) {
+                qDebug() << "Error copying file: " << file.fileName();
+                return false;
+            }
+        }
+    }
 
-    runProcess("taste-update-data-view", QStringList() << "*.asn", generatedPath);
-    runProcess("make", QStringList() << "skeletons", generatedPath);
+    if (!runProcess("taste-update-data-view", { "*.asn" }, generatedPath)) {
+        return false;
+    }
+    if (!runProcess("make", { "skeletons" }, generatedPath)) {
+        return false;
+    }
+    return true;
 }
 
 auto TestGenerator::copyFunctionImplementations(const QString &functionName) -> void
@@ -199,7 +220,7 @@ auto TestGenerator::copyFunctionImplementations(const QString &functionName) -> 
     QString sourcePath = projectDirectory + QDir::separator() + "work" + QDir::separator() + functionName.toLower();
     QString destPath = generatedPath + QDir::separator() + "work" + QDir::separator();
     QDir(destPath + QDir::separator() + functionName.toLower()).removeRecursively();
-    runProcess("cp", QStringList() << "-r" << sourcePath << destPath, generatedPath);
+    runProcess("cp", { "-r", sourcePath, destPath }, generatedPath);
 
     sourcePath = generatedPath + QDir::separator() + "testdriver.c";
     destPath = generatedPath + QDir::separator() + "work/testdriver/C/src/testdriver.c";
@@ -210,57 +231,42 @@ auto TestGenerator::copyFunctionImplementations(const QString &functionName) -> 
 
 auto TestGenerator::compileSystemUnderTest() -> void
 {
-    runProcess("make",
-            QStringList() << "deploymentview"
-                          << "debug",
-            generatedPath);
+    runProcess("make", { "deploymentview", "debug" }, generatedPath);
     qDebug() << "Tests compilation finished";
 }
 
-auto TestGenerator::exportIvModel(ivm::IVModel *ivModel, const QString &outputFilename) -> void
+auto TestGenerator::exportIvModel(ivm::IVModel *ivModel, const QString &outputFilename) -> bool
 {
-    QByteArray modelData;
-    QBuffer modelDataBuffer(&modelData);
-    modelDataBuffer.open(QIODevice::WriteOnly);
+    QBuffer buffer;
+    buffer.open(QIODevice::ReadWrite);
 
     IVExporter exporter;
-    exporter.exportObjects(ivModel->objects().values(), &modelDataBuffer);
+    if (!exporter.exportObjects(ivModel->objects().values(), &buffer)) {
+        return false;
+    }
 
     QSaveFile outputFile(outputFilename);
     outputFile.open(QIODevice::WriteOnly);
-    outputFile.write(modelData);
+    outputFile.write(buffer.data());
     outputFile.commit();
+    return true;
 }
 
-auto TestGenerator::exportDvModel(dvm::DVModel *dvModel, const QString &outputFilename) -> void
+auto TestGenerator::exportDvModel(dvm::DVModel *dvModel, const QString &outputFilename) -> bool
 {
-    const auto dvObjects = getDvObjectsFromModel(dvModel);
+    QBuffer buffer;
+    buffer.open(QIODevice::ReadWrite);
 
-    dve::DVExporter exporter;
-    QList<shared::VEObject *> objects;
-    std::for_each(dvObjects->begin(), dvObjects->end(), [&objects](const auto &obj) { objects.push_back(obj); });
-
-    const int objectMaxSize = 1'000;
-    QByteArray qba(objects.size() * objectMaxSize, '\00');
-    QBuffer buf = QBuffer(&qba);
-
-    exporter.exportObjects(objects, &buf);
-
-    QFile file(outputFilename);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        return;
-    }
-    file.write(qba);
-}
-
-auto TestGenerator::getDvObjectsFromModel(dvm::DVModel *const model) -> std::unique_ptr<QVector<dvm::DVObject *>>
-{
-    auto generatedDvObjects = std::make_unique<QVector<dvm::DVObject *>>();
-    for (const auto &obj : model->objects()) {
-        generatedDvObjects->append(static_cast<dvm::DVObject *>(obj));
+    DVExporter exporter;
+    if (!exporter.exportObjects(dvModel->objects().values(), &buffer)) {
+        return false;
     }
 
-    return generatedDvObjects;
+    QSaveFile outputFile(outputFilename);
+    outputFile.open(QIODevice::WriteOnly);
+    outputFile.write(buffer.data());
+    outputFile.commit();
+    return true;
 }
 
 auto TestGenerator::generateTableRow(QTextStream &stream, const TestResultModel::CellTable &cells, int row) -> void

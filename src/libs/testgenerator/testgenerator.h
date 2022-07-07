@@ -50,21 +50,50 @@ struct TestResultModel
     float maxDelta;
 };
 
+/**
+ * @brief  Class for generating and executing interface tests. Backend for FunctionTesterPlugin.
+ *
+ */
 class TestGenerator final
 {
 public:
+    /**
+     * @brief Constructor of the class
+     *
+     * @param baseDirectory directory where the TestGenerator looks for taste project files
+     */
     TestGenerator(const QString &baseDirectory);
+
+    /**
+     * @brief Generate, compile and execute test of the specified interface
+     *
+     * @param interface interface to test
+     * @param csvModel the CSV data with test vectors
+     * @param asn1Model ASN.1 model to be used during testing
+     * @param delta maximum allowed absolute error
+     *
+     * @return true if there was no error during execution of the testing procedure nad false otherwise
+     */
     auto testUsingDataFromCsv(ivm::IVInterface &interface, const csv::CsvModel &csvModel,
-            Asn1Acn::Asn1Model &asn1Model, float delta) -> void;
+            Asn1Acn::Asn1Model &asn1Model, float delta) -> bool;
+
+    /**
+     * @brief Prepare test harness files to be used for compilation of tests
+     *
+     * @param interface interface under test
+     * @param csvModel the CSV data with test vectors
+     * @param asn1Model ASN.1 model to be used during testing
+     *
+     * @return true if there was no error during creation of the test harness files
+     */
     auto prepareTestHarness(ivm::IVInterface &interface,
             const csv::CsvModel &csvModel, Asn1Acn::Asn1Model &asn1Model) -> QString;
 private:
     auto initializePaths(const QString &baseDirectory) -> void;
-    auto exportDvModel(dvm::DVModel *dvModel, const QString &outputFilename) -> void;
-    auto exportIvModel(ivm::IVModel *ivModel, const QString &outputFilename) -> void;
-    auto getDvObjectsFromModel(dvm::DVModel *const model) -> std::unique_ptr<QVector<dvm::DVObject *>>;
-    auto runProcess(QString cmd, QStringList args, QString workingPath) -> void;
-    auto prepareTasteProjectSkeleton() -> void;
+    auto exportDvModel(dvm::DVModel *dvModel, const QString &outputFilename) -> bool;
+    auto exportIvModel(ivm::IVModel *ivModel, const QString &outputFilename) -> bool;
+    auto runProcess(QString cmd, QStringList args, QString workingPath) -> bool;
+    auto prepareTasteProjectSkeleton() -> bool;
     auto copyFunctionImplementations(const QString &functionName) -> void;
     auto compileSystemUnderTest() -> void;
     auto getAllFunctionsFromModel(const ivm::IVModel &ivModel) -> std::vector<ivm::IVFunction *>;
