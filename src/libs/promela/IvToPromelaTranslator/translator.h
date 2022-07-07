@@ -263,5 +263,7 @@ private:
     auto handleParameterType(const QString &parameterTypeName, const QString &parameterName,
             const QString &interfaceName, const QString &functionName,
             const Asn1Acn::Definitions *asn1SubtypesDefinitions) const -> QString;
+    auto buildParameterSubtypeName(
+            const QString &functionName, const QString &interfaceName, const QString &parameterName) const -> QString;
 };
 }

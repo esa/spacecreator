@@ -1001,10 +1001,7 @@ QString IvToPromelaTranslator::handleParameterType(const QString &parameterTypeN
         return parameterTypeName;
     }
 
-    auto parameterSubtypeName = QString("%1-%2-%3").arg(functionName).arg(interfaceName).arg(parameterName);
-    parameterSubtypeName.replace('_', '-');
-    parameterSubtypeName = parameterSubtypeName.toLower();
-    parameterSubtypeName[0] = parameterSubtypeName[0].toUpper();
+    auto parameterSubtypeName = buildParameterSubtypeName(functionName, interfaceName, parameterName);
 
     const auto parameterSubtype = asn1SubtypesDefinitions->type(parameterSubtypeName);
 
@@ -1014,4 +1011,16 @@ QString IvToPromelaTranslator::handleParameterType(const QString &parameterTypeN
         return parameterSubtypeName;
     }
 }
+
+QString IvToPromelaTranslator::buildParameterSubtypeName(
+        const QString &functionName, const QString &interfaceName, const QString &parameterName) const
+{
+    auto subtypeName = QString("%1-%2-%3").arg(functionName).arg(interfaceName).arg(parameterName);
+    subtypeName.replace('_', '-');
+    subtypeName = subtypeName.toLower();
+    subtypeName[0] = subtypeName[0].toUpper();
+
+    return subtypeName;
+}
+
 }
