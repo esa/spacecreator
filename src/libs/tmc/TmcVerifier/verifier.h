@@ -67,9 +67,9 @@ public:
     /**
      * @brief   Set path to the ASN.1 containing subtypes
      *
-     * @param   filepath    Path to the file
+     * @param   filepaths    Paths to the files
      */
-    void setSubtypesFilepath(std::optional<QString> filepath);
+    void setSubtypesFilepaths(const std::vector<QString> &filepath);
     /**
      * @brief Add Stop Condition files to verifier.
      *

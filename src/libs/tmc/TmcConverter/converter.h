@@ -117,9 +117,9 @@ public:
     /**
      * @brief   Set path to the ASN.1 containing subtypes
      *
-     * @param   filepath    Path to the file
+     * @param   filepaths   Paths to the files
      */
-    void setSubtypesFilepath(std::optional<QString> filepath);
+    void setSubtypesFilepaths(const std::vector<QString> &filepaths);
     /**
      * @brief Add Stop Condition files to convert.
      *
@@ -184,7 +184,7 @@ private:
     std::vector<QString> m_keepFunctions;
     std::optional<QString> m_globalInputVectorLengthLimit;
     std::unordered_map<QString, QString> m_interfaceInputVectorLengthLimits;
-    std::optional<QString> m_subtypesFilepath;
+    std::vector<QString> m_subtypesFilepaths;
     QStringList m_stopConditionsFiles;
     std::vector<ObserverInfo> m_observerInfos;
     QStringList m_observerAttachmentInfos;

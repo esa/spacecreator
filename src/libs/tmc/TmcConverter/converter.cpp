@@ -144,9 +144,9 @@ void TmcConverter::setInterfaceInputVectorLengthLimits(std::unordered_map<QStrin
     m_interfaceInputVectorLengthLimits = std::move(limits);
 }
 
-void TmcConverter::setSubtypesFilepath(std::optional<QString> filepath)
+void TmcConverter::setSubtypesFilepaths(const std::vector<QString> &filepaths)
 {
-    m_subtypesFilepath = std::move(filepath);
+    m_subtypesFilepaths = filepaths;
 }
 
 bool TmcConverter::addStopConditionFiles(const QStringList &files)
@@ -329,8 +329,8 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
         asn1Files.append(datamodel);
     }
 
-    if (m_subtypesFilepath.has_value()) {
-        QFileInfo subtypesFileInfo(*m_subtypesFilepath);
+    for (const auto &subtypesFilepath : m_subtypesFilepaths) {
+        QFileInfo subtypesFileInfo(subtypesFilepath);
 
         if (!subtypesFileInfo.exists()) {
             qCritical() << "File " << subtypesFileInfo.absoluteFilePath() << " with subtypes does not exist.";
@@ -398,8 +398,8 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
         options.add(PromelaOptions::interfaceInputVectorLengthLimit.arg(interfaceName.toLower()), value);
     }
 
-    if (m_subtypesFilepath.has_value()) {
-        QFileInfo subtypesFileInfo(*m_subtypesFilepath);
+    for (const auto &subtypesFilepath : m_subtypesFilepaths) {
+        QFileInfo subtypesFileInfo(subtypesFilepath);
         options.add(PromelaOptions::subtypesFilepath, subtypesFileInfo.absoluteFilePath());
     }
 
@@ -440,8 +440,8 @@ bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, cons
         options.add(Asn1Options::inputFilepath, inputFileName);
     }
 
-    if (m_subtypesFilepath.has_value()) {
-        QFileInfo subtypesFileInfo(*m_subtypesFilepath);
+    for (const auto &subtypesFilepath : m_subtypesFilepaths) {
+        QFileInfo subtypesFileInfo(subtypesFilepath);
         options.add(PromelaOptions::subtypesFilepath, subtypesFileInfo.absoluteFilePath());
     }
 
@@ -565,8 +565,8 @@ bool TmcConverter::createEnvGenerationInlines(
 
     options.add(Asn1Options::inputFilepath, inputDataView.absoluteFilePath());
 
-    if (m_subtypesFilepath.has_value()) {
-        QFileInfo subtypesFileInfo(*m_subtypesFilepath);
+    for (const auto &subtypesFilepath : m_subtypesFilepaths) {
+        QFileInfo subtypesFileInfo(subtypesFilepath);
 
         qDebug() << "Converting ASN.1 subtypes value generators using " << subtypesFileInfo.absoluteFilePath();
         options.add(Asn1Options::inputFilepath, subtypesFileInfo.absoluteFilePath());

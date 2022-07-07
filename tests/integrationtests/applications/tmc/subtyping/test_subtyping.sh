@@ -20,7 +20,8 @@ mkdir $TEST_OUTPUT_DIR
 # Translate
 $TMC -iv $RESOURCE_DIR/interfaceview.xml \
     -o $TEST_OUTPUT_DIR \
-    -sub $RESOURCE_DIR/subtypes.asn
+    -sub $RESOURCE_DIR/subtypes1.asn \
+    -sub $RESOURCE_DIR/subtypes2.asn
 
 cd $TEST_OUTPUT_DIR \
     && $SPIN -a system.pml \
@@ -28,5 +29,4 @@ cd $TEST_OUTPUT_DIR \
     && ./system.out -m1000000 -a -n > system.output \
     && grep -q "errors: 0" system.output \
     && cd .. \
-
-    # && rm -r $TEST_OUTPUT_DIR
+    && rm -r $TEST_OUTPUT_DIR

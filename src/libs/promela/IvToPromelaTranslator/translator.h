@@ -235,7 +235,8 @@ private:
             const QString &functionName) const -> void;
     auto createPromelaObjectsForEnvironment(Context &context, const ::ivm::IVModel *ivModel,
             ::ivm::IVFunction *ivFunction, const QString &functionName,
-            const Asn1Acn::Definitions *asn1SubtypesDefinitions, const conversion::Options &options) const -> void;
+            const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions,
+            const conversion::Options &options) const -> void;
     auto createCheckQueueInline(
             model::PromelaModel *promelaModel, const QString &functionName, QList<QString> &channelNames) const -> void;
     auto createSystemState(model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,
@@ -252,7 +253,7 @@ private:
     auto constructChannelName(const QString &functionName, const QString &interfaceName) const -> QString;
 
     auto getSubtypesDefinitions(const Asn1Acn::Asn1Model *asn1Model, const conversion::Options &options) const
-            -> const Asn1Acn::Definitions *;
+            -> std::vector<const Asn1Acn::Definitions *>;
     auto getInterfaceName(const ivm::IVInterface *interface) const -> QString;
     auto getInterfaceFunctionName(const ivm::IVInterface *interface) const -> QString;
     auto getInterfaceProperty(ivm::IVInterface *interface, const QString &name) const -> QVariant;
@@ -262,7 +263,7 @@ private:
 
     auto handleParameterType(const QString &parameterTypeName, const QString &parameterName,
             const QString &interfaceName, const QString &functionName,
-            const Asn1Acn::Definitions *asn1SubtypesDefinitions) const -> QString;
+            const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const -> QString;
     auto buildParameterSubtypeName(
             const QString &functionName, const QString &interfaceName, const QString &parameterName) const -> QString;
 };

@@ -93,15 +93,18 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
 std::vector<std::unique_ptr<conversion::Model>> Asn1ToPromelaTranslator::generateValueGenerationInlines(
         const Asn1Acn::Asn1Model *model, const QStringList &typeNames, const Options &options) const
 {
-    const auto subtypesFilepath = options.value(PromelaOptions::subtypesFilepath);
+    const auto subtypesFilepaths = options.values(PromelaOptions::subtypesFilepath);
 
     std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
     for (const std::unique_ptr<File> &file : model->data()) {
-        if (subtypesFilepath && *subtypesFilepath == file->name()) {
-            Asn1NodeValueGeneratorVisitor visitor(*promelaModel);
+        const auto subtypesFilepathFound = std::find_if(subtypesFilepaths.begin(), subtypesFilepaths.end(),
+                [&](const auto &filepath) { return filepath == file->name(); });
+
+        if (subtypesFilepathFound == subtypesFilepaths.end()) {
+            Asn1NodeValueGeneratorVisitor visitor(*promelaModel, typeNames);
             visitor.visit(*file);
         } else {
-            Asn1NodeValueGeneratorVisitor visitor(*promelaModel, typeNames);
+            Asn1NodeValueGeneratorVisitor visitor(*promelaModel);
             visitor.visit(*file);
         }
     }

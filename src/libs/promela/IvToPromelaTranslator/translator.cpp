@@ -650,7 +650,8 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslato
 
 void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTranslator::Context &context,
         const IVModel *ivModel, IVFunction *ivFunction, const QString &functionName,
-        const Asn1Acn::Definitions *asn1SubtypesDefinitions, const conversion::Options &options) const
+        const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions,
+        const conversion::Options &options) const
 {
     QVector<IVInterface *> providedInterfaceList = ivFunction->pis();
     for (IVInterface *providedInterface : providedInterfaceList) {
@@ -900,36 +901,30 @@ QString IvToPromelaTranslator::constructChannelName(const QString &functionName,
     return QString("%1_%2_channel").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
 }
 
-const Asn1Acn::Definitions *IvToPromelaTranslator::getSubtypesDefinitions(
+std::vector<const Asn1Acn::Definitions *> IvToPromelaTranslator::getSubtypesDefinitions(
         const Asn1Model *asn1Model, const Options &options) const
 {
-    const auto subtypesFilepath = options.value(PromelaOptions::subtypesFilepath);
+    std::vector<const Asn1Acn::Definitions *> result;
 
-    if (subtypesFilepath.has_value()) {
+    const auto subtypesFilepaths = options.values(PromelaOptions::subtypesFilepath);
+
+    for (const auto &subtypesFilepath : subtypesFilepaths) {
         const auto &asn1ModelData = asn1Model->data();
 
         const auto foundAsn1File = std::find_if(asn1ModelData.begin(), asn1ModelData.end(),
-                [&](const auto &file) { return file->name() == *subtypesFilepath; });
+                [&](const auto &file) { return file->name() == subtypesFilepath; });
 
         if (foundAsn1File == asn1ModelData.end()) {
-            auto errorMessage = QString("Unable to find subtypes file '%1' in the ASN.1 model").arg(*subtypesFilepath);
+            auto errorMessage = QString("Unable to find subtypes file '%1' in the ASN.1 model").arg(subtypesFilepath);
             throw TranslationException(std::move(errorMessage));
         }
 
         const auto &definitionsList = (*foundAsn1File)->definitionsList();
-
-        if (definitionsList.empty()) {
-            auto errorMessage = QString("Subtypes file '%1' doesn't contain any definitions").arg(*subtypesFilepath);
-            throw TranslationException(std::move(errorMessage));
-        } else if (definitionsList.size() > 1) {
-            auto errorMessage = QString("Subtypes file '%1' contains more than one definitions").arg(*subtypesFilepath);
-            throw TranslationException(std::move(errorMessage));
-        }
-
-        return definitionsList.at(0).get();
-    } else {
-        return nullptr;
+        std::for_each(definitionsList.begin(), definitionsList.end(),
+                [&](const auto &definitions) { result.push_back(definitions.get()); });
     }
+
+    return result;
 }
 
 QString IvToPromelaTranslator::getInterfaceName(const ivm::IVInterface *interface) const
@@ -995,21 +990,23 @@ size_t IvToPromelaTranslator::getInterfacePriority(IVInterface *interface) const
 
 QString IvToPromelaTranslator::handleParameterType(const QString &parameterTypeName, const QString &parameterName,
         const QString &interfaceName, const QString &functionName,
-        const Asn1Acn::Definitions *asn1SubtypesDefinitions) const
+        const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const
 {
-    if (asn1SubtypesDefinitions == nullptr) {
+    if (asn1SubtypesDefinitions.empty()) {
         return parameterTypeName;
     }
 
     auto parameterSubtypeName = buildParameterSubtypeName(functionName, interfaceName, parameterName);
 
-    const auto parameterSubtype = asn1SubtypesDefinitions->type(parameterSubtypeName);
+    for (const auto definitions : asn1SubtypesDefinitions) {
+        const auto parameterSubtype = definitions->type(parameterSubtypeName);
 
-    if (parameterSubtype == nullptr) {
-        return parameterTypeName;
-    } else {
-        return parameterSubtypeName;
+        if (parameterSubtype != nullptr) {
+            return parameterSubtypeName;
+        }
     }
+
+    return parameterTypeName;
 }
 
 QString IvToPromelaTranslator::buildParameterSubtypeName(
@@ -1022,5 +1019,4 @@ QString IvToPromelaTranslator::buildParameterSubtypeName(
 
     return subtypeName;
 }
-
 }
