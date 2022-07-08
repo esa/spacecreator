@@ -28,6 +28,11 @@ namespace testgenerator {
 
 struct TestResultModel
 {
+    enum class ColumnSize
+    {
+        Regular,
+        Wide
+    };
     enum class CellColor
     {
         Red,
@@ -40,12 +45,14 @@ struct TestResultModel
         CellColor color;
     };
     typedef QVector<QVector<Cell>> CellTable;
+
     TestResultModel(const ivm::IVInterface &interface, const CsvModel &csvModel, const QVector<QVariant> &results, float delta);
     QString interfaceName;
     QString functionName;
     QVector<shared::InterfaceParameter> ifaceParams;
     CellTable cells;
     QVector<QString> columnNames;
+    QVector<ColumnSize> columnSizes;
     int rows;
     float maxDelta;
 };
@@ -101,7 +108,7 @@ private:
     auto generateResultHtmlFile(const TestResultModel &resultData) -> void;
     auto generateResultHtmlStream(QTextStream &stream, const TestResultModel &resultData) -> void;
     auto generateTableRow(QTextStream &stream, const TestResultModel::CellTable &cells, int row) -> void;
-    auto generateTableHeader(QTextStream &stream, const QVector<QString> &columnNames) -> void;
+    auto generateTableHeader(QTextStream &stream, const TestResultModel &resultsModel) -> void;
 
     QString projectDirectory;
     QString generatedPath;

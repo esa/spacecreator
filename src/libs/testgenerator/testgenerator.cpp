@@ -76,12 +76,11 @@ TestResultModel::TestResultModel(
         i++;
     }
     for (int l = 0; l < ifaceParams.size(); l++) {
+        columnNames.append(ifaceParams[l].name());
         if (ifaceParams[l].isInDirection()) {
-            columnNames.append(ifaceParams[l].name());
+            columnSizes.append(ColumnSize::Regular);
         } else {
-            columnNames.append(ifaceParams[l].name() + " (expected)");
-            columnNames.append(ifaceParams[l].name() + " (actual)");
-            columnNames.append(ifaceParams[l].name() + " (delta)");
+            columnSizes.append(ColumnSize::Wide);
         }
     }
 }
@@ -288,14 +287,43 @@ auto TestGenerator::generateTableRow(QTextStream &stream, const TestResultModel:
     stream << "\t\t\t</tr>\n";
 }
 
-auto TestGenerator::generateTableHeader(QTextStream &stream, const QVector<QString> &columnNames) -> void
+auto TestGenerator::generateTableHeader(QTextStream &stream, const TestResultModel &resultsModel) -> void
 {
+    auto names = resultsModel.columnNames;
+    auto sizes = resultsModel.columnSizes;
+
     stream << "\t\t\t<tr>\n";
     stream << "\t\t\t\t";
-    for (const auto &name : columnNames) {
-        stream << "<th>";
-        stream << name;
-        stream << "</th>";
+    for (int i = 0; i < names.size(); i++) {
+        if (sizes[i] == TestResultModel::ColumnSize::Regular) {
+            stream << "<th rowspan='2'>";
+            stream << names[i];
+            stream << "</th>";
+        } else {
+            stream << "<th colspan='3'>";
+            stream << names[i];
+            stream << "</th>";
+        }
+    }
+    stream << "\n";
+    stream << "\t\t\t</tr>\n";
+
+    stream << "\t\t\t<tr>\n";
+    stream << "\t\t\t\t";
+    for (int i = 0; i < names.size(); i++) {
+        if (sizes[i] == TestResultModel::ColumnSize::Wide) {
+            stream << "<th>";
+            stream << "expected";
+            stream << "</th>";
+
+            stream << "<th>";
+            stream << "actual";
+            stream << "</th>";
+
+            stream << "<th>";
+            stream << "&Delta;";
+            stream << "</th>";
+        }
     }
     stream << "\n";
     stream << "\t\t\t</tr>\n";
@@ -311,7 +339,7 @@ auto TestGenerator::generateResultHtmlStream(QTextStream &stream, const TestResu
     stream << "\t</head>\n";
     stream << "\t<style> ";
     stream << "table, th, td { ";
-    stream << "border: 1px solid black; border-collapse: collapse; font-size: 30px; } ";
+    stream << "border: 1px solid black; border-collapse: collapse; font-size: 22px; } ";
     stream << "th { ";
     stream << "font-size: 18px; } ";
     stream << "\t</style>\n";
@@ -320,7 +348,7 @@ auto TestGenerator::generateResultHtmlStream(QTextStream &stream, const TestResu
            << resultData.functionName << "</h2>\n";
     stream << "\t\t<p style='font-size: 22px'>Maximum allowed absolute error: " << resultData.maxDelta << "</p>\n";
     stream << "\t\t<table>\n";
-    generateTableHeader(stream, resultData.columnNames);
+    generateTableHeader(stream, resultData);
     for (int i = 0; i < resultData.rows; i++) {
         generateTableRow(stream, resultData.cells, i);
     }
