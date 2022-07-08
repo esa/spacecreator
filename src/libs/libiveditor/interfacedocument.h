@@ -109,6 +109,7 @@ public:
     ivm::IVModel *sharedModel() const;
     IVItemModel *itemsModel() const;
     ivm::IVModel *layersModel() const;
+    QHash<shared::Id, shared::VEObject *> layersObjects() const;
 
     IVVisualizationModelBase *visualisationModel() const;
     QItemSelectionModel *objectsSelectionModel() const;

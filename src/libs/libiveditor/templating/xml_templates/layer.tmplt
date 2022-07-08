@@ -1,0 +1,7 @@
+{% comment %}
+Template for generation of XML scheme of comment.
+The following tags are available in this sub-template:
+layer           : Instance of layer (provided by a top level template)
+layer.name      :   |_ Layer name
+{% endcomment %}
+<Layer name="{{ layer.name }}"/>

@@ -522,6 +522,11 @@ ivm::IVModel *InterfaceDocument::layersModel() const
     return d->layersModel;
 }
 
+QHash<shared::Id, shared::VEObject *> InterfaceDocument::layersObjects() const
+{
+    return d->layersModel->objects();
+}
+
 IVVisualizationModelBase *InterfaceDocument::visualisationModel() const
 {
     if (!d->objectsVisualizationModel) {
