@@ -22,8 +22,10 @@
 #include <QCoreApplication>
 #include <QString>
 #include <ivcore/ivlibrary.h>
+#include <shared/qstringhash.h>
 #include <shared/sharedlibrary.h>
 #include <tmc/TmcVerifier/verifier.h>
+#include <unordered_map>
 
 const auto separator = QString(":");
 
@@ -66,6 +68,10 @@ int main(int argc, char *argv[])
     QStringList stopConditionFiles;
     QStringList observerInfos;
     std::vector<QString> environmentFunctions;
+    std::vector<QString> keepFunctions;
+    std::optional<QString> globalInputVectorLengthLimit;
+    std::unordered_map<QString, QString> interfaceInputVectorLengthLimits;
+    std::vector<QString> subtypesFilepaths;
 
     const QStringList args = app.arguments();
 
@@ -102,16 +108,80 @@ int main(int argc, char *argv[])
         } else if (arg == "-e" || arg == "--envfunc") {
             ++i;
             environmentFunctions.emplace_back(args[i]);
+        } else if (arg == "-k" || arg == "--keep") {
+            ++i;
+            keepFunctions.emplace_back(args[i]);
+        } else if (arg == "-ivl") {
+            ++i;
+
+            auto limit = args[i];
+            auto limitSemicolonCount = limit.count(':');
+
+            if (limitSemicolonCount == 0) {
+                if (globalInputVectorLengthLimit.has_value()) {
+                    qCritical("Duplicated global input vector length limit argument");
+                    exit(EXIT_FAILURE);
+                }
+
+                bool valueOk;
+                limit.toInt(&valueOk);
+
+                if (!valueOk) {
+                    qCritical("Global input vector length limit argument value is not an integer");
+                    exit(EXIT_FAILURE);
+                }
+
+                globalInputVectorLengthLimit = limit;
+            } else if (limitSemicolonCount == 1) {
+                auto interfaceLimit = limit.split(':');
+
+                if (interfaceInputVectorLengthLimits.count(interfaceLimit[0]) != 0) {
+                    qCritical("Duplicated input vector length limit argument for interface %s",
+                            interfaceLimit[0].toStdString().c_str());
+                    exit(EXIT_FAILURE);
+                }
+
+                bool valueOk;
+                interfaceLimit[1].toInt(&valueOk);
+
+                if (!valueOk) {
+                    qCritical("Input vector length limit argument for interface %s is not an integer",
+                            interfaceLimit[0].toStdString().c_str());
+                    exit(EXIT_FAILURE);
+                }
+
+                interfaceInputVectorLengthLimits.insert({ interfaceLimit[0], interfaceLimit[1] });
+            } else {
+                qCritical("Incorrect input vector length limit argument value");
+                exit(EXIT_FAILURE);
+            }
+        } else if (arg == "-sub") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing filename after -sub");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
+            subtypesFilepaths.emplace_back(args[i]);
         } else if (arg == "-h" || arg == "--help") {
             qInfo("tmc: TASTE Model Chcecker");
             qInfo("Usage: tmc [OPTIONS]");
-            qInfo("  -iv <filepath>       Use <filepath> as input InterfaceView");
-            qInfo("  -o <dir>             Use <dir> as output directory.");
-            qInfo("  -scl <filepath>      Use <filepath> as input Stop Condition source file.");
+            qInfo("  -iv <filepath>         Use <filepath> as input InterfaceView");
+            qInfo("  -o <dir>               Use <dir> as output directory.");
+            qInfo("  -scl <filepath>        Use <filepath> as input Stop Condition source file.");
             qInfo("  -os <filepath>[:priority]");
-            qInfo("                       Use <filepath> as an Observer source file.");
-            qInfo("                       Integer <priority> of the Observer is optional");
-            qInfo("  -h, --help           Print this message and exit.");
+            qInfo("                         Use <filepath> as an Observer source file.");
+            qInfo("                         Integer <priority> of the Observer is optional");
+            qInfo("  -e, --envfunc <name>   Use <name> to specify a SDL function that should be treated as "
+                  "environment");
+            qInfo("  -k, --keepfunc <name>  Use <name> to specify a SDL function that shouldn't be treated as "
+                  "environment.");
+            qInfo("                         All other functions will be treated as environment");
+            qInfo("  -ivl <limit>           Use <limit> to specify input vector length limit.");
+            qInfo("                         Provide number only to set the global limit");
+            qInfo("                         Use <interface_name>:<number> to set limit for a single interface");
+            qInfo("                         Interface limit overrides the global limit");
+            qInfo("  -sub <filepath>        Use <filepath> as an ASN.1 file used for subtyping");
+            qInfo("  -h, --help             Print this message and exit.");
             exit(EXIT_SUCCESS);
         } else {
             qCritical("Unrecognized command line option");
@@ -127,10 +197,18 @@ int main(int argc, char *argv[])
         qCritical("Missing mandatory argument: output directory");
         exit(EXIT_FAILURE);
     }
+    if (!environmentFunctions.empty() && !keepFunctions.empty()) {
+        qCritical("-e and -k arguments cannot be combined");
+        exit(EXIT_FAILURE);
+    }
 
     tmc::verifier::TmcVerifier verifier(inputIvFilepath.value(), outputDirectory.value());
 
-    verifier.addEnvironmentFunctions(environmentFunctions);
+    verifier.setEnvironmentFunctions(environmentFunctions);
+    verifier.setKeepFunctions(keepFunctions);
+    verifier.setGlobalInputVectorLengthLimit(std::move(globalInputVectorLengthLimit));
+    verifier.setInterfaceInputVectorLengthLimits(std::move(interfaceInputVectorLengthLimits));
+    verifier.setSubtypesFilepaths(subtypesFilepaths);
 
     if (!verifier.addStopConditionFiles(stopConditionFiles)) {
         return EXIT_FAILURE;

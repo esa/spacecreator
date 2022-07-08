@@ -25,7 +25,6 @@
 #include <QInputDialog>
 #include <QMenu>
 #include <QMessageBox>
-#include <QTextBrowser>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <editormanager/editormanager.h>
 #include <libiveditor/interfacedocument.h>

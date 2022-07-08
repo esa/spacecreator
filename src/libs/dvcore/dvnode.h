@@ -58,6 +58,8 @@ public:
     DVSystemFunction *systemFunction(const QString &name) const;
     bool hasSystemFunction(const QString &name) const;
 
+    bool containsFunction(const QString &name) const;
+
     QString nodeLabel() const;
 
 private:

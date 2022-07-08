@@ -23,6 +23,10 @@ Options:
             Run the mscconverter
         [--sedsconverter [--help]]
             Run the sedsconverter
+        [--tmcconverter [--help]]
+            Run the TMC converter
+        [--tmcivoptimizer [--help]]
+            Run the TMC Interface View optimizer
         [--mscstreaming [--help]]
             Run the mscstreaming
         [--DVeditor [--help]]
@@ -67,6 +71,12 @@ case $1 in
     ;;
 --sedsconverter)
     exec "$bindir/sedsconverter" "${@:2}"
+    ;;
+--tmcconverter)
+    exec "$bindir/tmc" "${@:2}"
+    ;;
+--tmcivoptimizer)
+    exec "$bindir/tmcivoptimizer" "${@:2}"
     ;;
 --mscstreaming)
     exec "$bindir/mscstreaming" "$2" "$3" "$4" "$5" "$6" "$7"

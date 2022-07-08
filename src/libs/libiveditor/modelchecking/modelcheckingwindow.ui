@@ -7,68 +7,416 @@
     <x>0</x>
     <y>0</y>
     <width>880</width>
-    <height>720</height>
+    <height>703</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Model Checking Window</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QTabWidget" name="tabWidget">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>30</y>
-      <width>711</width>
-      <height>651</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>0</number>
-    </property>
-    <widget class="QWidget" name="tab">
-     <attribute name="title">
-      <string>Configuration</string>
-     </attribute>
-     <widget class="QTreeWidget" name="treeWidget_properties">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>371</width>
-        <height>351</height>
-       </rect>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="0">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
       </property>
-      <property name="columnCount">
-       <number>1</number>
-      </property>
-      <attribute name="headerCascadingSectionResizes">
-       <bool>false</bool>
-      </attribute>
-      <attribute name="headerDefaultSectionSize">
-       <number>400</number>
-      </attribute>
-      <attribute name="headerMinimumSectionSize">
-       <number>400</number>
-      </attribute>
-      <attribute name="headerStretchLastSection">
-       <bool>false</bool>
-      </attribute>
-      <column>
-       <property name="text">
-        <string>Name</string>
-       </property>
-      </column>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Configuration</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Select properties to check</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="label_15">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Select Functions (submodel)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_17">
+          <property name="font">
+           <font>
+            <pointsize>9</pointsize>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="text">
+           <string>(right-click entries to add/delete/convert, double-click to open)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" rowspan="2">
+         <widget class="QTreeWidget" name="treeWidget_submodel">
+          <attribute name="headerDefaultSectionSize">
+           <number>400</number>
+          </attribute>
+          <attribute name="headerMinimumSectionSize">
+           <number>400</number>
+          </attribute>
+          <attribute name="headerStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QTreeWidget" name="treeWidget_properties">
+          <property name="columnCount">
+           <number>1</number>
+          </property>
+          <attribute name="headerCascadingSectionResizes">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="headerDefaultSectionSize">
+           <number>400</number>
+          </attribute>
+          <attribute name="headerMinimumSectionSize">
+           <number>400</number>
+          </attribute>
+          <attribute name="headerStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Select environment subtyping</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_18">
+          <property name="font">
+           <font>
+            <pointsize>9</pointsize>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="text">
+           <string>(right-click entries to add/delete, double-click to open)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QTreeWidget" name="treeWidget_subtyping">
+          <property name="horizontalScrollMode">
+           <enum>QAbstractItemView::ScrollPerPixel</enum>
+          </property>
+          <property name="columnCount">
+           <number>1</number>
+          </property>
+          <attribute name="headerCascadingSectionResizes">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="headerDefaultSectionSize">
+           <number>400</number>
+          </attribute>
+          <attribute name="headerMinimumSectionSize">
+           <number>400</number>
+          </attribute>
+          <attribute name="headerStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>Native model-checker</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>IF model-checker</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="4" column="0" colspan="3">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>Exploration algorithm:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="4">
+         <widget class="QLineEdit" name="lineEdit_maxNumStates">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="4" colspan="2">
+         <widget class="QComboBox" name="comboBox_expAlgorithm">
+          <item>
+           <property name="text">
+            <string>DFS (Depth First Search)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>BFS (Breadth First Search)</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="7" column="2" colspan="3">
+         <widget class="QLabel" name="label_13">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Scenarios found</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3" colspan="3">
+         <widget class="QCheckBox" name="checkBox_successScenarios">
+          <property name="text">
+           <string>Success scenarios</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0" colspan="3">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>Time limit (sec) for exploration:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="2" colspan="3">
+         <widget class="QLabel" name="label_19">
+          <property name="font">
+           <font>
+            <pointsize>9</pointsize>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="text">
+           <string>(double-click entries to open)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="4">
+         <widget class="QLineEdit" name="lineEdit_timeLimit">
+          <property name="text">
+           <string>120</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="5">
+         <widget class="QLabel" name="label_16">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>(optional field)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>Generate:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0" rowspan="2" colspan="2">
+         <widget class="QPushButton" name="pushButton_callIF">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Call IF</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="4">
+         <widget class="QLineEdit" name="lineEdit_maxNumEnvRICalls">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="5">
+         <widget class="QLabel" name="label_11">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>(recommended field)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="4">
+         <widget class="QLineEdit" name="lineEdit_maxNumScenarios">
+          <property name="text">
+           <string>5</string>
+          </property>
+          <property name="maxLength">
+           <number>32767</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" colspan="2">
+         <widget class="QCheckBox" name="checkBox_errorScenarios">
+          <property name="text">
+           <string>Error scenarios</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="2" colspan="4">
+         <widget class="QTreeWidget" name="treeWidget_results">
+          <attribute name="headerDefaultSectionSize">
+           <number>400</number>
+          </attribute>
+          <attribute name="headerMinimumSectionSize">
+           <number>400</number>
+          </attribute>
+          <attribute name="headerStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="4">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Max. number of scenarios to look for:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="5">
+         <widget class="QLabel" name="label_12">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>(recommended field)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0" colspan="4">
+         <widget class="QLabel" name="label_5">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Max. number of environment calls:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0" colspan="3">
+         <widget class="QLabel" name="label_7">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Max. number of states to explore:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="5">
+         <widget class="QLabel" name="label_14">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>(optional field)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>IF options</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_4">
+       <attribute name="title">
+        <string>SPIN model-checker</string>
+       </attribute>
+      </widget>
      </widget>
-     <widget class="QLabel" name="label">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>241</width>
-        <height>21</height>
-       </rect>
-      </property>
+    </item>
+    <item row="0" column="0" alignment="Qt::AlignLeft|Qt::AlignTop">
+     <widget class="QLabel" name="label_3">
       <property name="font">
        <font>
         <weight>75</weight>
@@ -76,517 +424,31 @@
        </font>
       </property>
       <property name="text">
-       <string>Select properties to check</string>
+       <string>TASTE Space Creator Model Checking Configuration Window</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>380</y>
-        <width>231</width>
-        <height>21</height>
-       </rect>
-      </property>
+    </item>
+    <item row="3" column="1" alignment="Qt::AlignRight|Qt::AlignBottom">
+     <widget class="QPushButton" name="pushButton_loadConfiguration">
       <property name="font">
        <font>
-        <weight>75</weight>
-        <bold>true</bold>
+        <weight>50</weight>
+        <bold>false</bold>
        </font>
       </property>
       <property name="text">
-       <string>Select environment subtyping</string>
+       <string>Load configuration</string>
       </property>
      </widget>
-     <widget class="QTreeWidget" name="treeWidget_subtyping">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>400</y>
-        <width>321</width>
-        <height>211</height>
-       </rect>
-      </property>
-      <property name="horizontalScrollMode">
-       <enum>QAbstractItemView::ScrollPerPixel</enum>
-      </property>
-      <property name="columnCount">
-       <number>1</number>
-      </property>
-      <attribute name="headerCascadingSectionResizes">
-       <bool>false</bool>
-      </attribute>
-      <attribute name="headerDefaultSectionSize">
-       <number>400</number>
-      </attribute>
-      <attribute name="headerMinimumSectionSize">
-       <number>400</number>
-      </attribute>
-      <attribute name="headerStretchLastSection">
-       <bool>false</bool>
-      </attribute>
-      <column>
-       <property name="text">
-        <string>Name</string>
-       </property>
-      </column>
-     </widget>
-     <widget class="QTreeWidget" name="treeWidget_submodel">
-      <property name="geometry">
-       <rect>
-        <x>400</x>
-        <y>30</y>
-        <width>301</width>
-        <height>351</height>
-       </rect>
-      </property>
-      <attribute name="headerDefaultSectionSize">
-       <number>400</number>
-      </attribute>
-      <attribute name="headerMinimumSectionSize">
-       <number>400</number>
-      </attribute>
-      <attribute name="headerStretchLastSection">
-       <bool>false</bool>
-      </attribute>
-      <column>
-       <property name="text">
-        <string>Name</string>
-       </property>
-      </column>
-     </widget>
-     <widget class="QLabel" name="label_15">
-      <property name="geometry">
-       <rect>
-        <x>400</x>
-        <y>10</y>
-        <width>241</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
+    </item>
+    <item row="4" column="1" alignment="Qt::AlignRight">
+     <widget class="QPushButton" name="pushButton_saveConfiguration">
       <property name="text">
-       <string>Select Functions (submodel)</string>
+       <string>Save configuration</string>
       </property>
      </widget>
-    </widget>
-    <widget class="QWidget" name="tab_2">
-     <attribute name="title">
-      <string>Native model-checker</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="tab_3">
-     <attribute name="title">
-      <string>IF model-checker</string>
-     </attribute>
-     <widget class="QLabel" name="label_4">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>20</y>
-        <width>81</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>IF options</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_5">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>190</y>
-        <width>231</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Max. number of environment calls:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_6">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>80</y>
-        <width>231</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Max. number of scenarios to look for:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_7">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>220</y>
-        <width>211</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Max. number of states to explore:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_8">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>140</y>
-        <width>151</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Exploration algorithm:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_9">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>110</y>
-        <width>201</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Time limit (sec) for exploration:</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="lineEdit_maxNumEnvRICalls">
-      <property name="geometry">
-       <rect>
-        <x>250</x>
-        <y>190</y>
-        <width>71</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="lineEdit_maxNumScenarios">
-      <property name="geometry">
-       <rect>
-        <x>250</x>
-        <y>80</y>
-        <width>71</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>5</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="lineEdit_maxNumStates">
-      <property name="geometry">
-       <rect>
-        <x>250</x>
-        <y>220</y>
-        <width>71</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="lineEdit_timeLimit">
-      <property name="geometry">
-       <rect>
-        <x>250</x>
-        <y>110</y>
-        <width>71</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>120</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_expAlgorithm">
-      <property name="geometry">
-       <rect>
-        <x>250</x>
-        <y>140</y>
-        <width>191</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <item>
-       <property name="text">
-        <string>DFS (Depth First Search)</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>BFS (Breadth First Search)</string>
-       </property>
-      </item>
-     </widget>
-     <widget class="QPushButton" name="pushButton_callIF">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>270</y>
-        <width>101</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Call IF</string>
-      </property>
-     </widget>
-     <widget class="QTreeWidget" name="treeWidget_results">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>280</y>
-        <width>401</width>
-        <height>241</height>
-       </rect>
-      </property>
-      <attribute name="headerDefaultSectionSize">
-       <number>400</number>
-      </attribute>
-      <attribute name="headerMinimumSectionSize">
-       <number>400</number>
-      </attribute>
-      <attribute name="headerStretchLastSection">
-       <bool>false</bool>
-      </attribute>
-      <column>
-       <property name="text">
-        <string>Name</string>
-       </property>
-      </column>
-     </widget>
-     <widget class="QCheckBox" name="checkBox_errorScenarios">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>50</y>
-        <width>141</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Error scenarios</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="checkBox_successScenarios">
-      <property name="geometry">
-       <rect>
-        <x>230</x>
-        <y>50</y>
-        <width>161</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Success scenarios</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_13">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>260</y>
-        <width>191</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Scenarios found</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_10">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>50</y>
-        <width>59</width>
-        <height>15</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Generate:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_11">
-      <property name="geometry">
-       <rect>
-        <x>330</x>
-        <y>80</y>
-        <width>151</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>(recommended field)</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_12">
-      <property name="geometry">
-       <rect>
-        <x>330</x>
-        <y>110</y>
-        <width>151</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>(recommended field)</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_14">
-      <property name="geometry">
-       <rect>
-        <x>330</x>
-        <y>190</y>
-        <width>151</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>(optional field)</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_16">
-      <property name="geometry">
-       <rect>
-        <x>330</x>
-        <y>220</y>
-        <width>151</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>(optional field)</string>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tab_4">
-     <attribute name="title">
-      <string>SPIN model-checker</string>
-     </attribute>
-    </widget>
-   </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>421</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>TASTE Space Creator Model Checking Configuration Window</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_saveConfiguration">
-    <property name="geometry">
-     <rect>
-      <x>740</x>
-      <y>530</y>
-      <width>121</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Save configuration</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_loadConfiguration">
-    <property name="geometry">
-     <rect>
-      <x>740</x>
-      <y>500</y>
-      <width>121</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>Load configuration</string>
-    </property>
-   </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">

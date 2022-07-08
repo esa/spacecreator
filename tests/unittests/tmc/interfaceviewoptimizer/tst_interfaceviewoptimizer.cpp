@@ -65,7 +65,7 @@ void tst_InterfaceViewOptimizer::testEnvironmentSelection()
     std::unique_ptr<ivm::IVModel> ivModel = importIvModel("resources/environmentselection.xml");
     QVERIFY(ivModel);
 
-    InterfaceViewOptimizer::optimizeModel(ivModel.get(), { "Pinger" });
+    InterfaceViewOptimizer::optimizeModel(ivModel.get(), { "Pinger" }, InterfaceViewOptimizer::Mode::Environment);
 
     QVERIFY(hasSdlFunction("Ponger", ivModel.get()));
     QVERIFY(hasEnvFunction("Pinger", ivModel.get()));

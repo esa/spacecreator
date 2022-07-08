@@ -1,0 +1,24 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Receiver;
+    /* CIF TEXT (1334, 60), (267, 143) */
+    -- Text area for declarations and comments
+    
+    dcl pingArg MyBetterInteger;
+    dcl pongArg MyBetterInteger;
+    /* CIF ENDTEXT */
+    /* CIF START (437, 12), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (437, 67), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (644, 14), (70, 35) */
+    state Wait;
+        /* CIF input (613, 69), (132, 41) */
+        input Ping(pingArg);
+            /* CIF PROCEDURECALL (594, 130), (168, 35) */
+            call writeln("Ping ", pingArg);
+            /* CIF output (616, 185), (125, 35) */
+            output Pong(pingArg);
+            /* CIF NEXTSTATE (644, 235), (70, 35) */
+            NEXTSTATE Wait;
+    endstate;
+endprocess Receiver;

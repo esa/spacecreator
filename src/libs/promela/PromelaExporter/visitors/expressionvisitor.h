@@ -67,6 +67,12 @@ public:
      * @param inlineCall InlineCall to export
      */
     void operator()(const model::InlineCall &inlineCall);
+    /**
+     * @brief Handle Boolean Constant
+     *
+     * @param constant BooleanConstant to export
+     */
+    void operator()(const model::BooleanConstant &constant);
 
 private:
     QTextStream &m_stream;

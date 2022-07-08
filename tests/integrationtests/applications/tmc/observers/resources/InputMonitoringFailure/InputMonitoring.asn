@@ -1,7 +1,8 @@
 INPUTMONITORING-DATAVIEW DEFINITIONS ::=
 BEGIN
 
-   MyInteger ::= INTEGER (0 .. 10)
+   MyInteger ::= INTEGER (0 .. 5)
+   MyIntegerBigger ::= INTEGER (0 .. 10)
 
 END
 

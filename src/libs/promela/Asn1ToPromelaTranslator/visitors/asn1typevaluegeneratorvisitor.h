@@ -42,6 +42,7 @@ class Asn1TypeValueGeneratorVisitor : public Asn1Acn::Types::TypeReadingVisitor
 {
 public:
     /**
+
      * @brief Constructor
      *
      * @param promelaModel target promela model
@@ -140,6 +141,7 @@ private:
     public:
         static const QString lengthMemberName;
         static const QString octetGeneratorName;
+        static const QString ia5StringGeneratorName;
 
         static void addRangedIntegerGeneratorToModel(
                 const QString &inlineName, model::PromelaModel &model, long minSize, long maxSize);

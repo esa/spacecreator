@@ -1,0 +1,8 @@
+IA5STRING-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+    MyString ::= IA5String (SIZE(1))
+    MyBetterString ::= MyString
+
+END
+

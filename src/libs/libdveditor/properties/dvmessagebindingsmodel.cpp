@@ -127,6 +127,11 @@ bool DVMessageBindingsModel::setData(const QModelIndex &index, const QVariant &v
     }
 
     if (role == Qt::CheckStateRole && index.flags().testFlag(Qt::ItemIsUserCheckable)) {
+        QVariant currentState = data(index, role);
+        if (currentState == value) {
+            return false;
+        }
+
         DataItem &item = m_messages[index.row()];
         if ((Qt::CheckState)value.toInt() == Qt::Checked) {
             auto cmd = new cmd::CmdMessageEntityCreate(

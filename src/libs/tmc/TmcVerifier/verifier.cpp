@@ -29,9 +29,29 @@ TmcVerifier::TmcVerifier(const QString &inputIvFilepath, const QString &outputDi
     m_converter = std::make_unique<TmcConverter>(m_inputIvFilepath, m_outputDirectory);
 }
 
-void TmcVerifier::addEnvironmentFunctions(const std::vector<QString> &environmentFunctions)
+void TmcVerifier::setEnvironmentFunctions(const std::vector<QString> &environmentFunctions)
 {
-    m_converter->addEnvironmentFunctions(environmentFunctions);
+    m_converter->setEnvironmentFunctions(environmentFunctions);
+}
+
+void TmcVerifier::setKeepFunctions(const std::vector<QString> &keepFunctions)
+{
+    m_converter->setKeepFunctions(keepFunctions);
+}
+
+void TmcVerifier::setGlobalInputVectorLengthLimit(std::optional<QString> limit)
+{
+    m_converter->setGlobalInputVectorLengthLimit(std::move(limit));
+}
+
+void TmcVerifier::setInterfaceInputVectorLengthLimits(std::unordered_map<QString, QString> limits)
+{
+    m_converter->setInterfaceInputVectorLengthLimits(std::move(limits));
+}
+
+void TmcVerifier::setSubtypesFilepaths(const std::vector<QString> &filepaths)
+{
+    m_converter->setSubtypesFilepaths(filepaths);
 }
 
 bool TmcVerifier::addStopConditionFiles(const QStringList &files)

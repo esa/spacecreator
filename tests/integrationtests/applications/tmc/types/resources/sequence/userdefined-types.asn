@@ -1,0 +1,9 @@
+USERDEFINED-TYPES-DATAVIEW DEFINITIONS ::=
+BEGIN
+    MySequence ::= SEQUENCE {
+        val1 INTEGER(0 .. 1),
+        val2 INTEGER(2 .. 3)
+    }
+    MyBetterSequence ::= MySequence
+END
+

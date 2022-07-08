@@ -93,7 +93,7 @@ void tst_Asn1ToPromelaTranslator_RangeChecks::testInteger() const
         QVERIFY(minValueExpr->getOperator() == BinaryExpression::Operator::GEQUAL);
         const auto minValueVar = std::get_if<VariableRef>(&minValueExpr->getLeft()->getContent());
         QVERIFY(minValueVar != nullptr);
-        QCOMPARE(minValueVar->getElements().begin()->m_name, "MyInteger_value_check");
+        QCOMPARE(minValueVar->getElements().begin()->m_name, "MyInteger_vc");
         const auto minValueConst = std::get_if<Constant>(&minValueExpr->getRight()->getContent());
         QVERIFY(minValueConst != nullptr);
         QCOMPARE(minValueConst->getValue(), 1);
@@ -104,7 +104,7 @@ void tst_Asn1ToPromelaTranslator_RangeChecks::testInteger() const
         QVERIFY(maxValueExpr->getOperator() == BinaryExpression::Operator::LEQUAL);
         const auto maxValueVar = std::get_if<VariableRef>(&maxValueExpr->getLeft()->getContent());
         QVERIFY(maxValueVar != nullptr);
-        QCOMPARE(maxValueVar->getElements().begin()->m_name, "MyInteger_value_check");
+        QCOMPARE(maxValueVar->getElements().begin()->m_name, "MyInteger_vc");
         const auto maxValueConst = std::get_if<Constant>(&maxValueExpr->getRight()->getContent());
         QVERIFY(maxValueConst != nullptr);
         QCOMPARE(maxValueConst->getValue(), 10);
@@ -147,7 +147,7 @@ void tst_Asn1ToPromelaTranslator_RangeChecks::testEnum() const
         QVERIFY(assertExpr->getOperator() == BinaryExpression::Operator::EQUAL);
         const auto valueVar = std::get_if<VariableRef>(&assertExpr->getLeft()->getContent());
         QVERIFY(valueVar != nullptr);
-        QCOMPARE(valueVar->getElements().begin()->m_name, "MyEnum_value_check");
+        QCOMPARE(valueVar->getElements().begin()->m_name, "MyEnum_vc");
         const auto enumValueVar = std::get_if<VariableRef>(&assertExpr->getRight()->getContent());
         QVERIFY(enumValueVar != nullptr);
         QCOMPARE(enumValueVar->getElements().begin()->m_name, "MyEnum_value2");
@@ -182,7 +182,7 @@ void tst_Asn1ToPromelaTranslator_RangeChecks::testSequenceOf() const
 
     QCOMPARE(promelaModel.getInlineDefs().size(), 6);
     {
-        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MySequenceOf_range_check");
+        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MySequenceOf_size_check");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
@@ -201,7 +201,7 @@ void tst_Asn1ToPromelaTranslator_RangeChecks::testSequenceOf() const
         QVERIFY(minSizeExpr->getOperator() == BinaryExpression::Operator::GEQUAL);
         const auto minSizeVar = std::get_if<VariableRef>(&minSizeExpr->getLeft()->getContent());
         QVERIFY(minSizeVar != nullptr);
-        QCOMPARE(minSizeVar->getElements().begin()->m_name, "MySequenceOf_size_check");
+        QCOMPARE(minSizeVar->getElements().begin()->m_name, "MySequenceOf_sc");
         const auto minSizeConst = std::get_if<Constant>(&minSizeExpr->getRight()->getContent());
         QVERIFY(minSizeConst != nullptr);
         QCOMPARE(minSizeConst->getValue(), 2);
@@ -212,7 +212,7 @@ void tst_Asn1ToPromelaTranslator_RangeChecks::testSequenceOf() const
         QVERIFY(maxSizeExpr->getOperator() == BinaryExpression::Operator::LEQUAL);
         const auto maxSizeVar = std::get_if<VariableRef>(&maxSizeExpr->getLeft()->getContent());
         QVERIFY(maxSizeVar != nullptr);
-        QCOMPARE(maxSizeVar->getElements().begin()->m_name, "MySequenceOf_size_check");
+        QCOMPARE(maxSizeVar->getElements().begin()->m_name, "MySequenceOf_sc");
         const auto maxSizeConst = std::get_if<Constant>(&maxSizeExpr->getRight()->getContent());
         QVERIFY(maxSizeConst != nullptr);
         QCOMPARE(maxSizeConst->getValue(), 5);

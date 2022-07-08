@@ -39,19 +39,146 @@ using conversion::translator::TranslationException;
 
 namespace tmc {
 
-void InterfaceViewOptimizer::optimizeModel(IVModel *ivModel, const std::vector<QString> &environmentFunctions)
+void InterfaceViewOptimizer::optimizeModel(
+        IVModel *ivModel, const std::vector<QString> &functionNames, InterfaceViewOptimizer::Mode mode)
 {
-    for (const auto &functionName : environmentFunctions) {
-        markAsEnvironment(functionName, ivModel);
+    auto parentFunctionsInfo = flattenModel(ivModel);
+
+    auto allFunctionNames = resolveFunctionNames(functionNames, parentFunctionsInfo);
+
+    switch (mode) {
+    case Mode::Environment:
+        discardFunctions(ivModel, allFunctionNames);
+        break;
+    case Mode::Keep:
+        keepFunctions(ivModel, allFunctionNames);
+        break;
+    case Mode::None:
+        break;
     }
 
+    removeDeadConnections(ivModel);
+    removeDeadInterfaces(ivModel);
     removeDeadFunctions(ivModel);
 }
 
-void InterfaceViewOptimizer::markAsEnvironment(const QString &functionName, IVModel *ivModel)
+void InterfaceViewOptimizer::discardFunctions(IVModel *ivModel, const std::vector<QString> &functionNames)
 {
-    auto function = findFunction(functionName, ivModel);
+    for (const auto &functionName : functionNames) {
+        auto function = ivModel->getFunction(functionName, Qt::CaseInsensitive);
 
+        if (function == nullptr) {
+            auto errorMessage = QString("InterfaceView optimizer cannot find function '%1'").arg(functionName);
+            throw TranslationException(errorMessage);
+        }
+
+        markAsEnvironment(function);
+    }
+}
+
+void InterfaceViewOptimizer::keepFunctions(IVModel *ivModel, const std::vector<QString> &functionNames)
+{
+    for (auto function : ivModel->allObjectsByType<IVFunction>()) {
+        const auto functionFound = std::find(functionNames.begin(), functionNames.end(), function->title());
+        if (functionFound == functionNames.end()) {
+            markAsEnvironment(function);
+        }
+    }
+}
+
+InterfaceViewOptimizer::ParentFunctionsInfo InterfaceViewOptimizer::flattenModel(IVModel *ivModel)
+{
+    ParentFunctionsInfo parentFunctionsInfo;
+    std::vector<IVFunctionType *> functionsToRemove;
+
+    for (auto function : ivModel->allObjectsByType<IVFunctionType>()) {
+
+        if (isFunctionParent(function)) {
+            std::vector<QString> children;
+            for (auto childFunction : function->functions()) {
+                children.push_back(childFunction->title());
+            }
+            parentFunctionsInfo.insert({ function->title(), std::move(children) });
+
+            functionsToRemove.push_back(function);
+        } else {
+            flattenConnections(function, ivModel);
+        }
+    }
+
+    for (auto function : functionsToRemove) {
+        const auto &connections = ivModel->getConnectionsForFunction(function->id());
+        for (auto connection : connections) {
+            ivModel->removeObject(connection);
+        }
+
+        ivModel->removeObject(function);
+    }
+
+    return parentFunctionsInfo;
+}
+
+void InterfaceViewOptimizer::flattenConnections(IVFunctionType *function, IVModel *ivModel)
+{
+    const auto &connections = ivModel->getConnectionsForFunction(function->id());
+
+    for (auto connection : connections) {
+        if (!shouldFlattenConnection(connection, function)) {
+            continue;
+        }
+
+        const auto sourceInterface = connection->sourceInterface();
+        auto lastConnection = findLastConnection(connection, ivModel);
+        const auto targetInterface = lastConnection->targetInterface();
+        ivModel->removeObject(lastConnection);
+
+        auto newConnection = new IVConnection(sourceInterface, targetInterface);
+        ivModel->addObject(newConnection);
+    }
+}
+
+bool InterfaceViewOptimizer::shouldFlattenConnection(IVConnection *connection, IVFunctionType *function)
+{
+    if (connection == nullptr) {
+        return false;
+    }
+
+    if (connection->sourceName() != function->title()) {
+        return false;
+    }
+
+    const auto target = connection->target();
+    if (isFunctionType(target)) {
+        const auto targetFunc = target->as<const IVFunctionType *>();
+        if (isFunctionParent(targetFunc)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+IVConnection *InterfaceViewOptimizer::findLastConnection(IVConnection *connection, IVModel *ivModel)
+{
+    auto target = connection->target()->as<IVFunctionType *>();
+
+    if (isFunctionParent(target)) {
+        const auto &targetName = connection->targetName();
+        const auto &targetConnections = ivModel->getConnectionsForIface(connection->targetInterface()->id());
+
+        const auto foundNextConnection = std::find_if(targetConnections.begin(), targetConnections.end(),
+                [&](const auto conn) { return conn->sourceName() == targetName; });
+
+        ivModel->removeObject(connection);
+
+        return findLastConnection(*foundNextConnection, ivModel);
+    } else {
+        return connection;
+    }
+}
+
+void InterfaceViewOptimizer::markAsEnvironment(IVFunction *function)
+{
     const auto &currentDefaultImplementationName = function->defaultImplementation();
     const auto &currentDefaultImplementationType = findImplementationType(currentDefaultImplementationName, function);
 
@@ -60,40 +187,36 @@ void InterfaceViewOptimizer::markAsEnvironment(const QString &functionName, IVMo
     }
 }
 
-void InterfaceViewOptimizer::removeDeadFunctions(IVModel *ivModel)
+std::vector<QString> InterfaceViewOptimizer::resolveFunctionNames(
+        const std::vector<QString> &functionNames, InterfaceViewOptimizer::ParentFunctionsInfo parentFunctionsInfo)
 {
-    std::vector<IVObject *> objectsToRemove;
+    std::vector<QString> allFunctionNames;
 
-    for (auto obj : ivModel->objects()) {
-        auto connection = dynamic_cast<IVConnection *>(obj);
+    for (const auto &functionName : functionNames) {
+        auto resolvedFunctionNames = resolveFunctionName(functionName, parentFunctionsInfo);
+        allFunctionNames.insert(allFunctionNames.end(), resolvedFunctionNames.begin(), resolvedFunctionNames.end());
+    }
 
-        if (connection == nullptr || !isConnectionDead(connection)) {
-            continue;
+    return allFunctionNames;
+}
+
+std::vector<QString> InterfaceViewOptimizer::resolveFunctionName(
+        const QString &functionName, InterfaceViewOptimizer::ParentFunctionsInfo parentFunctionsInfo)
+{
+    if (parentFunctionsInfo.count(functionName) == 0) {
+        return { functionName };
+    } else {
+        const auto childrenFunctionsNames = parentFunctionsInfo.at(functionName);
+
+        std::vector<QString> allFunctionNames;
+
+        for (const auto &childrenFunctionName : childrenFunctionsNames) {
+            auto resolvedChildrenFunctionNames = resolveFunctionName(childrenFunctionName, parentFunctionsInfo);
+            allFunctionNames.insert(allFunctionNames.begin(), resolvedChildrenFunctionNames.begin(),
+                    resolvedChildrenFunctionNames.end());
         }
 
-        objectsToRemove.push_back(connection);
-        objectsToRemove.push_back(connection->sourceInterface());
-        objectsToRemove.push_back(connection->targetInterface());
-    }
-
-    for (const auto obj : objectsToRemove) {
-        ivModel->removeObject(obj);
-    }
-
-    std::vector<IVFunctionType *> functionsToRemove;
-
-    for (auto obj : ivModel->objects()) {
-        auto func = dynamic_cast<IVFunctionType *>(obj);
-
-        if (func == nullptr || !isFunctionDead(func)) {
-            continue;
-        }
-
-        functionsToRemove.push_back(func);
-    }
-
-    for (const auto func : functionsToRemove) {
-        ivModel->removeObject(func);
+        return allFunctionNames;
     }
 }
 
@@ -119,18 +242,6 @@ void InterfaceViewOptimizer::setGuiAsDefaultImplementation(IVFunction *function)
     removeUnallowedInterfaces(function);
 }
 
-IVFunction *InterfaceViewOptimizer::findFunction(const QString &functionName, IVModel *ivModel)
-{
-    auto function = ivModel->getFunction(functionName, Qt::CaseSensitive);
-
-    if (function == nullptr) {
-        auto errorMessage = QString("Unable to find function '%1' for environment selection").arg(functionName);
-        throw TranslationException(std::move(errorMessage));
-    }
-
-    return function;
-}
-
 QString InterfaceViewOptimizer::findImplementationType(const QString &implementationName, const IVFunction *function)
 {
     for (const auto &impl : function->implementations()) {
@@ -140,6 +251,53 @@ QString InterfaceViewOptimizer::findImplementationType(const QString &implementa
     }
 
     return "";
+}
+
+void InterfaceViewOptimizer::removeDeadConnections(IVModel *ivModel)
+{
+    std::vector<IVObject *> objectsToRemove;
+
+    for (auto connection : ivModel->allObjectsByType<IVConnection>()) {
+        if (isConnectionDead(connection)) {
+            objectsToRemove.push_back(connection);
+            objectsToRemove.push_back(connection->sourceInterface());
+            objectsToRemove.push_back(connection->targetInterface());
+        }
+    }
+
+    for (const auto obj : objectsToRemove) {
+        ivModel->removeObject(obj);
+    }
+}
+
+void InterfaceViewOptimizer::removeDeadInterfaces(IVModel *ivModel)
+{
+    std::vector<IVInterface *> interfacesToRemove;
+
+    for (auto interface : ivModel->allObjectsByType<IVInterface>()) {
+        if (isInterfaceDead(interface, ivModel)) {
+            interfacesToRemove.push_back(interface);
+        }
+    }
+
+    for (const auto interface : interfacesToRemove) {
+        ivModel->removeObject(interface);
+    }
+}
+
+void InterfaceViewOptimizer::removeDeadFunctions(IVModel *ivModel)
+{
+    std::vector<IVFunctionType *> functionsToRemove;
+
+    for (auto function : ivModel->allObjectsByType<IVFunction>()) {
+        if (isFunctionDead(function)) {
+            functionsToRemove.push_back(function);
+        }
+    }
+
+    for (const auto function : functionsToRemove) {
+        ivModel->removeObject(function);
+    }
 }
 
 void InterfaceViewOptimizer::removeUnallowedInterfaces(IVFunction *function)
@@ -157,34 +315,50 @@ void InterfaceViewOptimizer::removeUnallowedInterfaces(IVFunction *function)
     }
 }
 
+bool InterfaceViewOptimizer::isFunction(const shared::VEObject *object)
+{
+    auto ivObject = object->as<const IVObject *>();
+
+    return ivObject->type() == IVObject::Type::Function;
+}
+
+bool InterfaceViewOptimizer::isFunctionType(const shared::VEObject *object)
+{
+    auto ivObject = object->as<const IVObject *>();
+
+    return ivObject->type() == IVObject::Type::Function || ivObject->type() == IVObject::Type::FunctionType;
+}
+
 bool InterfaceViewOptimizer::isConnectionDead(const IVConnection *connection)
 {
     const auto source = connection->source();
     const auto target = connection->target();
 
-    if (source->type() != IVObject::Type::Function || target->type() != IVObject::Type::Function) {
-        return false;
+    if (source == nullptr || target == nullptr) {
+        return true;
     }
 
-    const auto sourceFunction = dynamic_cast<IVFunction *>(source);
-    const auto targetFunction = dynamic_cast<IVFunction *>(target);
+    if (!isFunctionType(source)) {
+        return true;
+    }
+    const auto sourceFunction = source->as<IVFunctionType *>();
+
+    if (!isFunctionType(target)) {
+        return true;
+    }
+    const auto targetFunction = target->as<IVFunctionType *>();
 
     return !isSdlFunction(sourceFunction) && !isSdlFunction(targetFunction);
 }
 
-bool InterfaceViewOptimizer::isSdlFunction(const ivm::IVFunction *function)
+bool InterfaceViewOptimizer::isInterfaceDead(const IVInterface *interface, const IVModel *ivModel)
 {
-    const QString defaultImplementation = function->defaultImplementation();
-    for (const auto &impl : function->implementations()) { // NOLINT(readability-use-anyofallof)
-        if (impl.name() == defaultImplementation && impl.value().type() == QVariant::Type::String
-                && impl.value().toString().toLower() == "sdl") {
-            return true;
-        }
-    }
-    return false;
+    const auto connection = ivModel->getConnectionForIface(interface->id());
+
+    return connection == nullptr;
 }
 
-bool InterfaceViewOptimizer::isFunctionDead(const IVFunctionType *function)
+bool InterfaceViewOptimizer::isFunctionDead(const IVFunction *function)
 {
     // Function in considered 'dead' if it has no non-cyclic interfaces
     for (const auto interface : function->interfaces()) {
@@ -194,6 +368,29 @@ bool InterfaceViewOptimizer::isFunctionDead(const IVFunctionType *function)
     }
 
     return true;
+}
+
+bool InterfaceViewOptimizer::isFunctionParent(const IVFunctionType *function)
+{
+    return !function->functions().empty() || !function->functionTypes().empty();
+}
+
+bool InterfaceViewOptimizer::isSdlFunction(const IVFunctionType *functionType)
+{
+    if (functionType->type() != IVObject::Type::Function) {
+        return false;
+    }
+
+    const auto function = functionType->as<const IVFunction *>();
+
+    const QString defaultImplementation = function->defaultImplementation();
+    for (const auto &impl : function->implementations()) { // NOLINT(readability-use-anyofallof)
+        if (impl.name() == defaultImplementation && impl.value().type() == QVariant::Type::String
+                && impl.value().toString().toLower() == "sdl") {
+            return true;
+        }
+    }
+    return false;
 }
 
 } // namespace tmc

@@ -52,7 +52,7 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
     if (asn1ValueGeneration) {
         QStringList typeNames;
         std::copy(valueGeneration.begin(), valueGeneration.end(), std::back_inserter(typeNames));
-        return generateValueGenerationInlines(asn1Model, typeNames);
+        return generateValueGenerationInlines(asn1Model, typeNames, options);
     } else {
         return translateAsn1Model(asn1Model, enhancedSpinSupport);
     }
@@ -78,7 +78,8 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
 {
     std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
     for (const std::unique_ptr<File> &file : model->data()) {
-        visitAsn1File(file.get(), *promelaModel, enhancedSpinSupport);
+        Asn1NodeVisitor visitor(*promelaModel, enhancedSpinSupport);
+        visitor.visit(*file);
     }
 
     PromelaTypeSorter typeSorter;
@@ -90,27 +91,25 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
 }
 
 std::vector<std::unique_ptr<conversion::Model>> Asn1ToPromelaTranslator::generateValueGenerationInlines(
-        const Asn1Acn::Asn1Model *model, const QStringList &typeNames) const
+        const Asn1Acn::Asn1Model *model, const QStringList &typeNames, const Options &options) const
 {
+    const auto subtypesFilepaths = options.values(PromelaOptions::subtypesFilepath);
+
     std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
     for (const std::unique_ptr<File> &file : model->data()) {
-        visitAsn1FileGenerate(file.get(), *promelaModel, typeNames);
+        const auto subtypesFilepathFound = std::find_if(subtypesFilepaths.begin(), subtypesFilepaths.end(),
+                [&](const auto &filepath) { return filepath == file->name(); });
+
+        if (subtypesFilepathFound == subtypesFilepaths.end()) {
+            Asn1NodeValueGeneratorVisitor visitor(*promelaModel, typeNames);
+            visitor.visit(*file);
+        } else {
+            Asn1NodeValueGeneratorVisitor visitor(*promelaModel);
+            visitor.visit(*file);
+        }
     }
     std::vector<std::unique_ptr<Model>> result;
     result.push_back(std::move(promelaModel));
     return result;
-}
-
-void Asn1ToPromelaTranslator::visitAsn1File(File *file, PromelaModel &promelaModel, bool enhancedSpinSupport) const
-{
-    Asn1NodeVisitor visitor(promelaModel, enhancedSpinSupport);
-    visitor.visit(*file);
-}
-
-void Asn1ToPromelaTranslator::visitAsn1FileGenerate(
-        File *file, PromelaModel &promelaModel, const QStringList &typeNames) const
-{
-    Asn1NodeValueGeneratorVisitor visitor(promelaModel, typeNames);
-    visitor.visit(*file);
 }
 }

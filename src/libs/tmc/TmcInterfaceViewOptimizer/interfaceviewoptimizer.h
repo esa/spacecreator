@@ -20,6 +20,8 @@
 #pragma once
 
 #include <ivcore/ivmodel.h>
+#include <shared/qstringhash.h>
+#include <unordered_map>
 #include <vector>
 
 namespace tmc {
@@ -33,6 +35,17 @@ namespace tmc {
  */
 class InterfaceViewOptimizer final
 {
+public:
+    /// @brief   Mode in which optimizer should work
+    enum class Mode
+    {
+        Environment,
+        Keep,
+        None
+    };
+
+    using ParentFunctionsInfo = std::unordered_map<QString, std::vector<QString>>;
+
 public:
     /**
      * @brief   Deleted constructor
@@ -60,25 +73,43 @@ public:
     /**
      * @brief   Optimize passed model
      *
-     * @param   ivModel                 Model to modify
-     * @param   environmentFunctions    Names of functions that should be marked as environment
+     * @param   ivModel         Model to modify
+     * @param   functionNames   Names of functions
+     * @param   mode            Mode in which optimizer should work
      */
-    static auto optimizeModel(ivm::IVModel *ivModel, const std::vector<QString> &environmentFunctions) -> void;
+    static auto optimizeModel(ivm::IVModel *ivModel, const std::vector<QString> &functionNames, Mode mode) -> void;
 
 private:
-    static auto markAsEnvironment(const QString &functionName, ivm::IVModel *ivModel) -> void;
-    static auto removeDeadFunctions(ivm::IVModel *ivModel) -> void;
+    static auto flattenModel(ivm::IVModel *ivModel) -> ParentFunctionsInfo;
+    static auto flattenConnections(ivm::IVFunctionType *function, ivm::IVModel *ivModel) -> void;
+    static auto shouldFlattenConnection(ivm::IVConnection *connection, ivm::IVFunctionType *function) -> bool;
+    static auto findLastConnection(ivm::IVConnection *connection, ivm::IVModel *ivModel) -> ivm::IVConnection *;
+
+    static auto discardFunctions(ivm::IVModel *ivModel, const std::vector<QString> &functionNames) -> void;
+    static auto keepFunctions(ivm::IVModel *ivModel, const std::vector<QString> &functionNames) -> void;
+
+    static auto markAsEnvironment(ivm::IVFunction *function) -> void;
+
+    static auto resolveFunctionNames(const std::vector<QString> &functionNames,
+            InterfaceViewOptimizer::ParentFunctionsInfo parentFunctionsInfo) -> std::vector<QString>;
+    static auto resolveFunctionName(const QString &functionName,
+            InterfaceViewOptimizer::ParentFunctionsInfo parentFunctionsInfo) -> std::vector<QString>;
 
     static auto setGuiAsDefaultImplementation(ivm::IVFunction *function) -> void;
-
-    static auto findFunction(const QString &functionName, ivm::IVModel *ivModel) -> ivm::IVFunction *;
     static auto findImplementationType(const QString &implementationName, const ivm::IVFunction *function) -> QString;
 
+    static auto removeDeadConnections(ivm::IVModel *ivModel) -> void;
+    static auto removeDeadInterfaces(ivm::IVModel *ivModel) -> void;
+    static auto removeDeadFunctions(ivm::IVModel *ivModel) -> void;
     static auto removeUnallowedInterfaces(ivm::IVFunction *function) -> void;
 
+    static auto isFunction(const shared::VEObject *object) -> bool;
+    static auto isFunctionType(const shared::VEObject *object) -> bool;
     static auto isConnectionDead(const ivm::IVConnection *connection) -> bool;
-    static auto isFunctionDead(const ivm::IVFunctionType *function) -> bool;
-    static auto isSdlFunction(const ivm::IVFunction *function) -> bool;
+    static auto isInterfaceDead(const ivm::IVInterface *interface, const ivm::IVModel *ivModel) -> bool;
+    static auto isFunctionDead(const ivm::IVFunction *function) -> bool;
+    static auto isFunctionParent(const ivm::IVFunctionType *function) -> bool;
+    static auto isSdlFunction(const ivm::IVFunctionType *functionType) -> bool;
 
     static inline const QString m_environmentImplementationName = "environment";
     static inline const QString m_environmentImplementationType = "GUI";

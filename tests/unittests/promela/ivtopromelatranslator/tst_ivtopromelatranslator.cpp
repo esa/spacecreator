@@ -19,6 +19,7 @@
 
 #include <QObject>
 #include <QtTest>
+#include <asn1library/asn1/asn1model.h>
 #include <conversion/common/modeltype.h>
 #include <ivcore/ivlibrary.h>
 #include <ivcore/ivmodel.h>
@@ -283,7 +284,7 @@ void tst_IvToPromelaTranslator::testParameters()
         QCOMPARE(actuator->getVisibility(), Declaration::Visibility::NORMAL);
     }
 
-    QCOMPARE(promelaModel->getDeclarations().size(), 7);
+    QCOMPARE(promelaModel->getDeclarations().size(), 11);
 
     {
         const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "global_state");
@@ -342,6 +343,43 @@ void tst_IvToPromelaTranslator::testParameters()
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+
+    {
+        const Declaration *declaration =
+                findDeclaration(promelaModel->getDeclarations(), "Actuator_work_signal_parameter");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isUtypeReference());
+        QCOMPARE(declaration->getType().getUtypeReference().getName(), "TestParam");
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+    }
+
+    {
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Actuator_work_channel_used");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::BOOLEAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+
+    {
+        const Declaration *declaration =
+                findDeclaration(promelaModel->getDeclarations(), "Controller_result_signal_parameter");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isUtypeReference());
+        QCOMPARE(declaration->getType().getUtypeReference().getName(), "TestInteger");
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+    }
+
+    {
+        const Declaration *declaration =
+                findDeclaration(promelaModel->getDeclarations(), "Controller_result_channel_used");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::BOOLEAN);
         QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
         QVERIFY(declaration->hasInit());
     }
@@ -460,7 +498,7 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
         QCOMPARE(actuator->getVisibility(), Declaration::Visibility::NORMAL);
     }
 
-    QCOMPARE(promelaModel->getDeclarations().size(), 10);
+    QCOMPARE(promelaModel->getDeclarations().size(), 20);
 
     {
         const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "global_state");
@@ -489,10 +527,48 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
 
     {
         const Declaration *declaration =
+                findDeclaration(promelaModel->getDeclarations(), "Controller_test_signal_parameter");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isUtypeReference());
+        QCOMPARE(declaration->getType().getUtypeReference().getName(), "MyTestInteger");
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+    }
+
+    {
+        const Declaration *declaration =
+                findDeclaration(promelaModel->getDeclarations(), "Controller_test_channel_used");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::BOOLEAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+
+    {
+        const Declaration *declaration =
                 findDeclaration(promelaModel->getDeclarations(), "Controller_up_result_channel");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+
+    {
+        const Declaration *declaration =
+                findDeclaration(promelaModel->getDeclarations(), "Controller_up_result_signal_parameter");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isUtypeReference());
+        QCOMPARE(declaration->getType().getUtypeReference().getName(), "MyInteger");
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+    }
+
+    {
+        const Declaration *declaration =
+                findDeclaration(promelaModel->getDeclarations(), "Controller_up_result_channel_used");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::BOOLEAN);
         QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
         QVERIFY(declaration->hasInit());
     }
@@ -508,6 +584,26 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
     }
 
     {
+        const Declaration *declaration =
+                findDeclaration(promelaModel->getDeclarations(), "Controller_down_result_signal_parameter");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isUtypeReference());
+        QCOMPARE(declaration->getType().getUtypeReference().getName(), "MyInteger");
+
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+    }
+
+    {
+        const Declaration *declaration =
+                findDeclaration(promelaModel->getDeclarations(), "Controller_down_result_channel_used");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::BOOLEAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+
+    {
         const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Up_check_channel");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
@@ -517,10 +613,47 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
     }
 
     {
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Up_check_signal_parameter");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isUtypeReference());
+        QCOMPARE(declaration->getType().getUtypeReference().getName(), "MyInteger");
+
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+    }
+
+    {
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Up_check_channel_used");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::BOOLEAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+
+    {
         const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Down_check_channel");
         QVERIFY(declaration != nullptr);
         QVERIFY(declaration->getType().isBasicType());
         QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+
+    {
+        const Declaration *declaration =
+                findDeclaration(promelaModel->getDeclarations(), "Down_check_signal_parameter");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isUtypeReference());
+        QCOMPARE(declaration->getType().getUtypeReference().getName(), "MyInteger");
+
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+    }
+
+    {
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Down_check_channel_used");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::BOOLEAN);
         QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
         QVERIFY(declaration->hasInit());
     }
@@ -681,8 +814,10 @@ std::unique_ptr<PromelaModel> tst_IvToPromelaTranslator::translateIvToPromela(
     for (const QString &function : functions) {
         options.add(PromelaOptions::modelFunctionName, function);
     }
+    auto asn1Model = std::make_unique<Asn1Acn::Asn1Model>();
     std::vector<conversion::Model *> inputs;
     inputs.push_back(ivModel.get());
+    inputs.push_back(asn1Model.get());
     auto result = translator.translateModels(std::move(inputs), options);
 
     if (result.empty()) {

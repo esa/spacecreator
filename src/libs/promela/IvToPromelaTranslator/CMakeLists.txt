@@ -18,6 +18,7 @@ target_include_directories(IvToPromelaTranslator
 target_link_libraries(IvToPromelaTranslator
   PUBLIC              Conversion::Common
                       Promela::Model
+                      asn1library
                       ivcore
   PRIVATE             CommonProjectWarnings)
 

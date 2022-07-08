@@ -47,8 +47,17 @@ public:
     /** @brief Use function name as part of model under verification */
     inline static const QString modelFunctionName = "Promela_Convert_ModelFunction";
 
-    /** @brief Use function name as part of environment  */
+    /** @brief Use function name as part of environment */
     inline static const QString environmentFunctionName = "Promela_Convert_EnvironmentFunction";
+
+    /** @brief Global input vector length limit */
+    inline static const QString globalInputVectorLengthLimit = "Promela_Convert_GlobalInputVectorLengthLimit";
+
+    /** @brief Interface input vector length limit template*/
+    inline static const QString interfaceInputVectorLengthLimit = "Promela_Convert_InterfaceInputVectorLengthLimit_%1";
+
+    /** @brief  Filepath of the ASN.1 file containing subtypes */
+    inline static const QString subtypesFilepath = "Promela_Convert_SubtypesFilepath";
 
     /**
      *  @brief Specification of an observer attachment

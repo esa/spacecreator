@@ -22,6 +22,10 @@
 
 namespace dvm {
 
+/**
+ * Represents a message between two node
+ * @note the message can go both ways. So fromNode/toNodes can be swapped (names kept for backwards compatibility)
+ */
 class DVMessage : public DVObject
 {
     Q_OBJECT
@@ -37,6 +41,8 @@ class DVMessage : public DVObject
 
 public:
     explicit DVMessage(QObject *parent = nullptr);
+
+    bool postInit() override;
 
     QString titleUI() const override;
 
@@ -59,7 +65,7 @@ public:
     DVNode *toNode() const;
 
 private:
-    QStringList pathOfFunction(const QString &functionName) const;
+    QStringList pathOfFunction(const QString &functionName, DVNode *node) const;
 };
 
 } // namespace dvm

@@ -20,6 +20,7 @@
 #pragma once
 
 #include "binaryexpression.h"
+#include "booleanconstant.h"
 #include "constant.h"
 #include "inlinecall.h"
 #include "variableref.h"
@@ -37,7 +38,7 @@ public:
     /**
      * @brief Variant to represent alternatives of expression
      */
-    using Value = std::variant<VariableRef, Constant, BinaryExpression, InlineCall>;
+    using Value = std::variant<VariableRef, Constant, BinaryExpression, InlineCall, BooleanConstant>;
 
     /**
      * @brief Constructor.

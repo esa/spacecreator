@@ -91,7 +91,7 @@ void IntegerRangeConstraintVisitor::visit(const Asn1Acn::Constraints::Constraint
         if (!tmp.has_value()) {
             tmp = rhs;
         } else if (rhs.has_value()) {
-            tmp = tmp.value() | rhs.value();
+            tmp = tmp.value() & rhs.value();
         }
     }
 

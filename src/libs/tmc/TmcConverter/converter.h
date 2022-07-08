@@ -32,6 +32,7 @@
 #include <map>
 #include <memory>
 #include <tmc/SdlToPromelaConverter/processmetadata.h>
+#include <unordered_map>
 
 namespace tmc::converter {
 /**
@@ -93,7 +94,32 @@ public:
      *
      * @param   environmentFunctions    Functions to treat as an evironment
      */
-    void addEnvironmentFunctions(const std::vector<QString> &environmentFunctions);
+    void setEnvironmentFunctions(const std::vector<QString> &environmentFunctions);
+    /**
+     * @brief   Specify which IV functions shouldn't be treated as an environment
+     *          during model checking
+     *
+     * @param   keepFunctions   Functions to be treated as an evironment
+     */
+    void setKeepFunctions(const std::vector<QString> &keepFunctions);
+    /**
+     * @brief   Set global input vector length limit
+     *
+     * @param   limit   Limit to set
+     */
+    void setGlobalInputVectorLengthLimit(std::optional<QString> limit);
+    /**
+     * @brief   Set per interface input vector length limits
+     *
+     * @param   limits  Limits to set
+     */
+    void setInterfaceInputVectorLengthLimits(std::unordered_map<QString, QString> limits);
+    /**
+     * @brief   Set path to the ASN.1 containing subtypes
+     *
+     * @param   filepaths   Paths to the files
+     */
+    void setSubtypesFilepaths(const std::vector<QString> &filepaths);
     /**
      * @brief Add Stop Condition files to convert.
      *
@@ -124,7 +150,8 @@ private:
     bool convertStopConditions(const std::map<QString, ProcessMetadata> &allSdlFiles);
 
     bool convertInterfaceview(const QString &inputFilepath, const QString &outputFilepath,
-            const QStringList &modelFunctions, const QStringList &environmentFunctions);
+            const QList<QString> &asn1FilepathList, const QStringList &modelFunctions,
+            const QStringList &environmentFunctions);
     bool convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath);
     std::unique_ptr<ivm::IVModel> readInterfaceView(const QString &filepath);
     void saveOptimizedInterfaceView(const ivm::IVModel *ivModel, const QString outputFilePath);
@@ -154,6 +181,10 @@ private:
     ivm::IVPropertyTemplateConfig *m_dynPropConfig;
 
     std::vector<QString> m_environmentFunctions;
+    std::vector<QString> m_keepFunctions;
+    std::optional<QString> m_globalInputVectorLengthLimit;
+    std::unordered_map<QString, QString> m_interfaceInputVectorLengthLimits;
+    std::vector<QString> m_subtypesFilepaths;
     QStringList m_stopConditionsFiles;
     std::vector<ObserverInfo> m_observerInfos;
     QStringList m_observerAttachmentInfos;

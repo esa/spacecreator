@@ -5,6 +5,7 @@ set(SOURCES
   assertcall.cpp
   assignment.cpp
   binaryexpression.cpp
+  booleanconstant.cpp
   channelinit.cpp
   channelrecv.cpp
   channelsend.cpp
@@ -37,6 +38,7 @@ set(INCLUDES
   assignment.h
   basictypes.h
   binaryexpression.h
+  booleanconstant.h
   channelinit.h
   channelrecv.h
   channelsend.h
@@ -45,6 +47,7 @@ set(INCLUDES
   datatype.h
   declaration.h
   doloop.h
+  elsestatement.h
   expression.h
   forloop.h
   initproctype.h

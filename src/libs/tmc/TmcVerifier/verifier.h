@@ -44,7 +44,32 @@ public:
      *
      * @param   environmentFunctions    Functions to treat as an evironment
      */
-    void addEnvironmentFunctions(const std::vector<QString> &environmentFunctions);
+    void setEnvironmentFunctions(const std::vector<QString> &environmentFunctions);
+    /**
+     * @brief   Specify which IV functions shouldn't be treated as an environment
+     *          during model checking
+     *
+     * @param   keepFunctions   Functions to be treated as an evironment
+     */
+    void setKeepFunctions(const std::vector<QString> &keepFunctions);
+    /**
+     * @brief   Set global input vector length limit
+     *
+     * @param   limit   Limit to set
+     */
+    void setGlobalInputVectorLengthLimit(std::optional<QString> limit);
+    /**
+     * @brief   Set per interface input vector length limits
+     *
+     * @param   limits  Limits to set
+     */
+    void setInterfaceInputVectorLengthLimits(std::unordered_map<QString, QString> limits);
+    /**
+     * @brief   Set path to the ASN.1 containing subtypes
+     *
+     * @param   filepaths    Paths to the files
+     */
+    void setSubtypesFilepaths(const std::vector<QString> &filepath);
     /**
      * @brief Add Stop Condition files to verifier.
      *

@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <asn1library/asn1/asn1model.h>
+#include <asn1library/asn1/definitions.h>
 #include <conversion/common/translation/translator.h>
 #include <ivcore/ivinterface.h>
 #include <promela/PromelaModel/promelamodel.h>
@@ -209,6 +211,10 @@ public:
     auto getDependencies() const -> std::set<conversion::ModelType> override;
 
 private:
+    static const char *TIMER_MANAGER_DATA_NAME;
+    static const char *TIMER_MANAGER_PROCTYPE_NAME;
+
+private:
     auto addChannelAndLock(IvToPromelaTranslator::Context &context, const QString &functionName) const -> void;
     auto observerInputSignalName(const IvToPromelaTranslator::ObserverAttachment &attachment) const -> QString;
     auto attachInputObservers(IvToPromelaTranslator::Context &context, const QString &functionName,
@@ -220,27 +226,45 @@ private:
             const QString &parameterType, size_t queueSize, size_t priority, bool environment) const
             -> std::unique_ptr<model::Proctype>;
     auto generateEnvironmentProctype(const QString &functionName, const QString &interfaceName,
-            const QString &parameterType, const QString &sendInline) const -> std::unique_ptr<model::Proctype>;
+            const QString &parameterType, const QString &sendInline, const conversion::Options &options) const
+            -> std::unique_ptr<model::Proctype>;
     auto generateSendInline(const QString &functionName, const QString &interfaceName, const QString &parameterName,
             const QString &parameterType, const QString &sourceFunctionName, const QString &sourceInterfaceName) const
             -> std::unique_ptr<model::InlineDef>;
     auto createPromelaObjectsForFunction(Context &context, const ::ivm::IVModel *ivModel, ::ivm::IVFunction *ivFunction,
             const QString &functionName) const -> void;
     auto createPromelaObjectsForEnvironment(Context &context, const ::ivm::IVModel *ivModel,
-            ::ivm::IVFunction *ivFunction, const QString &functionName) const -> void;
+            ::ivm::IVFunction *ivFunction, const QString &functionName,
+            const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions,
+            const conversion::Options &options) const -> void;
     auto createCheckQueueInline(
             model::PromelaModel *promelaModel, const QString &functionName, QList<QString> &channelNames) const -> void;
     auto createSystemState(model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,
             const std::vector<QString> &modelFunctions, const std::vector<QString> &observers) const -> void;
+    auto createPromelaObjectsForTimers(
+            Context &context, const ::ivm::IVModel *ivModel, const std::vector<QString> &modelFunctions) const -> void;
+    auto createTimerInlinesForFunction(
+            Context &context, const QString &functionName, const QString &timerName, int timerId) const -> void;
+    auto createGlobalTimerObjects(Context &context, int timerCount, const std::map<int, QString> &timerSignals) const
+            -> void;
+    auto createWaitForInitStatement() const -> std::unique_ptr<model::ProctypeElement>;
 
     auto containsContextVariables(const QVector<shared::ContextParameter> &parameters) const -> bool;
     auto constructChannelName(const QString &functionName, const QString &interfaceName) const -> QString;
 
+    auto getSubtypesDefinitions(const Asn1Acn::Asn1Model *asn1Model, const conversion::Options &options) const
+            -> std::vector<const Asn1Acn::Definitions *>;
     auto getInterfaceName(const ivm::IVInterface *interface) const -> QString;
     auto getInterfaceFunctionName(const ivm::IVInterface *interface) const -> QString;
     auto getInterfaceProperty(ivm::IVInterface *interface, const QString &name) const -> QVariant;
     auto getInterfaceParameter(const ivm::IVInterface *interface) const -> std::pair<QString, QString>;
     auto getInterfaceQueueSize(ivm::IVInterface *interface) const -> size_t;
     auto getInterfacePriority(ivm::IVInterface *interface) const -> size_t;
+
+    auto handleParameterType(const QString &parameterTypeName, const QString &parameterName,
+            const QString &interfaceName, const QString &functionName,
+            const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const -> QString;
+    auto buildParameterSubtypeName(
+            const QString &functionName, const QString &interfaceName, const QString &parameterName) const -> QString;
 };
 }

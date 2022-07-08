@@ -73,7 +73,7 @@ void DeclarationVisitor::generateChannelInit(const model::ChannelInit &channelIn
         if (!first) {
             m_stream << ", ";
         }
-        first = true;
+        first = false;
         DataTypePrefixVisitor typeVisitor(m_stream);
         typeVisitor.visit(type);
     }

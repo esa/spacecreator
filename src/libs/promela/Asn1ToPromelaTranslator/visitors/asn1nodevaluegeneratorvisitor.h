@@ -35,9 +35,15 @@ public:
      * @brief Constructor.
      *
      * @param promelaModel         target promela model
+     */
+    Asn1NodeValueGeneratorVisitor(model::PromelaModel &promelaModel);
+    /**
+     * @brief Constructor.
+     *
+     * @param promelaModel         target promela model
      * @param typeNames            list of top-level type names to generate value generation inlines
      */
-    Asn1NodeValueGeneratorVisitor(model::PromelaModel &promelaModel, const QStringList &typeNames);
+    Asn1NodeValueGeneratorVisitor(model::PromelaModel &promelaModel, QStringList typeNames);
 
     /// @brief Visit Asn1Acn::Definitions
     void visit(const Asn1Acn::Definitions &defs) override;
@@ -54,6 +60,7 @@ public:
 
 private:
     model::PromelaModel &m_promelaModel;
-    const QStringList &m_typeNames;
+    QStringList m_typeNames;
+    bool m_generateAll;
 };
 }

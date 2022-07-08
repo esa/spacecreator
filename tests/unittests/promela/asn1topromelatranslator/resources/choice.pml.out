@@ -24,10 +24,10 @@ inline SimpleChoice_generate_value(SimpleChoice_gv)
 {
     if
     ::  true;
-        Type1_generate_value(SimpleChoice_gv.alt1);
+        Type1_generate_value(SimpleChoice_gv.data.alt1);
         SimpleChoice_gv.selection = SimpleChoice_alt1_PRESENT;
     ::  true;
-        Type2_generate_value(SimpleChoice_gv.alt2);
+        Type2_generate_value(SimpleChoice_gv.data.alt2);
         SimpleChoice_gv.selection = SimpleChoice_alt2_PRESENT;
     fi;
 }

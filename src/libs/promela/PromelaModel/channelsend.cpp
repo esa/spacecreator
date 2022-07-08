@@ -20,7 +20,7 @@
 #include "channelsend.h"
 
 namespace promela::model {
-ChannelSend::ChannelSend(VariableRef channelRef, const QList<VariableRef> &args)
+ChannelSend::ChannelSend(VariableRef channelRef, const QList<Expression> &args)
     : m_channelRef(std::move(channelRef))
     , m_args(args)
 {
@@ -31,7 +31,7 @@ const VariableRef &ChannelSend::getChannelRef() const noexcept
     return m_channelRef;
 }
 
-const QList<VariableRef> &ChannelSend::getArgs() const noexcept
+const QList<Expression> &ChannelSend::getArgs() const noexcept
 {
     return m_args;
 }

@@ -29,11 +29,25 @@ class tsti_InterfaceViewOptimizer : public QObject
 
 private Q_SLOTS:
     void test_interfaceViewOptimizer();
+    void test_interfaceViewOptimizer_standalone();
+    void test_interfaceViewOptimizer_keep();
 };
 
 void tsti_InterfaceViewOptimizer::test_interfaceViewOptimizer()
 {
     const int result = system("./test_interface_view_optimizer.sh");
+    QCOMPARE(result, 0);
+}
+
+void tsti_InterfaceViewOptimizer::test_interfaceViewOptimizer_standalone()
+{
+    const int result = system("./test_interface_view_optimizer_standalone.sh");
+    QCOMPARE(result, 0);
+}
+
+void tsti_InterfaceViewOptimizer::test_interfaceViewOptimizer_keep()
+{
+    const int result = system("./test_interface_view_optimizer_keep.sh");
     QCOMPARE(result, 0);
 }
 

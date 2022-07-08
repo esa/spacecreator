@@ -19,7 +19,7 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
-#include "proctypemaker.h"
+#include "visitors/integerrangeconstraintvisitor.h"
 #include "visitors/sizeconstraintvisitor.h"
 
 #include <QList>
@@ -97,6 +97,7 @@ namespace promela::translator {
 
 const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::lengthMemberName = "length";
 const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::octetGeneratorName = "OctetStringElement_generate_value";
+const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::ia5StringGeneratorName = "IA5StringElement_generate_value";
 
 Asn1TypeValueGeneratorVisitor::Asn1TypeValueGeneratorVisitor(PromelaModel &promelaModel, QString name)
     : m_promelaModel(promelaModel)
@@ -148,14 +149,10 @@ void Asn1TypeValueGeneratorVisitor::visit(const BitString &type)
 
 void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
 {
-    SizeConstraintVisitor<Asn1Acn::OctetStringValue> osVisitor;
-    const auto &typeConstraints = type.constraints().constraints();
-    if (typeConstraints.size() != 1) {
-        const QString msg("OctetString shall have only one constraint");
-        throw std::logic_error(msg.toStdString().c_str());
-    }
-    typeConstraints.front()->accept(osVisitor);
-    if (!osVisitor.isSizeConstraintVisited()) {
+    SizeConstraintVisitor<Asn1Acn::OctetStringValue> constraintVisitor;
+    type.constraints().accept(constraintVisitor);
+
+    if (!constraintVisitor.isSizeConstraintVisited()) {
         const QString msg("Specified OctetString has no size constraint");
         throw std::logic_error(msg.toStdString().c_str());
     }
@@ -166,13 +163,13 @@ void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
         InlineDefAdder::addRangedIntegerGeneratorToModel("OctetStringElement", m_promelaModel, 0, maxOctetValue);
     }
 
-    const QString typeIdentifier = Escaper::escapePromelaName(type.identifier());
+    const QString typeIdentifier = Escaper::escapePromelaName(m_name);
     const QString argumentName = QString("%1_gv").arg(typeIdentifier);
 
     auto sequence = ProctypeMaker::makeNormalSequence();
     sequence->appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, "i"));
-    const size_t minSize = osVisitor.getMinSize();
-    const size_t maxSize = osVisitor.getMaxSize();
+    const size_t minSize = constraintVisitor.getMinSize();
+    const size_t maxSize = constraintVisitor.getMaxSize();
     if (minSize == maxSize) {
         sequence->appendElement(
                 ProctypeMaker::makeCallForEachValue(octetGeneratorName, argumentName, Expression(maxSize - 1)));
@@ -200,11 +197,50 @@ void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
 
 void Asn1TypeValueGeneratorVisitor::visit(const IA5String &type)
 {
-    Q_UNUSED(type);
-    const QString message = QString("IA5String ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
-                                    .arg(__FILE__)
-                                    .arg(__LINE__);
-    throw std::logic_error(message.toStdString().c_str());
+    SizeConstraintVisitor<Asn1Acn::StringValue> constraintVisitor;
+    type.constraints().accept(constraintVisitor);
+
+    if (!constraintVisitor.isSizeConstraintVisited()) {
+        const QString msg("Specified IA5String has no size constraint");
+        throw std::logic_error(msg.toStdString().c_str());
+    }
+
+    const QString &ia5StringGeneratorName = InlineDefAdder::ia5StringGeneratorName;
+    if (!modelContainsInlineGenerator(ia5StringGeneratorName)) {
+        const long maxStringValue = 127;
+        InlineDefAdder::addRangedIntegerGeneratorToModel("IA5StringElement", m_promelaModel, 0, maxStringValue);
+    }
+
+    const QString typeIdentifier = Escaper::escapePromelaName(m_name);
+    const QString argumentName = QString("%1_gv").arg(typeIdentifier);
+
+    auto sequence = ProctypeMaker::makeNormalSequence();
+    sequence->appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, "i"));
+    const size_t minSize = constraintVisitor.getMinSize();
+    const size_t maxSize = constraintVisitor.getMaxSize();
+    if (minSize == maxSize) {
+        sequence->appendElement(
+                ProctypeMaker::makeCallForEachValue(ia5StringGeneratorName, argumentName, Expression(maxSize - 1)));
+    } else { // IA5String has variable length
+        const QString lengthGeneratorTypeName =
+                QString("%1_%2").arg(typeIdentifier).arg(InlineDefAdder::lengthMemberName);
+        InlineDefAdder::addRangedIntegerGeneratorToModel(
+                lengthGeneratorTypeName, m_promelaModel, static_cast<long>(minSize), static_cast<long>(maxSize));
+
+        const QString valueLengthVariableName =
+                QString("%1.%2").arg(argumentName).arg(InlineDefAdder::lengthMemberName);
+        sequence->appendElement(ProctypeMaker::makeInlineCall(
+                QString("%1_generate_value").arg(lengthGeneratorTypeName), valueLengthVariableName));
+
+        Expression end = InlineDefAdder::getValueLenghtMinusConstAsExpression(argumentName, 1);
+        sequence->appendElement(ProctypeMaker::makeCallForEachValue(ia5StringGeneratorName, argumentName, end));
+    }
+
+    const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);
+    const QStringList inlineArguments = { argumentName };
+    auto inlineDef = std::make_unique<InlineDef>(inlineSeqGeneratorName, inlineArguments, std::move(*sequence));
+
+    m_promelaModel.addInlineDef(std::move(inlineDef));
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const NumericString &type)
@@ -249,9 +285,17 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
 
     auto sequence = ProctypeMaker::makeNormalSequence();
 
+    const auto &withComponentConstraints = type.withComponentConstraints();
+    const auto hasConstraints = !withComponentConstraints.empty();
+
     auto conditional = std::make_unique<Conditional>();
     int selectorVal = 1;
+
     for (auto &component : type.components()) {
+        if (hasConstraints && withComponentConstraints.count(component->name()) == 0) {
+            continue;
+        }
+
         const QString &componentName = component->name();
         const QString thisComponentSelected =
                 Escaper::escapePromelaName(QString("%1_%2_PRESENT").arg(m_name).arg(componentName));
@@ -271,7 +315,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
         auto alternative = ProctypeMaker::makeNormalSequence();
         alternative->appendElement(ProctypeMaker::makeTrueExpressionProctypeElement());
         alternative->appendElement(ProctypeMaker::makeInlineCall(inlineTypeGeneratorName,
-                QString("%1.%2").arg(valueVariableName).arg(Escaper::escapePromelaName(componentName))));
+                QString("%1.data.%2").arg(valueVariableName).arg(Escaper::escapePromelaName(componentName))));
         alternative->appendElement(ProctypeMaker::makeAssignmentProctypeElement(
                 QString("%1.selection").arg(valueVariableName), thisComponentSelected));
 
@@ -417,7 +461,8 @@ void Asn1TypeValueGeneratorVisitor::visit(const UserdefinedType &type)
 {
     auto *const typeType = type.type();
     if (typeType != nullptr) {
-        Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, type.typeName());
+        const auto name = m_name.isEmpty() ? type.typeName() : m_name;
+        Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, name);
         typeType->accept(visitor);
     }
 }
@@ -508,11 +553,13 @@ std::unique_ptr<ProctypeElement> Asn1TypeValueGeneratorVisitor::generateAsnSeque
         valueExistsSequence->appendElement(ProctypeMaker::makeTrueExpressionProctypeElement());
         valueExistsSequence->appendElement(ProctypeMaker::makeInlineCall(typeGeneratorToCallName,
                 Escaper::escapePromelaName(argumentName), Escaper::escapePromelaName(componentName)));
-        valueExistsSequence->appendElement(ProctypeMaker::makeAssignmentProctypeElement(valueExistAssignmentName, 1));
+        valueExistsSequence->appendElement(
+                ProctypeMaker::makeAssignmentProctypeElement(valueExistAssignmentName, Constant(1)));
 
         auto valueNotExistSequence = ProctypeMaker::makeNormalSequence();
         valueNotExistSequence->appendElement(ProctypeMaker::makeTrueExpressionProctypeElement());
-        valueNotExistSequence->appendElement(ProctypeMaker::makeAssignmentProctypeElement(valueExistAssignmentName, 0));
+        valueNotExistSequence->appendElement(
+                ProctypeMaker::makeAssignmentProctypeElement(valueExistAssignmentName, Constant(0)));
 
         Conditional conditional;
         conditional.appendAlternative(std::move(valueExistsSequence));
