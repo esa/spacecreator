@@ -22,6 +22,7 @@
 #include "datareconstructor/datareconstructor.h"
 #include "gdbconnector/gdbconnector.h"
 #include "gdbconnector/process.h"
+#include "resultexporter/htmlresultexporter.h"
 
 #include <QBuffer>
 #include <QDebug>
@@ -45,45 +46,7 @@ using plugincommon::ModelLoader;
 
 namespace testgenerator {
 
-TestResultModel::TestResultModel(
-        const ivm::IVInterface &interface, const CsvModel &csvModel, const QVector<QVariant> &results, float delta)
-    : interfaceName(interface.title())
-    , functionName(interface.function()->title())
-    , ifaceParams(interface.params())
-    , rows(results.size() / ifaceParams.size())
-    , maxDelta(delta)
-{
-    std::vector<QString>::size_type i = 0;
-    std::vector<QString>::size_type k = 0;
-    for (const auto &row : csvModel.records()) {
-        csv::Row csvRow = *row;
-        auto csvFields = csvRow.fields();
-        cells.push_back({});
-        std::vector<QString>::size_type j = 0;
-        for (const auto &csvField : csvFields) {
-            if (ifaceParams[j].isInDirection()) {
-                cells[i].push_back({ results[k], CellColor::Black });
-            } else {
-                auto currDelta = results[k].toFloat() - csvField.toFloat();
-                auto color = abs(currDelta) > maxDelta ? CellColor::Red : CellColor::Green;
-                cells[i].push_back({ csvField, CellColor::Black });
-                cells[i].push_back({ results[k], color });
-                cells[i].push_back({ currDelta, color });
-            }
-            j++;
-            k++;
-        }
-        i++;
-    }
-    for (int l = 0; l < ifaceParams.size(); l++) {
-        columnNames.append(ifaceParams[l].name());
-        if (ifaceParams[l].isInDirection()) {
-            columnSizes.append(ColumnSize::Regular);
-        } else {
-            columnSizes.append(ColumnSize::Wide);
-        }
-    }
-}
+const QString resultFileName = "Results.html";
 
 TestGenerator::TestGenerator(const QString &baseDirectory)
 {
@@ -106,7 +69,10 @@ auto TestGenerator::testUsingDataFromCsv(
     copyFunctionImplementations(testedFunctionName);
     compileSystemUnderTest();
     QVector<QVariant> testResults = extractResult(interface, asn1Model);
-    generateResultHtmlFile(TestResultModel(interface, csvModel, testResults, delta));
+
+    QString resultPath = this->projectDirectory + QDir::separator() + "work" + QDir::separator() + resultFileName;
+    HtmlResultExporter exporter(interface, csvModel, testResults, delta);
+    exporter.exportResult(resultPath);
     return true;
 }
 
@@ -266,106 +232,6 @@ auto TestGenerator::exportDvModel(dvm::DVModel *dvModel, const QString &outputFi
     outputFile.write(buffer.data());
     outputFile.commit();
     return true;
-}
-
-auto TestGenerator::generateTableRow(QTextStream &stream, const TestResultModel::CellTable &cells, int row) -> void
-{
-    stream << "\t\t\t<tr>\n";
-    stream << "\t\t\t\t";
-    for (int j = 0; j < cells[row].size(); j++) {
-        if (cells[row][j].color == TestResultModel::CellColor::Green) {
-            stream << "<td style='color:green'>";
-        } else if (cells[row][j].color == TestResultModel::CellColor::Red) {
-            stream << "<td style='color:red'>";
-        } else {
-            stream << "<td>";
-        }
-        stream << cells[row][j].value.toString();
-        stream << "</td>";
-    }
-    stream << "\n";
-    stream << "\t\t\t</tr>\n";
-}
-
-auto TestGenerator::generateTableHeader(QTextStream &stream, const TestResultModel &resultsModel) -> void
-{
-    auto names = resultsModel.columnNames;
-    auto sizes = resultsModel.columnSizes;
-
-    stream << "\t\t\t<tr>\n";
-    stream << "\t\t\t\t";
-    for (int i = 0; i < names.size(); i++) {
-        if (sizes[i] == TestResultModel::ColumnSize::Regular) {
-            stream << "<th rowspan='2'>";
-            stream << names[i];
-            stream << "</th>";
-        } else {
-            stream << "<th colspan='3'>";
-            stream << names[i];
-            stream << "</th>";
-        }
-    }
-    stream << "\n";
-    stream << "\t\t\t</tr>\n";
-
-    stream << "\t\t\t<tr>\n";
-    stream << "\t\t\t\t";
-    for (int i = 0; i < names.size(); i++) {
-        if (sizes[i] == TestResultModel::ColumnSize::Wide) {
-            stream << "<th>";
-            stream << "expected";
-            stream << "</th>";
-
-            stream << "<th>";
-            stream << "actual";
-            stream << "</th>";
-
-            stream << "<th>";
-            stream << "&Delta;";
-            stream << "</th>";
-        }
-    }
-    stream << "\n";
-    stream << "\t\t\t</tr>\n";
-}
-
-auto TestGenerator::generateResultHtmlStream(QTextStream &stream, const TestResultModel &resultData) -> void
-{
-    stream << "<!DOCTYPE html>\n";
-    stream << "<html lang='en'>\n";
-    stream << "\t<head>\n";
-    stream << "\t\t<title>Test results for interface " << resultData.interfaceName << "</title>\n";
-    stream << "\t\t<meta charset='utf-8'>\n";
-    stream << "\t</head>\n";
-    stream << "\t<style> ";
-    stream << "table, th, td { ";
-    stream << "border: 1px solid black; border-collapse: collapse; font-size: 22px; } ";
-    stream << "th { ";
-    stream << "font-size: 18px; } ";
-    stream << "\t</style>\n";
-    stream << "\t<body>\n";
-    stream << "\t\t<h2>Test results for interface " << resultData.interfaceName << " of function "
-           << resultData.functionName << "</h2>\n";
-    stream << "\t\t<p style='font-size: 22px'>Maximum allowed absolute error: " << resultData.maxDelta << "</p>\n";
-    stream << "\t\t<table>\n";
-    generateTableHeader(stream, resultData);
-    for (int i = 0; i < resultData.rows; i++) {
-        generateTableRow(stream, resultData.cells, i);
-    }
-
-    stream << "\t\t</table>\n";
-    stream << "\t</body>\n";
-    stream << "</html>\n";
-}
-
-auto TestGenerator::generateResultHtmlFile(const TestResultModel &resultData) -> void
-{
-    QString filename = this->projectDirectory + QDir::separator() + "work" + QDir::separator() + "Results.html";
-    QFile file(filename);
-    if (file.open(QIODevice::WriteOnly)) {
-        QTextStream stream(&file);
-        generateResultHtmlStream(stream, resultData);
-    }
 }
 
 auto TestGenerator::extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Model &asn1Model) -> QVector<QVariant>

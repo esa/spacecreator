@@ -43,6 +43,8 @@ using plugincommon::ModelLoader;
 
 namespace spctr {
 
+const QString resultFileName = "Results.html";
+
 FunctionTesterPlugin::FunctionTesterPlugin() { }
 
 FunctionTesterPlugin::~FunctionTesterPlugin() { }
@@ -195,8 +197,12 @@ auto FunctionTesterPlugin::getCurrentIvEditorCore() -> IVEditorCorePtr
 auto FunctionTesterPlugin::displayResultHtml() -> void
 {
     qDebug() << "Displaying html";
-    QString filepath = getBaseDirectory() + QDir::separator() + "work" + QDir::separator() + "Results.html";
-    QDesktopServices::openUrl(QUrl::fromLocalFile(filepath));
+    QString filepath = getBaseDirectory() + QDir::separator() + "work" + QDir::separator() + resultFileName;
+    if (QFile::exists(filepath)) {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(filepath));
+    } else {
+        MessageManager::write(GenMsg::msgError.arg("Could not find file with test results: " +  filepath));
+    }
 }
 
 } // namespace spctr

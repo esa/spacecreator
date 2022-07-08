@@ -26,37 +26,6 @@
 
 namespace testgenerator {
 
-struct TestResultModel
-{
-    enum class ColumnSize
-    {
-        Regular,
-        Wide
-    };
-    enum class CellColor
-    {
-        Red,
-        Green,
-        Black
-    };
-    struct Cell
-    {
-        QVariant value;
-        CellColor color;
-    };
-    typedef QVector<QVector<Cell>> CellTable;
-
-    TestResultModel(const ivm::IVInterface &interface, const CsvModel &csvModel, const QVector<QVariant> &results, float delta);
-    QString interfaceName;
-    QString functionName;
-    QVector<shared::InterfaceParameter> ifaceParams;
-    CellTable cells;
-    QVector<QString> columnNames;
-    QVector<ColumnSize> columnSizes;
-    int rows;
-    float maxDelta;
-};
-
 /**
  * @brief  Class for generating and executing interface tests. Backend for FunctionTesterPlugin.
  *
@@ -105,10 +74,6 @@ private:
     auto compileSystemUnderTest() -> void;
     auto getAllFunctionsFromModel(const ivm::IVModel &ivModel) -> std::vector<ivm::IVFunction *>;
     auto extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Model &asn1Model) -> QVector<QVariant>;
-    auto generateResultHtmlFile(const TestResultModel &resultData) -> void;
-    auto generateResultHtmlStream(QTextStream &stream, const TestResultModel &resultData) -> void;
-    auto generateTableRow(QTextStream &stream, const TestResultModel::CellTable &cells, int row) -> void;
-    auto generateTableHeader(QTextStream &stream, const TestResultModel &resultsModel) -> void;
 
     QString projectDirectory;
     QString generatedPath;
