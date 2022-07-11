@@ -12,31 +12,14 @@ target_include_directories(${TEST_NAME}
                 ${CMAKE_SOURCE_DIR}/tests/integrationtests
 )
 
-set(QTC_LIBRARIES
-    -L"${QTC_LIB_DIR}"
-    -L"${QTC_PLUGINS_DIR}"
-    Aggregation
-    ExtensionSystem
-    QtcSsh
-    Utils
-)
-set(QTC_PLUGINS
-    Core
-    ProjectExplorer
-    TextEditor
-)
-
 target_link_libraries(${TEST_NAME} PUBLIC
     TestGenerator
-    libiveditor
-    SpaceCreatorPlugin
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Test
     spacecreatorsystem
+    libiveditor
     CommonTools
     CommonProjectWarnings
-    ${QTC_LIBRARIES}
-    ${QTC_PLUGINS}
-    ${QT_TEST}
-    ${QT_WIDGETS}
 )
 
 set_tests_properties(${TEST_NAME} PROPERTIES
