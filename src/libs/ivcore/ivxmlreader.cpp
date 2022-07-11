@@ -63,6 +63,7 @@ struct CurrentObjectHolder {
         m_comment = m_object ? m_object->as<IVComment *>() : nullptr;
         m_connection = m_object ? m_object->as<IVConnection *>() : nullptr;
         m_connectionGroup = m_object ? m_object->as<IVConnectionGroup *>() : nullptr;
+        m_layer = m_object ? m_object->as<IVConnectionLayerType *>() : nullptr;
     }
 
     QPointer<IVObject> get() { return m_object; }
@@ -71,6 +72,7 @@ struct CurrentObjectHolder {
     QPointer<IVComment> comment() { return m_comment; }
     QPointer<IVConnection> connection() { return m_connection; }
     QPointer<IVConnectionGroup> connectionGroup() { return m_connectionGroup; }
+    QPointer<IVConnectionLayerType> layer() { return m_layer; }
 
     bool isValid() const { return !m_object.isNull(); }
 
@@ -81,11 +83,13 @@ private:
     QPointer<IVComment> m_comment { nullptr };
     QPointer<IVConnection> m_connection { nullptr };
     QPointer<IVConnectionGroup> m_connectionGroup { nullptr };
+    QPointer<IVConnectionLayerType> m_layer { nullptr };
 };
 
 typedef QHash<QString, QHash<QString, IVInterface *>> IfacesByFunction; // { Function[Type]Id, {IfaceName, Iface} }
 struct IVXMLReaderPrivate {
     QVector<IVObject *> m_allObjects {};
+    QHash<QString, IVObject *> m_layers {};
     QHash<QString, IVFunctionType *> m_functionNames {};
     IfacesByFunction m_ifaceRequiredNames {};
     IfacesByFunction m_ifaceProvidedNames {};
@@ -104,7 +108,7 @@ struct IVXMLReaderPrivate {
         if (!m_currentObject.get())
             return;
 
-        if (!m_allObjects.contains(m_currentObject.get()))
+        if (!m_allObjects.contains(m_currentObject.get()) && !m_currentObject.layer())
             m_allObjects.append(m_currentObject.get());
 
         if (IVFunctionType *fn = m_currentObject.function()) {
@@ -129,6 +133,10 @@ struct IVXMLReaderPrivate {
             if (!m_connectionsById.contains(connId))
                 m_connectionsById[connId] = conn;
         }
+
+        if (IVConnectionLayerType *layer = m_currentObject.layer()) {
+            m_layers.insert(layer->title(), layer);
+        }
     }
 };
 
@@ -143,6 +151,11 @@ IVXMLReader::~IVXMLReader() {}
 QVector<IVObject *> IVXMLReader::parsedObjects() const
 {
     return d->m_allObjects;
+}
+
+QVector<IVObject *> IVXMLReader::parsedLayers() const
+{
+    return d->m_layers.values().toVector();
 }
 
 IVConnection::EndPointInfo addConnectionPart(const EntityAttributes &otherAttrs)
@@ -256,6 +269,12 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
         if (fn) {
             fn->addImplementation(attrValue(attrs, Props::Token::name), attrValue(attrs, Props::Token::language));
         }
+        break;
+    }
+    case Props::Token::Layer: {
+        ivm::IVConnectionLayerType *layer = new ivm::IVConnectionLayerType();
+        layer->rename(attrValue(attrs, Props::Token::name));
+        obj = layer;
         break;
     }
     default:

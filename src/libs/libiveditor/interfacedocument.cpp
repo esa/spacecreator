@@ -689,6 +689,12 @@ void InterfaceDocument::setObjects(const QVector<ivm::IVObject *> &objects)
     d->objectsModel->setRootObject({});
 }
 
+void InterfaceDocument::setLayers(const QVector<ivm::IVObject *> &layers)
+{
+    d->layersModel->initFromObjects(layers);
+    d->layersModel->setRootObject({});
+}
+
 void InterfaceDocument::onAttributesManagerRequested()
 {
     auto dialog = new shared::PropertyTemplateManager({ d->dynPropConfig }, nullptr);
@@ -888,6 +894,7 @@ bool InterfaceDocument::loadImpl(const QString &path)
     }
 
     setObjects(parser.parsedObjects());
+    setLayers(parser.parsedLayers());
     const QVariantMap metadata = parser.metaData();
     QVariantMap::const_iterator i = metadata.constFind("asn1file");
     while (i != metadata.end() && i.key() == "asn1file") {

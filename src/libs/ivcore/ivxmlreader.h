@@ -44,6 +44,7 @@ public:
     ~IVXMLReader() override;
 
     QVector<IVObject *> parsedObjects() const;
+    QVector<IVObject *> parsedLayers() const;
 
 protected:
     void processTagOpen(QXmlStreamReader &xml) override;
