@@ -45,6 +45,11 @@ HtmlResultExporter::HtmlResultExporter(
     }
 }
 
+auto HtmlResultExporter::getData() -> CellTable
+{
+    return cells;
+}
+
 auto HtmlResultExporter::exportResult(const QString &filepath) -> void
 {
     QFile file(filepath);

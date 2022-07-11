@@ -22,7 +22,6 @@
 #include "datareconstructor/datareconstructor.h"
 #include "gdbconnector/gdbconnector.h"
 #include "gdbconnector/process.h"
-#include "resultexporter/htmlresultexporter.h"
 
 #include <QBuffer>
 #include <QDebug>
@@ -42,11 +41,13 @@
 
 using dve::DVExporter;
 using ive::IVExporter;
+using ivm::IVObject;
 using plugincommon::ModelLoader;
 
 namespace testgenerator {
 
 const QString resultFileName = "Results.html";
+const QString gdbScriptPath = "~/.local/share/QtProject/QtCreator/x86-linux-cpp.gdb";
 
 TestGenerator::TestGenerator(const QString &baseDirectory)
 {
@@ -54,7 +55,7 @@ TestGenerator::TestGenerator(const QString &baseDirectory)
 }
 
 auto TestGenerator::testUsingDataFromCsv(
-        ivm::IVInterface &interface, const csv::CsvModel &csvModel, Asn1Acn::Asn1Model &asn1Model, float delta) -> bool
+        IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model, float delta) -> bool
 {
     Q_UNUSED(delta);
 
@@ -68,7 +69,8 @@ auto TestGenerator::testUsingDataFromCsv(
     }
     copyFunctionImplementations(testedFunctionName);
     compileSystemUnderTest();
-    QVector<QVariant> testResults = extractResult(interface, asn1Model);
+    const QString binToRun = generatedPath + "/work/binaries/hostpartition";
+    QVector<QVariant> testResults = runTests(interface, asn1Model, binToRun);
 
     QString resultPath = this->projectDirectory + QDir::separator() + "work" + QDir::separator() + resultFileName;
     HtmlResultExporter exporter(interface, csvModel, testResults, delta);
@@ -85,20 +87,20 @@ auto TestGenerator::initializePaths(const QString &baseDirectory) -> void
     generatedDvPath = generatedPath + QDir::separator() + "deploymentview.dv.xml";
 }
 
-auto TestGenerator::getAllFunctionsFromModel(const ivm::IVModel &ivModel) -> std::vector<ivm::IVFunction *>
+auto TestGenerator::getAllFunctionsFromModel(const IVModel &ivModel) -> std::vector<IVFunction *>
 {
-    QList<ivm::IVObject *> ivObjects = ivModel.visibleObjects();
-    std::vector<ivm::IVFunction *> ivFunctions = {};
+    QList<IVObject *> ivObjects = ivModel.visibleObjects();
+    std::vector<IVFunction *> ivFunctions = {};
     for (const auto &ivObject : ivObjects) {
         if (ivObject->isFunction()) {
-            ivFunctions.push_back(dynamic_cast<ivm::IVFunction *>(ivObject));
+            ivFunctions.push_back(dynamic_cast<IVFunction *>(ivObject));
         }
     }
     return ivFunctions;
 }
 
-auto TestGenerator::prepareTestHarness(
-        ivm::IVInterface &interface, const csv::CsvModel &csvModel, Asn1Acn::Asn1Model &asn1Model) -> QString
+auto TestGenerator::prepareTestHarness(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model)
+        -> QString
 {
     QDir dir(generatedPath);
     dir.removeRecursively();
@@ -121,12 +123,12 @@ auto TestGenerator::prepareTestHarness(
         return {};
     }
 
-    std::vector<ivm::IVFunction *> ivFunctions = getAllFunctionsFromModel(*ivModelGenerated);
+    std::vector<IVFunction *> ivFunctions = getAllFunctionsFromModel(*ivModelGenerated);
     if (!exportIvModel(ivModelGenerated.get(), generatedIvPath)) {
         return {};
     }
 
-    const std::unique_ptr<dvm::DVModel> dvModelGenerated =
+    const std::unique_ptr<DVModel> dvModelGenerated =
             DvGenerator::generate(ivFunctions, "x86 Linux CPP", "x86_Linux_TestRunner", "Node_1", "hostPartition");
     if (dvModelGenerated == nullptr) {
         qDebug() << "DV model was not generated";
@@ -200,7 +202,7 @@ auto TestGenerator::compileSystemUnderTest() -> void
     qDebug() << "Tests compilation finished";
 }
 
-auto TestGenerator::exportIvModel(ivm::IVModel *ivModel, const QString &outputFilename) -> bool
+auto TestGenerator::exportIvModel(IVModel *ivModel, const QString &outputFilename) -> bool
 {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
@@ -217,7 +219,7 @@ auto TestGenerator::exportIvModel(ivm::IVModel *ivModel, const QString &outputFi
     return true;
 }
 
-auto TestGenerator::exportDvModel(dvm::DVModel *dvModel, const QString &outputFilename) -> bool
+auto TestGenerator::exportDvModel(DVModel *dvModel, const QString &outputFilename) -> bool
 {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
@@ -234,17 +236,12 @@ auto TestGenerator::exportDvModel(dvm::DVModel *dvModel, const QString &outputFi
     return true;
 }
 
-auto TestGenerator::extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Model &asn1Model) -> QVector<QVariant>
+auto TestGenerator::runTests(IVInterface &interface, Asn1Model &asn1Model, const QString &binaryPath)
+        -> QVector<QVariant>
 {
-
-    const QString binLocalization =
-            generatedPath + QDir::separator() + "work" + QDir::separator() + "binaries" + QDir::separator();
-    // TODO: it is now absolute but later will be changed
-    const QString script =
-            "/home/taste/SpaceCreator/spacecreator/src/libs/testgenerator/gdbconnector/scripts/x86-linux-cpp.gdb";
-    const QString binToRun = "/home/taste/SpaceCreator/TestProj3/generated/work/binaries/hostpartition";
+    const QString binLocalization = binaryPath.left(binaryPath.lastIndexOf("/"));
     const QByteArray rawTestData = GdbConnector::getRawTestResults(
-            binLocalization, { "-batch", "-x", script }, { "localhost:1234", binToRun });
+            binLocalization, { "-batch", "-x", gdbScriptPath }, { "localhost:1234", binaryPath });
 
     const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
         { "INTEGER", 4, 4 },
@@ -253,6 +250,10 @@ auto TestGenerator::extractResult(ivm::IVInterface &interface, Asn1Acn::Asn1Mode
     };
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
             rawTestData, &interface, &asn1Model, QDataStream::LittleEndian, typeLayoutInfos);
+
+    for (const auto &readValue : readTestData) {
+        qDebug() << readValue;
+    }
 
     return readTestData;
 }

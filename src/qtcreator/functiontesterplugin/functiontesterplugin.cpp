@@ -87,7 +87,7 @@ auto FunctionTesterPlugin::testUsingDataFromCsvGui() -> void
 
     TestGenerator testGenerator(getBaseDirectory());
     testGenerator.testUsingDataFromCsv(*interface, *csvModel, *asn1Model, delta);
-    displayResultHtml();
+    displayResultHtml(resultFileName);
 }
 
 auto FunctionTesterPlugin::addTestInterfaceOption() -> void
@@ -194,7 +194,7 @@ auto FunctionTesterPlugin::getCurrentIvEditorCore() -> IVEditorCorePtr
     return currentIvDocument->ivEditorCore();
 }
 
-auto FunctionTesterPlugin::displayResultHtml() -> void
+auto FunctionTesterPlugin::displayResultHtml(const QString &resultFileName) -> void
 {
     qDebug() << "Displaying html";
     QString filepath = getBaseDirectory() + QDir::separator() + "work" + QDir::separator() + resultFileName;

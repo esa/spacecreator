@@ -14,6 +14,7 @@ namespace testgenerator {
  */
 class HtmlResultExporter
 {
+public:
     enum class ColumnSize
     {
         Regular,
@@ -28,10 +29,10 @@ class HtmlResultExporter
     struct Cell {
         QVariant value;
         CellColor color;
+        friend bool operator==(const Cell &l, const Cell &r) { return l.value == r.value && l.color == r.color; }
     };
     typedef QVector<QVector<Cell>> CellTable;
 
-public:
     /**
      * @brief Constructor of the class
      *
@@ -49,6 +50,13 @@ public:
      * @param filepath path to the html file to generate
      */
     auto exportResult(const QString &filepath) -> void;
+
+    /**
+     * @brief exports test result to a HTML file
+     *
+     * @return table with data to be put in html table
+     */
+    auto getData() -> CellTable;
 
 private:
     auto generateHtmlStream(QTextStream &stream) -> void;
