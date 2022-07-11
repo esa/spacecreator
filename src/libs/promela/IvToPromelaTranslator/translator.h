@@ -264,6 +264,11 @@ private:
     auto handleParameterType(const QString &parameterTypeName, const QString &parameterName,
             const QString &interfaceName, const QString &functionName,
             const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const -> QString;
+    auto handleSendInlineArgument(const QString &parameterType, const QString &functionName,
+            const QString &interfaceName, const QString parameterName, promela::model::Sequence &sequence) const
+            -> QList<QString>;
+    auto handleSendInlineParameter(const QString &argumentName) const -> promela::model::Expression;
+
     auto buildParameterSubtypeName(
             const QString &functionName, const QString &interfaceName, const QString &parameterName) const -> QString;
 };

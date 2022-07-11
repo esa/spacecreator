@@ -581,25 +581,17 @@ std::unique_ptr<model::InlineDef> IvToPromelaTranslator::generateSendInline(cons
             QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(sourceFunctionName)).arg(sourceInterfaceName);
     QString channelName = constructChannelName(functionName, interfaceName);
 
-    QList<QString> arguments;
-    QString argumentName;
     Sequence sequence(Sequence::Type::NORMAL);
 
-    if (parameterType.isEmpty()) {
-        argumentName = "dummy";
-        std::unique_ptr<ProctypeElement> dummyVariableDef =
-                std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), argumentName));
-        sequence.appendElement(std::move(dummyVariableDef));
-    } else {
-        argumentName = QString("%1_%2_%3").arg(functionName).arg(interfaceName).arg(parameterName);
-        arguments.append(argumentName);
-    }
+    auto arguments = handleSendInlineArgument(parameterType, functionName, interfaceName, parameterName, sequence);
 
     QList<Expression> params;
-    params.append(Expression(VariableRef(argumentName)));
+    for (const auto &argumentName : arguments) {
+        params.append(handleSendInlineParameter(argumentName));
+    }
+
     std::unique_ptr<ProctypeElement> channelSend =
             std::make_unique<ProctypeElement>(ChannelSend(VariableRef(channelName), params));
-
     sequence.appendElement(std::move(channelSend));
 
     return std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
@@ -1007,6 +999,31 @@ QString IvToPromelaTranslator::handleParameterType(const QString &parameterTypeN
     }
 
     return parameterTypeName;
+}
+
+QList<QString> IvToPromelaTranslator::handleSendInlineArgument(const QString &parameterType,
+        const QString &functionName, const QString &interfaceName, const QString parameterName,
+        Sequence &sequence) const
+{
+    QList<QString> arguments;
+
+    if (parameterType.isEmpty()) {
+        std::unique_ptr<ProctypeElement> dummyVariableDef =
+                std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "dummy"));
+        sequence.appendElement(std::move(dummyVariableDef));
+    } else {
+        auto argumentName = QString("%1_%2_%3").arg(functionName).arg(interfaceName).arg(parameterName);
+        arguments.append(argumentName);
+    }
+
+    return arguments;
+}
+
+Expression IvToPromelaTranslator::handleSendInlineParameter(const QString &argumentName) const
+{
+    auto parameter = Expression(VariableRef(argumentName));
+
+    return parameter;
 }
 
 QString IvToPromelaTranslator::buildParameterSubtypeName(
