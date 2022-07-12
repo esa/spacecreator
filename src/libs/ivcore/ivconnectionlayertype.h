@@ -37,6 +37,8 @@ class IVConnectionLayerType : public IVObject
 public:
     /**
     * @brief The IVConnectionLayerType constructor without name set
+    * @param parent                  parent of IVConnectionLayerType object
+    * @param id                      id of IVConnectionLayerType object
     */
     IVConnectionLayerType(QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
 
