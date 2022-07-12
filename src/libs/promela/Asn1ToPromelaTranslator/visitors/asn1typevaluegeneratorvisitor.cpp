@@ -471,11 +471,14 @@ void Asn1TypeValueGeneratorVisitor::createValueGenerationInline(model::Sequence 
 {
     const auto valueVariableName = getInlineArgumentName();
     const QString inlineName = getInlineGeneratorName(m_name);
-    const QList<QString> inlineArguments = { valueVariableName };
-    std::unique_ptr<InlineDef> inlineDef =
-            std::make_unique<InlineDef>(inlineName, inlineArguments, std::move(sequence));
 
-    m_promelaModel.addInlineDef(std::move(inlineDef));
+    if (!modelContainsInlineGenerator(inlineName)) {
+        const QList<QString> inlineArguments = { valueVariableName };
+        std::unique_ptr<InlineDef> inlineDef =
+                std::make_unique<InlineDef>(inlineName, inlineArguments, std::move(sequence));
+
+        m_promelaModel.addInlineDef(std::move(inlineDef));
+    }
 }
 
 Asn1Acn::Types::Type *Asn1TypeValueGeneratorVisitor::getAsnSequenceComponentType(
