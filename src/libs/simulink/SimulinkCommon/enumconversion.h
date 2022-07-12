@@ -39,6 +39,13 @@ auto enumFromString(const StringRef &enumStr) -> std::optional<EnumType>
     return std::nullopt;
 }
 
+/**
+ * @brief   Template function to convert enum value into string
+ *
+ * @param   enumType     Enum value that will be converted to string
+ * 
+ * @return  String representing enum value
+ */
 template <typename EnumType>
 auto stringFromEnum(EnumType enumType) -> const QString&
 {

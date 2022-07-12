@@ -83,7 +83,7 @@ public:
     /**
      * @brief   Return vector of all data types accessible in Simulink Model
      *
-     * @return  Pointer to data type or nullptr if it does not exist
+     * @return  Reference to vector containing all data type objects
      */
     auto dataTypes() const -> const DataTypes &;
     /**
@@ -96,7 +96,7 @@ public:
     /**
      * @brief   Return vector of all inports accessible in Simulink Model
      *
-     * @return  Reference to vector contains all inport objects
+     * @return  Reference to vector containing all inport objects
      */
     auto inports() const -> const Inports &;
     /**
@@ -109,13 +109,13 @@ public:
     /**
      * @brief   Return vector of all outports accessible in Simulink Model
      *
-     * @return  Reference to vector contains all outport objects
+     * @return  Reference to vector containing all outport objects
      */
     auto outports() const -> const Outports &;
     /**
      * @brief   Append outport to Simulink Model
      *
-     * @param   inport    outport object
+     * @param   outport    outport object
      */
     auto addOutport(Outport outport) -> void;
 
