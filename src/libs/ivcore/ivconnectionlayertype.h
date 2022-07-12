@@ -35,15 +35,25 @@ class IVConnectionLayerType : public IVObject
     Q_OBJECT
 
 public:
+    /**
+    * @brief The IVConnectionLayerType constructor without name set
+    */
     IVConnectionLayerType(QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
+
+    /**
+    * @brief The IVConnectionLayerType destructor
+    */
     ~IVConnectionLayerType();
 
     /**
     * @brief rename layer
-    * @param name                   new name
+    * @param name                    new name
     */
     auto rename(const QString &name) -> void;
 
+    /**
+    * @brief Constant for default layer name
+    */
     static const QString DefaultLayerName;
 };
 
