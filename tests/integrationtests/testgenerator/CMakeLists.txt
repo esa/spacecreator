@@ -16,14 +16,9 @@ target_link_libraries(${TEST_NAME} PUBLIC
     TestGenerator
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Test
-    spacecreatorsystem
     libiveditor
     CommonTools
     CommonProjectWarnings
-)
-
-set_tests_properties(${TEST_NAME} PROPERTIES
-    ENVIRONMENT "LD_LIBRARY_PATH=$<TARGET_FILE_DIR:TestGenerator>:${QTC_LIB_DIR}:${QTC_PLUGINS_DIR}:$LD_LIBRARY_PATH"
 )
 
 configure_file(resources/test.csv resources/test.csv COPYONLY)

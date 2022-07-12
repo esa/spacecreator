@@ -37,16 +37,14 @@
 #include <shared/entityattribute.h>
 #include <shared/errorhub.h>
 
+using dvm::meta::Props;
+
 namespace testgenerator {
 
 QVector<qint32> DvGenerator::Coordinates::node = { 192, 193, 396, 353 };
 QVector<qint32> DvGenerator::Coordinates::partition = { 236, 237, 356, 317 };
 
-const QString DvGenerator::nodeLabelToken = dvm::meta::Props::token(dvm::meta::Props::Token::node_label);
-const QString DvGenerator::nameToken = dvm::meta::Props::token(dvm::meta::Props::Token::name);
 const QString DvGenerator::devNamespaceToken = "namespace";
-const QString DvGenerator::typeToken = dvm::meta::Props::token(dvm::meta::Props::Token::type);
-const QString DvGenerator::pathToken = dvm::meta::Props::token(dvm::meta::Props::Token::path);
 
 auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind, const QString &hw,
         const QString &nodeTitle, const QString &nodeLabel, const QString &hostPartitionName)
@@ -104,7 +102,7 @@ auto DvGenerator::cloneFunctionAndAddToModel(ivm::IVFunction *function, dvm::DVM
     for (const auto &partition : dvNode->partitions()) {
         if (partition->title().compare(partitionTitle) == 0) {
             auto *const fun = makeDvObject<dvm::DVFunction>(model, function->title());
-            fun->setEntityAttribute(pathToken, function->title());
+            fun->setEntityAttribute(Props::token(Props::Token::path), function->title());
             fun->setParentObject(partition);
             const auto dvPartition = static_cast<dvm::DVPartition *>(partition);
 
@@ -120,9 +118,10 @@ auto DvGenerator::makeNodeAndAddToModel(const QString &nodeTitle, const QString 
 {
     auto *const node = makeDvObject<dvm::DVNode>(model, nodeTitle);
     node->setCoordinates(Coordinates::node);
-    node->setEntityAttribute(nameToken, nodeTitle);
-    node->setEntityAttribute(nodeLabelToken, nodeLabel);
-    node->setEntityAttribute(typeToken, board->entityAttributeValue(typeToken));
+    node->setEntityAttribute(Props::token(Props::Token::name), nodeTitle);
+    node->setEntityAttribute(Props::token(Props::Token::node_label), nodeLabel);
+    node->setEntityAttribute(
+            Props::token(Props::Token::type), board->entityAttributeValue(Props::token(Props::Token::type)));
     node->setEntityAttribute(devNamespaceToken, board->entityAttributeValue(devNamespaceToken));
 
     model->addObject(node);
