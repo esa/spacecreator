@@ -680,7 +680,7 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTransl
         const size_t priority = getInterfacePriority(providedInterface);
 
         context.model()->addProctype(
-                generateProctype(context, functionName, interfaceName, parameterType, queueSize, priority, true));
+                generateProctype(context, functionName, interfaceName, parameter.second, queueSize, priority, true));
     }
 
     QVector<IVInterface *> requiredInterfaceList = ivFunction->ris();
