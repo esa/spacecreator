@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <simulink/SimulinkModel/base/namedentity.h>
+#include <simulink/SimulinkModel/common/namedentity.h>
 
 namespace simulink::model {
 

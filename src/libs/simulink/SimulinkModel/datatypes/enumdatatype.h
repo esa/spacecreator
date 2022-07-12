@@ -23,6 +23,7 @@
 #include "rootdatatype.h"
 
 #include <simulink/SimulinkCommon/basetypesmappings.h>
+#include <simulink/SimulinkModel/common/datascope.h>
 #include <vector>
 
 namespace simulink::model {
@@ -44,11 +45,17 @@ public:
     auto description() const -> const common::String &;
     auto setDescription(common::String description) -> void;
 
-    auto addClassNameToEnumNames() const -> const common::String &;
-    auto setAddClassNameToEnumNames(common::String addClassNameToEnumNames) -> void;
+    /**
+     * @brief It is an enum attribute, not adder method
+     */
+    auto addClassNameToEnumNames() const -> bool;
+    /**
+     * @brief It is an enum attribute, not setter method
+     */
+    auto setAddClassNameToEnumNames(bool addClassNameToEnumNames) -> void;
 
-    auto dataScope() const -> const common::String &;
-    auto setDataScope(common::String dataScope) -> void;
+    auto dataScope() const -> DataScope;
+    auto setDataScope(DataScope dataScope) -> void;
 
     auto defaultValue() const -> const common::String &;
     auto setDefaultValue(common::String defaultValue) -> void;
@@ -59,8 +66,8 @@ public:
 private:
     common::String m_headerFile;
     common::String m_description;
-    common::String m_addClassNameToEnumNames;
-    common::String m_dataScope;
+    bool m_addClassNameToEnumNames;
+    DataScope m_dataScope;
     common::String m_defaultValue;
 
     EnumValues m_enumValues;

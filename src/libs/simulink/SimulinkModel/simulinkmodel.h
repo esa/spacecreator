@@ -19,7 +19,12 @@
 
 #pragma once
 
-#include "modelinterface.h"
+#include "datatypes/aliasdatatype.h"
+#include "datatypes/busdatatype.h"
+#include "datatypes/datatype.h"
+#include "datatypes/enumdatatype.h"
+#include "inport/inport.h"
+#include "outport/outport.h"
 
 #include <conversion/common/model.h>
 
@@ -31,12 +36,15 @@ namespace simulink::model {
 class SimulinkModel final : public conversion::Model
 {
 public:
+    using DataTypes = std::vector<DataType>;
+    using Inports = std::vector<Inport>;
+    using Outports = std::vector<Outport>;
+
+public:
     /**
-     * @brief   Constructor
-     *
-     * @param   modelInterface    Model interface
+     * @brief   Default constructor
      */
-    explicit SimulinkModel(ModelInterface modelInterface);
+    SimulinkModel() = default;
     /**
      * @brief   Deleted copy constructor/
      */
@@ -64,16 +72,25 @@ public:
     virtual auto modelType() const -> conversion::ModelType override;
 
 public:
-    /**
-     * @brief   Getter for model interface
-     *
-     * @returns Model interface
-     */
-    auto modelInterface() const -> const ModelInterface &;
+    auto dataType(const QString &name) const -> const DataType *;
+    auto dataTypes() const -> const DataTypes &;
+    auto addDataType(DataType dataType) -> void;
+
+    auto inports() const -> const Inports &;
+    auto addInport(Inport inport) -> void;
+
+    auto outports() const -> const Outports &;
+    auto addOutport(Outport outport) -> void;
 
 private:
-    /** @brief  Model interface */
-    ModelInterface m_modelInterface;
+    /** @brief  Data types using by model */
+    DataTypes m_dataTypes;
+
+    /** @brief  Model inports */
+    Inports m_inports;
+
+    /** @brief  Model outports */
+    Outports m_outports;
 };
 
 } // namespace simulink::model

@@ -36,7 +36,7 @@ UnhandledAttribute::UnhandledAttribute(const StringRef &attributeName, const Str
 {
 }
 
-UnexpectedEOF::UnexpectedEOF(const StringRef &elementType)
+UnexpectedEof::UnexpectedEof(const StringRef &elementType)
     : ParserException(QString("Unexpected EOF in <%1>").arg(elementType))
 {
 }

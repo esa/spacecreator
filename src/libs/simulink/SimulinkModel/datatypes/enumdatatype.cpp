@@ -41,24 +41,24 @@ void EnumDataType::setDescription(common::String description)
     m_description = std::move(description);
 }
 
-const common::String &EnumDataType::addClassNameToEnumNames() const
+bool EnumDataType::addClassNameToEnumNames() const
 {
     return m_addClassNameToEnumNames;
 }
 
-void EnumDataType::setAddClassNameToEnumNames(common::String addClassNameToEnumNames)
+void EnumDataType::setAddClassNameToEnumNames(bool addClassNameToEnumNames)
 {
-    m_addClassNameToEnumNames = std::move(addClassNameToEnumNames);
+    m_addClassNameToEnumNames = addClassNameToEnumNames;
 }
 
-const common::String &EnumDataType::dataScope() const
+DataScope EnumDataType::dataScope() const
 {
     return m_dataScope;
 }
 
-void EnumDataType::setDataScope(common::String dataScope)
+void EnumDataType::setDataScope(DataScope dataScope)
 {
-    m_dataScope = std::move(dataScope);
+    m_dataScope = dataScope;
 }
 
 const common::String &EnumDataType::defaultValue() const

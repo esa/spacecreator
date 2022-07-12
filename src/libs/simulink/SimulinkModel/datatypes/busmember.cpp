@@ -31,14 +31,14 @@ void BusMember::setDataType(common::String dataType)
     m_dataType = std::move(dataType);
 }
 
-const common::String &BusMember::complexity() const
+Complexity BusMember::complexity() const
 {
     return m_complexity;
 }
 
-void BusMember::setComplexity(common::String complexity)
+void BusMember::setComplexity(Complexity complexity)
 {
-    m_complexity = std::move(complexity);
+    m_complexity = complexity;
 }
 
 const common::String &BusMember::description() const
@@ -51,24 +51,24 @@ void BusMember::setDescription(common::String description)
     m_description = std::move(description);
 }
 
-const common::String &BusMember::dimensions() const
+const Dimensions &BusMember::dimensions() const
 {
     return m_dimensions;
 }
 
-void BusMember::setDimensions(common::String dimensions)
+void BusMember::setDimensions(Dimensions dimensions)
 {
     m_dimensions = std::move(dimensions);
 }
 
-const common::String &BusMember::dimensionsMode() const
+DimensionsMode BusMember::dimensionsMode() const
 {
     return m_dimensionsMode;
 }
 
-void BusMember::setDimensionsMode(common::String dimensionsMode)
+void BusMember::setDimensionsMode(DimensionsMode dimensionsMode)
 {
-    m_dimensionsMode = std::move(dimensionsMode);
+    m_dimensionsMode = dimensionsMode;
 }
 
 const common::String &BusMember::max() const

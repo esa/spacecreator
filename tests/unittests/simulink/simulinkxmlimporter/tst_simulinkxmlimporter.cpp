@@ -21,10 +21,19 @@
 #include <QtTest>
 #include <simulink/SimulinkModel/simulinkmodel.h>
 #include <simulink/SimulinkOptions/options.h>
+#include <simulink/SimulinkXMLImporter/exceptions.h>
 #include <simulink/SimulinkXMLImporter/importer.h>
+#include <unittests/common/verifyexception.h>
 
 using conversion::simulink::SimulinkOptions;
+using simulink::importer::ParserException;
 using simulink::importer::SimulinkXmlImporter;
+using simulink::model::Complexity;
+using simulink::model::DataScope;
+using simulink::model::Dimensions;
+using simulink::model::DimensionsMode;
+using simulink::model::PortDimension;
+using simulink::model::SignalType;
 using simulink::model::SimulinkModel;
 
 namespace simulink::test {
@@ -37,18 +46,44 @@ public:
     virtual ~tst_SimulinkXmlImporter() = default;
 
 private Q_SLOTS:
-    void testImporter();
+    void testElementsAmountInModel();
+    void testEnumDataTypesParsing();
+    void testAliasDataTypesParsing();
+    void testBusDataTypesParsing();
+    void testInportsParsing();
+    void testOutportsParsing();
+
+    void testDimensionsEmpty();
+    void testDimensionsVecEmpty();
+    void testDimensionsZero();
+    void testDimensionsMinusOne();
+    void testDimensionsTwo();
+    void testDimensionsIntMax();
+    void testDimensionsIntMaxPlusOne();
+    void testDimensionsFloat6p1();
+    void testDimensionsVariable();
+    void testDimensionsVec2();
+    void testDimensionsVecIntMax();
+    void testDimensionsVec23();
+    void testDimensionsVec2Float6p1();
+    void testDimensionsVec20();
+    void testDimensionsVec23Spaces();
+    void testDimensionsVec2sc2();
+    void testDimensionsVec22sc22();
+    void testDimensionsVecIntMaxIntMaxIntMax();
+    void testDimensionsVec23456();
+    void testDimensionsVec2Var();
+    void testDimensionsVec2sc2sc2();
+    void testDimensionsCell234();
 };
 
-void tst_SimulinkXmlImporter::testImporter()
+void tst_SimulinkXmlImporter::testElementsAmountInModel()
 {
     conversion::Options options;
     options.add(SimulinkOptions::inputFilepath, "Complex.xml");
     SimulinkXmlImporter importer;
 
     const auto expectedDataTypesAmount = 63;
-    const auto expected11thBusMembersAmount = 33;
-    const auto expected43thEnumValuesAmount = 2;
     const auto expectedInportsAmount = 78;
     const auto expectedOutportsAmount = 79;
 
@@ -56,106 +91,547 @@ void tst_SimulinkXmlImporter::testImporter()
         const auto model = importer.importModel(options);
         const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
 
-        const auto &dataTypes = simulinkModel->modelInterface().dataTypes();
+        const auto &dataTypes = simulinkModel->dataTypes();
         QCOMPARE(dataTypes.size(), expectedDataTypesAmount);
 
-        const auto &aliasType = std::get<model::AliasDataType>(dataTypes.at(0));
+        const auto &inports = simulinkModel->inports();
+        QCOMPARE(inports.size(), expectedInportsAmount);
+
+        const auto &outports = simulinkModel->outports();
+        QCOMPARE(outports.size(), expectedOutportsAmount);
+
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+}
+
+void tst_SimulinkXmlImporter::testEnumDataTypesParsing()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "Complex.xml");
+    SimulinkXmlImporter importer;
+
+    const auto enum43thInDataTypesIndex = 42;
+    const auto expected43thEnumValuesAmount = 2;
+
+    try {
+        const auto model = importer.importModel(options);
+        const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
+
+        const auto &dataTypes = simulinkModel->dataTypes();
+
+        const auto &enumType = std::get<model::EnumDataType>(dataTypes.at(enum43thInDataTypesIndex));
+        QCOMPARE(enumType.name(), "Int16InMemoryEnumDataDictionary");
+        QCOMPARE(enumType.headerFile(), "");
+        QCOMPARE(enumType.description(), "");
+        QCOMPARE(enumType.addClassNameToEnumNames(), false);
+        QCOMPARE(enumType.dataScope(), DataScope::Auto);
+        QCOMPARE(enumType.defaultValue(), "ok");
+        QCOMPARE(enumType.enumValues().size(), expected43thEnumValuesAmount);
+
+        const auto &firstEnumValue = enumType.enumValues().front();
+        QCOMPARE(firstEnumValue.name(), "ok");
+        QCOMPARE(firstEnumValue.value(), 1);
+        QCOMPARE(firstEnumValue.description(), "");
+        QCOMPARE(firstEnumValue.detailedDescription(), "");
+
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+}
+
+void tst_SimulinkXmlImporter::testAliasDataTypesParsing()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "Complex.xml");
+    SimulinkXmlImporter importer;
+
+    const auto alias1stInDataTypesIndex = 0;
+
+    try {
+        const auto model = importer.importModel(options);
+        const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
+
+        const auto &dataTypes = simulinkModel->dataTypes();
+
+        const auto &aliasType = std::get<model::AliasDataType>(dataTypes.at(alias1stInDataTypesIndex));
         QCOMPARE(aliasType.name(), "AliasToBooleanAliasBaseWorkspace");
         QCOMPARE(aliasType.baseType(), "BooleanAliasBaseWorkspace");
-        QCOMPARE(aliasType.dataScope(), "Auto");
+        QCOMPARE(aliasType.dataScope(), DataScope::Auto);
         QCOMPARE(aliasType.description(), "");
         QCOMPARE(aliasType.headerFile(), "");
 
-        const auto &busType = std::get<model::BusDataType>(dataTypes.at(10));
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+}
+
+void tst_SimulinkXmlImporter::testBusDataTypesParsing()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "Complex.xml");
+    SimulinkXmlImporter importer;
+
+    const auto bus11thInDataTypesIndex = 10;
+    const auto expected11thBusMembersAmount = 33;
+
+    try {
+        const auto model = importer.importModel(options);
+        const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
+
+        const auto &dataTypes = simulinkModel->dataTypes();
+
+        const auto &busType = std::get<model::BusDataType>(dataTypes.at(bus11thInDataTypesIndex));
         QCOMPARE(busType.name(), "Bus1BaseWorkspace");
-        QCOMPARE(busType.dataScope(), "Auto");
+        QCOMPARE(busType.dataScope(), DataScope::Auto);
         QCOMPARE(busType.description(), "");
         QCOMPARE(busType.headerFile(), "");
         QCOMPARE(busType.alignment(), "-1");
         QCOMPARE(busType.busMembers().size(), expected11thBusMembersAmount);
 
-        const auto &busMember = busType.busMembers().at(0);
-        QCOMPARE(busMember.name(), "boolSimulinkIntEnumTypeEnumFile");
-        QCOMPARE(busMember.dataType(), "BoolSimulinkIntEnumType");
-        QCOMPARE(busMember.complexity(), "real");
-        QCOMPARE(busMember.description(), "");
-        QCOMPARE(busMember.dimensions(), "1");
-        QCOMPARE(busMember.dimensionsMode(), "Fixed");
-        QCOMPARE(busMember.max(), "");
-        QCOMPARE(busMember.min(), "");
-        QCOMPARE(busMember.sampleTime(), "-1");
-        QCOMPARE(busMember.unit(), "");
+        const auto &firstBusMember = busType.busMembers().front();
+        const auto *dimensions = std::get_if<int64_t>(&firstBusMember.dimensions());
 
-        const auto &enumType = std::get<model::EnumDataType>(dataTypes.at(42));
-        QCOMPARE(enumType.name(), "Int16InMemoryEnumDataDictionary");
-        QCOMPARE(enumType.headerFile(), "");
-        QCOMPARE(enumType.description(), "");
-        QCOMPARE(enumType.addClassNameToEnumNames(), "false");
-        QCOMPARE(enumType.dataScope(), "Auto");
-        QCOMPARE(enumType.defaultValue(), "ok");
-        QCOMPARE(enumType.enumValues().size(), expected43thEnumValuesAmount);
-
-        const auto &enumValue = enumType.enumValues().at(0);
-        QCOMPARE(enumValue.name(), "ok");
-        QCOMPARE(enumValue.value(), "1");
-        QCOMPARE(enumValue.description(), "");
-        QCOMPARE(enumValue.detailedDescription(), "");
-
-        const auto &inports = simulinkModel->modelInterface().inports();
-        QCOMPARE(inports.size(), expectedInportsAmount);
-
-        const auto &inport = inports.at(0);
-        QCOMPARE(inport.name(), "doubleIn");
-        QCOMPARE(inport.outDataTypeStr(), "double");
-        QCOMPARE(inport.busObject(), "BusObject");
-        QCOMPARE(inport.busOutputAsStruct(), "off");
-        QCOMPARE(inport.iconDisplay(), "Port number");
-        QCOMPARE(inport.interpolate(), "on");
-        QCOMPARE(inport.latchByDelayingOutsideSignal(), "off");
-        QCOMPARE(inport.latchInputForFeedbackSignals(), "off");
-        QCOMPARE(inport.lockScale(), "off");
-        QCOMPARE(inport.outMax(), "[]");
-        QCOMPARE(inport.outMin(), "[]");
-        QCOMPARE(inport.outputSignalNames(), "doubleInSignal");
-        QCOMPARE(inport.port(), "1");
-        QCOMPARE(inport.portDimensions(), "-1");
-        QCOMPARE(inport.sampleTime(), "-1");
-        QCOMPARE(inport.signalType(), "auto");
-        QCOMPARE(inport.unit(), "inherit");
-        QCOMPARE(inport.unitNoProp(), "");
-        QCOMPARE(inport.useBusObject(), "off");
-
-        const auto &outports = simulinkModel->modelInterface().outports();
-        QCOMPARE(outports.size(), expectedOutportsAmount);
-
-        const auto &outport = outports.at(0);
-        QCOMPARE(outport.name(), "doubleOut");
-        QCOMPARE(outport.outDataTypeStr(), "double");
-        QCOMPARE(outport.busObject(), "BusObject");
-        QCOMPARE(outport.busOutputAsStruct(), "off");
-        QCOMPARE(outport.iconDisplay(), "Port number");
-        QCOMPARE(outport.initialOutput(), "[]");
-        QCOMPARE(outport.inputSignalNames(), "doubleOutSignal");
-        QCOMPARE(outport.lockScale(), "off");
-        QCOMPARE(outport.mustResolveToSignalObject(), "off");
-        QCOMPARE(outport.outMax(), "[]");
-        QCOMPARE(outport.outMin(), "[]");
-        QCOMPARE(outport.outputWhenDisabled(), "held");
-        QCOMPARE(outport.port(), "1");
-        QCOMPARE(outport.portDimensions(), "-1");
-        QCOMPARE(outport.sampleTime(), "-1");
-        QCOMPARE(outport.signalName(), "");
-        QCOMPARE(outport.signalObject(), "");
-        QCOMPARE(outport.signalType(), "auto");
-        QCOMPARE(outport.storageClass(), "Auto");
-        QCOMPARE(outport.unit(), "inherit");
-        QCOMPARE(outport.unitNoProp(), "");
-        QCOMPARE(outport.useBusObject(), "off");
-        QCOMPARE(outport.varSizeSig(), "Inherit");
+        QCOMPARE(firstBusMember.name(), "boolSimulinkIntEnumTypeEnumFile");
+        QCOMPARE(firstBusMember.dataType(), "BoolSimulinkIntEnumType");
+        QCOMPARE(firstBusMember.complexity(), Complexity::Real);
+        QCOMPARE(firstBusMember.description(), "");
+        QCOMPARE(*dimensions, 1);
+        QCOMPARE(firstBusMember.dimensionsMode(), DimensionsMode::Fixed);
+        QCOMPARE(firstBusMember.max(), "");
+        QCOMPARE(firstBusMember.min(), "");
+        QCOMPARE(firstBusMember.sampleTime(), "-1");
+        QCOMPARE(firstBusMember.unit(), "");
 
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
+}
+
+void tst_SimulinkXmlImporter::testInportsParsing()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "Complex.xml");
+    SimulinkXmlImporter importer;
+
+    try {
+        const auto model = importer.importModel(options);
+        const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
+
+        const auto &inports = simulinkModel->inports();
+
+        const auto &firstInport = inports.front();
+        const auto *portDimension = std::get_if<int64_t>(&firstInport.portDimensions());
+
+        QCOMPARE(firstInport.name(), "doubleIn");
+        QCOMPARE(firstInport.outDataTypeStr(), "double");
+        QCOMPARE(firstInport.busObject(), "BusObject");
+        QCOMPARE(firstInport.busOutputAsStruct(), "off");
+        QCOMPARE(firstInport.iconDisplay(), "Port number");
+        QCOMPARE(firstInport.interpolate(), "on");
+        QCOMPARE(firstInport.latchByDelayingOutsideSignal(), "off");
+        QCOMPARE(firstInport.latchInputForFeedbackSignals(), "off");
+        QCOMPARE(firstInport.lockScale(), "off");
+        QCOMPARE(firstInport.outMax(), "[]");
+        QCOMPARE(firstInport.outMin(), "[]");
+        QCOMPARE(firstInport.outputSignalNames(), "doubleInSignal");
+        QCOMPARE(firstInport.port(), "1");
+        QCOMPARE(*portDimension, -1);
+        QCOMPARE(firstInport.sampleTime(), "-1");
+        QCOMPARE(firstInport.signalType(), SignalType::Auto);
+        QCOMPARE(firstInport.unit(), "inherit");
+        QCOMPARE(firstInport.unitNoProp(), "");
+        QCOMPARE(firstInport.useBusObject(), "off");
+
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+}
+
+void tst_SimulinkXmlImporter::testOutportsParsing()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "Complex.xml");
+    SimulinkXmlImporter importer;
+
+    try {
+        const auto model = importer.importModel(options);
+        const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
+
+        const auto &outports = simulinkModel->outports();
+
+        const auto &firstOutport = outports.front();
+        const auto *portDimension = std::get_if<int64_t>(&firstOutport.portDimensions());
+
+        QCOMPARE(firstOutport.name(), "doubleOut");
+        QCOMPARE(firstOutport.outDataTypeStr(), "double");
+        QCOMPARE(firstOutport.busObject(), "BusObject");
+        QCOMPARE(firstOutport.busOutputAsStruct(), "off");
+        QCOMPARE(firstOutport.iconDisplay(), "Port number");
+        QCOMPARE(firstOutport.initialOutput(), "[]");
+        QCOMPARE(firstOutport.inputSignalNames(), "doubleOutSignal");
+        QCOMPARE(firstOutport.lockScale(), "off");
+        QCOMPARE(firstOutport.mustResolveToSignalObject(), "off");
+        QCOMPARE(firstOutport.outMax(), "[]");
+        QCOMPARE(firstOutport.outMin(), "[]");
+        QCOMPARE(firstOutport.outputWhenDisabled(), "held");
+        QCOMPARE(firstOutport.port(), "1");
+        QCOMPARE(*portDimension, -1);
+        QCOMPARE(firstOutport.sampleTime(), "-1");
+        QCOMPARE(firstOutport.signalName(), "");
+        QCOMPARE(firstOutport.signalObject(), "");
+        QCOMPARE(firstOutport.signalType(), SignalType::Auto);
+        QCOMPARE(firstOutport.storageClass(), "Auto");
+        QCOMPARE(firstOutport.unit(), "inherit");
+        QCOMPARE(firstOutport.unitNoProp(), "");
+        QCOMPARE(firstOutport.useBusObject(), "off");
+        QCOMPARE(firstOutport.varSizeSig(), "Inherit");
+
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+}
+
+void tst_SimulinkXmlImporter::testDimensionsEmpty()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsEmpty.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions=""
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(importer.importModel(options), ParserException, "Dimensions is empty");
+}
+
+void tst_SimulinkXmlImporter::testDimensionsVecEmpty()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsVecEmpty.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="[  ]"
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(importer.importModel(options), ParserException, "Dimensions Array is empty");
+}
+
+void tst_SimulinkXmlImporter::testDimensionsZero()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsZero.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="0"
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
+            importer.importModel(options), ParserException, "Value of dimension should be -1 or be greater than 0 '0'");
+}
+
+void tst_SimulinkXmlImporter::testDimensionsMinusOne()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsMinusOne.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="-1"
+
+    try {
+        const auto model = importer.importModel(options);
+        const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
+        const auto &outports = simulinkModel->dataTypes();
+
+        QCOMPARE(outports.size(), 1);
+
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+}
+
+void tst_SimulinkXmlImporter::testDimensionsTwo()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsTwo.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="2"
+
+    try {
+        const auto model = importer.importModel(options);
+        const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
+        const auto &outports = simulinkModel->dataTypes();
+
+        QCOMPARE(outports.size(), 1);
+
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+}
+
+void tst_SimulinkXmlImporter::testDimensionsIntMax()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsIntMax.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="2147483647"
+
+    try {
+        const auto model = importer.importModel(options);
+        const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
+        const auto &outports = simulinkModel->dataTypes();
+
+        QCOMPARE(outports.size(), 1);
+
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+}
+
+void tst_SimulinkXmlImporter::testDimensionsIntMaxPlusOne()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsIntMaxPlusOne.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="2147483648"
+
+    try {
+        const auto model = importer.importModel(options);
+        const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
+        const auto &outports = simulinkModel->dataTypes();
+
+        QCOMPARE(outports.size(), 1);
+
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+}
+
+void tst_SimulinkXmlImporter::testDimensionsFloat6p1()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsFloat6p1.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="6.1"
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
+            importer.importModel(options), ParserException, "Unable to parse dimension number '6.1'");
+}
+
+void tst_SimulinkXmlImporter::testDimensionsVariable()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsVariable.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="Variable"
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
+            importer.importModel(options), ParserException, "Importer doesn't handle variables 'Variable'");
+}
+
+void tst_SimulinkXmlImporter::testDimensionsVec2()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsVec2.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="[2]"
+
+    try {
+        const auto model = importer.importModel(options);
+        const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
+        const auto &outports = simulinkModel->dataTypes();
+
+        QCOMPARE(outports.size(), 1);
+
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+}
+
+void tst_SimulinkXmlImporter::testDimensionsVecIntMax()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsVecIntMax.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="[2147483647]"
+
+    try {
+        const auto model = importer.importModel(options);
+        const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
+        const auto &outports = simulinkModel->dataTypes();
+
+        QCOMPARE(outports.size(), 1);
+
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+}
+
+void tst_SimulinkXmlImporter::testDimensionsVec23()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsVec23.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="[2 3]"
+
+    try {
+        const auto model = importer.importModel(options);
+        const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
+        const auto &outports = simulinkModel->dataTypes();
+
+        QCOMPARE(outports.size(), 1);
+
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+}
+
+void tst_SimulinkXmlImporter::testDimensionsVec2Float6p1()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsVec2Float6p1.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="[2 6.1]"
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
+            importer.importModel(options), ParserException, "Unable to parse one of array value '6.1'");
+}
+
+void tst_SimulinkXmlImporter::testDimensionsVec20()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsVec20.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="[2 0]"
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
+            importer.importModel(options), ParserException, "Value of dimension array should be greater than 0 '0'");
+}
+
+void tst_SimulinkXmlImporter::testDimensionsVec23Spaces()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsVec23Spaces.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="[    2     3   ]"
+
+    try {
+        const auto model = importer.importModel(options);
+        const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
+        const auto &outports = simulinkModel->dataTypes();
+
+        QCOMPARE(outports.size(), 1);
+
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+}
+
+void tst_SimulinkXmlImporter::testDimensionsVec2sc2()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsVec2sc2.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="[2; 2]"
+
+    try {
+        const auto model = importer.importModel(options);
+        const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
+        const auto &outports = simulinkModel->dataTypes();
+
+        QCOMPARE(outports.size(), 1);
+
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+}
+
+void tst_SimulinkXmlImporter::testDimensionsVec22sc22()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsVec22sc22.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="[2 2; 2 2]"
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(importer.importModel(options), ParserException,
+            "Dimensions Array has '4' dimension, but it should be max 2-dimensional");
+}
+
+void tst_SimulinkXmlImporter::testDimensionsVecIntMaxIntMaxIntMax()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsVecIntMaxIntMax.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="[2147483647 2147483647]"
+
+    try {
+        const auto model = importer.importModel(options);
+        const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
+        const auto &outports = simulinkModel->dataTypes();
+
+        QCOMPARE(outports.size(), 1);
+
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+}
+
+void tst_SimulinkXmlImporter::testDimensionsVec23456()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsVec23456.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="[2 3 4 5 6]"
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(importer.importModel(options), ParserException,
+            "Dimensions Array has '5' dimension, but it should be max 2-dimensional");
+}
+
+void tst_SimulinkXmlImporter::testDimensionsVec2Var()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsVec2Var.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="[2 Variable]"
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
+            importer.importModel(options), ParserException, "Importer doesn't handle variables 'Variable'");
+}
+
+void tst_SimulinkXmlImporter::testDimensionsVec2sc2sc2()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsVec2sc2sc2.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="[2; 2; 2]"
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(importer.importModel(options), ParserException,
+            "Dimensions Array has '3' dimension, but it should be max 2-dimensional");
+}
+
+void tst_SimulinkXmlImporter::testDimensionsCell234()
+{
+    conversion::Options options;
+    options.add(SimulinkOptions::inputFilepath, "DimensionsCell234.xml");
+    SimulinkXmlImporter importer;
+
+    // Dimensions="{2 3 4}"
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
+            importer.importModel(options), ParserException, "Importer doesn't handle cell array '{2 3 4}'");
 }
 
 } // namespace simulink::test

@@ -22,7 +22,10 @@
 #include "rootdatatype.h"
 
 #include <simulink/SimulinkCommon/basetypesmappings.h>
-#include <simulink/SimulinkModel/base/namedentity.h>
+#include <simulink/SimulinkModel/common/complexity.h>
+#include <simulink/SimulinkModel/common/dimensions.h>
+#include <simulink/SimulinkModel/common/dimensionsmode.h>
+#include <simulink/SimulinkModel/common/namedentity.h>
 
 namespace simulink::model {
 
@@ -37,17 +40,17 @@ public:
     auto dataType() const -> const common::String &;
     auto setDataType(common::String dataType) -> void;
 
-    auto complexity() const -> const common::String &;
-    auto setComplexity(common::String complexity) -> void;
+    auto complexity() const -> Complexity;
+    auto setComplexity(Complexity complexity) -> void;
 
     auto description() const -> const common::String &;
     auto setDescription(common::String description) -> void;
 
-    auto dimensions() const -> const common::String &;
-    auto setDimensions(common::String dimensions) -> void;
+    auto dimensions() const -> const Dimensions &;
+    auto setDimensions(Dimensions dimensions) -> void;
 
-    auto dimensionsMode() const -> const common::String &;
-    auto setDimensionsMode(common::String dimensionsMode) -> void;
+    auto dimensionsMode() const -> DimensionsMode;
+    auto setDimensionsMode(DimensionsMode dimensionsMode) -> void;
 
     auto max() const -> const common::String &;
     auto setMax(common::String max) -> void;
@@ -63,10 +66,10 @@ public:
 
 private:
     common::String m_dataType;
-    common::String m_complexity;
+    Complexity m_complexity;
     common::String m_description;
-    common::String m_dimensions;
-    common::String m_dimensionsMode;
+    Dimensions m_dimensions;
+    DimensionsMode m_dimensionsMode;
     common::String m_max;
     common::String m_min;
     common::String m_sampleTime;

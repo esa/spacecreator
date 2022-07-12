@@ -71,7 +71,7 @@ public:
 /**
  * @brief   Exception thrown when unexpected EOF occured
  */
-class UnexpectedEOF : public ParserException
+class UnexpectedEof : public ParserException
 {
 public:
     /**
@@ -79,7 +79,7 @@ public:
      *
      * @param   elementType     Type of the element in which EOF was encountered in
      */
-    UnexpectedEOF(const StringRef &elementType);
+    UnexpectedEof(const StringRef &elementType);
 };
 
 } // namespace simulink::importer

@@ -23,6 +23,7 @@
 #include "rootdatatype.h"
 
 #include <simulink/SimulinkCommon/basetypesmappings.h>
+#include <simulink/SimulinkModel/common/datascope.h>
 #include <vector>
 
 namespace simulink::model {
@@ -38,8 +39,8 @@ public:
     BusDataType &operator=(BusDataType &&) = default;
 
 public:
-    auto dataScope() const -> const common::String &;
-    auto setDataScope(common::String dataScope) -> void;
+    auto dataScope() const -> DataScope;
+    auto setDataScope(DataScope dataScope) -> void;
 
     auto description() const -> const common::String &;
     auto setDescription(common::String description) -> void;
@@ -54,7 +55,7 @@ public:
     auto addBusMember(BusMember busMember) -> void;
 
 private:
-    common::String m_dataScope;
+    DataScope m_dataScope;
     common::String m_description;
     common::String m_headerFile;
     common::String m_alignment;

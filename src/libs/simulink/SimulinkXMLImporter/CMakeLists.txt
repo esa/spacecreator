@@ -18,6 +18,7 @@ target_include_directories(SimulinkXmlImporter
 target_link_libraries(SimulinkXmlImporter
     PUBLIC      Conversion::Common
                 SIMULINK::Model
+                ${QT_CORE}
     PRIVATE     Qt${QT_VERSION_MAJOR}::Xml
                 CommonProjectWarnings)
 

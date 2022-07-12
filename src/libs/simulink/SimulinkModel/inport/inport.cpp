@@ -141,12 +141,12 @@ void Inport::setPort(common::String port)
     m_port = std::move(port);
 }
 
-const common::String &Inport::portDimensions() const
+const PortDimension &Inport::portDimensions() const
 {
     return m_portDimensions;
 }
 
-void Inport::setPortDimensions(common::String portDimensions)
+void Inport::setPortDimensions(PortDimension portDimensions)
 {
     m_portDimensions = std::move(portDimensions);
 }
@@ -161,14 +161,14 @@ void Inport::setSampleTime(common::String sampleTime)
     m_sampleTime = std::move(sampleTime);
 }
 
-const common::String &Inport::signalType() const
+SignalType Inport::signalType() const
 {
     return m_signalType;
 }
 
-void Inport::setSignalType(common::String signalType)
+void Inport::setSignalType(SignalType signalType)
 {
-    m_signalType = std::move(signalType);
+    m_signalType = signalType;
 }
 
 const common::String &Inport::unit() const

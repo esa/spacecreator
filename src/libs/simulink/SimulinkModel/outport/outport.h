@@ -20,7 +20,9 @@
 #pragma once
 
 #include <simulink/SimulinkCommon/basetypesmappings.h>
-#include <simulink/SimulinkModel/base/namedentity.h>
+#include <simulink/SimulinkModel/common/namedentity.h>
+#include <simulink/SimulinkModel/common/portdimension.h>
+#include <simulink/SimulinkModel/common/signaltype.h>
 
 namespace simulink::model {
 
@@ -68,8 +70,8 @@ public:
     auto port() const -> const common::String &;
     auto setPort(common::String port) -> void;
 
-    auto portDimensions() const -> const common::String &;
-    auto setPortDimensions(common::String portDimensions) -> void;
+    auto portDimensions() const -> const PortDimension &;
+    auto setPortDimensions(PortDimension portDimensions) -> void;
 
     auto sampleTime() const -> const common::String &;
     auto setSampleTime(common::String sampleTime) -> void;
@@ -80,8 +82,8 @@ public:
     auto signalObject() const -> const common::String &;
     auto setSignalObject(common::String signalObject) -> void;
 
-    auto signalType() const -> const common::String &;
-    auto setSignalType(common::String signalType) -> void;
+    auto signalType() const -> const SignalType &;
+    auto setSignalType(SignalType signalType) -> void;
 
     auto storageClass() const -> const common::String &;
     auto setStorageClass(common::String storageClass) -> void;
@@ -111,11 +113,11 @@ private:
     common::String m_outMin;
     common::String m_outputWhenDisabled;
     common::String m_port;
-    common::String m_portDimensions;
+    PortDimension m_portDimensions;
     common::String m_sampleTime;
     common::String m_signalName;
     common::String m_signalObject;
-    common::String m_signalType;
+    SignalType m_signalType;
     common::String m_storageClass;
     common::String m_unit;
     common::String m_unitNoProp;

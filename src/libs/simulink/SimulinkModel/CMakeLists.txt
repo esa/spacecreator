@@ -1,9 +1,13 @@
 project(SimulinkModel VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES
-    base/namedentity.cpp
+    common/namedentity.cpp
+    common/signaltype.cpp
+    common/datascope.cpp
+    common/complexity.cpp
+    common/dimensionsmode.cpp
+    common/vectordimensions.cpp
     simulinkmodel.cpp
-    modelinterface.cpp
     inport/inport.cpp
     outport/outport.cpp
     datatypes/aliasdatatype.cpp
@@ -15,9 +19,15 @@ set(SOURCES
     datatypes/rootdatatype.cpp
     )
 set(INCLUDES
-    base/namedentity.h
+    common/namedentity.h
+    common/signaltype.h
+    common/datascope.h
+    common/complexity.h
+    common/dimensionsmode.h
+    common/vectordimensions.h
+    common/portdimension.h
+    common/dimensions.h
     simulinkmodel.h
-    modelinterface.h
     inport/inport.h
     outport/outport.h
     datatypes/aliasdatatype.h

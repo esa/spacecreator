@@ -141,12 +141,12 @@ void Outport::setPort(common::String port)
     m_port = std::move(port);
 }
 
-const common::String &Outport::portDimensions() const
+const PortDimension &Outport::portDimensions() const
 {
     return m_portDimensions;
 }
 
-void Outport::setPortDimensions(common::String portDimensions)
+void Outport::setPortDimensions(PortDimension portDimensions)
 {
     m_portDimensions = std::move(portDimensions);
 }
@@ -181,12 +181,12 @@ void Outport::setSignalObject(common::String signalObject)
     m_signalObject = std::move(signalObject);
 }
 
-const common::String &Outport::signalType() const
+const SignalType &Outport::signalType() const
 {
     return m_signalType;
 }
 
-void Outport::setSignalType(common::String signalType)
+void Outport::setSignalType(SignalType signalType)
 {
     m_signalType = std::move(signalType);
 }

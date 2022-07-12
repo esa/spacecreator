@@ -22,6 +22,7 @@
 #include "rootdatatype.h"
 
 #include <simulink/SimulinkCommon/basetypesmappings.h>
+#include <simulink/SimulinkModel/common/datascope.h>
 
 namespace simulink::model {
 
@@ -36,8 +37,8 @@ public:
     auto baseType() const -> const common::String &;
     auto setBaseType(common::String baseType) -> void;
 
-    auto dataScope() const -> const common::String &;
-    auto setDataScope(common::String dataScope) -> void;
+    auto dataScope() const -> DataScope;
+    auto setDataScope(DataScope dataScope) -> void;
 
     auto description() const -> const common::String &;
     auto setDescription(common::String description) -> void;
@@ -47,7 +48,7 @@ public:
 
 private:
     common::String m_baseType;
-    common::String m_dataScope;
+    DataScope m_dataScope;
     common::String m_description;
     common::String m_headerFile;
 };

@@ -21,7 +21,9 @@
 
 #include "exceptions.h"
 
+#include <QDebug>
 #include <QFileInfo>
+#include <QVariant>
 #include <QXmlStreamReader>
 #include <conversion/common/exceptions.h>
 #include <conversion/common/import/exceptions.h>
@@ -37,6 +39,8 @@ using conversion::FileNotFoundException;
 using conversion::Options;
 using conversion::importer::ImportException;
 using conversion::simulink::SimulinkOptions;
+using simulink::model::Dimensions;
+using simulink::model::VectorDimensions;
 
 namespace simulink::importer {
 
@@ -57,17 +61,6 @@ std::unique_ptr<conversion::Model> SimulinkXmlImporter::importModel(const Option
     return model;
 }
 
-bool SimulinkXmlImporter::processForNamedEntity(model::NamedEntity &namedEntity, const QXmlStreamAttribute &attribute)
-{
-    if (attribute.name() == QStringLiteral("Name")) {
-        namedEntity.setName(attribute.value().toString());
-    } else {
-        return false;
-    }
-
-    return true;
-}
-
 std::unique_ptr<conversion::Model> SimulinkXmlImporter::parse(const common::String &inputSimulinkFilename)
 {
     QFile inputSimulinkFile(inputSimulinkFilename);
@@ -80,40 +73,40 @@ std::unique_ptr<conversion::Model> SimulinkXmlImporter::parse(const common::Stri
     xmlReader.readNextStartElement();
 
     if (xmlReader.name() == QLatin1String("ModelInterface")) {
-        return std::make_unique<model::SimulinkModel>(readModelInterface(xmlReader));
+        auto simulinkModel = std::make_unique<model::SimulinkModel>();
+        readSimulinkModel(xmlReader, simulinkModel);
+        return simulinkModel;
     } else {
         throw UnhandledElement(xmlReader.name(), "Root");
     }
 }
 
-model::ModelInterface SimulinkXmlImporter::readModelInterface(QXmlStreamReader &xmlReader)
+void SimulinkXmlImporter::readSimulinkModel(
+        QXmlStreamReader &xmlReader, std::unique_ptr<model::SimulinkModel> &simulinkModel)
 {
-    model::ModelInterface modelInterface;
-
     while (xmlReader.readNextStartElement()) {
         if (xmlReader.name() == QStringLiteral("DataTypes")) {
-            readDataTypes(xmlReader, modelInterface);
+            readDataTypes(xmlReader, simulinkModel);
         } else if (xmlReader.name() == QStringLiteral("Inports")) {
-            readInports(xmlReader, modelInterface);
+            readInports(xmlReader, simulinkModel);
         } else if (xmlReader.name() == QStringLiteral("Outports")) {
-            readOutports(xmlReader, modelInterface);
+            readOutports(xmlReader, simulinkModel);
         } else {
             throw UnhandledElement(xmlReader.name(), "ModelInterface");
         }
     }
-
-    return modelInterface;
 }
 
-void SimulinkXmlImporter::readDataTypes(QXmlStreamReader &xmlReader, model::ModelInterface &modelInterface)
+void SimulinkXmlImporter::readDataTypes(
+        QXmlStreamReader &xmlReader, std::unique_ptr<model::SimulinkModel> &simulinkModel)
 {
     while (xmlReader.readNextStartElement()) {
         if (xmlReader.name() == QStringLiteral("EnumDataType")) {
-            modelInterface.addDataType(readEnumDataType(xmlReader));
+            simulinkModel->addDataType(readEnumDataType(xmlReader));
         } else if (xmlReader.name() == QStringLiteral("AliasDataType")) {
-            modelInterface.addDataType(readAliasDataType(xmlReader));
+            simulinkModel->addDataType(readAliasDataType(xmlReader));
         } else if (xmlReader.name() == QStringLiteral("BusDataType")) {
-            modelInterface.addDataType(readBusDataType(xmlReader));
+            simulinkModel->addDataType(readBusDataType(xmlReader));
         } else {
             throw UnhandledElement(xmlReader.name(), "Workspace");
         }
@@ -128,9 +121,9 @@ model::EnumDataType SimulinkXmlImporter::readEnumDataType(QXmlStreamReader &xmlR
         if (processForNamedEntity(enumDataType, attribute)) {
             continue;
         } else if (attribute.name() == QStringLiteral("AddClassNameToEnumNames")) {
-            enumDataType.setAddClassNameToEnumNames(attribute.value().toString());
+            enumDataType.setAddClassNameToEnumNames(parseBool(attribute.value()));
         } else if (attribute.name() == QStringLiteral("DataScope")) {
-            enumDataType.setDataScope(attribute.value().toString());
+            enumDataType.setDataScope(parseDataScope(attribute.value()));
         } else if (attribute.name() == QStringLiteral("DefaultValue")) {
             enumDataType.setDefaultValue(attribute.value().toString());
         } else if (attribute.name() == QStringLiteral("Description")) {
@@ -172,7 +165,7 @@ model::EnumValue SimulinkXmlImporter::readEnumValue(QXmlStreamReader &xmlReader)
         if (processForNamedEntity(enumValue, attribute)) {
             continue;
         } else if (attribute.name() == QStringLiteral("Value")) {
-            enumValue.setValue(attribute.value().toString());
+            enumValue.setValue(parseInt64(attribute.value()));
         } else if (attribute.name() == QStringLiteral("Description")) {
             enumValue.setDescription(attribute.value().toString());
         } else if (attribute.name() == QStringLiteral("DetailedDescription")) {
@@ -197,7 +190,7 @@ model::AliasDataType SimulinkXmlImporter::readAliasDataType(QXmlStreamReader &xm
         } else if (attribute.name() == QStringLiteral("BaseType")) {
             aliasDataType.setBaseType(attribute.value().toString());
         } else if (attribute.name() == QStringLiteral("DataScope")) {
-            aliasDataType.setDataScope(attribute.value().toString());
+            aliasDataType.setDataScope(parseDataScope(attribute.value()));
         } else if (attribute.name() == QStringLiteral("Description")) {
             aliasDataType.setDescription(attribute.value().toString());
         } else if (attribute.name() == QStringLiteral("HeaderFile")) {
@@ -220,7 +213,7 @@ model::BusDataType SimulinkXmlImporter::readBusDataType(QXmlStreamReader &xmlRea
         if (processForNamedEntity(busDataType, attribute)) {
             continue;
         } else if (attribute.name() == QStringLiteral("DataScope")) {
-            busDataType.setDataScope(attribute.value().toString());
+            busDataType.setDataScope(parseDataScope(attribute.value()));
         } else if (attribute.name() == QStringLiteral("Description")) {
             busDataType.setDescription(attribute.value().toString());
         } else if (attribute.name() == QStringLiteral("HeaderFile")) {
@@ -264,13 +257,13 @@ model::BusMember SimulinkXmlImporter::readBusMember(QXmlStreamReader &xmlReader)
         } else if (attribute.name() == QStringLiteral("DataType")) {
             busMember.setDataType(attribute.value().toString());
         } else if (attribute.name() == QStringLiteral("Complexity")) {
-            busMember.setComplexity(attribute.value().toString());
+            busMember.setComplexity(parseComplexity(attribute.value()));
         } else if (attribute.name() == QStringLiteral("Description")) {
             busMember.setDescription(attribute.value().toString());
         } else if (attribute.name() == QStringLiteral("Dimensions")) {
-            busMember.setDimensions(attribute.value().toString());
+            busMember.setDimensions(parseDimensions(attribute.value()));
         } else if (attribute.name() == QStringLiteral("DimensionsMode")) {
-            busMember.setDimensionsMode(attribute.value().toString());
+            busMember.setDimensionsMode(parseDimensionsMode(attribute.value()));
         } else if (attribute.name() == QStringLiteral("Max")) {
             busMember.setMax(attribute.value().toString());
         } else if (attribute.name() == QStringLiteral("Min")) {
@@ -289,11 +282,11 @@ model::BusMember SimulinkXmlImporter::readBusMember(QXmlStreamReader &xmlReader)
     return busMember;
 }
 
-void SimulinkXmlImporter::readInports(QXmlStreamReader &xmlReader, model::ModelInterface &modelInterface)
+void SimulinkXmlImporter::readInports(QXmlStreamReader &xmlReader, std::unique_ptr<model::SimulinkModel> &simulinkModel)
 {
     while (xmlReader.readNextStartElement()) {
         if (xmlReader.name() == QStringLiteral("Inport")) {
-            modelInterface.addInport(readInport(xmlReader));
+            simulinkModel->addInport(readInport(xmlReader));
         } else {
             throw UnhandledElement(xmlReader.name(), "Inports");
         }
@@ -332,11 +325,11 @@ model::Inport SimulinkXmlImporter::readInport(QXmlStreamReader &xmlReader)
         } else if (attribute.name() == QStringLiteral("Port")) {
             inport.setPort(attribute.value().toString());
         } else if (attribute.name() == QStringLiteral("PortDimensions")) {
-            inport.setPortDimensions(attribute.value().toString());
+            inport.setPortDimensions(parsePortDimension(attribute.value()));
         } else if (attribute.name() == QStringLiteral("SampleTime")) {
             inport.setSampleTime(attribute.value().toString());
         } else if (attribute.name() == QStringLiteral("SignalType")) {
-            inport.setSignalType(attribute.value().toString());
+            inport.setSignalType(parseSignalType(attribute.value()));
         } else if (attribute.name() == QStringLiteral("Unit")) {
             inport.setUnit(attribute.value().toString());
         } else if (attribute.name() == QStringLiteral("UnitNoProp")) {
@@ -353,11 +346,12 @@ model::Inport SimulinkXmlImporter::readInport(QXmlStreamReader &xmlReader)
     return inport;
 }
 
-void SimulinkXmlImporter::readOutports(QXmlStreamReader &xmlReader, model::ModelInterface &modelInterface)
+void SimulinkXmlImporter::readOutports(
+        QXmlStreamReader &xmlReader, std::unique_ptr<model::SimulinkModel> &simulinkModel)
 {
     while (xmlReader.readNextStartElement()) {
         if (xmlReader.name() == QStringLiteral("Outport")) {
-            modelInterface.addOutport(readOutport(xmlReader));
+            simulinkModel->addOutport(readOutport(xmlReader));
         } else {
             throw UnhandledElement(xmlReader.name(), "Outports");
         }
@@ -396,7 +390,7 @@ model::Outport SimulinkXmlImporter::readOutport(QXmlStreamReader &xmlReader)
         } else if (attribute.name() == QStringLiteral("Port")) {
             outport.setPort(attribute.value().toString());
         } else if (attribute.name() == QStringLiteral("PortDimensions")) {
-            outport.setPortDimensions(attribute.value().toString());
+            outport.setPortDimensions(parsePortDimension(attribute.value()));
         } else if (attribute.name() == QStringLiteral("SampleTime")) {
             outport.setSampleTime(attribute.value().toString());
         } else if (attribute.name() == QStringLiteral("SignalName")) {
@@ -404,7 +398,7 @@ model::Outport SimulinkXmlImporter::readOutport(QXmlStreamReader &xmlReader)
         } else if (attribute.name() == QStringLiteral("SignalObject")) {
             outport.setSignalObject(attribute.value().toString());
         } else if (attribute.name() == QStringLiteral("SignalType")) {
-            outport.setSignalType(attribute.value().toString());
+            outport.setSignalType(parseSignalType(attribute.value()));
         } else if (attribute.name() == QStringLiteral("StorageClass")) {
             outport.setStorageClass(attribute.value().toString());
         } else if (attribute.name() == QStringLiteral("Unit")) {
@@ -423,6 +417,148 @@ model::Outport SimulinkXmlImporter::readOutport(QXmlStreamReader &xmlReader)
     xmlReader.skipCurrentElement();
 
     return outport;
+}
+
+bool SimulinkXmlImporter::parseBool(const StringRef &valueStr)
+{
+    return QVariant(valueStr.toString()).toBool();
+}
+
+int64_t SimulinkXmlImporter::parseInt64(const StringRef &valueStr)
+{
+    bool ok = false;
+    const auto value = valueStr.toLong(&ok);
+
+    if (ok) {
+        return value;
+    }
+
+    throw ParserException(QString("Unable to parse int64 value '%1'").arg(valueStr));
+}
+
+bool SimulinkXmlImporter::processForNamedEntity(model::NamedEntity &namedEntity, const QXmlStreamAttribute &attribute)
+{
+    if (attribute.name() == QStringLiteral("Name")) {
+        namedEntity.setName(attribute.value().toString());
+    } else {
+        return false;
+    }
+
+    return true;
+}
+
+model::DataScope SimulinkXmlImporter::parseDataScope(const StringRef &dataScopeStr)
+{
+    auto dataScope = model::enumFromString<model::DataScope>(dataScopeStr);
+
+    if (dataScope) {
+        return *dataScope;
+    } else {
+        throw ParserException(QString("Unable to parse data scope '%1'").arg(dataScopeStr));
+    }
+}
+
+model::Complexity SimulinkXmlImporter::parseComplexity(const StringRef &complexityStr)
+{
+    auto complexity = model::enumFromString<model::Complexity>(complexityStr);
+
+    if (complexity) {
+        return *complexity;
+    } else {
+        throw ParserException(QString("Unable to parse complexity '%1'").arg(complexityStr));
+    }
+}
+
+model::Dimensions SimulinkXmlImporter::parseDimensions(const StringRef &dimensionsStr)
+{
+    if (dimensionsStr.isEmpty())
+        throw ParserException(QString("Dimensions is empty"));
+
+    const auto trimmedStrRef = dimensionsStr.trimmed();
+
+    const auto conversionNumberBase = 10;
+    auto conversionSuccess = false;
+    const auto scalarValue = trimmedStrRef.toLong(&conversionSuccess, conversionNumberBase);
+
+    if (conversionSuccess) {
+        if (scalarValue == -1 || scalarValue > 0)
+            return Dimensions(scalarValue);
+        else {
+            throw ParserException(
+                    QString("Value of dimension should be -1 or be greater than 0 '%1'").arg(scalarValue));
+        }
+    } else if ((trimmedStrRef.front() == '[') && (trimmedStrRef.back() == ']')) {
+        const auto preparedStr = trimmedStrRef.toString()
+                                         .remove(trimmedStrRef.size() - 1, 1) // removing ']'
+                                         .remove(0, 1) // removing '['
+                                         .replace(QChar(';'), QChar(' '), Qt::CaseSensitive); // replacing ';' to ' '
+
+        const auto splitBySpacesStrList = preparedStr.split(' ', QString::SkipEmptyParts, Qt::CaseSensitive);
+        const auto splitBySpacesStrListSize = splitBySpacesStrList.size();
+
+        if (splitBySpacesStrListSize == 0) {
+            throw ParserException(QString("Dimensions Array is empty"));
+        } else if (splitBySpacesStrListSize > 2) {
+            throw ParserException(QString("Dimensions Array has '%1' dimension, but it should be max 2-dimensional")
+                                          .arg(splitBySpacesStrListSize));
+        } else {
+            VectorDimensions vectorDimensions;
+
+            for (const auto &dimensionValueStr : splitBySpacesStrList) {
+                const auto convertedDimensionValue = dimensionValueStr.toLong(&conversionSuccess, conversionNumberBase);
+
+                if (conversionSuccess) {
+                    if (convertedDimensionValue > 0)
+                        vectorDimensions.addValue(convertedDimensionValue);
+                    else {
+                        throw ParserException(QString("Value of dimension array should be greater than 0 '%1'")
+                                                      .arg(convertedDimensionValue));
+                    }
+                } else if (dimensionValueStr.front().isLetter()) {
+                    throw ParserException(QString("Importer doesn't handle variables '%1'").arg(dimensionValueStr));
+                } else {
+                    throw ParserException(QString("Unable to parse one of array value '%1'").arg(dimensionValueStr));
+                }
+            }
+
+            return Dimensions(std::move(vectorDimensions));
+        }
+    } else if ((trimmedStrRef.front() == '{') && (trimmedStrRef.back() == '}')) {
+        throw ParserException(QString("Importer doesn't handle cell array '%1'").arg(dimensionsStr));
+    } else if (trimmedStrRef.front().isLetter()) {
+        throw ParserException(QString("Importer doesn't handle variables '%1'").arg(dimensionsStr));
+    } else if (trimmedStrRef.front().isDigit()) {
+        throw ParserException(QString("Unable to parse dimension number '%1'").arg(dimensionsStr));
+    } else {
+        throw ParserException(QString("Unable to parse dimensions '%1'").arg(dimensionsStr));
+    }
+}
+
+model::DimensionsMode SimulinkXmlImporter::parseDimensionsMode(const StringRef &dimensionsModeStr)
+{
+    auto dimensionsMode = model::enumFromString<model::DimensionsMode>(dimensionsModeStr);
+
+    if (dimensionsMode) {
+        return *dimensionsMode;
+    } else {
+        throw ParserException(QString("Unable to parse dimensions mode '%1'").arg(dimensionsModeStr));
+    }
+}
+
+model::PortDimension SimulinkXmlImporter::parsePortDimension(const StringRef &portDimensionStr)
+{
+    return parseDimensions(portDimensionStr);
+}
+
+model::SignalType SimulinkXmlImporter::parseSignalType(const StringRef &signalTypeStr)
+{
+    auto signalType = model::enumFromString<model::SignalType>(signalTypeStr);
+
+    if (signalType) {
+        return *signalType;
+    } else {
+        throw ParserException(QString("Unable to parse signal type '%1'").arg(signalTypeStr));
+    }
 }
 
 } // namespace simulink::importer

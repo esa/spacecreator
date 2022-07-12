@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2022 N7 Space Sp. z o.o.
+ * @copyright (C) 2021 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,38 +17,22 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "enumvalue.h"
+#pragma once
+
+#include <simulink/SimulinkCommon/enumconversion.h>
 
 namespace simulink::model {
 
-EnumValue::Value EnumValue::value() const
+enum class DataScope
 {
-    return m_value;
-}
+    Auto,
+    Exported,
+    Imported
+};
 
-void EnumValue::setValue(Value value)
-{
-    m_value = value;
-}
+template<>
+auto enumFromString(const StringRef &enumStr) -> std::optional<DataScope>;
+template<>
+auto stringFromEnum(DataScope enumType) -> const QString &;
 
-const common::String &EnumValue::description() const
-{
-    return m_description;
-}
-
-void EnumValue::setDescription(common::String description)
-{
-    m_description = std::move(description);
-}
-
-const common::String &EnumValue::detailedDescription() const
-{
-    return m_detailedDescription;
-}
-
-void EnumValue::setDetailedDescription(common::String detailedDescription)
-{
-    m_detailedDescription = std::move(detailedDescription);
-}
-
-} // namespace simulink::model
+} // namespace seds::model

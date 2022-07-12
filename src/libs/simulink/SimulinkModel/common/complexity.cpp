@@ -17,38 +17,39 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "enumvalue.h"
+#include "complexity.h"
 
 namespace simulink::model {
 
-EnumValue::Value EnumValue::value() const
+template<>
+auto enumFromString(const StringRef &enumStr) -> std::optional<Complexity>
 {
-    return m_value;
+    if (enumStr.compare(QStringLiteral("real"), Qt::CaseInsensitive) == 0) {
+        return Complexity::Real;
+    } else if (enumStr.compare(QStringLiteral("complex"), Qt::CaseInsensitive) == 0) {
+        return Complexity::Complex;
+    } else {
+        return std::nullopt;
+    }
 }
 
-void EnumValue::setValue(Value value)
+template<>
+auto stringFromEnum(Complexity enumType) -> const QString &
 {
-    m_value = value;
-}
-
-const common::String &EnumValue::description() const
-{
-    return m_description;
-}
-
-void EnumValue::setDescription(common::String description)
-{
-    m_description = std::move(description);
-}
-
-const common::String &EnumValue::detailedDescription() const
-{
-    return m_detailedDescription;
-}
-
-void EnumValue::setDetailedDescription(common::String detailedDescription)
-{
-    m_detailedDescription = std::move(detailedDescription);
+    switch (enumType) {
+    case Complexity::Real: {
+        static const QString strValue = "Real";
+        return strValue;
+    }
+    case Complexity::Complex: {
+        static const QString strValue = "Complex";
+        return strValue;
+    }
+    default: {
+        static const QString unhandled = "unhandledSignalType";
+        return unhandled;
+    }
+    }
 }
 
 } // namespace simulink::model

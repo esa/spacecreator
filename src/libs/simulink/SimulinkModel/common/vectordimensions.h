@@ -17,38 +17,30 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "enumvalue.h"
+#pragma once
+
+#include <cstdint>
+#include <vector>
 
 namespace simulink::model {
 
-EnumValue::Value EnumValue::value() const
+class VectorDimensions
 {
-    return m_value;
-}
+public:
+    using Value = int64_t;
+    using Vector = std::vector<Value>;
 
-void EnumValue::setValue(Value value)
-{
-    m_value = value;
-}
+public:
+    VectorDimensions() = default;
+    VectorDimensions(VectorDimensions &&) = default;
+    VectorDimensions &operator=(VectorDimensions &&) = default;
 
-const common::String &EnumValue::description() const
-{
-    return m_description;
-}
+public:
+    auto values() const -> const Vector &;
+    auto addValue(Value value) -> void;
 
-void EnumValue::setDescription(common::String description)
-{
-    m_description = std::move(description);
-}
-
-const common::String &EnumValue::detailedDescription() const
-{
-    return m_detailedDescription;
-}
-
-void EnumValue::setDetailedDescription(common::String detailedDescription)
-{
-    m_detailedDescription = std::move(detailedDescription);
-}
+protected:
+    Vector m_values;
+};
 
 } // namespace simulink::model

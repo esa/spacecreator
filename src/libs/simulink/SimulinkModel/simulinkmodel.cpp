@@ -21,19 +21,51 @@
 
 namespace simulink::model {
 
-SimulinkModel::SimulinkModel(ModelInterface modelInterface)
-    : m_modelInterface(std::move(modelInterface))
-{
-}
-
 conversion::ModelType SimulinkModel::modelType() const
 {
     return conversion::ModelProperties<SimulinkModel>::type;
 }
 
-const ModelInterface &SimulinkModel::modelInterface() const
+const DataType *SimulinkModel::dataType(const QString &name) const
 {
-    return m_modelInterface;
+    auto result = std::find_if(m_dataTypes.begin(), m_dataTypes.end(),
+            [&name](const auto &dataType) { return dataTypeNameStr(dataType) == name; });
+
+    if (result != m_dataTypes.end()) {
+        return &(*result);
+    }
+
+    return nullptr;
 }
 
-} // namespace seds::model
+const SimulinkModel::DataTypes &SimulinkModel::dataTypes() const
+{
+    return m_dataTypes;
+}
+
+void SimulinkModel::addDataType(DataType dataType)
+{
+    m_dataTypes.push_back(std::move(dataType));
+}
+
+const SimulinkModel::Inports &SimulinkModel::inports() const
+{
+    return m_inports;
+}
+
+void SimulinkModel::addInport(Inport inport)
+{
+    m_inports.push_back(std::move(inport));
+}
+
+const SimulinkModel::Outports &SimulinkModel::outports() const
+{
+    return m_outports;
+}
+
+void SimulinkModel::addOutport(Outport outport)
+{
+    m_outports.push_back(std::move(outport));
+}
+
+} // namespace simulink::model

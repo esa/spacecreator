@@ -21,14 +21,14 @@
 
 namespace simulink::model {
 
-const common::String &BusDataType::dataScope() const
+DataScope BusDataType::dataScope() const
 {
     return m_dataScope;
 }
 
-void BusDataType::setDataScope(common::String dataScope)
+void BusDataType::setDataScope(DataScope dataScope)
 {
-    m_dataScope = std::move(dataScope);
+    m_dataScope = dataScope;
 }
 
 const common::String &BusDataType::description() const

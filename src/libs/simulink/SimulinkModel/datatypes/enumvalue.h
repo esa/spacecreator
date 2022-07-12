@@ -20,20 +20,23 @@
 #pragma once
 
 #include <simulink/SimulinkCommon/basetypesmappings.h>
-#include <simulink/SimulinkModel/base/namedentity.h>
+#include <simulink/SimulinkModel/common/namedentity.h>
 
 namespace simulink::model {
 
 class EnumValue final : public NamedEntity
 {
 public:
+    using Value = int64_t;
+
+public:
     EnumValue() = default;
     EnumValue(EnumValue &&) = default;
     EnumValue &operator=(EnumValue &&) = default;
 
 public:
-    auto value() const -> const common::String &;
-    auto setValue(common::String value) -> void;
+    auto value() const -> Value;
+    auto setValue(Value value) -> void;
 
     auto description() const -> const common::String &;
     auto setDescription(common::String description) -> void;
@@ -42,7 +45,7 @@ public:
     auto setDetailedDescription(common::String detailedDescription) -> void;
 
 private:
-    common::String m_value;
+    Value m_value;
     common::String m_description;
     common::String m_detailedDescription;
 };

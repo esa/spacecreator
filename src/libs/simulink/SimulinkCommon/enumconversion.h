@@ -16,39 +16,28 @@
  * You should have received a copy of the GNU Library General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
+#pragma once
 
-#include "enumvalue.h"
+#include "basetypesmappings.h"
+
+#include <QString>
+#include <optional>
 
 namespace simulink::model {
 
-EnumValue::Value EnumValue::value() const
+template <typename EnumType>
+auto enumFromString(const StringRef &enumStr) -> std::optional<EnumType>
 {
-    return m_value;
+    Q_UNUSED(enumStr);
+    return std::nullopt;
 }
 
-void EnumValue::setValue(Value value)
+template <typename EnumType>
+auto stringFromEnum(EnumType enumType) -> const QString&
 {
-    m_value = value;
-}
-
-const common::String &EnumValue::description() const
-{
-    return m_description;
-}
-
-void EnumValue::setDescription(common::String description)
-{
-    m_description = std::move(description);
-}
-
-const common::String &EnumValue::detailedDescription() const
-{
-    return m_detailedDescription;
-}
-
-void EnumValue::setDetailedDescription(common::String detailedDescription)
-{
-    m_detailedDescription = std::move(detailedDescription);
+    Q_UNUSED(enumType);
+    static const QString unhandled = "unhandled";
+    return unhandled;
 }
 
 } // namespace simulink::model

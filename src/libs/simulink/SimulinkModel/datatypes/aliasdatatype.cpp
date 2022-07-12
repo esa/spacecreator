@@ -31,14 +31,14 @@ void AliasDataType::setBaseType(common::String baseType)
     m_baseType = std::move(baseType);
 }
 
-const common::String &AliasDataType::dataScope() const
+DataScope AliasDataType::dataScope() const
 {
     return m_dataScope;
 }
 
-void AliasDataType::setDataScope(common::String dataScope)
+void AliasDataType::setDataScope(DataScope dataScope)
 {
-    m_dataScope = std::move(dataScope);
+    m_dataScope = dataScope;
 }
 
 const common::String &AliasDataType::description() const
