@@ -25,6 +25,13 @@
 
 namespace simulink::model {
 
+/**
+ * @brief   Template function to convert string into appropriate enum value
+ *
+ * @param   enumStr     String that represents enum value
+ * 
+ * @return  Enum value
+ */
 template <typename EnumType>
 auto enumFromString(const StringRef &enumStr) -> std::optional<EnumType>
 {

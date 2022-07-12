@@ -21,8 +21,8 @@
 #include <QtTest>
 #include <simulink/SimulinkModel/simulinkmodel.h>
 #include <simulink/SimulinkOptions/options.h>
-#include <simulink/SimulinkXMLImporter/exceptions.h>
-#include <simulink/SimulinkXMLImporter/importer.h>
+#include <simulink/SimulinkXmlImporter/exceptions.h>
+#include <simulink/SimulinkXmlImporter/importer.h>
 #include <unittests/common/verifyexception.h>
 
 using conversion::simulink::SimulinkOptions;
@@ -35,6 +35,7 @@ using simulink::model::DimensionsMode;
 using simulink::model::PortDimension;
 using simulink::model::SignalType;
 using simulink::model::SimulinkModel;
+using simulink::model::VectorDimensions;
 
 namespace simulink::test {
 
@@ -337,9 +338,16 @@ void tst_SimulinkXmlImporter::testDimensionsMinusOne()
     try {
         const auto model = importer.importModel(options);
         const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
-        const auto &outports = simulinkModel->dataTypes();
 
-        QCOMPARE(outports.size(), 1);
+        const auto &dataTypes = simulinkModel->dataTypes();
+        QCOMPARE(dataTypes.size(), 1);
+
+        const auto *busDataType = std::get_if<model::BusDataType>(&dataTypes.front());
+        QCOMPARE(busDataType->busMembers().size(), 1);
+
+        const auto &dimensions = busDataType->busMembers().front().dimensions();
+        const auto *dimensionsValue = std::get_if<int64_t>(&dimensions);
+        QCOMPARE(*dimensionsValue, -1);
 
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
@@ -357,9 +365,16 @@ void tst_SimulinkXmlImporter::testDimensionsTwo()
     try {
         const auto model = importer.importModel(options);
         const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
-        const auto &outports = simulinkModel->dataTypes();
 
-        QCOMPARE(outports.size(), 1);
+        const auto &dataTypes = simulinkModel->dataTypes();
+        QCOMPARE(dataTypes.size(), 1);
+
+        const auto *busDataType = std::get_if<model::BusDataType>(&dataTypes.front());
+        QCOMPARE(busDataType->busMembers().size(), 1);
+
+        const auto &dimensions = busDataType->busMembers().front().dimensions();
+        const auto *dimensionsValue = std::get_if<int64_t>(&dimensions);
+        QCOMPARE(*dimensionsValue, 2);
 
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
@@ -377,9 +392,16 @@ void tst_SimulinkXmlImporter::testDimensionsIntMax()
     try {
         const auto model = importer.importModel(options);
         const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
-        const auto &outports = simulinkModel->dataTypes();
 
-        QCOMPARE(outports.size(), 1);
+        const auto &dataTypes = simulinkModel->dataTypes();
+        QCOMPARE(dataTypes.size(), 1);
+
+        const auto *busDataType = std::get_if<model::BusDataType>(&dataTypes.front());
+        QCOMPARE(busDataType->busMembers().size(), 1);
+
+        const auto &dimensions = busDataType->busMembers().front().dimensions();
+        const auto *dimensionsValue = std::get_if<int64_t>(&dimensions);
+        QCOMPARE(*dimensionsValue, 2147483647);
 
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
@@ -397,9 +419,16 @@ void tst_SimulinkXmlImporter::testDimensionsIntMaxPlusOne()
     try {
         const auto model = importer.importModel(options);
         const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
-        const auto &outports = simulinkModel->dataTypes();
 
-        QCOMPARE(outports.size(), 1);
+        const auto &dataTypes = simulinkModel->dataTypes();
+        QCOMPARE(dataTypes.size(), 1);
+
+        const auto *busDataType = std::get_if<model::BusDataType>(&dataTypes.front());
+        QCOMPARE(busDataType->busMembers().size(), 1);
+
+        const auto &dimensions = busDataType->busMembers().front().dimensions();
+        const auto *dimensionsValue = std::get_if<int64_t>(&dimensions);
+        QCOMPARE(*dimensionsValue, 2147483648);
 
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
@@ -441,9 +470,17 @@ void tst_SimulinkXmlImporter::testDimensionsVec2()
     try {
         const auto model = importer.importModel(options);
         const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
-        const auto &outports = simulinkModel->dataTypes();
 
-        QCOMPARE(outports.size(), 1);
+        const auto &dataTypes = simulinkModel->dataTypes();
+        QCOMPARE(dataTypes.size(), 1);
+
+        const auto *busDataType = std::get_if<model::BusDataType>(&dataTypes.front());
+        QCOMPARE(busDataType->busMembers().size(), 1);
+
+        const auto &dimensions = busDataType->busMembers().front().dimensions();
+        const auto *dimensionsValues = std::get_if<VectorDimensions>(&dimensions);
+        QCOMPARE(dimensionsValues->values().size(), 1);
+        QCOMPARE(dimensionsValues->values().front(), 2);
 
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
@@ -461,9 +498,17 @@ void tst_SimulinkXmlImporter::testDimensionsVecIntMax()
     try {
         const auto model = importer.importModel(options);
         const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
-        const auto &outports = simulinkModel->dataTypes();
 
-        QCOMPARE(outports.size(), 1);
+        const auto &dataTypes = simulinkModel->dataTypes();
+        QCOMPARE(dataTypes.size(), 1);
+
+        const auto *busDataType = std::get_if<model::BusDataType>(&dataTypes.front());
+        QCOMPARE(busDataType->busMembers().size(), 1);
+
+        const auto &dimensions = busDataType->busMembers().front().dimensions();
+        const auto *dimensionsValues = std::get_if<VectorDimensions>(&dimensions);
+        QCOMPARE(dimensionsValues->values().size(), 1);
+        QCOMPARE(dimensionsValues->values().front(), 2147483647);
 
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
@@ -481,9 +526,18 @@ void tst_SimulinkXmlImporter::testDimensionsVec23()
     try {
         const auto model = importer.importModel(options);
         const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
-        const auto &outports = simulinkModel->dataTypes();
 
-        QCOMPARE(outports.size(), 1);
+        const auto &dataTypes = simulinkModel->dataTypes();
+        QCOMPARE(dataTypes.size(), 1);
+
+        const auto *busDataType = std::get_if<model::BusDataType>(&dataTypes.front());
+        QCOMPARE(busDataType->busMembers().size(), 1);
+
+        const auto &dimensions = busDataType->busMembers().front().dimensions();
+        const auto *dimensionsValues = std::get_if<VectorDimensions>(&dimensions);
+        QCOMPARE(dimensionsValues->values().size(), 2);
+        QCOMPARE(dimensionsValues->values()[0], 2);
+        QCOMPARE(dimensionsValues->values()[1], 3);
 
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
@@ -525,9 +579,18 @@ void tst_SimulinkXmlImporter::testDimensionsVec23Spaces()
     try {
         const auto model = importer.importModel(options);
         const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
-        const auto &outports = simulinkModel->dataTypes();
 
-        QCOMPARE(outports.size(), 1);
+        const auto &dataTypes = simulinkModel->dataTypes();
+        QCOMPARE(dataTypes.size(), 1);
+
+        const auto *busDataType = std::get_if<model::BusDataType>(&dataTypes.front());
+        QCOMPARE(busDataType->busMembers().size(), 1);
+
+        const auto &dimensions = busDataType->busMembers().front().dimensions();
+        const auto *dimensionsValues = std::get_if<VectorDimensions>(&dimensions);
+        QCOMPARE(dimensionsValues->values().size(), 2);
+        QCOMPARE(dimensionsValues->values()[0], 2);
+        QCOMPARE(dimensionsValues->values()[1], 3);
 
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
@@ -545,9 +608,18 @@ void tst_SimulinkXmlImporter::testDimensionsVec2sc2()
     try {
         const auto model = importer.importModel(options);
         const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
-        const auto &outports = simulinkModel->dataTypes();
 
-        QCOMPARE(outports.size(), 1);
+        const auto &dataTypes = simulinkModel->dataTypes();
+        QCOMPARE(dataTypes.size(), 1);
+
+        const auto *busDataType = std::get_if<model::BusDataType>(&dataTypes.front());
+        QCOMPARE(busDataType->busMembers().size(), 1);
+
+        const auto &dimensions = busDataType->busMembers().front().dimensions();
+        const auto *dimensionsValues = std::get_if<VectorDimensions>(&dimensions);
+        QCOMPARE(dimensionsValues->values().size(), 2);
+        QCOMPARE(dimensionsValues->values()[0], 2);
+        QCOMPARE(dimensionsValues->values()[1], 2);
 
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
@@ -577,9 +649,18 @@ void tst_SimulinkXmlImporter::testDimensionsVecIntMaxIntMaxIntMax()
     try {
         const auto model = importer.importModel(options);
         const auto simulinkModel = dynamic_cast<SimulinkModel *>(model.get());
-        const auto &outports = simulinkModel->dataTypes();
 
-        QCOMPARE(outports.size(), 1);
+        const auto &dataTypes = simulinkModel->dataTypes();
+        QCOMPARE(dataTypes.size(), 1);
+
+        const auto *busDataType = std::get_if<model::BusDataType>(&dataTypes.front());
+        QCOMPARE(busDataType->busMembers().size(), 1);
+
+        const auto &dimensions = busDataType->busMembers().front().dimensions();
+        const auto *dimensionsValues = std::get_if<VectorDimensions>(&dimensions);
+        QCOMPARE(dimensionsValues->values().size(), 2);
+        QCOMPARE(dimensionsValues->values()[0], 2147483647);
+        QCOMPARE(dimensionsValues->values()[1], 2147483647);
 
     } catch (const std::exception &ex) {
         QFAIL(ex.what());

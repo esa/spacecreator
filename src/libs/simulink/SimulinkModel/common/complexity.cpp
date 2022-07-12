@@ -46,7 +46,7 @@ auto stringFromEnum(Complexity enumType) -> const QString &
         return strValue;
     }
     default: {
-        static const QString unhandled = "unhandledSignalType";
+        static const QString unhandled = "unhandledComplexity";
         return unhandled;
     }
     }

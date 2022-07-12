@@ -46,7 +46,7 @@ public:
      */
     SimulinkModel() = default;
     /**
-     * @brief   Deleted copy constructor/
+     * @brief   Deleted copy constructor
      */
     SimulinkModel(const SimulinkModel &) = delete;
     /**
@@ -72,14 +72,51 @@ public:
     virtual auto modelType() const -> conversion::ModelType override;
 
 public:
+    /**
+     * @brief   Return data type that has name equal to 'name' param
+     *
+     * @param   name     Data type name
+     *
+     * @return  Pointer to data type or nullptr if it does not exist
+     */
     auto dataType(const QString &name) const -> const DataType *;
+    /**
+     * @brief   Return vector of all data types accessible in Simulink Model
+     *
+     * @return  Pointer to data type or nullptr if it does not exist
+     */
     auto dataTypes() const -> const DataTypes &;
+    /**
+     * @brief   Append data type to Simulink Model
+     *
+     * @param   dataType    Data type object
+     */
     auto addDataType(DataType dataType) -> void;
 
+    /**
+     * @brief   Return vector of all inports accessible in Simulink Model
+     *
+     * @return  Reference to vector contains all inport objects
+     */
     auto inports() const -> const Inports &;
+    /**
+     * @brief   Append inport to Simulink Model
+     *
+     * @param   inport    Inport object
+     */
     auto addInport(Inport inport) -> void;
 
+    /**
+     * @brief   Return vector of all outports accessible in Simulink Model
+     *
+     * @return  Reference to vector contains all outport objects
+     */
     auto outports() const -> const Outports &;
+    /**
+     * @brief   Append outport to Simulink Model
+     *
+     * @param   inport    outport object
+     */
     auto addOutport(Outport outport) -> void;
 
 private:

@@ -46,7 +46,7 @@ auto stringFromEnum(DimensionsMode enumType) -> const QString &
         return strValue;
     }
     default: {
-        static const QString unhandled = "unhandledSignalType";
+        static const QString unhandled = "unhandledDimensionsMode";
         return unhandled;
     }
     }

@@ -52,7 +52,7 @@ auto stringFromEnum(DataScope enumType) -> const QString &
         return strValue;
     }
     default: {
-        static const QString unhandled = "unhandledSignalType";
+        static const QString unhandled = "unhandledDataScope";
         return unhandled;
     }
     }
