@@ -229,8 +229,8 @@ private:
             const QString &parameterType, const QString &sendInline, const conversion::Options &options) const
             -> std::unique_ptr<model::Proctype>;
     auto generateSendInline(const QString &functionName, const QString &interfaceName, const QString &parameterName,
-            const QString &parameterType, const QString &sourceFunctionName, const QString &sourceInterfaceName) const
-            -> std::unique_ptr<model::InlineDef>;
+            const QString &parameterType, const QString &sourceFunctionName, const QString &sourceInterfaceName,
+            const bool parameterSubtyped) const -> std::unique_ptr<model::InlineDef>;
     auto createPromelaObjectsForFunction(Context &context, const ::ivm::IVModel *ivModel, ::ivm::IVFunction *ivFunction,
             const QString &functionName) const -> void;
     auto createPromelaObjectsForEnvironment(Context &context, const ::ivm::IVModel *ivModel,
@@ -264,10 +264,11 @@ private:
     auto handleParameterType(const QString &parameterTypeName, const QString &parameterName,
             const QString &interfaceName, const QString &functionName,
             const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const -> QString;
+    auto handleSendInlineParameter(const QString &argumentName, const QString &parameterType,
+            promela::model::Sequence &sequence) const -> promela::model::Expression;
     auto handleSendInlineArgument(const QString &parameterType, const QString &functionName,
             const QString &interfaceName, const QString parameterName, promela::model::Sequence &sequence) const
             -> QList<QString>;
-    auto handleSendInlineParameter(const QString &argumentName) const -> promela::model::Expression;
 
     auto buildParameterSubtypeName(
             const QString &functionName, const QString &interfaceName, const QString &parameterName) const -> QString;

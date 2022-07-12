@@ -575,7 +575,7 @@ std::unique_ptr<model::ProctypeElement> IvToPromelaTranslator::createWaitForInit
 
 std::unique_ptr<model::InlineDef> IvToPromelaTranslator::generateSendInline(const QString &functionName,
         const QString &interfaceName, const QString &parameterName, const QString &parameterType,
-        const QString &sourceFunctionName, const QString &sourceInterfaceName) const
+        const QString &sourceFunctionName, const QString &sourceInterfaceName, const bool parameterSubtyped) const
 {
     QString inlineName =
             QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(sourceFunctionName)).arg(sourceInterfaceName);
@@ -587,7 +587,11 @@ std::unique_ptr<model::InlineDef> IvToPromelaTranslator::generateSendInline(cons
 
     QList<Expression> params;
     for (const auto &argumentName : arguments) {
-        params.append(handleSendInlineParameter(argumentName));
+        if (parameterSubtyped) {
+            params.append(handleSendInlineParameter(argumentName, parameterType, sequence));
+        } else {
+            params.append(Expression(VariableRef(argumentName)));
+        }
     }
 
     std::unique_ptr<ProctypeElement> channelSend =
@@ -628,8 +632,8 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslato
         const QString parameterName = parameter.first;
         const QString parameterType = parameter.second;
 
-        context.model()->addInlineDef(generateSendInline(
-                functionName, interfaceName, parameterName, parameterType, sourceFunctionName, sourceInterfaceName));
+        context.model()->addInlineDef(generateSendInline(functionName, interfaceName, parameterName, parameterType,
+                sourceFunctionName, sourceInterfaceName, false));
 
         context.model()->addProctype(
                 generateProctype(context, functionName, interfaceName, parameterType, queueSize, priority, false));
@@ -667,8 +671,10 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTransl
         const QString parameterType = handleParameterType(
                 parameter.second, parameterName, interfaceName, functionName, asn1SubtypesDefinitions);
 
-        context.model()->addInlineDef(generateSendInline(
-                functionName, interfaceName, parameterName, parameterType, sourceFunctionName, sourceInterfaceName));
+        const auto parameterSubtyped = (parameterType != parameter.second);
+
+        context.model()->addInlineDef(generateSendInline(functionName, interfaceName, parameterName, parameter.second,
+                sourceFunctionName, sourceInterfaceName, parameterSubtyped));
 
         const size_t queueSize = getInterfaceQueueSize(providedInterface);
         const size_t priority = getInterfacePriority(providedInterface);
@@ -1019,11 +1025,24 @@ QList<QString> IvToPromelaTranslator::handleSendInlineArgument(const QString &pa
     return arguments;
 }
 
-Expression IvToPromelaTranslator::handleSendInlineParameter(const QString &argumentName) const
+Expression IvToPromelaTranslator::handleSendInlineParameter(
+        const QString &argumentName, const QString &parameterType, Sequence &sequence) const
 {
-    auto parameter = Expression(VariableRef(argumentName));
+    const auto parameterName = QString("%1_value").arg(argumentName);
 
-    return parameter;
+    auto parameterDecl = Declaration(DataType(UtypeRef(Escaper::escapePromelaName(parameterType))), parameterName);
+    auto parameterDeclElem = std::make_unique<ProctypeElement>(std::move(parameterDecl));
+    sequence.appendElement(std::move(parameterDeclElem));
+
+    const auto inlineCallName = QString("%1_assign_value").arg(Escaper::escapePromelaName(parameterType));
+    QList<InlineCall::Argument> inlineArguments;
+    inlineArguments.append(VariableRef(parameterName));
+    inlineArguments.append(VariableRef(argumentName));
+    auto inlineCall = InlineCall(inlineCallName, inlineArguments);
+    auto inlineCallElem = std::make_unique<ProctypeElement>(std::move(inlineCall));
+    sequence.appendElement(std::move(inlineCallElem));
+
+    return Expression(VariableRef(parameterName));
 }
 
 QString IvToPromelaTranslator::buildParameterSubtypeName(
