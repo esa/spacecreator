@@ -40,6 +40,7 @@ private Q_SLOTS:
     void test_readFunction();
     void test_readFunctionLanguages();
     void test_connectionGroup();
+    void test_multicast();
 };
 
 void IVXMLReader::runReader(const XmlFileMock &xml)
@@ -181,6 +182,22 @@ void IVXMLReader::test_connectionGroup()
 
     QList<QPointer<ivm::IVConnection>> groupedConnection = cgroup->groupedConnections();
     QCOMPARE(groupedConnection.size(), 2);
+}
+
+void IVXMLReader::test_multicast()
+{
+    ivm::IVXMLReader reader;
+    reader.readFile(":/data/multicast.xml");
+    const QVector<ivm::IVObject *> objectsList = reader.parsedObjects();
+
+    QVector<ivm::IVConnection *> connections;
+    for (ivm::IVObject *object : objectsList) {
+        if (object->type() == ivm::IVObject::Type::Connection) {
+            auto connection = static_cast<ivm::IVConnection *>(object);
+            connections.append(connection);
+        }
+    }
+    QCOMPARE(connections.size(), 2);
 }
 
 QTEST_APPLESS_MAIN(IVXMLReader)

@@ -1,0 +1,49 @@
+<InterfaceView asn1file="one2m.acn">
+<Function name="dstA" is_type="NO" language="C" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="104000 33500 129600 49700"/>
+<Provided_Interface name="pi_a" kind="Sporadic" enable_multicast="true" layer="default" queue_size="1" priority="1" wcet="0" miat="0" stack_size="1024">
+    <Property name="Taste::coordinates" value="104000 42500"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Function name="src" is_type="NO" language="C" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="35000 35900 61800 54700"/>
+<Required_Interface name="pi_a" kind="Sporadic" enable_multicast="true" layer="default" queue_size="1" priority="1" wcet="0" miat="0" stack_size="1024">
+    <Property name="Taste::coordinates" value="61800 46600"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Function name="dstB" is_type="NO" language="C" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="105000 80700 128400 94500"/>
+<Provided_Interface name="pi_b" kind="Sporadic" enable_multicast="true" layer="default" queue_size="1" priority="1" wcet="0" miat="0" stack_size="1024">
+    <Property name="Taste::coordinates" value="105000 87300"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Connection >
+    <Source func_name="src" ri_name="pi_a"/>
+    <Target func_name="dstB" pi_name="pi_b"/>
+    <Property name="Taste::coordinates" value="62400 46600 83500 46600 83500 87300 104700 87300"/>
+</Connection>
+
+<Connection >
+    <Source func_name="src" ri_name="pi_a"/>
+    <Target func_name="dstA" pi_name="pi_a"/>
+    <Property name="Taste::coordinates" value="62400 46600 83000 46600 83000 42500 103700 42500"/>
+</Connection>
+
+</InterfaceView>
