@@ -26,6 +26,10 @@
 
 namespace ivm {
 
+/**
+ * @brief The IVConnectionLayerType is a class to represent view layer
+ * for interfaces and connections as IVObject
+ */
 class IVConnectionLayerType : public IVObject
 {
     Q_OBJECT
@@ -33,7 +37,13 @@ class IVConnectionLayerType : public IVObject
 public:
     IVConnectionLayerType(QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
     ~IVConnectionLayerType();
+
+    /**
+    * @brief rename layer
+    * @param name                   new name
+    */
     auto rename(const QString &name) -> void;
+
     static const QString DefaultLayerName;
 };
 

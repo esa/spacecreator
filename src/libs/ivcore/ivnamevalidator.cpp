@@ -435,9 +435,9 @@ QString IVNameValidator::nameConnectionLayer(const IVObject *layer) const
 
     int counter = 1;
     if (layer->model()) {
-        for (const auto ly : layer->model()->objects()) {
-            if (auto obj = qobject_cast<ivm::IVConnectionLayerType *>(ly)) {
-                if (obj->type() == IVObject::Type::ConnectionLayer && ly != layer) {
+        for (const auto modelObject : layer->model()->objects()) {
+            if (auto modelLayer = qobject_cast<ivm::IVConnectionLayerType *>(modelObject)) {
+                if (modelLayer->type() == IVObject::Type::ConnectionLayer && modelObject != layer) {
                     ++counter;
                 }
             }
@@ -529,9 +529,9 @@ bool IVNameValidator::isConnectionLayerNameUsed(const QString &name, const IVObj
         return false;
     }
 
-    for (const auto ly : layer->model()->objects()) {
-        if (auto obj = qobject_cast<ivm::IVConnectionLayerType *>(ly)) {
-            if (obj->title() == name) {
+    for (const auto modelObject : layer->model()->objects()) {
+        if (auto modelLayer = qobject_cast<ivm::IVConnectionLayerType *>(modelObject)) {
+            if (modelLayer->title() == name) {
                     return true;
             }
         }

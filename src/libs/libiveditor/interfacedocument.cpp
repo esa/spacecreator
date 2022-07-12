@@ -692,7 +692,6 @@ void InterfaceDocument::setObjects(const QVector<ivm::IVObject *> &objects)
 void InterfaceDocument::setLayers(const QVector<ivm::IVObject *> &layers)
 {
     d->layersModel->initFromObjects(layers);
-    d->layersModel->setRootObject({});
 }
 
 void InterfaceDocument::onAttributesManagerRequested()
