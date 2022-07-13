@@ -36,7 +36,8 @@ enum class ModelType
     InterfaceView,
     Promela,
     Sdl,
-    Seds
+    Seds,
+    Simulink
 };
 
 /**
@@ -136,6 +137,17 @@ template<>
 struct ModelTypeProperties<ModelType::Seds> {
     /// @brief  Model name
     static inline const QString name = "SEDS";
+    /// @brief  Model extension
+    static inline const QStringList extensions = { ".xml" };
+};
+
+/**
+ * @brief   Specialization for SIMULINK model type
+ */
+template<>
+struct ModelTypeProperties<ModelType::Simulink> {
+    /// @brief  Model name
+    static inline const QString name = "SIMULINK";
     /// @brief  Model extension
     static inline const QStringList extensions = { ".xml" };
 };

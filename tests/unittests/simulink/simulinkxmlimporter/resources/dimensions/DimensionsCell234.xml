@@ -1,0 +1,21 @@
+<ModelInterface>
+   <DataTypes>
+      <BusDataType Alignment="-1" DataScope="Auto" Description="" HeaderFile=""
+                   Name="Bus">
+         <BusMembers>
+            <BusMember Complexity="real" DataType="double" Description=""
+                       Dimensions="{2 3 4}"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="BusMember"
+                       SampleTime="-1"
+                       Unit=""/>
+         </BusMembers>
+      </BusDataType>
+   </DataTypes>
+   <Inports>
+   </Inports>
+   <Outports>
+   </Outports>
+</ModelInterface>

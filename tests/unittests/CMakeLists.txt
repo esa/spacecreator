@@ -13,6 +13,7 @@ add_subdirectory(promela)
 add_subdirectory(tmc)
 add_subdirectory(sdl)
 add_subdirectory(seds)
+add_subdirectory(simulink)
 add_subdirectory(shared)
 add_subdirectory(spacecreatorsystem)
 
