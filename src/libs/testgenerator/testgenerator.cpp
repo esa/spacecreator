@@ -37,6 +37,7 @@
 #include <libdveditor/dvexporter.h>
 #include <libiveditor/ivexporter.h>
 #include <modelloader.h>
+#include <qstandardpaths.h>
 #include <shared/ui/veinteractiveobject.h>
 
 using dve::DVExporter;
@@ -47,7 +48,6 @@ using plugincommon::ModelLoader;
 namespace testgenerator {
 
 const QString resultFileName = "Results.html";
-const QString gdbScriptPath = "~/.local/share/QtProject/QtCreator/x86-linux-cpp.gdb";
 
 TestGenerator::TestGenerator(const QString &baseDirectory)
 {
@@ -80,6 +80,7 @@ auto TestGenerator::testUsingDataFromCsv(
 
 auto TestGenerator::initializePaths(const QString &baseDirectory) -> void
 {
+    qWarning() << "Pathh:" << QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
     projectDirectory = baseDirectory;
     generatedPath = projectDirectory + QDir::separator() + "generated";
     generatedCodePath = generatedPath + QDir::separator() + "testdriver.c";
@@ -240,6 +241,8 @@ auto TestGenerator::runTests(IVInterface &interface, Asn1Model &asn1Model, const
         -> QVector<QVariant>
 {
     const QString binLocalization = binaryPath.left(binaryPath.lastIndexOf("/"));
+    const QString gdbScriptPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+            + QDir::separator() + "x86-linux-cpp.gdb";
     const QByteArray rawTestData = GdbConnector::getRawTestResults(
             binLocalization, { "-batch", "-x", gdbScriptPath }, { "localhost:1234", binaryPath });
 

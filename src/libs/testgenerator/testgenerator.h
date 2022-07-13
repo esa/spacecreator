@@ -71,13 +71,13 @@ public:
     auto prepareTestHarness(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model) -> QString;
 
     /**
-     * @brief Prepare test harness files to be used for compilation of tests
+     * @brief Runs the tests in GDB debugger
      *
      * @param interface interface under test
      * @param asn1Model ASN.1 model to be used during testing
      * @param binaryPath path to the binary file to run
      *
-     * @return true if there was no error during creation of the test harness files
+     * @return vector of the test results obtained from GDB
      */
     auto runTests(IVInterface &interface, Asn1Model &asn1Model, const QString &binaryPath) -> QVector<QVariant>;
 

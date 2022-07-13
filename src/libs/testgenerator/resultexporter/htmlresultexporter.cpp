@@ -6,35 +6,45 @@
 namespace testgenerator {
 
 HtmlResultExporter::HtmlResultExporter(
-        const IVInterface &interface, const CsvModel &csvModel, const QVector<QVariant> &results, float delta)
+        const IVInterface &interface, const CsvModel &csvModel, const QVector<QVariant> &results, const float delta)
     : interfaceName(interface.title())
     , functionName(interface.function()->title())
     , ifaceParams(interface.params())
     , rows(results.size() / ifaceParams.size())
     , maxDelta(delta)
 {
-    std::vector<QString>::size_type i = 0;
-    std::vector<QString>::size_type k = 0;
+    initTableCells(csvModel, results);
+    initTableHeader();
+}
+
+auto HtmlResultExporter::initTableCells(const CsvModel &csvModel, const QVector<QVariant> &results) -> void
+{
+    std::vector<QString>::size_type rowIndex = 0;
+    std::vector<QString>::size_type resultIndex = 0;
     for (const auto &row : csvModel.records()) {
         csv::Row csvRow = *row;
         auto csvFields = csvRow.fields();
         cells.push_back({});
-        std::vector<QString>::size_type j = 0;
+        std::vector<QString>::size_type parameterIndex = 0;
         for (const auto &csvField : csvFields) {
-            if (ifaceParams[j].isInDirection()) {
-                cells[i].push_back({ results[k], CellColor::Black });
+            if (ifaceParams[parameterIndex].isInDirection()) {
+                cells[rowIndex].push_back({ results[resultIndex], CellColor::Black });
             } else {
-                auto currDelta = results[k].toFloat() - csvField.toFloat();
+                auto currDelta = results[resultIndex].toFloat() - csvField.toFloat();
                 auto color = abs(currDelta) > maxDelta ? CellColor::Red : CellColor::Green;
-                cells[i].push_back({ csvField, CellColor::Black });
-                cells[i].push_back({ results[k], color });
-                cells[i].push_back({ currDelta, color });
+                cells[rowIndex].push_back({ csvField, CellColor::Black });
+                cells[rowIndex].push_back({ results[resultIndex], color });
+                cells[rowIndex].push_back({ currDelta, color });
             }
-            j++;
-            k++;
+            parameterIndex++;
+            resultIndex++;
         }
-        i++;
+        rowIndex++;
     }
+}
+
+auto HtmlResultExporter::initTableHeader() -> void
+{
     for (int l = 0; l < ifaceParams.size(); l++) {
         columnNames.append(ifaceParams[l].name());
         if (ifaceParams[l].isInDirection()) {
@@ -79,8 +89,8 @@ auto HtmlResultExporter::generateHtmlStream(QTextStream &stream) -> void
     stream << "\t\t<table>\n";
 
     generateTableHeader(stream);
-    for (int i = 0; i < rows; i++) {
-        generateTableRow(stream, i);
+    for (int rowIndex = 0; rowIndex < rows; rowIndex++) {
+        generateTableRow(stream, rowIndex);
     }
 
     stream << "\t\t</table>\n";

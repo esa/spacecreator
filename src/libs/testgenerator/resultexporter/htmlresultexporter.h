@@ -14,23 +14,38 @@ namespace testgenerator {
  */
 class HtmlResultExporter
 {
-public:
     enum class ColumnSize
     {
         Regular,
         Wide
     };
+
+public:
+    /**
+     * @brief Colors of the cells in result table
+     *
+     */
     enum class CellColor
     {
         Red,
         Green,
         Black
     };
+
+    /**
+     * @brief Description of each cell in result table
+     *
+     */
     struct Cell {
+        /** value displayed in the cell */
         QVariant value;
+        /** color of the displayed text */
         CellColor color;
+        /** operator for cells comparison */
         friend bool operator==(const Cell &l, const Cell &r) { return l.value == r.value && l.color == r.color; }
     };
+
+    /** Type for the two dimentional vector containing cells of the result table */
     typedef QVector<QVector<Cell>> CellTable;
 
     /**
@@ -41,24 +56,26 @@ public:
      * @param results results obtained from GDB
      * @param delta maximum allowed absolute error
      */
-    HtmlResultExporter(
-            const IVInterface &interface, const CsvModel &csvModel, const QVector<QVariant> &results, float delta);
+    HtmlResultExporter(const IVInterface &interface, const CsvModel &csvModel, const QVector<QVariant> &results,
+            const float delta);
 
     /**
-     * @brief exports test result to a HTML file
+     * @brief Exports test result to a HTML file
      *
      * @param filepath path to the html file to generate
      */
     auto exportResult(const QString &filepath) -> void;
 
     /**
-     * @brief exports test result to a HTML file
+     * @brief Getter for an array with cell values of the result table
      *
-     * @return table with data to be put in html table
+     * @return an array with cell values of the result table
      */
     auto getData() -> CellTable;
 
 private:
+    auto initTableHeader() -> void;
+    auto initTableCells(const CsvModel &csvModel, const QVector<QVariant> &results) -> void;
     auto generateHtmlStream(QTextStream &stream) -> void;
     auto generateTableRow(QTextStream &stream, int row) -> void;
     auto generateTableHeader(QTextStream &stream) -> void;
