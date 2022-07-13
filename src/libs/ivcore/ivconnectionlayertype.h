@@ -48,7 +48,7 @@ public:
     ~IVConnectionLayerType();
 
     /**
-    * @brief rename layer
+    * @brief Rename layer
     * @param name                    new name
     */
     auto rename(const QString &name) -> void;
