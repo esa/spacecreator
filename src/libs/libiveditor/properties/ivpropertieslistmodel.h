@@ -67,14 +67,18 @@ class InterfacePropertiesListModel : public IVPropertiesListModel
 {
 public:
     explicit InterfacePropertiesListModel(
-            cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
+            cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, ivm::IVModel *layersModel, QObject *parent = nullptr);
 
+    void setDataObject(shared::VEObject *obj) override;
     QVariant data(const QModelIndex &index, int role) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role = DataRole) override;
     ivm::IVInterface *entity() const override;
 
 protected:
     bool isEditable(const QModelIndex &index) const override;
+
+private:
+    ivm::IVModel *m_layersModel;
 };
 
 } // namespace ive
