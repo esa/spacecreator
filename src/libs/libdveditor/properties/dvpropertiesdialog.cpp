@@ -25,6 +25,7 @@
 #include "dvdevice.h"
 #include "dvmessagebindingswidget.h"
 #include "dvmodel.h"
+#include "errorhub.h"
 #include "interface/attributedelegate.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
@@ -120,6 +121,34 @@ void DVPropertiesDialog::initAttributesView()
 dvm::DVObject *DVPropertiesDialog::dataObject() const
 {
     return qobject_cast<dvm::DVObject *>(shared::PropertiesDialog::dataObject());
+}
+
+void DVPropertiesDialog::done(int r)
+{
+    if (dataObject()->type() == dvm::DVObject::Type::Device) {
+        auto device = qobject_cast<dvm::DVDevice *>(dataObject());
+        dvm::DVModel *model = device->model();
+        Q_ASSERT(model);
+        for (dvm::DVConnection *connection : model->connections(device)) {
+            QString sourceName, targetName, sourcePacketizer, targetPacketizer;
+            if (connection->sourceDevice()) {
+                sourcePacketizer = connection->sourceDevice()->packetizerName();
+                sourceName = connection->sourceDevice()->titleUI();
+            }
+            if (connection->targetDevice()) {
+                targetPacketizer = connection->targetDevice()->packetizerName();
+                targetName = connection->targetDevice()->titleUI();
+            }
+
+            if (sourcePacketizer != targetPacketizer) {
+                shared::ErrorHub::addError(shared::ErrorItem::Warning,
+                        QStringLiteral("Source (%1) and target (%2) packetizers are different: %3 <-> %4").arg(
+                        sourceName, targetName, sourcePacketizer, targetPacketizer));
+            }
+        }
+    }
+
+    PropertiesDialog::done(r);
 }
 
 } // namespace dve

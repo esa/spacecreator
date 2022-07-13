@@ -66,6 +66,11 @@ QString DVDevice::portName() const
     return entityAttributeValue(meta::Props::token(meta::Props::Token::port)).toString();
 }
 
+QString DVDevice::packetizerName() const
+{
+    return entityAttributeValue(meta::Props::token(meta::Props::Token::packetizer)).toString();
+}
+
 void DVDevice::setPortName(const QString &name)
 {
     setEntityAttribute(meta::Props::token(meta::Props::Token::port), name);
