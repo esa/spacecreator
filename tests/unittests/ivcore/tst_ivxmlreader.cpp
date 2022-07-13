@@ -17,7 +17,10 @@
 
 #include "ivconnectiongroup.h"
 #include "ivfunction.h"
+#include "ivlibrary.h"
+#include "ivmodel.h"
 #include "ivobject.h"
+#include "ivpropertytemplateconfig.h"
 #include "ivxmlreader.h"
 #include "xmlcommon.h"
 
@@ -33,6 +36,7 @@ private:
     void runReader(const XmlFileMock &xml);
 
 private Q_SLOTS:
+    void initTestCase();
     void test_emptyInterfaceViewDoc();
     void test_singleItems();
     void test_allItems();
@@ -41,7 +45,17 @@ private Q_SLOTS:
     void test_readFunctionLanguages();
     void test_connectionGroup();
     void test_multicast();
+
+private:
+    ivm::IVPropertyTemplateConfig *conf { nullptr };
 };
+
+void IVXMLReader::initTestCase()
+{
+    ivm::initIVLibrary();
+    conf = ivm::IVPropertyTemplateConfig::instance();
+    conf->init(QLatin1String("default_attrinbutes.xml"));
+}
 
 void IVXMLReader::runReader(const XmlFileMock &xml)
 {
@@ -190,14 +204,30 @@ void IVXMLReader::test_multicast()
     reader.readFile(":/data/multicast.xml");
     const QVector<ivm::IVObject *> objectsList = reader.parsedObjects();
 
-    QVector<ivm::IVConnection *> connections;
-    for (ivm::IVObject *object : objectsList) {
-        if (object->type() == ivm::IVObject::Type::Connection) {
-            auto connection = static_cast<ivm::IVConnection *>(object);
-            connections.append(connection);
-        }
-    }
+    // This object is required to run postInit functions
+    // Without postInit, there is no access to the read data
+    ivm::IVModel model(conf);
+    model.initFromObjects(objectsList);
+
+    // Direct iteration over objectsList may yield objects without private data
+    // which segfault upon query
+    QVector<ivm::IVConnection *> connections = model.allObjectsByType<ivm::IVConnection>();
+
     QCOMPARE(connections.size(), 2);
+    // This code is required because IVModel stores objects internally in non-deterministic
+    // hashes and maps
+    const auto expectedDstAIndex = connections[0]->targetName() == "dstA" ? 0 : 1;
+    const auto connection1 = connections[expectedDstAIndex];
+    const auto connection2 = connections[1 - expectedDstAIndex];
+
+    QCOMPARE(connection1->sourceName(), "src");
+    QCOMPARE(connection1->targetName(), "dstA");
+    QCOMPARE(connection1->sourceInterfaceName(), "pi_a");
+    QCOMPARE(connection1->targetInterfaceName(), "pi_a");
+    QCOMPARE(connection2->sourceName(), "src");
+    QCOMPARE(connection2->targetName(), "dstB");
+    QCOMPARE(connection2->sourceInterfaceName(), "pi_a");
+    QCOMPARE(connection2->targetInterfaceName(), "pi_b");
 }
 
 QTEST_APPLESS_MAIN(IVXMLReader)

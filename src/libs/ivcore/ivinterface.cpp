@@ -524,6 +524,10 @@ void IVInterface::reflectAttrs(const IVInterface *from)
             !(m_originalFields.collected() ? m_originalFields.attrs.value(autonamedProp).value().value<bool>()
                                            : entityAttributeValue(autonamedProp, true));
     const bool keepName = isFunctionTypeInherited || isCustomName;
+    // This logic requires refinement, as it can - unexpectedly for the user - remame
+    // an interface during load, breaking a connection. The problematic behaviour
+    // was encountered with multicast, where a single required interface
+    // has multiple connections to provided interfaces.
     if (keepName) {
         revertAttribute(meta::Props::Token::name, newAttrs, m_originalFields.attrs);
     } else if (const IVFunctionType *fn = function()) {

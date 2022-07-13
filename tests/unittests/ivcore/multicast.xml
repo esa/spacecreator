@@ -14,8 +14,6 @@
     <Property name="Taste::coordinates" value="35000 35900 61800 54700"/>
 <Required_Interface name="pi_a" kind="Sporadic" enable_multicast="true" layer="default" queue_size="1" priority="1" wcet="0" miat="0" stack_size="1024">
     <Property name="Taste::coordinates" value="61800 46600"/>
-    <Property name="Taste::InheritPI" value="true"/>
-    <Property name="Taste::Autonamed" value="true"/>
 </Required_Interface>
 
     <Implementations>
