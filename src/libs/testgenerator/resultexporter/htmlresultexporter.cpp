@@ -30,8 +30,8 @@ auto HtmlResultExporter::initTableCells(const CsvModel &csvModel, const QVector<
             if (ifaceParams[parameterIndex].isInDirection()) {
                 cells[rowIndex].push_back({ results[resultIndex], CellColor::Black });
             } else {
-                auto currDelta = results[resultIndex].toFloat() - csvField.toFloat();
-                auto color = abs(currDelta) > maxDelta ? CellColor::Red : CellColor::Green;
+                auto currDelta = abs(results[resultIndex].toFloat() - csvField.toFloat());
+                auto color = currDelta > maxDelta ? CellColor::Red : CellColor::Green;
                 cells[rowIndex].push_back({ csvField, CellColor::Black });
                 cells[rowIndex].push_back({ results[resultIndex], color });
                 cells[rowIndex].push_back({ currDelta, color });
