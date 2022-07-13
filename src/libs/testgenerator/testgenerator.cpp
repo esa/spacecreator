@@ -80,7 +80,6 @@ auto TestGenerator::testUsingDataFromCsv(
 
 auto TestGenerator::initializePaths(const QString &baseDirectory) -> void
 {
-    qWarning() << "Pathh:" << QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
     projectDirectory = baseDirectory;
     generatedPath = projectDirectory + QDir::separator() + "generated";
     generatedCodePath = generatedPath + QDir::separator() + "testdriver.c";
