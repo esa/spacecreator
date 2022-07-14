@@ -19,9 +19,12 @@
 
 #pragma once
 
+#include "integersubset.h"
+
 #include <asn1library/asn1/types/typereadingvisitor.h>
 #include <optional>
 #include <promela/PromelaModel/promelamodel.h>
+#include <vector>
 
 namespace promela::translator {
 /**
@@ -39,10 +42,11 @@ public:
      * @param promelaModel target promela model
      * @param baseTypeName base name for new types
      * @param name name for new types
+     * @param generateInits if true, then generate initialization inlines
      * @param enhancedSpinSupport  if true, then generate model for enhanced spin
      */
     Asn1ItemTypeVisitor(model::PromelaModel &promelaModel, std::optional<QString> baseTypeName, QString name,
-            bool enhancedSpinSupport);
+            bool generateInits, bool enhancedSpinSupport);
 
     /**
      * @brief Getter for result promela data type
@@ -138,6 +142,7 @@ public:
 
 private:
     inline static const QString m_assignValueInlineSuffix = "_assign_value";
+    inline static const QString m_initializeValueInlineSuffix = "_init_value";
     inline static const QString m_rangeCheckInlineSuffix = "_range_check";
     inline static const QString m_sizeCheckInlineSuffix = "_size_check";
 
@@ -147,19 +152,27 @@ private:
     void addSimpleArrayAssignInlineValue(const QString &typeName, int length, bool lengthFieldPresent);
     void addAssignValueInline(const QString &typeName, model::Sequence sequence);
 
+    void addSimpleValueInitializationInline(const QString &typeName, model::InlineCall::Argument initValue);
+    void addEmptyValueInitializationInline(const QString &typeName);
+    void addInitializeValueInline(const QString &typeName, model::Sequence sequence);
+
     void addBoolRangeCheckInline(const Asn1Acn::Types::Boolean &type, const QString &typeName);
-    void addEnumRangeCheckInline(const Asn1Acn::Types::Enumerated &type, const QString &typeName);
-    void addIntegerRangeCheckInline(const Asn1Acn::Types::Integer &type, const QString &typeName);
+    void addEnumRangeCheckInline(const QString &typeName, const std::vector<QString> &allowedValues);
+    void addIntegerRangeCheckInline(const QString &typeName, const IntegerSubset &rangeSubsets);
     void addRangeCheckInline(const model::Expression &type, const QString &typeName);
     void addSizeCheckInline(const std::size_t minValue, const std::size_t maxValue, const QString &typeName);
     QString getAssignValueInlineNameForNestedType(const QString &utype, const QString &field) const;
     QString buildCheckArgumentName(const QString &typeName, const QString &postfix) const;
 
+    model::ForLoop createSequenceOfDataLoop(const QString &utypeName) const;
+    model::ForLoop createSequenceOfZeroingLoop(const QString &utypeName, const std::size_t loopRangeEnd) const;
+
 private:
     model::PromelaModel &m_promelaModel;
-    const std::optional<QString> m_baseTypeName;
-    const QString m_name;
-    const bool m_enhancedSpinSupport;
+    std::optional<QString> m_baseTypeName;
+    QString m_name;
+    bool m_generateInits;
+    bool m_enhancedSpinSupport;
     std::optional<model::DataType> m_resultDataType;
 };
 }
