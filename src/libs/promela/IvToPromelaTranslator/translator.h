@@ -211,8 +211,9 @@ public:
     auto getDependencies() const -> std::set<conversion::ModelType> override;
 
 private:
-    static const char *TIMER_MANAGER_DATA_NAME;
-    static const char *TIMER_MANAGER_PROCTYPE_NAME;
+    inline static const QString m_timerManagerDataName = "timer_manager_data";
+    inline static const QString m_timerManagerProctypeName = "timer_manager_proc";
+    inline static const QString m_dummyParamName = "dummy";
 
 private:
     auto addChannelAndLock(IvToPromelaTranslator::Context &context, const QString &functionName) const -> void;
@@ -268,7 +269,7 @@ private:
             promela::model::Sequence &sequence) const -> promela::model::Expression;
     auto handleSendInlineArgument(const QString &parameterType, const QString &functionName,
             const QString &interfaceName, const QString parameterName, promela::model::Sequence &sequence) const
-            -> QList<QString>;
+            -> QString;
 
     auto buildParameterSubtypeName(
             const QString &functionName, const QString &interfaceName, const QString &parameterName) const -> QString;

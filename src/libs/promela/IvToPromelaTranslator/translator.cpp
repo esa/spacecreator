@@ -312,9 +312,6 @@ static void initializeFunction(Sequence &sequence, const QString &functionName)
             std::make_unique<ProctypeElement>(ChannelSend(VariableRef(lockChannelName), lockChannelArguments)));
 }
 
-const char *IvToPromelaTranslator::TIMER_MANAGER_DATA_NAME = "timer_manager_data";
-const char *IvToPromelaTranslator::TIMER_MANAGER_PROCTYPE_NAME = "timer_manager_proc";
-
 InitProctype IvToPromelaTranslator::generateInitProctype(
         const std::vector<QString> &modelFunctions, const std::vector<QString> &observers, const IVModel *ivModel) const
 {
@@ -583,15 +580,22 @@ std::unique_ptr<model::InlineDef> IvToPromelaTranslator::generateSendInline(cons
 
     Sequence sequence(Sequence::Type::NORMAL);
 
-    auto arguments = handleSendInlineArgument(parameterType, functionName, interfaceName, parameterName, sequence);
+    const auto argumentName =
+            handleSendInlineArgument(parameterType, functionName, interfaceName, parameterName, sequence);
 
+    QList<QString> arguments;
     QList<Expression> params;
-    for (const auto &argumentName : arguments) {
+
+    if (argumentName.isEmpty()) {
+        params.append(Expression(VariableRef(m_dummyParamName)));
+    } else {
         if (parameterSubtyped) {
             params.append(handleSendInlineParameter(argumentName, parameterType, sequence));
         } else {
             params.append(Expression(VariableRef(argumentName)));
         }
+
+        arguments.push_back(argumentName);
     }
 
     std::unique_ptr<ProctypeElement> channelSend =
@@ -821,7 +825,7 @@ void IvToPromelaTranslator::createTimerInlinesForFunction(
     const QString resetTimerName = QString("%1_0_%2_reset").arg(Escaper::escapePromelaIV(functionName)).arg(timerName);
 
     Sequence setTimerSequence(Sequence::Type::NORMAL);
-    VariableRef element(QString(TIMER_MANAGER_DATA_NAME), std::make_unique<Expression>((Constant(timerId))));
+    VariableRef element(m_timerManagerDataName, std::make_unique<Expression>((Constant(timerId))));
     setTimerSequence.appendElement(
             std::make_unique<ProctypeElement>(Assignment(element, Expression(BooleanConstant(true)))));
 
@@ -840,7 +844,7 @@ void IvToPromelaTranslator::createGlobalTimerObjects(
         Context &context, int timerCount, const std::map<int, QString> &timerSignals) const
 {
     Declaration timerManagerDataDeclaration(
-            DataType(ArrayType(static_cast<size_t>(timerCount), BasicType::BOOLEAN)), QString(TIMER_MANAGER_DATA_NAME));
+            DataType(ArrayType(static_cast<size_t>(timerCount), BasicType::BOOLEAN)), m_timerManagerDataName);
     context.model()->addDeclaration(std::move(timerManagerDataDeclaration));
 
     Sequence timerProctypeBody(Sequence::Type::NORMAL);
@@ -857,7 +861,7 @@ void IvToPromelaTranslator::createGlobalTimerObjects(
         for (auto iter = timerSignals.begin(); iter != timerSignals.end(); ++iter) {
             Conditional cond;
 
-            VariableRef fpt(QString(TIMER_MANAGER_DATA_NAME), std::make_unique<Expression>(Constant(iter->first)));
+            VariableRef fpt(m_timerManagerDataName, std::make_unique<Expression>(Constant(iter->first)));
 
             std::unique_ptr<Sequence> timerCall = std::make_unique<Sequence>(Sequence::Type::NORMAL);
             timerCall->appendElement(std::make_unique<ProctypeElement>(Expression(fpt)));
@@ -881,7 +885,7 @@ void IvToPromelaTranslator::createGlobalTimerObjects(
     timerProctypeBody.appendElement(std::make_unique<ProctypeElement>(std::move(mainLoop)));
 
     std::unique_ptr<Proctype> timerManagerProctype =
-            std::make_unique<Proctype>(QString(TIMER_MANAGER_PROCTYPE_NAME), std::move(timerProctypeBody));
+            std::make_unique<Proctype>(m_timerManagerProctypeName, std::move(timerProctypeBody));
     timerManagerProctype->setActive(true);
     timerManagerProctype->setPriority(1);
     context.model()->addProctype(std::move(timerManagerProctype));
@@ -1007,22 +1011,18 @@ QString IvToPromelaTranslator::handleParameterType(const QString &parameterTypeN
     return parameterTypeName;
 }
 
-QList<QString> IvToPromelaTranslator::handleSendInlineArgument(const QString &parameterType,
-        const QString &functionName, const QString &interfaceName, const QString parameterName,
-        Sequence &sequence) const
+QString IvToPromelaTranslator::handleSendInlineArgument(const QString &parameterType, const QString &functionName,
+        const QString &interfaceName, const QString parameterName, Sequence &sequence) const
 {
-    QList<QString> arguments;
-
     if (parameterType.isEmpty()) {
         std::unique_ptr<ProctypeElement> dummyVariableDef =
-                std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "dummy"));
+                std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), m_dummyParamName));
         sequence.appendElement(std::move(dummyVariableDef));
-    } else {
-        auto argumentName = QString("%1_%2_%3").arg(functionName).arg(interfaceName).arg(parameterName);
-        arguments.append(argumentName);
-    }
 
-    return arguments;
+        return "";
+    } else {
+        return QString("%1_%2_%3").arg(functionName).arg(interfaceName).arg(parameterName);
+    }
 }
 
 Expression IvToPromelaTranslator::handleSendInlineParameter(
