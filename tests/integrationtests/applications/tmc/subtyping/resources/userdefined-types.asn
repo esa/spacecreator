@@ -2,5 +2,6 @@ USERDEFINED-TYPES-DATAVIEW DEFINITIONS ::=
 BEGIN
     MyInteger ::= INTEGER (0 .. 10)
     MyBetterInteger ::= MyInteger (2 .. 8)
+    MyArray ::= SEQUENCE (SIZE(0..10)) OF MyBetterInteger
 END
 
