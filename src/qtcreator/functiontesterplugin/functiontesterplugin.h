@@ -54,6 +54,7 @@ private:
     auto loadAsn1Model() -> std::unique_ptr<Asn1Acn::Asn1Model>;
     auto getBaseDirectory() -> QString;
     auto getCurrentIvEditorCore() -> IVEditorCorePtr;
+    auto displayResultHtml(const QString &resultFileName) -> void;
 };
 
 }

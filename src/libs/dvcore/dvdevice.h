@@ -39,6 +39,8 @@ public:
     QString portName() const;
     void setPortName(const QString &name);
 
+    QString packetizerName() const;
+
     QString qualifier() const;
     void setQualifier(const QString &name);
 

@@ -92,6 +92,7 @@ target_link_libraries(${LIB_NAME}
     asn1editor
     templating
     shared
+    ${QT_CORE}
     ${QT_SVG}
     ${QT_WIDGETS}
     ${QT_XML}

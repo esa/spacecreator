@@ -181,6 +181,8 @@ target_sources(${LIB_NAME} PRIVATE
     templating/exportableivconnectiongroup.h
     templating/exportableivfunction.cpp
     templating/exportableivfunction.h
+    templating/exportableivconnectionlayertype.cpp
+    templating/exportableivconnectionlayertype.h
     templating/exportableivinterface.cpp
     templating/exportableivinterface.h
     templating/exportableivobject.cpp

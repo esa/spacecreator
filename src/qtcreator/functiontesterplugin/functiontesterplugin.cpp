@@ -20,6 +20,7 @@
 #include "functiontesterplugin.h"
 #include "pluginconstants.h"
 
+#include <QDesktopServices>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMenu>
@@ -41,6 +42,8 @@ using ive::IVExporter;
 using plugincommon::ModelLoader;
 
 namespace spctr {
+
+const QString resultFileName = "Results.html";
 
 FunctionTesterPlugin::FunctionTesterPlugin() { }
 
@@ -84,6 +87,7 @@ auto FunctionTesterPlugin::testUsingDataFromCsvGui() -> void
 
     TestGenerator testGenerator(getBaseDirectory());
     testGenerator.testUsingDataFromCsv(*interface, *csvModel, *asn1Model, delta);
+    displayResultHtml(resultFileName);
 }
 
 auto FunctionTesterPlugin::addTestInterfaceOption() -> void
@@ -188,6 +192,17 @@ auto FunctionTesterPlugin::getCurrentIvEditorCore() -> IVEditorCorePtr
         return nullptr;
     }
     return currentIvDocument->ivEditorCore();
+}
+
+auto FunctionTesterPlugin::displayResultHtml(const QString &resultFileName) -> void
+{
+    qDebug() << "Displaying html";
+    QString filepath = getBaseDirectory() + QDir::separator() + "work" + QDir::separator() + resultFileName;
+    if (QFile::exists(filepath)) {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(filepath));
+    } else {
+        MessageManager::write(GenMsg::msgError.arg("Could not find file with test results: " +  filepath));
+    }
 }
 
 } // namespace spctr

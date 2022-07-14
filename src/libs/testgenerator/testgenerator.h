@@ -23,6 +23,13 @@
 #include "harness/ivgenerator/ivgenerator.h"
 #include "testdrivergenerator/testdrivergenerator.h"
 #include "testdrivergenerator/testdrivergeneratorexception.h"
+#include "resultexporter/htmlresultexporter.h"
+
+using csv::CsvModel;
+using dvm::DVModel;
+using ivm::IVFunction;
+using ivm::IVInterface;
+using ivm::IVModel;
 
 namespace testgenerator {
 
@@ -50,8 +57,7 @@ public:
      *
      * @return true if there was no error during execution of the testing procedure nad false otherwise
      */
-    auto testUsingDataFromCsv(ivm::IVInterface &interface, const csv::CsvModel &csvModel,
-            Asn1Acn::Asn1Model &asn1Model, float delta) -> bool;
+    auto testUsingDataFromCsv(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model, float delta) -> bool;
 
     /**
      * @brief Prepare test harness files to be used for compilation of tests
@@ -62,18 +68,29 @@ public:
      *
      * @return true if there was no error during creation of the test harness files
      */
-    auto prepareTestHarness(ivm::IVInterface &interface,
-            const csv::CsvModel &csvModel, Asn1Acn::Asn1Model &asn1Model) -> QString;
+    auto prepareTestHarness(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model) -> QString;
+
+    /**
+     * @brief Runs the tests in GDB debugger
+     *
+     * @param interface interface under test
+     * @param asn1Model ASN.1 model to be used during testing
+     * @param binaryPath path to the binary file to run
+     *
+     * @return vector of the test results obtained from GDB
+     */
+    auto runTests(IVInterface &interface, Asn1Model &asn1Model, const QString &binaryPath) -> QVector<QVariant>;
+
 private:
     auto initializePaths(const QString &baseDirectory) -> void;
-    auto exportDvModel(dvm::DVModel *dvModel, const QString &outputFilename) -> bool;
-    auto exportIvModel(ivm::IVModel *ivModel, const QString &outputFilename) -> bool;
+    auto exportDvModel(DVModel *dvModel, const QString &outputFilename) -> bool;
+    auto exportIvModel(IVModel *ivModel, const QString &outputFilename) -> bool;
     auto runProcess(QString cmd, QStringList args, QString workingPath) -> bool;
     auto prepareTasteProjectSkeleton() -> bool;
     auto copyFunctionImplementations(const QString &functionName) -> void;
     auto compileSystemUnderTest() -> void;
-    auto getAllFunctionsFromModel(const ivm::IVModel &ivModel) -> std::vector<ivm::IVFunction *>;
-    
+    auto getAllFunctionsFromModel(const IVModel &ivModel) -> std::vector<IVFunction *>;
+
     QString projectDirectory;
     QString generatedPath;
     QString generatedCodePath;

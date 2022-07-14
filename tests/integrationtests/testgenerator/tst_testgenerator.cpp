@@ -26,6 +26,7 @@
 
 using plugincommon::IvTools;
 using plugincommon::ModelLoader;
+using testgenerator::HtmlResultExporter;
 using testgenerator::TestGenerator;
 
 namespace tests::testgenerator {
@@ -36,6 +37,8 @@ class tst_testgenerator : public QObject
 
 private Q_SLOTS:
     void testPrepareTestHarness();
+    void testResultHtmlFile();
+    void testResultHtmlData();
 };
 
 void tst_testgenerator::testPrepareTestHarness()
@@ -65,6 +68,59 @@ void tst_testgenerator::testPrepareTestHarness()
     QVERIFY(QFileInfo::exists(generatedDvFile));
 
     QDir(generatedHarnessDirectory).removeRecursively();
+}
+
+void tst_testgenerator::testResultHtmlFile()
+{
+    const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview.xml");
+    QVERIFY(ivModel);
+
+    ivm::IVInterface *const interface = IvTools::getIfaceFromModel("CustomIface", ivModel.get());
+    QVERIFY(interface);
+
+    auto csvModel = ModelLoader::loadCsvModel("resources/test.csv");
+    QVERIFY(csvModel);
+
+    QVector<QVariant> testResults = { 1, 2, 3, 2, 5, 3, 4, 7, 12, 25 };
+    const QString resultFileName = "Results.html";
+    HtmlResultExporter exporter(*interface, *csvModel, testResults, 0);
+    exporter.exportResult(resultFileName);
+
+    QVERIFY(QFileInfo::exists(resultFileName));
+    QVERIFY(QFile(resultFileName).size() > 0);
+
+    QFile::remove(resultFileName);
+}
+
+void tst_testgenerator::testResultHtmlData()
+{
+    const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview.xml");
+    QVERIFY(ivModel);
+
+    ivm::IVInterface *const interface = IvTools::getIfaceFromModel("CustomIface", ivModel.get());
+    QVERIFY(interface);
+
+    auto csvModel = ModelLoader::loadCsvModel("resources/test.csv");
+    QVERIFY(csvModel);
+
+    auto asn1Model = ModelLoader::loadAsn1Model("resources/dataview-uniq.asn");
+    QVERIFY(asn1Model);
+
+    QVector<QVariant> testResults = { 1, 2, 3, 2, 5, 3, 4, 7, 12, 25 };
+    HtmlResultExporter exporter(*interface, *csvModel, testResults, 0);
+    auto cells = exporter.getData();
+
+    constexpr auto G = HtmlResultExporter::CellColor::Green;
+    constexpr auto B = HtmlResultExporter::CellColor::Black;
+
+    const auto firstRow = QVector<HtmlResultExporter::Cell>({ { 1, B }, { 2, B }, { 3, B }, { 3, G }, { 0, G },
+            { 2, B }, { 2, G }, { 0, G }, { 5, B }, { 5, G }, { 0, G } });
+
+    const auto secondRow = QVector<HtmlResultExporter::Cell>({ { 3, B }, { 4, B }, { 7, B }, { 7, G }, { 0, G },
+            { 12, B }, { 12, G }, { 0, G }, { 25, B }, { 25, G }, { 0, G } });
+
+    QCOMPARE(cells[0], firstRow);
+    QCOMPARE(cells[1], secondRow);
 }
 
 }

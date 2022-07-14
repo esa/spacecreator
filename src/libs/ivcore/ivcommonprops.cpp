@@ -38,6 +38,7 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "Target", Token::Target },
     { "Implementations", Token::Implementations },
     { "Implementation", Token::Implementation },
+    { "Layer", Token::Layer },
 
     // attrs:
     { "name", Token::name },

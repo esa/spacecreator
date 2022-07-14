@@ -232,7 +232,7 @@ void tst_ItemZOrder::testItem_ConnectionLayer()
 {
     auto *layer = ivm::testutils::createConnectionLayer();
     ++m_itemTypesTested;
-    QVERIFY(layer->name().compare("default") == 0);
+    QVERIFY(layer->title().compare("default") == 0);
     delete layer;
 }
 

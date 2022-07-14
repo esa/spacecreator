@@ -59,7 +59,7 @@ protected:
 class CmdConnectionLayerCreate : public CmdConnectionLayerManage
 {
 public:
-    explicit CmdConnectionLayerCreate(const QString &name, ivm::IVModel *layersModel, ivm::IVModel *objectsModel);
+    explicit CmdConnectionLayerCreate(ivm::IVModel *layersModel, ivm::IVModel *objectsModel, bool isDefault = false);
     ~CmdConnectionLayerCreate() override;
 
     void redo() override;

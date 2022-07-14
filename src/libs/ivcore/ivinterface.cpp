@@ -126,7 +126,7 @@ IVInterface::IVInterface(IVObject::Type ifaceType, const CreationInfo &ci)
                                                              : IVInterface::InterfaceType::Provided))
 {
     setKind(ci.kind);
-    setLayerName(ci.layer != nullptr ? ci.layer->name() : IVConnectionLayerType::DefaultLayerName);
+    setLayerName(ci.layer != nullptr ? ci.layer->title() : IVConnectionLayerType::DefaultLayerName);
     setParams(ci.parameters);
 
     if (ci.toBeCloned) {
@@ -416,7 +416,7 @@ IVInterface *IVInterface::createIface(const CreationInfo &descr)
         qFatal("Unsupported interface type");
     iface->setKind(descr.kind);
     iface->setTitle(descr.name);
-    iface->setLayerName(descr.layer != nullptr ? descr.layer->name() : IVConnectionLayerType::DefaultLayerName);
+    iface->setLayerName(descr.layer != nullptr ? descr.layer->title() : IVConnectionLayerType::DefaultLayerName);
     return iface;
 }
 

@@ -44,6 +44,7 @@ IVNameValidator::IVNameValidator()
         { IVObject::Type::Comment, QObject::tr("Comment_") },
         { IVObject::Type::Connection, QObject::tr("Connection_") },
         { IVObject::Type::ConnectionGroup, QObject::tr("Connection_Group_") },
+        { IVObject::Type::ConnectionLayer, QObject::tr("Layer_") },
     }
 {
 }
@@ -151,9 +152,11 @@ bool IVNameValidator::isAcceptableName(const IVObject *object, const QString &na
     case IVObject::Type::ProvidedInterface: {
         return !instance()->isProvidedInterfaceNameUsed(name, object);
     }
+    case IVObject::Type::ConnectionLayer: {
+        return !instance()->isConnectionLayerNameUsed(name, object);
+    }
     case IVObject::Type::InterfaceGroup:
     case IVObject::Type::ConnectionGroup:
-    case IVObject::Type::ConnectionLayer:
     case IVObject::Type::Connection:
     case IVObject::Type::Comment: {
         return true;
@@ -286,8 +289,9 @@ QString IVNameValidator::nextName(const IVObject *object) const
     case IVObject::Type::ConnectionGroup:
     case IVObject::Type::Connection:
         return nameConnection(object);
-    case IVObject::Type::InterfaceGroup:
     case IVObject::Type::ConnectionLayer:
+        return nameConnectionLayer(object);
+    case IVObject::Type::InterfaceGroup:
     case IVObject::Type::Unknown:
         return QString();
     default:
@@ -424,6 +428,25 @@ QString IVNameValidator::nameConnection(const IVObject *connection) const
     return {};
 }
 
+QString IVNameValidator::nameConnectionLayer(const IVObject *layer) const
+{
+    Q_ASSERT(layer);
+    const QString nameTemplate = m_typePrefixes[layer->type()];
+
+    int counter = 1;
+    if (layer->model()) {
+        for (const auto modelObject : layer->model()->objects()) {
+            if (auto modelLayer = qobject_cast<ivm::IVConnectionLayerType *>(modelObject)) {
+                if (modelLayer->type() == IVObject::Type::ConnectionLayer && modelObject != layer) {
+                    ++counter;
+                }
+            }
+        }
+    }
+
+    return makeCountedName(layer, nameTemplate, counter);
+}
+
 bool IVNameValidator::isFunctionTypeNameUsed(const QString &name, const IVObject *fnType) const
 {
     if (name.isEmpty() || !fnType) {
@@ -498,6 +521,23 @@ bool IVNameValidator::isProvidedInterfaceNameUsed(const QString &name, const IVO
     auto it = std::find_if(providedIfaces.cbegin(), providedIfaces.cend(),
             [=](IVInterface *iface) { return iface->title() == name && iface != provIface; });
     return it != providedIfaces.cend();
+}
+
+bool IVNameValidator::isConnectionLayerNameUsed(const QString &name, const IVObject *layer) const
+{
+    if (name.isEmpty() || !layer || !layer->model()) {
+        return false;
+    }
+
+    for (const auto modelObject : layer->model()->objects()) {
+        if (auto modelLayer = qobject_cast<ivm::IVConnectionLayerType *>(modelObject)) {
+            if (modelLayer->title() == name) {
+                    return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 }

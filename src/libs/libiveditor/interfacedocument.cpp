@@ -250,13 +250,12 @@ void InterfaceDocument::updateLayersModel() const
         auto layers = layersModel()->allObjectsByType<ivm::IVConnectionLayerType>();
         bool isDefaultPresent = false;
         for (auto * const layer : layers) {
-            if (layer->name() == ivm::IVConnectionLayerType::DefaultLayerName) {
+            if (layer->title() == ivm::IVConnectionLayerType::DefaultLayerName) {
                 isDefaultPresent = true;
             }
         }
         if (!isDefaultPresent) {
-            auto *cmd = new cmd::CmdConnectionLayerCreate(
-                    ivm::IVConnectionLayerType::DefaultLayerName, layersModel(), objectsModel());
+            auto *cmd = new cmd::CmdConnectionLayerCreate(layersModel(), objectsModel(), true);
             commandsStack()->push(cmd);
         }
         if (objectsModel() != nullptr) {
@@ -523,6 +522,11 @@ ivm::IVModel *InterfaceDocument::layersModel() const
     return d->layersModel;
 }
 
+QHash<shared::Id, shared::VEObject *> InterfaceDocument::layersObjects() const
+{
+    return d->layersModel->objects();
+}
+
 IVVisualizationModelBase *InterfaceDocument::visualisationModel() const
 {
     if (!d->objectsVisualizationModel) {
@@ -683,6 +687,11 @@ void InterfaceDocument::setObjects(const QVector<ivm::IVObject *> &objects)
 {
     d->objectsModel->initFromObjects(objects);
     d->objectsModel->setRootObject({});
+}
+
+void InterfaceDocument::setLayers(const QVector<ivm::IVObject *> &layers)
+{
+    d->layersModel->initFromObjects(layers);
 }
 
 void InterfaceDocument::onAttributesManagerRequested()
@@ -884,6 +893,7 @@ bool InterfaceDocument::loadImpl(const QString &path)
     }
 
     setObjects(parser.parsedObjects());
+    setLayers(parser.parsedLayers());
     const QVariantMap metadata = parser.metaData();
     QVariantMap::const_iterator i = metadata.constFind("asn1file");
     while (i != metadata.end() && i.key() == "asn1file") {

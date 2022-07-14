@@ -66,6 +66,7 @@ public:
         to_node,
         to_port,
         requires_bus_access,
+        packetizer,
 
         requiresBusAccess,
 
