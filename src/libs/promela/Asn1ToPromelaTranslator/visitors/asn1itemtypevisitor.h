@@ -164,7 +164,7 @@ private:
     QString getAssignValueInlineNameForNestedType(const QString &utype, const QString &field) const;
     QString buildCheckArgumentName(const QString &typeName, const QString &postfix) const;
 
-    model::ForLoop createSequenceOfDataLoop(const QString &utypeName) const;
+    model::ForLoop createSequenceOfDataLoop(const QString &utypeName, const model::Expression loopRangeEnd) const;
     model::ForLoop createSequenceOfZeroingLoop(const QString &utypeName, const std::size_t loopRangeEnd) const;
 
 private:
