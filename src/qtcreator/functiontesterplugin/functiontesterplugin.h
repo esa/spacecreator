@@ -25,6 +25,7 @@
 #include <extensionsystem/iplugin.h>
 #include <csv/CsvModel/csvmodel.h>
 #include <asn1library/asn1/asn1model.h>
+#include <qlistwidget.h>
 
 namespace spctr {
 
@@ -40,11 +41,13 @@ public:
     auto initialize(const QStringList &arguments, QString *errorString) -> bool override;
     auto extensionsInitialized() -> void override;
     auto aboutToShutdown() -> ShutdownFlag override;
+
     /**
      * @brief Test the selected interface using user provided data
      *
      */
-    auto testUsingDataFromCsvGui() -> void;
+    auto testUsingDataFromCsvGui(const QString &boardName) -> void;
+    auto boardOptionsDialog(const QString &boardName) -> void;
 private:
     auto addTestInterfaceOption() -> void;
     auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
@@ -55,6 +58,9 @@ private:
     auto getBaseDirectory() -> QString;
     auto getCurrentIvEditorCore() -> IVEditorCorePtr;
     auto displayResultHtml(const QString &resultFileName) -> void;
+    auto selectBoardDialog() -> void;
+
+    QWidget chooseBoardWindow;
 };
 
 }

@@ -19,12 +19,18 @@
 
 #include "functiontesterplugin.h"
 #include "pluginconstants.h"
+#include "dvcore/dvhwlibraryreader.h"
 
+#include <QApplication>
+#include <QBoxLayout>
 #include <QDesktopServices>
+#include <QDirIterator>
 #include <QFileDialog>
 #include <QInputDialog>
+#include <QListWidgetItem>
 #include <QMenu>
 #include <QMessageBox>
+#include <QPushButton>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <editormanager/editormanager.h>
 #include <libiveditor/interfacedocument.h>
@@ -38,6 +44,7 @@
 using namespace Core;
 using namespace testgenerator;
 
+using dvm::DVObject;
 using ive::IVExporter;
 using plugincommon::ModelLoader;
 
@@ -66,7 +73,7 @@ auto FunctionTesterPlugin::aboutToShutdown() -> ExtensionSystem::IPlugin::Shutdo
     return SynchronousShutdown;
 }
 
-auto FunctionTesterPlugin::testUsingDataFromCsvGui() -> void
+auto FunctionTesterPlugin::testUsingDataFromCsvGui(const QString &boardName) -> void
 {
     ivm::IVInterface *interface = getSelectedInterface();
     if (!interface) {
@@ -97,7 +104,7 @@ auto FunctionTesterPlugin::addTestInterfaceOption() -> void
     ActionContainer *const acToolsFunctionTester = createActionContainerInTools(tr("&Test Interface"));
 
     const auto csvImportAction = new QAction(tr("Test using data from CSV"), this);
-    connect(csvImportAction, &QAction::triggered, [=]() { this->testUsingDataFromCsvGui(); });
+    connect(csvImportAction, &QAction::triggered, [this]() { selectBoardDialog(); });
     Command *const csvImport = ActionManager::registerAction(csvImportAction, Constants::CSV_IMPORT_ID, allContexts);
     acToolsFunctionTester->addAction(csvImport);
 }
@@ -203,6 +210,81 @@ auto FunctionTesterPlugin::displayResultHtml(const QString &resultFileName) -> v
     } else {
         MessageManager::write(GenMsg::msgError.arg("Could not find file with test results: " +  filepath));
     }
+}
+
+auto loadHWLibraryObjects(const QString &directory) -> QVector<DVObject *>
+{
+    QVector<DVObject *> objects;
+    QDirIterator it(directory, QStringList() << "*.xml", QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        QString fileName = it.next();
+        dvm::DVHWLibraryReader reader;
+        if (reader.readFile(fileName)) {
+            objects << reader.parsedObjects();
+        }
+    }
+    return objects;
+}
+
+auto FunctionTesterPlugin::selectBoardDialog() -> void
+{
+    int wndWidth = 800;
+    int wndHeight = 600;
+
+    int listWidgetHeight = 0.9 * wndHeight;
+
+    QListWidget listWidget(&chooseBoardWindow);
+    auto hwObjects = loadHWLibraryObjects(shared::hwLibraryPath());
+    for (const auto &obj : hwObjects)
+    {
+        if (obj->type() == DVObject::Type::Board) {
+            listWidget.addItem(obj->title());
+        }
+    }
+
+    auto font = listWidget.font();
+    font.setPointSize(15);
+    listWidget.setFont(font);
+    listWidget.resize(wndWidth, listWidgetHeight);
+
+    QWidget bottomPanel(&chooseBoardWindow);
+    bottomPanel.setGeometry(0, listWidgetHeight, wndWidth, wndHeight - listWidgetHeight);
+
+    QPushButton okBtn("OK", &bottomPanel);
+    okBtn.setFixedHeight(bottomPanel.height() * 0.5);
+    // okBtn.setStyleSheet("background-color:#007ACC;");
+
+    QPushButton optionsBtn("Options", &bottomPanel);
+    optionsBtn.setFixedHeight(bottomPanel.height() * 0.5);
+    // optionsBtn.setStyleSheet("background-color:#007ACC;");
+
+    QBoxLayout boxLayout(QBoxLayout::Direction::RightToLeft, &bottomPanel);
+    boxLayout.addWidget(&okBtn);
+    boxLayout.addSpacing(bottomPanel.width() * 0.05);
+    boxLayout.addWidget(&optionsBtn);
+    boxLayout.addSpacing(bottomPanel.width() * 0.65);
+
+    chooseBoardWindow.setWindowTitle("Choose target board");
+    chooseBoardWindow.resize(wndWidth, wndHeight);
+    chooseBoardWindow.show();
+
+    listWidget.setCurrentRow(0);
+
+    QEventLoop loop;
+    connect(&okBtn, &QPushButton::clicked, this,[&]{
+        chooseBoardWindow.close();
+        testUsingDataFromCsvGui(listWidget.currentItem()->text());
+    });
+    connect(&optionsBtn, &QPushButton::clicked, this, [&]{
+        chooseBoardWindow.close();
+        boardOptionsDialog(listWidget.currentItem()->text());
+    });
+    loop.exec();
+}
+
+void FunctionTesterPlugin::boardOptionsDialog(const QString &boardName)
+{
+    qDebug() << "OPTIONS CLICKED: " << boardName;
 }
 
 } // namespace spctr
