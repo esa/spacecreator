@@ -65,4 +65,23 @@ private Q_SLOTS:
     void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
 };
 
+class IVLayerVisualizationModel : public IVVisualizationModelBase
+{
+    Q_OBJECT
+public:
+    explicit IVLayerVisualizationModel(ivm::IVModel *ivModel, ivm::IVModel *objectsModel,
+                                       cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
+
+    QList<QStandardItem *> createItems(shared::VEObject *obj) override;
+
+private Q_SLOTS:
+    void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
+
+private:
+    void setObjectsVisibility(const QString layerName, ivm::IVModel *objectsModel, bool isVisible);
+
+private:
+    ivm::IVModel *m_objectsModel;
+};
+
 } // namespace ive

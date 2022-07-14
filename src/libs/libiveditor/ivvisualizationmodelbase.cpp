@@ -248,4 +248,71 @@ void IVVisualizationModel::onDataChanged(
     }
 }
 
+IVLayerVisualizationModel::IVLayerVisualizationModel(ivm::IVModel *layerModel, ivm::IVModel *objectsModel,
+                                                     cmd::CommandsStack *commandsStack, QObject *parent)
+    : IVVisualizationModelBase(layerModel, commandsStack, shared::DropData::Type::None, parent)
+    , m_objectsModel(objectsModel)
+{
+    connect(this, &QStandardItemModel::dataChanged, this, &IVLayerVisualizationModel::onDataChanged);
+}
+
+QList<QStandardItem *> IVLayerVisualizationModel::createItems(shared::VEObject *obj)
+{
+    QList<QStandardItem *> items = IVVisualizationModelBase::createItems(obj);
+    if (!items.isEmpty()) {
+        items[0]->setEditable(true);
+        items[0]->setCheckable(true);
+        items[0]->setDragEnabled(false);
+        items[0]->setData(Qt::Checked, Qt::CheckStateRole);
+    }
+    return items;
+}
+
+void IVLayerVisualizationModel::onDataChanged(
+        const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+{
+    if (!m_commandsStack) {
+        qWarning() << Q_FUNC_INFO << "No command stack set in VisualizationModel";
+        return;
+    }
+
+    const QStandardItem *firstItem = itemFromIndex(topLeft);
+    const QStandardItem *lastItem = itemFromIndex(bottomRight);
+    Q_ASSERT(firstItem->parent() == lastItem->parent());
+    for (int row = firstItem->row(); row <= lastItem->row(); ++row) {
+        const QStandardItem *parent = firstItem->parent() ? firstItem->parent() : invisibleRootItem();
+        auto item = parent->child(row);
+        if (!item) {
+            continue;
+        }
+        if (roles.contains(Qt::CheckStateRole) || roles.contains(Qt::DisplayRole) || roles.isEmpty()) {
+            const shared::Id id = item->data(IdRole).toUuid();
+            if (auto obj = m_veModel->getObject(id)->as<ivm::IVObject *>()) {
+                if (item->isCheckable() && roles.contains(Qt::CheckStateRole)) {
+                    setObjectsVisibility(item->text(), m_objectsModel, item->checkState() == Qt::Checked);
+                }
+            }
+        }
+    }
+}
+
+void IVLayerVisualizationModel::setObjectsVisibility(const QString layerName, ivm::IVModel *objectsModel, bool isVisible) 
+{
+    const QString encodedLayerName = ivm::IVNameValidator::encodeName(ivm::IVObject::Type::ConnectionLayer, layerName);
+
+    for (auto entity : objectsModel->objects()) {
+        if(auto connection = entity->as<ivm::IVConnection *>()) {
+            if(connection->sourceInterface()->layerName() == encodedLayerName && 
+                    connection->targetInterface()->layerName() == encodedLayerName) {
+                connection->setVisible(isVisible);
+            }
+        }
+        if(auto interface = entity->as<ivm::IVInterface *>()) {
+            if(interface->layerName() == encodedLayerName){
+                interface->setVisible(isVisible);
+            }
+        }
+    }
+}
+
 } // namespace ive

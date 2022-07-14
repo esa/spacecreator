@@ -304,6 +304,13 @@ void IVInterfaceGraphicsItem::applyColorScheme()
     update();
 }
 
+void IVInterfaceGraphicsItem::rebuildLayout()
+{
+    shared::ui::VEConnectionEndPointGraphicsItem::rebuildLayout();
+    setVisible(entity() && entity()->isVisible());
+    update();
+}
+
 void IVInterfaceGraphicsItem::updateLabel()
 {
     setInterfaceName(ifaceLabel());
