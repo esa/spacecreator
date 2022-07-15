@@ -276,27 +276,20 @@ void IVLayerVisualizationModel::onDataChanged(
         return;
     }
 
-    const QStandardItem *firstItem = itemFromIndex(topLeft);
-    const QStandardItem *lastItem = itemFromIndex(bottomRight);
-    Q_ASSERT(firstItem->parent() == lastItem->parent());
-    for (int row = firstItem->row(); row <= lastItem->row(); ++row) {
-        const QStandardItem *parent = firstItem->parent() ? firstItem->parent() : invisibleRootItem();
-        auto item = parent->child(row);
-        if (!item) {
-            continue;
-        }
-        if (roles.contains(Qt::CheckStateRole) || roles.contains(Qt::DisplayRole) || roles.isEmpty()) {
-            const shared::Id id = item->data(IdRole).toUuid();
-            if (auto obj = m_veModel->getObject(id)->as<ivm::IVObject *>()) {
-                if (item->isCheckable() && roles.contains(Qt::CheckStateRole)) {
-                    setObjectsVisibility(item->text(), m_objectsModel, item->checkState() == Qt::Checked);
-                }
-            }
+    Q_ASSERT(topLeft == bottomRight);
+
+    QStandardItem *item = itemFromIndex(topLeft);
+    if (!item) {
+        return;
+    }
+    if (roles.contains(Qt::CheckStateRole) || roles.contains(Qt::DisplayRole) || roles.isEmpty()) {
+        if (item->isCheckable() && roles.contains(Qt::CheckStateRole)) {
+            setObjectsVisibility(item->text(), m_objectsModel, item->checkState() == Qt::Checked);
         }
     }
 }
 
-void IVLayerVisualizationModel::setObjectsVisibility(const QString layerName, ivm::IVModel *objectsModel, bool isVisible) 
+void IVLayerVisualizationModel::setObjectsVisibility(const QString layerName, ivm::IVModel *objectsModel, const bool isVisible) 
 {
     const QString encodedLayerName = ivm::IVNameValidator::encodeName(ivm::IVObject::Type::ConnectionLayer, layerName);
 
