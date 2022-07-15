@@ -248,7 +248,7 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
 
         if (std::find(modelFunctions.begin(), modelFunctions.end(), functionName) != modelFunctions.end()) {
             promelaModel->addInclude(QString("%1.pml").arg(functionName.toLower()));
-            createPromelaObjectsForFunction(context, ivModel, ivFunction, functionName);
+            createPromelaObjectsForFunction(context, ivModel, ivFunction, functionName, asn1SubtypesDefinitions);
         } else if (std::find(environmentFunctions.begin(), environmentFunctions.end(), functionName)
                 != environmentFunctions.end()) {
             createPromelaObjectsForEnvironment(
@@ -606,7 +606,8 @@ std::unique_ptr<model::InlineDef> IvToPromelaTranslator::generateSendInline(cons
 }
 
 void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslator::Context &context,
-        const IVModel *ivModel, IVFunction *ivFunction, const QString &functionName) const
+        const IVModel *ivModel, IVFunction *ivFunction, const QString &functionName,
+        const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const
 {
     QVector<IVInterface *> providedInterfaceList = ivFunction->pis();
 
@@ -631,13 +632,13 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslato
         const QString interfaceName = getInterfaceName(providedInterface);
         const size_t queueSize = getInterfaceQueueSize(providedInterface);
         const size_t priority = getInterfacePriority(providedInterface);
-        const std::pair<QString, QString> parameter = getInterfaceParameter(providedInterface);
+        const auto &[parameterName, parameterType] = getInterfaceParameter(providedInterface);
 
-        const QString parameterName = parameter.first;
-        const QString parameterType = parameter.second;
+        const auto parameterSubtyped = isParameterSubtyped(
+                parameterType, parameterName, sourceInterfaceName, sourceFunctionName, asn1SubtypesDefinitions);
 
         context.model()->addInlineDef(generateSendInline(functionName, interfaceName, parameterName, parameterType,
-                sourceFunctionName, sourceInterfaceName, false));
+                sourceFunctionName, sourceInterfaceName, parameterSubtyped));
 
         context.model()->addProctype(
                 generateProctype(context, functionName, interfaceName, parameterType, queueSize, priority, false));
@@ -669,22 +670,19 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTransl
         const QString sourceFunctionName = getInterfaceFunctionName(requiredInterface);
 
         const QString interfaceName = getInterfaceName(providedInterface);
-        const std::pair<QString, QString> parameter = getInterfaceParameter(providedInterface);
+        const auto &[parameterName, parameterType] = getInterfaceParameter(providedInterface);
 
-        const QString parameterName = parameter.first;
-        const QString parameterType = handleParameterType(
-                parameter.second, parameterName, interfaceName, functionName, asn1SubtypesDefinitions);
+        const auto parameterSubtyped =
+                isParameterSubtyped(parameterType, parameterName, interfaceName, functionName, asn1SubtypesDefinitions);
 
-        const auto parameterSubtyped = (parameterType != parameter.second);
-
-        context.model()->addInlineDef(generateSendInline(functionName, interfaceName, parameterName, parameter.second,
+        context.model()->addInlineDef(generateSendInline(functionName, interfaceName, parameterName, parameterType,
                 sourceFunctionName, sourceInterfaceName, parameterSubtyped));
 
         const size_t queueSize = getInterfaceQueueSize(providedInterface);
         const size_t priority = getInterfacePriority(providedInterface);
 
         context.model()->addProctype(
-                generateProctype(context, functionName, interfaceName, parameter.second, queueSize, priority, true));
+                generateProctype(context, functionName, interfaceName, parameterType, queueSize, priority, true));
     }
 
     QVector<IVInterface *> requiredInterfaceList = ivFunction->ris();
@@ -700,7 +698,7 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTransl
         const std::pair<QString, QString> parameter = getInterfaceParameter(requiredInterface);
 
         const QString parameterName = parameter.first;
-        const QString parameterType = handleParameterType(
+        const QString parameterType = handleParameterSubtype(
                 parameter.second, parameterName, interfaceName, functionName, asn1SubtypesDefinitions);
 
         const QString sendInline =
@@ -990,7 +988,7 @@ size_t IvToPromelaTranslator::getInterfacePriority(IVInterface *interface) const
     return 1;
 }
 
-QString IvToPromelaTranslator::handleParameterType(const QString &parameterTypeName, const QString &parameterName,
+QString IvToPromelaTranslator::handleParameterSubtype(const QString &parameterTypeName, const QString &parameterName,
         const QString &interfaceName, const QString &functionName,
         const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const
 {
@@ -1043,6 +1041,15 @@ Expression IvToPromelaTranslator::handleSendInlineParameter(
     sequence.appendElement(std::move(inlineCallElem));
 
     return Expression(VariableRef(parameterName));
+}
+
+bool IvToPromelaTranslator::isParameterSubtyped(const QString &parameterType, const QString &parameterName,
+        const QString &interfaceName, const QString &functionName,
+        const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const
+{
+    const auto subtype =
+            handleParameterSubtype(parameterType, parameterName, interfaceName, functionName, asn1SubtypesDefinitions);
+    return parameterType != subtype;
 }
 
 QString IvToPromelaTranslator::buildParameterSubtypeName(
