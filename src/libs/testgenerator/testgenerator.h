@@ -54,10 +54,13 @@ public:
      * @param csvModel the CSV data with test vectors
      * @param asn1Model ASN.1 model to be used during testing
      * @param delta maximum allowed absolute error
-     *
+     * @param boardName name of the board the tests are run on
+     * @param gdbScriptPath path to the GDB script for running tests
+     * 
      * @return true if there was no error during execution of the testing procedure nad false otherwise
      */
-    auto testUsingDataFromCsv(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model, float delta) -> bool;
+    auto testUsingDataFromCsv(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model, const float delta,
+            const QString &boardName, const QString &gdbScriptPath) -> bool;
 
     /**
      * @brief Prepare test harness files to be used for compilation of tests
@@ -65,10 +68,12 @@ public:
      * @param interface interface under test
      * @param csvModel the CSV data with test vectors
      * @param asn1Model ASN.1 model to be used during testing
+     * @param boardName name of the board the tests are run on
      *
      * @return true if there was no error during creation of the test harness files
      */
-    auto prepareTestHarness(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model) -> QString;
+    auto prepareTestHarness(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model,
+            const QString &boardName) -> QString;
 
     /**
      * @brief Runs the tests in GDB debugger
@@ -76,10 +81,12 @@ public:
      * @param interface interface under test
      * @param asn1Model ASN.1 model to be used during testing
      * @param binaryPath path to the binary file to run
+     * @param gdbScriptPath path to the GDB script for running tests
      *
      * @return vector of the test results obtained from GDB
      */
-    auto runTests(IVInterface &interface, Asn1Model &asn1Model, const QString &binaryPath) -> QVector<QVariant>;
+    auto runTests(IVInterface &interface, Asn1Model &asn1Model, const QString &binaryPath,
+            const QString &gdbScriptPath) -> QVector<QVariant>;
 
 private:
     auto initializePaths(const QString &baseDirectory) -> void;

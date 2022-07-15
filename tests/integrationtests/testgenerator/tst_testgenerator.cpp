@@ -56,7 +56,7 @@ void tst_testgenerator::testPrepareTestHarness()
     QVERIFY(asn1Model);
 
     TestGenerator testGenerator(QDir::currentPath());
-    QString testedFunctionName = testGenerator.prepareTestHarness(*interface, *csvModel, *asn1Model);
+    QString testedFunctionName = testGenerator.prepareTestHarness(*interface, *csvModel, *asn1Model, "x86 Linux CPP");
 
     QString generatedHarnessDirectory = "generated";
     auto generatedTestDriver = generatedHarnessDirectory + QDir::separator() + "testdriver.c";

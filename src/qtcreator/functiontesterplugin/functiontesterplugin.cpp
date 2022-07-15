@@ -18,8 +18,9 @@
  */
 
 #include "functiontesterplugin.h"
-#include "pluginconstants.h"
+
 #include "dvcore/dvhwlibraryreader.h"
+#include "pluginconstants.h"
 
 #include <QApplication>
 #include <QBoxLayout>
@@ -92,8 +93,16 @@ auto FunctionTesterPlugin::testUsingDataFromCsvGui(const QString &boardName) -> 
     }
     float delta = setDeltaDialog();
 
+    if (gdbScriptPath.isEmpty()) {
+        MessageManager::write(GenMsg::msgInfo.arg("Path to the GDB file is empty"));
+        return;
+    }
+
+    // const QString gdbScriptPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+    //         + QDir::separator() + "x86-linux-cpp.gdb";
+
     TestGenerator testGenerator(getBaseDirectory());
-    testGenerator.testUsingDataFromCsv(*interface, *csvModel, *asn1Model, delta);
+    testGenerator.testUsingDataFromCsv(*interface, *csvModel, *asn1Model, delta, boardName, gdbScriptPath);
     displayResultHtml(resultFileName);
 }
 
@@ -208,7 +217,7 @@ auto FunctionTesterPlugin::displayResultHtml(const QString &resultFileName) -> v
     if (QFile::exists(filepath)) {
         QDesktopServices::openUrl(QUrl::fromLocalFile(filepath));
     } else {
-        MessageManager::write(GenMsg::msgError.arg("Could not find file with test results: " +  filepath));
+        MessageManager::write(GenMsg::msgError.arg("Could not find file with test results: " + filepath));
     }
 }
 
@@ -233,58 +242,58 @@ auto FunctionTesterPlugin::selectBoardDialog() -> void
 
     int listWidgetHeight = 0.9 * wndHeight;
 
-    QListWidget listWidget(&chooseBoardWindow);
+    QWidget *chooseBoardWindow = new QWidget;
+
+    QListWidget *listWidget = new QListWidget(chooseBoardWindow);
     auto hwObjects = loadHWLibraryObjects(shared::hwLibraryPath());
-    for (const auto &obj : hwObjects)
-    {
+    for (const auto &obj : hwObjects) {
         if (obj->type() == DVObject::Type::Board) {
-            listWidget.addItem(obj->title());
+            listWidget->addItem(obj->title());
         }
     }
+    listWidget->setCurrentRow(0);
 
-    auto font = listWidget.font();
+    auto font = listWidget->font();
     font.setPointSize(15);
-    listWidget.setFont(font);
-    listWidget.resize(wndWidth, listWidgetHeight);
+    listWidget->setFont(font);
+    listWidget->resize(wndWidth, listWidgetHeight);
 
-    QWidget bottomPanel(&chooseBoardWindow);
-    bottomPanel.setGeometry(0, listWidgetHeight, wndWidth, wndHeight - listWidgetHeight);
+    QWidget *bottomPanel = new QWidget(chooseBoardWindow);
+    bottomPanel->setGeometry(0, listWidgetHeight, wndWidth, wndHeight - listWidgetHeight);
 
-    QPushButton okBtn("OK", &bottomPanel);
-    okBtn.setFixedHeight(bottomPanel.height() * 0.5);
-    // okBtn.setStyleSheet("background-color:#007ACC;");
+    QPushButton *okBtn = new QPushButton("OK", bottomPanel);
+    okBtn->setFixedHeight(bottomPanel->height() * 0.5);
 
-    QPushButton optionsBtn("Options", &bottomPanel);
-    optionsBtn.setFixedHeight(bottomPanel.height() * 0.5);
-    // optionsBtn.setStyleSheet("background-color:#007ACC;");
+    QPushButton *optionsBtn = new QPushButton("Options", bottomPanel);
+    optionsBtn->setFixedHeight(bottomPanel->height() * 0.5);
 
-    QBoxLayout boxLayout(QBoxLayout::Direction::RightToLeft, &bottomPanel);
-    boxLayout.addWidget(&okBtn);
-    boxLayout.addSpacing(bottomPanel.width() * 0.05);
-    boxLayout.addWidget(&optionsBtn);
-    boxLayout.addSpacing(bottomPanel.width() * 0.65);
+    QBoxLayout *boxLayout = new QBoxLayout(QBoxLayout::Direction::RightToLeft, bottomPanel);
+    boxLayout->addWidget(okBtn);
+    boxLayout->addSpacing(bottomPanel->width() * 0.05);
+    boxLayout->addWidget(optionsBtn);
+    boxLayout->addSpacing(bottomPanel->width() * 0.65);
 
-    chooseBoardWindow.setWindowTitle("Choose target board");
-    chooseBoardWindow.resize(wndWidth, wndHeight);
-    chooseBoardWindow.show();
+    chooseBoardWindow->setWindowTitle("Choose target board");
+    chooseBoardWindow->resize(wndWidth, wndHeight);
+    chooseBoardWindow->show();
 
-    listWidget.setCurrentRow(0);
+    auto a = listWidget->currentItem()->text();
 
-    QEventLoop loop;
-    connect(&okBtn, &QPushButton::clicked, this,[&]{
-        chooseBoardWindow.close();
-        testUsingDataFromCsvGui(listWidget.currentItem()->text());
+    connect(okBtn, &QPushButton::clicked, this, [=] {
+        QString boardName = listWidget->currentItem()->text();
+        chooseBoardWindow->close();
+        testUsingDataFromCsvGui(boardName);
     });
-    connect(&optionsBtn, &QPushButton::clicked, this, [&]{
-        chooseBoardWindow.close();
-        boardOptionsDialog(listWidget.currentItem()->text());
+    connect(optionsBtn, &QPushButton::clicked, this, [=] {
+        boardOptionsDialog(chooseBoardWindow, listWidget->currentItem()->text());
     });
-    loop.exec();
 }
 
-void FunctionTesterPlugin::boardOptionsDialog(const QString &boardName)
+auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &boardName) -> void
 {
-    qDebug() << "OPTIONS CLICKED: " << boardName;
+    QString defaultDirPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+    gdbScriptPath = QFileDialog::getOpenFileName(
+            parent, tr("Select GDB script for running tests..."), defaultDirPath, tr("*.gdb"));
 }
 
 } // namespace spctr

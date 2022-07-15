@@ -47,7 +47,6 @@ public:
      *
      */
     auto testUsingDataFromCsvGui(const QString &boardName) -> void;
-    auto boardOptionsDialog(const QString &boardName) -> void;
 private:
     auto addTestInterfaceOption() -> void;
     auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
@@ -59,8 +58,9 @@ private:
     auto getCurrentIvEditorCore() -> IVEditorCorePtr;
     auto displayResultHtml(const QString &resultFileName) -> void;
     auto selectBoardDialog() -> void;
+    auto boardOptionsDialog(QWidget *parent, const QString &boardName) -> void;
 
-    QWidget chooseBoardWindow;
+    QString gdbScriptPath;
 };
 
 }
