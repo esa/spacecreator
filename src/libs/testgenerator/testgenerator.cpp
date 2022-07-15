@@ -139,7 +139,7 @@ auto TestGenerator::prepareTestHarness(
     }
 
     const std::unique_ptr<DVModel> dvModelGenerated =
-            DvGenerator::generate(ivFunctions, boardName, "x86_Linux_TestRunner", "Node_1", "hostPartition");
+            DvGenerator::generate(ivFunctions, boardName, "TestRunner", "Node_1", "hostPartition");
     if (dvModelGenerated == nullptr) {
         qDebug() << "DV model was not generated";
         return {};

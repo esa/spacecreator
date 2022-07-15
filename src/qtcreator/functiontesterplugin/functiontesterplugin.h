@@ -34,6 +34,15 @@ class FunctionTesterPlugin : public ExtensionSystem::IPlugin
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QtCreatorPlugin" FILE "FunctionTesterPlugin.json")
 
+    struct BoardLaunchConfig
+    {
+        QString scriptPath;
+        QString clientName;
+        QString clientParams;
+        QString serverName;
+        QString serverParams;
+    };
+
 public:
     FunctionTesterPlugin();
     ~FunctionTesterPlugin() override;
@@ -58,11 +67,12 @@ private:
     auto getCurrentIvEditorCore() -> IVEditorCorePtr;
     auto displayResultHtml(const QString &resultFileName) -> void;
     auto selectBoardDialog() -> void;
+    auto boardOptionsDialog(QWidget *parent, const QString &boardName) -> void;
     auto selectScriptDialog(QWidget *parent, const QString &boardName) -> void;
-    auto loadBoardsConfiguration() -> QMap<QString, QString>;
+    auto loadBoardsConfiguration() -> QMap<QString, BoardLaunchConfig>;
     auto saveBoardConfiguration(const QString &boardName, const QString &gdbScriptPath) -> bool;
 
-    QMap<QString, QString> boardsConfiguration;
+    QMap<QString, BoardLaunchConfig> boardsConfiguration;
 };
 
 }

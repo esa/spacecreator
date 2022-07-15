@@ -27,6 +27,7 @@
 #include <QDesktopServices>
 #include <QDirIterator>
 #include <QFileDialog>
+#include <QFormLayout>
 #include <QInputDialog>
 #include <QListWidgetItem>
 #include <QMenu>
@@ -53,6 +54,8 @@ namespace spctr {
 
 const QString resultFileName = "Results.html";
 const QString boardsConfigPath = "boards_config.txt";
+constexpr int BOARD_CONFIG_LENGTH = 6;
+
 
 FunctionTesterPlugin::FunctionTesterPlugin() { }
 
@@ -94,7 +97,7 @@ auto FunctionTesterPlugin::testUsingDataFromCsvGui(const QString &boardName) -> 
     }
     float delta = setDeltaDialog();
 
-    QString gdbScriptPath = boardsConfiguration[boardName];
+    QString gdbScriptPath = boardsConfiguration[boardName].scriptPath;
     if (gdbScriptPath.isEmpty()) {
         MessageManager::write(GenMsg::msgInfo.arg("Path to the GDB file is empty"));
         return;
@@ -287,8 +290,41 @@ auto FunctionTesterPlugin::selectBoardDialog() -> void
         testUsingDataFromCsvGui(boardName);
     });
     connect(optionsBtn, &QPushButton::clicked, this, [=] {
-        selectScriptDialog(chooseBoardWindow, listWidget->currentItem()->text());
+        boardOptionsDialog(chooseBoardWindow, listWidget->currentItem()->text());
     });
+}
+
+auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &boardName) -> void
+{
+    QWidget *boardOptionsWindow = new QWidget;
+    boardOptionsWindow->resize(400, 300);
+
+    QLineEdit *scriptPathEdit = new QLineEdit;
+    QLineEdit *clientNameEdit = new QLineEdit;
+    QLineEdit *clientParamsEdit = new QLineEdit;
+    QLineEdit *serverNameEdit = new QLineEdit;
+    QLineEdit *serverParamsEdit = new QLineEdit;
+
+    QFormLayout *formLayout = new QFormLayout;
+    formLayout->addRow("Script path", scriptPathEdit);
+    formLayout->addRow("Client", clientNameEdit);
+    formLayout->addRow("Client params", clientParamsEdit);
+    formLayout->addRow("Server", serverNameEdit);
+    formLayout->addRow("Server params", serverParamsEdit);
+
+    QPushButton *okBtn = new QPushButton("OK");
+    formLayout->addWidget(okBtn);
+
+    boardOptionsWindow->setLayout(formLayout);
+
+    scriptPathEdit->setText(boardsConfiguration[boardName].scriptPath);
+    clientNameEdit->setText(boardsConfiguration[boardName].clientName);
+    clientParamsEdit->setText(boardsConfiguration[boardName].clientParams);
+    serverNameEdit->setText(boardsConfiguration[boardName].serverName);
+    serverParamsEdit->setText(boardsConfiguration[boardName].serverParams);
+
+    boardOptionsWindow->setWindowTitle("Board options");
+    boardOptionsWindow->show();
 }
 
 auto FunctionTesterPlugin::selectScriptDialog(QWidget *parent, const QString &boardName) -> void
@@ -301,17 +337,21 @@ auto FunctionTesterPlugin::selectScriptDialog(QWidget *parent, const QString &bo
     }
 }
 
-auto FunctionTesterPlugin::loadBoardsConfiguration() -> QMap<QString, QString>
+auto FunctionTesterPlugin::loadBoardsConfiguration() -> QMap<QString, BoardLaunchConfig>
 {
-    QMap<QString, QString> boardsConfig;
+    QMap<QString, BoardLaunchConfig> boardsConfig;
     QFile file(boardsConfigPath);
     if (file.open(QIODevice::ReadOnly)) {
         QTextStream stream(&file);
         QString key, value;
         while (!stream.atEnd()) {
             QString line = stream.readLine();
-            QStringList keyAndValue = line.split(';');
-            boardsConfig.insert(keyAndValue[0], keyAndValue[1]);
+            QStringList conf = line.split(';');
+            if (conf.size() >= BOARD_CONFIG_LENGTH) {
+                boardsConfig.insert(conf[0], BoardLaunchConfig { conf[1], conf[2], conf[3], conf[4], conf[5] });
+            } else {
+                MessageManager::write(GenMsg::msgInfo.arg("Not enough information in boards_config.txt file"));
+            }
         }
         file.close();
     }
@@ -320,12 +360,12 @@ auto FunctionTesterPlugin::loadBoardsConfiguration() -> QMap<QString, QString>
 
 auto FunctionTesterPlugin::saveBoardConfiguration(const QString &boardName, const QString &gdbScriptPath) -> bool
 {
-    boardsConfiguration[boardName] = gdbScriptPath;
+    boardsConfiguration[boardName].scriptPath = gdbScriptPath;
     QFile file(boardsConfigPath);
     if (file.open(QIODevice::WriteOnly)) {
         QTextStream stream(&file);
         for (const auto &key : boardsConfiguration.keys()) {
-            stream << key << ';' <<  boardsConfiguration[key] << '\n';
+            stream << key << ';' <<  boardsConfiguration[key].scriptPath << '\n';
         }
     }
     return true;
