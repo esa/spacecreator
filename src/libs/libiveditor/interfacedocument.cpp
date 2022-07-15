@@ -893,7 +893,11 @@ bool InterfaceDocument::loadImpl(const QString &path)
     }
 
     setObjects(parser.parsedObjects());
-    setLayers(parser.parsedLayers());
+
+    auto layers = parser.parsedLayers();
+    ivm::IVObject::sortObjectListByTitle(layers);
+    setLayers(layers);
+
     const QVariantMap metadata = parser.metaData();
     QVariantMap::const_iterator i = metadata.constFind("asn1file");
     while (i != metadata.end() && i.key() == "asn1file") {
