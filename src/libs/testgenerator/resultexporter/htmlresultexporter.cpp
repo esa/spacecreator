@@ -66,6 +66,7 @@ auto HtmlResultExporter::exportResult(const QString &filepath) -> void
     if (file.open(QIODevice::WriteOnly)) {
         QTextStream stream(&file);
         generateHtmlStream(stream);
+        file.close();
     }
 }
 

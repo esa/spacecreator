@@ -58,9 +58,11 @@ private:
     auto getCurrentIvEditorCore() -> IVEditorCorePtr;
     auto displayResultHtml(const QString &resultFileName) -> void;
     auto selectBoardDialog() -> void;
-    auto boardOptionsDialog(QWidget *parent, const QString &boardName) -> void;
+    auto selectScriptDialog(QWidget *parent, const QString &boardName) -> void;
+    auto loadBoardsConfiguration() -> QMap<QString, QString>;
+    auto saveBoardConfiguration(const QString &boardName, const QString &gdbScriptPath) -> bool;
 
-    QString gdbScriptPath;
+    QMap<QString, QString> boardsConfiguration;
 };
 
 }

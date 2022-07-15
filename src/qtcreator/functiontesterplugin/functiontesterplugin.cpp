@@ -52,6 +52,7 @@ using plugincommon::ModelLoader;
 namespace spctr {
 
 const QString resultFileName = "Results.html";
+const QString boardsConfigPath = "boards_config.txt";
 
 FunctionTesterPlugin::FunctionTesterPlugin() { }
 
@@ -93,6 +94,7 @@ auto FunctionTesterPlugin::testUsingDataFromCsvGui(const QString &boardName) -> 
     }
     float delta = setDeltaDialog();
 
+    QString gdbScriptPath = boardsConfiguration[boardName];
     if (gdbScriptPath.isEmpty()) {
         MessageManager::write(GenMsg::msgInfo.arg("Path to the GDB file is empty"));
         return;
@@ -146,7 +148,7 @@ auto FunctionTesterPlugin::setDeltaDialog() -> float
 auto FunctionTesterPlugin::loadCsv() -> std::unique_ptr<csv::CsvModel>
 {
     const QString inputFilePath = QFileDialog::getOpenFileName(
-            nullptr, tr("Select CSV file to import test vectors from..."), QString(), tr("*.csv"));
+            nullptr, tr("Select CSV file to import test vectors from..."), "", tr("*.csv"));
     if (inputFilePath.isEmpty()) {
         MessageManager::write(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
         return std::unique_ptr<csv::CsvModel> {};
@@ -244,6 +246,8 @@ auto FunctionTesterPlugin::selectBoardDialog() -> void
 
     QWidget *chooseBoardWindow = new QWidget;
 
+    boardsConfiguration = loadBoardsConfiguration();
+
     QListWidget *listWidget = new QListWidget(chooseBoardWindow);
     auto hwObjects = loadHWLibraryObjects(shared::hwLibraryPath());
     for (const auto &obj : hwObjects) {
@@ -277,23 +281,54 @@ auto FunctionTesterPlugin::selectBoardDialog() -> void
     chooseBoardWindow->resize(wndWidth, wndHeight);
     chooseBoardWindow->show();
 
-    auto a = listWidget->currentItem()->text();
-
     connect(okBtn, &QPushButton::clicked, this, [=] {
         QString boardName = listWidget->currentItem()->text();
         chooseBoardWindow->close();
         testUsingDataFromCsvGui(boardName);
     });
     connect(optionsBtn, &QPushButton::clicked, this, [=] {
-        boardOptionsDialog(chooseBoardWindow, listWidget->currentItem()->text());
+        selectScriptDialog(chooseBoardWindow, listWidget->currentItem()->text());
     });
 }
 
-auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &boardName) -> void
+auto FunctionTesterPlugin::selectScriptDialog(QWidget *parent, const QString &boardName) -> void
 {
     QString defaultDirPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
-    gdbScriptPath = QFileDialog::getOpenFileName(
+    QString selectedScriptPath = QFileDialog::getOpenFileName(
             parent, tr("Select GDB script for running tests..."), defaultDirPath, tr("*.gdb"));
+    if (!selectedScriptPath.isEmpty()) {
+        saveBoardConfiguration(boardName, selectedScriptPath);
+    }
+}
+
+auto FunctionTesterPlugin::loadBoardsConfiguration() -> QMap<QString, QString>
+{
+    QMap<QString, QString> boardsConfig;
+    QFile file(boardsConfigPath);
+    if (file.open(QIODevice::ReadOnly)) {
+        QTextStream stream(&file);
+        QString key, value;
+        while (!stream.atEnd()) {
+            QString line = stream.readLine();
+            QStringList keyAndValue = line.split(';');
+            boardsConfig.insert(keyAndValue[0], keyAndValue[1]);
+        }
+        file.close();
+    }
+    return boardsConfig;
+}
+
+auto FunctionTesterPlugin::saveBoardConfiguration(const QString &boardName, const QString &gdbScriptPath) -> bool
+{
+    boardsConfiguration[boardName] = gdbScriptPath;
+    QFile file(boardsConfigPath);
+    if (file.open(QIODevice::WriteOnly)) {
+        QTextStream stream(&file);
+        for (const auto &key : boardsConfiguration.keys()) {
+            stream << key << ';' <<  boardsConfiguration[key] << '\n';
+        }
+    }
+    return true;
 }
 
 } // namespace spctr
