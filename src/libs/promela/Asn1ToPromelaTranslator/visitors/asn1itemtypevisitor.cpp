@@ -842,9 +842,6 @@ ForLoop Asn1ItemTypeVisitor::createSequenceOfZeroingLoop(const QString &utypeNam
     VariableRef dstLength = VariableRef("dst");
     dstLength.appendElement("length");
 
-    auto loopRangeStart = BinaryExpression(BinaryExpression::Operator::SUBTRACT,
-            std::make_unique<Expression>(dstLength), std::make_unique<Expression>(1));
-
     QList<InlineCall::Argument> inlineArguments;
     inlineArguments.append(dst);
 
