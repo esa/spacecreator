@@ -295,8 +295,7 @@ void IVLayerVisualizationModel::setObjectsVisibility(const QString layerName, iv
 
     for (auto entity : objectsModel->objects()) {
         if(auto connection = entity->as<ivm::IVConnection *>()) {
-            if(connection->sourceInterface()->layerName() == encodedLayerName && 
-                    connection->targetInterface()->layerName() == encodedLayerName) {
+            if(connection->layer()->title() == encodedLayerName) {
                 connection->setVisible(isVisible);
             }
         }
