@@ -26,22 +26,16 @@
 #include <csv/CsvModel/csvmodel.h>
 #include <asn1library/asn1/asn1model.h>
 #include <qlistwidget.h>
+#include <testgenerator/testgenerator.h>
 
 namespace spctr {
+
+using testgenerator::LaunchConfiguration;
 
 class FunctionTesterPlugin : public ExtensionSystem::IPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QtCreatorPlugin" FILE "FunctionTesterPlugin.json")
-
-    struct BoardLaunchConfig
-    {
-        QString scriptPath;
-        QString clientName;
-        QString clientParams;
-        QString serverName;
-        QString serverParams;
-    };
 
 public:
     FunctionTesterPlugin();
@@ -68,11 +62,11 @@ private:
     auto displayResultHtml(const QString &resultFileName) -> void;
     auto selectBoardDialog() -> void;
     auto boardOptionsDialog(QWidget *parent, const QString &boardName) -> void;
-    auto selectScriptDialog(QWidget *parent, const QString &boardName) -> void;
-    auto loadBoardsConfiguration() -> QMap<QString, BoardLaunchConfig>;
-    auto saveBoardConfiguration(const QString &boardName, const QString &gdbScriptPath) -> bool;
+    auto selectScriptDialog(QWidget *parent, const QString &boardName, QLineEdit *scriptPathEdit) -> void;
+    auto loadBoardsConfiguration() -> QMap<QString, LaunchConfiguration>;
+    auto saveBoardConfiguration(const QString &boardName, const LaunchConfiguration &launchConfig) -> bool;
 
-    QMap<QString, BoardLaunchConfig> boardsConfiguration;
+    QMap<QString, LaunchConfiguration> boardsConfiguration;
 };
 
 }

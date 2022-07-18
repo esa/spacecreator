@@ -41,7 +41,6 @@
 #include <modelloader.h>
 #include <shared/ui/veinteractiveobject.h>
 #include <spacecreatorplugin/iv/iveditordocument.h>
-#include <testgenerator/testgenerator.h>
 
 using namespace Core;
 using namespace testgenerator;
@@ -97,17 +96,13 @@ auto FunctionTesterPlugin::testUsingDataFromCsvGui(const QString &boardName) -> 
     }
     float delta = setDeltaDialog();
 
-    QString gdbScriptPath = boardsConfiguration[boardName].scriptPath;
-    if (gdbScriptPath.isEmpty()) {
+    if (boardsConfiguration[boardName].scriptPath.isEmpty()) {
         MessageManager::write(GenMsg::msgInfo.arg("Path to the GDB file is empty"));
         return;
     }
 
-    // const QString gdbScriptPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
-    //         + QDir::separator() + "x86-linux-cpp.gdb";
-
     TestGenerator testGenerator(getBaseDirectory());
-    testGenerator.testUsingDataFromCsv(*interface, *csvModel, *asn1Model, delta, boardName, gdbScriptPath);
+    testGenerator.testUsingDataFromCsv(*interface, *csvModel, *asn1Model, delta, boardName, boardsConfiguration[boardName]);
     displayResultHtml(resultFileName);
 }
 
@@ -245,11 +240,10 @@ auto FunctionTesterPlugin::selectBoardDialog() -> void
     int wndWidth = 800;
     int wndHeight = 600;
 
-    int listWidgetHeight = 0.9 * wndHeight;
+    boardsConfiguration = loadBoardsConfiguration();
 
     QWidget *chooseBoardWindow = new QWidget;
-
-    boardsConfiguration = loadBoardsConfiguration();
+    chooseBoardWindow->resize(wndWidth, wndHeight);
 
     QListWidget *listWidget = new QListWidget(chooseBoardWindow);
     auto hwObjects = loadHWLibraryObjects(shared::hwLibraryPath());
@@ -258,12 +252,14 @@ auto FunctionTesterPlugin::selectBoardDialog() -> void
             listWidget->addItem(obj->title());
         }
     }
-    listWidget->setCurrentRow(0);
 
     auto font = listWidget->font();
     font.setPointSize(15);
     listWidget->setFont(font);
+
+    int listWidgetHeight = 0.9 * chooseBoardWindow->height();
     listWidget->resize(wndWidth, listWidgetHeight);
+    listWidget->setCurrentRow(0);
 
     QWidget *bottomPanel = new QWidget(chooseBoardWindow);
     bottomPanel->setGeometry(0, listWidgetHeight, wndWidth, wndHeight - listWidgetHeight);
@@ -280,10 +276,6 @@ auto FunctionTesterPlugin::selectBoardDialog() -> void
     boxLayout->addWidget(optionsBtn);
     boxLayout->addSpacing(bottomPanel->width() * 0.65);
 
-    chooseBoardWindow->setWindowTitle("Choose target board");
-    chooseBoardWindow->resize(wndWidth, wndHeight);
-    chooseBoardWindow->show();
-
     connect(okBtn, &QPushButton::clicked, this, [=] {
         QString boardName = listWidget->currentItem()->text();
         chooseBoardWindow->close();
@@ -292,12 +284,15 @@ auto FunctionTesterPlugin::selectBoardDialog() -> void
     connect(optionsBtn, &QPushButton::clicked, this, [=] {
         boardOptionsDialog(chooseBoardWindow, listWidget->currentItem()->text());
     });
+
+    chooseBoardWindow->setWindowTitle("Choose target board");
+    chooseBoardWindow->show();
 }
 
 auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &boardName) -> void
 {
     QWidget *boardOptionsWindow = new QWidget;
-    boardOptionsWindow->resize(400, 300);
+    boardOptionsWindow->resize(500, 200);
 
     QLineEdit *scriptPathEdit = new QLineEdit;
     QLineEdit *clientNameEdit = new QLineEdit;
@@ -305,8 +300,13 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
     QLineEdit *serverNameEdit = new QLineEdit;
     QLineEdit *serverParamsEdit = new QLineEdit;
 
+    QBoxLayout *pathEditLayout = new QBoxLayout(QBoxLayout::Direction::RightToLeft);
+    QPushButton *selectBtn = new QPushButton("Select");
+    pathEditLayout->addWidget(selectBtn);
+    pathEditLayout->addWidget(scriptPathEdit);
+
     QFormLayout *formLayout = new QFormLayout;
-    formLayout->addRow("Script path", scriptPathEdit);
+    formLayout->addRow("Script path", pathEditLayout);
     formLayout->addRow("Client", clientNameEdit);
     formLayout->addRow("Client params", clientParamsEdit);
     formLayout->addRow("Server", serverNameEdit);
@@ -319,27 +319,37 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
 
     scriptPathEdit->setText(boardsConfiguration[boardName].scriptPath);
     clientNameEdit->setText(boardsConfiguration[boardName].clientName);
-    clientParamsEdit->setText(boardsConfiguration[boardName].clientParams);
+    clientParamsEdit->setText(boardsConfiguration[boardName].clientArgs);
     serverNameEdit->setText(boardsConfiguration[boardName].serverName);
-    serverParamsEdit->setText(boardsConfiguration[boardName].serverParams);
+    serverParamsEdit->setText(boardsConfiguration[boardName].serverArgs);
+
+    connect(selectBtn, &QPushButton::clicked, this, [=] {
+        selectScriptDialog(boardOptionsWindow, boardName, scriptPathEdit);
+    });
+    connect(okBtn, &QPushButton::clicked, this, [=] {
+        boardOptionsWindow->close();
+        LaunchConfiguration boardConfig(scriptPathEdit->text(),
+                clientNameEdit->text(), clientParamsEdit->text(), serverNameEdit->text(), serverParamsEdit->text());
+        saveBoardConfiguration(boardName, boardConfig);
+    });
 
     boardOptionsWindow->setWindowTitle("Board options");
     boardOptionsWindow->show();
 }
 
-auto FunctionTesterPlugin::selectScriptDialog(QWidget *parent, const QString &boardName) -> void
+auto FunctionTesterPlugin::selectScriptDialog(QWidget *parent, const QString &boardName, QLineEdit *scriptPathEdit) -> void
 {
     QString defaultDirPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
     QString selectedScriptPath = QFileDialog::getOpenFileName(
             parent, tr("Select GDB script for running tests..."), defaultDirPath, tr("*.gdb"));
     if (!selectedScriptPath.isEmpty()) {
-        saveBoardConfiguration(boardName, selectedScriptPath);
+        scriptPathEdit->setText(selectedScriptPath);
     }
 }
 
-auto FunctionTesterPlugin::loadBoardsConfiguration() -> QMap<QString, BoardLaunchConfig>
+auto FunctionTesterPlugin::loadBoardsConfiguration() -> QMap<QString, LaunchConfiguration>
 {
-    QMap<QString, BoardLaunchConfig> boardsConfig;
+    QMap<QString, LaunchConfiguration> boardsConfig;
     QFile file(boardsConfigPath);
     if (file.open(QIODevice::ReadOnly)) {
         QTextStream stream(&file);
@@ -348,7 +358,7 @@ auto FunctionTesterPlugin::loadBoardsConfiguration() -> QMap<QString, BoardLaunc
             QString line = stream.readLine();
             QStringList conf = line.split(';');
             if (conf.size() >= BOARD_CONFIG_LENGTH) {
-                boardsConfig.insert(conf[0], BoardLaunchConfig { conf[1], conf[2], conf[3], conf[4], conf[5] });
+                boardsConfig.insert(conf[0], LaunchConfiguration(conf[1], conf[2], conf[3], conf[4], conf[5]));
             } else {
                 MessageManager::write(GenMsg::msgInfo.arg("Not enough information in boards_config.txt file"));
             }
@@ -358,14 +368,16 @@ auto FunctionTesterPlugin::loadBoardsConfiguration() -> QMap<QString, BoardLaunc
     return boardsConfig;
 }
 
-auto FunctionTesterPlugin::saveBoardConfiguration(const QString &boardName, const QString &gdbScriptPath) -> bool
+auto FunctionTesterPlugin::saveBoardConfiguration(const QString &boardName, const LaunchConfiguration &launchConfig) -> bool
 {
-    boardsConfiguration[boardName].scriptPath = gdbScriptPath;
+    boardsConfiguration[boardName] = launchConfig;
     QFile file(boardsConfigPath);
     if (file.open(QIODevice::WriteOnly)) {
         QTextStream stream(&file);
         for (const auto &key : boardsConfiguration.keys()) {
-            stream << key << ';' <<  boardsConfiguration[key].scriptPath << '\n';
+            stream << key << ';' <<  boardsConfiguration[key].scriptPath << ";" << boardsConfiguration[key].clientName
+            << ";" << boardsConfiguration[key].clientArgs << ";" << boardsConfiguration[key].serverName
+            << ";" << boardsConfiguration[key].serverArgs << '\n';
         }
     }
     return true;

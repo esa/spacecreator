@@ -21,9 +21,9 @@
 
 #include "harness/dvgenerator/dvgenerator.h"
 #include "harness/ivgenerator/ivgenerator.h"
+#include "resultexporter/htmlresultexporter.h"
 #include "testdrivergenerator/testdrivergenerator.h"
 #include "testdrivergenerator/testdrivergeneratorexception.h"
-#include "resultexporter/htmlresultexporter.h"
 
 using csv::CsvModel;
 using dvm::DVModel;
@@ -32,6 +32,47 @@ using ivm::IVInterface;
 using ivm::IVModel;
 
 namespace testgenerator {
+
+/**
+ * @brief Struct containing tested binary launching params.
+ *
+ */
+struct LaunchConfiguration {
+    /** path to the GDB script for launching the tested binary */
+    QString scriptPath;
+    /** debugger client to use for testing binary */
+    QString clientName;
+    /** arguments for debugger client */
+    QString clientArgs;
+    /** debugger client to use for testing binary */
+    QString serverName;
+    /** arguments for debugger server */
+    QString serverArgs;
+    /** arguments for debugger client converted to list with parsed variables */
+    QStringList clientArgsParsed;
+    /** arguments for debugger server converted to list with parsed variables */
+    QStringList serverArgsParsed;
+
+    /**
+     * @brief Default constructor of the class
+     * 
+     */
+    LaunchConfiguration() = default;
+
+    /**
+     * @brief Constructor of the class
+     *
+     * @param launchScriptPath path to the GDB script for launching the tested binary
+     * @param client name of the debugger client to use for testing binary
+     * @param clientParams arguments for debugger client
+     * @param server name of the debugger server to use for testing binary
+     * @param serverParams arguments for debugger server
+     *
+     * @return true if there was no error during creation of the test harness files
+     */
+    LaunchConfiguration(const QString &launchScriptPath, const QString &client, QString clientParams, const QString &server,
+            QString serverParams);
+};
 
 /**
  * @brief  Class for generating and executing interface tests. Backend for FunctionTesterPlugin.
@@ -55,12 +96,12 @@ public:
      * @param asn1Model ASN.1 model to be used during testing
      * @param delta maximum allowed absolute error
      * @param boardName name of the board the tests are run on
-     * @param gdbScriptPath path to the GDB script for running tests
-     * 
+     * @param launchConfig tested binary launching params
+     *
      * @return true if there was no error during execution of the testing procedure nad false otherwise
      */
     auto testUsingDataFromCsv(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model, const float delta,
-            const QString &boardName, const QString &gdbScriptPath) -> bool;
+            const QString &boardName, const LaunchConfiguration &launchConfig) -> bool;
 
     /**
      * @brief Prepare test harness files to be used for compilation of tests
@@ -80,13 +121,12 @@ public:
      *
      * @param interface interface under test
      * @param asn1Model ASN.1 model to be used during testing
-     * @param binaryPath path to the binary file to run
-     * @param gdbScriptPath path to the GDB script for running tests
+     * @param launchConfig tested binary launching params
      *
      * @return vector of the test results obtained from GDB
      */
-    auto runTests(IVInterface &interface, Asn1Model &asn1Model, const QString &binaryPath,
-            const QString &gdbScriptPath) -> QVector<QVariant>;
+    auto runTests(IVInterface &interface, Asn1Model &asn1Model, const LaunchConfiguration &launchConfig)
+            -> QVector<QVariant>;
 
 private:
     auto initializePaths(const QString &baseDirectory) -> void;
@@ -103,6 +143,7 @@ private:
     QString generatedCodePath;
     QString generatedIvPath;
     QString generatedDvPath;
+    QString binaryPath;
 };
 
 }
