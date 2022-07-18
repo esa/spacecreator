@@ -627,6 +627,13 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslato
     }
 
     createCheckQueueInline(context.model(), functionName, channelNames);
+
+    for (const auto requiredInterface : ivFunction->ris()) {
+        if (requiredInterface->kind() == IVInterface::OperationKind::Protected
+                || requiredInterface->kind() == IVInterface::OperationKind::Unprotected) {
+            createPromelaObjectsForExternalFunction(context, requiredInterface, functionName);
+        }
+    }
 }
 
 void IvToPromelaTranslator::createPromelaObjectsForLocalFunction(IvToPromelaTranslator::Context &context,
@@ -653,6 +660,34 @@ void IvToPromelaTranslator::createPromelaObjectsForLocalFunction(IvToPromelaTran
             generateProctype(context, functionName, interfaceName, parameterType, queueSize, priority, false));
 }
 
+void IvToPromelaTranslator::createPromelaObjectsForExternalFunction(IvToPromelaTranslator::Context &context,
+        const IVInterface *requiredInterface, const QString &functionName) const
+{
+    Sequence sequence(Sequence::Type::NORMAL);
+
+    QList<QString> arguments;
+    for (const auto &interfaceParam : requiredInterface->params()) {
+        const auto &paramName = interfaceParam.name();
+        const auto &paramTypeName = interfaceParam.paramTypeName();
+
+        arguments.append(paramName);
+
+        if (interfaceParam.isInDirection()) {
+            continue;
+        }
+
+        const auto generateValueInlineName = QString("%1_generate_value").arg(paramTypeName);
+        const QList<InlineCall::Argument> generateValueInlineArgs({ paramName });
+        InlineCall generateValueInlineCall(generateValueInlineName, generateValueInlineArgs);
+        auto generateValueInlineElem = std::make_unique<ProctypeElement>(std::move(generateValueInlineCall));
+        sequence.appendElement(std::move(generateValueInlineElem));
+    }
+
+    const auto inlineName = QString("%1_0_%2").arg(functionName).arg(requiredInterface->title());
+    auto inlineDef = std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
+    context.model()->addInlineDef(std::move(inlineDef));
+}
+
 void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTranslator::Context &context,
         const IVModel *ivModel, const IVFunction *ivFunction, const QString &functionName,
         const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions,
@@ -660,11 +695,8 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTransl
 {
     QVector<IVInterface *> providedInterfaceList = ivFunction->pis();
     for (IVInterface *providedInterface : providedInterfaceList) {
-
         if (providedInterface->kind() != IVInterface::OperationKind::Sporadic) {
-            auto message = QString("Unallowed interface kind in function %1, only sporatic interfaces are allowed")
-                                   .arg(functionName);
-            throw TranslationException(message);
+            continue;
         }
 
         IVConnection *connection = ivModel->getConnectionForIface(providedInterface->id());
@@ -692,8 +724,9 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTransl
     QVector<IVInterface *> requiredInterfaceList = ivFunction->ris();
     for (IVInterface *requiredInterface : requiredInterfaceList) {
         if (requiredInterface->kind() != IVInterface::OperationKind::Sporadic) {
-            auto message = QString("Unallowed interface kind in function %1, only sporatic interfaces are allowed")
-                                   .arg(functionName);
+            auto message =
+                    QString("Unallowed interface kind in function %1, only sporatic required interfaces are allowed")
+                            .arg(functionName);
             throw TranslationException(message);
         }
 
