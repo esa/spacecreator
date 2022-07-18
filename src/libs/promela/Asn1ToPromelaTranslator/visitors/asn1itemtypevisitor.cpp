@@ -476,11 +476,11 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
         auto dataLoop = createSequenceOfDataLoop(utypeName, Expression(std::move(loopRangeEnd)));
         sequence.appendElement(std::make_unique<ProctypeElement>(std::move(dataLoop)));
     } else {
-        auto dstLength = VariableRef("dst");
-        dstLength.appendElement("length");
+        auto srcLength = VariableRef("src");
+        srcLength.appendElement("length");
 
         auto loopRangeEnd = BinaryExpression(BinaryExpression::Operator::SUBTRACT,
-                std::make_unique<Expression>(dstLength), std::make_unique<Expression>(1));
+                std::make_unique<Expression>(srcLength), std::make_unique<Expression>(1));
 
         auto dataLoop = createSequenceOfDataLoop(utypeName, Expression(std::move(loopRangeEnd)));
         sequence.appendElement(std::make_unique<ProctypeElement>(std::move(dataLoop)));
@@ -839,8 +839,8 @@ ForLoop Asn1ItemTypeVisitor::createSequenceOfZeroingLoop(const QString &utypeNam
 
     VariableRef dst("dst");
     dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
-    VariableRef dstLength = VariableRef("dst");
-    dstLength.appendElement("length");
+    VariableRef srcLength = VariableRef("src");
+    srcLength.appendElement("length");
 
     QList<InlineCall::Argument> inlineArguments;
     inlineArguments.append(dst);
@@ -850,7 +850,7 @@ ForLoop Asn1ItemTypeVisitor::createSequenceOfZeroingLoop(const QString &utypeNam
     auto inlineCallElem = std::make_unique<ProctypeElement>(std::move(inlineCall));
     loopSequence->appendElement(std::move(inlineCallElem));
 
-    auto forLoop = ForLoop(VariableRef("i"), Expression(dstLength), loopRangeEnd, std::move(loopSequence));
+    auto forLoop = ForLoop(VariableRef("i"), Expression(srcLength), loopRangeEnd, std::move(loopSequence));
 
     return forLoop;
 }

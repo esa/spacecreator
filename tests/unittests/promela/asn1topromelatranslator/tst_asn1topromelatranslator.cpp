@@ -1179,7 +1179,7 @@ void tst_Asn1ToPromelaTranslator::testVariableSequenceOf()
         QVERIFY(dataLoopLastExpressionLeft != nullptr);
         auto iter = dataLoopLastExpressionLeft->getElements().begin();
         QVERIFY(iter->m_index.get() == nullptr);
-        QCOMPARE(iter->m_name, "dst");
+        QCOMPARE(iter->m_name, "src");
         ++iter;
         QVERIFY(iter->m_index.get() == nullptr);
         QCOMPARE(iter->m_name, "length");
@@ -1195,7 +1195,7 @@ void tst_Asn1ToPromelaTranslator::testVariableSequenceOf()
         QVERIFY(zeroLoopFirstExpression != nullptr);
         iter = zeroLoopFirstExpression->getElements().begin();
         QVERIFY(iter->m_index.get() == nullptr);
-        QCOMPARE(iter->m_name, "dst");
+        QCOMPARE(iter->m_name, "src");
         ++iter;
         QVERIFY(iter->m_index.get() == nullptr);
         QCOMPARE(iter->m_name, "length");
