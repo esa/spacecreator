@@ -561,6 +561,7 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(con
 
     proctype->setActive(true);
     proctype->setInstancesCount(1);
+    proctype->setPriority(1);
 
     return proctype;
 }
@@ -647,7 +648,7 @@ void IvToPromelaTranslator::createPromelaObjectsForAsyncPis(IvToPromelaTranslato
     const auto sourceFunctionName = getInterfaceFunctionName(requiredInterface);
 
     const auto queueSize = getInterfaceQueueSize(providedInterface);
-    const auto priority = getInterfacePriority(providedInterface);
+    const auto priority = getInterfacePriority(providedInterface) + 1;
     const auto &[parameterName, parameterType] = getInterfaceParameter(providedInterface);
 
     const auto parameterSubtyped = isParameterSubtyped(
@@ -715,7 +716,7 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTransl
                 sourceFunctionName, sourceInterfaceName, parameterSubtyped));
 
         const size_t queueSize = getInterfaceQueueSize(providedInterface);
-        const size_t priority = getInterfacePriority(providedInterface);
+        const size_t priority = getInterfacePriority(providedInterface) + 1;
 
         context.model()->addProctype(
                 generateProctype(context, functionName, interfaceName, parameterType, queueSize, priority, true));
@@ -1021,8 +1022,9 @@ size_t IvToPromelaTranslator::getInterfacePriority(const IVInterface *interface)
     QVariant property = getInterfaceProperty(interface, "priority");
     if (property.isValid()) {
         return property.toULongLong();
+    } else {
+        return 1;
     }
-    return 1;
 }
 
 QString IvToPromelaTranslator::handleParameterSubtype(const QString &parameterTypeName, const QString &parameterName,
