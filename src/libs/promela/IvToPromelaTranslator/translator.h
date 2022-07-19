@@ -235,16 +235,22 @@ private:
     auto createPromelaObjectsForFunction(Context &context, const ivm::IVModel *ivModel,
             const ivm::IVFunction *ivFunction, const QString &functionName, const uint32_t basePriority,
             const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const -> void;
-    auto createPromelaObjectsForAsyncPis(Context &context, const ivm::IVModel *ivModel,
+    auto createPromelaObjectsForFunctionAsyncPis(Context &context, const ivm::IVModel *ivModel,
             const ivm::IVInterface *providedInterface, const QString &functionName, const QString &interfaceName,
             const std::size_t priority, const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const
             -> void;
-    auto createPromelaObjectsForSyncRis(
+    auto createPromelaObjectsForFunctionSyncRis(
             Context &context, const ivm::IVInterface *requiredInterface, const QString &functionName) const -> void;
     auto createPromelaObjectsForEnvironment(Context &context, const ivm::IVModel *ivModel,
             const ivm::IVFunction *ivFunction, const QString &functionName, const uint32_t basePriority,
             const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions,
             const conversion::Options &options) const -> void;
+    auto createPromelaObjectsForEnvironmentAsyncPis(Context &context, const ivm::IVModel *ivModel,
+            const ivm::IVInterface *providedInterface, const QString &functionName, const std::size_t priority,
+            const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const -> void;
+    void createPromelaObjectsForEnvironmentAsyncRis(Context &context, const ivm::IVInterface *requiredInterface,
+            const QString &functionName, const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions,
+            const conversion::Options &options) const;
     auto createCheckQueueInline(
             model::PromelaModel *promelaModel, const QString &functionName, QList<QString> &channelNames) const -> void;
     auto createSystemState(model::PromelaModel *promelaModel, const ivm::IVModel *ivModel,

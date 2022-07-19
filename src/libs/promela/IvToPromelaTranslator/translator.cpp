@@ -622,8 +622,10 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslato
                 || providedInterface->kind() == IVInterface::OperationKind::Sporadic) {
             const auto interfaceName = getInterfaceName(providedInterface);
             const auto priority = getInterfacePriority(providedInterface) + basePriority;
-            createPromelaObjectsForAsyncPis(context, ivModel, providedInterface, functionName, interfaceName, priority,
-                    asn1SubtypesDefinitions);
+
+            createPromelaObjectsForFunctionAsyncPis(context, ivModel, providedInterface, functionName, interfaceName,
+                    priority, asn1SubtypesDefinitions);
+
             channelNames.append(constructChannelName(functionName, interfaceName));
         } else {
             auto message =
@@ -638,12 +640,12 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslato
     for (const auto requiredInterface : ivFunction->ris()) {
         if (requiredInterface->kind() == IVInterface::OperationKind::Protected
                 || requiredInterface->kind() == IVInterface::OperationKind::Unprotected) {
-            createPromelaObjectsForSyncRis(context, requiredInterface, functionName);
+            createPromelaObjectsForFunctionSyncRis(context, requiredInterface, functionName);
         }
     }
 }
 
-void IvToPromelaTranslator::createPromelaObjectsForAsyncPis(IvToPromelaTranslator::Context &context,
+void IvToPromelaTranslator::createPromelaObjectsForFunctionAsyncPis(IvToPromelaTranslator::Context &context,
         const IVModel *ivModel, const IVInterface *providedInterface, const QString &functionName,
         const QString &interfaceName, const std::size_t priority,
         const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const
@@ -667,7 +669,7 @@ void IvToPromelaTranslator::createPromelaObjectsForAsyncPis(IvToPromelaTranslato
             generateProctype(context, functionName, interfaceName, parameterType, queueSize, priority, false));
 }
 
-void IvToPromelaTranslator::createPromelaObjectsForSyncRis(IvToPromelaTranslator::Context &context,
+void IvToPromelaTranslator::createPromelaObjectsForFunctionSyncRis(IvToPromelaTranslator::Context &context,
         const IVInterface *requiredInterface, const QString &functionName) const
 {
     Sequence sequence(Sequence::Type::NORMAL);
@@ -700,57 +702,70 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTransl
         const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions,
         const conversion::Options &options) const
 {
-    QVector<IVInterface *> providedInterfaceList = ivFunction->pis();
-    for (IVInterface *providedInterface : providedInterfaceList) {
-        if (providedInterface->kind() != IVInterface::OperationKind::Sporadic) {
-            continue;
+    for (IVInterface *providedInterface : ivFunction->pis()) {
+        if (providedInterface->kind() == IVInterface::OperationKind::Sporadic) {
+            const size_t priority = getInterfacePriority(providedInterface) + basePriority;
+
+            createPromelaObjectsForEnvironmentAsyncPis(
+                    context, ivModel, providedInterface, functionName, priority, asn1SubtypesDefinitions);
         }
-
-        IVConnection *connection = ivModel->getConnectionForIface(providedInterface->id());
-
-        IVInterface *requiredInterface = connection->sourceInterface();
-        const QString sourceInterfaceName = getInterfaceName(requiredInterface);
-        const QString sourceFunctionName = getInterfaceFunctionName(requiredInterface);
-
-        const QString interfaceName = getInterfaceName(providedInterface);
-        const auto &[parameterName, parameterType] = getInterfaceParameter(providedInterface);
-
-        const auto parameterSubtyped =
-                isParameterSubtyped(parameterType, parameterName, interfaceName, functionName, asn1SubtypesDefinitions);
-
-        context.model()->addInlineDef(generateSendInline(functionName, interfaceName, parameterName, parameterType,
-                sourceFunctionName, sourceInterfaceName, parameterSubtyped));
-
-        const size_t queueSize = getInterfaceQueueSize(providedInterface);
-        const size_t priority = getInterfacePriority(providedInterface) + basePriority;
-
-        context.model()->addProctype(
-                generateProctype(context, functionName, interfaceName, parameterType, queueSize, priority, true));
     }
 
-    QVector<IVInterface *> requiredInterfaceList = ivFunction->ris();
-    for (IVInterface *requiredInterface : requiredInterfaceList) {
-        if (requiredInterface->kind() != IVInterface::OperationKind::Sporadic) {
+    for (IVInterface *requiredInterface : ivFunction->ris()) {
+        if (requiredInterface->kind() == IVInterface::OperationKind::Sporadic) {
+            createPromelaObjectsForEnvironmentAsyncRis(
+                    context, requiredInterface, functionName, asn1SubtypesDefinitions, options);
+        } else {
             auto message =
                     QString("Unallowed interface kind in function %1, only sporadic required interfaces are allowed")
                             .arg(functionName);
             throw TranslationException(message);
         }
-
-        const QString interfaceName = getInterfaceName(requiredInterface);
-
-        const std::pair<QString, QString> parameter = getInterfaceParameter(requiredInterface);
-
-        const QString parameterName = parameter.first;
-        const QString parameterType = handleParameterSubtype(
-                parameter.second, parameterName, interfaceName, functionName, asn1SubtypesDefinitions);
-
-        const QString sendInline =
-                QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
-
-        context.model()->addProctype(
-                generateEnvironmentProctype(functionName, interfaceName, parameterType, sendInline, options));
     }
+}
+
+void IvToPromelaTranslator::createPromelaObjectsForEnvironmentAsyncPis(IvToPromelaTranslator::Context &context,
+        const IVModel *ivModel, const IVInterface *providedInterface, const QString &functionName,
+        const std::size_t priority, const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const
+{
+    IVConnection *connection = ivModel->getConnectionForIface(providedInterface->id());
+
+    IVInterface *requiredInterface = connection->sourceInterface();
+    const QString sourceInterfaceName = getInterfaceName(requiredInterface);
+    const QString sourceFunctionName = getInterfaceFunctionName(requiredInterface);
+
+    const QString interfaceName = getInterfaceName(providedInterface);
+    const auto &[parameterName, parameterType] = getInterfaceParameter(providedInterface);
+
+    const auto parameterSubtyped =
+            isParameterSubtyped(parameterType, parameterName, interfaceName, functionName, asn1SubtypesDefinitions);
+
+    context.model()->addInlineDef(generateSendInline(functionName, interfaceName, parameterName, parameterType,
+            sourceFunctionName, sourceInterfaceName, parameterSubtyped));
+
+    const size_t queueSize = getInterfaceQueueSize(providedInterface);
+
+    context.model()->addProctype(
+            generateProctype(context, functionName, interfaceName, parameterType, queueSize, priority, true));
+}
+
+void IvToPromelaTranslator::createPromelaObjectsForEnvironmentAsyncRis(IvToPromelaTranslator::Context &context,
+        const IVInterface *requiredInterface, const QString &functionName,
+        const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions,
+        const conversion::Options &options) const
+{
+    const QString interfaceName = getInterfaceName(requiredInterface);
+
+    const std::pair<QString, QString> parameter = getInterfaceParameter(requiredInterface);
+
+    const QString parameterName = parameter.first;
+    const QString parameterType = handleParameterSubtype(
+            parameter.second, parameterName, interfaceName, functionName, asn1SubtypesDefinitions);
+
+    const QString sendInline = QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
+
+    context.model()->addProctype(
+            generateEnvironmentProctype(functionName, interfaceName, parameterType, sendInline, options));
 }
 
 void IvToPromelaTranslator::createCheckQueueInline(
