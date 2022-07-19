@@ -28,8 +28,8 @@ const QString SdlToPromelaConverter::m_sdl2PromelaCommand = QStringLiteral("sdl2
 
 bool SdlToPromelaConverter::convertSdl(const ProcessMetadata &processMetadata, const QFileInfo &outputFile)
 {
-    if (!processMetadata.getSystemStructure().exists()) {
-        qCritical() << "File " << processMetadata.getSystemStructure().absoluteFilePath() << " does not exist.";
+    if (processMetadata.getSystemStructure().has_value() && !processMetadata.getSystemStructure().value().exists()) {
+        qCritical() << "File " << processMetadata.getSystemStructure().value().absoluteFilePath() << " does not exist.";
         return false;
     }
 
@@ -39,7 +39,10 @@ bool SdlToPromelaConverter::convertSdl(const ProcessMetadata &processMetadata, c
     }
 
     qDebug() << "Converting SDL files:";
-    qDebug() << "    " << processMetadata.getSystemStructure().absoluteFilePath();
+    if (processMetadata.getSystemStructure().has_value()) {
+        qDebug() << "    " << processMetadata.getSystemStructure().value().absoluteFilePath();
+    }
+
     qDebug() << "    " << processMetadata.getProcess().absoluteFilePath();
 
     qDebug() << "  to:";
@@ -48,7 +51,9 @@ bool SdlToPromelaConverter::convertSdl(const ProcessMetadata &processMetadata, c
     QStringList arguments = QStringList();
     arguments.append("--sdl");
 
-    arguments.append(processMetadata.getSystemStructure().absoluteFilePath());
+    if (processMetadata.getSystemStructure().has_value()) {
+        arguments.append(processMetadata.getSystemStructure().value().absoluteFilePath());
+    }
     arguments.append(processMetadata.getProcess().absoluteFilePath());
 
     arguments.append("-o");
@@ -68,8 +73,8 @@ bool SdlToPromelaConverter::convertSdl(const ProcessMetadata &processMetadata, c
 bool SdlToPromelaConverter::convertObserverSdl(
         const ProcessMetadata &processMetadata, const QFileInfo &outputFile, const QFileInfo &outputInfoFile)
 {
-    if (!processMetadata.getSystemStructure().exists()) {
-        qCritical() << "File " << processMetadata.getSystemStructure().absoluteFilePath() << " does not exist.";
+    if (processMetadata.getSystemStructure().has_value() && !processMetadata.getSystemStructure().value().exists()) {
+        qCritical() << "File " << processMetadata.getSystemStructure().value().absoluteFilePath() << " does not exist.";
         return false;
     }
 
@@ -79,7 +84,9 @@ bool SdlToPromelaConverter::convertObserverSdl(
     }
 
     qDebug() << "Converting SDL files:";
-    qDebug() << "    " << processMetadata.getSystemStructure().absoluteFilePath();
+    if (processMetadata.getSystemStructure().has_value()) {
+        qDebug() << "    " << processMetadata.getSystemStructure().value().absoluteFilePath();
+    }
     qDebug() << "    " << processMetadata.getProcess().absoluteFilePath();
 
     qDebug() << "  to:";
@@ -88,7 +95,9 @@ bool SdlToPromelaConverter::convertObserverSdl(
     QStringList arguments = QStringList();
     arguments.append("--sdl");
 
-    arguments.append(processMetadata.getSystemStructure().absoluteFilePath());
+    if (processMetadata.getSystemStructure().has_value()) {
+        arguments.append(processMetadata.getSystemStructure().value().absoluteFilePath());
+    }
     arguments.append(processMetadata.getProcess().absoluteFilePath());
 
     arguments.append("-o");
@@ -118,7 +127,9 @@ bool SdlToPromelaConverter::convertStopCondition(const QFileInfo &inputFile, con
 
     for (const auto &iter : inputSdlFiles) {
         arguments.append("--sdl");
-        arguments.append(iter.second.getSystemStructure().absoluteFilePath());
+        if (iter.second.getSystemStructure().has_value()) {
+            arguments.append(iter.second.getSystemStructure().value().absoluteFilePath());
+        }
         arguments.append(iter.second.getProcess().absoluteFilePath());
     }
 

@@ -113,6 +113,7 @@ private:
         QString m_observerInterfaceName;
         Priority m_priority;
         Kind m_kind;
+        std::optional<QString> m_parameterName;
 
         static auto stringToKind(const QString &kind) -> Kind;
     };
@@ -167,6 +168,8 @@ private:
         auto hasObserverAttachments(
                 const QString &function, const QString &interface, const ObserverAttachment::Kind kind) -> bool;
 
+        auto getObserverAttachments(const ObserverAttachment::Kind) -> const ObserverAttachments;
+
         /**
          * Getter for the Promela model that is being created
          *
@@ -176,7 +179,8 @@ private:
 
     private:
         model::PromelaModel *m_promelaModel;
-        std::map<QString, std::map<QString, ObserverAttachments>> m_observerAttachments;
+        std::map<QString, std::map<QString, ObserverAttachments>> m_fromObserverAttachments;
+        std::map<QString, std::map<QString, ObserverAttachments>> m_toObserverAttachments;
     };
 
 public:
@@ -221,6 +225,9 @@ private:
     auto attachInputObservers(IvToPromelaTranslator::Context &context, const QString &functionName,
             const QString &interfaceName, const QString &parameterName, const QString &parameterType,
             promela::model::Sequence *sequence) const -> void;
+    auto attachOutputObservers(IvToPromelaTranslator::Context &context, const QString &functionName,
+            const QString &interfaceName, const QString parameterName, const QString &parameterType,
+            promela::model::Sequence *sequence) const -> void;
     auto generateInitProctype(const std::vector<QString> &modelFunctions, const std::vector<QString> &observers,
             const ivm::IVModel *ivModel) const -> model::InitProctype;
     auto generateProctype(Context &context, const QString &functionName, const QString &interfaceName,
@@ -256,6 +263,7 @@ private:
     auto createGlobalTimerObjects(Context &context, int timerCount, const std::map<int, QString> &timerSignals) const
             -> void;
     auto createWaitForInitStatement() const -> std::unique_ptr<model::ProctypeElement>;
+    auto createPromelaObjectsForObservers(Context &context, const ::ivm::IVModel *ivModel) const -> void;
 
     auto containsContextVariables(const QVector<shared::ContextParameter> &parameters) const -> bool;
     auto constructChannelName(const QString &functionName, const QString &interfaceName) const -> QString;

@@ -21,6 +21,7 @@
 
 #include <QFileInfo>
 #include <QString>
+#include <optional>
 
 namespace tmc::converter {
 /**
@@ -38,8 +39,8 @@ public:
      * @param datamodel location of process datamodel ASN.1 file
      * @param context location of process context ASN.1 files
      */
-    ProcessMetadata(
-            QString name, QFileInfo systemStructure, QFileInfo process, QFileInfo datamodel, QList<QFileInfo> context);
+    ProcessMetadata(QString name, std::optional<QFileInfo> systemStructure, QFileInfo process, QFileInfo datamodel,
+            QList<QFileInfo> context);
 
     /**
      * @brief Getter for process name.
@@ -52,7 +53,7 @@ public:
      *
      * @return Location of system_structure.pr file.
      */
-    const QFileInfo &getSystemStructure() const noexcept;
+    const std::optional<QFileInfo> &getSystemStructure() const noexcept;
     /**
      * @brief Getter for process implementation location.
      *
@@ -74,7 +75,7 @@ public:
 
 private:
     const QString m_name;
-    const QFileInfo m_systemStructure;
+    const std::optional<QFileInfo> m_systemStructure;
     const QFileInfo m_process;
     const QFileInfo m_datamodel;
     const QList<QFileInfo> m_context;

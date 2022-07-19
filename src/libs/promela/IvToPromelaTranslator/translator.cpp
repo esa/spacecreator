@@ -165,10 +165,10 @@ IvToPromelaTranslator::Context::Context(model::PromelaModel *promelaModel)
 void IvToPromelaTranslator::Context::addObserverAttachment(const IvToPromelaTranslator::ObserverAttachment &attachment)
 {
     if (attachment.fromFunction().has_value()) {
-        m_observerAttachments[*attachment.fromFunction()][attachment.interface()].push_back(attachment);
+        m_fromObserverAttachments[*attachment.fromFunction()][attachment.interface()].push_back(attachment);
     }
     if (attachment.toFunction().has_value()) {
-        m_observerAttachments[*attachment.toFunction()][attachment.interface()].push_back(attachment);
+        m_toObserverAttachments[*attachment.toFunction()][attachment.interface()].push_back(attachment);
     }
 }
 
@@ -176,10 +176,10 @@ auto IvToPromelaTranslator::Context::getObserverAttachments(const QString &funct
         const ObserverAttachment::Kind kind) -> const IvToPromelaTranslator::ObserverAttachments
 {
     ObserverAttachments result;
-    if (m_observerAttachments.find(function) == m_observerAttachments.end()) {
+    if (m_toObserverAttachments.find(function) == m_toObserverAttachments.end()) {
         return result;
     }
-    const auto &attachments = m_observerAttachments.at(function);
+    const auto &attachments = m_toObserverAttachments.at(function);
     if (attachments.find(interface) == attachments.end()) {
         return result;
     }
@@ -195,6 +195,19 @@ auto IvToPromelaTranslator::Context::hasObserverAttachments(
         const QString &function, const QString &interface, const ObserverAttachment::Kind kind) -> bool
 {
     return getObserverAttachments(function, interface, kind).size() > 0;
+}
+
+auto IvToPromelaTranslator::Context::getObserverAttachments(const ObserverAttachment::Kind) -> const ObserverAttachments
+{
+    ObserverAttachments result;
+    for (auto functionIter = m_toObserverAttachments.begin(); functionIter != m_toObserverAttachments.end();
+            ++functionIter) {
+        for (auto interfaceIter = functionIter->second.begin(); interfaceIter != functionIter->second.end();
+                ++interfaceIter) {
+            std::copy(interfaceIter->second.begin(), interfaceIter->second.end(), std::back_inserter(result));
+        }
+    }
+    return result;
 }
 
 auto IvToPromelaTranslator::Context::model() -> model::PromelaModel *
@@ -246,6 +259,8 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     const auto basePriority = options.isSet(PromelaOptions::processesBasePriority)
             ? options.value(PromelaOptions::processesBasePriority)->toUInt()
             : 0;
+
+    createPromelaObjectsForObservers(context, ivModel);
 
     for (const IVFunction *ivFunction : ivFunctionList) {
         const QString functionName = ivFunction->property("name").toString();
@@ -367,7 +382,7 @@ QString IvToPromelaTranslator::observerInputSignalName(
         const IvToPromelaTranslator::ObserverAttachment &attachment) const
 {
     return QString("%1_0_PI_0_%2")
-            .arg(Escaper::escapePromelaName(attachment.observer()))
+            .arg(Escaper::escapePromelaIV(attachment.observer()))
             .arg(Escaper::escapePromelaName(attachment.observerInterface()));
 }
 
@@ -390,6 +405,37 @@ void IvToPromelaTranslator::attachInputObservers(IvToPromelaTranslator::Context 
         if (!parameterType.isEmpty()) {
             arguments.append(VariableRef(parameterName));
         }
+        sequence->appendElement(
+                std::make_unique<ProctypeElement>(InlineCall(observerInputSignalName(attachment), arguments)));
+
+        QList<Expression> unlockChannelArguments;
+        unlockChannelArguments.append(Expression(VariableRef("token")));
+        sequence->appendElement(
+                std::make_unique<ProctypeElement>(ChannelSend(VariableRef(lockChannelName), unlockChannelArguments)));
+    }
+}
+
+void IvToPromelaTranslator::attachOutputObservers(IvToPromelaTranslator::Context &context, const QString &functionName,
+        const QString &interfaceName, const QString parameterName, const QString &parameterType,
+        promela::model::Sequence *sequence) const
+{
+    auto attachments = context.getObserverAttachments(
+            functionName, interfaceName, IvToPromelaTranslator::ObserverAttachment::Kind::Kind_Output);
+    std::sort(attachments.begin(), attachments.end(),
+            [](const auto &a, const auto &b) -> bool { return a.priority() > b.priority(); });
+    for (const auto &attachment : attachments) {
+        qDebug() << "attaching " << attachment.observer();
+        const VariableRef lockChannelName =
+                VariableRef(QString("%1_lock").arg(Escaper::escapePromelaIV(attachment.observer())));
+        QList<VariableRef> lockChannelArguments;
+        lockChannelArguments.append(VariableRef("token"));
+        sequence->appendElement(std::make_unique<ProctypeElement>(ChannelRecv(lockChannelName, lockChannelArguments)));
+
+        QList<InlineCall::Argument> arguments;
+        if (!parameterType.isEmpty()) {
+            arguments.append(VariableRef(parameterName));
+        }
+
         sequence->appendElement(
                 std::make_unique<ProctypeElement>(InlineCall(observerInputSignalName(attachment), arguments)));
 
@@ -454,13 +500,19 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(Context &conte
     }
 
     if (!environment) {
-        const QString piName = QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
         const VariableRef lockChannelName = VariableRef(QString("%1_lock").arg(Escaper::escapePromelaIV(functionName)));
         QList<VariableRef> lockChannelArguments;
         lockChannelArguments.append(VariableRef("token"));
 
         loopSequence->appendElement(
                 std::make_unique<ProctypeElement>(ChannelRecv(lockChannelName, lockChannelArguments)));
+    }
+
+    attachOutputObservers(context, functionName, interfaceName, signalParameterName, parameterType, loopSequence.get());
+    // input observers
+
+    if (!environment) {
+        const QString piName = QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
 
         if (parameterType.isEmpty()) {
             loopSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(piName, {})));
@@ -469,14 +521,18 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(Context &conte
             arguments.append(VariableRef(signalParameterName));
             loopSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(piName, arguments)));
         }
-        QList<Expression> unlockChannelArguments;
-        unlockChannelArguments.append(Expression(VariableRef("token")));
-        loopSequence->appendElement(
-                std::make_unique<ProctypeElement>(ChannelSend(VariableRef(lockChannelName), unlockChannelArguments)));
     }
 
     // Observers can be also attached to environment
     attachInputObservers(context, functionName, interfaceName, signalParameterName, parameterType, loopSequence.get());
+
+    if (!environment) {
+        QList<Expression> unlockChannelArguments;
+        unlockChannelArguments.append(Expression(VariableRef("token")));
+        const VariableRef lockChannelName = VariableRef(QString("%1_lock").arg(Escaper::escapePromelaIV(functionName)));
+        loopSequence->appendElement(
+                std::make_unique<ProctypeElement>(ChannelSend(VariableRef(lockChannelName), unlockChannelArguments)));
+    }
 
     DoLoop loop;
 
@@ -931,6 +987,26 @@ void IvToPromelaTranslator::createGlobalTimerObjects(
     timerManagerProctype->setActive(true);
     timerManagerProctype->setPriority(1);
     context.model()->addProctype(std::move(timerManagerProctype));
+}
+
+void IvToPromelaTranslator::createPromelaObjectsForObservers(Context &context, const ::ivm::IVModel *ivModel) const
+{
+    Q_UNUSED(ivModel);
+    const auto attachments =
+            context.getObserverAttachments(IvToPromelaTranslator::ObserverAttachment::Kind::Kind_Output);
+
+    for (const auto &attachment : attachments) {
+        const QString inlineName = QString("%1_0_RI_0_%2")
+                                           .arg(Escaper::escapePromelaIV(attachment.observer()))
+                                           .arg(attachment.observerInterface());
+
+        QList<QString> arguments;
+        arguments.append(QString("param"));
+        Sequence sequence(Sequence::Type::NORMAL);
+        sequence.appendElement(std::make_unique<ProctypeElement>(Skip()));
+
+        context.model()->addInlineDef(std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence)));
+    }
 }
 
 bool IvToPromelaTranslator::containsContextVariables(const QVector<shared::ContextParameter> &parameters) const

@@ -203,13 +203,10 @@ auto TmcConverter::integrateObserver(const ObserverInfo &info, QStringList &obse
     const auto process = QFileInfo(info.path());
     const auto processName = process.baseName();
     const auto directory = process.absoluteDir();
-    // Observers require separate system_stucture, because OpenGEODE does not save
-    // some "renames" declarations.
-    const auto structure = QFileInfo(directory.absolutePath() + QDir::separator() + "system_structure.pr");
     const auto datamodel =
             QFileInfo(directory.absolutePath() + QDir::separator() + processName.toLower() + "_datamodel.asn");
 
-    ProcessMetadata meta(Escaper::escapePromelaName(processName), structure, process, datamodel, QList<QFileInfo>());
+    ProcessMetadata meta(Escaper::escapePromelaName(processName), std::nullopt, process, datamodel, QList<QFileInfo>());
     SdlToPromelaConverter sdl2Promela;
 
     const auto promelaFilename = Escaper::escapePromelaIV(processName) + ".pml";
