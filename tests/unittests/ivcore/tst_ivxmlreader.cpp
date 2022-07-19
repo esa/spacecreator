@@ -44,6 +44,7 @@ private Q_SLOTS:
     void test_readFunction();
     void test_readFunctionLanguages();
     void test_connectionGroup();
+    void test_readLayer();
     void test_multicast();
 
 private:
@@ -196,6 +197,31 @@ void IVXMLReader::test_connectionGroup()
 
     QList<QPointer<ivm::IVConnection>> groupedConnection = cgroup->groupedConnections();
     QCOMPARE(groupedConnection.size(), 2);
+}
+
+void IVXMLReader::test_readLayer()
+{
+    QByteArray xml("<InterfaceView>"
+                   "<Layer name=\"TestLayer\"/>"
+                   "<Layer name=\"SomeOtherName\"/>"
+                   "</InterfaceView>");
+
+    QBuffer buffer(&xml);
+    buffer.open(QIODevice::ReadOnly | QIODevice::Text);
+
+    ivm::IVXMLReader reader;
+
+    const bool ok = reader.read(&buffer);
+    QVERIFY(ok);
+    const QVector<ivm::IVObject *> layersList = reader.parsedLayers();
+    QCOMPARE(layersList.size(), 2);
+    ivm::IVConnectionLayerType *layer0 = qobject_cast<ivm::IVConnectionLayerType *>(layersList[0]);
+    ivm::IVConnectionLayerType *layer1 = qobject_cast<ivm::IVConnectionLayerType *>(layersList[1]);
+
+    QVERIFY(layer0 != nullptr);
+    QVERIFY(layer1 != nullptr);
+    QCOMPARE(layer0->title(), "TestLayer");
+    QCOMPARE(layer1->title(), "SomeOtherName");
 }
 
 void IVXMLReader::test_multicast()

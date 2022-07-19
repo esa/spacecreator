@@ -248,8 +248,8 @@ void IVVisualizationModel::onDataChanged(
     }
 }
 
-IVLayerVisualizationModel::IVLayerVisualizationModel(ivm::IVModel *layerModel, ivm::IVModel *objectsModel,
-                                                     cmd::CommandsStack *commandsStack, QObject *parent)
+IVLayerVisualizationModel::IVLayerVisualizationModel(
+        ivm::IVModel *layerModel, ivm::IVModel *objectsModel, cmd::CommandsStack *commandsStack, QObject *parent)
     : IVVisualizationModelBase(layerModel, commandsStack, shared::DropData::Type::None, parent)
     , m_objectsModel(objectsModel)
 {
@@ -289,18 +289,19 @@ void IVLayerVisualizationModel::onDataChanged(
     }
 }
 
-void IVLayerVisualizationModel::setObjectsVisibility(const QString layerName, ivm::IVModel *objectsModel, const bool isVisible) 
+void IVLayerVisualizationModel::setObjectsVisibility(
+        const QString layerName, ivm::IVModel *objectsModel, const bool isVisible)
 {
     const QString encodedLayerName = ivm::IVNameValidator::encodeName(ivm::IVObject::Type::ConnectionLayer, layerName);
 
     for (auto entity : objectsModel->objects()) {
-        if(auto connection = entity->as<ivm::IVConnection *>()) {
-            if(connection->layer()->title() == encodedLayerName) {
+        if (auto connection = entity->as<ivm::IVConnection *>()) {
+            if (connection->layer()->title() == encodedLayerName) {
                 connection->setVisible(isVisible);
             }
         }
-        if(auto interface = entity->as<ivm::IVInterface *>()) {
-            if(interface->layerName() == encodedLayerName){
+        if (auto interface = entity->as<ivm::IVInterface *>()) {
+            if (interface->layerName() == encodedLayerName) {
                 interface->setVisible(isVisible);
             }
         }

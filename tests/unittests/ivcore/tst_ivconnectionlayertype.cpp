@@ -39,7 +39,6 @@ private Q_SLOTS:
     void initTestCase();
     void tst_layerRenaming();
     void tst_interfaceLayerName();
-    
 };
 
 void tst_IVConnectionLayerType::initTestCase()
@@ -67,10 +66,11 @@ void tst_IVConnectionLayerType::tst_interfaceLayerName()
 
     std::unique_ptr<ivm::IVFunction> function1(ivm::testutils::createFunction("Fn1"));
     std::unique_ptr<ivm::IVInterface> requiredInterfaceFunction1(
-        ivm::testutils::createIface(function1.get(), ivm::IVInterface::InterfaceType::Required, "RI1"));
+            ivm::testutils::createIface(function1.get(), ivm::IVInterface::InterfaceType::Required, "RI1"));
 
     QVERIFY(requiredInterfaceFunction1->hasEntityAttribute(layerNameAttr));
-    QCOMPARE(requiredInterfaceFunction1->entityAttributeValue(layerNameAttr).toString(), ivm::IVConnectionLayerType::DefaultLayerName);
+    QCOMPARE(requiredInterfaceFunction1->entityAttributeValue(layerNameAttr).toString(),
+            ivm::IVConnectionLayerType::DefaultLayerName);
     QCOMPARE(requiredInterfaceFunction1->layerName(), ivm::IVConnectionLayerType::DefaultLayerName);
 
     requiredInterfaceFunction1->setLayerName(customLayerName);
