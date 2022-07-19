@@ -615,7 +615,7 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslato
         if (providedInterface->kind() == IVInterface::OperationKind::Cyclic
                 || providedInterface->kind() == IVInterface::OperationKind::Sporadic) {
             const auto interfaceName = getInterfaceName(providedInterface);
-            createPromelaObjectsForLocalFunction(
+            createPromelaObjectsForAsyncPis(
                     context, ivModel, providedInterface, functionName, interfaceName, asn1SubtypesDefinitions);
             channelNames.append(constructChannelName(functionName, interfaceName));
         } else {
@@ -631,12 +631,12 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslato
     for (const auto requiredInterface : ivFunction->ris()) {
         if (requiredInterface->kind() == IVInterface::OperationKind::Protected
                 || requiredInterface->kind() == IVInterface::OperationKind::Unprotected) {
-            createPromelaObjectsForExternalFunction(context, requiredInterface, functionName);
+            createPromelaObjectsForSyncRis(context, requiredInterface, functionName);
         }
     }
 }
 
-void IvToPromelaTranslator::createPromelaObjectsForLocalFunction(IvToPromelaTranslator::Context &context,
+void IvToPromelaTranslator::createPromelaObjectsForAsyncPis(IvToPromelaTranslator::Context &context,
         const IVModel *ivModel, const IVInterface *providedInterface, const QString &functionName,
         const QString &interfaceName, const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const
 {
@@ -660,7 +660,7 @@ void IvToPromelaTranslator::createPromelaObjectsForLocalFunction(IvToPromelaTran
             generateProctype(context, functionName, interfaceName, parameterType, queueSize, priority, false));
 }
 
-void IvToPromelaTranslator::createPromelaObjectsForExternalFunction(IvToPromelaTranslator::Context &context,
+void IvToPromelaTranslator::createPromelaObjectsForSyncRis(IvToPromelaTranslator::Context &context,
         const IVInterface *requiredInterface, const QString &functionName) const
 {
     Sequence sequence(Sequence::Type::NORMAL);

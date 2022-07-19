@@ -235,10 +235,10 @@ private:
     auto createPromelaObjectsForFunction(Context &context, const ivm::IVModel *ivModel,
             const ivm::IVFunction *ivFunction, const QString &functionName,
             const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const -> void;
-    auto createPromelaObjectsForLocalFunction(Context &context, const ivm::IVModel *ivModel,
+    auto createPromelaObjectsForAsyncPis(Context &context, const ivm::IVModel *ivModel,
             const ivm::IVInterface *providedInterface, const QString &functionName, const QString &interfaceName,
             const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const -> void;
-    auto createPromelaObjectsForExternalFunction(
+    auto createPromelaObjectsForSyncRis(
             Context &context, const ivm::IVInterface *requiredInterface, const QString &functionName) const -> void;
     auto createPromelaObjectsForEnvironment(Context &context, const ivm::IVModel *ivModel,
             const ivm::IVFunction *ivFunction, const QString &functionName,
