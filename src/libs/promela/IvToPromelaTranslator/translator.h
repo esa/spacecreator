@@ -252,9 +252,11 @@ private:
             const ivm::IVFunction *ivFunction, const QString &functionName, const uint32_t basePriority,
             const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions,
             const conversion::Options &options) const -> void;
-    auto createCheckQueueInline(
-            model::PromelaModel *promelaModel, const QString &functionName, QList<QString> &channelNames) const -> void;
-    auto createSystemState(model::PromelaModel *promelaModel, const ivm::IVModel *ivModel,
+    auto createCheckQueueInline(model::PromelaModel *promelaModel, const QString &functionName,
+            const QList<QString> &channelNames) const -> void;
+    auto createCheckQueuesExpression(const QList<QString> &channelNames, bool empty) const
+            -> std::unique_ptr<::promela::model::Expression>;
+    auto createSystemState(model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,
             const std::vector<QString> &modelFunctions, const std::vector<QString> &observers) const -> void;
     auto createPromelaObjectsForTimers(
             Context &context, const ivm::IVModel *ivModel, const std::vector<QString> &modelFunctions) const -> void;
@@ -292,5 +294,9 @@ private:
 
     auto buildParameterSubtypeName(
             const QString &functionName, const QString &interfaceName, const QString &parameterName) const -> QString;
+
+    auto findProvidedInterface(const ivm::IVModel *model, const QString &functionName,
+            const QString &interfaceName) const -> const ivm::IVInterface *;
+    auto observerChannelName(const ObserverAttachment &attachment) const -> QString;
 };
 }
