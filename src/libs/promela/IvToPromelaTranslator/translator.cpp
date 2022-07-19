@@ -620,7 +620,7 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslato
             channelNames.append(constructChannelName(functionName, interfaceName));
         } else {
             auto message =
-                    QString("Unallowed interface kind in function %1, only sporatic and cyclic interfaces are allowed")
+                    QString("Unallowed interface kind in function %1, only sporadic and cyclic interfaces are allowed")
                             .arg(functionName);
             throw TranslationException(message);
         }
@@ -725,7 +725,7 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTransl
     for (IVInterface *requiredInterface : requiredInterfaceList) {
         if (requiredInterface->kind() != IVInterface::OperationKind::Sporadic) {
             auto message =
-                    QString("Unallowed interface kind in function %1, only sporatic required interfaces are allowed")
+                    QString("Unallowed interface kind in function %1, only sporadic required interfaces are allowed")
                             .arg(functionName);
             throw TranslationException(message);
         }
