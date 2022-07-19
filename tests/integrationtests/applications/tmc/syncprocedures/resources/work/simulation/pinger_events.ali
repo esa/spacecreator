@@ -1,0 +1,211 @@
+V "GNAT Lib v8"
+A -gnatwa
+A -Wall
+A -Wextra
+A -Wcast-align
+A -gnatA
+A -fPIC
+A -mtune=generic
+A -march=x86-64
+P SL ZX
+
+RN
+RV NO_IO
+RV NO_IMPLICIT_CONDITIONALS
+RV NO_STANDARD_STORAGE_POOLS
+RV NO_DEFAULT_INITIALIZATION
+RV NO_DYNAMIC_SIZED_OBJECTS
+RV NO_IMPLEMENTATION_PRAGMAS
+RV SPARK_05
+
+U pinger_events%b	pinger_events.adb	5809d16c NE OO PK
+Z ada.tags%s		a-tags.adb		a-tags.ali
+W asn1_ada_iterators%s	asn1_ada_iterators.ads	asn1_ada_iterators.ali
+W asn1_ada_iterators.iterators%s  asn1_ada_iterators-iterators.adb  asn1_ada_iterators-iterators.ali
+Z system.concat_3%s	s-conca3.adb		s-conca3.ali
+Z system.secondary_stack%s  s-secsta.adb	s-secsta.ali
+W text_io%s		text_io.ads		text_io.ali
+
+U pinger_events%s	pinger_events.ads	15109da1 EE NE OO PK
+W pinger_pi%s		pinger_pi.adb		pinger_pi.ali
+W simulation_dataview%s	simulation_dataview.adb	simulation_dataview.ali
+W syncprocedures_dataview%s  syncprocedures_dataview.adb  syncprocedures_dataview.ali
+
+D ada.ads		20170911084841 76789da1 ada%s
+D a-charac.ads		20170908151217 2d3ec45b ada.characters%s
+D a-chahan.ads		20180111085525 1601a50f ada.characters.handling%s
+D a-chlat1.ads		20170908151217 66457d31 ada.characters.latin_1%s
+D a-except.ads		20180111085525 291912d5 ada.exceptions%s
+D a-finali.ads		20180111085525 bf4f806b ada.finalization%s
+D a-ioexce.ads		20170908151217 e4a01f64 ada.io_exceptions%s
+D a-iteint.ads		20170908151217 7c7305e9 ada.iterator_interfaces%s
+D a-stream.ads		20180111085525 119b8fb3 ada.streams%s
+D a-string.ads		20170908151217 90ac6797 ada.strings%s
+D a-strfix.ads		20170908151217 d07c346e ada.strings.fixed%s
+D a-strmap.ads		20180111085525 e8bb714a ada.strings.maps%s
+D a-tags.ads		20180111085525 491b781d ada.tags%s
+D a-textio.ads		20180111085525 881db35a ada.text_io%s
+D a-unccon.ads		20170908151217 0e9b276f ada.unchecked_conversion%s
+D adaasn1rtl.ads	20220719135033 ba1d55d4 adaasn1rtl%s
+D adaasn1rtl-encoding.ads  20220719135033 2b3c6770 adaasn1rtl.encoding%s
+D asn1_ada_iterators.ads  20220719135029 db0dab03 asn1_ada_iterators%s
+D asn1_ada_iterators-iterators.ads  20220719135029 17566339 asn1_ada_iterators.iterators%s
+D asn1_iterators.ads	20200722144717 75700315 asn1_iterators%s
+D asn1_iterators-generic_basic.ads  20200722144717 dc450f6a asn1_iterators.generic_basic%s
+D asn1_iterators-generic_basic.adb  20200722144717 3cd2f92b asn1_iterators.generic_basic%b
+D asn1_iterators-generic_enumerated.ads  20200722144717 65ea3820 asn1_iterators.generic_enumerated%s
+D asn1_iterators-generic_enumerated.adb  20200722144717 acb3dd58 asn1_iterators.generic_enumerated%b
+D asn1_iterators-generic_fixed_octet_string.ads  20220512140628 0d239ce5 asn1_iterators.generic_fixed_octet_string%s
+D asn1_iterators-generic_fixed_seqof.ads  20220216133908 1db3f297 asn1_iterators.generic_fixed_seqof%s
+D asn1_iterators-generic_fixed_seqof.adb  20200722144717 4e18150e asn1_iterators.generic_fixed_seqof%b
+D asn1_iterators-generic_integer.ads  20211103141530 4ea02b89 asn1_iterators.generic_integer%s
+D asn1_iterators-generic_integer.adb  20211103141530 b00be7e7 asn1_iterators.generic_integer%b
+D asn1_iterators-generic_real.ads  20200722144717 491f5934 asn1_iterators.generic_real%s
+D asn1_iterators-generic_seqof.ads  20220216133908 089f578a asn1_iterators.generic_seqof%s
+D asn1_iterators-generic_unsigned_integer.ads  20200722144717 2ae6f11e asn1_iterators.generic_unsigned_integer%s
+D asn1_iterators-generic_unsigned_integer.adb  20211103141530 91627f39 asn1_iterators.generic_unsigned_integer%b
+D asn1_iterators-simpletypes.ads  20200722144717 ac65d31e asn1_iterators.simpletypes%s
+D asn1_iterators-simpletypes.adb  20200722144717 49afc14e asn1_iterators.simpletypes%b
+D board_config.ads	20220719135033 ff248fc1 board_config%s
+D interfac.ads		20180111085525 5ab55268 interfaces%s
+D i-c.ads		20170908151217 5421119b interfaces.c%s
+D i-cstrin.ads		20180111085525 341d0ddf interfaces.c.strings%s
+D i-cstrea.ads		20180111085525 e53d8b8e interfaces.c_streams%s
+D pinger.ads		20220719135031 2c183d16 pinger%s
+D pinger_datamodel.ads	20220719135033 d8df5cb5 pinger_datamodel%s
+D pinger_events.ads	20220719135017 37d01806 pinger_events%s
+D pinger_events.adb	20220719135017 593d62cb pinger_events%b
+D pinger_pi.ads		20220719135017 0b5e2446 pinger_pi%s
+D pinger_ri.ads		20220719135017 450cb4ca pinger_ri%s
+D ponger_datamodel.ads	20220719135033 1fdabd37 ponger_datamodel%s
+D simulation_dataview.ads  20220719135033 299ea1e1 simulation_dataview%s
+D syncprocedures_dataview.ads  20220719135033 0644128b syncprocedures_dataview%s
+D system.ads		20180111085525 4635ec04 system%s
+D s-bitops.ads		20180111085525 0765e3a3 system.bit_ops%s
+D s-conca3.ads		20180111085525 0b705ca5 system.concat_3%s
+D s-crtl.ads		20180111085525 0ebbdb71 system.crtl%s
+D s-exctab.ads		20180111085525 54135002 system.exception_table%s
+D s-ficobl.ads		20180111085525 078245e4 system.file_control_block%s
+D s-finmas.ads		20180111085525 7811a767 system.finalization_masters%s
+D s-finroo.ads		20180111085525 4ff27390 system.finalization_root%s
+D s-imenne.ads		20180111085525 614c06c0 system.img_enum_new%s
+D s-imglli.ads		20180111085525 114f55d1 system.img_lli%s
+D s-imgllu.ads		20180111085525 49c900c3 system.img_llu%s
+D s-parame.ads		20180111085525 f896c45c system.parameters%s
+D s-pooglo.ads		20180111085525 ede33ef8 system.pool_global%s
+D s-secsta.ads		20180111085525 283dec34 system.secondary_stack%s
+D s-soflin.ads		20180111085525 a7318a92 system.soft_links%s
+D s-stache.ads		20180111085525 a37c21ec system.stack_checking%s
+D s-stalib.ads		20180111085525 09bd3940 system.standard_library%s
+D s-stoele.ads		20180111085525 2dc34a04 system.storage_elements%s
+D s-stopoo.ads		20180111085525 b16154c2 system.storage_pools%s
+D s-stposu.ads		20180111085525 97a6219c system.storage_pools.subpools%s
+D s-stratt.ads		20180111085525 aedef97e system.stream_attributes%s
+D s-traent.ads		20180111085525 005bf670 system.traceback_entries%s
+D s-unstyp.ads		20180111085525 34867c83 system.unsigned_types%s
+D s-wchcon.ads		20180111085525 1b7d22d2 system.wch_con%s
+D taste_basictypes.ads	20220719135033 f39e5956 taste_basictypes%s
+D text_io.ads		20170908151217 21b2c898 text_io%s
+X 8 a-iteint.ads
+24h9 Forward_Iterator
+X 14 a-textio.ads
+242U14*Put 44|78s18 81s18 87s18
+263U14*Put_Line 44|64s23 76s19 79s19 82s19 88s19
+X 16 adaasn1rtl.ads
+14I12*Asn1Int{36|3I12}
+15M12*Asn1UInt{36|4M12}
+X 18 asn1_ada_iterators.ads
+6K9*ASN1_Ada_Iterators 7e23 44|3r6 3r48
+X 19 asn1_ada_iterators-iterators.ads
+26K28*Iterators 146e33 44|3w25 3r67
+28K12*MyInteger_Pkg 41e21 44|79r36 88r36
+39V16*Image{string} 44|79s50 88s50
+X 36 board_config.ads
+3I12*Asn1Int{37|55I9}
+4M12*Asn1UInt{37|77M9}
+X 37 interfac.ads
+55I9*Integer_64<long_long_integer>
+77M9*Unsigned_64
+X 41 pinger.ads
+27U14*Pong 28i<c,pinger_PI_Pong>21
+30U14*Tick 31i<c,pinger_PI_Tick>21
+X 43 pinger_events.ads
+12K9*Pinger_Events 33l5 33e18 44|5b14 95l5 95t18
+14U14*Startup=15:25
+14r23 Global_State{48|993R6}
+24b4*CS_Barrier{boolean} 44|30m19 32m19
+28U14*Process_Event 28>29 29=29 44|7b14 68l8 68t21
+28r29 Event{48|855R6} 44|8b7 12r21 14r21 16r21 23r10 55r55
+29r29 Global_State{48|993R6} 44|9b7 31m49 37m72 40m51 58r23 59m23 60r26 61m23
+. 62r26
+31U14*Print_Event 31>27 44|70b14 91l8 91t19
+31r27 Event{48|133R6} 44|70b27 72r12 74r18 79r57 85r18 88r57
+X 44 pinger_events.adb
+11r7 Evt{48|133R6} 26r12 28r18 35r50 44r18
+20r7 Input_Event{48|855R6} 47m20 48m20 49m20 62r63
+35m22 Param{49|33M9} 37m49 37r49
+X 45 pinger_pi.ads
+7K9*Pinger_PI 43|10w6 15r15 44|31r19 37r22 40r19 45|24e14
+9U14*Startup 43|15r25
+13U14*Continuous_Signals 44|31s29
+16U14*Pong 44|37s32
+17r8 Global_State{48|993R6} 44|37r56
+18m7 Pongarg{49|33M9} 44|37r38
+22U14*Tick 44|40s29
+22r20 Global_State{48|993R6} 44|40r35
+X 48 simulation_dataview.ads
+50K9*Simulation_DataView 43|2w6 2r31 48|1116e24
+65m5*pongarg{49|33M9} 44|35r66 79r75
+77n47*input_none_PRESENT{77E6} 44|29r21 75r21
+77n67*pong_PRESENT{77E6} 44|33r21 77r21
+77n81*tick_PRESENT{77E6} 44|39r21 80r21
+82e33*kind{77E6} 44|28r29 74r31
+88r13*pong{64R6} 44|35r61 79r70
+102m5*pingarg{49|33M9} 44|55r100 88r76
+108n48*ping_PRESENT{108E6} 44|46r22 86r22
+113e34*kind{108E6} 44|44r30 85r32
+117r13*ping{101R6} 44|55r95 88r71
+128n40*msg_in_PRESENT{128E6} 44|27r15 73r15
+128n56*msg_out_PRESENT{128E6} 44|42r15 84r15
+133R6*asn1SccPinger_Event 43|31r35 44|11r22 70r35 48|141e11
+133e26*kind{128E6} 44|26r16 72r18
+137r13*msg_in{82R6} 44|28r22 35r54 74r24 79r63
+139r13*msg_out{113R6} 44|44r22 55r87 85r24 88r63
+168V10*asn1SccPinger_Event_Init{133R6} 44|17s33
+234m5*pingarg{49|33M9} 44|55m43
+240n67*ping_PRESENT{240E6} 44|53r47
+245e33*kind{240E6} 44|53m39
+251r13*ping{233R6} 44|54m39
+289n40*msg_in_PRESENT{289E6} 44|52r38
+294e26*kind{289E6} 44|52m28
+298r13*msg_in{245R6} 44|53m28
+381n47*asn1Sccpinger{381E6} 44|47r54
+381n62*asn1Sccponger{381E6} 44|48r54
+522n73*ponger_PRESENT{522E6} 44|50r32
+527e28*kind{522E6} 44|50m24
+533r13*pinger{133R6} 44|14r45 16r46 55r80
+535r13*ponger{294R6} 44|51m24
+782e5*source{381E6} 44|47m44
+783e5*dest{381E6} 44|48m44
+784r5*event{527R6} 44|14r39 16r40 49m44 55r74
+850n44*no_event_PRESENT{850E6} 44|23r24
+850n62*system_startup_PRESENT{850E6} 44|23r44
+850n86*input_event_PRESENT{850E6} 44|13r23 20r54
+850n107*output_event_PRESENT{850E6} 44|15r23
+855R6*asn1SccObservable_Event 43|28r51 44|8r22 20r21 48|869e11
+855e30*kind{850E6} 44|12r27 23r16
+863r13*input_event{781R6} 44|14r27 47m32 48m32 49m32
+865r13*output_event{781R6} 44|16r27 55r61
+934A6*asn1SccEvents_Ty_array(855R6)<integer>
+935I9*asn1SccEvents_Ty_length_index{integer} 44|58r58
+937i5*Length{935I9} 44|58r49 59m49 60r52 62r52
+938a5*Data{934A6} 44|61m49
+993R6*asn1SccSystem_State 43|14r45 29r51 44|9r29 48|998e11
+995r5*ponger_queue{987R9} 44|58r36 59m36 60r39 61m36 62r39
+1110i1*ponger_queue_size{16|14I12} 44|58r89
+X 49 syncprocedures_dataview.ads
+29K9*SYNCPROCEDURES_DATAVIEW 43|5w6 5r35 8w6 8r35 49|80e28
+33M9*asn1SccMyInteger{16|15M12} 44|35r30
+X 75 text_io.ads
+24K9*Text_IO=24:29 44|1w6 1r19
+

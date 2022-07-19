@@ -1,0 +1,140 @@
+V "GNAT Lib v8"
+A -gnatwa
+A -Wall
+A -Wextra
+A -Wcast-align
+A -gnatA
+A -fPIC
+A -mtune=generic
+A -march=x86-64
+P SL ZX
+
+RN
+RV NO_UNCHECKED_CONVERSION
+RV NO_IMPLEMENTATION_PRAGMAS
+RV NO_ELABORATION_CODE
+RV SPARK_05
+
+U ponger%b		ponger.adb		fa6d0bfb OO PK
+W ada%s			ada.ads			ada.ali
+W ada.numerics%s	a-numeri.ads		a-numeri.ali
+W ada.numerics.generic_elementary_functions%s
+W ada.unchecked_conversion%s
+Z interfaces%s		interfac.ads		interfac.ali
+Z ponger_ri%s		ponger_ri.adb		ponger_ri.ali  AD
+W system%s		system.ads		system.ali
+Z system.img_llu%s	s-imgllu.adb		s-imgllu.ali
+W system.io%s		s-io.adb		s-io.ali
+Z system.unsigned_types%s  s-unstyp.ads		s-unstyp.ali
+
+U ponger%s		ponger.ads		1399ec22 EB EE NE OO PK
+W ada%s			ada.ads			ada.ali
+W ada.characters%s	a-charac.ads		a-charac.ali
+W ada.characters.handling%s  a-chahan.adb	a-chahan.ali
+W adaasn1rtl%s		adaasn1rtl.adb		adaasn1rtl.ali
+W interfaces%s		interfac.ads		interfac.ali
+W interfaces.c%s	i-c.adb			i-c.ali
+W interfaces.c.strings%s  i-cstrin.adb		i-cstrin.ali
+W ponger_datamodel%s	ponger_datamodel.adb	ponger_datamodel.ali
+W ponger_ri%s		ponger_ri.adb		ponger_ri.ali
+W syncprocedures_dataview%s  syncprocedures_dataview.adb  syncprocedures_dataview.ali
+Z system%s		system.ads		system.ali
+Z system.img_enum_new%s	s-imenne.adb		s-imenne.ali
+W taste_basictypes%s	taste_basictypes.adb	taste_basictypes.ali
+
+D ada.ads		20170911084841 76789da1 ada%s
+D a-charac.ads		20170908151217 2d3ec45b ada.characters%s
+D a-chahan.ads		20180111085525 1601a50f ada.characters.handling%s
+D a-chlat1.ads		20170908151217 66457d31 ada.characters.latin_1%s
+D a-numeri.ads		20170908151217 bb51c45a ada.numerics%s
+D a-numaux.ads		20180111085525 243fe0b7 ada.numerics.aux%s
+D a-ngelfu.ads		20180111085525 cb378f71 ada.numerics.generic_elementary_functions%s
+D a-ngelfu.adb		20180111085525 a9022048 ada.numerics.generic_elementary_functions%b
+D a-unccon.ads		20170908151217 0e9b276f ada.unchecked_conversion%s
+D adaasn1rtl.ads	20220719135033 ba1d55d4 adaasn1rtl%s
+D adaasn1rtl-encoding.ads  20220719135033 2b3c6770 adaasn1rtl.encoding%s
+D board_config.ads	20220719135033 ff248fc1 board_config%s
+D interfac.ads		20180111085525 5ab55268 interfaces%s
+D i-c.ads		20170908151217 5421119b interfaces.c%s
+D i-cstrin.ads		20180111085525 341d0ddf interfaces.c.strings%s
+D ponger.ads		20220719135031 c86f8cd2 ponger%s
+D ponger.adb		20220719135031 69ecd878 ponger%b
+D ponger_datamodel.ads	20220719135033 1fdabd37 ponger_datamodel%s
+D ponger_ri.ads		20220719135017 f3423976 ponger_ri%s
+D syncprocedures_dataview.ads  20220719135033 0644128b syncprocedures_dataview%s
+D system.ads		20180111085525 4635ec04 system%s
+D s-bitops.ads		20180111085525 0765e3a3 system.bit_ops%s
+D s-exctab.ads		20180111085525 54135002 system.exception_table%s
+D s-imenne.ads		20180111085525 614c06c0 system.img_enum_new%s
+D s-imgllu.ads		20180111085525 49c900c3 system.img_llu%s
+D s-io.ads		20180111085525 9e42f74f system.io%s
+D s-parame.ads		20180111085525 f896c45c system.parameters%s
+D s-stalib.ads		20180111085525 09bd3940 system.standard_library%s
+D s-unstyp.ads		20180111085525 34867c83 system.unsigned_types%s
+D taste_basictypes.ads	20220719135033 f39e5956 taste_basictypes%s
+X 1 ada.ads
+16K9*Ada 20e8 16|5r6 9r5 17|6r6 7r6
+X 2 a-charac.ads
+16K13*Characters 18e19 16|5r10 9r9
+X 3 a-chahan.ads
+36K24*Handling 159e28 16|5w21 9r20
+X 5 a-numeri.ads
+16K13*Numerics 32e17 17|7r10
+X 7 a-ngelfu.ads
+39k22*Generic_Elementary_Functions 205e46 17|7w19
+X 9 a-unccon.ads
+20v14*Unchecked_Conversion 17|6w10
+X 10 adaasn1rtl.ads
+5K9*adaasn1rtl 125e15 16|15w6 16r5
+15M12*Asn1UInt{12|4M12}
+19B12*Asn1Boolean{boolean}
+X 12 board_config.ads
+4M12*Asn1UInt{13|77M9}
+X 13 interfac.ads
+38K9*Interfaces 184e15 16|3w6 4r6 7r5 8r5
+77M9*Unsigned_64
+X 14 i-c.ads
+18K20*C 230e17 16|4r17 8r16
+X 15 i-cstrin.ads
+36K22*Strings 106e25 16|4w19 8r18
+47P9*chars_ptr 16|24r30
+X 16 ponger.ads
+20K9*Ponger 33l5 33e11 17|9b14 61l5 61t11
+21r4*ctxt{18|84R6} 24r96 17|12r15 14m16 30m19 34r48 37m29 37r29 40m19 57m10
+24V13*Get_State{15|47P9}
+25U14*Startup 17|54b14 58l11 58t18 60s7
+27U14*Ping 27=19 28i<c,ponger_PI_Ping>21 17|10b14 19l11 19t15
+27m19 pingArg{20|33M9} 17|10b19 14r32
+30U14*RI_0_Pong=30:78 17|37s19
+30m25 pongArg{20|33M9}
+31U14*Execute_Transition 31>34 17|15s16 17s16 22b14 51l11 51t29 56s10
+31i34 Id{integer} 17|22b34 23r25
+32N4*CS_Only 17|17r36 42r21
+X 17 ponger.adb
+23i7 trId{integer} 25r17 26r18 29m19 39m19 43m19
+48L15 Continuous_Signals 31r24 41r24 44r24
+49L15 Next_Transition
+X 18 ponger_datamodel.ads
+36K9*Ponger_Datamodel 16|17w6 17r28 18|144e21
+41E6*asn1SccPonger_States 16|24r68 18|41e44
+41n31*asn1Sccwait{41E6} 17|13r18 30r33 40r33
+84R6*asn1SccPonger_Context 16|21r19 18|88e11
+85e5*state{41E6} 16|24r101 17|12r20 30m24 40m24
+86b5*init_done{10|19E12} 16|22m8 17|57m15
+87m5*pingarg{20|33M9} 17|14m21 34r53 37m34
+X 19 ponger_ri.ads
+9K9*Ponger_RI 16|19w6 24r44 30r68 19|19e14
+11U14*Pong 16|30r78
+17V13*To_C_Pointer{15|47P9} 16|24s54
+X 20 syncprocedures_dataview.ads
+29K9*SYNCPROCEDURES_DATAVIEW 16|11w6 12r5 20|80e28
+33M9*asn1SccMyInteger{10|15M12} 16|27r35 30r42 17|10r35 34r24
+X 21 system.ads
+37K9*System 17|3r6 4r5 21|156e11
+X 26 s-io.ads
+37K16*IO 17|3w13 4r12 26|64e14
+44U14*Put 17|34s19
+47U14*New_Line 17|35s19
+X 30 taste_basictypes.ads
+29K9*TASTE_BasicTypes 16|13w6 14r5 30|282e21
+

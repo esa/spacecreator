@@ -1,0 +1,230 @@
+---------------------------------------------------
+-- AADL2.2
+-- TASTE type interfaceview
+-- 
+-- generated code: do not edit
+---------------------------------------------------
+
+
+PACKAGE interfaceview::IV::Ponger
+PUBLIC
+
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+WITH interfaceview::IV::Pinger;
+
+SUBPROGRAM PI_Ping
+FEATURES
+    pingArg : IN PARAMETER DataView::MyInteger {
+       Taste::encoding => NATIVE;
+    };
+END PI_Ping;
+
+SUBPROGRAM IMPLEMENTATION PI_Ping.others
+END PI_Ping.others;
+
+
+SUBPROGRAM RI_Pong
+FEATURES
+    pongArg : IN PARAMETER DataView::MyInteger {
+       Taste::encoding => NATIVE;
+    };
+END RI_Pong;
+
+SUBPROGRAM IMPLEMENTATION RI_Pong.others
+END RI_Pong.others;
+
+
+
+SYSTEM Ponger
+FEATURES
+   PI_Ping : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: Ponger:: PI_Ping.others {
+      Taste::InterfaceName           => "Ping";            
+      Taste::RCMoperationKind        => unprotected;      
+      -- Unrecognized property: enable_multicast => false      
+      -- Unrecognized property: layer => default      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+   };
+   RI_Pong : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: Pinger:: PI_Pong.others {
+      Taste::labelInheritance        => "true";
+      Taste::InterfaceName           => "Pong";            
+      Taste::RCMoperationKind        => unprotected;      
+      -- Unrecognized property: enable_multicast => false      
+      -- Unrecognized property: layer => default      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+   };
+PROPERTIES
+   -- ignored property: name = Ponger
+   -- ignored property: is_type = NO
+   Source_Language => (SDL);
+   -- ignored property: default_implementation = default
+   -- ignored property: FPGA_Configurations = 
+END Ponger;
+
+SYSTEM IMPLEMENTATION Ponger.others
+END Ponger.others;
+
+END interfaceview::IV::Ponger;
+
+
+
+PACKAGE interfaceview::IV::Pinger
+PUBLIC
+
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+WITH interfaceview::IV::Clock;
+WITH interfaceview::IV::Ponger;
+
+SUBPROGRAM PI_Pong
+FEATURES
+    pongArg : IN PARAMETER DataView::MyInteger {
+       Taste::encoding => NATIVE;
+    };
+END PI_Pong;
+
+SUBPROGRAM IMPLEMENTATION PI_Pong.others
+END PI_Pong.others;
+
+
+SUBPROGRAM PI_Tick
+END PI_Tick;
+
+SUBPROGRAM IMPLEMENTATION PI_Tick.others
+END PI_Tick.others;
+
+
+SUBPROGRAM RI_Ping
+FEATURES
+    pingArg : IN PARAMETER DataView::MyInteger {
+       Taste::encoding => NATIVE;
+    };
+END RI_Ping;
+
+SUBPROGRAM IMPLEMENTATION RI_Ping.others
+END RI_Ping.others;
+
+
+
+SYSTEM Pinger
+FEATURES
+   PI_Pong : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: Pinger:: PI_Pong.others {
+      Taste::InterfaceName           => "Pong";            
+      Taste::RCMoperationKind        => unprotected;      
+      -- Unrecognized property: enable_multicast => false      
+      -- Unrecognized property: layer => default      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+   };
+   PI_Tick : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: Pinger:: PI_Tick.others {
+      Taste::InterfaceName           => "Tick";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => false      
+      -- Unrecognized property: layer => default      
+      Taste::Interface_Stack_Size    => 1024;      
+      Taste::Interface_Priority      => 1;      
+      Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+   };
+   RI_Ping : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: Ponger:: PI_Ping.others {
+      Taste::labelInheritance        => "true";
+      Taste::InterfaceName           => "Ping";            
+      Taste::RCMoperationKind        => unprotected;      
+      -- Unrecognized property: enable_multicast => false      
+      -- Unrecognized property: layer => default      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+   };
+PROPERTIES
+   -- ignored property: name = Pinger
+   -- ignored property: is_type = NO
+   Source_Language => (SDL);
+   -- ignored property: default_implementation = default
+   -- ignored property: FPGA_Configurations = 
+END Pinger;
+
+SYSTEM IMPLEMENTATION Pinger.others
+END Pinger.others;
+
+END interfaceview::IV::Pinger;
+
+
+
+PACKAGE interfaceview::IV::Clock
+PUBLIC
+
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+WITH interfaceview::IV::Pinger;
+
+SUBPROGRAM RI_Tick
+END RI_Tick;
+
+SUBPROGRAM IMPLEMENTATION RI_Tick.others
+END RI_Tick.others;
+
+
+
+SYSTEM Clock
+FEATURES
+   RI_Tick : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: Pinger:: PI_Tick.others {
+      Taste::labelInheritance        => "true";
+      Taste::InterfaceName           => "Tick";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => false      
+      -- Unrecognized property: layer => default      
+      Taste::Interface_Stack_Size    => 1024;      
+      Taste::Interface_Priority      => 1;      
+      Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+   };
+PROPERTIES
+   -- ignored property: name = Clock
+   -- ignored property: is_type = NO
+   Source_Language => (GUI);
+   -- ignored property: default_implementation = default
+   -- ignored property: FPGA_Configurations = 
+END Clock;
+
+SYSTEM IMPLEMENTATION Clock.others
+END Clock.others;
+
+END interfaceview::IV::Clock;
+
+
+PACKAGE interfaceview::IV
+PUBLIC
+
+WITH interfaceview::IV::Ponger;
+WITH interfaceview::IV::Pinger;
+WITH interfaceview::IV::Clock;
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+
+SYSTEM interfaceview
+PROPERTIES
+   Taste::dataView     => ("DataView");
+   TASTE::dataViewPath => ("DataView.aadl");
+END interfaceview;
+
+SYSTEM IMPLEMENTATION interfaceview.others
+SUBCOMPONENTS
+  Ponger : SYSTEM interfaceview::IV::Ponger::Ponger.others;
+  Pinger : SYSTEM interfaceview::IV::Pinger::Pinger.others;
+  Clock : SYSTEM interfaceview::IV::Clock::Clock.others;
+CONNECTIONS
+   Ponger_RI_Pong : SUBPROGRAM ACCESS Pinger.PI_Pong -> Ponger.RI_Pong;
+   Clock_RI_Tick : SUBPROGRAM ACCESS Pinger.PI_Tick -> Clock.RI_Tick;
+   Pinger_RI_Ping : SUBPROGRAM ACCESS Ponger.PI_Ping -> Pinger.RI_Ping;
+END interfaceview.others;
+
+PROPERTIES
+   Taste::dataView     => ("DataView");
+   Taste::dataViewPath => ("DataView.aadl");
+   Taste::coordinates  => "0 0 297000 210000";
+   Taste::version      => "3.0";
+END interfaceview::IV;

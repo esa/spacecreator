@@ -1,0 +1,7 @@
+all:
+	mkdir -p code
+	cd code && opengeode --toAda /home/taste/etb/spacecreator/tests/integrationtests/applications/tmc/syncprocedures/resources/work/pinger/SDL/src/pinger.pr 
+	asn1scc -fp AUTO -typePrefix asn1Scc -o code -equal -Ada dataview-uniq.asn code/pinger_datamodel.asn
+	cd code && gnat make pinger
+clean:
+	rm -rf code

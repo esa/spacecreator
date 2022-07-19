@@ -1,0 +1,118 @@
+V "GNAT Lib v8"
+A -gnatwa
+A -Wall
+A -Wextra
+A -Wcast-align
+A -gnatA
+A -fPIC
+A -mtune=generic
+A -march=x86-64
+P SL ZX
+
+RN
+RV NO_DIRECT_BOOLEAN_OPERATORS
+RV NO_IMPLEMENTATION_PRAGMAS
+RV SPARK_05
+
+U syncprocedures_dataview%b  syncprocedures_dataview.adb  ee930ee0 NE OO PK IU
+W adaasn1rtl%s		adaasn1rtl.adb		adaasn1rtl.ali
+W adaasn1rtl.encoding%s	adaasn1rtl-encoding.adb	adaasn1rtl-encoding.ali
+W adaasn1rtl.encoding.uper%s  adaasn1rtl-encoding-uper.adb  adaasn1rtl-encoding-uper.ali
+
+U syncprocedures_dataview%s  syncprocedures_dataview.ads  d150cc2b EE NE OO PK IU
+W adaasn1rtl%s		adaasn1rtl.adb		adaasn1rtl.ali
+W adaasn1rtl.encoding%s	adaasn1rtl-encoding.adb	adaasn1rtl-encoding.ali
+W system%s		system.ads		system.ali
+
+D ada.ads		20170911084841 76789da1 ada%s
+D a-charac.ads		20170908151217 2d3ec45b ada.characters%s
+D a-chlat1.ads		20170908151217 66457d31 ada.characters.latin_1%s
+D adaasn1rtl.ads	20220719135033 ba1d55d4 adaasn1rtl%s
+D adaasn1rtl-encoding.ads  20220719135033 2b3c6770 adaasn1rtl.encoding%s
+D adaasn1rtl-encoding-uper.ads  20220719135033 329abd2c adaasn1rtl.encoding.uper%s
+D board_config.ads	20220719135033 ff248fc1 board_config%s
+D interfac.ads		20180111085525 5ab55268 interfaces%s
+D syncprocedures_dataview.ads  20220719135033 0644128b syncprocedures_dataview%s
+D syncprocedures_dataview.adb  20220719135033 da4da147 syncprocedures_dataview%b
+D system.ads		20180111085525 4635ec04 system%s
+D s-bitops.ads		20180111085525 0765e3a3 system.bit_ops%s
+D s-unstyp.ads		20180111085525 34867c83 system.unsigned_types%s
+X 4 adaasn1rtl.ads
+5K9*adaasn1rtl 125e15 9|3w6 5r6 14r5 19r10 20r10 21r10 22r10 23r10 33r29
+. 41r76 47r41 49r116 50r75 50r119 62r121 63r78 63r122 10|8r6 41r76 44r11
+. 44r37 52r75 52r119 58r9 63r115 70r78 70r122 74r5 76r120
+10M9*BIT 9|23r21
+12M12*Asn1Byte{8|63M9}
+14I12*Asn1Int{7|3I12} 9|22r21
+15M12*Asn1UInt{7|4M12} 9|21r21 33r40
+22A9*BitArray(10M9)<integer> 9|20r21
+25A9*OctetBuffer(12M12)<integer> 9|19r21
+41R9*ASN1_RESULT 44e14 9|41r87 49r127 50r130 62r132 63r133 10|41r87 44r22
+. 44r48 52r130 63r126 70r133 76r131
+42b7*Success{boolean} 9|56r18 58r21 69r18 71r21 10|44m61 47m9 48r30 57r15
+. 74m94 81r15
+43i7*ErrorCode{integer} 10|44m78 48m9 57r35 73m12
+X 5 adaasn1rtl-encoding.ads
+5K20*encoding 422e24 9|5w17 47r52 50r86 63r89 10|8r17 52r86 58r20 70r89 74r16
+23R9*Bitstream 31e14 9|47r61 50r95 63r98 10|52r95 70r98
+23i20*Size_In_Bytes{positive} 9|53r19 54r87 66r19 67r87
+25a7*Buffer{4|25A9} 10|66m169
+27i7*Current_Bit_Pos{natural} 9|52r15 54r19 56r33 56r59 56r82 56r108 65r15
+. 67r19 69r33 69r59 69r82 69r108 10|66m108 79m12
+28i7*pushDataPrm{integer} 10|66m131
+29i7*fetchDataPrm{integer} 10|66m150
+X 6 adaasn1rtl-encoding-uper.ads
+1K29*uper 370e29 10|8w26 58r29 74r25
+80U14*UPER_Enc_ConstraintPosWholeNumber 10|58s34
+104U14*UPER_Dec_ConstraintPosWholeNumber 10|74s30
+X 7 board_config.ads
+3I12*Asn1Int{8|55I9}
+4M12*Asn1UInt{8|77M9}
+X 8 interfac.ads
+55I9*Integer_64<long_long_integer>
+63M9*Unsigned_8
+77M9*Unsigned_64
+X 9 syncprocedures_dataview.ads
+29K9*SYNCPROCEDURES_DATAVIEW 80l5 80e28 10|15b14 92l5 92t28
+33M9*asn1SccMyInteger{4|15M12} 36r46 38r39 41r51 49r42 50r45 62r44 63r48
+. 10|23r48 31r39 33r10 41r51 52r45 63r41 70r48 76r43
+36V10*asn1SccMyInteger_Equal{boolean} 36>33 36>39 10|23b10 29l5 29t27
+36m33 val1{33M9} 10|23b34 27r16
+36m39 val2{33M9} 10|23b40 27r23
+38V10*asn1SccMyInteger_Init{33M9} 10|31b10 39l5 39t26
+40i1*ERR_MYINTEGER{integer} 10|48r50
+41V10*asn1SccMyInteger_IsConstraintValid{4|41R9} 41>45 10|41b10 50l5 50t39
+. 56s15 82s19
+41m45 val{33M9} 10|41b45 47r21
+43i1*ERR_UPER_ENCODE_MYINTEGER{integer}
+44i1*asn1SccMyInteger_REQUIRED_BYTES_FOR_ENCODING{integer} 47r71 10|66r62
+45i1*asn1SccMyInteger_REQUIRED_BITS_FOR_ENCODING{integer} 52r48 54r37 56r126
+. 65r48 67r37 69r126
+47R9*asn1SccMyInteger_uPER_Stream{5|23R9} 49r73 62r78 10|63r72 66r15 76r77
+49U11*asn1SccMyInteger_Encode 49>36 49<60 49<103 10|63b11 68l5 68t28
+49m36 val{33M9} 10|63b35 67r33
+49r60 Stream{47R9} 10|63b59 66m5 67m38
+49r103 result{4|41R9} 10|63b102 67m46
+50U11*asn1SccMyInteger_Encode_aux 50>39 50=63 50<106 10|52b11 61l5 61t32
+. 67s5
+50m39 val{33M9} 10|52b39 56r50 58r72
+50r63 bs{5|23R9} 52r12 53r16 54r16 54r84 56r30 56r52 56r79 56r101 10|52b63
+. 58m68
+50r106 result{4|41R9} 56r11 58r14 10|52b106 56m5 57r8 57r28
+61i1*ERR_UPER_DECODE_MYINTEGER{integer} 10|73r25
+62U11*asn1SccMyInteger_Decode 62<35 62=62 62<108 10|76b11 85l5 85t28
+62m35 val{33M9} 10|76b35 80m33 82r54
+62r62 Stream{47R9} 10|76b61 79m5 80m38
+62r108 result{4|41R9} 10|76b107 80m46 81r8 82m9
+63U11*asn1SccMyInteger_Decode_aux 63<39 63=66 63<109 10|70b11 75l5 75t32
+. 80s5
+63m39 val{33M9} 10|70b39 74m68
+63r66 bs{5|23R9} 65r12 66r16 67r16 67r84 69r30 69r52 69r79 69r101 10|70b66
+. 74m64
+63r109 result{4|41R9} 69r11 71r14 10|70b109 73m5 74m87 74r87
+X 10 syncprocedures_dataview.adb
+33m5 val{9|33M9} 35m5 37r12
+44r5 ret{4|41R9} 47m5 48m5 48r26 49r12
+X 11 system.ads
+37K9*System 9|10w6 11|156e11
+

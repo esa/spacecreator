@@ -1,0 +1,1 @@
+cd clock_GUI && cp -fu ../../clock/GUI/src/* . && taste-gui

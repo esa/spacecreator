@@ -1,0 +1,93 @@
+V "GNAT Lib v8"
+A -gnatwa
+A -Wall
+A -Wextra
+A -Wcast-align
+A -gnatA
+A -fPIC
+A -mtune=generic
+A -march=x86-64
+P SL ZX
+
+RN
+RV NO_IMPLEMENTATION_PRAGMAS
+RV SPARK_05
+
+U pinger_pi%b		pinger_pi.adb		26ba70bd NE OO PK
+
+U pinger_pi%s		pinger_pi.ads		fb02f36c EE NE OO PK
+W pinger%s		pinger.adb		pinger.ali
+W simulation_dataview%s	simulation_dataview.adb	simulation_dataview.ali
+W syncprocedures_dataview%s  syncprocedures_dataview.adb  syncprocedures_dataview.ali
+W taste_basictypes%s	taste_basictypes.adb	taste_basictypes.ali
+
+D ada.ads		20170911084841 76789da1 ada%s
+D a-charac.ads		20170908151217 2d3ec45b ada.characters%s
+D a-chahan.ads		20180111085525 1601a50f ada.characters.handling%s
+D a-chlat1.ads		20170908151217 66457d31 ada.characters.latin_1%s
+D a-unccon.ads		20170908151217 0e9b276f ada.unchecked_conversion%s
+D adaasn1rtl.ads	20220719135033 ba1d55d4 adaasn1rtl%s
+D adaasn1rtl-encoding.ads  20220719135033 2b3c6770 adaasn1rtl.encoding%s
+D board_config.ads	20220719135033 ff248fc1 board_config%s
+D interfac.ads		20180111085525 5ab55268 interfaces%s
+D i-c.ads		20170908151217 5421119b interfaces.c%s
+D i-cstrin.ads		20180111085525 341d0ddf interfaces.c.strings%s
+D pinger.ads		20220719135031 2c183d16 pinger%s
+D pinger_datamodel.ads	20220719135033 d8df5cb5 pinger_datamodel%s
+D pinger_pi.ads		20220719135017 0b5e2446 pinger_pi%s
+D pinger_pi.adb		20220719135017 2de454fb pinger_pi%b
+D pinger_ri.ads		20220719135017 450cb4ca pinger_ri%s
+D ponger_datamodel.ads	20220719135033 1fdabd37 ponger_datamodel%s
+D simulation_dataview.ads  20220719135033 299ea1e1 simulation_dataview%s
+D syncprocedures_dataview.ads  20220719135033 0644128b syncprocedures_dataview%s
+D system.ads		20180111085525 4635ec04 system%s
+D s-bitops.ads		20180111085525 0765e3a3 system.bit_ops%s
+D s-exctab.ads		20180111085525 54135002 system.exception_table%s
+D s-imenne.ads		20180111085525 614c06c0 system.img_enum_new%s
+D s-parame.ads		20180111085525 f896c45c system.parameters%s
+D s-stalib.ads		20180111085525 09bd3940 system.standard_library%s
+D s-unstyp.ads		20180111085525 34867c83 system.unsigned_types%s
+D taste_basictypes.ads	20220719135033 f39e5956 taste_basictypes%s
+X 6 adaasn1rtl.ads
+15M12*Asn1UInt{8|4M12}
+X 8 board_config.ads
+4M12*Asn1UInt{9|77M9}
+X 9 interfac.ads
+77M9*Unsigned_64
+X 12 pinger.ads
+20K9*Pinger 36e11 14|5w6 15|20r30 25r7 26r7 26r34 27r30 36r7 39r7 42r30 51r7
+. 54r7 56r30
+21r4*ctxt{13|84R6} 15|20r37 25m14 27r37 36m14 42r37 51m14 56r37
+27U14*Pong 28i<c,pinger_PI_Pong>21 15|39s14
+27m19 pongArg{19|33M9} 15|40r11
+30U14*Tick 31i<c,pinger_PI_Tick>21 15|54s14
+34U14*Execute_Transition 15|26s14
+35N4*CS_Only 15|26r41
+X 14 pinger_pi.ads
+7K9*Pinger_PI 24l5 24e14 15|3b14 61l5 61t14
+9U14*Startup 9=23 15|17b14 21l8 21t15
+9r23 Global_State{18|993R6} 15|17b23 20m7
+13U14*Continuous_Signals 13=34 15|23b14 28l8 28t26
+13r34 Global_State{18|993R6} 15|23b34 25r22 27m7
+16U14*Pong 17=8 18=7 15|31b14 45l8 45t12
+17r8 Global_State{18|993R6} 15|32b8 36r22 38r44 42m7 44m52
+18m7 Pongarg{19|33M9} 15|33b7 40m22
+22U14*Tick 22=20 15|48b14 59l8 59t12
+22r20 Global_State{18|993R6} 15|48b20 51r22 53r44 56m7 58m52
+X 15 pinger_pi.adb
+5U14 Update_States_For_Synchronous_Calls 5b14 5>51 9l8 9t43 38s7 53s7
+5r51 Global_State{18|993R6}
+11U14 Update_Global_State_After_Synchronous_Calls 11b14 11=59 15l8 15t51
+. 44s7 58s7
+11r59 Global_State{18|993R6}
+X 18 simulation_dataview.ads
+50K9*Simulation_DataView 14|4w6 4r31 18|1116e24
+993R6*asn1SccSystem_State 14|9r45 13r56 17r30 22r42 15|5r66 11r81 17r45 23r56
+. 32r30 48r42 18|998e11
+996r5*pinger{13|84R6} 15|20m20 25r35 27m20 36r35 42m20 51r35 56m20
+X 19 syncprocedures_dataview.ads
+29K9*SYNCPROCEDURES_DATAVIEW 14|2w6 2r35 19|80e28
+33M9*asn1SccMyInteger{6|15M12} 14|18r24 15|33r24
+X 27 taste_basictypes.ads
+29K9*TASTE_BasicTypes 14|3w6 3r35 27|282e21
+

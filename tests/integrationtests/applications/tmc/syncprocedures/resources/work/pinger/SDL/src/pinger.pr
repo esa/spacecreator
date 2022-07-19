@@ -1,0 +1,30 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Pinger;
+    /* CIF TEXT (976, 87), (267, 140) */
+    -- Text area for declarations and comments
+    
+    dcl pongArg MyInteger;
+    /* CIF ENDTEXT */
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (320, 60), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (620, 13), (70, 35) */
+    state Wait;
+        /* CIF input (598, 68), (113, 35) */
+        input Pong(pongArg);
+            /* CIF PROCEDURECALL (591, 123), (127, 35) */
+            call writeln(pongArg);
+            /* CIF NEXTSTATE (620, 178), (70, 35) */
+            NEXTSTATE Wait;
+    endstate;
+    /* CIF state (450, 10), (70, 35) */
+    state Wait;
+        /* CIF input (450, 65), (70, 35) */
+        input Tick;
+            /* CIF output (432, 120), (104, 35) */
+            output Ping(0);
+            /* CIF NEXTSTATE (450, 175), (70, 35) */
+            NEXTSTATE Wait;
+    endstate;
+endprocess Pinger;
