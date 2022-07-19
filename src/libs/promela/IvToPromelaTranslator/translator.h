@@ -233,15 +233,16 @@ private:
             const QString &parameterType, const QString &sourceFunctionName, const QString &sourceInterfaceName,
             const bool parameterSubtyped) const -> std::unique_ptr<model::InlineDef>;
     auto createPromelaObjectsForFunction(Context &context, const ivm::IVModel *ivModel,
-            const ivm::IVFunction *ivFunction, const QString &functionName,
+            const ivm::IVFunction *ivFunction, const QString &functionName, const uint32_t basePriority,
             const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const -> void;
     auto createPromelaObjectsForAsyncPis(Context &context, const ivm::IVModel *ivModel,
             const ivm::IVInterface *providedInterface, const QString &functionName, const QString &interfaceName,
-            const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const -> void;
+            const std::size_t priority, const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const
+            -> void;
     auto createPromelaObjectsForSyncRis(
             Context &context, const ivm::IVInterface *requiredInterface, const QString &functionName) const -> void;
     auto createPromelaObjectsForEnvironment(Context &context, const ivm::IVModel *ivModel,
-            const ivm::IVFunction *ivFunction, const QString &functionName,
+            const ivm::IVFunction *ivFunction, const QString &functionName, const uint32_t basePriority,
             const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions,
             const conversion::Options &options) const -> void;
     auto createCheckQueueInline(

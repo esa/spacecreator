@@ -144,6 +144,11 @@ void TmcConverter::setInterfaceInputVectorLengthLimits(std::unordered_map<QStrin
     m_interfaceInputVectorLengthLimits = std::move(limits);
 }
 
+void TmcConverter::setProcessesBasePriority(std::optional<QString> value)
+{
+    m_processesBasePriority = std::move(value);
+}
+
 void TmcConverter::setSubtypesFilepaths(const std::vector<QString> &filepaths)
 {
     m_subtypesFilepaths = filepaths;
@@ -396,6 +401,10 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
 
     for (const auto &[interfaceName, value] : m_interfaceInputVectorLengthLimits) {
         options.add(PromelaOptions::interfaceInputVectorLengthLimit.arg(interfaceName.toLower()), value);
+    }
+
+    if (m_processesBasePriority) {
+        options.add(PromelaOptions::processesBasePriority, *m_processesBasePriority);
     }
 
     for (const auto &subtypesFilepath : m_subtypesFilepaths) {

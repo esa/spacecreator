@@ -49,6 +49,11 @@ void TmcVerifier::setInterfaceInputVectorLengthLimits(std::unordered_map<QString
     m_converter->setInterfaceInputVectorLengthLimits(std::move(limits));
 }
 
+void TmcVerifier::setProcessesBasePriority(std::optional<QString> value)
+{
+    m_converter->setProcessesBasePriority(std::move(value));
+}
+
 void TmcVerifier::setSubtypesFilepaths(const std::vector<QString> &filepaths)
 {
     m_converter->setSubtypesFilepaths(filepaths);

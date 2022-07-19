@@ -53,8 +53,11 @@ public:
     /** @brief Global input vector length limit */
     inline static const QString globalInputVectorLengthLimit = "Promela_Convert_GlobalInputVectorLengthLimit";
 
-    /** @brief Interface input vector length limit template*/
+    /** @brief Interface input vector length limit template */
     inline static const QString interfaceInputVectorLengthLimit = "Promela_Convert_InterfaceInputVectorLengthLimit_%1";
+
+    /** @brief Base priority for non-environment processes */
+    inline static const QString processesBasePriority = "Promela_Convert_ProcessesBasePriority";
 
     /** @brief  Filepath of the ASN.1 file containing subtypes */
     inline static const QString subtypesFilepath = "Promela_Convert_SubtypesFilepath";
