@@ -135,7 +135,8 @@ private:
          * @param promelaModel The model that is being created
          */
         Context(model::PromelaModel *promelaModel, const ivm::IVModel *ivModel, const conversion::Options &options,
-                const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitons);
+                const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitons,
+                const std::vector<QString> &modelFunctions, const std::vector<QString> &observerNames);
 
         /**
          * @brief Add observer attachment
@@ -200,6 +201,20 @@ private:
         auto subtypesDefinitions() const -> const std::vector<const Asn1Acn::Definitions *> &;
 
         /**
+         * Getter for model function list
+         *
+         * @return list of model functions
+         */
+        auto modelFunctions() const -> const std::vector<QString> &;
+
+        /**
+         * Getter for list of observers
+         *
+         * @return list of names of observers
+         */
+        auto observerNames() const -> const std::vector<QString> &;
+
+        /**
          * @brief Setter for base priority for proctypes
          *
          * @param priority new base proctype priority
@@ -218,6 +233,8 @@ private:
         const ivm::IVModel *m_ivModel;
         const conversion::Options &m_options;
         const std::vector<const Asn1Acn::Definitions *> &m_asn1SubtypesDefinitons;
+        const std::vector<QString> &m_modelFunctions;
+        const std::vector<QString> &m_observerNames;
         uint32_t m_baseProctypePriority;
         std::map<QString, std::map<QString, ObserverAttachments>> m_fromObserverAttachments;
         std::map<QString, std::map<QString, ObserverAttachments>> m_toObserverAttachments;
@@ -265,16 +282,14 @@ private:
     auto attachInputObservers(IvToPromelaTranslator::Context &context, const QString &functionName,
             const QString &interfaceName, const QString &parameterName, const QString &parameterType,
             promela::model::Sequence *sequence) const -> void;
-    auto generateInitProctype(const std::vector<QString> &modelFunctions, const std::vector<QString> &observers,
-            const ivm::IVModel *ivModel) const -> model::InitProctype;
+    auto generateInitProctype(Context &context) const -> void;
     auto generateProctype(Context &context, const QString &functionName, const QString &interfaceName,
-            const QString &parameterType, size_t queueSize, size_t priority, bool environment) const
-            -> std::unique_ptr<model::Proctype>;
+            const QString &parameterType, size_t queueSize, size_t priority, bool environment) const -> void;
     auto generateEnvironmentProctype(Context &context, const QString &functionName, const QString &interfaceName,
-            const QString &parameterType, const QString &sendInline) const -> std::unique_ptr<model::Proctype>;
-    auto generateSendInline(const QString &functionName, const QString &interfaceName, const QString &parameterName,
-            const QString &parameterType, const QString &sourceFunctionName, const QString &sourceInterfaceName,
-            const bool parameterSubtyped) const -> std::unique_ptr<model::InlineDef>;
+            const QString &parameterType, const QString &sendInline) const -> void;
+    auto generateSendInline(Context &context, const QString &functionName, const QString &interfaceName,
+            const QString &parameterName, const QString &parameterType, const QString &sourceFunctionName,
+            const QString &sourceInterfaceName, const bool parameterSubtyped) const -> void;
     auto createPromelaObjectsForFunction(
             Context &context, const ::ivm::IVFunction *ivFunction, const QString &functionName) const -> void;
     auto createPromelaObjectsForAsyncPis(Context &context, const ivm::IVInterface *providedInterface,
@@ -287,9 +302,8 @@ private:
             const QList<QString> &channelNames) const -> void;
     auto createCheckQueuesExpression(const QList<QString> &channelNames, bool empty) const
             -> std::unique_ptr<::promela::model::Expression>;
-    auto createSystemState(model::PromelaModel *promelaModel, const ::ivm::IVModel *ivModel,
-            const std::vector<QString> &modelFunctions, const std::vector<QString> &observers) const -> void;
-    auto createPromelaObjectsForTimers(Context &context, const std::vector<QString> &modelFunctions) const -> void;
+    auto createSystemState(Context &context) const -> void;
+    auto createPromelaObjectsForTimers(Context &context) const -> void;
     auto createTimerInlinesForFunction(
             Context &context, const QString &functionName, const QString &timerName, int timerId) const -> void;
     auto createGlobalTimerObjects(Context &context, int timerCount, const std::map<int, QString> &timerSignals) const
