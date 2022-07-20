@@ -149,7 +149,7 @@ auto FunctionTesterPlugin::setDeltaDialog() -> float
 auto FunctionTesterPlugin::loadCsv() -> std::unique_ptr<csv::CsvModel>
 {
     const QString inputFilePath = QFileDialog::getOpenFileName(
-            nullptr, tr("Select CSV file to import test vectors from..."), "", tr("*.csv"));
+            nullptr, tr("Select CSV file to import test vectors from..."), getBaseDirectory(), tr("*.csv"));
     if (inputFilePath.isEmpty()) {
         MessageManager::write(GenMsg::msgInfo.arg(GenMsg::fileToImportNotSelected));
         return std::unique_ptr<csv::CsvModel> {};
