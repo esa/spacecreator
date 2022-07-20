@@ -92,7 +92,7 @@ void ValueAssignmentVisitor::visit(const Boolean &type)
     QList<InlineCall::Argument> inlineArguments;
     inlineArguments.append(m_target);
     inlineArguments.append(Constant(value));
-    m_sequence.appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineCallName, inlineArguments)));
+    m_sequence.appendElement(InlineCall(inlineCallName, inlineArguments));
 }
 
 void ValueAssignmentVisitor::visit(const Null &type)
@@ -142,7 +142,7 @@ void ValueAssignmentVisitor::visit(const Enumerated &type)
     QList<InlineCall::Argument> inlineArguments;
     inlineArguments.append(m_target);
     inlineArguments.append(VariableRef(value));
-    m_sequence.appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineCallName, inlineArguments)));
+    m_sequence.appendElement(InlineCall(inlineCallName, inlineArguments));
 }
 
 void ValueAssignmentVisitor::visit(const Choice &type)
@@ -163,7 +163,7 @@ void ValueAssignmentVisitor::visit(const Choice &type)
 
     const auto selectionValue = Expression(QString("%1_%2_PRESENT").arg(escapedTypeName).arg(escapedSelectionName));
 
-    m_sequence.appendElement(std::make_unique<ProctypeElement>(Assignment(selectionMember, selectionValue)));
+    m_sequence.appendElement(Assignment(selectionMember, selectionValue));
 
     auto component = type.component(choiceValue->name());
     ValueAssignmentVisitor visitor(choiceValue->value().get(), m_sequence, dataMember,
@@ -210,7 +210,7 @@ void ValueAssignmentVisitor::visit(const SequenceOf &type)
         target.appendElement("length");
 
         auto assignment = Assignment(target, Expression(Constant(valuesCount)));
-        m_sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assignment)));
+        m_sequence.appendElement(std::move(assignment));
     }
 }
 
@@ -240,7 +240,7 @@ void ValueAssignmentVisitor::visit(const Integer &type)
     QList<InlineCall::Argument> inlineArguments;
     inlineArguments.append(m_target);
     inlineArguments.append(Constant(value));
-    m_sequence.appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineCallName, inlineArguments)));
+    m_sequence.appendElement(InlineCall(inlineCallName, inlineArguments));
 }
 
 void ValueAssignmentVisitor::visit(const UserdefinedType &type)

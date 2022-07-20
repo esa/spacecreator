@@ -69,7 +69,17 @@ public:
      */
     void appendElement(std::unique_ptr<ProctypeElement> element);
 
-private:
+    /**
+     * @brief Construct element and add it to sequence
+     *
+     * @param args... arguments to create ProctypeElement
+     */
+    template<typename... Args>
+    void appendElement(Args... args)
+    {
+        m_content.push_back(std::make_unique<ProctypeElement>(std::forward<Args>(args)...));
+    }
+
     Type m_type;
     std::list<std::unique_ptr<ProctypeElement>> m_content;
 };
