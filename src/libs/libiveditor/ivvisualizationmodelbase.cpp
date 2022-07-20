@@ -276,7 +276,10 @@ void IVLayerVisualizationModel::onDataChanged(
         return;
     }
 
-    Q_ASSERT(topLeft == bottomRight);
+    if (topLeft != bottomRight) {
+        qWarning() << "Not allowed to modify more than one layer at a time";
+        return;
+    }
 
     QStandardItem *item = itemFromIndex(topLeft);
     if (!item) {
