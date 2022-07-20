@@ -233,9 +233,6 @@ private:
     auto attachInputObservers(IvToPromelaTranslator::Context &context, const QString &functionName,
             const QString &interfaceName, const QString &parameterName, const QString &parameterType,
             promela::model::Sequence *sequence) const -> void;
-    auto attachOutputObservers(IvToPromelaTranslator::Context &context, const QString &functionName,
-            const QString &interfaceName, const QString parameterName, const QString &parameterType,
-            promela::model::Sequence *sequence) const -> void;
     auto generateInitProctype(const std::vector<QString> &modelFunctions, const std::vector<QString> &observers,
             const ivm::IVModel *ivModel) const -> model::InitProctype;
     auto generateProctype(Context &context, const QString &functionName, const QString &interfaceName,
@@ -306,6 +303,7 @@ private:
     auto findRequiredInterface(const ivm::IVModel *model, const QString &functionName,
             const QString &interfaceName) const -> const ivm::IVInterface *;
 
-    auto observerChannelName(const ivm::IVModel *model, const ObserverAttachment &attachment) const -> QString;
+    auto observerChannelName(const ObserverAttachment &attachment, const QString &toFunction) const -> QString;
+    auto getAttachmentToFunction(const ivm::IVModel *model, const ObserverAttachment &attachment) const -> QString;
 };
 }
