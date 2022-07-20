@@ -366,7 +366,7 @@ void IvToPromelaTranslator::initializeFunction(Sequence &sequence, const QString
 
     const VariableRef lockChannelName = VariableRef(getFunctionLockChannelName(functionName));
     QList<Expression> lockChannelArguments;
-    lockChannelArguments.append(Expression(VariableRef("init_token")));
+    lockChannelArguments.append(Expression(Constant(1)));
 
     sequence.appendElement(ChannelSend(VariableRef(lockChannelName), lockChannelArguments));
 }
@@ -385,13 +385,6 @@ void IvToPromelaTranslator::generateInitProctype(Context &context) const
     }
 
     Sequence sequence(Sequence::Type::ATOMIC);
-
-    {
-        Declaration initTokenDeclaration = Declaration(DataType(BasicType::INT), "init_token");
-        initTokenDeclaration.setInit(Expression(Constant(1)));
-
-        sequence.appendElement(std::move(initTokenDeclaration));
-    }
 
     for (const QString &functionName : context.modelFunctions()) {
         if (functionsWithContextVariables.contains(functionName)) {
@@ -468,16 +461,6 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
     Sequence sequence(Sequence::Type::NORMAL);
     sequence.appendElement(createWaitForInitStatement());
 
-    const auto hasOutputObservers = context.hasObserverAttachments(
-            functionName, interfaceName, IvToPromelaTranslator::ObserverAttachment::Kind::Kind_Output);
-
-    const auto hasInputObservers = context.hasObserverAttachments(
-            functionName, interfaceName, IvToPromelaTranslator::ObserverAttachment::Kind::Kind_Input);
-
-    if (hasInputObservers || hasOutputObservers || !environment) {
-        sequence.appendElement(Declaration(DataType(BasicType::INT), "token"));
-    }
-
     const QString &signalParameterName =
             QString("%1_%2_signal_parameter").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName.toLower());
     const QString channelUsedName =
@@ -507,96 +490,33 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
         loopSequence->appendElement(createLockAcquireStatement(functionName));
     }
 
+    // process all observers
     for (const ObserverAttachment &attachment : outputObservers) {
         const QString currentChannelName = channelNames.front();
         channelNames.pop_front();
 
-        QList<InlineCall::Argument> checkQueueArguments;
-        checkQueueArguments.append(VariableRef(currentChannelName));
-
-        std::unique_ptr<Sequence> processMessageSeq = std::make_unique<Sequence>(Sequence::Type::NORMAL);
-        processMessageSeq->appendElement(InlineCall("nempty", checkQueueArguments));
-
-        // channel receive
-        QList<VariableRef> receiveParams;
-        receiveParams.append(VariableRef(parameterType.isEmpty() ? QString("_") : signalParameterName));
-        processMessageSeq->appendElement(ChannelRecv(VariableRef(currentChannelName), receiveParams));
-
-        // acquire observer lock
-        processMessageSeq->appendElement(createLockAcquireStatement(attachment.observer()));
-
-        QList<InlineCall::Argument> arguments;
-        if (!parameterType.isEmpty()) {
-            arguments.append(VariableRef(signalParameterName));
-        }
-
-        // call observer transition
-        processMessageSeq->appendElement(InlineCall(observerInputSignalName(attachment), arguments));
-
-        // release observer lock
-        processMessageSeq->appendElement(createLockReleaseStatement(attachment.observer()));
-
-        std::unique_ptr<Sequence> emptySeq = std::make_unique<Sequence>(Sequence::Type::NORMAL);
-        emptySeq->appendElement(InlineCall("empty", checkQueueArguments));
-        emptySeq->appendElement(Skip());
-
-        Conditional cond;
-        cond.appendAlternative(std::move(processMessageSeq));
-        cond.appendAlternative(std::move(emptySeq));
-
-        loopSequence->appendElement(std::move(cond));
+        loopSequence->appendElement(generateProcessMessageBlock(attachment.observer(), currentChannelName,
+                observerInputSignalName(attachment), parameterType, signalParameterName, true));
     }
 
+    // process sdl process
     {
         const QString currentChannelName = channelNames.front();
         channelNames.pop_front();
 
-        QList<InlineCall::Argument> checkQueueArguments;
-        checkQueueArguments.append(VariableRef(currentChannelName));
+        const QString piName = environment
+                ? QString()
+                : QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
 
-        std::unique_ptr<Sequence> processMessageSeq = std::make_unique<Sequence>(Sequence::Type::NORMAL);
-        processMessageSeq->appendElement(InlineCall("nempty", checkQueueArguments));
-
-        // receive variable from channel
-        QList<VariableRef> receiveParams;
-        receiveParams.append(VariableRef(parameterType.isEmpty() ? QString("_") : signalParameterName));
-        processMessageSeq->appendElement(ChannelRecv(VariableRef(currentChannelName), receiveParams));
-
-        // set channel used variable
-        if (!parameterType.isEmpty()) {
-            processMessageSeq->appendElement(Assignment(VariableRef(channelUsedName), Expression(Constant(1))));
-        }
-
-        if (!environment) {
-            // call process transition
-            const QString piName =
-                    QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
-
-            if (parameterType.isEmpty()) {
-                processMessageSeq->appendElement(InlineCall(piName, {}));
-            } else {
-                QList<InlineCall::Argument> arguments;
-                arguments.append(VariableRef(signalParameterName));
-                processMessageSeq->appendElement(InlineCall(piName, arguments));
-            }
-        }
-
-        std::unique_ptr<Sequence> emptySeq = std::make_unique<Sequence>(Sequence::Type::NORMAL);
-        emptySeq->appendElement(InlineCall("empty", checkQueueArguments));
-        emptySeq->appendElement(Skip());
-
-        Conditional cond;
-        cond.appendAlternative(std::move(processMessageSeq));
-        cond.appendAlternative(std::move(emptySeq));
-
-        loopSequence->appendElement(std::move(cond));
+        loopSequence->appendElement(generateProcessMessageBlock(
+                functionName, currentChannelName, piName, parameterType, signalParameterName, false));
     }
 
     // Observers can be also attached to environment
     attachInputObservers(context, functionName, interfaceName, signalParameterName, parameterType, loopSequence.get());
 
+    // release function mutex
     if (!environment) {
-        // release function mutex
         loopSequence->appendElement(createLockReleaseStatement(functionName));
     }
 
@@ -614,6 +534,45 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
     proctype->setPriority(priority);
 
     context.model()->addProctype(std::move(proctype));
+}
+
+std::unique_ptr<ProctypeElement> IvToPromelaTranslator::generateProcessMessageBlock(const QString &functionName,
+        const QString &channelName, const QString &inlineName, const QString &parameterType,
+        const QString &parameterName, bool lock) const
+{
+    QList<InlineCall::Argument> checkQueueArguments;
+    checkQueueArguments.append(VariableRef(channelName));
+
+    std::unique_ptr<Sequence> processMessageSeq = std::make_unique<Sequence>(Sequence::Type::NORMAL);
+    processMessageSeq->appendElement(InlineCall("nempty", checkQueueArguments));
+
+    // channel receive
+    processMessageSeq->appendElement(createReceiveStatement(channelName, parameterType, parameterName));
+
+    // acquire observer lock
+    if (lock) {
+        processMessageSeq->appendElement(createLockAcquireStatement(functionName));
+    }
+
+    // call observer transition
+    if (!inlineName.isEmpty()) {
+        processMessageSeq->appendElement(createProcessInlineCall(inlineName, parameterType, parameterName));
+    }
+
+    // release observer lock
+    if (lock) {
+        processMessageSeq->appendElement(createLockReleaseStatement(functionName));
+    }
+
+    std::unique_ptr<Sequence> emptySeq = std::make_unique<Sequence>(Sequence::Type::NORMAL);
+    emptySeq->appendElement(InlineCall("empty", checkQueueArguments));
+    emptySeq->appendElement(Skip());
+
+    Conditional cond;
+    cond.appendAlternative(std::move(processMessageSeq));
+    cond.appendAlternative(std::move(emptySeq));
+
+    return std::make_unique<ProctypeElement>(std::move(cond));
 }
 
 void IvToPromelaTranslator::generateEnvironmentProctype(Context &context, const QString &functionName,
@@ -1317,16 +1276,38 @@ std::unique_ptr<ProctypeElement> IvToPromelaTranslator::createLockAcquireStateme
 {
     const VariableRef lockChannelName = VariableRef(getFunctionLockChannelName(functionName));
     QList<VariableRef> lockChannelArguments;
-    lockChannelArguments.append(VariableRef(m_lockAuxilaryVariableName));
+    lockChannelArguments.append(VariableRef("_"));
 
     return std::make_unique<ProctypeElement>(ChannelRecv(lockChannelName, lockChannelArguments));
 }
+
 std::unique_ptr<ProctypeElement> IvToPromelaTranslator::createLockReleaseStatement(const QString &functionName) const
 {
     const VariableRef lockChannelName = VariableRef(getFunctionLockChannelName(functionName));
 
     QList<Expression> unlockChannelArguments;
-    unlockChannelArguments.append(Expression(VariableRef(m_lockAuxilaryVariableName)));
+    unlockChannelArguments.append(Expression(Constant(1)));
     return std::make_unique<ProctypeElement>(ChannelSend(VariableRef(lockChannelName), unlockChannelArguments));
 }
+
+std::unique_ptr<ProctypeElement> IvToPromelaTranslator::createProcessInlineCall(
+        const QString &inlineName, const QString &parameterType, const QString &parameterName) const
+{
+    if (parameterType.isEmpty()) {
+        return std::make_unique<ProctypeElement>((InlineCall(inlineName, {})));
+    } else {
+        QList<InlineCall::Argument> arguments;
+        arguments.append(VariableRef(parameterName));
+        return std::make_unique<ProctypeElement>(InlineCall(inlineName, arguments));
+    }
+}
+std::unique_ptr<model::ProctypeElement> IvToPromelaTranslator::createReceiveStatement(
+        const QString &channelName, const QString &parameterType, const QString &parameterName) const
+{
+    // channel receive
+    QList<VariableRef> receiveParams;
+    receiveParams.append(VariableRef(parameterType.isEmpty() ? QString("_") : parameterName));
+    return std::make_unique<ProctypeElement>(ChannelRecv(VariableRef(channelName), receiveParams));
+}
+
 }

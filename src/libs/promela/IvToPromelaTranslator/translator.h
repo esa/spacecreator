@@ -276,7 +276,6 @@ private:
     inline static const QString m_timerManagerProctypeName = "timer_manager_proc";
     inline static const QString m_dummyParamName = "dummy";
     inline static const QString m_systemInitedVariableName = "inited";
-    inline static const QString m_lockAuxilaryVariableName = "token";
 
 private:
     auto initializeFunction(model::Sequence &sequence, const QString &functionName) const -> void;
@@ -288,6 +287,9 @@ private:
     auto generateInitProctype(Context &context) const -> void;
     auto generateProctype(Context &context, const QString &functionName, const QString &interfaceName,
             const QString &parameterType, size_t queueSize, size_t priority, bool environment) const -> void;
+    auto generateProcessMessageBlock(const QString &functionName, const QString &channelName, const QString &inlineName,
+            const QString &parameterType, const QString &parameterName, bool lock) const
+            -> std::unique_ptr<model::ProctypeElement>;
     auto generateEnvironmentProctype(Context &context, const QString &functionName, const QString &interfaceName,
             const QString &parameterType, const QString &sendInline) const -> void;
     auto generateSendInline(Context &context, const QString &functionName, const QString &interfaceName,
@@ -351,5 +353,9 @@ private:
     auto getFunctionLockChannelName(const QString &functionName) const -> QString;
     auto createLockAcquireStatement(const QString &functionName) const -> std::unique_ptr<model::ProctypeElement>;
     auto createLockReleaseStatement(const QString &functionName) const -> std::unique_ptr<model::ProctypeElement>;
+    auto createProcessInlineCall(const QString &inlineName, const QString &parameterType,
+            const QString &parameterName) const -> std::unique_ptr<model::ProctypeElement>;
+    auto createReceiveStatement(const QString &channelName, const QString &parameterType,
+            const QString &parameterName) const -> std::unique_ptr<model::ProctypeElement>;
 };
 }
