@@ -157,9 +157,13 @@ IvToPromelaTranslator::ObserverAttachment::Priority IvToPromelaTranslator::Obser
     return m_priority;
 }
 
-IvToPromelaTranslator::Context::Context(model::PromelaModel *promelaModel, const IVModel *ivModel)
+IvToPromelaTranslator::Context::Context(model::PromelaModel *promelaModel, const IVModel *ivModel,
+        const conversion::Options &options, const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitons)
     : m_promelaModel(promelaModel)
     , m_ivModel(ivModel)
+    , m_options(options)
+    , m_asn1SubtypesDefinitons(asn1SubtypesDefinitons)
+    , m_baseProctypePriority(0)
 {
 }
 
@@ -213,14 +217,34 @@ auto IvToPromelaTranslator::Context::getObserverAttachments(const ObserverAttach
     return result;
 }
 
-auto IvToPromelaTranslator::Context::model() -> model::PromelaModel *
+auto IvToPromelaTranslator::Context::model() const -> model::PromelaModel *
 {
     return m_promelaModel;
 }
 
-const IVModel *IvToPromelaTranslator::Context::ivModel()
+const IVModel *IvToPromelaTranslator::Context::ivModel() const
 {
     return m_ivModel;
+}
+
+const conversion::Options &IvToPromelaTranslator::Context::options() const
+{
+    return m_options;
+}
+
+const std::vector<const Asn1Acn::Definitions *> &IvToPromelaTranslator::Context::subtypesDefinitions() const
+{
+    return m_asn1SubtypesDefinitons;
+}
+
+void IvToPromelaTranslator::Context::setBaseProctypePriority(uint32_t priority)
+{
+    m_baseProctypePriority = priority;
+}
+
+uint32_t IvToPromelaTranslator::Context::getBaseProctypePriority() const
+{
+    return m_baseProctypePriority;
 }
 
 void IvToPromelaTranslator::addChannelAndLock(
@@ -245,28 +269,27 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     const auto &observerNames = options.values(PromelaOptions::observerFunctionName);
     auto promelaModel = std::make_unique<PromelaModel>();
     const auto *ivModel = getModel<IVModel>(sourceModels);
+    const auto *asn1Model = getModel<Asn1Model>(sourceModels);
+    const auto asn1SubtypesDefinitions = getSubtypesDefinitions(asn1Model, options);
 
-    Context context(promelaModel.get(), ivModel);
+    Context context(promelaModel.get(), ivModel, options, asn1SubtypesDefinitions);
 
     for (const auto &info : observerAttachmentInfos) {
         qDebug() << "Attaching  " << info;
         context.addObserverAttachment(ObserverAttachment(info));
     }
 
-    const auto ivFunctionList = ivModel->allObjectsByType<IVFunction>();
+    if (options.isSet(PromelaOptions::processesBasePriority)) {
+        context.setBaseProctypePriority(options.value(PromelaOptions::processesBasePriority)->toUInt());
+    }
 
-    const auto *asn1Model = getModel<Asn1Model>(sourceModels);
-    const auto asn1SubtypesDefinitions = getSubtypesDefinitions(asn1Model, options);
+    const auto ivFunctionList = ivModel->allObjectsByType<IVFunction>();
 
     promelaModel->addInclude("dataview.pml");
 
     promelaModel->addDeclaration(Declaration(DataType(BasicType::INT), "inited"));
 
     createPromelaObjectsForTimers(context, modelFunctions);
-
-    const auto basePriority = options.isSet(PromelaOptions::processesBasePriority)
-            ? options.value(PromelaOptions::processesBasePriority)->toUInt()
-            : 0;
 
     createPromelaObjectsForObservers(context);
 
@@ -275,11 +298,10 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
 
         if (std::find(modelFunctions.begin(), modelFunctions.end(), functionName) != modelFunctions.end()) {
             promelaModel->addInclude(QString("%1.pml").arg(functionName.toLower()));
-            createPromelaObjectsForFunction(context, ivFunction, functionName, basePriority, asn1SubtypesDefinitions);
+            createPromelaObjectsForFunction(context, ivFunction, functionName);
         } else if (std::find(environmentFunctions.begin(), environmentFunctions.end(), functionName)
                 != environmentFunctions.end()) {
-            createPromelaObjectsForEnvironment(
-                    context, ivFunction, functionName, basePriority, asn1SubtypesDefinitions, options);
+            createPromelaObjectsForEnvironment(context, ivFunction, functionName);
         }
     }
 
@@ -620,9 +642,9 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateProctype(Context &conte
     return proctype;
 }
 
-std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(const QString &functionName,
-        const QString &interfaceName, const QString &parameterType, const QString &sendInline,
-        const conversion::Options &options) const
+std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(Context &context,
+        const QString &functionName, const QString &interfaceName, const QString &parameterType,
+        const QString &sendInline) const
 {
     Sequence sequence(Sequence::Type::NORMAL);
     sequence.appendElement(createWaitForInitStatement());
@@ -632,9 +654,9 @@ std::unique_ptr<Proctype> IvToPromelaTranslator::generateEnvironmentProctype(con
                 Declaration(DataType(UtypeRef(Escaper::escapePromelaName(parameterType))), "value")));
     }
 
-    const auto &globalInputVectorLengthLimit = options.value(PromelaOptions::globalInputVectorLengthLimit);
+    const auto &globalInputVectorLengthLimit = context.options().value(PromelaOptions::globalInputVectorLengthLimit);
     const auto &interfaceInputVectorLenghtLimit =
-            options.value(PromelaOptions::interfaceInputVectorLengthLimit.arg(interfaceName.toLower()));
+            context.options().value(PromelaOptions::interfaceInputVectorLengthLimit.arg(interfaceName.toLower()));
 
     std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>(Sequence::Type::ATOMIC);
 
@@ -735,9 +757,8 @@ std::unique_ptr<model::InlineDef> IvToPromelaTranslator::generateSendInline(cons
     return std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
 }
 
-void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslator::Context &context,
-        const IVFunction *ivFunction, const QString &functionName, const uint32_t basePriority,
-        const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const
+void IvToPromelaTranslator::createPromelaObjectsForFunction(
+        IvToPromelaTranslator::Context &context, const IVFunction *ivFunction, const QString &functionName) const
 {
     QList<QString> channelNames;
 
@@ -745,9 +766,8 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslato
         if (providedInterface->kind() == IVInterface::OperationKind::Cyclic
                 || providedInterface->kind() == IVInterface::OperationKind::Sporadic) {
             const auto interfaceName = getInterfaceName(providedInterface);
-            const auto priority = getInterfacePriority(providedInterface) + basePriority;
-            createPromelaObjectsForAsyncPis(
-                    context, providedInterface, functionName, interfaceName, priority, asn1SubtypesDefinitions);
+            const auto priority = getInterfacePriority(providedInterface) + context.getBaseProctypePriority();
+            createPromelaObjectsForAsyncPis(context, providedInterface, functionName, interfaceName, priority);
             channelNames.append(constructChannelName(functionName, interfaceName));
         } else {
             auto message =
@@ -767,7 +787,7 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslato
 
 void IvToPromelaTranslator::createPromelaObjectsForAsyncPis(IvToPromelaTranslator::Context &context,
         const IVInterface *providedInterface, const QString &functionName, const QString &interfaceName,
-        const std::size_t priority, const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const
+        const std::size_t priority) const
 {
     const auto connection = context.ivModel()->getConnectionForIface(providedInterface->id());
 
@@ -778,8 +798,8 @@ void IvToPromelaTranslator::createPromelaObjectsForAsyncPis(IvToPromelaTranslato
     const auto queueSize = getInterfaceQueueSize(providedInterface);
     const auto &[parameterName, parameterType] = getInterfaceParameter(providedInterface);
 
-    const auto parameterSubtyped = isParameterSubtyped(
-            parameterType, parameterName, sourceInterfaceName, sourceFunctionName, asn1SubtypesDefinitions);
+    const auto parameterSubtyped =
+            isParameterSubtyped(context, parameterType, parameterName, sourceInterfaceName, sourceFunctionName);
 
     context.model()->addInlineDef(generateSendInline(functionName, interfaceName, parameterName, parameterType,
             sourceFunctionName, sourceInterfaceName, parameterSubtyped));
@@ -816,10 +836,8 @@ void IvToPromelaTranslator::createPromelaObjectsForSyncRis(IvToPromelaTranslator
     context.model()->addInlineDef(std::move(inlineDef));
 }
 
-void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTranslator::Context &context,
-        const IVFunction *ivFunction, const QString &functionName, const uint32_t basePriority,
-        const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions,
-        const conversion::Options &options) const
+void IvToPromelaTranslator::createPromelaObjectsForEnvironment(
+        IvToPromelaTranslator::Context &context, const IVFunction *ivFunction, const QString &functionName) const
 {
     QVector<IVInterface *> providedInterfaceList = ivFunction->pis();
     for (IVInterface *providedInterface : providedInterfaceList) {
@@ -837,13 +855,13 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTransl
         const auto &[parameterName, parameterType] = getInterfaceParameter(providedInterface);
 
         const auto parameterSubtyped =
-                isParameterSubtyped(parameterType, parameterName, interfaceName, functionName, asn1SubtypesDefinitions);
+                isParameterSubtyped(context, parameterType, parameterName, interfaceName, functionName);
 
         context.model()->addInlineDef(generateSendInline(functionName, interfaceName, parameterName, parameterType,
                 sourceFunctionName, sourceInterfaceName, parameterSubtyped));
 
         const size_t queueSize = getInterfaceQueueSize(providedInterface);
-        const size_t priority = getInterfacePriority(providedInterface) + basePriority;
+        const size_t priority = getInterfacePriority(providedInterface) + context.getBaseProctypePriority();
 
         context.model()->addProctype(
                 generateProctype(context, functionName, interfaceName, parameterType, queueSize, priority, true));
@@ -863,14 +881,14 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(IvToPromelaTransl
         const std::pair<QString, QString> parameter = getInterfaceParameter(requiredInterface);
 
         const QString parameterName = parameter.first;
-        const QString parameterType = handleParameterSubtype(
-                parameter.second, parameterName, interfaceName, functionName, asn1SubtypesDefinitions);
+        const QString parameterType =
+                handleParameterSubtype(context, parameter.second, parameterName, interfaceName, functionName);
 
         const QString sendInline =
                 QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
 
         context.model()->addProctype(
-                generateEnvironmentProctype(functionName, interfaceName, parameterType, sendInline, options));
+                generateEnvironmentProctype(context, functionName, interfaceName, parameterType, sendInline));
     }
 }
 
@@ -1212,17 +1230,16 @@ size_t IvToPromelaTranslator::getInterfacePriority(const IVInterface *interface)
     }
 }
 
-QString IvToPromelaTranslator::handleParameterSubtype(const QString &parameterTypeName, const QString &parameterName,
-        const QString &interfaceName, const QString &functionName,
-        const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const
+QString IvToPromelaTranslator::handleParameterSubtype(Context &context, const QString &parameterTypeName,
+        const QString &parameterName, const QString &interfaceName, const QString &functionName) const
 {
-    if (asn1SubtypesDefinitions.empty()) {
+    if (context.subtypesDefinitions().empty()) {
         return parameterTypeName;
     }
 
     auto parameterSubtypeName = buildParameterSubtypeName(functionName, interfaceName, parameterName);
 
-    for (const auto definitions : asn1SubtypesDefinitions) {
+    for (const auto definitions : context.subtypesDefinitions()) {
         const auto parameterSubtype = definitions->type(parameterSubtypeName);
 
         if (parameterSubtype != nullptr) {
@@ -1267,12 +1284,10 @@ Expression IvToPromelaTranslator::handleSendInlineParameter(
     return Expression(VariableRef(parameterName));
 }
 
-bool IvToPromelaTranslator::isParameterSubtyped(const QString &parameterType, const QString &parameterName,
-        const QString &interfaceName, const QString &functionName,
-        const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const
+bool IvToPromelaTranslator::isParameterSubtyped(Context &context, const QString &parameterType,
+        const QString &parameterName, const QString &interfaceName, const QString &functionName) const
 {
-    const auto subtype =
-            handleParameterSubtype(parameterType, parameterName, interfaceName, functionName, asn1SubtypesDefinitions);
+    const auto subtype = handleParameterSubtype(context, parameterType, parameterName, interfaceName, functionName);
     return parameterType != subtype;
 }
 

@@ -134,7 +134,8 @@ private:
          *
          * @param promelaModel The model that is being created
          */
-        Context(model::PromelaModel *promelaModel, const ivm::IVModel *ivModel);
+        Context(model::PromelaModel *promelaModel, const ivm::IVModel *ivModel, const conversion::Options &options,
+                const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitons);
 
         /**
          * @brief Add observer attachment
@@ -175,18 +176,49 @@ private:
          *
          * @return Promela model
          */
-        auto model() -> model::PromelaModel *;
+        auto model() const -> model::PromelaModel *;
 
         /**
          * Getter for the IV model that is translated
          *
          * @return IV model
          */
-        auto ivModel() -> const ivm::IVModel *;
+        auto ivModel() const -> const ivm::IVModel *;
+
+        /**
+         * Getter for the conversion options
+         *
+         * @return conversion options
+         */
+        auto options() const -> const conversion::Options &;
+
+        /**
+         * Getter for the ASN.1 Subtypes Definitions
+         *
+         * @return conversion options
+         */
+        auto subtypesDefinitions() const -> const std::vector<const Asn1Acn::Definitions *> &;
+
+        /**
+         * @brief Setter for base priority for proctypes
+         *
+         * @param priority new base proctype priority
+         */
+        auto setBaseProctypePriority(uint32_t priority) -> void;
+
+        /**
+         * @brief Getter base priority for proctypes
+         *
+         * @return base priority for proctypes
+         */
+        auto getBaseProctypePriority() const -> uint32_t;
 
     private:
         model::PromelaModel *m_promelaModel;
         const ivm::IVModel *m_ivModel;
+        const conversion::Options &m_options;
+        const std::vector<const Asn1Acn::Definitions *> &m_asn1SubtypesDefinitons;
+        uint32_t m_baseProctypePriority;
         std::map<QString, std::map<QString, ObserverAttachments>> m_fromObserverAttachments;
         std::map<QString, std::map<QString, ObserverAttachments>> m_toObserverAttachments;
     };
@@ -238,24 +270,19 @@ private:
     auto generateProctype(Context &context, const QString &functionName, const QString &interfaceName,
             const QString &parameterType, size_t queueSize, size_t priority, bool environment) const
             -> std::unique_ptr<model::Proctype>;
-    auto generateEnvironmentProctype(const QString &functionName, const QString &interfaceName,
-            const QString &parameterType, const QString &sendInline, const conversion::Options &options) const
-            -> std::unique_ptr<model::Proctype>;
+    auto generateEnvironmentProctype(Context &context, const QString &functionName, const QString &interfaceName,
+            const QString &parameterType, const QString &sendInline) const -> std::unique_ptr<model::Proctype>;
     auto generateSendInline(const QString &functionName, const QString &interfaceName, const QString &parameterName,
             const QString &parameterType, const QString &sourceFunctionName, const QString &sourceInterfaceName,
             const bool parameterSubtyped) const -> std::unique_ptr<model::InlineDef>;
-    auto createPromelaObjectsForFunction(Context &context, const ::ivm::IVFunction *ivFunction,
-            const QString &functionName, const uint32_t basePriority,
-            const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const -> void;
+    auto createPromelaObjectsForFunction(
+            Context &context, const ::ivm::IVFunction *ivFunction, const QString &functionName) const -> void;
     auto createPromelaObjectsForAsyncPis(Context &context, const ivm::IVInterface *providedInterface,
-            const QString &functionName, const QString &interfaceName, const std::size_t priority,
-            const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const -> void;
+            const QString &functionName, const QString &interfaceName, const std::size_t priority) const -> void;
     auto createPromelaObjectsForSyncRis(
             Context &context, const ivm::IVInterface *requiredInterface, const QString &functionName) const -> void;
-    auto createPromelaObjectsForEnvironment(Context &context, const ivm::IVFunction *ivFunction,
-            const QString &functionName, const uint32_t basePriority,
-            const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions,
-            const conversion::Options &options) const -> void;
+    auto createPromelaObjectsForEnvironment(
+            Context &context, const ivm::IVFunction *ivFunction, const QString &functionName) const -> void;
     auto createCheckQueueInline(model::PromelaModel *promelaModel, const QString &functionName,
             const QList<QString> &channelNames) const -> void;
     auto createCheckQueuesExpression(const QList<QString> &channelNames, bool empty) const
@@ -282,18 +309,16 @@ private:
     auto getInterfaceQueueSize(const ivm::IVInterface *interface) const -> size_t;
     auto getInterfacePriority(const ivm::IVInterface *interface) const -> size_t;
 
-    auto handleParameterSubtype(const QString &parameterTypeName, const QString &parameterName,
-            const QString &interfaceName, const QString &functionName,
-            const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const -> QString;
+    auto handleParameterSubtype(Context &context, const QString &parameterTypeName, const QString &parameterName,
+            const QString &interfaceName, const QString &functionName) const -> QString;
     auto handleSendInlineParameter(const QString &argumentName, const QString &parameterType,
             promela::model::Sequence &sequence) const -> promela::model::Expression;
     auto handleSendInlineArgument(const QString &parameterType, const QString &functionName,
             const QString &interfaceName, const QString parameterName, promela::model::Sequence &sequence) const
             -> QString;
 
-    auto isParameterSubtyped(const QString &parameterTypeName, const QString &parameterName,
-            const QString &interfaceName, const QString &functionName,
-            const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitions) const -> bool;
+    auto isParameterSubtyped(Context &context, const QString &parameterTypeName, const QString &parameterName,
+            const QString &interfaceName, const QString &functionName) const -> bool;
 
     auto buildParameterSubtypeName(
             const QString &functionName, const QString &interfaceName, const QString &parameterName) const -> QString;
