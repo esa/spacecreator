@@ -201,10 +201,9 @@ void IVXMLReader::test_connectionGroup()
 
 void IVXMLReader::test_readLayer()
 {
-    QByteArray xml("<InterfaceView>"
-                   "<Layer name=\"TestLayer\"/>"
-                   "<Layer name=\"SomeOtherName\"/>"
-                   "</InterfaceView>");
+    QByteArray xml(R"(<InterfaceView>
+                      <Layer name="TestLayer"/>
+                      </InterfaceView>)");
 
     QBuffer buffer(&xml);
     buffer.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -214,14 +213,11 @@ void IVXMLReader::test_readLayer()
     const bool ok = reader.read(&buffer);
     QVERIFY(ok);
     const QVector<ivm::IVObject *> layersList = reader.parsedLayers();
-    QCOMPARE(layersList.size(), 2);
-    ivm::IVConnectionLayerType *layer0 = qobject_cast<ivm::IVConnectionLayerType *>(layersList[0]);
-    ivm::IVConnectionLayerType *layer1 = qobject_cast<ivm::IVConnectionLayerType *>(layersList[1]);
+    QCOMPARE(layersList.size(), 1);
+    ivm::IVConnectionLayerType *layer = qobject_cast<ivm::IVConnectionLayerType *>(layersList[0]);
 
-    QVERIFY(layer0 != nullptr);
-    QVERIFY(layer1 != nullptr);
-    QCOMPARE(layer0->title(), "TestLayer");
-    QCOMPARE(layer1->title(), "SomeOtherName");
+    QVERIFY(layer != nullptr);
+    QCOMPARE(layer->title(), "TestLayer");
 }
 
 void IVXMLReader::test_multicast()

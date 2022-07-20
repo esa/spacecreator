@@ -165,22 +165,19 @@ void tst_XmlDocExporter::testExportNestedComment()
 
 void tst_XmlDocExporter::testExportLayer()
 {
-    auto testLayer0 = ivm::testutils::createConnectionLayer(m_doc.get());
-    testLayer0->setTitle("TestLayer");
-    auto testLayer1 = ivm::testutils::createConnectionLayer(m_doc.get());
-    testLayer1->setTitle("OtherTestLayer");
+    auto testLayer = ivm::testutils::createConnectionLayer(m_doc.get());
+    testLayer->setTitle("TestLayer");
 
     QVector<ivm::IVObject *> objects;
-    objects.append(testLayer0);
-    objects.append(testLayer1);
+    objects.append(testLayer);
     m_doc->setObjects(objects);
 
     QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
     const QByteArray text = testFileContent();
-    const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
-                                "<Layer name=\"TestLayer\"/>\n"
-                                "<Layer name=\"OtherTestLayer\"/>\n"
-                                "</InterfaceView>";
+    const QByteArray expected = R"(<?xml version="1.0"?>
+                                   <InterfaceView>
+                                   <Layer name="TestLayer"/>
+                                   </InterfaceView>)";
     QVERIFY(XmlData(expected) == XmlData(text));
 }
 
