@@ -266,8 +266,7 @@ void IvToPromelaTranslator::addChannelAndLock(
     QList<ChannelInit::Type> channelType;
     channelType.append(BasicType::INT);
     ChannelInit channelInit(1, std::move(channelType));
-    Declaration channelDeclaration(
-            DataType(BasicType::CHAN), QString("%1_lock").arg(Escaper::escapePromelaIV(functionName)));
+    Declaration channelDeclaration(DataType(BasicType::CHAN), getFunctionLockChannelName(functionName));
     channelDeclaration.setInit(channelInit);
     context.model()->addDeclaration(channelDeclaration);
 }
@@ -300,7 +299,7 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
 
     promelaModel->addInclude("dataview.pml");
 
-    promelaModel->addDeclaration(Declaration(DataType(BasicType::INT), "inited"));
+    promelaModel->addDeclaration(Declaration(DataType(BasicType::INT), m_systemInitedVariableName));
 
     createPromelaObjectsForTimers(context);
 
@@ -360,12 +359,12 @@ std::set<ModelType> IvToPromelaTranslator::getDependencies() const
     return std::set<ModelType> { ModelType::InterfaceView, ModelType::Asn1 };
 }
 
-static void initializeFunction(Sequence &sequence, const QString &functionName)
+void IvToPromelaTranslator::initializeFunction(Sequence &sequence, const QString &functionName) const
 {
     QString initFn = QString("%1_0_init").arg(Escaper::escapePromelaIV(functionName));
     sequence.appendElement(InlineCall(initFn, {}));
 
-    const VariableRef lockChannelName = VariableRef(QString("%1_lock").arg(Escaper::escapePromelaIV(functionName)));
+    const VariableRef lockChannelName = VariableRef(getFunctionLockChannelName(functionName));
     QList<Expression> lockChannelArguments;
     lockChannelArguments.append(Expression(VariableRef("init_token")));
 
@@ -410,7 +409,7 @@ void IvToPromelaTranslator::generateInitProctype(Context &context) const
         initializeFunction(sequence, observer);
     }
 
-    sequence.appendElement(Assignment(VariableRef("inited"), Expression(Constant(1))));
+    sequence.appendElement(Assignment(VariableRef(m_systemInitedVariableName), Expression(Constant(1))));
 
     context.model()->setInit(InitProctype(std::move(sequence)));
 }
@@ -430,11 +429,7 @@ void IvToPromelaTranslator::attachInputObservers(IvToPromelaTranslator::Context 
     auto attachments = context.getObserverAttachments(
             functionName, interfaceName, IvToPromelaTranslator::ObserverAttachment::Kind::Kind_Input);
     for (const auto &attachment : attachments) {
-        const VariableRef lockChannelName =
-                VariableRef(QString("%1_lock").arg(Escaper::escapePromelaIV(attachment.observer())));
-        QList<VariableRef> lockChannelArguments;
-        lockChannelArguments.append(VariableRef("token"));
-        sequence->appendElement(ChannelRecv(lockChannelName, lockChannelArguments));
+        sequence->appendElement(createLockAcquireStatement(functionName));
 
         QList<InlineCall::Argument> arguments;
         if (!parameterType.isEmpty()) {
@@ -442,9 +437,7 @@ void IvToPromelaTranslator::attachInputObservers(IvToPromelaTranslator::Context 
         }
         sequence->appendElement(InlineCall(observerInputSignalName(attachment), arguments));
 
-        QList<Expression> unlockChannelArguments;
-        unlockChannelArguments.append(Expression(VariableRef("token")));
-        sequence->appendElement(ChannelSend(VariableRef(lockChannelName), unlockChannelArguments));
+        sequence->appendElement(createLockReleaseStatement(functionName));
     }
 }
 
@@ -511,11 +504,7 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
 
     // acquire function mutex
     if (!environment) {
-        const VariableRef lockChannelName = VariableRef(QString("%1_lock").arg(Escaper::escapePromelaIV(functionName)));
-        QList<VariableRef> lockChannelArguments;
-        lockChannelArguments.append(VariableRef("token"));
-
-        loopSequence->appendElement(ChannelRecv(lockChannelName, lockChannelArguments));
+        loopSequence->appendElement(createLockAcquireStatement(functionName));
     }
 
     for (const ObserverAttachment &attachment : outputObservers) {
@@ -534,11 +523,7 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
         processMessageSeq->appendElement(ChannelRecv(VariableRef(currentChannelName), receiveParams));
 
         // acquire observer lock
-        const VariableRef lockChannelName =
-                VariableRef(QString("%1_lock").arg(Escaper::escapePromelaIV(attachment.observer())));
-        QList<VariableRef> lockChannelArguments;
-        lockChannelArguments.append(VariableRef("token"));
-        processMessageSeq->appendElement(ChannelRecv(lockChannelName, lockChannelArguments));
+        processMessageSeq->appendElement(createLockAcquireStatement(attachment.observer()));
 
         QList<InlineCall::Argument> arguments;
         if (!parameterType.isEmpty()) {
@@ -549,9 +534,7 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
         processMessageSeq->appendElement(InlineCall(observerInputSignalName(attachment), arguments));
 
         // release observer lock
-        QList<Expression> unlockChannelArguments;
-        unlockChannelArguments.append(Expression(VariableRef("token")));
-        processMessageSeq->appendElement(ChannelSend(VariableRef(lockChannelName), unlockChannelArguments));
+        processMessageSeq->appendElement(createLockReleaseStatement(attachment.observer()));
 
         std::unique_ptr<Sequence> emptySeq = std::make_unique<Sequence>(Sequence::Type::NORMAL);
         emptySeq->appendElement(InlineCall("empty", checkQueueArguments));
@@ -614,10 +597,7 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
 
     if (!environment) {
         // release function mutex
-        QList<Expression> unlockChannelArguments;
-        unlockChannelArguments.append(Expression(VariableRef("token")));
-        const VariableRef lockChannelName = VariableRef(QString("%1_lock").arg(Escaper::escapePromelaIV(functionName)));
-        loopSequence->appendElement(ChannelSend(VariableRef(lockChannelName), unlockChannelArguments));
+        loopSequence->appendElement(createLockReleaseStatement(functionName));
     }
 
     DoLoop loop;
@@ -702,7 +682,7 @@ void IvToPromelaTranslator::generateEnvironmentProctype(Context &context, const 
 
 std::unique_ptr<model::ProctypeElement> IvToPromelaTranslator::createWaitForInitStatement() const
 {
-    return std::make_unique<ProctypeElement>(Expression(VariableRef("inited")));
+    return std::make_unique<ProctypeElement>(Expression(VariableRef(m_systemInitedVariableName)));
 }
 
 void IvToPromelaTranslator::generateSendInline(Context &context, const QString &functionName,
@@ -1326,5 +1306,27 @@ QString IvToPromelaTranslator::getAttachmentToFunction(
         const IVConnection *conn = model->getConnectionForIface(ri->id());
         return conn->targetName();
     }
+}
+
+QString IvToPromelaTranslator::getFunctionLockChannelName(const QString &functionName) const
+{
+    return QString("%1_lock").arg(Escaper::escapePromelaIV(functionName));
+}
+
+std::unique_ptr<ProctypeElement> IvToPromelaTranslator::createLockAcquireStatement(const QString &functionName) const
+{
+    const VariableRef lockChannelName = VariableRef(getFunctionLockChannelName(functionName));
+    QList<VariableRef> lockChannelArguments;
+    lockChannelArguments.append(VariableRef(m_lockAuxilaryVariableName));
+
+    return std::make_unique<ProctypeElement>(ChannelRecv(lockChannelName, lockChannelArguments));
+}
+std::unique_ptr<ProctypeElement> IvToPromelaTranslator::createLockReleaseStatement(const QString &functionName) const
+{
+    const VariableRef lockChannelName = VariableRef(getFunctionLockChannelName(functionName));
+
+    QList<Expression> unlockChannelArguments;
+    unlockChannelArguments.append(Expression(VariableRef(m_lockAuxilaryVariableName)));
+    return std::make_unique<ProctypeElement>(ChannelSend(VariableRef(lockChannelName), unlockChannelArguments));
 }
 }

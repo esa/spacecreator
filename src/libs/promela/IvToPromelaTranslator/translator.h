@@ -275,8 +275,11 @@ private:
     inline static const QString m_timerManagerDataName = "timer_manager_data";
     inline static const QString m_timerManagerProctypeName = "timer_manager_proc";
     inline static const QString m_dummyParamName = "dummy";
+    inline static const QString m_systemInitedVariableName = "inited";
+    inline static const QString m_lockAuxilaryVariableName = "token";
 
 private:
+    auto initializeFunction(model::Sequence &sequence, const QString &functionName) const -> void;
     auto addChannelAndLock(IvToPromelaTranslator::Context &context, const QString &functionName) const -> void;
     auto observerInputSignalName(const IvToPromelaTranslator::ObserverAttachment &attachment) const -> QString;
     auto attachInputObservers(IvToPromelaTranslator::Context &context, const QString &functionName,
@@ -344,5 +347,9 @@ private:
 
     auto observerChannelName(const ObserverAttachment &attachment, const QString &toFunction) const -> QString;
     auto getAttachmentToFunction(const ivm::IVModel *model, const ObserverAttachment &attachment) const -> QString;
+
+    auto getFunctionLockChannelName(const QString &functionName) const -> QString;
+    auto createLockAcquireStatement(const QString &functionName) const -> std::unique_ptr<model::ProctypeElement>;
+    auto createLockReleaseStatement(const QString &functionName) const -> std::unique_ptr<model::ProctypeElement>;
 };
 }
