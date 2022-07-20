@@ -27,6 +27,7 @@
 using plugincommon::IvTools;
 using plugincommon::ModelLoader;
 using testgenerator::HtmlResultExporter;
+using testgenerator::LaunchConfiguration;
 using testgenerator::TestGenerator;
 
 namespace tests::testgenerator {
@@ -39,6 +40,7 @@ private Q_SLOTS:
     void testPrepareTestHarness();
     void testResultHtmlFile();
     void testResultHtmlData();
+    void testParsingBoardSettings();
 };
 
 void tst_testgenerator::testPrepareTestHarness()
@@ -121,6 +123,14 @@ void tst_testgenerator::testResultHtmlData()
 
     QCOMPARE(cells[0], firstRow);
     QCOMPARE(cells[1], secondRow);
+}
+
+void tst_testgenerator::testParsingBoardSettings()
+{
+    LaunchConfiguration config(
+            "/path/to/gdb/script", "gdb", "dummyClientParam1 $SCRIPT_PATH", "gdbserver", "dummyServerParam1 $BIN_PATH");
+    QCOMPARE(config.clientArgsParsed, QStringList({ "dummyClientParam1", "/path/to/gdb/script" }));
+    QCOMPARE(config.serverArgsParsed, QStringList({ "dummyServerParam1", "hostpartition" }));
 }
 
 }
