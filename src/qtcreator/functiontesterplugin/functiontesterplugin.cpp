@@ -52,11 +52,14 @@ using plugincommon::ModelLoader;
 namespace spctr {
 
 const QString resultFileName = "Results.html";
-const QString boardsConfigPath = "boards_config.txt";
+const QString boardsConfigFileName = "boards_config.txt";
 constexpr int BOARD_CONFIG_LENGTH = 6;
 
-
-FunctionTesterPlugin::FunctionTesterPlugin() { }
+FunctionTesterPlugin::FunctionTesterPlugin()
+{
+    boardsConfigPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+            + QDir::separator() + boardsConfigFileName;
+}
 
 FunctionTesterPlugin::~FunctionTesterPlugin() { }
 
@@ -364,6 +367,8 @@ auto FunctionTesterPlugin::loadBoardsConfiguration() -> QMap<QString, LaunchConf
             }
         }
         file.close();
+    } else {
+        MessageManager::write(GenMsg::msgInfo.arg("Could not find file with default boards configuration at path: " + boardsConfigPath));
     }
     return boardsConfig;
 }

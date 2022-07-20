@@ -103,9 +103,6 @@ auto TestGenerator::initializePaths(const QString &baseDirectory) -> void
     generatedIvPath = generatedPath + QDir::separator() + "interfaceview.xml";
     generatedDvPath = generatedPath + QDir::separator() + "deploymentview.dv.xml";
     binaryPath = generatedPath + QDir::separator() + "work" + QDir::separator() + "binaries" + QDir::separator();
-
-    // QList<QString> clientArgs = { "-batch", "-x", "gdbScriptPath" };
-    // QList<QString> serverArgs = { "localhost:1234", binaryPath };
 }
 
 auto TestGenerator::getAllFunctionsFromModel(const IVModel &ivModel) -> std::vector<IVFunction *>

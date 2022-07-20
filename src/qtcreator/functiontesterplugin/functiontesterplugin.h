@@ -67,6 +67,7 @@ private:
     auto saveBoardConfiguration(const QString &boardName, const LaunchConfiguration &launchConfig) -> bool;
 
     QMap<QString, LaunchConfiguration> boardsConfiguration;
+    QString boardsConfigPath;
 };
 
 }
