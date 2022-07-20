@@ -75,8 +75,9 @@ class IVLayerVisualizationModel : public IVVisualizationModelBase
 public:
 
     /**
-    * @brief Constructor for IVLayerVisualizationModel, because layers are stored in seperate model
-    * we need to give IVLayerVisualizationModel reference for both layers and the rest of objects
+    * @brief Constructor for IVLayerVisualizationModel
+    * Layers are stored in seperate model so we need to give IVLayerVisualizationModel reference
+    * for both layers and the rest of objects
     */
     explicit IVLayerVisualizationModel(ivm::IVModel *layerModel, ivm::IVModel *objectsModel,
                                        cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
@@ -87,7 +88,7 @@ private Q_SLOTS:
     void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
 
 private:
-    void setObjectsVisibility(const QString layerName, ivm::IVModel *objectsModel, const bool isVisible);
+    void setObjectsVisibility(const QString &layerName, ivm::IVModel *objectsModel, const bool &isVisible);
 
 private:
     ivm::IVModel *m_objectsModel;

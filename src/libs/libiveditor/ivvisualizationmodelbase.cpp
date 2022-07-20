@@ -286,27 +286,38 @@ void IVLayerVisualizationModel::onDataChanged(
         return;
     }
     if (roles.contains(Qt::CheckStateRole) || roles.contains(Qt::DisplayRole) || roles.isEmpty()) {
-        if (item->isCheckable() && roles.contains(Qt::CheckStateRole)) {
+        if (item->isCheckable()) {
             setObjectsVisibility(item->text(), m_objectsModel, item->checkState() == Qt::Checked);
         }
     }
 }
 
 void IVLayerVisualizationModel::setObjectsVisibility(
-        const QString layerName, ivm::IVModel *objectsModel, const bool isVisible)
+        const QString &layerName, ivm::IVModel *objectsModel, const bool &isVisible)
 {
     const QString encodedLayerName = ivm::IVNameValidator::encodeName(ivm::IVObject::Type::ConnectionLayer, layerName);
 
     for (auto entity : objectsModel->objects()) {
-        if (auto connection = entity->as<ivm::IVConnection *>()) {
+        auto ivObject = qobject_cast<ivm::IVObject *>(entity);
+
+        switch (ivObject->type()) {
+        case ivm::IVObject::Type::Connection: {
+            auto connection = ivObject->as<ivm::IVConnection *>();
             if (connection->layer()->title() == encodedLayerName) {
                 connection->setVisible(isVisible);
             }
+            break;
         }
-        if (auto interface = entity->as<ivm::IVInterface *>()) {
+        case ivm::IVObject::Type::RequiredInterface:
+        case ivm::IVObject::Type::ProvidedInterface: {
+            auto interface = ivObject->as<ivm::IVInterface *>();
             if (interface->layerName() == encodedLayerName) {
                 interface->setVisible(isVisible);
             }
+            break;
+        }
+        default:
+            break;
         }
     }
 }
