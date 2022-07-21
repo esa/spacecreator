@@ -37,12 +37,12 @@ auto CsvImporter::importModel(const Options &options) const -> std::unique_ptr<C
 {
     const QString fileToImportName = options.value(CsvOptions::inputFilepath).value_or("");
     if (fileToImportName.isEmpty()) {
-        throw ImporterException("No name of file to import supplied");
+        throw ImporterException("No name of CSV file to import supplied");
     }
 
     QFile fileToImport = QFile(fileToImportName);
     if (!fileToImport.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        throw ImporterException("File to import cannot be opened.");
+        throw ImporterException("CSV file to import cannot be opened.");
     }
 
     const QString separator = options.value(CsvOptions::separator).value_or(",");

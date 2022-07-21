@@ -36,7 +36,7 @@ public:
     MscModel *parseFile(const QString &filename, QStringList *errorMessages = nullptr);
     MscModel *parseText(const QString &text, QStringList *errorMessages = nullptr);
 
-    QStringList getErrorMessages() const;
+    const QStringList &getErrorMessages() const;
 
 private:
     MscModel *parse(antlr4::ANTLRInputStream &input, QStringList *errorMessages = nullptr);
