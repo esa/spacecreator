@@ -20,19 +20,31 @@
 #pragma once
 
 #include <QString>
+#include <conversion/common/export/modelexporter.h>
+#include <memory>
 
-namespace conversion::msc {
+namespace conversion {
+class Model;
+class Options;
+} // namespace conversion
+
+namespace conversion::msc::exporter {
 
 /**
- * @brief   Possible options for MSC conversion
+ * @brief   Exporter that outputs MSC files
  */
-class MscOptions
+class MscExporter final : public conversion::exporter::ModelExporter
 {
 public:
-    /** @brief  Filepath of input file */
-    inline static const QString inputFilepath = "Msc_Import_InputFilepath";
-    /** @brief  Filepath of output file */
-    inline static const QString outputFilepath = "Msc_Export_OutputFilepath";
+    /**
+     * @brief   Creates an MSC file from the passed model
+     *
+     * @param   model       Model to export
+     * @param   options     List of options
+     *
+     * @throws  conversion::exporter::ExportException
+     */
+    virtual auto exportModel(const conversion::Model *model, const conversion::Options &options) const -> void override;
 };
 
-} // namespace conversion::asn1
+} // namespace conversion::msc::exporter
