@@ -27,6 +27,7 @@
 using plugincommon::IvTools;
 using plugincommon::ModelLoader;
 using testgenerator::HtmlResultExporter;
+using testgenerator::LaunchConfigLoader;
 using testgenerator::LaunchConfiguration;
 using testgenerator::TestGenerator;
 
@@ -41,6 +42,7 @@ private Q_SLOTS:
     void testResultHtmlFile();
     void testResultHtmlData();
     void testParsingBoardSettings();
+    void testStoringBoardsConfig();
 };
 
 void tst_testgenerator::testPrepareTestHarness()
@@ -131,6 +133,26 @@ void tst_testgenerator::testParsingBoardSettings()
             "/path/to/gdb/script", "gdb", "dummyClientParam1 $SCRIPT_PATH", "gdbserver", "dummyServerParam1 $BIN_PATH");
     QCOMPARE(config.clientArgsParsed, QStringList({ "dummyClientParam1", "/path/to/gdb/script" }));
     QCOMPARE(config.serverArgsParsed, QStringList({ "dummyServerParam1", "hostpartition" }));
+}
+
+void tst_testgenerator::testStoringBoardsConfig()
+{
+    const QString configPath = "boards_config.txt";
+    LaunchConfigLoader configLoader(configPath);
+    LaunchConfiguration configToSave(
+            "/path/to/script", "gdb", "dummyParam1 dummyParam2", "gdbserver", "dummyParam3 dummyParam4");
+    configLoader.saveConfig("x86 Linux CPP", configToSave);
+    configLoader.loadConfig();
+    auto boardsConfig = configLoader.getConfig();
+    LaunchConfiguration readConfig = boardsConfig["x86 Linux CPP"];
+
+    QCOMPARE(readConfig.scriptPath, "/path/to/script");
+    QCOMPARE(readConfig.clientName, "gdb");
+    QCOMPARE(readConfig.clientArgs, "dummyParam1 dummyParam2");
+    QCOMPARE(readConfig.serverName, "gdbserver");
+    QCOMPARE(readConfig.serverArgs, "dummyParam3 dummyParam4");
+
+    QFile::remove(configPath);
 }
 
 }

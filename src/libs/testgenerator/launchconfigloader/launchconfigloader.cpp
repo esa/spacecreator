@@ -41,7 +41,6 @@ LaunchConfiguration::LaunchConfiguration(const QString &launchScriptPath, const 
 LaunchConfigLoader::LaunchConfigLoader(const QString &launchConfigPath)
     : configPath(launchConfigPath)
 {
-    loadConfig();
 }
 
 auto LaunchConfigLoader::getConfig() -> QMap<QString, LaunchConfiguration> &
