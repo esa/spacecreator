@@ -19,6 +19,7 @@
 
 #include "htmlresultexporter.h"
 
+#include <QDebug>
 #include <QFile>
 #include <ivfunctiontype.h>
 
@@ -40,6 +41,10 @@ auto HtmlResultExporter::initTableCells(const CsvModel &csvModel, const QVector<
 {
     std::vector<QString>::size_type rowIndex = 0;
     std::vector<QString>::size_type resultIndex = 0;
+    if (results.empty()) {
+        qWarning() << "Results vector is empty";
+        return;
+    }
     for (const auto &row : csvModel.records()) {
         csv::Row csvRow = *row;
         auto csvFields = csvRow.fields();
