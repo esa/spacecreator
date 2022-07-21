@@ -10,6 +10,8 @@ target_sources(TestGenerator
                 gdbconnector/gdbconnector.h
                 gdbconnector/process.cpp
                 gdbconnector/process.h
+                launchconfigloader/launchconfigloader.cpp
+                launchconfigloader/launchconfigloader.h
                 resultexporter/htmlresultexporter.cpp
                 resultexporter/htmlresultexporter.h
                 testdrivergenerator/testdrivergenerator.cpp

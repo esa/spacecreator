@@ -21,6 +21,7 @@
 
 #include "harness/dvgenerator/dvgenerator.h"
 #include "harness/ivgenerator/ivgenerator.h"
+#include "launchconfigloader/launchconfigloader.h"
 #include "resultexporter/htmlresultexporter.h"
 #include "testdrivergenerator/testdrivergenerator.h"
 #include "testdrivergenerator/testdrivergeneratorexception.h"
@@ -32,88 +33,6 @@ using ivm::IVInterface;
 using ivm::IVModel;
 
 namespace testgenerator {
-
-/**
- * @brief Struct containing tested binary launching params.
- *
- */
-struct LaunchConfiguration {
-    /** path to the GDB script for launching the tested binary */
-    QString scriptPath;
-    /** debugger client to use for testing binary */
-    QString clientName;
-    /** arguments for debugger client */
-    QString clientArgs;
-    /** debugger client to use for testing binary */
-    QString serverName;
-    /** arguments for debugger server */
-    QString serverArgs;
-    /** arguments for debugger client converted to list with parsed variables */
-    QStringList clientArgsParsed;
-    /** arguments for debugger server converted to list with parsed variables */
-    QStringList serverArgsParsed;
-
-    /**
-     * @brief Default constructor of the class
-     *
-     */
-    LaunchConfiguration() = default;
-
-    /**
-     * @brief Constructor of the class
-     *
-     * @param launchScriptPath path to the GDB script for launching the tested binary
-     * @param client name of the debugger client to use for testing binary
-     * @param clientParams arguments for debugger client
-     * @param server name of the debugger server to use for testing binary
-     * @param serverParams arguments for debugger server
-     *
-     * @return true if there was no error during creation of the test harness files
-     */
-    LaunchConfiguration(const QString &launchScriptPath, const QString &client, QString clientParams,
-            const QString &server, QString serverParams);
-};
-
-/**
- * @brief Class for storing launch parameters of every board
- *
- */
-class LaunchConfigLoader
-{
-public:
-    /**
-     * @brief Constructor of the class
-     *
-     * @param launchConfigPath path to the file with launch configuration of each board
-     *
-     */
-    LaunchConfigLoader(const QString &launchConfigPath);
-
-    /**
-     * @brief Getter for the configuration map of board names and their launch parameters
-     *
-     * @return map of board names as keys and launch parameters as values
-     */
-    auto getConfig() -> QMap<QString, LaunchConfiguration> &;
-
-    /**
-     * @brief Load launch parameters for every board and stores in configMap private field
-     *
-     * @return true if file with boards' launch configuration was successfuly opened
-     */
-    auto loadConfig() -> bool;
-
-    /**
-     * @brief Store launch parameters of every board in a CSV file specified in constructor
-     *
-     * @return true if saving configuration is successful, false otherwise
-     */
-    auto saveConfig(const QString &boardName, const LaunchConfiguration &launchConfig) -> bool;
-
-private:
-    QString configPath;
-    QMap<QString, LaunchConfiguration> configMap;
-};
 
 /**
  * @brief  Class for generating and executing interface tests. Backend for FunctionTesterPlugin.
