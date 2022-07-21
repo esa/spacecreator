@@ -688,6 +688,12 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(
             const auto interfaceName = getInterfaceName(providedInterface);
             const auto priority = getInterfacePriority(providedInterface) + context.getBaseProctypePriority();
             createPromelaObjectsForAsyncPis(context, providedInterface, functionName, interfaceName, priority);
+            ObserverAttachments outputObservers =
+                    context.getObserverAttachments(functionName, interfaceName, ObserverAttachment::Kind::Kind_Output);
+            for (const ObserverAttachment &attachment : outputObservers) {
+                const QString toFunction = getAttachmentToFunction(context.ivModel(), attachment);
+                channelNames.append(observerChannelName(attachment, toFunction));
+            }
             channelNames.append(constructChannelName(functionName, interfaceName));
         } else {
             auto message =
@@ -696,6 +702,8 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(
             throw TranslationException(message);
         }
     }
+
+    createCheckQueueInline(context.model(), functionName, channelNames);
 
     for (const auto requiredInterface : ivFunction->ris()) {
         if (requiredInterface->kind() == IVInterface::OperationKind::Protected
