@@ -168,7 +168,7 @@ auto FunctionTesterPlugin::getSelectedInterface() -> ivm::IVInterface *
             if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
                 if (auto entity = iObj->entity() ? iObj->entity()->as<ivm::IVObject *>() : nullptr) {
                     if (entity->isInterface()) {
-                        MessageManager::write(GenMsg::msgInfo.arg(entity->title()));
+                        MessageManager::write(GenMsg::msgInfo.arg("Selected interface: " + entity->title()));
                         return dynamic_cast<ivm::IVInterface *>(entity);
                     }
                 }

@@ -71,13 +71,14 @@ public:
     /**
      * @brief Constructor of the class
      *
+     * @param chosenBoardName name of the board the test were run on
      * @param interface tested interface
      * @param csvModel the CSV data with test vectors
      * @param results results obtained from GDB
      * @param delta maximum allowed absolute error
      */
-    HtmlResultExporter(const IVInterface &interface, const CsvModel &csvModel, const QVector<QVariant> &results,
-            const float delta);
+    HtmlResultExporter(const QString &chosenBoardName, const IVInterface &interface, const CsvModel &csvModel,
+            const QVector<QVariant> &results, const float delta);
 
     /**
      * @brief Exports test result to a HTML file
@@ -100,6 +101,7 @@ private:
     auto generateTableRow(QTextStream &stream, int row) -> void;
     auto generateTableHeader(QTextStream &stream) -> void;
 
+    QString boardName;
     QString interfaceName;
     QString functionName;
     QVector<shared::InterfaceParameter> ifaceParams;

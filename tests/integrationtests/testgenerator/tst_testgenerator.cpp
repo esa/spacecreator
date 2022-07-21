@@ -87,7 +87,7 @@ void tst_testgenerator::testResultHtmlFile()
 
     QVector<QVariant> testResults = { 1, 2, 3, 2, 5, 3, 4, 7, 12, 25 };
     const QString resultFileName = "Results.html";
-    HtmlResultExporter exporter(*interface, *csvModel, testResults, 0);
+    HtmlResultExporter exporter("Dummy board name", *interface, *csvModel, testResults, 0);
     exporter.exportResult(resultFileName);
 
     QVERIFY(QFileInfo::exists(resultFileName));
@@ -111,7 +111,7 @@ void tst_testgenerator::testResultHtmlData()
     QVERIFY(asn1Model);
 
     QVector<QVariant> testResults = { 1, 2, 3, 2, 5, 3, 4, 7, 12, 25 };
-    HtmlResultExporter exporter(*interface, *csvModel, testResults, 0);
+    HtmlResultExporter exporter("Dummy board name", *interface, *csvModel, testResults, 0);
     auto cells = exporter.getData();
 
     constexpr auto G = HtmlResultExporter::CellColor::Green;

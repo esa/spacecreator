@@ -78,7 +78,7 @@ auto TestGenerator::testUsingDataFromCsv(IVInterface &interface, const CsvModel 
     QVector<QVariant> testResults = runTests(interface, asn1Model, launchConfig);
 
     QString resultPath = this->projectDirectory + QDir::separator() + "work" + QDir::separator() + resultFileName;
-    HtmlResultExporter exporter(interface, csvModel, testResults, delta);
+    HtmlResultExporter exporter(boardName, interface, csvModel, testResults, delta);
     exporter.exportResult(resultPath);
     return true;
 }

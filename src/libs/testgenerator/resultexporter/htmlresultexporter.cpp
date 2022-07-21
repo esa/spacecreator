@@ -25,9 +25,10 @@
 
 namespace testgenerator {
 
-HtmlResultExporter::HtmlResultExporter(
-        const IVInterface &interface, const CsvModel &csvModel, const QVector<QVariant> &results, const float delta)
-    : interfaceName(interface.title())
+HtmlResultExporter::HtmlResultExporter(const QString &chosenBoardName, const IVInterface &interface,
+        const CsvModel &csvModel, const QVector<QVariant> &results, const float delta)
+    : boardName(chosenBoardName)
+    , interfaceName(interface.title())
     , functionName(interface.function()->title())
     , ifaceParams(interface.params())
     , rows(results.size() / ifaceParams.size())
@@ -110,6 +111,7 @@ auto HtmlResultExporter::generateHtmlStream(QTextStream &stream) -> void
     stream << "\t</style>\n";
     stream << "\t<body>\n";
     stream << "\t\t<h2>Test results for interface " << interfaceName << " of function " << functionName << "</h2>\n";
+    stream << "\t\t<p style='font-size: 22px'>Chosen board: " << boardName << "</p>\n";
     stream << "\t\t<p style='font-size: 22px'>Maximum allowed absolute error: " << maxDelta << "</p>\n";
     stream << "\t\t<table>\n";
 
