@@ -1230,7 +1230,7 @@ const ::ivm::IVInterface *IvToPromelaTranslator::findProvidedInterface(
     }
     const QVector<IVInterface *> pis = function->pis();
     auto iter = std::find_if(pis.begin(), pis.end(), [&interfaceName, this](const IVInterface *i) {
-        return interfaceName.compare(getInterfaceName(i), Qt::CaseInsensitive);
+        return interfaceName.compare(getInterfaceName(i), Qt::CaseInsensitive) == 0;
     });
     if (iter == pis.end()) {
         return nullptr;
@@ -1247,7 +1247,7 @@ const ::ivm::IVInterface *IvToPromelaTranslator::findRequiredInterface(
     }
     const QVector<IVInterface *> ris = function->ris();
     auto iter = std::find_if(ris.begin(), ris.end(), [&interfaceName, this](const IVInterface *i) {
-        return interfaceName.compare(getInterfaceName(i), Qt::CaseInsensitive);
+        return interfaceName.compare(getInterfaceName(i), Qt::CaseInsensitive) == 0;
     });
     if (iter == ris.end()) {
         return nullptr;
