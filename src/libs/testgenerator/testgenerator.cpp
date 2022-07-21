@@ -48,6 +48,7 @@ using plugincommon::ModelLoader;
 namespace testgenerator {
 
 const QString resultFileName = "Results.html";
+constexpr int BOARD_CONFIG_LENGTH = 6;
 
 LaunchConfiguration::LaunchConfiguration(const QString &launchScriptPath, const QString &client, QString clientParams,
         const QString &server, QString serverParams)
@@ -59,6 +60,54 @@ LaunchConfiguration::LaunchConfiguration(const QString &launchScriptPath, const 
 {
     clientArgsParsed = clientParams.replace("$SCRIPT_PATH", scriptPath).split(" ");
     serverArgsParsed = serverParams.replace("$BIN_PATH", "hostpartition").split(" ");
+}
+
+LaunchConfigLoader::LaunchConfigLoader(const QString &launchConfigPath)
+    : configPath(launchConfigPath)
+{
+    loadConfig();
+}
+
+auto LaunchConfigLoader::getConfig() -> QMap<QString, LaunchConfiguration> &
+{
+    return configMap;
+}
+
+auto LaunchConfigLoader::loadConfig() -> bool
+{
+    QFile file(configPath);
+    if (file.open(QIODevice::ReadOnly)) {
+        QTextStream stream(&file);
+        while (!stream.atEnd()) {
+            QString line = stream.readLine();
+            QStringList conf = line.split(';');
+            if (conf.size() >= BOARD_CONFIG_LENGTH) {
+                configMap.insert(conf[0], LaunchConfiguration(conf[1], conf[2], conf[3], conf[4], conf[5]));
+            } else {
+                qDebug() << "Not enough information in boards_config.txt file for board " << conf[0];
+            }
+        }
+        file.close();
+    } else {
+        qDebug() << "Could not find file with default boards configuration at path: " << configPath;
+        return false;
+    }
+    return true;
+}
+
+auto LaunchConfigLoader::saveConfig(const QString &boardName, const LaunchConfiguration &launchConfig) -> bool
+{
+    configMap[boardName] = launchConfig;
+    QFile file(configPath);
+    if (file.open(QIODevice::WriteOnly)) {
+        QTextStream stream(&file);
+        for (const auto &key : configMap.keys()) {
+            stream << key << ';' << configMap[key].scriptPath << ";" << configMap[key].clientName << ";"
+                   << configMap[key].clientArgs << ";" << configMap[key].serverName << ";" << configMap[key].serverArgs
+                   << '\n';
+        }
+    }
+    return true;
 }
 
 TestGenerator::TestGenerator(const QString &baseDirectory)

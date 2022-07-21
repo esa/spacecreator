@@ -55,7 +55,7 @@ struct LaunchConfiguration {
 
     /**
      * @brief Default constructor of the class
-     * 
+     *
      */
     LaunchConfiguration() = default;
 
@@ -70,8 +70,49 @@ struct LaunchConfiguration {
      *
      * @return true if there was no error during creation of the test harness files
      */
-    LaunchConfiguration(const QString &launchScriptPath, const QString &client, QString clientParams, const QString &server,
-            QString serverParams);
+    LaunchConfiguration(const QString &launchScriptPath, const QString &client, QString clientParams,
+            const QString &server, QString serverParams);
+};
+
+/**
+ * @brief Class for storing launch parameters of every board
+ *
+ */
+class LaunchConfigLoader
+{
+public:
+    /**
+     * @brief Constructor of the class
+     *
+     * @param launchConfigPath path to the file with launch configuration of each board
+     *
+     */
+    LaunchConfigLoader(const QString &launchConfigPath);
+
+    /**
+     * @brief Getter for the configuration map of board names and their launch parameters
+     *
+     * @return map of board names as keys and launch parameters as values
+     */
+    auto getConfig() -> QMap<QString, LaunchConfiguration> &;
+
+    /**
+     * @brief Load launch parameters for every board and stores in configMap private field
+     *
+     * @return true if file with boards' launch configuration was successfuly opened
+     */
+    auto loadConfig() -> bool;
+
+    /**
+     * @brief Store launch parameters of every board in a CSV file specified in constructor
+     *
+     * @return true if saving configuration is successful, false otherwise
+     */
+    auto saveConfig(const QString &boardName, const LaunchConfiguration &launchConfig) -> bool;
+
+private:
+    QString configPath;
+    QMap<QString, LaunchConfiguration> configMap;
 };
 
 /**
@@ -117,7 +158,7 @@ public:
             const QString &boardName) -> QString;
 
     /**
-     * @brief Runs the tests in GDB debugger
+     * @brief Run the tests in GDB debugger
      *
      * @param interface interface under test
      * @param asn1Model ASN.1 model to be used during testing

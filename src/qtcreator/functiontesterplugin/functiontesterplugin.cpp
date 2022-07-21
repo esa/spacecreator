@@ -53,13 +53,11 @@ namespace spctr {
 
 const QString resultFileName = "Results.html";
 const QString boardsConfigFileName = "boards_config.txt";
-constexpr int BOARD_CONFIG_LENGTH = 6;
 
 FunctionTesterPlugin::FunctionTesterPlugin()
-{
-    boardsConfigPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
-            + QDir::separator() + boardsConfigFileName;
-}
+    : boardsConfigLoader(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+            + QDir::separator() + boardsConfigFileName)
+{}
 
 FunctionTesterPlugin::~FunctionTesterPlugin() { }
 
@@ -80,7 +78,7 @@ auto FunctionTesterPlugin::aboutToShutdown() -> ExtensionSystem::IPlugin::Shutdo
     return SynchronousShutdown;
 }
 
-auto FunctionTesterPlugin::testUsingDataFromCsvGui(const QString &boardName) -> void
+auto FunctionTesterPlugin::testUsingDataFromCsvGui(const QString &boardName, const LaunchConfiguration &launchConfig) -> void
 {
     ivm::IVInterface *interface = getSelectedInterface();
     if (!interface) {
@@ -99,13 +97,13 @@ auto FunctionTesterPlugin::testUsingDataFromCsvGui(const QString &boardName) -> 
     }
     float delta = setDeltaDialog();
 
-    if (boardsConfiguration[boardName].scriptPath.isEmpty()) {
+    if (launchConfig.scriptPath.isEmpty()) {
         MessageManager::write(GenMsg::msgInfo.arg("Path to the GDB file is empty"));
         return;
     }
 
     TestGenerator testGenerator(getBaseDirectory());
-    testGenerator.testUsingDataFromCsv(*interface, *csvModel, *asn1Model, delta, boardName, boardsConfiguration[boardName]);
+    testGenerator.testUsingDataFromCsv(*interface, *csvModel, *asn1Model, delta, boardName, launchConfig);
     displayResultHtml(resultFileName);
 }
 
@@ -243,7 +241,7 @@ auto FunctionTesterPlugin::selectBoardDialog() -> void
     int wndWidth = 800;
     int wndHeight = 600;
 
-    boardsConfiguration = loadBoardsConfiguration();
+    boardsConfigLoader.loadConfig();
 
     QWidget *chooseBoardWindow = new QWidget;
     chooseBoardWindow->resize(wndWidth, wndHeight);
@@ -282,7 +280,7 @@ auto FunctionTesterPlugin::selectBoardDialog() -> void
     connect(okBtn, &QPushButton::clicked, this, [=] {
         QString boardName = listWidget->currentItem()->text();
         chooseBoardWindow->close();
-        testUsingDataFromCsvGui(boardName);
+        testUsingDataFromCsvGui(boardName, boardsConfigLoader.getConfig()[boardName]);
     });
     connect(optionsBtn, &QPushButton::clicked, this, [=] {
         boardOptionsDialog(chooseBoardWindow, listWidget->currentItem()->text());
@@ -320,6 +318,8 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
 
     boardOptionsWindow->setLayout(formLayout);
 
+    QMap<QString, LaunchConfiguration> boardsConfiguration = boardsConfigLoader.getConfig();
+
     scriptPathEdit->setText(boardsConfiguration[boardName].scriptPath);
     clientNameEdit->setText(boardsConfiguration[boardName].clientName);
     clientParamsEdit->setText(boardsConfiguration[boardName].clientArgs);
@@ -333,7 +333,7 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
         boardOptionsWindow->close();
         LaunchConfiguration boardConfig(scriptPathEdit->text(),
                 clientNameEdit->text(), clientParamsEdit->text(), serverNameEdit->text(), serverParamsEdit->text());
-        saveBoardConfiguration(boardName, boardConfig);
+        boardsConfigLoader.saveConfig(boardName, boardConfig);
     });
 
     boardOptionsWindow->setWindowTitle("Board options");
@@ -348,44 +348,6 @@ auto FunctionTesterPlugin::selectScriptDialog(QWidget *parent, const QString &bo
     if (!selectedScriptPath.isEmpty()) {
         scriptPathEdit->setText(selectedScriptPath);
     }
-}
-
-auto FunctionTesterPlugin::loadBoardsConfiguration() -> QMap<QString, LaunchConfiguration>
-{
-    QMap<QString, LaunchConfiguration> boardsConfig;
-    QFile file(boardsConfigPath);
-    if (file.open(QIODevice::ReadOnly)) {
-        QTextStream stream(&file);
-        QString key, value;
-        while (!stream.atEnd()) {
-            QString line = stream.readLine();
-            QStringList conf = line.split(';');
-            if (conf.size() >= BOARD_CONFIG_LENGTH) {
-                boardsConfig.insert(conf[0], LaunchConfiguration(conf[1], conf[2], conf[3], conf[4], conf[5]));
-            } else {
-                MessageManager::write(GenMsg::msgInfo.arg("Not enough information in boards_config.txt file"));
-            }
-        }
-        file.close();
-    } else {
-        MessageManager::write(GenMsg::msgInfo.arg("Could not find file with default boards configuration at path: " + boardsConfigPath));
-    }
-    return boardsConfig;
-}
-
-auto FunctionTesterPlugin::saveBoardConfiguration(const QString &boardName, const LaunchConfiguration &launchConfig) -> bool
-{
-    boardsConfiguration[boardName] = launchConfig;
-    QFile file(boardsConfigPath);
-    if (file.open(QIODevice::WriteOnly)) {
-        QTextStream stream(&file);
-        for (const auto &key : boardsConfiguration.keys()) {
-            stream << key << ';' <<  boardsConfiguration[key].scriptPath << ";" << boardsConfiguration[key].clientName
-            << ";" << boardsConfiguration[key].clientArgs << ";" << boardsConfiguration[key].serverName
-            << ";" << boardsConfiguration[key].serverArgs << '\n';
-        }
-    }
-    return true;
 }
 
 } // namespace spctr

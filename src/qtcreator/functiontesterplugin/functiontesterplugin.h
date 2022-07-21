@@ -31,6 +31,7 @@
 namespace spctr {
 
 using testgenerator::LaunchConfiguration;
+using testgenerator::LaunchConfigLoader;
 
 class FunctionTesterPlugin : public ExtensionSystem::IPlugin
 {
@@ -47,9 +48,12 @@ public:
 
     /**
      * @brief Test the selected interface using user provided data
+     * 
+     * @param boardName name of the board to run tests on
+     * @param launchConfig tested binary launching params
      *
      */
-    auto testUsingDataFromCsvGui(const QString &boardName) -> void;
+    auto testUsingDataFromCsvGui(const QString &boardName, const LaunchConfiguration &launchConfig) -> void;
 private:
     auto addTestInterfaceOption() -> void;
     auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
@@ -63,11 +67,8 @@ private:
     auto selectBoardDialog() -> void;
     auto boardOptionsDialog(QWidget *parent, const QString &boardName) -> void;
     auto selectScriptDialog(QWidget *parent, const QString &boardName, QLineEdit *scriptPathEdit) -> void;
-    auto loadBoardsConfiguration() -> QMap<QString, LaunchConfiguration>;
-    auto saveBoardConfiguration(const QString &boardName, const LaunchConfiguration &launchConfig) -> bool;
 
-    QMap<QString, LaunchConfiguration> boardsConfiguration;
-    QString boardsConfigPath;
+    LaunchConfigLoader boardsConfigLoader;
 };
 
 }
