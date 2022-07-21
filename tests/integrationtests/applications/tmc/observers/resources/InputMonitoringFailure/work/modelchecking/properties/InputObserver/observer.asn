@@ -1,5 +1,6 @@
 Model-Datamodel DEFINITIONS ::=
 BEGIN
+--  This file was generated automatically by OpenGEODE
 IMPORTS
    MyInteger, MyIntegerBigger FROM INPUTMONITORING-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
@@ -44,17 +45,42 @@ T-Null-Record ::= SEQUENCE {}
 END
 
 
+MMI-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS MyIntegerBigger FROM INPUTMONITORING-DATAVIEW
+
+
+MyInteger FROM INPUTMONITORING-DATAVIEW
+
+ ;
+
+
+
+
+Mmi-action-y ::= MyIntegerBigger
+
+
+
+
+Mmi-trigger-z ::= MyInteger
+
+
+
+
+END
+
 
 Simulation-DataView DEFINITIONS ::=
 BEGIN
    IMPORTS
       
       --  ASN.1 modules used by thread mmi_action
-      MyInteger FROM INPUTMONITORING-DATAVIEW
+      MyIntegerBigger FROM INPUTMONITORING-DATAVIEW
       
       
       --  ASN.1 modules used by thread model_trigger
-      MyIntegerBigger FROM INPUTMONITORING-DATAVIEW
+      MyInteger FROM INPUTMONITORING-DATAVIEW
       
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
@@ -82,20 +108,20 @@ BEGIN
    
    Mmi-Event ::= CHOICE {
       msg-in CHOICE {
-         action SEQUENCE { y MyInteger}
+         action SEQUENCE { y MyIntegerBigger}
       },
       msg-out CHOICE {
-         trigger SEQUENCE { z MyIntegerBigger }
+         trigger SEQUENCE { z MyInteger }
       }
    }
    
    Model-Event ::= CHOICE {
       msg-in CHOICE {
          input-none SEQUENCE {},
-         trigger SEQUENCE { z MyIntegerBigger }
+         trigger SEQUENCE { z MyInteger}
       },
       msg-out CHOICE {
-         action SEQUENCE { y MyInteger }
+         action SEQUENCE { y MyIntegerBigger }
       }
    }
    

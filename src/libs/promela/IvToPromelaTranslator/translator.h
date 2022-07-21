@@ -170,7 +170,7 @@ private:
         auto hasObserverAttachments(
                 const QString &function, const QString &interface, const ObserverAttachment::Kind kind) -> bool;
 
-        auto getObserverAttachments(const ObserverAttachment::Kind) -> const ObserverAttachments;
+        auto getObserverAttachments(const ObserverAttachment::Kind kind) -> const ObserverAttachments;
 
         /**
          * Getter for the Promela model that is being created

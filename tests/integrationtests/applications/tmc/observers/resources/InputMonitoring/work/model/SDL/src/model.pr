@@ -8,15 +8,15 @@ process Model;
     START;
         /* CIF NEXTSTATE (320, 60), (70, 35) */
         NEXTSTATE S1;
-    /* CIF state (450, 10), (70, 35) */
+    /* CIF state (461, 43), (70, 35) */
     state S1;
-        /* CIF input (441, 65), (78, 35) */
+        /* CIF input (451, 98), (78, 35) */
         input trigger(x);
-            /* CIF task (444, 120), (72, 35) */
+            /* CIF task (454, 153), (72, 35) */
             task y := x * 2;
-            /* CIF output (443, 170), (74, 35) */
+            /* CIF output (453, 203), (74, 35) */
             output action(y);
-            /* CIF NEXTSTATE (446, 225), (70, 35) */
+            /* CIF NEXTSTATE (456, 258), (70, 35) */
             NEXTSTATE S1;
     endstate;
 endprocess Model;

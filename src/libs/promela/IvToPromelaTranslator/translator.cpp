@@ -207,14 +207,16 @@ auto IvToPromelaTranslator::Context::hasObserverAttachments(
     return getObserverAttachments(function, interface, kind).size() > 0;
 }
 
-auto IvToPromelaTranslator::Context::getObserverAttachments(const ObserverAttachment::Kind) -> const ObserverAttachments
+auto IvToPromelaTranslator::Context::getObserverAttachments(const ObserverAttachment::Kind kind)
+        -> const ObserverAttachments
 {
     ObserverAttachments result;
     for (auto functionIter = m_toObserverAttachments.begin(); functionIter != m_toObserverAttachments.end();
             ++functionIter) {
         for (auto interfaceIter = functionIter->second.begin(); interfaceIter != functionIter->second.end();
                 ++interfaceIter) {
-            std::copy(interfaceIter->second.begin(), interfaceIter->second.end(), std::back_inserter(result));
+            std::copy_if(interfaceIter->second.begin(), interfaceIter->second.end(), std::back_inserter(result),
+                    [kind](const ObserverAttachment &attachment) { return attachment.kind() == kind; });
         }
     }
     return result;
@@ -422,7 +424,7 @@ void IvToPromelaTranslator::attachInputObservers(IvToPromelaTranslator::Context 
     auto attachments = context.getObserverAttachments(
             functionName, interfaceName, IvToPromelaTranslator::ObserverAttachment::Kind::Kind_Input);
     for (const auto &attachment : attachments) {
-        sequence->appendElement(createLockAcquireStatement(functionName));
+        sequence->appendElement(createLockAcquireStatement(attachment.observer()));
 
         QList<InlineCall::Argument> arguments;
         if (!parameterType.isEmpty()) {
@@ -430,7 +432,7 @@ void IvToPromelaTranslator::attachInputObservers(IvToPromelaTranslator::Context 
         }
         sequence->appendElement(InlineCall(observerInputSignalName(attachment), arguments));
 
-        sequence->appendElement(createLockReleaseStatement(functionName));
+        sequence->appendElement(createLockReleaseStatement(attachment.observer()));
     }
 }
 
