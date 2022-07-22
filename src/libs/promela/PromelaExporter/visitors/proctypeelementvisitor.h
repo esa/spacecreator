@@ -135,6 +135,18 @@ public:
      * @param statement ElseStatement to export
      */
     void operator()(const model::ElseStatement &statement);
+    /**
+     * @brief Handle Label Statement
+     *
+     * @param label Label to export
+     */
+    void operator()(const model::Label &label);
+    /**
+     * @brief Handle Else Statement
+     *
+     * @param statement GoTo to export
+     */
+    void operator()(const model::GoTo &statement);
 
 private:
     QString expressionContentToString(const model::Expression &expression);

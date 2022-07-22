@@ -288,7 +288,7 @@ private:
     auto generateProctype(Context &context, const QString &functionName, const QString &interfaceName,
             const QString &parameterType, size_t queueSize, size_t priority, bool environment) const -> void;
     auto generateProcessMessageBlock(const QString &functionName, const QString &channelName, const QString &inlineName,
-            const QString &parameterType, const QString &parameterName, bool lock) const
+            const QString &parameterType, const QString &parameterName, const QString &exitLabel, bool lock) const
             -> std::unique_ptr<model::ProctypeElement>;
     auto generateEnvironmentProctype(Context &context, const QString &functionName, const QString &interfaceName,
             const QString &parameterType, const QString &sendInline) const -> void;

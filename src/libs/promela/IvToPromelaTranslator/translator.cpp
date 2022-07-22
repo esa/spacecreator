@@ -55,9 +55,11 @@ using promela::model::DoLoop;
 using promela::model::ElseStatement;
 using promela::model::Expression;
 using promela::model::ForLoop;
+using promela::model::GoTo;
 using promela::model::InitProctype;
 using promela::model::InlineCall;
 using promela::model::InlineDef;
+using promela::model::Label;
 using promela::model::Proctype;
 using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
@@ -502,26 +504,37 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
         loopSequence->appendElement(createLockAcquireStatement(functionName));
     }
 
-    // process all observers
-    for (const ObserverAttachment &attachment : outputObservers) {
-        const QString currentChannelName = channelNames.front();
-        channelNames.pop_front();
+    const QString mainLoopLabel =
+            QString("%1_%2_loop").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName.toLower());
 
-        loopSequence->appendElement(generateProcessMessageBlock(attachment.observer(), currentChannelName,
-                observerInputSignalName(attachment), parameterType, signalParameterName, true));
-    }
+    loopSequence->appendElement(Label(mainLoopLabel));
+
+    // the incoming message is processed by output observers first
+    // and then by sdl process
+    // however, code of message processing is generated in reverse order
+    // first the process, and then the observers
 
     // process sdl process
     {
-        const QString currentChannelName = channelNames.front();
-        channelNames.pop_front();
+        const QString currentChannelName = channelNames.back();
+        channelNames.pop_back();
 
         const QString piName = environment
                 ? QString()
                 : QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
 
         loopSequence->appendElement(generateProcessMessageBlock(
-                functionName, currentChannelName, piName, parameterType, signalParameterName, false));
+                functionName, currentChannelName, piName, parameterType, signalParameterName, mainLoopLabel, false));
+    }
+
+    // process all observers
+    for (auto iter = outputObservers.rbegin(); iter != outputObservers.rend(); ++iter) {
+        const ObserverAttachment &attachment = *iter;
+        const QString currentChannelName = channelNames.front();
+        channelNames.pop_front();
+
+        loopSequence->appendElement(generateProcessMessageBlock(attachment.observer(), currentChannelName,
+                observerInputSignalName(attachment), parameterType, signalParameterName, mainLoopLabel, true));
     }
 
     // Observers can be also attached to environment
@@ -550,7 +563,7 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
 
 std::unique_ptr<ProctypeElement> IvToPromelaTranslator::generateProcessMessageBlock(const QString &functionName,
         const QString &channelName, const QString &inlineName, const QString &parameterType,
-        const QString &parameterName, bool lock) const
+        const QString &parameterName, const QString &exitLabel, bool lock) const
 {
     QList<InlineCall::Argument> checkQueueArguments;
     checkQueueArguments.append(VariableRef(channelName));
@@ -575,6 +588,8 @@ std::unique_ptr<ProctypeElement> IvToPromelaTranslator::generateProcessMessageBl
     if (lock) {
         processMessageSeq->appendElement(createLockReleaseStatement(functionName));
     }
+
+    processMessageSeq->appendElement(GoTo(exitLabel));
 
     std::unique_ptr<Sequence> emptySeq = std::make_unique<Sequence>(Sequence::Type::NORMAL);
     emptySeq->appendElement(InlineCall("empty", checkQueueArguments));
