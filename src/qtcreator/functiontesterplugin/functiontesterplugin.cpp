@@ -214,7 +214,7 @@ auto FunctionTesterPlugin::getCurrentIvEditorCore() -> IVEditorCorePtr
 auto FunctionTesterPlugin::displayResultHtml(const QString &resultFileName) -> void
 {
     qDebug() << "Displaying html";
-    QString filepath = getBaseDirectory() + QDir::separator() + "work" + QDir::separator() + resultFileName;
+    QString filepath = getBaseDirectory() + QDir::separator() + "generated" + QDir::separator() + resultFileName;
     if (QFile::exists(filepath)) {
         QDesktopServices::openUrl(QUrl::fromLocalFile(filepath));
     } else {

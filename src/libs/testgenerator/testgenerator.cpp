@@ -77,7 +77,7 @@ auto TestGenerator::testUsingDataFromCsv(IVInterface &interface, const CsvModel 
     const QString binToRun = generatedPath + "/work/binaries/hostpartition";
     QVector<QVariant> testResults = runTests(interface, asn1Model, launchConfig);
 
-    QString resultPath = this->projectDirectory + QDir::separator() + "work" + QDir::separator() + resultFileName;
+    QString resultPath = this->generatedPath + QDir::separator() + resultFileName;
     HtmlResultExporter exporter(boardName, interface, csvModel, testResults, delta);
     exporter.exportResult(resultPath);
     return true;
@@ -250,8 +250,7 @@ auto TestGenerator::exportDvModel(DVModel *dvModel, const QString &outputFilenam
 auto TestGenerator::runTests(IVInterface &interface, Asn1Model &asn1Model, const LaunchConfiguration &launchConfig)
         -> QVector<QVariant>
 {
-    const QString binLocalization = binaryPath.left(binaryPath.lastIndexOf("/"));
-    const QByteArray rawTestData = GdbConnector::getRawTestResults(binLocalization, launchConfig.clientArgsParsed,
+    const QByteArray rawTestData = GdbConnector::getRawTestResults(binaryPath, launchConfig.clientArgsParsed,
             launchConfig.serverArgsParsed, launchConfig.clientName, launchConfig.serverName);
 
     const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
@@ -259,6 +258,8 @@ auto TestGenerator::runTests(IVInterface &interface, Asn1Model &asn1Model, const
         { "BOOLEAN", 1, 7 },
         { "REAL", 8, 0 },
     };
+
+    qDebug() << "Raw test data size: " << rawTestData.size();
 
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
             rawTestData, &interface, &asn1Model, QDataStream::LittleEndian, typeLayoutInfos);

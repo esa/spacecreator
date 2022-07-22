@@ -35,6 +35,7 @@ namespace testgenerator {
 QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, const QStringList &clientArgs,
         const QStringList &serverArgs, const QString &client, const QString &server)
 {
+    qDebug() << "Binary under test dir: " << binaryUnderTestDir;
     std::unique_ptr<Process> gdbserver = nullptr;
     if (!server.isEmpty()) {
         gdbserver = std::make_unique<Process>(server, serverArgs, binaryUnderTestDir);
