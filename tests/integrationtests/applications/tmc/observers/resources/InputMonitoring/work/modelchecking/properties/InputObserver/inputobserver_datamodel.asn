@@ -8,7 +8,7 @@ IMPORTS
    Mmi-action-y, Mmi-trigger-z FROM MMI-SUBTYPE
    PID, Mmi-Event, Model-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView;
 
-Inputobserver-States ::= ENUMERATED {waitfortrigger, done, waitforaction}
+Inputobserver-States ::= ENUMERATED {waitforaction, waitfortrigger, done}
 
 Inputobserver-Context ::= SEQUENCE {
    state Inputobserver-States,

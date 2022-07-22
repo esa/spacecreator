@@ -80,6 +80,7 @@ public:
         m_content.push_back(std::make_unique<ProctypeElement>(std::forward<Args>(args)...));
     }
 
+private:
     Type m_type;
     std::list<std::unique_ptr<ProctypeElement>> m_content;
 };

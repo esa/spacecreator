@@ -7,16 +7,12 @@ system InputObserver;
     /* CIF ENDTEXT */
     channel c
         from env to InputObserver with trigger_in,
-action_in,
-action_in,
-trigger_in;
+action_in;
     endchannel;
     block InputObserver;
         signalroute r
             from env to InputObserver with trigger_in,
-action_in,
-action_in,
-trigger_in;
+action_in;
         connect c and r;
         /* CIF PROCESS (259, 86), (150, 75) */
         process InputObserver;
@@ -35,26 +31,26 @@ trigger_in;
 received_trigger := False;
                 /* CIF NEXTSTATE (114, 424), (111, 35) */
                 NEXTSTATE WaitForTrigger;
-            /* CIF state (661, 351), (107, 35) */
-            state WaitForAction;
-                /* CIF input (669, 406), (91, 35) */
-                input action_in(y);
-                    /* CIF task (634, 461), (160, 35) */
-                    task received_action := True;
-                    /* CIF NEXTSTATE (680, 516), (70, 35) */
-                    NEXTSTATE Done;
+            /* CIF state (126, 574), (70, 35) */
+            state Done;
             endstate;
-            /* CIF state (373, 342), (111, 35) */
+            /* CIF state (372, 342), (111, 35) */
             state WaitForTrigger;
-                /* CIF input (381, 397), (95, 35) */
+                /* CIF input (380, 397), (95, 35) */
                 input trigger_in(x);
                     /* CIF task (346, 452), (164, 35) */
                     task received_trigger := True;
-                    /* CIF NEXTSTATE (375, 507), (107, 35) */
+                    /* CIF NEXTSTATE (374, 507), (107, 35) */
                     NEXTSTATE WaitForAction;
             endstate;
-            /* CIF state (126, 574), (70, 35) */
-            state Done;
+            /* CIF state (660, 351), (107, 35) */
+            state WaitForAction;
+                /* CIF input (668, 406), (91, 35) */
+                input action_in(y);
+                    /* CIF task (634, 461), (160, 35) */
+                    task received_action := True;
+                    /* CIF NEXTSTATE (679, 516), (70, 35) */
+                    NEXTSTATE Done;
             endstate;
         endprocess InputObserver;
     endblock;
