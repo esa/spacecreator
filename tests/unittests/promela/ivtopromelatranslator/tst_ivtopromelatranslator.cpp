@@ -856,6 +856,7 @@ void tst_IvToPromelaTranslator::testSimpleObservers()
     options.add(PromelaOptions::modelFunctionName, "actuator");
     options.add(PromelaOptions::observerAttachment,
             "observer:ObservedSignalKind.OUTPUT:work_in:work:<controller:>actuator");
+    options.add(PromelaOptions::observerFunctionName, "observer");
 
     std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), options);
     QVERIFY(promelaModel);
