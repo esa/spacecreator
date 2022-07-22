@@ -1,2 +1,3 @@
 add_subdirectory(SdlRegistrar)
+add_subdirectory(MscToSdlTranslator)
 add_subdirectory(SedsToSdlTranslator)
