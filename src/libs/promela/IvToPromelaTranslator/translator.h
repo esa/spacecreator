@@ -349,6 +349,7 @@ private:
 
     auto observerChannelName(const ObserverAttachment &attachment, const QString &toFunction) const -> QString;
     auto getAttachmentToFunction(const ivm::IVModel *model, const ObserverAttachment &attachment) const -> QString;
+    auto getAttachmentFromFunction(const ivm::IVModel *model, const ObserverAttachment &attachment) const -> QString;
 
     auto getFunctionLockChannelName(const QString &functionName) const -> QString;
     auto createLockAcquireStatement(const QString &functionName) const -> std::unique_ptr<model::ProctypeElement>;
@@ -357,5 +358,7 @@ private:
             const QString &parameterName) const -> std::unique_ptr<model::ProctypeElement>;
     auto createReceiveStatement(const QString &channelName, const QString &parameterType,
             const QString &parameterName) const -> std::unique_ptr<model::ProctypeElement>;
+    auto getObserverAttachments(Context &context, const QString &function, const QString &interface,
+            const ObserverAttachment::Kind kind) const -> ObserverAttachments;
 };
 }

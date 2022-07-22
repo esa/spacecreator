@@ -211,12 +211,23 @@ auto IvToPromelaTranslator::Context::getObserverAttachments(const ObserverAttach
         -> const ObserverAttachments
 {
     ObserverAttachments result;
-    for (auto functionIter = m_toObserverAttachments.begin(); functionIter != m_toObserverAttachments.end();
-            ++functionIter) {
-        for (auto interfaceIter = functionIter->second.begin(); interfaceIter != functionIter->second.end();
-                ++interfaceIter) {
-            std::copy_if(interfaceIter->second.begin(), interfaceIter->second.end(), std::back_inserter(result),
-                    [kind](const ObserverAttachment &attachment) { return attachment.kind() == kind; });
+    if (kind == ObserverAttachment::Kind::Kind_Output) {
+        for (auto functionIter = m_fromObserverAttachments.begin(); functionIter != m_fromObserverAttachments.end();
+                ++functionIter) {
+            for (auto interfaceIter = functionIter->second.begin(); interfaceIter != functionIter->second.end();
+                    ++interfaceIter) {
+                std::copy_if(interfaceIter->second.begin(), interfaceIter->second.end(), std::back_inserter(result),
+                        [kind](const ObserverAttachment &attachment) { return attachment.kind() == kind; });
+            }
+        }
+    } else {
+        for (auto functionIter = m_toObserverAttachments.begin(); functionIter != m_toObserverAttachments.end();
+                ++functionIter) {
+            for (auto interfaceIter = functionIter->second.begin(); interfaceIter != functionIter->second.end();
+                    ++interfaceIter) {
+                std::copy_if(interfaceIter->second.begin(), interfaceIter->second.end(), std::back_inserter(result),
+                        [kind](const ObserverAttachment &attachment) { return attachment.kind() == kind; });
+            }
         }
     }
     return result;
@@ -289,7 +300,6 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     Context context(promelaModel.get(), ivModel, options, asn1SubtypesDefinitions, modelFunctions, observerNames);
 
     for (const auto &info : observerAttachmentInfos) {
-        qDebug() << "Attaching  " << info;
         context.addObserverAttachment(ObserverAttachment(info));
     }
 
@@ -443,7 +453,7 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
     QString channelName = constructChannelName(functionName, interfaceName);
 
     ObserverAttachments outputObservers =
-            context.getObserverAttachments(functionName, interfaceName, ObserverAttachment::Kind::Kind_Output);
+            getObserverAttachments(context, functionName, interfaceName, ObserverAttachment::Kind::Kind_Output);
     QList<QString> channelNames;
     channelNames.append(channelName);
     for (const ObserverAttachment &attachment : outputObservers) {
@@ -1277,6 +1287,17 @@ QString IvToPromelaTranslator::getAttachmentToFunction(
     }
 }
 
+QString IvToPromelaTranslator::getAttachmentFromFunction(
+        const ivm::IVModel *model, const ObserverAttachment &attachment) const
+{
+    Q_UNUSED(model);
+    if (attachment.fromFunction().has_value()) {
+        return attachment.fromFunction().value();
+    } else {
+        throw TranslationException("getAttachmentFromFunction is not implemented");
+    }
+}
+
 QString IvToPromelaTranslator::getFunctionLockChannelName(const QString &functionName) const
 {
     return QString("%1_lock").arg(Escaper::escapePromelaIV(functionName));
@@ -1311,6 +1332,7 @@ std::unique_ptr<ProctypeElement> IvToPromelaTranslator::createProcessInlineCall(
         return std::make_unique<ProctypeElement>(InlineCall(inlineName, arguments));
     }
 }
+
 std::unique_ptr<model::ProctypeElement> IvToPromelaTranslator::createReceiveStatement(
         const QString &channelName, const QString &parameterType, const QString &parameterName) const
 {
@@ -1318,6 +1340,33 @@ std::unique_ptr<model::ProctypeElement> IvToPromelaTranslator::createReceiveStat
     QList<VariableRef> receiveParams;
     receiveParams.append(VariableRef(parameterType.isEmpty() ? QString("_") : parameterName));
     return std::make_unique<ProctypeElement>(ChannelRecv(VariableRef(channelName), receiveParams));
+}
+
+IvToPromelaTranslator::ObserverAttachments IvToPromelaTranslator::getObserverAttachments(
+        Context &context, const QString &function, const QString &interface, const ObserverAttachment::Kind kind) const
+{
+    ObserverAttachments allAttachments = context.getObserverAttachments(kind);
+    ObserverAttachments result;
+
+    if (kind == ObserverAttachment::Kind::Kind_Output) {
+        for (const ObserverAttachment &attachment : allAttachments) {
+            const QString toFunction = getAttachmentToFunction(context.ivModel(), attachment);
+            if (function.compare(toFunction, Qt::CaseInsensitive) == 0
+                    && interface.compare(attachment.interface(), Qt::CaseInsensitive) == 0) {
+                result.push_back(attachment);
+            }
+        }
+    } else {
+        for (const ObserverAttachment &attachment : allAttachments) {
+            const QString fromFunction = getAttachmentFromFunction(context.ivModel(), attachment);
+            if (function.compare(fromFunction, Qt::CaseInsensitive) == 0
+                    && interface.compare(attachment.interface(), Qt::CaseInsensitive) == 0) {
+                result.push_back(attachment);
+            }
+        }
+    }
+
+    return result;
 }
 
 }
