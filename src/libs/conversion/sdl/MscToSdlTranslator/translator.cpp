@@ -19,7 +19,10 @@
 
 #include "translator.h"
 
+#include "specialized/documenttranslator.h"
+
 #include <conversion/common/translation/exceptions.h>
+#include <msccore/mscdocument.h>
 
 using conversion::translator::TranslationException;
 using msc::MscModel;
@@ -57,6 +60,11 @@ std::set<ModelType> MscToSdlTranslator::getDependencies() const
 
 std::vector<std::unique_ptr<Model>> MscToSdlTranslator::translateMscModel(const MscModel *mscModel) const
 {
+    DocumentTranslator documentTranslator;
+    for (const auto mscDocument : mscModel->allDocuments()) {
+        documentTranslator.translateDocument(mscDocument);
+    }
+
     auto sdlModel = std::make_unique<SdlModel>();
 
     std::vector<std::unique_ptr<Model>> result;

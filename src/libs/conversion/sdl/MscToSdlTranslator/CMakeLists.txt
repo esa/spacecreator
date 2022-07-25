@@ -1,7 +1,11 @@
 project(MscToSdlTranslator VERSION 1.0.0 LANGUAGES CXX)
 
-set(SOURCES translator.cpp)
-set(INCLUDES translator.h)
+set(SOURCES     translator.cpp
+                specialized/charttranslator.cpp
+                specialized/documenttranslator.cpp)
+set(INCLUDES    translator.h
+                specialized/charttranslator.h
+                specialized/documenttranslator.h)
 
 add_library(MscToSdlTranslator STATIC)
 target_sources(MscToSdlTranslator
