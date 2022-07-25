@@ -34,8 +34,8 @@ namespace ivm {
  */
 
 struct ArchetypeObjectPrivate {
-    ArchetypeObjectPrivate(const ArchetypeObject::Type t)
-        : m_type(t)
+    ArchetypeObjectPrivate(const ArchetypeObject::Type type)
+        : m_type(type)
     {
     }
 
@@ -43,9 +43,9 @@ struct ArchetypeObjectPrivate {
 };
 
 ArchetypeObject::ArchetypeObject(
-        const QString &title, const ivm::ArchetypeObject::Type t, QObject *parent, const shared::Id &id)
+        const QString &title, const ivm::ArchetypeObject::Type type, QObject *parent, const shared::Id &id)
     : shared::VEObject(id, parent)
-    , m_privateObject(new ArchetypeObjectPrivate(t))
+    , m_privateObject(new ArchetypeObjectPrivate(type))
 {
     if (const ArchetypeObject *parentObject = qobject_cast<const ArchetypeObject *>(parent))
         setModel(parentObject->model());

@@ -46,7 +46,7 @@ public:
     };
     Q_ENUM(Type)
 
-    explicit ArchetypeObject(const QString &title, const ArchetypeObject::Type t, QObject *parent = nullptr,
+    explicit ArchetypeObject(const QString &title, const ArchetypeObject::Type type, QObject *parent = nullptr,
             const shared::Id &id = shared::InvalidId);
     virtual ~ArchetypeObject() override;
 
@@ -55,7 +55,7 @@ public:
 
     ArchetypeObject::Type type() const;
 
-    QVector<qint32> coordinates() const override; // Tutaj
+    QVector<qint32> coordinates() const override;
     void setCoordinates(const QVector<qint32> &coordinates) override;
 
     ArchetypeObject *parentObject() const override;
