@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2022 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -46,7 +46,8 @@ public:
     };
     Q_ENUM(Type)
 
-    explicit ArchetypeObject(const ArchetypeObject::Type t, QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
+    explicit ArchetypeObject(const QString &title, const ArchetypeObject::Type t, QObject *parent = nullptr,
+            const shared::Id &id = shared::InvalidId);
     virtual ~ArchetypeObject() override;
 
     QString title() const override;
@@ -81,11 +82,7 @@ public:
     QVariantList generateProperties(bool isProperty) const override;
 
 Q_SIGNALS:
-    void urlChanged(const QString &url);
     void titleChanged(const QString &title);
-    void coordinatesChanged(const QVector<qint32> &coordinates);
-    void visibilityChanged(bool visible);
-    void groupChanged(const QString &groupName);
 
 public Q_SLOTS:
     bool setTitle(const QString &title);

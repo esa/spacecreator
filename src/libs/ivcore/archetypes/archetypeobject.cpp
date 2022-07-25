@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2022 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -42,7 +42,8 @@ struct ArchetypeObjectPrivate {
     const ArchetypeObject::Type m_type;
 };
 
-ArchetypeObject::ArchetypeObject(const ivm::ArchetypeObject::Type t, QObject *parent, const shared::Id &id)
+ArchetypeObject::ArchetypeObject(
+        const QString &title, const ivm::ArchetypeObject::Type t, QObject *parent, const shared::Id &id)
     : shared::VEObject(id, parent)
     , m_privateObject(new ArchetypeObjectPrivate(t))
 {
@@ -50,6 +51,8 @@ ArchetypeObject::ArchetypeObject(const ivm::ArchetypeObject::Type t, QObject *pa
         setModel(parentObject->model());
     else if (ArchetypeModel *model = qobject_cast<ArchetypeModel *>(parent))
         setModel(model);
+
+    setTitle(title);
 }
 
 ArchetypeObject::~ArchetypeObject() {}
@@ -152,10 +155,7 @@ QVector<qint32> ArchetypeObject::coordinates() const
     return QVector<qint32>();
 }
 
-void ArchetypeObject::setCoordinates(const QVector<qint32> &coordinates)
-{
-
-}
+void ArchetypeObject::setCoordinates(const QVector<qint32> &coordinates) {}
 
 ArchetypeObject *ArchetypeObject::parentObject() const
 {
