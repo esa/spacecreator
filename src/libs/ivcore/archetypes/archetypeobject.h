@@ -48,7 +48,7 @@ public:
 
     explicit ArchetypeObject(const QString &title, const ArchetypeObject::Type type, QObject *parent = nullptr,
             const shared::Id &id = shared::InvalidId);
-    virtual ~ArchetypeObject() override;
+    ~ArchetypeObject();
 
     QString title() const override;
     QString titleUI() const override;
@@ -91,7 +91,7 @@ protected:
     QList<EntityAttribute> sortedAttributesValues(const EntityAttributes &attributes) override;
 
 private:
-    const std::unique_ptr<ArchetypeObjectPrivate> m_privateObject;
+    std::unique_ptr<ArchetypeObjectPrivate> m_privateObject;
 };
 
 }

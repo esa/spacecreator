@@ -49,7 +49,7 @@ public:
             const QString &directionString, const ParameterDirection &defaultKind = ParameterDirection::IN);
 
 private:
-    const std::unique_ptr<ParameterArchetypePrivate> m_parameterPrivate;
+    std::unique_ptr<ParameterArchetypePrivate> m_parameterPrivate;
 };
 
 }

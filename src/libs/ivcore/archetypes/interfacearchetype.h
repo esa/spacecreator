@@ -71,7 +71,7 @@ public:
             const QString &operationKindString, const OperationKind &defaultOperationKind = OperationKind::CYCLIC);
 
 private:
-    const std::unique_ptr<InterfaceArchetypePrivate> m_interfacePrivate;
+    std::unique_ptr<InterfaceArchetypePrivate> m_interfacePrivate;
 };
 
 }

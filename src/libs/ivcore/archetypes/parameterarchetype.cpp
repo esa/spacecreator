@@ -30,12 +30,12 @@ struct ParameterArchetypePrivate {
 ParameterArchetype::ParameterArchetype(const QString &title, QObject *parent, const QString &type,
         const ParameterArchetype::ParameterDirection &direction)
     : ArchetypeObject(title, ArchetypeObject::Type::ParameterArchetype, parent)
-    , m_parameterPrivate(new ParameterArchetypePrivate(direction))
+    , m_parameterPrivate(std::make_unique<ParameterArchetypePrivate>(direction))
 {
     setEntityAttribute(meta::ArchetypeProps::token(meta::ArchetypeProps::Token::type), type);
 }
 
-ParameterArchetype::~ParameterArchetype() {}
+ParameterArchetype::~ParameterArchetype() = default;
 
 QString ParameterArchetype::getType() const
 {

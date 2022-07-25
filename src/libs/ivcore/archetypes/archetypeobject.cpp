@@ -30,7 +30,7 @@ namespace ivm {
 
 /*!
  * \namespace ivm
- * \brief The Archetype model code
+ * \brief The Archetype object code
  */
 
 struct ArchetypeObjectPrivate {
@@ -39,13 +39,13 @@ struct ArchetypeObjectPrivate {
     {
     }
 
-    const ArchetypeObject::Type m_type;
+    ArchetypeObject::Type m_type;
 };
 
 ArchetypeObject::ArchetypeObject(
         const QString &title, const ivm::ArchetypeObject::Type type, QObject *parent, const shared::Id &id)
     : shared::VEObject(id, parent)
-    , m_privateObject(new ArchetypeObjectPrivate(type))
+    , m_privateObject(std::make_unique<ArchetypeObjectPrivate>(type))
 {
     if (const ArchetypeObject *parentObject = qobject_cast<const ArchetypeObject *>(parent))
         setModel(parentObject->model());
@@ -55,7 +55,7 @@ ArchetypeObject::ArchetypeObject(
     setTitle(title);
 }
 
-ArchetypeObject::~ArchetypeObject() {}
+ArchetypeObject::~ArchetypeObject() = default;
 
 QString ArchetypeObject::title() const
 {

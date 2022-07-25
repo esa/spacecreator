@@ -34,12 +34,12 @@ struct InterfaceArchetypePrivate {
 InterfaceArchetype::InterfaceArchetype(const QString &title, QObject *parent, const InterfaceType &interfaceType,
         const OperationKind &operationKind, const QString &layer)
     : ArchetypeObject(title, ArchetypeObject::Type::InterfaceArchetype, parent)
-    , m_interfacePrivate(new InterfaceArchetypePrivate(interfaceType, operationKind))
+    , m_interfacePrivate(std::make_unique<InterfaceArchetypePrivate>(interfaceType, operationKind))
 {
     setEntityAttribute(meta::ArchetypeProps::token(meta::ArchetypeProps::Token::layer), layer);
 }
 
-InterfaceArchetype::~InterfaceArchetype() {}
+InterfaceArchetype::~InterfaceArchetype() = default;
 
 InterfaceArchetype::InterfaceType InterfaceArchetype::getInterfaceType() const
 {

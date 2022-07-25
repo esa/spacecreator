@@ -26,11 +26,11 @@ struct FunctionArchetypePrivate {
 
 FunctionArchetype::FunctionArchetype(const QString &title, QObject *parent)
     : ArchetypeObject(title, ArchetypeObject::Type::FunctionArchetype, parent)
-    , m_functionPrivate(new FunctionArchetypePrivate())
+    , m_functionPrivate(std::make_unique<FunctionArchetypePrivate>())
 {
 }
 
-FunctionArchetype::~FunctionArchetype() {}
+FunctionArchetype::~FunctionArchetype() = default;
 
 QVector<InterfaceArchetype *> FunctionArchetype::getInterfaces() const
 {

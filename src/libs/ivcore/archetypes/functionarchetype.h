@@ -36,7 +36,7 @@ public:
     void removeInterface(InterfaceArchetype *interfaceArchetype);
 
 private:
-    const std::unique_ptr<FunctionArchetypePrivate> m_functionPrivate;
+    std::unique_ptr<FunctionArchetypePrivate> m_functionPrivate;
 };
 
 }

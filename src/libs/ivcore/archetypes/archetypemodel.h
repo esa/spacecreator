@@ -51,7 +51,7 @@ Q_SIGNALS:
     void rootObjectChanged(shared::Id rootId);
 
 private:
-    const std::unique_ptr<ArchetypeModelPrivate> m_privateModel;
+    std::unique_ptr<ArchetypeModelPrivate> m_privateModel;
 };
 
 }

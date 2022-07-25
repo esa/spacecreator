@@ -30,11 +30,11 @@ struct ArchetypeModelPrivate {
 
 ArchetypeModel::ArchetypeModel(QObject *parent)
     : shared::VEModel(parent)
-    , m_privateModel(new ArchetypeModelPrivate)
+    , m_privateModel(std::make_unique<ArchetypeModelPrivate>())
 {
 }
 
-ArchetypeModel::~ArchetypeModel() {}
+ArchetypeModel::~ArchetypeModel() = default;
 
 void ArchetypeModel::setRootObject(shared::Id rootId)
 {
@@ -62,8 +62,9 @@ ArchetypeObject *ArchetypeModel::getObject(const shared::Id &id) const
 
 ArchetypeObject *ArchetypeModel::getObjectByName(const QString &name, ArchetypeObject::Type type, Qt::CaseSensitivity caseSensitivity) const
 {
-    if (name.isEmpty())
+    if (name.isEmpty()){
         return nullptr;
+    }
 
     for (auto object : objects()) {
         if (auto obj = qobject_cast<ivm::ArchetypeObject *>(object)) {
