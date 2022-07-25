@@ -41,7 +41,7 @@ QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, co
         gdbserver = std::make_unique<Process>(server, serverArgs, binaryUnderTestDir);
     }
     if (!client.isEmpty()) {
-        Process gdbclient(client, clientArgs, QDir::currentPath());
+        Process gdbclient(client, clientArgs, binaryUnderTestDir);
 
         QProcess *const clientProcess = gdbclient.get();
         if (clientProcess->state() != QProcess::Running) {
