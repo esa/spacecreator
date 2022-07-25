@@ -60,17 +60,19 @@ ArchetypeObject *ArchetypeModel::getObject(const shared::Id &id) const
     return qobject_cast<ArchetypeObject *>(shared::VEModel::getObject(id));
 }
 
-ArchetypeObject *ArchetypeModel::getObjectByName(const QString &name, ArchetypeObject::Type type, Qt::CaseSensitivity caseSensitivity) const
+ArchetypeObject *ArchetypeModel::getObjectByName(
+        const QString &name, ArchetypeObject::Type type, Qt::CaseSensitivity caseSensitivity) const
 {
-    if (name.isEmpty()){
+    if (name.isEmpty()) {
         return nullptr;
     }
 
     for (auto object : objects()) {
         if (auto obj = qobject_cast<ivm::ArchetypeObject *>(object)) {
             if ((type == ArchetypeObject::Type::Unknown || type == obj->type())
-                    && obj->title().compare(name, caseSensitivity) == 0)
+                    && obj->title().compare(name, caseSensitivity) == 0) {
                 return obj;
+            }
         }
     }
     return nullptr;

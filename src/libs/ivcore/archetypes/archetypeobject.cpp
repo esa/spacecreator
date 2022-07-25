@@ -47,10 +47,11 @@ ArchetypeObject::ArchetypeObject(
     : shared::VEObject(id, parent)
     , m_privateObject(std::make_unique<ArchetypeObjectPrivate>(type))
 {
-    if (const ArchetypeObject *parentObject = qobject_cast<const ArchetypeObject *>(parent))
+    if (const ArchetypeObject *parentObject = qobject_cast<const ArchetypeObject *>(parent)) {
         setModel(parentObject->model());
-    else if (ArchetypeModel *model = qobject_cast<ArchetypeModel *>(parent))
+    } else if (ArchetypeModel *model = qobject_cast<ArchetypeModel *>(parent)) {
         setModel(model);
+    }
 
     setTitle(title);
 }
