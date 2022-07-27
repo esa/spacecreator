@@ -144,7 +144,7 @@ auto IvGenerator::makeStartTestIface(ivm::IVFunction *const testDriverFunction) 
 
     auto *const iface = ivm::IVInterface::createIface(ci);
     iface->setEntityAttribute("period", "999");
-    iface->setEntityAttribute("stack_size", "50");
+    iface->setEntityAttribute("stack_size", "5000");
     iface->setEntityAttribute("priority", "1");
     iface->setEntityAttribute("dispatch_offset", "0");
     iface->setEntityAttribute("wcet", "0");

@@ -22,6 +22,9 @@
 #include "process.h"
 
 #include <QMap>
+#include <QStandardPaths>
+#include <QThread>
+#include <cstdio>
 #include <filesystem>
 #include <fstream>
 #include <memory>
@@ -35,34 +38,47 @@ namespace testgenerator {
 QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, const QStringList &clientArgs,
         const QStringList &serverArgs, const QString &client, const QString &server)
 {
-    qDebug() << "Binary under test dir: " << binaryUnderTestDir;
-    std::unique_ptr<Process> gdbserver = nullptr;
-    if (!server.isEmpty()) {
-        gdbserver = std::make_unique<Process>(server, serverArgs, binaryUnderTestDir);
+    if (server.isEmpty()) {
+        throw std::invalid_argument("Debugging server program name shall not be empty");
     }
-    if (!client.isEmpty()) {
-        Process gdbclient(client, clientArgs, binaryUnderTestDir);
-
-        QProcess *const clientProcess = gdbclient.get();
-        if (clientProcess->state() != QProcess::Running) {
-            throw std::runtime_error("client is not running");
-        }
-        clientProcess->waitForFinished();
-
-        const QString errorLogFilename = "gdbclient-errors.log";
-        dumpProcessErrorsToFile(*clientProcess, errorLogFilename);
-
-        const QString outStr = clientProcess->readAllStandardOutput();
-        if (outStr.isEmpty()) {
-            throw std::runtime_error(
-                    QString("gdb client returned errors. Errors dumped to %1").arg(errorLogFilename).toStdString());
-        }
-        const QString srecData = splitAndExtractSrecData(outStr);
-
-        return stringToByteArray(srecData);
-    } else {
+    if (client.isEmpty()) {
         throw std::invalid_argument("Debugging client program name shall not be empty");
     }
+
+    const QString errorLogFilename = "gdbclient-errors.log";
+
+    QString cmdServer = "cd " + binaryUnderTestDir + "; " + server + " " + serverArgs.join(" ") + " &";
+    QString cmdClient = "cd " + binaryUnderTestDir + "; " + client + " " + clientArgs.join(" ");
+    cmdClient += " 2> " + errorLogFilename;
+
+    qDebug() << "Server command: " << cmdServer;
+    qDebug() << "Client command: " << cmdClient;
+    qDebug() << "Binary under test dir: " << binaryUnderTestDir;
+
+    const QString outputFilePath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+            + QDir::separator() + "gdboutput.txt";
+    qDebug() << "Output file path: " << outputFilePath;
+
+    std::system(cmdServer.toStdString().c_str());
+    std::system(cmdClient.toStdString().c_str());
+    std::system(("killall " + server).toStdString().c_str());
+
+    QString outStr;
+    QFile file(outputFilePath);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        outStr = QString(file.readAll());
+        file.remove();
+    }
+
+    if (outStr.isEmpty()) {
+        throw std::runtime_error(
+                QString("gdb client returned errors. Errors dumped to %1").arg(errorLogFilename).toStdString());
+    }
+
+    const QString srecData = splitAndExtractSrecData(outStr, "\n");
+    qDebug() << "srecData: " << srecData;
+
+    return stringToByteArray(srecData);
 }
 
 QString GdbConnector::splitAndExtractSrecData(const QString &packetizedData, const QString &delimeter)
@@ -78,6 +94,8 @@ QString GdbConnector::splitAndExtractSrecData(const QString &packetizedData, con
     const int recordStartByteLength = 1; // first byte contains start character and record type
     const int byteCount = 1;
     const int checksumLength = 1;
+
+    qDebug() << "packetizedData: " << packetizedData;
 
     QString rawData;
     rawData.reserve(packetizedData.size());
