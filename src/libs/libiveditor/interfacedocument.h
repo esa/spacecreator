@@ -157,6 +157,7 @@ private:
     bool loadImpl(const QString &path);
     QString getComponentName(const QStringList &exportNames);
     bool loadComponentModel(ivm::IVModel *model, const QString &path);
+    void loadArchetypes();
 
     bool reloadComponentModel();
     bool reloadSharedTypeModel();

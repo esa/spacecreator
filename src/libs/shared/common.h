@@ -141,6 +141,16 @@ QString componentsLibraryPath();
 QString sharedTypesPath();
 
 /*!
+ * Returns starting string of archetype library file
+ */
+QString startingArchetypesFileString();
+
+/*!
+ * Returns path to archetype library directory ~/.local/share/QtProject/QtCreator/archetypes/
+ */
+QString interfaceCustomArchetypesDirectoryPath();
+
+/*!
  * Returns path to user defined attributes set in TASTE_DEFAULT_ATTRIBUTES_PATH
  * environment variable otherwise points to default, for ex. ~/.local/share/ESA/IV Editor/default_attributes.xml
  */

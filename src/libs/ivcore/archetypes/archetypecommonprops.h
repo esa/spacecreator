@@ -32,7 +32,7 @@ public:
     enum class Token
     {
         Unknown = 0,
-        InterfaceView,
+        ArchetypeLibrary,
 
         // tags:
         ParameterArchetype,
@@ -43,6 +43,8 @@ public:
         name,
         value,
         type,
+        interfaceType,
+        kind,
         direction,
         layer
     };

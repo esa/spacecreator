@@ -212,6 +212,7 @@ target_link_libraries(${LIB_NAME}
     ${QT_SVGWIDGETS}
     ${QT_WIDGETS}
     ${QT_XML}
+    "stdc++fs"
     )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

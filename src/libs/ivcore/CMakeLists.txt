@@ -60,6 +60,8 @@ target_sources(${LIB_NAME} PRIVATE
     archetypes/functionarchetype.cpp
     archetypes/archetypecommonprops.h
     archetypes/archetypecommonprops.cpp
+    archetypes/archetypexmlreader.h
+    archetypes/archetypexmlreader.cpp
     )
 
 target_include_directories(${LIB_NAME}

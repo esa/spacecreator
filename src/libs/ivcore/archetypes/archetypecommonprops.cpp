@@ -23,7 +23,7 @@ namespace ivm {
 namespace meta {
 
 const QHash<QString, ArchetypeProps::Token> ArchetypeProps::TokensByName = {
-    { "InterfaceView", Token::InterfaceView },
+    { "ArchetypeLibrary", Token::ArchetypeLibrary },
 
     // tags:
     { "ParameterArchetype", Token::ParameterArchetype },
@@ -34,6 +34,8 @@ const QHash<QString, ArchetypeProps::Token> ArchetypeProps::TokensByName = {
     { "name", Token::name },
     { "value", Token::value },
     { "type", Token::type },
+    { "interfaceType", Token::interfaceType },
+    { "kind", Token::kind },
     { "direction", Token::direction },
     { "layer", Token::layer },
 };

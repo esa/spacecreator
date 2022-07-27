@@ -18,6 +18,10 @@
 #include "interfacedocument.h"
 
 #include "actionsbar.h"
+#include "archetypes/archetypemodel.h"
+#include "archetypes/archetypexmlreader.h"
+#include "archetypes/functionarchetype.h"
+#include "archetypes/interfacearchetype.h"
 #include "asn1modelstorage.h"
 #include "asn1systemchecks.h"
 #include "colors/colormanagerdialog.h"
@@ -61,6 +65,7 @@
 #include <QUndoStack>
 #include <QVBoxLayout>
 #include <algorithm>
+#include <filesystem>
 
 namespace ive {
 
@@ -81,6 +86,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     IVExporter *exporter { nullptr };
     ivm::IVModel *layersModel { nullptr };
     IVVisualizationModelBase *layerSelect { nullptr };
+    ivm::ArchetypeModel *archetypeModel { nullptr };
 
     Asn1Acn::Asn1SystemChecks *asnCheck { nullptr };
     ivm::AbstractSystemChecks *ivCheck { nullptr };
@@ -108,6 +114,7 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     d->sharedModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
     d->objectsModel = new ivm::IVModel(d->dynPropConfig, d->sharedModel, this);
     d->layersModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
+    d->archetypeModel = new ivm::ArchetypeModel(this);
 }
 
 InterfaceDocument::~InterfaceDocument()
@@ -249,7 +256,7 @@ void InterfaceDocument::updateLayersModel() const
     if (layersModel() != nullptr) {
         auto layers = layersModel()->allObjectsByType<ivm::IVConnectionLayerType>();
         bool isDefaultPresent = false;
-        for (auto * const layer : layers) {
+        for (auto *const layer : layers) {
             if (layer->title() == ivm::IVConnectionLayerType::DefaultLayerName) {
                 isDefaultPresent = true;
             }
@@ -898,6 +905,8 @@ bool InterfaceDocument::loadImpl(const QString &path)
     ivm::IVObject::sortObjectListByTitle(layers);
     setLayers(layers);
 
+    loadArchetypes();
+
     const QVariantMap metadata = parser.metaData();
     QVariantMap::const_iterator i = metadata.constFind("asn1file");
     while (i != metadata.end() && i.key() == "asn1file") {
@@ -908,6 +917,31 @@ bool InterfaceDocument::loadImpl(const QString &path)
     shared::ErrorHub::clearCurrentFile();
 
     return true;
+}
+
+void InterfaceDocument::loadArchetypes()
+{
+    QVector<QString> archetypeLibraryPaths;
+
+    for (const auto &entry :
+            std::filesystem::directory_iterator(shared::interfaceCustomArchetypesDirectoryPath().toStdString())) {
+        QString path = QString(entry.path().c_str());
+        QString fileName = QString(entry.path().filename().c_str());
+        if (fileName.startsWith("archetype_library_") && fileName.endsWith(".xml")) {
+            archetypeLibraryPaths.append(path);
+        }
+    }
+
+    ivm::ArchetypeXMLReader archetypeParser;
+    d->archetypeModel->clear();
+
+    for (const auto &path : archetypeLibraryPaths) {
+        if (!archetypeParser.readFile(path)) {
+            shared::ErrorHub::addError(shared::ErrorItem::Error, archetypeParser.errorString(), path);
+            shared::ErrorHub::clearCurrentFile();
+        }
+        d->archetypeModel->addObjects(archetypeParser.parsedObjects());
+    }
 }
 
 void InterfaceDocument::showNIYGUI(const QString &title)
