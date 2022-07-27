@@ -27,8 +27,14 @@ using msc::MscChart;
 using msc::MscCondition;
 using msc::MscEntity;
 using msc::MscInstanceEvent;
+using sdl::SdlModel;
 
 namespace conversion::sdl::translator {
+
+ChartTranslator::ChartTranslator(SdlModel *sdlModel)
+    : m_neverObserverTranslator(sdlModel)
+{
+}
 
 void ChartTranslator::translateChart(const MscChart *mscChart) const
 {
@@ -36,11 +42,9 @@ void ChartTranslator::translateChart(const MscChart *mscChart) const
 
     const auto observerType = getObserverType(mscEvents);
     switch (observerType) {
-    case ObserverType::Never: {
-        auto errorMessage = QString("Cannot translate chart '%1' - \"never\" observers are not yet implemented")
-                                    .arg(mscChart->name());
-        throw TranslationException(std::move(errorMessage));
-    } break;
+    case ObserverType::Never:
+        m_neverObserverTranslator.createObserver(mscChart);
+        break;
     case ObserverType::When: {
         auto errorMessage = QString("Cannot translate chart '%1' - \"when\" observers are not yet implemented")
                                     .arg(mscChart->name());
