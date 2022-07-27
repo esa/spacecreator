@@ -294,11 +294,6 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
     QMap<QString, QString> uniqueAsn1Files;
     for (const QString &ivFunction : modelFunctions) {
         const ProcessMetadata &processMetadata = allSdlFiles.at(ivFunction);
-        for (const QFileInfo &fileInfo : allSdlFiles.at(ivFunction).getContext()) {
-            if (fileInfo.exists()) {
-                uniqueAsn1Files.insert(fileInfo.fileName(), fileInfo.absoluteFilePath());
-            }
-        }
         const QFileInfo outputFile = outputFilepath(processMetadata.getName().toLower() + ".pml");
 
         SdlToPromelaConverter sdl2Promela;

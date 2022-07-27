@@ -387,26 +387,9 @@ void IvToPromelaTranslator::initializeFunction(Sequence &sequence, const QString
 
 void IvToPromelaTranslator::generateInitProctype(Context &context) const
 {
-    QSet<QString> functionsWithContextVariables;
-
-    QVector<IVFunction *> ivFunctionList = context.ivModel()->allObjectsByType<IVFunction>();
-
-    for (IVFunction *ivFunction : ivFunctionList) {
-        if (containsContextVariables(ivFunction->contextParams())) {
-            const QString functionName = ivFunction->property("name").toString();
-            functionsWithContextVariables.insert(functionName);
-        }
-    }
-
     Sequence sequence(Sequence::Type::ATOMIC);
 
-    for (const QString &functionName : context.modelFunctions()) {
-        if (functionsWithContextVariables.contains(functionName)) {
-            const QString ctxtInitInline =
-                    QString("%1_ctxt_init").arg(Escaper::escapePromelaIV(functionName).toLower());
-            sequence.appendElement(InlineCall(ctxtInitInline, {}));
-        }
-    }
+    sequence.appendElement(InlineCall("global_dataview_init", {}));
 
     for (const QString &functionName : context.modelFunctions()) {
         initializeFunction(sequence, functionName);
@@ -1076,13 +1059,6 @@ void IvToPromelaTranslator::createPromelaObjectsForObservers(Context &context) c
 
         context.model()->addInlineDef(std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence)));
     }
-}
-
-bool IvToPromelaTranslator::containsContextVariables(const QVector<shared::ContextParameter> &parameters) const
-{
-    return std::any_of(parameters.begin(), parameters.end(), [](const shared::ContextParameter &param) {
-        return param.paramType() == shared::BasicParameter::Type::Other;
-    });
 }
 
 QString IvToPromelaTranslator::constructChannelName(const QString &functionName, const QString &interfaceName) const

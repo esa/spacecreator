@@ -50,6 +50,11 @@ Asn1NodeVisitor::Asn1NodeVisitor(PromelaModel &promelaModel, bool enhancedSpinSu
 {
 }
 
+const QVector<QString> Asn1NodeVisitor::getInitInlineNames() const
+{
+    return m_initInlines;
+}
+
 void Asn1NodeVisitor::visit(const Definitions &defs)
 {
     for (const std::unique_ptr<TypeAssignment> &type : defs.types()) {
@@ -95,6 +100,7 @@ void Asn1NodeVisitor::visit(const ValueAssignment &value)
 
         m_promelaModel.addInlineDef(
                 std::make_unique<InlineDef>(initInlineName, initInlineArgs, std::move(initInlineSequence)));
+        m_initInlines.append(initInlineName);
     }
 }
 

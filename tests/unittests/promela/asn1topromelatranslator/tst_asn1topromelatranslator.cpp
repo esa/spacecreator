@@ -214,6 +214,12 @@ void tst_Asn1ToPromelaTranslator::testBasicTypes()
         const auto skip = findProctypeElement<Skip>(sequence, 0);
         QVERIFY(skip != nullptr);
     }
+
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "global_dataview_init");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 0);
+    }
 }
 
 void tst_Asn1ToPromelaTranslator::testEnumerated()

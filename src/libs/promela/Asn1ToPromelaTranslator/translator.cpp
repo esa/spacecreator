@@ -35,7 +35,10 @@ using conversion::ModelType;
 using conversion::Options;
 using conversion::promela::PromelaOptions;
 
+using promela::model::InlineCall;
+using promela::model::InlineDef;
 using promela::model::PromelaModel;
+using promela::model::Skip;
 
 namespace promela::translator {
 std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
@@ -76,14 +79,18 @@ std::set<ModelType> Asn1ToPromelaTranslator::getDependencies() const
 std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
         const Asn1Model *model, bool enhancedSpinSupport) const
 {
+    QVector<QString> initInlineNames;
     std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
     for (const std::unique_ptr<File> &file : model->data()) {
         Asn1NodeVisitor visitor(*promelaModel, enhancedSpinSupport);
         visitor.visit(*file);
+        initInlineNames.append(visitor.getInitInlineNames());
     }
 
     PromelaTypeSorter typeSorter;
     typeSorter.sortTypeDefinitions(*promelaModel);
+
+    createDataviewInitInline(*promelaModel, initInlineNames);
 
     std::vector<std::unique_ptr<Model>> result;
     result.push_back(std::move(promelaModel));
@@ -111,5 +118,24 @@ std::vector<std::unique_ptr<conversion::Model>> Asn1ToPromelaTranslator::generat
     std::vector<std::unique_ptr<Model>> result;
     result.push_back(std::move(promelaModel));
     return result;
+}
+
+void Asn1ToPromelaTranslator::createDataviewInitInline(
+        promela::model::PromelaModel &model, const QVector<QString> &initInlineNames) const
+{
+    promela::model::Sequence initSequence(promela::model::Sequence::Type::D_STEP);
+
+    if (initInlineNames.isEmpty()) {
+        initSequence.appendElement(Skip());
+    } else {
+        for (const QString &inlineName : initInlineNames) {
+            initSequence.appendElement(InlineCall(inlineName, {}));
+        }
+    }
+
+    std::unique_ptr<InlineDef> dataviewInitInline =
+            std::make_unique<InlineDef>("global_dataview_init", QList<QString>(), std::move(initSequence));
+
+    model.addInlineDef(std::move(dataviewInitInline));
 }
 }
