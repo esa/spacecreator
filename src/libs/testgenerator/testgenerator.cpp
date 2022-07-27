@@ -55,9 +55,9 @@ TestGenerator::TestGenerator(const QString &baseDirectory)
 }
 
 auto TestGenerator::testUsingDataFromCsv(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model,
-        const float delta, const QString &boardName, const LaunchConfiguration &launchConfig) -> bool
+        const float delta, const LaunchConfiguration &launchConfig) -> bool
 {
-    QString testedFunctionName = prepareTestHarness(interface, csvModel, asn1Model, boardName);
+    QString testedFunctionName = prepareTestHarness(interface, csvModel, asn1Model, launchConfig.boardName);
     if (testedFunctionName.isEmpty()) {
         qWarning() << "Tested function name is empty";
         return false;
@@ -78,7 +78,7 @@ auto TestGenerator::testUsingDataFromCsv(IVInterface &interface, const CsvModel 
     QVector<QVariant> testResults = runTests(interface, asn1Model, launchConfig);
 
     QString resultPath = this->generatedPath + QDir::separator() + resultFileName;
-    HtmlResultExporter exporter(boardName, interface, csvModel, testResults, delta);
+    HtmlResultExporter exporter(launchConfig.boardName, interface, csvModel, testResults, delta);
     exporter.exportResult(resultPath);
     return true;
 }
@@ -263,7 +263,7 @@ auto TestGenerator::runTests(IVInterface &interface, Asn1Model &asn1Model, const
     qDebug() << "Raw test data: " << rawTestData;
 
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
-            rawTestData, &interface, &asn1Model, QDataStream::BigEndian, typeLayoutInfos);
+            rawTestData, &interface, &asn1Model, launchConfig.endianess, typeLayoutInfos);
 
     for (const auto &readValue : readTestData) {
         qDebug() << readValue;

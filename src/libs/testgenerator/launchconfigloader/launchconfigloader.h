@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <QDataStream>
 #include <QTextStream>
 
 namespace testgenerator {
@@ -28,6 +29,8 @@ namespace testgenerator {
  *
  */
 struct LaunchConfiguration {
+    /** name of the board */
+    QString boardName;
     /** path to the GDB script for launching the tested binary */
     QString scriptPath;
     /** debugger client to use for testing binary */
@@ -42,6 +45,8 @@ struct LaunchConfiguration {
     QStringList clientArgsParsed;
     /** arguments for debugger server converted to list with parsed variables */
     QStringList serverArgsParsed;
+    /** endianess of the board architecture */
+    QDataStream::ByteOrder endianess;
 
     /**
      * @brief Default constructor of the class
@@ -52,16 +57,17 @@ struct LaunchConfiguration {
     /**
      * @brief Constructor of the class
      *
+     * @param name name of the board
      * @param launchScriptPath path to the GDB script for launching the tested binary
      * @param client name of the debugger client to use for testing binary
      * @param clientParams arguments for debugger client
      * @param server name of the debugger server to use for testing binary
      * @param serverParams arguments for debugger server
      *
-     * @return true if there was no error during creation of the test harness files
+     * @return true if there was no error during creation of the test harness files and false otherwise
      */
-    LaunchConfiguration(const QString &launchScriptPath, const QString &client, QString clientParams,
-            const QString &server, QString serverParams);
+    LaunchConfiguration(const QString &name, const QString &launchScriptPath, const QString &client,
+            QString clientParams, const QString &server, QString serverParams);
 };
 
 /**
@@ -96,9 +102,11 @@ public:
     /**
      * @brief Store launch parameters of every board in a CSV file specified in constructor
      *
+     * @param launchConfig a board configuration to save
+     *
      * @return true if saving configuration is successful, false otherwise
      */
-    auto saveConfig(const QString &boardName, const LaunchConfiguration &launchConfig) -> bool;
+    auto saveConfig(const LaunchConfiguration &launchConfig) -> bool;
 
 private:
     QString configPath;

@@ -129,8 +129,8 @@ void tst_testgenerator::testResultHtmlData()
 
 void tst_testgenerator::testParsingBoardSettings()
 {
-    LaunchConfiguration config(
-            "/path/to/gdb/script", "gdb", "dummyClientParam1 $SCRIPT_PATH", "gdbserver", "dummyServerParam1 $BIN_PATH");
+    LaunchConfiguration config("x86 Linux CPP", "/path/to/gdb/script", "gdb", "dummyClientParam1 $SCRIPT_PATH",
+            "gdbserver", "dummyServerParam1 $BIN_PATH");
     QCOMPARE(config.clientArgsParsed, QStringList({ "dummyClientParam1", "/path/to/gdb/script" }));
     QCOMPARE(config.serverArgsParsed, QStringList({ "dummyServerParam1", "hostpartition" }));
 }
@@ -139,9 +139,9 @@ void tst_testgenerator::testStoringBoardsConfig()
 {
     const QString configPath = "boards_config.txt";
     LaunchConfigLoader configLoader(configPath);
-    LaunchConfiguration configToSave(
-            "/path/to/script", "gdb", "dummyParam1 dummyParam2", "gdbserver", "dummyParam3 dummyParam4");
-    configLoader.saveConfig("x86 Linux CPP", configToSave);
+    LaunchConfiguration configToSave("x86 Linux CPP", "/path/to/script", "gdb", "dummyParam1 dummyParam2", "gdbserver",
+            "dummyParam3 dummyParam4");
+    configLoader.saveConfig(configToSave);
     configLoader.loadConfig();
     auto boardsConfig = configLoader.getConfig();
     LaunchConfiguration readConfig = boardsConfig["x86 Linux CPP"];

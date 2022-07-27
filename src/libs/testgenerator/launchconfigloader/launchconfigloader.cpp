@@ -25,15 +25,21 @@
 namespace testgenerator {
 
 constexpr int BOARD_CONFIG_LENGTH = 6;
+const QMap<QString, QDataStream::ByteOrder> endianessMap = {
+    { "x86 Linux CPP", QDataStream::LittleEndian },
+    { "GR712RC RTEMS6 SMP QDP", QDataStream::BigEndian },
+};
 
-LaunchConfiguration::LaunchConfiguration(const QString &launchScriptPath, const QString &client, QString clientParams,
-        const QString &server, QString serverParams)
-    : scriptPath(launchScriptPath)
+LaunchConfiguration::LaunchConfiguration(const QString &name, const QString &launchScriptPath, const QString &client,
+        QString clientParams, const QString &server, QString serverParams)
+    : boardName(name)
+    , scriptPath(launchScriptPath)
     , clientName(client)
     , clientArgs(clientParams)
     , serverName(server)
     , serverArgs(serverParams)
 {
+    endianess = endianessMap[boardName];
     clientArgsParsed = clientParams.replace("$SCRIPT_PATH", scriptPath).split(" ");
     serverArgsParsed = serverParams.replace("$BIN_PATH", "hostpartition").split(" ");
 }
@@ -57,7 +63,7 @@ auto LaunchConfigLoader::loadConfig() -> bool
             QString line = stream.readLine();
             QStringList conf = line.split(';');
             if (conf.size() >= BOARD_CONFIG_LENGTH) {
-                configMap.insert(conf[0], LaunchConfiguration(conf[1], conf[2], conf[3], conf[4], conf[5]));
+                configMap.insert(conf[0], LaunchConfiguration(conf[0], conf[1], conf[2], conf[3], conf[4], conf[5]));
             } else {
                 qDebug() << "Not enough information in boards_config.txt file for board " << conf[0];
             }
@@ -70,9 +76,9 @@ auto LaunchConfigLoader::loadConfig() -> bool
     return true;
 }
 
-auto LaunchConfigLoader::saveConfig(const QString &boardName, const LaunchConfiguration &launchConfig) -> bool
+auto LaunchConfigLoader::saveConfig(const LaunchConfiguration &launchConfig) -> bool
 {
-    configMap[boardName] = launchConfig;
+    configMap[launchConfig.boardName] = launchConfig;
     QFile file(configPath);
     if (file.open(QIODevice::WriteOnly)) {
         QTextStream stream(&file);

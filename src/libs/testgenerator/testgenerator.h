@@ -55,13 +55,12 @@ public:
      * @param csvModel the CSV data with test vectors
      * @param asn1Model ASN.1 model to be used during testing
      * @param delta maximum allowed absolute error
-     * @param boardName name of the board the tests are run on
      * @param launchConfig tested binary launching params
      *
      * @return true if there was no error during execution of the testing procedure nad false otherwise
      */
     auto testUsingDataFromCsv(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model, const float delta,
-            const QString &boardName, const LaunchConfiguration &launchConfig) -> bool;
+            const LaunchConfiguration &launchConfig) -> bool;
 
     /**
      * @brief Prepare test harness files to be used for compilation of tests

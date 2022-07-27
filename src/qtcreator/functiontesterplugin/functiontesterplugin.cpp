@@ -78,7 +78,7 @@ auto FunctionTesterPlugin::aboutToShutdown() -> ExtensionSystem::IPlugin::Shutdo
     return SynchronousShutdown;
 }
 
-auto FunctionTesterPlugin::testUsingDataFromCsvGui(const QString &boardName, const LaunchConfiguration &launchConfig) -> void
+auto FunctionTesterPlugin::testUsingDataFromCsvGui(const LaunchConfiguration &launchConfig) -> void
 {
     ivm::IVInterface *interface = getSelectedInterface();
     if (!interface) {
@@ -103,7 +103,7 @@ auto FunctionTesterPlugin::testUsingDataFromCsvGui(const QString &boardName, con
     }
 
     TestGenerator testGenerator(getBaseDirectory());
-    testGenerator.testUsingDataFromCsv(*interface, *csvModel, *asn1Model, delta, boardName, launchConfig);
+    testGenerator.testUsingDataFromCsv(*interface, *csvModel, *asn1Model, delta, launchConfig);
     displayResultHtml(resultFileName);
 }
 
@@ -280,7 +280,7 @@ auto FunctionTesterPlugin::selectBoardDialog() -> void
     connect(okBtn, &QPushButton::clicked, this, [=] {
         QString boardName = listWidget->currentItem()->text();
         chooseBoardWindow->close();
-        testUsingDataFromCsvGui(boardName, boardsConfigLoader.getConfig()[boardName]);
+        testUsingDataFromCsvGui(boardsConfigLoader.getConfig()[boardName]);
     });
     connect(optionsBtn, &QPushButton::clicked, this, [=] {
         boardOptionsDialog(chooseBoardWindow, listWidget->currentItem()->text());
@@ -331,9 +331,9 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
     });
     connect(okBtn, &QPushButton::clicked, this, [=] {
         boardOptionsWindow->close();
-        LaunchConfiguration boardConfig(scriptPathEdit->text(),
+        LaunchConfiguration boardConfig(boardName, scriptPathEdit->text(),
                 clientNameEdit->text(), clientParamsEdit->text(), serverNameEdit->text(), serverParamsEdit->text());
-        boardsConfigLoader.saveConfig(boardName, boardConfig);
+        boardsConfigLoader.saveConfig(boardConfig);
     });
 
     boardOptionsWindow->setWindowTitle("Board options");

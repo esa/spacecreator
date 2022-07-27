@@ -49,11 +49,10 @@ public:
     /**
      * @brief Test the selected interface using user provided data
      * 
-     * @param boardName name of the board to run tests on
      * @param launchConfig tested binary launching params
      *
      */
-    auto testUsingDataFromCsvGui(const QString &boardName, const LaunchConfiguration &launchConfig) -> void;
+    auto testUsingDataFromCsvGui(const LaunchConfiguration &launchConfig) -> void;
 private:
     auto addTestInterfaceOption() -> void;
     auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
