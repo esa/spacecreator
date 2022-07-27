@@ -1,5 +1,6 @@
 Pinger-Datamodel DEFINITIONS ::=
 BEGIN
+--  This file was generated automatically by OpenGEODE
 IMPORTS
    MyInteger FROM ENVIRONMENT-SELECTOR-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
@@ -17,6 +18,7 @@ END
 
 Ponger-Datamodel DEFINITIONS ::=
 BEGIN
+--  This file was generated automatically by OpenGEODE
 IMPORTS
    MyInteger FROM ENVIRONMENT-SELECTOR-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
