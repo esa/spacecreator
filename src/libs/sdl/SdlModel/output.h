@@ -41,12 +41,10 @@ public:
      * @brief   Default constructor
      */
     Output() = default;
-
     /**
      * @brief   Deleted copy constructor
      */
     Output(const Output &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -56,19 +54,18 @@ public:
      * @brief   Deleted copy assignment operator
      */
     Output &operator=(const Output &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     Output &operator=(Output &&) = default;
 
+public:
     /**
      * @brief   Getter for the optional output parameter
      *
      * @return  a pointer to variable reference
      */
     auto parameter() const -> std::unique_ptr<VariableReference> const &;
-
     /**
      * @brief   Setter for the optional output parameter
      *
@@ -76,6 +73,7 @@ public:
      */
     auto setParameter(std::unique_ptr<VariableReference> parameter) -> void;
 
+public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */

@@ -39,23 +39,20 @@ class Process final : public Node
 {
 public:
     /**
+     * @brief   Default constructor
+     */
+    Process() = default;
+    /**
      * @brief   Constructor
      *
      * @param   name           name of the process
      * @param   stateMachine   state machine of the process
      */
     Process(QString name, std::unique_ptr<StateMachine> stateMachine);
-
-    /**
-     * @brief   Default constructor
-     */
-    Process() = default;
-
     /**
      * @brief Deleted copy constructor
      */
     Process(const Process &) = delete;
-
     /**
      * @brief Default move constructor
      */
@@ -65,19 +62,18 @@ public:
      * @brief Deleted copy assignment
      */
     Process &operator=(const Process &) = delete;
-
     /**
      * @brief Default move assignment
      */
     Process &operator=(Process &&) = default;
 
+public:
     /**
      * @brief Getter for START transition
      *
      * @return START transition pointer
      */
     auto startTransition() const -> Transition *;
-
     /**
      * @brief Setter for START transition
      *
@@ -91,7 +87,6 @@ public:
      * @return  a const reference to a pointer to the state machine
      */
     auto stateMachine() const -> const StateMachine *;
-
     /**
      * @brief   Setter for the state machine
      *
@@ -105,14 +100,12 @@ public:
      * @return  a const reference to a vector of pointers to variable declarations
      */
     auto variables() const -> const std::vector<std::unique_ptr<VariableDeclaration>> &;
-
     /**
      * @brief   Setter for the variables declared in this process
      *
      * @param   variables a vector of pointers to variable declarations
      */
     auto setVariables(std::vector<std::unique_ptr<VariableDeclaration>> variables) -> void;
-
     /**
      * @brief   Add a variable declaration
      *
@@ -126,7 +119,6 @@ public:
      * @return  a const reference to a vector of pointers to procedure
      */
     auto procedures() const -> const std::vector<std::unique_ptr<Procedure>> &;
-
     /**
      * @brief   Add a procedure declared in this process
      *
@@ -140,12 +132,12 @@ public:
      * @param   timerName Timer name
      */
     auto addTimer(const QString &timerName) -> void;
-
     /**
      * @brief   Timer names
      */
     auto timerNames() const -> const std::vector<QString> &;
 
+public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */

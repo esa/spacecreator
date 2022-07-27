@@ -37,12 +37,10 @@ public:
      * @param   name      name of the label
      */
     Label(QString name = "");
-
     /**
      * @brief   Deleted copy constructor
      */
     Label(const Label &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -52,12 +50,12 @@ public:
      * @brief   Deleted copy assignment operator
      */
     Label &operator=(const Label &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     Label &operator=(Label &&) = default;
 
+public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */

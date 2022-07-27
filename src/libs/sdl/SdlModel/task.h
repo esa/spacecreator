@@ -41,12 +41,10 @@ public:
      * @param   content   content of the task
      */
     Task(QString name = "", QString content = "");
-
     /**
      * @brief   Deleted copy constructor
      */
     Task(const Task &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -56,19 +54,18 @@ public:
      * @brief   Deleted copy assignment operator
      */
     Task &operator=(const Task &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     Task &operator=(Task &&) = default;
 
+public:
     /**
      * @brief   Getter for the task content
      *
      * @return  task content
      */
     auto content() const -> const QString &;
-
     /**
      * @brief   Setter for the task content
      *
@@ -76,6 +73,7 @@ public:
      */
     auto setContent(QString content) -> void;
 
+public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */
