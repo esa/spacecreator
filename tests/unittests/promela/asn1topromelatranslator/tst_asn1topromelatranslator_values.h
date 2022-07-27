@@ -43,6 +43,7 @@ private Q_SLOTS:
     void testEnumerated() const;
     void testBoolean() const;
     void testSequenceOf() const;
+    void testChoice() const;
 
 private:
     std::unique_ptr<Definitions> createModel() const;

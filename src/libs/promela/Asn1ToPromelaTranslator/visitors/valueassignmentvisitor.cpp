@@ -160,6 +160,7 @@ void ValueAssignmentVisitor::visit(const Choice &type)
 
     auto dataMember = m_target;
     dataMember.appendElement("data");
+    dataMember.appendElement(escapedSelectionName);
 
     const auto selectionValue = Expression(QString("%1_%2_PRESENT").arg(escapedTypeName).arg(escapedSelectionName));
 
@@ -201,7 +202,7 @@ void ValueAssignmentVisitor::visit(const SequenceOf &type)
         auto target = m_target;
         target.appendElement("data", std::make_unique<Expression>(Constant(i)));
 
-        ValueAssignmentVisitor visitor(value.get(), m_sequence, target, type.itemsType()->identifier());
+        ValueAssignmentVisitor visitor(value.get(), m_sequence, target, QString("%1_%2").arg(m_typeName).arg("elem"));
         type.itemsType()->accept(visitor);
     }
 
