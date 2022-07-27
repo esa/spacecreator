@@ -71,7 +71,7 @@ QPair<QString, QVariant> IVPropertiesListModel::prepareDataForUpdate(
 
 bool IVPropertiesListModel::isEditable(const QModelIndex &index) const
 {
-    if (!entity() || !index.isValid() || !PropertiesListModel::isEditable(index))
+    if (!entity() || !index.isValid() || isFixed() || !PropertiesListModel::isEditable(index))
         return false;
 
     bool editable = true;
@@ -79,10 +79,29 @@ bool IVPropertiesListModel::isEditable(const QModelIndex &index) const
     case ivm::meta::Props::Token::is_type:
         editable = false;
         break;
+    case ivm::meta::Props::Token::fixed_system_element: {
+        editable = false;
+        break;
+    }
     default:
         break;
     }
     return editable;
+}
+
+bool IVPropertiesListModel::isFixed() const
+{
+    QModelIndex parent = QModelIndex();
+    for(int r = 0; r < rowCount(parent); ++r) {
+        QModelIndex idx = index(r, 1, parent);
+        const QString &name = tokenNameFromIndex(idx);
+        const QString &value = data(idx, DataRole).toString();
+
+        if (name == "fixed_system_element") {
+            return value == "YES";
+        }
+    }
+    return false;
 }
 
 IVPropertiesListModel::IVPropertiesListModel(
@@ -272,7 +291,7 @@ ivm::IVInterface *InterfacePropertiesListModel::entity() const
 
 bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const
 {
-    if (!entity() || !index.isValid() || !PropertiesListModel::isEditable(index))
+    if (!entity() || !index.isValid() || isFixed() || !PropertiesListModel::isEditable(index))
         return false;
 
     if (auto iface = entity()->as<const ivm::IVInterface *>()) {
@@ -281,6 +300,8 @@ bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const
         case ivm::meta::Props::Token::name:
         case ivm::meta::Props::Token::InheritPI:
             return !isClone;
+        case ivm::meta::Props::Token::fixed_system_element:
+            return false;
         default:
             if (iface->isRequired()) {
                 if (auto ri = iface->as<const ivm::IVInterfaceRequired *>()) {
