@@ -21,7 +21,7 @@
 
 #include "common.h"
 #include "entityattribute.h"
-#include "ivcommonprops.h"
+#include "archetypecommonprops.h"
 #include "veobject.h"
 
 #include <QObject>
@@ -40,6 +40,7 @@ class ArchetypeObject : public shared::VEObject
 {
     Q_OBJECT
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    Q_PROPERTY(QVariantList attributes READ attributes)
 
 public:
     enum class Type
@@ -78,6 +79,25 @@ public:
     */
     void setVisible(bool isVisible);
     bool isVisible() const;
+
+    /**
+     * @brief Returns list of attributes for using in string templates.
+     * @return list of attributes.
+     */
+    QVariantList attributes() const;
+
+    /**
+     * @brief Returns list of properties for using in string templates.
+     * @return list of properties.
+     */
+    QVariantList properties() const;
+
+    /**
+     * @brief generateProperties generates a variant list sorted by meta::ArchetypeProps::Token.
+     * @param isProperty determines if result should be generated for properties or attributes
+     * @return sorted QVariantList which can be used in string templates
+     */
+    QVariantList generateProperties(bool isProperty) const;
 
     bool postInit() override;
     bool aboutToBeRemoved() override;

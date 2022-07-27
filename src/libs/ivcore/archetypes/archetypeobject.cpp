@@ -145,6 +145,43 @@ bool ArchetypeObject::isVisible() const
     return entityAttributeValue(meta::Props::token(meta::Props::Token::is_visible), true);
 }
 
+QVariantList ArchetypeObject::attributes() const
+{
+    return generateProperties(false);
+}
+
+QVariantList ArchetypeObject::properties() const
+{
+    return generateProperties(true);
+}
+
+QVariantList ArchetypeObject::generateProperties(bool isProperty) const
+{
+    QVariantList result;
+    EntityAttributes attributes = entityAttributes();
+    for (auto it = attributes.cbegin(); it != attributes.cend(); ++it) {
+        if (it.value().isExportable() && it.value().isProperty() == isProperty) {
+            result << QVariant::fromValue(shared::ExportableProperty(it.key(), it.value().value()));
+        }
+    }
+
+    std::sort(result.begin(), result.end(), [](const QVariant &leftVal, const QVariant &rightVal) {
+        const auto &rightExportable = rightVal.value<shared::ExportableProperty>();
+        const ivm::meta::ArchetypeProps::Token rightToken = ivm::meta::ArchetypeProps::token(rightExportable.name());
+        if (rightToken == ivm::meta::ArchetypeProps::Token::Unknown)
+            return true;
+
+        const auto &leftExportable = leftVal.value<shared::ExportableProperty>();
+        const ivm::meta::ArchetypeProps::Token leftToken = ivm::meta::ArchetypeProps::token(leftExportable.name());
+        if (leftToken == ivm::meta::ArchetypeProps::Token::Unknown)
+            return false;
+
+        return leftToken < rightToken;
+    });
+
+    return result;
+}
+
 QList<EntityAttribute> ArchetypeObject::sortedAttributesValues(const EntityAttributes &attributes)
 {
     QList<EntityAttribute> attrs = attributes.values();
