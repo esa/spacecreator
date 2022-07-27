@@ -19,15 +19,19 @@
 
 #include "specialized/documenttranslator.h"
 
-#include "specialized/charttranslator.h"
+using sdl::SdlModel;
 
 namespace conversion::sdl::translator {
 
+DocumentTranslator::DocumentTranslator(SdlModel *sdlModel)
+    : m_chartTranslator(sdlModel)
+{
+}
+
 void DocumentTranslator::translateDocument(const msc::MscDocument *mscDocument) const
 {
-    ChartTranslator chartTranslator;
     for (const auto mscChart : mscDocument->charts()) {
-        chartTranslator.translateChart(mscChart);
+        m_chartTranslator.translateChart(mscChart);
     }
 }
 

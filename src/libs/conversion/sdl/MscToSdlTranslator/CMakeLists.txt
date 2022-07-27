@@ -2,10 +2,12 @@ project(MscToSdlTranslator VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES     translator.cpp
                 specialized/charttranslator.cpp
-                specialized/documenttranslator.cpp)
+                specialized/documenttranslator.cpp
+                specialized/neverobservertranslator.cpp)
 set(INCLUDES    translator.h
                 specialized/charttranslator.h
-                specialized/documenttranslator.h)
+                specialized/documenttranslator.h
+                specialized/neverobservertranslator.h)
 
 add_library(MscToSdlTranslator STATIC)
 target_sources(MscToSdlTranslator

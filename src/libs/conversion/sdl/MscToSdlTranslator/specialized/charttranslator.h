@@ -20,15 +20,17 @@
 #pragma once
 
 #include "observertype.h"
+#include "specialized/neverobservertranslator.h"
 
 #include <msccore/mscchart.h>
+#include <sdl/SdlModel/sdlmodel.h>
 
 namespace conversion::sdl::translator {
 
 class ChartTranslator final
 {
 public:
-    ChartTranslator() = default;
+    ChartTranslator(::sdl::SdlModel *sdlModel);
 
     ChartTranslator(const ChartTranslator &) = delete;
     ChartTranslator(ChartTranslator &&) = delete;
@@ -44,6 +46,9 @@ private:
     inline static const QString m_observerNameWhen = "when";
 
     auto getObserverType(const QVector<msc::MscInstanceEvent *> &mscEvents) const -> ObserverType;
+
+private:
+    NeverObserverTranslator m_neverObserverTranslator;
 };
 
 } // namespace conversion::sdl::translator

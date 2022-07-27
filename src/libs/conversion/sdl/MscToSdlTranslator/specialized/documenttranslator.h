@@ -19,14 +19,17 @@
 
 #pragma once
 
+#include "specialized/charttranslator.h"
+
 #include <msccore/mscdocument.h>
+#include <sdl/SdlModel/sdlmodel.h>
 
 namespace conversion::sdl::translator {
 
 class DocumentTranslator final
 {
 public:
-    DocumentTranslator() = default;
+    DocumentTranslator(::sdl::SdlModel *sdlModel);
 
     DocumentTranslator(const DocumentTranslator &) = delete;
     DocumentTranslator(DocumentTranslator &&) = delete;
@@ -36,6 +39,9 @@ public:
 
 public:
     auto translateDocument(const msc::MscDocument *mscDocument) const -> void;
+
+private:
+    ChartTranslator m_chartTranslator;
 };
 
 } // namespace conversion::sdl::translator
