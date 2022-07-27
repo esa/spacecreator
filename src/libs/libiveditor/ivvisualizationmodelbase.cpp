@@ -248,4 +248,78 @@ void IVVisualizationModel::onDataChanged(
     }
 }
 
+IVLayerVisualizationModel::IVLayerVisualizationModel(
+        ivm::IVModel *layerModel, ivm::IVModel *objectsModel, cmd::CommandsStack *commandsStack, QObject *parent)
+    : IVVisualizationModelBase(layerModel, commandsStack, shared::DropData::Type::None, parent)
+    , m_objectsModel(objectsModel)
+{
+    connect(this, &QStandardItemModel::dataChanged, this, &IVLayerVisualizationModel::onDataChanged);
+}
+
+QList<QStandardItem *> IVLayerVisualizationModel::createItems(shared::VEObject *obj)
+{
+    QList<QStandardItem *> items = IVVisualizationModelBase::createItems(obj);
+    if (!items.isEmpty()) {
+        items[0]->setEditable(true);
+        items[0]->setCheckable(true);
+        items[0]->setDragEnabled(false);
+        items[0]->setData(Qt::Checked, Qt::CheckStateRole);
+    }
+    return items;
+}
+
+void IVLayerVisualizationModel::onDataChanged(
+        const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+{
+    if (!m_commandsStack) {
+        qWarning() << Q_FUNC_INFO << "No command stack set in VisualizationModel";
+        return;
+    }
+
+    if (topLeft != bottomRight) {
+        qWarning() << "Not allowed to modify more than one layer at a time";
+        return;
+    }
+
+    QStandardItem *item = itemFromIndex(topLeft);
+    if (!item) {
+        return;
+    }
+    if (roles.contains(Qt::CheckStateRole) || roles.contains(Qt::DisplayRole) || roles.isEmpty()) {
+        if (item->isCheckable()) {
+            setObjectsVisibility(item->text(), m_objectsModel, item->checkState() == Qt::Checked);
+        }
+    }
+}
+
+void IVLayerVisualizationModel::setObjectsVisibility(
+        const QString &layerName, ivm::IVModel *objectsModel, const bool &isVisible)
+{
+    const QString encodedLayerName = ivm::IVNameValidator::encodeName(ivm::IVObject::Type::ConnectionLayer, layerName);
+
+    for (auto entity : objectsModel->objects()) {
+        auto ivObject = qobject_cast<ivm::IVObject *>(entity);
+
+        switch (ivObject->type()) {
+        case ivm::IVObject::Type::Connection: {
+            auto connection = ivObject->as<ivm::IVConnection *>();
+            if (connection->layer()->title() == encodedLayerName) {
+                connection->setVisible(isVisible);
+            }
+            break;
+        }
+        case ivm::IVObject::Type::RequiredInterface:
+        case ivm::IVObject::Type::ProvidedInterface: {
+            auto interface = ivObject->as<ivm::IVInterface *>();
+            if (interface->layerName() == encodedLayerName) {
+                interface->setVisible(isVisible);
+            }
+            break;
+        }
+        default:
+            break;
+        }
+    }
+}
+
 } // namespace ive

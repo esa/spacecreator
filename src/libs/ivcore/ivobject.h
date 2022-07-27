@@ -101,6 +101,7 @@ public:
     void resetTitle();
 
     static void sortObjectList(QVector<ivm::IVObject *> &objects);
+    static void sortObjectListByTitle(QVector<IVObject *> &objects);
     static QString typeToString(Type t);
 
     QVariantList attributes() const;

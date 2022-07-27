@@ -48,6 +48,7 @@ private Q_SLOTS:
     void testExportFunctions();
     void testExportComment();
     void testExportNestedComment();
+    void testExportLayer();
     void testExportAsn1File();
     void testExportToBuffer();
 };
@@ -159,6 +160,24 @@ void tst_XmlDocExporter::testExportNestedComment()
                                 "        </Implementations>\n"
                                 "    </Function>\n"
                                 "</InterfaceView>";
+    QVERIFY(XmlData(expected) == XmlData(text));
+}
+
+void tst_XmlDocExporter::testExportLayer()
+{
+    auto testLayer = ivm::testutils::createConnectionLayer(m_doc.get());
+    testLayer->setTitle("TestLayer");
+
+    QVector<ivm::IVObject *> objects;
+    objects.append(testLayer);
+    m_doc->setObjects(objects);
+
+    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
+    const QByteArray text = testFileContent();
+    const QByteArray expected = R"(<?xml version="1.0"?>
+                                   <InterfaceView>
+                                   <Layer name="TestLayer"/>
+                                   </InterfaceView>)";
     QVERIFY(XmlData(expected) == XmlData(text));
 }
 

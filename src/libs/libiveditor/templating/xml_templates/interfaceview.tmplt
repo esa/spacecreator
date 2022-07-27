@@ -23,4 +23,7 @@ comm                :   |_ Instance of comment
 {% for comm in Comments %}
     {% include "comment.tmplt" %}
 {% endfor %}
+{% for layer in ConnectionLayers %}
+    {% include "layer.tmplt" %}
+{% endfor %}
 </InterfaceView>

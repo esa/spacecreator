@@ -34,6 +34,7 @@ enum class ModelType
     Asn1,
     Csv,
     InterfaceView,
+    Msc,
     Promela,
     Sdl,
     Seds,
@@ -106,6 +107,17 @@ struct ModelTypeProperties<ModelType::InterfaceView> {
     static inline const QString name = "InterfaceView";
     /// @brief  Model extensions
     static inline const QStringList extensions = { ".xml" };
+};
+
+/**
+ * @brief   Specialization for MSC model type
+ */
+template<>
+struct ModelTypeProperties<ModelType::Msc> {
+    /// @brief  Model name
+    static inline const QString name = "MSC";
+    /// @brief  Model extension
+    static inline const QStringList extensions = { ".msc" };
 };
 
 /**

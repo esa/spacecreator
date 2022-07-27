@@ -41,7 +41,7 @@ std::unique_ptr<conversion::Model> Asn1Importer::importModel(const Options &opti
 {
     const auto inputFilepaths = options.values(Asn1Options::inputFilepath);
     if (inputFilepaths.empty()) {
-        throw ImportException("File to import wasn't specified");
+        throw ImportException("ASN.1/ACN files to import weren't specified");
     }
 
     Asn1Reader asn1Reader;

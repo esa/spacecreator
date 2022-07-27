@@ -48,7 +48,7 @@ std::unique_ptr<conversion::Model> SimulinkXmlImporter::importModel(const Option
 {
     const auto inputFilepath = options.value(SimulinkOptions::inputFilepath);
     if (!inputFilepath) {
-        throw ImportException("File to import wasn't specified");
+        throw ImportException("Simulink file to import wasn't specified");
     }
 
     const QFileInfo inputFileInfo(*inputFilepath);

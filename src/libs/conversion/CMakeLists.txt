@@ -4,6 +4,7 @@ add_subdirectory(registry)
 
 add_subdirectory(asn1)
 add_subdirectory(iv)
+add_subdirectory(msc)
 add_subdirectory(sdl)
 add_subdirectory(seds)
 add_subdirectory(promela)

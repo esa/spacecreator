@@ -46,7 +46,7 @@ Asn1SequenceComponentVisitor::Asn1SequenceComponentVisitor(
 
 void Asn1SequenceComponentVisitor::visit(const AsnSequenceComponent &component)
 {
-    Asn1ItemTypeVisitor visitor(m_promelaModel, m_baseTypeName, component.name(), m_enhancedSpinSupport);
+    Asn1ItemTypeVisitor visitor(m_promelaModel, m_baseTypeName, component.name(), false, m_enhancedSpinSupport);
     component.type()->accept(visitor);
     m_componentName = Escaper::escapePromelaName(component.name());
     m_componentType = visitor.getResultDataType();

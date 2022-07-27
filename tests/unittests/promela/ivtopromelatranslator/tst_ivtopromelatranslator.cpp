@@ -33,14 +33,19 @@
 
 using conversion::promela::PromelaOptions;
 using promela::model::BasicType;
+using promela::model::ChannelRecv;
 using promela::model::ChannelSend;
+using promela::model::Conditional;
 using promela::model::DataType;
 using promela::model::Declaration;
+using promela::model::DoLoop;
 using promela::model::Expression;
 using promela::model::InlineDef;
+using promela::model::Label;
 using promela::model::Proctype;
 using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
+using promela::model::Sequence;
 using promela::model::Utype;
 using promela::translator::IvToPromelaTranslator;
 
@@ -56,11 +61,28 @@ private Q_SLOTS:
     void testSimple();
     void testParameters();
     void testFunctionTypes();
+    void testProctypePriority();
+    void testSimpleObservers();
+
+private:
+    template<typename T>
+    const T *findProctypeElement(const Sequence &sequence, size_t index)
+    {
+        auto iter = sequence.getContent().begin();
+        std::advance(iter, index);
+        if (iter == sequence.getContent().end()) {
+            return nullptr;
+        }
+        if (std::holds_alternative<T>((*iter)->getValue())) {
+            return &(std::get<T>((*iter)->getValue()));
+        }
+        return nullptr;
+    }
 
 private:
     std::unique_ptr<ivm::IVModel> importIvModel(const QString &filepath);
     std::unique_ptr<PromelaModel> translateIvToPromela(
-            std::unique_ptr<ivm::IVModel> ivModel, const QStringList &functions);
+            std::unique_ptr<ivm::IVModel> ivModel, const conversion::Options &options);
 
     const Declaration *findDeclaration(const QList<Declaration> &list, const QString &name);
     const InlineDef *findInline(const std::list<std::unique_ptr<InlineDef>> &list, const QString &name);
@@ -83,10 +105,12 @@ void tst_IvToPromelaTranslator::testSimple()
 {
     std::unique_ptr<ivm::IVModel> ivModel = importIvModel("parameterless.xml");
     QVERIFY(ivModel);
-    QStringList functions;
-    functions.append("controller");
-    functions.append("actuator");
-    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), functions);
+
+    conversion::Options options;
+    options.add(PromelaOptions::modelFunctionName, "controller");
+    options.add(PromelaOptions::modelFunctionName, "actuator");
+
+    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), options);
     QVERIFY(promelaModel);
 
     QCOMPARE(promelaModel->getIncludes().size(), 4);
@@ -251,10 +275,12 @@ void tst_IvToPromelaTranslator::testParameters()
 {
     std::unique_ptr<ivm::IVModel> ivModel = importIvModel("interface_params.xml");
     QVERIFY(ivModel);
-    QStringList functions;
-    functions.append("controller");
-    functions.append("actuator");
-    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), functions);
+
+    conversion::Options options;
+    options.add(PromelaOptions::modelFunctionName, "controller");
+    options.add(PromelaOptions::modelFunctionName, "actuator");
+
+    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), options);
     QVERIFY(promelaModel);
 
     QCOMPARE(promelaModel->getIncludes().size(), 4);
@@ -456,11 +482,13 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
 {
     std::unique_ptr<ivm::IVModel> ivModel = importIvModel("function_types.xml");
     QVERIFY(ivModel);
-    QStringList functions;
-    functions.append("controller");
-    functions.append("up");
-    functions.append("down");
-    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), functions);
+
+    conversion::Options options;
+    options.add(PromelaOptions::modelFunctionName, "controller");
+    options.add(PromelaOptions::modelFunctionName, "up");
+    options.add(PromelaOptions::modelFunctionName, "down");
+
+    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), options);
     QVERIFY(promelaModel);
 
     QCOMPARE(promelaModel->getIncludes().size(), 5);
@@ -790,6 +818,104 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
     }
 }
 
+void tst_IvToPromelaTranslator::testProctypePriority()
+{
+    std::unique_ptr<ivm::IVModel> ivModel = importIvModel("proctype_priority.xml");
+    QVERIFY(ivModel);
+
+    conversion::Options options;
+    options.add(PromelaOptions::modelFunctionName, "Receiver");
+    options.add(PromelaOptions::environmentFunctionName, "Pinger");
+    options.add(PromelaOptions::processesBasePriority, "3");
+
+    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), options);
+    QVERIFY(promelaModel);
+
+    QCOMPARE(promelaModel->getProctypes().size(), 2);
+
+    {
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Receiver_IntegerInterface");
+        QVERIFY(proctype != nullptr);
+        QCOMPARE(proctype->getPriority(), 6);
+    }
+
+    {
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Pinger_IntegerInterface");
+        QVERIFY(proctype != nullptr);
+        QCOMPARE(proctype->getPriority(), 1);
+    }
+}
+
+void tst_IvToPromelaTranslator::testSimpleObservers()
+{
+    std::unique_ptr<ivm::IVModel> ivModel = importIvModel("interface_params.xml");
+    QVERIFY(ivModel);
+
+    conversion::Options options;
+    options.add(PromelaOptions::modelFunctionName, "controller");
+    options.add(PromelaOptions::modelFunctionName, "actuator");
+    options.add(PromelaOptions::observerAttachment,
+            "observer:ObservedSignalKind.OUTPUT:work_in:work:<controller:>actuator");
+    options.add(PromelaOptions::observerFunctionName, "observer");
+
+    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), options);
+    QVERIFY(promelaModel);
+
+    QVERIFY(promelaModel->getIncludes().indexOf("observer.pml") >= 0);
+
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Observer_0_RI_0_work_in");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
+    }
+
+    {
+        const Declaration *declaration =
+                findDeclaration(promelaModel->getDeclarations(), "Actuator_observer_work_channel");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+
+    {
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Actuator_work");
+        QVERIFY(proctype != nullptr);
+        QVERIFY(proctype->isActive());
+        QCOMPARE(proctype->getInstancesCount(), 1);
+
+        const Sequence &main = proctype->getSequence();
+
+        const DoLoop *mainLoop = findProctypeElement<DoLoop>(main, 1);
+        QVERIFY(mainLoop);
+
+        QVERIFY(mainLoop->getSequences().size() > 0);
+
+        const Sequence &mainSequence = *mainLoop->getSequences().front();
+
+        const Expression *queueCheckExpression = findProctypeElement<Expression>(mainSequence, 0);
+        QVERIFY(queueCheckExpression);
+
+        const ChannelRecv *functionLockStatement = findProctypeElement<ChannelRecv>(mainSequence, 1);
+        QVERIFY(functionLockStatement);
+
+        const Label *loopLabel = findProctypeElement<Label>(mainSequence, 2);
+        QVERIFY(loopLabel);
+
+        const Conditional *sdlProcessingBlock = findProctypeElement<Conditional>(mainSequence, 3);
+        QVERIFY(sdlProcessingBlock);
+
+        const Conditional *observerProcessingBlock = findProctypeElement<Conditional>(mainSequence, 4);
+        QVERIFY(observerProcessingBlock);
+
+        const ChannelSend *functionUnlockStatement = findProctypeElement<ChannelSend>(mainSequence, 5);
+        QVERIFY(functionUnlockStatement);
+    }
+}
+
 std::unique_ptr<ivm::IVModel> tst_IvToPromelaTranslator::importIvModel(const QString &filepath)
 {
     ivm::IVXMLReader reader;
@@ -807,13 +933,9 @@ std::unique_ptr<ivm::IVModel> tst_IvToPromelaTranslator::importIvModel(const QSt
 }
 
 std::unique_ptr<PromelaModel> tst_IvToPromelaTranslator::translateIvToPromela(
-        std::unique_ptr<ivm::IVModel> ivModel, const QStringList &functions)
+        std::unique_ptr<ivm::IVModel> ivModel, const conversion::Options &options)
 {
     IvToPromelaTranslator translator;
-    conversion::Options options;
-    for (const QString &function : functions) {
-        options.add(PromelaOptions::modelFunctionName, function);
-    }
     auto asn1Model = std::make_unique<Asn1Acn::Asn1Model>();
     std::vector<conversion::Model *> inputs;
     inputs.push_back(ivModel.get());

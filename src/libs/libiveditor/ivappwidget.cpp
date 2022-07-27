@@ -35,6 +35,7 @@
 #include "ivvisualizationmodelbase.h"
 #include "properties/ivpropertiesdialog.h"
 #include "ui_ivappwidget.h"
+#include "ivnamevalidator.h"
 
 #include <QAction>
 #include <QActionGroup>
@@ -159,9 +160,7 @@ void IVAppWidget::showAvailableLayers(const QPoint &pos)
         const auto *layer = qobject_cast<const ivm::IVConnectionLayerType *>(obj);
         auto *actAddNewLayer = new QAction(tr("Add"));
         connect(actAddNewLayer, &QAction::triggered, this, [&]() {
-            QString newLayerName = "newLayer";
-            auto cmd = new cmd::CmdConnectionLayerCreate(
-                    newLayerName, m_document->layersModel(), m_document->objectsModel());
+            auto cmd = new cmd::CmdConnectionLayerCreate(m_document->layersModel(), m_document->objectsModel());
             if (cmd->layer() != nullptr) {
                 m_document->commandsStack()->push(cmd);
             } else {
@@ -172,9 +171,9 @@ void IVAppWidget::showAvailableLayers(const QPoint &pos)
 
         auto *actDeleteLayer = new QAction(tr("Delete"));
         connect(actDeleteLayer, &QAction::triggered, this, [&]() {
-            if (layer != nullptr && layer->name().compare(ivm::IVConnectionLayerType::DefaultLayerName) != 0) {
+            if (layer != nullptr && layer->title().compare(ivm::IVConnectionLayerType::DefaultLayerName) != 0) {
                 auto cmd = new cmd::CmdConnectionLayerDelete(
-                        layer->name(), m_document->layersModel(), m_document->objectsModel());
+                        layer->title(), m_document->layersModel(), m_document->objectsModel());
                 m_document->commandsStack()->push(cmd);
             }
         });
@@ -197,11 +196,12 @@ void IVAppWidget::renameSelectedLayer(QStandardItem *item)
 
     if (obj->type() == ivm::IVObject::Type::ConnectionLayer) {
         const auto *layer = qobject_cast<const ivm::IVConnectionLayerType *>(obj);
-        if (layer != nullptr && layer->name().compare(ivm::IVConnectionLayerType::DefaultLayerName) != 0) {
+        const auto itemText = ivm::IVNameValidator::encodeName(layer->type(), item->text());
+        if (layer != nullptr && layer->title().compare(ivm::IVConnectionLayerType::DefaultLayerName) != 0) {
             disconnect(m_document->layerVisualisationModel(), &IVVisualizationModelBase::itemChanged, this,
                     &IVAppWidget::renameSelectedLayer);
             auto *cmd = new cmd::CmdConnectionLayerRename(
-                    layer->name(), item->text(), m_document->layersModel(), m_document->objectsModel());
+                    layer->title(), itemText, m_document->layersModel(), m_document->objectsModel());
             if (cmd->layer() != nullptr) {
                 m_document->commandsStack()->push(cmd);
             } else {
@@ -212,7 +212,7 @@ void IVAppWidget::renameSelectedLayer(QStandardItem *item)
         }
     }
 
-    item->setText(obj->title());
+    item->setText(obj->titleUI());
 }
 
 void IVAppWidget::copyItems()
@@ -275,7 +275,8 @@ void IVAppWidget::showPropertyEditor(const shared::Id &id)
     }
 
     ive::IVPropertiesDialog dialog(QFileInfo(m_document->path()).absolutePath(), m_document->dynPropConfig(), obj,
-            m_document->ivCheck(), m_document->asn1Check(), m_document->commandsStack(), graphicsView());
+            m_document->layersModel(), m_document->ivCheck(), m_document->asn1Check(), m_document->commandsStack(),
+            graphicsView());
     dialog.init();
     dialog.exec();
 }

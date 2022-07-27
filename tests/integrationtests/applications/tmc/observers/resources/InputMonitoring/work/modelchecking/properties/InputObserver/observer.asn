@@ -1,5 +1,6 @@
 Model-Datamodel DEFINITIONS ::=
 BEGIN
+--  This file was generated automatically by OpenGEODE
 IMPORTS
    MyInteger, MyIntegerBigger FROM INPUTMONITORING-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
@@ -43,6 +44,31 @@ T-Null-Record ::= SEQUENCE {}
 
 END
 
+
+MMI-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS MyIntegerBigger FROM INPUTMONITORING-DATAVIEW
+
+
+MyInteger FROM INPUTMONITORING-DATAVIEW
+
+ ;
+
+
+
+
+Mmi-action-y ::= MyIntegerBigger
+
+
+
+
+Mmi-trigger-z ::= MyInteger
+
+
+
+
+END
 
 
 Simulation-DataView DEFINITIONS ::=

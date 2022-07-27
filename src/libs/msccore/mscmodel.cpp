@@ -39,6 +39,12 @@ MscModel::~MscModel()
     clear();
 }
 
+
+conversion::ModelType MscModel::modelType() const
+{
+    return conversion::ModelProperties<MscModel>::type;
+}
+
 void MscModel::setFilename(const QString filename)
 {
     if (filename == m_filename) {

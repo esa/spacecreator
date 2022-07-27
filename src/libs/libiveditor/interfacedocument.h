@@ -109,6 +109,7 @@ public:
     ivm::IVModel *sharedModel() const;
     IVItemModel *itemsModel() const;
     ivm::IVModel *layersModel() const;
+    QHash<shared::Id, shared::VEObject *> layersObjects() const;
 
     IVVisualizationModelBase *visualisationModel() const;
     QItemSelectionModel *objectsSelectionModel() const;
@@ -142,6 +143,7 @@ Q_SIGNALS:
 public Q_SLOTS:
     void onSavedExternally(const QString &filePath, bool saved);
     void setObjects(const QVector<ivm::IVObject *> &objects);
+    void setLayers(const QVector<ivm::IVObject *> &layers);
     void onAttributesManagerRequested();
     void onColorSchemeMenuInvoked();
     void onDynContextEditorMenuInvoked();

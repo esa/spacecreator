@@ -47,6 +47,7 @@ public:
         Target,
         Implementations,
         Implementation,
+        Layer,
 
         // attrs:
         name,

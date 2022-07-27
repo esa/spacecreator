@@ -92,9 +92,10 @@ IVComment *createComment(const QString &name, QObject *parent)
     return comment;
 }
 
-IVConnectionLayerType *createConnectionLayer(const QString &name, QObject *parent)
+IVConnectionLayerType *createConnectionLayer(QObject *parent)
 {
-    auto layer = new IVConnectionLayerType(name, parent);
+    auto layer = new IVConnectionLayerType(parent);
+    layer->setTitle(ivm::IVConnectionLayerType::DefaultLayerName);
     return layer;
 }
 

@@ -115,6 +115,12 @@ public:
      */
     void setInterfaceInputVectorLengthLimits(std::unordered_map<QString, QString> limits);
     /**
+     * @brief   Set non-environment processes base priority
+     *
+     * @param   value   Priority to set
+     */
+    void setProcessesBasePriority(std::optional<QString> value);
+    /**
      * @brief   Set path to the ASN.1 containing subtypes
      *
      * @param   filepaths   Paths to the files
@@ -183,6 +189,7 @@ private:
     std::vector<QString> m_environmentFunctions;
     std::vector<QString> m_keepFunctions;
     std::optional<QString> m_globalInputVectorLengthLimit;
+    std::optional<QString> m_processesBasePriority;
     std::unordered_map<QString, QString> m_interfaceInputVectorLengthLimits;
     std::vector<QString> m_subtypesFilepaths;
     QStringList m_stopConditionsFiles;

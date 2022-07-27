@@ -16,16 +16,18 @@ set(SOURCES
   doloop.cpp
   expression.cpp
   forloop.cpp
+  goto.cpp
   initproctype.cpp
   inlinecall.cpp
   inlinedef.cpp
+  label.cpp
   mtyperef.cpp
   namedmtype.cpp
   proctype.cpp
   proctypeelement.cpp
   promelamodel.cpp
-  sequence.cpp
   select.cpp
+  sequence.cpp
   typealias.cpp
   utype.cpp
   utyperef.cpp
@@ -48,20 +50,22 @@ set(INCLUDES
   declaration.h
   doloop.h
   elsestatement.h
+  exitloop.h
   expression.h
   forloop.h
+  goto.h
   initproctype.h
   inlinecall.cpp
   inlinedef.h
+  label.h
   mtyperef.h
   namedmtype.h
   proctype.h
   proctypeelement.h
   promelamodel.h
+  select.h
   sequence.h
   skip.h
-  exitloop.h
-  select.h
   typealias.h
   unsigneddatatype.h
   utype.h

@@ -180,7 +180,7 @@ void tst_Asn1ToPromelaTranslator_RangeChecks::testSequenceOf() const
     Asn1NodeVisitor visitor(promelaModel, true);
     visitor.visit(*asn1Model);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 6);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 7);
     {
         const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MySequenceOf_size_check");
         QVERIFY(inlineDef != nullptr);

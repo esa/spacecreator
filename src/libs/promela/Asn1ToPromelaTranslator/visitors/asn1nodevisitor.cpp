@@ -70,7 +70,7 @@ void Asn1NodeVisitor::visit(const File &file)
 
 void Asn1NodeVisitor::visit(const TypeAssignment &type)
 {
-    Asn1ItemTypeVisitor typeVisitor(m_promelaModel, std::nullopt, type.name(), m_enhancedSpinSupport);
+    Asn1ItemTypeVisitor typeVisitor(m_promelaModel, std::nullopt, type.name(), false, m_enhancedSpinSupport);
     type.type()->accept(typeVisitor);
 }
 

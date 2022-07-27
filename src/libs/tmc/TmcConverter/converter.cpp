@@ -144,6 +144,11 @@ void TmcConverter::setInterfaceInputVectorLengthLimits(std::unordered_map<QStrin
     m_interfaceInputVectorLengthLimits = std::move(limits);
 }
 
+void TmcConverter::setProcessesBasePriority(std::optional<QString> value)
+{
+    m_processesBasePriority = std::move(value);
+}
+
 void TmcConverter::setSubtypesFilepaths(const std::vector<QString> &filepaths)
 {
     m_subtypesFilepaths = filepaths;
@@ -198,13 +203,10 @@ auto TmcConverter::integrateObserver(const ObserverInfo &info, QStringList &obse
     const auto process = QFileInfo(info.path());
     const auto processName = process.baseName();
     const auto directory = process.absoluteDir();
-    // Observers require separate system_stucture, because OpenGEODE does not save
-    // some "renames" declarations.
-    const auto structure = QFileInfo(directory.absolutePath() + QDir::separator() + "system_structure.pr");
     const auto datamodel =
             QFileInfo(directory.absolutePath() + QDir::separator() + processName.toLower() + "_datamodel.asn");
 
-    ProcessMetadata meta(Escaper::escapePromelaName(processName), structure, process, datamodel, QList<QFileInfo>());
+    ProcessMetadata meta(Escaper::escapePromelaName(processName), std::nullopt, process, datamodel, QList<QFileInfo>());
     SdlToPromelaConverter sdl2Promela;
 
     const auto promelaFilename = Escaper::escapePromelaIV(processName) + ".pml";
@@ -396,6 +398,10 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
 
     for (const auto &[interfaceName, value] : m_interfaceInputVectorLengthLimits) {
         options.add(PromelaOptions::interfaceInputVectorLengthLimit.arg(interfaceName.toLower()), value);
+    }
+
+    if (m_processesBasePriority) {
+        options.add(PromelaOptions::processesBasePriority, *m_processesBasePriority);
     }
 
     for (const auto &subtypesFilepath : m_subtypesFilepaths) {

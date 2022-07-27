@@ -250,13 +250,12 @@ void InterfaceDocument::updateLayersModel() const
         auto layers = layersModel()->allObjectsByType<ivm::IVConnectionLayerType>();
         bool isDefaultPresent = false;
         for (auto * const layer : layers) {
-            if (layer->name() == ivm::IVConnectionLayerType::DefaultLayerName) {
+            if (layer->title() == ivm::IVConnectionLayerType::DefaultLayerName) {
                 isDefaultPresent = true;
             }
         }
         if (!isDefaultPresent) {
-            auto *cmd = new cmd::CmdConnectionLayerCreate(
-                    ivm::IVConnectionLayerType::DefaultLayerName, layersModel(), objectsModel());
+            auto *cmd = new cmd::CmdConnectionLayerCreate(layersModel(), objectsModel(), true);
             commandsStack()->push(cmd);
         }
         if (objectsModel() != nullptr) {
@@ -523,6 +522,11 @@ ivm::IVModel *InterfaceDocument::layersModel() const
     return d->layersModel;
 }
 
+QHash<shared::Id, shared::VEObject *> InterfaceDocument::layersObjects() const
+{
+    return d->layersModel->objects();
+}
+
 IVVisualizationModelBase *InterfaceDocument::visualisationModel() const
 {
     if (!d->objectsVisualizationModel) {
@@ -575,8 +579,8 @@ IVVisualizationModelBase *InterfaceDocument::sharedVisualisationModel() const
 IVVisualizationModelBase *InterfaceDocument::layerVisualisationModel() const
 {
     if (d->layerSelect == nullptr) {
-        d->layerSelect = new IVVisualizationModelBase(
-                layersModel(), d->commandsStack, shared::DropData::Type::None, const_cast<InterfaceDocument *>(this));
+        d->layerSelect = new IVLayerVisualizationModel(
+                layersModel(), d->objectsModel, d->commandsStack, const_cast<InterfaceDocument *>(this));
         auto *title = new QStandardItem(tr("Connection Layers"));
         title->setTextAlignment(Qt::AlignCenter);
         d->layerSelect->setHorizontalHeaderItem(0, title);
@@ -683,6 +687,11 @@ void InterfaceDocument::setObjects(const QVector<ivm::IVObject *> &objects)
 {
     d->objectsModel->initFromObjects(objects);
     d->objectsModel->setRootObject({});
+}
+
+void InterfaceDocument::setLayers(const QVector<ivm::IVObject *> &layers)
+{
+    d->layersModel->initFromObjects(layers);
 }
 
 void InterfaceDocument::onAttributesManagerRequested()
@@ -884,6 +893,11 @@ bool InterfaceDocument::loadImpl(const QString &path)
     }
 
     setObjects(parser.parsedObjects());
+
+    auto layers = parser.parsedLayers();
+    ivm::IVObject::sortObjectListByTitle(layers);
+    setLayers(layers);
+
     const QVariantMap metadata = parser.metaData();
     QVariantMap::const_iterator i = metadata.constFind("asn1file");
     while (i != metadata.end() && i.key() == "asn1file") {

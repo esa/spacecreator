@@ -41,6 +41,7 @@
 #include <QObject>
 #include <QScopedPointer>
 #include <QStandardPaths>
+#include <QtDebug>
 
 namespace ive {
 
@@ -111,6 +112,8 @@ QString IVExporter::groupName(const shared::VEObject *object) const
             return QStringLiteral("Connections");
         case ivm::IVObject::Type::ConnectionGroup:
             return QStringLiteral("ConnectionGroups");
+        case ivm::IVObject::Type::ConnectionLayer:
+            return QStringLiteral("ConnectionLayers");
         default:
             break;
         }
@@ -121,6 +124,8 @@ QString IVExporter::groupName(const shared::VEObject *object) const
 QHash<QString, QVariant> IVExporter::collectInterfaceObjects(InterfaceDocument *doc)
 {
     QHash<QString, QVariant> grouppedObjects = collectObjects(doc->objects().values());
+    QHash<QString, QVariant> grouppedLayers = collectObjects(doc->layersObjects().values());
+    grouppedObjects.unite(grouppedLayers);
     // Add meta-data
     for (const QString &asnFileName : doc->asn1FilesNames()) {
         grouppedObjects["Asn1FileName"] = QVariant::fromValue(asnFileName);

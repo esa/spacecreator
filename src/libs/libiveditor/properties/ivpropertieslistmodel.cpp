@@ -202,10 +202,31 @@ bool FunctionPropertiesListModel::isEditable(const QModelIndex &index) const
     return editable;
 }
 
-InterfacePropertiesListModel::InterfacePropertiesListModel(
-        cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent)
+InterfacePropertiesListModel::InterfacePropertiesListModel(cmd::CommandsStack::Macro *macro,
+        shared::PropertyTemplateConfig *dynPropConfig, ivm::IVModel *layersModel, QObject *parent)
     : IVPropertiesListModel(macro, dynPropConfig, parent)
+    , m_layersModel(layersModel)
 {
+}
+
+void InterfacePropertiesListModel::setDataObject(shared::VEObject *obj)
+{
+    shared::PropertiesListModel::setDataObject(obj);
+
+    QStringList values;
+    auto layers = m_layersModel->allObjectsByType<ivm::IVConnectionLayerType>();
+    for (auto *const layer : layers) {
+        values.append(QString(layer->title()));
+    }
+
+    for (int i = 0; i < rowCount(); i++) {
+        QStandardItem *titleItem = item(i, Column::Name);
+
+        if (titleItem->data(Roles::DataRole) == ivm::meta::Props::token(ivm::meta::Props::Token::layer)) {
+            QStandardItem *itemObj = item(i, Column::Value);
+            itemObj->setData(QVariant(values), Roles::EditRole);
+        }
+    }
 }
 
 QVariant InterfacePropertiesListModel::data(const QModelIndex &index, int role) const
