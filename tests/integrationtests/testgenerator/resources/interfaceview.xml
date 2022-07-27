@@ -1,7 +1,7 @@
 <InterfaceView>
 <Function name="TestDriver" is_type="NO" language="C" default_implementation="default" FPGA_Configurations="">
     <Property name="Taste::coordinates" value="7500 18400 27500 26400"/>
-<Provided_Interface name="StartTest" kind="Cyclic" layer="default" priority="1" period="999" wcet="0" dispatch_offset="0" stack_size="50">
+<Provided_Interface name="StartTest" kind="Cyclic" layer="default" priority="1" period="999" wcet="0" dispatch_offset="0" stack_size="5000">
     <Property name="Taste::coordinates" value="12300 18400"/>
 </Provided_Interface>
 

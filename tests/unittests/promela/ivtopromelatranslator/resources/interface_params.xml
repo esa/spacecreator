@@ -1,16 +1,16 @@
 <InterfaceView asn1file="mcheck.asn">
 <Function name="controller" is_type="NO" language="SDL" default_implementation="default">
     <Property name="Taste::coordinates" value="43000 34200 65200 59200"/>
-<Provided_Interface name="result" kind="Sporadic" miat="0" queue_size="2" priority="2" stack_size="50">
+<Provided_Interface name="result" kind="Sporadic" miat="0" queue_size="2" priority="2" stack_size="5000">
     <Input_Parameter name="p1" type="TestInteger" encoding="NATIVE"/>
     <Property name="Taste::coordinates" value="65200 54200"/>
 </Provided_Interface>
 
-<Provided_Interface name="error" kind="Sporadic" miat="0" queue_size="1" priority="10" stack_size="50">
+<Provided_Interface name="error" kind="Sporadic" miat="0" queue_size="1" priority="10" stack_size="5000">
     <Property name="Taste::coordinates" value="65200 44500"/>
 </Provided_Interface>
 
-<Required_Interface name="work" kind="Sporadic" miat="0" queue_size="2" priority="4" stack_size="50">
+<Required_Interface name="work" kind="Sporadic" miat="0" queue_size="2" priority="4" stack_size="5000">
     <Input_Parameter name="p1" type="TestParam" encoding="NATIVE"/>
     <Property name="Taste::coordinates" value="65200 38800"/>
     <Property name="Taste::InheritPI" value="true"/>
@@ -24,19 +24,19 @@
 
 <Function name="actuator" is_type="NO" language="SDL" default_implementation="default">
     <Property name="Taste::coordinates" value="81900 34400 104800 59200"/>
-<Provided_Interface name="work" kind="Sporadic" miat="0" queue_size="2" priority="4" stack_size="50">
+<Provided_Interface name="work" kind="Sporadic" miat="0" queue_size="2" priority="4" stack_size="5000">
     <Input_Parameter name="p1" type="TestParam" encoding="NATIVE"/>
     <Property name="Taste::coordinates" value="81900 38800"/>
 </Provided_Interface>
 
-<Required_Interface name="result" kind="Sporadic" miat="0" queue_size="2" priority="2" stack_size="50">
+<Required_Interface name="result" kind="Sporadic" miat="0" queue_size="2" priority="2" stack_size="5000">
     <Input_Parameter name="p1" type="TestInteger" encoding="NATIVE"/>
     <Property name="Taste::coordinates" value="81900 54100"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
-<Required_Interface name="error" kind="Sporadic" miat="0" queue_size="1" priority="10" stack_size="50">
+<Required_Interface name="error" kind="Sporadic" miat="0" queue_size="1" priority="10" stack_size="5000">
     <Property name="Taste::coordinates" value="81900 44500"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="true"/>
