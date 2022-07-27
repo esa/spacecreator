@@ -17,45 +17,37 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
-
-#include <QHash>
-#include <QObject>
-#include <QString>
+#include "archetypelibrary.h"
 
 namespace ivm {
-namespace meta {
 
-struct ArchetypeProps {
-    Q_GADGET
-public:
-    enum class Token
-    {
-        Unknown = 0,
+ArchetypeLibrary::ArchetypeLibrary(const QString &title, QObject *parent)
+    : ArchetypeObject(title, ArchetypeObject::Type::ArchetypeLibrary, parent)
+{
+}
 
-        // tags:
-        ParameterArchetype,
-        InterfaceArchetype,
-        FunctionArchetype,
-        ArchetypeLibrary,
+ArchetypeLibrary::~ArchetypeLibrary() = default;
 
-        // attrs:
-        name,
-        value,
-        type,
-        interfaceType,
-        kind,
-        direction,
-        layer
-    };
-    Q_ENUM(Token)
+QVector<FunctionArchetype *> ArchetypeLibrary::getFunctions() const
+{
+    return m_functions;
+}
 
-    static const QHash<QString, ArchetypeProps::Token> TokensByName;
+void ArchetypeLibrary::addFunction(FunctionArchetype *functionArchetype)
+{
+    if (!functionArchetype) {
+        return;
+    }
+    functionArchetype->setParentObject(this);
+    m_functions.append(functionArchetype);
+}
 
-    static ArchetypeProps::Token token(const QString &fromString);
-
-    static QString token(ArchetypeProps::Token tag);
-};
-
-} // namespace meta
-} // namespace ivm
+void ArchetypeLibrary::removeFunction(FunctionArchetype *functionArchetype)
+{
+    if (!functionArchetype) {
+        return;
+    }
+    functionArchetype->setParentObject(nullptr);
+    m_functions.removeAll(functionArchetype);
+}
+}

@@ -58,6 +58,8 @@ target_sources(${LIB_NAME} PRIVATE
     archetypes/interfacearchetype.cpp
     archetypes/functionarchetype.h
     archetypes/functionarchetype.cpp
+    archetypes/archetypelibrary.h
+    archetypes/archetypelibrary.cpp
     archetypes/archetypecommonprops.h
     archetypes/archetypecommonprops.cpp
     archetypes/archetypexmlreader.h

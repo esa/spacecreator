@@ -194,7 +194,7 @@ void copyDir(const QString &source, const QString &dest, FileCopyingMode replace
 }
 
 QString startingArchetypesFileString() {
-    static const QString kArchetypesStartingString = QLatin1String("archetype_library_");
+    static const QString kArchetypesStartingString = QString("archetype_library_");
     return kArchetypesStartingString;
 }
 

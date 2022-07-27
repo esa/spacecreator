@@ -18,10 +18,11 @@
 #include "interfacedocument.h"
 
 #include "actionsbar.h"
+#include "archetypes/archetypelibrary.h"
 #include "archetypes/archetypemodel.h"
+#include "archetypes/archetypeobject.h"
 #include "archetypes/archetypexmlreader.h"
 #include "archetypes/functionarchetype.h"
-#include "archetypes/interfacearchetype.h"
 #include "asn1modelstorage.h"
 #include "asn1systemchecks.h"
 #include "colors/colormanagerdialog.h"
@@ -922,26 +923,46 @@ bool InterfaceDocument::loadImpl(const QString &path)
 void InterfaceDocument::loadArchetypes()
 {
     QVector<QString> archetypeLibraryPaths;
+    QRegularExpression regex(shared::startingArchetypesFileString() + "(.+?).xml");
 
     for (const auto &entry :
             std::filesystem::directory_iterator(shared::interfaceCustomArchetypesDirectoryPath().toStdString())) {
         QString path = QString(entry.path().c_str());
         QString fileName = QString(entry.path().filename().c_str());
-        if (fileName.startsWith("archetype_library_") && fileName.endsWith(".xml")) {
+        if (fileName.startsWith(shared::startingArchetypesFileString()) && fileName.endsWith(".xml")) {
             archetypeLibraryPaths.append(path);
         }
     }
 
-    ivm::ArchetypeXMLReader archetypeParser;
     d->archetypeModel->clear();
 
     for (const auto &path : archetypeLibraryPaths) {
+        ivm::ArchetypeXMLReader archetypeParser;
         if (!archetypeParser.readFile(path)) {
             shared::ErrorHub::addError(shared::ErrorItem::Error, archetypeParser.errorString(), path);
             shared::ErrorHub::clearCurrentFile();
         }
-        d->archetypeModel->addObjects(archetypeParser.parsedObjects());
+        QString archetypeLibraryName = regex.match(path).captured(1);
+        QVector<ivm::ArchetypeObject *> archetypeObjects = archetypeParser.parsedObjects();
+
+        generateArchetypeLibrary(archetypeObjects, archetypeLibraryName);
+
+        d->archetypeModel->addObjects(archetypeObjects);
     }
+}
+
+void InterfaceDocument::generateArchetypeLibrary(
+        QVector<ivm::ArchetypeObject *> &archetypeObjects, const QString &archetypeLibraryName)
+{
+    ivm::ArchetypeLibrary *archetypelibrary = new ivm::ArchetypeLibrary(archetypeLibraryName);
+
+    for (auto archetypeObject : archetypeObjects) {
+        if (auto functionArchetype = archetypeObject->as<ivm::FunctionArchetype *>()) {
+            archetypelibrary->addFunction(functionArchetype);
+        }
+    }
+
+    archetypeObjects.append(archetypelibrary);
 }
 
 void InterfaceDocument::showNIYGUI(const QString &title)

@@ -48,7 +48,8 @@ public:
         Unknown = 0,
         ParameterArchetype,
         InterfaceArchetype,
-        FunctionArchetype
+        FunctionArchetype,
+        ArchetypeLibrary
     };
     Q_ENUM(Type)
 
