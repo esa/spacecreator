@@ -1,36 +1,30 @@
-/*
-  Copyright (C) 2022 European Space Agency - <maxime.perrotin@esa.int>
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Library General Public
-  License as published by the Free Software Foundation; either
-  version 2 of the License, or (at your option) any later version.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Library General Public License for more details.
-
-  You should have received a copy of the GNU Library General Public License
-  along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
-*/
+/** @file
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 
 #include "parameterarchetype.h"
 
 namespace ivm {
 
-struct ParameterArchetypePrivate {
-    explicit ParameterArchetypePrivate(const ParameterArchetype::ParameterDirection &direction)
-        : m_direction(direction)
-    {
-    }
-    ParameterArchetype::ParameterDirection m_direction;
-};
-
 ParameterArchetype::ParameterArchetype(const QString &title, QObject *parent, const QString &type,
         const ParameterArchetype::ParameterDirection &direction)
     : ArchetypeObject(title, ArchetypeObject::Type::ParameterArchetype, parent)
-    , m_parameterPrivate(std::make_unique<ParameterArchetypePrivate>(direction))
+    , m_direction(direction)
 {
     setEntityAttribute(meta::ArchetypeProps::token(meta::ArchetypeProps::Token::type), type);
 }
@@ -49,12 +43,12 @@ void ParameterArchetype::setType(const QString &type)
 
 ParameterArchetype::ParameterDirection ParameterArchetype::getDirection() const
 {
-    return m_parameterPrivate->m_direction;
+    return m_direction;
 }
 
 void ParameterArchetype::setDirection(const ParameterDirection &direction)
 {
-    m_parameterPrivate->m_direction = direction;
+    m_direction = direction;
 }
 
 QString ParameterArchetype::directionToString(const ParameterArchetype::ParameterDirection &direction)

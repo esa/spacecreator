@@ -1,19 +1,21 @@
-/*
-   Copyright (C) 2022 European Space Agency - <maxime.perrotin@esa.int>
-
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License as published by the Free Software Foundation; either
-   version 2 of the License, or (at your option) any later version.
-
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public License
-   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
-*/
+/** @file
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 
 #pragma once
 
@@ -29,12 +31,15 @@
 
 namespace ivm {
 class ArchetypeModel;
-struct ArchetypeObjectPrivate;
+
+/*!
+ * @namespace ivm
+ * @brief The Archetype object code
+ */
 class ArchetypeObject : public shared::VEObject
 {
     Q_OBJECT
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
-    Q_PROPERTY(QVariantList attributes READ attributes)
 
 public:
     enum class Type
@@ -67,6 +72,10 @@ public:
 
     bool isRootObject() const;
 
+    /*!
+    Returns false, if the "is_visible" is set to false.
+    Returns true, if set to true or is not set at all. Also does not take the parent's visibility into account.
+    */
     void setVisible(bool isVisible);
     bool isVisible() const;
 
@@ -76,10 +85,6 @@ public:
     void resetTitle();
 
     static QString typeToString(Type t);
-
-    QVariantList attributes() const;
-
-    QVariantList generateProperties(bool isProperty) const override;
 
 Q_SIGNALS:
     void titleChanged(const QString &title);
@@ -91,7 +96,7 @@ protected:
     QList<EntityAttribute> sortedAttributesValues(const EntityAttributes &attributes) override;
 
 private:
-    std::unique_ptr<ArchetypeObjectPrivate> m_privateObject;
+    ArchetypeObject::Type m_type;
 };
 
 }

@@ -1,19 +1,21 @@
-/*
-  Copyright (C) 2022 European Space Agency - <maxime.perrotin@esa.int>
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Library General Public
-  License as published by the Free Software Foundation; either
-  version 2 of the License, or (at your option) any later version.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Library General Public License for more details.
-
-  You should have received a copy of the GNU Library General Public License
-  along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
-*/
+/** @file
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 
 #include "archetypeobject.h"
 
@@ -28,24 +30,10 @@
 
 namespace ivm {
 
-/*!
- * \namespace ivm
- * \brief The Archetype object code
- */
-
-struct ArchetypeObjectPrivate {
-    ArchetypeObjectPrivate(const ArchetypeObject::Type type)
-        : m_type(type)
-    {
-    }
-
-    ArchetypeObject::Type m_type;
-};
-
 ArchetypeObject::ArchetypeObject(
         const QString &title, const ivm::ArchetypeObject::Type type, QObject *parent, const shared::Id &id)
     : shared::VEObject(id, parent)
-    , m_privateObject(std::make_unique<ArchetypeObjectPrivate>(type))
+    , m_type(type)
 {
     if (const ArchetypeObject *parentObject = qobject_cast<const ArchetypeObject *>(parent)) {
         setModel(parentObject->model());
@@ -96,50 +84,9 @@ QString ArchetypeObject::typeToString(Type t)
     return metaEnum.valueToKey(int(t));
 }
 
-/**
- * @brief Returns list of attributes for using in string templates.
- * @return list of attributes.
- */
-QVariantList ArchetypeObject::attributes() const
-{
-    return generateProperties(false);
-}
-
-/**
- * @brief generateProperties generates a variant list sorted by meta::Props::Token.
- * @param props can be hash of attributes or properties of ArchetypeObject.
- * @return sorted QVariantList which can be used in string templates
- */
-QVariantList ArchetypeObject::generateProperties(bool isProperty) const
-{
-    QVariantList result;
-    EntityAttributes attributes = entityAttributes();
-    for (auto it = attributes.cbegin(); it != attributes.cend(); ++it) {
-        if (it.value().isExportable() && it.value().isProperty() == isProperty) {
-            result << QVariant::fromValue(shared::ExportableProperty(it.key(), it.value().value()));
-        }
-    }
-
-    std::sort(result.begin(), result.end(), [](const QVariant &left_val, const QVariant &right_val) {
-        const auto &r = right_val.value<shared::ExportableProperty>();
-        const ivm::meta::Props::Token right_token = ivm::meta::Props::token(r.name());
-        if (right_token == ivm::meta::Props::Token::Unknown)
-            return true;
-
-        const auto &l = left_val.value<shared::ExportableProperty>();
-        const ivm::meta::Props::Token left_token = ivm::meta::Props::token(l.name());
-        if (left_token == ivm::meta::Props::Token::Unknown)
-            return false;
-
-        return left_token < right_token;
-    });
-
-    return result;
-}
-
 ArchetypeObject::Type ArchetypeObject::type() const
 {
-    return m_privateObject->m_type;
+    return m_type;
 }
 
 bool ArchetypeObject::setTitle(const QString &title)
@@ -193,10 +140,6 @@ void ArchetypeObject::setVisible(bool isVisible)
     setEntityAttribute(meta::Props::token(meta::Props::Token::is_visible), isVisible);
 }
 
-/*!
-   Returns false, if the "is_visible" is set to false.
-   Returns true, if set to true or is not set at all. Also does not take the parent's visibility into account.
- */
 bool ArchetypeObject::isVisible() const
 {
     return entityAttributeValue(meta::Props::token(meta::Props::Token::is_visible), true);
