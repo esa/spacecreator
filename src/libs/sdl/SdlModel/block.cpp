@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,48 +17,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "sdlmodel.h"
+#include "block.h"
+
+#include <sdl/SdlExporter/visitors/visitor.h>
 
 namespace sdl {
 
-SdlModel::SdlModel(QString name)
-    : m_name(std::move(name))
+const Process &Block::process() const
 {
+    return m_process;
 }
 
-conversion::ModelType SdlModel::modelType() const
+void Block::setProcess(Process process)
 {
-    return conversion::ModelProperties<SdlModel>::type;
+    m_process = std::move(process);
 }
 
-const std::vector<System> &SdlModel::systems() const
+void Block::accept(Visitor &visitor) const
 {
-    return m_systems;
-}
-
-void SdlModel::addSystem(System system)
-{
-    m_systems.push_back(std::move(system));
-}
-
-const std::vector<Process> &SdlModel::processes() const
-{
-    return m_processes;
-}
-
-void SdlModel::addProcess(Process process)
-{
-    m_processes.push_back(std::move(process));
-}
-
-const QString &SdlModel::name() const
-{
-    return m_name;
-}
-
-void SdlModel::setName(QString name)
-{
-    m_name = std::move(name);
+    visitor.visit(*this);
 }
 
 } // namespace sdl

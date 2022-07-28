@@ -214,6 +214,19 @@ public:
      */
     SdlVisitor &operator=(SdlVisitor &&) = delete; // instances of this class cannot be moved
 
+public:
+    /**
+     * @brief   System visitor
+     *
+     * @param   system     System to be serialized
+     */
+    virtual auto visit(const System &system) -> void override;
+    /**
+     * @brief   Block visitor
+     *
+     * @param   block   Block to be serialized
+     */
+    virtual auto visit(const Block &block) -> void override;
     /**
      * @brief   Process visitor
      *
