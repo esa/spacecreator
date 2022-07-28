@@ -70,8 +70,7 @@ QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, co
     }
 
     if (outStr.isEmpty()) {
-        throw std::runtime_error(
-                QString("Errors while debugging. Dumped to: %1").arg(errorLogFilename).toStdString());
+        throw std::runtime_error(QString("Errors while debugging. Dumped to: %1").arg(errorLogFilename).toStdString());
     }
 
     const QString srecData = splitAndExtractSrecData(outStr, "\n");
