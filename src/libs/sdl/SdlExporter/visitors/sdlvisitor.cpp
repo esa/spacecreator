@@ -183,6 +183,16 @@ SdlVisitor::SdlVisitor(IndentingStreamWriter &writer, Layouter &layouter)
 {
 }
 
+void SdlVisitor::visit(const System &system)
+{
+    Q_UNUSED(system);
+}
+
+void SdlVisitor::visit(const Block &block)
+{
+    Q_UNUSED(block);
+}
+
 void SdlVisitor::visit(const Process &process)
 {
     if (process.name().isEmpty()) {

@@ -20,6 +20,7 @@
 #pragma once
 
 #include <sdl/SdlModel/answer.h>
+#include <sdl/SdlModel/block.h>
 #include <sdl/SdlModel/decision.h>
 #include <sdl/SdlModel/input.h>
 #include <sdl/SdlModel/join.h>
@@ -33,6 +34,7 @@
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/signal.h>
 #include <sdl/SdlModel/state.h>
+#include <sdl/SdlModel/system.h>
 #include <sdl/SdlModel/task.h>
 #include <sdl/SdlModel/transition.h>
 #include <sdl/SdlModel/variabledeclaration.h>
@@ -73,7 +75,17 @@ public:
 
 public:
     /**
+     * @brief   System visitor
+     *
+     * @param   system      system to be visited
      */
+    virtual auto visit(const System &system) -> void = 0;
+    /**
+     * @brief   Block visitor
+     *
+     * @param   block   Block to be visited
+     */
+    virtual auto visit(const Block &block) -> void = 0;
     /**
      * @brief   Process visitor
      *

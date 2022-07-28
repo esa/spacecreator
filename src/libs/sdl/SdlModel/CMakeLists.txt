@@ -5,6 +5,7 @@ add_library(SdlModel STATIC)
 
 set(SOURCES     action.cpp
                 answer.cpp
+                block.cpp
                 expression.cpp
                 decision.cpp
                 input.cpp
@@ -22,6 +23,7 @@ set(SOURCES     action.cpp
                 signal.cpp
                 state.cpp
                 statemachine.cpp
+                system.cpp
                 task.cpp
                 transition.cpp
                 variabledeclaration.cpp
@@ -29,6 +31,7 @@ set(SOURCES     action.cpp
                 variablereference.cpp)
 set(INCLUDES    action.h
                 answer.h
+                block.h
                 expression.h
                 decision.h
                 input.h
@@ -46,6 +49,7 @@ set(INCLUDES    action.h
                 signal.h
                 state.h
                 statemachine.h
+                system.h
                 task.h
                 transition.h
                 variabledeclaration.h
