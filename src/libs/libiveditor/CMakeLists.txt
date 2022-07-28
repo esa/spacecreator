@@ -189,6 +189,8 @@ target_sources(${LIB_NAME} PRIVATE
     templating/exportableivobject.h
     templating/exportableivfunctiontype.cpp
     templating/exportableivfunctiontype.h
+    templating/exportableivarchetypereference.cpp
+    templating/exportableivarchetypereference.h
     zoomcontroller.cpp
     zoomcontroller.h
     config/ivlibrarywidget.cpp

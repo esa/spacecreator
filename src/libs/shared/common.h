@@ -143,7 +143,7 @@ QString sharedTypesPath();
 /*!
  * Returns starting string of archetype library file
  */
-QString startingArchetypesFileString();
+QString archetypesFileStartingString();
 
 /*!
  * Returns path to archetype library directory ~/.local/share/QtProject/QtCreator/archetypes/

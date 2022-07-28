@@ -39,6 +39,7 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "Implementations", Token::Implementations },
     { "Implementation", Token::Implementation },
     { "Layer", Token::Layer },
+    { "ArchetypeReference", Token::ArchetypeReference },
 
     // attrs:
     { "name", Token::name },
@@ -59,6 +60,8 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "default_implementation", Token::default_implementation },
     { "enable_multicast", Token::enable_multicast },
     { "layer", Token::layer },
+    { "archetype_library", Token::archetype_library },
+    { "archetype_function", Token::archetype_function },
 
     // TASTE props:
     { "Taste::coordinates", Token::coordinates },

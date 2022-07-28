@@ -25,6 +25,7 @@
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "ivinterfacegroup.h"
+#include "ivarchetypereference.h"
 
 #include <QDebug>
 
@@ -43,6 +44,7 @@ struct IVFunctionTypePrivate {
     QVector<IVComment *> m_comments;
     QVector<IVConnection *> m_connections;
     QVector<IVConnectionGroup *> m_connectionGroups;
+    QVector<IVArchetypeReference *> m_archetypeReferences;
 };
 
 IVFunctionType::IVFunctionType(QObject *parent, const shared::Id &id)
@@ -104,6 +106,10 @@ bool IVFunctionType::addChild(IVObject *child)
             d->m_connections.append(child->as<IVConnection *>());
             break;
         }
+        case IVObject::Type::ArchetypeReference: {
+            d->m_archetypeReferences.append(child->as<IVArchetypeReference *>());
+            break;
+        }
         default: {
             shared::ErrorHub::addError(shared::ErrorItem::Warning,
                     tr("attempt to reg unsupported Function child: %1").arg(IVObject::typeToString(t)));
@@ -157,6 +163,10 @@ bool IVFunctionType::removeChild(IVObject *child)
         }
         case IVObject::Type::Connection: {
             d->m_connections.removeAll(child->as<IVConnection *>());
+            break;
+        }
+        case IVObject::Type::ArchetypeReference: {
+            d->m_archetypeReferences.removeAll(child->as<IVArchetypeReference *>());
             break;
         }
         default: {
@@ -240,6 +250,11 @@ QVector<IVInterface *> IVFunctionType::pis() const
 QVector<IVInterfaceGroup *> IVFunctionType::interfaceGroups() const
 {
     return d->m_ifaceGroups;
+}
+
+QVector<IVArchetypeReference *> IVFunctionType::archetypeReferences() const
+{
+    return d->m_archetypeReferences;
 }
 
 bool IVFunctionType::hasNestedChildren() const

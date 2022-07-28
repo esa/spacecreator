@@ -923,13 +923,13 @@ bool InterfaceDocument::loadImpl(const QString &path)
 void InterfaceDocument::loadArchetypes()
 {
     QVector<QString> archetypeLibraryPaths;
-    QRegularExpression regex(shared::startingArchetypesFileString() + "(.+?).xml");
+    QRegularExpression regex(shared::archetypesFileStartingString() + "(.+?).xml");
 
     for (const auto &entry :
             std::filesystem::directory_iterator(shared::interfaceCustomArchetypesDirectoryPath().toStdString())) {
         QString path = QString(entry.path().c_str());
         QString fileName = QString(entry.path().filename().c_str());
-        if (fileName.startsWith(shared::startingArchetypesFileString()) && fileName.endsWith(".xml")) {
+        if (fileName.startsWith(shared::archetypesFileStartingString()) && fileName.endsWith(".xml")) {
             archetypeLibraryPaths.append(path);
         }
     }

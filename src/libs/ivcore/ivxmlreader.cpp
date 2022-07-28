@@ -27,6 +27,7 @@
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
 #include "ivinterfacegroup.h"
+#include "ivarchetypereference.h"
 #include "parameter.h"
 
 #include <QDebug>
@@ -64,6 +65,7 @@ struct CurrentObjectHolder {
         m_connection = m_object ? m_object->as<IVConnection *>() : nullptr;
         m_connectionGroup = m_object ? m_object->as<IVConnectionGroup *>() : nullptr;
         m_layer = m_object ? m_object->as<IVConnectionLayerType *>() : nullptr;
+        m_archetypeReference = m_object ? m_object->as<IVArchetypeReference *>() : nullptr;
     }
 
     QPointer<IVObject> get() { return m_object; }
@@ -73,6 +75,7 @@ struct CurrentObjectHolder {
     QPointer<IVConnection> connection() { return m_connection; }
     QPointer<IVConnectionGroup> connectionGroup() { return m_connectionGroup; }
     QPointer<IVConnectionLayerType> layer() { return m_layer; }
+    QPointer<IVArchetypeReference> archetypeReference() { return m_archetypeReference; }
 
     bool isValid() const { return !m_object.isNull(); }
 
@@ -84,6 +87,7 @@ private:
     QPointer<IVConnection> m_connection { nullptr };
     QPointer<IVConnectionGroup> m_connectionGroup { nullptr };
     QPointer<IVConnectionLayerType> m_layer { nullptr };
+    QPointer<IVArchetypeReference> m_archetypeReference { nullptr };
 };
 
 typedef QHash<QString, QHash<QString, IVInterface *>> IfacesByFunction; // { Function[Type]Id, {IfaceName, Iface} }
@@ -277,6 +281,11 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
         obj = layer;
         break;
     }
+    case Props::Token::ArchetypeReference: {
+        obj = addArchetypeReference(
+                attrValue(attrs, Props::Token::archetype_library), attrValue(attrs, Props::Token::archetype_function));
+        break;
+    }
     default:
         static const QString msg("The '%1' is unknown/unexpected here: %2@%3 %4");
         shared::ErrorHub::addError(shared::ErrorItem::Warning,
@@ -300,7 +309,8 @@ void IVXMLReader::processTagClose(QXmlStreamReader &xml)
     case Props::Token::Provided_Interface:
     case Props::Token::ConnectionGroup:
     case Props::Token::Connection:
-    case Props::Token::Comment: {
+    case Props::Token::Comment:
+    case Props::Token::ArchetypeReference: {
         d->setCurrentObject(d->m_currentObject.get() ? d->m_currentObject.get()->parentObject() : nullptr);
         break;
     }
@@ -401,6 +411,17 @@ IVConnectionGroup *IVXMLReader::addConnectionGroup(const QString &groupName)
         d->m_currentObject.function()->addChild(connection);
 
     return connection;
+}
+
+IVArchetypeReference *IVXMLReader::addArchetypeReference(
+        const QString &archetypeLibrary, const QString &archetypeFunction)
+{
+    IVArchetypeReference *archetypeReference { nullptr };
+    if (d->m_currentObject.function()) {
+        archetypeReference = new IVArchetypeReference(d->m_currentObject.get(), archetypeLibrary, archetypeFunction);
+        d->m_currentObject.function()->addChild(archetypeReference);
+    }
+    return archetypeReference;
 }
 
 }

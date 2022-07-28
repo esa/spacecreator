@@ -23,11 +23,13 @@
 #include "exportableivfunctiontype.h"
 #include "exportableivinterface.h"
 #include "exportableivconnectionlayertype.h"
+#include "exportableivarchetypereference.h"
 #include "exportableproperty.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
+#include "ivarchetypereference.h"
 #include "ivobject.h"
 
 namespace ive {
@@ -67,6 +69,8 @@ QVariant ExportableIVObject::createFrom(const ivm::IVObject *ivObject)
         return QVariant::fromValue(ExportableIVConnectionGroup(static_cast<const ivm::IVConnectionGroup *>(ivObject)));
     case ivm::IVObject::Type::ConnectionLayer:
         return QVariant::fromValue(ExportableIVConnectionLayerType(static_cast<const ivm::IVConnectionLayerType *>(ivObject)));
+    case ivm::IVObject::Type::ArchetypeReference:
+        return QVariant::fromValue(ExportableIVArchetypeReference(static_cast<const ivm::IVArchetypeReference *>(ivObject)));
     default:
         Q_UNREACHABLE();
     }

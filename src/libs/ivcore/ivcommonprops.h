@@ -48,6 +48,7 @@ public:
         Implementations,
         Implementation,
         Layer,
+        ArchetypeReference,
 
         // attrs:
         name,
@@ -68,6 +69,8 @@ public:
         default_implementation,
         enable_multicast,
         layer,
+        archetype_library,
+        archetype_function,
 
         // KNOWN TASTE props:
         coordinates,
