@@ -17,8 +17,9 @@ target_link_libraries(TmcConverter
     PUBLIC     Conversion::Common
                Conversion::Converter
                Conversion::Registry
-               Conversion::IvRegistrar
                Conversion::Asn1Registrar
+               Conversion::IvRegistrar
+               Conversion::MscRegistrar
                Conversion::PromelaRegistrar
                Tmc::SdlToPromelaConverter
     PRIVATE    CommonProjectWarnings

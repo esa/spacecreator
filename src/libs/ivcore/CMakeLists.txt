@@ -48,6 +48,18 @@ target_sources(${LIB_NAME} PRIVATE
     ivpropertytemplateconfig.cpp
     ivpropertytemplateconfig.h
     ivresources.qrc
+    archetypes/archetypemodel.h
+    archetypes/archetypemodel.cpp
+    archetypes/archetypeobject.h
+    archetypes/archetypeobject.cpp
+    archetypes/parameterarchetype.h
+    archetypes/parameterarchetype.cpp
+    archetypes/interfacearchetype.h
+    archetypes/interfacearchetype.cpp
+    archetypes/functionarchetype.h
+    archetypes/functionarchetype.cpp
+    archetypes/archetypecommonprops.h
+    archetypes/archetypecommonprops.cpp
     )
 
 target_include_directories(${LIB_NAME}

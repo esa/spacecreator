@@ -1,2 +1,3 @@
-add_subdirectory(MscImporter)
 add_subdirectory(MscExporter)
+add_subdirectory(MscImporter)
+add_subdirectory(MscRegistrar)

@@ -36,6 +36,7 @@
 #include <conversion/converter/exceptions.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/IvRegistrar/registrar.h>
+#include <conversion/msc/MscRegistrar/registrar.h>
 #include <conversion/promela/PromelaRegistrar/registrar.h>
 #include <iostream>
 #include <ivcore/ivfunction.h>
@@ -57,6 +58,7 @@ using conversion::exporter::ExportException;
 using conversion::importer::ImportException;
 using conversion::iv::IvOptions;
 using conversion::iv::IvRegistrar;
+using conversion::msc::MscRegistrar;
 using conversion::promela::PromelaOptions;
 using conversion::promela::PromelaRegistrar;
 using conversion::translator::TranslationException;
@@ -101,6 +103,11 @@ TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &output
     result = ivRegistrar.registerCapabilities(m_registry);
     if (!result) {
         throw RegistrationFailedException(ModelType::InterfaceView);
+    }
+    MscRegistrar mscRegistrar;
+    result = mscRegistrar.registerCapabilities(m_registry);
+    if (!result) {
+        throw RegistrationFailedException(ModelType::Msc);
     }
     PromelaRegistrar tmcRegistrar;
     result = tmcRegistrar.registerCapabilities(m_registry);
@@ -294,11 +301,6 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
     QMap<QString, QString> uniqueAsn1Files;
     for (const QString &ivFunction : modelFunctions) {
         const ProcessMetadata &processMetadata = allSdlFiles.at(ivFunction);
-        for (const QFileInfo &fileInfo : allSdlFiles.at(ivFunction).getContext()) {
-            if (fileInfo.exists()) {
-                uniqueAsn1Files.insert(fileInfo.fileName(), fileInfo.absoluteFilePath());
-            }
-        }
         const QFileInfo outputFile = outputFilepath(processMetadata.getName().toLower() + ".pml");
 
         SdlToPromelaConverter sdl2Promela;

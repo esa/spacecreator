@@ -71,5 +71,7 @@ private:
             -> std::vector<std::unique_ptr<conversion::Model>>;
     auto generateValueGenerationInlines(const Asn1Acn::Asn1Model *model, const QStringList &typeNames,
             const conversion::Options &options) const -> std::vector<std::unique_ptr<conversion::Model>>;
+    auto createDataviewInitInline(promela::model::PromelaModel &model, const QVector<QString> &initInlineNames) const
+            -> void;
 };
 }

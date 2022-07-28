@@ -316,7 +316,6 @@ private:
     auto createWaitForInitStatement() const -> std::unique_ptr<model::ProctypeElement>;
     auto createPromelaObjectsForObservers(Context &context) const -> void;
 
-    auto containsContextVariables(const QVector<shared::ContextParameter> &parameters) const -> bool;
     auto constructChannelName(const QString &functionName, const QString &interfaceName) const -> QString;
 
     auto getSubtypesDefinitions(const Asn1Acn::Asn1Model *asn1Model, const conversion::Options &options) const
