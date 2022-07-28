@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,35 +17,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "sdlmodelbuilder.h"
+#include "sdlsystembuilder.h"
 
-using sdl::Process;
-using sdl::SdlModel;
+using sdl::Block;
 using sdl::System;
 
 namespace tests::common {
 
-SdlModelBuilder::SdlModelBuilder(QString name)
-    : m_model(std::make_unique<SdlModel>())
+SdlSystemBuilder::SdlSystemBuilder(QString systemName)
 {
-    m_model->setName(std::move(name));
+    m_system.setName(std::move(systemName));
 }
 
-std::unique_ptr<SdlModel> SdlModelBuilder::build()
+System SdlSystemBuilder::build()
 {
-    return std::move(m_model);
+    return std::move(m_system);
 }
 
-SdlModelBuilder &SdlModelBuilder::withSystem(System system)
+SdlSystemBuilder &SdlSystemBuilder::withBlock(Block block)
 {
-    m_model->addSystem(std::move(system));
-
-    return *this;
-}
-
-SdlModelBuilder &SdlModelBuilder::withProcess(Process process)
-{
-    m_model->addProcess(std::move(process));
+    m_system.setBlock(std::move(block));
 
     return *this;
 }

@@ -31,6 +31,7 @@ public:
 
     auto build() -> std::unique_ptr<sdl::SdlModel>;
 
+    auto withSystem(sdl::System system) -> SdlModelBuilder &;
     auto withProcess(sdl::Process process) -> SdlModelBuilder &;
 
 private:

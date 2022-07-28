@@ -20,6 +20,7 @@
 #include <QObject>
 #include <QtTest>
 #include <common/sdlmodelbuilder/sdlanswerbuilder.h>
+#include <common/sdlmodelbuilder/sdlblockbuilder.h>
 #include <common/sdlmodelbuilder/sdldecisionbuilder.h>
 #include <common/sdlmodelbuilder/sdlinputbuilder.h>
 #include <common/sdlmodelbuilder/sdlmodelbuilder.h>
@@ -29,6 +30,7 @@
 #include <common/sdlmodelbuilder/sdlprocessbuilder.h>
 #include <common/sdlmodelbuilder/sdlstatebuilder.h>
 #include <common/sdlmodelbuilder/sdlstatemachinebuilder.h>
+#include <common/sdlmodelbuilder/sdlsystembuilder.h>
 #include <common/sdlmodelbuilder/sdltaskbuilder.h>
 #include <common/sdlmodelbuilder/sdltransitionbuilder.h>
 #include <common/textcheckerandconsumer/textcheckerandconsumer.h>
@@ -83,6 +85,7 @@ using sdl::VariableLiteral;
 using sdl::VariableReference;
 using sdl::exporter::SdlExporter;
 using tests::common::SdlAnswerBuilder;
+using tests::common::SdlBlockBuilder;
 using tests::common::SdlDecisionBuilder;
 using tests::common::SdlInputBuilder;
 using tests::common::SdlModelBuilder;
@@ -92,6 +95,7 @@ using tests::common::SdlProcedureCallBuilder;
 using tests::common::SdlProcessBuilder;
 using tests::common::SdlStateBuilder;
 using tests::common::SdlStateMachineBuilder;
+using tests::common::SdlSystemBuilder;
 using tests::common::SdlTaskBuilder;
 using tests::common::SdlTransitionBuilder;
 using tests::common::TextCheckerAndConsumer;
@@ -112,6 +116,7 @@ private Q_SLOTS:
     void testGenerateProcessWithParamlessProcedure();
     void testGenerateProcessWithProcedureWithParamsAndReturn();
     void testGenerateProcessWithReturnlessProcedure();
+    void testGenerateSystem();
 };
 
 static std::unique_ptr<VariableDeclaration> makeVariableDeclaration(QString name, QString type)
@@ -799,6 +804,74 @@ void tst_sdlexporter::testGenerateProcessWithReturnlessProcedure()
 
         QString("endprocess %1;").arg(processName),
     };
+    TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
+}
+
+void tst_sdlexporter::testGenerateSystem()
+{
+    QString modelName = "BasicSystem";
+    QString modelPrefix = "Sdl_";
+    QString systemName = modelName.toLower(); // NOLINT
+
+    auto transition1 = SdlTransitionBuilder().withNextStateAction().build();
+    auto state1 = SdlStateBuilder("Wait")
+                          .withInput(SdlInputBuilder().withName("someInput").withTransition(transition1.get()).build())
+                          .build();
+
+    auto startTransition = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
+
+    auto transition2 = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
+
+    auto state2 =
+            SdlStateBuilder("Idle")
+                    .withInput(SdlInputBuilder().withName("someOtherInput").withTransition(transition2.get()).build())
+                    .build();
+
+    // clang-format off
+    const auto exampleModel = SdlModelBuilder(systemName)
+        .withSystem(SdlSystemBuilder(systemName)
+                    .withBlock(SdlBlockBuilder(systemName)
+                               .withProcess(SdlProcessBuilder(systemName)
+                                            .withStartTransition(std::move(startTransition))
+                                            .withStateMachine(SdlStateMachineBuilder()
+                                                              .withState(std::move(state1))
+                                                              .withState(std::move(state2))
+                                                              .withTransition(std::move(transition1))
+                                                              .withTransition(std::move(transition2))
+                                                              .build())
+                                            .build())
+                                .build())
+                    .build())
+        .build();
+    // clang-format on
+
+    Options options;
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
+
+    SdlExporter exporter;
+    try {
+        exporter.exportModel(exampleModel.get(), options);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+
+    QString filename = QString("%1%2.%3").arg(modelPrefix, systemName, "pr");
+    QFile outputFile(filename);
+    if (!outputFile.open(QIODevice::ReadOnly)) {
+        QFAIL("requested file cannot be found");
+    }
+    QTextStream consumableOutput(&outputFile);
+    // clang-format off
+    std::vector<QString> expectedOutput = { 
+        QString("system %1;").arg(systemName),
+        QString("block %1;").arg(systemName),
+        QString("process %1;").arg(systemName),
+        "START;", "NEXTSTATE Wait;",
+        "state Wait;", "input someInput;", "NEXTSTATE -;", "endstate;",
+        "state Idle;", "input someOtherInput;", "NEXTSTATE Wait;", "endstate;",
+        QString("endprocess %1;").arg(systemName), "endblock;", "endsystem;"
+    };
+    // clang-format on
     TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
