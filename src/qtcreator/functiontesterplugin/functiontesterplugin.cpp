@@ -28,10 +28,10 @@
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <editormanager/editormanager.h>
 #include <libiveditor/interfacedocument.h>
-#include <messagemanager.h>
 #include <messagestrings.h>
 #include <modelloader.h>
 #include <shared/ui/veinteractiveobject.h>
+#include <spacecreatorplugin/common/messagemanager.h>
 #include <spacecreatorplugin/iv/iveditordocument.h>
 #include <testgenerator/testgenerator.h>
 
@@ -120,7 +120,7 @@ auto FunctionTesterPlugin::setDeltaDialog() -> float
     float delta = 0.0;
     bool isOk;
     QString text = QInputDialog::getText(nullptr, tr("Set delta"), tr("Maximum allowed absolute error:"),
-            QLineEdit::Normal, "0.0", &isOk, { 0U }, Qt::ImhFormattedNumbersOnly);
+            QLineEdit::Normal, "0.0", &isOk, Qt::WindowFlags(), Qt::ImhFormattedNumbersOnly);
     if (isOk && !text.isEmpty()) {
         delta = text.toFloat();
     }
