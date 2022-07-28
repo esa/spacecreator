@@ -185,12 +185,34 @@ SdlVisitor::SdlVisitor(IndentingStreamWriter &writer, Layouter &layouter)
 
 void SdlVisitor::visit(const System &system)
 {
-    Q_UNUSED(system);
+    if (system.name().isEmpty()) {
+        throw ExportException("System shall have a name but it doesn't");
+    }
+
+    m_writer.writeLine(QString("system %1;").arg(system.name()));
+
+    m_writer.pushIndent(INDENT);
+
+    system.block().accept(*this);
+
+    m_writer.popIndent();
+    m_writer.writeLine("endsystem;");
 }
 
 void SdlVisitor::visit(const Block &block)
 {
-    Q_UNUSED(block);
+    if (block.name().isEmpty()) {
+        throw ExportException("Block shall have a name but it doesn't");
+    }
+
+    m_writer.writeLine(QString("block %1;").arg(block.name()));
+
+    m_writer.pushIndent(INDENT);
+
+    block.process().accept(*this);
+
+    m_writer.popIndent();
+    m_writer.writeLine("endblock;");
 }
 
 void SdlVisitor::visit(const Process &process)
