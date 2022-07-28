@@ -97,7 +97,7 @@ public:
      * @param isProperty determines if result should be generated for properties or attributes
      * @return sorted QVariantList which can be used in string templates
      */
-    QVariantList generateProperties(bool isProperty) const;
+    virtual QVariantList generateProperties(bool isProperty) const override;
 
     bool postInit() override;
     bool aboutToBeRemoved() override;
