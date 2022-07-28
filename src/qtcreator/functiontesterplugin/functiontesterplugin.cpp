@@ -241,7 +241,7 @@ auto FunctionTesterPlugin::selectBoardDialog() -> void
     int wndWidth = 800;
     int wndHeight = 600;
 
-    boardsConfigLoader.loadConfig();
+    boardsConfiguration = boardsConfigLoader.loadConfig().value();
 
     QWidget *chooseBoardWindow = new QWidget;
     chooseBoardWindow->resize(wndWidth, wndHeight);
@@ -280,7 +280,7 @@ auto FunctionTesterPlugin::selectBoardDialog() -> void
     connect(okBtn, &QPushButton::clicked, this, [=] {
         QString boardName = listWidget->currentItem()->text();
         chooseBoardWindow->close();
-        testUsingDataFromCsvGui(boardsConfigLoader.getConfig()[boardName]);
+        testUsingDataFromCsvGui(boardsConfiguration[boardName]);
     });
     connect(optionsBtn, &QPushButton::clicked, this, [=] {
         boardOptionsDialog(chooseBoardWindow, listWidget->currentItem()->text());
@@ -318,8 +318,6 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
 
     boardOptionsWindow->setLayout(formLayout);
 
-    QMap<QString, LaunchConfiguration> boardsConfiguration = boardsConfigLoader.getConfig();
-
     scriptPathEdit->setText(boardsConfiguration[boardName].scriptPath);
     clientNameEdit->setText(boardsConfiguration[boardName].clientName);
     clientParamsEdit->setText(boardsConfiguration[boardName].clientArgs);
@@ -333,7 +331,8 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
         boardOptionsWindow->close();
         LaunchConfiguration boardConfig(boardName, scriptPathEdit->text(),
                 clientNameEdit->text(), clientParamsEdit->text(), serverNameEdit->text(), serverParamsEdit->text());
-        boardsConfigLoader.saveConfig(boardConfig);
+        boardsConfiguration[boardName] = boardConfig;
+        boardsConfigLoader.saveConfig(boardsConfiguration);
     });
 
     boardOptionsWindow->setWindowTitle("Board options");

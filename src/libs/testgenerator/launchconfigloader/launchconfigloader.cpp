@@ -25,6 +25,7 @@
 namespace testgenerator {
 
 constexpr int BOARD_CONFIG_LENGTH = 6;
+const QString defaultBinaryName = "hostpartition";
 const QMap<QString, QDataStream::ByteOrder> endianessMap = {
     { "x86 Linux CPP", QDataStream::LittleEndian },
     { "GR712RC RTEMS6 SMP QDP", QDataStream::BigEndian },
@@ -41,7 +42,7 @@ LaunchConfiguration::LaunchConfiguration(const QString &name, const QString &lau
 {
     endianess = endianessMap[boardName];
     clientArgsParsed = clientParams.replace("$SCRIPT_PATH", scriptPath).split(" ");
-    serverArgsParsed = serverParams.replace("$BIN_PATH", "hostpartition").split(" ");
+    serverArgsParsed = serverParams.replace("$BIN_PATH", defaultBinaryName).split(" ");
 }
 
 LaunchConfigLoader::LaunchConfigLoader(const QString &launchConfigPath)
@@ -49,13 +50,16 @@ LaunchConfigLoader::LaunchConfigLoader(const QString &launchConfigPath)
 {
 }
 
-auto LaunchConfigLoader::getConfig() -> QMap<QString, LaunchConfiguration> &
+auto LaunchConfigLoader::loadConfig() -> std::optional<QMap<QString, LaunchConfiguration>>
 {
-    return configMap;
-}
+    constexpr int BOARD_NAME_IDX = 0;
+    constexpr int SCRIPT_PATH_IDX = 1;
+    constexpr int CLIENT_NAME_IDX = 2;
+    constexpr int CLIENT_PARAMS_IDX = 3;
+    constexpr int SERVER_NAME_IDX = 4;
+    constexpr int SERVER_PARAMS_IDX = 5;
 
-auto LaunchConfigLoader::loadConfig() -> bool
-{
+    QMap<QString, LaunchConfiguration> configMap;
     QFile file(configPath);
     if (file.open(QIODevice::ReadOnly)) {
         QTextStream stream(&file);
@@ -63,22 +67,23 @@ auto LaunchConfigLoader::loadConfig() -> bool
             QString line = stream.readLine();
             QStringList conf = line.split(';');
             if (conf.size() >= BOARD_CONFIG_LENGTH) {
-                configMap.insert(conf[0], LaunchConfiguration(conf[0], conf[1], conf[2], conf[3], conf[4], conf[5]));
+                configMap.insert(conf[BOARD_NAME_IDX],
+                        LaunchConfiguration(conf[BOARD_NAME_IDX], conf[SCRIPT_PATH_IDX], conf[CLIENT_NAME_IDX],
+                                conf[CLIENT_PARAMS_IDX], conf[SERVER_NAME_IDX], conf[SERVER_PARAMS_IDX]));
             } else {
-                qDebug() << "Not enough information in boards_config.txt file for board " << conf[0];
+                qDebug() << "Not enough information in boards_config.txt file for board " << conf[BOARD_NAME_IDX];
             }
         }
         file.close();
     } else {
         qDebug() << "Could not find file with default boards configuration at path: " << configPath;
-        return false;
+        return std::nullopt;
     }
-    return true;
+    return configMap;
 }
 
-auto LaunchConfigLoader::saveConfig(const LaunchConfiguration &launchConfig) -> bool
+auto LaunchConfigLoader::saveConfig(const QMap<QString, LaunchConfiguration> &configMap) -> bool
 {
-    configMap[launchConfig.boardName] = launchConfig;
     QFile file(configPath);
     if (file.open(QIODevice::WriteOnly)) {
         QTextStream stream(&file);

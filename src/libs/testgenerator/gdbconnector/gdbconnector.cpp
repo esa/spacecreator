@@ -94,8 +94,6 @@ QString GdbConnector::splitAndExtractSrecData(const QString &packetizedData, con
     const int byteCount = 1;
     const int checksumLength = 1;
 
-    qDebug() << "packetizedData: " << packetizedData;
-
     QString rawData;
     rawData.reserve(packetizedData.size());
     const QStringList dataRows = packetizedData.split(delimeter);

@@ -68,6 +68,7 @@ private:
     auto selectScriptDialog(QWidget *parent, const QString &boardName, QLineEdit *scriptPathEdit) -> void;
 
     LaunchConfigLoader boardsConfigLoader;
+    QMap<QString, LaunchConfiguration> boardsConfiguration;
 };
 
 }

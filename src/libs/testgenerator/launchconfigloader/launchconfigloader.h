@@ -31,13 +31,13 @@ namespace testgenerator {
 struct LaunchConfiguration {
     /** name of the board */
     QString boardName;
-    /** path to the GDB script for launching the tested binary */
+    /** path to the GDB script for managing the data acquisition */
     QString scriptPath;
     /** debugger client to use for testing binary */
     QString clientName;
     /** arguments for debugger client */
     QString clientArgs;
-    /** debugger client to use for testing binary */
+    /** debugger server to use for testing binary */
     QString serverName;
     /** arguments for debugger server */
     QString serverArgs;
@@ -81,36 +81,27 @@ public:
      * @brief Constructor of the class
      *
      * @param launchConfigPath path to the file with launch configuration of each board
-     *
      */
     LaunchConfigLoader(const QString &launchConfigPath);
 
     /**
-     * @brief Getter for the configuration map of board names and their launch parameters
+     * @brief Load launch parameters of every board
      *
-     * @return map of board names as keys and launch parameters as values
+     * @return an optional containing a mapping of boards to their configurations
      */
-    auto getConfig() -> QMap<QString, LaunchConfiguration> &;
-
-    /**
-     * @brief Load launch parameters for every board and stores in configMap private field
-     *
-     * @return true if file with boards' launch configuration was successfuly opened
-     */
-    auto loadConfig() -> bool;
+    auto loadConfig() -> std::optional<QMap<QString, LaunchConfiguration>>;
 
     /**
      * @brief Store launch parameters of every board in a CSV file specified in constructor
      *
-     * @param launchConfig a board configuration to save
+     * @param configMap a configuration mapping to save
      *
      * @return true if saving configuration is successful, false otherwise
      */
-    auto saveConfig(const LaunchConfiguration &launchConfig) -> bool;
+    auto saveConfig(const QMap<QString, LaunchConfiguration> &configMap) -> bool;
 
 private:
     QString configPath;
-    QMap<QString, LaunchConfiguration> configMap;
 };
 
 }

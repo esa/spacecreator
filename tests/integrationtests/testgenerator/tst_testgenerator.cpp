@@ -139,12 +139,16 @@ void tst_testgenerator::testStoringBoardsConfig()
 {
     const QString configPath = "boards_config.txt";
     LaunchConfigLoader configLoader(configPath);
-    LaunchConfiguration configToSave("x86 Linux CPP", "/path/to/script", "gdb", "dummyParam1 dummyParam2", "gdbserver",
-            "dummyParam3 dummyParam4");
-    configLoader.saveConfig(configToSave);
-    configLoader.loadConfig();
-    auto boardsConfig = configLoader.getConfig();
-    LaunchConfiguration readConfig = boardsConfig["x86 Linux CPP"];
+    QMap<QString, LaunchConfiguration> boardsConfig;
+    const QString testBoardName = "x86 Linux CPP";
+
+    LaunchConfiguration configToSave(
+            testBoardName, "/path/to/script", "gdb", "dummyParam1 dummyParam2", "gdbserver", "dummyParam3 dummyParam4");
+    boardsConfig[testBoardName] = configToSave;
+    configLoader.saveConfig(boardsConfig);
+
+    boardsConfig = configLoader.loadConfig().value();
+    LaunchConfiguration readConfig = boardsConfig[testBoardName];
 
     QCOMPARE(readConfig.scriptPath, "/path/to/script");
     QCOMPARE(readConfig.clientName, "gdb");
