@@ -63,11 +63,12 @@ struct LaunchConfiguration {
      * @param clientParams arguments for debugger client
      * @param server name of the debugger server to use for testing binary
      * @param serverParams arguments for debugger server
+     * @param byteOrder byte order used by the board's architecture
      *
      * @return true if there was no error during creation of the test harness files and false otherwise
      */
     LaunchConfiguration(const QString &name, const QString &launchScriptPath, const QString &client,
-            QString clientParams, const QString &server, QString serverParams);
+            QString clientParams, const QString &server, QString serverParams, const QDataStream::ByteOrder byteOrder);
 };
 
 /**

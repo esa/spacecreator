@@ -130,7 +130,7 @@ void tst_testgenerator::testResultHtmlData()
 void tst_testgenerator::testParsingBoardSettings()
 {
     LaunchConfiguration config("x86 Linux CPP", "/path/to/gdb/script", "gdb", "dummyClientParam1 $SCRIPT_PATH",
-            "gdbserver", "dummyServerParam1 $BIN_PATH");
+            "gdbserver", "dummyServerParam1 $BIN_PATH", QDataStream::LittleEndian);
     QCOMPARE(config.clientArgsParsed, QStringList({ "dummyClientParam1", "/path/to/gdb/script" }));
     QCOMPARE(config.serverArgsParsed, QStringList({ "dummyServerParam1", "hostpartition" }));
 }
@@ -142,8 +142,8 @@ void tst_testgenerator::testStoringBoardsConfig()
     QMap<QString, LaunchConfiguration> boardsConfig;
     const QString testBoardName = "x86 Linux CPP";
 
-    LaunchConfiguration configToSave(
-            testBoardName, "/path/to/script", "gdb", "dummyParam1 dummyParam2", "gdbserver", "dummyParam3 dummyParam4");
+    LaunchConfiguration configToSave(testBoardName, "/path/to/script", "gdb", "dummyParam1 dummyParam2", "gdbserver",
+            "dummyParam3 dummyParam4", QDataStream::LittleEndian);
     boardsConfig[testBoardName] = configToSave;
     configLoader.saveConfig(boardsConfig);
 

@@ -24,6 +24,7 @@
 
 #include <QApplication>
 #include <QBoxLayout>
+#include <QComboBox>
 #include <QDesktopServices>
 #include <QDirIterator>
 #include <QFileDialog>
@@ -55,9 +56,10 @@ const QString resultFileName = "Results.html";
 const QString boardsConfigFileName = "boards_config.txt";
 
 FunctionTesterPlugin::FunctionTesterPlugin()
-    : boardsConfigLoader(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
-            + QDir::separator() + boardsConfigFileName)
-{}
+    : boardsConfigLoader(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + QDir::separator()
+            + boardsConfigFileName)
+{
+}
 
 FunctionTesterPlugin::~FunctionTesterPlugin() { }
 
@@ -282,9 +284,8 @@ auto FunctionTesterPlugin::selectBoardDialog() -> void
         chooseBoardWindow->close();
         testUsingDataFromCsvGui(boardsConfiguration[boardName]);
     });
-    connect(optionsBtn, &QPushButton::clicked, this, [=] {
-        boardOptionsDialog(chooseBoardWindow, listWidget->currentItem()->text());
-    });
+    connect(optionsBtn, &QPushButton::clicked, this,
+            [=] { boardOptionsDialog(chooseBoardWindow, listWidget->currentItem()->text()); });
 
     chooseBoardWindow->setWindowTitle("Choose target board");
     chooseBoardWindow->show();
@@ -306,12 +307,20 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
     pathEditLayout->addWidget(selectBtn);
     pathEditLayout->addWidget(scriptPathEdit);
 
+    const QString bigEndianStr = "Big Endian";
+    const QString littleEndianStr = "Little Endian";
+
+    QStringList endianessOptions = { bigEndianStr, littleEndianStr };
+    QComboBox *endianessCombo = new QComboBox;
+    endianessCombo->addItems(endianessOptions);
+
     QFormLayout *formLayout = new QFormLayout;
     formLayout->addRow("Script path", pathEditLayout);
     formLayout->addRow("Client", clientNameEdit);
     formLayout->addRow("Client params", clientParamsEdit);
     formLayout->addRow("Server", serverNameEdit);
     formLayout->addRow("Server params", serverParamsEdit);
+    formLayout->addRow("Byte order", endianessCombo);
 
     QPushButton *okBtn = new QPushButton("OK");
     formLayout->addWidget(okBtn);
@@ -323,14 +332,16 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
     clientParamsEdit->setText(boardsConfiguration[boardName].clientArgs);
     serverNameEdit->setText(boardsConfiguration[boardName].serverName);
     serverParamsEdit->setText(boardsConfiguration[boardName].serverArgs);
+    endianessCombo->setCurrentText(
+            boardsConfiguration[boardName].endianess == QDataStream::BigEndian ? bigEndianStr : littleEndianStr);
 
-    connect(selectBtn, &QPushButton::clicked, this, [=] {
-        selectScriptDialog(boardOptionsWindow, boardName, scriptPathEdit);
-    });
+    connect(selectBtn, &QPushButton::clicked, this,
+            [=] { selectScriptDialog(boardOptionsWindow, boardName, scriptPathEdit); });
     connect(okBtn, &QPushButton::clicked, this, [=] {
         boardOptionsWindow->close();
-        LaunchConfiguration boardConfig(boardName, scriptPathEdit->text(),
-                clientNameEdit->text(), clientParamsEdit->text(), serverNameEdit->text(), serverParamsEdit->text());
+        LaunchConfiguration boardConfig(boardName, scriptPathEdit->text(), clientNameEdit->text(),
+                clientParamsEdit->text(), serverNameEdit->text(), serverParamsEdit->text(),
+                endianessCombo->currentText() == bigEndianStr ? QDataStream::BigEndian : QDataStream::LittleEndian);
         boardsConfiguration[boardName] = boardConfig;
         boardsConfigLoader.saveConfig(boardsConfiguration);
     });
@@ -339,7 +350,8 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
     boardOptionsWindow->show();
 }
 
-auto FunctionTesterPlugin::selectScriptDialog(QWidget *parent, const QString &boardName, QLineEdit *scriptPathEdit) -> void
+auto FunctionTesterPlugin::selectScriptDialog(QWidget *parent, const QString &boardName, QLineEdit *scriptPathEdit)
+        -> void
 {
     QString defaultDirPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
     QString selectedScriptPath = QFileDialog::getOpenFileName(

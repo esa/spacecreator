@@ -21,26 +21,23 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QMetaEnum>
 
 namespace testgenerator {
 
-constexpr int BOARD_CONFIG_LENGTH = 6;
+constexpr int BOARD_CONFIG_LENGTH = 7;
 const QString defaultBinaryName = "hostpartition";
-const QMap<QString, QDataStream::ByteOrder> endianessMap = {
-    { "x86 Linux CPP", QDataStream::LittleEndian },
-    { "GR712RC RTEMS6 SMP QDP", QDataStream::BigEndian },
-};
 
 LaunchConfiguration::LaunchConfiguration(const QString &name, const QString &launchScriptPath, const QString &client,
-        QString clientParams, const QString &server, QString serverParams)
+        QString clientParams, const QString &server, QString serverParams, const QDataStream::ByteOrder byteOrder)
     : boardName(name)
     , scriptPath(launchScriptPath)
     , clientName(client)
     , clientArgs(clientParams)
     , serverName(server)
     , serverArgs(serverParams)
+    , endianess(byteOrder)
 {
-    endianess = endianessMap[boardName];
     clientArgsParsed = clientParams.replace("$SCRIPT_PATH", scriptPath).split(" ");
     serverArgsParsed = serverParams.replace("$BIN_PATH", defaultBinaryName).split(" ");
 }
@@ -58,6 +55,7 @@ auto LaunchConfigLoader::loadConfig() -> std::optional<QMap<QString, LaunchConfi
     constexpr int CLIENT_PARAMS_IDX = 3;
     constexpr int SERVER_NAME_IDX = 4;
     constexpr int SERVER_PARAMS_IDX = 5;
+    constexpr int BYTE_ORDER_IDX = 6;
 
     QMap<QString, LaunchConfiguration> configMap;
     QFile file(configPath);
@@ -69,7 +67,8 @@ auto LaunchConfigLoader::loadConfig() -> std::optional<QMap<QString, LaunchConfi
             if (conf.size() >= BOARD_CONFIG_LENGTH) {
                 configMap.insert(conf[BOARD_NAME_IDX],
                         LaunchConfiguration(conf[BOARD_NAME_IDX], conf[SCRIPT_PATH_IDX], conf[CLIENT_NAME_IDX],
-                                conf[CLIENT_PARAMS_IDX], conf[SERVER_NAME_IDX], conf[SERVER_PARAMS_IDX]));
+                                conf[CLIENT_PARAMS_IDX], conf[SERVER_NAME_IDX], conf[SERVER_PARAMS_IDX],
+                                static_cast<QDataStream::ByteOrder>(conf[BYTE_ORDER_IDX].toInt())));
             } else {
                 qDebug() << "Not enough information in boards_config.txt file for board " << conf[BOARD_NAME_IDX];
             }
@@ -90,7 +89,7 @@ auto LaunchConfigLoader::saveConfig(const QMap<QString, LaunchConfiguration> &co
         for (const auto &key : configMap.keys()) {
             stream << key << ';' << configMap[key].scriptPath << ";" << configMap[key].clientName << ";"
                    << configMap[key].clientArgs << ";" << configMap[key].serverName << ";" << configMap[key].serverArgs
-                   << '\n';
+                   << ";" << configMap[key].endianess << '\n';
         }
     }
     return true;

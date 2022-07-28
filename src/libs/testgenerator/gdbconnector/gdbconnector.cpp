@@ -71,7 +71,7 @@ QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, co
 
     if (outStr.isEmpty()) {
         throw std::runtime_error(
-                QString("gdb client returned errors. Errors dumped to %1").arg(errorLogFilename).toStdString());
+                QString("Errors while debugging. Dumped to: %1").arg(errorLogFilename).toStdString());
     }
 
     const QString srecData = splitAndExtractSrecData(outStr, "\n");
