@@ -301,6 +301,7 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
     QLineEdit *clientParamsEdit = new QLineEdit;
     QLineEdit *serverNameEdit = new QLineEdit;
     QLineEdit *serverParamsEdit = new QLineEdit;
+    QLineEdit *stackSizeEdit = new QLineEdit;
 
     QBoxLayout *pathEditLayout = new QBoxLayout(QBoxLayout::Direction::RightToLeft);
     QPushButton *selectBtn = new QPushButton("Select");
@@ -321,6 +322,7 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
     formLayout->addRow("Server", serverNameEdit);
     formLayout->addRow("Server params", serverParamsEdit);
     formLayout->addRow("Byte order", endianessCombo);
+    formLayout->addRow("Stack size", stackSizeEdit);
 
     QPushButton *okBtn = new QPushButton("OK");
     formLayout->addWidget(okBtn);
@@ -332,6 +334,7 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
     clientParamsEdit->setText(boardsConfiguration[boardName].clientArgs);
     serverNameEdit->setText(boardsConfiguration[boardName].serverName);
     serverParamsEdit->setText(boardsConfiguration[boardName].serverArgs);
+    stackSizeEdit->setText(QString::number(boardsConfiguration[boardName].stackSize));
     endianessCombo->setCurrentText(
             boardsConfiguration[boardName].endianess == QDataStream::BigEndian ? bigEndianStr : littleEndianStr);
 
@@ -341,7 +344,8 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
         boardOptionsWindow->close();
         LaunchConfiguration boardConfig(boardName, scriptPathEdit->text(), clientNameEdit->text(),
                 clientParamsEdit->text(), serverNameEdit->text(), serverParamsEdit->text(),
-                endianessCombo->currentText() == bigEndianStr ? QDataStream::BigEndian : QDataStream::LittleEndian);
+                endianessCombo->currentText() == bigEndianStr ? QDataStream::BigEndian : QDataStream::LittleEndian,
+                stackSizeEdit->text().toInt());
         boardsConfiguration[boardName] = boardConfig;
         boardsConfigLoader.saveConfig(boardsConfiguration);
     });

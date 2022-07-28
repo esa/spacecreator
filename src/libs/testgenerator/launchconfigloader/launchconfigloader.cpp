@@ -25,11 +25,12 @@
 
 namespace testgenerator {
 
-constexpr int BOARD_CONFIG_LENGTH = 7;
+constexpr int BOARD_CONFIG_LENGTH = 8;
 const QString defaultBinaryName = "hostpartition";
 
 LaunchConfiguration::LaunchConfiguration(const QString &name, const QString &launchScriptPath, const QString &client,
-        QString clientParams, const QString &server, QString serverParams, const QDataStream::ByteOrder byteOrder)
+        QString clientParams, const QString &server, QString serverParams, const QDataStream::ByteOrder byteOrder,
+        const int stackSizeKB)
     : boardName(name)
     , scriptPath(launchScriptPath)
     , clientName(client)
@@ -37,6 +38,7 @@ LaunchConfiguration::LaunchConfiguration(const QString &name, const QString &lau
     , serverName(server)
     , serverArgs(serverParams)
     , endianess(byteOrder)
+    , stackSize(stackSizeKB)
 {
     clientArgsParsed = clientParams.replace("$SCRIPT_PATH", scriptPath).split(" ");
     serverArgsParsed = serverParams.replace("$BIN_PATH", defaultBinaryName).split(" ");
@@ -56,6 +58,7 @@ auto LaunchConfigLoader::loadConfig() -> std::optional<QMap<QString, LaunchConfi
     constexpr int SERVER_NAME_IDX = 4;
     constexpr int SERVER_PARAMS_IDX = 5;
     constexpr int BYTE_ORDER_IDX = 6;
+    constexpr int STACK_SIZE_IDX = 7;
 
     QMap<QString, LaunchConfiguration> configMap;
     QFile file(configPath);
@@ -68,7 +71,8 @@ auto LaunchConfigLoader::loadConfig() -> std::optional<QMap<QString, LaunchConfi
                 configMap.insert(conf[BOARD_NAME_IDX],
                         LaunchConfiguration(conf[BOARD_NAME_IDX], conf[SCRIPT_PATH_IDX], conf[CLIENT_NAME_IDX],
                                 conf[CLIENT_PARAMS_IDX], conf[SERVER_NAME_IDX], conf[SERVER_PARAMS_IDX],
-                                static_cast<QDataStream::ByteOrder>(conf[BYTE_ORDER_IDX].toInt())));
+                                static_cast<QDataStream::ByteOrder>(conf[BYTE_ORDER_IDX].toInt()),
+                                conf[STACK_SIZE_IDX].toInt()));
             } else {
                 qDebug() << "Not enough information in boards_config.txt file for board " << conf[BOARD_NAME_IDX];
             }
@@ -89,7 +93,7 @@ auto LaunchConfigLoader::saveConfig(const QMap<QString, LaunchConfiguration> &co
         for (const auto &key : configMap.keys()) {
             stream << key << ';' << configMap[key].scriptPath << ";" << configMap[key].clientName << ";"
                    << configMap[key].clientArgs << ";" << configMap[key].serverName << ";" << configMap[key].serverArgs
-                   << ";" << configMap[key].endianess << '\n';
+                   << ";" << configMap[key].endianess << ";" << QString::number(configMap[key].stackSize) + ';' + '\n';
         }
     }
     return true;

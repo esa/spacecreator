@@ -69,11 +69,12 @@ public:
      * @param csvModel the CSV data with test vectors
      * @param asn1Model ASN.1 model to be used during testing
      * @param boardName name of the board the tests are run on
+     * @param stackSize size of the stack in the generated binary in kilobytes
      *
      * @return true if there was no error during creation of the test harness files
      */
     auto prepareTestHarness(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model,
-            const QString &boardName) -> QString;
+            const QString &boardName, const int stackSize) -> QString;
 
     /**
      * @brief Run the tests in GDB debugger

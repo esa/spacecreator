@@ -60,7 +60,8 @@ void tst_testgenerator::testPrepareTestHarness()
     QVERIFY(asn1Model);
 
     TestGenerator testGenerator(QDir::currentPath());
-    QString testedFunctionName = testGenerator.prepareTestHarness(*interface, *csvModel, *asn1Model, "x86 Linux CPP");
+    QString testedFunctionName =
+            testGenerator.prepareTestHarness(*interface, *csvModel, *asn1Model, "x86 Linux CPP", 5000);
 
     QString generatedHarnessDirectory = "generated";
     auto generatedTestDriver = generatedHarnessDirectory + QDir::separator() + "testdriver.c";
@@ -130,7 +131,7 @@ void tst_testgenerator::testResultHtmlData()
 void tst_testgenerator::testParsingBoardSettings()
 {
     LaunchConfiguration config("x86 Linux CPP", "/path/to/gdb/script", "gdb", "dummyClientParam1 $SCRIPT_PATH",
-            "gdbserver", "dummyServerParam1 $BIN_PATH", QDataStream::LittleEndian);
+            "gdbserver", "dummyServerParam1 $BIN_PATH", QDataStream::LittleEndian, 5000);
     QCOMPARE(config.clientArgsParsed, QStringList({ "dummyClientParam1", "/path/to/gdb/script" }));
     QCOMPARE(config.serverArgsParsed, QStringList({ "dummyServerParam1", "hostpartition" }));
 }
@@ -143,7 +144,7 @@ void tst_testgenerator::testStoringBoardsConfig()
     const QString testBoardName = "x86 Linux CPP";
 
     LaunchConfiguration configToSave(testBoardName, "/path/to/script", "gdb", "dummyParam1 dummyParam2", "gdbserver",
-            "dummyParam3 dummyParam4", QDataStream::LittleEndian);
+            "dummyParam3 dummyParam4", QDataStream::LittleEndian, 5000);
     boardsConfig[testBoardName] = configToSave;
     configLoader.saveConfig(boardsConfig);
 
@@ -155,6 +156,8 @@ void tst_testgenerator::testStoringBoardsConfig()
     QCOMPARE(readConfig.clientArgs, "dummyParam1 dummyParam2");
     QCOMPARE(readConfig.serverName, "gdbserver");
     QCOMPARE(readConfig.serverArgs, "dummyParam3 dummyParam4");
+    QCOMPARE(readConfig.endianess, QDataStream::LittleEndian);
+    QCOMPARE(readConfig.stackSize, 5000);
 
     QFile::remove(configPath);
 }

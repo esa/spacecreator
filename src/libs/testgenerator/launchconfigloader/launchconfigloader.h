@@ -47,6 +47,8 @@ struct LaunchConfiguration {
     QStringList serverArgsParsed;
     /** endianess of the board architecture */
     QDataStream::ByteOrder endianess;
+    /** size of the stack of the generated binary in kilobytes */
+    int stackSize;
 
     /**
      * @brief Default constructor of the class
@@ -64,11 +66,13 @@ struct LaunchConfiguration {
      * @param server name of the debugger server to use for testing binary
      * @param serverParams arguments for debugger server
      * @param byteOrder byte order used by the board's architecture
+     * @param stackSize size of the stack of the generated binary in kilobytes
      *
      * @return true if there was no error during creation of the test harness files and false otherwise
      */
     LaunchConfiguration(const QString &name, const QString &launchScriptPath, const QString &client,
-            QString clientParams, const QString &server, QString serverParams, const QDataStream::ByteOrder byteOrder);
+            QString clientParams, const QString &server, QString serverParams, const QDataStream::ByteOrder byteOrder,
+            const int stackSizeKB);
 };
 
 /**

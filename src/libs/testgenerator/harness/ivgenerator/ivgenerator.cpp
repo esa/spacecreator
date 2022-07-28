@@ -44,7 +44,7 @@ const QVector<qint32> IvGenerator::Coordinates::connection = { 281, 218, 370, 21
 const QString IvGenerator::startTestInterfaceName = "StartTest";
 const QString IvGenerator::testDriverFunctionName = "TestDriver";
 
-auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::unique_ptr<ivm::IVModel>
+auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest, int stackSize) -> std::unique_ptr<ivm::IVModel>
 {
     checkInputArgument(interfaceUnderTest);
 
@@ -61,7 +61,7 @@ auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::u
 
     auto *const testDriverFunction = makeTestDriverFunction(ivModel.get());
     auto *const testDriverRi = makeTestDriverRequiredIface(interfaceUnderTest, testDriverFunction);
-    auto *const testDriverStartTestIf = makeStartTestIface(testDriverFunction);
+    auto *const testDriverStartTestIf = makeStartTestIface(testDriverFunction, stackSize);
 
     testDriverFunction->addChild(testDriverRi);
     testDriverFunction->addChild(testDriverStartTestIf);
@@ -131,7 +131,8 @@ auto IvGenerator::makeFunctionUnderTest(ivm::IVModel *const model, ivm::IVInterf
     return function;
 }
 
-auto IvGenerator::makeStartTestIface(ivm::IVFunction *const testDriverFunction) -> ivm::IVInterface *
+auto IvGenerator::makeStartTestIface(ivm::IVFunction *const testDriverFunction, const int stackSize)
+        -> ivm::IVInterface *
 {
     throwOnNullpointer(testDriverFunction);
 
@@ -144,7 +145,7 @@ auto IvGenerator::makeStartTestIface(ivm::IVFunction *const testDriverFunction) 
 
     auto *const iface = ivm::IVInterface::createIface(ci);
     iface->setEntityAttribute("period", "999");
-    iface->setEntityAttribute("stack_size", "5000");
+    iface->setEntityAttribute("stack_size", stackSize);
     iface->setEntityAttribute("priority", "1");
     iface->setEntityAttribute("dispatch_offset", "0");
     iface->setEntityAttribute("wcet", "0");

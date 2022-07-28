@@ -57,7 +57,8 @@ TestGenerator::TestGenerator(const QString &baseDirectory)
 auto TestGenerator::testUsingDataFromCsv(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model,
         const float delta, const LaunchConfiguration &launchConfig) -> bool
 {
-    QString testedFunctionName = prepareTestHarness(interface, csvModel, asn1Model, launchConfig.boardName);
+    QString testedFunctionName =
+            prepareTestHarness(interface, csvModel, asn1Model, launchConfig.boardName, launchConfig.stackSize);
     if (testedFunctionName.isEmpty()) {
         qWarning() << "Tested function name is empty";
         return false;
@@ -105,8 +106,8 @@ auto TestGenerator::getAllFunctionsFromModel(const IVModel &ivModel) -> std::vec
     return ivFunctions;
 }
 
-auto TestGenerator::prepareTestHarness(
-        IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model, const QString &boardName) -> QString
+auto TestGenerator::prepareTestHarness(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model,
+        const QString &boardName, const int stackSize) -> QString
 {
     if (boardName.isEmpty()) {
         qWarning() << "TestGenerator::prepareTestHarness: Board name is empty";
@@ -128,7 +129,7 @@ auto TestGenerator::prepareTestHarness(
         return {};
     }
 
-    const auto ivModelGenerated = IvGenerator::generate(&interface);
+    const auto ivModelGenerated = IvGenerator::generate(&interface, stackSize);
     if (ivModelGenerated == nullptr) {
         qDebug() << "IV model was not generated";
         return {};
