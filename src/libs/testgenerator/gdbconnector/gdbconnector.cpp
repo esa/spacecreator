@@ -46,18 +46,17 @@ QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, co
     }
 
     const QString errorLogFilename = "gdbclient-errors.log";
+    const QString outputFilePath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+            + QDir::separator() + "gdboutput.txt";
+    qDebug() << "Output file path: " << outputFilePath;
 
     QString cmdServer = "cd " + binaryUnderTestDir + "; " + server + " " + serverArgs.join(" ") + " &";
     QString cmdClient = "cd " + binaryUnderTestDir + "; " + client + " " + clientArgs.join(" ");
-    cmdClient += " 2> " + errorLogFilename;
+    cmdClient += " 2> " + errorLogFilename + " > " + outputFilePath;
 
     qDebug() << "Server command: " << cmdServer;
     qDebug() << "Client command: " << cmdClient;
     qDebug() << "Binary under test dir: " << binaryUnderTestDir;
-
-    const QString outputFilePath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
-            + QDir::separator() + "gdboutput.txt";
-    qDebug() << "Output file path: " << outputFilePath;
 
     std::system(cmdServer.toStdString().c_str());
     std::system(cmdClient.toStdString().c_str());
