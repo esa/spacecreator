@@ -24,10 +24,6 @@
 #include <sdl/SdlModel/procedurecall.h>
 #include <sdl/SdlModel/transition.h>
 
-using sdl::Procedure;
-using sdl::ProcedureCall;
-using sdl::Transition;
-
 namespace tests::common {
 
 class SdlProcedureCallBuilder final
@@ -35,14 +31,13 @@ class SdlProcedureCallBuilder final
 public:
     SdlProcedureCallBuilder();
 
-    auto build() -> std::unique_ptr<ProcedureCall>;
+    auto build() -> std::unique_ptr<sdl::ProcedureCall>;
 
-    auto withProcedure(Procedure *procedure) -> SdlProcedureCallBuilder &;
-
-    auto withArgument(ProcedureCall::Argument argument) -> SdlProcedureCallBuilder &;
+    auto withProcedure(sdl::Procedure *procedure) -> SdlProcedureCallBuilder &;
+    auto withArgument(sdl::ProcedureCall::Argument argument) -> SdlProcedureCallBuilder &;
 
 private:
-    std::unique_ptr<ProcedureCall> m_procedureCall;
+    std::unique_ptr<sdl::ProcedureCall> m_procedureCall;
 };
 
 } // namespace tests::common

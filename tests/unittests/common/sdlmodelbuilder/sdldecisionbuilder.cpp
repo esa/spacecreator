@@ -21,6 +21,10 @@
 
 #include <memory>
 
+using sdl::Answer;
+using sdl::Decision;
+using sdl::Expression;
+
 namespace tests::common {
 
 SdlDecisionBuilder::SdlDecisionBuilder()

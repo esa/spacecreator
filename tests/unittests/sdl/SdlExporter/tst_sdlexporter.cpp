@@ -98,7 +98,7 @@ using tests::common::TextCheckerAndConsumer;
 
 namespace tests::Sdl {
 
-class tst_sdlmodel : public QObject
+class tst_sdlexporter : public QObject
 {
     Q_OBJECT
 
@@ -133,7 +133,7 @@ static std::unique_ptr<ProcedureParameter> makeProcedureParameter(QString name, 
     return parameter;
 }
 
-void tst_sdlmodel::testDefaultValuesInModel()
+void tst_sdlexporter::testDefaultValuesInModel()
 {
     QString processName = "exampleProcess";
 
@@ -154,7 +154,7 @@ void tst_sdlmodel::testDefaultValuesInModel()
     QVERIFY(processName == process->name());
 }
 
-void tst_sdlmodel::testGenerateBasicProcess()
+void tst_sdlexporter::testGenerateBasicProcess()
 {
     QString modelName = "BasicProcess";
     QString modelPrefix = "Sdl_";
@@ -225,7 +225,7 @@ void tst_sdlmodel::testGenerateBasicProcess()
     TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
-void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
+void tst_sdlexporter::testGenerateProcessWithDeclarationsAndTasks()
 {
     QString modelName = "DeclarationsAndTasks";
     QString modelPrefix = "Sdl_";
@@ -323,7 +323,7 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
     TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
-void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
+void tst_sdlexporter::testGenerateProcessWithLabelAndJoin()
 {
     QString modelName = "LabelAndJoin";
     QString modelPrefix = "Sdl_";
@@ -386,7 +386,7 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
     TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
-void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
+void tst_sdlexporter::testGenerateProcessWithDecisionExpressionAndAnswer()
 {
     QString modelName = "DecisionExpressionAndAnswer";
     QString modelPrefix = "Sdl_";
@@ -505,7 +505,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
-void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
+void tst_sdlexporter::testGenerateProcessWithParamlessProcedure()
 {
     QString modelName = "ParamlessProcedure";
     QString modelPrefix = "Sdl_";
@@ -582,7 +582,7 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
     TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
-void tst_sdlmodel::testJoinWithoutSpecifiedLabel()
+void tst_sdlexporter::testJoinWithoutSpecifiedLabel()
 {
     QString modelName = "JoinWithoutSpecifiedLabel";
     QString modelPrefix = "Sdl_";
@@ -613,7 +613,7 @@ void tst_sdlmodel::testJoinWithoutSpecifiedLabel()
     QVERIFY_EXCEPTION_THROWN(exporter.exportModel(exampleModel.get(), options), ExportException);
 }
 
-void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
+void tst_sdlexporter::testGenerateProcessWithProcedureWithParamsAndReturn()
 {
     QString modelName = "ProcedureWithParamsAndReturn";
     QString modelPrefix = "Sdl_";
@@ -712,7 +712,7 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
     TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
-void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
+void tst_sdlexporter::testGenerateProcessWithReturnlessProcedure()
 {
     QString modelName = "ReturnlessProcedure";
     QString modelPrefix = "Sdl_";
@@ -804,6 +804,6 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
 
 } // namespace tests::sdl
 
-QTEST_MAIN(tests::Sdl::tst_sdlmodel)
+QTEST_MAIN(tests::Sdl::tst_sdlexporter)
 
 #include "tst_sdlexporter.moc"

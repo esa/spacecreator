@@ -31,9 +31,7 @@
 namespace sdl {
 
 /**
- * @brief   Represents a next state (go to state) action in SDL model.
- *
- * Stores a pointer to the next state
+ * @brief   Represents an SDL process
  */
 class Process final : public Node
 {

@@ -21,6 +21,10 @@
 
 #include <memory>
 
+using sdl::Output;
+using sdl::Transition;
+using sdl::VariableReference;
+
 namespace tests::common {
 
 SdlOutputBuilder::SdlOutputBuilder()

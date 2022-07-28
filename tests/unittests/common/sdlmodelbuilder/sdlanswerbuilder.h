@@ -24,10 +24,6 @@
 #include <sdl/SdlModel/transition.h>
 #include <sdl/SdlModel/variableliteral.h>
 
-using sdl::Answer;
-using sdl::Transition;
-using sdl::VariableLiteral;
-
 namespace tests::common {
 
 class SdlAnswerBuilder final
@@ -35,16 +31,14 @@ class SdlAnswerBuilder final
 public:
     SdlAnswerBuilder();
 
-    auto build() -> std::unique_ptr<Answer>;
+    auto build() -> std::unique_ptr<sdl::Answer>;
 
     auto withName(QString name) -> SdlAnswerBuilder &;
-
-    auto withTransition(std::unique_ptr<Transition> transition) -> SdlAnswerBuilder &;
-
-    auto withLiteral(VariableLiteral literal) -> SdlAnswerBuilder &;
+    auto withTransition(std::unique_ptr<sdl::Transition> transition) -> SdlAnswerBuilder &;
+    auto withLiteral(sdl::VariableLiteral literal) -> SdlAnswerBuilder &;
 
 private:
-    std::unique_ptr<Answer> m_answer;
+    std::unique_ptr<sdl::Answer> m_answer;
 };
 
 } // namespace tests::common

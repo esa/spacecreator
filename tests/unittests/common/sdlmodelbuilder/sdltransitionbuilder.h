@@ -25,12 +25,6 @@
 #include <sdl/SdlModel/task.h>
 #include <sdl/SdlModel/transition.h>
 
-using sdl::Action;
-using sdl::Output;
-using sdl::State;
-using sdl::Task;
-using sdl::Transition;
-
 namespace tests::common {
 
 class SdlTransitionBuilder final
@@ -38,18 +32,15 @@ class SdlTransitionBuilder final
 public:
     SdlTransitionBuilder();
 
-    auto build() -> std::unique_ptr<Transition>;
+    auto build() -> std::unique_ptr<sdl::Transition>;
 
-    auto withNextStateAction(State *nextState = nullptr) -> SdlTransitionBuilder &;
-
-    auto withTask(std::unique_ptr<Task> task) -> SdlTransitionBuilder &;
-
-    auto withOutput(std::unique_ptr<Output> output) -> SdlTransitionBuilder &;
-
-    auto withAction(std::unique_ptr<Action> action) -> SdlTransitionBuilder &;
+    auto withNextStateAction(sdl::State *nextState = nullptr) -> SdlTransitionBuilder &;
+    auto withTask(std::unique_ptr<sdl::Task> task) -> SdlTransitionBuilder &;
+    auto withOutput(std::unique_ptr<sdl::Output> output) -> SdlTransitionBuilder &;
+    auto withAction(std::unique_ptr<sdl::Action> action) -> SdlTransitionBuilder &;
 
 private:
-    std::unique_ptr<Transition> m_transition;
+    std::unique_ptr<sdl::Transition> m_transition;
 };
 
 } // namespace tests::common
