@@ -316,7 +316,7 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
     formLayout->addRow("Server", serverNameEdit);
     formLayout->addRow("Server params", serverParamsEdit);
     formLayout->addRow("Byte order", endianessCombo);
-    formLayout->addRow("Stack size", stackSizeEdit);
+    formLayout->addRow("Stack size [KB]", stackSizeEdit);
 
     QLabel *integerLabel = new QLabel("INTEGER");
     QLineEdit *integerSizeEdit = new QLineEdit;
@@ -330,16 +330,22 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
     QLineEdit *realSizeEdit = new QLineEdit;
     QLineEdit *realPaddingEdit = new QLineEdit;
 
+    QLabel *typeSizeLabel = new QLabel("Size");
+    QLabel *typePaddingLabel = new QLabel("Padding");
+
     QGridLayout *typeLayoutGrid = new QGridLayout;
-    typeLayoutGrid->addWidget(integerLabel, 0, 0, 1, 1);
-    typeLayoutGrid->addWidget(integerSizeEdit, 0, 1, 1, 1);
-    typeLayoutGrid->addWidget(integerPaddingEdit, 0, 2, 1, 1);
-    typeLayoutGrid->addWidget(booleanLabel, 1, 0, 1, 1);
-    typeLayoutGrid->addWidget(booleanSizeEdit, 1, 1, 1, 1);
-    typeLayoutGrid->addWidget(booleanPaddingEdit, 1, 2, 1, 1);
-    typeLayoutGrid->addWidget(realLabel, 2, 0, 1, 1);
-    typeLayoutGrid->addWidget(realSizeEdit, 2, 1, 1, 1);
-    typeLayoutGrid->addWidget(realPaddingEdit, 2, 2, 1, 1);
+    typeLayoutGrid->addWidget(new QLabel(""), 0, 0, 1, 1);
+    typeLayoutGrid->addWidget(typeSizeLabel, 0, 1, 1, 1);
+    typeLayoutGrid->addWidget(typePaddingLabel, 0, 2, 1, 1);
+    typeLayoutGrid->addWidget(integerLabel, 1, 0, 1, 1);
+    typeLayoutGrid->addWidget(integerSizeEdit, 1, 1, 1, 1);
+    typeLayoutGrid->addWidget(integerPaddingEdit, 1, 2, 1, 1);
+    typeLayoutGrid->addWidget(booleanLabel, 2, 0, 1, 1);
+    typeLayoutGrid->addWidget(booleanSizeEdit, 2, 1, 1, 1);
+    typeLayoutGrid->addWidget(booleanPaddingEdit, 2, 2, 1, 1);
+    typeLayoutGrid->addWidget(realLabel, 3, 0, 1, 1);
+    typeLayoutGrid->addWidget(realSizeEdit, 3, 1, 1, 1);
+    typeLayoutGrid->addWidget(realPaddingEdit, 3, 2, 1, 1);
     formLayout->addRow("Type layout", typeLayoutGrid);
 
     QPushButton *okBtn = new QPushButton("OK");
