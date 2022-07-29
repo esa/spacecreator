@@ -58,13 +58,14 @@ public:
     /**
      * @brief Convert stop condition file into promela file.
      *
-     * @param inputFile filepath to input stop condition file
+     * @param inputFiles list of filepath to input stop condition files
      * @param outputFile output promela file
      * @param inputSdlFiles a map of ProcessMetadata objects, which are context for stop condition file
+     * @param includeObservers true if generated Stop Condition shall check observers
      * @return true if execution was successful, otherwise false
      */
-    bool convertStopCondition(const QFileInfo &inputFile, const QFileInfo &outputFile,
-            const std::map<QString, ProcessMetadata> &inputSdlFiles);
+    bool convertStopConditions(const QList<QFileInfo> &inputFiles, const QFileInfo &outputFile,
+            const std::map<QString, ProcessMetadata> &inputSdlFiles, bool includeObservers);
 
 private:
     bool startSdl2PromelaProcess(QProcess &process, const QStringList &arguments);
