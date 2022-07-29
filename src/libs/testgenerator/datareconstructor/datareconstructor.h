@@ -54,6 +54,11 @@ public:
     {
     public:
         /**
+         * @brief Default constructor of the class
+         *
+         */
+        TypeLayoutInfos() = default;
+        /**
          * @brief Construct a new object storing user-supplied information about datatypes
          *
          * @param infos list of information about datatypes

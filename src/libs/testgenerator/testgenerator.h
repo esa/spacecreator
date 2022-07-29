@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "datareconstructor/datareconstructor.h"
 #include "harness/dvgenerator/dvgenerator.h"
 #include "harness/ivgenerator/ivgenerator.h"
 #include "launchconfigloader/launchconfigloader.h"

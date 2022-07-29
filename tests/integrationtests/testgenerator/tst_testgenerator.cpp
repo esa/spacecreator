@@ -26,6 +26,7 @@
 
 using plugincommon::IvTools;
 using plugincommon::ModelLoader;
+using testgenerator::DataReconstructor;
 using testgenerator::HtmlResultExporter;
 using testgenerator::LaunchConfigLoader;
 using testgenerator::LaunchConfiguration;
@@ -130,8 +131,13 @@ void tst_testgenerator::testResultHtmlData()
 
 void tst_testgenerator::testParsingBoardSettings()
 {
+    const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
+        { "INTEGER", 4, 4 },
+        { "BOOLEAN", 1, 7 },
+        { "REAL", 8, 0 },
+    };
     LaunchConfiguration config("x86 Linux CPP", "/path/to/gdb/script", "gdb", "dummyClientParam1 $SCRIPT_PATH",
-            "gdbserver", "dummyServerParam1 $BIN_PATH", QDataStream::LittleEndian, 5000);
+            "gdbserver", "dummyServerParam1 $BIN_PATH", typeLayoutInfos, QDataStream::LittleEndian, 5000);
     QCOMPARE(config.clientArgsParsed, QStringList({ "dummyClientParam1", "/path/to/gdb/script" }));
     QCOMPARE(config.serverArgsParsed, QStringList({ "dummyServerParam1", "hostpartition" }));
 }
@@ -143,8 +149,14 @@ void tst_testgenerator::testStoringBoardsConfig()
     QMap<QString, LaunchConfiguration> boardsConfig;
     const QString testBoardName = "x86 Linux CPP";
 
+    const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
+        { "INTEGER", 4, 4 },
+        { "BOOLEAN", 1, 7 },
+        { "REAL", 8, 0 },
+    };
+
     LaunchConfiguration configToSave(testBoardName, "/path/to/script", "gdb", "dummyParam1 dummyParam2", "gdbserver",
-            "dummyParam3 dummyParam4", QDataStream::LittleEndian, 5000);
+            "dummyParam3 dummyParam4", typeLayoutInfos, QDataStream::LittleEndian, 5000);
     boardsConfig[testBoardName] = configToSave;
     configLoader.saveConfig(boardsConfig);
 
@@ -156,6 +168,9 @@ void tst_testgenerator::testStoringBoardsConfig()
     QCOMPARE(readConfig.clientArgs, "dummyParam1 dummyParam2");
     QCOMPARE(readConfig.serverName, "gdbserver");
     QCOMPARE(readConfig.serverArgs, "dummyParam3 dummyParam4");
+    QCOMPARE(readConfig.typeLayoutInfos["INTEGER"], typeLayoutInfos["INTEGER"]);
+    QCOMPARE(readConfig.typeLayoutInfos["BOOLEAN"], typeLayoutInfos["BOOLEAN"]);
+    QCOMPARE(readConfig.typeLayoutInfos["REAL"], typeLayoutInfos["REAL"]);
     QCOMPARE(readConfig.endianess, QDataStream::LittleEndian);
     QCOMPARE(readConfig.stackSize, 5000);
 

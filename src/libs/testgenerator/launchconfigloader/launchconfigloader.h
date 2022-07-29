@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "datareconstructor/datareconstructor.h"
+
 #include <QDataStream>
 #include <QTextStream>
 
@@ -45,6 +47,8 @@ struct LaunchConfiguration {
     QStringList clientArgsParsed;
     /** arguments for debugger server converted to list with parsed variables */
     QStringList serverArgsParsed;
+    /** map of length and padding of data on a remote target */
+    DataReconstructor::TypeLayoutInfos typeLayoutInfos;
     /** endianess of the board architecture */
     QDataStream::ByteOrder endianess;
     /** size of the stack of the generated binary in kilobytes */
@@ -65,13 +69,15 @@ struct LaunchConfiguration {
      * @param clientParams arguments for debugger client
      * @param server name of the debugger server to use for testing binary
      * @param serverParams arguments for debugger server
+     * @param typeLayout map of length and padding of data on a remote target
      * @param byteOrder byte order used by the board's architecture
      * @param stackSize size of the stack of the generated binary in kilobytes
      *
      * @return true if there was no error during creation of the test harness files and false otherwise
      */
     LaunchConfiguration(const QString &name, const QString &launchScriptPath, const QString &client,
-            QString clientParams, const QString &server, QString serverParams, const QDataStream::ByteOrder byteOrder,
+            QString clientParams, const QString &server, QString serverParams,
+            const DataReconstructor::TypeLayoutInfos &typeLayout, const QDataStream::ByteOrder byteOrder,
             const int stackSizeKB);
 };
 

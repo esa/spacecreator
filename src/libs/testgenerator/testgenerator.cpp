@@ -254,17 +254,11 @@ auto TestGenerator::runTests(IVInterface &interface, Asn1Model &asn1Model, const
     const QByteArray rawTestData = GdbConnector::getRawTestResults(binaryPath, launchConfig.clientArgsParsed,
             launchConfig.serverArgsParsed, launchConfig.clientName, launchConfig.serverName);
 
-    const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
-        { "INTEGER", 4, 4 },
-        { "BOOLEAN", 1, 7 },
-        { "REAL", 8, 0 },
-    };
-
     qDebug() << "Raw test data size: " << rawTestData.size();
     qDebug() << "Raw test data: " << rawTestData;
 
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
-            rawTestData, &interface, &asn1Model, launchConfig.endianess, typeLayoutInfos);
+            rawTestData, &interface, &asn1Model, launchConfig.endianess, launchConfig.typeLayoutInfos);
 
     for (const auto &readValue : readTestData) {
         qDebug() << readValue;

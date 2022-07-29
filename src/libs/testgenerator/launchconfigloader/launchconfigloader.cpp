@@ -25,11 +25,12 @@
 
 namespace testgenerator {
 
-constexpr int BOARD_CONFIG_LENGTH = 8;
+constexpr int BOARD_CONFIG_LENGTH = 9;
 const QString defaultBinaryName = "hostpartition";
 
 LaunchConfiguration::LaunchConfiguration(const QString &name, const QString &launchScriptPath, const QString &client,
-        QString clientParams, const QString &server, QString serverParams, const QDataStream::ByteOrder byteOrder,
+        QString clientParams, const QString &server, QString serverParams,
+        const DataReconstructor::TypeLayoutInfos &typeLayout, const QDataStream::ByteOrder byteOrder,
         const int stackSizeKB)
     : boardName(name)
     , scriptPath(launchScriptPath)
@@ -37,6 +38,7 @@ LaunchConfiguration::LaunchConfiguration(const QString &name, const QString &lau
     , clientArgs(clientParams)
     , serverName(server)
     , serverArgs(serverParams)
+    , typeLayoutInfos(typeLayout)
     , endianess(byteOrder)
     , stackSize(stackSizeKB)
 {
@@ -49,6 +51,32 @@ LaunchConfigLoader::LaunchConfigLoader(const QString &launchConfigPath)
 {
 }
 
+auto typeLayoutToString(const DataReconstructor::TypeLayoutInfos &layoutInfos) -> QString
+{
+    QString layoutInfosStr;
+    for (const auto &typeName : layoutInfos.keys()) {
+        layoutInfosStr += typeName + "," + QString::number(layoutInfos[typeName].first) + ","
+                + QString::number(layoutInfos[typeName].second) + "|";
+    }
+    return layoutInfosStr;
+}
+
+auto typeLayoutFromString(const QString &layoutInfosStr) -> DataReconstructor::TypeLayoutInfos
+{
+    constexpr int TYPE_NAME_IDX = 0;
+    constexpr int DATA_LENGTH_IDX = 1;
+    constexpr int PADDING_LENGTH_IDX = 2;
+    DataReconstructor::TypeLayoutInfos layoutInfos {};
+    QStringList layoutInfosList = layoutInfosStr.split("|");
+    layoutInfosList.removeLast();
+    for (const auto &layoutInfoStr : layoutInfosList) {
+        QStringList layoutInfoList = layoutInfoStr.split(",");
+        layoutInfos.insert(layoutInfoList[TYPE_NAME_IDX],
+                { layoutInfoList[DATA_LENGTH_IDX].toInt(), layoutInfoList[PADDING_LENGTH_IDX].toInt() });
+    }
+    return layoutInfos;
+}
+
 auto LaunchConfigLoader::loadConfig() -> std::optional<QMap<QString, LaunchConfiguration>>
 {
     constexpr int BOARD_NAME_IDX = 0;
@@ -57,8 +85,9 @@ auto LaunchConfigLoader::loadConfig() -> std::optional<QMap<QString, LaunchConfi
     constexpr int CLIENT_PARAMS_IDX = 3;
     constexpr int SERVER_NAME_IDX = 4;
     constexpr int SERVER_PARAMS_IDX = 5;
-    constexpr int BYTE_ORDER_IDX = 6;
-    constexpr int STACK_SIZE_IDX = 7;
+    constexpr int TYPE_LAYOUT_IDX = 6;
+    constexpr int BYTE_ORDER_IDX = 7;
+    constexpr int STACK_SIZE_IDX = 8;
 
     QMap<QString, LaunchConfiguration> configMap;
     QFile file(configPath);
@@ -71,6 +100,7 @@ auto LaunchConfigLoader::loadConfig() -> std::optional<QMap<QString, LaunchConfi
                 configMap.insert(conf[BOARD_NAME_IDX],
                         LaunchConfiguration(conf[BOARD_NAME_IDX], conf[SCRIPT_PATH_IDX], conf[CLIENT_NAME_IDX],
                                 conf[CLIENT_PARAMS_IDX], conf[SERVER_NAME_IDX], conf[SERVER_PARAMS_IDX],
+                                typeLayoutFromString(conf[TYPE_LAYOUT_IDX]),
                                 static_cast<QDataStream::ByteOrder>(conf[BYTE_ORDER_IDX].toInt()),
                                 conf[STACK_SIZE_IDX].toInt()));
             } else {
@@ -93,7 +123,8 @@ auto LaunchConfigLoader::saveConfig(const QMap<QString, LaunchConfiguration> &co
         for (const auto &key : configMap.keys()) {
             stream << key << ';' << configMap[key].scriptPath << ";" << configMap[key].clientName << ";"
                    << configMap[key].clientArgs << ";" << configMap[key].serverName << ";" << configMap[key].serverArgs
-                   << ";" << configMap[key].endianess << ";" << QString::number(configMap[key].stackSize) + ';' + '\n';
+                   << ";" << typeLayoutToString(configMap[key].typeLayoutInfos) << ";" << configMap[key].endianess
+                   << ";" << QString::number(configMap[key].stackSize) + ';' + '\n';
         }
     }
     return true;

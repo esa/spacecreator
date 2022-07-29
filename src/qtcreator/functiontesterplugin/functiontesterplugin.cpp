@@ -30,6 +30,7 @@
 #include <QFileDialog>
 #include <QFormLayout>
 #include <QInputDialog>
+#include <QLabel>
 #include <QListWidgetItem>
 #include <QMenu>
 #include <QMessageBox>
@@ -324,6 +325,30 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
     formLayout->addRow("Byte order", endianessCombo);
     formLayout->addRow("Stack size", stackSizeEdit);
 
+    QLabel *integerLabel = new QLabel("INTEGER");
+    QLineEdit *integerSizeEdit = new QLineEdit;
+    QLineEdit *integerPaddingEdit = new QLineEdit;
+
+    QLabel *booleanLabel = new QLabel("BOOLEAN");
+    QLineEdit *booleanSizeEdit = new QLineEdit;
+    QLineEdit *booleanPaddingEdit = new QLineEdit;
+
+    QLabel *realLabel = new QLabel("REAL");
+    QLineEdit *realSizeEdit = new QLineEdit;
+    QLineEdit *realPaddingEdit = new QLineEdit;
+
+    QGridLayout *typeLayoutGrid = new QGridLayout;
+    typeLayoutGrid->addWidget(integerLabel, 0, 0, 1, 1);
+    typeLayoutGrid->addWidget(integerSizeEdit, 0, 1, 1, 1);
+    typeLayoutGrid->addWidget(integerPaddingEdit, 0, 2, 1, 1);
+    typeLayoutGrid->addWidget(booleanLabel, 1, 0, 1, 1);
+    typeLayoutGrid->addWidget(booleanSizeEdit, 1, 1, 1, 1);
+    typeLayoutGrid->addWidget(booleanPaddingEdit, 1, 2, 1, 1);
+    typeLayoutGrid->addWidget(realLabel, 2, 0, 1, 1);
+    typeLayoutGrid->addWidget(realSizeEdit, 2, 1, 1, 1);
+    typeLayoutGrid->addWidget(realPaddingEdit, 2, 2, 1, 1);
+    formLayout->addRow("Type layout", typeLayoutGrid);
+
     QPushButton *okBtn = new QPushButton("OK");
     formLayout->addWidget(okBtn);
 
@@ -337,17 +362,30 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
     stackSizeEdit->setText(QString::number(boardsConfiguration[boardName].stackSize));
     endianessCombo->setCurrentText(
             boardsConfiguration[boardName].endianess == QDataStream::BigEndian ? bigEndianStr : littleEndianStr);
+    
+    auto readTypeLayout = boardsConfiguration[boardName].typeLayoutInfos;
+    integerSizeEdit->setText(QString::number(readTypeLayout[integerLabel->text()].first));
+    integerPaddingEdit->setText(QString::number(readTypeLayout[integerLabel->text()].second));
+    booleanSizeEdit->setText(QString::number(readTypeLayout[booleanLabel->text()].first));
+    booleanPaddingEdit->setText(QString::number(readTypeLayout[booleanLabel->text()].second));
+    realSizeEdit->setText(QString::number(readTypeLayout[realLabel->text()].first));
+    realPaddingEdit->setText(QString::number(readTypeLayout[realLabel->text()].second));
 
     connect(selectBtn, &QPushButton::clicked, this,
             [=] { selectScriptDialog(boardOptionsWindow, boardName, scriptPathEdit); });
     connect(okBtn, &QPushButton::clicked, this, [=] {
-        boardOptionsWindow->close();
+        const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
+            { integerLabel->text(), integerSizeEdit->text().toInt(), integerPaddingEdit->text().toInt() },
+            { booleanLabel->text(), booleanSizeEdit->text().toInt(), booleanPaddingEdit->text().toInt() },
+            { realLabel->text(), realSizeEdit->text().toInt(), realPaddingEdit->text().toInt() },
+        };
         LaunchConfiguration boardConfig(boardName, scriptPathEdit->text(), clientNameEdit->text(),
-                clientParamsEdit->text(), serverNameEdit->text(), serverParamsEdit->text(),
+                clientParamsEdit->text(), serverNameEdit->text(), serverParamsEdit->text(), typeLayoutInfos,
                 endianessCombo->currentText() == bigEndianStr ? QDataStream::BigEndian : QDataStream::LittleEndian,
                 stackSizeEdit->text().toInt());
         boardsConfiguration[boardName] = boardConfig;
         boardsConfigLoader.saveConfig(boardsConfiguration);
+        boardOptionsWindow->close();
     });
 
     boardOptionsWindow->setWindowTitle("Board options");
