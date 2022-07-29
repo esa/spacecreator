@@ -117,7 +117,9 @@ auto HtmlResultExporter::generateHtmlStream(QTextStream &stream) -> void
 
     generateTableHeader(stream);
     for (int rowIndex = 0; rowIndex < rows; rowIndex++) {
-        generateTableRow(stream, rowIndex);
+        if (cells.size() > rowIndex) {
+            generateTableRow(stream, rowIndex);
+        }
     }
 
     stream << "\t\t</table>\n";
