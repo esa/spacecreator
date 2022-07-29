@@ -242,7 +242,7 @@ auto loadHWLibraryObjects(const QString &directory) -> QVector<DVObject *>
 auto FunctionTesterPlugin::selectBoardDialog() -> void
 {
     int wndWidth = 800;
-    int wndHeight = 600;
+    int wndHeight = 400;
 
     boardsConfiguration = boardsConfigLoader.loadConfig().value();
 
@@ -257,10 +257,6 @@ auto FunctionTesterPlugin::selectBoardDialog() -> void
         }
     }
 
-    auto font = listWidget->font();
-    font.setPointSize(15);
-    listWidget->setFont(font);
-
     int listWidgetHeight = 0.9 * chooseBoardWindow->height();
     listWidget->resize(wndWidth, listWidgetHeight);
     listWidget->setCurrentRow(0);
@@ -269,10 +265,7 @@ auto FunctionTesterPlugin::selectBoardDialog() -> void
     bottomPanel->setGeometry(0, listWidgetHeight, wndWidth, wndHeight - listWidgetHeight);
 
     QPushButton *okBtn = new QPushButton("OK", bottomPanel);
-    okBtn->setFixedHeight(bottomPanel->height() * 0.5);
-
     QPushButton *optionsBtn = new QPushButton("Options", bottomPanel);
-    optionsBtn->setFixedHeight(bottomPanel->height() * 0.5);
 
     QBoxLayout *boxLayout = new QBoxLayout(QBoxLayout::Direction::RightToLeft, bottomPanel);
     boxLayout->addWidget(okBtn);
