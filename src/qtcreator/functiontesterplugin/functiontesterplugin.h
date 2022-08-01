@@ -22,6 +22,7 @@
 #include "iveditorcore.h"
 
 #include <QGridLayout>
+#include <QLabel>
 #include <asn1library/asn1/asn1model.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <csv/CsvModel/csvmodel.h>
@@ -31,14 +32,28 @@
 
 namespace spctr {
 
+using testgenerator::DataReconstructor;
 using testgenerator::LaunchConfigLoader;
 using testgenerator::LaunchConfiguration;
-using testgenerator::DataReconstructor;
 
 class FunctionTesterPlugin : public ExtensionSystem::IPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QtCreatorPlugin" FILE "FunctionTesterPlugin.json")
+
+    struct TypeLayoutFormFields {
+        QLabel *integerLabel;
+        QLineEdit *integerSizeEdit;
+        QLineEdit *integerPaddingEdit;
+
+        QLabel *booleanLabel;
+        QLineEdit *booleanSizeEdit;
+        QLineEdit *booleanPaddingEdit;
+
+        QLabel *realLabel;
+        QLineEdit *realSizeEdit;
+        QLineEdit *realPaddingEdit;
+    };
 
 public:
     FunctionTesterPlugin();
@@ -69,8 +84,9 @@ private:
     auto selectBoardDialog() -> void;
     auto boardOptionsDialog(QWidget *parent, const QString &boardName) -> void;
     auto selectScriptDialog(QWidget *parent, const QString &boardName, QLineEdit *scriptPathEdit) -> void;
-    auto typeLayoutForm(const DataReconstructor::TypeLayoutInfos &typeLayout) -> QGridLayout *;
-    auto readTypeInfos(QGridLayout *typeInfoGrid) -> DataReconstructor::TypeLayoutInfos const;
+    auto typeLayoutForm(const DataReconstructor::TypeLayoutInfos &typeLayout, TypeLayoutFormFields &formFields)
+            -> QGridLayout *;
+    auto readTypeInfos(const TypeLayoutFormFields &formFields) -> DataReconstructor::TypeLayoutInfos const;
 
     LaunchConfigLoader boardsConfigLoader;
     QMap<QString, LaunchConfiguration> boardsConfiguration;
