@@ -30,6 +30,7 @@
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
 #include "ivinterfacegroup.h"
+#include "ivarchetypereference.h"
 #include "ivobject.h"
 #include "ivtestutils.h"
 #include "sharedlibrary.h"
@@ -59,7 +60,7 @@ private Q_SLOTS:
     void testItem_Connection();
     void testItem_ConnectionGroup();
     void testItem_ConnectionLayer();
-
+    void testItem_ArchetypeReference();
     void testItem_CheckCoverage();
 
 private:
@@ -234,6 +235,15 @@ void tst_ItemZOrder::testItem_ConnectionLayer()
     ++m_itemTypesTested;
     QVERIFY(layer->title().compare("default") == 0);
     delete layer;
+}
+
+void tst_ItemZOrder::testItem_ArchetypeReference()
+{
+    auto *archetypeReference = ivm::testutils::createArchetypeReference(QString("TestArchetypeLibraryName"), QString("TestArchetypeFunctionName"));
+    ++m_itemTypesTested;
+    QVERIFY(archetypeReference->getLibraryName().compare("TestArchetypeLibraryName") == 0);
+    QVERIFY(archetypeReference->getFunctionName().compare("TestArchetypeFunctionName") == 0);
+    delete archetypeReference;
 }
 
 void tst_ItemZOrder::testItem_CheckCoverage()

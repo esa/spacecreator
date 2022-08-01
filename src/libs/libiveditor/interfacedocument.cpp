@@ -925,6 +925,11 @@ void InterfaceDocument::loadArchetypes()
     QVector<QString> archetypeLibraryPaths;
     QRegularExpression regex(shared::archetypesFileStartingString() + "(.+?).xml");
 
+    if(!std::filesystem::is_directory(shared::interfaceCustomArchetypesDirectoryPath().toStdString())){
+        qWarning() << tr("No Archetype Library directory found");
+        return;
+    }
+
     for (const auto &entry :
             std::filesystem::directory_iterator(shared::interfaceCustomArchetypesDirectoryPath().toStdString())) {
         QString path = QString(entry.path().c_str());
