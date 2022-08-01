@@ -46,49 +46,16 @@ static inline QString attrValue(
     return attrValue(attrs, meta::ArchetypeProps::token(token), defaultValue);
 }
 
-struct CurrentObjectHolder {
-    void set(ArchetypeObject *object)
-    {
-        m_object = object;
-        m_function = m_object ? m_object->as<FunctionArchetype *>() : nullptr;
-        m_iface = m_object ? m_object->as<InterfaceArchetype *>() : nullptr;
-        m_parameter = m_object ? m_object->as<ParameterArchetype *>() : nullptr;
-    }
-
-    QPointer<ArchetypeObject> getObject() { return m_object; }
-    QPointer<FunctionArchetype> getFunctionObject() { return m_function; }
-    QPointer<InterfaceArchetype> getInterfaceObject() { return m_iface; }
-    QPointer<ParameterArchetype> getParameterObject() { return m_parameter; }
-
-    bool isValid() const { return !m_object.isNull(); }
-
-private:
-    QPointer<ArchetypeObject> m_object { nullptr };
-    QPointer<FunctionArchetype> m_function { nullptr };
-    QPointer<InterfaceArchetype> m_iface { nullptr };
-    QPointer<ParameterArchetype> m_parameter { nullptr };
-};
-
-struct ArchetypeXMLReaderPrivate {
-    QVector<ArchetypeObject *> m_allObjects {};
-
-    CurrentObjectHolder m_currentObject;
-    void setCurrentObject(ArchetypeObject *object)
-    {
-        m_currentObject.set(object);
-        if (!m_currentObject.getObject()) {
-            return;
-        }
-
-        if (!m_allObjects.contains(m_currentObject.getObject())) {
-            m_allObjects.append(m_currentObject.getObject());
-        }
-    }
-};
+void CurrentObjectHolder::set(ArchetypeObject *object)
+{
+    m_object = object;
+    m_function = m_object ? m_object->as<FunctionArchetype *>() : nullptr;
+    m_iface = m_object ? m_object->as<InterfaceArchetype *>() : nullptr;
+    m_parameter = m_object ? m_object->as<ParameterArchetype *>() : nullptr;
+}
 
 ArchetypeXMLReader::ArchetypeXMLReader(QObject *parent)
     : shared::XmlReader(parent)
-    , m_readerPrivate(std::make_unique<ArchetypeXMLReaderPrivate>())
 {
 }
 
@@ -96,7 +63,7 @@ ArchetypeXMLReader::~ArchetypeXMLReader() = default;
 
 QVector<ArchetypeObject *> ArchetypeXMLReader::parsedObjects() const
 {
-    return m_readerPrivate->m_allObjects;
+    return m_allObjects;
 }
 
 void ArchetypeXMLReader::processTagOpen(QXmlStreamReader &xml)
@@ -109,18 +76,17 @@ void ArchetypeXMLReader::processTagOpen(QXmlStreamReader &xml)
     const ArchetypeProps::Token token = ArchetypeProps::token(tagName);
     switch (token) {
     case ArchetypeProps::Token::FunctionArchetype: {
-
         object = new FunctionArchetype(objectName);
         break;
     }
     case ArchetypeProps::Token::InterfaceArchetype: {
-        if (m_readerPrivate->m_currentObject.getFunctionObject()) {
+        if (m_currentObject.getFunctionObject()) {
             object = createInterface(objectName, attrs);
         }
         break;
     }
     case ArchetypeProps::Token::ParameterArchetype: {
-        if (m_readerPrivate->m_currentObject.getInterfaceObject()) {
+        if (m_currentObject.getInterfaceObject()) {
             object = createParameter(objectName, attrs);
         }
         break;
@@ -135,7 +101,8 @@ void ArchetypeXMLReader::processTagOpen(QXmlStreamReader &xml)
 
     if (object) {
         object->setEntityAttributes(attrs);
-        m_readerPrivate->setCurrentObject(object);
+        m_currentObject.set(object);
+        addCurrentObject();
     }
 }
 
@@ -146,9 +113,7 @@ void ArchetypeXMLReader::processTagClose(QXmlStreamReader &xml)
     case ArchetypeProps::Token::FunctionArchetype:
     case ArchetypeProps::Token::InterfaceArchetype:
     case ArchetypeProps::Token::ParameterArchetype: {
-        m_readerPrivate->setCurrentObject(m_readerPrivate->m_currentObject.getObject()
-                        ? m_readerPrivate->m_currentObject.getObject()->parentObject()
-                        : nullptr);
+        m_currentObject.set(m_currentObject.getObject() ? m_currentObject.getObject()->parentObject() : nullptr);
         break;
     }
     default:
@@ -163,7 +128,7 @@ QString ArchetypeXMLReader::rootElementName() const
 
 InterfaceArchetype *ArchetypeXMLReader::createInterface(const QString &objectName, const EntityAttributes &attrs)
 {
-    FunctionArchetype *currentFunction = m_readerPrivate->m_currentObject.getFunctionObject();
+    FunctionArchetype *currentFunction = m_currentObject.getFunctionObject();
     const QString interfaceTypeString = attrValue(attrs, ArchetypeProps::Token::interfaceType);
     const QString interfaceKindString = attrValue(attrs, ArchetypeProps::Token::kind);
     const QString interfaceLayerString = attrValue(attrs, ArchetypeProps::Token::layer);
@@ -178,7 +143,7 @@ InterfaceArchetype *ArchetypeXMLReader::createInterface(const QString &objectNam
 
 ParameterArchetype *ArchetypeXMLReader::createParameter(const QString &objectName, const EntityAttributes &attrs)
 {
-    InterfaceArchetype *currentInterface = m_readerPrivate->m_currentObject.getInterfaceObject();
+    InterfaceArchetype *currentInterface = m_currentObject.getInterfaceObject();
     const QString parameterTypeString = attrValue(attrs, ArchetypeProps::Token::type);
     const QString parameterDirectionString = attrValue(attrs, ArchetypeProps::Token::direction);
     ParameterArchetype::ParameterDirection direction =
@@ -188,6 +153,16 @@ ParameterArchetype *ArchetypeXMLReader::createParameter(const QString &objectNam
             new ParameterArchetype(objectName, currentInterface, parameterTypeString, direction);
     currentInterface->addParameter(parameter);
     return parameter;
+}
+
+void ArchetypeXMLReader::addCurrentObject()
+{
+    if (!m_currentObject.getObject()) {
+        return;
+    }
+    if (!m_allObjects.contains(m_currentObject.getObject())) {
+        m_allObjects.append(m_currentObject.getObject());
+    }
 }
 
 }

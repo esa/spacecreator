@@ -35,7 +35,21 @@ class QXmlStreamReader;
 
 namespace ivm {
 
-struct ArchetypeXMLReaderPrivate;
+struct CurrentObjectHolder {
+    void set(ArchetypeObject *object);
+
+    QPointer<ArchetypeObject> getObject() { return m_object; }
+    QPointer<FunctionArchetype> getFunctionObject() { return m_function; }
+    QPointer<InterfaceArchetype> getInterfaceObject() { return m_iface; }
+    QPointer<ParameterArchetype> getParameterObject() { return m_parameter; }
+
+private:
+    QPointer<ArchetypeObject> m_object { nullptr };
+    QPointer<FunctionArchetype> m_function { nullptr };
+    QPointer<InterfaceArchetype> m_iface { nullptr };
+    QPointer<ParameterArchetype> m_parameter { nullptr };
+};
+
 class ArchetypeXMLReader : public shared::XmlReader
 {
     Q_OBJECT
@@ -54,8 +68,11 @@ private:
     InterfaceArchetype *createInterface(const QString &objectName, const EntityAttributes &attrs);
     ParameterArchetype *createParameter(const QString &objectName, const EntityAttributes &attrs);
 
+    void addCurrentObject();
+
 private:
-    const std::unique_ptr<ArchetypeXMLReaderPrivate> m_readerPrivate;
+    QVector<ArchetypeObject *> m_allObjects {};
+    CurrentObjectHolder m_currentObject;
 };
 
 }
