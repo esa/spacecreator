@@ -296,4 +296,31 @@ ivm::IVModel *IvSystemQueries::ivModel() const
     return ivCore()->document()->objectsModel();
 }
 
+QString IvSystemQueries::resolvedTargetFunction(const QString &sourceFunction, const QString &sourceInterface,
+        const QString &targetFunction, const QString &targetInterface) const
+{
+    Q_UNUSED(sourceInterface);
+    Q_UNUSED(targetInterface);
+    auto target = functionByName(targetFunction);
+    auto source = functionByName(sourceFunction);
+
+    auto targetParent = target->parentObject();
+    auto sourceParent = source->parentObject();
+    if (targetParent == sourceParent) {
+        // Same level
+        return target->title();
+    }
+    // Nested function -> first connection is to parent
+    auto parentFunction = dynamic_cast<ivm::IVFunction *>(source->parent());
+    if (parentFunction != nullptr) {
+        return parentFunction->title();
+    }
+}
+
+QString IvSystemQueries::resolvedTargetInterface(const QString &sourceFunction, const QString &sourceInterface,
+        const QString &targetFunction, const QString &targetInterface) const
+{
+    return "TODO";
+}
+
 } // namespace scs

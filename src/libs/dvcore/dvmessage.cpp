@@ -25,6 +25,8 @@
 #include "errorhub.h"
 
 #include <QDebug>
+#include <iostream>
+#include <ivcore/ivfunction.h>
 
 namespace dvm {
 
@@ -142,6 +144,42 @@ QStringList DVMessage::pathOfFunction(const QString &functionName, DVNode *node)
     }
 
     return { functionName };
+}
+
+QString DVMessage::resolvedTargetFunction() const
+{
+    const auto model = getModel();
+    if (model == nullptr) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("DVMessage has no parent model"));
+        return "";
+    }
+    return model->ivQueries()->resolvedTargetFunction(fromFunction(), fromInterface(), toFunction(), toInterface());
+}
+
+QString DVMessage::resolvedTargetInterface() const
+{
+    const auto model = getModel();
+    if (model == nullptr) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("DVMessage has no parent model"));
+        return "";
+    }
+    return model->ivQueries()->resolvedTargetInterface(fromFunction(), fromInterface(), toFunction(), toInterface());
+}
+
+DVModel *DVMessage::getModel() const
+{
+    std::cout << "getModel" << std::endl;
+    DVObject *parent = parentObject();
+    DVModel *model = NULL;
+    while (parent != NULL) {
+        std::cout << "parent == " << intptr_t(parent) << std::endl;
+        model = dynamic_cast<DVModel *>(parent);
+        if (model != NULL) {
+            return model;
+        }
+        parent = parent->parentObject();
+    }
+    return NULL;
 }
 
 } // namespace dvm

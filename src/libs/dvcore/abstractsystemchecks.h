@@ -21,6 +21,10 @@
 #include <QObject>
 #include <QPair>
 
+namespace ivm {
+class IVFunction;
+}
+
 namespace dvm {
 
 class AbstractSystemChecks : public QObject
@@ -35,6 +39,7 @@ public:
     virtual QStringList functionsNames() const = 0;
     virtual QStringList pseudoFunctionsNames() const = 0;
     virtual QStringList connectedProtectedFunctionNames(const QString &functionName) const = 0;
+    virtual ivm::IVFunction *functionByName(const QString &functionName) const = 0;
 
     virtual QList<QPair<QString, QString>> messages(
             const QString &sourceFunction, const QString &targetFunction) const = 0;
@@ -43,6 +48,11 @@ public:
     virtual QStringList implementationsForFunction(const QString &function) const = 0;
 
     virtual QStringList functionPath(const QString &function) const = 0;
+
+    virtual QString resolvedTargetFunction(const QString &sourceFunction, const QString &sourceInterface,
+            const QString &targetFunction, const QString &targetInterface) const = 0;
+    virtual QString resolvedTargetInterface(const QString &sourceFunction, const QString &sourceInterface,
+            const QString &targetFunction, const QString &targetInterface) const = 0;
 
 Q_SIGNALS:
     void ivDataReset();

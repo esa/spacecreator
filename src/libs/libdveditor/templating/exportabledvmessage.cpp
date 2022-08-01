@@ -56,4 +56,14 @@ QString ExportableDVMessage::toInterface() const
     return exportedObject<dvm::DVMessage>()->toInterface();
 }
 
+QString ExportableDVMessage::resolvedTargetFunction() const
+{
+    return exportedObject<dvm::DVMessage>()->resolvedTargetFunction();
+}
+
+QString ExportableDVMessage::resolvedTargetInterface() const
+{
+    return exportedObject<dvm::DVMessage>()->resolvedTargetInterface();
+}
+
 } // namespace dve

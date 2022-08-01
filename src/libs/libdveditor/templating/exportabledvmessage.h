@@ -30,6 +30,8 @@ class ExportableDVMessage : public ExportableDVObject
     Q_PROPERTY(QString toFunction READ toFunction)
     Q_PROPERTY(QStringList toFunctionPath READ toFunctionPath)
     Q_PROPERTY(QString toInterface READ toInterface)
+    Q_PROPERTY(QString resolvedTargetFunction READ resolvedTargetFunction)
+    Q_PROPERTY(QString resolvedTargetInterface READ resolvedTargetInterface)
 public:
     ExportableDVMessage(const dvm::DVObject *dvObject = nullptr);
 
@@ -40,6 +42,8 @@ public:
     QString toFunction() const;
     QStringList toFunctionPath() const;
     QString toInterface() const;
+    QString resolvedTargetFunction() const;
+    QString resolvedTargetInterface() const;
 };
 
 } // namespace dve
