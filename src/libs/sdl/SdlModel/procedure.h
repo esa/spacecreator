@@ -112,6 +112,7 @@ public:
      */
     auto setReturnType(QString returnType) -> void;
 
+public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */

@@ -25,10 +25,6 @@
 #include <sdl/SdlModel/transition.h>
 #include <vector>
 
-using sdl::State;
-using sdl::StateMachine;
-using sdl::Transition;
-
 namespace tests::common {
 
 class SdlStateMachineBuilder final
@@ -36,13 +32,13 @@ class SdlStateMachineBuilder final
 public:
     SdlStateMachineBuilder();
 
-    auto build() -> std::unique_ptr<StateMachine>;
+    auto build() -> std::unique_ptr<sdl::StateMachine>;
 
-    auto withState(std::unique_ptr<State> state) -> SdlStateMachineBuilder &;
-    auto withTransition(std::unique_ptr<Transition> transition) -> SdlStateMachineBuilder &;
+    auto withState(std::unique_ptr<sdl::State> state) -> SdlStateMachineBuilder &;
+    auto withTransition(std::unique_ptr<sdl::Transition> transition) -> SdlStateMachineBuilder &;
 
 private:
-    std::unique_ptr<StateMachine> m_stateMachine;
+    std::unique_ptr<sdl::StateMachine> m_stateMachine;
 };
 
 } // namespace tests::common

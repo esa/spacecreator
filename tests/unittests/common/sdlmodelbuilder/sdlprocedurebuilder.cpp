@@ -21,6 +21,12 @@
 
 #include <memory>
 
+using sdl::Procedure;
+using sdl::ProcedureParameter;
+using sdl::Transition;
+using sdl::VariableDeclaration;
+using sdl::VariableReference;
+
 namespace tests::common {
 
 SdlProcedureBuilder::SdlProcedureBuilder()

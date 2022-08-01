@@ -24,10 +24,6 @@
 #include <sdl/SdlModel/input.h>
 #include <sdl/SdlModel/state.h>
 
-using sdl::ContinuousSignal;
-using sdl::Input;
-using sdl::State;
-
 namespace tests::common {
 
 class SdlStateBuilder final
@@ -35,14 +31,13 @@ class SdlStateBuilder final
 public:
     SdlStateBuilder(QString stateName);
 
-    auto build() -> std::unique_ptr<State>;
+    auto build() -> std::unique_ptr<sdl::State>;
 
-    auto withInput(std::unique_ptr<Input> input) -> SdlStateBuilder &;
-
-    auto withContinuousSignal(std::unique_ptr<ContinuousSignal> continuousSignal) -> SdlStateBuilder &;
+    auto withInput(std::unique_ptr<sdl::Input> input) -> SdlStateBuilder &;
+    auto withContinuousSignal(std::unique_ptr<sdl::ContinuousSignal> continuousSignal) -> SdlStateBuilder &;
 
 private:
-    std::unique_ptr<State> m_state;
+    std::unique_ptr<sdl::State> m_state;
 };
 
 } // namespace tests::common

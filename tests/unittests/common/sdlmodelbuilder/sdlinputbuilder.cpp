@@ -21,6 +21,10 @@
 
 #include <memory>
 
+using sdl::Input;
+using sdl::Transition;
+using sdl::VariableReference;
+
 namespace tests::common {
 
 SdlInputBuilder::SdlInputBuilder()

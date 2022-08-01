@@ -37,17 +37,14 @@ public:
      * @brief   Constructor
      */
     Join() = default;
-
     /**
      * @brief   Constructor with label name
      */
     explicit Join(QString label);
-
     /**
      * @brief   Deleted copy constructor
      */
     Join(const Join &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -57,19 +54,18 @@ public:
      * @brief   Deleted copy assignment operator
      */
     Join &operator=(const Join &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     Join &operator=(Join &&) = default;
 
+public:
     /**
      * @brief   Getter for label name
      *
      * @return  label name
      */
     auto label() const -> const QString &;
-
     /**
      * @brief   Setter for label name
      *
@@ -77,6 +73,7 @@ public:
      */
     auto setLabel(QString label) -> void;
 
+public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */

@@ -44,7 +44,6 @@ public:
      * @return  return content
      */
     auto content() const -> const QString &;
-
     /**
      * @brief   Setter for the return content
      *
@@ -52,6 +51,7 @@ public:
      */
     auto setContent(QString content) -> void;
 
+public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */

@@ -141,14 +141,14 @@ auto SdlVisitor::IndentingStreamWriter::beginLine(const QString &line) -> void
     m_stream << getIndent() << line;
 }
 
-auto SdlVisitor::IndentingStreamWriter::write(const QString &line) -> void
-{
-    m_stream << line;
-}
-
 auto SdlVisitor::IndentingStreamWriter::endLine(const QString &line) -> void
 {
     m_stream << line << "\n";
+}
+
+auto SdlVisitor::IndentingStreamWriter::write(const QString &line) -> void
+{
+    m_stream << line;
 }
 
 auto SdlVisitor::IndentingStreamWriter::writeLine(const QString &line) -> void

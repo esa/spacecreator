@@ -40,12 +40,10 @@ public:
      * @param name        name of this process model
      */
     explicit SdlModel(QString name = "");
-
     /**
      * @brief   Deleted copy constructor/
      */
     SdlModel(const SdlModel &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -55,12 +53,12 @@ public:
      * @brief   Default copy assignment operator
      */
     SdlModel &operator=(const SdlModel &) = delete;
-
     /**
      * @brief   Deleted move assignment operator
      */
     SdlModel &operator=(SdlModel &&) = default;
 
+public:
     /**
      * @brief   Getter for this model type
      *
@@ -74,7 +72,6 @@ public:
      * @returns Model processes
      */
     auto processes() const -> const std::vector<Process> &;
-
     /**
      * @brief   Add a Process to the model
      *
@@ -88,7 +85,6 @@ public:
      * @returns Model name
      */
     auto name() const -> const QString &;
-
     /**
      * @brief   Setter for model name
      *

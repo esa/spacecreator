@@ -39,12 +39,10 @@ public:
      * @param   value   value of the literal
      */
     VariableLiteral(QString value = "");
-
     /**
      * @brief   Deleted copy constructor
      */
     VariableLiteral(const VariableLiteral &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -54,19 +52,18 @@ public:
      * @brief   Deleted copy assignment operator
      */
     VariableLiteral &operator=(const VariableLiteral &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     VariableLiteral &operator=(VariableLiteral &&) = default;
 
+public:
     /**
      * @brief   Getter for literal value
      *
      * @returns a literal value
      */
     auto value() const -> const QString &;
-
     /**
      * @brief   Setter for literal value
      *
