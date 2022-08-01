@@ -33,6 +33,8 @@
 #include "ivinterface.h"
 #include "ivnamevalidator.h"
 #include "ivobject.h"
+#include "archetypes/archetypemodel.h"
+#include "archetypeswidget.h"
 #include "ivpropertieslistmodel.h"
 #include "ivpropertiesview.h"
 #include "ivpropertytemplateconfig.h"
@@ -50,13 +52,15 @@
 namespace ive {
 
 IVPropertiesDialog::IVPropertiesDialog(const QString &projectPath, ivm::IVPropertyTemplateConfig *dynPropConfig,
-        ivm::IVObject *obj, ivm::IVModel *layersModel, ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks,
-        cmd::CommandsStack *commandsStack, QWidget *parent)
+        ivm::IVObject *obj, ivm::IVModel *layersModel, ivm::ArchetypeModel *archetypesModel,
+        ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack,
+        QWidget *parent)
     : shared::PropertiesDialog(dynPropConfig, obj, commandsStack, parent)
     , m_ivChecks(checks)
     , m_asn1Checks(asn1Checks)
     , m_projectPath(projectPath)
     , m_layersModel(layersModel)
+    , m_archetypesModel(archetypesModel)
     , m_isFixedSystemElement(obj ? obj->isFixedSystemElement() : false)
     , m_isRequiredSystemElement(false)
 {
@@ -111,6 +115,7 @@ void IVPropertiesDialog::init()
     case ivm::IVObject::Type::FunctionType:
         initContextParams();
         initAttributesView();
+        initArchetypeView();
         break;
     case ivm::IVObject::Type::RequiredInterface:
     case ivm::IVObject::Type::ProvidedInterface: {
@@ -218,7 +223,8 @@ void IVPropertiesDialog::initContextParams()
 
 void IVPropertiesDialog::initIfaceParams()
 {
-    IfaceParametersModel *modelIfaceParams = new IfaceParametersModel(commandMacro(), m_asn1Checks->allTypeNames(), this);
+    IfaceParametersModel *modelIfaceParams =
+            new IfaceParametersModel(commandMacro(), m_asn1Checks->allTypeNames(), this);
     modelIfaceParams->setDataObject(dataObject());
 
     shared::PropertiesViewBase *viewAttrs = new IfaceParametersView(this);
@@ -276,6 +282,16 @@ void IVPropertiesDialog::initLanguageView()
         languagesWidget->setDisabled(true);
     }
     insertTab(languagesWidget, tr("Implementations"));
+}
+
+void IVPropertiesDialog::initArchetypeView()
+{
+    auto function = qobject_cast<ivm::IVFunctionType *>(dataObject());
+    if (!function) {
+        return;
+    }
+    auto archetypesWidget = new ive::ArchetypesWidget(m_archetypesModel, function, m_ivChecks, commandMacro(), this);
+    insertTab(archetypesWidget, tr("Archetypes"));
 }
 
 } // namespace ive

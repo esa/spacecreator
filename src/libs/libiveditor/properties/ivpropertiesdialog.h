@@ -29,6 +29,7 @@ class Asn1SystemChecks;
 namespace ivm {
 class AbstractSystemChecks;
 class IVPropertyTemplateConfig;
+class ArchetypeModel;
 }
 
 namespace ive {
@@ -42,8 +43,9 @@ class IVPropertiesDialog : public shared::PropertiesDialog
 
 public:
     explicit IVPropertiesDialog(const QString &projectPath, ivm::IVPropertyTemplateConfig *dynPropConfig,
-            ivm::IVObject *obj, ivm::IVModel *layersModel, ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks,
-            cmd::CommandsStack *commandsStack, QWidget *parent = nullptr);
+            ivm::IVObject *obj, ivm::IVModel *layersModel, ivm::ArchetypeModel *archetypesModel,
+            ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack,
+            QWidget *parent = nullptr);
     ~IVPropertiesDialog() override;
     void init() override;
 
@@ -58,11 +60,13 @@ private:
     void initIfaceParams();
     void initCommentView();
     void initLanguageView();
+    void initArchetypeView();
 
     QPointer<ivm::AbstractSystemChecks> m_ivChecks;
     QPointer<Asn1Acn::Asn1SystemChecks> m_asn1Checks;
     const QString m_projectPath;
     ivm::IVModel *m_layersModel;
+    ivm::ArchetypeModel *m_archetypesModel;
     bool m_isFixedSystemElement;
     bool m_isRequiredSystemElement;
 };

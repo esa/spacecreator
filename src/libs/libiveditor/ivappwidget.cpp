@@ -32,10 +32,10 @@
 #include "ivcreatortool.h"
 #include "iveditorcore.h"
 #include "ivexporter.h"
+#include "ivnamevalidator.h"
 #include "ivvisualizationmodelbase.h"
 #include "properties/ivpropertiesdialog.h"
 #include "ui_ivappwidget.h"
-#include "ivnamevalidator.h"
 
 #include <QAction>
 #include <QActionGroup>
@@ -275,8 +275,8 @@ void IVAppWidget::showPropertyEditor(const shared::Id &id)
     }
 
     ive::IVPropertiesDialog dialog(QFileInfo(m_document->path()).absolutePath(), m_document->dynPropConfig(), obj,
-            m_document->layersModel(), m_document->ivCheck(), m_document->asn1Check(), m_document->commandsStack(),
-            graphicsView());
+            m_document->layersModel(), m_document->archetypesModel(), m_document->ivCheck(), m_document->asn1Check(),
+            m_document->commandsStack(), graphicsView());
     dialog.init();
     dialog.exec();
 }

@@ -162,6 +162,11 @@ target_sources(${LIB_NAME} PRIVATE
     properties/contextparametersmodel.h
     properties/delegates/asn1valuedelegate.cpp
     properties/delegates/asn1valuedelegate.h
+    properties/archetypeswidgetmodel.cpp
+    properties/archetypeswidgetmodel.h
+    properties/archetypeswidget.cpp
+    properties/archetypeswidget.h
+    properties/archetypeswidget.ui
     properties/ifaceparametersmodel.cpp
     properties/ifaceparametersmodel.h
     properties/implementationsmodel.cpp

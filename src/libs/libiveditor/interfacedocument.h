@@ -46,6 +46,7 @@ class IVObject;
 class IVConnectionLayerType;
 class IVPropertyTemplateConfig;
 class ArchetypeObject;
+class ArchetypeModel;
 }
 
 namespace ive {
@@ -111,6 +112,7 @@ public:
     IVItemModel *itemsModel() const;
     ivm::IVModel *layersModel() const;
     QHash<shared::Id, shared::VEObject *> layersObjects() const;
+    ivm::ArchetypeModel *archetypesModel() const;
 
     IVVisualizationModelBase *visualisationModel() const;
     QItemSelectionModel *objectsSelectionModel() const;
