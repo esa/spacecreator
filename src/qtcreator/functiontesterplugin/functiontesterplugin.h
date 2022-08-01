@@ -21,17 +21,19 @@
 
 #include "iveditorcore.h"
 
-#include <coreplugin/actionmanager/actioncontainer.h>
-#include <extensionsystem/iplugin.h>
-#include <csv/CsvModel/csvmodel.h>
+#include <QGridLayout>
 #include <asn1library/asn1/asn1model.h>
+#include <coreplugin/actionmanager/actioncontainer.h>
+#include <csv/CsvModel/csvmodel.h>
+#include <extensionsystem/iplugin.h>
 #include <qlistwidget.h>
 #include <testgenerator/testgenerator.h>
 
 namespace spctr {
 
-using testgenerator::LaunchConfiguration;
 using testgenerator::LaunchConfigLoader;
+using testgenerator::LaunchConfiguration;
+using testgenerator::DataReconstructor;
 
 class FunctionTesterPlugin : public ExtensionSystem::IPlugin
 {
@@ -48,11 +50,12 @@ public:
 
     /**
      * @brief Test the selected interface using user provided data
-     * 
+     *
      * @param launchConfig tested binary launching params
      *
      */
     auto testUsingDataFromCsvGui(const LaunchConfiguration &launchConfig) -> void;
+
 private:
     auto addTestInterfaceOption() -> void;
     auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
@@ -66,6 +69,8 @@ private:
     auto selectBoardDialog() -> void;
     auto boardOptionsDialog(QWidget *parent, const QString &boardName) -> void;
     auto selectScriptDialog(QWidget *parent, const QString &boardName, QLineEdit *scriptPathEdit) -> void;
+    auto typeLayoutForm(const DataReconstructor::TypeLayoutInfos &typeLayout) -> QGridLayout *;
+    auto readTypeInfos(QGridLayout *typeInfoGrid) -> DataReconstructor::TypeLayoutInfos const;
 
     LaunchConfigLoader boardsConfigLoader;
     QMap<QString, LaunchConfiguration> boardsConfiguration;
