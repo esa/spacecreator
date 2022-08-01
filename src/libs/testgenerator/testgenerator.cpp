@@ -47,7 +47,8 @@ using plugincommon::ModelLoader;
 
 namespace testgenerator {
 
-const QString resultFileName = "Results.html";
+const QString TestGenerator::resultFileName = "Results.html";
+const QString TestGenerator::defaultBinaryName = "hostpartition";
 
 TestGenerator::TestGenerator(const QString &baseDirectory)
 {
@@ -141,7 +142,7 @@ auto TestGenerator::prepareTestHarness(IVInterface &interface, const CsvModel &c
     }
 
     const std::unique_ptr<DVModel> dvModelGenerated =
-            DvGenerator::generate(ivFunctions, boardName, "TestRunner", "Node_1", "hostPartition");
+            DvGenerator::generate(ivFunctions, boardName, "TestRunner", "Node_1", defaultBinaryName);
     if (dvModelGenerated == nullptr) {
         qDebug() << "DV model was not generated";
         return {};

@@ -74,7 +74,7 @@ QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, co
     }
 
     const QString srecData = splitAndExtractSrecData(outStr, "\n");
-    qDebug() << "srecData: " << srecData;
+    qDebug() << "srecData length: " << srecData.size();
 
     return stringToByteArray(srecData);
 }

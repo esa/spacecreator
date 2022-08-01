@@ -70,7 +70,7 @@ public:
      * @param csvModel the CSV data with test vectors
      * @param asn1Model ASN.1 model to be used during testing
      * @param boardName name of the board the tests are run on
-     * @param stackSize size of the stack in the generated binary in kilobytes
+     * @param stackSize size of the stack in the generated binary in bytes
      *
      * @return true if there was no error during creation of the test harness files
      */
@@ -88,6 +88,12 @@ public:
      */
     auto runTests(IVInterface &interface, Asn1Model &asn1Model, const LaunchConfiguration &launchConfig)
             -> QVector<QVariant>;
+
+    /** Name of the binary resolved from $BIN_PATH variable provided by the user */
+    static const QString defaultBinaryName;
+
+    /** Name of the html file with the test results */
+    static const QString resultFileName;
 
 private:
     auto initializePaths(const QString &baseDirectory) -> void;

@@ -92,7 +92,7 @@ public:
      * @brief generate an IV model with a function under test and a test driver function
      *
      * @param interfaceUnderTest  interface which is tested
-     * @param stackSize size of the stack in compiled binary in kilobytes
+     * @param stackSize size of the stack in compiled binary in bytes
      *
      * @return IV model with the function under test and the test driver function
      */

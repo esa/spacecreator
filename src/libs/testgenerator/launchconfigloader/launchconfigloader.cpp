@@ -21,7 +21,6 @@
 
 #include <QDebug>
 #include <QFile>
-#include <QMetaEnum>
 
 namespace testgenerator {
 
@@ -31,7 +30,7 @@ const QString defaultBinaryName = "hostpartition";
 LaunchConfiguration::LaunchConfiguration(const QString &name, const QString &launchScriptPath, const QString &client,
         QString clientParams, const QString &server, QString serverParams,
         const DataReconstructor::TypeLayoutInfos &typeLayout, const QDataStream::ByteOrder byteOrder,
-        const int stackSizeKB)
+        const int stackSizeBytes)
     : boardName(name)
     , scriptPath(launchScriptPath)
     , clientName(client)
@@ -40,7 +39,7 @@ LaunchConfiguration::LaunchConfiguration(const QString &name, const QString &lau
     , serverArgs(serverParams)
     , typeLayoutInfos(typeLayout)
     , endianess(byteOrder)
-    , stackSize(stackSizeKB)
+    , stackSize(stackSizeBytes)
 {
     clientArgsParsed = clientParams.replace("$SCRIPT_PATH", scriptPath).split(" ");
     serverArgsParsed = serverParams.replace("$BIN_PATH", defaultBinaryName).split(" ");
@@ -104,12 +103,12 @@ auto LaunchConfigLoader::loadConfig() -> std::optional<QMap<QString, LaunchConfi
                                 static_cast<QDataStream::ByteOrder>(conf[BYTE_ORDER_IDX].toInt()),
                                 conf[STACK_SIZE_IDX].toInt()));
             } else {
-                qDebug() << "Not enough information in boards_config.txt file for board " << conf[BOARD_NAME_IDX];
+                qWarning() << "Not enough information in boards_config.txt file for board " << conf[BOARD_NAME_IDX];
             }
         }
         file.close();
     } else {
-        qDebug() << "Could not find file with default boards configuration at path: " << configPath;
+        qWarning() << "Could not find file with default boards configuration at path: " << configPath;
         return std::nullopt;
     }
     return configMap;

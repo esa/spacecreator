@@ -51,7 +51,7 @@ struct LaunchConfiguration {
     DataReconstructor::TypeLayoutInfos typeLayoutInfos;
     /** endianess of the board architecture */
     QDataStream::ByteOrder endianess;
-    /** size of the stack of the generated binary in kilobytes */
+    /** size of the stack of the generated binary in bytes */
     int stackSize;
 
     /**
@@ -71,14 +71,14 @@ struct LaunchConfiguration {
      * @param serverParams arguments for debugger server
      * @param typeLayout map of length and padding of data on a remote target
      * @param byteOrder byte order used by the board's architecture
-     * @param stackSize size of the stack of the generated binary in kilobytes
+     * @param stackSize size of the stack of the generated binary in bytes
      *
      * @return true if there was no error during creation of the test harness files and false otherwise
      */
     LaunchConfiguration(const QString &name, const QString &launchScriptPath, const QString &client,
             QString clientParams, const QString &server, QString serverParams,
             const DataReconstructor::TypeLayoutInfos &typeLayout, const QDataStream::ByteOrder byteOrder,
-            const int stackSizeKB);
+            const int stackSizeBytes);
 };
 
 /**

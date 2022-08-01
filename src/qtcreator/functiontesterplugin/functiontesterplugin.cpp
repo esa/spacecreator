@@ -53,7 +53,6 @@ using plugincommon::ModelLoader;
 
 namespace spctr {
 
-const QString resultFileName = "Results.html";
 const QString boardsConfigFileName = "boards_config.txt";
 
 FunctionTesterPlugin::FunctionTesterPlugin()
@@ -107,7 +106,7 @@ auto FunctionTesterPlugin::testUsingDataFromCsvGui(const LaunchConfiguration &la
 
     TestGenerator testGenerator(getBaseDirectory());
     testGenerator.testUsingDataFromCsv(*interface, *csvModel, *asn1Model, delta, launchConfig);
-    displayResultHtml(resultFileName);
+    displayResultHtml(TestGenerator::resultFileName);
 }
 
 auto FunctionTesterPlugin::addTestInterfaceOption() -> void
@@ -316,7 +315,7 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
     formLayout->addRow("Server", serverNameEdit);
     formLayout->addRow("Server params", serverParamsEdit);
     formLayout->addRow("Byte order", endianessCombo);
-    formLayout->addRow("Stack size [KB]", stackSizeEdit);
+    formLayout->addRow("Stack size (bytes)", stackSizeEdit);
 
     QLabel *integerLabel = new QLabel("INTEGER");
     QLineEdit *integerSizeEdit = new QLineEdit;
