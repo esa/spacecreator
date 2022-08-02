@@ -33,6 +33,16 @@ void System::addFreeformText(QString text)
     m_freeformTexts.push_back(text);
 }
 
+const std::vector<std::unique_ptr<Signal>> &System::getSignals() const
+{
+    return m_signals;
+}
+
+void System::addSignal(std::unique_ptr<Signal> signal)
+{
+    m_signals.push_back(std::move(signal));
+}
+
 const Block &System::block() const
 {
     return m_block;

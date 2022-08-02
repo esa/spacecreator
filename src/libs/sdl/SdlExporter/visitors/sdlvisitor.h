@@ -240,6 +240,12 @@ public:
      */
     virtual auto visit(const State &state) -> void override;
     /**
+     * @brief   Signal visitor
+     *
+     * @param   signal   Signal to be visited
+     */
+    virtual auto visit(const Signal &input) -> void override;
+    /**
      * @brief   Input visitor
      *
      * @param   input   input to be serialized

@@ -831,6 +831,7 @@ void tst_sdlexporter::testGenerateSystem()
     const auto exampleModel = SdlModelBuilder(systemName)
         .withSystem(SdlSystemBuilder(systemName)
             .withFreeformText("use datamodel comment 'observer.asn';")
+            .withSignal("Signal1")
             .withBlock(SdlBlockBuilder(systemName)
                 .withProcess(SdlProcessBuilder(systemName)
                     .withStartTransition(std::move(startTransition))
@@ -866,6 +867,7 @@ void tst_sdlexporter::testGenerateSystem()
     std::vector<QString> expectedOutput = { 
         QString("system %1;").arg(systemName),
         QString("use datamodel comment 'observer.asn';"),
+        QString("signal Signal1;"),
         QString("block %1;").arg(systemName),
         QString("process %1;").arg(systemName),
         "START;", "NEXTSTATE Wait;",
