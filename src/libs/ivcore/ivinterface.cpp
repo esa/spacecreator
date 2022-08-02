@@ -258,6 +258,11 @@ void IVInterface::setLayerName(const QString &layerName)
     Q_EMIT attributeChanged(meta::Props::token(meta::Props::Token::layer));
 }
 
+bool IVInterface::isRequiredSystemElement() const
+{
+    return entityAttributeValue(meta::Props::token(meta::Props::Token::required_system_element)) == "YES";
+}
+
 IVInterface::OperationKind IVInterface::kindFromString(const QString &k) const
 {
     return kindFromString(k, defaultKind());

@@ -69,6 +69,7 @@ public:
         enable_multicast,
         layer,
         fixed_system_element,
+        required_system_element,
 
         // KNOWN TASTE props:
         coordinates,

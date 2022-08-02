@@ -57,7 +57,16 @@ IVPropertiesDialog::IVPropertiesDialog(const QString &projectPath, ivm::IVProper
     , m_asn1Checks(asn1Checks)
     , m_projectPath(projectPath)
     , m_isFixedSystemElement(obj ? obj->isFixedSystemElement() : false)
+    , m_isRequiredSystemElement(false)
 {
+    switch (obj->type()) {
+    case ivm::IVObject::Type::RequiredInterface:
+    case ivm::IVObject::Type::ProvidedInterface: {
+        ivm::IVInterface *iface = qobject_cast<ivm::IVInterface *>(obj);
+        m_isRequiredSystemElement = iface->isRequiredSystemElement();
+        break;
+    }
+    }
 }
 
 IVPropertiesDialog::~IVPropertiesDialog() {}
@@ -167,7 +176,7 @@ void IVPropertiesDialog::initAttributesView()
     viewAttrs->tableView()->setItemDelegateForColumn(shared::PropertiesListModel::Column::Value, attrDelegate);
     viewAttrs->setModel(modelAttrs);
 
-    if (m_isFixedSystemElement) {
+    if (m_isFixedSystemElement && !m_isRequiredSystemElement) {
         viewAttrs->setDisabled(true);
     }
     insertTab(viewAttrs, tr("Attributes"));
@@ -221,7 +230,7 @@ void IVPropertiesDialog::initIfaceParams()
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelIfaceParams);
 
-    if (m_isFixedSystemElement) {
+    if (m_isFixedSystemElement && !m_isRequiredSystemElement) {
         viewAttrs->setDisabled(true);
     }
     insertTab(viewAttrs, tr("Parameters"));

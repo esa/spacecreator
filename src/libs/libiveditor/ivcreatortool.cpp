@@ -104,6 +104,10 @@ void IVCreatorTool::removeSelectedItems()
                     }
                     if (entity->isInterface()) {
                         if (auto iface = entity->as<const ivm::IVInterface *>()) {
+                            if (iface->isRequiredSystemElement()) {
+                                nonRemovableEntities.append(iface->title());
+                                continue;
+                            }
                             if (auto srcIface = iface->cloneOf()) {
                                 clonedIfaces.append(QStringLiteral("%1's %2 is from %3")
                                                             .arg(iface->parentObject()->title(), iface->title(),
