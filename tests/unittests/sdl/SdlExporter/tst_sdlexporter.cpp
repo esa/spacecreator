@@ -830,18 +830,19 @@ void tst_sdlexporter::testGenerateSystem()
     // clang-format off
     const auto exampleModel = SdlModelBuilder(systemName)
         .withSystem(SdlSystemBuilder(systemName)
-                    .withBlock(SdlBlockBuilder(systemName)
-                               .withProcess(SdlProcessBuilder(systemName)
-                                            .withStartTransition(std::move(startTransition))
-                                            .withStateMachine(SdlStateMachineBuilder()
-                                                              .withState(std::move(state1))
-                                                              .withState(std::move(state2))
-                                                              .withTransition(std::move(transition1))
-                                                              .withTransition(std::move(transition2))
-                                                              .build())
-                                            .build())
-                                .build())
+            .withFreeformText("use datamodel comment 'observer.asn';")
+            .withBlock(SdlBlockBuilder(systemName)
+                .withProcess(SdlProcessBuilder(systemName)
+                    .withStartTransition(std::move(startTransition))
+                    .withStateMachine(SdlStateMachineBuilder()
+                        .withState(std::move(state1))
+                        .withState(std::move(state2))
+                        .withTransition(std::move(transition1))
+                        .withTransition(std::move(transition2))
+                        .build())
                     .build())
+                .build())
+            .build())
         .build();
     // clang-format on
 
@@ -864,6 +865,7 @@ void tst_sdlexporter::testGenerateSystem()
     // clang-format off
     std::vector<QString> expectedOutput = { 
         QString("system %1;").arg(systemName),
+        QString("use datamodel comment 'observer.asn';"),
         QString("block %1;").arg(systemName),
         QString("process %1;").arg(systemName),
         "START;", "NEXTSTATE Wait;",

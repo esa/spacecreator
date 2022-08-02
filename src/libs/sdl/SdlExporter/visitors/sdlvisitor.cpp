@@ -193,6 +193,17 @@ void SdlVisitor::visit(const System &system)
 
     m_writer.pushIndent(INDENT);
 
+    if (!system.freeformTexts().empty()) {
+        m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
+        m_layouter.moveDown(Layouter::ElementType::Text);
+
+        for (const auto &text : system.freeformTexts()) {
+            m_writer.writeLine(text);
+        }
+
+        m_writer.writeLine("/* ENDTEXT */");
+    }
+
     system.block().accept(*this);
 
     m_writer.popIndent();

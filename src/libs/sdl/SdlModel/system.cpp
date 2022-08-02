@@ -23,6 +23,16 @@
 
 namespace sdl {
 
+const QStringList &System::freeformTexts() const
+{
+    return m_freeformTexts;
+}
+
+void System::addFreeformText(QString text)
+{
+    m_freeformTexts.push_back(text);
+}
+
 const Block &System::block() const
 {
     return m_block;

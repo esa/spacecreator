@@ -31,6 +31,7 @@ public:
 
     auto build() -> sdl::System;
 
+    auto withFreeformText(QString text) -> SdlSystemBuilder &;
     auto withBlock(sdl::Block block) -> SdlSystemBuilder &;
 
 private:
