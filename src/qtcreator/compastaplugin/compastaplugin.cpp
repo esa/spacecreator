@@ -107,10 +107,10 @@ auto CompastaPlugin::addCompastaMenu() -> void
     Command *const editContractsMenuItem = ActionManager::registerAction(editContractsAction, Constants::COMPASTA_EDIT_CONTRACTS_ID, allContexts);
     acToolsCompasta->addAction(editContractsMenuItem);
 
-    /*const auto editRequirementsAction = new QAction(tr("Edit &Requirements"), this);
+    const auto editRequirementsAction = new QAction(tr("Edit &Requirements"), this);
     connect(editRequirementsAction, &QAction::triggered, [=]() { this->editRequirements(); });
     Command *const editRequirementsMenuItem = ActionManager::registerAction(editRequirementsAction, Constants::COMPASTA_EDIT_REQUIREMENTS_ID, allContexts);
-    acToolsCompasta->addAction(editRequirementsMenuItem);*/
+    acToolsCompasta->addAction(editRequirementsMenuItem);
 
     const auto editPropertiesAction = new QAction(tr("Edit &Properties"), this);
     connect(editPropertiesAction, &QAction::triggered, [=]() { this->editProperties(); });
