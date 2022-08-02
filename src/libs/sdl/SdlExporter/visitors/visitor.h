@@ -30,6 +30,7 @@
 #include <sdl/SdlModel/procedure.h>
 #include <sdl/SdlModel/procedurecall.h>
 #include <sdl/SdlModel/process.h>
+#include <sdl/SdlModel/rename.h>
 #include <sdl/SdlModel/return.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/signal.h>
@@ -104,6 +105,12 @@ public:
      * @param   signal   Signal to be visited
      */
     virtual auto visit(const Signal &input) -> void = 0;
+    /**
+     * @brief   Rename visitor
+     *
+     * @param   rename  Rename to be visited
+     */
+    virtual auto visit(const Rename &rename) -> void = 0;
     /**
      * @brief   Input visitor
      *

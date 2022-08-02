@@ -33,6 +33,10 @@ public:
 
     auto withFreeformText(QString text) -> SdlSystemBuilder &;
     auto withSignal(QString signalName) -> SdlSystemBuilder &;
+    auto withInputRename(QString signalName, QString originalSignalName, QString originalFunctionName)
+            -> SdlSystemBuilder &;
+    auto withOutputRename(QString signalName, QString originalSignalName, QString originalFunctionName)
+            -> SdlSystemBuilder &;
     auto withBlock(sdl::Block block) -> SdlSystemBuilder &;
 
 private:
