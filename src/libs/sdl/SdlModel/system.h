@@ -22,6 +22,8 @@
 #include "block.h"
 #include "node.h"
 
+#include <QStringList>
+
 namespace sdl {
 
 /**
@@ -54,6 +56,19 @@ public:
 
 public:
     /**
+     * @brief   Get list of freeform texts
+     *
+     * @return  Freeform texts
+     */
+    auto freeformTexts() const -> const QStringList &;
+    /**
+     * @brief   Add a freeform text
+     *
+     * @param   text    Text to add
+     */
+    auto addFreeformText(QString text) -> void;
+
+    /**
      * @brief   Getter for the block
      *
      * @return  Block
@@ -73,6 +88,7 @@ public:
     virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
+    QStringList m_freeformTexts;
     Block m_block;
 };
 

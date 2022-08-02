@@ -34,6 +34,13 @@ System SdlSystemBuilder::build()
     return std::move(m_system);
 }
 
+SdlSystemBuilder &SdlSystemBuilder::withFreeformText(QString text)
+{
+    m_system.addFreeformText(std::move(text));
+
+    return *this;
+}
+
 SdlSystemBuilder &SdlSystemBuilder::withBlock(Block block)
 {
     m_system.setBlock(std::move(block));
