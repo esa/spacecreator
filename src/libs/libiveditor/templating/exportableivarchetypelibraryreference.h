@@ -22,25 +22,27 @@
 #include "exportableivobject.h"
 
 namespace ivm {
-class IVConnectionLayerType;
+class IVArchetypeLibraryReference;
 }
 
 namespace ive {
 
 /**
- * @brief The ExportableIVConnectionLayerType is a class to export IVConnectionLayerType
+ * @brief The ExportableIVArchetypeLibraryReference is a class to export IVArchetypeLibraryReference
  */
-class ExportableIVConnectionLayerType : public ExportableIVObject
+class ExportableIVArchetypeLibraryReference : public ExportableIVObject
 {
     Q_GADGET
-    Q_PROPERTY(QString name READ connectionLayerName)
+    Q_PROPERTY(QString archetypeLibrary READ archetypeLibraryName)
+    Q_PROPERTY(QString archetypePath READ archetypeLibraryPath)
 
 public:
-    explicit ExportableIVConnectionLayerType(const ivm::IVConnectionLayerType *layer = nullptr);
-    QString connectionLayerName() const;
+    explicit ExportableIVArchetypeLibraryReference(const ivm::IVArchetypeLibraryReference *archetypeLibraryReference = nullptr);
+    QString archetypeLibraryName() const;
+    QString archetypeLibraryPath() const;
 };
 
 }
 
-Q_DECLARE_METATYPE(ive::ExportableIVConnectionLayerType)
-Q_DECLARE_TYPEINFO(ive::ExportableIVConnectionLayerType, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(ive::ExportableIVArchetypeLibraryReference)
+Q_DECLARE_TYPEINFO(ive::ExportableIVArchetypeLibraryReference, Q_MOVABLE_TYPE);

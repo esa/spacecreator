@@ -18,6 +18,7 @@
 #include "../common/xmldatahelper.h"
 #include "asn1modelstorage.h"
 #include "interfacedocument.h"
+#include "ivarchetypelibraryreference.h"
 #include "ivcomment.h"
 #include "iveditor.h"
 #include "ivexporter.h"
@@ -49,6 +50,7 @@ private Q_SLOTS:
     void testExportComment();
     void testExportNestedComment();
     void testExportLayer();
+    void testExportArchetypeLibraryReference();
     void testExportAsn1File();
     void testExportToBuffer();
 };
@@ -177,6 +179,25 @@ void tst_XmlDocExporter::testExportLayer()
     const QByteArray expected = R"(<?xml version="1.0"?>
                                    <InterfaceView>
                                    <Layer name="TestLayer"/>
+                                   </InterfaceView>)";
+    QVERIFY(XmlData(expected) == XmlData(text));
+}
+
+void tst_XmlDocExporter::testExportArchetypeLibraryReference()
+{
+    QString libraryName = QString("SomeLibraryName");
+    QString libraryPath = QString("SomeLibraryPath.xml");
+    auto testReference = ivm::testutils::createArchetypeLibraryReference(libraryName, libraryPath, m_doc.get());
+
+    QVector<ivm::IVObject *> objects;
+    objects.append(testReference);
+    m_doc->setObjects(objects);
+
+    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
+    const QByteArray text = testFileContent();
+    const QByteArray expected = R"(<?xml version="1.0"?>
+                                   <InterfaceView>
+                                   <ArchetypeLibraryReference archetype_library="SomeLibraryName" path="SomeLibraryPath.xml"/>
                                    </InterfaceView>)";
     QVERIFY(XmlData(expected) == XmlData(text));
 }

@@ -10,6 +10,7 @@ class IVConnection;
 class IVFunctionType;
 class IVComment;
 class IVArchetypeReference;
+class IVArchetypeLibraryReference;
 
 namespace testutils {
 
@@ -34,6 +35,9 @@ IVConnectionLayerType *createConnectionLayer(QObject *parent = nullptr);
 
 IVArchetypeReference *createArchetypeReference(
         const QString &archetypeLibraryName, const QString &archetypeFunctionName, QObject *parent = nullptr);
+
+IVArchetypeLibraryReference *createArchetypeLibraryReference(
+        const QString &archetypeLibraryName, const QString &archetypeLibraryPath, QObject *parent = nullptr);
 
 }
 }

@@ -23,6 +23,8 @@
 #include "itemeditor/ivfunctiontypegraphicsitem.h"
 #include "itemeditor/ivinterfacegraphicsitem.h"
 #include "itemeditor/ivinterfacegroupgraphicsitem.h"
+#include "ivarchetypereference.h"
+#include "ivarchetypelibraryreference.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
@@ -30,7 +32,6 @@
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
 #include "ivinterfacegroup.h"
-#include "ivarchetypereference.h"
 #include "ivobject.h"
 #include "ivtestutils.h"
 #include "sharedlibrary.h"
@@ -61,6 +62,7 @@ private Q_SLOTS:
     void testItem_ConnectionGroup();
     void testItem_ConnectionLayer();
     void testItem_ArchetypeReference();
+    void testItem_ArchetypeLibraryReference();
     void testItem_CheckCoverage();
 
 private:
@@ -239,11 +241,22 @@ void tst_ItemZOrder::testItem_ConnectionLayer()
 
 void tst_ItemZOrder::testItem_ArchetypeReference()
 {
-    auto *archetypeReference = ivm::testutils::createArchetypeReference(QString("TestArchetypeLibraryName"), QString("TestArchetypeFunctionName"));
+    auto *archetypeReference = ivm::testutils::createArchetypeReference(
+            QString("TestArchetypeLibraryName"), QString("TestArchetypeFunctionName"));
     ++m_itemTypesTested;
     QVERIFY(archetypeReference->getLibraryName().compare("TestArchetypeLibraryName") == 0);
     QVERIFY(archetypeReference->getFunctionName().compare("TestArchetypeFunctionName") == 0);
     delete archetypeReference;
+}
+
+void tst_ItemZOrder::testItem_ArchetypeLibraryReference()
+{
+    auto *archetypeLibraryReference = ivm::testutils::createArchetypeLibraryReference(
+            QString("TestArchetypeLibraryName"), QString("TestArchetypeLibraryPath"));
+    ++m_itemTypesTested;
+    QVERIFY(archetypeLibraryReference->getLibraryName().compare("TestArchetypeLibraryName") == 0);
+    QVERIFY(archetypeLibraryReference->getLibraryPath().compare("TestArchetypeLibraryPath") == 0);
+    delete archetypeLibraryReference;
 }
 
 void tst_ItemZOrder::testItem_CheckCoverage()

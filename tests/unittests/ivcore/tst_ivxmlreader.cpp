@@ -15,6 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "ivarchetypelibraryreference.h"
 #include "ivconnectiongroup.h"
 #include "ivfunction.h"
 #include "ivlibrary.h"
@@ -45,6 +46,7 @@ private Q_SLOTS:
     void test_readFunctionLanguages();
     void test_connectionGroup();
     void test_readLayer();
+    void test_readArchetypeLibraryReference();
     void test_multicast();
 
 private:
@@ -218,6 +220,28 @@ void IVXMLReader::test_readLayer()
 
     QVERIFY(layer != nullptr);
     QCOMPARE(layer->title(), "TestLayer");
+}
+
+void IVXMLReader::test_readArchetypeLibraryReference()
+{
+    QByteArray xml(R"(<InterfaceView>
+                      <ArchetypeLibraryReference archetype_library="SomeLibrary" path="SomeLibrary.xml"/>
+                      </InterfaceView>)");
+
+    QBuffer buffer(&xml);
+    buffer.open(QIODevice::ReadOnly | QIODevice::Text);
+
+    ivm::IVXMLReader reader;
+
+    const bool ok = reader.read(&buffer);
+    QVERIFY(ok);
+    const QVector<ivm::IVObject *> referencesList = reader.parsedObjects();
+    QCOMPARE(referencesList.size(), 1);
+    ivm::IVArchetypeLibraryReference *reference = qobject_cast<ivm::IVArchetypeLibraryReference *>(referencesList[0]);
+
+    QVERIFY(reference != nullptr);
+    QCOMPARE(reference->getLibraryName(), "SomeLibrary");
+    QCOMPARE(reference->getLibraryPath(), "SomeLibrary.xml");
 }
 
 void IVXMLReader::test_multicast()

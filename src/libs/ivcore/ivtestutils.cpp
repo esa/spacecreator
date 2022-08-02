@@ -5,6 +5,7 @@
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivarchetypereference.h"
+#include "ivarchetypelibraryreference.h"
 #include "ivmodel.h"
 
 #include <algorithm>
@@ -105,6 +106,13 @@ IVArchetypeReference *createArchetypeReference(
 {
     auto archetypeReference = new IVArchetypeReference(parent, archetypeLibraryName, archetypeFunctionName);
     return archetypeReference;
+}
+
+IVArchetypeLibraryReference *createArchetypeLibraryReference(
+        const QString &archetypeLibraryName, const QString &archetypeLibraryPath, QObject *parent)
+{
+    auto archetypeLibraryReference = new IVArchetypeLibraryReference(parent, archetypeLibraryName, archetypeLibraryPath);
+    return archetypeLibraryReference;
 }
 
 }

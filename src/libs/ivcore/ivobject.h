@@ -50,7 +50,8 @@ public:
         Connection,
         ConnectionGroup,
         ConnectionLayer,
-        ArchetypeReference
+        ArchetypeReference,
+        ArchetypeLibraryReference,
     };
     Q_ENUM(Type)
 

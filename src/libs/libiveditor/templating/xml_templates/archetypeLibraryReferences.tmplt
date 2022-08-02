@@ -1,0 +1,6 @@
+{# This template is for test purposes only #}
+<ArchetypeLibraryReferences>
+{% for archetypeLibraryReference in ArchetypeLibraryReferences %}
+    {% include "archetypeLibraryReference.tmplt" %}
+{% endfor %}
+</ArchetypeLibraryReferences>

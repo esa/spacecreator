@@ -17,28 +17,32 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "exportableivconnectionlayertype.h"
+#pragma once
 
-#include "exportableproperty.h"
-#include "ivcomment.h"
-#include "ivconnection.h"
-#include "ivconnectiongroup.h"
-#include "ivfunction.h"
-#include "ivfunctiontype.h"
-#include "ivinterface.h"
-#include "ivinterfacechain.h"
-#include "ivmodel.h"
+#include <QObject>
+#include <QString>
+#include "ivobject.h"
 
-namespace ive {
+namespace ivm {
 
-ExportableIVConnectionLayerType::ExportableIVConnectionLayerType(const ivm::IVConnectionLayerType *layer)
-    : ExportableIVObject(layer)
+class IVArchetypeLibraryReference : public IVObject
 {
-}
+    Q_OBJECT
 
-QString ExportableIVConnectionLayerType::connectionLayerName() const
-{
-    return exportedObject<ivm::IVConnectionLayerType>()->title();
-}
+public:
+    explicit IVArchetypeLibraryReference(QObject *parent = nullptr, const QString &archetypeLibraryName = QString(),
+            const QString &archetypeLibraryPath = QString());
+    ~IVArchetypeLibraryReference() = default;
+
+    QString getLibraryName() const;
+    void setLibraryName(const QString &libraryName);
+    QString getLibraryPath() const;
+    void setLibraryPath(const QString &libraryPath);
+    bool operator==(const IVArchetypeLibraryReference &other) const;
+
+private:
+    QString m_archetypeLibraryName;
+    QString m_archetypeLibraryPath;
+};
 
 }

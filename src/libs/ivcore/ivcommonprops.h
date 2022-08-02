@@ -49,6 +49,7 @@ public:
         Implementation,
         Layer,
         ArchetypeReference,
+        ArchetypeLibraryReference,
 
         // attrs:
         name,
@@ -71,6 +72,7 @@ public:
         layer,
         archetype_library,
         archetype_function,
+        path,
 
         // KNOWN TASTE props:
         coordinates,

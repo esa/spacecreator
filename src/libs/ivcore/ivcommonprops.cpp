@@ -40,6 +40,7 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "Implementation", Token::Implementation },
     { "Layer", Token::Layer },
     { "ArchetypeReference", Token::ArchetypeReference },
+    { "ArchetypeLibraryReference", Token::ArchetypeLibraryReference },
 
     // attrs:
     { "name", Token::name },
@@ -62,6 +63,7 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "layer", Token::layer },
     { "archetype_library", Token::archetype_library },
     { "archetype_function", Token::archetype_function },
+    { "path", Token::path },
 
     // TASTE props:
     { "Taste::coordinates", Token::coordinates },

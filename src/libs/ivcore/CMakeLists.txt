@@ -29,6 +29,8 @@ target_sources(${LIB_NAME} PRIVATE
     ivfunctiontype.h
     ivarchetypereference.h
     ivarchetypereference.cpp
+    ivarchetypelibraryreference.h
+    ivarchetypelibraryreference.cpp
     ivinterface.cpp
     ivinterface.h
     ivinterfacegroup.cpp

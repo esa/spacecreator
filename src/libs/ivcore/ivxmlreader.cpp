@@ -19,6 +19,8 @@
 
 #include "entityattribute.h"
 #include "errorhub.h"
+#include "ivarchetypereference.h"
+#include "ivarchetypelibraryreference.h"
 #include "ivcomment.h"
 #include "ivcommonprops.h"
 #include "ivconnection.h"
@@ -27,7 +29,6 @@
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
 #include "ivinterfacegroup.h"
-#include "ivarchetypereference.h"
 #include "parameter.h"
 
 #include <QDebug>
@@ -66,6 +67,7 @@ struct CurrentObjectHolder {
         m_connectionGroup = m_object ? m_object->as<IVConnectionGroup *>() : nullptr;
         m_layer = m_object ? m_object->as<IVConnectionLayerType *>() : nullptr;
         m_archetypeReference = m_object ? m_object->as<IVArchetypeReference *>() : nullptr;
+        m_archetypeLibraryReference = m_object ? m_object->as<IVArchetypeLibraryReference *>() : nullptr;
     }
 
     QPointer<IVObject> get() { return m_object; }
@@ -76,6 +78,7 @@ struct CurrentObjectHolder {
     QPointer<IVConnectionGroup> connectionGroup() { return m_connectionGroup; }
     QPointer<IVConnectionLayerType> layer() { return m_layer; }
     QPointer<IVArchetypeReference> archetypeReference() { return m_archetypeReference; }
+    QPointer<IVArchetypeLibraryReference> archetypeLibraryReference() { return m_archetypeLibraryReference; }
 
     bool isValid() const { return !m_object.isNull(); }
 
@@ -88,6 +91,7 @@ private:
     QPointer<IVConnectionGroup> m_connectionGroup { nullptr };
     QPointer<IVConnectionLayerType> m_layer { nullptr };
     QPointer<IVArchetypeReference> m_archetypeReference { nullptr };
+    QPointer<IVArchetypeLibraryReference> m_archetypeLibraryReference { nullptr };
 };
 
 typedef QHash<QString, QHash<QString, IVInterface *>> IfacesByFunction; // { Function[Type]Id, {IfaceName, Iface} }
@@ -284,6 +288,11 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
     case Props::Token::ArchetypeReference: {
         obj = addArchetypeReference(
                 attrValue(attrs, Props::Token::archetype_library), attrValue(attrs, Props::Token::archetype_function));
+        break;
+    }
+    case Props::Token::ArchetypeLibraryReference: {
+        obj = new IVArchetypeLibraryReference(d->m_currentObject.get(),
+                attrValue(attrs, Props::Token::archetype_library), attrValue(attrs, Props::Token::path));
         break;
     }
     default:

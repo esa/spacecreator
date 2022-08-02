@@ -245,7 +245,8 @@ QString IVNameValidator::nameOfType(IVObject::Type t)
     case IVObject::Type::Comment:
     case IVObject::Type::ConnectionGroup:
     case IVObject::Type::ConnectionLayer:
-    case IVObject::Type::Connection: {
+    case IVObject::Type::Connection:
+    case IVObject::Type::ArchetypeLibraryReference: {
         return instance()->m_typePrefixes[t];
     }
     case IVObject::Type::Unknown: {
@@ -292,6 +293,8 @@ QString IVNameValidator::nextName(const IVObject *object) const
     case IVObject::Type::ConnectionLayer:
         return nameConnectionLayer(object);
     case IVObject::Type::InterfaceGroup:
+    case IVObject::Type::ArchetypeLibraryReference:
+    case IVObject::Type::ArchetypeReference:
     case IVObject::Type::Unknown:
         return QString();
     default:
