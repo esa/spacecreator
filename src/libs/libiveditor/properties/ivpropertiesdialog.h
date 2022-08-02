@@ -62,7 +62,7 @@ private:
     QPointer<ivm::AbstractSystemChecks> m_ivChecks;
     QPointer<Asn1Acn::Asn1SystemChecks> m_asn1Checks;
     const QString m_projectPath;
-    bool m_isFixed;
+    bool m_isFixedSystemElement;
 };
 
 } // namespace ive

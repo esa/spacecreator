@@ -92,7 +92,7 @@ public:
 
     bool isGrouped() const;
 
-    bool isFixed() const;
+    bool isFixedSystemElement() const;
 
     void setVisible(bool isVisible);
     bool isVisible() const;

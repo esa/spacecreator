@@ -391,9 +391,13 @@ bool IVObject::isVisible() const
     return entityAttributeValue(meta::Props::token(meta::Props::Token::is_visible), true);
 }
 
-bool IVObject::isFixed() const
+bool IVObject::isFixedSystemElement() const
 {
-    return entityAttributeValue(meta::Props::token(meta::Props::Token::fixed_system_element)) == "YES";
+    auto obj = this;
+    if (isInterface()) {
+        obj = parentObject();
+    }
+    return obj->entityAttributeValue(meta::Props::token(meta::Props::Token::fixed_system_element)) == "YES";
 }
 
 }

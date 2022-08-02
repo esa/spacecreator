@@ -86,7 +86,7 @@ void IVCreatorTool::removeSelectedItems()
 
     if (auto scene = m_view->scene()) {
         QStringList clonedIfaces;
-        QStringList fixedEntities;
+        QStringList nonRemovableEntities;
         QList<QPointer<ivm::IVObject>> entities;
         clearPreviewItem();
         while (!scene->selectedItems().isEmpty()) {
@@ -98,8 +98,8 @@ void IVCreatorTool::removeSelectedItems()
                     if (entity->isRootObject()) {
                         continue;
                     }
-                    if (entity->isFixed()) {
-                        fixedEntities.append(entity->title());
+                    if (entity->isFixedSystemElement()) {
+                        nonRemovableEntities.append(entity->title());
                         continue;
                     }
                     if (entity->isInterface()) {
@@ -120,9 +120,9 @@ void IVCreatorTool::removeSelectedItems()
         cmdRm->setText(tr("Remove selected item(s)"));
         m_doc->commandsStack()->push(cmdRm);
 
-        if (!fixedEntities.isEmpty()) {
-            const QString names = fixedEntities.join(QStringLiteral("<br>"));
-            const QString msg = tr("The following entities are marked as 'fixed, thus can not be removed:<br><br>"
+        if (!nonRemovableEntities.isEmpty()) {
+            const QString names = nonRemovableEntities.join(QStringLiteral("<br>"));
+            const QString msg = tr("The following entities are marked as non-removable:<br><br>"
                                    "<b>%1</b>").arg(names);
             Q_EMIT informUser(tr("Entity removal"), msg);
         }

@@ -56,7 +56,7 @@ IVPropertiesDialog::IVPropertiesDialog(const QString &projectPath, ivm::IVProper
     , m_ivChecks(checks)
     , m_asn1Checks(asn1Checks)
     , m_projectPath(projectPath)
-    , m_isFixed(obj ? obj->isFixed() : false)
+    , m_isFixedSystemElement(obj ? obj->isFixedSystemElement() : false)
 {
 }
 
@@ -134,7 +134,7 @@ void IVPropertiesDialog::initConnectionGroup()
     auto connectionsView = new QListView;
     connectionsView->setModel(model);
 
-    if (m_isFixed) {
+    if (m_isFixedSystemElement) {
         connectionsView->setDisabled(true);
     }
     insertTab(connectionsView, tr("Connections"));
@@ -167,7 +167,7 @@ void IVPropertiesDialog::initAttributesView()
     viewAttrs->tableView()->setItemDelegateForColumn(shared::PropertiesListModel::Column::Value, attrDelegate);
     viewAttrs->setModel(modelAttrs);
 
-    if (m_isFixed) {
+    if (m_isFixedSystemElement) {
         viewAttrs->setDisabled(true);
     }
     insertTab(viewAttrs, tr("Attributes"));
@@ -200,7 +200,7 @@ void IVPropertiesDialog::initContextParams()
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelCtxParams);
 
-    if (m_isFixed) {
+    if (m_isFixedSystemElement) {
         viewAttrs->setDisabled(true);
     }
     insertTab(viewAttrs, tr("Context Parameters"));
@@ -221,7 +221,7 @@ void IVPropertiesDialog::initIfaceParams()
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelIfaceParams);
 
-    if (m_isFixed) {
+    if (m_isFixedSystemElement) {
         viewAttrs->setDisabled(true);
     }
     insertTab(viewAttrs, tr("Parameters"));
@@ -233,7 +233,7 @@ void IVPropertiesDialog::initCommentView()
         auto commentEdit = new QPlainTextEdit(this);
         commentEdit->setPlainText(comment->titleUI());
 
-        if (m_isFixed) {
+        if (m_isFixedSystemElement) {
             commentEdit->setDisabled(true);
         }
         insertTab(commentEdit, tr("Comment content"));
@@ -262,7 +262,7 @@ void IVPropertiesDialog::initLanguageView()
     }
     auto languagesWidget = new ive::ImplementationsWidget(m_projectPath, fn, m_ivChecks, commandMacro(), this);
 
-    if (m_isFixed) {
+    if (m_isFixedSystemElement) {
         languagesWidget->setDisabled(true);
     }
     insertTab(languagesWidget, tr("Implementations"));
