@@ -832,6 +832,8 @@ void tst_sdlexporter::testGenerateSystem()
         .withSystem(SdlSystemBuilder(systemName)
             .withFreeformText("use datamodel comment 'observer.asn';")
             .withSignal("Signal1")
+            .withInputRename("Signal2", "OGSignal2", "Func2")
+            .withOutputRename("Signal3", "OGSignal3", "Func3")
             .withBlock(SdlBlockBuilder(systemName)
                 .withProcess(SdlProcessBuilder(systemName)
                     .withStartTransition(std::move(startTransition))
@@ -868,6 +870,8 @@ void tst_sdlexporter::testGenerateSystem()
         QString("system %1;").arg(systemName),
         QString("use datamodel comment 'observer.asn';"),
         QString("signal Signal1;"),
+        QString("signal Signal2 renames input OGSignal2 to Func2;"),
+        QString("signal Signal3 renames output OGSignal3 from Func3;"),
         QString("block %1;").arg(systemName),
         QString("process %1;").arg(systemName),
         "START;", "NEXTSTATE Wait;",

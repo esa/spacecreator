@@ -246,6 +246,12 @@ public:
      */
     virtual auto visit(const Signal &input) -> void override;
     /**
+     * @brief   Rename visitor
+     *
+     * @param   rename      Rename to be serialized
+     */
+    virtual auto visit(const Rename &rename) -> void override;
+    /**
      * @brief   Input visitor
      *
      * @param   input   input to be serialized

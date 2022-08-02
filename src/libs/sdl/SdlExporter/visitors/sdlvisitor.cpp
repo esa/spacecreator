@@ -314,6 +314,44 @@ void SdlVisitor::visit(const Signal &signal)
     m_writer.writeLine(QString("signal %1;").arg(signal.name()));
 }
 
+void SdlVisitor::visit(const Rename &rename)
+{
+    if (rename.name().isEmpty()) {
+        throw ExportException("Signal rename shall have a name but it doesn't");
+    }
+    if (rename.originalName().isEmpty()) {
+        throw ExportException("Signal rename shall have an original name but it doesn't");
+    }
+    if (rename.originalFunctionName().isEmpty()) {
+        throw ExportException("Signal rename shall have an original function name but it doesn't");
+    }
+
+    m_writer.beginLine(QString("signal %1 renames").arg(rename.name()));
+
+    switch (rename.direction()) {
+    case Rename::Direction::Input:
+        m_writer.write(" input ");
+        break;
+    case Rename::Direction::Output:
+        m_writer.write(" output ");
+        break;
+    }
+
+    m_writer.write(rename.originalName());
+
+    switch (rename.direction()) {
+    case Rename::Direction::Input:
+        m_writer.write(" to ");
+        break;
+    case Rename::Direction::Output:
+        m_writer.write(" from ");
+        break;
+    }
+
+    m_writer.write(rename.originalFunctionName());
+    m_writer.endLine(";");
+}
+
 void SdlVisitor::visit(const Input &input)
 {
     if (input.name().isEmpty()) {

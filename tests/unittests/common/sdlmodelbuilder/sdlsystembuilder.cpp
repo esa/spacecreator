@@ -19,7 +19,11 @@
 
 #include "sdlsystembuilder.h"
 
+#include <sdl/SdlModel/rename.h>
+#include <sdl/SdlModel/signal.h>
+
 using sdl::Block;
+using sdl::Rename;
 using sdl::Signal;
 using sdl::System;
 
@@ -46,6 +50,26 @@ SdlSystemBuilder &SdlSystemBuilder::withSignal(QString signalName)
 {
     auto signal = std::make_unique<Signal>(signalName);
     m_system.addSignal(std::move(signal));
+
+    return *this;
+}
+
+SdlSystemBuilder &SdlSystemBuilder::withInputRename(
+        QString signalName, QString originalSignalName, QString originalFunctionName)
+{
+    auto rename =
+            std::make_unique<Rename>(signalName, Rename::Direction::Input, originalSignalName, originalFunctionName);
+    m_system.addSignal(std::move(rename));
+
+    return *this;
+}
+
+SdlSystemBuilder &SdlSystemBuilder::withOutputRename(
+        QString signalName, QString originalSignalName, QString originalFunctionName)
+{
+    auto rename =
+            std::make_unique<Rename>(signalName, Rename::Direction::Output, originalSignalName, originalFunctionName);
+    m_system.addSignal(std::move(rename));
 
     return *this;
 }
