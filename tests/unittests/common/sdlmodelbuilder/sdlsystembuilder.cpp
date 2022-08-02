@@ -20,6 +20,7 @@
 #include "sdlsystembuilder.h"
 
 using sdl::Block;
+using sdl::Signal;
 using sdl::System;
 
 namespace tests::common {
@@ -37,6 +38,14 @@ System SdlSystemBuilder::build()
 SdlSystemBuilder &SdlSystemBuilder::withFreeformText(QString text)
 {
     m_system.addFreeformText(std::move(text));
+
+    return *this;
+}
+
+SdlSystemBuilder &SdlSystemBuilder::withSignal(QString signalName)
+{
+    auto signal = std::make_unique<Signal>(signalName);
+    m_system.addSignal(std::move(signal));
 
     return *this;
 }

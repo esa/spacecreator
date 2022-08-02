@@ -21,8 +21,10 @@
 
 #include "block.h"
 #include "node.h"
+#include "signal.h"
 
 #include <QStringList>
+#include <vector>
 
 namespace sdl {
 
@@ -62,11 +64,24 @@ public:
      */
     auto freeformTexts() const -> const QStringList &;
     /**
-     * @brief   Add a freeform text
+     * @brief   Adds a freeform text
      *
      * @param   text    Text to add
      */
     auto addFreeformText(QString text) -> void;
+
+    /**
+     * @brief   Getter for signals
+     *
+     * @return  Signals
+     */
+    auto getSignals() const -> const std::vector<std::unique_ptr<Signal>> &;
+    /**
+     * @brief   Adds a signal
+     *
+     * @param   singal  Signal to add
+     */
+    auto addSignal(std::unique_ptr<Signal> signal) -> void;
 
     /**
      * @brief   Getter for the block
@@ -89,6 +104,7 @@ public:
 
 private:
     QStringList m_freeformTexts;
+    std::vector<std::unique_ptr<Signal>> m_signals;
     Block m_block;
 };
 

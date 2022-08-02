@@ -204,6 +204,13 @@ void SdlVisitor::visit(const System &system)
         m_writer.writeLine("/* ENDTEXT */");
     }
 
+    if (!system.getSignals().empty()) {
+        m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
+        m_layouter.moveDown(Layouter::ElementType::Text);
+        exportCollection(system.getSignals());
+        m_writer.writeLine("/* ENDTEXT */");
+    }
+
     system.block().accept(*this);
 
     m_writer.popIndent();
@@ -296,6 +303,15 @@ void SdlVisitor::visit(const State &state)
     m_layouter.popPosition();
     m_layouter.moveRightToHighWatermark();
     m_layouter.moveRight(Layouter::ElementType::State);
+}
+
+void SdlVisitor::visit(const Signal &signal)
+{
+    if (signal.name().isEmpty()) {
+        throw ExportException("Signal shall have a name but it doesn't");
+    }
+
+    m_writer.writeLine(QString("signal %1;").arg(signal.name()));
 }
 
 void SdlVisitor::visit(const Input &input)

@@ -99,6 +99,12 @@ public:
      */
     virtual auto visit(const State &state) -> void = 0;
     /**
+     * @brief   Signal visitor
+     *
+     * @param   signal   Signal to be visited
+     */
+    virtual auto visit(const Signal &input) -> void = 0;
+    /**
      * @brief   Input visitor
      *
      * @param   input   input to be visited

@@ -20,12 +20,18 @@
 #include "signal.h"
 
 #include <memory>
+#include <sdl/SdlExporter/visitors/visitor.h>
 
 namespace sdl {
 
 Signal::Signal(QString name)
     : Node(std::move(name))
 {
+}
+
+void Signal::accept(Visitor &visitor) const
+{
+    visitor.visit(*this);
 }
 
 } // namespace sdl
