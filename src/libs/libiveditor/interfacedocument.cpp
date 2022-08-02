@@ -36,6 +36,7 @@
 #include "itemeditor/graphicsitemhelpers.h"
 #include "itemeditor/ivfunctiongraphicsitem.h"
 #include "itemeditor/ivitemmodel.h"
+#include "ivarchetypelibraryreference.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
@@ -922,35 +923,19 @@ bool InterfaceDocument::loadImpl(const QString &path)
 
 void InterfaceDocument::loadArchetypes()
 {
-    QVector<QString> archetypeLibraryPaths;
-    QRegularExpression regex(shared::archetypesFileStartingString() + "(.+?).xml");
-
-    if(!std::filesystem::is_directory(shared::interfaceCustomArchetypesDirectoryPath().toStdString())){
-        qWarning() << tr("No Archetype Library directory found");
-        return;
-    }
-
-    for (const auto &entry :
-            std::filesystem::directory_iterator(shared::interfaceCustomArchetypesDirectoryPath().toStdString())) {
-        QString path = QString(entry.path().c_str());
-        QString fileName = QString(entry.path().filename().c_str());
-        if (fileName.startsWith(shared::archetypesFileStartingString()) && fileName.endsWith(".xml")) {
-            archetypeLibraryPaths.append(path);
-        }
-    }
-
     d->archetypeModel->clear();
 
-    for (const auto &path : archetypeLibraryPaths) {
+    for (const auto &libraryReference : d->objectsModel->getArchetypeLibraryReferences()) {
         ivm::ArchetypeXMLReader archetypeParser;
-        if (!archetypeParser.readFile(path)) {
-            shared::ErrorHub::addError(shared::ErrorItem::Error, archetypeParser.errorString(), path);
+        QString absolutePath = shared::interfaceCustomArchetypesDirectoryPath() + QDir::separator()
+                + libraryReference->getLibraryPath();
+        if (!archetypeParser.readFile(absolutePath)) {
+            shared::ErrorHub::addError(shared::ErrorItem::Error, archetypeParser.errorString(), absolutePath);
             shared::ErrorHub::clearCurrentFile();
         }
-        QString archetypeLibraryName = regex.match(path).captured(1);
         QVector<ivm::ArchetypeObject *> archetypeObjects = archetypeParser.parsedObjects();
 
-        generateArchetypeLibrary(archetypeObjects, archetypeLibraryName);
+        generateArchetypeLibrary(archetypeObjects, libraryReference->getLibraryName());
 
         d->archetypeModel->addObjects(archetypeObjects);
     }
