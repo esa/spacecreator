@@ -56,6 +56,7 @@ IVPropertiesDialog::IVPropertiesDialog(const QString &projectPath, ivm::IVProper
     , m_ivChecks(checks)
     , m_asn1Checks(asn1Checks)
     , m_projectPath(projectPath)
+    , m_isFixed(obj ? obj->isFixed() : false)
 {
 }
 
@@ -132,6 +133,10 @@ void IVPropertiesDialog::initConnectionGroup()
     auto model = new IVConnectionGroupModel(qobject_cast<ivm::IVConnectionGroup *>(dataObject()), commandMacro(), this);
     auto connectionsView = new QListView;
     connectionsView->setModel(model);
+
+    if (m_isFixed) {
+        connectionsView->setDisabled(true);
+    }
     insertTab(connectionsView, tr("Connections"));
 }
 
@@ -162,6 +167,9 @@ void IVPropertiesDialog::initAttributesView()
     viewAttrs->tableView()->setItemDelegateForColumn(shared::PropertiesListModel::Column::Value, attrDelegate);
     viewAttrs->setModel(modelAttrs);
 
+    if (m_isFixed) {
+        viewAttrs->setDisabled(true);
+    }
     insertTab(viewAttrs, tr("Attributes"));
 
     QTimer::singleShot(0, viewAttrs, [this, viewAttrs, modelAttrs]() {
@@ -191,6 +199,10 @@ void IVPropertiesDialog::initContextParams()
             ContextParametersModel::Column::Value, new Asn1ValueDelegate(m_asn1Checks, viewAttrs->tableView()));
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelCtxParams);
+
+    if (m_isFixed) {
+        viewAttrs->setDisabled(true);
+    }
     insertTab(viewAttrs, tr("Context Parameters"));
 }
 
@@ -208,6 +220,10 @@ void IVPropertiesDialog::initIfaceParams()
             IfaceParametersModel::Column::Direction, new shared::AttributeDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelIfaceParams);
+
+    if (m_isFixed) {
+        viewAttrs->setDisabled(true);
+    }
     insertTab(viewAttrs, tr("Parameters"));
 }
 
@@ -216,6 +232,10 @@ void IVPropertiesDialog::initCommentView()
     if (auto comment = qobject_cast<ivm::IVComment *>(dataObject())) {
         auto commentEdit = new QPlainTextEdit(this);
         commentEdit->setPlainText(comment->titleUI());
+
+        if (m_isFixed) {
+            commentEdit->setDisabled(true);
+        }
         insertTab(commentEdit, tr("Comment content"));
         connect(this, &QDialog::accepted, this, [comment, commentEdit, this]() {
             const QString text = commentEdit->toPlainText();
@@ -241,6 +261,10 @@ void IVPropertiesDialog::initLanguageView()
         return;
     }
     auto languagesWidget = new ive::ImplementationsWidget(m_projectPath, fn, m_ivChecks, commandMacro(), this);
+
+    if (m_isFixed) {
+        languagesWidget->setDisabled(true);
+    }
     insertTab(languagesWidget, tr("Implementations"));
 }
 

@@ -86,6 +86,7 @@ void IVCreatorTool::removeSelectedItems()
 
     if (auto scene = m_view->scene()) {
         QStringList clonedIfaces;
+        QStringList fixedEntities;
         QList<QPointer<ivm::IVObject>> entities;
         clearPreviewItem();
         while (!scene->selectedItems().isEmpty()) {
@@ -95,6 +96,10 @@ void IVCreatorTool::removeSelectedItems()
             if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
                 if (auto entity = iObj->entity() ? iObj->entity()->as<ivm::IVObject *>() : nullptr) {
                     if (entity->isRootObject()) {
+                        continue;
+                    }
+                    if (entity->isFixed()) {
+                        fixedEntities.append(entity->title());
                         continue;
                     }
                     if (entity->isInterface()) {
@@ -114,6 +119,13 @@ void IVCreatorTool::removeSelectedItems()
         auto cmdRm = new cmd::CmdEntitiesRemove(entities, model()->objectsModel());
         cmdRm->setText(tr("Remove selected item(s)"));
         m_doc->commandsStack()->push(cmdRm);
+
+        if (!fixedEntities.isEmpty()) {
+            const QString names = fixedEntities.join(QStringLiteral("<br>"));
+            const QString msg = tr("The following entities are marked as 'fixed, thus can not be removed:<br><br>"
+                                   "<b>%1</b>").arg(names);
+            Q_EMIT informUser(tr("Entity removal"), msg);
+        }
 
         if (!clonedIfaces.isEmpty()) {
             const QString names = clonedIfaces.join(QStringLiteral("<br>"));

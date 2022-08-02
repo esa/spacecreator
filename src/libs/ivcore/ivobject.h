@@ -92,6 +92,8 @@ public:
 
     bool isGrouped() const;
 
+    bool isFixed() const;
+
     void setVisible(bool isVisible);
     bool isVisible() const;
 

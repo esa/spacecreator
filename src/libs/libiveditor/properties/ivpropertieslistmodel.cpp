@@ -71,7 +71,7 @@ QPair<QString, QVariant> IVPropertiesListModel::prepareDataForUpdate(
 
 bool IVPropertiesListModel::isEditable(const QModelIndex &index) const
 {
-    if (!entity() || !index.isValid() || isFixed() || !PropertiesListModel::isEditable(index))
+    if (!entity() || !index.isValid() || !PropertiesListModel::isEditable(index))
         return false;
 
     bool editable = true;
@@ -87,21 +87,6 @@ bool IVPropertiesListModel::isEditable(const QModelIndex &index) const
         break;
     }
     return editable;
-}
-
-bool IVPropertiesListModel::isFixed() const
-{
-    QModelIndex parent = QModelIndex();
-    for(int r = 0; r < rowCount(parent); ++r) {
-        QModelIndex idx = index(r, 1, parent);
-        const QString &name = tokenNameFromIndex(idx);
-        const QString &value = data(idx, DataRole).toString();
-
-        if (name == "fixed_system_element") {
-            return value == "YES";
-        }
-    }
-    return false;
 }
 
 IVPropertiesListModel::IVPropertiesListModel(
@@ -291,7 +276,7 @@ ivm::IVInterface *InterfacePropertiesListModel::entity() const
 
 bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const
 {
-    if (!entity() || !index.isValid() || isFixed() || !PropertiesListModel::isEditable(index))
+    if (!entity() || !index.isValid() || !PropertiesListModel::isEditable(index))
         return false;
 
     if (auto iface = entity()->as<const ivm::IVInterface *>()) {
