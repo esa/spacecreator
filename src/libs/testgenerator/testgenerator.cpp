@@ -253,11 +253,17 @@ auto TestGenerator::exportDvModel(DVModel *dvModel, const QString &outputFilenam
 auto TestGenerator::runTests(IVInterface &interface, Asn1Model &asn1Model, const LaunchConfiguration &launchConfig)
         -> QVector<QVariant>
 {
-    const QByteArray rawTestData = GdbConnector::getRawTestResults(binaryPath, launchConfig.clientArgsParsed,
-            launchConfig.serverArgsParsed, launchConfig.clientName, launchConfig.serverName);
+    QByteArray rawTestData;
+    try {
+        rawTestData = GdbConnector::getRawTestResults(binaryPath, launchConfig.clientArgsParsed,
+                launchConfig.serverArgsParsed, launchConfig.clientName, launchConfig.serverName);
+    } catch (std::invalid_argument &e) {
+        qCritical() << "Error while getting raw test results (invalid argument): " << e.what();
+    } catch (std::runtime_error &e) {
+        qCritical() << "Error while getting raw test results (runtime error): " << e.what();
+    }
 
     qDebug() << "Raw test data size: " << rawTestData.size();
-    qDebug() << "Raw test data: " << rawTestData;
 
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
             rawTestData, &interface, &asn1Model, launchConfig.endianess, launchConfig.typeLayoutInfos);
