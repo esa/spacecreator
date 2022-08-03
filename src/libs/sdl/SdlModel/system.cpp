@@ -68,6 +68,27 @@ void System::setBlock(Block block)
     m_block = std::move(block);
 }
 
+void System::createRoutes(const QString &channelName, const QString &signalRouteName)
+{
+    Route route;
+    route.setFrom("env");
+    route.setTo(m_block.name());
+    for (const auto &signal : m_signals) {
+        route.addWith(signal->name());
+    }
+
+    Channel channel(channelName);
+    channel.addRoute(route);
+    addChannel(std::move(channel));
+
+    SignalRoute signalRoute(signalRouteName);
+    signalRoute.addRoute(route);
+    m_block.addSignalRoute(std::move(signalRoute));
+
+    Connection connection(channelName, signalRouteName);
+    m_block.addConnection(std::move(connection));
+}
+
 void System::accept(Visitor &visitor) const
 {
     visitor.visit(*this);

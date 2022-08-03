@@ -114,6 +114,15 @@ public:
 
 public:
     /**
+     * @brief   Creates a channel and signal route for all signals
+     *
+     * @param   channelName         Channel name
+     * @param   signalRouteName     Signal route name
+     */
+    auto createRoutes(const QString &channelName, const QString &signalRouteName) -> void;
+
+public:
+    /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */
     virtual auto accept(Visitor &visitor) const -> void override;
