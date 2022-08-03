@@ -1,31 +1,34 @@
-/*
-  Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Library General Public
-  License as published by the Free Software Foundation; either
-  version 2 of the License, or (at your option) any later version.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Library General Public License for more details.
-
-  You should have received a copy of the GNU Library General Public License
-  along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
-*/
+/** @file
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 
 #include "archetypeswidgetmodel.h"
 
+#include "archetypes/archetypemodel.h"
 #include "commands/cmdfunctionattrchange.h"
 #include "commands/cmdfunctionimplementationdefaultchange.h"
 #include "commands/cmdfunctionimplementationinsert.h"
 #include "commands/cmdfunctionimplementationremove.h"
 #include "commands/cmdfunctionimplementationupdate.h"
+#include "ivarchetypereference.h"
 #include "ivcore/abstractsystemchecks.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"
-#include "archetypes/archetypemodel.h"
 #include "ivpropertytemplateconfig.h"
 
 #include <QApplication>
@@ -33,6 +36,7 @@
 #include <QFont>
 #include <QMessageBox>
 #include <QMetaEnum>
+#include <algorithm>
 
 namespace ive {
 
@@ -85,7 +89,7 @@ int ArchetypesWidgetModel::rowCount(const QModelIndex &parent) const
         return 0;
     }
 
-    return m_function->archetypeReferences().size();
+    return m_archetypeReferences.size();
 }
 
 int ArchetypesWidgetModel::columnCount(const QModelIndex &parent) const
@@ -97,7 +101,28 @@ int ArchetypesWidgetModel::columnCount(const QModelIndex &parent) const
 
 QVariant ArchetypesWidgetModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || !m_function || m_function->archetypeReferences().size() <= index.row()) {
+    if (!index.isValid() || !m_function) {
+        return QVariant();
+    }
+
+    if (role == Qt::DisplayRole) {
+        switch (index.column()) {
+        case Column::LibraryName:
+            return QVariant(m_archetypeReferences.value(index.row())->getLibraryName());
+        case Column::FunctionName:
+            return QVariant(m_archetypeReferences.value(index.row())->getFunctionName());
+        }
+        return QVariant();
+    }
+
+    if (role == Qt::EditRole) {
+        QString libraryName = m_archetypeReferences.value(index.row())->getLibraryName();
+        switch (index.column()) {
+        case Column::LibraryName:
+            return QVariant(m_archetypeModel->getLibrariesNames());
+        case Column::FunctionName:
+            return QVariant(m_archetypeModel->getFunctionsNamesByLibraryName(libraryName));
+        }
         return QVariant();
     }
 
@@ -106,8 +131,25 @@ QVariant ArchetypesWidgetModel::data(const QModelIndex &index, int role) const
 
 bool ArchetypesWidgetModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (!index.isValid() || !m_function || m_function->archetypeReferences().size() <= index.row()) {
+    if (!index.isValid() || !m_function) {
         return false;
+    }
+
+    if ((role == Qt::DisplayRole || role == Qt::EditRole)) {
+        switch (index.column()) {
+        case Column::LibraryName:
+            m_archetypeReferences.value(index.row())->setLibraryName(value.toString());
+            m_archetypeReferences.value(index.row())->setFunctionName(QString());
+            break;
+        case Column::FunctionName:
+            m_archetypeReferences.value(index.row())->setFunctionName(value.toString());
+            break;
+        default:
+            return false;
+        }
+
+        Q_EMIT dataChanged(index, index, QVector<int>() << role);
+        return true;
     }
 
     return false;
@@ -127,7 +169,32 @@ bool ArchetypesWidgetModel::insertRows(int row, int count, const QModelIndex &pa
     if (!m_function) {
         return false;
     }
+    if (m_archetypeModel->getLibrariesNames().isEmpty()) {
+        QMessageBox::warning(qApp->activeWindow(), tr("No Archetype libraries"),
+                tr("It's not possible to set add new archetype implementations, no archetype libraries loaded"));
+        return false;
+    }
+
     beginInsertRows(parent, row, row + count - 1);
+
+    for (int i = 0; i < count; ++i) {
+        ivm::IVArchetypeReference *reference = new ivm::IVArchetypeReference();
+        const QString firstLibraryName = m_archetypeModel->getLibrariesNames().first();
+
+        reference->setLibraryName(firstLibraryName);
+
+        if(!m_archetypeModel->getFunctionsNamesByLibraryName(firstLibraryName).isEmpty())
+        {
+            reference->setFunctionName(m_archetypeModel->getFunctionsNamesByLibraryName(firstLibraryName).first());
+        }
+
+        m_archetypeReferences.append(reference);
+
+        std::sort(m_archetypeReferences.begin(), m_archetypeReferences.end(),
+                [](ivm::IVArchetypeReference *firstReference, ivm::IVArchetypeReference *secondReference) -> bool {
+                    return firstReference->getLibraryName() < secondReference->getLibraryName();
+                });
+    }
 
     endInsertRows();
     return true;
@@ -138,12 +205,14 @@ bool ArchetypesWidgetModel::removeRows(int row, int count, const QModelIndex &pa
     if (!m_function) {
         return false;
     }
-    const auto result = QMessageBox::question(qApp->activeWindow(), tr("Remove implementations"),
-            tr("Are you sure you want to remove selected implementations?"));
+    const auto result = QMessageBox::question(qApp->activeWindow(), tr("Remove archetype implementations"),
+            tr("Are you sure you want to remove selected archetype implementations?"));
     if (QMessageBox::StandardButton::Yes != result) {
         return false;
     }
     beginRemoveRows(parent, row, row + count - 1);
+
+    m_archetypeReferences.remove(row, count);
 
     endRemoveRows();
     return true;

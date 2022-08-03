@@ -19,42 +19,23 @@
 
 #pragma once
 
-#include "commandsstack.h"
+#include <QStringList>
+#include <QStyledItemDelegate>
 
-#include <QWidget>
+namespace shared::archetype {
 
-namespace ivm {
-class AbstractSystemChecks;
-class IVFunctionType;
-class ArchetypeModel;
-}
-
-namespace Ui {
-class ArchetypesWidget;
-}
-
-namespace ive {
-class ArchetypesWidgetModel;
-
-/*!
-   UI to select the archetype(s) for functions
- */
-class ArchetypesWidget : public QWidget
+class ComboBoxDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
-
 public:
-    explicit ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVFunctionType *function, ivm::AbstractSystemChecks *checks,
-            cmd::CommandsStack::Macro *macro, QWidget *parent = nullptr);
-    ~ArchetypesWidget();
+    explicit ComboBoxDelegate(const QStringList &options, QObject *parent = nullptr);
 
-    void addArchetype();
-    void deleteArchetype();
-    Ui::ArchetypesWidget *getUi();
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
 
 private:
-    Ui::ArchetypesWidget *ui;
-    ArchetypesWidgetModel *m_model = nullptr;
+    QStringList m_options;
 };
 
-} // namespace ive
+} // namespace shared::archetype
