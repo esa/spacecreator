@@ -24,7 +24,7 @@
 namespace sdl {
 
 Input::Input(QString name, Transition *transition)
-    : Signal(std::move(name))
+    : Node(std::move(name))
     , m_transition(transition)
 {
 }
