@@ -527,7 +527,15 @@ void SdlVisitor::visit(const VariableDeclaration &declaration)
     }
 
     m_writer.writeComment(declaration.comment());
-    m_writer.writeLine("dcl " + declaration.name() + " " + declaration.type() + ";");
+
+    if (declaration.isMonitor()) {
+        m_writer.beginLine("monitor ");
+    } else {
+        m_writer.beginLine("dcl ");
+    }
+
+    m_writer.write(QString("%1 %2").arg(declaration.name()).arg(declaration.type()));
+    m_writer.endLine(";");
 }
 
 void SdlVisitor::visit(const Label &label)

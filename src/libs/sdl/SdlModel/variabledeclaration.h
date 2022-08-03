@@ -34,10 +34,11 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   name   name of the declared variable
-     * @param   type   type of the declared variable
+     * @param   name        name of the declared variable
+     * @param   type        type of the declared variable
+     * @param   isMonitor   whether this variable is a monitor
      */
-    VariableDeclaration(QString name = "", QString type = "");
+    VariableDeclaration(QString name = "", QString type = "", bool isMonitor = false);
     /**
      * @brief   Deleted copy constructor
      */
@@ -70,6 +71,19 @@ public:
      */
     auto setType(QString type) -> void;
 
+    /**
+     * @brief   Getter for monitor status
+     *
+     * @return  True if this variable is a monitor, false otherwise
+     */
+    auto isMonitor() const -> bool;
+    /**
+     * @brief   Sets whether this variable is a monitor
+     *
+     * @param   isMonitor       Is monitor
+     */
+    auto setMonitor(bool isMonitor) -> void;
+
 public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
@@ -78,6 +92,7 @@ public:
 
 private:
     QString m_type;
+    bool m_isMonitor;
 };
 
 } // namespace sdl

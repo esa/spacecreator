@@ -129,6 +129,17 @@ static std::unique_ptr<VariableDeclaration> makeVariableDeclaration(QString name
     auto variable = std::make_unique<VariableDeclaration>();
     variable->setName(std::move(name));
     variable->setType(std::move(type));
+    variable->setMonitor(false);
+
+    return variable;
+}
+
+static std::unique_ptr<VariableDeclaration> makeMonitorDeclaration(QString name, QString type)
+{
+    auto variable = std::make_unique<VariableDeclaration>();
+    variable->setName(std::move(name));
+    variable->setType(std::move(type));
+    variable->setMonitor(true);
 
     return variable;
 }
@@ -818,6 +829,8 @@ void tst_sdlexporter::testGenerateSystem()
     QString modelPrefix = "Sdl_";
     QString systemName = modelName.toLower(); // NOLINT
 
+    auto monitor = makeMonitorDeclaration("event", "Observable_Event");
+
     auto transition1 = SdlTransitionBuilder().withNextStateAction().build();
     auto state1 = SdlStateBuilder("Wait")
                           .withInput(SdlInputBuilder().withName("someInput").withTransition(transition1.get()).build())
@@ -849,6 +862,7 @@ void tst_sdlexporter::testGenerateSystem()
                 .withConnection("c", "r")
                 .withProcess(SdlProcessBuilder(systemName)
                     .withStartTransition(std::move(startTransition))
+                    .withVariable(std::move(monitor))
                     .withStateMachine(SdlStateMachineBuilder()
                         .withState(std::move(state1))
                         .withState(std::move(state2))
@@ -880,18 +894,19 @@ void tst_sdlexporter::testGenerateSystem()
     // clang-format off
     std::vector<QString> expectedOutput = { 
         QString("system %1;").arg(systemName),
-        QString("use datamodel comment 'observer.asn';"),
-        QString("signal Signal1;"),
-        QString("signal Signal2 renames input OGSignal2 to Func2;"),
-        QString("signal Signal3 renames output OGSignal3 from Func3;"),
-        QString("channel c"),
+        "use datamodel comment 'observer.asn';",
+        "signal Signal1;",
+        "signal Signal2 renames input OGSignal2 to Func2;",
+        "signal Signal3 renames output OGSignal3 from Func3;",
+        "channel c",
         QString("from env to %1 with Signal1, Signal2, Signal3").arg(systemName),
-        QString("endchannel;"),
+        "endchannel;",
         QString("block %1;").arg(systemName),
-        QString("signalroute r"),
+        "signalroute r",
         QString("from env to %1 with Signal1, Signal2, Signal3;").arg(systemName),
-        QString("connect c and r;"),
+        "connect c and r;",
         QString("process %1;").arg(systemName),
+        "monitor event Observable_Event",
         "START;", "NEXTSTATE Wait;",
         "state Wait;", "input someInput;", "NEXTSTATE -;", "endstate;",
         "state Idle;", "input someOtherInput;", "NEXTSTATE Wait;", "endstate;",
@@ -906,6 +921,8 @@ void tst_sdlexporter::testGenerateSystemAutoRoutes()
     QString modelName = "BasicSystem";
     QString modelPrefix = "Sdl_";
     QString systemName = modelName.toLower(); // NOLINT
+
+    auto monitor = makeMonitorDeclaration("event", "Observable_Event");
 
     auto transition1 = SdlTransitionBuilder().withNextStateAction().build();
     auto state1 = SdlStateBuilder("Wait")
@@ -930,6 +947,7 @@ void tst_sdlexporter::testGenerateSystemAutoRoutes()
         .withBlock(SdlBlockBuilder(systemName)
             .withProcess(SdlProcessBuilder(systemName)
                 .withStartTransition(std::move(startTransition))
+                .withVariable(std::move(monitor))
                 .withStateMachine(SdlStateMachineBuilder()
                     .withState(std::move(state1))
                     .withState(std::move(state2))
@@ -963,18 +981,19 @@ void tst_sdlexporter::testGenerateSystemAutoRoutes()
     // clang-format off
     std::vector<QString> expectedOutput = { 
         QString("system %1;").arg(systemName),
-        QString("use datamodel comment 'observer.asn';"),
-        QString("signal Signal1;"),
-        QString("signal Signal2 renames input OGSignal2 to Func2;"),
-        QString("signal Signal3 renames output OGSignal3 from Func3;"),
-        QString("channel c"),
+        "use datamodel comment 'observer.asn';",
+        "signal Signal1;",
+        "signal Signal2 renames input OGSignal2 to Func2;",
+        "signal Signal3 renames output OGSignal3 from Func3;",
+        " channel c",
         QString("from env to %1 with Signal1, Signal2, Signal3").arg(systemName),
-        QString("endchannel;"),
+        "endchannel;",
         QString("block %1;").arg(systemName),
-        QString("signalroute r"),
+        "signalroute r",
         QString("from env to %1 with Signal1, Signal2, Signal3;").arg(systemName),
-        QString("connect c and r;"),
+        "connect c and r;",
         QString("process %1;").arg(systemName),
+        "monitor event Observable_Event",
         "START;", "NEXTSTATE Wait;",
         "state Wait;", "input someInput;", "NEXTSTATE -;", "endstate;",
         "state Idle;", "input someOtherInput;", "NEXTSTATE Wait;", "endstate;",
