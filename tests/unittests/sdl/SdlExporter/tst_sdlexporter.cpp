@@ -29,6 +29,7 @@
 #include <common/sdlmodelbuilder/sdlprocedurebuilder.h>
 #include <common/sdlmodelbuilder/sdlprocedurecallbuilder.h>
 #include <common/sdlmodelbuilder/sdlprocessbuilder.h>
+#include <common/sdlmodelbuilder/sdlsignalroutebuilder.h>
 #include <common/sdlmodelbuilder/sdlstatebuilder.h>
 #include <common/sdlmodelbuilder/sdlstatemachinebuilder.h>
 #include <common/sdlmodelbuilder/sdlsystembuilder.h>
@@ -95,6 +96,7 @@ using tests::common::SdlOutputBuilder;
 using tests::common::SdlProcedureBuilder;
 using tests::common::SdlProcedureCallBuilder;
 using tests::common::SdlProcessBuilder;
+using tests::common::SdlSignalRouteBuilder;
 using tests::common::SdlStateBuilder;
 using tests::common::SdlStateMachineBuilder;
 using tests::common::SdlSystemBuilder;
@@ -840,6 +842,10 @@ void tst_sdlexporter::testGenerateSystem()
                 .withRoute("env", systemName, {"Signal1", "Signal2", "Signal3" })
                 .build())
             .withBlock(SdlBlockBuilder(systemName)
+                .withSignalRoute(SdlSignalRouteBuilder("r")
+                    .withRoute("env", systemName, {"Signal1", "Signal2", "Signal3" })
+                    .build())
+                .withConnection("c", "r")
                 .withProcess(SdlProcessBuilder(systemName)
                     .withStartTransition(std::move(startTransition))
                     .withStateMachine(SdlStateMachineBuilder()
@@ -881,6 +887,9 @@ void tst_sdlexporter::testGenerateSystem()
         QString("from env to %1 with Signal1, Signal2, Signal3").arg(systemName),
         QString("endchannel;"),
         QString("block %1;").arg(systemName),
+        QString("signalroute r"),
+        QString("from env to %1 with Signal1, Signal2, Signal3;").arg(systemName),
+        QString("connect c and r;"),
         QString("process %1;").arg(systemName),
         "START;", "NEXTSTATE Wait;",
         "state Wait;", "input someInput;", "NEXTSTATE -;", "endstate;",

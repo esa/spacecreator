@@ -19,8 +19,10 @@
 
 #pragma once
 
+#include "connection.h"
 #include "node.h"
 #include "process.h"
+#include "signalroute.h"
 
 namespace sdl {
 
@@ -56,6 +58,32 @@ public:
 
 public:
     /**
+     * @brief   Getter for signal routes
+     *
+     * @return  SignalRoutes
+     */
+    auto signalRoutes() const -> const std::vector<SignalRoute> &;
+    /**
+     * @brief   Adds a signal route
+     *
+     * @param   signalRoute     Signal route to add
+     */
+    auto addSignalRoute(SignalRoute signalRoute) -> void;
+
+    /**
+     * @brief   Getter for connections
+     *
+     * @return  Connection
+     */
+    auto connections() const -> const std::vector<Connection> &;
+    /**
+     * @brief   Adds a connection
+     *
+     * @param   connection      Connection to add
+     */
+    auto addConnection(Connection connection) -> void;
+
+    /**
      * @brief   Getter for the process
      *
      * @return  Process
@@ -75,6 +103,8 @@ public:
     virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
+    std::vector<SignalRoute> m_signalRoutes;
+    std::vector<Connection> m_connections;
     Process m_process;
 };
 

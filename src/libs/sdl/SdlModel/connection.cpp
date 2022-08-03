@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2022 N7 Space Sp. z o.o.
+ * @copyright (C) 2021 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,48 +17,39 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "block.h"
+#include "connection.h"
 
 #include <sdl/SdlExporter/visitors/visitor.h>
 
 namespace sdl {
 
-Block::Block(QString name)
-    : Node(std::move(name))
+Connection::Connection(QString channelName, QString signalRouteName)
+    : m_channelName(std::move(channelName))
+    , m_signalRouteName(std::move(signalRouteName))
 {
 }
 
-const std::vector<SignalRoute> &Block::signalRoutes() const
+const QString &Connection::channelName() const
 {
-    return m_signalRoutes;
+    return m_channelName;
 }
 
-void Block::addSignalRoute(SignalRoute signalRoute)
+void Connection::setChannelName(QString name)
 {
-    m_signalRoutes.push_back(std::move(signalRoute));
+    m_channelName = std::move(name);
 }
 
-const std::vector<Connection> &Block::connections() const
+const QString &Connection::signalRouteName() const
 {
-    return m_connections;
+    return m_signalRouteName;
 }
 
-void Block::addConnection(Connection connection)
+void Connection::setSignalRouteName(QString name)
 {
-    m_connections.push_back(std::move(connection));
+    m_signalRouteName = std::move(name);
 }
 
-const Process &Block::process() const
-{
-    return m_process;
-}
-
-void Block::setProcess(Process process)
-{
-    m_process = std::move(process);
-}
-
-void Block::accept(Visitor &visitor) const
+void Connection::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
 }

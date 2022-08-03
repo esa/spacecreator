@@ -222,17 +222,29 @@ public:
      */
     virtual auto visit(const System &system) -> void override;
     /**
+     * @brief   Channel visitor
+     *
+     * @param   channel   Channel to be visited
+     */
+    virtual auto visit(const Channel &channel) -> void override;
+    /**
      * @brief   Block visitor
      *
      * @param   block   Block to be serialized
      */
     virtual auto visit(const Block &block) -> void override;
     /**
-     * @brief   Channel visitor
+     * @brief   SignalRoute visitor
      *
-     * @param   channel   Channel to be visited
+     * @param   block   Signal route to be serialized
      */
-    virtual auto visit(const Channel &channel) -> void override;
+    virtual auto visit(const SignalRoute &signalRoute) -> void override;
+    /**
+     * @brief   Connection visitor
+     *
+     * @param   connection      Connection to be serialized
+     */
+    virtual auto visit(const Connection &connection) -> void override;
     /**
      * @brief   Route visitor
      *
