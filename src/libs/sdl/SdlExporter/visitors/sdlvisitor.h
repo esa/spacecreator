@@ -228,6 +228,18 @@ public:
      */
     virtual auto visit(const Block &block) -> void override;
     /**
+     * @brief   Channel visitor
+     *
+     * @param   channel   Channel to be visited
+     */
+    virtual auto visit(const Channel &channel) -> void override;
+    /**
+     * @brief   Route visitor
+     *
+     * @param   route   Route to be visited
+     */
+    virtual auto visit(const Route &route) -> void override;
+    /**
      * @brief   Process visitor
      *
      * @param   process   process to be serialized

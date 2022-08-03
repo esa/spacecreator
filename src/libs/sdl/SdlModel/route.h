@@ -19,63 +19,94 @@
 
 #pragma once
 
-#include "node.h"
-#include "process.h"
+#include <QString>
+#include <QStringList>
 
 namespace sdl {
 
-/**
- * @brief   Represents an SDL system
- */
-class Block final : public Node
+class Visitor;
+
+class Route final
 {
 public:
     /**
-     * @brief   Constructor
-     *
-     * @param   name    Block name
+     * @brief   Default constructor
      */
-    Block(QString name = "");
+    Route() = default;
     /**
      * @brief   Deleted copy constructor
      */
-    Block(const Block &system) = delete;
+    Route(const Route &system) = delete;
     /**
      * @brief   Default move constructor
      */
-    Block(Block &&system) = default;
+    Route(Route &&system) = default;
 
     /**
      * @brief   Deleted copy assignment operator
      */
-    Block &operator=(const Block &) = delete;
+    Route &operator=(const Route &) = delete;
     /**
      * @brief   Default move assignment operator
      */
-    Block &operator=(Block &&) = default;
+    Route &operator=(Route &&) = default;
 
 public:
     /**
-     * @brief   Getter for the process
+     * @brief   Getter for from
      *
-     * @return  Process
+     * @return  From
      */
-    auto process() const -> const Process &;
+    auto from() const -> const QString &;
     /**
-     * @brier   Setter for the process
+     * @brief   Setter forr from
      *
-     * @param   process     Process
+     * @param   from    From
      */
-    auto setProcess(Process process) -> void;
+    auto setFrom(QString from) -> void;
+
+    /**
+     * @brief   Getter for to
+     *
+     * @return  To
+     */
+    auto to() const -> const QString &;
+    /**
+     * @brief   Setter for to
+     *
+     * @param   to      To
+     */
+    auto setTo(QString to) -> void;
+
+    /**
+     * @brief   Getter for with
+     *
+     * @return  With
+     */
+    auto with() const -> const QStringList &;
+    /**
+     * @brief   Add for with signal
+     *
+     * @param   with    With signal
+     */
+    auto addWith(QString with) -> void;
+    /**
+     * @brief   Setter for with signals
+     *
+     * @param   with    With signals
+     */
+    auto setWith(QStringList with) -> void;
 
 public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */
-    virtual auto accept(Visitor &visitor) const -> void override;
+    auto accept(Visitor &visitor) const -> void;
 
 private:
-    Process m_process;
+    QString m_from;
+    QString m_to;
+    QStringList m_with;
 };
 
 } // namespace sdl

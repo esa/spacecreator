@@ -20,6 +20,7 @@
 #pragma once
 
 #include "block.h"
+#include "channel.h"
 #include "node.h"
 #include "signal.h"
 
@@ -35,9 +36,11 @@ class System final : public Node
 {
 public:
     /**
-     * @brief   Default constructor
+     * @brief   Constructor
+     *
+     * @param   name    System name
      */
-    System() = default;
+    System(QString name = "");
     /**
      * @brief   Deleted copy constructor
      */
@@ -79,9 +82,22 @@ public:
     /**
      * @brief   Adds a signal
      *
-     * @param   singal  Signal to add
+     * @param   singal          Signal to add
      */
     auto addSignal(std::unique_ptr<Signal> signal) -> void;
+
+    /**
+     * @brief   Getter for channels
+     *
+     * @return  Channels
+     */
+    auto channels() const -> const std::vector<Channel> &;
+    /**
+     * @brief   Adds a channel
+     *
+     * @param   channel     Channel to add
+     */
+    auto addChannel(Channel channel) -> void;
 
     /**
      * @brief   Getter for the block
@@ -105,6 +121,7 @@ public:
 private:
     QStringList m_freeformTexts;
     std::vector<std::unique_ptr<Signal>> m_signals;
+    std::vector<Channel> m_channels;
     Block m_block;
 };
 

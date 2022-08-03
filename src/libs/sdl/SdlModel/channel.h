@@ -20,53 +20,52 @@
 #pragma once
 
 #include "node.h"
-#include "process.h"
+#include "route.h"
+
+#include <vector>
 
 namespace sdl {
 
-/**
- * @brief   Represents an SDL system
- */
-class Block final : public Node
+class Channel final : public Node
 {
 public:
     /**
      * @brief   Constructor
      *
-     * @param   name    Block name
+     * @param   name    Channel name
      */
-    Block(QString name = "");
+    Channel(QString name = "");
     /**
      * @brief   Deleted copy constructor
      */
-    Block(const Block &system) = delete;
+    Channel(const Channel &system) = delete;
     /**
      * @brief   Default move constructor
      */
-    Block(Block &&system) = default;
+    Channel(Channel &&system) = default;
 
     /**
      * @brief   Deleted copy assignment operator
      */
-    Block &operator=(const Block &) = delete;
+    Channel &operator=(const Channel &) = delete;
     /**
      * @brief   Default move assignment operator
      */
-    Block &operator=(Block &&) = default;
+    Channel &operator=(Channel &&) = default;
 
 public:
     /**
-     * @brief   Getter for the process
+     * @brief   Getter for routes
      *
-     * @return  Process
+     * @return  Routes
      */
-    auto process() const -> const Process &;
+    auto routes() const -> const std::vector<Route> &;
     /**
-     * @brier   Setter for the process
+     * @brief   Adds route
      *
-     * @param   process     Process
+     * @param   route       Route to add
      */
-    auto setProcess(Process process) -> void;
+    auto addRoute(Route route) -> void;
 
 public:
     /**
@@ -75,7 +74,7 @@ public:
     virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
-    Process m_process;
+    std::vector<Route> m_routes;
 };
 
 } // namespace sdl
