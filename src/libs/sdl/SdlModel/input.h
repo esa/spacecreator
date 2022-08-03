@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "signal.h"
+#include "node.h"
 #include "transition.h"
 #include "variableliteral.h"
 #include "variablereference.h"
@@ -35,7 +35,7 @@ namespace sdl {
  *
  * Stores a pointer to the transition which should be fired upon reception of this signal.
  */
-class Input final : public Signal
+class Input final : public Node
 {
 public:
     /**
