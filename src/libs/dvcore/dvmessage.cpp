@@ -153,6 +153,11 @@ QString DVMessage::resolvedTargetFunction() const
         shared::ErrorHub::addError(shared::ErrorItem::Error, tr("DVMessage has no parent model"));
         return "";
     }
+    if (model->ivQueries() == nullptr) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("ivQueries are not initialized in DVModel"));
+        return "";
+    }
+
     return model->ivQueries()->resolvedTargetFunction(fromFunction(), fromInterface(), toFunction(), toInterface());
 }
 
@@ -163,21 +168,26 @@ QString DVMessage::resolvedTargetInterface() const
         shared::ErrorHub::addError(shared::ErrorItem::Error, tr("DVMessage has no parent model"));
         return "";
     }
+    if (model->ivQueries() == nullptr) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("ivQueries are not initialized in DVModel"));
+        return "";
+    }
     return model->ivQueries()->resolvedTargetInterface(fromFunction(), fromInterface(), toFunction(), toInterface());
 }
 
 DVModel *DVMessage::getModel() const
 {
     std::cout << "getModel" << std::endl;
-    DVObject *parent = parentObject();
+    QObject *parentObject = parent();
     DVModel *model = NULL;
-    while (parent != NULL) {
-        std::cout << "parent == " << intptr_t(parent) << std::endl;
-        model = dynamic_cast<DVModel *>(parent);
+    while (parentObject != NULL) {
+        std::cout << "parent == " << intptr_t(parentObject) << std::endl;
+        model = qobject_cast<DVModel *>(parentObject);
         if (model != NULL) {
+            std::cout << "returning model" << std::endl;
             return model;
         }
-        parent = parent->parentObject();
+        parentObject = parentObject->parent();
     }
     return NULL;
 }
