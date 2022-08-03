@@ -178,7 +178,8 @@ auto TestGenerator::prepareTasteProjectSkeleton() -> bool
         return false;
     }
     for (const auto &file : qFileInfoList) {
-        if (file.suffix() == "asn" || file.suffix() == "acn" || file.fileName() == "Makefile") {
+        if (file.suffix() == "asn" || file.suffix() == "acn" || file.fileName() == "Makefile"
+                || file.fileName() == "Makefile.modelcheck") {
             if (!QFile::copy(file.absoluteFilePath(), generatedPath + QDir::separator() + file.fileName())) {
                 qDebug() << "Error copying file: " << file.fileName();
                 return false;
