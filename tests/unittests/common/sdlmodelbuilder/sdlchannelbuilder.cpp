@@ -17,30 +17,35 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "block.h"
+#include "sdlchannelbuilder.h"
 
-#include <sdl/SdlExporter/visitors/visitor.h>
+#include <sdl/SdlModel/route.h>
 
-namespace sdl {
+using sdl::Channel;
+using sdl::Route;
 
-Block::Block(QString name)
-    : Node(std::move(name))
+namespace tests::common {
+
+SdlChannelBuilder::SdlChannelBuilder(QString channelName)
 {
+    m_channel.setName(std::move(channelName));
 }
 
-const Process &Block::process() const
+Channel SdlChannelBuilder::build()
 {
-    return m_process;
+    return std::move(m_channel);
 }
 
-void Block::setProcess(Process process)
+SdlChannelBuilder &SdlChannelBuilder::withRoute(QString from, QString to, QStringList with)
 {
-    m_process = std::move(process);
+    Route route;
+    route.setFrom(std::move(from));
+    route.setTo(std::move(to));
+    route.setWith(std::move(with));
+
+    m_channel.addRoute(std::move(route));
+
+    return *this;
 }
 
-void Block::accept(Visitor &visitor) const
-{
-    visitor.visit(*this);
-}
-
-} // namespace sdl
+} // namespace tests::common

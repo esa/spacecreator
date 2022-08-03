@@ -23,6 +23,11 @@
 
 namespace sdl {
 
+System::System(QString name)
+    : Node(std::move(name))
+{
+}
+
 const QStringList &System::freeformTexts() const
 {
     return m_freeformTexts;
@@ -41,6 +46,16 @@ const std::vector<std::unique_ptr<Signal>> &System::getSignals() const
 void System::addSignal(std::unique_ptr<Signal> signal)
 {
     m_signals.push_back(std::move(signal));
+}
+
+const std::vector<Channel> &System::channels() const
+{
+    return m_channels;
+}
+
+void System::addChannel(Channel channel)
+{
+    m_channels.push_back(std::move(channel));
 }
 
 const Block &System::block() const

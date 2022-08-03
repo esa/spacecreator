@@ -20,6 +20,7 @@
 #pragma once
 
 #include <sdl/SdlModel/block.h>
+#include <sdl/SdlModel/channel.h>
 #include <sdl/SdlModel/system.h>
 
 namespace tests::common {
@@ -37,6 +38,7 @@ public:
             -> SdlSystemBuilder &;
     auto withOutputRename(QString signalName, QString originalSignalName, QString originalFunctionName)
             -> SdlSystemBuilder &;
+    auto withChannel(sdl::Channel channel) -> SdlSystemBuilder &;
     auto withBlock(sdl::Block block) -> SdlSystemBuilder &;
 
 private:

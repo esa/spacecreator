@@ -6,6 +6,7 @@ add_library(SdlModel STATIC)
 set(SOURCES     action.cpp
                 answer.cpp
                 block.cpp
+                channel.cpp
                 expression.cpp
                 decision.cpp
                 input.cpp
@@ -20,6 +21,7 @@ set(SOURCES     action.cpp
                 process.cpp
                 rename.cpp
                 return.cpp
+                route.cpp
                 sdlmodel.cpp
                 signal.cpp
                 state.cpp
@@ -33,6 +35,7 @@ set(SOURCES     action.cpp
 set(INCLUDES    action.h
                 answer.h
                 block.h
+                channel.h
                 expression.h
                 decision.h
                 input.h
@@ -47,6 +50,7 @@ set(INCLUDES    action.h
                 process.h
                 rename.h
                 return.h
+                route.h
                 sdlmodel.h
                 signal.h
                 state.h

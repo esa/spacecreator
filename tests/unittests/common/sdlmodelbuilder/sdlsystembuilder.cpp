@@ -23,6 +23,7 @@
 #include <sdl/SdlModel/signal.h>
 
 using sdl::Block;
+using sdl::Channel;
 using sdl::Rename;
 using sdl::Signal;
 using sdl::System;
@@ -70,6 +71,13 @@ SdlSystemBuilder &SdlSystemBuilder::withOutputRename(
     auto rename =
             std::make_unique<Rename>(signalName, Rename::Direction::Output, originalSignalName, originalFunctionName);
     m_system.addSignal(std::move(rename));
+
+    return *this;
+}
+
+SdlSystemBuilder &SdlSystemBuilder::withChannel(Channel channel)
+{
+    m_system.addChannel(std::move(channel));
 
     return *this;
 }

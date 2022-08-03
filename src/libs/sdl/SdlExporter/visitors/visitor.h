@@ -21,6 +21,7 @@
 
 #include <sdl/SdlModel/answer.h>
 #include <sdl/SdlModel/block.h>
+#include <sdl/SdlModel/channel.h>
 #include <sdl/SdlModel/decision.h>
 #include <sdl/SdlModel/input.h>
 #include <sdl/SdlModel/join.h>
@@ -87,6 +88,18 @@ public:
      * @param   block   Block to be visited
      */
     virtual auto visit(const Block &block) -> void = 0;
+    /**
+     * @brief   Channel visitor
+     *
+     * @param   channel   Channel to be visited
+     */
+    virtual auto visit(const Channel &channel) -> void = 0;
+    /**
+     * @brief   Route visitor
+     *
+     * @param   route   Route to be visited
+     */
+    virtual auto visit(const Route &route) -> void = 0;
     /**
      * @brief   Process visitor
      *

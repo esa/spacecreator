@@ -17,30 +17,50 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "block.h"
+#include "route.h"
 
 #include <sdl/SdlExporter/visitors/visitor.h>
 
 namespace sdl {
 
-Block::Block(QString name)
-    : Node(std::move(name))
+const QString &Route::from() const
 {
+    return m_from;
 }
 
-const Process &Block::process() const
+void Route::setFrom(QString from)
 {
-    return m_process;
+    m_from = std::move(from);
 }
 
-void Block::setProcess(Process process)
+const QString &Route::to() const
 {
-    m_process = std::move(process);
+    return m_to;
 }
 
-void Block::accept(Visitor &visitor) const
+void Route::setTo(QString to)
+{
+    m_to = std::move(to);
+}
+
+const QStringList &Route::with() const
+{
+    return m_with;
+}
+
+void Route::addWith(QString with)
+{
+    m_with.push_back(std::move(with));
+}
+
+void Route::setWith(QStringList with)
+{
+    m_with = std::move(with);
+}
+
+void Route::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
 }
 
-} // namespace sdl
+} // namespace sdl {

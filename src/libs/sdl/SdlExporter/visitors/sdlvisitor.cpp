@@ -211,6 +211,10 @@ void SdlVisitor::visit(const System &system)
         m_writer.writeLine("/* ENDTEXT */");
     }
 
+    for (const auto &channel : system.channels()) {
+        channel.accept(*this);
+    }
+
     system.block().accept(*this);
 
     m_writer.popIndent();
@@ -231,6 +235,44 @@ void SdlVisitor::visit(const Block &block)
 
     m_writer.popIndent();
     m_writer.writeLine("endblock;");
+}
+
+void SdlVisitor::visit(const Channel &channel)
+{
+    if (channel.name().isEmpty()) {
+        throw ExportException("Channel shall have a name but it doesn't");
+    }
+    if (channel.routes().empty()) {
+        throw ExportException("Channel shall have at least one route");
+    }
+
+    m_writer.writeLine(QString("channel %1").arg(channel.name()));
+
+    m_writer.pushIndent(INDENT);
+
+    for (const auto &route : channel.routes()) {
+        route.accept(*this);
+    }
+
+    m_writer.popIndent();
+    m_writer.writeLine("endchannel;");
+}
+
+void SdlVisitor::visit(const Route &route)
+{
+    if (route.from().isEmpty()) {
+        throw ExportException("Route shall have a from name but it doesn't");
+    }
+    if (route.to().isEmpty()) {
+        throw ExportException("Route shall have a to name but it doesn't");
+    }
+    if (route.with().isEmpty()) {
+        throw ExportException("Route shall have at least one with name but it doesn't");
+    }
+
+    m_writer.beginLine(QString("from %1").arg(route.from()));
+    m_writer.write(QString(" to %1").arg(route.to()));
+    m_writer.endLine(QString(" with %1;").arg(route.with().join(", ")));
 }
 
 void SdlVisitor::visit(const Process &process)

@@ -21,6 +21,7 @@
 #include <QtTest>
 #include <common/sdlmodelbuilder/sdlanswerbuilder.h>
 #include <common/sdlmodelbuilder/sdlblockbuilder.h>
+#include <common/sdlmodelbuilder/sdlchannelbuilder.h>
 #include <common/sdlmodelbuilder/sdldecisionbuilder.h>
 #include <common/sdlmodelbuilder/sdlinputbuilder.h>
 #include <common/sdlmodelbuilder/sdlmodelbuilder.h>
@@ -86,6 +87,7 @@ using sdl::VariableReference;
 using sdl::exporter::SdlExporter;
 using tests::common::SdlAnswerBuilder;
 using tests::common::SdlBlockBuilder;
+using tests::common::SdlChannelBuilder;
 using tests::common::SdlDecisionBuilder;
 using tests::common::SdlInputBuilder;
 using tests::common::SdlModelBuilder;
@@ -834,6 +836,9 @@ void tst_sdlexporter::testGenerateSystem()
             .withSignal("Signal1")
             .withInputRename("Signal2", "OGSignal2", "Func2")
             .withOutputRename("Signal3", "OGSignal3", "Func3")
+            .withChannel(SdlChannelBuilder("c")
+                .withRoute("env", systemName, {"Signal1", "Signal2", "Signal3" })
+                .build())
             .withBlock(SdlBlockBuilder(systemName)
                 .withProcess(SdlProcessBuilder(systemName)
                     .withStartTransition(std::move(startTransition))
@@ -872,6 +877,9 @@ void tst_sdlexporter::testGenerateSystem()
         QString("signal Signal1;"),
         QString("signal Signal2 renames input OGSignal2 to Func2;"),
         QString("signal Signal3 renames output OGSignal3 from Func3;"),
+        QString("channel c"),
+        QString("from env to %1 with Signal1, Signal2, Signal3").arg(systemName),
+        QString("endchannel;"),
         QString("block %1;").arg(systemName),
         QString("process %1;").arg(systemName),
         "START;", "NEXTSTATE Wait;",

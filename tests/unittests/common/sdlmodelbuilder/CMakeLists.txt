@@ -2,6 +2,7 @@ project(SdlModelBuilder VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES     sdlanswerbuilder.cpp
                 sdlblockbuilder.cpp
+                sdlchannelbuilder.cpp
                 sdldecisionbuilder.cpp
                 sdlmodelbuilder.cpp
                 sdlinputbuilder.cpp
@@ -16,6 +17,7 @@ set(SOURCES     sdlanswerbuilder.cpp
                 sdltransitionbuilder.cpp)
 set(INCLUDES    sdlanswerbuilder.h
                 sdlblockbuilder.h
+                sdlchannelbuilder.h
                 sdldecisionbuilder.h
                 sdlmodelbuilder.h
                 sdlinputbuilder.h
