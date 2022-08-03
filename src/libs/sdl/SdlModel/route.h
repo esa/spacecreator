@@ -36,7 +36,7 @@ public:
     /**
      * @brief   Deleted copy constructor
      */
-    Route(const Route &system) = delete;
+    Route(const Route &system) = default;
     /**
      * @brief   Default move constructor
      */
@@ -45,7 +45,7 @@ public:
     /**
      * @brief   Deleted copy assignment operator
      */
-    Route &operator=(const Route &) = delete;
+    Route &operator=(const Route &) = default;
     /**
      * @brief   Default move assignment operator
      */

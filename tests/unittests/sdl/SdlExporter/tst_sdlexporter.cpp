@@ -121,6 +121,7 @@ private Q_SLOTS:
     void testGenerateProcessWithProcedureWithParamsAndReturn();
     void testGenerateProcessWithReturnlessProcedure();
     void testGenerateSystem();
+    void testGenerateSystemAutoRoutes();
 };
 
 static std::unique_ptr<VariableDeclaration> makeVariableDeclaration(QString name, QString type)
@@ -859,6 +860,89 @@ void tst_sdlexporter::testGenerateSystem()
             .build())
         .build();
     // clang-format on
+
+    Options options;
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
+
+    SdlExporter exporter;
+    try {
+        exporter.exportModel(exampleModel.get(), options);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+
+    QString filename = QString("%1%2.%3").arg(modelPrefix, systemName, "pr");
+    QFile outputFile(filename);
+    if (!outputFile.open(QIODevice::ReadOnly)) {
+        QFAIL("requested file cannot be found");
+    }
+    QTextStream consumableOutput(&outputFile);
+    // clang-format off
+    std::vector<QString> expectedOutput = { 
+        QString("system %1;").arg(systemName),
+        QString("use datamodel comment 'observer.asn';"),
+        QString("signal Signal1;"),
+        QString("signal Signal2 renames input OGSignal2 to Func2;"),
+        QString("signal Signal3 renames output OGSignal3 from Func3;"),
+        QString("channel c"),
+        QString("from env to %1 with Signal1, Signal2, Signal3").arg(systemName),
+        QString("endchannel;"),
+        QString("block %1;").arg(systemName),
+        QString("signalroute r"),
+        QString("from env to %1 with Signal1, Signal2, Signal3;").arg(systemName),
+        QString("connect c and r;"),
+        QString("process %1;").arg(systemName),
+        "START;", "NEXTSTATE Wait;",
+        "state Wait;", "input someInput;", "NEXTSTATE -;", "endstate;",
+        "state Idle;", "input someOtherInput;", "NEXTSTATE Wait;", "endstate;",
+        QString("endprocess %1;").arg(systemName), "endblock;", "endsystem;"
+    };
+    // clang-format on
+    TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
+}
+
+void tst_sdlexporter::testGenerateSystemAutoRoutes()
+{
+    QString modelName = "BasicSystem";
+    QString modelPrefix = "Sdl_";
+    QString systemName = modelName.toLower(); // NOLINT
+
+    auto transition1 = SdlTransitionBuilder().withNextStateAction().build();
+    auto state1 = SdlStateBuilder("Wait")
+                          .withInput(SdlInputBuilder().withName("someInput").withTransition(transition1.get()).build())
+                          .build();
+
+    auto startTransition = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
+
+    auto transition2 = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
+
+    auto state2 =
+            SdlStateBuilder("Idle")
+                    .withInput(SdlInputBuilder().withName("someOtherInput").withTransition(transition2.get()).build())
+                    .build();
+
+    // clang-format off
+    auto exampleSystem = SdlSystemBuilder(systemName)
+        .withFreeformText("use datamodel comment 'observer.asn';")
+        .withSignal("Signal1")
+        .withInputRename("Signal2", "OGSignal2", "Func2")
+        .withOutputRename("Signal3", "OGSignal3", "Func3")
+        .withBlock(SdlBlockBuilder(systemName)
+            .withProcess(SdlProcessBuilder(systemName)
+                .withStartTransition(std::move(startTransition))
+                .withStateMachine(SdlStateMachineBuilder()
+                    .withState(std::move(state1))
+                    .withState(std::move(state2))
+                    .withTransition(std::move(transition1))
+                    .withTransition(std::move(transition2))
+                    .build())
+                .build())
+            .build())
+        .build();
+    exampleSystem.createRoutes("c", "r");
+    // clang-format on
+
+    const auto exampleModel = SdlModelBuilder(systemName).withSystem(std::move(exampleSystem)).build();
 
     Options options;
     options.add(SdlOptions::filepathPrefix, modelPrefix);
