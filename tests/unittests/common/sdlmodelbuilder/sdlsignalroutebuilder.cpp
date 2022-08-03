@@ -17,50 +17,35 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "block.h"
+#include "sdlsignalroutebuilder.h"
 
-#include <sdl/SdlExporter/visitors/visitor.h>
+#include <sdl/SdlModel/route.h>
 
-namespace sdl {
+using sdl::Route;
+using sdl::SignalRoute;
 
-Block::Block(QString name)
-    : Node(std::move(name))
+namespace tests::common {
+
+SdlSignalRouteBuilder::SdlSignalRouteBuilder(QString signalRouteName)
 {
+    m_signalRoute.setName(std::move(signalRouteName));
 }
 
-const std::vector<SignalRoute> &Block::signalRoutes() const
+SignalRoute SdlSignalRouteBuilder::build()
 {
-    return m_signalRoutes;
+    return std::move(m_signalRoute);
 }
 
-void Block::addSignalRoute(SignalRoute signalRoute)
+SdlSignalRouteBuilder &SdlSignalRouteBuilder::withRoute(QString from, QString to, QStringList with)
 {
-    m_signalRoutes.push_back(std::move(signalRoute));
+    Route route;
+    route.setFrom(std::move(from));
+    route.setTo(std::move(to));
+    route.setWith(std::move(with));
+
+    m_signalRoute.addRoute(std::move(route));
+
+    return *this;
 }
 
-const std::vector<Connection> &Block::connections() const
-{
-    return m_connections;
-}
-
-void Block::addConnection(Connection connection)
-{
-    m_connections.push_back(std::move(connection));
-}
-
-const Process &Block::process() const
-{
-    return m_process;
-}
-
-void Block::setProcess(Process process)
-{
-    m_process = std::move(process);
-}
-
-void Block::accept(Visitor &visitor) const
-{
-    visitor.visit(*this);
-}
-
-} // namespace sdl
+} // namespace tests::common

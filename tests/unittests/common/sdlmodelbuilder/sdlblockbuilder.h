@@ -21,6 +21,7 @@
 
 #include <sdl/SdlModel/block.h>
 #include <sdl/SdlModel/process.h>
+#include <sdl/SdlModel/signalroute.h>
 
 namespace tests::common {
 
@@ -31,6 +32,8 @@ public:
 
     auto build() -> sdl::Block;
 
+    auto withSignalRoute(sdl::SignalRoute signalRoute) -> SdlBlockBuilder &;
+    auto withConnection(QString channelName, QString signalRouteName) -> SdlBlockBuilder &;
     auto withProcess(sdl::Process block) -> SdlBlockBuilder &;
 
 private:

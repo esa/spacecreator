@@ -27,34 +27,34 @@
 namespace sdl {
 
 /**
- * @brief   Represents an SDL channel
+ * @brief   Represents an SDL signal route
  */
-class Channel final : public Node
+class SignalRoute final : public Node
 {
 public:
     /**
      * @brief   Constructor
      *
-     * @param   name    Channel name
+     * @param   name    SignalRoute name
      */
-    Channel(QString name = "");
+    SignalRoute(QString name = "");
     /**
      * @brief   Deleted copy constructor
      */
-    Channel(const Channel &system) = delete;
+    SignalRoute(const SignalRoute &system) = delete;
     /**
      * @brief   Default move constructor
      */
-    Channel(Channel &&system) = default;
+    SignalRoute(SignalRoute &&system) = default;
 
     /**
      * @brief   Deleted copy assignment operator
      */
-    Channel &operator=(const Channel &) = delete;
+    SignalRoute &operator=(const SignalRoute &) = delete;
     /**
      * @brief   Default move assignment operator
      */
-    Channel &operator=(Channel &&) = default;
+    SignalRoute &operator=(SignalRoute &&) = default;
 
 public:
     /**

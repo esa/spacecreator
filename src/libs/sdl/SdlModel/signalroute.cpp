@@ -17,48 +17,28 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "block.h"
+#include "signalroute.h"
 
 #include <sdl/SdlExporter/visitors/visitor.h>
 
 namespace sdl {
 
-Block::Block(QString name)
+SignalRoute::SignalRoute(QString name)
     : Node(std::move(name))
 {
 }
 
-const std::vector<SignalRoute> &Block::signalRoutes() const
+const std::vector<Route> &SignalRoute::routes() const
 {
-    return m_signalRoutes;
+    return m_routes;
 }
 
-void Block::addSignalRoute(SignalRoute signalRoute)
+void SignalRoute::addRoute(Route route)
 {
-    m_signalRoutes.push_back(std::move(signalRoute));
+    m_routes.push_back(std::move(route));
 }
 
-const std::vector<Connection> &Block::connections() const
-{
-    return m_connections;
-}
-
-void Block::addConnection(Connection connection)
-{
-    m_connections.push_back(std::move(connection));
-}
-
-const Process &Block::process() const
-{
-    return m_process;
-}
-
-void Block::setProcess(Process process)
-{
-    m_process = std::move(process);
-}
-
-void Block::accept(Visitor &visitor) const
+void SignalRoute::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
 }

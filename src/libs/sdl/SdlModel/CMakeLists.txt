@@ -7,6 +7,7 @@ set(SOURCES     action.cpp
                 answer.cpp
                 block.cpp
                 channel.cpp
+                connection.cpp
                 expression.cpp
                 decision.cpp
                 input.cpp
@@ -24,6 +25,7 @@ set(SOURCES     action.cpp
                 route.cpp
                 sdlmodel.cpp
                 signal.cpp
+                signalroute.cpp
                 state.cpp
                 statemachine.cpp
                 system.cpp
@@ -36,6 +38,7 @@ set(INCLUDES    action.h
                 answer.h
                 block.h
                 channel.h
+                connection.h
                 expression.h
                 decision.h
                 input.h
@@ -53,6 +56,7 @@ set(INCLUDES    action.h
                 route.h
                 sdlmodel.h
                 signal.h
+                signalroute.h
                 state.h
                 statemachine.h
                 system.h

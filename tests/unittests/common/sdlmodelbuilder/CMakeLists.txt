@@ -10,6 +10,7 @@ set(SOURCES     sdlanswerbuilder.cpp
                 sdlprocedurebuilder.cpp
                 sdlprocedurecallbuilder.cpp
                 sdlprocessbuilder.cpp
+                sdlsignalroutebuilder.cpp
                 sdlstatebuilder.cpp
                 sdlstatemachinebuilder.cpp
                 sdlsystembuilder.cpp
@@ -25,6 +26,7 @@ set(INCLUDES    sdlanswerbuilder.h
                 sdlprocedurebuilder.h
                 sdlprocedurecallbuilder.h
                 sdlprocessbuilder.h
+                sdlsignalroutebuilder.h
                 sdlstatebuilder.h
                 sdlstatemachinebuilder.h
                 sdlsystembuilder.h

@@ -221,22 +221,6 @@ void SdlVisitor::visit(const System &system)
     m_writer.writeLine("endsystem;");
 }
 
-void SdlVisitor::visit(const Block &block)
-{
-    if (block.name().isEmpty()) {
-        throw ExportException("Block shall have a name but it doesn't");
-    }
-
-    m_writer.writeLine(QString("block %1;").arg(block.name()));
-
-    m_writer.pushIndent(INDENT);
-
-    block.process().accept(*this);
-
-    m_writer.popIndent();
-    m_writer.writeLine("endblock;");
-}
-
 void SdlVisitor::visit(const Channel &channel)
 {
     if (channel.name().isEmpty()) {
@@ -256,6 +240,61 @@ void SdlVisitor::visit(const Channel &channel)
 
     m_writer.popIndent();
     m_writer.writeLine("endchannel;");
+}
+
+void SdlVisitor::visit(const Block &block)
+{
+    if (block.name().isEmpty()) {
+        throw ExportException("Block shall have a name but it doesn't");
+    }
+
+    m_writer.writeLine(QString("block %1;").arg(block.name()));
+
+    m_writer.pushIndent(INDENT);
+
+    for (const auto &signalRoute : block.signalRoutes()) {
+        signalRoute.accept(*this);
+    }
+
+    for (const auto &connection : block.connections()) {
+        connection.accept(*this);
+    }
+
+    block.process().accept(*this);
+
+    m_writer.popIndent();
+    m_writer.writeLine("endblock;");
+}
+
+void SdlVisitor::visit(const SignalRoute &signalRoute)
+{
+    if (signalRoute.name().isEmpty()) {
+        throw ExportException("Signal route shall have a name but it doesn't");
+    }
+    if (signalRoute.routes().empty()) {
+        throw ExportException("Signal route shall have at least one route");
+    }
+
+    m_writer.writeLine(QString("signalroute %1").arg(signalRoute.name()));
+
+    for (const auto &route : signalRoute.routes()) {
+        route.accept(*this);
+    }
+}
+
+void SdlVisitor::visit(const Connection &connection)
+{
+    const auto &channelName = connection.channelName();
+    const auto &signalRouteName = connection.signalRouteName();
+
+    if (channelName.isEmpty()) {
+        throw ExportException("Connection shall have a channel name but it doesn't");
+    }
+    if (signalRouteName.isEmpty()) {
+        throw ExportException("Connection shall have a signal route name but it doesn't");
+    }
+
+    m_writer.writeLine(QString("connect %1 and %2;").arg(channelName).arg(signalRouteName));
 }
 
 void SdlVisitor::visit(const Route &route)

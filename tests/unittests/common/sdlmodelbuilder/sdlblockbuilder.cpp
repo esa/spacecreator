@@ -19,8 +19,12 @@
 
 #include "sdlblockbuilder.h"
 
+#include <sdl/SdlModel/connection.h>
+
 using sdl::Block;
+using sdl::Connection;
 using sdl::Process;
+using sdl::SignalRoute;
 
 namespace tests::common {
 
@@ -32,6 +36,21 @@ SdlBlockBuilder::SdlBlockBuilder(QString blockName)
 Block SdlBlockBuilder::build()
 {
     return std::move(m_block);
+}
+
+SdlBlockBuilder &SdlBlockBuilder::withSignalRoute(sdl::SignalRoute signalRoute)
+{
+    m_block.addSignalRoute(std::move(signalRoute));
+
+    return *this;
+}
+
+SdlBlockBuilder &SdlBlockBuilder::withConnection(QString channelName, QString signalRouteName)
+{
+    Connection connection(std::move(channelName), std::move(signalRouteName));
+    m_block.addConnection(std::move(connection));
+
+    return *this;
 }
 
 SdlBlockBuilder &SdlBlockBuilder::withProcess(Process process)
