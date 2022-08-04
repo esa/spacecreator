@@ -58,7 +58,7 @@ public:
     /**
      * @brief Convert stop condition file into promela file.
      *
-     * @param inputFiles list of filepath to input stop condition files
+     * @param inputFiles list of filepaths to input stop condition files
      * @param outputFile output promela file
      * @param inputSdlFiles a map of ProcessMetadata objects, which are context for stop condition file
      * @param includeObservers true if generated Stop Condition shall check observers
