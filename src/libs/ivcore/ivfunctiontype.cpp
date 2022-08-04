@@ -18,14 +18,15 @@
 #include "ivfunctiontype.h"
 
 #include "errorhub.h"
+#include "ivarchetypereference.h"
 #include "ivcomment.h"
+#include "archetypes/archetypemodel.h"
 #include "ivcommonprops.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "ivinterfacegroup.h"
-#include "ivarchetypereference.h"
 
 #include <QDebug>
 
@@ -345,6 +346,11 @@ void IVFunctionType::forgetInstance(IVFunction *function)
 {
     if (function)
         d->m_instances.removeAll(function);
+}
+
+void IVFunctionType::applyArchetypes(QVector<IVArchetypeReference *> references, ivm::ArchetypeModel *archetypeModel) 
+{
+    d->m_archetypeReferences = QVector<IVArchetypeReference *>(references);
 }
 
 }

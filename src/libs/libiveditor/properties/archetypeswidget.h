@@ -50,11 +50,15 @@ public:
 
     void addArchetype();
     void deleteArchetype();
-    Ui::ArchetypesWidget *getUi();
+    void applyArchetypes();
+
+private:
+    bool checkReferences();
 
 private:
     Ui::ArchetypesWidget *ui;
     ArchetypesWidgetModel *m_model = nullptr;
+    ivm::ArchetypeModel *m_archetypeModel = nullptr;
 };
 
 } // namespace ive

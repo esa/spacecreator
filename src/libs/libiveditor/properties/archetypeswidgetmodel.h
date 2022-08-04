@@ -48,7 +48,10 @@ public:
     explicit ArchetypesWidgetModel(ivm::ArchetypeModel *archetypeModel, ivm::AbstractSystemChecks *checks,
             cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
 
+    ivm::IVFunctionType *getFunction();
     void setFunction(ivm::IVFunctionType *fn);
+    
+    QVector<ivm::IVArchetypeReference *> getArchetypeReferences();
 
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;

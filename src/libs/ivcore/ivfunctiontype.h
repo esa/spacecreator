@@ -33,6 +33,7 @@ class IVInterface;
 class IVInterfaceGroup;
 class IVConnectionGroup;
 class IVArchetypeReference;
+class ArchetypeModel;
 
 struct IVFunctionTypePrivate;
 
@@ -72,6 +73,8 @@ public:
     QVector<QPointer<IVFunction>> instances() const;
     void rememberInstance(IVFunction *function);
     void forgetInstance(IVFunction *function);
+
+    void applyArchetypes(QVector<IVArchetypeReference *> references, ivm::ArchetypeModel *archetypeModel);
 
 Q_SIGNALS:
     void contextParamsChanged();

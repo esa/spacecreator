@@ -19,15 +19,17 @@
 
 #include "archetypeswidget.h"
 
-#include "archetypeswidgetmodel.h"
 #include "archetype/comboboxdelegate.h"
+#include "archetypes/archetypemodel.h"
+#include "archetypeswidgetmodel.h"
+#include "ivarchetypereference.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"
-#include "archetypes/archetypemodel.h"
 #include "ui_archetypeswidget.h"
 
 #include <QDebug>
 #include <QHeaderView>
+#include <QMessageBox>
 
 namespace ive {
 
@@ -35,6 +37,7 @@ ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVF
         ivm::AbstractSystemChecks *checks, shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ArchetypesWidget)
+    , m_archetypeModel(archetypeModel)
 {
     Q_ASSERT(function && function->model());
     ui->setupUi(this);
@@ -52,6 +55,7 @@ ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVF
 
     connect(ui->addButton, &QPushButton::clicked, this, &ArchetypesWidget::addArchetype);
     connect(ui->deleteButton, &QPushButton::clicked, this, &ArchetypesWidget::deleteArchetype);
+    connect(ui->applyButton, &QPushButton::clicked, this, &ArchetypesWidget::applyArchetypes);
 }
 
 ArchetypesWidget::~ArchetypesWidget()
@@ -79,9 +83,42 @@ void ArchetypesWidget::deleteArchetype()
     m_model->removeRow(selections.at(0).row());
 }
 
-Ui::ArchetypesWidget *ArchetypesWidget::getUi()
+void ArchetypesWidget::applyArchetypes()
 {
-    return ui;
+    if (!checkReferences()) {
+        return;
+    }
+
+    m_model->getFunction()->applyArchetypes(m_model->getArchetypeReferences(), m_archetypeModel);
+}
+
+bool ArchetypesWidget::checkReferences()
+{
+    QVector<ivm::IVArchetypeReference *> references = m_model->getArchetypeReferences();
+
+    const bool hasDuplicates =
+            std::adjacent_find(references.begin(), references.end(),
+                    [](ivm::IVArchetypeReference *firstReference, ivm::IVArchetypeReference *secondReference) -> bool {
+                        return firstReference->getLibraryName() == secondReference->getLibraryName()
+                                && firstReference->getFunctionName() == secondReference->getFunctionName();
+                    })
+            != references.end();
+
+    if (hasDuplicates) {
+        QMessageBox::warning(
+                qApp->activeWindow(), tr("Archetype error"), tr("Archetype list has duplicate implementations"));
+        return false;
+    }
+
+    for (auto reference : references) {
+        if (reference->getLibraryName().isEmpty() || reference->getFunctionName().isEmpty()) {
+            QMessageBox::warning(
+                    qApp->activeWindow(), tr("Archetype error"), tr("Archetypes implementations are incomplete"));
+            return false;
+        }
+    }
+
+    return true;
 }
 
 } // namespace ive

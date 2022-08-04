@@ -49,11 +49,22 @@ ArchetypesWidgetModel::ArchetypesWidgetModel(ivm::ArchetypeModel *archetypeModel
 {
 }
 
+ivm::IVFunctionType *ArchetypesWidgetModel::getFunction()
+{
+    return m_function;
+}
+
 void ArchetypesWidgetModel::setFunction(ivm::IVFunctionType *fn)
 {
     beginResetModel();
     m_function = fn;
+    m_archetypeReferences = QVector<ivm::IVArchetypeReference *>(m_function->archetypeReferences());
     endResetModel();
+}
+
+QVector<ivm::IVArchetypeReference *> ArchetypesWidgetModel::getArchetypeReferences()
+{
+    return m_archetypeReferences;
 }
 
 QVariant ArchetypesWidgetModel::headerData(int section, Qt::Orientation orientation, int role) const
