@@ -21,6 +21,7 @@
 
 #include "datareconstructor/datareconstructor.h"
 
+#include <optional>
 #include <QDataStream>
 #include <QTextStream>
 
