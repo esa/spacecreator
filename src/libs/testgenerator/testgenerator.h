@@ -19,11 +19,13 @@
 
 #pragma once
 
+#include "datareconstructor/datareconstructor.h"
 #include "harness/dvgenerator/dvgenerator.h"
 #include "harness/ivgenerator/ivgenerator.h"
+#include "launchconfigloader/launchconfigloader.h"
+#include "resultexporter/htmlresultexporter.h"
 #include "testdrivergenerator/testdrivergenerator.h"
 #include "testdrivergenerator/testdrivergeneratorexception.h"
-#include "resultexporter/htmlresultexporter.h"
 
 using csv::CsvModel;
 using dvm::DVModel;
@@ -54,10 +56,12 @@ public:
      * @param csvModel the CSV data with test vectors
      * @param asn1Model ASN.1 model to be used during testing
      * @param delta maximum allowed absolute error
+     * @param launchConfig tested binary launching params
      *
      * @return true if there was no error during execution of the testing procedure nad false otherwise
      */
-    auto testUsingDataFromCsv(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model, float delta) -> bool;
+    auto testUsingDataFromCsv(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model, const float delta,
+            const LaunchConfiguration &launchConfig) -> bool;
 
     /**
      * @brief Prepare test harness files to be used for compilation of tests
@@ -65,21 +69,31 @@ public:
      * @param interface interface under test
      * @param csvModel the CSV data with test vectors
      * @param asn1Model ASN.1 model to be used during testing
+     * @param boardName name of the board the tests are run on
+     * @param stackSize size of the stack in the generated binary in bytes
      *
      * @return true if there was no error during creation of the test harness files
      */
-    auto prepareTestHarness(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model) -> QString;
+    auto prepareTestHarness(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model,
+            const QString &boardName, const int stackSize) -> QString;
 
     /**
-     * @brief Runs the tests in GDB debugger
+     * @brief Run the tests in GDB debugger
      *
      * @param interface interface under test
      * @param asn1Model ASN.1 model to be used during testing
-     * @param binaryPath path to the binary file to run
+     * @param launchConfig tested binary launching params
      *
      * @return vector of the test results obtained from GDB
      */
-    auto runTests(IVInterface &interface, Asn1Model &asn1Model, const QString &binaryPath) -> QVector<QVariant>;
+    auto runTests(IVInterface &interface, Asn1Model &asn1Model, const LaunchConfiguration &launchConfig)
+            -> QVector<QVariant>;
+
+    /** Name of the binary resolved from $BIN_PATH variable provided by the user */
+    static const QString defaultBinaryName;
+
+    /** Name of the html file with the test results */
+    static const QString resultFileName;
 
 private:
     auto initializePaths(const QString &baseDirectory) -> void;
@@ -96,6 +110,7 @@ private:
     QString generatedCodePath;
     QString generatedIvPath;
     QString generatedDvPath;
+    QString binaryPath;
 };
 
 }

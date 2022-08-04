@@ -38,12 +38,10 @@ public:
      * @param   type   type of the declared variable
      */
     VariableDeclaration(QString name = "", QString type = "");
-
     /**
      * @brief   Deleted copy constructor
      */
     VariableDeclaration(const VariableDeclaration &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -53,19 +51,18 @@ public:
      * @brief   Deleted copy assignment operator
      */
     VariableDeclaration &operator=(const VariableDeclaration &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     VariableDeclaration &operator=(VariableDeclaration &&) = default;
 
+public:
     /**
      * @brief    Getter for the type
      *
      * @return   type of the declared variable
      */
     auto type() const -> const QString &;
-
     /**
      * @brief    Setter for the type
      *
@@ -73,6 +70,7 @@ public:
      */
     auto setType(QString type) -> void;
 
+public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */

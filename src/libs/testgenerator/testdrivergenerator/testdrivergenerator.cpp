@@ -76,7 +76,7 @@ auto TestDriverGenerator::generateTestDriver(
           "\n"
           "\n";
     ss << QString("#define TEST_DATA_SIZE %1\n").arg(testRecordsSize).toStdString();
-    ss << "const int testDataSize = TEST_DATA_SIZE;\n"
+    ss << "int testDataSize = TEST_DATA_SIZE;\n"
           "\n"
           "typedef struct {\n";
 

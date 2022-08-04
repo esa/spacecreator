@@ -42,12 +42,10 @@ public:
      * @param   state   a pointer to the next state
      */
     NextState(QString name, State *state = nullptr);
-
     /**
      * @brief   Deleted copy constructor
      */
     NextState(const NextState &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -57,19 +55,18 @@ public:
      * @brief   Deleted copy assignment operator
      */
     NextState &operator=(const NextState &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     NextState &operator=(NextState &&) = default;
 
+public:
     /**
      * @brief   Getter for the next state
      *
      * @return  next state
      */
     auto state() const -> State *;
-
     /**
      * @brief   Setter for the next state
      *
@@ -77,6 +74,7 @@ public:
      */
     auto setState(State *state) -> void;
 
+public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */

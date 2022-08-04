@@ -21,43 +21,48 @@
 
 #include <memory>
 
+using sdl::Procedure;
+using sdl::Process;
+using sdl::StateMachine;
+using sdl::Transition;
+using sdl::VariableDeclaration;
+
 namespace tests::common {
 
 SdlProcessBuilder::SdlProcessBuilder(QString processName)
-    : m_process(std::make_unique<Process>())
 {
-    m_process->setName(std::move(processName));
+    m_process.setName(std::move(processName));
 }
 
-std::unique_ptr<Process> SdlProcessBuilder::build()
+Process SdlProcessBuilder::build()
 {
     return std::move(m_process);
 }
 
 SdlProcessBuilder &SdlProcessBuilder::withStartTransition(std::unique_ptr<Transition> transition)
 {
-    m_process->setStartTransition(std::move(transition));
+    m_process.setStartTransition(std::move(transition));
 
     return *this;
 }
 
 SdlProcessBuilder &SdlProcessBuilder::withStateMachine(std::unique_ptr<StateMachine> stateMachine)
 {
-    m_process->setStateMachine(std::move(stateMachine));
+    m_process.setStateMachine(std::move(stateMachine));
 
     return *this;
 }
 
 SdlProcessBuilder &SdlProcessBuilder::withProcedure(std::unique_ptr<Procedure> procedure)
 {
-    m_process->addProcedure(std::move(procedure));
+    m_process.addProcedure(std::move(procedure));
 
     return *this;
 }
 
 SdlProcessBuilder &SdlProcessBuilder::withVariable(std::unique_ptr<VariableDeclaration> variable)
 {
-    m_process->addVariable(std::move(variable));
+    m_process.addVariable(std::move(variable));
 
     return *this;
 }

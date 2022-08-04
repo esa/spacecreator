@@ -1,7 +1,7 @@
 <InterfaceView asn1file="testharness.asn">
 <Function name="TestDriver" is_type="NO" language="C" default_implementation="default" FPGA_Configurations="">
     <Property name="Taste::coordinates" value="12400 44000 32400 52000"/>
-<Provided_Interface name="StartTest" kind="Cyclic" layer="default" priority="1" wcet="0" period="999" dispatch_offset="0" stack_size="50">
+<Provided_Interface name="StartTest" kind="Cyclic" layer="default" priority="1" wcet="0" period="999" dispatch_offset="0" stack_size="5000">
     <Property name="Taste::coordinates" value="13900 44600"/>
 </Provided_Interface>
 

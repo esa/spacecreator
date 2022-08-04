@@ -21,7 +21,12 @@
 
 #include <sdl/SdlModel/nextstate.h>
 
+using sdl::Action;
 using sdl::NextState;
+using sdl::Output;
+using sdl::State;
+using sdl::Task;
+using sdl::Transition;
 
 namespace tests::common {
 

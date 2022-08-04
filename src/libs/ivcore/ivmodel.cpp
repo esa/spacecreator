@@ -23,6 +23,7 @@
 #include "ivconnection.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
+#include "ivarchetypelibraryreference.h"
 #include "ivnamevalidator.h"
 #include "ivpropertytemplate.h"
 #include "propertytemplateconfig.h"
@@ -356,6 +357,18 @@ IVConnectionLayerType *IVModel::getConnectionLayerByName(const QString &name) co
         }
     }
     return nullptr;
+}
+
+QVector<IVArchetypeLibraryReference *> IVModel::getArchetypeLibraryReferences()
+{
+    QVector<IVArchetypeLibraryReference *> result;
+
+    for (auto obj : objects()) {
+        if (auto reference = qobject_cast<IVArchetypeLibraryReference *>(obj)) {
+            result.append(reference);
+        }
+    }
+    return result;
 }
 
 QVector<IVConnection *> IVModel::getConnectionsForFunction(const shared::Id &id) const

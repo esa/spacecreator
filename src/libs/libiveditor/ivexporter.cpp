@@ -114,6 +114,8 @@ QString IVExporter::groupName(const shared::VEObject *object) const
             return QStringLiteral("ConnectionGroups");
         case ivm::IVObject::Type::ConnectionLayer:
             return QStringLiteral("ConnectionLayers");
+        case ivm::IVObject::Type::ArchetypeLibraryReference:
+            return QStringLiteral("ArchetypeLibraryReferences");
         default:
             break;
         }

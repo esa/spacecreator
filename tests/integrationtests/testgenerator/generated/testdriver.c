@@ -6,7 +6,7 @@
 //#include <stdio.h>
 
 #define TEST_DATA_SIZE 2
-const int testDataSize = TEST_DATA_SIZE;
+int testDataSize = TEST_DATA_SIZE;
 
 typedef struct {
     asn1SccMyInteger p1;

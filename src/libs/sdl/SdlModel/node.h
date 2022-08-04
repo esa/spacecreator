@@ -57,6 +57,7 @@ public:
      */
     Node &operator=(Node &&) = default;
 
+public:
     /**
      * @brief   Getter for this node name
      *
@@ -70,6 +71,7 @@ public:
      */
     auto setName(QString name) -> void;
 
+public:
     /**
      * @brief   Getter for this node comment
      *
@@ -83,6 +85,7 @@ public:
      */
     auto setComment(QString comment) -> void;
 
+public:
     /**
      * @brief   Visitor acceptor (shall call visit method of the given visitor)
      */

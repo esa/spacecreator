@@ -39,23 +39,20 @@ class Input final : public Signal
 {
 public:
     /**
+     * @brief   Default constructor
+     */
+    Input() = default;
+    /**
      * @brief   Constructor
      *
      * @param name        signal name
      * @param transition  a pointer to the transition which should be triggered upon reception of this signal
      */
     Input(QString name, Transition *transition);
-
-    /**
-     * @brief   Default constructor
-     */
-    Input() = default;
-
     /**
      * @brief   Deleted copy constructor
      */
     Input(const Input &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -65,19 +62,18 @@ public:
      * @brief   Deleted copy assignment operator
      */
     Input &operator=(const Input &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     Input &operator=(Input &&) = default;
 
+public:
     /**
      * @brief   Getter for the transition
      *
      * @return  a pointer to transition which should be triggered upon reception of this signal
      */
     auto transition() const -> Transition *;
-
     /**
      * @brief   Setter for the transition
      *
@@ -91,7 +87,6 @@ public:
      * @return  a reference to vector of pointers to input parameters
      */
     auto parameters() const -> const std::vector<std::unique_ptr<VariableReference>> &;
-
     /**
      * @brief   Setter for the transition
      *
@@ -99,6 +94,7 @@ public:
      */
     auto addParameter(std::unique_ptr<VariableReference> parameter) -> void;
 
+public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */

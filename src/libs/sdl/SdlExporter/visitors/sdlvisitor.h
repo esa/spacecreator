@@ -22,20 +22,6 @@
 #include "visitor.h"
 
 #include <QTextStream>
-#include <sdl/SdlModel/answer.h>
-#include <sdl/SdlModel/input.h>
-#include <sdl/SdlModel/label.h>
-#include <sdl/SdlModel/nextstate.h>
-#include <sdl/SdlModel/output.h>
-#include <sdl/SdlModel/procedure.h>
-#include <sdl/SdlModel/procedurecall.h>
-#include <sdl/SdlModel/process.h>
-#include <sdl/SdlModel/return.h>
-#include <sdl/SdlModel/sdlmodel.h>
-#include <sdl/SdlModel/signal.h>
-#include <sdl/SdlModel/state.h>
-#include <sdl/SdlModel/task.h>
-#include <sdl/SdlModel/transition.h>
 
 namespace sdl {
 
@@ -55,7 +41,6 @@ public:
          * @brief  Entity 2D position
          */
         using Position = std::pair<uint32_t, uint32_t>;
-
         /**
          * @brief   Entity 2D size
          */
@@ -82,21 +67,21 @@ public:
             ProcedureCall,
         };
 
+    public:
         /**
          * @brief   Constructor
          */
         Layouter();
 
+    public:
         /**
          * @brief   Reset the current position and position watermarks
          */
         auto resetPosition() -> void;
-
         /**
          * @brief   Push current position onto the position stack
          */
         auto pushPosition() -> void;
-
         /**
          * @brief   Pop current position from the position stack
          */
@@ -108,7 +93,6 @@ public:
          * @param   element   element to use as size reference
          */
         auto moveRight(const ElementType element) -> void;
-
         /**
          * @brief   Move position down by the size of the element + proportional margin
          *
@@ -122,7 +106,6 @@ public:
          * @return  current position
          */
         auto getPosition() -> const Position &;
-
         /**
          * @brief   Get CIF position string
          *
@@ -155,20 +138,13 @@ public:
          */
         IndentingStreamWriter(QTextStream &stream);
 
+    public:
         /**
          * @brief   Start new line with indent and write text
          *
          * @param   line   text to write
          */
         auto beginLine(const QString &line) -> void;
-
-        /**
-         * @brief   Write text
-         *
-         * @param   line   text to write
-         */
-        auto write(const QString &line) -> void;
-
         /**
          * @brief   Write text and end line
          *
@@ -177,12 +153,17 @@ public:
         auto endLine(const QString &line) -> void;
 
         /**
+         * @brief   Write text
+         *
+         * @param   line   text to write
+         */
+        auto write(const QString &line) -> void;
+        /**
          * @brief   Write entire line - indent, text and newline
          *
          * @param   line   text to write
          */
         auto writeLine(const QString &line) -> void;
-
         /**
          * @brief   Write a comment line - indent, comment and newline
          *
@@ -196,7 +177,6 @@ public:
          * @param   indent   additional indent amount
          */
         auto pushIndent(const QString &indent) -> void;
-
         /**
          * @brief   Remove indent from the top of the indent stack
          */
@@ -216,12 +196,10 @@ public:
      * @param   layouter layouter for calculating element positions
      */
     SdlVisitor(IndentingStreamWriter &writer, Layouter &layouter);
-
     /**
      * @brief   Deleted copy constructor
      */
     SdlVisitor(const SdlVisitor &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -231,7 +209,6 @@ public:
      * @brief   Deleted copy assignment operator
      */
     SdlVisitor &operator=(const SdlVisitor &) = delete;
-
     /**
      * @brief   Deleted move assignment operator
      */
@@ -242,98 +219,85 @@ public:
      *
      * @param   process   process to be serialized
      */
-    auto visit(const Process &process) -> void override;
-
+    virtual auto visit(const Process &process) -> void override;
     /**
      * @brief   State visitor
      *
      * @param   state   state to be serialized
      */
-    auto visit(const State &state) -> void override;
-
+    virtual auto visit(const State &state) -> void override;
     /**
      * @brief   Input visitor
      *
      * @param   input   input to be serialized
      */
-    auto visit(const Input &input) -> void override;
-
+    virtual auto visit(const Input &input) -> void override;
     /**
      * @brief   Output visitor
      *
      * @param   output  output to be serialized
      */
-    auto visit(const Output &output) -> void override;
-
+    virtual auto visit(const Output &output) -> void override;
     /**
      * @brief   NEXTSTATE action visitor
      *
      * @param   nextstate   NEXTSTATE action to be serialized
      */
-    auto visit(const NextState &nextstate) -> void override;
-
+    virtual auto visit(const NextState &nextstate) -> void override;
     /**
      * @brief   Task visitor
      *
      * @param   task   task to be serialized
      */
-    auto visit(const Task &task) -> void override;
-
+    virtual auto visit(const Task &task) -> void override;
     /**
      * @brief   Variable declaration visitor
      *
      * @param   declaration   declaration to be serialized
      */
-    auto visit(const VariableDeclaration &declaration) -> void override;
-
+    virtual auto visit(const VariableDeclaration &declaration) -> void override;
     /**
      * @brief   Label visitor
      *
      * @param   label   label to be serialized
      */
-    auto visit(const Label &label) -> void override;
-
+    virtual auto visit(const Label &label) -> void override;
     /**
      * @brief   Join visitor
      *
      * @param   join   join to be serialized
      */
-    auto visit(const Join &join) -> void override;
-
+    virtual auto visit(const Join &join) -> void override;
     /**
      * @brief   Return visitor
      *
      * @param   ret   return to be serialized
      */
-    auto visit(const Return &ret) -> void override;
-
+    virtual auto visit(const Return &ret) -> void override;
     /**
      * @brief   Answer visitor
      *
      * @param   answer  answer to be serialized
      */
-    auto visit(const Answer &answer) -> void override;
-
+    virtual auto visit(const Answer &answer) -> void override;
     /**
      * @brief   Decision visitor
      *
      * @param   decision  decision to be serialized
      */
     virtual auto visit(const Decision &decision) -> void override;
-
     /**
      * @brief   Procedure visitor
      *
      * @param   procedure   procedure to be serialized
      */
-    auto visit(const Procedure &procedure) -> void override;
-
+    virtual auto visit(const Procedure &procedure) -> void override;
     /**
      * @brief   Procedure call visitor
      *
      * @param   procedureCall   procedure call to be serialized
      */
-    auto visit(const ProcedureCall &procedureCall) -> void override;
+    virtual auto visit(const ProcedureCall &procedureCall) -> void override;
 
 private:
     template<typename T>

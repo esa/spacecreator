@@ -27,6 +27,10 @@ target_sources(${LIB_NAME} PRIVATE
     ivfunction.h
     ivfunctiontype.cpp
     ivfunctiontype.h
+    ivarchetypereference.h
+    ivarchetypereference.cpp
+    ivarchetypelibraryreference.h
+    ivarchetypelibraryreference.cpp
     ivinterface.cpp
     ivinterface.h
     ivinterfacegroup.cpp
@@ -58,8 +62,12 @@ target_sources(${LIB_NAME} PRIVATE
     archetypes/interfacearchetype.cpp
     archetypes/functionarchetype.h
     archetypes/functionarchetype.cpp
+    archetypes/archetypelibrary.h
+    archetypes/archetypelibrary.cpp
     archetypes/archetypecommonprops.h
     archetypes/archetypecommonprops.cpp
+    archetypes/archetypexmlreader.h
+    archetypes/archetypexmlreader.cpp
     )
 
 target_include_directories(${LIB_NAME}

@@ -56,6 +56,7 @@ public:
      */
     Transition &operator=(Transition &&) = default;
 
+public:
     /**
      * @brief    Getter for the actions
      *

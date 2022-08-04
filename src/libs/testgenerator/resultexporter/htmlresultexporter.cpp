@@ -1,13 +1,34 @@
+/** @file
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+
 #include "htmlresultexporter.h"
 
+#include <QDebug>
 #include <QFile>
 #include <ivfunctiontype.h>
 
 namespace testgenerator {
 
-HtmlResultExporter::HtmlResultExporter(
-        const IVInterface &interface, const CsvModel &csvModel, const QVector<QVariant> &results, const float delta)
-    : interfaceName(interface.title())
+HtmlResultExporter::HtmlResultExporter(const QString &chosenBoardName, const IVInterface &interface,
+        const CsvModel &csvModel, const QVector<QVariant> &results, const float delta)
+    : boardName(chosenBoardName)
+    , interfaceName(interface.title())
     , functionName(interface.function()->title())
     , ifaceParams(interface.params())
     , rows(results.size() / ifaceParams.size())
@@ -21,6 +42,10 @@ auto HtmlResultExporter::initTableCells(const CsvModel &csvModel, const QVector<
 {
     std::vector<QString>::size_type rowIndex = 0;
     std::vector<QString>::size_type resultIndex = 0;
+    if (results.empty()) {
+        qWarning() << "Results vector is empty";
+        return;
+    }
     for (const auto &row : csvModel.records()) {
         csv::Row csvRow = *row;
         auto csvFields = csvRow.fields();
@@ -66,6 +91,7 @@ auto HtmlResultExporter::exportResult(const QString &filepath) -> void
     if (file.open(QIODevice::WriteOnly)) {
         QTextStream stream(&file);
         generateHtmlStream(stream);
+        file.close();
     }
 }
 
@@ -85,12 +111,15 @@ auto HtmlResultExporter::generateHtmlStream(QTextStream &stream) -> void
     stream << "\t</style>\n";
     stream << "\t<body>\n";
     stream << "\t\t<h2>Test results for interface " << interfaceName << " of function " << functionName << "</h2>\n";
+    stream << "\t\t<p style='font-size: 22px'>Chosen board: " << boardName << "</p>\n";
     stream << "\t\t<p style='font-size: 22px'>Maximum allowed absolute error: " << maxDelta << "</p>\n";
     stream << "\t\t<table>\n";
 
     generateTableHeader(stream);
     for (int rowIndex = 0; rowIndex < rows; rowIndex++) {
-        generateTableRow(stream, rowIndex);
+        if (cells.size() > rowIndex) {
+            generateTableRow(stream, rowIndex);
+        }
     }
 
     stream << "\t\t</table>\n";

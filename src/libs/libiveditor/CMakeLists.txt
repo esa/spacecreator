@@ -189,6 +189,10 @@ target_sources(${LIB_NAME} PRIVATE
     templating/exportableivobject.h
     templating/exportableivfunctiontype.cpp
     templating/exportableivfunctiontype.h
+    templating/exportableivarchetypereference.cpp
+    templating/exportableivarchetypereference.h
+    templating/exportableivarchetypelibraryreference.cpp
+    templating/exportableivarchetypelibraryreference.h
     zoomcontroller.cpp
     zoomcontroller.h
     config/ivlibrarywidget.cpp
@@ -212,6 +216,7 @@ target_link_libraries(${LIB_NAME}
     ${QT_SVGWIDGETS}
     ${QT_WIDGETS}
     ${QT_XML}
+    "stdc++fs"
     )
 
 target_include_directories(${LIB_NAME} PUBLIC .)
