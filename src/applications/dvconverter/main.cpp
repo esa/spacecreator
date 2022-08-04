@@ -35,14 +35,14 @@
 
 static const QString INTERFACEVIEW_FILE_NAME("interfaceview.xml");
 
-static void setupIvSystenQueriesIfAvailable(const QString &inputFile, dve::DVEditorCore *dvcore)
+static void setupIvSystemQueriesIfAvailable(const QString &inputFile, dve::DVEditorCore *dvcore)
 {
     // If available, load Interface View to enable additional queries
     const QFileInfo inputFileInfo(inputFile);
     const QDir modelDirectory = inputFileInfo.dir();
-    QString interfaceViewFilePath = modelDirectory.filePath(INTERFACEVIEW_FILE_NAME);
+    const QString interfaceViewFilePath = modelDirectory.filePath(INTERFACEVIEW_FILE_NAME);
 
-    QFileInfo interfaceViewFileInfo(interfaceViewFilePath);
+    const QFileInfo interfaceViewFileInfo(interfaceViewFilePath);
     if (interfaceViewFileInfo.exists()) {
         IVEditorCorePtr ivcore(new ive::IVEditorCore);
         if (!ivcore->document()->load(interfaceViewFilePath)) {
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
             return -1;
         }
 
-        setupIvSystenQueriesIfAvailable(inputFile, &dvcore);
+        setupIvSystemQueriesIfAvailable(inputFile, &dvcore);
 
         const bool convertOk = dvcore.exporter()->exportObjectsSilently(
                 appModel->objectsModel()->objects().values(), outputFile, templateFile);
