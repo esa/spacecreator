@@ -548,6 +548,9 @@ void IVInterface::reflectAttrs(const IVInterface *from)
         }
     }
 
+    // Required_system_element should never be inherited, because RI should be removable.
+    revertAttribute(meta::Props::Token::required_system_element, newAttrs, m_originalFields.attrs);
+
     for (auto t : { meta::Props::Token::InheritPI, meta::Props::Token::coordinates, meta::Props::Token::RootCoordinates,
                  meta::Props::Token::Autonamed }) {
         const bool isInheritPIFlag = t == meta::Props::Token::InheritPI;
