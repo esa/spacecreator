@@ -29,7 +29,31 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QDir>
+#include <QFileInfo>
 #include <spacecreatorsystem/ivsystemqueries.h>
+
+static const QString INTERFACEVIEW_FILE_NAME("interfaceview.xml");
+
+static void setupIvSystenQueriesIfAvailable(const QString &inputFile, dve::DVEditorCore *dvcore)
+{
+    // If available, load Interface View to enable additional queries
+    const QFileInfo inputFileInfo(inputFile);
+    const QDir modelDirectory = inputFileInfo.dir();
+    QString interfaceViewFilePath = modelDirectory.filePath(INTERFACEVIEW_FILE_NAME);
+
+    QFileInfo interfaceViewFileInfo(interfaceViewFilePath);
+    if (interfaceViewFileInfo.exists()) {
+        IVEditorCorePtr ivcore(new ive::IVEditorCore);
+        if (!ivcore->document()->load(interfaceViewFilePath)) {
+            qWarning() << "InterfaceView " << interfaceViewFilePath << " could not be loaded";
+        } else {
+            auto checker = new scs::IvSystemQueries(nullptr, dvcore);
+            checker->setIVCore(ivcore);
+            dvcore->setSystemChecker(checker);
+        }
+    }
+}
 
 int main(int argc, char *argv[])
 {
@@ -58,20 +82,16 @@ int main(int argc, char *argv[])
         const QString outputFile = cmdParser.value(shared::CommandLineParser::Positional::ExportToFile);
 
         dve::DVEditorCore dvcore;
-        IVEditorCorePtr ivcore(new ive::IVEditorCore);
         dve::DVAppModel *appModel = dvcore.appModel();
-
-        auto checker = new scs::IvSystemQueries(nullptr, &dvcore);
-        checker->setIVCore(ivcore);
-        dvcore.setSystemChecker(checker);
-
-        ivcore->document()->load("interfaceview.xml");
 
         const bool loadOk = appModel->load(inputFile);
         if (!loadOk) {
             qCritical() << "Unable to load file" << inputFile;
             return -1;
         }
+
+        setupIvSystenQueriesIfAvailable(inputFile, &dvcore);
+
         const bool convertOk = dvcore.exporter()->exportObjectsSilently(
                 appModel->objectsModel()->objects().values(), outputFile, templateFile);
         if (!convertOk) {

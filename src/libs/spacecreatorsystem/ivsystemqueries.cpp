@@ -301,7 +301,6 @@ QString IvSystemQueries::resolvedTargetFunction(const QString &sourceFunction, c
 {
     Q_UNUSED(sourceInterface);
     Q_UNUSED(targetInterface);
-    // return "TODO";
     auto target = functionByName(targetFunction);
     auto source = functionByName(sourceFunction);
 
@@ -321,7 +320,20 @@ QString IvSystemQueries::resolvedTargetFunction(const QString &sourceFunction, c
 QString IvSystemQueries::resolvedTargetInterface(const QString &sourceFunction, const QString &sourceInterface,
         const QString &targetFunction, const QString &targetInterface) const
 {
-    return "TODO";
+    auto target = functionByName(targetFunction);
+    auto source = functionByName(sourceFunction);
+
+    auto targetParent = target->parentObject();
+    auto sourceParent = source->parentObject();
+    if (targetParent == sourceParent) {
+        // Same level
+        return targetInterface;
+    }
+    // Nested function -> first connection is to parent
+    auto parentFunction = dynamic_cast<ivm::IVFunction *>(source->parent());
+    if (parentFunction != nullptr) {
+        return sourceInterface;
+    }
 }
 
 } // namespace scs

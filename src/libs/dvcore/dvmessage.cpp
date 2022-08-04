@@ -25,7 +25,6 @@
 #include "errorhub.h"
 
 #include <QDebug>
-#include <iostream>
 #include <ivcore/ivfunction.h>
 
 namespace dvm {
@@ -177,14 +176,11 @@ QString DVMessage::resolvedTargetInterface() const
 
 DVModel *DVMessage::getModel() const
 {
-    std::cout << "getModel" << std::endl;
     QObject *parentObject = parent();
     DVModel *model = NULL;
     while (parentObject != NULL) {
-        std::cout << "parent == " << intptr_t(parentObject) << std::endl;
         model = qobject_cast<DVModel *>(parentObject);
         if (model != NULL) {
-            std::cout << "returning model" << std::endl;
             return model;
         }
         parentObject = parentObject->parent();
