@@ -41,7 +41,7 @@ public:
      * @param typeName name of enum type.
      * @param enumerated ASN.1 Enumerated data type.
      */
-    EnumeratedGenerator(QString typeName, const ::Asn1Acn::Types::Enumerated &enumerated);
+    EnumeratedGenerator(QString typeName, const Asn1Acn::Types::Enumerated &enumerated);
 
     /**
      * @brief Reset the generator to initial state.
@@ -62,7 +62,7 @@ public:
 
 private:
     const QString m_typeName;
-    QVector<::Asn1Acn::Types::EnumeratedItem> m_items;
-    QVector<::Asn1Acn::Types::EnumeratedItem>::const_iterator m_iter;
+    QVector<Asn1Acn::Types::EnumeratedItem> m_items;
+    QVector<Asn1Acn::Types::EnumeratedItem>::const_iterator m_iter;
 };
 }

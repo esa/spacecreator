@@ -20,6 +20,7 @@
 #include <QVector>
 #include <functional>
 
+namespace tests {
 namespace testgenerator {
 
 /**
@@ -53,16 +54,16 @@ static auto elementsEqualByName = [](const auto &v1, int i, const auto &v2, int 
 /**
  * @brief  create map from one QVector to another, using provided function
  *
- * @tparam QVectorT     type of QVector
+ * @tparam T            type stored in QVector
  * @param source        source vector (mapping FROM)
  * @param destination   destination vector (mapping TO)
  * @param elementsEqual comparison function
  *
  * @return map (a vector with indexes of corresponding `destination` elements on `source` indexes)
  */
-template<typename QVectorT>
-static QVector<int> createQVectorToQVectorMap(const QVectorT &source, const QVectorT &destination,
-        std::function<bool(const QVectorT &source, int i, const QVectorT &destination, int j)> elementsEqual)
+template<typename T>
+static QVector<int> createQVectorToQVectorMap(const QVector<T> &source, const QVector<T> &destination,
+        std::function<bool(const QVector<T> &source, int i, const QVector<T> &destination, int j)> elementsEqual)
 {
     assert(source.size() == destination.size());
 
@@ -82,3 +83,4 @@ static QVector<int> createQVectorToQVectorMap(const QVectorT &source, const QVec
 }
 
 } // namespace testgenerator
+} // namespace tests

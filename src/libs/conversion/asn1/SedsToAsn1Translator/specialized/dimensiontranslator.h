@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,20 +19,10 @@
 
 #pragma once
 
-#include <asn1library/asn1/constraints/rangeconstraint.h>
-#include <asn1library/asn1/constraints/sizeconstraint.h>
-#include <asn1library/asn1/definitions.h>
-#include <asn1library/asn1/types/integer.h>
-#include <asn1library/asn1/types/sequenceof.h>
-#include <memory>
-#include <optional>
+#include "context.h"
 
-namespace seds::model {
-class DimensionSize;
-class EnumeratedDataType;
-class IntegerDataType;
-class Package;
-} // namespace seds::model
+#include <asn1library/asn1/types/sequenceof.h>
+#include <seds/SedsModel/types/dimensionsize.h>
 
 namespace conversion::asn1::translator {
 
@@ -45,32 +35,49 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   sedsPackage         Parent SEDS package
+     * @param   context     Current translation context
      */
-    explicit DimensionTranslator(const seds::model::Package *sedsPackage);
+    explicit DimensionTranslator(Context &context);
+    /**
+     * @brief   Deleted copy constructor
+     */
+    DimensionTranslator(const DimensionTranslator &) = delete;
+    /**
+     * @brief   Deleted move constructor
+     */
+    DimensionTranslator(DimensionTranslator &&) = delete;
 
     /**
-     * @brief   Translate SEDS array dimension
-     *
-     * This is translated as ASN.1 range constraint
-     *
-     * @param   dimension       SEDS array dimension
-     * @param   asn1SequenceOf  ASN.1 type that will be updated
+     * @brief   Deleted copy assignment operator
      */
-    auto translateDimension(
-            const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1SequenceOf) const -> void;
+    DimensionTranslator &operator=(const DimensionTranslator &) = delete;
+    /**
+     * @brief   Deleted move assignment operator
+     */
+    DimensionTranslator &operator=(DimensionTranslator &&) = delete;
+
+public:
+    /**
+     * @brief   Translate SEDS dimension to ASN.1 SequenceOf size constriant
+     *
+     * @param   dimension       Dimension to translate
+     * @param   asn1Type        Sequence to constraint
+     */
+    auto translate(const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
 
 private:
-    auto translateSizeDimension(
-            const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1SequenceOf) const -> void;
+    auto translateSizeDimension(const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const
+            -> void;
     auto translateIndexDimension(
-            const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1SequenceOf) const -> void;
+            const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
+
     auto translateEnumDimensionIndex(
-            const seds::model::EnumeratedDataType &indexType, Asn1Acn::Types::SequenceOf *asn1SequenceOf) const -> void;
+            const seds::model::EnumeratedDataType &indexType, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
 
 private:
-    /// @brief  Parent package
-    const seds::model::Package *m_sedsPackage;
+    Context &m_context;
+
+    std::optional<uint64_t> m_threshold;
 };
 
 } // namespace conversion::asn1::translator

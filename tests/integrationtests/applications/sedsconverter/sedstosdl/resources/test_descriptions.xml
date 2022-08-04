@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="Descriptions">
+    <DataTypeSet>
+      <IntegerDataType name="IntegerType">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="MegaInterface">
+        <ParameterSet>
+          <Parameter name="Param" mode="sync" type="IntegerType" />
+        </ParameterSet>
+        <CommandSet>
+          <Command name="MegaCommand" mode="sync">
+            <Argument name="commandArg" type="IntegerType" mode="in"/>
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="Component">
+        <ProvidedInterfaceSet>
+          <Interface name="InterfacePi" type="MegaInterface" />
+        </ProvidedInterfaceSet>
+        <RequiredInterfaceSet>
+          <Interface name="InterfaceRi" type="MegaInterface" />
+        </RequiredInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="megaVariable" type="IntegerType" shortDescription="MegaVariable short description">
+              <LongDescription>MegaVariable
+long description</LongDescription>
+            </Variable>
+          </VariableSet>
+          <ParameterMapSet>
+            <ParameterMap variableRef="megaVariable" parameter="Param" interface="InterfacePi" />
+          </ParameterMapSet>
+          <ActivitySet>
+            <Activity name="MegaActivity" shortDescription="MegaActivity short description">
+            <LongDescription>MegaActivity
+long description</LongDescription>
+              <Argument name="activityArg" type="IntegerType" shortDescription="ActivityArg short description">
+                <LongDescription>ActivityArg
+long description</LongDescription>
+              </Argument>
+              <Body>
+                <SendParameterPrimitive interface="InterfaceRi" parameter="Param" operation="get" shortDescription="SPP short description">
+                  <LongDescription>SPP
+long description</LongDescription>
+                  <ArgumentValue>
+                    <VariableRef variableRef="megaVariable" />
+                  </ArgumentValue>
+                </SendParameterPrimitive>
+                <Assignment outputVariableRef="megaVariable" shortDescription="Assignment short description">
+                  <LongDescription>Assignment
+long description</LongDescription>
+                  <Value value="1"/>
+                </Assignment>
+                <Conditional shortDescription="Conditional short description">
+                  <LongDescription>Conditional
+long description</LongDescription>
+                  <Condition>
+                    <Condition>
+                      <FirstOperand variableRef="activityArg" />
+                      <ComparisonOperator>lessThan</ComparisonOperator>
+                      <SecondOperand variableRef="activityArg" />
+                    </Condition>
+                  </Condition>
+                  <OnConditionTrue>
+                    <SendCommandPrimitive interface="InterfaceRi" command="MegaCommand" shortDescription="SCP short description">
+                      <LongDescription>SCP
+long description</LongDescription>
+                      <ArgumentValue name="commandArg">
+                        <Value value="0" />
+                      </ArgumentValue>
+                    </SendCommandPrimitive>
+                  </OnConditionTrue>
+                  <OnConditionFalse>
+                    <SendCommandPrimitive interface="InterfaceRi" command="MegaCommand">
+                      <ArgumentValue name="commandArg">
+                        <Value value="1" />
+                      </ArgumentValue>
+                    </SendCommandPrimitive>
+                  </OnConditionFalse>
+                </Conditional>
+                <MathOperation outputVariableRef="megaVariable" shortDescription="Math short description">
+                  <LongDescription>Math
+long description</LongDescription>
+                  <Operator operator="add" />
+                  <VariableRef variableRef="megaVariable" />
+                  <Value value="1" />
+                </MathOperation>
+                <Calibration inputVariableRef="megaVariable" outputVariableRef="megaVariable" shortDescription="Calibration short description">
+                  <LongDescription>Calibration
+long description</LongDescription>
+                  <PolynomialCalibrator>
+                    <Term coefficient="2" exponent="0" />
+                    <Term coefficient="4" exponent="1" />
+                  </PolynomialCalibrator>
+                </Calibration>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="StateMachine" shortDescription="StateMachine short description">
+              <LongDescription>StateMachine
+long description</LongDescription>
+              <EntryState name="State1" shortDescription="EntryState short description">
+                <LongDescription>EntryState
+long description</LongDescription>
+              </EntryState>
+              <State name="State2" shortDescription="State short description">
+                <LongDescription>State
+long description</LongDescription>
+              </State>
+              <ExitState name="State3" shortDescription="ExitState short description">
+                <LongDescription>ExitState
+long description</LongDescription>
+              </ExitState>
+              <Transition fromState="State2" toState="State2" name="Transition1" shortDescription="Transition short description">
+                <LongDescription>Transition
+long description</LongDescription>
+                <OnCommandPrimitive command="MegaCommand" interface="InterfacePi">
+                  <ArgumentValue name="commandArg" outputVariableRef="megaVariable" />
+                </OnCommandPrimitive>
+                <Do activity="MegaActivity" shortDescription="Do short description">
+                  <LongDescription>Do
+long description</LongDescription>
+                  <ArgumentValue name="activityArg">
+                    <VariableRef variableRef="megaVariable" />
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

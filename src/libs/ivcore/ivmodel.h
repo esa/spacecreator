@@ -36,6 +36,7 @@ class IVComment;
 class IVConnection;
 class IVFunction;
 class IVFunctionType;
+class IVArchetypeLibraryReference;
 
 struct IVModelPrivate;
 class IVModel : public shared::VEModel, public conversion::Model
@@ -85,6 +86,8 @@ public:
     auto setConnectionLayersModel(IVModel *layersModel) -> void;
     auto getConnectionLayersModel() const -> IVModel *;
     auto getConnectionLayerByName(const QString &name) const -> IVConnectionLayerType *;
+
+    QVector<IVArchetypeLibraryReference *> getArchetypeLibraryReferences();
 
     QList<IVObject *> visibleObjects() const;
     QList<IVObject *> visibleObjects(shared::Id rootId) const;

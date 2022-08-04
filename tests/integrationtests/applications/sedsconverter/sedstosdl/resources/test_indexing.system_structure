@@ -14,7 +14,7 @@ use Datamodel;
 
 system Component;
 
-   signal I_C_Pi(C_Type);
+   signal I_C_Pi(TI_C_Type);
 
    channel c
       from env to Component with I_C_Pi;

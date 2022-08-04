@@ -26,12 +26,12 @@ SplinePoint::SplinePoint() noexcept
 {
 }
 
-int SplinePoint::order() const
+uint8_t SplinePoint::order() const
 {
     return m_order;
 }
 
-void SplinePoint::setOrder(int order)
+void SplinePoint::setOrder(uint8_t order)
 {
     m_order = order;
 }
@@ -54,6 +54,11 @@ double SplinePoint::calibrated() const
 void SplinePoint::setCalibrated(double calibrated)
 {
     m_calibrated = calibrated;
+}
+
+bool SplinePoint::operator<(const SplinePoint &rhs) const
+{
+    return m_raw < rhs.raw();
 }
 
 } // namespace seds::model

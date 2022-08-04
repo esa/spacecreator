@@ -1,0 +1,6 @@
+add_subdirectory(externalprocedures)
+add_subdirectory(inputvectorlimit)
+add_subdirectory(interfaceviewoptimizer)
+add_subdirectory(observers)
+add_subdirectory(types)
+add_subdirectory(use-cases)

@@ -32,19 +32,19 @@
 
 namespace testgenerator {
 
-const QVector<qint32> Coordinates::Function::testDriver = { 75, 184, 275, 264 };
-const QVector<qint32> Coordinates::Function::functionUnderTest = { 462, 106, 662, 186 };
+const QVector<qint32> IvGenerator::Coordinates::Function::testDriver = { 75, 184, 275, 264 };
+const QVector<qint32> IvGenerator::Coordinates::Function::functionUnderTest = { 462, 106, 662, 186 };
 
-const QVector<qint32> Coordinates::Interface::startTestIf = { 123, 184 };
-const QVector<qint32> Coordinates::Interface::interfaceUnderTestRi = { 275, 218 };
-const QVector<qint32> Coordinates::Interface::interfaceUnderTestPi = { 462, 142 };
+const QVector<qint32> IvGenerator::Coordinates::Interface::startTestIf = { 123, 184 };
+const QVector<qint32> IvGenerator::Coordinates::Interface::interfaceUnderTestRi = { 275, 218 };
+const QVector<qint32> IvGenerator::Coordinates::Interface::interfaceUnderTestPi = { 462, 142 };
 
-const QVector<qint32> Coordinates::connection = { 281, 218, 370, 218, 459, 142 };
+const QVector<qint32> IvGenerator::Coordinates::connection = { 281, 218, 370, 218, 459, 142 };
 
 const QString IvGenerator::startTestInterfaceName = "StartTest";
 const QString IvGenerator::testDriverFunctionName = "TestDriver";
 
-auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::unique_ptr<ivm::IVModel>
+auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest, int stackSize) -> std::unique_ptr<ivm::IVModel>
 {
     checkInputArgument(interfaceUnderTest);
 
@@ -61,7 +61,7 @@ auto IvGenerator::generate(ivm::IVInterface *const interfaceUnderTest) -> std::u
 
     auto *const testDriverFunction = makeTestDriverFunction(ivModel.get());
     auto *const testDriverRi = makeTestDriverRequiredIface(interfaceUnderTest, testDriverFunction);
-    auto *const testDriverStartTestIf = makeStartTestIface(testDriverFunction);
+    auto *const testDriverStartTestIf = makeStartTestIface(testDriverFunction, stackSize);
 
     testDriverFunction->addChild(testDriverRi);
     testDriverFunction->addChild(testDriverStartTestIf);
@@ -131,7 +131,8 @@ auto IvGenerator::makeFunctionUnderTest(ivm::IVModel *const model, ivm::IVInterf
     return function;
 }
 
-auto IvGenerator::makeStartTestIface(ivm::IVFunction *const testDriverFunction) -> ivm::IVInterface *
+auto IvGenerator::makeStartTestIface(ivm::IVFunction *const testDriverFunction, const int stackSize)
+        -> ivm::IVInterface *
 {
     throwOnNullpointer(testDriverFunction);
 
@@ -144,7 +145,7 @@ auto IvGenerator::makeStartTestIface(ivm::IVFunction *const testDriverFunction) 
 
     auto *const iface = ivm::IVInterface::createIface(ci);
     iface->setEntityAttribute("period", "999");
-    iface->setEntityAttribute("stack_size", "50");
+    iface->setEntityAttribute("stack_size", stackSize);
     iface->setEntityAttribute("priority", "1");
     iface->setEntityAttribute("dispatch_offset", "0");
     iface->setEntityAttribute("wcet", "0");
@@ -159,7 +160,9 @@ auto IvGenerator::makeTestDriverRequiredIface(
     throwOnNullpointer(ifaceUnderTest);
     throwOnNullpointer(testDriverFunction);
 
-    ivm::IVInterface::CreationInfo ci = ivm::IVInterface::CreationInfo::fromIface(ifaceUnderTest);
+    ivm::IVInterface::CreationInfo ci =
+            ivm::IVInterface::CreationInfo::initFromIface(ifaceUnderTest, ivm::IVInterface::CreationInfo::Policy::Init);
+
     ci.model = testDriverFunction->model();
     ci.function = testDriverFunction;
     ci.type = ivm::IVInterface::InterfaceType::Required;
@@ -176,7 +179,9 @@ auto IvGenerator::makeTestDriverRequiredIface(
 auto IvGenerator::makeFunctionUnderTestProvidedInterface(
         ivm::IVInterface *const ifaceUnderTest, ivm::IVFunction *const functionUnderTest) -> ivm::IVInterface *
 {
-    ivm::IVInterface::CreationInfo ci = ivm::IVInterface::CreationInfo::fromIface(ifaceUnderTest);
+    ivm::IVInterface::CreationInfo ci =
+            ivm::IVInterface::CreationInfo::initFromIface(ifaceUnderTest, ivm::IVInterface::CreationInfo::Policy::Init);
+
     ci.function = functionUnderTest;
 
     auto *const iface = ivm::IVInterface::createIface(ci);

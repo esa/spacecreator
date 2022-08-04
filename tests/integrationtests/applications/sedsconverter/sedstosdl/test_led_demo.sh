@@ -21,12 +21,15 @@ $SEDS_CONVERTER --from SEDS --to SDL --aux-models ASN.1,InterfaceView --skip-val
 # Setup additional data
 cp resources/test_led_demo.system_structure output/system_structure.pr
 cp $TEST_OUTPUT_DIR/COM-N7SPACE-LEDDEMO.asn $TEST_OUTPUT_DIR/dataview-uniq.asn
+# Rename the module to avoid naming conflicts
+sed -i 's/LEDDEMO/SYSTEM-DATAVIEW/g' $TEST_OUTPUT_DIR/dataview-uniq.asn
 cd $TEST_OUTPUT_DIR
 # Compare output against reference, and compile to make sure the reference is valid
 # Clean (rm) only if all steps pass
+# This test uses Ada, as C backend in OpenGEODE is too buggy to handle this example
 $DIFF leddemo.pr ../resources/test_led_demo.output \
-  && $OPENGEODE --toC system_structure.pr leddemo.pr \
-  && asn1scc -c --type-prefix asn1Scc dataview-uniq.asn \
-  && gcc -c LedDemo.c \
+  && $OPENGEODE --toAda system_structure.pr leddemo.pr \
+  && asn1scc -Ada --type-prefix asn1Scc dataview-uniq.asn leddemo_datamodel.asn \
+  && gcc -c leddemo.adb \
   && cd .. \
   && rm -r -f $TEST_OUTPUT_DIR

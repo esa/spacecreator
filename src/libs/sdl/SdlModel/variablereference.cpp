@@ -21,19 +21,19 @@
 
 namespace sdl {
 
-VariableReference::VariableReference(VariableDeclaration *declaration)
-    : m_declaration(declaration)
+VariableReference::VariableReference(QString variableName)
+    : m_variableName(std::move(variableName))
 {
 }
 
-const VariableDeclaration *VariableReference::declaration() const
+const QString &VariableReference::variableName() const
 {
-    return m_declaration;
+    return m_variableName;
 }
 
-void VariableReference::setDeclaration(VariableDeclaration *declaration)
+void VariableReference::setVariableName(QString variableName)
 {
-    m_declaration = declaration;
+    m_variableName = std::move(variableName);
 }
 
 } // namespace sdl

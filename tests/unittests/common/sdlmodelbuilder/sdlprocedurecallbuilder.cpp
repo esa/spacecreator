@@ -19,6 +19,10 @@
 
 #include "sdlprocedurecallbuilder.h"
 
+using sdl::Procedure;
+using sdl::ProcedureCall;
+using sdl::Transition;
+
 namespace tests::common {
 
 SdlProcedureCallBuilder::SdlProcedureCallBuilder()

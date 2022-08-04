@@ -22,6 +22,7 @@
 #include <QStringList>
 #include <QVector>
 #include <memory>
+#include <conversion/common/model.h>
 
 namespace Asn1Acn {
 class Asn1SystemChecks;
@@ -32,7 +33,7 @@ class MscChart;
 class MscDocument;
 class MscMessage;
 
-class MscModel : public QObject
+class MscModel : public QObject, public conversion::Model
 {
     Q_OBJECT
     Q_PROPERTY(QString dataLanguage READ dataLanguage WRITE setDataLanguage NOTIFY dataLanguageChanged)
@@ -45,6 +46,8 @@ class MscModel : public QObject
 public:
     explicit MscModel(QObject *parent = nullptr);
     ~MscModel();
+
+    virtual conversion::ModelType modelType() const override;
 
     void setFilename(const QString filename);
     const QString filename() const;
@@ -100,4 +103,22 @@ private:
     QString m_filename;
 };
 
-}
+} // namespace msc
+
+
+namespace conversion {
+
+/**
+ * @brief   Specialization for MSC model
+ */
+template<>
+struct ModelProperties<::msc::MscModel> {
+    /// @brief  Model type
+    static const ModelType type = ModelType::Msc;
+    /// @brief  Model name
+    static inline const QString name = ModelTypeProperties<type>::name;
+    /// @brief  Model extension
+    static inline const QStringList extensions = ModelTypeProperties<type>::extensions;
+};
+
+} // namespace conversion

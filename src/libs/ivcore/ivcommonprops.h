@@ -47,9 +47,13 @@ public:
         Target,
         Implementations,
         Implementation,
+        Layer,
+        ArchetypeReference,
+        ArchetypeLibraryReference,
 
         // attrs:
         name,
+        comment,
         url,
         is_type,
         instance_of,
@@ -66,6 +70,9 @@ public:
         default_implementation,
         enable_multicast,
         layer,
+        archetype_library,
+        archetype_function,
+        path,
 
         // KNOWN TASTE props:
         coordinates,

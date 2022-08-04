@@ -19,121 +19,153 @@
 
 #pragma once
 
+#include <asn1library/asn1/asnsequencecomponent.h>
+#include <asn1library/asn1/types/choice.h>
+#include <asn1library/asn1/types/type.h>
 #include <asn1library/asn1/types/typereadingvisitor.h>
 #include <optional>
+#include <promela/PromelaModel/proctypeelement.h>
 #include <promela/PromelaModel/promelamodel.h>
 
+using promela::model::Expression;
+
 namespace promela::translator {
+
 /**
- * @brief Visitor for asn.1 toplevel types
+ * @brief Visitor for ASN.1 top-level types
  *
  * Visitor generates Promela inlines responsible for value generation for inlines
  *
  * This is a part of Asn1ToPromelaTranslator
  */
-class Asn1TypeValueGeneratorVisitor : public ::Asn1Acn::Types::TypeReadingVisitor
+class Asn1TypeValueGeneratorVisitor : public Asn1Acn::Types::TypeReadingVisitor
 {
 public:
     /**
+
      * @brief Constructor
      *
      * @param promelaModel target promela model
-     * @param name name of type
-     * @param enhancedSpinSupport  if true, then generate model for enhanced spin
+     * @param name name of ASN.1 type
      */
-    Asn1TypeValueGeneratorVisitor(::promela::model::PromelaModel &promelaModel, QString name, bool enhancedSpinSupport);
+    Asn1TypeValueGeneratorVisitor(model::PromelaModel &promelaModel, QString name);
 
     /**
-     * @brief Visit ::Asn1Acn::Types::Boolean
+     * @brief Visit Asn1Acn::Types::Boolean
      *
      * @param type boolean value
      */
-    void visit(const ::Asn1Acn::Types::Boolean &type) override;
+    void visit(const Asn1Acn::Types::Boolean &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::Null
+     * @brief Visit Asn1Acn::Types::Null
      *
      * @param type null value
      */
-    void visit(const ::Asn1Acn::Types::Null &type) override;
+    void visit(const Asn1Acn::Types::Null &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::BitString
+     * @brief Visit Asn1Acn::Types::BitString
      *
      * @param type bit string value
      */
-    void visit(const ::Asn1Acn::Types::BitString &type) override;
+    void visit(const Asn1Acn::Types::BitString &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::OctetString
+     * @brief Visit Asn1Acn::Types::OctetString
      *
      * @param type octest string value
      */
-    void visit(const ::Asn1Acn::Types::OctetString &type) override;
+    void visit(const Asn1Acn::Types::OctetString &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::IA5String
+     * @brief Visit Asn1Acn::Types::IA5String
      *
      * @param type IA5String value
      */
-    void visit(const ::Asn1Acn::Types::IA5String &type) override;
+    void visit(const Asn1Acn::Types::IA5String &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::NumericString
+     * @brief Visit Asn1Acn::Types::NumericString
      *
      * @param type numeric string value
      */
-    void visit(const ::Asn1Acn::Types::NumericString &type) override;
+    void visit(const Asn1Acn::Types::NumericString &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::Enumerated
+     * @brief Visit Asn1Acn::Types::Enumerated
      *
      * @param type enumerated value
      */
-    void visit(const ::Asn1Acn::Types::Enumerated &type) override;
+    void visit(const Asn1Acn::Types::Enumerated &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::Choice
+     * @brief Visit Asn1Acn::Types::Choice
      *
      * @param type choice value
      */
-    void visit(const ::Asn1Acn::Types::Choice &type) override;
+    void visit(const Asn1Acn::Types::Choice &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::Sequence
+     * @brief Visit Asn1Acn::Types::Sequence
      *
      * @param type sequence value
      */
-    void visit(const ::Asn1Acn::Types::Sequence &type) override;
+    void visit(const Asn1Acn::Types::Sequence &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::SequenceOf
+     * @brief Visit Asn1Acn::Types::SequenceOf
      *
      * @param type 'sequence of' value
      */
-    void visit(const ::Asn1Acn::Types::SequenceOf &type) override;
+    void visit(const Asn1Acn::Types::SequenceOf &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::Real
+     * @brief Visit Asn1Acn::Types::Real
      *
      * @param type real value
      */
-    void visit(const ::Asn1Acn::Types::Real &type) override;
+    void visit(const Asn1Acn::Types::Real &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::LabelType
+     * @brief Visit Asn1Acn::Types::LabelType
      *
      * @param type label type value
      */
-    void visit(const ::Asn1Acn::Types::LabelType &type) override;
+    void visit(const Asn1Acn::Types::LabelType &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::Integer
+     * @brief Visit Asn1Acn::Types::Integer
      *
      * @param type integer value
      */
-    void visit(const ::Asn1Acn::Types::Integer &type) override;
+    void visit(const Asn1Acn::Types::Integer &type) override;
     /**
-     * @brief Visit ::Asn1Acn::Types::UserdefinedType
+     * @brief Visit Asn1Acn::Types::UserdefinedType
      *
      * @param type user defined type value
      */
-    void visit(const ::Asn1Acn::Types::UserdefinedType &type) override;
+    void visit(const Asn1Acn::Types::UserdefinedType &type) override;
 
 private:
-    void createValueGenerationInline(::promela::model::Sequence sequence);
+    class InlineDefAdder final
+    {
+    public:
+        static const QString lengthMemberName;
+        static const QString octetGeneratorName;
+        static const QString ia5StringGeneratorName;
+
+        static void addRangedIntegerGeneratorToModel(
+                const QString &inlineName, model::PromelaModel &model, long minSize, long maxSize);
+
+        static Expression getValueLenghtMinusConstAsExpression(const QString &valueVariableName, int x);
+    };
+
+    auto createValueGenerationInline(model::Sequence sequence) -> void;
+    auto getAsnSequenceComponentType(Asn1Acn::AsnSequenceComponent *component) -> Asn1Acn::Types::Type *;
+    auto getChoiceComponentType(Asn1Acn::Types::ChoiceAlternative *component) -> Asn1Acn::Types::Type *;
+    auto getSequenceComponentTypeName(const Asn1Acn::AsnSequenceComponent &asnComponent, const QString &sequenceName)
+            -> QString;
+    auto getChoiceComponentTypeName(const Asn1Acn::Types::ChoiceAlternative &choiceComponent, const QString &choiceName)
+            -> QString;
+    auto generateAsnSequenceComponentInlineCall(Asn1Acn::AsnSequenceComponent *asnSequenceComponent,
+            const QString &argumentName) -> std::unique_ptr<model::ProctypeElement>;
+    auto modelContainsInlineGenerator(const QString &inlineGeneratorName) -> bool;
+    auto isEmbeddedType(const Asn1Acn::Types::Type &type) -> bool;
+    auto getInlineGeneratorName(const QString &typeName) -> QString;
+    auto getInlineArgumentName() -> QString;
 
 private:
-    ::promela::model::PromelaModel &m_promelaModel;
-    const QString m_name;
-    const bool m_enhancedSpinSupport;
+    model::PromelaModel &m_promelaModel;
+    QString m_name;
 };
-}
+
+} // namespace promela::translator

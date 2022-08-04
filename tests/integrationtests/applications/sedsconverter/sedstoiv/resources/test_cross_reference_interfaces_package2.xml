@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DataSheet xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/Package2">
+    <DeclaredInterfaceSet>
+      <Interface name="ChildInterface">
+      <BaseInterfaceSet>
+        <Interface type="com/n7space/Package3/ParentInterface">
+          <GenericTypeMapSet>
+            <GenericTypeMap name="GenericType" type="com/n7space/Package3/MappedItem" />
+          </GenericTypeMapSet>
+        </Interface>
+      </BaseInterfaceSet>
+      <ParameterSet>
+        <Parameter name="BaseParam" type="com/n7space/Package3/ParamItem" mode="sync" readOnly="true"/>
+      </ParameterSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+  </Package>
+</DataSheet>
+

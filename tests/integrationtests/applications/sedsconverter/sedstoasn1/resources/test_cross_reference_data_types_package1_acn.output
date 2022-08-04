@@ -1,0 +1,29 @@
+COM-N7SPACE-PACKAGE1 DEFINITIONS ::= BEGIN
+BasicArray1D []
+ArrayWithIndexDataRef []
+BasicContainer []
+{
+    realization []
+    {
+        realizationBasicContainer []
+        {
+            fieldA [],
+            fieldB [],
+            fieldC [],
+            lengthEntry COM-N7SPACE-PACKAGE2.LengthItem [],
+            listEntry [size lengthEntry]
+        },
+        realizationChildContainer []
+    }
+}
+ChildContainer []
+{
+    fieldA [],
+    fieldB [],
+    fieldC [],
+    lengthEntry COM-N7SPACE-PACKAGE2.LengthItem [],
+    listEntry [size lengthEntry]
+}
+SubRangeData [size 8, encoding pos-int, endianness big]
+END
+

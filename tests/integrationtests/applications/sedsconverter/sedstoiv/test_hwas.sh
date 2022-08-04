@@ -4,7 +4,7 @@ set -euo pipefail
 
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 AADL_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/aadlconverter
-UPDATE_DATAVIEW="asn2aadlPlus -f output.asn DataView.aadl -aadlv2"
+UPDATE_DATAVIEW="asn2aadlPlus -f dataview-uniq.asn DataView.aadl -aadlv2"
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
 TEST_OUTPUT_DIR=output
@@ -17,17 +17,12 @@ mkdir $TEST_OUTPUT_DIR
 # Translate
 $SEDS_CONVERTER --from SEDS --to InterfaceView --aux-models ASN.1 --skip-validation -i resources/test_hwas.xml \
   --out $TEST_OUTPUT_DIR/interfaceview.xml --iv-config resources/config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/
-# Setup additional data
-cp $TEST_OUTPUT_DIR/COM-N7SPACE-HWAS.asn $TEST_OUTPUT_DIR/output.asn
-# Remove output ACN to avoid conflicts between the existing one and the ASN.1 file
-# This cannot be replaced due to a reported bug in SEDS -> ASN.1 conversion
-rm -f $TEST_OUTPUT_DIR/output.acn
-# Rename the module to avoid naming conflicts
-sed -i 's/COM-N7SPACE-HWAS/OUTPUT-DATAVIEW/g' $TEST_OUTPUT_DIR/output.asn
-# Change implementation language to C
-sed -i 's/language="SDL"/language="C"/g' $TEST_OUTPUT_DIR/interfaceview.xml
 
 cd $TEST_OUTPUT_DIR
+
+# Merge ASN files
+sed -e '$s/$/\n/' -s COM-N7SPACE-HWAS.asn COM-N7SPACE-HWAS-HWAS.asn > dataview-uniq.asn
+sed -e '$s/$/\n/' -s COM-N7SPACE-HWAS.acn COM-N7SPACE-HWAS-HWAS.acn > dataview-uniq.acn
 
 # Execute commands in chain to make sure that the generated interface view matches
 # the reference and allows to succesfully generate derived artefacts

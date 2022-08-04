@@ -20,6 +20,7 @@
 #include "datatypesdependencyresolver.h"
 
 #include <algorithm>
+#include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/types/arraydatatype.h>
 #include <seds/SedsModel/types/binarydatatype.h>
 #include <seds/SedsModel/types/booleandatatype.h>
@@ -30,6 +31,10 @@
 #include <seds/SedsModel/types/stringdatatype.h>
 #include <seds/SedsModel/types/subrangedatatype.h>
 #include <unordered_map>
+
+using conversion::translator::NotDagException;
+using conversion::translator::TranslationException;
+using conversion::translator::UndeclaredDataTypeException;
 
 namespace conversion::asn1::translator {
 
@@ -63,7 +68,7 @@ void DataTypesDependencyResolver::visit(const seds::model::DataType *dataType)
     }
 
     if (isTemporarilyMarked(dataType)) {
-        throw NotDagException();
+        throw NotDagException(dataTypeNameStr(*dataType));
     }
 
     markTemporary(dataType);
@@ -81,13 +86,22 @@ void DataTypesDependencyResolver::visit(const seds::model::DataType *dataType)
 void DataTypesDependencyResolver::visitArray(const seds::model::ArrayDataType &arrayDataType)
 {
     const auto &itemDataTypeRef = arrayDataType.type();
-    const auto *itemDataType = findDataType(itemDataTypeRef);
 
+    if (itemDataTypeRef.packageStr().has_value()) {
+        return;
+    }
+
+    const auto *itemDataType = findDataType(itemDataTypeRef.nameStr());
     visit(itemDataType);
 
     for (const auto &dimension : arrayDataType.dimensions()) {
-        if (dimension.indexTypeRef()) {
-            const auto *indexType = findDataType(*dimension.indexTypeRef());
+        const auto &indexTypeRef = dimension.indexTypeRef();
+        if (indexTypeRef) {
+            if (indexTypeRef->packageStr()) {
+                return;
+            }
+
+            const auto *indexType = findDataType(indexTypeRef->nameStr());
             visit(indexType);
         }
     }
@@ -95,14 +109,31 @@ void DataTypesDependencyResolver::visitArray(const seds::model::ArrayDataType &a
 
 void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDataType &containerDataType)
 {
+    const auto &baseTypeRef = containerDataType.baseType();
+    if (baseTypeRef) {
+        if (baseTypeRef->packageStr().has_value()) {
+            auto errorMessage = QString("Cross-package reference inheritance in type \"%1\" is not supported because "
+                                        "of the ASN.1 limitations")
+                                        .arg(containerDataType.nameStr());
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        const auto *baseType = findDataType(baseTypeRef->nameStr());
+        visit(baseType);
+    }
+
     const auto visitor = [this](auto &&entry) {
         using T = std::decay_t<decltype(entry)>;
         if constexpr (std::is_same_v<T, seds::model::PaddingEntry>) {
             return;
         } else {
-            const auto &entryDataTypeRef = entry.type();
-            const auto *entryDataType = findDataType(entryDataTypeRef);
+            const auto &entryTypeRef = entry.type();
 
+            if (entryTypeRef.packageStr().has_value()) {
+                return;
+            }
+
+            const auto *entryDataType = findDataType(entryTypeRef.nameStr());
             visit(entryDataType);
         }
     };
@@ -113,19 +144,12 @@ void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDat
     for (const auto &containerTrailerEntry : containerDataType.trailerEntries()) {
         std::visit(visitor, containerTrailerEntry);
     }
-
-    const auto &baseTypeRef = containerDataType.baseType();
-    if (baseTypeRef) {
-        const auto *baseType = findDataType(*baseTypeRef);
-
-        visit(baseType);
-    }
 }
 
-const seds::model::DataType *DataTypesDependencyResolver::findDataType(const seds::model::DataTypeRef &dataTypeRef)
+const seds::model::DataType *DataTypesDependencyResolver::findDataType(const QString &dataTypeName)
 {
     auto result = std::find_if(m_dataTypes->begin(), m_dataTypes->end(),
-            [&dataTypeRef](const auto *dataType) { return dataTypeNameStr(*dataType) == dataTypeRef.nameStr(); });
+            [&dataTypeName](const auto *dataType) { return dataTypeNameStr(*dataType) == dataTypeName; });
 
     if (result != m_dataTypes->end()) {
         return *result;
@@ -133,14 +157,14 @@ const seds::model::DataType *DataTypesDependencyResolver::findDataType(const sed
 
     if (m_globalDataTypes) {
         result = std::find_if(m_globalDataTypes->begin(), m_globalDataTypes->end(),
-                [&dataTypeRef](const auto *dataType) { return dataTypeNameStr(*dataType) == dataTypeRef.nameStr(); });
+                [&dataTypeName](const auto *dataType) { return dataTypeNameStr(*dataType) == dataTypeName; });
 
         if (result != m_globalDataTypes->end()) {
             return *result;
         }
     }
 
-    throw UndeclaredDataTypeException(dataTypeRef.nameStr());
+    throw UndeclaredDataTypeException(dataTypeName);
     return nullptr;
 }
 
@@ -170,16 +194,6 @@ bool DataTypesDependencyResolver::isPermanentlyMarked(const seds::model::DataTyp
     }
 
     return m_marks.at(dataType) == MarkType::Permanent;
-}
-
-NotDagException::NotDagException()
-    : ConversionException("Data types doesn't make a DAG")
-{
-}
-
-UndeclaredDataTypeException::UndeclaredDataTypeException(const QString &dataTypeName)
-    : ConversionException(QString("Undeclared data type '%1'").arg(dataTypeName))
-{
 }
 
 } // namespace conversion::asn1::translator

@@ -19,6 +19,10 @@
 
 #include "sdlstatebuilder.h"
 
+using sdl::ContinuousSignal;
+using sdl::Input;
+using sdl::State;
+
 namespace tests::common {
 
 SdlStateBuilder::SdlStateBuilder(QString name)

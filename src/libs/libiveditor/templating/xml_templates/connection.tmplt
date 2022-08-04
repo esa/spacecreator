@@ -4,6 +4,8 @@ The following tags are available in this sub-template:
 conn              : Instance of connection (provided by a top level template)
 conn.source       :   |_ Name of source object
 conn.target       :   |_ Name of target object
+conn.sourcePath   :   |_ Full path of source object
+conn.targetPath   :   |_ Full path of target object
 conn.siName       :   |_ Name of source interface
 conn.tiName       :   |_ Name of target interface
 conn.siIsRequired :   |_ Whether source interface is required

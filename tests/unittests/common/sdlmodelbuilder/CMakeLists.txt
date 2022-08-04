@@ -1,31 +1,29 @@
 project(SdlModelBuilder VERSION 1.0.0 LANGUAGES CXX)
 
-set(SOURCES sdlanswerbuilder.cpp
-            sdldecisionbuilder.cpp
-            sdlmodelbuilder.cpp
-            sdlinputbuilder.cpp
-            sdloutputbuilder.cpp
-            sdlprocedurebuilder.cpp
-            sdlprocedurecallbuilder.cpp
-            sdlprocessbuilder.cpp
-            sdlstatebuilder.cpp
-            sdlstatemachinebuilder.cpp
-            sdltaskbuilder.cpp
-            sdltransitionbuilder.cpp
-            )
-set(INCLUDES sdlanswerbuilder.h
-             sdldecisionbuilder.h
-             sdlmodelbuilder.h
-             sdlinputbuilder.h
-             sdloutputbuilder.cpp
-             sdlprocedurebuilder.h
-             sdlprocedurecallbuilder.h
-             sdlprocessbuilder.h
-             sdlstatebuilder.h
-             sdlstatemachinebuilder.h
-             sdltaskbuilder.h
-             sdltransitionbuilder.h
-             )
+set(SOURCES     sdlanswerbuilder.cpp
+                sdldecisionbuilder.cpp
+                sdlmodelbuilder.cpp
+                sdlinputbuilder.cpp
+                sdloutputbuilder.cpp
+                sdlprocedurebuilder.cpp
+                sdlprocedurecallbuilder.cpp
+                sdlprocessbuilder.cpp
+                sdlstatebuilder.cpp
+                sdlstatemachinebuilder.cpp
+                sdltaskbuilder.cpp
+                sdltransitionbuilder.cpp)
+set(INCLUDES    sdlanswerbuilder.h
+                sdldecisionbuilder.h
+                sdlmodelbuilder.h
+                sdlinputbuilder.h
+                sdloutputbuilder.cpp
+                sdlprocedurebuilder.h
+                sdlprocedurecallbuilder.h
+                sdlprocessbuilder.h
+                sdlstatebuilder.h
+                sdlstatemachinebuilder.h
+                sdltaskbuilder.h
+                sdltransitionbuilder.h)
 
 add_library(SdlModelBuilder STATIC)
 target_sources(SdlModelBuilder

@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021 - 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -31,6 +31,7 @@
 #include <asn1library/asn1/types/choice.h>
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/ia5string.h>
+#include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/octetstring.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/sequenceof.h>
@@ -44,6 +45,7 @@
 using Asn1Acn::AsnSequenceComponent;
 using Asn1Acn::BitStringValue;
 using Asn1Acn::Definitions;
+using Asn1Acn::EnumValue;
 using Asn1Acn::IntegerValue;
 using Asn1Acn::OctetStringValue;
 using Asn1Acn::Range;
@@ -58,6 +60,7 @@ using Asn1Acn::Types::ChoiceAlternative;
 using Asn1Acn::Types::Enumerated;
 using Asn1Acn::Types::EnumeratedItem;
 using Asn1Acn::Types::IA5String;
+using Asn1Acn::Types::Integer;
 using Asn1Acn::Types::OctetString;
 using Asn1Acn::Types::Sequence;
 using Asn1Acn::Types::SequenceOf;
@@ -66,6 +69,9 @@ using Asn1Acn::Types::TypeFactory;
 using Asn1Acn::Types::UserdefinedType;
 using promela::model::Assignment;
 using promela::model::BasicType;
+using promela::model::BinaryExpression;
+using promela::model::Conditional;
+using promela::model::Constant;
 using promela::model::Declaration;
 using promela::model::ForLoop;
 using promela::model::InlineCall;
@@ -76,6 +82,7 @@ using promela::model::TypeAlias;
 using promela::model::Utype;
 using promela::model::UtypeRef;
 using promela::model::ValueDefinition;
+using promela::model::VariableRef;
 using promela::translator::Asn1NodeVisitor;
 using promela::translator::PromelaTypeSorter;
 
@@ -91,6 +98,9 @@ void tst_Asn1ToPromelaTranslator::testBasicTypes()
 
     {
         auto integerType = TypeFactory::createBuiltinType("INTEGER");
+        dynamic_cast<Integer *>(integerType.get())
+                ->constraints()
+                .append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
         auto myIntegerAssignment = std::make_unique<TypeAssignment>(
                 QStringLiteral("MyInteger"), QStringLiteral("MyIntegerT"), SourceLocation(), std::move(integerType));
         model->addType(std::move(myIntegerAssignment));
@@ -149,35 +159,60 @@ void tst_Asn1ToPromelaTranslator::testBasicTypes()
     QVERIFY(std::holds_alternative<BasicType>(expectedNull.getType()));
     QCOMPARE(std::get<BasicType>(expectedNull.getType()), BasicType::BIT);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 4);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 6);
 
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyInteger_assign_value");
+        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyInteger_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
-        QVERIFY(std::holds_alternative<Assignment>(inlineDef->getSequence().getContent().front()->getValue()));
+
+        const auto &sequence = inlineDef->getSequence();
+        QCOMPARE(sequence.getContent().size(), 2);
+
+        const auto assignment = findProctypeElement<Assignment>(sequence, 0);
+        QVERIFY(assignment != nullptr);
+
+        const auto rangeCheckCall = findProctypeElement<InlineCall>(sequence, 1);
+        QVERIFY(rangeCheckCall != nullptr);
     }
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyReal_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
-        QVERIFY(std::holds_alternative<Assignment>(inlineDef->getSequence().getContent().front()->getValue()));
+
+        const auto &sequence = inlineDef->getSequence();
+        QCOMPARE(sequence.getContent().size(), 2);
+
+        const auto assignment = findProctypeElement<Assignment>(sequence, 0);
+        QVERIFY(assignment != nullptr);
+
+        const auto rangeCheckCall = findProctypeElement<InlineCall>(sequence, 1);
+        QVERIFY(rangeCheckCall != nullptr);
     }
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyBoolean_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
-        QVERIFY(std::holds_alternative<Assignment>(inlineDef->getSequence().getContent().front()->getValue()));
+
+        const auto &sequence = inlineDef->getSequence();
+        QCOMPARE(sequence.getContent().size(), 2);
+
+        const auto assignment = findProctypeElement<Assignment>(sequence, 0);
+        QVERIFY(assignment != nullptr);
+
+        const auto rangeCheckCall = findProctypeElement<InlineCall>(sequence, 1);
+        QVERIFY(rangeCheckCall != nullptr);
     }
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyNull_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
-        QVERIFY(std::holds_alternative<Skip>(inlineDef->getSequence().getContent().front()->getValue()));
+
+        const auto &sequence = inlineDef->getSequence();
+        QCOMPARE(sequence.getContent().size(), 1);
+
+        const auto skip = findProctypeElement<Skip>(sequence, 0);
+        QVERIFY(skip != nullptr);
     }
 }
 
@@ -189,6 +224,8 @@ void tst_Asn1ToPromelaTranslator::testEnumerated()
     type->addItem(EnumeratedItem(0, "zero", 0));
     type->addItem(EnumeratedItem(1, "one", 1));
     type->addItem(EnumeratedItem(2, "infinity", 100));
+
+    type->constraints().append(RangeConstraint<EnumValue>::create({ "zero" }));
 
     auto typeAssignment = std::make_unique<TypeAssignment>(
             QStringLiteral("MyType"), QStringLiteral("MyTypeT"), SourceLocation(), std::move(type));
@@ -223,13 +260,20 @@ void tst_Asn1ToPromelaTranslator::testEnumerated()
     QCOMPARE(expectedInfinity.getName(), "MyType_infinity");
     QCOMPARE(expectedInfinity.getValue(), 100);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 1);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 2);
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
+        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
-        QVERIFY(std::holds_alternative<Assignment>(inlineDef->getSequence().getContent().front()->getValue()));
+
+        const auto &sequence = inlineDef->getSequence();
+        QCOMPARE(sequence.getContent().size(), 2);
+
+        const auto assignment = findProctypeElement<Assignment>(sequence, 0);
+        QVERIFY(assignment != nullptr);
+
+        const auto rangeCheckCall = findProctypeElement<InlineCall>(sequence, 1);
+        QVERIFY(rangeCheckCall != nullptr);
     }
 }
 
@@ -275,20 +319,28 @@ void tst_Asn1ToPromelaTranslator::testVariableBitString()
     QVERIFY(expectedLength.getType().isBasicType());
     QCOMPARE(expectedLength.getType().getBasicType(), BasicType::INT);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 1);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 2);
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
+        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 3);
-        const Declaration *decl = findProctypeElement<Declaration>(inlineDef->getSequence(), 0);
+
+        const auto &sequence = inlineDef->getSequence();
+        QCOMPARE(sequence.getContent().size(), 4);
+
+        const auto sizeCheckCall = findProctypeElement<InlineCall>(sequence, 0);
+        QVERIFY(sizeCheckCall != nullptr);
+
+        const auto decl = findProctypeElement<Declaration>(sequence, 1);
         QVERIFY(decl != nullptr);
-        const ForLoop *loop = findProctypeElement<ForLoop>(inlineDef->getSequence(), 1);
+
+        const auto loop = findProctypeElement<ForLoop>(sequence, 2);
         QVERIFY(loop != nullptr);
         QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstValue(), 0);
-        QCOMPARE(loop->getLastValue(), EXPECTED_SIZE - 1);
-        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 2);
+        QCOMPARE(loop->getFirstIntValue(), 0);
+        QCOMPARE(loop->getLastIntValue(), EXPECTED_SIZE - 1);
+
+        const auto assignment = findProctypeElement<Assignment>(sequence, 3);
         QVERIFY(assignment != nullptr);
     }
 }
@@ -341,8 +393,8 @@ void tst_Asn1ToPromelaTranslator::testFixedBitString()
         const ForLoop *loop = findProctypeElement<ForLoop>(inlineDef->getSequence(), 1);
         QVERIFY(loop != nullptr);
         QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstValue(), 0);
-        QCOMPARE(loop->getLastValue(), EXPECTED_SIZE - 1);
+        QCOMPARE(loop->getFirstIntValue(), 0);
+        QCOMPARE(loop->getLastIntValue(), EXPECTED_SIZE - 1);
     }
 }
 
@@ -387,20 +439,28 @@ void tst_Asn1ToPromelaTranslator::testVariableOctetString()
     QCOMPARE(expectedLength.getName(), "length");
     QVERIFY(expectedLength.getType().isBasicType());
     QCOMPARE(expectedLength.getType().getBasicType(), BasicType::INT);
-    QCOMPARE(promelaModel.getInlineDefs().size(), 1);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 2);
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
+        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 3);
-        const Declaration *decl = findProctypeElement<Declaration>(inlineDef->getSequence(), 0);
+
+        const auto &sequence = inlineDef->getSequence();
+        QCOMPARE(sequence.getContent().size(), 4);
+
+        const auto sizeCheckCall = findProctypeElement<InlineCall>(sequence, 0);
+        QVERIFY(sizeCheckCall != nullptr);
+
+        const auto decl = findProctypeElement<Declaration>(sequence, 1);
         QVERIFY(decl != nullptr);
-        const ForLoop *loop = findProctypeElement<ForLoop>(inlineDef->getSequence(), 1);
+
+        const auto loop = findProctypeElement<ForLoop>(sequence, 2);
         QVERIFY(loop != nullptr);
         QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstValue(), 0);
-        QCOMPARE(loop->getLastValue(), EXPECTED_SIZE - 1);
-        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 2);
+        QCOMPARE(loop->getFirstIntValue(), 0);
+        QCOMPARE(loop->getLastIntValue(), EXPECTED_SIZE - 1);
+
+        const auto assignment = findProctypeElement<Assignment>(sequence, 3);
         QVERIFY(assignment != nullptr);
     }
 }
@@ -453,8 +513,8 @@ void tst_Asn1ToPromelaTranslator::testFixedOctetString()
         const ForLoop *loop = findProctypeElement<ForLoop>(inlineDef->getSequence(), 1);
         QVERIFY(loop != nullptr);
         QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstValue(), 0);
-        QCOMPARE(loop->getLastValue(), EXPECTED_SIZE - 1);
+        QCOMPARE(loop->getFirstIntValue(), 0);
+        QCOMPARE(loop->getLastIntValue(), EXPECTED_SIZE - 1);
     }
 }
 
@@ -500,20 +560,28 @@ void tst_Asn1ToPromelaTranslator::testVariableIA5String()
     QVERIFY(expectedLength.getType().isBasicType());
     QCOMPARE(expectedLength.getType().getBasicType(), BasicType::INT);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 1);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 2);
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
+        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 3);
-        const Declaration *decl = findProctypeElement<Declaration>(inlineDef->getSequence(), 0);
+
+        const auto &sequence = inlineDef->getSequence();
+        QCOMPARE(sequence.getContent().size(), 4);
+
+        const auto sizeCheckCall = findProctypeElement<InlineCall>(sequence, 0);
+        QVERIFY(sizeCheckCall != nullptr);
+
+        const auto decl = findProctypeElement<Declaration>(sequence, 1);
         QVERIFY(decl != nullptr);
-        const ForLoop *loop = findProctypeElement<ForLoop>(inlineDef->getSequence(), 1);
+
+        const auto loop = findProctypeElement<ForLoop>(sequence, 2);
         QVERIFY(loop != nullptr);
         QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstValue(), 0);
-        QCOMPARE(loop->getLastValue(), EXPECTED_SIZE - 1);
-        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 2);
+        QCOMPARE(loop->getFirstIntValue(), 0);
+        QCOMPARE(loop->getLastIntValue(), EXPECTED_SIZE - 1);
+
+        const auto assignment = findProctypeElement<Assignment>(sequence, 3);
         QVERIFY(assignment != nullptr);
     }
 }
@@ -566,8 +634,8 @@ void tst_Asn1ToPromelaTranslator::testFixedIA5String()
         const ForLoop *loop = findProctypeElement<ForLoop>(inlineDef->getSequence(), 1);
         QVERIFY(loop != nullptr);
         QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstValue(), 0);
-        QCOMPARE(loop->getLastValue(), EXPECTED_SIZE - 1);
+        QCOMPARE(loop->getFirstIntValue(), 0);
+        QCOMPARE(loop->getLastIntValue(), EXPECTED_SIZE - 1);
     }
 }
 
@@ -575,9 +643,11 @@ void tst_Asn1ToPromelaTranslator::testChoice()
 {
     auto model = createModel();
     auto type = std::make_unique<Choice>();
+
+    auto ch1Type = TypeFactory::createBuiltinType(QStringLiteral("INTEGER"));
+    dynamic_cast<Integer *>(ch1Type.get())->constraints().append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
     type->addComponent(std::make_unique<ChoiceAlternative>(QStringLiteral("ch1"), QStringLiteral(""),
-            QStringLiteral(""), QStringLiteral(""), QStringLiteral(""), SourceLocation(),
-            TypeFactory::createBuiltinType(QStringLiteral("INTEGER"))));
+            QStringLiteral(""), QStringLiteral(""), QStringLiteral(""), SourceLocation(), std::move(ch1Type)));
 
     type->addComponent(std::make_unique<ChoiceAlternative>(QStringLiteral("ch2"), QStringLiteral(""),
             QStringLiteral(""), QStringLiteral(""), QStringLiteral(""), SourceLocation(),
@@ -595,21 +665,9 @@ void tst_Asn1ToPromelaTranslator::testChoice()
     QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
     QCOMPARE(promelaModel.getUtypes().size(), 2);
     QCOMPARE(promelaModel.getTypeAliases().size(), 2);
-    QCOMPARE(promelaModel.getValueDefinitions().size(), 3);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 5);
 
-    const Utype &expectedDataUtype = promelaModel.getUtypes().at(0);
-    QCOMPARE(expectedDataUtype.getName(), "MyType_data");
-    QVERIFY(expectedDataUtype.isUnionType());
-
-    QCOMPARE(expectedDataUtype.getFields().size(), 2);
-    QCOMPARE(expectedDataUtype.getFields().at(0).getName(), "ch1");
-    QVERIFY(expectedDataUtype.getFields().at(0).getType().isUtypeReference());
-    QCOMPARE(expectedDataUtype.getFields().at(0).getType().getUtypeReference().getName(), "MyType_ch1");
-    QCOMPARE(expectedDataUtype.getFields().at(1).getName(), "ch2");
-    QVERIFY(expectedDataUtype.getFields().at(1).getType().isUtypeReference());
-    QCOMPARE(expectedDataUtype.getFields().at(1).getType().getUtypeReference().getName(), "MyType_ch2");
-
-    const Utype &expectedUtype = promelaModel.getUtypes().at(1);
+    const Utype &expectedUtype = promelaModel.getUtypes().at(0);
     QCOMPARE(expectedUtype.getName(), "MyType");
     QVERIFY(!expectedUtype.isUnionType());
     QCOMPARE(expectedUtype.getFields().size(), 2);
@@ -622,39 +680,68 @@ void tst_Asn1ToPromelaTranslator::testChoice()
     QVERIFY(expectedUtype.getFields().at(1).getType().isBasicType());
     QCOMPARE(expectedUtype.getFields().at(1).getType().getBasicType(), BasicType::INT);
 
+    const Utype &expectedDataUtype = promelaModel.getUtypes().at(1);
+    QCOMPARE(expectedDataUtype.getName(), "MyType_data");
+    QVERIFY(expectedDataUtype.isUnionType());
+
+    QCOMPARE(expectedDataUtype.getFields().size(), 2);
+    QCOMPARE(expectedDataUtype.getFields().at(0).getName(), "ch1");
+    QVERIFY(expectedDataUtype.getFields().at(0).getType().isUtypeReference());
+    QCOMPARE(expectedDataUtype.getFields().at(0).getType().getUtypeReference().getName(), "MyType_ch1");
+    QCOMPARE(expectedDataUtype.getFields().at(1).getName(), "ch2");
+    QVERIFY(expectedDataUtype.getFields().at(1).getType().isUtypeReference());
+    QCOMPARE(expectedDataUtype.getFields().at(1).getType().getUtypeReference().getName(), "MyType_ch2");
+
     QCOMPARE(promelaModel.getValueDefinitions().at(0).getName(), "MyType_NONE");
     QCOMPARE(promelaModel.getValueDefinitions().at(0).getValue(), 0);
     QCOMPARE(promelaModel.getValueDefinitions().at(1).getName(), "MyType_ch1_PRESENT");
     QCOMPARE(promelaModel.getValueDefinitions().at(1).getValue(), 1);
-    QCOMPARE(promelaModel.getValueDefinitions().at(2).getName(), "MyType_ch2_PRESENT");
-    QCOMPARE(promelaModel.getValueDefinitions().at(2).getValue(), 2);
+    QCOMPARE(promelaModel.getValueDefinitions().at(2).getName(), "Mytype_selection_ch1_PRESENT");
+    QCOMPARE(promelaModel.getValueDefinitions().at(2).getValue(), 1);
+    QCOMPARE(promelaModel.getValueDefinitions().at(3).getName(), "MyType_ch2_PRESENT");
+    QCOMPARE(promelaModel.getValueDefinitions().at(3).getValue(), 2);
+    QCOMPARE(promelaModel.getValueDefinitions().at(4).getName(), "Mytype_selection_ch2_PRESENT");
+    QCOMPARE(promelaModel.getValueDefinitions().at(4).getValue(), 2);
 
     QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "MyType_ch1");
     QCOMPARE(promelaModel.getTypeAliases().at(1).getName(), "MyType_ch2");
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 3);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 5);
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
+        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 3);
-        const InlineCall *inlineCall = findProctypeElement<InlineCall>(inlineDef->getSequence(), 0);
-        QVERIFY(inlineCall != nullptr);
-        inlineCall = findProctypeElement<InlineCall>(inlineDef->getSequence(), 1);
-        QVERIFY(inlineCall != nullptr);
-        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 2);
-        QVERIFY(assignment != nullptr);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
+
+        const auto selectionAssignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
+        QVERIFY(selectionAssignment != nullptr);
+
+        const auto assignConditional = findProctypeElement<Conditional>(inlineDef->getSequence(), 1);
+        QVERIFY(assignConditional != nullptr);
+        QCOMPARE(assignConditional->getAlternatives().size(), 3);
     }
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_ch1_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
     }
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_ch2_assign_value");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 2);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
+        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
+        QVERIFY(assignment != nullptr);
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_ch1_range_check");
+        QVERIFY(inlineDef != nullptr);
+    }
+    {
+        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "Mytype_selection_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
@@ -667,12 +754,15 @@ void tst_Asn1ToPromelaTranslator::testSequence()
 {
     auto model = createModel();
     auto type = std::make_unique<Sequence>();
+    auto field1Type = TypeFactory::createBuiltinType(QStringLiteral("INTEGER"));
+    dynamic_cast<Integer *>(field1Type.get())->constraints().append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
     auto component1 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"), false,
-            std::nullopt, QStringLiteral(""), SourceLocation(),
-            TypeFactory::createBuiltinType(QStringLiteral("INTEGER")));
+            std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
+            std::move(field1Type));
     type->addComponent(std::move(component1));
     auto component2 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field2"), QStringLiteral("field2"), false,
-            std::nullopt, QStringLiteral(""), SourceLocation(), TypeFactory::createBuiltinType(QStringLiteral("REAL")));
+            std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
+            TypeFactory::createBuiltinType(QStringLiteral("REAL")));
     type->addComponent(std::move(component2));
     auto typeAssignment = std::make_unique<TypeAssignment>(
             QStringLiteral("MyType"), QStringLiteral("MyTypeT"), SourceLocation(), std::move(type));
@@ -713,7 +803,7 @@ void tst_Asn1ToPromelaTranslator::testSequence()
     QVERIFY(std::holds_alternative<BasicType>(expectedAlias2.getType()));
     QCOMPARE(std::get<BasicType>(expectedAlias2.getType()), BasicType::FLOAT);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 3);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 4);
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
@@ -728,7 +818,7 @@ void tst_Asn1ToPromelaTranslator::testSequence()
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field1_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
     }
@@ -736,7 +826,7 @@ void tst_Asn1ToPromelaTranslator::testSequence()
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field2_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
     }
@@ -746,12 +836,15 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
 {
     auto model = createModel();
     auto type = std::make_unique<Sequence>();
+    auto field1Type = TypeFactory::createBuiltinType(QStringLiteral("INTEGER"));
+    dynamic_cast<Integer *>(field1Type.get())->constraints().append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
     auto component1 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"), true,
-            std::nullopt, QStringLiteral(""), SourceLocation(),
-            TypeFactory::createBuiltinType(QStringLiteral("INTEGER")));
+            std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
+            std::move(field1Type));
     type->addComponent(std::move(component1));
     auto component2 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field2"), QStringLiteral("field2"), true,
-            std::nullopt, QStringLiteral(""), SourceLocation(), TypeFactory::createBuiltinType(QStringLiteral("REAL")));
+            std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
+            TypeFactory::createBuiltinType(QStringLiteral("REAL")));
     type->addComponent(std::move(component2));
     auto typeAssignment = std::make_unique<TypeAssignment>(
             QStringLiteral("MyType"), QStringLiteral("MyTypeT"), SourceLocation(), std::move(type));
@@ -808,7 +901,7 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
     QVERIFY(std::holds_alternative<BasicType>(expectedAlias2.getType()));
     QCOMPARE(std::get<BasicType>(expectedAlias2.getType()), BasicType::FLOAT);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 3);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 4);
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
@@ -820,14 +913,73 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
         QVERIFY(inlineCall != nullptr);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 2);
         QVERIFY(assignment != nullptr);
+        {
+            QCOMPARE(assignment->getVariableRef().getElements().size(), 3);
+            auto iter = assignment->getVariableRef().getElements().begin();
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "dst");
+            ++iter;
+
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "exist");
+            ++iter;
+
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "field1");
+
+            QVERIFY(std::holds_alternative<VariableRef>(assignment->getExpression().getContent()));
+            const VariableRef &rhs = std::get<VariableRef>(assignment->getExpression().getContent());
+            QCOMPARE(rhs.getElements().size(), 3);
+            iter = rhs.getElements().begin();
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "src");
+            ++iter;
+
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "exist");
+            ++iter;
+
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "field1");
+        }
+
         assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 3);
         QVERIFY(assignment != nullptr);
+        {
+            QCOMPARE(assignment->getVariableRef().getElements().size(), 3);
+            auto iter = assignment->getVariableRef().getElements().begin();
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "dst");
+            ++iter;
+
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "exist");
+            ++iter;
+
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "field2");
+
+            QVERIFY(std::holds_alternative<VariableRef>(assignment->getExpression().getContent()));
+            const VariableRef &rhs = std::get<VariableRef>(assignment->getExpression().getContent());
+            QCOMPARE(rhs.getElements().size(), 3);
+            iter = rhs.getElements().begin();
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "src");
+            ++iter;
+
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "exist");
+            ++iter;
+
+            QVERIFY(iter->m_index.get() == nullptr);
+            QCOMPARE(iter->m_name, "field2");
+        }
     }
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field1_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
     }
@@ -835,7 +987,7 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field2_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
     }
@@ -848,19 +1000,23 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
     auto level1 = std::make_unique<Sequence>();
     auto level2 = std::make_unique<Sequence>();
 
+    auto fieldType = TypeFactory::createBuiltinType(QStringLiteral("INTEGER"));
+    dynamic_cast<Integer *>(fieldType.get())->constraints().append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
     auto level2Component = std::make_unique<AsnSequenceComponent>(QStringLiteral("field"), QStringLiteral("field"),
-            false, std::nullopt, QStringLiteral(""), SourceLocation(),
-            TypeFactory::createBuiltinType(QStringLiteral("INTEGER")));
+            false, std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
+            std::move(fieldType));
 
     level2->addComponent(std::move(level2Component));
 
     auto level1Component = std::make_unique<AsnSequenceComponent>(QStringLiteral("level2"), QStringLiteral("level2"),
-            false, std::nullopt, QStringLiteral(""), SourceLocation(), std::move(level2));
+            false, std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
+            std::move(level2));
 
     level1->addComponent(std::move(level1Component));
 
     auto level0Component = std::make_unique<AsnSequenceComponent>(QStringLiteral("level1"), QStringLiteral("level1"),
-            false, std::nullopt, QStringLiteral(""), SourceLocation(), std::move(level1));
+            false, std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
+            std::move(level1));
 
     level0->addComponent(std::move(level0Component));
 
@@ -918,7 +1074,7 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
     QVERIFY(std::holds_alternative<BasicType>(expectedAlias.getType()));
     QCOMPARE(std::get<BasicType>(expectedAlias.getType()), BasicType::INT);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 4);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 5);
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "Level0_assign_value");
         QVERIFY(inlineDef != nullptr);
@@ -948,7 +1104,7 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
                 findInline(promelaModel.getInlineDefs(), "Level0_level1_level2_field_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
     }
@@ -960,7 +1116,9 @@ void tst_Asn1ToPromelaTranslator::testVariableSequenceOf()
 
     auto model = createModel();
     auto type = std::make_unique<SequenceOf>();
-    type->setItemsType(TypeFactory::createBuiltinType("INTEGER"));
+    auto itemsType = TypeFactory::createBuiltinType(QStringLiteral("INTEGER"));
+    dynamic_cast<Integer *>(itemsType.get())->constraints().append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
+    type->setItemsType(std::move(itemsType));
     auto sizeConstraint = std::make_unique<SizeConstraint<IntegerValue>>(
             RangeConstraint<IntegerValue>::create(Range<int64_t>({ 1, EXPECTED_SIZE })));
     type->constraints().append(std::move(sizeConstraint));
@@ -989,40 +1147,69 @@ void tst_Asn1ToPromelaTranslator::testVariableSequenceOf()
     QCOMPARE(expectedData.getType().getArrayType().getSize(), EXPECTED_SIZE);
     QVERIFY(std::holds_alternative<UtypeRef>(expectedData.getType().getArrayType().getType()));
     const UtypeRef &expectedRef = std::get<UtypeRef>(expectedData.getType().getArrayType().getType());
-    QCOMPARE(expectedRef.getName(), "MyType_item");
+    QCOMPARE(expectedRef.getName(), "MyType_elem");
 
     const Declaration expectedLength = expectedUtype.getFields().at(1);
     QCOMPARE(expectedLength.getName(), "length");
     QVERIFY(expectedLength.getType().isBasicType());
     QCOMPARE(expectedLength.getType().getBasicType(), BasicType::INT);
 
-    QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "MyType_item");
+    QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "MyType_elem");
     QVERIFY(std::holds_alternative<BasicType>(promelaModel.getTypeAliases().at(0).getType()));
     QCOMPARE(std::get<BasicType>(promelaModel.getTypeAliases().at(0).getType()), BasicType::INT);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 2);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 5);
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 3);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 4);
         const Declaration *decl = findProctypeElement<Declaration>(inlineDef->getSequence(), 0);
         QVERIFY(decl != nullptr);
-        const ForLoop *loop = findProctypeElement<ForLoop>(inlineDef->getSequence(), 1);
-        QVERIFY(loop != nullptr);
-        QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstValue(), 0);
-        QCOMPARE(loop->getLastValue(), EXPECTED_SIZE - 1);
-        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 2);
+        const ForLoop *dataLoop = findProctypeElement<ForLoop>(inlineDef->getSequence(), 1);
+        QVERIFY(dataLoop != nullptr);
+        QCOMPARE(dataLoop->getType(), ForLoop::Type::RANGE);
+        QCOMPARE(dataLoop->getFirstIntValue(), 0);
+        const auto dataLoopLastExpression = std::get_if<BinaryExpression>(&dataLoop->getLastExpression().getContent());
+        QVERIFY(dataLoopLastExpression != nullptr);
+        QCOMPARE(dataLoopLastExpression->getOperator(), BinaryExpression::Operator::SUBTRACT);
+        QVERIFY(dataLoopLastExpression->getLeft() != nullptr);
+        const auto dataLoopLastExpressionLeft =
+                std::get_if<VariableRef>(&dataLoopLastExpression->getLeft()->getContent());
+        QVERIFY(dataLoopLastExpressionLeft != nullptr);
+        auto iter = dataLoopLastExpressionLeft->getElements().begin();
+        QVERIFY(iter->m_index.get() == nullptr);
+        QCOMPARE(iter->m_name, "src");
+        ++iter;
+        QVERIFY(iter->m_index.get() == nullptr);
+        QCOMPARE(iter->m_name, "length");
+        QVERIFY(dataLoopLastExpression->getRight() != nullptr);
+        const auto dataLoopLastExpressionRight =
+                std::get_if<Constant>(&dataLoopLastExpression->getRight()->getContent());
+        QVERIFY(dataLoopLastExpressionRight != nullptr);
+        QCOMPARE(dataLoopLastExpressionRight->getValue(), 1);
+        const ForLoop *zeroLoop = findProctypeElement<ForLoop>(inlineDef->getSequence(), 2);
+        QVERIFY(zeroLoop != nullptr);
+        QCOMPARE(zeroLoop->getType(), ForLoop::Type::RANGE);
+        const auto zeroLoopFirstExpression = std::get_if<VariableRef>(&zeroLoop->getFirstExpression().getContent());
+        QVERIFY(zeroLoopFirstExpression != nullptr);
+        iter = zeroLoopFirstExpression->getElements().begin();
+        QVERIFY(iter->m_index.get() == nullptr);
+        QCOMPARE(iter->m_name, "src");
+        ++iter;
+        QVERIFY(iter->m_index.get() == nullptr);
+        QCOMPARE(iter->m_name, "length");
+        QCOMPARE(zeroLoop->getLastIntValue(), EXPECTED_SIZE - 1);
+        const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 3);
         QVERIFY(assignment != nullptr);
     }
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 2);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 5);
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_item_assign_value");
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_elem_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
     }
@@ -1034,7 +1221,9 @@ void tst_Asn1ToPromelaTranslator::testFixedSequenceOf()
 
     auto model = createModel();
     auto type = std::make_unique<SequenceOf>();
-    type->setItemsType(TypeFactory::createBuiltinType("INTEGER"));
+    auto itemsType = TypeFactory::createBuiltinType(QStringLiteral("INTEGER"));
+    dynamic_cast<Integer *>(itemsType.get())->constraints().append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
+    type->setItemsType(std::move(itemsType));
     auto sizeConstraint = std::make_unique<SizeConstraint<IntegerValue>>(
             RangeConstraint<IntegerValue>::create(Range<int64_t>(EXPECTED_SIZE)));
     type->constraints().append(std::move(sizeConstraint));
@@ -1063,13 +1252,13 @@ void tst_Asn1ToPromelaTranslator::testFixedSequenceOf()
     QCOMPARE(expectedData.getType().getArrayType().getSize(), EXPECTED_SIZE);
     QVERIFY(std::holds_alternative<UtypeRef>(expectedData.getType().getArrayType().getType()));
     const UtypeRef &expectedRef = std::get<UtypeRef>(expectedData.getType().getArrayType().getType());
-    QCOMPARE(expectedRef.getName(), "MyType_item");
+    QCOMPARE(expectedRef.getName(), "MyType_elem");
 
-    QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "MyType_item");
+    QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "MyType_elem");
     QVERIFY(std::holds_alternative<BasicType>(promelaModel.getTypeAliases().at(0).getType()));
     QCOMPARE(std::get<BasicType>(promelaModel.getTypeAliases().at(0).getType()), BasicType::INT);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 2);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 4);
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
@@ -1080,18 +1269,91 @@ void tst_Asn1ToPromelaTranslator::testFixedSequenceOf()
         const ForLoop *loop = findProctypeElement<ForLoop>(inlineDef->getSequence(), 1);
         QVERIFY(loop != nullptr);
         QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstValue(), 0);
-        QCOMPARE(loop->getLastValue(), EXPECTED_SIZE - 1);
+        QCOMPARE(loop->getFirstIntValue(), 0);
+        QCOMPARE(loop->getLastIntValue(), EXPECTED_SIZE - 1);
     }
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 2);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 4);
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_item_assign_value");
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_elem_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
-        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
+    }
+}
+
+void tst_Asn1ToPromelaTranslator::testUserDefinedType()
+{
+    auto model = createModel();
+
+    {
+        auto integerType = TypeFactory::createBuiltinType("INTEGER");
+        dynamic_cast<Integer *>(integerType.get())
+                ->constraints()
+                .append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
+        auto myIntegerAssignment = std::make_unique<TypeAssignment>(
+                QStringLiteral("MyInteger"), QStringLiteral("MyIntegerT"), SourceLocation(), integerType->clone());
+        model->addType(std::move(myIntegerAssignment));
+
+        auto typeAlias = std::make_unique<UserdefinedType>("MyIntegerAlias", "");
+        typeAlias->setType(integerType->clone());
+        auto typeAliasAssignment = std::make_unique<TypeAssignment>(QStringLiteral("MyIntegerAlias"),
+                QStringLiteral("MyIntegerAliasT"), SourceLocation(), std::move(typeAlias));
+        model->addType(std::move(typeAliasAssignment));
+    }
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel, true);
+    visitor.visit(*model);
+
+    QCOMPARE(promelaModel.getMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
+    QCOMPARE(promelaModel.getUtypes().size(), 0);
+    QCOMPARE(promelaModel.getValueDefinitions().size(), 0);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 2);
+
+    const QList<TypeAlias> aliases = promelaModel.getTypeAliases();
+
+    const TypeAlias &expectedInteger = aliases.at(0);
+    QCOMPARE(expectedInteger.getName(), "MyInteger");
+    QVERIFY(std::holds_alternative<BasicType>(expectedInteger.getType()));
+    QCOMPARE(std::get<BasicType>(expectedInteger.getType()), BasicType::INT);
+
+    const TypeAlias &expectedAlias = aliases.at(1);
+    QCOMPARE(expectedAlias.getName(), "MyIntegerAlias");
+    QVERIFY(std::holds_alternative<BasicType>(expectedAlias.getType()));
+    QCOMPARE(std::get<BasicType>(expectedAlias.getType()), BasicType::INT);
+
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyInteger_assign_value");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 2);
+
+        const auto &sequence = inlineDef->getSequence();
+        QCOMPARE(sequence.getContent().size(), 2);
+
+        const auto assignment = findProctypeElement<Assignment>(sequence, 0);
+        QVERIFY(assignment != nullptr);
+
+        const auto rangeCheckCall = findProctypeElement<InlineCall>(sequence, 1);
+        QVERIFY(rangeCheckCall != nullptr);
+    }
+
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyIntegerAlias_assign_value");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 2);
+
+        const auto &sequence = inlineDef->getSequence();
+        QCOMPARE(sequence.getContent().size(), 2);
+
+        const auto assignment = findProctypeElement<Assignment>(sequence, 0);
+        QVERIFY(assignment != nullptr);
+
+        const auto rangeCheckCall = findProctypeElement<InlineCall>(sequence, 1);
+        QVERIFY(rangeCheckCall != nullptr);
     }
 }
 
@@ -1099,22 +1361,42 @@ void tst_Asn1ToPromelaTranslator::testTypeSorting()
 {
     auto model = createModel();
 
-    auto secondType = std::make_unique<Sequence>();
-    auto secondTypeComponent = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"),
-            QStringLiteral("field1"), false, std::nullopt, QStringLiteral(""), SourceLocation(),
-            std::make_unique<UserdefinedType>(QStringLiteral("MyTypeFirst"), QStringLiteral("myModule")));
+    auto secondType = std::make_unique<Sequence>("MyTypeSecond");
+
+    auto secondTypeComponentType = TypeFactory::createBuiltinType("INTEGER");
+    dynamic_cast<Integer *>(secondTypeComponentType.get())
+            ->constraints()
+            .append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
+    auto secondTypeComponentTypeAssignment = std::make_unique<TypeAssignment>(QStringLiteral("MyInteger"),
+            QStringLiteral("MyIntegerT"), SourceLocation(), secondTypeComponentType->clone());
+    model->addType(std::move(secondTypeComponentTypeAssignment));
+
+    auto secondTypeComponentTypeReference = std::make_unique<UserdefinedType>("MyIntegerAlias", "");
+    secondTypeComponentTypeReference->setType(secondTypeComponentType->clone());
+    auto secondTypeComponentTypeReferenceAssignment = std::make_unique<TypeAssignment>(
+            "MyIntegerAlias", "MyIntegerAliasT", SourceLocation(), secondTypeComponentTypeReference->clone());
+    model->addType(std::move(secondTypeComponentTypeReferenceAssignment));
+
+    auto secondTypeComponent = std::make_unique<AsnSequenceComponent>("field2", "field2", false, std::nullopt, "",
+            AsnSequenceComponent::Presence::NotSpecified, SourceLocation(), secondTypeComponentTypeReference->clone());
     secondType->addComponent(std::move(secondTypeComponent));
-    auto secondTypeAssignment = std::make_unique<TypeAssignment>(
-            QStringLiteral("MyTypeSecond"), QStringLiteral("MyTypeSecondT"), SourceLocation(), std::move(secondType));
+
+    auto secondTypeAssignment =
+            std::make_unique<TypeAssignment>("MyTypeSecond", "MyTypeSecondT", SourceLocation(), std::move(secondType));
     model->addType(std::move(secondTypeAssignment));
 
-    auto firstType = std::make_unique<Sequence>();
-    auto firstTypeComponent = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"),
-            false, std::nullopt, QStringLiteral(""), SourceLocation(),
-            TypeFactory::createBuiltinType(QStringLiteral("INTEGER")));
+    auto firstType = std::make_unique<Sequence>("MyTypeFirst");
+
+    auto firstTypeComponentType = TypeFactory::createBuiltinType("INTEGER");
+    dynamic_cast<Integer *>(firstTypeComponentType.get())
+            ->constraints()
+            .append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
+    auto firstTypeComponent = std::make_unique<AsnSequenceComponent>("field1", "field1", false, std::nullopt, "",
+            AsnSequenceComponent::Presence::NotSpecified, SourceLocation(), std::move(firstTypeComponentType));
     firstType->addComponent(std::move(firstTypeComponent));
-    auto firstTypeAssignment = std::make_unique<TypeAssignment>(
-            QStringLiteral("MyTypeFirst"), QStringLiteral("MyTypeSecondT"), SourceLocation(), std::move(firstType));
+
+    auto firstTypeAssignment =
+            std::make_unique<TypeAssignment>("MyTypeFirst", "MyTypeSecondT", SourceLocation(), std::move(firstType));
     model->addType(std::move(firstTypeAssignment));
 
     PromelaModel promelaModel;
@@ -1126,7 +1408,7 @@ void tst_Asn1ToPromelaTranslator::testTypeSorting()
 
     QCOMPARE(promelaModel.getMtypeValues().size(), 0);
     QCOMPARE(promelaModel.getNamedMtypeValues().size(), 0);
-    QCOMPARE(promelaModel.getTypeAliases().size(), 2);
+    QCOMPARE(promelaModel.getTypeAliases().size(), 4);
     QCOMPARE(promelaModel.getValueDefinitions().size(), 0);
     QCOMPARE(promelaModel.getUtypes().size(), 2);
 

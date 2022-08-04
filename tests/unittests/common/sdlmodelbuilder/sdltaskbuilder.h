@@ -22,8 +22,6 @@
 #include <memory>
 #include <sdl/SdlModel/task.h>
 
-using sdl::Task;
-
 namespace tests::common {
 
 class SdlTaskBuilder final
@@ -31,14 +29,13 @@ class SdlTaskBuilder final
 public:
     SdlTaskBuilder();
 
-    auto build() -> std::unique_ptr<Task>;
+    auto build() -> std::unique_ptr<sdl::Task>;
 
     auto withName(QString name) -> SdlTaskBuilder &;
-
     auto withContents(QString contents) -> SdlTaskBuilder &;
 
 private:
-    std::unique_ptr<Task> m_task;
+    std::unique_ptr<sdl::Task> m_task;
 };
 
 } // namespace tests::common

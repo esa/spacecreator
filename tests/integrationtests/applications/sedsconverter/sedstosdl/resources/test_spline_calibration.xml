@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="SplineCalibration">
+    <DataTypeSet>
+      <IntegerDataType name="IntegerType">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <FloatDataType name="RealType">
+        <FloatDataEncoding encodingAndPrecision="IEEE754_2008_double" sizeInBits="64" />
+        <Range>
+          <PrecisionRange>double</PrecisionRange>
+        </Range>
+      </FloatDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="CalibrationInterface">
+        <CommandSet>
+          <Command name="Tick" mode="async" />
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="Calibration">
+        <ProvidedInterfaceSet>
+          <Interface name="ComponentInterface" type="CalibrationInterface" />
+        </ProvidedInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="iterator" type="RealType" />
+            <Variable name="calibratedValue" type="RealType" />
+          </VariableSet>
+          <ActivitySet>
+            <Activity name="CalibrateActivity">
+              <Body>
+                <Iteration iteratorVariableRef="iterator">
+                  <StartAt>
+                    <Value value="-5.0" />
+                  </StartAt>
+                  <Step>
+                    <Value value="1.0" />
+                  </Step>
+                  <EndAt>
+                    <Value value="25.0" />
+                  </EndAt>
+                  <Do>
+                    <Calibration inputVariableRef="iterator" outputVariableRef="calibratedValue">
+                      <SplineCalibrator>
+                        <SplinePoint raw="1" calibrated="2" />
+                        <SplinePoint raw="5" calibrated="10" />
+                        <SplinePoint raw="10" calibrated="-20" />
+                        <SplinePoint raw="20" calibrated="40" />
+                      </SplineCalibrator>
+                    </Calibration>
+                  </Do>
+                </Iteration>
+                <Iteration iteratorVariableRef="iterator">
+                  <StartAt>
+                    <Value value="-5.0" />
+                  </StartAt>
+                  <Step>
+                    <Value value="1.0" />
+                  </Step>
+                  <EndAt>
+                    <Value value="25.0" />
+                  </EndAt>
+                  <Do>
+                    <Calibration inputVariableRef="iterator" outputVariableRef="calibratedValue">
+                      <SplineCalibrator>
+                        <SplinePoint raw="10" calibrated="-20" order="2"/>
+                        <SplinePoint raw="5" calibrated="10" order="2"/>
+                        <SplinePoint raw="1" calibrated="2" order="2"/>
+                        <SplinePoint raw="20" calibrated="40" order="2"/>
+                      </SplineCalibrator>
+                    </Calibration>
+                  </Do>
+                </Iteration>
+                <Iteration iteratorVariableRef="iterator">
+                  <StartAt>
+                    <Value value="-5.0" />
+                  </StartAt>
+                  <Step>
+                    <Value value="1.0" />
+                  </Step>
+                  <EndAt>
+                    <Value value="25.0" />
+                  </EndAt>
+                  <Do>
+                    <Calibration inputVariableRef="iterator" outputVariableRef="calibratedValue">
+                      <SplineCalibrator>
+                        <SplinePoint raw="20" calibrated="40" order="3"/>
+                        <SplinePoint raw="10" calibrated="-20" order="3"/>
+                        <SplinePoint raw="5" calibrated="10" order="3"/>
+                        <SplinePoint raw="1" calibrated="2" order="3"/>
+                      </SplineCalibrator>
+                    </Calibration>
+                  </Do>
+                </Iteration>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="CalibrationMachine">
+              <EntryState name="Idle"/>
+              <State name="DoCalibration"/>
+              <Transition fromState="Idle" toState="DoCalibration" name="Calibrate">
+                <OnCommandPrimitive interface="ComponentInterface" command="Tick" />
+                <Do activity="CalibrateActivity" />
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

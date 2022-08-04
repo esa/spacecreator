@@ -38,6 +38,7 @@
           <VariableSet>
             <Variable name="var1" type="Container" />
             <Variable name="var2" type="Container" />
+            <Variable name="var3" type="Scalar" />
           </VariableSet>
           <ActivitySet>
             <Activity name="Activity">
@@ -54,6 +55,25 @@
                 <Assignment outputVariableRef="var2.v[1]">
                   <VariableRef variableRef="var1.v[2]" />
                 </Assignment>
+                <Conditional>
+                  <Condition>
+                    <Condition>
+                      <FirstOperand variableRef="var1.a"/>
+                      <ComparisonOperator>equals</ComparisonOperator>
+                      <Value value="5"/>
+                    </Condition>
+                  </Condition>
+                  <OnConditionTrue>
+                    <Assignment outputVariableRef="var3">
+                      <Value value="1" />
+                    </Assignment>
+                  </OnConditionTrue>
+                  <OnConditionFalse>
+                    <Assignment outputVariableRef="var3">
+                      <Value value="0" />
+                    </Assignment>
+                  </OnConditionFalse>
+                </Conditional>
               </Body>
             </Activity>
           </ActivitySet>

@@ -24,7 +24,7 @@
 
 namespace promela::exporter {
 /**
- * @brief  Visitor for exporting @link{::promela::model::Declaration}
+ * @brief  Visitor for exporting @link{model::Declaration}
  */
 class DeclarationVisitor
 {
@@ -41,13 +41,13 @@ public:
      *
      * @param declaration Declaration to visit
      */
-    void visit(const ::promela::model::Declaration &declaration);
+    void visit(const model::Declaration &declaration);
 
 private:
-    void generateInitExpression(const ::promela::model::Declaration::InitExpression &initExpression);
-    void generateChannelInit(const ::promela::model::ChannelInit &channelInit);
-    void generateExpression(const ::promela::model::Expression &expression);
-    QString getVisibilityString(const ::promela::model::Declaration &declaration);
+    void generateInitExpression(const model::Declaration::InitExpression &initExpression);
+    void generateChannelInit(const model::ChannelInit &channelInit);
+    void generateExpression(const model::Expression &expression);
+    QString getVisibilityString(const model::Declaration &declaration);
 
 private:
     QTextStream &m_stream;

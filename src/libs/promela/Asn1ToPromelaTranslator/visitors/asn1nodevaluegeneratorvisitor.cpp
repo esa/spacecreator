@@ -33,11 +33,17 @@ using Asn1Acn::ValueAssignment;
 using promela::model::PromelaModel;
 
 namespace promela::translator {
-Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(
-        PromelaModel &promelaModel, bool enhancedSpinSupport, const QStringList &typeNames)
+
+Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(PromelaModel &promelaModel)
     : m_promelaModel(promelaModel)
-    , m_enhancedSpinSupport(enhancedSpinSupport)
-    , m_typeNames(typeNames)
+    , m_generateAll(true)
+{
+}
+
+Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(PromelaModel &promelaModel, QStringList typeNames)
+    : m_promelaModel(promelaModel)
+    , m_typeNames(std::move(typeNames))
+    , m_generateAll(false)
 {
 }
 
@@ -57,8 +63,8 @@ void Asn1NodeValueGeneratorVisitor::visit(const File &file)
 
 void Asn1NodeValueGeneratorVisitor::visit(const TypeAssignment &type)
 {
-    if (m_typeNames.contains(type.name())) {
-        Asn1TypeValueGeneratorVisitor typeVisitor(m_promelaModel, type.name(), m_enhancedSpinSupport);
+    if (m_generateAll || m_typeNames.contains(type.name())) {
+        Asn1TypeValueGeneratorVisitor typeVisitor(m_promelaModel, type.name());
         type.type()->accept(typeVisitor);
     }
 }

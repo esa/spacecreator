@@ -33,11 +33,49 @@ public:
     /**
      * @brief Constructor.
      *
-     * @param inputIvFilepath Path to XML interface view.
-     * @param outputDirectory Pat to output directory.
+     * @param   inputIvFilepath         Path to XML interface view.
+     * @param   outputDirectory         Path to output directory.
      */
     TmcVerifier(const QString &inputIvFilepath, const QString &outputDirectory);
 
+    /**
+     * @brief   Specify which IV functions should be treated as an environment
+     *          during model checking
+     *
+     * @param   environmentFunctions    Functions to treat as an evironment
+     */
+    void setEnvironmentFunctions(const std::vector<QString> &environmentFunctions);
+    /**
+     * @brief   Specify which IV functions shouldn't be treated as an environment
+     *          during model checking
+     *
+     * @param   keepFunctions   Functions to be treated as an evironment
+     */
+    void setKeepFunctions(const std::vector<QString> &keepFunctions);
+    /**
+     * @brief   Set global input vector length limit
+     *
+     * @param   limit   Limit to set
+     */
+    void setGlobalInputVectorLengthLimit(std::optional<QString> limit);
+    /**
+     * @brief   Set per interface input vector length limits
+     *
+     * @param   limits  Limits to set
+     */
+    void setInterfaceInputVectorLengthLimits(std::unordered_map<QString, QString> limits);
+    /**
+     * @brief   Set non-environment processes base priority
+     *
+     * @param   value   Priority to set
+     */
+    void setProcessesBasePriority(std::optional<QString> value);
+    /**
+     * @brief   Set path to the ASN.1 containing subtypes
+     *
+     * @param   filepaths    Paths to the files
+     */
+    void setSubtypesFilepaths(const std::vector<QString> &filepath);
     /**
      * @brief Add Stop Condition files to verifier.
      *
@@ -45,6 +83,16 @@ public:
      * @return true if files exist, otherwise false.
      */
     bool addStopConditionFiles(const QStringList &files);
+
+    /**
+     * @brief Attach an Observer
+     *
+     * @param observerPath Path to the observer process file
+     * @param priority Observer priority
+     * @return true if the operation succeeded, false otherwise.
+     */
+    bool attachObserver(const QString &observerPath, const uint32_t priority);
+
     /**
      * @brief Prepare the system and process formal model verification.
      *

@@ -1,0 +1,56 @@
+<InterfaceView asn1file="InputMonitoring.asn">
+<Function name="MODEL" is_type="NO" language="SDL" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="74700 39600 94700 47600"/>
+<Provided_Interface name="trigger" kind="Sporadic" layer="default" queue_size="1" stack_size="1024" miat="0" priority="1" wcet="0">
+    <Input_Parameter name="z" type="MyInteger" encoding="ACN"/>
+    <Property name="Taste::coordinates" value="74700 42300"/>
+</Provided_Interface>
+
+<Required_Interface name="action" kind="Sporadic" layer="default" queue_size="1" stack_size="1024" miat="0" priority="1" wcet="0">
+    <Input_Parameter name="y" type="MyIntegerBigger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="74700 45200"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="MMI" is_type="NO" language="GUI" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="18100 35000 44700 52200"/>
+<Provided_Interface name="action" kind="Sporadic" layer="default" queue_size="1" stack_size="1024" miat="0" priority="1" wcet="0">
+    <Input_Parameter name="y" type="MyIntegerBigger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="44700 45200"/>
+</Provided_Interface>
+
+<Required_Interface name="trigger" kind="Sporadic" layer="default" queue_size="1" stack_size="1024" miat="0" priority="1" wcet="0">
+    <Input_Parameter name="z" type="MyInteger" encoding="ACN"/>
+    <Property name="Taste::coordinates" value="44700 41500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Connection >
+    <Source func_name="MODEL" ri_name="action"/>
+    <Target func_name="MMI" pi_name="action"/>
+    <Property name="Taste::coordinates" value="74100 45200 45000 45200"/>
+</Connection>
+
+<Connection >
+    <Source func_name="MMI" ri_name="trigger"/>
+    <Target func_name="MODEL" pi_name="trigger"/>
+    <Property name="Taste::coordinates" value="45300 41500 59800 41500 74400 42300"/>
+</Connection>
+
+<Comment name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3">
+    <Property name="Taste::coordinates" value="4800 5100 46100 20700"/>
+</Comment>
+
+</InterfaceView>

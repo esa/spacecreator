@@ -103,6 +103,13 @@ target_sources(${LIB_NAME} PRIVATE
     endtoend/endtoendview.ui
     endtoend/leafdocumentsmodel.cpp
     endtoend/leafdocumentsmodel.h
+    modelchecking/modelcheckingwindow.cpp
+    modelchecking/modelcheckingwindow.h
+    modelchecking/modelcheckingwindow.ui
+    modelchecking/xmelwriter.h
+    modelchecking/xmelwriter.cpp
+    modelchecking/xmelreader.h
+    modelchecking/xmelreader.cpp
     endtoend/end2endfunctiongraphicsitem.cpp
     endtoend/end2endfunctiongraphicsitem.h
     interfacedocument.cpp
@@ -174,12 +181,18 @@ target_sources(${LIB_NAME} PRIVATE
     templating/exportableivconnectiongroup.h
     templating/exportableivfunction.cpp
     templating/exportableivfunction.h
+    templating/exportableivconnectionlayertype.cpp
+    templating/exportableivconnectionlayertype.h
     templating/exportableivinterface.cpp
     templating/exportableivinterface.h
     templating/exportableivobject.cpp
     templating/exportableivobject.h
     templating/exportableivfunctiontype.cpp
     templating/exportableivfunctiontype.h
+    templating/exportableivarchetypereference.cpp
+    templating/exportableivarchetypereference.h
+    templating/exportableivarchetypelibraryreference.cpp
+    templating/exportableivarchetypelibraryreference.h
     zoomcontroller.cpp
     zoomcontroller.h
     config/ivlibrarywidget.cpp
@@ -203,6 +216,7 @@ target_link_libraries(${LIB_NAME}
     ${QT_SVGWIDGETS}
     ${QT_WIDGETS}
     ${QT_XML}
+    "stdc++fs"
     )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

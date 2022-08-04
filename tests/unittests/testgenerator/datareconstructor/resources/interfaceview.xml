@@ -1,0 +1,46 @@
+<InterfaceView asn1file="testharness.asn">
+<Function name="TestDriver" is_type="NO" language="C" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="12400 44000 32400 52000"/>
+<Provided_Interface name="StartTest" kind="Cyclic" layer="default" priority="1" wcet="0" period="999" dispatch_offset="0" stack_size="5000">
+    <Property name="Taste::coordinates" value="13900 44600"/>
+</Provided_Interface>
+
+<Required_Interface name="InterfaceUnderTest" kind="Protected" layer="default" wcet="0">
+    <Input_Parameter name="active" type="MyBool" encoding="NATIVE"/>
+    <Input_Parameter name="temperature" type="MyReal" encoding="NATIVE"/>
+    <Input_Parameter name="posX" type="MyInteger" encoding="NATIVE"/>
+    <Input_Parameter name="posY" type="MyInteger" encoding="NATIVE"/>
+    <Output_Parameter name="result" type="MyBool" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="32400 47900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Function name="FunctionUnderTest" is_type="NO" language="C" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="51100 41200 71100 49200"/>
+<Provided_Interface name="InterfaceUnderTest" kind="Protected" layer="default" wcet="0">
+    <Input_Parameter name="active" type="MyBool" encoding="NATIVE"/>
+    <Input_Parameter name="temperature" type="MyReal" encoding="NATIVE"/>
+    <Input_Parameter name="posX" type="MyInteger" encoding="NATIVE"/>
+    <Input_Parameter name="posY" type="MyInteger" encoding="NATIVE"/>
+    <Output_Parameter name="result" type="MyBool" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="51100 45000"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Connection >
+    <Source func_name="TestDriver" ri_name="InterfaceUnderTest"/>
+    <Target func_name="FunctionUnderTest" pi_name="InterfaceUnderTest"/>
+    <Property name="Taste::coordinates" value="33000 47900 41900 47900 41900 45000 50800 45000"/>
+</Connection>
+
+</InterfaceView>

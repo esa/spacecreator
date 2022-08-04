@@ -19,6 +19,7 @@
 #include "dvdevice.h"
 #include "dvmodel.h"
 #include "dvnode.h"
+#include "dvxmlreader.h"
 
 #include <QScopedPointer>
 #include <QtTest>
@@ -38,6 +39,7 @@ private Q_SLOTS:
     void testConnectionName();
     void testGetObjectByName();
     void testUniqueNodeLabel();
+    void testRemoveInvalidMessages();
 
 private:
     QScopedPointer<dvm::DVModel> m_model;
@@ -168,6 +170,17 @@ void tst_DVModel::testUniqueNodeLabel()
     node2->setEntityAttribute(dvm::meta::Props::token(dvm::meta::Props::Token::node_label), "Node_1");
     m_model->addObject(node2);
     QCOMPARE(node2->nodeLabel(), "Node_2");
+}
+
+void tst_DVModel::testRemoveInvalidMessages()
+{
+    dvm::DVXMLReader reader;
+    reader.readFile(":/data/ghost_messages.dv.xml");
+    QVector<dvm::DVObject *> objects = reader.parsedObjects();
+    m_model->initFromObjects(objects);
+    const int filteredMessages = 3;
+    const int addedBusses = 1;
+    QCOMPARE(m_model->objects().size(), objects.size() - filteredMessages + addedBusses);
 }
 
 QTEST_APPLESS_MAIN(tst_DVModel)

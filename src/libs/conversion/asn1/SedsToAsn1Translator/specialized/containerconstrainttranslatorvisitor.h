@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2022 N7 Space Sp. z o.o.
+ * @copyright (C) 2021-2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,28 +19,13 @@
 
 #pragma once
 
-#include "specialized/rangetranslatorvisitor.h"
+#include "context.h"
 
-#include <conversion/common/translation/exceptions.h>
-#include <cstdint>
-
-namespace Asn1Acn {
-class Definitions;
-namespace Types {
-class Integer;
-class Real;
-class Sequence;
-class Type;
-} // namespace Asn1Acn
-} // namespace Types
-
-namespace seds::model {
-class EntryRef;
-class ContainerRangeConstraint;
-class ContainerTypeConstraint;
-class ContainerValueConstraint;
-class Package;
-} // namespace seds::model
+#include <asn1library/asn1/types/sequence.h>
+#include <seds/SedsModel/components/entryref.h>
+#include <seds/SedsModel/types/constraints/containerrangeconstraint.h>
+#include <seds/SedsModel/types/constraints/containertypeconstraint.h>
+#include <seds/SedsModel/types/constraints/containervalueconstraint.h>
 
 namespace conversion::asn1::translator {
 
@@ -55,12 +40,10 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   asn1Sequence        ASN.1 sequence to which the translated constraints will be applied
-     * @param   asn1Definitions     Parent ASN.1 definitions
-     * @param   sedsPackage         Parent SEDS package
+     * @param   context     Current translation context
+     * @param   sequence    ASN.1 sequence to constraint
      */
-    ContainerConstraintTranslatorVisitor(
-            Asn1Acn::Types::Sequence *asn1Sequence, const seds::model::Package *sedsPackage);
+    ContainerConstraintTranslatorVisitor(Context &context, Asn1Acn::Types::Sequence *sequence);
     /**
      * @brief   Deleted copy constructor
      */
@@ -69,6 +52,7 @@ public:
      * @brief   Deleted move constructor
      */
     ContainerConstraintTranslatorVisitor(ContainerConstraintTranslatorVisitor &&) = delete;
+
     /**
      * @brief   Deleted copy assignment operator
      */
@@ -109,9 +93,8 @@ private:
     auto getConstrainedType(const seds::model::EntryRef &entry) const -> Asn1Acn::Types::Type *;
 
 private:
-    Asn1Acn::Types::Sequence *m_asn1Sequence;
-
-    const seds::model::Package *m_sedsPackage;
+    Context &m_context;
+    Asn1Acn::Types::Sequence *m_sequence;
 };
 
 } // namespace conversion::asn1::translator

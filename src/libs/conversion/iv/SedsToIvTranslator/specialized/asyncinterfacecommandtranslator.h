@@ -20,7 +20,9 @@
 #pragma once
 
 #include "generictypemapper.h"
+#include "interfacetypenamehelper.h"
 
+#include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/definitions.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivinterface.h>
@@ -36,43 +38,16 @@ namespace conversion::iv::translator {
  */
 class AsyncInterfaceCommandTranslator final
 {
-private:
-    struct ArgumentData {
-        QString name;
-        QString typeName;
-        std::optional<QString> fixedValue;
-        std::optional<QString> determinantName;
-        bool isDeterminant;
-
-        friend auto operator==(const ArgumentData &lhs, const ArgumentData &rhs) -> bool
-        {
-            return lhs.name == rhs.name && lhs.typeName == rhs.typeName;
-        }
-
-        friend auto operator!=(const ArgumentData &lhs, const ArgumentData &rhs) -> bool { return !(lhs == rhs); }
-    };
-
-    struct CommandArgumentEntry final {
-        QString bundledTypeName;
-        std::size_t typeHash;
-        std::vector<ArgumentData> arguments;
-    };
-
-    using Arguments = std::vector<ArgumentData>;
-
 public:
     /**
      * @brief   Constructor
      *
      * @param   ivFunction          Output interface view function
      * @param   sedsInterfaceName   Parent interface name
-     * @param   asn1Definitions     Parent ASN.1 definitions
-     * @param   sedsPackage         Parent SEDS package
-     * @param   typeMapper          Generic type mapper
+     * @param   typeNameHelper      Helper for ASN.1 type names
      */
     AsyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
-            Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
-            const GenericTypeMapper *typeMapper);
+            const InterfaceTypeNameHelper &typeNameHelper);
     /**
      * @brief   Deleted copy constructor
      */
@@ -104,49 +79,18 @@ public:
 
 private:
     auto translateArguments(const seds::model::InterfaceCommand &sedsCommand,
-            seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface) -> void;
-
-    auto buildBundledType(const seds::model::InterfaceCommand &sedsCommand,
-            seds::model::CommandArgumentMode requestedArgumentMode) -> QString;
-    auto createBundledType(const QString &sedsCommandName, const std::vector<ArgumentData> &arguments) -> QString;
-    auto createBundledTypeComponent(const ArgumentData &argumentData, Asn1Acn::Types::Sequence *sequence) const -> void;
-
-    auto processArguments(const std::vector<seds::model::CommandArgument> &sedsArguments,
-            seds::model::CommandArgumentMode requestedArgumentMode) -> Arguments;
-    auto processArgument(const seds::model::CommandArgument &sedsArgument, const Arguments &arguments)
-            -> AsyncInterfaceCommandTranslator::ArgumentData;
-
-    auto handleArgumentSimpleMapping(const seds::model::CommandArgument &sedsArgument,
-            const TypeMapping::ConcreteType &concreteType) -> AsyncInterfaceCommandTranslator::ArgumentData;
-    auto handleArgumentAlternateMapping(const seds::model::CommandArgument &sedsArgument,
-            const std::vector<TypeMapping::ConcreteType> &concreteTypes, const QString &determinantTypeName,
-            const Arguments &arguments) -> AsyncInterfaceCommandTranslator::ArgumentData;
-    auto handleArrayArgument(const seds::model::CommandArgument &sedsArgument, const QString &typeName) -> QString;
-
-    auto createAlternateType(const QString &genericTypeName,
-            const std::vector<TypeMapping::ConcreteType> &concreteTypes, const QString &determinantName) -> QString;
-
-    auto calculateArgumentsHash(const std::vector<AsyncInterfaceCommandTranslator::ArgumentData> &arguments) const
-            -> std::size_t;
+            const seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface) -> void;
 
 private:
     /// @brief  Output interface view function
     ivm::IVFunction *m_ivFunction;
-
     /// @brief  Parent SEDS interface name
     const QString &m_sedsInterfaceName;
-    /// @brief  Parent ASN.1 type definitions
-    Asn1Acn::Definitions *m_asn1Definitions;
-    /// @brief  Parent SEDS package
-    const seds::model::Package *m_sedsPackage;
-
-    /// @brief  Generic type mapper
-    const GenericTypeMapper *m_typeMapper;
+    /// @brief  Helper for ASN.1 names
+    const InterfaceTypeNameHelper &m_typeNameHelper;
 
     /// @brief  Name for the argument in the IV interface
-    static const QString m_ivInterfaceParameterName;
-    /// @brief  Saved arguments for given command
-    static std::multimap<QString, CommandArgumentEntry> m_commandArguments;
+    inline static const QString m_ivInterfaceParameterName = "InputParam";
 };
 
 } // namespace conversion::iv::translator

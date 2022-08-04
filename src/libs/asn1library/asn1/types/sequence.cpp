@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2017-2021 N7 Space sp. z o. o.
+** Copyright (C) 2017-2022 N7 Space sp. z o. o.
 ** Contact: http://n7space.com
 **
 ** This file is part of ASN.1/ACN Library.
@@ -43,4 +43,34 @@ void Sequence::accept(TypeReadingVisitor &visitor) const
 std::unique_ptr<Type> Sequence::clone() const
 {
     return std::make_unique<Sequence>(*this);
+}
+
+std::optional<QString> Sequence::postEncodingFunction() const
+{
+    return m_postEncodingFunction;
+}
+
+void Sequence::setPostEncodingFunction(QString postEncodingFunction)
+{
+    m_postEncodingFunction = std::move(postEncodingFunction);
+}
+
+std::optional<QString> Sequence::postDecodingValidator() const
+{
+    return m_postDecodingValidator;
+}
+
+void Sequence::setPostDecodingValidator(QString postDecodingValidator)
+{
+    m_postDecodingValidator = std::move(postDecodingValidator);
+}
+
+std::vector<PatcherSnippet> Sequence::patcherSnippets() const
+{
+    return m_patcherSnippets;
+}
+
+void Sequence::addPatcherSnippet(PatcherSnippet patcherSnippet)
+{
+    m_patcherSnippets.push_back(std::move(patcherSnippet));
 }

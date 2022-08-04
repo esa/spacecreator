@@ -1,0 +1,41 @@
+<InterfaceView>
+<Function name="MegaComponent" is_type="NO" language="SDL" default_implementation="default">
+<Provided_Interface name="Get_ProvidedInterface_FunParameter_Pi" kind="Protected" layer="default">
+    <Output_Parameter name="Param" type="ParameterItem" encoding="ACN"/>
+</Provided_Interface>
+<Provided_Interface name="ProvidedInterface_SyncCommandNoMapping_Pi" kind="Protected" layer="default">
+    <Input_Parameter name="ArgumentNoMapping" type="SyncItem" encoding="ACN"/>
+</Provided_Interface>
+<Provided_Interface name="ProvidedInterface_SyncCommandNoMappingArray_Pi" kind="Protected" layer="default">
+    <Input_Parameter name="ArrayArgumentNoMapping" type="SyncItemArrayArray-10" encoding="ACN"/>
+</Provided_Interface>
+<Provided_Interface name="ProvidedInterface_SyncCommandSimpleMapping_Pi" kind="Protected" layer="default">
+    <Input_Parameter name="ArgumentSimpleMapping" type="MegaComponent-ProvidedInterface-SyncGenericType" encoding="ACN"/>
+</Provided_Interface>
+<Provided_Interface name="ProvidedInterface_SyncCommandSimpleMappingArray_Pi" kind="Protected" layer="default">
+    <Input_Parameter name="ArrayArgumentSimpleMapping" type="MegaComponent-ProvidedInterface-SyncGenericTypeArray-10" encoding="ACN"/>
+</Provided_Interface>
+<Provided_Interface name="ProvidedInterface_AsyncCommandNoMapping_Pi" layer="default">
+    <Input_Parameter name="InputParam" type="MegaInterface-AsyncCommandNoMapping-Type" encoding="ACN"/>
+</Provided_Interface>
+<Provided_Interface name="ProvidedInterface_AsyncCommandNoMappingArray_Pi" layer="default">
+    <Input_Parameter name="InputParam" type="MegaInterface-AsyncCommandNoMappingArray-Type" encoding="ACN"/>
+</Provided_Interface>
+<Provided_Interface name="ProvidedInterface_AsyncCommandSimpleMapping_Pi" layer="default">
+    <Input_Parameter name="InputParam" type="MegaComponent-ProvidedInterface-AsyncCommandSimpleMapping-Type" encoding="ACN"/>
+</Provided_Interface>
+<Provided_Interface name="ProvidedInterface_AsyncCommandSimpleMappingArray_Pi" layer="default">
+    <Input_Parameter name="InputParam" type="MegaComponent-ProvidedInterface-AsyncCommandSimpleMappingArray-Type" encoding="ACN"/>
+</Provided_Interface>
+<Provided_Interface name="ProvidedInterface_AsyncCommandAlternateMapping_Pi" layer="default">
+    <Input_Parameter name="InputParam" type="MegaComponent-ProvidedInterface-AsyncCommandAlternateMapping-Type" encoding="ACN"/>
+</Provided_Interface>
+<Provided_Interface name="ProvidedInterface_AsyncCommandAlternateMappingArray_Pi" layer="default">
+    <Input_Parameter name="InputParam" type="MegaComponent-ProvidedInterface-AsyncCommandAlternateMappingArray-Type" encoding="ACN"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+</InterfaceView>

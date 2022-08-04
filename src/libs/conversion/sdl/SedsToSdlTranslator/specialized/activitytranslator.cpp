@@ -19,6 +19,7 @@
 
 #include "activitytranslator.h"
 
+#include "descriptiontranslator.h"
 #include "statementtranslatorvisitor.h"
 
 #include <conversion/common/escaper/escaper.h>
@@ -31,15 +32,19 @@ namespace conversion::sdl::translator {
 auto ActivityTranslator::translateActivity(
         Context &context, const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess) -> void
 {
-
     const auto name = Escaper::escapeSdlName(sedsActivity.nameStr());
+
     auto procedure = std::make_unique<::sdl::Procedure>(name);
+    DescriptionTranslator::translate(sedsActivity, procedure.get());
+
     for (const auto &argument : sedsActivity.arguments()) {
-        const auto &parameterName = Escaper::escapeAsn1FieldName(argument.nameStr());
-        const auto &parameterType = Escaper::escapeAsn1TypeName(argument.type().nameStr());
+        const auto parameterName = Escaper::escapeSdlVariableName(argument.nameStr());
+        const auto parameterType = Escaper::escapeSdlName(argument.type().nameStr());
         auto parameter = std::make_unique<::sdl::ProcedureParameter>(parameterName, parameterType, "in");
+        DescriptionTranslator::translate(argument, parameter.get());
         procedure->addParameter(std::move(parameter));
     }
+
     translateBody(context, sedsActivity, sdlProcess, procedure.get());
     sdlProcess->addProcedure(std::move(procedure));
 }

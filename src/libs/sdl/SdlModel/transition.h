@@ -38,12 +38,10 @@ public:
      * @brief   Default constructor
      */
     Transition() = default;
-
     /**
      * @brief   Deleted copy constructor
      */
     Transition(const Transition &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -53,19 +51,18 @@ public:
      * @brief   Deleted copy assignment operator
      */
     Transition &operator=(const Transition &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     Transition &operator=(Transition &&) = default;
 
+public:
     /**
      * @brief    Getter for the actions
      *
      * @return   const reference to the vector of pointers to actions
      */
     auto actions() -> const std::vector<std::unique_ptr<Action>> &;
-
     /**
      * @brief    Setter for the actions
      *
@@ -73,8 +70,22 @@ public:
      */
     auto addAction(std::unique_ptr<Action> action) -> void;
 
+    /**
+     * @brief   Getter for this transition comment
+     *
+     * @return  transition comment
+     */
+    auto comment() const -> const QString &;
+    /**
+     * @brief   Setter for this transition comment
+     *
+     * @param   comment     comment to set
+     */
+    auto setComment(QString comment) -> void;
+
 private:
     std::vector<std::unique_ptr<Action>> m_actions;
+    QString m_comment;
 };
 
 } // namespace sdl

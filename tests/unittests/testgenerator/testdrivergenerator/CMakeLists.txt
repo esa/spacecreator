@@ -15,7 +15,7 @@ target_link_libraries(${TEST_NAME}
     PRIVATE     Conversion::Common
                 ivcore
                 IV::XmlImporter
-                Asn1Importer
+                CommonTools
                 TestGenerator
                 CsvImporter
                 Qt${QT_VERSION_MAJOR}::Core

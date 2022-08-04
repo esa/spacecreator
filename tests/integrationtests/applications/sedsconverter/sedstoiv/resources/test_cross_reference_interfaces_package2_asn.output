@@ -1,0 +1,6 @@
+COM-N7SPACE-PACKAGE2 DEFINITIONS ::= BEGIN
+IMPORTS
+MappedItem FROM COM-N7SPACE-PACKAGE3
+;
+ChildInterface-GenericType ::= MappedItem(0 .. 255)
+END

@@ -21,22 +21,21 @@
 
 #include "interfacetranslatorhelper.h"
 
+#include <conversion/asn1/SedsToAsn1Translator/datatypetranslationhelper.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <shared/parameter.h>
 
+using conversion::asn1::translator::DataTypeTranslationHelper;
 using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator {
 
-SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction,
-        const QString &sedsInterfaceName, Asn1Acn::Definitions *asn1Definitions,
-        const seds::model::Package *sedsPackage, const GenericTypeMapper *typeMapper)
+SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(
+        ivm::IVFunction *ivFunction, const QString &sedsInterfaceName, const InterfaceTypeNameHelper &typeNameHelper)
     : m_ivFunction(ivFunction)
     , m_sedsInterfaceName(sedsInterfaceName)
-    , m_asn1Definitions(asn1Definitions)
-    , m_sedsPackage(sedsPackage)
-    , m_typeMapper(typeMapper)
+    , m_typeNameHelper(typeNameHelper)
 {
 }
 
@@ -47,21 +46,21 @@ void SyncInterfaceCommandTranslator::translateCommand(
             m_sedsInterfaceName, sedsCommand.nameStr(), interfaceType);
 
     switch (sedsCommand.argumentsCombination()) {
+    case seds::model::ArgumentsCombination::NoArgs:
     case seds::model::ArgumentsCombination::InOnly:
     case seds::model::ArgumentsCombination::OutOnly:
     case seds::model::ArgumentsCombination::InAndOut: {
         auto *ivInterface = InterfaceTranslatorHelper::createIvInterface(
-                interfaceName, interfaceType, ivm::IVInterface::OperationKind::Protected, m_ivFunction);
+                interfaceName, interfaceType, ivm::IVInterface::OperationKind::Protected, sedsCommand, m_ivFunction);
         translateArguments(sedsCommand.arguments(), ivInterface);
         m_ivFunction->addChild(ivInterface);
     } break;
-    case seds::model::ArgumentsCombination::NoArgs:
     case seds::model::ArgumentsCombination::NotifyOnly:
     case seds::model::ArgumentsCombination::InAndNotify:
     case seds::model::ArgumentsCombination::OutAndNotify:
     case seds::model::ArgumentsCombination::All: {
         const auto message = QString(
-                "Interface command arguments combination '%1' is not supported for TASTE InterfaceView async interface")
+                "Interface command arguments combination '%1' is not supported for TASTE InterfaceView sync interface")
                                      .arg(argumentsCombinationToString(sedsCommand.argumentsCombination()));
         throw TranslationException(message);
     } break;
@@ -75,7 +74,7 @@ void SyncInterfaceCommandTranslator::translateArguments(
         const std::vector<seds::model::CommandArgument> &sedsArguments, ivm::IVInterface *ivInterface)
 {
     for (const auto &sedsArgument : sedsArguments) {
-        const auto sedsArgumentTypeName = handleArgumentType(sedsArgument, ivInterface->title());
+        const auto sedsArgumentTypeName = handleArgumentTypeName(sedsArgument);
 
         switch (sedsArgument.mode()) {
         case seds::model::CommandArgumentMode::In: {
@@ -105,43 +104,12 @@ void SyncInterfaceCommandTranslator::translateArguments(
     }
 }
 
-QString SyncInterfaceCommandTranslator::handleArgumentType(
-        const seds::model::CommandArgument &sedsArgument, const QString interfaceName) const
+QString SyncInterfaceCommandTranslator::handleArgumentTypeName(const seds::model::CommandArgument &sedsArgument) const
 {
-    const auto argumentTypeName = sedsArgument.type().nameStr();
+    const auto &argumentTypeRef = sedsArgument.type();
+    const auto &argumentDimensions = sedsArgument.arrayDimensions();
 
-    const auto typeMapping = m_typeMapper->getMapping(argumentTypeName);
-
-    if (typeMapping == nullptr) {
-        return argumentTypeName;
-    }
-
-    const auto &concreteTypes = typeMapping->concreteTypes;
-
-    if (concreteTypes.empty()) {
-        auto errorMessage = QString("Type \"%1\" of the argument \"%2\" in the sync interface \"%3\" is handled as "
-                                    "generic, but no mappings was provided")
-                                    .arg(argumentTypeName)
-                                    .arg(sedsArgument.nameStr())
-                                    .arg(interfaceName);
-        throw TranslationException(std::move(errorMessage));
-    } else if (concreteTypes.size() != 1) {
-        auto errorMessage = QString("Generic type \"%1\" of the argument \"%2\" in the sync interface \"%3\" can only "
-                                    "be simply mapped (AlternateSet not supported)")
-                                    .arg(argumentTypeName)
-                                    .arg(sedsArgument.nameStr())
-                                    .arg(interfaceName);
-        throw TranslationException(std::move(errorMessage));
-    }
-
-    const auto argumentConcreteTypeName = concreteTypes.front().typeName;
-
-    if (sedsArgument.arrayDimensions().empty()) {
-        return Escaper::escapeAsn1TypeName(argumentConcreteTypeName);
-    } else {
-        return InterfaceTranslatorHelper::createArrayType(
-                argumentConcreteTypeName, sedsArgument.arrayDimensions(), m_asn1Definitions, m_sedsPackage);
-    }
+    return m_typeNameHelper.handleTypeName(argumentTypeRef, argumentDimensions);
 }
 
 } // namespace conversion::iv::translator

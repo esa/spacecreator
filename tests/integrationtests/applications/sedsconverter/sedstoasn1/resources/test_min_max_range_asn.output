@@ -9,6 +9,6 @@ AtLeastInteger ::= INTEGER(42 .. 999)
 AtMostInteger ::= INTEGER(0 .. 42)
 InclusiveMinInclusiveMaxFloat ::= REAL(0.42 .. 3.14)
 AtLeastFloat ::= REAL(0.42 .. 3.40282e+38)
-AtMostFloat ::= REAL(1.17549e-38 .. 3.14)
+AtMostFloat ::= REAL(-3.40282e+38 .. 3.14)
 END
 

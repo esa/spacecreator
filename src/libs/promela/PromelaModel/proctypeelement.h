@@ -19,15 +19,21 @@
 
 #pragma once
 
+#include "assertcall.h"
 #include "assignment.h"
 #include "channelrecv.h"
 #include "channelsend.h"
 #include "conditional.h"
 #include "declaration.h"
 #include "doloop.h"
+#include "elsestatement.h"
+#include "exitloop.h"
 #include "expression.h"
 #include "forloop.h"
+#include "goto.h"
 #include "inlinecall.h"
+#include "label.h"
+#include "select.h"
 #include "sequence.h"
 #include "skip.h"
 
@@ -44,7 +50,7 @@ public:
      * @brief Variant representation of different alternatives of proctype element
      */
     using Value = std::variant<Declaration, ChannelSend, ChannelRecv, Expression, DoLoop, Assignment, InlineCall, Skip,
-            Conditional, Sequence, ForLoop>;
+            Conditional, Sequence, ForLoop, ExitLoop, Select, AssertCall, ElseStatement, Label, GoTo>;
 
     /**
      * @brief Constructor

@@ -31,6 +31,7 @@
 #include <common/sdlmodelbuilder/sdlstatemachinebuilder.h>
 #include <common/sdlmodelbuilder/sdltaskbuilder.h>
 #include <common/sdlmodelbuilder/sdltransitionbuilder.h>
+#include <common/textcheckerandconsumer/textcheckerandconsumer.h>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/options.h>
 #include <memory>
@@ -46,6 +47,7 @@
 #include <sdl/SdlModel/procedurecall.h>
 #include <sdl/SdlModel/procedureparameter.h>
 #include <sdl/SdlModel/process.h>
+#include <sdl/SdlModel/return.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/statemachine.h>
 #include <sdl/SdlModel/task.h>
@@ -70,6 +72,7 @@ using sdl::Output;
 using sdl::Procedure;
 using sdl::ProcedureParameter;
 using sdl::Process;
+using sdl::Return;
 using sdl::SdlModel;
 using sdl::State;
 using sdl::StateMachine;
@@ -91,10 +94,11 @@ using tests::common::SdlStateBuilder;
 using tests::common::SdlStateMachineBuilder;
 using tests::common::SdlTaskBuilder;
 using tests::common::SdlTransitionBuilder;
+using tests::common::TextCheckerAndConsumer;
 
 namespace tests::Sdl {
 
-class tst_sdlmodel : public QObject
+class tst_sdlexporter : public QObject
 {
     Q_OBJECT
 
@@ -129,32 +133,7 @@ static std::unique_ptr<ProcedureParameter> makeProcedureParameter(QString name, 
     return parameter;
 }
 
-static bool verifyAndConsume(QTextStream &stream, const QString &string)
-{
-    QString line;
-    do {
-        line = stream.readLine();
-        if (line.contains(string)) {
-            return true;
-        }
-    } while ((!line.isEmpty() || !line.contains(string)) && !stream.atEnd());
-
-    return false;
-}
-
-static void checkSequenceAndConsume(std::vector<QString> &expectedOutput, QTextStream &consumableOutput)
-{
-    for (const auto &expectedLine : expectedOutput) {
-        if (verifyAndConsume(consumableOutput, expectedLine)) {
-            continue;
-        } else {
-            QString message = QString("the generated file does not contain '%1' substring").arg(expectedLine);
-            QFAIL(message.toStdString().c_str());
-        }
-    }
-}
-
-void tst_sdlmodel::testDefaultValuesInModel()
+void tst_sdlexporter::testDefaultValuesInModel()
 {
     QString processName = "exampleProcess";
 
@@ -175,7 +154,7 @@ void tst_sdlmodel::testDefaultValuesInModel()
     QVERIFY(processName == process->name());
 }
 
-void tst_sdlmodel::testGenerateBasicProcess()
+void tst_sdlexporter::testGenerateBasicProcess()
 {
     QString modelName = "BasicProcess";
     QString modelPrefix = "Sdl_";
@@ -243,10 +222,10 @@ void tst_sdlmodel::testGenerateBasicProcess()
 
         QString("endprocess %1;").arg(processName),
     };
-    checkSequenceAndConsume(expectedOutput, consumableOutput);
+    TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
-void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
+void tst_sdlexporter::testGenerateProcessWithDeclarationsAndTasks()
 {
     QString modelName = "DeclarationsAndTasks";
     QString modelPrefix = "Sdl_";
@@ -261,7 +240,7 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
     auto someInput = SdlInputBuilder()
                              .withName("some_input_name")
                              .withTransition(transition1.get())
-                             .withParameter(std::make_unique<VariableReference>(variable.get()))
+                             .withParameter(std::make_unique<VariableReference>(variable->name()))
                              .build();
     auto state1 = SdlStateBuilder("Looping")
                           .withInput(std::move(someInput))
@@ -270,7 +249,7 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
 
     auto referenceOutput = SdlOutputBuilder()
                                    .withName("referenceOutput")
-                                   .withParameter(std::make_unique<VariableReference>(variable.get()))
+                                   .withParameter(std::make_unique<VariableReference>(variable->name()))
                                    .build();
 
     auto transition2 = SdlTransitionBuilder()
@@ -341,10 +320,10 @@ void tst_sdlmodel::testGenerateProcessWithDeclarationsAndTasks()
 
         QString("endprocess %1;").arg(processName),
     };
-    checkSequenceAndConsume(expectedOutput, consumableOutput);
+    TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
-void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
+void tst_sdlexporter::testGenerateProcessWithLabelAndJoin()
 {
     QString modelName = "LabelAndJoin";
     QString modelPrefix = "Sdl_";
@@ -353,7 +332,7 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
     auto fromStartLabel = std::make_unique<Label>("fromStart");
 
     auto joinFromStart = std::make_unique<Join>();
-    joinFromStart->setLabel(fromStartLabel.get());
+    joinFromStart->setLabel("fromStart");
     auto transition = SdlTransitionBuilder() //
                               .withAction(std::move(joinFromStart))
                               .build();
@@ -404,10 +383,10 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
 
         QString("endprocess %1;").arg(processName),
     };
-    checkSequenceAndConsume(expectedOutput, consumableOutput);
+    TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
-void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
+void tst_sdlexporter::testGenerateProcessWithDecisionExpressionAndAnswer()
 {
     QString modelName = "DecisionExpressionAndAnswer";
     QString modelPrefix = "Sdl_";
@@ -436,7 +415,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
                                                                                         .withName("sendOutput")
                                                                                         .withParameter(std::make_unique<
                                                                                                 VariableReference>(
-                                                                                                variableX.get()))
+                                                                                                variableX->name()))
                                                                                         .build())
                                                                     .withTask(
                                                                             SdlTaskBuilder()
@@ -461,7 +440,7 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
     auto waitState = SdlStateBuilder("Wait")
                              .withInput(SdlInputBuilder()
                                                 .withName("startProcess")
-                                                .withParameter(std::make_unique<VariableReference>(variableX.get()))
+                                                .withParameter(std::make_unique<VariableReference>(variableX->name()))
                                                 .withTransition(transition.get())
                                                 .build())
                              .build();
@@ -523,10 +502,10 @@ void tst_sdlmodel::testGenerateProcessWithDecisionExpressionAndAnswer()
 
         QString("endprocess %1;").arg(processName),
     };
-    checkSequenceAndConsume(expectedOutput, consumableOutput);
+    TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
-void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
+void tst_sdlexporter::testGenerateProcessWithParamlessProcedure()
 {
     QString modelName = "ParamlessProcedure";
     QString modelPrefix = "Sdl_";
@@ -586,7 +565,6 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
         "START;",
         "task 'TASK INSIDE PROCEDURE';",
         "task 'SECOND TASK INSIDE PROCEDURE';",
-        "return ;",
         "endprocedure;",
 
         "START;",
@@ -601,10 +579,10 @@ void tst_sdlmodel::testGenerateProcessWithParamlessProcedure()
 
         QString("endprocess %1;").arg(processName),
     };
-    checkSequenceAndConsume(expectedOutput, consumableOutput);
+    TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
-void tst_sdlmodel::testJoinWithoutSpecifiedLabel()
+void tst_sdlexporter::testJoinWithoutSpecifiedLabel()
 {
     QString modelName = "JoinWithoutSpecifiedLabel";
     QString modelPrefix = "Sdl_";
@@ -635,20 +613,24 @@ void tst_sdlmodel::testJoinWithoutSpecifiedLabel()
     QVERIFY_EXCEPTION_THROWN(exporter.exportModel(exampleModel.get(), options), ExportException);
 }
 
-void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
+void tst_sdlexporter::testGenerateProcessWithProcedureWithParamsAndReturn()
 {
     QString modelName = "ProcedureWithParamsAndReturn";
     QString modelPrefix = "Sdl_";
     QString processName = modelName.toLower(); // NOLINT
 
+    auto returnVariable = makeVariableDeclaration("ret", "MyInteger");
+
     auto procedure = SdlProcedureBuilder()
                              .withName("myProcedure")
+                             .withReturnType(returnVariable->type())
+                             .withVariable(std::move(returnVariable))
                              .withParameter(makeProcedureParameter("a", "MyInteger", "in/out"))
                              .withParameter(makeProcedureParameter("b", "MyInteger", "in"))
-                             .withReturnVariableDeclaration(makeVariableDeclaration("ret", "MyInteger"))
                              .withTransition(SdlTransitionBuilder()
                                                      .withAction(SdlTaskBuilder().withContents("ret := a + b;").build())
                                                      .withAction(SdlTaskBuilder().withContents("a := a + 1;").build())
+                                                     .withAction(std::make_unique<Return>("ret"))
                                                      .build())
                              .build();
 
@@ -664,7 +646,7 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
                          .withInput(SdlInputBuilder()
                                             .withName("startProcess")
                                             .withTransition(transition.get())
-                                            .withParameter(std::make_unique<VariableReference>(variableX.get()))
+                                            .withParameter(std::make_unique<VariableReference>(variableX->name()))
                                             .build())
                          .build();
 
@@ -705,11 +687,11 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
         "dcl y MyInteger;",
 
         "procedure myProcedure;",
+        "dcl ret MyInteger;",
         "fpar",
         "in/out a MyInteger,",
         "in b MyInteger;",
         "returns MyInteger;",
-        "dcl ret MyInteger;",
         "START;",
         "task ret := a + b;",
         "task a := a + 1;",
@@ -727,10 +709,10 @@ void tst_sdlmodel::testGenerateProcessWithProcedureWithParamsAndReturn()
 
         QString("endprocess %1;").arg(processName),
     };
-    checkSequenceAndConsume(expectedOutput, consumableOutput);
+    TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
-void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
+void tst_sdlexporter::testGenerateProcessWithReturnlessProcedure()
 {
     QString modelName = "ReturnlessProcedure";
     QString modelPrefix = "Sdl_";
@@ -751,7 +733,7 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
                               .withAction(SdlProcedureCallBuilder()
                                                   .withProcedure(procedure.get())
                                                   .withArgument(std::make_unique<VariableLiteral>("2"))
-                                                  .withArgument(std::make_unique<VariableReference>(variableX.get()))
+                                                  .withArgument(std::make_unique<VariableReference>(variableX->name()))
                                                   .build())
                               .withNextStateAction()
                               .build();
@@ -759,7 +741,7 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
     auto state = SdlStateBuilder("Wait")
                          .withInput(SdlInputBuilder()
                                             .withName("startProcess")
-                                            .withParameter(std::make_unique<VariableReference>(variableX.get()))
+                                            .withParameter(std::make_unique<VariableReference>(variableX->name()))
                                             .withTransition(transition.get())
                                             .build())
                          .build();
@@ -804,7 +786,6 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
         "in b MyInteger;",
         "START;",
         "task 'EXAMPLE'",
-        "return ;",
         "endprocedure;",
 
         "START;",
@@ -818,11 +799,11 @@ void tst_sdlmodel::testGenerateProcessWithReturnlessProcedure()
 
         QString("endprocess %1;").arg(processName),
     };
-    checkSequenceAndConsume(expectedOutput, consumableOutput);
+    TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
 } // namespace tests::sdl
 
-QTEST_MAIN(tests::Sdl::tst_sdlmodel)
+QTEST_MAIN(tests::Sdl::tst_sdlexporter)
 
 #include "tst_sdlexporter.moc"

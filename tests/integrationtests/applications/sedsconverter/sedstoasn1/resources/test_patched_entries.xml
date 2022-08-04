@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/Patched">
+    <DataTypeSet>
+      <IntegerDataType name="IntegerData">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <FloatDataType name="FloatData">
+        <FloatDataEncoding encodingAndPrecision="IEEE754_2008_single" sizeInBits="32" />
+        <Range>
+          <PrecisionRange>single</PrecisionRange>
+        </Range>
+      </FloatDataType>
+      <IntegerDataType name="LengthType">
+        <IntegerDataEncoding encoding="unsigned" byteOrder="littleEndian" sizeInBits="16" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="65535" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="GigaLengthType">
+        <IntegerDataEncoding encoding="unsigned" byteOrder="littleEndian" sizeInBits="32" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="4294967295" />
+        </Range>
+      </IntegerDataType>
+      <BinaryDataType name="Crc8Pattern" sizeInBits="8" fixedSize="true"/>
+      <BinaryDataType name="Crc16Pattern" sizeInBits="16" fixedSize="true"/>
+      <BinaryDataType name="ChecksumPattern" sizeInBits="32" fixedSize="true"/>
+      <BinaryDataType name="ChecksumLongitudinalPattern" sizeInBits="8" fixedSize="true"/>
+      <ContainerDataType name="PacketHeader">
+        <EntryList>
+          <Entry name="version" type="IntegerData"/>
+          <Entry name="release" type="IntegerData"/>
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="PacketBody">
+        <EntryList>
+          <Entry name="data" type="IntegerData"/>
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="Crc8-Packet">
+        <EntryList>
+          <Entry name="Nice-Packet-header" type="PacketHeader"/>
+          <LengthEntry name="Nice-Packet-lengthEntry" type="LengthType"/>
+          <Entry name="Nice-Packet-body" type="PacketBody"/>
+          <ErrorControlEntry name="Nice-Packet-errorControlEntry" errorControlType="CRC8" type="Crc8Pattern" />
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="Crc16-Packet">
+        <EntryList>
+          <Entry name="Nice-Packet-header" type="PacketHeader"/>
+          <LengthEntry name="Nice-Packet-lengthEntry" type="GigaLengthType"/>
+          <Entry name="Nice-Packet-body" type="PacketBody"/>
+          <ErrorControlEntry name="Nice-Packet-errorControlEntry" errorControlType="CRC16_ccitt" type="Crc16Pattern" />
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="Checksum-Packet">
+        <EntryList>
+          <Entry name="Nice-Packet-header" type="PacketHeader"/>
+          <LengthEntry name="Nice-Packet-lengthEntry" type="LengthType"/>
+          <Entry name="Nice-Packet-body" type="PacketBody"/>
+          <ErrorControlEntry name="Nice-Packet-errorControlEntry" errorControlType="checksum" type="ChecksumPattern" />
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="ChecksumLongitudinal-Packet">
+        <EntryList>
+          <Entry name="Nice-Packet-header" type="PacketHeader"/>
+          <LengthEntry name="Nice-Packet-lengthEntry" type="LengthType"/>
+          <Entry name="Nice-Packet-body" type="PacketBody"/>
+          <ErrorControlEntry name="Nice-Packet-errorControlEntry" errorControlType="checksum_longitudinal" type="ChecksumLongitudinalPattern" />
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="OnlyErrorControl">
+        <EntryList>
+          <Entry name="Nice-Packet-header" type="PacketHeader"/>
+          <Entry name="Nice-Packet-body" type="PacketBody"/>
+          <ErrorControlEntry name="Nice-Packet-errorControlEntry" errorControlType="CRC8" type="Crc8Pattern" />
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="OnlyLength">
+        <EntryList>
+          <Entry name="Nice-Packet-header" type="PacketHeader"/>
+          <LengthEntry name="Nice-Packet-lengthEntry" type="LengthType"/>
+          <Entry name="Nice-Packet-body" type="PacketBody"/>
+        </EntryList>
+      </ContainerDataType>
+    </DataTypeSet>
+  </Package>
+</PackageFile>
+
+<!-- <PaddingEntry> -->

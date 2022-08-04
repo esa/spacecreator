@@ -68,7 +68,7 @@ private:
     auto visitArray(const seds::model::ArrayDataType &arrayDataType) -> void;
     auto visitContainer(const seds::model::ContainerDataType &containerDataType) -> void;
 
-    auto findDataType(const seds::model::DataTypeRef &dataTypeRef) -> const seds::model::DataType *;
+    auto findDataType(const QString &dataTypeName) -> const seds::model::DataType *;
 
     auto markTemporary(const seds::model::DataType *dataType) -> void;
     auto markPermanent(const seds::model::DataType *dataType) -> void;
@@ -81,31 +81,6 @@ private:
 
     MarksMap m_marks;
     ResultList m_result;
-};
-
-/**
- * @brief   Exception thrown when data types to sort doesn't create a DAG
- *
- * Exception for cyclic dependency
- */
-class NotDagException final : public ConversionException
-{
-public:
-    /**
-     * @brief   Constructor
-     */
-    NotDagException();
-};
-
-class UndeclaredDataTypeException final : public ConversionException
-{
-public:
-    /**
-     * @brief   Constructor
-     *
-     * @param   dataTypeName    Name of the referenced undeclared type
-     */
-    UndeclaredDataTypeException(const QString &dataTypeName);
 };
 
 } // namespace conversion::asn1::translator

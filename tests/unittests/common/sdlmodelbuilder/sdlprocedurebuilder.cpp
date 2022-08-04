@@ -21,6 +21,12 @@
 
 #include <memory>
 
+using sdl::Procedure;
+using sdl::ProcedureParameter;
+using sdl::Transition;
+using sdl::VariableDeclaration;
+using sdl::VariableReference;
+
 namespace tests::common {
 
 SdlProcedureBuilder::SdlProcedureBuilder()
@@ -47,6 +53,13 @@ SdlProcedureBuilder &SdlProcedureBuilder::withTransition(std::unique_ptr<Transit
     return *this;
 }
 
+SdlProcedureBuilder &SdlProcedureBuilder::withVariable(std::unique_ptr<VariableDeclaration> variable)
+{
+    m_procedure->addVariable(std::move(variable));
+
+    return *this;
+}
+
 SdlProcedureBuilder &SdlProcedureBuilder::withParameter(std::unique_ptr<ProcedureParameter> parameter)
 {
     m_procedure->addParameter(std::move(parameter));
@@ -54,9 +67,9 @@ SdlProcedureBuilder &SdlProcedureBuilder::withParameter(std::unique_ptr<Procedur
     return *this;
 }
 
-SdlProcedureBuilder &SdlProcedureBuilder::withReturnVariableDeclaration(std::unique_ptr<VariableDeclaration> variable)
+SdlProcedureBuilder &SdlProcedureBuilder::withReturnType(QString returnType)
 {
-    m_procedure->setReturnVariableDeclaration(std::move(variable));
+    m_procedure->setReturnType(std::move(returnType));
 
     return *this;
 }

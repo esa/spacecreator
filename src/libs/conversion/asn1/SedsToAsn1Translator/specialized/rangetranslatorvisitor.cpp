@@ -137,13 +137,13 @@ void RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>::operator(
 {
     switch (range) {
     case seds::model::FloatPrecisionRange::Single: {
-        const auto min = static_cast<double>(std::numeric_limits<float>::min());
+        const auto min = static_cast<double>(std::numeric_limits<float>::lowest());
         const auto max = static_cast<double>(std::numeric_limits<float>::max());
 
         addRangeConstraint(min, max);
     } break;
     case seds::model::FloatPrecisionRange::Double: {
-        const auto min = std::numeric_limits<double>::min();
+        const auto min = std::numeric_limits<double>::lowest();
         const auto max = std::numeric_limits<double>::max();
 
         addRangeConstraint(min, max);
@@ -204,11 +204,11 @@ typename Asn1Acn::RealValue::Type RangeTranslatorVisitor<Asn1Acn::Types::Real, A
 {
     switch (m_asn1Type->encoding()) {
     case Asn1Acn::Types::RealEncoding::IEEE754_1985_32:
-        return static_cast<double>(std::numeric_limits<float>::min());
+        return static_cast<double>(std::numeric_limits<float>::lowest());
     case Asn1Acn::Types::RealEncoding::IEEE754_1985_64:
-        return std::numeric_limits<double>::min();
+        return std::numeric_limits<double>::lowest();
     case Asn1Acn::Types::RealEncoding::unspecified:
-        return std::numeric_limits<Asn1Acn::RealValue::Type>::min();
+        return std::numeric_limits<Asn1Acn::RealValue::Type>::lowest();
     default:
         throw TranslationException("Unhandled RealEncoding for container constraint");
         break;

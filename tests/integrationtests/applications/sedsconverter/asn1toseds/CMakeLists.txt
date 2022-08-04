@@ -33,3 +33,8 @@ configure_file(test_choices.sh test_choices.sh COPYONLY)
 configure_file(resources/test_choices.output resources/test_choices.output COPYONLY)
 configure_file(resources/test_choices.asn resources/test_choices.asn COPYONLY)
 configure_file(resources/test_choices.acn resources/test_choices.acn COPYONLY)
+
+configure_file(test_with_components.sh test_with_components.sh COPYONLY)
+configure_file(resources/test_with_components.output resources/test_with_components.output COPYONLY)
+configure_file(resources/test_with_components.asn resources/test_with_components.asn COPYONLY)
+configure_file(resources/test_with_components.acn resources/test_with_components.acn COPYONLY)

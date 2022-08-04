@@ -28,7 +28,7 @@ using conversion::Escaper;
 
 namespace promela::translator {
 EnumeratedGenerator::EnumeratedGenerator(QString typeName, const Enumerated &enumerated)
-    : m_typeName(typeName)
+    : m_typeName(std::move(typeName))
 {
     m_items = enumerated.items().values().toVector();
     std::sort(m_items.begin(), m_items.end(),

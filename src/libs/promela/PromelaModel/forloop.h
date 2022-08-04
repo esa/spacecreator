@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "expression.h"
 #include "sequence.h"
 #include "variableref.h"
 
@@ -49,12 +50,12 @@ public:
     /**
      * @brief Constructor for range based for loop.
      *
-     * @param var loop variable.
-     * @param first First element or range.
-     * @param last Last element of range.
+     * @param var      loop variable.
+     * @param first    First element or range.
+     * @param last     Last element of range.
      * @param sequence body.
      */
-    ForLoop(VariableRef var, int first, int last, std::unique_ptr<Sequence> sequence);
+    ForLoop(VariableRef var, const Expression &first, const Expression &last, std::unique_ptr<Sequence> sequence);
 
     /**
      * @brief Constructor for array based for loop.
@@ -80,20 +81,36 @@ public:
     const VariableRef &getForVariable() const noexcept;
 
     /**
-     * @brief Getter for first value of range based loop.
+     * @brief Getter for first Expression of range based loop.
+     *
+     * @return First Expression in range.
+     * @throws std::bad_optional_access if loop is not range based.
+     */
+    const Expression &getFirstExpression() const;
+
+    /**
+     * @brief Getter for last Expression of range based loop.
+     *
+     * @return Last Expression in range.
+     * @throws std::bad_optional_access if loop is not range based.
+     */
+    const Expression &getLastExpression() const;
+
+    /**
+     * @brief Getter for first value of range based loop if it is a constant.
      *
      * @return First value in range.
      * @throws std::bad_optional_access if loop is not range based.
      */
-    int getFirstValue() const;
+    int getFirstIntValue() const;
 
     /**
-     * @brief Getter for last value of range based loop.
+     * @brief Getter for last value of range based loop if it is a constant.
      *
      * @return Last value in range.
      * @throws std::bad_optional_access if loop is not range based.
      */
-    int getLastValue() const;
+    int getLastIntValue() const;
 
     /**
      * @brief Getter for array of array based loop.
@@ -112,7 +129,7 @@ public:
 
 private:
     VariableRef m_variable;
-    using Range = std::pair<int, int>;
+    using Range = std::pair<Expression, Expression>;
     std::variant<Range, VariableRef> m_data;
     std::unique_ptr<Sequence> m_sequence;
 };

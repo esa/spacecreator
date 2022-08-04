@@ -1,0 +1,10 @@
+USERDEFINED-TYPES-DATAVIEW DEFINITIONS ::=
+BEGIN
+    MyEnum ::= ENUMERATED {
+        red,
+        green,
+        blue
+    }
+    MyBetterEnum ::= MyEnum (red | blue)
+END
+

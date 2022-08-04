@@ -51,10 +51,10 @@ using namespace seds::model;
 
 using conversion::Options;
 using conversion::asn1::translator::DataTypesDependencyResolver;
-using conversion::asn1::translator::NotDagException;
 using conversion::asn1::translator::SedsToAsn1Translator;
-using conversion::asn1::translator::UndeclaredDataTypeException;
+using conversion::translator::NotDagException;
 using conversion::translator::TranslationException;
+using conversion::translator::UndeclaredDataTypeException;
 using tests::conversion::common::SedsContainerDataTypeBuilder;
 using tests::conversion::common::SedsDataTypeFactory;
 using tests::conversion::common::SedsModelBuilder;
@@ -349,7 +349,7 @@ void tst_SedsToAsn1Translator::testTranslateArrayDataTypeMultiDimension()
 /// \SRS  ETB-FUN-140
 void tst_SedsToAsn1Translator::testTranslateBinaryDataType()
 {
-    const auto sedsModel = SedsModelBuilder("Model").withBinaryDataType("Bitstring").build();
+    const auto sedsModel = SedsModelBuilder("Model").withBinaryDataType("Bitstring", 42).build();
 
     Options options;
     SedsToAsn1Translator translator;
@@ -418,7 +418,7 @@ void tst_SedsToAsn1Translator::testTranslateBooleanDataType()
 
     QCOMPARE(booleanType->identifier(), "Boolean");
     QCOMPARE(booleanType->typeName(), "BOOLEAN");
-    QCOMPARE(booleanType->trueValue(), "0");
+    QCOMPARE(booleanType->trueValue(), "0000000000000000");
 }
 
 /// \SRS  ETB-FUN-230
@@ -486,7 +486,7 @@ void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithErrorControlEntry
     // clang-format off
     const auto &sedsModel = SedsModelBuilder("Model")
                                 .withContainerDataType(std::move(container))
-                                .withIntegerDataType("CrcData")
+                                .withBinaryDataType("CrcData", 16, true)
                             .build();
     // clang-format on
 
@@ -893,7 +893,7 @@ void tst_SedsToAsn1Translator::testTranslateFloatDataType()
     QVERIFY(rangeConstraint);
 
     const auto &range = rangeConstraint->range();
-    QCOMPARE(range.begin(), std::numeric_limits<double>::min());
+    QCOMPARE(range.begin(), std::numeric_limits<double>::lowest());
     QCOMPARE(range.end(), std::numeric_limits<double>::max());
 }
 

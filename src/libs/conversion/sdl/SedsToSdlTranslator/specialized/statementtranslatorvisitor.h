@@ -73,36 +73,43 @@ public:
          * @returns Unique label name
          */
         auto uniqueLabelName(const QString &prefix = "label_") -> QString;
+        /**
+         * @brief   Returns a unique raw spline points array name
+         *
+         * @returns Unique array name
+         */
+        auto uniqueRawSplinePointsVariableName() -> QString;
+        /**
+         * @brief   Returns a unique calibrated spline points array name
+         *
+         * @returns Unique array name
+         */
+        auto uniqueCalibratedSplinePointsVariableName() -> QString;
 
         /**
          * @brief SEDS Package accessor
          *
          * @returns SEDS Package
          */
-
         auto sedsPackage() -> const seds::model::Package &;
-
         /**
          * @brief ASN.1 Model accessor
          *
          * @returns ASN.1 Model
          */
         auto asn1Model() -> Asn1Acn::Asn1Model *;
-
         /**
          * @brief InterfaceView Function accessor
          *
          * @returns InterfaceView Function Package
          */
         auto ivFunction() -> ivm::IVFunction *;
-
         /**
          * @brief SDL Process accessor
          *
          * @returns SDL Process
          */
         auto sdlProcess() -> ::sdl::Process *;
-
         /**
          * @brief SDL Procedure accessor
          *
@@ -111,12 +118,32 @@ public:
         auto sdlProcedure() -> ::sdl::Procedure *;
 
         /**
+         * @brief   Check if interval index variable was already created for current procedure
+         *
+         * @param   True if variable was created, false otherwise
+         */
+        auto intervalIndexVariableCreated() const -> bool;
+        /**
+         * @brief   Set creation status of the interval index variable
+         *
+         * @param   created     Interval index variable creation status
+         */
+        auto setIntervalIndexVariableCreated(bool created) -> void;
+
+        /**
+         * @brief   Set new count as max if bigger than current max
+         *
+         * @param   count   Point count
+         */
+        auto handleSplinePointCount(const std::size_t count) -> void;
+
+        /**
          * @brief Add ActivityInfo
          *
          * @param name  Name of the Activity
          * @param info  ActivityInfo to be added
          */
-        auto addActivityInfo(const QString name, ActivityInfo info) -> void;
+        auto addActivityInfo(const QString &name, ActivityInfo info) -> void;
 
         /**
          * @brief Retrieve InterfaceCommand
@@ -124,15 +151,18 @@ public:
          * @param interface     Name of the interface hosting the command
          * @param name          Name of the command
          *
-         * @return InterfaceCommand
+         * @return Command info
          */
-        auto getCommand(const QString interface, const QString name) -> const seds::model::InterfaceCommand *;
+        auto getCommand(const QString &interface, const QString &name) -> const CommandInfo *;
 
     private:
         int m_labelCount;
+        int m_rawSplinePointsVariableCount;
+        int m_calibratedSplinePointsVariableCount;
         Context &m_masterContext;
         ::sdl::Process *m_sdlProcess;
         ::sdl::Procedure *m_sdlProcedure;
+        bool m_intervalIndexVariableCreated;
     };
 
     /**
@@ -229,7 +259,7 @@ public:
      *
      * @returns Translated variable reference
      */
-    static auto translateVariableReference(QString reference) -> QString;
+    static auto translateVariableReference(const QString &reference) -> QString;
 
 private:
     StatementContext &m_context;
@@ -237,28 +267,23 @@ private:
 
     static auto findIvInterface(ivm::IVFunction *function, const QString &interfaceName) -> ivm::IVInterface *;
 
-    static auto findVariableDeclaration(::sdl::Process *process, ::sdl::Procedure *sdlProcedure, QString name)
-            -> ::sdl::VariableDeclaration *;
-
-    static auto translateArgument(::sdl::Process *process, ::sdl::Procedure *sdlProcedure,
-            const seds::model::NamedArgumentValue &argument) -> ::sdl::ProcedureCall::Argument;
+    static auto translateArgument(const seds::model::NamedArgumentValue &argument) -> ::sdl::ProcedureCall::Argument;
 
     static auto translatePolynomial(const QString variable, const seds::model::Polynomial &polynomial) -> QString;
 
-    static auto translateCall(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString callName,
+    static auto translateCall(::sdl::Process *hostProcess, const QString callName,
             const seds::model::SendCommandPrimitive &sendCommand) -> std::unique_ptr<::sdl::ProcedureCall>;
 
-    static auto translateCall(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString callName,
+    static auto translateCall(::sdl::Process *hostProcess, const QString callName,
             const seds::model::SendParameterPrimitive &sendParameter) -> std::unique_ptr<::sdl::ProcedureCall>;
 
-    static auto translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString &callName,
-            const seds::model::SendCommandPrimitive &sendCommand) -> std::vector<std::unique_ptr<::sdl::Action>>;
+    static auto translateOutput(const QString &callName, const seds::model::SendCommandPrimitive &sendCommand)
+            -> std::vector<std::unique_ptr<::sdl::Action>>;
 
-    static auto translateOutput(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const QString &callName,
-            const seds::model::SendParameterPrimitive &sendParameter) -> std::vector<std::unique_ptr<::sdl::Action>>;
+    static auto translateOutput(const QString &callName, const seds::model::SendParameterPrimitive &sendParameter)
+            -> std::vector<std::unique_ptr<::sdl::Action>>;
 
-    static auto translateComparison(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-            const seds::model::Comparison &comparison) -> QString;
+    static auto translateComparison(const seds::model::Comparison &comparison) -> QString;
 
     static auto translateAndedConditions(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
             const seds::model::AndedConditions &conditions) -> QString;
@@ -278,6 +303,8 @@ private:
 
     static auto translateBody(StatementContext &context, ::sdl::Transition *transition, const seds::model::Body *body)
             -> void;
+
+    auto generateSplineCalibratorBoilerplate(const seds::model::SplineCalibrator &splineCalibrator) const -> void;
 
     static auto generateLoopStart(
             ::sdl::Transition *transition, const seds::model::Iteration &iteration, ::sdl::Decision *decision) -> void;

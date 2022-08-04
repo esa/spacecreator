@@ -65,6 +65,9 @@ public:
         SedsConverterKeepIntermediateFiles,
         SedsConverterAcnFilepathPrefix,
         SedsConverterAsn1FilepathPrefix,
+        SedsConverterAsn1SequenceSizeThreshold,
+        SedsConverterPatcherFunctionsFilepathPrefix,
+        SedsConverterMappingFunctionsModuleFileName,
         SedsConverterSdlFilepathPrefix,
 
         Unknown

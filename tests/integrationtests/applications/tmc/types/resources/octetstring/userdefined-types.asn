@@ -1,0 +1,6 @@
+USERDEFINED-TYPES-DATAVIEW DEFINITIONS ::=
+BEGIN
+    MyOctetString ::= OCTET STRING (SIZE(1))
+    MyBetterOctetString ::= MyOctetString
+END
+

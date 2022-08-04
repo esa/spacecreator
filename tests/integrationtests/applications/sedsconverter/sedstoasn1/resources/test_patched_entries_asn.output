@@ -1,0 +1,49 @@
+COM-N7SPACE-PATCHED DEFINITIONS ::= BEGIN
+IntegerData ::= INTEGER(0 .. 255)
+FloatData ::= REAL(-3.40282e+38 .. 3.40282e+38)
+LengthType ::= INTEGER(0 .. 65535)
+GigaLengthType ::= INTEGER(0 .. 4294967295)
+Crc8Pattern ::= BIT STRING(SIZE(8))
+Crc16Pattern ::= BIT STRING(SIZE(16))
+ChecksumPattern ::= BIT STRING(SIZE(32))
+ChecksumLongitudinalPattern ::= BIT STRING(SIZE(8))
+PacketHeader ::= SEQUENCE
+{
+    version IntegerData(0 .. 255),
+    release IntegerData(0 .. 255)
+}
+PacketBody ::= SEQUENCE
+{
+    data IntegerData(0 .. 255)
+}
+Crc8-Packet ::= SEQUENCE
+{
+    nice-Packet-header PacketHeader,
+    nice-Packet-body PacketBody
+}
+Crc16-Packet ::= SEQUENCE
+{
+    nice-Packet-header PacketHeader,
+    nice-Packet-body PacketBody
+}
+Checksum-Packet ::= SEQUENCE
+{
+    nice-Packet-header PacketHeader,
+    nice-Packet-body PacketBody
+}
+ChecksumLongitudinal-Packet ::= SEQUENCE
+{
+    nice-Packet-header PacketHeader,
+    nice-Packet-body PacketBody
+}
+OnlyErrorControl ::= SEQUENCE
+{
+    nice-Packet-header PacketHeader,
+    nice-Packet-body PacketBody
+}
+OnlyLength ::= SEQUENCE
+{
+    nice-Packet-header PacketHeader,
+    nice-Packet-body PacketBody
+}
+END

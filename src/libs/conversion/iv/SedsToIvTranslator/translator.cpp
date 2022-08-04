@@ -23,6 +23,7 @@
 
 #include <QFileInfo>
 #include <asn1library/asn1/asn1model.h>
+#include <conversion/asn1/Asn1Options/options.h>
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
@@ -49,7 +50,8 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateModels(
     checkSourceModelCount(sourceModels);
 
     const auto *sedsModel = getModel<SedsModel>(sourceModels);
-    auto *asn1Model = getModel<Asn1Model>(sourceModels);
+    const auto *asn1Model = getModel<Asn1Model>(sourceModels);
+    Q_UNUSED(asn1Model);
 
     const auto ivConfigFilepath = options.value(IvOptions::configFilepath);
     if (!ivConfigFilepath) {
@@ -65,7 +67,7 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateModels(
     ivm::IVPropertyTemplateConfig *ivConfig = ivm::IVPropertyTemplateConfig::instance();
     ivConfig->init(*ivConfigFilepath);
 
-    return translateSedsModel(sedsModel, asn1Model, ivConfig, options);
+    return translateSedsModel(sedsModel, ivConfig, options);
 }
 
 ModelType SedsToIvTranslator::getSourceModelType() const
@@ -84,8 +86,8 @@ std::set<ModelType> SedsToIvTranslator::getDependencies() const
     return dependencies;
 }
 
-std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(const SedsModel *sedsModel,
-        Asn1Model *asn1Model, ivm::IVPropertyTemplateConfig *ivConfig, const Options &options) const
+std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(
+        const SedsModel *sedsModel, ivm::IVPropertyTemplateConfig *ivConfig, const Options &options) const
 {
     const auto generateFunctionsForPackages = options.isSet(IvOptions::generateFunctionsForPackages);
 
@@ -94,11 +96,11 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(const
     const auto &sedsModelData = sedsModel->data();
     if (std::holds_alternative<seds::model::PackageFile>(sedsModelData)) {
         const auto &sedsPackage = std::get<seds::model::PackageFile>(sedsModelData).package();
-        translatePackage(sedsPackage, asn1Model, ivModel.get(), generateFunctionsForPackages);
+        translatePackage(sedsPackage, ivModel.get(), {}, generateFunctionsForPackages);
     } else if (std::holds_alternative<seds::model::DataSheet>(sedsModelData)) {
         const auto &sedsPackages = std::get<seds::model::DataSheet>(sedsModelData).packages();
         for (const auto &sedsPackage : sedsPackages) {
-            translatePackage(sedsPackage, asn1Model, ivModel.get(), generateFunctionsForPackages);
+            translatePackage(sedsPackage, ivModel.get(), sedsPackages, generateFunctionsForPackages);
         }
     } else {
         throw TranslationException("Unhandled SEDS model data type");
@@ -110,12 +112,10 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(const
     return resultModels;
 }
 
-void SedsToIvTranslator::translatePackage(
-        const seds::model::Package &sedsPackage, Asn1Model *asn1Model, IVModel *ivModel, bool generateFunction) const
+void SedsToIvTranslator::translatePackage(const seds::model::Package &sedsPackage, IVModel *ivModel,
+        const std::vector<seds::model::Package> &sedsPackages, bool generateFunction) const
 {
-    auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(sedsPackage, asn1Model);
-
-    ComponentsTranslator componentsTranslator(&sedsPackage, asn1Definitions);
+    ComponentsTranslator componentsTranslator(&sedsPackage, sedsPackages);
     auto ivFunctions = componentsTranslator.translateComponents();
 
     if (generateFunction) {
@@ -132,6 +132,19 @@ void SedsToIvTranslator::translatePackage(
     } else {
         ivModel->addObjects(ivFunctions);
     }
+}
+
+const seds::model::Package *SedsToIvTranslator::getSedsPackage(
+        const QString &packageName, const std::vector<seds::model::Package> &sedsPackages)
+{
+    const auto sedsPackage = std::find_if(sedsPackages.begin(), sedsPackages.end(),
+            [&](const auto &package) { return package.nameStr() == packageName; });
+    if (sedsPackage == sedsPackages.end()) {
+        auto message = QString("Unable to find package \"%1\"").arg(packageName);
+        throw TranslationException(std::move(message));
+    }
+
+    return &(*sedsPackage);
 }
 
 } // namespace conversion::iv::translator

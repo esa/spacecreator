@@ -19,12 +19,15 @@
 
 #include "converter.h"
 
+#include <QBuffer>
 #include <QDebug>
 #include <QProcess>
+#include <QTemporaryFile>
 #include <QtDebug>
 #include <QtGlobal>
 #include <conversion/asn1/Asn1Options/options.h>
 #include <conversion/asn1/Asn1Registrar/registrar.h>
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/exceptions.h>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/import/exceptions.h>
@@ -33,14 +36,19 @@
 #include <conversion/converter/exceptions.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/IvRegistrar/registrar.h>
+#include <conversion/msc/MscRegistrar/registrar.h>
 #include <conversion/promela/PromelaRegistrar/registrar.h>
+#include <iostream>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivxmlreader.h>
+#include <libiveditor/ivexporter.h>
 #include <promela/PromelaOptions/options.h>
 #include <tmc/SdlToPromelaConverter/converter.h>
+#include <tmc/TmcInterfaceViewOptimizer/interfaceviewoptimizer.h>
 
 using conversion::ConversionException;
 using conversion::Converter;
+using conversion::Escaper;
 using conversion::ModelType;
 using conversion::Options;
 using conversion::RegistrationFailedException;
@@ -50,16 +58,36 @@ using conversion::exporter::ExportException;
 using conversion::importer::ImportException;
 using conversion::iv::IvOptions;
 using conversion::iv::IvRegistrar;
+using conversion::msc::MscRegistrar;
 using conversion::promela::PromelaOptions;
 using conversion::promela::PromelaRegistrar;
 using conversion::translator::TranslationException;
+using ive::IVExporter;
 using ivm::IVFunction;
+using ivm::IVFunctionType;
 using ivm::IVInterface;
 using ivm::IVModel;
+using ivm::IVObject;
 using shared::InterfaceParameter;
 using tmc::converter::TmcConverter;
 
 namespace tmc::converter {
+
+TmcConverter::ObserverInfo::ObserverInfo(const QString path, const uint32_t priority)
+{
+    m_path = path;
+    m_priority = priority;
+}
+
+const QString &TmcConverter::ObserverInfo::path() const
+{
+    return m_path;
+}
+uint32_t TmcConverter::ObserverInfo::priority() const
+{
+    return m_priority;
+}
+
 TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &outputDirectory)
     : m_inputIvFilepath(inputIvFilepath)
     , m_outputDirectoryFilepath(outputDirectory)
@@ -76,6 +104,11 @@ TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &output
     if (!result) {
         throw RegistrationFailedException(ModelType::InterfaceView);
     }
+    MscRegistrar mscRegistrar;
+    result = mscRegistrar.registerCapabilities(m_registry);
+    if (!result) {
+        throw RegistrationFailedException(ModelType::Msc);
+    }
     PromelaRegistrar tmcRegistrar;
     result = tmcRegistrar.registerCapabilities(m_registry);
     if (!result) {
@@ -83,18 +116,49 @@ TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &output
     }
 
     m_dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
-    m_dynPropConfig->init(QLatin1String("default_attributes.xml"));
+    m_dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
 }
 
 bool TmcConverter::convert()
 {
-    if (!convertSystem()) {
+    std::map<QString, ProcessMetadata> allSdlFiles;
+    if (!convertSystem(allSdlFiles)) {
         return false;
     }
-    if (!convertStopConditions()) {
+    if (!convertStopConditions(allSdlFiles)) {
         return false;
     }
     return true;
+}
+
+void TmcConverter::setEnvironmentFunctions(const std::vector<QString> &environmentFunctions)
+{
+    m_environmentFunctions = environmentFunctions;
+}
+
+void TmcConverter::setKeepFunctions(const std::vector<QString> &keepFunctions)
+{
+    m_keepFunctions = keepFunctions;
+}
+
+void TmcConverter::setGlobalInputVectorLengthLimit(std::optional<QString> limit)
+{
+    m_globalInputVectorLengthLimit = std::move(limit);
+}
+
+void TmcConverter::setInterfaceInputVectorLengthLimits(std::unordered_map<QString, QString> limits)
+{
+    m_interfaceInputVectorLengthLimits = std::move(limits);
+}
+
+void TmcConverter::setProcessesBasePriority(std::optional<QString> value)
+{
+    m_processesBasePriority = std::move(value);
+}
+
+void TmcConverter::setSubtypesFilepaths(const std::vector<QString> &filepaths)
+{
+    m_subtypesFilepaths = filepaths;
 }
 
 bool TmcConverter::addStopConditionFiles(const QStringList &files)
@@ -107,6 +171,12 @@ bool TmcConverter::addStopConditionFiles(const QStringList &files)
         m_stopConditionsFiles.append(filepath);
     }
 
+    return true;
+}
+
+bool TmcConverter::attachObserver(const QString &observerPath, const uint32_t priority)
+{
+    m_observerInfos.emplace_back(ObserverInfo(observerPath, priority));
     return true;
 }
 
@@ -134,7 +204,40 @@ bool TmcConverter::convertModel(const std::set<conversion::ModelType> &sourceMod
     return false;
 }
 
-bool TmcConverter::convertSystem()
+auto TmcConverter::integrateObserver(const ObserverInfo &info, QStringList &observerNames, QStringList &asn1Files,
+        std::map<QString, ProcessMetadata> &allSdlFiles, QStringList &attachmentInfos)
+{
+    const auto process = QFileInfo(info.path());
+    const auto processName = process.baseName();
+    const auto directory = process.absoluteDir();
+    const auto datamodel =
+            QFileInfo(directory.absolutePath() + QDir::separator() + processName.toLower() + "_datamodel.asn");
+
+    ProcessMetadata meta(Escaper::escapePromelaName(processName), std::nullopt, process, datamodel, QList<QFileInfo>());
+    SdlToPromelaConverter sdl2Promela;
+
+    const auto promelaFilename = Escaper::escapePromelaIV(processName) + ".pml";
+    const auto infoPath = outputFilepath(Escaper::escapePromelaIV(processName) + ".info");
+    observerNames.append(Escaper::escapePromelaIV(processName));
+    sdl2Promela.convertObserverSdl(meta, outputFilepath(promelaFilename), infoPath);
+    QFile infoFile(infoPath.absoluteFilePath());
+    if (infoFile.open(QIODevice::ReadOnly)) {
+        QTextStream in(&infoFile);
+        while (!in.atEnd()) {
+            attachmentInfos.append(in.readLine() + ":" + QString::number(info.priority()));
+            qDebug() << "Appended observer specification " << attachmentInfos.last();
+        }
+        infoFile.close();
+    } else {
+        const auto message = QString("Could not open observer info file %1").arg(infoPath.absoluteFilePath());
+        throw TranslationException(message);
+    }
+
+    allSdlFiles.emplace(processName, meta);
+    asn1Files.append(datamodel.absoluteFilePath());
+}
+
+bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles)
 {
     const QFileInfo ivFileInfo(m_inputIvFilepath);
 
@@ -160,9 +263,34 @@ bool TmcConverter::convertSystem()
         return false;
     }
 
+    if (!m_environmentFunctions.empty() && !m_keepFunctions.empty()) {
+        qCritical() << "Environment and keep functions shouldn't be specified at once";
+        return false;
+    }
+
+    if (!m_environmentFunctions.empty()) {
+        InterfaceViewOptimizer::optimizeModel(
+                inputIv.get(), m_environmentFunctions, InterfaceViewOptimizer::Mode::Environment);
+    } else if (!m_keepFunctions.empty()) {
+        InterfaceViewOptimizer::optimizeModel(inputIv.get(), m_keepFunctions, InterfaceViewOptimizer::Mode::Keep);
+    } else {
+        InterfaceViewOptimizer::optimizeModel(inputIv.get(), {}, InterfaceViewOptimizer::Mode::None);
+    }
+
+    QTemporaryFile outputOptimizedIvFile;
+    if (!outputOptimizedIvFile.open()) {
+        qCritical() << "Unable to create temp file for optimized IV model";
+        return false;
+    }
+    outputOptimizedIvFile.close();
+    const auto &outputOptimizedIvFileName = outputOptimizedIvFile.fileName();
+
+    saveOptimizedInterfaceView(inputIv.get(), outputOptimizedIvFileName);
+
     QStringList modelFunctions;
     QStringList environmentFunctions;
-    findFunctionsToConvert(*inputIv, modelFunctions, environmentFunctions);
+
+    findFunctionsToConvert(*inputIv, modelFunctions, allSdlFiles, environmentFunctions);
     QStringList environmentDatatypes;
     findEnvironmentDatatypes(*inputIv, environmentFunctions, environmentDatatypes);
 
@@ -170,81 +298,95 @@ bool TmcConverter::convertSystem()
     qDebug() << "Using the following ENV functions: " << environmentFunctions.join(", ");
     qDebug() << "Using the following ENV data types: " << environmentDatatypes.join(", ");
 
+    QMap<QString, QString> uniqueAsn1Files;
     for (const QString &ivFunction : modelFunctions) {
-        QList<QFileInfo> sdlFiles;
-        sdlFiles.append(sdlSystemStructureLocation(ivFunction));
-        sdlFiles.append(sdlImplementationLocation(ivFunction));
-        const QFileInfo outputFile = outputFilepath(ivFunction.toLower() + ".pml");
+        const ProcessMetadata &processMetadata = allSdlFiles.at(ivFunction);
+        const QFileInfo outputFile = outputFilepath(processMetadata.getName().toLower() + ".pml");
 
         SdlToPromelaConverter sdl2Promela;
 
-        if (!sdl2Promela.convertSdl(sdlFiles, outputFile)) {
+        if (!sdl2Promela.convertSdl(processMetadata, outputFile)) {
             return false;
         }
     }
 
     QStringList asn1Files;
 
-    const QFileInfo dataviewUniq = dataViewUniqLocation();
-    if (!dataviewUniq.exists()) {
-        qCritical() << "File " << dataviewUniq.absoluteFilePath() << " does not exist.";
+    for (const auto &info : m_observerInfos) {
+        integrateObserver(info, m_observerNames, asn1Files, allSdlFiles, m_observerAttachmentInfos);
+    }
+
+    const QFileInfo simuDataView = simuDataViewLocation();
+    if (!simuDataView.exists()) {
+        qCritical() << "File " << simuDataView.absoluteFilePath() << " does not exist.";
         return false;
     }
 
-    asn1Files.append(dataviewUniq.absoluteFilePath());
+    asn1Files.append(simuDataView.absoluteFilePath());
 
-    for (const QString &ivFunction : modelFunctions) {
-        const QFileInfo functionDatamodel = sdlFunctionDatamodelLocation(ivFunction);
-
-        if (!functionDatamodel.exists()) {
-            qCritical() << "File " << functionDatamodel.absoluteFilePath() << " does not exist.";
+    for (const QString &datamodel : uniqueAsn1Files) {
+        if (!QFileInfo(datamodel).exists()) {
+            qCritical() << "File " << datamodel << " does not exist.";
             return false;
         }
 
-        asn1Files.append(functionDatamodel.absoluteFilePath());
+        asn1Files.append(datamodel);
+    }
+
+    for (const auto &subtypesFilepath : m_subtypesFilepaths) {
+        QFileInfo subtypesFileInfo(subtypesFilepath);
+
+        if (!subtypesFileInfo.exists()) {
+            qCritical() << "File " << subtypesFileInfo.absoluteFilePath() << " with subtypes does not exist.";
+            return false;
+        }
+
+        asn1Files.append(subtypesFileInfo.absoluteFilePath());
     }
 
     const QFileInfo outputDataview = outputFilepath("dataview.pml");
-
     convertDataview(asn1Files, outputDataview.absoluteFilePath());
 
     const QFileInfo outputEnv = outputFilepath("env_inlines.pml");
-
-    createEnvGenerationInlines(dataviewUniq, outputEnv, environmentDatatypes);
+    createEnvGenerationInlines(simuDataView, outputEnv, environmentDatatypes);
 
     const QFileInfo outputSystemFile = outputFilepath("system.pml");
-
-    convertInterfaceview(
-            ivFileInfo.absoluteFilePath(), outputSystemFile.absoluteFilePath(), modelFunctions, environmentFunctions);
+    convertInterfaceview(outputOptimizedIvFileName, outputSystemFile.absoluteFilePath(), asn1Files, modelFunctions,
+            environmentFunctions);
 
     return true;
 }
 
-bool TmcConverter::convertStopConditions()
+bool TmcConverter::convertStopConditions(const std::map<QString, ProcessMetadata> &allSdlFiles)
 {
     const QDir outputDirectory = QDir(m_outputDirectory);
 
-    for (const QString &filepath : m_stopConditionsFiles) {
-        const QFileInfo input(filepath);
-        const QString base = input.baseName();
-        const QFileInfo output = outputFilepath(base.toLower() + ".pml");
+    QList<QFileInfo> inputFiles;
 
-        SdlToPromelaConverter sdl2Promela;
-        if (sdl2Promela.convertStopCondition(input, output)) {
-            return false;
-        }
+    for (const QString &filepath : m_stopConditionsFiles) {
+        inputFiles.append(QFileInfo(filepath));
+    }
+
+    const QFileInfo output = outputFilepath(QString("scl.pml"));
+    const bool includeObservers = !m_observerNames.isEmpty();
+
+    SdlToPromelaConverter sdl2Promela;
+    if (!sdl2Promela.convertStopConditions(inputFiles, output, allSdlFiles, includeObservers)) {
+        return false;
     }
     return true;
 }
+
 bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QString &outputFilepath,
-        const QStringList &modelFunctions, const QStringList &environmentFunctions)
+        const QList<QString> &asn1FilepathList, const QStringList &modelFunctions,
+        const QStringList &environmentFunctions)
 {
     qDebug() << "Converting InterfaceView " << inputFilepath << " to " << outputFilepath;
 
     Options options;
 
     options.add(IvOptions::inputFilepath, inputFilepath);
-    options.add(IvOptions::configFilepath, IvOptions::defaultConfigFilename);
+    options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
     options.add(PromelaOptions::outputFilepath, outputFilepath);
 
     for (const QString &function : modelFunctions) {
@@ -255,16 +397,40 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
         options.add(PromelaOptions::environmentFunctionName, function);
     }
 
-    for (const QString &filepath : m_stopConditionsFiles) {
-        const QFileInfo input(filepath);
-        const QString base = input.baseName();
-
-        options.add(PromelaOptions::additionalIncludes, base.toLower() + ".pml");
+    if (m_globalInputVectorLengthLimit) {
+        options.add(PromelaOptions::globalInputVectorLengthLimit, *m_globalInputVectorLengthLimit);
     }
 
-    ModelType sourceModelType = ModelType::InterfaceView;
+    for (const auto &[interfaceName, value] : m_interfaceInputVectorLengthLimits) {
+        options.add(PromelaOptions::interfaceInputVectorLengthLimit.arg(interfaceName.toLower()), value);
+    }
 
-    return convertModel({ sourceModelType }, ModelType::Promela, {}, std::move(options));
+    if (m_processesBasePriority) {
+        options.add(PromelaOptions::processesBasePriority, *m_processesBasePriority);
+    }
+
+    for (const auto &subtypesFilepath : m_subtypesFilepaths) {
+        QFileInfo subtypesFileInfo(subtypesFilepath);
+        options.add(PromelaOptions::subtypesFilepath, subtypesFileInfo.absoluteFilePath());
+    }
+
+    for (const QString &observer : m_observerNames) {
+        options.add(PromelaOptions::observerFunctionName, observer);
+    }
+
+    for (const auto &info : m_observerAttachmentInfos) {
+        options.add(PromelaOptions::observerAttachment, info);
+    }
+
+    if (!m_stopConditionsFiles.isEmpty() || !m_observerNames.isEmpty()) {
+        options.add(PromelaOptions::additionalIncludes, "scl.pml");
+    }
+
+    for (const QString &inputFileName : asn1FilepathList) {
+        options.add(Asn1Options::inputFilepath, inputFileName);
+    }
+
+    return convertModel({ ModelType::InterfaceView, ModelType::Asn1 }, ModelType::Promela, {}, std::move(options));
 }
 
 bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath)
@@ -275,17 +441,21 @@ bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, cons
     }
     qDebug() << "  to:";
     qDebug() << "    " << outputFilepath;
+
     Options options;
 
     for (const QString &inputFileName : inputFilepathList) {
         options.add(Asn1Options::inputFilepath, inputFileName);
     }
 
+    for (const auto &subtypesFilepath : m_subtypesFilepaths) {
+        QFileInfo subtypesFileInfo(subtypesFilepath);
+        options.add(PromelaOptions::subtypesFilepath, subtypesFileInfo.absoluteFilePath());
+    }
+
     options.add(PromelaOptions::outputFilepath, outputFilepath);
 
-    ModelType sourceModelType = ModelType::Asn1;
-
-    return convertModel({ sourceModelType }, ModelType::Promela, {}, std::move(options));
+    return convertModel({ ModelType::Asn1 }, ModelType::Promela, {}, std::move(options));
 }
 
 std::unique_ptr<IVModel> TmcConverter::readInterfaceView(const QString &filepath)
@@ -304,14 +474,62 @@ std::unique_ptr<IVModel> TmcConverter::readInterfaceView(const QString &filepath
     return {};
 }
 
-void TmcConverter::findFunctionsToConvert(const IVModel &model, QStringList &sdlFunctions, QStringList &envFunctions)
+void TmcConverter::saveOptimizedInterfaceView(const IVModel *ivModel, const QString outputFilePath)
+{
+    QByteArray modelData;
+    QBuffer modelDataBuffer(&modelData);
+    modelDataBuffer.open(QIODevice::WriteOnly);
+
+    IVExporter exporter;
+    exporter.exportObjects(ivModel->objects().values(), &modelDataBuffer);
+
+    QSaveFile outputFile(outputFilePath);
+    outputFile.open(QIODevice::WriteOnly);
+    outputFile.write(modelData);
+    outputFile.commit();
+}
+
+void TmcConverter::findFunctionsToConvert(const IVModel &model, QStringList &sdlFunctions,
+        std::map<QString, ProcessMetadata> &sdlProcesses, QStringList &envFunctions)
 {
     QStringList functionNames;
+
+    QVector<IVFunctionType *> ivFunctionTypeList = model.allObjectsByType<IVFunctionType>();
+
+    for (IVFunctionType *ivFunctionType : ivFunctionTypeList) {
+        if (ivFunctionType->type() == IVObject::Type::FunctionType) {
+            const QString name = ivFunctionType->property("name").toString();
+            qDebug() << "Function Type " << name;
+        }
+    }
 
     QVector<IVFunction *> ivFunctionList = model.allObjectsByType<IVFunction>();
     for (IVFunction *ivFunction : ivFunctionList) {
         if (isSdlFunction(ivFunction)) {
-            sdlFunctions.append(ivFunction->property("name").toString());
+            const QString ivFunctionName = ivFunction->property("name").toString();
+            sdlFunctions.append(ivFunctionName);
+
+            const QFileInfo systemStructure = sdlSystemStructureLocation(ivFunctionName);
+            QList<QFileInfo> contextLocations;
+            contextLocations.append(sdlFunctionContextLocation(ivFunctionName));
+
+            if (ivFunction->instanceOf() != nullptr) {
+                const QString ivFunctionTypeName = ivFunction->instanceOf()->property("name").toString();
+                contextLocations.append(sdlFunctionContextLocation(ivFunctionTypeName));
+                const QFileInfo sdlProcess = sdlImplementationLocation(ivFunctionTypeName);
+                const QFileInfo functionDatamodel = sdlFunctionDatamodelLocation(ivFunctionName, ivFunctionTypeName);
+
+                sdlProcesses.emplace(ivFunctionName,
+                        ProcessMetadata(ivFunctionName, systemStructure, sdlProcess, functionDatamodel,
+                                std::move(contextLocations)));
+            } else {
+                const QFileInfo sdlProcess = sdlImplementationLocation(ivFunctionName);
+                const QFileInfo functionDatamodel = sdlFunctionDatamodelLocation(ivFunctionName);
+                sdlProcesses.emplace(ivFunctionName,
+                        ProcessMetadata(ivFunctionName, systemStructure, sdlProcess, functionDatamodel,
+                                std::move(contextLocations)));
+            }
+
         } else {
             envFunctions.append(ivFunction->property("name").toString());
         }
@@ -354,10 +572,21 @@ bool TmcConverter::createEnvGenerationInlines(
     Options options;
 
     options.add(Asn1Options::inputFilepath, inputDataView.absoluteFilePath());
+
+    for (const auto &subtypesFilepath : m_subtypesFilepaths) {
+        QFileInfo subtypesFileInfo(subtypesFilepath);
+
+        qDebug() << "Converting ASN.1 subtypes value generators using " << subtypesFileInfo.absoluteFilePath();
+        options.add(Asn1Options::inputFilepath, subtypesFileInfo.absoluteFilePath());
+        options.add(PromelaOptions::subtypesFilepath, subtypesFileInfo.absoluteFilePath());
+    }
+
     options.add(PromelaOptions::outputFilepath, outputFilepath.absoluteFilePath());
 
+    options.add(PromelaOptions::asn1ValueGeneration);
+
     for (const QString &datatype : envDatatypes) {
-        options.add(PromelaOptions::asn1ValueGeneration, datatype);
+        options.add(PromelaOptions::asn1ValueGenerationForType, datatype);
     }
 
     ModelType sourceModelType = ModelType::Asn1;
@@ -386,10 +615,10 @@ QFileInfo TmcConverter::workDirectory() const
     return m_ivBaseDirectory.absolutePath() + QDir::separator() + "work";
 }
 
-QFileInfo TmcConverter::dataViewUniqLocation() const
+QFileInfo TmcConverter::simuDataViewLocation() const
 {
-    return workDirectory().absoluteFilePath() + QDir::separator() + "dataview" + QDir::separator()
-            + "dataview-uniq.asn";
+    return workDirectory().absoluteFilePath() + QDir::separator() + "simulation" + QDir::separator() + "observers"
+            + QDir::separator() + "observer.asn";
 }
 
 QFileInfo TmcConverter::sdlImplementationBaseDirectory(const QString &functionName) const
@@ -413,6 +642,23 @@ QFileInfo TmcConverter::sdlFunctionDatamodelLocation(const QString &functionName
 {
     return sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator() + "code"
             + QDir::separator() + functionName.toLower() + "_datamodel.asn";
+}
+
+QFileInfo TmcConverter::sdlFunctionDatamodelLocation(const QString &functionName, const QString &functionTypeName) const
+{
+    return sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator() + "code"
+            + QDir::separator() + functionTypeName.toLower() + "_datamodel.asn";
+}
+
+QFileInfo TmcConverter::sdlFunctionContextLocation(const QString &functionName) const
+{
+    QFileInfo contextLocation = sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator()
+            + "Context-" + functionName.toLower() + ".asn";
+    if (contextLocation.exists()) {
+        return contextLocation;
+    } else {
+        return QFileInfo();
+    }
 }
 
 QFileInfo TmcConverter::outputFilepath(const QString &name)

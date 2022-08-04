@@ -19,11 +19,14 @@
 
 #pragma once
 
-#include "generictypemapper.h"
+#include "context.h"
+#include "interfacetypenamehelper.h"
 
 #include <QVector>
+#include <asn1library/asn1/asn1model.h>
 #include <ivcore/ivinterface.h>
 #include <optional>
+#include <seds/SedsModel/interfaces/interfacedeclarationref.h>
 
 namespace Asn1Acn {
 class Definitions;
@@ -35,7 +38,6 @@ class IVFunction;
 
 namespace seds::model {
 class Component;
-class GenericTypeMapSet;
 class Interface;
 class InterfaceDeclaration;
 class Package;
@@ -53,9 +55,10 @@ public:
      * @brief   Constructor
      *
      * @param   sedsPackage         Package with components to translate
-     * @param   asn1Definitions     ASN.1 file where types of the packed argument will be saved
+     * @param   sedsPackages        List of SEDS packages
      */
-    ComponentsTranslator(const seds::model::Package *sedsPackage, Asn1Acn::Definitions *asn1Definitions);
+    ComponentsTranslator(
+            const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages);
     /**
      * @brief   Deleted copy constructor
      */
@@ -81,24 +84,6 @@ public:
      */
     auto translateComponents() -> QVector<ivm::IVFunction *>;
 
-public:
-    /**
-     * @brief   Searches for interface declaration
-     *
-     * It first searches in the component interface declarations. If no declaration was found
-     * then it searches in the package interface declarations.
-     *
-     * @param   name            Interface declaration name
-     * @param   sedsComponent   Component to search in
-     * @param   sedsPackage     Package to search in, if the search in the component fails
-     *
-     * @throw UndeclaredInterfaceException  If interface declaration was not found
-     *
-     * @return  Found interface declarartion
-     */
-    static auto findInterfaceDeclaration(const QString &name, const seds::model::Component &sedsComponent,
-            const seds::model::Package *sedsPackage) -> const seds::model::InterfaceDeclaration &;
-
 private:
     /**
      * @brief   Translates SEDS component to InterfaceView function
@@ -119,24 +104,24 @@ private:
      */
     auto translateInterface(const seds::model::Interface &sedsInterface, const seds::model::Component &sedsComponent,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) -> void;
-    auto translateInterfaceDeclaration(const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
-            const QString &sedsInterfaceName, const std::optional<seds::model::GenericTypeMapSet> &genericTypeMapSet,
-            const seds::model::Component &sedsComponent, const ivm::IVInterface::InterfaceType interfaceType,
-            ivm::IVFunction *ivFunction) const -> void;
+    auto translateInterfaceDeclaration(const seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
+            const QString &sedsInterfaceName, const seds::model::Component &sedsComponent, const QString &parentName,
+            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction, Context context) const
+            -> void;
     auto translateParameters(const QString &sedsInterfaceName,
-            const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
+            const seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
-            const GenericTypeMapper *typeMapper) const -> void;
+            const InterfaceTypeNameHelper &typeNameHelper) const -> void;
     auto translateCommands(const QString &sedsInterfaceName,
-            const seds::model::InterfaceDeclaration &sedsInterfaceDeclaration,
+            const seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
-            const GenericTypeMapper *typeMapper) const -> void;
+            const InterfaceTypeNameHelper &typeNameHelper) const -> void;
 
 private:
     /// @brief  Parent package
     const seds::model::Package *m_sedsPackage;
-    /// @brief  Target ASN.1 type definitions
-    Asn1Acn::Definitions *m_asn1Definitions;
+    /// @brief  List of SEDS packages
+    const std::vector<seds::model::Package> &m_sedsPackages;
 };
 
 } // namespace conversion::iv::translator

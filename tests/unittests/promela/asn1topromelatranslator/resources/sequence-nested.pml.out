@@ -1,0 +1,18 @@
+inline Inner_sequence_write_address_generate_value(Inner_sequence_write_address_gv)
+{
+    int Inner_sequence_write_address_tmp;
+    if
+    ::  atomic {
+        select (Inner_sequence_write_address_tmp : 0 .. 10);
+    }
+    fi;
+    Inner_sequence_write_address_gv = Inner_sequence_write_address_tmp;
+}
+inline Inner_sequence_generate_value(Inner_sequence_gv)
+{
+    Inner_sequence_write_address_generate_value(Inner_sequence_gv.write_address);
+}
+inline Outer_sequence_generate_value(Outer_sequence_gv)
+{
+    Inner_sequence_generate_value(Outer_sequence_gv.mywritevalue);
+}

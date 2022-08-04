@@ -1,0 +1,59 @@
+COM-N7SPACE-PATCHED DEFINITIONS ::= BEGIN
+IntegerData [size 8, encoding pos-int, endianness big]
+FloatData [encoding IEEE754-1985-32, endianness big]
+LengthType [size 16, encoding pos-int, endianness little]
+GigaLengthType [size 32, encoding pos-int, endianness little]
+Crc8Pattern []
+Crc16Pattern []
+ChecksumPattern []
+ChecksumLongitudinalPattern []
+PacketHeader []
+{
+    version [],
+    release []
+}
+PacketBody []
+{
+    data []
+}
+Crc8-Packet [post-encoding-function crc8-packet-encoding-function, post-decoding-validator crc8-packet-decoding-validator]
+{
+    nice-Packet-header [],
+    nice-Packet-lengthEntry NULL [align-to-next byte, pattern '0000000000000000'B, save-position],
+    nice-Packet-body [],
+    nice-Packet-errorControlEntry NULL [align-to-next byte, pattern '00000000'B, save-position]
+}
+Crc16-Packet [post-encoding-function crc16-packet-encoding-function, post-decoding-validator crc16-packet-decoding-validator]
+{
+    nice-Packet-header [],
+    nice-Packet-lengthEntry NULL [align-to-next byte, pattern '00000000000000000000000000000000'B, save-position],
+    nice-Packet-body [],
+    nice-Packet-errorControlEntry NULL [align-to-next byte, pattern '0000000000000000'B, save-position]
+}
+Checksum-Packet [post-encoding-function checksum-packet-encoding-function, post-decoding-validator checksum-packet-decoding-validator]
+{
+    nice-Packet-header [],
+    nice-Packet-lengthEntry NULL [align-to-next byte, pattern '0000000000000000'B, save-position],
+    nice-Packet-body [],
+    nice-Packet-errorControlEntry NULL [align-to-next byte, pattern '00000000000000000000000000000000'B, save-position]
+}
+ChecksumLongitudinal-Packet [post-encoding-function checksumlongitudinal-packet-encoding-function, post-decoding-validator checksumlongitudinal-packet-decoding-validator]
+{
+    nice-Packet-header [],
+    nice-Packet-lengthEntry NULL [align-to-next byte, pattern '0000000000000000'B, save-position],
+    nice-Packet-body [],
+    nice-Packet-errorControlEntry NULL [align-to-next byte, pattern '00000000'B, save-position]
+}
+OnlyErrorControl [post-encoding-function onlyerrorcontrol-encoding-function, post-decoding-validator onlyerrorcontrol-decoding-validator]
+{
+    nice-Packet-header [],
+    nice-Packet-body [],
+    nice-Packet-errorControlEntry NULL [align-to-next byte, pattern '00000000'B, save-position]
+}
+OnlyLength [post-encoding-function onlylength-encoding-function, post-decoding-validator onlylength-decoding-validator]
+{
+    nice-Packet-header [],
+    nice-Packet-lengthEntry NULL [align-to-next byte, pattern '0000000000000000'B, save-position],
+    nice-Packet-body []
+}
+END

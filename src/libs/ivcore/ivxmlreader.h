@@ -35,6 +35,7 @@ class IVFunctionType;
 class IVComment;
 class IVConnection;
 class IVConnectionGroup;
+class IVArchetypeReference;
 struct IVXMLReaderPrivate;
 class IVXMLReader : public shared::XmlReader
 {
@@ -44,6 +45,7 @@ public:
     ~IVXMLReader() override;
 
     QVector<IVObject *> parsedObjects() const;
+    QVector<IVObject *> parsedLayers() const;
 
 protected:
     void processTagOpen(QXmlStreamReader &xml) override;
@@ -58,6 +60,7 @@ private:
     IVComment *addComment();
     IVConnection *addConnection();
     IVConnectionGroup *addConnectionGroup(const QString &groupName);
+    IVArchetypeReference *addArchetypeReference(const QString &archetypeLibrary, const QString &archetypeFunction);
 };
 
 }

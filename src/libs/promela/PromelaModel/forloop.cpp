@@ -19,11 +19,17 @@
 
 #include "forloop.h"
 
+#include "binaryexpression.h"
+#include "constant.h"
+#include "expression.h"
 #include "proctypeelement.h"
+
+#include <stdexcept>
+#include <variant>
 
 namespace promela::model {
 
-ForLoop::ForLoop(VariableRef var, int first, int last, std::unique_ptr<Sequence> sequence)
+ForLoop::ForLoop(VariableRef var, const Expression &first, const Expression &last, std::unique_ptr<Sequence> sequence)
     : m_variable(std::move(var))
     , m_data(std::make_pair(first, last))
     , m_sequence(std::move(sequence))
@@ -47,14 +53,36 @@ const VariableRef &ForLoop::getForVariable() const noexcept
     return m_variable;
 }
 
-int ForLoop::getFirstValue() const
+const Expression &ForLoop::getFirstExpression() const
 {
     return std::get<Range>(m_data).first;
 }
 
-int ForLoop::getLastValue() const
+const Expression &ForLoop::getLastExpression() const
 {
     return std::get<Range>(m_data).second;
+}
+
+int ForLoop::getFirstIntValue() const
+{
+    const Expression &value = std::get<Range>(m_data).first;
+    const auto &content = value.getContent();
+    if (std::holds_alternative<Constant>(content)) {
+        return std::get<Constant>(content).getValue();
+    } else {
+        throw std::logic_error("Expression does not contain a constant");
+    }
+}
+
+int ForLoop::getLastIntValue() const
+{
+    const Expression &value = std::get<Range>(m_data).second;
+    const auto &content = value.getContent();
+    if (std::holds_alternative<Constant>(content)) {
+        return std::get<Constant>(content).getValue();
+    } else {
+        throw std::logic_error("Expression does not contain a constant");
+    }
 }
 
 const VariableRef &ForLoop::getArrayRef() const

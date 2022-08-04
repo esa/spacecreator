@@ -16,5 +16,7 @@ target_link_libraries(${TEST_NAME}
 
 configure_file(resources/parameterless.xml parameterless.xml COPYONLY)
 configure_file(resources/interface_params.xml interface_params.xml COPYONLY)
+configure_file(resources/function_types.xml function_types.xml COPYONLY)
+configure_file(resources/proctype_priority.xml proctype_priority.xml COPYONLY)
 
 add_format_target(${TEST_NAME})

@@ -46,9 +46,9 @@ SedsModelBuilder &SedsModelBuilder::withArrayDataType(QString name, QString item
     return *this;
 }
 
-SedsModelBuilder &SedsModelBuilder::withBinaryDataType(QString name)
+SedsModelBuilder &SedsModelBuilder::withBinaryDataType(QString name, uint64_t bits, bool fixedSize)
 {
-    auto dataType = SedsDataTypeFactory::createBinary(std::move(name));
+    auto dataType = SedsDataTypeFactory::createBinary(std::move(name), bits, fixedSize);
     m_package.addDataType(std::move(dataType));
 
     return *this;

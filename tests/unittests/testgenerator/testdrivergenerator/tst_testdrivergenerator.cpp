@@ -17,35 +17,28 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include <QDebug>
+#include <QDirIterator>
 #include <QObject>
+#include <QStandardPaths>
 #include <QTest>
 #include <QtTest/qtestcase.h>
-#include <algorithm>
-#include <asn1library/asn1/asn1model.h>
-#include <conversion/asn1/Asn1Importer/importer.h>
-#include <conversion/asn1/Asn1Options/options.h>
 #include <conversion/common/model.h>
 #include <conversion/common/options.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/IvXmlImporter/importer.h>
-#include <csv/CsvImporter/csvimporter.h>
-#include <csv/CsvModel/csvmodel.h>
-#include <csv/CsvOptions/options.h>
 #include <ivcore/ivinterface.h>
 #include <ivcore/ivlibrary.h>
 #include <ivcore/ivmodel.h>
 #include <ivcore/ivobject.h>
 #include <memory>
-#include <qdebug.h>
-#include <qdiriterator.h>
-#include <qstandardpaths.h>
+#include <modelloader.h>
 #include <qtestcase.h>
 #include <shared/common.h>
 #include <shared/sharedlibrary.h>
 #include <sstream>
 #include <testgenerator/testgenerator.h>
 
+using plugincommon::ModelLoader;
 using testgenerator::TestDriverGenerator;
 using testgenerator::TestDriverGeneratorException;
 
@@ -63,56 +56,6 @@ private Q_SLOTS:
     void testCyclicInterface();
     void testImplementationNotInC();
 };
-
-static std::unique_ptr<conversion::Model> loadAsn1Model(const QString &filename)
-{
-    std::unique_ptr<conversion::Model> model;
-
-    conversion::Options options;
-    options.add(conversion::asn1::Asn1Options::inputFilepath, filename);
-
-    conversion::asn1::importer::Asn1Importer importer;
-    try {
-        model = importer.importModel(options);
-    } catch (const std::exception &ex) {
-        return nullptr;
-    }
-
-    return model;
-}
-
-static std::unique_ptr<conversion::Model> loadIvModel(
-        const QString &filename, QString configFilename = shared::interfaceCustomAttributesFilePath())
-{
-    std::unique_ptr<conversion::Model> model;
-
-    conversion::Options options;
-    options.add(conversion::iv::IvOptions::inputFilepath, filename);
-    options.add(conversion::iv::IvOptions::configFilepath, std::move(configFilename));
-
-    conversion::iv::importer::IvXmlImporter ivImporter;
-    try {
-        model = ivImporter.importModel(options);
-    } catch (const std::exception &ex) {
-        return nullptr;
-    }
-
-    return model;
-}
-
-static std::unique_ptr<csv::CsvModel> loadCsvModel(const QString &filename)
-{
-    csv::importer::CsvImporter importer;
-    csv::importer::Options options;
-    options.add(csv::importer::CsvOptions::inputFilepath, filename);
-
-    auto csvModel = importer.importModel(options);
-    if (csvModel == nullptr) {
-        throw "CSV file could not be read";
-    }
-
-    return csvModel;
-}
 
 static void checkStreamAgainstExpectedOut(const std::stringstream &stream, const QString &expectedOutFilename)
 {
@@ -137,16 +80,14 @@ static void checkStreamAgainstExpectedOut(const std::stringstream &stream, const
 
 void tst_testdrivergenerator::testEmpty()
 {
-    const auto csvModel = loadCsvModel("resources/empty.csv");
+    const auto csvModel = ModelLoader::loadCsvModel("resources/empty.csv");
     const csv::CsvModel &csvRef = *csvModel;
 
-    const auto asn1ModelRaw = loadAsn1Model("resources/testgenerator.asn");
-    const auto asn1Model = dynamic_cast<Asn1Acn::Asn1Model *>(asn1ModelRaw.get());
+    const auto asn1Model = ModelLoader::loadAsn1Model("resources/testgenerator.asn");
     QVERIFY(asn1Model != nullptr);
     const Asn1Acn::Asn1Model &asn1ModelRef = *asn1Model;
 
-    const auto ivModelRaw = loadIvModel("resources/nominal-interfaceview.xml", "resources/config.xml");
-    const auto ivModel = dynamic_cast<ivm::IVModel *>(ivModelRaw.get());
+    const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/nominal-interfaceview.xml");
     if (ivModel == nullptr) {
         QFAIL("No model");
     }
@@ -163,16 +104,14 @@ void tst_testdrivergenerator::testEmpty()
 
 void tst_testdrivergenerator::testNominal()
 {
-    auto csvModel = loadCsvModel("resources/test_data.csv");
+    auto csvModel = ModelLoader::loadCsvModel("resources/test_data.csv");
     const csv::CsvModel &csvRef = *csvModel;
 
-    const auto asn1ModelRaw = loadAsn1Model("resources/testgenerator.asn");
-    const auto asn1Model = dynamic_cast<Asn1Acn::Asn1Model *>(asn1ModelRaw.get());
+    const auto asn1Model = ModelLoader::loadAsn1Model("resources/testgenerator.asn");
     QVERIFY(asn1Model != nullptr);
     const Asn1Acn::Asn1Model &asn1ModelRef = *asn1Model;
 
-    const auto ivModelRaw = loadIvModel("resources/nominal-interfaceview.xml", "resources/config.xml");
-    const auto ivModel = dynamic_cast<ivm::IVModel *>(ivModelRaw.get());
+    const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/nominal-interfaceview.xml");
     QVERIFY(ivModel != nullptr);
 
     const QString ifName = "PI_InterfaceUnderTest";
@@ -182,23 +121,21 @@ void tst_testdrivergenerator::testNominal()
     }
     const ivm::IVInterface &interface = *ifUnderTest;
 
-    auto outStream = TestDriverGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
+    const auto outStream = TestDriverGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
 
     checkStreamAgainstExpectedOut(outStream, "resources/testdriver.c.out");
 }
 
 void tst_testdrivergenerator::testNominalSwappedColumns()
 {
-    auto csvModel = loadCsvModel("resources/test_data_swapped_columns.csv");
+    auto csvModel = ModelLoader::loadCsvModel("resources/test_data_swapped_columns.csv");
     const csv::CsvModel &csvRef = *csvModel;
 
-    const auto asn1ModelRaw = loadAsn1Model("resources/testgenerator.asn");
-    const auto asn1Model = dynamic_cast<Asn1Acn::Asn1Model *>(asn1ModelRaw.get());
+    const auto asn1Model = ModelLoader::loadAsn1Model("resources/testgenerator.asn");
     QVERIFY(asn1Model != nullptr);
     const Asn1Acn::Asn1Model &asn1ModelRef = *asn1Model;
 
-    const auto ivModelRaw = loadIvModel("resources/nominal-interfaceview.xml", "resources/config.xml");
-    const auto ivModel = dynamic_cast<ivm::IVModel *>(ivModelRaw.get());
+    const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/nominal-interfaceview.xml");
     QVERIFY(ivModel != nullptr);
 
     const QString ifName = "PI_InterfaceUnderTest";
@@ -208,23 +145,21 @@ void tst_testdrivergenerator::testNominalSwappedColumns()
     }
     const ivm::IVInterface &interface = *ifUnderTest;
 
-    auto outStream = TestDriverGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
+    const auto outStream = TestDriverGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
 
     checkStreamAgainstExpectedOut(outStream, "resources/testdriver.c.out");
 }
 
 void tst_testdrivergenerator::testNominalTwoOutputs()
 {
-    auto csvModel = loadCsvModel("resources/two_outputs-test_data.csv");
+    auto csvModel = ModelLoader::loadCsvModel("resources/two_outputs-test_data.csv");
     const csv::CsvModel &csvRef = *csvModel;
 
-    const auto asn1ModelRaw = loadAsn1Model("resources/testgenerator.asn");
-    const auto asn1Model = dynamic_cast<Asn1Acn::Asn1Model *>(asn1ModelRaw.get());
+    const auto asn1Model = ModelLoader::loadAsn1Model("resources/testgenerator.asn");
     QVERIFY(asn1Model != nullptr);
     const Asn1Acn::Asn1Model &asn1ModelRef = *asn1Model;
 
-    const auto ivModelRaw = loadIvModel("resources/two_outputs-interfaceview.xml", "resources/config.xml");
-    const auto ivModel = dynamic_cast<ivm::IVModel *>(ivModelRaw.get());
+    const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/two_outputs-interfaceview.xml");
     QVERIFY(ivModel != nullptr);
 
     const QString ifName = "InterfaceUnderTest";
@@ -234,23 +169,21 @@ void tst_testdrivergenerator::testNominalTwoOutputs()
     }
     const ivm::IVInterface &interface = *ifUnderTest;
 
-    auto outStream = TestDriverGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
+    const auto outStream = TestDriverGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
 
     checkStreamAgainstExpectedOut(outStream, "resources/two_outputs-testdriver.c.out");
 }
 
 void tst_testdrivergenerator::testCyclicInterface()
 {
-    auto csvModel = loadCsvModel("resources/test_data.csv");
+    auto csvModel = ModelLoader::loadCsvModel("resources/test_data.csv");
     const csv::CsvModel &csvRef = *csvModel;
 
-    const auto asn1ModelRaw = loadAsn1Model("resources/testgenerator.asn");
-    const auto asn1Model = dynamic_cast<Asn1Acn::Asn1Model *>(asn1ModelRaw.get());
+    const auto asn1Model = ModelLoader::loadAsn1Model("resources/testgenerator.asn");
     QVERIFY(asn1Model != nullptr);
     const Asn1Acn::Asn1Model &asn1ModelRef = *asn1Model;
 
-    const auto ivModelRaw = loadIvModel("resources/cyclicif-interfaceview.xml", "resources/config.xml");
-    const auto ivModel = dynamic_cast<ivm::IVModel *>(ivModelRaw.get());
+    const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/cyclicif-interfaceview.xml");
     QVERIFY(ivModel != nullptr);
 
     const QString ifName = "PI_InterfaceUnderTest";
@@ -266,16 +199,14 @@ void tst_testdrivergenerator::testCyclicInterface()
 
 void tst_testdrivergenerator::testImplementationNotInC()
 {
-    auto csvModel = loadCsvModel("resources/test_data.csv");
+    auto csvModel = ModelLoader::loadCsvModel("resources/test_data.csv");
     const csv::CsvModel &csvRef = *csvModel;
 
-    const auto asn1ModelRaw = loadAsn1Model("resources/testgenerator.asn");
-    const auto asn1Model = dynamic_cast<Asn1Acn::Asn1Model *>(asn1ModelRaw.get());
+    const auto asn1Model = ModelLoader::loadAsn1Model("resources/testgenerator.asn");
     QVERIFY(asn1Model != nullptr);
     const Asn1Acn::Asn1Model &asn1ModelRef = *asn1Model;
 
-    const auto ivModelRaw = loadIvModel("resources/implementation-interfaceview.xml", "resources/config.xml");
-    const auto ivModel = dynamic_cast<ivm::IVModel *>(ivModelRaw.get());
+    const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/implementation-interfaceview.xml");
     QVERIFY(ivModel != nullptr);
 
     const QString ifName = "PI_InterfaceUnderTest";
@@ -285,7 +216,7 @@ void tst_testdrivergenerator::testImplementationNotInC()
     }
     const ivm::IVInterface &interface = *ifUnderTest;
 
-    auto outStream = TestDriverGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
+    const auto outStream = TestDriverGenerator::generateTestDriver(csvRef, interface, asn1ModelRef);
 
     checkStreamAgainstExpectedOut(outStream, "resources/testdriver.c.out");
 }

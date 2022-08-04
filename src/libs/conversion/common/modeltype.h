@@ -19,8 +19,6 @@
 
 #pragma once
 
-class QString;
-
 #include <QString>
 #include <QStringList>
 #include <set>
@@ -36,9 +34,11 @@ enum class ModelType
     Asn1,
     Csv,
     InterfaceView,
+    Msc,
     Promela,
     Sdl,
-    Seds
+    Seds,
+    Simulink
 };
 
 /**
@@ -110,6 +110,17 @@ struct ModelTypeProperties<ModelType::InterfaceView> {
 };
 
 /**
+ * @brief   Specialization for MSC model type
+ */
+template<>
+struct ModelTypeProperties<ModelType::Msc> {
+    /// @brief  Model name
+    static inline const QString name = "MSC";
+    /// @brief  Model extension
+    static inline const QStringList extensions = { ".msc" };
+};
+
+/**
  * @brief   Specialization for Promela model type
  */
 template<>
@@ -138,6 +149,17 @@ template<>
 struct ModelTypeProperties<ModelType::Seds> {
     /// @brief  Model name
     static inline const QString name = "SEDS";
+    /// @brief  Model extension
+    static inline const QStringList extensions = { ".xml" };
+};
+
+/**
+ * @brief   Specialization for SIMULINK model type
+ */
+template<>
+struct ModelTypeProperties<ModelType::Simulink> {
+    /// @brief  Model name
+    static inline const QString name = "SIMULINK";
     /// @brief  Model extension
     static inline const QStringList extensions = { ".xml" };
 };

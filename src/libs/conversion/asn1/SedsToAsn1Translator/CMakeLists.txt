@@ -1,16 +1,38 @@
 project(SedsToAsn1Translator VERSION 1.0.0 LANGUAGES CXX)
 
-set(SOURCES     datatypesdependencyresolver.cpp
+set(SOURCES     context.cpp
+                datatypetranslationhelper.cpp
+                datatypesdependencyresolver.cpp
+                generictypecreator.cpp
+                generictypemapper.cpp
+                interfacetypecreator.cpp
+                interfacetypecreatorcontext.cpp
+                packagesdependencyresolver.cpp
+                patchersnippetsgenerator.cpp
                 translator.cpp
+                specialized/arraydatatypetranslator.cpp
                 specialized/containerconstrainttranslatorvisitor.cpp
+                specialized/containerdatatypetranslator.cpp
                 specialized/datatypetranslatorvisitor.cpp
+                specialized/descriptiontranslator.cpp
                 specialized/dimensiontranslator.cpp
                 specialized/entrytranslatorvisitor.cpp
                 specialized/rangetranslatorvisitor.cpp)
-set(INCLUDES    datatypesdependencyresolver.h
+set(INCLUDES    context.h
+                datatypetranslationhelper.h
+                datatypesdependencyresolver.h
+                generictypecreator.cpp
+                generictypemapper.h
+                interfacetypecreator.h
+                interfacetypecreatorcontext.h
+                packagesdependencyresolver.h
+                patchersnippetsgenerator.h
                 translator.h
+                specialized/arraydatatypetranslator.h
                 specialized/containerconstrainttranslatorvisitor.h
+                specialized/containerdatatypetranslator.h
                 specialized/datatypetranslatorvisitor.h
+                specialized/descriptiontranslator.h
                 specialized/dimensiontranslator.h
                 specialized/entrytranslatorvisitor.h
                 specialized/rangetranslatorvisitor.h

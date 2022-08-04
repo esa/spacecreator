@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="com/n7space/Descriptions" shortDescription="Package short description">
+    <LongDescription>Package
+long description</LongDescription>
+    <DataTypeSet>
+      <IntegerDataType name="IntegerType" shortDescription="Integer short description">
+        <LongDescription>Integer
+long description</LongDescription>
+        <IntegerDataEncoding encoding="twosComplement" byteOrder="littleEndian" sizeInBits="16" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="-32768" max="32767" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+  </Package>
+</PackageFile>

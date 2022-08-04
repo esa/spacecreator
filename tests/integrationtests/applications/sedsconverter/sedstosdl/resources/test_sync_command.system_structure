@@ -18,9 +18,9 @@ system Component;
    -- and copy the signature (the FPAR section) in a text box
    exported procedure IF_SyncCommand_Pi;
       fpar
-            in     A1 Number,
-            in     A2 Number,
-            in/out A3 Number;
+            in     Argument1 Number,
+            in     Argument2 Number,
+            in/out Argument3 Number;
    
       referenced;
 

@@ -22,24 +22,33 @@
 
 namespace dvm {
 
+/**
+ * Represents a message between two node
+ * @note the message can go both ways. So fromNode/toNodes can be swapped (names kept for backwards compatibility)
+ */
 class DVMessage : public DVObject
 {
     Q_OBJECT
     Q_PROPERTY(QString titleUI READ titleUI)
     Q_PROPERTY(QString fromFunction READ fromFunction WRITE setFromFunction)
+    Q_PROPERTY(QStringList fromFunctionPath READ fromFunctionPath)
     Q_PROPERTY(QString fromInterface READ fromInterface WRITE setFromInterface)
     Q_PROPERTY(dvm::DVNode *fromNode READ fromNode)
     Q_PROPERTY(QString toFunction READ toFunction WRITE setToFunction)
+    Q_PROPERTY(QStringList toFunctionPath READ toFunctionPath)
     Q_PROPERTY(QString toInterface READ toInterface WRITE setToInterface)
     Q_PROPERTY(dvm::DVNode *toNode READ toNode)
 
 public:
     explicit DVMessage(QObject *parent = nullptr);
 
+    bool postInit() override;
+
     QString titleUI() const override;
 
     QString fromFunction() const;
     void setFromFunction(const QString &from);
+    QStringList fromFunctionPath() const;
 
     QString fromInterface() const;
     void setFromInterface(const QString &from);
@@ -48,11 +57,15 @@ public:
 
     QString toFunction() const;
     void setToFunction(const QString &to);
+    QStringList toFunctionPath() const;
 
     QString toInterface() const;
     void setToInterface(const QString &to);
 
     DVNode *toNode() const;
+
+private:
+    QStringList pathOfFunction(const QString &functionName, DVNode *node) const;
 };
 
 } // namespace dvm

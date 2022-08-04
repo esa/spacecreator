@@ -39,6 +39,10 @@ class State final : public Node
 {
 public:
     /**
+     * @brief   Default constructor
+     */
+    State() = default;
+    /**
      * @brief   Constructor
      *
      * @param   name              name of this state
@@ -49,17 +53,10 @@ public:
      */
     State(QString name, std::vector<std::unique_ptr<Input>> inputs,
             std::vector<std::unique_ptr<ContinuousSignal>> continuousSignals);
-
-    /**
-     * @brief   Default constructor
-     */
-    State() = default;
-
     /**
      * @brief   Deleted copy constructor
      */
     State(const State &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -69,19 +66,18 @@ public:
      * @brief   Deleted copy assignment operator
      */
     State &operator=(const State &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     State &operator=(State &&) = default;
 
+public:
     /**
      * @brief   Getter for the inputs (input signals)
      *
      * @return  a const reference to a vector of pointers to input signals
      */
     auto inputs() const -> const std::vector<std::unique_ptr<Input>> &;
-
     /**
      * @brief   Add the input signal
      *
@@ -95,7 +91,6 @@ public:
      * @return  a const reference to a vector of pointers to continuous signals
      */
     auto continuousSignals() const -> const std::vector<std::unique_ptr<ContinuousSignal>> &;
-
     /**
      * @brief   Add a continuous signal
      *
@@ -103,6 +98,7 @@ public:
      */
     auto addContinuousSignal(std::unique_ptr<ContinuousSignal> continuousSignal) -> void;
 
+public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */

@@ -63,7 +63,6 @@ public:
      * @param ref name of the variable.
      */
     VariableRef(QString ref);
-
     /**
      * @brief Constructor.
      *
@@ -73,20 +72,18 @@ public:
      * @param indexExpression index expression
      */
     VariableRef(QString ref, std::unique_ptr<Expression> indexExpression);
-
     /**
      * @brief Copy constructor.
      *
      * @param other Other instance of VariableRef.
      */
     VariableRef(const VariableRef &other);
-
     /**
      * @brief Move constructor.
      *
      * @param other Other instance of VariableRef.
      */
-    VariableRef(VariableRef &&other);
+    VariableRef(VariableRef &&other) noexcept;
 
     /**
      * @brief Copy assignment operator.
@@ -95,14 +92,13 @@ public:
      * @return reference to self.
      */
     const VariableRef &operator=(const VariableRef &rhs);
-
     /**
      * @brief Move assignment operator.
      *
      * @param rhs right hand side instance of VariableRef.
      * @return reference to self.
      */
-    const VariableRef &operator=(VariableRef &&rhs);
+    const VariableRef &operator=(VariableRef &&rhs) noexcept;
 
     /**
      * @brief Append single name element to the variable reference.

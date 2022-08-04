@@ -47,6 +47,9 @@ public:
 
     void init() override;
 
+public Q_SLOTS:
+    void done(int r) override;
+
 protected:
     QString objectTypeName() const override;
     dvm::DVObject *dataObject() const override;

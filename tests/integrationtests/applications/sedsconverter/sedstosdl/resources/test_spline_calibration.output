@@ -1,0 +1,515 @@
+/* CIF Process (0, 0), (800, 100) */
+process Calibration;
+    /* CIF Text (0, 150), (400, 500) */
+    dcl Iterator RealType;
+    dcl Calibratedvalue RealType;
+    dcl RawSplinePoints1 SplinePointsArray;
+    dcl CalibratedSplinePoints1 SplinePointsArray;
+    dcl RawSplinePoints2 SplinePointsArray;
+    dcl CalibratedSplinePoints2 SplinePointsArray;
+    dcl RawSplinePoints3 SplinePointsArray;
+    dcl CalibratedSplinePoints3 SplinePointsArray;
+    /* CIF ENDTEXT */
+    /* CIF Procedure (0, 900), (800, 50) */
+    procedure InitRawSplinePoints1;
+        /* CIF Start (0, 0), (200, 75) */
+        START;
+            /* CIF Task (0, 187), (100, 50) */
+            task RawSplinePoints1 := { 1.000000, 5.000000, 10.000000, 20.000000 };
+        return;
+    endprocedure;
+    /* CIF Procedure (0, 975), (800, 50) */
+    procedure InitCalibratedSplinePoints1;
+        /* CIF Start (0, 0), (200, 75) */
+        START;
+            /* CIF Task (0, 187), (100, 50) */
+            task CalibratedSplinePoints1 := { 2.000000, 10.000000, -20.000000, 40.000000 };
+        return;
+    endprocedure;
+    /* CIF Procedure (0, 1050), (800, 50) */
+    procedure InitRawSplinePoints2;
+        /* CIF Start (0, 0), (200, 75) */
+        START;
+            /* CIF Task (0, 187), (100, 50) */
+            task RawSplinePoints2 := { 1.000000, 5.000000, 10.000000, 20.000000 };
+        return;
+    endprocedure;
+    /* CIF Procedure (0, 1125), (800, 50) */
+    procedure InitCalibratedSplinePoints2;
+        /* CIF Start (0, 0), (200, 75) */
+        START;
+            /* CIF Task (0, 187), (100, 50) */
+            task CalibratedSplinePoints2 := { 2.000000, 10.000000, -20.000000, 40.000000 };
+        return;
+    endprocedure;
+    /* CIF Procedure (0, 1200), (800, 50) */
+    procedure InitRawSplinePoints3;
+        /* CIF Start (0, 0), (200, 75) */
+        START;
+            /* CIF Task (0, 187), (100, 50) */
+            task RawSplinePoints3 := { 1.000000, 5.000000, 10.000000, 20.000000 };
+        return;
+    endprocedure;
+    /* CIF Procedure (0, 1275), (800, 50) */
+    procedure InitCalibratedSplinePoints3;
+        /* CIF Start (0, 0), (200, 75) */
+        START;
+            /* CIF Task (0, 187), (100, 50) */
+            task CalibratedSplinePoints3 := { 2.000000, 10.000000, -20.000000, 40.000000 };
+        return;
+    endprocedure;
+    /* CIF Procedure (0, 1350), (800, 50) */
+    procedure CalibrateActivity;
+        /* CIF Text (0, 0), (400, 500) */
+        dcl intervalIndex SplinePointsArrayIndex;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Task (0, 937), (100, 50) */
+            task Iterator := -5.0;
+            /* CIF Label (0, 1012), (100, 50) */
+            loop_start_1:
+            /* CIF Decision (0, 1012), (400, 50) */
+            decision Iterator <= 25.0;
+                /* CIF Answer (0, 1087), (400, 50) */
+                (False):
+                    /* CIF Join (0, 1162), (100, 50) */
+                    join loop_end_2;
+                /* CIF Answer (600, 1087), (400, 50) */
+                (True):
+                    /* CIF Task (600, 1162), (100, 50) */
+                    task intervalIndex := call FindInterval(Iterator, RawSplinePoints1);
+                    /* CIF Decision (600, 1162), (400, 50) */
+                    decision intervalIndex = -1;
+                        /* CIF Answer (600, 1237), (400, 50) */
+                        (True):
+                            /* CIF Task (600, 1312), (100, 50) */
+                            task Calibratedvalue := CalibratedSplinePoints1(0);
+                        /* CIF Answer (1200, 1237), (400, 50) */
+                        (False):
+                            /* CIF Decision (1200, 1237), (400, 50) */
+                            decision intervalIndex = length(RawSplinePoints1);
+                                /* CIF Answer (1200, 1312), (400, 50) */
+                                (True):
+                                    /* CIF Task (1200, 1387), (100, 50) */
+                                    task Calibratedvalue := CalibratedSplinePoints1(length(CalibratedSplinePoints1) - 1);
+                                /* CIF Answer (1800, 1312), (400, 50) */
+                                (False):
+                                    /* CIF Task (1800, 1387), (100, 50) */
+                                    task Calibratedvalue := call LinearCalibration(intervalIndex, Iterator, RawSplinePoints1, CalibratedSplinePoints1);
+                            enddecision;
+                    enddecision;
+                    /* CIF Task (3000, 1312), (100, 50) */
+                    task Iterator := Iterator + 1.0;
+                    /* CIF Join (3000, 1387), (100, 50) */
+                    join loop_start_1;
+            enddecision;
+            /* CIF Label (3600, 1162), (100, 50) */
+            loop_end_2:
+            /* CIF Task (3600, 1237), (100, 50) */
+            task Iterator := -5.0;
+            /* CIF Label (3600, 1312), (100, 50) */
+            loop_start_3:
+            /* CIF Decision (3600, 1312), (400, 50) */
+            decision Iterator <= 25.0;
+                /* CIF Answer (3600, 1387), (400, 50) */
+                (False):
+                    /* CIF Join (3600, 1462), (100, 50) */
+                    join loop_end_4;
+                /* CIF Answer (4200, 1387), (400, 50) */
+                (True):
+                    /* CIF Task (4200, 1462), (100, 50) */
+                    task intervalIndex := call FindInterval(Iterator, RawSplinePoints2);
+                    /* CIF Decision (4200, 1462), (400, 50) */
+                    decision intervalIndex = -1;
+                        /* CIF Answer (4200, 1537), (400, 50) */
+                        (True):
+                            /* CIF Task (4200, 1612), (100, 50) */
+                            task Calibratedvalue := CalibratedSplinePoints2(0);
+                        /* CIF Answer (4800, 1537), (400, 50) */
+                        (False):
+                            /* CIF Decision (4800, 1537), (400, 50) */
+                            decision intervalIndex = length(RawSplinePoints2);
+                                /* CIF Answer (4800, 1612), (400, 50) */
+                                (True):
+                                    /* CIF Task (4800, 1687), (100, 50) */
+                                    task Calibratedvalue := CalibratedSplinePoints2(length(CalibratedSplinePoints2) - 1);
+                                /* CIF Answer (5400, 1612), (400, 50) */
+                                (False):
+                                    /* CIF Task (5400, 1687), (100, 50) */
+                                    task Calibratedvalue := call SquareCalibration(intervalIndex, Iterator, RawSplinePoints2, CalibratedSplinePoints2);
+                            enddecision;
+                    enddecision;
+                    /* CIF Task (6600, 1612), (100, 50) */
+                    task Iterator := Iterator + 1.0;
+                    /* CIF Join (6600, 1687), (100, 50) */
+                    join loop_start_3;
+            enddecision;
+            /* CIF Label (7200, 1462), (100, 50) */
+            loop_end_4:
+            /* CIF Task (7200, 1537), (100, 50) */
+            task Iterator := -5.0;
+            /* CIF Label (7200, 1612), (100, 50) */
+            loop_start_5:
+            /* CIF Decision (7200, 1612), (400, 50) */
+            decision Iterator <= 25.0;
+                /* CIF Answer (7200, 1687), (400, 50) */
+                (False):
+                    /* CIF Join (7200, 1762), (100, 50) */
+                    join loop_end_6;
+                /* CIF Answer (7800, 1687), (400, 50) */
+                (True):
+                    /* CIF Task (7800, 1762), (100, 50) */
+                    task intervalIndex := call FindInterval(Iterator, RawSplinePoints3);
+                    /* CIF Decision (7800, 1762), (400, 50) */
+                    decision intervalIndex = -1;
+                        /* CIF Answer (7800, 1837), (400, 50) */
+                        (True):
+                            /* CIF Task (7800, 1912), (100, 50) */
+                            task Calibratedvalue := CalibratedSplinePoints3(0);
+                        /* CIF Answer (8400, 1837), (400, 50) */
+                        (False):
+                            /* CIF Decision (8400, 1837), (400, 50) */
+                            decision intervalIndex = length(RawSplinePoints3);
+                                /* CIF Answer (8400, 1912), (400, 50) */
+                                (True):
+                                    /* CIF Task (8400, 1987), (100, 50) */
+                                    task Calibratedvalue := CalibratedSplinePoints3(length(CalibratedSplinePoints3) - 1);
+                                /* CIF Answer (9000, 1912), (400, 50) */
+                                (False):
+                                    /* CIF Task (9000, 1987), (100, 50) */
+                                    task Calibratedvalue := call CubicCalibration(intervalIndex, Iterator, RawSplinePoints3, CalibratedSplinePoints3);
+                            enddecision;
+                    enddecision;
+                    /* CIF Task (10200, 1912), (100, 50) */
+                    task Iterator := Iterator + 1.0;
+                    /* CIF Join (10200, 1987), (100, 50) */
+                    join loop_start_5;
+            enddecision;
+            /* CIF Label (10800, 1762), (100, 50) */
+            loop_end_6:
+        return;
+    endprocedure;
+    /* CIF Procedure (0, 1425), (800, 50) */
+    procedure FindInterval;
+        /* CIF Text (0, 0), (400, 500) */
+        dcl result SplinePointsArrayIndex;
+        fpar
+            in value SplinePointValue,
+            in rawPoints SplinePointsArray;
+        returns SplinePointsArrayIndex;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Decision (0, 862), (400, 50) */
+            decision value < rawPoints(0);
+                /* CIF Answer (0, 937), (400, 50) */
+                (True):
+                    return -1;
+                /* CIF Answer (600, 937), (400, 50) */
+                (False):
+            enddecision;
+            /* CIF Task (1200, 1012), (100, 50) */
+            task result := 0;
+            /* CIF Label (1200, 1087), (100, 50) */
+            find_interval_start:
+            /* CIF Decision (1200, 1087), (400, 50) */
+            decision result < length(rawPoints);
+                /* CIF Answer (1200, 1162), (400, 50) */
+                (True):
+                    /* CIF Decision (1200, 1162), (400, 50) */
+                    decision rawPoints(result) >= value;
+                        /* CIF Answer (1200, 1237), (400, 50) */
+                        (True):
+                            return result;
+                        /* CIF Answer (1800, 1237), (400, 50) */
+                        (False):
+                            /* CIF Task (1800, 1312), (100, 50) */
+                            task result := result + 1;
+                            /* CIF Join (1800, 1387), (100, 50) */
+                            join find_interval_start;
+                    enddecision;
+                /* CIF Answer (3000, 1162), (400, 50) */
+                (False):
+                    /* CIF Join (3000, 1237), (100, 50) */
+                    join find_interval_end;
+            enddecision;
+            /* CIF Label (3600, 1237), (100, 50) */
+            find_interval_end:
+        return result;
+    endprocedure;
+    /* CIF Procedure (0, 1500), (800, 50) */
+    procedure LinearCalibration;
+        /* CIF Text (0, 0), (400, 500) */
+        dcl intervalIndex SplinePointsArrayIndex;
+        dcl x0 SplinePointValue;
+        dcl x1 SplinePointValue;
+        dcl y0 SplinePointValue;
+        dcl y1 SplinePointValue;
+        dcl l0 SplinePointValue;
+        dcl l1 SplinePointValue;
+        dcl result SplinePointValue;
+        fpar
+            in index SplinePointsArrayIndex,
+            in value SplinePointValue,
+            in rawPoints SplinePointsArray,
+            in calibratedPoints SplinePointsArray;
+        returns SplinePointValue;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Task (0, 937), (100, 50) */
+            task intervalIndex := index;
+            /* CIF Decision (0, 937), (400, 50) */
+            decision intervalIndex = -1;
+                /* CIF Answer (0, 1012), (400, 50) */
+                (True):
+                    /* CIF Task (0, 1087), (100, 50) */
+                    task intervalIndex := 1;
+                /* CIF Answer (600, 1012), (400, 50) */
+                (False):
+            enddecision;
+            /* CIF Decision (1200, 1012), (400, 50) */
+            decision intervalIndex = length(rawPoints);
+                /* CIF Answer (1200, 1087), (400, 50) */
+                (True):
+                    /* CIF Task (1200, 1162), (100, 50) */
+                    task intervalIndex := length(rawPoints) - 1;
+                /* CIF Answer (1800, 1087), (400, 50) */
+                (False):
+            enddecision;
+            /* CIF Decision (2400, 1087), (400, 50) */
+            decision value = rawPoints(intervalIndex);
+                /* CIF Answer (2400, 1162), (400, 50) */
+                (True):
+                    return calibratedPoints(intervalIndex);
+                /* CIF Answer (3000, 1162), (400, 50) */
+                (False):
+            enddecision;
+            /* CIF Task (3600, 1237), (100, 50) */
+            task x0 := rawPoints(intervalIndex-1);
+            /* CIF Task (3600, 1312), (100, 50) */
+            task x1 := rawPoints(intervalIndex);
+            /* CIF Task (3600, 1387), (100, 50) */
+            task y0 := calibratedPoints(intervalIndex-1);
+            /* CIF Task (3600, 1462), (100, 50) */
+            task y1 := calibratedPoints(intervalIndex);
+            /* CIF Task (3600, 1537), (100, 50) */
+            task l0 := (value - x1) / (x0 - x1);
+            /* CIF Task (3600, 1612), (100, 50) */
+            task l1 := (value - x0) / (x1 - x0);
+            /* CIF Task (3600, 1687), (100, 50) */
+            task result := l0 * y0 + l1 * y1;
+        return result;
+    endprocedure;
+    /* CIF Procedure (0, 1575), (800, 50) */
+    procedure SquareCalibration;
+        /* CIF Text (0, 0), (400, 500) */
+        dcl intervalIndex SplinePointsArrayIndex;
+        dcl x0 SplinePointValue;
+        dcl x1 SplinePointValue;
+        dcl x2 SplinePointValue;
+        dcl y0 SplinePointValue;
+        dcl y1 SplinePointValue;
+        dcl y2 SplinePointValue;
+        dcl l0 SplinePointValue;
+        dcl l1 SplinePointValue;
+        dcl l2 SplinePointValue;
+        dcl result SplinePointValue;
+        fpar
+            in index SplinePointsArrayIndex,
+            in value SplinePointValue,
+            in rawPoints SplinePointsArray,
+            in calibratedPoints SplinePointsArray;
+        returns SplinePointValue;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Task (0, 937), (100, 50) */
+            task intervalIndex := index;
+            /* CIF Decision (0, 937), (400, 50) */
+            decision intervalIndex = -1;
+                /* CIF Answer (0, 1012), (400, 50) */
+                (True):
+                    /* CIF Task (0, 1087), (100, 50) */
+                    task intervalIndex := 1;
+                /* CIF Answer (600, 1012), (400, 50) */
+                (False):
+            enddecision;
+            /* CIF Decision (1200, 1012), (400, 50) */
+            decision intervalIndex = length(rawPoints);
+                /* CIF Answer (1200, 1087), (400, 50) */
+                (True):
+                    /* CIF Task (1200, 1162), (100, 50) */
+                    task intervalIndex := length(rawPoints) - 2;
+                /* CIF Answer (1800, 1087), (400, 50) */
+                (False):
+            enddecision;
+            /* CIF Decision (2400, 1087), (400, 50) */
+            decision value = rawPoints(intervalIndex);
+                /* CIF Answer (2400, 1162), (400, 50) */
+                (True):
+                    return calibratedPoints(intervalIndex);
+                /* CIF Answer (3000, 1162), (400, 50) */
+                (False):
+            enddecision;
+            /* CIF Decision (3600, 1162), (400, 50) */
+            decision intervalIndex = length(rawPoints) - 1;
+                /* CIF Answer (3600, 1237), (400, 50) */
+                (True):
+                    /* CIF Task (3600, 1312), (100, 50) */
+                    task intervalIndex := length(rawPoints) - 2;
+                /* CIF Answer (4200, 1237), (400, 50) */
+                (False):
+            enddecision;
+            /* CIF Task (4800, 1312), (100, 50) */
+            task x0 := rawPoints(intervalIndex-1);
+            /* CIF Task (4800, 1387), (100, 50) */
+            task x1 := rawPoints(intervalIndex);
+            /* CIF Task (4800, 1462), (100, 50) */
+            task x2 := rawPoints(intervalIndex+1);
+            /* CIF Task (4800, 1537), (100, 50) */
+            task y0 := calibratedPoints(intervalIndex-1);
+            /* CIF Task (4800, 1612), (100, 50) */
+            task y1 := calibratedPoints(intervalIndex);
+            /* CIF Task (4800, 1687), (100, 50) */
+            task y2 := calibratedPoints(intervalIndex+1);
+            /* CIF Task (4800, 1762), (100, 50) */
+            task l0 := ((value - x1) * (value - x2)) / ((x0 - x1) * (x0 - x2));
+            /* CIF Task (4800, 1837), (100, 50) */
+            task l1 := ((value - x0) * (value - x2)) / ((x1 - x0) * (x1 - x2));
+            /* CIF Task (4800, 1912), (100, 50) */
+            task l2 := ((value - x0) * (value - x1)) / ((x2 - x0) * (x2 - x1));
+            /* CIF Task (4800, 1987), (100, 50) */
+            task result := l0 * y0 + l1 * y1 + l2 * y2;
+        return result;
+    endprocedure;
+    /* CIF Procedure (0, 1650), (800, 50) */
+    procedure CubicCalibration;
+        /* CIF Text (0, 0), (400, 500) */
+        dcl intervalIndex SplinePointsArrayIndex;
+        dcl x0 SplinePointValue;
+        dcl x1 SplinePointValue;
+        dcl x2 SplinePointValue;
+        dcl x3 SplinePointValue;
+        dcl y0 SplinePointValue;
+        dcl y1 SplinePointValue;
+        dcl y2 SplinePointValue;
+        dcl y3 SplinePointValue;
+        dcl l0 SplinePointValue;
+        dcl l1 SplinePointValue;
+        dcl l2 SplinePointValue;
+        dcl l3 SplinePointValue;
+        dcl result SplinePointValue;
+        fpar
+            in index SplinePointsArrayIndex,
+            in value SplinePointValue,
+            in rawPoints SplinePointsArray,
+            in calibratedPoints SplinePointsArray;
+        returns SplinePointValue;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Task (0, 937), (100, 50) */
+            task intervalIndex := index;
+            /* CIF Decision (0, 937), (400, 50) */
+            decision intervalIndex = -1;
+                /* CIF Answer (0, 1012), (400, 50) */
+                (True):
+                    /* CIF Task (0, 1087), (100, 50) */
+                    task intervalIndex := 2;
+                /* CIF Answer (600, 1012), (400, 50) */
+                (False):
+            enddecision;
+            /* CIF Decision (1200, 1012), (400, 50) */
+            decision intervalIndex = length(rawPoints);
+                /* CIF Answer (1200, 1087), (400, 50) */
+                (True):
+                    /* CIF Task (1200, 1162), (100, 50) */
+                    task intervalIndex := length(rawPoints) - 2;
+                /* CIF Answer (1800, 1087), (400, 50) */
+                (False):
+            enddecision;
+            /* CIF Decision (2400, 1087), (400, 50) */
+            decision value = rawPoints(intervalIndex);
+                /* CIF Answer (2400, 1162), (400, 50) */
+                (True):
+                    return calibratedPoints(intervalIndex);
+                /* CIF Answer (3000, 1162), (400, 50) */
+                (False):
+            enddecision;
+            /* CIF Decision (3600, 1162), (400, 50) */
+            decision intervalIndex = 1;
+                /* CIF Answer (3600, 1237), (400, 50) */
+                (True):
+                    /* CIF Task (3600, 1312), (100, 50) */
+                    task intervalIndex := 2;
+                /* CIF Answer (4200, 1237), (400, 50) */
+                (False):
+            enddecision;
+            /* CIF Decision (4800, 1237), (400, 50) */
+            decision intervalIndex = length(rawPoints) - 1;
+                /* CIF Answer (4800, 1312), (400, 50) */
+                (True):
+                    /* CIF Task (4800, 1387), (100, 50) */
+                    task intervalIndex := length(rawPoints) - 2;
+                /* CIF Answer (5400, 1312), (400, 50) */
+                (False):
+            enddecision;
+            /* CIF Task (6000, 1387), (100, 50) */
+            task x0 := rawPoints(intervalIndex-2);
+            /* CIF Task (6000, 1462), (100, 50) */
+            task x1 := rawPoints(intervalIndex-1);
+            /* CIF Task (6000, 1537), (100, 50) */
+            task x2 := rawPoints(intervalIndex);
+            /* CIF Task (6000, 1612), (100, 50) */
+            task x3 := rawPoints(intervalIndex+1);
+            /* CIF Task (6000, 1687), (100, 50) */
+            task y0 := calibratedPoints(intervalIndex-2);
+            /* CIF Task (6000, 1762), (100, 50) */
+            task y1 := calibratedPoints(intervalIndex-1);
+            /* CIF Task (6000, 1837), (100, 50) */
+            task y2 := calibratedPoints(intervalIndex);
+            /* CIF Task (6000, 1912), (100, 50) */
+            task y3 := calibratedPoints(intervalIndex+1);
+            /* CIF Task (6000, 1987), (100, 50) */
+            task l0 := ((value - x1) * (value - x2) * (value - x3)) / ((x0 - x1) * (x0 - x2) * (x0 - x3));
+            /* CIF Task (6000, 2062), (100, 50) */
+            task l1 := ((value - x0) * (value - x2) * (value - x3)) / ((x1 - x0) * (x1 - x2) * (x1 - x3));
+            /* CIF Task (6000, 2137), (100, 50) */
+            task l2 := ((value - x0) * (value - x1) * (value - x3)) / ((x2 - x0) * (x2 - x1) * (x2 - x3));
+            /* CIF Task (6000, 2212), (100, 50) */
+            task l3 := ((value - x0) * (value - x1) * (value - x2)) / ((x3 - x0) * (x3 - x1) * (x3 - x2));
+            /* CIF Task (6000, 2287), (100, 50) */
+            task result := l0 * y0 + l1 * y1 + l2 * y2 + l3 * y3;
+        return result;
+    endprocedure;
+    /* CIF Start (0, 1725), (200, 75) */
+    START;
+        /* CIF ProcedureCall (0, 1912), (100, 50) */
+        call InitRawSplinePoints1;
+        /* CIF ProcedureCall (0, 1987), (100, 50) */
+        call InitCalibratedSplinePoints1;
+        /* CIF ProcedureCall (0, 2062), (100, 50) */
+        call InitRawSplinePoints2;
+        /* CIF ProcedureCall (0, 2137), (100, 50) */
+        call InitCalibratedSplinePoints2;
+        /* CIF ProcedureCall (0, 2212), (100, 50) */
+        call InitRawSplinePoints3;
+        /* CIF ProcedureCall (0, 2287), (100, 50) */
+        call InitCalibratedSplinePoints3;
+        /* CIF NextState (0, 2362), (200, 50) */
+        NEXTSTATE Idle;
+    /* CIF State (0, 2437), (200, 50) */
+    state DoCalibration;
+    endstate;
+    /* CIF State (6300, 2437), (200, 50) */
+    state Idle;
+        /* CIF Input (6300, 2437), (200, 50) */
+        input ComponentInterface_Tick_Pi;
+            /* CIF ProcedureCall (6300, 2512), (100, 50) */
+            call CalibrateActivity;
+            /* CIF NextState (6300, 2587), (200, 50) */
+            NEXTSTATE DoCalibration;
+    endstate;
+endprocess Calibration;

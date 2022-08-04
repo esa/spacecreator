@@ -18,5 +18,7 @@ $SEDS_CONVERTER --from SEDS --to ASN.1 --skip-validation -i resources/test_array
 # Compare and clean-up on success
 $DIFF $TEST_OUTPUT_DIR/COM-N7SPACE-ARRAYS.asn resources/test_arrays_asn.output && \
     $DIFF $TEST_OUTPUT_DIR/COM-N7SPACE-ARRAYS.acn resources/test_arrays_acn.output && \
-    asn1scc -c -o $TEST_OUTPUT_DIR $TEST_OUTPUT_DIR/COM-N7SPACE-ARRAYS.asn $TEST_OUTPUT_DIR/COM-N7SPACE-ARRAYS.acn && \
+    $DIFF $TEST_OUTPUT_DIR/COM-N7SPACE-ARRAYS-COMPONENT.asn resources/test_arrays_component_asn.output && \
+    $DIFF $TEST_OUTPUT_DIR/COM-N7SPACE-ARRAYS-COMPONENT.acn resources/test_arrays_component_acn.output && \
+    asn1scc -c -o $TEST_OUTPUT_DIR $TEST_OUTPUT_DIR/COM-N7SPACE-ARRAYS.asn $TEST_OUTPUT_DIR/COM-N7SPACE-ARRAYS.acn  $TEST_OUTPUT_DIR/COM-N7SPACE-ARRAYS-COMPONENT.asn  $TEST_OUTPUT_DIR/COM-N7SPACE-ARRAYS-COMPONENT.acn && \
     rm -r -f $TEST_OUTPUT_DIR

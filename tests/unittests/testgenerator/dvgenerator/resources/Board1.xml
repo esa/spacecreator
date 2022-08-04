@@ -1,0 +1,39 @@
+<Boards>
+    <Board name="x86 Linux CPP" type="ocarina_processors_x86::x86.generic_linux" namespace="ocarina_processors_x86">
+      <Port name="eth0" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::ip_socket" impl_extends="ocarina_drivers::ip_socket.linux" asn1file="/home/taste/tool-inst/include/TASTE-Linux-Drivers/configurations/linux-socket-ip-driver.asn" asn1module="LINUX-SOCKET-IP-DRIVER" asn1type="Socket-IP-Conf-T" requiresBusAccess="ocarina_buses::ip.generic"/>
+      <Port name="uart0" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::serial_ccsds" impl_extends="ocarina_drivers::serial_ccsds.linux" asn1file="/home/taste/tool-inst/include/TASTE-Linux-Drivers/configurations/linux-serial-ccsds-driver.asn" asn1module="LINUX-SERIAL-CCSDS-DRIVER" asn1type="Serial-CCSDS-Linux-Conf-T" requiresBusAccess="ocarina_buses::serial.ccsds"/>
+   </Board>
+   <Board name="SAM V71 FreeRTOS N7S" type="ocarina_processors_arm::samv71.freertos" namespace="ocarina_processors_arm">
+      <Port name="uart0" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::serial_ccsds" impl_extends="ocarina_drivers::serial_ccsds.samv71" asn1file="/home/taste/tool-inst/include/TASTE-SAMV71-Drivers/configurations/samv71-serial-ccsds-driver.asn" asn1module="SAMV71-SERIAL-CCSDS-DRIVER" asn1type="Serial-CCSDS-SamV71-Conf-T" requiresBusAccess="ocarina_buses::serial.ccsds"/>
+   </Board>
+   <Board name="x86 Linux POHIC" type="ocarina_processors_x86::x86.linux" namespace="ocarina_processors_x86">
+      <Port name="ethernet1" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::generic_sockets_ip" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
+      <Port name="ethernet2" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::generic_sockets_ip" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
+      <Port name="ethernet3" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::generic_sockets_ip" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
+   </Board>
+   <Board name="GR740 RTEMS POHIC" type="ocarina_processors_leon::leon3.rtems51_posix" namespace="ocarina_processors_leon">
+   </Board>
+   <Board name="Raspberry PI Linux POHIC" type="ocarina_processors_arm::rpi.posix" namespace="ocarina_processors_arm">
+   </Board>
+   <Board name="ZynQ ZC706 RTEMS POHIC" type="ocarina_processors_arm::zynqzc706.rtems_posix" namespace="ocarina_processors_arm">
+   </Board>
+   <Board name="BRAVE_Large FreeRTOS" type="ocarina_processors_arm::brave_large.freertos" namespace="ocarina_processors_arm">
+   </Board>
+   <Board name="Linux ARM Runtime" type="ocarina_processors_arm::aarch64.linux" namespace="ocarina_processors_aarch64">
+      <Port name="eth0" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::generic_sockets_ip" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
+      <Port name="eth1" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::generic_sockets_ip" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
+      <Port name="eth2" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::generic_sockets_ip" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
+      <Port name="eth3" namespace="ocarina_drivers" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
+      <Port name="eth4" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::generic_sockets_ip" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
+      <Port name="eth5" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::generic_sockets_ip" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
+      <Port name="eth6" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::generic_sockets_ip" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
+      <Port name="eth7" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::generic_sockets_ip" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
+       <System_Function name="PrecisionTimer">
+          <Provided_Interface name="getTime">
+          </Provided_Interface>
+          <Required_Interface name="init">
+              <Input_Parameter name="seed" type="MyInt" encoding="NATIVE"/>
+          </Required_Interface>
+       </System_Function>
+   </Board>
+</Boards>

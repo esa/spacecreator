@@ -1,0 +1,23 @@
+ALTERNATESET-MEGACOMPONENT DEFINITIONS ::= BEGIN
+MegaComponent-ProvidedInterface-GenericType1 []
+MegaComponent-ProvidedInterface-GenericType2 []
+MegaComponent-ProvidedInterface-GenericType3 <ALTERNATESET.DeterminantType:determinant> []
+{
+    concrete0 [present-when determinant==0],
+    concrete1 [present-when determinant==1],
+    concrete2 [present-when determinant==2]
+}
+MegaComponent-ProvidedInterface-GenericType4 <ALTERNATESET.DeterminantType:determinant> []
+{
+    concrete0 [present-when determinant==0],
+    concrete1 [present-when determinant==1],
+    concrete2 [present-when determinant==2]
+}
+MegaComponent-ProvidedInterface-AsyncWithGenericTypes-Type []
+{
+    genericArgument1 [],
+    genericArgument2 MegaComponent-ProvidedInterface-GenericType2 [],
+    genericArgument3 <genericArgument2>[],
+    genericArgument4 <genericArgument2>[]
+}
+END

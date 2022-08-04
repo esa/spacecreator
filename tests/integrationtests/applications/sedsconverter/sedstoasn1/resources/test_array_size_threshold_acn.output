@@ -1,0 +1,8 @@
+COM-N7SPACE-ARRAYSIZETHRESHOLD DEFINITIONS ::= BEGIN
+DataItem [size 8, encoding pos-int, endianness big]
+IndexItem [size 8, encoding pos-int, endianness big]
+BasicArray1D []
+Matrix4x4 []
+ArrayWithIndexDataRef []
+END
+

@@ -1,0 +1,14 @@
+COM-N7SPACE-PACKAGE1 DEFINITIONS ::= BEGIN
+NiceItem [size 8, encoding pos-int, endianness big]
+SyncItemArrayArray-10 []
+MegaInterface-AsyncCommandNoMapping-Type []
+{
+    argumentNoMapping []
+}
+AsyncItemArrayArray-10 []
+MegaInterface-AsyncCommandNoMappingArray-Type []
+{
+    arrayArgumentNoMapping []
+}
+END
+

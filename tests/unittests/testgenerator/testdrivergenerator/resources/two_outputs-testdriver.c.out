@@ -6,6 +6,7 @@
 //#include <stdio.h>
 
 #define TEST_DATA_SIZE 5
+int testDataSize = TEST_DATA_SIZE;
 
 typedef struct {
     asn1SccMyBool active;
@@ -66,7 +67,7 @@ void testdriver_startup(void)
 
 void testdriver_PI_StartTest(void)
 {
-    for (unsigned int i = 0; i < TEST_DATA_SIZE; i++) {
+    for (unsigned int i = 0; i < testDataSize; i++) {
         // clang-format off
         testdriver_RI_InterfaceUnderTest(
                 &(testData[i].active),

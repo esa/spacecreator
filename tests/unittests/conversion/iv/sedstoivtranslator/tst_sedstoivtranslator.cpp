@@ -20,9 +20,10 @@
 #include <QObject>
 #include <QtTest>
 #include <asn1modelbuilder/asn1modelbuilder.h>
+#include <conversion/asn1/SedsToAsn1Translator/context.h>
+#include <conversion/asn1/SedsToAsn1Translator/generictypemapper.h>
 #include <conversion/common/options.h>
 #include <conversion/iv/IvOptions/options.h>
-#include <conversion/iv/SedsToIvTranslator/generictypemapper.h>
 #include <conversion/iv/SedsToIvTranslator/translator.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
@@ -40,8 +41,9 @@ using namespace ivm;
 using namespace seds::model;
 
 using conversion::Options;
+using conversion::asn1::translator::Context;
+using conversion::asn1::translator::GenericTypeMapper;
 using conversion::iv::IvOptions;
-using conversion::iv::translator::GenericTypeMapper;
 using conversion::iv::translator::SedsToIvTranslator;
 using conversion::translator::TranslationException;
 
@@ -75,7 +77,6 @@ private Q_SLOTS:
     void testTranslateComponentWithProvidedInterface();
     void testTranslateComponentWithRequiredInterface();
 
-    void testGenericTypeMapping();
     void testGenericTypeMappingAmbiguousDeterminant();
 };
 
@@ -116,6 +117,7 @@ void tst_SedsToIvTranslator::testTooManyModels()
 void tst_SedsToIvTranslator::testWrongModel()
 {
     Options options;
+    options.add(IvOptions::configFilepath, "config.xml");
     SedsToIvTranslator translator;
 
     const auto sedsModel = SedsModelBuilder("Package").build();
@@ -191,7 +193,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
 
     const auto param = params[0];
     QCOMPARE(param.name(), "InputParam");
-    QCOMPARE(param.paramTypeName(), "ICommand_Type");
+    QCOMPARE(param.paramTypeName(), "Component-Interface-ICommand-Type");
     QCOMPARE(param.direction(), shared::InterfaceParameter::Direction::IN);
 }
 
@@ -260,69 +262,37 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
 
     const auto param = params[0];
     QCOMPARE(param.name(), "InputParam");
-    QCOMPARE(param.paramTypeName(), "ICommand_Type");
+    QCOMPARE(param.paramTypeName(), "Component-Interface-ICommand-Type");
     QCOMPARE(param.direction(), shared::InterfaceParameter::Direction::IN);
-}
-
-void tst_SedsToIvTranslator::testGenericTypeMapping()
-{
-    // clang-format off
-    const auto typeMapSet = std::make_optional(
-        SedsTypeMapSetBuilder()
-            .withMapping("GenericType1", "ConcreteType1")
-            .withAlternateSet(
-                SedsAlternateSetBuilder()
-                    .withAlternate(
-                        SedsAlternateBuilder()
-                            .withMapping("GenericType2", "DeterminantType", "1")
-                            .withMapping("GenericType3", "DeterminantType", "2")
-                        .build())
-                    .withAlternate(
-                        SedsAlternateBuilder()
-                            .withMapping("GenericType2", "DeterminantType", "2")
-                            .withMapping("GenericType3", "DeterminantType", "3")
-                        .build())
-                    .withAlternate(
-                        SedsAlternateBuilder()
-                            .withMapping("GenericType2", "DeterminantType", "3")
-                            .withMapping("GenericType3", "ConcreteType3", std::nullopt)
-                        .build())
-                    .build())
-            .build());
-    // clang-format on
-
-    GenericTypeMapper typeMapper("SedsInterfaceName", typeMapSet);
-
-    const auto typeMapping = typeMapper.getMapping("GenericType3");
-    QCOMPARE(typeMapping->genericTypeName, "GenericType3");
-
-    QVERIFY(typeMapping->determinantTypeName.has_value());
-    QCOMPARE(typeMapping->determinantTypeName.value(), "DeterminantType");
-
-    QCOMPARE(typeMapping->concreteTypes.size(), 3);
-
-    const auto concreteType1 = typeMapping->concreteTypes.at(0);
-    QCOMPARE(concreteType1.typeName, "DeterminantType");
-    QVERIFY(concreteType1.determinantValue.has_value());
-    QCOMPARE(concreteType1.determinantValue.value(), "1");
-
-    const auto concreteType2 = typeMapping->concreteTypes.at(1);
-    QCOMPARE(concreteType2.typeName, "DeterminantType");
-    QVERIFY(concreteType2.determinantValue.has_value());
-    QCOMPARE(concreteType2.determinantValue.value(), "2");
-
-    const auto concreteType3 = typeMapping->concreteTypes.at(2);
-    QCOMPARE(concreteType3.typeName, "ConcreteType3");
-    QVERIFY(concreteType3.determinantValue.has_value());
-    QCOMPARE(concreteType3.determinantValue.value(), "3");
 }
 
 void tst_SedsToIvTranslator::testGenericTypeMappingAmbiguousDeterminant()
 {
     // clang-format off
-    const auto typeMapSet = std::make_optional(
+    const auto sedsModel =
+        SedsModelBuilder("MyPackage")
+            .withIntegerDataType("DeterminantType")
+            .build();
+    // clang-format on
+
+    const auto &sedsPackage = std::get<seds::model::PackageFile>(sedsModel->data()).package();
+
+    // clang-format off
+    const auto asn1Model =
+        Asn1ModelBuilder("MYPACKAGE")
+            .withIntegerDataType("ConcreteType")
+            .withIntegerDataType("DeterminantType")
+        .build();
+    // clang-format on
+
+    const auto asn1Definitions = asn1Model->data().front()->definitions("MYPACKAGE");
+
+    Context context(&sedsPackage, asn1Definitions, nullptr, nullptr, {}, {}, Options());
+
+    // clang-format off
+    const auto typeMapSet =
         SedsTypeMapSetBuilder()
-            .withMapping("GenericType1", "ConcreteType1")
+            .withMapping("GenericType1", "ConcreteType")
             .withAlternateSet(
                 SedsAlternateSetBuilder()
                     .withAlternate(
@@ -336,14 +306,13 @@ void tst_SedsToIvTranslator::testGenericTypeMappingAmbiguousDeterminant()
                             .withMapping("GenericType3", "DeterminantType", "3")
                         .build())
                     .build())
-            .build());
+            .build();
     // clang-format on
 
-    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(GenericTypeMapper typeMapper("SedsInterfaceName", typeMapSet),
-            TranslationException,
-            "More than one possible alternate determinant was found in the interface \"SedsInterfaceName\"");
+    GenericTypeMapper typeMapper(context, "CoolInterface");
 
-    ;
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(typeMapper.addMappings(typeMapSet), TranslationException,
+            "More than one possible alternate determinant was found in \"CoolInterface\"");
 }
 
 } // namespace conversion::iv::test

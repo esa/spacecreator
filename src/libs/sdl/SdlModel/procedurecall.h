@@ -38,13 +38,13 @@ class ProcedureCall : public Action
 public:
     using Argument = std::variant<std::unique_ptr<VariableLiteral>, std::unique_ptr<VariableReference>>;
 
+public:
     /**
      * @brief   Constructor
      *
      * @param   name   name of the element
      */
     ProcedureCall(QString name = "");
-
     /**
      * @brief   Deleted copy constructor
      */
@@ -54,24 +54,22 @@ public:
      * @brief   Default move constructor
      */
     ProcedureCall(ProcedureCall &&) = default;
-
     /**
      * @brief   Deleted copy assignment operator
      */
     ProcedureCall &operator=(const ProcedureCall &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     ProcedureCall &operator=(ProcedureCall &&) = default;
 
+public:
     /**
      * @brief   Getter for the procedure declaration
      *
      * @return  a procedure declaration
      */
     auto procedure() const -> Procedure *;
-
     /**
      * @brief   Setter for the procedure declaration
      *
@@ -85,7 +83,6 @@ public:
      * @return  vector of arguments
      */
     auto arguments() const -> const std::vector<Argument> &;
-
     /**
      * @brief   Add an argument
      *
@@ -93,6 +90,7 @@ public:
      */
     auto addArgument(Argument argument) -> void;
 
+public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */

@@ -1,0 +1,33 @@
+COM-N7SPACE-PACKAGE1 DEFINITIONS ::= BEGIN
+IMPORTS
+ArrayItem FROM COM-N7SPACE-PACKAGE2
+FieldItem FROM COM-N7SPACE-PACKAGE2
+LengthItem FROM COM-N7SPACE-PACKAGE2
+ListItem FROM COM-N7SPACE-PACKAGE2
+;
+BasicArray1D ::= SEQUENCE (SIZE(15)) OF ArrayItem(0 .. 255)
+ArrayWithIndexDataRef ::= SEQUENCE (SIZE(16)) OF ArrayItem(0 .. 255)
+BasicContainer ::= SEQUENCE
+{
+    realization CHOICE
+    {
+        realizationBasicContainer SEQUENCE
+        {
+            fieldA FieldItem(0 .. 255),
+            fieldB FieldItem(0 .. 255),
+            fieldC FieldItem(0 .. 255),
+            listEntry SEQUENCE (SIZE(0 .. 10)) OF ListItem(0 .. 255)
+        } ,
+        realizationChildContainer ChildContainer
+    }
+}
+ChildContainer ::= SEQUENCE
+{
+    fieldA FieldItem(0 .. 255) (0 .. 10),
+    fieldB FieldItem(0 .. 255),
+    fieldC FieldItem(0 .. 255),
+    listEntry SEQUENCE (SIZE(0 .. 10)) OF ListItem(0 .. 255)
+}
+SubRangeData ::= INTEGER(10 .. 255)
+END
+

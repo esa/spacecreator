@@ -1,31 +1,39 @@
 project(Asn1ToPromelaTranslator VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES
-  translator.cpp
-  promelatypesorter.cpp
-  integersubset.cpp
-  integergenerator.cpp
   enumeratedgenerator.cpp
-  visitors/asn1nodevisitor.cpp
-  visitors/asn1sequencecomponentvisitor.cpp
-  visitors/integerconstraintvisitor.cpp
+  integergenerator.cpp
+  integersubset.cpp
+  proctypemaker.cpp
+  promelatypesorter.cpp
+  translator.cpp
   visitors/asn1itemtypevisitor.cpp
   visitors/asn1nodevaluegeneratorvisitor.cpp
+  visitors/asn1nodevisitor.cpp
+  visitors/asn1sequencecomponentvisitor.cpp
   visitors/asn1typevaluegeneratorvisitor.cpp
+  visitors/enumvalueconstraintvisitor.cpp
+  visitors/integerrangeconstraintvisitor.cpp
+  visitors/sequencecomponentvaluevisitor.cpp
+  visitors/valueassignmentvisitor.cpp
 )
 set(INCLUDES
-  translator.h
-  promelatypesorter.h
-  integersubset.h
-  integergenerator.h
   enumeratedgenerator.h
-  visitors/asn1nodevisitor.h
-  visitors/asn1sequencecomponentvisitor.h
-  visitors/integerconstraintvisitor.h
-  visitors/asn1constraintvisitor.h
+  integergenerator.h
+  integersubset.h
+  proctypemaker.h
+  promelatypesorter.h
+  translator.h
   visitors/asn1itemtypevisitor.h
   visitors/asn1nodevaluegeneratorvisitor.h
+  visitors/asn1nodevisitor.h
+  visitors/asn1sequencecomponentvisitor.h
   visitors/asn1typevaluegeneratorvisitor.h
+  visitors/enumvalueconstraintvisitor.h
+  visitors/integerrangeconstraintvisitor.h
+  visitors/sequencecomponentvaluevisitor.h
+  visitors/sizeconstraintvisitor.h
+  visitors/valueassignmentvisitor.h
 )
 
 add_library(Asn1ToPromelaTranslator STATIC)
@@ -38,6 +46,7 @@ target_include_directories(Asn1ToPromelaTranslator
   PRIVATE                  "${CMAKE_SOURCE_DIR}/src/libs")
 target_link_libraries(Asn1ToPromelaTranslator
   PUBLIC              Conversion::Common
+                      Conversion::Converter
                       asn1library
                       Promela::Model
   PRIVATE             CommonProjectWarnings)

@@ -38,12 +38,39 @@ public:
     /** @brief Add additional includes at the end of model */
     inline static const QString additionalIncludes = "Promela_Convert_AdditionalIncludes";
 
-    /** @brief Generate promela inlines to generate values of ASN1 type */
+    /** @brief Enable generation of inlines for environment */
     inline static const QString asn1ValueGeneration = "Promela_Convert_Asn1ValueGeneration";
 
+    /** @brief Generate promela inlines to generate values of ASN1 type */
+    inline static const QString asn1ValueGenerationForType = "Promela_Convert_Asn1ValueGenerationForType";
+
+    /** @brief Use function name as part of model under verification */
     inline static const QString modelFunctionName = "Promela_Convert_ModelFunction";
 
+    /** @brief Use function name as part of environment */
     inline static const QString environmentFunctionName = "Promela_Convert_EnvironmentFunction";
+
+    /** @brief Global input vector length limit */
+    inline static const QString globalInputVectorLengthLimit = "Promela_Convert_GlobalInputVectorLengthLimit";
+
+    /** @brief Interface input vector length limit template */
+    inline static const QString interfaceInputVectorLengthLimit = "Promela_Convert_InterfaceInputVectorLengthLimit_%1";
+
+    /** @brief Base priority for non-environment processes */
+    inline static const QString processesBasePriority = "Promela_Convert_ProcessesBasePriority";
+
+    /** @brief  Filepath of the ASN.1 file containing subtypes */
+    inline static const QString subtypesFilepath = "Promela_Convert_SubtypesFilepath";
+
+    /**
+     *  @brief Specification of an observer attachment
+     *  Contains information regarding the name of the observer, as well as the location
+     *  where it should be attached.
+     */
+    inline static const QString observerAttachment = "Promela_Convert_ObserverAttachmentSpecification";
+
+    /** @brief Use observer name as part of model of requirements */
+    inline static const QString observerFunctionName = "Promela_Convert_ObserverFunction";
 };
 
 }

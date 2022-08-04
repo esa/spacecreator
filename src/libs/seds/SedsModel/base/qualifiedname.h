@@ -21,6 +21,7 @@
 
 #include "base/name.h"
 
+#include <optional>
 #include <seds/SedsCommon/basetypesmappings.h>
 
 namespace seds::model {
@@ -30,16 +31,27 @@ class QualifiedName final
 public:
     QualifiedName() = default;
     QualifiedName(common::String value) noexcept;
+    QualifiedName(const QualifiedName &) = default;
     QualifiedName(QualifiedName &&) = default;
+    QualifiedName &operator=(const QualifiedName &) = default;
     QualifiedName &operator=(QualifiedName &&) = default;
 
 public:
     auto name() const -> const Name &;
-    auto namespaceName() const -> const common::String &;
+    auto namespaceName() const -> const std::optional<common::String> &;
+
+public:
+    auto pathStr() const -> const QString &;
+
+    friend auto operator==(const QualifiedName &lhs, const QualifiedName &rhs) -> bool;
+    friend auto operator!=(const QualifiedName &lhs, const QualifiedName &rhs) -> bool;
+    friend auto operator<(const QualifiedName &lhs, const QualifiedName &rhs) -> bool;
 
 private:
     Name m_name;
-    common::String m_namespaceName;
+    std::optional<common::String> m_namespaceName;
+
+    QString m_path;
 };
 
 } // namespace seds::model

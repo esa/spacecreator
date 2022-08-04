@@ -99,7 +99,7 @@ QString SedsXmlImporter::preprocess(
 {
     const auto inputFilepath = options.value(SedsOptions::inputFilepath);
     if (!inputFilepath) {
-        throw ImportException("File to import wasn't specified");
+        throw ImportException("SEDS file to import wasn't specified");
     }
 
     const QFileInfo inputFileInfo(*inputFilepath);

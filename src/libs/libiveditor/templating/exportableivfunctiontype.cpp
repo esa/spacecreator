@@ -18,6 +18,7 @@
 #include "exportableivfunctiontype.h"
 
 #include "exportableproperty.h"
+#include "ivarchetypereference.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
@@ -94,6 +95,15 @@ QVariantList ExportableIVFunctionType::contextParameters() const
         parameters << QVariant::fromValue(param);
     }
     return parameters;
+}
+
+QVariantList ExportableIVFunctionType::archetypeReferences() const
+{
+    QVariantList archetypeReferences;
+    for (ivm::IVArchetypeReference *archetypeReference : exportedObject<ivm::IVFunctionType>()->archetypeReferences()) {
+        archetypeReferences << createFrom(archetypeReference);
+    }
+    return archetypeReferences;
 }
 
 } // namespace ive

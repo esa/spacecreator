@@ -19,6 +19,8 @@
 
 #include "sdltaskbuilder.h"
 
+using sdl::Task;
+
 namespace tests::common {
 
 SdlTaskBuilder::SdlTaskBuilder()

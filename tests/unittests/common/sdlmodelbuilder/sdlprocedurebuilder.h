@@ -24,11 +24,7 @@
 #include <sdl/SdlModel/procedureparameter.h>
 #include <sdl/SdlModel/transition.h>
 #include <sdl/SdlModel/variabledeclaration.h>
-
-using sdl::Procedure;
-using sdl::ProcedureParameter;
-using sdl::Transition;
-using sdl::VariableDeclaration;
+#include <sdl/SdlModel/variablereference.h>
 
 namespace tests::common {
 
@@ -37,18 +33,16 @@ class SdlProcedureBuilder final
 public:
     SdlProcedureBuilder();
 
-    auto build() -> std::unique_ptr<Procedure>;
+    auto build() -> std::unique_ptr<sdl::Procedure>;
 
     auto withName(QString name) -> SdlProcedureBuilder &;
-
-    auto withTransition(std::unique_ptr<Transition> transition) -> SdlProcedureBuilder &;
-
-    auto withParameter(std::unique_ptr<ProcedureParameter> parameter) -> SdlProcedureBuilder &;
-
-    auto withReturnVariableDeclaration(std::unique_ptr<VariableDeclaration> variable) -> SdlProcedureBuilder &;
+    auto withTransition(std::unique_ptr<sdl::Transition> transition) -> SdlProcedureBuilder &;
+    auto withVariable(std::unique_ptr<sdl::VariableDeclaration> variable) -> SdlProcedureBuilder &;
+    auto withParameter(std::unique_ptr<sdl::ProcedureParameter> parameter) -> SdlProcedureBuilder &;
+    auto withReturnType(QString returnType) -> SdlProcedureBuilder &;
 
 private:
-    std::unique_ptr<Procedure> m_procedure;
+    std::unique_ptr<sdl::Procedure> m_procedure;
 };
 
 } // namespace tests::common

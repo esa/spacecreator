@@ -19,6 +19,8 @@
 
 #include "sdlmodelbuilder.h"
 
+using sdl::Process;
+using sdl::SdlModel;
 namespace tests::common {
 
 SdlModelBuilder::SdlModelBuilder(QString name)
@@ -32,9 +34,9 @@ std::unique_ptr<SdlModel> SdlModelBuilder::build()
     return std::move(m_model);
 }
 
-SdlModelBuilder &SdlModelBuilder::withProcess(std::unique_ptr<Process> process)
+SdlModelBuilder &SdlModelBuilder::withProcess(Process process)
 {
-    m_model->addProcess(std::move(*process));
+    m_model->addProcess(std::move(process));
 
     return *this;
 }

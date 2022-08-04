@@ -38,6 +38,16 @@ void Procedure::setTransition(std::unique_ptr<Transition> transition)
     m_implementation = std::move(transition);
 }
 
+const std::vector<std::unique_ptr<VariableDeclaration>> &Procedure::variables() const
+{
+    return m_variables;
+}
+
+void Procedure::addVariable(std::unique_ptr<VariableDeclaration> variable)
+{
+    m_variables.push_back(std::move(variable));
+}
+
 const std::vector<std::unique_ptr<ProcedureParameter>> &Procedure::parameters() const
 {
     return m_parameters;
@@ -48,14 +58,14 @@ void Procedure::addParameter(std::unique_ptr<ProcedureParameter> parameter)
     m_parameters.push_back(std::move(parameter));
 }
 
-VariableDeclaration *Procedure::returnVariableDeclaration() const
+const std::optional<QString> &Procedure::returnType() const
 {
-    return m_returnVariableDeclaration.get();
+    return m_returnType;
 }
 
-void Procedure::setReturnVariableDeclaration(std::unique_ptr<VariableDeclaration> declaration)
+void Procedure::setReturnType(QString returnType)
 {
-    m_returnVariableDeclaration = std::move(declaration);
+    m_returnType = std::move(returnType);
 }
 
 void Procedure::accept(Visitor &visitor) const

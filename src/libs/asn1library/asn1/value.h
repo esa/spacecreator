@@ -32,10 +32,20 @@ namespace Asn1Acn {
 class Value
 {
 public:
+    enum ValueType
+    {
+        SINGLE_VALUE,
+        MULTIPLE_VALUE,
+        NAMED_VALUE,
+        CHOICE_VALUE,
+    };
+
     virtual ~Value() = default;
 
     virtual QString asString() const = 0;
     virtual std::unique_ptr<Value> clone() const = 0;
+
+    virtual ValueType typeEnum() const = 0;
 };
 
 using ValuePtr = std::unique_ptr<Value>;

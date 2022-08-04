@@ -33,17 +33,27 @@ namespace Asn1Acn {
 class AsnSequenceComponent : public SequenceComponent
 {
 public:
+    enum class Presence
+    {
+        NotSpecified,
+        AlwaysPresent,
+        AlwaysAbsent,
+    };
+
+public:
     AsnSequenceComponent() = default;
     ~AsnSequenceComponent() override = default;
 
     AsnSequenceComponent(const QString &name, const QString &cName, bool optional, std::optional<QString> defaultValue,
-            const QString &presentWhen, const SourceLocation &location, std::unique_ptr<Types::Type> type);
+            const QString &presentWhen, const Presence presence, const SourceLocation &location,
+            std::unique_ptr<Types::Type> type);
 
     AsnSequenceComponent(const AsnSequenceComponent &other);
 
     std::unique_ptr<SequenceComponent> clone() const override;
     QString definitionAsString() const override;
     QString presentWhen() const override;
+    Presence presence() const;
     bool isOptional() const;
     const std::optional<QString> &defaultValue() const;
 
@@ -54,6 +64,7 @@ public:
 private:
     bool m_optional;
     std::optional<QString> m_defaultValue;
+    Presence m_presence;
     QString m_presentWhen;
     SourceLocation m_location;
 };

@@ -1,10 +1,10 @@
 project(TmcConverter VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES
-	converter.cpp)
+    converter.cpp)
 
 set(INCLUDES
-	converter.h)
+    converter.h)
 
 add_library(TmcConverter STATIC)
 target_sources(TmcConverter
@@ -15,13 +15,15 @@ target_include_directories(TmcConverter
     PRIVATE    ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(TmcConverter
     PUBLIC     Conversion::Common
-	           Conversion::Converter
+               Conversion::Converter
                Conversion::Registry
-	           Conversion::IvRegistrar
                Conversion::Asn1Registrar
+               Conversion::IvRegistrar
+               Conversion::MscRegistrar
                Conversion::PromelaRegistrar
-			   Tmc::SdlToPromelaConverter
-    PRIVATE    CommonProjectWarnings)
+               Tmc::SdlToPromelaConverter
+    PRIVATE    CommonProjectWarnings
+               Tmc::InterfaceViewOptimizer)
 
 add_format_target(TmcConverter)
 add_tidy_target(TmcConverter)

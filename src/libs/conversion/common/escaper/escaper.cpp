@@ -35,6 +35,16 @@ QString Escaper::escapeSdlName(QString name)
     return name;
 }
 
+QString Escaper::escapeSdlVariableName(QString name)
+{
+    escapeName(name, '_');
+
+    name = name.toLower();
+    name[0] = name[0].toUpper();
+
+    return name;
+}
+
 QString Escaper::escapeIvName(QString name)
 {
     escapeName(name, '_');
@@ -86,7 +96,42 @@ QString Escaper::escapePromelaIV(QString name)
 {
     escapeName(name, '_');
 
+    name = name.toLower();
     name[0] = name[0].toUpper();
+
+    return name;
+}
+
+QString Escaper::escapePromelaField(QString name)
+{
+    escapeName(name, '_');
+
+    name = name.toLower();
+
+    return name;
+}
+
+QString Escaper::escapeCName(QString name)
+{
+    escapeName(name, '_');
+
+    return name;
+}
+
+QString Escaper::escapeCSequenceName(QString name)
+{
+    escapeName(name, '_');
+
+    name[0] = name[0].toUpper();
+
+    return name;
+}
+
+QString Escaper::escapeCFieldName(QString name)
+{
+    escapeName(name, '_');
+
+    name[0] = name[0].toLower();
 
     return name;
 }

@@ -19,20 +19,20 @@
 
 #include "specialized/interfaceparametertranslator.h"
 
+#include <conversion/asn1/SedsToAsn1Translator/datatypetranslationhelper.h>
 #include <conversion/common/translation/exceptions.h>
 
 using conversion::UnhandledValueException;
+using conversion::asn1::translator::DataTypeTranslationHelper;
 using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator {
 
-const QString InterfaceParameterTranslator::m_ivInterfaceParameterName = "Param";
-
 InterfaceParameterTranslator::InterfaceParameterTranslator(
-        ivm::IVFunction *ivFunction, const QString &sedsInterfaceName, const GenericTypeMapper *typeMapper)
+        ivm::IVFunction *ivFunction, const QString &sedsInterfaceName, const InterfaceTypeNameHelper &typeNameHelper)
     : m_ivFunction(ivFunction)
     , m_sedsInterfaceName(sedsInterfaceName)
-    , m_typeMapper(typeMapper)
+    , m_typeNameHelper(typeNameHelper)
 {
 }
 
@@ -95,8 +95,8 @@ void InterfaceParameterTranslator::buildParameter(const seds::model::InterfacePa
 
     const auto interfaceName = InterfaceTranslatorHelper::buildParameterInterfaceName(
             m_sedsInterfaceName, sedsParameter.nameStr(), interfaceParameterType, interfaceType);
-    const auto ivInterface =
-            InterfaceTranslatorHelper::createIvInterface(interfaceName, interfaceType, interfaceKind, m_ivFunction);
+    const auto ivInterface = InterfaceTranslatorHelper::createIvInterface(
+            interfaceName, interfaceType, interfaceKind, sedsParameter, m_ivFunction);
     ivInterface->addParam(ivParameter);
 
     m_ivFunction->addChild(ivInterface);
@@ -105,31 +105,10 @@ void InterfaceParameterTranslator::buildParameter(const seds::model::InterfacePa
 QString InterfaceParameterTranslator::handleParameterTypeName(
         const seds::model::InterfaceParameter &sedsParameter) const
 {
-    const auto parameterTypeName = sedsParameter.type().nameStr();
+    const auto &parameterTypeRef = sedsParameter.type();
+    const auto &parameterDimensions = sedsParameter.arrayDimensions();
 
-    const auto typeMapping = m_typeMapper->getMapping(parameterTypeName);
-
-    if (typeMapping == nullptr) {
-        return parameterTypeName;
-    }
-
-    const auto &concreteTypes = typeMapping->concreteTypes;
-
-    if (concreteTypes.empty()) {
-        auto errorMessage =
-                QString("Type \"%1\" of the parameter \"%2\" is handled as generic, but no mappings was provided")
-                        .arg(parameterTypeName)
-                        .arg(sedsParameter.nameStr());
-        throw TranslationException(std::move(errorMessage));
-    } else if (concreteTypes.size() != 1) {
-        auto errorMessage = QString(
-                "Generic type \"%1\" of the parameter \"%2\" can only be simply mapped (AlternateSet not supported)")
-                                    .arg(parameterTypeName)
-                                    .arg(sedsParameter.nameStr());
-        throw TranslationException(std::move(errorMessage));
-    }
-
-    return concreteTypes.front().typeName;
+    return m_typeNameHelper.handleTypeName(parameterTypeRef, parameterDimensions);
 }
 
 } // namespace conversion::iv::translator

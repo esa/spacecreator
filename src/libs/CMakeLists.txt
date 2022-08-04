@@ -2,6 +2,9 @@
 add_subdirectory(shared)
 add_subdirectory(templating)
 
+# Common tools
+add_subdirectory(common)
+
 # Asn.1 editor
 add_subdirectory(asn1library)
 add_subdirectory(asn1editor)
@@ -30,6 +33,7 @@ add_subdirectory(testgenerator)
 # conversion
 add_subdirectory(conversion)
 add_subdirectory(seds)
+add_subdirectory(simulink)
 add_subdirectory(promela)
 add_subdirectory(tmc)
 

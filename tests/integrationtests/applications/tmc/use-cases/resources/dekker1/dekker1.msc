@@ -1,0 +1,12 @@
+mscdocument dekker1 /* MSC AND */;
+    language ASN.1;
+    data dekker1.asn;
+
+/* CIF MSCDOCUMENT (0, 0) (4200, 2300) */
+
+mscdocument Nominal /* MSC LEAF */;
+
+msc dekker1;
+endmsc;
+endmscdocument;
+endmscdocument;

@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2021 - 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,7 +19,10 @@
 
 #pragma once
 
+#include "binaryexpression.h"
+#include "booleanconstant.h"
 #include "constant.h"
+#include "inlinecall.h"
 #include "variableref.h"
 
 #include <QString>
@@ -34,10 +37,8 @@ class Expression final
 public:
     /**
      * @brief Variant to represent alternatives of expression
-     *
-     * TODO: implement full support for expressions
      */
-    using Value = std::variant<VariableRef, Constant>;
+    using Value = std::variant<VariableRef, Constant, BinaryExpression, InlineCall, BooleanConstant>;
 
     /**
      * @brief Constructor.
@@ -45,6 +46,12 @@ public:
      * @param content expression content
      */
     Expression(Value content);
+    /**
+     * @brief Constructor.
+     *
+     * @param constant expression content
+     */
+    Expression(int constant);
 
     /**
      * @brief Getter for expression content

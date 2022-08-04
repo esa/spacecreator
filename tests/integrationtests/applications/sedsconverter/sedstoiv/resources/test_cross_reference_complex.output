@@ -1,0 +1,28 @@
+<InterfaceView>
+<Function name="Component1" is_type="NO" language="SDL" default_implementation="default">
+<Provided_Interface name="Component1Pi_Interface1Command_Pi" kind="Protected" layer="default">
+    <Input_Parameter name="arg1" type="Integer2" encoding="ACN"/>
+    <Input_Parameter name="arg2" type="Integer3" encoding="ACN"/>
+</Provided_Interface>
+
+<Required_Interface name="Component2Ri_ParentInterface1Command_Ri" kind="Sporadic" layer="default">
+    <Input_Parameter name="InputParam" type="ParentInterface1-ParentInterface1Command-Type" encoding="ACN"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="Component2Ri_ParentInterface2Command_Ri" kind="Sporadic" layer="default">
+    <Input_Parameter name="InputParam" type="ParentInterface2-ParentInterface2Command-Type" encoding="ACN"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="Component2Ri_Interface2Command_Ri" kind="Sporadic" layer="default">
+    <Input_Parameter name="InputParam" type="Interface2-Interface2Command-Type" encoding="ACN"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+</InterfaceView>

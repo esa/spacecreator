@@ -19,6 +19,10 @@
 
 #include "sdlstatemachinebuilder.h"
 
+using sdl::State;
+using sdl::StateMachine;
+using sdl::Transition;
+
 namespace tests::common {
 
 SdlStateMachineBuilder::SdlStateMachineBuilder()

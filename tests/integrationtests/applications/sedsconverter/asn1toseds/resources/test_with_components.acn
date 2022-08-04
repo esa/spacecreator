@@ -1,0 +1,12 @@
+WithComponents DEFINITIONS ::= BEGIN
+
+MySequence []
+{
+    firstEntry [],
+    secondEntry [],
+    thirdEntry []
+}
+
+ConcreteSequence []
+
+END

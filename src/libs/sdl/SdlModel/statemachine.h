@@ -35,23 +35,20 @@ class StateMachine final
 {
 public:
     /**
+     * @brief    Default constructor
+     */
+    StateMachine() = default;
+    /**
      * @brief   Constructor
      *
      * @param   states      a vector of pointers to states
      * @param   transitions a vector of pointers to transitions
      */
     StateMachine(std::vector<std::unique_ptr<State>> states, std::vector<std::unique_ptr<Transition>> transitions);
-
-    /**
-     * @brief    Default constructor
-     */
-    StateMachine() = default;
-
     /**
      * @brief    Deleted copy constructor
      */
     StateMachine(const StateMachine &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -61,19 +58,18 @@ public:
      * @brief   Default copy assignment operator
      */
     StateMachine &operator=(const StateMachine &) = default;
-
     /**
      * @brief   Default move assignment operator
      */
     StateMachine &operator=(StateMachine &&) = default;
 
+public:
     /**
      * @brief   Getter for the states of the state machine
      *
      * @return  const reference to a vector of pointers to states
      */
     auto states() const -> const std::vector<std::unique_ptr<State>> &;
-
     /**
      * @brief   Add a state to this state machine
      *
@@ -87,7 +83,6 @@ public:
      * @return  const reference to a vector of pointers to transitions
      */
     auto transitions() const -> const std::vector<std::unique_ptr<Transition>> &;
-
     /**
      * @brief   Add a transition to this state machine
      *

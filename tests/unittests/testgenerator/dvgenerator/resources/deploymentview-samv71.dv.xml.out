@@ -1,0 +1,10 @@
+<DeploymentView>
+    <Node name="SAM V71 FreeRTOS N7S_1" type="ocarina_processors_arm::samv71.freertos" node_label="Node_1" namespace="ocarina_processors_arm">
+        <Property name="Taste::coordinates" value="19200 19300 39600 35300"/>
+        <Partition name="hostPartition">
+            <Property name="Taste::coordinates" value="23600 23700 35600 31700"/>
+            <Function name="TestDriver" path="TestDriver"/>
+            <Function name="FunctionUnderTest" path="FunctionUnderTest"/>
+        </Partition>
+    </Node>
+</DeploymentView>

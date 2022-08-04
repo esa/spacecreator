@@ -123,7 +123,7 @@ public:
         setIntegerAcnParameters(type);
 
         const auto encodeValues = m_attributes.value(QStringLiteral("encode-values"));
-        type.setEncodeValues(encodeValues.toString().toLower() == "true");
+        type.setEncodeValues(encodeValues.toString().toLower() == QStringLiteral("true"));
     }
 
     void visit(Types::Choice &type) override
@@ -217,10 +217,24 @@ public:
         SourceLocation location(m_currentFile, readIntegerAttribute(QStringLiteral("Line")),
                 readIntegerAttribute(QStringLiteral("CharPositionInLine")));
 
+        auto presence = AsnSequenceComponent::Presence::NotSpecified;
+        if (hasAttribute(QStringLiteral("ALWAYS-PRESENT"))) {
+            const auto alwaysPresent = readStringAttribute(QStringLiteral("ALWAYS-PRESENT")).toLower();
+            if (alwaysPresent == QStringLiteral("true")) {
+                presence = AsnSequenceComponent::Presence::AlwaysPresent;
+            }
+        }
+        if (hasAttribute(QStringLiteral("ALWAYS-ABSENT"))) {
+            const auto alwaysAbsent = readStringAttribute(QStringLiteral("ALWAYS-ABSENT")).toLower();
+            if (alwaysAbsent == QStringLiteral("true")) {
+                presence = AsnSequenceComponent::Presence::AlwaysAbsent;
+            }
+        }
+
         m_childType->setIdentifier(name);
 
-        type.addComponent(std::make_unique<AsnSequenceComponent>(
-                name, cName, optional == "true", defaultValue, presentWhen, location, std::move(m_childType)));
+        type.addComponent(std::make_unique<AsnSequenceComponent>(name, cName, optional == QStringLiteral("true"),
+                defaultValue, presentWhen, presence, location, std::move(m_childType)));
     }
 
     void visit(Types::SequenceOf &type) override { type.setItemsType(std::move(m_childType)); }
@@ -964,14 +978,20 @@ void AstXmlParser::readSequenceOf(Types::Type &type)
 
 void AstXmlParser::readChoice(Types::Type &type)
 {
-    while (skipToChildElement(QStringLiteral("CHOICE_ALTERNATIVE"))) {
-        auto attributes = m_xmlReader.attributes();
-        auto childType = findAndReadType();
+    while (m_xmlReader.readNextStartElement()) {
+        if (m_xmlReader.name() == QStringLiteral("CHOICE_ALTERNATIVE")) {
+            auto attributes = m_xmlReader.attributes();
+            auto childType = findAndReadType();
 
-        ChildItemAddingVisitor visitor(attributes, m_currentFile, std::move(childType));
-        type.accept(visitor);
+            ChildItemAddingVisitor visitor(attributes, m_currentFile, std::move(childType));
+            type.accept(visitor);
 
-        m_xmlReader.skipCurrentElement();
+            m_xmlReader.skipCurrentElement();
+        } else if (m_xmlReader.name() == QStringLiteral("Constraints")) {
+            readConstraints(type);
+        } else {
+            m_xmlReader.skipCurrentElement();
+        }
     }
 }
 
@@ -1067,7 +1087,7 @@ public:
 
     void visit(Types::Enumerated &type) override { readConstraints<EnumValue>(type); }
 
-    void visit(Types::Choice &type) override { Q_UNUSED(type); }
+    void visit(Types::Choice &type) override { readWithComponentConstraints(type); }
 
     void visit(Types::Sequence &type) override { Q_UNUSED(type); }
 
@@ -1091,6 +1111,27 @@ private:
     {
         AstXmlConstraintParser<T> parser(m_xmlReader, type.constraints());
         parser.parse();
+    }
+
+    void readWithComponentConstraints(Types::Choice &choice) const
+    {
+        m_xmlReader.readNextStartElement();
+
+        if (m_xmlReader.name() != QStringLiteral("WithComponentConstraints")) {
+            return;
+        }
+
+        while (m_xmlReader.readNextStartElement()) {
+            if (m_xmlReader.name() == QStringLiteral("WithComponent")) {
+                auto name = m_xmlReader.attributes().value(QStringLiteral("Name")).toString();
+                choice.addWithComponentConstraint(std::move(name));
+                m_xmlReader.skipCurrentElement();
+            } else {
+                m_xmlReader.skipCurrentElement();
+            }
+        }
+
+        m_xmlReader.skipCurrentElement();
     }
 
     QXmlStreamReader &m_xmlReader;

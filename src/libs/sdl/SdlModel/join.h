@@ -37,12 +37,14 @@ public:
      * @brief   Constructor
      */
     Join() = default;
-
+    /**
+     * @brief   Constructor with label name
+     */
+    explicit Join(QString label);
     /**
      * @brief   Deleted copy constructor
      */
     Join(const Join &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -52,33 +54,33 @@ public:
      * @brief   Deleted copy assignment operator
      */
     Join &operator=(const Join &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     Join &operator=(Join &&) = default;
 
+public:
     /**
-     * @brief   Getter for label
+     * @brief   Getter for label name
      *
-     * @return  label
+     * @return  label name
      */
-    auto label() const -> Label *;
-
+    auto label() const -> const QString &;
     /**
-     * @brief   Setter for label
+     * @brief   Setter for label name
      *
-     * @param   label  label
+     * @param   label  label name
      */
-    auto setLabel(Label *label) -> void;
+    auto setLabel(QString label) -> void;
 
+public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */
     virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
-    Label *m_label;
+    QString m_label;
 };
 
 } // namespace sdl

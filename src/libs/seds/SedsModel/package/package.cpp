@@ -84,7 +84,7 @@ void Package::addComponent(Component component)
 
 const QString &Package::nameStr() const
 {
-    return m_qualifiedName.name().value();
+    return m_qualifiedName.pathStr();
 }
 
 } // namespace seds::model

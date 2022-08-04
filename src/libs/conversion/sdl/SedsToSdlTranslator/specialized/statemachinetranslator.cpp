@@ -19,6 +19,7 @@
 
 #include "statemachinetranslator.h"
 
+#include "descriptiontranslator.h"
 #include "statementtranslatorvisitor.h"
 
 #include <algorithm>
@@ -27,7 +28,6 @@
 #include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/iv/SedsToIvTranslator/interfacetranslatorhelper.h>
-#include <conversion/iv/SedsToIvTranslator/specialized/componentstranslator.h>
 #include <conversion/iv/SedsToIvTranslator/translator.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
@@ -36,7 +36,6 @@
 
 using conversion::Escaper;
 using conversion::asn1::translator::SedsToAsn1Translator;
-using conversion::iv::translator::ComponentsTranslator;
 using conversion::iv::translator::InterfaceTranslatorHelper;
 using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::MissingInterfaceViewFunctionException;
@@ -98,7 +97,7 @@ static inline auto getOnEntry(const seds::model::StateMachine &sedsStateMachine,
     return &(*((*state)->onEntry()));
 }
 
-static inline auto getInterfaceByName(ivm::IVFunction *function, QString name) -> ivm::IVInterface *
+static inline auto getInterfaceByName(ivm::IVFunction *function, const QString &name) -> ivm::IVInterface *
 {
     for (auto interface : function->allInterfaces()) {
         if (interface->title() == name) {
@@ -108,8 +107,8 @@ static inline auto getInterfaceByName(ivm::IVFunction *function, QString name) -
     return nullptr;
 }
 
-static inline auto getTransitionsForCommand(const seds::model::StateMachine &sedsStateMachine, const QString interface,
-        const QString command) -> std::vector<const seds::model::Transition *>
+static inline auto getTransitionsForCommand(const seds::model::StateMachine &sedsStateMachine, const QString &interface,
+        const QString &command) -> std::vector<const seds::model::Transition *>
 {
     std::vector<const seds::model::Transition *> result;
     for (const auto &element : sedsStateMachine.elements()) {
@@ -127,13 +126,14 @@ static inline auto getTransitionsForCommand(const seds::model::StateMachine &sed
     return result;
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 static inline auto getConsistentUnconditionalActivityInvocation(
         std::vector<const seds::model::Transition *> transitions) -> const seds::model::ActivityInvocation *
 {
-    if (transitions.size() == 0) {
+    if (transitions.empty()) {
         throw TranslationException("Sync commands with no associated transitions are not supported");
     }
-    for (const auto transition : transitions) {
+    for (const auto &transition : transitions) {
         if (!transition->doActivity().has_value()) {
             throw TranslationException(
                     "Sync commands with transitions without associated activities are not supported");
@@ -145,7 +145,7 @@ static inline auto getConsistentUnconditionalActivityInvocation(
                                    "a transition which is not OnCommandPrimitive");
     }
     const auto &primitive = std::get<seds::model::OnCommandPrimitive>(transitions[0]->primitive());
-    for (const auto otherTransition : transitions) {
+    for (const auto &otherTransition : transitions) {
         if (!std::holds_alternative<seds::model::OnCommandPrimitive>(otherTransition->primitive())) {
             throw TranslationException(
                     "Uknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
@@ -167,7 +167,7 @@ static inline auto getConsistentUnconditionalActivityInvocation(
     }
     // doActivity optional is now guaranteed to have a value
     const auto invocation = &(*(transitions[0]->doActivity()));
-    for (const auto transition : transitions) {
+    for (const auto &transition : transitions) {
         const auto otherInvocation = &(*(transition->doActivity()));
         if (invocation->activity().value() != otherInvocation->activity().value()) {
             throw TranslationException("Inconsistent activities associated with a sync command");
@@ -187,7 +187,7 @@ static inline auto getConsistentUnconditionalActivityInvocation(
 }
 
 static inline auto generateProcedureForSyncCommand(Context &context, const seds::model::StateMachine &sedsStateMachine,
-        const QString interfaceName, const seds::model::InterfaceCommand &command) -> void
+        const QString &interfaceName, const seds::model::InterfaceCommand &command) -> void
 {
     const auto &name = InterfaceTranslatorHelper::buildCommandInterfaceName(
             interfaceName, command.nameStr(), ivm::IVInterface::InterfaceType::Provided);
@@ -195,9 +195,12 @@ static inline auto generateProcedureForSyncCommand(Context &context, const seds:
     auto procedure = std::make_unique<::sdl::Procedure>(name);
     for (const auto &ivParameter : ivInterface->params()) {
         // TASTE skeleton generator generates upper-case names
+        const auto parameterName = Escaper::escapeSdlVariableName(ivParameter.name());
+        const auto &parameterType = Escaper::escapeSdlName(ivParameter.paramTypeName());
+        const auto &parameterDirection =
+                ivParameter.direction() == shared::InterfaceParameter::Direction::IN ? "in" : "in/out";
         auto sdlParameter =
-                std::make_unique<::sdl::ProcedureParameter>(ivParameter.name().toUpper(), ivParameter.paramTypeName(),
-                        ivParameter.direction() == shared::InterfaceParameter::Direction::IN ? "in" : "in/out");
+                std::make_unique<::sdl::ProcedureParameter>(parameterName, parameterType, parameterDirection);
         procedure->addParameter(std::move(sdlParameter));
     }
     auto transition = std::make_unique<::sdl::Transition>();
@@ -213,8 +216,8 @@ static inline auto generateProcedureForSyncCommand(Context &context, const seds:
 
     const auto &primitive = std::get<seds::model::OnCommandPrimitive>(transitions[0]->primitive());
     for (const auto &argument : primitive.argumentValues()) {
-        const auto targetVariableName = Escaper::escapeAsn1FieldName(argument.outputVariableRef().value().value());
-        const auto fieldName = Escaper::escapeAsn1FieldName(argument.name().value());
+        const auto targetVariableName = Escaper::escapeSdlVariableName(argument.outputVariableRef().value().value());
+        const auto fieldName = Escaper::escapeSdlVariableName(argument.name().value());
         transition->addAction(
                 std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(targetVariableName, fieldName)));
     }
@@ -233,29 +236,30 @@ static inline auto generateProcedureForSyncCommand(Context &context, const seds:
     context.sdlProcess()->addProcedure(std::move(procedure));
 }
 
-static inline auto buildCommandMapInternal(
-        Context &context, QString interfaceName, const seds::model::InterfaceDeclaration &intefaceDeclaration) -> void
+static inline auto buildCommandMapInternal(Context &context, const bool isProvided, const QString &interfaceName,
+        const seds::model::InterfaceDeclaration &intefaceDeclaration) -> void
 {
     for (const auto &command : intefaceDeclaration.commands()) {
-        context.addCommand(interfaceName, command.nameStr(), &command);
+        if (isProvided) {
+            context.addProvidedCommand(interfaceName, command.nameStr(), &command);
+        } else {
+            context.addRequiredCommand(interfaceName, command.nameStr(), &command);
+        }
     }
 
     for (const auto &baseInterface : intefaceDeclaration.baseInterfaces()) {
-        const auto &baseIntefaceDeclaration = ComponentsTranslator::findInterfaceDeclaration(
-                baseInterface.type().nameStr(), context.sedsComponent(), &context.sedsPackage());
-        buildCommandMapInternal(context, interfaceName, baseIntefaceDeclaration);
+        const auto &baseIntefaceDeclaration = InterfaceTranslatorHelper::findInterfaceDeclaration(
+                baseInterface.type(), context.sedsComponent(), &context.sedsPackage(), context.sedsPackages());
+        buildCommandMapInternal(context, isProvided, interfaceName, baseIntefaceDeclaration);
     }
 }
 
 auto StateMachineTranslator::setInitialVariableValues(
         const seds::model::ComponentImplementation::VariableSet &variables, ::sdl::Transition *transition) -> void
 {
-    if (variables.size() == 0) {
-        return;
-    }
     for (const auto &variable : variables) {
         if (variable.initialValue().has_value()) {
-            const auto name = Escaper::escapeAsn1FieldName(variable.nameStr());
+            const auto name = Escaper::escapeSdlVariableName(variable.nameStr());
             const auto value = variable.initialValue()->value();
             auto assignment = std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(name, value));
             transition->addAction(std::move(assignment));
@@ -266,9 +270,14 @@ auto StateMachineTranslator::setInitialVariableValues(
 auto StateMachineTranslator::buildCommandMap(Context &context) -> void
 {
     for (const auto &interface : context.sedsComponent().providedInterfaces()) {
-        const auto &intefaceDeclaration = ComponentsTranslator::findInterfaceDeclaration(
-                interface.type().nameStr(), context.sedsComponent(), &context.sedsPackage());
-        buildCommandMapInternal(context, interface.nameStr(), intefaceDeclaration);
+        const auto &intefaceDeclaration = InterfaceTranslatorHelper::findInterfaceDeclaration(
+                interface.type(), context.sedsComponent(), &context.sedsPackage(), context.sedsPackages());
+        buildCommandMapInternal(context, true, interface.nameStr(), intefaceDeclaration);
+    }
+    for (const auto &interface : context.sedsComponent().requiredInterfaces()) {
+        const auto &intefaceDeclaration = InterfaceTranslatorHelper::findInterfaceDeclaration(
+                interface.type(), context.sedsComponent(), &context.sedsPackage(), context.sedsPackages());
+        buildCommandMapInternal(context, false, interface.nameStr(), intefaceDeclaration);
     }
 }
 
@@ -276,8 +285,10 @@ static inline auto generateProceduresForSyncCommands(
         Context &context, const seds::model::StateMachine &sedsStateMachine) -> void
 {
     for (const auto &command : context.commands()) {
-        if (command.second->mode() == seds::model::InterfaceCommandMode::Sync) {
-            generateProcedureForSyncCommand(context, sedsStateMachine, command.first, *command.second);
+        if (command.second->interfaceType() == CommandInfo::HostInterfaceType::Provided
+                && command.second->definition()->mode() == seds::model::InterfaceCommandMode::Sync) {
+            // Procedures are generated only for sync commands in provided interfaces
+            generateProcedureForSyncCommand(context, sedsStateMachine, command.first, *command.second->definition());
         }
     }
 }
@@ -288,18 +299,20 @@ auto StateMachineTranslator::translateStateMachine(Context &context, const seds:
     // Consider rewriting this to filters when C++20 is supported
     std::map<QString, std::unique_ptr<::sdl::State>> stateMap;
     // First pass through states
-    for (auto &element : sedsStateMachine.elements()) {
-        // Tried to rewrite it with std::visit and overload - this is the simpler way
-        if (std::holds_alternative<seds::model::State>(element)) {
-            const auto &state = std::get<seds::model::State>(element);
-            stateMap[state.nameStr()] = translateState(state);
-        } else if (std::holds_alternative<seds::model::EntryState>(element)) {
-            const auto &state = std::get<seds::model::EntryState>(element);
-            stateMap[state.name().value()] = translateState(state);
-        } else if (std::holds_alternative<seds::model::ExitState>(element)) {
-            const auto &state = std::get<seds::model::ExitState>(element);
-            stateMap[state.name().value()] = translateState(state);
-        }
+    for (auto &sedsElement : sedsStateMachine.elements()) {
+        // clang-format off
+        std::visit(
+            overloaded {
+                [&](auto &&element) {
+                    auto state = translateState(element);
+                    DescriptionTranslator::translate(element, state.get());
+                    stateMap.insert({ element.nameStr(), std::move(state) });
+                },
+                [&](const seds::model::Transition &transition) {
+                    Q_UNUSED(transition);
+                }
+            }, sedsElement);
+        // clang-format on
     }
 
     generateProceduresForSyncCommands(context, sedsStateMachine);
@@ -322,15 +335,15 @@ auto StateMachineTranslator::translateVariables(
         Context &context, const seds::model::ComponentImplementation::VariableSet &variables) -> void
 {
     for (const auto &variable : variables) {
-        const auto variableName = Escaper::escapeAsn1FieldName(variable.nameStr());
-        const auto variableTypeName = Escaper::escapeAsn1TypeName(variable.type().nameStr());
-        // TODO implement check for types imported from other packages
-        auto asn1Definitions = SedsToAsn1Translator::getAsn1Definitions(context.sedsPackage(), context.asn1Model());
-        const auto *referencedType = asn1Definitions->type(variableTypeName);
-        if (referencedType == nullptr) {
-            throw MissingAsn1TypeDefinitionException(variableTypeName);
-        }
-        context.sdlProcess()->addVariable(std::make_unique<::sdl::VariableDeclaration>(variableName, variableTypeName));
+        const auto variableName = Escaper::escapeSdlVariableName(variable.nameStr());
+        const auto variableType = variable.type();
+        const auto variableTypeName = Escaper::escapeAsn1TypeName(variableType.nameStr());
+
+        auto sdlVariable =
+                std::make_unique<::sdl::VariableDeclaration>(variableName, Escaper::escapeSdlName(variableTypeName));
+        DescriptionTranslator::translate(variable, sdlVariable.get());
+
+        context.sdlProcess()->addVariable(std::move(sdlVariable));
     }
 }
 
@@ -372,7 +385,7 @@ auto StateMachineTranslator::createExternalProcedures(Context &context) -> void
 
 auto StateMachineTranslator::ioVariableName(const QString &interfaceName) -> QString
 {
-    return IO_VARIABLE_PATTERN.arg(interfaceName);
+    return Escaper::escapeSdlVariableName(IO_VARIABLE_PATTERN.arg(interfaceName));
 }
 
 auto StateMachineTranslator::timerName(const QString &stateName) -> QString
@@ -382,7 +395,7 @@ auto StateMachineTranslator::timerName(const QString &stateName) -> QString
 
 auto StateMachineTranslator::ensureMinimalStateMachineExists(Context &context) -> void
 {
-    if (context.sdlStateMachine()->states().size() > 0) {
+    if (!context.sdlStateMachine()->states().empty()) {
         // State machine has at least one state, minimum is ensured.
         return;
     }
@@ -406,7 +419,7 @@ auto StateMachineTranslator::getAnyState(::sdl::StateMachine *stateMachine) -> :
 }
 
 auto StateMachineTranslator::getParameterInterface(ivm::IVFunction *function, const ParameterType type,
-        const ParameterMode mode, const QString interfaceName, const QString parameterName) -> ivm::IVInterface *
+        const ParameterMode mode, const QString &interfaceName, const QString &parameterName) -> ivm::IVInterface *
 {
     const auto parameterType = type == ParameterType::Getter
             ? InterfaceTranslatorHelper::InterfaceParameterType::Getter
@@ -431,7 +444,7 @@ auto StateMachineTranslator::getParameterInterface(ivm::IVFunction *function, co
 auto StateMachineTranslator::createParameterSyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
         ::sdl::Process *sdlProcess, const ParameterType type) -> void
 {
-    const auto paramName = Escaper::escapeAsn1FieldName(interface->params()[0].name());
+    const auto paramName = Escaper::escapeSdlVariableName(interface->params()[0].name());
     auto transition = std::make_unique<::sdl::Transition>();
     auto procedure = std::make_unique<::sdl::Procedure>(interface->title());
 
@@ -448,8 +461,9 @@ auto StateMachineTranslator::createParameterSyncPi(ivm::IVInterface *interface, 
         break;
     }
     auto parameter = std::make_unique<::sdl::ProcedureParameter>(
-            paramName, interface->params()[0].paramTypeName(), parameterDirection);
-    const auto action = actionTemplate.arg(paramName, Escaper::escapeAsn1FieldName(map.variableRef().value().value()));
+            paramName, Escaper::escapeSdlName(interface->params()[0].paramTypeName()), parameterDirection);
+    const auto action =
+            actionTemplate.arg(paramName, Escaper::escapeSdlVariableName(map.variableRef().value().value()));
     transition->addAction(std::make_unique<::sdl::Task>("", action));
     procedure->addParameter(std::move(parameter));
     procedure->setTransition(std::move(transition));
@@ -466,8 +480,8 @@ static inline auto getInputOfName(::sdl::State *state, const QString name) -> ::
     return input->get();
 }
 
-auto StateMachineTranslator::createParameterAsyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
-        ::sdl::Process *sdlProcess, ::sdl::StateMachine *stateMachine) -> void
+auto StateMachineTranslator::createParameterAsyncPi(
+        ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::StateMachine *stateMachine) -> void
 {
     for (const auto &state : stateMachine->states()) {
         const auto &existingInput = getInputOfName(state.get(), interface->title());
@@ -478,13 +492,8 @@ auto StateMachineTranslator::createParameterAsyncPi(ivm::IVInterface *interface,
         auto input = std::make_unique<::sdl::Input>();
         input->setName(interface->title());
         const auto variableName = ioVariableName(input->name());
-        const auto &variableIterator = std::find_if(sdlProcess->variables().begin(), sdlProcess->variables().end(),
-                [variableName](const auto &variable) { return variable->name() == variableName; });
-        if (variableIterator == sdlProcess->variables().end()) {
-            throw TranslationException(QString("Reception variable %1 not found").arg(variableName));
-        }
-        input->addParameter(std::make_unique<::sdl::VariableReference>((*variableIterator).get()));
-        const auto targetVariableName = Escaper::escapeAsn1FieldName(map.variableRef().value().value());
+        input->addParameter(std::make_unique<::sdl::VariableReference>(variableName));
+        const auto targetVariableName = Escaper::escapeSdlVariableName(map.variableRef().value().value());
 
         auto transition = std::make_unique<::sdl::Transition>();
         auto transitionPtr = transition.get();
@@ -517,12 +526,12 @@ auto StateMachineTranslator::translateParameter(Context &context, const seds::mo
     const auto asyncSetter = getParameterInterface(context.ivFunction(), ParameterType::Setter, ParameterMode::Async,
             map.interface().value(), map.parameter().value());
     if (asyncSetter != nullptr) {
-        createParameterAsyncPi(asyncSetter, map, context.sdlProcess(), context.sdlStateMachine());
+        createParameterAsyncPi(asyncSetter, map, context.sdlStateMachine());
     }
     const auto asyncGetter = getParameterInterface(context.ivFunction(), ParameterType::Getter, ParameterMode::Async,
             map.interface().value(), map.parameter().value());
     if (asyncGetter != nullptr) {
-        createParameterAsyncPi(asyncGetter, map, context.sdlProcess(), context.sdlStateMachine());
+        createParameterAsyncPi(asyncGetter, map, context.sdlStateMachine());
     }
 }
 
@@ -537,20 +546,31 @@ auto StateMachineTranslator::translateParameterMaps(
 auto StateMachineTranslator::createStartTransition(Context &context, const seds::model::StateMachine &sedsStateMachine,
         std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void
 {
+    bool entryStateHandled = false;
+
     for (auto &element : sedsStateMachine.elements()) {
         if (std::holds_alternative<seds::model::EntryState>(element)) {
-            if (context.sdlProcess()->startTransition() != nullptr) {
+            if (entryStateHandled) {
                 throw TranslationException("Multiple entry states are not supported");
             }
-            auto transition = std::make_unique<::sdl::Transition>();
-            setInitialVariableValues(context.sedsComponent().implementation().variables(), transition.get());
+
+            if (context.sdlProcess()->startTransition() == nullptr) {
+                auto transition = std::make_unique<::sdl::Transition>();
+                context.sdlProcess()->setStartTransition(std::move(transition));
+            }
+
+            auto transition = context.sdlProcess()->startTransition();
+            DescriptionTranslator::translate(sedsStateMachine, transition);
+
+            setInitialVariableValues(context.sedsComponent().implementation().variables(), transition);
             const auto &state = std::get<seds::model::EntryState>(element);
             const auto timerTime = getTimerInvocationTime(sedsStateMachine, state.nameStr());
             if (timerTime.has_value()) {
                 transition->addAction(createTimerSetCall(timerName(state.nameStr()), *timerTime));
             }
             transition->addAction(std::make_unique<::sdl::NextState>("", stateMap[state.nameStr()].get()));
-            context.sdlProcess()->setStartTransition(std::move(transition));
+
+            entryStateHandled = true;
         }
     }
 }
@@ -582,7 +602,6 @@ auto StateMachineTranslator::translateState(const seds::model::EntryState &sedsS
 auto StateMachineTranslator::translatePrimitive(Context &context, const seds::model::OnCommandPrimitive &command)
         -> InputHandler
 {
-    auto sdlProcess = context.sdlProcess();
     auto input = std::make_unique<::sdl::Input>();
     std::vector<std::unique_ptr<::sdl::Action>> unpackingActions;
 
@@ -601,16 +620,12 @@ auto StateMachineTranslator::translatePrimitive(Context &context, const seds::mo
     const bool isSporadic = interface->kind() == ivm::IVInterface::OperationKind::Sporadic;
     if (isSporadic) {
         const auto variableName = ioVariableName(input->name());
-        const auto &variableIterator = std::find_if(sdlProcess->variables().begin(), sdlProcess->variables().end(),
-                [variableName](const auto &variable) { return variable->name() == variableName; });
-        if (variableIterator == sdlProcess->variables().end()) {
-            throw TranslationException(QString("Reception variable %1 not found").arg(variableName));
-        }
-        input->addParameter(std::make_unique<::sdl::VariableReference>((*variableIterator).get()));
+        input->addParameter(std::make_unique<::sdl::VariableReference>(variableName));
 
         for (const auto &argument : command.argumentValues()) {
-            const auto targetVariableName = Escaper::escapeAsn1FieldName(argument.outputVariableRef().value().value());
-            const auto fieldName = Escaper::escapeAsn1FieldName(argument.name().value());
+            const auto targetVariableName =
+                    Escaper::escapeSdlVariableName(argument.outputVariableRef().value().value());
+            const auto fieldName = Escaper::escapeSdlVariableName(argument.name().value());
             unpackingActions.push_back(std::make_unique<::sdl::Task>(
                     "", QString("%1 := %2.%3").arg(targetVariableName, variableName, fieldName)));
         }
@@ -625,7 +640,6 @@ auto StateMachineTranslator::translatePrimitive(Context &context, const seds::mo
 auto StateMachineTranslator::translatePrimitive(Context &context, const seds::model::OnParameterPrimitive &parameter)
         -> InputHandler
 {
-    auto sdlProcess = context.sdlProcess();
     const auto parameterType = parameter.operation() == seds::model::ParameterOperation::Set
             ? InterfaceTranslatorHelper::InterfaceParameterType::Setter
             : InterfaceTranslatorHelper::InterfaceParameterType::Getter;
@@ -645,12 +659,7 @@ auto StateMachineTranslator::translatePrimitive(Context &context, const seds::mo
     if (isSporadic) {
         // This is a sporadic interface, so we must unpack the value.
         const auto variableName = ioVariableName(name);
-        const auto &variableIterator = std::find_if(sdlProcess->variables().begin(), sdlProcess->variables().end(),
-                [variableName](const auto &variable) { return variable->name() == variableName; });
-        if (variableIterator == sdlProcess->variables().end()) {
-            throw TranslationException(QString("Reception variable %1 not found").arg(variableName));
-        }
-        input->addParameter(std::make_unique<::sdl::VariableReference>((*variableIterator).get()));
+        input->addParameter(std::make_unique<::sdl::VariableReference>(variableName));
         // Handle ParameterMap
         const auto &parameterMaps = context.sedsComponent().implementation().parameterMaps();
         const auto &map = std::find_if(parameterMaps.begin(), parameterMaps.end(), [&parameter](const auto &m) {
@@ -658,13 +667,13 @@ auto StateMachineTranslator::translatePrimitive(Context &context, const seds::mo
                     && m.parameter().value() == parameter.parameter().value();
         });
         if (map != parameterMaps.end()) {
-            const auto targetVariableName = Escaper::escapeAsn1FieldName(map->variableRef().value().value());
+            const auto targetVariableName = Escaper::escapeSdlVariableName(map->variableRef().value().value());
             unpackingActions.push_back(
                     std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(targetVariableName, variableName)));
         }
         // Handle variable ref
         if (parameter.variableRef().has_value()) {
-            const auto targetVariableName = Escaper::escapeAsn1FieldName((*parameter.variableRef()).value().value());
+            const auto targetVariableName = Escaper::escapeSdlVariableName((*parameter.variableRef()).value().value());
             unpackingActions.push_back(
                     std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(targetVariableName, variableName)));
         }
@@ -730,6 +739,7 @@ auto StateMachineTranslator::translateTransition(Context &context, const seds::m
     auto inputHandler = translatePrimitive(context, sdlFromState, sedsTransition.primitive());
 
     auto mainTransition = std::make_unique<::sdl::Transition>();
+    DescriptionTranslator::translate(sedsTransition, mainTransition.get());
     auto currentTransitionPtr = mainTransition.get();
     inputHandler.first->setTransition(mainTransition.get());
     sdlFromState->addInput(std::move(inputHandler.first));
@@ -759,7 +769,7 @@ auto StateMachineTranslator::translateTransition(Context &context, const seds::m
             throw TranslationException(
                     QString("Transition on undefined command %1").arg(onCommandPrimitive.command().value()));
         }
-        if (command->mode() == seds::model::InterfaceCommandMode::Sync) {
+        if (command->definition()->mode() == seds::model::InterfaceCommandMode::Sync) {
             invokeDoActivity = false;
         }
     }
@@ -774,12 +784,13 @@ auto StateMachineTranslator::translateTransition(Context &context, const seds::m
             currentTransitionPtr->addAction(
                     StatementTranslatorVisitor::translateActivityCall(context.sdlProcess(), **onEntry));
         }
-        const auto timerTime = getTimerInvocationTime(sedsStateMachine, sedsTransition.toState().nameStr());
-        if (timerTime.has_value()) {
-            currentTransitionPtr->addAction(
-                    createTimerSetCall(timerName(sedsTransition.toState().nameStr()), *timerTime));
-        }
     }
+
+    const auto timerTime = getTimerInvocationTime(sedsStateMachine, sedsTransition.toState().nameStr());
+    if (timerTime.has_value()) {
+        currentTransitionPtr->addAction(createTimerSetCall(timerName(sedsTransition.toState().nameStr()), *timerTime));
+    }
+
     // State switch
     currentTransitionPtr->addAction(std::make_unique<::sdl::NextState>("", sdlToState));
 
@@ -798,7 +809,8 @@ auto StateMachineTranslator::createIoVariable(ivm::IVInterface const *interface,
     }
     const auto variableName = ioVariableName(interfaceName);
     const auto &param = interface->params()[0];
-    sdlProcess->addVariable(std::make_unique<::sdl::VariableDeclaration>(variableName, param.paramTypeName()));
+    sdlProcess->addVariable(
+            std::make_unique<::sdl::VariableDeclaration>(variableName, Escaper::escapeSdlName(param.paramTypeName())));
 }
 
 auto StateMachineTranslator::createExternalProcedure(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess)

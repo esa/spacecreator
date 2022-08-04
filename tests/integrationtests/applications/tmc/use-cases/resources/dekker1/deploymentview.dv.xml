@@ -1,0 +1,16 @@
+<DeploymentView>
+    <Node name="x86 Linux CPP_1" type="ocarina_processors_x86::x86.generic_linux" node_label="Node_1" namespace="ocarina_processors_x86">
+        <Property name="Taste::coordinates" value="24600 7100 88800 57800"/>
+        <Partition name="Partition_1">
+            <Property name="Taste::coordinates" value="29000 11500 79400 50000"/>
+            <Function name="TestGUI" path="TestGUI"/>
+            <Function name="SharedMemory" path="SharedMemory"/>
+        </Partition>
+        <Device name="eth0" requires_bus_access="ocarina_buses::ip.generic" port="eth0" asn1file="/home/taste/tool-inst/include/TASTE-Linux-Drivers/configurations/linux-socket-ip-driver.asn" asn1type="Socket-IP-Conf-T" asn1module="LINUX-SOCKET-IP-DRIVER" impl_extends="ocarina_drivers::ip_socket.linux" bus_namespace="ocarina_buses" namespace="ocarina_drivers" extends="ocarina_drivers::ip_socket">
+            <Property name="Taste::coordinates" value="24600 8800"/>
+        </Device>
+        <Device name="uart0" requires_bus_access="ocarina_buses::serial.ccsds" port="uart0" asn1file="/home/taste/tool-inst/include/TASTE-Linux-Drivers/configurations/linux-serial-ccsds-driver.asn" asn1type="Serial-CCSDS-Linux-Conf-T" asn1module="LINUX-SERIAL-CCSDS-DRIVER" impl_extends="ocarina_drivers::serial_ccsds.linux" bus_namespace="ocarina_buses" namespace="ocarina_drivers" extends="ocarina_drivers::serial_ccsds">
+            <Property name="Taste::coordinates" value="24600 12900"/>
+        </Device>
+    </Node>
+</DeploymentView>

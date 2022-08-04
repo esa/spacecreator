@@ -44,3 +44,13 @@ ValuePtr SingleValue::clone() const
 {
     return std::make_unique<SingleValue>(*this);
 }
+
+Value::ValueType SingleValue::typeEnum() const
+{
+    return Value::SINGLE_VALUE;
+}
+
+const QString &SingleValue::value() const
+{
+    return m_value;
+}

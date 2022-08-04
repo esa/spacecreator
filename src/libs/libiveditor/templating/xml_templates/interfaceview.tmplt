@@ -1,14 +1,18 @@
 {% comment %}
 Template for generation of XML scheme of the whole interface view.
 The following tags are available in this template:
-Functions           : List of all available NON-nested functions (provided by application)
-func                :   |_ Instance of function
-Connections         : List of all available NON-nested connections (provided by application). Connections between top-level functions;
-conn                :   |_ Instance of connection
-ConnectionGroups    : List of all available NON-nested connection groups (provided by application). Grouped connections between top-level functions;
-conngroups          :   |_ Instance of connection
-Comments            : List of all available NON-nested comments (provided by application)
-comm                :   |_ Instance of comment
+Functions                     : List of all available NON-nested functions (provided by application)
+func                          :   |_ Instance of function
+Connections                   : List of all available NON-nested connections (provided by application). Connections between top-level functions;
+conn                          :   |_ Instance of connection
+ConnectionGroups              : List of all available NON-nested connection groups (provided by application). Grouped connections between top-level functions;
+conngroups                    :   |_ Instance of connection
+Comments                      : List of all available NON-nested comments (provided by application)
+comm                          :   |_ Instance of comment
+ConnectionLayers              : List of all available NON-nested layers (provided by application)
+layer                         :   |_ Instance of layer
+ArchetypeLibraryReferences    : List of all available NON-nested archetypeLibraryReferences (provided by application)
+archetypeLibraryReference     :   |_ Instance of archetypeLibraryReference
 {% endcomment %}
 <InterfaceView{% if Asn1FileName %} asn1file="{{ Asn1FileName }}"{% endif %}{% if MscFileName %} mscfile="{{ MscFileName }}"{% endif %}>
 {% for func in Functions %}
@@ -22,5 +26,11 @@ comm                :   |_ Instance of comment
 {% endfor %}
 {% for comm in Comments %}
     {% include "comment.tmplt" %}
+{% endfor %}
+{% for layer in ConnectionLayers %}
+    {% include "layer.tmplt" %}
+{% endfor %}
+{% for archetypeLibraryReference in ArchetypeLibraryReferences %}
+    {% include "archetypeLibraryReference.tmplt" %}
 {% endfor %}
 </InterfaceView>

@@ -38,8 +38,13 @@ private Q_SLOTS:
     void testTimers();
     void testParameterMap();
     void testSyncCommand();
+    void testAsyncCommand();
     void testIndexing();
     void testInitialValues();
+    void testNamedValues();
+    void testDescriptions();
+    void testCrossReference();
+    void testSplineCalibrators();
 };
 
 /// \SRS  ETB-FUN-10
@@ -231,6 +236,22 @@ void tst_SedsConverter_SedsToSdl::testSyncCommand()
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-2010
+/// \SRS  ETB-FUN-2020
+/// \SRS  ETB-FUN-2060
+/// \SRS  ETB-FUN-2140
+/// \SRS  ETB-FUN-2150
+/// \SRS  ETB-FUN-2170
+/// \SRS  ETB-FUN-2490
+/// \SRS  ETB-FUN-2550
+/// \SRS  ETB-FUN-2560
+void tst_SedsConverter_SedsToSdl::testAsyncCommand()
+{
+    const int result = system("./test_async_command.sh");
+    QCOMPARE(result, 0);
+}
+
 /// \SRS  ETB-FUN-2020
 /// \SRS  ETB-FUN-2060
 /// \SRS  ETB-FUN-2400
@@ -245,6 +266,35 @@ void tst_SedsConverter_SedsToSdl::testIndexing()
 void tst_SedsConverter_SedsToSdl::testInitialValues()
 {
     const int result = system("./test_initial_values.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-2020
+/// \SRS  ETB-FUN-2060
+/// \SRS  ETB-FUN-2400
+void tst_SedsConverter_SedsToSdl::testNamedValues()
+{
+    const int result = system("./test_named_values.sh");
+}
+
+/// \SRS  ETB-FUN-10
+void tst_SedsConverter_SedsToSdl::testDescriptions()
+{
+    const int result = system("./test_descriptions.sh");
+}
+
+/// \SRS  ETB-FUN-10
+void tst_SedsConverter_SedsToSdl::testCrossReference()
+{
+    const int result = system("./test_cross_reference.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-2470
+void tst_SedsConverter_SedsToSdl::testSplineCalibrators()
+{
+    const int result = system("./test_spline_calibration.sh");
     QCOMPARE(result, 0);
 }
 

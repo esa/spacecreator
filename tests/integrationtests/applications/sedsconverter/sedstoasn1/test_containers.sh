@@ -18,5 +18,7 @@ $SEDS_CONVERTER --from SEDS --to ASN.1 --skip-validation -i resources/test_conta
 # Compare and clean-up on success
 $DIFF $TEST_OUTPUT_DIR/COM-N7SPACE-CONTAINERS.asn resources/test_containers_asn.output && \
     $DIFF $TEST_OUTPUT_DIR/COM-N7SPACE-CONTAINERS.acn resources/test_containers_acn.output && \
-    asn1scc -c -o $TEST_OUTPUT_DIR $TEST_OUTPUT_DIR/COM-N7SPACE-CONTAINERS.asn $TEST_OUTPUT_DIR/COM-N7SPACE-CONTAINERS.acn && \
+    $DIFF $TEST_OUTPUT_DIR/COM-N7SPACE-CONTAINERS-COMPONENT.asn resources/test_containers_component_asn.output && \
+    $DIFF $TEST_OUTPUT_DIR/COM-N7SPACE-CONTAINERS-COMPONENT.acn resources/test_containers_component_acn.output && \
+    asn1scc -c -o $TEST_OUTPUT_DIR $TEST_OUTPUT_DIR/COM-N7SPACE-CONTAINERS.asn $TEST_OUTPUT_DIR/COM-N7SPACE-CONTAINERS.acn  $TEST_OUTPUT_DIR/COM-N7SPACE-CONTAINERS-COMPONENT.asn  $TEST_OUTPUT_DIR/COM-N7SPACE-CONTAINERS-COMPONENT.acn && \
     rm -r -f $TEST_OUTPUT_DIR

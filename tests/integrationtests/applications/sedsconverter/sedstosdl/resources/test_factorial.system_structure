@@ -14,8 +14,8 @@ use Datamodel;
 
 system Factorial;
 
-   signal AsyncFactorial_CalculateFactorial_Ri(CalculateFactorial_Type1);
-   signal AsyncFactorial_CalculateFactorial_Pi(CalculateFactorial_Type);
+   signal AsyncFactorial_CalculateFactorial_Ri(AsyncFactorialType_CalculateFactorial_TypeNotify);
+   signal AsyncFactorial_CalculateFactorial_Pi(AsyncFactorialType_CalculateFactorial_Type);
    signal AsyncFactorial_Init_Pi;
   
 

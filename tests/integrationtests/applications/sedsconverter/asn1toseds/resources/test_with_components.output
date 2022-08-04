@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+ <Package name="WithComponents">
+  <DataTypeSet>
+   <BooleanDataType name="IsPresent"/>
+   <IntegerDataType name="Type_MySequence_firstEntry">
+    <Range>
+     <MinMaxRange min="0" max="10" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <IntegerDataType name="Type_MySequence_secondEntry">
+    <Range>
+     <MinMaxRange min="0" max="10" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <IntegerDataType name="Type_MySequence_thirdEntry">
+    <Range>
+     <MinMaxRange min="0" max="10" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType name="MySequence">
+    <EntryList>
+     <Entry type="IsPresent" name="is_firstEntry_present"/>
+     <Entry type="IsPresent" name="is_thirdEntry_present"/>
+     <Entry type="Type_MySequence_firstEntry" name="firstEntry"/>
+     <Entry type="Type_MySequence_secondEntry" name="secondEntry"/>
+     <Entry type="Type_MySequence_thirdEntry" name="thirdEntry"/>
+    </EntryList>
+   </ContainerDataType>
+   <IntegerDataType name="Type_ConcreteSequence_firstEntry">
+    <Range>
+     <MinMaxRange min="0" max="10" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <IntegerDataType name="Type_ConcreteSequence_secondEntry">
+    <Range>
+     <MinMaxRange min="0" max="10" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType name="ConcreteSequence">
+    <EntryList>
+     <Entry type="Type_ConcreteSequence_firstEntry" name="firstEntry"/>
+     <Entry type="Type_ConcreteSequence_secondEntry" name="secondEntry"/>
+    </EntryList>
+   </ContainerDataType>
+   <EnumeratedDataType name="Index_MyChoice">
+    <EnumerationList>
+     <Enumeration value="0" label="firstOption"/>
+     <Enumeration value="1" label="secondOption"/>
+     <Enumeration value="2" label="thirdOption"/>
+    </EnumerationList>
+   </EnumeratedDataType>
+   <ContainerDataType name="MyChoice" abstract="true">
+    <EntryList>
+     <Entry type="Index_MyChoice" name="index"/>
+    </EntryList>
+   </ContainerDataType>
+   <IntegerDataType name="Type_MyChoice_firstOption">
+    <Range>
+     <MinMaxRange min="0" max="20" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType baseType="MyChoice" name="MyChoice_firstOption">
+    <ConstraintSet>
+     <ValueConstraint value="0" entry="index"/>
+    </ConstraintSet>
+    <EntryList>
+     <Entry type="Type_MyChoice_firstOption" name="element"/>
+    </EntryList>
+   </ContainerDataType>
+   <IntegerDataType name="Type_MyChoice_secondOption">
+    <Range>
+     <MinMaxRange min="0" max="25" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType baseType="MyChoice" name="MyChoice_secondOption">
+    <ConstraintSet>
+     <ValueConstraint value="1" entry="index"/>
+    </ConstraintSet>
+    <EntryList>
+     <Entry type="Type_MyChoice_secondOption" name="element"/>
+    </EntryList>
+   </ContainerDataType>
+   <IntegerDataType name="Type_MyChoice_thirdOption">
+    <Range>
+     <MinMaxRange min="0" max="30" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType baseType="MyChoice" name="MyChoice_thirdOption">
+    <ConstraintSet>
+     <ValueConstraint value="2" entry="index"/>
+    </ConstraintSet>
+    <EntryList>
+     <Entry type="Type_MyChoice_thirdOption" name="element"/>
+    </EntryList>
+   </ContainerDataType>
+   <EnumeratedDataType name="Index_ConcreteChoice">
+    <EnumerationList>
+     <Enumeration value="0" label="firstOption"/>
+     <Enumeration value="1" label="thirdOption"/>
+    </EnumerationList>
+   </EnumeratedDataType>
+   <ContainerDataType name="ConcreteChoice" abstract="true">
+    <EntryList>
+     <Entry type="Index_ConcreteChoice" name="index"/>
+    </EntryList>
+   </ContainerDataType>
+   <IntegerDataType name="Type_ConcreteChoice_firstOption">
+    <Range>
+     <MinMaxRange min="0" max="20" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType baseType="ConcreteChoice" name="ConcreteChoice_firstOption">
+    <ConstraintSet>
+     <ValueConstraint value="0" entry="index"/>
+    </ConstraintSet>
+    <EntryList>
+     <Entry type="Type_ConcreteChoice_firstOption" name="element"/>
+    </EntryList>
+   </ContainerDataType>
+   <IntegerDataType name="Type_ConcreteChoice_thirdOption">
+    <Range>
+     <MinMaxRange min="0" max="30" rangeType="inclusiveMinInclusiveMax"/>
+    </Range>
+   </IntegerDataType>
+   <ContainerDataType baseType="ConcreteChoice" name="ConcreteChoice_thirdOption">
+    <ConstraintSet>
+     <ValueConstraint value="1" entry="index"/>
+    </ConstraintSet>
+    <EntryList>
+     <Entry type="Type_ConcreteChoice_thirdOption" name="element"/>
+    </EntryList>
+   </ContainerDataType>
+  </DataTypeSet>
+ </Package>
+</PackageFile>

@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2017-2021 N7 Space sp. z o. o.
+** Copyright (C) 2017-2022 N7 Space sp. z o. o.
 ** Contact: http://n7space.com
 **
 ** This file is part of ASN.1/ACN Library.
@@ -24,11 +24,13 @@
 ****************************************************************************/
 #pragma once
 
+#include "../patchersnippet.h"
 #include "../sequencecomponent.h"
 #include "acnparameterizablecomposite.h"
 #include "type.h"
 
 #include <QString>
+#include <optional>
 
 namespace Asn1Acn {
 namespace Types {
@@ -51,6 +53,20 @@ public:
     std::unique_ptr<Type> clone() const override;
 
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/sequence.png"); }
+
+    std::optional<QString> postEncodingFunction() const;
+    void setPostEncodingFunction(QString postEncodingFunction);
+
+    std::optional<QString> postDecodingValidator() const;
+    void setPostDecodingValidator(QString postDecodingValidator);
+
+    std::vector<PatcherSnippet> patcherSnippets() const;
+    void addPatcherSnippet(PatcherSnippet patcherSnippet);
+
+private:
+    std::optional<QString> m_postEncodingFunction;
+    std::optional<QString> m_postDecodingValidator;
+    std::vector<PatcherSnippet> m_patcherSnippets;
 };
 
 }

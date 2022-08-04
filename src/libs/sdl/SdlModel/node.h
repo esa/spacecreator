@@ -35,12 +35,14 @@ public:
      * @brief   Constructor
      */
     Node(QString name = "");
-
+    /**
+     * @brief   Default virtual destructor
+     */
+    virtual ~Node() = default;
     /**
      * @brief   Deleted copy constructor
      */
     Node(const Node &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -50,31 +52,40 @@ public:
      * @brief   Deleted copy assignment operator
      */
     Node &operator=(const Node &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     Node &operator=(Node &&) = default;
 
-    /**
-     * @brief   Default virtual destructor
-     */
-    virtual ~Node() = default;
-
-    /**
-     * @brief   Setter for this model type
-     *
-     * @param   name name to set
-     */
-    auto setName(QString name) -> void;
-
+public:
     /**
      * @brief   Getter for this node name
      *
      * @return  node name
      */
     auto name() const -> const QString &;
+    /**
+     * @brief   Setter for this model type
+     *
+     * @param   name    name to set
+     */
+    auto setName(QString name) -> void;
 
+public:
+    /**
+     * @brief   Getter for this node comment
+     *
+     * @return  node comment
+     */
+    auto comment() const -> const QString &;
+    /**
+     * @brief   Setter for this node comment
+     *
+     * @param   comment     comment to set
+     */
+    auto setComment(QString comment) -> void;
+
+public:
     /**
      * @brief   Visitor acceptor (shall call visit method of the given visitor)
      */
@@ -82,6 +93,7 @@ public:
 
 private:
     QString m_name;
+    QString m_comment;
 };
 
 } // namespace sdl

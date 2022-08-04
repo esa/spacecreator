@@ -1,0 +1,11 @@
+COM-N7SPACE-INTERFACEINHERITANCE1 DEFINITIONS ::= BEGIN
+PackageInteger [size 8, encoding pos-int]
+PackageFloat [encoding IEEE754-1985-32, endianness big]
+PackageFloatArray-1 []
+PackageIntegerArray-1 []
+InterfaceDecl1-Async1-Type []
+{
+    arg1 [],
+    arg2 []
+}
+END

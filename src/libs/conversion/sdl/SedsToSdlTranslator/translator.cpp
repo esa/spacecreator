@@ -21,6 +21,7 @@
 
 #include "specialized/activitytranslator.h"
 #include "specialized/common.h"
+#include "specialized/splinecalibratortranslator.h"
 #include "specialized/statemachinetranslator.h"
 
 #include <conversion/common/escaper/escaper.h>
@@ -77,11 +78,11 @@ std::vector<std::unique_ptr<Model>> SedsToSdlTranslator::translateSedsModel(
     const auto &sedsModelData = sedsModel->data();
     if (std::holds_alternative<seds::model::PackageFile>(sedsModelData)) {
         const auto &sedsPackage = std::get<seds::model::PackageFile>(sedsModelData).package();
-        translatePackage(sedsPackage, asn1Model, ivModel, sdlModel.get());
+        translatePackage(sedsPackage, {}, asn1Model, ivModel, sdlModel.get());
     } else if (std::holds_alternative<seds::model::DataSheet>(sedsModelData)) {
         const auto &sedsPackages = std::get<seds::model::DataSheet>(sedsModelData).packages();
         for (const auto &sedsPackage : sedsPackages) {
-            translatePackage(sedsPackage, asn1Model, ivModel, sdlModel.get());
+            translatePackage(sedsPackage, sedsPackages, asn1Model, ivModel, sdlModel.get());
         }
     } else {
         throw TranslationException("Unhandled SEDS model data type");
@@ -93,17 +94,18 @@ std::vector<std::unique_ptr<Model>> SedsToSdlTranslator::translateSedsModel(
     return result;
 }
 
-auto SedsToSdlTranslator::translatePackage(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model,
-        ivm::IVModel *ivModel, ::sdl::SdlModel *model) const -> void
+auto SedsToSdlTranslator::translatePackage(const seds::model::Package &sedsPackage,
+        const std::vector<seds::model::Package> &sedsPackages, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
+        ::sdl::SdlModel *model) const -> void
 {
     for (const auto &component : sedsPackage.components()) {
-        translateComponent(sedsPackage, component, asn1Model, ivModel, model);
+        translateComponent(sedsPackage, sedsPackages, component, asn1Model, ivModel, model);
     }
 }
 
 auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPackage,
-        const seds::model::Component &sedsComponent, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
-        ::sdl::SdlModel *model) const -> void
+        const std::vector<seds::model::Package> &sedsPackages, const seds::model::Component &sedsComponent,
+        Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel, ::sdl::SdlModel *model) const -> void
 {
 
     const auto &implementation = sedsComponent.implementation();
@@ -124,7 +126,7 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
         process.setName(Escaper::escapeIvName(sedsComponent.nameStr()));
         const auto ivFunction = ivModel->getFunction(process.name(), Qt::CaseInsensitive);
 
-        Context context(sedsPackage, sedsComponent, asn1Model, ivFunction, &process, stateMachine.get());
+        Context context(sedsPackage, sedsPackages, sedsComponent, asn1Model, ivFunction, &process, stateMachine.get());
 
         StateMachineTranslator::buildCommandMap(context);
         StateMachineTranslator::translateVariables(context, implementation.variables());
@@ -146,6 +148,9 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
         for (const auto &timerName : process.timerNames()) {
             shared::ContextParameter timer(timerName, shared::BasicParameter::Type::Timer);
             ivFunction->addContextParam(timer);
+        }
+        if (context.maxSplinePointCount() > 0) {
+            SplineCalibratorTranslator::buildSplineCalibratorBoilerplate(context);
         }
 
         // State machine needs to be moved after processing, because later it cannot be accessed for modification

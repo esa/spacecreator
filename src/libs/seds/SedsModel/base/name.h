@@ -28,11 +28,17 @@ class Name final
 public:
     Name() = default;
     Name(common::String value) noexcept;
+    Name(const Name &) = default;
     Name(Name &&) = default;
+    Name &operator=(const Name &) = default;
     Name &operator=(Name &&) = default;
 
 public:
     auto value() const -> const common::String &;
+
+public:
+    friend auto operator==(const Name &lhs, const Name &rhs) -> bool;
+    friend auto operator!=(const Name &lhs, const Name &rhs) -> bool;
 
 private:
     common::String m_value;

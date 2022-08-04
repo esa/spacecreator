@@ -36,6 +36,8 @@ Asn1NodeReconstructingVisitor::Asn1NodeReconstructingVisitor(QTextStream &outStr
 
 void Asn1NodeReconstructingVisitor::visit(const Definitions &defs)
 {
+    reconstructComment(defs);
+
     m_outStream << defs.name() << QStringLiteral(" DEFINITIONS ::= BEGIN") << QStringLiteral("\n");
 
     reconstructImports(defs);
@@ -52,6 +54,8 @@ void Asn1NodeReconstructingVisitor::visit(const File &file)
 
 void Asn1NodeReconstructingVisitor::visit(const TypeAssignment &type)
 {
+    reconstructComment(type);
+
     m_outStream << type.name() << QStringLiteral(" ::= ");
 
     Asn1TypeComponentReconstructingVisitor visitor(m_outStream);
@@ -111,5 +115,18 @@ void Asn1NodeReconstructingVisitor::reconstructCollection(const T &collection) c
     for (const auto &item : collection) {
         Asn1NodeReconstructingVisitor visitor(m_outStream);
         item->accept(visitor);
+    }
+}
+
+void Asn1NodeReconstructingVisitor::reconstructComment(const Node &node) const
+{
+    const auto &comment = node.comment();
+
+    if (comment.isEmpty()) {
+        return;
+    }
+
+    for (const auto &commentPart : comment.split("\n")) {
+        m_outStream << QStringLiteral("-- ") << commentPart << QStringLiteral("\n");
     }
 }

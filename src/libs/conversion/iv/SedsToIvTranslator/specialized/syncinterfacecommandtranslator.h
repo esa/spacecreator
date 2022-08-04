@@ -20,7 +20,9 @@
 #pragma once
 
 #include "generictypemapper.h"
+#include "interfacetypenamehelper.h"
 
+#include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/definitions.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivinterface.h>
@@ -40,13 +42,10 @@ public:
      *
      * @param   ivFunction          Output interface view function
      * @param   sedsInterfaceName   Parent interface name
-     * @param   asn1Definitions     Parent ASN.1 definitions
-     * @param   sedsPackage         Parent SEDS package
-     * @param   typeMapper          Generic type mapper
+     * @param   typeNameHelper      Helper for ASN.1 type names
      */
     SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
-            Asn1Acn::Definitions *asn1Definitions, const seds::model::Package *sedsPackage,
-            const GenericTypeMapper *typeMapper);
+            const InterfaceTypeNameHelper &typeNameHelper);
     /**
      * @brief   Deleted copy constructor
      */
@@ -79,22 +78,15 @@ public:
 private:
     auto translateArguments(
             const std::vector<seds::model::CommandArgument> &sedsArguments, ivm::IVInterface *ivInterface) -> void;
-    auto handleArgumentType(const seds::model::CommandArgument &sedsArgument, const QString interfaceName) const
-            -> QString;
+    auto handleArgumentTypeName(const seds::model::CommandArgument &sedsArgument) const -> QString;
 
 private:
     /// @brief  Output interface view function
     ivm::IVFunction *m_ivFunction;
-
     /// @brief  Parent SEDS interface name
     const QString &m_sedsInterfaceName;
-    /// @brief  Parent ASN.1 type definitions
-    Asn1Acn::Definitions *m_asn1Definitions;
-    /// @brief  Parent SEDS package
-    const seds::model::Package *m_sedsPackage;
-
-    /// @brief  Generic type mapper
-    const GenericTypeMapper *m_typeMapper;
+    /// @brief  Helper for ASN.1 names
+    const InterfaceTypeNameHelper &m_typeNameHelper;
 };
 
 } // namespace conversion::iv::translator

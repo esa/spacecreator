@@ -4,6 +4,8 @@
 #include "ivconnection.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
+#include "ivarchetypereference.h"
+#include "ivarchetypelibraryreference.h"
 #include "ivmodel.h"
 
 #include <algorithm>
@@ -92,10 +94,25 @@ IVComment *createComment(const QString &name, QObject *parent)
     return comment;
 }
 
-IVConnectionLayerType *createConnectionLayer(const QString &name, QObject *parent)
+IVConnectionLayerType *createConnectionLayer(QObject *parent)
 {
-    auto layer = new IVConnectionLayerType(name, parent);
+    auto layer = new IVConnectionLayerType(parent);
+    layer->setTitle(ivm::IVConnectionLayerType::DefaultLayerName);
     return layer;
+}
+
+IVArchetypeReference *createArchetypeReference(
+        const QString &archetypeLibraryName, const QString &archetypeFunctionName, QObject *parent)
+{
+    auto archetypeReference = new IVArchetypeReference(parent, archetypeLibraryName, archetypeFunctionName);
+    return archetypeReference;
+}
+
+IVArchetypeLibraryReference *createArchetypeLibraryReference(
+        const QString &archetypeLibraryName, const QString &archetypeLibraryPath, QObject *parent)
+{
+    auto archetypeLibraryReference = new IVArchetypeLibraryReference(parent, archetypeLibraryName, archetypeLibraryPath);
+    return archetypeLibraryReference;
 }
 
 }

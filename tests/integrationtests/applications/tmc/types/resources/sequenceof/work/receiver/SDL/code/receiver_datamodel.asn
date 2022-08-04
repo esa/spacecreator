@@ -1,0 +1,17 @@
+Receiver-Datamodel DEFINITIONS ::=
+BEGIN
+IMPORTS
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   MySequenceOf, MyBetterSequenceOf FROM USERDEFINED-TYPES-DATAVIEW;
+
+Receiver-States ::= ENUMERATED {wait}
+
+Receiver-Context ::= SEQUENCE {
+   state Receiver-States,
+   init-done BOOLEAN,
+   seqofarg MyBetterSequenceOf,
+   seqofvalue MyBetterSequenceOf,
+   seqofhandled T-Boolean
+}
+
+END

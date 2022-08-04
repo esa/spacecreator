@@ -3,5 +3,6 @@
         <file>allitems.xml</file>
         <file>ifaceparams.xml</file>
         <file>connection_group.xml</file>
+        <file>multicast.xml</file>
     </qresource>
 </RCC>

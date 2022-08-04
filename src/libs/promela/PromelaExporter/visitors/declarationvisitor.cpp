@@ -64,7 +64,7 @@ void DeclarationVisitor::generateInitExpression(const Declaration::InitExpressio
             initExpression);
 }
 
-void DeclarationVisitor::generateChannelInit(const ::promela::model::ChannelInit &channelInit)
+void DeclarationVisitor::generateChannelInit(const model::ChannelInit &channelInit)
 {
     m_stream << " = [" << channelInit.getSize() << "] of {";
 
@@ -73,7 +73,7 @@ void DeclarationVisitor::generateChannelInit(const ::promela::model::ChannelInit
         if (!first) {
             m_stream << ", ";
         }
-        first = true;
+        first = false;
         DataTypePrefixVisitor typeVisitor(m_stream);
         typeVisitor.visit(type);
     }
@@ -81,7 +81,7 @@ void DeclarationVisitor::generateChannelInit(const ::promela::model::ChannelInit
     m_stream << "}";
 }
 
-void DeclarationVisitor::generateExpression(const ::promela::model::Expression &expression)
+void DeclarationVisitor::generateExpression(const model::Expression &expression)
 {
     m_stream << " = ";
     ExpressionVisitor visitor(m_stream);

@@ -17,14 +17,43 @@
 
 #include "dvmessage.h"
 
+#include "abstractsystemchecks.h"
 #include "dvconnection.h"
+#include "dvfunction.h"
+#include "dvmodel.h"
 #include "dvnode.h"
+#include "errorhub.h"
+
+#include <QDebug>
 
 namespace dvm {
 
 DVMessage::DVMessage(QObject *parent)
     : DVObject(DVObject::Type::Message, {}, parent)
 {
+}
+
+bool DVMessage::postInit()
+{
+    DVNode *node1 = fromNode();
+    if (!node1) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Message %1 has invalid node").arg(title()));
+        return false;
+    }
+    DVNode *node2 = toNode();
+    if (!node2) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Message %1 has invalid node").arg(title()));
+        return false;
+    }
+
+    bool direction1Ok = node1->containsFunction(fromFunction()) && node2->containsFunction(toFunction());
+    bool direction2Ok = node2->containsFunction(fromFunction()) && node1->containsFunction(toFunction());
+
+    if (!direction1Ok && !direction2Ok) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Message %1 has invalid function").arg(title()));
+        return false;
+    }
+    return true;
 }
 
 QString DVMessage::titleUI() const
@@ -42,6 +71,11 @@ void DVMessage::setFromFunction(const QString &from)
     setEntityAttribute(meta::Props::token(meta::Props::Token::from_function), from);
 }
 
+QStringList DVMessage::fromFunctionPath() const
+{
+    return pathOfFunction(fromFunction(), fromNode());
+}
+
 QString DVMessage::fromInterface() const
 {
     return entityAttributeValue(meta::Props::token(meta::Props::Token::from_interface)).toString();
@@ -54,7 +88,7 @@ void DVMessage::setFromInterface(const QString &from)
 
 DVNode *DVMessage::fromNode() const
 {
-    auto connection = qobject_cast<const DVConnection *>(this);
+    auto connection = qobject_cast<const DVConnection *>(parent());
     if (!connection) {
         return nullptr;
     }
@@ -71,6 +105,11 @@ void DVMessage::setToFunction(const QString &to)
     setEntityAttribute(meta::Props::token(meta::Props::Token::to_function), to);
 }
 
+QStringList DVMessage::toFunctionPath() const
+{
+    return pathOfFunction(toFunction(), toNode());
+}
+
 QString DVMessage::toInterface() const
 {
     return entityAttributeValue(meta::Props::token(meta::Props::Token::to_interface)).toString();
@@ -83,11 +122,26 @@ void DVMessage::setToInterface(const QString &to)
 
 DVNode *DVMessage::toNode() const
 {
-    auto connection = qobject_cast<const DVConnection *>(this);
+    auto connection = qobject_cast<const DVConnection *>(parent());
     if (!connection) {
         return nullptr;
     }
     return connection->targetNode();
+}
+
+QStringList DVMessage::pathOfFunction(const QString &functionName, DVNode *node) const
+{
+    Q_ASSERT(node != nullptr);
+
+    for (const DVPartition *partition : node->partitions()) {
+        for (const DVFunction *func : partition->functions()) {
+            if (func->title() == functionName) {
+                return func->path();
+            }
+        }
+    }
+
+    return { functionName };
 }
 
 } // namespace dvm

@@ -1,0 +1,23 @@
+COM-N7SPACE-CONTAINERS-COMPONENT DEFINITIONS ::= BEGIN
+IMPORTS
+DataItemA FROM COM-N7SPACE-CONTAINERS
+DataItemB FROM COM-N7SPACE-CONTAINERS
+;
+PackageContainer ::= SEQUENCE
+{
+    realization CHOICE
+    {
+        realizationPackageContainer SEQUENCE
+        {
+            fieldA DataItemA(0 .. 255),
+            fieldB DataItemB(0 .. 255)
+        } ,
+        realizationPackageChildContainer PackageChildContainer
+    }
+}
+PackageChildContainer ::= SEQUENCE
+{
+    fieldA DataItemA(0 .. 255) (0),
+    fieldB DataItemB(0 .. 255)
+}
+END

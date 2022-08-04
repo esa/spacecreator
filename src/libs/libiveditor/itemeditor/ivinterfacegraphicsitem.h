@@ -76,6 +76,7 @@ protected:
     virtual QPainterPath typePath() const;
     QPainterPath itemPath(Qt::Alignment alignment) const override;
     virtual void applyColorScheme() override;
+    void rebuildLayout() override;
 
 protected Q_SLOTS:
     void updateKind();

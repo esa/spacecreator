@@ -71,6 +71,9 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterKeepIntermediateFiles();
     void testCmdArgumentSedsConverterAcnFilepathPrefix();
     void testCmdArgumentSedsConverterAsn1FilepathPrefix();
+    void testCmdArgumentSedsConverterAsn1SequenceSizeThreshold();
+    void testCmdArgumentSedsConverterPatcherFunctionsFilepathPrefix();
+    void testCmdArgumentSedsConverterMappingFunctionsModuleFileName();
     void testCmdArgumentSedsConverterSdlFilepathPrefix();
 
     void initTestCase();
@@ -494,6 +497,63 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterAsn1FilepathPrefix()
     QVERIFY(parser.isSet(CommandArg::SedsConverterAsn1FilepathPrefix));
 
     const QString value = parser.value(CommandArg::SedsConverterAsn1FilepathPrefix);
+    QCOMPARE(value, prefix);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterAsn1SequenceSizeThreshold()
+{
+    const QCommandLineOption cmdExportToFile =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterAsn1SequenceSizeThreshold);
+    const QString threshold("42");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdExportToFile.names().first(), threshold) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterAsn1SequenceSizeThreshold);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterAsn1SequenceSizeThreshold));
+
+    const QString value = parser.value(CommandArg::SedsConverterAsn1SequenceSizeThreshold);
+    QCOMPARE(value, threshold);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterPatcherFunctionsFilepathPrefix()
+{
+    const QCommandLineOption cmdExportToFile =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterPatcherFunctionsFilepathPrefix);
+    const QString prefix("patcher_function_prefix_");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdExportToFile.names().first(), prefix) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterPatcherFunctionsFilepathPrefix);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterPatcherFunctionsFilepathPrefix));
+
+    const QString value = parser.value(CommandArg::SedsConverterPatcherFunctionsFilepathPrefix);
+    QCOMPARE(value, prefix);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterMappingFunctionsModuleFileName()
+{
+    const QCommandLineOption cmdExportToFile =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterMappingFunctionsModuleFileName);
+    const QString prefix("mfm_module_name");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdExportToFile.names().first(), prefix) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterMappingFunctionsModuleFileName);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterMappingFunctionsModuleFileName));
+
+    const QString value = parser.value(CommandArg::SedsConverterMappingFunctionsModuleFileName);
     QCOMPARE(value, prefix);
 }
 

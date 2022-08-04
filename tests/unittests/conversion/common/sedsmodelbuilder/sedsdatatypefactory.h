@@ -42,11 +42,13 @@ public:
     /**
      * @brief   Create binary data type
      *
-     * @param   name    Name for the created type
+     * @param   name        Name for the created type
+     * @param   bits        Bit size
+     * @param   fixedSize   If type should be fixed size
      *
      * @return  Created data type
      */
-    static auto createBinary(QString name) -> seds::model::BinaryDataType;
+    static auto createBinary(QString name, uint64_t bits, bool fixedSize) -> seds::model::BinaryDataType;
     /**
      * @brief   Create boolean data type
      *

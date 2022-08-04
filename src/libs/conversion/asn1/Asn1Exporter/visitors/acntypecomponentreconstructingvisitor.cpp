@@ -41,6 +41,7 @@ void AcnTypeComponentReconstructingVisitor::visit(const Types::Boolean &type)
 
     tryAppendAlignToNext(type, params);
 
+    tryAppendSize(type, params);
     tryAppendTrueValue(type, params);
     tryAppendFalseValue(type, params);
 
@@ -53,6 +54,7 @@ void AcnTypeComponentReconstructingVisitor::visit(const Types::Null &type)
 
     tryAppendAlignToNext(type, params);
     tryAppendPattern(type, params);
+    tryAppendSavePosition(type, params);
 
     endParamsList(params);
 }
@@ -112,12 +114,30 @@ void AcnTypeComponentReconstructingVisitor::visit(const Types::Enumerated &type)
 void AcnTypeComponentReconstructingVisitor::visit(const Types::Choice &type)
 {
     // TODO: append determinant, when it will be fixed
-    reconstructComplexType(type, m_indent);
+    reconstructComplexTypeParameters(type);
+
+    auto params = beginParamsList();
+
+    tryAppendAlignToNext(type, params);
+
+    endParamsList(params);
+
+    reconstructComplexTypeComponents(type, m_indent);
 }
 
 void AcnTypeComponentReconstructingVisitor::visit(const Types::Sequence &type)
 {
-    reconstructComplexType(type, m_indent);
+    reconstructComplexTypeParameters(type);
+
+    auto params = beginParamsList();
+
+    tryAppendPostEncodingFunction(type, params);
+    tryAppendPostDecodingValidator(type, params);
+    tryAppendAlignToNext(type, params);
+
+    endParamsList(params);
+
+    reconstructComplexTypeComponents(type, m_indent);
 }
 
 void AcnTypeComponentReconstructingVisitor::visit(const Types::SequenceOf &type)
@@ -226,6 +246,13 @@ void AcnTypeComponentReconstructingVisitor::tryAppendPattern(const Types::Null &
     }
 }
 
+void AcnTypeComponentReconstructingVisitor::tryAppendSavePosition(const Types::Null &type, QStringList &params) const
+{
+    if (type.savePosition()) {
+        params << QStringLiteral("save-position");
+    }
+}
+
 void AcnTypeComponentReconstructingVisitor::tryAppendTerminationPattern(
         const Types::AsciiStringAcnParameters &type, QStringList &params) const
 {
@@ -249,6 +276,14 @@ void AcnTypeComponentReconstructingVisitor::tryAppendSize(const T &type, QString
     const auto size = type.acnSize();
     if (!size.isEmpty()) {
         params << QStringLiteral("size ") + size;
+    }
+}
+
+void AcnTypeComponentReconstructingVisitor::tryAppendSize(const Types::Boolean &type, QStringList &params) const
+{
+    const auto size = type.acnSize();
+    if (size != 0) {
+        params << QStringLiteral("size ") + QString::number(size);
     }
 }
 
@@ -281,18 +316,22 @@ void AcnTypeComponentReconstructingVisitor::tryAppendEndianness(const T &type, Q
     }
 }
 
-template<typename T>
-void AcnTypeComponentReconstructingVisitor::reconstructComplexType(const T &type, const int indent)
+void AcnTypeComponentReconstructingVisitor::tryAppendPostEncodingFunction(
+        const Types::Sequence &type, QStringList &params) const
 {
-    reconstructComplexTypeParameters(type);
+    auto postEncodingFunction = type.postEncodingFunction();
+    if (postEncodingFunction.has_value()) {
+        params.append(QStringLiteral("post-encoding-function ") + *postEncodingFunction);
+    }
+}
 
-    auto params = beginParamsList();
-
-    tryAppendAlignToNext(type, params);
-
-    endParamsList(params);
-
-    reconstructComplexTypeComponents(type, indent);
+void AcnTypeComponentReconstructingVisitor::tryAppendPostDecodingValidator(
+        const Types::Sequence &type, QStringList &params) const
+{
+    auto postDecodingValidator = type.postDecodingValidator();
+    if (postDecodingValidator.has_value()) {
+        params.append(QStringLiteral("post-decoding-validator ") + *postDecodingValidator);
+    }
 }
 
 template<typename T>

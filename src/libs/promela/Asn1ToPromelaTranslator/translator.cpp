@@ -35,7 +35,10 @@ using conversion::ModelType;
 using conversion::Options;
 using conversion::promela::PromelaOptions;
 
+using promela::model::InlineCall;
+using promela::model::InlineDef;
 using promela::model::PromelaModel;
+using promela::model::Skip;
 
 namespace promela::translator {
 std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
@@ -44,15 +47,15 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
     checkSourceModelCount(sourceModels);
 
     const bool enhancedSpinSupport = options.isSet(PromelaOptions::enhancedSpinSupport);
-
-    const std::vector<QString> valueGeneration = options.values(PromelaOptions::asn1ValueGeneration);
+    const bool asn1ValueGeneration = options.isSet(PromelaOptions::asn1ValueGeneration);
+    const std::vector<QString> valueGeneration = options.values(PromelaOptions::asn1ValueGenerationForType);
 
     const auto *asn1Model = getModel<Asn1Model>(sourceModels);
 
-    if (!valueGeneration.empty()) {
+    if (asn1ValueGeneration) {
         QStringList typeNames;
         std::copy(valueGeneration.begin(), valueGeneration.end(), std::back_inserter(typeNames));
-        return generateValueGenerationInlines(asn1Model, enhancedSpinSupport, typeNames);
+        return generateValueGenerationInlines(asn1Model, typeNames, options);
     } else {
         return translateAsn1Model(asn1Model, enhancedSpinSupport);
     }
@@ -76,13 +79,18 @@ std::set<ModelType> Asn1ToPromelaTranslator::getDependencies() const
 std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
         const Asn1Model *model, bool enhancedSpinSupport) const
 {
+    QVector<QString> initInlineNames;
     std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
     for (const std::unique_ptr<File> &file : model->data()) {
-        visitAsn1File(file.get(), *promelaModel, enhancedSpinSupport);
+        Asn1NodeVisitor visitor(*promelaModel, enhancedSpinSupport);
+        visitor.visit(*file);
+        initInlineNames.append(visitor.getInitInlineNames());
     }
 
     PromelaTypeSorter typeSorter;
     typeSorter.sortTypeDefinitions(*promelaModel);
+
+    createDataviewInitInline(*promelaModel, initInlineNames);
 
     std::vector<std::unique_ptr<Model>> result;
     result.push_back(std::move(promelaModel));
@@ -90,27 +98,44 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
 }
 
 std::vector<std::unique_ptr<conversion::Model>> Asn1ToPromelaTranslator::generateValueGenerationInlines(
-        const ::Asn1Acn::Asn1Model *model, bool enhancedSpinSupport, const QStringList &typeNames) const
+        const Asn1Acn::Asn1Model *model, const QStringList &typeNames, const Options &options) const
 {
+    const auto subtypesFilepaths = options.values(PromelaOptions::subtypesFilepath);
+
     std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
     for (const std::unique_ptr<File> &file : model->data()) {
-        visitAsn1FileGenerate(file.get(), *promelaModel, enhancedSpinSupport, typeNames);
+        const auto subtypesFilepathFound = std::find_if(subtypesFilepaths.begin(), subtypesFilepaths.end(),
+                [&](const auto &filepath) { return filepath == file->name(); });
+
+        if (subtypesFilepathFound == subtypesFilepaths.end()) {
+            Asn1NodeValueGeneratorVisitor visitor(*promelaModel, typeNames);
+            visitor.visit(*file);
+        } else {
+            Asn1NodeValueGeneratorVisitor visitor(*promelaModel);
+            visitor.visit(*file);
+        }
     }
     std::vector<std::unique_ptr<Model>> result;
     result.push_back(std::move(promelaModel));
     return result;
 }
 
-void Asn1ToPromelaTranslator::visitAsn1File(File *file, PromelaModel &promelaModel, bool enhancedSpinSupport) const
+void Asn1ToPromelaTranslator::createDataviewInitInline(
+        promela::model::PromelaModel &model, const QVector<QString> &initInlineNames) const
 {
-    Asn1NodeVisitor visitor(promelaModel, enhancedSpinSupport);
-    visitor.visit(*file);
-}
+    promela::model::Sequence initSequence(promela::model::Sequence::Type::D_STEP);
 
-void Asn1ToPromelaTranslator::visitAsn1FileGenerate(
-        File *file, PromelaModel &promelaModel, bool enhancedSpinSupport, const QStringList &typeNames) const
-{
-    Asn1NodeValueGeneratorVisitor visitor(promelaModel, enhancedSpinSupport, typeNames);
-    visitor.visit(*file);
+    if (initInlineNames.isEmpty()) {
+        initSequence.appendElement(Skip());
+    } else {
+        for (const QString &inlineName : initInlineNames) {
+            initSequence.appendElement(InlineCall(inlineName, {}));
+        }
+    }
+
+    std::unique_ptr<InlineDef> dataviewInitInline =
+            std::make_unique<InlineDef>("global_dataview_init", QList<QString>(), std::move(initSequence));
+
+    model.addInlineDef(std::move(dataviewInitInline));
 }
 }

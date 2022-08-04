@@ -40,9 +40,6 @@
 
 using plugincommon::IvTools;
 using plugincommon::ModelLoader;
-using testgenerator::createQVectorToQVectorMap;
-using testgenerator::elementsEqualByName;
-using testgenerator::elementsEqualByTitle;
 using testgenerator::IvGenerator;
 
 namespace tests::testgenerator {
@@ -54,6 +51,7 @@ class tst_ivgenerator final : public QObject
 private Q_SLOTS:
     void initTestCase();
     void testNominal();
+    void testDefaultInterfaceName();
 
 private:
     const QString ivDir = "resources";
@@ -102,13 +100,35 @@ void tst_ivgenerator::testNominal()
         QFAIL("IV model was not generated");
     }
 
-    const auto ivModelLoadedUniquePtr = ModelLoader::loadIvModel(ivConfig, ivPath.arg("interfaceview"));
-    const auto ivModelLoadedRaw = dynamic_cast<ivm::IVModel *>(ivModelLoadedUniquePtr.get());
-    if (ivModelLoadedRaw == nullptr) {
+    const auto ivModelLoaded = ModelLoader::loadIvModel(ivConfig, ivPath.arg("interfaceview"));
+    if (ivModelLoaded == nullptr) {
         throw std::runtime_error(QString("%1 file could not be read as IV").arg(ivDir).toStdString());
     }
 
-    compareModels(ivModelLoadedRaw, ivModelGenerated.get());
+    compareModels(ivModelLoaded.get(), ivModelGenerated.get());
+}
+
+void tst_ivgenerator::testDefaultInterfaceName()
+{
+    const auto functionUnderTest = makeFunctionUnderTest("FunctionUnderTest");
+
+    ivm::IVInterface *const interfaceUnderTest =
+            makeInterfaceUnderTest("PI_0", functionUnderTest.get(), ivm::IVInterface::OperationKind::Protected);
+
+    functionUnderTest->addChild(interfaceUnderTest);
+
+    const auto ivModelGenerated = IvGenerator::generate(interfaceUnderTest);
+
+    if (ivModelGenerated == nullptr) {
+        QFAIL("IV model was not generated");
+    }
+
+    const auto ivModelLoaded = ModelLoader::loadIvModel(ivConfig, ivPath.arg("interfaceview_default_iface_name"));
+    if (ivModelLoaded == nullptr) {
+        throw std::runtime_error(QString("%1 file could not be read as IV").arg(ivDir).toStdString());
+    }
+
+    compareModels(ivModelLoaded.get(), ivModelGenerated.get());
 }
 
 static ivm::IVInterface *makeInterfaceUnderTest(const QString &interfaceName, ivm::IVFunction *const function,
@@ -171,8 +191,8 @@ static void compareModels(ivm::IVModel *const loaded, ivm::IVModel *const genera
     const int generatedFunctionsSize = generatedFunctions.size();
     QCOMPARE(generatedFunctionsSize, loadedFunctionsSize);
 
-    const QVector<int> loadedToGeneratedFunctionMap = createQVectorToQVectorMap<QVector<ivm::IVFunction *>>(
-            loadedFunctions, generatedFunctions, elementsEqualByTitle);
+    const QVector<int> loadedToGeneratedFunctionMap =
+            createQVectorToQVectorMap<ivm::IVFunction *>(loadedFunctions, generatedFunctions, elementsEqualByTitle);
     checkAllElementsMapped(loadedToGeneratedFunctionMap, loadedFunctionsSize);
 
     for (int i = 0; i < generatedFunctionsSize; i++) {
@@ -210,8 +230,8 @@ static void compareFunctions(ivm::IVFunction *const loaded, ivm::IVFunction *con
     const int generatedInterfacesSize = generatedInterfaces.size();
     QCOMPARE(generatedInterfacesSize, loadedInterfacesSize);
 
-    const QVector<int> loadedToGeneratedInterfaceMap = createQVectorToQVectorMap<QVector<ivm::IVInterface *>>(
-            loadedInterfaces, generatedInterfaces, elementsEqualByTitle);
+    const QVector<int> loadedToGeneratedInterfaceMap =
+            createQVectorToQVectorMap<ivm::IVInterface *>(loadedInterfaces, generatedInterfaces, elementsEqualByTitle);
     checkAllElementsMapped(loadedToGeneratedInterfaceMap, loadedInterfacesSize);
 
     for (int i = 0; i < generatedInterfacesSize; i++) {
@@ -237,8 +257,8 @@ static void compareInterfaces(ivm::IVInterface *const loaded, ivm::IVInterface *
     const int loadedParametersSize = loadedParams.size();
     QCOMPARE(generatedParametersSize, loadedParametersSize);
 
-    const QVector<int> loadedToGeneratedParameterMap = createQVectorToQVectorMap<QVector<shared::InterfaceParameter>>(
-            loadedParams, generatedParams, elementsEqualByName);
+    const QVector<int> loadedToGeneratedParameterMap =
+            createQVectorToQVectorMap<shared::InterfaceParameter>(loadedParams, generatedParams, elementsEqualByName);
     checkAllElementsMapped(loadedToGeneratedParameterMap, loadedParametersSize);
 
     const int generatedParamsSize = generatedParams.size();

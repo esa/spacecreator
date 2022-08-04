@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "processmetadata.h"
+
 #include <QDir>
 #include <QFileInfo>
 #include <QList>
@@ -27,7 +29,10 @@
 #include <conversion/registry/registry.h>
 #include <ivcore/ivmodel.h>
 #include <ivcore/ivpropertytemplateconfig.h>
+#include <map>
 #include <memory>
+#include <tmc/SdlToPromelaConverter/processmetadata.h>
+#include <unordered_map>
 
 namespace tmc::converter {
 /**
@@ -37,10 +42,41 @@ class TmcConverter
 {
 public:
     /**
+     * @brief Attached observer information
+     */
+    class ObserverInfo
+    {
+    public:
+        /**
+         * @brief Constructor
+         *
+         * @param path Path to the observer process file
+         * @param priority Observer priority
+         */
+        ObserverInfo(const QString path, const uint32_t priority);
+        /**
+         * @brief Getter for the observer path
+         *
+         * @returns Path to the obsever process file
+         */
+        auto path() const -> const QString &;
+        /**
+         * @brief Getter for the observer priority
+         *
+         * @returns Observer priority
+         */
+        auto priority() const -> uint32_t;
+
+    private:
+        QString m_path;
+        uint32_t m_priority;
+    };
+
+    /**
      * @brief Constructor.
      *
-     * @param inputIvFilepath Path to XML interface view.
-     * @param outputDirectory Pat to output directory for conversion results.
+     * @param   inputIvFilepath         Path to XML interface view.
+     * @param   outputDirectory         Path to output directory for conversion results.
      */
     TmcConverter(const QString &inputIvFilepath, const QString &outputDirectory);
 
@@ -53,6 +89,44 @@ public:
      */
     bool convert();
     /**
+     * @brief   Specify which IV functions should be treated as an environment
+     *          during model checking
+     *
+     * @param   environmentFunctions    Functions to treat as an evironment
+     */
+    void setEnvironmentFunctions(const std::vector<QString> &environmentFunctions);
+    /**
+     * @brief   Specify which IV functions shouldn't be treated as an environment
+     *          during model checking
+     *
+     * @param   keepFunctions   Functions to be treated as an evironment
+     */
+    void setKeepFunctions(const std::vector<QString> &keepFunctions);
+    /**
+     * @brief   Set global input vector length limit
+     *
+     * @param   limit   Limit to set
+     */
+    void setGlobalInputVectorLengthLimit(std::optional<QString> limit);
+    /**
+     * @brief   Set per interface input vector length limits
+     *
+     * @param   limits  Limits to set
+     */
+    void setInterfaceInputVectorLengthLimits(std::unordered_map<QString, QString> limits);
+    /**
+     * @brief   Set non-environment processes base priority
+     *
+     * @param   value   Priority to set
+     */
+    void setProcessesBasePriority(std::optional<QString> value);
+    /**
+     * @brief   Set path to the ASN.1 containing subtypes
+     *
+     * @param   filepaths   Paths to the files
+     */
+    void setSubtypesFilepaths(const std::vector<QString> &filepaths);
+    /**
      * @brief Add Stop Condition files to convert.
      *
      * This shall be called before @link{convert}
@@ -62,19 +136,33 @@ public:
      */
     bool addStopConditionFiles(const QStringList &files);
 
+    /**
+     * @brief Attach an Observer
+     *
+     * @param observerPath Path to the observer process file
+     * @param priority Observer priority
+     * @return true if the operation succeeded, false otherwise.
+     */
+    auto attachObserver(const QString &observerPath, const uint32_t priority) -> bool;
+
 private:
     bool convertModel(const std::set<conversion::ModelType> &sourceModelTypes, conversion::ModelType targetModelType,
             const std::set<conversion::ModelType> &auxilaryModelTypes, conversion::Options options) const;
 
-    bool convertSystem();
+    auto integrateObserver(const ObserverInfo &info, QStringList &observerNames, QStringList &asn1Files,
+            std::map<QString, ProcessMetadata> &allSdlFiles, QStringList &attachmentInfos);
+    bool convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles);
 
-    bool convertStopConditions();
+    bool convertStopConditions(const std::map<QString, ProcessMetadata> &allSdlFiles);
 
     bool convertInterfaceview(const QString &inputFilepath, const QString &outputFilepath,
-            const QStringList &modelFunctions, const QStringList &environmentFunctions);
+            const QList<QString> &asn1FilepathList, const QStringList &modelFunctions,
+            const QStringList &environmentFunctions);
     bool convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath);
     std::unique_ptr<ivm::IVModel> readInterfaceView(const QString &filepath);
-    void findFunctionsToConvert(const ivm::IVModel &model, QStringList &sdlFunctions, QStringList &envFunctions);
+    void saveOptimizedInterfaceView(const ivm::IVModel *ivModel, const QString outputFilePath);
+    void findFunctionsToConvert(const ivm::IVModel &model, QStringList &sdlFunctions,
+            std::map<QString, ProcessMetadata> &sdlProcesses, QStringList &envFunctions);
     bool isSdlFunction(const ivm::IVFunction *function);
     void findEnvironmentDatatypes(
             const ivm::IVModel &model, const QStringList &envFunctions, QStringList &envDataTypes);
@@ -82,11 +170,13 @@ private:
             const QFileInfo &inputDataView, const QFileInfo &outputFilepath, const QStringList &envDatatypes);
 
     QFileInfo workDirectory() const;
-    QFileInfo dataViewUniqLocation() const;
+    QFileInfo simuDataViewLocation() const;
     QFileInfo sdlImplementationBaseDirectory(const QString &functionName) const;
     QFileInfo sdlImplementationLocation(const QString &functionName) const;
     QFileInfo sdlSystemStructureLocation(const QString &functionName) const;
     QFileInfo sdlFunctionDatamodelLocation(const QString &functionName) const;
+    QFileInfo sdlFunctionDatamodelLocation(const QString &functionName, const QString &functionTypeName) const;
+    QFileInfo sdlFunctionContextLocation(const QString &functionName) const;
     QFileInfo outputFilepath(const QString &name);
 
 private:
@@ -96,7 +186,16 @@ private:
     const QDir m_outputDirectory;
     ivm::IVPropertyTemplateConfig *m_dynPropConfig;
 
+    std::vector<QString> m_environmentFunctions;
+    std::vector<QString> m_keepFunctions;
+    std::optional<QString> m_globalInputVectorLengthLimit;
+    std::optional<QString> m_processesBasePriority;
+    std::unordered_map<QString, QString> m_interfaceInputVectorLengthLimits;
+    std::vector<QString> m_subtypesFilepaths;
     QStringList m_stopConditionsFiles;
+    std::vector<ObserverInfo> m_observerInfos;
+    QStringList m_observerAttachmentInfos;
+    QStringList m_observerNames;
 
     conversion::Registry m_registry;
 };

@@ -41,4 +41,9 @@ Asn1Model::Data &Asn1Model::data()
     return m_data;
 }
 
+void Asn1Model::addAsn1File(std::unique_ptr<File> asn1File)
+{
+    m_data.push_back(std::move(asn1File));
+}
+
 } // namespace Asn1Acn

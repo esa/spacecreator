@@ -1,0 +1,57 @@
+system InputObserver;
+    /* CIF TEXT (144, 214), (507, 136) */
+    use datamodel comment 'observer.asn';
+    
+    signal trigger_in (MyInteger) renames input trigger to MODEL;
+    signal action_in (MyIntegerBigger) renames input action to MMI;
+    /* CIF ENDTEXT */
+    channel c
+        from env to InputObserver with trigger_in,
+action_in;
+    endchannel;
+    block InputObserver;
+        signalroute r
+            from env to InputObserver with trigger_in,
+action_in;
+        connect c and r;
+        /* CIF PROCESS (259, 86), (150, 75) */
+        process InputObserver;
+            /* CIF TEXT (0, 57), (256, 112) */
+            monitor st System_State;
+            
+            monitor event Observable_Event;
+            
+            dcl received_action T_Boolean;
+            dcl received_trigger T_Boolean;
+            /* CIF ENDTEXT */
+            /* CIF START (135, 311), (70, 35) */
+            START;
+                /* CIF task (85, 366), (169, 38) */
+                task received_action := False,
+received_trigger := False;
+                /* CIF NEXTSTATE (114, 424), (111, 35) */
+                NEXTSTATE WaitForTrigger;
+            /* CIF state (126, 574), (70, 35) */
+            state Done;
+            endstate;
+            /* CIF state (372, 342), (111, 35) */
+            state WaitForTrigger;
+                /* CIF input (380, 397), (95, 35) */
+                input trigger_in(x);
+                    /* CIF task (346, 452), (164, 35) */
+                    task received_trigger := True;
+                    /* CIF NEXTSTATE (374, 507), (107, 35) */
+                    NEXTSTATE WaitForAction;
+            endstate;
+            /* CIF state (660, 351), (107, 35) */
+            state WaitForAction;
+                /* CIF input (668, 406), (91, 35) */
+                input action_in(y);
+                    /* CIF task (634, 461), (160, 35) */
+                    task received_action := True;
+                    /* CIF NEXTSTATE (679, 516), (70, 35) */
+                    NEXTSTATE Done;
+            endstate;
+        endprocess InputObserver;
+    endblock;
+endsystem;

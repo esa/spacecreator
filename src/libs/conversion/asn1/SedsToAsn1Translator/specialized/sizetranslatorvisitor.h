@@ -24,6 +24,7 @@
 #include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/values.h>
 #include <conversion/common/translation/exceptions.h>
+#include <optional>
 #include <seds/SedsModel/types/ranges/minmaxrange.h>
 
 namespace conversion::asn1::translator {
@@ -73,9 +74,10 @@ public:
      * @param   asn1Type        ASN.1 type that is currently translated
      * @param   lengthType      Type of the desired constraint
      * @param   sourceType      Type of the source to derive the size from
+     * @param   threshold       Optional ASN.1 sequence size threshold
      */
-    explicit SizeTranslatorVisitor(
-            Asn1Acn::Types::Type *asn1Type, const LengthType lengthType, const SourceType sourceType);
+    SizeTranslatorVisitor(Asn1Acn::Types::Type *asn1Type, const LengthType lengthType, const SourceType sourceType,
+            const std::optional<uint64_t> &threshold);
     /**
      * @brief   Deleted copy constructor
      */
@@ -157,14 +159,16 @@ private:
     typename Asn1Acn::IntegerValue::Type m_lastSetMin;
     LengthType m_lengthType;
     SourceType m_sourceType;
+    const std::optional<uint64_t> &m_threshold;
 };
 
 template<typename Type, typename ValueType>
-SizeTranslatorVisitor<Type, ValueType>::SizeTranslatorVisitor(
-        Asn1Acn::Types::Type *asn1Type, const LengthType lengthType, const SourceType sourceType)
+SizeTranslatorVisitor<Type, ValueType>::SizeTranslatorVisitor(Asn1Acn::Types::Type *asn1Type,
+        const LengthType lengthType, const SourceType sourceType, const std::optional<uint64_t> &threshold)
     : m_asn1Type(dynamic_cast<Type *>(asn1Type))
     , m_lengthType(lengthType)
     , m_sourceType(sourceType)
+    , m_threshold(threshold)
 {
 }
 
@@ -250,7 +254,12 @@ void SizeTranslatorVisitor<Type, ValueType>::addSizeConstraint(
     // Index type "8-bit" has valid values of 0..255, and if the maximum size of an array is 255,
     // then index 255 is invalid. Therefore it is assumed that the last index value is treated
     // as an invalid/length identifier, similarly in concept to end().
-    const auto actualMax = max;
+    auto actualMax = max;
+
+    if (m_threshold.has_value() && actualMax > static_cast<long>(*m_threshold)) {
+        actualMax = static_cast<long>(*m_threshold);
+    }
+
     m_lastSetMin = min;
     auto rangeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
             { m_lengthType == LengthType::FixedLength ? actualMax : min, actualMax });

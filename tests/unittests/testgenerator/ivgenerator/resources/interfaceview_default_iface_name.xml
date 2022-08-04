@@ -1,0 +1,40 @@
+<InterfaceView asn1file="INTERFACES.acn">
+<Function name="FunctionUnderTest" is_type="NO" language="SDL" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="46200 10600 66200 18600"/>
+<Provided_Interface name="PI_0" kind="Protected" layer="default" wcet="0">
+    <Input_Parameter name="p1" type="MyInteger" encoding="ACN"/>
+    <Output_Parameter name="p2" type="MyInteger" encoding="ACN"/>
+    <Property name="Taste::coordinates" value="46200 14200"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="TestDriver" is_type="NO" language="C" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="7500 18400 27500 26400"/>
+<Provided_Interface name="StartTest" kind="Cyclic" layer="default" dispatch_offset="0" wcet="0" period="999" priority="1" stack_size="5000">
+    <Property name="Taste::coordinates" value="12300 18400"/>
+</Provided_Interface>
+
+<Required_Interface name="PI_0" kind="Protected" layer="default" wcet="0">
+    <Input_Parameter name="p1" type="MyInteger" encoding="ACN"/>
+    <Output_Parameter name="p2" type="MyInteger" encoding="ACN"/>
+    <Property name="Taste::coordinates" value="27500 21800"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Connection >
+    <Source func_name="TestDriver" ri_name="PI_0"/>
+    <Target func_name="FunctionUnderTest" pi_name="PI_0"/>
+    <Property name="Taste::coordinates" value="28100 21800 37000 21800 45900 14200"/>
+</Connection>
+
+</InterfaceView>

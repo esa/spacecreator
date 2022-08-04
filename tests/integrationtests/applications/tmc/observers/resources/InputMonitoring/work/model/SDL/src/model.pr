@@ -1,0 +1,22 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Model;
+    /* CIF TEXT (536, 12), (156, 44) */
+    dcl x MyInteger;
+    dcl y MyIntegerBigger;
+    /* CIF ENDTEXT */
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (320, 60), (70, 35) */
+        NEXTSTATE S1;
+    /* CIF state (461, 43), (70, 35) */
+    state S1;
+        /* CIF input (451, 98), (78, 35) */
+        input trigger(x);
+            /* CIF task (454, 153), (72, 35) */
+            task y := x * 2;
+            /* CIF output (453, 203), (74, 35) */
+            output action(y);
+            /* CIF NEXTSTATE (456, 258), (70, 35) */
+            NEXTSTATE S1;
+    endstate;
+endprocess Model;

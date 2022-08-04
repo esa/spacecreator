@@ -37,12 +37,10 @@ public:
      * @brief   Constructor
      */
     Answer();
-
     /**
      * @brief   Deleted copy constructor
      */
     Answer(const Answer &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -52,19 +50,18 @@ public:
      * @brief   Deleted copy assignment operator
      */
     Answer &operator=(const Answer &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     Answer &operator=(Answer &&) = default;
 
+public:
     /**
      * @brief   Getter for the stored transition
      *
      * @return  transition
      */
     auto transition() const -> Transition *;
-
     /**
      * @brief   Setter for the stored value
      *
@@ -78,7 +75,6 @@ public:
      * @return  variable literal
      */
     auto literal() const -> const VariableLiteral &;
-
     /**
      * @brief   Setter for answer literal
      *
@@ -86,6 +82,7 @@ public:
      */
     auto setLiteral(VariableLiteral literal) -> void;
 
+public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */

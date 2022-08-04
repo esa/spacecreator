@@ -1,10 +1,12 @@
 project(SdlToPromelaConverter VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES
-	converter.cpp)
+    processmetadata.cpp
+    converter.cpp)
 
 set(INCLUDES
-	converter.h)
+    processmetadata.h
+    converter.h)
 
 add_library(SdlToPromelaConverter STATIC)
 target_sources(SdlToPromelaConverter
@@ -15,7 +17,7 @@ target_include_directories(SdlToPromelaConverter
     PRIVATE    ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SdlToPromelaConverter
     PUBLIC     Conversion::Common
-	           Tmc::Converter
+               Tmc::Converter
     PRIVATE    CommonProjectWarnings)
 
 add_format_target(SdlToPromelaConverter)

@@ -21,11 +21,6 @@
 
 #include <conversion/common/translation/translator.h>
 
-namespace Asn1Acn {
-class Asn1Model;
-class Definitions;
-} // namespace Asn1Acn
-
 namespace ivm {
 class IVModel;
 class IVPropertyTemplateConfig;
@@ -73,32 +68,41 @@ public:
      */
     virtual auto getDependencies() const -> std::set<ModelType> override;
 
+    /**
+     * @brief   Gets SEDS package from given vector
+     *
+     * @param   packageName     Package name
+     * @param   sedsPackages    SEDS packages
+     *
+     * @return  SEDS package
+     */
+    static auto getSedsPackage(const QString &packageName, const std::vector<seds::model::Package> &sedsPackages)
+            -> const seds::model::Package *;
+
 private:
     /**
      * @brief   Translate SEDS model
      *
      * @param   sedsModel   SEDS model to translate
-     * @param   asn1Model   ASN.1 Model with types defined in this package
      * @param   ivConfig    IV model config
      * @param   options     List of options
      *
      * @return  Result IV model with auxiliary ASN.1 model
      */
-    auto translateSedsModel(const seds::model::SedsModel *sedsModel, Asn1Acn::Asn1Model *asn1Model,
-            ivm::IVPropertyTemplateConfig *ivConfig, const Options &options) const
-            -> std::vector<std::unique_ptr<Model>>;
+    auto translateSedsModel(const seds::model::SedsModel *sedsModel, ivm::IVPropertyTemplateConfig *ivConfig,
+            const Options &options) const -> std::vector<std::unique_ptr<Model>>;
 
 private:
     /**
      * @brief   Translate SEDS package
      *
-     * @param   package             Package to translate
-     * @param   asn1Model           ASN.1 Model with types defined in this package
-     * @param   model               InterfaceView model to which should translated IV functions will be added
+     * @param   sedsPackage         Package to translate
+     * @param   ivModel             InterfaceView model to which should translated IV functions will be added
+     * @param   sedsPackages        List of SEDS packages
      * @param   generateFunction    Generate parent function for the translated components
      */
-    auto translatePackage(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
-            bool generateFunction) const -> void;
+    auto translatePackage(const seds::model::Package &sedsPackage, ivm::IVModel *ivModel,
+            const std::vector<seds::model::Package> &sedsPackages, bool generateFunction) const -> void;
 };
 
 } // namespace conversion::iv::translator

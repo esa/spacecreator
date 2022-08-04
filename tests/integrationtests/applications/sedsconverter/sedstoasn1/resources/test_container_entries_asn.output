@@ -5,19 +5,9 @@ BasicEntryContainer ::= SEQUENCE
 {
     basicEntry IntegerData(0 .. 255)
 }
-ErrorControlEntryContainer ::= SEQUENCE
-{
-
-}
 FixedValueEntryContainer ::= SEQUENCE
 {
     fixedValueEntry BinaryData(SIZE(0 .. 8)) ('00110011'B)
-}
-LengthEntryContainer ::= SEQUENCE
-{
-    entry1 IntegerData(0 .. 255),
-    entry2 IntegerData(0 .. 255),
-    entry3 IntegerData(0 .. 255)
 }
 ListEntryContainer ::= SEQUENCE
 {
