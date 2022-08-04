@@ -48,6 +48,8 @@ public:
         Implementations,
         Implementation,
         Layer,
+        ArchetypeReference,
+        ArchetypeLibraryReference,
 
         // attrs:
         name,
@@ -68,6 +70,9 @@ public:
         default_implementation,
         enable_multicast,
         layer,
+        archetype_library,
+        archetype_function,
+        path,
         fixed_system_element,
         required_system_element,
 

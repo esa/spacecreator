@@ -36,6 +36,7 @@
 #include <conversion/converter/exceptions.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/IvRegistrar/registrar.h>
+#include <conversion/msc/MscRegistrar/registrar.h>
 #include <conversion/promela/PromelaRegistrar/registrar.h>
 #include <iostream>
 #include <ivcore/ivfunction.h>
@@ -57,6 +58,7 @@ using conversion::exporter::ExportException;
 using conversion::importer::ImportException;
 using conversion::iv::IvOptions;
 using conversion::iv::IvRegistrar;
+using conversion::msc::MscRegistrar;
 using conversion::promela::PromelaOptions;
 using conversion::promela::PromelaRegistrar;
 using conversion::translator::TranslationException;
@@ -102,6 +104,11 @@ TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &output
     if (!result) {
         throw RegistrationFailedException(ModelType::InterfaceView);
     }
+    MscRegistrar mscRegistrar;
+    result = mscRegistrar.registerCapabilities(m_registry);
+    if (!result) {
+        throw RegistrationFailedException(ModelType::Msc);
+    }
     PromelaRegistrar tmcRegistrar;
     result = tmcRegistrar.registerCapabilities(m_registry);
     if (!result) {
@@ -142,6 +149,11 @@ void TmcConverter::setGlobalInputVectorLengthLimit(std::optional<QString> limit)
 void TmcConverter::setInterfaceInputVectorLengthLimits(std::unordered_map<QString, QString> limits)
 {
     m_interfaceInputVectorLengthLimits = std::move(limits);
+}
+
+void TmcConverter::setProcessesBasePriority(std::optional<QString> value)
+{
+    m_processesBasePriority = std::move(value);
 }
 
 void TmcConverter::setSubtypesFilepaths(const std::vector<QString> &filepaths)
@@ -198,13 +210,10 @@ auto TmcConverter::integrateObserver(const ObserverInfo &info, QStringList &obse
     const auto process = QFileInfo(info.path());
     const auto processName = process.baseName();
     const auto directory = process.absoluteDir();
-    // Observers require separate system_stucture, because OpenGEODE does not save
-    // some "renames" declarations.
-    const auto structure = QFileInfo(directory.absolutePath() + QDir::separator() + "system_structure.pr");
     const auto datamodel =
             QFileInfo(directory.absolutePath() + QDir::separator() + processName.toLower() + "_datamodel.asn");
 
-    ProcessMetadata meta(Escaper::escapePromelaName(processName), structure, process, datamodel, QList<QFileInfo>());
+    ProcessMetadata meta(Escaper::escapePromelaName(processName), std::nullopt, process, datamodel, QList<QFileInfo>());
     SdlToPromelaConverter sdl2Promela;
 
     const auto promelaFilename = Escaper::escapePromelaIV(processName) + ".pml";
@@ -292,11 +301,6 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
     QMap<QString, QString> uniqueAsn1Files;
     for (const QString &ivFunction : modelFunctions) {
         const ProcessMetadata &processMetadata = allSdlFiles.at(ivFunction);
-        for (const QFileInfo &fileInfo : allSdlFiles.at(ivFunction).getContext()) {
-            if (fileInfo.exists()) {
-                uniqueAsn1Files.insert(fileInfo.fileName(), fileInfo.absoluteFilePath());
-            }
-        }
         const QFileInfo outputFile = outputFilepath(processMetadata.getName().toLower() + ".pml");
 
         SdlToPromelaConverter sdl2Promela;
@@ -396,6 +400,10 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
 
     for (const auto &[interfaceName, value] : m_interfaceInputVectorLengthLimits) {
         options.add(PromelaOptions::interfaceInputVectorLengthLimit.arg(interfaceName.toLower()), value);
+    }
+
+    if (m_processesBasePriority) {
+        options.add(PromelaOptions::processesBasePriority, *m_processesBasePriority);
     }
 
     for (const auto &subtypesFilepath : m_subtypesFilepaths) {

@@ -14,6 +14,8 @@
         <file>templating/xml_templates/connectiongroups.tmplt</file>
         <file>templating/xml_templates/layer.tmplt</file>
         <file>templating/xml_templates/layers.tmplt</file>
+        <file>templating/xml_templates/archetypeLibraryReference.tmplt</file>
+        <file>templating/xml_templates/archetypeLibraryReferences.tmplt</file>
     </qresource>
     <qresource prefix="/toolbar">
         <file>icns/asn1.png</file>

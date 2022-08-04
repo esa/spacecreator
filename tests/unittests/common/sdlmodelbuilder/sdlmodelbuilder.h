@@ -22,9 +22,6 @@
 #include <memory>
 #include <sdl/SdlModel/sdlmodel.h>
 
-using sdl::Process;
-using sdl::SdlModel;
-
 namespace tests::common {
 
 class SdlModelBuilder final
@@ -32,12 +29,12 @@ class SdlModelBuilder final
 public:
     SdlModelBuilder(QString modelName);
 
-    auto build() -> std::unique_ptr<SdlModel>;
+    auto build() -> std::unique_ptr<sdl::SdlModel>;
 
-    auto withProcess(std::unique_ptr<Process> process) -> SdlModelBuilder &;
+    auto withProcess(sdl::Process process) -> SdlModelBuilder &;
 
 private:
-    std::unique_ptr<SdlModel> m_model;
+    std::unique_ptr<sdl::SdlModel> m_model;
 };
 
 } // namespace tests::common

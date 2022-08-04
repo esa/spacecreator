@@ -3,7 +3,7 @@ BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   MyInteger, MyBetterInteger FROM USERDEFINED-TYPES-DATAVIEW;
+   MyInteger, MyBetterInteger, MyArray FROM USERDEFINED-TYPES-DATAVIEW;
 
 Receiver-States ::= ENUMERATED {wait}
 
@@ -11,7 +11,7 @@ Receiver-Context ::= SEQUENCE {
    state Receiver-States,
    init-done BOOLEAN,
    pingarg MyBetterInteger,
-   pongarg MyBetterInteger
+   temp MyArray
 }
 
 END
@@ -40,6 +40,7 @@ USERDEFINED-TYPES-DATAVIEW DEFINITIONS ::=
 BEGIN
     MyInteger ::= INTEGER (0 .. 10)
     MyBetterInteger ::= MyInteger (2 .. 8)
+    MyArray ::= SEQUENCE (SIZE(0..10)) OF MyBetterInteger
 END
 
 
@@ -51,6 +52,9 @@ BEGIN
       
       --  ASN.1 modules used by thread pinger_Pong
       MyBetterInteger FROM USERDEFINED-TYPES-DATAVIEW
+      
+      --  ASN.1 modules used by thread pinger_PongButArray
+      MyArray FROM USERDEFINED-TYPES-DATAVIEW
       
       --  ASN.1 modules used by thread receiver_Ping
       MyBetterInteger FROM USERDEFINED-TYPES-DATAVIEW
@@ -81,7 +85,8 @@ BEGIN
    
    Pinger-Event ::= CHOICE {
       msg-in CHOICE {
-         pong SEQUENCE { pongarg MyBetterInteger}
+         pong         SEQUENCE { pongarg MyBetterInteger},
+         pongbutarray SEQUENCE { pongarg MyArray}
       },
       msg-out CHOICE {
          ping SEQUENCE { pingarg MyBetterInteger }
@@ -94,7 +99,8 @@ BEGIN
          ping SEQUENCE { pingarg MyBetterInteger}
       },
       msg-out CHOICE {
-         pong SEQUENCE { pongarg MyBetterInteger }
+         pong         SEQUENCE { pongarg MyBetterInteger },
+         pongbutarray SEQUENCE { pongarg MyArray }
       }
    }
    

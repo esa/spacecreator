@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <QVector>
 #include <asn1library/asn1/visitor.h>
 #include <promela/PromelaModel/promelamodel.h>
 
@@ -39,6 +40,17 @@ public:
      */
     Asn1NodeVisitor(model::PromelaModel &promelaModel, bool enhancedSpinSupport);
 
+    /**
+     * @brief Getter for init inline names.
+     *
+     * If the model contain value definitions, then they shall be initialized,
+     * by calling inlines. This getter returns inline names to initialize
+     * all values.
+     *
+     * @returns reference to vector with inline names.
+     */
+    const QVector<QString> getInitInlineNames() const;
+
     /// @brief Visit Asn1Acn::Definitions
     void visit(const Asn1Acn::Definitions &defs) override;
     /// @brief Visit Asn1Acn::File
@@ -55,5 +67,6 @@ public:
 private:
     model::PromelaModel &m_promelaModel;
     const bool m_enhancedSpinSupport;
+    QVector<QString> m_initInlines;
 };
 }

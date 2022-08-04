@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ivinterface.h"
 #include "ivconnectionlayertype.h"
+#include "ivinterface.h"
 
 #include <QString>
 
@@ -9,6 +9,8 @@ namespace ivm {
 class IVConnection;
 class IVFunctionType;
 class IVComment;
+class IVArchetypeReference;
+class IVArchetypeLibraryReference;
 
 namespace testutils {
 
@@ -30,6 +32,12 @@ IVFunctionType *createFunctionType(const QString &name = QString(), QObject *par
 IVComment *createComment(const QString &name = QString(), QObject *parent = nullptr);
 
 IVConnectionLayerType *createConnectionLayer(QObject *parent = nullptr);
+
+IVArchetypeReference *createArchetypeReference(
+        const QString &archetypeLibraryName, const QString &archetypeFunctionName, QObject *parent = nullptr);
+
+IVArchetypeLibraryReference *createArchetypeLibraryReference(
+        const QString &archetypeLibraryName, const QString &archetypeLibraryPath, QObject *parent = nullptr);
 
 }
 }

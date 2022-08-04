@@ -65,4 +65,33 @@ private Q_SLOTS:
     void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
 };
 
+/**
+ * @brief The IVLayerVisualizationModel is a class to represent view window
+ * for layers in main GUI window
+ */
+class IVLayerVisualizationModel : public IVVisualizationModelBase
+{
+    Q_OBJECT
+public:
+
+    /**
+    * @brief Constructor for IVLayerVisualizationModel
+    * Layers are stored in seperate model so we need to give IVLayerVisualizationModel reference
+    * for both layers and the rest of objects
+    */
+    explicit IVLayerVisualizationModel(ivm::IVModel *layerModel, ivm::IVModel *objectsModel,
+                                       cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
+
+    QList<QStandardItem *> createItems(shared::VEObject *obj) override;
+
+private Q_SLOTS:
+    void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
+
+private:
+    void setObjectsVisibility(const QString &layerName, ivm::IVModel *objectsModel, const bool &isVisible);
+
+private:
+    ivm::IVModel *m_objectsModel;
+};
+
 } // namespace ive

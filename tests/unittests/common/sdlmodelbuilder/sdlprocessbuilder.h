@@ -26,12 +26,6 @@
 #include <sdl/SdlModel/transition.h>
 #include <sdl/SdlModel/variabledeclaration.h>
 
-using sdl::Procedure;
-using sdl::Process;
-using sdl::StateMachine;
-using sdl::Transition;
-using sdl::VariableDeclaration;
-
 namespace tests::common {
 
 class SdlProcessBuilder final
@@ -39,15 +33,15 @@ class SdlProcessBuilder final
 public:
     SdlProcessBuilder(QString processName);
 
-    auto build() -> std::unique_ptr<Process>;
+    auto build() -> sdl::Process;
 
-    auto withStartTransition(std::unique_ptr<Transition> transition) -> SdlProcessBuilder &;
-    auto withStateMachine(std::unique_ptr<StateMachine> stateMachine) -> SdlProcessBuilder &;
-    auto withProcedure(std::unique_ptr<Procedure> procedure) -> SdlProcessBuilder &;
-    auto withVariable(std::unique_ptr<VariableDeclaration> variable) -> SdlProcessBuilder &;
+    auto withStartTransition(std::unique_ptr<sdl::Transition> transition) -> SdlProcessBuilder &;
+    auto withStateMachine(std::unique_ptr<sdl::StateMachine> stateMachine) -> SdlProcessBuilder &;
+    auto withProcedure(std::unique_ptr<sdl::Procedure> procedure) -> SdlProcessBuilder &;
+    auto withVariable(std::unique_ptr<sdl::VariableDeclaration> variable) -> SdlProcessBuilder &;
 
 private:
-    std::unique_ptr<Process> m_process;
+    sdl::Process m_process;
 };
 
 } // namespace tests::common

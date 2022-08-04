@@ -63,7 +63,7 @@ if [ ! -d "${QTC_INSTALL}" ]; then
     echo "Extracting QtCreator binary"
     mkdir -p ${QTC_INSTALL}
     cd ${QTC_INSTALL}
-    p7zip -d -k -f ../${QTC_BINARY_FILE}
+    p7zip -d -k -f ${DOWNLOAD_DIR}/${QTC_BINARY_FILE}
 fi
 if [ -d "${QTC_INSTALL}" ]; then
     echo "QtCreator binary installed in ${QTC_INSTALL}"
@@ -84,7 +84,7 @@ if [ ! -f "${LIB_FILE}" ]; then
     echo "Extracting QtCreator dev"
     mkdir -p ${QTC_INSTALL}
     cd ${QTC_INSTALL}
-    p7zip -d -f -k ../${QTC_DEV_FILE}
+    p7zip -d -f -k ${DOWNLOAD_DIR}/${QTC_DEV_FILE}
 fi
 if [ -f "${HEADER_FILE}" ]; then
     echo "QtCreator dev installed in ${QTC_INSTALL}"

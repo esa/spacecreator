@@ -3,7 +3,7 @@ BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   MyInteger, MyBetterInteger FROM USERDEFINED-TYPES-DATAVIEW;
+   MyInteger, MyBetterInteger, MyArray FROM USERDEFINED-TYPES-DATAVIEW;
 
 Receiver-States ::= ENUMERATED {wait}
 
@@ -11,7 +11,7 @@ Receiver-Context ::= SEQUENCE {
    state Receiver-States,
    init-done BOOLEAN,
    pingarg MyBetterInteger,
-   pongarg MyBetterInteger
+   temp MyArray
 }
 
 END

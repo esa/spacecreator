@@ -86,7 +86,7 @@ public:
      * @return First Expression in range.
      * @throws std::bad_optional_access if loop is not range based.
      */
-    Expression getFirstExpression() const;
+    const Expression &getFirstExpression() const;
 
     /**
      * @brief Getter for last Expression of range based loop.
@@ -94,7 +94,7 @@ public:
      * @return Last Expression in range.
      * @throws std::bad_optional_access if loop is not range based.
      */
-    Expression getLastExpression() const;
+    const Expression &getLastExpression() const;
 
     /**
      * @brief Getter for first value of range based loop if it is a constant.

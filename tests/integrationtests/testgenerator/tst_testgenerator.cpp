@@ -26,7 +26,10 @@
 
 using plugincommon::IvTools;
 using plugincommon::ModelLoader;
+using testgenerator::DataReconstructor;
 using testgenerator::HtmlResultExporter;
+using testgenerator::LaunchConfigLoader;
+using testgenerator::LaunchConfiguration;
 using testgenerator::TestGenerator;
 
 namespace tests::testgenerator {
@@ -39,6 +42,8 @@ private Q_SLOTS:
     void testPrepareTestHarness();
     void testResultHtmlFile();
     void testResultHtmlData();
+    void testParsingBoardSettings();
+    void testStoringBoardsConfig();
 };
 
 void tst_testgenerator::testPrepareTestHarness()
@@ -56,7 +61,8 @@ void tst_testgenerator::testPrepareTestHarness()
     QVERIFY(asn1Model);
 
     TestGenerator testGenerator(QDir::currentPath());
-    QString testedFunctionName = testGenerator.prepareTestHarness(*interface, *csvModel, *asn1Model);
+    QString testedFunctionName =
+            testGenerator.prepareTestHarness(*interface, *csvModel, *asn1Model, "x86 Linux CPP", 5000);
 
     QString generatedHarnessDirectory = "generated";
     auto generatedTestDriver = generatedHarnessDirectory + QDir::separator() + "testdriver.c";
@@ -83,7 +89,7 @@ void tst_testgenerator::testResultHtmlFile()
 
     QVector<QVariant> testResults = { 1, 2, 3, 2, 5, 3, 4, 7, 12, 25 };
     const QString resultFileName = "Results.html";
-    HtmlResultExporter exporter(*interface, *csvModel, testResults, 0);
+    HtmlResultExporter exporter("Dummy board name", *interface, *csvModel, testResults, 0);
     exporter.exportResult(resultFileName);
 
     QVERIFY(QFileInfo::exists(resultFileName));
@@ -107,7 +113,7 @@ void tst_testgenerator::testResultHtmlData()
     QVERIFY(asn1Model);
 
     QVector<QVariant> testResults = { 1, 2, 3, 2, 5, 3, 4, 7, 12, 25 };
-    HtmlResultExporter exporter(*interface, *csvModel, testResults, 0);
+    HtmlResultExporter exporter("Dummy board name", *interface, *csvModel, testResults, 0);
     auto cells = exporter.getData();
 
     constexpr auto G = HtmlResultExporter::CellColor::Green;
@@ -121,6 +127,54 @@ void tst_testgenerator::testResultHtmlData()
 
     QCOMPARE(cells[0], firstRow);
     QCOMPARE(cells[1], secondRow);
+}
+
+void tst_testgenerator::testParsingBoardSettings()
+{
+    const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
+        { "INTEGER", 4, 4 },
+        { "BOOLEAN", 1, 7 },
+        { "REAL", 8, 0 },
+    };
+    LaunchConfiguration config("x86 Linux CPP", "/path/to/gdb/script", "gdb", "dummyClientParam1 $SCRIPT_PATH",
+            "gdbserver", "dummyServerParam1 $BIN_PATH", typeLayoutInfos, QDataStream::LittleEndian, 5000);
+    QCOMPARE(config.clientArgsParsed, QStringList({ "dummyClientParam1", "/path/to/gdb/script" }));
+    QCOMPARE(config.serverArgsParsed, QStringList({ "dummyServerParam1", "hostpartition" }));
+}
+
+void tst_testgenerator::testStoringBoardsConfig()
+{
+    const QString configPath = "boards_config.txt";
+    LaunchConfigLoader configLoader(configPath);
+    QMap<QString, LaunchConfiguration> boardsConfig;
+    const QString testBoardName = "x86 Linux CPP";
+
+    const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
+        { "INTEGER", 4, 4 },
+        { "BOOLEAN", 1, 7 },
+        { "REAL", 8, 0 },
+    };
+
+    LaunchConfiguration configToSave(testBoardName, "/path/to/script", "gdb", "dummyParam1 dummyParam2", "gdbserver",
+            "dummyParam3 dummyParam4", typeLayoutInfos, QDataStream::LittleEndian, 5000);
+    boardsConfig[testBoardName] = configToSave;
+    configLoader.saveConfig(boardsConfig);
+
+    boardsConfig = configLoader.loadConfig().value();
+    LaunchConfiguration readConfig = boardsConfig[testBoardName];
+
+    QCOMPARE(readConfig.scriptPath, "/path/to/script");
+    QCOMPARE(readConfig.clientName, "gdb");
+    QCOMPARE(readConfig.clientArgs, "dummyParam1 dummyParam2");
+    QCOMPARE(readConfig.serverName, "gdbserver");
+    QCOMPARE(readConfig.serverArgs, "dummyParam3 dummyParam4");
+    QCOMPARE(readConfig.typeLayoutInfos["INTEGER"], typeLayoutInfos["INTEGER"]);
+    QCOMPARE(readConfig.typeLayoutInfos["BOOLEAN"], typeLayoutInfos["BOOLEAN"]);
+    QCOMPARE(readConfig.typeLayoutInfos["REAL"], typeLayoutInfos["REAL"]);
+    QCOMPARE(readConfig.endianess, QDataStream::LittleEndian);
+    QCOMPARE(readConfig.stackSize, 5000);
+
+    QFile::remove(configPath);
 }
 
 }

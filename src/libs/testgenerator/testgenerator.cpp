@@ -47,33 +47,40 @@ using plugincommon::ModelLoader;
 
 namespace testgenerator {
 
-const QString resultFileName = "Results.html";
+const QString TestGenerator::resultFileName = "Results.html";
+const QString TestGenerator::defaultBinaryName = "hostpartition";
 
 TestGenerator::TestGenerator(const QString &baseDirectory)
 {
     initializePaths(baseDirectory);
 }
 
-auto TestGenerator::testUsingDataFromCsv(
-        IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model, float delta) -> bool
+auto TestGenerator::testUsingDataFromCsv(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model,
+        const float delta, const LaunchConfiguration &launchConfig) -> bool
 {
-    Q_UNUSED(delta);
-
-    QString testedFunctionName = prepareTestHarness(interface, csvModel, asn1Model);
+    QString testedFunctionName =
+            prepareTestHarness(interface, csvModel, asn1Model, launchConfig.boardName, launchConfig.stackSize);
     if (testedFunctionName.isEmpty()) {
+        qWarning() << "Tested function name is empty";
         return false;
     }
     if (!prepareTasteProjectSkeleton()) {
-        qDebug() << "Error preparing taste project skeleton";
+        qWarning() << "Error preparing taste project skeleton";
         return false;
     }
+
+    if (launchConfig.scriptPath.isEmpty()) {
+        qWarning() << "Path to the GDB script is empty";
+        return false;
+    }
+
     copyFunctionImplementations(testedFunctionName);
     compileSystemUnderTest();
     const QString binToRun = generatedPath + "/work/binaries/hostpartition";
-    QVector<QVariant> testResults = runTests(interface, asn1Model, binToRun);
+    QVector<QVariant> testResults = runTests(interface, asn1Model, launchConfig);
 
-    QString resultPath = this->projectDirectory + QDir::separator() + "work" + QDir::separator() + resultFileName;
-    HtmlResultExporter exporter(interface, csvModel, testResults, delta);
+    QString resultPath = this->generatedPath + QDir::separator() + resultFileName;
+    HtmlResultExporter exporter(launchConfig.boardName, interface, csvModel, testResults, delta);
     exporter.exportResult(resultPath);
     return true;
 }
@@ -85,6 +92,7 @@ auto TestGenerator::initializePaths(const QString &baseDirectory) -> void
     generatedCodePath = generatedPath + QDir::separator() + "testdriver.c";
     generatedIvPath = generatedPath + QDir::separator() + "interfaceview.xml";
     generatedDvPath = generatedPath + QDir::separator() + "deploymentview.dv.xml";
+    binaryPath = generatedPath + QDir::separator() + "work" + QDir::separator() + "binaries" + QDir::separator();
 }
 
 auto TestGenerator::getAllFunctionsFromModel(const IVModel &ivModel) -> std::vector<IVFunction *>
@@ -99,9 +107,14 @@ auto TestGenerator::getAllFunctionsFromModel(const IVModel &ivModel) -> std::vec
     return ivFunctions;
 }
 
-auto TestGenerator::prepareTestHarness(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model)
-        -> QString
+auto TestGenerator::prepareTestHarness(IVInterface &interface, const CsvModel &csvModel, Asn1Model &asn1Model,
+        const QString &boardName, const int stackSize) -> QString
 {
+    if (boardName.isEmpty()) {
+        qWarning() << "TestGenerator::prepareTestHarness: Board name is empty";
+        return "";
+    }
+
     QDir dir(generatedPath);
     dir.removeRecursively();
     dir.mkpath(".");
@@ -117,7 +130,7 @@ auto TestGenerator::prepareTestHarness(IVInterface &interface, const CsvModel &c
         return {};
     }
 
-    const auto ivModelGenerated = IvGenerator::generate(&interface);
+    const auto ivModelGenerated = IvGenerator::generate(&interface, stackSize);
     if (ivModelGenerated == nullptr) {
         qDebug() << "IV model was not generated";
         return {};
@@ -129,7 +142,7 @@ auto TestGenerator::prepareTestHarness(IVInterface &interface, const CsvModel &c
     }
 
     const std::unique_ptr<DVModel> dvModelGenerated =
-            DvGenerator::generate(ivFunctions, "x86 Linux CPP", "x86_Linux_TestRunner", "Node_1", "hostPartition");
+            DvGenerator::generate(ivFunctions, boardName, "TestRunner", "Node_1", defaultBinaryName);
     if (dvModelGenerated == nullptr) {
         qDebug() << "DV model was not generated";
         return {};
@@ -236,22 +249,17 @@ auto TestGenerator::exportDvModel(DVModel *dvModel, const QString &outputFilenam
     return true;
 }
 
-auto TestGenerator::runTests(IVInterface &interface, Asn1Model &asn1Model, const QString &binaryPath)
+auto TestGenerator::runTests(IVInterface &interface, Asn1Model &asn1Model, const LaunchConfiguration &launchConfig)
         -> QVector<QVariant>
 {
-    const QString binLocalization = binaryPath.left(binaryPath.lastIndexOf("/"));
-    const QString gdbScriptPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
-            + QDir::separator() + "x86-linux-cpp.gdb";
-    const QByteArray rawTestData = GdbConnector::getRawTestResults(
-            binLocalization, { "-batch", "-x", gdbScriptPath }, { "localhost:1234", binaryPath });
+    const QByteArray rawTestData = GdbConnector::getRawTestResults(binaryPath, launchConfig.clientArgsParsed,
+            launchConfig.serverArgsParsed, launchConfig.clientName, launchConfig.serverName);
 
-    const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
-        { "INTEGER", 4, 4 },
-        { "BOOLEAN", 1, 7 },
-        { "REAL", 8, 0 },
-    };
+    qDebug() << "Raw test data size: " << rawTestData.size();
+    qDebug() << "Raw test data: " << rawTestData;
+
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
-            rawTestData, &interface, &asn1Model, QDataStream::LittleEndian, typeLayoutInfos);
+            rawTestData, &interface, &asn1Model, launchConfig.endianess, launchConfig.typeLayoutInfos);
 
     for (const auto &readValue : readTestData) {
         qDebug() << readValue;

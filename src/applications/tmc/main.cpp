@@ -71,6 +71,7 @@ int main(int argc, char *argv[])
     std::vector<QString> keepFunctions;
     std::optional<QString> globalInputVectorLengthLimit;
     std::unordered_map<QString, QString> interfaceInputVectorLengthLimits;
+    std::optional<QString> processesBasePriority;
     std::vector<QString> subtypesFilepaths;
 
     const QStringList args = app.arguments();
@@ -155,6 +156,26 @@ int main(int argc, char *argv[])
                 qCritical("Incorrect input vector length limit argument value");
                 exit(EXIT_FAILURE);
             }
+        } else if (arg == "-pbp") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing value after -pbp");
+                exit(EXIT_FAILURE);
+            }
+            if (processesBasePriority.has_value()) {
+                qCritical("Duplicated -pbp argument");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
+
+            bool valueOk;
+            args[i].toUInt(&valueOk);
+
+            if (!valueOk) {
+                qCritical("Processes base priority argument value is not an unsigned integer");
+                exit(EXIT_FAILURE);
+            }
+
+            processesBasePriority = args[i];
         } else if (arg == "-sub") {
             if (i + 1 == args.size()) {
                 qCritical("Missing filename after -sub");
@@ -180,6 +201,9 @@ int main(int argc, char *argv[])
             qInfo("                         Provide number only to set the global limit");
             qInfo("                         Use <interface_name>:<number> to set limit for a single interface");
             qInfo("                         Interface limit overrides the global limit");
+            qInfo("  -pbp <value>           Use <value> to specify base priority for all non-environment processess");
+            qInfo("                         Base priority will be added to interfaces priorities specified in ");
+            qInfo("                         the Interface View");
             qInfo("  -sub <filepath>        Use <filepath> as an ASN.1 file used for subtyping");
             qInfo("  -h, --help             Print this message and exit.");
             exit(EXIT_SUCCESS);
@@ -208,6 +232,7 @@ int main(int argc, char *argv[])
     verifier.setKeepFunctions(keepFunctions);
     verifier.setGlobalInputVectorLengthLimit(std::move(globalInputVectorLengthLimit));
     verifier.setInterfaceInputVectorLengthLimits(std::move(interfaceInputVectorLengthLimits));
+    verifier.setProcessesBasePriority(std::move(processesBasePriority));
     verifier.setSubtypesFilepaths(subtypesFilepaths);
 
     if (!verifier.addStopConditionFiles(stopConditionFiles)) {

@@ -18,6 +18,11 @@
 #include "interfacedocument.h"
 
 #include "actionsbar.h"
+#include "archetypes/archetypelibrary.h"
+#include "archetypes/archetypemodel.h"
+#include "archetypes/archetypeobject.h"
+#include "archetypes/archetypexmlreader.h"
+#include "archetypes/functionarchetype.h"
 #include "asn1modelstorage.h"
 #include "asn1systemchecks.h"
 #include "colors/colormanagerdialog.h"
@@ -31,6 +36,7 @@
 #include "itemeditor/graphicsitemhelpers.h"
 #include "itemeditor/ivfunctiongraphicsitem.h"
 #include "itemeditor/ivitemmodel.h"
+#include "ivarchetypelibraryreference.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
@@ -61,6 +67,7 @@
 #include <QUndoStack>
 #include <QVBoxLayout>
 #include <algorithm>
+#include <filesystem>
 
 namespace ive {
 
@@ -81,6 +88,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     IVExporter *exporter { nullptr };
     ivm::IVModel *layersModel { nullptr };
     IVVisualizationModelBase *layerSelect { nullptr };
+    ivm::ArchetypeModel *archetypeModel { nullptr };
 
     Asn1Acn::Asn1SystemChecks *asnCheck { nullptr };
     ivm::AbstractSystemChecks *ivCheck { nullptr };
@@ -108,6 +116,7 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     d->sharedModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
     d->objectsModel = new ivm::IVModel(d->dynPropConfig, d->sharedModel, this);
     d->layersModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
+    d->archetypeModel = new ivm::ArchetypeModel(this);
 }
 
 InterfaceDocument::~InterfaceDocument()
@@ -249,7 +258,7 @@ void InterfaceDocument::updateLayersModel() const
     if (layersModel() != nullptr) {
         auto layers = layersModel()->allObjectsByType<ivm::IVConnectionLayerType>();
         bool isDefaultPresent = false;
-        for (auto * const layer : layers) {
+        for (auto *const layer : layers) {
             if (layer->title() == ivm::IVConnectionLayerType::DefaultLayerName) {
                 isDefaultPresent = true;
             }
@@ -579,8 +588,8 @@ IVVisualizationModelBase *InterfaceDocument::sharedVisualisationModel() const
 IVVisualizationModelBase *InterfaceDocument::layerVisualisationModel() const
 {
     if (d->layerSelect == nullptr) {
-        d->layerSelect = new IVVisualizationModelBase(
-                layersModel(), d->commandsStack, shared::DropData::Type::None, const_cast<InterfaceDocument *>(this));
+        d->layerSelect = new IVLayerVisualizationModel(
+                layersModel(), d->objectsModel, d->commandsStack, const_cast<InterfaceDocument *>(this));
         auto *title = new QStandardItem(tr("Connection Layers"));
         title->setTextAlignment(Qt::AlignCenter);
         d->layerSelect->setHorizontalHeaderItem(0, title);
@@ -893,7 +902,13 @@ bool InterfaceDocument::loadImpl(const QString &path)
     }
 
     setObjects(parser.parsedObjects());
-    setLayers(parser.parsedLayers());
+
+    auto layers = parser.parsedLayers();
+    ivm::IVObject::sortObjectListByTitle(layers);
+    setLayers(layers);
+
+    loadArchetypes();
+
     const QVariantMap metadata = parser.metaData();
     QVariantMap::const_iterator i = metadata.constFind("asn1file");
     while (i != metadata.end() && i.key() == "asn1file") {
@@ -904,6 +919,40 @@ bool InterfaceDocument::loadImpl(const QString &path)
     shared::ErrorHub::clearCurrentFile();
 
     return true;
+}
+
+void InterfaceDocument::loadArchetypes()
+{
+    d->archetypeModel->clear();
+
+    for (const auto &libraryReference : d->objectsModel->getArchetypeLibraryReferences()) {
+        ivm::ArchetypeXMLReader archetypeParser;
+        QString absolutePath = shared::interfaceCustomArchetypesDirectoryPath() + QDir::separator()
+                + libraryReference->getLibraryPath();
+        if (!archetypeParser.readFile(absolutePath)) {
+            shared::ErrorHub::addError(shared::ErrorItem::Error, archetypeParser.errorString(), absolutePath);
+            shared::ErrorHub::clearCurrentFile();
+        }
+        QVector<ivm::ArchetypeObject *> archetypeObjects = archetypeParser.parsedObjects();
+
+        generateArchetypeLibrary(archetypeObjects, libraryReference->getLibraryName());
+
+        d->archetypeModel->addObjects(archetypeObjects);
+    }
+}
+
+void InterfaceDocument::generateArchetypeLibrary(
+        QVector<ivm::ArchetypeObject *> &archetypeObjects, const QString &archetypeLibraryName)
+{
+    ivm::ArchetypeLibrary *archetypelibrary = new ivm::ArchetypeLibrary(archetypeLibraryName);
+
+    for (auto archetypeObject : archetypeObjects) {
+        if (auto functionArchetype = archetypeObject->as<ivm::FunctionArchetype *>()) {
+            archetypelibrary->addFunction(functionArchetype);
+        }
+    }
+
+    archetypeObjects.append(archetypelibrary);
 }
 
 void InterfaceDocument::showNIYGUI(const QString &title)

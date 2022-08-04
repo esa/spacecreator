@@ -24,10 +24,6 @@
 #include <sdl/SdlModel/decision.h>
 #include <sdl/SdlModel/expression.h>
 
-using sdl::Answer;
-using sdl::Decision;
-using sdl::Expression;
-
 namespace tests::common {
 
 class SdlDecisionBuilder final
@@ -35,16 +31,14 @@ class SdlDecisionBuilder final
 public:
     SdlDecisionBuilder();
 
-    auto build() -> std::unique_ptr<Decision>;
+    auto build() -> std::unique_ptr<sdl::Decision>;
 
     auto withName(QString name) -> SdlDecisionBuilder &;
-
-    auto withAnswer(std::unique_ptr<Answer> answer) -> SdlDecisionBuilder &;
-
-    auto withExpression(std::unique_ptr<Expression> expression) -> SdlDecisionBuilder &;
+    auto withAnswer(std::unique_ptr<sdl::Answer> answer) -> SdlDecisionBuilder &;
+    auto withExpression(std::unique_ptr<sdl::Expression> expression) -> SdlDecisionBuilder &;
 
 private:
-    std::unique_ptr<Decision> m_decision;
+    std::unique_ptr<sdl::Decision> m_decision;
 };
 
 } // namespace tests::common

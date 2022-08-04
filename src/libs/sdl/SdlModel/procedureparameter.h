@@ -39,12 +39,10 @@ public:
      * @param   direction    direction (input or output) of the parameter
      */
     ProcedureParameter(QString name = "", QString type = "", QString direction = "");
-
     /**
      * @brief   Deleted copy constructor
      */
     ProcedureParameter(const ProcedureParameter &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -54,19 +52,18 @@ public:
      * @brief   Deleted copy assignment operator
      */
     ProcedureParameter &operator=(const ProcedureParameter &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     ProcedureParameter &operator=(ProcedureParameter &&) = default;
 
+public:
     /**
      * @brief    Getter for the direction
      *
      * @return   direction of the parameter
      */
     auto direction() const -> const QString &;
-
     /**
      * @brief    Setter for the direction
      *
@@ -74,6 +71,7 @@ public:
      */
     auto setDirection(QString type) -> void;
 
+public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */

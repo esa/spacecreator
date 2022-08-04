@@ -254,6 +254,17 @@ void ProctypeElementVisitor::operator()(const ElseStatement &statement)
     m_stream << "else;\n";
 }
 
+void ProctypeElementVisitor::operator()(const model::Label &label)
+{
+    m_stream << label.getName() << ":\n";
+}
+
+void ProctypeElementVisitor::operator()(const model::GoTo &statement)
+{
+    m_stream << m_indent;
+    m_stream << "goto " << statement.getLabel() << ";\n";
+}
+
 QString ProctypeElementVisitor::expressionContentToString(const model::Expression &expression)
 {
     const Expression::Value &content = expression.getContent();

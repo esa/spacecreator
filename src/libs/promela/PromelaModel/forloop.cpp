@@ -53,12 +53,12 @@ const VariableRef &ForLoop::getForVariable() const noexcept
     return m_variable;
 }
 
-Expression ForLoop::getFirstExpression() const
+const Expression &ForLoop::getFirstExpression() const
 {
     return std::get<Range>(m_data).first;
 }
 
-Expression ForLoop::getLastExpression() const
+const Expression &ForLoop::getLastExpression() const
 {
     return std::get<Range>(m_data).second;
 }

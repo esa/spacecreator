@@ -193,6 +193,19 @@ void copyDir(const QString &source, const QString &dest, FileCopyingMode replace
     }
 }
 
+QString archetypesFileStartingString() {
+    static const QString kArchetypesStartingString = QString("archetype_library_");
+    return kArchetypesStartingString;
+}
+
+QString interfaceCustomArchetypesDirectoryPath()
+{
+    static const QString kArchetypesPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+            + QDir::separator() + QLatin1String("archetypes");
+
+    return kArchetypesPath;
+}
+
 QString interfaceCustomAttributesFilePath()
 {
     static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)

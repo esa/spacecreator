@@ -1,37 +1,57 @@
-/* CIF PROCESS (248, 150), (150, 75) */
-process Inputobserver;
-    /* CIF TEXT (609, 97), (267, 140) */
-    monitor st System_State;
-    monitor event Observable_Event;
-    dcl received_action T_Boolean;
-    dcl received_trigger T_Boolean;
+system InputObserver;
+    /* CIF TEXT (144, 214), (507, 136) */
+    use datamodel comment 'observer.asn';
+    
+    signal trigger_in (MyIntegerBigger) renames input trigger to MODEL;
+    signal action_in (MyInteger) renames input action to MMI;
     /* CIF ENDTEXT */
-    /* CIF START (49, 83), (70, 35) */
-    START;
-        /* CIF task (0, 138), (169, 53) */
-        task received_action := False,
+    channel c
+        from env to InputObserver with trigger_in,
+action_in;
+    endchannel;
+    block InputObserver;
+        signalroute r
+            from env to InputObserver with trigger_in,
+action_in;
+        connect c and r;
+        /* CIF PROCESS (259, 87), (150, 75) */
+        process InputObserver;
+            /* CIF TEXT (0, 57), (256, 112) */
+            monitor st System_State;
+            
+            monitor event Observable_Event;
+            
+            dcl received_action T_Boolean;
+            dcl received_trigger T_Boolean;
+            /* CIF ENDTEXT */
+            /* CIF START (77, 208), (70, 35) */
+            START;
+                /* CIF task (27, 263), (169, 38) */
+                task received_action := False,
 received_trigger := False;
-        /* CIF NEXTSTATE (28, 221), (111, 35) */
-        NEXTSTATE WaitForTrigger;
-    /* CIF state (53, 309), (70, 35) */
-    state Done;
-    endstate;
-    /* CIF state (210, 87), (111, 35) */
-    state WaitForTrigger;
-        /* CIF input (214, 142), (95, 35) */
-        input trigger_in(x);
-            /* CIF task (179, 197), (164, 35) */
-            task received_trigger := True;
-            /* CIF NEXTSTATE (208, 247), (107, 35) */
-            NEXTSTATE WaitForAction;
-    endstate;
-    /* CIF state (382, 87), (107, 35) */
-    state WaitForAction;
-        /* CIF input (390, 142), (91, 35) */
-        input action_in(y);
-            /* CIF task (355, 197), (160, 35) */
-            task received_action := True;
-            /* CIF NEXTSTATE (401, 252), (70, 35) */
-            NEXTSTATE Done;
-    endstate;
-endprocess InputObserver;
+                /* CIF NEXTSTATE (56, 321), (111, 35) */
+                NEXTSTATE WaitForTrigger;
+            /* CIF state (87, 486), (70, 35) */
+            state Done;
+            endstate;
+            /* CIF state (358, 202), (111, 35) */
+            state WaitForTrigger;
+                /* CIF input (366, 257), (95, 35) */
+                input trigger_in(x);
+                    /* CIF task (332, 312), (164, 35) */
+                    task received_trigger := True;
+                    /* CIF NEXTSTATE (360, 367), (107, 35) */
+                    NEXTSTATE WaitForAction;
+            endstate;
+            /* CIF state (636, 206), (107, 35) */
+            state WaitForAction;
+                /* CIF input (644, 261), (91, 35) */
+                input action_in(y);
+                    /* CIF task (610, 316), (160, 35) */
+                    task received_action := True;
+                    /* CIF NEXTSTATE (655, 371), (70, 35) */
+                    NEXTSTATE Done;
+            endstate;
+        endprocess InputObserver;
+    endblock;
+endsystem;

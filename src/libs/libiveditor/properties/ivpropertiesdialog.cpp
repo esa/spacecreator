@@ -50,12 +50,13 @@
 namespace ive {
 
 IVPropertiesDialog::IVPropertiesDialog(const QString &projectPath, ivm::IVPropertyTemplateConfig *dynPropConfig,
-        ivm::IVObject *obj, ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks,
+        ivm::IVObject *obj, ivm::IVModel *layersModel, ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks,
         cmd::CommandsStack *commandsStack, QWidget *parent)
     : shared::PropertiesDialog(dynPropConfig, obj, commandsStack, parent)
     , m_ivChecks(checks)
     , m_asn1Checks(asn1Checks)
     , m_projectPath(projectPath)
+    , m_layersModel(layersModel)
     , m_isFixedSystemElement(obj ? obj->isFixedSystemElement() : false)
     , m_isRequiredSystemElement(false)
 {
@@ -165,7 +166,7 @@ void IVPropertiesDialog::initAttributesView()
     case ivm::IVObject::Type::InterfaceGroup:
     case ivm::IVObject::Type::ProvidedInterface:
     case ivm::IVObject::Type::RequiredInterface:
-        modelAttrs = new InterfacePropertiesListModel(commandMacro(), propertiesConfig(), this);
+        modelAttrs = new InterfacePropertiesListModel(commandMacro(), propertiesConfig(), m_layersModel, this);
         break;
     default:
         modelAttrs = new shared::PropertiesListModel(commandMacro(), propertiesConfig(), this);

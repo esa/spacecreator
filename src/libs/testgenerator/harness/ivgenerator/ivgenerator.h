@@ -92,15 +92,18 @@ public:
      * @brief generate an IV model with a function under test and a test driver function
      *
      * @param interfaceUnderTest  interface which is tested
+     * @param stackSize size of the stack in compiled binary in bytes
+     *
      * @return IV model with the function under test and the test driver function
      */
-    static auto generate(ivm::IVInterface *interfaceUnderTest) -> std::unique_ptr<ivm::IVModel>;
+    static auto generate(ivm::IVInterface *interfaceUnderTest, const int stackSize = 5000)
+            -> std::unique_ptr<ivm::IVModel>;
 
 private:
     static auto checkInputArgument(ivm::IVInterface *ifaceUnderTest) -> void;
     static auto makeTestDriverFunction(ivm::IVModel *model) -> ivm::IVFunction *;
     static auto makeFunctionUnderTest(ivm::IVModel *model, ivm::IVInterface *ifaceUnderTest) -> ivm::IVFunction *;
-    static auto makeStartTestIface(ivm::IVFunction *testDriverFunction) -> ivm::IVInterface *;
+    static auto makeStartTestIface(ivm::IVFunction *testDriverFunction, const int stackSize) -> ivm::IVInterface *;
     static auto makeTestDriverRequiredIface(ivm::IVInterface *ifaceUnderTest, ivm::IVFunction *testDriverFunction)
             -> ivm::IVInterface *;
     static auto makeFunctionUnderTestProvidedInterface(

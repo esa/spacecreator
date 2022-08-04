@@ -24,10 +24,6 @@
 #include <sdl/SdlModel/transition.h>
 #include <sdl/SdlModel/variablereference.h>
 
-using sdl::Output;
-using sdl::Transition;
-using sdl::VariableReference;
-
 namespace tests::common {
 
 class SdlOutputBuilder final
@@ -35,14 +31,13 @@ class SdlOutputBuilder final
 public:
     SdlOutputBuilder();
 
-    auto build() -> std::unique_ptr<Output>;
+    auto build() -> std::unique_ptr<sdl::Output>;
 
     auto withName(QString name) -> SdlOutputBuilder &;
-
-    auto withParameter(std::unique_ptr<VariableReference> parameter) -> SdlOutputBuilder &;
+    auto withParameter(std::unique_ptr<sdl::VariableReference> parameter) -> SdlOutputBuilder &;
 
 private:
-    std::unique_ptr<Output> m_output;
+    std::unique_ptr<sdl::Output> m_output;
 };
 
 } // namespace tests::common

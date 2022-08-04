@@ -21,6 +21,10 @@
 
 #include <memory>
 
+using sdl::Answer;
+using sdl::Transition;
+using sdl::VariableLiteral;
+
 namespace tests::common {
 
 SdlAnswerBuilder::SdlAnswerBuilder()

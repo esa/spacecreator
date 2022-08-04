@@ -23,6 +23,7 @@
 #include "enumeratedgenerator.h"
 #include "enumvalueconstraintvisitor.h"
 #include "integerrangeconstraintvisitor.h"
+#include "proctypemaker.h"
 #include "sizeconstraintvisitor.h"
 
 #include <asn1library/asn1/types/bitstring.h>
@@ -88,11 +89,12 @@ using promela::model::ValueDefinition;
 using promela::model::VariableRef;
 
 namespace promela::translator {
-Asn1ItemTypeVisitor::Asn1ItemTypeVisitor(
-        PromelaModel &promelaModel, std::optional<QString> baseTypeName, QString name, bool enhancedSpinSupport)
+Asn1ItemTypeVisitor::Asn1ItemTypeVisitor(PromelaModel &promelaModel, std::optional<QString> baseTypeName, QString name,
+        bool generateInits, bool enhancedSpinSupport)
     : m_promelaModel(promelaModel)
     , m_baseTypeName(std::move(baseTypeName))
     , m_name(std::move(name))
+    , m_generateInits(generateInits)
     , m_enhancedSpinSupport(enhancedSpinSupport)
 {
 }
@@ -111,6 +113,10 @@ void Asn1ItemTypeVisitor::visit(const Boolean &type)
     addSimpleValueAssignmentInline(typeName);
     addBoolRangeCheckInline(type, typeName);
 
+    if (m_generateInits) {
+        addSimpleValueInitializationInline(typeName, Constant(0));
+    }
+
     m_resultDataType = DataType(UtypeRef(typeName));
 }
 
@@ -122,9 +128,13 @@ void Asn1ItemTypeVisitor::visit(const Null &type)
 
     model::Sequence sequence(model::Sequence::Type::NORMAL);
 
-    sequence.appendElement(std::make_unique<ProctypeElement>(Skip()));
+    sequence.appendElement(Skip());
 
     addAssignValueInline(typeName, std::move(sequence));
+
+    if (m_generateInits) {
+        addEmptyValueInitializationInline(typeName);
+    }
 
     m_resultDataType = DataType(UtypeRef(typeName));
 }
@@ -151,6 +161,10 @@ void Asn1ItemTypeVisitor::visit(const BitString &type)
 
     if (!isConstSize) {
         addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
+    }
+
+    if (m_generateInits) {
+        addSimpleValueInitializationInline(utypeName, Constant(0));
     }
 
     m_resultDataType = DataType(UtypeRef(utypeName));
@@ -180,6 +194,10 @@ void Asn1ItemTypeVisitor::visit(const OctetString &type)
         addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
     }
 
+    if (m_generateInits) {
+        addSimpleValueInitializationInline(utypeName, Constant(0));
+    }
+
     m_resultDataType = DataType(UtypeRef(utypeName));
 }
 
@@ -207,6 +225,10 @@ void Asn1ItemTypeVisitor::visit(const IA5String &type)
         addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
     }
 
+    if (m_generateInits) {
+        addSimpleValueInitializationInline(utypeName, Constant(0));
+    }
+
     m_resultDataType = DataType(UtypeRef(utypeName));
 }
 
@@ -226,10 +248,24 @@ void Asn1ItemTypeVisitor::visit(const Enumerated &type)
         m_promelaModel.addValueDefinition(ValueDefinition(element.first, element.second));
     }
 
+    EnumValueConstraintVisitor visitor;
+    type.constraints().accept(visitor);
+
+    const auto &allowedValues = visitor.allowedValues();
+
+    if (allowedValues.empty()) {
+        auto errorMessage = QString("Unable to create enum range check for type %1, no value is allowed").arg(typeName);
+        throw TranslationException(std::move(errorMessage));
+    }
+
     m_promelaModel.addTypeAlias(TypeAlias(typeName, BasicType::INT));
 
     addSimpleValueAssignmentInline(typeName);
-    addEnumRangeCheckInline(type, typeName);
+    addEnumRangeCheckInline(typeName, allowedValues);
+
+    if (m_generateInits) {
+        addSimpleValueInitializationInline(typeName, VariableRef(allowedValues.front()));
+    }
 
     m_resultDataType = DataType(UtypeRef(typeName));
 }
@@ -259,13 +295,13 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
         dst.appendElement("selection");
         VariableRef src("src");
         src.appendElement("selection");
-        sequence.appendElement(std::make_unique<ProctypeElement>(Assignment(dst, Expression(src))));
+        sequence.appendElement(Assignment(dst, Expression(src)));
     }
 
     model::Conditional assignConditional;
     int32_t index = 1;
     for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type.components()) {
-        Asn1ItemTypeVisitor nestedVisitor(m_promelaModel, utypeName, component->name(), m_enhancedSpinSupport);
+        Asn1ItemTypeVisitor nestedVisitor(m_promelaModel, utypeName, component->name(), false, m_enhancedSpinSupport);
         component->type()->accept(nestedVisitor);
         std::optional<DataType> nestedDataType = nestedVisitor.getResultDataType();
 
@@ -288,7 +324,7 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
                 std::make_unique<Expression>(std::move(componentSelection)));
         model::Expression assignCheckSelectionExpr(std::move(assignCheckSelection));
 
-        assignSequence->appendElement(std::make_unique<ProctypeElement>(std::move(assignCheckSelectionExpr)));
+        assignSequence->appendElement(std::move(assignCheckSelectionExpr));
 
         VariableRef dst("dst");
         dst.appendElement("data");
@@ -300,28 +336,32 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
         QList<InlineCall::Argument> inlineArguments;
         inlineArguments.append(dst);
         inlineArguments.append(src);
-        assignSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineName, inlineArguments)));
+        assignSequence->appendElement(InlineCall(inlineName, inlineArguments));
 
         assignConditional.appendAlternative(std::move(assignSequence));
     }
 
     auto assignSequenceElse = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
     model::Expression assignCheckElseExpr(VariableRef("else"));
-    assignSequenceElse->appendElement(std::make_unique<ProctypeElement>(std::move(assignCheckElseExpr)));
-    assignSequenceElse->appendElement(std::make_unique<ProctypeElement>(Skip()));
+    assignSequenceElse->appendElement(std::move(assignCheckElseExpr));
+    assignSequenceElse->appendElement(Skip());
     assignConditional.appendAlternative(std::move(assignSequenceElse));
 
-    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assignConditional)));
+    sequence.appendElement(std::move(assignConditional));
 
     m_promelaModel.addUtype(nestedUtype);
 
     addAssignValueInline(utypeName, std::move(sequence));
 
+    if (m_generateInits) {
+        addEmptyValueInitializationInline(utypeName);
+    }
+
     {
         model::Sequence seq(model::Sequence::Type::NORMAL);
 
         Assignment assignment(VariableRef("dst"), Expression(VariableRef("src")));
-        seq.appendElement(std::make_unique<ProctypeElement>(std::move(assignment)));
+        seq.appendElement(std::move(assignment));
 
         addAssignValueInline(QString("%1_selection").arg(selectionTypeName), std::move(seq));
     }
@@ -358,7 +398,7 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
             QList<InlineCall::Argument> arguments;
             arguments.append(dst);
             arguments.append(src);
-            sequence.appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineName, arguments)));
+            sequence.appendElement(InlineCall(inlineName, arguments));
         }
     }
 
@@ -379,18 +419,22 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
             VariableRef src("src");
             src.appendElement(existFieldName);
             src.appendElement(field);
-            sequence.appendElement(std::make_unique<ProctypeElement>(Assignment(dst, Expression(src))));
+            sequence.appendElement(Assignment(dst, Expression(src)));
         }
     }
 
     if (nestedUtype.getFields().isEmpty()) {
         nestedUtype.addField(Declaration(DataType(BasicType::BIT), "dummy"));
-        sequence.appendElement(std::make_unique<ProctypeElement>(Skip()));
+        sequence.appendElement(Skip());
     }
 
     m_promelaModel.addUtype(nestedUtype);
 
     addAssignValueInline(nestedUtypeName, std::move(sequence));
+
+    if (m_generateInits) {
+        addEmptyValueInitializationInline(nestedUtypeName);
+    }
 
     m_resultDataType = DataType(UtypeRef(nestedUtypeName));
 }
@@ -404,7 +448,7 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
 
-    Asn1ItemTypeVisitor itemTypeVisitor(m_promelaModel, utypeName, "elem", m_enhancedSpinSupport);
+    Asn1ItemTypeVisitor itemTypeVisitor(m_promelaModel, utypeName, "elem", true, m_enhancedSpinSupport);
     type.itemsType()->accept(itemTypeVisitor);
     DataType dataType = itemTypeVisitor.getResultDataType().value();
 
@@ -420,43 +464,47 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
         utype.addField(Declaration(DataType(BasicType::INT), "length"));
     }
 
-    type.itemsType();
     m_promelaModel.addUtype(utype);
 
     model::Sequence sequence(model::Sequence::Type::NORMAL);
 
-    sequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "i")));
+    sequence.appendElement(Declaration(DataType(BasicType::INT), "i"));
 
-    std::unique_ptr<model::Sequence> loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
+    if (isConstSize) {
+        auto loopRangeEnd = Constant(constraintVisitor.getMaxSize() - 1);
 
-    VariableRef dst("dst");
-    dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
-    VariableRef src("src");
-    src.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+        auto dataLoop = createSequenceOfDataLoop(utypeName, Expression(std::move(loopRangeEnd)));
+        sequence.appendElement(std::move(dataLoop));
+    } else {
+        auto srcLength = VariableRef("src");
+        srcLength.appendElement("length");
 
-    QList<InlineCall::Argument> inlineArguments;
-    inlineArguments.append(dst);
-    inlineArguments.append(src);
+        auto loopRangeEnd = BinaryExpression(BinaryExpression::Operator::SUBTRACT,
+                std::make_unique<Expression>(srcLength), std::make_unique<Expression>(1));
 
-    const QString inlineName = utypeName + "_elem" + m_assignValueInlineSuffix;
+        auto dataLoop = createSequenceOfDataLoop(utypeName, Expression(std::move(loopRangeEnd)));
+        sequence.appendElement(std::move(dataLoop));
 
-    loopSequence->appendElement(std::make_unique<ProctypeElement>(InlineCall(inlineName, inlineArguments)));
-
-    sequence.appendElement(std::make_unique<ProctypeElement>(
-            ForLoop(VariableRef("i"), 0, constraintVisitor.getMaxSize() - 1, std::move(loopSequence))));
+        auto zeroingLoop = createSequenceOfZeroingLoop(utypeName, constraintVisitor.getMaxSize() - 1);
+        sequence.appendElement(std::move(zeroingLoop));
+    }
 
     if (!isConstSize) {
         VariableRef dst_length = VariableRef("dst");
         dst_length.appendElement("length");
         VariableRef src_length = VariableRef("src");
         src_length.appendElement("length");
-        sequence.appendElement(std::make_unique<ProctypeElement>(Assignment(dst_length, Expression(src_length))));
+        sequence.appendElement(Assignment(dst_length, Expression(src_length)));
     }
 
     addAssignValueInline(utypeName, std::move(sequence));
 
     if (!isConstSize) {
         addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
+    }
+
+    if (m_generateInits) {
+        addEmptyValueInitializationInline(utypeName);
     }
 
     m_resultDataType = DataType(UtypeRef(utypeName));
@@ -474,6 +522,11 @@ void Asn1ItemTypeVisitor::visit(const Real &type)
 
     addSimpleValueAssignmentInline(typeName);
 
+    if (m_generateInits) {
+        // TODO: Implement when floating points will be implemented
+        addEmptyValueInitializationInline(typeName);
+    }
+
     m_resultDataType = DataType(UtypeRef(typeName));
 }
 
@@ -484,12 +537,26 @@ void Asn1ItemTypeVisitor::visit(const LabelType &type)
 
 void Asn1ItemTypeVisitor::visit(const Integer &type)
 {
-    Q_UNUSED(type);
     const QString typeName = constructTypeName(m_name);
+
+    IntegerRangeConstraintVisitor visitor;
+    type.constraints().accept(visitor);
+
+    const auto &rangeSubsets = visitor.getResultSubset();
+
+    if (!rangeSubsets.has_value() || rangeSubsets->isEmpty()) {
+        auto errorMessage = QString("Integer type %1 allows for no value").arg(m_name);
+        throw TranslationException(std::move(errorMessage));
+    }
+
     m_promelaModel.addTypeAlias(TypeAlias(typeName, BasicType::INT));
 
     addSimpleValueAssignmentInline(typeName);
-    addIntegerRangeCheckInline(type, typeName);
+    addIntegerRangeCheckInline(typeName, *rangeSubsets);
+
+    if (m_generateInits) {
+        addSimpleValueInitializationInline(typeName, Constant(*rangeSubsets->getMin()));
+    }
 
     m_resultDataType = DataType(UtypeRef(typeName));
 }
@@ -498,7 +565,7 @@ void Asn1ItemTypeVisitor::visit(const UserdefinedType &type)
 {
     if (type.type()) {
         const auto name = m_name.isEmpty() ? type.typeName() : m_name;
-        Asn1ItemTypeVisitor visitor(m_promelaModel, m_baseTypeName, name, m_enhancedSpinSupport);
+        Asn1ItemTypeVisitor visitor(m_promelaModel, m_baseTypeName, name, m_generateInits, m_enhancedSpinSupport);
         type.type()->accept(visitor);
 
         m_resultDataType = visitor.getResultDataType();
@@ -518,14 +585,14 @@ void Asn1ItemTypeVisitor::addSimpleValueAssignmentInline(const QString &typeName
     model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     Assignment assignment(VariableRef("dst"), Expression(VariableRef("src")));
-    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assignment)));
+    sequence.appendElement(std::move(assignment));
 
     QList<InlineCall::Argument> rangeCheckCallArguments;
     rangeCheckCallArguments.append(VariableRef("dst"));
     const auto rangeCheckInlineName =
             QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(m_rangeCheckInlineSuffix);
     InlineCall rangeCheckCall(rangeCheckInlineName, std::move(rangeCheckCallArguments));
-    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(rangeCheckCall)));
+    sequence.appendElement(std::move(rangeCheckCall));
 
     addAssignValueInline(typeName, std::move(sequence));
 }
@@ -544,10 +611,10 @@ void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeNam
         const auto sizeCheckInlineName =
                 QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(m_sizeCheckInlineSuffix);
         InlineCall sizeCheckCall(sizeCheckInlineName, std::move(sizeCheckCallArguments));
-        sequence.appendElement(std::make_unique<ProctypeElement>(std::move(sizeCheckCall)));
+        sequence.appendElement(std::move(sizeCheckCall));
     }
 
-    sequence.appendElement(std::make_unique<ProctypeElement>(Declaration(DataType(BasicType::INT), "i")));
+    sequence.appendElement(Declaration(DataType(BasicType::INT), "i"));
 
     std::unique_ptr<model::Sequence> loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
 
@@ -556,17 +623,16 @@ void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeNam
     VariableRef src("src");
     src.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
 
-    loopSequence->appendElement(std::make_unique<ProctypeElement>(Assignment(dst, Expression(src))));
+    loopSequence->appendElement(Assignment(dst, Expression(src)));
 
-    sequence.appendElement(
-            std::make_unique<ProctypeElement>(ForLoop(VariableRef("i"), 0, length - 1, std::move(loopSequence))));
+    sequence.appendElement(ForLoop(VariableRef("i"), 0, length - 1, std::move(loopSequence)));
 
     if (lengthFieldPresent) {
         VariableRef dst_length = VariableRef("dst");
         dst_length.appendElement("length");
         VariableRef src_length = VariableRef("src");
         src_length.appendElement("length");
-        sequence.appendElement(std::make_unique<ProctypeElement>(Assignment(dst_length, Expression(src_length))));
+        sequence.appendElement(Assignment(dst_length, Expression(src_length)));
     }
 
     addAssignValueInline(typeName, std::move(sequence));
@@ -583,6 +649,43 @@ void Asn1ItemTypeVisitor::addAssignValueInline(const QString &typeName, model::S
     m_promelaModel.addInlineDef(std::make_unique<InlineDef>(assignValueInline, arguments, std::move(sequence)));
 }
 
+void Asn1ItemTypeVisitor::addSimpleValueInitializationInline(const QString &typeName, InlineCall::Argument initValue)
+{
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
+
+    const QString assignValueInlineName =
+            QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(m_assignValueInlineSuffix);
+
+    QList<InlineCall::Argument> assignValueInlineArguments;
+    assignValueInlineArguments.append(VariableRef("dst"));
+    assignValueInlineArguments.append(initValue);
+
+    auto assignValueInlineCall = InlineCall(assignValueInlineName, assignValueInlineArguments);
+    sequence.appendElement(std::move(assignValueInlineCall));
+
+    addInitializeValueInline(typeName, std::move(sequence));
+}
+
+void Asn1ItemTypeVisitor::addEmptyValueInitializationInline(const QString &typeName)
+{
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
+    sequence.appendElement(Skip());
+
+    addInitializeValueInline(typeName, std::move(sequence));
+}
+
+void Asn1ItemTypeVisitor::addInitializeValueInline(const QString &typeName, model::Sequence sequence)
+{
+    const auto initValueInlineName =
+            QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(m_initializeValueInlineSuffix);
+
+    QList<QString> arguments;
+    arguments.append("dst");
+
+    auto initializeValueInlineDef = std::make_unique<InlineDef>(initValueInlineName, arguments, std::move(sequence));
+    m_promelaModel.addInlineDef(std::move(initializeValueInlineDef));
+}
+
 void Asn1ItemTypeVisitor::addBoolRangeCheckInline(const Boolean &type, const QString &typeName)
 {
     // TODO: Generating empty inline for now
@@ -590,19 +693,8 @@ void Asn1ItemTypeVisitor::addBoolRangeCheckInline(const Boolean &type, const QSt
     addRangeCheckInline(Expression(VariableRef("true")), typeName);
 }
 
-void Asn1ItemTypeVisitor::addEnumRangeCheckInline(const Enumerated &type, const QString &typeName)
+void Asn1ItemTypeVisitor::addEnumRangeCheckInline(const QString &typeName, const std::vector<QString> &allowedValues)
 {
-    // Get allowed values
-    EnumValueConstraintVisitor visitor;
-    type.constraints().accept(visitor);
-
-    const auto &allowedValues = visitor.allowedValues();
-
-    if (allowedValues.empty()) {
-        auto errorMessage = QString("Unable to create enum range check for type %1, no value is allowed").arg(typeName);
-        throw TranslationException(std::move(errorMessage));
-    }
-
     const auto argumentName = buildCheckArgumentName(typeName, "v");
 
     // Build one big expression for range check
@@ -628,26 +720,13 @@ void Asn1ItemTypeVisitor::addEnumRangeCheckInline(const Enumerated &type, const 
     addRangeCheckInline(*valueCheckingExpression, typeName);
 }
 
-void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const Integer &type, const QString &typeName)
+void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const QString &typeName, const IntegerSubset &rangeSubsets)
 {
-    // Get type range subset
-    IntegerRangeConstraintVisitor visitor;
-    type.constraints().accept(visitor);
-
-    const auto &rangeSubsets = visitor.getResultSubset();
-
-    if (!rangeSubsets.has_value()) {
-        auto errorMessage =
-                QString("Unable to generate integer range check for type %1, unable to determine available subset")
-                        .arg(m_name);
-        throw TranslationException(std::move(errorMessage));
-    }
-
     const auto argumentName = buildCheckArgumentName(typeName, "v");
 
     // Build one big expression for range check
     std::vector<BinaryExpression> rangeCheckingExpressions;
-    for (const auto &range : rangeSubsets->getRanges()) {
+    for (const auto &range : rangeSubsets.getRanges()) {
         auto minValueConst = std::make_unique<Expression>(Constant(range.first));
         auto minValueVar = std::make_unique<Expression>(VariableRef(argumentName));
         auto greaterThanExpr = std::make_unique<Expression>(
@@ -683,7 +762,7 @@ void Asn1ItemTypeVisitor::addRangeCheckInline(const Expression &expression, cons
     model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     AssertCall assertCall(expression);
-    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assertCall)));
+    sequence.appendElement(std::move(assertCall));
 
     auto rangeCheckInline = std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
     m_promelaModel.addInlineDef(std::move(rangeCheckInline));
@@ -713,7 +792,7 @@ void Asn1ItemTypeVisitor::addSizeCheckInline(
             BinaryExpression::Operator::AND, std::move(greaterThanExpr), std::move(lessThanExpr));
 
     AssertCall assertCall(Expression(std::move(sizeCheckingExpression)));
-    sequence.appendElement(std::make_unique<ProctypeElement>(std::move(assertCall)));
+    sequence.appendElement(std::move(assertCall));
 
     auto rangeCheckInline = std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
     m_promelaModel.addInlineDef(std::move(rangeCheckInline));
@@ -727,6 +806,49 @@ QString Asn1ItemTypeVisitor::getAssignValueInlineNameForNestedType(const QString
 QString Asn1ItemTypeVisitor::buildCheckArgumentName(const QString &typeName, const QString &postfix) const
 {
     return QString("%1_%2c").arg(typeName).arg(postfix);
+}
+
+ForLoop Asn1ItemTypeVisitor::createSequenceOfDataLoop(const QString &utypeName, Expression loopRangeEnd) const
+{
+    auto loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
+
+    VariableRef dst("dst");
+    dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+    VariableRef src("src");
+    src.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+
+    QList<InlineCall::Argument> inlineArguments;
+    inlineArguments.append(dst);
+    inlineArguments.append(src);
+
+    const auto inlineName = QString("%1_elem%2").arg(utypeName).arg(m_assignValueInlineSuffix);
+    auto inlineCall = InlineCall(inlineName, inlineArguments);
+    loopSequence->appendElement(std::move(inlineCall));
+
+    auto forLoop = ForLoop(VariableRef("i"), 0, std::move(loopRangeEnd), std::move(loopSequence));
+
+    return forLoop;
+}
+
+ForLoop Asn1ItemTypeVisitor::createSequenceOfZeroingLoop(const QString &utypeName, const std::size_t loopRangeEnd) const
+{
+    auto loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
+
+    VariableRef dst("dst");
+    dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+    VariableRef srcLength = VariableRef("src");
+    srcLength.appendElement("length");
+
+    QList<InlineCall::Argument> inlineArguments;
+    inlineArguments.append(dst);
+
+    const auto inlineName = QString("%1_elem%2").arg(utypeName).arg(m_initializeValueInlineSuffix);
+    auto inlineCall = InlineCall(inlineName, inlineArguments);
+    loopSequence->appendElement(std::move(inlineCall));
+
+    auto forLoop = ForLoop(VariableRef("i"), Expression(srcLength), loopRangeEnd, std::move(loopSequence));
+
+    return forLoop;
 }
 
 }

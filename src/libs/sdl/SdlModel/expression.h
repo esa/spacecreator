@@ -35,12 +35,10 @@ public:
      * @param   content    content to store
      */
     Expression(QString content = "");
-
     /**
      * @brief   Deleted copy constructor
      */
     Expression(const Expression &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -50,19 +48,18 @@ public:
      * @brief   Deleted copy assignment operator
      */
     Expression &operator=(const Expression &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     Expression &operator=(Expression &&) = default;
 
+public:
     /**
      * @brief   Getter for the stored value
      *
      * @return  const reference to the stored value
      */
     auto content() const -> const QString &;
-
     /**
      * @brief   Setter for the stored value
      *

@@ -39,12 +39,10 @@ public:
      * @brief   Default constructor
      */
     Decision() = default;
-
     /**
      * @brief   Deleted copy constructor
      */
     Decision(const Decision &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -54,19 +52,18 @@ public:
      * @brief   Deleted copy assignment operator
      */
     Decision &operator=(const Decision &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */
     Decision &operator=(Decision &&) = default;
 
+public:
     /**
      * @brief   Getter for a vector of answers
      *
      * @return  vector of answers
      */
     auto answers() const -> const std::vector<std::unique_ptr<Answer>> &;
-
     /**
      * @brief   Add an answer to a vector
      *
@@ -80,7 +77,6 @@ public:
      * @return  expression
      */
     auto expression() const -> Expression *;
-
     /**
      * @brief   Setter for expression
      *
@@ -88,6 +84,7 @@ public:
      */
     auto setExpression(std::unique_ptr<Expression> expression) -> void;
 
+public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */

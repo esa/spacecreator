@@ -69,7 +69,7 @@ std::unique_ptr<conversion::Model> IvXmlImporter::parse(const Options &options, 
 {
     const auto inputFilepath = options.value(IvOptions::inputFilepath);
     if (!inputFilepath) {
-        throw ImportException("File to import wasn't specified");
+        throw ImportException("Interface View file to import wasn't specified");
     }
 
     IVXMLReader parser;

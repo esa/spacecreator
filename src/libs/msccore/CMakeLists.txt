@@ -105,6 +105,7 @@ target_sources(${LIB_NAME} PRIVATE
 
 target_include_directories(${LIB_NAME}
     PUBLIC .
+    PUBLIC ${CMAKE_SOURCE_DIR}/src/libs
     PRIVATE cif
     PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
 )

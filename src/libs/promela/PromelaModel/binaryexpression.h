@@ -70,7 +70,6 @@ public:
      *
      * @param other other BinaryExpression
      */
-
     BinaryExpression(BinaryExpression &&other);
 
     /**

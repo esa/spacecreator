@@ -39,12 +39,10 @@ public:
      * @param   name   name of the element
      */
     Action(QString name = "");
-
     /**
      * @brief   Deleted copy constructor
      */
     Action(const Action &) = delete;
-
     /**
      * @brief   Default move constructor
      */
@@ -54,7 +52,6 @@ public:
      * @brief   Deleted copy assignment operator
      */
     Action &operator=(const Action &) = delete;
-
     /**
      * @brief   Default move assignment operator
      */

@@ -66,7 +66,7 @@ void SequenceComponentValueVisitor::visit(const AsnSequenceComponent &component)
     existFieldRef.appendElement(Escaper::escapePromelaName(componentName));
 
     if (iter == values.end() && component.isOptional()) {
-        m_sequence.appendElement(std::make_unique<ProctypeElement>(Assignment(existFieldRef, Expression(Constant(0)))));
+        m_sequence.appendElement(Assignment(existFieldRef, Expression(Constant(0))));
         return;
     }
 
@@ -76,7 +76,7 @@ void SequenceComponentValueVisitor::visit(const AsnSequenceComponent &component)
     }
 
     if (component.isOptional()) {
-        m_sequence.appendElement(std::make_unique<ProctypeElement>(Assignment(existFieldRef, Expression(Constant(1)))));
+        m_sequence.appendElement(Assignment(existFieldRef, Expression(Constant(1))));
     }
 
     m_target.appendElement(Escaper::escapePromelaName(componentName));

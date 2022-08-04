@@ -1,31 +1,17 @@
-<InterfaceView asn1file="/home/taste/tool-inst/share/taste-types/taste-types.asn">
-<Function name="Receiver" is_type="NO" language="SDL" default_implementation="default" FPGA_Configurations="">
-    <Property name="Taste::coordinates" value="21100 35700 48100 45500"/>
-<Provided_Interface name="Ping" kind="Sporadic" layer="default" stack_size="1024" wcet="0" priority="1" miat="0" queue_size="1">
-    <Input_Parameter name="pingArg" type="MyBetterInteger" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="25300 35700"/>
-</Provided_Interface>
-
-<Required_Interface name="Pong" kind="Sporadic" layer="default" stack_size="1024" wcet="0" priority="1" miat="0" queue_size="1">
-    <Input_Parameter name="pongArg" type="MyBetterInteger" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="41700 35700"/>
-    <Property name="Taste::InheritPI" value="true"/>
-    <Property name="Taste::Autonamed" value="true"/>
-</Required_Interface>
-
-    <Implementations>
-        <Implementation name="default" language="SDL"/>
-    </Implementations>
-</Function>
-
+<InterfaceView asn1file="userdefined-types.acn">
 <Function name="Pinger" is_type="NO" language="GUI" default_implementation="default" FPGA_Configurations="">
     <Property name="Taste::coordinates" value="21500 18100 47500 26400"/>
-<Provided_Interface name="Pong" kind="Sporadic" layer="default" stack_size="1024" wcet="0" priority="1" miat="0" queue_size="1">
+<Provided_Interface name="Pong" kind="Sporadic" layer="default" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
     <Input_Parameter name="pongArg" type="MyBetterInteger" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="41700 26400"/>
+    <Property name="Taste::coordinates" value="34800 26400"/>
 </Provided_Interface>
 
-<Required_Interface name="Ping" kind="Sporadic" layer="default" stack_size="1024" wcet="0" priority="1" miat="0" queue_size="1">
+<Provided_Interface name="PongButArray" kind="Sporadic" layer="default" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
+    <Input_Parameter name="pongArg" type="MyArray" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="41600 26400"/>
+</Provided_Interface>
+
+<Required_Interface name="Ping" kind="Sporadic" layer="default" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
     <Input_Parameter name="pingArg" type="MyBetterInteger" encoding="NATIVE"/>
     <Property name="Taste::coordinates" value="25300 26400"/>
     <Property name="Taste::InheritPI" value="true"/>
@@ -37,6 +23,38 @@
     </Implementations>
 </Function>
 
+<Function name="Receiver" is_type="NO" language="SDL" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="21100 35700 48100 45500"/>
+<Provided_Interface name="Ping" kind="Sporadic" layer="default" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
+    <Input_Parameter name="pingArg" type="MyBetterInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="25300 35700"/>
+</Provided_Interface>
+
+<Required_Interface name="Pong" kind="Sporadic" layer="default" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
+    <Input_Parameter name="pongArg" type="MyBetterInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="34800 35700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="PongButArray" kind="Sporadic" layer="default" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
+    <Input_Parameter name="pongArg" type="MyArray" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="41600 35700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Connection >
+    <Source func_name="Receiver" ri_name="PongButArray"/>
+    <Target func_name="Pinger" pi_name="PongButArray"/>
+    <Property name="Taste::coordinates" value="41600 35100 41600 26700"/>
+</Connection>
+
 <Connection >
     <Source func_name="Pinger" ri_name="Ping"/>
     <Target func_name="Receiver" pi_name="Ping"/>
@@ -46,7 +64,7 @@
 <Connection >
     <Source func_name="Receiver" ri_name="Pong"/>
     <Target func_name="Pinger" pi_name="Pong"/>
-    <Property name="Taste::coordinates" value="41700 35100 41700 26700"/>
+    <Property name="Taste::coordinates" value="34800 35100 34800 26700"/>
 </Connection>
 
 </InterfaceView>

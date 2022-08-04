@@ -78,7 +78,7 @@ MscModel *MscReader::parseText(const QString &text, QStringList *errorMessages)
 /*!
    Returns the error messages of the last parsing
  */
-QStringList MscReader::getErrorMessages() const
+const QStringList &MscReader::getErrorMessages() const
 {
     return m_errorMessages;
 }
