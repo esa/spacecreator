@@ -198,7 +198,8 @@ void SdlVisitor::visit(const System &system)
         m_layouter.moveDown(Layouter::ElementType::Text);
 
         for (const auto &text : system.freeformTexts()) {
-            m_writer.writeLine(text);
+            m_writer.beginLine(text);
+            m_writer.endLine(";");
         }
 
         m_writer.writeLine("/* ENDTEXT */");
@@ -218,6 +219,7 @@ void SdlVisitor::visit(const System &system)
     system.block().accept(*this);
 
     m_writer.popIndent();
+
     m_writer.writeLine("endsystem;");
 }
 
@@ -277,9 +279,13 @@ void SdlVisitor::visit(const SignalRoute &signalRoute)
 
     m_writer.writeLine(QString("signalroute %1").arg(signalRoute.name()));
 
+    m_writer.pushIndent(INDENT);
+
     for (const auto &route : signalRoute.routes()) {
         route.accept(*this);
     }
+
+    m_writer.popIndent();
 }
 
 void SdlVisitor::visit(const Connection &connection)
@@ -326,18 +332,30 @@ void SdlVisitor::visit(const Process &process)
     m_writer.writeLine("process " + process.name() + ";");
     m_writer.pushIndent(INDENT);
 
-    if (!process.variables().empty() || !process.timerNames().empty()) {
+    const auto hasVariables = !process.variables().empty();
+    const auto hasTimers = !process.timerNames().empty();
+    const auto hasErrorStates = !process.errorStates().empty();
+    const auto hasProcedures = !process.procedures().empty();
+
+    if (hasVariables || hasTimers || hasErrorStates) {
         m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
         m_layouter.moveDown(Layouter::ElementType::Text);
+
         // Timers are just names, a dedicated visitor does not add any benfits
         for (const auto &timer : process.timerNames()) {
             m_writer.writeLine("Timer " + timer + ";");
         }
+
         exportCollection(process.variables());
+
+        if (hasErrorStates) {
+            m_writer.writeLine(QString("errorstates %1;").arg(process.errorStates().join(", ")));
+        }
+
         m_writer.writeLine("/* CIF ENDTEXT */");
     }
 
-    if (!process.procedures().empty()) {
+    if (hasProcedures) {
         exportCollection(process.procedures());
     }
 
