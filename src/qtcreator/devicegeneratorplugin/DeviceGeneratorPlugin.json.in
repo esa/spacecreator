@@ -1,0 +1,12 @@
+{
+    \"Name\" : \"DeviceGenerator\",
+    \"Version\" : \"0.0.1\",
+    \"CompatVersion\" : \"0.0.1\",
+    \"Vendor\" : \"ESA\",
+    \"Copyright\" : \"(C) 2021 European Space Agency\",
+    \"License\" : \"LGPL 2.1\",
+    \"Category\" : \"Modeling\",
+    \"Description\" : \"TBD\",
+    \"Url\" : \"$$ORGANISATION_DOMAIN",
+    $$dependencyList
+}
