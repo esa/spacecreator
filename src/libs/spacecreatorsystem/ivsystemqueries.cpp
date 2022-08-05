@@ -315,6 +315,7 @@ QString IvSystemQueries::resolvedTargetFunction(const QString &sourceFunction, c
     if (parentFunction != nullptr) {
         return parentFunction->title();
     }
+    return "";
 }
 
 QString IvSystemQueries::resolvedTargetInterface(const QString &sourceFunction, const QString &sourceInterface,
@@ -334,6 +335,7 @@ QString IvSystemQueries::resolvedTargetInterface(const QString &sourceFunction, 
     if (parentFunction != nullptr) {
         return sourceInterface;
     }
+    return "";
 }
 
 } // namespace scs
