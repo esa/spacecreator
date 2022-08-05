@@ -848,7 +848,7 @@ void tst_sdlexporter::testGenerateSystem()
     // clang-format off
     const auto exampleModel = SdlModelBuilder(systemName)
         .withSystem(SdlSystemBuilder(systemName)
-            .withFreeformText("use datamodel comment 'observer.asn';")
+            .withFreeformText("use datamodel comment 'observer.asn'")
             .withSignal("Signal1")
             .withInputRename("Signal2", "OGSignal2", "Func2")
             .withOutputRename("Signal3", "OGSignal3", "Func3")
@@ -940,7 +940,7 @@ void tst_sdlexporter::testGenerateSystemAutoRoutes()
 
     // clang-format off
     auto exampleSystem = SdlSystemBuilder(systemName)
-        .withFreeformText("use datamodel comment 'observer.asn';")
+        .withFreeformText("use datamodel comment 'observer.asn'")
         .withSignal("Signal1")
         .withInputRename("Signal2", "OGSignal2", "Func2")
         .withOutputRename("Signal3", "OGSignal3", "Func3")
