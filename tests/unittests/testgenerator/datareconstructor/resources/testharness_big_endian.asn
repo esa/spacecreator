@@ -1,0 +1,8 @@
+TESTBOOLFLOAT2-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   MyInteger ::= INTEGER (0 .. 10000)
+   MyFloat ::= REAL(-100 .. 100)
+   MyBool ::= BOOLEAN
+END
+

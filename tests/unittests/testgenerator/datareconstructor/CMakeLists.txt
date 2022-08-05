@@ -27,4 +27,6 @@ add_format_target(${TEST_NAME})
 
 configure_file(resources/config.xml resources/config.xml COPYONLY)
 configure_file(resources/interfaceview.xml resources/interfaceview.xml COPYONLY)
+configure_file(resources/interfaceview_big_endian.xml resources/interfaceview_big_endian.xml COPYONLY)
 configure_file(resources/testharness.asn resources/testharness.asn COPYONLY)
+configure_file(resources/testharness_big_endian.asn resources/testharness_big_endian.asn COPYONLY)

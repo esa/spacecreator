@@ -41,6 +41,7 @@ class tst_datareconstructor final : public QObject
 
 private Q_SLOTS:
     void testNominal() const;
+    void testNominalBigEndian() const;
 };
 auto printQByteArrayInHex(const QByteArray &array) -> void;
 static auto byteToHexStr(char byte) -> QString;
@@ -79,6 +80,52 @@ void tst_datareconstructor::testNominal() const
     };
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
             rawTestData, ivIface, asn1Model.get(), QDataStream::LittleEndian, typeLayoutInfos);
+
+    QCOMPARE(readTestData.size(), expectedTestData.size());
+    const int dataSize = readTestData.size();
+    for (int i = 0; i < dataSize; i++) {
+        if (readTestData.at(i) != expectedTestData.at(i)) {
+            printQByteArrayInHex(rawTestData);
+
+            const char readChar = readTestData.at(i).toChar().toLatin1();
+            const char expectedChar = expectedTestData.at(i).toChar().toLatin1();
+            qDebug().noquote() << i << byteToHexStr(readChar) << byteToHexStr(expectedChar);
+        }
+
+        QCOMPARE(readTestData.at(i), expectedTestData.at(i));
+    }
+}
+
+void tst_datareconstructor::testNominalBigEndian() const
+{
+    const QVector<QVariant> expectedTestData = { 2, 2.5, true, 5.0, 4, 5.0, false, 0.8 };
+
+    const char *const rawTestData = "\x00\x00\x00\x00\x00\x00\x00\x02"
+                                    "\x40\x04\x00\x00\x00\x00\x00\x00"
+                                    "\x01\x00\x00\x00\x00\x00\x00\x00"
+                                    "\x40\x14\x00\x00\x00\x00\x00\x00"
+                                    "\x00\x00\x00\x00\x00\x00\x00\x04"
+                                    "\x40\x14\x00\x00\x00\x00\x00\x00"
+                                    "\x00\x00\x00\x00\x00\x00\x00\x00"
+                                    "\x3F\xE9\x99\x99\x99\x99\x99\x9A";
+
+    const int resultBytesNum = 64;
+    QByteArray rawTestByteArray = QByteArray::fromRawData(rawTestData, resultBytesNum);
+
+    const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview_big_endian.xml");
+    ivm::IVInterface *const ivIface = IvTools::getIfaceFromModel("Calculate", ivModel.get());
+
+    const QString asn1Filepath =
+            QString("%1%2%3").arg("resources").arg(QDir::separator()).arg("testharness_big_endian.asn");
+    const auto asn1Model = ModelLoader::loadAsn1Model(asn1Filepath);
+
+    const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
+        { "INTEGER", 8, 0 },
+        { "BOOLEAN", 1, 7 },
+        { "REAL", 8, 0 },
+    };
+    const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
+            rawTestByteArray, ivIface, asn1Model.get(), QDataStream::BigEndian, typeLayoutInfos);
 
     QCOMPARE(readTestData.size(), expectedTestData.size());
     const int dataSize = readTestData.size();
