@@ -22,19 +22,24 @@
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <sdl/SdlModel/nextstate.h>
+#include <sdl/SdlModel/variabledeclaration.h>
 
 using conversion::translator::TranslationException;
 using msc::MscChart;
 using msc::MscEntity;
 using msc::MscInstanceEvent;
 using msc::MscMessage;
+using sdl::Block;
 using sdl::Input;
 using sdl::NextState;
 using sdl::Process;
+using sdl::Rename;
 using sdl::SdlModel;
 using sdl::State;
 using sdl::StateMachine;
+using sdl::System;
 using sdl::Transition;
+using sdl::VariableDeclaration;
 
 namespace conversion::sdl::translator {
 
@@ -52,38 +57,12 @@ void NeverObserverTranslator::createObserver(const MscChart *mscChart) const
         const auto mscEvent = *it;
         handleEvent(context, mscEvent);
     }
-}
 
-NeverObserverTranslator::Context NeverObserverTranslator::createSdlSkeleton(const MscChart *mscChart) const
-{
-    Process process;
-    process.setName(Escaper::escapeSdlName(mscChart->name()));
+    context.process.addErrorState(context.lastState->name());
 
-    auto stateMachine = std::make_unique<StateMachine>();
+    auto system = createSdlSystem(context);
 
-    auto startState = std::make_unique<State>();
-    startState->setName(m_stateNameTemplate.arg(0));
-
-    auto startTransition = std::make_unique<Transition>();
-    startTransition->addAction(std::make_unique<NextState>("", startState.get()));
-    process.setStartTransition(std::move(startTransition));
-
-    // clang-format off
-    Context context {
-        .processName = process.name(),
-        .stateMachine = stateMachine.get(),
-        .startState = startState.get(),
-        .lastState = startState.get(),
-        .stateCounter = 0
-    };
-    // clang-format on
-
-    stateMachine->addState(std::move(startState));
-
-    process.setStateMachine(std::move(stateMachine));
-    m_sdlModel->addProcess(std::move(process));
-
-    return context;
+    m_sdlModel->addSystem(std::move(system));
 }
 
 void NeverObserverTranslator::handleEvent(
@@ -102,23 +81,29 @@ void NeverObserverTranslator::handleEvent(
     default: {
         auto errorMessage = QString("Encountered unsupported %1 event in never observer %2")
                                     .arg(mscEvent->entityTypeName())
-                                    .arg(context.processName);
+                                    .arg(context.process.name());
         throw TranslationException(std::move(errorMessage));
     }
     }
 }
 
 void NeverObserverTranslator::handleMessageEvent(
-        NeverObserverTranslator::Context &context, const MscMessage *mscEvent) const
+        NeverObserverTranslator::Context &context, const MscMessage *mscMessage) const
 {
     auto state = std::make_unique<State>();
     state->setName(m_stateNameTemplate.arg(++context.stateCounter));
 
     auto transition = std::make_unique<Transition>();
-    transition->addAction(std::make_unique<NextState>("", state.get()));
+    transition->addAction(std::make_unique<NextState>(state->name(), state.get()));
+
+    auto signalRename = std::make_unique<Rename>();
+    signalRename->setName(m_signalRenameNameTemplate.arg(context.stateCounter));
+    signalRename->setDirection(Rename::Direction::Input);
+    signalRename->setOriginalName(Escaper::escapeSdlName(mscMessage->name()));
+    signalRename->setOriginalFunctionName(Escaper::escapeSdlName(mscMessage->targetInstance()->name()));
 
     auto input = std::make_unique<Input>();
-    input->setName(Escaper::escapeSdlName(mscEvent->name()));
+    input->setName(signalRename->name());
     input->setTransition(transition.get());
 
     context.lastState->addInput(std::move(input));
@@ -137,6 +122,60 @@ void NeverObserverTranslator::handleMessageEvent(
     context.stateMachine->addState(std::move(state));
     context.stateMachine->addTransition(std::move(transition));
     context.stateMachine->addTransition(std::move(returnTransition));
+
+    context.signalRenames.push_back(std::move(signalRename));
+}
+
+NeverObserverTranslator::Context NeverObserverTranslator::createSdlSkeleton(const MscChart *mscChart) const
+{
+    Process process;
+    process.setName(Escaper::escapeSdlName(mscChart->name()));
+
+    auto stateMachine = std::make_unique<StateMachine>();
+    auto stateMachinePtr = stateMachine.get();
+
+    auto startState = std::make_unique<State>();
+    auto startStatePtr = startState.get();
+    startState->setName(m_stateNameTemplate.arg(0));
+    stateMachine->addState(std::move(startState));
+
+    auto startTransition = std::make_unique<Transition>();
+    startTransition->addAction(std::make_unique<NextState>("", startStatePtr));
+    process.setStartTransition(std::move(startTransition));
+
+    process.setStateMachine(std::move(stateMachine));
+
+    auto eventMonitorVariable = std::make_unique<VariableDeclaration>("event", "Observable_Event", true);
+    process.addVariable(std::move(eventMonitorVariable));
+
+    Context context;
+    context.process = std::move(process);
+    context.stateMachine = stateMachinePtr;
+    context.startState = startStatePtr;
+    context.lastState = startStatePtr;
+    context.stateCounter = 0;
+
+    return context;
+}
+
+System NeverObserverTranslator::createSdlSystem(NeverObserverTranslator::Context &context) const
+{
+    const auto processName = context.process.name();
+
+    Block block(processName);
+    block.setProcess(std::move(context.process));
+
+    System system(processName);
+    system.addFreeformText("use datamodel comment 'observer.asn'");
+    system.setBlock(std::move(block));
+
+    for (auto &signalRename : context.signalRenames) {
+        system.addSignal(std::move(signalRename));
+    }
+
+    system.createRoutes("c", "r");
+
+    return system;
 }
 
 } // namespace conversion::sdl::translator

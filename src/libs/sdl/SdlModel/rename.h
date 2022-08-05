@@ -38,6 +38,10 @@ public:
 
 public:
     /**
+     * @brief   Default constructor
+     */
+    Rename() = default;
+    /**
      * @brief   Constructor
      *
      * @param   name        Signal name

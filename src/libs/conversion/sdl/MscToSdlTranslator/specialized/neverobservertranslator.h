@@ -21,8 +21,11 @@
 
 #include "observertype.h"
 
+#include <memory>
 #include <msccore/mscchart.h>
+#include <sdl/SdlModel/rename.h>
 #include <sdl/SdlModel/sdlmodel.h>
+#include <vector>
 
 namespace conversion::sdl::translator {
 
@@ -42,21 +45,24 @@ public:
 
 private:
     struct Context {
-        QString processName;
+        ::sdl::Process process;
         ::sdl::StateMachine *stateMachine;
         ::sdl::State *startState;
         ::sdl::State *lastState;
+        std::vector<std::unique_ptr<::sdl::Rename>> signalRenames;
         std::size_t stateCounter;
     };
 
 private:
-    auto createSdlSkeleton(const msc::MscChart *mscChart) const -> Context;
-
     auto handleEvent(NeverObserverTranslator::Context &context, const msc::MscInstanceEvent *mscEvent) const -> void;
-    auto handleMessageEvent(NeverObserverTranslator::Context &context, const msc::MscMessage *mscEvent) const -> void;
+    auto handleMessageEvent(NeverObserverTranslator::Context &context, const msc::MscMessage *mscMessage) const -> void;
+
+    auto createSdlSkeleton(const msc::MscChart *mscChart) const -> Context;
+    auto createSdlSystem(NeverObserverTranslator::Context &context) const -> ::sdl::System;
 
 private:
     inline static const QString m_stateNameTemplate = "s%1";
+    inline static const QString m_signalRenameNameTemplate = "sig%1";
 
     ::sdl::SdlModel *m_sdlModel;
 };
