@@ -73,7 +73,7 @@ void tst_datareconstructor::testNominal() const
     const auto asn1Model = ModelLoader::loadAsn1Model(asn1Filepath);
 
     const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
-        { "INTEGER", 4, 4 },
+        { "INTEGER", 8, 0 },
         { "BOOLEAN", 1, 7 },
         { "REAL", 8, 0 },
     };

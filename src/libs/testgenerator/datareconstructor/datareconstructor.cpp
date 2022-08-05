@@ -49,7 +49,7 @@ QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(const QByteArra
             const int paddingLength = typeLayoutInfos.value(type->typeName()).second;
             const int variableLength = dataLength + paddingLength;
 
-            QByteArray rawVariable = rawData.mid(i, variableLength);
+            QByteArray rawVariable = rawData.mid(i, dataLength);
             i += variableLength;
 
             if (endianness == QDataStream::BigEndian) {

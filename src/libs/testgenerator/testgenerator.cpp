@@ -263,7 +263,9 @@ auto TestGenerator::runTests(IVInterface &interface, Asn1Model &asn1Model, const
         qCritical() << "Error while getting raw test results (runtime error): " << e.what();
     }
 
+    constexpr int LOGGED_DATA_SIZE = 100;
     qDebug() << "Raw test data size: " << rawTestData.size();
+    qDebug() << "Raw test data (first 100 bytes): " << rawTestData.left(LOGGED_DATA_SIZE);
 
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
             rawTestData, &interface, &asn1Model, launchConfig.endianess, launchConfig.typeLayoutInfos);
