@@ -21,10 +21,16 @@
 
 #include "archetype/comboboxdelegate.h"
 #include "archetypes/archetypemodel.h"
+#include "archetypes/archetypeobject.h"
+#include "archetypes/functionarchetype.h"
+#include "archetypes/interfacearchetype.h"
+#include "archetypes/parameterarchetype.h"
 #include "archetypeswidgetmodel.h"
 #include "commands/cmdfunctionarchetypesapply.h"
+#include "commands/cmdinterfaceitemcreate.h"
 #include "ivarchetypereference.h"
 #include "ivfunctiontype.h"
+#include "ivinterface.h"
 #include "ivmodel.h"
 #include "ui_archetypeswidget.h"
 
@@ -91,9 +97,32 @@ void ArchetypesWidget::applyArchetypes()
         return;
     }
 
-    auto cmd = new cmd::CmdFunctionArchetypesApply(
-            m_model->getFunction(), m_model->getArchetypeReferences(), m_archetypeModel);
-    m_cmdMacro->push(cmd);
+    auto command = new cmd::CmdFunctionArchetypesApply(m_model->getFunction(), m_model->getArchetypeReferences());
+    m_cmdMacro->push(command);
+
+    for (auto reference : m_model->getArchetypeReferences()) {
+
+        ivm::ArchetypeObject *archetypeObject = m_archetypeModel->getObjectByName(
+                reference->getFunctionName(), ivm::ArchetypeObject::Type::FunctionArchetype);
+        ivm::FunctionArchetype *functionArchetype = archetypeObject->as<ivm::FunctionArchetype *>();
+
+        if (!functionArchetype) {
+            continue;
+        }
+
+        for (auto interface : functionArchetype->getInterfaces()) {
+            if (m_model->getFunction()->hasInterface(interface->title())) {
+                qWarning() << Q_FUNC_INFO << "Function" << m_model->getFunction()->title()
+                           << "already has an interface named" << interface->title();
+                continue;
+            }
+
+            ivm::IVInterface::CreationInfo creationInfo = generateCreationInfo(interface);
+
+            auto command = new cmd::CmdInterfaceItemCreate(creationInfo);
+            m_cmdMacro->push(command);
+        }
+    }
 }
 
 bool ArchetypesWidget::checkReferences()
@@ -123,6 +152,71 @@ bool ArchetypesWidget::checkReferences()
     }
 
     return true;
+}
+
+ivm::IVInterface::CreationInfo ArchetypesWidget::generateCreationInfo(ivm::InterfaceArchetype *interfaceArchetype)
+{
+    ivm::IVInterface::CreationInfo creationInfo;
+
+    switch (interfaceArchetype->getInterfaceType()) {
+    case ivm::InterfaceArchetype::InterfaceType::PROVIDED:
+        creationInfo.type = ivm::IVInterface::InterfaceType::Provided;
+        break;
+    case ivm::InterfaceArchetype::InterfaceType::REQUIRED:
+        creationInfo.type = ivm::IVInterface::InterfaceType::Required;
+        break;
+    }
+
+    switch (interfaceArchetype->getOperationKind()) {
+    case ivm::InterfaceArchetype::OperationKind::CYCLIC:
+        creationInfo.kind = ivm::IVInterface::OperationKind::Cyclic;
+        break;
+    case ivm::InterfaceArchetype::OperationKind::SPORADIC:
+        creationInfo.kind = ivm::IVInterface::OperationKind::Sporadic;
+        break;
+    case ivm::InterfaceArchetype::OperationKind::PROTECTED:
+        creationInfo.kind = ivm::IVInterface::OperationKind::Protected;
+        break;
+    case ivm::InterfaceArchetype::OperationKind::UNPROTECTED:
+        creationInfo.kind = ivm::IVInterface::OperationKind::Unprotected;
+        break;
+    }
+
+    ivm::IVConnectionLayerType *layer = new ivm::IVConnectionLayerType();
+    layer->rename(interfaceArchetype->getLayer());
+
+    creationInfo.parameters = generateInterfaceParameters(interfaceArchetype->getParameters());
+    creationInfo.layer = layer;
+    creationInfo.function = m_model->getFunction();
+    creationInfo.model = m_model->getFunction()->model();
+    creationInfo.name = interfaceArchetype->title();
+
+    return creationInfo;
+}
+
+QVector<shared::InterfaceParameter> ArchetypesWidget::generateInterfaceParameters(
+        QVector<ivm::ParameterArchetype *> parameters)
+{
+    QVector<shared::InterfaceParameter> resultParameters;
+
+    for (auto archetypeParameter : parameters) {
+        shared::InterfaceParameter::Direction parameterDirection;
+        switch (archetypeParameter->getDirection()) {
+        case ivm::ParameterArchetype::ParameterDirection::IN:
+            parameterDirection = shared::InterfaceParameter::Direction::IN;
+            break;
+        case ivm::ParameterArchetype::ParameterDirection::OUT:
+            parameterDirection = shared::InterfaceParameter::Direction::OUT;
+            break;
+        }
+
+        shared::InterfaceParameter parameter(archetypeParameter->title(), shared::BasicParameter::Type::Other,
+                archetypeParameter->getType(), QObject::tr("NATIVE"), parameterDirection);
+
+        resultParameters.append(parameter);
+    }
+
+    return resultParameters;
 }
 
 } // namespace ive

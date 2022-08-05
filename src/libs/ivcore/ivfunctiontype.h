@@ -60,6 +60,7 @@ public:
     QVector<IVInterface *> pis() const;
     QVector<IVInterfaceGroup *> interfaceGroups() const;
     QVector<IVArchetypeReference *> archetypeReferences() const;
+    void setArchetypeReferences(QVector<IVArchetypeReference *> references);
     bool hasNestedChildren() const;
     bool hasInterface(const QString &name, Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
 
@@ -73,8 +74,6 @@ public:
     QVector<QPointer<IVFunction>> instances() const;
     void rememberInstance(IVFunction *function);
     void forgetInstance(IVFunction *function);
-
-    void applyArchetypes(QVector<IVArchetypeReference *> references, ivm::ArchetypeModel *archetypeModel);
 
 Q_SIGNALS:
     void contextParamsChanged();

@@ -38,8 +38,7 @@ class CmdFunctionArchetypesApply : public shared::UndoCommand
 {
     Q_OBJECT
 public:
-    explicit CmdFunctionArchetypesApply(ivm::IVFunctionType *function, QVector<ivm::IVArchetypeReference *> references,
-            ivm::ArchetypeModel *archetypeModel);
+    explicit CmdFunctionArchetypesApply(ivm::IVFunctionType *function, QVector<ivm::IVArchetypeReference *> references);
 
     void redo() override;
     void undo() override;

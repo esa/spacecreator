@@ -19,21 +19,20 @@
 
 #include "cmdfunctionarchetypesapply.h"
 
-#include "commandids.h"
-#include "ivfunctiontype.h"
-#include "ivarchetypereference.h"
 #include "archetypes/archetypemodel.h"
+#include "commandids.h"
+#include "ivarchetypereference.h"
+#include "ivfunctiontype.h"
 
 namespace ive {
 namespace cmd {
 
-CmdFunctionArchetypesApply::CmdFunctionArchetypesApply(ivm::IVFunctionType *function,
-        QVector<ivm::IVArchetypeReference *> references, ivm::ArchetypeModel *archetypeModel)
+CmdFunctionArchetypesApply::CmdFunctionArchetypesApply(
+        ivm::IVFunctionType *function, QVector<ivm::IVArchetypeReference *> references)
     : shared::UndoCommand()
     , m_function(function)
     , m_newReferences(references)
     , m_oldReferences(function->archetypeReferences())
-    , m_archetypeModel(archetypeModel)
 {
     Q_ASSERT(m_function);
     Q_ASSERT(m_archetypeModel);
@@ -42,14 +41,14 @@ CmdFunctionArchetypesApply::CmdFunctionArchetypesApply(ivm::IVFunctionType *func
 void CmdFunctionArchetypesApply::redo()
 {
     if (m_function) {
-        m_function->applyArchetypes(m_newReferences, m_archetypeModel);
+        m_function->setArchetypeReferences(m_newReferences);
     }
 }
 
 void CmdFunctionArchetypesApply::undo()
 {
     if (m_function) {
-        m_function->applyArchetypes(m_oldReferences, m_archetypeModel);
+        m_function->setArchetypeReferences(m_oldReferences);
     }
 }
 
