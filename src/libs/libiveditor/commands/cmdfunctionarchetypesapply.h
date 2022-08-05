@@ -19,47 +19,38 @@
 
 #pragma once
 
-#include "commandsstack.h"
+#include "entityattribute.h"
+#include "undocommand.h"
 
-#include <QWidget>
+#include <QPointer>
+#include <QVector>
 
 namespace ivm {
-class AbstractSystemChecks;
 class IVFunctionType;
+class IVArchetypeReference;
 class ArchetypeModel;
 }
 
-namespace Ui {
-class ArchetypesWidget;
-}
-
 namespace ive {
-class ArchetypesWidgetModel;
+namespace cmd {
 
-/*!
-   UI to select the archetype(s) for functions
- */
-class ArchetypesWidget : public QWidget
+class CmdFunctionArchetypesApply : public shared::UndoCommand
 {
     Q_OBJECT
-
 public:
-    explicit ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVFunctionType *function, ivm::AbstractSystemChecks *checks,
-            cmd::CommandsStack::Macro *macro, QWidget *parent = nullptr);
-    ~ArchetypesWidget();
+    explicit CmdFunctionArchetypesApply(ivm::IVFunctionType *function, QVector<ivm::IVArchetypeReference *> references,
+            ivm::ArchetypeModel *archetypeModel);
 
-    void addArchetype();
-    void deleteArchetype();
-    void applyArchetypes();
-
-private:
-    bool checkReferences();
+    void redo() override;
+    void undo() override;
+    int id() const override;
 
 private:
-    Ui::ArchetypesWidget *ui;
-    ArchetypesWidgetModel *m_model = nullptr;
-    ivm::ArchetypeModel *m_archetypeModel = nullptr;
-    shared::cmd::CommandsStackBase::Macro *m_cmdMacro = nullptr;
+    QPointer<ivm::IVFunctionType> m_function;
+    QVector<ivm::IVArchetypeReference *> m_newReferences;
+    QVector<ivm::IVArchetypeReference *> m_oldReferences;
+    QPointer<ivm::ArchetypeModel> m_archetypeModel;
 };
 
+} // namespace cmd
 } // namespace ive

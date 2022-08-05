@@ -20,11 +20,6 @@
 #include "archetypeswidgetmodel.h"
 
 #include "archetypes/archetypemodel.h"
-#include "commands/cmdfunctionattrchange.h"
-#include "commands/cmdfunctionimplementationdefaultchange.h"
-#include "commands/cmdfunctionimplementationinsert.h"
-#include "commands/cmdfunctionimplementationremove.h"
-#include "commands/cmdfunctionimplementationupdate.h"
 #include "ivarchetypereference.h"
 #include "ivcore/abstractsystemchecks.h"
 #include "ivfunctiontype.h"
@@ -193,11 +188,7 @@ bool ArchetypesWidgetModel::insertRows(int row, int count, const QModelIndex &pa
         const QString firstLibraryName = m_archetypeModel->getLibrariesNames().first();
 
         reference->setLibraryName(firstLibraryName);
-
-        if(!m_archetypeModel->getFunctionsNamesByLibraryName(firstLibraryName).isEmpty())
-        {
-            reference->setFunctionName(m_archetypeModel->getFunctionsNamesByLibraryName(firstLibraryName).first());
-        }
+        reference->setFunctionName(QString());
 
         m_archetypeReferences.append(reference);
 

@@ -22,6 +22,7 @@
 #include "archetype/comboboxdelegate.h"
 #include "archetypes/archetypemodel.h"
 #include "archetypeswidgetmodel.h"
+#include "commands/cmdfunctionarchetypesapply.h"
 #include "ivarchetypereference.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"
@@ -38,6 +39,7 @@ ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVF
     : QWidget(parent)
     , ui(new Ui::ArchetypesWidget)
     , m_archetypeModel(archetypeModel)
+    , m_cmdMacro(macro)
 {
     Q_ASSERT(function && function->model());
     ui->setupUi(this);
@@ -89,7 +91,9 @@ void ArchetypesWidget::applyArchetypes()
         return;
     }
 
-    m_model->getFunction()->applyArchetypes(m_model->getArchetypeReferences(), m_archetypeModel);
+    auto cmd = new cmd::CmdFunctionArchetypesApply(
+            m_model->getFunction(), m_model->getArchetypeReferences(), m_archetypeModel);
+    m_cmdMacro->push(cmd);
 }
 
 bool ArchetypesWidget::checkReferences()

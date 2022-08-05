@@ -32,6 +32,8 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdentitiesinstantiate.h
     commands/cmdentitiesremove.cpp
     commands/cmdentitiesremove.h
+    commands/cmdfunctionarchetypesapply.cpp
+    commands/cmdfunctionarchetypesapply.h
     commands/cmdfunctionattrchange.cpp
     commands/cmdfunctionattrchange.h
     commands/cmdfunctionimplementationdefaultchange.cpp
