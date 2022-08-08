@@ -139,7 +139,8 @@ void IVItemModel::onObjectAdded(shared::Id objectId)
     }
 
     if (object->type() == ivm::IVObject::Type::InterfaceGroup
-            || object->type() == ivm::IVObject::Type::ArchetypeLibraryReference) {
+            || object->type() == ivm::IVObject::Type::ArchetypeLibraryReference
+            || object->type() == ivm::IVObject::Type::ArchetypeReference) {
         return;
     }
 

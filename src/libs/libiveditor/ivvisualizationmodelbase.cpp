@@ -140,7 +140,9 @@ QList<QStandardItem *> IVVisualizationModelBase::createItems(shared::VEObject *o
         return {};
     }
 
-    if (obj->type() == ivm::IVObject::Type::InterfaceGroup) {
+    if (obj->type() == ivm::IVObject::Type::InterfaceGroup
+            || obj->type() == ivm::IVObject::Type::ArchetypeLibraryReference
+            || obj->type() == ivm::IVObject::Type::ArchetypeReference) {
         return {};
     }
 
