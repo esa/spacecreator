@@ -45,6 +45,7 @@ class IVModel;
 class IVObject;
 class IVConnectionLayerType;
 class IVPropertyTemplateConfig;
+class ArchetypeObject;
 }
 
 namespace ive {
@@ -157,6 +158,9 @@ private:
     bool loadImpl(const QString &path);
     QString getComponentName(const QStringList &exportNames);
     bool loadComponentModel(ivm::IVModel *model, const QString &path);
+    void loadArchetypes();
+    void generateArchetypeLibrary(
+            QVector<ivm::ArchetypeObject *> &archetypeObjects, const QString &archetypeLibraryName);
 
     bool reloadComponentModel();
     bool reloadSharedTypeModel();

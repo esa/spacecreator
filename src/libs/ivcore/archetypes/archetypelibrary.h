@@ -17,37 +17,27 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#pragma once
+
 #include "archetypecommonprops.h"
+#include "archetypeobject.h"
+#include "functionarchetype.h"
 
 namespace ivm {
-namespace meta {
 
-const QHash<QString, ArchetypeProps::Token> ArchetypeProps::TokensByName = {
-    // tags:
-    { "ParameterArchetype", Token::ParameterArchetype },
-    { "InterfaceArchetype", Token::InterfaceArchetype },
-    { "FunctionArchetype", Token::FunctionArchetype },
-    { "ArchetypeLibrary", Token::ArchetypeLibrary },
+class ArchetypeLibrary : public ArchetypeObject
+{
+    Q_OBJECT
+public:
+    explicit ArchetypeLibrary(const QString &title, QObject *parent = nullptr);
+    ~ArchetypeLibrary() override;
 
-    // attrs:
-    { "name", Token::name },
-    { "value", Token::value },
-    { "type", Token::type },
-    { "interfaceType", Token::interfaceType },
-    { "kind", Token::kind },
-    { "direction", Token::direction },
-    { "layer", Token::layer },
+    QVector<FunctionArchetype *> getFunctions() const;
+    void addFunction(FunctionArchetype *functionArchetype);
+    void removeFunction(FunctionArchetype *functionArchetype);
+
+private:
+    QVector<FunctionArchetype *> m_functions;
 };
 
-ArchetypeProps::Token ArchetypeProps::token(const QString &fromString)
-{
-    return TokensByName.value(fromString, Token::Unknown);
-}
-
-QString ArchetypeProps::token(ArchetypeProps::Token tag)
-{
-    return TokensByName.key(tag);
-}
-
-}
 }

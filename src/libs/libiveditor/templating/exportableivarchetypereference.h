@@ -17,28 +17,32 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "exportableivconnectionlayertype.h"
+#pragma once
 
-#include "exportableproperty.h"
-#include "ivcomment.h"
-#include "ivconnection.h"
-#include "ivconnectiongroup.h"
-#include "ivfunction.h"
-#include "ivfunctiontype.h"
-#include "ivinterface.h"
-#include "ivinterfacechain.h"
-#include "ivmodel.h"
+#include "exportableivobject.h"
+
+namespace ivm {
+class IVArchetypeReference;
+}
 
 namespace ive {
 
-ExportableIVConnectionLayerType::ExportableIVConnectionLayerType(const ivm::IVConnectionLayerType *layer)
-    : ExportableIVObject(layer)
+/**
+ * @brief The IVArchetypeReference is a class to export IVArchetypeReference
+ */
+class ExportableIVArchetypeReference : public ExportableIVObject
 {
+    Q_GADGET
+    Q_PROPERTY(QString archetypeLibrary READ archetypeLibraryName)
+    Q_PROPERTY(QString archetypeFunction READ archetypeFunctionName)
+
+public:
+    explicit ExportableIVArchetypeReference(const ivm::IVArchetypeReference *archetypeReference = nullptr);
+    QString archetypeLibraryName() const;
+    QString archetypeFunctionName() const;
+};
+
 }
 
-QString ExportableIVConnectionLayerType::connectionLayerName() const
-{
-    return exportedObject<ivm::IVConnectionLayerType>()->title();
-}
-
-}
+Q_DECLARE_METATYPE(ive::ExportableIVArchetypeReference)
+Q_DECLARE_TYPEINFO(ive::ExportableIVArchetypeReference, Q_MOVABLE_TYPE);

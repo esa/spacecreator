@@ -49,7 +49,9 @@ public:
         Comment,
         Connection,
         ConnectionGroup,
-        ConnectionLayer
+        ConnectionLayer,
+        ArchetypeReference,
+        ArchetypeLibraryReference,
     };
     Q_ENUM(Type)
 

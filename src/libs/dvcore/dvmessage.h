@@ -38,6 +38,8 @@ class DVMessage : public DVObject
     Q_PROPERTY(QStringList toFunctionPath READ toFunctionPath)
     Q_PROPERTY(QString toInterface READ toInterface WRITE setToInterface)
     Q_PROPERTY(dvm::DVNode *toNode READ toNode)
+    Q_PROPERTY(QString resolvedTargetFunction READ resolvedTargetFunction)
+    Q_PROPERTY(QString resolvedTargetInterface READ resolvedTargetInterface)
 
 public:
     explicit DVMessage(QObject *parent = nullptr);
@@ -64,8 +66,12 @@ public:
 
     DVNode *toNode() const;
 
+    QString resolvedTargetFunction() const;
+    QString resolvedTargetInterface() const;
+
 private:
     QStringList pathOfFunction(const QString &functionName, DVNode *node) const;
+    DVModel *getModel() const;
 };
 
 } // namespace dvm

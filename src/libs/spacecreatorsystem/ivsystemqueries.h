@@ -48,7 +48,7 @@ public:
     QStringList functionsNames() const override;
     QStringList pseudoFunctionsNames() const override;
     QList<ivm::IVFunction *> connectedPseudoFunctions(const QString &functionName) const;
-    ivm::IVFunction *functionByName(const QString &functionName) const;
+    ivm::IVFunction *functionByName(const QString &functionName) const override;
     QList<ivm::IVFunction *> connectedProtectedFunctions(const QString &functionName) const;
     QStringList connectedProtectedFunctionNames(const QString &functionName) const override;
 
@@ -62,6 +62,11 @@ public:
     QStringList implementationsForFunction(const QString &function) const override;
 
     QStringList functionPath(const QString &function) const override;
+
+    QString resolvedTargetFunction(const QString &sourceFunction, const QString &sourceInterface,
+            const QString &targetFunction, const QString &targetInterface) const override;
+    QString resolvedTargetInterface(const QString &sourceFunction, const QString &sourceInterface,
+            const QString &targetFunction, const QString &targetInterface) const override;
 
     ivm::IVModel *ivModel() const;
 

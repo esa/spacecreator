@@ -18,10 +18,13 @@
 #include "../common/xmldatahelper.h"
 #include "asn1modelstorage.h"
 #include "interfacedocument.h"
+#include "ivarchetypelibraryreference.h"
+#include "ivarchetypereference.h"
 #include "ivcomment.h"
 #include "iveditor.h"
 #include "ivexporter.h"
 #include "ivfunction.h"
+#include "ivfunctiontype.h"
 #include "ivlibrary.h"
 #include "ivtestutils.h"
 #include "parameter.h"
@@ -49,6 +52,9 @@ private Q_SLOTS:
     void testExportComment();
     void testExportNestedComment();
     void testExportLayer();
+    void testExportArchetypeLibraryReference();
+    void testExportArchetypeReferenceInFunction();
+    void testExportArchetypeReferenceInFunctionType();
     void testExportAsn1File();
     void testExportToBuffer();
 };
@@ -177,6 +183,75 @@ void tst_XmlDocExporter::testExportLayer()
     const QByteArray expected = R"(<?xml version="1.0"?>
                                    <InterfaceView>
                                    <Layer name="TestLayer"/>
+                                   </InterfaceView>)";
+    QVERIFY(XmlData(expected) == XmlData(text));
+}
+
+void tst_XmlDocExporter::testExportArchetypeLibraryReference()
+{
+    QString libraryName = QString("SomeLibraryName");
+    QString libraryPath = QString("SomeLibraryPath.xml");
+    auto testReference = ivm::testutils::createArchetypeLibraryReference(libraryName, libraryPath, m_doc.get());
+
+    QVector<ivm::IVObject *> objects;
+    objects.append(testReference);
+    m_doc->setObjects(objects);
+
+    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
+    const QByteArray text = testFileContent();
+    const QByteArray expected = R"(<?xml version="1.0"?>
+                                   <InterfaceView>
+                                   <ArchetypeLibraryReference archetype_library="SomeLibraryName" path="SomeLibraryPath.xml"/>
+                                   </InterfaceView>)";
+    QVERIFY(XmlData(expected) == XmlData(text));
+}
+
+void tst_XmlDocExporter::testExportArchetypeReferenceInFunction()
+{
+    auto testfunc = ivm::testutils::createFunction("TestFunc", m_doc.get());
+    testfunc->setEntityAttribute(QLatin1String("instance_of"), QString());
+    QString libraryName = QString("SomeLibraryName");
+    QString functionName = QString("SomeFunctionName");
+    auto testReference = ivm::testutils::createArchetypeReference(libraryName, functionName, m_doc.get());
+    testfunc->addChild(testReference);
+
+    QVector<ivm::IVObject *> objects;
+    objects.append(testfunc);
+    m_doc->setObjects(objects);
+
+    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
+    const QByteArray text = testFileContent();
+    const QByteArray expected = R"(<?xml version="1.0"?>
+                                   <InterfaceView>
+                                   <Function name="TestFunc" is_type="NO" instance_of="" language="SDL" default_implementation="default">
+                                       <Implementations>
+                                           <Implementation name="default" language="SDL"/>
+                                       </Implementations>
+                                       <ArchetypeReference archetype_library="SomeLibraryName" archetype_function="SomeFunctionName"/>
+                                   </Function>
+                                   </InterfaceView>)";
+    QVERIFY(XmlData(expected) == XmlData(text));
+}
+
+void tst_XmlDocExporter::testExportArchetypeReferenceInFunctionType()
+{
+    auto testfunc = ivm::testutils::createFunctionType("TestFunc", m_doc.get());
+    QString libraryName = QString("SomeLibraryName");
+    QString functionName = QString("SomeFunctionName");
+    auto testReference = ivm::testutils::createArchetypeReference(libraryName, functionName, m_doc.get());
+    testfunc->addChild(testReference);
+
+    QVector<ivm::IVObject *> objects;
+    objects.append(testfunc);
+    m_doc->setObjects(objects);
+
+    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
+    const QByteArray text = testFileContent();
+    const QByteArray expected = R"(<?xml version="1.0"?>
+                                   <InterfaceView>
+                                   <Function name="TestFunc" type_language="SDL" is_type="YES">
+                                       <ArchetypeReference archetype_library="SomeLibraryName" archetype_function="SomeFunctionName"/>
+                                   </Function>
                                    </InterfaceView>)";
     QVERIFY(XmlData(expected) == XmlData(text));
 }

@@ -117,13 +117,21 @@ bool SdlToPromelaConverter::convertObserverSdl(
     return waitForSdl2PromelaProcess(process);
 }
 
-bool SdlToPromelaConverter::convertStopCondition(const QFileInfo &inputFile, const QFileInfo &outputFile,
-        const std::map<QString, ProcessMetadata> &inputSdlFiles)
+bool SdlToPromelaConverter::convertStopConditions(const QList<QFileInfo> &inputFiles, const QFileInfo &outputFile,
+        const std::map<QString, ProcessMetadata> &inputSdlFiles, bool includeObservers)
 {
-    qDebug() << "Converting Stop Conditions file: " << inputFile.absoluteFilePath() << " to "
-             << outputFile.absoluteFilePath();
-    QStringList arguments = QStringList()
-            << "--scl" << inputFile.absoluteFilePath() << "-o" << outputFile.absoluteFilePath();
+    QStringList arguments;
+    for (const auto &inputFile : inputFiles) {
+        qDebug() << "Converting Stop Conditions file: " << inputFile.absoluteFilePath() << " to "
+                 << outputFile.absoluteFilePath();
+        arguments << "--scl" << inputFile.absoluteFilePath();
+    }
+
+    arguments << "-o" << outputFile.absoluteFilePath();
+
+    if (includeObservers) {
+        arguments << "--os";
+    }
 
     for (const auto &iter : inputSdlFiles) {
         arguments.append("--sdl");

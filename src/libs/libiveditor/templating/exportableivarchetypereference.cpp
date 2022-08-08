@@ -17,28 +17,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "exportableivconnectionlayertype.h"
-
+#include "exportableivarchetypereference.h"
 #include "exportableproperty.h"
-#include "ivcomment.h"
-#include "ivconnection.h"
-#include "ivconnectiongroup.h"
-#include "ivfunction.h"
-#include "ivfunctiontype.h"
-#include "ivinterface.h"
-#include "ivinterfacechain.h"
-#include "ivmodel.h"
+#include "ivarchetypereference.h"
+
 
 namespace ive {
 
-ExportableIVConnectionLayerType::ExportableIVConnectionLayerType(const ivm::IVConnectionLayerType *layer)
-    : ExportableIVObject(layer)
+ExportableIVArchetypeReference::ExportableIVArchetypeReference(const ivm::IVArchetypeReference *archetypeReference)
+    : ExportableIVObject(archetypeReference)
 {
 }
 
-QString ExportableIVConnectionLayerType::connectionLayerName() const
+QString ExportableIVArchetypeReference::archetypeLibraryName() const
 {
-    return exportedObject<ivm::IVConnectionLayerType>()->title();
+    return exportedObject<ivm::IVArchetypeReference>()->getLibraryName();
+}
+
+QString ExportableIVArchetypeReference::archetypeFunctionName() const
+{
+    return exportedObject<ivm::IVArchetypeReference>()->getFunctionName();
 }
 
 }

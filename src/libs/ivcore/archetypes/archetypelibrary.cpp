@@ -17,28 +17,37 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "exportableivconnectionlayertype.h"
+#include "archetypelibrary.h"
 
-#include "exportableproperty.h"
-#include "ivcomment.h"
-#include "ivconnection.h"
-#include "ivconnectiongroup.h"
-#include "ivfunction.h"
-#include "ivfunctiontype.h"
-#include "ivinterface.h"
-#include "ivinterfacechain.h"
-#include "ivmodel.h"
+namespace ivm {
 
-namespace ive {
-
-ExportableIVConnectionLayerType::ExportableIVConnectionLayerType(const ivm::IVConnectionLayerType *layer)
-    : ExportableIVObject(layer)
+ArchetypeLibrary::ArchetypeLibrary(const QString &title, QObject *parent)
+    : ArchetypeObject(title, ArchetypeObject::Type::ArchetypeLibrary, parent)
 {
 }
 
-QString ExportableIVConnectionLayerType::connectionLayerName() const
+ArchetypeLibrary::~ArchetypeLibrary() = default;
+
+QVector<FunctionArchetype *> ArchetypeLibrary::getFunctions() const
 {
-    return exportedObject<ivm::IVConnectionLayerType>()->title();
+    return m_functions;
 }
 
+void ArchetypeLibrary::addFunction(FunctionArchetype *functionArchetype)
+{
+    if (!functionArchetype) {
+        return;
+    }
+    functionArchetype->setParentObject(this);
+    m_functions.append(functionArchetype);
+}
+
+void ArchetypeLibrary::removeFunction(FunctionArchetype *functionArchetype)
+{
+    if (!functionArchetype) {
+        return;
+    }
+    functionArchetype->setParentObject(nullptr);
+    m_functions.removeAll(functionArchetype);
+}
 }
