@@ -1,0 +1,48 @@
+<InterfaceView asn1file="FunctionTesterExample.acn">
+<Function name="QGenHost" is_type="NO" language="QGenC" default_implementation="default" FPGA_Configurations="" startup_priority="1">
+    <Property name="Taste::coordinates" value="59300 28100 79300 36100"/>
+<Provided_Interface name="Calculate" kind="Protected" layer="default" wcet="0">
+    <Input_Parameter name="intparam" type="MyInteger" encoding="NATIVE"/>
+    <Input_Parameter name="realparam" type="MyReal" encoding="NATIVE"/>
+    <Input_Parameter name="boolparam" type="MyBool" encoding="NATIVE"/>
+    <Output_Parameter name="outparam" type="MyReal" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="59300 30100"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="QGenC"/>
+    </Implementations>
+</Function>
+
+<Function name="Controller" is_type="NO" language="C" default_implementation="default" FPGA_Configurations="" startup_priority="1">
+    <Property name="Taste::coordinates" value="24600 30900 44600 38900"/>
+<Provided_Interface name="Trigger" kind="Cyclic" layer="default" wcet="0" stack_size="1024" priority="1">
+    <Property name="Taste::coordinates" value="39300 35700"/>
+</Provided_Interface>
+
+<Required_Interface name="Calculate" kind="Protected" layer="default" wcet="0">
+    <Input_Parameter name="intparam" type="MyInteger" encoding="NATIVE"/>
+    <Input_Parameter name="realparam" type="MyReal" encoding="NATIVE"/>
+    <Input_Parameter name="boolparam" type="MyBool" encoding="NATIVE"/>
+    <Output_Parameter name="outparam" type="MyReal" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="44600 33700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Connection >
+    <Source func_name="Controller" ri_name="Calculate"/>
+    <Target func_name="QGenHost" pi_name="Calculate"/>
+    <Property name="Taste::coordinates" value="45200 33700 52100 33700 52100 30100 59000 30100"/>
+</Connection>
+
+<Comment name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3">
+    <Property name="Taste::coordinates" value="4800 5100 46100 20700"/>
+</Comment>
+
+</InterfaceView>

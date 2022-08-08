@@ -1,0 +1,23 @@
+#  node_linux x86_linux  PLATFORM_NATIVE ocarina_processors_x86::x86.linux
+all:	debug
+
+simulate:
+	# Configure gprbuild to use GCC toolchain even if LLVM is installed
+	gprconfig --batch --config=Ada,,default,,GNAT --config=C,,default,,GCC --config=C++,,default,,G++ || :
+
+debug:
+	# Configure gprbuild to use GCC toolchain even if LLVM is installed
+	gprconfig --batch --config=Ada,,default,,GNAT --config=C,,default,,GCC --config=C++,,default,,G++ || :
+	# In debug mode, add -v to gprbuild command for verbose output
+	gprbuild -v -p -P demo.gpr -XCFG="Debug" -cargs:C -DSTATIC=""
+
+release:
+	# Configure gprbuild to use GCC toolchain even if LLVM is installed
+	gprconfig --batch --config=Ada,,default,,GNAT --config=C,,default,,GCC --config=C++,,default,,G++ || :
+	gprbuild -p -P demo.gpr -XCFG="Release" -cargs:C -DSTATIC=""
+
+
+
+clean:
+	rm -rf demo_obj
+

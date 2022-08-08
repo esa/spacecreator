@@ -1,0 +1,4 @@
+demo_polyorb_interface.c:8:6:vm_controller_calculate	80	dynamic,bounded
+demo_polyorb_interface.c:27:6:pro_QGenHost_Calculate	80	dynamic,bounded
+demo_polyorb_interface.c:48:6:call_controller_trigger	32	static
+demo_polyorb_interface.c:53:1:_GLOBAL__sub_I_00099_0_vm_controller_calculate	16	static

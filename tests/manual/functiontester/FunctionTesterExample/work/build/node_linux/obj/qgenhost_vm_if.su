@@ -1,0 +1,4 @@
+qgenhost_vm_if.c:13:6:init_qgenhost	32	static
+qgenhost_vm_if.c:25:6:qgenhost_Calculate	80	static
+qgenhost_vm_if.c:56:1:_GLOBAL__sub_D_00099_0_qgenhost_initialized	16	static
+qgenhost_vm_if.c:56:1:_GLOBAL__sub_I_00099_1_qgenhost_initialized	16	static

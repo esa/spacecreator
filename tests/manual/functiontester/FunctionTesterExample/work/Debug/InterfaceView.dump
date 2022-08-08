@@ -1,0 +1,109 @@
+Function Controller in context _Root
+├─ Full Prefix : (none)
+├─ Language    : c
+├─ Zip file    : (none)
+├─ Is type     : FALSE
+├─ Instance of : 
+├─ Context Parameters :
+├─ Directives:
+├─ Simulink Tuneable Parameters:
+├─ Implementations:
+├─ User properties:
+├─ Timers:
+├─ Provided interfaces:
+│  └─ Name : Trigger - in FV: Controller
+│     ├─ RCM Kind    : CYCLIC_OPERATION
+│     ├─ Period/MIAT :  1000
+│     ├─ WCET (ms)   :  0
+│     ├─ Queue Size  :  1
+│     ├─ Parameters  :
+│     └─ Connections :
+└─ Required interfaces:
+   └─ Name : Calculate - in FV: Controller
+      ├─ RCM Kind    : PROTECTED_OPERATION
+      ├─ Period/MIAT :  0
+      ├─ WCET (ms)   :  0
+      ├─ Queue Size  :  1
+      ├─ Parameters  :
+      │  ├─ Name            : intparam
+      │  │  ├─ Type         : MyInteger
+      │  │  ├─ ASN.1 Module : FUNCTIONTESTEREXAMPLE_DATAVIEW
+      │  │  ├─ ASN.1 File   : FunctionTesterExample.asn
+      │  │  ├─ Basic type   : ASN1_INTEGER
+      │  │  ├─ Encoding     : NATIVE
+      │  │  └─ Direction    : PARAM_IN
+      │  ├─ Name            : realparam
+      │  │  ├─ Type         : MyReal
+      │  │  ├─ ASN.1 Module : FUNCTIONTESTEREXAMPLE_DATAVIEW
+      │  │  ├─ ASN.1 File   : FunctionTesterExample.asn
+      │  │  ├─ Basic type   : ASN1_REAL
+      │  │  ├─ Encoding     : NATIVE
+      │  │  └─ Direction    : PARAM_IN
+      │  ├─ Name            : boolparam
+      │  │  ├─ Type         : MyBool
+      │  │  ├─ ASN.1 Module : FUNCTIONTESTEREXAMPLE_DATAVIEW
+      │  │  ├─ ASN.1 File   : FunctionTesterExample.asn
+      │  │  ├─ Basic type   : ASN1_BOOLEAN
+      │  │  ├─ Encoding     : NATIVE
+      │  │  └─ Direction    : PARAM_IN
+      │  ├─ Name            : outparam
+      │  │  ├─ Type         : MyReal
+      │  │  ├─ ASN.1 Module : FUNCTIONTESTEREXAMPLE_DATAVIEW
+      │  │  ├─ ASN.1 File   : FunctionTesterExample.asn
+      │  │  ├─ Basic type   : ASN1_REAL
+      │  │  ├─ Encoding     : NATIVE
+      │  │  └─ Direction    : PARAM_OUT
+      └─ Connections :
+         └─ Function QGenHost, interface Calculate
+
+Function QGenHost in context _Root
+├─ Full Prefix : (none)
+├─ Language    : qgenc
+├─ Zip file    : (none)
+├─ Is type     : FALSE
+├─ Instance of : 
+├─ Context Parameters :
+├─ Directives:
+├─ Simulink Tuneable Parameters:
+├─ Implementations:
+├─ User properties:
+├─ Timers:
+├─ Provided interfaces:
+│  └─ Name : Calculate - in FV: QGenHost
+│     ├─ RCM Kind    : PROTECTED_OPERATION
+│     ├─ Period/MIAT :  0
+│     ├─ WCET (ms)   :  0
+│     ├─ Queue Size  :  1
+│     ├─ Parameters  :
+│     │  ├─ Name            : intparam
+│     │  │  ├─ Type         : MyInteger
+│     │  │  ├─ ASN.1 Module : FUNCTIONTESTEREXAMPLE_DATAVIEW
+│     │  │  ├─ ASN.1 File   : FunctionTesterExample.asn
+│     │  │  ├─ Basic type   : ASN1_INTEGER
+│     │  │  ├─ Encoding     : NATIVE
+│     │  │  └─ Direction    : PARAM_IN
+│     │  ├─ Name            : realparam
+│     │  │  ├─ Type         : MyReal
+│     │  │  ├─ ASN.1 Module : FUNCTIONTESTEREXAMPLE_DATAVIEW
+│     │  │  ├─ ASN.1 File   : FunctionTesterExample.asn
+│     │  │  ├─ Basic type   : ASN1_REAL
+│     │  │  ├─ Encoding     : NATIVE
+│     │  │  └─ Direction    : PARAM_IN
+│     │  ├─ Name            : boolparam
+│     │  │  ├─ Type         : MyBool
+│     │  │  ├─ ASN.1 Module : FUNCTIONTESTEREXAMPLE_DATAVIEW
+│     │  │  ├─ ASN.1 File   : FunctionTesterExample.asn
+│     │  │  ├─ Basic type   : ASN1_BOOLEAN
+│     │  │  ├─ Encoding     : NATIVE
+│     │  │  └─ Direction    : PARAM_IN
+│     │  ├─ Name            : outparam
+│     │  │  ├─ Type         : MyReal
+│     │  │  ├─ ASN.1 Module : FUNCTIONTESTEREXAMPLE_DATAVIEW
+│     │  │  ├─ ASN.1 File   : FunctionTesterExample.asn
+│     │  │  ├─ Basic type   : ASN1_REAL
+│     │  │  ├─ Encoding     : NATIVE
+│     │  │  └─ Direction    : PARAM_OUT
+│     └─ Connections :
+│        └─ Function Controller, interface Calculate
+└─ Required interfaces:
+

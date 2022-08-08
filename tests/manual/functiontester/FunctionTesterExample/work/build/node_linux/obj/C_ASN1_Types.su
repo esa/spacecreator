@@ -1,0 +1,7 @@
+C_ASN1_Types.c:49:5:Encode_NATIVE_MyInteger	48	static
+C_ASN1_Types.c:102:5:Decode_NATIVE_MyInteger	48	static
+C_ASN1_Types.c:151:5:Encode_NATIVE_MyReal	48	static
+C_ASN1_Types.c:204:5:Decode_NATIVE_MyReal	48	static
+C_ASN1_Types.c:253:5:Encode_NATIVE_MyBool	48	static
+C_ASN1_Types.c:306:5:Decode_NATIVE_MyBool	48	static
+C_ASN1_Types.c:313:1:_GLOBAL__sub_I_00099_0_Encode_NATIVE_MyInteger	16	static

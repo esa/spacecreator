@@ -270,8 +270,10 @@ auto TestGenerator::runTests(IVInterface &interface, Asn1Model &asn1Model, const
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
             rawTestData, &interface, &asn1Model, launchConfig.endianess, launchConfig.typeLayoutInfos);
 
-    for (const auto &readValue : readTestData) {
-        qDebug() << readValue;
+    for (int i = 0; i < readTestData.size(); i++) {
+        if (i < LOGGED_DATA_SIZE) {
+            qDebug() << readTestData[i];
+        }
     }
 
     return readTestData;

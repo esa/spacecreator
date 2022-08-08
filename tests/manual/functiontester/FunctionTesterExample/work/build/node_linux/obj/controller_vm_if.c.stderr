@@ -1,0 +1,4 @@
+[01m[K/home/taste/FunctionTesterExample/work/controller/C/wrappers/controller_vm_if.c:[m[K In function ‘[01m[Kinit_controller[m[K’:
+[01m[K/home/taste/FunctionTesterExample/work/controller/C/wrappers/controller_vm_if.c:18:17:[m[K [01;35m[Kwarning: [m[Kunused variable ‘[01m[Kunused[m[K’ [[01;35m[K-Wunused-variable[m[K]
+       long long [01;35m[Kunused[m[K = getTimeInMilliseconds();
+                 [01;35m[K^~~~~~[m[K
