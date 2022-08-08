@@ -177,9 +177,13 @@ auto TestGenerator::prepareTasteProjectSkeleton() -> bool
         qDebug() << "No files found in project directory: " + projectDirectory;
         return false;
     }
+
+    const QStringList suffixesToCopy { "asn", "acn", "modelcheck" };
+    const QStringList namesToCopy { "Makefile" };
     for (const auto &file : qFileInfoList) {
-        if (file.suffix() == "asn" || file.suffix() == "acn" || file.fileName() == "Makefile"
-                || file.fileName() == "Makefile.modelcheck") {
+        auto suffixIt = std::find(std::begin(suffixesToCopy), std::end(suffixesToCopy), file.suffix());
+        auto namesIt = std::find(std::begin(namesToCopy), std::end(namesToCopy), file.fileName());
+        if (suffixIt != std::end(suffixesToCopy) || namesIt != std::end(namesToCopy)) {
             if (!QFile::copy(file.absoluteFilePath(), generatedPath + QDir::separator() + file.fileName())) {
                 qDebug() << "Error copying file: " << file.fileName();
                 return false;
