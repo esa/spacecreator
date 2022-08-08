@@ -177,7 +177,7 @@ bool ArchetypesWidgetModel::insertRows(int row, int count, const QModelIndex &pa
     }
     if (m_archetypeModel->getLibrariesNames().isEmpty()) {
         QMessageBox::warning(qApp->activeWindow(), tr("No Archetype libraries"),
-                tr("It's not possible to set add new archetype implementations, no archetype libraries loaded"));
+                tr("It's not possible to add new archetype implementation, no archetype libraries loaded"));
         return false;
     }
 

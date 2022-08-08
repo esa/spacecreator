@@ -120,4 +120,9 @@ Ui::PropertiesDialog *PropertiesDialog::propertiesDialogUi() const
     return d->ui.get();
 }
 
+int PropertiesDialog::getTabCount() const
+{
+    return d->ui->tabWidget->count();
+}
+
 } // namespace ive

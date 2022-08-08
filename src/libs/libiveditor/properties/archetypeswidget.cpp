@@ -34,6 +34,7 @@
 #include "ivmodel.h"
 #include "ui_archetypeswidget.h"
 
+#include <QApplication>
 #include <QDebug>
 #include <QHeaderView>
 #include <QMessageBox>
@@ -76,7 +77,12 @@ ArchetypesWidget::~ArchetypesWidget()
 void ArchetypesWidget::addArchetype()
 {
     int newRow = m_model->rowCount();
-    m_model->insertRow(newRow);
+
+    if(!m_model->insertRow(newRow))
+    {
+        return;
+    }
+
     QModelIndex idx = m_model->index(newRow, ArchetypesWidgetModel::Column::LibraryName);
     ui->tableView->edit(idx);
     ui->tableView->scrollToBottom();
@@ -114,8 +120,11 @@ void ArchetypesWidget::applyArchetypes()
 
         for (auto interface : functionArchetype->getInterfaces()) {
             if (m_model->getFunction()->hasInterface(interface->title())) {
-                qWarning() << Q_FUNC_INFO << "Function" << m_model->getFunction()->title()
-                           << "already has an interface named" << interface->title();
+                QMessageBox::warning(qApp->activeWindow(), tr("Duplicate Archetype"),
+                        tr("%1 Function %2 already has an interface named %3")
+                                .arg(Q_FUNC_INFO)
+                                .arg(m_model->getFunction()->title())
+                                .arg(interface->title()));
                 continue;
             }
 
@@ -130,6 +139,10 @@ void ArchetypesWidget::applyArchetypes()
 bool ArchetypesWidget::checkReferences()
 {
     QVector<ivm::IVArchetypeReference *> references = m_model->getArchetypeReferences();
+
+    if (references.isEmpty()) {
+        return false;
+    }
 
     const bool hasDuplicates =
             std::adjacent_find(references.begin(), references.end(),

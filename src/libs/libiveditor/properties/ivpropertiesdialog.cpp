@@ -295,7 +295,7 @@ void IVPropertiesDialog::initArchetypeView()
 
     connect(propertiesDialogUi()->buttonBox, &QDialogButtonBox::accepted, archetypesWidget,
             &ive::ArchetypesWidget::applyArchetypes);
-    insertTab(archetypesWidget, tr("Archetypes"));
+    insertTab(archetypesWidget, tr("Archetypes"), getTabCount());
 }
 
 } // namespace ive

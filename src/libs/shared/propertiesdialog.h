@@ -54,6 +54,7 @@ protected:
     cmd::CommandsStackBase *commandStack() const;
     PropertyTemplateConfig *propertiesConfig() const;
     Ui::PropertiesDialog *propertiesDialogUi() const;
+    int getTabCount() const;
 
 private:
     struct PropertiesDialogPrivate;
