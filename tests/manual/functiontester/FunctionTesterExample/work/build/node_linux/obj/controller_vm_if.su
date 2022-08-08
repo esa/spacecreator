@@ -1,4 +1,0 @@
-controller_vm_if.c:14:6:init_controller	32	static
-controller_vm_if.c:32:6:controller_Trigger	32	static
-controller_vm_if.c:48:1:_GLOBAL__sub_D_00099_0_controller_initialized	16	static
-controller_vm_if.c:48:1:_GLOBAL__sub_I_00099_1_controller_initialized	16	static

@@ -1,4 +1,0 @@
-calculate.c:16:6:Calculate_initStates	32	static
-calculate.c:32:6:Calculate_comp	64	static
-calculate.c:74:6:Calculate_up	32	static
-calculate.c:81:1:_GLOBAL__sub_I_00099_0_Calculate_initStates	16	static

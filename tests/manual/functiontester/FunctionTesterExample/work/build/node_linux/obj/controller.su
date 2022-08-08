@@ -1,3 +1,0 @@
-controller.c:14:6:controller_startup	16	static
-controller.c:20:6:controller_PI_Trigger	16	static
-controller.c:23:1:_GLOBAL__sub_I_00099_0_controller_startup	16	static
