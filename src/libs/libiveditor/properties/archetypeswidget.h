@@ -61,6 +61,7 @@ private:
     bool checkReferences();
     ivm::IVInterface::CreationInfo generateCreationInfo(ivm::InterfaceArchetype *interfaceArchetype);
     QVector<shared::InterfaceParameter> generateInterfaceParameters(QVector<ivm::ParameterArchetype *> parameters);
+    void rowsInserted(const QModelIndex &parent, int first, int last);
 
 private:
     Ui::ArchetypesWidget *ui;

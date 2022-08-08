@@ -63,6 +63,9 @@ ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVF
 
     connect(ui->addButton, &QPushButton::clicked, this, &ArchetypesWidget::addArchetype);
     connect(ui->deleteButton, &QPushButton::clicked, this, &ArchetypesWidget::deleteArchetype);
+
+    connect(m_model, &ArchetypesWidgetModel::rowsInserted, this, &ArchetypesWidget::rowsInserted);
+    rowsInserted(QModelIndex(), 0, m_model->rowCount() - 1);
 }
 
 ArchetypesWidget::~ArchetypesWidget()
@@ -216,6 +219,16 @@ QVector<shared::InterfaceParameter> ArchetypesWidget::generateInterfaceParameter
     }
 
     return resultParameters;
+}
+
+void ArchetypesWidget::rowsInserted(const QModelIndex &parent, int first, int last)
+{
+    for (int i = first; i <= last; ++i) {
+        const QModelIndex functionIndex = m_model->index(i, ArchetypesWidgetModel::Column::FunctionName, parent);
+        if (functionIndex.isValid()) {
+            ui->tableView->openPersistentEditor(functionIndex);
+        }
+    }
 }
 
 } // namespace ive
