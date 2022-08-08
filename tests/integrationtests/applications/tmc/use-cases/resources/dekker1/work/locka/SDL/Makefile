@@ -1,6 +1,8 @@
 # SDL
 #TASTE_IV_Properties::is_instance_of Lock
+SEDS_CONVERTER?=spacecreator.AppImage --sedsconverter
 OPENGEODE?=opengeode
+VISUAL?=kate
 
 all: compile-linux
 
