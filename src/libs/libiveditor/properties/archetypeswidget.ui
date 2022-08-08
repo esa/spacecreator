@@ -14,7 +14,7 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" rowspan="4">
+   <item row="0" column="0" rowspan="3">
     <widget class="QTableView" name="tableView">
      <property name="selectionMode">
       <enum>QAbstractItemView::SingleSelection</enum>
@@ -48,13 +48,6 @@
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QPushButton" name="applyButton">
-     <property name="text">
-      <string>Apply</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -62,7 +55,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>217</height>
+       <height>417</height>
       </size>
      </property>
     </spacer>

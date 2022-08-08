@@ -17,6 +17,9 @@
 
 #include "ivpropertiesdialog.h"
 
+#include "../../shared/ui_propertiesdialog.h"
+#include "archetypes/archetypemodel.h"
+#include "archetypeswidget.h"
 #include "asn1systemchecks.h"
 #include "commands/cmdentityattributeschange.h"
 #include "commandsstack.h"
@@ -33,8 +36,6 @@
 #include "ivinterface.h"
 #include "ivnamevalidator.h"
 #include "ivobject.h"
-#include "archetypes/archetypemodel.h"
-#include "archetypeswidget.h"
 #include "ivpropertieslistmodel.h"
 #include "ivpropertiesview.h"
 #include "ivpropertytemplateconfig.h"
@@ -291,6 +292,9 @@ void IVPropertiesDialog::initArchetypeView()
         return;
     }
     auto archetypesWidget = new ive::ArchetypesWidget(m_archetypesModel, function, m_ivChecks, commandMacro(), this);
+
+    connect(propertiesDialogUi()->buttonBox, &QDialogButtonBox::accepted, archetypesWidget,
+            &ive::ArchetypesWidget::applyArchetypes);
     insertTab(archetypesWidget, tr("Archetypes"));
 }
 

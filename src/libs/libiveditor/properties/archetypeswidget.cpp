@@ -63,7 +63,6 @@ ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVF
 
     connect(ui->addButton, &QPushButton::clicked, this, &ArchetypesWidget::addArchetype);
     connect(ui->deleteButton, &QPushButton::clicked, this, &ArchetypesWidget::deleteArchetype);
-    connect(ui->applyButton, &QPushButton::clicked, this, &ArchetypesWidget::applyArchetypes);
 }
 
 ArchetypesWidget::~ArchetypesWidget()

@@ -115,4 +115,9 @@ PropertyTemplateConfig *PropertiesDialog::propertiesConfig() const
     return d->dynPropConfig;
 }
 
+Ui::PropertiesDialog *PropertiesDialog::propertiesDialogUi() const
+{
+    return d->ui.get();
+}
+
 } // namespace ive
