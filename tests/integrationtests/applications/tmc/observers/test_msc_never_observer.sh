@@ -21,7 +21,7 @@ mkdir $TEST_OUTPUT_DIR
 # Translate
 $TMC -iv $RESOURCE_DIR/interfaceview.xml \
     -o $TEST_OUTPUT_DIR \
-    -mos $RESOURCE_DIR/MscObserver.msc
+    -mos $PROPERTIES_DIR/MscObserver/MscObserver.msc
 
 cd $TEST_OUTPUT_DIR \
     && $SPIN -a system.pml \

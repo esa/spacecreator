@@ -167,7 +167,7 @@ private:
             const QStringList &environmentFunctions);
     bool convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath);
 
-    bool convertMscObservers(const QString &outputPath);
+    bool convertMscObservers();
     bool generateObserverDatamodel(QProcess &process, const QString &sdlFileName);
 
     std::unique_ptr<ivm::IVModel> readInterfaceView(const QString &filepath);
@@ -211,6 +211,7 @@ private:
 
     conversion::Registry m_registry;
 
+    inline static const QString m_opengeodeCommand = "opengeode";
     constexpr static int m_commandTimeout = 12000;
 };
 }

@@ -29,6 +29,8 @@ work/**/SDL/**/Makefile.*
 
 **/modelchecking/**/*.adb
 **/modelchecking/**/*.ads
+**/modelchecking/properties/MscObserver/*.asn
+**/modelchecking/properties/MscObserver/*.pr
 
 work/binaries
 work/build

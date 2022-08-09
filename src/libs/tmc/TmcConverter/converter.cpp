@@ -21,7 +21,6 @@
 
 #include <QBuffer>
 #include <QDebug>
-#include <QTemporaryDir>
 #include <QTemporaryFile>
 #include <QtDebug>
 #include <QtGlobal>
@@ -326,32 +325,8 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
         }
     }
 
-    if (!m_mscObserverFiles.empty()) {
-        QTemporaryDir outputDir;
-        if (!outputDir.isValid()) {
-            qCritical() << "Unable to create temp directory for converting MSC observers";
-            return false;
-        }
-        outputDir.setAutoRemove(false);
-
-        const auto &outputPath = outputDir.path() + "/";
-
-        if (!convertMscObservers(outputPath)) {
-            qCritical() << "Unable to translate MSC files to SDL observers";
-            return false;
-        }
-
-        QProcess process;
-        process.setWorkingDirectory(outputPath);
-
-        for (const auto &sdlFileName : QDir(outputPath).entryList({ "*.pr" })) {
-            if (!generateObserverDatamodel(process, sdlFileName)) {
-                return false;
-            }
-
-            const auto sdlFilePath = outputPath + sdlFileName;
-            m_observerInfos.emplace_back(ObserverInfo(sdlFilePath, 1));
-        }
+    if (!convertMscObservers()) {
+        return false;
     }
 
     QStringList asn1Files;
@@ -502,35 +477,59 @@ bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, cons
     return convertModel({ ModelType::Asn1 }, ModelType::Promela, {}, std::move(options));
 }
 
-bool TmcConverter::convertMscObservers(const QString &outputPath)
+bool TmcConverter::convertMscObservers()
 {
-    Options options;
+    for (const QString &mscFilePath : m_mscObserverFiles) {
+        QFileInfo mscFile(mscFilePath);
 
-    qDebug() << "Converting MSC observers:";
-    for (const QString &mscFile : m_mscObserverFiles) {
-        qDebug() << "\t" << mscFile << "\n";
-        options.add(MscOptions::inputFilepath, mscFile);
+        if (!mscFile.exists()) {
+            qCritical() << "MSC file " << mscFilePath << " doesn't exist";
+            return false;
+        }
+
+        const auto outputDir = mscFile.dir();
+        const auto &outputPath = outputDir.path() + "/";
+
+        Options options;
+
+        options.add(MscOptions::inputFilepath, mscFilePath);
+        options.add(MscOptions::simuDataViewFilepath, simuDataViewLocation().absoluteFilePath());
+        options.add(SdlOptions::filepathPrefix, outputPath);
+
+        qDebug() << "Converting MSC file" << mscFilePath << "to an SDL observer";
+
+        if (!convertModel({ ModelType::Msc }, ModelType::Sdl, {}, std::move(options))) {
+            qCritical() << "Unable to translate MSC file" << mscFilePath << "to SDL observer";
+            return false;
+        }
+
+        QProcess process;
+        process.setWorkingDirectory(outputPath);
+
+        for (const auto &sdlFileName : QDir(outputPath).entryList({ "*.pr" })) {
+            if (!generateObserverDatamodel(process, sdlFileName)) {
+                return false;
+            }
+
+            const auto sdlFilePath = outputPath + sdlFileName;
+            m_observerInfos.emplace_back(ObserverInfo(sdlFilePath, 1));
+        }
     }
-    qDebug() << "\t to: " << outputPath << '\n';
 
-    options.add(MscOptions::simuDataViewFilepath, simuDataViewLocation().absoluteFilePath());
-    options.add(SdlOptions::filepathPrefix, outputPath);
-
-    return convertModel({ ModelType::Msc }, ModelType::Sdl, {}, std::move(options));
+    return true;
 }
 
 bool TmcConverter::generateObserverDatamodel(QProcess &process, const QString &sdlFileName)
 {
-    const QString command("opengeode");
     QStringList arguments;
     arguments << "--toAda" << sdlFileName;
 
-    qDebug() << "Executing: " << command << " with args: " << arguments.join(", ") << '\n';
+    qDebug() << "Executing:" << m_opengeodeCommand << "with args:" << arguments.join(", ");
 
-    process.start(command, arguments);
+    process.start(m_opengeodeCommand, arguments);
 
     if (!process.waitForStarted()) {
-        qCritical("Cannot generate observer datamodel using opengeode.");
+        qCritical() << "Cannot generate observer datamodel using opengeode.";
         process.terminate();
         return false;
     }
