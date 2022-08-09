@@ -1,0 +1,29 @@
+mscdocument MscObserver /* MSC AND */;
+    language ASN.1;
+    data MscObserver.asn;
+/* CIF MSCDOCUMENT (0, 0) (4200, 2300) */
+mscdocument Nominal /* MSC LEAF */;
+    language ASN.1;
+    data MscObserver.asn;
+msc MscObserver;
+/* CIF INSTANCE (37, 61) (148, 87) (800, 2127) */
+instance Pinger;
+/* CIF CONDITION (37, 196) (836, 66) */
+condition Never shared all;
+/* CIF MESSAGE (111, 331) (794, 331) */
+out Ping to Ponger;
+/* CIF MESSAGE (794, 421) (111, 421) */
+in Pong from Ponger;
+endinstance;
+/* CIF INSTANCE (714, 61) (159, 87) (800, 2127) */
+instance Ponger;
+/* CIF CONDITION (37, 196) (836, 66) */
+condition Never shared all;
+/* CIF MESSAGE (111, 331) (794, 331) */
+in Ping from Pinger;
+/* CIF MESSAGE (794, 421) (111, 421) */
+out Pong to Pinger;
+endinstance;
+endmsc;
+endmscdocument;
+endmscdocument;
