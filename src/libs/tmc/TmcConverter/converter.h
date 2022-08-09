@@ -89,6 +89,12 @@ public:
      */
     bool convert();
     /**
+     * @brief   Set paths to MSC files to be converted to observers
+     *
+     * @param   mscObserverFiles    Paths to the files
+     */
+    void setMscObserverFiles(const QStringList &mscObserverFiles);
+    /**
      * @brief   Specify which IV functions should be treated as an environment
      *          during model checking
      *
@@ -186,6 +192,7 @@ private:
     const QDir m_outputDirectory;
     ivm::IVPropertyTemplateConfig *m_dynPropConfig;
 
+    QStringList m_mscObserverFiles;
     std::vector<QString> m_environmentFunctions;
     std::vector<QString> m_keepFunctions;
     std::optional<QString> m_globalInputVectorLengthLimit;
