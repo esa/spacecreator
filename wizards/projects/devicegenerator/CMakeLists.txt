@@ -7,12 +7,11 @@ set(IVSOURCES %{IVFile})
 include(asn1sccSettings.cmake)
 include(createFilesList.cmake)
 
-set(SOURCES ${DVSOURCES} ${ASN1SCC_PRODUCTS} ${IVSOURCES})
+set(SOURCES ${ASN1ACNSOURCES} ${ASN1SCC_PRODUCTS} ${IVSOURCES})
 
 if(SOURCES)
     set(TARGET_NAME ${PROJECT_NAME})
-    add_executable(${TARGET_NAME})
-    target_sources(${TARGET_NAME} PRIVATE ${SOURCES})
+    add_library(${TARGET_NAME} ${SOURCES})
 endif()
 
 include(configureAsn1SccTarget.cmake)
