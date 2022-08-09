@@ -21,6 +21,7 @@
 
 #include "observertype.h"
 
+#include <conversion/common/options.h>
 #include <memory>
 #include <msccore/mscchart.h>
 #include <sdl/SdlModel/rename.h>
@@ -32,7 +33,7 @@ namespace conversion::sdl::translator {
 class NeverObserverTranslator final
 {
 public:
-    NeverObserverTranslator(::sdl::SdlModel *sdlModel);
+    NeverObserverTranslator(::sdl::SdlModel *sdlModel, const Options &options);
 
     NeverObserverTranslator(const NeverObserverTranslator &) = delete;
     NeverObserverTranslator(NeverObserverTranslator &&) = delete;
@@ -65,6 +66,7 @@ private:
     inline static const QString m_signalRenameNameTemplate = "sig%1";
 
     ::sdl::SdlModel *m_sdlModel;
+    const Options &m_options;
 };
 
 } // namespace conversion::sdl::translator

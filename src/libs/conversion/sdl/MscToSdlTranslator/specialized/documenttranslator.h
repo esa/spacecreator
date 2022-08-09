@@ -29,7 +29,7 @@ namespace conversion::sdl::translator {
 class DocumentTranslator final
 {
 public:
-    DocumentTranslator(::sdl::SdlModel *sdlModel);
+    DocumentTranslator(::sdl::SdlModel *sdlModel, const Options &options);
 
     DocumentTranslator(const DocumentTranslator &) = delete;
     DocumentTranslator(DocumentTranslator &&) = delete;

@@ -69,7 +69,8 @@ private:
      *
      * @return  Result SDL model
      */
-    auto translateMscModel(const ::msc::MscModel *mscModel) const -> std::vector<std::unique_ptr<Model>>;
+    auto translateMscModel(const ::msc::MscModel *mscModel, const Options &options) const
+            -> std::vector<std::unique_ptr<Model>>;
 };
 
 } // namespace conversion::sdl::translator

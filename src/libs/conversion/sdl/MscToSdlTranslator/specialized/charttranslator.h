@@ -30,7 +30,7 @@ namespace conversion::sdl::translator {
 class ChartTranslator final
 {
 public:
-    ChartTranslator(::sdl::SdlModel *sdlModel);
+    ChartTranslator(::sdl::SdlModel *sdlModel, const Options &options);
 
     ChartTranslator(const ChartTranslator &) = delete;
     ChartTranslator(ChartTranslator &&) = delete;

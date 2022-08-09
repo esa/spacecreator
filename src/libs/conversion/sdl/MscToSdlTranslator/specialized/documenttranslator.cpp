@@ -23,8 +23,8 @@ using sdl::SdlModel;
 
 namespace conversion::sdl::translator {
 
-DocumentTranslator::DocumentTranslator(SdlModel *sdlModel)
-    : m_chartTranslator(sdlModel)
+DocumentTranslator::DocumentTranslator(SdlModel *sdlModel, const Options &options)
+    : m_chartTranslator(sdlModel, options)
 {
 }
 

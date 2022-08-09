@@ -31,8 +31,8 @@ using sdl::SdlModel;
 
 namespace conversion::sdl::translator {
 
-ChartTranslator::ChartTranslator(SdlModel *sdlModel)
-    : m_neverObserverTranslator(sdlModel)
+ChartTranslator::ChartTranslator(SdlModel *sdlModel, const Options &options)
+    : m_neverObserverTranslator(sdlModel, options)
 {
 }
 
