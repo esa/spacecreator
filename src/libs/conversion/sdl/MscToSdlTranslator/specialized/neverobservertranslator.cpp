@@ -21,9 +21,11 @@
 
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
+#include <conversion/msc/MscOptions/options.h>
 #include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/variabledeclaration.h>
 
+using conversion::msc::MscOptions;
 using conversion::translator::TranslationException;
 using msc::MscChart;
 using msc::MscEntity;
@@ -43,8 +45,9 @@ using sdl::VariableDeclaration;
 
 namespace conversion::sdl::translator {
 
-NeverObserverTranslator::NeverObserverTranslator(SdlModel *sdlModel)
+NeverObserverTranslator::NeverObserverTranslator(SdlModel *sdlModel, const Options &options)
     : m_sdlModel(sdlModel)
+    , m_options(options)
 {
 }
 
@@ -166,8 +169,16 @@ System NeverObserverTranslator::createSdlSystem(NeverObserverTranslator::Context
     block.setProcess(std::move(context.process));
 
     System system(processName);
-    system.addFreeformText("use datamodel comment 'observer.asn'");
     system.setBlock(std::move(block));
+
+    if (m_options.isSet(MscOptions::simuDataViewFilepath)) {
+        const auto simuDataViewFilepath = *m_options.value(MscOptions::simuDataViewFilepath);
+        auto useDatamodel = QString("use datamodel comment '%1'").arg(simuDataViewFilepath);
+
+        system.addFreeformText(std::move(useDatamodel));
+    } else {
+        system.addFreeformText("use datamodel comment 'observer.asn'");
+    }
 
     for (auto &signalRename : context.signalRenames) {
         system.addSignal(std::move(signalRename));

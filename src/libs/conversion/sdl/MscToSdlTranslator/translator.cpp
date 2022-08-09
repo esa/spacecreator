@@ -34,13 +34,11 @@ namespace conversion::sdl::translator {
 std::vector<std::unique_ptr<Model>> MscToSdlTranslator::translateModels(
         std::vector<Model *> sourceModels, const Options &options) const
 {
-    Q_UNUSED(options);
-
     checkSourceModelCount(sourceModels);
 
     const auto *mscModel = getModel<MscModel>(sourceModels);
 
-    return translateMscModel(mscModel);
+    return translateMscModel(mscModel, options);
 }
 
 ModelType MscToSdlTranslator::getSourceModelType() const
@@ -59,11 +57,12 @@ std::set<ModelType> MscToSdlTranslator::getDependencies() const
     return dependencies;
 }
 
-std::vector<std::unique_ptr<Model>> MscToSdlTranslator::translateMscModel(const MscModel *mscModel) const
+std::vector<std::unique_ptr<Model>> MscToSdlTranslator::translateMscModel(
+        const MscModel *mscModel, const Options &options) const
 {
     auto sdlModel = std::make_unique<SdlModel>();
 
-    DocumentTranslator documentTranslator(sdlModel.get());
+    DocumentTranslator documentTranslator(sdlModel.get(), options);
     for (const auto mscDocument : mscModel->allDocuments()) {
         documentTranslator.translateDocument(mscDocument);
     }
