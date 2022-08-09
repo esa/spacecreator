@@ -78,8 +78,7 @@ void ArchetypesWidget::addArchetype()
 {
     int newRow = m_model->rowCount();
 
-    if(!m_model->insertRow(newRow))
-    {
+    if (!m_model->insertRow(newRow)) {
         return;
     }
 
@@ -121,8 +120,7 @@ void ArchetypesWidget::applyArchetypes()
         for (auto interface : functionArchetype->getInterfaces()) {
             if (m_model->getFunction()->hasInterface(interface->title())) {
                 QMessageBox::warning(qApp->activeWindow(), tr("Duplicate Archetype"),
-                        tr("%1 Function %2 already has an interface named %3")
-                                .arg(Q_FUNC_INFO)
+                        tr("Function %1 already has an interface named %2")
                                 .arg(m_model->getFunction()->title())
                                 .arg(interface->title()));
                 continue;
