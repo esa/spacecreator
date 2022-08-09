@@ -24,6 +24,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QList>
+#include <QProcess>
 #include <QStringList>
 #include <conversion/common/modeltype.h>
 #include <conversion/registry/registry.h>
@@ -165,6 +166,10 @@ private:
             const QList<QString> &asn1FilepathList, const QStringList &modelFunctions,
             const QStringList &environmentFunctions);
     bool convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath);
+
+    bool convertMscObservers(const QString &outputPath);
+    bool generateObserverDatamodel(QProcess &process, const QString &sdlFileName);
+
     std::unique_ptr<ivm::IVModel> readInterfaceView(const QString &filepath);
     void saveOptimizedInterfaceView(const ivm::IVModel *ivModel, const QString outputFilePath);
     void findFunctionsToConvert(const ivm::IVModel &model, QStringList &sdlFunctions,
@@ -205,5 +210,7 @@ private:
     QStringList m_observerNames;
 
     conversion::Registry m_registry;
+
+    constexpr static int m_commandTimeout = 12000;
 };
 }
