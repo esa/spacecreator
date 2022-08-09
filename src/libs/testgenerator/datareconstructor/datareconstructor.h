@@ -81,7 +81,7 @@ public:
     static auto getVariantVectorFromRawData(const QByteArray &rawData, ivm::IVInterface *iface,
             Asn1Acn::Asn1Model *asn1Model, QDataStream::ByteOrder endianness = QDataStream::LittleEndian,
             const TypeLayoutInfos &typeLayoutInfos = {
-                    { "INTEGER", 4, 4 },
+                    { "INTEGER", 8, 0 },
                     { "BOOLEAN", 1, 7 },
                     { "REAL", 8, 0 },
             }) -> QVector<QVariant>;

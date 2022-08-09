@@ -361,15 +361,18 @@ bool TmcConverter::convertStopConditions(const std::map<QString, ProcessMetadata
 {
     const QDir outputDirectory = QDir(m_outputDirectory);
 
-    for (const QString &filepath : m_stopConditionsFiles) {
-        const QFileInfo input(filepath);
-        const QString base = input.baseName();
-        const QFileInfo output = outputFilepath(base.toLower() + ".pml");
+    QList<QFileInfo> inputFiles;
 
-        SdlToPromelaConverter sdl2Promela;
-        if (!sdl2Promela.convertStopCondition(input, output, allSdlFiles)) {
-            return false;
-        }
+    for (const QString &filepath : m_stopConditionsFiles) {
+        inputFiles.append(QFileInfo(filepath));
+    }
+
+    const QFileInfo output = outputFilepath(QString("scl.pml"));
+    const bool includeObservers = !m_observerNames.isEmpty();
+
+    SdlToPromelaConverter sdl2Promela;
+    if (!sdl2Promela.convertStopConditions(inputFiles, output, allSdlFiles, includeObservers)) {
+        return false;
     }
     return true;
 }
@@ -419,11 +422,8 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
         options.add(PromelaOptions::observerAttachment, info);
     }
 
-    for (const QString &filepath : m_stopConditionsFiles) {
-        const QFileInfo input(filepath);
-        const QString base = input.baseName();
-
-        options.add(PromelaOptions::additionalIncludes, base.toLower() + ".pml");
+    if (!m_stopConditionsFiles.isEmpty() || !m_observerNames.isEmpty()) {
+        options.add(PromelaOptions::additionalIncludes, "scl.pml");
     }
 
     for (const QString &inputFileName : asn1FilepathList) {

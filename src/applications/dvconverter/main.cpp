@@ -22,11 +22,38 @@
 #include "dvexporter.h"
 #include "dvlibrary.h"
 #include "dvmodel.h"
+#include "interfacedocument.h"
+#include "iveditorcore.h"
 #include "scversion.h"
 #include "sharedlibrary.h"
 
 #include <QApplication>
 #include <QDebug>
+#include <QDir>
+#include <QFileInfo>
+#include <spacecreatorsystem/ivsystemqueries.h>
+
+static const QString INTERFACEVIEW_FILE_NAME("interfaceview.xml");
+
+static void setupIvSystemQueriesIfAvailable(const QString &inputFile, dve::DVEditorCore *dvcore)
+{
+    // If available, load Interface View to enable additional queries
+    const QFileInfo inputFileInfo(inputFile);
+    const QDir modelDirectory = inputFileInfo.dir();
+    const QString interfaceViewFilePath = modelDirectory.filePath(INTERFACEVIEW_FILE_NAME);
+
+    const QFileInfo interfaceViewFileInfo(interfaceViewFilePath);
+    if (interfaceViewFileInfo.exists()) {
+        IVEditorCorePtr ivcore(new ive::IVEditorCore);
+        if (!ivcore->document()->load(interfaceViewFilePath)) {
+            qWarning() << "InterfaceView " << interfaceViewFilePath << " could not be loaded";
+        } else {
+            auto checker = new scs::IvSystemQueries(nullptr, dvcore);
+            checker->setIVCore(ivcore);
+            dvcore->setSystemChecker(checker);
+        }
+    }
+}
 
 int main(int argc, char *argv[])
 {
@@ -54,14 +81,18 @@ int main(int argc, char *argv[])
         const QString templateFile = cmdParser.value(shared::CommandLineParser::Positional::OpenStringTemplateFile);
         const QString outputFile = cmdParser.value(shared::CommandLineParser::Positional::ExportToFile);
 
-        dve::DVEditorCore core;
-        dve::DVAppModel *appModel = core.appModel();
+        dve::DVEditorCore dvcore;
+        dve::DVAppModel *appModel = dvcore.appModel();
+
         const bool loadOk = appModel->load(inputFile);
         if (!loadOk) {
             qCritical() << "Unable to load file" << inputFile;
             return -1;
         }
-        const bool convertOk = core.exporter()->exportObjectsSilently(
+
+        setupIvSystemQueriesIfAvailable(inputFile, &dvcore);
+
+        const bool convertOk = dvcore.exporter()->exportObjectsSilently(
                 appModel->objectsModel()->objects().values(), outputFile, templateFile);
         if (!convertOk) {
             qCritical() << "Error converting " << inputFile << "to" << outputFile;
