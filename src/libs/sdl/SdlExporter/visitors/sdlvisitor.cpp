@@ -202,14 +202,14 @@ void SdlVisitor::visit(const System &system)
             m_writer.endLine(";");
         }
 
-        m_writer.writeLine("/* ENDTEXT */");
+        m_writer.writeLine("/* CIF ENDTEXT */");
     }
 
     if (!system.getSignals().empty()) {
         m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
         m_layouter.moveDown(Layouter::ElementType::Text);
         exportCollection(system.getSignals());
-        m_writer.writeLine("/* ENDTEXT */");
+        m_writer.writeLine("/* CIF ENDTEXT */");
     }
 
     for (const auto &channel : system.channels()) {
