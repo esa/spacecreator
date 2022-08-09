@@ -122,6 +122,11 @@ IvToPromelaTranslator::ObserverAttachment::ObserverAttachment(const QString &spe
             }
         }
     }
+
+    if (m_interfaceName.isEmpty()) {
+        const auto message = QString("Observed interface name is empty in observer %1 ").arg(m_observerName);
+        throw TranslationException(message);
+    }
 }
 
 std::optional<QString> IvToPromelaTranslator::ObserverAttachment::toFunction() const
@@ -723,6 +728,16 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(
         }
     }
 
+    const QVector<shared::ContextParameter> parameters = ivFunction->contextParams();
+
+    for (const shared::ContextParameter &parameter : parameters) {
+        if (parameter.paramType() != shared::BasicParameter::Type::Timer) {
+            continue;
+        }
+
+        generateProctype(context, functionName, parameter.name().toLower(), QString(), 1, 1, false);
+    }
+
     createCheckQueueInline(context.model(), functionName, channelNames);
 
     for (const auto requiredInterface : ivFunction->ris()) {
@@ -935,12 +950,11 @@ void IvToPromelaTranslator::createPromelaObjectsForTimers(Context &context) cons
             for (const shared::ContextParameter &parameter : parameters) {
                 if (parameter.paramType() == shared::BasicParameter::Type::Timer) {
                     const QString timerName = parameter.name().toLower();
-                    const QString signalName =
-                            QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(timerName);
+                    const QString channelName = constructChannelName(functionName, timerName);
                     const int timerId = timerCount;
                     ++timerCount;
                     createTimerInlinesForFunction(context, functionName, timerName, timerId);
-                    timerSignals.emplace(timerId, signalName);
+                    timerSignals.emplace(timerId, channelName);
                 }
             }
         }
@@ -998,8 +1012,10 @@ void IvToPromelaTranslator::createGlobalTimerObjects(
 
             std::unique_ptr<Sequence> timerCall = std::make_unique<Sequence>(Sequence::Type::NORMAL);
             timerCall->appendElement(Expression(fpt));
-            QList<InlineCall::Argument> arguments;
-            timerCall->appendElement(InlineCall(iter->second, arguments));
+            const QString channelName = iter->second;
+            QList<Expression> sendParams;
+            sendParams.append(Expression(Constant(0)));
+            timerCall->appendElement(ChannelSend(VariableRef(channelName), std::move(sendParams)));
             timerCall->appendElement(Assignment(fpt, Expression(BooleanConstant(false))));
             cond.appendAlternative(std::move(timerCall));
 
