@@ -131,6 +131,11 @@ bool TmcConverter::convert()
     return true;
 }
 
+void TmcConverter::setMscObserverFiles(const QStringList &mscObserverFiles)
+{
+    m_mscObserverFiles = mscObserverFiles;
+}
+
 void TmcConverter::setEnvironmentFunctions(const std::vector<QString> &environmentFunctions)
 {
     m_environmentFunctions = environmentFunctions;

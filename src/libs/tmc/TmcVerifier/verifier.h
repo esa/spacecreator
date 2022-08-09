@@ -39,6 +39,12 @@ public:
     TmcVerifier(const QString &inputIvFilepath, const QString &outputDirectory);
 
     /**
+     * @brief   Set paths to MSC files to be converted to observers
+     *
+     * @param   mscObserverFiles    Paths to the files
+     */
+    void setMscObserverFiles(const QStringList &mscObserverFiles);
+    /**
      * @brief   Specify which IV functions should be treated as an environment
      *          during model checking
      *
