@@ -75,6 +75,10 @@
                     "openAsProject": true
                 },
                 {
+                    "source": "taste.pro",
+                    "target": "%{ProjectDirectory}/work/taste.pro"
+                },
+                {
                     "source": "template.asn",
                     "target": "%{ProjectDirectory}/%{AsnFile}",
                     "openInEditor": true
@@ -88,6 +92,10 @@
                     "source": "%{JS: '%{IVFileSource}' === 'empty' ? 'interfaceview_empty.xml' : 'interfaceview.xml'}",
                     "target": "%{ProjectDirectory}/%{IVFile}",
                     "openInEditor": true
+                },
+                {
+                    "source": "Makefile",
+                    "target": "%{ProjectDirectory}/Makefile"
                 }
             ]
         }
