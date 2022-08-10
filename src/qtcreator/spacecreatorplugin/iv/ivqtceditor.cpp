@@ -20,11 +20,12 @@
 #include "commands/cmdchangeasn1file.h"
 #include "commandsstack.h"
 #include "endtoend/endtoendview.h"
-#include "modelchecking/modelcheckingwindow.h"
 #include "interfacedocument.h"
+#include "ivappwidget.h"
 #include "iveditordocument.h"
 #include "ivmainwidget.h"
 #include "mainmodel.h"
+#include "modelchecking/modelcheckingwindow.h"
 #include "msceditorcore.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorprojectimpl.h"
@@ -33,10 +34,14 @@
 #include <QFileInfo>
 #include <QToolBar>
 #include <QUndoCommand>
+#include <coreplugin/actionmanager/actioncontainer.h>
+#include <coreplugin/actionmanager/actionmanager.h>
+#include <coreplugin/actionmanager/command.h>
+#include <coreplugin/coreconstants.h>
 #include <editormanager/editormanager.h>
-#include <utils/qtcassert.h>
 #include <projectexplorer/project.h>
 #include <projectexplorer/projecttree.h>
+#include <utils/qtcassert.h>
 
 namespace spctr {
 
@@ -49,10 +54,16 @@ IVQtCEditor::IVQtCEditor(SpaceCreatorProjectManager *projectManager)
     setContext(Core::Context(spctr::Constants::K_IV_EDITOR_ID));
     setWidget(m_editorWidget);
 
-    connect(m_document, &spctr::IVEditorDocument::ivDataLoaded, this,
-            [this](const QString &, IVEditorCorePtr data) { m_editorWidget->init(data); });
+    connect(m_document, &spctr::IVEditorDocument::ivDataLoaded, this, [this](const QString &, IVEditorCorePtr data) {
+        m_editorWidget->init(data);
+        auto command = Core::ActionManager::command(Constants::IV_MANAGE_ARCHETYPES_ID);
+        IVEditorCorePtr plugin = m_editorWidget->ivPlugin();
+        auto ivWidget = qobject_cast<ive::IVAppWidget *>(plugin->mainwidget());
+        connect(command->action(), &QAction::triggered, ivWidget, &ive::IVAppWidget::showArchetypeManager);
+    });
     connect(m_editorWidget, &IVMainWidget::requestE2EDataflow, this, &IVQtCEditor::showCurrentE2EDataflow);
-    connect(m_editorWidget, &IVMainWidget::requestModelCheckingWindow, this, &IVQtCEditor::showCurrentModelCheckingWindow);
+    connect(m_editorWidget, &IVMainWidget::requestModelCheckingWindow, this,
+            &IVQtCEditor::showCurrentModelCheckingWindow);
 }
 
 IVQtCEditor::~IVQtCEditor()
@@ -92,7 +103,8 @@ void IVQtCEditor::showCurrentModelCheckingWindow()
     if (auto ivEditor = qobject_cast<spctr::IVQtCEditor *>(Core::EditorManager::currentEditor())) {
         SpaceCreatorProjectImpl *project = m_projectManager->project(ivEditor->ivPlugin());
         if (project) {
-            ivEditor->showModelCheckingWindow(ProjectExplorer::ProjectTree::currentProject()->projectDirectory().toString());
+            ivEditor->showModelCheckingWindow(
+                    ProjectExplorer::ProjectTree::currentProject()->projectDirectory().toString());
         }
     }
 }
@@ -109,8 +121,10 @@ void IVQtCEditor::showModelCheckingWindow(const QString projectDir)
         m_modelCheckingWindow->callTasteGens(true);
         m_modelCheckingWindow->setAttribute(Qt::WA_DeleteOnClose);
         connect(plugin->document(), &QObject::destroyed, m_modelCheckingWindow.data(), &QObject::deleteLater);
-        connect(m_modelCheckingWindow, &ive::ModelCheckingWindow::visibleChanged, m_editorWidget->ivPlugin()->actionLaunchModelCheckingWindow(), &QAction::setChecked);
-        connect(m_editorWidget->ivPlugin()->actionLaunchModelCheckingWindow(), &QAction::toggled, m_modelCheckingWindow, &ive::ModelCheckingWindow::setVisible);
+        connect(m_modelCheckingWindow, &ive::ModelCheckingWindow::visibleChanged,
+                m_editorWidget->ivPlugin()->actionLaunchModelCheckingWindow(), &QAction::setChecked);
+        connect(m_editorWidget->ivPlugin()->actionLaunchModelCheckingWindow(), &QAction::toggled, m_modelCheckingWindow,
+                &ive::ModelCheckingWindow::setVisible);
     }
     m_modelCheckingWindow->show();
     m_modelCheckingWindow->raise();

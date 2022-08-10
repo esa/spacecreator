@@ -98,6 +98,9 @@ target_sources(${LIB_NAME} PRIVATE
     context/action/extprocmonitor.h
     createconnectiongroupdialog.cpp
     createconnectiongroupdialog.h
+    archetypesmanagerdialog.cpp
+    archetypesmanagerdialog.h
+    archetypesmanagerdialog.ui
     endtoend/endtoendconnections.cpp
     endtoend/endtoendconnections.h
     endtoend/endtoendview.cpp

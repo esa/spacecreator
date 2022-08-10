@@ -17,6 +17,7 @@
 
 #include "ivappwidget.h"
 
+#include "archetypesmanagerdialog.h"
 #include "commands/cmdconnectionlayermanage.h"
 #include "commands/cmdentitiesimport.h"
 #include "commands/cmdentitiesinstantiate.h"
@@ -622,6 +623,17 @@ QVector<QAction *> IVAppWidget::initViewActions()
     m_viewActions.append(actionSaveSceneRender);
 
     return m_viewActions;
+}
+
+void IVAppWidget::showArchetypeManager()
+{
+    if (m_document == nullptr || m_document->objectsModel() == nullptr) {
+        return;
+    }
+
+    ive::ArchetypesManagerDialog dialog(m_document->objectsModel(), m_document->commandsStack());
+    dialog.init();
+    dialog.exec();
 }
 
 } // namespace ive
