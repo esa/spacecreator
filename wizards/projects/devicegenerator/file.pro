@@ -3,5 +3,8 @@ CONFIG -= qt
 CONFIG += generateC
 
 DISTFILES += %{IVFile}
+DISTFILES += %{AsnFile}
+DISTFILES += %{AcnFile}
 
-include(handleAsn1AcnBuild.pri)
+include(work/taste.pro)
+message($$DISTFILES)
