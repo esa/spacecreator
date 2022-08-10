@@ -11,6 +11,7 @@
 
     "options":[
         { "key": "ProFile", "value": "%{JS: Util.fileName('%{ProjectName}', 'pro')}" },
+        { "key": "ProFileShared", "value": "%{JS: Util.fileName('%{ProjectName}', 'pro.shared')}" },
         { "key": "AsnFile", "value": "%{JS: Util.fileName('%{ProjectName}', 'asn')}" },
         { "key": "AcnFile", "value": "%{JS: Util.fileName('%{ProjectName}', 'acn')}" },
         { "key": "IVFile", "value": "interfaceview.xml" },
@@ -73,6 +74,10 @@
                     "source": "file.pro",
                     "target": "%{ProjectDirectory}/%{ProFile}",
                     "openAsProject": true
+                },
+                {
+                    "source": "build_settings.xml",
+                    "target": "%{ProjectDirectory}/%{ProFileShared}"
                 },
                 {
                     "source": "taste.pro",
