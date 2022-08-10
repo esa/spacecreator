@@ -1,0 +1,12 @@
+mscdocument integerparam /* MSC AND */;
+    language ASN.1;
+    data integerparam.asn;
+
+/* CIF MSCDOCUMENT (0, 0) (4200, 2300) */
+
+mscdocument Nominal /* MSC LEAF */;
+
+msc integerparam;
+endmsc;
+endmscdocument;
+endmscdocument;

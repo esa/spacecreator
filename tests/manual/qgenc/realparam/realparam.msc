@@ -1,0 +1,12 @@
+mscdocument realparam /* MSC AND */;
+    language ASN.1;
+    data realparam.asn;
+
+/* CIF MSCDOCUMENT (0, 0) (4200, 2300) */
+
+mscdocument Nominal /* MSC LEAF */;
+
+msc realparam;
+endmsc;
+endmscdocument;
+endmscdocument;

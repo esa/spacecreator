@@ -1,0 +1,158 @@
+---------------------------------------------------
+-- AADL2.2
+-- TASTE type interfaceview
+-- 
+-- generated code: do not edit
+---------------------------------------------------
+
+
+PACKAGE interfaceview::IV::Controller
+PUBLIC
+
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+WITH interfaceview::IV::QGenC;
+
+SUBPROGRAM PI_Trigger
+END PI_Trigger;
+
+SUBPROGRAM IMPLEMENTATION PI_Trigger.others
+END PI_Trigger.others;
+
+
+SUBPROGRAM RI_Iface
+FEATURES
+    input : IN PARAMETER DataView::MyReal {
+       Taste::encoding => NATIVE;
+    };
+    output : OUT PARAMETER DataView::MyReal {
+       Taste::encoding => NATIVE;
+    };
+END RI_Iface;
+
+SUBPROGRAM IMPLEMENTATION RI_Iface.others
+END RI_Iface.others;
+
+
+
+SYSTEM Controller
+FEATURES
+   PI_Trigger : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: Controller:: PI_Trigger.others {
+      Taste::InterfaceName           => "Trigger";            
+      Taste::RCMoperationKind        => cyclic;      
+      -- Unrecognized property: enable_multicast => false      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
+      Taste::Interface_Stack_Size    => 1024;      
+      Taste::RCMperiod               => 1000 ms;      
+      Taste::Interface_Cyclic_Offset => 0;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+   };
+   RI_Iface : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: QGenC:: PI_Iface.others {
+      Taste::labelInheritance        => "true";
+      Taste::InterfaceName           => "Iface";            
+      Taste::RCMoperationKind        => protected;      
+      -- Unrecognized property: enable_multicast => false      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+   };
+PROPERTIES
+   -- ignored property: name = Controller
+   -- ignored property: is_type = NO
+   Source_Language => (C);
+   -- ignored property: default_implementation = default
+   -- ignored property: required_system_element = NO
+   -- ignored property: FPGA_Configurations = 
+   -- ignored property: fixed_system_element = NO
+   -- ignored property: startup_priority = 1
+END Controller;
+
+SYSTEM IMPLEMENTATION Controller.others
+END Controller.others;
+
+END interfaceview::IV::Controller;
+
+
+
+PACKAGE interfaceview::IV::QGenC
+PUBLIC
+
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+WITH interfaceview::IV::Controller;
+
+SUBPROGRAM PI_Iface
+FEATURES
+    input : IN PARAMETER DataView::MyReal {
+       Taste::encoding => NATIVE;
+    };
+    output : OUT PARAMETER DataView::MyReal {
+       Taste::encoding => NATIVE;
+    };
+END PI_Iface;
+
+SUBPROGRAM IMPLEMENTATION PI_Iface.others
+END PI_Iface.others;
+
+
+
+SYSTEM QGenC
+FEATURES
+   PI_Iface : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: QGenC:: PI_Iface.others {
+      Taste::InterfaceName           => "Iface";            
+      Taste::RCMoperationKind        => protected;      
+      -- Unrecognized property: enable_multicast => false      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+   };
+PROPERTIES
+   -- ignored property: name = QGenC
+   -- ignored property: is_type = NO
+   Source_Language => (QGenC);
+   -- ignored property: default_implementation = default
+   -- ignored property: required_system_element = NO
+   -- ignored property: FPGA_Configurations = 
+   -- ignored property: fixed_system_element = NO
+   -- ignored property: startup_priority = 1
+END QGenC;
+
+SYSTEM IMPLEMENTATION QGenC.others
+END QGenC.others;
+
+END interfaceview::IV::QGenC;
+
+
+PACKAGE interfaceview::IV
+PUBLIC
+
+WITH interfaceview::IV::Controller;
+WITH interfaceview::IV::QGenC;
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+
+SYSTEM interfaceview
+PROPERTIES
+   Taste::dataView     => ("DataView");
+   TASTE::dataViewPath => ("DataView.aadl");
+END interfaceview;
+
+SYSTEM IMPLEMENTATION interfaceview.others
+SUBCOMPONENTS
+  Controller : SYSTEM interfaceview::IV::Controller::Controller.others;
+  QGenC : SYSTEM interfaceview::IV::QGenC::QGenC.others;
+CONNECTIONS
+   Controller_RI_Iface : SUBPROGRAM ACCESS QGenC.PI_Iface -> Controller.RI_Iface;
+END interfaceview.others;
+
+PROPERTIES
+   Taste::dataView     => ("DataView");
+   Taste::dataViewPath => ("DataView.aadl");
+   Taste::coordinates  => "0 0 297000 210000";
+   Taste::version      => "3.0";
+END interfaceview::IV;
