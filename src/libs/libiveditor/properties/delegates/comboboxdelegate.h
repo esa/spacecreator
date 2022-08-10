@@ -19,31 +19,23 @@
 
 #pragma once
 
-#include "ivobject.h"
+#include <QStringList>
+#include <QStyledItemDelegate>
 
-#include <QObject>
-#include <QString>
+namespace ive {
 
-namespace ivm {
-
-class IVArchetypeLibraryReference : public IVObject
+class ComboBoxDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
-
 public:
-    explicit IVArchetypeLibraryReference(const QString &archetypeLibraryName = QString(),
-            const QString &archetypeLibraryPath = QString(), QObject *parent = nullptr);
-    ~IVArchetypeLibraryReference() = default;
+    explicit ComboBoxDelegate(const QStringList &options, QObject *parent = nullptr);
 
-    QString getLibraryName() const;
-    void setLibraryName(const QString &libraryName);
-    QString getLibraryPath() const;
-    void setLibraryPath(const QString &libraryPath);
-    bool operator==(const IVArchetypeLibraryReference &other) const;
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
 
 private:
-    QString m_archetypeLibraryName;
-    QString m_archetypeLibraryPath;
+    QStringList m_options;
 };
 
-}
+} // namespace ive

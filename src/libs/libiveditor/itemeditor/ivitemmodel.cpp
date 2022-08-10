@@ -138,7 +138,9 @@ void IVItemModel::onObjectAdded(shared::Id objectId)
         return;
     }
 
-    if (object->type() == ivm::IVObject::Type::InterfaceGroup) {
+    if (object->type() == ivm::IVObject::Type::InterfaceGroup
+            || object->type() == ivm::IVObject::Type::ArchetypeLibraryReference
+            || object->type() == ivm::IVObject::Type::ArchetypeReference) {
         return;
     }
 
@@ -665,6 +667,8 @@ shared::ui::VEInteractiveObject *IVItemModel::createItem(shared::Id objectId)
                 &IVItemModel::scheduleInterfaceTextUpdate);
         return functionType;
     } break;
+    case ivm::IVObject::Type::ArchetypeLibraryReference:
+        break;
     default: {
         qCritical() << "Unknown object type:" << obj->type();
         break;

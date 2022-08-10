@@ -22,7 +22,7 @@
 namespace ivm {
 
 IVArchetypeLibraryReference::IVArchetypeLibraryReference(
-        QObject *parent, const QString &archetypeLibraryName, const QString &archetypeLibraryPath)
+        const QString &archetypeLibraryName, const QString &archetypeLibraryPath, QObject *parent)
     : IVObject(IVObject::Type::ArchetypeLibraryReference, parent)
     , m_archetypeLibraryName(archetypeLibraryName)
     , m_archetypeLibraryPath(archetypeLibraryPath)

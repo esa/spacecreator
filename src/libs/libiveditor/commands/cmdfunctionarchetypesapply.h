@@ -19,31 +19,37 @@
 
 #pragma once
 
-#include "ivobject.h"
+#include "entityattribute.h"
+#include "undocommand.h"
 
-#include <QObject>
-#include <QString>
+#include <QPointer>
+#include <QVector>
 
 namespace ivm {
+class IVFunctionType;
+class IVArchetypeReference;
+class ArchetypeModel;
+}
 
-class IVArchetypeLibraryReference : public IVObject
+namespace ive {
+namespace cmd {
+
+class CmdFunctionArchetypesApply : public shared::UndoCommand
 {
     Q_OBJECT
-
 public:
-    explicit IVArchetypeLibraryReference(const QString &archetypeLibraryName = QString(),
-            const QString &archetypeLibraryPath = QString(), QObject *parent = nullptr);
-    ~IVArchetypeLibraryReference() = default;
+    explicit CmdFunctionArchetypesApply(ivm::IVFunctionType *function, QVector<ivm::IVArchetypeReference *> references);
 
-    QString getLibraryName() const;
-    void setLibraryName(const QString &libraryName);
-    QString getLibraryPath() const;
-    void setLibraryPath(const QString &libraryPath);
-    bool operator==(const IVArchetypeLibraryReference &other) const;
+    void redo() override;
+    void undo() override;
+    int id() const override;
 
 private:
-    QString m_archetypeLibraryName;
-    QString m_archetypeLibraryPath;
+    QPointer<ivm::IVFunctionType> m_function;
+    QVector<ivm::IVArchetypeReference *> m_newReferences;
+    QVector<ivm::IVArchetypeReference *> m_oldReferences;
+    QPointer<ivm::ArchetypeModel> m_archetypeModel;
 };
 
-}
+} // namespace cmd
+} // namespace ive
