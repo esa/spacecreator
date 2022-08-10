@@ -138,10 +138,6 @@ bool ArchetypesWidget::checkReferences()
 {
     QVector<ivm::IVArchetypeReference *> references = m_model->getArchetypeReferences();
 
-    if (references.isEmpty()) {
-        return false;
-    }
-
     for (auto reference : references) {
         if (reference->getLibraryName().isEmpty() || reference->getFunctionName().isEmpty()) {
             QMessageBox::warning(

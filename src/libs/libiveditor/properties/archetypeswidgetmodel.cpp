@@ -148,10 +148,15 @@ bool ArchetypesWidgetModel::setData(const QModelIndex &index, const QVariant &va
     }
 
     if ((role == Qt::DisplayRole || role == Qt::EditRole)) {
+        QString firstFunctionName = QString();
+
         switch (index.column()) {
         case Column::LibraryName:
+            if (!m_archetypeModel->getFunctionsNamesByLibraryName(value.toString()).isEmpty()) {
+                firstFunctionName = m_archetypeModel->getFunctionsNamesByLibraryName(value.toString()).first();
+            }
             m_archetypeReferences.value(index.row())->setLibraryName(value.toString());
-            m_archetypeReferences.value(index.row())->setFunctionName(QString());
+            m_archetypeReferences.value(index.row())->setFunctionName(firstFunctionName);
             break;
         case Column::FunctionName:
             m_archetypeReferences.value(index.row())->setFunctionName(value.toString());
@@ -162,7 +167,7 @@ bool ArchetypesWidgetModel::setData(const QModelIndex &index, const QVariant &va
 
         m_areArchetypesModified = true;
 
-        const auto functionIndex = createIndex(index.row(), index.column() + 1);
+        const auto functionIndex = createIndex(index.row(), Column::FunctionName);
         Q_EMIT dataChanged(index, functionIndex, QVector<int>() << role);
         return true;
     }
@@ -181,6 +186,9 @@ Qt::ItemFlags ArchetypesWidgetModel::flags(const QModelIndex &index) const
 
 bool ArchetypesWidgetModel::insertRows(int row, int count, const QModelIndex &parent)
 {
+    QString firstLibraryName;
+    QString firstFunctionName;
+
     if (m_function == nullptr) {
         return false;
     }
@@ -190,14 +198,23 @@ bool ArchetypesWidgetModel::insertRows(int row, int count, const QModelIndex &pa
         return false;
     }
 
+    if (m_archetypeModel->getLibrariesNames().isEmpty()) {
+        return false;
+    }
+    firstLibraryName = m_archetypeModel->getLibrariesNames().first();
+
+    if (m_archetypeModel->getFunctionsNamesByLibraryName(firstLibraryName).isEmpty()) {
+        return false;
+    }
+    firstFunctionName = m_archetypeModel->getFunctionsNamesByLibraryName(firstLibraryName).first();
+
     beginInsertRows(parent, row, row + count - 1);
 
     for (int i = 0; i < count; ++i) {
         ivm::IVArchetypeReference *reference = new ivm::IVArchetypeReference();
-        const QString firstLibraryName = m_archetypeModel->getLibrariesNames().first();
 
         reference->setLibraryName(firstLibraryName);
-        reference->setFunctionName(QString());
+        reference->setFunctionName(firstFunctionName);
 
         m_archetypeReferences.append(reference);
 
