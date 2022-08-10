@@ -1,5 +1,8 @@
 debug:
-	@echo "Hello World!"
-	
+	@echo "debug Hello World!"
+
 release:
-	@echo "Hello World!"
+	@echo "release Hello World!"
+
+run:
+	@echo "run Hello World!"
