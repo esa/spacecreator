@@ -99,7 +99,7 @@ QStringList ArchetypeModel::getFunctionsNamesByLibraryName(const QString &librar
 
     for (auto object : objects()) {
         auto library = object->as<ArchetypeLibrary *>();
-        if (library && library->title().compare(libraryName) == 0) {
+        if (library != nullptr && library->title() == libraryName) {
             librariesNames.append(library->getFunctionsNames());
         }
     }

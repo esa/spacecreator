@@ -19,7 +19,6 @@
 
 #include "archetypeswidget.h"
 
-#include "archetype/comboboxdelegate.h"
 #include "archetypes/archetypemodel.h"
 #include "archetypes/archetypeobject.h"
 #include "archetypes/functionarchetype.h"
@@ -28,6 +27,7 @@
 #include "archetypeswidgetmodel.h"
 #include "commands/cmdfunctionarchetypesapply.h"
 #include "commands/cmdinterfaceitemcreate.h"
+#include "delegates/comboboxdelegate.h"
 #include "ivarchetypereference.h"
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
@@ -44,26 +44,26 @@ namespace ive {
 ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVFunctionType *function,
         ivm::AbstractSystemChecks *checks, shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::ArchetypesWidget)
+    , m_ui(new Ui::ArchetypesWidget)
     , m_archetypeModel(archetypeModel)
     , m_cmdMacro(macro)
 {
     Q_ASSERT(function && function->model());
-    ui->setupUi(this);
+    m_ui->setupUi(this);
 
-    ui->tableView->setItemDelegateForColumn(ArchetypesWidgetModel::Column::LibraryName,
-            new shared::archetype::ComboBoxDelegate(archetypeModel->getLibrariesNames(), ui->tableView));
-    ui->tableView->setItemDelegateForColumn(ArchetypesWidgetModel::Column::FunctionName,
-            new shared::archetype::ComboBoxDelegate(QStringList(), ui->tableView));
+    m_ui->tableView->setItemDelegateForColumn(ArchetypesWidgetModel::Column::LibraryName,
+            new ive::ComboBoxDelegate(archetypeModel->getLibrariesNames(), m_ui->tableView));
+    m_ui->tableView->setItemDelegateForColumn(
+            ArchetypesWidgetModel::Column::FunctionName, new ive::ComboBoxDelegate(QStringList(), m_ui->tableView));
 
     m_model = new ArchetypesWidgetModel(archetypeModel, checks, macro, this);
     m_model->setFunction(function);
-    ui->tableView->setModel(m_model);
-    ui->tableView->horizontalHeader()->resizeSection(0, 220);
-    ui->tableView->horizontalHeader()->resizeSection(1, 180);
+    m_ui->tableView->setModel(m_model);
+    m_ui->tableView->horizontalHeader()->resizeSection(0, 220);
+    m_ui->tableView->horizontalHeader()->resizeSection(1, 180);
 
-    connect(ui->addButton, &QPushButton::clicked, this, &ArchetypesWidget::addArchetype);
-    connect(ui->deleteButton, &QPushButton::clicked, this, &ArchetypesWidget::deleteArchetype);
+    connect(m_ui->addButton, &QPushButton::clicked, this, &ArchetypesWidget::addArchetype);
+    connect(m_ui->deleteButton, &QPushButton::clicked, this, &ArchetypesWidget::deleteArchetype);
 
     connect(m_model, &ArchetypesWidgetModel::rowsInserted, this, &ArchetypesWidget::rowsInserted);
     rowsInserted(QModelIndex(), 0, m_model->rowCount() - 1);
@@ -71,7 +71,7 @@ ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVF
 
 ArchetypesWidget::~ArchetypesWidget()
 {
-    delete ui;
+    delete m_ui;
 }
 
 void ArchetypesWidget::addArchetype()
@@ -83,14 +83,14 @@ void ArchetypesWidget::addArchetype()
     }
 
     QModelIndex idx = m_model->index(newRow, ArchetypesWidgetModel::Column::LibraryName);
-    ui->tableView->edit(idx);
-    ui->tableView->scrollToBottom();
-    ui->tableView->selectRow(newRow);
+    m_ui->tableView->edit(idx);
+    m_ui->tableView->scrollToBottom();
+    m_ui->tableView->selectRow(newRow);
 }
 
 void ArchetypesWidget::deleteArchetype()
 {
-    QModelIndexList selections = ui->tableView->selectionModel()->selectedRows();
+    QModelIndexList selections = m_ui->tableView->selectionModel()->selectedRows();
     if (selections.size() != 1) {
         return;
     }
@@ -100,7 +100,7 @@ void ArchetypesWidget::deleteArchetype()
 
 void ArchetypesWidget::applyArchetypes()
 {
-    if (!checkReferences()) {
+    if (!checkReferences() || !m_model->areArchetypesModified()) {
         return;
     }
 
@@ -113,13 +113,13 @@ void ArchetypesWidget::applyArchetypes()
                 reference->getFunctionName(), ivm::ArchetypeObject::Type::FunctionArchetype);
         ivm::FunctionArchetype *functionArchetype = archetypeObject->as<ivm::FunctionArchetype *>();
 
-        if (!functionArchetype) {
+        if (functionArchetype == nullptr) {
             continue;
         }
 
         for (auto interface : functionArchetype->getInterfaces()) {
             if (m_model->getFunction()->hasInterface(interface->title())) {
-                QMessageBox::warning(qApp->activeWindow(), tr("Duplicate Archetype"),
+                QMessageBox::warning(qApp->activeWindow(), tr("Duplicate interface"),
                         tr("Function %1 already has an interface named %2")
                                 .arg(m_model->getFunction()->title())
                                 .arg(interface->title()));
@@ -142,25 +142,22 @@ bool ArchetypesWidget::checkReferences()
         return false;
     }
 
-    const bool hasDuplicates =
-            std::adjacent_find(references.begin(), references.end(),
-                    [](ivm::IVArchetypeReference *firstReference, ivm::IVArchetypeReference *secondReference) -> bool {
-                        return firstReference->getLibraryName() == secondReference->getLibraryName()
-                                && firstReference->getFunctionName() == secondReference->getFunctionName();
-                    })
-            != references.end();
-
-    if (hasDuplicates) {
-        QMessageBox::warning(
-                qApp->activeWindow(), tr("Archetype error"), tr("Archetype list has duplicate implementations"));
-        return false;
-    }
-
     for (auto reference : references) {
         if (reference->getLibraryName().isEmpty() || reference->getFunctionName().isEmpty()) {
             QMessageBox::warning(
                     qApp->activeWindow(), tr("Archetype error"), tr("Archetypes implementations are incomplete"));
             return false;
+        }
+    }
+
+    for (int i = 0; i < references.size(); ++i) {
+        for (int j = i + 1; j < references.size(); ++j) {
+            if (references[i]->getLibraryName() == references[j]->getLibraryName()
+                    && references[i]->getFunctionName() == references[j]->getFunctionName()) {
+                QMessageBox::warning(qApp->activeWindow(), tr("Archetype error"),
+                        tr("Archetype list has duplicate implementations"));
+                return false;
+            }
         }
     }
 
@@ -237,7 +234,7 @@ void ArchetypesWidget::rowsInserted(const QModelIndex &parent, int first, int la
     for (int i = first; i <= last; ++i) {
         const QModelIndex functionIndex = m_model->index(i, ArchetypesWidgetModel::Column::FunctionName, parent);
         if (functionIndex.isValid()) {
-            ui->tableView->openPersistentEditor(functionIndex);
+            m_ui->tableView->openPersistentEditor(functionIndex);
         }
     }
 }

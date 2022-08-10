@@ -60,8 +60,6 @@ target_sources(${LIB_NAME} PRIVATE
     geometry.h
     graphicsviewutils.cpp
     graphicsviewutils.h
-    archetype/comboboxdelegate.cpp
-    archetype/comboboxdelegate.h
     interface/attributedelegate.cpp
     interface/attributedelegate.h
     interface/comboboxdelegate.cpp

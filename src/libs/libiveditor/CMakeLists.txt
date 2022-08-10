@@ -164,6 +164,8 @@ target_sources(${LIB_NAME} PRIVATE
     properties/contextparametersmodel.h
     properties/delegates/asn1valuedelegate.cpp
     properties/delegates/asn1valuedelegate.h
+    properties/delegates/comboboxdelegate.cpp
+    properties/delegates/comboboxdelegate.h
     properties/archetypeswidgetmodel.cpp
     properties/archetypeswidgetmodel.h
     properties/archetypeswidget.cpp

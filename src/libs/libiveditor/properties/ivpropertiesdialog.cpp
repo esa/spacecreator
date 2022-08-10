@@ -288,7 +288,7 @@ void IVPropertiesDialog::initLanguageView()
 void IVPropertiesDialog::initArchetypeView()
 {
     auto function = qobject_cast<ivm::IVFunctionType *>(dataObject());
-    if (!function) {
+    if (function == nullptr) {
         return;
     }
     auto archetypesWidget = new ive::ArchetypesWidget(m_archetypesModel, function, m_ivChecks, commandMacro(), this);

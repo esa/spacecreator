@@ -38,6 +38,7 @@ namespace ive {
 ArchetypesWidgetModel::ArchetypesWidgetModel(ivm::ArchetypeModel *archetypeModel, ivm::AbstractSystemChecks *checks,
         cmd::CommandsStack::Macro *macro, QObject *parent)
     : QAbstractItemModel(parent)
+    , m_areArchetypesModified(false)
     , m_checks(checks)
     , m_cmdMacro(macro)
     , m_archetypeModel(archetypeModel)
@@ -60,6 +61,11 @@ void ArchetypesWidgetModel::setFunction(ivm::IVFunctionType *fn)
 QVector<ivm::IVArchetypeReference *> ArchetypesWidgetModel::getArchetypeReferences()
 {
     return m_archetypeReferences;
+}
+
+bool ArchetypesWidgetModel::areArchetypesModified()
+{
+    return m_areArchetypesModified;
 }
 
 QVariant ArchetypesWidgetModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -91,7 +97,7 @@ QModelIndex ArchetypesWidgetModel::parent(const QModelIndex &index) const
 int ArchetypesWidgetModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
-    if (!m_function) {
+    if (m_function == nullptr) {
         return 0;
     }
 
@@ -107,7 +113,7 @@ int ArchetypesWidgetModel::columnCount(const QModelIndex &parent) const
 
 QVariant ArchetypesWidgetModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || !m_function) {
+    if (!index.isValid() || m_function == nullptr) {
         return QVariant();
     }
 
@@ -137,7 +143,7 @@ QVariant ArchetypesWidgetModel::data(const QModelIndex &index, int role) const
 
 bool ArchetypesWidgetModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (!index.isValid() || !m_function) {
+    if (!index.isValid() || m_function == nullptr) {
         return false;
     }
 
@@ -154,7 +160,10 @@ bool ArchetypesWidgetModel::setData(const QModelIndex &index, const QVariant &va
             return false;
         }
 
-        Q_EMIT dataChanged(index, index, QVector<int>() << role);
+        m_areArchetypesModified = true;
+
+        const auto functionIndex = createIndex(index.row(), index.column() + 1);
+        Q_EMIT dataChanged(index, functionIndex, QVector<int>() << role);
         return true;
     }
 
@@ -172,7 +181,7 @@ Qt::ItemFlags ArchetypesWidgetModel::flags(const QModelIndex &index) const
 
 bool ArchetypesWidgetModel::insertRows(int row, int count, const QModelIndex &parent)
 {
-    if (!m_function) {
+    if (m_function == nullptr) {
         return false;
     }
     if (m_archetypeModel->getLibrariesNames().isEmpty()) {
@@ -194,17 +203,19 @@ bool ArchetypesWidgetModel::insertRows(int row, int count, const QModelIndex &pa
 
         std::sort(m_archetypeReferences.begin(), m_archetypeReferences.end(),
                 [](ivm::IVArchetypeReference *firstReference, ivm::IVArchetypeReference *secondReference) -> bool {
-                    return firstReference->getLibraryName() < secondReference->getLibraryName();
+                    return firstReference->getLibraryName() < secondReference->getLibraryName()
+                            && firstReference->getFunctionName() < secondReference->getFunctionName();
                 });
     }
 
     endInsertRows();
+    m_areArchetypesModified = true;
     return true;
 }
 
 bool ArchetypesWidgetModel::removeRows(int row, int count, const QModelIndex &parent)
 {
-    if (!m_function) {
+    if (m_function == nullptr) {
         return false;
     }
     const auto result = QMessageBox::question(qApp->activeWindow(), tr("Remove archetype implementations"),
@@ -217,6 +228,7 @@ bool ArchetypesWidgetModel::removeRows(int row, int count, const QModelIndex &pa
     m_archetypeReferences.remove(row, count);
 
     endRemoveRows();
+    m_areArchetypesModified = true;
     return true;
 }
 

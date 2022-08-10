@@ -64,7 +64,7 @@ private:
     void rowsInserted(const QModelIndex &parent, int first, int last);
 
 private:
-    Ui::ArchetypesWidget *ui;
+    Ui::ArchetypesWidget *m_ui;
     ArchetypesWidgetModel *m_model = nullptr;
     ivm::ArchetypeModel *m_archetypeModel = nullptr;
     shared::cmd::CommandsStackBase::Macro *m_cmdMacro = nullptr;

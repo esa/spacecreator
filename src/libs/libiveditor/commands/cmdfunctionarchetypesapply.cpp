@@ -40,14 +40,14 @@ CmdFunctionArchetypesApply::CmdFunctionArchetypesApply(
 
 void CmdFunctionArchetypesApply::redo()
 {
-    if (m_function) {
+    if (m_function != nullptr) {
         m_function->setArchetypeReferences(m_newReferences);
     }
 }
 
 void CmdFunctionArchetypesApply::undo()
 {
-    if (m_function) {
+    if (m_function != nullptr) {
         m_function->setArchetypeReferences(m_oldReferences);
     }
 }

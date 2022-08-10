@@ -22,7 +22,7 @@
 #include <QComboBox>
 #include <QDebug>
 
-namespace shared::archetype {
+namespace ive {
 
 ComboBoxDelegate::ComboBoxDelegate(const QStringList &options, QObject *parent)
     : QStyledItemDelegate(parent)
@@ -70,4 +70,4 @@ void ComboBoxDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, 
     QStyledItemDelegate::setModelData(editor, model, index);
 }
 
-} // namespace shared::archetype
+} // namespace ive

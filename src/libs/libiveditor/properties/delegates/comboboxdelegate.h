@@ -22,7 +22,7 @@
 #include <QStringList>
 #include <QStyledItemDelegate>
 
-namespace shared::archetype {
+namespace ive {
 
 class ComboBoxDelegate : public QStyledItemDelegate
 {
@@ -38,4 +38,4 @@ private:
     QStringList m_options;
 };
 
-} // namespace shared::archetype
+} // namespace ive

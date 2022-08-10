@@ -50,8 +50,9 @@ public:
 
     ivm::IVFunctionType *getFunction();
     void setFunction(ivm::IVFunctionType *fn);
-    
+
     QVector<ivm::IVArchetypeReference *> getArchetypeReferences();
+    bool areArchetypesModified();
 
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
@@ -70,7 +71,7 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
 private:
-
+    bool m_areArchetypesModified;
     QPointer<ivm::IVFunctionType> m_function;
     QPointer<ivm::AbstractSystemChecks> m_checks;
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
