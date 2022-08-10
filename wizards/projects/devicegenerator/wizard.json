@@ -25,6 +25,33 @@
             "typeId": "Project"
         },
         {
+            "trDisplayName": "Project Initialization",
+            "trShortTitle": "Project Initialization",
+            "typeId": "Fields",
+            "enabled": true,
+            "data":[
+                {
+                    "name": "IVFileSource",
+                    "trDisplayName": "IV file:",
+                    "type": "ComboBox",
+                    "data":
+                    {
+                        "index": 0,
+                        "items":[
+                            {
+                                "trKey": "empty",
+                                "value": "empty"
+                            },
+                            {
+                                "trKey": "example",
+                                "value": "example"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
             "trDisplayName": "Kit Selection",
             "trShortTitle": "Kits",
             "typeId": "Kits",
@@ -58,7 +85,7 @@
                     "openInEditor": true
                 },
                 {
-                    "source": "interfaceview_empty.xml",
+                    "source": "%{JS: '%{IVFileSource}' === 'empty' ? 'interfaceview_empty.xml' : 'interfaceview.xml'}",
                     "target": "%{ProjectDirectory}/%{IVFile}",
                     "openInEditor": true
                 }
