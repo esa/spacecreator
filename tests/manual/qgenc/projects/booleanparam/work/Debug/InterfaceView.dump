@@ -1,0 +1,81 @@
+Function Controller in context _Root
+├─ Full Prefix : (none)
+├─ Language    : c
+├─ Zip file    : (none)
+├─ Is type     : FALSE
+├─ Instance of : 
+├─ Context Parameters :
+├─ Directives:
+├─ Simulink Tuneable Parameters:
+├─ Implementations:
+├─ User properties:
+├─ Timers:
+├─ Provided interfaces:
+│  └─ Name : Trigger - in FV: Controller
+│     ├─ RCM Kind    : CYCLIC_OPERATION
+│     ├─ Period/MIAT :  1000
+│     ├─ WCET (ms)   :  0
+│     ├─ Queue Size  :  1
+│     ├─ Parameters  :
+│     └─ Connections :
+└─ Required interfaces:
+   └─ Name : Iface - in FV: Controller
+      ├─ RCM Kind    : PROTECTED_OPERATION
+      ├─ Period/MIAT :  0
+      ├─ WCET (ms)   :  0
+      ├─ Queue Size  :  1
+      ├─ Parameters  :
+      │  ├─ Name            : input
+      │  │  ├─ Type         : MyBool
+      │  │  ├─ ASN.1 Module : BOOLEANPARAM_DATAVIEW
+      │  │  ├─ ASN.1 File   : booleanparam.asn
+      │  │  ├─ Basic type   : ASN1_BOOLEAN
+      │  │  ├─ Encoding     : NATIVE
+      │  │  └─ Direction    : PARAM_IN
+      │  ├─ Name            : output
+      │  │  ├─ Type         : MyBool
+      │  │  ├─ ASN.1 Module : BOOLEANPARAM_DATAVIEW
+      │  │  ├─ ASN.1 File   : booleanparam.asn
+      │  │  ├─ Basic type   : ASN1_BOOLEAN
+      │  │  ├─ Encoding     : NATIVE
+      │  │  └─ Direction    : PARAM_OUT
+      └─ Connections :
+         └─ Function QGenC, interface Iface
+
+Function QGenC in context _Root
+├─ Full Prefix : (none)
+├─ Language    : qgenc
+├─ Zip file    : (none)
+├─ Is type     : FALSE
+├─ Instance of : 
+├─ Context Parameters :
+├─ Directives:
+├─ Simulink Tuneable Parameters:
+├─ Implementations:
+├─ User properties:
+├─ Timers:
+├─ Provided interfaces:
+│  └─ Name : Iface - in FV: QGenC
+│     ├─ RCM Kind    : PROTECTED_OPERATION
+│     ├─ Period/MIAT :  0
+│     ├─ WCET (ms)   :  0
+│     ├─ Queue Size  :  1
+│     ├─ Parameters  :
+│     │  ├─ Name            : input
+│     │  │  ├─ Type         : MyBool
+│     │  │  ├─ ASN.1 Module : BOOLEANPARAM_DATAVIEW
+│     │  │  ├─ ASN.1 File   : booleanparam.asn
+│     │  │  ├─ Basic type   : ASN1_BOOLEAN
+│     │  │  ├─ Encoding     : NATIVE
+│     │  │  └─ Direction    : PARAM_IN
+│     │  ├─ Name            : output
+│     │  │  ├─ Type         : MyBool
+│     │  │  ├─ ASN.1 Module : BOOLEANPARAM_DATAVIEW
+│     │  │  ├─ ASN.1 File   : booleanparam.asn
+│     │  │  ├─ Basic type   : ASN1_BOOLEAN
+│     │  │  ├─ Encoding     : NATIVE
+│     │  │  └─ Direction    : PARAM_OUT
+│     └─ Connections :
+│        └─ Function Controller, interface Iface
+└─ Required interfaces:
+

@@ -1,0 +1,5 @@
+[INFO] Exporting model to xmi IntIface.slx
+[INFO] Processing model <a href="matlab:iqgen_highlight('IntIface')">IntIface</a>
+[INFO] Exported model to <a href="matlab: open('C:\matlabremote\55736\src\..\xmi\IntIface.qsi')">IntIface.qsi</a>
+[INFO] Exported model to <a href="matlab: open('C:\matlabremote\55736\src\..\xmi\IntIface.xmi')">IntIface.xmi</a>
+[INFO] Exported workspace to <a href="matlab: open('C:\matlabremote\55736\src\..\xmi\QGen_Base_Workspace.xmi')">QGen_Base_Workspace.xmi</a>

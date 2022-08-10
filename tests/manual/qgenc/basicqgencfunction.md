@@ -2,7 +2,7 @@
 
 **1. Steps:**
 
-* Open project `tests/manual/qgenc/basicqgencfunction/basicqgencfunction.pro`
+* Open project `tests/manual/qgenc/projects/basicqgencfunction/basicqgencfunction.pro`
 * Open the `interfaceview.xml` file
 * Right click at any place and choose "Generate/update code skeletons"
 
