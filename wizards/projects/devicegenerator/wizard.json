@@ -10,10 +10,12 @@
     "enabled": true,
 
     "options":[
-        { "key": "ProjectFile", "value": "%{JS: '%{BuildSystem}' === 'qmake' ? '%{ProFile}' : '%{CMakeFile}'}" },
-        { "key": "ProFile", "value": "%{JS: Util.fileName('%{ProjectDirectory}/%{ProjectName}', 'pro')}" },
-        { "key": "CMakeFile", "value": "%{ProjectDirectory}/CMakeLists.txt" },
-        { "key": "IVFile", "value": "interfaceview.xml" }
+        { "key": "ProFile", "value": "%{JS: Util.fileName('%{ProjectName}', 'pro')}" },
+        { "key": "AsnFile", "value": "%{JS: Util.fileName('%{ProjectName}', 'asn')}" },
+        { "key": "AcnFile", "value": "%{JS: Util.fileName('%{ProjectName}', 'acn')}" },
+        { "key": "IVFile", "value": "interfaceview.xml" },
+        { "key": "Model", "value": "%{JS: '%{ProjectName}'.toUpperCase()}" },
+        { "key": "IVAsnFile", "value": " asn1file=\"%{AsnFile}\"" }
     ],
 
     "pages":[
@@ -23,41 +25,11 @@
             "typeId": "Project"
         },
         {
-            "trDisplayName": "Project Initialization",
-            "trShortTitle": "Project Initialization",
-            "typeId": "Fields",
-            "enabled": true,
-            "data":[
-                {
-                    "name": "BuildSystem",
-                    "trDisplayName": "Build system:",
-                    "type": "ComboBox",
-                    "data":
-                    {
-                        "index": 0,
-                        "items":
-                        [
-                            {
-                                "trKey": "qmake",
-                                "value": "qmake",
-                                "condition": "%{JS: [ %{Plugins} ].indexOf('QmakeProjectManager') >= 0}"
-                            },
-                            {
-                                "trKey": "CMake",
-                                "value": "cmake",
-                                "condition": "%{JS: [ %{Plugins} ].indexOf('CMakeProjectManager') >= 0}"
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
             "trDisplayName": "Kit Selection",
             "trShortTitle": "Kits",
             "typeId": "Kits",
             "enabled": true,
-            "data": { "projectFilePath": "%{ProjectFile}" }
+            "data": { "projectFilePath": "%{ProFile}" }
         },
         {
             "trDisplayName": "Project Management",
@@ -72,55 +44,22 @@
             "data":[
                 {
                     "source": "file.pro",
-                    "target": "%{ProFile}",
-                    "openAsProject": true,
-                    "condition": "%{JS: '%{BuildSystem}' === 'qmake'}"
+                    "target": "%{ProjectDirectory}/%{ProFile}",
+                    "openAsProject": true
                 },
                 {
-                    "source": "../asn1acn/handleAsn1AcnBuild.pri",
-                    "target": "handleAsn1AcnBuild.pri",
-                    "openAsProject": false,
-                    "condition": "%{JS: '%{BuildSystem}' === 'qmake'}"
+                    "source": "template.asn",
+                    "target": "%{ProjectDirectory}/%{AsnFile}",
+                    "openInEditor": true
                 },
                 {
-                    "source": "../asn1acn/updateSourcesList.pri",
-                    "target": "updateSourcesList.pri",
-                    "openAsProject": false,
-                    "condition": "%{JS: '%{BuildSystem}' === 'qmake'}"
+                    "source": "template.acn",
+                    "target": "%{ProjectDirectory}/%{AcnFile}",
+                    "openInEditor": true
                 },
                 {
-                    "source": "../asn1acn/generateFromAsn1.pri",
-                    "target": "generateFromAsn1.pri",
-                    "openAsProject": false,
-                    "condition": "%{JS: '%{BuildSystem}' === 'qmake'}"
-                },
-                {
-                    "source": "CMakeLists.txt",
-                    "target": "CMakeLists.txt",
-                    "openAsProject": true,
-                    "condition": "%{JS: '%{BuildSystem}' === 'cmake'}"
-                },
-                {
-                    "source": "../asn1acn/asn1sccSettings.cmake",
-                    "target": "asn1sccSettings.cmake",
-                    "openAsProject": false,
-                    "condition": "%{JS: '%{BuildSystem}' === 'cmake'}"
-                },
-                {
-                    "source": "../asn1acn/configureAsn1SccTarget.cmake",
-                    "target": "configureAsn1SccTarget.cmake",
-                    "openAsProject": false,
-                    "condition": "%{JS: '%{BuildSystem}' === 'cmake'}"
-                },
-                {
-                    "source": "../asn1acn/createFilesList.cmake",
-                    "target": "createFilesList.cmake",
-                    "openAsProject": false,
-                    "condition": "%{JS: '%{BuildSystem}' === 'cmake'}"
-                },
-                {
-                    "source": "interfaceview.xml",
-                    "target": "%{IVFile}",
+                    "source": "interfaceview_empty.xml",
+                    "target": "%{ProjectDirectory}/%{IVFile}",
                     "openInEditor": true
                 }
             ]
