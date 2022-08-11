@@ -57,6 +57,10 @@ const QVector<QString> Asn1NodeVisitor::getInitInlineNames() const
 
 void Asn1NodeVisitor::visit(const Definitions &defs)
 {
+    if (defs.name().endsWith(m_defaultSubtypePostfix)) {
+        return;
+    }
+
     for (const std::unique_ptr<TypeAssignment> &type : defs.types()) {
         type->accept(*this);
     }

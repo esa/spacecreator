@@ -68,5 +68,7 @@ private:
     model::PromelaModel &m_promelaModel;
     const bool m_enhancedSpinSupport;
     QVector<QString> m_initInlines;
+
+    inline static const QString m_defaultSubtypePostfix = "-DEFAULT-SUBTYPE";
 };
 }
