@@ -530,7 +530,7 @@ void ModelCheckingWindow::on_pushButton_interactiveSim_clicked()
     QString callSimCmd = "xterm -hold -e make simu";
     if (QProcess::execute(callSimCmd) != 0) {
         QMessageBox::warning(this, tr("Interactive Simulator"),
-                             "Error executing: " + callIFCmd);
+                             "Error executing: " + callSimCmd);
     }
 }
 
