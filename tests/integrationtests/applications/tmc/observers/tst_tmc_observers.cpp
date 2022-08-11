@@ -30,7 +30,7 @@ class tst_Tmc_Observers : public QObject
 private Q_SLOTS:
     void test_inputMonitoring();
     void test_inputMonitoringFailure();
-    void test_mscNeverObserver();
+    void test_mscNeverSequenceFailure();
 };
 
 void tst_Tmc_Observers::test_inputMonitoring()
@@ -45,9 +45,9 @@ void tst_Tmc_Observers::test_inputMonitoringFailure()
     QCOMPARE(result, 0);
 }
 
-void tst_Tmc_Observers::test_mscNeverObserver()
+void tst_Tmc_Observers::test_mscNeverSequenceFailure()
 {
-    const int result = system("./test_msc_never_observer.sh");
+    const int result = system("./test_msc_never_sequence_failure.sh");
     QCOMPARE(result, 0);
 }
 

@@ -9,7 +9,7 @@ CC=gcc
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
 TEST_OUTPUT_DIR=output
-RESOURCE_DIR=resources/MscNeverObserver
+RESOURCE_DIR=resources/MscNeverSequenceFailure
 PROPERTIES_DIR=$RESOURCE_DIR/work/modelchecking/properties
 
 echo "Running TMC test: ${0##*/}'"

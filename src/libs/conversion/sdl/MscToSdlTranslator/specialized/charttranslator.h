@@ -20,7 +20,7 @@
 #pragma once
 
 #include "observertype.h"
-#include "specialized/neverobservertranslator.h"
+#include "specialized/neversequencetranslator.h"
 
 #include <msccore/mscchart.h>
 #include <sdl/SdlModel/sdlmodel.h>
@@ -74,7 +74,7 @@ private:
     auto getObserverType(const QVector<msc::MscInstanceEvent *> &mscEvents) const -> ObserverType;
 
 private:
-    NeverObserverTranslator m_neverObserverTranslator;
+    NeverSequenceTranslator m_neverSequenceTranslator;
 };
 
 } // namespace conversion::sdl::translator

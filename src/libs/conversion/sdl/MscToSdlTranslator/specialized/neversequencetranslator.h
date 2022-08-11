@@ -33,7 +33,7 @@ namespace conversion::sdl::translator {
 /**
  * @brief   Translator for MSC "Never" charts
  */
-class NeverObserverTranslator final
+class NeverSequenceTranslator final
 {
 public:
     /**
@@ -42,25 +42,25 @@ public:
      * @param   sdlModel    Parent SDL model
      * @param   options     Conversion options
      */
-    NeverObserverTranslator(::sdl::SdlModel *sdlModel, const Options &options);
+    NeverSequenceTranslator(::sdl::SdlModel *sdlModel, const Options &options);
 
     /**
      * @brief   Deleted copy constuctor
      */
-    NeverObserverTranslator(const NeverObserverTranslator &) = delete;
+    NeverSequenceTranslator(const NeverSequenceTranslator &) = delete;
     /**
      * @brief   Deleted move constuctor
      */
-    NeverObserverTranslator(NeverObserverTranslator &&) = delete;
+    NeverSequenceTranslator(NeverSequenceTranslator &&) = delete;
 
     /**
      * @brief   Deleted copy assignment operator
      */
-    NeverObserverTranslator &operator=(const NeverObserverTranslator &) = delete;
+    NeverSequenceTranslator &operator=(const NeverSequenceTranslator &) = delete;
     /**
      * @brief   Deleted move assignment operator
      */
-    NeverObserverTranslator &operator=(NeverObserverTranslator &&) = delete;
+    NeverSequenceTranslator &operator=(NeverSequenceTranslator &&) = delete;
 
 public:
     /**
@@ -81,11 +81,11 @@ private:
     };
 
 private:
-    auto handleEvent(NeverObserverTranslator::Context &context, const msc::MscInstanceEvent *mscEvent) const -> void;
-    auto handleMessageEvent(NeverObserverTranslator::Context &context, const msc::MscMessage *mscMessage) const -> void;
+    auto handleEvent(NeverSequenceTranslator::Context &context, const msc::MscInstanceEvent *mscEvent) const -> void;
+    auto handleMessageEvent(NeverSequenceTranslator::Context &context, const msc::MscMessage *mscMessage) const -> void;
 
     auto createSdlSkeleton(const msc::MscChart *mscChart) const -> Context;
-    auto createSdlSystem(NeverObserverTranslator::Context &context) const -> ::sdl::System;
+    auto createSdlSystem(NeverSequenceTranslator::Context &context) const -> ::sdl::System;
 
 private:
     inline static const QString m_stateNameTemplate = "s%1";

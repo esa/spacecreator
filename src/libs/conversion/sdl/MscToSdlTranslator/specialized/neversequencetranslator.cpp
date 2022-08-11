@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "specialized/neverobservertranslator.h"
+#include "specialized/neversequencetranslator.h"
 
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
@@ -45,13 +45,13 @@ using sdl::VariableDeclaration;
 
 namespace conversion::sdl::translator {
 
-NeverObserverTranslator::NeverObserverTranslator(SdlModel *sdlModel, const Options &options)
+NeverSequenceTranslator::NeverSequenceTranslator(SdlModel *sdlModel, const Options &options)
     : m_sdlModel(sdlModel)
     , m_options(options)
 {
 }
 
-void NeverObserverTranslator::createObserver(const MscChart *mscChart) const
+void NeverSequenceTranslator::createObserver(const MscChart *mscChart) const
 {
     auto context = createSdlSkeleton(mscChart);
 
@@ -68,8 +68,8 @@ void NeverObserverTranslator::createObserver(const MscChart *mscChart) const
     m_sdlModel->addSystem(std::move(system));
 }
 
-void NeverObserverTranslator::handleEvent(
-        NeverObserverTranslator::Context &context, const MscInstanceEvent *mscEvent) const
+void NeverSequenceTranslator::handleEvent(
+        NeverSequenceTranslator::Context &context, const MscInstanceEvent *mscEvent) const
 {
     switch (mscEvent->entityType()) {
     case MscEntity::EntityType::Message: {
@@ -90,8 +90,8 @@ void NeverObserverTranslator::handleEvent(
     }
 }
 
-void NeverObserverTranslator::handleMessageEvent(
-        NeverObserverTranslator::Context &context, const MscMessage *mscMessage) const
+void NeverSequenceTranslator::handleMessageEvent(
+        NeverSequenceTranslator::Context &context, const MscMessage *mscMessage) const
 {
     auto state = std::make_unique<State>();
     state->setName(m_stateNameTemplate.arg(++context.stateCounter));
@@ -129,7 +129,7 @@ void NeverObserverTranslator::handleMessageEvent(
     context.signalRenames.push_back(std::move(signalRename));
 }
 
-NeverObserverTranslator::Context NeverObserverTranslator::createSdlSkeleton(const MscChart *mscChart) const
+NeverSequenceTranslator::Context NeverSequenceTranslator::createSdlSkeleton(const MscChart *mscChart) const
 {
     Process process;
     process.setName(Escaper::escapeSdlName(mscChart->name()));
@@ -161,7 +161,7 @@ NeverObserverTranslator::Context NeverObserverTranslator::createSdlSkeleton(cons
     return context;
 }
 
-System NeverObserverTranslator::createSdlSystem(NeverObserverTranslator::Context &context) const
+System NeverSequenceTranslator::createSdlSystem(NeverSequenceTranslator::Context &context) const
 {
     const auto processName = context.process.name();
 
