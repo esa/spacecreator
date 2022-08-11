@@ -488,7 +488,7 @@ bool TmcConverter::convertMscObservers()
         }
 
         const auto outputDir = mscFile.dir();
-        const auto &outputPath = outputDir.path() + "/";
+        const auto &outputPath = outputDir.path() + QDir::separator();
 
         Options options;
 
