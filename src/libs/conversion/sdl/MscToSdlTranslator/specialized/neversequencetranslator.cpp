@@ -102,8 +102,8 @@ void NeverSequenceTranslator::handleMessageEvent(
     auto signalRename = std::make_unique<Rename>();
     signalRename->setName(m_signalRenameNameTemplate.arg(context.stateCounter));
     signalRename->setDirection(Rename::Direction::Input);
-    signalRename->setOriginalName(Escaper::escapeSdlName(mscMessage->name()));
-    signalRename->setOriginalFunctionName(Escaper::escapeSdlName(mscMessage->targetInstance()->name()));
+    signalRename->setReferencedName(Escaper::escapeSdlName(mscMessage->name()));
+    signalRename->setReferencedFunctionName(Escaper::escapeSdlName(mscMessage->targetInstance()->name()));
 
     auto input = std::make_unique<Input>();
     input->setName(signalRename->name());

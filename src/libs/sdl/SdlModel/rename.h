@@ -46,10 +46,10 @@ public:
      *
      * @param   name                    Signal name
      * @param   direction               Renamed signal direction
-     * @param   originalName            Name of the renamed signal
-     * @param   originalFunctionName    Name of the function from the renamed signal
+     * @param   referencedName          Name of the renamed signal
+     * @param   referencedFunctionName  Name of the function from the renamed signal
      */
-    Rename(QString name, Direction direction, QString originalName, QString originalFunctionName);
+    Rename(QString name, Direction direction, QString referencedName, QString referencedFunctionName);
     /**
      * @brief   Deleted copy constructor
      */
@@ -83,30 +83,30 @@ public:
     auto setDirection(Direction direction) -> void;
 
     /**
-     * @brief   Getter for original signal name
+     * @brief   Getter for referenced signal name
      *
-     * @return  Original name
+     * @return  Referenced name
      */
-    auto originalName() const -> const QString &;
+    auto referencedName() const -> const QString &;
     /**
-     * @brief   Setter for original signal name
+     * @brief   Setter for referenced signal name
      *
-     * @param   name    Original signal name
+     * @param   name    Referenced signal name
      */
-    auto setOriginalName(QString name) -> void;
+    auto setReferencedName(QString name) -> void;
 
     /**
-     * @brief   Getter for original function name
+     * @brief   Getter for referenced function name
      *
-     * @return  Original name
+     * @return  Referenced name
      */
-    auto originalFunctionName() const -> const QString &;
+    auto referencedFunctionName() const -> const QString &;
     /**
-     * @brief   Setter for original funcion name
+     * @brief   Setter for referenced funcion name
      *
-     * @param   name    Original function name
+     * @param   name    Referenced function name
      */
-    auto setOriginalFunctionName(QString name) -> void;
+    auto setReferencedFunctionName(QString name) -> void;
 
 public:
     /**
@@ -116,8 +116,8 @@ public:
 
 private:
     Direction m_direction;
-    QString m_originalName;
-    QString m_originalFunctionName;
+    QString m_referencedName;
+    QString m_referencedFunctionName;
 };
 
 } // namespace sdl

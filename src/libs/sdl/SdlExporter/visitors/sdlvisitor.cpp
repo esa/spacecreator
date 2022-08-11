@@ -421,7 +421,7 @@ void SdlVisitor::visit(const Rename &rename)
 
     m_writer.beginLine(QString("signal %1 renames").arg(rename.name()));
 
-    if (rename.originalName().isEmpty()) {
+    if (rename.referencedName().isEmpty()) {
         return;
     }
 
@@ -434,9 +434,9 @@ void SdlVisitor::visit(const Rename &rename)
         break;
     }
 
-    m_writer.write(rename.originalName());
+    m_writer.write(rename.referencedName());
 
-    if (rename.originalFunctionName().isEmpty()) {
+    if (rename.referencedFunctionName().isEmpty()) {
         return;
     }
 
@@ -449,7 +449,7 @@ void SdlVisitor::visit(const Rename &rename)
         break;
     }
 
-    m_writer.write(rename.originalFunctionName());
+    m_writer.write(rename.referencedFunctionName());
     m_writer.endLine(";");
 }
 

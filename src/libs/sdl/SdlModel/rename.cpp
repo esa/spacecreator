@@ -23,11 +23,11 @@
 
 namespace sdl {
 
-Rename::Rename(QString name, Direction direction, QString originalName, QString originalFunctionName)
+Rename::Rename(QString name, Direction direction, QString referencedName, QString referencedFunctionName)
     : Signal(std::move(name))
     , m_direction(direction)
-    , m_originalName(std::move(originalName))
-    , m_originalFunctionName(std::move(originalFunctionName))
+    , m_referencedName(std::move(referencedName))
+    , m_referencedFunctionName(std::move(referencedFunctionName))
 {
 }
 
@@ -41,24 +41,24 @@ void Rename::setDirection(Direction direction)
     m_direction = direction;
 }
 
-const QString &Rename::originalName() const
+const QString &Rename::referencedName() const
 {
-    return m_originalName;
+    return m_referencedName;
 }
 
-void Rename::setOriginalName(QString name)
+void Rename::setReferencedName(QString name)
 {
-    m_originalName = std::move(name);
+    m_referencedName = std::move(name);
 }
 
-const QString &Rename::originalFunctionName() const
+const QString &Rename::referencedFunctionName() const
 {
-    return m_originalFunctionName;
+    return m_referencedFunctionName;
 }
 
-void Rename::setOriginalFunctionName(QString name)
+void Rename::setReferencedFunctionName(QString name)
 {
-    m_originalFunctionName = std::move(name);
+    m_referencedFunctionName = std::move(name);
 }
 
 void Rename::accept(Visitor &visitor) const
