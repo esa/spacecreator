@@ -27,18 +27,44 @@
 
 namespace conversion::sdl::translator {
 
+/**
+ * @brief   Translator for MSC charts
+ */
 class ChartTranslator final
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   sdlModel    Parent SDL model
+     * @param   options     Conversion options
+     */
     ChartTranslator(::sdl::SdlModel *sdlModel, const Options &options);
 
+    /**
+     * @brief   Deleted copy constuctor
+     */
     ChartTranslator(const ChartTranslator &) = delete;
+    /**
+     * @brief   Deleted move constuctor
+     */
     ChartTranslator(ChartTranslator &&) = delete;
 
+    /**
+     * @brief   Deleted copy assignment operator
+     */
     ChartTranslator &operator=(const ChartTranslator &) = delete;
+    /**
+     * @brief   Deleted move assignment operator
+     */
     ChartTranslator &operator=(ChartTranslator &&) = delete;
 
 public:
+    /**
+     * @brief   Translate given chart and add the result to the SDL model
+     *
+     * @param   mscChart    Chart to translate
+     */
     auto translateChart(const msc::MscChart *mscChart) const -> void;
 
 private:

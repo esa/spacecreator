@@ -26,18 +26,44 @@
 
 namespace conversion::sdl::translator {
 
+/**
+ * @brief   Translator for MSC documents
+ */
 class DocumentTranslator final
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   sdlModel    Parent SDL model
+     * @param   options     Conversion options
+     */
     DocumentTranslator(::sdl::SdlModel *sdlModel, const Options &options);
 
+    /**
+     * @brief   Deleted copy constuctor
+     */
     DocumentTranslator(const DocumentTranslator &) = delete;
+    /**
+     * @brief   Deleted move constuctor
+     */
     DocumentTranslator(DocumentTranslator &&) = delete;
 
+    /**
+     * @brief   Deleted copy assignment operator
+     */
     DocumentTranslator &operator=(const DocumentTranslator &) = delete;
+    /**
+     * @brief   Deleted move assignment operator
+     */
     DocumentTranslator &operator=(DocumentTranslator &&) = delete;
 
 public:
+    /**
+     * @brief   Translate given document and add the result to the SDL model
+     *
+     * @param   mscDocument     Document to translate
+     */
     auto translateDocument(const msc::MscDocument *mscDocument) const -> void;
 
 private:

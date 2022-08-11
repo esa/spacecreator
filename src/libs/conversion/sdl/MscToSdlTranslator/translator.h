@@ -66,6 +66,7 @@ private:
      * @brief   Translate MSC model
      *
      * @param   mscModel    MSC model to translate
+     * @param   options     List of options
      *
      * @return  Result SDL model
      */

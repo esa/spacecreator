@@ -82,7 +82,7 @@ public:
     /**
      * @brief   Adds a signal
      *
-     * @param   singal          Signal to add
+     * @param   signal          Signal to add
      */
     auto addSignal(std::unique_ptr<Signal> signal) -> void;
 
@@ -128,6 +128,8 @@ public:
     virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
+    inline static const QString m_environmentName = "env";
+
     QStringList m_freeformTexts;
     std::vector<std::unique_ptr<Signal>> m_signals;
     std::vector<Channel> m_channels;

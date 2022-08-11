@@ -236,7 +236,7 @@ public:
     /**
      * @brief   SignalRoute visitor
      *
-     * @param   block   Signal route to be serialized
+     * @param   signalRoute     Signal route to be serialized
      */
     virtual auto visit(const SignalRoute &signalRoute) -> void override;
     /**

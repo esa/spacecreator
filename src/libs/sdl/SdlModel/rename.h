@@ -44,10 +44,12 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   name        Signal name
-     * @param   direction   Renamed signal direction
+     * @param   name                    Signal name
+     * @param   direction               Renamed signal direction
+     * @param   originalName            Name of the renamed signal
+     * @param   originalFunctionName    Name of the function from the renamed signal
      */
-    Rename(QString name, Direction direction, QString originalName, QString originamFunctionName);
+    Rename(QString name, Direction direction, QString originalName, QString originalFunctionName);
     /**
      * @brief   Deleted copy constructor
      */

@@ -41,11 +41,11 @@ public:
     /**
      * @brief   Deleted copy constructor
      */
-    Channel(const Channel &system) = delete;
+    Channel(const Channel &) = delete;
     /**
      * @brief   Default move constructor
      */
-    Channel(Channel &&system) = default;
+    Channel(Channel &&) = default;
 
     /**
      * @brief   Deleted copy assignment operator

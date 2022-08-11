@@ -41,11 +41,11 @@ public:
     /**
      * @brief   Deleted copy constructor
      */
-    SignalRoute(const SignalRoute &system) = delete;
+    SignalRoute(const SignalRoute &) = delete;
     /**
      * @brief   Default move constructor
      */
-    SignalRoute(SignalRoute &&system) = default;
+    SignalRoute(SignalRoute &&) = default;
 
     /**
      * @brief   Deleted copy assignment operator

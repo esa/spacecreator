@@ -71,7 +71,7 @@ void System::setBlock(Block block)
 void System::createRoutes(const QString &channelName, const QString &signalRouteName)
 {
     Route route;
-    route.setFrom("env");
+    route.setFrom(m_environmentName);
     route.setTo(m_block.name());
     for (const auto &signal : m_signals) {
         route.addWith(signal->name());

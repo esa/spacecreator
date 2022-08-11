@@ -418,14 +418,12 @@ void SdlVisitor::visit(const Rename &rename)
     if (rename.name().isEmpty()) {
         throw ExportException("Signal rename shall have a name but it doesn't");
     }
-    if (rename.originalName().isEmpty()) {
-        throw ExportException("Signal rename shall have an original name but it doesn't");
-    }
-    if (rename.originalFunctionName().isEmpty()) {
-        throw ExportException("Signal rename shall have an original function name but it doesn't");
-    }
 
     m_writer.beginLine(QString("signal %1 renames").arg(rename.name()));
+
+    if (rename.originalName().isEmpty()) {
+        return;
+    }
 
     switch (rename.direction()) {
     case Rename::Direction::Input:
@@ -437,6 +435,10 @@ void SdlVisitor::visit(const Rename &rename)
     }
 
     m_writer.write(rename.originalName());
+
+    if (rename.originalFunctionName().isEmpty()) {
+        return;
+    }
 
     switch (rename.direction()) {
     case Rename::Direction::Input:

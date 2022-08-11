@@ -184,7 +184,7 @@ System NeverObserverTranslator::createSdlSystem(NeverObserverTranslator::Context
         system.addSignal(std::move(signalRename));
     }
 
-    system.createRoutes("c", "r");
+    system.createRoutes(m_defaultChannelName, m_defaultRouteName);
 
     return system;
 }

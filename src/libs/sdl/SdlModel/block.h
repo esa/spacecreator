@@ -27,7 +27,7 @@
 namespace sdl {
 
 /**
- * @brief   Represents an SDL system
+ * @brief   Represents an SDL block
  */
 class Block final : public Node
 {
@@ -41,11 +41,11 @@ public:
     /**
      * @brief   Deleted copy constructor
      */
-    Block(const Block &system) = delete;
+    Block(const Block &block) = delete;
     /**
      * @brief   Default move constructor
      */
-    Block(Block &&system) = default;
+    Block(Block &&block) = default;
 
     /**
      * @brief   Deleted copy assignment operator
@@ -73,7 +73,7 @@ public:
     /**
      * @brief   Getter for connections
      *
-     * @return  Connection
+     * @return  Connections
      */
     auto connections() const -> const std::vector<Connection> &;
     /**

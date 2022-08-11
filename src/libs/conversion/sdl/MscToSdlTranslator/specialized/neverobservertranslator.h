@@ -30,18 +30,44 @@
 
 namespace conversion::sdl::translator {
 
+/**
+ * @brief   Translator for MSC "Never" charts
+ */
 class NeverObserverTranslator final
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   sdlModel    Parent SDL model
+     * @param   options     Conversion options
+     */
     NeverObserverTranslator(::sdl::SdlModel *sdlModel, const Options &options);
 
+    /**
+     * @brief   Deleted copy constuctor
+     */
     NeverObserverTranslator(const NeverObserverTranslator &) = delete;
+    /**
+     * @brief   Deleted move constuctor
+     */
     NeverObserverTranslator(NeverObserverTranslator &&) = delete;
 
+    /**
+     * @brief   Deleted copy assignment operator
+     */
     NeverObserverTranslator &operator=(const NeverObserverTranslator &) = delete;
+    /**
+     * @brief   Deleted move assignment operator
+     */
     NeverObserverTranslator &operator=(NeverObserverTranslator &&) = delete;
 
 public:
+    /**
+     * @brief   Create observer from given MSC chart and add it to the SDL model
+     *
+     * @param   mscChart    Chart to translatr
+     */
     auto createObserver(const msc::MscChart *mscChart) const -> void;
 
 private:
@@ -64,6 +90,8 @@ private:
 private:
     inline static const QString m_stateNameTemplate = "s%1";
     inline static const QString m_signalRenameNameTemplate = "sig%1";
+    inline static const QString m_defaultChannelName = "c";
+    inline static const QString m_defaultRouteName = "r";
 
     ::sdl::SdlModel *m_sdlModel;
     const Options &m_options;

@@ -21,6 +21,9 @@
 
 namespace conversion::sdl::translator {
 
+/**
+ * @brief   Type of the MSC observer
+ */
 enum class ObserverType
 {
     None,
