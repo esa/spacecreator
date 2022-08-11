@@ -33,7 +33,7 @@
             "data":[
                 {
                     "name": "IVFileSource",
-                    "trDisplayName": "IV file:",
+                    "trDisplayName": "Interface View template:",
                     "type": "ComboBox",
                     "data":
                     {
