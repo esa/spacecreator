@@ -44,6 +44,7 @@
 #include <QBuffer>
 #include <QClipboard>
 #include <QDebug>
+#include <QDialog>
 #include <QFileInfo>
 #include <QIcon>
 #include <QMenu>
@@ -627,13 +628,15 @@ QVector<QAction *> IVAppWidget::initViewActions()
 
 void IVAppWidget::showArchetypeManager()
 {
-    if (m_document == nullptr || m_document->objectsModel() == nullptr) {
+    if (m_document == nullptr || m_document->objectsModel() == nullptr || m_document->archetypesModel() == nullptr) {
         return;
     }
 
     ive::ArchetypesManagerDialog dialog(m_document->objectsModel(), m_document->commandsStack());
     dialog.init();
-    dialog.exec();
+    if (dialog.exec() == QDialog::Accepted) {
+        m_document->loadArchetypes();
+    }
 }
 
 } // namespace ive

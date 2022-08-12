@@ -17,37 +17,42 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "cmdarchetypelibraryapply.h"
 
-#include "entityattribute.h"
-#include "undocommand.h"
-
-#include <QPointer>
-#include <QVector>
-
-namespace ivm {
-class IVFunctionType;
-class IVArchetypeReference;
-}
+#include "commandids.h"
+#include "ivarchetypelibraryreference.h"
+#include "ivmodel.h"
 
 namespace ive {
 namespace cmd {
 
-class CmdFunctionArchetypesApply : public shared::UndoCommand
+CmdArchetypeLibraryApply::CmdArchetypeLibraryApply(
+        ivm::IVModel *objectsModel, QVector<ivm::IVArchetypeLibraryReference *> references)
+    : shared::UndoCommand()
+    , m_model(objectsModel)
+    , m_newReferences(references)
+    , m_oldReferences(objectsModel->getArchetypeLibraryReferences())
 {
-    Q_OBJECT
-public:
-    explicit CmdFunctionArchetypesApply(ivm::IVFunctionType *function, QVector<ivm::IVArchetypeReference *> references);
+}
 
-    void redo() override;
-    void undo() override;
-    int id() const override;
+void CmdArchetypeLibraryApply::redo()
+{
+    if (m_model != nullptr) {
+        m_model->setArchetypeLibraryReferences(m_newReferences);
+    }
+}
 
-private:
-    QPointer<ivm::IVFunctionType> m_function;
-    QVector<ivm::IVArchetypeReference *> m_newReferences;
-    QVector<ivm::IVArchetypeReference *> m_oldReferences;
-};
+void CmdArchetypeLibraryApply::undo()
+{
+    if (m_model != nullptr) {
+        m_model->setArchetypeLibraryReferences(m_oldReferences);
+    }
+}
+
+int CmdArchetypeLibraryApply::id() const
+{
+    return ApplyArchetypeLibraries;
+}
 
 } // namespace cmd
 } // namespace ive

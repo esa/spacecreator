@@ -43,6 +43,9 @@ public:
             ivm::IVModel *objectsModel, cmd::CommandsStack *commandsStack, QWidget *parent = nullptr);
     ~ArchetypesManagerDialog() override;
 
+    void addArchetypeLibrary();
+    void deleteArchetypeLibrary();
+
     void init();
 
 public Q_SLOTS:

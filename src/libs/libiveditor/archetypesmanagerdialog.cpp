@@ -17,9 +17,10 @@
 
 #include "archetypesmanagerdialog.h"
 
+#include "archetypesmanagermodel.h"
+#include "commands/cmdarchetypelibraryapply.h"
 #include "ivmodel.h"
 #include "ui_archetypesmanagerdialog.h"
-#include "archetypesmanagermodel.h"
 
 #include <QDebug>
 #include <QPointer>
@@ -43,8 +44,11 @@ ArchetypesManagerDialog::ArchetypesManagerDialog(
 
     m_ui->gridLayout_4->setColumnMinimumWidth(1, 15);
     m_ui->gridLayout_4->setColumnStretch(0, 10);
-    m_ui->tableView->horizontalHeader()->resizeSection(0, 220);
-    m_ui->tableView->horizontalHeader()->resizeSection(1, 180);
+    m_ui->tableView->horizontalHeader()->resizeSection(0, 150);
+    m_ui->tableView->horizontalHeader()->resizeSection(1, 220);
+
+    connect(m_ui->addButton, &QPushButton::clicked, this, &ArchetypesManagerDialog::addArchetypeLibrary);
+    connect(m_ui->deleteButton, &QPushButton::clicked, this, &ArchetypesManagerDialog::deleteArchetypeLibrary);
 
     connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
@@ -52,8 +56,35 @@ ArchetypesManagerDialog::ArchetypesManagerDialog(
 
 ArchetypesManagerDialog::~ArchetypesManagerDialog() {}
 
+void ArchetypesManagerDialog::addArchetypeLibrary()
+{
+    int newRow = m_model->rowCount();
+
+    if (!m_model->insertRow(newRow)) {
+        return;
+    }
+
+    QModelIndex idx = m_model->index(newRow, ArchetypesManagerModel::Column::LibraryName);
+    m_ui->tableView->edit(idx);
+    m_ui->tableView->scrollToBottom();
+    m_ui->tableView->selectRow(newRow);
+}
+
+void ArchetypesManagerDialog::deleteArchetypeLibrary()
+{
+    QModelIndexList selections = m_ui->tableView->selectionModel()->selectedRows();
+    if (selections.size() != 1) {
+        return;
+    }
+
+    m_model->removeRow(selections.at(0).row());
+}
+
 void ArchetypesManagerDialog::done(int r)
 {
+    auto command = new cmd::CmdArchetypeLibraryApply(m_objectsModel, m_model->getArchetypeLibraryReferences());
+    m_cmdMacro->push(command);
+
     if (!m_cmdMacro) {
         r = QDialog::Rejected;
     } else {
@@ -68,8 +99,8 @@ void ArchetypesManagerDialog::init()
     setWindowTitle(tr("Archetypes Library Manager"));
 
     if (!m_cmdMacro) {
-        m_cmdMacro = std::make_unique<cmd::CommandsStack::Macro>(
-                m_commandsStack.data(), tr("Archetypes library managment"));
+        m_cmdMacro =
+                std::make_unique<cmd::CommandsStack::Macro>(m_commandsStack.data(), tr("Archetypes library managment"));
     }
 }
 

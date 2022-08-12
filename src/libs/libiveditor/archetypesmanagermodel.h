@@ -23,6 +23,7 @@
 
 #include <QAbstractItemModel>
 #include <QPointer>
+#include <QVector>
 
 namespace ivm {
 class IVModel;
@@ -45,6 +46,8 @@ public:
 
     explicit ArchetypesManagerModel(
             ivm::IVModel *objectsModel, cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
+
+    QVector<ivm::IVArchetypeLibraryReference *> getArchetypeLibraryReferences();
 
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;

@@ -50,6 +50,7 @@
 #include "propertytemplatemanager.h"
 #include "propertytemplatewidget.h"
 
+#include <QApplication>
 #include <QAction>
 #include <QBuffer>
 #include <QDebug>

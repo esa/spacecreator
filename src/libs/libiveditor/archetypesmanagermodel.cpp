@@ -36,7 +36,13 @@ ArchetypesManagerModel::ArchetypesManagerModel(
     : QAbstractItemModel(parent)
     , m_cmdMacro(macro)
     , m_objectsModel(objectsModel)
+    , m_archetypeLibraryReferences(objectsModel->getArchetypeLibraryReferences())
 {
+}
+
+QVector<ivm::IVArchetypeLibraryReference *> ArchetypesManagerModel::getArchetypeLibraryReferences()
+{
+    return m_archetypeLibraryReferences;
 }
 
 QVariant ArchetypesManagerModel::headerData(int section, Qt::Orientation orientation, int role) const

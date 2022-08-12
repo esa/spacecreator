@@ -19,30 +19,36 @@
 
 #pragma once
 
-#include "archetypecommonprops.h"
-#include "archetypeobject.h"
-#include "functionarchetype.h"
-#include <QStringList>
+#include "entityattribute.h"
+#include "undocommand.h"
+
+#include <QPointer>
+#include <QVector>
 
 namespace ivm {
+class IVModel;
+class IVArchetypeLibraryReference;
+}
 
-class ArchetypeLibrary : public ArchetypeObject
+namespace ive {
+namespace cmd {
+
+class CmdArchetypeLibraryApply : public shared::UndoCommand
 {
     Q_OBJECT
 public:
-    explicit ArchetypeLibrary(const QString &title, QObject *parent = nullptr);
-    ~ArchetypeLibrary() override;
+    explicit CmdArchetypeLibraryApply(
+            ivm::IVModel *objectsModel, QVector<ivm::IVArchetypeLibraryReference *> references);
 
-    bool aboutToBeRemoved() override;
-
-    QVector<FunctionArchetype *> getFunctions() const;
-    void addFunction(FunctionArchetype *functionArchetype);
-    void removeFunction(FunctionArchetype *functionArchetype);
-
-    QStringList getFunctionsNames();
+    void redo() override;
+    void undo() override;
+    int id() const override;
 
 private:
-    QVector<FunctionArchetype *> m_functions;
+    QPointer<ivm::IVModel> m_model;
+    QVector<ivm::IVArchetypeLibraryReference *> m_newReferences;
+    QVector<ivm::IVArchetypeLibraryReference *> m_oldReferences;
 };
 
-}
+} // namespace cmd
+} // namespace ive

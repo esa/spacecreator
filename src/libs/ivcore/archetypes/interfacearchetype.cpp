@@ -33,6 +33,15 @@ InterfaceArchetype::InterfaceArchetype(const QString &title, QObject *parent, co
 
 InterfaceArchetype::~InterfaceArchetype() = default;
 
+bool InterfaceArchetype::aboutToBeRemoved()
+{
+    for (auto parameter : m_parameters) {
+        parameter->setParentObject(nullptr);
+    }
+    m_parameters.clear();
+    return true;
+}
+
 InterfaceArchetype::InterfaceType InterfaceArchetype::getInterfaceType() const
 {
     return m_interfaceType;
