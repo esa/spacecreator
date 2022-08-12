@@ -1,6 +1,0 @@
-[INFO] Exporting model to xmi Iface.slx
-[INFO] Processing model <a href="matlab:iqgen_highlight('Iface')">Iface</a>
-[INFO] Exported model to <a href="matlab: open('C:\matlabremote\55758\src\..\xmi\Iface.qsi')">Iface.qsi</a>
-[INFO] Exported model to <a href="matlab: open('C:\matlabremote\55758\src\..\xmi\Iface.xmi')">Iface.xmi</a>
-[WARNING] Ignoring variable "MySeqOf_member_data", which does not appear to be used in the model: type "Simulink.BusElement" is not supported by QGen.
-[INFO] Exported workspace to <a href="matlab: open('C:\matlabremote\55758\src\..\xmi\QGen_Base_Workspace.xmi')">QGen_Base_Workspace.xmi</a>
