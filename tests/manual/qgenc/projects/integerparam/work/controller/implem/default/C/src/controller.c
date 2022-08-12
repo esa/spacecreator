@@ -8,7 +8,8 @@
  */
 
 #include "controller.h"
-//#include <stdio.h>
+#include <stdio.h>
+#include <assert.h>
 
 
 void controller_startup(void)
@@ -19,7 +20,10 @@ void controller_startup(void)
 
 void controller_PI_Trigger(void)
 {
-   // Write your code here
+    asn1SccMyInteger inputParam = 5;
+    asn1SccMyInteger outputParam = 0;
+    asn1SccMyInteger expectedOutput = 10;
+    controller_RI_IntIface( &inputParam, &outputParam );
+    printf("Output: %u\n", outputParam);
+    assert(outputParam == expectedOutput);
 }
-
-
