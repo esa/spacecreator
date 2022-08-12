@@ -101,6 +101,8 @@ target_sources(${LIB_NAME} PRIVATE
     archetypesmanagerdialog.cpp
     archetypesmanagerdialog.h
     archetypesmanagerdialog.ui
+    archetypesmanagermodel.cpp
+    archetypesmanagermodel.h
     endtoend/endtoendconnections.cpp
     endtoend/endtoendconnections.h
     endtoend/endtoendview.cpp

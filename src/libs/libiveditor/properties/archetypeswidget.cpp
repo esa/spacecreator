@@ -42,7 +42,7 @@
 namespace ive {
 
 ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVFunctionType *function,
-        ivm::AbstractSystemChecks *checks, shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent)
+        shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent)
     : QWidget(parent)
     , m_ui(new Ui::ArchetypesWidget)
     , m_archetypeModel(archetypeModel)
@@ -56,7 +56,7 @@ ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVF
     m_ui->tableView->setItemDelegateForColumn(
             ArchetypesWidgetModel::Column::FunctionName, new ive::ComboBoxDelegate(QStringList(), m_ui->tableView));
 
-    m_model = new ArchetypesWidgetModel(archetypeModel, checks, macro, this);
+    m_model = new ArchetypesWidgetModel(archetypeModel, macro, this);
     m_model->setFunction(function);
     m_ui->tableView->setModel(m_model);
     m_ui->tableView->horizontalHeader()->resizeSection(0, 220);

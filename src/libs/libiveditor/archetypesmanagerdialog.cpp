@@ -19,6 +19,7 @@
 
 #include "ivmodel.h"
 #include "ui_archetypesmanagerdialog.h"
+#include "archetypesmanagermodel.h"
 
 #include <QDebug>
 #include <QPointer>
@@ -36,6 +37,14 @@ ArchetypesManagerDialog::ArchetypesManagerDialog(
     , m_ui(new Ui::ArchetypesManagerDialog)
 {
     m_ui->setupUi(this);
+
+    m_model = new ArchetypesManagerModel(objectsModel, m_cmdMacro.get(), this);
+    m_ui->tableView->setModel(m_model);
+
+    m_ui->gridLayout_4->setColumnMinimumWidth(1, 15);
+    m_ui->gridLayout_4->setColumnStretch(0, 10);
+    m_ui->tableView->horizontalHeader()->resizeSection(0, 220);
+    m_ui->tableView->horizontalHeader()->resizeSection(1, 180);
 
     connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
@@ -57,7 +66,6 @@ void ArchetypesManagerDialog::done(int r)
 void ArchetypesManagerDialog::init()
 {
     setWindowTitle(tr("Archetypes Library Manager"));
-    m_ui->tabWidget->setCurrentIndex(0);
 
     if (!m_cmdMacro) {
         m_cmdMacro = std::make_unique<cmd::CommandsStack::Macro>(

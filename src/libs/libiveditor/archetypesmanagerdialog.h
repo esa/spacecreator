@@ -32,6 +32,7 @@ class IVModel;
 }
 
 namespace ive {
+class ArchetypesManagerModel;
 
 class ArchetypesManagerDialog : public QDialog
 {
@@ -50,6 +51,7 @@ public Q_SLOTS:
 private:
     QPointer<ivm::IVModel> m_objectsModel;
     QPointer<cmd::CommandsStack> m_commandsStack;
+    ArchetypesManagerModel *m_model = nullptr;
     std::unique_ptr<Ui::ArchetypesManagerDialog> m_ui;
     std::unique_ptr<cmd::CommandsStack::Macro> m_cmdMacro;
 };
