@@ -5,7 +5,7 @@ IMPORTS
    MyInteger FROM MSCOBSERVER-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
 
-Ponger-States ::= ENUMERATED {wait}
+Ponger-States ::= ENUMERATED {ready, wait}
 
 Ponger-Context ::= SEQUENCE {
    state Ponger-States,

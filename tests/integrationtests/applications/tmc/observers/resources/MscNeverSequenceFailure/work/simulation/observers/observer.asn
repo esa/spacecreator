@@ -1,3 +1,19 @@
+Helper-Datamodel DEFINITIONS ::=
+BEGIN
+--  This file was generated automatically by OpenGEODE
+IMPORTS
+   MyInteger FROM MSCOBSERVER-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
+
+Helper-States ::= ENUMERATED {wait}
+
+Helper-Context ::= SEQUENCE {
+   state Helper-States,
+   init-done BOOLEAN
+}
+
+END
+
 Pinger-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
@@ -21,7 +37,7 @@ IMPORTS
    MyInteger FROM MSCOBSERVER-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
 
-Ponger-States ::= ENUMERATED {wait}
+Ponger-States ::= ENUMERATED {ready, wait}
 
 Ponger-Context ::= SEQUENCE {
    state Ponger-States,
@@ -93,6 +109,24 @@ T-Null-Record ::= SEQUENCE {}
 END
 
 
+CLOCK-DEFAULT-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+ ;
+
+
+
+
+
+
+
+
+
+
+END
+
 
 Simulation-DataView DEFINITIONS ::=
 BEGIN
@@ -102,16 +136,19 @@ BEGIN
       
       
       
+      
+      
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
       --  Import the SDL function states needed for the global system state
+      Helper-Context FROM Helper-Datamodel
       Pinger-Context FROM Pinger-Datamodel
       Ponger-Context FROM Ponger-Datamodel
    ;
 
    --  List all the TASTE functions present in the system
    PID ::= ENUMERATED {
-        env, clock, pinger, ponger
+        env, clock, helper, pinger, ponger
    }
 
    --  Simulator needs to knows about cyclic interfaces
@@ -129,7 +166,18 @@ BEGIN
    
    Clock-Event ::= CHOICE {
       msg-out CHOICE {
-         clk SEQUENCE {   }
+         clk  SEQUENCE {   },
+         tick SEQUENCE {   }
+      }
+   }
+   
+   Helper-Event ::= CHOICE {
+      msg-in CHOICE {
+         input-none SEQUENCE {},
+         tick SEQUENCE {  }
+      },
+      msg-out CHOICE {
+         helpme SEQUENCE {   }
       }
    }
    
@@ -147,7 +195,8 @@ BEGIN
    Ponger-Event ::= CHOICE {
       msg-in CHOICE {
          input-none SEQUENCE {},
-         ping SEQUENCE {  }
+         helpme SEQUENCE {  },
+         ping   SEQUENCE {  }
       },
       msg-out CHOICE {
          pong SEQUENCE {   }
@@ -166,6 +215,7 @@ BEGIN
    --  Event related to the execution of a PI or call of a RI in the functional code
    Function-Event ::= CHOICE {
       clock  Clock-Event,
+      helper Helper-Event,
       pinger Pinger-Event,
       ponger Ponger-Event
    }
@@ -200,13 +250,16 @@ BEGIN
    Events-Ty ::= SEQUENCE (SIZE (0 .. max-events)) OF Observable-Event
 
    --  Global system state (excluding observers, which are defined later)
+   helper-queue-size INTEGER ::= 2
    pinger-queue-size INTEGER ::= 2
    ponger-queue-size INTEGER ::= 2
    System-State ::= SEQUENCE {
       --  Message queues
+      helper-queue Events-Ty (SIZE (0 .. helper-queue-size)),
       pinger-queue Events-Ty (SIZE (0 .. pinger-queue-size)),
       ponger-queue Events-Ty (SIZE (0 .. ponger-queue-size)),
 
+      helper  Helper-Context,
       pinger  Pinger-Context,
       ponger  Ponger-Context
    }

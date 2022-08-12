@@ -8,20 +8,23 @@
 **/wrappers/*
 **/cache/*
 
+work/pinger/SDL/code
 work/pinger/**/*.ad*
 work/pinger/**/*.md5
 work/pinger/**/Makefile
 work/pinger/**/*.pro
 
+work/ponger/SDL/code
 work/ponger/**/*.ad*
 work/ponger/**/*.md5
 work/ponger/**/Makefile
 work/ponger/**/*.pro
 
-work/utils/**/*.ad*
-work/utils/**/*.md5
-work/utils/**/Makefile
-work/utils/**/*.pro
+work/helper/SDL/code
+work/helper/**/*.ad*
+work/helper/**/*.md5
+work/helper/**/Makefile
+work/helper/**/*.pro
 
 work/**/GUI
 

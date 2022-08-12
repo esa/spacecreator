@@ -61,3 +61,21 @@ T-Null-Record ::= SEQUENCE {}
 END
 
 
+CLOCK-DEFAULT-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+ ;
+
+
+
+
+
+
+
+
+
+
+END
+
