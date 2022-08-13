@@ -51,9 +51,9 @@ void ChartTranslator::translateChart(const MscChart *mscChart) const
         throw TranslationException(std::move(errorMessage));
     } break;
     case ObserverType::None: {
-        auto errorMessage =
-                QString("Cannot translate chart '%1' - first event is not a \"never\" nor \"when\" shared condition")
-                        .arg(mscChart->name());
+        auto errorMessage = QString(
+                "Cannot translate chart '%1' - first chart item is not a \"never\" nor \"when\" shared condition")
+                                    .arg(mscChart->name());
         throw TranslationException(std::move(errorMessage));
     } break;
     };
