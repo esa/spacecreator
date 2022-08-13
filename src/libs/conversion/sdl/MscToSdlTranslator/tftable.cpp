@@ -30,19 +30,9 @@ TFTable::TFTable(const std::vector<uint32_t> &sequence, const uint32_t signalCou
     compute(sequence);
 }
 
-void TFTable::print() const
+const std::vector<uint32_t> &TFTable::transitionsForState(uint32_t state) const
 {
-    for (std::size_t i = 0; i < m_table.size(); ++i) {
-        std::cout << i << "\t|";
-
-        const auto &stateTransitions = m_table.at(i);
-
-        for (std::size_t j = 0; j < stateTransitions.size(); ++j) {
-            std::cout << " " << stateTransitions.at(j);
-        }
-
-        std::cout << '\n';
-    }
+    return m_table.at(state);
 }
 
 void TFTable::compute(const std::vector<uint32_t> &sequence)

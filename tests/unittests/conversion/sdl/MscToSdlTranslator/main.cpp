@@ -17,33 +17,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "tst_tftable.h"
 
-#include <cstdint>
-#include <vector>
+#include <QTest>
 
-namespace conversion::sdl::translator {
-
-class TFTable final
+int main(int argc, char *argv[])
 {
-public:
-    TFTable(const std::vector<uint32_t> &sequence, const uint32_t signalCount);
-    TFTable(const TFTable &) = delete;
-    TFTable(TFTable &&) = delete;
+    int status = 0;
+    {
+        tests::sdl::tst_TFTable test;
+        status |= QTest::qExec(&test, argc, argv);
+    }
 
-    TFTable &operator=(const TFTable &) = delete;
-    TFTable &operator=(TFTable &&) = delete;
-
-public:
-    auto transitionsForState(uint32_t state) const -> const std::vector<uint32_t>&;
-
-private:
-    auto compute(const std::vector<uint32_t> &sequence) -> void;
-    auto getNextState(const std::vector<uint32_t> &sequence, const uint32_t state, const uint32_t sig) const -> uint32_t;
-
-private:
-    std::vector<std::vector<uint32_t>> m_table;
-    uint32_t m_signalCount;
-};
-
-} // namespace conversion::sdl::translator
+    return status;
+}

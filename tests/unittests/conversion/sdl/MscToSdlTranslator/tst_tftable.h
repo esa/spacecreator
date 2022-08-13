@@ -19,31 +19,18 @@
 
 #pragma once
 
-#include <cstdint>
-#include <vector>
+#include <QObject>
+#include <QtTest>
 
-namespace conversion::sdl::translator {
+namespace tests::sdl {
 
-class TFTable final
+class tst_TFTable : public QObject
 {
-public:
-    TFTable(const std::vector<uint32_t> &sequence, const uint32_t signalCount);
-    TFTable(const TFTable &) = delete;
-    TFTable(TFTable &&) = delete;
+    Q_OBJECT
 
-    TFTable &operator=(const TFTable &) = delete;
-    TFTable &operator=(TFTable &&) = delete;
-
-public:
-    auto transitionsForState(uint32_t state) const -> const std::vector<uint32_t>&;
-
-private:
-    auto compute(const std::vector<uint32_t> &sequence) -> void;
-    auto getNextState(const std::vector<uint32_t> &sequence, const uint32_t state, const uint32_t sig) const -> uint32_t;
-
-private:
-    std::vector<std::vector<uint32_t>> m_table;
-    uint32_t m_signalCount;
+private Q_SLOTS:
+    void testTFTableSimple();
+    void testTFTableComplex();
 };
 
-} // namespace conversion::sdl::translator
+} // namespace tests::sdl
