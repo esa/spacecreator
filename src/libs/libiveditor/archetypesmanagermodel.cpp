@@ -167,13 +167,6 @@ bool ArchetypesManagerModel::insertRows(int row, int count, const QModelIndex &p
         reference->setLibraryPath(QString());
 
         m_archetypeLibraryReferences.append(reference);
-
-        std::sort(m_archetypeLibraryReferences.begin(), m_archetypeLibraryReferences.end(),
-                [](ivm::IVArchetypeLibraryReference *firstReference,
-                        ivm::IVArchetypeLibraryReference *secondReference) -> bool {
-                    return firstReference->getLibraryName() < secondReference->getLibraryName()
-                            && firstReference->getLibraryPath() < secondReference->getLibraryPath();
-                });
     }
 
     endInsertRows();
@@ -185,11 +178,16 @@ bool ArchetypesManagerModel::removeRows(int row, int count, const QModelIndex &p
     if (m_objectsModel == nullptr) {
         return false;
     }
-    const auto result = QMessageBox::question(qApp->activeWindow(), tr("Remove archetype library reference"),
-            tr("Are you sure you want to remove selected archetype library reference?"));
-    if (QMessageBox::StandardButton::Yes != result) {
-        return false;
+
+    if (!m_archetypeLibraryReferences[row]->getLibraryName().isEmpty()
+            && !m_archetypeLibraryReferences[row]->getLibraryPath().isEmpty()) {
+        const auto result = QMessageBox::question(qApp->activeWindow(), tr("Remove archetype library reference"),
+                tr("Are you sure you want to remove selected archetype library reference?"));
+        if (result != QMessageBox::StandardButton::Yes) {
+            return false;
+        }
     }
+
     beginRemoveRows(parent, row, row + count - 1);
 
     m_archetypeLibraryReferences.remove(row, count);

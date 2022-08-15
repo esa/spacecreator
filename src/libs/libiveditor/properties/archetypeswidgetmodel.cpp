@@ -230,7 +230,7 @@ bool ArchetypesWidgetModel::removeRows(int row, int count, const QModelIndex &pa
     }
     const auto result = QMessageBox::question(qApp->activeWindow(), tr("Remove archetype implementations"),
             tr("Are you sure you want to remove selected archetype implementations?"));
-    if (QMessageBox::StandardButton::Yes != result) {
+    if (result != QMessageBox::StandardButton::Yes) {
         return false;
     }
     beginRemoveRows(parent, row, row + count - 1);

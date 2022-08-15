@@ -58,7 +58,6 @@ void FileDialogDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     if(!fileName.isEmpty()){
         QFileInfo fileInfo(fileName[0]);
         model->setData(index, fileInfo.fileName());
-        return;
     }
 }
 

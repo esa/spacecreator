@@ -19,12 +19,15 @@
 
 #include "archetypesmanagermodel.h"
 #include "commands/cmdarchetypelibraryapply.h"
+#include "ivarchetypelibraryreference.h"
 #include "ivmodel.h"
 #include "properties/delegates/filedialogdelegate.h"
 #include "shared/common.h"
 #include "ui_archetypesmanagerdialog.h"
 
+#include <QApplication>
 #include <QDebug>
+#include <QMessageBox>
 #include <QPointer>
 #include <QTableView>
 #include <QTimer>
@@ -70,7 +73,7 @@ void ArchetypesManagerDialog::addArchetypeLibrary()
         return;
     }
 
-    QModelIndex idx = m_model->index(newRow, ArchetypesManagerModel::Column::LibraryName);
+    QModelIndex idx = m_model->index(newRow, ArchetypesManagerModel::Column::LibraryPath);
     m_ui->tableView->edit(idx);
     m_ui->tableView->scrollToBottom();
     m_ui->tableView->selectRow(newRow);
@@ -86,28 +89,69 @@ void ArchetypesManagerDialog::deleteArchetypeLibrary()
     m_model->removeRow(selections.at(0).row());
 }
 
-void ArchetypesManagerDialog::done(int r)
+void ArchetypesManagerDialog::accept()
 {
+    if (!checkReferences()) {
+        return;
+    }
+
     auto command = new cmd::CmdArchetypeLibraryApply(m_objectsModel, m_model->getArchetypeLibraryReferences());
     m_cmdMacro->push(command);
 
-    if (!m_cmdMacro) {
+    int r = QDialog::Accepted;
+
+    if (m_cmdMacro == nullptr) {
         r = QDialog::Rejected;
     } else {
-        m_cmdMacro->setComplete(r == QDialog::Accepted);
+        m_cmdMacro->setComplete(true);
     }
 
     QDialog::done(r);
+}
+
+void ArchetypesManagerDialog::reject()
+{
+    if (m_cmdMacro != nullptr) {
+        m_cmdMacro->setComplete(false);
+    }
+
+    QDialog::done(QDialog::Rejected);
 }
 
 void ArchetypesManagerDialog::init()
 {
     setWindowTitle(tr("Archetypes Library Manager"));
 
-    if (!m_cmdMacro) {
+    if (m_cmdMacro == nullptr) {
         m_cmdMacro =
                 std::make_unique<cmd::CommandsStack::Macro>(m_commandsStack.data(), tr("Archetypes library managment"));
     }
+}
+
+bool ArchetypesManagerDialog::checkReferences()
+{
+    QVector<ivm::IVArchetypeLibraryReference *> references = m_model->getArchetypeLibraryReferences();
+
+    for (auto reference : references) {
+        if (reference->getLibraryName().isEmpty() || reference->getLibraryPath().isEmpty()) {
+            QMessageBox::warning(
+                    qApp->activeWindow(), tr("Archetype error"), tr("Archetypes library references are incomplete"));
+            return false;
+        }
+    }
+
+    for (int i = 0; i < references.size() - 1; ++i) {
+        for (int j = i + 1; j < references.size(); ++j) {
+            if (references[i]->getLibraryName() == references[j]->getLibraryName()
+                    || references[i]->getLibraryPath() == references[j]->getLibraryPath()) {
+                QMessageBox::warning(qApp->activeWindow(), tr("Archetype error"),
+                        tr("Archetype library list has duplicate references"));
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 } // namespace ive

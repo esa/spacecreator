@@ -146,7 +146,7 @@ bool ArchetypesWidget::checkReferences()
         }
     }
 
-    for (int i = 0; i < references.size(); ++i) {
+    for (int i = 0; i < references.size() - 1; ++i) {
         for (int j = i + 1; j < references.size(); ++j) {
             if (references[i]->getLibraryName() == references[j]->getLibraryName()
                     && references[i]->getFunctionName() == references[j]->getFunctionName()) {

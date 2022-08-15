@@ -48,8 +48,12 @@ public:
 
     void init();
 
+private:
+    bool checkReferences();
+
 public Q_SLOTS:
-    void done(int r) override;
+    void accept() override;
+    void reject() override;
 
 private:
     QPointer<ivm::IVModel> m_objectsModel;
