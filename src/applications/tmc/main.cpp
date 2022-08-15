@@ -31,7 +31,7 @@ const auto separator = QString(":");
 
 static QString extractObserverPath(const QString &info)
 {
-    const auto elements = info.split(separator, QString::KeepEmptyParts);
+    const auto elements = info.split(separator, Qt::KeepEmptyParts);
     if (elements.size() == 0) {
         qCritical("Malformed observer info: missing path");
     }
@@ -40,7 +40,7 @@ static QString extractObserverPath(const QString &info)
 
 static uint32_t extractObserverPriority(const QString &info)
 {
-    const auto elements = info.split(separator, QString::KeepEmptyParts);
+    const auto elements = info.split(separator, Qt::KeepEmptyParts);
     bool ok = true;
     const auto priority = elements.size() > 1 ? elements[1].toUInt(&ok) : 1;
     if (!ok) {

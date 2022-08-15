@@ -15,6 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+
 #include "modelcheckingwindow.h"
 #include "ui_modelcheckingwindow.h"
 #include "ivfunction.h"
@@ -32,6 +33,7 @@
 #include <QMenu>
 #include <QDirIterator>
 #include <QFileDialog>
+#include <QTextStream>
 #include <QDebug>
 
 namespace ive {
@@ -563,10 +565,10 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     QFile callIfFile("callif.sh");
     if(callIfFile.open(QIODevice::ReadWrite)){
         QTextStream stream(&callIfFile);
-        stream << "#!/bin/bash" << endl;
-        stream << "make clean" << endl;
-        stream << "make model-check" << endl;
-        stream << "echo $? > statusfile" << endl;
+        stream << "#!/bin/bash" << Qt::endl;
+        stream << "make clean" << Qt::endl;
+        stream << "make model-check" << Qt::endl;
+        stream << "echo $? > statusfile" << Qt::endl;
     } else {
         QMessageBox::warning(this, tr("Call IF"),
                              "Error opening callif.sh!");
@@ -907,7 +909,7 @@ void ModelCheckingWindow::addSubtypes()
 
         // ADD NEW TREE NODE
         QStringList fileColumn;
-        QFileInfo fileInfo = filePath;
+        QFileInfo fileInfo(filePath);
         fileColumn.append(fileInfo.fileName());
         fileColumn.append(fileInfo.filePath());
         QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);

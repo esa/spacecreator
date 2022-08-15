@@ -493,7 +493,7 @@ model::Dimensions SimulinkXmlImporter::parseDimensions(const StringRef &dimensio
                                          .remove(0, 1) // removing '['
                                          .replace(QChar(';'), QChar(' '), Qt::CaseSensitive); // replacing ';' to ' '
 
-        const auto splitBySpacesStrList = preparedStr.split(' ', QString::SkipEmptyParts, Qt::CaseSensitive);
+        const auto splitBySpacesStrList = preparedStr.split(' ', Qt::SkipEmptyParts, Qt::CaseSensitive);
         const auto splitBySpacesStrListSize = splitBySpacesStrList.size();
 
         if (splitBySpacesStrListSize == 0) {
@@ -532,6 +532,7 @@ model::Dimensions SimulinkXmlImporter::parseDimensions(const StringRef &dimensio
     } else {
         throw ParserException(QString("Unable to parse dimensions '%1'").arg(dimensionsStr));
     }
+    return model::Dimensions();
 }
 
 model::DimensionsMode SimulinkXmlImporter::parseDimensionsMode(const StringRef &dimensionsModeStr)
