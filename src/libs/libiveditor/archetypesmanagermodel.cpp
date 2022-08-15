@@ -130,7 +130,10 @@ bool ArchetypesManagerModel::setData(const QModelIndex &index, const QVariant &v
             m_archetypeLibraryReferences.value(index.row())->setLibraryName(value.toString());
             break;
         case Column::LibraryPath:
-            m_archetypeLibraryReferences.value(index.row())->setLibraryPath(value.toString());
+            // allow library path edit only when reference is created
+            if (m_archetypeLibraryReferences.value(index.row())->getLibraryPath().isEmpty()) {
+                m_archetypeLibraryReferences.value(index.row())->setLibraryPath(value.toString());
+            }
             break;
         default:
             return false;
@@ -147,6 +150,14 @@ Qt::ItemFlags ArchetypesManagerModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid()) {
         return Qt::NoItemFlags;
+    }
+
+    switch (index.column()) {
+    case Column::LibraryPath:
+        if (!m_archetypeLibraryReferences.value(index.row())->getLibraryPath().isEmpty()) {
+            return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+        }
+        break;
     }
 
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;

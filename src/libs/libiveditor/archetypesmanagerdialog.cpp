@@ -59,8 +59,8 @@ ArchetypesManagerDialog::ArchetypesManagerDialog(
     connect(m_ui->addButton, &QPushButton::clicked, this, &ArchetypesManagerDialog::addArchetypeLibrary);
     connect(m_ui->deleteButton, &QPushButton::clicked, this, &ArchetypesManagerDialog::deleteArchetypeLibrary);
 
-    connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
-    connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+    connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &ArchetypesManagerDialog::accept);
+    connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this, &ArchetypesManagerDialog::reject);
 }
 
 ArchetypesManagerDialog::~ArchetypesManagerDialog() {}
@@ -98,15 +98,15 @@ void ArchetypesManagerDialog::accept()
     auto command = new cmd::CmdArchetypeLibraryApply(m_objectsModel, m_model->getArchetypeLibraryReferences());
     m_cmdMacro->push(command);
 
-    int r = QDialog::Accepted;
+    int result = QDialog::Accepted;
 
     if (m_cmdMacro == nullptr) {
-        r = QDialog::Rejected;
+        result = QDialog::Rejected;
     } else {
         m_cmdMacro->setComplete(true);
     }
 
-    QDialog::done(r);
+    QDialog::done(result);
 }
 
 void ArchetypesManagerDialog::reject()

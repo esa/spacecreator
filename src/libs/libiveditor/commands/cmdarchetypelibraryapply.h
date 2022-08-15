@@ -21,13 +21,16 @@
 
 #include "entityattribute.h"
 #include "undocommand.h"
+#include "shared/common.h"
 
 #include <QPointer>
 #include <QVector>
+#include <QHash>
 
 namespace ivm {
 class IVModel;
 class IVArchetypeLibraryReference;
+class IVArchetypeReference;
 }
 
 namespace ive {
@@ -45,9 +48,15 @@ public:
     int id() const override;
 
 private:
+    void applyReferences(QHash<shared::Id, QVector<ivm::IVArchetypeReference *>> refencesForFunctions);
+    bool isReferencePresent(const QString &libraryName);
+
+private:
     QPointer<ivm::IVModel> m_model;
     QVector<ivm::IVArchetypeLibraryReference *> m_newReferences;
     QVector<ivm::IVArchetypeLibraryReference *> m_oldReferences;
+    QHash<shared::Id, QVector<ivm::IVArchetypeReference *>> m_newFunctionsArchetypeReferences;
+    QHash<shared::Id, QVector<ivm::IVArchetypeReference *>> m_oldFunctionsArchetypeReferences;
 };
 
 } // namespace cmd
