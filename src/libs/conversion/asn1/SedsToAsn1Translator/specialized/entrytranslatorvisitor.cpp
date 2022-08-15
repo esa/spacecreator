@@ -157,7 +157,8 @@ std::unique_ptr<Asn1Acn::Types::Null> EntryTranslatorVisitor::translateLengthEnt
 
     auto nullType = std::make_unique<Asn1Acn::Types::Null>(sedsEntry.nameStr());
     nullType->setAlignToNext(Asn1Acn::Types::AlignToNext::byte);
-    nullType->setPattern(QString(encoding.bits(), '0'));
+    qsizetype encodingBits = static_cast<qsizetype>(encoding.bits());
+    nullType->setPattern(QString(encodingBits, '0'));
 
     return nullType;
 }
@@ -269,8 +270,8 @@ void EntryTranslatorVisitor::translateCoreErrorControl(seds::model::CoreErrorCon
                                     .arg(sedsEntry.nameStr());
         throw TranslationException(std::move(errorMessage));
     }
-
-    asn1Type->setPattern(QString(bitCount, '0'));
+    qsizetype bitCountQsizetype = static_cast<qsizetype>(bitCount);
+    asn1Type->setPattern(QString(bitCountQsizetype, '0'));
 }
 
 uint64_t EntryTranslatorVisitor::getErrorControlEntryBitCount(const seds::model::ErrorControlEntry &entry) const
