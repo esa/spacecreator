@@ -612,48 +612,48 @@ bool TmcConverter::createEnvGenerationInlines(
 
 QFileInfo TmcConverter::workDirectory() const
 {
-    return m_ivBaseDirectory.absolutePath() + QDir::separator() + "work";
+    return QFileInfo(m_ivBaseDirectory.absolutePath() + QDir::separator() + "work");
 }
 
 QFileInfo TmcConverter::simuDataViewLocation() const
 {
-    return workDirectory().absoluteFilePath() + QDir::separator() + "simulation" + QDir::separator() + "observers"
-            + QDir::separator() + "observer.asn";
+    return QFileInfo(workDirectory().absoluteFilePath() + QDir::separator() + "simulation" + QDir::separator() + "observers"
+            + QDir::separator() + "observer.asn");
 }
 
 QFileInfo TmcConverter::sdlImplementationBaseDirectory(const QString &functionName) const
 {
-    return workDirectory().absoluteFilePath() + QDir::separator() + functionName.toLower() + QDir::separator() + "SDL";
+    return QFileInfo(workDirectory().absoluteFilePath() + QDir::separator() + functionName.toLower() + QDir::separator() + "SDL");
 }
 
 QFileInfo TmcConverter::sdlImplementationLocation(const QString &functionName) const
 {
-    return sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator() + "src"
-            + QDir::separator() + functionName.toLower() + ".pr";
+    return QFileInfo(sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator() + "src"
+            + QDir::separator() + functionName.toLower() + ".pr");
 }
 
 QFileInfo TmcConverter::sdlSystemStructureLocation(const QString &functionName) const
 {
-    return sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator() + "src"
-            + QDir::separator() + "system_structure.pr";
+    return QFileInfo(sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator() + "src"
+            + QDir::separator() + "system_structure.pr");
 }
 
 QFileInfo TmcConverter::sdlFunctionDatamodelLocation(const QString &functionName) const
 {
-    return sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator() + "code"
-            + QDir::separator() + functionName.toLower() + "_datamodel.asn";
+    return QFileInfo(sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator() + "code"
+            + QDir::separator() + functionName.toLower() + "_datamodel.asn");
 }
 
 QFileInfo TmcConverter::sdlFunctionDatamodelLocation(const QString &functionName, const QString &functionTypeName) const
 {
-    return sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator() + "code"
-            + QDir::separator() + functionTypeName.toLower() + "_datamodel.asn";
+    return QFileInfo(sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator() + "code"
+            + QDir::separator() + functionTypeName.toLower() + "_datamodel.asn");
 }
 
 QFileInfo TmcConverter::sdlFunctionContextLocation(const QString &functionName) const
 {
-    QFileInfo contextLocation = sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator()
-            + "Context-" + functionName.toLower() + ".asn";
+    QFileInfo contextLocation = QFileInfo(sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator()
+            + "Context-" + functionName.toLower() + ".asn");
     if (contextLocation.exists()) {
         return contextLocation;
     } else {
@@ -663,6 +663,6 @@ QFileInfo TmcConverter::sdlFunctionContextLocation(const QString &functionName) 
 
 QFileInfo TmcConverter::outputFilepath(const QString &name)
 {
-    return m_outputDirectory.absolutePath() + QDir::separator() + name;
+    return QFileInfo(m_outputDirectory.absolutePath() + QDir::separator() + name);
 }
 }
