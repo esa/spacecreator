@@ -61,7 +61,7 @@ template<>
 struct hash<Asn1Acn::ImportedType> {
     std::size_t operator()(const Asn1Acn::ImportedType &it) const noexcept
     {
-        return static_cast<size_t>(qHash(it.fullPath()));
+        return qHash(it.fullPath());
     }
 };
 
