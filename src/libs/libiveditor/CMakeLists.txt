@@ -173,6 +173,8 @@ target_sources(${LIB_NAME} PRIVATE
     properties/delegates/asn1valuedelegate.h
     properties/delegates/comboboxdelegate.cpp
     properties/delegates/comboboxdelegate.h
+    properties/delegates/filedialogdelegate.h
+    properties/delegates/filedialogdelegate.cpp
     properties/archetypeswidgetmodel.cpp
     properties/archetypeswidgetmodel.h
     properties/archetypeswidget.cpp

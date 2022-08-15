@@ -20,6 +20,8 @@
 #include "archetypesmanagermodel.h"
 #include "commands/cmdarchetypelibraryapply.h"
 #include "ivmodel.h"
+#include "properties/delegates/filedialogdelegate.h"
+#include "shared/common.h"
 #include "ui_archetypesmanagerdialog.h"
 
 #include <QDebug>
@@ -38,6 +40,10 @@ ArchetypesManagerDialog::ArchetypesManagerDialog(
     , m_ui(new Ui::ArchetypesManagerDialog)
 {
     m_ui->setupUi(this);
+
+    m_ui->tableView->setItemDelegateForColumn(ArchetypesManagerModel::Column::LibraryPath,
+            new ive::FileDialogDelegate(shared::interfaceCustomArchetypesDirectoryPath(),
+                    tr("Chose archetype library file"), "*.xml", m_ui->tableView));
 
     m_model = new ArchetypesManagerModel(objectsModel, m_cmdMacro.get(), this);
     m_ui->tableView->setModel(m_model);
