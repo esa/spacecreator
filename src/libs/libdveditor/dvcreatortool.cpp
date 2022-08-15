@@ -164,7 +164,7 @@ bool DVCreatorTool::onMousePress(QMouseEvent *e)
         return false;
     }
 
-    const QPointF scenePos = cursorInScene(e->globalPos());
+    const QPointF scenePos = cursorInScene(e->globalPosition.toPoint());
     if ((m_toolType == ToolType::ReCreateConnection || e->modifiers() & Qt::ShiftModifier)
             && e->button() != Qt::RightButton) {
         return prepareReCreateConnectionPreview(e);
@@ -196,11 +196,11 @@ bool DVCreatorTool::onMouseRelease(QMouseEvent *e)
         return false;
 
     if ((e->button() & Qt::RightButton) && m_previewItem) {
-        return showContextMenu(e->globalPos());
+        return showContextMenu(e->globalPosition().toPoint());
     } else if (m_toolType != ToolType::Pointer) {
         const bool hasPreview = m_previewItem || m_previewConnectionItem;
         if (hasPreview) {
-            const QPointF &scenePos = cursorInScene(e->globalPos());
+            const QPointF &scenePos = cursorInScene(e->globalPosition().toPoint());
             return handleToolType(m_toolType, scenePos);
         }
     }
@@ -212,7 +212,7 @@ bool DVCreatorTool::onMouseMove(QMouseEvent *e)
     if (!m_view || !m_view->scene())
         return false;
 
-    const QPointF &scenePos = cursorInScene(e->globalPos());
+    const QPointF &scenePos = cursorInScene(e->globalPosition().toPoint());
     if (m_previewItem && m_previewItem->isVisible()) {
         const QRectF newGeometry = QRectF(m_clickScenePos, scenePos).normalized();
         if (!newGeometry.isValid())
@@ -490,7 +490,7 @@ void DVCreatorTool::handleConnectionReCreate(const QVector<QPointF> &graphicPoin
 bool DVCreatorTool::prepareMultiPointConnectionPreview(QMouseEvent *e)
 {
     QGraphicsScene *scene = m_view->scene();
-    const QPointF scenePos = cursorInScene(e->globalPos());
+    const QPointF scenePos = cursorInScene(e->globalPosition().toPoint());
     QGraphicsItem *item = shared::graphicsviewutils::nearestItem(
             scene, scenePos, shared::graphicsviewutils::kInterfaceTolerance, { DVDeviceGraphicsItem::Type });
     if (!item) {
@@ -512,7 +512,7 @@ bool DVCreatorTool::prepareMultiPointConnectionPreview(QMouseEvent *e)
 bool DVCreatorTool::prepareReCreateConnectionPreview(QMouseEvent *e)
 {
     QGraphicsScene *scene = m_view->scene();
-    const QPointF scenePos = cursorInScene(e->globalPos());
+    const QPointF scenePos = cursorInScene(e->globalPosition().toPoint());
 
     if (!m_previewConnectionItem) {
         QGraphicsItem *item = shared::graphicsviewutils::nearestItem(
@@ -548,7 +548,7 @@ bool DVCreatorTool::prepareReCreateConnectionPreview(QMouseEvent *e)
 bool DVCreatorTool::prepareRectPreview(QMouseEvent *e)
 {
     QGraphicsScene *scene = m_view->scene();
-    const QPointF scenePos = cursorInScene(e->globalPos());
+    const QPointF scenePos = cursorInScene(e->globalPosition().toPoint());
     QGraphicsItem *parentItem = m_view->itemAt(e->pos());
     if (!parentItem) {
         return false;
@@ -586,7 +586,7 @@ bool DVCreatorTool::prepareRectPreview(QMouseEvent *e)
 bool DVCreatorTool::prepareDirectConnectionPreview(QMouseEvent *e)
 {
     QGraphicsScene *scene = m_view->scene();
-    const QPointF scenePos = cursorInScene(e->globalPos());
+    const QPointF scenePos = cursorInScene(e->globalPosition().toPoint());
 
     if (!shared::graphicsviewutils::nearestItem(
                 scene, scenePos, shared::graphicsviewutils::kInterfaceTolerance, { DVDeviceGraphicsItem::Type })) {
