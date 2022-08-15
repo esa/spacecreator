@@ -24,6 +24,7 @@
 #include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/package/package.h>
+#include <QIODevice>
 
 using conversion::translator::TranslationException;
 
