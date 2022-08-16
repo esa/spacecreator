@@ -52,6 +52,7 @@ void ArchetypesWidgetModel::setFunction(ivm::IVFunctionType *fn)
     beginResetModel();
     m_function = fn;
     m_archetypeReferences = QVector<ivm::IVArchetypeReference *>(m_function->archetypeReferences());
+    m_isReferenceNew.fill(false, m_archetypeReferences.size());
     endResetModel();
 }
 
@@ -60,9 +61,19 @@ QVector<ivm::IVArchetypeReference *> ArchetypesWidgetModel::getArchetypeReferenc
     return m_archetypeReferences;
 }
 
-bool ArchetypesWidgetModel::areArchetypesModified()
+bool ArchetypesWidgetModel::areArchetypesModified() const
 {
     return m_areArchetypesModified;
+}
+
+bool ArchetypesWidgetModel::isReferenceNew(int i) const
+{
+    return m_isReferenceNew[i];
+}
+
+void ArchetypesWidgetModel::setReferenceNotNew(int i)
+{
+    m_isReferenceNew[i] = false;
 }
 
 QVariant ArchetypesWidgetModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -210,12 +221,8 @@ bool ArchetypesWidgetModel::insertRows(int row, int count, const QModelIndex &pa
         reference->setFunctionName(firstFunctionName);
 
         m_archetypeReferences.append(reference);
+        m_isReferenceNew.append(true);
 
-        std::sort(m_archetypeReferences.begin(), m_archetypeReferences.end(),
-                [](ivm::IVArchetypeReference *firstReference, ivm::IVArchetypeReference *secondReference) -> bool {
-                    return firstReference->getLibraryName() < secondReference->getLibraryName()
-                            && firstReference->getFunctionName() < secondReference->getFunctionName();
-                });
     }
 
     endInsertRows();
@@ -236,6 +243,7 @@ bool ArchetypesWidgetModel::removeRows(int row, int count, const QModelIndex &pa
     beginRemoveRows(parent, row, row + count - 1);
 
     m_archetypeReferences.remove(row, count);
+    m_isReferenceNew.remove(row, count);
 
     endRemoveRows();
     m_areArchetypesModified = true;

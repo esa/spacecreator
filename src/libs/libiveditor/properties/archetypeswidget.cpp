@@ -108,13 +108,13 @@ void ArchetypesWidget::applyArchetypes()
     auto command = new cmd::CmdFunctionArchetypesApply(m_model->getFunction(), m_model->getArchetypeReferences());
     m_cmdMacro->push(command);
 
-    for (auto reference : m_model->getArchetypeReferences()) {
+    for (int i = 0; i < m_model->getArchetypeReferences().size(); i++) {
 
         ivm::ArchetypeObject *archetypeObject = m_archetypeModel->getObjectByName(
-                reference->getFunctionName(), ivm::ArchetypeObject::Type::FunctionArchetype);
+                m_model->getArchetypeReferences()[i]->getFunctionName(), ivm::ArchetypeObject::Type::FunctionArchetype);
         ivm::FunctionArchetype *functionArchetype = archetypeObject->as<ivm::FunctionArchetype *>();
 
-        if (functionArchetype == nullptr) {
+        if (functionArchetype == nullptr || !m_model->isReferenceNew(i)) {
             continue;
         }
 
@@ -131,6 +131,8 @@ void ArchetypesWidget::applyArchetypes()
 
             auto command = new cmd::CmdInterfaceItemCreate(creationInfo);
             m_cmdMacro->push(command);
+
+            m_model->setReferenceNotNew(i);
         }
     }
 }
