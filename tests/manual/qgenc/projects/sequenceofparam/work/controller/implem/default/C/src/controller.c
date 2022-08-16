@@ -25,7 +25,7 @@ void controller_PI_Trigger(void)
     asn1SccMySeqOf expectedOutput = { .arr = {6, 10, 14} };
     controller_RI_Iface( &inputParam, &outputParam );
     printf("Output: %u %u %u\n", outputParam.arr[0], outputParam.arr[1], outputParam.arr[2]);
-//    assert(outputParam.arr[0] == expectedOutput.arr[0]);
-//    assert(outputParam.arr[1] == expectedOutput.arr[1]);
-//    assert(outputParam.arr[2] == expectedOutput.arr[2]);
+    assert(outputParam.arr[0] == expectedOutput.arr[0]);
+    assert(outputParam.arr[1] == expectedOutput.arr[1]);
+    assert(outputParam.arr[2] == expectedOutput.arr[2]);
 }

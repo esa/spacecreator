@@ -4,7 +4,7 @@
 
 * Open project `tests/manual/qgenc/projects/realparam/realparam.pro`
 * Open the `interfaceview.xml` file
-* Click the green arrow icon near the down left corner
+* Build and run the project
 
 Expected results:
 

@@ -31,6 +31,16 @@ conversion::ModelType SdlModel::modelType() const
     return conversion::ModelProperties<SdlModel>::type;
 }
 
+const std::vector<System> &SdlModel::systems() const
+{
+    return m_systems;
+}
+
+void SdlModel::addSystem(System system)
+{
+    m_systems.push_back(std::move(system));
+}
+
 const std::vector<Process> &SdlModel::processes() const
 {
     return m_processes;

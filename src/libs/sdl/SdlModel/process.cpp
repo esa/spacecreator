@@ -75,14 +75,24 @@ void Process::addProcedure(std::unique_ptr<Procedure> procedure)
     m_procedures.push_back(std::move(procedure));
 }
 
-auto Process::addTimer(const QString &timerName) -> void
-{
-    m_timerNames.push_back(timerName);
-}
-
-auto Process::timerNames() const -> const std::vector<QString> &
+const std::vector<QString> &Process::timerNames() const
 {
     return m_timerNames;
+}
+
+void Process::addTimer(QString timerName)
+{
+    m_timerNames.push_back(std::move(timerName));
+}
+
+const QStringList &Process::errorStates() const
+{
+    return m_errorStates;
+}
+
+void Process::addErrorState(QString stateName)
+{
+    m_errorStates.push_back(std::move(stateName));
 }
 
 void Process::accept(Visitor &visitor) const
