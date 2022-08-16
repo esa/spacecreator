@@ -35,14 +35,15 @@ class IVModel;
 
 namespace ive {
 class ArchetypesManagerModel;
+class InterfaceDocument;
 
 class ArchetypesManagerDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit ArchetypesManagerDialog(
-            ivm::IVModel *objectsModel, cmd::CommandsStack *commandsStack, QWidget *parent = nullptr);
+    explicit ArchetypesManagerDialog(ive::InterfaceDocument *document, ivm::IVModel *objectsModel,
+            cmd::CommandsStack *commandsStack, QWidget *parent = nullptr);
     ~ArchetypesManagerDialog() override;
 
     void addArchetypeLibrary();
@@ -59,6 +60,7 @@ public Q_SLOTS:
 
 private:
     QPointer<ivm::IVModel> m_objectsModel;
+    QPointer<ive::InterfaceDocument> m_document;
     QPointer<cmd::CommandsStack> m_commandsStack;
     ArchetypesManagerModel *m_model = nullptr;
     std::unique_ptr<Ui::ArchetypesManagerDialog> m_ui;

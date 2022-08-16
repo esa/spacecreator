@@ -20,6 +20,7 @@
 #include "cmdarchetypelibraryapply.h"
 
 #include "commandids.h"
+#include "interfacedocument.h"
 #include "ivarchetypelibraryreference.h"
 #include "ivarchetypereference.h"
 #include "ivfunctiontype.h"
@@ -28,9 +29,10 @@
 namespace ive {
 namespace cmd {
 
-CmdArchetypeLibraryApply::CmdArchetypeLibraryApply(
-        ivm::IVModel *objectsModel, QVector<ivm::IVArchetypeLibraryReference *> references)
+CmdArchetypeLibraryApply::CmdArchetypeLibraryApply(ive::InterfaceDocument *document, ivm::IVModel *objectsModel,
+        QVector<ivm::IVArchetypeLibraryReference *> references)
     : shared::UndoCommand()
+    , m_document(document)
     , m_model(objectsModel)
     , m_newReferences(references)
     , m_oldReferences(objectsModel->getArchetypeLibraryReferences())
@@ -54,17 +56,19 @@ CmdArchetypeLibraryApply::CmdArchetypeLibraryApply(
 
 void CmdArchetypeLibraryApply::redo()
 {
-    if (m_model != nullptr) {
+    if (m_model != nullptr && m_document != nullptr) {
         m_model->setArchetypeLibraryReferences(m_newReferences);
         applyReferences(m_newFunctionsArchetypeReferences);
+        m_document->loadArchetypes();
     }
 }
 
 void CmdArchetypeLibraryApply::undo()
 {
-    if (m_model != nullptr) {
+    if (m_model != nullptr && m_document != nullptr) {
         m_model->setArchetypeLibraryReferences(m_oldReferences);
         applyReferences(m_oldFunctionsArchetypeReferences);
+        m_document->loadArchetypes();
     }
 }
 
@@ -73,12 +77,12 @@ int CmdArchetypeLibraryApply::id() const
     return ApplyArchetypeLibraries;
 }
 
-void CmdArchetypeLibraryApply::applyReferences(QHash<shared::Id, QVector<ivm::IVArchetypeReference *>> refencesForFunctions)
+void CmdArchetypeLibraryApply::applyReferences(
+        QHash<shared::Id, QVector<ivm::IVArchetypeReference *>> refencesForFunctions)
 {
     for (auto id : refencesForFunctions.keys()) {
         auto functionType = qobject_cast<ivm::IVFunctionType *>(m_model->getObject(id));
-        if(functionType != nullptr)
-        {
+        if (functionType != nullptr) {
             functionType->setArchetypeReferences(refencesForFunctions[id]);
         }
     }

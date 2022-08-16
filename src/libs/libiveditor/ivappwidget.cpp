@@ -632,11 +632,9 @@ void IVAppWidget::showArchetypeManager()
         return;
     }
 
-    ive::ArchetypesManagerDialog dialog(m_document->objectsModel(), m_document->commandsStack());
+    ive::ArchetypesManagerDialog dialog(m_document, m_document->objectsModel(), m_document->commandsStack(), this);
     dialog.init();
-    if (dialog.exec() == QDialog::Accepted) {
-        m_document->loadArchetypes();
-    }
+    dialog.exec();
 }
 
 } // namespace ive

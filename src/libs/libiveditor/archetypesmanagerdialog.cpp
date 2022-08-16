@@ -21,6 +21,7 @@
 
 #include "archetypesmanagermodel.h"
 #include "commands/cmdarchetypelibraryapply.h"
+#include "interfacedocument.h"
 #include "ivarchetypelibraryreference.h"
 #include "ivmodel.h"
 #include "properties/delegates/filedialogdelegate.h"
@@ -37,10 +38,11 @@
 
 namespace ive {
 
-ArchetypesManagerDialog::ArchetypesManagerDialog(
-        ivm::IVModel *objectsModel, cmd::CommandsStack *commandsStack, QWidget *parent)
+ArchetypesManagerDialog::ArchetypesManagerDialog(ive::InterfaceDocument *document, ivm::IVModel *objectsModel,
+        cmd::CommandsStack *commandsStack, QWidget *parent)
     : QDialog(parent)
     , m_objectsModel(objectsModel)
+    , m_document(document)
     , m_commandsStack(commandsStack)
     , m_ui(new Ui::ArchetypesManagerDialog)
 {
@@ -97,7 +99,8 @@ void ArchetypesManagerDialog::accept()
         return;
     }
 
-    auto command = new cmd::CmdArchetypeLibraryApply(m_objectsModel, m_model->getArchetypeLibraryReferences());
+    auto command =
+            new cmd::CmdArchetypeLibraryApply(m_document, m_objectsModel, m_model->getArchetypeLibraryReferences());
     m_cmdMacro->push(command);
 
     int result = QDialog::Accepted;

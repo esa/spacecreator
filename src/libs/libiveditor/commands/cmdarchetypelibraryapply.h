@@ -20,12 +20,12 @@
 #pragma once
 
 #include "entityattribute.h"
-#include "undocommand.h"
 #include "shared/common.h"
+#include "undocommand.h"
 
+#include <QHash>
 #include <QPointer>
 #include <QVector>
-#include <QHash>
 
 namespace ivm {
 class IVModel;
@@ -34,14 +34,15 @@ class IVArchetypeReference;
 }
 
 namespace ive {
+class InterfaceDocument;
 namespace cmd {
 
 class CmdArchetypeLibraryApply : public shared::UndoCommand
 {
     Q_OBJECT
 public:
-    explicit CmdArchetypeLibraryApply(
-            ivm::IVModel *objectsModel, QVector<ivm::IVArchetypeLibraryReference *> references);
+    explicit CmdArchetypeLibraryApply(ive::InterfaceDocument *document, ivm::IVModel *objectsModel,
+            QVector<ivm::IVArchetypeLibraryReference *> references);
 
     void redo() override;
     void undo() override;
@@ -53,6 +54,7 @@ private:
 
 private:
     QPointer<ivm::IVModel> m_model;
+    QPointer<ive::InterfaceDocument> m_document;
     QVector<ivm::IVArchetypeLibraryReference *> m_newReferences;
     QVector<ivm::IVArchetypeLibraryReference *> m_oldReferences;
     QHash<shared::Id, QVector<ivm::IVArchetypeReference *>> m_newFunctionsArchetypeReferences;
