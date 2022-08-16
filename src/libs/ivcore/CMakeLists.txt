@@ -56,6 +56,8 @@ target_sources(${LIB_NAME} PRIVATE
     archetypes/archetypemodel.cpp
     archetypes/archetypeobject.h
     archetypes/archetypeobject.cpp
+    archetypes/layerarchetype.h
+    archetypes/layerarchetype.cpp
     archetypes/parameterarchetype.h
     archetypes/parameterarchetype.cpp
     archetypes/interfacearchetype.h

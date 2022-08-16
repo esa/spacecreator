@@ -46,6 +46,7 @@ public:
     enum class Type
     {
         Unknown = 0,
+        LayerArchetype,
         ParameterArchetype,
         InterfaceArchetype,
         FunctionArchetype,

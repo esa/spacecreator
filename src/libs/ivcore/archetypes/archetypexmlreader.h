@@ -24,6 +24,7 @@
 #include "functionarchetype.h"
 #include "interfacearchetype.h"
 #include "parameterarchetype.h"
+#include "layerarchetype.h"
 #include "archetypecommonprops.h"
 
 #include <QObject>

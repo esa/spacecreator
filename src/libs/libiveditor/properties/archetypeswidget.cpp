@@ -29,9 +29,11 @@
 #include "commands/cmdinterfaceitemcreate.h"
 #include "delegates/comboboxdelegate.h"
 #include "ivarchetypereference.h"
+#include "ivconnectionlayertype.h"
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
 #include "ivmodel.h"
+#include "ivobject.h"
 #include "shared/veobject.h"
 #include "ui_archetypeswidget.h"
 
@@ -42,11 +44,12 @@
 
 namespace ive {
 
-ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVFunctionType *function,
-        shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent)
+ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVModel *layersModel,
+        ivm::IVFunctionType *function, shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent)
     : QWidget(parent)
-    , m_ui(new Ui::ArchetypesWidget)
+    , m_ui(std::make_unique<Ui::ArchetypesWidget>())
     , m_archetypeModel(archetypeModel)
+    , m_layersModel(layersModel)
     , m_cmdMacro(macro)
 {
     Q_ASSERT(function && function->model());
@@ -70,10 +73,7 @@ ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVF
     rowsInserted(QModelIndex(), 0, m_model->rowCount() - 1);
 }
 
-ArchetypesWidget::~ArchetypesWidget()
-{
-    delete m_ui;
-}
+ArchetypesWidget::~ArchetypesWidget() {}
 
 void ArchetypesWidget::addArchetype()
 {
@@ -184,8 +184,15 @@ ivm::IVInterface::CreationInfo ArchetypesWidget::generateCreationInfo(ivm::Inter
         break;
     }
 
-    ivm::IVConnectionLayerType *layer = new ivm::IVConnectionLayerType();
-    layer->rename(interfaceArchetype->getLayer());
+    ivm::IVObject *object =
+            m_layersModel->getObjectByName(interfaceArchetype->getLayer(), ivm::IVObject::Type::ConnectionLayer);
+    ivm::IVConnectionLayerType *layer = object->as<ivm::IVConnectionLayerType *>();
+
+    if (layer == nullptr) {
+        layer = new ivm::IVConnectionLayerType();
+        layer->rename(interfaceArchetype->getLayer());
+        m_layersModel->addObject(layer);
+    }
 
     creationInfo.parameters = generateInterfaceParameters(interfaceArchetype->getParameters());
     creationInfo.layer = layer;
