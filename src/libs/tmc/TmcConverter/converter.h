@@ -24,6 +24,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QList>
+#include <QProcess>
 #include <QStringList>
 #include <conversion/common/modeltype.h>
 #include <conversion/registry/registry.h>
@@ -88,6 +89,12 @@ public:
      * @return true if conversion succeed, otherwise false.
      */
     bool convert();
+    /**
+     * @brief   Set paths to MSC files to be converted to observers
+     *
+     * @param   mscObserverFiles    Paths to the files
+     */
+    void setMscObserverFiles(const QStringList &mscObserverFiles);
     /**
      * @brief   Specify which IV functions should be treated as an environment
      *          during model checking
@@ -159,6 +166,10 @@ private:
             const QList<QString> &asn1FilepathList, const QStringList &modelFunctions,
             const QStringList &environmentFunctions);
     bool convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath);
+
+    bool convertMscObservers();
+    bool generateObserverDatamodel(QProcess &process, const QString &sdlFileName);
+
     std::unique_ptr<ivm::IVModel> readInterfaceView(const QString &filepath);
     void saveOptimizedInterfaceView(const ivm::IVModel *ivModel, const QString outputFilePath);
     void findFunctionsToConvert(const ivm::IVModel &model, QStringList &sdlFunctions,
@@ -186,6 +197,7 @@ private:
     const QDir m_outputDirectory;
     ivm::IVPropertyTemplateConfig *m_dynPropConfig;
 
+    QStringList m_mscObserverFiles;
     std::vector<QString> m_environmentFunctions;
     std::vector<QString> m_keepFunctions;
     std::optional<QString> m_globalInputVectorLengthLimit;
@@ -198,5 +210,8 @@ private:
     QStringList m_observerNames;
 
     conversion::Registry m_registry;
+
+    inline static const QString m_opengeodeCommand = "opengeode";
+    constexpr static int m_commandTimeout = 12000;
 };
 }

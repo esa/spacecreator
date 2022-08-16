@@ -21,7 +21,6 @@
 
 #include <QBuffer>
 #include <QDebug>
-#include <QProcess>
 #include <QTemporaryFile>
 #include <QtDebug>
 #include <QtGlobal>
@@ -36,13 +35,16 @@
 #include <conversion/converter/exceptions.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/IvRegistrar/registrar.h>
+#include <conversion/msc/MscOptions/options.h>
 #include <conversion/msc/MscRegistrar/registrar.h>
 #include <conversion/promela/PromelaRegistrar/registrar.h>
+#include <conversion/sdl/SdlRegistrar/registrar.h>
 #include <iostream>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivxmlreader.h>
 #include <libiveditor/ivexporter.h>
 #include <promela/PromelaOptions/options.h>
+#include <sdl/SdlOptions/options.h>
 #include <tmc/SdlToPromelaConverter/converter.h>
 #include <tmc/TmcInterfaceViewOptimizer/interfaceviewoptimizer.h>
 
@@ -58,9 +60,12 @@ using conversion::exporter::ExportException;
 using conversion::importer::ImportException;
 using conversion::iv::IvOptions;
 using conversion::iv::IvRegistrar;
+using conversion::msc::MscOptions;
 using conversion::msc::MscRegistrar;
 using conversion::promela::PromelaOptions;
 using conversion::promela::PromelaRegistrar;
+using conversion::sdl::SdlOptions;
+using conversion::sdl::SdlRegistrar;
 using conversion::translator::TranslationException;
 using ive::IVExporter;
 using ivm::IVFunction;
@@ -114,6 +119,11 @@ TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &output
     if (!result) {
         throw RegistrationFailedException(ModelType::Promela);
     }
+    SdlRegistrar sdlRegistrar;
+    result = sdlRegistrar.registerCapabilities(m_registry);
+    if (!result) {
+        throw RegistrationFailedException(ModelType::Sdl);
+    }
 
     m_dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
     m_dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
@@ -129,6 +139,11 @@ bool TmcConverter::convert()
         return false;
     }
     return true;
+}
+
+void TmcConverter::setMscObserverFiles(const QStringList &mscObserverFiles)
+{
+    m_mscObserverFiles = mscObserverFiles;
 }
 
 void TmcConverter::setEnvironmentFunctions(const std::vector<QString> &environmentFunctions)
@@ -310,6 +325,10 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
         }
     }
 
+    if (!convertMscObservers()) {
+        return false;
+    }
+
     QStringList asn1Files;
 
     for (const auto &info : m_observerInfos) {
@@ -458,6 +477,77 @@ bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, cons
     return convertModel({ ModelType::Asn1 }, ModelType::Promela, {}, std::move(options));
 }
 
+bool TmcConverter::convertMscObservers()
+{
+    for (const QString &mscFilePath : m_mscObserverFiles) {
+        QFileInfo mscFile(mscFilePath);
+
+        if (!mscFile.exists()) {
+            qCritical() << "MSC file " << mscFilePath << " doesn't exist";
+            return false;
+        }
+
+        const auto outputDir = mscFile.dir();
+        const auto &outputPath = outputDir.path() + QDir::separator();
+
+        Options options;
+
+        options.add(MscOptions::inputFilepath, mscFilePath);
+        options.add(MscOptions::simuDataViewFilepath, simuDataViewLocation().absoluteFilePath());
+        options.add(SdlOptions::filepathPrefix, outputPath);
+
+        qDebug() << "Converting MSC file" << mscFilePath << "to an SDL observer";
+
+        if (!convertModel({ ModelType::Msc }, ModelType::Sdl, {}, std::move(options))) {
+            qCritical() << "Unable to translate MSC file" << mscFilePath << "to SDL observer";
+            return false;
+        }
+
+        QProcess process;
+        process.setWorkingDirectory(outputPath);
+
+        for (const auto &sdlFileName : QDir(outputPath).entryList({ "*.pr" })) {
+            if (!generateObserverDatamodel(process, sdlFileName)) {
+                return false;
+            }
+
+            const auto sdlFilePath = outputPath + sdlFileName;
+            m_observerInfos.emplace_back(ObserverInfo(sdlFilePath, 1));
+        }
+    }
+
+    return true;
+}
+
+bool TmcConverter::generateObserverDatamodel(QProcess &process, const QString &sdlFileName)
+{
+    QStringList arguments;
+    arguments << "--toAda" << sdlFileName;
+
+    qDebug() << "Executing:" << m_opengeodeCommand << "with args:" << arguments.join(", ");
+
+    process.start(m_opengeodeCommand, arguments);
+
+    if (!process.waitForStarted()) {
+        qCritical() << "Cannot generate observer datamodel using opengeode.";
+        process.terminate();
+        return false;
+    }
+
+    if (!process.waitForFinished(m_commandTimeout)) {
+        qCritical() << "Timeout while waiting for generating observer datamodel.";
+        process.terminate();
+        return false;
+    }
+
+    if (process.exitCode() != EXIT_SUCCESS) {
+        qCritical() << "Observer datamodel generation finished with code: " << process.exitCode();
+        return false;
+    }
+
+    return true;
+}
+
 std::unique_ptr<IVModel> TmcConverter::readInterfaceView(const QString &filepath)
 {
     ivm::IVXMLReader reader;
@@ -593,7 +683,6 @@ bool TmcConverter::createEnvGenerationInlines(
 
     try {
         return convertModel({ sourceModelType }, ModelType::Promela, {}, std::move(options));
-        return true;
     } catch (const ImportException &ex) {
         const auto errorMessage = QString("Import failure: %1").arg(ex.errorMessage());
         qFatal("%s", errorMessage.toLatin1().constData());

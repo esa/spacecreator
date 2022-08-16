@@ -72,8 +72,10 @@ public:
 
 private:
     auto exportSdlModel(const SdlModel *model, const conversion::Options &options) const -> void;
+    auto exportSystem(const System &system, const conversion::Options &options) const -> void;
     auto exportProcess(const Process &process, const conversion::Options &options) const -> void;
 
+    static auto makeSdlFilename(const System &system) -> QString;
     static auto makeSdlFilename(const Process &process) -> QString;
 };
 } // namespace sdl::exporter

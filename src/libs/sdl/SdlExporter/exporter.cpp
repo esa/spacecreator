@@ -67,9 +67,31 @@ QStringList SdlExporter::getFilenamesForModel(const SdlModel *const model)
 
 void SdlExporter::exportSdlModel(const SdlModel *const model, const Options &options) const
 {
+    for (const auto &system : model->systems()) {
+        exportSystem(system, options);
+    }
+
     for (const auto &process : model->processes()) {
         exportProcess(process, options);
     }
+}
+
+void SdlExporter::exportSystem(const System &system, const Options &options) const
+{
+    QString serializedProcess;
+    QTextStream outputTextStream(&serializedProcess, QIODevice::WriteOnly);
+
+    sdl::SdlVisitor::Layouter layouter;
+    sdl::SdlVisitor::IndentingStreamWriter writer(outputTextStream);
+    sdl::SdlVisitor visitor(writer, layouter);
+
+    visitor.visit(system);
+
+    const auto pathPrefix = options.value(SdlOptions::filepathPrefix).value_or("");
+    const auto filePath = QString("%1%2").arg(pathPrefix).arg(makeSdlFilename(system));
+
+    QSaveFile outputFile(filePath);
+    writeAndCommit(outputFile, serializedProcess);
 }
 
 void SdlExporter::exportProcess(const Process &process, const Options &options) const
@@ -88,6 +110,15 @@ void SdlExporter::exportProcess(const Process &process, const Options &options) 
 
     QSaveFile outputFile(filePath);
     writeAndCommit(outputFile, serializedProcess);
+}
+
+QString SdlExporter::makeSdlFilename(const System &system)
+{
+    if (system.name().isEmpty()) {
+        throw MissingOutputFilenameException(ModelType::Sdl);
+    }
+
+    return QString("%1.%2").arg(system.name().toLower()).arg("pr");
 }
 
 QString SdlExporter::makeSdlFilename(const Process &process)

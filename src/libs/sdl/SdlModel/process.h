@@ -25,6 +25,7 @@
 #include "variabledeclaration.h"
 
 #include <QString>
+#include <QStringList>
 #include <memory>
 #include <vector>
 
@@ -125,15 +126,28 @@ public:
     auto addProcedure(std::unique_ptr<Procedure> procedure) -> void;
 
     /**
+     * @brief   Timer names
+     */
+    auto timerNames() const -> const std::vector<QString> &;
+    /**
      * @brief   Add timer
      *
      * @param   timerName Timer name
      */
-    auto addTimer(const QString &timerName) -> void;
+    auto addTimer(QString timerName) -> void;
+
     /**
-     * @brief   Timer names
+     * @brief   Getter for error states names
+     *
+     * @return  Error states names
      */
-    auto timerNames() const -> const std::vector<QString> &;
+    auto errorStates() const -> const QStringList &;
+    /**
+     * @brief   Adds an error state name
+     *
+     * @param   stateName   Error state name
+     */
+    auto addErrorState(QString stateName) -> void;
 
 public:
     /**
@@ -145,7 +159,8 @@ private:
     std::unique_ptr<Transition> m_startTransition;
     std::unique_ptr<StateMachine> m_stateMachine;
     std::vector<std::unique_ptr<VariableDeclaration>> m_variables;
-    std::vector<QString> m_timerNames;
     std::vector<std::unique_ptr<Procedure>> m_procedures;
+    std::vector<QString> m_timerNames;
+    QStringList m_errorStates;
 };
 } // namespace sdl
