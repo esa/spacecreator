@@ -41,17 +41,9 @@ add_qtc_plugin(${PLUGIN_NAME}
 )
 
 target_include_directories(${PLUGIN_NAME}
-    PRIVATE src
-    PRIVATE ${QTC_SOURCE_DIR}/src
     PRIVATE ${QTC_SOURCE_DIR}/src/libs
-    PRIVATE ${QTC_SOURCE_DIR}/src/libs/aggregation
-    PRIVATE ${QTC_SOURCE_DIR}/src/libs/extensionsystem
-    PRIVATE ${QTC_SOURCE_DIR}/src/libs/utils
     PRIVATE ${QTC_SOURCE_DIR}/src/plugins
     PRIVATE ${QTC_SOURCE_DIR}/src/plugins/coreplugin
-    PRIVATE ${QTC_SOURCE_DIR}/src/plugins/projectexplorer
-    PRIVATE ${QTC_SOURCE_DIR}/src/plugins/qtsupport
-    PRIVATE ${QTC_SOURCE_DIR}/src/plugins/texteditor
 )
 
 source_group("Designer Files" REGULAR_EXPRESSION ".*.ui$")

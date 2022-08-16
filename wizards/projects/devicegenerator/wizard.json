@@ -1,7 +1,7 @@
 {
     "version": 1,
     "kind": "project",
-    "supportedProjectTypes": [ "CMakeProjectManager.CMakeProject", "Qt4ProjectManager.Qt4Project" ],
+    "supportedProjectTypes": [ "Qt4ProjectManager.Qt4Project" ],
     "id": "S.DeviceGenerator Project",
     "category": "I.Projects",
     "trDescription": "Create Communication Device project.",
@@ -94,7 +94,7 @@
                     "openInEditor": true
                 },
                 {
-                    "source": "%{JS: '%{IVFileSource}' === 'empty' ? 'interfaceview_empty.xml' : 'interfaceview.xml'}",
+                    "source": "%{IVFileSource}_template.xml",
                     "target": "%{ProjectDirectory}/%{IVFile}",
                     "openInEditor": true
                 },
