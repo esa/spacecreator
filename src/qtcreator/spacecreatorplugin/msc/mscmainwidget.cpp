@@ -90,7 +90,9 @@ void MscMainWidget::init()
         m_plugin->chartView()->setZoom(100);
     }
     connect(mainWidget, &msc::MscAppWidget::showAsn1File, this,
-            [&](const QString &asnFilename) { Core::EditorManager::instance()->openEditor(asnFilename); });
+            [&](const QString &asnFilename) {
+                Core::EditorManager::instance()->openEditor(Utils::FilePath::fromString(asnFilename));
+            });
     connect(mainWidget, &msc::MscAppWidget::selectAsn1, this, &spctr::MscMainWidget::openAsn1Dialog);
     connect(mainWidget, &msc::MscAppWidget::showInterfaceView, this, [&]() {
         if (!m_project) {
@@ -98,7 +100,7 @@ void MscMainWidget::init()
         }
         const QStringList ivFiles = m_project->allIVFiles();
         if (!ivFiles.isEmpty()) {
-            Core::EditorManager::instance()->openEditor(ivFiles.first());
+            Core::EditorManager::instance()->openEditor(Utils::FilePath::fromString(ivFiles.first()));
         }
     });
 }
