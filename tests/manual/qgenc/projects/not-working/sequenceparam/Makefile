@@ -83,7 +83,6 @@ work/glue_simu:	InterfaceView.aadl DataView.aadl
 work/glue_release:	InterfaceView.aadl DeploymentView.aadl DataView.aadl
 	sed -i 's/CoverageEnabled => true/CoverageEnabled => false/g' DeploymentView.aadl || :
 	$(KAZOO) -p --glue --gw -o work
-	cp ~/makefile-hack ./work/qgenc/implem/default/QGenC/Makefile
 	touch $@
 
 work/glue_debug:	InterfaceView.aadl DeploymentView.aadl DataView.aadl
