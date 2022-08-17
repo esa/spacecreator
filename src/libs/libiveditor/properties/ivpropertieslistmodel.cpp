@@ -77,6 +77,8 @@ bool IVPropertiesListModel::isEditable(const QModelIndex &index) const
     bool editable = true;
     switch (tokenFromIndex(index)) {
     case ivm::meta::Props::Token::is_type:
+    case ivm::meta::Props::Token::fixed_system_element:
+    case ivm::meta::Props::Token::required_system_element:
         editable = false;
         break;
     default:
@@ -300,8 +302,18 @@ bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const
         const bool isClone = iface->isClone();
         switch (tokenFromIndex(index)) {
         case ivm::meta::Props::Token::name:
+            if (iface->isRequiredSystemElement()) {
+                return false;
+            } // no break
         case ivm::meta::Props::Token::InheritPI:
             return !isClone;
+        case ivm::meta::Props::Token::fixed_system_element:
+        case ivm::meta::Props::Token::required_system_element:
+            return false;
+        case ivm::meta::Props::Token::kind:
+            if (iface->isRequiredSystemElement()) {
+                return false;
+            } // no break
         default:
             if (iface->isRequired()) {
                 if (auto ri = iface->as<const ivm::IVInterfaceRequired *>()) {

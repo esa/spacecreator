@@ -119,7 +119,6 @@ private:
     static auto qstringToBoolSymbol(const QString &str) -> QString;
     static auto getAssignmentsForRecords(const ivm::IVInterface &interface, const Asn1Model &asn1Model,
             const CsvModel &testData, unsigned int index, const TestDriverGeneratorContext &context) -> QString;
-    static auto removePiPrefix(const QString &str) -> QString;
 };
 
 } // namespace testgenerator

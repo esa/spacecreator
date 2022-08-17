@@ -63,7 +63,7 @@ void testdriver_PI_StartTest(void)
 {
     for (unsigned int i = 0; i < testDataSize; i++) {
         // clang-format off
-        testdriver_RI_InterfaceUnderTest(
+        testdriver_RI_PI_InterfaceUnderTest(
                 &(testData[i].active),
                 &(testData[i].temperature),
                 &(testData[i].posX),

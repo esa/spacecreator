@@ -111,7 +111,7 @@ IVArchetypeReference *createArchetypeReference(
 IVArchetypeLibraryReference *createArchetypeLibraryReference(
         const QString &archetypeLibraryName, const QString &archetypeLibraryPath, QObject *parent)
 {
-    auto archetypeLibraryReference = new IVArchetypeLibraryReference(parent, archetypeLibraryName, archetypeLibraryPath);
+    auto archetypeLibraryReference = new IVArchetypeLibraryReference(archetypeLibraryName, archetypeLibraryPath, parent);
     return archetypeLibraryReference;
 }
 

@@ -20,6 +20,8 @@
 #include <QObject>
 #include <QtTest>
 #include <common/sdlmodelbuilder/sdlanswerbuilder.h>
+#include <common/sdlmodelbuilder/sdlblockbuilder.h>
+#include <common/sdlmodelbuilder/sdlchannelbuilder.h>
 #include <common/sdlmodelbuilder/sdldecisionbuilder.h>
 #include <common/sdlmodelbuilder/sdlinputbuilder.h>
 #include <common/sdlmodelbuilder/sdlmodelbuilder.h>
@@ -27,8 +29,10 @@
 #include <common/sdlmodelbuilder/sdlprocedurebuilder.h>
 #include <common/sdlmodelbuilder/sdlprocedurecallbuilder.h>
 #include <common/sdlmodelbuilder/sdlprocessbuilder.h>
+#include <common/sdlmodelbuilder/sdlsignalroutebuilder.h>
 #include <common/sdlmodelbuilder/sdlstatebuilder.h>
 #include <common/sdlmodelbuilder/sdlstatemachinebuilder.h>
+#include <common/sdlmodelbuilder/sdlsystembuilder.h>
 #include <common/sdlmodelbuilder/sdltaskbuilder.h>
 #include <common/sdlmodelbuilder/sdltransitionbuilder.h>
 #include <common/textcheckerandconsumer/textcheckerandconsumer.h>
@@ -83,6 +87,8 @@ using sdl::VariableLiteral;
 using sdl::VariableReference;
 using sdl::exporter::SdlExporter;
 using tests::common::SdlAnswerBuilder;
+using tests::common::SdlBlockBuilder;
+using tests::common::SdlChannelBuilder;
 using tests::common::SdlDecisionBuilder;
 using tests::common::SdlInputBuilder;
 using tests::common::SdlModelBuilder;
@@ -90,8 +96,10 @@ using tests::common::SdlOutputBuilder;
 using tests::common::SdlProcedureBuilder;
 using tests::common::SdlProcedureCallBuilder;
 using tests::common::SdlProcessBuilder;
+using tests::common::SdlSignalRouteBuilder;
 using tests::common::SdlStateBuilder;
 using tests::common::SdlStateMachineBuilder;
+using tests::common::SdlSystemBuilder;
 using tests::common::SdlTaskBuilder;
 using tests::common::SdlTransitionBuilder;
 using tests::common::TextCheckerAndConsumer;
@@ -112,6 +120,8 @@ private Q_SLOTS:
     void testGenerateProcessWithParamlessProcedure();
     void testGenerateProcessWithProcedureWithParamsAndReturn();
     void testGenerateProcessWithReturnlessProcedure();
+    void testGenerateSystem();
+    void testGenerateSystemAutoRoutes();
 };
 
 static std::unique_ptr<VariableDeclaration> makeVariableDeclaration(QString name, QString type)
@@ -119,6 +129,17 @@ static std::unique_ptr<VariableDeclaration> makeVariableDeclaration(QString name
     auto variable = std::make_unique<VariableDeclaration>();
     variable->setName(std::move(name));
     variable->setType(std::move(type));
+    variable->setMonitor(false);
+
+    return variable;
+}
+
+static std::unique_ptr<VariableDeclaration> makeMonitorDeclaration(QString name, QString type)
+{
+    auto variable = std::make_unique<VariableDeclaration>();
+    variable->setName(std::move(name));
+    variable->setType(std::move(type));
+    variable->setMonitor(true);
 
     return variable;
 }
@@ -799,6 +820,186 @@ void tst_sdlexporter::testGenerateProcessWithReturnlessProcedure()
 
         QString("endprocess %1;").arg(processName),
     };
+    TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
+}
+
+void tst_sdlexporter::testGenerateSystem()
+{
+    QString modelName = "BasicSystem";
+    QString modelPrefix = "Sdl_";
+    QString systemName = modelName.toLower(); // NOLINT
+
+    auto monitor = makeMonitorDeclaration("event", "Observable_Event");
+
+    auto transition1 = SdlTransitionBuilder().withNextStateAction().build();
+    auto state1 = SdlStateBuilder("Wait")
+                          .withInput(SdlInputBuilder().withName("someInput").withTransition(transition1.get()).build())
+                          .build();
+
+    auto startTransition = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
+
+    auto transition2 = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
+
+    auto state2 =
+            SdlStateBuilder("Idle")
+                    .withInput(SdlInputBuilder().withName("someOtherInput").withTransition(transition2.get()).build())
+                    .build();
+
+    // clang-format off
+    const auto exampleModel = SdlModelBuilder(systemName)
+        .withSystem(SdlSystemBuilder(systemName)
+            .withFreeformText("use datamodel comment 'observer.asn'")
+            .withSignal("Signal1")
+            .withInputRename("Signal2", "OGSignal2", "Func2")
+            .withOutputRename("Signal3", "OGSignal3", "Func3")
+            .withChannel(SdlChannelBuilder("c")
+                .withRoute("env", systemName, {"Signal1", "Signal2", "Signal3" })
+                .build())
+            .withBlock(SdlBlockBuilder(systemName)
+                .withSignalRoute(SdlSignalRouteBuilder("r")
+                    .withRoute("env", systemName, {"Signal1", "Signal2", "Signal3" })
+                    .build())
+                .withConnection("c", "r")
+                .withProcess(SdlProcessBuilder(systemName)
+                    .withStartTransition(std::move(startTransition))
+                    .withVariable(std::move(monitor))
+                    .withStateMachine(SdlStateMachineBuilder()
+                        .withState(std::move(state1))
+                        .withState(std::move(state2))
+                        .withTransition(std::move(transition1))
+                        .withTransition(std::move(transition2))
+                        .build())
+                    .build())
+                .build())
+            .build())
+        .build();
+    // clang-format on
+
+    Options options;
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
+
+    SdlExporter exporter;
+    try {
+        exporter.exportModel(exampleModel.get(), options);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+
+    QString filename = QString("%1%2.%3").arg(modelPrefix, systemName, "pr");
+    QFile outputFile(filename);
+    if (!outputFile.open(QIODevice::ReadOnly)) {
+        QFAIL("requested file cannot be found");
+    }
+    QTextStream consumableOutput(&outputFile);
+    // clang-format off
+    std::vector<QString> expectedOutput = { 
+        QString("system %1;").arg(systemName),
+        "use datamodel comment 'observer.asn';",
+        "signal Signal1;",
+        "signal Signal2 renames input OGSignal2 to Func2;",
+        "signal Signal3 renames output OGSignal3 from Func3;",
+        "channel c",
+        QString("from env to %1 with Signal1, Signal2, Signal3").arg(systemName),
+        "endchannel;",
+        QString("block %1;").arg(systemName),
+        "signalroute r",
+        QString("from env to %1 with Signal1, Signal2, Signal3;").arg(systemName),
+        "connect c and r;",
+        QString("process %1;").arg(systemName),
+        "monitor event Observable_Event",
+        "START;", "NEXTSTATE Wait;",
+        "state Wait;", "input someInput;", "NEXTSTATE -;", "endstate;",
+        "state Idle;", "input someOtherInput;", "NEXTSTATE Wait;", "endstate;",
+        QString("endprocess %1;").arg(systemName), "endblock;", "endsystem;"
+    };
+    // clang-format on
+    TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
+}
+
+void tst_sdlexporter::testGenerateSystemAutoRoutes()
+{
+    QString modelName = "BasicSystem";
+    QString modelPrefix = "Sdl_";
+    QString systemName = modelName.toLower(); // NOLINT
+
+    auto monitor = makeMonitorDeclaration("event", "Observable_Event");
+
+    auto transition1 = SdlTransitionBuilder().withNextStateAction().build();
+    auto state1 = SdlStateBuilder("Wait")
+                          .withInput(SdlInputBuilder().withName("someInput").withTransition(transition1.get()).build())
+                          .build();
+
+    auto startTransition = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
+
+    auto transition2 = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
+
+    auto state2 =
+            SdlStateBuilder("Idle")
+                    .withInput(SdlInputBuilder().withName("someOtherInput").withTransition(transition2.get()).build())
+                    .build();
+
+    // clang-format off
+    auto exampleSystem = SdlSystemBuilder(systemName)
+        .withFreeformText("use datamodel comment 'observer.asn'")
+        .withSignal("Signal1")
+        .withInputRename("Signal2", "OGSignal2", "Func2")
+        .withOutputRename("Signal3", "OGSignal3", "Func3")
+        .withBlock(SdlBlockBuilder(systemName)
+            .withProcess(SdlProcessBuilder(systemName)
+                .withStartTransition(std::move(startTransition))
+                .withVariable(std::move(monitor))
+                .withStateMachine(SdlStateMachineBuilder()
+                    .withState(std::move(state1))
+                    .withState(std::move(state2))
+                    .withTransition(std::move(transition1))
+                    .withTransition(std::move(transition2))
+                    .build())
+                .build())
+            .build())
+        .build();
+    exampleSystem.createRoutes("c", "r");
+    // clang-format on
+
+    const auto exampleModel = SdlModelBuilder(systemName).withSystem(std::move(exampleSystem)).build();
+
+    Options options;
+    options.add(SdlOptions::filepathPrefix, modelPrefix);
+
+    SdlExporter exporter;
+    try {
+        exporter.exportModel(exampleModel.get(), options);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+
+    QString filename = QString("%1%2.%3").arg(modelPrefix, systemName, "pr");
+    QFile outputFile(filename);
+    if (!outputFile.open(QIODevice::ReadOnly)) {
+        QFAIL("requested file cannot be found");
+    }
+    QTextStream consumableOutput(&outputFile);
+    // clang-format off
+    std::vector<QString> expectedOutput = { 
+        QString("system %1;").arg(systemName),
+        "use datamodel comment 'observer.asn';",
+        "signal Signal1;",
+        "signal Signal2 renames input OGSignal2 to Func2;",
+        "signal Signal3 renames output OGSignal3 from Func3;",
+        " channel c",
+        QString("from env to %1 with Signal1, Signal2, Signal3").arg(systemName),
+        "endchannel;",
+        QString("block %1;").arg(systemName),
+        "signalroute r",
+        QString("from env to %1 with Signal1, Signal2, Signal3;").arg(systemName),
+        "connect c and r;",
+        QString("process %1;").arg(systemName),
+        "monitor event Observable_Event",
+        "START;", "NEXTSTATE Wait;",
+        "state Wait;", "input someInput;", "NEXTSTATE -;", "endstate;",
+        "state Idle;", "input someOtherInput;", "NEXTSTATE Wait;", "endstate;",
+        QString("endprocess %1;").arg(systemName), "endblock;", "endsystem;"
+    };
+    // clang-format on
     TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 

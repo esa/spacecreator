@@ -132,7 +132,7 @@ void tst_testgenerator::testResultHtmlData()
 void tst_testgenerator::testParsingBoardSettings()
 {
     const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
-        { "INTEGER", 4, 4 },
+        { "INTEGER", 8, 0 },
         { "BOOLEAN", 1, 7 },
         { "REAL", 8, 0 },
     };
@@ -150,7 +150,7 @@ void tst_testgenerator::testStoringBoardsConfig()
     const QString testBoardName = "x86 Linux CPP";
 
     const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
-        { "INTEGER", 4, 4 },
+        { "INTEGER", 8, 0 },
         { "BOOLEAN", 1, 7 },
         { "REAL", 8, 0 },
     };

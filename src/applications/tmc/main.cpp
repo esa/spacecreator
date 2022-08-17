@@ -22,6 +22,7 @@
 #include <QCoreApplication>
 #include <QString>
 #include <ivcore/ivlibrary.h>
+#include <msccore/msclibrary.h>
 #include <shared/qstringhash.h>
 #include <shared/sharedlibrary.h>
 #include <tmc/TmcVerifier/verifier.h>
@@ -55,6 +56,7 @@ int main(int argc, char *argv[])
 
     shared::initSharedLibrary();
     ivm::initIVLibrary();
+    msc::initMscLibrary();
 
     QCoreApplication app(argc, argv);
 
@@ -67,6 +69,7 @@ int main(int argc, char *argv[])
     std::optional<QString> outputDirectory;
     QStringList stopConditionFiles;
     QStringList observerInfos;
+    QStringList mscObserverFiles;
     std::vector<QString> environmentFunctions;
     std::vector<QString> keepFunctions;
     std::optional<QString> globalInputVectorLengthLimit;
@@ -106,6 +109,9 @@ int main(int argc, char *argv[])
         } else if (arg == "-os") {
             ++i;
             observerInfos.append(args[i]);
+        } else if (arg == "-mos") {
+            ++i;
+            mscObserverFiles.append(args[i]);
         } else if (arg == "-e" || arg == "--envfunc") {
             ++i;
             environmentFunctions.emplace_back(args[i]);
@@ -228,6 +234,7 @@ int main(int argc, char *argv[])
 
     tmc::verifier::TmcVerifier verifier(inputIvFilepath.value(), outputDirectory.value());
 
+    verifier.setMscObserverFiles(mscObserverFiles);
     verifier.setEnvironmentFunctions(environmentFunctions);
     verifier.setKeepFunctions(keepFunctions);
     verifier.setGlobalInputVectorLengthLimit(std::move(globalInputVectorLengthLimit));
@@ -239,7 +246,6 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     for (const auto &info : observerInfos) {
-
         if (!verifier.attachObserver(extractObserverPath(info), extractObserverPriority(info))) {
             return EXIT_FAILURE;
         }

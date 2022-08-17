@@ -50,4 +50,15 @@ void ArchetypeLibrary::removeFunction(FunctionArchetype *functionArchetype)
     functionArchetype->setParentObject(nullptr);
     m_functions.removeAll(functionArchetype);
 }
+
+QStringList ArchetypeLibrary::getFunctionsNames()
+{
+    QStringList functionsNames;
+
+    for (auto function : getFunctions()) {
+        functionsNames.append(function->title());
+    }
+
+    return functionsNames;
+}
 }

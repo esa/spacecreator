@@ -22,6 +22,7 @@
 #include <conversion/common/modeltype.h>
 #include <conversion/msc/MscExporter/exporter.h>
 #include <conversion/msc/MscImporter/importer.h>
+#include <conversion/sdl/MscToSdlTranslator/translator.h>
 #include <memory>
 
 namespace conversion::msc {
@@ -30,6 +31,12 @@ bool MscRegistrar::registerCapabilities(conversion::Registry &registry)
 {
     auto mscImporter = std::make_unique<importer::MscImporter>();
     auto result = registry.registerImporter(ModelType::Msc, std::move(mscImporter));
+    if (!result) {
+        return false;
+    }
+
+    auto mscToSdlTranslator = std::make_unique<sdl::translator::MscToSdlTranslator>();
+    result = registry.registerTranslator({ ModelType::Msc }, ModelType::Sdl, std::move(mscToSdlTranslator));
     if (!result) {
         return false;
     }

@@ -31,6 +31,8 @@ class MscOptions
 public:
     /** @brief  Filepath of input file */
     inline static const QString inputFilepath = "Msc_Import_InputFilepath";
+    /** @brief  Filepath of simulation dataview file */
+    inline static const QString simuDataViewFilepath = "Msc_Translation_SimuDataViewFilepath";
     /** @brief  Filepath of output file */
     inline static const QString outputFilepath = "Msc_Export_OutputFilepath";
 };

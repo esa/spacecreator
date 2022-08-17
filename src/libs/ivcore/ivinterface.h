@@ -139,6 +139,8 @@ public:
 
     virtual QString ifaceLabel() const;
 
+    bool isRequiredSystemElement() const;
+
     auto layer() const ->  IVConnectionLayerType *;
     auto layerName() const ->  QString;
     auto setLayerName(const QString &layerName) -> void;

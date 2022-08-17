@@ -1,0 +1,5 @@
+[INFO] Exporting model to xmi Calculate.slx
+[INFO] Processing model <a href="matlab:iqgen_highlight('Calculate')">Calculate</a>
+[INFO] Exported model to <a href="matlab: open('C:\matlabremote\44396\src\..\xmi\Calculate.qsi')">Calculate.qsi</a>
+[INFO] Exported model to <a href="matlab: open('C:\matlabremote\44396\src\..\xmi\Calculate.xmi')">Calculate.xmi</a>
+[INFO] Exported workspace to <a href="matlab: open('C:\matlabremote\44396\src\..\xmi\QGen_Base_Workspace.xmi')">QGen_Base_Workspace.xmi</a>

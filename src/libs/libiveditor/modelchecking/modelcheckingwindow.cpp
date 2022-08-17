@@ -524,6 +524,19 @@ void ModelCheckingWindow::on_treeWidget_subtyping_itemChanged(QTreeWidgetItem *i
 }
 
 /*!
+ * \brief ModelCheckingWindow::on_pushButton_interactiveSim_clicked Calls the interactive simulator
+ */
+void ModelCheckingWindow::on_pushButton_interactiveSim_clicked()
+{
+    // CALL IF make rule via terminal, saving make return in statusfile
+    QString callSimCmd = "xterm -hold -e make simu";
+    if (QProcess::execute(callSimCmd) != 0) {
+        QMessageBox::warning(this, tr("Interactive Simulator"),
+                             "Error executing: " + callSimCmd);
+    }
+}
+
+/*!
  * \brief ModelCheckingWindow::on_pushButton_callIF_clicked Calls the model checker engine (IF), performing necessary operations before (e.g. save current configuration) and after (e.g. results translation) the call.
  */
 void ModelCheckingWindow::on_pushButton_callIF_clicked()

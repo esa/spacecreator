@@ -73,6 +73,8 @@ public:
         archetype_library,
         archetype_function,
         path,
+        fixed_system_element,
+        required_system_element,
 
         // KNOWN TASTE props:
         coordinates,

@@ -33,6 +33,7 @@ class IVInterface;
 class IVInterfaceGroup;
 class IVConnectionGroup;
 class IVArchetypeReference;
+class ArchetypeModel;
 
 struct IVFunctionTypePrivate;
 
@@ -59,6 +60,7 @@ public:
     QVector<IVInterface *> pis() const;
     QVector<IVInterfaceGroup *> interfaceGroups() const;
     QVector<IVArchetypeReference *> archetypeReferences() const;
+    void setArchetypeReferences(QVector<IVArchetypeReference *> references);
     bool hasNestedChildren() const;
     bool hasInterface(const QString &name, Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
 

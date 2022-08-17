@@ -59,6 +59,12 @@ public:
      * @brief   Default move assignment operator
      */
     Signal &operator=(Signal &&) = default;
+
+public:
+    /**
+     * @brief   Visitor acceptor (shall call visit method of the given visitor)
+     */
+    virtual auto accept(Visitor &visitor) const -> void;
 };
 
 } // namespace sdl

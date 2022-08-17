@@ -88,7 +88,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     IVExporter *exporter { nullptr };
     ivm::IVModel *layersModel { nullptr };
     IVVisualizationModelBase *layerSelect { nullptr };
-    ivm::ArchetypeModel *archetypeModel { nullptr };
+    ivm::ArchetypeModel *archetypesModel { nullptr };
 
     Asn1Acn::Asn1SystemChecks *asnCheck { nullptr };
     ivm::AbstractSystemChecks *ivCheck { nullptr };
@@ -116,7 +116,7 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     d->sharedModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
     d->objectsModel = new ivm::IVModel(d->dynPropConfig, d->sharedModel, this);
     d->layersModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
-    d->archetypeModel = new ivm::ArchetypeModel(this);
+    d->archetypesModel = new ivm::ArchetypeModel(this);
 }
 
 InterfaceDocument::~InterfaceDocument()
@@ -536,6 +536,11 @@ QHash<shared::Id, shared::VEObject *> InterfaceDocument::layersObjects() const
     return d->layersModel->objects();
 }
 
+ivm::ArchetypeModel *InterfaceDocument::archetypesModel() const
+{
+    return d->archetypesModel;
+}
+
 IVVisualizationModelBase *InterfaceDocument::visualisationModel() const
 {
     if (!d->objectsVisualizationModel) {
@@ -923,7 +928,7 @@ bool InterfaceDocument::loadImpl(const QString &path)
 
 void InterfaceDocument::loadArchetypes()
 {
-    d->archetypeModel->clear();
+    d->archetypesModel->clear();
 
     for (const auto &libraryReference : d->objectsModel->getArchetypeLibraryReferences()) {
         ivm::ArchetypeXMLReader archetypeParser;
@@ -937,7 +942,7 @@ void InterfaceDocument::loadArchetypes()
 
         generateArchetypeLibrary(archetypeObjects, libraryReference->getLibraryName());
 
-        d->archetypeModel->addObjects(archetypeObjects);
+        d->archetypesModel->addObjects(archetypeObjects);
     }
 }
 
