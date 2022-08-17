@@ -204,7 +204,7 @@ void tst_sdlexporter::testGenerateBasicProcess()
         QFAIL("requested file cannot be found");
     }
     QTextStream consumableOutput(&outputFile);
-    std::vector<QString> expectedOutput = {
+    QStringList expectedOutput = {
         QString("process %1;").arg(processName),
 
         "START;",
@@ -297,7 +297,7 @@ void tst_sdlexporter::testGenerateProcessWithDeclarationsAndTasks()
         QFAIL("requested file cannot be found");
     }
     QTextStream consumableOutput(&outputFile);
-    std::vector<QString> expectedOutput = {
+    QStringList expectedOutput = {
         QString("process %1;").arg(processName),
 
         "dcl howManyLoops MyInteger",
@@ -369,7 +369,7 @@ void tst_sdlexporter::testGenerateProcessWithLabelAndJoin()
         QFAIL("requested file cannot be found");
     }
     QTextStream consumableOutput(&outputFile);
-    std::vector<QString> expectedOutput = {
+    QStringList expectedOutput = {
         QString("process %1;").arg(processName),
 
         "START;",
@@ -477,7 +477,7 @@ void tst_sdlexporter::testGenerateProcessWithDecisionExpressionAndAnswer()
         QFAIL("requested file cannot be found");
     }
     QTextStream consumableOutput(&outputFile);
-    std::vector<QString> expectedOutput = {
+    QStringList expectedOutput = {
         QString("process %1;").arg(processName),
 
         "dcl x MyInteger;",
@@ -558,7 +558,7 @@ void tst_sdlexporter::testGenerateProcessWithParamlessProcedure()
         QFAIL("requested file cannot be found");
     }
     QTextStream consumableOutput(&outputFile);
-    std::vector<QString> expectedOutput = {
+    QStringList expectedOutput = {
         QString("process %1;").arg(processName),
 
         "procedure myParamlessProcedure;",
@@ -680,7 +680,7 @@ void tst_sdlexporter::testGenerateProcessWithProcedureWithParamsAndReturn()
     }
     QTextStream consumableOutput(&outputFile);
 
-    std::vector<QString> expectedOutput = {
+    QStringList expectedOutput = {
         QString("process %1;").arg(processName),
 
         "dcl x MyInteger;",
@@ -775,7 +775,7 @@ void tst_sdlexporter::testGenerateProcessWithReturnlessProcedure()
     }
     QTextStream consumableOutput(&outputFile);
 
-    std::vector<QString> expectedOutput = {
+    QStringList expectedOutput = {
         QString("process %1;").arg(processName),
 
         "dcl x MyInteger;",

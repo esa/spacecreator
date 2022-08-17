@@ -181,11 +181,8 @@ static ivm::IVInterface::CreationInfo createInterfaceUnderTestCreationInfo(
 
 static void compareModels(ivm::IVModel *const loaded, ivm::IVModel *const generated)
 {
-    const QVector<ivm::IVFunction *> loadedFunctions =
-            QVector<ivm::IVFunction *>::fromStdVector(IvTools::getFunctions(loaded));
-
-    const QVector<ivm::IVFunction *> generatedFunctions =
-            QVector<ivm::IVFunction *>::fromStdVector(IvTools::getFunctions(generated));
+    const QList<ivm::IVFunction *> loadedFunctions = plugincommon::IvTools::getFunctions(loaded);
+    const QList<ivm::IVFunction *> generatedFunctions = plugincommon::IvTools::getFunctions(generated);
 
     const int loadedFunctionsSize = loadedFunctions.size();
     const int generatedFunctionsSize = generatedFunctions.size();
