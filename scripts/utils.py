@@ -1,5 +1,7 @@
 import os.path
+import os
 import subprocess
+import shutil
 
 
 def join_dir(*subdir):
@@ -28,3 +30,11 @@ def ensure_dir(dir_str: str):
     return_code = subprocess.call(mkdir)
     if return_code:
         exit(1)
+
+
+def copy_content_of_dir_to_other_dir(src_dir: str, dst_dir: str):
+    for content in os.listdir(src_dir):
+        if os.path.isdir(content):
+            shutil.copytree(content, dst_dir)
+        if os.path.isfile(content):
+            shutil.copy2(content, dst_dir)

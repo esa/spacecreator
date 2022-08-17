@@ -151,11 +151,11 @@ def install_grantlee(env_path: str) -> None:
 if __name__ == '__main__':
     # Parse arguments
     parser = argparse.ArgumentParser(prog='prebuild')
-    parser.add_argument('--env_path', dest='env_path', type=str,
+    parser.add_argument('--env_path', dest='env_path', type=str, required=True,
                         help='Path to the folder that is to contain the build environment')
-    parser.add_argument('--qt_version', dest='qt_version', type=str,
+    parser.add_argument('--qt_version', dest='qt_version', type=str, required=True,
                         help='Version of Qt to download. Format X.Y.Z')
-    parser.add_argument('--qtcreator_version', dest='qtcreator_version', type=str,
+    parser.add_argument('--qtcreator_version', dest='qtcreator_version', type=str, required=True,
                         help='Version of Qt Creator to download. Format X.Y.Z')
     args = parser.parse_args()
 
@@ -174,12 +174,12 @@ if __name__ == '__main__':
 
     # setup Qt and QtCreator with plugin development files
     download_qt(env_qt_dir, qt_version)
-    #download_qtcreator(env_dir, qtcreator_version, env_app_dir)
+    download_qtcreator(env_dir, qtcreator_version, env_app_dir)
 
     # Grant Lee Template Library
-    #download_grantlee(env_dir)
-    #build_grantlee(env_dir, env_qt_distribution_dir)
-    #install_grantlee(env_dir)
+    download_grantlee(env_dir)
+    build_grantlee(env_dir, env_qt_distribution_dir)
+    install_grantlee(env_dir)
 
 
 
