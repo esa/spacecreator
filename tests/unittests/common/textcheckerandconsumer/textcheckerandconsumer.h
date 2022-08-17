@@ -20,7 +20,7 @@
 #pragma once
 
 #include <QTextStream>
-#include <vector>
+#include <QStringList>
 
 namespace tests::common {
 
@@ -38,8 +38,7 @@ public:
      * @param expectedOutput         expected strings
      * @param actualConsumableOutput actual text stream to be checked
      */
-    static auto checkSequenceAndConsume(const std::vector<QString> &expectedOutput, QTextStream &actualConsumableOutput)
-            -> void;
+    static auto checkSequenceAndConsume(const QStringList &expectedOutput, QTextStream &actualConsumableOutput) -> void;
 
     /**
      * @brief  Read file and return its contents as a vector of strings. Each string is a separate line, trimmed.
@@ -48,7 +47,7 @@ public:
      *
      * @return vector of read strings
      */
-    static auto readLinesFromFile(const QString &filename) -> std::vector<QString>;
+    static auto readLinesFromFile(const QString &filename) -> const QStringList;
 
 private:
     /**
