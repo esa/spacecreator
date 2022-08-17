@@ -28,6 +28,16 @@ FunctionArchetype::FunctionArchetype(const QString &title, QObject *parent)
 
 FunctionArchetype::~FunctionArchetype() = default;
 
+bool FunctionArchetype::aboutToBeRemoved()
+{
+    for (auto interface : m_interfaces) {
+        interface->setParentObject(nullptr);
+    }
+    m_interfaces.clear();
+
+    return true;
+}
+
 QVector<InterfaceArchetype *> FunctionArchetype::getInterfaces() const
 {
     return m_interfaces;

@@ -32,6 +32,7 @@
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
 #include "ivmodel.h"
+#include "shared/veobject.h"
 #include "ui_archetypeswidget.h"
 
 #include <QApplication>
@@ -42,7 +43,7 @@
 namespace ive {
 
 ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVFunctionType *function,
-        ivm::AbstractSystemChecks *checks, shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent)
+        shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent)
     : QWidget(parent)
     , m_ui(new Ui::ArchetypesWidget)
     , m_archetypeModel(archetypeModel)
@@ -56,7 +57,7 @@ ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVF
     m_ui->tableView->setItemDelegateForColumn(
             ArchetypesWidgetModel::Column::FunctionName, new ive::ComboBoxDelegate(QStringList(), m_ui->tableView));
 
-    m_model = new ArchetypesWidgetModel(archetypeModel, checks, macro, this);
+    m_model = new ArchetypesWidgetModel(archetypeModel, macro, this);
     m_model->setFunction(function);
     m_ui->tableView->setModel(m_model);
     m_ui->tableView->horizontalHeader()->resizeSection(0, 220);
@@ -146,15 +147,10 @@ bool ArchetypesWidget::checkReferences()
         }
     }
 
-    for (int i = 0; i < references.size(); ++i) {
-        for (int j = i + 1; j < references.size(); ++j) {
-            if (references[i]->getLibraryName() == references[j]->getLibraryName()
-                    && references[i]->getFunctionName() == references[j]->getFunctionName()) {
-                QMessageBox::warning(qApp->activeWindow(), tr("Archetype error"),
-                        tr("Archetype list has duplicate implementations"));
-                return false;
-            }
-        }
+    if (shared::VEObject::hasDuplicates(references)) {
+        QMessageBox::warning(
+                qApp->activeWindow(), tr("Archetype error"), tr("Archetype list has duplicate implementations"));
+        return false;
     }
 
     return true;

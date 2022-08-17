@@ -20,33 +20,45 @@
 #pragma once
 
 #include "entityattribute.h"
+#include "shared/common.h"
 #include "undocommand.h"
 
+#include <QHash>
 #include <QPointer>
 #include <QVector>
 
 namespace ivm {
-class IVFunctionType;
+class IVModel;
+class IVArchetypeLibraryReference;
 class IVArchetypeReference;
 }
 
 namespace ive {
+class InterfaceDocument;
 namespace cmd {
 
-class CmdFunctionArchetypesApply : public shared::UndoCommand
+class CmdArchetypeLibraryApply : public shared::UndoCommand
 {
     Q_OBJECT
 public:
-    explicit CmdFunctionArchetypesApply(ivm::IVFunctionType *function, QVector<ivm::IVArchetypeReference *> references);
+    explicit CmdArchetypeLibraryApply(ive::InterfaceDocument *document, ivm::IVModel *objectsModel,
+            QVector<ivm::IVArchetypeLibraryReference *> references);
 
     void redo() override;
     void undo() override;
     int id() const override;
 
 private:
-    QPointer<ivm::IVFunctionType> m_function;
-    QVector<ivm::IVArchetypeReference *> m_newReferences;
-    QVector<ivm::IVArchetypeReference *> m_oldReferences;
+    void applyReferences(QHash<shared::Id, QVector<ivm::IVArchetypeReference *>> refencesForFunctions);
+    bool isReferencePresent(const QString &libraryName);
+
+private:
+    QPointer<ivm::IVModel> m_model;
+    QPointer<ive::InterfaceDocument> m_document;
+    QVector<ivm::IVArchetypeLibraryReference *> m_newReferences;
+    QVector<ivm::IVArchetypeLibraryReference *> m_oldReferences;
+    QHash<shared::Id, QVector<ivm::IVArchetypeReference *>> m_newFunctionsArchetypeReferences;
+    QHash<shared::Id, QVector<ivm::IVArchetypeReference *>> m_oldFunctionsArchetypeReferences;
 };
 
 } // namespace cmd

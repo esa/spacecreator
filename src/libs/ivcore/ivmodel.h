@@ -88,6 +88,7 @@ public:
     auto getConnectionLayerByName(const QString &name) const -> IVConnectionLayerType *;
 
     QVector<IVArchetypeLibraryReference *> getArchetypeLibraryReferences();
+    void setArchetypeLibraryReferences(QVector<IVArchetypeLibraryReference *> references);
 
     QList<IVObject *> visibleObjects() const;
     QList<IVObject *> visibleObjects(shared::Id rootId) const;

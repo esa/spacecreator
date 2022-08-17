@@ -19,30 +19,25 @@
 
 #pragma once
 
-#include "archetypecommonprops.h"
-#include "archetypeobject.h"
-#include "functionarchetype.h"
-#include <QStringList>
+#include <QString>
+#include <QStyledItemDelegate>
 
-namespace ivm {
+namespace ive {
 
-class ArchetypeLibrary : public ArchetypeObject
+class FileDialogDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
-    explicit ArchetypeLibrary(const QString &title, QObject *parent = nullptr);
-    ~ArchetypeLibrary() override;
+    explicit FileDialogDelegate(
+            const QString &defaultDirectory, const QString &caption, const QString &filter, QObject *parent = nullptr);
 
-    bool aboutToBeRemoved() override;
-
-    QVector<FunctionArchetype *> getFunctions() const;
-    void addFunction(FunctionArchetype *functionArchetype);
-    void removeFunction(FunctionArchetype *functionArchetype);
-
-    QStringList getFunctionsNames();
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
 
 private:
-    QVector<FunctionArchetype *> m_functions;
+    QString m_defaultDirectory;
+    QString m_caption;
+    QString m_filter;
 };
 
-}
+} // namespace ive

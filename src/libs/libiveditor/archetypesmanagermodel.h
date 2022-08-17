@@ -23,16 +23,16 @@
 
 #include <QAbstractItemModel>
 #include <QPointer>
+#include <QVector>
 
 namespace ivm {
-class IVFunctionType;
-class ArchetypeModel;
-class IVArchetypeReference;
+class IVModel;
+class IVArchetypeLibraryReference;
 }
 
 namespace ive {
 
-class ArchetypesWidgetModel : public QAbstractItemModel
+class ArchetypesManagerModel : public QAbstractItemModel
 {
     Q_OBJECT
 
@@ -40,18 +40,14 @@ public:
     enum Column
     {
         LibraryName = 0,
-        FunctionName,
+        LibraryPath,
     };
     Q_ENUM(Column)
 
-    explicit ArchetypesWidgetModel(
-            ivm::ArchetypeModel *archetypeModel, cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
+    explicit ArchetypesManagerModel(
+            ivm::IVModel *objectsModel, cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
 
-    ivm::IVFunctionType *getFunction();
-    void setFunction(ivm::IVFunctionType *fn);
-
-    QVector<ivm::IVArchetypeReference *> getArchetypeReferences();
-    bool areArchetypesModified();
+    QVector<ivm::IVArchetypeLibraryReference *> getArchetypeLibraryReferences();
 
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
@@ -70,11 +66,9 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
 private:
-    bool m_areArchetypesModified;
-    QPointer<ivm::IVFunctionType> m_function;
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
-    QPointer<ivm::ArchetypeModel> m_archetypeModel;
-    QVector<ivm::IVArchetypeReference *> m_archetypeReferences;
+    QPointer<ivm::IVModel> m_objectsModel;
+    QVector<ivm::IVArchetypeLibraryReference *> m_archetypeLibraryReferences;
 };
 
 } // namespace ive
