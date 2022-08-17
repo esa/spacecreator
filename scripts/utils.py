@@ -26,10 +26,7 @@ def ensure_dir(dir_str: str):
         return_code = subprocess.call(rm_dir)
         if return_code:
             exit(1)
-    mkdir = ['mkdir', dir_str]
-    return_code = subprocess.call(mkdir)
-    if return_code:
-        exit(1)
+    os.makedirs(dir_str, exist_ok=True)
 
 
 def copy_content_of_dir_to_other_dir(src_dir: str, dst_dir: str):
