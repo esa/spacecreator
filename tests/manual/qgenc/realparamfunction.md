@@ -1,4 +1,4 @@
-# Building function with real type param
+# Testing function with real type param
 
 **1. Steps:**
 

@@ -34,7 +34,6 @@ generate-code: ./xmi/Iface_built
 
 
 compile-linux: generate-code
-	cp ~/working-qgen-file.c ./wrappers/Iface_QGenC.QGenC.c
 	mkdir -p obj && cd obj && gcc -c ../src/*.c ../code/*.c ../wrappers/*.c
 
 .PHONY: all clean edit generate-code compile-linux
