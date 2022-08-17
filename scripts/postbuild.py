@@ -50,7 +50,11 @@ def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
 
 if __name__ == '__main__':
     # Parse arguments
-    parser = argparse.ArgumentParser(prog='postbuild')
+    parser = argparse.ArgumentParser(prog='postbuild',
+                                     epilog='python3 ./scripts/postbuild.py '
+                                            '--project_dir=/home/<user>/projects/spacecreator/ '
+                                            '--build_dir=/home/<user>/projects/spacecreator/build '
+                                            '--env_dir=/home/<user>/opt/qtcreatorenv ')
 
     parser.add_argument('--project_dir', dest='project_dir', type=str, required=True,
                         help='Path to the folder where spacecreator project is')
@@ -70,5 +74,3 @@ if __name__ == '__main__':
     wizards_dir = join_dir(project_dir, 'wizards')
     wizards_install_dir = join_dir(env_dir, 'spacecreator.AppDir', 'share', 'qtcreator', 'templates', 'wizards')
     copy_wizards(wizards_dir, wizards_install_dir)
-
-    # python3 ./scripts/postbuild.py --project_dir=/home/fisker/projects/spacecreator/ --build_dir=/home/fisker/projects/spacecreator/build --env_dir=/home/fisker/opt/qtcreatorenv
