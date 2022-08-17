@@ -36,7 +36,7 @@ ChartTranslator::ChartTranslator(SdlModel *sdlModel, const Options &options)
 {
 }
 
-void ChartTranslator::translateChart(const MscChart *mscChart) const
+void ChartTranslator::translateChart(const MscChart *mscChart)
 {
     const auto &mscEvents = mscChart->instanceEvents();
 

@@ -24,10 +24,21 @@
 namespace conversion::sdl::translator {
 
 TFTable::TFTable(const std::vector<uint32_t> &sequence, const uint32_t signalCount)
-    : m_table(sequence.size(), std::vector<uint32_t>(signalCount))
+    : m_stateCount(sequence.size())
     , m_signalCount(signalCount)
+    , m_table(m_stateCount, std::vector<uint32_t>(m_signalCount))
 {
     compute(sequence);
+}
+
+uint32_t TFTable::stateCount() const
+{
+    return m_stateCount;
+}
+
+uint32_t TFTable::signalCount() const
+{
+    return m_signalCount;
 }
 
 const std::vector<uint32_t> &TFTable::transitionsForState(uint32_t state) const
@@ -49,11 +60,11 @@ void TFTable::compute(const std::vector<uint32_t> &sequence)
 uint32_t TFTable::getNextState(const std::vector<uint32_t> &sequence, const uint32_t state, const uint32_t sig) const
 {
     if (state < sequence.size() && sequence.at(state) == sig) {
-        return state+1;
+        return state + 1;
     }
 
     for (uint32_t nextState = state; nextState > 0; --nextState) {
-        if(sequence.at(nextState-1) == sig) {
+        if (sequence.at(nextState - 1) == sig) {
             uint32_t i;
 
             for (i = 0; i < nextState - 1; ++i) {

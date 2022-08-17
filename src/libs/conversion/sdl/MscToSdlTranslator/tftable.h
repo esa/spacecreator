@@ -35,15 +35,23 @@ public:
     TFTable &operator=(TFTable &&) = delete;
 
 public:
-    auto transitionsForState(uint32_t state) const -> const std::vector<uint32_t>&;
+    auto stateCount() const -> uint32_t;
+    auto signalCount() const -> uint32_t;
+
+    auto transitionsForState(uint32_t state) const -> const std::vector<uint32_t> &;
+
+    auto print() const -> void;
 
 private:
     auto compute(const std::vector<uint32_t> &sequence) -> void;
-    auto getNextState(const std::vector<uint32_t> &sequence, const uint32_t state, const uint32_t sig) const -> uint32_t;
+    auto getNextState(const std::vector<uint32_t> &sequence, const uint32_t state, const uint32_t sig) const
+            -> uint32_t;
 
 private:
-    std::vector<std::vector<uint32_t>> m_table;
+    uint32_t m_stateCount;
     uint32_t m_signalCount;
+
+    std::vector<std::vector<uint32_t>> m_table;
 };
 
 } // namespace conversion::sdl::translator

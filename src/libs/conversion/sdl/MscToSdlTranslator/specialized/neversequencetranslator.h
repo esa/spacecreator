@@ -20,6 +20,7 @@
 #pragma once
 
 #include "observertype.h"
+#include "tftable.h"
 
 #include <conversion/common/options.h>
 #include <memory>
@@ -68,24 +69,32 @@ public:
      *
      * @param   mscChart    Chart to translatr
      */
-    auto createObserver(const msc::MscChart *mscChart) const -> void;
+    auto createObserver(const msc::MscChart *mscChart) -> void;
 
 private:
     struct Context {
-        ::sdl::Process process;
-        ::sdl::StateMachine *stateMachine;
-        ::sdl::State *startState;
-        ::sdl::State *lastState;
-        std::vector<std::unique_ptr<::sdl::Rename>> signalRenames;
-        std::size_t stateCounter;
+        QString chartName;
+        std::set<QString> messages;
+        std::unordered_map<uint32_t, std::unique_ptr<::sdl::Rename>> signals;
+        std::vector<uint32_t> sequence;
+        std::size_t signalCounter;
     };
 
 private:
-    auto handleEvent(NeverSequenceTranslator::Context &context, const msc::MscInstanceEvent *mscEvent) const -> void;
-    auto handleMessageEvent(NeverSequenceTranslator::Context &context, const msc::MscMessage *mscMessage) const -> void;
+    using StateList = std::vector<std::unique_ptr<::sdl::State>>;
+    using TransitionList = std::vector<std::unique_ptr<::sdl::Transition>>;
 
-    auto createSdlSkeleton(const msc::MscChart *mscChart) const -> Context;
-    auto createSdlSystem(NeverSequenceTranslator::Context &context) const -> ::sdl::System;
+    auto collectData(const msc::MscChart *mscChart) const -> NeverSequenceTranslator::Context;
+
+    auto handleEvent(Context &context, const msc::MscInstanceEvent *mscEvent) const -> void;
+    auto handleMessageEvent(Context &context, const msc::MscMessage *mscMessage) const -> void;
+
+    auto createSdlSystem(Context &context) -> void;
+    auto createSdlProcess(const Context &context) -> ::sdl::Process;
+    auto createStateMachine(const Context &context) const -> std::unique_ptr<::sdl::StateMachine>;
+
+    auto createStates(const uint32_t stateCount) const -> StateList;
+    auto createTransitions(const TFTable &table, StateList &states) const -> TransitionList;
 
 private:
     inline static const QString m_stateNameTemplate = "s%1";
