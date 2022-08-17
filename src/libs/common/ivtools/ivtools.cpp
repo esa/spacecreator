@@ -33,13 +33,14 @@
 
 namespace plugincommon {
 
-auto IvTools::getFunctions(ivm::IVModel *const model) -> std::vector<ivm::IVFunction *>
+
+auto IvTools::getFunctions(ivm::IVModel *model) -> QList<ivm::IVFunction *>
 {
     if (model == nullptr) {
-        return std::vector<ivm::IVFunction *>();
+        return QList<ivm::IVFunction *>();
     }
 
-    std::vector<ivm::IVFunction *> functions;
+    QList<ivm::IVFunction *> functions;
 
     for (auto &ivObject : model->visibleObjects()) {
         auto *const function = dynamic_cast<ivm::IVFunction *>(ivObject);
