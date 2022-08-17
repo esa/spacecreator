@@ -70,5 +70,3 @@ if __name__ == '__main__':
     env_qt_distribution_dir = args.env_qt_distribution_dir
 
     build_spacecreator(project_dir, build_dir, build_type, env_dir, env_qt_distribution_dir)
-
-# python3 ./scripts/build_spacecreator.py --project_dir=/home/fisker/projects/spacecreator --build_dir=/home/fisker/projects/spacecreator/build --build_type=Release --env_dir=/home/fisker/opt/qtcreatorenv --env_qt_distribution_dir=/home/fisker/opt/qtcreatorenv/Qt/6.3.1/gcc_64

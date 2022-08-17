@@ -6,10 +6,19 @@ import os.path
 import subprocess
 
 import utils
-from utils import join_dir, print_cmd, ensure_dir, copy_content_of_dir_to_other_dir
+from utils import join_dir, copy_content_of_dir_to_other_dir
 
 """
-
+When the spacecreator plugin has been build, it needs to be copied to the plugin folder of the
+QtCreator that is to load it. To be able to create a project and populate the project with files, QtCreator
+needs a project and a file template definition copied to its 
+spacecreator.AppDir/share/qtcreator/templates/wizards/files
+and 
+spacecreator.AppDir/share/qtcreator/templates/wizards/project
+folders.
+This script handles all this and can be called on the commandline or from the QtCreator/Other IDE used to develop in.
+In QtCreator the run settings could be a custom Deploy Configuration with the command python3 an the arguments:
+ %{ActiveProject:Path}/scripts/postbuild.py --project_dir=%{ActiveProject:Path} --build_dir=%{buildDir} --env_dir=/home/<user>/opt/qtcreatorenv/
 """
 
 

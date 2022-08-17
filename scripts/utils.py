@@ -15,7 +15,7 @@ def print_cmd(cmd: list[str]) -> None:
     print(' '.join(cmd))
 
 
-def ensure_dir(dir_str: str):
+def ensure_dir(dir_str: str) -> None:
     """
     Ensure the given dir exists and is empty
     :param dir_str:
@@ -29,7 +29,12 @@ def ensure_dir(dir_str: str):
     os.makedirs(dir_str, exist_ok=True)
 
 
-def copy_content_of_dir_to_other_dir(src_dir: str, dst_dir: str):
+def copy_content_of_dir_to_other_dir(src_dir: str, dst_dir: str) -> None:
+    """
+    Copy all files and dirs in src_dir to dst_dir
+    :param src_dir: source dir
+    :param dst_dir: destination dir
+    """
     for content in os.listdir(src_dir):
         if os.path.isdir(content):
             shutil.copytree(content, dst_dir)

@@ -87,7 +87,6 @@ def download_grantlee(env_dir: str) -> None:
     Downloads the source code for Grant Lee's template library.
     """
     #  Download grantlee
-    #url = 'https://github.com/steveire/grantlee/archive/v5.2.0.tar.gz'
     grantlee_compressed = join_dir(env_dir, '..', 'grantlee-esa.zip')  # ToDo Download from ESA GitLab
     print("Uncompressing Grant Lee from {} to {}".format(grantlee_compressed, env_dir))
     # urllib.request.urlretrieve(url, grantlee_compressed)  # download qtcreator.7z to the root of the env folder
@@ -137,10 +136,6 @@ def install_grantlee(env_dir: str) -> None:
     message = "\nTo finish the installation of grantlee, you'll have to run last command:\n" +\
               'sudo -E ' + ' '.join(install_cmd)
     print(message)
-
-    # return_code = subprocess.call(install_cmd)
-    # if return_code:
-    #     exit(5)
 
 
 if __name__ == '__main__':

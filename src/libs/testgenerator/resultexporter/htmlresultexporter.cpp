@@ -40,8 +40,8 @@ HtmlResultExporter::HtmlResultExporter(const QString &chosenBoardName, const IVI
 
 auto HtmlResultExporter::initTableCells(const CsvModel &csvModel, const QVector<QVariant> &results) -> void
 {
-    QVector<QString>::size_type rowIndex = 0;
-    QVector<QString>::size_type resultIndex = 0;
+    QStringList::size_type rowIndex = 0;
+    QStringList::size_type resultIndex = 0;
     if (results.empty()) {
         qWarning() << "Results vector is empty";
         return;
@@ -50,7 +50,7 @@ auto HtmlResultExporter::initTableCells(const CsvModel &csvModel, const QVector<
         csv::Row csvRow = *row;
         auto csvFields = csvRow.fields();
         cells.push_back({});
-        QVector<QString>::size_type parameterIndex = 0;
+        QStringList::size_type parameterIndex = 0;
         for (const auto &csvField : csvFields) {
             if (ifaceParams[parameterIndex].isInDirection()) {
                 cells[rowIndex].push_back({ results[resultIndex], CellColor::Black });

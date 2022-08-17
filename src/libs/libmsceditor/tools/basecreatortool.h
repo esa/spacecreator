@@ -45,7 +45,6 @@ protected Q_SLOTS:
 
 protected:
     QPointer<ChartLayoutManager> m_model = nullptr;
-    //QScopedPointer<MscEntity> m_previewEntity;
     std::unique_ptr<MscEntity> m_previewEntity;
     QPointer<MscChart> m_activeChart = nullptr;
     QPointer<MscEntity> m_addedEntity = nullptr;
