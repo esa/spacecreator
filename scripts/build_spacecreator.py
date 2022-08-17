@@ -43,7 +43,7 @@ def build_spacecreator(project_dir: str, build_dir: str, build_type: str, env_di
 if __name__ == '__main__':
     # Parse arguments
     parser = argparse.ArgumentParser(prog='build_spacecreator',
-                                     epilog='Example: python3 ./build_spacecreator.py '
+                                     epilog='Example: python3 ./postbuild.py '
                                             '--project_dir=/home/<user>/projects/spacecreator/ '
                                             '--build_dir=./build '
                                             '--build_type=Release'
