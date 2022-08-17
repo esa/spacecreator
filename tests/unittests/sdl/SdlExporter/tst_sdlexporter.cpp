@@ -19,6 +19,7 @@
 
 #include <QObject>
 #include <QtTest>
+#include <QStringList>
 #include <common/sdlmodelbuilder/sdlanswerbuilder.h>
 #include <common/sdlmodelbuilder/sdlblockbuilder.h>
 #include <common/sdlmodelbuilder/sdlchannelbuilder.h>
@@ -892,7 +893,7 @@ void tst_sdlexporter::testGenerateSystem()
     }
     QTextStream consumableOutput(&outputFile);
     // clang-format off
-    std::vector<QString> expectedOutput = { 
+    QStringList expectedOutput = {
         QString("system %1;").arg(systemName),
         "use datamodel comment 'observer.asn';",
         "signal Signal1;",
@@ -979,7 +980,7 @@ void tst_sdlexporter::testGenerateSystemAutoRoutes()
     }
     QTextStream consumableOutput(&outputFile);
     // clang-format off
-    std::vector<QString> expectedOutput = { 
+    QStringList expectedOutput = {
         QString("system %1;").arg(systemName),
         "use datamodel comment 'observer.asn';",
         "signal Signal1;",
