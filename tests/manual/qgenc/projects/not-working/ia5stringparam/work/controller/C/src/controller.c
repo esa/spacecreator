@@ -8,7 +8,7 @@
  */
 
 #include "controller.h"
-//#include <stdio.h>
+#include <assert.h>
 
 
 void controller_startup(void)
@@ -19,7 +19,9 @@ void controller_startup(void)
 
 void controller_PI_Trigger(void)
 {
-   // Write your code here
+    asn1SccMyIA5String input = "abcde";
+    asn1SccMyIA5String expectedOutput = "bcdef";
+    asn1SccMyIA5String *output = NULL;
+    controller_RI_Iface(&input, &output, sizeof (input));
+    assert(memcmp(output, expectedOutput) == 0);
 }
-
-
