@@ -1,0 +1,71 @@
+<InterfaceView asn1file="MscNeverSequenceBacktracking.asn">
+<Function name="Ponger" is_type="NO" language="SDL" default_implementation="default" required_system_element="NO" FPGA_Configurations="" fixed_system_element="NO" startup_priority="1">
+    <Property name="Taste::coordinates" value="64600 43200 84600 51200"/>
+<Provided_Interface name="Ping" kind="Sporadic" layer="default" miat="0" queue_size="1" wcet="0" required_system_element="NO" stack_size="1024" priority="3">
+    <Property name="Taste::coordinates" value="64600 45800"/>
+</Provided_Interface>
+
+<Required_Interface name="Pong" kind="Sporadic" layer="default" miat="0" queue_size="1" wcet="0" required_system_element="NO" stack_size="1024" priority="5">
+    <Property name="Taste::coordinates" value="64600 49400"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="Pinger" is_type="NO" language="SDL" default_implementation="default" required_system_element="NO" FPGA_Configurations="" fixed_system_element="NO" startup_priority="1">
+    <Property name="Taste::coordinates" value="26800 42800 46800 50800"/>
+<Provided_Interface name="Tick" kind="Sporadic" layer="default" miat="0" queue_size="1" wcet="0" required_system_element="NO" stack_size="1024" priority="2">
+    <Property name="Taste::coordinates" value="43400 42800"/>
+</Provided_Interface>
+
+<Provided_Interface name="Pong" kind="Sporadic" layer="default" miat="0" queue_size="1" wcet="0" required_system_element="NO" stack_size="1024" priority="5">
+    <Property name="Taste::coordinates" value="46800 48900"/>
+</Provided_Interface>
+
+<Required_Interface name="Ping" kind="Sporadic" layer="default" miat="0" queue_size="1" wcet="0" required_system_element="NO" stack_size="1024" priority="3">
+    <Property name="Taste::coordinates" value="46800 45500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="Clock" is_type="NO" language="GUI" default_implementation="default" required_system_element="NO" FPGA_Configurations="" fixed_system_element="NO" startup_priority="1">
+    <Property name="Taste::coordinates" value="26500 26700 46500 34700"/>
+<Required_Interface name="Tick" kind="Sporadic" layer="default" miat="0" queue_size="1" wcet="0" required_system_element="NO" stack_size="1024" priority="2">
+    <Property name="Taste::coordinates" value="43400 34700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Pinger" ri_name="Ping"/>
+    <Target func_name="Ponger" pi_name="Ping"/>
+    <Property name="Taste::coordinates" value="47400 45500 55800 45500 64300 45800"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Ponger" ri_name="Pong"/>
+    <Target func_name="Pinger" pi_name="Pong"/>
+    <Property name="Taste::coordinates" value="64000 49400 55600 49400 47100 48900"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Clock" ri_name="Tick"/>
+    <Target func_name="Pinger" pi_name="Tick"/>
+    <Property name="Taste::coordinates" value="43400 35300 43400 42500"/>
+</Connection>
+
+</InterfaceView>
