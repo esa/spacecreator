@@ -51,6 +51,7 @@ void IVArchetypeLibraryReference::setLibraryPath(const QString &libraryPath)
 
 bool IVArchetypeLibraryReference::operator==(const IVArchetypeLibraryReference &other) const
 {
-    return m_archetypeLibraryName == other.getLibraryName() && m_archetypeLibraryPath == other.getLibraryPath();
+    return m_archetypeLibraryName == other.getLibraryName()
+            || m_archetypeLibraryPath == other.getLibraryPath();
 }
 }

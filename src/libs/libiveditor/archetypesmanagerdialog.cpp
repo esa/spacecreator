@@ -24,6 +24,7 @@
 #include "interfacedocument.h"
 #include "ivarchetypelibraryreference.h"
 #include "ivmodel.h"
+#include "veobject.h"
 #include "properties/delegates/filedialogdelegate.h"
 #include "shared/common.h"
 #include "ui_archetypesmanagerdialog.h"
@@ -90,6 +91,7 @@ void ArchetypesManagerDialog::deleteArchetypeLibrary()
         return;
     }
 
+    m_ui->tableView->selectionModel()->clear();
     m_model->removeRow(selections.at(0).row());
 }
 
@@ -103,30 +105,18 @@ void ArchetypesManagerDialog::accept()
             new cmd::CmdArchetypeLibraryApply(m_document, m_objectsModel, m_model->getArchetypeLibraryReferences());
     m_cmdMacro->push(command);
 
-    int result = QDialog::Accepted;
-
-    if (m_cmdMacro == nullptr) {
-        result = QDialog::Rejected;
-    } else {
-        m_cmdMacro->setComplete(true);
-    }
-
-    QDialog::done(result);
+    m_cmdMacro->setComplete(true);
+    QDialog::done(QDialog::Accepted);
 }
 
 void ArchetypesManagerDialog::reject()
 {
-    if (m_cmdMacro != nullptr) {
-        m_cmdMacro->setComplete(false);
-    }
-
+    m_cmdMacro->setComplete(false);
     QDialog::done(QDialog::Rejected);
 }
 
 void ArchetypesManagerDialog::init()
 {
-    setWindowTitle(tr("Archetypes Library Manager"));
-
     if (m_cmdMacro == nullptr) {
         m_cmdMacro =
                 std::make_unique<cmd::CommandsStack::Macro>(m_commandsStack.data(), tr("Archetypes library managment"));
@@ -145,15 +135,10 @@ bool ArchetypesManagerDialog::checkReferences()
         }
     }
 
-    for (int i = 0; i < references.size() - 1; ++i) {
-        for (int j = i + 1; j < references.size(); ++j) {
-            if (references[i]->getLibraryName() == references[j]->getLibraryName()
-                    || references[i]->getLibraryPath() == references[j]->getLibraryPath()) {
-                QMessageBox::warning(qApp->activeWindow(), tr("Archetype error"),
-                        tr("Archetype library list has duplicate references"));
-                return false;
-            }
-        }
+    if (shared::VEObject::hasDuplicates(references)) {
+        QMessageBox::warning(
+                qApp->activeWindow(), tr("Archetype error"), tr("Archetype library list has duplicate references"));
+        return false;
     }
 
     return true;

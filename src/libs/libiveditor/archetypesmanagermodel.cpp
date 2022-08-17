@@ -94,17 +94,7 @@ QVariant ArchetypesManagerModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
-    if (role == Qt::DisplayRole) {
-        switch (index.column()) {
-        case Column::LibraryName:
-            return QVariant(m_archetypeLibraryReferences.value(index.row())->getLibraryName());
-        case Column::LibraryPath:
-            return QVariant(m_archetypeLibraryReferences.value(index.row())->getLibraryPath());
-        }
-        return QVariant();
-    }
-
-    if (role == Qt::EditRole) {
+    if (role == Qt::DisplayRole || role == Qt::EditRole) {
         switch (index.column()) {
         case Column::LibraryName:
             return QVariant(m_archetypeLibraryReferences.value(index.row())->getLibraryName());

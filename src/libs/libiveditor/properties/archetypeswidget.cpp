@@ -32,6 +32,7 @@
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
 #include "ivmodel.h"
+#include "shared/veobject.h"
 #include "ui_archetypeswidget.h"
 
 #include <QApplication>
@@ -146,15 +147,10 @@ bool ArchetypesWidget::checkReferences()
         }
     }
 
-    for (int i = 0; i < references.size() - 1; ++i) {
-        for (int j = i + 1; j < references.size(); ++j) {
-            if (references[i]->getLibraryName() == references[j]->getLibraryName()
-                    && references[i]->getFunctionName() == references[j]->getFunctionName()) {
-                QMessageBox::warning(qApp->activeWindow(), tr("Archetype error"),
-                        tr("Archetype list has duplicate implementations"));
-                return false;
-            }
-        }
+    if (shared::VEObject::hasDuplicates(references)) {
+        QMessageBox::warning(
+                qApp->activeWindow(), tr("Archetype error"), tr("Archetype list has duplicate implementations"));
+        return false;
     }
 
     return true;
