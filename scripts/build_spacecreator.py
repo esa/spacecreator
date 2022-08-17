@@ -42,7 +42,13 @@ def build_spacecreator(project_dir: str, build_dir: str, build_type: str, env_di
 
 if __name__ == '__main__':
     # Parse arguments
-    parser = argparse.ArgumentParser(prog='build_spacecreator')
+    parser = argparse.ArgumentParser(prog='build_spacecreator',
+                                     epilog='Example: python3 ./build_spacecreator.py '
+                                            '--project_dir=/home/<user>/projects/spacecreator/ '
+                                            '--build_dir=./build '
+                                            '--build_type=Release'
+                                            '--env_dir=/home/<user>/opt/qtcreatorenv/ '
+                                            '--env_qt_dir /home/<user>/opt/qtcreatorenv/Qt/6.3.1/gcc_64/ ')
 
     parser.add_argument('--project_dir', dest='project_dir', type=str, required=True,
                         help='Path to the folder where spacecreator is located')
@@ -52,7 +58,7 @@ if __name__ == '__main__':
                         help='Release or Debug')
     parser.add_argument('--env_dir', dest='env_dir', type=str, required=True,
                         help='Path to the build environment dir created by prebuild.py')
-    parser.add_argument('--env_qt_distribution_dir', dest='env_qt_distribution_dir', type=str, required=True,
+    parser.add_argument('--env_qt_dir', dest='env_qt_distribution_dir', type=str, required=True,
                         help='Path to the Qt distribution (./Qt/6.3.1/gcc_64/)')
 
     args = parser.parse_args()
