@@ -4,38 +4,35 @@ import argparse
 import os.path
 import subprocess
 import urllib.request
-
 import py7zr
 import zipfile
-
 from utils import join_dir, print_cmd, ensure_dir
-
 
 '''
 This script prepares a build environment in a given folder for SpaceCreator. SpaceCreator is plugin for QtCreator
 and the following is needed to compile it:
 
 Qt
-GrantLee - A template library that arguments Qt
-Qt Creator with header files for plugin development
+GrantLee - A template library that arguments Qt.
+Qt Creator with header files for plugin development.
 
-Requires aqt to be installed. (pip3 install aqtinstall)
+Requires aqt to be installed. (pip3 install aqtinstall).
 '''
 
 
 def build_path_object(env_path: str, qt_version: str):
     """
     Builds an object with named paths for files and folders.
-    :param env_path:
-    :return: an object with attributes named after files and folders
+    :param qt_version: Version of Qt to be used. Format is X.Y.Z
+    :param env_path: path to build environment.
+    :return: an object with attributes named after files and folders.
     """
 
     class Paths:
         env_dir = os.path.abspath(env_path)
-        env_qt_dir = join_dir(env_dir, 'Qt')
-        env_qt_distribution_dir = join_dir(env_qt_dir, qt_version, 'gcc_64')
-        env_app_dir = join_dir(env_dir, 'spacecreator.AppDir')  # This will where TODO
-
+        env_qt_install_dir = join_dir(env_dir, 'Qt')
+        env_qt_dir = join_dir(env_dir, 'Qt', qt_version, 'gcc_64')
+        env_app_dir = join_dir(env_dir, 'spacecreator.AppDir')  # This is where we put QtCreator and the SpaceCreator plugin
     _paths = Paths()
     return _paths
 
@@ -56,8 +53,6 @@ def download_qt(env_qt_path: str, env_qt_version: str) -> None:
         print("Download of Qt {} failed.".format(env_qt_version))
         exit(2)
 
-# debug_info qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtimageformats qtlanguageserver
-# qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtvirtualkeyboard qtwaylandcompositor qtwebchannel qtwebengine qtwebsockets qtwebview
 
 def download_qtcreator(env_path: str, env_qt_version: str, env_app_dir) -> None:
     """
@@ -87,29 +82,29 @@ def download_qtcreator(env_path: str, env_qt_version: str, env_app_dir) -> None:
         zdev.extractall(env_app_dir)  # uncompress qtcreator into AppDir because qtcreator IS the app
 
 
-def download_grantlee(env_path: str) -> None:
+def download_grantlee(env_dir: str) -> None:
     """
     Downloads the source code for Grant Lee's template library.
     """
     #  Download grantlee
     #url = 'https://github.com/steveire/grantlee/archive/v5.2.0.tar.gz'
-    grantlee_compressed = join_dir(env_path, '..', 'grantlee-esa.zip')  # ToDo Download from ESA GitLab
-    print("Uncompressing Grant Lee from {} to {}".format(grantlee_compressed, env_path))
+    grantlee_compressed = join_dir(env_dir, '..', 'grantlee-esa.zip')  # ToDo Download from ESA GitLab
+    print("Uncompressing Grant Lee from {} to {}".format(grantlee_compressed, env_dir))
     # urllib.request.urlretrieve(url, grantlee_compressed)  # download qtcreator.7z to the root of the env folder
     with zipfile.ZipFile(grantlee_compressed, 'r') as z:
-        z.extractall(env_path)
+        z.extractall(env_dir)
 
 
-def build_grantlee(env_path: str, env_qt_distribution_path: str) -> None:
+def build_grantlee(env_dir: str, env_qt_dir: str) -> None:
 
-    cmake_build_dir = join_dir(env_path, 'build')
-    cmake_source_dir = join_dir(env_path, 'grantlee-esa')
+    cmake_build_dir = join_dir(env_dir, 'build')
+    cmake_source_dir = join_dir(env_dir, 'grantlee-esa')
     qmake_dir = join_dir(env_qt_dir, 'bin/qmake')
 
     # Make ninja.build
     ninja_cmd = ['cmake',
                  '-GNinja',
-                 '-DCMAKE_PREFIX_PATH:STRING=' + env_qt_distribution_path,
+                 '-DCMAKE_PREFIX_PATH:STRING=' + env_qt_dir,
                  '-DQT_QMAKE_EXECUTABLE:STRING=' + qmake_dir,
                  '-DCMAKE_BUILD_TYPE=Release',
                  '-DGRANTLEE_BUILD_WITH_QT6=ON',
@@ -130,8 +125,8 @@ def build_grantlee(env_path: str, env_qt_distribution_path: str) -> None:
         exit(4)
 
 
-def install_grantlee(env_path: str) -> None:
-    cmake_build_dir = join_dir(env_path, 'build')
+def install_grantlee(env_dir: str) -> None:
+    cmake_build_dir = join_dir(env_dir, 'build')
     # Install GrantLee lib in /usr/local/ not ideal but it's what we have for now
     install_cmd = ['cmake',
                    '--build',
@@ -150,11 +145,16 @@ def install_grantlee(env_path: str) -> None:
 
 if __name__ == '__main__':
     # Parse arguments
-    parser = argparse.ArgumentParser(prog='prebuild')
-    parser.add_argument('--env_path', dest='env_path', type=str, required=True,
-                        help='Path to the folder that is to contain the build environment')
+    parser = argparse.ArgumentParser(prog='prebuild',
+                                     epilog="Example: python3 ./prebuild.py --output_dirh=/home/<user>/opt/qtcreatorenv "
+                                            "--qt_version='6.3.1' "
+                                            "--qtcreator_version='8.0.1'")
+    parser.add_argument('--output_dir', dest='env_path', type=str, required=True,
+                        help='Where to put the build environment t . This means the '
+                             'specified version of Qt, GrantLee lib and the spacecrator.AppDir which'
+                             ' is the final application')
     parser.add_argument('--qt_version', dest='qt_version', type=str, required=True,
-                        help='Version of Qt to download. Format X.Y.Z')
+                        help='Version of Qt to download to the build environment. Format X.Y.Z')
     parser.add_argument('--qtcreator_version', dest='qtcreator_version', type=str, required=True,
                         help='Version of Qt Creator to download. Format X.Y.Z')
     args = parser.parse_args()
@@ -164,25 +164,17 @@ if __name__ == '__main__':
     qt_version = args.qt_version
     qtcreator_version = args.qtcreator_version
     paths = build_path_object(env_dir, qt_version)
-    env_qt_dir = paths.env_qt_dir
-    env_qt_distribution_dir = paths.env_qt_distribution_dir
-    env_app_dir = join_dir(env_dir, 'spacecreator.AppDir')
 
     # Ensure dirs
-    ensure_dir(env_dir)
-    ensure_dir(env_app_dir)
+    ensure_dir(paths.env_dir)
+    # ensure_dir(paths.env_qt_dir)
+    ensure_dir(paths.env_app_dir)
 
-    # setup Qt and QtCreator with plugin development files
-    download_qt(env_qt_dir, qt_version)
-    download_qtcreator(env_dir, qtcreator_version, env_app_dir)
+    # Setup Qt and QtCreator with plugin development files
+    download_qt(paths.env_qt_install_dir, qt_version)
+    download_qtcreator(env_dir, qtcreator_version, paths.env_app_dir)
 
     # Grant Lee Template Library
     download_grantlee(env_dir)
-    build_grantlee(env_dir, env_qt_distribution_dir)
+    build_grantlee(env_dir, paths.env_qt_dir)
     install_grantlee(env_dir)
-
-
-
-
-# example python3 ./prebuild.py --env_path=/home/fisker/opt/qtcreatorenv --qt_version='6.3.1' --qtcreator_version='8.0.1'
-
