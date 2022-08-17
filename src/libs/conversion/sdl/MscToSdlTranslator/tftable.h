@@ -24,23 +24,59 @@
 
 namespace conversion::sdl::translator {
 
+/**
+ * @brief   Represents a TF table that cointains transitions between states for given sequence
+ */
 class TFTable final
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   sequence        Sequence that should be detected by the state machine
+     * @param   signalCount     Number of possible singals
+     */
     TFTable(const std::vector<uint32_t> &sequence, const uint32_t signalCount);
+    /**
+     * @brief   Deleted copy constructor
+     */
     TFTable(const TFTable &) = delete;
+    /**
+     * @brief   Deleted move constructor
+     */
     TFTable(TFTable &&) = delete;
 
+    /**
+     * @brief   Deleted copy assignment operator
+     */
     TFTable &operator=(const TFTable &) = delete;
+    /**
+     * @brief   Deleted move assignment operator
+     */
     TFTable &operator=(TFTable &&) = delete;
 
 public:
+    /**
+     * @brief   Getter for number of the states in the table
+     *
+     * @return  State count
+     */
     auto stateCount() const -> uint32_t;
+    /**
+     * @brief   Getter for number of the possible signals in the table
+     *
+     * @return  Signal count
+     */
     auto signalCount() const -> uint32_t;
 
+    /**
+     * @brief   Getter for list of transitions for given state
+     *
+     * @param   state       State to get
+     *
+     * @return  List of transitions
+     */
     auto transitionsForState(uint32_t state) const -> const std::vector<uint32_t> &;
-
-    auto print() const -> void;
 
 private:
     auto compute(const std::vector<uint32_t> &sequence) -> void;
