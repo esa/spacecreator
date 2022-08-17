@@ -21,7 +21,8 @@ void controller_PI_Trigger(void)
 {
     asn1SccMyIA5String input = "abcde";
     asn1SccMyIA5String expectedOutput = "bcdef";
-    asn1SccMyIA5String output = "";
-    controller_RI_Iface(&input, &output, sizeof (input));
-    assert(memcmp(output, expectedOutput) == 0);
+    asn1SccMyIA5String output;
+    memset(output, 0x0, 101);
+    controller_RI_Iface(&input, &output);
+    assert(strcmp(output, expectedOutput) == 0);
 }
