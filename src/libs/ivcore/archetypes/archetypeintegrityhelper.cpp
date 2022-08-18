@@ -81,7 +81,6 @@ void ArchetypeIntegrityHelper::checkFunctionArchetypeIntegrity(
 bool ArchetypeIntegrityHelper::checkInterfaceArchetypeIntegrity(
         ivm::IVInterface *interface, ivm::InterfaceArchetype *interfaceArchetype)
 {
-
     if (interface->title() != interfaceArchetype->title()) {
         return false;
     }
@@ -126,14 +125,12 @@ bool ArchetypeIntegrityHelper::checkInterfaceArchetypeIntegrity(
         return false;
     }
 
-    for (auto parameterArchetype : interfaceArchetype->getParameters()) {
-        bool contains = false;
-        for (auto parameter : interface->params()) {
-            if (checkParameterArchetypeIntegrity(parameter, parameterArchetype)) {
-                contains = true;
-            }
-        }
-        if (!contains) {
+    if (interfaceArchetype->getParameters().size() != interface->params().size()) {
+        return false;
+    }
+
+    for (int i = 0; i < interfaceArchetype->getParameters().size(); i++) {
+        if (!checkParameterArchetypeIntegrity(interface->params()[i], interfaceArchetype->getParameters()[i])) {
             return false;
         }
     }
