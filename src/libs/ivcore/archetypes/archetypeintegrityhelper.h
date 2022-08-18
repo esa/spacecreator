@@ -19,31 +19,35 @@
 
 #pragma once
 
-#include "archetypecommonprops.h"
-#include "archetypeobject.h"
-#include "functionarchetype.h"
-#include <QStringList>
+#include <QObject>
+
+namespace shared {
+class VEObject;
+class InterfaceParameter;
+}
 
 namespace ivm {
 
-class ArchetypeLibrary : public ArchetypeObject
+class ArchetypeModel;
+class InterfaceArchetype;
+class ParameterArchetype;
+class IVFunctionType;
+class IVInterface;
+
+class ArchetypeIntegrityHelper : public QObject
 {
     Q_OBJECT
 public:
-    explicit ArchetypeLibrary(const QString &title, QObject *parent = nullptr);
-    ~ArchetypeLibrary() override;
+    ArchetypeIntegrityHelper() = delete;
 
-    bool aboutToBeRemoved() override;
-
-    QVector<FunctionArchetype *> getFunctions() const;
-    FunctionArchetype *getFunctionByName(QString name) const;
-    void addFunction(FunctionArchetype *functionArchetype);
-    void removeFunction(FunctionArchetype *functionArchetype);
-
-    QStringList getFunctionsNames();
+    static void checkArchetypeIntegrity(QList<shared::VEObject *> ivObjects, ivm::ArchetypeModel *archetypesModel);
 
 private:
-    QVector<FunctionArchetype *> m_functions;
+    static void checkFunctionArchetypeIntegrity(ivm::IVFunctionType *function, ivm::ArchetypeModel *archetypesModel);
+    static bool checkInterfaceArchetypeIntegrity(
+            ivm::IVInterface *interface, ivm::InterfaceArchetype *interfaceArchetype);
+    static bool checkParameterArchetypeIntegrity(
+            const shared::InterfaceParameter &parameter, ivm::ParameterArchetype *parameterArchetype);
 };
 
 }

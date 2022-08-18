@@ -70,6 +70,8 @@ target_sources(${LIB_NAME} PRIVATE
     archetypes/archetypecommonprops.cpp
     archetypes/archetypexmlreader.h
     archetypes/archetypexmlreader.cpp
+    archetypes/archetypeintegrityhelper.h
+    archetypes/archetypeintegrityhelper.cpp
     )
 
 target_include_directories(${LIB_NAME}

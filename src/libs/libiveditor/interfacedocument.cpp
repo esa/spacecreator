@@ -754,8 +754,8 @@ void InterfaceDocument::showInfoMessage(const QString &title, const QString &mes
     QMessageBox::information(qobject_cast<QWidget *>(parent()), title, message);
 }
 
-static inline bool exportObjects(
-        IVExporter *exporter, const QList<shared::VEObject *> &objects, const QString &filePath)
+static inline bool exportObjects(IVExporter *exporter, const QList<shared::VEObject *> &objects,
+        ivm::ArchetypeModel *archetypesModel, const QString &filePath)
 {
     QBuffer buffer;
     if (!buffer.open(QIODevice::WriteOnly)) {
@@ -763,7 +763,7 @@ static inline bool exportObjects(
                 shared::ErrorItem::Error, QObject::tr("Can't open buffer for exporting: %1").arg(buffer.errorString()));
         return false;
     }
-    if (!exporter->exportObjects(objects, &buffer)) {
+    if (!exporter->exportObjects(objects, &buffer, archetypesModel)) {
         shared::ErrorHub::addError(shared::ErrorItem::Error, QObject::tr("Error during component export"));
         return false;
     }
@@ -868,7 +868,7 @@ bool InterfaceDocument::exportImpl(QString &targetPath, const QList<shared::VEOb
         (*it)->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name), targetDir.dirName());
     }
 
-    if (!exportObjects(exporter(), objects, targetDir.filePath(shared::kDefaultInterfaceViewFileName))) {
+    if (!exportObjects(exporter(), objects, d->archetypesModel, targetDir.filePath(shared::kDefaultInterfaceViewFileName))) {
         return false;
     }
 

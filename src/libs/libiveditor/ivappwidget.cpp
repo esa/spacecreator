@@ -233,7 +233,7 @@ void IVAppWidget::copyItems()
             objects.append(object);
         }
     }
-    if (!m_document->exporter()->exportObjects(objects, &buffer)) {
+    if (!m_document->exporter()->exportObjects(objects, &buffer, m_document->archetypesModel())) {
         shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
         return;
     }
@@ -317,7 +317,7 @@ void IVAppWidget::importEntity(const shared::Id &id, const QPointF &sceneDropPoi
         return;
     }
 
-    if (!m_document->exporter()->exportObjects({ obj }, &buffer)) {
+    if (!m_document->exporter()->exportObjects({ obj }, &buffer, m_document->archetypesModel())) {
         shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
         return;
     }

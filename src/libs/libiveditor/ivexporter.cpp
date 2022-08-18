@@ -17,15 +17,14 @@
 
 #include "ivexporter.h"
 
+#include "archetypes/archetypemodel.h"
+#include "archetypes/archetypeintegrityhelper.h"
 #include "common.h"
 #include "interfacedocument.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
 #include "ivfunction.h"
-#include "ivfunctiontype.h"
-#include "ivinterface.h"
-#include "ivobject.h"
 #include "stringtemplate.h"
 #include "templateeditor.h"
 #include "templating/exportableivconnection.h"
@@ -59,18 +58,21 @@ QString IVExporter::defaultTemplatePath() const
    @brief XmlDocExporter::exportObjects writes the document as xml to the given buffer
    @param objects the set of IV(AADL) entities
    @param outBuffer the buffer that is open and ready to be written to
+   @param archetypesModel model of archetypes for archetypes check, if null then no check
    @param templatePath the grantlee template to use for the export. If empty, the default one is used
    @return true when the export was successful.
  */
-bool IVExporter::exportObjects(
-        const QList<shared::VEObject *> &objects, QBuffer *outBuffer, const QString &templatePath)
+bool IVExporter::exportObjects(const QList<shared::VEObject *> &objects, QBuffer *outBuffer,
+        ivm::ArchetypeModel *archetypesModel, const QString &templatePath)
 {
+    ivm::ArchetypeIntegrityHelper::checkArchetypeIntegrity(objects, archetypesModel);
     const QHash<QString, QVariant> ivObjects = collectObjects(objects);
     return exportData(ivObjects, templatePath, outBuffer);
 }
 
 bool IVExporter::exportDocSilently(InterfaceDocument *doc, const QString &outPath, const QString &templatePath)
 {
+    ivm::ArchetypeIntegrityHelper::checkArchetypeIntegrity(doc->objects().values(), doc->archetypesModel());
     const QHash<QString, QVariant> ivObjects = collectInterfaceObjects(doc);
     return exportData(ivObjects, outPath.isEmpty() ? doc->path() : outPath, templatePath, InteractionPolicy::Silently);
 }
@@ -78,6 +80,7 @@ bool IVExporter::exportDocSilently(InterfaceDocument *doc, const QString &outPat
 bool IVExporter::exportDocInteractively(
         InterfaceDocument *doc, const QString &outPath, const QString &templatePath, QWidget *root)
 {
+    ivm::ArchetypeIntegrityHelper::checkArchetypeIntegrity(doc->objects().values(), doc->archetypesModel());
     const QHash<QString, QVariant> ivObjects = collectInterfaceObjects(doc);
     return exportData(
             ivObjects, outPath.isEmpty() ? doc->path() : outPath, templatePath, InteractionPolicy::Interactive, root);

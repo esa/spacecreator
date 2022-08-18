@@ -24,8 +24,13 @@
 
 class QBuffer;
 class QWidget;
+
+namespace shared {
+class VEObject;
+}
+
 namespace ivm {
-class IVObject;
+class ArchetypeModel;
 }
 
 namespace ive {
@@ -38,8 +43,8 @@ public:
     explicit IVExporter(QObject *parent = nullptr);
     QString defaultTemplatePath() const override;
 
-    bool exportObjects(
-            const QList<shared::VEObject *> &objects, QBuffer *outBuffer, const QString &templatePath = QString());
+    bool exportObjects(const QList<shared::VEObject *> &objects, QBuffer *outBuffer,
+            ivm::ArchetypeModel *archetypesModel = nullptr, const QString &templatePath = QString());
 
     bool exportDocSilently(
             InterfaceDocument *doc, const QString &outPath = QString(), const QString &templatePath = QString());
