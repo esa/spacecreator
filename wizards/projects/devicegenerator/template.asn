@@ -1,19 +1,27 @@
-%{Model}-DATAVIEW DEFINITIONS ::= BEGIN
+COMMDEVTEST1-DATAVIEW DEFINITIONS ::= BEGIN
 
-    MyInteger ::= INTEGER (0 .. 10000)
+    SystemBus ::= INTEGER (0 .. 255)
 
-    SystemBus ::= ENUMERATED { hello, world, how-are-you } --(Broker)enum SystemBus valid_buses[SYSTEM_BUSES_NUMBER]
+    RemoteInterface ::= INTEGER (0 .. 255)
+
+    InputDataPtr ::= INTEGER (0 .. 255)
+
+    OutputDataPtr ::= INTEGER (0 .. 255)
+
+    DataLength ::= INTEGER (-2147483648 .. 2147483647)
+
+    SystemBusSeq ::= SEQUENCE (SIZE (255)) OF SystemBus --(Broker)enum SystemBus valid_buses[SYSTEM_BUSES_NUMBER]
 
     DeliverRequestSeq ::= SEQUENCE{
-        interface MyInteger, --(Broker)const enum RemoteInterface
-        data MyInteger, --(Broker)const uint8_t* const
-        length MyInteger --(Broker)const size_t
+        interface RemoteInterface, --(Broker)const enum RemoteInterface
+        data InputDataPtr, --(Broker)const uint8_t* const
+        length DataLength --(Broker)const size_t
     }
 
     ReceiveRequestSeq ::= SEQUENCE{
-        bus-id MyInteger, --(Broker)enum SystemBus
-        data MyInteger, --(Broker)uint8_t* const
-        length MyInteger --(Broker)const size_t
+        bus-id SystemBus, --(Broker)enum SystemBus
+        data OutputDataPtr, --(Broker)uint8_t* const
+        length DataLength --(Broker)const size_t
     }
 
     -- ASN.1 Type definitions must start with an uppercase
