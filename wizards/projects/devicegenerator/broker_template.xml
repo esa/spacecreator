@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<InterfaceView%{IVAsnFile}>
+
+<Function name="Broker" is_type="NO" instance_of="" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
+    <Property name="Taste::coordinates" value="6600 28800 26600 41100"/>
+<Provided_Interface name="Init" kind="Any" layer="default" required_system_element="NO">
+    <Input_Parameter name="ValidBusses" type="SystemBus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="25700 31900"/>
+</Provided_Interface>
+
+<Provided_Interface name="Deliver" kind="Sporadic" layer="default" required_system_element="NO" stack_size="1024" miat="0" queue_size="1" priority="1" wcet="0">
+    <Input_Parameter name="DeliverSeq" type="DeliverRequestSeq" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26000 34700"/>
+</Provided_Interface>
+
+<Provided_Interface name="Receive" kind="Sporadic" layer="default" required_system_element="NO" stack_size="1024" miat="0" queue_size="1" priority="1" wcet="0">
+    <Input_Parameter name="ReceiveSeq" type="ReceiveRequestSeq" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26600 37600"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Comment name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3" required_system_element="NO">
+    <Property name="Taste::coordinates" value="4800 5100 46100 20700"/>
+</Comment>
+
+<Layer name="default"/>
+
+</InterfaceView>
