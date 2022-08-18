@@ -46,10 +46,9 @@ void ChartTranslator::translateChart(const MscChart *mscChart)
     case ObserverType::Never:
         m_neverSequenceTranslator.createObserver(mscChart);
         break;
-    case ObserverType::When: {
+    case ObserverType::When:
         m_whenSequenceTranslator.createObserver(mscChart);
         break;
-    } break;
     case ObserverType::None: {
         auto errorMessage = QString(
                 "Cannot translate chart '%1' - first chart item is not a \"never\" nor \"when\" shared condition")

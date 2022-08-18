@@ -69,10 +69,8 @@ public:
 private:
     struct Context {
         QString chartName;
-        std::set<QString> messages;
-        std::unordered_map<uint32_t, std::unique_ptr<::sdl::Rename>> signals;
         std::vector<uint32_t> sequence;
-        ::sdl::State *startState;
+        std::unordered_map<uint32_t, std::unique_ptr<::sdl::Rename>> signals;
         ::sdl::State *errorState;
         std::size_t signalCounter;
     };

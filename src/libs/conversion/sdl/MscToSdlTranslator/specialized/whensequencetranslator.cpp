@@ -21,40 +21,52 @@
 
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
-#include <conversion/msc/MscOptions/options.h>
+#include <msccore/msccondition.h>
 #include <sdl/SdlModel/nextstate.h>
-#include <sdl/SdlModel/variabledeclaration.h>
 
-using conversion::msc::MscOptions;
 using conversion::translator::TranslationException;
 using msc::MscChart;
+using msc::MscCondition;
 using msc::MscEntity;
 using msc::MscInstanceEvent;
 using msc::MscMessage;
-using sdl::Block;
 using sdl::Input;
 using sdl::NextState;
-using sdl::Process;
 using sdl::Rename;
 using sdl::SdlModel;
 using sdl::State;
 using sdl::StateMachine;
-using sdl::System;
 using sdl::Transition;
-using sdl::VariableDeclaration;
 
 namespace conversion::sdl::translator {
 
 WhenSequenceTranslator::WhenSequenceTranslator(SdlModel *sdlModel, const Options &options)
-    : m_sdlModel(sdlModel)
-    , m_options(options)
+    : SequenceTranslator(sdlModel, options)
 {
 }
 
 void WhenSequenceTranslator::createObserver(const MscChart *mscChart)
 {
     auto context = collectData(mscChart);
-    createSdlSystem(context);
+
+    if (context.mode == Mode::When) {
+        auto errorMessage = QString("When sequence without 'then' or 'then-not' in chart %1").arg(context.chartName);
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    auto stateMachine = createStateMachine(context);
+
+    auto process = createSdlProcess(context.chartName, std::move(stateMachine));
+    process.addErrorState(m_errorStateName);
+    process.addSuccessState(context.successState->name());
+
+    auto system = createSdlSystem(context.chartName, std::move(process));
+    for (auto &[id, signalRename] : context.signals) {
+        system.addSignal(std::move(signalRename));
+    }
+    system.createRoutes(m_defaultChannelName, m_defaultRouteName);
+
+    m_sdlModel->addSystem(std::move(system));
 }
 
 WhenSequenceTranslator::Context WhenSequenceTranslator::collectData(const MscChart *mscChart) const
@@ -62,6 +74,7 @@ WhenSequenceTranslator::Context WhenSequenceTranslator::collectData(const MscCha
     Context context;
     context.chartName = Escaper::escapeSdlName(mscChart->name());
     context.signalCounter = 0;
+    context.mode = Mode::When;
 
     const auto &mscEvents = mscChart->instanceEvents();
     for (auto it = std::next(mscEvents.begin()); it != mscEvents.end(); ++it) {
@@ -78,6 +91,10 @@ void WhenSequenceTranslator::handleEvent(
     case MscEntity::EntityType::Message: {
         const auto mscMessageEvent = dynamic_cast<const MscMessage *>(mscEvent);
         handleMessageEvent(context, mscMessageEvent);
+    } break;
+    case MscEntity::EntityType::Condition: {
+        const auto mscConditionEvent = dynamic_cast<const MscCondition *>(mscEvent);
+        handleConditionEvent(context, mscConditionEvent);
     } break;
     case MscEntity::EntityType::Coregion: {
         throw TranslationException("Coregion for when observer is not yet implemented");
@@ -99,6 +116,8 @@ void WhenSequenceTranslator::handleMessageEvent(
     const auto signalRenamed = std::find_if(context.signals.begin(), context.signals.end(),
             [&](auto &&sig) { return sig.second->referencedName() == mscMessage->name(); });
 
+    uint32_t sequenceValue = 0;
+
     if (signalRenamed == context.signals.end()) {
         auto signalRename = std::make_unique<Rename>();
         signalRename->setName(m_signalRenameNameTemplate.arg(context.signalCounter));
@@ -108,123 +127,120 @@ void WhenSequenceTranslator::handleMessageEvent(
 
         context.signals.insert({ context.signalCounter, std::move(signalRename) });
 
-        context.sequence.push_back(context.signalCounter++);
+        sequenceValue = context.signalCounter++;
     } else {
-        context.sequence.push_back(signalRenamed->first);
+        sequenceValue = signalRenamed->first;
     }
-}
 
-void WhenSequenceTranslator::createSdlSystem(WhenSequenceTranslator::Context &context)
-{
-    auto process = createSdlProcess(context);
-
-    Block block(context.chartName);
-    block.setProcess(std::move(process));
-
-    System system(context.chartName);
-    system.setBlock(std::move(block));
-
-    if (m_options.isSet(MscOptions::simuDataViewFilepath)) {
-        const auto simuDataViewFilepath = *m_options.value(MscOptions::simuDataViewFilepath);
-        auto useDatamodel = QString("use datamodel comment '%1'").arg(simuDataViewFilepath);
-
-        system.addFreeformText(std::move(useDatamodel));
+    if (context.mode == Mode::When) {
+        context.whenSequence.push_back(sequenceValue);
     } else {
-        system.addFreeformText("use datamodel comment 'observer.asn'");
+        context.thenSequence.push_back(sequenceValue);
     }
-
-    for (auto &[id, signalRename] : context.signals) {
-        system.addSignal(std::move(signalRename));
-    }
-
-    system.createRoutes(m_defaultChannelName, m_defaultRouteName);
-
-    m_sdlModel->addSystem(std::move(system));
 }
 
-Process WhenSequenceTranslator::createSdlProcess(const WhenSequenceTranslator::Context &context)
+void WhenSequenceTranslator::handleConditionEvent(
+        WhenSequenceTranslator::Context &context, const MscCondition *mscCondition) const
 {
-    Process process;
-    process.setName(context.chartName);
+    if (!mscCondition->shared()) {
+        auto errorMessage =
+                QString("Encountered a condition that is not shared in when observer %1").arg(context.chartName);
+        throw TranslationException(std::move(errorMessage));
+    }
 
-    auto stateMachine = createStateMachine(context);
+    if (context.mode == Mode::Then) {
+        auto errorMessage = QString("Encountered a condition while already handling 'then' in when observer %1")
+                                    .arg(context.chartName);
+        throw TranslationException(std::move(errorMessage));
+    } else if (context.mode == Mode::ThenNot) {
+        auto errorMessage = QString("Encountered a condition while already handling 'then not' in when observer %1")
+                                    .arg(context.chartName);
+        throw TranslationException(std::move(errorMessage));
+    }
 
-    const auto startState = stateMachine->states().front().get();
+    const auto &mscConditionName = mscCondition->name();
 
-    auto startTransition = std::make_unique<Transition>();
-    startTransition->addAction(std::make_unique<NextState>("", startState));
-    process.setStartTransition(std::move(startTransition));
-
-    auto eventMonitorVariable = std::make_unique<VariableDeclaration>("event", "Observable_Event", true);
-    process.addVariable(std::move(eventMonitorVariable));
-
-    process.setStateMachine(std::move(stateMachine));
-
-    return process;
+    if (mscConditionName.toLower() == m_observerNameThen) {
+        context.mode = Mode::Then;
+    } else if (mscConditionName.toLower() == m_observerNameThenNot) {
+        context.mode = Mode::ThenNot;
+    } else {
+        auto errorMessage = QString("Encountered a condition with unknown name '%1' in when observer %2")
+                                    .arg(mscConditionName)
+                                    .arg(context.chartName);
+        throw TranslationException(std::move(errorMessage));
+    }
 }
 
-std::unique_ptr<StateMachine> WhenSequenceTranslator::createStateMachine(
-        const WhenSequenceTranslator::Context &context) const
+std::unique_ptr<StateMachine> WhenSequenceTranslator::createStateMachine(WhenSequenceTranslator::Context &context) const
 {
-    TFTable table(context.sequence, context.signals.size());
-
-    auto states = createStates(table.stateCount());
-    auto transitions = createTransitions(table, states);
-
     auto stateMachine = std::make_unique<StateMachine>();
+
+    auto states = createStates(context.whenSequence.size() + context.thenSequence.size());
+    context.successState = states.back().get();
+
+    TFTable table(context.whenSequence, context.signals.size());
+    auto whenTransitions = createTransitions(table, states, 0);
+    for (auto &transition : whenTransitions) {
+        stateMachine->addTransition(std::move(transition));
+    }
+
+    if (context.mode == Mode::Then) {
+        auto thenTransitions = createThenTransitions(context, states, context.whenSequence.size());
+        for (auto &transition : thenTransitions) {
+            stateMachine->addTransition(std::move(transition));
+        }
+    } else if (context.mode == Mode::ThenNot) {
+        throw TranslationException("ThenNot sequences not yet implemented");
+    }
 
     for (auto &state : states) {
         stateMachine->addState(std::move(state));
     }
 
-    for (auto &transition : transitions) {
-        stateMachine->addTransition(std::move(transition));
-    }
-
     return stateMachine;
 }
 
-WhenSequenceTranslator::StateList WhenSequenceTranslator::createStates(const uint32_t stateCount) const
+WhenSequenceTranslator::TransitionList WhenSequenceTranslator::createThenTransitions(
+        WhenSequenceTranslator::Context &context, StateList &states, const uint32_t startStateId) const
 {
-    std::vector<std::unique_ptr<State>> states;
+    auto errorState = std::make_unique<State>();
+    errorState->setName(m_errorStateName);
 
-    for (uint32_t stateId = 0; stateId <= stateCount; ++stateId) {
-        auto state = std::make_unique<State>();
-        state->setName(m_stateNameTemplate.arg(stateId));
+    auto errorTransition = std::make_unique<Transition>();
+    errorTransition->addAction(std::make_unique<NextState>(errorState->name(), errorState.get()));
 
-        states.push_back(std::move(state));
-    }
-
-    return states;
-}
-
-WhenSequenceTranslator::TransitionList WhenSequenceTranslator::createTransitions(
-        const TFTable &table, StateList &states) const
-{
     std::vector<std::unique_ptr<Transition>> transitions;
 
-    for (uint32_t stateId = 0; stateId < table.stateCount(); ++stateId) {
-        const auto &transitionsForState = table.transitionsForState(stateId);
+    uint32_t stateId = startStateId;
 
-        for (uint32_t signalId = 0; signalId < transitionsForState.size(); ++signalId) {
-            const auto targetStateId = transitionsForState.at(signalId);
+    for (const auto &signalId : context.thenSequence) {
+        const auto signalName = m_signalRenameNameTemplate.arg(signalId);
+        auto sourceState = states.at(stateId).get();
+        const auto targetState = states.at(stateId + 1).get();
 
-            const auto signalName = m_signalRenameNameTemplate.arg(signalId);
-            auto sourceState = states.at(stateId).get();
-            const auto targetState = states.at(targetStateId).get();
+        auto transition = std::make_unique<Transition>();
+        transition->addAction(std::make_unique<NextState>(targetState->name(), targetState));
 
-            auto transition = std::make_unique<Transition>();
-            transition->addAction(std::make_unique<NextState>(targetState->name(), targetState));
+        auto input = std::make_unique<Input>();
+        input->setName(signalName);
+        input->setTransition(transition.get());
 
-            auto input = std::make_unique<Input>();
-            input->setName(signalName);
-            input->setTransition(transition.get());
+        sourceState->addInput(std::move(input));
 
-            sourceState->addInput(std::move(input));
+        auto errorInput = std::make_unique<Input>();
+        errorInput->setName(m_anySignalName);
+        errorInput->setTransition(errorTransition.get());
 
-            transitions.push_back(std::move(transition));
-        }
+        sourceState->addInput(std::move(errorInput));
+
+        transitions.push_back(std::move(transition));
+
+        ++stateId;
     }
+
+    states.push_back(std::move(errorState));
+    transitions.push_back(std::move(errorTransition));
 
     return transitions;
 }

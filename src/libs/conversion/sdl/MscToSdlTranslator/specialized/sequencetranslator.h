@@ -72,8 +72,11 @@ protected:
             const ::sdl::State *targetState) const -> std::unique_ptr<::sdl::Transition>;
 
 protected:
+    inline static const QString m_observerNameThen = "then";
+    inline static const QString m_observerNameThenNot = "then not";
     inline static const QString m_stateNameTemplate = "s%1";
     inline static const QString m_signalRenameNameTemplate = "sig%1";
+    inline static const QString m_errorStateName = "sErr";
     inline static const QString m_anySignalName = "*";
     inline static const QString m_defaultChannelName = "c";
     inline static const QString m_defaultRouteName = "r";
