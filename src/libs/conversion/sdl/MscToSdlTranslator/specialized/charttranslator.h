@@ -21,6 +21,7 @@
 
 #include "observertype.h"
 #include "specialized/neversequencetranslator.h"
+#include "specialized/whensequencetranslator.h"
 
 #include <msccore/mscchart.h>
 #include <sdl/SdlModel/sdlmodel.h>
@@ -75,6 +76,7 @@ private:
 
 private:
     NeverSequenceTranslator m_neverSequenceTranslator;
+    WhenSequenceTranslator m_whenSequenceTranslator;
 };
 
 } // namespace conversion::sdl::translator
